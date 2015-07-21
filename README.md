@@ -21,3 +21,9 @@ VDMJ is a command line tool, but it is used by the Overture project, which adds 
 ###Screen Shots
 ![Help](/screenshots/help.jpg?raw=true "Help")
 ![Precondition failure](/screenshots/precondition.jpg?raw=true "Precondition failure")
+
+###Documentation
+* ![User Guide](/FJ-VDMJ/documentation/UserGuide.pdf "User Guide")
+* ![One Page Guide](/FJ-VDMJ/documentation/OnePageGuide.pdf "One Page Guide")
+* ![High Precision Guide](/FJ-VDMJ/documentation/HighPrecisionGuide.pdf "High Precision Guide")
+* ![VDMJUnit Guide](/FJ-VDMJ/documentation/VDMJUnit.pdf "VDMJUnit Guide")
