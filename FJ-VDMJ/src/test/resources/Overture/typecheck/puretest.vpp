@@ -1,0 +1,52 @@
+class A
+instance variables
+	public x:nat := 0;
+	inv x < impop();
+	
+values
+	v = 123;
+
+operations
+	pure A: () ==> A
+	A() == 
+	(
+		dcl z:nat := 0;
+		duration (impop()) z := 123
+	);
+
+	pure async public op: () ==> nat
+	op() ==
+	(
+		duration (impop()) x := impop();
+		return x
+	);
+
+	public impop: () ==> nat
+	impop() == return op()
+	pre x > op()
+	post x < op();
+	
+	pure void() == skip;
+
+sync
+	per op => #fin(op) > 0;
+	mutex(op, impop)
+	
+thread
+	periodic(0,0,0,impop()) (void)
+	
+end A
+
+class B is subclass of A
+operations
+	public op: () ==> nat
+	op() == return 0;
+	
+end B
+
+class Test
+functions
+	public f: A -> nat
+	f(a) == a.impop() + a.pre_impop(a);
+
+end Test

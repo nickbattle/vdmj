@@ -1,0 +1,36 @@
+VDMJC Release Notes
+
+Latest Changes in version 3.0.1
+
+2013-11-19 Updated vdmjc.properties for VDMJ 3.0.1
+2013-09-26 Released.
+
+Change history of version 2.0.1
+
+2013-01-29 Added RELEASE_NOTES file
+
+Historical Changes:
+
+2013-01-15 Added -path command line option
+2012-09-22 Small README tweak
+2012-09-11 Correct VDMJC Maven groupId
+2012-08-04 Small POM tweaks
+2012-07-31 Updated the READMEs for Maven
+2012-07-31 Updated to use Maven and pom.xml for building
+2012-03-06 Cleaned up some warnings
+2011-06-02 Added Class-Path to manifest files
+2011-05-12 Added jar version number and -v option
+2011-04-17 Relative path to VDMJ jar in vdmjc.properties
+2011-03-05 Added "word" and "release" commands to VDMJC
+2011-02-07 Add remote debug JVM options to vdmjc.properties
+2010-11-20 Prevent log command for SL and PP
+2010-11-18 Small VDMJC synchronization tweak
+2010-11-18 Add debugtrace to help
+2010-10-22 Add "." to MANIFEST.MF for VDMJ and VDMJC
+2010-10-21 Small fix for XML quoting in expressions
+2010-10-21 Clean up the name and location of jar files
+2010-10-13 Initial checkin
+2010-10-13 Initial import.
+
+For earlier changes, see the subversion history at:
+https://sourceforge.net/p/vdmj/code/commit_browser

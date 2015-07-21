@@ -1,0 +1,142 @@
+Index: pom.xml
+===================================================================
+--- pom.xml	(revision 465)
++++ pom.xml	(working copy)
+@@ -4,7 +4,7 @@
+ 	<groupId>com.fujitsu</groupId>
+ 	<artifactId>vdmjunit</artifactId>
+ 	<name>VDMJUnit</name>
+-	<version>1.0.0</version>
++	<version>1.0.0-P</version>
+ 
+ 	<properties>
+ 		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
+@@ -33,7 +33,7 @@
+ 		<dependency>
+ 			<groupId>com.fujitsu</groupId>
+ 			<artifactId>vdmj</artifactId>
+-			<version>3.0.1</version>
++			<version>3.0.1-P</version>
+ 		</dependency>
+ 	</dependencies>
+ 
+Index: src/main/java/vdmjunit/VDMJUnitTest.java
+===================================================================
+--- src/main/java/vdmjunit/VDMJUnitTest.java	(revision 465)
++++ src/main/java/vdmjunit/VDMJUnitTest.java	(working copy)
+@@ -23,7 +23,10 @@
+ 
+ package vdmjunit;
+ 
++import java.math.BigDecimal;
++import java.math.BigInteger;
+ import java.nio.charset.Charset;
++
+ import static org.junit.Assert.fail;
+ 
+ import org.overturetool.vdmj.Release;
+@@ -207,7 +210,7 @@
+ 	 * 			or the specification has not been initialized, or if the result is not
+ 	 * 			a VDM integer value.
+ 	 */
+-	protected long runInt(String expression) throws Exception
++	protected BigInteger runInt(String expression) throws Exception
+ 	{
+ 		return run(expression).intValue(null);
+ 	}
+@@ -222,7 +225,7 @@
+ 	 * 			or the specification has not been initialized, or if the result is not
+ 	 * 			a VDM real value.
+ 	 */
+-	protected double runReal(String expression) throws Exception
++	protected BigDecimal runReal(String expression) throws Exception
+ 	{
+ 		return run(expression).realValue(null);
+ 	}
+Index: src/test/java/vdmjunit/PPTest.java
+===================================================================
+--- src/test/java/vdmjunit/PPTest.java	(revision 465)
++++ src/test/java/vdmjunit/PPTest.java	(working copy)
+@@ -26,6 +26,8 @@
+ import static org.junit.Assert.assertEquals;
+ import static org.junit.Assert.fail;
+ 
++import java.math.BigInteger;
++
+ import org.junit.Before;
+ import org.junit.BeforeClass;
+ import org.junit.Test;
+@@ -51,14 +53,14 @@
+ 	public void one() throws Exception
+ 	{
+ 		create("object", "new A()");
+-		assertEquals(2, runInt("object.f(1)"));
++		assertEquals(new BigInteger("2"), runInt("object.f(1)"));
+ 	}
+ 	
+ 	@Test
+ 	public void two() throws Exception
+ 	{
+ 		create("object", "new A()");
+-		assertEquals(123, runInt("object.getValue()"));
++		assertEquals(new BigInteger("123"), runInt("object.getValue()"));
+ 	}
+ 	
+ 	@Test
+Index: src/test/java/vdmjunit/RTTest.java
+===================================================================
+--- src/test/java/vdmjunit/RTTest.java	(revision 465)
++++ src/test/java/vdmjunit/RTTest.java	(working copy)
+@@ -25,9 +25,12 @@
+ 
+ import static org.junit.Assert.assertEquals;
+ 
++import java.math.BigInteger;
++
+ import org.junit.Before;
+ import org.junit.BeforeClass;
+ import org.junit.Test;
++
+ import vdmjunit.VDMJUnitTestRT;
+ 
+ public class RTTest extends VDMJUnitTestRT
+@@ -47,6 +50,6 @@
+ 	@Test
+ 	public void one() throws Exception
+ 	{
+-		assertEquals(321, runInt("obj.Get2(obj2)"));
++		assertEquals(new BigInteger("321"), runInt("obj.Get2(obj2)"));
+ 	}
+ }
+Index: src/test/java/vdmjunit/SLTest.java
+===================================================================
+--- src/test/java/vdmjunit/SLTest.java	(revision 465)
++++ src/test/java/vdmjunit/SLTest.java	(working copy)
+@@ -25,6 +25,8 @@
+ 
+ import static org.junit.Assert.assertEquals;
+ 
++import java.math.BigInteger;
++
+ import org.junit.Before;
+ import org.junit.BeforeClass;
+ import org.junit.Test;
+@@ -50,15 +52,15 @@
+ 	{
+ 		setDefault("A");
+ 		run("setValue(123)");
+-		assertEquals(123, runInt("getValue()"));
++		assertEquals(new BigInteger("123"), runInt("getValue()"));
+ 	}
+ 	
+ 	@Test
+ 	public void two() throws Exception
+ 	{
+-		assertEquals(100, runInt("B`g(99)"));
++		assertEquals(new BigInteger("100"), runInt("B`g(99)"));
+ 		setDefault("B");
+-		assertEquals(2, runInt("g(1)"));
++		assertEquals(new BigInteger("2"), runInt("g(1)"));
+ 	}
+ 	
+ 	@Test

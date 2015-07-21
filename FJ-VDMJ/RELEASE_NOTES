@@ -1,0 +1,217 @@
+VDMJ Release Notes
+
+For more detail of these changes, and to be notified of future changes, subscribe to
+https://lists.sourceforge.net/lists/listinfo/vdmj-news.
+
+Latest Changes in version 3.0.1
+
+2015-07-15 Added type checking for pure operations (RM#27)
+2015-07-10 Fix for invariants failing in some cases
+2015-07-07 Enable object field updates to trigger invariants
+2015-07-05 Allow functions to access instance variables of arguments
+2015-06-04 Prevent static constructors and limit constructor calling
+2015-05-21 Correction to type check of let constants
+2015-05-19 Correction to type invariants on char/bool/token
+2015-05-02 Prevent RESULT in definition names
+2015-03-24 Fix to typecheck of forward references
+2015-03-18 Fix to typecheck of map/seq override operator
+2015-03-14 Fix to typecheck of subset and psubset
+2015-03-03 Correction for is_ handling of function types
+2015-02-17 Created 3.0.1-P jar for arbitrary precision arithmetic
+2015-01-31 Fix for combinatorial trace stemming
+2015-01-29 Correction for dev, rem and mod by zero
+2015-01-26 Correction to static data initialization
+2015-01-21 Fix to type check of set ranges
+2015-01-19 Fix to type check of object field designators
+2014-12-23 Fix for runtime exception handling during initialization
+2014-12-17 Correction to type check of self-referential definitions
+2014-11-11 Correction to conversion of composed function values
+2014-11-10 Fix IO`freadval to use specification charset
+2014-11-09 Correction for object reference comparisons
+2014-11-04 Introduce the -exceptions flag to throw <RuntimeException> 
+2014-10-30 Correct problem with type check of unary minus expressions
+2014-10-24 Fix for membership test of recursive types
+2014-10-23 Correction to externals clause type checking
+2014-09-28 Added implementation of Object Patterns (RM#25)
+2014-08-19 Detect spurious trailing tokens in flat specifications
+2014-07-25 Disable periodic and sporadic threads for VDM++
+2014-07-23 Type checker correction for abstract subclass detection
+2014-07-07 Account for is_ expressions in and clauses
+2014-07-06 Fix for type check of optional union types
+2014-07-05 Correct type check of undefined values
+2014-07-02 Correct type check error with record field values
+2014-06-23 Fix type checker to report errors for private abstract fn/ops
+2014-06-23 Fix for maplet patterns and possible type matching
+2014-05-22 Account for is_ expressions in type checker
+2014-05-21 Set intersect can fail with named types
+2014-05-20 Correct type check of while statement condition
+2014-05-16 Enable type restrictions on UpdatableValues
+2014-05-08 Prevent inheritance of private constructors
+2014-05-08 Correction to listener handling in value assignments
+2014-05-08 Correct guards for static operations and variables
+2014-05-06 Correction for guards with uninitialized field expressions
+2014-05-01 Change SL state record types to reflect any state invariant
+2014-04-27 Fixed toString in set comprehensions and field number expressions
+2014-04-26 POG fix for implicit operation post contexts
+2014-04-26 POG fix to add an implies context in ImpliesExpressions
+2014-04-03 Type constraint fix for variable assignments
+2014-04-03 Correction for type invariant pattern mismatches
+2014-03-28 Correction for function value assignments
+2014-03-23 Type constraint fixes for card, len, mk_() and set ranges
+2014-03-22 Correction to type checking of set intersections
+2014-03-20 First cut of type constraints for Statements
+2014-03-20 Type corrections for iota and map/set/seq comprehensions
+2014-03-19 Correction for map compose calls with incompatible dom/rng
+2014-03-19 And more fixes for type-constrained expressions
+2014-03-18 Yet more fixes for type-constrained expressions
+2014-03-17 More fixes for type-constrained expressions
+2014-03-14 Typechecker fixes for type-constrained expressions
+2014-02-13 Fix to text and location of warning 5010
+2014-02-09 Correction to merge for incompatible maps
+2014-02-07 Added type check correction for constructor return statements
+2014-01-22 Missing type error for value definitions calling operations
+2014-01-15 Correction for checking nested compose types
+2014-01-10 Corrections for compose type handling
+2014-01-06 Further correction to atomic evaluation
+2014-01-01 Allow VDM-SL traces to see state data
+2013-12-18 Correction to VDMUtil`seq_of_char2val for quoted characters
+2013-12-13 Correct detection of recursive functions with lambda expressions
+2013-12-11 Allow "T = compose R of ... end" to define both T and R
+2013-12-11 Prevent the definition of a new T tag for "T = R"
+2013-11-27 Correction to atomic evaluation with class invariants
+2013-11-22 Correction to satisfiability POs
+2013-11-21 Removed the "nil" type from the parser
+2013-11-19 Allow breakpoints on class invariant expressions
+2013-11-16 Correct type checking of static calls to non static operations
+2013-11-15 Allow static operation postconditions to use "old" static data
+2013-11-11 Corrected scheduling policy unfairness that affects stop ordering
+2013-11-11 Only allow stop to work on the same CPU as the caller
+2013-10-30 Fix breakpoints with "for" statement without "by" clause
+2013-10-30 Correction to type checking of nil returns
+2013-10-28 Type checker correction for "while true" loops
+2013-10-22 Corrections to type check of static operation guards
+2013-10-21 Correction for sync guards on static operations
+2013-09-30 Correction for two successive stop calls
+2013-09-27 Correction for deadlocked CT test cases
+2013-09-26 Correction to stopped thread handling
+2013-09-26 First cut of RM#18, sporadic threads
+2013-09-26 First cut of RM#20, thread stop statements
+2013-09-26 Released.
+
+Change history of version 2.0.1
+
+2013-09-13 Correction to traces running in VDM-RT
+2013-09-05 Clean up threads properly with exit statements
+2013-08-14 Correction to implicit function satisfiability POs
+2013-08-14 Correction to allow self to be used in thread sections 
+2013-08-12 Efficiency improvement for traces that create objects
+2013-08-09 Small correction to empty sequence subtype testing
+2013-08-09 Fix for polymorphic parameter type comparisons
+2013-08-09 Fix to identify duplicate trace definitions in SL
+2013-08-04 Correction to pattern matching in set binds
+2013-08-01 Improvement to state designator error messages
+2013-08-01 Fix for breakpoint on exit statements with no argument
+2013-07-31 Type resolution correction for value definitions
+2013-07-26 Correction for old~ names in postcondition apply expressions
+2013-07-03 Correction to subtype POs for implicit functions
+2013-07-01 Improve ParameterPatternObligation and add missing param pattern checks
+2013-06-28 Correction for duplicate pattern identifiers
+2013-06-27 PO correction for parameter pattern matching
+2013-06-26 Correction for POs that involve ignore patterns
+2013-06-04 Fix for type check of object parameter field access
+2013-06-04 Correction for class invariant handling
+2013-06-01 Fix coverage for atomic statements
+2013-05-28 Another type accessibility correction
+2013-05-14 Fix for coverage tracking of copied objects
+2013-05-13 Correction for type checking of type accessibility
+2013-05-08 Improve type checking for "(not) in set" expressions
+2013-05-07 Tighten syntax check for commas in cases expressions and statements
+2013-05-03 Correction to type checking for expression patterns in cases
+2013-05-03 Small correction to PO for case alternatives
+
+Historical Changes:
+
+2013-04-30 Further correction to atomic statement 
+2013-04-26 Fix to atomic statement checks of type invariants
+2013-04-26 Fix to invariant checks for updatable RecordValues
+2013-04-22 Small fix for inconclusive function calls in traces
+2013-04-18 Parser correction for "is not yet specified" and "is subclass responsibility"
+2013-04-17 Correction to field accessibility for state designators
+2013-03-26 Correction for type inference with negative mod expressions
+2013-03-16 Correction to inmap type binds
+2013-03-15 Correction to inmap subtype checking
+2013-03-12 Small fix for errors with implicit constructors
+2013-03-08 Improvement to VDM++ initialization error reporting 
+2013-03-06 Fix to class constructor return type error
+2013-02-06 Imported renamed values now hide the original name
+2013-02-05 Fix for INCONCLUSIVE trace results with precondition failures
+2013-02-01 Updated User Guide to cover VDMJUnit library
+2013-01-30 Fixed problem with measures for functions that return functions
+2013-01-30 Corrected PO generation for curried polymorphic functions
+2013-01-29 Added RELEASE_NOTES file
+2013-01-28 Changes to measures for curried polymorphic functions
+2013-01-24 Correction for non-existent source files
+2013-01-15 Added -path command line option
+2013-01-12 Improved token comparison
+2013-01-11 Correction to mk_token comparisons to include type information.
+2012-12-17 Correct narrow_ type check error with unknown types
+2012-12-14 Small fix to cmd line options for -remote
+2012-12-13 Tweak to allow tracepoints to be set in flat SL specifications
+2012-12-13 Tweak to allow breakpoints to be set in flat SL specifications
+2012-12-13 Small PO correction for numeric subtypes
+2012-12-13 Set the VDM release in all unit tests explicitly
+2012-12-12 Type check fix for narrow_
+2012-12-12 Improved narrow_ syntax errors
+2012-12-12 Fix traces, let be st definitions were hiding subsequent let definitions
+2012-12-12 First cut of narrow_ extension
+2012-12-12 Created some new tests
+2012-12-12 Added narrow_ regression test
+2012-12-02 Correct set-range expressions with non-integer arguments
+2012-11-23 Display the number of generated tests in runtrace
+2012-11-20 Small POM tweak
+2012-11-20 Fix ParameterType to work with type binds
+2012-11-08 Corrections to PO generation for map patterns
+2012-10-18 Fix to TimesExpression type inference
+2012-10-12 CT fix to allow traces to generate no tests without failing
+2012-09-22 Small README tweak
+2012-08-29 Small fixes for POG generation with seq1 types
+2012-08-29 Fixed organisation in POM file
+2012-08-04 Small POM tweaks
+2012-07-31 Updated to use Maven and pom.xml for building
+2012-07-31 Updated the READMEs for Maven
+2012-07-11 Modified guard listeners to cope with field expression updates
+2012-07-02 Changed UnknownType to behave like seq/set of z not [] and {}
+2012-06-29 Error message fix for periodic argument expressions.
+2012-06-29 Added support for periodic argument expressions.
+2012-06-20 Changes for RM Values in duration / cycles statements
+2012-06-08 Error now raised for SL func/op of the same name, and duplicate errors/warnings suppressed
+2012-06-08 Corrected some tests to deal with duplicate error removal
+2012-06-08 Correct VDMMessage equals method
+2012-05-24 Small correction to map pattern type resolution
+2012-05-20 Detect overloads when adding ops/fns to coverage
+2012-05-11 Fixed syntax bug for mk_<type>()
+2012-05-07 Added map patterns, RM 3438625
+2012-04-16 Corrected pattern handling for empty sequence/sets
+2012-04-13 Change "old" variable processing for postconditions to copy only affected state.
+2012-03-22 Correction to sequence comprehensions
+2012-03-22 Add a sequence comprehension test
+2012-03-12 Fix to not stop on any binary op nodes while debugging
+2012-03-11 Fix to not stop on boolean binary op nodes while debugging
+2012-03-06 Correction for SL handling of Sigma~
+2012-03-06 Cleaned up some warnings
+2012-02-20 TransactionValue fix
+2012-02-12 Allow breakpoints on errs clauses
+2012-02-03 Fixes for unused imports
+2012-02-02 Small improvements to SL state invariant handling
+2012-01-27 Added a test for recursive measures
+2012-01-25 Added getConstant and tidied use of deref
+2012-01-24 Corrected tests for typecheck of cases statements
+2012-01-19 Corrected pattern matching constraints
+2012-01-17 Added some more unit tests for recent fixes
+2012-01-16 Update seq/set pattern matching
+2012-01-12 Small improvement to optional unknown type checking (eg. "return nil")
+2012-01-12 Correction to exists1 for type bindings
+2012-01-09 Bug fixed: iota type binds, invariant clones and FCFS policy sync bug.
+
+For earlier changes, see the subversion history at:
+https://sourceforge.net/p/vdmj/code/commit_browser

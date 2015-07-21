@@ -1,0 +1,8 @@
+operations
+	op: nat ==> ()
+	op(n) == skip
+	pre n < 5;
+	
+traces
+	-- Tests 1-4 succeed, 5-10 violate the precondition.
+	T1:	let n in set {1, ..., 10} in op(n);
