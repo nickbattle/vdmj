@@ -17,3 +17,6 @@ VDMJ is a command line tool, but it is used by the Overture project, which adds 
 * Supports external libraries and remote control (tool integration)
 * Provides JUnit support for automatic testing of specifications
 * Supports arbitrary precision arithmetic
+
+![Help](/screenshots/help.jpg?raw=true "Help")
+![Precondition failure](/screenshots/precondition.jpg?raw=true "Precondition failure")
