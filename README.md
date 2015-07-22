@@ -18,14 +18,14 @@ VDMJ is a command line tool, but it is used by the Overture project, which adds 
 * Provides JUnit support for automatic testing of specifications
 * Supports arbitrary precision arithmetic
 
-###Screen Shots
-![Help](/screenshots/help.jpg?raw=true "Help")
-![Precondition failure](/screenshots/precondition.jpg?raw=true "Precondition failure")
-![Eclipse Integration](/screenshots/eclipse.jpg?raw=true "Eclipse Integration")
-![VDMJUnit](/screenshots/VDMJUnit.png?raw=true "VDMJUnit")
-
 ###Documentation
 * ![User Guide](/FJ-VDMJ/documentation/UserGuide.pdf "User Guide")
 * ![One Page Guide](/FJ-VDMJ/documentation/OnePageGuide.pdf "One Page Guide")
 * ![High Precision Guide](/FJ-VDMJ/documentation/HighPrecisionGuide.pdf "High Precision Guide")
 * ![VDMJUnit Guide](/FJ-VDMJ/documentation/VDMJUnit.pdf "VDMJUnit Guide")
+
+###Screen Shots
+![Help](/screenshots/help.jpg?raw=true "Help")
+![Precondition failure](/screenshots/precondition.jpg?raw=true "Precondition failure")
+![Eclipse Integration](/screenshots/eclipse.jpg?raw=true "Eclipse Integration")
+![VDMJUnit](/screenshots/VDMJUnit.png?raw=true "VDMJUnit")
