@@ -97,10 +97,11 @@ definitions
     fac:nat -> nat1
     fac(a) ==
     is not yet specified
-    pre a < 21;
+    -- pre a < 21;
 
   values
-    pi = 3.14159265358979323846
+    pi = pi_f();
+    euler = exp(1);
 
  
 end MATH
