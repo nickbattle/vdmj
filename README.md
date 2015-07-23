@@ -3,7 +3,7 @@
 
 VDMJ provides basic tool support for the VDM-SL, VDM++ and VDM-RT specification languages, written in Java. It includes a parser, a type checker, an interpreter (with arbitrary precision arithmetic), a debugger, a proof obligation generator and a combinatorial test generator with coverage recording, as well as JUnit support for automatic testing.
 
-VDMJ is a command line tool, but it is used by the Overture project, which adds a graphical Eclipse IDE interface (see screen shots below).
+VDMJ is a command line tool, but it is used by the ![Overture](https://github.com/overturetool/overture) project, which adds a graphical Eclipse IDE interface (see screen shots below).
 
 ###Features
 
