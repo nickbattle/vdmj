@@ -29,3 +29,4 @@ VDMJ is a command line tool, but it is used by the Overture project, which adds 
 ![Precondition failure](/screenshots/precondition.jpg?raw=true "Precondition failure")
 ![Eclipse Integration](/screenshots/eclipse.jpg?raw=true "Eclipse Integration")
 ![VDMJUnit](/screenshots/VDMJUnit.png?raw=true "VDMJUnit")
+![High Precision](/screenshots/Precision.png?raw=true "High Precision")
