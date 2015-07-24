@@ -23,6 +23,7 @@
 
 package org.overturetool.vdmj.expressions;
 
+import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.scheduler.SystemClock;
@@ -73,6 +74,13 @@ public class TimeExpression extends Expression
 	@Override
 	public Type typeCheck(Environment env, TypeList qualifiers, NameScope scope, Type constraint)
 	{
+		Definition encl = env.getEnclosingDefinition();
+		
+		if (encl != null && encl.isPure())
+		{
+			report(3346, "Cannot use time in pure operations");
+		}
+
 		return checkConstraint(constraint, new NaturalType(location));
 	}
 }

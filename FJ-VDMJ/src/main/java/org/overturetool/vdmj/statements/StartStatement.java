@@ -23,6 +23,7 @@
 
 package org.overturetool.vdmj.statements;
 
+import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.pog.POContextStack;
@@ -61,6 +62,13 @@ public class StartStatement extends Statement
 	@Override
 	public Type typeCheck(Environment env, NameScope scope, Type constraint)
 	{
+		Definition encl = env.getEnclosingDefinition();
+		
+		if (encl != null && encl.isPure())
+		{
+			report(3346, "Cannot use start in pure operations");
+		}
+
 		Type type = objects.typeCheck(env, null, scope, null);
 
 		if (type.isSet())

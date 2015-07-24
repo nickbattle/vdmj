@@ -722,7 +722,7 @@ as the expected and actual values.
 3343, "Cannot have a mutex with pure operations"
 3344, "Pure operation '<name>' must return a value"
 3345, "Pure operation '<name>' cannot also be async"
-3346, "Cannot call duration or cycles in pure operations"
+3346, "Cannot use <statement/expression> in pure operations"
 3347, "Cannot have a pure operation as the body of a thread"
 
 4000, "Cannot instantiate abstract class <class>"

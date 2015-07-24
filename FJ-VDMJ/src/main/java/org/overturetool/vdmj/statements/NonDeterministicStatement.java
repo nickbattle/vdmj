@@ -23,6 +23,7 @@
 
 package org.overturetool.vdmj.statements;
 
+import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.typechecker.Environment;
@@ -46,6 +47,13 @@ public class NonDeterministicStatement extends SimpleBlockStatement
 	@Override
 	public Type typeCheck(Environment env, NameScope scope, Type constraint)
 	{
+		Definition encl = env.getEnclosingDefinition();
+		
+		if (encl != null && encl.isPure())
+		{
+			report(3346, "Cannot use non-deterministic statement in pure operations");
+		}
+
 		TypeSet rtypes = new TypeSet();
 		int rcount = 0;
 

@@ -11,7 +11,12 @@ operations
 	A() == 
 	(
 		dcl z:nat := 0;
-		duration (impop()) z := 123
+		duration (impop()) z := 123;
+		let - = time in skip;
+		||(skip, skip);
+		start(new A());
+		let - = threadid in skip;
+		exit 123
 	);
 
 	pure async public op: () ==> nat

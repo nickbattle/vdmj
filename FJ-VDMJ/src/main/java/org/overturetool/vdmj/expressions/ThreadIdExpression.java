@@ -23,6 +23,7 @@
 
 package org.overturetool.vdmj.expressions;
 
+import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.typechecker.Environment;
@@ -71,6 +72,13 @@ public class ThreadIdExpression extends Expression
 	@Override
 	public Type typeCheck(Environment env, TypeList qualifiers, NameScope scope, Type constraint)
 	{
+		Definition encl = env.getEnclosingDefinition();
+		
+		if (encl != null && encl.isPure())
+		{
+			report(3346, "Cannot use threadid in pure operations");
+		}
+
 		return checkConstraint(constraint, new NaturalType(location));
 	}
 }

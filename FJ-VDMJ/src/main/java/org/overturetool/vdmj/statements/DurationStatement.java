@@ -70,7 +70,7 @@ public class DurationStatement extends Statement
 		
 		if (encl != null && encl.isPure())
 		{
-			duration.report(3346, "Cannot call duration or cycles in pure operations");
+			duration.report(3346, "Cannot use duration in pure operations");
 		}
 		
 		Environment functional = new FlatEnvironment(env, true);
