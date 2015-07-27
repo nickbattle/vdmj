@@ -1,5 +1,5 @@
 
-#![Logo](/screenshots/fujitsu.png?raw=true "Logo")  VDMJ
+#![Fujitsu Logo](/screenshots/fujitsu.png?raw=true "Fujitsu Logo")  VDMJ
 ###Description
 
 VDMJ provides basic tool support for the VDM-SL, VDM++ and VDM-RT specification languages, written in Java. It includes a parser, a type checker, an interpreter (with arbitrary precision arithmetic), a debugger, a proof obligation generator and a combinatorial test generator with coverage recording, as well as JUnit support for automatic testing.
