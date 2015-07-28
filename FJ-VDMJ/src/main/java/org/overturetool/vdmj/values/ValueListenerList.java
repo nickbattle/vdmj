@@ -42,10 +42,13 @@ public class ValueListenerList extends Vector<ValueListener>
 	{
 		addAll(list);
 	}
-
+	
 	public void changedValue(LexLocation location, Value value, Context ctxt) throws ValueException
 	{
-		for (ValueListener vl: this)
+		// Copy the list so that any additions caused by changeValue are not concurrent
+		ValueListenerList copy = new ValueListenerList(this);
+		
+		for (ValueListener vl: copy)
 		{
 			vl.changedValue(location, value, ctxt);
 		}
