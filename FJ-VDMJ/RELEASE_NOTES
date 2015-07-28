@@ -5,6 +5,7 @@ https://github.com/nickbattle/vdmj/issues.
 
 Latest Changes in version 3.0.1
 
+2015-07-28 Implicit compose types should have same access as the outer type
 2015-07-15 Added type checking for pure operations (RM#27)
 2015-07-10 Fix for invariants failing in some cases
 2015-07-07 Enable object field updates to trigger invariants

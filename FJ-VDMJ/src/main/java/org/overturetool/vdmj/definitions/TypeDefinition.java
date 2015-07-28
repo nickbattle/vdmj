@@ -165,7 +165,9 @@ public class TypeDefinition extends Definition
 			for (Type compose: TypeComparator.checkComposeTypes(nt.type, base, true))
 			{
 				RecordType rtype = (RecordType)compose;
-				composeDefinitions.add(new TypeDefinition(rtype.name, rtype, null, null));
+				Definition cdef = new TypeDefinition(rtype.name, rtype, null, null);
+				cdef.setAccessSpecifier(accessSpecifier);	// Same as this one
+				composeDefinitions.add(cdef);
 			}
 		}
 
