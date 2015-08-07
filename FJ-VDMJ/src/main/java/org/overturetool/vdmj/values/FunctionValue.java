@@ -465,11 +465,13 @@ public class FunctionValue extends Value
 			{
 				// Functions are executed atomically, so they can safely access arg object state
 				evalContext.threadState.setAtomic(true);
+				evalContext.threadState.setPure(true);
 				rv = body.eval(evalContext).convertTo(type.result, evalContext);
 			}
 			finally
 			{
 				evalContext.threadState.setAtomic(false);
+				evalContext.threadState.setPure(false);
 			}
 
     		if (ctxt.prepost > 0)	// Note, caller's context is checked

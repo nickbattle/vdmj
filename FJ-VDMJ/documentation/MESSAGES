@@ -886,6 +886,8 @@ as the expected and actual values.
 4163, "Cannot inherit private constructor"
 4164, "Compose function cannot be restricted to <type>"
 4165, "Cannot convert <type> to <type>"
+4166, "Cannot call impure operation: <name>"
+4167, "Cannot call exit in a pure operation"
 
 
 5000, "Definition <name> not used"

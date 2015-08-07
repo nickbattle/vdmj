@@ -23,6 +23,8 @@
 
 package org.overturetool.vdmj.statements;
 
+import org.overturetool.vdmj.Release;
+import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.pog.POContextStack;
@@ -106,6 +108,11 @@ public class ExitStatement extends Statement
 	{
 		breakpoint.check(location, ctxt);
 		Value v = null;
+
+		if (Settings.release == Release.VDM_10 && ctxt.threadState.isPure())
+		{
+			return abort(4167, "Cannot call exit in a pure operation", ctxt);
+		}
 
 		if (expression != null)
 		{

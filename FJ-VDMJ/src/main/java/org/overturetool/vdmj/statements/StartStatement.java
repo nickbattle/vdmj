@@ -156,11 +156,13 @@ public class StartStatement extends Statement
 			try
 			{
 				pctxt.threadState.setAtomic(true);
+				ctxt.threadState.setPure(true);
 				ps.eval(pctxt);	// Ignore return value
 			}
 			finally
 			{
 				pctxt.threadState.setAtomic(false);
+				ctxt.threadState.setPure(false);
 			}
 			
 			OperationValue pop = pctxt.lookup(ps.opname).operationValue(pctxt);
@@ -185,11 +187,13 @@ public class StartStatement extends Statement
     		try
     		{
     			pctxt.threadState.setAtomic(true);
+				ctxt.threadState.setPure(true);
     			ss.eval(pctxt);	// Ignore return value
     		}
     		finally
     		{
     			pctxt.threadState.setAtomic(false);
+				ctxt.threadState.setPure(false);
     		}
 			
 			OperationValue pop = pctxt.lookup(ss.opname).operationValue(pctxt);

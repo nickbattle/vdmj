@@ -26,6 +26,7 @@ package org.overturetool.vdmj.values;
 import java.util.Iterator;
 import java.util.ListIterator;
 
+import org.overturetool.vdmj.Release;
 import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.config.Properties;
 import org.overturetool.vdmj.definitions.ClassDefinition;
@@ -362,6 +363,11 @@ public class OperationValue extends Value
     				ctxt.setPrepost(0, null);
     				ctxt.threadState.setAtomic(false);
     			}
+    		}
+    		
+    		if (Settings.release == Release.VDM_10 && !type.isPure() && ctxt.threadState.isPure())
+    		{
+    			abort(4166, "Cannot call impure operation: " + name, ctxt);
     		}
 
     		rv = body.eval(argContext);

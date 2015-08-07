@@ -55,6 +55,7 @@ public class ClassInvariantListener implements ValueListener, Serializable
 			try
 			{
 				ctxt.threadState.setAtomic(true);
+				ctxt.threadState.setPure(true);
 				boolean inv = invopvalue.eval(location, new ValueList(), ctxt).boolValue(ctxt);
 			
     			if (!inv)
@@ -66,6 +67,7 @@ public class ClassInvariantListener implements ValueListener, Serializable
 			finally
 			{
 				ctxt.threadState.setAtomic(false);
+				ctxt.threadState.setPure(false);
 			}
 		}
 	}
