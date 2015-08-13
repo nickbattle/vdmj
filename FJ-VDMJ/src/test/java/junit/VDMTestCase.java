@@ -50,7 +50,7 @@ public class VDMTestCase extends TestCase
 
 	protected ClassList parseClasses(String vpppath, String charset)
 	{
-		Settings.release = Release.DEFAULT;
+		Settings.release = Release.CLASSIC;
 		Settings.dialect = Dialect.VDM_PP;
 		ClassList classes = null;
 		int errs = 0;

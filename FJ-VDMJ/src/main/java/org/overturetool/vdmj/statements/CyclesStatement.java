@@ -70,7 +70,7 @@ public class CyclesStatement extends Statement
 		
 		if (encl != null && encl.isPure())
 		{
-			cycles.report(3346, "Cannot use cycles in pure operations");
+			report(3346, "Cannot use cycles in pure operations");
 		}
 		
 		Environment functional = new FlatEnvironment(env, true);

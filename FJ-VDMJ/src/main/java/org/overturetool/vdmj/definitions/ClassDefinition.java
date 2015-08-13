@@ -1503,6 +1503,7 @@ public class ClassDefinition extends Definition
 
 		OperationType type = new OperationType(
 			invloc, new TypeList(), new BooleanType(invloc));
+		type.setPure(true);
 
 		LexNameToken invname =
 			new LexNameToken(name.name, "inv_" + name.name, invloc);

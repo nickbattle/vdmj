@@ -181,7 +181,7 @@ abstract public class OvertureTest extends TestCase
 
 	protected void evaluate(String rpath, ResultType rt, int error)
 	{
-		evaluate(rpath, rt, error, Release.DEFAULT);
+		evaluate(rpath, rt, error, Release.CLASSIC);
 	}
 
 	protected void evaluate(String rpath, ResultType rt, int error, Release release)

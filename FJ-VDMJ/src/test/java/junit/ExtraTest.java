@@ -44,7 +44,7 @@ public class ExtraTest extends TestCase
 	protected void setUp() throws Exception
 	{
 		super.setUp();
-		Settings.release = Release.DEFAULT;
+		Settings.release = Release.CLASSIC;
 	}
 
 	@Override
