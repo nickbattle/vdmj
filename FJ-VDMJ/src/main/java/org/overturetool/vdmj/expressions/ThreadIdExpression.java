@@ -23,6 +23,8 @@
 
 package org.overturetool.vdmj.expressions;
 
+import org.overturetool.vdmj.Release;
+import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.runtime.Context;
@@ -77,6 +79,11 @@ public class ThreadIdExpression extends Expression
 		if (encl != null && encl.isPure())
 		{
 			report(3346, "Cannot use threadid in pure operations");
+		}
+
+		if (Settings.release == Release.VDM_10 && env.isFunctional())
+		{
+			report(3348, "Cannot use threadid in a functional context");
 		}
 
 		return checkConstraint(constraint, new NaturalType(location));

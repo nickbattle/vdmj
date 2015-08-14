@@ -185,7 +185,7 @@ public class ApplyExpression extends Expression
 
 			if (inFunction && Settings.release == Release.VDM_10 && !ot.pure)
 			{
-				report(3300, "Impure operation '" + root + "' cannot be called from a function");
+				report(3300, "Impure operation '" + root + "' cannot be called from here");
 				results.add(new UnknownType(location));
 			}
 			else if (inOperation && Settings.release == Release.VDM_10 && func != null && func.isPure() && !ot.pure)

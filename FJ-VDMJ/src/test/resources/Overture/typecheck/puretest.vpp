@@ -53,5 +53,8 @@ class Test
 functions
 	public f: A -> nat
 	f(a) == a.impop() + a.pre_impop(a);
+	
+	g:() -> nat
+	g() == time + threadid;
 
 end Test

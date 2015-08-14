@@ -676,7 +676,7 @@ as the expected and actual values.
 3297, "Cannot use default constructor for this class"
 3298, "Cannot inherit from CPU"
 3299, "Cannot inherit from BUS"
-3300, "Impure operation <name> cannot be called from a function"
+3300, "Impure operation <name> cannot be called from here"
 3301, "Variable <name> in scope is not updatable"
 3302, "Variable <name> cannot be accessed from this context"
 3303, "Measure parameters different to function"
@@ -724,6 +724,7 @@ as the expected and actual values.
 3345, "Pure operation '<name>' cannot also be async"
 3346, "Cannot use <statement/expression> in pure operations"
 3347, "Cannot have a pure operation as the body of a thread"
+3348, "Cannot use <expression> in a functional context"
 
 4000, "Cannot instantiate abstract class <class>"
 4002, "Expression value is not in set bind"
