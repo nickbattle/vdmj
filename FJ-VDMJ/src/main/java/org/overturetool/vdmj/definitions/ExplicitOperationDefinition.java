@@ -300,7 +300,7 @@ public class ExplicitOperationDefinition extends Definition
 			report(3293, "Asynchronous operation '" + name + "' cannot return a value");
 		}
 
-		if (accessSpecifier.isPure && type.result.isType(VoidType.class))
+		if (accessSpecifier.isPure && type.result.isType(VoidType.class) && !type.result.isUnknown())
 		{
 			report(3344, "Pure operation '" + name + "' must return a value");
 		}
