@@ -213,9 +213,9 @@ public class UnionType extends Type
 	}
 
 	@Override
-	public boolean isClass()
+	public boolean isClass(Environment env)
 	{
-		return getClassType() != null;
+		return getClassType(env) != null;
 	}
 
 	@Override
@@ -380,12 +380,12 @@ public class UnionType extends Type
 	}
 
 	@Override
-	public ClassType getClassType()
+	public ClassType getClassType(Environment env)
 	{
 		if (!classDone)
 		{
     		classDone = true;		// Mark early to avoid recursion.
-    		classType = new UnknownType(location).getClassType();
+    		classType = new UnknownType(location).getClassType(env);
 
     		// Build a class type with the common fields of the contained
     		// class types, making the field types the union of the original
@@ -397,9 +397,9 @@ public class UnionType extends Type
 
     		for (Type t: types)
     		{
-    			if (t.isClass())
+    			if (t.isClass(env))
     			{
-    				ClassType ct = t.getClassType();
+    				ClassType ct = t.getClassType(env);
 
     				if (classname == null)
     				{
@@ -408,6 +408,12 @@ public class UnionType extends Type
 
     				for (Definition f: ct.classdef.getDefinitions())
     				{
+    					if (env != null && !ClassDefinition.isAccessible(env, f, false))
+    					{
+    						// Omit inaccessible fields
+    						continue;
+    					}
+    					
     					// TypeSet current = common.get(f.name);
     					LexNameToken synthname = f.name.getModifiedName(classname.name);
     					TypeSet current = null;

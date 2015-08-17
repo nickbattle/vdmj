@@ -28,6 +28,7 @@ import java.util.Vector;
 import org.overturetool.vdmj.definitions.AccessSpecifier;
 import org.overturetool.vdmj.definitions.ClassDefinition;
 import org.overturetool.vdmj.lex.LexLocation;
+import org.overturetool.vdmj.typechecker.Environment;
 
 
 public class UnknownType extends Type
@@ -94,7 +95,7 @@ public class UnknownType extends Type
 	}
 
 	@Override
-	public boolean isClass()
+	public boolean isClass(Environment env)
 	{
 		return true;		// Too much trouble?
 	}
@@ -154,7 +155,7 @@ public class UnknownType extends Type
 	}
 
 	@Override
-	public ClassType getClassType()
+	public ClassType getClassType(Environment env)
 	{
 		return new ClassType(location, new ClassDefinition());
 	}

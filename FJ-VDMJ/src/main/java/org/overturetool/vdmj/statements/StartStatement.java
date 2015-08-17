@@ -75,13 +75,13 @@ public class StartStatement extends Statement
 		{
 			SetType set = type.getSet();
 
-			if (!set.setof.isClass())
+			if (!set.setof.isClass(null))
 			{
 				objects.report(3235, "Expression is not a set of object references");
 			}
 			else
 			{
-				ClassType ctype = set.setof.getClassType();
+				ClassType ctype = set.setof.getClassType(null);
 
 				if (ctype.classdef.findThread() == null)
 				{
@@ -89,9 +89,9 @@ public class StartStatement extends Statement
 				}
 			}
 		}
-		else if (type.isClass())
+		else if (type.isClass(null))
 		{
-			ClassType ctype = type.getClassType();
+			ClassType ctype = type.getClassType(null);
 
 			if (ctype.classdef.findThread() == null)
 			{

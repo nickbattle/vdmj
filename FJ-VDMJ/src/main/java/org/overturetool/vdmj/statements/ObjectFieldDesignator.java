@@ -80,9 +80,9 @@ public class ObjectFieldDesignator extends ObjectDesignator
 		TypeSet result = new TypeSet();
 		boolean unique = !type.isUnion();
 
-		if (type.isClass())
+		if (type.isClass(env))
 		{
-			ClassType ctype = type.getClassType();
+			ClassType ctype = type.getClassType(env);
 			
 			if (classname == null)
 			{

@@ -107,7 +107,7 @@ public class ObjectPattern extends Pattern
 			fieldlist.typeResolve(env);
 			type = type.typeResolve(env, null);
 
-			if (!type.isClass())
+			if (!type.isClass(env))
 			{
 				report(3331, "obj_ expression is not an object type");
 				detail("Type", type);
@@ -127,7 +127,7 @@ public class ObjectPattern extends Pattern
 	private void typeCheck(Environment base)
 	{
 		// Check whether the field access is permitted from here.
-		ClassType cls = type.getClassType();
+		ClassType cls = type.getClassType(base);
 
 		for (NamePatternPair npp: fieldlist)
 		{
@@ -153,8 +153,8 @@ public class ObjectPattern extends Pattern
 	public DefinitionList getAllDefinitions(Type exptype, NameScope scope)
 	{
 		DefinitionList defs = new DefinitionList();
-		ClassType pattype = type.getClassType();
-		ClassType expctype = exptype.getClassType();
+		ClassType pattype = type.getClassType(null);
+		ClassType expctype = exptype.getClassType(null);
 
 		if (expctype == null || !TypeComparator.isSubType(pattype, expctype))
 		{

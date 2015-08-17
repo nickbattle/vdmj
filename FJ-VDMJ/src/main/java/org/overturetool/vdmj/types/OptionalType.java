@@ -150,9 +150,9 @@ public class OptionalType extends Type
 	}
 
 	@Override
-	public boolean isClass()
+	public boolean isClass(Environment env)
 	{
-		return type.isClass();
+		return type.isClass(env);
 	}
 
 	@Override
@@ -210,9 +210,9 @@ public class OptionalType extends Type
 	}
 
 	@Override
-	public ClassType getClassType()
+	public ClassType getClassType(Environment env)
 	{
-		return type.getClassType();
+		return type.getClassType(env);
 	}
 
 	@Override

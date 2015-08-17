@@ -214,9 +214,9 @@ public class ExplicitOperationDefinition extends Definition
 					report(3286, "Constructor cannot be 'async', 'static' or 'pure'");
 				}
 
-				if (type.result.isClass())
+				if (type.result.isClass(base))
 				{
-					ClassType ctype = type.result.getClassType();
+					ClassType ctype = type.result.getClassType(base);
 
 					if (ctype.classdef != classDefinition)
 					{

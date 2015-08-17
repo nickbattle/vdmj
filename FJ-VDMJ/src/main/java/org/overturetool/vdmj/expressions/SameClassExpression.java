@@ -120,14 +120,14 @@ public class SameClassExpression extends Expression
 	{
 		Type lt = left.typeCheck(env, null, scope, null);
 
-		if (!lt.isClass())
+		if (!lt.isClass(env))
 		{
 			left.report(3266, "Argument is not an object");
 		}
 
 		Type rt = right.typeCheck(env, null, scope, null);
 
-		if (!rt.isClass())
+		if (!rt.isClass(env))
 		{
 			right.report(3266, "Argument is not an object");
 		}

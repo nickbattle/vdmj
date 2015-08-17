@@ -130,10 +130,10 @@ public class NamedType extends InvariantType
 	}
 
 	@Override
-	public boolean isClass()
+	public boolean isClass(Environment env)
 	{
 		if (opaque) return false;
-		return type.isClass();
+		return type.isClass(env);
 	}
 
 	@Override
@@ -202,9 +202,9 @@ public class NamedType extends InvariantType
 	}
 
 	@Override
-	public ClassType getClassType()
+	public ClassType getClassType(Environment env)
 	{
-		return type.getClassType();
+		return type.getClassType(env);
 	}
 
 	@Override

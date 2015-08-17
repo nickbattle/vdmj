@@ -118,13 +118,13 @@ public class ClassType extends Type
 	}
 
 	@Override
-	public boolean isClass()
+	public boolean isClass(Environment env)
 	{
 		return true;
 	}
 
 	@Override
-	public ClassType getClassType()
+	public ClassType getClassType(Environment env)
 	{
 		return this;
 	}

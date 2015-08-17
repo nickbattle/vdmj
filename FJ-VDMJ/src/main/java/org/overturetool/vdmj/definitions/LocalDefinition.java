@@ -121,7 +121,7 @@ public class LocalDefinition extends Definition
 	@Override
 	public boolean isUpdatable()
 	{
-		return nameScope.matches(NameScope.STATE) || getType().isClass();
+		return nameScope.matches(NameScope.STATE) || getType().isClass(null);
 	}
 
 	public void setValueDefinition()

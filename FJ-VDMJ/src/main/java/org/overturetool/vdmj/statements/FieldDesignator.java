@@ -84,9 +84,9 @@ public class FieldDesignator extends StateDesignator
     		}
 		}
 
-		if (type.isClass())
+		if (type.isClass(env))
 		{
-			ClassType ctype = type.getClassType();
+			ClassType ctype = type.getClassType(env);
 			String cname = ctype.name.name;
 
 			objectfield = new LexNameToken(cname, field.name, location);

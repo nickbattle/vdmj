@@ -135,7 +135,7 @@ public class IsOfBaseClassExpression extends Expression
 
 		Type rt = exp.typeCheck(env, null, scope, null);
 
-		if (!rt.isClass())
+		if (!rt.isClass(env))
 		{
 			exp.report(3266, "Argument is not an object");
 		}

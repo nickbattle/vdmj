@@ -112,13 +112,13 @@ public class CallObjectStatement extends Statement
 	{
 		Type dtype = designator.typeCheck(env, null);
 
-		if (!dtype.isClass())
+		if (!dtype.isClass(env))
 		{
 			report(3207, "Object designator is not an object type");
 			return new UnknownType(location);
 		}
 
-		ClassType ctype = dtype.getClassType();
+		ClassType ctype = dtype.getClassType(env);
 		ClassDefinition classdef = ctype.classdef;
 		ClassDefinition self = env.findClassDefinition();
 		Environment classenv = null;

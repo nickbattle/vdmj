@@ -114,9 +114,9 @@ public class FieldExpression extends Expression
    			recOrClass = true;
 		}
 
-		if (env.isVDMPP() && root.isClass())
+		if (env.isVDMPP() && root.isClass(env))
 		{
-    		ClassType cls = root.getClassType();
+    		ClassType cls = root.getClassType(env);
 
     		if (memberName == null)
     		{
