@@ -30,7 +30,6 @@ import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.pog.POContextStack;
 import org.overturetool.vdmj.pog.ProofObligationList;
 import org.overturetool.vdmj.runtime.Context;
-import org.overturetool.vdmj.runtime.ContextException;
 import org.overturetool.vdmj.runtime.ValueException;
 import org.overturetool.vdmj.scheduler.ObjectThread;
 import org.overturetool.vdmj.scheduler.PeriodicThread;
@@ -67,13 +66,13 @@ public class StopStatement extends Statement
 		{
 			SetType set = type.getSet();
 
-			if (!set.setof.isClass(env))
+			if (!set.setof.isClass(null))
 			{
 				objects.report(3235, "Expression is not a set of object references");
 			}
 			else
 			{
-				ClassType ctype = set.setof.getClassType(env);
+				ClassType ctype = set.setof.getClassType(null);
 
 				if (ctype.classdef.findThread() == null)
 				{
@@ -81,9 +80,9 @@ public class StopStatement extends Statement
 				}
 			}
 		}
-		else if (type.isClass(env))
+		else if (type.isClass(null))
 		{
-			ClassType ctype = type.getClassType(env);
+			ClassType ctype = type.getClassType(null);
 
 			if (ctype.classdef.findThread() == null)
 			{
