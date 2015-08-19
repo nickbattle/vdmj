@@ -91,6 +91,7 @@ public class ClassInvariantDefinition extends Definition
 	public void typeCheck(Environment base, NameScope scope)
 	{
 		Environment functional = new FlatEnvironment(base, true);
+		functional.setEnclosingDefinition(this);
 		Type type = expression.typeCheck(functional, null, NameScope.NAMESANDSTATE, new BooleanType(location));
 
 		if (!type.isType(BooleanType.class))

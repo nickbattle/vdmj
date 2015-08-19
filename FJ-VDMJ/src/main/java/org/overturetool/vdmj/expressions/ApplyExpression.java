@@ -111,6 +111,7 @@ public class ApplyExpression extends Expression
 
 		boolean inFunction = env.isFunctional();
 		boolean inOperation = !inFunction;
+		boolean inReserved = (func == null || func.name == null) ? false : func.name.isReserved();
 			
 		if (inFunction)
 		{
@@ -196,6 +197,11 @@ public class ApplyExpression extends Expression
 			else
 			{
     			results.add(operationApply(isSimple, ot));
+			}
+			
+			if (inFunction && Settings.release == Release.VDM_10 && ot.pure && !inReserved)
+			{
+				warning(5017, "Pure operation call may not be referentially transparent");
 			}
 		}
 

@@ -115,6 +115,15 @@ public class LexNameToken extends LexToken implements Serializable, Comparable<L
 	{
 		return new LexNameToken(module, "init_" + name, l);
 	}
+	
+	public boolean isReserved()
+	{
+		return
+			name.startsWith("pre_") ||
+			name.startsWith("post_") ||
+			name.startsWith("inv_") ||
+			name.startsWith("init_");
+	}
 
 	public LexNameToken getModifiedName(String classname)
 	{
