@@ -446,10 +446,17 @@ public class UnionType extends Type
     					}
     					else
     					{
-    						if (curracc.narrowerThan(f.accessSpecifier))
-    						{
-    							access.put(synthname, f.accessSpecifier);
-    						}
+    						if (curracc.narrowerThan(f.accessSpecifier) ||
+    							(!curracc.isPure && f.accessSpecifier.isPure))
+							{
+								AccessSpecifier purified = new AccessSpecifier(
+									f.accessSpecifier.isStatic,
+									f.accessSpecifier.isAsync,
+									f.accessSpecifier.access,
+									curracc.isPure || f.accessSpecifier.isPure);
+
+								access.put(synthname, purified);
+							}
     					}
     				}
     			}
@@ -463,8 +470,16 @@ public class UnionType extends Type
 
     		for (LexNameToken synthname: common.keySet())
     		{
+    			Type ptype = common.get(synthname).getType(location);
+    			
+    			if (ptype instanceof OperationType)
+    			{
+    				OperationType optype = (OperationType)ptype;
+    				optype.setPure(access.get(synthname).isPure);
+    			}
+    			
     			Definition def = new LocalDefinition(synthname.location,
-					synthname, NameScope.GLOBAL, common.get(synthname).getType(location));
+					synthname, NameScope.GLOBAL, ptype);
 
     			def.setAccessSpecifier(access.get(synthname));
 				newdefs.add(def);
