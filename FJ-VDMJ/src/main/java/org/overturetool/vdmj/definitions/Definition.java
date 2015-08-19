@@ -55,7 +55,7 @@ import org.overturetool.vdmj.values.ValueList;
  * definition.
  */
 
-public abstract class Definition implements Serializable
+public abstract class Definition implements Serializable, Comparable<Definition>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -106,6 +106,11 @@ public abstract class Definition implements Serializable
 
 		return false;
 	}
+	
+	public int compareTo(Definition o)
+	{
+		return name == null ? 0 : name.compareTo(o.name); 
+	};
 
 	@Override
 	public int hashCode()

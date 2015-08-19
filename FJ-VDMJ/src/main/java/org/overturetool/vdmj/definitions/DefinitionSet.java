@@ -23,14 +23,14 @@
 
 package org.overturetool.vdmj.definitions;
 
-import java.util.HashSet;
+import java.util.TreeSet;
 
 /**
  * A class to hold a set of Definitions with unique names.
  */
 
 @SuppressWarnings("serial")
-public class DefinitionSet extends HashSet<Definition>
+public class DefinitionSet extends TreeSet<Definition>
 {
 	public DefinitionSet()
 	{
