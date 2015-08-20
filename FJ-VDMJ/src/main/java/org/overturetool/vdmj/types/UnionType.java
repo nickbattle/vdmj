@@ -475,7 +475,9 @@ public class UnionType extends Type
     			if (ptype instanceof OperationType)
     			{
     				OperationType optype = (OperationType)ptype;
-    				optype.setPure(access.get(synthname).isPure);
+    				OperationType newtype = new OperationType(optype.location, optype.parameters, optype.result);
+    				newtype.setPure(access.get(synthname).isPure);
+    				ptype = newtype;
     			}
     			
     			Definition def = new LocalDefinition(synthname.location,
