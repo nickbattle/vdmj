@@ -78,12 +78,12 @@ public class ThreadIdExpression extends Expression
 		
 		if (encl != null && encl.isPure())
 		{
-			report(3346, "Cannot use threadid in pure operations");
+			report(3346, "Cannot use 'threadid' in pure operations");
 		}
 
 		if (Settings.release == Release.VDM_10 && env.isFunctional())
 		{
-			report(3348, "Cannot use threadid in a functional context");
+			report(3348, "Cannot use 'threadid' in a functional context");
 		}
 
 		return checkConstraint(constraint, new NaturalType(location));

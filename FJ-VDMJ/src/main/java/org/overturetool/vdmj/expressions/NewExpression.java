@@ -23,6 +23,8 @@
 
 package org.overturetool.vdmj.expressions;
 
+import org.overturetool.vdmj.Release;
+import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.definitions.BUSClassDefinition;
 import org.overturetool.vdmj.definitions.CPUClassDefinition;
 import org.overturetool.vdmj.definitions.ClassDefinition;
@@ -78,6 +80,11 @@ public class NewExpression extends Expression
 		{
 			report(3133, "Class name " + classname + " not in scope");
 			return new UnknownType(location);
+		}
+		
+		if (Settings.release == Release.VDM_10 && env.isFunctional())
+		{
+			report(3348, "Cannot use 'new' in a functional context");
 		}
 
 		classdef = (ClassDefinition)cdef;

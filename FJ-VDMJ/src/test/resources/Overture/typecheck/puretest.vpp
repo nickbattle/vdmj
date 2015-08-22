@@ -7,7 +7,7 @@ values
 	v = 123;
 
 operations
-	pure A: () ==> A
+	public pure A: () ==> A
 	A() == 
 	(
 		dcl z:nat := 0;
@@ -55,6 +55,6 @@ functions
 	f(a) == a.impop() + a.pre_impop(a) + a.op();
 	
 	g:() -> nat
-	g() == time + threadid;
+	g() == time + threadid + new A().x;
 
 end Test
