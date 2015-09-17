@@ -422,12 +422,14 @@ public class ApplyExpression extends Expression
 			}
 		}
 
-		if (!type.isUnknown() && type.isFunction())
+		if (!type.isUnknown() && (type.isFunction() || type.isOperation()))
 		{
-			FunctionType f = type.getFunction();
+			TypeList paramTypes = type.isFunction() ?
+				type.getFunction().parameters : type.getOperation().parameters;
+			
 			String prename = root.getPreName();
 
-			if (prename == null || !prename.equals(""))
+			if (type.isFunction() && (prename == null || !prename.equals("")))
 			{
 				obligations.add(new FunctionApplyObligation(root, args, prename, ctxt));
 			}
@@ -437,7 +439,7 @@ public class ApplyExpression extends Expression
 			for (Type at: argtypes)
 			{
 				at = ctxt.checkType(args.get(i), at);
-				Type pt = f.parameters.get(i);
+				Type pt = paramTypes.get(i);
 
 				if (!TypeComparator.isSubType(at, pt))
 				{
@@ -446,7 +448,10 @@ public class ApplyExpression extends Expression
 
 				i++;
 			}
+		}
 
+		if (!type.isUnknown() && type.isFunction())
+		{
 			if (recursive != null)
 			{
 				if (recursive instanceof ExplicitFunctionDefinition)

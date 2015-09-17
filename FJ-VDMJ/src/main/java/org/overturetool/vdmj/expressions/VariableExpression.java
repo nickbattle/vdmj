@@ -26,7 +26,9 @@ package org.overturetool.vdmj.expressions;
 import org.overturetool.vdmj.definitions.ClassDefinition;
 import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.definitions.ExplicitFunctionDefinition;
+import org.overturetool.vdmj.definitions.ExplicitOperationDefinition;
 import org.overturetool.vdmj.definitions.ImplicitFunctionDefinition;
+import org.overturetool.vdmj.definitions.ImplicitOperationDefinition;
 import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.runtime.Context;
@@ -207,8 +209,30 @@ public class VariableExpression extends Expression
 
 			return im.predef.name.name;
 		}
+		else if (def instanceof ExplicitOperationDefinition)
+		{
+			ExplicitOperationDefinition ex = (ExplicitOperationDefinition)def;
 
-		return null;	// Not a function.
+			if (ex.predef == null)
+			{
+				return "";		// An operation without a precondition
+			}
+
+			return ex.predef.name.name;
+		}
+		else if (def instanceof ImplicitOperationDefinition)
+		{
+			ImplicitOperationDefinition im = (ImplicitOperationDefinition)def;
+
+			if (im.predef == null)
+			{
+				return "";		// An operation without a precondition
+			}
+
+			return im.predef.name.name;
+		}
+
+		return null;	// Not a function/operation.
 	}
 
 	@Override
