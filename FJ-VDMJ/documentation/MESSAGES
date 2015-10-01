@@ -725,6 +725,7 @@ as the expected and actual values.
 3346, "Cannot use <statement/expression> in pure operations"
 3347, "Cannot have a pure operation as the body of a thread"
 3348, "Cannot use <expression> in a functional context"
+3349, "Cannot see non-static operation from static context"
 
 4000, "Cannot instantiate abstract class <class>"
 4002, "Expression value is not in set bind"

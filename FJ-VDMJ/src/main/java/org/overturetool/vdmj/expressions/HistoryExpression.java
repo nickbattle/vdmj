@@ -31,6 +31,7 @@ import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.lex.Token;
 import org.overturetool.vdmj.runtime.ClassContext;
 import org.overturetool.vdmj.runtime.Context;
+import org.overturetool.vdmj.runtime.ContextException;
 import org.overturetool.vdmj.runtime.ObjectContext;
 import org.overturetool.vdmj.runtime.ValueException;
 import org.overturetool.vdmj.typechecker.Environment;
@@ -142,6 +143,10 @@ public class HistoryExpression extends Expression
 		{
 			return abort(e);
 		}
+		catch (ContextException e)
+		{
+			throw e;
+		}
 		catch (Exception e)
 		{
 			return abort(4065, e.getMessage(), ctxt);
@@ -197,6 +202,11 @@ public class HistoryExpression extends Expression
     				if (def.isPure())
     				{
     					opname.report(3342, "Cannot use history counters for pure operations");
+    				}
+    				
+    				if (!def.isStatic() && env.isStatic())
+    				{
+    					opname.report(3349, "Cannot see non-static operation from static context");
     				}
     			}
     		}
