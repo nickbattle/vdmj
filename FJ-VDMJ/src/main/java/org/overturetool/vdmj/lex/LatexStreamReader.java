@@ -74,6 +74,7 @@ public class LatexStreamReader extends InputStreamReader
     			else if (trimmed.startsWith("\\end{vdm_al}") ||
     					 trimmed.startsWith("\\section") ||
     					 trimmed.startsWith("\\subsection") ||
+    					 trimmed.startsWith("\\subsubsection") ||
     					 trimmed.startsWith("\\document"))
     			{
     				supress = true;
