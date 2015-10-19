@@ -5,6 +5,7 @@ https://github.com/nickbattle/vdmj/issues.
 
 Latest Changes in version 3.0.1
 
+2015-10-19 Remove "unused" warning for traces in SL modules
 2015-10-06 Recognise \subsubsection in LaTeX files
 2015-10-01 Check for non-static history operations in static sync clauses
 2015-07-28 Implicit compose types should have same access as the outer type

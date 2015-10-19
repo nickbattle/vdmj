@@ -60,6 +60,7 @@ public class NamedTraceDefinition extends Definition
 		this.terms = terms;
 
 		setAccessSpecifier(new AccessSpecifier(false, false, Token.PUBLIC, false));
+		markUsed();		// Traces are never called, so this makes sense
 	}
 
 	@Override
