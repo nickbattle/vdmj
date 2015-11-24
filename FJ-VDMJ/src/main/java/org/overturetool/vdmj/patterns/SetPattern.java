@@ -276,6 +276,24 @@ public class SetPattern extends Pattern
 		{
 			return true;	// Set types are various, so we must permute
 		}
+		
+		// Check that lengths of the members are the same
+		int length = 0;
+		
+		for (Pattern p: plist)
+		{
+			if (length == 0)
+			{
+				length = p.getLength();
+			}
+			else
+			{
+				if (p.getLength() != length)
+				{
+					return true;	// Patterns are different sizes, so permute them
+				}
+			}
+		}
 
 		return plist.isConstrained();
 	}
