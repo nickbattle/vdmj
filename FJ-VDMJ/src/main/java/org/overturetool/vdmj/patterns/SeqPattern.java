@@ -232,7 +232,7 @@ public class SeqPattern extends Pattern
 	@Override
 	public Type getPossibleType()
 	{
-		return new SeqType(location, new UnknownType(location));
+		return new SeqType(location, plist.getPossibleType(location));
 	}
 
 	@Override

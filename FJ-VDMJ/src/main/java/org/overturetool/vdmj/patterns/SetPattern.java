@@ -42,7 +42,6 @@ import org.overturetool.vdmj.typechecker.NameScope;
 import org.overturetool.vdmj.typechecker.TypeCheckException;
 import org.overturetool.vdmj.types.SetType;
 import org.overturetool.vdmj.types.Type;
-import org.overturetool.vdmj.types.UnknownType;
 import org.overturetool.vdmj.values.NameValuePair;
 import org.overturetool.vdmj.values.NameValuePairList;
 import org.overturetool.vdmj.values.NameValuePairMap;
@@ -266,7 +265,7 @@ public class SetPattern extends Pattern
 	@Override
 	public Type getPossibleType()
 	{
-		return new SetType(location, new UnknownType(location));
+		return new SetType(location, plist.getPossibleType(location));
 	}
 
 	@Override

@@ -302,7 +302,14 @@ public class ConcatenationPattern extends Pattern
 	@Override
 	public Type getPossibleType()
 	{
-		return new SeqType(location, new UnknownType(location));
+		PatternList plist = new PatternList();
+		plist.add(left);
+		plist.add(right);
+		
+		Type type = plist.getPossibleType(location);
+		
+		return type.isUnknown() ? 
+			new SeqType(location, new UnknownType(location)) : type;
 	}
 
 	@Override
