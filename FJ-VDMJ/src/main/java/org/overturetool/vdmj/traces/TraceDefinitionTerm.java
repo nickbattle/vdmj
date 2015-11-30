@@ -46,13 +46,20 @@ public class TraceDefinitionTerm extends Vector<TraceDefinition>
 
 	public TraceIterator getIterator(Context ctxt)
 	{
-		AlternativeIterator node = new AlternativeIterator();
+		TraceIteratorList list = new TraceIteratorList();
 
 		for (TraceDefinition term: this)
 		{
-			node.add(term.getIterator(ctxt));
+			list.add(term.getIterator(ctxt));
 		}
 
-		return node;
+		if (list.size() == 1)
+		{
+			return list.get(0);
+		}
+		else
+		{
+			return new AlternativeIterator(list);
+		}
 	}
 }

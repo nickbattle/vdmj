@@ -30,10 +30,9 @@ import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.lex.Token;
 import org.overturetool.vdmj.runtime.Context;
-import org.overturetool.vdmj.traces.SequenceIterator;
-import org.overturetool.vdmj.traces.TestSequence;
 import org.overturetool.vdmj.traces.TraceDefinitionTerm;
 import org.overturetool.vdmj.traces.TraceIterator;
+import org.overturetool.vdmj.traces.TraceIteratorList;
 import org.overturetool.vdmj.traces.TraceReductionType;
 import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.FlatEnvironment;
@@ -123,18 +122,18 @@ public class NamedTraceDefinition extends Definition
 	public TraceIterator getIterator(
 		Context ctxt, float subset, TraceReductionType type, long seed) throws Exception
 	{
-		SequenceIterator traces = new SequenceIterator();
+		TraceIteratorList iterators = new TraceIteratorList();
 
 		for (TraceDefinitionTerm term: terms)
 		{
-			traces.add(term.getIterator(ctxt));
+			iterators.add(term.getIterator(ctxt));
 		}
 
-		if (!traces.hasMoreTests())
+		if (iterators.isEmpty())
 		{
 			throw new Exception("Trace expansion generated no tests");
 		}
 
-		return traces;
+		return iterators.getSequenceIterator();
 	}
 }

@@ -32,11 +32,11 @@ public class AlternativeIterator extends TraceIterator
 		this.alternatives = new TraceIteratorList();
 	}
 	
-	public void add(TraceIterator iter)
+	public AlternativeIterator(TraceIteratorList alternatives)
 	{
-		alternatives.add(iter);
+		this.alternatives = alternatives;
 	}
-
+	
 	@Override
 	public String toString()
 	{

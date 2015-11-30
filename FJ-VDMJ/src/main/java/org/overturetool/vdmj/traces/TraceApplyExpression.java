@@ -69,7 +69,7 @@ public class TraceApplyExpression extends TraceCoreDefinition
 	}
 
 	@Override
-	public TraceIterator expand(Context ctxt)
+	public TraceIterator getIterator(Context ctxt)
 	{
 		ExpressionList newargs = new ExpressionList();
 		ExpressionList args = null;

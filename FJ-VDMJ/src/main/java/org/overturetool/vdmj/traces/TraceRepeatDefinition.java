@@ -73,7 +73,7 @@ public class TraceRepeatDefinition extends TraceDefinition
 	@Override
 	public TraceIterator getIterator(Context ctxt)
 	{
-		TraceIterator body = core.expand(ctxt);
+		TraceIterator body = core.getIterator(ctxt);
 
 		if (from == 1 && to == 1)
 		{

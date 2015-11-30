@@ -107,18 +107,15 @@ public class TraceIteratorList extends Vector<TraceIterator>
 	 */
 	public CallSequence getNextTestSequence()
 	{
-		if (!isReset())
+		for (int i=0; i<size(); i++)
 		{
-    		for (int i=0; i<size(); i++)
-    		{
-    			if (get(i).hasMoreTests())
-    			{
-        			get(i).getNextTest();	// Sets lastTest for this iterator
-    				break;
-    			}
-    
-    			get(i).reset();
-    		}
+			if (get(i).hasMoreTests())
+			{
+    			get(i).getNextTest();	// Sets lastTest for this iterator
+				break;
+			}
+
+			get(i).reset();
 		}
 		
 		CallSequence seq = new CallSequence();
@@ -152,5 +149,35 @@ public class TraceIteratorList extends Vector<TraceIterator>
 		}
 		
 		throw new RuntimeException("Called getNextTest() when !hasMoreTests()");
+	}
+	
+	/**
+	 * Get the simplest alternative iterator representing the list.
+	 */
+	public TraceIterator getAlternatveIterator()
+	{
+		if (size() == 1)
+		{
+			return get(0);
+		}
+		else
+		{
+			return new AlternativeIterator(this);
+		}
+	}
+	
+	/**
+	 * Get the simplest sequence iterator representing the list.
+	 */
+	public TraceIterator getSequenceIterator()
+	{
+		if (size() == 1)
+		{
+			return get(0);
+		}
+		else
+		{
+			return new SequenceIterator(this);
+		}
 	}
 }

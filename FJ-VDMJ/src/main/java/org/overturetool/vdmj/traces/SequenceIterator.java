@@ -32,9 +32,9 @@ public class SequenceIterator extends TraceIterator
 		this.nodes = new TraceIteratorList();
 	}
 	
-	public void add(TraceIterator iter)
+	public SequenceIterator(TraceIteratorList nodes)
 	{
-		nodes.add(iter);
+		this.nodes = nodes;
 	}
 
 	@Override
