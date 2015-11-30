@@ -23,16 +23,13 @@
 
 package org.overturetool.vdmj.traces;
 
-import org.overturetool.vdmj.lex.LexLocation;
-import org.overturetool.vdmj.statements.SkipStatement;
-
-public class RepeatTraceNode extends TraceNode
+public class RepeatIterator extends TraceIterator
 {
-	public final TraceNode repeat;
+	public final TraceIterator repeat;
 	public final int from;
 	public final int to;
 
-	public RepeatTraceNode(TraceNode repeat, long from, long to)
+	public RepeatIterator(TraceIterator repeat, long from, long to)
 	{
 		this.repeat = repeat;
 		this.from = (int)from;
@@ -49,45 +46,71 @@ public class RepeatTraceNode extends TraceNode
 	}
 
 	@Override
-	public TestSequence getTests()
+	public CallSequence getNextTest()
 	{
-		TestSequence tests = new TestSequence();
-		TestSequence rtests = repeat.getTests();
-		int count = rtests.size();
+//		TestSequence tests = new TestSequence();
+//		TestSequence rtests = repeat.getNextTest();
+//		int count = rtests.size();
+//
+//		for (int r = from; r <= to; r++)
+//		{
+//			if (r == 0)
+//			{
+//				CallSequence seq = getVariables();
+//   				seq.add(new SkipStatement(new LexLocation()));
+//    			tests.add(seq);
+//				continue;
+//			}
+//
+// 			int[] c = new int[r];
+//
+//			for (int i=0; i<r; i++)
+//			{
+//				c[i] = count;
+//			}
+//
+//			Permutor p = new Permutor(c);
+//
+//			while (p.hasNext())
+//			{
+//	   			CallSequence seq = getVariables();
+//	   			int[] select = p.next();
+//
+//	   			for (int i=0; i<r; i++)
+//    			{
+//    				seq.addAll(rtests.get(select[i]));
+//    			}
+//
+//    			tests.add(seq);
+//			}
+//		}
+//
+//		return tests;
+		
+		return new CallSequence();
+	}
 
-		for (int r = from; r <= to; r++)
-		{
-			if (r == 0)
-			{
-				CallSequence seq = getVariables();
-   				seq.add(new SkipStatement(new LexLocation()));
-    			tests.add(seq);
-				continue;
-			}
+	@Override
+	public boolean hasMoreTests()
+	{
+		return repeat.hasMoreTests();
+	}
 
- 			int[] c = new int[r];
+	@Override
+	public int count()
+	{
+		return to - from + 1;
+	}
 
-			for (int i=0; i<r; i++)
-			{
-				c[i] = count;
-			}
+	@Override
+	public void reset()
+	{
+		repeat.reset();
+	}
 
-			Permutor p = new Permutor(c);
-
-			while (p.hasNext())
-			{
-	   			CallSequence seq = getVariables();
-	   			int[] select = p.next();
-
-	   			for (int i=0; i<r; i++)
-    			{
-    				seq.addAll(rtests.get(select[i]));
-    			}
-
-    			tests.add(seq);
-			}
-		}
-
-		return tests;
+	@Override
+	public boolean isReset()
+	{
+		return repeat.isReset();
 	}
 }

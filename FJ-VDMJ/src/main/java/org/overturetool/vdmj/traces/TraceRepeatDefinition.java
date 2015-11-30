@@ -71,9 +71,9 @@ public class TraceRepeatDefinition extends TraceDefinition
 	}
 
 	@Override
-	public TraceNode expand(Context ctxt)
+	public TraceIterator getIterator(Context ctxt)
 	{
-		TraceNode body = core.expand(ctxt);
+		TraceIterator body = core.expand(ctxt);
 
 		if (from == 1 && to == 1)
 		{
@@ -81,7 +81,7 @@ public class TraceRepeatDefinition extends TraceDefinition
 		}
 		else
 		{
-			return new RepeatTraceNode(body, from, to);
+			return new RepeatIterator(body, from, to);
 		}
 	}
 }

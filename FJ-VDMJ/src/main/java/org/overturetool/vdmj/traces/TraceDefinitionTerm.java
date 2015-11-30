@@ -44,13 +44,13 @@ public class TraceDefinitionTerm extends Vector<TraceDefinition>
 		}
 	}
 
-	public TraceNode expand(Context ctxt)
+	public TraceIterator getIterator(Context ctxt)
 	{
-		AlternativeTraceNode node = new AlternativeTraceNode();
+		AlternativeIterator node = new AlternativeIterator();
 
 		for (TraceDefinition term: this)
 		{
-			node.alternatives.add(term.expand(ctxt));
+			node.add(term.getIterator(ctxt));
 		}
 
 		return node;

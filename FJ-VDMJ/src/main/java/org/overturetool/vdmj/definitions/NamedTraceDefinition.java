@@ -30,9 +30,10 @@ import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.lex.Token;
 import org.overturetool.vdmj.runtime.Context;
-import org.overturetool.vdmj.traces.SequenceTraceNode;
+import org.overturetool.vdmj.traces.SequenceIterator;
 import org.overturetool.vdmj.traces.TestSequence;
 import org.overturetool.vdmj.traces.TraceDefinitionTerm;
+import org.overturetool.vdmj.traces.TraceIterator;
 import org.overturetool.vdmj.traces.TraceReductionType;
 import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.FlatEnvironment;
@@ -113,35 +114,27 @@ public class NamedTraceDefinition extends Definition
 		}
 	}
 
-	public TestSequence getTests(Context ctxt) throws Exception
+	public TraceIterator getIterator(Context ctxt) throws Exception
 	{
-		return getTests(
+		return getIterator(
 			ctxt, 1.0F, TraceReductionType.NONE, System.currentTimeMillis());
 	}
 
-	public TestSequence getTests(
+	public TraceIterator getIterator(
 		Context ctxt, float subset, TraceReductionType type, long seed) throws Exception
 	{
-		SequenceTraceNode traces = new SequenceTraceNode();
+		SequenceIterator traces = new SequenceIterator();
 
 		for (TraceDefinitionTerm term: terms)
 		{
-			traces.nodes.add(term.expand(ctxt));
+			traces.add(term.getIterator(ctxt));
 		}
 
-		TestSequence tests = traces.getTests();
-		
-		if (tests.isEmpty())
+		if (!traces.hasMoreTests())
 		{
 			throw new Exception("Trace expansion generated no tests");
 		}
 
-		if (subset < 1.0)
-		{
-			tests.reduce(subset, type, seed);
-		}
-
-		tests.typeCheck(classDefinition);
-		return tests;
+		return traces;
 	}
 }

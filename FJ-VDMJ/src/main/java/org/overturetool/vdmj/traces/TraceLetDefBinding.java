@@ -88,7 +88,7 @@ public class TraceLetDefBinding extends TraceDefinition
 	}
 
 	@Override
-	public TraceNode expand(Context ctxt)
+	public TraceIterator getIterator(Context ctxt)
 	{
 		Context evalContext = new Context(location, "TRACE", ctxt);
 
@@ -97,7 +97,7 @@ public class TraceLetDefBinding extends TraceDefinition
 			evalContext.putList(d.getNamedValues(evalContext));
 		}
 
-		TraceNode node = body.expand(evalContext);
+		TraceIterator node = body.getIterator(evalContext);
 		node.addVariables(new TraceVariableList(evalContext, localDefs));
 		return node;
 	}

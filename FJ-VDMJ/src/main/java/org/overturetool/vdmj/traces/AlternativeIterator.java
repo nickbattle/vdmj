@@ -23,16 +23,18 @@
 
 package org.overturetool.vdmj.traces;
 
-import java.util.List;
-import java.util.Vector;
-
-public class AlternativeTraceNode extends TraceNode
+public class AlternativeIterator extends TraceIterator
 {
-	public List<TraceNode> alternatives;
+	private TraceIteratorList alternatives;
 
-	public AlternativeTraceNode()
+	public AlternativeIterator()
 	{
-		this.alternatives = new Vector<TraceNode>();
+		this.alternatives = new TraceIteratorList();
+	}
+	
+	public void add(TraceIterator iter)
+	{
+		alternatives.add(iter);
 	}
 
 	@Override
@@ -42,7 +44,7 @@ public class AlternativeTraceNode extends TraceNode
 		sb.append("(");
 		String sep = "";
 
-		for (TraceNode node: alternatives)
+		for (TraceIterator node: alternatives)
 		{
 			sb.append(sep);
 			sb.append(node.toString());
@@ -54,23 +56,50 @@ public class AlternativeTraceNode extends TraceNode
 	}
 
 	@Override
-	public TestSequence getTests()
+	public CallSequence getNextTest()
 	{
-		TestSequence tests = new TestSequence();
+//		TestSequence tests = new TestSequence();
+//
+//		for (TraceIterator node: alternatives)
+//		{
+//			// Alternatives within an alternative are just like larger alts,
+//			// so we add all the lower alts to the list...
+//
+//    		for (CallSequence test: node.getNextTest())
+//    		{
+//    			CallSequence seq = getVariables();
+//    			seq.addAll(test);
+//    			tests.add(seq);
+//    		}
+//		}
+//
+//		return tests;
 
-		for (TraceNode node: alternatives)
-		{
-			// Alternatives within an alternative are just like larger alts,
-			// so we add all the lower alts to the list...
+		lastTest = alternatives.getNextTestAlternative();
+		return lastTest;
+	}
 
-    		for (CallSequence test: node.getTests())
-    		{
-    			CallSequence seq = getVariables();
-    			seq.addAll(test);
-    			tests.add(seq);
-    		}
-		}
+	@Override
+	public boolean hasMoreTests()
+	{
+		return alternatives.hasMoreTests();
+	}
 
-		return tests;
+	@Override
+	public int count()
+	{
+		return alternatives.countAlternative();
+	}
+
+	@Override
+	public void reset()
+	{
+		alternatives.reset();
+	}
+
+	@Override
+	public boolean isReset()
+	{
+		return alternatives.isReset();
 	}
 }

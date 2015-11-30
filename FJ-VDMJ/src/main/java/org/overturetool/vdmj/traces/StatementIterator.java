@@ -25,11 +25,11 @@ package org.overturetool.vdmj.traces;
 
 import org.overturetool.vdmj.statements.Statement;
 
-public class StatementTraceNode extends TraceNode
+public class StatementIterator extends TraceIterator
 {
 	public final Statement statement;
 
-	public StatementTraceNode(Statement newStatement)
+	public StatementIterator(Statement newStatement)
 	{
 		this.statement = newStatement;
 	}
@@ -41,12 +41,34 @@ public class StatementTraceNode extends TraceNode
 	}
 
 	@Override
-	public TestSequence getTests()
+	public CallSequence getNextTest()
 	{
-		TestSequence tests = new TestSequence();
-		CallSequence seq = getVariables();
-		seq.add(statement);
-		tests.add(seq);
-		return tests;
+		lastTest = getVariables();
+		lastTest.add(statement);
+		return lastTest;
+	}
+
+	@Override
+	public boolean hasMoreTests()
+	{
+		return lastTest == null;
+	}
+
+	@Override
+	public int count()
+	{
+		return 1;
+	}
+
+	@Override
+	public void reset()
+	{
+		lastTest = null;
+	}
+
+	@Override
+	public boolean isReset()
+	{
+		return lastTest == null;
 	}
 }
