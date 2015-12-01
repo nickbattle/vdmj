@@ -79,10 +79,4 @@ public class AlternativeIterator extends TraceIterator
 	{
 		alternatives.reset();
 	}
-
-	@Override
-	public boolean isReset()
-	{
-		return alternatives.isReset();
-	}
 }

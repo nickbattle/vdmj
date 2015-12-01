@@ -23,13 +23,17 @@
 
 package org.overturetool.vdmj.traces;
 
+import java.util.Arrays;
+
 public class RepeatIterator extends TraceIterator
 {
-	public final TraceIterator repeat;
-	public final int from;
-	public final int to;
-
-	private int rValue;
+	private final TraceIterator repeat;
+	private final int from;
+	private final int to;
+	
+	private int repeatCount;
+	private Integer repeatValue;
+	private Permutor permutor;
 	
 	public RepeatIterator(TraceIterator repeat, long from, long to)
 	{
@@ -37,7 +41,8 @@ public class RepeatIterator extends TraceIterator
 		this.from = (int)from;
 		this.to = (int)to;
 		
-		rValue = this.from;
+		repeatValue = this.from;
+		repeatCount = repeat.count();
 	}
 
 	@Override
@@ -52,70 +57,77 @@ public class RepeatIterator extends TraceIterator
 	@Override
 	public CallSequence getNextTest()
 	{
-//		TestSequence tests = new TestSequence();
-//		TestSequence rtests = repeat.getNextTest();
-//		int count = rtests.size();
-//
-//		for (int r = from; r <= to; r++)
-//		{
-//			if (r == 0)
-//			{
-//				CallSequence seq = getVariables();
-//   				seq.add(new SkipStatement(new LexLocation()));
-//    			tests.add(seq);
-//				continue;
-//			}
-//
-// 			int[] c = new int[r];
-//
-//			for (int i=0; i<r; i++)
-//			{
-//				c[i] = count;
-//			}
-//
-//			Permutor p = new Permutor(c);
-//
-//			while (p.hasNext())
-//			{
-//	   			CallSequence seq = getVariables();
-//	   			int[] select = p.next();
-//
-//	   			for (int i=0; i<r; i++)
-//    			{
-//    				seq.addAll(rtests.get(select[i]));
-//    			}
-//
-//    			tests.add(seq);
-//			}
-//		}
-//
-//		return tests;
+		if (permutor == null)	// Start new permutor for repeatValue
+		{
+			int[] c = new int[repeatValue];
+			Arrays.fill(c, repeatCount);
+			permutor = new Permutor(c);
+		}
 		
-		return new CallSequence();
+		CallSequence result = new CallSequence();
+		
+		if (permutor.hasNext())
+		{
+			int[] select = permutor.next();
+			
+			// The select array contains a set of numbers, being the elements of
+			// the expansion of "repeat" that must be concatenated.
+			
+			CallSequence[] subsequences = new CallSequence[repeatCount];
+			repeat.reset();
+			
+			for (int i=0; i<repeatCount; i++)
+			{
+				subsequences[i] = repeat.getNextTest();
+			}
+			
+			for (int i=0; i<repeatValue; i++)	// ie. {n} additions
+			{
+				result.addAll(subsequences[select[i]]);
+			}
+		}
+
+		if (!permutor.hasNext())		// Exhausted permutor for repeatValue
+		{
+			permutor = null;
+
+			if (repeatValue < to)
+			{
+				repeatValue++;
+			}
+			else
+			{
+				repeatValue = null;		// Indicates no more tests
+			}
+		}
+		
+		return result;
 	}
 
 	@Override
 	public boolean hasMoreTests()
 	{
-		return repeat.hasMoreTests();
+		return repeatValue != null;		// Cleared by getNextTest
 	}
 
 	@Override
 	public int count()
 	{
-		return to - from + 1;
+		int n = 0;
+		
+		for (int rval=from; rval <= to; rval++)
+		{
+			n = (int) (n + Math.pow(repeatCount, rval));
+		}
+		
+		return n;
 	}
 
 	@Override
 	public void reset()
 	{
 		repeat.reset();
-		rValue = from;
-	}
-
-	@Override
-	public boolean isReset()
-	{
-		return repeat.isReset();
+		repeatValue = from;
+		permutor = null;
 	}
 }

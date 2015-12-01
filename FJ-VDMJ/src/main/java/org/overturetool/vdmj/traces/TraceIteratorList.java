@@ -40,19 +40,6 @@ public class TraceIteratorList extends Vector<TraceIterator>
 		}
 	}
 	
-	public boolean isReset()
-	{
-		for (TraceIterator iter: this)
-		{
-			if (!iter.isReset())
-			{
-				return false;
-			}
-		}
-		
-		return true;
-	}
-	
 	public int countSequence()
 	{
 		int result = 1;

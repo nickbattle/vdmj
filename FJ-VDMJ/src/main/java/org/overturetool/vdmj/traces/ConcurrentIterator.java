@@ -118,10 +118,4 @@ public class ConcurrentIterator extends TraceIterator
 	{
 		nodes.reset();
 	}
-
-	@Override
-	public boolean isReset()
-	{
-		return nodes.isReset();
-	}
 }

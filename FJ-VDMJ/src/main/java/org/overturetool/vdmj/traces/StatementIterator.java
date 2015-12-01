@@ -65,10 +65,4 @@ public class StatementIterator extends TraceIterator
 	{
 		lastTest = null;
 	}
-
-	@Override
-	public boolean isReset()
-	{
-		return lastTest == null;
-	}
 }

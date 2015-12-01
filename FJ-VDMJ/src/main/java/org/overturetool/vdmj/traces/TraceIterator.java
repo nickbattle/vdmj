@@ -54,6 +54,4 @@ public abstract class TraceIterator
 	abstract public int count();
 	
 	abstract public void reset();
-
-	abstract public boolean isReset();
 }
