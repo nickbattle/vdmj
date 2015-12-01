@@ -47,5 +47,5 @@ public abstract class TraceCoreDefinition implements Serializable
 
 	abstract public void typeCheck(Environment local, NameScope scope);
 
-	abstract public TraceIterator getIterator(Context ctxt);
+	abstract public TraceNode expand(Context ctxt);
 }

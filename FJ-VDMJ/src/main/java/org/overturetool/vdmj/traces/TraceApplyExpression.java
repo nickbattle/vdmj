@@ -69,7 +69,7 @@ public class TraceApplyExpression extends TraceCoreDefinition
 	}
 
 	@Override
-	public TraceIterator getIterator(Context ctxt)
+	public TraceNode expand(Context ctxt)
 	{
 		ExpressionList newargs = new ExpressionList();
 		ExpressionList args = null;
@@ -138,6 +138,6 @@ public class TraceApplyExpression extends TraceCoreDefinition
 			}
 		}
 
-		return new StatementIterator(newStatement);
+		return new StatementTraceNode(newStatement);
 	}
 }

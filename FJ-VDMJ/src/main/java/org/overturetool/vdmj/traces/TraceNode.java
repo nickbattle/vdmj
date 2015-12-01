@@ -23,11 +23,14 @@
 
 package org.overturetool.vdmj.traces;
 
-public abstract class TraceIterator
+public abstract class TraceNode
 {
 	private TraceVariableList variables = new TraceVariableList();
-	
-	protected CallSequence lastTest = null;
+
+	@Override
+	abstract public String toString();
+
+	abstract public TestSequence getTests();
 
 	public void addVariables(TraceVariableList variables)
 	{
@@ -38,22 +41,4 @@ public abstract class TraceIterator
 	{
 		return variables.getVariables();
 	}
-
-	@Override
-	abstract public String toString();
-
-	abstract public boolean hasMoreTests();
-
-	abstract public CallSequence getNextTest();
-
-	public CallSequence getLastTest()
-	{
-		return lastTest;
-	}
-
-	abstract public int count();
-	
-	abstract public void reset();
-
-	abstract public boolean isReset();
 }

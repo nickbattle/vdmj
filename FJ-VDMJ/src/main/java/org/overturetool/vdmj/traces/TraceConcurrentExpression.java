@@ -51,13 +51,13 @@ public class TraceConcurrentExpression extends TraceCoreDefinition
 	}
 
 	@Override
-	public TraceIterator getIterator(Context ctxt)
+	public TraceNode expand(Context ctxt)
 	{
-		ConcurrentIterator node = new ConcurrentIterator();
+		ConcurrentTraceNode node = new ConcurrentTraceNode();
 
 		for (TraceDefinition term: defs)
 		{
-			node.nodes.add(term.getIterator(ctxt));
+			node.nodes.add(term.expand(ctxt));
 		}
 
 		return node;

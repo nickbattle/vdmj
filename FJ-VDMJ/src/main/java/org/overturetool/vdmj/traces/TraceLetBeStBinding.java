@@ -93,9 +93,9 @@ public class TraceLetBeStBinding extends TraceDefinition
 	}
 
 	@Override
-	public TraceIterator getIterator(Context ctxt)
+	public TraceNode expand(Context ctxt)
 	{
-		TraceIteratorList iterators = new TraceIteratorList();
+		AlternativeTraceNode node = new AlternativeTraceNode();
 
 		try
 		{
@@ -116,7 +116,8 @@ public class TraceLetBeStBinding extends TraceDefinition
 
 			if (quantifiers.finished())		// No entries at all
 			{
-				return new StatementIterator(new SkipStatement(location));
+				node.alternatives.add(new StatementTraceNode(new SkipStatement(location)));
+				return node;
 			}
 
 			while (quantifiers.hasNext())
@@ -146,9 +147,9 @@ public class TraceLetBeStBinding extends TraceDefinition
 				if (matches &&
 					(stexp == null || stexp.eval(evalContext).boolValue(ctxt)))
 				{
-					TraceIterator exp = body.getIterator(evalContext);
+					TraceNode exp = body.expand(evalContext);
 					exp.addVariables(new TraceVariableList(evalContext, def.getDefinitions()));
-					iterators.add(exp);
+					node.alternatives.add(exp);
 				}
 			}
 		}
@@ -157,13 +158,6 @@ public class TraceLetBeStBinding extends TraceDefinition
         	throw new ContextException(e, location);
         }
 
-		if (iterators.size() == 1)
-		{
-			return iterators.get(0);
-		}
-		else
-		{
-			return new AlternativeIterator(iterators);
-		}
+		return node;
 	}
 }

@@ -23,18 +23,16 @@
 
 package org.overturetool.vdmj.traces;
 
-public class SequenceIterator extends TraceIterator
-{
-	private TraceIteratorList nodes;
+import java.util.List;
+import java.util.Vector;
 
-	public SequenceIterator()
+public class SequenceTraceNode extends TraceNode
+{
+	public List<TraceNode> nodes;
+
+	public SequenceTraceNode()
 	{
-		this.nodes = new TraceIteratorList();
-	}
-	
-	public SequenceIterator(TraceIteratorList nodes)
-	{
-		this.nodes = nodes;
+		this.nodes = new Vector<TraceNode>();
 	}
 
 	@Override
@@ -43,7 +41,7 @@ public class SequenceIterator extends TraceIterator
 		StringBuilder sb = new StringBuilder();
 		String sep = "";
 
-		for (TraceIterator node: nodes)
+		for (TraceNode node: nodes)
 		{
 			sb.append(sep);
 			sb.append(node.toString());
@@ -54,33 +52,42 @@ public class SequenceIterator extends TraceIterator
 	}
 
 	@Override
-	public CallSequence getNextTest()
+	public TestSequence getTests()
 	{
-		lastTest = nodes.getNextTestSequence();
-		return lastTest;
-	}
+		List<TestSequence> nodetests = new Vector<TestSequence>();
+		int count = nodes.size();
+		int[] sizes = new int[count];
+		int n = 0;
 
-	@Override
-	public boolean hasMoreTests()
-	{
-		return nodes.hasMoreTests();
-	}
+		for (TraceNode node: nodes)
+		{
+			TestSequence nt = node.getTests();
+			nodetests.add(nt);
+			sizes[n++] = nt.size();
+		}
 
-	@Override
-	public int count()
-	{
-		return nodes.countSequence();
-	}
+		TestSequence tests = new TestSequence();
+		Permutor p = new Permutor(sizes);
 
-	@Override
-	public void reset()
-	{
-		nodes.reset();
-	}
+		while (p.hasNext())
+		{
+			int[] select = p.next();
+			CallSequence seq = getVariables();
 
-	@Override
-	public boolean isReset()
-	{
-		return nodes.isReset();
+			for (int i=0; i<count; i++)
+			{
+				TestSequence ith = nodetests.get(i);
+				
+				if (!ith.isEmpty())
+				{
+					CallSequence subseq = ith.get(select[i]);
+					seq.addAll(subseq);
+				}
+			}
+
+			tests.add(seq);
+		}
+
+		return tests;
 	}
 }

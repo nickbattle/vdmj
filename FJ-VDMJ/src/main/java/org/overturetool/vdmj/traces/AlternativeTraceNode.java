@@ -23,52 +23,54 @@
 
 package org.overturetool.vdmj.traces;
 
-import org.overturetool.vdmj.statements.Statement;
+import java.util.List;
+import java.util.Vector;
 
-public class StatementIterator extends TraceIterator
+public class AlternativeTraceNode extends TraceNode
 {
-	public final Statement statement;
+	public List<TraceNode> alternatives;
 
-	public StatementIterator(Statement newStatement)
+	public AlternativeTraceNode()
 	{
-		this.statement = newStatement;
+		this.alternatives = new Vector<TraceNode>();
 	}
 
 	@Override
 	public String toString()
 	{
-		return statement.toString();
+		StringBuilder sb = new StringBuilder();
+		sb.append("(");
+		String sep = "";
+
+		for (TraceNode node: alternatives)
+		{
+			sb.append(sep);
+			sb.append(node.toString());
+			sep = " | ";
+		}
+
+		sb.append(")");
+		return sb.toString();
 	}
 
 	@Override
-	public CallSequence getNextTest()
+	public TestSequence getTests()
 	{
-		lastTest = getVariables();
-		lastTest.add(statement);
-		return lastTest;
-	}
+		TestSequence tests = new TestSequence();
 
-	@Override
-	public boolean hasMoreTests()
-	{
-		return lastTest == null;
-	}
+		for (TraceNode node: alternatives)
+		{
+			// Alternatives within an alternative are just like larger alts,
+			// so we add all the lower alts to the list...
 
-	@Override
-	public int count()
-	{
-		return 1;
-	}
+    		for (CallSequence test: node.getTests())
+    		{
+    			CallSequence seq = getVariables();
+    			seq.addAll(test);
+    			tests.add(seq);
+    		}
+		}
 
-	@Override
-	public void reset()
-	{
-		lastTest = null;
-	}
-
-	@Override
-	public boolean isReset()
-	{
-		return lastTest == null;
+		return tests;
 	}
 }

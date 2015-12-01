@@ -44,22 +44,15 @@ public class TraceDefinitionTerm extends Vector<TraceDefinition>
 		}
 	}
 
-	public TraceIterator getIterator(Context ctxt)
+	public TraceNode expand(Context ctxt)
 	{
-		TraceIteratorList list = new TraceIteratorList();
+		AlternativeTraceNode node = new AlternativeTraceNode();
 
 		for (TraceDefinition term: this)
 		{
-			list.add(term.getIterator(ctxt));
+			node.alternatives.add(term.expand(ctxt));
 		}
 
-		if (list.size() == 1)
-		{
-			return list.get(0);
-		}
-		else
-		{
-			return new AlternativeIterator(list);
-		}
+		return node;
 	}
 }

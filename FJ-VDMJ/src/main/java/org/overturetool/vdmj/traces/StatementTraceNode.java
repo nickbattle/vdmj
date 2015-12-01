@@ -23,66 +23,30 @@
 
 package org.overturetool.vdmj.traces;
 
-public class AlternativeIterator extends TraceIterator
-{
-	private TraceIteratorList alternatives;
+import org.overturetool.vdmj.statements.Statement;
 
-	public AlternativeIterator()
+public class StatementTraceNode extends TraceNode
+{
+	public final Statement statement;
+
+	public StatementTraceNode(Statement newStatement)
 	{
-		this.alternatives = new TraceIteratorList();
+		this.statement = newStatement;
 	}
-	
-	public AlternativeIterator(TraceIteratorList alternatives)
-	{
-		this.alternatives = alternatives;
-	}
-	
+
 	@Override
 	public String toString()
 	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("(");
-		String sep = "";
-
-		for (TraceIterator node: alternatives)
-		{
-			sb.append(sep);
-			sb.append(node.toString());
-			sep = " | ";
-		}
-
-		sb.append(")");
-		return sb.toString();
+		return statement.toString();
 	}
 
 	@Override
-	public CallSequence getNextTest()
+	public TestSequence getTests()
 	{
-		lastTest = alternatives.getNextTestAlternative();
-		return lastTest;
-	}
-
-	@Override
-	public boolean hasMoreTests()
-	{
-		return alternatives.hasMoreTests();
-	}
-
-	@Override
-	public int count()
-	{
-		return alternatives.countAlternative();
-	}
-
-	@Override
-	public void reset()
-	{
-		alternatives.reset();
-	}
-
-	@Override
-	public boolean isReset()
-	{
-		return alternatives.isReset();
+		TestSequence tests = new TestSequence();
+		CallSequence seq = getVariables();
+		seq.add(statement);
+		tests.add(seq);
+		return tests;
 	}
 }

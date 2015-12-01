@@ -57,7 +57,6 @@ import org.overturetool.vdmj.statements.Statement;
 import org.overturetool.vdmj.syntax.ParserException;
 import org.overturetool.vdmj.traces.CallSequence;
 import org.overturetool.vdmj.traces.TestSequence;
-import org.overturetool.vdmj.traces.TraceIterator;
 import org.overturetool.vdmj.traces.TraceReductionType;
 import org.overturetool.vdmj.traces.Verdict;
 import org.overturetool.vdmj.typechecker.Environment;
@@ -562,7 +561,7 @@ abstract public class Interpreter
 			throw new Exception("Trace " + lexname + " not found");
 		}
 
-		TraceIterator tests = tracedef.getIterator(
+		TestSequence tests = tracedef.getTests(
 			getTraceContext(tracedef.classDefinition), subset, type, seed);
 
 		boolean wasDBGP = Settings.usingDBGP;
@@ -579,20 +578,18 @@ abstract public class Interpreter
 			writer = Console.out;
 		}
 
-//		if (testNo > tests.size())
-//		{
-//			throw new Exception("Trace " + lexname +
-//				" only has " + tests.size() + " tests");
-//		}
+		if (testNo > tests.size())
+		{
+			throw new Exception("Trace " + lexname +
+				" only has " + tests.size() + " tests");
+		}
 
 		int n = 1;
 		boolean failed = false;
-		writer.println("Generated " + tests.count() + " tests");
+		writer.println("Generated " + tests.size() + " tests");
 
-		while (tests.hasMoreTests())
+		for (CallSequence test: tests)
 		{
-			CallSequence test = tests.getNextTest();
-			
 			if (testNo > 0 && n != testNo)
 			{
 				n++;
@@ -602,18 +599,18 @@ abstract public class Interpreter
 			// Bodge until we figure out how to not have explicit op names.
 			String clean = test.toString().replaceAll("\\.\\w+`", ".");
 
-//			if (test.getFilter() > 0)
-//			{
-//    			writer.println("Test " + n + " = " + clean);
-//				writer.println(
-//					"Test " + n + " FILTERED by test " + test.getFilter());
-//			}
-//			else
+			if (test.getFilter() > 0)
+			{
+    			writer.println("Test " + n + " = " + clean);
+				writer.println(
+					"Test " + n + " FILTERED by test " + test.getFilter());
+			}
+			else
 			{
 				// Initialize completely between every run...
     			init(null);
     			List<Object> result = runOneTrace(tracedef.classDefinition, test, debug);
-    			// tests.filter(result, test, n);
+    			tests.filter(result, test, n);
 
     			writer.println("Test " + n + " = " + clean);
     			writer.println("Result = " + result);
