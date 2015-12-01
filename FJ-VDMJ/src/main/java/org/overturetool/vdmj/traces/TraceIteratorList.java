@@ -26,7 +26,7 @@ package org.overturetool.vdmj.traces;
 import java.util.Vector;
 
 /**
- * A list of trace iterators.
+ * A list of trace iterators, and operations to perform on them as a group.
  */
 public class TraceIteratorList extends Vector<TraceIterator>
 {

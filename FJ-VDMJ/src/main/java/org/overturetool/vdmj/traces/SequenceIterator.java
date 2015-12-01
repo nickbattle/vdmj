@@ -56,42 +56,6 @@ public class SequenceIterator extends TraceIterator
 	@Override
 	public CallSequence getNextTest()
 	{
-//		List<TestSequence> nodetests = new Vector<TestSequence>();
-//		int count = nodes.size();
-//		int[] sizes = new int[count];
-//		int n = 0;
-//
-//		for (TraceIterator node: nodes)
-//		{
-//			TestSequence nt = node.getNextTest();
-//			nodetests.add(nt);
-//			sizes[n++] = node.count();
-//		}
-//
-//		TestSequence tests = new TestSequence();
-//		Permutor p = new Permutor(sizes);
-//
-//		while (p.hasNext())
-//		{
-//			int[] select = p.next();
-//			CallSequence seq = getVariables();
-//
-//			for (int i=0; i<count; i++)
-//			{
-//				TestSequence ith = nodetests.get(i);
-//				
-//				if (!ith.isEmpty())
-//				{
-//					CallSequence subseq = ith.get(select[i]);
-//					seq.addAll(subseq);
-//				}
-//			}
-//
-//			tests.add(seq);
-//		}
-//
-//		return tests;
-		
 		lastTest = nodes.getNextTestSequence();
 		return lastTest;
 	}

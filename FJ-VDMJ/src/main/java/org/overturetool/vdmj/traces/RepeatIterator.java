@@ -29,11 +29,15 @@ public class RepeatIterator extends TraceIterator
 	public final int from;
 	public final int to;
 
+	private int rValue;
+	
 	public RepeatIterator(TraceIterator repeat, long from, long to)
 	{
 		this.repeat = repeat;
 		this.from = (int)from;
 		this.to = (int)to;
+		
+		rValue = this.from;
 	}
 
 	@Override
@@ -106,6 +110,7 @@ public class RepeatIterator extends TraceIterator
 	public void reset()
 	{
 		repeat.reset();
+		rValue = from;
 	}
 
 	@Override

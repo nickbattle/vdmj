@@ -58,23 +58,6 @@ public class AlternativeIterator extends TraceIterator
 	@Override
 	public CallSequence getNextTest()
 	{
-//		TestSequence tests = new TestSequence();
-//
-//		for (TraceIterator node: alternatives)
-//		{
-//			// Alternatives within an alternative are just like larger alts,
-//			// so we add all the lower alts to the list...
-//
-//    		for (CallSequence test: node.getNextTest())
-//    		{
-//    			CallSequence seq = getVariables();
-//    			seq.addAll(test);
-//    			tests.add(seq);
-//    		}
-//		}
-//
-//		return tests;
-
 		lastTest = alternatives.getNextTestAlternative();
 		return lastTest;
 	}

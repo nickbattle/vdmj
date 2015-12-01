@@ -27,7 +27,7 @@ public abstract class TraceIterator
 {
 	private TraceVariableList variables = new TraceVariableList();
 	
-	protected CallSequence lastTest;
+	protected CallSequence lastTest = null;
 
 	public void addVariables(TraceVariableList variables)
 	{
