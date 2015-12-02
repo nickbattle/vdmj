@@ -624,6 +624,11 @@ abstract public class Interpreter
     			}
 			}
 
+			if (testNo > 0 && n == testNo)
+			{
+				break;
+			}
+
 			n++;
 		}
 

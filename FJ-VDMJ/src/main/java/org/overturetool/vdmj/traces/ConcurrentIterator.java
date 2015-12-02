@@ -25,22 +25,88 @@ package org.overturetool.vdmj.traces;
 
 public class ConcurrentIterator extends TraceIterator
 {
-	public TraceIteratorList nodes;
+	private final TraceIteratorList nodes;
+	
+	private PermuteArray permutations = null;
+	
+	private Permutor permutor = null;
 
-	public ConcurrentIterator()
+	public ConcurrentIterator(TraceIteratorList nodes)
 	{
-		nodes = new TraceIteratorList();
+		this.nodes = nodes;
 	}
 
 	@Override
 	public CallSequence getNextTest()
 	{
+		if (permutations == null)
+		{
+			permutations = new PermuteArray(nodes.size());
+			permutor = null;
+		}
+		
+		if (permutor == null)
+		{
+			int[] c = new int[nodes.size()];
+			
+			for (int i=0; i<nodes.size(); i++)
+			{
+				c[i] = nodes.get(i).count();
+			}
+			
+			permutor = new Permutor(c);
+		}
+
+		CallSequence result = new CallSequence();
+		
+		if (permutor.hasNext())
+		{
+			int[] select = permutor.next();
+			int[] permutation = permutations.next();
+			
+			// The select array contains a set of numbers, being the elements of
+			// the expansion of the permutation that must be concatenated.
+			
+			CallSequence[] subsequences = new CallSequence[nodes.size()];
+			nodes.reset();
+			
+			for (int node=0; node<nodes.size(); node++)
+			{
+//				for (int i=0; i<repeatCount; i++)
+//				{
+//					subsequences[i] = repeat.getNextTest();
+//				}
+//				
+//				for (int i=0; i<repeatValue; i++)	// ie. {n} additions
+//				{
+//					result.addAll(subsequences[select[i]]);
+//				}
+			}
+		}
+
+		if (!permutor.hasNext())		// Exhausted permutor for repeatValue
+		{
+			permutor = null;
+
+//			if (repeatValue < to)
+//			{
+//				repeatValue++;
+//			}
+//			else
+//			{
+//				repeatValue = null;		// Indicates no more tests
+//			}
+		}
+		
+		return result;
+		
+		
 //		List<TestSequence> nodetests = new Vector<TestSequence>();
 //		int count = nodes.size();
 //
-//		for (TraceIterator node: nodes)
+//		for (TraceNode node: nodes)
 //		{
-//			nodetests.add(node.getNextTest());
+//			nodetests.add(node.getTests());
 //		}
 //
 //		TestSequence tests = new TestSequence();
@@ -79,8 +145,6 @@ public class ConcurrentIterator extends TraceIterator
 //		}
 //
 //		return tests;
-
-		return new CallSequence();
 	}
 
 	@Override
