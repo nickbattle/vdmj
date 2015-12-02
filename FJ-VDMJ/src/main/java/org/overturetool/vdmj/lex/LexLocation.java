@@ -85,8 +85,12 @@ public class LexLocation implements Serializable
 		this.endLine = endLine;
 		this.endPos = endPos;
 
-		allLocations.add(this);
-		uniqueLocations.put(this, this);
+		if (!file.getName().equals("console") &&
+			!file.getName().equals("?"))	// Don't remember junk
+		{
+			allLocations.add(this);
+			uniqueLocations.put(this, this);
+		}
 	}
 
 	/**

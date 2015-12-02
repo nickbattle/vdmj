@@ -56,7 +56,6 @@ import org.overturetool.vdmj.scheduler.SchedulableThread;
 import org.overturetool.vdmj.statements.Statement;
 import org.overturetool.vdmj.syntax.ParserException;
 import org.overturetool.vdmj.traces.CallSequence;
-import org.overturetool.vdmj.traces.TestSequence;
 import org.overturetool.vdmj.traces.TraceIterator;
 import org.overturetool.vdmj.traces.TraceReductionType;
 import org.overturetool.vdmj.traces.Verdict;

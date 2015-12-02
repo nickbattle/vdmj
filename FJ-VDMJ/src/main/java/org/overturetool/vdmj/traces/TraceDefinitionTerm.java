@@ -53,13 +53,6 @@ public class TraceDefinitionTerm extends Vector<TraceDefinition>
 			list.add(term.getIterator(ctxt));
 		}
 
-		if (list.size() == 1)
-		{
-			return list.get(0);
-		}
-		else
-		{
-			return new AlternativeIterator(list);
-		}
+		return list.getAlternatveIterator();
 	}
 }

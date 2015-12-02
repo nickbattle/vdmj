@@ -146,9 +146,9 @@ public class TraceLetBeStBinding extends TraceDefinition
 				if (matches &&
 					(stexp == null || stexp.eval(evalContext).boolValue(ctxt)))
 				{
-					TraceIterator exp = body.getIterator(evalContext);
-					exp.addVariables(new TraceVariableList(evalContext, def.getDefinitions()));
-					iterators.add(exp);
+					TraceIterator iter = body.getIterator(evalContext);
+					iter.addVariables(new TraceVariableList(evalContext, def.getDefinitions()));
+					iterators.add(iter);
 				}
 			}
 		}
@@ -157,13 +157,6 @@ public class TraceLetBeStBinding extends TraceDefinition
         	throw new ContextException(e, location);
         }
 
-		if (iterators.size() == 1)
-		{
-			return iterators.get(0);
-		}
-		else
-		{
-			return new AlternativeIterator(iterators);
-		}
+		return iterators.getAlternatveIterator();
 	}
 }
