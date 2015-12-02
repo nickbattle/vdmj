@@ -578,11 +578,11 @@ abstract public class Interpreter
 			writer = Console.out;
 		}
 
-//		if (testNo > tests.size())
-//		{
-//			throw new Exception("Trace " + lexname +
-//				" only has " + tests.size() + " tests");
-//		}
+		if (testNo > tests.count())
+		{
+			throw new Exception("Trace " + lexname +
+				" only has " + tests.count() + " tests");
+		}
 
 		int n = 1;
 		boolean failed = false;
@@ -591,6 +591,7 @@ abstract public class Interpreter
 		while (tests.hasMoreTests())
 		{
 			CallSequence test = tests.getNextTest();
+			test.typeCheck(tracedef.classDefinition);
 			
 			if (testNo > 0 && n != testNo)
 			{

@@ -25,9 +25,16 @@ package org.overturetool.vdmj.traces;
 
 import java.util.Vector;
 
+import org.overturetool.vdmj.definitions.ClassDefinition;
+import org.overturetool.vdmj.definitions.DefinitionList;
+import org.overturetool.vdmj.runtime.ClassInterpreter;
+import org.overturetool.vdmj.runtime.Interpreter;
 import org.overturetool.vdmj.statements.CallObjectStatement;
 import org.overturetool.vdmj.statements.CallStatement;
 import org.overturetool.vdmj.statements.Statement;
+import org.overturetool.vdmj.typechecker.Environment;
+import org.overturetool.vdmj.typechecker.FlatEnvironment;
+import org.overturetool.vdmj.typechecker.PrivateClassEnvironment;
 
 @SuppressWarnings("serial")
 public class CallSequence extends Vector<Statement>
@@ -146,5 +153,29 @@ public class CallSequence extends Vector<Statement>
 	public int getFilter()
 	{
 		return filtered;
+	}
+	
+	public void typeCheck(ClassDefinition classdef) throws Exception
+	{
+		Interpreter interpreter = Interpreter.getInstance();
+		Environment env = null;
+
+		if (interpreter instanceof ClassInterpreter)
+		{
+			env = new FlatEnvironment(
+				classdef.getSelfDefinition(),
+				new PrivateClassEnvironment(classdef, interpreter.getGlobalEnvironment()));
+		}
+		else
+		{
+			env = new FlatEnvironment(
+				new DefinitionList(),
+				interpreter.getGlobalEnvironment());
+		}
+
+		for (Statement statement: this)
+		{
+			interpreter.typeCheck(statement, env);
+		}
 	}
 }
