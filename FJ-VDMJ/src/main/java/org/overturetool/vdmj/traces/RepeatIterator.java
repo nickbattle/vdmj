@@ -64,7 +64,7 @@ public class RepeatIterator extends TraceIterator
 			permutor = new Permutor(c);
 		}
 		
-		CallSequence result = new CallSequence();
+		lastTest = getVariables();
 		
 		if (permutor.hasNext())
 		{
@@ -83,7 +83,7 @@ public class RepeatIterator extends TraceIterator
 			
 			for (int i=0; i<repeatValue; i++)	// ie. {n} additions
 			{
-				result.addAll(subsequences[select[i]]);
+				lastTest.addAll(subsequences[select[i]]);
 			}
 		}
 
@@ -101,7 +101,7 @@ public class RepeatIterator extends TraceIterator
 			}
 		}
 		
-		return result;
+		return lastTest;
 	}
 
 	@Override
@@ -129,5 +129,6 @@ public class RepeatIterator extends TraceIterator
 		repeat.reset();
 		repeatValue = from;
 		permutor = null;
+		lastTest = null;
 	}
 }

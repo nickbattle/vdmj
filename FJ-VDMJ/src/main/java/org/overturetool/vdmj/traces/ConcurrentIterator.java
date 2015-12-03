@@ -86,7 +86,7 @@ public class ConcurrentIterator extends TraceIterator
 			selector = new Permutor(c);
 		}
 
-		CallSequence result = getVariables();
+		lastTest = getVariables();
 		
 		if (selector.hasNext())
 		{
@@ -108,11 +108,11 @@ public class ConcurrentIterator extends TraceIterator
 			
 			for (int i=0; i<nodesSize; i++)		// Add in permutation order
 			{
-				result.addAll(subsequences[permutation[i]]);
+				lastTest.addAll(subsequences[permutation[i]]);
 			}
 		}
 		
-		return result;
+		return lastTest;
 	}
 
 	@Override
@@ -137,5 +137,6 @@ public class ConcurrentIterator extends TraceIterator
 	public void reset()
 	{
 		nodes.reset();
+		lastTest = null;
 	}
 }

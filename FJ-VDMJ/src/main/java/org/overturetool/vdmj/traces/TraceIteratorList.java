@@ -101,8 +101,10 @@ public class TraceIteratorList extends Vector<TraceIterator>
     			get(i).getNextTest();	// Sets lastTest for this iterator
 				break;
 			}
-
-			get(i).reset();
+			else if (i < size() - 1 && get(i+1).hasMoreTests())
+			{
+				get(i).reset();
+			}
 		}
 		
 		CallSequence seq = new CallSequence();

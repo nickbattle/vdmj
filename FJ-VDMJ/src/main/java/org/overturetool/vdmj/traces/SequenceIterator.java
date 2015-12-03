@@ -56,7 +56,8 @@ public class SequenceIterator extends TraceIterator
 	@Override
 	public CallSequence getNextTest()
 	{
-		lastTest = nodes.getNextTestSequence();
+		lastTest = getVariables();
+		lastTest.addAll(nodes.getNextTestSequence());
 		return lastTest;
 	}
 
@@ -76,5 +77,6 @@ public class SequenceIterator extends TraceIterator
 	public void reset()
 	{
 		nodes.reset();
+		lastTest = null;
 	}
 }
