@@ -27,7 +27,9 @@ import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.expressions.ExpressionList;
 import org.overturetool.vdmj.lex.LexException;
+import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexTokenReader;
+import org.overturetool.vdmj.runtime.Breakpoint;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.statements.CallObjectStatement;
 import org.overturetool.vdmj.statements.CallStatement;
@@ -48,6 +50,9 @@ public class TraceApplyExpression extends TraceCoreDefinition
     private static final long serialVersionUID = 1L;
 	public final Statement callStatement;
 	public final String currentModule;
+
+	private static final LexLocation NOWHERE = new LexLocation();
+	private static final Breakpoint DUMMY = new Breakpoint(NOWHERE);
 
 	public TraceApplyExpression(Statement stmt, String currentModule)
 	{
@@ -113,6 +118,12 @@ public class TraceApplyExpression extends TraceCoreDefinition
     				newargs.add(arg);		// Give up!
     			}
 			}
+		}
+		
+		// Remove Breakpoints to save on heap
+		for (Expression arg: newargs)
+		{
+			arg.breakpoint = DUMMY;
 		}
 
 		Statement newStatement = null;

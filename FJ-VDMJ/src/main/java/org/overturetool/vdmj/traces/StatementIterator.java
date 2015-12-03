@@ -23,15 +23,21 @@
 
 package org.overturetool.vdmj.traces;
 
+import org.overturetool.vdmj.lex.LexLocation;
+import org.overturetool.vdmj.runtime.Breakpoint;
 import org.overturetool.vdmj.statements.Statement;
 
 public class StatementIterator extends TraceIterator
 {
 	public final Statement statement;
+	
+	private static final LexLocation NOWHERE = new LexLocation();
+	private static final Breakpoint DUMMY = new Breakpoint(NOWHERE);
 
 	public StatementIterator(Statement newStatement)
 	{
 		this.statement = newStatement;
+		statement.breakpoint = DUMMY;	// Reduce garbage
 	}
 
 	@Override
