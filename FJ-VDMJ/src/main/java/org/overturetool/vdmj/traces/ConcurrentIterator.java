@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2010 Fujitsu Services Ltd.
+ *	Copyright (c) 2015 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -27,124 +27,15 @@ public class ConcurrentIterator extends TraceIterator
 {
 	private final TraceIteratorList nodes;
 	
-	private PermuteArray permutations = null;
+	private PermuteArray permutations = null;	// Of the node orderings
+
+	private int[] permutation = null;			// The current ordering
 	
-	private Permutor permutor = null;
+	private Permutor selector = null;			// Of the alternatives from each node
 
 	public ConcurrentIterator(TraceIteratorList nodes)
 	{
 		this.nodes = nodes;
-	}
-
-	@Override
-	public CallSequence getNextTest()
-	{
-		if (permutations == null)
-		{
-			permutations = new PermuteArray(nodes.size());
-			permutor = null;
-		}
-		
-		if (permutor == null)
-		{
-			int[] c = new int[nodes.size()];
-			
-			for (int i=0; i<nodes.size(); i++)
-			{
-				c[i] = nodes.get(i).count();
-			}
-			
-			permutor = new Permutor(c);
-		}
-
-		CallSequence result = new CallSequence();
-		
-		if (permutor.hasNext())
-		{
-			int[] select = permutor.next();
-			int[] permutation = permutations.next();
-			
-			// The select array contains a set of numbers, being the elements of
-			// the expansion of the permutation that must be concatenated.
-			
-			CallSequence[] subsequences = new CallSequence[nodes.size()];
-			nodes.reset();
-			
-			for (int node=0; node<nodes.size(); node++)
-			{
-//				for (int i=0; i<repeatCount; i++)
-//				{
-//					subsequences[i] = repeat.getNextTest();
-//				}
-//				
-//				for (int i=0; i<repeatValue; i++)	// ie. {n} additions
-//				{
-//					result.addAll(subsequences[select[i]]);
-//				}
-			}
-		}
-
-		if (!permutor.hasNext())		// Exhausted permutor for repeatValue
-		{
-			permutor = null;
-
-//			if (repeatValue < to)
-//			{
-//				repeatValue++;
-//			}
-//			else
-//			{
-//				repeatValue = null;		// Indicates no more tests
-//			}
-		}
-		
-		return result;
-		
-		
-//		List<TestSequence> nodetests = new Vector<TestSequence>();
-//		int count = nodes.size();
-//
-//		for (TraceNode node: nodes)
-//		{
-//			nodetests.add(node.getTests());
-//		}
-//
-//		TestSequence tests = new TestSequence();
-//		PermuteArray pa = new PermuteArray(count);
-//
-//		while (pa.hasNext())
-//		{
-//			int[] sizes = new int[count];
-//			int[] perm = pa.next();
-//
-//			for (int i=0; i<count; i++)
-//			{
-//				sizes[i] = nodetests.get(perm[i]).size();
-//			}
-//
-//			Permutor p = new Permutor(sizes);
-//
-//    		while (p.hasNext())
-//    		{
-//    			int[] select = p.next();
-//    			CallSequence seq = getVariables();
-//
-//    			for (int i=0; i<count; i++)
-//    			{
-//    				TestSequence ith = nodetests.get(perm[i]);
-//    				
-//    				if (!ith.isEmpty())
-//    				{
-//    					CallSequence subseq = ith.get(select[i]);
-//    					seq.addAll(subseq);
-//    				}
-//    			}
-//
-//    			tests.add(seq);
-//    		}
-//		}
-//
-//		return tests;
 	}
 
 	@Override
@@ -153,28 +44,93 @@ public class ConcurrentIterator extends TraceIterator
 		StringBuilder sb = new StringBuilder();
 		sb.append("|| (");
 		String sep = "";
-
+	
 		for (TraceIterator node: nodes)
 		{
 			sb.append(sep);
 			sb.append(node.toString());
 			sep = ", ";
 		}
-
+	
 		sb.append(")");
 		return sb.toString();
 	}
 
 	@Override
+	public CallSequence getNextTest()
+	{
+		int nodesSize = nodes.size();
+		
+		if (permutations == null)	// First time in
+		{
+			permutations = new PermuteArray(nodes.size());
+			selector = null;
+		}
+		
+		if ((selector == null || !selector.hasNext()) &&	// Start next perm
+			permutations.hasNext())
+		{
+			permutation = permutations.next();
+			selector = null;
+		}
+		
+		if (selector == null)		// First for a given permutation
+		{
+			int[] c = new int[nodesSize];
+			
+			for (int i=0; i<nodesSize; i++)
+			{
+				c[i] = nodes.get(i).count();
+			}
+			
+			selector = new Permutor(c);
+		}
+
+		CallSequence result = getVariables();
+		
+		if (selector.hasNext())
+		{
+			int[] select = selector.next();
+			
+			// The select array contains a set of numbers, being the elements of
+			// the expansion of each node that must be concatenated.
+			
+			CallSequence[] subsequences = new CallSequence[nodesSize];
+			nodes.reset();
+			
+			for (int node=0; node<nodesSize; node++)
+			{
+				for (int i=0; i<=select[node]; i++)		// Drive each iterator to the nth
+				{
+					subsequences[node] = nodes.get(node).getNextTest();
+				}
+			}
+			
+			for (int i=0; i<nodesSize; i++)		// Add in permutation order
+			{
+				result.addAll(subsequences[permutation[i]]);
+			}
+		}
+		
+		return result;
+	}
+
+	@Override
 	public boolean hasMoreTests()
 	{
-		return nodes.hasMoreTests();
+		return permutations == null || permutations.hasNext() ||
+			(selector != null && selector.hasNext());
 	}
 
 	@Override
 	public int count()
 	{
-		return nodes.countAlternative();
+		return nodes.countSequence() * factorial(nodes.size());
+	}
+
+	private int factorial(int size)
+	{
+		return (size == 1) ? 1 : size * factorial(size - 1);
 	}
 
 	@Override

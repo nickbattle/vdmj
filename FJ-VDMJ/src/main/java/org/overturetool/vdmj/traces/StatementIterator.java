@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (C) 2008, 2009 Fujitsu Services Ltd.
+ *	Copyright (C) 2015 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
