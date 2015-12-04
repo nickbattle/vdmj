@@ -56,6 +56,7 @@ import org.overturetool.vdmj.scheduler.SchedulableThread;
 import org.overturetool.vdmj.statements.Statement;
 import org.overturetool.vdmj.syntax.ParserException;
 import org.overturetool.vdmj.traces.CallSequence;
+import org.overturetool.vdmj.traces.TraceFilter;
 import org.overturetool.vdmj.traces.TraceIterator;
 import org.overturetool.vdmj.traces.TraceReductionType;
 import org.overturetool.vdmj.traces.Verdict;
@@ -495,13 +496,13 @@ abstract public class Interpreter
 		return typeCheck(expr, getGlobalEnvironment());
 	}
 
-	public ClassDefinition findClass(@SuppressWarnings("unused") String classname)
+	public ClassDefinition findClass(String classname)
 	{
 		assert false : "findClass cannot be called for modules";
 		return null;
 	}
 
-	public Module findModule(@SuppressWarnings("unused") String module)
+	public Module findModule(String module)
 	{
 		assert false : "findModule cannot be called for classes";
 		return null;
@@ -587,6 +588,7 @@ abstract public class Interpreter
 		int n = 1;
 		boolean failed = false;
 		writer.println("Generated " + tests.count() + " tests");
+		TraceFilter filter = new TraceFilter();
 
 		while (tests.hasMoreTests())
 		{
@@ -602,18 +604,18 @@ abstract public class Interpreter
 			// Bodge until we figure out how to not have explicit op names.
 			String clean = test.toString().replaceAll("\\.\\w+`", ".");
 
-//			if (test.getFilter() > 0)
-//			{
-//    			writer.println("Test " + n + " = " + clean);
-//				writer.println(
-//					"Test " + n + " FILTERED by test " + test.getFilter());
-//			}
-//			else
+			if (filter.getFilter(test) > 0)
+			{
+    			writer.println("Test " + n + " = " + clean);
+				writer.println(
+					"Test " + n + " FILTERED by test " + filter.getFilter(test));
+			}
+			else
 			{
 				// Initialize completely between every run...
     			init(null);
     			List<Object> result = runOneTrace(tracedef.classDefinition, test, debug);
-    			// tests.filter(result, test, n);
+    			filter.check(result, test, n);
 
     			writer.println("Test " + n + " = " + clean);
     			writer.println("Result = " + result);

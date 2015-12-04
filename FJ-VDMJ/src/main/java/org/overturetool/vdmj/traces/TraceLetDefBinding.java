@@ -98,7 +98,7 @@ public class TraceLetDefBinding extends TraceDefinition
 		}
 
 		TraceIterator iterator = body.getIterator(evalContext);
-		iterator.addVariables(new TraceVariableList(evalContext, localDefs));
+		iterator.setVariables(new TraceVariableList(evalContext, localDefs));
 		return iterator;
 	}
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (C) 2008, 2009 Fujitsu Services Ltd.
+ *	Copyright (C) 2015 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -23,35 +23,38 @@
 
 package org.overturetool.vdmj.traces;
 
-public abstract class TraceIterator
+import java.util.List;
+import java.util.Vector;
+
+/**
+ * A class to collect test sequences that failed, in order to filter subsequent tests.
+ */
+public class TraceFilter
 {
-	private TraceVariableList variables = null;
+	private List<CallSequence> failedTests = new Vector<CallSequence>();
+	private List<Integer> failedStems = new Vector<Integer>();
+	private List<Integer> failedNumbers = new Vector<Integer>();
 	
-	protected CallSequence lastTest = null;
-
-	public void setVariables(TraceVariableList variables)
+	public int getFilter(CallSequence test)
 	{
-		this.variables = variables;
+		for (int i=0; i<failedTests.size(); i++)
+		{
+			if (failedTests.get(i).compareStem(test, failedStems.get(i)))
+			{
+				return failedNumbers.get(i);
+			}
+		}
+		
+		return 0;
 	}
 
-	public CallSequence getVariables()
+	public void check(List<Object> result, CallSequence test, int n)
 	{
-		return (variables == null) ? new CallSequence() : variables.getVariables();
+		if (result.get(result.size()-1) != Verdict.PASSED)
+		{
+			failedTests.add(test);
+			failedStems.add(result.size() - 1);
+			failedNumbers.add(n);
+		}
 	}
-
-	@Override
-	abstract public String toString();
-
-	abstract public boolean hasMoreTests();
-
-	abstract public CallSequence getNextTest();
-
-	public CallSequence getLastTest()
-	{
-		return lastTest;
-	}
-
-	abstract public int count();
-	
-	abstract public void reset();
 }

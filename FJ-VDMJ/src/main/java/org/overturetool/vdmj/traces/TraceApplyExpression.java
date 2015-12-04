@@ -26,6 +26,11 @@ package org.overturetool.vdmj.traces;
 import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.expressions.ExpressionList;
+import org.overturetool.vdmj.expressions.MapEnumExpression;
+import org.overturetool.vdmj.expressions.MapletExpression;
+import org.overturetool.vdmj.expressions.MkTypeExpression;
+import org.overturetool.vdmj.expressions.SeqEnumExpression;
+import org.overturetool.vdmj.expressions.SetEnumExpression;
 import org.overturetool.vdmj.lex.LexException;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexTokenReader;
@@ -53,6 +58,8 @@ public class TraceApplyExpression extends TraceCoreDefinition
 
 	private static final LexLocation NOWHERE = new LexLocation();
 	private static final Breakpoint DUMMY = new Breakpoint(NOWHERE);
+	
+	private Statement lastStatement = null;
 
 	public TraceApplyExpression(Statement stmt, String currentModule)
 	{
@@ -120,10 +127,9 @@ public class TraceApplyExpression extends TraceCoreDefinition
 			}
 		}
 		
-		// Remove Breakpoints to save on heap
 		for (Expression arg: newargs)
 		{
-			arg.breakpoint = DUMMY;
+			reduceExpression(arg);	// Reduce heap usage
 		}
 
 		Statement newStatement = null;
@@ -148,7 +154,58 @@ public class TraceApplyExpression extends TraceCoreDefinition
 					stmt.designator, stmt.fieldname, newargs);
 			}
 		}
+		
+		// If we're generating the same statement, re-use the object to reduce heap
+		if (lastStatement != null && lastStatement.toString().equals(newStatement.toString()))
+		{
+			newStatement = lastStatement;
+		}
+		
+		lastStatement = newStatement;
 
 		return new StatementIterator(newStatement);
+	}
+
+	/**
+	 * Remove as much as possible from an Expression tree, to reduce heap usage.
+	 * For now, just replace the Breakpoints and recurse for larger aggregates.
+	 */
+	private void reduceExpression(Expression arg)
+	{
+		arg.breakpoint = DUMMY;
+		
+		if (arg instanceof SeqEnumExpression)
+		{
+			SeqEnumExpression s = (SeqEnumExpression)arg;
+			reduceExpressions(s.members);
+		}
+		else if (arg instanceof SetEnumExpression)
+		{
+			SetEnumExpression s = (SetEnumExpression)arg;
+			reduceExpressions(s.members);
+		}
+		else if (arg instanceof MkTypeExpression)
+		{
+			MkTypeExpression m = (MkTypeExpression)arg;
+			reduceExpressions(m.args);
+		}
+		else if (arg instanceof MapEnumExpression)
+		{
+			MapEnumExpression m = (MapEnumExpression)arg;
+			
+			for (MapletExpression e: m.members)
+			{
+				reduceExpression(e.left);
+				reduceExpression(e.right);
+			}
+		}
+	}
+	
+	private void reduceExpressions(ExpressionList list)
+	{
+		for (Expression e: list)
+		{
+			reduceExpression(e);
+		}
 	}
 }
