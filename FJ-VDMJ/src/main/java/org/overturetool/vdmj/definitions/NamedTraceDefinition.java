@@ -33,7 +33,6 @@ import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.traces.TraceDefinitionTerm;
 import org.overturetool.vdmj.traces.TraceIterator;
 import org.overturetool.vdmj.traces.TraceIteratorList;
-import org.overturetool.vdmj.traces.TraceReductionType;
 import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.FlatEnvironment;
 import org.overturetool.vdmj.typechecker.NameScope;
@@ -114,13 +113,6 @@ public class NamedTraceDefinition extends Definition
 	}
 
 	public TraceIterator getIterator(Context ctxt) throws Exception
-	{
-		return getIterator(
-			ctxt, 1.0F, TraceReductionType.NONE, System.currentTimeMillis());
-	}
-
-	public TraceIterator getIterator(
-		Context ctxt, float subset, TraceReductionType type, long seed) throws Exception
 	{
 		TraceIteratorList iterators = new TraceIteratorList();
 

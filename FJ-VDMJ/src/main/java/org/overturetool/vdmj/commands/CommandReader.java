@@ -85,7 +85,7 @@ abstract public class CommandReader
 	private float reduction = 1.0F;
 
 	/** The type of trace reduction. */
-	private TraceReductionType reductionType = TraceReductionType.RANDOM;
+	private TraceReductionType reductionType = TraceReductionType.NONE;
 
 	/** The IDE DBGPReader, if any */
 	private DBGPReader dbgp = null;
@@ -418,12 +418,22 @@ abstract public class CommandReader
 				{
 					println("Usage: filter %age (1-100)");
 				}
+				
+				if (reductionType == TraceReductionType.NONE)
+				{
+					reductionType = TraceReductionType.RANDOM;
+				}
 			}
 			catch (NumberFormatException e)
 			{
 				try
 				{
 					reductionType = TraceReductionType.valueOf(parts[1].toUpperCase());
+					
+					if (reductionType == TraceReductionType.NONE)
+					{
+						reduction = (float)1.0;
+					}
 				}
 				catch (Exception e1)
 				{

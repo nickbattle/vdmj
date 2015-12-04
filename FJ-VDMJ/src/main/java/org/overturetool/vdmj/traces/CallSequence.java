@@ -39,8 +39,6 @@ import org.overturetool.vdmj.typechecker.PrivateClassEnvironment;
 @SuppressWarnings("serial")
 public class CallSequence extends Vector<Statement>
 {
-	private int filtered = 0;
-
 	@Override
 	public String toString()
 	{
@@ -87,6 +85,10 @@ public class CallSequence extends Vector<Statement>
        					sb.append(tvs.toString());
        	       			sep = "; ";
        					break;
+       					
+					case NONE:
+					case RANDOM:
+						break;
     			}
      		}
     		else if (stmt instanceof CallStatement)
@@ -145,16 +147,6 @@ public class CallSequence extends Vector<Statement>
 		return get(i).toString().equals(other.get(i).toString());
 	}
 
-	public void setFilter(int n)
-	{
-		filtered = n;
-	}
-
-	public int getFilter()
-	{
-		return filtered;
-	}
-	
 	public void typeCheck(ClassDefinition classdef) throws Exception
 	{
 		Interpreter interpreter = Interpreter.getInstance();

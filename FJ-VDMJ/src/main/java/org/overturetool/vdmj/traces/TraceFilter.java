@@ -23,18 +23,33 @@
 
 package org.overturetool.vdmj.traces;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.Vector;
 
 /**
- * A class to collect test sequences that failed, in order to filter subsequent tests.
+ * A class to filter whether tests are performed, by various criteria.
  */
 public class TraceFilter
 {
+	private final float subset;
+	private final TraceReductionType reductionType;
+	private final Random prng;
+	
 	private List<CallSequence> failedTests = new Vector<CallSequence>();
 	private List<Integer> failedStems = new Vector<Integer>();
 	private List<Integer> failedNumbers = new Vector<Integer>();
+	private Set<String> shapes = new HashSet<String>();
 	
+	public TraceFilter(float subset, TraceReductionType reductionType, long seed)
+	{
+		this.subset = subset;
+		this.reductionType = reductionType;
+		this.prng = new Random(seed);
+	}
+
 	public int getFilter(CallSequence test)
 	{
 		for (int i=0; i<failedTests.size(); i++)
@@ -56,5 +71,34 @@ public class TraceFilter
 			failedStems.add(result.size() - 1);
 			failedNumbers.add(n);
 		}
+	}
+
+	public boolean isRemoved(CallSequence test)
+	{
+		switch (reductionType)
+		{
+			case NONE:
+				return false;
+
+			case RANDOM:
+				return prng.nextFloat() > subset;
+				
+			case SHAPES_NOVARS:
+			case SHAPES_VARNAMES:
+			case SHAPES_VARVALUES:
+				String shape = test.toShape(reductionType);
+				
+				if (shapes.contains(shape))
+				{
+					return prng.nextFloat() < subset;
+				}
+				else
+				{
+					shapes.add(shape);
+					return false;	// Every shape appears once
+				}
+		}
+		
+		return false;
 	}
 }

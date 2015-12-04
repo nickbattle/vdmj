@@ -527,7 +527,7 @@ abstract public class Interpreter
 
 	public boolean runtrace(
 		String name, int testNo, boolean debug,
-		float subset, TraceReductionType type, long seed)
+		float subset, TraceReductionType reductionType, long seed)
 		throws Exception
 	{
 		LexTokenReader ltr = new LexTokenReader(name, Dialect.VDM_SL);
@@ -562,8 +562,7 @@ abstract public class Interpreter
 			throw new Exception("Trace " + lexname + " not found");
 		}
 
-		TraceIterator tests = tracedef.getIterator(
-			getTraceContext(tracedef.classDefinition), subset, type, seed);
+		TraceIterator tests = tracedef.getIterator(getTraceContext(tracedef.classDefinition));
 
 		boolean wasDBGP = Settings.usingDBGP;
 		boolean wasCMD = Settings.usingCmdLine;
@@ -585,39 +584,42 @@ abstract public class Interpreter
 				" only has " + tests.count() + " tests");
 		}
 
-		int n = 1;
+		int testNumber = 1;
+		int excluded = 0;
 		boolean failed = false;
+		TraceFilter filter = new TraceFilter(subset, reductionType, seed);
+
 		writer.println("Generated " + tests.count() + " tests");
-		TraceFilter filter = new TraceFilter();
 
 		while (tests.hasMoreTests())
 		{
 			CallSequence test = tests.getNextTest();
 			test.typeCheck(tracedef.classDefinition);
 			
-			if (testNo > 0 && n != testNo)
-			{
-				n++;
-				continue;
-			}
-
 			// Bodge until we figure out how to not have explicit op names.
 			String clean = test.toString().replaceAll("\\.\\w+`", ".");
 
-			if (filter.getFilter(test) > 0)
+			if ((testNo > 0 && testNumber != testNo) || filter.isRemoved(test))
 			{
-    			writer.println("Test " + n + " = " + clean);
+				testNumber++;
+				excluded++;
+				continue;
+			}
+			else if (filter.getFilter(test) > 0)
+			{
+				excluded++;
+    			writer.println("Test " + testNumber + " = " + clean);
 				writer.println(
-					"Test " + n + " FILTERED by test " + filter.getFilter(test));
+					"Test " + testNumber + " FILTERED by test " + filter.getFilter(test));
 			}
 			else
 			{
 				// Initialize completely between every run...
     			init(null);
     			List<Object> result = runOneTrace(tracedef.classDefinition, test, debug);
-    			filter.check(result, test, n);
+    			filter.check(result, test, testNumber);
 
-    			writer.println("Test " + n + " = " + clean);
+    			writer.println("Test " + testNumber + " = " + clean);
     			writer.println("Result = " + result);
     			
     			if (result.lastIndexOf(Verdict.PASSED) == -1)
@@ -626,17 +628,22 @@ abstract public class Interpreter
     			}
 			}
 
-			if (testNo > 0 && n == testNo)
+			if (testNo > 0 && testNumber == testNo)
 			{
 				break;
 			}
 
-			n++;
+			testNumber++;
 		}
 
 		init(null);
 		Settings.usingCmdLine = wasCMD;
 		Settings.usingDBGP = wasDBGP;
+		
+		if (excluded > 0)
+		{
+			writer.println("Excluded " + excluded + " tests");
+		}
 		
 		return !failed;
 	}
