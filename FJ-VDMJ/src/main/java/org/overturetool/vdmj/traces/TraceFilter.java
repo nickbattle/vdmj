@@ -63,7 +63,7 @@ public class TraceFilter
 		return 0;
 	}
 
-	public void check(List<Object> result, CallSequence test, int n)
+	public void update(List<Object> result, CallSequence test, int n)
 	{
 		if (result.get(result.size()-1) != Verdict.PASSED)
 		{

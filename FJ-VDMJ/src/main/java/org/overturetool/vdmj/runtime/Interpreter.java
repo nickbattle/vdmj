@@ -38,6 +38,7 @@ import java.util.Map.Entry;
 import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.debug.DBGPReader;
 import org.overturetool.vdmj.definitions.ClassDefinition;
+import org.overturetool.vdmj.definitions.DefinitionList;
 import org.overturetool.vdmj.definitions.NamedTraceDefinition;
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.lex.Dialect;
@@ -61,7 +62,9 @@ import org.overturetool.vdmj.traces.TraceIterator;
 import org.overturetool.vdmj.traces.TraceReductionType;
 import org.overturetool.vdmj.traces.Verdict;
 import org.overturetool.vdmj.typechecker.Environment;
+import org.overturetool.vdmj.typechecker.FlatEnvironment;
 import org.overturetool.vdmj.typechecker.NameScope;
+import org.overturetool.vdmj.typechecker.PrivateClassEnvironment;
 import org.overturetool.vdmj.typechecker.TypeChecker;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.values.Value;
@@ -588,22 +591,22 @@ abstract public class Interpreter
 		int excluded = 0;
 		boolean failed = false;
 		TraceFilter filter = new TraceFilter(subset, reductionType, seed);
+		ClassDefinition classdef = tracedef.classDefinition;
+		tracedef = null;	// Garbage now
 
 		writer.println("Generated " + tests.count() + " tests");
 
 		while (tests.hasMoreTests())
 		{
 			CallSequence test = tests.getNextTest();
-			test.typeCheck(tracedef.classDefinition);
+			test.typeCheck(this, getTraceEnvironment(classdef));
 			
 			// Bodge until we figure out how to not have explicit op names.
 			String clean = test.toString().replaceAll("\\.\\w+`", ".");
 
 			if ((testNo > 0 && testNumber != testNo) || filter.isRemoved(test))
 			{
-				testNumber++;
 				excluded++;
-				continue;
 			}
 			else if (filter.getFilter(test) > 0)
 			{
@@ -614,10 +617,9 @@ abstract public class Interpreter
 			}
 			else
 			{
-				// Initialize completely between every run...
-    			init(null);
-    			List<Object> result = runOneTrace(tracedef.classDefinition, test, debug);
-    			filter.check(result, test, testNumber);
+    			init(null);	// Initialize completely between every run...
+    			List<Object> result = runOneTrace(classdef, test, debug);
+    			filter.update(result, test, testNumber);
 
     			writer.println("Test " + testNumber + " = " + clean);
     			writer.println("Result = " + result);
@@ -650,4 +652,17 @@ abstract public class Interpreter
 
 	abstract public List<Object> runOneTrace(
 		ClassDefinition classDefinition, CallSequence test, boolean debug);
+	
+	private Environment getTraceEnvironment(ClassDefinition classdef) throws Exception
+	{
+		if (this instanceof ClassInterpreter)
+		{
+			return new FlatEnvironment(classdef.getSelfDefinition(),
+				new PrivateClassEnvironment(classdef, getGlobalEnvironment()));
+		}
+		else
+		{
+			return new FlatEnvironment(new DefinitionList(), getGlobalEnvironment());
+		}
+	}
 }

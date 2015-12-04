@@ -147,24 +147,8 @@ public class CallSequence extends Vector<Statement>
 		return get(i).toString().equals(other.get(i).toString());
 	}
 
-	public void typeCheck(ClassDefinition classdef) throws Exception
+	public void typeCheck(Interpreter interpreter, Environment env) throws Exception
 	{
-		Interpreter interpreter = Interpreter.getInstance();
-		Environment env = null;
-
-		if (interpreter instanceof ClassInterpreter)
-		{
-			env = new FlatEnvironment(
-				classdef.getSelfDefinition(),
-				new PrivateClassEnvironment(classdef, interpreter.getGlobalEnvironment()));
-		}
-		else
-		{
-			env = new FlatEnvironment(
-				new DefinitionList(),
-				interpreter.getGlobalEnvironment());
-		}
-
 		for (Statement statement: this)
 		{
 			interpreter.typeCheck(statement, env);
