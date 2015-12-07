@@ -23,7 +23,7 @@
 
 package org.overturetool.vdmj.traces;
 
-import java.util.Vector;
+import java.util.HashSet;
 
 import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.definitions.DefinitionList;
@@ -35,7 +35,7 @@ import org.overturetool.vdmj.typechecker.NameScope;
 import org.overturetool.vdmj.values.ObjectValue;
 import org.overturetool.vdmj.values.Value;
 
-public class TraceVariableList extends Vector<TraceVariable>
+public class TraceVariableList extends HashSet<TraceVariable>
 {
 	private static final long serialVersionUID = 1L;
 

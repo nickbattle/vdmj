@@ -35,6 +35,8 @@ public class TraceVariable
 	public final Value value;
 	public final Type type;
 	public final boolean clone;
+	
+	private final String cached;
 
 	public TraceVariable(LexLocation location, LexNameToken name, Value value, Type type, boolean clone)
 	{
@@ -43,11 +45,24 @@ public class TraceVariable
 		this.value = value;
 		this.type = type;
 		this.clone = clone;
+		this.cached = "(" + name + " = " + value + ")";
 	}
 
 	@Override
 	public String toString()
 	{
-		return "(" + name + " = " + value + ")";
+		return cached;
+	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		return toString().equals(other.toString());
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return toString().hashCode();
 	}
 }
