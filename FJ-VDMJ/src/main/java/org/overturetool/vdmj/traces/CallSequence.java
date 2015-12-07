@@ -25,16 +25,11 @@ package org.overturetool.vdmj.traces;
 
 import java.util.Vector;
 
-import org.overturetool.vdmj.definitions.ClassDefinition;
-import org.overturetool.vdmj.definitions.DefinitionList;
-import org.overturetool.vdmj.runtime.ClassInterpreter;
 import org.overturetool.vdmj.runtime.Interpreter;
 import org.overturetool.vdmj.statements.CallObjectStatement;
 import org.overturetool.vdmj.statements.CallStatement;
 import org.overturetool.vdmj.statements.Statement;
 import org.overturetool.vdmj.typechecker.Environment;
-import org.overturetool.vdmj.typechecker.FlatEnvironment;
-import org.overturetool.vdmj.typechecker.PrivateClassEnvironment;
 
 @SuppressWarnings("serial")
 public class CallSequence extends Vector<Statement>
@@ -47,7 +42,7 @@ public class CallSequence extends Vector<Statement>
 
 		for (Statement stmt: this)
 		{
-    		if (!(stmt instanceof TraceVariableStatement))
+    		// if (!(stmt instanceof TraceVariableStatement))
     		{
        			sb.append(sep);
        			sb.append(stmt.toString());

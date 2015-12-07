@@ -30,6 +30,8 @@ import org.overturetool.vdmj.statements.Statement;
 public class StatementIterator extends TraceIterator
 {
 	public final Statement statement;
+
+	private boolean done = false;
 	
 	private static final LexLocation NOWHERE = new LexLocation();
 	private static final Breakpoint DUMMY = new Breakpoint(NOWHERE);
@@ -49,15 +51,16 @@ public class StatementIterator extends TraceIterator
 	@Override
 	public CallSequence getNextTest()
 	{
-		lastTest = getVariables();
-		lastTest.add(statement);
-		return lastTest;
+		CallSequence test = getVariables();
+		test.add(statement);
+		done = true;
+		return test;
 	}
 
 	@Override
 	public boolean hasMoreTests()
 	{
-		return lastTest == null;
+		return !done;
 	}
 
 	@Override
@@ -69,6 +72,6 @@ public class StatementIterator extends TraceIterator
 	@Override
 	public void reset()
 	{
-		lastTest = null;
+		done = false;
 	}
 }

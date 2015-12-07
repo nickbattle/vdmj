@@ -48,6 +48,6 @@ public class TraceVariable
 	@Override
 	public String toString()
 	{
-		return name + ":" + type + " = " + value;
+		return "(" + name + " = " + value + ")";
 	}
 }

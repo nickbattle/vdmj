@@ -27,11 +27,16 @@ public abstract class TraceIterator
 {
 	private TraceVariableList variables = null;
 	
-	protected CallSequence lastTest = null;
-
 	public void setVariables(TraceVariableList variables)
 	{
-		this.variables = variables;
+		if (this.variables == null)
+		{
+			this.variables = variables;
+		}
+		else
+		{
+			this.variables.addAll(variables);
+		}
 	}
 
 	public CallSequence getVariables()
@@ -45,11 +50,6 @@ public abstract class TraceIterator
 	abstract public boolean hasMoreTests();
 
 	abstract public CallSequence getNextTest();
-
-	public CallSequence getLastTest()
-	{
-		return lastTest;
-	}
 
 	abstract public int count();
 	

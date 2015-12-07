@@ -23,28 +23,15 @@
 
 package org.overturetool.vdmj.traces;
 
-import org.overturetool.vdmj.Settings;
-import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.expressions.ExpressionList;
-import org.overturetool.vdmj.expressions.MapEnumExpression;
-import org.overturetool.vdmj.expressions.MapletExpression;
-import org.overturetool.vdmj.expressions.MkTypeExpression;
-import org.overturetool.vdmj.expressions.SeqEnumExpression;
-import org.overturetool.vdmj.expressions.SetEnumExpression;
-import org.overturetool.vdmj.lex.LexException;
 import org.overturetool.vdmj.lex.LexLocation;
-import org.overturetool.vdmj.lex.LexTokenReader;
 import org.overturetool.vdmj.runtime.Breakpoint;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.statements.CallObjectStatement;
 import org.overturetool.vdmj.statements.CallStatement;
 import org.overturetool.vdmj.statements.Statement;
-import org.overturetool.vdmj.syntax.ExpressionReader;
-import org.overturetool.vdmj.syntax.ParserException;
 import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.NameScope;
-import org.overturetool.vdmj.values.ObjectValue;
-import org.overturetool.vdmj.values.Value;
 
 /**
  * A class representing a trace apply expression.
@@ -97,41 +84,46 @@ public class TraceApplyExpression extends TraceCoreDefinition
 			args = stmt.args;
 		}
 
-		for (Expression arg: args)
-		{
-			Value v = arg.eval(ctxt).deref();
+		/**
+		 * This has been removed because of the excessive heap overhead creatd for large traces.
+		 */
+//		for (Expression arg: args)
+//		{
+//			Value v = arg.eval(ctxt).deref();
+//
+//			if (v instanceof ObjectValue)
+//			{
+//				newargs.add(arg);
+//			}
+//			else
+//			{
+//    			String value = v.toString();
+//    			LexTokenReader ltr = new LexTokenReader(value, Settings.dialect);
+//    			ExpressionReader er = new ExpressionReader(ltr);
+//    			er.setCurrentModule(currentModule);
+//
+//    			try
+//    			{
+//    				newargs.add(er.readExpression());
+//    			}
+//    			catch (ParserException e)
+//    			{
+//    				newargs.add(arg);		// Give up!
+//    			}
+//    			catch (LexException e)
+//    			{
+//    				newargs.add(arg);		// Give up!
+//    			}
+//			}
+//		}
+//		
+//		for (Expression arg: newargs)
+//		{
+//			reduceExpression(arg);	// Reduce heap usage
+//		}
 
-			if (v instanceof ObjectValue)
-			{
-				newargs.add(arg);
-			}
-			else
-			{
-    			String value = v.toString();
-    			LexTokenReader ltr = new LexTokenReader(value, Settings.dialect);
-    			ExpressionReader er = new ExpressionReader(ltr);
-    			er.setCurrentModule(currentModule);
-
-    			try
-    			{
-    				newargs.add(er.readExpression());
-    			}
-    			catch (ParserException e)
-    			{
-    				newargs.add(arg);		// Give up!
-    			}
-    			catch (LexException e)
-    			{
-    				newargs.add(arg);		// Give up!
-    			}
-			}
-		}
+		newargs = args;
 		
-		for (Expression arg: newargs)
-		{
-			reduceExpression(arg);	// Reduce heap usage
-		}
-
 		Statement newStatement = null;
 
 		if (callStatement instanceof CallStatement)
@@ -170,42 +162,42 @@ public class TraceApplyExpression extends TraceCoreDefinition
 	 * Remove as much as possible from an Expression tree, to reduce heap usage.
 	 * For now, just replace the Breakpoints and recurse for larger aggregates.
 	 */
-	private void reduceExpression(Expression arg)
-	{
-		arg.breakpoint = DUMMY;
-		
-		if (arg instanceof SeqEnumExpression)
-		{
-			SeqEnumExpression s = (SeqEnumExpression)arg;
-			reduceExpressions(s.members);
-		}
-		else if (arg instanceof SetEnumExpression)
-		{
-			SetEnumExpression s = (SetEnumExpression)arg;
-			reduceExpressions(s.members);
-		}
-		else if (arg instanceof MkTypeExpression)
-		{
-			MkTypeExpression m = (MkTypeExpression)arg;
-			reduceExpressions(m.args);
-		}
-		else if (arg instanceof MapEnumExpression)
-		{
-			MapEnumExpression m = (MapEnumExpression)arg;
-			
-			for (MapletExpression e: m.members)
-			{
-				reduceExpression(e.left);
-				reduceExpression(e.right);
-			}
-		}
-	}
-	
-	private void reduceExpressions(ExpressionList list)
-	{
-		for (Expression e: list)
-		{
-			reduceExpression(e);
-		}
-	}
+//	private void reduceExpression(Expression arg)
+//	{
+//		arg.breakpoint = DUMMY;
+//		
+//		if (arg instanceof SeqEnumExpression)
+//		{
+//			SeqEnumExpression s = (SeqEnumExpression)arg;
+//			reduceExpressions(s.members);
+//		}
+//		else if (arg instanceof SetEnumExpression)
+//		{
+//			SetEnumExpression s = (SetEnumExpression)arg;
+//			reduceExpressions(s.members);
+//		}
+//		else if (arg instanceof MkTypeExpression)
+//		{
+//			MkTypeExpression m = (MkTypeExpression)arg;
+//			reduceExpressions(m.args);
+//		}
+//		else if (arg instanceof MapEnumExpression)
+//		{
+//			MapEnumExpression m = (MapEnumExpression)arg;
+//			
+//			for (MapletExpression e: m.members)
+//			{
+//				reduceExpression(e.left);
+//				reduceExpression(e.right);
+//			}
+//		}
+//	}
+//	
+//	private void reduceExpressions(ExpressionList list)
+//	{
+//		for (Expression e: list)
+//		{
+//			reduceExpression(e);
+//		}
+//	}
 }

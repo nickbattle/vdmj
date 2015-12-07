@@ -31,6 +31,8 @@ import java.util.Vector;
 public class TraceIteratorList extends Vector<TraceIterator>
 {
 	private static final long serialVersionUID = 1L;
+	
+	private CallSequence[] alternatives = null;
 
 	public void reset()
 	{
@@ -38,6 +40,8 @@ public class TraceIteratorList extends Vector<TraceIterator>
 		{
 			iter.reset();
 		}
+		
+		alternatives = null;
 	}
 	
 	public int countSequence()
@@ -76,49 +80,43 @@ public class TraceIteratorList extends Vector<TraceIterator>
 		
 		return false;
 	}
-	
-	public CallSequence getLastTest()
-	{
-		CallSequence seq = new CallSequence();
-		
-		for (TraceIterator iter: this)
-		{
-			seq.addAll(iter.getLastTest());
-		}
-		
-		return seq;
-	}
 
 	/**
 	 * Add together one subsequence from each iterator.
 	 */
 	public CallSequence getNextTestSequence()
 	{
-		for (int i=0; i<size(); i++)
+		if (alternatives == null)	// First time in
 		{
-			if (get(i).hasMoreTests())
+			alternatives  = new CallSequence[size()];
+			
+			for (int i=0; i<size(); i++)
 			{
-    			get(i).getNextTest();	// Sets lastTest for this iterator
-				break;
+				alternatives[i] = get(i).getNextTest();
 			}
-			else if (i < size() - 1 && get(i+1).hasMoreTests())
-			{
-				get(i).reset();
-			}
+		}
+		else
+		{
+        	for (int i=0; i<size(); i++)
+        	{
+        		if (get(i).hasMoreTests())
+        		{
+        			alternatives[i] = get(i).getNextTest();
+        			break;
+        		}
+        		else if (i < size() - 1 && get(i+1).hasMoreTests())
+        		{
+        			get(i).reset();
+        			alternatives[i] = get(i).getNextTest();
+        		}
+        	}
 		}
 		
 		CallSequence seq = new CallSequence();
 		
-		for (TraceIterator iter: this)
+		for (int i=0; i<size(); i++)
 		{
-			if (iter.getLastTest() == null)
-			{
-				seq.addAll(iter.getNextTest());
-			}
-			else
-			{
-				seq.addAll(iter.getLastTest());
-			}
+			seq.addAll(alternatives[i]);
 		}
 		
 		return seq;

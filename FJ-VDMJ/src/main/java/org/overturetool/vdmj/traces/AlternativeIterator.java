@@ -58,9 +58,9 @@ public class AlternativeIterator extends TraceIterator
 	@Override
 	public CallSequence getNextTest()
 	{
-		lastTest = getVariables();
-		lastTest.addAll(alternatives.getNextTestAlternative());
-		return lastTest;
+		CallSequence test = getVariables();
+		test.addAll(alternatives.getNextTestAlternative());
+		return test;
 	}
 
 	@Override
@@ -79,6 +79,5 @@ public class AlternativeIterator extends TraceIterator
 	public void reset()
 	{
 		alternatives.reset();
-		lastTest = null;
 	}
 }

@@ -591,15 +591,13 @@ abstract public class Interpreter
 		int excluded = 0;
 		boolean failed = false;
 		TraceFilter filter = new TraceFilter(subset, reductionType, seed);
-		ClassDefinition classdef = tracedef.classDefinition;
-		tracedef = null;	// Garbage now
 
 		writer.println("Generated " + tests.count() + " tests");
 
 		while (tests.hasMoreTests())
 		{
 			CallSequence test = tests.getNextTest();
-			test.typeCheck(this, getTraceEnvironment(classdef));
+			test.typeCheck(this, getTraceEnvironment(tracedef.classDefinition));
 			
 			// Bodge until we figure out how to not have explicit op names.
 			String clean = test.toString().replaceAll("\\.\\w+`", ".");
@@ -618,7 +616,7 @@ abstract public class Interpreter
 			else
 			{
     			init(null);	// Initialize completely between every run...
-    			List<Object> result = runOneTrace(classdef, test, debug);
+    			List<Object> result = runOneTrace(tracedef.classDefinition, test, debug);
     			filter.update(result, test, testNumber);
 
     			writer.println("Test " + testNumber + " = " + clean);
@@ -632,6 +630,7 @@ abstract public class Interpreter
 
 			if (testNo > 0 && testNumber == testNo)
 			{
+				excluded = tests.count() - 1;
 				break;
 			}
 
