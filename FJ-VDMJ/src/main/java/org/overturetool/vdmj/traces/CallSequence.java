@@ -28,6 +28,7 @@ import java.util.Vector;
 import org.overturetool.vdmj.expressions.ApplyExpression;
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.expressions.ExpressionList;
+import org.overturetool.vdmj.expressions.NewExpression;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.Interpreter;
@@ -86,7 +87,8 @@ public class CallSequence extends Vector<Statement>
 		{
 			sb.append(comma);
 			
-			if (e instanceof ApplyExpression)
+			if (e instanceof ApplyExpression ||
+				e instanceof NewExpression)
 			{
 				sb.append(e.toString());	// Don't actually execute these things!
 			}
