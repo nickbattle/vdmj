@@ -67,7 +67,7 @@ public class CallObjectStatement extends Statement
 	public final ExpressionList args;
 	public final boolean explicit;
 
-	private LexNameToken field;
+	public LexNameToken field = null;
 
 	public CallObjectStatement(ObjectDesignator designator,
 		LexNameToken classname, ExpressionList args)

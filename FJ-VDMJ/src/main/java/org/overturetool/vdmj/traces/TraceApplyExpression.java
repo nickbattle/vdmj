@@ -23,12 +23,7 @@
 
 package org.overturetool.vdmj.traces;
 
-import org.overturetool.vdmj.expressions.ExpressionList;
-import org.overturetool.vdmj.lex.LexLocation;
-import org.overturetool.vdmj.runtime.Breakpoint;
 import org.overturetool.vdmj.runtime.Context;
-import org.overturetool.vdmj.statements.CallObjectStatement;
-import org.overturetool.vdmj.statements.CallStatement;
 import org.overturetool.vdmj.statements.Statement;
 import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.NameScope;
@@ -41,18 +36,11 @@ public class TraceApplyExpression extends TraceCoreDefinition
 {
     private static final long serialVersionUID = 1L;
 	public final Statement callStatement;
-	public final String currentModule;
 
-	private static final LexLocation NOWHERE = new LexLocation();
-	private static final Breakpoint DUMMY = new Breakpoint(NOWHERE);
-	
-	private Statement lastStatement = null;
-
-	public TraceApplyExpression(Statement stmt, String currentModule)
+	public TraceApplyExpression(Statement stmt)
 	{
 		super(stmt.location);
 		this.callStatement = stmt;
-		this.currentModule = currentModule;
 	}
 
 	@Override
@@ -70,134 +58,6 @@ public class TraceApplyExpression extends TraceCoreDefinition
 	@Override
 	public TraceIterator getIterator(Context ctxt)
 	{
-		ExpressionList newargs = new ExpressionList();
-		ExpressionList args = null;
-
-		if (callStatement instanceof CallStatement)
-		{
-			CallStatement stmt = (CallStatement)callStatement;
-			args = stmt.args;
-		}
-		else
-		{
-			CallObjectStatement stmt = (CallObjectStatement)callStatement;
-			args = stmt.args;
-		}
-
-		/**
-		 * This has been removed because of the excessive heap overhead creatd for large traces.
-		 */
-//		for (Expression arg: args)
-//		{
-//			Value v = arg.eval(ctxt).deref();
-//
-//			if (v instanceof ObjectValue)
-//			{
-//				newargs.add(arg);
-//			}
-//			else
-//			{
-//    			String value = v.toString();
-//    			LexTokenReader ltr = new LexTokenReader(value, Settings.dialect);
-//    			ExpressionReader er = new ExpressionReader(ltr);
-//    			er.setCurrentModule(currentModule);
-//
-//    			try
-//    			{
-//    				newargs.add(er.readExpression());
-//    			}
-//    			catch (ParserException e)
-//    			{
-//    				newargs.add(arg);		// Give up!
-//    			}
-//    			catch (LexException e)
-//    			{
-//    				newargs.add(arg);		// Give up!
-//    			}
-//			}
-//		}
-//		
-//		for (Expression arg: newargs)
-//		{
-//			reduceExpression(arg);	// Reduce heap usage
-//		}
-
-		newargs = args;
-		
-		Statement newStatement = null;
-
-		if (callStatement instanceof CallStatement)
-		{
-			CallStatement stmt = (CallStatement)callStatement;
-			newStatement = new CallStatement(stmt.name, newargs);
-		}
-		else
-		{
-			CallObjectStatement stmt = (CallObjectStatement)callStatement;
-			
-			if (stmt.classname != null)
-			{
-				newStatement = new CallObjectStatement(
-					stmt.designator, stmt.classname, newargs);
-			}
-			else
-			{
-				newStatement = new CallObjectStatement(
-					stmt.designator, stmt.fieldname, newargs);
-			}
-		}
-		
-		// If we're generating the same statement, re-use the object to reduce heap
-		if (lastStatement != null && lastStatement.toString().equals(newStatement.toString()))
-		{
-			newStatement = lastStatement;
-		}
-		
-		lastStatement = newStatement;
-
-		return new StatementIterator(newStatement);
+		return new StatementIterator(callStatement);
 	}
-
-	/**
-	 * Remove as much as possible from an Expression tree, to reduce heap usage.
-	 * For now, just replace the Breakpoints and recurse for larger aggregates.
-	 */
-//	private void reduceExpression(Expression arg)
-//	{
-//		arg.breakpoint = DUMMY;
-//		
-//		if (arg instanceof SeqEnumExpression)
-//		{
-//			SeqEnumExpression s = (SeqEnumExpression)arg;
-//			reduceExpressions(s.members);
-//		}
-//		else if (arg instanceof SetEnumExpression)
-//		{
-//			SetEnumExpression s = (SetEnumExpression)arg;
-//			reduceExpressions(s.members);
-//		}
-//		else if (arg instanceof MkTypeExpression)
-//		{
-//			MkTypeExpression m = (MkTypeExpression)arg;
-//			reduceExpressions(m.args);
-//		}
-//		else if (arg instanceof MapEnumExpression)
-//		{
-//			MapEnumExpression m = (MapEnumExpression)arg;
-//			
-//			for (MapletExpression e: m.members)
-//			{
-//				reduceExpression(e.left);
-//				reduceExpression(e.right);
-//			}
-//		}
-//	}
-//	
-//	private void reduceExpressions(ExpressionList list)
-//	{
-//		for (Expression e: list)
-//		{
-//			reduceExpression(e);
-//		}
-//	}
 }

@@ -25,7 +25,13 @@ package org.overturetool.vdmj.traces;
 
 import java.util.Vector;
 
+import org.overturetool.vdmj.expressions.ApplyExpression;
+import org.overturetool.vdmj.expressions.Expression;
+import org.overturetool.vdmj.expressions.ExpressionList;
+import org.overturetool.vdmj.lex.LexLocation;
+import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.Interpreter;
+import org.overturetool.vdmj.runtime.RootContext;
 import org.overturetool.vdmj.statements.CallObjectStatement;
 import org.overturetool.vdmj.statements.CallStatement;
 import org.overturetool.vdmj.statements.Statement;
@@ -34,22 +40,65 @@ import org.overturetool.vdmj.typechecker.Environment;
 @SuppressWarnings("serial")
 public class CallSequence extends Vector<Statement>
 {
-	@Override
-	public String toString()
+	public String getCallString(RootContext initialContext)
 	{
 		StringBuilder sb = new StringBuilder();
 		String sep = "";
+		Context ctxt = new Context(new LexLocation(), "traces", initialContext);
+		ctxt.setThreadState(null, null);
 
 		for (Statement stmt: this)
 		{
-    		// if (!(stmt instanceof TraceVariableStatement))
+    		if (stmt instanceof TraceVariableStatement)
     		{
-       			sb.append(sep);
-       			sb.append(stmt.toString());
-       			sep = "; ";
+    			TraceVariableStatement tvs = (TraceVariableStatement)stmt;
+    			ctxt.put(tvs.var.name, tvs.var.value);
      		}
+    		else if (stmt instanceof CallStatement)
+    		{
+    			CallStatement cs = (CallStatement)stmt;
+       			sb.append(sep);
+       			sb.append(opArgs(cs.name.name, cs.args, ctxt));
+       			sep = "; ";
+    		}
+    		else if (stmt instanceof CallObjectStatement)
+    		{
+    			CallObjectStatement cos = (CallObjectStatement)stmt;
+       			sb.append(sep);
+       			sb.append(cos.designator);
+       			sb.append(".");
+       			sb.append(opArgs(cos.fieldname.name, cos.args, ctxt));
+       			sep = "; ";
+    		}
 		}
 
+		return sb.toString();
+	}
+	
+	private String opArgs(String name, ExpressionList args, Context ctxt)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append(name);
+		sb.append("(");
+		String comma = "";
+
+		for (Expression e: args)
+		{
+			sb.append(comma);
+			
+			if (e instanceof ApplyExpression)
+			{
+				sb.append(e.toString());	// Don't actually execute these things!
+			}
+			else
+			{
+				sb.append(e.eval(ctxt));
+			}
+			
+			comma = ", ";
+		}
+
+		sb.append(")");
 		return sb.toString();
 	}
 
@@ -146,6 +195,25 @@ public class CallSequence extends Vector<Statement>
 	{
 		for (Statement statement: this)
 		{
+			if (statement instanceof CallStatement)
+			{
+				CallStatement call = (CallStatement)statement;
+				
+				if (call.name.typeQualifier != null)
+				{
+					continue;	// Already type checked
+				}
+			}
+			else if (statement instanceof CallObjectStatement)
+			{
+				CallObjectStatement call = (CallObjectStatement)statement;
+				
+				if (call.field != null)
+				{
+					continue;	// Already type checked
+				}
+			}
+			
 			interpreter.typeCheck(statement, env);
 		}
 	}

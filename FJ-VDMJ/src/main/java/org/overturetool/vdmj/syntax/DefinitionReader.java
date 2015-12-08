@@ -1655,7 +1655,7 @@ public class DefinitionReader extends SyntaxReader
 						"Expecting 'obj.op(args)' or 'op(args)'", token);
 				}
 
-				return new TraceApplyExpression(stmt, getCurrentModule());
+				return new TraceApplyExpression(stmt);
 
 			case BRA:
 				nextToken();

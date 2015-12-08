@@ -597,11 +597,7 @@ abstract public class Interpreter
 		while (tests.hasMoreTests())
 		{
 			CallSequence test = tests.getNextTest();
-			test.typeCheck(this, getTraceEnvironment(tracedef.classDefinition));
 			
-			// Bodge until we figure out how to not have explicit op names.
-			String clean = test.toString().replaceAll("\\.\\w+`", ".");
-
 			if ((testNo > 0 && testNumber != testNo) || filter.isRemoved(test))
 			{
 				excluded++;
@@ -609,17 +605,17 @@ abstract public class Interpreter
 			else if (filter.getFilter(test) > 0)
 			{
 				excluded++;
-    			writer.println("Test " + testNumber + " = " + clean);
-				writer.println(
-					"Test " + testNumber + " FILTERED by test " + filter.getFilter(test));
+    			writer.println("Test " + testNumber + " = " + test.getCallString(initialContext));
+				writer.println("Test " + testNumber + " FILTERED by test " + filter.getFilter(test));
 			}
 			else
 			{
+				test.typeCheck(this, getTraceEnvironment(tracedef.classDefinition));
     			init(null);	// Initialize completely between every run...
     			List<Object> result = runOneTrace(tracedef.classDefinition, test, debug);
     			filter.update(result, test, testNumber);
 
-    			writer.println("Test " + testNumber + " = " + clean);
+    			writer.println("Test " + testNumber + " = " + test.getCallString(initialContext));
     			writer.println("Result = " + result);
     			
     			if (result.lastIndexOf(Verdict.PASSED) == -1)
