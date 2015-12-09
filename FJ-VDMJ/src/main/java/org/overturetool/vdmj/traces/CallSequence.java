@@ -32,7 +32,6 @@ import org.overturetool.vdmj.expressions.NewExpression;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.Interpreter;
-import org.overturetool.vdmj.runtime.RootContext;
 import org.overturetool.vdmj.statements.CallObjectStatement;
 import org.overturetool.vdmj.statements.CallStatement;
 import org.overturetool.vdmj.statements.Statement;
@@ -41,11 +40,11 @@ import org.overturetool.vdmj.typechecker.Environment;
 @SuppressWarnings("serial")
 public class CallSequence extends Vector<Statement>
 {
-	public String getCallString(RootContext initialContext)
+	public String getCallString(Context context)
 	{
 		StringBuilder sb = new StringBuilder();
 		String sep = "";
-		Context ctxt = new Context(new LexLocation(), "traces", initialContext);
+		Context ctxt = new Context(new LexLocation(), "traces", context);
 		ctxt.setThreadState(null, null);
 
 		for (Statement stmt: this)

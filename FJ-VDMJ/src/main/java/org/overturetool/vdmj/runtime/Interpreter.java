@@ -583,8 +583,7 @@ abstract public class Interpreter
 
 		if (testNo > tests.count())
 		{
-			throw new Exception("Trace " + lexname +
-				" only has " + tests.count() + " tests");
+			throw new Exception("Trace " + lexname + " only has " + tests.count() + " tests");
 		}
 
 		int testNumber = 1;
@@ -605,7 +604,7 @@ abstract public class Interpreter
 			else if (filter.getFilter(test) > 0)
 			{
 				excluded++;
-    			writer.println("Test " + testNumber + " = " + test.getCallString(initialContext));
+    			writer.println("Test " + testNumber + " = " + test.getCallString(getTraceContext(tracedef.classDefinition)));
 				writer.println("Test " + testNumber + " FILTERED by test " + filter.getFilter(test));
 			}
 			else
@@ -615,7 +614,7 @@ abstract public class Interpreter
     			List<Object> result = runOneTrace(tracedef.classDefinition, test, debug);
     			filter.update(result, test, testNumber);
 
-    			writer.println("Test " + testNumber + " = " + test.getCallString(initialContext));
+    			writer.println("Test " + testNumber + " = " + test.getCallString(getTraceContext(tracedef.classDefinition)));
     			writer.println("Result = " + result);
     			
     			if (result.lastIndexOf(Verdict.PASSED) == -1)
