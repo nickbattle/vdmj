@@ -86,7 +86,7 @@ public class CTMainThread extends MainThread
 		}
 		catch (ContextException e)
 		{
-			result.add(e.getMessage().replaceAll(" \\(.+\\)", ""));
+			result.add(e.getMessage());
 
 			if (debug)
 			{
