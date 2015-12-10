@@ -60,7 +60,7 @@
 					<archive>
 						<manifestEntries>
 							<Main-Class>org.overturetool.vdmj.VDMJ</Main-Class>
-							<Implementation-Version>${maven.build.timestamp}</Implementation-Version>
+							<Implementation-Version>${project.version} build ${maven.build.timestamp}</Implementation-Version>
 							<Class-Path>.</Class-Path>
 						</manifestEntries>
 					</archive>

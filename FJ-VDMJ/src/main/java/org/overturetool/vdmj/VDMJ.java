@@ -108,11 +108,11 @@ abstract public class VDMJ
 
     			if (version == null)
     			{
-    				println("Cannot determine jar version");
+    				println("Cannot determine version");
     			}
     			else
     			{
-    				println("VDMJ jar version " + version);
+    				println("VDMJ version = " + version);
     			}
     		}
     		else if (arg.equals("-w"))
