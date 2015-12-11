@@ -40,7 +40,6 @@ import org.overturetool.vdmj.runtime.ContextException;
 import org.overturetool.vdmj.runtime.ExceptionHandler;
 import org.overturetool.vdmj.runtime.ValueException;
 import org.overturetool.vdmj.values.ObjectValue;
-import org.overturetool.vdmj.values.Value;
 
 public abstract class SchedulableThread extends Thread implements Serializable
 {

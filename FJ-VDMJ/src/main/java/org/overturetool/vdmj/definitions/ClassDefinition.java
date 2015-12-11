@@ -1024,6 +1024,9 @@ public class ClassDefinition extends Definition
 						publicStaticValues.putAllNew(nvl);
 						initCtxt.putList(nvl);
 						break;
+						
+					default:
+						break;
 				}
 			}
 		}
@@ -1097,6 +1100,9 @@ public class ClassDefinition extends Definition
 						publicStaticValues.putAllNew(nvl);
 						initCtxt.putAllNew(nvl);
 						break;
+						
+					default:
+						break;
 				}
 			}
 			else if (d.isStatic() && d.isInstanceVariable())
@@ -1114,6 +1120,9 @@ public class ClassDefinition extends Definition
 					case PUBLIC:
 						publicStaticValues.putAllNew(nvl);
 						initCtxt.putAllNew(nvl);
+						break;
+						
+					default:
 						break;
 				}
 			}

@@ -23,8 +23,6 @@
 
 package org.overturetool.vdmj.messages;
 
-import java.util.Formatter;
-
 @SuppressWarnings("serial")
 public class InternalException extends RuntimeException
 {
@@ -39,8 +37,6 @@ public class InternalException extends RuntimeException
 	@Override
 	public String toString()
 	{
-		Formatter f = new Formatter();
-		f.format("Internal %04d: %s", number, getMessage());
-		return f.out().toString();
+		return String.format("Internal %04d: %s", number, getMessage());
 	}
 }

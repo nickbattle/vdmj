@@ -42,7 +42,6 @@ import org.overturetool.vdmj.typechecker.NameScope;
 import org.overturetool.vdmj.typechecker.TypeCheckException;
 import org.overturetool.vdmj.types.SeqType;
 import org.overturetool.vdmj.types.Type;
-import org.overturetool.vdmj.types.UnknownType;
 import org.overturetool.vdmj.values.NameValuePair;
 import org.overturetool.vdmj.values.NameValuePairList;
 import org.overturetool.vdmj.values.NameValuePairMap;

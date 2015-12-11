@@ -248,6 +248,9 @@ abstract public class OvertureTest extends TestCase
 				case UNDEFINED:
 					expected = new UndefinedValue();
 					break;
+					
+				default:
+					break;
 				}
 
 			assertEquals("Evaluation error", expected, result);

@@ -155,6 +155,9 @@ public abstract class Statement implements Serializable
 		return (location.startLine == lineno) ? this : null;
 	}
 
+	/**
+	 * @param lineno  
+	 */
 	public Expression findExpression(int lineno)
 	{
 		return null;

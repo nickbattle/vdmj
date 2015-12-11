@@ -251,6 +251,9 @@ public abstract class Type implements Comparable<Type>, Serializable
 		return false;
 	}
 
+	/**
+	 * @param env  
+	 */
 	public boolean isClass(Environment env)
 	{
 		return false;
@@ -311,6 +314,9 @@ public abstract class Type implements Comparable<Type>, Serializable
 		return null;
 	}
 
+	/**
+	 * @param env  
+	 */
 	public ClassType getClassType(Environment env)
 	{
 		assert false : "Can't getClassType of a non-class";

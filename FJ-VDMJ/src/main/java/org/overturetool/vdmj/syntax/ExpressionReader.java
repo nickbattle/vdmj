@@ -290,6 +290,9 @@ public class ExpressionReader extends SyntaxReader
 				nextToken();
 				exp = new NotInSetExpression(exp, token, readNotExpression());
 				break;
+				
+			default:
+				break;
 		}
 
 		return exp;

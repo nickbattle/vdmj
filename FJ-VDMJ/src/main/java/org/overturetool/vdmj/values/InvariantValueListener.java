@@ -28,7 +28,6 @@ import java.io.Serializable;
 import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.runtime.Context;
-import org.overturetool.vdmj.runtime.ContextException;
 import org.overturetool.vdmj.runtime.ValueException;
 
 public class InvariantValueListener implements ValueListener, Serializable

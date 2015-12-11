@@ -499,12 +499,18 @@ abstract public class Interpreter
 		return typeCheck(expr, getGlobalEnvironment());
 	}
 
+	/**
+	 * @param classname 
+	 */
 	public ClassDefinition findClass(String classname)
 	{
 		assert false : "findClass cannot be called for modules";
 		return null;
 	}
 
+	/**
+	 * @param module  
+	 */
 	public Module findModule(String module)
 	{
 		assert false : "findModule cannot be called for classes";

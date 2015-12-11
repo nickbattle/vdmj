@@ -1542,6 +1542,9 @@ public class DefinitionReader extends SyntaxReader
 						throwMessage(2266, "Expecting '{n}' or '{n1, n2}' after trace definition");
 				}
 				break;
+				
+			default:
+				break;
 		}
 
        	return new TraceRepeatDefinition(token.location, core, from, to);

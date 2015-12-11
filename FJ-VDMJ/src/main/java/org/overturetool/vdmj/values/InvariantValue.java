@@ -24,11 +24,9 @@
 package org.overturetool.vdmj.values;
 
 import org.overturetool.vdmj.Settings;
-import org.overturetool.vdmj.messages.Console;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ContextException;
 import org.overturetool.vdmj.runtime.ExceptionHandler;
-import org.overturetool.vdmj.runtime.ExitException;
 import org.overturetool.vdmj.runtime.ValueException;
 import org.overturetool.vdmj.types.NamedType;
 import org.overturetool.vdmj.types.Type;

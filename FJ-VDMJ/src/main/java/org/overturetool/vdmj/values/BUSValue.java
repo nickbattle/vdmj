@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Vector;
 
 import org.overturetool.vdmj.runtime.Context;
-import org.overturetool.vdmj.runtime.ContextException;
 import org.overturetool.vdmj.runtime.ValueException;
 import org.overturetool.vdmj.scheduler.BusThread;
 import org.overturetool.vdmj.scheduler.CPUResource;

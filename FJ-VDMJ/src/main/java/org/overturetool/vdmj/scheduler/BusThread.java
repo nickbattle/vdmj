@@ -53,6 +53,9 @@ public class BusThread extends SchedulableThread
 
 			case SUSPEND:	// Ignore
 				break;
+				
+			default:
+				break;
 		}
 	}
 }
