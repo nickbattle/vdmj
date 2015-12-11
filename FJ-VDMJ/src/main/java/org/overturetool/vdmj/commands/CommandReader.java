@@ -312,11 +312,11 @@ abstract public class CommandReader
 				{
 					carryOn = doEvaluate(line);
 				}
-				else if (line.startsWith("runtrace "))
+				else if (line.startsWith("runtrace ") || line.startsWith("rt "))
 				{
 					carryOn = doRuntrace(line, false);
 				}
-				else if (line.startsWith("debugtrace "))
+				else if (line.startsWith("debugtrace ") || line.startsWith("dt "))
 				{
 					carryOn = doRuntrace(line, true);
 				}
