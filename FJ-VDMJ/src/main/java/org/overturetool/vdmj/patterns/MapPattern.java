@@ -289,7 +289,7 @@ public class MapPattern extends Pattern
 			types.add(p.getPossibleType());
 		}
 		
-		return types.getType(location);
+		return types.isEmpty() ? new MapType(location) : types.getType(location);
 	}
 
 	@Override
