@@ -240,11 +240,11 @@ public class ProcessCommandLine extends CommandLine
 	            {
 	            	carryOn = processCoverage(line);
 	            }
-	            else if (line.startsWith("runtrace"))
+	            else if (line.startsWith("runtrace") || line.startsWith("rt "))
 	            {
 	            	carryOn = processRuntrace(line, false);
 	            }
-	            else if (line.startsWith("debugtrace"))
+	            else if (line.startsWith("debugtrace") || line.startsWith("dt "))
 	            {
 	            	carryOn = processRuntrace(line, true);
 	            }

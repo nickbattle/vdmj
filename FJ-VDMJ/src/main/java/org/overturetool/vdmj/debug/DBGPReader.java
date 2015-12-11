@@ -1042,7 +1042,7 @@ public class DBGPReader
 		}
 		catch (Throwable e)
 		{
-			errorResponse(DBGPErrorCode.INTERNAL_ERROR, e.getMessage());
+			errorResponse(DBGPErrorCode.INTERNAL_ERROR, "" + e.getMessage());
 		}
 
 		return carryOn;
