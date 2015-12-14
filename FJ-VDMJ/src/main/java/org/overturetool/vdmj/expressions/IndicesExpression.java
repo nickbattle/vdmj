@@ -79,7 +79,7 @@ public class IndicesExpression extends UnaryExpression
 
     		for (int i=1; i<= seq.size(); i++)
     		{
-    			result.add(new NaturalOneValue(i));
+    			result.addNoCheck(new NaturalOneValue(i));
     		}
 
     		return new SetValue(result);
