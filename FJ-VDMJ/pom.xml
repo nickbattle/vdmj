@@ -56,15 +56,39 @@
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.2</version>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Main-Class>org.overturetool.vdmj.VDMJ</Main-Class>
-							<Implementation-Version>${project.version} build ${maven.build.timestamp}</Implementation-Version>
-							<Class-Path>.</Class-Path>
-						</manifestEntries>
-					</archive>
-				</configuration>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+							<archive>
+								<manifestEntries>
+									<Main-Class>org.overturetool.vdmj.VDMJ</Main-Class>
+									<Implementation-Version>${project.version} build ${maven.build.timestamp}</Implementation-Version>
+									<Class-Path>.</Class-Path>
+								</manifestEntries>
+							</archive>
+						</configuration>
+					</execution>
+                    <execution>
+                        <id>documentation</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classesDirectory>${basedir}</classesDirectory>
+                            <includes>
+                                <include>documentation/**.pdf</include>
+                                <include>documentation/MESSAGES</include>
+                            </includes>
+                            <classifier>docs</classifier>
+                        </configuration>
+                    </execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
