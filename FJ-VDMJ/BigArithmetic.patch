@@ -25,8 +25,8 @@ Index: pom.xml
  	<groupId>com.fujitsu</groupId>
  	<artifactId>vdmj</artifactId>
  	<name>VDMJ</name>
--	<version>3.0.1</version>
-+	<version>3.0.1-P</version>
+-	<version>3.1.1</version>
++	<version>3.1.1-P</version>
  
  	<properties>
  		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
@@ -48958,14 +48958,6 @@ Index: src/main/java/org/overturetool/vdmj/definitions/CPUClassDefinition.java
 ===================================================================
 --- src/main/java/org/overturetool/vdmj/definitions/CPUClassDefinition.java	(revision 466)
 +++ src/main/java/org/overturetool/vdmj/definitions/CPUClassDefinition.java	(working copy)
-@@ -30,7 +30,6 @@
- import org.overturetool.vdmj.lex.LexNameToken;
- import org.overturetool.vdmj.lex.LexTokenReader;
- import org.overturetool.vdmj.runtime.Context;
--import org.overturetool.vdmj.runtime.ContextException;
- import org.overturetool.vdmj.runtime.ObjectContext;
- import org.overturetool.vdmj.runtime.ValueException;
- import org.overturetool.vdmj.syntax.DefinitionReader;
 @@ -117,7 +116,7 @@
      		SeqValue opname = (SeqValue)octxt.lookup(varName("opname"));
      		NaturalValue priority = (NaturalValue)octxt.check(varName("priority"));
@@ -49467,14 +49459,6 @@ Index: src/main/java/org/overturetool/vdmj/expressions/SetRangeExpression.java
  import org.overturetool.vdmj.lex.LexLocation;
  import org.overturetool.vdmj.pog.POContextStack;
  import org.overturetool.vdmj.pog.ProofObligationList;
-@@ -31,7 +34,6 @@
- import org.overturetool.vdmj.typechecker.Environment;
- import org.overturetool.vdmj.typechecker.NameScope;
- import org.overturetool.vdmj.types.IntegerType;
--import org.overturetool.vdmj.types.NaturalType;
- import org.overturetool.vdmj.types.SetType;
- import org.overturetool.vdmj.types.Type;
- import org.overturetool.vdmj.types.TypeList;
 @@ -94,13 +96,14 @@
  
  		try
@@ -49488,8 +49472,8 @@ Index: src/main/java/org/overturetool/vdmj/expressions/SetRangeExpression.java
 -    		for (long i=from; i<= to; i++)
 +    		while (from.compareTo(to) <= 0)
      		{
--    			set.add(new IntegerValue(i));
-+    			set.add(new IntegerValue(from));
+-    			set.addNoCheck(new IntegerValue(i));
++    			set.addNoCheck(new IntegerValue(from));
 +    			from = from.add(BigInteger.ONE);
      		}
  
@@ -49998,14 +49982,6 @@ Index: src/main/java/org/overturetool/vdmj/values/BUSValue.java
 ===================================================================
 --- src/main/java/org/overturetool/vdmj/values/BUSValue.java	(revision 466)
 +++ src/main/java/org/overturetool/vdmj/values/BUSValue.java	(working copy)
-@@ -28,7 +28,6 @@
- import java.util.Vector;
- 
- import org.overturetool.vdmj.runtime.Context;
--import org.overturetool.vdmj.runtime.ContextException;
- import org.overturetool.vdmj.runtime.ValueException;
- import org.overturetool.vdmj.scheduler.BusThread;
- import org.overturetool.vdmj.scheduler.CPUResource;
 @@ -57,7 +56,7 @@
  		SchedulingPolicy policy = SchedulingPolicy.factory(parg.value.toUpperCase());
  
