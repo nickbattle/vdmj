@@ -84,6 +84,7 @@
                             <includes>
                                 <include>documentation/**.pdf</include>
                                 <include>documentation/MESSAGES</include>
+                                <include>documentation/UserGuideTests.zip</include>
                             </includes>
                             <classifier>docs</classifier>
                         </configuration>

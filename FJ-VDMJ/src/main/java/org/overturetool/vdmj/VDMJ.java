@@ -102,18 +102,21 @@ abstract public class VDMJ
     			controller = new VDMRT();
     			dialect = Dialect.VDM_RT;
     		}
-    		else if (arg.equals("-v"))
+    		else if (arg.equals("-v"))		// Exit if this option is used.
     		{
     			String version = getVersion();
 
     			if (version == null)
     			{
-    				println("Cannot determine version");
+    				println("Cannot determine VDMJ version");
+        			System.exit(1);
     			}
     			else
     			{
     				println("VDMJ version = " + version);
+        			System.exit(0);
     			}
+    			
     		}
     		else if (arg.equals("-w"))
     		{
