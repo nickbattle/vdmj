@@ -412,12 +412,14 @@ abstract public class CommandReader
 		{
 			try
 			{
-				reduction = Float.parseFloat(parts[1]) / 100.0F;
+				float val = Float.parseFloat(parts[1]) / 100.0F;
 
-				if (reduction > 1 || reduction < 0)
+				if (val > 1 || val <= 0)
 				{
-					println("Usage: filter %age (1-100)");
+					throw new NumberFormatException("Should be 1-100");
 				}
+				
+				reduction = val;
 				
 				if (reductionType == TraceReductionType.NONE)
 				{

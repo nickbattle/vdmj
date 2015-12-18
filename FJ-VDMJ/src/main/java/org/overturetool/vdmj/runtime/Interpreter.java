@@ -595,23 +595,32 @@ abstract public class Interpreter
 		int testNumber = 1;
 		int excluded = 0;
 		boolean failed = false;
-		TraceFilter filter = new TraceFilter(subset, reductionType, seed);
+		final int count = tests.count();
+		TraceFilter filter = new TraceFilter(count, subset, reductionType, seed);
 
-		writer.println("Generated " + tests.count() + " tests");
+		if (subset < 1.0 && reductionType == TraceReductionType.RANDOM)
+		{
+			int r = (int)Math.ceil(count * subset);
+			writer.println("Generated " + count + " tests, reduced to " + r);
+		}
+		else
+		{
+			writer.println("Generated " + count + " tests");
+		}
 
 		while (tests.hasMoreTests())
 		{
 			CallSequence test = tests.getNextTest();
 			
-			if ((testNo > 0 && testNumber != testNo) || filter.isRemoved(test))
+			if ((testNo > 0 && testNumber != testNo) || filter.isRemoved(test, testNumber))
 			{
 				excluded++;
 			}
-			else if (filter.getFilter(test) > 0)
+			else if (filter.getFilteredBy(test) > 0)
 			{
 				excluded++;
     			writer.println("Test " + testNumber + " = " + test.getCallString(getTraceContext(tracedef.classDefinition)));
-				writer.println("Test " + testNumber + " FILTERED by test " + filter.getFilter(test));
+				writer.println("Test " + testNumber + " FILTERED by test " + filter.getFilteredBy(test));
 			}
 			else
 			{

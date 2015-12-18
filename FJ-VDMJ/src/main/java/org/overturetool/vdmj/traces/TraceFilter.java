@@ -34,7 +34,6 @@ import java.util.Vector;
  */
 public class TraceFilter
 {
-	private final float subset;
 	private final TraceReductionType reductionType;
 	private final Random prng;
 	
@@ -43,14 +42,32 @@ public class TraceFilter
 	private List<Integer> failedNumbers = new Vector<Integer>();
 	private Set<String> shapes = new HashSet<String>();
 	
-	public TraceFilter(float subset, TraceReductionType reductionType, long seed)
+	private Set<Integer> included = new HashSet<Integer>();
+	
+	public TraceFilter(int count, float subset, TraceReductionType reductionType, long seed)
 	{
-		this.subset = subset;
 		this.reductionType = reductionType;
 		this.prng = new Random(seed);
+		
+		// Generate explicit random tests to include for the subset, if there is one.
+		if (subset < 1.0)
+		{
+    		for (int i=0; i<(count * subset); i++)
+    		{
+    			int n;
+    			
+    			do
+    			{
+    				n = prng.nextInt(count) + 1;
+    			}
+    			while (included.contains(n));
+    			
+    			included.add(n);
+    		}
+		}
 	}
 
-	public int getFilter(CallSequence test)
+	public int getFilteredBy(CallSequence test)
 	{
 		for (int i=0; i<failedTests.size(); i++)
 		{
@@ -73,7 +90,7 @@ public class TraceFilter
 		}
 	}
 
-	public boolean isRemoved(CallSequence test)
+	public boolean isRemoved(CallSequence test, int number)
 	{
 		switch (reductionType)
 		{
@@ -81,7 +98,14 @@ public class TraceFilter
 				return false;
 
 			case RANDOM:
-				return prng.nextFloat() > subset;
+				if (included.size() > 0)
+				{
+					return !included.contains(number);
+				}
+				else
+				{
+					return false;	// 100% random
+				}
 				
 			case SHAPES_NOVARS:
 			case SHAPES_VARNAMES:
@@ -90,7 +114,14 @@ public class TraceFilter
 				
 				if (shapes.contains(shape))
 				{
-					return prng.nextFloat() < subset;
+					if (included.size() > 0)
+					{
+						return !included.contains(number);
+					}
+					else
+					{
+						return false;	// 100% random
+					}
 				}
 				else
 				{
