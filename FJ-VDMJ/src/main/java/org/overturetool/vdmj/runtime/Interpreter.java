@@ -587,21 +587,21 @@ abstract public class Interpreter
 			writer = Console.out;
 		}
 
-		if (testNo > tests.count())
+		final int count = tests.count();
+
+		if (testNo > count)
 		{
-			throw new Exception("Trace " + lexname + " only has " + tests.count() + " tests");
+			throw new Exception("Trace " + lexname + " only has " + count + " tests");
 		}
 
 		int testNumber = 1;
 		int excluded = 0;
 		boolean failed = false;
-		final int count = tests.count();
 		TraceFilter filter = new TraceFilter(count, subset, reductionType, seed);
 
-		if (subset < 1.0 && reductionType == TraceReductionType.RANDOM)
+		if (filter.getFilteredCount() > 0)
 		{
-			int r = (int)Math.ceil(count * subset);
-			writer.println("Generated " + count + " tests, reduced to " + r);
+			writer.println("Generated " + count + " tests, reduced to " + filter.getFilteredCount());
 		}
 		else
 		{
@@ -640,7 +640,7 @@ abstract public class Interpreter
 
 			if (testNo > 0 && testNumber == testNo)
 			{
-				excluded = tests.count() - 1;
+				excluded = count - 1;
 				break;
 			}
 

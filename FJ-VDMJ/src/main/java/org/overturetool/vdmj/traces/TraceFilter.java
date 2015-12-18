@@ -34,6 +34,8 @@ import java.util.Vector;
  */
 public class TraceFilter
 {
+	private final int count;
+	private final float subset;
 	private final TraceReductionType reductionType;
 	private final Random prng;
 	
@@ -46,6 +48,8 @@ public class TraceFilter
 	
 	public TraceFilter(int count, float subset, TraceReductionType reductionType, long seed)
 	{
+		this.count = count;
+		this.subset = subset;
 		this.reductionType = reductionType;
 		this.prng = new Random(seed);
 		
@@ -131,5 +135,18 @@ public class TraceFilter
 		}
 		
 		return false;
+	}
+	
+	public int getFilteredCount()
+	{
+		if (subset < 1.0 && reductionType == TraceReductionType.RANDOM)
+		{
+			return (int)Math.ceil(count * subset);
+		}
+		else
+		{
+			// We don't know how many will be returned for shaped reductions
+			return -1;
+		}
 	}
 }
