@@ -34,6 +34,8 @@ public class TraceIteratorList extends Vector<TraceIterator>
 	
 	private CallSequence[] alternatives = null;
 
+	private Boolean lastResult = null;	// Cache of hasMoreTests result
+
 	public void reset()
 	{
 		for (TraceIterator iter: this)
@@ -70,14 +72,21 @@ public class TraceIteratorList extends Vector<TraceIterator>
 
 	public boolean hasMoreTests()
 	{
+		if (lastResult != null)
+		{
+			return lastResult.booleanValue(); 
+		}
+		
 		for (TraceIterator iter: this)
 		{
 			if (iter.hasMoreTests())
 			{
+				lastResult = Boolean.TRUE;
 				return true;
 			}
 		}
 		
+		lastResult = Boolean.FALSE;
 		return false;
 	}
 
@@ -86,6 +95,8 @@ public class TraceIteratorList extends Vector<TraceIterator>
 	 */
 	public CallSequence getNextTestSequence()
 	{
+		lastResult = null;
+		
 		if (alternatives == null)	// First time in
 		{
 			alternatives  = new CallSequence[size()];
@@ -127,6 +138,8 @@ public class TraceIteratorList extends Vector<TraceIterator>
 	 */
 	public CallSequence getNextTestAlternative()
 	{
+		lastResult = null;
+		
 		for (int i=0; i<size(); i++)
 		{
 			if (get(i).hasMoreTests())
