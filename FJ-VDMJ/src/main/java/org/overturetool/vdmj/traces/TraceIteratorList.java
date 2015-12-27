@@ -44,6 +44,7 @@ public class TraceIteratorList extends Vector<TraceIterator>
 		}
 		
 		alternatives = null;
+		lastResult = null;
 	}
 	
 	public int countSequence()
