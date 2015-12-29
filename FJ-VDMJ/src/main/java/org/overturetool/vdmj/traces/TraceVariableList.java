@@ -64,7 +64,7 @@ public class TraceVariableList extends HashSet<TraceVariable>
 				clone = (self != null && obj.objectReference > self.objectReference);
 			}
 
-			add(new TraceVariable(key.location, key, value, d.getType(), clone));
+			add(new TraceVariable(key, value, d.getType(), clone));
 		}
 	}
 

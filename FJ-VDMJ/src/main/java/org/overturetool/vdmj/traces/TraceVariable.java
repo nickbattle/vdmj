@@ -23,14 +23,12 @@
 
 package org.overturetool.vdmj.traces;
 
-import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.values.Value;
 
 public class TraceVariable
 {
-	public final LexLocation location;
 	public final LexNameToken name;
 	public final Value value;
 	public final Type type;
@@ -38,9 +36,8 @@ public class TraceVariable
 	
 	private final String cached;
 
-	public TraceVariable(LexLocation location, LexNameToken name, Value value, Type type, boolean clone)
+	public TraceVariable(LexNameToken name, Value value, Type type, boolean clone)
 	{
-		this.location = location;
 		this.name = name;
 		this.value = value;
 		this.type = type;
