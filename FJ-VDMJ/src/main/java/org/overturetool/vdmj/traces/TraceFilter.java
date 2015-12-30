@@ -43,6 +43,7 @@ public class TraceFilter
 	private List<Integer> failedStems = new Vector<Integer>();
 	private List<Integer> failedNumbers = new Vector<Integer>();
 	private Set<String> shapes = new HashSet<String>();
+	private Set<String> extras = new HashSet<String>();
 	
 	private Set<Integer> included = new HashSet<Integer>();
 	
@@ -120,16 +121,30 @@ public class TraceFilter
 				{
 					if (included.size() > 0)
 					{
-						return !included.contains(number);
+						if (included.contains(number))
+						{
+							if (extras.contains(shape))		// We already did this shape once
+							{
+								extras.remove(shape);
+								return true;				// So exclude this one
+							}
+
+							return false;
+						}
+						else
+						{
+							return true;
+						}
 					}
 					else
 					{
-						return false;	// 100% random
+						return false;	// 100%
 					}
 				}
 				else
 				{
 					shapes.add(shape);
+					extras.add(shape);
 					return false;	// Every shape appears once
 				}
 		}

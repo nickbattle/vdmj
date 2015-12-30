@@ -86,6 +86,9 @@ abstract public class CommandReader
 
 	/** The type of trace reduction. */
 	private TraceReductionType reductionType = TraceReductionType.NONE;
+	
+	/** The output file for trace execution or null */
+	private File traceoutput = null;
 
 	/** The IDE DBGPReader, if any */
 	private DBGPReader dbgp = null;
@@ -179,10 +182,6 @@ abstract public class CommandReader
 					{
 						return ExitStatus.RELOAD;
 					}
-				}
-				else if (line.startsWith("save"))
-				{
-					carryOn = doSave(line);
 				}
 				else if (line.equals("files"))
 				{
@@ -319,6 +318,14 @@ abstract public class CommandReader
 				else if (line.startsWith("debugtrace ") || line.startsWith("dt "))
 				{
 					carryOn = doRuntrace(line, true);
+				}
+				else if (line.startsWith("savetrace"))
+				{
+					carryOn = doSavetrace(line);
+				}
+				else if (line.startsWith("save"))
+				{
+					carryOn = doSave(line);
 				}
 				else if (line.startsWith("filter"))
 				{
@@ -470,11 +477,34 @@ abstract public class CommandReader
 
 		try
 		{
+			PrintWriter out = null;
+			
+			if (!debug && traceoutput != null)
+			{
+				try
+				{
+					out = new PrintWriter(traceoutput);
+					Interpreter.setTraceOutput(out);
+					println("Trace output sent to " + traceoutput);
+				}
+				catch (Exception e)
+				{
+					println("Cannot create output file " + traceoutput);
+					return true;
+				}
+			}
+			
    			long before = System.currentTimeMillis();
    			boolean passed = interpreter.runtrace(line, testNo, debug, reduction, reductionType, 0);
    			long after = System.currentTimeMillis();
 			println("Executed in " + (double)(after-before)/1000 + " secs. ");
 			
+			if (!debug && traceoutput != null)
+			{
+				out.close();
+				Interpreter.setTraceOutput(null);
+			}
+
 			if (passed)
 			{
 				println("All tests passed");
@@ -509,6 +539,42 @@ abstract public class CommandReader
 		catch (Exception e)
 		{
 			println("Error: " + e.getMessage());
+		}
+
+		return true;
+	}
+	
+	protected boolean doSavetrace(String line)
+	{
+		String[] parts = line.split("\\s+");
+		
+		if (parts.length == 1)
+		{
+			if (traceoutput == null)
+			{
+				println("runtrace output is not redirected");
+			}
+			else
+			{
+				println("runtrace output is redirected to " + traceoutput);
+			}
+		}
+		else if (parts.length != 2)
+		{
+			println("savetrace <file> | OFF");
+		}
+		else
+		{
+			if (parts[1].equalsIgnoreCase("off"))
+			{
+				traceoutput = null;
+				println("runtrace output is not redirected");
+			}
+			else
+			{
+				traceoutput = new File(parts[1]);
+				println("runtrace output redirected to " + traceoutput);
+			}
 		}
 
 		return true;
@@ -1329,6 +1395,7 @@ abstract public class CommandReader
 		println("print <expression> - evaluate expression");
 		println("runtrace <name> [test number] - run CT trace(s)");
 		println("debugtrace <name> [test number] - debug CT trace(s)");
+		println("savetrace [<file> | off] - save CT trace output");
 		println("filter %age | <reduction type> - reduce CT trace(s)");
 		println("assert <file> - run assertions from a file");
 		println("init - re-initialize the global environment");
