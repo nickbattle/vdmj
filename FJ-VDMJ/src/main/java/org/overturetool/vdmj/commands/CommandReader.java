@@ -90,6 +90,9 @@ abstract public class CommandReader
 	/** The output file for trace execution or null */
 	private File traceoutput = null;
 
+	/** The seed for the trace PRNG */
+	private long traceseed = 0;
+
 	/** The IDE DBGPReader, if any */
 	private DBGPReader dbgp = null;
 
@@ -323,6 +326,10 @@ abstract public class CommandReader
 				{
 					carryOn = doSavetrace(line);
 				}
+				else if (line.startsWith("seedtrace"))
+				{
+					carryOn = doSeedtrace(line);
+				}
 				else if (line.startsWith("save"))
 				{
 					carryOn = doSave(line);
@@ -451,7 +458,7 @@ abstract public class CommandReader
 			}
 		}
 
-		println("Trace filter currently " + reduction*100 + "% " + reductionType);
+		println("Trace filter currently " + reduction*100 + "% " + reductionType + " (seed " + traceseed + ")");
 		return true;
 	}
 
@@ -495,7 +502,7 @@ abstract public class CommandReader
 			}
 			
    			long before = System.currentTimeMillis();
-   			boolean passed = interpreter.runtrace(line, testNo, debug, reduction, reductionType, 0);
+   			boolean passed = interpreter.runtrace(line, testNo, debug, reduction, reductionType, traceseed);
    			long after = System.currentTimeMillis();
 			println("Executed in " + (double)(after-before)/1000 + " secs. ");
 			
@@ -577,6 +584,30 @@ abstract public class CommandReader
 			}
 		}
 
+		return true;
+	}
+
+	protected boolean doSeedtrace(String line)
+	{
+		String[] parts = line.split("\\s+");
+		
+		if (parts.length != 2)
+		{
+			println("seedtrace <number>");
+		}
+		else
+		{
+			try
+			{
+				traceseed = Long.parseLong(parts[1]);
+				println("Seed now set to " + traceseed);
+			}
+			catch (NumberFormatException e)
+			{
+				println("seedtrace <number>");
+			}
+		}
+		
 		return true;
 	}
 
@@ -1396,7 +1427,9 @@ abstract public class CommandReader
 		println("runtrace <name> [test number] - run CT trace(s)");
 		println("debugtrace <name> [test number] - debug CT trace(s)");
 		println("savetrace [<file> | off] - save CT trace output");
+		println("seedtrace <number> - seed CT trace random generator");
 		println("filter %age | <reduction type> - reduce CT trace(s)");
+		println("seedtrace <number> - seed CT trace random generator");
 		println("assert <file> - run assertions from a file");
 		println("init - re-initialize the global environment");
 		println("env - list the global symbols in the default environment");
