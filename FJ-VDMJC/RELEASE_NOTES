@@ -1,6 +1,14 @@
 VDMJC Release Notes
 
-Latest Changes in version 3.0.1
+For more detail of these changes, and to be notified of future changes, subscribe to
+https://github.com/nickbattle/vdmj/issues.
+
+Release notes and issues for version 3.1.1 and later are held on GitHub:
+
+	See https://github.com/nickbattle/vdmj/releases
+	And https://github.com/nickbattle/vdmj/issues
+
+Change history of version 3.0.1
 
 2013-11-19 Updated vdmjc.properties for VDMJ 3.0.1
 2013-09-26 Released.
