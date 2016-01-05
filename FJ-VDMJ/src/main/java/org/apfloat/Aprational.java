@@ -890,7 +890,7 @@ public class Aprational
     private synchronized Apfloat ensureApprox(long precision)
         throws ApfloatRuntimeException
     {
-        Apfloat approx = getApprox(precision);
+        Apfloat approx = getApprox();
         if (approx == null || approx.precision() < precision)
         {
             if (denominator().equals(ONE))
@@ -920,7 +920,7 @@ public class Aprational
         return approx;
     }
 
-    private Apfloat getApprox(long precision)
+    private Apfloat getApprox()
     {
         return (this.approx == null ? null : this.approx.get());
     }

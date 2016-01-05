@@ -23,11 +23,8 @@
 
 package org.overturetool.vdmj.expressions;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 
-import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.lex.LexToken;
 import org.overturetool.vdmj.pog.NonZeroObligation;
 import org.overturetool.vdmj.pog.POContextStack;
