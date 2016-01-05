@@ -3,7 +3,12 @@ VDMJ Release Notes
 For more detail of these changes, and to be notified of future changes, subscribe to
 https://github.com/nickbattle/vdmj/issues.
 
-Latest Changes in version 3.0.1
+Release notes and issues for version 3.1.1 and later are held on GitHub:
+
+	See https://github.com/nickbattle/vdmj/releases
+	And https://github.com/nickbattle/vdmj/issues
+
+Change history of version 3.0.1
 
 2015-11-24 Fix a problem with set pattern matching, fixes #4
 2015-10-19 Remove "unused" warning for traces in SL modules
