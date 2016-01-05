@@ -23,6 +23,8 @@
 
 package org.overturetool.vdmj.definitions;
 
+import java.math.BigInteger;
+
 import org.overturetool.vdmj.expressions.EqualsExpression;
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.expressions.HistoryExpression;
@@ -190,6 +192,6 @@ public class MutexSyncDefinition extends Definition
 		return new EqualsExpression(
 			new HistoryExpression(location, Token.ACTIVE, list),
     		new LexKeywordToken(Token.EQUALS, location),
-    		new IntegerLiteralExpression(new LexIntegerToken(0, location)));
+    		new IntegerLiteralExpression(new LexIntegerToken(BigInteger.ZERO, location)));
 	}
 }

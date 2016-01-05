@@ -23,6 +23,9 @@
 
 package org.overturetool.vdmj.values;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
 import org.overturetool.vdmj.types.RationalType;
@@ -33,12 +36,12 @@ public class RationalValue extends RealValue
 {
 	private static final long serialVersionUID = 1L;
 
-	public RationalValue(double value) throws Exception
+	public RationalValue(BigDecimal value) throws Exception
 	{
 		super(value);
 	}
 
-	public RationalValue(long value)
+	public RationalValue(BigInteger value)
 	{
 		super(value);
 	}

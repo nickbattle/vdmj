@@ -23,6 +23,11 @@
 
 package org.overturetool.vdmj.expressions;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+
+import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.lex.LexToken;
 import org.overturetool.vdmj.pog.NonZeroObligation;
 import org.overturetool.vdmj.pog.POContextStack;
@@ -61,49 +66,23 @@ public class DivExpression extends NumericBinaryExpression
 
 		try
 		{
-    		double lv = left.eval(ctxt).intValue(ctxt);
-    		double rv = right.eval(ctxt).intValue(ctxt);
+    		BigInteger lv = left.eval(ctxt).intValue(ctxt);
+    		BigInteger rv = right.eval(ctxt).intValue(ctxt);
 
-    		if (rv == 0)
+    		if (rv.equals(BigInteger.ZERO))
     		{
     			throw new ValueException(4134, "Infinite or NaN trouble", ctxt);
     		}
 
-    		return NumericValue.valueOf(div(lv, rv), ctxt);
+    		return NumericValue.valueOf(lv.divide(rv), ctxt);
         }
         catch (ValueException e)
         {
         	return abort(e);
         }
-	}
-
-	static public long div(double lv, double rv)
-	{
-		/*
-		 * There is often confusion on how integer division, remainder and modulus
-		 * work on negative numbers. In fact, there are two valid answers to -14 div
-		 * 3: either (the intuitive) -4 as in the Toolbox, or -5 as in e.g. Standard
-		 * ML [Paulson91]. It is therefore appropriate to explain these operations in
-		 * some detail.
-		 *
-		 * Integer division is defined using floor and real number division:
-		 *
-		 *		x/y < 0:	x div y = -floor(abs(-x/y))
-		 *		x/y >= 0:	x div y = floor(abs(x/y))
-		 *
-		 * Note that the order of floor and abs on the right-hand side makes a difference,
-		 * the above example would yield -5 if we changed the order. This is
-		 * because floor always yields a smaller (or equal) integer, e.g. floor (14/3) is
-		 * 4 while floor (-14/3) is -5.
-		 */
-
-		if (lv/rv < 0)
+		catch (Exception e)
 		{
-			return (long)-Math.floor(Math.abs(lv/rv));
-		}
-		else
-		{
-			return (long)Math.floor(Math.abs(-lv/rv));
+			return abort(new ValueException(4064, e.getMessage(), ctxt));
 		}
 	}
 

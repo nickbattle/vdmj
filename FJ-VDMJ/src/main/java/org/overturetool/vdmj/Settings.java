@@ -23,6 +23,9 @@
 
 package org.overturetool.vdmj;
 
+import java.math.MathContext;
+import java.math.RoundingMode;
+
 import org.overturetool.vdmj.lex.Dialect;
 
 /**
@@ -39,6 +42,7 @@ public class Settings
 	public static boolean dynamictypechecks = true;
 	public static boolean measureChecks = true;
 	public static boolean exceptions = false;
+	public static MathContext precision = new MathContext(100, RoundingMode.HALF_UP);
 
 	public static boolean usingDBGP = false;
 	public static boolean usingCmdLine = false;

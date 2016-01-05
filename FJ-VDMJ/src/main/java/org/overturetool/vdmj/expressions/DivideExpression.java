@@ -23,6 +23,10 @@
 
 package org.overturetool.vdmj.expressions;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.lex.LexToken;
 import org.overturetool.vdmj.pog.NonZeroObligation;
 import org.overturetool.vdmj.pog.POContextStack;
@@ -61,15 +65,34 @@ public class DivideExpression extends NumericBinaryExpression
 
 		try
 		{
-    		double lv = left.eval(ctxt).realValue(ctxt);
-    		double rv = right.eval(ctxt).realValue(ctxt);
+    		Value l = left.eval(ctxt);
+    		Value r = right.eval(ctxt);
 
-    		return NumericValue.valueOf(lv / rv, ctxt);
+			if (NumericValue.areIntegers(l, r))
+			{
+				BigInteger lv = l.intValue(ctxt);
+				BigInteger rv = r.intValue(ctxt);
+				BigInteger[] result = lv.divideAndRemainder(rv);
+				
+				if (result[1].equals(BigInteger.ZERO))	// Else do BigDecimal
+				{
+					return NumericValue.valueOf(result[0], ctxt);
+				}
+			}
+
+			BigDecimal lv = l.realValue(ctxt);
+    		BigDecimal rv = r.realValue(ctxt);
+
+    		return NumericValue.valueOf(lv.divide(rv, Settings.precision), ctxt);
         }
         catch (ValueException e)
         {
         	return abort(e);
         }
+		catch (Exception e)
+		{
+			return abort(new ValueException(4134, e.getMessage(), ctxt));
+		}
 	}
 
 	@Override

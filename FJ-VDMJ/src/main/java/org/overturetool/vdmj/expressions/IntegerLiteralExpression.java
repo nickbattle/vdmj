@@ -23,6 +23,8 @@
 
 package org.overturetool.vdmj.expressions;
 
+import java.math.BigInteger;
+
 import org.overturetool.vdmj.lex.LexIntegerToken;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -58,11 +60,11 @@ public class IntegerLiteralExpression extends Expression
 	{
 		Type result = null;
 		
-		if (value.value < 0)
+		if (value.value.compareTo(BigInteger.ZERO) < 0)
 		{
 			result = new IntegerType(location);
 		}
-		else if (value.value == 0)
+		else if (value.value.equals(BigInteger.ZERO))
 		{
 			result = new NaturalType(location);
 		}

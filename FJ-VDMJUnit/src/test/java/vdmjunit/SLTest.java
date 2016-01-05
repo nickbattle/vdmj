@@ -25,6 +25,8 @@ package vdmjunit;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigInteger;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -50,15 +52,15 @@ public class SLTest extends VDMJUnitTestSL
 	{
 		setDefault("A");
 		run("setValue(123)");
-		assertEquals(123, runInt("getValue()"));
+		assertEquals(new BigInteger("123"), runInt("getValue()"));
 	}
 	
 	@Test
 	public void two() throws Exception
 	{
-		assertEquals(100, runInt("B`g(99)"));
+		assertEquals(new BigInteger("100"), runInt("B`g(99)"));
 		setDefault("B");
-		assertEquals(2, runInt("g(1)"));
+		assertEquals(new BigInteger("2"), runInt("g(1)"));
 	}
 	
 	@Test

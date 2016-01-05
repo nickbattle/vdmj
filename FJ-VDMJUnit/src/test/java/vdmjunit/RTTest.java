@@ -25,9 +25,12 @@ package vdmjunit;
 
 import static org.junit.Assert.assertEquals;
 
+import java.math.BigInteger;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import vdmjunit.VDMJUnitTestRT;
 
 public class RTTest extends VDMJUnitTestRT
@@ -47,6 +50,6 @@ public class RTTest extends VDMJUnitTestRT
 	@Test
 	public void one() throws Exception
 	{
-		assertEquals(321, runInt("obj.Get2(obj2)"));
+		assertEquals(new BigInteger("321"), runInt("obj.Get2(obj2)"));
 	}
 }

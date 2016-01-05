@@ -23,6 +23,12 @@
 
 package org.overturetool.vdmj.expressions;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import org.apfloat.Apfloat;
+import org.apfloat.ApfloatMath;
+import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.lex.LexToken;
 import org.overturetool.vdmj.pog.FuncIterationObligation;
 import org.overturetool.vdmj.pog.MapIterationObligation;
@@ -46,6 +52,8 @@ public class StarStarExpression extends BinaryExpression
 {
 	private static final long serialVersionUID = 1L;
 
+	private static final BigInteger BIG_MAX_INT = new BigInteger(Integer.toString(Integer.MAX_VALUE));
+	
 	public StarStarExpression(Expression left, LexToken op, Expression right)
 	{
 		super(left, op, right);
@@ -101,7 +109,7 @@ public class StarStarExpression extends BinaryExpression
     		if (lv instanceof MapValue)
     		{
     			ValueMap map = lv.mapValue(ctxt);
-    			long n = rv.intValue(ctxt);
+    			long n = rv.intValue(ctxt).longValue();
     			ValueMap result = new ValueMap();
 
     			for (Value k: map.keySet())
@@ -131,14 +139,23 @@ public class StarStarExpression extends BinaryExpression
     		else if (lv instanceof FunctionValue)
     		{
     			return new IterFunctionValue(
-    				lv.functionValue(ctxt), rv.intValue(ctxt));
+    				lv.functionValue(ctxt), rv.intValue(ctxt).longValue());
     		}
     		else if (lv instanceof NumericValue)
     		{
-    			double ld = lv.realValue(ctxt);
-    			double rd = rv.realValue(ctxt);
+    			if (NumericValue.areIntegers(lv, rv))
+    			{
+    				if (rv.intValue(ctxt).compareTo(BIG_MAX_INT) < 0)
+    				{
+    					return NumericValue.valueOf(lv.intValue(ctxt).pow(rv.intValue(ctxt).intValue()), ctxt);
+    				}
+    			}
 
-    			return NumericValue.valueOf(Math.pow(ld, rd), ctxt);
+    			Apfloat ld = new Apfloat(lv.realValue(ctxt));
+    			Apfloat rd = new Apfloat(rv.realValue(ctxt));
+    			Apfloat result = ApfloatMath.pow(ld, rd);
+
+    			return NumericValue.valueOf(new BigDecimal(result.toString(), Settings.precision), ctxt);
     		}
 
     		return abort(4031,

@@ -163,7 +163,7 @@ public class PlusPlusExpression extends BinaryExpression
 
     			for (Value k: map.keySet())
     			{
-					int iv = (int)k.intValue(ctxt);
+					int iv = k.intValue(ctxt).intValue();
 
 					if (iv < 1 || iv > seq.size())
 					{

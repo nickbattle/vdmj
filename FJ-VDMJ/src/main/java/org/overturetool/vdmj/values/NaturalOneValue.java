@@ -23,6 +23,8 @@
 
 package org.overturetool.vdmj.values;
 
+import java.math.BigInteger;
+
 import org.overturetool.vdmj.messages.InternalException;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -34,14 +36,19 @@ public class NaturalOneValue extends NaturalValue
 {
 	private static final long serialVersionUID = 1L;
 
-	public NaturalOneValue(long value) throws Exception
+	public NaturalOneValue(BigInteger iv) throws Exception
 	{
-		super(value);
+		super(iv);
 
-		if (value < 1)
+		if (iv.compareTo(BigInteger.ONE) < 0)
 		{
-			throw new Exception("Value " + value + " is not a nat1");
+			throw new Exception("Value " + iv + " is not a nat1");
 		}
+	}
+
+	public NaturalOneValue(long i) throws Exception
+	{
+		this(new BigInteger("" + i));
 	}
 
 	@Override

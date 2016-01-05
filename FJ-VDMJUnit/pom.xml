@@ -4,7 +4,7 @@
 	<groupId>com.fujitsu</groupId>
 	<artifactId>vdmjunit</artifactId>
 	<name>VDMJUnit</name>
-	<version>1.0.0</version>
+	<version>1.0.0-P</version>
 
 	<properties>
 		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>com.fujitsu</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>3.0.1</version>
+			<version>3.0.1-P</version>
 		</dependency>
 	</dependencies>
 

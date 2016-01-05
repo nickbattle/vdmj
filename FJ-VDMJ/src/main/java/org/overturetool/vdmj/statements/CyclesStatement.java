@@ -108,7 +108,7 @@ public class CyclesStatement extends Statement
 				try
 				{
 					ctxt.threadState.setAtomic(true);
-					value = cycles.eval(ctxt).intValue(ctxt);
+					value = cycles.eval(ctxt).intValue(ctxt).longValue();
 				}
 				finally
 				{

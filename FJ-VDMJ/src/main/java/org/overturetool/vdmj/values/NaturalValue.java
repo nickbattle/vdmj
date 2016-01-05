@@ -23,6 +23,8 @@
 
 package org.overturetool.vdmj.values;
 
+import java.math.BigInteger;
+
 import org.overturetool.vdmj.messages.InternalException;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -34,14 +36,19 @@ public class NaturalValue extends IntegerValue
 {
 	private static final long serialVersionUID = 1L;
 
-	public NaturalValue(long value) throws Exception
+	public NaturalValue(BigInteger iv) throws Exception
 	{
-		super(value);
+		super(iv);
 
-		if (value < 0)
+		if (iv.compareTo(BigInteger.ZERO) < 0)
 		{
-			throw new Exception("Value " + value + " is not a nat");
+			throw new Exception("Value " + iv + " is not a nat");
 		}
+	}
+
+	public NaturalValue(long size) throws Exception
+	{
+		this(new BigInteger(Long.toString(size)));
 	}
 
 	@Override

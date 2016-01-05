@@ -24,6 +24,8 @@
 package org.overturetool.vdmj.values;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Formattable;
 import java.util.FormattableFlags;
 import java.util.Formatter;
@@ -349,34 +351,34 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 		return this;
 	}
 
-	public double realValue(Context ctxt) throws ValueException
+	public BigDecimal realValue(Context ctxt) throws ValueException
 	{
 		abort(4089, "Can't get real value of " + kind(), ctxt);
-		return 0;
+		return BigDecimal.ZERO;
 	}
 
-	public double ratValue(Context ctxt) throws ValueException
+	public BigDecimal ratValue(Context ctxt) throws ValueException
 	{
 		abort(4090, "Can't get rat value of " + kind(), ctxt);
-		return 0;
+		return BigDecimal.ZERO;
 	}
 
-	public long intValue(Context ctxt) throws ValueException
+	public BigInteger intValue(Context ctxt) throws ValueException
 	{
 		abort(4091, "Can't get int value of " + kind(), ctxt);
-		return 0;
+		return BigInteger.ZERO;
 	}
 
-	public long natValue(Context ctxt) throws ValueException
+	public BigInteger natValue(Context ctxt) throws ValueException
 	{
 		abort(4092, "Can't get nat value of " + kind(), ctxt);
-		return 0;
+		return BigInteger.ZERO;
 	}
 
-	public long nat1Value(Context ctxt) throws ValueException
+	public BigInteger nat1Value(Context ctxt) throws ValueException
 	{
 		abort(4093, "Can't get nat1 value of " + kind(), ctxt);
-		return 0;
+		return BigInteger.ZERO;
 	}
 
 	public boolean boolValue(Context ctxt) throws ValueException

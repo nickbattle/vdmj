@@ -131,7 +131,7 @@ public class DEFAULT implements Serializable
 		return MATH.pi_f();
 	}
 
-	public static Value rand(Value arg) throws ValueException
+	public static Value rand(Value arg) throws Exception
 	{
 		return MATH.rand(arg);
 	}

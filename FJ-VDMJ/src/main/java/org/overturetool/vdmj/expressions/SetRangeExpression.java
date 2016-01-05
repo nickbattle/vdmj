@@ -23,6 +23,9 @@
 
 package org.overturetool.vdmj.expressions;
 
+import java.math.BigInteger;
+import java.math.RoundingMode;
+
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.pog.POContextStack;
 import org.overturetool.vdmj.pog.ProofObligationList;
@@ -93,13 +96,14 @@ public class SetRangeExpression extends SetExpression
 
 		try
 		{
-    		long from = (long)Math.ceil(first.eval(ctxt).realValue(ctxt));
-    		long to = (long)Math.floor(last.eval(ctxt).realValue(ctxt));
+    		BigInteger from = first.eval(ctxt).realValue(ctxt).setScale(0, RoundingMode.CEILING).toBigInteger();
+    		BigInteger to = last.eval(ctxt).realValue(ctxt).setScale(0, RoundingMode.FLOOR).toBigInteger();
     		ValueSet set = new ValueSet();
 
-    		for (long i=from; i<= to; i++)
+    		while (from.compareTo(to) <= 0)
     		{
-    			set.addNoCheck(new IntegerValue(i));
+    			set.addNoCheck(new IntegerValue(from));
+    			from = from.add(BigInteger.ONE);
     		}
 
     		return new SetValue(set);

@@ -23,18 +23,23 @@
 
 package org.overturetool.vdmj.lex;
 
+import java.math.BigDecimal;
+
+import org.overturetool.vdmj.Settings;
+
 public class LexRealToken extends LexToken
 {
 	private static final long serialVersionUID = 1L;
-	public final double value;
+	public final BigDecimal value;
 
 	public LexRealToken(String real, LexLocation location)
 	{
 		super(location, Token.REALNUMBER);
-		value = Double.parseDouble(real);
+		value = new BigDecimal(real).setScale(
+			Settings.precision.getPrecision(), Settings.precision.getRoundingMode());
 	}
 
-	public LexRealToken(double value, LexLocation location)
+	public LexRealToken(BigDecimal value, LexLocation location)
 	{
 		super(location, Token.REALNUMBER);
 		this.value = value;
@@ -43,6 +48,6 @@ public class LexRealToken extends LexToken
 	@Override
 	public String toString()
 	{
-		return Double.toString(value);
+		return value.stripTrailingZeros().toString();
 	}
 }

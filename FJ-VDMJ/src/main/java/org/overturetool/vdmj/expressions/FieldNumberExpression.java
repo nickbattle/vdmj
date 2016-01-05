@@ -73,7 +73,7 @@ public class FieldNumberExpression extends Expression
 		}
 
 		ProductType product = type.getProduct();
-		long fn = field.value;
+		long fn = field.value.longValue();
 
 		if (fn > product.types.size() || fn < 1)
 		{
@@ -93,7 +93,7 @@ public class FieldNumberExpression extends Expression
 		try
 		{
     		ValueList fields = tuple.eval(ctxt).tupleValue(ctxt);
-    		Value r = fields.get((int)field.value - 1);
+    		Value r = fields.get(field.value.intValue() - 1);
 
     		if (r == null)
     		{
@@ -132,7 +132,7 @@ public class FieldNumberExpression extends Expression
 				{
 					ProductType pt = t.getProduct();
 
-					if (pt.types.size() < field.value)
+					if (pt.types.size() < field.value.intValue())
 					{
 						list.add(new TupleSelectObligation(this, pt, ctxt));
 					}

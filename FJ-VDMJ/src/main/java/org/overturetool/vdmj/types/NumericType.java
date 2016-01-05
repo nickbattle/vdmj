@@ -23,6 +23,8 @@
 
 package org.overturetool.vdmj.types;
 
+import java.math.BigInteger;
+
 import org.overturetool.vdmj.lex.LexLocation;
 
 public abstract class NumericType extends BasicType
@@ -48,13 +50,13 @@ public abstract class NumericType extends BasicType
 		return this;
 	}
 	
-	public static NumericType typeOf(long iv, LexLocation location)
+	public static NumericType typeOf(BigInteger iv, LexLocation location)
 	{
-		if (iv > 0)
+		if (iv.compareTo(BigInteger.ZERO) > 0)
 		{
 			return new NaturalOneType(location);
 		}
-		else if (iv >= 0)
+		else if (iv.compareTo(BigInteger.ZERO) >= 0)
 		{
 			return new NaturalType(location);
 		}

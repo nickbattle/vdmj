@@ -157,7 +157,7 @@ public class MapSeqDesignator extends StateDesignator
 			else if (root.isType(SeqValue.class))
 			{
 				ValueList seq = root.seqValue(ctxt);
-				int i = (int)index.intValue(ctxt)-1;
+				int i = index.intValue(ctxt).intValue()-1;
 
 				if (!seq.inbounds(i))
 				{

@@ -108,7 +108,7 @@ public class DurationStatement extends Statement
 				try
 				{
 					ctxt.threadState.setAtomic(true);
-					step = duration.eval(ctxt).intValue(ctxt);
+					step = duration.eval(ctxt).intValue(ctxt).longValue();
 				}
 				finally
 				{

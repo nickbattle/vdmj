@@ -23,6 +23,8 @@
 
 package org.overturetool.vdmj.expressions;
 
+import java.math.RoundingMode;
+
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -67,7 +69,16 @@ public class FloorExpression extends UnaryExpression
 
 		try
 		{
-			return NumericValue.valueOf(Math.floor(exp.eval(ctxt).realValue(ctxt)), ctxt);
+			Value v = exp.eval(ctxt);
+			
+			if (NumericValue.isInteger(v))
+			{
+				return v;
+			}
+			else
+			{
+				return NumericValue.valueOf(v.realValue(ctxt).setScale(0, RoundingMode.FLOOR), ctxt);
+			}
         }
         catch (ValueException e)
         {

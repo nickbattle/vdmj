@@ -24,6 +24,8 @@
 package org.overturetool.vdmj;
 
 import java.io.File;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -283,6 +285,26 @@ abstract public class VDMJ
     				usage("-path option requires a directory");
     			}
     		}
+    		else if (arg.equals("-precision"))
+    		{
+    			if (i.hasNext())
+    			{
+       				int precision = Integer.parseInt(i.next());
+       				
+       				if (precision < 10)
+       				{
+       					usage("Precision argument must be >= 10");
+       				}
+       				else
+       				{
+       					Settings.precision = new MathContext(precision, RoundingMode.HALF_UP);
+       				}
+    			}
+    			else
+    			{
+    				usage("-precision option requires a value");
+    			}
+    		}
     		else if (arg.startsWith("-"))
     		{
     			usage("Unknown option " + arg);
@@ -479,6 +501,7 @@ abstract public class VDMJ
 		System.err.println("-measures: disable recursive measure checking");
 		System.err.println("-log <filename>: enable real-time event logging");
 		System.err.println("-remote <class>: enable remote control");
+		System.err.println("-precision <n>: set real number precision to n places");
 
 		System.exit(1);
 	}

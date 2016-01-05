@@ -89,7 +89,16 @@ public class AbsoluteExpression extends UnaryExpression
 
 		try
 		{
-			return NumericValue.valueOf(Math.abs(exp.eval(ctxt).realValue(ctxt)), ctxt);
+			Value arg = exp.eval(ctxt);
+			
+			if (NumericValue.isInteger(arg))
+			{
+				return NumericValue.valueOf(arg.intValue(ctxt).abs(), ctxt);
+			}
+			else
+			{
+				return NumericValue.valueOf(arg.realValue(ctxt).abs(), ctxt);
+			}
 		}
 		catch (ValueException e)
 		{

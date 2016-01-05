@@ -23,6 +23,9 @@
 
 package org.overturetool.vdmj.values;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.config.Properties;
 import org.overturetool.vdmj.lex.Dialect;
@@ -222,25 +225,25 @@ public class UpdatableValue extends ReferenceValue
 	}
 
 	@Override
-	public synchronized double realValue(Context ctxt) throws ValueException
+	public synchronized BigDecimal realValue(Context ctxt) throws ValueException
 	{
 		return value.realValue(ctxt);
 	}
 
 	@Override
-	public synchronized long intValue(Context ctxt) throws ValueException
+	public synchronized BigInteger intValue(Context ctxt) throws ValueException
 	{
 		return value.intValue(ctxt);
 	}
 
 	@Override
-	public synchronized long natValue(Context ctxt) throws ValueException
+	public synchronized BigInteger natValue(Context ctxt) throws ValueException
 	{
 		return value.nat1Value(ctxt);
 	}
 
 	@Override
-	public synchronized long nat1Value(Context ctxt) throws ValueException
+	public synchronized BigInteger nat1Value(Context ctxt) throws ValueException
 	{
 		return value.nat1Value(ctxt);
 	}

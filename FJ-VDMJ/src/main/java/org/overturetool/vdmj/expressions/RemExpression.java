@@ -23,6 +23,8 @@
 
 package org.overturetool.vdmj.expressions;
 
+import java.math.BigInteger;
+
 import org.overturetool.vdmj.lex.LexToken;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -74,15 +76,15 @@ public class RemExpression extends NumericBinaryExpression
 			 * is positive.
 			 */
 
-    		double lv = left.eval(ctxt).intValue(ctxt);
-    		double rv = right.eval(ctxt).intValue(ctxt);
+    		BigInteger lv = left.eval(ctxt).intValue(ctxt);
+    		BigInteger rv = right.eval(ctxt).intValue(ctxt);
 
-    		if (rv == 0)
+    		if (rv.equals(BigInteger.ZERO))
     		{
     			throw new ValueException(4134, "Infinite or NaN trouble", ctxt);
     		}
-
-    		return NumericValue.valueOf(lv - rv * DivExpression.div(lv, rv), ctxt);
+    		
+    		return NumericValue.valueOf(lv.remainder(rv), ctxt);
 		}
 		catch (ValueException e)
 		{

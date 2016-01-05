@@ -23,6 +23,10 @@
 
 package org.overturetool.vdmj.values;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.messages.InternalException;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -33,12 +37,17 @@ import org.overturetool.vdmj.types.TypeSet;
 public class IntegerValue extends RationalValue
 {
 	private static final long serialVersionUID = 1L;
-	protected final long longVal;
+	protected final BigInteger longVal;
 
-	public IntegerValue(long value)
+	public IntegerValue(BigInteger value)
 	{
 		super(value);
 		longVal = value;
+	}
+
+	public IntegerValue(long value)
+	{
+		this(new BigInteger(Long.toString(value)));
 	}
 
 	@Override
@@ -47,7 +56,7 @@ public class IntegerValue extends RationalValue
 		if (other instanceof IntegerValue)
 		{
 			IntegerValue io = (IntegerValue)other;
-			return (int)(longVal - io.longVal);
+			return longVal.compareTo(io.longVal);
 		}
 
 		return super.compareTo(other);
@@ -56,19 +65,19 @@ public class IntegerValue extends RationalValue
 	@Override
 	public String toString()
 	{
-		return Long.toString(longVal);
+		return longVal.toString();
 	}
 
 	@Override
-	public long intValue(Context ctxt)
+	public BigInteger intValue(Context ctxt)
 	{
 		return longVal;
 	}
 
 	@Override
-	public long nat1Value(Context ctxt) throws ValueException
+	public BigInteger nat1Value(Context ctxt) throws ValueException
 	{
-		if (longVal < 1)
+		if (longVal.compareTo(BigInteger.ONE) < 0)
 		{
 			abort(4058, "Value " + longVal + " is not a nat1", ctxt);
 		}
@@ -77,9 +86,9 @@ public class IntegerValue extends RationalValue
 	}
 
 	@Override
-	public long natValue(Context ctxt) throws ValueException
+	public BigInteger natValue(Context ctxt) throws ValueException
 	{
-		if (longVal < 0)
+		if (longVal.compareTo(BigInteger.ZERO) < 0)
 		{
 			abort(4059, "Value " + longVal + " is not a nat", ctxt);
 		}
@@ -88,15 +97,16 @@ public class IntegerValue extends RationalValue
 	}
 
 	@Override
-	public double realValue(Context ctxt)
+	public BigDecimal realValue(Context ctxt)
 	{
-		return longVal;
+		return new BigDecimal(longVal).setScale(
+			Settings.precision.getPrecision(), Settings.precision.getRoundingMode());
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return (int)longVal;
+		return longVal.hashCode();
 	}
 
 	@Override

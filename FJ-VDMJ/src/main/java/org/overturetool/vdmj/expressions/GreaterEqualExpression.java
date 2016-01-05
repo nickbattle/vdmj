@@ -61,7 +61,7 @@ public class GreaterEqualExpression extends NumericBinaryExpression
 
 		try
 		{
-			return new BooleanValue(lv.realValue(ctxt) >= rv.realValue(ctxt));
+			return new BooleanValue(lv.realValue(ctxt).compareTo(rv.realValue(ctxt)) >= 0);
         }
         catch (ValueException e)
         {

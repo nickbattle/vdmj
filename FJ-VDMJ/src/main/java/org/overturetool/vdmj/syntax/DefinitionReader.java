@@ -1518,8 +1518,8 @@ public class DefinitionReader extends SyntaxReader
 				}
 
 				LexIntegerToken lit = (LexIntegerToken)lastToken();
-				from = lit.value;
-				to = lit.value;
+				from = lit.value.longValue();
+				to = lit.value.longValue();
 
 				switch (nextToken().type)
 				{
@@ -1530,7 +1530,7 @@ public class DefinitionReader extends SyntaxReader
 						}
 
 						lit = (LexIntegerToken)readToken();
-						to = lit.value;
+						to = lit.value.longValue();
 						checkFor(Token.SET_CLOSE, 2265, "Expecting '{n1, n2}' after trace definition");
 						break;
 

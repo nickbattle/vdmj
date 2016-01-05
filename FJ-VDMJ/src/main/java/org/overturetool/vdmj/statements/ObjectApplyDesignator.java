@@ -145,7 +145,7 @@ public class ObjectApplyDesignator extends ObjectDesignator
 			{
 				ValueList seq = v.seqValue(ctxt);
 				Value a = args.get(0).eval(ctxt);
-				int i = (int)a.intValue(ctxt)-1;
+				int i = a.intValue(ctxt).intValue()-1;
 
 				if (!seq.inbounds(i))
 				{

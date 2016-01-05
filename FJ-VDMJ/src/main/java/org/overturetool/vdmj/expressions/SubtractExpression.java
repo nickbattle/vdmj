@@ -23,6 +23,10 @@
 
 package org.overturetool.vdmj.expressions;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.lex.LexToken;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -67,10 +71,21 @@ public class SubtractExpression extends NumericBinaryExpression
 
 		try
 		{
-    		double lv = left.eval(ctxt).realValue(ctxt);
-    		double rv = right.eval(ctxt).realValue(ctxt);
+    		Value l = left.eval(ctxt);
+    		Value r = right.eval(ctxt);
 
-    		return NumericValue.valueOf(lv - rv, ctxt);
+			if (NumericValue.areIntegers(l, r))
+			{
+				BigInteger lv = l.intValue(ctxt);
+				BigInteger rv = r.intValue(ctxt);
+				return NumericValue.valueOf(lv.subtract(rv), ctxt);
+			}
+			else
+			{
+        		BigDecimal lv = l.realValue(ctxt);
+        		BigDecimal rv = r.realValue(ctxt);
+        		return NumericValue.valueOf(lv.subtract(rv, Settings.precision), ctxt);
+			}
 		}
 		catch (ValueException e)
 		{

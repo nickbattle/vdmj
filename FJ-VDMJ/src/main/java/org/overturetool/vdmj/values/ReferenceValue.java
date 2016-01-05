@@ -23,6 +23,9 @@
 
 package org.overturetool.vdmj.values;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
 import org.overturetool.vdmj.types.Type;
@@ -75,25 +78,25 @@ abstract public class ReferenceValue extends Value
 	}
 
 	@Override
-	public double realValue(Context ctxt) throws ValueException
+	public BigDecimal realValue(Context ctxt) throws ValueException
 	{
 		return value.realValue(ctxt);
 	}
 
 	@Override
-	public long intValue(Context ctxt) throws ValueException
+	public BigInteger intValue(Context ctxt) throws ValueException
 	{
 		return value.intValue(ctxt);
 	}
 
 	@Override
-	public long natValue(Context ctxt) throws ValueException
+	public BigInteger natValue(Context ctxt) throws ValueException
 	{
 		return value.nat1Value(ctxt);
 	}
 
 	@Override
-	public long nat1Value(Context ctxt) throws ValueException
+	public BigInteger nat1Value(Context ctxt) throws ValueException
 	{
 		return value.nat1Value(ctxt);
 	}

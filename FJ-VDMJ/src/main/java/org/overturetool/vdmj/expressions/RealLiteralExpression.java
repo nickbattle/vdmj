@@ -23,6 +23,9 @@
 
 package org.overturetool.vdmj.expressions;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import org.overturetool.vdmj.lex.LexRealToken;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -59,13 +62,13 @@ public class RealLiteralExpression extends Expression
 	{
 		Type result;
 		
-		if (Math.round(value.value) == value.value)
+		if (value.value.setScale(0, RoundingMode.HALF_UP).compareTo(value.value) == 0)
 		{
-    		if (value.value < 0)
+    		if (value.value.compareTo(BigDecimal.ZERO) < 0)
     		{
     			result = new IntegerType(location);
     		}
-    		else if (value.value == 0)
+    		else if (value.value.equals(BigDecimal.ZERO))
     		{
     			result = new NaturalType(location);
     		}

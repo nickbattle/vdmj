@@ -249,7 +249,7 @@ public class Delegate implements Serializable
 		catch (InvocationTargetException e)
 		{
 			throw new InternalException(59,
-				"Failed in native method: " + e.getTargetException().getMessage());
+				"Failed in native method: " + e.getTargetException());
 		}
 	}
 

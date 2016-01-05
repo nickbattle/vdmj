@@ -23,6 +23,10 @@
 
 package org.overturetool.vdmj.values;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
 import org.overturetool.vdmj.types.IntegerType;
@@ -36,24 +40,24 @@ import org.overturetool.vdmj.types.TypeSet;
 public abstract class NumericValue extends Value
 {
 	private static final long serialVersionUID = 1L;
-	public final double value;
+	public final BigDecimal value;
 
-	public NumericValue(double value)
+	public NumericValue(BigDecimal value)
 	{
 		super();
 		this.value = value;
 	}
 
-	public static NumericValue valueOf(double d, Context ctxt) throws ValueException
+	public static NumericValue valueOf(BigDecimal d, Context ctxt) throws ValueException
 	{
-		if (Double.isInfinite(d) || Double.isNaN(d))
-		{
-			throw new ValueException(4134, "Infinite or NaN trouble", ctxt);
-		}
+//		if (Double.isInfinite(d) || Double.isNaN(d))
+//		{
+//			throw new ValueException(4134, "Infinite or NaN trouble", ctxt);
+//		}
 
-		long rounded = Math.round(d);
+		BigInteger rounded = d.setScale(0, RoundingMode.HALF_UP).toBigInteger();
 
-		if (rounded != d)
+		if (new BigDecimal(rounded).compareTo(d) != 0)
 		{
 			try
 			{
@@ -68,9 +72,9 @@ public abstract class NumericValue extends Value
 		return valueOf(rounded, ctxt);
 	}
 
-	public static NumericValue valueOf(long iv, Context ctxt) throws ValueException
+	public static NumericValue valueOf(BigInteger iv, Context ctxt) throws ValueException
 	{
-		if (iv > 0)
+		if (iv.compareTo(BigInteger.ZERO) > 0)
 		{
 			try
 			{
@@ -82,7 +86,7 @@ public abstract class NumericValue extends Value
 			}
 		}
 
-		if (iv >= 0)
+		if (iv.compareTo(BigInteger.ZERO) >= 0)
 		{
 			try
 			{
@@ -95,6 +99,16 @@ public abstract class NumericValue extends Value
 		}
 
 		return new IntegerValue(iv);
+	}
+	
+	public static boolean isInteger(Value value)
+	{
+		return value instanceof IntegerValue;
+	}
+
+	public static boolean areIntegers(Value left, Value right)
+	{
+		return isInteger(left) && isInteger(right);
 	}
 
 	@Override
@@ -164,7 +178,7 @@ public abstract class NumericValue extends Value
 			if (val instanceof NumericValue)
 			{
 				NumericValue nov = (NumericValue)val;
-				return nov.value == value;
+				return nov.value.compareTo(value) == 0;		// NB. NOT equals()
 			}
 		}
 
@@ -172,15 +186,15 @@ public abstract class NumericValue extends Value
 	}
 
 	@Override
-	abstract public double realValue(Context ctxt) throws ValueException;
+	abstract public BigDecimal realValue(Context ctxt) throws ValueException;
 	@Override
-	abstract public double ratValue(Context ctxt) throws ValueException;
+	abstract public BigDecimal ratValue(Context ctxt) throws ValueException;
 	@Override
-	abstract public long intValue(Context ctxt) throws ValueException;
+	abstract public BigInteger intValue(Context ctxt) throws ValueException;
 	@Override
-	abstract public long natValue(Context ctxt) throws ValueException;
+	abstract public BigInteger natValue(Context ctxt) throws ValueException;
 	@Override
-	abstract public long nat1Value(Context ctxt) throws ValueException;
+	abstract public BigInteger nat1Value(Context ctxt) throws ValueException;
 	@Override
 	abstract public int hashCode();
 	@Override

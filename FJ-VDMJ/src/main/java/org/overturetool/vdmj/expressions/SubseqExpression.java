@@ -23,6 +23,8 @@
 
 package org.overturetool.vdmj.expressions;
 
+import java.math.RoundingMode;
+
 import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.pog.POContextStack;
 import org.overturetool.vdmj.pog.ProofObligationList;
@@ -93,10 +95,8 @@ public class SubseqExpression extends Expression
 		try
 		{
     		ValueList list = seq.eval(ctxt).seqValue(ctxt);
-    		double fr = from.eval(ctxt).realValue(ctxt);
-    		double tr = to.eval(ctxt).realValue(ctxt);
-    		int fi = (int)Math.ceil(fr);
-    		int ti = (int)Math.floor(tr);
+    		int fi = from.eval(ctxt).realValue(ctxt).setScale(0, RoundingMode.CEILING).intValue();
+    		int ti = to.eval(ctxt).realValue(ctxt).setScale(0, RoundingMode.FLOOR).intValue();
 
     		if (fi < 1)
     		{
