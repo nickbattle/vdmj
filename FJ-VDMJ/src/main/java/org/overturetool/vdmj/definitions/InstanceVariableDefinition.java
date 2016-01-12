@@ -27,6 +27,7 @@ import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.expressions.UndefinedExpression;
 import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.typechecker.Environment;
+import org.overturetool.vdmj.typechecker.FlatCheckedEnvironment;
 import org.overturetool.vdmj.typechecker.NameScope;
 import org.overturetool.vdmj.typechecker.PrivateClassEnvironment;
 import org.overturetool.vdmj.typechecker.TypeCheckException;
@@ -86,6 +87,14 @@ public class InstanceVariableDefinition extends AssignmentDefinition
 		// resolution will succeed.
 
 		Environment cenv = new PrivateClassEnvironment(classDefinition, base);
+		
+		if (this.isStatic())
+		{
+			FlatCheckedEnvironment checked = new FlatCheckedEnvironment(new DefinitionList(), base, NameScope.NAMES);
+			checked.setStatic(true);
+			cenv = checked;
+		}
+		
 		super.typeCheck(cenv, NameScope.NAMESANDSTATE);
 	}
 
