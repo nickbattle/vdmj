@@ -1255,7 +1255,7 @@ public class ClassDefinition extends Definition
 				i.name.setTypeQualifier(i.superdef.name.typeQualifier);
 			}
 
-			if (idef.isRuntime())	// eg. TypeDefinitions aren't
+			if (idef.isRuntime() && !idef.isSubclassResponsibility())	// eg. TypeDefinitions aren't
 			{
 				Value v = null;
 
@@ -1315,10 +1315,11 @@ public class ClassDefinition extends Definition
     				// If there are already overloads inherited, we have to remove them because
 					// any local names hide all inherited overloads (like C++).
 					
-					for (Value iname: inheritedNames.getOverloads(nvp.name))
+					for (LexNameToken iname: inheritedNames.getOverloadNames(nvp.name))
 					{
 						initCtxt.remove(iname);
 						members.remove(iname);
+						inheritedNames.remove(iname);
 					}
 					
 					initCtxt.put(nvp.name, nvp.value);
