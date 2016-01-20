@@ -63,6 +63,7 @@ import org.overturetool.vdmj.util.Delegate;
 import org.overturetool.vdmj.values.CPUValue;
 import org.overturetool.vdmj.values.ClassInvariantListener;
 import org.overturetool.vdmj.values.MapValue;
+import org.overturetool.vdmj.values.NameValuePair;
 import org.overturetool.vdmj.values.NameValuePairList;
 import org.overturetool.vdmj.values.NameValuePairMap;
 import org.overturetool.vdmj.values.ObjectValue;
@@ -1300,14 +1301,29 @@ public class ClassDefinition extends Definition
 		// there are no spurious free variables created.
 
 		Context empty = new Context(location, "empty", null);
+		NameValuePairMap inheritedNames = new NameValuePairMap();
+		inheritedNames.putAll(members);		// Not a clone
 
 		for (Definition d: definitions)
 		{
 			if (!d.isStatic() && d.isFunctionOrOperation())
 			{
 				NameValuePairList nvpl = d.getNamedValues(empty);
-				initCtxt.putList(nvpl);
-				members.putAll(nvpl);
+
+				for (NameValuePair nvp: nvpl)
+				{
+    				// If there are already overloads inherited, we have to remove them because
+					// any local names hide all inherited overloads (like C++).
+					
+					for (Value iname: inheritedNames.getOverloads(nvp.name))
+					{
+						initCtxt.remove(iname);
+						members.remove(iname);
+					}
+					
+					initCtxt.put(nvp.name, nvp.value);
+					members.put(nvp.name, nvp.value);
+				}
 			}
 		}
 
