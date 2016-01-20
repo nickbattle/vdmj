@@ -26,6 +26,7 @@ package org.overturetool.vdmj.values;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.lex.LexNameToken;
 
 @SuppressWarnings("serial")
@@ -69,6 +70,21 @@ public class NameValuePairMap extends HashMap<LexNameToken, Value>
 			if (entry.getKey().matches(sought))		// All overloaded names
 			{
 				list.add(entry.getValue());
+			}
+		}
+
+		return list;
+	}
+
+	public LexNameList getOverloadNames(LexNameToken sought)
+	{
+		LexNameList list = new LexNameList();
+
+		for (Entry<LexNameToken, Value> entry: this.entrySet())
+		{
+			if (entry.getKey().matches(sought))		// All overloaded names
+			{
+				list.add(entry.getKey());
 			}
 		}
 
