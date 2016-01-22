@@ -227,9 +227,17 @@ public class DefinitionList extends Vector<Definition>
 		{
 			sb.append(d.accessSpecifier.toString());
 			sb.append(" ");
+			
+			if (d.isSubclassResponsibility())
+			{
+				sb.append("abstract ");
+			}
 
-			sb.append(d.kind() + " " + d.getVariableNames() + ":" + d.getType());
-			sb.append("\n");
+			for (LexNameToken name: d.getVariableNames())
+			{
+				sb.append(d.kind() + " " + name.getExplicit(true) + ":" + d.getType());
+				sb.append("\n");
+			}
 		}
 
 		return sb.toString();
@@ -327,6 +335,8 @@ public class DefinitionList extends Vector<Definition>
 		
 		for (Definition d: this)
 		{
+			d.findName(d.name, NameScope.NAMESANDSTATE);	// Update InheritedDefinition type qualifiers
+			
 			if (!fixed.contains(d))		// Name comparison
 			{
 				fixed.add(d);
@@ -346,5 +356,41 @@ public class DefinitionList extends Vector<Definition>
 		{
 			d.excluded = ex;
 		}
+	}
+	
+	public DefinitionList removeAbstracts()
+	{
+		DefinitionList keep = new DefinitionList();
+		
+		for (Definition def: this)
+		{
+			if (def.isSubclassResponsibility())
+			{
+				boolean found = false;
+				
+				for (Definition def2: this)
+				{
+					def2.findName(def2.name, NameScope.NAMESANDSTATE);	// Update type qualifier
+					
+					if (!def2.isSubclassResponsibility() &&
+						def.findName(def2.name, NameScope.NAMESANDSTATE) != null)
+					{
+						found = true;
+						break;
+					}
+				}
+				
+				if (!found)
+				{
+					keep.add(def);
+				}
+			}
+			else
+			{
+				keep.add(def);
+			}
+		}
+		
+		return keep;
 	}
 }
