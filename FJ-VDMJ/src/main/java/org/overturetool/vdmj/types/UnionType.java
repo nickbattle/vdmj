@@ -414,6 +414,11 @@ public class UnionType extends Type
     			classType = found;
     			return classType;
     		}
+    		else if (count == 0)
+    		{
+    			classType = null;
+    			return null;
+    		}
 
     		LexNameToken classname = new LexNameToken("CLASS", classString, new LexLocation());
     		
