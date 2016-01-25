@@ -393,18 +393,35 @@ public class UnionType extends Type
 
     		Map<LexNameToken, TypeSet> common = new HashMap<LexNameToken, TypeSet>();
     		Map<LexNameToken, AccessSpecifier> access = new HashMap<LexNameToken, AccessSpecifier>();
-    		LexNameToken classname = null;
+    		
+    		// Derive the pseudoclass name for the combined union
+    		String classString = "*union";	// NB, illegal class name
+    		int count = 0;
+    		ClassType found = null;
 
     		for (Type t: types)
     		{
     			if (t.isClass(env))
     			{
-    				ClassType ct = t.getClassType(env);
+    				found = t.getClassType(env);
+    				classString = classString + "_" + found.name.name;	// eg. "*union_A_B"
+    				count++;
+    			}
+    		}
+    		
+    		if (count == 1)		// Only one class in union, so just return this one
+    		{
+    			classType = found;
+    			return classType;
+    		}
 
-    				if (classname == null)
-    				{
-    					classname = ct.classdef.name;
-    				}
+    		LexNameToken classname = new LexNameToken("CLASS", classString, new LexLocation());
+    		
+    		for (Type t: types)
+    		{
+    			if (t.isClass(env))
+    			{
+    				ClassType ct = t.getClassType(env);
 
     				for (Definition f: ct.classdef.getDefinitions())
     				{
@@ -464,25 +481,28 @@ public class UnionType extends Type
 
     		DefinitionList newdefs = new DefinitionList();
 
-    		// Note that the pseudo-class is named after one arbitrary
-    		// member of the union, even though it has all the distinct
-    		// fields of the set of classes within the union.
-
     		for (LexNameToken synthname: common.keySet())
     		{
     			Type ptype = common.get(synthname).getType(location);
+    			LexNameToken newname = null;
     			
-    			if (ptype instanceof OperationType)
+    			if (ptype.isOperation())
     			{
-    				OperationType optype = (OperationType)ptype;
+    				OperationType optype = ptype.getOperation();
     				OperationType newtype = new OperationType(optype.location, optype.parameters, optype.result);
     				newtype.setPure(access.get(synthname).isPure);
     				ptype = newtype;
+    				newname = synthname.getModifiedName(optype.parameters);
+    			}
+    			else if (ptype.isFunction())
+    			{
+    				FunctionType ftype = ptype.getFunction();
+    				newname = synthname.getModifiedName(ftype.parameters);
     			}
     			
     			Definition def = new LocalDefinition(synthname.location,
-					synthname, NameScope.GLOBAL, ptype);
-
+					(newname == null ? synthname : newname), NameScope.GLOBAL, ptype);
+    			
     			def.setAccessSpecifier(access.get(synthname));
 				newdefs.add(def);
     		}

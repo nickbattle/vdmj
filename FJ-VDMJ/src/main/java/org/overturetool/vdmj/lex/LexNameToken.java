@@ -132,6 +132,13 @@ public class LexNameToken extends LexToken implements Serializable, Comparable<L
 		return mod;
 	}
 
+	public LexNameToken getModifiedName(TypeList qualifier)
+	{
+		LexNameToken mod = new LexNameToken(module, name, location, old, explicit);
+		mod.setTypeQualifier(qualifier);
+		return mod;
+	}
+
 	public LexNameToken getSelfName()
 	{
 		if (module.equals("CLASS"))
@@ -148,17 +155,23 @@ public class LexNameToken extends LexToken implements Serializable, Comparable<L
 	{
 		if (module.equals("CLASS"))
 		{
-			return new LexNameToken(name, "thread", location);
+			LexNameToken thread = new LexNameToken(name, "thread", location);
+			thread.setTypeQualifier(new TypeList());
+			return thread;
 		}
 		else
 		{
-			return new LexNameToken(module, "thread", location);
+			LexNameToken thread = new LexNameToken(module, "thread", location);
+			thread.setTypeQualifier(new TypeList());
+			return thread;
 		}
 	}
 
 	public static LexNameToken getThreadName(LexLocation loc)
 	{
-		return new LexNameToken(loc.module, "thread", loc);
+		LexNameToken thread = new LexNameToken(loc.module, "thread", loc);
+		thread.setTypeQualifier(new TypeList());
+		return thread;
 	}
 
 	public LexNameToken getPerName(LexLocation loc)
