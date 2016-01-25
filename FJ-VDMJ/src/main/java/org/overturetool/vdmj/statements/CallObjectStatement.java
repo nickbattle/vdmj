@@ -49,6 +49,7 @@ import org.overturetool.vdmj.types.OperationType;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.types.TypeList;
 import org.overturetool.vdmj.types.TypeSet;
+import org.overturetool.vdmj.types.UnionType;
 import org.overturetool.vdmj.types.UnknownType;
 import org.overturetool.vdmj.types.VoidType;
 import org.overturetool.vdmj.util.Utils;
@@ -293,6 +294,54 @@ public class CallObjectStatement extends Statement
 
 		try
 		{
+			ValueList argValues = new ValueList();
+
+			for (Expression arg: args)
+			{
+				argValues.add(arg.eval(ctxt));
+			}
+			
+			// Work out the actual types of the arguments, so we bind the right op/fn
+			TypeList argTypes = new TypeList();
+			int arg = 0;
+			
+			for (Type argType: field.typeQualifier)
+			{
+				if (argType instanceof UnionType)
+				{
+					UnionType u = (UnionType)argType;
+					
+					for (Type possible: u.types)
+					{
+						try
+						{
+							argValues.get(arg).convertTo(possible, ctxt);
+							argTypes.add(possible);
+							break;
+						}
+						catch (ValueException e)
+						{
+							// Try again
+						}
+					}
+				}
+				else
+				{
+					argTypes.add(argType);
+				}
+				
+				arg++;
+			}
+			
+			if (argTypes.size() != field.typeQualifier.size())
+			{
+				field.abort(4168, "Arguments do not match parameters: " + field, ctxt);
+			}
+			else
+			{
+				field = field.getModifiedName(argTypes);
+			}
+
 			ObjectValue obj = designator.eval(ctxt).objectValue(ctxt);
 			Value v = obj.get(field, explicit);
 
@@ -306,25 +355,11 @@ public class CallObjectStatement extends Statement
 			if (v instanceof OperationValue)
 			{
     			OperationValue op = v.operationValue(ctxt);
-    			ValueList argValues = new ValueList();
-
-    			for (Expression arg: args)
-    			{
-    				argValues.add(arg.eval(ctxt));
-    			}
-
     			return op.eval(location, argValues, ctxt);
 			}
 			else
 			{
     			FunctionValue op = v.functionValue(ctxt);
-    			ValueList argValues = new ValueList();
-
-    			for (Expression arg: args)
-    			{
-    				argValues.add(arg.eval(ctxt));
-    			}
-
     			return op.eval(location, argValues, ctxt);
 			}
 		}

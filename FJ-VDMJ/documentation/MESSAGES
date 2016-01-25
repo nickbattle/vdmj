@@ -890,6 +890,7 @@ as the expected and actual values.
 4165, "Cannot convert <type> to <type>"
 4166, "Cannot call impure operation: <name>"
 4167, "Cannot call exit in a pure operation"
+4168, "Arguments do not match parameters: <name(params)>"
 
 
 5000, "Definition <name> not used"
