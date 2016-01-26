@@ -37,6 +37,7 @@ import org.overturetool.vdmj.definitions.TypeDefinition;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.lex.LexNameToken;
+import org.overturetool.vdmj.lex.Token;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
 import org.overturetool.vdmj.typechecker.Environment;
@@ -464,22 +465,24 @@ public class UnionType extends Type
 
     					if (curracc == null)
     					{
-    						access.put(synthname, f.accessSpecifier);
-    					}
-    					else
-    					{
-    						if (curracc.narrowerThan(f.accessSpecifier) ||
-    							(!curracc.isPure && f.accessSpecifier.isPure))
-							{
-								AccessSpecifier purified = new AccessSpecifier(
-									f.accessSpecifier.isStatic,
-									f.accessSpecifier.isAsync,
-									f.accessSpecifier.access,
-									curracc.isPure || f.accessSpecifier.isPure);
+							AccessSpecifier acc = new AccessSpecifier(
+								f.accessSpecifier.isStatic,
+								f.accessSpecifier.isAsync,
+								Token.PUBLIC,	// Guaranteed to be accessible
+								f.accessSpecifier.isPure);
 
-								access.put(synthname, purified);
-							}
+							access.put(synthname, acc);
     					}
+    					else if (!curracc.isPure && f.accessSpecifier.isPure)
+						{
+							AccessSpecifier purified = new AccessSpecifier(
+								f.accessSpecifier.isStatic,
+								f.accessSpecifier.isAsync,
+								Token.PUBLIC,
+								curracc.isPure || f.accessSpecifier.isPure);
+
+							access.put(synthname, purified);
+						}
     				}
     			}
     		}
