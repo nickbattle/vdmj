@@ -103,4 +103,10 @@ public class ExpressionPattern extends Pattern
 	{
 		return exp;
 	}
+
+	@Override
+	public int getLength()
+	{
+		return ANY;	// Special value meaning "any length"
+	}
 }
