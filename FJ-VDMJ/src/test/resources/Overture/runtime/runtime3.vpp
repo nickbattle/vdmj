@@ -1,0 +1,21 @@
+class X
+instance variables
+	static iv:nat := op();
+
+types
+    A :: a : B inv x == x.a.b.c < 10;
+    B :: b : C;
+    C :: c : nat;
+
+operations
+    public static op: () ==> nat
+    op() ==
+    (
+        dcl x:A := mk_A(mk_B(mk_C(1)));
+        dcl y:C := mk_C(1);
+        x.a.b := y;     -- Update part of the tree
+        x.a.b.c := 11;  -- Should fail.
+        return 0
+    )
+    
+end X
