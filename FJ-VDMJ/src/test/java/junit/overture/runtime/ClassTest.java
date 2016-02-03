@@ -36,4 +36,9 @@ public class ClassTest extends OvertureTest
 	{
 		runtime("runtime2");
 	}
+
+	public void test_Runtime3() throws Exception
+	{
+		runtime("runtime3");
+	}
 }
