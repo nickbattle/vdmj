@@ -127,6 +127,11 @@ public class InheritedDefinition extends Definition
 	{
 		// The problem is, when the InheritedDefinition is created, we
 		// don't know its fully qualified name.
+		
+		if (superdef instanceof InheritedDefinition)
+		{
+			superdef.findName(sought, scope);
+		}
 
 		name.setTypeQualifier(superdef.name.typeQualifier);
 
