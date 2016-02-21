@@ -27,7 +27,7 @@ import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.values.Value;
 
-public class TraceVariable
+public class TraceVariable implements Comparable<TraceVariable>
 {
 	public final LexNameToken name;
 	public final Value value;
@@ -61,5 +61,10 @@ public class TraceVariable
 	public int hashCode()
 	{
 		return toString().hashCode();
+	}
+
+	public int compareTo(TraceVariable o)
+	{
+		return toString().compareTo(o.toString());
 	}
 }
