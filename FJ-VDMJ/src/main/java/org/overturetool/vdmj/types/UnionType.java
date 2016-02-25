@@ -37,6 +37,7 @@ import org.overturetool.vdmj.definitions.TypeDefinition;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.lex.LexNameToken;
+import org.overturetool.vdmj.lex.LexQuoteToken;
 import org.overturetool.vdmj.lex.Token;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -344,19 +345,22 @@ public class UnionType extends Type
     		// record types, making the field types the union of the original
     		// fields' types...
 
-    		Map<String, TypeSet> common = new HashMap<String, TypeSet>();
+    		Map<String, TypeList> common = new HashMap<String, TypeList>();
+    		int recordCount = 0;
 
     		for (Type t: types)
     		{
     			if (t.isRecord())
     			{
+    				recordCount++;
+    				
     				for (Field f: t.getRecord().fields)
     				{
-    					TypeSet current = common.get(f.tag);
+    					TypeList current = common.get(f.tag);
 
     					if (current == null)
     					{
-    						common.put(f.tag, new TypeSet(f.type));
+    						common.put(f.tag, new TypeList(f.type));
     					}
     					else
     					{
@@ -365,13 +369,35 @@ public class UnionType extends Type
     				}
     			}
     		}
+    		
+    		// If all fields were present in all records, the TypeLists will be the
+    		// same size. But if not, the shorter ones have to have UnknownTypes added,
+    		// because some of the records do not have that field.
+    		
+    		Map<String, TypeSet> typesets = new HashMap<String, TypeSet>();
+    		
+    		for (String field: common.keySet())
+    		{
+    			TypeList list = common.get(field);
+    			
+    			if (list.size() != recordCount)
+    			{
+    				// Both unknown and undefined types do not trigger isSubType, so we use
+    				// an illegal quote type, <?>.
+    				list.add(new QuoteType(new LexQuoteToken("?", location)));
+    			}
+    			
+    			TypeSet set = new TypeSet();
+    			set.addAll(list);
+    			typesets.put(field, set);
+    		}
 
     		List<Field> fields = new Vector<Field>();
 
-    		for (String tag: common.keySet())
+    		for (String tag: typesets.keySet())
     		{
 				LexNameToken tagname = new LexNameToken("?", tag, location);
-				fields.add(new Field(tagname, tag, common.get(tag).getType(location), false));
+				fields.add(new Field(tagname, tag, typesets.get(tag).getType(location), false));
     		}
 
     		recType = fields.isEmpty() ? null : new RecordType(location, fields);
