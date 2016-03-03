@@ -52,15 +52,10 @@ public class TypeCheckException extends RuntimeException
 		}
 		
 		extras.add(e);
-	}
-	
-	public void addExtras(List<TypeCheckException> es)
-	{
-		if (extras == null)
-		{
-			extras = new Vector<TypeCheckException>();
-		}
 		
-		extras.addAll(es);
+		if (e.extras != null)
+		{
+			extras.addAll(e.extras);
+		}
 	}
 }
