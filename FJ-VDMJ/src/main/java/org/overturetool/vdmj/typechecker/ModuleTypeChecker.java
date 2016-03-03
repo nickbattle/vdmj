@@ -186,6 +186,14 @@ public class ModuleTypeChecker extends TypeChecker
 			catch (TypeCheckException te)
 			{
 				report(3430, te.getMessage(), te.location);
+				
+				if (te.extras != null)
+				{
+					for (TypeCheckException e: te.extras)
+					{
+						report(3430, e.getMessage(), e.location);
+					}
+				}
 			}
 		}
 
@@ -211,6 +219,14 @@ public class ModuleTypeChecker extends TypeChecker
     						catch (TypeCheckException te)
     						{
     							report(3431, te.getMessage(), te.location);
+    							
+    		    				if (te.extras != null)
+    		    				{
+    		    					for (TypeCheckException ex: te.extras)
+    		    					{
+    		    						report(3431, ex.getMessage(), ex.location);
+    		    					}
+    		    				}
     						}
     					}
     				}

@@ -53,6 +53,7 @@ import org.overturetool.vdmj.typechecker.FlatCheckedEnvironment;
 import org.overturetool.vdmj.typechecker.FlatEnvironment;
 import org.overturetool.vdmj.typechecker.NameScope;
 import org.overturetool.vdmj.typechecker.Pass;
+import org.overturetool.vdmj.typechecker.TypeCheckException;
 import org.overturetool.vdmj.typechecker.TypeComparator;
 import org.overturetool.vdmj.types.BooleanType;
 import org.overturetool.vdmj.types.ClassType;
@@ -880,7 +881,34 @@ public class ClassDefinition extends Definition
 	public void typeResolve(Environment globals)
 	{
 		Environment cenv = new FlatEnvironment(definitions, globals);
-		definitions.typeResolve(cenv);
+		TypeCheckException problem = null;
+		
+		for (Definition d: definitions)
+		{
+			try
+			{
+				d.typeResolve(cenv);
+			}
+			catch (TypeCheckException te)
+			{
+				if (problem == null)
+				{
+					problem = te;
+				}
+				else
+				{
+					if (te.extras != null)
+					{
+						problem.addExtras(te.extras);
+					}
+				}
+			}
+		}
+		
+		if (problem != null)
+		{
+			throw problem;
+		}
 	}
 
 	/**

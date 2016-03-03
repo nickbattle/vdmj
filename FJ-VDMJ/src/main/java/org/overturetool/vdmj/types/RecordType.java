@@ -33,6 +33,7 @@ import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
 import org.overturetool.vdmj.typechecker.Environment;
+import org.overturetool.vdmj.typechecker.TypeCheckException;
 import org.overturetool.vdmj.util.Utils;
 import org.overturetool.vdmj.values.RecordValue;
 import org.overturetool.vdmj.values.TupleValue;
@@ -136,16 +137,40 @@ public class RecordType extends InvariantType
 			resolved = true;
 			infinite = false;
 		}
+		
+		TypeCheckException problem = null;
 
 		for (Field f: fields)
 		{
 			if (root != null)
 				root.infinite = false;
 
-			f.typeResolve(env, root);
+			try
+			{
+				f.typeResolve(env, root);
+			}
+			catch (TypeCheckException e)
+			{
+				if (problem == null)
+				{
+					problem = e;
+				}
+				else
+				{
+					// Add extra messages to the exception for each field
+					problem.addExtra(e);
+				}
+			}
 
 			if (root != null)
 				infinite = infinite || root.infinite;
+		}
+		
+		if (problem != null)
+		{
+			resolved = false;
+			infinite = false;
+			throw problem;
 		}
 
 		if (root != null) root.infinite = infinite;
