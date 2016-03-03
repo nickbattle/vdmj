@@ -897,10 +897,7 @@ public class ClassDefinition extends Definition
 				}
 				else
 				{
-					if (te.extras != null)
-					{
-						problem.addExtras(te.extras);
-					}
+					problem.addExtra(te);
 				}
 			}
 		}
