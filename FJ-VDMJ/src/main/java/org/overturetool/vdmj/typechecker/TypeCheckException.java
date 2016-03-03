@@ -23,6 +23,9 @@
 
 package org.overturetool.vdmj.typechecker;
 
+import java.util.List;
+import java.util.Vector;
+
 import org.overturetool.vdmj.lex.LexLocation;
 
 /**
@@ -33,10 +36,31 @@ import org.overturetool.vdmj.lex.LexLocation;
 public class TypeCheckException extends RuntimeException
 {
 	public final LexLocation location;
+	public List<TypeCheckException> extras = null;
 
 	public TypeCheckException(String msg, LexLocation location)
 	{
 		super(msg);
 		this.location = location;
+	}
+	
+	public void addExtra(TypeCheckException e)
+	{
+		if (extras == null)
+		{
+			extras = new Vector<TypeCheckException>();
+		}
+		
+		extras.add(e);
+	}
+	
+	public void addExtras(List<TypeCheckException> es)
+	{
+		if (extras == null)
+		{
+			extras = new Vector<TypeCheckException>();
+		}
+		
+		extras.addAll(es);
 	}
 }
