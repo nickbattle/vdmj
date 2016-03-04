@@ -184,7 +184,7 @@ public class UpdatableValue extends ReferenceValue
 			{
 				if (!listeners.contains(vl))
 				{
-					addListener(vl);
+					listeners.add(vl);
 				}
 			}
 		}
