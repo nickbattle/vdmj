@@ -120,24 +120,38 @@ public class ProductType extends Type
 	{
 		if (resolved) return this; else { resolved = true; }
 
-		try
-		{
-			TypeList fixed = new TypeList();
+		TypeList fixed = new TypeList();
+		TypeCheckException problem = null;
 
-			for (Type t: types)
+		for (Type t: types)
+		{
+			try
 			{
 				Type rt = t.typeResolve(env, root);
 				fixed.add(rt);
 			}
-
-			types = fixed;
-			return this;
+			catch (TypeCheckException e)
+			{
+				if (problem == null)
+				{
+					problem = e;
+				}
+				else
+				{
+					// Add extra messages to the exception for each product member
+					problem.addExtra(e);
+				}
+			}
 		}
-		catch (TypeCheckException e)
+		
+		if (problem != null)
 		{
 			unResolve();
-			throw e;
+			throw problem;
 		}
+
+		types = fixed;
+		return this;
 	}
 
 	@Override

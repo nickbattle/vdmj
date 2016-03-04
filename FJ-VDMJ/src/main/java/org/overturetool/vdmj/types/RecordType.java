@@ -168,8 +168,7 @@ public class RecordType extends InvariantType
 		
 		if (problem != null)
 		{
-			resolved = false;
-			infinite = false;
+			unResolve();
 			throw problem;
 		}
 

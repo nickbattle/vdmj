@@ -844,35 +844,49 @@ public class UnionType extends Type
 			infinite = true;
 		}
 
-		try
+		TypeSet fixed = new TypeSet();
+		TypeCheckException problem = null;
+
+		for (Type t: types)
 		{
-			TypeSet fixed = new TypeSet();
+			if (root != null)
+				root.infinite = false;
 
-			for (Type t: types)
+			try
 			{
-				if (root != null)
-					root.infinite = false;
-
 				fixed.add(t.typeResolve(env, root));
-
-				if (root != null)
-					infinite = infinite && root.infinite;
+			}
+			catch (TypeCheckException e)
+			{
+				if (problem == null)
+				{
+					problem = e;
+				}
+				else
+				{
+					// Add extra messages to the exception for each union member
+					problem.addExtra(e);
+				}
 			}
 
-			types = fixed;
-			if (root != null) root.infinite = infinite;
-
-			// Resolved types may be unions, so force a re-expand
-			expanded = false;
-			expand();
-
-			return this;
+			if (root != null)
+				infinite = infinite && root.infinite;
 		}
-		catch (TypeCheckException e)
+		
+		if (problem != null)
 		{
 			unResolve();
-			throw e;
+			throw problem;
 		}
+
+		types = fixed;
+		if (root != null) root.infinite = infinite;
+
+		// Resolved types may be unions, so force a re-expand
+		expanded = false;
+		expand();
+
+		return this;
 	}
 
 	@Override

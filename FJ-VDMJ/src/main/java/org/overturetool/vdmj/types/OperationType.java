@@ -150,24 +150,55 @@ public class OperationType extends Type
 	{
 		if (resolved) return this; else { resolved = true; }
 
-		try
-		{
-			TypeList fixed = new TypeList();
+		TypeList fixed = new TypeList();
+		TypeCheckException problem = null;
 
-			for (Type type: parameters)
+		for (Type type: parameters)
+		{
+			try
 			{
 				fixed.add(type.typeResolve(env, root));
 			}
+			catch (TypeCheckException e)
+			{
+				if (problem == null)
+				{
+					problem = e;
+				}
+				else
+				{
+					// Add extra messages to the exception for each parameter
+					problem.addExtra(e);
+				}
 
+				fixed.add(new UnknownType(location));	// Parameter count must be right
+			}
+		}
+
+		try
+		{
 			parameters = fixed;
 			result = result.typeResolve(env, root);
-			return this;
 		}
 		catch (TypeCheckException e)
 		{
-			unResolve();
-			throw e;
+			if (problem == null)
+			{
+				problem = e;
+			}
+			else
+			{
+				problem.addExtra(e);
+			}
 		}
+		
+		if (problem != null)
+		{
+			unResolve();
+			throw problem;
+		}
+
+		return this;
 	}
 
 	@Override
