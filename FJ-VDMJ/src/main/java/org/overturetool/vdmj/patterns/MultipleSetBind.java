@@ -94,7 +94,7 @@ public class MultipleSetBind extends MultipleBind
 	}
 
 	@Override
-	public ValueList getBindValues(Context ctxt)
+	public ValueList getBindValues(Context ctxt, boolean permuted)
 	{
 		try
 		{
@@ -106,7 +106,7 @@ public class MultipleSetBind extends MultipleBind
 			{
 				v = v.deref();
 
-				if (v instanceof SetValue)
+				if (v instanceof SetValue && permuted)
 				{
 					SetValue sv = (SetValue)v;
 					vl.addAll(sv.permutedSets());

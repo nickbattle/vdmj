@@ -143,7 +143,7 @@ public class LetBeStStatement extends Statement
 
 			for (MultipleBind mb: def.bindings)
 			{
-				ValueList bvals = mb.getBindValues(ctxt);
+				ValueList bvals = mb.getBindValues(ctxt, false);
 
 				for (Pattern p: mb.plist)
 				{

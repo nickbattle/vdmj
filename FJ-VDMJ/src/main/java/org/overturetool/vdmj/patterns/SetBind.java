@@ -66,7 +66,7 @@ public class SetBind extends Bind
 	}
 
 	@Override
-	public ValueList getBindValues(Context ctxt)
+	public ValueList getBindValues(Context ctxt, boolean permuted)
 	{
 		try
 		{
@@ -78,7 +78,7 @@ public class SetBind extends Bind
 			{
 				e = e.deref();
 
-				if (e instanceof SetValue)
+				if (e instanceof SetValue && permuted)
 				{
 					SetValue sv = (SetValue)e;
 					results.addAll(sv.permutedSets());

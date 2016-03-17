@@ -69,7 +69,7 @@ public class TypeBind extends Bind
 	}
 
 	@Override
-	public ValueList getBindValues(Context ctxt) throws ValueException
+	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
 		return type.getAllValues(ctxt);
 	}

@@ -27,6 +27,7 @@ import java.util.Vector;
 
 import org.overturetool.vdmj.expressions.ExpressionList;
 import org.overturetool.vdmj.lex.LexLocation;
+import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.PatternMatchException;
 import org.overturetool.vdmj.typechecker.Environment;
@@ -112,12 +113,15 @@ public class PatternList extends Vector<Pattern>
 
 	public boolean isConstrained()
 	{
+		LexNameList names = new LexNameList();
+
 		for (Pattern p: this)
 		{
-			if (p.isConstrained()) return true;		// NB. OR
+			if (p.isConstrained()) return true;		// NB. OR		
+			names.addAll(p.getAllVariableNames());
 		}
 
-		return false;
+		return names.hasDuplicates();	// No duplicates => not constrained
 	}
 
 	public boolean isSimple()

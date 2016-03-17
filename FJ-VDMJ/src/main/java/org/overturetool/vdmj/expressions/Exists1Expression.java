@@ -106,7 +106,7 @@ public class Exists1Expression extends Expression
 		
 		try
 		{
-			allValues = bind.getBindValues(ctxt);
+			allValues = bind.getBindValues(ctxt, false);
 		}
 		catch (ValueException e)
 		{

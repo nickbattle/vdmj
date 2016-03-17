@@ -121,7 +121,7 @@ public class MapCompExpression extends MapExpression
 
 			for (MultipleBind mb: bindings)
 			{
-				ValueList bvals = mb.getBindValues(ctxt);
+				ValueList bvals = mb.getBindValues(ctxt, false);
 
 				for (Pattern p: mb.plist)
 				{

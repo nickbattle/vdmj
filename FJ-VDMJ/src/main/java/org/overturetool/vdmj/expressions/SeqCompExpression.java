@@ -113,7 +113,7 @@ public class SeqCompExpression extends SeqExpression
 	{
 		breakpoint.check(location, ctxt);
 
-		ValueList allValues = setbind.getBindValues(ctxt);
+		ValueList allValues = setbind.getBindValues(ctxt, false);
 
 		ValueSet seq = new ValueSet();	// Bind variable values
 		ValueMap map = new ValueMap();	// Map bind values to output values
