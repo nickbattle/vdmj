@@ -96,7 +96,7 @@ public abstract class MultipleBind implements Serializable
 	}
 
 	/** Get a list of all the possible values to bind the variables to. */ 
-	abstract public ValueList getBindValues(Context ctxt) throws ValueException;
+	abstract public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException;
 
 	/** Get a list of POs. */
 	abstract public ProofObligationList getProofObligations(POContextStack ctxt);

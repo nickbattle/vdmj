@@ -109,7 +109,7 @@ public class ExistsExpression extends Expression
 
 			for (MultipleBind mb: bindList)
 			{
-				ValueList bvals = mb.getBindValues(ctxt);
+				ValueList bvals = mb.getBindValues(ctxt, false);
 
 				for (Pattern p: mb.plist)
 				{

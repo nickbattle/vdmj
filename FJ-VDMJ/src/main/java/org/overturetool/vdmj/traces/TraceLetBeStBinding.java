@@ -103,7 +103,7 @@ public class TraceLetBeStBinding extends TraceDefinition
 
 			for (MultipleBind mb: def.bindings)
 			{
-				ValueList bvals = mb.getBindValues(ctxt);
+				ValueList bvals = mb.getBindValues(ctxt, true);		// NB. permuted
 
 				for (Pattern p: mb.plist)
 				{
