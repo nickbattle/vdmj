@@ -34,7 +34,7 @@ public class TraceIteratorList extends Vector<TraceIterator>
 	
 	private CallSequence[] alternatives = null;
 
-	private Boolean lastResult = null;	// Cache of hasMoreTests result
+	private Integer lastAlternative = null;		// Last index that hasMoreTests, if known
 
 	public void reset()
 	{
@@ -44,7 +44,7 @@ public class TraceIteratorList extends Vector<TraceIterator>
 		}
 		
 		alternatives = null;
-		lastResult = null;
+		lastAlternative = null;
 	}
 	
 	public int countSequence()
@@ -73,21 +73,17 @@ public class TraceIteratorList extends Vector<TraceIterator>
 
 	public boolean hasMoreTests()
 	{
-		if (lastResult != null)
+		int i = (lastAlternative != null) ? lastAlternative : 0;
+
+		for (; i < size(); i++)
 		{
-			return lastResult.booleanValue(); 
-		}
-		
-		for (TraceIterator iter: this)
-		{
-			if (iter.hasMoreTests())
+			if (get(i).hasMoreTests())
 			{
-				lastResult = Boolean.TRUE;
+				lastAlternative = i;
 				return true;
 			}
 		}
 		
-		lastResult = Boolean.FALSE;
 		return false;
 	}
 
@@ -96,8 +92,6 @@ public class TraceIteratorList extends Vector<TraceIterator>
 	 */
 	public CallSequence getNextTestSequence()
 	{
-		lastResult = null;
-		
 		if (alternatives == null)	// First time in
 		{
 			alternatives  = new CallSequence[size()];
@@ -139,12 +133,13 @@ public class TraceIteratorList extends Vector<TraceIterator>
 	 */
 	public CallSequence getNextTestAlternative()
 	{
-		lastResult = null;
+		int i = (lastAlternative != null) ? lastAlternative : 0;
 		
-		for (int i=0; i<size(); i++)
+		for (; i<size(); i++)
 		{
 			if (get(i).hasMoreTests())
 			{
+				lastAlternative = i;
 				return get(i).getNextTest();
 			}
 		}
