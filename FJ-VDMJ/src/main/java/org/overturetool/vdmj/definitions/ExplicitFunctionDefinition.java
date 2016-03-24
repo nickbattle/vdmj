@@ -117,6 +117,7 @@ public class ExplicitFunctionDefinition extends Definition
 		this.isCurried = parameters.size() > 1;
 
 		type.definitions = new DefinitionList(this);
+		type.instantiated = typeParams == null ? null : false;
 	}
 
 	@Override
@@ -430,6 +431,8 @@ public class ExplicitFunctionDefinition extends Definition
 				Type ptype = ti.next();
 				ftype = (FunctionType)ftype.polymorph(pname, ptype);
 			}
+
+			ftype.instantiated = true;
 		}
 
 		return ftype;

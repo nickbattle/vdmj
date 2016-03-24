@@ -123,6 +123,7 @@ public class ImplicitFunctionDefinition extends Definition
 		// NB: implicit functions are always +> total, apparently
 		type = new FunctionType(location, false, ptypes, result.type);
 		type.definitions = new DefinitionList(this);
+		type.instantiated = typeParams == null ? null : false;
 	}
 
 	@Override
@@ -421,12 +422,17 @@ public class ImplicitFunctionDefinition extends Definition
 		Iterator<Type> ti = actualTypes.iterator();
 		FunctionType ftype = type;
 
-		for (LexNameToken pname: typeParams)
+		if (typeParams != null)
 		{
-			Type ptype = ti.next();
-			ftype = (FunctionType)ftype.polymorph(pname, ptype);
+    		for (LexNameToken pname: typeParams)
+    		{
+    			Type ptype = ti.next();
+    			ftype = (FunctionType)ftype.polymorph(pname, ptype);
+    		}
+    
+    		ftype.instantiated = true;
 		}
-
+		
 		return ftype;
 	}
 

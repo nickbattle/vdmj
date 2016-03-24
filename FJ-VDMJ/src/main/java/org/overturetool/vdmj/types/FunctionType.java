@@ -37,6 +37,7 @@ public class FunctionType extends Type
 	public TypeList parameters;
 	public Type result;
 	public final boolean partial;
+	public Boolean instantiated = null;		// Null => not polymorphic
 
 	public FunctionType(LexLocation location,
 		boolean partial, TypeList parameters, Type result)
@@ -222,7 +223,9 @@ public class FunctionType extends Type
 		Type polyresult = result.polymorph(pname, actualType);
 		FunctionType type =
 			new FunctionType(location, partial, polyparams, polyresult);
+		
 		type.definitions = definitions;
+		type.instantiated = true;
 		return type;
 	}
 
