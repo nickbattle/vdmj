@@ -163,6 +163,13 @@ public class ApplyExpression extends Expression
 		if (type.isFunction())
 		{
 			FunctionType ft = type.getFunction();
+			
+			if (ft.instantiated != null && !ft.instantiated)
+			{
+				// Something like f(x) rather than f[nat](x)
+				root.report(3350, "Polymorphic function has not been instantiated");
+			}
+			
 			ft.typeResolve(env, null);
 			results.add(functionApply(isSimple, ft));
 		}
