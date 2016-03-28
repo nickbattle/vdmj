@@ -95,6 +95,15 @@ public class TypeSet extends TreeSet<Type>
 				}
 			}
 		}
+		else if (t instanceof OptionalType)
+		{
+			OptionalType opt = (OptionalType)t;
+			
+			if (!opt.type.isUnknown() && contains(opt.type))
+			{
+				remove(opt.type);	// Because T | [T] = [T]
+			}
+		}
 		
 		return super.add(t);
 	}
