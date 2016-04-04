@@ -36,6 +36,7 @@ import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.NameScope;
 import org.overturetool.vdmj.types.FunctionType;
 import org.overturetool.vdmj.types.OperationType;
+import org.overturetool.vdmj.types.ParameterType;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.types.TypeList;
 import org.overturetool.vdmj.types.UnknownType;
@@ -167,12 +168,25 @@ public class VariableExpression extends Expression
 		}
 		else
 		{
+			Type result = vardef.getType();
+			
+			if (result instanceof ParameterType)
+			{
+				ParameterType ptype = (ParameterType)result;
+				
+				if (ptype.name.equals(name))	// Referring to "T" of @T
+				{
+					report(3351, "Type parameter '" + name.name + "' cannot be used here");
+					return new UnknownType(location);
+				}
+			}
+			
 			// Note that we perform an extra typeResolve here. This is
 			// how forward referenced types are resolved, and is the reason
 			// we don't need to retry at the top level (assuming all names
 			// are in the environment).
 
-			Type result = vardef.getType().typeResolve(env, null);
+			result = result.typeResolve(env, null);
 			
 			// If a constraint is passed in, we can raise an error if it is
 			// not possible for the type to match the constraint (rather than
