@@ -726,7 +726,8 @@ as the expected and actual values.
 3347, "Cannot have a pure operation as the body of a thread"
 3348, "Cannot use <expression> in a functional context"
 3349, "Cannot see non-static operation from static context"
-3350, "Polymorphic function has not been instantiated" 
+3350, "Polymorphic function has not been instantiated"
+3351, "Type parameter '<name>' cannot be used here"
 
 4000, "Cannot instantiate abstract class <class>"
 4002, "Expression value is not in set bind"
