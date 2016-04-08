@@ -471,17 +471,32 @@ abstract public class CommandReader
 	protected boolean doRuntrace(String line, boolean debug)
 	{
 		String[] parts = line.split("\\s+");
-		int testNo = 0;
+		int startTest = 0;
+		int endTest = 0;
 
 		if (parts.length == 3)
 		{
 			try
 			{
-				testNo = Integer.parseInt(parts[2]);
+				startTest = Integer.parseInt(parts[2]);
+				endTest = startTest;
 			}
 			catch (NumberFormatException e)
 			{
-				println(parts[0] + " <name> [test number]");
+				println(parts[0] + " <name> [start number]");
+				return true;
+			}
+		}
+		else if (parts.length == 4)
+		{
+			try
+			{
+				startTest = Integer.parseInt(parts[2]);
+				endTest = Integer.parseInt(parts[3]);
+			}
+			catch (NumberFormatException e)
+			{
+				println(parts[0] + " <name> [start number [end number]]");
 				return true;
 			}
 		}
@@ -508,7 +523,7 @@ abstract public class CommandReader
 			}
 			
    			long before = System.currentTimeMillis();
-   			boolean passed = interpreter.runtrace(line, testNo, debug, reduction, reductionType, traceseed);
+   			boolean passed = interpreter.runtrace(line, startTest, endTest, debug, reduction, reductionType, traceseed);
    			long after = System.currentTimeMillis();
 			println("Executed in " + (double)(after-before)/1000 + " secs. ");
 			
@@ -1459,12 +1474,11 @@ abstract public class CommandReader
 	protected void doHelp(@SuppressWarnings("unused") String line)
 	{
 		println("print <expression> - evaluate expression");
-		println("runtrace <name> [test number] - run CT trace(s)");
-		println("debugtrace <name> [test number] - debug CT trace(s)");
+		println("runtrace <name> [start test [end test]] - run CT trace(s)");
+		println("debugtrace <name> [start test [end test]] - debug CT trace(s)");
 		println("savetrace [<file> | off] - save CT trace output");
 		println("seedtrace <number> - seed CT trace random generator");
 		println("filter %age | <reduction type> - reduce CT trace(s)");
-		println("seedtrace <number> - seed CT trace random generator");
 		println("assert <file> - run assertions from a file");
 		println("init - re-initialize the global environment");
 		println("env - list the global symbols in the default environment");

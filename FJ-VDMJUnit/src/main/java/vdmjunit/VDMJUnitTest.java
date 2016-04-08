@@ -139,23 +139,24 @@ public abstract class VDMJUnitTest
 	 */
 	protected boolean runTrace(String name) throws Exception
 	{
-		return interpreter.runtrace(name, 0, false, 0, TraceReductionType.NONE, 0);
+		return interpreter.runtrace(name, 0, 0, false, 0, TraceReductionType.NONE, 0);
 	}
 
 	/**
-	 * Run one test from a combinatorial trace. Tests are numbered from 1. The test results
+	 * Run a range of tests from a combinatorial trace. Tests are numbered from 1. The test results
 	 * are sent to stdout as the test suite executes. If all tests produce a PASSED verdict,
 	 * then the method returns true, else if there are any FAILED or INDETERMINATE, the method
 	 * returns false. Test results are send to stdout.
 	 * 
 	 * @param name The name of the trace to run.
-	 * @param testNo The test number to run.
+	 * @param startTest The first test number to run.
+	 * @param endTest The last test number to run - zero means to the end.
 	 * @return True, if the test passes.
 	 * @throws Exception
 	 */
-	protected boolean runTrace(String name, int testNo) throws Exception
+	protected boolean runTrace(String name, int startTest, int endTest) throws Exception
 	{
-		return interpreter.runtrace(name, testNo, false, 0, TraceReductionType.NONE, 0);
+		return interpreter.runtrace(name, startTest, endTest, false, 0, TraceReductionType.NONE, 0);
 	}
 
 	/**
@@ -177,7 +178,7 @@ public abstract class VDMJUnitTest
 	protected boolean runTrace(String name, double subset, TraceReductionType type, int seed)
 		throws Exception
 	{
-		return interpreter.runtrace(name, 0, false, (float)subset, type, seed);
+		return interpreter.runtrace(name, 0, 0, false, (float)subset, type, seed);
 	}
 
 	/**

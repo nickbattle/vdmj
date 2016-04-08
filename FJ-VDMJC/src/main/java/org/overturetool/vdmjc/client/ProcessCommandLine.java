@@ -331,8 +331,8 @@ public class ProcessCommandLine extends CommandLine
 			println("Running:");
     		println("  init");
     		println("  run");
-    		println("  runtrace <trace> [test number]");
-    		println("  debugtrace <trace> [test number]");
+    		println("  runtrace <trace> [start test [end test]]");
+    		println("  debugtrace <trace> [start test [end test]]");
     		println("  p[rint] <expression>");
     		println("  coverage [<files>]");
     		println("  word [<files>]");
@@ -699,25 +699,28 @@ public class ProcessCommandLine extends CommandLine
    		}
 
 		String[] parts = line.split("\\s+");
-		int testNo = 0;
+		int startTest = 0;
+		int endTest = 0;
 		String name = null;
 
 		switch (parts.length)
 		{
 			default:
-				println(parts[0] + " <name> [test number]");
+				println(parts[0] + " <name> [start test [end test]]");
 				return true;
 
 			case 2:
 				name = parts[1];
-				testNo = 0;
+				startTest = 1;
+				endTest = 0;
 				break;
 
 			case 3:
     			try
     			{
     				name = parts[1];
-    				testNo = Integer.parseInt(parts[2]);
+    				startTest = Integer.parseInt(parts[2]);
+    				endTest = startTest;
     			}
     			catch (NumberFormatException e)
     			{
@@ -725,9 +728,23 @@ public class ProcessCommandLine extends CommandLine
     				return true;
     			}
     			break;
+
+			case 4:
+    			try
+    			{
+    				name = parts[1];
+    				startTest = Integer.parseInt(parts[2]);
+    				endTest = Integer.parseInt(parts[3]);
+    			}
+    			catch (NumberFormatException e)
+    			{
+    				println(parts[0] + " <name> [start test [end test]]");
+    				return true;
+    			}
+    			break;
 		}
 
-		currentThread.xcmd_overture_runtrace(name, testNo, debug);
+		currentThread.xcmd_overture_runtrace(name, startTest, endTest, debug);
 
 		return true;
 	}
