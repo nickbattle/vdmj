@@ -528,14 +528,14 @@ abstract public class Interpreter
 
 	abstract protected Context getTraceContext(ClassDefinition classdef) throws ValueException;
 
-	public void runtrace(String name, int testNo, boolean debug)
+	public void runtrace(String name, int startTest, int endTest, boolean debug)
 		throws Exception
 	{
-		runtrace(name, testNo, debug, 1.0F, TraceReductionType.NONE, 1234);
+		runtrace(name, startTest, endTest, debug, 1.0F, TraceReductionType.NONE, 1234);
 	}
 
 	public boolean runtrace(
-		String name, int testNo, boolean debug,
+		String name, int startTest, int endTest, boolean debug,
 		float subset, TraceReductionType reductionType, long seed)
 		throws Exception
 	{
@@ -589,9 +589,14 @@ abstract public class Interpreter
 
 		final int count = tests.count();
 
-		if (testNo > count)
+		if (endTest > count)
 		{
 			throw new Exception("Trace " + lexname + " only has " + count + " tests");
+		}
+		
+		if (endTest == 0)
+		{
+			endTest = count;
 		}
 
 		int testNumber = 1;
@@ -612,7 +617,7 @@ abstract public class Interpreter
 		{
 			CallSequence test = tests.getNextTest();
 			
-			if ((testNo > 0 && testNumber != testNo) || filter.isRemoved(test, testNumber))
+			if (testNumber < startTest || testNumber > endTest || filter.isRemoved(test, testNumber))
 			{
 				excluded++;
 			}
@@ -638,9 +643,9 @@ abstract public class Interpreter
     			}
 			}
 
-			if (testNo > 0 && testNumber == testNo)
+			if (testNumber >= endTest)
 			{
-				excluded = count - 1;
+				excluded = count - (endTest - startTest + 1);
 				break;
 			}
 

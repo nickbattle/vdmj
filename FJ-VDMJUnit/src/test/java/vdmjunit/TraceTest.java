@@ -58,11 +58,17 @@ public class TraceTest extends VDMJUnitTestSL
 	@Test
 	public void two() throws Exception
 	{
-		assertTrue(runTrace("T1", 3));
+		assertTrue(runTrace("T1", 3, 3));
 	}
 	
 	@Test
 	public void three() throws Exception
+	{
+		assertTrue(runTrace("T1", 1, 4));
+	}
+	
+	@Test
+	public void four() throws Exception
 	{
 		assertFalse(runTrace("T1", 0.5, TraceReductionType.RANDOM, 123));
 	}

@@ -321,7 +321,7 @@ abstract public class OvertureTest extends TestCase
 			Interpreter.setTraceOutput(pw);
 
 			//interpreter.execute(testExp, null);
-			interpreter.runtrace(testExp, 0, false);
+			interpreter.runtrace(testExp, 0, 0, false);
 
 			pw.close();
 			String result = out.toString();

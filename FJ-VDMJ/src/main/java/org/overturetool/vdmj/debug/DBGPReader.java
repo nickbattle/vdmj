@@ -2461,13 +2461,14 @@ public class DBGPReader
 		try
 		{
 			String[] parts = c.data.split("\\s+");
-			int testNo = Integer.parseInt(parts[1]);
-			boolean debug = Boolean.parseBoolean(parts[2]);
+			int startTest = Integer.parseInt(parts[1]);
+			int endTest = Integer.parseInt(parts[2]);
+			boolean debug = Boolean.parseBoolean(parts[3]);
 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			PrintWriter pw = new PrintWriter(out);
 			Interpreter.setTraceOutput(pw);
-			interpreter.runtrace(parts[0], testNo, debug);
+			interpreter.runtrace(parts[0], startTest, endTest, debug);
 			pw.close();
 
 			cdataResponse(out.toString());

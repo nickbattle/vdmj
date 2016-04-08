@@ -668,8 +668,8 @@ public class ConnectionThread extends Thread
 		xcmd_overture_cmd("log", file);
 	}
 
-	public void xcmd_overture_runtrace(String name, int testNo, boolean debug) throws IOException
+	public void xcmd_overture_runtrace(String name, int startTest, int endTest, boolean debug) throws IOException
 	{
-		xcmd_overture_cmd("runtrace", name + " " + testNo + " " + debug);
+		xcmd_overture_cmd("runtrace", name + " " + startTest + " " + endTest + " " + debug);
 	}
 }
