@@ -30,6 +30,7 @@ import java.math.BigInteger;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.overturetool.vdmj.values.Value;
 
 import vdmjunit.VDMJUnitTestSL;
 
@@ -53,6 +54,7 @@ public class SLTest extends VDMJUnitTestSL
 		setDefault("A");
 		run("setValue(123)");
 		assertEquals(new BigInteger("123"), runInt("getValue()"));
+		assertVDM("getValue()", "RESULT = 123");
 	}
 	
 	@Test
@@ -60,7 +62,9 @@ public class SLTest extends VDMJUnitTestSL
 	{
 		assertEquals(new BigInteger("100"), runInt("B`g(99)"));
 		setDefault("B");
-		assertEquals(new BigInteger("2"), runInt("g(1)"));
+		Value r = run("g(1)");
+		assertEquals(new BigInteger("2"), r.intValue(null));
+		assertVDM(r, "RESULT = 2");
 	}
 	
 	@Test

@@ -11,6 +11,6 @@ level folder will build an Eclipse project file and allow the project to be impo
 Alternatively, the Eclipse Maven plugin should be able to import the project directly
 from the pom.xml file.
 
-Maven installs VDMJ in the com.fujitsu group.
+Maven installs VDMJC in the com.fujitsu group.
 
 For information on a particular release, see the RELEASE_NOTES file.
