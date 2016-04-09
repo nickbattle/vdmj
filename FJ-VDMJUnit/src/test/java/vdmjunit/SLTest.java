@@ -28,6 +28,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.overturetool.vdmj.values.Value;
 
 import vdmjunit.VDMJUnitTestSL;
 
@@ -51,6 +52,7 @@ public class SLTest extends VDMJUnitTestSL
 		setDefault("A");
 		run("setValue(123)");
 		assertEquals(123, runInt("getValue()"));
+		assertVDM("getValue()", "RESULT = 123");
 	}
 	
 	@Test
@@ -58,7 +60,9 @@ public class SLTest extends VDMJUnitTestSL
 	{
 		assertEquals(100, runInt("B`g(99)"));
 		setDefault("B");
-		assertEquals(2, runInt("g(1)"));
+		Value r = run("g(1)");
+		assertEquals(2, r.intValue(null));
+		assertVDM(r, "RESULT = 2");
 	}
 	
 	@Test

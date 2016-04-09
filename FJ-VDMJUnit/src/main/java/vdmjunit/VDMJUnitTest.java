@@ -24,12 +24,17 @@
 package vdmjunit;
 
 import java.nio.charset.Charset;
+
 import static org.junit.Assert.fail;
 
 import org.overturetool.vdmj.Release;
 import org.overturetool.vdmj.Settings;
+import org.overturetool.vdmj.lex.LexLocation;
+import org.overturetool.vdmj.lex.LexNameToken;
+import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.Interpreter;
 import org.overturetool.vdmj.traces.TraceReductionType;
+import org.overturetool.vdmj.values.BooleanValue;
 import org.overturetool.vdmj.values.Value;
 
 /**
@@ -241,5 +246,48 @@ public abstract class VDMJUnitTest
 	protected boolean runBool(String expression) throws Exception
 	{
 		return run(expression).boolValue(null);
+	}
+	
+	/**
+	 * Assert that the result Value passed, when substituted into the VDM assertion passed
+	 * as RESULT, evaluates to true.
+	 * 
+	 * @param result The RESULT being tested.
+	 * @param assertion A VDM assertion about RESULT.
+	 * @throws Exception Thrown if the assertion expression is not boolean.
+	 */
+	protected void assertVDM(Value result, String assertion) throws Exception
+	{
+		Context ctxt = new Context(new LexLocation(), "Assertion context", interpreter.initialContext);
+		LexNameToken rname = new LexNameToken(interpreter.getDefaultName(), "RESULT", new LexLocation());
+		ctxt.put(rname, result);
+		Value res = interpreter.evaluate(assertion, ctxt);
+		
+		if (!(res instanceof BooleanValue))
+		{
+			throw new Exception("Expression is not boolean. Value = " + res);
+		}
+		else
+		{
+			BooleanValue bv = (BooleanValue)res;
+			
+			if (!bv.value)
+			{
+				throw new AssertionError("Assertion failed");
+			}
+		}
+	}
+	
+	/**
+	 * Assert that the VDM expression passed, when evaluated and substituted as RESULT 
+	 * into the VDM assertion passed, evaluates to true.
+	 * 
+	 * @param expression The expression to evaluate and test.
+	 * @param assertion The VDM assertion about the RESULT of the expression.
+	 * @throws Exception Thrown if the assertion expression is not boolean.
+	 */
+	protected void assertVDM(String expression, String assertion) throws Exception
+	{
+		assertVDM(run(expression), assertion);
 	}
 }
