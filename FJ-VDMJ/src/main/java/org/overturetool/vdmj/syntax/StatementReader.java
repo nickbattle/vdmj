@@ -367,7 +367,7 @@ public class StatementReader extends SyntaxReader
 		return new AtomicStatement(token, assignments);
 	}
 
-	private Statement readCallStatement()
+	public Statement readCallStatement()
 		throws ParserException, LexException
 	{
 		if (dialect != Dialect.VDM_SL)
