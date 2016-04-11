@@ -90,6 +90,9 @@
                                 <include>documentation/UserGuideTests.zip</include>
                             </includes>
                             <classifier>docs</classifier>
+							<finalName>
+								${project.artifactId}-${project.version}-${maven.build.timestamp}
+							</finalName>
                         </configuration>
                     </execution>
 				</executions>

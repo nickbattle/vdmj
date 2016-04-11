@@ -258,7 +258,7 @@ public abstract class VDMJUnitTest
 	 * @param assertion A VDM assertion about RESULT.
 	 * @throws Exception Thrown if the assertion expression is not boolean.
 	 */
-	protected void assertVDM(Value result, String assertion) throws Exception
+	protected void assertVDM(String message, Value result, String assertion) throws Exception
 	{
 		Context ctxt = new Context(new LexLocation(), "Assertion context", interpreter.initialContext);
 		LexNameToken rname = new LexNameToken(interpreter.getDefaultName(), "RESULT", new LexLocation());
@@ -275,11 +275,20 @@ public abstract class VDMJUnitTest
 			
 			if (!bv.value)
 			{
-				throw new AssertionError("Assertion failed");
+				throw new AssertionError(message == null ? "Assertion failed" : message);
 			}
 		}
 	}
 	
+	/**
+	 * Assert that the result Value passed, when substituted into the VDM assertion passed
+	 * as RESULT, evaluates to true. Uses the default assertion failure message.
+	 */
+	protected void assertVDM(Value result, String assertion) throws Exception
+	{
+		assertVDM(null, result, assertion);
+	}
+
 	/**
 	 * Assert that the VDM expression passed, when evaluated and substituted as RESULT 
 	 * into the VDM assertion passed, evaluates to true.
@@ -288,8 +297,18 @@ public abstract class VDMJUnitTest
 	 * @param assertion The VDM assertion about the RESULT of the expression.
 	 * @throws Exception Thrown if the assertion expression is not boolean.
 	 */
+	protected void assertVDM(String message, String expression, String assertion) throws Exception
+	{
+		assertVDM(message, run(expression), assertion);
+	}
+	
+	/**
+	 * Assert that the VDM expression passed, when evaluated and substituted as RESULT 
+	 * into the VDM assertion passed, evaluates to true. Uses the default assertion
+	 * failure message.
+	 */ 
 	protected void assertVDM(String expression, String assertion) throws Exception
 	{
-		assertVDM(run(expression), assertion);
+		assertVDM(null, run(expression), assertion);
 	}
 }

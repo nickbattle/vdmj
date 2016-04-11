@@ -24,6 +24,7 @@
 package vdmjunit;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.math.BigInteger;
 
@@ -55,6 +56,16 @@ public class SLTest extends VDMJUnitTestSL
 		run("setValue(123)");
 		assertEquals(new BigInteger("123"), runInt("getValue()"));
 		assertVDM("getValue()", "RESULT = 123");
+		
+		try
+		{
+			assertVDM("Testing!", "getValue()", "RESULT=456");
+			fail("Expected failure");
+		}
+		catch (AssertionError e)
+		{
+			assertEquals(e.getMessage(), "Testing!");
+		}
 	}
 	
 	@Test
@@ -65,6 +76,16 @@ public class SLTest extends VDMJUnitTestSL
 		Value r = run("g(1)");
 		assertEquals(new BigInteger("2"), r.intValue(null));
 		assertVDM(r, "RESULT = 2");
+		
+		try
+		{
+			assertVDM("Testing!", r, "RESULT=456");
+			fail("Expected failure");
+		}
+		catch (AssertionError e)
+		{
+			assertEquals(e.getMessage(), "Testing!");
+		}
 	}
 	
 	@Test
