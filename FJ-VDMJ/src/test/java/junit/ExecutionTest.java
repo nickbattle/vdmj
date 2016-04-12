@@ -48,6 +48,7 @@ public class ExecutionTest extends TestCase
 	{
 		super.setUp();
 		Settings.release = Release.CLASSIC;
+		Settings.dialect = Dialect.VDM_SL;
 	}
 
 	@Override

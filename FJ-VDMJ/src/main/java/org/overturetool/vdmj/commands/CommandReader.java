@@ -1444,6 +1444,7 @@ abstract public class CommandReader
 			{
 				println("FAILED: " + assertion);
 				println("Runtime: " + e.getMessage());
+				e.printStackTrace();
 				assertErrors++;
 				break;
 			}
@@ -1451,6 +1452,7 @@ abstract public class CommandReader
 			{
 				println("FAILED: " + assertion);
 				println("Exception: " + e);
+				e.printStackTrace();
 				assertErrors++;
 				break;
 			}
