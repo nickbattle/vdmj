@@ -47,6 +47,7 @@ public class PogTest extends TestCase
 	{
 		super.setUp();
 		Settings.release = Release.DEFAULT;
+		Settings.dialect = Dialect.VDM_SL;
 	}
 
 	@Override
