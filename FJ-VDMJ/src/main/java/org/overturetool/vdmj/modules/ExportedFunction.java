@@ -73,12 +73,6 @@ public class ExportedFunction extends Export
 			{
 				Type act = def.getType();
 
-				if (act != null && !act.equals(type))
-				{
-					report(3184, "Exported " + name + " function type incorrect");
-					detail2("Exported", type, "Actual", act);
-				}
-				
 				if (typeParams != null)
 				{
 					if (def instanceof ExplicitFunctionDefinition)
@@ -94,6 +88,12 @@ public class ExportedFunction extends Export
 							report(3353, "Exported " + name + " function type parameters incorrect");
 							detail2("Exported", typeParams, "Actual", efd.typeParams);
 						}
+						
+						if (act != null && !act.toString().equals(type.toString()))
+						{
+							report(3184, "Exported " + name + " function type incorrect");
+							detail2("Exported", type, "Actual", act);
+						}
 					}
 					else if (def instanceof ImplicitFunctionDefinition)
 					{
@@ -108,7 +108,18 @@ public class ExportedFunction extends Export
 							report(3353, "Exported " + name + " function type parameters incorrect");
 							detail2("Exported", typeParams, "Actual", ifd.typeParams);
 						}
+						
+						if (act != null && !act.toString().equals(type.toString()))
+						{
+							report(3184, "Exported " + name + " function type incorrect");
+							detail2("Exported", type, "Actual", act);
+						}
 					}
+				}
+				else if (act != null && !act.equals(type))
+				{
+					report(3184, "Exported " + name + " function type incorrect");
+					detail2("Exported", type, "Actual", act);
 				}
 
 				list.add(def);
