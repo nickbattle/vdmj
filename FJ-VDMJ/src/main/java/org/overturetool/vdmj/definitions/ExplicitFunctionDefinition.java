@@ -370,8 +370,16 @@ public class ExplicitFunctionDefinition extends Definition
 				}
 		
 				FunctionType mtype = (FunctionType)measuredef.getType();
-
-				if (!TypeComparator.compatible(mtype.parameters, getMeasureParams()))
+				
+				if (typeParams != null)		// Polymorphic, so compare "shape" of param signature
+				{
+					if (!mtype.parameters.toString().equals(getMeasureParams().toString()))
+					{
+						measure.report(3303, "Measure parameters different to function");
+						detail2(measure.name, mtype.parameters, "Expected", getMeasureParams());
+					}
+				}
+				else if (!TypeComparator.compatible(mtype.parameters, getMeasureParams()))
 				{
 					measure.report(3303, "Measure parameters different to function");
 					detail2(measure.name, mtype.parameters, "Expected", getMeasureParams());
