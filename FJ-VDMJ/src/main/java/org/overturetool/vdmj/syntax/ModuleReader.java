@@ -392,7 +392,7 @@ public class ModuleReader extends SyntaxReader
 	{
 		LexToken token = lastToken();
 		LexNameList nameList = readIdList();
-		ignoreTypeParams();
+		LexNameList typeParams = ignoreTypeParams();
 		checkFor(Token.COLON, 2176, "Expecting ':' after export name");
 		LexToken tloc = lastToken();
 		Type type = getTypeReader().readType();
@@ -403,7 +403,7 @@ public class ModuleReader extends SyntaxReader
 		}
 
 		ignore(Token.SEMICOLON);
-		return new ExportedFunction(token.location, nameList, type);
+		return new ExportedFunction(token.location, nameList, type, typeParams);
 	}
 
 	private List<Export> readExportedOperations()
@@ -724,11 +724,15 @@ public class ModuleReader extends SyntaxReader
     	return name;
 	}
 
-	private void ignoreTypeParams() throws LexException, ParserException
+	private LexNameList ignoreTypeParams() throws LexException, ParserException
 	{
 		if (lastToken().is(Token.SEQ_OPEN))
 		{
-			getDefinitionReader().readTypeParams();
+			return getDefinitionReader().readTypeParams();
+		}
+		else
+		{
+			return null;
 		}
 	}
 }
