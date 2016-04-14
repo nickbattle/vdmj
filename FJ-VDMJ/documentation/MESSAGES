@@ -728,6 +728,8 @@ as the expected and actual values.
 3349, "Cannot see non-static operation from static context"
 3350, "Polymorphic function has not been instantiated"
 3351, "Type parameter '<name>' cannot be used here"
+3352, "Exported <name> function has no type paramaters"
+3353, "Exported <name> function type parameters incorrect"
 
 4000, "Cannot instantiate abstract class <class>"
 4002, "Expression value is not in set bind"

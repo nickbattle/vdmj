@@ -25,6 +25,8 @@ package org.overturetool.vdmj.modules;
 
 import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.definitions.DefinitionList;
+import org.overturetool.vdmj.definitions.ExplicitFunctionDefinition;
+import org.overturetool.vdmj.definitions.ImplicitFunctionDefinition;
 import org.overturetool.vdmj.definitions.LocalDefinition;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameList;
@@ -38,12 +40,14 @@ public class ExportedFunction extends Export
 	private static final long serialVersionUID = 1L;
 	public final LexNameList nameList;
 	public final Type type;
+	public final LexNameList typeParams;
 
-	public ExportedFunction(LexLocation location, LexNameList nameList, Type type)
+	public ExportedFunction(LexLocation location, LexNameList nameList, Type type, LexNameList typeParams)
 	{
 		super(location);
 		this.nameList = nameList;
 		this.type = type;
+		this.typeParams = typeParams;
 	}
 
 	@Override
@@ -73,6 +77,38 @@ public class ExportedFunction extends Export
 				{
 					report(3184, "Exported " + name + " function type incorrect");
 					detail2("Exported", type, "Actual", act);
+				}
+				
+				if (typeParams != null)
+				{
+					if (def instanceof ExplicitFunctionDefinition)
+					{
+						ExplicitFunctionDefinition efd = (ExplicitFunctionDefinition)def;
+						
+						if (efd.typeParams == null)
+						{
+							report(3352, "Exported " + name + " function has no type paramaters");
+						}
+						else if (!efd.typeParams.equals(typeParams))
+						{
+							report(3353, "Exported " + name + " function type parameters incorrect");
+							detail2("Exported", typeParams, "Actual", efd.typeParams);
+						}
+					}
+					else if (def instanceof ImplicitFunctionDefinition)
+					{
+						ImplicitFunctionDefinition ifd = (ImplicitFunctionDefinition)def;
+						
+						if (ifd.typeParams == null)
+						{
+							report(3352, "Exported " + name + " function has no type paramaters");
+						}
+						else if (!ifd.typeParams.equals(typeParams))
+						{
+							report(3353, "Exported " + name + " function type parameters incorrect");
+							detail2("Exported", typeParams, "Actual", ifd.typeParams);
+						}
+					}
 				}
 
 				list.add(def);
