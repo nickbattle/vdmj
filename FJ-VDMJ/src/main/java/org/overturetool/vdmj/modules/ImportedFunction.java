@@ -25,6 +25,8 @@ package org.overturetool.vdmj.modules;
 
 import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.definitions.DefinitionList;
+import org.overturetool.vdmj.definitions.ExplicitFunctionDefinition;
+import org.overturetool.vdmj.definitions.ImplicitFunctionDefinition;
 import org.overturetool.vdmj.definitions.LocalDefinition;
 import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.lex.LexNameToken;
@@ -51,32 +53,73 @@ public class ImportedFunction extends ImportedValue
 	@Override
 	public void typeCheck(Environment env)
 	{
-		if (type != null)
-		{
-			TypeComparator.checkComposeTypes(type, env, false);
-		}
-		
 		if (typeParams == null)
 		{
 			super.typeCheck(env);
 		}
 		else
 		{
-    		DefinitionList defs = new DefinitionList();
+			if (type != null && from != null)
+			{
+	    		DefinitionList defs = new DefinitionList();
 
-    		for (LexNameToken pname: typeParams)
-    		{
-    			Definition p = new LocalDefinition(
-    				pname.location, pname, NameScope.NAMES, new ParameterType(pname));
+	    		for (LexNameToken pname: typeParams)
+	    		{
+	    			Definition p = new LocalDefinition(
+	    				pname.location, pname, NameScope.NAMES, new ParameterType(pname));
 
-    			p.markUsed();
-    			defs.add(p);
-    		}
+	    			p.markUsed();
+	    			defs.add(p);
+	    		}
 
-    		FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
-    			defs, env, NameScope.NAMES);
-
-    		super.typeCheck(params);
+	    		FlatCheckedEnvironment params =	new FlatCheckedEnvironment(defs, env, NameScope.NAMES);
+				type = type.typeResolve(params, null);
+				TypeComparator.checkComposeTypes(type, params, false);
+				
+				Definition def = from.exportdefs.findName(name, NameScope.NAMES);
+				Type act = def.getType();
+				
+				if (def instanceof ExplicitFunctionDefinition)
+				{
+					ExplicitFunctionDefinition efd = (ExplicitFunctionDefinition)def;
+					
+					if (efd.typeParams == null)
+					{
+						report(3352, "Imported " + name + " function has no type paramaters");
+					}
+					else if (!efd.typeParams.toString().equals(typeParams.toString()))
+					{
+						report(3353, "Imported " + name + " function type parameters incorrect");
+						detail2("Imported", typeParams, "Actual", efd.typeParams);
+					}
+					
+					if (act != null && !act.toString().equals(type.toString()))
+					{
+						report(3184, "Imported " + name + " function type incorrect");
+						detail2("Imported", type, "Actual", act);
+					}
+				}
+				else if (def instanceof ImplicitFunctionDefinition)
+				{
+					ImplicitFunctionDefinition ifd = (ImplicitFunctionDefinition)def;
+					
+					if (ifd.typeParams == null)
+					{
+						report(3352, "Imported " + name + " function has no type paramaters");
+					}
+					else if (!ifd.typeParams.toString().equals(typeParams.toString()))
+					{
+						report(3353, "Imported " + name + " function type parameters incorrect");
+						detail2("Imported", typeParams, "Actual", ifd.typeParams);
+					}
+					
+					if (act != null && !act.toString().equals(type.toString()))
+					{
+						report(3184, "Imported " + name + " function type incorrect");
+						detail2("Imported", type, "Actual", act);
+					}
+				}
+			}
 		}
 	}
 

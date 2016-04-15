@@ -633,7 +633,7 @@ public class ModuleReader extends SyntaxReader
 	{
 		LexNameToken name =	readNameToken("Expecting imported function name");
 		LexNameToken defname = getDefName(from, name);
-		LexNameList typeParams = getDefinitionReader().readTypeParams();
+		LexNameList typeParams = ignoreTypeParams();
 
 		Type type = null;
 
