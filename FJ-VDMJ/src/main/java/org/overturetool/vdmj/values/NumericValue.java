@@ -97,6 +97,11 @@ public abstract class NumericValue extends Value
 		return new IntegerValue(iv);
 	}
 
+	public static boolean areIntegers(Value l, Value r)
+	{
+		return (l instanceof IntegerValue && r instanceof IntegerValue);
+	}
+
 	@Override
 	protected Value convertValueTo(Type to, Context ctxt, TypeSet done) throws ValueException
 	{

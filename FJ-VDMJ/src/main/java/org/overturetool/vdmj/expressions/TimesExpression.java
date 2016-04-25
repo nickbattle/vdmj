@@ -93,10 +93,21 @@ public class TimesExpression extends NumericBinaryExpression
 
 		try
 		{
-    		double lv = left.eval(ctxt).realValue(ctxt);
-    		double rv = right.eval(ctxt).realValue(ctxt);
+    		Value l = left.eval(ctxt);
+    		Value r = right.eval(ctxt);
 
-    		return NumericValue.valueOf(lv * rv, ctxt);
+			if (NumericValue.areIntegers(l, r))
+			{
+				long lv = l.intValue(ctxt);
+				long rv = r.intValue(ctxt);
+				return NumericValue.valueOf(lv * rv, ctxt);
+			}
+			else
+			{
+				double lv = l.realValue(ctxt);
+				double rv = r.realValue(ctxt);
+	    		return NumericValue.valueOf(lv * rv, ctxt);
+			}
 		}
 		catch (ValueException e)
 		{
