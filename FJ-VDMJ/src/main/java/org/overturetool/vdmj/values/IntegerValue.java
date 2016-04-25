@@ -47,7 +47,7 @@ public class IntegerValue extends RationalValue
 		if (other instanceof IntegerValue)
 		{
 			IntegerValue io = (IntegerValue)other;
-			return (int)(longVal - io.longVal);
+			return (longVal < io.longVal ? -1 : (longVal == io.longVal ? 0 : 1));
 		}
 
 		return super.compareTo(other);
