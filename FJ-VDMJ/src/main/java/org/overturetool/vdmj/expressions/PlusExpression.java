@@ -105,7 +105,8 @@ public class PlusExpression extends NumericBinaryExpression
 			{
 				long lv = l.intValue(ctxt);
 				long rv = r.intValue(ctxt);
-				return NumericValue.valueOf(lv + rv, ctxt);
+				long sum = addExact(lv, rv, ctxt);
+				return NumericValue.valueOf(sum, ctxt);
 			}
 			else
 			{
@@ -124,5 +125,19 @@ public class PlusExpression extends NumericBinaryExpression
 	public String kind()
 	{
 		return "plus";
+	}
+	
+	// This is included in Java 8 Math.java
+	private long addExact(long x, long y, Context ctxt) throws ValueException
+	{
+		long r = x + y;
+		// HD 2-12 Overflow iff both arguments have the opposite sign of the result
+		
+		if (((x ^ r) & (y ^ r)) < 0)
+		{
+			throw new ValueException(4169, "Arithmetic overflow", ctxt);
+		}
+		
+		return r;
 	}
 }

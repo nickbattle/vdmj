@@ -100,7 +100,8 @@ public class TimesExpression extends NumericBinaryExpression
 			{
 				long lv = l.intValue(ctxt);
 				long rv = r.intValue(ctxt);
-				return NumericValue.valueOf(lv * rv, ctxt);
+				long mult = multiplyExact(lv, rv, ctxt);
+				return NumericValue.valueOf(mult, ctxt);
 			}
 			else
 			{
@@ -120,4 +121,22 @@ public class TimesExpression extends NumericBinaryExpression
 	{
 		return "multiply";
 	}
+	
+	// This is included in Java 8 Math.java
+    private long multiplyExact(long x, long y, Context ctxt) throws ValueException
+    {
+    	long r = x * y;
+    	long ax = Math.abs(x);
+    	long ay = Math.abs(y);
+
+    	if (((ax | ay) >>> 31 != 0))
+    	{
+    		if (((y != 0) && (r / y != x)) || (x == Long.MIN_VALUE && y == -1))
+    		{
+    			throw new ValueException(4169, "Arithmetic overflow", ctxt);
+    		}
+    	}
+
+    	return r;
+    }
 }

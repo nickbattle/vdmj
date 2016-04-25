@@ -74,7 +74,8 @@ public class SubtractExpression extends NumericBinaryExpression
 			{
 				long lv = l.intValue(ctxt);
 				long rv = r.intValue(ctxt);
-				return NumericValue.valueOf(lv - rv, ctxt);
+				long diff = subtractExact(lv, rv, ctxt);
+				return NumericValue.valueOf(diff, ctxt);
 			}
 			else
 			{
@@ -93,5 +94,20 @@ public class SubtractExpression extends NumericBinaryExpression
 	public String kind()
 	{
 		return "subtract";
+	}
+	
+	// This is included in Java 8 Math.java
+	private long subtractExact(long x, long y, Context ctxt) throws ValueException
+	{
+		long r = x - y;
+		// HD 2-12 Overflow iff the arguments have different signs and
+		// the sign of the result is different than the sign of x
+
+		if (((x ^ y) & (x ^ r)) < 0)
+		{
+			throw new ValueException(4169, "Arithmetic overflow", ctxt);
+		}
+
+		return r;
 	}
 }
