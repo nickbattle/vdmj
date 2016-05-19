@@ -571,7 +571,9 @@ abstract public class Interpreter
 			throw new Exception("Trace " + lexname + " not found");
 		}
 
+		long before = System.currentTimeMillis();
 		TraceIterator tests = tracedef.getIterator(getTraceContext(tracedef.classDefinition));
+		long after = System.currentTimeMillis();
 
 		boolean wasDBGP = Settings.usingDBGP;
 		boolean wasCMD = Settings.usingCmdLine;
@@ -594,9 +596,15 @@ abstract public class Interpreter
 			throw new Exception("Trace " + lexname + " only has " + count + " tests");
 		}
 		
-		if (endTest == 0)
+		if (endTest == 0)		// To the end of the tests, if specified as zero
 		{
 			endTest = count;
+		}
+		
+		if (startTest > 0)		// Suppress any reduction if a range specified
+		{
+			subset = 1.0F;
+			reductionType = TraceReductionType.NONE;
 		}
 
 		int testNumber = 1;
@@ -606,12 +614,15 @@ abstract public class Interpreter
 
 		if (filter.getFilteredCount() > 0)
 		{
-			writer.println("Generated " + count + " tests, reduced to " + filter.getFilteredCount());
+			writer.print("Generated " + count + " tests, reduced to " + filter.getFilteredCount() + ",");
 		}
 		else
 		{
-			writer.println("Generated " + count + " tests");
+			writer.print("Generated " + count + " tests");
 		}
+		
+		writer.println(" in " + (double)(after-before)/1000 + " secs. ");
+		before = System.currentTimeMillis();
 
 		while (tests.hasMoreTests())
 		{
@@ -660,6 +671,9 @@ abstract public class Interpreter
 		{
 			writer.println("Excluded " + excluded + " tests");
 		}
+
+		after = System.currentTimeMillis();
+		writer.println("Executed in " + (double)(after-before)/1000 + " secs. ");
 		
 		return !failed;
 	}
