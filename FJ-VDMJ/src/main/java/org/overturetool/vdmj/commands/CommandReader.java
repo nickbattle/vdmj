@@ -492,11 +492,11 @@ abstract public class CommandReader
 			try
 			{
 				startTest = Integer.parseInt(parts[2]);
-				endTest = Integer.parseInt(parts[3]);
+				endTest = parts[3].equalsIgnoreCase("end") ? 0 : Integer.parseInt(parts[3]);
 			}
 			catch (NumberFormatException e)
 			{
-				println(parts[0] + " <name> [start number [end number]]");
+				println(parts[0] + " <name> [start number [end number or \"end\"]]");
 				return true;
 			}
 		}
@@ -522,10 +522,7 @@ abstract public class CommandReader
 				}
 			}
 			
-   			long before = System.currentTimeMillis();
    			boolean passed = interpreter.runtrace(line, startTest, endTest, debug, reduction, reductionType, traceseed);
-   			long after = System.currentTimeMillis();
-			println("Executed in " + (double)(after-before)/1000 + " secs. ");
 			
 			if (!debug && traceoutput != null)
 			{
