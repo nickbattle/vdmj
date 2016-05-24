@@ -305,6 +305,16 @@ public class ApplyExpression extends Expression
 				concern(isSimple, 3061, "Inappropriate type for argument " + i);
 				detail2(isSimple, "Expect", pt, "Actual", at);
 			}
+			else if (at instanceof FunctionType)
+			{
+				FunctionType fat = (FunctionType)at;
+				
+				if (fat.instantiated != null && !fat.instantiated)
+				{
+					// Cannot pass uninstantiated polymorphic function arguments
+					args.get(i-1).concern(isSimple, 3354, "Function argument must be instantiated");
+				}
+			}
 		}
 
 		return ftype.result;
