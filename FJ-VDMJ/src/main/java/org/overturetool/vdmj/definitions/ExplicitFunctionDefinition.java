@@ -177,7 +177,7 @@ public class ExplicitFunctionDefinition extends Definition
 		}
 	}
 
-	private DefinitionList getTypeParamDefinitions()
+	public DefinitionList getTypeParamDefinitions()
 	{
 		DefinitionList defs = new DefinitionList();
 
