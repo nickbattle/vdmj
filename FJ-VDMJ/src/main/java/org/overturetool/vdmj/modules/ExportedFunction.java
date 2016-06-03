@@ -31,7 +31,9 @@ import org.overturetool.vdmj.definitions.LocalDefinition;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.lex.LexNameToken;
+import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.NameScope;
+import org.overturetool.vdmj.typechecker.TypeComparator;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.util.Utils;
 
@@ -71,57 +73,6 @@ public class ExportedFunction extends Export
 			}
 			else
 			{
-				Type act = def.getType();
-
-				if (typeParams != null)
-				{
-					if (def instanceof ExplicitFunctionDefinition)
-					{
-						ExplicitFunctionDefinition efd = (ExplicitFunctionDefinition)def;
-						
-						if (efd.typeParams == null)
-						{
-							report(3352, "Exported " + name + " function has no type paramaters");
-						}
-						else if (!efd.typeParams.equals(typeParams))
-						{
-							report(3353, "Exported " + name + " function type parameters incorrect");
-							detail2("Exported", typeParams, "Actual", efd.typeParams);
-						}
-						
-						if (act != null && !act.toString().equals(type.toString()))
-						{
-							report(3184, "Exported " + name + " function type incorrect");
-							detail2("Exported", type, "Actual", act);
-						}
-					}
-					else if (def instanceof ImplicitFunctionDefinition)
-					{
-						ImplicitFunctionDefinition ifd = (ImplicitFunctionDefinition)def;
-						
-						if (ifd.typeParams == null)
-						{
-							report(3352, "Exported " + name + " function has no type paramaters");
-						}
-						else if (!ifd.typeParams.equals(typeParams))
-						{
-							report(3353, "Exported " + name + " function type parameters incorrect");
-							detail2("Exported", typeParams, "Actual", ifd.typeParams);
-						}
-						
-						if (act != null && !act.toString().equals(type.toString()))
-						{
-							report(3184, "Exported " + name + " function type incorrect");
-							detail2("Exported", type, "Actual", act);
-						}
-					}
-				}
-				else if (act != null && !act.equals(type))
-				{
-					report(3184, "Exported " + name + " function type incorrect");
-					detail2("Exported", type, "Actual", act);
-				}
-
 				list.add(def);
 			}
 		}
@@ -140,5 +91,79 @@ public class ExportedFunction extends Export
 		}
 
 		return list;
+	}
+
+	@Override
+	public void typeCheck(Environment env, DefinitionList actualDefs)
+	{
+		Type resolved = type;
+		
+		if (type.toString().indexOf('@') < 0)	// Don't check polymorphic types here
+		{
+			resolved = type.typeResolve(env, null);
+		}
+		
+		for (LexNameToken name: nameList)
+		{
+			Definition def = actualDefs.findName(name, NameScope.NAMES);
+
+			if (def == null)
+			{
+				report(3183, "Exported function " + name + " not defined in module");
+			}
+			else
+			{
+				Type actualType = def.getType();
+
+				if (typeParams != null)
+				{
+					if (def instanceof ExplicitFunctionDefinition)
+					{
+						ExplicitFunctionDefinition efd = (ExplicitFunctionDefinition)def;
+						
+						if (efd.typeParams == null)
+						{
+							report(3352, "Exported " + name + " function has no type paramaters");
+						}
+						else if (!efd.typeParams.equals(typeParams))
+						{
+							report(3353, "Exported " + name + " function type parameters incorrect");
+							detail2("Exported", typeParams, "Actual", efd.typeParams);
+						}
+						
+						if (actualType != null && !actualType.toString().equals(type.toString()))
+						{
+							report(3184, "Exported " + name + " function type incorrect");
+							detail2("Exported", type, "Actual", actualType);
+						}
+					}
+					else if (def instanceof ImplicitFunctionDefinition)
+					{
+						ImplicitFunctionDefinition ifd = (ImplicitFunctionDefinition)def;
+						
+						if (ifd.typeParams == null)
+						{
+							report(3352, "Exported " + name + " function has no type paramaters");
+						}
+						else if (!ifd.typeParams.equals(typeParams))
+						{
+							report(3353, "Exported " + name + " function type parameters incorrect");
+							detail2("Exported", typeParams, "Actual", ifd.typeParams);
+						}
+						
+						if (actualType != null && !actualType.toString().equals(type.toString()))
+						{
+							report(3184, "Exported " + name + " function type incorrect");
+							detail2("Exported", type, "Actual", actualType);
+						}
+					}
+				}
+				else if (actualType != null && !TypeComparator.compatible(resolved, actualType))
+				{
+					report(3184, "Exported " + name + " function type incorrect");
+					detail2("Exported", resolved, "Actual", actualType);
+				}
+			}
+		}
 	}
 }

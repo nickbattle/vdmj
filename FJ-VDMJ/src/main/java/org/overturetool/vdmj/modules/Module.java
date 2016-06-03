@@ -215,6 +215,18 @@ public class Module implements Serializable
 	}
 
 	/**
+	 * Type check the exports, compared to their local definitions.
+	 */
+
+	public void typeCheckExports()
+	{
+		if (exports != null)
+		{
+			exports.typeCheck(new ModuleEnvironment(this), defs);
+		}
+	}
+
+	/**
 	 * Return the module's state context, if any. Modules which define
 	 * state produce a {@link Context} object that contains the state field
 	 * values. This is independent of the initial context.

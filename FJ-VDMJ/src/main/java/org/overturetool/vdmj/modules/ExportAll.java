@@ -25,6 +25,7 @@ package org.overturetool.vdmj.modules;
 
 import org.overturetool.vdmj.definitions.DefinitionList;
 import org.overturetool.vdmj.lex.LexLocation;
+import org.overturetool.vdmj.typechecker.Environment;
 
 public class ExportAll extends Export
 {
@@ -51,5 +52,11 @@ public class ExportAll extends Export
 	public String toString()
 	{
 		return "export all";
+	}
+
+	@Override
+	public void typeCheck(Environment env, DefinitionList actualDefs)
+	{
+		return;		// Implicitly OK.
 	}
 }

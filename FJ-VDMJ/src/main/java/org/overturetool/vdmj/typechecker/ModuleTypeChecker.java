@@ -246,6 +246,7 @@ public class ModuleTypeChecker extends TypeChecker
     			try
     			{
     				m.typeCheckImports();		// Imports compared to exports
+    				m.typeCheckExports();		// Exports compared to definitions
     			}
     			catch (TypeCheckException te)
     			{

@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.definitions.DefinitionList;
+import org.overturetool.vdmj.typechecker.ModuleEnvironment;
 
 
 public class ModuleExports implements Serializable
@@ -92,5 +93,16 @@ public class ModuleExports implements Serializable
 		}
 
 		return exportDefs;
+	}
+
+	public void typeCheck(ModuleEnvironment env, DefinitionList actualDefs)
+	{
+		for (List<Export> etype: exports)
+		{
+			for (Export exp: etype)
+			{
+				exp.typeCheck(env, actualDefs);
+			}
+		}
 	}
 }

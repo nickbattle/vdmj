@@ -329,7 +329,8 @@ public class ModuleReader extends SyntaxReader
 		list.add(readExportedType());
 
 		while (lastToken().isNot(Token.DEFINITIONS) &&
-			   lastToken().isNot(Token.USELIB) && !newType())
+			   lastToken().isNot(Token.USELIB) &&
+			   lastToken().isNot(Token.IMPORTS) && !newType())
 		{
 			list.add(readExportedType());
 		}
@@ -354,7 +355,8 @@ public class ModuleReader extends SyntaxReader
 		list.add(readExportedValue());
 
 		while (lastToken().isNot(Token.DEFINITIONS) &&
-			   lastToken().isNot(Token.USELIB) && !newType())
+			   lastToken().isNot(Token.USELIB) &&
+			   lastToken().isNot(Token.IMPORTS) && !newType())
 		{
 			list.add(readExportedValue());
 		}
