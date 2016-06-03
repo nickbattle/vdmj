@@ -30,7 +30,9 @@ import org.overturetool.vdmj.definitions.UntypedDefinition;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.lex.LexNameToken;
+import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.NameScope;
+import org.overturetool.vdmj.typechecker.TypeComparator;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.util.Utils;
 
@@ -73,14 +75,6 @@ public class ExportedValue extends Export
 			}
 			else
 			{
-				Type act = def.getType();
-
-				if (act != null && !act.equals(type))
-				{
-					report(3189, "Exported type does not match actual type");
-					detail2("Exported", type, "Actual", act);
-				}
-
 				list.add(def);
 			}
 		}
@@ -99,5 +93,27 @@ public class ExportedValue extends Export
 		}
 
 		return list;
+	}
+
+	@Override
+	public void typeCheck(Environment env, DefinitionList actualDefs)
+	{
+		Type resolved = type.typeResolve(env, null);
+		
+		for (LexNameToken name: nameList)
+		{
+			Definition actual = actualDefs.findName(name, NameScope.GLOBAL);
+			
+			if (actual != null)
+			{
+    			Type actualType = actual.getType();
+    			
+				if (actualType != null && !TypeComparator.compatible(resolved, actualType))
+				{
+					report(3189, "Exported type does not match actual type");
+					detail2("Exported", resolved, "Actual", actualType);
+				}
+			}
+		}
 	}
 }

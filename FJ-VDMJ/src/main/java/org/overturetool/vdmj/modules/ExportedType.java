@@ -27,6 +27,7 @@ import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.definitions.DefinitionList;
 import org.overturetool.vdmj.definitions.TypeDefinition;
 import org.overturetool.vdmj.lex.LexNameToken;
+import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.types.InvariantType;
 import org.overturetool.vdmj.types.NamedType;
 import org.overturetool.vdmj.types.RecordType;
@@ -101,5 +102,11 @@ public class ExportedType extends Export
 	public DefinitionList getDefinition()
 	{
 		return new DefinitionList();
+	}
+
+	@Override
+	public void typeCheck(Environment env, DefinitionList actualDefs)
+	{
+		return;		// Implicitly agrees with type
 	}
 }

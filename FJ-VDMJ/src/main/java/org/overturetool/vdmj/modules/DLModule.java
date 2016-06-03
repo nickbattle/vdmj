@@ -61,6 +61,12 @@ public class DLModule extends Module
 			exportdefs.addAll(exports.getDefinitions());
 		}
 	}
+	
+	@Override
+	public void typeCheckExports()
+	{
+		return;		// We cannot check the content of the library
+	}
 
 	@Override
 	public String toString()

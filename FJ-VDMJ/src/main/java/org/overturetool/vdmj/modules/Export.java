@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import org.overturetool.vdmj.definitions.DefinitionList;
 import org.overturetool.vdmj.lex.LexLocation;
+import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.TypeChecker;
 
 /**
@@ -57,6 +58,9 @@ abstract public class Export implements Serializable
 
 	/** Lookup the actual definition of the export declaration. */
 	abstract public DefinitionList getDefinition(DefinitionList actualDefs);
+
+	/** Check that the export types match the defined types. */
+	abstract public void typeCheck(Environment env, DefinitionList actualDefs);
 
 	/**
 	 * @see org.overturetool.vdmj.definitions.Definition#report

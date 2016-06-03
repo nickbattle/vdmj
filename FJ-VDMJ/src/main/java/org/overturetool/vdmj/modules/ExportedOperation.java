@@ -29,7 +29,9 @@ import org.overturetool.vdmj.definitions.LocalDefinition;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.lex.LexNameToken;
+import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.NameScope;
+import org.overturetool.vdmj.typechecker.TypeComparator;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.util.Utils;
 
@@ -93,5 +95,28 @@ public class ExportedOperation extends Export
 		}
 
 		return list;
+	}
+
+
+	@Override
+	public void typeCheck(Environment env, DefinitionList actualDefs)
+	{
+		Type resolved = type.typeResolve(env, null);
+		
+		for (LexNameToken name: nameList)
+		{
+			Definition actual = actualDefs.findName(name, NameScope.GLOBAL);
+
+			if (actual != null)
+			{
+    			Type actualType = actual.getType();
+    			
+				if (actualType != null && !TypeComparator.compatible(resolved, actualType))
+				{
+					report(3186, "Exported operation type does not match actual type");
+					detail2("Exported", resolved, "Actual", actualType);
+				}
+			}
+		}
 	}
 }
