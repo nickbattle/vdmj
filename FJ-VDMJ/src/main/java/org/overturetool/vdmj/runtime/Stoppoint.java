@@ -56,11 +56,16 @@ public class Stoppoint extends Breakpoint
 
 			try
 			{
+				ctxt.threadState.setAtomic(true);
 				stop = (parsed == null) ? true : parsed.eval(ctxt).boolValue(ctxt);
 			}
 			catch (Exception e)
 			{
 				println("Breakpoint [" + number + "]: " + e.getMessage() + " \"" + trace + "\"");
+			}
+			finally
+			{
+				ctxt.threadState.setAtomic(false);
 			}
 
 			if (stop)
