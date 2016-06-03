@@ -161,7 +161,7 @@ public class ImplicitFunctionDefinition extends Definition
 		}
 	}
 
-	private DefinitionList getTypeParamDefinitions()
+	public DefinitionList getTypeParamDefinitions()
 	{
 		DefinitionList defs = new DefinitionList();
 

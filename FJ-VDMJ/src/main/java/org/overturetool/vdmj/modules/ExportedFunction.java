@@ -32,6 +32,7 @@ import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.typechecker.Environment;
+import org.overturetool.vdmj.typechecker.FlatCheckedEnvironment;
 import org.overturetool.vdmj.typechecker.NameScope;
 import org.overturetool.vdmj.typechecker.TypeComparator;
 import org.overturetool.vdmj.types.Type;
@@ -96,13 +97,6 @@ public class ExportedFunction extends Export
 	@Override
 	public void typeCheck(Environment env, DefinitionList actualDefs)
 	{
-		Type resolved = type;
-		
-		if (type.toString().indexOf('@') < 0)	// Don't check polymorphic types here
-		{
-			resolved = type.typeResolve(env, null);
-		}
-		
 		for (LexNameToken name: nameList)
 		{
 			Definition def = actualDefs.findName(name, NameScope.NAMES);
@@ -120,6 +114,10 @@ public class ExportedFunction extends Export
 					if (def instanceof ExplicitFunctionDefinition)
 					{
 						ExplicitFunctionDefinition efd = (ExplicitFunctionDefinition)def;
+						FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
+							efd.getTypeParamDefinitions(), env, NameScope.NAMES);
+
+						Type resolved = type.typeResolve(params, null);
 						
 						if (efd.typeParams == null)
 						{
@@ -131,15 +129,19 @@ public class ExportedFunction extends Export
 							detail2("Exported", typeParams, "Actual", efd.typeParams);
 						}
 						
-						if (actualType != null && !actualType.toString().equals(type.toString()))
+						if (actualType != null && !actualType.toString().equals(resolved.toString()))
 						{
 							report(3184, "Exported " + name + " function type incorrect");
-							detail2("Exported", type, "Actual", actualType);
+							detail2("Exported", resolved, "Actual", actualType);
 						}
 					}
 					else if (def instanceof ImplicitFunctionDefinition)
 					{
 						ImplicitFunctionDefinition ifd = (ImplicitFunctionDefinition)def;
+						FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
+							ifd.getTypeParamDefinitions(), env, NameScope.NAMES);
+
+						Type resolved = type.typeResolve(params, null);
 						
 						if (ifd.typeParams == null)
 						{
@@ -151,17 +153,22 @@ public class ExportedFunction extends Export
 							detail2("Exported", typeParams, "Actual", ifd.typeParams);
 						}
 						
-						if (actualType != null && !actualType.toString().equals(type.toString()))
+						if (actualType != null && !actualType.toString().equals(resolved.toString()))
 						{
 							report(3184, "Exported " + name + " function type incorrect");
-							detail2("Exported", type, "Actual", actualType);
+							detail2("Exported", resolved, "Actual", actualType);
 						}
 					}
 				}
-				else if (actualType != null && !TypeComparator.compatible(resolved, actualType))
+				else
 				{
-					report(3184, "Exported " + name + " function type incorrect");
-					detail2("Exported", resolved, "Actual", actualType);
+					Type resolved = type.typeResolve(env, null);
+					
+					if (actualType != null && !TypeComparator.compatible(resolved, actualType))
+					{
+						report(3184, "Exported " + name + " function type incorrect");
+						detail2("Exported", resolved, "Actual", actualType);
+					}
 				}
 			}
 		}
