@@ -63,20 +63,8 @@ public class ExportedOperation extends Export
 		{
 			Definition def = actualDefs.findName(name, NameScope.NAMES);
 
-			if (def == null)
+			if (def != null)
 			{
-				report(3185, "Exported operation " + name + " not defined in module");
-			}
-			else
-			{
-				Type act = def.getType();
-
-				if (act != null && !act.equals(type))
-				{
-					report(3186, "Exported operation type does not match actual type");
-					detail2("Exported", type, "Actual", act);
-				}
-
 				list.add(def);
 			}
 		}
@@ -107,7 +95,11 @@ public class ExportedOperation extends Export
 		{
 			Definition actual = actualDefs.findName(name, NameScope.GLOBAL);
 
-			if (actual != null)
+			if (actual == null)
+			{
+				report(3185, "Exported operation " + name + " not defined in module");
+			}
+			else
 			{
     			Type actualType = actual.getType();
     			

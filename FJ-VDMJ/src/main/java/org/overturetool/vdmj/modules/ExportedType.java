@@ -58,11 +58,7 @@ public class ExportedType extends Export
 		DefinitionList list = new DefinitionList();
 		Definition def = actualDefs.findType(name, name.module);
 
-		if (def == null)
-		{
-			report(3187, "Exported type " + name + " not defined in module");
-		}
-		else
+		if (def != null)
 		{
 			if (struct)
 			{
@@ -107,6 +103,11 @@ public class ExportedType extends Export
 	@Override
 	public void typeCheck(Environment env, DefinitionList actualDefs)
 	{
-		return;		// Implicitly agrees with type
+		Definition def = actualDefs.findType(name, name.module);
+
+		if (def == null)
+		{
+			report(3187, "Exported type " + name + " not defined in module");
+		}
 	}
 }
