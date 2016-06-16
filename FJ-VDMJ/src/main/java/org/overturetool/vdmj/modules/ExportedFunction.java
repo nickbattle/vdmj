@@ -68,11 +68,7 @@ public class ExportedFunction extends Export
 		{
 			Definition def = actualDefs.findName(name, NameScope.NAMES);
 
-			if (def == null)
-			{
-				report(3183, "Exported function " + name + " not defined in module");
-			}
-			else
+			if (def != null)
 			{
 				list.add(def);
 			}

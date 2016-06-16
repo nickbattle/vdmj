@@ -64,18 +64,17 @@ public class ExportedValue extends Export
 		{
 			Definition def = actualDefs.findName(name, NameScope.NAMES);
 
-			if (def == null)
+			if (def != null)
 			{
-				report(3188, "Exported value " + name + " not defined in module");
-			}
-			else if (def instanceof UntypedDefinition)
-			{
-				UntypedDefinition untyped = (UntypedDefinition)def;
-				list.add(new LocalDefinition(untyped.location, untyped.name, NameScope.GLOBAL, type));
-			}
-			else
-			{
-				list.add(def);
+    			if (def instanceof UntypedDefinition)
+    			{
+    				UntypedDefinition untyped = (UntypedDefinition)def;
+    				list.add(new LocalDefinition(untyped.location, untyped.name, NameScope.GLOBAL, type));
+    			}
+    			else
+    			{
+    				list.add(def);
+    			}
 			}
 		}
 
@@ -104,7 +103,11 @@ public class ExportedValue extends Export
 		{
 			Definition actual = actualDefs.findName(name, NameScope.GLOBAL);
 			
-			if (actual != null)
+			if (actual == null)
+			{
+				report(3188, "Exported value " + name + " not defined in module");
+			}
+			else
 			{
     			Type actualType = actual.getType();
     			
