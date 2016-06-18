@@ -77,6 +77,32 @@ public class TypeSet extends TreeSet<Type>
 				remove(s1t);	// Replace seq with seq1
 			}
 		}
+		else if (t instanceof Set1Type)
+		{
+			// If we add a Set1Type, and there is already a SetType in the set
+			// we ignore the Set1Type.
+			
+			Set1Type s1t = (Set1Type)t;
+			SetType st = new SetType(s1t.location, s1t.setof);
+			
+			if (contains(st))
+			{
+				return false;	// Was already there
+			}
+		}
+		else if (t instanceof SetType)
+		{
+			// If we add a SetType, and there is already a Set1Type in the set
+			// we replace the Set1Type.
+			
+			SetType st = (SetType)t;
+			SetType s1t = new Set1Type(st.location, st.setof);
+			
+			if (contains(s1t))
+			{
+				remove(s1t);	// Replace seq with set1
+			}
+		}
 		else if (t instanceof NumericType)
 		{
 			for (Type x: this)

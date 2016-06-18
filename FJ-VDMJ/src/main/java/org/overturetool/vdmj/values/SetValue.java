@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
+import org.overturetool.vdmj.types.Set1Type;
 import org.overturetool.vdmj.types.SetType;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.types.TypeSet;
@@ -148,6 +149,11 @@ public class SetValue extends Value
 	{
 		if (to instanceof SetType)
 		{
+			if (to instanceof Set1Type && values.isEmpty())
+			{
+				abort(4170, "Cannot convert empty set to set1", ctxt);
+			}
+
 			SetType setto = (SetType)to;
 			ValueSet ns = new ValueSet();
 

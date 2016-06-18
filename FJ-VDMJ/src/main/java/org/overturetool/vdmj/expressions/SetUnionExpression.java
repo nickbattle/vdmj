@@ -28,9 +28,12 @@ import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
 import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.NameScope;
+import org.overturetool.vdmj.types.Set1Type;
+import org.overturetool.vdmj.types.SetType;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.types.TypeList;
 import org.overturetool.vdmj.types.TypeSet;
+import org.overturetool.vdmj.types.UnknownType;
 import org.overturetool.vdmj.values.SetValue;
 import org.overturetool.vdmj.values.Value;
 import org.overturetool.vdmj.values.ValueSet;
@@ -53,15 +56,26 @@ public class SetUnionExpression extends BinaryExpression
 		if (!ltype.isSet())
 		{
 			report(3168, "Left hand of " + op + " is not a set");
+			ltype = new SetType(location, new UnknownType(location));
 		}
 
 		if (!rtype.isSet())
 		{
 			report(3169, "Right hand of " + op + " is not a set");
+			rtype = new SetType(location, new UnknownType(location));
 		}
 
-		TypeSet result = new TypeSet(ltype, rtype);
-		return result.getType(location);
+		Type lof = ltype.getSet();
+		Type rof = rtype.getSet();
+		boolean set1 = (lof instanceof Set1Type) || (rof instanceof Set1Type);
+		
+		lof = ((SetType)lof).setof;
+		rof = ((SetType)rof).setof;
+		TypeSet ts = new TypeSet(lof, rof);
+		
+		return set1 ?
+			new Set1Type(location, ts.getType(location)) :
+			new SetType(location, ts.getType(location));
 	}
 
 	@Override

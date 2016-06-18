@@ -374,6 +374,7 @@ as the expected and actual values.
 2323, "Object patterns not available in VDM classic"
 2324, "Pure only permitted for operations"
 2325, "Pure operations are not available in classic"
+2326, "Expecting 'of' after set1"
 
 3000, "Expression does not match declared type"
 3001, "Class inherits thread definition from multiple supertypes"
@@ -897,6 +898,7 @@ as the expected and actual values.
 4167, "Cannot call exit in a pure operation"
 4168, "Arguments do not match parameters: <name(params)>"
 4169, "Arithmetic overflow"
+4170, "Cannot convert empty set to set1"
 
 
 5000, "Definition <name> not used"

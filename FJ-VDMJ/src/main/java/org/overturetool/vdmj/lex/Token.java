@@ -150,6 +150,7 @@ public enum Token implements Serializable
 	MAP("map", "map", VDM_SL, VDM_PP, VDM_RT),
 	INMAP("inmap", "inmap", VDM_SL, VDM_PP, VDM_RT),
 	SET("set", "set", VDM_SL, VDM_PP, VDM_RT),
+	SET1("set1", "set1", VDM_SL, VDM_PP, VDM_RT),
 	SEQ("seq", "seq", VDM_SL, VDM_PP, VDM_RT),
 	SEQ1("seq1", "seq1", VDM_SL, VDM_PP, VDM_RT),
 	OF("of", "of", VDM_SL, VDM_PP, VDM_RT),

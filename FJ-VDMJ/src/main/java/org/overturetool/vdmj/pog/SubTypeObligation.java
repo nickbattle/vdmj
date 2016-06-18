@@ -66,6 +66,7 @@ import org.overturetool.vdmj.types.ProductType;
 import org.overturetool.vdmj.types.RecordType;
 import org.overturetool.vdmj.types.Seq1Type;
 import org.overturetool.vdmj.types.SeqType;
+import org.overturetool.vdmj.types.Set1Type;
 import org.overturetool.vdmj.types.SetType;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.types.TypeSet;
@@ -432,12 +433,20 @@ public class SubTypeObligation extends ProofObligation
 		}
 		else if (etype instanceof SetType)
 		{
+			prefix = "";
+
+			if (etype instanceof Set1Type)
+			{
+    			sb.append(exp);
+    			sb.append(" <> {}");
+    			prefix = " and ";
+			}
+
 			if (exp instanceof SetEnumExpression)
 			{
 				SetType stype = (SetType)etype;
 				SetEnumExpression set = (SetEnumExpression)exp;
 				Iterator<Type> it = set.types.iterator();
-				prefix = "";
 
 				for (Expression m: set.members)
 				{
@@ -460,7 +469,6 @@ public class SubTypeObligation extends ProofObligation
 				SetType stype = (SetType)etype;
 				SetRangeExpression range = (SetRangeExpression)exp;
 				Type itype = new IntegerType(exp.location);
-				prefix = "";
 
 				String s = oneType(true, range.first, itype, range.ftype);
 

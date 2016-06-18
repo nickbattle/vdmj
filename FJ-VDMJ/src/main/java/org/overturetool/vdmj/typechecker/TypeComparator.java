@@ -42,6 +42,7 @@ import org.overturetool.vdmj.types.ProductType;
 import org.overturetool.vdmj.types.RecordType;
 import org.overturetool.vdmj.types.Seq1Type;
 import org.overturetool.vdmj.types.SeqType;
+import org.overturetool.vdmj.types.Set1Type;
 import org.overturetool.vdmj.types.SetType;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.types.TypeList;
@@ -389,7 +390,7 @@ public class TypeComparator
 					 searchCompatible(ma.to, mb.to, paramOnly) == Result.Yes)) ?
 							Result.Yes : Result.No;
 			}
-			else if (to instanceof SetType)
+			else if (to instanceof SetType)	// Includes set1
 			{
 				if (!(from instanceof SetType))
 				{
@@ -398,6 +399,11 @@ public class TypeComparator
 
 				SetType sa = (SetType)to;
 				SetType sb = (SetType)from;
+
+				if (to instanceof Set1Type && sb.empty)
+				{
+					return Result.No;
+				}
 
 				return (sa.empty || sb.empty ||
 						searchCompatible(sa.setof, sb.setof, paramOnly) == Result.Yes) ?
@@ -829,7 +835,7 @@ public class TypeComparator
 					return Result.No;
 				}
 			}
-			else if (sub instanceof SetType)
+			else if (sub instanceof SetType)	// Includes set1
 			{
 				if (!(sup instanceof SetType))
 				{
@@ -839,9 +845,25 @@ public class TypeComparator
 				SetType subs = (SetType)sub;
 				SetType sups = (SetType)sup;
 
-				return (subs.empty || sups.empty ||
-						searchSubType(subs.setof, sups.setof, invignore) == Result.Yes) ?
-							Result.Yes : Result.No;
+				if ((subs.empty && !(sup instanceof Set1Type)) || sups.empty)
+				{
+					return Result.Yes;
+				}
+
+				if (searchSubType(subs.setof, sups.setof, invignore) == Result.Yes)
+				{
+					if (!(sub instanceof Set1Type) &&
+						 (sup instanceof Set1Type))
+					{
+						return Result.No;
+					}
+					
+					return Result.Yes;
+				}
+				else
+				{
+					return Result.No;
+				}
 			}
 			else if (sub instanceof SeqType)	// Includes seq1
 			{

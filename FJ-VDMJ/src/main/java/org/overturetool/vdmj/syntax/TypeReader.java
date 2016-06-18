@@ -54,6 +54,7 @@ import org.overturetool.vdmj.types.RealType;
 import org.overturetool.vdmj.types.RecordType;
 import org.overturetool.vdmj.types.Seq1Type;
 import org.overturetool.vdmj.types.SeqType;
+import org.overturetool.vdmj.types.Set1Type;
 import org.overturetool.vdmj.types.SetType;
 import org.overturetool.vdmj.types.TokenType;
 import org.overturetool.vdmj.types.Type;
@@ -284,6 +285,12 @@ public class TypeReader extends SyntaxReader
 				nextToken();
 				checkFor(Token.OF, 2253, "Expecting 'of' after set");
 				type = new SetType(token.location, readComposeType());
+				break;
+
+			case SET1:
+				nextToken();
+				checkFor(Token.OF, 2326, "Expecting 'of' after set1");
+				type = new Set1Type(token.location, readComposeType());
 				break;
 
 			case SEQ:

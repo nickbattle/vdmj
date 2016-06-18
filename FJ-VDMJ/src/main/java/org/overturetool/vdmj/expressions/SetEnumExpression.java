@@ -30,6 +30,7 @@ import org.overturetool.vdmj.pog.ProofObligationList;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.NameScope;
+import org.overturetool.vdmj.types.Set1Type;
 import org.overturetool.vdmj.types.SetType;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.types.TypeList;
@@ -85,7 +86,7 @@ public class SetEnumExpression extends SetExpression
 		}
 
 		return ts.isEmpty() ? new SetType(location) :
-					new SetType(location, ts.getType(location));
+					new Set1Type(location, ts.getType(location));
 	}
 
 	@Override
