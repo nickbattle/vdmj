@@ -33,7 +33,6 @@ import org.overturetool.vdmj.types.Set1Type;
 import org.overturetool.vdmj.types.SetType;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.types.TypeList;
-import org.overturetool.vdmj.types.UnknownType;
 import org.overturetool.vdmj.values.SetValue;
 import org.overturetool.vdmj.values.Value;
 import org.overturetool.vdmj.values.ValueSet;
@@ -56,7 +55,6 @@ public class SetDifferenceExpression extends BinaryExpression
 		if (!ltype.isSet())
 		{
 			report(3160, "Left hand of '\\' is not a set");
-			ltype = new SetType(location, new UnknownType(location));
 		}
 
 		if (!rtype.isSet())

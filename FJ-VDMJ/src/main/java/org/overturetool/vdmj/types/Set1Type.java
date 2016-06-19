@@ -25,6 +25,10 @@ package org.overturetool.vdmj.types;
 
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameToken;
+import org.overturetool.vdmj.runtime.Context;
+import org.overturetool.vdmj.runtime.ValueException;
+import org.overturetool.vdmj.values.SetValue;
+import org.overturetool.vdmj.values.ValueList;
 
 public class Set1Type extends SetType
 {
@@ -59,5 +63,13 @@ public class Set1Type extends SetType
 		}
 
 		return false;
+	}
+
+	@Override
+	public ValueList getAllValues(Context ctxt) throws ValueException
+	{
+		ValueList all = super.getAllValues(ctxt);
+		all.remove(new SetValue());  // Remove {}
+		return all;
 	}
 }
