@@ -24,6 +24,7 @@
 package org.overturetool.vdmj.types;
 
 import org.overturetool.vdmj.lex.LexLocation;
+import org.overturetool.vdmj.lex.LexNameToken;
 
 public class Set1Type extends SetType
 {
@@ -38,5 +39,25 @@ public class Set1Type extends SetType
 	public String toDisplay()
 	{
 		return "set1 of (" + setof + ")";
+	}
+
+	@Override
+	public Type polymorph(LexNameToken pname, Type actualType)
+	{
+		return new Set1Type(location, setof.polymorph(pname, actualType));
+	}
+
+	@Override
+	public boolean equals(Object other)
+	{
+		other = deBracket(other);
+
+		if (other.getClass().equals(Set1Type.class))
+		{
+			Set1Type os = (Set1Type)other;
+			return setof.equals(os.setof);
+		}
+
+		return false;
 	}
 }

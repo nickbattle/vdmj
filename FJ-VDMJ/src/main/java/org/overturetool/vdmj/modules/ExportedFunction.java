@@ -34,7 +34,6 @@ import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.FlatCheckedEnvironment;
 import org.overturetool.vdmj.typechecker.NameScope;
-import org.overturetool.vdmj.typechecker.TypeComparator;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.util.Utils;
 
@@ -160,7 +159,8 @@ public class ExportedFunction extends Export
 				{
 					Type resolved = type.typeResolve(env, null);
 					
-					if (actualType != null && !TypeComparator.compatible(resolved, actualType))
+					// if (actualType != null && !TypeComparator.compatible(resolved, actualType))
+					if (actualType != null && !actualType.equals(resolved))
 					{
 						report(3184, "Exported " + name + " function type incorrect");
 						detail2("Exported", resolved, "Actual", actualType);

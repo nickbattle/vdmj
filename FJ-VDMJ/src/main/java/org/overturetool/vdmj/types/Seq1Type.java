@@ -24,6 +24,7 @@
 package org.overturetool.vdmj.types;
 
 import org.overturetool.vdmj.lex.LexLocation;
+import org.overturetool.vdmj.lex.LexNameToken;
 
 public class Seq1Type extends SeqType
 {
@@ -38,5 +39,25 @@ public class Seq1Type extends SeqType
 	public String toDisplay()
 	{
 		return "seq1 of (" + seqof + ")";
+	}
+
+	@Override
+	public Type polymorph(LexNameToken pname, Type actualType)
+	{
+		return new Seq1Type(location, seqof.polymorph(pname, actualType));
+	}
+
+	@Override
+	public boolean equals(Object other)
+	{
+		other = deBracket(other);
+
+		if (other.getClass().equals(Seq1Type.class))
+		{
+			Seq1Type os = (Seq1Type)other;
+			return seqof.equals(os.seqof);
+		}
+
+		return false;
 	}
 }

@@ -117,7 +117,7 @@ public class SetType extends Type
 	{
 		other = deBracket(other);
 
-		if (other instanceof SetType)
+		if (other.getClass().equals(SetType.class))
 		{
 			SetType os = (SetType)other;
 			// NB empty set same type as any set

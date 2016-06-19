@@ -110,7 +110,7 @@ public class SeqType extends Type
 	{
 		other = deBracket(other);
 
-		if (other instanceof SeqType)
+		if (other.getClass().equals(SeqType.class))
 		{
 			SeqType os = (SeqType)other;
 			// NB. Empty sequence is the same type as any sequence
