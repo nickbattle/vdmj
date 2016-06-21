@@ -50,6 +50,7 @@ import org.overturetool.vdmj.patterns.Bind;
 import org.overturetool.vdmj.patterns.MultipleBind;
 import org.overturetool.vdmj.patterns.Pattern;
 import org.overturetool.vdmj.patterns.PatternList;
+import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TypeBind;
 import org.overturetool.vdmj.typechecker.NameScope;
 import org.overturetool.vdmj.types.BooleanType;
@@ -1355,7 +1356,7 @@ public class ExpressionReader extends SyntaxReader
 		{
 			nextToken();
 			BindReader br = getBindReader();
-			Bind bind = br.readSetSeqBind();
+			SetBind setbind = br.readSetBind();
 			Expression exp = null;
 
 			if (lastToken().is(Token.AMPERSAND))
@@ -1365,7 +1366,7 @@ public class ExpressionReader extends SyntaxReader
 			}
 
 			checkFor(Token.SEQ_CLOSE, 2142, "Expecting ']' after list comprehension");
-			result = new SeqCompExpression(start, first, bind, exp);
+			result = new SeqCompExpression(start, first, setbind, exp);
 		}
 		else
 		{

@@ -374,7 +374,6 @@ as the expected and actual values.
 2323, "Object patterns not available in VDM classic"
 2324, "Pure only permitted for operations"
 2325, "Pure operations are not available in classic"
-2328, "Sequence binds are not available in classic"
 
 3000, "Expression does not match declared type"
 3001, "Class inherits thread definition from multiple supertypes"

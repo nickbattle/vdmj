@@ -66,28 +66,36 @@ public class SetBind extends Bind
 	}
 
 	@Override
-	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
+	public ValueList getBindValues(Context ctxt, boolean permuted)
 	{
-		ValueList results = new ValueList();
-		ValueSet elements = set.eval(ctxt).setValue(ctxt);
-		elements.sort();
-
-		for (Value e: elements)
+		try
 		{
-			e = e.deref();
+			ValueList results = new ValueList();
+			ValueSet elements = set.eval(ctxt).setValue(ctxt);
+			elements.sort();
 
-			if (e instanceof SetValue && permuted)
+			for (Value e: elements)
 			{
-				SetValue sv = (SetValue)e;
-				results.addAll(sv.permutedSets());
+				e = e.deref();
+
+				if (e instanceof SetValue && permuted)
+				{
+					SetValue sv = (SetValue)e;
+					results.addAll(sv.permutedSets());
+				}
+				else
+				{
+					results.add(e);
+				}
 			}
-			else
-			{
-				results.add(e);
-			}
+
+			return results;
 		}
-
-		return results;
+		catch (ValueException ex)
+		{
+			abort(ex);
+			return null;
+		}
 	}
 
 	@Override

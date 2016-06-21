@@ -29,7 +29,6 @@ import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.definitions.MultiBindListDefinition;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameList;
-import org.overturetool.vdmj.patterns.Bind;
 import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.pog.POForAllPredicateContext;
 import org.overturetool.vdmj.pog.POForAllContext;
@@ -57,33 +56,32 @@ public class SeqCompExpression extends SeqExpression
 {
 	private static final long serialVersionUID = 1L;
 	public final Expression first;
-	public final Bind bind;
+	public final SetBind setbind;
 	public final Expression predicate;
 
 	public SeqCompExpression(LexLocation start,
-		Expression first, Bind bind, Expression predicate)
+		Expression first, SetBind setbind, Expression predicate)
 	{
 		super(start);
 		this.first = first;
-		this.bind = bind;
+		this.setbind = setbind;
 		this.predicate = predicate;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "[" + first + " | " + bind +
+		return "[" + first + " | " + setbind +
 			(predicate == null ? "]" : " & " + predicate + "]");
 	}
 
 	@Override
 	public Type typeCheck(Environment base, TypeList qualifiers, NameScope scope, Type constraint)
 	{
-		Definition def = new MultiBindListDefinition(location, bind.getMultipleBindList());
+		Definition def = new MultiBindListDefinition(location, setbind.getMultipleBindList());
 		def.typeCheck(base, scope);
 
-		if (bind instanceof SetBind &&
-			(bind.pattern.getVariableNames().size() != 1 || !def.getType().isNumeric()))
+		if (setbind.pattern.getVariableNames().size() != 1 || !def.getType().isNumeric())
 		{
 			report(3155, "List comprehension must define one numeric bind variable");
 		}
@@ -114,29 +112,9 @@ public class SeqCompExpression extends SeqExpression
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-		ValueList allValues = null;
-		
-		try
-		{
-			allValues = bind.getBindValues(ctxt, false);
-		}
-		catch (ValueException e)
-		{
-			abort(e);
-		}
-		
-		if (bind instanceof SetBind)
-		{
-			return evalSetBind(allValues, ctxt);
-		}
-		else
-		{
-			return evalSeqBind(allValues, ctxt);
-		}
-	}
-	
-	private Value evalSetBind(ValueList allValues, Context ctxt)
-	{
+
+		ValueList allValues = setbind.getBindValues(ctxt, false);
+
 		ValueSet seq = new ValueSet();	// Bind variable values
 		ValueMap map = new ValueMap();	// Map bind values to output values
 
@@ -145,7 +123,7 @@ public class SeqCompExpression extends SeqExpression
 			try
 			{
 				Context evalContext = new Context(location, "seq comprehension", ctxt);
-				NameValuePairList nvpl = bind.pattern.getNamedValues(val, ctxt);
+				NameValuePairList nvpl = setbind.pattern.getNamedValues(val, ctxt);
 				Value sortOn = nvpl.get(0).value;
 
 				if (map.get(sortOn) == null)
@@ -186,37 +164,6 @@ public class SeqCompExpression extends SeqExpression
 		return new SeqValue(sorted);
 	}
 
-	private Value evalSeqBind(ValueList allValues, Context ctxt)
-	{
-		ValueList seq = new ValueList();	// Bind variable values
-
-		for (Value val: allValues)
-		{
-			try
-			{
-				Context evalContext = new Context(location, "seq comprehension", ctxt);
-				NameValuePairList nvpl = bind.pattern.getNamedValues(val, ctxt);
-
-				evalContext.putList(nvpl);
-
-				if (predicate == null || predicate.eval(evalContext).boolValue(ctxt))
-				{
-					seq.add(first.eval(evalContext));
-				}
-			}
-			catch (ValueException e)
-			{
-				abort(e);
-			}
-			catch (PatternMatchException e)
-			{
-				// Ignore mismatches
-			}
-		}
-
-		return new SeqValue(seq);
-	}
-
 	@Override
 	public Expression findExpression(int lineno)
 	{
@@ -238,7 +185,7 @@ public class SeqCompExpression extends SeqExpression
 		obligations.addAll(first.getProofObligations(ctxt));
 		ctxt.pop();
 
-		obligations.addAll(bind.getProofObligations(ctxt));
+		obligations.addAll(setbind.getProofObligations(ctxt));
 
 		if (predicate != null)
 		{
@@ -260,7 +207,7 @@ public class SeqCompExpression extends SeqExpression
 	public ValueList getValues(Context ctxt)
 	{
 		ValueList list = first.getValues(ctxt);
-		list.addAll(bind.getValues(ctxt));
+		list.addAll(setbind.getValues(ctxt));
 
 		if (predicate != null)
 		{
@@ -274,7 +221,7 @@ public class SeqCompExpression extends SeqExpression
 	public LexNameList getOldNames()
 	{
 		LexNameList list = first.getOldNames();
-		list.addAll(bind.getOldNames());
+		list.addAll(setbind.getOldNames());
 
 		if (predicate != null)
 		{
