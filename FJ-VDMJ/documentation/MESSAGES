@@ -375,6 +375,7 @@ as the expected and actual values.
 2324, "Pure only permitted for operations"
 2325, "Pure operations are not available in classic"
 2326, "Expecting 'of' after set1"
+2327, "Type set1 is not available in classic"
 
 3000, "Expression does not match declared type"
 3001, "Class inherits thread definition from multiple supertypes"
