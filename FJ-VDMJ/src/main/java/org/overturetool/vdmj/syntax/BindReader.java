@@ -33,7 +33,6 @@ import org.overturetool.vdmj.lex.LexTokenReader;
 import org.overturetool.vdmj.lex.Token;
 import org.overturetool.vdmj.patterns.Bind;
 import org.overturetool.vdmj.patterns.MultipleBind;
-import org.overturetool.vdmj.patterns.MultipleSeqBind;
 import org.overturetool.vdmj.patterns.MultipleSetBind;
 import org.overturetool.vdmj.patterns.MultipleTypeBind;
 import org.overturetool.vdmj.patterns.Pattern;
@@ -196,22 +195,11 @@ public class BindReader extends SyntaxReader
 		switch (lastToken().type)
 		{
 			case IN:
-				nextToken();
-				
-				if (lastToken().is(Token.SET))
+				if (nextToken().is(Token.SET))
 				{
 					nextToken();
-					mb = new MultipleSetBind(plist, getExpressionReader().readExpression());
-				}
-				else if (lastToken().is(Token.SEQ))
-				{
-					if (Settings.release == Release.CLASSIC)
-					{
-						throwMessage(2328, "Sequence binds are not available in classic");
-					}
-
-					nextToken();
-					mb = new MultipleSeqBind(plist, getExpressionReader().readExpression());
+					mb = new MultipleSetBind(
+							plist, getExpressionReader().readExpression());
 				}
 				else
 				{
