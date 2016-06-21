@@ -105,6 +105,6 @@ public class ClassTest extends OvertureTest
 
 	public void test_Set1()
 	{
-		evaluate("set1", ResultType.TRUE);
+		evaluate("set1", ResultType.TRUE, 0, Release.VDM_10);
 	}
 }
