@@ -56,7 +56,7 @@ public class POForAllContext extends POContext
 
 	public POForAllContext(SeqCompExpression exp)
 	{
-		this.bindings = exp.setbind.getMultipleBindList();
+		this.bindings = exp.bind.getMultipleBindList();
 	}
 
 	public POForAllContext(ForAllExpression exp)

@@ -26,16 +26,20 @@ package org.overturetool.vdmj.syntax;
 import java.util.List;
 import java.util.Vector;
 
+import org.overturetool.vdmj.Release;
+import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.lex.LexException;
 import org.overturetool.vdmj.lex.LexTokenReader;
 import org.overturetool.vdmj.lex.Token;
 import org.overturetool.vdmj.patterns.Bind;
 import org.overturetool.vdmj.patterns.MultipleBind;
+import org.overturetool.vdmj.patterns.MultipleSeqBind;
 import org.overturetool.vdmj.patterns.MultipleSetBind;
 import org.overturetool.vdmj.patterns.MultipleTypeBind;
 import org.overturetool.vdmj.patterns.Pattern;
 import org.overturetool.vdmj.patterns.PatternBind;
 import org.overturetool.vdmj.patterns.PatternList;
+import org.overturetool.vdmj.patterns.SeqBind;
 import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TypeBind;
 
@@ -91,7 +95,7 @@ public class BindReader extends SyntaxReader
 		try
 		{
 			reader.push();
-			Bind bind = readSetBind();
+			Bind bind = readSetSeqBind();
 			reader.unpush();
 			return bind;
 		}
@@ -117,29 +121,40 @@ public class BindReader extends SyntaxReader
 		}
 	}
 
-	public SetBind readSetBind() throws LexException, ParserException
+	public Bind readSetSeqBind() throws LexException, ParserException
 	{
 		Pattern pattern = getPatternReader().readPattern();
-		SetBind sb = null;
 
 		if (lastToken().is(Token.IN))
 		{
-			if (nextToken().is(Token.SET))
+			nextToken();
+			
+			if (lastToken().is(Token.SET))
 			{
 				nextToken();
-				sb = new SetBind(pattern, getExpressionReader().readExpression());
+				return new SetBind(pattern, getExpressionReader().readExpression());
+			}
+			else if (lastToken().is(Token.SEQ))
+			{
+				if (Settings.release == Release.CLASSIC)
+				{
+					throwMessage(2328, "Sequence binds are not available in classic");
+				}
+
+				nextToken();
+				return new SeqBind(pattern, getExpressionReader().readExpression());
 			}
 			else
 			{
-				throwMessage(2000, "Expecting 'in set' after pattern in set binding");
+				throwMessage(2000, "Expecting 'in set' or 'in seq' after pattern in binding");
 			}
 		}
 		else
 		{
-			throwMessage(2001, "Expecting 'in set' in set bind");
+			throwMessage(2001, "Expecting 'in set' or 'in seq' in set bind");
 		}
-
-		return sb;
+		
+		return null;	// Not reached
 	}
 
 	public TypeBind readTypeBind() throws LexException, ParserException
@@ -181,11 +196,22 @@ public class BindReader extends SyntaxReader
 		switch (lastToken().type)
 		{
 			case IN:
-				if (nextToken().is(Token.SET))
+				nextToken();
+				
+				if (lastToken().is(Token.SET))
 				{
 					nextToken();
-					mb = new MultipleSetBind(
-							plist, getExpressionReader().readExpression());
+					mb = new MultipleSetBind(plist, getExpressionReader().readExpression());
+				}
+				else if (lastToken().is(Token.SEQ))
+				{
+					if (Settings.release == Release.CLASSIC)
+					{
+						throwMessage(2328, "Sequence binds are not available in classic");
+					}
+
+					nextToken();
+					mb = new MultipleSeqBind(plist, getExpressionReader().readExpression());
 				}
 				else
 				{
