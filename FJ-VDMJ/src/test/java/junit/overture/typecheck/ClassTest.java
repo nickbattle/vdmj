@@ -56,7 +56,7 @@ public class ClassTest extends OvertureTest
 		typecheck("puretest");
 	}
 
-	public void test_set1()
+	public void test_Set1()
 	{
 		typecheck("set1");
 	}

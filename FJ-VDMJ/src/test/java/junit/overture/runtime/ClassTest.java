@@ -42,8 +42,8 @@ public class ClassTest extends OvertureTest
 		runtime("runtime3");
 	}
 
-	public void test_Runtime4() throws Exception
+	public void test_Set1() throws Exception
 	{
-		runtime("runtime4");
+		runtime("set1");
 	}
 }
