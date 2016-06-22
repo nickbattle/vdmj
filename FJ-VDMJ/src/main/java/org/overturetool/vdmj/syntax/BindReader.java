@@ -127,26 +127,23 @@ public class BindReader extends SyntaxReader
 
 		if (lastToken().is(Token.IN))
 		{
-			nextToken();
-			
-			if (lastToken().is(Token.SET))
+			switch (nextToken().type)
 			{
-				nextToken();
-				return new SetBind(pattern, getExpressionReader().readExpression());
-			}
-			else if (lastToken().is(Token.SEQ))
-			{
-				if (Settings.release == Release.CLASSIC)
-				{
-					throwMessage(2328, "Sequence binds are not available in classic");
-				}
+				case SET:
+    				nextToken();
+    				return new SetBind(pattern, getExpressionReader().readExpression());
 
-				nextToken();
-				return new SeqBind(pattern, getExpressionReader().readExpression());
-			}
-			else
-			{
-				throwMessage(2000, "Expecting 'in set' or 'in seq' after pattern in binding");
+				case SEQ:
+    				if (Settings.release == Release.CLASSIC)
+    				{
+    					throwMessage(2328, "Sequence binds are not available in classic");
+    				}
+    
+    				nextToken();
+    				return new SeqBind(pattern, getExpressionReader().readExpression());
+    				
+    			default:
+    				throwMessage(2000, "Expecting 'in set' or 'in seq' after pattern in binding");
 			}
 		}
 		else
@@ -196,26 +193,25 @@ public class BindReader extends SyntaxReader
 		switch (lastToken().type)
 		{
 			case IN:
-				nextToken();
-				
-				if (lastToken().is(Token.SET))
+				switch (nextToken().type)
 				{
-					nextToken();
-					mb = new MultipleSetBind(plist, getExpressionReader().readExpression());
-				}
-				else if (lastToken().is(Token.SEQ))
-				{
-					if (Settings.release == Release.CLASSIC)
-					{
-						throwMessage(2328, "Sequence binds are not available in classic");
-					}
+					case SET:
+    					nextToken();
+    					mb = new MultipleSetBind(plist, getExpressionReader().readExpression());
+    					break;
 
-					nextToken();
-					mb = new MultipleSeqBind(plist, getExpressionReader().readExpression());
-				}
-				else
-				{
-					throwMessage(2003, "Expecting 'in set' after pattern in binding");
+					case SEQ:
+    					if (Settings.release == Release.CLASSIC)
+    					{
+    						throwMessage(2328, "Sequence binds are not available in classic");
+    					}
+    
+    					nextToken();
+    					mb = new MultipleSeqBind(plist, getExpressionReader().readExpression());
+    					break;
+    					
+    				default:
+    					throwMessage(2003, "Expecting 'in set' or 'in seq' after pattern in binding");
 				}
 				break;
 
@@ -225,7 +221,7 @@ public class BindReader extends SyntaxReader
 				break;
 
 			default:
-				throwMessage(2004, "Expecting 'in set' or ':' after patterns");
+				throwMessage(2004, "Expecting 'in set', 'in seq' or ':' after patterns");
 		}
 
 		return mb;
