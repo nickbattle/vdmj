@@ -28,6 +28,7 @@ import org.overturetool.vdmj.definitions.DefinitionList;
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.patterns.PatternBind;
+import org.overturetool.vdmj.patterns.SeqBind;
 import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TypeBind;
 import org.overturetool.vdmj.pog.POContextStack;
@@ -43,6 +44,7 @@ import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.types.TypeSet;
 import org.overturetool.vdmj.types.UnknownType;
 import org.overturetool.vdmj.values.Value;
+import org.overturetool.vdmj.values.ValueList;
 import org.overturetool.vdmj.values.ValueSet;
 
 public class TrapStatement extends Statement
@@ -170,6 +172,22 @@ public class TrapStatement extends Statement
     				else
     				{
     					abort(4050, "Value " + exval + " is not in set bind", ctxt);
+    				}
+    			}
+    			else if (patternBind.bind instanceof SeqBind)
+    			{
+    				SeqBind seqbind = (SeqBind)patternBind.bind;
+    				ValueList seq = seqbind.sequence.eval(ctxt).seqValue(ctxt);
+
+    				if (seq.contains(exval))
+    				{
+    					Context evalContext = new Context(location, "trap seq", ctxt);
+    					evalContext.putList(seqbind.pattern.getNamedValues(exval, ctxt));
+    					rv = with.eval(evalContext);
+    				}
+    				else
+    				{
+    					abort(4050, "Value " + exval + " is not in seq bind", ctxt);
     				}
     			}
     			else

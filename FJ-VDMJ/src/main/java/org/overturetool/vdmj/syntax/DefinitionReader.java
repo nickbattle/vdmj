@@ -64,10 +64,12 @@ import org.overturetool.vdmj.lex.LexToken;
 import org.overturetool.vdmj.lex.LexTokenReader;
 import org.overturetool.vdmj.lex.Token;
 import org.overturetool.vdmj.messages.LocatedException;
+import org.overturetool.vdmj.patterns.Bind;
 import org.overturetool.vdmj.patterns.IdentifierPattern;
 import org.overturetool.vdmj.patterns.MultipleBind;
 import org.overturetool.vdmj.patterns.Pattern;
 import org.overturetool.vdmj.patterns.PatternList;
+import org.overturetool.vdmj.patterns.SeqBind;
 import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TuplePattern;
 import org.overturetool.vdmj.patterns.TypeBind;
@@ -1219,14 +1221,15 @@ public class DefinitionReader extends SyntaxReader
 		// "def" <patternBind>=<expression> "in" <expression>, but since
 		// a set bind is "s in set S" that naively parses as
 		// "s in set (S = <expression>)". Talking to PGL, we have to
-		// make a special parse here. It is one of three forms:
+		// make a special parse here. It is one of these forms:
 		//
 		//	"def" <pattern> "=" <expression> "in" ...
 		//	"def" <type bind> "=" <expression> "in" ...
 		//	"def" <pattern> "in set" <equals-expression> "in" ...
+		//	"def" <pattern> "in seq" <equals-expression> "in" ...
 		//
 		// and the "=" is unpicked from the left and right of the equals
-		// expression in the third case.
+		// expression in the last two cases.
 
 		LexLocation location = lastToken().location;
 		ParserException equalsDefError = null;
@@ -1265,17 +1268,39 @@ public class DefinitionReader extends SyntaxReader
 			equalsDefError = e.deeperThan(equalsDefError) ? e : equalsDefError;
 		}
 
-		try	// "def" <pattern> "in set" <equals-expression> "in" ...
+		try
 		{
         	reader.push();
     		Pattern pattern = getPatternReader().readPattern();
-     		checkFor(Token.IN, 2110, "Expecting <pattern> in set <set exp>");
-     		checkFor(Token.SET, 2111, "Expecting <pattern> in set <set exp>");
-     		EqualsExpression test = getExpressionReader().readDefEqualsExpression();
-     		SetBind setbind = new SetBind(pattern, test.left);
-     		reader.unpush();
+     		checkFor(Token.IN, 2110, "Expecting <pattern> in set|seq <exp>");
+     		Bind bind = null;
+     		EqualsExpression test = null;
+     		
+     		switch (lastToken().type)
+     		{
+     			case SET:			// "def" <pattern> "in set" <equals-expression> "in" ...
+     				nextToken();
+             		test = getExpressionReader().readDefEqualsExpression();
+             		bind = new SetBind(pattern, test.left);
+             		reader.unpush();
+             		return new EqualsDefinition(location, bind, test.right);
+             		
+     			case SEQ:			// "def" <pattern> "in seq" <equals-expression> "in" ...
+					if (Settings.release == Release.CLASSIC)
+					{
+						throwMessage(2328, "Sequence binds are not available in classic");
+					}
 
-     		return new EqualsDefinition(location, setbind, test.right);
+					nextToken();
+             		test = getExpressionReader().readDefEqualsExpression();
+             		bind = new SeqBind(pattern, test.left);
+             		reader.unpush();
+             		return new EqualsDefinition(location, bind, test.right);
+             		
+     			default:
+     				throwMessage(2111, "Expecting <pattern> in set|seq <exp>");
+     				return null;
+     		}
 		}
 		catch (ParserException e)
 		{

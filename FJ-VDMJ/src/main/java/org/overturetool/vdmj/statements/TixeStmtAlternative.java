@@ -26,6 +26,7 @@ package org.overturetool.vdmj.statements;
 import org.overturetool.vdmj.definitions.DefinitionList;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.patterns.PatternBind;
+import org.overturetool.vdmj.patterns.SeqBind;
 import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TypeBind;
 import org.overturetool.vdmj.pog.POContextStack;
@@ -39,6 +40,7 @@ import org.overturetool.vdmj.typechecker.NameScope;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.types.TypeSet;
 import org.overturetool.vdmj.values.Value;
+import org.overturetool.vdmj.values.ValueList;
 import org.overturetool.vdmj.values.ValueSet;
 
 public class TixeStmtAlternative
@@ -97,6 +99,21 @@ public class TixeStmtAlternative
 				else
 				{
 					setbind.abort(4049, "Value " + exval + " is not in set bind", ctxt);
+				}
+			}
+			else if (patternBind.bind instanceof SeqBind)
+			{
+				SeqBind seqbind = (SeqBind)patternBind.bind;
+				ValueList seq = seqbind.sequence.eval(ctxt).seqValue(ctxt);
+
+				if (seq.contains(exval))
+				{
+					evalContext = new Context(location, "tixe seq", ctxt);
+					evalContext.putList(seqbind.pattern.getNamedValues(exval, ctxt));
+				}
+				else
+				{
+					seqbind.abort(4049, "Value " + exval + " is not in seq bind", ctxt);
 				}
 			}
 			else

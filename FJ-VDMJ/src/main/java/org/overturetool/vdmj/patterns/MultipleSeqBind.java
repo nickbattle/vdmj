@@ -83,7 +83,7 @@ public class MultipleSeqBind extends MultipleBind
 			}
 			else
 			{
-				sequence.warning(3264, "Empty sequence used in bind");
+				sequence.warning(5009, "Empty sequence used in bind");
 			}
 		}
 

@@ -33,6 +33,7 @@ import org.overturetool.vdmj.messages.InternalException;
 import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.NameScope;
 import org.overturetool.vdmj.typechecker.TypeComparator;
+import org.overturetool.vdmj.types.SeqType;
 import org.overturetool.vdmj.types.SetType;
 import org.overturetool.vdmj.types.Type;
 
@@ -100,15 +101,36 @@ public class PatternBind implements Serializable
 					bind.detail2("Bind", typebind.type, "Exp", type);
 				}
 			}
-			else
+			else if (bind instanceof SetBind)
 			{
 				SetBind setbind = (SetBind)bind;
-				SetType settype = setbind.set.typeCheck(base, null, scope, null).getSet();
+				Type bindtype = setbind.set.typeCheck(base, null, scope, null);
+				SetType settype = bindtype.getSet();
 
-				if (!TypeComparator.compatible(type, settype.setof))
+				if (!bindtype.isSet())
 				{
-					bind.report(3199, "Set bind not compatible with expression");
-					bind.detail2("Bind", settype.setof, "Exp", type);
+					setbind.set.report(3199, "Set bind not compatible with expression");
+				}
+				else if (!TypeComparator.compatible(type, settype.setof))
+				{
+					setbind.set.report(3199, "Set bind not compatible with expression");
+					setbind.set.detail2("Bind", settype.setof, "Exp", type);
+				}
+			}
+			else if (bind instanceof SeqBind)
+			{
+				SeqBind seqbind = (SeqBind)bind;
+				Type bindtype = seqbind.sequence.typeCheck(base, null, scope, null);
+				SeqType seqtype = bindtype.getSeq();
+
+				if (!bindtype.isSeq())
+				{
+					seqbind.sequence.report(3199, "Seq bind not compatible with expression");
+				}
+				else if (!TypeComparator.compatible(type, seqtype.seqof))
+				{
+					seqbind.sequence.report(3199, "Seq bind not compatible with expression");
+					seqbind.sequence.detail2("Bind", seqtype.seqof, "Exp", type);
 				}
 			}
 

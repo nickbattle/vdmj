@@ -29,6 +29,7 @@ import org.overturetool.vdmj.definitions.DefinitionList;
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.patterns.PatternBind;
+import org.overturetool.vdmj.patterns.SeqBind;
 import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TypeBind;
 import org.overturetool.vdmj.pog.POContextStack;
@@ -186,6 +187,35 @@ public class ForPatternBindStatement extends Statement
 
 						Context evalContext = new Context(location, "for set bind", ctxt);
 						evalContext.putList(setbind.pattern.getNamedValues(val, ctxt));
+						Value rv = statement.eval(evalContext);
+
+						if (!rv.isVoid())
+						{
+							return rv;
+						}
+					}
+					catch (PatternMatchException e)
+					{
+						// Ignore mismatches
+					}
+				}
+			}
+			else if (patternBind.bind instanceof SeqBind)
+			{
+				SeqBind seqbind = (SeqBind)patternBind.bind;
+				ValueList seq = seqbind.sequence.eval(ctxt).seqValue(ctxt);
+
+				for (Value val: values)
+				{
+					try
+					{
+						if (!seq.contains(val))
+						{
+							abort(4039, "Seq bind does not contain value " + val, ctxt);
+						}
+
+						Context evalContext = new Context(location, "for seq bind", ctxt);
+						evalContext.putList(seqbind.pattern.getNamedValues(val, ctxt));
 						Value rv = statement.eval(evalContext);
 
 						if (!rv.isVoid())

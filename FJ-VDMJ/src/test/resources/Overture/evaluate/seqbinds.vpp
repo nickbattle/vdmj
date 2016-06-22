@@ -1,0 +1,7 @@
+class A
+functions
+public test: () -> seq of nat
+test() ==
+	[ a+b | mk_(a,b) in seq [mk_(3,2), mk_(2,1)] ]
+	
+end A
