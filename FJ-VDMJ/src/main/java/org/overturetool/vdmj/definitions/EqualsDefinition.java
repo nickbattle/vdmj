@@ -36,6 +36,8 @@ import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TypeBind;
 import org.overturetool.vdmj.pog.POContextStack;
 import org.overturetool.vdmj.pog.ProofObligationList;
+import org.overturetool.vdmj.pog.SeqMemberObligation;
+import org.overturetool.vdmj.pog.SetMemberObligation;
 import org.overturetool.vdmj.pog.SubTypeObligation;
 import org.overturetool.vdmj.pog.ValueBindingObligation;
 import org.overturetool.vdmj.runtime.Context;
@@ -372,10 +374,12 @@ public class EqualsDefinition extends Definition
 		else if (bind instanceof SetBind)
 		{
 			list.addAll(((SetBind)bind).set.getProofObligations(ctxt));
+			list.add(new SetMemberObligation(test, ((SetBind)bind).set, ctxt));
 		}
 		else if (bind instanceof SeqBind)
 		{
 			list.addAll(((SeqBind)bind).sequence.getProofObligations(ctxt));
+			list.add(new SeqMemberObligation(test, ((SeqBind)bind).sequence, ctxt));
 		}
 
 		list.addAll(test.getProofObligations(ctxt));
