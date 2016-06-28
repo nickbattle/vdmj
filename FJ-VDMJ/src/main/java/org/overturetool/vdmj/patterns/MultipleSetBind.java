@@ -86,7 +86,7 @@ public class MultipleSetBind extends MultipleBind
 			}
 			else
 			{
-				set.warning(3264, "Empty set used in bind");
+				set.warning(5009, "Empty set used in bind");
 			}
 		}
 

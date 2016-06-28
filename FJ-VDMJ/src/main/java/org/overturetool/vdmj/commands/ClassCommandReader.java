@@ -32,6 +32,8 @@ import java.util.regex.Pattern;
 import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.definitions.ClassDefinition;
 import org.overturetool.vdmj.definitions.ClassList;
+import org.overturetool.vdmj.definitions.Definition;
+import org.overturetool.vdmj.definitions.NamedTraceDefinition;
 import org.overturetool.vdmj.lex.Dialect;
 import org.overturetool.vdmj.messages.RTLogger;
 import org.overturetool.vdmj.runtime.ClassInterpreter;
@@ -154,6 +156,32 @@ public class ClassCommandReader extends CommandReader
 			}
 		}
 
+		return true;
+	}
+	
+	@Override
+	protected boolean doAlltraces(String line)
+	{
+		int index = line.indexOf(' ') + 1;
+		String pattern = (index == 0) ? ".*" : line.substring(index);
+
+		for (ClassDefinition cdef: cinterpreter.getClasses())
+		{
+			if (cdef.name.name.matches(pattern))
+			{
+    			for (Definition d: cdef.definitions)
+    			{
+    				if (d instanceof NamedTraceDefinition)
+    				{
+    					String cmd = "runtrace " + d.name.getExplicit(true).getName();
+    					println("-------------------------------------");
+    					println(cmd);
+    					doRuntrace(cmd, false);
+    				}
+    			}
+			}
+		}
+		
 		return true;
 	}
 
