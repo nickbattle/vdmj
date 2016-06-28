@@ -322,6 +322,10 @@ abstract public class CommandReader
 				{
 					carryOn = doRuntrace(line, true);
 				}
+				else if (line.startsWith("runalltraces"))
+				{
+					carryOn = doAlltraces(line);
+				}
 				else if (line.startsWith("savetrace"))
 				{
 					carryOn = doSavetrace(line);
@@ -621,6 +625,11 @@ abstract public class CommandReader
 		}
 		
 		return true;
+	}
+
+	protected boolean doAlltraces(String line)
+	{
+		return notAvailable(line);
 	}
 
 	protected boolean doQuit(@SuppressWarnings("unused") String line)
@@ -1438,10 +1447,11 @@ abstract public class CommandReader
 	protected void doHelp(@SuppressWarnings("unused") String line)
 	{
 		println("print <expression> - evaluate expression");
-		println("runtrace <name> [start test [end test]] - run CT trace(s)");
-		println("debugtrace <name> [start test [end test]] - debug CT trace(s)");
+		println("runtrace <name> [start test [end test]] - run CT trace");
+		println("debugtrace <name> [start test [end test]] - debug CT trace");
 		println("savetrace [<file> | off] - save CT trace output");
 		println("seedtrace <number> - seed CT trace random generator");
+		println("runalltraces [<name>] - run all CT traces in class/module name");
 		println("filter %age | <reduction type> - reduce CT trace(s)");
 		println("assert <file> - run assertions from a file");
 		println("init - re-initialize the global environment");

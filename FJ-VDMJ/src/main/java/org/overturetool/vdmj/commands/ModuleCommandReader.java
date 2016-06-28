@@ -25,6 +25,8 @@ package org.overturetool.vdmj.commands;
 
 import java.util.List;
 
+import org.overturetool.vdmj.definitions.Definition;
+import org.overturetool.vdmj.definitions.NamedTraceDefinition;
 import org.overturetool.vdmj.modules.Module;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ModuleInterpreter;
@@ -86,6 +88,32 @@ public class ModuleCommandReader extends CommandReader
 
 		minterpreter.setDefaultName(parts[1]);
 		println("Default module set to " + minterpreter.getDefaultName());
+		return true;
+	}
+	
+	@Override
+	protected boolean doAlltraces(String line)
+	{
+		int index = line.indexOf(' ') + 1;
+		String pattern = (index == 0) ? ".*" : line.substring(index);
+
+		for (Module m: minterpreter.getModules())
+		{
+			if (m.name.name.matches(pattern))
+			{
+    			for (Definition d: m.defs)
+    			{
+    				if (d instanceof NamedTraceDefinition)
+    				{
+    					String cmd = "runtrace " + d.name.getExplicit(true).getName();
+    					println("-------------------------------------");
+    					println(cmd);
+    					doRuntrace(cmd, false);
+    				}
+    			}
+			}
+		}
+		
 		return true;
 	}
 
