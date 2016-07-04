@@ -38,7 +38,7 @@ public class RTTest extends VDMJUnitTestRT
 	@BeforeClass
 	public static void start() throws Exception
 	{
-		readSpecification("vice.vpp");
+		readSpecification("testRT.vpp");
 	}
 	
 	@Before
