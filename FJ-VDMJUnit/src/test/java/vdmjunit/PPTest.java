@@ -38,7 +38,7 @@ public class PPTest extends VDMJUnitTestPP
 	@BeforeClass
 	public static void start() throws Exception
 	{
-		readSpecification("test.vpp");
+		readSpecification("testPP.vpp");
 	}
 	
 	@Before
@@ -75,7 +75,7 @@ public class PPTest extends VDMJUnitTestPP
 			// Error 4055: Precondition failure: pre_f in 'A' (test.vpp) at line 8:11
 			assertEquals(4055, e.number);
 			assertEquals("A", e.location.module);
-			assertEquals("test.vpp", e.location.file.getName());
+			assertEquals("testPP.vpp", e.location.file.getName());
 			assertEquals(8, e.location.startLine);
 			assertEquals(11, e.location.startPos);
 		}
