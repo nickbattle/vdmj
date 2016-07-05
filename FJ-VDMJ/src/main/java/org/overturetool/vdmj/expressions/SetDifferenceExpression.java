@@ -50,12 +50,12 @@ public class SetDifferenceExpression extends BinaryExpression
 		ltype = left.typeCheck(env, null, scope, null);
 		rtype = right.typeCheck(env, null, scope, null);
 
-		if (!ltype.isSet())
+		if (!ltype.isSet(location))
 		{
 			report(3160, "Left hand of '\\' is not a set");
 		}
 
-		if (!rtype.isSet())
+		if (!rtype.isSet(location))
 		{
 			report(3161, "Right hand of '\\' is not a set");
 		}

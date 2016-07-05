@@ -94,7 +94,7 @@ public class MapEnumExpression extends MapExpression
 		Type domConstraint = null;
 		Type rngConstraint = null;
 		
-		if (constraint != null && constraint.isMap())
+		if (constraint != null && constraint.isMap(location))
 		{
 			domConstraint = constraint.getMap().from;
 			rngConstraint = constraint.getMap().to;
@@ -104,7 +104,7 @@ public class MapEnumExpression extends MapExpression
 		{
 			Type mt = ex.typeCheck(env, scope, domConstraint, rngConstraint);
 
-			if (!mt.isMap())
+			if (!mt.isMap(location))
 			{
 				report(3121, "Element is not of maplet type");
 			}

@@ -54,7 +54,7 @@ public class SetIntersectExpression extends BinaryExpression
 		Type lset = null;
 		Type rset = null;
 
-		if (!ltype.isSet())
+		if (!ltype.isSet(location))
 		{
 			report(3163, "Left hand of " + location + " is not a set");
 		}
@@ -63,7 +63,7 @@ public class SetIntersectExpression extends BinaryExpression
 			lset = ltype.getSet().setof;
 		}
 
-		if (!rtype.isSet())
+		if (!rtype.isSet(location))
 		{
 			report(3164, "Right hand of " + location + " is not a set");
 		}
@@ -74,7 +74,7 @@ public class SetIntersectExpression extends BinaryExpression
 		
 		Type result = ltype;	// A guess
 		
-		if (lset != null && !lset.isUnknown() && rset != null && !rset.isUnknown())
+		if (lset != null && !lset.isUnknown(location) && rset != null && !rset.isUnknown(location))
 		{
 			Type interTypes = TypeComparator.intersect(lset, rset);
 	

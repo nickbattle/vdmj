@@ -57,12 +57,12 @@ abstract public class BinaryExpression extends Expression
 		ltype = left.typeCheck(env, null, scope, null);
 		rtype = right.typeCheck(env, null, scope, null);
 
-		if (!ltype.isType(expected.getClass()))
+		if (!ltype.isType(expected.getClass(), location))
 		{
 			report(3065, "Left hand of " + op + " is not " + expected);
 		}
 
-		if (!rtype.isType(expected.getClass()))
+		if (!rtype.isType(expected.getClass(), location))
 		{
 			report(3066, "Right hand of " + op + " is not " + expected);
 		}

@@ -80,7 +80,7 @@ public class LetBeStExpression extends Expression
 		Environment local = new FlatCheckedEnvironment(def, base, scope);
 
 		if (suchThat != null &&
-			!suchThat.typeCheck(local, null, scope, null).isType(BooleanType.class))
+			!suchThat.typeCheck(local, null, scope, null).isType(BooleanType.class, location))
 		{
 			report(3117, "Such that clause is not boolean");
 		}

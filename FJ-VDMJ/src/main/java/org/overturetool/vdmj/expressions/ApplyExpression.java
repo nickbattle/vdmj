@@ -102,7 +102,7 @@ public class ApplyExpression extends Expression
 
 		type = root.typeCheck(env, argtypes, scope, null);
 
-		if (type.isUnknown())
+		if (type.isUnknown(location))
 		{
 			return type;
 		}
@@ -157,10 +157,10 @@ public class ApplyExpression extends Expression
 			}
 		}
 
-		boolean isSimple = !type.isUnion();
+		boolean isSimple = !type.isUnion(location);
 		TypeSet results = new TypeSet();
 
-		if (type.isFunction())
+		if (type.isFunction(location))
 		{
 			FunctionType ft = type.getFunction();
 			
@@ -174,7 +174,7 @@ public class ApplyExpression extends Expression
 			results.add(functionApply(isSimple, ft));
 		}
 
-		if (type.isOperation())
+		if (type.isOperation(location))
 		{
 			if (root instanceof VariableExpression)
 			{
@@ -212,13 +212,13 @@ public class ApplyExpression extends Expression
 			}
 		}
 
-		if (type.isSeq())
+		if (type.isSeq(location))
 		{
 			SeqType seq = type.getSeq();
 			results.add(sequenceApply(isSimple, seq));
 		}
 
-		if (type.isMap())
+		if (type.isMap(location))
 		{
 			MapType map = type.getMap();
 			results.add(mapApply(isSimple, map));
@@ -243,7 +243,7 @@ public class ApplyExpression extends Expression
 		{
 			concern(isSimple, 3055, "Sequence selector must have one argument");
 		}
-		else if (!argtypes.get(0).isNumeric())
+		else if (!argtypes.get(0).isNumeric(location))
 		{
 			concern(isSimple, 3056, "Sequence application argument must be numeric");
 		}
@@ -427,7 +427,7 @@ public class ApplyExpression extends Expression
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
-		if (type.isMap())
+		if (type.isMap(location))
 		{
 			MapType m = type.getMap();
 			obligations.add(new MapApplyObligation(root, args.get(0), ctxt));
@@ -439,14 +439,14 @@ public class ApplyExpression extends Expression
 			}
 		}
 
-		if (!type.isUnknown() && (type.isFunction() || type.isOperation()))
+		if (!type.isUnknown(location) && (type.isFunction(location) || type.isOperation(location)))
 		{
-			TypeList paramTypes = type.isFunction() ?
+			TypeList paramTypes = type.isFunction(location) ?
 				type.getFunction().parameters : type.getOperation().parameters;
 			
 			String prename = root.getPreName();
 
-			if (type.isFunction() && (prename == null || !prename.equals("")))
+			if (type.isFunction(location) && (prename == null || !prename.equals("")))
 			{
 				obligations.add(new FunctionApplyObligation(root, args, prename, ctxt));
 			}
@@ -467,7 +467,7 @@ public class ApplyExpression extends Expression
 			}
 		}
 
-		if (!type.isUnknown() && type.isFunction())
+		if (!type.isUnknown(location) && type.isFunction(location))
 		{
 			if (recursive != null)
 			{
@@ -492,7 +492,7 @@ public class ApplyExpression extends Expression
 			}
 		}
 
-		if (type.isSeq())
+		if (type.isSeq(location))
 		{
 			obligations.add(new SeqApplyObligation(root, args.get(0), ctxt));
 		}

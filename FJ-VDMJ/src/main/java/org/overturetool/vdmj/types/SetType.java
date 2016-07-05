@@ -64,7 +64,7 @@ public class SetType extends Type
 	}
 
 	@Override
-	public boolean isSet()
+	public boolean isSet(LexLocation from)
 	{
 		return true;
 	}

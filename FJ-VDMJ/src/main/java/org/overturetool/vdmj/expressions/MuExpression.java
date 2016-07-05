@@ -74,12 +74,12 @@ public class MuExpression extends Expression
 	{
 		Type rtype = record.typeCheck(env, null, scope, null);
 
-		if (rtype.isUnknown())
+		if (rtype.isUnknown(location))
 		{
 			return rtype;
 		}
 
-		if (rtype.isRecord())
+		if (rtype.isRecord(location))
 		{
 			recordType = rtype.getRecord();
 			modTypes = new TypeList();

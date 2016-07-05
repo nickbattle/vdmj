@@ -52,7 +52,7 @@ public class DomainResByExpression extends BinaryExpression
 	{
 		Type domConstraint = null;
 		
-		if (constraint != null && constraint.isMap())
+		if (constraint != null && constraint.isMap(location))
 		{
 			domConstraint = new SetType(location, constraint.getMap().from);
 		}
@@ -60,11 +60,11 @@ public class DomainResByExpression extends BinaryExpression
 		ltype = left.typeCheck(env, null, scope, domConstraint);
 		rtype = right.typeCheck(env, null, scope, constraint);
 
-		if (!ltype.isSet())
+		if (!ltype.isSet(location))
 		{
 			report(3079, "Left of '<-:' is not a set");
 		}
-		else if (!rtype.isMap())
+		else if (!rtype.isMap(location))
 		{
 			report(3080, "Right of '<-:' is not a map");
 		}

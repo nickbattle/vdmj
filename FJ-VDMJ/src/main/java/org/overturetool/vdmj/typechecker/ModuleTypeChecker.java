@@ -204,6 +204,8 @@ public class ModuleTypeChecker extends TypeChecker
 		{
 			for (Module m: modules)
 			{
+				TypeComparator.setCurrentModule(m.name.name);
+				
 				if (!m.typechecked)
 				{
     				Environment e = new ModuleEnvironment(m);

@@ -71,7 +71,7 @@ public class WhileStatement extends Statement
 	@Override
 	public Type typeCheck(Environment env, NameScope scope, Type constraint)
 	{
-		if (!exp.typeCheck(env, null, scope, null).isType(BooleanType.class))
+		if (!exp.typeCheck(env, null, scope, null).isType(BooleanType.class, location))
 		{
 			exp.report(3218, "Expression is not boolean");
 		}

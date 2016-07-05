@@ -81,7 +81,7 @@ public class SeqCompExpression extends SeqExpression
 		Definition def = new MultiBindListDefinition(location, setbind.getMultipleBindList());
 		def.typeCheck(base, scope);
 
-		if (setbind.pattern.getVariableNames().size() != 1 || !def.getType().isNumeric())
+		if (setbind.pattern.getVariableNames().size() != 1 || !def.getType().isNumeric(location))
 		{
 			report(3155, "List comprehension must define one numeric bind variable");
 		}
@@ -89,7 +89,7 @@ public class SeqCompExpression extends SeqExpression
 		Environment local = new FlatCheckedEnvironment(def, base, scope);
 		Type elemConstraint = null;
 		
-		if (constraint != null && constraint.isSeq())
+		if (constraint != null && constraint.isSeq(location))
 		{
 			elemConstraint = constraint.getSeq().seqof;
 		}
@@ -98,7 +98,7 @@ public class SeqCompExpression extends SeqExpression
 
 		if (predicate != null)
 		{
-			if (!predicate.typeCheck(local, null, scope, new BooleanType(location)).isType(BooleanType.class))
+			if (!predicate.typeCheck(local, null, scope, new BooleanType(location)).isType(BooleanType.class, location))
 			{
 				predicate.report(3156, "Predicate is not boolean");
 			}

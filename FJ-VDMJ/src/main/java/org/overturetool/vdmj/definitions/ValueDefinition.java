@@ -320,7 +320,7 @@ public class ValueDefinition extends Definition
 
 		if (!(pattern instanceof IdentifierPattern) &&
 			!(pattern instanceof IgnorePattern) &&
-			type.isUnion())
+			type.isUnion(location))
 		{
 			Type patternType = pattern.getPossibleType();	// With unknowns
 			UnionType ut = type.getUnion();

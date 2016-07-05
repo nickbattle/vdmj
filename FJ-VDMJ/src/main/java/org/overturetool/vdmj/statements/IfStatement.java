@@ -93,7 +93,7 @@ public class IfStatement extends Statement
 	{
 		Type test = ifExp.typeCheck(env, null, scope, null);
 
-		if (!test.isType(BooleanType.class))
+		if (!test.isType(BooleanType.class, location))
 		{
 			ifExp.report(3224, "If expression is not boolean");
 		}

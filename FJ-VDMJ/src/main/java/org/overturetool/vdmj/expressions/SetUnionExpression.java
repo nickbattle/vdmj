@@ -50,12 +50,12 @@ public class SetUnionExpression extends BinaryExpression
 		ltype = left.typeCheck(env, null, scope, constraint);
 		rtype = right.typeCheck(env, null, scope, constraint);
 
-		if (!ltype.isSet())
+		if (!ltype.isSet(location))
 		{
 			report(3168, "Left hand of " + op + " is not a set");
 		}
 
-		if (!rtype.isSet())
+		if (!rtype.isSet(location))
 		{
 			report(3169, "Right hand of " + op + " is not a set");
 		}

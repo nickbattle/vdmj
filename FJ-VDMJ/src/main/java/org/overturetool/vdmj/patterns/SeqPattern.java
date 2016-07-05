@@ -113,7 +113,7 @@ public class SeqPattern extends Pattern
 	{
 		DefinitionList defs = new DefinitionList();
 
-		if (!type.isSeq())
+		if (!type.isSeq(location))
 		{
 			report(3203, "Sequence pattern is matched against " + type);
 		}

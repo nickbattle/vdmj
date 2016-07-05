@@ -89,13 +89,13 @@ public class OrExpression extends BooleanBinaryExpression
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
-		if (ltype.isUnion())
+		if (ltype.isUnion(location))
 		{
 			obligations.add(
 				new SubTypeObligation(left, new BooleanType(left.location), ltype, ctxt));
 		}
 
-		if (rtype.isUnion())
+		if (rtype.isUnion(location))
 		{
 			ctxt.push(new PONotImpliesContext(left));
 			obligations.add(new SubTypeObligation(

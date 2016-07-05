@@ -51,20 +51,20 @@ public class SubsetExpression extends BinaryExpression
 		ltype = left.typeCheck(env, null, scope, null);
 		rtype = right.typeCheck(env, null, scope, null);
 		
-		if (ltype.isSet() && rtype.isSet() && !TypeComparator.compatible(ltype, rtype))
+		if (ltype.isSet(location) && rtype.isSet(location) && !TypeComparator.compatible(ltype, rtype))
 		{
 			report(3335, "Subset will only be true if the LHS set is empty");
 			detail("Left", ltype);
 			detail("Right", rtype);
 		}
 
-		if (!ltype.isSet())
+		if (!ltype.isSet(location))
 		{
 			report(3177, "Left hand of " + op + " is not a set");
 			detail("Type", ltype);
 		}
 
-		if (!rtype.isSet())
+		if (!rtype.isSet(location))
 		{
 			report(3178, "Right hand of " + op + " is not a set");
 			detail("Type", rtype);

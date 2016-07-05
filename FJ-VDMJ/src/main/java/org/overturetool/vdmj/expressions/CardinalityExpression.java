@@ -54,7 +54,7 @@ public class CardinalityExpression extends UnaryExpression
 	@Override
 	public Type typeCheck(Environment env, TypeList qualifiers, NameScope scope, Type constraint)
 	{
-		if (!exp.typeCheck(env, null, scope, null).isSet())
+		if (!exp.typeCheck(env, null, scope, null).isSet(location))
 		{
 			exp.report(3067, "Argument of 'card' is not a set");
 		}

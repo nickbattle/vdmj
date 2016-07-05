@@ -91,7 +91,7 @@ public class MkTypeExpression extends Expression
 
 		recordType = (RecordType)rec;
 
-		if (recordType.opaque)
+		if (recordType.opaque && !location.module.equals(recordType.location.module))
 		{
 			report(3127, "Type '" + typename + "' is not a record type");
 			return rec;

@@ -89,7 +89,7 @@ public class SetCompExpression extends SetExpression
 		Environment local = new FlatCheckedEnvironment(def, base, scope);
 		Type elemConstraint = null;
 		
-		if (constraint != null && constraint.isSet())
+		if (constraint != null && constraint.isSet(location))
 		{
 			elemConstraint = constraint.getSet().setof;
 		}
@@ -98,7 +98,7 @@ public class SetCompExpression extends SetExpression
 
 		if (predicate != null)
 		{
-			if (!predicate.typeCheck(local, null, scope, new BooleanType(location)).isType(BooleanType.class))
+			if (!predicate.typeCheck(local, null, scope, new BooleanType(location)).isType(BooleanType.class, location))
 			{
 				predicate.report(3159, "Predicate is not boolean");
 			}

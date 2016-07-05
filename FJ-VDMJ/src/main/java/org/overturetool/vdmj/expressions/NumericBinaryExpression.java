@@ -51,14 +51,14 @@ abstract public class NumericBinaryExpression extends BinaryExpression
 		ltype = left.typeCheck(env, null, scope, null);
 		rtype = right.typeCheck(env, null, scope, null);
 
-		if (!ltype.isNumeric())
+		if (!ltype.isNumeric(location))
 		{
 			report(3139, "Left hand of " + op + " is not numeric");
 			detail("Actual", ltype);
 			ltype = new RealType(location);
 		}
 
-		if (!rtype.isNumeric())
+		if (!rtype.isNumeric(location))
 		{
 			report(3140, "Right hand of " + op + " is not numeric");
 			detail("Actual", rtype);
@@ -71,13 +71,13 @@ abstract public class NumericBinaryExpression extends BinaryExpression
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
-		if (ltype.isUnion())
+		if (ltype.isUnion(location))
 		{
 			obligations.add(
 				new SubTypeObligation(left, new RealType(left.location), ltype, ctxt));
 		}
 
-		if (rtype.isUnion())
+		if (rtype.isUnion(location))
 		{
 			obligations.add(
 				new SubTypeObligation(right, new RealType(right.location), rtype, ctxt));

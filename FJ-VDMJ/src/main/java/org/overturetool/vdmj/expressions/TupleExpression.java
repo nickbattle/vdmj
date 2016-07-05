@@ -61,7 +61,7 @@ public class TupleExpression extends Expression
 	{
 		TypeList elemConstraints = null;
 		
-		if (constraint != null && constraint.isProduct())
+		if (constraint != null && constraint.isProduct(location))
 		{
 			elemConstraints = constraint.getProduct().types;
 			

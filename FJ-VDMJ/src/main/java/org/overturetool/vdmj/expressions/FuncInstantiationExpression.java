@@ -84,12 +84,12 @@ public class FuncInstantiationExpression extends Expression
 
 		Type ftype = function.typeCheck(env, qualifiers, scope, null);
 
-		if (ftype.isUnknown())
+		if (ftype.isUnknown(location))
 		{
 			return ftype;
 		}
 
-		if (ftype.isFunction())
+		if (ftype.isFunction(location))
 		{
 			FunctionType t = ftype.getFunction();
 			TypeSet set = new TypeSet();

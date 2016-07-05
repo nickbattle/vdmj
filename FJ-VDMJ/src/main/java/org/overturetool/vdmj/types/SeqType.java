@@ -57,7 +57,7 @@ public class SeqType extends Type
 	}
 
 	@Override
-	public boolean isSeq()
+	public boolean isSeq(LexLocation from)
 	{
 		return true;
 	}

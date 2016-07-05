@@ -78,29 +78,29 @@ public class ObjectApplyDesignator extends ObjectDesignator
 		}
 
 		Type type = object.typeCheck(env, argtypes);
-		boolean unique = !type.isUnion();
+		boolean unique = !type.isUnion(location);
 		TypeSet result = new TypeSet();
 
-		if (type.isMap())
+		if (type.isMap(location))
 		{
 			MapType map = type.getMap();
 			result.add(mapApply(map, env, NameScope.NAMESANDSTATE, unique));
 		}
 
-		if (type.isSeq())
+		if (type.isSeq(location))
 		{
 			SeqType seq = type.getSeq();
 			result.add(seqApply(seq, env, NameScope.NAMESANDSTATE, unique));
 		}
 
-		if (type.isFunction())
+		if (type.isFunction(location))
 		{
 			FunctionType ft = type.getFunction();
 			ft.typeResolve(env, null);
 			result.add(functionApply(ft, env, NameScope.NAMESANDSTATE, unique));
 		}
 
-		if (type.isOperation())
+		if (type.isOperation(location))
 		{
 			OperationType ot = type.getOperation();
 			ot.typeResolve(env, null);
@@ -221,7 +221,7 @@ public class ObjectApplyDesignator extends ObjectDesignator
 
 		Type argtype = args.get(0).typeCheck(env, null, scope, null);
 
-		if (!argtype.isNumeric())
+		if (!argtype.isNumeric(location))
 		{
 			concern(unique, 3253, "Sequence argument is not numeric");
 			detail(unique, "Type", argtype);

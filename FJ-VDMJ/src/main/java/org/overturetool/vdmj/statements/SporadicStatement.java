@@ -72,7 +72,7 @@ public class SporadicStatement extends Statement
 			{
 				Type type = arg.typeCheck(functional, null, scope, null);
 				
-				if (!type.isNumeric())
+				if (!type.isNumeric(location))
 				{
 					arg.report(3316, "Expecting number in sporadic argument");
 				}

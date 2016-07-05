@@ -97,7 +97,7 @@ public class LetBeStStatement extends Statement
 		
 		Environment local = new FlatCheckedEnvironment(qualified, base, scope);
 
-		if (suchThat != null && !suchThat.typeCheck(local, null, scope, null).isType(BooleanType.class))
+		if (suchThat != null && !suchThat.typeCheck(local, null, scope, null).isType(BooleanType.class, location))
 		{
 			report(3225, "Such that clause is not boolean");
 		}

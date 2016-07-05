@@ -63,11 +63,11 @@ public class DistConcatExpression extends UnaryExpression
 
 		Type result = exp.typeCheck(env, null, scope, seqType);
 
-		if (result.isSeq())
+		if (result.isSeq(location))
 		{
 			Type inner = result.getSeq().seqof;
 
-			if (inner.isSeq())
+			if (inner.isSeq(location))
 			{
 				return inner.getSeq();
 			}

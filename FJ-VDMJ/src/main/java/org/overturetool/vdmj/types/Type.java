@@ -196,22 +196,36 @@ public abstract class Type implements Comparable<Type>, Serializable
 		}
 	}
 
-	public Type isType(String typename)
+	/**
+	 * @param typename
+	 * @param from
+	 */
+	public Type isType(String typename, LexLocation from)
 	{
 		return (toDisplay().equals(typename)) ? this : null;
 	}
 
-	public boolean isType(Class<? extends Type> typeclass)
+	/**
+	 * @param typeclass
+	 * @param from
+	 */
+	public boolean isType(Class<? extends Type> typeclass, LexLocation from)
 	{
 		return typeclass.isInstance(this);
 	}
 
-	public boolean isUnion()
+	/**
+	 * @param from
+	 */
+	public boolean isUnion(LexLocation from)
 	{
 		return false;	// Unions, or names of unions etc are not unique.
 	}
 
-	public boolean isUnknown()
+	/**
+	 * @param from
+	 */
+	public boolean isUnknown(LexLocation from)
 	{
 		return false;	// Parameter types and type check errors are unknown.
 	}
@@ -226,22 +240,34 @@ public abstract class Type implements Comparable<Type>, Serializable
 		return false;	// VoidType and VoidReturnType are void.
 	}
 
-	public boolean isSeq()
+	/**
+	 * @param from
+	 */
+	public boolean isSeq(LexLocation from)
 	{
 		return false;
 	}
 
-	public boolean isSet()
+	/**
+	 * @param from
+	 */
+	public boolean isSet(LexLocation from)
 	{
 		return false;
 	}
 
-	public boolean isMap()
+	/**
+	 * @param from Where the test is being made from.
+	 */
+	public boolean isMap(LexLocation from)
 	{
 		return false;
 	}
 
-	public boolean isRecord()	// ie. does it contain fields (see isTag)
+	/**
+	 * @param from Where the test is being made from.
+	 */
+	public boolean isRecord(LexLocation from)	// ie. does it contain fields (see isTag)
 	{
 		return false;
 	}
@@ -259,27 +285,43 @@ public abstract class Type implements Comparable<Type>, Serializable
 		return false;
 	}
 
-	public boolean isNumeric()
+	/**
+	 * @param from
+	 */
+	public boolean isNumeric(LexLocation from)
 	{
 		return false;
 	}
 
-	public boolean isProduct()
+	/**
+	 * @param from
+	 */
+	public boolean isProduct(LexLocation from)
 	{
 		return false;
 	}
 
-	public boolean isProduct(@SuppressWarnings("unused") int n)
+	/**
+	 * @param n
+	 * @param from
+	 */
+	public boolean isProduct(int n, LexLocation from)
 	{
 		return false;
 	}
 
-	public boolean isFunction()
+	/**
+	 * @param from
+	 */
+	public boolean isFunction(LexLocation from)
 	{
 		return false;
 	}
 
-	public boolean isOperation()
+	/**
+	 * @param from
+	 */
+	public boolean isOperation(LexLocation from)
 	{
 		return false;
 	}

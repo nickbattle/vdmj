@@ -75,7 +75,7 @@ public class MapSeqDesignator extends StateDesignator
 		Type rtype = mapseq.typeCheck(env);
 		TypeSet result = new TypeSet();
 
-		if (rtype.isMap())
+		if (rtype.isMap(location))
 		{
 			mapType = rtype.getMap();
 
@@ -90,11 +90,11 @@ public class MapSeqDesignator extends StateDesignator
 			}
 		}
 
-		if (rtype.isSeq())
+		if (rtype.isSeq(location))
 		{
 			seqType = rtype.getSeq();
 
-			if (!etype.isNumeric())
+			if (!etype.isNumeric(location))
 			{
 				report(3243, "Seq index is not numeric");
 				detail("Actual", etype);
@@ -105,14 +105,14 @@ public class MapSeqDesignator extends StateDesignator
 			}
 		}
 		
-		if (rtype.isFunction())
+		if (rtype.isFunction(location))
 		{
 			// Error case, but improves errors if we work out the return type
 			FunctionType ftype = rtype.getFunction();
 			result.add(ftype.result);
 		}
 
-		if (rtype.isOperation())
+		if (rtype.isOperation(location))
 		{
 			// Error case, but improves errors if we work out the return type
 			OperationType otype = rtype.getOperation();

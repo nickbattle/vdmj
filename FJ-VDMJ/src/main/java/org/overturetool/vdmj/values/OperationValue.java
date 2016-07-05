@@ -633,7 +633,7 @@ public class OperationValue extends Value
 	@Override
 	protected Value convertValueTo(Type to, Context ctxt, TypeSet done) throws ValueException
 	{
-		if (to.isType(OperationType.class))
+		if (to.isType(OperationType.class, to.location))
 		{
 			return this;
 		}

@@ -115,7 +115,7 @@ public class LocalDefinition extends Definition
 		// operations, not local definitions that happen to be function values.
 		// So we exclude parameter types. We also exclude value definitions.
 
-		return (valueDefinition || type.isType(ParameterType.class)) ? false : type.isFunction();
+		return (valueDefinition || type.isType(ParameterType.class, location)) ? false : type.isFunction(location);
 	}
 
 	@Override

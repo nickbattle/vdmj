@@ -67,11 +67,11 @@ public class DistMergeExpression extends UnaryExpression
 		
 		Type arg = exp.typeCheck(env, null, scope, setType);
 
-		if (arg.isSet())
+		if (arg.isSet(location))
 		{
 			SetType set = arg.getSet();
 
-			if (!set.empty && set.setof.isMap())
+			if (!set.empty && set.setof.isMap(location))
 			{
 				return set.setof;
 			}

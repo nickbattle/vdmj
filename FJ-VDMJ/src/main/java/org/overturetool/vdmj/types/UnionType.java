@@ -107,11 +107,11 @@ public class UnionType extends Type
 	}
 
 	@Override
-	public Type isType(String typename)
+	public Type isType(String typename, LexLocation from)
 	{
 		for (Type t: types)
 		{
-			Type rt = t.isType(typename);
+			Type rt = t.isType(typename, location);
 
 			if (rt != null)
 			{
@@ -123,11 +123,11 @@ public class UnionType extends Type
 	}
 
 	@Override
-	public boolean isType(Class<? extends Type> typeclass)
+	public boolean isType(Class<? extends Type> typeclass, LexLocation from)
 	{
 		for (Type t: types)
 		{
-			if (t.isType(typeclass))
+			if (t.isType(typeclass, location))
 			{
 				return true;
 			}
@@ -137,11 +137,11 @@ public class UnionType extends Type
 	}
 
 	@Override
-	public boolean isUnknown()
+	public boolean isUnknown(LexLocation from)
 	{
 		for (Type t: types)
 		{
-			if (t.isUnknown())
+			if (t.isUnknown(location))
 			{
 				return true;
 			}
@@ -179,31 +179,31 @@ public class UnionType extends Type
 	}
 
 	@Override
-	public boolean isUnion()
+	public boolean isUnion(LexLocation from)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean isSeq()
+	public boolean isSeq(LexLocation from)
 	{
 		return getSeq() != null;
 	}
 
 	@Override
-	public boolean isSet()
+	public boolean isSet(LexLocation from)
 	{
 		return getSet() != null;
 	}
 
 	@Override
-	public boolean isMap()
+	public boolean isMap(LexLocation from)
 	{
 		return getMap() != null;
 	}
 
 	@Override
-	public boolean isRecord()
+	public boolean isRecord(LexLocation from)
 	{
 		return getRecord() != null;
 	}
@@ -221,31 +221,31 @@ public class UnionType extends Type
 	}
 
 	@Override
-	public boolean isNumeric()
+	public boolean isNumeric(LexLocation from)
 	{
 		return getNumeric() != null;
 	}
 
 	@Override
-	public boolean isProduct()
+	public boolean isProduct(LexLocation from)
 	{
 		return getProduct() != null;
 	}
 
 	@Override
-	public boolean isProduct(int n)
+	public boolean isProduct(int n, LexLocation from)
 	{
 		return getProduct(n) != null;
 	}
 
 	@Override
-	public boolean isFunction()
+	public boolean isFunction(LexLocation from)
 	{
 		return getFunction() != null;
 	}
 
 	@Override
-	public boolean isOperation()
+	public boolean isOperation(LexLocation from)
 	{
 		return getOperation() != null;
 	}
@@ -268,7 +268,7 @@ public class UnionType extends Type
 
     		for (Type t: types)
     		{
-    			if (t.isSeq())
+    			if (t.isSeq(location))
     			{
     				set.add(t.getSeq().seqof);
     			}
@@ -293,7 +293,7 @@ public class UnionType extends Type
 
     		for (Type t: types)
     		{
-    			if (t.isSet())
+    			if (t.isSet(location))
     			{
     				set.add(t.getSet().setof);
     			}
@@ -319,7 +319,7 @@ public class UnionType extends Type
 
     		for (Type t: types)
     		{
-    			if (t.isMap())
+    			if (t.isMap(location))
     			{
     				from.add(t.getMap().from);
     				to.add(t.getMap().to);
@@ -350,7 +350,7 @@ public class UnionType extends Type
 
     		for (Type t: types)
     		{
-    			if (t.isRecord())
+    			if (t.isRecord(location))
     			{
     				recordCount++;
     				
@@ -520,7 +520,7 @@ public class UnionType extends Type
     			Type ptype = common.get(synthname).getType(location);
     			LexNameToken newname = null;
     			
-    			if (ptype.isOperation())
+    			if (ptype.isOperation(location))
     			{
     				OperationType optype = ptype.getOperation();
     				OperationType newtype = new OperationType(optype.location, optype.parameters, optype.result);
@@ -528,7 +528,7 @@ public class UnionType extends Type
     				ptype = newtype;
     				newname = synthname.getModifiedName(optype.parameters);
     			}
-    			else if (ptype.isFunction())
+    			else if (ptype.isFunction(location))
     			{
     				FunctionType ftype = ptype.getFunction();
     				newname = synthname.getModifiedName(ftype.parameters);
@@ -561,7 +561,7 @@ public class UnionType extends Type
 
     		for (Type t: types)
     		{
-    			if (t.isNumeric())
+    			if (t.isNumeric(location))
     			{
     				NumericType nt = t.getNumeric();
 
@@ -601,7 +601,7 @@ public class UnionType extends Type
 
     		for (Type t: types)
     		{
-    			if ((n == 0 && t.isProduct()) || t.isProduct(n))
+    			if ((n == 0 && t.isProduct(location)) || t.isProduct(n, location))
     			{
     				ProductType pt = t.getProduct(n);
     				int i=0;
@@ -649,7 +649,7 @@ public class UnionType extends Type
 
     		for (Type t: types)
     		{
-    			if (t.isFunction())
+    			if (t.isFunction(location))
     			{
     				if (t.definitions != null) defs.addAll(t.definitions);
     				FunctionType f = t.getFunction();
@@ -710,7 +710,7 @@ public class UnionType extends Type
 
     		for (Type t: types)
     		{
-    			if (t.isOperation())
+    			if (t.isOperation(location))
     			{
     				if (t.definitions != null) defs.addAll(t.definitions);
     				OperationType op = t.getOperation();

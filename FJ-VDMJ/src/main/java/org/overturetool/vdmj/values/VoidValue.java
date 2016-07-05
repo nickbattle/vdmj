@@ -72,7 +72,7 @@ public class VoidValue extends Value
 	@Override
 	protected Value convertValueTo(Type to, Context ctxt, TypeSet done) throws ValueException
 	{
-		if (to.isType(VoidType.class))
+		if (to.isType(VoidType.class, to.location))
 		{
 			return new VoidValue();
 		}

@@ -126,7 +126,7 @@ public class RecordPattern extends Pattern
 		}
 
 		RecordType pattype = type.getRecord();
-		Type using = exptype.isType(pattype.name.getName());
+		Type using = exptype.isType(pattype.name.getName(), location);
 
 		if (using == null || !(using instanceof RecordType))
 		{

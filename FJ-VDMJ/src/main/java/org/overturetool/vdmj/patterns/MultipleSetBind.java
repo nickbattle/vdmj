@@ -64,7 +64,7 @@ public class MultipleSetBind extends MultipleBind
 		Type type = set.typeCheck(base, null, scope, null);
 		Type result = new UnknownType(location);
 
-		if (!type.isSet())
+		if (!type.isSet(location))
 		{
 			set.report(3197, "Expression matching set bind is not a set");
 			set.detail("Actual type", type);

@@ -113,7 +113,7 @@ public class SetPattern extends Pattern
 	{
 		DefinitionList defs = new DefinitionList();
 
-		if (!type.isSet())
+		if (!type.isSet(location))
 		{
 			report(3204, "Set pattern is not matched against set type");
 			detail("Actual type", type);
@@ -271,7 +271,7 @@ public class SetPattern extends Pattern
 	@Override
 	public boolean isConstrained()
 	{
-		if (plist.getPossibleType(location).isUnion())
+		if (plist.getPossibleType(location).isUnion(location))
 		{
 			return true;	// Set types are various, so we must permute
 		}

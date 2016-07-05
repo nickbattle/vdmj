@@ -90,7 +90,7 @@ public class MapCompExpression extends MapExpression
 		Environment local = new FlatCheckedEnvironment(def, base, scope);
 
 		if (predicate != null &&
-			!predicate.typeCheck(local, null, scope, new BooleanType(location)).isType(BooleanType.class))
+			!predicate.typeCheck(local, null, scope, new BooleanType(location)).isType(BooleanType.class, location))
 		{
 			predicate.report(3118, "Predicate is not boolean");
 		}
@@ -98,7 +98,7 @@ public class MapCompExpression extends MapExpression
 		Type domConstraint = null;
 		Type rngConstraint = null;
 		
-		if (constraint != null && constraint.isMap())
+		if (constraint != null && constraint.isMap(location))
 		{
 			domConstraint = constraint.getMap().from;
 			rngConstraint = constraint.getMap().to;

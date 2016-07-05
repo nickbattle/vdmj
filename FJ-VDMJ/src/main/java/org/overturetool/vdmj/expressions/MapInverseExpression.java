@@ -60,7 +60,7 @@ public class MapInverseExpression extends UnaryExpression
 	{
 		Type etype = exp.typeCheck(env, null, scope, null);
 
-		if (!etype.isMap())
+		if (!etype.isMap(location))
 		{
 			report(3111, "Argument to 'inverse' is not a map");
 			return new UnknownType(location);

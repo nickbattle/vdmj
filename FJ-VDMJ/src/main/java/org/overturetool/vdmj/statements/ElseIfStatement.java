@@ -66,7 +66,7 @@ public class ElseIfStatement extends Statement
 	@Override
 	public Type typeCheck(Environment env, NameScope scope, Type constraint)
 	{
-		if (!elseIfExp.typeCheck(env, null, scope, null).isType(BooleanType.class))
+		if (!elseIfExp.typeCheck(env, null, scope, null).isType(BooleanType.class, location))
 		{
 			elseIfExp.report(3218, "Expression is not boolean");
 		}

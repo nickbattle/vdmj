@@ -54,7 +54,7 @@ public class NotExpression extends UnaryExpression
 	{
 		Type t = exp.typeCheck(env, null, scope, null);
 
-		if (!t.isType(BooleanType.class))
+		if (!t.isType(BooleanType.class, location))
 		{
 			report(3137, "Not expression is not a boolean");
 		}

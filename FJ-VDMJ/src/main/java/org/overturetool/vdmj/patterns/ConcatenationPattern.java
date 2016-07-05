@@ -308,7 +308,7 @@ public class ConcatenationPattern extends Pattern
 		
 		Type type = plist.getPossibleType(location);
 		
-		return type.isUnknown() ? 
+		return type.isUnknown(location) ? 
 			new SeqType(location, new UnknownType(location)) : type;
 	}
 

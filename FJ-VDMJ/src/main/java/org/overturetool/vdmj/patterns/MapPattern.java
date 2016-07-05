@@ -130,7 +130,7 @@ public class MapPattern extends Pattern
 	{
 		DefinitionList defs = new DefinitionList();
 
-		if (!type.isMap())
+		if (!type.isMap(location))
 		{
 			report(3314, "Map pattern is not matched against map type");
 			detail("Actual type", type);

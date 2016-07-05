@@ -79,7 +79,7 @@ public class Exists1Expression extends Expression
 			tb.typeResolve(base);
 		}
 
-		if (!predicate.typeCheck(local, null, scope, new BooleanType(location)).isType(BooleanType.class))
+		if (!predicate.typeCheck(local, null, scope, new BooleanType(location)).isType(BooleanType.class, location))
 		{
 			predicate.report(3088, "Predicate is not boolean");
 		}

@@ -59,14 +59,14 @@ public class PowerSetExpression extends UnaryExpression
 	{
 		Type elemConstraint = null;
 		
-		if (constraint != null && constraint.isSet())
+		if (constraint != null && constraint.isSet(location))
 		{
 			elemConstraint = constraint.getSet().setof;
 		}
 
 		Type etype = exp.typeCheck(env, null, scope, elemConstraint);
 
-		if (!etype.isSet())
+		if (!etype.isSet(location))
 		{
 			report(3145, "Argument to 'power' is not a set");
 			return new UnknownType(location);
