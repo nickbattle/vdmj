@@ -61,9 +61,9 @@ public class CompExpression extends BinaryExpression
 		rtype = right.typeCheck(env, null, scope, null);
 		TypeSet results = new TypeSet();
 
-		if (ltype.isMap())
+		if (ltype.isMap(location))
 		{
-    		if (!rtype.isMap())
+    		if (!rtype.isMap(location))
     		{
     			report(3068, "Right hand of map 'comp' is not a map");
     			detail("Type", rtype);
@@ -82,9 +82,9 @@ public class CompExpression extends BinaryExpression
     		results.add(new MapType(location, rm.from, lm.to));
 		}
 
-		if (ltype.isFunction())
+		if (ltype.isFunction(location))
 		{
-    		if (!rtype.isFunction())
+    		if (!rtype.isFunction(location))
     		{
     			report(3070, "Right hand of function 'comp' is not a function");
     			detail("Type", rtype);
@@ -190,7 +190,7 @@ public class CompExpression extends BinaryExpression
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
-		if (ltype.isFunction())
+		if (ltype.isFunction(location))
 		{
 			String pref1 = left.getPreName();
 			String pref2 = right.getPreName();
@@ -202,7 +202,7 @@ public class CompExpression extends BinaryExpression
 			}
 		}
 
-		if (ltype.isMap())
+		if (ltype.isMap(location))
 		{
 			obligations.add(new MapComposeObligation(this, ctxt));
 		}

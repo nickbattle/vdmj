@@ -97,50 +97,50 @@ public class OptionalType extends Type
 	}
 
 	@Override
-	public Type isType(String typename)
+	public Type isType(String typename, LexLocation from)
 	{
-		return type.isType(typename);
+		return type.isType(typename, location);
 	}
 
 	@Override
-	public boolean isType(Class<? extends Type> typeclass)
+	public boolean isType(Class<? extends Type> typeclass, LexLocation from)
 	{
 		if (typeclass.equals(VoidType.class))
 		{
 			return false;	// Optionals are never void
 		}
 		
-		return type.isType(typeclass);
+		return type.isType(typeclass, location);
 	}
 
 	@Override
-	public boolean isUnion()
+	public boolean isUnion(LexLocation from)
 	{
-		return type.isUnion();
+		return type.isUnion(location);
 	}
 
 	@Override
-	public boolean isSeq()
+	public boolean isSeq(LexLocation from)
 	{
-		return type.isSeq();
+		return type.isSeq(location);
 	}
 
 	@Override
-	public boolean isSet()
+	public boolean isSet(LexLocation from)
 	{
-		return type.isSet();
+		return type.isSet(location);
 	}
 
 	@Override
-	public boolean isMap()
+	public boolean isMap(LexLocation from)
 	{
-		return type.isMap();
+		return type.isMap(location);
 	}
 
 	@Override
-	public boolean isRecord()
+	public boolean isRecord(LexLocation from)
 	{
-		return type.isRecord();
+		return type.isRecord(from);
 	}
 
 	@Override
@@ -156,33 +156,33 @@ public class OptionalType extends Type
 	}
 
 	@Override
-	public boolean isNumeric()
+	public boolean isNumeric(LexLocation from)
 	{
-		return type.isNumeric();
+		return type.isNumeric(location);
 	}
 
 	@Override
-	public boolean isProduct()
+	public boolean isProduct(LexLocation from)
 	{
-		return type.isProduct();
+		return type.isProduct(location);
 	}
 
 	@Override
-	public boolean isProduct(int n)
+	public boolean isProduct(int n, LexLocation from)
 	{
-		return type.isProduct(n);
+		return type.isProduct(n, location);
 	}
 
 	@Override
-	public boolean isFunction()
+	public boolean isFunction(LexLocation from)
 	{
-		return type.isFunction();
+		return type.isFunction(location);
 	}
 
 	@Override
-	public boolean isOperation()
+	public boolean isOperation(LexLocation from)
 	{
-		return type.isOperation();
+		return type.isOperation(location);
 	}
 
 	@Override

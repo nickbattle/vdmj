@@ -61,7 +61,7 @@ public class TailExpression extends UnaryExpression
 	{
 		etype = exp.typeCheck(env, null, scope, null);
 
-		if (!etype.isSeq())
+		if (!etype.isSeq(location))
 		{
 			report(3179, "Argument to 'tl' is not a sequence");
 			return new SeqType(location, new UnknownType(location));
@@ -100,7 +100,7 @@ public class TailExpression extends UnaryExpression
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt);
 		
-		if (!etype.isType(Seq1Type.class))
+		if (!etype.isType(Seq1Type.class, location))
 		{
 			obligations.add(new NonEmptySeqObligation(exp, ctxt));
 		}

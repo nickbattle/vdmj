@@ -100,7 +100,7 @@ public class FunctionType extends Type
 	}
 
 	@Override
-	public boolean isFunction()
+	public boolean isFunction(LexLocation from)
 	{
 		return true;
 	}

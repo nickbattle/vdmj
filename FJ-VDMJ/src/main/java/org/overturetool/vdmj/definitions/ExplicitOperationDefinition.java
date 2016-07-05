@@ -240,7 +240,7 @@ public class ExplicitOperationDefinition extends Definition
 			BooleanType expected = new BooleanType(location);
 			Type b = predef.body.typeCheck(pre, null, NameScope.NAMESANDSTATE, expected);
 
-			if (!b.isType(BooleanType.class))
+			if (!b.isType(BooleanType.class, location))
 			{
 				report(3018, "Precondition returns unexpected type");
 				detail2("Actual", b, "Expected", expected);
@@ -265,7 +265,7 @@ public class ExplicitOperationDefinition extends Definition
 			BooleanType expected = new BooleanType(location);
 			Type b = postdef.body.typeCheck(post, null, NameScope.NAMESANDANYSTATE, expected);
 
-			if (!b.isType(BooleanType.class))
+			if (!b.isType(BooleanType.class, location))
 			{
 				report(3018, "Postcondition returns unexpected type");
 				detail2("Actual", b, "Expected", expected);
@@ -275,13 +275,13 @@ public class ExplicitOperationDefinition extends Definition
 		actualResult = body.typeCheck(local, NameScope.NAMESANDSTATE, type.result);
 		boolean compatible = TypeComparator.compatible(type.result, actualResult);
 
-		if ((isConstructor && !actualResult.isType(VoidType.class) && !compatible) ||
+		if ((isConstructor && !actualResult.isType(VoidType.class, location) && !compatible) ||
 			(!isConstructor && !compatible))
 		{
 			report(3027, "Operation returns unexpected type");
 			detail2("Actual", actualResult, "Expected", type.result);
 		}
-		else if (!isConstructor && !actualResult.isUnknown())
+		else if (!isConstructor && !actualResult.isUnknown(location))
 		{
 			if (type.result.isVoid() && !actualResult.isVoid())
     		{
@@ -295,12 +295,12 @@ public class ExplicitOperationDefinition extends Definition
     		}
 		}
 
-		if (accessSpecifier.isAsync && !type.result.isType(VoidType.class))
+		if (accessSpecifier.isAsync && !type.result.isType(VoidType.class, location))
 		{
 			report(3293, "Asynchronous operation '" + name + "' cannot return a value");
 		}
 
-		if (accessSpecifier.isPure && type.result.isType(VoidType.class) && !type.result.isUnknown())
+		if (accessSpecifier.isPure && type.result.isType(VoidType.class, location) && !type.result.isUnknown(location))
 		{
 			report(3344, "Pure operation '" + name + "' must return a value");
 		}

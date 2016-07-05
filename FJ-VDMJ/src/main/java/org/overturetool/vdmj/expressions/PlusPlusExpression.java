@@ -60,13 +60,13 @@ public class PlusPlusExpression extends BinaryExpression
 		Type mapcons = null;
 		Type leftcons = null;
 		
-		if (constraint != null && constraint.isSeq())
+		if (constraint != null && constraint.isSeq(location))
 		{
 			SeqType st = constraint.getSeq();
 			mapcons = new MapType(location, new NaturalOneType(location), st.seqof);
 			leftcons = new SeqType(location);
 		}
-		else if (constraint != null && constraint.isMap())
+		else if (constraint != null && constraint.isMap(location))
 		{
 			MapType mt = constraint.getMap();
 			mapcons = mt;
@@ -77,11 +77,11 @@ public class PlusPlusExpression extends BinaryExpression
 		rtype = right.typeCheck(env, null, scope, mapcons);
 
 		TypeSet result = new TypeSet();
-		boolean unique = (!ltype.isUnion() && !rtype.isUnion());
+		boolean unique = (!ltype.isUnion(location) && !rtype.isUnion(location));
 
-		if (ltype.isMap())
+		if (ltype.isMap(location))
 		{
-    		if (!rtype.isMap())
+    		if (!rtype.isMap(location))
     		{
     			concern(unique, 3141, "Right hand of '++' is not a map");
     			detail(unique, "Type", rtype);
@@ -98,11 +98,11 @@ public class PlusPlusExpression extends BinaryExpression
     			domain.getType(location), range.getType(location)));
 		}
 
-		if (ltype.isSeq())
+		if (ltype.isSeq(location))
 		{
     		SeqType st = ltype.getSeq();
 
-    		if (!rtype.isMap())
+    		if (!rtype.isMap(location))
     		{
     			concern(unique, 3142, "Right hand of '++' is not a map");
     			detail(unique, "Type", rtype);
@@ -112,7 +112,7 @@ public class PlusPlusExpression extends BinaryExpression
     		{
         		MapType mr = rtype.getMap();
 
-        		if (!mr.from.isType(NumericType.class))
+        		if (!mr.from.isType(NumericType.class, location))
         		{
         			concern(unique, 3143, "Domain of right hand of '++' must be nat1");
         			detail(unique, "Type", mr.from);
@@ -187,7 +187,7 @@ public class PlusPlusExpression extends BinaryExpression
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt);
 
-		if (ltype.isSeq())
+		if (ltype.isSeq(location))
 		{
 			obligations.add(new SeqModificationObligation(this, ctxt));
 		}

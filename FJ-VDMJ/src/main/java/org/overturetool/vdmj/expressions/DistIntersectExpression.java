@@ -59,11 +59,11 @@ public class DistIntersectExpression extends UnaryExpression
 	{
 		Type arg = exp.typeCheck(env, null, scope, null);
 
-		if (arg.isSet())
+		if (arg.isSet(location))
 		{
 			SetType set = arg.getSet();
 
-			if (set.empty || set.setof.isSet())
+			if (set.empty || set.setof.isSet(location))
 			{
 				return set.setof;
 			}

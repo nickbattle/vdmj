@@ -78,7 +78,7 @@ public class ObjectFieldDesignator extends ObjectDesignator
 	{
 		Type type = object.typeCheck(env, qualifiers);
 		TypeSet result = new TypeSet();
-		boolean unique = !type.isUnion();
+		boolean unique = !type.isUnion(location);
 
 		if (type.isClass(env))
 		{
@@ -113,7 +113,7 @@ public class ObjectFieldDesignator extends ObjectDesignator
 			}
 		}
 
-		if (type.isRecord())
+		if (type.isRecord(location))
 		{
 			String sname = (fieldname != null) ? fieldname.name : classname.toString();
 			RecordType rec = type.getRecord();

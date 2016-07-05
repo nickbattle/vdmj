@@ -77,7 +77,7 @@ public class IotaExpression extends Expression
 			SetBind sb = (SetBind)bind;
 			rt = sb.set.typeCheck(base, null, scope, null);
 
-			if (rt.isSet())
+			if (rt.isSet(location))
 			{
 				rt = rt.getSet().setof;
 			}
@@ -95,7 +95,7 @@ public class IotaExpression extends Expression
 
 		Environment local = new FlatCheckedEnvironment(def, base, scope);
 		
-		if (!predicate.typeCheck(local, null, scope, new BooleanType(location)).isType(BooleanType.class))
+		if (!predicate.typeCheck(local, null, scope, new BooleanType(location)).isType(BooleanType.class, location))
 		{
 			predicate.report(3088, "Predicate is not boolean");
 		}

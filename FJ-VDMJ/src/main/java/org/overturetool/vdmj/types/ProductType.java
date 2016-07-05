@@ -81,13 +81,13 @@ public class ProductType extends Type
 	}
 
 	@Override
-	public boolean isProduct()
+	public boolean isProduct(LexLocation from)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean isProduct(int n)
+	public boolean isProduct(int n, LexLocation from)
 	{
 		return n == 0 || types.size() == n;
 	}

@@ -152,7 +152,7 @@ public class EqualsDefinition extends Definition
 		{
 			Type st = setbind.set.typeCheck(base, null, scope, null);
 
-			if (!st.isSet())
+			if (!st.isSet(location))
 			{
 				report(3015, "Set bind is not a set type?");
 				defType = expType;
@@ -287,7 +287,7 @@ public class EqualsDefinition extends Definition
 		{
 			if (!(pattern instanceof IdentifierPattern) &&
 				!(pattern instanceof IgnorePattern) &&
-				expType.isUnion())
+				expType.isUnion(location))
 			{
 				Type patternType = pattern.getPossibleType();	// With unknowns
 				UnionType ut = expType.getUnion();

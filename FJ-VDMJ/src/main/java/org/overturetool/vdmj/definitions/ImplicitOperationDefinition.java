@@ -328,7 +328,7 @@ public class ImplicitOperationDefinition extends Definition
 			BooleanType expected = new BooleanType(location);
 			Type b = predef.body.typeCheck(pre, null, NameScope.NAMESANDSTATE, expected);
 
-			if (!b.isType(BooleanType.class))
+			if (!b.isType(BooleanType.class, location))
 			{
 				report(3018, "Precondition returns unexpected type");
 				detail2("Actual", b, "Expected", expected);
@@ -352,13 +352,13 @@ public class ImplicitOperationDefinition extends Definition
 			actualResult = body.typeCheck(local, NameScope.NAMESANDSTATE, type.result);
 			boolean compatible = TypeComparator.compatible(type.result, actualResult);
 
-			if ((isConstructor && !actualResult.isType(VoidType.class) && !compatible) ||
+			if ((isConstructor && !actualResult.isType(VoidType.class, location) && !compatible) ||
 				(!isConstructor && !compatible))
 			{
 				report(3035, "Operation returns unexpected type");
 				detail2("Actual", actualResult, "Expected", type.result);
 			}
-			else if (!isConstructor && !actualResult.isUnknown())
+			else if (!isConstructor && !actualResult.isUnknown(location))
 			{
 				if (type.result.isVoid() && !actualResult.isVoid())
 	    		{
@@ -373,12 +373,12 @@ public class ImplicitOperationDefinition extends Definition
 			}
 		}
 
-		if (accessSpecifier.isAsync && !type.result.isType(VoidType.class))
+		if (accessSpecifier.isAsync && !type.result.isType(VoidType.class, location))
 		{
 			report(3293, "Asynchronous operation '" + name + "' cannot return a value");
 		}
 
-		if (accessSpecifier.isPure && type.result.isType(VoidType.class) && !type.result.isUnknown())
+		if (accessSpecifier.isPure && type.result.isType(VoidType.class, location) && !type.result.isUnknown(location))
 		{
 			report(3344, "Pure operation '" + name + "' must return a value");
 		}
@@ -426,7 +426,7 @@ public class ImplicitOperationDefinition extends Definition
 				b = postdef.body.typeCheck(post, null, NameScope.NAMESANDANYSTATE, expected);
 			}
 
-			if (!b.isType(BooleanType.class))
+			if (!b.isType(BooleanType.class, location))
 			{
 				report(3018, "Postcondition returns unexpected type");
 				detail2("Actual", b, "Expected", expected);
@@ -441,14 +441,14 @@ public class ImplicitOperationDefinition extends Definition
 			{
 				Type a = error.left.typeCheck(local, null, NameScope.NAMESANDSTATE, expected);
 
-				if (!a.isType(BooleanType.class))
+				if (!a.isType(BooleanType.class, location))
 				{
 					error.left.report(3307, "Errs clause is not bool -> bool");
 				}
 
 				Type b = error.right.typeCheck(local, null, NameScope.NAMESANDANYSTATE, expected);
 
-				if (!b.isType(BooleanType.class))
+				if (!b.isType(BooleanType.class, location))
 				{
 					error.right.report(3307, "Errs clause is not bool -> bool");
 				}

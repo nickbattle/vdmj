@@ -58,7 +58,7 @@ public class ReverseExpression extends UnaryExpression
 	{
 		Type etype = exp.typeCheck(env, null, scope, constraint);
 
-		if (!etype.isSeq())
+		if (!etype.isSeq(location))
 		{
 			report(3295, "Argument to 'reverse' is not a sequence");
 			return new SeqType(location, new UnknownType(location));

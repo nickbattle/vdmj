@@ -51,7 +51,7 @@ public class InSetExpression extends BinaryExpression
 		ltype = left.typeCheck(env, null, scope, null);
 		rtype = right.typeCheck(env, null, scope, null);
 
-		if (!rtype.isSet())
+		if (!rtype.isSet(location))
 		{
 			report(3110, "Argument of 'in set' is not a set");
 			detail("Actual", rtype);

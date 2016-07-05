@@ -70,7 +70,7 @@ public class SetRangeExpression extends SetExpression
 		ftype = first.typeCheck(env, null, scope, null);
 		ltype = last.typeCheck(env, null, scope, null);
 
-		if (!ftype.isNumeric())
+		if (!ftype.isNumeric(location))
 		{
 			ftype.report(3166, "Set range type must be an number");
 			ftype = new IntegerType(location);	// Avoid later errors
@@ -81,7 +81,7 @@ public class SetRangeExpression extends SetExpression
 			ftype = new IntegerType(location);	// Caused by ceiling/floor
 		}
 
-		if (!ltype.isNumeric())
+		if (!ltype.isNumeric(location))
 		{
 			ltype.report(3167, "Set range type must be an number");
 		}

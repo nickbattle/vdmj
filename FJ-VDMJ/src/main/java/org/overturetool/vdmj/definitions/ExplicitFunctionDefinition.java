@@ -274,7 +274,7 @@ public class ExplicitFunctionDefinition extends Definition
 			BooleanType expected = new BooleanType(location);
 			Type b = predef.body.typeCheck(local, null, NameScope.NAMES, expected);
 
-			if (!b.isType(BooleanType.class))
+			if (!b.isType(BooleanType.class, location))
 			{
 				report(3018, "Precondition returns unexpected type");
 				detail2("Actual", b, "Expected", expected);
@@ -299,7 +299,7 @@ public class ExplicitFunctionDefinition extends Definition
 			BooleanType expected = new BooleanType(location);
 			Type b = postdef.body.typeCheck(post, null, NameScope.NAMES, expected);
 
-			if (!b.isType(BooleanType.class))
+			if (!b.isType(BooleanType.class, location))
 			{
 				report(3018, "Postcondition returns unexpected type");
 				detail2("Actual", b, "Expected", expected);
@@ -387,7 +387,7 @@ public class ExplicitFunctionDefinition extends Definition
 
 				if (!(mtype.result instanceof NaturalType))
 				{
-					if (mtype.result.isProduct())
+					if (mtype.result.isProduct(location))
 					{
 						ProductType pt = mtype.result.getProduct();
 

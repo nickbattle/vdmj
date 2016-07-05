@@ -53,13 +53,13 @@ abstract public class BooleanBinaryExpression extends BinaryExpression
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
-		if (ltype.isUnion())
+		if (ltype.isUnion(location))
 		{
 			obligations.add(
 				new SubTypeObligation(left, new BooleanType(left.location), ltype, ctxt));
 		}
 
-		if (rtype.isUnion())
+		if (rtype.isUnion(location))
 		{
 			obligations.add(
 				new SubTypeObligation(right, new BooleanType(right.location), rtype, ctxt));

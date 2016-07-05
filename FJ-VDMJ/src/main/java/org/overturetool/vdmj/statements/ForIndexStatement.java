@@ -83,12 +83,12 @@ public class ForIndexStatement extends Statement
 		Type ft = from.typeCheck(env, null, scope, null);
 		Type tt = to.typeCheck(env, null, scope, null);
 
-		if (!ft.isNumeric())
+		if (!ft.isNumeric(location))
 		{
 			report(3220, "From type is not numeric");
 		}
 
-		if (!tt.isNumeric())
+		if (!tt.isNumeric(location))
 		{
 			report(3221, "To type is not numeric");
 		}
@@ -97,7 +97,7 @@ public class ForIndexStatement extends Statement
 		{
 			Type bt = by.typeCheck(env, null, scope, null);
 
-			if (!bt.isNumeric())
+			if (!bt.isNumeric(location))
 			{
 				report(3222, "By type is not numeric");
 			}

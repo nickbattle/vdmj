@@ -66,9 +66,9 @@ public class FieldDesignator extends StateDesignator
 	{
 		Type type = object.typeCheck(env);
 		TypeSet result = new TypeSet();
-		boolean unique = !type.isUnion();
+		boolean unique = !type.isUnion(location);
 
-		if (type.isRecord())
+		if (type.isRecord(location))
 		{
     		RecordType rec = type.getRecord();
     		Field rf = rec.findField(field.name);

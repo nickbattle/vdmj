@@ -78,9 +78,9 @@ public class RecordType extends InvariantType
 	}
 
 	@Override
-	public Type isType(String typename)
+	public Type isType(String typename, LexLocation from)
 	{
-		if (opaque) return null;
+		if (opaque && !from.module.equals(location.module)) return null;
 
 		if (typename.indexOf('`') > 0)
 		{
@@ -94,9 +94,9 @@ public class RecordType extends InvariantType
 	}
 
 	@Override
-	public boolean isRecord()
+	public boolean isRecord(LexLocation from)
 	{
-		if (opaque) return false;
+		if (opaque && !from.module.equals(location.module)) return false;
 		return true;
 	}
 

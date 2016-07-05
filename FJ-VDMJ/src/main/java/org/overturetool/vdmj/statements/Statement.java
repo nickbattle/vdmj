@@ -90,7 +90,7 @@ public abstract class Statement implements Serializable
 	 */
 	protected Type checkReturnType(Type constraint, Type actual)
 	{
-		if (constraint != null && !(actual instanceof VoidType) && !(actual.isUnknown()))
+		if (constraint != null && !(actual instanceof VoidType) && !(actual.isUnknown(location)))
 		{
 			if (actual.hasVoid() && !(constraint instanceof VoidType))
 			{

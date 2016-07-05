@@ -120,7 +120,7 @@ public class MapUnionPattern extends Pattern
 	{
 		DefinitionList defs = new DefinitionList();
 
-		if (!type.isMap())
+		if (!type.isMap(location))
 		{
 			report(3315, "Matching expression is not a map type");
 		}
@@ -342,7 +342,7 @@ public class MapUnionPattern extends Pattern
 
 		Type s = list.getType(location);
 
-		return s.isUnknown() ?
+		return s.isUnknown(location) ?
 			new MapType(location, new UnknownType(location), new UnknownType(location)) : s;
 	}
 

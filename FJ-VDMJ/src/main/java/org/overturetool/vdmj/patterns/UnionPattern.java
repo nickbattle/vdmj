@@ -119,7 +119,7 @@ public class UnionPattern extends Pattern
 	{
 		DefinitionList defs = new DefinitionList();
 
-		if (!type.isSet())
+		if (!type.isSet(location))
 		{
 			report(3206, "Matching expression is not a set type");
 		}
@@ -339,7 +339,7 @@ public class UnionPattern extends Pattern
 
 		Type s = list.getType(location);
 
-		return s.isUnknown() ?
+		return s.isUnknown(location) ?
 			new SetType(location, new UnknownType(location)) : s;
 	}
 

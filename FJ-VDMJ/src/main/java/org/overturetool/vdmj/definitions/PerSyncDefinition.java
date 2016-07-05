@@ -166,7 +166,7 @@ public class PerSyncDefinition extends Definition
 		
 		Type rt = guard.typeCheck(local, null, NameScope.NAMESANDSTATE, new BooleanType(location));
 
-		if (!rt.isType(BooleanType.class))
+		if (!rt.isType(BooleanType.class, location))
 		{
 			guard.report(3046, "Guard is not a boolean expression");
 		}

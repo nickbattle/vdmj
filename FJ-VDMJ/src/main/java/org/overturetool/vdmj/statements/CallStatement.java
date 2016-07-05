@@ -120,7 +120,7 @@ public class CallStatement extends Statement
 
 		Type type = opdef.getType();
 
-		if (type.isOperation())
+		if (type.isOperation(location))
 		{
     		OperationType optype = type.getOperation();
     		optype.typeResolve(env, null);
@@ -142,7 +142,7 @@ public class CallStatement extends Statement
     		checkArgTypes(optype.parameters, atypes);
     		return checkReturnType(constraint, optype.result);
 		}
-		else if (type.isFunction())
+		else if (type.isFunction(location))
 		{
 			// This is the case where a function is called as an operation without
 			// a "return" statement.

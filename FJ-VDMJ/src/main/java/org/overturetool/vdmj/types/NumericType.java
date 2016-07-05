@@ -39,7 +39,7 @@ public abstract class NumericType extends BasicType
 	public abstract int getWeight();
 
 	@Override
-	public boolean isNumeric()
+	public boolean isNumeric(LexLocation from)
 	{
 		return true;
 	}

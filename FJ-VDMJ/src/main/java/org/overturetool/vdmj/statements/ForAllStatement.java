@@ -79,7 +79,7 @@ public class ForAllStatement extends Statement
 		setType = set.typeCheck(base, null, scope, null);
 		pattern.typeResolve(base);
 
-		if (setType.isSet())
+		if (setType.isSet(location))
 		{
 			SetType st = setType.getSet();
 			DefinitionList defs = pattern.getDefinitions(st.setof, NameScope.LOCAL);

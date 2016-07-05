@@ -113,12 +113,12 @@ public class SpecificationStatement extends Statement
 				Type lt = err.left.typeCheck(base, null, NameScope.NAMESANDSTATE, null);
 				Type rt = err.right.typeCheck(base, null, NameScope.NAMESANDSTATE, null);
 
-				if (!lt.isType(BooleanType.class))
+				if (!lt.isType(BooleanType.class, location))
 				{
 					err.left.report(3275, "Error clause must be a boolean");
 				}
 
-				if (!rt.isType(BooleanType.class))
+				if (!rt.isType(BooleanType.class, location))
 				{
 					err.right.report(3275, "Error clause must be a boolean");
 				}
@@ -129,13 +129,13 @@ public class SpecificationStatement extends Statement
 		Environment local = new FlatEnvironment(defs, base);	// NB. No check
 
 		if (precondition != null &&
-			!precondition.typeCheck(local, null, NameScope.NAMESANDSTATE, null).isType(BooleanType.class))
+			!precondition.typeCheck(local, null, NameScope.NAMESANDSTATE, null).isType(BooleanType.class, location))
 		{
 			precondition.report(3233, "Precondition is not a boolean expression");
 		}
 
 		if (postcondition != null &&
-			!postcondition.typeCheck(local, null, NameScope.NAMESANDANYSTATE, null).isType(BooleanType.class))
+			!postcondition.typeCheck(local, null, NameScope.NAMESANDANYSTATE, null).isType(BooleanType.class, location))
 		{
 			postcondition.report(3234, "Postcondition is not a boolean expression");
 		}

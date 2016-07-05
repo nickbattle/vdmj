@@ -65,23 +65,23 @@ public class StarStarExpression extends BinaryExpression
 		ltype = left.typeCheck(env, null, scope, null);
 		rtype = right.typeCheck(env, null, scope, null);
 
-		if (ltype.isMap())
+		if (ltype.isMap(location))
 		{
-			if (!rtype.isNumeric())
+			if (!rtype.isNumeric(location))
 			{
 				rtype.report(3170, "Map iterator expects nat as right hand arg");
 			}
 		}
-		else if (ltype.isFunction())
+		else if (ltype.isFunction(location))
 		{
-			if (!rtype.isNumeric())
+			if (!rtype.isNumeric(location))
 			{
 				rtype.report(3171, "Function iterator expects nat as right hand arg");
 			}
 		}
-		else if (ltype.isNumeric())
+		else if (ltype.isNumeric(location))
 		{
-			if (!rtype.isNumeric())
+			if (!rtype.isNumeric(location))
 			{
 				rtype.report(3172, "'**' expects number as right hand arg");
 			}
@@ -172,7 +172,7 @@ public class StarStarExpression extends BinaryExpression
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
-		if (ltype.isFunction())
+		if (ltype.isFunction(location))
 		{
 			String prename = left.getPreName();
 
@@ -183,7 +183,7 @@ public class StarStarExpression extends BinaryExpression
 			}
 		}
 
-		if (ltype.isMap())
+		if (ltype.isMap(location))
 		{
 			obligations.add(new MapIterationObligation(this, ctxt));
 		}

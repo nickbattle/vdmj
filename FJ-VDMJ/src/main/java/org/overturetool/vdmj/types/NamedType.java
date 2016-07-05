@@ -27,6 +27,7 @@ import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.definitions.AccessSpecifier;
 import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.definitions.TypeDefinition;
+import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -51,24 +52,24 @@ public class NamedType extends InvariantType
 	}
 
 	@Override
-	public Type isType(String other)
+	public Type isType(String other, LexLocation from)
 	{
-		if (opaque) return null;
-		return type.isType(other);
+		if (opaque && !from.module.equals(location.module)) return null;
+		return type.isType(other, location);
 	}
 
 	@Override
-	public boolean isType(Class<? extends Type> typeclass)
+	public boolean isType(Class<? extends Type> typeclass, LexLocation from)
 	{
-		if (opaque) return false;
-		return type.isType(typeclass);
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isType(typeclass, location);
 	}
 
 	@Override
-	public boolean isUnion()
+	public boolean isUnion(LexLocation from)
 	{
-		if (opaque) return false;
-		return type.isUnion();
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isUnion(location);
 	}
 
 	@Override
@@ -96,31 +97,31 @@ public class NamedType extends InvariantType
 	}
 
 	@Override
-	public boolean isSeq()
+	public boolean isSeq(LexLocation from)
 	{
-		if (opaque) return false;
-		return type.isSeq();
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isSeq(location);
 	}
 
 	@Override
-	public boolean isSet()
+	public boolean isSet(LexLocation from)
 	{
-		if (opaque) return false;
-		return type.isSet();
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isSet(location);
 	}
 
 	@Override
-	public boolean isMap()
+	public boolean isMap(LexLocation from)
 	{
-		if (opaque) return false;
-		return type.isMap();
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isMap(location);
 	}
 
 	@Override
-	public boolean isRecord()
+	public boolean isRecord(LexLocation from)
 	{
-		if (opaque) return false;
-		return type.isRecord();
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isRecord(from);
 	}
 
 	@Override
@@ -137,38 +138,38 @@ public class NamedType extends InvariantType
 	}
 
 	@Override
-	public boolean isNumeric()
+	public boolean isNumeric(LexLocation from)
 	{
-		if (opaque) return false;
-		return type.isNumeric();
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isNumeric(location);
 	}
 
 	@Override
-	public boolean isProduct()
+	public boolean isProduct(LexLocation from)
 	{
-		if (opaque) return false;
-		return type.isProduct();
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isProduct(location);
 	}
 
 	@Override
-	public boolean isProduct(int n)
+	public boolean isProduct(int n, LexLocation from)
 	{
-		if (opaque) return false;
-		return type.isProduct(n);
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isProduct(n, location);
 	}
 
 	@Override
-	public boolean isFunction()
+	public boolean isFunction(LexLocation from)
 	{
-		if (opaque) return false;
-		return type.isFunction();
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isFunction(location);
 	}
 
 	@Override
-	public boolean isOperation()
+	public boolean isOperation(LexLocation from)
 	{
-		if (opaque) return false;
-		return type.isOperation();
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isOperation(location);
 	}
 
 	@Override

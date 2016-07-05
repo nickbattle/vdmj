@@ -1,0 +1,32 @@
+module A
+exports types S; R; struct Z values v:S functions f: ()->S
+definitions
+types
+    S = seq of nat;
+    R :: a : nat;
+    Z :: a : nat;
+    
+values
+    v:A`S = [1,2,3];	-- should be OK
+    r:A`R = mk_A`R(1);	-- should be OK
+    p:A`S = A`v;		-- should be OK
+    q:A`S = A`f();		-- should be OK
+    s:A`Z = mk_A`Z(1)	-- should be OK
+
+functions
+	f: () -> S
+	f() == [1,2,3];
+	  
+end A
+
+module B
+imports from A types S; R; Z values v functions f
+definitions
+values
+    v:A`S = [1,2,3];	-- should be an error
+    r:A`R = mk_A`R(1);	-- should be an error
+    p:A`S = A`v;		-- should be OK
+    q:A`S = A`f();		-- should be OK
+    s:A`Z = mk_A`Z(1)	-- should be OK
+        
+end B
