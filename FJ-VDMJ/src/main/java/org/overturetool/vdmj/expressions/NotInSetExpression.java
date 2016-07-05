@@ -51,7 +51,7 @@ public class NotInSetExpression extends BinaryExpression
 		ltype = left.typeCheck(env, null, scope, null);
 		rtype = right.typeCheck(env, null, scope, null);
 
-		if (!rtype.isSet())
+		if (!rtype.isSet(location))
 		{
 			report(3138, "Argument of 'not in set' is not a set");
 			detail("Actual", rtype);

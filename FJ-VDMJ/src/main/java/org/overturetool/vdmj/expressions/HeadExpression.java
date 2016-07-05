@@ -59,7 +59,7 @@ public class HeadExpression extends UnaryExpression
 	{
 		etype = exp.typeCheck(env, null, scope, null);
 
-		if (!etype.isSeq())
+		if (!etype.isSeq(location))
 		{
 			report(3104, "Argument to 'hd' is not a sequence");
 			return new UnknownType(location);
@@ -95,7 +95,7 @@ public class HeadExpression extends UnaryExpression
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt);
 		
-		if (!etype.isType(Seq1Type.class))
+		if (!etype.isType(Seq1Type.class, location))
 		{
 			obligations.add(new NonEmptySeqObligation(exp, ctxt));
 		}

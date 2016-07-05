@@ -58,7 +58,7 @@ public class IndicesExpression extends UnaryExpression
 	{
 		Type etype = exp.typeCheck(env, null, scope, null);
 
-		if (!etype.isSeq())
+		if (!etype.isSeq(location))
 		{
 			report(3109, "Argument to 'inds' is not a sequence");
 			detail("Actual type", etype);

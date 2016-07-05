@@ -67,17 +67,17 @@ public class SubseqExpression extends Expression
 		ftype = from.typeCheck(env, null, scope, null);
 		ttype = to.typeCheck(env, null, scope, null);
 
-		if (!stype.isSeq())
+		if (!stype.isSeq(location))
 		{
 			report(3174, "Subsequence is not of a sequence type");
 		}
 
-		if (!ftype.isNumeric())
+		if (!ftype.isNumeric(location))
 		{
 			report(3175, "Subsequence range start is not a number");
 		}
 
-		if (!ttype.isNumeric())
+		if (!ttype.isNumeric(location))
 		{
 			report(3176, "Subsequence range end is not a number");
 		}

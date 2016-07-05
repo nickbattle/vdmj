@@ -66,7 +66,7 @@ public class FieldNumberExpression extends Expression
 	{
 		type = tuple.typeCheck(env, null, scope, null);
 
-		if (!type.isProduct())
+		if (!type.isProduct(location))
 		{
 			tuple.report(3094, "Field '#" + field + "' applied to non-tuple type");
 			return new UnknownType(location);
@@ -128,7 +128,7 @@ public class FieldNumberExpression extends Expression
 
 			for (Type t: union.types)
 			{
-				if (t.isProduct())
+				if (t.isProduct(location))
 				{
 					ProductType pt = t.getProduct();
 

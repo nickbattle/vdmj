@@ -52,7 +52,7 @@ public class FloorExpression extends UnaryExpression
 	@Override
 	public Type typeCheck(Environment env, TypeList qualifiers, NameScope scope, Type constraint)
 	{
-		if (!exp.typeCheck(env, null, scope, null).isNumeric())
+		if (!exp.typeCheck(env, null, scope, null).isNumeric(location))
 		{
 			report(3096, "Argument to floor is not numeric");
 		}

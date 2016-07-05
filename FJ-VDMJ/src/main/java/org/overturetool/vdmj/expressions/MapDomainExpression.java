@@ -58,7 +58,7 @@ public class MapDomainExpression extends UnaryExpression
 	{
 		Type etype = exp.typeCheck(env, null, scope, null);
 
-		if (!etype.isMap())
+		if (!etype.isMap(location))
 		{
 			report(3120, "Argument to 'dom' is not a map");
 			return new UnknownType(location);

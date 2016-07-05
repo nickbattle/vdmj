@@ -94,7 +94,7 @@ public class ClassInvariantDefinition extends Definition
 		functional.setEnclosingDefinition(this);
 		Type type = expression.typeCheck(functional, null, NameScope.NAMESANDSTATE, new BooleanType(location));
 
-		if (!type.isType(BooleanType.class))
+		if (!type.isType(BooleanType.class, location))
 		{
 			report(3013, "Class invariant is not a boolean expression");
 		}

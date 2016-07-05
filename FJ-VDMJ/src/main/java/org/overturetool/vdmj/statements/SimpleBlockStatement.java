@@ -134,7 +134,7 @@ abstract public class SimpleBlockStatement extends Statement
 		// return type, as the block may return nothing.
 
 		if (last != null &&
-			(last.isType(VoidType.class) ||	last.isUnknown()))
+			(last.isType(VoidType.class, location) ||	last.isUnknown(location)))
 		{
 			rtypes.add(new VoidType(location));
 		}

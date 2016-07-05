@@ -56,7 +56,7 @@ public class AbsoluteExpression extends UnaryExpression
 	{
 		Type absConstraint = null;
 		
-		if (constraint != null && constraint.isNumeric())
+		if (constraint != null && constraint.isNumeric(location))
 		{
 			if (constraint instanceof NaturalType || constraint instanceof NaturalOneType)
 			{
@@ -70,7 +70,7 @@ public class AbsoluteExpression extends UnaryExpression
 		
 		Type t = exp.typeCheck(env, null, scope, absConstraint);
 
-		if (!t.isNumeric())
+		if (!t.isNumeric(location))
 		{
 			report(3053, "Argument of 'abs' is not numeric");
 		}

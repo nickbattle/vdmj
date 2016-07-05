@@ -162,7 +162,7 @@ public class CallObjectStatement extends Statement
 		if (Settings.dialect == Dialect.VDM_RT &&
 			field.module.equals("CPU") && field.name.equals("deploy"))
 		{
-			if (!atypes.get(0).isType(ClassType.class))
+			if (!atypes.get(0).isType(ClassType.class, location))
 			{
 				args.get(0).report(3280, "Argument to deploy must be an object");
 			}
@@ -205,7 +205,7 @@ public class CallObjectStatement extends Statement
 
 		Type type = fdef.getType();
 
-		if (type.isOperation())
+		if (type.isOperation(location))
 		{
 			OperationType optype = type.getOperation();
 			optype.typeResolve(env, null);
@@ -220,7 +220,7 @@ public class CallObjectStatement extends Statement
 			checkArgTypes(optype.parameters, atypes);	// Not necessary?
 			return checkReturnType(constraint, optype.result);
 		}
-		else if (type.isFunction())
+		else if (type.isFunction(location))
 		{
 			// This is the case where a function is called as an operation without
 			// a "return" statement.

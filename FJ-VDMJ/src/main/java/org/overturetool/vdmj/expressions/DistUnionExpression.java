@@ -63,11 +63,11 @@ public class DistUnionExpression extends UnaryExpression
 
 		Type type = exp.typeCheck(env, null, scope, setType);
 
-		if (type.isSet())
+		if (type.isSet(location))
 		{
 			SetType set = type.getSet();
 
-			if (set.setof.isSet())
+			if (set.setof.isSet(location))
 			{
 				return set.setof;
 			}

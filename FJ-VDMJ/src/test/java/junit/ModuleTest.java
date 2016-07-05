@@ -31,6 +31,7 @@ import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.lex.Dialect;
 import org.overturetool.vdmj.lex.LexTokenReader;
 import org.overturetool.vdmj.messages.Console;
+import org.overturetool.vdmj.messages.VDMError;
 import org.overturetool.vdmj.modules.ModuleList;
 import org.overturetool.vdmj.syntax.ModuleReader;
 import org.overturetool.vdmj.typechecker.ModuleTypeChecker;
@@ -54,7 +55,7 @@ public class ModuleTest extends TestCase
 		super.tearDown();
 	}
 
-	private void process(String resource)
+	private void process(String resource, Integer... expected)
 	{
 		Console.out.println("Processing " + resource + "...");
 
@@ -80,7 +81,16 @@ public class ModuleTest extends TestCase
    		Console.out.println("Type checked in " + (double)(after-before)/1000 + " secs. ");
 		Console.out.println("There were " + TypeChecker.getWarningCount() + " warnings");
 		TypeChecker.printErrors(Console.out);
-		assertEquals("Type check errors", 0, TypeChecker.getErrorCount());
+
+		//assertEquals("Type check errors", 0, TypeChecker.getErrorCount());
+		assertEquals("Type check errors", expected.length, TypeChecker.getErrorCount());
+
+		int p = 0;
+		
+		for (VDMError err: TypeChecker.getErrors())
+		{
+			assertEquals("Type checking error", err.number, expected[p++].intValue());
+		}
 	}
 
 	public void testRailway()
@@ -151,5 +161,10 @@ public class ModuleTest extends TestCase
 	public void testExpress()
 	{
 		process("express.vdm");
+	}
+	
+	public void testStruct()
+	{
+		process("struct.vdm", 3051, 3127);
 	}
 }

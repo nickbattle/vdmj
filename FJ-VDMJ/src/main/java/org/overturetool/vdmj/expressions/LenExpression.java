@@ -55,7 +55,7 @@ public class LenExpression extends UnaryExpression
 	{
 		Type etype = exp.typeCheck(env, null, scope, null);
 
-		if (!etype.isSeq())
+		if (!etype.isSeq(location))
 		{
 			report(3116, "Argument to 'len' is not a sequence");
 		}

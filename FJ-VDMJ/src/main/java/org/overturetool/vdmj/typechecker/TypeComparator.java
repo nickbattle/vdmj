@@ -32,6 +32,7 @@ import org.overturetool.vdmj.types.BracketType;
 import org.overturetool.vdmj.types.ClassType;
 import org.overturetool.vdmj.types.FunctionType;
 import org.overturetool.vdmj.types.InMapType;
+import org.overturetool.vdmj.types.InvariantType;
 import org.overturetool.vdmj.types.MapType;
 import org.overturetool.vdmj.types.NamedType;
 import org.overturetool.vdmj.types.NumericType;
@@ -112,7 +113,20 @@ public class TypeComparator
 			return a.hashCode() + b.hashCode();
 		}
 	}
+	
+	/**
+	 * The current module name. This is set as the type checker goes from module
+	 * to module, and is used to affect the processing of opaque "non-struct"
+	 * type exports.
+	 */
+	
+	private static String currentModule = null;
 
+	public static void setCurrentModule(String module)
+	{
+		currentModule = module;
+	}
+	
 	/**
 	 * Test whether the two types are compatible. This means that, at runtime,
 	 * it is possible that the two types are the same, or sufficiently similar
@@ -290,17 +304,29 @@ public class TypeComparator
     			from = ((BracketType)from).type;
     			continue;
     		}
-
-    		if (to instanceof NamedType)
+    		
+    		if (to instanceof InvariantType)
     		{
-    			to = ((NamedType)to).type;
-    			continue;
+    			InvariantType ito =(InvariantType)to;
+    			
+	    		if (to instanceof NamedType &&
+	    			(!ito.opaque || ito.location.module.equals(currentModule)))
+	    		{
+	    			to = ((NamedType)to).type;
+	    			continue;
+	    		}
     		}
 
-    		if (from instanceof NamedType)
+    		if (from instanceof InvariantType)
     		{
-    			from = ((NamedType)from).type;
-    			continue;
+    			InvariantType ifrom =(InvariantType)from;
+    			
+	    		if (from instanceof NamedType &&
+	    			(!ifrom.opaque || ifrom.location.module.equals(currentModule)))
+	    		{
+	    			from = ((NamedType)from).type;
+	    			continue;
+	    		}
     		}
 
     		if (to instanceof OptionalType)
@@ -688,6 +714,8 @@ public class TypeComparator
     			continue;
     		}
 
+    		// NOTE: not testing opaque InvariantTypes here.
+    		
     		if (sub instanceof NamedType)
     		{
     			NamedType nt = (NamedType)sub;

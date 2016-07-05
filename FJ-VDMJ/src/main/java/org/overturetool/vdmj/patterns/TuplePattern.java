@@ -110,7 +110,7 @@ public class TuplePattern extends Pattern
 	{
 		DefinitionList defs = new DefinitionList();
 
-		if (!type.isProduct(plist.size()))
+		if (!type.isProduct(plist.size(), location))
 		{
 			report(3205, "Matching expression is not a product of cardinality " + plist.size());
 			detail("Actual", type);

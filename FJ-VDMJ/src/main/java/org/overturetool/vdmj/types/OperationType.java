@@ -111,7 +111,7 @@ public class OperationType extends Type
 	}
 
 	@Override
-	public boolean isOperation()
+	public boolean isOperation(LexLocation from)
 	{
 		return true;
 	}

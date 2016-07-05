@@ -55,13 +55,13 @@ public class MapUnionExpression extends BinaryExpression
 		ltype = left.typeCheck(env, null, scope, constraint);
 		rtype = right.typeCheck(env, null, scope, constraint);
 
-		if (!ltype.isMap())
+		if (!ltype.isMap(location))
 		{
 			report(3123, "Left hand of 'munion' is not a map");
 			detail("Type", ltype);
 			return new MapType(location);	// Unknown types
 		}
-		else if (!rtype.isMap())
+		else if (!rtype.isMap(location))
 		{
 			report(3124, "Right hand of 'munion' is not a map");
 			detail("Type", rtype);

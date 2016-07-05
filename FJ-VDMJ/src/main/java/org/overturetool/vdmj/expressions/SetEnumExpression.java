@@ -72,7 +72,7 @@ public class SetEnumExpression extends SetExpression
 		
 		Type elemConstraint = null;
 		
-		if (constraint != null && constraint.isSet())
+		if (constraint != null && constraint.isSet(location))
 		{
 			elemConstraint = constraint.getSet().setof;
 		}

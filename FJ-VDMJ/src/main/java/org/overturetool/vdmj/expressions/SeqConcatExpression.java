@@ -53,13 +53,13 @@ public class SeqConcatExpression extends BinaryExpression
 		ltype = left.typeCheck(env, null, scope, constraint);
 		rtype = right.typeCheck(env, null, scope, constraint);
 
-		if (!ltype.isSeq())
+		if (!ltype.isSeq(location))
 		{
 			report(3157, "Left hand of '^' is not a sequence");
 			ltype = new SeqType(location, new UnknownType(location));
 		}
 
-		if (!rtype.isSeq())
+		if (!rtype.isSeq(location))
 		{
 			report(3158, "Right hand of '^' is not a sequence");
 			rtype = new SeqType(location, new UnknownType(location));

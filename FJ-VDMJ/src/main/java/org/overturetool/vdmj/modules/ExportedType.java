@@ -25,12 +25,9 @@ package org.overturetool.vdmj.modules;
 
 import org.overturetool.vdmj.definitions.Definition;
 import org.overturetool.vdmj.definitions.DefinitionList;
-import org.overturetool.vdmj.definitions.TypeDefinition;
 import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.types.InvariantType;
-import org.overturetool.vdmj.types.NamedType;
-import org.overturetool.vdmj.types.RecordType;
 import org.overturetool.vdmj.types.Type;
 
 public class ExportedType extends Export
@@ -60,29 +57,16 @@ public class ExportedType extends Export
 
 		if (def != null)
 		{
-			if (struct)
-			{
-				list.add(def);
-			}
-			else
+			list.add(def);
+
+			if (!struct)	// Mark the type as opaque, since it is not struct-exported
 			{
 				Type type = def.getType();
-
-				if (type instanceof NamedType)
+				
+				if (type instanceof InvariantType)
 				{
-					NamedType ntype = (NamedType)type;
-					InvariantType copy = new NamedType(ntype.typename, ntype.type);
-					copy.setOpaque(true);
-					copy.setInvariant(ntype.invdef);
-					list.add(new TypeDefinition(def.name, copy,	null, null));
-				}
-				else if (type instanceof RecordType)
-				{
-					RecordType rtype = (RecordType)type;
-					InvariantType copy = new RecordType(rtype.name, rtype.fields, rtype.composed);
-					copy.setOpaque(true);
-					copy.setInvariant(rtype.invdef);
-					list.add(new TypeDefinition(def.name, copy,	null, null));
+					InvariantType itype = (InvariantType)type;
+					itype.setOpaque(true);
 				}
 				else
 				{

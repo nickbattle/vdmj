@@ -41,7 +41,7 @@ public class UnknownType extends Type
 	}
 
 	@Override
-	public Type isType(String typename)
+	public Type isType(String typename, LexLocation from)
 	{
 		return null;	// Isn't any particular type?
 	}
@@ -53,37 +53,37 @@ public class UnknownType extends Type
 	}
 
 	@Override
-	public boolean isType(Class<? extends Type> typeclass)
+	public boolean isType(Class<? extends Type> typeclass, LexLocation from)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean isUnknown()
+	public boolean isUnknown(LexLocation from)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean isSeq()
+	public boolean isSeq(LexLocation from)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean isSet()
+	public boolean isSet(LexLocation from)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean isMap()
+	public boolean isMap(LexLocation from)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean isRecord()
+	public boolean isRecord(LexLocation from)
 	{
 		return true;
 	}
@@ -101,31 +101,31 @@ public class UnknownType extends Type
 	}
 
 	@Override
-	public boolean isNumeric()
+	public boolean isNumeric(LexLocation from)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean isProduct()
+	public boolean isProduct(LexLocation from)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean isProduct(int n)
+	public boolean isProduct(int n, LexLocation from)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean isFunction()
+	public boolean isFunction(LexLocation from)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean isOperation()
+	public boolean isOperation(LexLocation from)
 	{
 		return true;
 	}

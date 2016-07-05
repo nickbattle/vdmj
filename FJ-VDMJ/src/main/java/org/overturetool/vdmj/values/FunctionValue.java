@@ -644,9 +644,9 @@ public class FunctionValue extends Value
 	@Override
 	protected Value convertValueTo(Type to, Context ctxt, TypeSet done) throws ValueException
 	{
-		if (to.isFunction())
+		if (to.isFunction(location))
 		{
-			if (type.equals(to) || to.isUnknown())
+			if (type.equals(to) || to.isUnknown(location))
 			{
 				return this;
 			}

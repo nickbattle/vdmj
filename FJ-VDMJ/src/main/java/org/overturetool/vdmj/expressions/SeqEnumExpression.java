@@ -72,7 +72,7 @@ public class SeqEnumExpression extends SeqExpression
 		
 		Type elemConstraint = null;
 		
-		if (constraint != null && constraint.isSeq())
+		if (constraint != null && constraint.isSeq(location))
 		{
 			elemConstraint = constraint.getSeq().seqof;
 		}

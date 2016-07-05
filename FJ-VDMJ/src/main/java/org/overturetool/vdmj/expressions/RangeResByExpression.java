@@ -52,7 +52,7 @@ public class RangeResByExpression extends BinaryExpression
 	{
 		Type rngConstraint = null;
 		
-		if (constraint != null && constraint.isMap())
+		if (constraint != null && constraint.isMap(location))
 		{
 			rngConstraint = new SetType(location, constraint.getMap().to);
 		}
@@ -60,11 +60,11 @@ public class RangeResByExpression extends BinaryExpression
 		ltype = left.typeCheck(env, null, scope, constraint);
 		rtype = right.typeCheck(env, null, scope, rngConstraint);
 
-		if (!ltype.isMap())
+		if (!ltype.isMap(location))
 		{
 			report(3148, "Left of ':->' is not a map");
 		}
-		else if (!rtype.isSet())
+		else if (!rtype.isSet(location))
 		{
 			report(3149, "Right of ':->' is not a set");
 		}

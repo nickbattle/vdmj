@@ -33,6 +33,7 @@ import org.overturetool.vdmj.definitions.InheritedDefinition;
 import org.overturetool.vdmj.definitions.RenamedDefinition;
 import org.overturetool.vdmj.definitions.StateDefinition;
 import org.overturetool.vdmj.definitions.TypeDefinition;
+import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameToken;
 import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.TypeCheckException;
@@ -49,7 +50,7 @@ public class UnresolvedType extends Type
 	}
 
 	@Override
-	public Type isType(String other)
+	public Type isType(String other, LexLocation from)
 	{
 		return typename.getName().equals(other) ? this : null;
 	}

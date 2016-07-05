@@ -99,7 +99,7 @@ public class TypeSet extends TreeSet<Type>
 		{
 			OptionalType opt = (OptionalType)t;
 			
-			if (!opt.type.isUnknown() && contains(opt.type))
+			if (!opt.type.isUnknown(opt.type.location) && contains(opt.type))
 			{
 				remove(opt.type);	// Because T | [T] = [T]
 			}

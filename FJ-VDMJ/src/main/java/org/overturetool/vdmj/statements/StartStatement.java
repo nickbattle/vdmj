@@ -71,7 +71,7 @@ public class StartStatement extends Statement
 
 		Type type = objects.typeCheck(env, null, scope, null);
 
-		if (type.isSet())
+		if (type.isSet(location))
 		{
 			SetType set = type.getSet();
 

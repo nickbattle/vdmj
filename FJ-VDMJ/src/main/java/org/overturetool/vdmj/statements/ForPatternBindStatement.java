@@ -87,7 +87,7 @@ public class ForPatternBindStatement extends Statement
 		Type stype = exp.typeCheck(base, null, scope, null);
 		Environment local = base;
 
-		if (stype.isSeq())
+		if (stype.isSeq(location))
 		{
 			seqType = stype.getSeq();
 			patternBind.typeCheck(base, scope, seqType.seqof);

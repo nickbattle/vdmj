@@ -86,7 +86,7 @@ public class FieldExpression extends Expression
 	{
 		Type root = object.typeCheck(env, null, scope, null);
 
-		if (root.isUnknown())
+		if (root.isUnknown(location))
 		{
 			memberName = new LexNameToken("?", field);
 			return root;
@@ -94,9 +94,9 @@ public class FieldExpression extends Expression
 
 		TypeSet results = new TypeSet();
 		boolean recOrClass = false;
-		boolean unique = !root.isUnion();
+		boolean unique = !root.isUnion(location);
 
-		if (root.isRecord())
+		if (root.isRecord(location))
 		{
     		RecordType rec = root.getRecord();
     		Field cf = rec.findField(field.name);

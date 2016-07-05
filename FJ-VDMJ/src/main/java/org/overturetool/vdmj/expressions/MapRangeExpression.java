@@ -58,7 +58,7 @@ public class MapRangeExpression extends UnaryExpression
 	{
 		Type etype = exp.typeCheck(env, null, scope, null);
 
-		if (!etype.isMap())
+		if (!etype.isMap(location))
 		{
 			report(3122, "Argument to 'rng' is not a map");
 			return new UnknownType(location);

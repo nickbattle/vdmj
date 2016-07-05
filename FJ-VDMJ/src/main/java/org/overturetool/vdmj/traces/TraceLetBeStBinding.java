@@ -82,7 +82,7 @@ public class TraceLetBeStBinding extends TraceDefinition
 		Environment local = new FlatCheckedEnvironment(def, base, scope);
 
 		if (stexp != null &&
-			!stexp.typeCheck(local, null, scope, null).isType(BooleanType.class))
+			!stexp.typeCheck(local, null, scope, null).isType(BooleanType.class, location))
 		{
 			TypeChecker.report(3225,
 				"Such that clause is not boolean", stexp.location);

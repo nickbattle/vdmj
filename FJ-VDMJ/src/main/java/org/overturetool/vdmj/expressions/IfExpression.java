@@ -90,7 +90,7 @@ public class IfExpression extends Expression
 	@Override
 	public Type typeCheck(Environment env, TypeList qualifiers, NameScope scope, Type constraint)
 	{
-		if (!ifExp.typeCheck(env, null, scope, null).isType(BooleanType.class))
+		if (!ifExp.typeCheck(env, null, scope, null).isType(BooleanType.class, location))
 		{
 			report(3108, "If expression is not a boolean");
 		}

@@ -63,14 +63,14 @@ public class ElementsExpression extends SetExpression
 	{
 		Type elemType = null;
 		
-		if (constraint != null && constraint.isSet())
+		if (constraint != null && constraint.isSet(location))
 		{
 			elemType = new SeqType(location, constraint.getSet().setof);
 		}
 		
 		Type arg = exp.typeCheck(env, null, scope, elemType);
 
-		if (!arg.isSeq())
+		if (!arg.isSeq(location))
 		{
 			report(3085, "Argument of 'elems' is not a sequence");
 			return new SetType(location, new UnknownType(location));

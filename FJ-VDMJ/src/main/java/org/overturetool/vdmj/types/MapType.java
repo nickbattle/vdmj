@@ -71,7 +71,7 @@ public class MapType extends Type
 	}
 
 	@Override
-	public boolean isMap()
+	public boolean isMap(LexLocation from)
 	{
 		return true;
 	}
