@@ -144,12 +144,14 @@ public class ModuleTypeChecker extends TypeChecker
 		// other definitions so that they are found first.
 
 		DefinitionList alldefs = new DefinitionList();
+		DefinitionList checkDefs = new DefinitionList();
 
 		for (Module m: modules)
 		{
 			for (Definition d: m.importdefs)
 			{
 				alldefs.add(d);
+				if (!m.typechecked) checkDefs.add(d);
 			}
 		}
 
@@ -158,11 +160,9 @@ public class ModuleTypeChecker extends TypeChecker
 			for (Definition d: m.defs)
 			{
 				alldefs.add(d);
+				if (!m.typechecked) checkDefs.add(d);
 			}
 		}
-		
-		// Do a global duplicate definition check by defining an environment
-		new FlatCheckedEnvironment(alldefs, NameScope.NAMESANDSTATE);
 
 		for (Module m: modules)
 		{
@@ -174,31 +174,27 @@ public class ModuleTypeChecker extends TypeChecker
 
 		// Attempt type resolution of unchecked definitions from all modules.
 
+		Environment env =
+			new FlatCheckedEnvironment(alldefs, NameScope.NAMESANDSTATE);
 
-		for (Module m: modules)
+		for (Definition d: checkDefs)
 		{
-			TypeComparator.setCurrentModule(m.name.name);
-			Environment me = new ModuleEnvironment(m);
-			
-    		for (Definition d: m.defs)
-    		{
-    			try
-    			{
-    				d.typeResolve(me);
-    			}
-    			catch (TypeCheckException te)
-    			{
-    				report(3430, te.getMessage(), te.location);
-    				
-    				if (te.extras != null)
-    				{
-    					for (TypeCheckException e: te.extras)
-    					{
-    						report(3430, e.getMessage(), e.location);
-    					}
-    				}
-    			}
-    		}
+			try
+			{
+				d.typeResolve(env);
+			}
+			catch (TypeCheckException te)
+			{
+				report(3430, te.getMessage(), te.location);
+				
+				if (te.extras != null)
+				{
+					for (TypeCheckException e: te.extras)
+					{
+						report(3430, e.getMessage(), e.location);
+					}
+				}
+			}
 		}
 
 		// Proceed to type check all definitions, considering types, values
