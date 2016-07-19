@@ -33,7 +33,7 @@ import org.overturetool.vdmj.patterns.SeqBind;
 import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TypeBind;
 import org.overturetool.vdmj.pog.POContextStack;
-import org.overturetool.vdmj.pog.POForAllSequence;
+import org.overturetool.vdmj.pog.POForAllSequenceContext;
 import org.overturetool.vdmj.pog.ProofObligationList;
 import org.overturetool.vdmj.pog.SeqMemberObligation;
 import org.overturetool.vdmj.pog.SetMemberObligation;
@@ -284,7 +284,7 @@ public class ForPatternBindStatement extends Statement
 			SetBind bind = (SetBind)patternBind.bind;
 			list.addAll(bind.set.getProofObligations(ctxt));
 			
-			ctxt.push(new POForAllSequence(bind, exp));
+			ctxt.push(new POForAllSequenceContext(bind, exp));
 			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
 			ctxt.pop();
 		}
@@ -293,7 +293,7 @@ public class ForPatternBindStatement extends Statement
 			SeqBind bind = (SeqBind)patternBind.bind;
 			list.addAll(bind.sequence.getProofObligations(ctxt));
 			
-			ctxt.push(new POForAllSequence(bind, exp));
+			ctxt.push(new POForAllSequenceContext(bind, exp));
 			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 			ctxt.pop();
 		}

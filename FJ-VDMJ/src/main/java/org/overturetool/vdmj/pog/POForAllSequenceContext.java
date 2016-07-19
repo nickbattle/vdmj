@@ -26,12 +26,12 @@ package org.overturetool.vdmj.pog;
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.patterns.Bind;
 
-public class POForAllSequence extends POContext
+public class POForAllSequenceContext extends POContext
 {
 	public final Bind bind;
 	public final Expression sequence;
 
-	public POForAllSequence(Bind bind, Expression exp)
+	public POForAllSequenceContext(Bind bind, Expression exp)
 	{
 		this.bind = bind;
 		this.sequence = exp;
