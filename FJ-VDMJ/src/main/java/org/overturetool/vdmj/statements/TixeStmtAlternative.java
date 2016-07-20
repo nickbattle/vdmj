@@ -31,6 +31,8 @@ import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TypeBind;
 import org.overturetool.vdmj.pog.POContextStack;
 import org.overturetool.vdmj.pog.ProofObligationList;
+import org.overturetool.vdmj.pog.SeqMemberObligation;
+import org.overturetool.vdmj.pog.SetMemberObligation;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.PatternMatchException;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -153,7 +155,17 @@ public class TixeStmtAlternative
 		{
 			SetBind bind = (SetBind)patternBind.bind;
 			list.addAll(bind.set.getProofObligations(ctxt));
+
+			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
 		}
+		else if (patternBind.bind instanceof SeqBind)
+		{
+			SeqBind bind = (SeqBind)patternBind.bind;
+			list.addAll(bind.sequence.getProofObligations(ctxt));
+
+			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
+		}
+
 
 		list.addAll(statement.getProofObligations(ctxt));
 		return list;
