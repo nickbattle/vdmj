@@ -28,6 +28,7 @@ import org.overturetool.vdmj.definitions.MultiBindListDefinition;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.patterns.Bind;
+import org.overturetool.vdmj.patterns.SeqBind;
 import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TypeBind;
 import org.overturetool.vdmj.pog.POForAllContext;
@@ -84,6 +85,20 @@ public class IotaExpression extends Expression
 			else
 			{
 				report(3112, "Iota set bind is not a set");
+			}
+		}
+		else if (bind instanceof SeqBind)
+		{
+			SeqBind sb = (SeqBind)bind;
+			rt = sb.sequence.typeCheck(base, null, scope, null);
+
+			if (rt.isSeq(location))
+			{
+				rt = rt.getSeq().seqof;
+			}
+			else
+			{
+				report(3112, "Iota seq bind is not a sequence");
 			}
 		}
 		else

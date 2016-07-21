@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2008 Fujitsu Services Ltd.
+ *	Copyright (C) 2016 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -21,49 +21,33 @@
  *
  ******************************************************************************/
 
-package junit.overture.typecheck;
+package org.overturetool.vdmj.pog;
 
-import org.overturetool.vdmj.Release;
-import org.overturetool.vdmj.Settings;
+import org.overturetool.vdmj.expressions.Expression;
+import org.overturetool.vdmj.patterns.Bind;
 
-import junit.overture.OvertureTest;
-
-public class ClassTest extends OvertureTest
+public class POForAllSequenceContext extends POContext
 {
-	public void test_Typecheck1()
+	public final Bind bind;
+	public final Expression sequence;
+
+	public POForAllSequenceContext(Bind bind, Expression exp)
 	{
-		typecheck("typecheck1");
+		this.bind = bind;
+		this.sequence = exp;
 	}
 
-	public void test_Typecheck2()
+	@Override
+	public String getContext()
 	{
-		typecheck("typecheck2");
-	}
+		StringBuilder sb = new StringBuilder();
 
-	public void test_ReturnNil()
-	{
-		typecheck("returnnil");
-	}
+		sb.append("forall ");
+		sb.append(bind.pattern);
+		sb.append(" in set elems ");
+		sb.append(sequence);
+		sb.append(" & ");
 
-	public void test_VarAccess()
-	{
-		typecheck("varaccess");
-	}
-
-	public void test_Pure()
-	{
-		Settings.release = Release.VDM_10;
-		typecheck("puretest");
-	}
-
-	public void test_Set1()
-	{
-		typecheck("set1");
-	}
-	
-	public void test_SeqBinds()
-	{
-		Settings.release = Release.VDM_10;
-		typecheck("seqbinds");
+		return sb.toString();
 	}
 }

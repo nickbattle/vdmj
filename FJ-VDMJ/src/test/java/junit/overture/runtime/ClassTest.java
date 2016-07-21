@@ -46,4 +46,9 @@ public class ClassTest extends OvertureTest
 	{
 		runtime("set1");
 	}
+	
+	public void test_SeqBinds() throws Exception
+	{
+		runtime("seqbinds");
+	}
 }

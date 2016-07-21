@@ -26,10 +26,13 @@ package org.overturetool.vdmj.statements;
 import org.overturetool.vdmj.definitions.DefinitionList;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.patterns.PatternBind;
+import org.overturetool.vdmj.patterns.SeqBind;
 import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TypeBind;
 import org.overturetool.vdmj.pog.POContextStack;
 import org.overturetool.vdmj.pog.ProofObligationList;
+import org.overturetool.vdmj.pog.SeqMemberObligation;
+import org.overturetool.vdmj.pog.SetMemberObligation;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.PatternMatchException;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -39,6 +42,7 @@ import org.overturetool.vdmj.typechecker.NameScope;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.types.TypeSet;
 import org.overturetool.vdmj.values.Value;
+import org.overturetool.vdmj.values.ValueList;
 import org.overturetool.vdmj.values.ValueSet;
 
 public class TixeStmtAlternative
@@ -99,6 +103,21 @@ public class TixeStmtAlternative
 					setbind.abort(4049, "Value " + exval + " is not in set bind", ctxt);
 				}
 			}
+			else if (patternBind.bind instanceof SeqBind)
+			{
+				SeqBind seqbind = (SeqBind)patternBind.bind;
+				ValueList seq = seqbind.sequence.eval(ctxt).seqValue(ctxt);
+
+				if (seq.contains(exval))
+				{
+					evalContext = new Context(location, "tixe seq", ctxt);
+					evalContext.putList(seqbind.pattern.getNamedValues(exval, ctxt));
+				}
+				else
+				{
+					seqbind.abort(4049, "Value " + exval + " is not in seq bind", ctxt);
+				}
+			}
 			else
 			{
 				TypeBind typebind = (TypeBind)patternBind.bind;
@@ -136,7 +155,17 @@ public class TixeStmtAlternative
 		{
 			SetBind bind = (SetBind)patternBind.bind;
 			list.addAll(bind.set.getProofObligations(ctxt));
+
+			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
 		}
+		else if (patternBind.bind instanceof SeqBind)
+		{
+			SeqBind bind = (SeqBind)patternBind.bind;
+			list.addAll(bind.sequence.getProofObligations(ctxt));
+
+			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
+		}
+
 
 		list.addAll(statement.getProofObligations(ctxt));
 		return list;

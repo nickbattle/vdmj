@@ -46,4 +46,9 @@ public class ClassTest extends OvertureTest
 	{
 		syntax("set1");
 	}
+	
+	public void test_SeqBinds()
+	{
+		syntax("seqbinds");
+	}
 }

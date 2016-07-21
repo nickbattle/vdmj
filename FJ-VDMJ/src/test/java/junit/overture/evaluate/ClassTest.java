@@ -107,4 +107,10 @@ public class ClassTest extends OvertureTest
 	{
 		evaluate("set1", ResultType.TRUE, 0, Release.VDM_10);
 	}
+	
+	public void test_SeqBinds()
+	{
+		Settings.dialect = Dialect.VDM_RT;
+		evaluate("seqbinds", ResultType.TRUE, 0, Release.VDM_10);
+	}
 }
