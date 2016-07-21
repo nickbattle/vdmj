@@ -55,4 +55,9 @@ public class ClassTest extends OvertureTest
 		Settings.release = Release.VDM_10;
 		typecheck("puretest");
 	}
+
+	public void test_Set1()
+	{
+		typecheck("set1");
+	}
 }

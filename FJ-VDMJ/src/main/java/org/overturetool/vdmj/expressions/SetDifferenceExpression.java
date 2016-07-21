@@ -29,6 +29,8 @@ import org.overturetool.vdmj.runtime.ValueException;
 import org.overturetool.vdmj.typechecker.Environment;
 import org.overturetool.vdmj.typechecker.NameScope;
 import org.overturetool.vdmj.typechecker.TypeComparator;
+import org.overturetool.vdmj.types.Set1Type;
+import org.overturetool.vdmj.types.SetType;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.types.TypeList;
 import org.overturetool.vdmj.values.SetValue;
@@ -66,7 +68,15 @@ public class SetDifferenceExpression extends BinaryExpression
 			detail2("Left", ltype, "Right", rtype);
 		}
 
-		return ltype;
+		if (ltype instanceof Set1Type)
+		{
+			Set1Type set1 = (Set1Type)ltype;
+			return new SetType(location, set1.setof);
+		}
+		else
+		{
+			return ltype;
+		}
 	}
 
 	@Override

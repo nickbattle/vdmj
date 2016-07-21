@@ -26,6 +26,8 @@ package org.overturetool.vdmj.syntax;
 import java.util.List;
 import java.util.Vector;
 
+import org.overturetool.vdmj.Release;
+import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.lex.LexException;
 import org.overturetool.vdmj.lex.LexIdentifierToken;
 import org.overturetool.vdmj.lex.LexLocation;
@@ -54,6 +56,7 @@ import org.overturetool.vdmj.types.RealType;
 import org.overturetool.vdmj.types.RecordType;
 import org.overturetool.vdmj.types.Seq1Type;
 import org.overturetool.vdmj.types.SeqType;
+import org.overturetool.vdmj.types.Set1Type;
 import org.overturetool.vdmj.types.SetType;
 import org.overturetool.vdmj.types.TokenType;
 import org.overturetool.vdmj.types.Type;
@@ -284,6 +287,17 @@ public class TypeReader extends SyntaxReader
 				nextToken();
 				checkFor(Token.OF, 2253, "Expecting 'of' after set");
 				type = new SetType(token.location, readComposeType());
+				break;
+
+			case SET1:
+				if (Settings.release == Release.CLASSIC)
+				{
+					throwMessage(2327, "Type set1 is not available in classic");
+				}
+
+				nextToken();
+				checkFor(Token.OF, 2326, "Expecting 'of' after set1");
+				type = new Set1Type(token.location, readComposeType());
 				break;
 
 			case SEQ:

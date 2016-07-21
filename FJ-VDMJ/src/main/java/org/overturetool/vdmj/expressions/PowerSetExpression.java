@@ -71,8 +71,10 @@ public class PowerSetExpression extends UnaryExpression
 			report(3145, "Argument to 'power' is not a set");
 			return new UnknownType(location);
 		}
+		
+		SetType eset = etype.getSet();
 
-		return new SetType(location, etype);
+		return new SetType(location, new SetType(location, eset.setof));
 	}
 
 	@Override
