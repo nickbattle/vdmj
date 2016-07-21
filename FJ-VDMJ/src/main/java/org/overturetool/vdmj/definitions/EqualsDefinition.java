@@ -27,13 +27,17 @@ import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.lex.LexNameToken;
+import org.overturetool.vdmj.patterns.Bind;
 import org.overturetool.vdmj.patterns.IdentifierPattern;
 import org.overturetool.vdmj.patterns.IgnorePattern;
 import org.overturetool.vdmj.patterns.Pattern;
+import org.overturetool.vdmj.patterns.SeqBind;
 import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TypeBind;
 import org.overturetool.vdmj.pog.POContextStack;
 import org.overturetool.vdmj.pog.ProofObligationList;
+import org.overturetool.vdmj.pog.SeqMemberObligation;
+import org.overturetool.vdmj.pog.SetMemberObligation;
 import org.overturetool.vdmj.pog.SubTypeObligation;
 import org.overturetool.vdmj.pog.ValueBindingObligation;
 import org.overturetool.vdmj.runtime.Context;
@@ -61,7 +65,7 @@ public class EqualsDefinition extends Definition
 	private static final long serialVersionUID = 1L;
 	public final Pattern pattern;
 	public final TypeBind typebind;
-	public final SetBind setbind;
+	public final Bind bind;
 	public final Expression test;
 
 	public Type expType = null;
@@ -73,7 +77,7 @@ public class EqualsDefinition extends Definition
 		super(Pass.DEFS, location, null, NameScope.LOCAL);
 		this.pattern = pattern;
 		this.typebind = null;
-		this.setbind = null;
+		this.bind = null;
 		this.test = test;
 	}
 
@@ -82,16 +86,16 @@ public class EqualsDefinition extends Definition
 		super(Pass.DEFS, location, null, NameScope.LOCAL);
 		this.pattern = null;
 		this.typebind = typebind;
-		this.setbind = null;
+		this.bind = null;
 		this.test = test;
 	}
 
-	public EqualsDefinition(LexLocation location, SetBind setbind, Expression test)
+	public EqualsDefinition(LexLocation location, Bind setbind, Expression test)
 	{
 		super(Pass.DEFS, location, null, NameScope.LOCAL);
 		this.pattern = null;
 		this.typebind = null;
-		this.setbind = setbind;
+		this.bind = setbind;
 		this.test = test;
 	}
 
@@ -105,7 +109,7 @@ public class EqualsDefinition extends Definition
 	public String toString()
 	{
 		return (pattern != null ? pattern :
-				typebind != null ? typebind : setbind) + " = " + test;
+				typebind != null ? typebind : bind) + " = " + test;
 	}
 	
 	@Override
@@ -148,9 +152,9 @@ public class EqualsDefinition extends Definition
 			defType = typebind.type;	// Effectively a cast
 			defs = typebind.pattern.getDefinitions(defType, nameScope);
 		}
-		else
+		else if (bind instanceof SetBind)
 		{
-			Type st = setbind.set.typeCheck(base, null, scope, null);
+			Type st = ((SetBind)bind).set.typeCheck(base, null, scope, null);
 
 			if (!st.isSet(location))
 			{
@@ -163,14 +167,38 @@ public class EqualsDefinition extends Definition
 
     			if (!TypeComparator.compatible(expType, setof))
     			{
-    				setbind.report(3016, "Expression is not compatible with set bind");
+    				bind.report(3016, "Expression is not compatible with set bind");
     			}
 
     			defType = setof;	// Effectively a cast
 			}
 
-			setbind.pattern.typeResolve(base);
-			defs = setbind.pattern.getDefinitions(defType, nameScope);
+			bind.pattern.typeResolve(base);
+			defs = bind.pattern.getDefinitions(defType, nameScope);
+		}
+		else if (bind instanceof SeqBind)
+		{
+			Type st = ((SeqBind)bind).sequence.typeCheck(base, null, scope, null);
+
+			if (!st.isSeq(location))
+			{
+				report(3015, "Seq bind is not a sequence type?");
+				defType = expType;
+			}
+			else
+			{
+    			Type seqof = st.getSeq().seqof;
+
+    			if (!TypeComparator.compatible(expType, seqof))
+    			{
+    				bind.report(3016, "Expression is not compatible with seq bind");
+    			}
+
+    			defType = seqof;	// Effectively a cast
+			}
+
+			bind.pattern.typeResolve(base);
+			defs = bind.pattern.getDefinitions(defType, nameScope);
 		}
 
 		defs.typeCheck(base, scope);
@@ -252,18 +280,40 @@ public class EqualsDefinition extends Definition
 				abort(e);
 			}
 		}
-		else if (setbind != null)
+		else if (bind instanceof SetBind)
 		{
 			try
 			{
-				ValueSet set = setbind.set.eval(ctxt).setValue(ctxt);
+				ValueSet set = ((SetBind)bind).set.eval(ctxt).setValue(ctxt);
 
 				if (!set.contains(v))
 				{
-					abort(4002, "Expression value is not in set bind", ctxt);
+					abort(4002, "Expression value " + v + " is not in set bind", ctxt);
 				}
 
-				nvpl = setbind.pattern.getNamedValues(v, ctxt);
+				nvpl = bind.pattern.getNamedValues(v, ctxt);
+			}
+			catch (PatternMatchException e)
+			{
+				abort(e, ctxt);
+			}
+			catch (ValueException e)
+			{
+				abort(e);
+			}
+		}
+		else if (bind instanceof SeqBind)
+		{
+			try
+			{
+				ValueList seq = ((SeqBind)bind).sequence.eval(ctxt).seqValue(ctxt);
+
+				if (!seq.contains(v))
+				{
+					abort(4002, "Expression value " + v + " is not in seq bind", ctxt);
+				}
+
+				nvpl = bind.pattern.getNamedValues(v, ctxt);
 			}
 			catch (PatternMatchException e)
 			{
@@ -321,9 +371,15 @@ public class EqualsDefinition extends Definition
 				list.add(new SubTypeObligation(test, defType, expType, ctxt));
 			}
 		}
-		else if (setbind != null)
+		else if (bind instanceof SetBind)
 		{
-			list.addAll(setbind.set.getProofObligations(ctxt));
+			list.addAll(((SetBind)bind).set.getProofObligations(ctxt));
+			list.add(new SetMemberObligation(test, ((SetBind)bind).set, ctxt));
+		}
+		else if (bind instanceof SeqBind)
+		{
+			list.addAll(((SeqBind)bind).sequence.getProofObligations(ctxt));
+			list.add(new SeqMemberObligation(test, ((SeqBind)bind).sequence, ctxt));
 		}
 
 		list.addAll(test.getProofObligations(ctxt));
@@ -341,9 +397,9 @@ public class EqualsDefinition extends Definition
 	{
 		ValueList list = test.getValues(ctxt);
 
-		if (setbind != null)
+		if (bind != null)
 		{
-			list.addAll(setbind.getValues(ctxt));
+			list.addAll(bind.getValues(ctxt));
 		}
 
 		return list;
@@ -354,9 +410,9 @@ public class EqualsDefinition extends Definition
 	{
 		LexNameList list = test.getOldNames();
 
-		if (setbind != null)
+		if (bind != null)
 		{
-			list.addAll(setbind.getOldNames());
+			list.addAll(bind.getOldNames());
 		}
 
 		return list;

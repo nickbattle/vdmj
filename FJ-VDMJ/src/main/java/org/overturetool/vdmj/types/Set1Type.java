@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2008 Fujitsu Services Ltd.
+ *	Copyright (c) 2016 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -25,12 +25,16 @@ package org.overturetool.vdmj.types;
 
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.lex.LexNameToken;
+import org.overturetool.vdmj.runtime.Context;
+import org.overturetool.vdmj.runtime.ValueException;
+import org.overturetool.vdmj.values.SetValue;
+import org.overturetool.vdmj.values.ValueList;
 
-public class Seq1Type extends SeqType
+public class Set1Type extends SetType
 {
 	private static final long serialVersionUID = 1L;
 
-	public Seq1Type(LexLocation location, Type type)
+	public Set1Type(LexLocation location, Type type)
 	{
 		super(location, type);
 	}
@@ -38,13 +42,13 @@ public class Seq1Type extends SeqType
 	@Override
 	public String toDisplay()
 	{
-		return "seq1 of (" + seqof + ")";
+		return "set1 of (" + setof + ")";
 	}
 
 	@Override
 	public Type polymorph(LexNameToken pname, Type actualType)
 	{
-		return new Seq1Type(location, seqof.polymorph(pname, actualType));
+		return new Set1Type(location, setof.polymorph(pname, actualType));
 	}
 
 	@Override
@@ -52,12 +56,20 @@ public class Seq1Type extends SeqType
 	{
 		other = deBracket(other);
 
-		if (other.getClass().equals(Seq1Type.class))
+		if (other.getClass().equals(Set1Type.class))
 		{
-			Seq1Type os = (Seq1Type)other;
-			return seqof.equals(os.seqof);
+			Set1Type os = (Set1Type)other;
+			return setof.equals(os.setof);
 		}
 
 		return false;
+	}
+
+	@Override
+	public ValueList getAllValues(Context ctxt) throws ValueException
+	{
+		ValueList all = super.getAllValues(ctxt);
+		all.remove(new SetValue());  // Remove {}
+		return all;
 	}
 }

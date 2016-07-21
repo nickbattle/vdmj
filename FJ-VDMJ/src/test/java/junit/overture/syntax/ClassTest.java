@@ -41,4 +41,14 @@ public class ClassTest extends OvertureTest
 	{
 		syntax("emptyblock");
 	}
+
+	public void test_Set1()
+	{
+		syntax("set1");
+	}
+	
+	public void test_SeqBinds()
+	{
+		syntax("seqbinds");
+	}
 }

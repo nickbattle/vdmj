@@ -1,0 +1,4 @@
+class A
+values
+	S : set1 of nat = {}
+end A

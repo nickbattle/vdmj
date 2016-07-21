@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2008 Fujitsu Services Ltd.
+ *	Copyright (c) 2016 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -23,88 +23,102 @@
 
 package org.overturetool.vdmj.patterns;
 
-import java.util.List;
-import java.util.Vector;
-
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.lex.LexNameList;
 import org.overturetool.vdmj.pog.POContextStack;
 import org.overturetool.vdmj.pog.ProofObligationList;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
-import org.overturetool.vdmj.values.SetValue;
-import org.overturetool.vdmj.values.Value;
+import org.overturetool.vdmj.typechecker.Environment;
+import org.overturetool.vdmj.typechecker.NameScope;
+import org.overturetool.vdmj.typechecker.TypeComparator;
+import org.overturetool.vdmj.types.SeqType;
+import org.overturetool.vdmj.types.Type;
+import org.overturetool.vdmj.types.UnknownType;
 import org.overturetool.vdmj.values.ValueList;
-import org.overturetool.vdmj.values.ValueSet;
 
-
-public class SetBind extends Bind
+public class MultipleSeqBind extends MultipleBind
 {
 	private static final long serialVersionUID = 1L;
-	public final Expression set;
+	public final Expression sequence;
 
-	public SetBind(Pattern pattern, Expression set)
+	public MultipleSeqBind(PatternList plist, Expression sequence)
 	{
-		super(pattern.location, pattern);
-		this.set = set;
-	}
-
-	@Override
-	public List<MultipleBind> getMultipleBindList()
-	{
-		PatternList plist = new PatternList();
-		plist.add(pattern);
-		List<MultipleBind> mblist = new Vector<MultipleBind>();
-		mblist.add(new MultipleSetBind(plist, set));
-		return mblist;
+		super(plist);
+		this.sequence = sequence;
 	}
 
 	@Override
 	public String toString()
 	{
-		return pattern + " in set " + set;
+		return plist + " in seq " + sequence;
 	}
 
 	@Override
-	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
+	public Type typeCheck(Environment base, NameScope scope)
 	{
-		ValueList results = new ValueList();
-		ValueSet elements = set.eval(ctxt).setValue(ctxt);
-		elements.sort();
+		plist.typeResolve(base);
+		Type type = sequence.typeCheck(base, null, scope, null);
+		Type result = new UnknownType(location);
 
-		for (Value e: elements)
+		if (!type.isSeq(location))
 		{
-			e = e.deref();
+			sequence.report(3197, "Expression matching seq bind is not a sequence");
+			sequence.detail("Actual type", type);
+		}
+		else
+		{
+			SeqType st = type.getSeq();
 
-			if (e instanceof SetValue && permuted)
+			if (!st.empty)
 			{
-				SetValue sv = (SetValue)e;
-				results.addAll(sv.permutedSets());
+				result = st.seqof;
+				Type ptype = getPossibleType();
+
+				if (!TypeComparator.compatible(ptype, result))
+				{
+					sequence.report(3264, "At least one bind cannot match sequence");
+					sequence.detail2("Binds", ptype, "Seq of", st);
+				}
 			}
 			else
 			{
-				results.add(e);
+				sequence.warning(5009, "Empty sequence used in bind");
 			}
 		}
 
-		return results;
+		return result;
+	}
+
+	@Override
+	public ValueList getBindValues(Context ctxt, boolean permuted)
+	{
+		try
+		{
+			return sequence.eval(ctxt).seqValue(ctxt);
+		}
+		catch (ValueException e)
+		{
+			abort(e);
+			return null;
+		}
 	}
 
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		return set.getProofObligations(ctxt);
+		return sequence.getProofObligations(ctxt);
 	}
 
 	@Override
 	public ValueList getValues(Context ctxt)
 	{
-		return set.getValues(ctxt);
+		return sequence.getValues(ctxt);
 	}
 
 	@Override
 	public LexNameList getOldNames()
 	{
-		return set.getOldNames();
+		return sequence.getOldNames();
 	}
 }

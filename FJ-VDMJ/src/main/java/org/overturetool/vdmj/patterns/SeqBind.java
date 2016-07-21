@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2008 Fujitsu Services Ltd.
+ *	Copyright (c) 2016 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -32,21 +32,18 @@ import org.overturetool.vdmj.pog.POContextStack;
 import org.overturetool.vdmj.pog.ProofObligationList;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
-import org.overturetool.vdmj.values.SetValue;
-import org.overturetool.vdmj.values.Value;
 import org.overturetool.vdmj.values.ValueList;
-import org.overturetool.vdmj.values.ValueSet;
 
 
-public class SetBind extends Bind
+public class SeqBind extends Bind
 {
 	private static final long serialVersionUID = 1L;
-	public final Expression set;
+	public final Expression sequence;
 
-	public SetBind(Pattern pattern, Expression set)
+	public SeqBind(Pattern pattern, Expression sequence)
 	{
 		super(pattern.location, pattern);
-		this.set = set;
+		this.sequence = sequence;
 	}
 
 	@Override
@@ -55,56 +52,37 @@ public class SetBind extends Bind
 		PatternList plist = new PatternList();
 		plist.add(pattern);
 		List<MultipleBind> mblist = new Vector<MultipleBind>();
-		mblist.add(new MultipleSetBind(plist, set));
+		mblist.add(new MultipleSeqBind(plist, sequence));
 		return mblist;
 	}
 
 	@Override
 	public String toString()
 	{
-		return pattern + " in set " + set;
+		return pattern + " in seq " + sequence;
 	}
 
 	@Override
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
-		ValueList results = new ValueList();
-		ValueSet elements = set.eval(ctxt).setValue(ctxt);
-		elements.sort();
-
-		for (Value e: elements)
-		{
-			e = e.deref();
-
-			if (e instanceof SetValue && permuted)
-			{
-				SetValue sv = (SetValue)e;
-				results.addAll(sv.permutedSets());
-			}
-			else
-			{
-				results.add(e);
-			}
-		}
-
-		return results;
+		return sequence.eval(ctxt).seqValue(ctxt);
 	}
 
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		return set.getProofObligations(ctxt);
+		return sequence.getProofObligations(ctxt);
 	}
 
 	@Override
 	public ValueList getValues(Context ctxt)
 	{
-		return set.getValues(ctxt);
+		return sequence.getValues(ctxt);
 	}
 
 	@Override
 	public LexNameList getOldNames()
 	{
-		return set.getOldNames();
+		return sequence.getOldNames();
 	}
 }

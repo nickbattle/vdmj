@@ -1,0 +1,5 @@
+class A
+values
+	a = def s in seq [1,2,3] = 4 in s;
+	
+end A

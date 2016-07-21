@@ -29,10 +29,14 @@ import org.overturetool.vdmj.definitions.DefinitionList;
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.patterns.PatternBind;
+import org.overturetool.vdmj.patterns.SeqBind;
 import org.overturetool.vdmj.patterns.SetBind;
 import org.overturetool.vdmj.patterns.TypeBind;
 import org.overturetool.vdmj.pog.POContextStack;
+import org.overturetool.vdmj.pog.POForAllSequenceContext;
 import org.overturetool.vdmj.pog.ProofObligationList;
+import org.overturetool.vdmj.pog.SeqMemberObligation;
+import org.overturetool.vdmj.pog.SetMemberObligation;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.PatternMatchException;
 import org.overturetool.vdmj.runtime.ValueException;
@@ -199,6 +203,35 @@ public class ForPatternBindStatement extends Statement
 					}
 				}
 			}
+			else if (patternBind.bind instanceof SeqBind)
+			{
+				SeqBind seqbind = (SeqBind)patternBind.bind;
+				ValueList seq = seqbind.sequence.eval(ctxt).seqValue(ctxt);
+
+				for (Value val: values)
+				{
+					try
+					{
+						if (!seq.contains(val))
+						{
+							abort(4039, "Seq bind does not contain value " + val, ctxt);
+						}
+
+						Context evalContext = new Context(location, "for seq bind", ctxt);
+						evalContext.putList(seqbind.pattern.getNamedValues(val, ctxt));
+						Value rv = statement.eval(evalContext);
+
+						if (!rv.isVoid())
+						{
+							return rv;
+						}
+					}
+					catch (PatternMatchException e)
+					{
+						// Ignore mismatches
+					}
+				}
+			}
 			else
 			{
 				TypeBind typebind = (TypeBind)patternBind.bind;
@@ -250,6 +283,19 @@ public class ForPatternBindStatement extends Statement
 		{
 			SetBind bind = (SetBind)patternBind.bind;
 			list.addAll(bind.set.getProofObligations(ctxt));
+			
+			ctxt.push(new POForAllSequenceContext(bind, exp));
+			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
+			ctxt.pop();
+		}
+		else if (patternBind.bind instanceof SeqBind)
+		{
+			SeqBind bind = (SeqBind)patternBind.bind;
+			list.addAll(bind.sequence.getProofObligations(ctxt));
+			
+			ctxt.push(new POForAllSequenceContext(bind, exp));
+			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
+			ctxt.pop();
 		}
 
 		list.addAll(statement.getProofObligations(ctxt));

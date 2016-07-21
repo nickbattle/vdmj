@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2008 Fujitsu Services Ltd.
+ *	Copyright (C) 2016 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -21,49 +21,15 @@
  *
  ******************************************************************************/
 
-package junit.overture.typecheck;
+package org.overturetool.vdmj.pog;
 
-import org.overturetool.vdmj.Release;
-import org.overturetool.vdmj.Settings;
+import org.overturetool.vdmj.expressions.Expression;
 
-import junit.overture.OvertureTest;
-
-public class ClassTest extends OvertureTest
+public class SeqMemberObligation extends ProofObligation
 {
-	public void test_Typecheck1()
+	public SeqMemberObligation(Expression exp, Expression seq, POContextStack ctxt)
 	{
-		typecheck("typecheck1");
-	}
-
-	public void test_Typecheck2()
-	{
-		typecheck("typecheck2");
-	}
-
-	public void test_ReturnNil()
-	{
-		typecheck("returnnil");
-	}
-
-	public void test_VarAccess()
-	{
-		typecheck("varaccess");
-	}
-
-	public void test_Pure()
-	{
-		Settings.release = Release.VDM_10;
-		typecheck("puretest");
-	}
-
-	public void test_Set1()
-	{
-		typecheck("set1");
-	}
-	
-	public void test_SeqBinds()
-	{
-		Settings.release = Release.VDM_10;
-		typecheck("seqbinds");
+		super(exp.location, POType.SEQ_MEMBER, ctxt);
+		value = ctxt.getObligation(exp + " in set elems " + seq);
 	}
 }
