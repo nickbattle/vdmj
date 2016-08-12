@@ -150,6 +150,8 @@ abstract public class CommandReader
 					carryOn = doQuit("");
 					continue;
 				}
+				
+				line = line.trim();
 
 				if (line.equals("."))
 				{
