@@ -191,7 +191,7 @@ public class ExplicitOperationDefinition extends Definition
 			return;
 		}
 
-		paramDefinitions = getParamDefinitions();
+		paramDefinitions = getParamDefinitions(base);
 		paramDefinitions.typeCheck(base, scope);
 
 		FlatEnvironment local = new FlatCheckedEnvironment(paramDefinitions, base, scope);
@@ -335,14 +335,15 @@ public class ExplicitOperationDefinition extends Definition
 		return type;		// NB entire "==>" type, not result
 	}
 
-	private DefinitionList getParamDefinitions()
+	private DefinitionList getParamDefinitions(Environment env)
 	{
 		DefinitionList defs = new DefinitionList();
 		Iterator<Type> titer = type.parameters.iterator();
 
 		for (Pattern p: parameterPatterns)
 		{
-   			defs.addAll(p.getDefinitions(titer.next(), NameScope.LOCAL));
+			Type ptype = titer.next();
+   			defs.addAll(p.getDefinitions(ptype, ptype.isClass(env) ? NameScope.STATE : NameScope.LOCAL));
 		}
 
 		return checkDuplicatePatterns(defs);

@@ -218,7 +218,7 @@ public class ImplicitOperationDefinition extends Definition
 
 		for (PatternListTypePair ptp: parameterPatterns)
 		{
-			argdefs.addAll(ptp.getDefinitions(NameScope.LOCAL));
+			argdefs.addAll(ptp.getDefinitions(ptp.type.isClass(base) ? NameScope.STATE : NameScope.LOCAL));
 		}
 
 		defs.addAll(checkDuplicatePatterns(argdefs));
