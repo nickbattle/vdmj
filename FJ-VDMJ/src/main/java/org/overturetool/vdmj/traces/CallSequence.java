@@ -31,11 +31,9 @@ import org.overturetool.vdmj.expressions.ExpressionList;
 import org.overturetool.vdmj.expressions.NewExpression;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.runtime.Context;
-import org.overturetool.vdmj.runtime.Interpreter;
 import org.overturetool.vdmj.statements.CallObjectStatement;
 import org.overturetool.vdmj.statements.CallStatement;
 import org.overturetool.vdmj.statements.Statement;
-import org.overturetool.vdmj.typechecker.Environment;
 
 @SuppressWarnings("serial")
 public class CallSequence extends Vector<Statement>
@@ -192,30 +190,30 @@ public class CallSequence extends Vector<Statement>
 		return get(i).toString().equals(other.get(i).toString());
 	}
 
-	public void typeCheck(Interpreter interpreter, Environment env) throws Exception
-	{
-		for (Statement statement: this)
-		{
-			if (statement instanceof CallStatement)
-			{
-				CallStatement call = (CallStatement)statement;
-				
-				if (call.name.typeQualifier != null)
-				{
-					continue;	// Already type checked
-				}
-			}
-			else if (statement instanceof CallObjectStatement)
-			{
-				CallObjectStatement call = (CallObjectStatement)statement;
-				
-				if (call.field != null)
-				{
-					continue;	// Already type checked
-				}
-			}
-			
-			interpreter.typeCheck(statement, env);
-		}
-	}
+//	public void typeCheck(Interpreter interpreter, Environment env) throws Exception
+//	{
+//		for (Statement statement: this)
+//		{
+//			if (statement instanceof CallStatement)
+//			{
+//				CallStatement call = (CallStatement)statement;
+//				
+//				if (call.name.typeQualifier != null)
+//				{
+//					continue;	// Already type checked
+//				}
+//			}
+//			else if (statement instanceof CallObjectStatement)
+//			{
+//				CallObjectStatement call = (CallObjectStatement)statement;
+//				
+//				if (call.field != null)
+//				{
+//					continue;	// Already type checked
+//				}
+//			}
+//			
+//			interpreter.typeCheck(statement, env);
+//		}
+//	}
 }
