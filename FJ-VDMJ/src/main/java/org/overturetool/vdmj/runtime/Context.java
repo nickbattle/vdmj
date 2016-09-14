@@ -121,30 +121,6 @@ public class Context extends HashMap<LexNameToken, Value>
 	}
 
 	/**
-	 * Make a deep copy of the context, using Value.deepCopy.
-	 */
-
-	public Context deepCopy()
-	{
-		Context below = null;
-
-		if (outer != null)
-		{
-			below = outer.deepCopy();
-		}
-
-		Context result = new Context(location, title, below);
-
-		for (LexNameToken var: keySet())
-		{
-			Value v = get(var);
-			result.put(var, v.deepCopy());
-		}
-
-		return result;
-	}
-
-	/**
 	 * Add a list of name/value pairs to this context.
 	 *
 	 * @param nvl A list of name/value pairs.

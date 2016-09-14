@@ -62,28 +62,6 @@ public class ObjectContext extends RootContext
 		this(location, title, null, outer, self);
 	}
 
-	@Override
-	public Context deepCopy()
-	{
-		Context below = null;
-
-		if (outer != null)
-		{
-			below = outer.deepCopy();
-		}
-
-		Context result =
-			new ObjectContext(location, title, freeVariables, below, self.deepCopy());
-
-		for (LexNameToken var: keySet())
-		{
-			Value v = get(var);
-			result.put(var, v.deepCopy());
-		}
-
-		return result;
-	}
-
 	/**
 	 * Check for the name in the current context and self, and if
 	 * not present search the global context. Note that the context
