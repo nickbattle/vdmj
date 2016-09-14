@@ -38,7 +38,6 @@ import java.util.Map.Entry;
 import org.overturetool.vdmj.Settings;
 import org.overturetool.vdmj.debug.DBGPReader;
 import org.overturetool.vdmj.definitions.ClassDefinition;
-import org.overturetool.vdmj.definitions.DefinitionList;
 import org.overturetool.vdmj.definitions.NamedTraceDefinition;
 import org.overturetool.vdmj.expressions.Expression;
 import org.overturetool.vdmj.lex.Dialect;
@@ -62,9 +61,7 @@ import org.overturetool.vdmj.traces.TraceIterator;
 import org.overturetool.vdmj.traces.TraceReductionType;
 import org.overturetool.vdmj.traces.Verdict;
 import org.overturetool.vdmj.typechecker.Environment;
-import org.overturetool.vdmj.typechecker.FlatEnvironment;
 import org.overturetool.vdmj.typechecker.NameScope;
-import org.overturetool.vdmj.typechecker.PrivateClassEnvironment;
 import org.overturetool.vdmj.typechecker.TypeChecker;
 import org.overturetool.vdmj.types.Type;
 import org.overturetool.vdmj.values.Value;
@@ -640,7 +637,9 @@ abstract public class Interpreter
 			}
 			else
 			{
-				test.typeCheck(this, getTraceEnvironment(tracedef.classDefinition));
+				// Typechecking should not be necessary with new traces
+				// test.typeCheck(this, getTraceEnvironment(tracedef.classDefinition));
+				
     			init(null);	// Initialize completely between every run...
     			List<Object> result = runOneTrace(tracedef.classDefinition, test, debug);
     			filter.update(result, test, testNumber);
@@ -681,16 +680,16 @@ abstract public class Interpreter
 	abstract public List<Object> runOneTrace(
 		ClassDefinition classDefinition, CallSequence test, boolean debug);
 	
-	private Environment getTraceEnvironment(ClassDefinition classdef) throws Exception
-	{
-		if (this instanceof ClassInterpreter)
-		{
-			return new FlatEnvironment(classdef.getSelfDefinition(),
-				new PrivateClassEnvironment(classdef, getGlobalEnvironment()));
-		}
-		else
-		{
-			return new FlatEnvironment(new DefinitionList(), getGlobalEnvironment());
-		}
-	}
+//	private Environment getTraceEnvironment(ClassDefinition classdef) throws Exception
+//	{
+//		if (this instanceof ClassInterpreter)
+//		{
+//			return new FlatEnvironment(classdef.getSelfDefinition(),
+//				new PrivateClassEnvironment(classdef, getGlobalEnvironment()));
+//		}
+//		else
+//		{
+//			return new FlatEnvironment(new DefinitionList(), getGlobalEnvironment());
+//		}
+//	}
 }
