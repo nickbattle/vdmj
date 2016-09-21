@@ -1171,4 +1171,17 @@ public class TypeComparator
 			return result.getType(a.location);
 		}
 	}
+	
+	/**
+	 * Return the narrowest of two types/type lists.
+	 */
+	public static synchronized TypeList narrowest(TypeList t1, TypeList t2)
+	{
+		return allSubTypes(t1, t2, false) == Result.Yes ? t1 : t2;
+	}
+	
+	public static synchronized Type narrowest(Type t1, Type t2)
+	{
+		return isSubType(t1, t2) ? t1 : t2;
+	}
 }

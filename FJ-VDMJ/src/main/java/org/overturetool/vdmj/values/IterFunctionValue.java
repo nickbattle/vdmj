@@ -26,6 +26,8 @@ package org.overturetool.vdmj.values;
 import org.overturetool.vdmj.lex.LexLocation;
 import org.overturetool.vdmj.runtime.Context;
 import org.overturetool.vdmj.runtime.ValueException;
+import org.overturetool.vdmj.types.Type;
+import org.overturetool.vdmj.types.TypeSet;
 
 
 public class IterFunctionValue extends FunctionValue
@@ -76,6 +78,13 @@ public class IterFunctionValue extends FunctionValue
 		}
 
 		return false;
+	}
+	
+	@Override
+	protected Value convertValueTo(Type to, Context ctxt, TypeSet done) throws ValueException
+	{
+		FunctionValue converted = (FunctionValue)function.convertValueTo(to, ctxt, done);
+		return new IterFunctionValue(converted, iterations);
 	}
 
 	@Override
