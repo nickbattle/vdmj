@@ -658,27 +658,20 @@ public class FunctionValue extends Value
 				{
 					return this;
 				}
-				else if (TypeComparator.isSubType(type, restrictedType))
-				{
-//					// Create a new function with restricted dom/rng
-//					FunctionValue restricted = new FunctionValue(location, name, restrictedType,
-//							paramPatternList, body, precondition, postcondition,
-//							freeVariables, checkInvariants, curriedArgs,
-//							measureName, measureValues);
-//
-//					restricted.typeValues = typeValues;
-//					return restricted;
-					
-					// Return the actual function value so that args passed outside
-					// the domain fail at runtime.
-					return this;
-				}
 				else
 				{
-//					return abort(4165, "Cannot convert " + this + " to " + restrictedType, ctxt);
-					
-					// By possible semantics, this is actually OK too, so return the value
-					return this;
+					TypeList domain = TypeComparator.narrowest(type.parameters, restrictedType.parameters);
+					Type range = TypeComparator.narrowest(type.result, restrictedType.result);
+					FunctionType newType = new FunctionType(location, true, domain, range);
+
+					// Create a new function with the narrowest dom/rng types
+					FunctionValue restricted = new FunctionValue(location, name, newType,
+							paramPatternList, body, precondition, postcondition,
+							freeVariables, checkInvariants, curriedArgs,
+							measureName, measureValues);
+
+					restricted.typeValues = typeValues;
+					return restricted;
 				}
 			}
 		}
