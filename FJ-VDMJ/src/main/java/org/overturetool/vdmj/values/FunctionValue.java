@@ -660,14 +660,18 @@ public class FunctionValue extends Value
 				}
 				else if (TypeComparator.isSubType(type, restrictedType))
 				{
-					// Create a new function with restricted dom/rng
-					FunctionValue restricted = new FunctionValue(location, name, restrictedType,
-							paramPatternList, body, precondition, postcondition,
-							freeVariables, checkInvariants, curriedArgs,
-							measureName, measureValues);
-
-					restricted.typeValues = typeValues;
-					return restricted;
+//					// Create a new function with restricted dom/rng
+//					FunctionValue restricted = new FunctionValue(location, name, restrictedType,
+//							paramPatternList, body, precondition, postcondition,
+//							freeVariables, checkInvariants, curriedArgs,
+//							measureName, measureValues);
+//
+//					restricted.typeValues = typeValues;
+//					return restricted;
+					
+					// Return the actual function value so that args passed outside
+					// the domain fail at runtime.
+					return this;
 				}
 				else
 				{
