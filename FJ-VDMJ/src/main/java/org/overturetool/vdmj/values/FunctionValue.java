@@ -675,7 +675,10 @@ public class FunctionValue extends Value
 				}
 				else
 				{
-					return abort(4165, "Cannot convert " + this + " to " + restrictedType, ctxt);
+//					return abort(4165, "Cannot convert " + this + " to " + restrictedType, ctxt);
+					
+					// By possible semantics, this is actually OK too, so return the value
+					return this;
 				}
 			}
 		}
