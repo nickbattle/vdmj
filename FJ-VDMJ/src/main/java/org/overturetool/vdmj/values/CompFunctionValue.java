@@ -134,4 +134,10 @@ public class CompFunctionValue extends FunctionValue
 	{
 		return "comp";
 	}
+
+	@Override
+	public Object clone()
+	{
+		return new CompFunctionValue((FunctionValue)ff1.clone(), (FunctionValue)ff2.clone());
+	}
 }
