@@ -304,12 +304,18 @@ public class DefinitionReader extends SyntaxReader
 			}
 		}
 
+		// Keyword counts
+		int numStatic = 0;
+		int numAsync = 0;
+		int numPure = 0;
+		int numAccess = 0;
+
 		// Defaults
 		boolean isStatic = false;
 		boolean isAsync = false;
 		boolean isPure = false;
 		Token access = Token.PRIVATE;
-
+		
 		boolean more = true;
 
 		while (more)
@@ -319,6 +325,11 @@ public class DefinitionReader extends SyntaxReader
 				case ASYNC:
 					if (asyncOK)
 					{
+						if (++numAsync > 1)
+						{
+							throwMessage(2329, "Duplicate async keyword");
+						}
+						
 						isAsync = true;
 						nextToken();
 					}
@@ -330,6 +341,11 @@ public class DefinitionReader extends SyntaxReader
 					break;
 
 				case STATIC:
+					if (++numStatic > 1)
+					{
+						throwMessage(2329, "Duplicate static keyword");
+					}
+					
 					isStatic = true;
 					nextToken();
 					break;
@@ -337,6 +353,11 @@ public class DefinitionReader extends SyntaxReader
 				case PUBLIC:
 				case PRIVATE:
 				case PROTECTED:
+					if (++numAccess > 1)
+					{
+						throwMessage(2329, "Duplicate access specifier keyword");
+					}
+
 					access = lastToken().type;
 					nextToken();
 					break;
@@ -349,6 +370,11 @@ public class DefinitionReader extends SyntaxReader
 
 					if (pureOK)
 					{
+						if (++numPure > 1)
+						{
+							throwMessage(2329, "Duplicate pure keyword");
+						}
+						
 						isPure = true;
 						nextToken();
 					}
