@@ -377,6 +377,7 @@ as the expected and actual values.
 2326, "Expecting 'of' after set1"
 2327, "Type set1 is not available in classic"
 2328, "Sequence binds are not available in classic"
+2329, "Duplicate <keyword> keyword"
 
 3000, "Expression does not match declared type"
 3001, "Class inherits thread definition from multiple supertypes"
