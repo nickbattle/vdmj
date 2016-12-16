@@ -1,0 +1,8 @@
+module B
+exports all
+definitions
+functions
+	g: nat -> nat
+	g(i) == i + 1
+
+end B

@@ -1,0 +1,17 @@
+Building VDMJUnit
+
+VDMJUnit is designed to be built with Maven (see http://maven.apache.org/).
+
+In practice, after checking out the source, this means you just need to sit at the root
+directory (where the pom.xml file is located) and run the command "mvn install". This
+will build the VDMJUnit jar file in the target folder. You can also run the command
+"mvn javadoc:jar" to generate the Javadocs in the target folder.
+
+To prepare VDMJUnit for work with Eclipse, the command "mvn eclipse:eclipse" from the top
+level folder will build an Eclipse project file and allow the project to be imported.
+Alternatively, the Eclipse Maven plugin should be able to import the project directly
+from the pom.xml file.
+
+Maven installs VDMJUnit in the com.fujitsu group.
+
+For information on a particular release, see the RELEASE_NOTES file.
