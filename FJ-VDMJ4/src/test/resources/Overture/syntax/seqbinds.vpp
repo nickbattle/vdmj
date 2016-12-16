@@ -1,0 +1,6 @@
+class A
+values
+	a = [ s | s in seq ];
+	b = { x+y | x, y in seq };
+	
+end A

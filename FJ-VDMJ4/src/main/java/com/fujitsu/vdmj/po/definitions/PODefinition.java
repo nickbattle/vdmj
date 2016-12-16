@@ -1,0 +1,117 @@
+/*******************************************************************************
+ *
+ *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *
+ *	Author: Nick Battle
+ *
+ *	This file is part of VDMJ.
+ *
+ *	VDMJ is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	VDMJ is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU General Public License
+ *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ ******************************************************************************/
+
+package com.fujitsu.vdmj.po.definitions;
+
+import java.io.Serializable;
+
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCType;
+
+/**
+ * The abstract parent of all definitions. A definition can represent a data
+ * type, a value (constant), implicit or explicit functions, implicit or
+ * explicit operations, module state, as well as various sorts of local variable
+ * definition.
+ */
+public abstract class PODefinition extends PONode implements Serializable, Comparable<PODefinition>
+{
+	private static final long serialVersionUID = 1L;
+
+	/** The name of the object being defined. */
+	public final TCNameToken name;
+	
+	/** A pointer to the enclosing class definition, if any. */
+	public POClassDefinition classDefinition = null;	// Set in subclass constructors.
+
+	/**
+	 * Create a new definition of a particular name and location.
+	 */
+	public PODefinition(LexLocation location, TCNameToken tcNameToken)
+	{
+		super(location);
+		this.name = tcNameToken;
+	}
+
+	@Override
+	abstract public String toString();
+	
+	@Override
+	public int compareTo(PODefinition o)
+	{
+		return name == null ? 0 : name.compareTo(o.name); 
+	};
+
+	@Override
+	public boolean equals(Object other)		// Used for sets of definitions.
+	{
+		if (other instanceof PODefinition)
+		{
+			PODefinition odef = (PODefinition)other;
+			return name != null && odef.name != null && name.equals(odef.name);
+		}
+
+		return false;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return name.hashCode();		// Used for sets of definitions (see equals).
+	}
+
+	/**
+	 * Return a list of variable names that would be defined by the definition.
+	 */
+	abstract public TCNameList getVariableNames();
+
+	/**
+	 * Return the static type of the definition. For example, the type of a
+	 * function or operation definition would be its parameter/result signature;
+	 * the type of a value definition would be that value's type; the type of a
+	 * type definition is the underlying type being defined.
+	 * <p>
+	 * Note that for Definitions which define multiple inner definitions (see
+	 * {@link #getDefinitions}), this method returns the primary type - eg.
+	 * the type of a function, not the types of its pre/post definitions.
+	 *
+	 * @return The primary type of this definition.
+	 */
+	abstract public TCType getType();
+
+	/**
+	 * Get a list of proof obligations for the definition.
+	 *
+	 * @param ctxt The call context.
+	 * @return A list of POs.
+	 */
+	public ProofObligationList getProofObligations(POContextStack ctxt)
+	{
+		return new ProofObligationList();
+	}
+}
