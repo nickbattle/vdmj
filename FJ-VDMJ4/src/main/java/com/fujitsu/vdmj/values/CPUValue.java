@@ -50,7 +50,7 @@ public class CPUValue extends ObjectValue
 		SchedulingPolicy cpup = SchedulingPolicy.factory(parg.value.toUpperCase());
 		RealValue sarg = (RealValue)argvals.get(1);
 
-		resource = new CPUResource(cpup, sarg.value);
+		resource = new CPUResource(cpup, sarg.value.doubleValue());
 		deployed = new Vector<ObjectValue>();
 	}
 

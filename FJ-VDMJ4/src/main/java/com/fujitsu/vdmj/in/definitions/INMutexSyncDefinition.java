@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.in.definitions;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.in.expressions.INEqualsExpression;
@@ -103,6 +105,6 @@ public class INMutexSyncDefinition extends INDefinition
 		return new INEqualsExpression(
 			new INHistoryExpression(location, Token.ACTIVE, list),
     		new LexKeywordToken(Token.EQUALS, location),
-    		new INIntegerLiteralExpression(new LexIntegerToken(0, location)));
+    		new INIntegerLiteralExpression(new LexIntegerToken(BigInteger.ZERO, location)));
 	}
 }

@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -62,15 +64,15 @@ public class INRemExpression extends INNumericBinaryExpression
 			 * is positive.
 			 */
 
-    		double lv = left.eval(ctxt).intValue(ctxt);
-    		double rv = right.eval(ctxt).intValue(ctxt);
+    		BigInteger lv = left.eval(ctxt).intValue(ctxt);
+    		BigInteger rv = right.eval(ctxt).intValue(ctxt);
 
-    		if (rv == 0)
+    		if (rv.equals(BigInteger.ZERO))
     		{
     			throw new ValueException(4134, "Infinite or NaN trouble", ctxt);
     		}
-
-    		return NumericValue.valueOf(lv - rv * INDivExpression.div(lv, rv), ctxt);
+    		
+    		return NumericValue.valueOf(lv.remainder(rv), ctxt);
 		}
 		catch (ValueException e)
 		{

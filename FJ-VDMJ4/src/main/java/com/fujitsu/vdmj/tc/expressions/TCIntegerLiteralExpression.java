@@ -54,11 +54,11 @@ public class TCIntegerLiteralExpression extends TCExpression
 	{
 		TCType result = null;
 		
-		if (value.value < 0)
+		if (value.value.signum() < 0)
 		{
 			result = new TCIntegerType(location);
 		}
-		else if (value.value == 0)
+		else if (value.value.signum() == 0)
 		{
 			result = new TCNaturalType(location);
 		}

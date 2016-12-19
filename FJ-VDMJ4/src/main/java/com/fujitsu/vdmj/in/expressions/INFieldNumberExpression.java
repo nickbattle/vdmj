@@ -60,7 +60,7 @@ public class INFieldNumberExpression extends INExpression
 		try
 		{
     		ValueList fields = tuple.eval(ctxt).tupleValue(ctxt);
-    		Value r = fields.get((int)field.value - 1);
+    		Value r = fields.get((int)field.value.intValue() - 1);
 
     		if (r == null)
     		{

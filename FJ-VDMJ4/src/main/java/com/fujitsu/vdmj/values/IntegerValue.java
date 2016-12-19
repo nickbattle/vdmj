@@ -23,22 +23,35 @@
 
 package com.fujitsu.vdmj.values;
 
-import com.fujitsu.vdmj.messages.InternalException;
-import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.ValueException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.IntegerValue;
+import com.fujitsu.vdmj.values.RationalValue;
+import com.fujitsu.vdmj.values.Value;
+
+import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ValueException;
 
 public class IntegerValue extends RationalValue
 {
 	private static final long serialVersionUID = 1L;
-	protected final long longVal;
+	protected final BigInteger longVal;
 
-	public IntegerValue(long value)
+	public IntegerValue(BigInteger value)
 	{
 		super(value);
 		longVal = value;
+	}
+
+	public IntegerValue(long value)
+	{
+		this(new BigInteger(Long.toString(value)));
 	}
 
 	@Override
@@ -47,7 +60,7 @@ public class IntegerValue extends RationalValue
 		if (other instanceof IntegerValue)
 		{
 			IntegerValue io = (IntegerValue)other;
-			return (longVal < io.longVal ? -1 : (longVal == io.longVal ? 0 : 1));
+			return longVal.compareTo(io.longVal);
 		}
 
 		return super.compareTo(other);
@@ -56,19 +69,19 @@ public class IntegerValue extends RationalValue
 	@Override
 	public String toString()
 	{
-		return Long.toString(longVal);
+		return longVal.toString();
 	}
 
 	@Override
-	public long intValue(Context ctxt)
+	public BigInteger intValue(Context ctxt)
 	{
 		return longVal;
 	}
 
 	@Override
-	public long nat1Value(Context ctxt) throws ValueException
+	public BigInteger nat1Value(Context ctxt) throws ValueException
 	{
-		if (longVal < 1)
+		if (longVal.compareTo(BigInteger.ONE) < 0)
 		{
 			abort(4058, "Value " + longVal + " is not a nat1", ctxt);
 		}
@@ -77,9 +90,9 @@ public class IntegerValue extends RationalValue
 	}
 
 	@Override
-	public long natValue(Context ctxt) throws ValueException
+	public BigInteger natValue(Context ctxt) throws ValueException
 	{
-		if (longVal < 0)
+		if (longVal.compareTo(BigInteger.ZERO) < 0)
 		{
 			abort(4059, "Value " + longVal + " is not a nat", ctxt);
 		}
@@ -88,15 +101,16 @@ public class IntegerValue extends RationalValue
 	}
 
 	@Override
-	public double realValue(Context ctxt)
+	public BigDecimal realValue(Context ctxt)
 	{
-		return longVal;
+		return new BigDecimal(longVal).setScale(
+			Settings.precision.getPrecision(), Settings.precision.getRoundingMode());
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return (int)longVal;
+		return longVal.hashCode();
 	}
 
 	@Override

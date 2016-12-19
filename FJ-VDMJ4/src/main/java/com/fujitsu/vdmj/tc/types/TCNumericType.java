@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.tc.types;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public abstract class TCNumericType extends TCBasicType
@@ -48,13 +50,13 @@ public abstract class TCNumericType extends TCBasicType
 		return this;
 	}
 	
-	public static TCNumericType typeOf(long iv, LexLocation location)
+	public static TCNumericType typeOf(BigInteger value, LexLocation location)
 	{
-		if (iv > 0)
+		if (value.signum() > 0)
 		{
 			return new TCNaturalOneType(location);
 		}
-		else if (iv >= 0)
+		else if (value.signum() >= 0)
 		{
 			return new TCNaturalType(location);
 		}

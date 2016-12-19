@@ -89,7 +89,7 @@ public class INCPUClassDefinition extends INClassDefinition
     		SeqValue opname = (SeqValue)octxt.lookup(varName("opname"));
     		NaturalValue priority = (NaturalValue)octxt.check(varName("priority"));
 
-    		cpu.setPriority(opname.stringValue(ctxt), priority.intValue(ctxt));
+    		cpu.setPriority(opname.stringValue(ctxt), priority.intValue(ctxt).longValue());
    			return new VoidValue();
 		}
 		catch (Exception e)

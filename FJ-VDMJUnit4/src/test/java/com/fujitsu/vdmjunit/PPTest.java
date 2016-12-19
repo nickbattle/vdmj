@@ -26,6 +26,8 @@ package com.fujitsu.vdmjunit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.math.BigInteger;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,14 +53,14 @@ public class PPTest extends VDMJUnitTestPP
 	public void one() throws Exception
 	{
 		create("object", "new A()");
-		assertEquals(2, runInt("object.f(1)"));
+		assertEquals(new BigInteger("2"), runInt("object.f(1)"));
 	}
 	
 	@Test
 	public void two() throws Exception
 	{
 		create("object", "new A()");
-		assertEquals(123, runInt("object.getValue()"));
+		assertEquals(new BigInteger("123"), runInt("object.getValue()"));
 	}
 	
 	@Test

@@ -23,6 +23,11 @@
 
 package com.fujitsu.vdmj.values;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCRealType;
@@ -33,23 +38,29 @@ public class RealValue extends NumericValue
 {
 	private static final long serialVersionUID = 1L;
 
-	public RealValue(double value) throws Exception
+	public RealValue(BigDecimal value) throws Exception
 	{
 		super(value);
 
-		if (Double.isInfinite(value))
-		{
-			throw new Exception("Real is infinite");
-		}
-		else if (Double.isNaN(value))
-		{
-			throw new Exception("Real is NaN");
-		}
+//		if (Double.isInfinite(value))
+//		{
+//			throw new Exception("Real is infinite");
+//		}
+//		else if (Double.isNaN(value))
+//		{
+//			throw new Exception("Real is NaN");
+//		}
 	}
 
-	public RealValue(long value)
+	public RealValue(BigInteger value)
 	{
-		super(value);
+		super(new BigDecimal(value).setScale(
+			Settings.precision.getPrecision(), Settings.precision.getRoundingMode()));
+	}
+
+	public RealValue(double value)
+	{
+		super(new BigDecimal(value));
 	}
 
 	@Override
@@ -58,73 +69,73 @@ public class RealValue extends NumericValue
 		if (other instanceof RealValue)
 		{
 			RealValue ro = (RealValue)other;
-			return (int)Math.round(Math.signum(value - ro.value));
+			return value.compareTo(ro.value);
 		}
 
 		return super.compareTo(other);
 	}
 
 	@Override
-	public double realValue(Context ctxt)
+	public BigDecimal realValue(Context ctxt)
 	{
 		return value;
 	}
 
 	@Override
-	public double ratValue(Context ctxt)
+	public BigDecimal ratValue(Context ctxt)
 	{
 		return value;
 	}
 
 	@Override
-	public long intValue(Context ctxt) throws ValueException
+	public BigInteger intValue(Context ctxt) throws ValueException
 	{
-		long rounded = Math.round(value);
+		BigDecimal rounded = value.setScale(0, RoundingMode.HALF_UP);
 
-		if (rounded != value)
+		if (rounded.compareTo(value) != 0)
 		{
-			abort(4075, "Value " + value + " is not an integer", ctxt);
+			abort(4075, "Value " + value.stripTrailingZeros() + " is not an integer", ctxt);
 		}
 
-		return rounded;
+		return rounded.toBigInteger();
 	}
 
 	@Override
-	public long nat1Value(Context ctxt) throws ValueException
+	public BigInteger nat1Value(Context ctxt) throws ValueException
 	{
-		long rounded = Math.round(value);
+		BigDecimal rounded = value.setScale(0, RoundingMode.HALF_UP);
 
-		if (rounded != value || rounded < 1)
+		if (rounded.compareTo(value) != 0 || rounded.compareTo(BigDecimal.ONE) < 0)
 		{
-			abort(4076, "Value " + value + " is not a nat1", ctxt);
+			abort(4076, "Value " + value.stripTrailingZeros() + " is not a nat1", ctxt);
 		}
 
-		return rounded;
+		return rounded.toBigInteger();
 	}
 
 	@Override
-	public long natValue(Context ctxt) throws ValueException
+	public BigInteger natValue(Context ctxt) throws ValueException
 	{
-		long rounded = Math.round(value);
+		BigDecimal rounded = value.setScale(0, RoundingMode.HALF_UP);
 
-		if (rounded != value || rounded < 0)
+		if (rounded.compareTo(value) != 0 || rounded.compareTo(BigDecimal.ONE) < 0)
 		{
-			abort(4077, "Value " + value + " is not a nat", ctxt);
+			abort(4077, "Value " + value.stripTrailingZeros() + " is not a nat", ctxt);
 		}
 
-		return rounded;
+		return rounded.toBigInteger();
 	}
 
 	@Override
 	public String toString()
 	{
-		return Double.toString(value);
+		return value.stripTrailingZeros().toString();
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return new Double(value).hashCode();
+		return value.hashCode();
 	}
 
 	@Override

@@ -72,7 +72,7 @@ public class INDurationStatement extends INStatement
 				try
 				{
 					ctxt.threadState.setAtomic(true);
-					step = duration.eval(ctxt).intValue(ctxt);
+					step = duration.eval(ctxt).intValue(ctxt).longValue();
 				}
 				finally
 				{

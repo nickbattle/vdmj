@@ -67,7 +67,7 @@ public class POFieldNumberExpression extends POExpression
 				{
 					TCProductType pt = t.getProduct();
 
-					if (pt.types.size() < field.value)
+					if (pt.types.size() < field.value.intValue())
 					{
 						list.add(new TupleSelectObligation(this, pt, ctxt));
 					}

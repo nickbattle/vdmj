@@ -72,7 +72,7 @@ public class INCyclesStatement extends INStatement
 				try
 				{
 					ctxt.threadState.setAtomic(true);
-					value = cycles.eval(ctxt).intValue(ctxt);
+					value = cycles.eval(ctxt).intValue(ctxt).longValue();
 				}
 				finally
 				{

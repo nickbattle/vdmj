@@ -23,6 +23,9 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import java.math.BigInteger;
+import java.math.RoundingMode;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -57,13 +60,14 @@ public class INSetRangeExpression extends INSetExpression
 
 		try
 		{
-    		long from = (long)Math.ceil(first.eval(ctxt).realValue(ctxt));
-    		long to = (long)Math.floor(last.eval(ctxt).realValue(ctxt));
+    		BigInteger from = first.eval(ctxt).realValue(ctxt).setScale(0, RoundingMode.CEILING).toBigInteger();
+    		BigInteger to = last.eval(ctxt).realValue(ctxt).setScale(0, RoundingMode.FLOOR).toBigInteger();
     		ValueSet set = new ValueSet();
 
-    		for (long i=from; i<= to; i++)
+    		while (from.compareTo(to) <= 0)
     		{
-    			set.addNoCheck(new IntegerValue(i));
+    			set.addNoCheck(new IntegerValue(from));
+    			from = from.add(BigInteger.ONE);
     		}
 
     		return new SetValue(set);

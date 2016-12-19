@@ -23,6 +23,10 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -51,16 +55,15 @@ public class INTimesExpression extends INNumericBinaryExpression
 
 			if (NumericValue.areIntegers(l, r))
 			{
-				long lv = l.intValue(ctxt);
-				long rv = r.intValue(ctxt);
-				long mult = multiplyExact(lv, rv, ctxt);
-				return NumericValue.valueOf(mult, ctxt);
+				BigInteger lv = l.intValue(ctxt);
+				BigInteger rv = r.intValue(ctxt);
+				return NumericValue.valueOf(lv.multiply(rv), ctxt);
 			}
 			else
 			{
-				double lv = l.realValue(ctxt);
-				double rv = r.realValue(ctxt);
-	    		return NumericValue.valueOf(lv * rv, ctxt);
+				BigDecimal lv = l.realValue(ctxt);
+				BigDecimal rv = r.realValue(ctxt);
+				return NumericValue.valueOf(lv.multiply(rv, Settings.precision), ctxt);
 			}
 		}
 		catch (ValueException e)
@@ -68,22 +71,4 @@ public class INTimesExpression extends INNumericBinaryExpression
 			return abort(e);
 		}
 	}
-	
-	// This is included in Java 8 Math.java
-    private long multiplyExact(long x, long y, Context ctxt) throws ValueException
-    {
-    	long r = x * y;
-    	long ax = Math.abs(x);
-    	long ay = Math.abs(y);
-
-    	if (((ax | ay) >>> 31 != 0))
-    	{
-    		if (((y != 0) && (r / y != x)) || (x == Long.MIN_VALUE && y == -1))
-    		{
-    			throw new ValueException(4169, "Arithmetic overflow", ctxt);
-    		}
-    	}
-
-    	return r;
-    }
 }

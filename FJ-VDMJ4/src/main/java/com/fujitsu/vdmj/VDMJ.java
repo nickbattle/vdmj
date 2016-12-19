@@ -25,6 +25,8 @@ package com.fujitsu.vdmj;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -37,6 +39,8 @@ import java.util.Map.Entry;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+
+import com.fujitsu.vdmj.Settings;
 
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -263,6 +267,26 @@ abstract public class VDMJ
     				usage("-path option requires a directory");
     			}
     		}
+    		else if (arg.equals("-precision"))
+    		{
+    			if (i.hasNext())
+    			{
+       				int precision = Integer.parseInt(i.next());
+       				
+       				if (precision < 10)
+       				{
+       					usage("Precision argument must be >= 10");
+       				}
+       				else
+       				{
+       					Settings.precision = new MathContext(precision, RoundingMode.HALF_UP);
+       				}
+    			}
+    			else
+    			{
+    				usage("-precision option requires a value");
+    			}
+    		}
     		else if (arg.startsWith("-"))
     		{
     			usage("Unknown option " + arg);
@@ -474,7 +498,8 @@ abstract public class VDMJ
 		System.err.println("-measures: disable recursive measure checking");
 		System.err.println("-log <filename>: enable real-time event logging");
 		System.err.println("-remote <class>: enable remote control");
-
+		System.err.println("-precision <n>: set real number precision to n places");
+		
 		System.exit(1);
 	}
 

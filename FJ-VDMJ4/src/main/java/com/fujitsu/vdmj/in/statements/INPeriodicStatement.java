@@ -59,7 +59,7 @@ public class INPeriodicStatement extends INStatement
 			{
 				arg.location.hit();
 				argval = arg.eval(ctxt);
-				values[i] = argval.intValue(ctxt);
+				values[i] = argval.intValue(ctxt).longValue();
 
 				if (values[i] < 0)
 				{

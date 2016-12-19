@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.lex;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
@@ -883,7 +884,7 @@ public class LexTokenReader extends BacktrackInputReader
 				{
 					unpush();
 					rdCh();
-					String decimal = String.valueOf(Long.parseLong(rdNumber(16), 16));
+					BigInteger decimal = new BigInteger(rdNumber(16), 16);
 					last = new LexIntegerToken(decimal, location(tokline, tokpos));
 				}
 				else

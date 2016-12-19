@@ -23,6 +23,10 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -51,35 +55,20 @@ public class INPlusExpression extends INNumericBinaryExpression
 
 			if (NumericValue.areIntegers(l, r))
 			{
-				long lv = l.intValue(ctxt);
-				long rv = r.intValue(ctxt);
-				long sum = addExact(lv, rv, ctxt);
-				return NumericValue.valueOf(sum, ctxt);
+				BigInteger lv = l.intValue(ctxt);
+				BigInteger rv = r.intValue(ctxt);
+				return NumericValue.valueOf(lv.add(rv), ctxt);
 			}
 			else
 			{
-				double lv = l.realValue(ctxt);
-				double rv = r.realValue(ctxt);
-	    		return NumericValue.valueOf(lv + rv, ctxt);
+				BigDecimal lv = l.realValue(ctxt);
+				BigDecimal rv = r.realValue(ctxt);
+	    		return NumericValue.valueOf(lv.add(rv, Settings.precision), ctxt);
 			}
     	}
     	catch (ValueException e)
     	{
     		return abort(e);
     	}
-	}
-	
-	// This is included in Java 8 Math.java
-	private long addExact(long x, long y, Context ctxt) throws ValueException
-	{
-		long r = x + y;
-		// HD 2-12 Overflow iff both arguments have the opposite sign of the result
-		
-		if (((x ^ r) & (y ^ r)) < 0)
-		{
-			throw new ValueException(4169, "Arithmetic overflow", ctxt);
-		}
-		
-		return r;
 	}
 }
