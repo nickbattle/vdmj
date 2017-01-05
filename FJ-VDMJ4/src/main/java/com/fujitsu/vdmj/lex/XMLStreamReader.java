@@ -32,6 +32,8 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import com.fujitsu.vdmj.VDMJ;
+
 /**
  * A class to read an XML encoded VDM file, such as .docx or ODF
  */
@@ -75,7 +77,7 @@ abstract public class XMLStreamReader extends InputStreamReader
 				while (r > 0);
 				
 				// Look for the XML encoding
-				String encoding = "ASCII"; //VDMJ.filecharset;
+				String encoding = VDMJ.filecharset;
 				String firstLine = new String(bytes, 0, 100);
 				Pattern epattern = Pattern.compile("encoding=\"([\\w-]+)\"");
 				Matcher ematch = epattern.matcher(firstLine);

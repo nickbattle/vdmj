@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.messages;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -63,8 +64,8 @@ public class Console
 			charset = cs;
 //			out = new StdoutRedirector(new OutputStreamWriter(System.out, charset));
 //			err = new StderrRedirector(new OutputStreamWriter(System.err, charset));
-			out = new PrintWriter(System.out, true);
-			err = new PrintWriter(System.err, true);
+			out = new PrintWriter(new OutputStreamWriter(System.out, charset), true);
+			err = new PrintWriter(new OutputStreamWriter(System.err, charset), true);
 			in = new BufferedReader(new InputStreamReader(System.in, charset));
 		}
 		catch (UnsupportedEncodingException e)

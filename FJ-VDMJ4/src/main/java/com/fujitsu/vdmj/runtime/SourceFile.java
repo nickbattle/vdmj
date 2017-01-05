@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -66,13 +67,13 @@ public class SourceFile
 			name.toLowerCase().endsWith(".odt"))
 		{
 			br = new BufferedReader(
-				new BacktrackInputReader(filename, "ASCII"));
+				new BacktrackInputReader(filename, VDMJ.filecharset));
 		}
 		else
 		{
 			br = new BufferedReader(
 				new InputStreamReader(
-					new FileInputStream(filename), "ASCII"));
+					new FileInputStream(filename), VDMJ.filecharset));
 		}
 
 		String line = br.readLine();
@@ -326,7 +327,7 @@ public class SourceFile
 
 		out.println("<html>");
 		out.println("<head>");
-		out.println("<meta http-equiv=Content-Type content=\"text/html; charset=ascii\">");
+		out.println("<meta http-equiv=Content-Type content=\"text/html; charset=" + VDMJ.filecharset + "\">");
 		out.println("<meta name=Generator content=\"Microsoft Word 11 (filtered)\">");
 		out.println("<title>" + filename.getName() + "</title>");
 		out.println("<style>");
