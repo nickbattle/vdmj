@@ -517,21 +517,21 @@ abstract public class VDMJ
 
 	abstract protected ExitStatus interpret(List<File> filenames, String defaultName);
 
-	public void setWarnings(boolean w)
-	{
-		warnings = w;
-	}
-
-	public void setQuiet(boolean q)
-	{
-		quiet = q;
-	}
-
-	public void setCharset(String charset)
-	{
-		filecharset = charset;
-		Console.setCharset(charset);
-	}
+//	public void setWarnings(boolean w)
+//	{
+//		warnings = w;
+//	}
+//
+//	public void setQuiet(boolean q)
+//	{
+//		quiet = q;
+//	}
+//
+//	public void setCharset(String charset)
+//	{
+//		filecharset = charset;
+//		Console.setCharset(charset);
+//	}
 
 	protected static void info(String m)
 	{

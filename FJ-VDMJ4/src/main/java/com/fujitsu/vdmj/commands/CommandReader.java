@@ -41,6 +41,7 @@ import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -1358,7 +1359,7 @@ abstract public class CommandReader
 
 		try
 		{
-			input = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "ASCII"));
+			input = new BufferedReader(new InputStreamReader(new FileInputStream(filename), VDMJ.filecharset));
 		}
 		catch (FileNotFoundException e)
 		{
