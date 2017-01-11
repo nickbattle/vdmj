@@ -40,7 +40,7 @@ public class INNewExpression extends INExpression
 	private static final long serialVersionUID = 1L;
 	public final TCIdentifierToken classname;
 	public final INExpressionList args;
-	public INClassDefinition classdef;	// Recursive update from mapper
+	public final INClassDefinition classdef;	// Recursive update from mapper
 	public final INDefinition ctordef;
 
 	public INNewExpression(LexLocation location, TCIdentifierToken classname, INExpressionList args,

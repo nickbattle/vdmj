@@ -29,7 +29,7 @@ map TCMutexSyncDefinition{location, operations} to INMutexSyncDefinition(locatio
 map TCNamedTraceDefinition{location, name, terms, classDefinition} to INNamedTraceDefinition(location, name, terms, classDefinition);
 map TCPerSyncDefinition{location, opname, guard} to INPerSyncDefinition(location, opname, guard);
 map TCRenamedDefinition{name, def} to INRenamedDefinition(name, def);
-map TCStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression, invdef, initdef} to INStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression, invdef, initdef);
+map TCStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression, invdef, initdef, canBeExecuted} to INStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression, invdef, initdef, canBeExecuted);
 map TCSystemDefinition{name, classtype, definitions} to INSystemDefinition(name, classtype, definitions);
 map TCThreadDefinition{statement, operationDef} to INThreadDefinition(statement, operationDef);
 map TCTypeDefinition{accessSpecifier, name, type, invPattern, invExpression, invdef} to INTypeDefinition(accessSpecifier, name, type, invPattern, invExpression, invdef);
@@ -205,7 +205,7 @@ map TCMultipleTypeBind{plist, type} to INMultipleTypeBind(plist, type);
 map TCNamePatternPair{name, pattern} to INNamePatternPair(name, pattern);
 map TCNamePatternPairList{} to INNamePatternPairList();
 map TCNilPattern{location} to INNilPattern(location);
-map TCObjectPattern{location, classname, fieldlist} to INObjectPattern(location, classname, fieldlist);
+map TCObjectPattern{location, classname, fieldlist, type} to INObjectPattern(location, classname, fieldlist, type);
 map TCPattern{} to INPattern();
 map TCPatternList{} to INPatternList(this);
 map TCPatternListList{} to INPatternListList(this);

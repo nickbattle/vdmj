@@ -33,8 +33,6 @@ public class POSporadicStatement extends POStatement
 	public final TCNameToken opname;
 	public final POExpressionList args;
 
-	public long[] values = new long[4];
-
 	public POSporadicStatement(TCNameToken opname, POExpressionList args)
 	{
 		super(opname.getLocation());

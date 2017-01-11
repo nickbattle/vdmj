@@ -49,6 +49,7 @@ public class INStateDefinition extends INDefinition
 	public final INExpression initExpression;
 	public final INExplicitFunctionDefinition invdef;
 	public final INExplicitFunctionDefinition initdef;
+	public final boolean canBeExecuted;
 
 	public FunctionValue invfunc = null;
 	public FunctionValue initfunc = null;
@@ -56,12 +57,12 @@ public class INStateDefinition extends INDefinition
 	private final INDefinitionList statedefs;
 	private TCRecordType recordType;
 	private State moduleState = null;
-	public boolean canBeExecuted = true;
 
 	public INStateDefinition(TCNameToken name, TCFieldList fields,
 		INPattern invPattern, INExpression invExpression,
 		INPattern initPattern, INExpression initExpression,
-		INExplicitFunctionDefinition invdef, INExplicitFunctionDefinition initdef)
+		INExplicitFunctionDefinition invdef, INExplicitFunctionDefinition initdef,
+		boolean canBeExecuted)
 	{
 		super(name.getLocation(), null, name);
 
@@ -72,6 +73,7 @@ public class INStateDefinition extends INDefinition
 		this.initExpression = initExpression;
 		this.invdef = invdef;
 		this.initdef = initdef;
+		this.canBeExecuted = canBeExecuted;
 
 		statedefs = new INDefinitionList();
 

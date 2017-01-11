@@ -35,9 +35,6 @@ public class INAccessSpecifier extends INNode implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	public final static INAccessSpecifier DEFAULT =
-		new INAccessSpecifier(false, false, Token.PRIVATE, false);
-
 	public final boolean isStatic;
 	public final boolean isAsync;
 	public final Token access;

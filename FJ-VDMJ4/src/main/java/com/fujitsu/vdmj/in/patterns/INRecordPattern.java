@@ -49,7 +49,7 @@ public class INRecordPattern extends INPattern
 	private static final long serialVersionUID = 1L;
 	public final TCNameToken typename;
 	public final INPatternList plist;
-	public TCType type;
+	public final TCType type;
 
 	public INRecordPattern(TCNameToken typename, INPatternList list, TCType type)
 	{

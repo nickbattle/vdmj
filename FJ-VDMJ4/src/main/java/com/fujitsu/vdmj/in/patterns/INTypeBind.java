@@ -33,7 +33,7 @@ import com.fujitsu.vdmj.values.ValueList;
 public class INTypeBind extends INBind
 {
 	private static final long serialVersionUID = 1L;
-	public TCType type;
+	public final TCType type;
 
 	public INTypeBind(INPattern pattern, TCType type)
 	{

@@ -35,9 +35,6 @@ public class POAccessSpecifier extends PONode implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	public final static POAccessSpecifier DEFAULT =
-		new POAccessSpecifier(false, false, Token.PRIVATE, false);
-
 	public final boolean isStatic;
 	public final boolean isAsync;
 	public final Token access;
