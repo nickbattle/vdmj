@@ -84,6 +84,7 @@ public class TCStateInitExpression extends TCExpression
 			detail("Expected", "p == p = mk_" + state.name.getName() + "(...)");
 		}
 
+		state.canBeExecuted = canBeExecuted;
 		return new TCBooleanType(location);
 	}
 }

@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.in.statements;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.VoidValue;
 
@@ -36,8 +35,6 @@ public class INCasesStatement extends INStatement
 	public final INExpression exp;
 	public final INCaseStmtAlternativeList cases;
 	public final INStatement others;
-
-	public TCType expType = null;
 
 	public INCasesStatement(LexLocation location,
 		INExpression exp, INCaseStmtAlternativeList cases, INStatement others)

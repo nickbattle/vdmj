@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Permutor;
 import com.fujitsu.vdmj.util.Utils;
@@ -48,14 +47,14 @@ public class INObjectPattern extends INPattern
 	private static final long serialVersionUID = 1L;
 	public final TCNameToken classname;
 	public final INNamePatternPairList fieldlist;
-	public TCType type;
+	public final TCType type;
 
-	public INObjectPattern(LexLocation location, TCNameToken classname, INNamePatternPairList fieldlist)
+	public INObjectPattern(LexLocation location, TCNameToken classname, INNamePatternPairList fieldlist, TCType type)
 	{
 		super(location);
 		this.classname = classname;
 		this.fieldlist = fieldlist;
-		this.type = new TCUnresolvedType(classname);
+		this.type = type;
 	}
 
 	@Override

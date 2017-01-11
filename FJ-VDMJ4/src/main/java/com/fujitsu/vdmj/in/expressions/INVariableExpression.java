@@ -34,7 +34,7 @@ public class INVariableExpression extends INExpression
 {
 	private static final long serialVersionUID = 1L;
 
-	public TCNameToken name;
+	public final TCNameToken name;
 
 	public INVariableExpression(TCNameToken name)
 	{

@@ -39,7 +39,6 @@ public class POCallObjectStatement extends POStatement
 	public final TCNameToken classname;
 	public final TCIdentifierToken fieldname;
 	public final POExpressionList args;
-	public final boolean explicit;
 
 	public LexNameToken field = null;
 
@@ -52,7 +51,6 @@ public class POCallObjectStatement extends POStatement
 		this.classname = classname;
 		this.fieldname = fieldname;
 		this.args = args;
-		this.explicit = classname.isExplicit();
 	}
 
 	@Override

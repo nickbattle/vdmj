@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.in.expressions;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.ValueList;
 
 abstract public class INBinaryExpression extends INExpression
@@ -36,9 +35,6 @@ abstract public class INBinaryExpression extends INExpression
 	public final INExpression left;
 	public final INExpression right;
 	public final LexToken op;
-
-	public TCType ltype = null;
-	public TCType rtype = null;
 
 	public INBinaryExpression(INExpression left, LexToken op, INExpression right)
 	{

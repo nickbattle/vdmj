@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.in.definitions;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INUndefinedExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -35,14 +34,12 @@ public class INInstanceVariableDefinition extends INAssignmentDefinition
 {
 	private static final long serialVersionUID = 1L;
 	public final TCNameToken oldname;
-	public boolean initialized;
 
 	public INInstanceVariableDefinition(INAccessSpecifier accessSpecifier,
 			TCNameToken name, TCType type, INExpression expression)
 	{
 		super(accessSpecifier, name, type, expression);
 		oldname = name.getOldName();
-		initialized = !(expression instanceof INUndefinedExpression);
 	}
 
 	@Override

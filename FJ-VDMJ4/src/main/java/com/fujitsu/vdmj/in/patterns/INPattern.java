@@ -47,9 +47,6 @@ public abstract class INPattern extends INNode implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	/** A flag to prevent recursive type resolution problems. */
-	boolean resolved = false;
-
 	/** A value for getLength meaning "any length" */
 	protected static int ANY = -1;
 

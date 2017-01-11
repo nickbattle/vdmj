@@ -29,7 +29,7 @@ import com.fujitsu.vdmj.util.Utils;
 public class ASTProductType extends ASTType
 {
 	private static final long serialVersionUID = 1L;
-	public ASTTypeList types = null;
+	public final ASTTypeList types;
 
 	public ASTProductType(LexLocation location, ASTTypeList types)
 	{

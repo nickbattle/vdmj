@@ -37,7 +37,7 @@ import com.fujitsu.vdmj.values.ValueList;
 public class INNarrowExpression extends INExpression
 {
 	private static final long serialVersionUID = 1L;
-	public TCType basictype;
+	public final TCType basictype;
 	public final TCNameToken typename;
 	public final INExpression test;
 

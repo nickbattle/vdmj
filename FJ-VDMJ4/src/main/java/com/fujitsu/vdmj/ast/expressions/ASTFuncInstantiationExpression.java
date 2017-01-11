@@ -30,7 +30,7 @@ public class ASTFuncInstantiationExpression extends ASTExpression
 {
 	private static final long serialVersionUID = 1L;
 	public final ASTExpression function;
-	public ASTTypeList actualTypes;
+	public final ASTTypeList actualTypes;
 
 	public ASTFuncInstantiationExpression(ASTExpression function, ASTTypeList types)
 	{

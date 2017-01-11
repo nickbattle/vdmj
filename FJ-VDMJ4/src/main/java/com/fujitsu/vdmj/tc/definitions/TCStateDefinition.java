@@ -62,6 +62,7 @@ public class TCStateDefinition extends TCDefinition
 
 	private final TCDefinitionList statedefs;
 	private TCRecordType recordType;
+	public boolean canBeExecuted = true;
 
 	public TCStateDefinition(TCNameToken name, TCFieldList fields, TCPattern invPattern,
 		TCExpression invExpression, TCPattern initPattern, TCExpression initExpression)

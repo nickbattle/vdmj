@@ -46,8 +46,6 @@ public abstract class ASTDefinition extends ASTNode implements Serializable, Com
 
 	/** A public/private/protected/static specifier, if any. */
 	public ASTAccessSpecifier accessSpecifier = null;
-	/** A pointer to the enclosing class definition, if any. */
-	public ASTClassDefinition classDefinition = null;
 
 	/**
 	 * Create a new definition of a particular name and location.
