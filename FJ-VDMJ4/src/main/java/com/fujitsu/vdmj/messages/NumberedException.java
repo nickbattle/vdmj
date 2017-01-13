@@ -30,7 +30,7 @@ abstract public class NumberedException extends Exception
 
 	public NumberedException(int number, String msg)
 	{
-		super(msg);
+		super(msg, null, false, false);		// No stack traces
 		this.number = number;
 	}
 }
