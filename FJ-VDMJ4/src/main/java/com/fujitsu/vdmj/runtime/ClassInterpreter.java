@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.RTLogger;
@@ -51,7 +52,9 @@ import com.fujitsu.vdmj.scheduler.RunState;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.scheduler.SystemClock;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
+import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionSet;
@@ -205,6 +208,13 @@ public class ClassInterpreter extends Interpreter
 		ExpressionReader reader = new ExpressionReader(ltr);
 		reader.setCurrentModule(module);
 		ASTExpression ast = reader.readExpression();
+		LexToken end = ltr.getLast();
+		
+		if (!end.is(Token.EOF))
+		{
+			throw new ParserException(2330, "Tokens found after expression at " + end, new LexLocation(), 0);
+		}
+
 		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
 	}
 
