@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
-import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -132,22 +131,6 @@ public class TCFuncInstantiationExpression extends TCExpression
 
     				for (TCType ptype: actualTypes)
     				{
-    					if (ptype instanceof TCParameterType)		// Recursive TClymorphism
-    					{
-    						TCParameterType pt = (TCParameterType)ptype;
-    						TCDefinition d = env.findName(pt.name, scope);
-
-    						if (d == null)
-    						{
-    							report(3102, "Parameter name " + pt + " not defined");
-    							ptype = new TCUnknownType(location);
-    						}
-    						else
-    						{
-    							ptype = d.getType();
-    						}
-    					}
-
     					ptype = ptype.typeResolve(env, null);
     					fixed.add(ptype);
     					TypeComparator.checkComposeTypes(ptype, env, false);

@@ -25,15 +25,14 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.definitions.INExplicitFunctionDefinition;
 import com.fujitsu.vdmj.in.definitions.INImplicitFunctionDefinition;
+import com.fujitsu.vdmj.in.types.Instantiate;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FunctionValue;
-import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -79,24 +78,10 @@ public class INFuncInstantiationExpression extends INExpression
 
     		for (TCType ptype: actualTypes)
     		{
-    			if (ptype instanceof TCParameterType)
+    			if (ptype.toString().indexOf('@') >= 0)		// Really need type.isPolymorphic
     			{
-    				TCParameterType pname = (TCParameterType)ptype;
-    				Value t = ctxt.lookup(pname.name);
-
-    				if (t == null)
-    				{
-    					abort(4008, "No such type parameter @" + pname + " in scope", ctxt);
-    				}
-    				else if (t instanceof ParameterValue)
-    				{
-    					ParameterValue tv = (ParameterValue)t;
-    					fixed.add(tv.type);
-    				}
-    				else
-    				{
-    					abort(4009, "INType parameter/local variable name clash, @" + pname, ctxt);
-    				}
+    				// Resolve any @T types referred to in the type parameters
+    				fixed.add(Instantiate.instantiate(ptype, ctxt));
     			}
     			else
     			{
