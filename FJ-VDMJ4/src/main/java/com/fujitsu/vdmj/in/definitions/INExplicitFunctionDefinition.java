@@ -24,13 +24,14 @@
 package com.fujitsu.vdmj.in.definitions;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.patterns.INPatternListList;
+import com.fujitsu.vdmj.in.types.Instantiate;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -113,25 +114,6 @@ public class INExplicitFunctionDefinition extends INDefinition
 		return type;		// NB entire "->" type, not the result
 	}
 
-	public TCFunctionType getType(TCTypeList actualTypes)
-	{
-		Iterator<TCType> ti = actualTypes.iterator();
-		TCFunctionType ftype = type;
-
-		if (typeParams != null)
-		{
-			for (TCNameToken pname: typeParams)
-			{
-				TCType ptype = ti.next();
-				ftype = (TCFunctionType)ftype.polymorph(pname, ptype);
-			}
-
-			ftype.instantiated = true;
-		}
-
-		return ftype;
-	}
-
 	@Override
 	public INExpression findExpression(int lineno)
 	{
@@ -209,7 +191,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 		return nvl;
 	}
 
-	public FunctionValue getPolymorphicValue(TCTypeList actualTypes)
+	public FunctionValue getPolymorphicValue(TCTypeList argTypes, Context params, Context ctxt)
 	{
 		if (polyfuncs == null)
 		{
@@ -222,7 +204,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 			// value can record measure counts for recursive polymorphic
 			// functions.
 			
-			FunctionValue rv = polyfuncs.get(actualTypes);
+			FunctionValue rv = polyfuncs.get(argTypes);
 			
 			if (rv != null)
 			{
@@ -235,26 +217,18 @@ public class INExplicitFunctionDefinition extends INDefinition
 
 		if (predef != null)
 		{
-			prefv = predef.getPolymorphicValue(actualTypes);
-		}
-		else
-		{
-			prefv = null;
+			prefv = predef.getPolymorphicValue(argTypes, params, ctxt);
 		}
 
 		if (postdef != null)
 		{
-			postfv = postdef.getPolymorphicValue(actualTypes);
+			postfv = postdef.getPolymorphicValue(argTypes, params, ctxt);
 		}
-		else
-		{
-			postfv = null;
-		}
+		
+		TCFunctionType ftype = (TCFunctionType)Instantiate.instantiate(getType(), params, ctxt);
+		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, null);
 
-		FunctionValue rv = new FunctionValue(
-				this, actualTypes, prefv, postfv, null);
-
-		polyfuncs.put(actualTypes, rv);
+		polyfuncs.put(argTypes, rv);
 		return rv;
 	}
 

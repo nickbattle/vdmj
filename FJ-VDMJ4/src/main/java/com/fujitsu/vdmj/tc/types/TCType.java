@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
@@ -122,22 +121,6 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	public void unResolve()
 	{
 		resolved = false;
-	}
-
-	/**
-	 * Apply a "type morph" to any type with TCParameterType subtypes. This is
-	 * used when a polymorphic function is instantiated. Note that the method
-	 * does not change the type, but returns a new type representing this type
-	 * with parameter type instances of the given name "morphed" to the actual
-	 * type given.
-	 *
-	 * @param pname The name of the type parameter being morphed.
-	 * @param actualType The type to morph the parameter to.
-	 * @return A new type with the named TCParameterType substituted.
-	 */
-	public TCType polymorph(TCNameToken pname, TCType actualType)
-	{
-		return this;
 	}
 
 	/**

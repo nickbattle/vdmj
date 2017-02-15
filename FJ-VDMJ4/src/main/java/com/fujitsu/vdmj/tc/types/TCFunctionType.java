@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.types;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.util.Utils;
@@ -207,24 +206,6 @@ public class TCFunctionType extends TCType
 	public int hashCode()
 	{
 		return parameters.hashCode() + result.hashCode();
-	}
-
-	@Override
-	public TCType polymorph(TCNameToken pname, TCType actualType)
-	{
-		TCTypeList polyparams = new TCTypeList();
-
-		for (TCType type: parameters)
-		{
-			polyparams.add(type.polymorph(pname, actualType));
-		}
-
-		TCType polyresult = result.polymorph(pname, actualType);
-		TCFunctionType type = new TCFunctionType(location, polyparams, partial, polyresult);
-		
-		type.definitions = definitions;
-		type.instantiated = true;
-		return type;
 	}
 
 	@Override

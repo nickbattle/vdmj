@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.types;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
@@ -896,18 +897,5 @@ public class TCUnionType extends TCType
 	public TCTypeList getComposeTypes()
 	{
 		return types.getComposeTypes();
-	}
-
-	@Override
-	public TCType polymorph(TCNameToken pname, TCType actualType)
-	{
-		TCTypeSet polytypes = new TCTypeSet();
-
-		for (TCType type: types)
-		{
-			polytypes.add(type.polymorph(pname, actualType));
-		}
-
-		return new TCUnionType(location, polytypes);
 	}
 }

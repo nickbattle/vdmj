@@ -23,8 +23,6 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import java.util.Iterator;
-
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotYetSpecifiedExpression;
@@ -402,25 +400,6 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	public TCType getType()
 	{
 		return type;		// NB overall "->" type, not result type
-	}
-
-	public TCFunctionType getType(TCTypeList actualTypes)
-	{
-		Iterator<TCType> ti = actualTypes.iterator();
-		TCFunctionType ftype = type;
-
-		if (typeParams != null)
-		{
-    		for (TCNameToken pname: typeParams)
-    		{
-    			TCType ptype = ti.next();
-    			ftype = (TCFunctionType)ftype.polymorph(pname, ptype);
-    		}
-    
-    		ftype.instantiated = true;
-		}
-		
-		return ftype;
 	}
 
 	@Override

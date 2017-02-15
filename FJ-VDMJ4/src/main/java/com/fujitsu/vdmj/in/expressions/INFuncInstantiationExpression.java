@@ -29,10 +29,12 @@ import com.fujitsu.vdmj.in.types.Instantiate;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FunctionValue;
+import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -74,30 +76,44 @@ public class INFuncInstantiationExpression extends INExpression
     			abort(3034, "Function is already instantiated: " + fv.name, ctxt);
     		}
 
-    		TCTypeList fixed = new TCTypeList();
-
-    		for (TCType ptype: actualTypes)
+    		TCNameList paramNames = null;
+    		
+    		if (expdef != null)
     		{
+    			paramNames = expdef.typeParams;
+    		}
+    		else
+    		{
+    			paramNames = impdef.typeParams;
+    		}
+
+    		Context params = new Context(location, "Instantiation params", null);
+    		TCTypeList argtypes = new TCTypeList();
+
+    		for (int i=0; i< actualTypes.size(); i++)
+    		{
+    			TCType ptype = actualTypes.get(i);
+    			TCNameToken pname = paramNames.get(i);
+    			
     			if (ptype.toString().indexOf('@') >= 0)		// Really need type.isPolymorphic
     			{
     				// Resolve any @T types referred to in the type parameters
-    				fixed.add(Instantiate.instantiate(ptype, ctxt));
+    				ptype = Instantiate.instantiate(ptype, ctxt, ctxt);
     			}
-    			else
-    			{
-    				fixed.add(ptype);
-    			}
+    			
+    			argtypes.add(ptype);
+    			params.put(pname, new ParameterValue(ptype));
     		}
     		
     		FunctionValue rv = null;
     		
-    		if (expdef == null)
+    		if (expdef != null)
 			{
-				rv = impdef.getPolymorphicValue(fixed);
+				rv = expdef.getPolymorphicValue(argtypes, params, ctxt);
 			}
 			else
 			{
-				rv = expdef.getPolymorphicValue(fixed);
+				rv = impdef.getPolymorphicValue(argtypes, params, ctxt);
 			}
 
     		rv.setSelf(fv.self);

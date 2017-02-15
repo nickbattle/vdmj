@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.types;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class TCSet1Type extends TCSetType
 {
@@ -53,11 +52,5 @@ public class TCSet1Type extends TCSetType
 		}
 
 		return false;
-	}
-
-	@Override
-	public TCType polymorph(TCNameToken pname, TCType actualType)
-	{
-		return new TCSet1Type(location, setof.polymorph(pname, actualType));
 	}
 }

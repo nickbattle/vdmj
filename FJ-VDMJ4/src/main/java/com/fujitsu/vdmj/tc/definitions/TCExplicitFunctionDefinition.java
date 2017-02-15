@@ -414,25 +414,6 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		return type;		// NB entire "->" type, not the result
 	}
 
-	public TCFunctionType getType(TCTypeList actualTypes)
-	{
-		Iterator<TCType> ti = actualTypes.iterator();
-		TCFunctionType ftype = type;
-
-		if (typeParams != null)
-		{
-			for (TCNameToken pname: typeParams)
-			{
-				TCType ptype = ti.next();
-				ftype = (TCFunctionType)ftype.polymorph(pname, ptype);
-			}
-
-			ftype.instantiated = true;
-		}
-
-		return ftype;
-	}
-	
 	private TCTypeList getMeasureParams()
 	{
 		TCTypeList params = new TCTypeList();
