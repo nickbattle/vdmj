@@ -54,12 +54,6 @@ public class TCParameterType extends TCType
 
 		return this;
 	}
-	
-	@Override
-	public TCType polymorph(TCNameToken pname, TCType actualType)
-	{
-		return (name.equals(pname)) ? actualType : this;
-	}
 
 	@Override
 	public int hashCode()

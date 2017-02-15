@@ -23,11 +23,16 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCInstantiate;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -102,11 +107,13 @@ public class TCFuncInstantiationExpression extends TCExpression
     				if (def instanceof TCExplicitFunctionDefinition)
     				{
     					expdef = (TCExplicitFunctionDefinition)def;
+    					type = (TCFunctionType)expdef.getType();
     					typeParams = expdef.typeParams;
     				}
     				else if (def instanceof TCImplicitFunctionDefinition)
     				{
     					impdef = (TCImplicitFunctionDefinition)def;
+    					type = (TCFunctionType)impdef.getType();
     					typeParams = impdef.typeParams;
     				}
     				else
@@ -128,18 +135,21 @@ public class TCFuncInstantiationExpression extends TCExpression
     				}
 
     				TCTypeList fixed = new TCTypeList();
+    				Map<TCNameToken, TCType> map = new HashMap<TCNameToken, TCType>();
 
-    				for (TCType ptype: actualTypes)
+    				for (int i=0; i < actualTypes.size(); i++)
     				{
+    					TCType ptype = actualTypes.get(i);
+    					TCNameToken name = typeParams.get(i);
+    					
     					ptype = ptype.typeResolve(env, null);
     					fixed.add(ptype);
+    					map.put(name, ptype);
     					TypeComparator.checkComposeTypes(ptype, env, false);
     				}
 
     				actualTypes = fixed;
-
-    				type = expdef == null ?
-    					impdef.getType(actualTypes) : expdef.getType(actualTypes);
+    				type = (TCFunctionType)TCInstantiate.instantiate(type, map);
 
     				set.add(type);
     			}

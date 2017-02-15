@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.in.definitions;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -36,6 +35,7 @@ import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.types.INPatternListTypePair;
 import com.fujitsu.vdmj.in.types.INPatternListTypePairList;
 import com.fujitsu.vdmj.in.types.INPatternTypePair;
+import com.fujitsu.vdmj.in.types.Instantiate;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -121,25 +121,6 @@ public class INImplicitFunctionDefinition extends INDefinition
 		return type;		// NB overall "->" type, not result type
 	}
 
-	public TCFunctionType getType(TCTypeList actualTypes)
-	{
-		Iterator<TCType> ti = actualTypes.iterator();
-		TCFunctionType ftype = type;
-
-		if (typeParams != null)
-		{
-    		for (TCNameToken pname: typeParams)
-    		{
-    			TCType ptype = ti.next();
-    			ftype = (TCFunctionType)ftype.polymorph(pname, ptype);
-    		}
-    
-    		ftype.instantiated = true;
-		}
-		
-		return ftype;
-	}
-
 	@Override
 	public INExpression findExpression(int lineno)
 	{
@@ -221,7 +202,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 		return nvl;
 	}
 
-	public FunctionValue getPolymorphicValue(TCTypeList actualTypes)
+	public FunctionValue getPolymorphicValue(TCTypeList actualTypes, Context params, Context ctxt)
 	{
 		if (polyfuncs == null)
 		{
@@ -247,24 +228,16 @@ public class INImplicitFunctionDefinition extends INDefinition
 
 		if (predef != null)
 		{
-			prefv = predef.getPolymorphicValue(actualTypes);
-		}
-		else
-		{
-			prefv = null;
+			prefv = predef.getPolymorphicValue(actualTypes, params, ctxt);
 		}
 
 		if (postdef != null)
 		{
-			postfv = postdef.getPolymorphicValue(actualTypes);
-		}
-		else
-		{
-			postfv = null;
+			postfv = postdef.getPolymorphicValue(actualTypes, params, ctxt);
 		}
 
-		FunctionValue rv = new FunctionValue(
-				this, actualTypes, prefv, postfv, null);
+		TCFunctionType ftype = (TCFunctionType)Instantiate.instantiate(getType(), params, ctxt);
+		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, null);
 
 		polyfuncs.put(actualTypes, rv);
 		return rv;

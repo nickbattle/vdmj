@@ -63,7 +63,7 @@ public class FunctionValue extends Value
 	private static final long serialVersionUID = 1L;
 	public final LexLocation location;
 	public final String name;
-	public NameValuePairList typeValues;
+	public Context typeValues;
 	public TCFunctionType type;
 	public final INPatternListList paramPatternList;
 	public final INExpression body;
@@ -191,37 +191,21 @@ public class FunctionValue extends Value
 	}
 
 	public FunctionValue(INImplicitFunctionDefinition fdef,
-		TCTypeList actualTypes, FunctionValue precondition,
+		TCFunctionType ftype, Context argTypes, FunctionValue precondition,
 		FunctionValue postcondition, Context freeVariables)
 	{
 		this(fdef, precondition, postcondition, freeVariables);
-		this.typeValues = new NameValuePairList();
-		this.type = fdef.getType(actualTypes);
-
-		Iterator<TCType> ti = actualTypes.iterator();
-
-		for (TCNameToken pname: fdef.typeParams)
-		{
-			TCType ptype = ti.next();
-			typeValues.add(new NameValuePair(pname, new ParameterValue(ptype)));
-		}
+		this.typeValues = argTypes;
+		this.type = ftype;
 	}
 
 	public FunctionValue(INExplicitFunctionDefinition fdef,
-		TCTypeList actualTypes, FunctionValue precondition,
+		TCFunctionType ftype, Context argTypes, FunctionValue precondition,
 		FunctionValue postcondition, Context freeVariables)
 	{
 		this(fdef, precondition, postcondition, freeVariables);
-		this.typeValues = new NameValuePairList();
-		this.type = fdef.getType(actualTypes);
-
-		Iterator<TCType> ti = actualTypes.iterator();
-
-		for (TCNameToken pname: fdef.typeParams)
-		{
-			TCType ptype = ti.next();
-			typeValues.add(new NameValuePair(pname, new ParameterValue(ptype)));
-		}
+		this.typeValues = argTypes;
+		this.type = ftype;
 	}
 
 	// This constructor is used by IterFunctionValue and CompFunctionValue
@@ -293,7 +277,7 @@ public class FunctionValue extends Value
 		if (typeValues != null)
 		{
 			// Add any @T type values, for recursive polymorphic functions
-			evalContext.putList(typeValues);
+			evalContext.putAll(typeValues);
 		}
 
 		if (argValues.size() != paramPatterns.size())

@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.types;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class TCOptionalType extends TCType
@@ -245,11 +244,5 @@ public class TCOptionalType extends TCType
 	public TCTypeList getComposeTypes()
 	{
 		return type.getComposeTypes();
-	}
-
-	@Override
-	public TCType polymorph(TCNameToken pname, TCType actualType)
-	{
-		return new TCOptionalType(location, type.polymorph(pname, actualType));
 	}
 }
