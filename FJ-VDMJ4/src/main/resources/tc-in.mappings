@@ -6,7 +6,7 @@
 package com.fujitsu.vdmj.tc.definitions to com.fujitsu.vdmj.in.definitions;
 map TCDefinitionList{} to INDefinitionList(this);
 map TCAccessSpecifier{isStatic, isAsync, access, isPure} to INAccessSpecifier(isStatic, isAsync, access, isPure);
-map TCAssignmentDefinition{accessSpecifier, name, type, expression} to INAssignmentDefinition(accessSpecifier, name, type, expression);
+map TCAssignmentDefinition{accessSpecifier, name, type, expression, expType} to INAssignmentDefinition(accessSpecifier, name, type, expression, expType);
 map TCBUSClassDefinition{name, classtype, supernames, definitions} to INBUSClassDefinition(name, classtype, supernames, definitions);
 map TCClassDefinition{name, classtype, supernames, definitions, superInheritedDefinitions, localInheritedDefinitions, superdefs, invariant, isAbstract} to INClassDefinition(name, classtype, supernames, definitions, superInheritedDefinitions, localInheritedDefinitions, superdefs, invariant, isAbstract);
 map TCClassInvariantDefinition{name, expression} to INClassInvariantDefinition(name, expression);
@@ -14,7 +14,7 @@ map TCClassList{} to INClassList(this);
 map TCCPUClassDefinition{name, classtype, supernames, definitions} to INCPUClassDefinition(name, classtype, supernames, definitions);
 map TCDefinition{} to INDefinition();
 map TCDefinitionSet{} to INDefinitionSet();
-map TCEqualsDefinition{location, pattern, typebind, bind, test} to INEqualsDefinition(location, pattern, typebind, bind, test);
+map TCEqualsDefinition{location, pattern, typebind, bind, test, defType, defs} to INEqualsDefinition(location, pattern, typebind, bind, test, defType, defs);
 map TCExplicitFunctionDefinition{accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measure, predef, postdef, classDefinition} to INExplicitFunctionDefinition(accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measure, predef, postdef, classDefinition);
 map TCExplicitOperationDefinition{accessSpecifier, name, type, parameterPatterns, precondition, postcondition, body, isConstructor, predef, postdef, state, classDefinition} to INExplicitOperationDefinition(accessSpecifier, name, type, parameterPatterns, precondition, postcondition, body, isConstructor, predef, postdef, state, classDefinition);
 map TCExternalDefinition{state, readOnly} to INExternalDefinition(state, readOnly);
@@ -22,8 +22,8 @@ map TCImplicitFunctionDefinition{accessSpecifier, name, typeParams, parameterPat
 map TCImplicitOperationDefinition{accessSpecifier, name, parameterPatterns, result, body, precondition, postcondition, errors, isConstructor, predef, postdef, state, classDefinition} to INImplicitOperationDefinition(accessSpecifier, name, parameterPatterns, result, body, precondition, postcondition, errors, isConstructor, predef, postdef, state, classDefinition);
 map TCImportedDefinition{location, def} to INImportedDefinition(location, def);
 map TCInheritedDefinition{name, accessSpecifier, superdef} to INInheritedDefinition(name, accessSpecifier, superdef);
-map TCInstanceVariableDefinition{accessSpecifier, name, type, expression} to INInstanceVariableDefinition(accessSpecifier, name, type, expression);
-map TCLocalDefinition{location, name, type} to INLocalDefinition(location, name, type);
+map TCInstanceVariableDefinition{accessSpecifier, name, type, expression, expType} to INInstanceVariableDefinition(accessSpecifier, name, type, expression, expType);
+map TCLocalDefinition{location, name, type, valueDefinition} to INLocalDefinition(location, name, type, valueDefinition);
 map TCMultiBindListDefinition{location, bindings, defs} to INMultiBindListDefinition(location, bindings, defs);
 map TCMutexSyncDefinition{location, operations} to INMutexSyncDefinition(location, operations);
 map TCNamedTraceDefinition{location, name, terms, classDefinition} to INNamedTraceDefinition(location, name, terms, classDefinition);

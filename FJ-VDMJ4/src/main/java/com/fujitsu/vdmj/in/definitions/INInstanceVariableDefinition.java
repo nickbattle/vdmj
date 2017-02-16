@@ -36,9 +36,9 @@ public class INInstanceVariableDefinition extends INAssignmentDefinition
 	public final TCNameToken oldname;
 
 	public INInstanceVariableDefinition(INAccessSpecifier accessSpecifier,
-			TCNameToken name, TCType type, INExpression expression)
+			TCNameToken name, TCType type, INExpression expression, TCType expType)
 	{
-		super(accessSpecifier, name, type, expression);
+		super(accessSpecifier, name, type, expression, expType);
 		oldname = name.getOldName();
 	}
 
