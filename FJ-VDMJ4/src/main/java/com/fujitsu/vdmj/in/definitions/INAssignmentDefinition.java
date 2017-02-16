@@ -42,14 +42,15 @@ public class INAssignmentDefinition extends INDefinition
 
 	public final TCType type;
 	public final INExpression expression;
-	public TCType expType;
+	public final TCType expType;
 
 	public INAssignmentDefinition(INAccessSpecifier accessSpecifier,
-			TCNameToken name, TCType type, INExpression expression)
+			TCNameToken name, TCType type, INExpression expression, TCType expType)
 	{
 		super(name.getLocation(), accessSpecifier, name);
 		this.type = type;
 		this.expression = expression;
+		this.expType = expType;
 		this.location.executable(false);
 	}
 

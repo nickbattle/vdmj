@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
@@ -45,8 +44,6 @@ public class INValueDefinition extends INDefinition
 	public final INPattern pattern;
 	public final TCType type;
 	public final INExpression exp;
-
-	protected TCType expType = null;
 
 	public INValueDefinition(INAccessSpecifier accessSpecifier, INPattern p, TCType type, INExpression exp)
 	{
@@ -103,8 +100,7 @@ public class INValueDefinition extends INDefinition
 	@Override
 	public TCType getType()
 	{
-		return type != null ? type :
-				(expType != null ? expType : new TCUnknownType(location));
+		return type;
 	}
 
 	@Override

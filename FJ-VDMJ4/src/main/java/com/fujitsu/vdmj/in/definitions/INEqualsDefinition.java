@@ -51,19 +51,19 @@ public class INEqualsDefinition extends INDefinition
 	public final INTypeBind typebind;
 	public final INBind bind;
 	public final INExpression test;
-
-	public TCType expType = null;
-	private TCType defType = null;
-	private INDefinitionList defs = null;
+	public final TCType defType;
+	public final INDefinitionList defs;
 
 	public INEqualsDefinition(LexLocation location, INPattern pattern,
-		INTypeBind typebind, INBind bind, INExpression test)
+		INTypeBind typebind, INBind bind, INExpression test, TCType defType, INDefinitionList defs)
 	{
 		super(location, null, null);
 		this.pattern = pattern;
 		this.typebind = typebind;
 		this.bind = bind;
 		this.test = test;
+		this.defType = defType;
+		this.defs = defs;
 	}
 
 	@Override

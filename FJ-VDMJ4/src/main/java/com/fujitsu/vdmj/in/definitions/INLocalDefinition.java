@@ -39,12 +39,13 @@ public class INLocalDefinition extends INDefinition
 {
 	private static final long serialVersionUID = 1L;
 	public final TCType type;
-	private boolean valueDefinition = false;
+	public final boolean valueDefinition;
 
-	public INLocalDefinition(LexLocation location, TCNameToken name, TCType type)
+	public INLocalDefinition(LexLocation location, TCNameToken name, TCType type, boolean valueDefinition)
 	{
 		super(location, null, name);
 		this.type = type;
+		this.valueDefinition = valueDefinition;
 	}
 
 	@Override
@@ -80,11 +81,6 @@ public class INLocalDefinition extends INDefinition
 	public boolean isUpdatable()
 	{
 		return getType().isClass(null);
-	}
-
-	public void setValueDefinition()
-	{
-		valueDefinition  = true;
 	}
 
 	@Override

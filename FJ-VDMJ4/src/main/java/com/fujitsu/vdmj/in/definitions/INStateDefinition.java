@@ -79,18 +79,18 @@ public class INStateDefinition extends INDefinition
 
 		for (TCField f: fields)
 		{
-			statedefs.add(new INLocalDefinition(f.tagname.getLocation(), f.tagname, f.type));
-			INLocalDefinition ld = new INLocalDefinition(f.tagname.getLocation(), f.tagname.getOldName(), f.type);
+			statedefs.add(new INLocalDefinition(f.tagname.getLocation(), f.tagname, f.type, false));
+			INLocalDefinition ld = new INLocalDefinition(f.tagname.getLocation(), f.tagname.getOldName(), f.type, false);
 			statedefs.add(ld);
 		}
 
 		recordType = new TCRecordType(name, fields, false);
 		INLocalDefinition recordDefinition = null;
 
-		recordDefinition = new INLocalDefinition(location, name, recordType);
+		recordDefinition = new INLocalDefinition(location, name, recordType, false);
 		statedefs.add(recordDefinition);
 
-		recordDefinition = new INLocalDefinition(location, name.getOldName(), recordType);
+		recordDefinition = new INLocalDefinition(location, name.getOldName(), recordType, false);
 		statedefs.add(recordDefinition);
 	}
 

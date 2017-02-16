@@ -64,8 +64,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 	public final INExplicitFunctionDefinition predef;
 	public final INExplicitFunctionDefinition postdef;
 	public final INClassDefinition classdef;
-
-	public TCFunctionType type;
+	public final TCFunctionType type;
 
 	private Map<TCTypeList, FunctionValue> polyfuncs = null;
 

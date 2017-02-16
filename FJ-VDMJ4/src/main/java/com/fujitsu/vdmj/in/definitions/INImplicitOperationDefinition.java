@@ -63,8 +63,7 @@ public class INImplicitOperationDefinition extends INDefinition
 	public final INExplicitFunctionDefinition predef;
 	public final INExplicitFunctionDefinition postdef;
 	public final INStateDefinition statedef;
-
-	private TCOperationType type;		// Created from params/result
+	public final TCOperationType type;		// Created from params/result
 
 	public INImplicitOperationDefinition(INAccessSpecifier accessSpecifier,
 		TCNameToken name,

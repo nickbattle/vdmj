@@ -51,7 +51,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 {
 	private static final long serialVersionUID = 1L;
 	public final TCNameList typeParams;
-	public TCFunctionType type;
+	public final TCFunctionType type;
 	public final INPatternListList paramPatternList;
 	public final INExpression precondition;
 	public final INExpression postcondition;
