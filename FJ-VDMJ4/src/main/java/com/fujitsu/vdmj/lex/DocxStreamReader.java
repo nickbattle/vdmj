@@ -29,7 +29,6 @@ import java.io.InputStream;
 /**
  * A class to read an ODF encoded VDM file.
  */
-
 public class DocxStreamReader extends XMLStreamReader
 {
 	public DocxStreamReader(InputStream in) throws IOException

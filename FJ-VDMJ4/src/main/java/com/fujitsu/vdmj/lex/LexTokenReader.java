@@ -45,7 +45,6 @@ import com.fujitsu.vdmj.config.Properties;
 /**
  * The main lexical analyser class.
  */
-
 public class LexTokenReader extends BacktrackInputReader
 {
 	/** The current module name, if parsing a module. */
@@ -75,7 +74,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * An inner class to hold all the position details that need to be
 	 * saved and restored on push/pop.
 	 */
-
 	private class Position
 	{
     	public int lc;
@@ -131,7 +129,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * @param file	The filename to parse.
 	 * @param dialect if VDM-SL or VDM++ tokens should be processed.
 	 */
-
 	public LexTokenReader(File file, Dialect dialect)
 	{
 		super(file);
@@ -147,7 +144,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * @param dialect if VDM-SL or VDM++ tokens should be processed.
 	 * @param charset The charset for the file.
 	 */
-
 	public LexTokenReader(File file, Dialect dialect, String charset)
 	{
 		super(file, charset);
@@ -163,7 +159,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * @param dialect Parse VDM++ or VDM-SL tokens.
 	 * @throws UnsupportedEncodingException
 	 */
-
 	public LexTokenReader(String expression, Dialect dialect)
 	{
 		super(expression);
@@ -180,7 +175,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * @param charset The charset to use.
 	 * @throws UnsupportedEncodingException
 	 */
-
 	public LexTokenReader(String expression, Dialect dialect, String charset)
 	{
 		super(expression, charset);
@@ -195,7 +189,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * This is used in the IDE to provide while typing outline and parse error
 	 * info.
 	 */
-
 	public LexTokenReader(String content, Dialect dialect, File file)
 	{
 		super(content);
@@ -210,7 +203,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * This is used in the IDE to provide while typing outline and parse error
 	 * info.
 	 */
-
 	public LexTokenReader(String content, Dialect dialect, File file, String charset)
 	{
 		super(content, charset);
@@ -222,7 +214,6 @@ public class LexTokenReader extends BacktrackInputReader
 	/**
 	 * A string representation of the current location.
 	 */
-
 	@Override
 	public String toString()
 	{
@@ -233,7 +224,6 @@ public class LexTokenReader extends BacktrackInputReader
 	/**
 	 * Initialize the position counters for a new file/string.
 	 */
-
 	private void init()
 	{
 		linecount = 1;
@@ -251,7 +241,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 *
 	 * @throws LexException
 	 */
-
 	private void throwMessage(int number, String msg)
 		throws LexException
 	{
@@ -274,7 +263,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * @param message The error message.
 	 * @throws LexException
 	 */
-
 	private void checkFor(char c, int number, String message) throws LexException
 	{
 		if (ch == c)
@@ -290,7 +278,6 @@ public class LexTokenReader extends BacktrackInputReader
 	/**
 	 * @see com.fujitsu.vdmj.lex.BacktrackInputReader#push()
 	 */
-
 	@Override
 	public void push()
 	{
@@ -303,7 +290,6 @@ public class LexTokenReader extends BacktrackInputReader
 	/**
 	 * @see com.fujitsu.vdmj.lex.BacktrackInputReader#pop()
 	 */
-
 	@Override
 	public void pop()
 	{
@@ -315,7 +301,6 @@ public class LexTokenReader extends BacktrackInputReader
 	/**
 	 * @see com.fujitsu.vdmj.lex.BacktrackInputReader#unpush()
 	 */
-
 	@Override
 	public void unpush()
 	{
@@ -329,7 +314,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * Go back to the mark, and re-mark it. This just calls pop() followed
 	 * by push().
 	 */
-
 	public void retry()
 	{
 		pop();
@@ -339,7 +323,6 @@ public class LexTokenReader extends BacktrackInputReader
 	/**
 	 * @return the number of characters read since the last push().
 	 */
-
 	public int getCharsRead()
 	{
 		return charsread;
@@ -348,7 +331,6 @@ public class LexTokenReader extends BacktrackInputReader
 	/**
 	 * @return the number of tokens read since the last push().
 	 */
-
 	public int getTokensRead()
 	{
 		return tokensread;
@@ -363,7 +345,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 *
 	 * @return the next character.
 	 */
-
 	private char rdCh()
 	{
 		char c = super.readCh();
@@ -396,7 +377,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * @return The actual character value (eg. "\n" returns 10).
 	 * @throws LexException
 	 */
-
 	private char rdQuotedCh() throws LexException
 	{
 		quotedQuote = false;
@@ -453,7 +433,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * @return	The converted value.
 	 * @see #rdNumber
 	 */
-
 	private int value(char c)
 	{
 		switch (c)
@@ -483,7 +462,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * @return The integer value of the number read.
 	 * @throws LexException
 	 */
-
 	private String rdNumber(int base) throws LexException
 	{
 		StringBuilder v = new StringBuilder();
@@ -520,7 +498,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 *
 	 * @return The next token, or a LexToken of type EOF.
 	 */
-
 	public LexToken nextToken() throws LexException
 	{
 		while (Character.isWhitespace(ch))
@@ -969,7 +946,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * @param tokpos	The token start position.
 	 * @return	A new LexLocation.
 	 */
-
 	private LexLocation location(int tokline, int tokpos)
 	{
 		return new LexLocation(
@@ -984,7 +960,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * @return Either a LexRealToken or a LexIntegerToken.
 	 * @throws LexException
 	 */
-
 	private LexToken rdReal(int tokline, int tokpos) throws LexException
 	{
 		String floatSyntax = "Expecting <digits>[.<digits>][e<+-><digits>]";
@@ -1064,7 +1039,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 * @return The last token, or the first token if none read yet.
 	 * @throws LexException
 	 */
-
 	public LexToken getLast() throws LexException
 	{
 		if (last == null)
@@ -1078,7 +1052,6 @@ public class LexTokenReader extends BacktrackInputReader
 	/**
 	 * @return True if the character passed can be the start of a variable name.
 	 */
-
 	private boolean startOfName(char c)
 	{
 		if (c < 0x0100)
@@ -1108,7 +1081,6 @@ public class LexTokenReader extends BacktrackInputReader
 	/**
 	 * @return True if the character passed can be part of a variable name.
 	 */
-
 	private boolean restOfName(char c)
 	{
 		if (c < 0x0100)
@@ -1138,7 +1110,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 *
 	 * @return A list of one or two name parts.
 	 */
-
 	private List<String> rdName()
 	{
 		List<String> names = new Vector<String>();
@@ -1174,7 +1145,6 @@ public class LexTokenReader extends BacktrackInputReader
 	 *
 	 * @return a simple name.
 	 */
-
 	private String rdIdentifier()
 	{
 		StringBuilder id = new StringBuilder();

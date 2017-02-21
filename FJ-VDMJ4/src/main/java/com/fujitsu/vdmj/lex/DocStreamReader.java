@@ -32,7 +32,6 @@ import java.io.UnsupportedEncodingException;
 /**
  * A class to read .doc encoded VDM files.
  */
-
 public class DocStreamReader extends InputStreamReader
 {
 	public DocStreamReader(InputStream in, String charsetName)

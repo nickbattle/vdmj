@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.values.Value;
 /**
  * A root context for object method invocations.
  */
-
 @SuppressWarnings("serial")
 public class ObjectContext extends RootContext
 {
@@ -47,7 +46,6 @@ public class ObjectContext extends RootContext
 	 * @param outer The context chain (not searched).
 	 * @param self The object context.
 	 */
-
 	public ObjectContext(
 		LexLocation location, String title, Context freeVariables,
 		Context outer, ObjectValue self)
@@ -69,7 +67,6 @@ public class ObjectContext extends RootContext
 	 *
 	 * @see com.fujitsu.vdmj.runtime.Context#check(com.fujitsu.vdmj.ast.lex.LexNameToken)
 	 */
-
 	@Override
 	public Value check(TCNameToken name)
 	{

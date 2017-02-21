@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.Settings;
 /**
  * A class to read LaTeX encoded VDM files.
  */
-
 public class LatexStreamReader extends InputStreamReader
 {
 	private Stack<Boolean> ifstack = new Stack<Boolean>();
