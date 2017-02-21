@@ -38,7 +38,6 @@ import com.fujitsu.vdmj.messages.InternalException;
  * A class to allow arbitrary checkpoints and backtracking while
  * parsing a file.
  */
-
 public class BacktrackInputReader extends Reader
 {
 	/** A stack of position markers for popping. */
@@ -58,7 +57,6 @@ public class BacktrackInputReader extends Reader
 	 *
 	 * @param file	The filename to open
 	 */
-
 	public BacktrackInputReader(File file, String charset)
 	{
 		try
@@ -80,7 +78,6 @@ public class BacktrackInputReader extends Reader
 	 *
 	 * @param file	The filename to open
 	 */
-
 	public BacktrackInputReader(File file)
 	{
 		this(file, Charset.defaultCharset().name());
@@ -92,7 +89,6 @@ public class BacktrackInputReader extends Reader
 	 *
 	 * @param expression
 	 */
-
 	public BacktrackInputReader(String expression, String charset)
 	{
     	try
@@ -119,7 +115,6 @@ public class BacktrackInputReader extends Reader
 	/**
 	 * Create an InputStreamReader from a File, depending on the filename.
 	 */
-
 	public static InputStreamReader readerFactory(File file, String charset)
 		throws IOException
 	{
@@ -146,7 +141,6 @@ public class BacktrackInputReader extends Reader
 	/**
 	 * Calculate the length to allocate for a given file/stream.
 	 */
-
 	private int readerLength(File file, InputStreamReader isr)
 	{
 		String name = file.getName();
@@ -169,7 +163,6 @@ public class BacktrackInputReader extends Reader
 	/**
 	 * Create an object to read the string passed with the default charset.
 	 */
-
 	public BacktrackInputReader(String expression)
 	{
 		this(expression, Charset.defaultCharset().name());
@@ -178,7 +171,6 @@ public class BacktrackInputReader extends Reader
 	/**
 	 * Push the current location to permit backtracking.
 	 */
-
 	public void push()
 	{
 		stack.push(pos);
@@ -189,7 +181,6 @@ public class BacktrackInputReader extends Reader
 	 * the parser reached a point where a potential ambiguity has been resolved,
 	 * and it knows that it will never need to backtrack.
 	 */
-
 	public void unpush()
 	{
 		stack.pop();	// don't set pos though
@@ -201,7 +192,6 @@ public class BacktrackInputReader extends Reader
 	 * the same character that would have been read immediately after the
 	 * push() operation that saved the position.
 	 */
-
 	public void pop()
 	{
 		pos = stack.pop();
@@ -210,7 +200,6 @@ public class BacktrackInputReader extends Reader
 	/**
 	 * Read one character.
 	 */
-
 	public char readCh()
 	{
 		return (pos == max) ? (char)-1 : data[pos++];
@@ -219,7 +208,6 @@ public class BacktrackInputReader extends Reader
 	/**
 	 * Read characters into the array passed.
 	 */
-
 	@Override
 	public int read(char[] cbuf, int off, int len)
 	{
@@ -236,7 +224,6 @@ public class BacktrackInputReader extends Reader
 	/**
 	 * Close the input stream.
 	 */
-
 	@Override
 	public void close()
 	{

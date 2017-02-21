@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.util.ConfigBase;
  * values are read from the vdmj.properties file, and defaults are defined
  * as public statics.
  */
-
 public class Properties extends ConfigBase
 {
 	/** The tab stop for source files. */
@@ -70,7 +69,6 @@ public class Properties extends ConfigBase
 	 * When the class is initialized, we call the ConfigBase init method, which
 	 * uses the properties file passed to update the static fields above.
 	 */
-
 	public static void init()
 	{
 		try

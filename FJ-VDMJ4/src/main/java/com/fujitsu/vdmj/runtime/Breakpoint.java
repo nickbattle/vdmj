@@ -80,7 +80,6 @@ public class Breakpoint implements Serializable
 	 * @param trace Any condition or trace expression.
 	 * @throws Exception 
 	 */
-
 	public Breakpoint(LexLocation location, int number, String trace)
 		throws Exception
 	{
@@ -171,7 +170,6 @@ public class Breakpoint implements Serializable
 	 * @param execl The execution location.
 	 * @param ctxt The execution context.
 	 */
-
 	public void check(LexLocation execl, Context ctxt)
 	{
 		location.hit();
@@ -220,7 +218,6 @@ public class Breakpoint implements Serializable
 	 * @param current The context to test.
 	 * @return True if the current context is above nextctxt.
 	 */
-
 	private boolean isAboveNext(Context current)
 	{
 		Context c = current.outer;
@@ -242,7 +239,6 @@ public class Breakpoint implements Serializable
 	 * @param current The context to test.
 	 * @return True if the current context is at or below outctxt.
 	 */
-
 	private boolean isOutOrBelow(Context current)
 	{
 		Context c = current.threadState.outctxt;

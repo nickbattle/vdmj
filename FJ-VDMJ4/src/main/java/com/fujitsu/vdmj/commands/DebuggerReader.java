@@ -69,7 +69,6 @@ public class DebuggerReader extends CommandReader
 	 * calling the superclass' run method. The synchronization prevents more
 	 * than one debugging session on the console.
 	 */
-
 	public ExitStatus run()
 	{
 		synchronized (DebuggerReader.class)		// Only one console!
@@ -112,7 +111,6 @@ public class DebuggerReader extends CommandReader
 	 *
 	 * @see com.fujitsu.vdmj.commands.CommandReader#doEvaluate(java.lang.String)
 	 */
-
 	@Override
 	protected boolean doEvaluate(String line)
 	{

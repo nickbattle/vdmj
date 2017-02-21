@@ -42,7 +42,6 @@ import com.fujitsu.vdmj.ast.lex.LexToken;
 /**
  * A class to hold the location of a token.
  */
-
 public class LexLocation implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -78,7 +77,6 @@ public class LexLocation implements Serializable
 	/**
 	 * Create a location with the given fields.
 	 */
-
 	public LexLocation(File file, String module,
 		int startLine, int startPos, int endLine, int endPos)
 	{
@@ -100,7 +98,6 @@ public class LexLocation implements Serializable
 	/**
 	 * Create a default location.
 	 */
-
 	public LexLocation()
 	{
 		this(new File("?"), "?", 0, 0, 0, 0);

@@ -36,7 +36,6 @@ import static com.fujitsu.vdmj.lex.Dialect.VDM_SL;
 /**
  * An enumeration for the basic token types recognised by the lexical analyser.
  */
-
 public enum Token implements Serializable
 {
 	// Variables
@@ -321,7 +320,6 @@ public enum Token implements Serializable
 	/**
 	 * Construct a token with the associated keyword, display and dialect.
 	 */
-
 	private Token(String keyword, String display, Dialect... dialects)
 	{
 		this.keyword = keyword;
@@ -332,7 +330,6 @@ public enum Token implements Serializable
 	/**
 	 * Lookup a keyword/dialect and return a Token, or null.
 	 */
-
 	public static Token lookup(String word, Dialect dialect)
 	{
 		switch (dialect)

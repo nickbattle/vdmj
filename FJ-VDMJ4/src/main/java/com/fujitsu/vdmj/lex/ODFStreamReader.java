@@ -29,7 +29,6 @@ import java.io.InputStream;
 /**
  * A class to read an ODF encoded VDM file.
  */
-
 public class ODFStreamReader extends XMLStreamReader
 {
 	public ODFStreamReader(InputStream in) throws IOException

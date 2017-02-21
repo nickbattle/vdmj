@@ -44,7 +44,6 @@ import com.fujitsu.vdmj.ast.lex.LexNameToken;
 /**
  * A class to hold a source file for source debug output.
  */
-
 public class SourceFile
 {
 	public final File filename;
