@@ -23,14 +23,13 @@
 
 package com.fujitsu.vdmj.runtime;
 
-import com.fujitsu.vdmj.commands.DebuggerReader;
+import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 /**
  * A breakpoint where execution must stop.
  */
-
 public class Stoppoint extends Breakpoint
 {
 	private static final long serialVersionUID = 1L;
@@ -74,14 +73,7 @@ public class Stoppoint extends Breakpoint
 					th.suspendOthers();
 				}
 
-//				if (Settings.usingDBGP)
-//				{
-//					ctxt.threadState.dbgp.stopped(ctxt, this);
-//				}
-//				else
-				{
-					new DebuggerReader(Interpreter.getInstance(), this, ctxt).run();
-				}
+				DebugLink.getInstance().breakpoint(ctxt, this);
 			}
 		}
 		catch (DebuggerException e)

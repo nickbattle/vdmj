@@ -25,7 +25,7 @@ package com.fujitsu.vdmj.scheduler;
 
 import java.lang.reflect.InvocationTargetException;
 
-import com.fujitsu.vdmj.commands.DebuggerReader;
+import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
@@ -86,7 +86,7 @@ public class MainThread extends SchedulableThread
 		{
 			setException(e);
 			suspendOthers();
-			DebuggerReader.stopped(e.ctxt, e.location);
+			DebugLink.getInstance().stopped(e.ctxt, e.location);
 		}
 		catch (Exception e)
 		{

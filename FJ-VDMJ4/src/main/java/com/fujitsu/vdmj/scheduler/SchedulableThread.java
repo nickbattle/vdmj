@@ -29,8 +29,9 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.commands.DebuggerReader;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.debug.DebugLink;
+import com.fujitsu.vdmj.debug.PostBox;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.InternalException;
@@ -62,6 +63,9 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	private long swapInBy;
 	private boolean inOuterTimeStep;
 	protected boolean stopCalled;
+	
+	public PostBox<String> debugCmd = new PostBox<String>(this);
+	public PostBox<String> debugResult = new PostBox<String>(this);
 
 	public SchedulableThread(
 		Resource resource, ObjectValue object, long priority,
@@ -304,20 +308,16 @@ public abstract class SchedulableThread extends Thread implements Serializable
 			case DEADLOCKED:
 				if (ctxt != null)
 				{
-//    				if (Settings.usingDBGP)
-//    				{
-//    					ctxt.threadState.dbgp.stopped(ctxt, location);
-//    				}
-//    				else
-    				{
-    					DebuggerReader.stopped(ctxt, location);
-    				}
+   					DebugLink.getInstance().stopped(ctxt, location);
 
     				if (sig == Signal.DEADLOCKED)
     				{
     					throw new ThreadDeath();
     				}
 				}
+				break;
+				
+			case RESUME:
 				break;
 		}
 	}
@@ -347,6 +347,17 @@ public abstract class SchedulableThread extends Thread implements Serializable
 		}
 	}
 
+	public static void resumeAll()
+	{
+		synchronized (allThreads)
+		{
+    		for (SchedulableThread th: allThreads)
+    		{
+   				th.setSignal(Signal.RESUME);
+    		}
+		}
+	}
+
 	public static void signalAll(Signal sig)
 	{
 		synchronized (allThreads)
@@ -357,7 +368,7 @@ public abstract class SchedulableThread extends Thread implements Serializable
     		}
 		}
 	}
-
+	
 	public synchronized boolean stopThread()
 	{
 		if (!stopCalled)

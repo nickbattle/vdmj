@@ -25,7 +25,7 @@ package com.fujitsu.vdmj.scheduler;
 
 import java.lang.reflect.InvocationTargetException;
 
-import com.fujitsu.vdmj.commands.DebuggerReader;
+import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Context;
@@ -103,13 +103,13 @@ public class AsyncThread extends SchedulableThread
 		{
 			suspendOthers();
 			ResourceScheduler.setException(e);
-			DebuggerReader.stopped(e.ctxt, operation.name.getLocation());
+			DebugLink.getInstance().stopped(e.ctxt, e.ctxt.location);
 		}
 		catch (ContextException e)
 		{
 			suspendOthers();
 			ResourceScheduler.setException(e);
-			DebuggerReader.stopped(e.ctxt, operation.name.getLocation());
+			DebugLink.getInstance().stopped(e.ctxt, e.location);
 		}
 		catch (Exception e)
 		{

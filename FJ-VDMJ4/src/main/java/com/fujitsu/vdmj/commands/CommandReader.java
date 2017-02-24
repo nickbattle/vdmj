@@ -49,6 +49,7 @@ import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.debug.DebugReader;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
@@ -382,6 +383,9 @@ abstract public class CommandReader
 	{
 		line = line.substring(line.indexOf(' ') + 1);
 
+		DebugReader dbg = new DebugReader();
+		dbg.start();
+		
 		try
 		{
    			long before = System.currentTimeMillis();
@@ -419,6 +423,10 @@ abstract public class CommandReader
 			}
 			
 			println("Error: " + e.getMessage());
+		}
+		finally
+		{
+			dbg.interrupt();	// Stop the debugger reader.
 		}
 
 		return true;

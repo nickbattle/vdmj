@@ -26,7 +26,7 @@ package com.fujitsu.vdmj.scheduler;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.commands.DebuggerReader;
+import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.traces.INTraceVariableStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -91,15 +91,7 @@ public class CTMainThread extends MainThread
 				setException(e);
 				suspendOthers();
 
-//				if (Settings.usingDBGP)
-//				{
-//					ctxt.threadState.dbgp.stopped(e.ctxt, e.location);
-//				}
-//				else
-				{
-					DebuggerReader.stopped(e.ctxt, e.location);
-				}
-
+				DebugLink.getInstance().stopped(e.ctxt, e.location);
 				result.add(Verdict.FAILED);
 			}
 			else
