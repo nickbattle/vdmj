@@ -27,11 +27,11 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.Exchanger;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.debug.DebugLink;
-import com.fujitsu.vdmj.debug.PostBox;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.InternalException;
@@ -64,8 +64,7 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	private boolean inOuterTimeStep;
 	protected boolean stopCalled;
 	
-	public PostBox<String> debugCmd = new PostBox<String>(this);
-	public PostBox<String> debugResult = new PostBox<String>(this);
+	public Exchanger<String> debugExch = new Exchanger<String>();
 
 	public SchedulableThread(
 		Resource resource, ObjectValue object, long priority,
@@ -343,17 +342,6 @@ public abstract class SchedulableThread extends Thread implements Serializable
     		for (SchedulableThread th: allThreads)
     		{
    				th.setSignal(Signal.TERMINATE);
-    		}
-		}
-	}
-
-	public static void resumeAll()
-	{
-		synchronized (allThreads)
-		{
-    		for (SchedulableThread th: allThreads)
-    		{
-   				th.setSignal(Signal.RESUME);
     		}
 		}
 	}

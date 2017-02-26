@@ -42,11 +42,17 @@ public class DebugReader extends Thread
 	public void run()
 	{
 		setName("DebugReader");
-		link.waitForStop();
 		
-		if (!this.isInterrupted())
+		while (true)
 		{
-			doThreads();
+			link.waitForStop();
+			debuggedThread = link.getThreads().get(0);
+			
+			if (this.isInterrupted())
+			{
+				break;
+			}
+
 			while (doCommand());
 		}
 	}
@@ -69,7 +75,15 @@ public class DebugReader extends Thread
 			
 			if (response.equals("continue"))
 			{
-				return false;
+				for (SchedulableThread th: link.getThreads())
+				{
+					if (th != debuggedThread)
+					{
+						link.command(th, "continue");
+					}
+				}
+				
+				return false;	// Call waitForStop
 			}
 			
 			Console.out.println(response);
@@ -127,5 +141,11 @@ public class DebugReader extends Thread
     		
     		debuggedThread = threads.get(choice-1);
 		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		return getName();
 	}
 }

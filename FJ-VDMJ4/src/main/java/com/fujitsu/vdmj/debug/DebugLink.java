@@ -38,6 +38,9 @@ import com.fujitsu.vdmj.scheduler.SchedulableThread;
  */
 public class DebugLink
 {
+	/** An ACK string */
+	private final static String ACK = "ACK";
+	
 	/** The singleton instance */
 	private static DebugLink instance = null;
 	
@@ -70,16 +73,24 @@ public class DebugLink
 	 */
 	public synchronized void waitForStop()
 	{
-		try
+		while (stopped.isEmpty())
 		{
-			wait();
-		}
-		catch (InterruptedException e)
-		{
-			// End of debugger session
+			pause(100);
 		}
 	}
 	
+	private void pause(int ms)
+	{
+		try
+		{
+			Thread.sleep(ms);
+		}
+		catch (InterruptedException e)
+		{
+			// ignore
+		}
+	}
+
 	/**
 	 * Return the current set of stopped threads.
 	 */
@@ -105,6 +116,7 @@ public class DebugLink
 	public void stopped(Context ctxt, LexLocation location)
 	{
 		SchedulableThread thread = (SchedulableThread)Thread.currentThread();
+		System.out.printf("%s: stopped entered\n", thread);
 		
 		synchronized(stopped)
 		{
@@ -127,14 +139,25 @@ public class DebugLink
 		
 		while (true)
 		{
-    		String request = thread.debugCmd.pickup();
-			String response = dc.run(request);
-			thread.debugResult.post(response);
-			
-			if (response.equals("continue"))
+			try
 			{
-				SchedulableThread.resumeAll();
-				return;
+				String request = thread.debugExch.exchange(ACK);
+				System.out.printf("%s: stopped got %s\n", thread, request);
+				String response = dc.run(request);
+				System.out.printf("%s: stopped returning %s\n", thread, response);
+				thread.debugExch.exchange(response);
+				
+				if (response.equals("continue"))
+				{
+					System.out.printf("%s: stopped continuing\n", thread);
+					stopped.clear();
+					breakpoints.clear();
+					return;
+				}
+			}
+			catch (InterruptedException e)
+			{
+				System.out.printf("%s: stopped interrupted\n", thread);
 			}
 		}
 	}
@@ -159,7 +182,17 @@ public class DebugLink
 	 */
 	public String command(SchedulableThread thread, String cmd)
 	{
-		thread.debugCmd.post(cmd);
-		return thread.debugResult.pickup();
+		try
+		{
+			System.out.printf("%s: command sending %s to %s\n", Thread.currentThread(), cmd, thread);
+			thread.debugExch.exchange(cmd);
+			System.out.printf("%s: command completed %s from %s\n", Thread.currentThread(), cmd, thread);
+			return thread.debugExch.exchange(ACK);
+		}
+		catch (InterruptedException e)
+		{
+			System.out.printf("%s: command interrupted\n", Thread.currentThread());
+			return null;
+		}
 	}
 }
