@@ -196,25 +196,25 @@ public class DebugCommand
 	private String doStep()
 	{
    		ctxt.threadState.setBreaks(breakpoint.location, null, null);
-   		return "continue";
+   		return "resume";
 	}
 
 	private String doNext()
 	{
 		ctxt.threadState.setBreaks(breakpoint.location,	ctxt.getRoot(), null);
-		return "continue";
+		return "resume";
 	}
 
 	private String doOut()
 	{
 		ctxt.threadState.setBreaks(breakpoint.location, null, ctxt.getRoot().outer);
-		return "continue";
+		return "resume";
 	}
 
 	private String doContinue()
 	{
 		ctxt.threadState.setBreaks(null, null, null);
-		return "continue";
+		return "resume";
 	}
 
 	private Context getFrame()

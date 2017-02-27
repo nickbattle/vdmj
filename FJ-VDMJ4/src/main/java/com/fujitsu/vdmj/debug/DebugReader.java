@@ -66,7 +66,7 @@ public class DebugReader extends Thread
 			
 			String response = link.command(debuggedThread, command);
 			
-			if (response.equals("continue"))
+			if (response.equals("resume"))
 			{
 				link.resume();
 				return false;	// Call waitForStop

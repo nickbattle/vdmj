@@ -140,9 +140,22 @@ public class DebugLink
 			{
 				String request = thread.debugExch.exchange(ACK);
 				System.out.printf("%s: stopped got %s\n", thread, request);
-				String response = dc.run(request);
-				System.out.printf("%s: stopped returning %s\n", thread, response);
-				thread.debugExch.exchange(response);
+				
+				if (request.equals("resume"))
+				{
+					System.out.printf("%s: stopped resuming\n", thread);
+					
+					synchronized(this)
+					{
+						return;
+					}
+				}
+				else
+				{
+					String response = dc.run(request);
+					System.out.printf("%s: stopped returning %s\n", thread, response);
+					thread.debugExch.exchange(response);
+				}
 			}
 			catch (InterruptedException e)
 			{
@@ -188,8 +201,23 @@ public class DebugLink
 	/**
 	 * Resume all threads, with the breakpoint thread last.
 	 */
-	public void resume()
+	public synchronized void resume()
 	{
+		for (SchedulableThread thread: stopped)
+		{
+			try
+			{
+				System.out.printf("%s: sending resume to %s\n", Thread.currentThread(), thread);
+				thread.debugExch.exchange("resume");
+				System.out.printf("%s: sent resume to %s\n", Thread.currentThread(), thread);
+			}
+			catch (InterruptedException e)
+			{
+				System.out.printf("%s: resume interrupted\n", Thread.currentThread());
+			}
+		}
 		
+		stopped.clear();
+		breakpoints.clear();
 	}
 }
