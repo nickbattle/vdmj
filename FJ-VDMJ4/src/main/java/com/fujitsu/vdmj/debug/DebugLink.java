@@ -71,24 +71,21 @@ public class DebugLink
 	/**
 	 * Wait for at least one thread to stop, so that it can be debugged.
 	 */
-	public synchronized void waitForStop()
+	public synchronized boolean waitForStop()
 	{
 		while (stopped.isEmpty())
 		{
-			pause(100);
+			try
+			{
+				wait();
+			}
+			catch (InterruptedException e)
+			{
+				return false;
+			}
 		}
-	}
-	
-	private void pause(int ms)
-	{
-		try
-		{
-			Thread.sleep(ms);
-		}
-		catch (InterruptedException e)
-		{
-			// ignore
-		}
+		
+		return true;
 	}
 
 	/**
@@ -146,14 +143,6 @@ public class DebugLink
 				String response = dc.run(request);
 				System.out.printf("%s: stopped returning %s\n", thread, response);
 				thread.debugExch.exchange(response);
-				
-				if (response.equals("continue"))
-				{
-					System.out.printf("%s: stopped continuing\n", thread);
-					stopped.clear();
-					breakpoints.clear();
-					return;
-				}
 			}
 			catch (InterruptedException e)
 			{
@@ -194,5 +183,13 @@ public class DebugLink
 			System.out.printf("%s: command interrupted\n", Thread.currentThread());
 			return null;
 		}
+	}
+	
+	/**
+	 * Resume all threads, with the breakpoint thread last.
+	 */
+	public void resume()
+	{
+		
 	}
 }

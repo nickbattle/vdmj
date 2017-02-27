@@ -43,16 +43,9 @@ public class DebugReader extends Thread
 	{
 		setName("DebugReader");
 		
-		while (true)
+		while (link.waitForStop())
 		{
-			link.waitForStop();
 			debuggedThread = link.getThreads().get(0);
-			
-			if (this.isInterrupted())
-			{
-				break;
-			}
-
 			while (doCommand());
 		}
 	}
@@ -75,14 +68,7 @@ public class DebugReader extends Thread
 			
 			if (response.equals("continue"))
 			{
-				for (SchedulableThread th: link.getThreads())
-				{
-					if (th != debuggedThread)
-					{
-						link.command(th, "continue");
-					}
-				}
-				
+				link.resume();
 				return false;	// Call waitForStop
 			}
 			
