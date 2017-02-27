@@ -28,6 +28,7 @@ import java.util.List;
 
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Breakpoint;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 /**
@@ -54,6 +55,14 @@ public class DebugReader extends Thread
 	{
 		try
 		{
+			Breakpoint bp = link.getBreakpoint(debuggedThread);
+			
+			if (bp != null)
+			{
+	    		Console.out.println("Stopped " + bp);
+	       		Console.out.println(Interpreter.getInstance().getSourceLine(bp.location));
+			}
+			
 			Console.out.printf("%s> ", debuggedThread.getName());
 			Console.out.flush();
 			String command = Console.in.readLine();
