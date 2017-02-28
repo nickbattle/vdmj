@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.debug;
 import java.io.IOException;
 import java.util.List;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -46,7 +47,7 @@ public class DebugReader extends Thread
 		
 		while (link.waitForStop())
 		{
-			debuggedThread = link.getThreads().get(0);
+			debuggedThread = link.getDebugThread();		// Initially bp thread
 			while (doCommand());
 		}
 	}
@@ -56,11 +57,20 @@ public class DebugReader extends Thread
 		try
 		{
 			Breakpoint bp = link.getBreakpoint(debuggedThread);
+			LexLocation loc = link.getLocation(debuggedThread);
 			
 			if (bp != null)
 			{
 	    		Console.out.println("Stopped " + bp);
 	       		Console.out.println(Interpreter.getInstance().getSourceLine(bp.location));
+			}
+			else if (loc.module.equals("?"))
+			{
+				Console.out.println("Thread has not yet started");
+			}
+			else
+			{
+				Console.out.println(Interpreter.getInstance().getSourceLine(loc));
 			}
 			
 			Console.out.printf("%s> ", debuggedThread.getName());
@@ -78,7 +88,7 @@ public class DebugReader extends Thread
 			if (response.equals("resume"))
 			{
 				link.resume();
-				return false;	// Call waitForStop
+				return false;	// Call waitForStop again
 			}
 			
 			Console.out.println(response);
@@ -101,7 +111,7 @@ public class DebugReader extends Thread
 		else if (threads.size() == 1)
 		{
 			debuggedThread = threads.get(0);
-			Breakpoint bp = link.getBreakpoint(debuggedThread);
+			Breakpoint bp = link.getBreakpoint();
 
 			if (bp != null)
 			{

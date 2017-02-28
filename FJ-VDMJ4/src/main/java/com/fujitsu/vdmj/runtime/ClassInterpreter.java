@@ -110,7 +110,7 @@ public class ClassInterpreter extends Interpreter
 	@Override
 	public void setDefaultName(String cname) throws Exception
 	{
-		if (cname == null)
+		if (cname == null || cname.equals("?"))
 		{
 			defaultClass = new INClassDefinition();
 			executableClasses.add(defaultClass);

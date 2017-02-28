@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
+import com.fujitsu.vdmj.values.CPUValue;
 
 /**
  * Link class to allow multiple stopped threads to link to a debugging interface.
@@ -44,11 +45,17 @@ public class DebugLink
 	/** The singleton instance */
 	private static DebugLink instance = null;
 	
+	/** True if we are attached to a debugger */
+	private static boolean debugging = false;
+	
 	/** The threads that are currently stopped */
 	private List<SchedulableThread> stopped = new LinkedList<SchedulableThread>();
 	
 	/** The threads breakpoint, if any */
 	private Map<SchedulableThread, Breakpoint> breakpoints = new HashMap<SchedulableThread, Breakpoint>();
+	
+	/** The threads locations, if known */
+	private Map<SchedulableThread, LexLocation> locations = new HashMap<SchedulableThread, LexLocation>();
 	
 	/**
 	 * Get the singleton.
@@ -73,7 +80,10 @@ public class DebugLink
 	 */
 	public synchronized boolean waitForStop()
 	{
-		while (stopped.isEmpty())
+		debugging = true;
+		
+		while (stopped.size() < SchedulableThread.getThreadCount() ||
+			SchedulableThread.getThreadCount() == 0)
 		{
 			try
 			{
@@ -81,6 +91,7 @@ public class DebugLink
 			}
 			catch (InterruptedException e)
 			{
+				debugging = false;
 				return false;
 			}
 		}
@@ -105,15 +116,62 @@ public class DebugLink
 	}
 	
 	/**
+	 * Return the location for a given thread, if known.
+	 */
+	public LexLocation getLocation(SchedulableThread thread)
+	{
+		return locations.get(thread);
+	}
+	
+	/**
+	 * Return the current breakpoint - should only ever be one or none.
+	 */
+	public Breakpoint getBreakpoint()
+	{
+		switch (breakpoints.size())
+		{
+			case 0:
+				return null;
+				
+			case 1:
+				return breakpoints.values().iterator().next();
+				
+			default:
+				System.err.println("More than one breakpoint??");
+				return null;
+		}
+	}
+	
+	/**
+	 * Return the thread with the current breakpoint, or the first thread otherwise.
+	 */
+	public SchedulableThread getDebugThread()
+	{
+		Breakpoint bp = getBreakpoint();
+		
+		if (bp == null)
+		{
+			return stopped.get(0);	// First stopped thread
+		}
+		else
+		{
+			return breakpoints.keySet().iterator().next();
+		}
+	}
+	
+	/**
 	 * Called by a thread which has stopped, but not at a breakpoint. For example,
 	 * when an exception occurs or deadlock is detected, or when a waiting thread
 	 * is pushed into the debugger with a suspendOthers call.
-	 * @param ctxt 
 	 */
 	public void stopped(Context ctxt, LexLocation location)
 	{
+		if (!debugging)		// Not attached to a debugger
+		{
+			return;
+		}
+		
 		SchedulableThread thread = (SchedulableThread)Thread.currentThread();
-		System.out.printf("%s: stopped entered\n", thread);
 		
 		synchronized(stopped)
 		{
@@ -122,12 +180,28 @@ public class DebugLink
 
 		synchronized(this)
 		{
-			this.notify();	// See waitForStop()
+			this.notify();		// See waitForStop()
+		}
+		
+		if (location == null)	// Stopped before it started!
+		{
+			location = new LexLocation();
+		}
+		
+		synchronized(locations)
+		{
+			locations.put(thread, location);
+		}
+		
+		if (ctxt == null)		// Stopped before it started!
+		{
+			ctxt = new Context(location, "Empty Context", ctxt);
+			ctxt.setThreadState(CPUValue.vCPU);
 		}
 		
 		Breakpoint bp = breakpoints.get(thread);
 		
-		if (bp == null)
+		if (bp == null)			// An interrupted thread, not a break
 		{
 			bp = new Breakpoint(location);
 		}
@@ -139,13 +213,10 @@ public class DebugLink
 			try
 			{
 				String request = thread.debugExch.exchange(ACK);
-				System.out.printf("%s: stopped got %s\n", thread, request);
 				
 				if (request.equals("resume"))
 				{
-					System.out.printf("%s: stopped resuming\n", thread);
-					
-					synchronized(this)
+					synchronized(this)	// So everyone resumes when "resume" method ends
 					{
 						return;
 					}
@@ -153,13 +224,12 @@ public class DebugLink
 				else
 				{
 					String response = dc.run(request);
-					System.out.printf("%s: stopped returning %s\n", thread, response);
 					thread.debugExch.exchange(response);
 				}
 			}
 			catch (InterruptedException e)
 			{
-				System.out.printf("%s: stopped interrupted\n", thread);
+				// Ignore?
 			}
 		}
 	}
@@ -171,7 +241,7 @@ public class DebugLink
 	{
 		SchedulableThread thread = (SchedulableThread)Thread.currentThread();
 		
-		synchronized(breakpoints)
+		synchronized (breakpoints)
 		{
 			breakpoints.put(thread, bp);
 		}
@@ -186,14 +256,11 @@ public class DebugLink
 	{
 		try
 		{
-			System.out.printf("%s: command sending %s to %s\n", Thread.currentThread(), cmd, thread);
 			thread.debugExch.exchange(cmd);
-			System.out.printf("%s: command completed %s from %s\n", Thread.currentThread(), cmd, thread);
 			return thread.debugExch.exchange(ACK);
 		}
 		catch (InterruptedException e)
 		{
-			System.out.printf("%s: command interrupted\n", Thread.currentThread());
 			return null;
 		}
 	}
@@ -207,17 +274,16 @@ public class DebugLink
 		{
 			try
 			{
-				System.out.printf("%s: sending resume to %s\n", Thread.currentThread(), thread);
 				thread.debugExch.exchange("resume");
-				System.out.printf("%s: sent resume to %s\n", Thread.currentThread(), thread);
 			}
 			catch (InterruptedException e)
 			{
-				System.out.printf("%s: resume interrupted\n", Thread.currentThread());
+				// Ignore?
 			}
 		}
 		
 		stopped.clear();
 		breakpoints.clear();
+		locations.clear();
 	}
 }

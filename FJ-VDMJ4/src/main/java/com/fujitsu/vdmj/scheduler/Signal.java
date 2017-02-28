@@ -25,5 +25,5 @@ package com.fujitsu.vdmj.scheduler;
 
 public enum Signal
 {
-	SUSPEND, DEADLOCKED, TERMINATE, RESUME
+	SUSPEND, DEADLOCKED, TERMINATE
 }

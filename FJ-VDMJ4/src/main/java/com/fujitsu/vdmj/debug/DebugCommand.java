@@ -28,7 +28,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 
-import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -72,7 +72,7 @@ public class DebugCommand
 		}
 		catch (Exception e)
 		{
-			throw new InternalException(52, "Cannot set default name at breakpoint");
+			// throw new InternalException(52, "Cannot set default name at breakpoint");
 		}
    		
    		String result = "";
@@ -125,7 +125,15 @@ public class DebugCommand
 			}
 			else if (line.startsWith("print ") || line.startsWith("p "))
 			{
-				result = doEvaluate(line);
+				try
+				{
+					ctxt.threadState.setAtomic(true);
+					result = doEvaluate(line);
+				}
+				finally
+				{
+					ctxt.threadState.setAtomic(false);
+				}
 			}
 			else
 			{
@@ -276,8 +284,9 @@ public class DebugCommand
 
 	private String doSource()
 	{
-		File file = breakpoint.location.file;
-		int current = breakpoint.location.startLine;
+		LexLocation loc = (frame == 0) ? breakpoint.location : getFrame().location;
+		File file = loc.file;
+		int current = loc.startLine;
 
 		int start = current - SOURCE_LINES;
 		if (start < 1) start = 1;

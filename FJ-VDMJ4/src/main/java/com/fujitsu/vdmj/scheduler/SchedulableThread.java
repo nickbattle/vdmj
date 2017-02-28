@@ -275,6 +275,12 @@ public abstract class SchedulableThread extends Thread implements Serializable
 
 	private synchronized void sleep(Context ctxt, LexLocation location)
 	{
+		if (signal != null)		// Can be set on entry
+		{
+			handleSignal(signal, ctxt, location);
+			signal = null;
+		}
+		
 		while (true)
 		{
     		try
@@ -292,6 +298,7 @@ public abstract class SchedulableThread extends Thread implements Serializable
     		catch (InterruptedException e)
     		{
     			handleSignal(signal, ctxt, location);
+    			signal = null;
     		}
 		}
 	}
@@ -305,7 +312,7 @@ public abstract class SchedulableThread extends Thread implements Serializable
 
 			case SUSPEND:
 			case DEADLOCKED:
-				if (ctxt != null)
+//				if (ctxt != null)
 				{
    					DebugLink.getInstance().stopped(ctxt, location);
 
@@ -314,9 +321,6 @@ public abstract class SchedulableThread extends Thread implements Serializable
     					throw new ThreadDeath();
     				}
 				}
-				break;
-				
-			case RESUME:
 				break;
 		}
 	}
@@ -393,6 +397,11 @@ public abstract class SchedulableThread extends Thread implements Serializable
     		
     		return list;
 		}
+	}
+	
+	public static int getThreadCount()
+	{
+		return allThreads.size();
 	}
 
 	private synchronized void setSignal(Signal sig)
