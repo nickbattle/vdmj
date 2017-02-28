@@ -54,7 +54,7 @@ public class MainThread extends SchedulableThread
 		this.ctxt = ctxt;
 		this.exception = null;
 
-		setName("MainThread-" + getId());
+		setName("MainThread");
 	}
 
 	@Override

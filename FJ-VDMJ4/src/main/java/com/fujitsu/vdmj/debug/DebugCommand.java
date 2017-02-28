@@ -279,6 +279,12 @@ public class DebugCommand
 	private String doSource()
 	{
 		LexLocation loc = (frame == 0) ? breakpoint.location : getFrame().location;
+		
+		if (loc.module.equals("?"))
+		{
+			return "No source";
+		}
+		
 		File file = loc.file;
 		int current = loc.startLine;
 

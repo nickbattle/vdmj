@@ -53,7 +53,7 @@ public class CTMainThread extends MainThread
 		this.test = test;
 		this.debug = debug;
 
-		setName("CTMainThread-" + getId());
+		setName("CTMainThread");
 	}
 
 	@Override

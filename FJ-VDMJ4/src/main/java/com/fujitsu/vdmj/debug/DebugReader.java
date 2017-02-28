@@ -66,7 +66,7 @@ public class DebugReader extends Thread
 			}
 			else if (loc == null)
 			{
-				Console.out.println("Thread has not yet started");
+				Console.out.printf("Thread %s has not yet started\n", debuggedThread.getName());
 			}
 			else
 			{
