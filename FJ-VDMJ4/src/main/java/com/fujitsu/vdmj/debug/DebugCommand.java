@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
-import com.fujitsu.vdmj.runtime.DebuggerException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.syntax.ParserException;
 
@@ -150,11 +149,6 @@ public class DebugCommand
 
 	protected String doException(Exception e)
 	{
-		if (e instanceof DebuggerException)
-		{
-			throw (DebuggerException)e;
-		}
-
 		while (e instanceof InvocationTargetException)
 		{
 			e = (Exception)e.getCause();
@@ -305,12 +299,12 @@ public class DebugCommand
 
 	private String doStop()
 	{
-		throw new DebuggerException("terminated");
+		return "quit";
 	}
 
 	private String doQuit()
 	{
-		throw new DebuggerException("terminated");
+		return "quit";
 	}
 
 	private String doHelp()

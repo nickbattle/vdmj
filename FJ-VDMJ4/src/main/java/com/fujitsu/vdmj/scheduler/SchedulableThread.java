@@ -275,16 +275,15 @@ public abstract class SchedulableThread extends Thread implements Serializable
 
 	private synchronized void sleep(Context ctxt, LexLocation location)
 	{
-		if (signal != null)		// Can be set on entry
-		{
-			handleSignal(signal, ctxt, location);
-			signal = null;
-		}
-		
 		while (true)
 		{
     		try
     		{
+   				if (signal != null)		// Can be set by handler
+   				{
+   					handleSignal(signal, ctxt, location);
+   				}
+   				
    				wait();
    				
    				if (stopCalled && state == RunState.RUNNING)
@@ -297,14 +296,15 @@ public abstract class SchedulableThread extends Thread implements Serializable
     		}
     		catch (InterruptedException e)
     		{
-    			handleSignal(signal, ctxt, location);
-    			signal = null;
+    			// Loop to handle signal
     		}
 		}
 	}
 
 	protected void handleSignal(Signal sig, Context ctxt, LexLocation location)
 	{
+		signal = null;
+
 		switch (sig)
 		{
 			case TERMINATE:
@@ -404,7 +404,7 @@ public abstract class SchedulableThread extends Thread implements Serializable
 		return allThreads.size();
 	}
 
-	private synchronized void setSignal(Signal sig)
+	public synchronized void setSignal(Signal sig)
 	{
 		signal = sig;
 		interrupt();

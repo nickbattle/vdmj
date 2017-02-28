@@ -90,6 +90,11 @@ public class DebugReader extends Thread
 				link.resume();
 				return false;	// Call waitForStop again
 			}
+			else if (response.equals("quit"))
+			{
+				link.kill();
+				return false;
+			}
 			
 			Console.out.println(response);
 			return true;

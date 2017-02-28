@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
+import com.fujitsu.vdmj.scheduler.Signal;
 import com.fujitsu.vdmj.values.CPUValue;
 
 /**
@@ -221,6 +222,11 @@ public class DebugLink
 						return;
 					}
 				}
+				else if (request.equals("terminate"))
+				{
+					thread.setSignal(Signal.TERMINATE);
+					return;
+				}
 				else
 				{
 					String response = dc.run(request);
@@ -229,7 +235,7 @@ public class DebugLink
 			}
 			catch (InterruptedException e)
 			{
-				// Ignore?
+				return;		// Being killed?
 			}
 		}
 	}
@@ -261,12 +267,12 @@ public class DebugLink
 		}
 		catch (InterruptedException e)
 		{
-			return null;
+			return "quit";
 		}
 	}
 	
 	/**
-	 * Resume all threads, with the breakpoint thread last.
+	 * Resume all threads.
 	 */
 	public synchronized void resume()
 	{
@@ -275,6 +281,28 @@ public class DebugLink
 			try
 			{
 				thread.debugExch.exchange("resume");
+			}
+			catch (InterruptedException e)
+			{
+				// Ignore?
+			}
+		}
+		
+		stopped.clear();
+		breakpoints.clear();
+		locations.clear();
+	}
+	
+	/**
+	 * Kill all threads.
+	 */
+	public void kill()
+	{
+		for (SchedulableThread thread: stopped)
+		{
+			try
+			{
+				thread.debugExch.exchange("terminate");
 			}
 			catch (InterruptedException e)
 			{
