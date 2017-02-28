@@ -64,7 +64,7 @@ public class DebugReader extends Thread
 	    		Console.out.println("Stopped " + bp);
 	       		Console.out.println(Interpreter.getInstance().getSourceLine(bp.location));
 			}
-			else if (loc.module.equals("?"))
+			else if (loc == null)
 			{
 				Console.out.println("Thread has not yet started");
 			}
@@ -73,31 +73,43 @@ public class DebugReader extends Thread
 				Console.out.println(Interpreter.getInstance().getSourceLine(loc));
 			}
 			
-			Console.out.printf("%s> ", debuggedThread.getName());
-			Console.out.flush();
-			String command = Console.in.readLine();
+			String command = null;
+			
+			while (command == null || command.length() == 0)
+			{
+    			Console.out.printf("%s> ", debuggedThread.getName());
+    			Console.out.flush();
+    			command = Console.in.readLine().trim();
+			}
 			
 			if (command.equals("threads"))
 			{
 				doThreads();
 				return true;
 			}
-			
-			String response = link.command(debuggedThread, command);
-			
-			if (response.equals("resume"))
+			else if (command.startsWith("thread "))
 			{
-				link.resume();
-				return false;	// Call waitForStop again
+				doThread(command);
+				return true;
 			}
-			else if (response.equals("quit"))
+			else
 			{
-				link.kill();
-				return false;
+    			String response = link.command(debuggedThread, command);
+    			
+    			if (response.equals("resume"))
+    			{
+    				link.resume();
+    				return false;	// Call waitForStop again
+    			}
+    			else if (response.equals("quit"))
+    			{
+    				link.kill();
+    				return false;
+    			}
+    			
+    			Console.out.println(response);
+    			return true;
 			}
-			
-			Console.out.println(response);
-			return true;
 		}
 		catch (IOException e)
 		{
@@ -113,19 +125,10 @@ public class DebugReader extends Thread
 		{
 			Console.out.println("No threads?");
 		}
-		else if (threads.size() == 1)
-		{
-			debuggedThread = threads.get(0);
-			Breakpoint bp = link.getBreakpoint();
-
-			if (bp != null)
-			{
-				Console.out.println(bp);
-			}
-		}
 		else
 		{
     		int i = 1;
+    		Console.out.println("----");
     		
     		for (SchedulableThread th: threads)
     		{
@@ -133,23 +136,37 @@ public class DebugReader extends Thread
     			Console.out.printf("%d: %s %s\n", i++, th.getName(), bp != null ? bp.toString() : "");
     		}
     		
-    		int choice = 0;
-    		
-    		while (choice < 1 || choice > threads.size())
-    		{
-    			try
-    			{
-    				Console.out.printf("Select 1 to %d: ", threads.size());
-    				Console.out.flush();
-    				choice = Integer.parseInt(Console.in.readLine());
-    			}
-    			catch (Exception e)
-    			{
-    				Console.out.printf("Must choose 1 to %d\n", threads.size());
-    			}
-    		}
-    		
-    		debuggedThread = threads.get(choice-1);
+    		Console.out.println("----");
+		}
+	}
+	
+	private void doThread(String line)
+	{
+		String[] parts = line.split("\\s+");
+
+		if (parts.length != 2 || !parts[0].equals("thread"))
+		{
+			Console.out.println("Usage: thread <n>");
+			return;
+		}
+
+		try
+		{
+			int n = Integer.parseInt(parts[1]);
+			List<SchedulableThread> threads = link.getThreads();
+
+			if (n < 1 || n > threads.size())
+			{
+				Console.out.printf("Thread number 1 to %d\n", threads.size());
+			}
+			else
+			{
+				debuggedThread = threads.get(n - 1);
+			}
+		}
+		catch (NumberFormatException e)
+		{
+			Console.out.println("Usage: thread <n>");
 		}
 	}
 	

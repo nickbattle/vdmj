@@ -311,16 +311,17 @@ public class DebugCommand
 	{
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append("step - step one expression/statement");
-		sb.append("next - step over functions or operations");
-		sb.append("out - run to the return of functions or operations");
-		sb.append("continue - resume execution");
-		sb.append("stack - display the current stack frame context");
-		sb.append("up - move the stack frame context up one frame");
-		sb.append("down - move the stack frame context down one frame");
-		sb.append("source - list VDM source code around the current breakpoint");
-		sb.append("stop - terminate the execution immediately");
-		sb.append("threads - list active threads");
+		sb.append("step - step one expression/statement\n");
+		sb.append("next - step over functions or operations\n");
+		sb.append("out - run to the return of functions or operations\n");
+		sb.append("continue - resume execution of all threads\n");
+		sb.append("stack - display the current stack frame context\n");
+		sb.append("up - move the stack frame context up one frame\n");
+		sb.append("down - move the stack frame context down one frame\n");
+		sb.append("source - list VDM source code around the current breakpoint\n");
+		sb.append("stop - terminate the execution immediately\n");
+		sb.append("threads - list active threads\n");
+		sb.append("thread <n> - select active thread to debug\n");
 		
 		return sb.toString();
 	}

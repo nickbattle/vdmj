@@ -138,7 +138,7 @@ abstract public class CommandReader
 			try
 			{
 				print(prompt);
-				line = getStdin().readLine();
+				line = Console.in.readLine();
 
 				if (line == null)
 				{
@@ -242,10 +242,6 @@ abstract public class CommandReader
 				else if(line.equals("list"))
 				{
 					carryOn = doList(line);
-				}
-				else if(line.equals("threads"))
-				{
-					carryOn = doThreads(line);
 				}
 				else if(line.equals("source"))
 				{
@@ -352,21 +348,6 @@ abstract public class CommandReader
 
 		return ExitStatus.EXIT_OK;
 	}
-
-	protected PrintWriter getStdout()
-	{
-		return Console.out;
-	}
-
-	protected BufferedReader getStdin()
-	{
-		return Console.in;
-	}
-
-//	public void setDebugReader(DBGPReader dbgp)
-//	{
-//		this.dbgp = dbgp;
-//	}
 
 	protected boolean doException(Exception e)
 	{
@@ -960,7 +941,7 @@ abstract public class CommandReader
 			}
 			else
 			{
-				source.printCoverage(getStdout());
+				source.printCoverage(Console.out);
 			}
 		}
 		catch (Exception e)
@@ -1275,22 +1256,6 @@ abstract public class CommandReader
 		return notAvailable(line);
 	}
 
-	protected boolean doThreads(@SuppressWarnings("unused") String line)
-	{
-		String threads = interpreter.getScheduler().getStatus();
-
-		if (threads.isEmpty())
-		{
-			println("No threads running");
-		}
-		else
-		{
-			println(threads);
-		}
-
-		return true;
-	}
-
 	protected boolean doAssert(String line)
 	{
 		File filename = null;
@@ -1424,7 +1389,7 @@ abstract public class CommandReader
 			{
 				println("FAILED: " + assertion);
 				println("Runtime: " + e.getMessage());
-				e.ctxt.printStackTrace(getStdout(), true);
+				e.ctxt.printStackTrace(Console.out, true);
 				assertErrors++;
 				break;
 			}
@@ -1738,13 +1703,13 @@ abstract public class CommandReader
 
 	protected void print(String m)
 	{
-		getStdout().print(m);
-		getStdout().flush();	// As it's not a complete line
+		Console.out.print(m);
+		Console.out.flush();	// As it's not a complete line
 	}
 
 	protected void println(String m)
 	{
-		getStdout().println(m);
+		Console.out.println(m);
 	}
 
 	protected String plural(int n, String s, String pl)

@@ -179,6 +179,11 @@ public class DebugLink
 			stopped.add(thread);
 		}
 
+		synchronized(locations)
+		{
+			locations.put(thread, location);
+		}
+		
 		synchronized(this)
 		{
 			this.notify();		// See waitForStop()
@@ -187,11 +192,6 @@ public class DebugLink
 		if (location == null)	// Stopped before it started!
 		{
 			location = new LexLocation();
-		}
-		
-		synchronized(locations)
-		{
-			locations.put(thread, location);
 		}
 		
 		if (ctxt == null)		// Stopped before it started!
@@ -213,7 +213,7 @@ public class DebugLink
 		{
 			try
 			{
-				String request = thread.debugExch.exchange(ACK);
+				String request = readCommand(thread);
 				
 				if (request.equals("resume"))
 				{
@@ -230,7 +230,7 @@ public class DebugLink
 				else
 				{
 					String response = dc.run(request);
-					thread.debugExch.exchange(response);
+					writeCommand(thread, response);
 				}
 			}
 			catch (InterruptedException e)
@@ -262,8 +262,8 @@ public class DebugLink
 	{
 		try
 		{
-			thread.debugExch.exchange(cmd);
-			return thread.debugExch.exchange(ACK);
+			writeCommand(thread, cmd);
+			return readCommand(thread);
 		}
 		catch (InterruptedException e)
 		{
@@ -280,7 +280,7 @@ public class DebugLink
 		{
 			try
 			{
-				thread.debugExch.exchange("resume");
+				writeCommand(thread, "resume");
 			}
 			catch (InterruptedException e)
 			{
@@ -302,7 +302,7 @@ public class DebugLink
 		{
 			try
 			{
-				thread.debugExch.exchange("terminate");
+				writeCommand(thread, "terminate");
 			}
 			catch (InterruptedException e)
 			{
@@ -313,5 +313,24 @@ public class DebugLink
 		stopped.clear();
 		breakpoints.clear();
 		locations.clear();
+	}
+	
+	/**
+	 * Read and return a value from the thread's Exchange, responding with an ACK.
+	 */
+	private String readCommand(SchedulableThread thread) throws InterruptedException
+	{
+		return thread.debugExch.exchange(ACK);		
+	}
+	
+	/**
+	 * Write a value to the thread's Exchange, and check for an ACK.
+	 */
+	private void writeCommand(SchedulableThread thread, String response) throws InterruptedException
+	{
+		if (!thread.debugExch.exchange(response).equals(ACK))
+		{
+			System.err.println("Unexpected ACK from debugger");
+		}
 	}
 }
