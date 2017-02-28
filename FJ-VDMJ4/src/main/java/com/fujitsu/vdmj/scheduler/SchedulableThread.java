@@ -279,11 +279,6 @@ public abstract class SchedulableThread extends Thread implements Serializable
 		{
     		try
     		{
-   				if (signal != null)		// Can be set by handler
-   				{
-   					handleSignal(signal, ctxt, location);
-   				}
-   				
    				wait();
    				
    				if (stopCalled && state == RunState.RUNNING)
@@ -296,7 +291,10 @@ public abstract class SchedulableThread extends Thread implements Serializable
     		}
     		catch (InterruptedException e)
     		{
-    			// Loop to handle signal
+   				while (signal != null)		// Can be set by handler
+   				{
+   					handleSignal(signal, ctxt, location);
+   				}
     		}
 		}
 	}
@@ -311,17 +309,12 @@ public abstract class SchedulableThread extends Thread implements Serializable
 				throw new ThreadDeath();
 
 			case SUSPEND:
-			case DEADLOCKED:
-//				if (ctxt != null)
-				{
-   					DebugLink.getInstance().stopped(ctxt, location);
-
-    				if (sig == Signal.DEADLOCKED)
-    				{
-    					throw new ThreadDeath();
-    				}
-				}
+				DebugLink.getInstance().stopped(ctxt, location);
 				break;
+				
+			case DEADLOCKED:
+				DebugLink.getInstance().stopped(ctxt, location);
+				throw new ThreadDeath();
 		}
 	}
 
