@@ -631,8 +631,8 @@ abstract public class Interpreter
 			writer.println("Excluded " + excluded + " tests");
 		}
 
-		after = System.currentTimeMillis();
-		writer.println("Executed in " + (double)(after-before)/1000 + " secs. ");
+		long finished = System.currentTimeMillis();
+		writer.println("Executed in " + (double)(finished-after)/1000 + " secs. ");
 		
 		return !failed;
 	}
