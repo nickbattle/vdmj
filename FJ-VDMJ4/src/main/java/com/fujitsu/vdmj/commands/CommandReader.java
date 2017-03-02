@@ -519,21 +519,39 @@ abstract public class CommandReader
 				}
 			}
 			
-   			boolean passed = interpreter.runtrace(line, startTest, endTest, debug, reduction, reductionType, traceseed);
+			DebugReader dbg = null;
 			
-			if (!debug && traceoutput != null)
+			try
 			{
-				out.close();
-				Interpreter.setTraceOutput(null);
-			}
+				if (debug)
+				{
+					dbg = new DebugReader();
+					dbg.start();
+				}
 
-			if (passed)
-			{
-				println("All tests passed");
+				boolean passed = interpreter.runtrace(line, startTest, endTest, debug, reduction, reductionType, traceseed);
+    			
+    			if (!debug && traceoutput != null)
+    			{
+    				out.close();
+    				Interpreter.setTraceOutput(null);
+    			}
+    
+    			if (passed)
+    			{
+    				println("All tests passed");
+    			}
+    			else
+    			{
+    				println("Some tests failed or indeterminate");
+    			}
 			}
-			else
+			finally
 			{
-				println("Some tests failed or indeterminate");
+				if (debug)
+				{
+					dbg.interrupt();
+				}
 			}
 
 			if (RTLogger.getLogSize() > 0)
