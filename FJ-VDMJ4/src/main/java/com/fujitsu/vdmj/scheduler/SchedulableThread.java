@@ -54,7 +54,7 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	private final boolean virtual;
 
 	protected RunState state;
-	private Signal signal;
+	protected Signal signal;
 	private long timeslice;
 	private long steps;
 	private long timestep;
@@ -394,7 +394,20 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	
 	public static int getThreadCount()
 	{
-		return allThreads.size();
+		int count = 0;
+		
+		synchronized (allThreads)
+		{
+    		for (SchedulableThread th: allThreads)
+    		{
+   				if (!(th instanceof BusThread))
+   				{
+   					count++;
+   				}
+    		}
+		}
+		
+		return count;
 	}
 
 	public synchronized void setSignal(Signal sig)

@@ -46,6 +46,8 @@ public class BusThread extends SchedulableThread
 	@Override
 	protected void handleSignal(Signal sig, Context ctxt, LexLocation location)
 	{
+		signal = null;
+
 		switch (sig)
 		{
 			case TERMINATE:

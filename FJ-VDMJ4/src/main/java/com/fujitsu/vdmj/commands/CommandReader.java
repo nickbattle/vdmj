@@ -335,6 +335,10 @@ abstract public class CommandReader
 				{
 					carryOn = doFilter(line);
 				}
+				else if (line.startsWith("thread"))		// thread or threads
+				{
+					carryOn = doThread(line);
+				}
 				else
 				{
 					println("Bad command. Try 'help'");
@@ -1256,6 +1260,11 @@ abstract public class CommandReader
 		return notAvailable(line);
 	}
 
+	protected boolean doThread(String line)
+	{
+		return notAvailable(line);
+	}
+
 	protected boolean doAssert(String line)
 	{
 		File filename = null;
@@ -1461,7 +1470,6 @@ abstract public class CommandReader
 	 * The method just prints "Command not available in this context" and
 	 * returns true.
 	 */
-
 	protected boolean notAvailable(@SuppressWarnings("unused") String line)
 	{
 		println("Command not available in this context");
@@ -1476,7 +1484,6 @@ abstract public class CommandReader
 	 * @param condition Any condition for the breakpoint, or null
 	 * @throws Exception Problems parsing condition.
 	 */
-
 	private void setBreakpoint(File file, int line, String condition)
 		throws Exception
 	{
@@ -1537,7 +1544,6 @@ abstract public class CommandReader
 	 * @param condition Any condition for the breakpoint, or null.
 	 * @throws Exception Problems parsing condition.
 	 */
-
 	private void setBreakpoint(String name, String condition)
 		throws Exception
 	{
@@ -1596,7 +1602,6 @@ abstract public class CommandReader
 	 * @param trace Any expression to evaluate at the tracepoint, or null
 	 * @throws Exception Problems parsing condition.
 	 */
-
 	private void setTracepoint(File file, int line, String trace)
 		throws Exception
 	{
