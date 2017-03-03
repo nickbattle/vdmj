@@ -26,8 +26,8 @@ package com.fujitsu.vdmj.scheduler;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 
-import com.fujitsu.vdmj.commands.DebuggerReader;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Context;
@@ -60,7 +60,7 @@ public class PeriodicThread extends SchedulableThread
 	{
 		super(self.getCPU().resource, self, operation.getPriority(), true, expected);
 
-		setName("PeriodicThread-" + getId());
+		setName("Periodic-" + object.type.name.getName() + "-" + getId());
 
 		this.operation = operation;
 		this.period = period;
@@ -158,13 +158,13 @@ public class PeriodicThread extends SchedulableThread
 		{
 			suspendOthers();
 			ResourceScheduler.setException(e);
-			DebuggerReader.stopped(e.ctxt, operation.name.getLocation());
+			DebugLink.getInstance().stopped(e.ctxt, e.ctxt.location);
 		}
 		catch (ContextException e)
 		{
 			suspendOthers();
 			ResourceScheduler.setException(e);
-			DebuggerReader.stopped(e.ctxt, operation.name.getLocation());
+			DebugLink.getInstance().stopped(e.ctxt, e.location);
 		}
 		catch (Exception e)
 		{

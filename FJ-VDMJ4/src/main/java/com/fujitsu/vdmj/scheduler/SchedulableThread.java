@@ -27,10 +27,11 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.Exchanger;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.commands.DebuggerReader;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.InternalException;
@@ -53,7 +54,7 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	private final boolean virtual;
 
 	protected RunState state;
-	private Signal signal;
+	protected Signal signal;
 	private long timeslice;
 	private long steps;
 	private long timestep;
@@ -62,6 +63,8 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	private long swapInBy;
 	private boolean inOuterTimeStep;
 	protected boolean stopCalled;
+	
+	public Exchanger<String> debugExch = new Exchanger<String>();
 
 	public SchedulableThread(
 		Resource resource, ObjectValue object, long priority,
@@ -288,37 +291,30 @@ public abstract class SchedulableThread extends Thread implements Serializable
     		}
     		catch (InterruptedException e)
     		{
-    			handleSignal(signal, ctxt, location);
+   				while (signal != null)		// Can be set by handler
+   				{
+   					handleSignal(signal, ctxt, location);
+   				}
     		}
 		}
 	}
 
 	protected void handleSignal(Signal sig, Context ctxt, LexLocation location)
 	{
+		signal = null;
+
 		switch (sig)
 		{
 			case TERMINATE:
 				throw new ThreadDeath();
 
 			case SUSPEND:
-			case DEADLOCKED:
-				if (ctxt != null)
-				{
-//    				if (Settings.usingDBGP)
-//    				{
-//    					ctxt.threadState.dbgp.stopped(ctxt, location);
-//    				}
-//    				else
-    				{
-    					DebuggerReader.stopped(ctxt, location);
-    				}
-
-    				if (sig == Signal.DEADLOCKED)
-    				{
-    					throw new ThreadDeath();
-    				}
-				}
+				DebugLink.getInstance().stopped(ctxt, location);
 				break;
+				
+			case DEADLOCKED:
+				DebugLink.getInstance().stopped(ctxt, location);
+				throw new ThreadDeath();
 		}
 	}
 
@@ -357,7 +353,7 @@ public abstract class SchedulableThread extends Thread implements Serializable
     		}
 		}
 	}
-
+	
 	public synchronized boolean stopThread()
 	{
 		if (!stopCalled)
@@ -395,8 +391,26 @@ public abstract class SchedulableThread extends Thread implements Serializable
     		return list;
 		}
 	}
+	
+	public static int getThreadCount()
+	{
+		int count = 0;
+		
+		synchronized (allThreads)
+		{
+    		for (SchedulableThread th: allThreads)
+    		{
+   				if (!(th instanceof BusThread))
+   				{
+   					count++;
+   				}
+    		}
+		}
+		
+		return count;
+	}
 
-	private synchronized void setSignal(Signal sig)
+	public synchronized void setSignal(Signal sig)
 	{
 		signal = sig;
 		interrupt();

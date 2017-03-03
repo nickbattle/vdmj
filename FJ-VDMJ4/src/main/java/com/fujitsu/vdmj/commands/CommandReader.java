@@ -51,6 +51,7 @@ import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.debug.DebugReader;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
@@ -139,7 +140,7 @@ abstract public class CommandReader
 			try
 			{
 				print(prompt);
-				line = getStdin().readLine();
+				line = Console.in.readLine();
 
 				if (line == null)
 				{
@@ -244,10 +245,6 @@ abstract public class CommandReader
 				{
 					carryOn = doList(line);
 				}
-				else if(line.equals("threads"))
-				{
-					carryOn = doThreads(line);
-				}
 				else if(line.equals("source"))
 				{
 					carryOn = doSource(line);
@@ -344,6 +341,10 @@ abstract public class CommandReader
 				{
 					carryOn = doPrecision(line);
 				}
+				else if (line.startsWith("thread"))		// thread or threads
+				{
+					carryOn = doThread(line);
+				}
 				else
 				{
 					println("Bad command. Try 'help'");
@@ -357,21 +358,6 @@ abstract public class CommandReader
 
 		return ExitStatus.EXIT_OK;
 	}
-
-	protected PrintWriter getStdout()
-	{
-		return Console.out;
-	}
-
-	protected BufferedReader getStdin()
-	{
-		return Console.in;
-	}
-
-//	public void setDebugReader(DBGPReader dbgp)
-//	{
-//		this.dbgp = dbgp;
-//	}
 
 	protected boolean doException(Exception e)
 	{
@@ -388,6 +374,9 @@ abstract public class CommandReader
 	{
 		line = line.substring(line.indexOf(' ') + 1);
 
+		DebugReader dbg = new DebugReader();
+		dbg.start();
+		
 		try
 		{
    			long before = System.currentTimeMillis();
@@ -425,6 +414,10 @@ abstract public class CommandReader
 			}
 			
 			println("Error: " + e.getMessage());
+		}
+		finally
+		{
+			dbg.interrupt();	// Stop the debugger reader.
 		}
 
 		return true;
@@ -532,21 +525,39 @@ abstract public class CommandReader
 				}
 			}
 			
-   			boolean passed = interpreter.runtrace(line, startTest, endTest, debug, reduction, reductionType, traceseed);
+			DebugReader dbg = null;
 			
-			if (!debug && traceoutput != null)
+			try
 			{
-				out.close();
-				Interpreter.setTraceOutput(null);
-			}
+				if (debug)
+				{
+					dbg = new DebugReader();
+					dbg.start();
+				}
 
-			if (passed)
-			{
-				println("All tests passed");
+				boolean passed = interpreter.runtrace(line, startTest, endTest, debug, reduction, reductionType, traceseed);
+    			
+    			if (!debug && traceoutput != null)
+    			{
+    				out.close();
+    				Interpreter.setTraceOutput(null);
+    			}
+    
+    			if (passed)
+    			{
+    				println("All tests passed");
+    			}
+    			else
+    			{
+    				println("Some tests failed or indeterminate");
+    			}
 			}
-			else
+			finally
 			{
-				println("Some tests failed or indeterminate");
+				if (debug)
+				{
+					dbg.interrupt();
+				}
 			}
 
 			if (RTLogger.getLogSize() > 0)
@@ -987,7 +998,7 @@ abstract public class CommandReader
 			}
 			else
 			{
-				source.printCoverage(getStdout());
+				source.printCoverage(Console.out);
 			}
 		}
 		catch (Exception e)
@@ -1302,20 +1313,9 @@ abstract public class CommandReader
 		return notAvailable(line);
 	}
 
-	protected boolean doThreads(@SuppressWarnings("unused") String line)
+	protected boolean doThread(String line)
 	{
-		String threads = interpreter.getScheduler().getStatus();
-
-		if (threads.isEmpty())
-		{
-			println("No threads running");
-		}
-		else
-		{
-			println(threads);
-		}
-
-		return true;
+		return notAvailable(line);
 	}
 
 	protected boolean doAssert(String line)
@@ -1451,7 +1451,7 @@ abstract public class CommandReader
 			{
 				println("FAILED: " + assertion);
 				println("Runtime: " + e.getMessage());
-				e.ctxt.printStackTrace(getStdout(), true);
+				e.ctxt.printStackTrace(Console.out, true);
 				assertErrors++;
 				break;
 			}
@@ -1524,7 +1524,6 @@ abstract public class CommandReader
 	 * The method just prints "Command not available in this context" and
 	 * returns true.
 	 */
-
 	protected boolean notAvailable(@SuppressWarnings("unused") String line)
 	{
 		println("Command not available in this context");
@@ -1539,7 +1538,6 @@ abstract public class CommandReader
 	 * @param condition Any condition for the breakpoint, or null
 	 * @throws Exception Problems parsing condition.
 	 */
-
 	private void setBreakpoint(File file, int line, String condition)
 		throws Exception
 	{
@@ -1600,7 +1598,6 @@ abstract public class CommandReader
 	 * @param condition Any condition for the breakpoint, or null.
 	 * @throws Exception Problems parsing condition.
 	 */
-
 	private void setBreakpoint(String name, String condition)
 		throws Exception
 	{
@@ -1659,7 +1656,6 @@ abstract public class CommandReader
 	 * @param trace Any expression to evaluate at the tracepoint, or null
 	 * @throws Exception Problems parsing condition.
 	 */
-
 	private void setTracepoint(File file, int line, String trace)
 		throws Exception
 	{
@@ -1766,13 +1762,13 @@ abstract public class CommandReader
 
 	protected void print(String m)
 	{
-		getStdout().print(m);
-		getStdout().flush();	// As it's not a complete line
+		Console.out.print(m);
+		Console.out.flush();	// As it's not a complete line
 	}
 
 	protected void println(String m)
 	{
-		getStdout().println(m);
+		Console.out.println(m);
 	}
 
 	protected String plural(int n, String s, String pl)
