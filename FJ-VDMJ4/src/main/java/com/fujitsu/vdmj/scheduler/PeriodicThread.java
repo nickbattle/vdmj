@@ -60,7 +60,7 @@ public class PeriodicThread extends SchedulableThread
 	{
 		super(self.getCPU().resource, self, operation.getPriority(), true, expected);
 
-		setName("Periodic-" + object.type.name.getName() + "-" + object.objectReference);
+		setName("Periodic-" + object.type.name.getName() + "-" + getId());
 
 		this.operation = operation;
 		this.period = period;

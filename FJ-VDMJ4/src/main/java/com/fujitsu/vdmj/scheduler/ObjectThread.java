@@ -52,7 +52,7 @@ public class ObjectThread extends SchedulableThread
 	{
 		super(object.getCPU().resource, object, 0, false, 0);
 
-		setName("Object-" + object.type.name.getName() + "-" + object.objectReference);
+		setName("Object-" + object.type.name.getName() + "-" + getId());
 
 		this.title =
 			"Thread " + getId() +
