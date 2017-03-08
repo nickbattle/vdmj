@@ -39,6 +39,7 @@ public class DebugReader extends Thread
 {
 	private DebugLink link = DebugLink.getInstance();;
 	private SchedulableThread debuggedThread = null;
+	private LexLocation lastLoc = null;
 	
 	@Override
 	public void run()
@@ -61,8 +62,8 @@ public class DebugReader extends Thread
 			
 			if (bp != null)
 			{
-	    		Console.out.println("Stopped " + bp);
-	       		Console.out.println(Interpreter.getInstance().getSourceLine(bp.location));
+				Console.out.println("Stopped " + bp);
+				Console.out.println(Interpreter.getInstance().getSourceLine(bp.location));
 			}
 			else if (loc == null)
 			{
@@ -70,7 +71,11 @@ public class DebugReader extends Thread
 			}
 			else
 			{
-				Console.out.println(Interpreter.getInstance().getSourceLine(loc));
+				if (!loc.equals(lastLoc))
+				{
+					Console.out.println(Interpreter.getInstance().getSourceLine(loc));
+					lastLoc = loc;
+				}
 			}
 			
 			String command = null;

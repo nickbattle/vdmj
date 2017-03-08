@@ -46,15 +46,7 @@ public class Tracepoint extends Breakpoint
 		if (condition == null)
 		{
 			String s = "Reached [" + number + "]";
-
-//			if (Settings.usingDBGP)
-//			{
-//				ctxt.threadState.dbgp.tracing(s);
-//			}
-//			else
-			{
-				println(s);
-			}
+			println(Thread.currentThread().getName() + ": " + s);
 		}
 		else
 		{
@@ -70,15 +62,7 @@ public class Tracepoint extends Breakpoint
 			}
 			
 			String s = trace + " = " + result + " at [" + number + "]";
-
-//			if (Settings.usingDBGP)
-//			{
-//				ctxt.threadState.dbgp.tracing(s);
-//			}
-//			else
-			{
-				println(s);
-			}
+			println(Thread.currentThread().getName() + ": " + s);
 		}
 	}
 

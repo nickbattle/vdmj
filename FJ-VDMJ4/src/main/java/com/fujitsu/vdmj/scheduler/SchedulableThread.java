@@ -396,15 +396,12 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	{
 		int count = 0;
 		
-		synchronized (allThreads)
+		for (SchedulableThread th: allThreads)	// Don't synchronize this!
 		{
-    		for (SchedulableThread th: allThreads)
-    		{
-   				if (!(th instanceof BusThread))
-   				{
-   					count++;
-   				}
-    		}
+			if (!(th instanceof BusThread))
+			{
+				count++;
+			}
 		}
 		
 		return count;
