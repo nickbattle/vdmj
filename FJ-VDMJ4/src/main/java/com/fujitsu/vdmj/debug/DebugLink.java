@@ -31,6 +31,7 @@ import java.util.Map;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.scheduler.Signal;
 import com.fujitsu.vdmj.values.CPUValue;
@@ -57,6 +58,9 @@ public class DebugLink
 	
 	/** The threads locations, if known */
 	private Map<SchedulableThread, LexLocation> locations = new HashMap<SchedulableThread, LexLocation>();
+	
+	/** The trace callback , if any */
+	private TraceCallback callback = null;
 	
 	/**
 	 * Get the singleton.
@@ -256,6 +260,17 @@ public class DebugLink
 	}
 	
 	/**
+	 * Called by a thread which has hit a tracepoint.
+	 */
+	public void tracepoint(Context ctxt, Tracepoint tp)
+	{
+		if (callback != null)
+		{
+			callback.tracepoint(ctxt, tp);
+		}
+	}
+	
+	/**
 	 * Send a command to one particular thread.
 	 */
 	public String command(SchedulableThread thread, String cmd)
@@ -313,6 +328,14 @@ public class DebugLink
 		stopped.clear();
 		breakpoints.clear();
 		locations.clear();
+	}
+	
+	/**
+	 * Set the trace callback.
+	 */
+	public void setTraceCallback(TraceCallback callback)
+	{
+		this.callback = callback;
 	}
 	
 	/**

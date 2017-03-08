@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2017 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -21,36 +21,40 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.runtime;
+package com.fujitsu.vdmj.debug;
 
-import com.fujitsu.vdmj.debug.DebugLink;
-import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.Tracepoint;
 
 /**
- * A breakpoint where something is displayed.
+ * Implement a trace callback for the command line.
  */
-public class Tracepoint extends Breakpoint
+public class TraceReader implements TraceCallback
 {
-	private static final long serialVersionUID = 1L;
-
-	public Tracepoint(LexLocation location, int number, String trace) throws Exception
-	{
-		super(location, number, trace);
-	}
-
 	@Override
-	public void check(LexLocation execl, Context ctxt)
+	public void tracepoint(Context ctxt, Tracepoint tp)
 	{
-		location.hit();
-		hits++;
-		DebugLink.getInstance().tracepoint(ctxt, this);
-	}
-
-	@Override
-	public String toString()
-	{
-		return "trace [" + number + "] " +
-				(trace == null ? "" : "show \"" + trace + "\" ") +
-				super.toString();
+		if (tp.condition == null)
+		{
+			String s = "Reached trace point [" + tp.number + "]";
+			Console.out.println(Thread.currentThread().getName() + ": " + s);
+		}
+		else
+		{
+			String result = null;
+			
+			try
+			{
+				result = tp.condition.eval(ctxt).toString();
+			}
+			catch (Exception e)
+			{
+				result = e.getMessage();
+			}
+			
+			String s = tp.trace + " = " + result + " at trace point [" + tp.number + "]";
+			Console.out.println(Thread.currentThread().getName() + ": " + s);
+		}
 	}
 }
