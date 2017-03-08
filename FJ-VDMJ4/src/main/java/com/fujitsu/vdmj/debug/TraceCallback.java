@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2017 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -21,36 +21,15 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.runtime;
+package com.fujitsu.vdmj.debug;
 
-import com.fujitsu.vdmj.debug.DebugLink;
-import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.Tracepoint;
 
 /**
- * A breakpoint where something is displayed.
+ * Interface for implementing trace callbacks.
  */
-public class Tracepoint extends Breakpoint
+public interface TraceCallback
 {
-	private static final long serialVersionUID = 1L;
-
-	public Tracepoint(LexLocation location, int number, String trace) throws Exception
-	{
-		super(location, number, trace);
-	}
-
-	@Override
-	public void check(LexLocation execl, Context ctxt)
-	{
-		location.hit();
-		hits++;
-		DebugLink.getInstance().tracepoint(ctxt, this);
-	}
-
-	@Override
-	public String toString()
-	{
-		return "trace [" + number + "] " +
-				(trace == null ? "" : "show \"" + trace + "\" ") +
-				super.toString();
-	}
+	public void tracepoint(Context ctxt, Tracepoint tp);
 }

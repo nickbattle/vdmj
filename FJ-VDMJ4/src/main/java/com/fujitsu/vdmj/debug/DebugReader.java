@@ -45,6 +45,7 @@ public class DebugReader extends Thread
 	public void run()
 	{
 		setName("DebugReader");
+		link.setTraceCallback(new TraceReader());
 		
 		while (link.waitForStop())
 		{
