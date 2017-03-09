@@ -29,23 +29,30 @@ import java.util.List;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Breakpoint;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 /**
  * A class to listen for and interact with multiple threads that are being debugged.
  */
-public class DebugReader extends Thread
+public class ConsoleDebugReader extends Thread implements TraceCallback
 {
-	private DebugLink link = DebugLink.getInstance();;
+	private ConsoleDebugLink link = null;
 	private SchedulableThread debuggedThread = null;
 	private LexLocation lastLoc = null;
+	
+	public ConsoleDebugReader() throws Exception
+	{
+		link = (ConsoleDebugLink)DebugLink.getInstance();
+	}
 	
 	@Override
 	public void run()
 	{
 		setName("DebugReader");
-		link.setTraceCallback(new TraceReader());
+		link.setTraceCallback(this);
 		
 		while (link.waitForStop())
 		{
@@ -100,16 +107,16 @@ public class DebugReader extends Thread
 			}
 			else
 			{
-    			String response = link.command(debuggedThread, command);
+    			String response = link.sendCommand(debuggedThread, command);
     			
     			if (response.equals("resume"))
     			{
-    				link.resume();
+    				link.resumeThreads();
     				return false;	// Call waitForStop again
     			}
     			else if (response.equals("quit"))
     			{
-    				link.kill();
+    				link.killThreads();
     				return false;
     			}
     			
@@ -180,5 +187,31 @@ public class DebugReader extends Thread
 	public String toString()
 	{
 		return getName();
+	}
+	
+	@Override
+	public void tracepoint(Context ctxt, Tracepoint tp)
+	{
+		if (tp.condition == null)
+		{
+			String s = "Reached trace point [" + tp.number + "]";
+			Console.out.println(Thread.currentThread().getName() + ": " + s);
+		}
+		else
+		{
+			String result = null;
+			
+			try
+			{
+				result = tp.condition.eval(ctxt).toString();
+			}
+			catch (Exception e)
+			{
+				result = e.getMessage();
+			}
+			
+			String s = tp.trace + " = " + result + " at trace point [" + tp.number + "]";
+			Console.out.println(Thread.currentThread().getName() + ": " + s);
+		}
 	}
 }
