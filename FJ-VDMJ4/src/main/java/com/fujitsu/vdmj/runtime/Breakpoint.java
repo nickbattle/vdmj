@@ -148,11 +148,6 @@ public class Breakpoint implements Serializable
 		return location.toString();
 	}
 
-	public String stoppedAtString()
-	{
-		return "Stopped [" + Thread.currentThread().getName() + "] " + location;
-	}
-
 	public void clearHits()
 	{
 		hits = 0;

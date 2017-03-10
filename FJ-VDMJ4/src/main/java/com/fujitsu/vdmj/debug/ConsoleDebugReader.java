@@ -42,6 +42,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 	private ConsoleDebugLink link = null;
 	private SchedulableThread debuggedThread = null;
 	private LexLocation lastLoc = null;
+	private SchedulableThread lastThread = null;
 	
 	public ConsoleDebugReader() throws Exception
 	{
@@ -56,6 +57,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 		
 		while (link.waitForStop())
 		{
+			lastThread = debuggedThread;
 			debuggedThread = link.getDebugThread();		// Initially bp thread
 			while (doCommand());
 		}
@@ -68,10 +70,11 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 			Breakpoint bp = link.getBreakpoint(debuggedThread);
 			LexLocation loc = link.getLocation(debuggedThread);
 			
-			if (bp != null)
+			if (bp != null && bp.number != 0)	// Zero is used for next/step breakpoints.
 			{
 				Console.out.println("Stopped " + bp);
 				Console.out.println(Interpreter.getInstance().getSourceLine(bp.location));
+				lastLoc = bp.location;
 			}
 			else if (loc == null)
 			{
@@ -79,7 +82,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 			}
 			else
 			{
-				if (!loc.equals(lastLoc))
+				if (!debuggedThread.equals(lastThread) || !loc.equals(lastLoc))
 				{
 					Console.out.println(Interpreter.getInstance().getSourceLine(loc));
 					lastLoc = loc;
