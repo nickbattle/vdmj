@@ -149,7 +149,7 @@ public class ConsoleDebugLink extends DebugLink
 	/**
 	 * Send a command to one particular thread.
 	 */
-	public String sendCommand(SchedulableThread thread, String cmd)
+	public DebugCommand sendCommand(SchedulableThread thread, DebugCommand cmd)
 	{
 		try
 		{
@@ -158,7 +158,7 @@ public class ConsoleDebugLink extends DebugLink
 		}
 		catch (InterruptedException e)
 		{
-			return "quit";
+			return DebugCommand.QUIT;
 		}
 	}
 
@@ -171,7 +171,7 @@ public class ConsoleDebugLink extends DebugLink
 		{
 			try
 			{
-				writeCommand(thread, "resume");
+				writeCommand(thread, DebugCommand.RESUME);
 			}
 			catch (InterruptedException e)
 			{
@@ -193,7 +193,7 @@ public class ConsoleDebugLink extends DebugLink
 		{
 			try
 			{
-				writeCommand(thread, "terminate");
+				writeCommand(thread, DebugCommand.TERMINATE);
 			}
 			catch (InterruptedException e)
 			{
@@ -256,30 +256,29 @@ public class ConsoleDebugLink extends DebugLink
 			ctxt.setThreadState(CPUValue.vCPU);
 		}
 		
-		DebugCommand dc = new DebugCommand(location, ctxt);
+		DebugExecutor dc = new DebugExecutor(location, ctxt);
 		
 		while (true)
 		{
 			try
 			{
-				String request = readCommand(thread);
+				DebugCommand request = readCommand(thread);
 				
-				if (request.equals("resume"))
+				switch (request.getType())
 				{
-					synchronized(this)	// So everyone resumes when "resumeThreads" method ends
-					{
+					case RESUME:
+						synchronized (this) // So everyone resumes when "resumeThreads" method ends
+						{
+							return;
+						}
+
+					case TERMINATE:
+						thread.setSignal(Signal.TERMINATE);
 						return;
-					}
-				}
-				else if (request.equals("terminate"))
-				{
-					thread.setSignal(Signal.TERMINATE);
-					return;
-				}
-				else
-				{
-					String response = dc.run(request);
-					writeCommand(thread, response);
+
+					default:
+						DebugCommand response = dc.run(request);
+						writeCommand(thread, response);
 				}
 			}
 			catch (InterruptedException e)

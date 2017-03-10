@@ -89,42 +89,45 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 				}
 			}
 			
-			String command = null;
+			DebugCommand command = null;
 			
-			while (command == null || command.length() == 0)
+			while (command == null)
 			{
     			Console.out.printf("%s> ", debuggedThread.getName());
     			Console.out.flush();
-    			command = Console.in.readLine().trim();
+    			command = DebugParser.parse(Console.in.readLine().trim());
 			}
 			
-			if (command.equals("threads"))
+			switch (command.getType())
 			{
-				doThreads();
-				return true;
-			}
-			else if (command.startsWith("thread "))
-			{
-				doThread(command);
-				return true;
-			}
-			else
-			{
-    			String response = link.sendCommand(debuggedThread, command);
-    			
-    			if (response.equals("resume"))
-    			{
-    				link.resumeThreads();
-    				return false;	// Call waitForStop again
-    			}
-    			else if (response.equals("quit"))
-    			{
-    				link.killThreads();
-    				return false;
-    			}
-    			
-    			Console.out.println(response);
-    			return true;
+				case THREADS:
+					doThreads();
+					return true;
+
+				case THREAD:
+					doThread(command);
+					return true;
+
+				default:
+				{
+					DebugCommand response = link.sendCommand(debuggedThread, command);
+
+					switch (response.getType())
+					{
+						case RESUME:
+							link.resumeThreads();
+							return false;
+
+						case STOP:
+						case QUIT:
+							link.killThreads();
+							return false;
+
+						default:
+							Console.out.println(response); // toString of commands are sensible
+							return true;
+					}
+				}
 			}
 		}
 		catch (IOException e)
@@ -144,7 +147,6 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 		else
 		{
     		int i = 1;
-    		Console.out.println("----");
     		
     		for (SchedulableThread th: threads)
     		{
@@ -152,37 +154,22 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
     			Console.out.printf("%d: %s %s\n", i++, th.getName(), bp != null ? bp.toString() : "");
     		}
     		
-    		Console.out.println("----");
+    		Console.out.println();
 		}
 	}
 	
-	private void doThread(String line)
+	private void doThread(DebugCommand cmd)
 	{
-		String[] parts = line.split("\\s+");
+		Integer n = (Integer)cmd.getPayload();
+		List<SchedulableThread> threads = link.getThreads();
 
-		if (parts.length != 2 || !parts[0].equals("thread"))
+		if (n < 1 || n > threads.size())
 		{
-			Console.out.println("Usage: thread <n>");
-			return;
+			Console.out.printf("Thread must be 1 to %d (see 'threads')\n", threads.size());
 		}
-
-		try
+		else
 		{
-			int n = Integer.parseInt(parts[1]);
-			List<SchedulableThread> threads = link.getThreads();
-
-			if (n < 1 || n > threads.size())
-			{
-				Console.out.printf("Thread number 1 to %d\n", threads.size());
-			}
-			else
-			{
-				debuggedThread = threads.get(n - 1);
-			}
-		}
-		catch (NumberFormatException e)
-		{
-			Console.out.println("Usage: thread <n>");
+			debuggedThread = threads.get(n - 1);
 		}
 	}
 	

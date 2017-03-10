@@ -31,6 +31,7 @@ import java.util.concurrent.Exchanger;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -65,7 +66,7 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	private boolean inOuterTimeStep;
 	protected boolean stopCalled;
 	
-	public Exchanger<String> debugExch = new Exchanger<String>();
+	public Exchanger<DebugCommand> debugExch = new Exchanger<DebugCommand>();
 
 	public SchedulableThread(
 		Resource resource, ObjectValue object, long priority,

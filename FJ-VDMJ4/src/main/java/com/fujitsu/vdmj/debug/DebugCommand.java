@@ -23,311 +23,56 @@
 
 package com.fujitsu.vdmj.debug;
 
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
-
-import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.ContextException;
-import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.syntax.ParserException;
-
 /**
- * Class to process one debugger command.
+ * Class to represent one debugger command or response.
  */
 public class DebugCommand
 {
-	/** The breakpoint which caused us to stop. */
-	private final LexLocation breakloc;
-	/** The context that was active when the breakpoint stopped. */
-	private final Context ctxt;
-	/** The interpreter */
-	private final Interpreter interpreter;
+	/** static values for commands with no payload */
+	public static final DebugCommand STEP		= new DebugCommand(DebugType.STEP);
+	public static final DebugCommand NEXT		= new DebugCommand(DebugType.NEXT);
+	public static final DebugCommand OUT		= new DebugCommand(DebugType.OUT);
+	public static final DebugCommand CONTINUE	= new DebugCommand(DebugType.CONTINUE);
+	public static final DebugCommand STACK		= new DebugCommand(DebugType.STACK);
+	public static final DebugCommand UP			= new DebugCommand(DebugType.UP);
+	public static final DebugCommand DOWN		= new DebugCommand(DebugType.DOWN);
+	public static final DebugCommand SOURCE		= new DebugCommand(DebugType.SOURCE);
+	public static final DebugCommand STOP		= new DebugCommand(DebugType.STOP);
+	public static final DebugCommand THREADS	= new DebugCommand(DebugType.THREADS);
+	public static final DebugCommand QUIT		= new DebugCommand(DebugType.QUIT);
+	public static final DebugCommand ACK		= new DebugCommand(DebugType.ACK);
+	public static final DebugCommand RESUME		= new DebugCommand(DebugType.RESUME);
+	public static final DebugCommand TERMINATE	= new DebugCommand(DebugType.TERMINATE);
+	public static final DebugCommand HELP		= new DebugCommand(DebugType.HELP);
 	
-	/** The before/after printing of the source command. */
-	private static final int SOURCE_LINES = 5;
+	private final DebugType type;
+	private final Object payload;
 
-	/** The number of stack levels moved down. */
-	private int frame = 0;
-
-	public DebugCommand(LexLocation breakloc, Context ctxt)
+	public DebugCommand(DebugType type)
 	{
-		this.breakloc = breakloc;
-		this.ctxt = ctxt;
-		this.interpreter = Interpreter.getInstance();
+		this.type = type;
+		this.payload = null;
 	}
-
-	/**
-	 * Perform one debugger command
-	 */
-	public String run(String line)
+	
+	public DebugCommand(DebugType type, Object payload)
 	{
-   		try
-		{
-			interpreter.setDefaultName(breakloc.module);
-		}
-		catch (Exception e)
-		{
-			// throw new InternalException(52, "Cannot set default name at breakpoint");
-		}
-   		
-   		String result = "";
-
-   		try
-   		{
-			if (line.equals("quit") || line.equals("q"))
-			{
-				result = doQuit();
-			}
-			else if (line.equals("stop"))
-			{
-				result = doStop();
-			}
-			else if (line.equals("help") || line.equals("?"))
-			{
-				result = doHelp();
-			}
-			else if(line.equals("continue") || line.equals("c"))
-			{
-				result = doContinue();
-			}
-			else if(line.equals("stack"))
-			{
-				result = doStack();
-			}
-			else if(line.equals("up"))
-			{
-				result = doUp();
-			}
-			else if(line.equals("down"))
-			{
-				result = doDown();
-			}
-			else if(line.equals("step") || line.equals("s"))
-			{
-				result = doStep();
-			}
-			else if(line.equals("next") || line.equals("n"))
-			{
-				result = doNext();
-			}
-			else if(line.equals("out") || line.equals("o"))
-			{
-				result = doOut();
-			}
-			else if(line.equals("source"))
-			{
-				result = doSource();
-			}
-			else if (line.startsWith("print ") || line.startsWith("p "))
-			{
-				try
-				{
-					ctxt.threadState.setAtomic(true);
-					result = doEvaluate(line);
-				}
-				finally
-				{
-					ctxt.threadState.setAtomic(false);
-				}
-			}
-			else
-			{
-				result = "Bad command. Try 'help'";
-			}
-		}
-		catch (Exception e)
-		{
-			result = doException(e);
-		}
-
-		return result;
+		this.type = type;
+		this.payload = payload;
 	}
-
-	protected String doException(Exception e)
+	
+	public DebugType getType()
 	{
-		while (e instanceof InvocationTargetException)
-		{
-			e = (Exception)e.getCause();
-		}
-		
-		return "Exception: " + e.getMessage();
+		return type;
 	}
-
-	/**
-	 * Evaluate an expression in the breakpoint's context. This is similar
-	 * to the superclass method, except that the context is the one taken
-	 * from the breakpoint, and the execution is not timed.
-	 *
-	 * @see com.fujitsu.vdmj.commands.CommandReader#doEvaluate(java.lang.String)
-	 */
-	private String doEvaluate(String line)
+	
+	public Object getPayload()
 	{
-		line = line.substring(line.indexOf(' ') + 1);
-
-		try
-		{
-   			return line + " = " + interpreter.evaluate(line, getFrame());
-		}
-		catch (ParserException e)
-		{
-			return "Syntax: " + e;
-		}
-		catch (ContextException e)
-		{
-			return "Runtime: " + e.getMessage();
-		}
-		catch (RuntimeException e)
-		{
-			return "Runtime: " + e.getMessage();
-		}
-		catch (Exception e)
-		{
-			while (e instanceof InvocationTargetException)
-			{
-				e = (Exception)e.getCause();
-			}
-			
-			return "Error: " + e.getMessage();
-		}
+		return payload;
 	}
-
-	private String doStep()
+	
+	@Override
+	public String toString()
 	{
-   		ctxt.threadState.setBreaks(breakloc, null, null);
-   		return "resume";
-	}
-
-	private String doNext()
-	{
-		ctxt.threadState.setBreaks(breakloc, ctxt.getRoot(), null);
-		return "resume";
-	}
-
-	private String doOut()
-	{
-		ctxt.threadState.setBreaks(breakloc, null, ctxt.getRoot().outer);
-		return "resume";
-	}
-
-	private String doContinue()
-	{
-		ctxt.threadState.setBreaks(null, null, null);
-		return "resume";
-	}
-
-	private Context getFrame()
-	{
-		Context fp = ctxt;
-		int c = frame;
-
-		while (c > 0 && fp.outer != null)
-		{
-			fp = fp.outer;
-			c--;
-		}
-
-		return fp;
-	}
-
-	private String doStack()
-	{
-		StringBuilder sb = new StringBuilder(); 
-		sb.append("Stopped [" + Thread.currentThread().getName() + "] " + breakloc);
-		sb.append("\n");
-		
-		StringWriter sw = new StringWriter();
-		getFrame().printStackTrace(new PrintWriter(sw), true);
-		sb.append(sw.toString());
-		
-		return sb.toString();
-	}
-
-	private String doUp()
-	{
-		if (frame == 0)
-		{
-			return "Already at first frame";
-		}
-		else
-		{
-			frame--;
-			Context fp = getFrame();
-			return "In context of " + fp.title + " " + fp.location;
-		}
-	}
-
-	private String doDown()
-	{
-		Context fp = getFrame();
-
-		if (fp.outer == null)
-		{
-			return "Already at last frame";
-		}
-		else
-		{
-			frame++;
-			fp = getFrame();
-			return "In context of " + fp.title + " " + fp.location;
-		}
-	}
-
-	private String doSource()
-	{
-		LexLocation loc = (frame == 0) ? breakloc : getFrame().location;
-		
-		if (loc.module.equals("?"))
-		{
-			return "No source";
-		}
-		
-		File file = loc.file;
-		int current = loc.startLine;
-
-		int start = current - SOURCE_LINES;
-		if (start < 1) start = 1;
-		int end = start + SOURCE_LINES*2 + 1;
-		
-		StringBuilder sb = new StringBuilder();
-
-		for (int src = start; src < end; src++)
-		{
-			sb.append(interpreter.getSourceLine(file, src, (src == current) ? ":>>" : ":  "));
-			sb.append("\n");
-		}
-
-		return sb.toString();
-	}
-
-	private String doStop()
-	{
-		return "quit";
-	}
-
-	private String doQuit()
-	{
-		return "quit";
-	}
-
-	private String doHelp()
-	{
-		StringBuilder sb = new StringBuilder();
-		
-		sb.append("step - step one expression/statement\n");
-		sb.append("next - step over functions or operations\n");
-		sb.append("out - run to the return of functions or operations\n");
-		sb.append("continue - resume execution of all threads\n");
-		sb.append("stack - display the current stack frame context\n");
-		sb.append("up - move the stack frame context up one frame\n");
-		sb.append("down - move the stack frame context down one frame\n");
-		sb.append("source - list VDM source code around the current breakpoint\n");
-		sb.append("stop - terminate the execution immediately\n");
-		sb.append("threads - list active threads\n");
-		sb.append("thread <n> - select active thread to debug\n");
-		
-		return sb.toString();
+		return payload == null ? type.name().toLowerCase() : payload.toString();
 	}
 }

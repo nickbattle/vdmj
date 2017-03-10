@@ -35,9 +35,6 @@ import com.fujitsu.vdmj.scheduler.SchedulableThread;
  */
 abstract public class DebugLink
 {
-	/** An ACK string */
-	private final static String ACK = "ACK";
-	
 	/** The singleton instance */
 	protected static DebugLink instance = null;
 	
@@ -95,17 +92,17 @@ abstract public class DebugLink
 	/**
 	 * Read and return a value from the thread's Exchange, responding with an ACK.
 	 */
-	protected String readCommand(SchedulableThread thread) throws InterruptedException
+	protected DebugCommand readCommand(SchedulableThread thread) throws InterruptedException
 	{
-		return thread.debugExch.exchange(ACK);		
+		return thread.debugExch.exchange(DebugCommand.ACK);		
 	}
 	
 	/**
 	 * Write a value to the thread's Exchange, and check for an ACK.
 	 */
-	protected void writeCommand(SchedulableThread thread, String response) throws InterruptedException
+	protected void writeCommand(SchedulableThread thread, DebugCommand response) throws InterruptedException
 	{
-		if (!thread.debugExch.exchange(response).equals(ACK))
+		if (!thread.debugExch.exchange(response).equals(DebugCommand.ACK))
 		{
 			System.err.println("Unexpected ACK from debugger");
 		}
