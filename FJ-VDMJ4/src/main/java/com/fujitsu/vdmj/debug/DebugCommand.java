@@ -29,7 +29,6 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -41,7 +40,7 @@ import com.fujitsu.vdmj.syntax.ParserException;
 public class DebugCommand
 {
 	/** The breakpoint which caused us to stop. */
-	private final Breakpoint breakpoint;
+	private final LexLocation breakloc;
 	/** The context that was active when the breakpoint stopped. */
 	private final Context ctxt;
 	/** The interpreter */
@@ -53,9 +52,9 @@ public class DebugCommand
 	/** The number of stack levels moved down. */
 	private int frame = 0;
 
-	public DebugCommand(Breakpoint breakpoint, Context ctxt)
+	public DebugCommand(LexLocation breakloc, Context ctxt)
 	{
-		this.breakpoint = breakpoint;
+		this.breakloc = breakloc;
 		this.ctxt = ctxt;
 		this.interpreter = Interpreter.getInstance();
 	}
@@ -67,7 +66,7 @@ public class DebugCommand
 	{
    		try
 		{
-			interpreter.setDefaultName(breakpoint.location.module);
+			interpreter.setDefaultName(breakloc.module);
 		}
 		catch (Exception e)
 		{
@@ -197,19 +196,19 @@ public class DebugCommand
 
 	private String doStep()
 	{
-   		ctxt.threadState.setBreaks(breakpoint.location, null, null);
+   		ctxt.threadState.setBreaks(breakloc, null, null);
    		return "resume";
 	}
 
 	private String doNext()
 	{
-		ctxt.threadState.setBreaks(breakpoint.location,	ctxt.getRoot(), null);
+		ctxt.threadState.setBreaks(breakloc, ctxt.getRoot(), null);
 		return "resume";
 	}
 
 	private String doOut()
 	{
-		ctxt.threadState.setBreaks(breakpoint.location, null, ctxt.getRoot().outer);
+		ctxt.threadState.setBreaks(breakloc, null, ctxt.getRoot().outer);
 		return "resume";
 	}
 
@@ -236,7 +235,7 @@ public class DebugCommand
 	private String doStack()
 	{
 		StringBuilder sb = new StringBuilder(); 
-		sb.append(breakpoint.stoppedAtString());
+		sb.append("Stopped [" + Thread.currentThread().getName() + "] " + breakloc);
 		sb.append("\n");
 		
 		StringWriter sw = new StringWriter();
@@ -278,7 +277,7 @@ public class DebugCommand
 
 	private String doSource()
 	{
-		LexLocation loc = (frame == 0) ? breakpoint.location : getFrame().location;
+		LexLocation loc = (frame == 0) ? breakloc : getFrame().location;
 		
 		if (loc.module.equals("?"))
 		{

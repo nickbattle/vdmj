@@ -47,6 +47,7 @@ public abstract class SchedulableThread extends Thread implements Serializable
     private static final long serialVersionUID = 1L;
 
 	private static List<SchedulableThread> allThreads =	new LinkedList<SchedulableThread>();
+	private static int threadCount = 0;		// Non-bus threads
 
 	protected final Resource resource;
 	protected final ObjectValue object;
@@ -91,6 +92,11 @@ public abstract class SchedulableThread extends Thread implements Serializable
 		synchronized (allThreads)
 		{
 			allThreads.add(this);
+			
+			if (!(this instanceof BusThread))
+			{
+				threadCount++;
+			}
 		}
 	}
 
@@ -153,6 +159,11 @@ public abstract class SchedulableThread extends Thread implements Serializable
 			synchronized (allThreads)
 			{
 				allThreads.remove(this);
+
+				if (!(this instanceof BusThread))
+				{
+					threadCount--;
+				}
 			}
 		}
 	}
@@ -394,17 +405,7 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	
 	public static int getThreadCount()
 	{
-		int count = 0;
-		
-		for (SchedulableThread th: allThreads)	// Don't synchronize this!
-		{
-			if (!(th instanceof BusThread))
-			{
-				count++;
-			}
-		}
-		
-		return count;
+		return threadCount;		// Number of non-bus threads
 	}
 
 	public synchronized void setSignal(Signal sig)

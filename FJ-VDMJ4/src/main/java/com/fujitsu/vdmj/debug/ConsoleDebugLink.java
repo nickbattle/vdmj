@@ -256,14 +256,7 @@ public class ConsoleDebugLink extends DebugLink
 			ctxt.setThreadState(CPUValue.vCPU);
 		}
 		
-		Breakpoint bp = breakpoints.get(thread);
-		
-		if (bp == null)			// An interrupted thread, not a break
-		{
-			bp = new Breakpoint(location);
-		}
-		
-		DebugCommand dc = new DebugCommand(bp, ctxt);
+		DebugCommand dc = new DebugCommand(location, ctxt);
 		
 		while (true)
 		{
@@ -273,7 +266,7 @@ public class ConsoleDebugLink extends DebugLink
 				
 				if (request.equals("resume"))
 				{
-					synchronized(this)	// So everyone resumes when "resume" method ends
+					synchronized(this)	// So everyone resumes when "resumeThreads" method ends
 					{
 						return;
 					}
@@ -304,11 +297,7 @@ public class ConsoleDebugLink extends DebugLink
 	{
 		SchedulableThread thread = (SchedulableThread)Thread.currentThread();
 		
-		synchronized (breakpoints)
-		{
-			breakpoints.put(thread, bp);
-		}
-
+		breakpoints.put(thread, bp);
 		stopped(ctxt, bp.location);
 	}
 	
