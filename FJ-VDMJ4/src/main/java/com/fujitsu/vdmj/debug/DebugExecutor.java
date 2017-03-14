@@ -39,9 +39,9 @@ import com.fujitsu.vdmj.syntax.ParserException;
  */
 public class DebugExecutor
 {
-	/** The breakpoint which caused us to stop. */
+	/** The location where the thread stopped. */
 	private final LexLocation breakloc;
-	/** The context that was active when the breakpoint stopped. */
+	/** The context that was active when the thread stopped. */
 	private final Context ctxt;
 	/** The interpreter */
 	private final Interpreter interpreter;
@@ -124,15 +124,7 @@ public class DebugExecutor
 					break;
 					
 				case PRINT:
-					try
-					{
-						ctxt.threadState.setAtomic(true);
-						result = doEvaluate(request);
-					}
-					finally
-					{
-						ctxt.threadState.setAtomic(false);
-					}
+					result = doEvaluate(request);
 					break;
 					
 				default:
@@ -149,11 +141,7 @@ public class DebugExecutor
 	}
 
 	/**
-	 * Evaluate an expression in the breakpoint's context. This is similar
-	 * to the superclass method, except that the context is the one taken
-	 * from the breakpoint, and the execution is not timed.
-	 *
-	 * @see com.fujitsu.vdmj.commands.CommandReader#doEvaluate(java.lang.String)
+	 * Evaluate an expression in the context, atomically.
 	 */
 	private DebugCommand doEvaluate(DebugCommand line)
 	{
@@ -161,6 +149,7 @@ public class DebugExecutor
 
 		try
 		{
+			ctxt.threadState.setAtomic(true);
    			return new DebugCommand(DebugType.DATA, expr + " = " + interpreter.evaluate(expr, getFrame()));
 		}
 		catch (ParserException e)
@@ -183,6 +172,10 @@ public class DebugExecutor
 			}
 			
 			return new DebugCommand(DebugType.ERROR, "Error: " + e.getMessage());
+		}
+		finally
+		{
+			ctxt.threadState.setAtomic(false);
 		}
 	}
 

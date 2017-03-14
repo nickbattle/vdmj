@@ -104,7 +104,7 @@ abstract public class DebugLink
 	{
 		if (!thread.debugExch.exchange(response).equals(DebugCommand.ACK))
 		{
-			System.err.println("Unexpected ACK from debugger");
+			throw new RuntimeException("Unexpected ACK from debugger");
 		}
 	}
 }

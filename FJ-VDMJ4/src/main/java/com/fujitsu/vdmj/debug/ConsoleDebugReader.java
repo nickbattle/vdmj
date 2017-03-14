@@ -80,7 +80,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 			{
 				Console.out.printf("Thread %s has not yet started\n", debuggedThread.getName());
 			}
-			else
+			else	// Only print the source if we have moved
 			{
 				if (!debuggedThread.equals(lastThread) || !loc.equals(lastLoc))
 				{
