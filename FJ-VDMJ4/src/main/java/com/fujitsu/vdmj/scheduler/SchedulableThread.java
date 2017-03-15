@@ -43,7 +43,7 @@ import com.fujitsu.vdmj.runtime.ExceptionHandler;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.values.ObjectValue;
 
-public abstract class SchedulableThread extends Thread implements Serializable
+public abstract class SchedulableThread extends Thread implements Serializable, Comparable<SchedulableThread>
 {
     private static final long serialVersionUID = 1L;
 
@@ -195,6 +195,11 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	}
 
 	public synchronized RunState getRunState()
+	{
+		return state;
+	}
+
+	public RunState getUnsafeRunState()
 	{
 		return state;
 	}
@@ -500,5 +505,11 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	public void abort(ValueException ve, LexLocation location)
 	{
 		ExceptionHandler.handle(new ContextException(ve, location));
+	}
+	
+	@Override
+	public int compareTo(SchedulableThread other)
+	{
+		return getName().compareTo(other.getName());
 	}
 }

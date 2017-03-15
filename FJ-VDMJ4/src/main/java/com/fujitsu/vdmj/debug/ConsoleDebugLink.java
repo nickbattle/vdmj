@@ -70,7 +70,7 @@ public class ConsoleDebugLink extends DebugLink
 		debugging = true;
 		
 		while (stopped.size() < SchedulableThread.getThreadCount() ||
-			SchedulableThread.getThreadCount() == 0)
+			   SchedulableThread.getThreadCount() == 0)
 		{
 			try
 			{
@@ -124,8 +124,7 @@ public class ConsoleDebugLink extends DebugLink
 				return breakpoints.values().iterator().next();
 				
 			default:
-				System.err.println("More than one breakpoint??");
-				return null;
+				throw new RuntimeException("More than one breakpoint??");
 		}
 	}
 	

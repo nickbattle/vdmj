@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -70,7 +71,7 @@ public class DebugExecutor
 		}
 		catch (Exception e)
 		{
-			// throw new InternalException(52, "Cannot set default name at breakpoint");
+			throw new InternalException(52, "Cannot set default name at breakpoint");
 		}
    		
    		DebugCommand result = null;

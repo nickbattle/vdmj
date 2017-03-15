@@ -51,10 +51,6 @@ public class DebugParser
 			{
 				return DebugCommand.HELP;
 			}
-			else if (request.equals("continue") || request.equals("c"))
-			{
-				return DebugCommand.CONTINUE;
-			}
 			else if (request.equals("stack"))
 			{
 				return DebugCommand.STACK;
@@ -78,6 +74,10 @@ public class DebugParser
 			else if (request.equals("out") || request.equals("o"))
 			{
 				return DebugCommand.OUT;
+			}
+			else if (request.equals("continue") || request.equals("c"))
+			{
+				return DebugCommand.CONTINUE;
 			}
 			else if (request.equals("source"))
 			{

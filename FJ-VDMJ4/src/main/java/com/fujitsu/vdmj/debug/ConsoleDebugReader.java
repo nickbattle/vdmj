@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.debug;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -139,6 +140,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 	private void doThreads()
 	{
 		List<SchedulableThread> threads = link.getThreads();
+		Collections.sort(threads);
 		
 		if (threads.isEmpty())
 		{
@@ -151,7 +153,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
     		for (SchedulableThread th: threads)
     		{
     			Breakpoint bp = link.getBreakpoint(th);
-    			Console.out.printf("%d: %s %s\n", i++, th.getName(), bp != null ? bp.toString() : "");
+    			Console.out.printf("%2d: %s %s\n", i++, th.getName(), bp != null ? bp.toString() : th.getUnsafeRunState());
     		}
     		
     		Console.out.println();
