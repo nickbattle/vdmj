@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
+import com.fujitsu.vdmj.values.OperationValue;
 
 /**
  * A class to listen for and interact with multiple threads that are being debugged.
@@ -149,11 +150,39 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 		else
 		{
     		int i = 1;
+    		int maxName = 0;
+    		int maxNum = (int)Math.floor(Math.log10(threads.size())) + 1;
+    		
+    		for (SchedulableThread th: threads)
+    		{
+    			if (th.getName().length() > maxName)
+    			{
+    				maxName = th.getName().length();
+    			}
+    		}
     		
     		for (SchedulableThread th: threads)
     		{
     			Breakpoint bp = link.getBreakpoint(th);
-    			Console.out.printf("%2d: %s %s\n", i++, th.getName(), bp != null ? bp.toString() : th.getUnsafeRunState());
+    			OperationValue guard = link.getGuardOp(th);
+    			LexLocation loc = link.getLocation(th);
+    			String info = "(not started)";
+    			
+    			if (bp != null)
+    			{
+    				info = bp.toString();
+    			}
+    			else if (guard != null)
+    			{
+    				info = "sync: " + guard.name.getName() + " " + loc;
+    			}
+    			else if (loc != null)
+    			{
+    				info = loc.toString();
+    			}
+    			
+    			String format = String.format("%%%dd: %%-%ds  %%s\n", maxNum, maxName);
+    			Console.out.printf(format, i++, th.getName(), info);
     		}
     		
     		Console.out.println();

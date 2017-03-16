@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.scheduler.Signal;
 import com.fujitsu.vdmj.values.CPUValue;
+import com.fujitsu.vdmj.values.OperationValue;
 
 /**
  * Link class to allow multiple stopped threads to link to a debugging interface.
@@ -52,6 +53,9 @@ public class ConsoleDebugLink extends DebugLink
 	
 	/** The threads locations, if known */
 	private Map<SchedulableThread, LexLocation> locations = new HashMap<SchedulableThread, LexLocation>();
+	
+	/** The threads waited guard operations, if any */
+	private Map<SchedulableThread, OperationValue> guardops = new HashMap<SchedulableThread, OperationValue>();
 	
 	/** The trace callback, if any */
 	private TraceCallback callback = null;
@@ -108,6 +112,14 @@ public class ConsoleDebugLink extends DebugLink
 	public LexLocation getLocation(SchedulableThread thread)
 	{
 		return locations.get(thread);
+	}
+	
+	/**
+	 * Return the guarded operation for a given thread, if any.
+	 */
+	public OperationValue getGuardOp(SchedulableThread thread)
+	{
+		return guardops.get(thread);
 	}
 	
 	/**
@@ -203,6 +215,7 @@ public class ConsoleDebugLink extends DebugLink
 		stopped.clear();
 		breakpoints.clear();
 		locations.clear();
+		guardops.clear();
 		callback = null;
 	}
 
@@ -237,6 +250,14 @@ public class ConsoleDebugLink extends DebugLink
 		synchronized(locations)
 		{
 			locations.put(thread, location);
+		}
+		
+		if (ctxt != null)
+		{
+			synchronized (guardops)
+			{
+				guardops.put(thread, ctxt.guardOp);
+			}
 		}
 		
 		synchronized(this)
