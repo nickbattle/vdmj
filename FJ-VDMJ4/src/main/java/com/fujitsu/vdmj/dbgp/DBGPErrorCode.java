@@ -21,40 +21,41 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.debug;
+package com.fujitsu.vdmj.dbgp;
 
-public enum DBGPBreakpointType
+public enum DBGPErrorCode
 {
-	LINE("line"),
-	CALL("call"),
-	RETURN("return"),
-	EXCEPTION("exception"),
-	CONDITIONAL("conditional"),
-	WATCH("watch");
+	NONE(0),
+	PARSE(1),
+	DUPLICATE_ARGS(2),
+	INVALID_OPTIONS(3),
+	UNIMPLEMENTED(4),
+	NOT_AVAILABLE(5),
 
-	public String value;
+	CANT_OPEN(100),
+	STREAM_REDIRECT_FAILED(101),
 
-	DBGPBreakpointType(String value)
+	CANT_SET_BREAKPOINT(200),
+	BREAKPOINT_TYPE_UNSUPPORTED(201),
+	INVALID_BREAKPOINT(202),
+	NO_CODE_AT_BREAKPOINT(203),
+	INVALID_BREAKPOINT_STATE(204),
+	NO_SUCH_BREAKPOINT(205),
+	EVALUATION_ERROR(206),
+	INVALID_EXPRESION(207),
+
+	CANT_GET_PROPERTY(300),
+	INVALID_STACK_DEPTH(301),
+	INVALID_CONTEXT(302),
+
+	INVALID_ENCODING(900),
+	INTERNAL_ERROR(998),
+	UNKNOWN_ERROR(999);
+
+	public int value;
+
+	DBGPErrorCode(int v)
 	{
-		this.value = value;
-	}
-
-	public static DBGPBreakpointType lookup(String string) throws DBGPException
-	{
-		for (DBGPBreakpointType cmd: values())
-		{
-			if (cmd.value.equals(string))
-			{
-				return cmd;
-			}
-		}
-
-		throw new DBGPException(DBGPErrorCode.PARSE, string);
-	}
-
-	@Override
-	public String toString()
-	{
-		return value;
+		value = v;
 	}
 }

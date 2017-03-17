@@ -21,30 +21,52 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.messages;
+package com.fujitsu.vdmj.dbgp;
 
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-
-abstract public class Redirector extends PrintWriter
+public enum DBGPOptionType
 {
-	public Redirector(OutputStreamWriter out)
+	TRANSACTION_ID("-i"),
+	N("-n"),
+	V("-v"),
+	T("-t"),
+	S("-s"),
+	F("-f"),
+	M("-m"),
+	O("-o"),
+	H("-h"),
+	X("-x"),
+	R("-r"),
+	D("-d"),
+	P("-p"),
+	K("-k"),
+	A("-a"),
+	C("-c"),
+	B("-b"),
+	E("-e");
+
+	public String tag;
+
+	DBGPOptionType(String tag)
 	{
-		super(out, true);
+		this.tag = tag;
+	}
+
+	public static DBGPOptionType lookup(String string) throws DBGPException
+	{
+		for (DBGPOptionType opt: values())
+		{
+			if (opt.tag.equals(string))
+			{
+				return opt;
+			}
+		}
+
+		throw new DBGPException(DBGPErrorCode.INVALID_OPTIONS, string);
 	}
 
 	@Override
-	public void println(String line)
+	public String toString()
 	{
-		print(line + "\n");
-		flush();
-	}
-
-	@Override
-	public PrintWriter printf(String format, Object ... args)
-	{
-		print(String.format(format, args));
-		flush();
-		return this;
+		return tag;
 	}
 }

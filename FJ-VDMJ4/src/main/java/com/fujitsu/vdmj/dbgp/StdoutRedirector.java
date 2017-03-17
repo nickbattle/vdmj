@@ -21,52 +21,42 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.debug;
+package com.fujitsu.vdmj.dbgp;
 
-public enum DBGPContextType
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
+public class StdoutRedirector extends Redirector
 {
-	LOCAL("local", 0),
-	CLASS("class", 2),
-	GLOBAL("global", 1);
-
-	public String value;
-	public int code;
-
-	DBGPContextType(String value, int code)
+	public StdoutRedirector(OutputStreamWriter out)
 	{
-		this.value = value;
-		this.code = code;
-	}
-
-	public static DBGPContextType lookup(String string) throws DBGPException
-	{
-		for (DBGPContextType type: values())
-		{
-			if (type.value.equals(string))
-			{
-				return type;
-			}
-		}
-
-		throw new DBGPException(DBGPErrorCode.PARSE, string);
-	}
-
-	public static DBGPContextType lookup(int code) throws DBGPException
-	{
-		for (DBGPContextType type: values())
-		{
-			if (type.code == code)
-			{
-				return type;
-			}
-		}
-
-		throw new DBGPException(DBGPErrorCode.PARSE, "" + code);
+		super(out);
 	}
 
 	@Override
-	public String toString()
+	public void print(String line)
 	{
-		return value;
+		try
+		{
+    		switch (type)
+    		{
+    			case DISABLE:
+    				super.print(line);
+    				break;
+
+    			case COPY:
+    				super.print(line);
+    				dbgp.stdout(line);
+    				break;
+
+    			case REDIRECT:
+    				dbgp.stdout(line);
+    				break;
+    		}
+		}
+		catch (IOException e)
+		{
+			super.print(line);		// Better than ignoring it??
+		}
 	}
 }

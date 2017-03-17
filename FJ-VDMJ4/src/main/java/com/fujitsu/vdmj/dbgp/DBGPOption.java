@@ -21,32 +21,23 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.debug;
+package com.fujitsu.vdmj.dbgp;
 
-import java.util.Properties;
-
-import com.fujitsu.vdmj.Settings;
-
-@SuppressWarnings("serial")
-public class DBGPFeatures extends Properties
+public class DBGPOption
 {
-	public DBGPFeatures()
+	public final DBGPOptionType type;
+	public final String value;
+
+	public DBGPOption(DBGPOptionType type, String value)
 	{
-		setProperty("lanuage_supports_threads", "1");
-		setProperty("language_name", Settings.dialect.name());
-		setProperty("language_version", "1");
-		setProperty("encoding", "UTF-8");
-    	setProperty("protocol_version", "1");
-    	setProperty("supports_async", "0");
-    	setProperty("data_encoding", "base64");
-    	setProperty("breakpoint_languages", "");
-    	setProperty("breakpoint_types", "?");
-    	setProperty("multiple_sessions", "1");
-    	setProperty("max_children", "10");
-    	setProperty("max_data", "1000");
-    	setProperty("max_depth", "10");
-    	setProperty("supports_postmortem", "0");
-    	setProperty("show_hidden", "0");
-    	setProperty("notify_ok", "0");
+		this.type = type;
+		this.value = value;
+	}
+
+	@Override
+	public String toString()
+	{
+		return type + " " + value;
 	}
 }
+

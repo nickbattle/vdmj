@@ -21,7 +21,7 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.debug;
+package com.fujitsu.vdmj.dbgp;
 
 public enum DBGPCommandType
 {

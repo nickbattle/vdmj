@@ -21,7 +21,7 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.debug;
+package com.fujitsu.vdmj.dbgp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -49,29 +49,29 @@ import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Release;
+import com.fujitsu.vdmj.RemoteControl;
+import com.fujitsu.vdmj.RemoteInterpreter;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.VDMPP;
 import com.fujitsu.vdmj.VDMRT;
 import com.fujitsu.vdmj.VDMSL;
-import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTMutexSyncDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTPerSyncDefinition;
-import com.fujitsu.vdmj.ast.expressions.ASTExpression;
-import com.fujitsu.vdmj.ast.expressions.ASTHistoryExpression;
-import com.fujitsu.vdmj.ast.modules.ASTModule;
-import com.fujitsu.vdmj.ast.statements.ASTStatement;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.definitions.INClassDefinition;
+import com.fujitsu.vdmj.in.definitions.INClassList;
+import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INHistoryExpression;
+import com.fujitsu.vdmj.in.modules.INModule;
+import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.ast.lex.LexNameList;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.RTLogger;
@@ -88,6 +88,11 @@ import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.syntax.ParserException;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCMutexSyncDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.Base64;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.NameValuePairMap;
@@ -126,8 +131,6 @@ public class DBGPReader
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args)
 	{
-		Settings.usingDBGP = true;
-
 		String host = null;
 		int port = -1;
 		String ideKey = null;
@@ -560,7 +563,7 @@ public class DBGPReader
 	private void startup(RemoteControl remote) throws IOException
 	{
 		remoteControl = remote;
-		interpreter.init(this);
+		interpreter.init();
 		connect();
 	}
 
@@ -757,7 +760,7 @@ public class DBGPReader
 	{
 		StringBuilder sb = new StringBuilder();
 
-		for (Entry<LexNameToken, Value> e: vars.entrySet())
+		for (Entry<TCNameToken, Value> e: vars.entrySet())
 		{
 			sb.append(propertyResponse(e.getKey(), e.getValue()));
 		}
@@ -765,12 +768,12 @@ public class DBGPReader
 		return sb;
 	}
 
-	private StringBuilder propertyResponse(LexNameToken name, Value value)
+	private StringBuilder propertyResponse(TCNameToken name, Value value)
 		throws UnsupportedEncodingException
 	{
 		return propertyResponse(
-			name.name, name.toString(),
-			name.module, value.toString());
+			name.getName(), name.toString(),
+			name.getModule(), value.toString());
 	}
 
 	private StringBuilder propertyResponse(
@@ -1275,7 +1278,7 @@ public class DBGPReader
 			{
 				status = DBGPStatus.RUNNING;
 				statusReason = DBGPReason.OK;
-				remoteControl.run(new RemoteInterpreter(interpreter, this));
+				remoteControl.run(new RemoteInterpreter(interpreter));
 				stdout("Remote control completed");
 				statusResponse(DBGPStatus.STOPPED, DBGPReason.OK);
 			}
@@ -1294,7 +1297,7 @@ public class DBGPReader
     		{
     			status = DBGPStatus.RUNNING;
     			statusReason = DBGPReason.OK;
-    			theAnswer = interpreter.execute(expression, this);
+    			theAnswer = interpreter.execute(expression);
     			stdout(expression + " = " + theAnswer.toString());
     			statusResponse(DBGPStatus.STOPPED, DBGPReason.OK);
     		}
@@ -1361,7 +1364,7 @@ public class DBGPReader
 			status = DBGPStatus.RUNNING;
 			statusReason = DBGPReason.OK;
 			String exp = c.data;	// Already base64 decoded by the parser
-			theAnswer = interpreter.execute(exp, this);
+			theAnswer = interpreter.execute(exp);
 			StringBuilder property = propertyResponse(
 				exp, exp, interpreter.getDefaultName(), theAnswer.toString());
 			StringBuilder hdr = new StringBuilder("success=\"1\"");
@@ -1442,7 +1445,7 @@ public class DBGPReader
 			throw new DBGPException(DBGPErrorCode.INVALID_OPTIONS, c.toString());
 		}
 
-		Breakpoint bp = interpreter.breakpoints.get(Integer.parseInt(option.value));
+		Breakpoint bp = interpreter.getBreakpoints().get(Integer.parseInt(option.value));
 
 		if (bp == null)
 		{
@@ -1539,11 +1542,11 @@ public class DBGPReader
 		}
 
 		Breakpoint bp = null;
-		ASTStatement stmt = interpreter.findStatement(filename, lineno);
+		INStatement stmt = interpreter.findStatement(filename, lineno);
 
 		if (stmt == null)
 		{
-			ASTExpression exp = interpreter.findExpression(filename, lineno);
+			INExpression exp = interpreter.findExpression(filename, lineno);
 
 			if (exp == null)
 			{
@@ -1553,13 +1556,12 @@ public class DBGPReader
 			{
 				try
 				{
-					// FIXME!
-//					if (exp.breakpoint.number != 0)
-//					{
-//						// Multiple threads set BPs multiple times, so...
-//						bp = exp.breakpoint;	// Re-use the existing one
-//					}
-//					else
+					if (exp.breakpoint.number != 0)
+					{
+						// Multiple threads set BPs multiple times, so...
+						bp = exp.breakpoint;	// Re-use the existing one
+					}
+					else
 					{
 						bp = interpreter.setBreakpoint(exp, condition);
 					}
@@ -1574,19 +1576,23 @@ public class DBGPReader
 					throw new DBGPException(DBGPErrorCode.CANT_SET_BREAKPOINT,
 						filename + ":" + lineno + ", " + e.getMessage());
 				}
+				catch (Exception e)
+				{
+					throw new DBGPException(DBGPErrorCode.CANT_SET_BREAKPOINT,
+						filename + ":" + lineno + ", " + e.getMessage());
+				}
 			}
 		}
 		else
 		{
 			try
 			{
-				// FIXME!
-//				if (stmt.breakpoint.number != 0)
-//				{
-//					// Multiple threads set BPs multiple times, so...
-//					bp = stmt.breakpoint;	// Re-use the existing one
-//				}
-//				else
+				if (stmt.breakpoint.number != 0)
+				{
+					// Multiple threads set BPs multiple times, so...
+					bp = stmt.breakpoint;	// Re-use the existing one
+				}
+				else
 				{
 					bp = interpreter.setBreakpoint(stmt, condition);
 				}
@@ -1597,6 +1603,11 @@ public class DBGPReader
 					filename + ":" + lineno + ", " + e.getMessage());
 			}
 			catch (LexException e)
+			{
+				throw new DBGPException(DBGPErrorCode.CANT_SET_BREAKPOINT,
+					filename + ":" + lineno + ", " + e.getMessage());
+			}
+			catch (Exception e)
 			{
 				throw new DBGPException(DBGPErrorCode.CANT_SET_BREAKPOINT,
 					filename + ":" + lineno + ", " + e.getMessage());
@@ -1619,7 +1630,7 @@ public class DBGPReader
 			throw new DBGPException(DBGPErrorCode.INVALID_OPTIONS, c.toString());
 		}
 
-		Breakpoint bp = interpreter.breakpoints.get(Integer.parseInt(option.value));
+		Breakpoint bp = interpreter.getBreakpoints().get(Integer.parseInt(option.value));
 
 		if (bp == null)
 		{
@@ -1654,9 +1665,9 @@ public class DBGPReader
 		checkArgs(c, 1, false);
 		StringBuilder bps = new StringBuilder();
 
-		for (Integer key: interpreter.breakpoints.keySet())
+		for (Integer key: interpreter.getBreakpoints().keySet())
 		{
-			Breakpoint bp = interpreter.breakpoints.get(key);
+			Breakpoint bp = interpreter.getBreakpoints().get(key);
 			bps.append(breakpointResponse(bp));
 		}
 
@@ -1764,7 +1775,7 @@ public class DBGPReader
 		response(null, names);
 	}
 
-	private NameValuePairMap getContextValues(DBGPContextType context, int depth)
+	private NameValuePairMap getContextValues(DBGPContextType context, int depth) throws Exception
 	{
 		NameValuePairMap vars = new NameValuePairMap();
 
@@ -1789,50 +1800,50 @@ public class DBGPReader
 				{
 					ObjectContext octxt = (ObjectContext)breakContext;
 					int line = breakpoint.location.startLine;
-					String opname = breakContext.guardOp == null ?
-						"" : breakContext.guardOp.name.name;
+					String opname = breakContext.guardOp == null ? "" : breakContext.guardOp.name.getName();
 
-					for (ASTDefinition d: octxt.self.type.classdef.definitions)
+					for (TCDefinition d: octxt.self.type.classdef.definitions)
 					{
-						if (d instanceof ASTPerSyncDefinition)
+						if (d instanceof TCPerSyncDefinition)
 						{
-							ASTPerSyncDefinition pdef = (ASTPerSyncDefinition)d;
-// FIXME!!
-//							if (pdef.opname.name.equals(opname) ||
-//								pdef.location.startLine == line ||
-//								pdef.guard.findExpression(line) != null)
-//							{
-//	            				for (ASTExpression sub: pdef.guard.getSubExpressions())
-//	            				{
-//	            					if (sub instanceof ASTHistoryExpression)
-//	            					{
-//	            						ASTHistoryExpression hexp = (ASTHistoryExpression)sub;
-//	            						Value v = hexp.eval(octxt);
-//	            						LexNameToken name =
-//	            							new LexNameToken(octxt.self.type.name.module,
-//	            								hexp.toString(),hexp.location);
-//	            						vars.put(name, v);
-//	            					}
-//	            				}
-//							}
-						}
-						else if (d instanceof ASTMutexSyncDefinition)
-						{
-							ASTMutexSyncDefinition mdef = (ASTMutexSyncDefinition)d;
+							TCPerSyncDefinition pdef = (TCPerSyncDefinition)d;
+							INExpression guard = ClassMapper.getInstance(INNode.MAPPINGS).convert(pdef.guard);
 
-            				for (LexNameToken mop: mdef.operations)
+							if (pdef.opname.getName().equals(opname) ||
+								pdef.location.startLine == line ||
+								guard.findExpression(line) != null)
+							{
+	            				for (INExpression sub: guard.getSubExpressions())
+	            				{
+	            					if (sub instanceof INHistoryExpression)
+	            					{
+	            						INHistoryExpression hexp = (INHistoryExpression)sub;
+	            						Value v = hexp.eval(octxt);
+                						TCNameToken name =
+                							new TCNameToken(pdef.location, octxt.self.type.name.getModule(),
+                								hexp.toString());
+	            						vars.put(name, v);
+	            					}
+	            				}
+							}
+						}
+						else if (d instanceof TCMutexSyncDefinition)
+						{
+							TCMutexSyncDefinition mdef = (TCMutexSyncDefinition)d;
+
+            				for (TCNameToken mop: mdef.operations)
             				{
-            					if (mop.name.equals(opname))
+            					if (mop.getName().equals(opname))
             					{
-                    				for (LexNameToken op: mdef.operations)
+                    				for (TCNameToken op: mdef.operations)
                     				{
-                    					LexNameList ops = new LexNameList(op);
-                    					ASTExpression hexp = new ASTHistoryExpression(mdef.location, Token.ACTIVE, ops);
-// FIXME!          						Value v = hexp.eval(octxt);
-                						LexNameToken name =
-                							new LexNameToken(octxt.self.type.name.module,
-                								hexp.toString(), mdef.location);
-// FIXME!         						vars.put(name, v);
+                    					TCNameList ops = new TCNameList(op);
+                    					INHistoryExpression hexp = new INHistoryExpression(mdef.location, Token.ACTIVE, ops);
+                    					Value v = hexp.eval(octxt);
+                						TCNameToken name =
+                							new TCNameToken(mdef.location, octxt.self.type.name.getModule(),
+                								hexp.toString());
+                						vars.put(name, v);
                     				}
 
                     				break;
@@ -1854,7 +1865,7 @@ public class DBGPReader
 				else if (root instanceof ClassContext)
 				{
 					ClassContext cctxt = (ClassContext)root;
-// FIXME!			vars.putAll(cctxt.classdef.getStatics());
+					vars.putAll(cctxt.classdef.getStatics());
 				}
 				else if (root instanceof StateContext)
 				{
@@ -1868,14 +1879,14 @@ public class DBGPReader
 				break;
 
 			case GLOBAL:
-				vars.putAll(interpreter.initialContext);
+				vars.putAll(interpreter.getInitialContext());
 				break;
 		}
 
 		return vars;
 	}
 
-	private void contextGet(DBGPCommand c) throws DBGPException, IOException
+	private void contextGet(DBGPCommand c) throws Exception
 	{
 		if (c.data != null || c.options.size() > 3)
 		{
@@ -1917,7 +1928,7 @@ public class DBGPReader
 		response(null, propertyResponse(vars));
 	}
 
-	private void propertyGet(DBGPCommand c) throws DBGPException, IOException
+	private void propertyGet(DBGPCommand c) throws Exception
 	{
 		if (c.data != null || c.options.size() > 4)
 		{
@@ -1976,7 +1987,7 @@ public class DBGPReader
 		}
 
 		NameValuePairMap vars = getContextValues(context, depth);
-		LexNameToken longname = (LexNameToken)token;
+		TCNameToken longname = new TCNameToken((LexNameToken)token);
 		Value value = vars.get(longname);
 
 		if (value == null)
@@ -2097,8 +2108,7 @@ public class DBGPReader
 		write(sb);
 	}
 
-	private void processOvertureCmd(DBGPCommand c)
-		throws DBGPException, IOException, URISyntaxException
+	private void processOvertureCmd(DBGPCommand c) throws Exception
 	{
 		checkArgs(c, 2, false);
 		DBGPOption option = c.getOption(DBGPOptionType.C);
@@ -2190,7 +2200,7 @@ public class DBGPReader
 		}
 
 		LexLocation.clearLocations();
-		interpreter.init(this);
+		interpreter.init();
 		statusResponse(DBGPStatus.STOPPED, DBGPReason.OK);
 		cdataResponse("Global context and test coverage initialized");
 	}
@@ -2262,7 +2272,7 @@ public class DBGPReader
 
 		OutputStream out = new ByteArrayOutputStream();
 		PrintWriter pw = new PrintWriter(out);
-		pw.println(breakpoint.stoppedAtString());
+		pw.println("Stopped [" + Thread.currentThread().getName() + "] " + breakpoint.location);
 		breakContext.printStackTrace(pw, true);
 		pw.close();
 		cdataResponse(out.toString());
@@ -2287,11 +2297,11 @@ public class DBGPReader
     		OutputStream out = new ByteArrayOutputStream();
     		PrintWriter pw = new PrintWriter(out);
 
-    		ASTStatement stmt = interpreter.findStatement(file, line);
+    		INStatement stmt = interpreter.findStatement(file, line);
 
     		if (stmt == null)
     		{
-    			ASTExpression exp = interpreter.findExpression(file, line);
+    			INExpression exp = interpreter.findExpression(file, line);
 
     			if (exp == null)
     			{
@@ -2300,7 +2310,7 @@ public class DBGPReader
     			}
     			else
     			{
-// FIXME!			interpreter.clearBreakpoint(exp.breakpoint.number);
+    				interpreter.clearBreakpoint(exp.breakpoint.number);
     				Breakpoint bp = interpreter.setTracepoint(exp, trace);
     				pw.println("Created " + bp);
     				pw.println(interpreter.getSourceLine(bp.location));
@@ -2308,7 +2318,7 @@ public class DBGPReader
     		}
     		else
     		{
-// FIXME!		interpreter.clearBreakpoint(stmt.breakpoint.number);
+    			interpreter.clearBreakpoint(stmt.breakpoint.number);
     			Breakpoint bp = interpreter.setTracepoint(stmt, trace);
     			pw.println("Created " + bp);
     			pw.println(interpreter.getSourceLine(bp.location));
@@ -2365,19 +2375,19 @@ public class DBGPReader
 
 		ClassInterpreter cinterpreter = (ClassInterpreter)interpreter;
 		String def = cinterpreter.getDefaultName();
-		ASTClassList classes = cinterpreter.getClasses();
+		INClassList classes = cinterpreter.getClasses();
 		OutputStream out = new ByteArrayOutputStream();
 		PrintWriter pw = new PrintWriter(out);
 
-		for (ASTClassDefinition cls: classes)
+		for (INClassDefinition cls: classes)
 		{
-			if (cls.name.name.equals(def))
+			if (cls.name.getName().equals(def))
 			{
-				pw.println(cls.name.name + " (default)");
+				pw.println(cls.name.getName() + " (default)");
 			}
 			else
 			{
-				pw.println(cls.name.name);
+				pw.println(cls.name.getName());
 			}
 		}
 
@@ -2395,19 +2405,19 @@ public class DBGPReader
 
 		ModuleInterpreter minterpreter = (ModuleInterpreter)interpreter;
 		String def = minterpreter.getDefaultName();
-		List<ASTModule> modules = minterpreter.getModules();
+		List<INModule> modules = minterpreter.getModules();
 		OutputStream out = new ByteArrayOutputStream();
 		PrintWriter pw = new PrintWriter(out);
 
-		for (ASTModule m: modules)
+		for (INModule m: modules)
 		{
-			if (m.name.name.equals(def))
+			if (m.name.getName().equals(def))
 			{
-				pw.println(m.name.name + " (default)");
+				pw.println(m.name.getName() + " (default)");
 			}
 			else
 			{
-				pw.println(m.name.name);
+				pw.println(m.name.getName());
 			}
 		}
 
@@ -2548,7 +2558,7 @@ public class DBGPReader
 
 		OutputStream out = new ByteArrayOutputStream();
 		PrintWriter pw = new PrintWriter(out);
-		pw.println(breakpoint.stoppedAtString());
+		pw.println("Stopped [" + Thread.currentThread().getName() + "] " + breakpoint.location);
 		pw.println(interpreter.getSourceLine(
 			breakpoint.location.file, breakpoint.location.startLine, ":  "));
 		pw.close();
@@ -2582,7 +2592,7 @@ public class DBGPReader
 		cdataResponse(sb.toString());
 	}
 
-	private void processPOG(DBGPCommand c) throws IOException
+	private void processPOG(DBGPCommand c) throws Exception
 	{
 		ProofObligationList all = interpreter.getProofObligations();
 		ProofObligationList list = null;

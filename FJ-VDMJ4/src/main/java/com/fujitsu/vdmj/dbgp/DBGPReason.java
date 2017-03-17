@@ -21,52 +21,15 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.debug;
+package com.fujitsu.vdmj.dbgp;
 
-public enum DBGPOptionType
+public enum DBGPReason
 {
-	TRANSACTION_ID("-i"),
-	N("-n"),
-	V("-v"),
-	T("-t"),
-	S("-s"),
-	F("-f"),
-	M("-m"),
-	O("-o"),
-	H("-h"),
-	X("-x"),
-	R("-r"),
-	D("-d"),
-	P("-p"),
-	K("-k"),
-	A("-a"),
-	C("-c"),
-	B("-b"),
-	E("-e");
-
-	public String tag;
-
-	DBGPOptionType(String tag)
-	{
-		this.tag = tag;
-	}
-
-	public static DBGPOptionType lookup(String string) throws DBGPException
-	{
-		for (DBGPOptionType opt: values())
-		{
-			if (opt.tag.equals(string))
-			{
-				return opt;
-			}
-		}
-
-		throw new DBGPException(DBGPErrorCode.INVALID_OPTIONS, string);
-	}
+	OK, ERROR, ABORTED, EXCEPTION;
 
 	@Override
 	public String toString()
 	{
-		return tag;
+		return super.toString().toLowerCase();
 	}
 }

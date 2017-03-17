@@ -21,41 +21,17 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.messages;
+package com.fujitsu.vdmj.dbgp;
 
-import java.io.OutputStreamWriter;
-
-public class StderrRedirector extends Redirector
+@SuppressWarnings("serial")
+public class DBGPException extends Exception
 {
-	public StderrRedirector(OutputStreamWriter out)
-	{
-		super(out);
-	}
+	public final DBGPErrorCode code;
+	public final String reason;
 
-//	@Override
-//	public void print(String line)
-//	{
-//		try
-//		{
-//    		switch (type)
-//    		{
-//    			case DISABLE:
-//    				super.print(line);
-//    				break;
-//
-//    			case COPY:
-//    				super.print(line);
-//    				dbgp.stderr(line);
-//    				break;
-//
-//    			case REDIRECT:
-//    				dbgp.stderr(line);
-//    				break;
-//    		}
-//		}
-//		catch (IOException e)
-//		{
-//			super.print(line);		// Better than ignoring it??
-//		}
-//	}
+	public DBGPException(DBGPErrorCode code, String reason)
+	{
+		this.code = code;
+		this.reason = reason;
+	}
 }

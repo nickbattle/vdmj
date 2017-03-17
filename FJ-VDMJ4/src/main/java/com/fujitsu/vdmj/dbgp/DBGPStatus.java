@@ -21,17 +21,15 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.debug;
+package com.fujitsu.vdmj.dbgp;
 
-@SuppressWarnings("serial")
-public class DBGPException extends Exception
+public enum DBGPStatus
 {
-	public final DBGPErrorCode code;
-	public final String reason;
+	STARTING, RUNNING, BREAK, STOPPING, STOPPED;
 
-	public DBGPException(DBGPErrorCode code, String reason)
+	@Override
+	public String toString()
 	{
-		this.code = code;
-		this.reason = reason;
+		return super.toString().toLowerCase();
 	}
 }

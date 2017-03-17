@@ -21,15 +21,54 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.debug;
+package com.fujitsu.vdmj.dbgp;
 
-public enum DBGPReason
+import java.util.List;
+
+import com.fujitsu.vdmj.util.Base64;
+import com.fujitsu.vdmj.util.Utils;
+
+public class DBGPCommand
 {
-	OK, ERROR, ABORTED, EXCEPTION;
+	public final DBGPCommandType type;
+	public final List<DBGPOption> options;
+	public final String data;
+
+	public DBGPCommand(
+		DBGPCommandType type, List<DBGPOption> options, String base64)
+		throws Exception
+	{
+		this.type = type;
+		this.options = options;
+
+		if (base64 != null)
+		{
+			this.data = new String(Base64.decode(base64), "UTF-8");
+		}
+		else
+		{
+			this.data = null;
+		}
+	}
 
 	@Override
 	public String toString()
 	{
-		return super.toString().toLowerCase();
+		return type +
+			(options.isEmpty() ? "" : " " + Utils.listToString(options, " ")) +
+			(data == null ? "" : " -- " + data);
+	}
+
+	public DBGPOption getOption(DBGPOptionType sought)
+	{
+		for (DBGPOption opt: options)
+		{
+			if (opt.type == sought)
+			{
+				return opt;
+			}
+		}
+
+		return null;
 	}
 }

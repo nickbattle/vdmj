@@ -21,22 +21,27 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.debug;
+package com.fujitsu.vdmj.dbgp;
 
-public enum DBGPRedirect
+public enum DBGPBreakpointType
 {
-	DISABLE("0"), COPY("1"), REDIRECT("2");
+	LINE("line"),
+	CALL("call"),
+	RETURN("return"),
+	EXCEPTION("exception"),
+	CONDITIONAL("conditional"),
+	WATCH("watch");
 
 	public String value;
 
-	DBGPRedirect(String v)
+	DBGPBreakpointType(String value)
 	{
-		value = v;
+		this.value = value;
 	}
 
-	public static DBGPRedirect lookup(String string) throws DBGPException
+	public static DBGPBreakpointType lookup(String string) throws DBGPException
 	{
-		for (DBGPRedirect cmd: values())
+		for (DBGPBreakpointType cmd: values())
 		{
 			if (cmd.value.equals(string))
 			{
@@ -45,5 +50,11 @@ public enum DBGPRedirect
 		}
 
 		throw new DBGPException(DBGPErrorCode.PARSE, string);
+	}
+
+	@Override
+	public String toString()
+	{
+		return value;
 	}
 }

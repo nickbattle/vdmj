@@ -21,15 +21,32 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.debug;
+package com.fujitsu.vdmj.dbgp;
 
-public enum DBGPStatus
+import java.util.Properties;
+
+import com.fujitsu.vdmj.Settings;
+
+@SuppressWarnings("serial")
+public class DBGPFeatures extends Properties
 {
-	STARTING, RUNNING, BREAK, STOPPING, STOPPED;
-
-	@Override
-	public String toString()
+	public DBGPFeatures()
 	{
-		return super.toString().toLowerCase();
+		setProperty("lanuage_supports_threads", "1");
+		setProperty("language_name", Settings.dialect.name());
+		setProperty("language_version", "1");
+		setProperty("encoding", "UTF-8");
+    	setProperty("protocol_version", "1");
+    	setProperty("supports_async", "0");
+    	setProperty("data_encoding", "base64");
+    	setProperty("breakpoint_languages", "");
+    	setProperty("breakpoint_types", "?");
+    	setProperty("multiple_sessions", "1");
+    	setProperty("max_children", "10");
+    	setProperty("max_data", "1000");
+    	setProperty("max_depth", "10");
+    	setProperty("supports_postmortem", "0");
+    	setProperty("show_hidden", "0");
+    	setProperty("notify_ok", "0");
 	}
 }

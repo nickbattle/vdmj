@@ -21,41 +21,29 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.messages;
+package com.fujitsu.vdmj.dbgp;
 
-import java.io.OutputStreamWriter;
-
-public class StdoutRedirector extends Redirector
+public enum DBGPRedirect
 {
-	public StdoutRedirector(OutputStreamWriter out)
+	DISABLE("0"), COPY("1"), REDIRECT("2");
+
+	public String value;
+
+	DBGPRedirect(String v)
 	{
-		super(out);
+		value = v;
 	}
 
-//	@Override
-//	public void print(String line)
-//	{
-//		try
-//		{
-//    		switch (type)
-//    		{
-//    			case DISABLE:
-//    				super.print(line);
-//    				break;
-//
-//    			case COPY:
-//    				super.print(line);
-//    				dbgp.stdout(line);
-//    				break;
-//
-//    			case REDIRECT:
-//    				dbgp.stdout(line);
-//    				break;
-//    		}
-//		}
-//		catch (IOException e)
-//		{
-//			super.print(line);		// Better than ignoring it??
-//		}
-//	}
+	public static DBGPRedirect lookup(String string) throws DBGPException
+	{
+		for (DBGPRedirect cmd: values())
+		{
+			if (cmd.value.equals(string))
+			{
+				return cmd;
+			}
+		}
+
+		throw new DBGPException(DBGPErrorCode.PARSE, string);
+	}
 }

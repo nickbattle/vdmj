@@ -21,23 +21,44 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.debug;
+package com.fujitsu.vdmj.dbgp;
 
-public class DBGPOption
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+
+import com.fujitsu.vdmj.dbgp.DBGPReader;
+import com.fujitsu.vdmj.dbgp.DBGPRedirect;
+
+abstract public class Redirector extends PrintWriter
 {
-	public final DBGPOptionType type;
-	public final String value;
+	protected DBGPRedirect type;
+	protected DBGPReader dbgp;
 
-	public DBGPOption(DBGPOptionType type, String value)
+	public Redirector(OutputStreamWriter out)
 	{
-		this.type = type;
-		this.value = value;
+		super(out, true);
+		this.type = DBGPRedirect.DISABLE;
+		this.dbgp = null;
+	}
+
+	public void redirect(DBGPRedirect t, DBGPReader d)
+	{
+		this.type = t;
+		this.dbgp = d;
 	}
 
 	@Override
-	public String toString()
+	public void println(String line)
 	{
-		return type + " " + value;
+		print(line + "\n");
+		flush();
+	}
+
+	@Override
+	public PrintWriter printf(String format, Object ... args)
+	{
+		print(String.format(format, args));
+		flush();
+		return this;
 	}
 }
-

@@ -21,54 +21,52 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.debug;
+package com.fujitsu.vdmj.dbgp;
 
-import java.util.List;
-
-import com.fujitsu.vdmj.util.Base64;
-import com.fujitsu.vdmj.util.Utils;
-
-public class DBGPCommand
+public enum DBGPContextType
 {
-	public final DBGPCommandType type;
-	public final List<DBGPOption> options;
-	public final String data;
+	LOCAL("local", 0),
+	CLASS("class", 2),
+	GLOBAL("global", 1);
 
-	public DBGPCommand(
-		DBGPCommandType type, List<DBGPOption> options, String base64)
-		throws Exception
+	public String value;
+	public int code;
+
+	DBGPContextType(String value, int code)
 	{
-		this.type = type;
-		this.options = options;
+		this.value = value;
+		this.code = code;
+	}
 
-		if (base64 != null)
+	public static DBGPContextType lookup(String string) throws DBGPException
+	{
+		for (DBGPContextType type: values())
 		{
-			this.data = new String(Base64.decode(base64), "UTF-8");
+			if (type.value.equals(string))
+			{
+				return type;
+			}
 		}
-		else
+
+		throw new DBGPException(DBGPErrorCode.PARSE, string);
+	}
+
+	public static DBGPContextType lookup(int code) throws DBGPException
+	{
+		for (DBGPContextType type: values())
 		{
-			this.data = null;
+			if (type.code == code)
+			{
+				return type;
+			}
 		}
+
+		throw new DBGPException(DBGPErrorCode.PARSE, "" + code);
 	}
 
 	@Override
 	public String toString()
 	{
-		return type +
-			(options.isEmpty() ? "" : " " + Utils.listToString(options, " ")) +
-			(data == null ? "" : " -- " + data);
-	}
-
-	public DBGPOption getOption(DBGPOptionType sought)
-	{
-		for (DBGPOption opt: options)
-		{
-			if (opt.type == sought)
-			{
-				return opt;
-			}
-		}
-
-		return null;
+		return value;
 	}
 }

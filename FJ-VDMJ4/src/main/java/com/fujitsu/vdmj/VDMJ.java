@@ -586,4 +586,19 @@ abstract public class VDMJ
 
 		return cs;
 	}
+
+	public void setCharset(String charset)
+	{
+		VDMJ.filecharset = charset;
+	}
+
+	public void setWarnings(boolean warnings)
+	{
+		VDMJ.warnings = warnings;
+	}
+
+	public void setQuiet(boolean quiet)
+	{
+		VDMJ.quiet = quiet;
+	}
 }
