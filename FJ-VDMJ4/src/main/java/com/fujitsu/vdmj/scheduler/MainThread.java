@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
+import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.TransactionValue;
 import com.fujitsu.vdmj.values.UndefinedValue;
 import com.fujitsu.vdmj.values.Value;
@@ -66,20 +67,10 @@ public class MainThread extends SchedulableThread
 	@Override
 	public void body()
 	{
-//		if (Settings.usingDBGP)
-//		{
-//			runDBGP();
-//		}
-//		else
-		{
-			runCmd();
-		}
-	}
-
-	private void runCmd()
-	{
 		try
 		{
+			DebugLink link = DebugLink.getInstance();
+			link.setCPU(CPUValue.vCPU);
 			result = expression.eval(ctxt);
 		}
 		catch (ContextException e)

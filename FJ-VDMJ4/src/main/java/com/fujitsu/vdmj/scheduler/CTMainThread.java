@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.traces.CallSequence;
 import com.fujitsu.vdmj.traces.Verdict;
+import com.fujitsu.vdmj.values.CPUValue;
 
 /**
  * A class representing the main VDM thread.
@@ -67,6 +68,9 @@ public class CTMainThread extends MainThread
 	{
 		try
 		{
+			DebugLink link = DebugLink.getInstance();
+			link.setCPU(CPUValue.vCPU);
+
 			for (INStatement statement: test)
 			{
 				if (statement instanceof INTraceVariableStatement)

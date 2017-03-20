@@ -39,6 +39,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,7 @@ import com.fujitsu.vdmj.VDMPP;
 import com.fujitsu.vdmj.VDMRT;
 import com.fujitsu.vdmj.VDMSL;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INClassList;
@@ -87,6 +89,7 @@ import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.runtime.StateContext;
+import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCMutexSyncDefinition;
@@ -99,17 +102,21 @@ import com.fujitsu.vdmj.values.NameValuePairMap;
 import com.fujitsu.vdmj.values.TransactionValue;
 import com.fujitsu.vdmj.values.Value;
 
-public class DBGPReader
+public class DBGPReader extends DebugLink
 {
-	private final String host;
-	private final int port;
-	private final String ideKey;
+	private static Map<String, DBGPReader> instances = new HashMap<String, DBGPReader>();
+	
+	private static String host;
+	private static int port;
+	private static String ideKey;
+	private static Interpreter interpreter;
 	private final String expression;
+	
+	private boolean connected = false;
 	private Socket socket;
 	private InputStream input;
 	private OutputStream output;
-	private final Interpreter interpreter;
-	private final CPUValue cpu;
+	private CPUValue cpu;
 
 	private int sessionId = 0;
 	private DBGPStatus status = null;
@@ -123,7 +130,6 @@ public class DBGPReader
 	private Breakpoint breakpoint = null;
 	private Value theAnswer = null;
 	private boolean breaksSuspended = false;
-	private boolean connected = false;
 	private RemoteControl remoteControl = null;
 
 	private static final int SOURCE_LINES = 5;
@@ -131,6 +137,9 @@ public class DBGPReader
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args)
 	{
+		// Identify this class as the debug link - See DebugLink
+		System.setProperty("vdmj.debug.link", DBGPReader.class.getName());
+		
 		String host = null;
 		int port = -1;
 		String ideKey = null;
@@ -480,6 +489,20 @@ public class DBGPReader
 			System.exit(1);
 		}
 	}
+	
+	public static synchronized DBGPReader getInstance()
+	{
+		String name = Thread.currentThread().getName();
+		DBGPReader reader = instances.get(name);
+		
+		if (reader == null)
+		{
+			reader = newThread();
+			instances.put(name, reader);
+		}
+		
+		return reader;
+	}
 
 	private static void usage(String string)
 	{
@@ -519,20 +542,27 @@ public class DBGPReader
 		String host, int port, String ideKey,
 		Interpreter interpreter, String expression, CPUValue cpu)
 	{
-		this.host = host;
-		this.port = port;
-		this.ideKey = ideKey;
+		DBGPReader.host = host;
+		DBGPReader.port = port;
+		DBGPReader.ideKey = ideKey;
+		DBGPReader.interpreter = interpreter;
+		
 		this.expression = expression;
-		this.interpreter = interpreter;
 		this.cpu = cpu;
 	}
 
-	public DBGPReader newThread(CPUValue _cpu)
+	private static DBGPReader newThread()
 	{
-		DBGPReader r = new DBGPReader(host, port, ideKey, interpreter, null, _cpu);
+		DBGPReader r = new DBGPReader(host, port, ideKey, interpreter, null, null);
 		r.command = DBGPCommandType.UNKNOWN;
 		r.transaction = "?";
 		return r;
+	}
+
+	@Override
+	public void setCPU(CPUValue _cpu)
+	{
+		this.cpu = _cpu;
 	}
 
 	private void connect() throws IOException
@@ -824,12 +854,14 @@ public class DBGPReader
 		while (line != null && process(line));
 	}
 
+	@Override
 	public void stopped(Context ctxt, LexLocation location)
 	{
-		stopped(ctxt, new Breakpoint(location));
+		breakpoint(ctxt, new Breakpoint(location));
 	}
 
-	public void stopped(Context ctxt, Breakpoint bp)
+	@Override
+	public void breakpoint(Context ctxt, Breakpoint bp)
 	{
 		if (breaksSuspended)
 		{
@@ -855,10 +887,33 @@ public class DBGPReader
 		}
 	}
 
-	public void tracing(String display)
+	@Override
+	public void tracepoint(Context ctxt, Tracepoint tp)
 	{
     	try
     	{
+    		String display = null;
+    		
+    		if (tp.condition == null)
+    		{
+    			display = "Reached trace point [" + tp.number + "]";
+    		}
+    		else
+    		{
+    			String result = null;
+    			
+    			try
+    			{
+    				result = tp.condition.eval(ctxt).toString();
+    			}
+    			catch (Exception e)
+    			{
+    				result = e.getMessage();
+    			}
+    			
+    			display = tp.trace + " = " + result + " at trace point [" + tp.number + "]";
+    		}
+
     		connect();
     		cdataResponse(display);
     	}
@@ -903,6 +958,8 @@ public class DBGPReader
 		}
 		finally
 		{
+			instances.remove(Thread.currentThread().getName());
+			
 			try
 			{
 				if (socket != null)

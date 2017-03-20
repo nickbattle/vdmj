@@ -76,13 +76,10 @@ public class AsyncThread extends SchedulableThread
 		LexLocation from = self.type.classdef.location;
 		Context ctxt = new ObjectContext(from, "async", global, self);
 
-		runCmd(ctxt);
-	}
-
-	private void runCmd(Context ctxt)
-	{
 		try
 		{
+			DebugLink link = DebugLink.getInstance();
+			link.setCPU(operation.getCPU());
     		ctxt.setThreadState(cpu);
 
 			if (breakAtStart)

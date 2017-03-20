@@ -125,18 +125,6 @@ public class PeriodicThread extends SchedulableThread
 			getObject(), operation, period, jitter, delay, 0,
 			nextTime(), sporadic).start();
 
-//		if (Settings.usingDBGP)
-//		{
-//			runDBGP(ctxt);
-//		}
-//		else
-		{
-			runCmd(ctxt);
-		}
-	}
-
-	private void runCmd(Context ctxt)
-	{
 		try
 		{
 			int overlaps = object.incPeriodicCount();
@@ -147,6 +135,8 @@ public class PeriodicThread extends SchedulableThread
 				abort(68, "Periodic threads overlapping", ctxt, operation.name.getLocation());
 			}
 
+			DebugLink link = DebugLink.getInstance();
+			link.setCPU(operation.getCPU());
     		ctxt.setThreadState(object.getCPU());
 
     		operation.localEval(

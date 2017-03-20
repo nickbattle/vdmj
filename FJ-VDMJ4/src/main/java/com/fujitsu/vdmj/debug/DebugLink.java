@@ -23,11 +23,14 @@
 
 package com.fujitsu.vdmj.debug;
 
+import java.lang.reflect.Method;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
+import com.fujitsu.vdmj.values.CPUValue;
 
 /**
  * Base class of all link objects that connect the runtime to a debugger. These
@@ -36,7 +39,7 @@ import com.fujitsu.vdmj.scheduler.SchedulableThread;
 abstract public class DebugLink
 {
 	/** The singleton instance */
-	protected static DebugLink instance = null;
+	private static DebugLink instance = null;
 	
 	/**
 	 * Get the singleton.
@@ -51,7 +54,9 @@ abstract public class DebugLink
     		{
     			try
 				{
-					instance = (DebugLink)Class.forName(link).newInstance();
+    				// Call static getInstance from class identified
+					Method getter = Class.forName(link).getDeclaredMethod("getInstance");
+					instance = (DebugLink)getter.invoke(null, (Object[])null);
 				}
 				catch (Exception e)
 				{
@@ -88,6 +93,15 @@ abstract public class DebugLink
 	 * Called by a thread which has hit a tracepoint.
 	 */
 	abstract public void tracepoint(Context ctxt, Tracepoint tp);
+	
+	/**
+	 * Called by a thread to set the CPU.
+	 * @param cpu
+	 */
+	public void setCPU(CPUValue cpu)
+	{
+		return;		// Ignored by default
+	}
 	
 	/**
 	 * Read and return a value from the thread's Exchange, responding with an ACK.

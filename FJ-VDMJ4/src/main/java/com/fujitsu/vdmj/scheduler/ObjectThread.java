@@ -73,20 +73,10 @@ public class ObjectThread extends SchedulableThread
 	@Override
 	public void body()
 	{
-//		if (Settings.usingDBGP)
-//		{
-//			runDBGP();
-//		}
-//		else
-		{
-			runCmd();
-		}
-	}
-
-	private void runCmd()
-	{
 		try
 		{
+			DebugLink link = DebugLink.getInstance();
+			link.setCPU(operation.getCPU());
 			ctxt.setThreadState(operation.getCPU());
 
 			if (breakAtStart)
