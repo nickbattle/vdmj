@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.scheduler;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.fujitsu.vdmj.dbgp.DBGPReason;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
@@ -75,10 +76,10 @@ public class AsyncThread extends SchedulableThread
 		RootContext global = ClassInterpreter.getInstance().getInitialContext();
 		LexLocation from = self.type.classdef.location;
 		Context ctxt = new ObjectContext(from, "async", global, self);
+		DebugLink link = DebugLink.getInstance();
 
 		try
 		{
-			DebugLink link = DebugLink.getInstance();
 			link.setCPU(operation.getCPU());
     		ctxt.setThreadState(cpu);
 
@@ -95,18 +96,20 @@ public class AsyncThread extends SchedulableThread
 			{
 				request.bus.reply(new MessageResponse(result, request));
 			}
+
+			link.complete(DBGPReason.OK, null);
 		}
 		catch (ValueException e)
 		{
 			suspendOthers();
 			ResourceScheduler.setException(e);
-			DebugLink.getInstance().stopped(e.ctxt, e.ctxt.location);
+			link.stopped(e.ctxt, e.ctxt.location);
 		}
 		catch (ContextException e)
 		{
 			suspendOthers();
 			ResourceScheduler.setException(e);
-			DebugLink.getInstance().stopped(e.ctxt, e.location);
+			link.stopped(e.ctxt, e.location);
 		}
 		catch (Exception e)
 		{

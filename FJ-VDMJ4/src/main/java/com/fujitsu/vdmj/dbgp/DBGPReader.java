@@ -104,12 +104,14 @@ import com.fujitsu.vdmj.values.Value;
 
 public class DBGPReader extends DebugLink
 {
-	private static Map<String, DBGPReader> instances = new HashMap<String, DBGPReader>();
+	private static Map<String, DBGPReader> threadInstances = new HashMap<String, DBGPReader>();
+	private static DBGPReader mainInstance;
 	
 	private static String host;
 	private static int port;
 	private static String ideKey;
 	private static Interpreter interpreter;
+
 	private final String expression;
 	
 	private boolean connected = false;
@@ -455,7 +457,8 @@ public class DBGPReader extends DebugLink
 					RemoteControl remote =
 						(remoteClass == null) ? null : remoteClass.newInstance();
 
-					new DBGPReader(host, port, ideKey, i, expression, null).startup(remote);
+					mainInstance = new DBGPReader(host, port, ideKey, i, expression, null);
+					mainInstance.startup(remote);
 
 					if (coverage != null)
 					{
@@ -493,12 +496,16 @@ public class DBGPReader extends DebugLink
 	public static synchronized DBGPReader getInstance()
 	{
 		String name = Thread.currentThread().getName();
-		DBGPReader reader = instances.get(name);
+		DBGPReader reader = threadInstances.get(name);
 		
-		if (reader == null)
+		if (name.equals("MainThread"))
+		{
+			reader = mainInstance;
+		}
+		else if (reader == null)
 		{
 			reader = newThread();
-			instances.put(name, reader);
+			threadInstances.put(name, reader);
 		}
 		
 		return reader;
@@ -857,6 +864,17 @@ public class DBGPReader extends DebugLink
 	@Override
 	public void stopped(Context ctxt, LexLocation location)
 	{
+		if (location == null)	// Not yet started
+		{
+			location = new LexLocation();
+		}
+		
+		if (ctxt == null)
+		{
+			ctxt = new Context(location, "Empty Context", null);
+			ctxt.setThreadState(CPUValue.vCPU);
+		}
+		
 		breakpoint(ctxt, new Breakpoint(location));
 	}
 
@@ -923,7 +941,8 @@ public class DBGPReader extends DebugLink
     	}
 	}
 
-	public void complete(DBGPReason reason, ContextException ctxt)
+	@Override
+	public void complete(DBGPReason reason, ContextException exception)
 	{
 		try
 		{
@@ -935,9 +954,9 @@ public class DBGPReader extends DebugLink
 			{
 				connect();
 
-				if (reason == DBGPReason.EXCEPTION && ctxt != null)
+				if (reason == DBGPReason.EXCEPTION && exception != null)
     			{
-    				dyingThread(ctxt);
+    				dyingThread(exception);
     			}
     			else
     			{
@@ -958,7 +977,7 @@ public class DBGPReader extends DebugLink
 		}
 		finally
 		{
-			instances.remove(Thread.currentThread().getName());
+			threadInstances.remove(Thread.currentThread().getName());
 			
 			try
 			{

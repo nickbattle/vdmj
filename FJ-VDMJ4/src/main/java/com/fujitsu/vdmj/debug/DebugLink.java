@@ -25,9 +25,11 @@ package com.fujitsu.vdmj.debug;
 
 import java.lang.reflect.Method;
 
+import com.fujitsu.vdmj.dbgp.DBGPReason;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.values.CPUValue;
@@ -38,38 +40,30 @@ import com.fujitsu.vdmj.values.CPUValue;
  */
 abstract public class DebugLink
 {
-	/** The singleton instance */
-	private static DebugLink instance = null;
-	
 	/**
-	 * Get the singleton.
+	 * Get the singleton. Delegates to static methods in the concrete classes.
 	 */
 	public static DebugLink getInstance()
 	{
-		if (instance == null)
-		{
-    		String link = System.getProperty("vdmj.debug.link");
-    		
-    		if (link != null)
-    		{
-    			try
-				{
-    				// Call static getInstance from class identified
-					Method getter = Class.forName(link).getDeclaredMethod("getInstance");
-					instance = (DebugLink)getter.invoke(null, (Object[])null);
-				}
-				catch (Exception e)
-				{
-					throw new RuntimeException("Failed to load debugger", e);
-				}
-    		}
-    		else
-    		{
-    			instance = new ConsoleDebugLink();
-    		}
-		}
+		String linkClass = System.getProperty("vdmj.debug.link");
 		
-		return instance;
+		if (linkClass != null)
+		{
+			try
+			{
+				// Call static getInstance from class identified
+				Method getter = Class.forName(linkClass).getDeclaredMethod("getInstance");
+				return (DebugLink)getter.invoke(null, (Object[])null);
+			}
+			catch (Exception e)
+			{
+				throw new RuntimeException("Failed to load debugger link class", e);
+			}
+		}
+		else
+		{
+			return ConsoleDebugLink.getInstance();
+		}
 	}
 	
 	protected DebugLink()
@@ -93,6 +87,11 @@ abstract public class DebugLink
 	 * Called by a thread which has hit a tracepoint.
 	 */
 	abstract public void tracepoint(Context ctxt, Tracepoint tp);
+	
+	/**
+	 * Called by a thread which is terminating, possibly with an exception.
+	 */
+	abstract public void complete(DBGPReason reason, ContextException exception);
 	
 	/**
 	 * Called by a thread to set the CPU.

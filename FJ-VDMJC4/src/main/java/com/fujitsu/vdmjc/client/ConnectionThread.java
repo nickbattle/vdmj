@@ -115,9 +115,10 @@ public class ConnectionThread extends Thread
 	@Override
 	public void run()
 	{
-		connected = true;
 		try
         {
+			connected = true;
+
 			if (!principal)
 			{
 				runme();		// Send run command to start new thread
@@ -183,11 +184,11 @@ public class ConnectionThread extends Thread
 
 		if (c == -1)
 		{
-			connected = false;		// End of thread
+			connected = false;		// End of thread/connection, so end listener
 			return;
 		}
 
-		if (c != 0)
+		if (length == 0 || c != 0)
 		{
 			throw new IOException("Malformed DBGp count on " + this);
 		}
@@ -196,32 +197,29 @@ public class ConnectionThread extends Thread
 		int offset = 0;
 		int remaining = length;
 		int retries = 10;
+		
 		int done = input.read(data, offset, remaining);
+		remaining -= done;
+		offset += done;
 
-		while (done < remaining && --retries > 0)
+		while (remaining > 0 && --retries > 0);
 		{
 			Utils.milliPause(100);
+			done = input.read(data, offset, remaining);
 			remaining -= done;
 			offset += done;
-			done = input.read(data, offset, remaining);
 		}
 
-		if (retries == 0)
+		if (remaining > 0 && retries == 0)
 		{
 			throw new IOException("Timeout DBGp reply on thread " + this.id +
-				", got [" + new String(data) + "]");
-		}
-
-		if (done != remaining)
-		{
-			throw new IOException("Short DBGp reply on thread " + this.id +
-				", got [" + new String(data) + "]");
+				", length=" + length + ", got [" + new String(data) + "]");
 		}
 
 		if (input.read() != 0)
 		{
 			throw new IOException("Malformed DBGp terminator on thread " + this.id +
-				", got [" + new String(data) + "]");
+				", length=" + length + ", got [" + new String(data) + "]");
 		}
 
 		process(data);

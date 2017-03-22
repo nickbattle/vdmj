@@ -28,9 +28,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.fujitsu.vdmj.dbgp.DBGPReason;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.scheduler.Signal;
@@ -44,6 +46,9 @@ public class ConsoleDebugLink extends DebugLink
 {
 	/** True if we are attached to a debugger */
 	private static boolean debugging = false;
+
+	/** Singleton instance */
+	private static DebugLink instance;
 	
 	/** The threads that are currently stopped */
 	private List<SchedulableThread> stopped = new LinkedList<SchedulableThread>();
@@ -60,7 +65,19 @@ public class ConsoleDebugLink extends DebugLink
 	/** The trace callback, if any */
 	private TraceCallback callback = null;
 	
-
+	/**
+	 * Get the singleton. 
+	 */
+	public static DebugLink getInstance()
+	{
+		if (instance == null)
+		{
+			instance = new ConsoleDebugLink();
+		}
+		
+		return instance;
+	}
+	
 	public ConsoleDebugLink()
 	{
 		// Private constructor for singleton.
@@ -272,7 +289,7 @@ public class ConsoleDebugLink extends DebugLink
 		
 		if (ctxt == null)		// Stopped before it started!
 		{
-			ctxt = new Context(location, "Empty Context", ctxt);
+			ctxt = new Context(location, "Empty Context", null);
 			ctxt.setThreadState(CPUValue.vCPU);
 		}
 		
@@ -330,5 +347,11 @@ public class ConsoleDebugLink extends DebugLink
 		{
 			callback.tracepoint(ctxt, tp);
 		}
+	}
+
+	@Override
+	public void complete(DBGPReason reason, ContextException exception)
+	{
+		// Not used by console debugger
 	}
 }
