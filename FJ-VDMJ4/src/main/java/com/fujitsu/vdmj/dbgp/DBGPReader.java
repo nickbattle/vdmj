@@ -2632,13 +2632,20 @@ public class DBGPReader extends DebugLink
 			throw new DBGPException(DBGPErrorCode.NOT_AVAILABLE, c.toString());
 		}
 
-		OutputStream out = new ByteArrayOutputStream();
-		PrintWriter pw = new PrintWriter(out);
-		pw.println("Stopped [" + Thread.currentThread().getName() + "] " + breakpoint.location);
-		pw.println(interpreter.getSourceLine(
-			breakpoint.location.file, breakpoint.location.startLine, ":  "));
-		pw.close();
-		cdataResponse(out.toString());
+		if (breakpoint.location.startLine == 0)
+		{
+			cdataResponse("Stopped [" + Thread.currentThread().getName() + "] Thread has not started");
+		}
+		else
+		{
+    		OutputStream out = new ByteArrayOutputStream();
+    		PrintWriter pw = new PrintWriter(out);
+    		pw.println("Stopped [" + Thread.currentThread().getName() + "] " + breakpoint.location);
+    		pw.println(interpreter.getSourceLine(
+    			breakpoint.location.file, breakpoint.location.startLine, ":  "));
+    		pw.close();
+    		cdataResponse(out.toString());
+		}
 	}
 
 	private void processCurrentSource(DBGPCommand c) throws DBGPException, IOException
@@ -2652,20 +2659,27 @@ public class DBGPReader extends DebugLink
 		File file = breakpoint.location.file;
 		int current = breakpoint.location.startLine;
 
-		int start = current - SOURCE_LINES;
-		if (start < 1) start = 1;
-		int end = start + SOURCE_LINES*2 + 1;
-
-		StringBuilder sb = new StringBuilder();
-
-		for (int src = start; src < end; src++)
+		if (current == 0)
 		{
-			sb.append(interpreter.getSourceLine(
-				file, src, (src == current) ? ":>>" : ":  "));
-			sb.append("\n");
+			cdataResponse("Thread has not started");
 		}
-
-		cdataResponse(sb.toString());
+		else
+		{
+    		int start = current - SOURCE_LINES;
+    		if (start < 1) start = 1;
+    		int end = start + SOURCE_LINES*2 + 1;
+    
+    		StringBuilder sb = new StringBuilder();
+    
+    		for (int src = start; src < end; src++)
+    		{
+    			sb.append(interpreter.getSourceLine(
+    				file, src, (src == current) ? ":>>" : ":  "));
+    			sb.append("\n");
+    		}
+    
+    		cdataResponse(sb.toString());
+		}
 	}
 
 	private void processPOG(DBGPCommand c) throws Exception

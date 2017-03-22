@@ -520,12 +520,12 @@ public class ConnectionThread extends Thread
 
 	public void step_over() throws IOException
 	{
-		write("step_into -i " + (++xid));
+		write("step_over -i " + (++xid));
 	}
 
 	public void step_out() throws IOException
 	{
-		write("step_into -i " + (++xid));
+		write("step_out -i " + (++xid));
 	}
 
 	public void expr(String expression) throws IOException
