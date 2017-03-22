@@ -28,13 +28,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.fujitsu.vdmj.dbgp.DBGPReason;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.scheduler.Signal;
 import com.fujitsu.vdmj.values.CPUValue;
+import com.fujitsu.vdmj.values.OperationValue;
 
 /**
  * Link class to allow multiple stopped threads to link to a debugging interface.
@@ -43,6 +46,9 @@ public class ConsoleDebugLink extends DebugLink
 {
 	/** True if we are attached to a debugger */
 	private static boolean debugging = false;
+
+	/** Singleton instance */
+	private static DebugLink instance;
 	
 	/** The threads that are currently stopped */
 	private List<SchedulableThread> stopped = new LinkedList<SchedulableThread>();
@@ -53,10 +59,25 @@ public class ConsoleDebugLink extends DebugLink
 	/** The threads locations, if known */
 	private Map<SchedulableThread, LexLocation> locations = new HashMap<SchedulableThread, LexLocation>();
 	
+	/** The threads waited guard operations, if any */
+	private Map<SchedulableThread, OperationValue> guardops = new HashMap<SchedulableThread, OperationValue>();
+	
 	/** The trace callback, if any */
 	private TraceCallback callback = null;
 	
-
+	/**
+	 * Get the singleton. 
+	 */
+	public static DebugLink getInstance()
+	{
+		if (instance == null)
+		{
+			instance = new ConsoleDebugLink();
+		}
+		
+		return instance;
+	}
+	
 	public ConsoleDebugLink()
 	{
 		// Private constructor for singleton.
@@ -70,7 +91,7 @@ public class ConsoleDebugLink extends DebugLink
 		debugging = true;
 		
 		while (stopped.size() < SchedulableThread.getThreadCount() ||
-			SchedulableThread.getThreadCount() == 0)
+			   SchedulableThread.getThreadCount() == 0)
 		{
 			try
 			{
@@ -111,6 +132,14 @@ public class ConsoleDebugLink extends DebugLink
 	}
 	
 	/**
+	 * Return the guarded operation for a given thread, if any.
+	 */
+	public OperationValue getGuardOp(SchedulableThread thread)
+	{
+		return guardops.get(thread);
+	}
+	
+	/**
 	 * Return the current breakpoint - should only ever be one or none.
 	 */
 	public Breakpoint getBreakpoint()
@@ -124,8 +153,7 @@ public class ConsoleDebugLink extends DebugLink
 				return breakpoints.values().iterator().next();
 				
 			default:
-				System.err.println("More than one breakpoint??");
-				return null;
+				throw new RuntimeException("More than one breakpoint??");
 		}
 	}
 	
@@ -149,7 +177,7 @@ public class ConsoleDebugLink extends DebugLink
 	/**
 	 * Send a command to one particular thread.
 	 */
-	public String sendCommand(SchedulableThread thread, String cmd)
+	public DebugCommand sendCommand(SchedulableThread thread, DebugCommand cmd)
 	{
 		try
 		{
@@ -158,7 +186,7 @@ public class ConsoleDebugLink extends DebugLink
 		}
 		catch (InterruptedException e)
 		{
-			return "quit";
+			return DebugCommand.QUIT;
 		}
 	}
 
@@ -171,7 +199,7 @@ public class ConsoleDebugLink extends DebugLink
 		{
 			try
 			{
-				writeCommand(thread, "resume");
+				writeCommand(thread, DebugCommand.RESUME);
 			}
 			catch (InterruptedException e)
 			{
@@ -193,7 +221,7 @@ public class ConsoleDebugLink extends DebugLink
 		{
 			try
 			{
-				writeCommand(thread, "terminate");
+				writeCommand(thread, DebugCommand.TERMINATE);
 			}
 			catch (InterruptedException e)
 			{
@@ -204,6 +232,7 @@ public class ConsoleDebugLink extends DebugLink
 		stopped.clear();
 		breakpoints.clear();
 		locations.clear();
+		guardops.clear();
 		callback = null;
 	}
 
@@ -240,6 +269,14 @@ public class ConsoleDebugLink extends DebugLink
 			locations.put(thread, location);
 		}
 		
+		if (ctxt != null)
+		{
+			synchronized (guardops)
+			{
+				guardops.put(thread, ctxt.guardOp);
+			}
+		}
+		
 		synchronized(this)
 		{
 			this.notify();		// See waitForStop()
@@ -252,34 +289,33 @@ public class ConsoleDebugLink extends DebugLink
 		
 		if (ctxt == null)		// Stopped before it started!
 		{
-			ctxt = new Context(location, "Empty Context", ctxt);
+			ctxt = new Context(location, "Empty Context", null);
 			ctxt.setThreadState(CPUValue.vCPU);
 		}
 		
-		DebugCommand dc = new DebugCommand(location, ctxt);
+		DebugExecutor dc = new DebugExecutor(location, ctxt);
 		
 		while (true)
 		{
 			try
 			{
-				String request = readCommand(thread);
+				DebugCommand request = readCommand(thread);
 				
-				if (request.equals("resume"))
+				switch (request.getType())
 				{
-					synchronized(this)	// So everyone resumes when "resumeThreads" method ends
-					{
+					case RESUME:
+						synchronized (this) // So everyone resumes when "resumeThreads" method ends
+						{
+							return;
+						}
+
+					case TERMINATE:
+						thread.setSignal(Signal.TERMINATE);
 						return;
-					}
-				}
-				else if (request.equals("terminate"))
-				{
-					thread.setSignal(Signal.TERMINATE);
-					return;
-				}
-				else
-				{
-					String response = dc.run(request);
-					writeCommand(thread, response);
+
+					default:
+						DebugCommand response = dc.run(request);
+						writeCommand(thread, response);
 				}
 			}
 			catch (InterruptedException e)
@@ -311,5 +347,11 @@ public class ConsoleDebugLink extends DebugLink
 		{
 			callback.tracepoint(ctxt, tp);
 		}
+	}
+
+	@Override
+	public void complete(DBGPReason reason, ContextException exception)
+	{
+		// Not used by console debugger
 	}
 }

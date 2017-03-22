@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.scheduler;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.fujitsu.vdmj.dbgp.DBGPReason;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
@@ -73,20 +74,11 @@ public class ObjectThread extends SchedulableThread
 	@Override
 	public void body()
 	{
-//		if (Settings.usingDBGP)
-//		{
-//			runDBGP();
-//		}
-//		else
-		{
-			runCmd();
-		}
-	}
+		DebugLink link = DebugLink.getInstance();
 
-	private void runCmd()
-	{
 		try
 		{
+			link.setCPU(operation.getCPU());
 			ctxt.setThreadState(operation.getCPU());
 
 			if (breakAtStart)
@@ -96,18 +88,19 @@ public class ObjectThread extends SchedulableThread
 			}
 
 			operation.eval(ctxt.location, new ValueList(), ctxt);
+			link.complete(DBGPReason.OK, null);
 		}
 		catch (ValueException e)
 		{
 			suspendOthers();
 			ResourceScheduler.setException(e);
-			DebugLink.getInstance().stopped(e.ctxt, e.ctxt.location);
+			link.stopped(e.ctxt, e.ctxt.location);
 		}
 		catch (ContextException e)
 		{
 			suspendOthers();
 			ResourceScheduler.setException(e);
-			DebugLink.getInstance().stopped(e.ctxt, e.location);
+			link.stopped(e.ctxt, e.location);
 		}
 		catch (Exception e)
 		{
@@ -118,6 +111,11 @@ public class ObjectThread extends SchedulableThread
 			
 			ResourceScheduler.setException(e);
 			SchedulableThread.signalAll(Signal.SUSPEND);
+		}
+		catch (ThreadDeath e)
+		{
+			link.complete(DBGPReason.ABORTED, null);
+			throw e;
 		}
 		finally
 		{

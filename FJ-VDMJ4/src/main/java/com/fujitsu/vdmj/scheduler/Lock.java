@@ -47,7 +47,7 @@ public class Lock implements Serializable
 	{
 		SchedulableThread th = (SchedulableThread)Thread.currentThread();
 
-		if (lockedBy != null && lockedBy != th)
+		while (lockedBy != null && lockedBy != th)
 		{
 			synchronized (waiters)
 			{
@@ -79,7 +79,7 @@ public class Lock implements Serializable
 			throw new InternalException(65, "Illegal Lock state");
 		}
 
-		lockedBy = null;
+		lockedBy = null;	// Unlocked, so signal locking waiters
 
 		synchronized (waiters)
 		{
@@ -87,7 +87,7 @@ public class Lock implements Serializable
 			{
 				if (w.getRunState() == RunState.LOCKING)
 				{
-					th.setState(RunState.RUNNABLE);
+					w.setState(RunState.RUNNABLE);
 				}
 			}
 		}
@@ -123,6 +123,13 @@ public class Lock implements Serializable
 
 	public void unlock()
 	{
+		SchedulableThread th = (SchedulableThread)Thread.currentThread();
+
+		if (lockedBy != null && lockedBy != th)
+		{
+			throw new InternalException(65, "Illegal Lock state");
+		}
+
 		lockedBy = null;
 		signalAll();
 	}

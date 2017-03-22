@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Random;
 
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.dbgp.DBGPReason;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
@@ -125,18 +126,9 @@ public class PeriodicThread extends SchedulableThread
 			getObject(), operation, period, jitter, delay, 0,
 			nextTime(), sporadic).start();
 
-//		if (Settings.usingDBGP)
-//		{
-//			runDBGP(ctxt);
-//		}
-//		else
-		{
-			runCmd(ctxt);
-		}
-	}
+		DebugLink link = DebugLink.getInstance();
+		link.setCPU(operation.getCPU());
 
-	private void runCmd(Context ctxt)
-	{
 		try
 		{
 			int overlaps = object.incPeriodicCount();
@@ -153,18 +145,20 @@ public class PeriodicThread extends SchedulableThread
     			operation.name.getLocation(), new ValueList(), ctxt, true);
 
     		object.decPeriodicCount();
+    		
+    		link.complete(DBGPReason.OK, null);
 		}
 		catch (ValueException e)
 		{
 			suspendOthers();
 			ResourceScheduler.setException(e);
-			DebugLink.getInstance().stopped(e.ctxt, e.ctxt.location);
+			link.stopped(e.ctxt, e.ctxt.location);
 		}
 		catch (ContextException e)
 		{
 			suspendOthers();
 			ResourceScheduler.setException(e);
-			DebugLink.getInstance().stopped(e.ctxt, e.location);
+			link.stopped(e.ctxt, e.location);
 		}
 		catch (Exception e)
 		{
@@ -175,6 +169,11 @@ public class PeriodicThread extends SchedulableThread
 			
 			ResourceScheduler.setException(e);
 			SchedulableThread.signalAll(Signal.SUSPEND);
+		}
+		catch (ThreadDeath e)
+		{
+			link.complete(DBGPReason.ABORTED, null);
+			throw e;
 		}
 		finally
 		{

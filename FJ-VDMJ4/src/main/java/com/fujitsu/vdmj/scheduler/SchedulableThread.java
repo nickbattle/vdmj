@@ -31,6 +31,7 @@ import java.util.concurrent.Exchanger;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -42,7 +43,7 @@ import com.fujitsu.vdmj.runtime.ExceptionHandler;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.values.ObjectValue;
 
-public abstract class SchedulableThread extends Thread implements Serializable
+public abstract class SchedulableThread extends Thread implements Serializable, Comparable<SchedulableThread>
 {
     private static final long serialVersionUID = 1L;
 
@@ -65,7 +66,7 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	private boolean inOuterTimeStep;
 	protected boolean stopCalled;
 	
-	public Exchanger<String> debugExch = new Exchanger<String>();
+	public Exchanger<DebugCommand> debugExch = new Exchanger<DebugCommand>();
 
 	public SchedulableThread(
 		Resource resource, ObjectValue object, long priority,
@@ -194,6 +195,11 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	}
 
 	public synchronized RunState getRunState()
+	{
+		return state;
+	}
+
+	public RunState getUnsafeRunState()
 	{
 		return state;
 	}
@@ -499,5 +505,11 @@ public abstract class SchedulableThread extends Thread implements Serializable
 	public void abort(ValueException ve, LexLocation location)
 	{
 		ExceptionHandler.handle(new ContextException(ve, location));
+	}
+	
+	@Override
+	public int compareTo(SchedulableThread other)
+	{
+		return getName().compareTo(other.getName());
 	}
 }

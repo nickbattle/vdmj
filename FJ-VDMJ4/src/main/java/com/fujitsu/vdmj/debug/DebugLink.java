@@ -23,11 +23,16 @@
 
 package com.fujitsu.vdmj.debug;
 
+import java.lang.reflect.Method;
+
+import com.fujitsu.vdmj.dbgp.DBGPReason;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
+import com.fujitsu.vdmj.values.CPUValue;
 
 /**
  * Base class of all link objects that connect the runtime to a debugger. These
@@ -35,39 +40,30 @@ import com.fujitsu.vdmj.scheduler.SchedulableThread;
  */
 abstract public class DebugLink
 {
-	/** An ACK string */
-	private final static String ACK = "ACK";
-	
-	/** The singleton instance */
-	protected static DebugLink instance = null;
-	
 	/**
-	 * Get the singleton.
+	 * Get the singleton. Delegates to static methods in the concrete classes.
 	 */
 	public static DebugLink getInstance()
 	{
-		if (instance == null)
-		{
-    		String link = System.getProperty("vdmj.debug.link");
-    		
-    		if (link != null)
-    		{
-    			try
-				{
-					instance = (DebugLink)Class.forName(link).newInstance();
-				}
-				catch (Exception e)
-				{
-					throw new RuntimeException("Failed to load debugger", e);
-				}
-    		}
-    		else
-    		{
-    			instance = new ConsoleDebugLink();
-    		}
-		}
+		String linkClass = System.getProperty("vdmj.debug.link");
 		
-		return instance;
+		if (linkClass != null)
+		{
+			try
+			{
+				// Call static getInstance from class identified
+				Method getter = Class.forName(linkClass).getDeclaredMethod("getInstance");
+				return (DebugLink)getter.invoke(null, (Object[])null);
+			}
+			catch (Exception e)
+			{
+				throw new RuntimeException("Failed to load debugger link class", e);
+			}
+		}
+		else
+		{
+			return ConsoleDebugLink.getInstance();
+		}
 	}
 	
 	protected DebugLink()
@@ -93,21 +89,35 @@ abstract public class DebugLink
 	abstract public void tracepoint(Context ctxt, Tracepoint tp);
 	
 	/**
+	 * Called by a thread which is terminating, possibly with an exception.
+	 */
+	abstract public void complete(DBGPReason reason, ContextException exception);
+	
+	/**
+	 * Called by a thread to set the CPU.
+	 * @param cpu
+	 */
+	public void setCPU(CPUValue cpu)
+	{
+		return;		// Ignored by default
+	}
+	
+	/**
 	 * Read and return a value from the thread's Exchange, responding with an ACK.
 	 */
-	protected String readCommand(SchedulableThread thread) throws InterruptedException
+	protected DebugCommand readCommand(SchedulableThread thread) throws InterruptedException
 	{
-		return thread.debugExch.exchange(ACK);		
+		return thread.debugExch.exchange(DebugCommand.ACK);		
 	}
 	
 	/**
 	 * Write a value to the thread's Exchange, and check for an ACK.
 	 */
-	protected void writeCommand(SchedulableThread thread, String response) throws InterruptedException
+	protected void writeCommand(SchedulableThread thread, DebugCommand response) throws InterruptedException
 	{
-		if (!thread.debugExch.exchange(response).equals(ACK))
+		if (!thread.debugExch.exchange(response).equals(DebugCommand.ACK))
 		{
-			System.err.println("Unexpected ACK from debugger");
+			throw new RuntimeException("Unexpected ACK from debugger");
 		}
 	}
 }
