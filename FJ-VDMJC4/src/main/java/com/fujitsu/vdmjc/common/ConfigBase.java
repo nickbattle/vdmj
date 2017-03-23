@@ -52,9 +52,14 @@ public class ConfigBase
 
 			for (Field f : target.getFields())
 			{
-				String name = f.getName();
+				String pname = f.getName().replace('_', '.');
 				Class<?> type = f.getType();
-				String value = props.getProperty(name.replace('_', '.'));
+				String value = System.getProperty(pname);	// Overrides
+				
+				if (value == null)
+				{
+					value = props.getProperty(pname);
+				}
 
 				if (value != null)
 				{

@@ -131,7 +131,7 @@ public class DBGPReader extends DebugLink
 	private Context breakContext = null;
 	private Breakpoint breakpoint = null;
 	private Value theAnswer = null;
-	private boolean breaksSuspended = false;
+	private static boolean breaksSuspended = false;
 	private RemoteControl remoteControl = null;
 
 	private static final int SOURCE_LINES = 5;
@@ -498,7 +498,7 @@ public class DBGPReader extends DebugLink
 		String name = Thread.currentThread().getName();
 		DBGPReader reader = threadInstances.get(name);
 		
-		if (name.equals("MainThread"))
+		if (name.equals("MainThread") || name.equals("CTMainThread"))
 		{
 			reader = mainInstance;
 		}
@@ -883,7 +883,7 @@ public class DBGPReader extends DebugLink
 	{
 		if (breaksSuspended)
 		{
-			return;		// We're inside an eval command, so don't stop
+			return;		// We're inside an eval command or runtrace, so don't stop
 		}
 
 		try
@@ -2556,14 +2556,20 @@ public class DBGPReader extends DebugLink
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			PrintWriter pw = new PrintWriter(out);
 			Interpreter.setTraceOutput(pw);
+			breaksSuspended = !debug;
 			interpreter.runtrace(parts[0], startTest, endTest, debug);
 			pw.close();
 
 			cdataResponse(out.toString());
+			statusResponse(DBGPStatus.STOPPED, DBGPReason.OK);
 		}
 		catch (Exception e)
 		{
 			throw new DBGPException(DBGPErrorCode.INTERNAL_ERROR, e.getMessage());
+		}
+		finally
+		{
+			breaksSuspended = false;
 		}
 	}
 

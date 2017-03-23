@@ -59,17 +59,17 @@ public class ConfigBase
     			throw new Exception(propertyFile + ": " + ex.getMessage());
     		}
 
-    		String name = "?";
+    		String pname = "?";
     		String value = "?";
 
 			try
 			{
 				for (Field f : target.getFields())
 				{
-					name = f.getName();
+					pname = f.getName().replace('_', '.');
 					Class<?> type = f.getType();
-					value = props.getProperty(name.replace('_', '.'));
-
+					value = getProperty(pname, null);
+					
 					if (value != null)
 					{
 						if (type == Integer.TYPE)
@@ -86,7 +86,7 @@ public class ConfigBase
 						}
 						else
 						{
-							throw new Exception("Cannot process " + name +
+							throw new Exception("Cannot process " + pname +
 								", Java type " + type + " unsupported");
 						}
 					}
@@ -95,7 +95,7 @@ public class ConfigBase
 			catch (Exception ex)
 			{
 				throw new Exception(propertyFile +
-					": (" +	name + " = " + value + ") " + ex.getMessage());
+					": (" +	pname + " = " + value + ") " + ex.getMessage());
 			}
 		}
 		finally
@@ -116,6 +116,13 @@ public class ConfigBase
 
 	public static String getProperty(String key, String def)
 	{
-		return props.getProperty(key, def);
+		String value = System.getProperty(key, def);	// Overrides
+		
+		if (value == null)
+		{
+			value = props.getProperty(key, def);
+		}
+
+		return value;
 	}
 }
