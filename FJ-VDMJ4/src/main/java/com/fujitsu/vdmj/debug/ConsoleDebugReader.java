@@ -149,9 +149,8 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 		}
 		else
 		{
-    		int i = 1;
     		int maxName = 0;
-    		int maxNum = (int)Math.floor(Math.log10(threads.size())) + 1;
+    		long maxNum = 0;
     		
     		for (SchedulableThread th: threads)
     		{
@@ -159,7 +158,14 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
     			{
     				maxName = th.getName().length();
     			}
+    			
+    			if (th.getId() > maxNum)
+    			{
+    				maxNum = th.getId();
+    			}
     		}
+    		
+    		int width = (int)Math.floor(Math.log10(maxNum)) + 1;
     		
     		for (SchedulableThread th: threads)
     		{
@@ -181,8 +187,8 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
     				info = loc.toString();
     			}
     			
-    			String format = String.format("%%%dd: %%-%ds  %%s\n", maxNum, maxName);
-    			Console.out.printf(format, i++, th.getName(), info);
+    			String format = String.format("%%%dd: %%-%ds  %%s\n", width, maxName);
+    			Console.out.printf(format, th.getId(), th.getName(), info);
     		}
     		
     		Console.out.println();
@@ -192,16 +198,17 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 	private void doThread(DebugCommand cmd)
 	{
 		Integer n = (Integer)cmd.getPayload();
-		List<SchedulableThread> threads = link.getThreads();
 
-		if (n < 1 || n > threads.size())
+		for (SchedulableThread th: link.getThreads())
 		{
-			Console.out.printf("Thread must be 1 to %d (see 'threads')\n", threads.size());
+			if (th.getId() == n)
+			{
+				debuggedThread = th;
+				return;
+			}
 		}
-		else
-		{
-			debuggedThread = threads.get(n - 1);
-		}
+
+		Console.out.println("No such thread Id - try 'threads'");
 	}
 	
 	@Override
