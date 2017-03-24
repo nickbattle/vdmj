@@ -64,6 +64,9 @@ public class ConsoleDebugLink extends DebugLink
 	
 	/** The trace callback, if any */
 	private TraceCallback callback = null;
+
+	/** True, if we're suspending breakpoints in an evaluation */
+	private boolean suspendBreaks = false;
 	
 	/**
 	 * Get the singleton. 
@@ -252,7 +255,7 @@ public class ConsoleDebugLink extends DebugLink
 	@Override
 	public void stopped(Context ctxt, LexLocation location)
 	{
-		if (!debugging)		// Not attached to a debugger
+		if (!debugging || suspendBreaks)	// Not attached to a debugger or local eval
 		{
 			return;
 		}
@@ -300,6 +303,7 @@ public class ConsoleDebugLink extends DebugLink
 			try
 			{
 				DebugCommand request = readCommand(thread);
+				DebugCommand response = null;
 				
 				switch (request.getType())
 				{
@@ -312,9 +316,16 @@ public class ConsoleDebugLink extends DebugLink
 					case TERMINATE:
 						thread.setSignal(Signal.TERMINATE);
 						return;
+						
+					case PRINT:
+						suspendBreaks = true;
+						response = dc.run(request);
+						writeCommand(thread, response);
+						suspendBreaks = false;
+						break;
 
 					default:
-						DebugCommand response = dc.run(request);
+						response = dc.run(request);
 						writeCommand(thread, response);
 				}
 			}
