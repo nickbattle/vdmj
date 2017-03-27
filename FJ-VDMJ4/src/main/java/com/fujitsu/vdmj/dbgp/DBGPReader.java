@@ -381,7 +381,7 @@ public class DBGPReader extends DebugLink
 		}
 
 		if (host == null || port == -1 || controller == null ||
-			ideKey == null || expression == null || Settings.dialect == null ||
+			ideKey == null || (expression == null && remoteName == null) || Settings.dialect == null ||
 			files.isEmpty())
 		{
 			usage("Missing mandatory arguments");
@@ -1331,7 +1331,7 @@ public class DBGPReader extends DebugLink
 			}
 		}
 
-		if (status == DBGPStatus.STARTING && expression == null)
+		if (status == DBGPStatus.STARTING && expression == null && remoteControl == null)
 		{
 			status = DBGPStatus.RUNNING;
 			statusReason = DBGPReason.OK;
