@@ -265,6 +265,28 @@ public class DBGPReader extends DebugLink
     				usage("-r option requires a VDM release");
     			}
     		}
+			else if (arg.equals("-pre"))
+			{
+				Settings.prechecks = false;
+			}
+			else if (arg.equals("-post"))
+			{
+				Settings.postchecks = false;
+			}
+			else if (arg.equals("-inv"))
+			{
+				Settings.invchecks = false;
+			}
+			else if (arg.equals("-dtc"))
+			{
+				// NB. Turn off both when no DTC
+				Settings.invchecks = false;
+				Settings.dynamictypechecks = false;
+			}
+			else if (arg.equals("-measures"))
+			{
+				Settings.measureChecks = false;
+			}
     		else if (arg.equals("-log"))
     		{
     			if (i.hasNext())
@@ -518,6 +540,7 @@ public class DBGPReader extends DebugLink
 			"Usage: -h <host> -p <port> -k <ide key> <-vdmpp|-vdmsl|-vdmrt>" +
 			" -e <expression> | -e64 <base64 expression>" +
 			" [-w] [-q] [-log <logfile URL>] [-c <charset>] [-r <release>]" +
+			" [-pre] [-post] [-inv] [-dtc] [-measures]" +
 			" [-coverage <dir URL>] [-default64 <base64 name>]" +
 			" [-remote <class>] {<filename URLs>}");
 

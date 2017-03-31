@@ -309,6 +309,7 @@ public class ProcessCommandLine extends CommandLine
 	            else if (line.equals("stop"))
 				{
 	            	carryOn = processStop();
+	            	process.die();
 				}
 	            else
 	            {
@@ -910,10 +911,15 @@ public class ProcessCommandLine extends CommandLine
    		}
    		else
    		{
-   			currentThread.allstop();
+   			ConnectionThread[] all = process.getConnections();
+
+   			for (ConnectionThread thread: all)
+   			{
+   				thread.stopme();
+   			}
    		}
 
-		return true;
+		return false;
 	}
 
 	private boolean processBreak(String line)

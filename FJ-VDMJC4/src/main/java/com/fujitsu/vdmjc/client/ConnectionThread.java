@@ -112,6 +112,11 @@ public class ConnectionThread extends Thread
 		focus = f;
 	}
 
+	public boolean isPrincipal()
+	{
+		return principal;
+	}
+
 	@Override
 	public void run()
 	{
@@ -498,7 +503,7 @@ public class ConnectionThread extends Thread
 		write("detach -i " + (++xid));
 	}
 
-	public void allstop() throws IOException
+	public void stopme() throws IOException
 	{
 		write("stop -i " + (++xid));
 	}
