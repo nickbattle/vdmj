@@ -366,6 +366,28 @@ public class DBGPReader extends DebugLink
     				usage("-remote option requires a Java classname");
     			}
     		}
+    		else if (arg.equals("-consoleName"))	// Overture compatability
+    		{
+    			if (i.hasNext())
+    			{
+       				i.next();	// Ignored
+    			}
+    			else
+    			{
+    				usage("-consoleName option requires a name");
+    			}
+    		}
+    		else if (arg.startsWith("-baseDir"))	// Overture compatability
+    		{
+    			if (i.hasNext())
+    			{
+       				i.next();	// Ignored
+    			}
+    			else
+    			{
+    				usage("-baseDir option requires a directory name");
+    			}
+    		}
     		else if (arg.startsWith("-"))
     		{
     			usage("Unknown option " + arg);
