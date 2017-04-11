@@ -69,6 +69,7 @@ import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -98,9 +99,15 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.Base64;
 import com.fujitsu.vdmj.values.CPUValue;
+import com.fujitsu.vdmj.values.CharacterValue;
+import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.NameValuePairMap;
+import com.fujitsu.vdmj.values.SeqValue;
+import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.TransactionValue;
 import com.fujitsu.vdmj.values.Value;
+import com.fujitsu.vdmj.values.ValueList;
+import com.fujitsu.vdmj.values.ValueMap;
 
 public class DBGPReader extends DebugLink
 {
@@ -366,6 +373,39 @@ public class DBGPReader extends DebugLink
     				usage("-remote option requires a Java classname");
     			}
     		}
+    		else if (arg.equals("-consoleName"))	// Overture compatibility
+    		{
+    			if (i.hasNext())
+    			{
+       				i.next();	// Ignored
+    			}
+    			else
+    			{
+    				usage("-consoleName option requires a name");
+    			}
+    		}
+    		else if (arg.startsWith("-baseDir"))	// Overture compatibility
+    		{
+    			if (i.hasNext())
+    			{
+       				i.next();	// Ignored
+    			}
+    			else
+    			{
+    				usage("-baseDir option requires a directory name");
+    			}
+    		}
+    		else if (arg.equals("-timeinv"))		// Overture compatibility
+			{
+				if (i.hasNext())
+				{
+       				i.next();	// Ignored
+				}
+				else
+				{
+					usage("-timeinv option requires a filename");
+				}
+			}
     		else if (arg.startsWith("-"))
     		{
     			usage("Unknown option " + arg);
@@ -464,8 +504,7 @@ public class DBGPReader extends DebugLink
 				{
 					if (logfile != null)
 					{
-		    			PrintWriter p = new PrintWriter(
-		    				new FileOutputStream(logfile, false));
+		    			PrintWriter p = new PrintWriter(new FileOutputStream(logfile, false));
 		    			RTLogger.setLogfile(p);
 					}
 
@@ -833,30 +872,138 @@ public class DBGPReader extends DebugLink
 	{
 		return propertyResponse(
 			name.getName(), name.toString(),
-			name.getModule(), value.toString());
+			name.getModule(), value);
 	}
 
 	private StringBuilder propertyResponse(
-		String name, String fullname, String clazz, String value)
+		String name, String fullname, String clazz, Value value)
 		throws UnsupportedEncodingException
     {
     	StringBuilder sb = new StringBuilder();
+    	
+    	int children = childCount(value);
 
     	sb.append("<property");
     	sb.append(" name=\"" + quote(name) + "\"");
     	sb.append(" fullname=\"" + quote(fullname) + "\"");
-    	sb.append(" type=\"string\"");
+    	sb.append(" type=\"" + value.kind() + "\"");
     	sb.append(" classname=\"" + clazz + "\"");
     	sb.append(" constant=\"0\"");
-    	sb.append(" children=\"0\"");
-    	sb.append(" size=\"" + value.length() + "\"");
-    	sb.append(" encoding=\"base64\"");
-    	sb.append("><![CDATA[");
-    	sb.append(Base64.encode(value.getBytes("UTF-8")));
-    	sb.append("]]></property>");
+    	sb.append(" children=\"" + children + "\"");
+    	sb.append(" size=\"" + (children > 0 ? "0" : value.toString().length()) + "\"");
+    	sb.append(" encoding=\"base64\">");
+    	
+    	if (children == 0)
+    	{
+        	sb.append("<![CDATA[");
+        	sb.append(Base64.encode(value.toString().getBytes("UTF-8")));
+        	sb.append("]]>");
+    	}
+    	else
+    	{
+    		int index = 0;
+    		
+    		for (Value child: getChildren(value))
+    		{
+    			sb.append(propertyResponse(name + "[" + index++ + "]", "", clazz, child));
+    		}
+    	}
+    	
+    	sb.append("</property>");
 
     	return sb;
     }
+
+	private ValueList getChildren(Value value)
+	{
+		ValueList results = new ValueList();
+		value = value.deref();
+		
+		if (value instanceof SetValue)
+		{
+			results.addAll(((SetValue)value).values);
+		}
+		else if (value instanceof SeqValue)
+		{
+			SeqValue seq = (SeqValue)value;
+			boolean string = !seq.values.isEmpty();		// So it's [] and not ""
+			
+			for (Value e: seq.values)
+			{
+				if (!(e instanceof CharacterValue))
+				{
+					string = false;
+					break;
+				}
+			}
+			
+			if (string)
+			{
+				results.add(new SeqValue(value.toString()));
+			}
+			else
+			{
+				results.addAll(seq.values);
+			}
+		}
+		else if (value instanceof MapValue)
+		{
+			ValueMap map = ((MapValue)value).values;
+			
+			for (Value dom: map.keySet())
+			{
+				Value rng = map.get(dom);
+				results.add(new SeqValue("{" + dom + " |-> " + rng + "}"));
+			}
+		}
+		else
+		{
+			results.add(value);
+		}
+		
+		return results;
+	}
+
+	private int childCount(Value value)
+	{
+		value = value.deref();
+		
+		if (value instanceof SetValue)
+		{
+			return ((SetValue)value).values.size();
+		}
+		else if (value instanceof SeqValue)
+		{
+			SeqValue seq = (SeqValue)value;
+			boolean string = !seq.values.isEmpty();		// So it's [] and not ""
+			
+			for (Value e: seq.values)
+			{
+				if (!(e instanceof CharacterValue))
+				{
+					string = false;
+					break;
+				}
+			}
+			
+			if (string)
+			{
+				return 0;
+			}
+			else
+			{
+				return ((SeqValue)value).values.size();
+			}
+		}
+		else if (value instanceof MapValue)
+		{
+			return ((MapValue)value).values.size();
+		}
+		else
+		{
+			return 0;
+		}
+	}
 
 	private void cdataResponse(String msg) throws IOException
 	{
@@ -1053,6 +1200,10 @@ public class DBGPReader extends DebugLink
     			case EXPR:
     				carryOn = processExpr(c);
     				break;
+
+				case EXEC:
+					carryOn = processExec(c);
+					break;
 
     			case STEP_INTO:
     				processStepInto(c);
@@ -1432,8 +1583,7 @@ public class DBGPReader extends DebugLink
 			String exp = c.data;	// Already base64 decoded by the parser
 			interpreter.setDefaultName(breakpoint.location.module);
 			theAnswer = interpreter.evaluate(exp, breakContext);
-			StringBuilder property = propertyResponse(
-				exp, exp, interpreter.getDefaultName(), theAnswer.toString());
+			StringBuilder property = propertyResponse(exp, exp, interpreter.getDefaultName(), theAnswer);
 			StringBuilder hdr = new StringBuilder("success=\"1\"");
 			response(hdr, property);
 		}
@@ -1464,8 +1614,7 @@ public class DBGPReader extends DebugLink
 			statusReason = DBGPReason.OK;
 			String exp = c.data;	// Already base64 decoded by the parser
 			theAnswer = interpreter.execute(exp);
-			StringBuilder property = propertyResponse(
-				exp, exp, interpreter.getDefaultName(), theAnswer.toString());
+			StringBuilder property = propertyResponse(exp, exp, interpreter.getDefaultName(), theAnswer);
 			StringBuilder hdr = new StringBuilder("success=\"1\"");
 			status = DBGPStatus.STOPPED;
 			statusReason = DBGPReason.OK;
@@ -1483,6 +1632,11 @@ public class DBGPReader extends DebugLink
 		}
 
 		return true;
+	}
+
+	private boolean processExec(DBGPCommand c) throws DBGPException
+	{
+		return processEval(c);	// For now
 	}
 
 	private void processStepInto(DBGPCommand c) throws DBGPException
@@ -2082,7 +2236,15 @@ public class DBGPReader extends DebugLink
 
 		if (token.isNot(Token.NAME))
 		{
-			throw new DBGPException(DBGPErrorCode.CANT_GET_PROPERTY, token.toString());
+			if (token.is(Token.IDENTIFIER))
+			{
+				LexIdentifierToken id = (LexIdentifierToken)token;
+				token = new LexNameToken("DEFAULT", id);
+			}
+			else
+			{
+				throw new DBGPException(DBGPErrorCode.CANT_GET_PROPERTY, token.toString());
+			}
 		}
 
 		NameValuePairMap vars = getContextValues(context, depth);

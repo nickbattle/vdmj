@@ -306,6 +306,10 @@ public class ProcessCommandLine extends CommandLine
 				{
 	            	carryOn = processGet(line);
 				}
+	            else if (line.startsWith("property"))
+				{
+	            	carryOn = processPropertyGet(line);
+				}
 	            else if (line.equals("stop"))
 				{
 	            	carryOn = processStop();
@@ -896,6 +900,47 @@ public class ProcessCommandLine extends CommandLine
        		else
        		{
        			println("Usage: get <local|class|global> [frame]");
+       		}
+   		}
+
+   		return true;
+	}
+
+	private boolean processPropertyGet(String line) throws IOException
+	{
+   		if (currentThread.getStatus() != DBGPStatus.BREAK &&
+   			currentThread.getStatus() != DBGPStatus.STOPPING)
+   		{
+   			println("Thread is not at a breakpoint");
+   			return true;
+   		}
+
+   		String[] parts = line.split("\\s+");
+
+   		if (parts.length != 3)
+   		{
+   			println("Usage: property <local|class|global> <name>");
+   		}
+   		else
+   		{
+   			String type = parts[1];
+   			String name = parts[2];
+
+       		if (type.equalsIgnoreCase("local"))
+       		{
+       			currentThread.property_get(0, name);
+       		}
+       		else if (type.equalsIgnoreCase("class"))
+       		{
+       			currentThread.property_get(1, name);
+       		}
+       		else if (type.equalsIgnoreCase("global"))
+       		{
+       			currentThread.property_get(2, name);
+       		}
+       		else
+       		{
+       			println("Usage: property <local|class|global> [frame]");
        		}
    		}
 

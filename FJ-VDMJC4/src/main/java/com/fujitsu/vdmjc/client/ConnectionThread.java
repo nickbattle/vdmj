@@ -352,6 +352,12 @@ public class ConnectionThread extends Thread
     			String text = new String(Base64.decode(data.cdata));
     			CommandLine.message(stream + ": " + text);
     		}
+			else if (msg.tag.equals("property"))
+    		{
+    			XMLOpenTagNode otn = (XMLOpenTagNode)msg;
+    			StringBuilder sb = processProperty(otn, 0);
+    			CommandLine.message(sb.toString());
+    		}
     		else if (msg.tag.equals("response"))
     		{
     			if (msg instanceof XMLOpenTagNode)
@@ -433,28 +439,15 @@ public class ConnectionThread extends Thread
      					CommandLine.message(sb.toString());
      					return;
     				}
-
-      				child = otn.getChild("property");
+    				
+       				child = otn.getChild("property");
 
     				if (child != null)
     				{
-       					StringBuilder sb = new StringBuilder();
-       					String sep = "";
-
-     					for (XMLNode prop: otn.children)
-    					{
-     						sb.append(sep);
-     						XMLOpenTagNode p = (XMLOpenTagNode)prop;
-     						sb.append(unquote(p.getAttr("name")));
-     						sb.append(" = ");
-     						XMLDataNode data = (XMLDataNode)p.getChild(0);
-     						sb.append(new String(Base64.decode(data.cdata), "UTF-8"));
-            				sep = "\n";
-    					}
-
-     					CommandLine.message(sb.toString());
-     					return;
-    				}
+    					StringBuilder sb = processProperty((XMLOpenTagNode)child, 0);
+    					CommandLine.message(sb.toString());
+    					return;
+    	    		}
 
     				CommandLine.message("Cannot display: " + msg);
     			}
@@ -491,6 +484,32 @@ public class ConnectionThread extends Thread
     	{
     		CommandLine.message("Cannot display: " + msg);
     	}
+	}
+	
+	public StringBuilder processProperty(XMLOpenTagNode otn, int indent) throws Exception
+	{
+		StringBuilder sb = new StringBuilder();
+
+		for (int i=0; i<indent; i++) sb.append("  ");
+		sb.append(unquote(otn.getAttr("name")));
+		sb.append(" = ");
+
+		if (otn.getAttr("children").equals("0"))
+		{
+			XMLDataNode data = (XMLDataNode)otn.getChild(0);
+			sb.append(new String(Base64.decode(data.cdata), "UTF-8"));
+		}
+		else
+		{
+			for (XMLNode prop: otn.children)
+			{
+				sb.append("\n");
+				XMLOpenTagNode node = (XMLOpenTagNode)prop;
+				sb.append(processProperty(node, indent + 1));
+			}
+		}
+		
+		return sb;
 	}
 
 	public void status() throws IOException
@@ -571,6 +590,11 @@ public class ConnectionThread extends Thread
 	public void context_get(int type, int depth) throws IOException
 	{
 		write("context_get -i " + (++xid) + " -c " + type + " -d " + depth);
+	}
+
+	public void property_get(int type, String name) throws IOException
+	{
+		write("property_get -i " + (++xid) + " -c " + type + " -n " + name + " -d 0");
 	}
 
 	private void xcmd_overture_cmd(String cmd, String arg) throws IOException
