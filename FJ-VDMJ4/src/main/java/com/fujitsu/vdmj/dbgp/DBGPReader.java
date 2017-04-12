@@ -32,6 +32,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
@@ -371,6 +373,26 @@ public class DBGPReader extends DebugLink
     			else
     			{
     				usage("-remote option requires a Java classname");
+    			}
+    		}
+    		else if (arg.equals("-precision"))
+    		{
+    			if (i.hasNext())
+    			{
+       				int precision = Integer.parseInt(i.next());
+       				
+       				if (precision < 10)
+       				{
+       					usage("Precision argument must be >= 10");
+       				}
+       				else
+       				{
+       					Settings.precision = new MathContext(precision, RoundingMode.HALF_UP);
+       				}
+    			}
+    			else
+    			{
+    				usage("-precision option requires a value");
     			}
     		}
     		else if (arg.equals("-consoleName"))	// Overture compatibility
@@ -2411,6 +2433,10 @@ public class DBGPReader extends DebugLink
 		{
 			processWord(c);
 		}
+		else if (option.value.equals("precision"))
+		{
+			processPrecision(c);
+		}
 		else if (option.value.equals("pog"))
 		{
 			processPOG(c);
@@ -2812,6 +2838,41 @@ public class DBGPReader extends DebugLink
 			source.printWordCoverage(pw);
 			pw.close();
 			cdataResponse("Word HTML coverage written to " + html);
+		}
+	}
+
+	private void processPrecision(DBGPCommand c)
+		throws DBGPException, IOException, URISyntaxException
+	{
+		if (status == DBGPStatus.BREAK)
+		{
+			throw new DBGPException(DBGPErrorCode.NOT_AVAILABLE, c.toString());
+		}
+
+		if (c.data == null || c.data.isEmpty())
+		{
+			cdataResponse("Precision set to " + Settings.precision.getPrecision());
+		}
+		else
+		{
+    		try
+    		{
+    			int precision = Integer.parseInt(c.data);
+    
+    			if (precision < 10)
+    			{
+    				cdataResponse("Precision argument must be >= 10");
+    			}
+    			else
+    			{
+    				Settings.precision = new MathContext(precision, RoundingMode.HALF_UP);
+        			cdataResponse("Precision set to " + precision);
+    			}
+    		}
+    		catch (NumberFormatException e)
+    		{
+    			throw new DBGPException(DBGPErrorCode.PARSE, c.toString());
+    		}
 		}
 	}
 

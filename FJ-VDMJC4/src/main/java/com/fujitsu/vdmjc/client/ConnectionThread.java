@@ -645,6 +645,11 @@ public class ConnectionThread extends Thread
 		xcmd_overture_cmd("word", dir.toURI() + " " + file.toURI());
 	}
 
+	public void xcmd_overture_precision(String precision) throws IOException
+	{
+		xcmd_overture_cmd("precision", precision);
+	}
+
 	public void xcmd_overture_pog(String name) throws IOException
 	{
 		xcmd_overture_cmd("pog", name);

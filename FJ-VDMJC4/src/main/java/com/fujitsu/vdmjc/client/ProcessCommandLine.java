@@ -256,6 +256,10 @@ public class ProcessCommandLine extends CommandLine
 	            {
 	            	carryOn = processWord(line);
 	            }
+	            else if (line.startsWith("precision"))
+	            {
+	            	carryOn = processPrecision(line);
+	            }
 	            else if (line.equals("run") ||
 	            		 line.equals("continue") ||
 	            		 line.equals("c"))
@@ -652,6 +656,27 @@ public class ProcessCommandLine extends CommandLine
 			println("Problem locating files");
 		}
 
+		return true;
+	}
+
+	private boolean processPrecision(String line) throws IOException
+	{
+   		if (currentThread.getStatus() == DBGPStatus.RUNNING)
+   		{
+   			println("Thread is running...");
+   			return true;
+   		}
+
+   		if (line.equals("precision"))
+   		{
+    		currentThread.xcmd_overture_precision("");
+   		}
+   		else
+   		{
+    		String precision = line.substring(line.indexOf(' ') + 1);
+    		currentThread.xcmd_overture_precision(precision);
+   		}
+   		
 		return true;
 	}
 
