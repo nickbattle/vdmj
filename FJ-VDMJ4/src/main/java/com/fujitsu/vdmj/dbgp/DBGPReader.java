@@ -91,6 +91,7 @@ import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.runtime.Tracepoint;
+import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCMutexSyncDefinition;
@@ -140,6 +141,7 @@ public class DBGPReader extends DebugLink
 	private Value theAnswer = null;
 	private static boolean breaksSuspended = false;
 	private RemoteControl remoteControl = null;
+	private boolean stopped = false;
 
 	private static final int SOURCE_LINES = 5;
 
@@ -713,16 +715,30 @@ public class DBGPReader extends DebugLink
 
 	private String readLine() throws IOException
 	{
-		StringBuilder line = new StringBuilder();
-		int c = input.read();
-
-		while (c != '\n' && c > 0)
+		try
 		{
-			if (c != '\r') line.append((char)c);		// Ignore CRs
-			c = input.read();
-		}
-
-		return (line.length() == 0 && c == -1) ? null : line.toString();
+    		StringBuilder line = new StringBuilder();
+    		int c = input.read();
+    
+    		while (c != '\n' && c > 0)
+    		{
+    			if (c != '\r') line.append((char)c);		// Ignore CRs
+    			c = input.read();
+    		}
+    
+    		return (line.length() == 0 && c == -1) ? null : line.toString();
+    	}
+		catch (SocketException e)
+    	{
+    		if (stopped)
+    		{
+    			return null;
+    		}
+    		else
+    		{
+    			throw e;
+    		}
+    	}
 	}
 
 	private void write(StringBuilder data) throws IOException
@@ -806,6 +822,11 @@ public class DBGPReader extends DebugLink
 	{
 		StringBuilder sb = new StringBuilder();
 
+		if (s == DBGPStatus.STOPPED)
+		{
+			stopped = true;
+		}
+
 		status = s;
 		statusReason = reason;
 
@@ -816,7 +837,36 @@ public class DBGPReader extends DebugLink
 		sb.append(statusReason);
 		sb.append("\"");
 
-		response(sb, null);
+		StringBuilder body = new StringBuilder();
+		body.append("<internal ");
+
+		if (Thread.currentThread() instanceof SchedulableThread)
+		{
+			SchedulableThread th = (SchedulableThread)Thread.currentThread();
+
+			body.append("threadId=\"");
+			body.append(th.getId());
+			body.append("\" ");
+
+			body.append("threadName=\"");
+			body.append(th.getName());
+			body.append("\" ");
+
+			body.append("threadState=\"");
+			body.append(th.getRunState().toString());
+			body.append("\" ");
+
+		}
+		else	// The init thread?
+		{
+			body.append("threadId=\"0\" ");
+			body.append("threadName=\"" + Thread.currentThread().getName() +"\" ");
+			body.append("threadState=\"STOPPED\" ");
+		}
+
+		body.append("/>");
+
+		response(sb, body);
 	}
 
 	private StringBuilder breakpointResponse(Breakpoint bp)
@@ -853,6 +903,42 @@ public class DBGPReader extends DebugLink
 
 		return sb;
 	}
+
+	private void overtureResponse(String overtureCmd, StringBuilder hdr, StringBuilder body) throws IOException
+    {
+    	StringBuilder sb = new StringBuilder();
+    
+    	sb.append("<xcmd_overture_response command=\"");
+    	sb.append(command);
+    	sb.append("\"");
+    
+    	sb.append(" overtureCmd=\"");
+    	sb.append(overtureCmd);
+    	sb.append("\"");
+    
+    	if (hdr != null)
+    	{
+    		sb.append(" ");
+    		sb.append(hdr);
+    	}
+    
+    	sb.append(" transaction_id=\"");
+    	sb.append(transaction);
+    	sb.append("\"");
+    
+    	if (body != null)
+    	{
+    		sb.append(">");
+    		sb.append(body);
+    		sb.append("</xcmd_overture_response>\n");
+    	}
+    	else
+    	{
+    		sb.append("/>\n");
+    	}
+    
+    	write(sb);
+    }
 
 	private StringBuilder propertyResponse(NameValuePairMap vars)
 		throws UnsupportedEncodingException
@@ -1034,18 +1120,10 @@ public class DBGPReader extends DebugLink
 	@Override
 	public void stopped(Context ctxt, LexLocation location)
 	{
-		if (location == null)	// Not yet started
+		if (location != null && ctxt != null)	// ie. thread has started
 		{
-			location = new LexLocation();
-		}
-		
-		if (ctxt == null)
-		{
-			ctxt = new Context(location, "Empty Context", null);
-			ctxt.setThreadState(CPUValue.vCPU);
-		}
-		
-		breakpoint(ctxt, new Breakpoint(location));
+			breakpoint(ctxt, new Breakpoint(location));
+		}	
 	}
 
 	@Override
@@ -1291,6 +1369,8 @@ public class DBGPReader extends DebugLink
 		}
 		catch (DBGPException e)
 		{
+			System.err.printf("DBGPException %s %s\n", e.code, e.reason);
+			e.printStackTrace(System.err);
 			errorResponse(e.code, e.reason);
 		}
 		catch (Throwable e)
@@ -1547,8 +1627,11 @@ public class DBGPReader extends DebugLink
     		{
     			status = DBGPStatus.RUNNING;
     			statusReason = DBGPReason.OK;
+    			long before = System.currentTimeMillis();
     			theAnswer = interpreter.execute(expression);
-    			stdout(expression + " = " + theAnswer.toString());
+    			stdout(expression + " = " + theAnswer.toString() + "\n");
+    			long after = System.currentTimeMillis();
+    			stdout("Executed in " + (double)(after-before)/1000 + " secs. ");
     			statusResponse(DBGPStatus.STOPPED, DBGPReason.OK);
     		}
     		catch (ContextException e)
@@ -1966,6 +2049,8 @@ public class DBGPReader extends DebugLink
 
 		if (depth >= actualDepth)
 		{
+			System.err.println("depth = " + depth);
+			System.err.println("actualDepth = " + actualDepth);
 			throw new DBGPException(DBGPErrorCode.INVALID_STACK_DEPTH, c.toString());
 		}
 
@@ -2399,6 +2484,10 @@ public class DBGPReader extends DebugLink
 		{
 			processCoverage(c);
 		}
+		else if (option.value.equals("write_complete_coverage"))
+		{
+			processCompleteCoverage(c);
+		}
 		else if (option.value.equals("runtrace"))
 		{
 			processRuntrace(c);
@@ -2449,7 +2538,7 @@ public class DBGPReader extends DebugLink
 		}
 		else
 		{
-			throw new DBGPException(DBGPErrorCode.INVALID_OPTIONS, c.toString());
+			throw new DBGPException(DBGPErrorCode.UNIMPLEMENTED, c.toString());
 		}
 	}
 
@@ -2724,6 +2813,17 @@ public class DBGPReader extends DebugLink
 		}
 	}
 
+	private void processCompleteCoverage(DBGPCommand c)
+		throws DBGPException, IOException, URISyntaxException
+	{
+		File file = new File(new URI(c.data));
+		file.mkdirs();
+		writeCoverage(interpreter, file);
+		StringBuilder sb = new StringBuilder();
+		sb.append("Coverage written to: " + file.toURI().toASCIIString());
+		overtureResponse("write_complete_coverage", null, sb);
+	}
+
 	private void processRuntrace(DBGPCommand c) throws DBGPException
 	{
 		if (status == DBGPStatus.BREAK)
@@ -2919,14 +3019,18 @@ public class DBGPReader extends DebugLink
 	private static void writeCoverage(Interpreter interpreter, File coverage)
 		throws IOException
 	{
+		Properties.init();
+
 		for (File f: interpreter.getSourceFiles())
 		{
 			SourceFile source = interpreter.getSourceFile(f);
 
-			File data = new File(coverage.getPath() + File.separator + f.getName() + ".cov");
+			File data = new File(coverage.getPath() + File.separator + f.getName() + ".covtbl");
 			PrintWriter pw = new PrintWriter(data);
 			source.writeCoverage(pw);
 			pw.close();
 		}
+		
+		Properties.parser_tabstop = 1;
 	}
 }
