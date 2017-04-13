@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -38,9 +39,9 @@ public class INMkTypeExpression extends INExpression
 	public final TCRecordType recordType;
 	public final INExpressionList args;
 
-	public INMkTypeExpression(TCRecordType recordType, INExpressionList args)
+	public INMkTypeExpression(LexLocation location, TCRecordType recordType, INExpressionList args)
 	{
-		super(recordType.name.getLocation());
+		super(location);
 		this.recordType = recordType;
 		this.args = args;
 	}

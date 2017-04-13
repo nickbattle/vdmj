@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexQuoteToken;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.values.QuoteValue;
 import com.fujitsu.vdmj.values.Value;
@@ -33,9 +34,9 @@ public class INQuoteLiteralExpression extends INExpression
 	private static final long serialVersionUID = 1L;
 	public final LexQuoteToken type;
 
-	public INQuoteLiteralExpression(LexQuoteToken type)
+	public INQuoteLiteralExpression(LexLocation location, LexQuoteToken type)
 	{
-		super(type.location);
+		super(location);
 		this.type = type;
 	}
 

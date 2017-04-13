@@ -121,7 +121,7 @@ map ASTPowerSetExpression{location, exp} to TCPowerSetExpression(location, exp);
 map ASTPreExpression{location, function, args} to TCPreExpression(location, function, args);
 map ASTPreOpExpression{opname, expression, errors, state} to TCPreOpExpression(opname, expression, errors, state);
 map ASTProperSubsetExpression{left, op, right} to TCProperSubsetExpression(left, op, right);
-map ASTQuoteLiteralExpression{type} to TCQuoteLiteralExpression(type);
+map ASTQuoteLiteralExpression{location, type} to TCQuoteLiteralExpression(location, type);
 map ASTRangeResByExpression{left, op, right} to TCRangeResByExpression(left, op, right);
 map ASTRangeResToExpression{left, op, right} to TCRangeResToExpression(left, op, right);
 map ASTRealLiteralExpression{value} to TCRealLiteralExpression(value);

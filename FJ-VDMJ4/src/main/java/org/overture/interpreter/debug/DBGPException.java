@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2017 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -21,36 +21,19 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.expressions;
+package org.overture.interpreter.debug;
 
-import com.fujitsu.vdmj.ast.lex.LexQuoteToken;
-import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.types.TCQuoteType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.dbgp.DBGPErrorCode;
 
-public class TCQuoteLiteralExpression extends TCExpression
+/**
+ * Class to simulate the Overture dbgp exception.
+ */
+public class DBGPException extends com.fujitsu.vdmj.dbgp.DBGPException
 {
 	private static final long serialVersionUID = 1L;
-	public final LexQuoteToken type;
 
-	public TCQuoteLiteralExpression(LexLocation location, LexQuoteToken type)
+	public DBGPException(DBGPErrorCode code, String reason)
 	{
-		super(location);
-		this.type = type;
-	}
-
-	@Override
-	public String toString()
-	{
-		return type.toString();
-	}
-
-	@Override
-	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
-	{
-		return checkConstraint(constraint, new TCQuoteType(location, type.value));
+		super(code, reason);
 	}
 }
