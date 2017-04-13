@@ -706,7 +706,7 @@ public class DBGPReader extends DebugLink
 		sb.append("idekey=\"" + ideKey + "\" ");
 		sb.append("session=\"" + sessionId + "\" ");
 		sb.append("thread=\"");
-		sb.append(Thread.currentThread().getId());
+		sb.append(Thread.currentThread().getName());
 
 		if (cpu != null)
 		{
