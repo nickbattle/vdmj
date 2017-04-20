@@ -859,9 +859,9 @@ public class DBGPReader extends DebugLink
 		}
 		else	// The init thread?
 		{
-			body.append("threadId=\"0\" ");
+			body.append("threadId=\"" + Thread.currentThread().getId() + "\" ");
 			body.append("threadName=\"" + Thread.currentThread().getName() +"\" ");
-			body.append("threadState=\"STOPPED\" ");
+			body.append("threadState=\"RUNNING\" ");
 		}
 
 		body.append("/>");
