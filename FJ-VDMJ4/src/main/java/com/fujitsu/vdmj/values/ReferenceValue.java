@@ -190,6 +190,27 @@ abstract public class ReferenceValue extends Value
 
 		return false;
 	}
+	
+	@Override
+	public int compareTo(Value other)
+	{
+		if (other instanceof Value)
+		{
+			Value val = ((Value)other).deref();
+
+    		if (val instanceof ReferenceValue)
+    		{
+    			ReferenceValue rvo = (ReferenceValue)val;
+    			return value.compareTo(rvo.value);
+    		}
+    		else
+    		{
+    			return value.compareTo(other);
+    		}
+		}
+
+		return super.compareTo(other);
+	}
 
 	@Override
 	public String kind()
