@@ -440,6 +440,11 @@ public class DefinitionReader extends SyntaxReader
     		switch (lastToken().type)
     		{
     			case INV:
+    				if (invPattern != null)
+    				{
+    					throwMessage(2332, "Duplicate inv clause");
+    				}
+    				
         			nextToken();
         			invPattern = getPatternReader().readPattern();
         			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after pattern in invariant");
@@ -447,6 +452,11 @@ public class DefinitionReader extends SyntaxReader
         			break;
         			
     			case EQ:
+    				if (eqPattern1 != null)
+    				{
+    					throwMessage(2332, "Duplicate eq clause");
+    				}
+    				
         			nextToken();
         			eqPattern1 = getPatternReader().readPattern();
         			checkFor(Token.EQUALS, 2087, "Expecting '=' between patterns in eq clause");
@@ -456,6 +466,11 @@ public class DefinitionReader extends SyntaxReader
     				break;
     				
     			case ORD:
+    				if (ordPattern1 != null)
+    				{
+    					throwMessage(2332, "Duplicate ord clause");
+    				}
+    				
         			nextToken();
         			ordPattern1 = getPatternReader().readPattern();
         			checkFor(Token.LT, 2087, "Expecting '<' between patterns in ord clause");

@@ -380,6 +380,7 @@ as the expected and actual values.
 2329, "Duplicate <keyword> keyword"
 2330, "Tokens found after expression at <token>"
 2331, "Expecting inv, eq or ord clause"
+2332, "Duplicate inv clause"
 
 3000, "Expression does not match declared type"
 3001, "Class inherits thread definition from multiple supertypes"
