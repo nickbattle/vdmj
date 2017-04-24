@@ -37,15 +37,30 @@ public class ASTTypeDefinition extends ASTDefinition
 	public final ASTInvariantType type;
 	public final ASTPattern invPattern;
 	public final ASTExpression invExpression;
+	public final ASTPattern eqPattern1;
+	public final ASTPattern eqPattern2;
+	public final ASTExpression eqExpression;
+	public final ASTPattern ordPattern1;
+	public final ASTPattern ordPattern2;
+	public final ASTExpression ordExpression;
 
 	public ASTTypeDefinition(LexNameToken name, ASTInvariantType type, ASTPattern invPattern,
-		ASTExpression invExpression)
+		ASTExpression invExpression, ASTPattern eqPattern1, ASTPattern eqPattern2, ASTExpression eqExpression,
+		ASTPattern ordPattern1, ASTPattern ordPattern2, ASTExpression ordExpression)
 	{
 		super(name.location, name);
 
 		this.type = type;
 		this.invPattern = invPattern;
 		this.invExpression = invExpression;
+		
+		this.eqPattern1 = eqPattern1;
+		this.eqPattern2 = eqPattern2;
+		this.eqExpression = eqExpression;
+		
+		this.ordPattern1 = ordPattern1;
+		this.ordPattern2 = ordPattern2;
+		this.ordExpression = ordExpression;
 	}
 
 	@Override
@@ -54,7 +69,11 @@ public class ASTTypeDefinition extends ASTDefinition
 		return accessSpecifier.ifSet(" ") +
 				name.name + " = " + type.toDetailedString() +
 				(invPattern == null ? "" :
-					"\n\tinv " + invPattern + " == " + invExpression);
+					"\n\tinv " + invPattern + " == " + invExpression) +
+        		(eqPattern1 == null ? "" :
+        			"\n\teq " + eqPattern1 + " = " + eqPattern2 + " == " + eqExpression) +
+        		(ordPattern1 == null ? "" :
+        			"\n\tord " + ordPattern1 + " < " + ordPattern2 + " == " + ordExpression);
 	}
 
 	@Override

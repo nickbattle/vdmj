@@ -164,6 +164,16 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 		return new TCNameToken(l, getModule(), "inv_" + getName(), false, false);
 	}
 
+	public TCNameToken getEqName(LexLocation l)
+	{
+		return new TCNameToken(l, getModule(), "eq_" + getName(), false, false);
+	}
+
+	public TCNameToken getOrdName(LexLocation l)
+	{
+		return new TCNameToken(l, getModule(), "ord_" + getName(), false, false);
+	}
+
 	public TCNameToken getInitName(LexLocation l)
 	{
 		return new TCNameToken(l, getModule(), "init_" + getName(), false, false);

@@ -379,6 +379,7 @@ as the expected and actual values.
 2328, "Sequence binds are not available in classic"
 2329, "Duplicate <keyword> keyword"
 2330, "Tokens found after expression at <token>"
+2331, "Expecting inv, eq or ord clause"
 
 3000, "Expression does not match declared type"
 3001, "Class inherits thread definition from multiple supertypes"
@@ -923,3 +924,4 @@ as the expected and actual values.
 5015, "LaTeX source should start with %comment, \document, \section or \subsection"
 5016, "Some statements will not be reached"
 5017, "Pure operation call may not be referentially transparent"
+5018, "Field has ':-' for type with eq definition"

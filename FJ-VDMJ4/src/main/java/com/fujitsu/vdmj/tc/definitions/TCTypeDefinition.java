@@ -54,12 +54,24 @@ public class TCTypeDefinition extends TCDefinition
 	public TCInvariantType type;
 	public final TCPattern invPattern;
 	public final TCExpression invExpression;
+	public final TCPattern eqPattern1;
+	public final TCPattern eqPattern2;
+	public final TCExpression eqExpression;
+	public final TCPattern ordPattern1;
+	public final TCPattern ordPattern2;
+	public final TCExpression ordExpression;
+	
 	public TCExplicitFunctionDefinition invdef;
+	public TCExplicitFunctionDefinition eqdef;
+	public TCExplicitFunctionDefinition orddef;
+	
 	public boolean infinite = false;
 	private TCDefinitionList composeDefinitions;
 
 	public TCTypeDefinition(TCAccessSpecifier accessSpecifier, TCNameToken name,
-		TCInvariantType type, TCPattern invPattern, TCExpression invExpression)
+		TCInvariantType type, TCPattern invPattern, TCExpression invExpression,
+		TCPattern eqPattern1, TCPattern eqPattern2, TCExpression eqExpression,
+		TCPattern ordPattern1, TCPattern ordPattern2, TCExpression ordExpression)
 	{
 		super(Pass.TYPES, name.getLocation(), name, NameScope.TYPENAME);
 
@@ -67,6 +79,12 @@ public class TCTypeDefinition extends TCDefinition
 		this.type = type;
 		this.invPattern = invPattern;
 		this.invExpression = invExpression;
+		this.eqPattern1 = eqPattern1;
+		this.eqPattern2 = eqPattern2;
+		this.eqExpression = eqExpression;
+		this.ordPattern1 = ordPattern1;
+		this.ordPattern2 = ordPattern2;
+		this.ordExpression = ordExpression;
 		
 		type.definitions = new TCDefinitionList(this);
 		composeDefinitions = new TCDefinitionList();
@@ -78,7 +96,11 @@ public class TCTypeDefinition extends TCDefinition
 		return accessSpecifier.ifSet(" ") +
 				name.getName() + " = " + type.toDetailedString() +
 				(invPattern == null ? "" :
-					"\n\tinv " + invPattern + " == " + invExpression);
+					"\n\tinv " + invPattern + " == " + invExpression) +
+        		(eqPattern1 == null ? "" :
+        			"\n\teq " + eqPattern1 + " = " + eqPattern2 + " == " + eqExpression) +
+        		(ordPattern1 == null ? "" :
+        			"\n\tord " + ordPattern1 + " < " + ordPattern2 + " == " + ordExpression);
 	}
 	
 	@Override
@@ -100,6 +122,28 @@ public class TCTypeDefinition extends TCDefinition
 			invdef = null;
 		}
 		
+		if (eqPattern1 != null)
+		{
+    		eqdef = getEqOrdDefinition(eqPattern1, eqPattern2,
+    			eqExpression, name.getEqName(eqExpression.location));
+    		type.setEquality(eqdef);
+		}
+		else
+		{
+			eqdef = null;
+		}
+		
+		if (ordPattern1 != null)
+		{
+    		orddef = getEqOrdDefinition(ordPattern1, ordPattern2,
+    			ordExpression, name.getOrdName(ordExpression.location));
+    		type.setOrder(orddef);
+		}
+		else
+		{
+			orddef = null;
+		}
+		
 		// TCType definitions of the form "A = compose B of ... end" also define the type
 		// B, which can be used globally. Here, we assume all compose types are legal
 		// but in the typeCheck we check whether they match any existing definitions.
@@ -112,7 +156,8 @@ public class TCTypeDefinition extends TCDefinition
 			for (TCType compose: nt.type.getComposeTypes())
 			{
 				TCRecordType rtype = (TCRecordType)compose;
-				composeDefinitions.add(new TCTypeDefinition(TCAccessSpecifier.DEFAULT, rtype.name, rtype, null, null));
+				composeDefinitions.add(new TCTypeDefinition(TCAccessSpecifier.DEFAULT,
+						rtype.name, rtype, null, null, null, null, null, null, null, null));
 			}
 		}
 	}
@@ -136,6 +181,20 @@ public class TCTypeDefinition extends TCDefinition
 				invPattern.typeResolve(base);
 			}
 			
+			if (eqdef != null)
+			{
+				eqdef.typeResolve(base);
+				eqPattern1.typeResolve(base);
+				eqPattern2.typeResolve(base);
+			}
+			
+			if (orddef != null)
+			{
+				orddef.typeResolve(base);
+				ordPattern1.typeResolve(base);
+				ordPattern2.typeResolve(base);
+			}
+			
 			composeDefinitions.typeResolve(base);
 		}
 		catch (TypeCheckException e)
@@ -153,6 +212,16 @@ public class TCTypeDefinition extends TCDefinition
 			invdef.typeCheck(base, NameScope.NAMES);
 		}
 		
+		if (eqdef != null)
+		{
+			eqdef.typeCheck(base, NameScope.NAMES);
+		}
+		
+		if (orddef != null)
+		{
+			orddef.typeCheck(base, NameScope.NAMES);
+		}
+		
 		if (type instanceof TCNamedType)
 		{
 			// Rebuild the compose definitions, after we check whether they already exist
@@ -162,7 +231,8 @@ public class TCTypeDefinition extends TCDefinition
 			for (TCType compose: TypeComparator.checkComposeTypes(nt.type, base, true))
 			{
 				TCRecordType rtype = (TCRecordType)compose;
-				TCDefinition cdef = new TCTypeDefinition(accessSpecifier, rtype.name, rtype, null, null);
+				TCDefinition cdef = new TCTypeDefinition(accessSpecifier,
+						rtype.name, rtype, null, null, null, null, null, null, null, null);
 				composeDefinitions.add(cdef);
 			}
 		}
@@ -191,6 +261,11 @@ public class TCTypeDefinition extends TCDefinition
 				{
 					field.tagname.report(3321, "Field type visibility less than type's definition");
 				}
+				
+				if (field.equalityAbstration && eqdef != null)
+				{
+					field.tagname.warning(5018, "Field has ':-' for type with eq definition");
+				}
 			}
 		}
 	}
@@ -207,6 +282,16 @@ public class TCTypeDefinition extends TCDefinition
 		if (invdef != null && invdef.findName(sought, incState) != null)
 		{
 			return invdef;
+		}
+
+		if (eqdef != null && eqdef.findName(sought, incState) != null)
+		{
+			return eqdef;
+		}
+
+		if (orddef != null && orddef.findName(sought, incState) != null)
+		{
+			return orddef;
 		}
 
 		return null;
@@ -237,6 +322,16 @@ public class TCTypeDefinition extends TCDefinition
 		if (invdef != null)
 		{
 			defs.add(invdef);
+		}
+
+		if (eqdef != null)
+		{
+			defs.add(eqdef);
+		}
+
+		if (orddef != null)
+		{
+			defs.add(orddef);
 		}
 
 		return defs;
@@ -275,8 +370,33 @@ public class TCTypeDefinition extends TCDefinition
 		TCFunctionType ftype =
 			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getInvName(loc),
-			null, ftype, parameters, invExpression, null, null, true, null);
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier,
+			name.getInvName(loc), null, ftype, parameters, invExpression, null, null, true, null);
+
+		def.classDefinition = classDefinition;
+		ftype.definitions = new TCDefinitionList(def);
+		return def;
+	}
+
+	private TCExplicitFunctionDefinition getEqOrdDefinition(TCPattern p1, TCPattern p2, TCExpression exp, TCNameToken fname)
+	{
+		LexLocation loc = p1.location;
+		TCPatternList params = new TCPatternList();
+		params.add(p1);
+		params.add(p2);
+
+		TCPatternListList parameters = new TCPatternListList();
+		parameters.add(params);
+
+		TCTypeList ptypes = new TCTypeList();
+		ptypes.add(new TCUnresolvedType(name));
+		ptypes.add(new TCUnresolvedType(name));
+
+		TCFunctionType ftype =
+			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
+
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier,
+			fname, null, ftype, parameters, exp, null, null, true, null);
 
 		def.classDefinition = classDefinition;
 		ftype.definitions = new TCDefinitionList(def);
