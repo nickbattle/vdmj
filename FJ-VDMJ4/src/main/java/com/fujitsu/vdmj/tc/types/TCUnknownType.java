@@ -104,6 +104,12 @@ public class TCUnknownType extends TCType
 	}
 
 	@Override
+	public boolean isOrdered(LexLocation from)
+	{
+		return true;
+	}
+
+	@Override
 	public boolean isProduct(LexLocation from)
 	{
 		return true;

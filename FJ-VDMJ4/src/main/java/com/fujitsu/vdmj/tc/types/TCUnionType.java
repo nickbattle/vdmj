@@ -217,6 +217,20 @@ public class TCUnionType extends TCType
 	{
 		return getNumeric() != null;
 	}
+	
+	@Override
+	public boolean isOrdered(LexLocation from)
+	{
+		for (TCType t: types)
+		{
+			if (t.isOrdered(from))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	@Override
 	public boolean isProduct(LexLocation from)

@@ -61,4 +61,22 @@ abstract public class TCNumericBinaryExpression extends TCBinaryExpression
 			rtype = new TCRealType(location);
 		}
 	}
+
+	protected void checkOrdered(Environment env, NameScope scope)
+	{
+		ltype = left.typeCheck(env, null, scope, null);
+		rtype = right.typeCheck(env, null, scope, null);
+
+		if (!ltype.isOrdered(location))
+		{
+			report(3139, "Left hand of " + op + " is not ordered");
+			detail("Actual", ltype);
+		}
+
+		if (!rtype.isOrdered(location))
+		{
+			report(3140, "Right hand of " + op + " is not ordered");
+			detail("Actual", rtype);
+		}
+	}
 }

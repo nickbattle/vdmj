@@ -151,6 +151,12 @@ public class TCOptionalType extends TCType
 	}
 
 	@Override
+	public boolean isOrdered(LexLocation from)
+	{
+		return type.isOrdered(location);
+	}
+
+	@Override
 	public boolean isProduct(LexLocation from)
 	{
 		return type.isProduct(location);

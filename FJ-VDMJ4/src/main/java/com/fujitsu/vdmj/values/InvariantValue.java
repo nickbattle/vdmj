@@ -36,7 +36,9 @@ public class InvariantValue extends ReferenceValue
 {
 	private static final long serialVersionUID = 1L;
 	public final TCNamedType type;
-	private FunctionValue invariant;
+	public final FunctionValue invariant;
+	public final FunctionValue equality;
+	public final FunctionValue ordering;
 
 	public InvariantValue(TCNamedType type, Value value, Context ctxt)
 		throws ValueException
@@ -44,7 +46,9 @@ public class InvariantValue extends ReferenceValue
 		super(value);
 		this.type = type;
 
-		invariant = type.getInvariant(ctxt);
+		this.invariant = type.getInvariant(ctxt);
+		this.equality = type.getEquality(ctxt);
+		this.ordering = type.getOrder(ctxt);
 		checkInvariant(ctxt);
 	}
 
@@ -81,11 +85,14 @@ public class InvariantValue extends ReferenceValue
 	}
 
 	// For clone only
-	private InvariantValue(TCNamedType type, Value value, FunctionValue invariant)
+	private InvariantValue(TCNamedType type, Value value, FunctionValue invariant,
+		FunctionValue equality, FunctionValue ordering)
 	{
 		super(value);
 		this.type = type;
 		this.invariant = invariant;
+		this.equality = equality;
+		this.ordering = ordering;
 	}
 
 	@Override
@@ -122,7 +129,7 @@ public class InvariantValue extends ReferenceValue
 			listeners = list;
 		}
 
-		InvariantValue ival = new InvariantValue(type, value.getUpdatable(listeners), invariant);
+		InvariantValue ival = new InvariantValue(type, value.getUpdatable(listeners), invariant, equality, ordering);
 		UpdatableValue uval = UpdatableValue.factory(ival, listeners);
 
 		if (invl != null)
@@ -137,12 +144,61 @@ public class InvariantValue extends ReferenceValue
 	@Override
 	public Value getConstant()
 	{
-		return new InvariantValue(type, value.getConstant(), invariant);
+		return new InvariantValue(type, value.getConstant(), invariant, equality, ordering);
 	}
 
 	@Override
 	public Object clone()
 	{
-		return new InvariantValue(type, (Value)value.clone(), invariant);
+		return new InvariantValue(type, (Value)value.clone(), invariant, equality, ordering);
+	}
+
+	@Override
+	public int compareTo(Value other)
+	{
+		if (other instanceof InvariantValue)
+		{
+			InvariantValue ot = (InvariantValue)other;
+
+			if (ot.type.equals(type))
+			{
+				if (ordering != null)
+				{
+					Context ctxt = new Context(equality.location, "ord", null);
+					ctxt.setThreadState(null);
+					ctxt.threadState.setAtomic(true);
+
+					try
+					{
+						ValueList args = new ValueList();
+						args.add(this);
+						args.add(ot);
+						
+						if (ordering.eval(equality.location, args, ctxt).boolValue(ctxt))
+						{
+							return -1;	// Less
+						}
+						else if (equals(other))
+						{
+							return 0;
+						}
+					}
+					catch (ValueException e)
+					{
+						throw new RuntimeException(e);
+					}
+					finally
+					{
+						ctxt.threadState.setAtomic(false);
+					}
+				}
+				else
+				{
+					return super.compareTo(other);
+				}
+			}
+		}
+
+		return -1;
 	}
 }

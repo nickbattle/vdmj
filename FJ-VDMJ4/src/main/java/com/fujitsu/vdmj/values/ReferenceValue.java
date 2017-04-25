@@ -196,17 +196,7 @@ abstract public class ReferenceValue extends Value
 	{
 		if (other instanceof Value)
 		{
-			Value val = ((Value)other).deref();
-
-    		if (val instanceof ReferenceValue)
-    		{
-    			ReferenceValue rvo = (ReferenceValue)val;
-    			return value.compareTo(rvo.value);
-    		}
-    		else
-    		{
-    			return value.compareTo(other);
-    		}
+   			return value.compareTo(other);
 		}
 
 		return super.compareTo(other);

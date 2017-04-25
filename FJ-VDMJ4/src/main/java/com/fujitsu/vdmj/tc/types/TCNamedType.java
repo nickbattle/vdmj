@@ -139,6 +139,13 @@ public class TCNamedType extends TCInvariantType
 	}
 
 	@Override
+	public boolean isOrdered(LexLocation from)
+	{
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isOrdered(location);
+	}
+
+	@Override
 	public boolean isProduct(LexLocation from)
 	{
 		if (opaque && !from.module.equals(location.module)) return false;

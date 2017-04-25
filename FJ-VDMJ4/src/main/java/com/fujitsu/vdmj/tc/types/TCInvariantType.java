@@ -100,4 +100,10 @@ public abstract class TCInvariantType extends TCType
 
 		return null;
 	}
+
+	@Override
+	public boolean isOrdered(LexLocation from)
+	{
+		return orddef != null;
+	}
 }

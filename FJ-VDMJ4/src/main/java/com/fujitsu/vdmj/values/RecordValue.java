@@ -300,7 +300,15 @@ public class RecordValue extends Value
 						ValueList args = new ValueList();
 						args.add(this);
 						args.add(ot);
-						return ordering.eval(equality.location, args, ctxt).boolValue(ctxt) ? -1 : +1;
+						
+						if (ordering.eval(equality.location, args, ctxt).boolValue(ctxt))
+						{
+							return -1;	// Less
+						}
+						else if (equals(other))
+						{
+							return 0;
+						}
 					}
 					catch (ValueException e)
 					{
