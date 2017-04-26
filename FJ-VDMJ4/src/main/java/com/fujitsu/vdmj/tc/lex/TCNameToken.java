@@ -200,7 +200,11 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 			getName().startsWith("pre_") ||
 			getName().startsWith("post_") ||
 			getName().startsWith("inv_") ||
-			getName().startsWith("init_");
+			getName().startsWith("init_") ||
+			getName().startsWith("eq_") ||
+			getName().startsWith("ord_") ||
+			getName().startsWith("min_") ||
+			getName().startsWith("max_");
 	}
 
 	public TCNameToken getExplicit(boolean explicit)

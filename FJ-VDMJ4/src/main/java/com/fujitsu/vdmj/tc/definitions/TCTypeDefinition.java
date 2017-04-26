@@ -23,16 +23,14 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
-import com.fujitsu.vdmj.tc.expressions.TCElseIfExpressionList;
+import com.fujitsu.vdmj.lex.LexTokenReader;
+import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.syntax.ExpressionReader;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.expressions.TCIfExpression;
-import com.fujitsu.vdmj.tc.expressions.TCOrExpression;
-import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
@@ -246,6 +244,16 @@ public class TCTypeDefinition extends TCDefinition
 		if (orddef != null)
 		{
 			orddef.typeCheck(base, NameScope.NAMES);
+		}
+		
+		if (mindef != null)
+		{
+			mindef.typeCheck(base, NameScope.NAMES);
+		}
+		
+		if (maxdef != null)
+		{
+			maxdef.typeCheck(base, NameScope.NAMES);
 		}
 		
 		if (type instanceof TCNamedType)
@@ -480,36 +488,22 @@ public class TCTypeDefinition extends TCDefinition
 		TCFunctionType ftype = new TCFunctionType(loc, ptypes, false, new TCUnresolvedType(name));
 		TCExpression body = null;
 		
-		TCExpression exp_a = new TCVariableExpression(loc, var_a, "a");
-		TCExpression exp_b = new TCVariableExpression(loc, var_b, "b");
-		
-		TCExpressionList args = new TCExpressionList();
-		args.add(exp_a);
-		args.add(exp_b);
-		
-		if (isMin)
+		try
 		{
-			// if ord_T(a, b) or eq_T(a, b) then a else b
-			body = new TCIfExpression(loc,
-				new TCOrExpression(
-					new TCApplyExpression(new TCVariableExpression(loc, name.getOrdName(loc), "ord"), args),
-					new LexKeywordToken(Token.OR, loc),
-					new TCApplyExpression(new TCVariableExpression(loc, name.getEqName(loc), "eq"), args)),
-				new TCVariableExpression(loc, var_a, "a"),
-				new TCElseIfExpressionList(),
-				new TCVariableExpression(loc, var_b, "b"));
+			if (isMin)
+			{
+				body = parse(String.format("if ord_%s(a, b) or eq_%s(a, b) then a else b",
+					name.getName(), name.getName()));
+			}
+			else
+			{
+				body = parse(String.format("if ord_%s(a, b) or eq_%s(a, b) then b else a",
+					name.getName(), name.getName()));
+			}
 		}
-		else
+		catch (Exception e)
 		{
-			// if ord_T(a, b) or eq_T(a, b) then b else a		
-			body = new TCIfExpression(loc,
-				new TCOrExpression(
-					new TCApplyExpression(new TCVariableExpression(loc, name.getOrdName(loc), "ord"), args),
-					new LexKeywordToken(Token.OR, loc),
-					new TCApplyExpression(new TCVariableExpression(loc, name.getEqName(loc), "eq"), args)),
-				new TCVariableExpression(loc, var_b, "b"),
-				new TCElseIfExpressionList(),
-				new TCVariableExpression(loc, var_a, "a"));
+			// Never reached
 		}
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier,
@@ -518,6 +512,15 @@ public class TCTypeDefinition extends TCDefinition
 		def.classDefinition = classDefinition;
 		ftype.definitions = new TCDefinitionList(def);
 		return def;
+	}
+	
+	private TCExpression parse(String body) throws Exception
+	{
+		LexTokenReader ltr = new LexTokenReader(body, Dialect.VDM_PP);
+		ExpressionReader er = new ExpressionReader(ltr);
+		er.setCurrentModule(name.getModule());
+		ASTExpression ast = er.readExpression();
+		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
 	}
 
 	@Override
