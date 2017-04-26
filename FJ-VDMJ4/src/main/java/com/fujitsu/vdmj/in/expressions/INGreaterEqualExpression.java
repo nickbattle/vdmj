@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -47,13 +46,6 @@ public class INGreaterEqualExpression extends INNumericBinaryExpression
 		Value lv = left.eval(ctxt);
 		Value rv = right.eval(ctxt);
 
-		try
-		{
-			return new BooleanValue(lv.realValue(ctxt) >= rv.realValue(ctxt));
-        }
-        catch (ValueException e)
-        {
-        	return abort(e);
-        }
+		return new BooleanValue(lv.compareTo(rv) >= 0);
 	}
 }

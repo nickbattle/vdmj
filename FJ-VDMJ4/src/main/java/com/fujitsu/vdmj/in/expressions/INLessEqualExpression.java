@@ -46,7 +46,6 @@ public class INLessEqualExpression extends INNumericBinaryExpression
 		Value lv = left.eval(ctxt);
 		Value rv = right.eval(ctxt);
 
-		int c = lv.compareTo(rv);
-		return new BooleanValue(c <= 0);
+		return new BooleanValue(lv.compareTo(rv) <= 0);
 	}
 }

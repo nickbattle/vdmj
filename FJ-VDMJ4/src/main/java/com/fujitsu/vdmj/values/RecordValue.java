@@ -307,7 +307,11 @@ public class RecordValue extends Value
 						}
 						else if (equals(other))
 						{
-							return 0;
+							return 0;	// Equal
+						}
+						else
+						{
+							return 1;	// More
 						}
 					}
 					catch (ValueException e)
@@ -347,7 +351,7 @@ public class RecordValue extends Value
 			}
 		}
 
-		return -1;
+		return -1;	// Arbitrary as not comparable
 	}
 
 	@Override

@@ -389,14 +389,25 @@ public class TCTypeDefinition extends TCDefinition
 		parameters.add(params);
 
 		TCTypeList ptypes = new TCTypeList();
-		ptypes.add(new TCUnresolvedType(name));
-		ptypes.add(new TCUnresolvedType(name));
+		if (type instanceof TCRecordType)
+		{
+			// Records are xxx_R: R * R +> bool
+			ptypes.add(new TCUnresolvedType(name));
+			ptypes.add(new TCUnresolvedType(name));
+		}
+		else
+		{
+			// Named types are xxx_T: X * X +> bool, for T = X
+			TCNamedType nt = (TCNamedType)type;
+			ptypes.add(nt.type);
+			ptypes.add(nt.type);
+		}
 
 		TCFunctionType ftype =
 			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier,
-			fname, null, ftype, parameters, exp, null, null, true, null);
+			fname, null, ftype, parameters, exp, null, null, false, null);
 
 		def.classDefinition = classDefinition;
 		ftype.definitions = new TCDefinitionList(def);
