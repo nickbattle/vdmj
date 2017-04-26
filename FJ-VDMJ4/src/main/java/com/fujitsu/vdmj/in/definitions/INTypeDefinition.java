@@ -45,11 +45,14 @@ public class INTypeDefinition extends INDefinition
 	public final INExplicitFunctionDefinition invdef;
 	public final INExplicitFunctionDefinition eqdef;
 	public final INExplicitFunctionDefinition orddef;
+	public final INExplicitFunctionDefinition mindef;
+	public final INExplicitFunctionDefinition maxdef;
 
 	public INTypeDefinition(INAccessSpecifier accessSpecifier, TCNameToken name,
 			TCInvariantType type, INPattern invPattern, INExpression invExpression,
 			INExplicitFunctionDefinition invdef, INExplicitFunctionDefinition eqdef,
-			INExplicitFunctionDefinition orddef)
+			INExplicitFunctionDefinition orddef, INExplicitFunctionDefinition mindef,
+			INExplicitFunctionDefinition maxdef)
 	{
 		super(name.getLocation(), accessSpecifier, name);
 
@@ -59,6 +62,8 @@ public class INTypeDefinition extends INDefinition
 		this.invdef = invdef;
 		this.eqdef = eqdef;
 		this.orddef = orddef;
+		this.mindef = mindef;
+		this.maxdef = maxdef;
 	}
 
 	@Override
@@ -92,6 +97,16 @@ public class INTypeDefinition extends INDefinition
 			return orddef;
 		}
 
+		if (mindef != null && mindef.findName(sought) != null)
+		{
+			return mindef;
+		}
+
+		if (maxdef != null && maxdef.findName(sought) != null)
+		{
+			return maxdef;
+		}
+
 		return null;
 	}
 
@@ -116,6 +131,18 @@ public class INTypeDefinition extends INDefinition
 			if (found != null) return found;
 		}
 
+		if (mindef != null)
+		{
+			INExpression found = mindef.findExpression(lineno);
+			if (found != null) return found;
+		}
+
+		if (maxdef != null)
+		{
+			INExpression found = maxdef.findExpression(lineno);
+			if (found != null) return found;
+		}
+
 		return null;
 	}
 
@@ -132,14 +159,26 @@ public class INTypeDefinition extends INDefinition
 
 		if (eqdef != null)
 		{
-			FunctionValue invfunc =	new FunctionValue(eqdef, null, null, ctxt);
-			nvl.add(new NameValuePair(eqdef.name, invfunc));
+			FunctionValue eqfunc =	new FunctionValue(eqdef, null, null, ctxt);
+			nvl.add(new NameValuePair(eqdef.name, eqfunc));
 		}
 
 		if (orddef != null)
 		{
-			FunctionValue invfunc =	new FunctionValue(orddef, null, null, ctxt);
-			nvl.add(new NameValuePair(orddef.name, invfunc));
+			FunctionValue ordfunc =	new FunctionValue(orddef, null, null, ctxt);
+			nvl.add(new NameValuePair(orddef.name, ordfunc));
+		}
+
+		if (mindef != null)
+		{
+			FunctionValue minfunc =	new FunctionValue(mindef, null, null, ctxt);
+			nvl.add(new NameValuePair(mindef.name, minfunc));
+		}
+
+		if (maxdef != null)
+		{
+			FunctionValue maxfunc =	new FunctionValue(maxdef, null, null, ctxt);
+			nvl.add(new NameValuePair(maxdef.name, maxfunc));
 		}
 
 		return nvl;

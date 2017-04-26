@@ -23,10 +23,19 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
+import com.fujitsu.vdmj.tc.expressions.TCElseIfExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.TCIfExpression;
+import com.fujitsu.vdmj.tc.expressions.TCOrExpression;
+import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
@@ -64,6 +73,8 @@ public class TCTypeDefinition extends TCDefinition
 	public TCExplicitFunctionDefinition invdef;
 	public TCExplicitFunctionDefinition eqdef;
 	public TCExplicitFunctionDefinition orddef;
+	public TCExplicitFunctionDefinition mindef;
+	public TCExplicitFunctionDefinition maxdef;
 	
 	public boolean infinite = false;
 	private TCDefinitionList composeDefinitions;
@@ -138,10 +149,15 @@ public class TCTypeDefinition extends TCDefinition
     		orddef = getEqOrdDefinition(ordPattern1, ordPattern2,
     			ordExpression, name.getOrdName(ordExpression.location));
     		type.setOrder(orddef);
+    		
+    		mindef = getMinMaxDefinition(true, name.getMinName(ordExpression.location));
+    		maxdef = getMinMaxDefinition(false, name.getMaxName(ordExpression.location));
 		}
 		else
 		{
 			orddef = null;
+			mindef = null;
+			maxdef = null;
 		}
 		
 		// TCType definitions of the form "A = compose B of ... end" also define the type
@@ -193,6 +209,16 @@ public class TCTypeDefinition extends TCDefinition
 				orddef.typeResolve(base);
 				ordPattern1.typeResolve(base);
 				ordPattern2.typeResolve(base);
+			}
+			
+			if (mindef != null)
+			{
+				mindef.typeResolve(base);
+			}
+			
+			if (maxdef != null)
+			{
+				maxdef.typeResolve(base);
 			}
 			
 			composeDefinitions.typeResolve(base);
@@ -294,6 +320,16 @@ public class TCTypeDefinition extends TCDefinition
 			return orddef;
 		}
 
+		if (mindef != null && mindef.findName(sought, incState) != null)
+		{
+			return mindef;
+		}
+
+		if (maxdef != null && maxdef.findName(sought, incState) != null)
+		{
+			return maxdef;
+		}
+
 		return null;
 	}
 
@@ -332,6 +368,16 @@ public class TCTypeDefinition extends TCDefinition
 		if (orddef != null)
 		{
 			defs.add(orddef);
+		}
+
+		if (mindef != null)
+		{
+			defs.add(mindef);
+		}
+
+		if (maxdef != null)
+		{
+			defs.add(maxdef);
 		}
 
 		return defs;
@@ -408,6 +454,66 @@ public class TCTypeDefinition extends TCDefinition
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier,
 			fname, null, ftype, parameters, exp, null, null, false, null);
+
+		def.classDefinition = classDefinition;
+		ftype.definitions = new TCDefinitionList(def);
+		return def;
+	}
+
+	private TCExplicitFunctionDefinition getMinMaxDefinition(boolean isMin, TCNameToken fname)
+	{
+		LexLocation loc = fname.getLocation();
+		TCPatternList params = new TCPatternList();
+		TCNameToken var_a = new TCNameToken(loc, loc.module, "a");
+		TCNameToken var_b = new TCNameToken(loc, loc.module, "b");
+		params.add(new TCIdentifierPattern(var_a));
+		params.add(new TCIdentifierPattern(var_b));
+
+		TCPatternListList parameters = new TCPatternListList();
+		parameters.add(params);
+
+		TCTypeList ptypes = new TCTypeList();
+		ptypes.add(new TCUnresolvedType(name));
+		ptypes.add(new TCUnresolvedType(name));
+
+		// min_T: T * T +> T
+		TCFunctionType ftype = new TCFunctionType(loc, ptypes, false, new TCUnresolvedType(name));
+		TCExpression body = null;
+		
+		TCExpression exp_a = new TCVariableExpression(loc, var_a, "a");
+		TCExpression exp_b = new TCVariableExpression(loc, var_b, "b");
+		
+		TCExpressionList args = new TCExpressionList();
+		args.add(exp_a);
+		args.add(exp_b);
+		
+		if (isMin)
+		{
+			// if ord_T(a, b) or eq_T(a, b) then a else b
+			body = new TCIfExpression(loc,
+				new TCOrExpression(
+					new TCApplyExpression(new TCVariableExpression(loc, name.getOrdName(loc), "ord"), args),
+					new LexKeywordToken(Token.OR, loc),
+					new TCApplyExpression(new TCVariableExpression(loc, name.getEqName(loc), "eq"), args)),
+				new TCVariableExpression(loc, var_a, "a"),
+				new TCElseIfExpressionList(),
+				new TCVariableExpression(loc, var_b, "b"));
+		}
+		else
+		{
+			// if ord_T(a, b) or eq_T(a, b) then b else a		
+			body = new TCIfExpression(loc,
+				new TCOrExpression(
+					new TCApplyExpression(new TCVariableExpression(loc, name.getOrdName(loc), "ord"), args),
+					new LexKeywordToken(Token.OR, loc),
+					new TCApplyExpression(new TCVariableExpression(loc, name.getEqName(loc), "eq"), args)),
+				new TCVariableExpression(loc, var_b, "b"),
+				new TCElseIfExpressionList(),
+				new TCVariableExpression(loc, var_a, "a"));
+		}
+
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier,
+			fname, null, ftype, parameters, body, null, null, false, null);
 
 		def.classDefinition = classDefinition;
 		ftype.definitions = new TCDefinitionList(def);
