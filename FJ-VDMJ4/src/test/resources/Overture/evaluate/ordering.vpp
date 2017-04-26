@@ -37,10 +37,14 @@ functions
 		mk_R(1,0) <= mk_R(2,0),
 		mk_R(2,0) > mk_R(1,0),
 		mk_R(2,0) >= mk_R(1,0),
+		mk_R(1,0) = mk_R(1,1),
+		mk_R(1,2) <> mk_R(2,1),
 		let t1:T = 1, t2:T = 2 in t1 > t2,
 		let t1:T = 1, t2:T = 2 in t1 >= t2,
 		let t1:T = 1, t2:T = 2 in t2 < t1,
-		let t1:T = 1, t2:T = 2 in t2 <= t1
+		let t1:T = 1, t2:T = 2 in t2 <= t1,
+		let t1:T = 1 in t1 = t1,
+		let t1:T = 1, t2:T = 2 in t2 <> t1
 	]
 	post elems RESULT = {true};
 
