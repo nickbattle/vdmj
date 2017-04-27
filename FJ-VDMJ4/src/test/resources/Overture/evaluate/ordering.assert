@@ -1,1 +1,5 @@
-new A().test() = [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
+new A().test() = [true, true, true, true, true, true, true,
+	true, true, true, true, true, true, true, true, true,
+	true, true, true, true, true, true, true, true, true,
+	true, true, true, true, true, true, true, true, true,
+	true, true]

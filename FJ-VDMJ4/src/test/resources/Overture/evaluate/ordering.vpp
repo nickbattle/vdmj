@@ -66,9 +66,18 @@ functions
 		max_R(mk_R(2,0), mk_R(2,0)) = mk_R(2,0)
 	]
 	post elems RESULT = {true};
+	
+	test_seq: () -> seq of bool
+	test_seq() ==
+	[
+		let S:set of T = {1,2,3} in [x | x in set S] = [3,2,1],
+		let S:set of R = {mk_R(2,0), mk_R(1,0)} in [x | x in set S] = [mk_R(1,0), mk_R(2,0)]
+	]
+	post elems RESULT = {true};
 
 	public test: () -> seq of bool
 	test() ==
-		test_eq_ord_f() ^ test_eq() ^ test_min_max_f();
+		test_eq_ord_f() ^ test_eq() ^ test_min_max_f() ^ test_seq()
+	post elems RESULT = {true};
 
 end A
