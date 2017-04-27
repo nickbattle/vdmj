@@ -70,20 +70,20 @@ public abstract class TCInvariantType extends TCType
 
 	public FunctionValue getInvariant(Context ctxt)
 	{
-		return getFunction(invdef, ctxt);
+		return findFunction(invdef, ctxt);
 	}
 
 	public FunctionValue getEquality(Context ctxt)
 	{
-		return getFunction(eqdef, ctxt);
+		return findFunction(eqdef, ctxt);
 	}
 
 	public FunctionValue getOrder(Context ctxt)
 	{
-		return getFunction(orddef, ctxt);
+		return findFunction(orddef, ctxt);
 	}
 
-	private FunctionValue getFunction(TCExplicitFunctionDefinition def, Context ctxt)
+	protected FunctionValue findFunction(TCExplicitFunctionDefinition def, Context ctxt)
 	{
 		if (def != null)
 		{

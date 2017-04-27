@@ -24,12 +24,14 @@
 package com.fujitsu.vdmj.tc.types;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
+import com.fujitsu.vdmj.values.FunctionValue;
 
 public class TCNamedType extends TCInvariantType
 {
@@ -231,6 +233,38 @@ public class TCNamedType extends TCInvariantType
 	public TCFunctionType getFunction()
 	{
 		return type.getFunction();
+	}
+
+	@Override
+	public FunctionValue getEquality(Context ctxt)
+	{
+		if (eqdef != null)
+		{
+			return findFunction(eqdef, ctxt);
+		}
+		else if (type instanceof TCInvariantType)
+		{
+			TCInvariantType it = (TCInvariantType)type;
+			return it.getEquality(ctxt);
+		}
+		
+		return null;
+	}
+
+	@Override
+	public FunctionValue getOrder(Context ctxt)
+	{
+		if (orddef != null)
+		{
+			return findFunction(orddef, ctxt);
+		}
+		else if (type instanceof TCInvariantType)
+		{
+			TCInvariantType it = (TCInvariantType)type;
+			return it.getOrder(ctxt);
+		}
+		
+		return null;
 	}
 
 	@Override

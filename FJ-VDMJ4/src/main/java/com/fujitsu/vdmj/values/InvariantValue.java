@@ -207,6 +207,43 @@ public class InvariantValue extends ReferenceValue
 	}
 	
 	@Override
+	public boolean equals(Object other)
+	{
+		if (other instanceof InvariantValue)
+		{
+			InvariantValue ot = (InvariantValue)other;
+
+			if (ot.type.equals(type))
+			{
+				if (equality != null)
+				{
+					Context ctxt = new Context(equality.location, "eq", null);
+					ctxt.setThreadState(null);
+					ctxt.threadState.setAtomic(true);
+
+					try
+					{
+    					ValueList args = new ValueList();
+    					args.add(this);
+    					args.add(ot);
+						return equality.eval(equality.location, args, ctxt).boolValue(ctxt);
+					}
+					catch (ValueException e)
+					{
+						throw new RuntimeException(e);
+					}
+					finally
+					{
+						ctxt.threadState.setAtomic(false);
+					}
+				}
+			}
+		}
+
+		return super.equals(other);
+	}
+	
+	@Override
 	public boolean isOrdered()
 	{
 		return ordering != null;
