@@ -126,6 +126,12 @@ public class RecordValue extends Value
 			this.fieldmap.add(nvp.name.getName(), nvp.value, !f.equalityAbstration);
 		}
 	}
+	
+	@Override
+	public boolean isOrdered()
+	{
+		return ordering != null;
+	}
 
 	public void checkInvariant(Context ctxt) throws ValueException
 	{

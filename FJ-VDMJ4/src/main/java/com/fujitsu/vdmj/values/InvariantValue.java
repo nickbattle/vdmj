@@ -205,4 +205,10 @@ public class InvariantValue extends ReferenceValue
 
 		return -1;	// Arbitrary as they're not comparable
 	}
+	
+	@Override
+	public boolean isOrdered()
+	{
+		return ordering != null;
+	}
 }

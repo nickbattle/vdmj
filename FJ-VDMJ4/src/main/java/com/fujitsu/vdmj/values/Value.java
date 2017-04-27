@@ -305,25 +305,6 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 
 	public boolean isOrdered()
 	{
-		if (this instanceof InvariantValue)
-		{
-			InvariantValue iv = (InvariantValue)this;
-
-			if (iv.ordering != null)
-			{
-				return true;
-			}
-		}
-		else if (this instanceof RecordValue)
-		{
-			RecordValue rv = (RecordValue)this;
-
-			if (rv.ordering != null)
-			{
-				return true;
-			}
-		}
-		
 		return isNumeric();
 	}
 
