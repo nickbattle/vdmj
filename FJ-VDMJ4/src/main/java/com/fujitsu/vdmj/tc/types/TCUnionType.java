@@ -231,6 +231,20 @@ public class TCUnionType extends TCType
 
 		return false;
 	}
+	
+	@Override
+	public boolean isEq(LexLocation from)
+	{
+		for (TCType t: types)
+		{
+			if (t.isEq(from))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	@Override
 	public boolean isProduct(LexLocation from)

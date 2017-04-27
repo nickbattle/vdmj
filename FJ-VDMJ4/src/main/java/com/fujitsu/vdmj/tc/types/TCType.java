@@ -275,6 +275,14 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	/**
 	 * @param from
 	 */
+	public boolean isEq(LexLocation from)
+	{
+		return false;
+	}
+
+	/**
+	 * @param from
+	 */
 	public boolean isProduct(LexLocation from)
 	{
 		return false;

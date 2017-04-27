@@ -106,4 +106,10 @@ public abstract class TCInvariantType extends TCType
 	{
 		return orddef != null;
 	}
+	
+	@Override
+	public boolean isEq(LexLocation from)
+	{
+		return eqdef != null;
+	}
 }
