@@ -164,7 +164,7 @@ public class InvariantValue extends ReferenceValue
 			{
 				if (ordering != null)
 				{
-					Context ctxt = new Context(equality.location, "ord", null);
+					Context ctxt = new Context(ordering.location, "ord", null);
 					ctxt.setThreadState(null);
 					ctxt.threadState.setAtomic(true);
 
@@ -174,7 +174,7 @@ public class InvariantValue extends ReferenceValue
 						args.add(this);
 						args.add(ot);
 						
-						if (ordering.eval(equality.location, args, ctxt).boolValue(ctxt))
+						if (ordering.eval(ordering.location, args, ctxt).boolValue(ctxt))
 						{
 							return -1;	// Less
 						}

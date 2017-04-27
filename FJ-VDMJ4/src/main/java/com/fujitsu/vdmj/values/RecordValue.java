@@ -291,7 +291,7 @@ public class RecordValue extends Value
 			{
 				if (ordering != null)
 				{
-					Context ctxt = new Context(equality.location, "ord", null);
+					Context ctxt = new Context(ordering.location, "ord", null);
 					ctxt.setThreadState(null);
 					ctxt.threadState.setAtomic(true);
 
@@ -301,7 +301,7 @@ public class RecordValue extends Value
 						args.add(this);
 						args.add(ot);
 						
-						if (ordering.eval(equality.location, args, ctxt).boolValue(ctxt))
+						if (ordering.eval(ordering.location, args, ctxt).boolValue(ctxt))
 						{
 							return -1;	// Less
 						}

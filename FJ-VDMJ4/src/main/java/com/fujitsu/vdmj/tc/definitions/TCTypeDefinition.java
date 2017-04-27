@@ -472,10 +472,8 @@ public class TCTypeDefinition extends TCDefinition
 	{
 		LexLocation loc = fname.getLocation();
 		TCPatternList params = new TCPatternList();
-		TCNameToken var_a = new TCNameToken(loc, loc.module, "a");
-		TCNameToken var_b = new TCNameToken(loc, loc.module, "b");
-		params.add(new TCIdentifierPattern(var_a));
-		params.add(new TCIdentifierPattern(var_b));
+		params.add(new TCIdentifierPattern(new TCNameToken(loc, loc.module, "a")));
+		params.add(new TCIdentifierPattern(new TCNameToken(loc, loc.module, "b")));
 
 		TCPatternListList parameters = new TCPatternListList();
 		parameters.add(params);
@@ -484,7 +482,7 @@ public class TCTypeDefinition extends TCDefinition
 		ptypes.add(new TCUnresolvedType(name));
 		ptypes.add(new TCUnresolvedType(name));
 
-		// min_T: T * T +> T
+		// min_T: T * T +> T, max_T: T * T +> T
 		TCFunctionType ftype = new TCFunctionType(loc, ptypes, false, new TCUnresolvedType(name));
 		TCExpression body = null;
 		
@@ -492,13 +490,11 @@ public class TCTypeDefinition extends TCDefinition
 		{
 			if (isMin)
 			{
-				body = parse(String.format("if ord_%s(a, b) or eq_%s(a, b) then a else b",
-					name.getName(), name.getName()));
+				body = parse(String.format("if a < b or a = b then a else b"));
 			}
 			else
 			{
-				body = parse(String.format("if ord_%s(a, b) or eq_%s(a, b) then b else a",
-					name.getName(), name.getName()));
+				body = parse(String.format("if a < b or a = b then b else a"));
 			}
 		}
 		catch (Exception e)
@@ -516,7 +512,7 @@ public class TCTypeDefinition extends TCDefinition
 	
 	private TCExpression parse(String body) throws Exception
 	{
-		LexTokenReader ltr = new LexTokenReader(body, Dialect.VDM_PP);
+		LexTokenReader ltr = new LexTokenReader(body, Dialect.VDM_SL);
 		ExpressionReader er = new ExpressionReader(ltr);
 		er.setCurrentModule(name.getModule());
 		ASTExpression ast = er.readExpression();
