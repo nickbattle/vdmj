@@ -144,14 +144,30 @@ public class TCNamedType extends TCInvariantType
 	public boolean isOrdered(LexLocation from)
 	{
 		if (opaque && !from.module.equals(location.module)) return false;
-		return type.isOrdered(location);
+		
+		if (orddef != null)
+		{
+			return true;
+		}
+		else
+		{
+			return type.isOrdered(location);
+		}
 	}
 	
 	@Override
 	public boolean isEq(LexLocation from)
 	{
 		if (opaque && !from.module.equals(location.module)) return false;
-		return type.isEq(location);
+		
+		if (eqdef != null)
+		{
+			return true;
+		}
+		else
+		{
+			return type.isEq(location);
+		}
 	}
 
 	@Override

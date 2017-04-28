@@ -241,6 +241,12 @@ public class TCOptionalType extends TCType
 	}
 
 	@Override
+	public TCUnionType getUnion()
+	{
+		return type.getUnion();
+	}
+
+	@Override
 	public String toDisplay()
 	{
 		return "[" + type + "]";

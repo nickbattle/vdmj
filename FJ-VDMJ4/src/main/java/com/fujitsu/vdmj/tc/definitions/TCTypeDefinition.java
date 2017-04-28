@@ -45,6 +45,7 @@ import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -255,6 +256,24 @@ public class TCTypeDefinition extends TCDefinition
 		{
 			maxdef.typeCheck(base, NameScope.NAMES);
 		}
+		
+//		if (type.isUnion(location))
+//		{
+//			TCUnionType ut = type.getUnion();
+//			
+//			for (TCType t: ut.types)
+//			{
+//				if (t.isOrdered(location) && !t.isNumeric(location))
+//				{
+//					warning(9999, "Order of union type " + t + " will be " + (orddef == null ? "ignored" : "overridden"));
+//				}
+//				
+//				if (t.isEq(location))
+//				{
+//					warning(9999, "Equality of union type " + t + " will be " + (eqdef == null ? "ignored" : "overridden"));
+//				}
+//			}
+//		}
 		
 		if (type instanceof TCNamedType)
 		{
