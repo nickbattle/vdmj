@@ -265,6 +265,7 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
+	 * True if the type is numeric, or defines an ord clause (so can use "<").
 	 * @param from
 	 */
 	public boolean isOrdered(LexLocation from)
@@ -273,6 +274,7 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
+	 * True if the type defines an eq clause (all types can be compared for equality)
 	 * @param from
 	 */
 	public boolean isEq(LexLocation from)

@@ -246,6 +246,6 @@ public class InvariantValue extends ReferenceValue
 	@Override
 	public boolean isOrdered()
 	{
-		return ordering != null;
+		return (ordering != null) ? true : value.isOrdered();
 	}
 }

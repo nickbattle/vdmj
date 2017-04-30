@@ -905,6 +905,7 @@ as the expected and actual values.
 4168, "Arguments do not match parameters: <name(params)>"
 4169, "Arithmetic overflow"
 4170, "Cannot convert empty set to set1"
+4171, "Values cannot be compared: <first>, <second>"
 
 
 5000, "Definition <name> not used"
@@ -926,3 +927,5 @@ as the expected and actual values.
 5016, "Some statements will not be reached"
 5017, "Pure operation call may not be referentially transparent"
 5018, "Field has ':-' for type with eq definition"
+5019, "Order of union member <name> will be overridden"
+5020, "Equality of union member <name> will be overridden"

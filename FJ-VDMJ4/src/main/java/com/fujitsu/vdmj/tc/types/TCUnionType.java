@@ -218,31 +218,43 @@ public class TCUnionType extends TCType
 		return getNumeric() != null;
 	}
 	
+	private boolean inOrdering = false;
+	
 	@Override
 	public boolean isOrdered(LexLocation from)
 	{
+		if (inOrdering) return false; else inOrdering = true;
+		
 		for (TCType t: types)
 		{
 			if (t.isOrdered(from))
 			{
+				inOrdering = false;
 				return true;
 			}
 		}
 
+		inOrdering = false;
 		return false;
 	}
+	
+	private boolean inEqing = false;
 	
 	@Override
 	public boolean isEq(LexLocation from)
 	{
+		if (inEqing) return false; else inEqing = true;
+
 		for (TCType t: types)
 		{
 			if (t.isEq(from))
 			{
+				inEqing = false;
 				return true;
 			}
 		}
 
+		inEqing = false;
 		return false;
 	}
 

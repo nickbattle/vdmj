@@ -257,23 +257,23 @@ public class TCTypeDefinition extends TCDefinition
 			maxdef.typeCheck(base, NameScope.NAMES);
 		}
 		
-//		if (type.isUnion(location))
-//		{
-//			TCUnionType ut = type.getUnion();
-//			
-//			for (TCType t: ut.types)
-//			{
-//				if (t.isOrdered(location) && !t.isNumeric(location))
-//				{
-//					warning(9999, "Order of union type " + t + " will be " + (orddef == null ? "ignored" : "overridden"));
-//				}
-//				
-//				if (t.isEq(location))
-//				{
-//					warning(9999, "Equality of union type " + t + " will be " + (eqdef == null ? "ignored" : "overridden"));
-//				}
-//			}
-//		}
+		if (type.isUnion(location))
+		{
+			TCUnionType ut = type.getUnion();
+			
+			for (TCType t: ut.types)
+			{
+				if (orddef != null && t.isOrdered(location) && !t.isNumeric(location))
+				{
+					warning(9999, "Order of union member " + t + " will be overridden");
+				}
+				
+				if (eqdef != null && t.isEq(location))
+				{
+					warning(9999, "Equality of union member " + t + " will be overridden");
+				}
+			}
+		}
 		
 		if (type instanceof TCNamedType)
 		{

@@ -45,7 +45,12 @@ public class INLessExpression extends INNumericBinaryExpression
 
 		Value lv = left.eval(ctxt);
 		Value rv = right.eval(ctxt);
+		
+		if (lv.isOrdered() && rv.isOrdered())
+		{
+			return new BooleanValue(lv.compareTo(rv) < 0);
+		}
 
-		return new BooleanValue(lv.compareTo(rv) < 0);
+		return abort(4171, "Values cannot be compared: " + lv + ", " + rv, ctxt);
 	}
 }
