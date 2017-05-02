@@ -398,7 +398,7 @@ public class LexTokenReader extends BacktrackInputReader
     		    case '\\': ch = '\\'; break;
 
     		    case 'x':
-    		    	ch = (char)(value(rdCh())*16 + value(rdCh()));
+    		    	ch = (char)(valCh(rdCh(), 16)*16 + valCh(rdCh(), 16));
     		    	break;
 
     		    case 'c':
@@ -406,13 +406,13 @@ public class LexTokenReader extends BacktrackInputReader
     		    	break;
 
     		    case 'u':
-    		    	ch = (char)(value(rdCh())*4096 + value(rdCh())*256 +
-    		    				value(rdCh())*16 + value(rdCh()));
+    		    	ch = (char)(valCh(rdCh(), 16)*4096 + valCh(rdCh(), 16)*256 +
+    		    				valCh(rdCh(), 16)*16 + valCh(rdCh(), 16));
     		    	break;
 
     		    case '0': case '1':	case '2': case '3': case '4':
     			case '5': case '6':	case '7':
-    		    	ch = (char)(value(ch)*64 + value(rdCh())*8 + value(rdCh()));
+    		    	ch = (char)(valCh(ch, 8)*64 + valCh(rdCh(), 8)*8 + valCh(rdCh(), 8));
        		    	break;
 
     		    default:
@@ -421,6 +421,22 @@ public class LexTokenReader extends BacktrackInputReader
 	    }
 
 	    return ch;
+	}
+	
+	/**
+	 * Check and return the value of a character in a particular base.
+	 * @throws LexException 
+	 */
+	private int valCh(char c, int base) throws LexException
+	{
+		int val = value(c);
+		
+		if (val == -1 || val >= base)
+		{
+			throwMessage(1000, "Illegal character for base " + base);
+		}
+		
+		return val;
 	}
 
 	/**
