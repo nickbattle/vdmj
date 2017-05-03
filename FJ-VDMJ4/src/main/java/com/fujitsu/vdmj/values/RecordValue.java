@@ -41,6 +41,8 @@ public class RecordValue extends Value
 	public final FunctionValue invariant;
 	public final FunctionValue equality;
 	public final FunctionValue ordering;
+	
+	private Context compareCtxt = null;
 
 	// mk_ expressions
 	public RecordValue(TCRecordType type, ValueList values, Context ctxt) throws ValueException
@@ -234,7 +236,8 @@ public class RecordValue extends Value
     			{
     				if (equality != null)
     				{
-    					Context ctxt = new Context(equality.location, "eq", null);
+    					Context ctxt = compareCtxt != null ?
+    						compareCtxt : new Context(ordering.location, "eq", null);
     					ctxt.setThreadState(null);
     					ctxt.threadState.setAtomic(true);
 
@@ -285,6 +288,24 @@ public class RecordValue extends Value
 	}
 
 	@Override
+	public boolean equals(Object other, Context ctxt)
+	{
+		compareCtxt = ctxt;
+		boolean rv = equals(other);
+		compareCtxt = null;
+		return rv;
+	}
+
+	@Override
+	public int compareTo(Value other, Context ctxt)
+	{
+		compareCtxt = ctxt;
+		int rv = compareTo(other);
+		compareCtxt = null;
+		return rv;
+	}
+
+	@Override
 	public int compareTo(Value other)
 	{
 		Value val = other.deref();
@@ -297,7 +318,8 @@ public class RecordValue extends Value
 			{
 				if (ordering != null)
 				{
-					Context ctxt = new Context(ordering.location, "ord", null);
+					Context ctxt = compareCtxt != null ?
+						compareCtxt : new Context(ordering.location, "ord", null);
 					ctxt.setThreadState(null);
 					ctxt.threadState.setAtomic(true);
 

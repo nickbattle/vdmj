@@ -46,6 +46,6 @@ public class INNotEqualExpression extends INBinaryExpression
 		Value lv = left.eval(ctxt);
 		Value rv = right.eval(ctxt);
 
-		return new BooleanValue(!lv.equals(rv));
+		return new BooleanValue(!lv.equals(rv, ctxt));
 	}
 }

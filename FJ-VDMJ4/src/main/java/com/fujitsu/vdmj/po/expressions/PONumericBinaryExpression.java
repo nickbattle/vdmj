@@ -82,7 +82,7 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 		
 		if (type.isUnion(location))
 		{
-			// If any members are not ordered, then the left argument must not be that type
+			// If any members are not ordered, then the argument must not be that type
 			TCTypeSet members = type.getUnion().types;
 			TCTypeSet unordered = new TCTypeSet();
 			

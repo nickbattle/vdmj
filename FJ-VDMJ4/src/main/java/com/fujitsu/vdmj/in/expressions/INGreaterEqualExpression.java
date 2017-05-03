@@ -48,7 +48,7 @@ public class INGreaterEqualExpression extends INNumericBinaryExpression
 
 		if (lv.isOrdered() && rv.isOrdered())
 		{
-			int cmp = lv.compareTo(rv);
+			int cmp = lv.compareTo(rv, ctxt);
 			
 			if (cmp != Integer.MIN_VALUE)	// Indicates comparable
 			{

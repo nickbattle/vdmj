@@ -24,7 +24,10 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.tc.types.TCInvariantType;
+import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -69,5 +72,35 @@ abstract public class TCBinaryExpression extends TCExpression
 	public String toString()
 	{
 		return "(" + left + " " + op + " " + right + ")";
+	}
+	
+	protected void checkMultipleEqualities(TCType union)
+	{
+		if (union instanceof TCNamedType)
+		{
+			TCNamedType nt = (TCNamedType)union;
+			
+			if (nt.eqdef != null)
+			{
+				return;		// eqdef will override others anyway
+			}
+		}
+		
+		TCTypeSet members = union.getUnion().types;
+		TCTypeSet equality = new TCTypeSet();
+		
+		for (TCType m: members)
+		{
+			if (m instanceof TCInvariantType)
+			{
+				TCInvariantType it = (TCInvariantType)m;
+				if (it.eqdef != null) equality.add(m);
+			}
+		}
+		
+		if (equality.size() > 1)
+		{
+			warning(5022, "Multiple union members define eq clauses, " + equality);
+		}
 	}
 }

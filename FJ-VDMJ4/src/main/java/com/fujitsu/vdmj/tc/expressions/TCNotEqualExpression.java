@@ -46,6 +46,16 @@ public class TCNotEqualExpression extends TCBinaryExpression
 		ltype = left.typeCheck(env, null, scope, null);
 		rtype = right.typeCheck(env, null, scope, null);
 
+		if (ltype.isUnion(location))
+		{
+			checkMultipleEqualities(ltype);
+		}
+		
+		if (rtype.isUnion(location))
+		{
+			checkMultipleEqualities(rtype);
+		}
+
 		if (!TypeComparator.compatible(ltype, rtype))
 		{
 			report(3136, "Left and right of '<>' different types");

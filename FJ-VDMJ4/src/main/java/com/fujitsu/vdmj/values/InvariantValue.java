@@ -39,6 +39,8 @@ public class InvariantValue extends ReferenceValue
 	public final FunctionValue invariant;
 	public final FunctionValue equality;
 	public final FunctionValue ordering;
+	
+	private Context compareCtxt = null;
 
 	public InvariantValue(TCNamedType type, Value value, Context ctxt)
 		throws ValueException
@@ -154,11 +156,21 @@ public class InvariantValue extends ReferenceValue
 	}
 
 	@Override
+	public int compareTo(Value other, Context ctxt)
+	{
+		compareCtxt = ctxt;
+		int rv = compareTo(other);
+		compareCtxt = null;
+		return rv;
+	}
+
+	@Override
 	public int compareTo(Value other)
 	{
 		if (ordering != null)
 		{
-			Context ctxt = new Context(ordering.location, "ord", null);
+			Context ctxt = compareCtxt != null ?
+				compareCtxt : new Context(ordering.location, "ord", null);
 			ctxt.setThreadState(null);
 			ctxt.threadState.setAtomic(true);
 
@@ -199,38 +211,47 @@ public class InvariantValue extends ReferenceValue
 	@Override
 	public boolean equals(Object other)
 	{
-		if (other instanceof InvariantValue)
+		if (other instanceof Value)
 		{
-			InvariantValue ot = (InvariantValue)other;
-
-			if (ot.type.equals(type))
-			{
-				if (equality != null)
-				{
-					Context ctxt = new Context(equality.location, "eq", null);
-					ctxt.setThreadState(null);
-					ctxt.threadState.setAtomic(true);
-
-					try
-					{
-    					ValueList args = new ValueList();
-    					args.add(this);
-    					args.add(ot);
-						return equality.eval(equality.location, args, ctxt).boolValue(ctxt);
-					}
-					catch (ValueException e)
-					{
-						throw new RuntimeException(e);
-					}
-					finally
-					{
-						ctxt.threadState.setAtomic(false);
-					}
-				}
-			}
+    		if (equality != null)
+    		{
+    			Context ctxt = compareCtxt != null ?
+    				compareCtxt : new Context(ordering.location, "eq", null);
+    			ctxt.setThreadState(null);
+    			ctxt.threadState.setAtomic(true);
+    
+    			try
+    			{
+    				ValueList args = new ValueList();
+    				args.add(this);
+    				args.add((Value)other);
+    				return equality.eval(equality.location, args, ctxt).boolValue(ctxt);
+    			}
+    			catch (ValueException e)
+    			{
+    				throw new RuntimeException(e);
+    			}
+    			finally
+    			{
+    				ctxt.threadState.setAtomic(false);
+    			}
+    		}
+    		else
+    		{
+    			return super.equals(other);
+    		}
 		}
+		
+		return false;
+	}
 
-		return super.equals(other);
+	@Override
+	public boolean equals(Object other, Context ctxt)
+	{
+		compareCtxt = ctxt;
+		boolean rv = equals(other);
+		compareCtxt = null;
+		return rv;
 	}
 	
 	@Override

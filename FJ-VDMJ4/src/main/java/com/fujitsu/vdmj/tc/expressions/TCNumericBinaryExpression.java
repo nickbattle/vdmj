@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
+import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -94,9 +95,18 @@ abstract public class TCNumericBinaryExpression extends TCBinaryExpression
 	
 	private void checkMultipleOrders(TCType union)
 	{
+		if (union instanceof TCNamedType)
+		{
+			TCNamedType nt = (TCNamedType)union;
+			
+			if (nt.orddef != null)
+			{
+				return;		// orddef will override others anyway
+			}
+		}
+		
 		TCTypeSet members = union.getUnion().types;
 		TCTypeSet ordered = new TCTypeSet();
-		TCTypeSet equality = new TCTypeSet();
 		
 		for (TCType m: members)
 		{
@@ -104,18 +114,12 @@ abstract public class TCNumericBinaryExpression extends TCBinaryExpression
 			{
 				TCInvariantType it = (TCInvariantType)m;
 				if (it.orddef != null) ordered.add(m);
-				if (it.eqdef != null) equality.add(m);
 			}
 		}
 		
 		if (ordered.size() > 1)
 		{
 			warning(5021, "Multiple union members define order clauses, " + ordered);
-		}
-		
-		if (equality.size() > 1)
-		{
-			warning(5022, "Multiple union members define eq clauses, " + equality);
 		}
 	}
 }
