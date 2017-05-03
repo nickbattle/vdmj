@@ -58,7 +58,8 @@ public enum POType
 	OPERATION_PATTERNS("operation parameter patterns"),
 	OP_SATISFIABILITY("operation satifiability"),
 	SET_MEMBER("set membership"),
-	SEQ_MEMBER("sequence membership");
+	SEQ_MEMBER("sequence membership"),
+	ORDERED("ordered");
 
 	private String kind;
 

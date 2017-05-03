@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2017 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -21,26 +21,36 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.expressions;
+package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.ast.lex.LexToken;
-import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 
-public class POLessExpression extends PONumericBinaryExpression
+public class OrderedObligation extends ProofObligation
 {
-	private static final long serialVersionUID = 1L;
-
-	public POLessExpression(POExpression left, LexToken op, POExpression right,
-		TCType ltype, TCType rtype)
+	public OrderedObligation(POExpression exp, TCTypeSet types, POContextStack ctxt)
 	{
-		super(left, op, right, ltype, rtype);
+		super(exp.location, POType.ORDERED, ctxt);
+		StringBuilder sb = new StringBuilder();
+		String prefix = "";
+		
+		for (TCType type: types)
+		{
+			sb.append(prefix);
+			addNotIs(sb, exp, type);
+			prefix = " and ";
+		}
+		
+		value = ctxt.getObligation(sb.toString());
 	}
-	
-	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+
+	private void addNotIs(StringBuilder sb, POExpression exp, TCType type)
 	{
-		return getOrderedObligations(ctxt);
+		sb.append("not is_(");
+		sb.append(exp);
+		sb.append(", ");
+		sb.append(type);
+		sb.append(")");
 	}
 }

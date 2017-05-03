@@ -24,11 +24,13 @@
 package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.pog.OrderedObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 
 abstract public class PONumericBinaryExpression extends POBinaryExpression
 {
@@ -59,6 +61,45 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 
 		obligations.addAll(left.getProofObligations(ctxt));
 		obligations.addAll(right.getProofObligations(ctxt));
+		return obligations;
+	}
+	
+	/**
+	 * Generate ordering obligations, as used by the comparison operators.
+	 */
+	protected ProofObligationList getOrderedObligations(POContextStack ctxt)
+	{
+		ProofObligationList obligations = getOrderedObligations(left, ltype, ctxt);
+		obligations.addAll(getOrderedObligations(right, rtype, ctxt));
+		obligations.addAll(left.getProofObligations(ctxt));
+		obligations.addAll(right.getProofObligations(ctxt));
+		return obligations;
+	}
+	
+	private ProofObligationList getOrderedObligations(POExpression exp, TCType type, POContextStack ctxt)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+		
+		if (type.isUnion(location))
+		{
+			// If any members are not ordered, then the left argument must not be that type
+			TCTypeSet members = type.getUnion().types;
+			TCTypeSet unordered = new TCTypeSet();
+			
+			for (TCType m: members)
+			{
+				if (!m.isOrdered(location))
+				{
+					unordered.add(m);
+				}
+			}
+			
+			if (!unordered.isEmpty())
+			{
+				obligations.add(new OrderedObligation(exp, unordered, ctxt));
+			}
+		}
+		
 		return obligations;
 	}
 }
