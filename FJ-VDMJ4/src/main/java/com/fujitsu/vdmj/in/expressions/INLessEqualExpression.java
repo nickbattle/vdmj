@@ -48,7 +48,12 @@ public class INLessEqualExpression extends INNumericBinaryExpression
 
 		if (lv.isOrdered() && rv.isOrdered())
 		{
-			return new BooleanValue(lv.compareTo(rv) <= 0);
+			int cmp = lv.compareTo(rv);
+			
+			if (cmp != Integer.MIN_VALUE)	// Indicates comparable
+			{
+				return new BooleanValue(cmp <= 0);
+			}
 		}
 
 		return abort(4171, "Values cannot be compared: " + lv + ", " + rv, ctxt);

@@ -51,6 +51,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
+import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 /**
@@ -247,6 +248,9 @@ public class TCTypeDefinition extends TCDefinition
 			orddef.typeCheck(base, NameScope.NAMES);
 		}
 		
+		// Suppress any TC errors around min/max as they can only add confusion
+		TypeChecker.suspend(true);
+		
 		if (mindef != null)
 		{
 			mindef.typeCheck(base, NameScope.NAMES);
@@ -256,21 +260,28 @@ public class TCTypeDefinition extends TCDefinition
 		{
 			maxdef.typeCheck(base, NameScope.NAMES);
 		}
-		
+
+		TypeChecker.suspend(false);
+
 		if (type.isUnion(location))
 		{
 			TCUnionType ut = type.getUnion();
 			
 			for (TCType t: ut.types)
 			{
-				if (orddef != null && t.isOrdered(location) && !t.isNumeric(location))
+				if (orddef != null && t instanceof TCInvariantType)
 				{
-					warning(9999, "Order of union member " + t + " will be overridden");
+					TCInvariantType it = (TCInvariantType) t;
+					
+					if (it.orddef != null)
+					{
+						warning(5019, "Order of union member " + t + " will be overridden");
+					}
 				}
 				
 				if (eqdef != null && t.isEq(location))
 				{
-					warning(9999, "Equality of union member " + t + " will be overridden");
+					warning(5020, "Equality of union member " + t + " will be overridden");
 				}
 			}
 		}

@@ -929,3 +929,5 @@ as the expected and actual values.
 5018, "Field has ':-' for type with eq definition"
 5019, "Order of union member <name> will be overridden"
 5020, "Equality of union member <name> will be overridden"
+5021, "Multiple union members define order clauses, <types>"
+5022, "Multiple union members define eq clauses, <types>"

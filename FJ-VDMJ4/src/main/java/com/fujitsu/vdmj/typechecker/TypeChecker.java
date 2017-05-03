@@ -43,6 +43,7 @@ abstract public class TypeChecker
 	private static List<VDMError> errors = new Vector<VDMError>();
 	private static List<VDMWarning> warnings = new Vector<VDMWarning>();
 	private static VDMMessage lastMessage = null;
+	private static boolean suspended = false;
 	private static final int MAX = 100;
 
 	public TypeChecker()
@@ -54,6 +55,7 @@ abstract public class TypeChecker
 
 	public static void report(int number, String problem, LexLocation location)
 	{
+		if (suspended) return;	
 		VDMError error = new VDMError(number, problem, location);
 
 		if (!errors.contains(error))
@@ -75,6 +77,7 @@ abstract public class TypeChecker
 
 	public static void warning(int number, String problem, LexLocation location)
 	{
+		if (suspended) return;
 		VDMWarning warning = new VDMWarning(number, problem, location);
 
 		if (!warnings.contains(warning))
@@ -138,5 +141,10 @@ abstract public class TypeChecker
 		{
 			out.println(w.toString());
 		}
+	}
+
+	public static void suspend(boolean suspend)
+	{
+		suspended  = suspend;
 	}
 }

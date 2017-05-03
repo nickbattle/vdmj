@@ -156,54 +156,44 @@ public class InvariantValue extends ReferenceValue
 	@Override
 	public int compareTo(Value other)
 	{
-		if (other instanceof InvariantValue)
+		if (ordering != null)
 		{
-			InvariantValue ot = (InvariantValue)other;
+			Context ctxt = new Context(ordering.location, "ord", null);
+			ctxt.setThreadState(null);
+			ctxt.threadState.setAtomic(true);
 
-			if (ot.type.equals(type))
+			try
 			{
-				if (ordering != null)
+				ValueList args = new ValueList();
+				args.add(this);
+				args.add(other);
+				
+				if (ordering.eval(ordering.location, args, ctxt).boolValue(ctxt))
 				{
-					Context ctxt = new Context(ordering.location, "ord", null);
-					ctxt.setThreadState(null);
-					ctxt.threadState.setAtomic(true);
-
-					try
-					{
-						ValueList args = new ValueList();
-						args.add(this);
-						args.add(ot);
-						
-						if (ordering.eval(ordering.location, args, ctxt).boolValue(ctxt))
-						{
-							return -1;	// Less
-						}
-						else if (equals(other))
-						{
-							return 0;	// Equal
-						}
-						else
-						{
-							return 1;	// More
-						}
-					}
-					catch (ValueException e)
-					{
-						throw new RuntimeException(e);
-					}
-					finally
-					{
-						ctxt.threadState.setAtomic(false);
-					}
+					return -1;	// Less
+				}
+				else if (equals(other))
+				{
+					return 0;	// Equal
 				}
 				else
 				{
-					return super.compareTo(other);
+					return 1;	// More
 				}
 			}
+			catch (ValueException e)
+			{
+				throw new RuntimeException(e);
+			}
+			finally
+			{
+				ctxt.threadState.setAtomic(false);
+			}
 		}
-
-		return -1;	// Arbitrary as they're not comparable
+		else
+		{
+			return super.compareTo(other);
+		}
 	}
 	
 	@Override

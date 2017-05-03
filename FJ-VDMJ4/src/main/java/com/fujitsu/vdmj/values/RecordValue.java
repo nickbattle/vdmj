@@ -357,7 +357,7 @@ public class RecordValue extends Value
 			}
 		}
 
-		return -1;	// Arbitrary as not comparable
+		return Integer.MIN_VALUE;	// Indicates incomparable values, but allows "sorting"
 	}
 
 	@Override
