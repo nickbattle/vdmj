@@ -92,38 +92,10 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 	@Override
 	abstract public boolean equals(Object other);
 
-	/**
-	 * Version of equals that is used for value that need to use a ctxt to
-	 * evaluate an equality function. Implemented by RecordValue and InvariantValue.
-	 * @param ctxt
-	 */
-	public boolean equals(Object other, Context ctxt)
-	{
-		return equals(other);
-	}
-
-
-	/**
-	 * The method for the comparable interface. This is implemented by
-	 * numeric and invariant types, and allows collections of them to be sorted or
-	 * used in comparison operators.
-	 *
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
 	@Override
 	public int compareTo(Value other)
 	{
-		return toString().compareTo(other.toString());
-	}
-
-	/**
-	 * Version of compareTo that is used for value that need to use a ctxt to
-	 * evaluate an ordering function. Implemented by RecordValue and InvariantValue.
-	 * @param ctxt
-	 */
-	public int compareTo(Value other, Context ctxt)
-	{
-		return compareTo(other);
+		return toString().compareTo(other.toString());	// Arbitrary order
 	}
 
 	@Override

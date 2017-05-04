@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ExceptionHandler;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -40,8 +41,6 @@ public class InvariantValue extends ReferenceValue
 	public final FunctionValue equality;
 	public final FunctionValue ordering;
 	
-	private Context compareCtxt = null;
-
 	public InvariantValue(TCNamedType type, Value value, Context ctxt)
 		throws ValueException
 	{
@@ -156,21 +155,11 @@ public class InvariantValue extends ReferenceValue
 	}
 
 	@Override
-	public int compareTo(Value other, Context ctxt)
-	{
-		compareCtxt = ctxt;
-		int rv = compareTo(other);
-		compareCtxt = null;
-		return rv;
-	}
-
-	@Override
 	public int compareTo(Value other)
 	{
 		if (ordering != null)
 		{
-			Context ctxt = compareCtxt != null ?
-				compareCtxt : new Context(ordering.location, "ord", null);
+			Context ctxt = Interpreter.getInstance().getInitialContext();
 			ctxt.setThreadState(null);
 			ctxt.threadState.setAtomic(true);
 
@@ -215,8 +204,7 @@ public class InvariantValue extends ReferenceValue
 		{
     		if (equality != null)
     		{
-    			Context ctxt = compareCtxt != null ?
-    				compareCtxt : new Context(ordering.location, "eq", null);
+    			Context ctxt = Interpreter.getInstance().getInitialContext();
     			ctxt.setThreadState(null);
     			ctxt.threadState.setAtomic(true);
     
@@ -243,15 +231,6 @@ public class InvariantValue extends ReferenceValue
 		}
 		
 		return false;
-	}
-
-	@Override
-	public boolean equals(Object other, Context ctxt)
-	{
-		compareCtxt = ctxt;
-		boolean rv = equals(other);
-		compareCtxt = null;
-		return rv;
 	}
 	
 	@Override

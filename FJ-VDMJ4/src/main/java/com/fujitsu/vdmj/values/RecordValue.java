@@ -27,6 +27,7 @@ import java.util.Iterator;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
@@ -42,8 +43,6 @@ public class RecordValue extends Value
 	public final FunctionValue equality;
 	public final FunctionValue ordering;
 	
-	private Context compareCtxt = null;
-
 	// mk_ expressions
 	public RecordValue(TCRecordType type, ValueList values, Context ctxt) throws ValueException
 	{
@@ -236,8 +235,7 @@ public class RecordValue extends Value
     			{
     				if (equality != null)
     				{
-    					Context ctxt = compareCtxt != null ?
-    						compareCtxt : new Context(ordering.location, "eq", null);
+    					Context ctxt = Interpreter.getInstance().getInitialContext();
     					ctxt.setThreadState(null);
     					ctxt.threadState.setAtomic(true);
 
@@ -288,24 +286,6 @@ public class RecordValue extends Value
 	}
 
 	@Override
-	public boolean equals(Object other, Context ctxt)
-	{
-		compareCtxt = ctxt;
-		boolean rv = equals(other);
-		compareCtxt = null;
-		return rv;
-	}
-
-	@Override
-	public int compareTo(Value other, Context ctxt)
-	{
-		compareCtxt = ctxt;
-		int rv = compareTo(other);
-		compareCtxt = null;
-		return rv;
-	}
-
-	@Override
 	public int compareTo(Value other)
 	{
 		Value val = other.deref();
@@ -318,8 +298,7 @@ public class RecordValue extends Value
 			{
 				if (ordering != null)
 				{
-					Context ctxt = compareCtxt != null ?
-						compareCtxt : new Context(ordering.location, "ord", null);
+	    			Context ctxt = Interpreter.getInstance().getInitialContext();
 					ctxt.setThreadState(null);
 					ctxt.threadState.setAtomic(true);
 

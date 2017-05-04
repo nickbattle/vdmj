@@ -57,6 +57,6 @@ public class INEqualsExpression extends INBinaryExpression
 			return rv;
 		}
 
-		return new BooleanValue(lv.equals(rv, ctxt));
+		return new BooleanValue(lv.equals(rv));
 	}
 }
