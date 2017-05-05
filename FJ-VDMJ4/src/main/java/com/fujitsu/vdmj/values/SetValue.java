@@ -61,6 +61,7 @@ public class SetValue extends Value
 			// do not match the type of the ord_T function parameters. Throwing
 			// an exception here allows the union convertTo to choose another
 			// type from the union, until one succeeds.
+
 			values.sort();
 		}
 
@@ -188,7 +189,7 @@ public class SetValue extends Value
 				ns.add(v.convertValueTo(setto.setof, ctxt));
 			}
 
-			return new SetValue(ns, false);
+			return new SetValue(ns, true);	// Re-sort, as ord_T may be different
 		}
 		else
 		{
