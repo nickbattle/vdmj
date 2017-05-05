@@ -29,28 +29,27 @@ import com.fujitsu.vdmj.tc.types.TCTypeSet;
 
 public class OrderedObligation extends ProofObligation
 {
-	public OrderedObligation(POExpression exp, TCTypeSet types, POContextStack ctxt)
+	public OrderedObligation(POExpression left, POExpression right, TCTypeSet types, POContextStack ctxt)
 	{
-		super(exp.location, POType.ORDERED, ctxt);
+		super(left.location, POType.ORDERED, ctxt);
 		StringBuilder sb = new StringBuilder();
 		String prefix = "";
-		
+
 		for (TCType type: types)
 		{
 			sb.append(prefix);
-			addNotIs(sb, exp, type);
-			prefix = " and ";
+    		sb.append("(is_(");
+    		sb.append(left);
+    		sb.append(", ");
+    		sb.append(type);
+    		sb.append(") and is_(");
+    		sb.append(right);
+    		sb.append(", ");
+    		sb.append(type);
+    		sb.append("))");
+    		prefix = " or ";
 		}
 		
 		value = ctxt.getObligation(sb.toString());
-	}
-
-	private void addNotIs(StringBuilder sb, POExpression exp, TCType type)
-	{
-		sb.append("not is_(");
-		sb.append(exp);
-		sb.append(", ");
-		sb.append(type);
-		sb.append(")");
 	}
 }

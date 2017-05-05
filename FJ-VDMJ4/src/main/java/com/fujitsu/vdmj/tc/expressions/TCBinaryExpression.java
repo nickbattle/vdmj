@@ -100,7 +100,7 @@ abstract public class TCBinaryExpression extends TCExpression
 		
 		if (equality.size() > 1)
 		{
-			warning(5022, "Multiple union members define eq clauses, " + equality);
+			warning(5021, "Multiple union members define eq clauses, " + equality);
 		}
 	}
 }

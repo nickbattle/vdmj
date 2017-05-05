@@ -24,12 +24,9 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
-import com.fujitsu.vdmj.tc.types.TCInvariantType;
-import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -76,50 +73,10 @@ abstract public class TCNumericBinaryExpression extends TCBinaryExpression
 			detail("Actual", ltype);
 		}
 		
-		if (ltype.isUnion(location))
-		{
-			checkMultipleOrders(ltype);
-		}
-
 		if (!rtype.isOrdered(location))
 		{
 			report(3140, "Right hand of " + op + " is not ordered");
 			detail("Actual", rtype);
-		}
-		
-		if (rtype.isUnion(location))
-		{
-			checkMultipleOrders(rtype);
-		}
-	}
-	
-	private void checkMultipleOrders(TCType union)
-	{
-		if (union instanceof TCNamedType)
-		{
-			TCNamedType nt = (TCNamedType)union;
-			
-			if (nt.orddef != null)
-			{
-				return;		// orddef will override others anyway
-			}
-		}
-		
-		TCTypeSet members = union.getUnion().types;
-		TCTypeSet ordered = new TCTypeSet();
-		
-		for (TCType m: members)
-		{
-			if (m instanceof TCInvariantType)
-			{
-				TCInvariantType it = (TCInvariantType)m;
-				if (it.orddef != null) ordered.add(m);
-			}
-		}
-		
-		if (ordered.size() > 1)
-		{
-			warning(5021, "Multiple union members define order clauses, " + ordered);
 		}
 	}
 }
