@@ -46,7 +46,7 @@ public class TCEqualsExpression extends TCBinaryExpression
 		ltype = left.typeCheck(env, null, scope, null);
 		rtype = right.typeCheck(env, null, scope, null);
 
-		if (!TypeComparator.compatible(ltype, rtype))
+		if (!TypeComparator.compatible(ltype, rtype) || !TypeComparator.compatible(rtype, ltype))
 		{
 			report(3087, "Left and right of '=' are incompatible types");
 			detail2("Left", ltype, "Right", rtype);
