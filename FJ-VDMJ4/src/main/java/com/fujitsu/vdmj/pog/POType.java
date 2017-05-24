@@ -59,7 +59,8 @@ public enum POType
 	OP_SATISFIABILITY("operation satifiability"),
 	SET_MEMBER("set membership"),
 	SEQ_MEMBER("sequence membership"),
-	ORDERED("ordered");
+	ORDERED("ordered"),
+	STRICT_ORDER("strict order");
 
 	private String kind;
 
