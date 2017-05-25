@@ -26,15 +26,16 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class StrictOrderObligation extends ProofObligation
+public class EquivRelationObligation extends ProofObligation
 {
-	public StrictOrderObligation(POTypeDefinition def, POContextStack ctxt)
+	public EquivRelationObligation(POTypeDefinition def, POContextStack ctxt)
 	{
-		super(def.location, POType.STRICT_ORDER, ctxt);
-		TCNameToken ordT = def.name.getOrdName(location);
-		String po = "(forall x:%T & not %N(x, x)) and\n"
+		super(def.location, POType.EQUIV_RELATION, ctxt);
+		TCNameToken eqT = def.name.getEqName(location);
+		String po = "(forall x:%T & %N(x, x)) and\n"
+			+ "(forall x, y:%T & %N(x, y) => %N(y, x)) and\n"
 			+ "(forall x, y, z:%T & %N(x, y) and %N(y, z) => %N(x, z))";
-		po = po.replaceAll("%N", ordT.getName());
+		po = po.replaceAll("%N", eqT.getName());
 		po = po.replaceAll("%T", def.name.getName());
 		value = ctxt.getObligation(po);
 	}

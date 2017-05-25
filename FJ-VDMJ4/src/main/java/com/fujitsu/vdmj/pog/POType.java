@@ -60,7 +60,8 @@ public enum POType
 	SET_MEMBER("set membership"),
 	SEQ_MEMBER("sequence membership"),
 	ORDERED("ordered"),
-	STRICT_ORDER("strict order");
+	STRICT_ORDER("strict order"),
+	EQUIV_RELATION("equivalence relation");
 
 	private String kind;
 

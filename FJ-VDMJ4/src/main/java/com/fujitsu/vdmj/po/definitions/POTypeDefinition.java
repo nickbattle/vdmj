@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.pog.EquivRelationObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StrictOrderObligation;
@@ -105,6 +106,7 @@ public class POTypeDefinition extends PODefinition
 		if (eqExpression != null)
 		{
 			list.addAll(eqExpression.getProofObligations(ctxt));
+			list.add(new EquivRelationObligation(this, ctxt));
 		}
 
 		if (ordExpression != null)
