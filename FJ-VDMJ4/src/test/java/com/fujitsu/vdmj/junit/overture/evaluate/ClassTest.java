@@ -117,4 +117,9 @@ public class ClassTest extends OvertureTest
 	{
 		evaluate("ordering", ResultType.TRUE, 0, Release.VDM_10);
 	}
+	
+	public void test_Ordering2()
+	{
+		evaluate("ordering2", ResultType.TRUE, 0, Release.VDM_10);
+	}
 }
