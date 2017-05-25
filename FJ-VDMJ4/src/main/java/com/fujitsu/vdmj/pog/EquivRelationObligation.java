@@ -30,7 +30,7 @@ public class EquivRelationObligation extends ProofObligation
 {
 	public EquivRelationObligation(POTypeDefinition def, POContextStack ctxt)
 	{
-		super(def.location, POType.EQUIV_RELATION, ctxt);
+		super(def.eqPattern1.location, POType.EQUIV_RELATION, ctxt);
 		TCNameToken eqT = def.name.getEqName(location);
 		String po = "(forall x:%T & %N(x, x)) and\n"
 			+ "(forall x, y:%T & %N(x, y) => %N(y, x)) and\n"

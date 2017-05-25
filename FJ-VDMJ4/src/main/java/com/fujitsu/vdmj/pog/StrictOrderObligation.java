@@ -30,7 +30,7 @@ public class StrictOrderObligation extends ProofObligation
 {
 	public StrictOrderObligation(POTypeDefinition def, POContextStack ctxt)
 	{
-		super(def.location, POType.STRICT_ORDER, ctxt);
+		super(def.ordPattern1.location, POType.STRICT_ORDER, ctxt);
 		TCNameToken ordT = def.name.getOrdName(location);
 		String po = "(forall x:%T & not %N(x, x)) and\n"
 			+ "(forall x, y, z:%T & %N(x, y) and %N(y, z) => %N(x, z))";
