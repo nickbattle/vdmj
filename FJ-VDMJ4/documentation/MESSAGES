@@ -381,6 +381,7 @@ as the expected and actual values.
 2330, "Tokens found after expression at <token>"
 2331, "Expecting inv, eq or ord clause"
 2332, "Duplicate inv clause"
+2333, "Type eq/ord clauses not available in classic"
 
 3000, "Expression does not match declared type"
 3001, "Class inherits thread definition from multiple supertypes"
