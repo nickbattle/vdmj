@@ -244,6 +244,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
         				else
         				{
             				defs.add(new TCExternalDefinition(sdef, clause.mode.is(Token.READ)));
+            				argdefs.add(new TCExternalDefinition(sdef, clause.mode.is(Token.READ)));
 
             				// VDM++ "ext wr" clauses in a constructor effectively
             				// initialize the instance variable concerned.
@@ -304,7 +305,8 @@ public class TCImplicitOperationDefinition extends TCDefinition
 
 		if (predef != null)
 		{
-			FlatEnvironment pre = new FlatEnvironment(new TCDefinitionList(), local);
+			FlatEnvironment pre = new FlatEnvironment(argdefs, base);
+			pre.setLimitStateScope(limitStateScope);
 			pre.setEnclosingDefinition(predef);
 			pre.setFunctional(true);
 			TCBooleanType expected = new TCBooleanType(location);
