@@ -238,8 +238,9 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 
 		if (predef != null)
 		{
+			FlatEnvironment pre = new FlatEnvironment(argdefs, base);
 			TCBooleanType expected = new TCBooleanType(location);
-			TCType b = predef.body.typeCheck(local, null, NameScope.NAMES, expected);
+			TCType b = predef.body.typeCheck(pre, null, NameScope.NAMES, expected);
 
 			if (!b.isType(TCBooleanType.class, location))
 			{
