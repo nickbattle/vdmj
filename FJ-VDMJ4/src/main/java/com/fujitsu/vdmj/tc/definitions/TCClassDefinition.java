@@ -920,8 +920,9 @@ public class TCClassDefinition extends TCDefinition
 
 		TCNameToken invname = name.getInvName(invloc);
 		TCStatement body = new TCClassInvariantStatement(invname, invdefs);
+		TCAccessSpecifier access = new TCAccessSpecifier(false, false, Token.PRIVATE, true);
 
-		return new TCExplicitOperationDefinition(TCAccessSpecifier.DEFAULT, invname, type, new TCPatternList(), null, null, body);
+		return new TCExplicitOperationDefinition(access, invname, type, new TCPatternList(), null, null, body);
 	}
 
 	@Override

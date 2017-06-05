@@ -171,7 +171,7 @@ public class ClassCommandReader extends CommandReader
     			{
     				if (d instanceof INNamedTraceDefinition)
     				{
-    					String cmd = "runtrace " + d.name.getExplicit(true).getName();
+    					String cmd = "runtrace " + d.name.getExplicit(true);
     					println("-------------------------------------");
     					println(cmd);
     					doRuntrace(cmd, false);
