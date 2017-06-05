@@ -50,18 +50,27 @@ public class ClassMapper
 	private final Stack<Progress> inProgress = new Stack<Progress>();
 	
 	private final Map<Long, Object> converted = new HashMap<Long, Object>();
+	
+	private long loadTimeMs;
 
 	/**
 	 * Get an instance of a mapper, defined by the mapspec file name (resource).
 	 */
 	public static ClassMapper getInstance(String config)
 	{
-		if (!mappers.containsKey(config))
+		ClassMapper mapper = mappers.get(config);
+		
+		if (mapper == null)
 		{
-			mappers.put(config, new ClassMapper(config));
+			mapper = new ClassMapper(config);
+			mappers.put(config, mapper);
+		}
+		else
+		{
+			mapper.loadTimeMs = 0;	// As not loaded
 		}
 
-		return mappers.get(config);
+		return mapper;
 	}
 	
 	/**
@@ -104,7 +113,7 @@ public class ClassMapper
 	private ClassMapper(String config)
 	{
 		configFile = config;
-		// long before = System.currentTimeMillis();
+		long before = System.currentTimeMillis();
 
 		try
 		{
@@ -116,7 +125,7 @@ public class ClassMapper
 			error(e.getMessage());
 		}
 		
-		// System.out.println("Loaded " + config + " in " + (System.currentTimeMillis() - before + "ms"));
+		loadTimeMs = System.currentTimeMillis() - before;
 		
 		if (errorCount > 0)
 		{
@@ -590,5 +599,15 @@ public class ClassMapper
 		}
 		
 		return null;
+	}
+	
+	public int getNodeCount()
+	{
+		return converted.size();
+	}
+	
+	public long getLoadTime()
+	{
+		return loadTimeMs;
 	}
 }
