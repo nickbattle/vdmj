@@ -137,10 +137,8 @@ public class VDMSL extends VDMJ
    		try
    		{
    			checkedModules = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedModules);
+   			mapperStats(before, TCNode.MAPPINGS);
    			terrs += checkedModules.combineDefaults();
-   			
-//   			infoln("Type converted " + plural(checkedModules.size(), "module", "s") +
-//   				" in " + (double)(System.currentTimeMillis()-before)/1000 + " secs. ");
 
    			TypeChecker typeChecker = new ModuleTypeChecker(checkedModules);
    			typeChecker.typeCheck();
@@ -225,9 +223,6 @@ public class VDMSL extends VDMJ
    			long before = System.currentTimeMillis();
    			interpreter = getInterpreter();
 
-//   			infoln("Interpreter converted " + plural(checkedModules.size(), "module", "s") +
-//   				" in " + (double)(System.currentTimeMillis()-before)/1000 + " secs. ");
-
    			interpreter.init();
 
    			if (defaultName != null)
@@ -294,7 +289,9 @@ public class VDMSL extends VDMJ
 	{
 		if (executableModules == null)
 		{
+			long before = System.currentTimeMillis();
    			executableModules = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedModules);
+   			mapperStats(before, INNode.MAPPINGS);
 		}
 		
 		return new ModuleInterpreter(executableModules, checkedModules);

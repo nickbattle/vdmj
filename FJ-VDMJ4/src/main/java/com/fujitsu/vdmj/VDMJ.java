@@ -40,6 +40,7 @@ import java.util.jar.Manifest;
 
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
@@ -600,5 +601,23 @@ abstract public class VDMJ
 	public void setQuiet(boolean quiet)
 	{
 		VDMJ.quiet = quiet;
+	}
+	
+	protected void mapperStats(long before, String mappings)
+	{
+		long after = System.currentTimeMillis();
+		long count = ClassMapper.getInstance(mappings).getNodeCount();
+		long load = ClassMapper.getInstance(mappings).getLoadTime();
+		double time = (double)(after-before-load)/1000;
+		
+		if (time < 0.01)
+		{
+			infoln("Mapped " + count + " nodes with " + mappings + " in " + time + " secs");
+		}
+		else
+		{
+			int rate = (int) (count/time);
+			infoln("Mapped " + count + " nodes with " + mappings + " in " + time + " secs (" + rate + "/sec)");
+		}
 	}
 }
