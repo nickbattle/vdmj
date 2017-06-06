@@ -65,10 +65,6 @@ public class ClassMapper
 			mapper = new ClassMapper(config);
 			mappers.put(config, mapper);
 		}
-		else
-		{
-			mapper.loadTimeMs = 0;	// As not loaded
-		}
 
 		return mapper;
 	}
@@ -606,8 +602,15 @@ public class ClassMapper
 		return converted.size();
 	}
 	
+	/**
+	 * Return the load time of the mappings file. This is zeroed after the first request,
+	 * because the mapping is not re-loaded after the first usage, and so the cost is
+	 * zero.
+	 */
 	public long getLoadTime()
 	{
-		return loadTimeMs;
+		long value = loadTimeMs;
+		loadTimeMs = 0;
+		return value;
 	}
 }

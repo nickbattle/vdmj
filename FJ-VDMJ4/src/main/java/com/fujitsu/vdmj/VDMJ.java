@@ -59,6 +59,7 @@ abstract public class VDMJ
 	protected static boolean quiet = false;
 	protected static String script = null;
 	protected static String logfile = null;
+	protected static boolean performance = false;
 
 	public static String filecharset = Charset.defaultCharset().name();
 
@@ -135,6 +136,10 @@ abstract public class VDMJ
     		else if (arg.equals("-q"))
     		{
     			quiet = true;
+    		}
+    		else if (arg.equals("-performance"))
+    		{
+    			performance = true;
     		}
     		else if (arg.equals("-e"))
     		{
@@ -500,7 +505,8 @@ abstract public class VDMJ
 		System.err.println("-log <filename>: enable real-time event logging");
 		System.err.println("-remote <class>: enable remote control");
 		System.err.println("-precision <n>: set real number precision to n places");
-		
+		System.err.println("-performance: display mapping performance");
+
 		System.exit(1);
 	}
 
@@ -628,21 +634,25 @@ abstract public class VDMJ
 		VDMJ.quiet = quiet;
 	}
 	
-	protected void mapperStats(long before, String mappings)
+	protected void mapperStats(long start, String mappings)
 	{
-		long after = System.currentTimeMillis();
-		long count = ClassMapper.getInstance(mappings).getNodeCount();
-		long load = ClassMapper.getInstance(mappings).getLoadTime();
-		double time = (double)(after-before-load)/1000;
-		
-		if (time < 0.01)
+		if (performance)
 		{
-			infoln("Mapped " + count + " nodes with " + mappings + " in " + time + " secs");
-		}
-		else
-		{
-			int rate = (int) (count/time);
-			infoln("Mapped " + count + " nodes with " + mappings + " in " + time + " secs (" + rate + "/sec)");
+    		long now = System.currentTimeMillis();
+    		ClassMapper mapper = ClassMapper.getInstance(mappings);
+    		long count = mapper.getNodeCount();
+    		long load = mapper.getLoadTime();
+    		double time = (double)(now-start-load)/1000;
+    		
+    		if (time < 0.01)
+    		{
+    			infoln("Mapped " + count + " nodes with " + mappings + " in " + time + " secs");
+    		}
+    		else
+    		{
+    			int rate = (int) (count/time);
+    			infoln("Mapped " + count + " nodes with " + mappings + " in " + time + " secs (" + rate + "/sec)");
+    		}
 		}
 	}
 }
