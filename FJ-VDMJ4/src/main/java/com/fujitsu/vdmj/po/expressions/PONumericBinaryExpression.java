@@ -50,14 +50,31 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 
 		if (ltype.isUnion(location))
 		{
-			obligations.add(
-				new SubTypeObligation(left, new TCRealType(left.location), ltype, ctxt));
+			for (TCType type: ltype.getUnion().types)
+			{
+				if (!type.isNumeric(type.location))
+				{
+					obligations.add(
+						new SubTypeObligation(left, new TCRealType(left.location), ltype, ctxt));
+
+					break;
+				}
+			}
+			
 		}
 
 		if (rtype.isUnion(location))
 		{
-			obligations.add(
-				new SubTypeObligation(right, new TCRealType(right.location), rtype, ctxt));
+			for (TCType type: rtype.getUnion().types)
+			{
+				if (!type.isNumeric(type.location))
+				{
+        			obligations.add(
+        				new SubTypeObligation(right, new TCRealType(right.location), rtype, ctxt));
+        			
+        			break;
+				}
+			}
 		}
 
 		obligations.addAll(left.getProofObligations(ctxt));
