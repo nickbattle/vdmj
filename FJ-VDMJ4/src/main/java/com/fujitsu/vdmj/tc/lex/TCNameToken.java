@@ -37,13 +37,13 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 {
 	private static final long serialVersionUID = 1L;
 
-	private final LexNameToken tcname;
+	private final LexNameToken lexname;
 
 	private TCTypeList parameters = null;
 	
 	public TCNameToken(LexNameToken name)
 	{
-		this.tcname = name;
+		this.lexname = name;
 	}
 
 	public TCNameToken(LexLocation location, String module, String name)
@@ -58,7 +58,7 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 
 	public TCNameToken(LexLocation location, String module, String name, boolean old, boolean explicit)
 	{
-		this.tcname = new LexNameToken(module, name, location, old, explicit);
+		this.lexname = new LexNameToken(module, name, location, old, explicit);
 	}
 
 	public void setTypeQualifier(TCTypeList parameters)
@@ -79,7 +79,7 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 	
 	public boolean matches(TCNameToken name)
 	{
-		return name.tcname.matches(tcname);
+		return name.lexname.matches(lexname);
 	}
 	
 	@Override
@@ -92,7 +92,7 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 
 		TCNameToken lother = (TCNameToken)other;
 		
-		if (!getLex().matches(lother.getLex()))	// module, name and old-flag)
+		if (!lexname.matches(lother.lexname))
 		{
 			return false;
 		}
@@ -104,49 +104,64 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 		{
 			return (parameters == null && lother.parameters == null);
 		}
+		
+//		if (parameters != null && lother.parameters != null)
+//		{
+//			if (!TypeComparator.compatible(parameters, lother.parameters))
+//			{
+//				return false;
+//			}
+//		}
+//		else if ((parameters != null && lother.parameters == null) ||
+//				 (parameters == null && lother.parameters != null))
+//		{
+//			return false;
+//		}
+//
+//		return matches(lother);
 	}
 	
 	@Override
 	public int hashCode()
 	{
-		return tcname.hashCode();
+		return lexname.hashCode();
 	}
 
 	@Override
 	public String toString()
 	{
-		return  tcname.toString() + (parameters == null ? "" : parameters);
+		return  lexname.toString() + (parameters == null ? "" : parameters);
 	}
 
 	public String getName()		// Simple name, never explicit
 	{
-		return tcname.name;
+		return lexname.name;
 	}
 
 	public String getModule()	// Module name
 	{
-		return tcname.getModule();
+		return lexname.getModule();
 	}
 	
 	public LexNameToken getLex()
 	{
-		return tcname;
+		return lexname;
 	}
 
 	@Override
 	public LexLocation getLocation()
 	{
-		return tcname.location;
+		return lexname.location;
 	}
 
 	public boolean isOld()
 	{
-		return tcname.old;
+		return lexname.old;
 	}
 	
 	public boolean isExplicit()
 	{
-		return tcname.explicit;
+		return lexname.explicit;
 	}
 
 	public TCNameToken getPreName(LexLocation l)
@@ -192,12 +207,12 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 
 	public TCNameToken getOldName()
 	{
-		return new TCNameToken(tcname.getOldName());
+		return new TCNameToken(lexname.getOldName());
 	}
 
 	public TCNameToken getNewName()
 	{
-		return new TCNameToken(tcname.getNewName());
+		return new TCNameToken(lexname.getNewName());
 	}
 
 	public TCNameToken getModifiedName(String classname)	// Just change module
