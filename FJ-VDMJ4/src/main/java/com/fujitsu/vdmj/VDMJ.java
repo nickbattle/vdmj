@@ -55,7 +55,7 @@ abstract public class VDMJ
 	protected static boolean quiet = false;
 	protected static String script = null;
 	protected static String logfile = null;
-	protected static boolean performance = false;
+	protected static boolean verbose = false;
 
 	public static String filecharset = Charset.defaultCharset().name();
 
@@ -66,7 +66,6 @@ abstract public class VDMJ
 	 *
 	 * @param args Arguments passed to the program.
 	 */
-
 	public static void main(String[] args)
 	{
 		List<File> filenames = new Vector<File>();
@@ -132,10 +131,12 @@ abstract public class VDMJ
     		else if (arg.equals("-q"))
     		{
     			quiet = true;
+    			verbose = false;
     		}
-    		else if (arg.equals("-performance"))
+    		else if (arg.equals("-verbose"))
     		{
-    			performance = true;
+    			verbose = true;
+    			quiet = false;
     		}
     		else if (arg.equals("-e"))
     		{
@@ -480,28 +481,26 @@ abstract public class VDMJ
 		System.err.println("-measures: disable recursive measure checking");
 		System.err.println("-log <filename>: enable real-time event logging");
 		System.err.println("-remote <class>: enable remote control");
-		System.err.println("-performance: display mapping performance");
+		System.err.println("-verbose: display detailed startup information");
 
 		System.exit(1);
 	}
 
 	/**
-	 * Parse the list of files passed. The value returned is the number of
-	 * syntax errors encountered.
+	 * Parse the list of files passed. The value returned indicates whether
+	 * syntax errors were encountered.
 	 *
 	 * @param files The files to parse.
-	 * @return The number of syntax errors.
+	 * @return The error status.
 	 */
-
 	public abstract ExitStatus parse(List<File> files);
 
 	/**
 	 * TCType check the files previously parsed by {@link #parse(List)}. The
-	 * value returned is the number of type checking errors.
+	 * value returned indicates whether errors were found.
 	 *
-	 * @return The number of type check errors.
+	 * @return The error status.
 	 */
-
 	public abstract ExitStatus typeCheck();
 
 	/**
@@ -509,36 +508,19 @@ abstract public class VDMJ
 	 * @return An initialized interpreter.
 	 * @throws Exception
 	 */
-
 	public abstract Interpreter getInterpreter() throws Exception;
 
 	/**
-	 * Interpret the type checked specification. The number returned is the
-	 * number of runtime errors not caught by the interpreter (usually zero
-	 * or one).
+	 * Interpret the type checked specification. The value returned indicates
+	 * whether the execution terminated successfully or because of a runtime
+	 * error
 	 *
 	 * @param filenames The filenames currently loaded.
 	 * @param defaultName The default module or class (or null).
 	 * @return The exit status of the interpreter.
 	 */
-
 	abstract protected ExitStatus interpret(List<File> filenames, String defaultName);
 
-//	public void setWarnings(boolean w)
-//	{
-//		warnings = w;
-//	}
-//
-//	public void setQuiet(boolean q)
-//	{
-//		quiet = q;
-//	}
-//
-//	public void setCharset(String charset)
-//	{
-//		filecharset = charset;
-//		Console.setCharset(charset);
-//	}
 
 	protected static void info(String m)
 	{
@@ -611,12 +593,18 @@ abstract public class VDMJ
 	
 	protected void mapperStats(long start, String mappings)
 	{
-		if (performance)
+		if (verbose)
 		{
     		long now = System.currentTimeMillis();
     		ClassMapper mapper = ClassMapper.getInstance(mappings);
     		long count = mapper.getNodeCount();
     		long load = mapper.getLoadTime();
+    		
+    		if (load != 0)
+    		{
+    			infoln("Loaded " + mappings + " in " + (double)load/1000 + " secs");
+    		}
+    		
     		double time = (double)(now-start-load)/1000;
     		
     		if (time < 0.01)
