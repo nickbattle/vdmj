@@ -591,7 +591,7 @@ abstract public class VDMJ
 		VDMJ.quiet = quiet;
 	}
 	
-	protected void mapperStats(long start, String mappings)
+	protected long mapperStats(long start, String mappings)
 	{
 		if (verbose)
 		{
@@ -616,6 +616,12 @@ abstract public class VDMJ
     			int rate = (int) (count/time);
     			infoln("Mapped " + count + " nodes with " + mappings + " in " + time + " secs (" + rate + "/sec)");
     		}
+    		
+    		return System.currentTimeMillis();		// ie. remove load times
+		}
+		else
+		{
+			return start;
 		}
 	}
 }

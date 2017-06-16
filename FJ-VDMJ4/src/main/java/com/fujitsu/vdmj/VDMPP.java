@@ -139,7 +139,7 @@ public class VDMPP extends VDMJ
    		try
    		{
    			checkedClasses = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedClasses);
-   			mapperStats(before, TCNode.MAPPINGS);
+   			before = mapperStats(before, TCNode.MAPPINGS);
    			TypeChecker typeChecker = new ClassTypeChecker(checkedClasses);
    			typeChecker.typeCheck();
    		}
@@ -242,6 +242,7 @@ public class VDMPP extends VDMJ
 		{
    			long before = System.currentTimeMillis();
    			interpreter = getInterpreter();
+   			if (verbose) before = System.currentTimeMillis();
    			interpreter.init();
 
    			if (defaultName != null)
