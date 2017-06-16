@@ -137,7 +137,7 @@ public class VDMSL extends VDMJ
    		try
    		{
    			checkedModules = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedModules);
-   			mapperStats(before, TCNode.MAPPINGS);
+   			before = mapperStats(before, TCNode.MAPPINGS);
    			terrs += checkedModules.combineDefaults();
 
    			TypeChecker typeChecker = new ModuleTypeChecker(checkedModules);
