@@ -187,7 +187,9 @@ public class VDMPP extends VDMJ
   			
       		try
       		{
+      			long now = System.currentTimeMillis();
       			POClassList pogClasses = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedClasses);
+      			mapperStats(now, PONode.MAPPINGS);
       			list = pogClasses.getProofObligations();
        		}
     		catch (InternalException e)

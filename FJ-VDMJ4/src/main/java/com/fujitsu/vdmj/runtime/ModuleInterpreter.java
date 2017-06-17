@@ -27,6 +27,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Set;
 
+import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.in.INNode;
@@ -328,7 +329,9 @@ public class ModuleInterpreter extends Interpreter
 	{
 		if (pogModules == null)
 		{
+			long now = System.currentTimeMillis();
 			pogModules = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedModules);
+			VDMJ.mapperStats(now, PONode.MAPPINGS);
 		}
 		
 		return pogModules.getProofObligations();
