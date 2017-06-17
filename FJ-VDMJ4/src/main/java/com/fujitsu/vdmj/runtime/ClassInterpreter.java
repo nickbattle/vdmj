@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INClassList;
@@ -393,7 +394,9 @@ public class ClassInterpreter extends Interpreter
 	{
 		if (pogClasses == null)
 		{
+			long now = System.currentTimeMillis();
 			pogClasses = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedClasses);
+			VDMJ.mapperStats(now, PONode.MAPPINGS);
 		}
 		
 		return pogClasses.getProofObligations();

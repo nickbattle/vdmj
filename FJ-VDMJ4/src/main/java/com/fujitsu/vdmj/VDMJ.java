@@ -616,7 +616,7 @@ abstract public class VDMJ
 		VDMJ.quiet = quiet;
 	}
 	
-	protected long mapperStats(long start, String mappings)
+	public static long mapperStats(long start, String mappings)
 	{
 		if (verbose)
 		{

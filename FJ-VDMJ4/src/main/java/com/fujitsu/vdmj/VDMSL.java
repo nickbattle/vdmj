@@ -181,7 +181,9 @@ public class VDMSL extends VDMJ
   			
       		try
       		{
+      			long now = System.currentTimeMillis();
       			POModuleList pogModules = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedModules);
+      			mapperStats(now, PONode.MAPPINGS);
       			list = pogModules.getProofObligations();
        		}
     		catch (InternalException e)
