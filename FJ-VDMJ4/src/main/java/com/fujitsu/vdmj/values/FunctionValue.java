@@ -640,6 +640,11 @@ public class FunctionValue extends Value
 				}
 				else
 				{
+					if (type.parameters.size() != restrictedType.parameters.size())
+					{
+						abort(4171, "Cannot convert " + type + " to " + to, ctxt);
+					}
+					
 					TCTypeList domain = TypeComparator.narrowest(type.parameters, restrictedType.parameters);
 					TCType range = TypeComparator.narrowest(type.result, restrictedType.result);
 					TCFunctionType newType = new TCFunctionType(location, domain, true, range);
