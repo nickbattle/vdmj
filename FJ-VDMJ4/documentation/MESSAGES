@@ -903,6 +903,7 @@ as the expected and actual values.
 4168, "Arguments do not match parameters: <name(params)>"
 4169, "Arithmetic overflow"
 4170, "Cannot convert empty set to set1"
+4171, "Cannot convert <function> to <function>"
 
 
 5000, "Definition <name> not used"
