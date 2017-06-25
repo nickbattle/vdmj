@@ -640,7 +640,7 @@ public class FunctionValue extends Value
 				}
 				else
 				{
-					if (type.parameters.size() != restrictedType.parameters.size())
+					if (!TypeComparator.compatible(to, type))
 					{
 						abort(4171, "Cannot convert " + type + " to " + to, ctxt);
 					}
