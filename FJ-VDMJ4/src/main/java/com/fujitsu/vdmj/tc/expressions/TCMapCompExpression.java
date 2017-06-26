@@ -26,6 +26,8 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -41,7 +43,9 @@ public class TCMapCompExpression extends TCMapExpression
 	public final TCMapletExpression first;
 	public final TCMultipleBindList bindings;
 	public final TCExpression predicate;
+	
 	private TCType maptype;
+	private TCDefinition def = null;
 
 	public TCMapCompExpression(LexLocation start,
 		TCMapletExpression first, TCMultipleBindList bindings,
@@ -63,7 +67,7 @@ public class TCMapCompExpression extends TCMapExpression
 	@Override
 	public TCType typeCheck(Environment base, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		TCDefinition def = new TCMultiBindListDefinition(location, bindings);
+		def = new TCMultiBindListDefinition(location, bindings);
 		def.typeCheck(base, scope);
 		Environment local = new FlatCheckedEnvironment(def, base, scope);
 
@@ -85,5 +89,24 @@ public class TCMapCompExpression extends TCMapExpression
 		maptype = first.typeCheck(local, scope, domConstraint, rngConstraint);	// The map from/to type
 		local.unusedCheck();
 		return maptype;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		Environment local = new FlatCheckedEnvironment(def, env, NameScope.NAMES);
+		TCNameSet names = new TCNameSet();
+		
+		if (predicate != null)
+		{
+			predicate.getFreeVariables(local);
+		}
+		
+		for (TCMultipleBind mb: bindings)
+		{
+			names.addAll(mb.getFreeVariables(local));
+		}
+		
+		return names;
 	}
 }

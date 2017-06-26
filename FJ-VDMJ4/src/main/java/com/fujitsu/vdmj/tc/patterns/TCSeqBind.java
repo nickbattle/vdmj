@@ -24,6 +24,8 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class TCSeqBind extends TCBind
 {
@@ -50,5 +52,11 @@ public class TCSeqBind extends TCBind
 	public String toString()
 	{
 		return pattern + " in seq " + sequence;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return sequence.getFreeVariables(env);
 	}
 }

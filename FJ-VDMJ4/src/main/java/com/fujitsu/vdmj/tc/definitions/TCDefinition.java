@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -157,6 +158,14 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 */
 	abstract public TCNameList getVariableNames();
 
+	/**
+	 * Return a list of free variables needed for the definition to initialise.
+	 */
+	public TCNameSet getFreeVariables()
+	{
+		return new TCNameSet();
+	}
+	
 	/**
 	 * Return the static type of the definition. For example, the type of a
 	 * function or operation definition would be its parameter/result signature;

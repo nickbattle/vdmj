@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -102,5 +103,20 @@ public class TCIfExpression extends TCExpression
 		rtypes.add(elseExp.typeCheck(env, null, scope, constraint));
 
 		return rtypes.getType(location);
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = ifExp.getFreeVariables(env);
+		names.addAll(thenExp.getFreeVariables(env));
+		
+		for (TCElseIfExpression eie: elseList)
+		{
+			names.addAll(eie.getFreeVariables(env));
+		}
+
+		names.addAll(elseExp.getFreeVariables(env));
+		return names;
 	}
 }

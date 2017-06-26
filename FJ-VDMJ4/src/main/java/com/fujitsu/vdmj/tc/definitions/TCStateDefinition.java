@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCStateInitExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -290,5 +291,23 @@ public class TCStateDefinition extends TCDefinition
 
 		ftype.definitions = new TCDefinitionList(def);
 		return def;
+	}
+	
+	@Override
+	public TCNameSet getFreeVariables()
+	{
+		TCNameSet names = new TCNameSet();
+		
+		if (invdef != null)
+		{
+			names.addAll(invdef.getFreeVariables());
+		}
+		
+		if (initdef != null)
+		{
+			names.addAll(initdef.getFreeVariables());
+		}
+		
+		return names;
 	}
 }

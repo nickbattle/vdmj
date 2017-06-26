@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -32,7 +33,7 @@ import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCElementsExpression extends TCSetExpression
+public class TCElementsExpression extends TCSeqExpression
 {
 	private static final long serialVersionUID = 1L;
 	public final TCExpression exp;
@@ -69,5 +70,11 @@ public class TCElementsExpression extends TCSetExpression
 
 		TCSeqType seq = arg.getSeq();
 		return seq.empty ? new TCSetType(location) : new TCSetType(location, seq.seqof);
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return exp.getFreeVariables(env);
 	}
 }

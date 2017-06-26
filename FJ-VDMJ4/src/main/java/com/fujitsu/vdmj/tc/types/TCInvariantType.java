@@ -27,6 +27,8 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -71,5 +73,22 @@ public abstract class TCInvariantType extends TCType
 		}
 
 		return null;
+	}
+
+	/**
+	 * Get a list of free variables needed to initialize the type invariant. 
+	 * @param env
+	 */
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		if (invdef != null)
+		{
+			return invdef.getFreeVariables();
+		}
+		else
+		{
+			return super.getFreeVariables(env);
+		}
 	}
 }

@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -73,5 +74,20 @@ public class TCLetBeStExpression extends TCExpression
 		TCType r = value.typeCheck(local, null, scope, constraint);
 		local.unusedCheck();
 		return r;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		Environment local = new FlatCheckedEnvironment(def, env, NameScope.NAMES);
+		TCNameSet names = bind.getFreeVariables(local);
+		
+		if (suchThat != null)
+		{
+			names.addAll(suchThat.getFreeVariables(local));
+		}
+		
+		names.addAll(value.getFreeVariables(local));
+		return names;
 	}
 }

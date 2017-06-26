@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -74,5 +75,14 @@ public class TCSubseqExpression extends TCExpression
 		}
 
 		return stype;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = seq.getFreeVariables(env);
+		names.addAll(from.getFreeVariables(env));
+		names.addAll(to.getFreeVariables(env));
+		return names;
 	}
 }

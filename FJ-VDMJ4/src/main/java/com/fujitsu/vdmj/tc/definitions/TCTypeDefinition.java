@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.definitions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -40,6 +41,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -293,5 +295,19 @@ public class TCTypeDefinition extends TCDefinition
 	public boolean isTypeDefinition()
 	{
 		return true;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables()
+	{
+		Environment env = new FlatEnvironment(null, true);
+		TCNameSet names = type.getFreeVariables(env);
+		
+		if (invdef != null)
+		{
+			names.addAll(invdef.getFreeVariables());
+		}
+		
+		return names;
 	}
 }

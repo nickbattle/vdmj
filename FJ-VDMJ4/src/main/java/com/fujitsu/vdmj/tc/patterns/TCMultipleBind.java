@@ -24,8 +24,10 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import java.io.Serializable;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -63,6 +65,9 @@ public abstract class TCMultipleBind implements Serializable
 
 	/** Perform a type check of the bind. */
 	abstract public TCType typeCheck(Environment base, NameScope scope);
+
+	/** Return the free variables used by this multiple bind */
+	abstract public TCNameSet getFreeVariables(Environment env);
 
 	/**
 	 * Get a list of definitions for the variables in the pattern list.

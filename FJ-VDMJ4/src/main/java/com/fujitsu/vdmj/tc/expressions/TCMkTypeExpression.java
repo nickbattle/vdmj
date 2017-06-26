@@ -27,6 +27,7 @@ import java.util.Iterator;
 
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
@@ -124,5 +125,13 @@ public class TCMkTypeExpression extends TCExpression
 		}
 
 		return checkConstraint(constraint, recordType);
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = new TCNameSet(typename);
+		names.addAll(args.getFreeVariables(env));
+		return names;
 	}
 }

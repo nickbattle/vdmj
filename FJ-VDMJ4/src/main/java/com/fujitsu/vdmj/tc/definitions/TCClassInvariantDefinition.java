@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -96,5 +97,12 @@ public class TCClassInvariantDefinition extends TCDefinition
 		{
 			report(3013, "Class invariant is not a boolean expression");
 		}
+	}
+
+	@Override
+	public TCNameSet getFreeVariables()
+	{
+		Environment env = new FlatEnvironment(null, true);
+		return expression.getFreeVariables(env);
 	}
 }

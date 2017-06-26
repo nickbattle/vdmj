@@ -138,6 +138,7 @@ public class ClassTypeChecker extends TypeChecker
 		{
 			c.initializedCheck();
 			c.unusedCheck();
-		}
+	    	cyclicDependencyCheck(c.getDefinitions());	// Only within classes?
+		}    	
 	}
 }

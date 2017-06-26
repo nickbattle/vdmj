@@ -24,7 +24,10 @@
 package com.fujitsu.vdmj.typechecker;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -32,6 +35,10 @@ import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 
 /**
@@ -44,13 +51,84 @@ abstract public class TypeChecker
 	private static List<VDMWarning> warnings = new Vector<VDMWarning>();
 	private static VDMMessage lastMessage = null;
 	private static final int MAX = 100;
-
+	
 	public TypeChecker()
 	{
 		clearErrors();
 	}
 
 	abstract public void typeCheck();
+	
+	/**
+	 * Check for cyclic dependencies between the free variables that definitions depend
+	 * on and the definition of those variables.
+	 */
+	protected void cyclicDependencyCheck(TCDefinitionList defs)
+	{
+		Map<TCNameToken, TCNameSet> dependencies = new HashMap<TCNameToken, TCNameSet>();
+
+    	for (TCDefinition def: defs)
+    	{
+			TCNameSet freevars = def.getFreeVariables();
+			
+			for (TCNameToken name: def.getVariableNames())
+			{
+				dependencies.put(name.getExplicit(true), freevars);
+			}
+    	}
+    	
+		for (TCNameToken sought: dependencies.keySet())
+		{
+			Stack<TCNameToken> stack = new Stack<TCNameToken>();
+			stack.push(sought);
+			
+			if (reachable(sought, dependencies.get(sought), dependencies, stack))
+			{
+	    		report(9999, "Cyclic dependency detected", stack.peek().getLocation());
+	    		detail("Cycle", stack.toString());
+			}
+			
+			stack.pop();
+		}
+	}
+
+	/**
+	 * Return true if the name sought is reachable via the next set of names passed using
+	 * the dependency map. The stack passed records the path taken to find a cycle.
+	 */
+	private boolean reachable(TCNameToken sought, TCNameSet nextset,
+		Map<TCNameToken, TCNameSet> dependencies, Stack<TCNameToken> stack)
+	{
+		if (nextset == null)
+		{
+			return false;
+		}
+		
+		if (nextset.contains(sought))
+		{
+			stack.push(sought);
+			return true;
+		}
+		
+		for (TCNameToken nextname: nextset)
+		{
+			if (stack.contains(nextname))	// Been here before!
+			{
+				return false;
+			}
+			
+			stack.push(nextname);
+			
+			if (reachable(sought, dependencies.get(nextname), dependencies, stack))
+			{
+				return true;
+			}
+			
+			stack.pop();
+		}
+		
+		return false;
+	}
 
 	public static void report(int number, String problem, LexLocation location)
 	{

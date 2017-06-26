@@ -28,6 +28,7 @@ import java.util.Iterator;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
@@ -35,6 +36,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -275,5 +277,15 @@ public class TCValueDefinition extends TCDefinition
 	public boolean isValueDefinition()
 	{
 		return true;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables()
+	{
+		Environment env = new FlatEnvironment(null, true);
+		TCNameSet names = new TCNameSet();
+		names.addAll(type.getFreeVariables(env));
+		names.addAll(exp.getFreeVariables(env));
+		return names;
 	}
 }

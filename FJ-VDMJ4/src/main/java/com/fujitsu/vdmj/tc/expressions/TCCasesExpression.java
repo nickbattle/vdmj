@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -73,5 +74,23 @@ public class TCCasesExpression extends TCExpression
 		}
 
 		return rtypes.getType(location);
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = exp.getFreeVariables(env);
+		
+		for (TCCaseAlternative c: cases)
+		{
+			names.addAll(c.getFreeVariables(env));
+		}
+
+		if (others != null)
+		{
+			names.addAll(others.getFreeVariables(env));
+		}
+
+		return names;
 	}
 }

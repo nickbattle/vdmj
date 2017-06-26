@@ -24,9 +24,10 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
 /**
@@ -53,6 +54,9 @@ public abstract class TCBind extends TCNode implements Serializable
 
 	/** Return this one bind as a list of {@link TCMultipleBind}. */
 	abstract public TCMultipleBindList getMultipleBindList();
+
+	/** Return a set of names of free variables from this bind */
+	abstract public TCNameSet getFreeVariables(Environment env);
 
 	/**
 	 * @see com.fujitsu.vdmj.ast.definitions.ASTDefinition#report

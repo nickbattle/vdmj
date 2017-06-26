@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -897,5 +898,11 @@ public class TCUnionType extends TCType
 	public TCTypeList getComposeTypes()
 	{
 		return types.getComposeTypes();
+	}
+	
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return types.getFreeVariables(env);
 	}
 }

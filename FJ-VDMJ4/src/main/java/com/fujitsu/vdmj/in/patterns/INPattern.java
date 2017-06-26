@@ -24,9 +24,7 @@
 package com.fujitsu.vdmj.in.patterns;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.in.INNode;
@@ -35,6 +33,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.NameValuePairList;
@@ -112,7 +111,7 @@ public abstract class INPattern extends INNode implements Serializable
 	 */
 	public final TCNameList getVariableNames()
 	{
-		Set<TCNameToken> set = new HashSet<TCNameToken>();
+		TCNameSet set = new TCNameSet();
 		set.addAll(getAllVariableNames());
 		TCNameList list = new TCNameList();
 		list.addAll(set);

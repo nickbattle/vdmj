@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -93,5 +94,25 @@ public class TCLetDefExpression extends TCExpression
 		TCType r = expression.typeCheck(local, null, scope, constraint);
 		local.unusedCheck(env);
 		return r;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		Environment local = env;
+
+		for (TCDefinition d: localDefs)
+		{
+			if (d instanceof TCExplicitFunctionDefinition)
+			{
+				// ignore
+			}
+			else
+			{
+				local = new FlatCheckedEnvironment(d, local, NameScope.NAMES);
+			}
+		}
+
+		return expression.getFreeVariables(local);
 	}
 }
