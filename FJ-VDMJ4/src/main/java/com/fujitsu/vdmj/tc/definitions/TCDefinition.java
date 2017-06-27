@@ -160,8 +160,9 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 
 	/**
 	 * Return a list of free variables needed for the definition to initialise.
+	 * @param env
 	 */
-	public TCNameSet getFreeVariables()
+	public TCNameSet getFreeVariables(Environment env)
 	{
 		return new TCNameSet();
 	}

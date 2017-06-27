@@ -326,7 +326,14 @@ public class TCNamedType extends TCInvariantType
 	@Override
 	public TCNameSet getFreeVariables(Environment env)
 	{
-		// Invariant values covered in TCTypeDefinition
-		return new TCNameSet(typename.getExplicit(true));
+		if (env.findType(typename, typename.getModule()) == null)
+		{
+			// Invariant values covered in TCTypeDefinition
+			return new TCNameSet(typename.getExplicit(true));
+		}
+		else
+		{
+			return new TCNameSet();
+		}
 	}
 }

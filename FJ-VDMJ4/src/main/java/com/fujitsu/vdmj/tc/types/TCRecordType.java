@@ -280,6 +280,14 @@ public class TCRecordType extends TCInvariantType
 	@Override
 	public TCNameSet getFreeVariables(Environment env)
 	{
-		return new TCNameSet(name);		// Invariant values covered in TCTypeDefinition
+		if (env.findType(name, name.getModule()) == null)
+		{
+			// Invariant values covered in TCTypeDefinition
+			return new TCNameSet(name.getExplicit(true));
+		}
+		else
+		{
+			return new TCNameSet();
+		}
 	}
 }

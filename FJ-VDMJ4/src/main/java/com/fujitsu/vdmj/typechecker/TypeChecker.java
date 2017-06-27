@@ -70,7 +70,8 @@ abstract public class TypeChecker
 
     	for (TCDefinition def: defs)
     	{
-			TCNameSet freevars = def.getFreeVariables();
+    		Environment empty = new FlatEnvironment(null, true);
+			TCNameSet freevars = def.getFreeVariables(empty);
 			
 			if (!freevars.isEmpty())
 			{

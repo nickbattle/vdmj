@@ -100,6 +100,7 @@ public class TCLetDefExpression extends TCExpression
 	public TCNameSet getFreeVariables(Environment env)
 	{
 		Environment local = env;
+		TCNameSet names = new TCNameSet();
 
 		for (TCDefinition d: localDefs)
 		{
@@ -110,9 +111,11 @@ public class TCLetDefExpression extends TCExpression
 			else
 			{
 				local = new FlatCheckedEnvironment(d, local, NameScope.NAMES);
+				names.addAll(d.getFreeVariables(local));
 			}
 		}
 
-		return expression.getFreeVariables(local);
+		names.addAll(expression.getFreeVariables(local));
+		return names;
 	}
 }

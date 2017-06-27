@@ -100,9 +100,8 @@ public class TCClassInvariantDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables()
+	public TCNameSet getFreeVariables(Environment env)
 	{
-		Environment env = new FlatEnvironment(null, true);
 		return expression.getFreeVariables(env);
 	}
 }

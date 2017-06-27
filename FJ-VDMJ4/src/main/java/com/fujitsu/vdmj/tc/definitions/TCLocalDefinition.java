@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
 
@@ -133,14 +132,13 @@ public class TCLocalDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables()
+	public TCNameSet getFreeVariables(Environment env)
 	{
-		Environment env = new FlatEnvironment(null, true);
 		TCNameSet names = type.getFreeVariables(env);
 		
 		if (valueDefinition != null)
 		{
-			names.addAll(valueDefinition.getFreeVariables());
+			names.addAll(valueDefinition.getFreeVariables(env));
 		}
 		
 		return names;

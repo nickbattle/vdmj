@@ -503,7 +503,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables()
+	public TCNameSet getFreeVariables(Environment env)
 	{
 		TCDefinitionList defs = new TCDefinitionList();
 
@@ -512,22 +512,22 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			defs.addAll(pltp.getDefinitions(NameScope.LOCAL));
 		}
 
-		Environment env = new FlatEnvironment(defs);
+		Environment local = new FlatEnvironment(defs, env);
 		TCNameSet names = new TCNameSet();
 		
 		if (body != null)
 		{
-			body.getFreeVariables(env);
+			body.getFreeVariables(local);
 		}
 		
 		if (predef != null)
 		{
-			names.addAll(predef.getFreeVariables());
+			names.addAll(predef.getFreeVariables(local));
 		}
 		
 		if (postdef != null)
 		{
-			names.addAll(postdef.getFreeVariables());
+			names.addAll(postdef.getFreeVariables(local));
 		}
 		
 		return names;

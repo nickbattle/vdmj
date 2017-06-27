@@ -41,7 +41,6 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -298,9 +297,8 @@ public class TCTypeDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables()
+	public TCNameSet getFreeVariables(Environment env)
 	{
-		Environment env = new FlatEnvironment(null, true);
 		TCNameSet names = new TCNameSet();
 		
 		if (type instanceof TCNamedType)
@@ -311,7 +309,7 @@ public class TCTypeDefinition extends TCDefinition
 		
 		if (invdef != null)
 		{
-			names.addAll(invdef.getFreeVariables());
+			names.addAll(invdef.getFreeVariables(env));
 		}
 		
 		return names;
