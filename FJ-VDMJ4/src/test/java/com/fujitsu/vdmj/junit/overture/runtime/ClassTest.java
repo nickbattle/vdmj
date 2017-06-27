@@ -32,10 +32,10 @@ public class ClassTest extends OvertureTest
 		runtime("runtime1");
 	}
 
-	public void test_Runtime2() throws Exception
-	{
-		runtime("runtime2");
-	}
+//	public void test_Runtime2() throws Exception
+//	{
+//		runtime("runtime2");
+//	}
 
 	public void test_Runtime3() throws Exception
 	{

@@ -99,7 +99,7 @@ public class TCSeqCompExpression extends TCSeqExpression
 	public TCNameSet getFreeVariables(Environment env)
 	{
 		Environment local = new FlatCheckedEnvironment(def, env, NameScope.NAMES);
-		TCNameSet names = new TCNameSet();
+		TCNameSet names = new TCNameSet();	// Note "first" is conditional
 		
 		if (predicate != null)
 		{

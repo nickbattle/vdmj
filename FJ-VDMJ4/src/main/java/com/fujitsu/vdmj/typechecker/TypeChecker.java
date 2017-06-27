@@ -66,29 +66,44 @@ abstract public class TypeChecker
 	protected void cyclicDependencyCheck(TCDefinitionList defs)
 	{
 		Map<TCNameToken, TCNameSet> dependencies = new HashMap<TCNameToken, TCNameSet>();
+		TCNameSet skip = new TCNameSet();
 
     	for (TCDefinition def: defs)
     	{
 			TCNameSet freevars = def.getFreeVariables();
 			
-			for (TCNameToken name: def.getVariableNames())
+			if (!freevars.isEmpty())
 			{
-				dependencies.put(name.getExplicit(true), freevars);
+    			for (TCNameToken name: def.getVariableNames())
+    			{
+    				dependencies.put(name.getExplicit(true), freevars);
+    			}
+			}
+			
+			// Skipped definition names occur in the cycle path, but are not checked
+			// for cycles themselves, because they are not "initializable".
+			
+			if (def.isFunction() || def.isTypeDefinition())
+			{
+				skip.add(def.name);
 			}
     	}
     	
 		for (TCNameToken sought: dependencies.keySet())
 		{
-			Stack<TCNameToken> stack = new Stack<TCNameToken>();
-			stack.push(sought);
-			
-			if (reachable(sought, dependencies.get(sought), dependencies, stack))
+			if (!skip.contains(sought))
 			{
-	    		report(9999, "Cyclic dependency detected", stack.peek().getLocation());
-	    		detail("Cycle", stack.toString());
+    			Stack<TCNameToken> stack = new Stack<TCNameToken>();
+    			stack.push(sought);
+    			
+    			if (reachable(sought, dependencies.get(sought), dependencies, stack))
+    			{
+    	    		report(3355, "Cyclic dependency detected for " + sought, sought.getLocation());
+    	    		detail("Cycle", stack.toString());
+    			}
+    			
+    			stack.pop();
 			}
-			
-			stack.pop();
 		}
 	}
 

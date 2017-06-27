@@ -25,11 +25,13 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
 
@@ -40,7 +42,8 @@ public class TCLocalDefinition extends TCDefinition
 {
 	private static final long serialVersionUID = 1L;
 	public TCType type;
-	private boolean valueDefinition = false;
+	
+	private TCValueDefinition valueDefinition = null;
 
 	public TCLocalDefinition(LexLocation location, TCNameToken name, TCType type)
 	{
@@ -108,7 +111,8 @@ public class TCLocalDefinition extends TCDefinition
 		// operations, not local definitions that happen to be function values.
 		// So we exclude parameter types. We also exclude value definitions.
 
-		return (valueDefinition || type.isType(TCParameterType.class, location)) ? false : type.isFunction(location);
+		return (valueDefinition != null ||
+			type.isType(TCParameterType.class, location)) ? false : type.isFunction(location);
 	}
 
 	@Override
@@ -117,14 +121,28 @@ public class TCLocalDefinition extends TCDefinition
 		return nameScope.matches(NameScope.STATE) || getType().isClass(null);
 	}
 
-	public void setValueDefinition()
+	public void setValueDefinition(TCValueDefinition def)
 	{
-		valueDefinition  = true;
+		valueDefinition = def;
 	}
 
 	@Override
 	public boolean isValueDefinition()
 	{
-		return valueDefinition;
+		return valueDefinition != null;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables()
+	{
+		Environment env = new FlatEnvironment(null, true);
+		TCNameSet names = type.getFreeVariables(env);
+		
+		if (valueDefinition != null)
+		{
+			names.addAll(valueDefinition.getFreeVariables());
+		}
+		
+		return names;
 	}
 }

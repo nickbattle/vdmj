@@ -223,7 +223,7 @@ public class TCValueDefinition extends TCDefinition
 			}
 
 			TCLocalDefinition ld = (TCLocalDefinition)d;
-			ld.setValueDefinition();
+			ld.setValueDefinition(this);
 		}
 
 		defs = newdefs;

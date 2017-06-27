@@ -408,7 +408,7 @@ public class TCApplyExpression extends TCExpression
 	@Override
 	public TCNameSet getFreeVariables(Environment env)
 	{
-		TCNameSet names = new TCNameSet();	// root.getFreeVariables(env);
+		TCNameSet names = root.getFreeVariables(env);
 		names.addAll(args.getFreeVariables(env));
 		return names;
 	}

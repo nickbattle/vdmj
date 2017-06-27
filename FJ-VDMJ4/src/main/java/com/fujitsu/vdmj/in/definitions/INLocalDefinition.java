@@ -39,9 +39,9 @@ public class INLocalDefinition extends INDefinition
 {
 	private static final long serialVersionUID = 1L;
 	public final TCType type;
-	public final boolean valueDefinition;
+	public final INValueDefinition valueDefinition;
 
-	public INLocalDefinition(LexLocation location, TCNameToken name, TCType type, boolean valueDefinition)
+	public INLocalDefinition(LexLocation location, TCNameToken name, TCType type, INValueDefinition valueDefinition)
 	{
 		super(location, null, name);
 		this.type = type;
@@ -74,7 +74,8 @@ public class INLocalDefinition extends INDefinition
 		// operations, not local definitions that happen to be function values.
 		// So we exclude parameter types. We also exclude value definitions.
 
-		return (valueDefinition || type.isType(TCParameterType.class, location)) ? false : type.isFunction(location);
+		return (valueDefinition != null ||
+			type.isType(TCParameterType.class, location)) ? false : type.isFunction(location);
 	}
 
 	@Override
@@ -86,6 +87,6 @@ public class INLocalDefinition extends INDefinition
 	@Override
 	public boolean isValueDefinition()
 	{
-		return valueDefinition;
+		return valueDefinition != null;
 	}
 }

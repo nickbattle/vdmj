@@ -301,7 +301,13 @@ public class TCTypeDefinition extends TCDefinition
 	public TCNameSet getFreeVariables()
 	{
 		Environment env = new FlatEnvironment(null, true);
-		TCNameSet names = type.getFreeVariables(env);
+		TCNameSet names = new TCNameSet();
+		
+		if (type instanceof TCNamedType)
+		{
+			TCNamedType nt = (TCNamedType)type;
+			names.addAll(nt.type.getFreeVariables(env));
+		}
 		
 		if (invdef != null)
 		{

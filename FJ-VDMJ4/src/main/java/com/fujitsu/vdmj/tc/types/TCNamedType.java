@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -320,5 +321,12 @@ public class TCNamedType extends TCInvariantType
 		
 		inNarrower = false;
 		return result;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		// Invariant values covered in TCTypeDefinition
+		return new TCNameSet(typename.getExplicit(true));
 	}
 }

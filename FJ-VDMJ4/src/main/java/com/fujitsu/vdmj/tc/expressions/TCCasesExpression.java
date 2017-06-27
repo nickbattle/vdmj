@@ -79,18 +79,6 @@ public class TCCasesExpression extends TCExpression
 	@Override
 	public TCNameSet getFreeVariables(Environment env)
 	{
-		TCNameSet names = exp.getFreeVariables(env);
-		
-		for (TCCaseAlternative c: cases)
-		{
-			names.addAll(c.getFreeVariables(env));
-		}
-
-		if (others != null)
-		{
-			names.addAll(others.getFreeVariables(env));
-		}
-
-		return names;
+		return exp.getFreeVariables(env);	// The rest is conditional
 	}
 }
