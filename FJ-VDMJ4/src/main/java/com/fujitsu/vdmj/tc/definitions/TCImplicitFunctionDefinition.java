@@ -518,7 +518,6 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		if (body != null)
 		{
 			body.getFreeVariables(env);
-			names.remove(name);		// To allow recursion
 		}
 		
 		if (predef != null)

@@ -639,7 +639,6 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 		Environment env = new FlatEnvironment(defs);
 		TCNameSet names = body.getFreeVariables(env);
-		names.remove(name);		// To allow recursion
 		
 		if (predef != null)
 		{
