@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2017 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -21,26 +21,30 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.expressions;
+package com.fujitsu.vdmj.tc.lex;
 
-import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.typechecker.Environment;
+import java.util.HashSet;
 
-abstract public class TCUnaryExpression extends TCExpression
+import com.fujitsu.vdmj.util.Utils;
+
+public class TCNameSet extends HashSet<TCNameToken>
 {
 	private static final long serialVersionUID = 1L;
-	public final TCExpression exp;
 
-	public TCUnaryExpression(LexLocation location, TCExpression exp)
+	public TCNameSet(TCNameToken name)
 	{
-		super(location);
-		this.exp = exp;
+		super();
+		add(name);
+	}
+
+	public TCNameSet()
+	{
+		super();
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public String toString()
 	{
-		return exp.getFreeVariables(env);
+		return Utils.setToString(this, ", ");
 	}
 }

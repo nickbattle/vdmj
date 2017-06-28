@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -73,5 +74,11 @@ public class TCSetEnumExpression extends TCSetExpression
 
 		return ts.isEmpty() ? new TCSetType(location) :
 					new TCSet1Type(location, ts.getType(location));
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return members.getFreeVariables(env);
 	}
 }

@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
@@ -76,5 +77,14 @@ public class TCExists1Expression extends TCExpression
 
 		local.unusedCheck();
 		return checkConstraint(constraint, new TCBooleanType(location));
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		Environment local = new FlatCheckedEnvironment(def, env, NameScope.NAMES);
+		TCNameSet names = predicate.getFreeVariables(local);
+		names.addAll(bind.getFreeVariables(local));
+		return names;
 	}
 }

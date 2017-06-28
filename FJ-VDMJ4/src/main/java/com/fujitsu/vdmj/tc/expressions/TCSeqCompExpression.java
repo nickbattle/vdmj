@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCSetBind;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
@@ -42,6 +43,8 @@ public class TCSeqCompExpression extends TCSeqExpression
 	public final TCExpression first;
 	public final TCBind bind;
 	public final TCExpression predicate;
+	
+	private TCDefinition def = null;
 
 	public TCSeqCompExpression(LexLocation start, TCExpression first, TCBind bind, TCExpression predicate)
 	{
@@ -61,7 +64,7 @@ public class TCSeqCompExpression extends TCSeqExpression
 	@Override
 	public TCType typeCheck(Environment base, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		TCDefinition def = new TCMultiBindListDefinition(location, bind.getMultipleBindList());
+		def = new TCMultiBindListDefinition(location, bind.getMultipleBindList());
 		def.typeCheck(base, scope);
 
 		if (bind instanceof TCSetBind &&
@@ -90,5 +93,20 @@ public class TCSeqCompExpression extends TCSeqExpression
 
 		local.unusedCheck();
 		return new TCSeqType(location, etype);
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		Environment local = new FlatCheckedEnvironment(def, env, NameScope.NAMES);
+		TCNameSet names = new TCNameSet();	// Note "first" is conditional
+		
+		if (predicate != null)
+		{
+			predicate.getFreeVariables(local);
+		}
+		
+		names.addAll(bind.getFreeVariables(local));
+		return names;
 	}
 }

@@ -65,4 +65,9 @@ public class ClassTest extends OvertureTest
 		Settings.release = Release.VDM_10;
 		typecheck("seqbinds");
 	}
+
+	public void test_Cyclic()
+	{
+		typecheck("cyclic");
+	}
 }

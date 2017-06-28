@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
@@ -47,6 +48,7 @@ public class TCLambdaExpression extends TCExpression
 	private TCFunctionType type;
 	private TCPatternList paramPatterns;
 	private TCDefinitionList paramDefinitions;
+	private TCDefinition def = null;
 
 	public TCLambdaExpression(LexLocation location, TCTypeBindList bindList, TCExpression expression)
 	{
@@ -81,7 +83,7 @@ public class TCLambdaExpression extends TCExpression
 		paramDefinitions.implicitDefinitions(base);
 		paramDefinitions.typeCheck(base, scope);
 
-		TCDefinition def = new TCMultiBindListDefinition(location, mbinds);
+		def = new TCMultiBindListDefinition(location, mbinds);
 		def.typeCheck(base, scope);
 		Environment local = new FlatCheckedEnvironment(def, base, scope);
 		local.setEnclosingDefinition(def); 	// Prevent recursive checks
@@ -91,5 +93,19 @@ public class TCLambdaExpression extends TCExpression
 
 		type = new TCFunctionType(location, ptypes, true, result);
 		return type;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		Environment local = new FlatCheckedEnvironment(def, env, NameScope.NAMES);
+		TCNameSet names = expression.getFreeVariables(local);
+		
+		for (TCTypeBind mb: bindList)
+		{
+			names.addAll(mb.getFreeVariables(local));
+		}
+		
+		return names;
 	}
 }

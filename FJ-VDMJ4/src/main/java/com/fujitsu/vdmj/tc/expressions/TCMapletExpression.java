@@ -24,8 +24,8 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -58,5 +58,12 @@ public class TCMapletExpression implements Serializable
 	public String toString()
 	{
 		return left + " |-> " + right;
+	}
+
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = left.getFreeVariables(env);
+		names.addAll(right.getFreeVariables(env));
+		return names;
 	}
 }

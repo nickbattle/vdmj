@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -82,5 +83,11 @@ public class TCMultipleSetBind extends TCMultipleBind
 		}
 
 		return result;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return set.getFreeVariables(env);
 	}
 }

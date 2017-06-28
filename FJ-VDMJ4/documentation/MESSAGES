@@ -736,6 +736,7 @@ as the expected and actual values.
 3352, "Exported <name> function has no type paramaters"
 3353, "Exported <name> function type parameters incorrect"
 3354, "Function argument must be instantiated"
+3355, "Cyclic dependency detected"
 
 4000, "Cannot instantiate abstract class <class>"
 4002, "Expression value is not in set|seq bind"

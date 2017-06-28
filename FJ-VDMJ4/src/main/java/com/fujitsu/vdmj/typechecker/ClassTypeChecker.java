@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.typechecker;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCSystemDefinition;
 
 /**
@@ -133,11 +134,16 @@ public class ClassTypeChecker extends TypeChecker
 				}
     		}
 		}
+	    
+	    TCDefinitionList allDefs = new TCDefinitionList();
 
     	for (TCClassDefinition c: classes)
 		{
 			c.initializedCheck();
 			c.unusedCheck();
+	    	allDefs.addAll(c.getDefinitions());
 		}
+    	
+    	cyclicDependencyCheck(allDefs);
 	}
 }

@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -56,5 +57,11 @@ public class TCTypeBind extends TCBind
 	public String toString()
 	{
 		return pattern + ":" + type;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return type.getFreeVariables(env);
 	}
 }

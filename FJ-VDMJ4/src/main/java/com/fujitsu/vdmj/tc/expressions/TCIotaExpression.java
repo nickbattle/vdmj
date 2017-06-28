@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCSetBind;
@@ -42,6 +43,8 @@ public class TCIotaExpression extends TCExpression
 	private static final long serialVersionUID = 1L;
 	public final TCBind bind;
 	public final TCExpression predicate;
+	
+	private TCDefinition def = null;
 
 	public TCIotaExpression(LexLocation location, TCBind bind, TCExpression predicate)
 	{
@@ -59,7 +62,7 @@ public class TCIotaExpression extends TCExpression
 	@Override
 	public TCType typeCheck(Environment base, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		TCDefinition def = new TCMultiBindListDefinition(location, bind.getMultipleBindList());
+		def = new TCMultiBindListDefinition(location, bind.getMultipleBindList());
 		def.typeCheck(base, scope);
 		TCType rt = null;
 
@@ -107,5 +110,14 @@ public class TCIotaExpression extends TCExpression
 
 		local.unusedCheck();
 		return rt;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		Environment local = new FlatCheckedEnvironment(def, env, NameScope.NAMES);
+		TCNameSet names = predicate.getFreeVariables(local);
+		names.addAll(bind.getFreeVariables(local));
+		return names;
 	}
 }

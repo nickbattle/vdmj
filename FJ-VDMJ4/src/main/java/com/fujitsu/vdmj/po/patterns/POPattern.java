@@ -24,16 +24,13 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionSet;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 /**
@@ -82,7 +79,7 @@ public abstract class POPattern extends PONode implements Serializable
 	 */
 	public TCNameList getVariableNames()
 	{
-		Set<TCNameToken> set = new HashSet<TCNameToken>();
+		TCNameSet set = new TCNameSet();
 		set.addAll(getAllVariableNames());
 		TCNameList list = new TCNameList();
 		list.addAll(set);

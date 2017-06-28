@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -100,5 +101,18 @@ public class TCMapEnumExpression extends TCMapExpression
 		}
 
 		return new TCMapType(location, dom.getType(location), rng.getType(location));
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = new TCNameSet();
+		
+		for (TCMapletExpression maplet: members)
+		{
+			names.addAll(maplet.getFreeVariables(env));
+		}
+		
+		return names;
 	}
 }

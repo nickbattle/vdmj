@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -621,5 +622,34 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	public boolean isSubclassResponsibility()
 	{
 		return body instanceof TCSubclassResponsibilityExpression;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCDefinitionList defs = new TCDefinitionList();
+		
+		if (paramDefinitionList != null)
+		{
+    		for (TCDefinitionList pdef: paramDefinitionList)
+    		{
+    			defs.addAll(pdef);	// All definitions of all parameter lists
+    		}
+		}
+
+		Environment local = new FlatEnvironment(defs, env);
+		TCNameSet names = body.getFreeVariables(local);
+		
+		if (predef != null)
+		{
+			names.addAll(predef.getFreeVariables(local));
+		}
+		
+		if (postdef != null)
+		{
+			names.addAll(postdef.getFreeVariables(local));
+		}
+		
+		return names;
 	}
 }

@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCTokenType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -59,5 +60,13 @@ public class TCMkBasicExpression extends TCExpression
 		}
 
 		return checkConstraint(constraint, type);
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = type.getFreeVariables(env);
+		names.addAll(arg.getFreeVariables(env));
+		return names;
 	}
 }

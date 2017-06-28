@@ -30,6 +30,8 @@ import com.fujitsu.vdmj.ast.types.ASTTypeSet;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 
@@ -186,5 +188,17 @@ public class TCTypeSet extends TreeSet<TCType>
 		}
 		
 		return list;
+	}
+
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = new TCNameSet();
+		
+		for (TCType type: this)
+		{
+			names.addAll(type.getFreeVariables(env));
+		}
+		
+		return names;
 	}
 }

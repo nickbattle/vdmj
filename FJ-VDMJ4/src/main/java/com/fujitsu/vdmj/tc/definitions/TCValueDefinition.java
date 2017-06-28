@@ -28,6 +28,7 @@ import java.util.Iterator;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
@@ -221,7 +222,7 @@ public class TCValueDefinition extends TCDefinition
 			}
 
 			TCLocalDefinition ld = (TCLocalDefinition)d;
-			ld.setValueDefinition();
+			ld.setValueDefinition(this);
 		}
 
 		defs = newdefs;
@@ -275,5 +276,14 @@ public class TCValueDefinition extends TCDefinition
 	public boolean isValueDefinition()
 	{
 		return true;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = new TCNameSet();
+		names.addAll(type.getFreeVariables(env));
+		names.addAll(exp.getFreeVariables(env));
+		return names;
 	}
 }

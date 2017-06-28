@@ -1,6 +1,6 @@
 class A
 values
-	a = b;
+	a = b;	-- Now a cyclic TC error 
 	b = a;
 	
 end A

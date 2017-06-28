@@ -239,5 +239,8 @@ public class ModuleTypeChecker extends TypeChecker
 			m.importdefs.unusedCheck();
 			m.defs.unusedCheck();
 		}
+    	
+    	// Check for inter-definition cyclic dependencies before initialization
+    	cyclicDependencyCheck(checkDefs);
 	}
 }

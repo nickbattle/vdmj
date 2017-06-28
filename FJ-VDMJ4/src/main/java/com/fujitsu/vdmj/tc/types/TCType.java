@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
@@ -121,6 +122,16 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	public void unResolve()
 	{
 		resolved = false;
+	}
+
+	/**
+	 * Get a list of free variables needed to initialize the type. This is
+	 * implemented by invariant types. 
+	 * @param env
+	 */
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return new TCNameSet();
 	}
 
 	/**

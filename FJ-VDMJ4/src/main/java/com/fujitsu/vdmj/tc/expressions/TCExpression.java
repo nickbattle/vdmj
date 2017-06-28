@@ -28,6 +28,7 @@ import java.io.Serializable;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -160,6 +161,16 @@ public abstract class TCExpression extends TCNode implements Serializable
 	public TCDefinitionList getQualifiedDefs(Environment env)
 	{
 		return new TCDefinitionList();
+	}
+	
+	/**
+	 * Search the expression for its free variables, if any. The environment passed contains
+	 * those names that are already defined in the scope - ie. which are not free variables.
+	 * @param env
+	 */
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return new TCNameSet();
 	}
 
 	/**

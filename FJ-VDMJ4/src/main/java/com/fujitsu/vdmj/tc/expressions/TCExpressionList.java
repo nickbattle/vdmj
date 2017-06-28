@@ -26,6 +26,8 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.tc.TCMappedList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 @SuppressWarnings("serial")
@@ -45,5 +47,17 @@ public class TCExpressionList extends TCMappedList<ASTExpression, TCExpression>
 	public String toString()
 	{
 		return Utils.listToString(this);
+	}
+
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = new TCNameSet();
+		
+		for (TCExpression exp: this)
+		{
+			names.addAll(exp.getFreeVariables(env));
+		}
+		
+		return names;
 	}
 }
