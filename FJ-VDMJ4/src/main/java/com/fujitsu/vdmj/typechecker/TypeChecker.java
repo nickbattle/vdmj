@@ -65,6 +65,11 @@ abstract public class TypeChecker
 	 */
 	protected void cyclicDependencyCheck(TCDefinitionList defs)
 	{
+		if (System.getProperty("skip.cyclic.check") != null)
+		{
+			return;		// For now, to allow us to skip if there are issues.
+		}
+		
 		Map<TCNameToken, TCNameSet> dependencies = new HashMap<TCNameToken, TCNameSet>();
 		TCNameSet skip = new TCNameSet();
 
