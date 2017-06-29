@@ -282,7 +282,12 @@ public class TCValueDefinition extends TCDefinition
 	public TCNameSet getFreeVariables(Environment env)
 	{
 		TCNameSet names = new TCNameSet();
-		names.addAll(type.getFreeVariables(env));
+		
+		if (type != null)
+		{
+			names.addAll(type.getFreeVariables(env));
+		}
+		
 		names.addAll(exp.getFreeVariables(env));
 		return names;
 	}

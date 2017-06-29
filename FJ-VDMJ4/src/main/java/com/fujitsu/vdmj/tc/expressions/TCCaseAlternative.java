@@ -27,7 +27,6 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCExpressionPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -104,11 +103,5 @@ public class TCCaseAlternative implements Serializable
 		TCType r = result.typeCheck(local, null, scope, constraint);
 		local.unusedCheck();
 		return r;
-	}
-
-	public TCNameSet getFreeVariables(Environment env)
-	{
-		Environment local = defs == null ? env : new FlatCheckedEnvironment(defs, env, NameScope.NAMES);
-		return cexp.getFreeVariables(local);
 	}
 }
