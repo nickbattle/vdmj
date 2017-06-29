@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCLetBeStExpression extends TCExpression
@@ -79,7 +80,7 @@ public class TCLetBeStExpression extends TCExpression
 	@Override
 	public TCNameSet getFreeVariables(Environment env)
 	{
-		Environment local = new FlatCheckedEnvironment(def, env, NameScope.NAMES);
+		Environment local = new FlatEnvironment(def, env);
 		TCNameSet names = bind.getFreeVariables(local);
 		
 		if (suchThat != null)
