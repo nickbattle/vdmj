@@ -91,7 +91,7 @@ abstract public class TypeChecker
 			
 			if (def.isFunction() || def.isTypeDefinition())
 			{
-				skip.add(def.name);
+				skip.add(def.name.getExplicit(true));
 			}
     	}
     	
