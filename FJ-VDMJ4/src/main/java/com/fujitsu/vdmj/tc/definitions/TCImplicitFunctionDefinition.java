@@ -517,7 +517,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		
 		if (body != null)
 		{
-			body.getFreeVariables(local);
+			names.addAll(body.getFreeVariables(local));
 		}
 		
 		if (predef != null)
