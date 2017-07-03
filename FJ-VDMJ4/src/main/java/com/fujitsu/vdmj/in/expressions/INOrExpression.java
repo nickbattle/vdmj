@@ -62,8 +62,9 @@ public class INOrExpression extends INBooleanBinaryExpression
 				}
 
 				Value rv = right.eval(ctxt);
+				boolean rb = rv.boolValue(ctxt);
 
-				if (lb)
+				if (lb || rb)
 				{
 					return new BooleanValue(true);
 				}
