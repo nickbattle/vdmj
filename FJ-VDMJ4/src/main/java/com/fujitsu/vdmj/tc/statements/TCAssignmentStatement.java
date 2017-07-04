@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -98,5 +99,13 @@ public class TCAssignmentStatement extends TCStatement
 	public TCTypeSet exitCheck()
 	{
 		return new TCTypeSet(new TCUnknownType(location));
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = new TCNameSet();
+		names.addAll(exp.getFreeVariables(env));
+		return names;
 	}
 }

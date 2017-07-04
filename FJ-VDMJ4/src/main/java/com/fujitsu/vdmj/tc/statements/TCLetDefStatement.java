@@ -28,10 +28,12 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCLetDefStatement extends TCStatement
@@ -99,5 +101,28 @@ public class TCLetDefStatement extends TCStatement
 	public TCTypeSet exitCheck()
 	{
 		return statement.exitCheck();
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		Environment local = env;
+		TCNameSet names = new TCNameSet();
+
+		for (TCDefinition d: localDefs)
+		{
+			if (d instanceof TCExplicitFunctionDefinition)
+			{
+				// ignore
+			}
+			else
+			{
+				local = new FlatEnvironment(d, local);
+				names.addAll(d.getFreeVariables(local));
+			}
+		}
+
+		names.addAll(statement.getFreeVariables(local));
+		return names;
 	}
 }

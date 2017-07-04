@@ -29,12 +29,14 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCQualifiedDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCLetBeStStatement extends TCStatement
@@ -92,5 +94,20 @@ public class TCLetBeStStatement extends TCStatement
 	public TCTypeSet exitCheck()
 	{
 		return statement.exitCheck();
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		Environment local = new FlatEnvironment(def, env);
+		TCNameSet names = bind.getFreeVariables(local);
+		
+		if (suchThat != null)
+		{
+			names.addAll(suchThat.getFreeVariables(local));
+		}
+		
+		names.addAll(statement.getFreeVariables(local));
+		return names;
 	}
 }

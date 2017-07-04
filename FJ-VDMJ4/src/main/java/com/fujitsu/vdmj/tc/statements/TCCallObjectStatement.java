@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCStringLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -248,5 +249,11 @@ public class TCCallObjectStatement extends TCStatement
 				}
 			}
 		}
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return args.getFreeVariables(env);
 	}
 }

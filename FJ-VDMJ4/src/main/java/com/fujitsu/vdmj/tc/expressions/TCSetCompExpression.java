@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -95,7 +96,7 @@ public class TCSetCompExpression extends TCSetExpression
 	@Override
 	public TCNameSet getFreeVariables(Environment env)
 	{
-		Environment local = new FlatCheckedEnvironment(def, env, NameScope.NAMES);
+		Environment local = new FlatEnvironment(def, env);
 		TCNameSet names = new TCNameSet();	// Note "first" is conditional
 		
 		if (predicate != null)

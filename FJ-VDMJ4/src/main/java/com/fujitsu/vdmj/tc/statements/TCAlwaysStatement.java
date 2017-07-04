@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -63,5 +64,14 @@ public class TCAlwaysStatement extends TCStatement
 		types.addAll(body.exitCheck());
 		types.addAll(always.exitCheck());
 		return types;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = new TCNameSet();
+		names.addAll(always.getFreeVariables(env));
+		names.addAll(body.getFreeVariables(env));
+		return names;
 	}
 }

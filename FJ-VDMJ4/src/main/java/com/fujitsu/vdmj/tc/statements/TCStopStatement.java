@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -87,5 +88,11 @@ public class TCStopStatement extends TCStatement
 	public String toString()
 	{
 		return "stop(" + objects + ")";
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return objects.getFreeVariables(env);
 	}
 }

@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -110,7 +111,7 @@ public class TCLetDefExpression extends TCExpression
 			}
 			else
 			{
-				local = new FlatCheckedEnvironment(d, local, NameScope.NAMES);
+				local = new FlatEnvironment(d, local);
 				names.addAll(d.getFreeVariables(local));
 			}
 		}

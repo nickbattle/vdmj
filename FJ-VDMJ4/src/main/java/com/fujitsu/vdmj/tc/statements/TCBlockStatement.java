@@ -26,9 +26,11 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCBlockStatement extends TCSimpleBlockStatement
@@ -82,5 +84,18 @@ public class TCBlockStatement extends TCSimpleBlockStatement
 		sb.append(super.toString());
 		sb.append(")");
 		return sb.toString();
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		Environment local = env;
+
+		for (TCDefinition d: assignmentDefs)
+		{
+			local = new FlatEnvironment(d, local);	// cumulative
+		}
+
+		return super.getFreeVariables(local);
 	}
 }
