@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInheritedDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
@@ -105,6 +106,16 @@ public abstract class TCStatement extends TCNode implements Serializable
 	public TCTypeSet exitCheck()
 	{
 		return new TCTypeSet();
+	}
+
+	/**
+	 * Search the statement for its free variables, if any. The environment passed contains
+	 * those names that are already defined in the scope - ie. which are not free variables.
+	 * @param env
+	 */
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return new TCNameSet();
 	}
 
 	/**

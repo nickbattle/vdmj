@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -73,5 +74,13 @@ public class TCDurationStatement extends TCStatement
 		}
 
 		return statement.typeCheck(env, scope, constraint);
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = duration.getFreeVariables(env);
+		names.addAll(statement.getFreeVariables(env));
+		return names;
 	}
 }

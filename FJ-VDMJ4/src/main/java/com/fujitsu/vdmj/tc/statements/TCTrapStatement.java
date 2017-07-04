@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCPatternBind;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -97,5 +98,11 @@ public class TCTrapStatement extends TCStatement
 		types.addAll(body.exitCheck());
 		types.addAll(with.exitCheck());
 		return types;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return body.getFreeVariables(env);
 	}
 }

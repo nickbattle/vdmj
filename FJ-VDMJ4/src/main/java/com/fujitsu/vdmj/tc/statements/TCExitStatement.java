@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -81,5 +82,16 @@ public class TCExitStatement extends TCStatement
 		}
 
 		return types;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		if (expression == null)
+		{
+			return new TCNameSet();
+		}
+		
+		return expression.getFreeVariables(env);
 	}
 }

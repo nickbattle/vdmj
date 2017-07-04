@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSelfExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -97,5 +98,18 @@ public class TCReturnStatement extends TCStatement
 		{
 			return super.exitCheck();
 		}
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = new TCNameSet();
+		
+		if (expression != null)
+		{
+			names.addAll(expression.getFreeVariables(env));
+		}
+		
+		return names;
 	}
 }

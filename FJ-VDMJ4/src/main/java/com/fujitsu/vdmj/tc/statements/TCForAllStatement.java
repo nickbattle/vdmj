@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -86,5 +87,11 @@ public class TCForAllStatement extends TCStatement
 	public TCTypeSet exitCheck()
 	{
 		return statement.exitCheck();
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return set.getFreeVariables(env);
 	}
 }

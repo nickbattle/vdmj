@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -79,5 +80,11 @@ public class TCTixeStatement extends TCStatement
 		}
 
 		return types;
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		return body.getFreeVariables(env);
 	}
 }

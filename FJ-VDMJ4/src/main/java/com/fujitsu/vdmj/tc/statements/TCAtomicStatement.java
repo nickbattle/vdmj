@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -57,5 +58,18 @@ public class TCAtomicStatement extends TCStatement
 		}
 
 		return new TCVoidType(location);
+	}
+
+	@Override
+	public TCNameSet getFreeVariables(Environment env)
+	{
+		TCNameSet names = new TCNameSet();
+		
+		for (TCAssignmentStatement stmt: assignments)
+		{
+			names.addAll(stmt.getFreeVariables(env));
+		}
+		
+		return names;
 	}
 }
