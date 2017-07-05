@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexStringToken;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -252,7 +254,7 @@ public class TCCallObjectStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
 	{
 		return args.getFreeVariables(env);
 	}

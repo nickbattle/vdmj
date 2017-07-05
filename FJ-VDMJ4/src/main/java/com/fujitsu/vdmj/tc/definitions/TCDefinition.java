@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
@@ -161,8 +162,9 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	/**
 	 * Return a list of free variables needed for the definition to initialise.
 	 * @param env
+	 * @param returns TODO
 	 */
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
 	{
 		return new TCNameSet();
 	}

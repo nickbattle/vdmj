@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.InternalException;
@@ -76,7 +77,7 @@ abstract public class TypeChecker
     	for (TCDefinition def: defs)
     	{
     		Environment empty = new FlatEnvironment(null, true);
-			TCNameSet freevars = def.getFreeVariables(empty);
+			TCNameSet freevars = def.getFreeVariables(empty, new AtomicBoolean(false));
 			
 			if (!freevars.isEmpty())
 			{

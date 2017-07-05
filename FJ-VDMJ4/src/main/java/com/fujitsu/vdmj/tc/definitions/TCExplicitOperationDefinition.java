@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
@@ -503,7 +504,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
 	{
 		TCDefinitionList defs = new TCDefinitionList();
 		
@@ -513,16 +514,16 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		}
 
 		Environment local = new FlatEnvironment(defs, env);
-		TCNameSet names = body.getFreeVariables(local);
+		TCNameSet names = body.getFreeVariables(local, returns);
 		
 		if (predef != null)
 		{
-			names.addAll(predef.getFreeVariables(local));
+			names.addAll(predef.getFreeVariables(local, returns));
 		}
 		
 		if (postdef != null)
 		{
-			names.addAll(postdef.getFreeVariables(local));
+			names.addAll(postdef.getFreeVariables(local, returns));
 		}
 		
 		return names;
