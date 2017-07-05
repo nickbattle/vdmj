@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -111,9 +112,13 @@ public abstract class TCStatement extends TCNode implements Serializable
 	/**
 	 * Search the statement for its free variables, if any. The environment passed contains
 	 * those names that are already defined in the scope - ie. which are not free variables.
+	 * The returns boolean (which is mutable) is updated by return and exit statements,
+	 * which indicate that statements that follow are conditional.
+	 * 
 	 * @param env
+	 * @param returns
 	 */
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
 	{
 		return new TCNameSet();
 	}

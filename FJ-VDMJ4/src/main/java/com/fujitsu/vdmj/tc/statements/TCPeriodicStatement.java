@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
@@ -139,7 +141,7 @@ public class TCPeriodicStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
 	{
 		return args.getFreeVariables(env);
 	}

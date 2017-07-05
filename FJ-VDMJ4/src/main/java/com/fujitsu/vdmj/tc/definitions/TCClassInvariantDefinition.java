@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -100,7 +102,7 @@ public class TCClassInvariantDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
 	{
 		return expression.getFreeVariables(env);
 	}

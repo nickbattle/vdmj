@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -631,7 +633,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
 	{
 		TCDefinitionList defs = new TCDefinitionList();
 
@@ -645,17 +647,17 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		
 		if (body != null)
 		{
-			names.addAll(body.getFreeVariables(local));
+			names.addAll(body.getFreeVariables(local, returns));
 		}
 		
 		if (predef != null)
 		{
-			names.addAll(predef.getFreeVariables(local));
+			names.addAll(predef.getFreeVariables(local, returns));
 		}
 		
 		if (postdef != null)
 		{
-			names.addAll(postdef.getFreeVariables(local));
+			names.addAll(postdef.getFreeVariables(local, returns));
 		}
 		
 		return names;

@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -625,7 +626,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
 	{
 		TCDefinitionList defs = new TCDefinitionList();
 		
@@ -642,12 +643,12 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		
 		if (predef != null)
 		{
-			names.addAll(predef.getFreeVariables(local));
+			names.addAll(predef.getFreeVariables(local, returns));
 		}
 		
 		if (postdef != null)
 		{
-			names.addAll(postdef.getFreeVariables(local));
+			names.addAll(postdef.getFreeVariables(local, returns));
 		}
 		
 		return names;

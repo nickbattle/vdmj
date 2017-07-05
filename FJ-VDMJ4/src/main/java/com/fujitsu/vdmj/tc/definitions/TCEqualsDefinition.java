@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -215,7 +217,7 @@ public class TCEqualsDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
 	{
 		Environment local = new FlatEnvironment(defs, env);
 		return test.getFreeVariables(local);

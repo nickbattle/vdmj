@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -112,7 +114,7 @@ public class TCLetDefExpression extends TCExpression
 			else
 			{
 				local = new FlatEnvironment(d, local);
-				names.addAll(d.getFreeVariables(local));
+				names.addAll(d.getFreeVariables(local, new AtomicBoolean()));
 			}
 		}
 

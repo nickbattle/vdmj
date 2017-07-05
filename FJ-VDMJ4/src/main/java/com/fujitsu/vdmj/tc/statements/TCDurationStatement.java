@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -77,10 +79,10 @@ public class TCDurationStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
 	{
 		TCNameSet names = duration.getFreeVariables(env);
-		names.addAll(statement.getFreeVariables(env));
+		names.addAll(statement.getFreeVariables(env, returns));
 		return names;
 	}
 }
