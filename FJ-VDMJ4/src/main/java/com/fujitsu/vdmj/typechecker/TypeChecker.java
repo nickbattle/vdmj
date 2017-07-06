@@ -92,7 +92,10 @@ abstract public class TypeChecker
 			
 			if (def.isTypeDefinition() || def.isFunction() || def.isOperation())
 			{
-				skip.add(def.name);
+				if (def.name != null)
+				{
+					skip.add(def.name);
+				}
 			}
     	}
     	
