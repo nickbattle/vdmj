@@ -40,7 +40,6 @@ import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Delegate;
 import com.fujitsu.vdmj.runtime.ObjectContext;
-import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.scheduler.Lock;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -51,6 +50,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.ClassInvariantListener;
+import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
@@ -566,12 +566,12 @@ public class INClassDefinition extends INDefinition
 		members.putAll(publicStaticValues);
 		members.putAll(privateStaticValues);
 
-		// We create a RootContext here so that the scope for member
-		// initializations are restricted.
+		// We create an ObjectContext here so that the member initializers can run in
+		// a "self" context that is sensible.
 
-		Context initCtxt = new StateContext(location, "field initializers", ctxt, null);
-		initCtxt.putList(members.asList());
-
+		ObjectValue object = new ObjectValue((TCClassType)getType(), members, inherited, ctxt.threadState.CPU, this);
+		Context initCtxt = new ObjectContext(location, "field initializers", ctxt, object);
+		
 		// We create an empty context to pass for function creation, so that
 		// there are no spurious free variables created.
 
@@ -599,6 +599,19 @@ public class INClassDefinition extends INDefinition
 					
 					initCtxt.put(nvp.name, nvp.value);
 					members.put(nvp.name, nvp.value);
+					
+					Value deref = nvp.value.deref();
+					
+					if (deref instanceof OperationValue)
+					{
+						OperationValue op = (OperationValue)deref;
+						op.setSelf(object);
+					}
+					else if (deref instanceof FunctionValue)
+		 			{
+		 				FunctionValue fv = (FunctionValue)deref;
+		 				fv.setSelf(object);
+		 			}
 				}
 			}
 		}
@@ -617,9 +630,6 @@ public class INClassDefinition extends INDefinition
 
 		setPermissions(definitions, members, initCtxt);
 		setPermissions(superInheritedDefinitions, members, initCtxt);
-
-		ObjectValue object =
-			new ObjectValue((TCClassType)getType(), members, inherited, ctxt.threadState.CPU, this);
 
 		Value ctor = null;
 
