@@ -75,6 +75,18 @@ abstract public class ReferenceValue extends Value
 	}
 
 	@Override
+	public boolean isNumeric()
+	{
+		return value.isNumeric();
+	}
+
+	@Override
+	public boolean isOrdered()
+	{
+		return value.isOrdered();
+	}
+
+	@Override
 	public double realValue(Context ctxt) throws ValueException
 	{
 		return value.realValue(ctxt);
@@ -189,6 +201,17 @@ abstract public class ReferenceValue extends Value
 		}
 
 		return false;
+	}
+	
+	@Override
+	public int compareTo(Value other)
+	{
+		if (other instanceof Value)
+		{
+   			return value.compareTo(other);
+		}
+
+		return super.compareTo(other);
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2017 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -21,28 +21,22 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.expressions;
+package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.ast.lex.LexToken;
-import com.fujitsu.vdmj.tc.types.TCBooleanType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class TCGreaterExpression extends TCNumericBinaryExpression
+public class EquivRelationObligation extends ProofObligation
 {
-	private static final long serialVersionUID = 1L;
-
-	public TCGreaterExpression(TCExpression left, LexToken op, TCExpression right)
+	public EquivRelationObligation(POTypeDefinition def, POContextStack ctxt)
 	{
-		super(left, op, right);
-	}
-
-	@Override
-	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
-	{
-		checkOrdered(env, scope);
-		return checkConstraint(constraint, new TCBooleanType(location));
+		super(def.eqPattern1.location, POType.EQUIV_RELATION, ctxt);
+		TCNameToken eqT = def.name.getEqName(location);
+		String po = "(forall x:%T & %N(x, x)) and\n"
+			+ "(forall x, y:%T & %N(x, y) => %N(y, x)) and\n"
+			+ "(forall x, y, z:%T & %N(x, y) and %N(y, z) => %N(x, z))";
+		po = po.replaceAll("%N", eqT.getName());
+		po = po.replaceAll("%T", def.name.getName());
+		value = ctxt.getObligation(po);
 	}
 }

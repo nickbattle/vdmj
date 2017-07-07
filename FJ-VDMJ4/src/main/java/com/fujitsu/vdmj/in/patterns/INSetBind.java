@@ -68,11 +68,11 @@ public class INSetBind extends INBind
 
 		for (Value e: elements)
 		{
-			e = e.deref();
+			Value d = e.deref();
 
-			if (e instanceof SetValue && permuted)
+			if (d instanceof SetValue && permuted)
 			{
-				SetValue sv = (SetValue)e;
+				SetValue sv = (SetValue)d;
 				results.addAll(sv.permutedSets());
 			}
 			else

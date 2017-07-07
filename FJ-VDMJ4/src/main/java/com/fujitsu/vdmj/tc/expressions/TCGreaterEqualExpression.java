@@ -42,7 +42,7 @@ public class TCGreaterEqualExpression extends TCNumericBinaryExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		checkNumeric(env, scope);
+		checkOrdered(env, scope);
 		return checkConstraint(constraint, new TCBooleanType(location));
 	}
 }

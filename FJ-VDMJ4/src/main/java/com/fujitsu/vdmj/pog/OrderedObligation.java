@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2017 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -21,28 +21,35 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.expressions;
+package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.ast.lex.LexToken;
-import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 
-public class TCGreaterExpression extends TCNumericBinaryExpression
+public class OrderedObligation extends ProofObligation
 {
-	private static final long serialVersionUID = 1L;
-
-	public TCGreaterExpression(TCExpression left, LexToken op, TCExpression right)
+	public OrderedObligation(POExpression left, POExpression right, TCTypeSet types, POContextStack ctxt)
 	{
-		super(left, op, right);
-	}
+		super(left.location, POType.ORDERED, ctxt);
+		StringBuilder sb = new StringBuilder();
+		String prefix = "";
 
-	@Override
-	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
-	{
-		checkOrdered(env, scope);
-		return checkConstraint(constraint, new TCBooleanType(location));
+		for (TCType type: types)
+		{
+			sb.append(prefix);
+    		sb.append("(is_(");
+    		sb.append(left);
+    		sb.append(", ");
+    		sb.append(type);
+    		sb.append(") and is_(");
+    		sb.append(right);
+    		sb.append(", ");
+    		sb.append(type);
+    		sb.append("))");
+    		prefix = " or ";
+		}
+		
+		value = ctxt.getObligation(sb.toString());
 	}
 }

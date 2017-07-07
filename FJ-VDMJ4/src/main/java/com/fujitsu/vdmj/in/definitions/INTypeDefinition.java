@@ -43,10 +43,16 @@ public class INTypeDefinition extends INDefinition
 	public final INPattern invPattern;
 	public final INExpression invExpression;
 	public final INExplicitFunctionDefinition invdef;
+	public final INExplicitFunctionDefinition eqdef;
+	public final INExplicitFunctionDefinition orddef;
+	public final INExplicitFunctionDefinition mindef;
+	public final INExplicitFunctionDefinition maxdef;
 
 	public INTypeDefinition(INAccessSpecifier accessSpecifier, TCNameToken name,
 			TCInvariantType type, INPattern invPattern, INExpression invExpression,
-			INExplicitFunctionDefinition invdef)
+			INExplicitFunctionDefinition invdef, INExplicitFunctionDefinition eqdef,
+			INExplicitFunctionDefinition orddef, INExplicitFunctionDefinition mindef,
+			INExplicitFunctionDefinition maxdef)
 	{
 		super(name.getLocation(), accessSpecifier, name);
 
@@ -54,6 +60,10 @@ public class INTypeDefinition extends INDefinition
 		this.invPattern = invPattern;
 		this.invExpression = invExpression;
 		this.invdef = invdef;
+		this.eqdef = eqdef;
+		this.orddef = orddef;
+		this.mindef = mindef;
+		this.maxdef = maxdef;
 	}
 
 	@Override
@@ -77,6 +87,26 @@ public class INTypeDefinition extends INDefinition
 			return invdef;
 		}
 
+		if (eqdef != null && eqdef.findName(sought) != null)
+		{
+			return eqdef;
+		}
+
+		if (orddef != null && orddef.findName(sought) != null)
+		{
+			return orddef;
+		}
+
+		if (mindef != null && mindef.findName(sought) != null)
+		{
+			return mindef;
+		}
+
+		if (maxdef != null && maxdef.findName(sought) != null)
+		{
+			return maxdef;
+		}
+
 		return null;
 	}
 
@@ -86,6 +116,30 @@ public class INTypeDefinition extends INDefinition
 		if (invdef != null)
 		{
 			INExpression found = invdef.findExpression(lineno);
+			if (found != null) return found;
+		}
+
+		if (eqdef != null)
+		{
+			INExpression found = eqdef.findExpression(lineno);
+			if (found != null) return found;
+		}
+
+		if (orddef != null)
+		{
+			INExpression found = orddef.findExpression(lineno);
+			if (found != null) return found;
+		}
+
+		if (mindef != null)
+		{
+			INExpression found = mindef.findExpression(lineno);
+			if (found != null) return found;
+		}
+
+		if (maxdef != null)
+		{
+			INExpression found = maxdef.findExpression(lineno);
 			if (found != null) return found;
 		}
 
@@ -101,6 +155,30 @@ public class INTypeDefinition extends INDefinition
 		{
 			FunctionValue invfunc =	new FunctionValue(invdef, null, null, ctxt);
 			nvl.add(new NameValuePair(invdef.name, invfunc));
+		}
+
+		if (eqdef != null)
+		{
+			FunctionValue eqfunc =	new FunctionValue(eqdef, null, null, ctxt);
+			nvl.add(new NameValuePair(eqdef.name, eqfunc));
+		}
+
+		if (orddef != null)
+		{
+			FunctionValue ordfunc =	new FunctionValue(orddef, null, null, ctxt);
+			nvl.add(new NameValuePair(orddef.name, ordfunc));
+		}
+
+		if (mindef != null)
+		{
+			FunctionValue minfunc =	new FunctionValue(mindef, null, null, ctxt);
+			nvl.add(new NameValuePair(mindef.name, minfunc));
+		}
+
+		if (maxdef != null)
+		{
+			FunctionValue maxfunc =	new FunctionValue(maxdef, null, null, ctxt);
+			nvl.add(new NameValuePair(maxdef.name, maxfunc));
 		}
 
 		return nvl;

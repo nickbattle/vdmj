@@ -52,17 +52,17 @@ public class INSetDifferenceExpression extends INBinaryExpression
 		{
 			togo = right.eval(ctxt).setValue(ctxt);
 			result.addAll(left.eval(ctxt).setValue(ctxt));
+
+			for (Value r: togo)
+			{
+				result.remove(r);
+			}
+
+			return new SetValue(result);
 		}
 		catch (ValueException e)
 		{
 			return abort(e);
 		}
-
-		for (Value r: togo)
-		{
-			result.remove(r);
-		}
-
-		return new SetValue(result);
 	}
 }

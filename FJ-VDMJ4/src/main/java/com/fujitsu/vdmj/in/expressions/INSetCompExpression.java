@@ -117,13 +117,13 @@ public class INSetCompExpression extends INSetExpression
 					set.add(first.eval(evalContext));
 				}
 			}
+
+			return new SetValue(set);
 		}
 		catch (ValueException e)
 		{
 			return abort(e);
 		}
-
-		return new SetValue(set);
 	}
 
 	@Override

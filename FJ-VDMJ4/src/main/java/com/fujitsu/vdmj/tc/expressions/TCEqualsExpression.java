@@ -46,6 +46,16 @@ public class TCEqualsExpression extends TCBinaryExpression
 		ltype = left.typeCheck(env, null, scope, null);
 		rtype = right.typeCheck(env, null, scope, null);
 
+		if (ltype.isUnion(location))
+		{
+			checkMultipleEqualities(ltype);
+		}
+		
+		if (rtype.isUnion(location))
+		{
+			checkMultipleEqualities(rtype);
+		}
+
 		if (!TypeComparator.compatible(ltype, rtype) || !TypeComparator.compatible(rtype, ltype))
 		{
 			report(3087, "Left and right of '=' are incompatible types");

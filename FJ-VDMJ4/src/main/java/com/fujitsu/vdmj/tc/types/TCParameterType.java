@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.tc.types;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -53,6 +54,12 @@ public class TCParameterType extends TCType
 		}
 
 		return this;
+	}
+	
+	@Override
+	public boolean isOrdered(LexLocation loc)
+	{
+		return true;
 	}
 
 	@Override

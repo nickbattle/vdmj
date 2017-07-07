@@ -102,9 +102,9 @@ public class INSeqCompExpression extends INSeqExpression
 
 				if (map.get(sortOn) == null)
 				{
-    				if (nvpl.size() != 1 || !sortOn.isNumeric())
+    				if (nvpl.size() != 1 || !sortOn.isOrdered())
     				{
-    					abort(4029, "Sequence comprehension bindings must be one numeric value", ctxt);
+    					abort(4029, "Sequence comprehension bindings must be one ordered value", ctxt);
     				}
 
     				evalContext.putList(nvpl);

@@ -33,7 +33,7 @@ map TCRenamedDefinition{name, def} to PORenamedDefinition(name, def);
 map TCStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression, recordType} to POStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression, recordType);
 map TCSystemDefinition{name, classtype, definitions} to POSystemDefinition(name, classtype, definitions);
 map TCThreadDefinition{statement} to POThreadDefinition(statement);
-map TCTypeDefinition{name, type, invPattern, invExpression} to POTypeDefinition(name, type, invPattern, invExpression);
+map TCTypeDefinition{name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression} to POTypeDefinition(name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression);
 map TCValueDefinition{pattern, type, exp, expType} to POValueDefinition(pattern, type, exp, expType);
 map TCUntypedDefinition{location, name} to POUntypedDefinition(location, name);
 map TCQualifiedDefinition{def, type} to POQualifiedDefinition(def, type);

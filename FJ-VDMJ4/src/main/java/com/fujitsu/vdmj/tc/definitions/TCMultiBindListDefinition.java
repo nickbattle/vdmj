@@ -119,8 +119,15 @@ public class TCMultiBindListDefinition extends TCDefinition
 		{
 			types.add(def.getType());
 		}
-
-		return new TCUnionType(location, types);
+		
+		if (types.size() == 1)
+		{
+			return types.iterator().next();
+		}
+		else
+		{
+			return new TCUnionType(location, types);
+		}
 	}
 
 	@Override

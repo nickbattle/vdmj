@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.SetValue;
@@ -61,7 +62,14 @@ public class INSetEnumExpression extends INSetExpression
 			values.add(e.eval(ctxt));
 		}
 
-		return new SetValue(values);
+		try
+		{
+			return new SetValue(values);
+		}
+		catch (ValueException e)
+		{
+			return abort(e);
+		}
 	}
 
 	@Override
