@@ -65,4 +65,10 @@ public abstract class TCNumericType extends TCBasicType
 			return new TCIntegerType(location);
 		}
 	}
+	
+	@Override
+	public boolean isOrdered(LexLocation from)
+	{
+		return true;
+	}
 }

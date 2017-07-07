@@ -32,7 +32,7 @@ map ASTRenamedDefinition{name, def} to TCRenamedDefinition(name, def);
 map ASTStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression} to TCStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression);
 map ASTSystemDefinition{name, definitions} to TCSystemDefinition(name, definitions);
 map ASTThreadDefinition{statement} to TCThreadDefinition(statement);
-map ASTTypeDefinition{accessSpecifier, name, type, invPattern, invExpression} to TCTypeDefinition(accessSpecifier, name, type, invPattern, invExpression);
+map ASTTypeDefinition{accessSpecifier, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression} to TCTypeDefinition(accessSpecifier, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression);
 map ASTUntypedDefinition{location, name} to TCUntypedDefinition(location, name);
 map ASTValueDefinition{accessSpecifier, pattern, type, exp} to TCValueDefinition(accessSpecifier, pattern, type, exp);
 

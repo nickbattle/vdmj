@@ -229,6 +229,18 @@ public class UpdatableValue extends ReferenceValue
 	}
 
 	@Override
+	public synchronized boolean isNumeric()
+	{
+		return value.isNumeric();
+	}
+
+	@Override
+	public synchronized boolean isOrdered()
+	{
+		return value.isOrdered();
+	}
+
+	@Override
 	public synchronized BigDecimal realValue(Context ctxt) throws ValueException
 	{
 		return value.realValue(ctxt);

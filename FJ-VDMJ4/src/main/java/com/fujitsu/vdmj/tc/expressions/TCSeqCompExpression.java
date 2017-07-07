@@ -69,9 +69,9 @@ public class TCSeqCompExpression extends TCSeqExpression
 		def.typeCheck(base, scope);
 
 		if (bind instanceof TCSetBind &&
-			(bind.pattern.getVariableNames().size() != 1 || !def.getType().isNumeric(location)))
+			(bind.pattern.getVariableNames().size() != 1 || !def.getType().isOrdered(location)))
 		{
-			report(3155, "List comprehension must define one numeric bind variable");
+			report(3155, "List comprehension must define one ordered bind variable");
 		}
 
 		Environment local = new FlatCheckedEnvironment(def, base, scope);

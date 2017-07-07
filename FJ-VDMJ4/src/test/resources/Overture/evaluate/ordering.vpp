@@ -1,0 +1,83 @@
+class A
+types
+	R :: a : nat b : nat
+	inv r == r.a < 10
+	eq r1 = r2 == r1.a = r2.a
+	ord mk_R(r1, -) < mk_R(r2, -) == r1 < r2;
+	
+	T = nat
+	inv t == t < 10
+	eq t1 = t2 == t1 = t2
+	ord t1 < t2 == t1 > t2;		-- Note descending order!
+	
+functions
+	test_eq_ord_f: () -> seq of bool
+	test_eq_ord_f() ==
+	[
+		eq_R(mk_R(1,0), mk_R(2,0)) = false,
+		eq_R(mk_R(2,0), mk_R(2,0)) = true,
+
+		ord_R(mk_R(1,0), mk_R(2,0)) = true,
+		ord_R(mk_R(2,0), mk_R(1,0)) = false,
+		ord_R(mk_R(1,0), mk_R(1,0)) = false,
+		
+		eq_T(1, 2) = false,
+		eq_T(2, 2) = true,
+		
+		ord_T(1, 2) = false,
+		ord_T(2, 1) = true,
+		ord_T(1, 1) = false
+	]
+	post elems RESULT = {true};
+	
+	test_eq: () -> seq of bool
+	test_eq() ==
+	[
+		mk_R(1,0) < mk_R(2,0),
+		mk_R(1,0) <= mk_R(2,0),
+		mk_R(2,0) > mk_R(1,0),
+		mk_R(2,0) >= mk_R(1,0),
+		mk_R(1,0) = mk_R(1,1),
+		mk_R(1,2) <> mk_R(2,1),
+		let t1:T = 1, t2:T = 2 in t1 > t2,
+		let t1:T = 1, t2:T = 2 in t1 >= t2,
+		let t1:T = 1, t2:T = 2 in t2 < t1,
+		let t1:T = 1, t2:T = 2 in t2 <= t1,
+		let t1:T = 1 in t1 = t1,
+		let t1:T = 1, t2:T = 2 in t2 <> t1
+	]
+	post elems RESULT = {true};
+
+	test_min_max_f: () -> seq of bool
+	test_min_max_f() ==
+	[
+		min_T(1, 2) = 2,	-- Descending order
+		min_T(2, 1) = 2,
+		min_T(2, 2) = 2,
+		max_T(1, 2) = 1,	-- Descending order
+		max_T(2, 1) = 1,
+		max_T(1, 1) = 1,
+		
+		min_R(mk_R(1,0), mk_R(2,0)) = mk_R(1,0),
+		min_R(mk_R(2,0), mk_R(1,0)) = mk_R(1,0),
+		min_R(mk_R(1,0), mk_R(1,0)) = mk_R(1,0),
+		max_R(mk_R(1,0), mk_R(2,0)) = mk_R(2,0),
+		max_R(mk_R(2,0), mk_R(1,0)) = mk_R(2,0),
+		max_R(mk_R(2,0), mk_R(2,0)) = mk_R(2,0)
+	]
+	post elems RESULT = {true};
+	
+	test_seq: () -> seq of bool
+	test_seq() ==
+	[
+		let S:set of T = {1,2,3} in [x | x in set S] = [3,2,1],
+		let S:set of R = {mk_R(2,0), mk_R(1,0)} in [x | x in set S] = [mk_R(1,0), mk_R(2,0)]
+	]
+	post elems RESULT = {true};
+
+	public test: () -> seq of bool
+	test() ==
+		test_eq_ord_f() ^ test_eq() ^ test_min_max_f() ^ test_seq()
+	post elems RESULT = {true};
+
+end A

@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -47,13 +46,16 @@ public class INGreaterExpression extends INNumericBinaryExpression
 		Value lv = left.eval(ctxt);
 		Value rv = right.eval(ctxt);
 
-		try
+		if (lv.isOrdered() && rv.isOrdered())
 		{
-			return new BooleanValue(lv.realValue(ctxt).compareTo(rv.realValue(ctxt)) > 0);
-        }
-        catch (ValueException e)
-        {
-        	return abort(e);
-        }
+			int cmp = lv.compareTo(rv);
+			
+			if (cmp != Integer.MIN_VALUE)	// Indicates comparable
+			{
+				return new BooleanValue(cmp > 0);
+			}
+		}
+
+		return abort(4172, "Values cannot be compared: " + lv + ", " + rv, ctxt);
 	}
 }

@@ -428,16 +428,74 @@ public class DefinitionReader extends SyntaxReader
 
 		ASTPattern invPattern = null;
 		ASTExpression invExpression = null;
+		ASTPattern eqPattern1 = null;
+		ASTPattern eqPattern2 = null;
+		ASTExpression eqExpression = null;
+		ASTPattern ordPattern1 = null;
+		ASTPattern ordPattern2 = null;
+		ASTExpression ordExpression = null;
 
-		if (lastToken().is(Token.INV))
+		while (lastToken().is(Token.INV) || lastToken().is(Token.EQ) || lastToken().is(Token.ORD))
 		{
-			nextToken();
-			invPattern =  getPatternReader().readPattern();
-			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after pattern in invariant");
-			invExpression = getExpressionReader().readExpression();
+    		switch (lastToken().type)
+    		{
+    			case INV:
+    				if (invPattern != null)
+    				{
+    					throwMessage(2332, "Duplicate inv clause");
+    				}
+    				
+        			nextToken();
+        			invPattern = getPatternReader().readPattern();
+        			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after pattern in invariant");
+        			invExpression = getExpressionReader().readExpression();
+        			break;
+        			
+    			case EQ:
+    				if (Settings.release == Release.CLASSIC)
+    				{
+    					throwMessage(2333, "Type eq/ord clauses not available in classic");
+    				}
+
+    				if (eqPattern1 != null)
+    				{
+    					throwMessage(2332, "Duplicate eq clause");
+    				}
+    				
+        			nextToken();
+        			eqPattern1 = getPatternReader().readPattern();
+        			checkFor(Token.EQUALS, 2087, "Expecting '=' between patterns in eq clause");
+        			eqPattern2 = getPatternReader().readPattern();
+        			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after patterns in eq clause");
+        			eqExpression = getExpressionReader().readExpression();
+    				break;
+    				
+    			case ORD:
+    				if (Settings.release == Release.CLASSIC)
+    				{
+    					throwMessage(2333, "Type eq/ord clauses not available in classic");
+    				}
+
+    				if (ordPattern1 != null)
+    				{
+    					throwMessage(2332, "Duplicate ord clause");
+    				}
+    				
+        			nextToken();
+        			ordPattern1 = getPatternReader().readPattern();
+        			checkFor(Token.LT, 2087, "Expecting '<' between patterns in ord clause");
+        			ordPattern2 = getPatternReader().readPattern();
+        			checkFor(Token.EQUALSEQUALS, 2087, "Expecting '==' after patterns in ord clause");
+        			ordExpression = getExpressionReader().readExpression();
+    				break;
+
+    			default:
+    				throwMessage(2331, "Expecting inv, eq or ord clause");
+    		}
 		}
 
-		return new ASTTypeDefinition(idToName(id), invtype, invPattern, invExpression);
+		return new ASTTypeDefinition(idToName(id), invtype, invPattern, invExpression,
+			eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression);
 	}
 
 	private ASTDefinitionList readTypes() throws LexException, ParserException

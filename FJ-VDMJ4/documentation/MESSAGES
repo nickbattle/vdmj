@@ -44,6 +44,7 @@ as the expected and actual values.
 0067, "Exported type <name> not structured"
 0068, "Periodic threads overlapping"
 
+
 1000, "Malformed quoted character"
 1001, "Invalid char <ch> in base <n> number"
 1002, "Expecting '|->'"
@@ -56,6 +57,7 @@ as the expected and actual values.
 1009, "Unexpected character 'c'"
 1010, "Expecting <digits>[.<digits>][e<+-><digits>]"
 1011, "Unterminated block comment"
+
 
 2000, "Expecting 'in set' or 'in seq' after pattern in set binding"
 2001, "Expecting 'in set' or 'in seq' in set bind"
@@ -379,6 +381,10 @@ as the expected and actual values.
 2328, "Sequence binds are not available in classic"
 2329, "Duplicate <keyword> keyword"
 2330, "Tokens found after expression at <token>"
+2331, "Expecting inv, eq or ord clause"
+2332, "Duplicate inv clause"
+2333, "Type eq/ord clauses not available in classic"
+
 
 3000, "Expression does not match declared type"
 3001, "Class inherits thread definition from multiple supertypes"
@@ -519,8 +525,8 @@ as the expected and actual values.
 3136, "Left and right of '<>' different types"
 3137, "Not expression is not a boolean"
 3138, "Argument of 'not in set' is not a set"
-3139, "Left hand of <operator> is not numeric"
-3140, "Right hand of <operator> is not numeric"
+3139, "Left hand of <operator> is not ordered"
+3140, "Right hand of <operator> is not ordered"
 3141, "Right hand of '++' is not a map"
 3142, "Right hand of '++' is not a map"
 3143, "Domain of right hand of '++' must be nat1"
@@ -535,7 +541,7 @@ as the expected and actual values.
 3152, "Right of ':>' is not a set"
 3153, "Restriction of map should be set of <type>"
 3154, "<name> not in scope"
-3155, "List comprehension must define one numeric bind variable"
+3155, "List comprehension must define one ordered bind variable"
 3156, "Predicate is not boolean"
 3157, "Left hand of '^' is not a sequence"
 3158, "Right hand of '^' is not a sequence"
@@ -738,6 +744,7 @@ as the expected and actual values.
 3354, "Function argument must be instantiated"
 3355, "Cyclic dependency detected"
 
+
 4000, "Cannot instantiate abstract class <class>"
 4002, "Expression value is not in set|seq bind"
 4003, "Value <value> cannot be applied"
@@ -905,6 +912,7 @@ as the expected and actual values.
 4169, "Arithmetic overflow"
 4170, "Cannot convert empty set to set1"
 4171, "Cannot convert <function> to <function>"
+4172, "Values cannot be compared: <first>, <second>"
 
 
 5000, "Definition <name> not used"
@@ -925,3 +933,7 @@ as the expected and actual values.
 5015, "LaTeX source should start with %comment, \document, \section or \subsection"
 5016, "Some statements will not be reached"
 5017, "Pure operation call may not be referentially transparent"
+5018, "Field has ':-' for type with eq definition"
+5019, "Order of union member <name> will be overridden"
+5020, "Equality of union member <name> will be overridden"
+5021, "Multiple union members define eq clauses, <types>"

@@ -24,6 +24,8 @@
 package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POLessExpression extends PONumericBinaryExpression
@@ -34,5 +36,11 @@ public class POLessExpression extends PONumericBinaryExpression
 		TCType ltype, TCType rtype)
 	{
 		super(left, op, right, ltype, rtype);
+	}
+	
+	@Override
+	public ProofObligationList getProofObligations(POContextStack ctxt)
+	{
+		return getOrderedObligations(ctxt);
 	}
 }

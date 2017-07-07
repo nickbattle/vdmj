@@ -179,6 +179,26 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 		return new TCNameToken(l, getModule(), "inv_" + getName(), false, false);
 	}
 
+	public TCNameToken getEqName(LexLocation l)
+	{
+		return new TCNameToken(l, getModule(), "eq_" + getName(), false, false);
+	}
+
+	public TCNameToken getOrdName(LexLocation l)
+	{
+		return new TCNameToken(l, getModule(), "ord_" + getName(), false, false);
+	}
+
+	public TCNameToken getMaxName(LexLocation l)
+	{
+		return new TCNameToken(l, getModule(), "max_" + getName(), false, false);
+	}
+
+	public TCNameToken getMinName(LexLocation l)
+	{
+		return new TCNameToken(l, getModule(), "min_" + getName(), false, false);
+	}
+
 	public TCNameToken getInitName(LexLocation l)
 	{
 		return new TCNameToken(l, getModule(), "init_" + getName(), false, false);
@@ -195,7 +215,11 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 			getName().startsWith("pre_") ||
 			getName().startsWith("post_") ||
 			getName().startsWith("inv_") ||
-			getName().startsWith("init_");
+			getName().startsWith("init_") ||
+			getName().startsWith("eq_") ||
+			getName().startsWith("ord_") ||
+			getName().startsWith("min_") ||
+			getName().startsWith("max_");
 	}
 
 	public TCNameToken getExplicit(boolean explicit)

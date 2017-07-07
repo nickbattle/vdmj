@@ -60,11 +60,11 @@ public class INMultipleSetBind extends INMultipleBind
 
 			for (Value v: vs)
 			{
-				v = v.deref();
+				Value d = v.deref();
 
-				if (v instanceof SetValue && permuted)
+				if (d instanceof SetValue && permuted)
 				{
-					SetValue sv = (SetValue)v;
+					SetValue sv = (SetValue)d;
 					vl.addAll(sv.permutedSets());
 				}
 				else

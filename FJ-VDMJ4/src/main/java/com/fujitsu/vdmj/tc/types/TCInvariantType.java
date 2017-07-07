@@ -34,6 +34,9 @@ public abstract class TCInvariantType extends TCType
 {
 	private static final long serialVersionUID = 1L;
 	public TCExplicitFunctionDefinition invdef = null;
+	public TCExplicitFunctionDefinition eqdef = null;
+	public TCExplicitFunctionDefinition orddef = null;
+
 	public boolean opaque = false;
 	protected boolean inNarrower = false;
 
@@ -55,13 +58,38 @@ public abstract class TCInvariantType extends TCType
 		this.invdef = invdef;
 	}
 
+	public void setEquality(TCExplicitFunctionDefinition eqdef)
+	{
+		this.eqdef = eqdef;
+	}
+
+	public void setOrder(TCExplicitFunctionDefinition orddef)
+	{
+		this.orddef = orddef;
+	}
+
 	public FunctionValue getInvariant(Context ctxt)
 	{
-		if (invdef != null)
+		return findFunction(invdef, ctxt);
+	}
+
+	public FunctionValue getEquality(Context ctxt)
+	{
+		return findFunction(eqdef, ctxt);
+	}
+
+	public FunctionValue getOrder(Context ctxt)
+	{
+		return findFunction(orddef, ctxt);
+	}
+
+	protected FunctionValue findFunction(TCExplicitFunctionDefinition def, Context ctxt)
+	{
+		if (def != null)
 		{
 			try
 			{
-				Value v = ctxt.getGlobal().lookup(invdef.name);
+				Value v = ctxt.getGlobal().lookup(def.name);
 				return v.functionValue(ctxt);
 			}
 			catch (ValueException e)
@@ -71,5 +99,17 @@ public abstract class TCInvariantType extends TCType
 		}
 
 		return null;
+	}
+
+	@Override
+	public boolean isOrdered(LexLocation from)
+	{
+		return orddef != null;
+	}
+	
+	@Override
+	public boolean isEq(LexLocation from)
+	{
+		return eqdef != null;
 	}
 }

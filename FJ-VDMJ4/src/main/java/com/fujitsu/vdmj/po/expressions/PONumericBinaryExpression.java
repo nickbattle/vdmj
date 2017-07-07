@@ -24,11 +24,14 @@
 package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.pog.OrderedObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 abstract public class PONumericBinaryExpression extends POBinaryExpression
 {
@@ -47,18 +50,107 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 
 		if (ltype.isUnion(location))
 		{
-			obligations.add(
-				new SubTypeObligation(left, new TCRealType(left.location), ltype, ctxt));
+			for (TCType type: ltype.getUnion().types)
+			{
+				if (!type.isNumeric(type.location))
+				{
+					obligations.add(
+						new SubTypeObligation(left, new TCRealType(left.location), ltype, ctxt));
+
+					break;
+				}
+			}
+			
 		}
 
 		if (rtype.isUnion(location))
 		{
-			obligations.add(
-				new SubTypeObligation(right, new TCRealType(right.location), rtype, ctxt));
+			for (TCType type: rtype.getUnion().types)
+			{
+				if (!type.isNumeric(type.location))
+				{
+        			obligations.add(
+        				new SubTypeObligation(right, new TCRealType(right.location), rtype, ctxt));
+        			
+        			break;
+				}
+			}
 		}
 
 		obligations.addAll(left.getProofObligations(ctxt));
 		obligations.addAll(right.getProofObligations(ctxt));
+		return obligations;
+	}
+	
+	/**
+	 * Generate ordering obligations, as used by the comparison operators.
+	 */
+	protected ProofObligationList getOrderedObligations(POContextStack ctxt)
+	{
+		ProofObligationList obligations = getCommonOrderedObligations(ctxt);
+		obligations.addAll(left.getProofObligations(ctxt));
+		obligations.addAll(right.getProofObligations(ctxt));
+		return obligations;
+	}
+	
+	private ProofObligationList getCommonOrderedObligations(POContextStack ctxt)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+		TCTypeSet lset = new TCTypeSet();
+		TCTypeSet rset = new TCTypeSet();
+		
+		if (ltype.isUnion(location))
+		{
+			lset.addAll(ltype.getUnion().types);
+		}
+		else
+		{
+			lset.add(ltype);
+		}
+		
+		if (rtype.isUnion(location))
+		{
+			rset.addAll(rtype.getUnion().types);
+		}
+		else
+		{
+			rset.add(rtype);
+		}
+
+		// For each LHS type, if there is a RHS type that is compatible, we potentially
+		// remember the type. If there is a RHS type that is incompatible, we note that
+		// a PO is actually needed.
+		
+		boolean poNeeded = false;
+		TCTypeSet poTypes = new TCTypeSet();
+		
+		for (TCType lhs: lset)
+		{
+			if (lhs.isOrdered(location))
+			{
+    			for (TCType rhs: rset)
+    			{
+    				if (rhs.isOrdered(location) && TypeComparator.compatible(lhs, rhs))
+    				{
+    					poTypes.add(lhs);
+    				}
+    				else
+    				{
+    					poNeeded = true;
+    				}
+    			}
+			}
+			else
+			{
+				poNeeded = true;
+			}
+		}
+		
+		if (poNeeded && !poTypes.isEmpty())
+		{
+			obligations.add(new OrderedObligation(left, right, poTypes, ctxt));
+		}
+		
 		return obligations;
 	}
 }

@@ -25,8 +25,10 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.pog.EquivRelationObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.StrictOrderObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
@@ -41,15 +43,29 @@ public class POTypeDefinition extends PODefinition
 	public final TCInvariantType type;
 	public final POPattern invPattern;
 	public final POExpression invExpression;
+	public final POPattern eqPattern1;
+	public final POPattern eqPattern2;
+	public final POExpression eqExpression;
+	public final POPattern ordPattern1;
+	public final POPattern ordPattern2;
+	public final POExpression ordExpression;
 
-	public POTypeDefinition(TCNameToken name, TCInvariantType type, POPattern invPattern,
-		POExpression invExpression)
+	public POTypeDefinition(TCNameToken name, TCInvariantType type,
+		POPattern invPattern, POExpression invExpression,
+		POPattern eqPattern1, POPattern eqPattern2, POExpression eqExpression,
+		POPattern ordPattern1, POPattern ordPattern2, POExpression ordExpression)
 	{
 		super(name.getLocation(), name);
 
 		this.type = type;
 		this.invPattern = invPattern;
 		this.invExpression = invExpression;
+		this.eqPattern1 = eqPattern1;
+		this.eqPattern2 = eqPattern2;
+		this.eqExpression = eqExpression;
+		this.ordPattern1 = ordPattern1;
+		this.ordPattern2 = ordPattern2;
+		this.ordExpression = ordExpression;
 	}
 
 	@Override
@@ -57,7 +73,11 @@ public class POTypeDefinition extends PODefinition
 	{
 		return name.getName() + " = " + type.toDetailedString() +
 				(invPattern == null ? "" :
-					"\n\tinv " + invPattern + " == " + invExpression);
+					"\n\tinv " + invPattern + " == " + invExpression) +
+        		(eqPattern1 == null ? "" :
+        			"\n\teq " + eqPattern1 + " = " + eqPattern2 + " == " + eqExpression) +
+        		(ordPattern1 == null ? "" :
+        			"\n\tord " + ordPattern1 + " = " + ordPattern2 + " == " + ordExpression);
 	}
 
 	@Override
@@ -81,6 +101,18 @@ public class POTypeDefinition extends PODefinition
 		if (invExpression != null)
 		{
 			list.addAll(invExpression.getProofObligations(ctxt));
+		}
+
+		if (eqExpression != null)
+		{
+			list.addAll(eqExpression.getProofObligations(ctxt));
+			list.add(new EquivRelationObligation(this, ctxt));
+		}
+
+		if (ordExpression != null)
+		{
+			list.addAll(ordExpression.getProofObligations(ctxt));
+			list.add(new StrictOrderObligation(this, ctxt));
 		}
 
 		return list;

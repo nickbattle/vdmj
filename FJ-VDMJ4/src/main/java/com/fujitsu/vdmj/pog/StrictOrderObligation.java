@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2017 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -21,28 +21,21 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.expressions;
+package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.ast.lex.LexToken;
-import com.fujitsu.vdmj.tc.types.TCBooleanType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class TCGreaterExpression extends TCNumericBinaryExpression
+public class StrictOrderObligation extends ProofObligation
 {
-	private static final long serialVersionUID = 1L;
-
-	public TCGreaterExpression(TCExpression left, LexToken op, TCExpression right)
+	public StrictOrderObligation(POTypeDefinition def, POContextStack ctxt)
 	{
-		super(left, op, right);
-	}
-
-	@Override
-	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
-	{
-		checkOrdered(env, scope);
-		return checkConstraint(constraint, new TCBooleanType(location));
+		super(def.ordPattern1.location, POType.STRICT_ORDER, ctxt);
+		TCNameToken ordT = def.name.getOrdName(location);
+		String po = "(forall x:%T & not %N(x, x)) and\n"
+			+ "(forall x, y, z:%T & %N(x, y) and %N(y, z) => %N(x, z))";
+		po = po.replaceAll("%N", ordT.getName());
+		po = po.replaceAll("%T", def.name.getName());
+		value = ctxt.getObligation(po);
 	}
 }
