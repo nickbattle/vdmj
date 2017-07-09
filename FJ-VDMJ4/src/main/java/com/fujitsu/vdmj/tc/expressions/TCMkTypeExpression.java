@@ -94,9 +94,13 @@ public class TCMkTypeExpression extends TCExpression
 			// name. This only really affects trace expansion.
 
 			TCExplicitFunctionDefinition inv = recordType.invdef;
+			TCExplicitFunctionDefinition eq = recordType.eqdef;
+			TCExplicitFunctionDefinition ord = recordType.orddef;
 
 			recordType = new TCRecordType(recordType.name, recordType.fields, recordType.composed);
 			recordType.setInvariant(inv);
+			recordType.setEquality(eq);
+			recordType.setOrder(ord);
 		}
 
 		if (recordType.fields.size() != args.size())
