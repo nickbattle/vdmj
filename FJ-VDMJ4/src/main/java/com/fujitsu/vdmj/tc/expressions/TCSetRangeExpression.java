@@ -62,7 +62,7 @@ public class TCSetRangeExpression extends TCSetExpression
 
 		if (!ftype.isNumeric(location))
 		{
-			ftype.report(3166, "Set range type must be an number");
+			first.report(3166, "Set range type must be a number");
 			ftype = new TCIntegerType(location);	// Avoid later errors
 		}
 		
@@ -73,7 +73,7 @@ public class TCSetRangeExpression extends TCSetExpression
 
 		if (!ltype.isNumeric(location))
 		{
-			ltype.report(3167, "Set range type must be an number");
+			last.report(3167, "Set range type must be a number");
 		}
 
 		return possibleConstraint(constraint, new TCSetType(first.location, ftype));
