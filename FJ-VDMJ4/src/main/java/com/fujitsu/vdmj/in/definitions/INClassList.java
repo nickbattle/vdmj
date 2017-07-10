@@ -96,7 +96,7 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
 		}
 	}
 
-	public RootContext initialize()
+	public RootContext creatInitialContext()
 	{
 		StateContext globalContext = null;
 
@@ -110,7 +110,12 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
 			globalContext =	new StateContext(
 				this.get(0).location, "public static environment");
 		}
+		
+		return globalContext;
+	}
 
+	public void initialize(StateContext globalContext)
+	{
 		globalContext.setThreadState(CPUValue.vCPU);
 
 		// Initialize all the functions/operations first because the values
@@ -180,7 +185,6 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
 		}
 
 		Settings.exceptions = exceptions;
-		return globalContext;
 	}
 
 	public INStatement findStatement(File file, int lineno)

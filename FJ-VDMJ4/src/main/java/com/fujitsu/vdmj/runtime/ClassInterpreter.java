@@ -179,7 +179,8 @@ public class ClassInterpreter extends Interpreter
 		ObjectValue.init();
 
 		logSwapIn();
-		initialContext = executableClasses.initialize();
+		initialContext = executableClasses.creatInitialContext();
+		executableClasses.initialize((StateContext) initialContext);
 		executableClasses.systemInit(scheduler, initialContext);
 		logSwapOut();
 
@@ -197,7 +198,8 @@ public class ClassInterpreter extends Interpreter
 		scheduler.reset();
 
 		SystemClock.init();
-		initialContext = executableClasses.initialize();
+		initialContext = executableClasses.creatInitialContext();
+		executableClasses.initialize((StateContext) initialContext);
 		createdValues = new NameValuePairMap();
 		createdDefinitions = new TCDefinitionSet();
 	}
