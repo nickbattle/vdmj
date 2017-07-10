@@ -197,14 +197,16 @@ public class ModuleInterpreter extends Interpreter
 	{
 		scheduler.init();
 		CPUValue.init(scheduler);
-		initialContext = executableModules.initialize();
+		initialContext = executableModules.creatInitialContext();
+		executableModules.initialize(initialContext);
 	}
 
 	@Override
 	public void traceInit()
 	{
 		scheduler.reset();
-		initialContext = executableModules.initialize();
+		initialContext = executableModules.creatInitialContext();
+		executableModules.initialize(initialContext);
 	}
 
 	@Override

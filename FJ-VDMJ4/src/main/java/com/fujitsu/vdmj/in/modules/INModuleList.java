@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.ContextException;
+import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -118,7 +119,7 @@ public class INModuleList extends INMappedList<TCModule, INModule>
 		return null;
 	}
 
-	public StateContext initialize()
+	public StateContext creatInitialContext()
 	{
 		StateContext initialContext = null;
 
@@ -132,7 +133,13 @@ public class INModuleList extends INMappedList<TCModule, INModule>
 			initialContext =
 				new StateContext(this.get(0).name.getLocation(), "global environment");
 		}
+		
+		return initialContext;
+	}
 
+	public void initialize(RootContext ctxt)
+	{
+		StateContext initialContext = (StateContext)ctxt;
 		initialContext.setThreadState(null);
 		Set<ContextException> problems = null;
 		int retries = 5;
@@ -173,7 +180,6 @@ public class INModuleList extends INMappedList<TCModule, INModule>
 		}
 
 		Settings.exceptions = exceptions;
-		return initialContext;
 	}
 
 	public INNamedTraceDefinition findTraceDefinition(TCNameToken name)
