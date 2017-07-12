@@ -77,14 +77,14 @@ public class TCExistsExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		Environment local = new FlatEnvironment(def, env);
-		TCNameSet names = predicate.getFreeVariables(local);
+		TCNameSet names = predicate.getFreeVariables(globals, local);
 		
 		for (TCMultipleBind mb: bindList)
 		{
-			names.addAll(mb.getFreeVariables(local));
+			names.addAll(mb.getFreeVariables(globals, local));
 		}
 		
 		return names;

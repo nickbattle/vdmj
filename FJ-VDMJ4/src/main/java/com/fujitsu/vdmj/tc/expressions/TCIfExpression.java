@@ -106,8 +106,8 @@ public class TCIfExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		return ifExp.getFreeVariables(env);		// The rest is conditional
+		return ifExp.getFreeVariables(globals, env);		// The rest is conditional
 	}
 }

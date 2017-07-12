@@ -78,11 +78,11 @@ public class TCSubseqExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		TCNameSet names = seq.getFreeVariables(env);
-		names.addAll(from.getFreeVariables(env));
-		names.addAll(to.getFreeVariables(env));
+		TCNameSet names = seq.getFreeVariables(globals, env);
+		names.addAll(from.getFreeVariables(globals, env));
+		names.addAll(to.getFreeVariables(globals, env));
 		return names;
 	}
 }

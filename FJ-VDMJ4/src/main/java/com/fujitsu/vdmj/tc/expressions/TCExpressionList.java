@@ -49,13 +49,13 @@ public class TCExpressionList extends TCMappedList<ASTExpression, TCExpression>
 		return Utils.listToString(this);
 	}
 
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		TCNameSet names = new TCNameSet();
 		
 		for (TCExpression exp: this)
 		{
-			names.addAll(exp.getFreeVariables(env));
+			names.addAll(exp.getFreeVariables(globals, env));
 		}
 		
 		return names;

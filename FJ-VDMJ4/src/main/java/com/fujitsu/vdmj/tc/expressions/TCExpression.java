@@ -166,9 +166,10 @@ public abstract class TCExpression extends TCNode implements Serializable
 	/**
 	 * Search the expression for its free variables, if any. The environment passed contains
 	 * those names that are already defined in the scope - ie. which are not free variables.
+	 * @param globals TODO
 	 * @param env
 	 */
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		return new TCNameSet();
 	}

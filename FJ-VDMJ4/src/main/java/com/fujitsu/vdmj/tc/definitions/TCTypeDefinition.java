@@ -564,7 +564,7 @@ public class TCTypeDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		TCNameSet names = new TCNameSet();
 		
@@ -576,7 +576,7 @@ public class TCTypeDefinition extends TCDefinition
 		
 		if (invdef != null)
 		{
-			names.addAll(invdef.getFreeVariables(env, returns));
+			names.addAll(invdef.getFreeVariables(globals, env, returns));
 		}
 		
 		return names;

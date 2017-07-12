@@ -184,8 +184,15 @@ public class TCVariableExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
+		TCDefinition d = globals.findName(name, NameScope.NAMESANDSTATE);
+		
+		if (d != null && d.isFunction())
+		{
+			return new TCNameSet();
+		}
+		
 		if (env.findName(name, NameScope.NAMESANDSTATE) == null)
 		{
 			return new TCNameSet(name.getExplicit(true));

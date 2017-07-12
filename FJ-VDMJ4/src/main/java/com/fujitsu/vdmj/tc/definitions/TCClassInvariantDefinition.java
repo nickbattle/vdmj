@@ -102,8 +102,8 @@ public class TCClassInvariantDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		return expression.getFreeVariables(env);
+		return expression.getFreeVariables(globals, env);
 	}
 }

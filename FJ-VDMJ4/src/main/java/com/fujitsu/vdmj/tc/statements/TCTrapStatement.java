@@ -103,8 +103,8 @@ public class TCTrapStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		return body.getFreeVariables(env, returns);
+		return body.getFreeVariables(globals, env, returns);
 	}
 }

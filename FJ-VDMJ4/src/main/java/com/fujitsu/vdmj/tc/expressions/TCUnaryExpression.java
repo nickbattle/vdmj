@@ -39,8 +39,8 @@ abstract public class TCUnaryExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		return exp.getFreeVariables(env);
+		return exp.getFreeVariables(globals, env);
 	}
 }

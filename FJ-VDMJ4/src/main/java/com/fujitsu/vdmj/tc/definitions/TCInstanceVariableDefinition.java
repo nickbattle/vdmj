@@ -124,11 +124,11 @@ public class TCInstanceVariableDefinition extends TCAssignmentDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		TCNameSet names = new TCNameSet();
 		names.addAll(type.getFreeVariables(env));
-		names.addAll(expression.getFreeVariables(env));
+		names.addAll(expression.getFreeVariables(globals, env));
 		return names;
 	}
 }

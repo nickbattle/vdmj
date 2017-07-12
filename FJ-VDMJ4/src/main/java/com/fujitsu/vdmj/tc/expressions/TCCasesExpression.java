@@ -77,8 +77,8 @@ public class TCCasesExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		return exp.getFreeVariables(env);	// The rest is conditional
+		return exp.getFreeVariables(globals, env);	// The rest is conditional
 	}
 }

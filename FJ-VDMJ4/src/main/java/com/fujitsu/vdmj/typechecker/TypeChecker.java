@@ -74,11 +74,12 @@ abstract public class TypeChecker
 		
 		Map<TCNameToken, TCNameSet> dependencies = new HashMap<TCNameToken, TCNameSet>();
 		TCNameSet skip = new TCNameSet();
+		Environment globals = new FlatEnvironment(defs, null);
 
     	for (TCDefinition def: defs)
     	{
     		Environment empty = new FlatEnvironment(null, true);
-			TCNameSet freevars = def.getFreeVariables(empty, new AtomicBoolean(false));
+			TCNameSet freevars = def.getFreeVariables(globals, empty, new AtomicBoolean(false));
 			
 			if (!freevars.isEmpty())
 			{
@@ -91,7 +92,7 @@ abstract public class TypeChecker
 			// Skipped definition names occur in the cycle path, but are not checked
 			// for cycles themselves, because they are not "initializable".
 			
-			if (def.isTypeDefinition() || def.isFunction() || def.isOperation())
+			if (def.isTypeDefinition() || def.isOperation())
 			{
 				if (def.name != null)
 				{

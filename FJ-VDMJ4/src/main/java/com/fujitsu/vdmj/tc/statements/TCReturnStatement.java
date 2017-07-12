@@ -103,13 +103,13 @@ public class TCReturnStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		TCNameSet names = new TCNameSet();
 		
 		if (expression != null)
 		{
-			names.addAll(expression.getFreeVariables(env));
+			names.addAll(expression.getFreeVariables(globals, env));
 		}
 		
 		returns.set(true);		// So everything that follows is conditional

@@ -280,7 +280,7 @@ public class TCValueDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		TCNameSet names = new TCNameSet();
 		
@@ -289,7 +289,7 @@ public class TCValueDefinition extends TCDefinition
 			names.addAll(type.getFreeVariables(env));
 		}
 		
-		names.addAll(exp.getFreeVariables(env));
+		names.addAll(exp.getFreeVariables(globals, env));
 		return names;
 	}
 }

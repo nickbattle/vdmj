@@ -100,7 +100,7 @@ public class TCLetDefExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		Environment local = env;
 		TCNameSet names = new TCNameSet();
@@ -114,11 +114,11 @@ public class TCLetDefExpression extends TCExpression
 			else
 			{
 				local = new FlatEnvironment(d, local);
-				names.addAll(d.getFreeVariables(local, new AtomicBoolean()));
+				names.addAll(d.getFreeVariables(globals, local, new AtomicBoolean()));
 			}
 		}
 
-		names.addAll(expression.getFreeVariables(local));
+		names.addAll(expression.getFreeVariables(globals, local));
 		return names;
 	}
 }

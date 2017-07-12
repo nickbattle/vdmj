@@ -99,17 +99,17 @@ public class TCLetBeStStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		Environment local = new FlatEnvironment(def, env);
-		TCNameSet names = bind.getFreeVariables(local);
+		TCNameSet names = bind.getFreeVariables(globals, local);
 		
 		if (suchThat != null)
 		{
-			names.addAll(suchThat.getFreeVariables(local));
+			names.addAll(suchThat.getFreeVariables(globals, local));
 		}
 		
-		names.addAll(statement.getFreeVariables(local, returns));
+		names.addAll(statement.getFreeVariables(globals, local, returns));
 		return names;
 	}
 }

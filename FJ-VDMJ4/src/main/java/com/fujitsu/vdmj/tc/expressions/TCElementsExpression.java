@@ -73,8 +73,8 @@ public class TCElementsExpression extends TCSeqExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		return exp.getFreeVariables(env);
+		return exp.getFreeVariables(globals, env);
 	}
 }

@@ -104,14 +104,14 @@ public class TCForIndexStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		TCNameSet names = from.getFreeVariables(env);
-		names.addAll(to.getFreeVariables(env));
+		TCNameSet names = from.getFreeVariables(globals, env);
+		names.addAll(to.getFreeVariables(globals, env));
 		
 		if (by != null)
 		{
-			names.addAll(by.getFreeVariables(env));
+			names.addAll(by.getFreeVariables(globals, env));
 		}
 		
 		return names;

@@ -80,10 +80,10 @@ public class TCSetRangeExpression extends TCSetExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		TCNameSet names = first.getFreeVariables(env);
-		names.addAll(last.getFreeVariables(env));
+		TCNameSet names = first.getFreeVariables(globals, env);
+		names.addAll(last.getFreeVariables(globals, env));
 		return names;
 	}
 }

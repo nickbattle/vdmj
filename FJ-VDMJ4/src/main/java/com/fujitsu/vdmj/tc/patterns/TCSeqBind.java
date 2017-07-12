@@ -55,8 +55,8 @@ public class TCSeqBind extends TCBind
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		return sequence.getFreeVariables(env);
+		return sequence.getFreeVariables(globals, env);
 	}
 }

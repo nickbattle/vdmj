@@ -89,7 +89,7 @@ public class TCBlockStatement extends TCSimpleBlockStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		Environment local = env;
 
@@ -98,6 +98,6 @@ public class TCBlockStatement extends TCSimpleBlockStatement
 			local = new FlatEnvironment(d, local);	// cumulative
 		}
 
-		return super.getFreeVariables(local, returns);
+		return super.getFreeVariables(globals, local, returns);
 	}
 }

@@ -69,11 +69,11 @@ public class TCAlwaysStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		TCNameSet names = new TCNameSet();
-		names.addAll(always.getFreeVariables(env, returns));
-		names.addAll(body.getFreeVariables(env, returns));
+		names.addAll(always.getFreeVariables(globals, env, returns));
+		names.addAll(body.getFreeVariables(globals, env, returns));
 		return names;
 	}
 }

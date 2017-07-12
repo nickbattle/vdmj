@@ -79,10 +79,10 @@ public class TCDurationStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		TCNameSet names = duration.getFreeVariables(env);
-		names.addAll(statement.getFreeVariables(env, returns));
+		TCNameSet names = duration.getFreeVariables(globals, env);
+		names.addAll(statement.getFreeVariables(globals, env, returns));
 		return names;
 	}
 }

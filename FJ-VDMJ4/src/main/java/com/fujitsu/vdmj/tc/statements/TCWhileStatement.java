@@ -106,8 +106,8 @@ public class TCWhileStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		return exp.getFreeVariables(env);
+		return exp.getFreeVariables(globals, env);
 	}
 }

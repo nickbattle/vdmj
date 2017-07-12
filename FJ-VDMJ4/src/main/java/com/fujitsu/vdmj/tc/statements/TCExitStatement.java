@@ -87,7 +87,7 @@ public class TCExitStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		returns.set(true);
 
@@ -96,6 +96,6 @@ public class TCExitStatement extends TCStatement
 			return new TCNameSet();
 		}
 		
-		return expression.getFreeVariables(env);
+		return expression.getFreeVariables(globals, env);
 	}
 }

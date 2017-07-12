@@ -101,13 +101,13 @@ public class TCMuExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		TCNameSet names = record.getFreeVariables(env);
+		TCNameSet names = record.getFreeVariables(globals, env);
 		
 		for (TCRecordModifier rm: modifiers)
 		{
-			names.addAll(rm.value.getFreeVariables(env));
+			names.addAll(rm.value.getFreeVariables(globals, env));
 		}
 		
 		return names;

@@ -77,8 +77,8 @@ public class TCSeqEnumExpression extends TCSeqExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		return members.getFreeVariables(env);
+		return members.getFreeVariables(globals, env);
 	}
 }

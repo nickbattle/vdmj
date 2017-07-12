@@ -78,17 +78,17 @@ public class TCLetBeStExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		Environment local = new FlatEnvironment(def, env);
-		TCNameSet names = bind.getFreeVariables(local);
+		TCNameSet names = bind.getFreeVariables(globals, local);
 		
 		if (suchThat != null)
 		{
-			names.addAll(suchThat.getFreeVariables(local));
+			names.addAll(suchThat.getFreeVariables(globals, local));
 		}
 		
-		names.addAll(value.getFreeVariables(local));
+		names.addAll(value.getFreeVariables(globals, local));
 		return names;
 	}
 }
