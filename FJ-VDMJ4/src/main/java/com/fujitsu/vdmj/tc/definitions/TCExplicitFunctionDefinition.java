@@ -626,7 +626,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		TCDefinitionList defs = new TCDefinitionList();
 		
@@ -639,16 +639,16 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		}
 
 		Environment local = new FlatEnvironment(defs, env);
-		TCNameSet names = body.getFreeVariables(local);
+		TCNameSet names = body.getFreeVariables(globals, local);
 		
 		if (predef != null)
 		{
-			names.addAll(predef.getFreeVariables(local, returns));
+			names.addAll(predef.getFreeVariables(globals, local, returns));
 		}
 		
 		if (postdef != null)
 		{
-			names.addAll(postdef.getFreeVariables(local, returns));
+			names.addAll(postdef.getFreeVariables(globals, local, returns));
 		}
 		
 		return names;

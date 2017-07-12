@@ -193,8 +193,8 @@ public class TCFieldExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		return object.getFreeVariables(env);
+		return object.getFreeVariables(globals, env);
 	}
 }

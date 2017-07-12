@@ -101,8 +101,8 @@ public class TCStartStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		return objects.getFreeVariables(env);
+		return objects.getFreeVariables(globals, env);
 	}
 }

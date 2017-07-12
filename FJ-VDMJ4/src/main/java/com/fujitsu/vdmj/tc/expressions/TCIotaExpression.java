@@ -114,11 +114,11 @@ public class TCIotaExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		Environment local = new FlatEnvironment(def, env);
-		TCNameSet names = predicate.getFreeVariables(local);
-		names.addAll(bind.getFreeVariables(local));
+		TCNameSet names = predicate.getFreeVariables(globals, local);
+		names.addAll(bind.getFreeVariables(globals, local));
 		return names;
 	}
 }

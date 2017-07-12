@@ -297,19 +297,19 @@ public class TCStateDefinition extends TCDefinition
 	}
 	
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		Environment local = new FlatEnvironment(this, env);
 		TCNameSet names = new TCNameSet();
 		
 		if (invdef != null)
 		{
-			names.addAll(invdef.getFreeVariables(local, returns));
+			names.addAll(invdef.getFreeVariables(globals, local, returns));
 		}
 		
 		if (initdef != null)
 		{
-			names.addAll(initdef.getFreeVariables(local, returns));
+			names.addAll(initdef.getFreeVariables(globals, local, returns));
 		}
 		
 		return names;

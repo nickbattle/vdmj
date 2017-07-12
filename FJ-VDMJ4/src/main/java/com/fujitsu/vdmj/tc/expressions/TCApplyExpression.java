@@ -406,10 +406,22 @@ public class TCApplyExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		TCNameSet names = root.getFreeVariables(env);
-		names.addAll(args.getFreeVariables(env));
+		TCNameSet names = new TCNameSet();
+		
+		if (root instanceof TCVariableExpression && type != null && type.isFunction(location))
+		{
+			// If this is a global call, then we depend on the function
+			TCVariableExpression v = (TCVariableExpression)root;
+			
+			if (globals.findName(v.name, NameScope.NAMESANDSTATE) != null)
+			{
+				names.add(v.name);
+			}
+		}
+		
+		names.addAll(args.getFreeVariables(globals, env));
 		return names;
 	}
 }

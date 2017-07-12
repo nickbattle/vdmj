@@ -60,10 +60,10 @@ public class TCMapletExpression implements Serializable
 		return left + " |-> " + right;
 	}
 
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		TCNameSet names = left.getFreeVariables(env);
-		names.addAll(right.getFreeVariables(env));
+		TCNameSet names = left.getFreeVariables(globals, env);
+		names.addAll(right.getFreeVariables(globals, env));
 		return names;
 	}
 }

@@ -134,13 +134,13 @@ public class TCLocalDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		TCNameSet names = type.getFreeVariables(env);
 		
 		if (valueDefinition != null)
 		{
-			names.addAll(valueDefinition.getFreeVariables(env, returns));
+			names.addAll(valueDefinition.getFreeVariables(globals, env, returns));
 		}
 		
 		return names;

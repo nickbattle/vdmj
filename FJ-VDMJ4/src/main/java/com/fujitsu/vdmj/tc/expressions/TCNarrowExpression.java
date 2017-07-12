@@ -94,9 +94,9 @@ public class TCNarrowExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		TCNameSet names = test.getFreeVariables(env);
+		TCNameSet names = test.getFreeVariables(globals, env);
 		
 		if (typename != null)
 		{

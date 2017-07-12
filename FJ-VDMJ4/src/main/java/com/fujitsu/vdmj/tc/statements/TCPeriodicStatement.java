@@ -141,8 +141,8 @@ public class TCPeriodicStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		return args.getFreeVariables(env);
+		return args.getFreeVariables(globals, env);
 	}
 }

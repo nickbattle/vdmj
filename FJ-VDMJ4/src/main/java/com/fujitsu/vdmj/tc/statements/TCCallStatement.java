@@ -200,10 +200,10 @@ public class TCCallStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		TCNameSet names = new TCNameSet(name.getExplicit(true));
-		names.addAll(args.getFreeVariables(env));
+		names.addAll(args.getFreeVariables(globals, env));
 		return names;
 	}
 }

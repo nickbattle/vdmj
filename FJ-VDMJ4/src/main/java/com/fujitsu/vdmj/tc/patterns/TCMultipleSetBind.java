@@ -86,8 +86,8 @@ public class TCMultipleSetBind extends TCMultipleBind
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		return set.getFreeVariables(env);
+		return set.getFreeVariables(globals, env);
 	}
 }

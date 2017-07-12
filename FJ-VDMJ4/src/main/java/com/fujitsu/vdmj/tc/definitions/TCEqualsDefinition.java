@@ -217,9 +217,9 @@ public class TCEqualsDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		Environment local = new FlatEnvironment(defs, env);
-		return test.getFreeVariables(local);
+		return test.getFreeVariables(globals, local);
 	}
 }

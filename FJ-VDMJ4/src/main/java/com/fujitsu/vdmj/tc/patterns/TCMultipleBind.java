@@ -66,8 +66,9 @@ public abstract class TCMultipleBind implements Serializable
 	/** Perform a type check of the bind. */
 	abstract public TCType typeCheck(Environment base, NameScope scope);
 
-	/** Return the free variables used by this multiple bind */
-	abstract public TCNameSet getFreeVariables(Environment env);
+	/** Return the free variables used by this multiple bind 
+	 * @param globals TODO*/
+	abstract public TCNameSet getFreeVariables(Environment globals, Environment env);
 
 	/**
 	 * Get a list of definitions for the variables in the pattern list.

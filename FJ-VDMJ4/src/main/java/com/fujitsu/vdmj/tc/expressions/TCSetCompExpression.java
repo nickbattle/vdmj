@@ -94,19 +94,19 @@ public class TCSetCompExpression extends TCSetExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		Environment local = new FlatEnvironment(def, env);
 		TCNameSet names = new TCNameSet();	// Note "first" is conditional
 		
 		if (predicate != null)
 		{
-			predicate.getFreeVariables(local);
+			predicate.getFreeVariables(globals, local);
 		}
 		
 		for (TCMultipleBind mb: bindings)
 		{
-			names.addAll(mb.getFreeVariables(local));
+			names.addAll(mb.getFreeVariables(globals, local));
 		}
 		
 		return names;

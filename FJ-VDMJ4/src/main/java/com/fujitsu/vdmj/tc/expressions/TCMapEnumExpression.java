@@ -104,13 +104,13 @@ public class TCMapEnumExpression extends TCMapExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		TCNameSet names = new TCNameSet();
 		
 		for (TCMapletExpression maplet: members)
 		{
-			names.addAll(maplet.getFreeVariables(env));
+			names.addAll(maplet.getFreeVariables(globals, env));
 		}
 		
 		return names;

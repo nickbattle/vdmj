@@ -78,10 +78,10 @@ public class TCCyclesStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		TCNameSet names = cycles.getFreeVariables(env);
-		names.addAll(statement.getFreeVariables(env, returns));
+		TCNameSet names = cycles.getFreeVariables(globals, env);
+		names.addAll(statement.getFreeVariables(globals, env, returns));
 		return names;
 	}
 }

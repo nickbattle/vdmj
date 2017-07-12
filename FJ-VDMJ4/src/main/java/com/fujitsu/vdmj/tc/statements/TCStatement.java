@@ -114,11 +114,11 @@ public abstract class TCStatement extends TCNode implements Serializable
 	 * those names that are already defined in the scope - ie. which are not free variables.
 	 * The returns boolean (which is mutable) is updated by return and exit statements,
 	 * which indicate that statements that follow are conditional.
-	 * 
+	 * @param globals TODO
 	 * @param env
 	 * @param returns
 	 */
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		return new TCNameSet();
 	}

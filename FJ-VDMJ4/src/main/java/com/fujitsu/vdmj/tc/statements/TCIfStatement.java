@@ -137,8 +137,8 @@ public class TCIfStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		return ifExp.getFreeVariables(env);
+		return ifExp.getFreeVariables(globals, env);
 	}
 }

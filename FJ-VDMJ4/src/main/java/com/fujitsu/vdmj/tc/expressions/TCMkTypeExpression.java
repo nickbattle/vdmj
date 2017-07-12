@@ -132,10 +132,10 @@ public class TCMkTypeExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		TCNameSet names = new TCNameSet(typename);
-		names.addAll(args.getFreeVariables(env));
+		names.addAll(args.getFreeVariables(globals, env));
 		return names;
 	}
 }

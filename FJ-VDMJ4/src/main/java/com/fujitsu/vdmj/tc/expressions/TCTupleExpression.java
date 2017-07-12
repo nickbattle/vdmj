@@ -84,8 +84,8 @@ public class TCTupleExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		return args.getFreeVariables(env);
+		return args.getFreeVariables(globals, env);
 	}
 }

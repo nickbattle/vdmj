@@ -170,8 +170,8 @@ public class TCFuncInstantiationExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		return function.getFreeVariables(env);
+		return function.getFreeVariables(globals, env);
 	}
 }

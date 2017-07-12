@@ -55,8 +55,9 @@ public abstract class TCBind extends TCNode implements Serializable
 	/** Return this one bind as a list of {@link TCMultipleBind}. */
 	abstract public TCMultipleBindList getMultipleBindList();
 
-	/** Return a set of names of free variables from this bind */
-	abstract public TCNameSet getFreeVariables(Environment env);
+	/** Return a set of names of free variables from this bind 
+	 * @param globals TODO*/
+	abstract public TCNameSet getFreeVariables(Environment globals, Environment env);
 
 	/**
 	 * @see com.fujitsu.vdmj.ast.definitions.ASTDefinition#report

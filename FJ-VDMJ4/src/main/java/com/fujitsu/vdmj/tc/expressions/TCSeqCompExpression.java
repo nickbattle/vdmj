@@ -97,17 +97,17 @@ public class TCSeqCompExpression extends TCSeqExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		Environment local = new FlatEnvironment(def, env);
 		TCNameSet names = new TCNameSet();	// Note "first" is conditional
 		
 		if (predicate != null)
 		{
-			predicate.getFreeVariables(local);
+			predicate.getFreeVariables(globals, local);
 		}
 		
-		names.addAll(bind.getFreeVariables(local));
+		names.addAll(bind.getFreeVariables(globals, local));
 		return names;
 	}
 }

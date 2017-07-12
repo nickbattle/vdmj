@@ -55,8 +55,8 @@ public class TCSetBind extends TCBind
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		return set.getFreeVariables(env);
+		return set.getFreeVariables(globals, env);
 	}
 }

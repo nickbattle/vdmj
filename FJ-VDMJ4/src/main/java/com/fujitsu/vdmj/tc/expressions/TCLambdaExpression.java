@@ -96,13 +96,13 @@ public class TCLambdaExpression extends TCExpression
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env)
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		TCNameSet names = new TCNameSet();	// Body expression is conditional
 		
 		for (TCTypeBind mb: bindList)
 		{
-			names.addAll(mb.getFreeVariables(env));
+			names.addAll(mb.getFreeVariables(globals, env));
 		}
 		
 		return names;

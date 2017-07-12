@@ -92,8 +92,8 @@ public class TCForAllStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		return set.getFreeVariables(env);
+		return set.getFreeVariables(globals, env);
 	}
 }

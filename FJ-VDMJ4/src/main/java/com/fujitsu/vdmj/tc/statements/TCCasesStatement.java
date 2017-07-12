@@ -112,8 +112,8 @@ public class TCCasesStatement extends TCStatement
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment env, AtomicBoolean returns)
+	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		return exp.getFreeVariables(env);	// Cases are conditional
+		return exp.getFreeVariables(globals, env);	// Cases are conditional
 	}
 }
