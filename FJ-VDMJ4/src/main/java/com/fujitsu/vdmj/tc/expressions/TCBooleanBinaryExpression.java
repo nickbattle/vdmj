@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -43,5 +44,11 @@ abstract public class TCBooleanBinaryExpression extends TCBinaryExpression
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
 		return checkConstraint(constraint, binaryCheck(env, scope, new TCBooleanType(location)));
+	}
+	
+	@Override
+	public TCNameSet getFreeVariables(Environment globals, Environment env)
+	{
+		return left.getFreeVariables(globals, env);		// May not do the RHS
 	}
 }

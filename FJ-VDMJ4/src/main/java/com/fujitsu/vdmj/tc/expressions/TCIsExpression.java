@@ -120,13 +120,6 @@ public class TCIsExpression extends TCExpression
 	@Override
 	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		TCNameSet names = test.getFreeVariables(globals, env);
-		
-		if (typename != null)
-		{
-			names.add(typename);
-		}
-		
-		return names;
+		return test.getFreeVariables(globals, env);
 	}
 }
