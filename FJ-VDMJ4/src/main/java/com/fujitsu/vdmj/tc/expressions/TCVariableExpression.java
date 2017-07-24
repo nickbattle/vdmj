@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCRenamedDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -191,6 +192,16 @@ public class TCVariableExpression extends TCExpression
 		if (d != null && d.isFunction())
 		{
 			return new TCNameSet();
+		}
+		
+		if (d instanceof TCRenamedDefinition)
+		{
+			TCRenamedDefinition rd = (TCRenamedDefinition)d;
+			
+			if (rd.def.name != null)
+			{
+				return new TCNameSet(rd.def.name.getExplicit(true));
+			}
 		}
 		
 		if (env.findName(name, NameScope.NAMESANDSTATE) == null)
