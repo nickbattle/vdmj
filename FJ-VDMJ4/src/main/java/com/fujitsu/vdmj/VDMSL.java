@@ -137,6 +137,7 @@ public class VDMSL extends VDMJ
    		try
    		{
    			checkedModules = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedModules);
+   			parsedModules = new ASTModuleList();	// AST not needed after this
    			before = mapperStats(before, TCNode.MAPPINGS);
    			terrs += checkedModules.combineDefaults();
 
@@ -234,7 +235,7 @@ public class VDMSL extends VDMJ
 
    			long after = System.currentTimeMillis();
 
-   	   		infoln("Initialized " + plural(parsedModules.size(), "module", "s") + " in " +
+   	   		infoln("Initialized " + plural(executableModules.size(), "module", "s") + " in " +
    	   			(double)(after-before)/1000 + " secs. ");
 		}
 		catch (ContextException e)

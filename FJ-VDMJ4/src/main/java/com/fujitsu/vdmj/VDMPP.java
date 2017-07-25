@@ -139,6 +139,7 @@ public class VDMPP extends VDMJ
    		try
    		{
    			checkedClasses = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedClasses);
+   			parsedClasses = new ASTClassList();		// AST not needed now
    			before = mapperStats(before, TCNode.MAPPINGS);
    			TypeChecker typeChecker = new ClassTypeChecker(checkedClasses);
    			typeChecker.typeCheck();
@@ -174,7 +175,7 @@ public class VDMPP extends VDMJ
 			TypeChecker.printWarnings(Console.out);
 		}
 
-		info("Type checked " + plural(parsedClasses.size(), "class", "es") + " in " +
+		info("Type checked " + plural(checkedClasses.size(), "class", "es") + " in " +
 			(double)(after-before)/1000 + " secs. ");
   		info(terrs == 0 ? "No type errors" :
   			"Found " + plural(terrs, "type error", "s"));
@@ -254,7 +255,7 @@ public class VDMPP extends VDMJ
 
    			long after = System.currentTimeMillis();
 
-   	   		infoln("Initialized " + plural(parsedClasses.size(), "class", "es") + " in " +
+   	   		infoln("Initialized " + plural(executableClasses.size(), "class", "es") + " in " +
    	   			(double)(after-before)/1000 + " secs. ");
 		}
 		catch (ContextException e)
