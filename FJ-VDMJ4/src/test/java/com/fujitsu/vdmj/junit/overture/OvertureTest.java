@@ -106,6 +106,7 @@ abstract public class OvertureTest extends TestCase
 		try
 		{
 			TCClassList checked = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsed);
+			parsed = null;	// Not needed now
 			TypeChecker typeChecker = new ClassTypeChecker(checked);
 			typeChecker.typeCheck();
 			TypeChecker.printErrors(Console.out);
@@ -149,6 +150,7 @@ abstract public class OvertureTest extends TestCase
 		try
 		{
 			TCClassList checked = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsed);
+			parsed = null;	// Not needed now
 			TypeChecker typeChecker = new ClassTypeChecker(checked);
 			typeChecker.typeCheck();
 			TypeChecker.printErrors(Console.out);
@@ -227,6 +229,7 @@ abstract public class OvertureTest extends TestCase
 		try
 		{
     		TCClassList checked = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsed);
+    		parsed = null;	// Not needed now
     		TypeChecker typeChecker = new ClassTypeChecker(checked);
     		typeChecker.typeCheck();
     		TypeChecker.printErrors(Console.out);
@@ -315,6 +318,7 @@ abstract public class OvertureTest extends TestCase
 		try
 		{
 			TCClassList checked = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsed);
+			parsed = null;	// Not needed now
 			TypeChecker typeChecker = new ClassTypeChecker(checked);
 			typeChecker.typeCheck();
 			TypeChecker.printErrors(Console.out);
