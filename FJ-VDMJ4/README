@@ -14,8 +14,9 @@ from the pom.xml file.
 
 Maven installs VDMJ in the com.fujitsu group.
 
-
 VDMJ includes the Apfloat library for arbitrary precision arithmetic.
 
-For information on licensing, see the LICENCE, LGPL and APFLOAT_README files in the
+For information on licensing, see the LGPL and APFLOAT_README files in the
 documentation folder.
+
+For information on a particular VDMJ release, see https://github.com/nickbattle/vdmj/releases.
