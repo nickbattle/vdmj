@@ -97,7 +97,9 @@ public class ClassMapper
 	/**
 	 * Fields used during the processing of the configuration file
 	 */
+	
 	private final String configFile;
+	private Field SELF;
 	private String srcPackage = "";
 	private String destPackage = "";
 	private int lineNo = 0;
@@ -113,6 +115,7 @@ public class ClassMapper
 
 		try
 		{
+			SELF = ClassMapper.class.getDeclaredField("SELF");
 			readMappings();
 			verifyConstructors();
 		}
@@ -275,7 +278,7 @@ public class ClassMapper
 			{
 				if (field.equals("this"))
 				{
-					selectedFields.add(null);
+					selectedFields.add(SELF);
 				}
 				else if (srcFields.containsKey(field))
 				{
@@ -348,7 +351,7 @@ public class ClassMapper
 					Class<?> fieldType = null;
 					MapParams mapping = null;
 					
-					if (field == null)	// ie. "this"
+					if (field == SELF)	// ie. "this"
 					{
 						fieldType = mp.srcClass;
 						mapping = null;
@@ -521,7 +524,7 @@ public class ClassMapper
     
     			for (Field field: mp.srcFields)
     			{
-    				if (field == null)	// ie. "this"
+    				if (field == SELF)	// ie. "this"
     				{
     					args[a++] = source;
     				}
@@ -545,7 +548,7 @@ public class ClassMapper
  
     			for (Field field: mp.srcFields)
     			{
-    				if (field != null)
+    				if (field != SELF)
     				{
     					Progress progress = isInProgress(field.get(source));
     
