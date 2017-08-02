@@ -78,6 +78,7 @@ public class INApplyExpression extends INExpression
 	{
 		breakpoint.check(location, ctxt);
 		location.hits--;	// This is counted below when root is evaluated
+		boolean endstop = breakpoint.catchReturn(ctxt);
 
     	try
     	{
@@ -93,7 +94,14 @@ public class INApplyExpression extends INExpression
         		}
 
            		FunctionValue fv = object.functionValue(ctxt);
-           		return fv.eval(location, argvals, ctxt);
+           		Value rv = fv.eval(location, argvals, ctxt);
+           		
+           		if (endstop)	// Catch after the return if we didn't skip
+           		{
+           			breakpoint.enterDebugger(ctxt);
+           		}
+           		
+           		return rv;
     		}
 			else if (object instanceof OperationValue)
     		{

@@ -82,6 +82,8 @@ public class INCallObjectStatement extends INStatement
 		// hit count here...
 
 		location.hits--;
+		
+		boolean endstop = breakpoint.catchReturn(ctxt);
 
 		try
 		{
@@ -146,12 +148,26 @@ public class INCallObjectStatement extends INStatement
 			if (v instanceof OperationValue)
 			{
     			OperationValue op = v.operationValue(ctxt);
-    			return op.eval(location, argValues, ctxt);
+    			Value rv = op.eval(location, argValues, ctxt);
+
+    			if (endstop)	// Catch after the return if we didn't skip
+           		{
+           			breakpoint.enterDebugger(ctxt);
+           		}
+           		
+    			return rv;
 			}
 			else
 			{
-    			FunctionValue op = v.functionValue(ctxt);
-    			return op.eval(location, argValues, ctxt);
+    			FunctionValue fn = v.functionValue(ctxt);
+    			Value rv = fn.eval(location, argValues, ctxt);
+
+    			if (endstop)	// Catch after the return if we didn't skip
+           		{
+           			breakpoint.enterDebugger(ctxt);
+           		}
+           		
+    			return rv;
 			}
 		}
 		catch (ValueException e)

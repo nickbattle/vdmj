@@ -57,6 +57,7 @@ public class INCallStatement extends INStatement
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
+		boolean endstop = breakpoint.catchReturn(ctxt);
 
 		try
 		{
@@ -72,7 +73,14 @@ public class INCallStatement extends INStatement
     				argValues.add(arg.eval(ctxt));
     			}
 
-    			return op.eval(location, argValues, ctxt);
+    			Value rv = op.eval(location, argValues, ctxt);
+
+    			if (endstop)	// Catch after the return if we didn't skip
+           		{
+           			breakpoint.enterDebugger(ctxt);
+           		}
+           		
+    			return rv;
 			}
 			else
 			{
@@ -84,7 +92,14 @@ public class INCallStatement extends INStatement
     				argValues.add(arg.eval(ctxt));
     			}
 
-    			return fn.eval(location, argValues, ctxt);
+    			Value rv = fn.eval(location, argValues, ctxt);
+
+    			if (endstop)	// Catch after the return if we didn't skip
+           		{
+           			breakpoint.enterDebugger(ctxt);
+           		}
+           		
+    			return rv;
 			}
 		}
 		catch (ValueException e)

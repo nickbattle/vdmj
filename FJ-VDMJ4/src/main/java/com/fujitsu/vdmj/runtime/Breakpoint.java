@@ -35,10 +35,12 @@ import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -159,8 +161,7 @@ public class Breakpoint implements Serializable
 	 * outctxt fields. If the current line is different to the last step line,
 	 * and the current context is not "above" the next context or the current
 	 * context equals the out context or neither the next or out context are
-	 * set, a {@link Stoppoint} is created and its check method is called -
-	 * which starts a DebuggerReader session.
+	 * set, we enter the debugger.
 	 *
 	 * @param execl The execution location.
 	 * @param ctxt The execution context.
@@ -187,23 +188,49 @@ public class Breakpoint implements Serializable
 				{
         			try
         			{
-        				new Stoppoint(location, 0, null).check(location, ctxt);
+        				enterDebugger(ctxt);
         			}
         			catch (DebuggerException e)
         			{
         				throw e;
         			}
-        			catch (Exception e)
-        			{
-        				// This happens when the Stoppoint throws an error, which
-        				// can't happen. But we need a catch clause for it anyway.
-
-        				throw new DebuggerException(
-        					"Breakpoint [" + number + "]: " + e.getMessage());
-        			}
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Actually stop and enter the debugger. The method returns when the user asks to
+	 * continue or step the specification.
+	 * 
+	 * @param ctxt
+	 */
+	public void enterDebugger(Context ctxt)
+	{
+		Thread current = Thread.currentThread();
+
+		if (current instanceof SchedulableThread)
+		{
+			SchedulableThread th = (SchedulableThread)current;
+			th.suspendOthers();
+		}
+
+		DebugLink.getInstance().breakpoint(ctxt, this);
+	}
+	
+	/**
+	 * Test for whether an apply expression or operation call ought to catch a breakpoint
+	 * after the return from the call. This only happens if we step into the call, so that
+	 * when we step out it is clear where we're unwinding too, rather than jumping down
+	 * the stack some considerable distance.
+	 * 
+	 * @param ctxt
+	 * @return
+	 */
+	public boolean catchReturn(Context ctxt)
+	{
+		ThreadState state = ctxt.threadState;
+		return state.stepline != null && state.nextctxt == null && state.outctxt == null;
 	}
 
 	/**

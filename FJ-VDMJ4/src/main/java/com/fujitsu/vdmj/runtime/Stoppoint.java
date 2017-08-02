@@ -23,9 +23,7 @@
 
 package com.fujitsu.vdmj.runtime;
 
-import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 /**
  * A breakpoint where execution must stop.
@@ -65,15 +63,7 @@ public class Stoppoint extends Breakpoint
 
 			if (stop)
 			{
-				Thread current = Thread.currentThread();
-
-				if (current instanceof SchedulableThread)
-				{
-					SchedulableThread th = (SchedulableThread)current;
-					th.suspendOthers();
-				}
-
-				DebugLink.getInstance().breakpoint(ctxt, this);
+				enterDebugger(ctxt);
 			}
 		}
 		catch (DebuggerException e)
