@@ -20,10 +20,10 @@ VDMJ is a command line tool, but it is used by the ![Overture](https://github.co
 * Supports arbitrary precision arithmetic
 
 ### Documentation
-* ![User Guide](/FJ-VDMJ/documentation/UserGuide.pdf "User Guide")
-* ![One Page Guide](/FJ-VDMJ/documentation/OnePageGuide.pdf "One Page Guide")
-* ![High Precision Guide](/FJ-VDMJ/documentation/HighPrecisionGuide.pdf "High Precision Guide")
-* ![VDMJUnit Guide](/FJ-VDMJ/documentation/VDMJUnit.pdf "VDMJUnit Guide")
+* ![User Guide](/FJ-VDMJ4/documentation/UserGuide.pdf "User Guide")
+* ![One Page Guide](/FJ-VDMJ4/documentation/OnePageGuide.pdf "One Page Guide")
+* ![High Precision Guide](/FJ-VDMJ4/documentation/HighPrecisionGuide.pdf "High Precision Guide")
+* ![VDMJUnit Guide](/FJ-VDMJ4/documentation/VDMJUnit.pdf "VDMJUnit Guide")
 
 ### Screen Shots
 ![Eclipse Integration](/screenshots/eclipse.jpg?raw=true "Eclipse Integration")
