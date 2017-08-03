@@ -44,6 +44,7 @@ import java.util.regex.Pattern;
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.VDMJ;
+import com.fujitsu.vdmj.in.expressions.INBinaryExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -1626,6 +1627,16 @@ abstract public class CommandReader
 		{
 			FunctionValue fv = (FunctionValue)v;
 			INExpression exp = fv.body;
+			
+			while (exp instanceof INBinaryExpression)
+			{
+				// None of the binary expressions check their BP, to avoid excessive stepping
+				// when going through (say) a chain of "and" clauses. So if we've picked a
+				// binary expression here, we move the BP to the left hand.
+				INBinaryExpression bexp = (INBinaryExpression)exp;
+				exp = bexp.left;
+			}
+			
 			interpreter.clearBreakpoint(exp.breakpoint.number);
 			Breakpoint bp = interpreter.setBreakpoint(exp, condition);
 			println("Created " + bp);
