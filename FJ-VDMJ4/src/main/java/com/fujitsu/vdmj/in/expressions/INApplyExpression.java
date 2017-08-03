@@ -113,7 +113,14 @@ public class INApplyExpression extends INExpression
         		}
 
          		OperationValue ov = object.operationValue(ctxt);
-           		return ov.eval(location, argvals, ctxt);
+           		Value rv = ov.eval(location, argvals, ctxt);
+           		
+           		if (endstop)	// Catch after the return if we didn't skip
+           		{
+           			breakpoint.enterDebugger(ctxt);
+           		}
+           		
+           		return rv;
     		}
 			else if (object instanceof SeqValue)
     		{
