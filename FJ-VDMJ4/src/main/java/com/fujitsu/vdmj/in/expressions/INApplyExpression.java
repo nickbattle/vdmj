@@ -96,7 +96,7 @@ public class INApplyExpression extends INExpression
            		FunctionValue fv = object.functionValue(ctxt);
            		Value rv = fv.eval(location, argvals, ctxt);
            		
-           		if (endstop)	// Catch after the return if we didn't skip
+           		if (endstop && !breakpoint.isContinue(ctxt))
            		{
            			breakpoint.enterDebugger(ctxt);
            		}
@@ -115,7 +115,7 @@ public class INApplyExpression extends INExpression
          		OperationValue ov = object.operationValue(ctxt);
            		Value rv = ov.eval(location, argvals, ctxt);
            		
-           		if (endstop)	// Catch after the return if we didn't skip
+           		if (endstop && !breakpoint.isContinue(ctxt))
            		{
            			breakpoint.enterDebugger(ctxt);
            		}

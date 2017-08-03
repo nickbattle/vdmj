@@ -150,7 +150,7 @@ public class INCallObjectStatement extends INStatement
     			OperationValue op = v.operationValue(ctxt);
     			Value rv = op.eval(location, argValues, ctxt);
 
-    			if (endstop)	// Catch after the return if we didn't skip
+    			if (endstop && !breakpoint.isContinue(ctxt))
            		{
            			breakpoint.enterDebugger(ctxt);
            		}
@@ -162,7 +162,7 @@ public class INCallObjectStatement extends INStatement
     			FunctionValue fn = v.functionValue(ctxt);
     			Value rv = fn.eval(location, argValues, ctxt);
 
-    			if (endstop)	// Catch after the return if we didn't skip
+    			if (endstop && !breakpoint.isContinue(ctxt))
            		{
            			breakpoint.enterDebugger(ctxt);
            		}
