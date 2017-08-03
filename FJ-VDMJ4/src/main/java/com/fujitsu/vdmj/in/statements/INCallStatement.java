@@ -75,7 +75,7 @@ public class INCallStatement extends INStatement
 
     			Value rv = op.eval(location, argValues, ctxt);
 
-    			if (endstop)	// Catch after the return if we didn't skip
+    			if (endstop && !breakpoint.isContinue(ctxt))
            		{
            			breakpoint.enterDebugger(ctxt);
            		}
@@ -94,7 +94,7 @@ public class INCallStatement extends INStatement
 
     			Value rv = fn.eval(location, argValues, ctxt);
 
-    			if (endstop)	// Catch after the return if we didn't skip
+    			if (endstop && !breakpoint.isContinue(ctxt))
            		{
            			breakpoint.enterDebugger(ctxt);
            		}
