@@ -19,13 +19,15 @@ JAVA=$JAVA32
 JAVA_VMOPTS=$JAVA32_VMOPTS
 PRECISION=""
 VDMJ_OPTS="-path $JARDIR/stdlib"
+VERSION="[0-9.]*"
+BUILD="[0-9]*"
 
 # Process non-VDMJ options
 while [ $# -gt 0 ]
 do
     case "$1" in
 		--help)
-			echo "Usage: $0 [--help] [-P] [-32|-64] <VDMJ options>"
+			echo "Usage: $0 [--help] [-P] [-32|-64] [-Vn.n.n] [-Byymmdd] <VDMJ options>"
 			echo "Java 32-bit is $JAVA32 $JAVA32_VMOPTS"
 			echo "Java 64-bit is $JAVA64 $JAVA64_VMOPTS"
 			echo "VDMJ installation is $JARDIR"
@@ -43,6 +45,12 @@ do
 			JAVA=$JAVA64
 			JAVA_VMOPTS=$JAVA64_VMOPTS
 			;;
+		-V*)
+			VERSION=${1:2}
+			;;
+		-B*)
+			BUILD=${1:2}
+			;;
 		*)
 			VDMJ_OPTS="$VDMJ_OPTS $1"
     esac
@@ -50,7 +58,13 @@ do
 done
 
 # Locate the latest jar
-VDMJ_JAR=$(ls -t $JARDIR/vdmj-*.jar | sed -ne "/vdmj-[0-9.]*$PRECISION-[0-9]*.jar/p" | head -1)
+VDMJ_JAR=$(ls -t $JARDIR/vdmj-*.jar | sed -ne "/vdmj-${VERSION}${PRECISION}-${BUILD}.jar/p" | head -1)
+
+if [ -z "$VDMJ_JAR" ]
+then
+	echo "Cannot locate $JARDIR/vdmj-${VERSION}${PRECISION}-${BUILD}.jar"
+	exit 1
+fi
 
 # Allow JMX for VisualVM
 VDMJ_VMOPTS="$VDMJ_VMOPTS -Dcom.sun.management.jmxremote=true"
