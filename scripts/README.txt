@@ -6,19 +6,31 @@ Cygwin on Windows.
 1. vdmsl
 
 This script will launch the most recent VDMJ jar, allowing you to select the high-precision
-build or 32/64-bit JVMs. The script should be copied three times (ideally hard-linked, unchanged)
-and renamed as "vdmsl", "vdmpp" and "vdmrt" in order to launch the given dialect. Change the
-variables at the top of the script to match your own installation. The current values can be
-listed with --help. Note that the script depends on rlwrap(1).
+build, 32/64-bit JVMs or a particular jar version. The script should be copied three times
+(ideally hard-linked, unchanged) and renamed as "vdmsl", "vdmpp" and "vdmrt" in order to launch
+the given dialect. Change the variables at the top of the script to match your own installation.
+The current values can be listed with --help. Note that the script depends on rlwrap(1).
 
 For example:
 
 $ vdmsl --help
-Usage: vdmsl [--help] [-P] [-32|-64] <VDMJ options>
+Usage: vdmsl [--help] [-P] [-32|-64] [-Vn.n.n] [-Byymmdd] <VDMJ options>
 Java 32-bit is /cygdrive/C/Program Files (x86)/Java/jre8/bin/javaw.exe -Xmx1000m -Xss5m
 Java 64-bit is /cygdrive/c/Program Files/Java/jre7/bin/javaw.exe -Xmx3000m -Xss5m
 VDMJ installation is C:/Cygwin/home/lib
 VDMJ default arguments are -path C:/Cygwin/home/lib/stdlib
+$
+
+$ vdmsl -v
+VDMJ version = 4.1.0 build 170803
+$ vdmsl -V4.1.0 -B170731 -v
+VDMJ version = 4.1.0 build 170731
+$ vdmsl -V3.2.0 -v
+VDMJ version = 3.2.0 build 161214
+$ vdmsl -V4.0.0 -v
+VDMJ version = 4.0.0 build 170619
+$ vdmsl -B123456 -v
+Cannot locate C:/Cygwin/home/lib/vdmj-[0-9.]*-123456.jar
 $
 
 $ vdmsl -i MATH.vdm
