@@ -342,10 +342,12 @@ public class ConsoleDebugLink extends DebugLink
 	@Override
 	public void breakpoint(Context ctxt, Breakpoint bp)
 	{
-		SchedulableThread thread = (SchedulableThread)Thread.currentThread();
-		
-		breakpoints.put(thread, bp);
-		stopped(ctxt, bp.location);
+		if (debugging && !suspendBreaks)
+		{
+			SchedulableThread thread = (SchedulableThread)Thread.currentThread();
+			breakpoints.put(thread, bp);
+			stopped(ctxt, bp.location);
+		}
 	}
 	
 	/**
