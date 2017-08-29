@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.tc.modules;
 
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -41,5 +42,17 @@ public class TCImportedOperation extends TCImportedValue
 		return "import operation " + name +
 				(renamed == null ? "" : " renamed " + renamed.getName()) +
 				(type == null ? "" : ":" + type);
+	}
+
+	@Override
+	public boolean isExpectedKind(TCDefinition def)
+	{
+		return def.isOperation();
+	}
+
+	@Override
+	public String kind()
+	{
+		return "operation";
 	}
 }

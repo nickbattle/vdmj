@@ -141,6 +141,7 @@ public class TCModule extends TCNode implements Serializable
 	{
 		if (exports != null)
 		{
+			exportdefs.clear();
 			exportdefs.addAll(exports.getDefinitions(defs));
 		}
 	}

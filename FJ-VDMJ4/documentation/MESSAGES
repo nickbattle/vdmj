@@ -114,7 +114,7 @@ as the expected and actual values.
 2052, "Expecting 'all', 'types', 'values', 'functions' or 'operations'"
 2053, "Exported function is not a function type"
 2054, "Expecting types, values, functions or operations"
-2055, "Imported function is not a function type"
+2055, "Import signature is not a function/operation type"
 2056, "Cannot use module'id name in patterns"
 2057, "Unexpected token in pattern"
 2058, "Expecting identifier"
@@ -743,6 +743,7 @@ as the expected and actual values.
 3353, "Exported <name> function type parameters incorrect"
 3354, "Function argument must be instantiated"
 3355, "Cyclic dependency detected"
+3356, "Import of <kind> <name> is <actual kind>"
 
 
 4000, "Cannot instantiate abstract class <class>"

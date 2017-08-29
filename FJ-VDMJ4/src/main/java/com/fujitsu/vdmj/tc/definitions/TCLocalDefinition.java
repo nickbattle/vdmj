@@ -113,7 +113,8 @@ public class TCLocalDefinition extends TCDefinition
 		// So we exclude parameter types. We also exclude value definitions.
 
 		return (valueDefinition != null ||
-			type.isType(TCParameterType.class, location)) ? false : type.isFunction(location);
+			type.isType(TCParameterType.class, location)) ? false :
+				!type.isUnknown(location) && type.isFunction(location);
 	}
 
 	@Override
@@ -131,6 +132,12 @@ public class TCLocalDefinition extends TCDefinition
 	public boolean isValueDefinition()
 	{
 		return valueDefinition != null;
+	}
+	
+	@Override
+	public boolean isOperation()
+	{
+		return type != null && !type.isUnknown(location) && type.isOperation(location);
 	}
 
 	@Override

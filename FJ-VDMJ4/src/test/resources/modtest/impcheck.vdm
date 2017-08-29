@@ -1,0 +1,28 @@
+module A
+exports all
+definitions
+operations
+	op : () ==> ()
+	op() == skip;
+	
+functions
+	f: nat -> nat
+	f(a) == a;
+	
+types
+	T = nat;
+	
+values
+	V = 123;
+	
+end A
+
+module B
+imports
+from A
+	functions op
+	operations f
+	types V
+	values f
+
+end B

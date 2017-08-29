@@ -50,6 +50,7 @@ import com.fujitsu.vdmj.ast.modules.ASTModuleExports;
 import com.fujitsu.vdmj.ast.modules.ASTModuleImports;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.ast.types.ASTFunctionType;
+import com.fujitsu.vdmj.ast.types.ASTOperationType;
 import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -581,7 +582,7 @@ public class ModuleReader extends SyntaxReader
 
 			if (!(type instanceof ASTFunctionType))
 			{
-				throwMessage(2055, "Imported function is not a function type", tloc);
+				throwMessage(2055, "Import signature is not a function type", tloc);
 			}
 		}
 
@@ -620,7 +621,13 @@ public class ModuleReader extends SyntaxReader
 		if (lastToken().is(Token.COLON))
 		{
 			nextToken();
+			LexToken tloc = lastToken();
 			type = getTypeReader().readOperationType();
+
+			if (!(type instanceof ASTOperationType))
+			{
+				throwMessage(2055, "Import signature is not an operation type", tloc);
+			}
 		}
 
 		LexNameToken renamed = null;
