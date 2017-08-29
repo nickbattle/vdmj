@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -69,6 +70,21 @@ abstract public class TCImport extends TCNode implements Serializable
 
 	/** Check that the import types match the exported types. */
 	abstract public void typeCheck(Environment env);
+	
+	/** Return the expected kind of the exported definition */
+	abstract public boolean isExpectedKind(TCDefinition def);
+	
+	/** The kind of this import (type, value, function or operation) */
+	abstract public String kind();
+	
+	/** Check the kind of the exported definition matches that expected. */
+	protected void checkKind(TCDefinition actual)
+	{
+		if (actual != null && !isExpectedKind(actual))
+		{
+			report(3356, "Import of " + kind() + " " + name + " is " + actual.kind());
+		}
+	}
 
 	/**
 	 * @see com.fujitsu.vdmj.ast.definitions.PODefinition#report

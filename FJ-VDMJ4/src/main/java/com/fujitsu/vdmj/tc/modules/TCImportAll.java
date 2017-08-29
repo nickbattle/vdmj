@@ -71,4 +71,16 @@ public class TCImportAll extends TCImport
 	{
 		return;		// Implicitly OK.
 	}
+
+	@Override
+	public boolean isExpectedKind(TCDefinition def)
+	{
+		return true;
+	}
+
+	@Override
+	public String kind()
+	{
+		return "all";
+	}
 }

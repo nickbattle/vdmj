@@ -83,22 +83,46 @@ public class TCImportedValue extends TCImport
 	@Override
 	public void typeCheck(Environment env)
 	{
-		if (type != null && from != null)
+		TCDefinition expdef = null;
+		
+		if (from != null)
+		{
+			expdef = from.exportdefs.findName(name, NameScope.NAMES);
+			checkKind(expdef);
+		}
+		
+		if (type != null)
 		{
 			type = type.typeResolve(env, null);
 			TypeComparator.checkComposeTypes(type, env, false);
-			TCDefinition expdef = from.exportdefs.findName(name, NameScope.NAMES);
-
-			if (expdef != null)
+			
+			if (from != null && expdef != null)
 			{
-    			TCType exptype = expdef.getType().typeResolve(env, null);
-
-    			if (!TypeComparator.compatible(type, exptype))
+    			expdef = from.exportdefs.findName(name, NameScope.NAMES);
+    
+    			if (expdef != null)
     			{
-    				report(3194, "Type of value import " + name + " does not match export from " + from.name);
-    				detail2("Import", type.toDetailedString(), "Export", exptype.toDetailedString());
+        			TCType exptype = expdef.getType().typeResolve(env, null);
+    
+        			if (!TypeComparator.compatible(type, exptype))
+        			{
+        				report(3194, "Type of value import " + name + " does not match export from " + from.name);
+        				detail2("Import", type.toDetailedString(), "Export", exptype.toDetailedString());
+        			}
     			}
 			}
 		}
+	}
+
+	@Override
+	public boolean isExpectedKind(TCDefinition def)
+	{
+		return def.isValueDefinition();
+	}
+
+	@Override
+	public String kind()
+	{
+		return "value";
 	}
 }

@@ -59,7 +59,15 @@ public class TCImportedFunction extends TCImportedValue
 		}
 		else
 		{
-			if (type != null && from != null)
+			TCDefinition expdef = null;
+			
+			if (from != null)
+			{
+				expdef = from.exportdefs.findName(name, NameScope.NAMES);
+				checkKind(expdef);
+			}
+			
+			if (type != null)
 			{
 	    		TCDefinitionList defs = new TCDefinitionList();
 
@@ -76,48 +84,50 @@ public class TCImportedFunction extends TCImportedValue
 				type = type.typeResolve(params, null);
 				TypeComparator.checkComposeTypes(type, params, false);
 				
-				TCDefinition def = from.exportdefs.findName(name, NameScope.NAMES);
-				TCType act = def.getType();
-				
-				if (def instanceof TCExplicitFunctionDefinition)
+				if (expdef != null)
 				{
-					TCExplicitFunctionDefinition efd = (TCExplicitFunctionDefinition)def;
-					
-					if (efd.typeParams == null)
-					{
-						report(3352, "Imported " + name + " function has no type paramaters");
-					}
-					else if (!efd.typeParams.toString().equals(typeParams.toString()))
-					{
-						report(3353, "Imported " + name + " function type parameters incorrect");
-						detail2("Imported", typeParams, "Actual", efd.typeParams);
-					}
-					
-					if (act != null && !act.toString().equals(type.toString()))
-					{
-						report(3184, "Imported " + name + " function type incorrect");
-						detail2("Imported", type, "Actual", act);
-					}
-				}
-				else if (def instanceof TCImplicitFunctionDefinition)
-				{
-					TCImplicitFunctionDefinition ifd = (TCImplicitFunctionDefinition)def;
-					
-					if (ifd.typeParams == null)
-					{
-						report(3352, "Imported " + name + " function has no type paramaters");
-					}
-					else if (!ifd.typeParams.toString().equals(typeParams.toString()))
-					{
-						report(3353, "Imported " + name + " function type parameters incorrect");
-						detail2("Imported", typeParams, "Actual", ifd.typeParams);
-					}
-					
-					if (act != null && !act.toString().equals(type.toString()))
-					{
-						report(3184, "Imported " + name + " function type incorrect");
-						detail2("Imported", type, "Actual", act);
-					}
+    				TCType act = expdef.getType();
+    				
+    				if (expdef instanceof TCExplicitFunctionDefinition)
+    				{
+    					TCExplicitFunctionDefinition efd = (TCExplicitFunctionDefinition)expdef;
+    					
+    					if (efd.typeParams == null)
+    					{
+    						report(3352, "Imported " + name + " function has no type paramaters");
+    					}
+    					else if (!efd.typeParams.toString().equals(typeParams.toString()))
+    					{
+    						report(3353, "Imported " + name + " function type parameters incorrect");
+    						detail2("Imported", typeParams, "Actual", efd.typeParams);
+    					}
+    					
+    					if (act != null && !act.toString().equals(type.toString()))
+    					{
+    						report(3184, "Imported " + name + " function type incorrect");
+    						detail2("Imported", type, "Actual", act);
+    					}
+    				}
+    				else if (expdef instanceof TCImplicitFunctionDefinition)
+    				{
+    					TCImplicitFunctionDefinition ifd = (TCImplicitFunctionDefinition)expdef;
+    					
+    					if (ifd.typeParams == null)
+    					{
+    						report(3352, "Imported " + name + " function has no type paramaters");
+    					}
+    					else if (!ifd.typeParams.toString().equals(typeParams.toString()))
+    					{
+    						report(3353, "Imported " + name + " function type parameters incorrect");
+    						detail2("Imported", typeParams, "Actual", ifd.typeParams);
+    					}
+    					
+    					if (act != null && !act.toString().equals(type.toString()))
+    					{
+    						report(3184, "Imported " + name + " function type incorrect");
+    						detail2("Imported", type, "Actual", act);
+    					}
+    				}
 				}
 			}
 		}
@@ -130,5 +140,17 @@ public class TCImportedFunction extends TCImportedValue
 				(typeParams == null ? "" : "[" + typeParams + "]") +
 				(renamed == null ? "" : " renamed " + renamed.getName()) +
 				(type == null ? "" : ":" + type);
+	}
+
+	@Override
+	public boolean isExpectedKind(TCDefinition def)
+	{
+		return def.isFunction();
+	}
+
+	@Override
+	public String kind()
+	{
+		return "function";
 	}
 }

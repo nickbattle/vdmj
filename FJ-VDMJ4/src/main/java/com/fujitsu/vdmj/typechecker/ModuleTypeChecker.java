@@ -218,6 +218,11 @@ public class ModuleTypeChecker extends TypeChecker
 
 		for (TCModule m: modules)
 		{
+			m.processExports();				// Re-populate exports
+		}
+		
+		for (TCModule m: modules)
+		{
 			m.processImports(modules);		// Re-populate importDefs
 
 			try

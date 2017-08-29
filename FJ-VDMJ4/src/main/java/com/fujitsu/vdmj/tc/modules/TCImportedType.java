@@ -84,11 +84,18 @@ public class TCImportedType extends TCImport
 	@Override
 	public void typeCheck(Environment env)
 	{
-		if (def != null && from != null)
+		TCDefinition expdef = null;
+
+		if (from != null)
+		{
+			expdef = from.exportdefs.findType(name, null);
+			checkKind(expdef);			
+		}
+		
+		if (def != null)
 		{
 			def.type = (TCInvariantType)def.type.typeResolve(env, null);
 			TypeComparator.checkComposeTypes(def.type, env, false);
-			TCDefinition expdef = from.exportdefs.findType(name, null);
 
 			if (expdef != null)
 			{
@@ -101,5 +108,17 @@ public class TCImportedType extends TCImport
 				}
 			}
 		}
+	}
+
+	@Override
+	public boolean isExpectedKind(TCDefinition def)
+	{
+		return def.isTypeDefinition() || def.kind().equals("state");
+	}
+
+	@Override
+	public String kind()
+	{
+		return "type";
 	}
 }

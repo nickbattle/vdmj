@@ -166,4 +166,9 @@ public class ModuleTest extends TestCase
 	{
 		process("struct.vdm", 3051, 3127);
 	}
+	
+	public void testImpCheck() throws Exception
+	{
+		process("impcheck.vdm", 3191, 3356, 3356, 3356);
+	}
 }
