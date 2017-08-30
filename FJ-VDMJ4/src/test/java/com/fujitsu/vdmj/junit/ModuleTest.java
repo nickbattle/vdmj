@@ -169,6 +169,6 @@ public class ModuleTest extends TestCase
 	
 	public void testImpCheck() throws Exception
 	{
-		process("impcheck.vdm", 3191, 3356, 3356, 3356);
+		process("impcheck.vdm", 3191, 3356, 3194, 3356, 3356);
 	}
 }
