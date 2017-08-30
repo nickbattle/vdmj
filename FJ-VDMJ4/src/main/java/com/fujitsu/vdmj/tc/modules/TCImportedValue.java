@@ -106,7 +106,7 @@ public class TCImportedValue extends TCImport
     
         			if (!TypeComparator.compatible(type, exptype))
         			{
-        				report(3194, "Type of value import " + name + " does not match export from " + from.name);
+        				report(3194, "Type of import " + name + " does not match export from " + from.name);
         				detail2("Import", type.toDetailedString(), "Export", exptype.toDetailedString());
         			}
     			}

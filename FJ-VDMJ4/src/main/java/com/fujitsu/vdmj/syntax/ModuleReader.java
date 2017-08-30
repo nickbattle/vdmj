@@ -49,8 +49,6 @@ import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.modules.ASTModuleExports;
 import com.fujitsu.vdmj.ast.modules.ASTModuleImports;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
-import com.fujitsu.vdmj.ast.types.ASTFunctionType;
-import com.fujitsu.vdmj.ast.types.ASTOperationType;
 import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -333,14 +331,7 @@ public class ModuleReader extends SyntaxReader
 		LexNameList nameList = readIdList();
 		LexNameList typeParams = ignoreTypeParams();
 		checkFor(Token.COLON, 2176, "Expecting ':' after export name");
-		LexToken tloc = lastToken();
 		ASTType type = getTypeReader().readType();
-
-		if (!(type instanceof ASTFunctionType))
-		{
-			throwMessage(2053, "Exported function is not a function type", tloc);
-		}
-
 		ignore(Token.SEMICOLON);
 		return new ASTExportedFunction(token.location, nameList, type, typeParams);
 	}
@@ -577,13 +568,7 @@ public class ModuleReader extends SyntaxReader
 		if (lastToken().is(Token.COLON))
 		{
 			nextToken();
-			LexToken tloc = lastToken();
 			type = getTypeReader().readType();
-
-			if (!(type instanceof ASTFunctionType))
-			{
-				throwMessage(2055, "Import signature is not a function type", tloc);
-			}
 		}
 
 		LexNameToken renamed = null;
@@ -621,13 +606,7 @@ public class ModuleReader extends SyntaxReader
 		if (lastToken().is(Token.COLON))
 		{
 			nextToken();
-			LexToken tloc = lastToken();
 			type = getTypeReader().readOperationType();
-
-			if (!(type instanceof ASTOperationType))
-			{
-				throwMessage(2055, "Import signature is not an operation type", tloc);
-			}
 		}
 
 		LexNameToken renamed = null;

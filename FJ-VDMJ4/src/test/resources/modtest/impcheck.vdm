@@ -20,7 +20,7 @@ end A
 module B
 imports
 from A
-	functions op
+	functions op: nat -> nat
 	operations f
 	types V
 	values f
