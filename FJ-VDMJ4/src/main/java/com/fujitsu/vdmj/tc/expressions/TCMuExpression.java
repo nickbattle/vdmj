@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -62,7 +63,7 @@ public class TCMuExpression extends TCExpression
 	{
 		TCType rtype = record.typeCheck(env, null, scope, null);
 
-		if (rtype.isUnknown(location))
+		if (rtype instanceof TCUnknownType)
 		{
 			return rtype;
 		}
