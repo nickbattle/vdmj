@@ -43,6 +43,8 @@ as the expected and actual values.
 0066, "Thread is not running on a CPU"
 0067, "Exported type <name> not structured"
 0068, "Periodic threads overlapping"
+0069, "Definition <name> is not <type>, actual <type>"
+0070, "Definition <name> not found"
 
 
 1000, "Malformed quoted character"
