@@ -49,6 +49,14 @@ public class ValueList extends Vector<Value>
 		add(v);
 	}
 
+	public ValueList(Value ...values)
+	{
+		for (Value v: values)
+		{
+			add(v);
+		}
+	}
+
 	public ValueList(int n)
 	{
 		super(n);
