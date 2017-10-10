@@ -130,17 +130,14 @@ public class INCallObjectStatement extends INStatement
 			{
 				ExceptionHandler.abort(location, 4168, "Arguments do not match parameters: " + field, ctxt);
 			}
-			else
-			{
-				field = field.getModifiedName(argTypes);
-			}
 
+			TCNameToken adjfield = field.getModifiedName(argTypes);
 			ObjectValue obj = designator.eval(ctxt).objectValue(ctxt);
-			Value v = obj.get(field, explicit);
+			Value v = obj.get(adjfield, explicit);
 
 			if (v == null)
 			{
-    			ExceptionHandler.abort(location, 4035, "Object has no field: " + field.getName(), ctxt);
+    			ExceptionHandler.abort(location, 4035, "Object has no field: " + adjfield.getName(), ctxt);
 			}
 
 			v = v.deref();
