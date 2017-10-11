@@ -49,21 +49,21 @@ public class TCStarStarExpression extends TCBinaryExpression
 		{
 			if (!rtype.isNumeric(location))
 			{
-				rtype.report(3170, "Map iterator expects nat as right hand arg");
+				right.report(3170, "Map iterator expects nat as right hand arg");
 			}
 		}
 		else if (ltype.isFunction(location))
 		{
 			if (!rtype.isNumeric(location))
 			{
-				rtype.report(3171, "Function iterator expects nat as right hand arg");
+				right.report(3171, "Function iterator expects nat as right hand arg");
 			}
 		}
 		else if (ltype.isNumeric(location))
 		{
 			if (!rtype.isNumeric(location))
 			{
-				rtype.report(3172, "'**' expects number as right hand arg");
+				right.report(3172, "'**' expects number as right hand arg");
 			}
 		}
 		else
