@@ -1,5 +1,0 @@
-class A
-functions
-	public f: () -> set of set1 of bool
-	f() == { b | b : set1 of bool }
-end A
