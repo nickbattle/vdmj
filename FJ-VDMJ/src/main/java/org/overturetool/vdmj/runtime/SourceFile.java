@@ -290,9 +290,9 @@ public class SourceFile
 				if (start >= p)		// Backtracker produces duplicate tokens
 				{
     				sb.append(line.substring(p, start));
-    				sb.append("!\\notcovered{");
+    				sb.append("(*@\\vdmnotcovered{");
     				sb.append(latexQuote(line.substring(start, end)));
-    				sb.append("}!");	//\u00A3");
+    				sb.append("}@*)");	//\u00A3");
 
     				p = end;
 				}
