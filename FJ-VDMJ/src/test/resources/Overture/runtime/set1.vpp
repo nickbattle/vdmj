@@ -1,9 +1,0 @@
-class X
-values
-	v = f();
-	
-functions
-	f: () -> set1 of nat
-	f() == {1,2,3} \ {1,2,3};
-	    
-end X

@@ -1,3 +1,0 @@
-Main-Class: org.overturetool.vdmjc.VDMJC
-Class-Path: .
-

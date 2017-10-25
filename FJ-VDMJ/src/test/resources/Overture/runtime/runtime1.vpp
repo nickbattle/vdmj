@@ -1,5 +1,0 @@
-class A
-values
-	i:int = 123 + 0.456
-	
-end A
