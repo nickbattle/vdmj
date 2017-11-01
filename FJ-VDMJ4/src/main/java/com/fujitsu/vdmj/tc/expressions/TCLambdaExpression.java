@@ -66,6 +66,7 @@ public class TCLambdaExpression extends TCExpression
 	@Override
 	public TCType typeCheck(Environment base, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
+		scope = NameScope.NAMES;	// lambdas are always functions, even if defined in operations
 		TCMultipleBindList mbinds = new TCMultipleBindList();
 		TCTypeList ptypes = new TCTypeList();
 
