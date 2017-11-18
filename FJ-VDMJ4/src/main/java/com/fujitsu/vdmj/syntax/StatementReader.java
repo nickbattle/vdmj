@@ -360,6 +360,8 @@ public class StatementReader extends SyntaxReader
 		ASTAssignmentStatementList assignments = new ASTAssignmentStatementList();
 
 		assignments.add(readAssignmentStatement(lastToken().location));
+		checkFor(Token.SEMICOLON, 2205, "Expecting ';' after atomic assignment");
+		assignments.add(readAssignmentStatement(lastToken().location));
 
 		while (lastToken().isNot(Token.KET))
 		{
