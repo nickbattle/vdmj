@@ -360,15 +360,18 @@ public class StatementReader extends SyntaxReader
 		ASTAssignmentStatementList assignments = new ASTAssignmentStatementList();
 
 		assignments.add(readAssignmentStatement(lastToken().location));
-		ignore(Token.SEMICOLON);	// Every statement has an ignorable semicolon
 
 		while (lastToken().isNot(Token.KET))
 		{
-			assignments.add(readAssignmentStatement(lastToken().location));
-			ignore(Token.SEMICOLON);
+			checkFor(Token.SEMICOLON, 2205, "Expecting ';' after atomic assignment");
+			
+			if (lastToken().isNot(Token.KET))
+			{
+				assignments.add(readAssignmentStatement(lastToken().location));
+			}
 		}
 
-		checkFor(Token.KET, 2205, "Expecting ')' after atomic assignments");
+		nextToken();
 		return new ASTAtomicStatement(token, assignments);
 	}
 
