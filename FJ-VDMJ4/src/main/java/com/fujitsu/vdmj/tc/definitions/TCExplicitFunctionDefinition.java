@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSubclassResponsibilityExpression;
+import com.fujitsu.vdmj.tc.expressions.TCUndefinedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -41,6 +42,7 @@ import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
@@ -68,7 +70,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	public final TCExpression postcondition;
 	public final TCExpression body;
 	public final boolean isTypeInvariant;
-	public final TCExpression measure;
+	public final TCExpression measureExp;
 	public final boolean isCurried;
 
 	public TCExplicitFunctionDefinition predef;
@@ -80,13 +82,15 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	private TCType actualResult;
 	private TCType expectedResult;
 	public int measureLexical = 0;
-	private TCDefinition measuredef;
+
+	public TCExplicitFunctionDefinition measureDef;
+	public TCNameToken measureName;
 
 	public TCExplicitFunctionDefinition(TCAccessSpecifier accessSpecifier, TCNameToken name,
 		TCNameList typeParams, TCFunctionType type,
 		TCPatternListList parameters, TCExpression body,
 		TCExpression precondition,
-		TCExpression postcondition, boolean typeInvariant, TCExpression measure)
+		TCExpression postcondition, boolean typeInvariant, TCExpression measureExp)
 	{
 		super(Pass.DEFS, name.getLocation(), name, NameScope.GLOBAL);
 
@@ -98,7 +102,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		this.postcondition = postcondition;
 		this.body = body;
 		this.isTypeInvariant = typeInvariant;
-		this.measure = measure;
+		this.measureExp = measureExp;
 		this.isCurried = parameters.size() > 1;
 
 		type.definitions = new TCDefinitionList(this);
@@ -319,17 +323,17 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			report(3329, "Abstract function/operation must be public or protected");
 		}
 
-		if (measure == null && recursive)
+		if (measureExp == null && recursive)
 		{
 			warning(5012, "Recursive function has no measure");
 		}
-		else if (measure instanceof TCVariableExpression)
+		else if (measureExp instanceof TCVariableExpression)
 		{
-			TCVariableExpression exp = (TCVariableExpression)measure;
-			measuredef = base.findName(exp.name, scope);
+			TCVariableExpression exp = (TCVariableExpression)measureExp;
+			if (base.isVDMPP()) exp.name.setTypeQualifier(getMeasureParams());
+			TCDefinition def = base.findName(exp.name, scope);
 			
-			if (measuredef instanceof TCExplicitFunctionDefinition ||
-				measuredef instanceof TCImplicitFunctionDefinition)
+			if (def instanceof TCExplicitFunctionDefinition)
 			{
 				setMeasureDef(exp.name, base, scope);
 			}
@@ -338,7 +342,13 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				setMeasureExp(local, scope);
 			}
 		}
-		else if (measure != null)
+		else if (measureExp instanceof TCUndefinedExpression)
+		{
+			// Undefined measure, so ignore (without warning).
+			measureDef = null;
+			measureName = null;
+		}
+		else if (measureExp != null)
 		{
 			setMeasureExp(local, scope);
 		}
@@ -351,12 +361,12 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	}
 
 	/**
-	 * Set measuredef to a new created function, based on the measure expression. 
+	 * Set measureDef to a newly created function, based on the measure expression. 
 	 */
 	private void setMeasureExp(Environment local, NameScope scope)
 	{
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getMeasureName(measure.location),
-				typeParams, type.getMeasureType(), paramPatternList, measure, null, null, false, null);
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getMeasureName(measureExp.location),
+				typeParams, type.getMeasureType(), paramPatternList, measureExp, null, null, false, null);
 
 		def.classDefinition = classDefinition;
 		def.typeResolve(local);
@@ -364,30 +374,32 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		TCNaturalType expected = new TCNaturalType(location);
 		TCType b = def.body.typeCheck(local, null, NameScope.NAMES, expected);
 
-		if (!b.isType(TCBooleanType.class, location))
+		if (!b.isType(TCIntegerType.class, location))
 		{
 			report(3018, "Measure expression is unexpected type");
 			detail2("Actual", b, "Expected", expected);
 		}
 		
-		measuredef = def;
+		measureDef = def;
+		measureName = def.name;
 	}
 
 	/**
-	 * Check that measuredef is an existing named definition.
+	 * Check that measure is an existing named function definition.
 	 */
 	private void setMeasureDef(TCNameToken name, Environment base, NameScope scope)
 	{
 		if (base.isVDMPP()) name.setTypeQualifier(getMeasureParams());
-		measuredef = base.findName(name, scope);
+		measureDef = (TCExplicitFunctionDefinition) base.findName(name, scope);
 
-		if (measuredef == this)
+		if (measureDef == this)
 		{
 			name.report(3304, "Recursive function cannot be its own measure");
 		}
 		else
 		{
-			TCExplicitFunctionDefinition efd = (TCExplicitFunctionDefinition)measuredef;
+			TCExplicitFunctionDefinition efd = (TCExplicitFunctionDefinition)measureDef;
+			measureName = efd.name;
 			
 			if (this.typeParams == null && efd.typeParams != null)
 			{
@@ -404,7 +416,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				detail2("Actual", efd.typeParams, "Expected", typeParams);
 			}
 
-			TCFunctionType mtype = (TCFunctionType)measuredef.getType();
+			TCFunctionType mtype = (TCFunctionType)measureDef.getType();
 			
 			if (typeParams != null)		// Polymorphic, so compare "shape" of param signature
 			{

@@ -66,8 +66,8 @@ public class POExplicitFunctionDefinition extends PODefinition
 	public final boolean isUndefined;
 	public final boolean recursive;
 	public final int measureLexical;
-	public final PODefinition measuredef;
-	public final TCNameToken measure;
+	public final POExplicitFunctionDefinition measureDef;
+	public final TCNameToken measureName;
 
 	public POExplicitFunctionDefinition(TCNameToken name,
 		TCNameList typeParams, TCFunctionType type,
@@ -79,8 +79,8 @@ public class POExplicitFunctionDefinition extends PODefinition
 		PODefinitionListList paramDefinitionList,
 		boolean recursive,
 		int measureLexical,
-		PODefinition measuredef,
-		TCNameToken measure)
+		POExplicitFunctionDefinition measureDef,
+		TCNameToken measureName)
 	{
 		super(name.getLocation(), name);
 
@@ -93,13 +93,13 @@ public class POExplicitFunctionDefinition extends PODefinition
 		this.expectedResult = expectedResult;
 		this.actualResult = actualResult;
 		this.isUndefined = isUndefined;
-		this.measuredef = measuredef;
+		this.measureDef = measureDef;
 		this.predef = predef;
 		this.postdef = postdef;
 		this.paramDefinitionList = paramDefinitionList;
 		this.recursive = recursive;
 		this.measureLexical = measureLexical;
-		this.measure = measure;
+		this.measureName = measureName;
 	}
 
 	@Override

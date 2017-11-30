@@ -120,7 +120,7 @@ public class POApplyExpression extends POExpression
 				{
 					POExplicitFunctionDefinition def = (POExplicitFunctionDefinition)recursive;
 
-					if (def.measure != null)
+					if (def.measureName != null)
 					{
 						obligations.add(new RecursiveObligation(def, this, ctxt));
 					}

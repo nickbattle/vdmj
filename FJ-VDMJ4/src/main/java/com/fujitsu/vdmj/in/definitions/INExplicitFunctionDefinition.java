@@ -57,7 +57,8 @@ public class INExplicitFunctionDefinition extends INDefinition
 	public final INExpression postcondition;
 	public final INExpression body;
 	public final boolean isTypeInvariant;
-	public final TCNameToken measure;
+	public final TCNameToken measureName;
+	public final INExplicitFunctionDefinition measureDef;
 	public final boolean isCurried;
 	public final INExplicitFunctionDefinition predef;
 	public final INExplicitFunctionDefinition postdef;
@@ -69,7 +70,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 		TCNameList typeParams, TCFunctionType type,
 		INPatternListList parameters,
 		INExpression body, INExpression precondition, INExpression postcondition,
-		boolean typeInvariant, TCNameToken measure,
+		boolean typeInvariant, TCNameToken measureName, INExplicitFunctionDefinition measureDef,
 		INExplicitFunctionDefinition predef, INExplicitFunctionDefinition postdef,
 		INClassDefinition classdef)
 	{
@@ -82,7 +83,8 @@ public class INExplicitFunctionDefinition extends INDefinition
 		this.postcondition = postcondition;
 		this.body = body;
 		this.isTypeInvariant = typeInvariant;
-		this.measure = measure;
+		this.measureName = measureName;
+		this.measureDef = measureDef;
 		this.isCurried = parameters.size() > 1;
 		this.predef = predef;
 		this.postdef = postdef;
@@ -180,6 +182,11 @@ public class INExplicitFunctionDefinition extends INDefinition
 		{
 			nvl.add(new NameValuePair(postdef.name, postfunc));
 			postfunc.uninstantiated = (typeParams != null);
+		}
+		
+		if (measureDef != null && measureName.getName().startsWith("measure_"))
+		{
+			nvl.add(new NameValuePair(measureName, new FunctionValue(measureDef, null, null, null)));
 		}
 
 		if (Settings.dialect == Dialect.VDM_SL)

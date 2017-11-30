@@ -47,13 +47,12 @@ import com.fujitsu.vdmj.ast.definitions.ASTStateDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTThreadDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTTypeDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
-import com.fujitsu.vdmj.ast.expressions.ASTBooleanLiteralExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTEqualsExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.expressions.ASTNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTSubclassResponsibilityExpression;
-import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
+import com.fujitsu.vdmj.ast.expressions.ASTUndefinedExpression;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexNameList;
@@ -849,7 +848,8 @@ public class DefinitionReader extends SyntaxReader
 			
 			if (lastToken().is(Token.MINUS))
 			{
-				measure = new ASTBooleanLiteralExpression(new LexBooleanToken(true, lastToken().location));
+				measure = new ASTUndefinedExpression(lastToken().location);
+				nextToken();
 			}
 			else
 			{
