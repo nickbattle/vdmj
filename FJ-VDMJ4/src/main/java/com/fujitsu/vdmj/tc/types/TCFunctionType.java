@@ -66,6 +66,14 @@ public class TCFunctionType extends TCType
 		return type;
 	}
 
+	public TCFunctionType getMeasureType()
+	{
+		TCFunctionType type =
+			new TCFunctionType(location, parameters, false, new TCNaturalType(location));
+		type.definitions = definitions;
+		return type;
+	}
+
 	public TCFunctionType getCurriedPreType(boolean isCurried)
 	{
 		if (isCurried && result instanceof TCFunctionType)

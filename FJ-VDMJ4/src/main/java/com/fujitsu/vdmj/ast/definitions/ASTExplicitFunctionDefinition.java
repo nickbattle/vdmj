@@ -44,13 +44,13 @@ public class ASTExplicitFunctionDefinition extends ASTDefinition
 	public final ASTExpression postcondition;
 	public final ASTExpression body;
 	public final boolean isTypeInvariant;
-	public final LexNameToken measure;
+	public final ASTExpression measure;
 
 	public ASTExplicitFunctionDefinition(LexNameToken name, LexNameList typeParams,
 		ASTFunctionType type, ASTPatternListList parameters,
 		ASTExpression body,
 		ASTExpression precondition, ASTExpression postcondition, boolean typeInvariant,
-		LexNameToken measure)
+		ASTExpression measure)
 	{
 		super(name.location, name);
 
