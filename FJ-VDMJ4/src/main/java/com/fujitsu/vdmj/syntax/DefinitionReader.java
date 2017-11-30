@@ -47,11 +47,13 @@ import com.fujitsu.vdmj.ast.definitions.ASTStateDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTThreadDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTTypeDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
+import com.fujitsu.vdmj.ast.expressions.ASTBooleanLiteralExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTEqualsExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.expressions.ASTNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTSubclassResponsibilityExpression;
+import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexNameList;
@@ -827,7 +829,7 @@ public class DefinitionReader extends SyntaxReader
 		ASTExpression body = readFunctionBody();
 		ASTExpression precondition = null;
 		ASTExpression postcondition = null;
-		LexNameToken measure = null;
+		ASTExpression measure = null;
 
 		if (lastToken().is(Token.PRE))
 		{
@@ -844,7 +846,15 @@ public class DefinitionReader extends SyntaxReader
 		if (lastToken().is(Token.MEASURE))
 		{
 			nextToken();
-			measure = readNameToken("Expecting name after 'measure'");
+			
+			if (lastToken().is(Token.MINUS))
+			{
+				measure = new ASTBooleanLiteralExpression(new LexBooleanToken(true, lastToken().location));
+			}
+			else
+			{
+				measure = getExpressionReader().readExpression();
+			}
 		}
 
 		return new ASTExplicitFunctionDefinition(
