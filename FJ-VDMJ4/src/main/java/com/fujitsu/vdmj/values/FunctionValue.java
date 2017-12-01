@@ -183,9 +183,9 @@ public class FunctionValue extends Value
 		this.checkInvariants = true;
 		this.classdef = def.classDefinition;
 
-		if (Settings.measureChecks && def.measure != null)
+		if (Settings.measureChecks && def.measureName != null)
 		{
-			measureName = def.measure;
+			measureName = def.measureName;
 			measureValues = Collections.synchronizedMap(new HashMap<Long, Stack<Value>>());
 		}
 	}

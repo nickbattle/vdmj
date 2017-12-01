@@ -52,7 +52,6 @@ import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.expressions.ASTNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTSubclassResponsibilityExpression;
-import com.fujitsu.vdmj.ast.expressions.ASTUndefinedExpression;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexNameList;
@@ -845,16 +844,7 @@ public class DefinitionReader extends SyntaxReader
 		if (lastToken().is(Token.MEASURE))
 		{
 			nextToken();
-			
-			if (lastToken().is(Token.MINUS))
-			{
-				measure = new ASTUndefinedExpression(lastToken().location);
-				nextToken();
-			}
-			else
-			{
-				measure = getExpressionReader().readExpression();
-			}
+			measure = getExpressionReader().readExpression();
 		}
 
 		return new ASTExplicitFunctionDefinition(
@@ -926,7 +916,7 @@ public class DefinitionReader extends SyntaxReader
 		ASTExpression body = null;
 		ASTExpression precondition = null;
 		ASTExpression postcondition = null;
-		LexNameToken measure = null;
+		ASTExpression measure = null;
 
 		if (lastToken().is(Token.EQUALSEQUALS))		// extended implicit function
 		{
@@ -957,7 +947,7 @@ public class DefinitionReader extends SyntaxReader
 		if (lastToken().is(Token.MEASURE))
 		{
 			nextToken();
-			measure = readNameToken("Expecting name after 'measure'");
+			measure = getExpressionReader().readExpression();
 		}
 
 		return new ASTImplicitFunctionDefinition(

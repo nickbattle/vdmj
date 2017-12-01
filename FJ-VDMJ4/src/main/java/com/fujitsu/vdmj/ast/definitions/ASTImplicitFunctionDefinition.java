@@ -42,7 +42,7 @@ public class ASTImplicitFunctionDefinition extends ASTDefinition
 	public final ASTExpression body;
 	public final ASTExpression precondition;
 	public final ASTExpression postcondition;
-	public final LexNameToken measure;
+	public final ASTExpression measureExp;
 
 	public ASTImplicitFunctionDefinition(LexNameToken name,
 		LexNameList typeParams, ASTPatternListTypePairList parameterPatterns,
@@ -50,7 +50,7 @@ public class ASTImplicitFunctionDefinition extends ASTDefinition
 		ASTExpression body,
 		ASTExpression precondition,
 		ASTExpression postcondition,
-		LexNameToken measure)
+		ASTExpression measureExp)
 	{
 		super(name.location, name);
 
@@ -60,7 +60,7 @@ public class ASTImplicitFunctionDefinition extends ASTDefinition
 		this.body = body;
 		this.precondition = precondition;
 		this.postcondition = postcondition;
-		this.measure = measure;
+		this.measureExp = measureExp;
 	}
 
 	@Override

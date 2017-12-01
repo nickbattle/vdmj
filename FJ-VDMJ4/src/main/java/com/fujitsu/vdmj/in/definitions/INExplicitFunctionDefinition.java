@@ -184,9 +184,9 @@ public class INExplicitFunctionDefinition extends INDefinition
 			postfunc.uninstantiated = (typeParams != null);
 		}
 		
-		if (measureDef != null && measureName.getName().startsWith("measure_"))
+		if (measureDef != null && measureDef.name.getName().startsWith("measure_"))
 		{
-			nvl.add(new NameValuePair(measureName, new FunctionValue(measureDef, null, null, null)));
+			nvl.add(new NameValuePair(measureDef.name, new FunctionValue(measureDef, null, null, null)));
 		}
 
 		if (Settings.dialect == Dialect.VDM_SL)

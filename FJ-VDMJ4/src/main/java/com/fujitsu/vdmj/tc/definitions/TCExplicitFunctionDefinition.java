@@ -42,7 +42,6 @@ import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
-import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
@@ -81,8 +80,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	public boolean isUndefined = false;
 	private TCType actualResult;
 	private TCType expectedResult;
+	
 	public int measureLexical = 0;
-
 	public TCExplicitFunctionDefinition measureDef;
 	public TCNameToken measureName;
 
@@ -374,7 +373,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		TCNaturalType expected = new TCNaturalType(location);
 		TCType b = def.body.typeCheck(local, null, NameScope.NAMES, expected);
 
-		if (!b.isType(TCIntegerType.class, location))
+		if (!b.isNumeric(location))
 		{
 			report(3018, "Measure expression is unexpected type");
 			detail2("Actual", b, "Expected", expected);
@@ -385,16 +384,16 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	}
 
 	/**
-	 * Check that measure is an existing named function definition.
+	 * Check that measure is an existing named explicit function definition.
 	 */
-	private void setMeasureDef(TCNameToken name, Environment base, NameScope scope)
+	private void setMeasureDef(TCNameToken mname, Environment base, NameScope scope)
 	{
-		if (base.isVDMPP()) name.setTypeQualifier(getMeasureParams());
-		measureDef = (TCExplicitFunctionDefinition) base.findName(name, scope);
+		if (base.isVDMPP()) mname.setTypeQualifier(getMeasureParams());
+		measureDef = (TCExplicitFunctionDefinition) base.findName(mname, scope);
 
 		if (measureDef == this)
 		{
-			name.report(3304, "Recursive function cannot be its own measure");
+			mname.report(3304, "Recursive function cannot be its own measure");
 		}
 		else
 		{
@@ -403,16 +402,16 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			
 			if (this.typeParams == null && efd.typeParams != null)
 			{
-				name.report(3309, "Measure must not be polymorphic");
+				mname.report(3309, "Measure must not be polymorphic");
 			}
 			else if (this.typeParams != null && efd.typeParams == null)
 			{
-				name.report(3310, "Measure must also be polymorphic");
+				mname.report(3310, "Measure must also be polymorphic");
 			}
 			else if (this.typeParams != null && efd.typeParams != null
 					&& !this.typeParams.equals(efd.typeParams))
 			{
-				name.report(3318, "Measure's type parameters must match function's");
+				mname.report(3318, "Measure's type parameters must match function's");
 				detail2("Actual", efd.typeParams, "Expected", typeParams);
 			}
 
@@ -422,14 +421,14 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			{
 				if (!mtype.parameters.toString().equals(getMeasureParams().toString()))
 				{
-					name.report(3303, "Measure parameters different to function");
-					detail2(name.getName(), mtype.parameters, "Expected", getMeasureParams());
+					mname.report(3303, "Measure parameters different to function");
+					detail2(mname.getName(), mtype.parameters, "Expected", getMeasureParams());
 				}
 			}
 			else if (!TypeComparator.compatible(mtype.parameters, getMeasureParams()))
 			{
-				name.report(3303, "Measure parameters different to function");
-				detail2(name.getName(), mtype.parameters, "Expected", getMeasureParams());
+				mname.report(3303, "Measure parameters different to function");
+				detail2(mname.getName(), mtype.parameters, "Expected", getMeasureParams());
 			}
 
 			if (!(mtype.result instanceof TCNaturalType))
@@ -442,8 +441,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 					{
 						if (!(t instanceof TCNaturalType))
 						{
-							name.report(3272, "Measure range is not a nat, or a nat tuple");
-							name.detail("Actual", mtype.result);
+							mname.report(3272, "Measure range is not a nat, or a nat tuple");
+							mname.detail("Actual", mtype.result);
 							break;
 						}
 					}
@@ -452,8 +451,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				}
 				else
 				{
-					name.report(3272, "Measure range is not a nat, or a nat tuple");
-					name.detail("Actual", mtype.result);
+					mname.report(3272, "Measure range is not a nat, or a nat tuple");
+					mname.detail("Actual", mtype.result);
 				}
 			}
 		}
