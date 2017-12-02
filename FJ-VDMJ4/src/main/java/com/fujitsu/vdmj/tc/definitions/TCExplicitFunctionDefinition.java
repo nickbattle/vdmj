@@ -363,23 +363,17 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	 */
 	private void setMeasureExp(Environment local, NameScope scope)
 	{
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getMeasureName(measureExp.location),
-				typeParams, type.getMeasureType(), paramPatternList, measureExp, null, null, false, null);
+		TCType actual = measureExp.typeCheck(local, null, NameScope.NAMES, null);
+		measureName = name.getMeasureName(measureExp.location);
+		checkMeasure(measureName, actual);
+		
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, measureName,
+				typeParams, type.getMeasureType(actual), paramPatternList, measureExp, null, null, false, null);
 
 		def.classDefinition = classDefinition;
 		def.typeResolve(local);
 		
-		TCNaturalType expected = new TCNaturalType(location);
-		TCType b = def.body.typeCheck(local, null, NameScope.NAMES, expected);
-
-		if (!b.isNumeric(location))
-		{
-			report(3018, "Measure expression is unexpected type");
-			detail2("Actual", b, "Expected", expected);
-		}
-		
 		measureDef = def;
-		measureName = def.name;
 	}
 
 	/**
@@ -430,29 +424,37 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				detail2(mname.getName(), mtype.parameters, "Expected", getMeasureParams());
 			}
 
-			if (!(mtype.result instanceof TCNaturalType))
-			{
-				if (mtype.result.isProduct(location))
-				{
-					TCProductType pt = mtype.result.getProduct();
+			checkMeasure(mname, mtype.result);
+		}
+	}
 
-					for (TCType t: pt.types)
-					{
-						if (!(t instanceof TCNaturalType))
-						{
-							mname.report(3272, "Measure range is not a nat, or a nat tuple");
-							mname.detail("Actual", mtype.result);
-							break;
-						}
-					}
-					
-					measureLexical = pt.types.size();
-				}
-				else
+	/**
+	 * A measure must return a nat or nat-tuple.
+	 */
+	private void checkMeasure(TCNameToken mname, TCType result)
+	{
+		if (!(result instanceof TCNaturalType))
+		{
+			if (result.isProduct(location))
+			{
+				TCProductType pt = result.getProduct();
+
+				for (TCType t: pt.types)
 				{
-					mname.report(3272, "Measure range is not a nat, or a nat tuple");
-					mname.detail("Actual", mtype.result);
+					if (!(t instanceof TCNaturalType))
+					{
+						mname.report(3272, "Measure range is not a nat, or a nat tuple");
+						mname.detail("Actual", result);
+						break;
+					}
 				}
+				
+				measureLexical = pt.types.size();
+			}
+			else
+			{
+				mname.report(3272, "Measure range is not a nat, or a nat tuple");
+				mname.detail("Actual", result);
 			}
 		}
 	}
@@ -589,6 +591,11 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		{
 			return postdef;
 		}
+		
+		if (measureDef != null && measureDef.findName(sought, scope) != null)
+		{
+			return measureDef;
+		}
 
 		return null;
 	}
@@ -606,6 +613,11 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		if (postdef != null)
 		{
 			defs.add(postdef);
+		}
+		
+		if (measureName != null && measureName.getName().startsWith("measure_"))
+		{
+			defs.add(measureDef);
 		}
 
 		return defs;

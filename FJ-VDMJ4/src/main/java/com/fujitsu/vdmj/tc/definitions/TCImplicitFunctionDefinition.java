@@ -368,36 +368,30 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	 */
 	private void setMeasureExp(Environment local, NameScope scope)
 	{
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getMeasureName(measureExp.location),
-				typeParams, type.getMeasureType(), getParamPatternList(), measureExp, null, null, false, null);
+		TCType actual = measureExp.typeCheck(local, null, NameScope.NAMES, null);
+		measureName = name.getMeasureName(measureExp.location);
+		checkMeasure(measureName, actual);
+		
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, measureName,
+				typeParams, type.getMeasureType(actual), getParamPatternList(), measureExp, null, null, false, null);
 
 		def.classDefinition = classDefinition;
 		def.typeResolve(local);
 		
-		TCNaturalType expected = new TCNaturalType(location);
-		TCType b = def.body.typeCheck(local, null, NameScope.NAMES, expected);
-
-		if (!b.isNumeric(location))
-		{
-			report(3018, "Measure expression is unexpected type");
-			detail2("Actual", b, "Expected", expected);
-		}
-		
 		measureDef = def;
-		measureName = def.name;
 	}
 
 	/**
 	 * Check that measure is an existing named explicit function definition.
 	 */
-	private void setMeasureDef(TCNameToken name, Environment base, NameScope scope)
+	private void setMeasureDef(TCNameToken mname, Environment base, NameScope scope)
 	{
-		if (base.isVDMPP()) name.setTypeQualifier(type.parameters);
-		measureDef = (TCExplicitFunctionDefinition) base.findName(name, scope);
+		if (base.isVDMPP()) mname.setTypeQualifier(type.parameters);
+		measureDef = (TCExplicitFunctionDefinition) base.findName(mname, scope);
 
 		if (measureDef == null)
 		{
-			name.report(3270, "Measure " + name + " is not in scope");
+			mname.report(3270, "Measure " + mname + " is not in scope");
 		}
 		else
 		{
@@ -406,16 +400,16 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			
 			if (this.typeParams == null && efd.typeParams != null)
 			{
-				name.report(3309, "Measure must not be polymorphic");
+				mname.report(3309, "Measure must not be polymorphic");
 			}
 			else if (this.typeParams != null && efd.typeParams == null)
 			{
-				name.report(3310, "Measure must also be polymorphic");
+				mname.report(3310, "Measure must also be polymorphic");
 			}
 			else if (this.typeParams != null && efd.typeParams != null
 					&& !this.typeParams.equals(efd.typeParams))
 			{
-				name.report(3318, "Measure's type parameters must match function's");
+				mname.report(3318, "Measure's type parameters must match function's");
 				detail2("Actual", efd.typeParams, "Expected", typeParams);
 			}
 			
@@ -423,32 +417,41 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 
 			if (!TypeComparator.compatible(mtype.parameters, type.parameters))
 			{
-				name.report(3303, "Measure parameters different to function");
-				detail2(name.getName(), mtype.parameters, name.getName(), type.parameters);
+				mname.report(3303, "Measure parameters different to function");
+				detail2(mname.getName(), mtype.parameters, mname.getName(), type.parameters);
 			}
 
-			if (!(mtype.result instanceof TCNaturalType))
-			{
-				if (mtype.result.isProduct(location))
-				{
-					TCProductType pt = mtype.result.getProduct();
+			checkMeasure(mname, mtype);
+		}
+	}
 
-					for (TCType t: pt.types)
-					{
-						if (!(t instanceof TCNaturalType))
-						{
-							name.report(3272, "Measure range is not a nat, or a nat tuple");
-							name.detail("Actual", mtype.result);
-						}
-					}
-					
-					measureLexical = pt.types.size();
-				}
-				else
+	/**
+	 * A measure must return a nat or nat-tuple.
+	 */
+	private void checkMeasure(TCNameToken mname, TCType result)
+	{
+		if (!(result instanceof TCNaturalType))
+		{
+			if (result.isProduct(location))
+			{
+				TCProductType pt = result.getProduct();
+
+				for (TCType t: pt.types)
 				{
-					name.report(3272, "Measure range is not a nat, or a nat tuple");
-					name.detail("Actual", mtype.result);
+					if (!(t instanceof TCNaturalType))
+					{
+						mname.report(3272, "Measure range is not a nat, or a nat tuple");
+						mname.detail("Actual", result);
+						break;
+					}
 				}
+				
+				measureLexical = pt.types.size();
+			}
+			else
+			{
+				mname.report(3272, "Measure range is not a nat, or a nat tuple");
+				mname.detail("Actual", result);
 			}
 		}
 	}
@@ -476,6 +479,11 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		{
 			return postdef;
 		}
+		
+		if (measureDef != null && measureDef.findName(sought, scope) != null)
+		{
+			return measureDef;
+		}
 
 		return null;
 	}
@@ -493,6 +501,11 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		if (postdef != null)
 		{
 			defs.add(postdef);
+		}
+		
+		if (measureName != null && measureName.getName().startsWith("measure_"))
+		{
+			defs.add(measureDef);
 		}
 
 		return defs;

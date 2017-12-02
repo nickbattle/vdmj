@@ -66,10 +66,9 @@ public class TCFunctionType extends TCType
 		return type;
 	}
 
-	public TCFunctionType getMeasureType()
+	public TCFunctionType getMeasureType(TCType result)
 	{
-		TCFunctionType type =
-			new TCFunctionType(location, parameters, false, new TCNaturalType(location));
+		TCFunctionType type = new TCFunctionType(location, parameters, false, result);
 		type.definitions = definitions;
 		return type;
 	}
