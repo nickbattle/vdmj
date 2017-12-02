@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSubclassResponsibilityExpression;
-import com.fujitsu.vdmj.tc.expressions.TCUndefinedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -341,7 +340,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				setMeasureExp(local, scope);
 			}
 		}
-		else if (measureExp instanceof TCUndefinedExpression)
+		else if (measureExp instanceof TCNotYetSpecifiedExpression)
 		{
 			// Undefined measure, so ignore (without warning).
 			measureDef = null;
