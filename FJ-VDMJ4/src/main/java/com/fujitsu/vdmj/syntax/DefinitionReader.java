@@ -847,6 +847,7 @@ public class DefinitionReader extends SyntaxReader
 			
 			if (lastToken().is(Token.IS))
 			{
+				nextToken();
 				checkFor(Token.NOT, 2125, "Expecting 'is not yet specified'");
 				checkFor(Token.YET, 2125, "Expecting 'is not yet specified'");
 				checkFor(Token.SPECIFIED, 2126, "Expecting 'is not yet specified'");

@@ -421,7 +421,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 				detail2(mname.getName(), mtype.parameters, mname.getName(), type.parameters);
 			}
 
-			checkMeasure(mname, mtype);
+			checkMeasure(mname, mtype.result);
 		}
 	}
 
