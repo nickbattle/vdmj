@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.util.Utils;
 
 public class RecursiveObligation extends ProofObligation
@@ -38,6 +40,7 @@ public class RecursiveObligation extends ProofObligation
 	{
 		super(apply.location, POType.RECURSIVE, ctxt);
 		StringBuilder sb = new StringBuilder();
+		int measureLexical = getLex(def.measureDef);
 
 		sb.append(def.measureName.getName());
 		
@@ -65,7 +68,7 @@ public class RecursiveObligation extends ProofObligation
 		}
 
 		sb.append(")");
-		sb.append(def.measureLexical > 0 ? " LEX" + def.measureLexical + "> " : " > ");
+		sb.append(measureLexical > 0 ? " LEX" + measureLexical + "> " : " > ");
 		sb.append(apply.getMeasureApply(def.measureName));
 
 		value = ctxt.getObligation(sb.toString());
@@ -76,7 +79,8 @@ public class RecursiveObligation extends ProofObligation
 	{
 		super(def.location, POType.RECURSIVE, ctxt);
 		StringBuilder sb = new StringBuilder();
-
+		int measureLexical = getLex(def.measureDef);
+		
 		sb.append(def.measureName);
 		sb.append("(");
 
@@ -86,12 +90,27 @@ public class RecursiveObligation extends ProofObligation
 		}
 
 		sb.append(")");
-		sb.append(def.measureLexical > 0 ? " LEX" + def.measureLexical + "> " : " > ");
+		sb.append(measureLexical > 0 ? " LEX" + measureLexical + "> " : " > ");
 		sb.append(def.measureName);
 		sb.append("(");
 		sb.append(apply.args);
 		sb.append(")");
 
 		value = ctxt.getObligation(sb.toString());
+	}
+	
+	private int getLex(POExplicitFunctionDefinition mdef)
+	{
+		TCFunctionType ftype = (TCFunctionType) mdef.getType();
+		
+		if (ftype.result instanceof TCProductType)
+		{
+			TCProductType type = (TCProductType)ftype.result;
+			return type.types.size();
+		}
+		else
+		{
+			return 0;
+		}
 	}
 }
