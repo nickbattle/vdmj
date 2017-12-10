@@ -367,8 +367,19 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		measureName = name.getMeasureName(measureExp.location);
 		checkMeasure(measureName, actual);
 		
+		// Concatenate the parameter patterns into one list for curried measures
+		TCPatternList all = new TCPatternList();
+		
+		for (TCPatternList p: paramPatternList)
+		{
+			all.addAll(p);
+		}
+		
+		TCPatternListList cpll = new TCPatternListList();
+		cpll.add(all);
+		
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, measureName,
-				typeParams, type.getMeasureType(actual), paramPatternList, measureExp, null, null, false, null);
+				typeParams, type.getMeasureType(isCurried, actual), cpll, measureExp, null, null, false, null);
 
 		def.classDefinition = classDefinition;
 		def.typeResolve(local);

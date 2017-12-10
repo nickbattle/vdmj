@@ -373,7 +373,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		checkMeasure(measureName, actual);
 		
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, measureName,
-				typeParams, type.getMeasureType(actual), getParamPatternList(), measureExp, null, null, false, null);
+				typeParams, type.getMeasureType(false, actual), getParamPatternList(), measureExp, null, null, false, null);
 
 		def.classDefinition = classDefinition;
 		def.typeResolve(local);

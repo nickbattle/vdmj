@@ -66,9 +66,19 @@ public class TCFunctionType extends TCType
 		return type;
 	}
 
-	public TCFunctionType getMeasureType(TCType result)
+	public TCFunctionType getMeasureType(boolean isCurried, TCType actual)
 	{
-		TCFunctionType type = new TCFunctionType(location, parameters, false, result);
+		TCTypeList cparams = new TCTypeList();
+		cparams.addAll(parameters);
+		TCFunctionType ft = this;
+		
+		while (ft.result instanceof TCFunctionType)
+		{
+			ft = (TCFunctionType)result;
+			cparams.addAll(ft.parameters);
+		}
+
+		TCFunctionType type = new TCFunctionType(location, cparams, false, actual);
 		type.definitions = definitions;
 		return type;
 	}
