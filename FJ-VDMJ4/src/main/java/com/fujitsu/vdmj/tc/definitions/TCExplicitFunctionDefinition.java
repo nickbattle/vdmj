@@ -80,7 +80,6 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	private TCType actualResult;
 	private TCType expectedResult;
 	
-	public int measureLexical = 0;
 	public TCExplicitFunctionDefinition measureDef;
 	public TCNameToken measureName;
 
@@ -459,8 +458,6 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 						break;
 					}
 				}
-				
-				measureLexical = pt.types.size();
 			}
 			else
 			{

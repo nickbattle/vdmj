@@ -66,7 +66,6 @@ public class POImplicitFunctionDefinition extends PODefinition
 	public final boolean recursive;
 	public final boolean isUndefined;
 	public final TCType actualResult;
-	public final int measureLexical;
 	public final POExplicitFunctionDefinition measureDef;
 	public final TCNameToken measureName;
 
@@ -83,7 +82,6 @@ public class POImplicitFunctionDefinition extends PODefinition
 		boolean recursive,
 		boolean isUndefined,
 		TCType actualResult,
-		int measureLexical,
 		POExplicitFunctionDefinition measureDef,
 		TCNameToken measureName)
 	{
@@ -100,7 +98,6 @@ public class POImplicitFunctionDefinition extends PODefinition
 		this.postdef = postdef;
 		this.recursive = recursive;
 		this.isUndefined = isUndefined;
-		this.measureLexical = measureLexical;
 		this.measureDef = measureDef;
 		this.actualResult = actualResult;
 		this.measureName = measureName;

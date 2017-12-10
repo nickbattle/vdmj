@@ -75,7 +75,6 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	public boolean isUndefined = false;
 	public TCType actualResult;
 	
-	public int measureLexical = 0;
 	public TCExplicitFunctionDefinition measureDef;
 	public TCNameToken measureName;
 
@@ -445,8 +444,6 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 						break;
 					}
 				}
-				
-				measureLexical = pt.types.size();
 			}
 			else
 			{
