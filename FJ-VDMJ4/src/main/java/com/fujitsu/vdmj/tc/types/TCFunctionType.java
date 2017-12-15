@@ -77,6 +77,25 @@ public class TCFunctionType extends TCType
 			ft = (TCFunctionType)result;
 			cparams.addAll(ft.parameters);
 		}
+		
+		// Clean the return types to be precisely nat or nat-tuple.
+		
+		if (actual.isNumeric(location))
+		{
+			actual = new TCNaturalType(location);
+		}
+		else if (actual.isProduct(location))
+		{
+			TCProductType p = actual.getProduct();
+			TCTypeList nats = new TCTypeList();
+			
+			for (int i=0; i<p.types.size(); i++)
+			{
+				nats.add(new TCNaturalType(location));
+			}
+			
+			actual = new TCProductType(location, nats);
+		}
 
 		TCFunctionType type = new TCFunctionType(location, cparams, false, actual);
 		type.definitions = definitions;

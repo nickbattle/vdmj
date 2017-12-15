@@ -41,8 +41,6 @@ import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
-import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
-import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -384,6 +382,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		def.classDefinition = classDefinition;
 		def.typeResolve(local);
 		
+		def.typeCheck(local, scope);
+		
 		measureDef = def;
 	}
 
@@ -444,7 +444,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	 */
 	private void checkMeasure(TCNameToken mname, TCType result)
 	{
-		if (!(result instanceof TCNaturalType) && !(result instanceof TCNaturalOneType))
+		if (!result.isNumeric(location))
 		{
 			if (result.isProduct(location))
 			{
@@ -452,7 +452,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 				for (TCType t: pt.types)
 				{
-					if (!(t instanceof TCNaturalType) && !(t instanceof TCNaturalOneType))
+					if (!t.isNumeric(location))
 					{
 						mname.report(3272, "Measure range is not a nat, or a nat tuple");
 						mname.detail("Actual", result);

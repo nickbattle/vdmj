@@ -169,6 +169,11 @@ public class POExplicitFunctionDefinition extends PODefinition
 			ctxt.pop();
 			ctxt.pop();
 		}
+		
+		if (measureDef != null && measureName != null && measureName.getName().startsWith("measure_"))
+		{
+			obligations.addAll(measureDef.getProofObligations(ctxt));
+		}
 
 		ctxt.push(new POFunctionDefinitionContext(this, true));
 		obligations.addAll(body.getProofObligations(ctxt));
