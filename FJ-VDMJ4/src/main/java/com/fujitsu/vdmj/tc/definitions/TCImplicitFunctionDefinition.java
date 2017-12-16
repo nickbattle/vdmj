@@ -339,7 +339,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			}
 			else
 			{
-				setMeasureExp(local, scope);
+				setMeasureExp(base, local, scope);
 			}
 		}
 		else if (measureExp instanceof TCNotYetSpecifiedExpression)
@@ -350,7 +350,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		}
 		else if (measureExp != null)
 		{
-			setMeasureExp(local, scope);
+			setMeasureExp(base, local, scope);
 		}
 
 		if (!(body instanceof TCNotYetSpecifiedExpression) &&
@@ -364,7 +364,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	/**
 	 * Set measureDef to a newly created function, based on the measure expression. 
 	 */
-	private void setMeasureExp(Environment local, NameScope scope)
+	private void setMeasureExp(Environment base, Environment local, NameScope scope)
 	{
 		TCType actual = measureExp.typeCheck(local, null, NameScope.NAMES, null);
 		measureName = name.getMeasureName(measureExp.location);
@@ -374,9 +374,9 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 				typeParams, type.getMeasureType(false, actual), getParamPatternList(), measureExp, null, null, false, null);
 
 		def.classDefinition = classDefinition;
-		def.typeResolve(local);
+		def.typeResolve(base);
 		
-		def.typeCheck(local, scope);
+		def.typeCheck(base, scope);
 		
 		measureDef = def;
 	}
