@@ -37,7 +37,6 @@ import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
-import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePairList;
@@ -340,7 +339,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			}
 			else
 			{
-				setMeasureExp(local, scope);
+				setMeasureExp(base, local, scope);
 			}
 		}
 		else if (measureExp instanceof TCNotYetSpecifiedExpression)
@@ -351,7 +350,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		}
 		else if (measureExp != null)
 		{
-			setMeasureExp(local, scope);
+			setMeasureExp(base, local, scope);
 		}
 
 		if (!(body instanceof TCNotYetSpecifiedExpression) &&
@@ -365,17 +364,19 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	/**
 	 * Set measureDef to a newly created function, based on the measure expression. 
 	 */
-	private void setMeasureExp(Environment local, NameScope scope)
+	private void setMeasureExp(Environment base, Environment local, NameScope scope)
 	{
 		TCType actual = measureExp.typeCheck(local, null, NameScope.NAMES, null);
 		measureName = name.getMeasureName(measureExp.location);
 		checkMeasure(measureName, actual);
 		
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, measureName,
-				typeParams, type.getMeasureType(actual), getParamPatternList(), measureExp, null, null, false, null);
+				typeParams, type.getMeasureType(false, actual), getParamPatternList(), measureExp, null, null, false, null);
 
 		def.classDefinition = classDefinition;
-		def.typeResolve(local);
+		def.typeResolve(base);
+		
+		def.typeCheck(base, scope);
 		
 		measureDef = def;
 	}
@@ -429,7 +430,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	 */
 	private void checkMeasure(TCNameToken mname, TCType result)
 	{
-		if (!(result instanceof TCNaturalType))
+		if (!result.isNumeric(location))
 		{
 			if (result.isProduct(location))
 			{
@@ -437,7 +438,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 
 				for (TCType t: pt.types)
 				{
-					if (!(t instanceof TCNaturalType))
+					if (!t.isNumeric(location))
 					{
 						mname.report(3272, "Measure range is not a nat, or a nat tuple");
 						mname.detail("Actual", result);

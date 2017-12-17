@@ -66,9 +66,38 @@ public class TCFunctionType extends TCType
 		return type;
 	}
 
-	public TCFunctionType getMeasureType(TCType result)
+	public TCFunctionType getMeasureType(boolean isCurried, TCType actual)
 	{
-		TCFunctionType type = new TCFunctionType(location, parameters, false, result);
+		TCTypeList cparams = new TCTypeList();
+		cparams.addAll(parameters);
+		TCFunctionType ft = this;
+		
+		while (ft.result instanceof TCFunctionType)
+		{
+			ft = (TCFunctionType)result;
+			cparams.addAll(ft.parameters);
+		}
+		
+		// Clean the return types to be precisely nat or nat-tuple.
+		
+		if (actual.isNumeric(location))
+		{
+			actual = new TCNaturalType(location);
+		}
+		else if (actual.isProduct(location))
+		{
+			TCProductType p = actual.getProduct();
+			TCTypeList nats = new TCTypeList();
+			
+			for (int i=0; i<p.types.size(); i++)
+			{
+				nats.add(new TCNaturalType(location));
+			}
+			
+			actual = new TCProductType(location, nats);
+		}
+
+		TCFunctionType type = new TCFunctionType(location, cparams, false, actual);
 		type.definitions = definitions;
 		return type;
 	}
