@@ -45,9 +45,9 @@ public class INValueDefinition extends INDefinition
 	public final TCType type;
 	public final INExpression exp;
 
-	public INValueDefinition(INAccessSpecifier accessSpecifier, INPattern p, TCType type, INExpression exp)
+	public INValueDefinition(INAccessSpecifier accessSpecifier, TCNameToken name, INPattern p, TCType type, INExpression exp)
 	{
-		super(p.location, accessSpecifier, null);
+		super(p.location, accessSpecifier, name);
 
 		this.pattern = p;
 		this.type = type;

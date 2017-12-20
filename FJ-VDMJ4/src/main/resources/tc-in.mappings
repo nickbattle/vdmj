@@ -33,7 +33,7 @@ map TCStateDefinition{name, fields, invPattern, invExpression, initPattern, init
 map TCSystemDefinition{name, classtype, definitions} to INSystemDefinition(name, classtype, definitions);
 map TCThreadDefinition{statement, operationDef} to INThreadDefinition(statement, operationDef);
 map TCTypeDefinition{accessSpecifier, name, type, invPattern, invExpression, invdef, eqdef, orddef, mindef, maxdef} to INTypeDefinition(accessSpecifier, name, type, invPattern, invExpression, invdef, eqdef, orddef, mindef, maxdef);
-map TCValueDefinition{accessSpecifier, pattern, type, exp} to INValueDefinition(accessSpecifier, pattern, type, exp);
+map TCValueDefinition{accessSpecifier, name, pattern, type, exp} to INValueDefinition(accessSpecifier, name, pattern, type, exp);
 map TCUntypedDefinition{location, name} to INUntypedDefinition(location, name);
 map TCQualifiedDefinition{def, type} to INQualifiedDefinition(def, type);
 
