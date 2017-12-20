@@ -4,7 +4,7 @@
 	<groupId>com.fujitsu</groupId>
 	<artifactId>vdmj</artifactId>
 	<name>VDMJ</name>
-	<version>4.1.0</version>
+	<version>4.2.0</version>
 
 	<properties>
 		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
