@@ -141,7 +141,7 @@ public class INTrapStatement extends INStatement
 			}
 			catch (ValueException ve)
 			{
-				abort(ve);
+				throw e;
 			}
 			catch (PatternMatchException pe)
 			{
