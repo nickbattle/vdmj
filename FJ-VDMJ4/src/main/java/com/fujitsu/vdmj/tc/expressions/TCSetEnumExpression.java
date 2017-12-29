@@ -72,8 +72,10 @@ public class TCSetEnumExpression extends TCSetExpression
 			types.add(mt);
 		}
 
-		return ts.isEmpty() ? new TCSetType(location) :
+		TCType rt = ts.isEmpty() ? new TCSetType(location) :
 					new TCSet1Type(location, ts.getType(location));
+		
+		return possibleConstraint(constraint, rt);
 	}
 
 	@Override

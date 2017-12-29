@@ -100,7 +100,8 @@ public class TCMapEnumExpression extends TCMapExpression
 			}
 		}
 
-		return new TCMapType(location, dom.getType(location), rng.getType(location));
+		TCType rt = new TCMapType(location, dom.getType(location), rng.getType(location));
+		return possibleConstraint(constraint, rt);
 	}
 
 	@Override
