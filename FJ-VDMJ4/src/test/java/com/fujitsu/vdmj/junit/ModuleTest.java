@@ -164,7 +164,7 @@ public class ModuleTest extends TestCase
 	
 	public void testStruct() throws Exception
 	{
-		process("struct.vdm", 3051, 3127);
+		process("struct.vdm", 3327, 3051, 3127);
 	}
 	
 	public void testImpCheck() throws Exception

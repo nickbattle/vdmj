@@ -72,8 +72,10 @@ public class TCSeqEnumExpression extends TCSeqExpression
   			types.add(mt);
 		}
 
-		return ts.isEmpty() ? new TCSeqType(location) :
+		TCType rt = ts.isEmpty() ? new TCSeqType(location) :
 			new TCSeq1Type(location, ts.getType(location));
+		
+		return possibleConstraint(constraint, rt);
 	}
 
 	@Override
