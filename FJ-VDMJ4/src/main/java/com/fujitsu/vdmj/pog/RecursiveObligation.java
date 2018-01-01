@@ -68,10 +68,10 @@ public class RecursiveObligation extends ProofObligation
 		}
 
 		sb.append(")");
-		sb.append(measureLexical > 0 ? " LEX" + measureLexical + "> " : " > ");
-		sb.append(apply.getMeasureApply(def.measureName));
+		String lhs = sb.toString();
+		String rhs = apply.getMeasureApply(def.measureName);
 
-		value = ctxt.getObligation(sb.toString());
+		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
 	}
 
 	public RecursiveObligation(
@@ -90,13 +90,11 @@ public class RecursiveObligation extends ProofObligation
 		}
 
 		sb.append(")");
-		sb.append(measureLexical > 0 ? " LEX" + measureLexical + "> " : " > ");
-		sb.append(def.measureName);
-		sb.append("(");
-		sb.append(apply.args);
-		sb.append(")");
+		
+		String lhs = sb.toString();
+		String rhs = def.measureName + "(" + apply.args + ")";
 
-		value = ctxt.getObligation(sb.toString());
+		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
 	}
 	
 	private int getLex(POExplicitFunctionDefinition mdef)
@@ -111,6 +109,36 @@ public class RecursiveObligation extends ProofObligation
 		else
 		{
 			return 0;
+		}
+	}
+
+	private String greater(int lexical, String lhs, String rhs)
+	{
+		if (lexical > 0)
+		{
+			StringBuilder sb = new StringBuilder();
+			
+			sb.append("(let lhs = ");
+			sb.append(lhs);
+			sb.append(", rhs = ");
+			sb.append(rhs);
+			sb.append(" in ");
+			
+			String kw = "if";
+			
+			for (int i=1; i < lexical; i++)
+			{
+				sb.append(String.format("%s lhs.#%d <> rhs.#%d then lhs.#%d > rhs.#%d ", kw, i, i, i, i)); 
+				kw = "elseif";
+			}
+			
+			sb.append(String.format("else lhs.#%d > rhs.#%d)", lexical, lexical));
+			
+			return sb.toString();
+		}
+		else
+		{
+			return lhs + " > " + rhs;
 		}
 	}
 }
