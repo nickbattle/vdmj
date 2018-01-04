@@ -324,6 +324,10 @@ abstract public class VDMJ
 		{
 			usage("You must specify either -vdmsl, -vdmpp or -vdmrt");
 		}
+		else
+		{
+			System.setProperty(dialect.name(), "1");
+		}
 
 		if (logfile != null)// && !(controller instanceof VDMRT))
 		{
