@@ -30,8 +30,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Stack;
 
-import com.fujitsu.vdmj.Settings;
-
 /**
  * A class to read LaTeX encoded VDM files.
  */
@@ -87,7 +85,7 @@ public class LatexStreamReader extends InputStreamReader
     				String label = trimmed.substring(6).trim();
     				ifstack.push(supress);
 
-    				if (!supress && !label.equals(Settings.dialect.name()))
+    				if (!supress && System.getProperty(label) == null)
     				{
     					supress = true;
     				}
