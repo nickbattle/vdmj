@@ -235,7 +235,7 @@ public class TCUnionType extends TCType
 		}
 
 		inOrdering = false;
-		return false;
+		return types.isEmpty();		// Empty => ordered
 	}
 	
 	private boolean inEqing = false;

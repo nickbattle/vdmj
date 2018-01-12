@@ -29,10 +29,12 @@ import com.fujitsu.vdmj.in.patterns.INBind;
 import com.fujitsu.vdmj.in.patterns.INSetBind;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.NameValuePairList;
+import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
@@ -91,6 +93,7 @@ public class INSeqCompExpression extends INSeqExpression
 	{
 		ValueSet seq = new ValueSet();	// INBind variable values
 		ValueMap map = new ValueMap();	// Map bind values to output values
+		int count = 0;
 
 		for (Value val: allValues)
 		{
@@ -98,13 +101,13 @@ public class INSeqCompExpression extends INSeqExpression
 			{
 				Context evalContext = new Context(location, "seq comprehension", ctxt);
 				NameValuePairList nvpl = bind.pattern.getNamedValues(val, ctxt);
-				Value sortOn = nvpl.get(0).value;
+				Value sortOn = nvpl.isEmpty() ? new NaturalValue(count++) : nvpl.get(0).value;
 
 				if (map.get(sortOn) == null)
 				{
-    				if (nvpl.size() != 1 || !sortOn.isOrdered())
+    				if (nvpl.size() > 1 || !sortOn.isOrdered())
     				{
-    					abort(4029, "Sequence comprehension bindings must be one ordered value", ctxt);
+    					abort(4029, "Sequence comprehension binding must be one ordered value", ctxt);
     				}
 
     				evalContext.putList(nvpl);
@@ -124,6 +127,14 @@ public class INSeqCompExpression extends INSeqExpression
 			catch (PatternMatchException e)
 			{
 				// Ignore mismatches
+			}
+			catch (ContextException e)
+			{
+				throw e;
+			}
+			catch (Exception e)
+			{
+				// Ignore NaturalValue exception
 			}
 		}
 
