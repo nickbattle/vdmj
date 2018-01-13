@@ -240,7 +240,7 @@ public class TCDefinitionList extends TCMappedList<ASTDefinition, TCDefinition>
 		
 		for (TCDefinition d: this)
 		{
-			d.findName(d.name, NameScope.NAMESANDSTATE);	// Update POInheritedDefinition type qualifiers
+			d.findName(d.name, NameScope.NAMESANDSTATE);	// Update TCInheritedDefinition type qualifiers
 			
 			if (!fixed.contains(d))		// Name comparison
 			{

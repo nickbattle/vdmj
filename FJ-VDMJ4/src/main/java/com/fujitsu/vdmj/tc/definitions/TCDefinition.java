@@ -132,7 +132,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * the types are primitive) and replacing them with the {@link TCType} value
 	 * from the definition of the named type in the {@link Environment} passed.
 	 * <p>
-	 * This method is defined for PODefinition subclasses which have a
+	 * This method is defined for TCDefinition subclasses which have a
 	 * {@link com.fujitsu.vdmj.typechecker.Pass Pass} value of
 	 * {@link com.fujitsu.vdmj.typechecker.Pass Pass.TYPES}.
 	 *
@@ -199,14 +199,14 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	}
 
 	/**
-	 * Find whether this PODefinition contains a definition of a name. Since some
+	 * Find whether this TCDefinition contains a definition of a name. Since some
 	 * definitions contain inner definitions (eg. function definitions contain
 	 * further definitions for their pre and post conditions), this cannot in
 	 * general compare the name passed with the name of this object.
 	 *
 	 * This method is used for finding Definitions that are not types. That can
 	 * include constants, functions, operations and state definitions. The
-	 * POTypeDefinition implementation of this method checks for any type
+	 * TCTypeDefinition implementation of this method checks for any type
 	 * invariant function definition that it has created, but does not return a
 	 * match for the name of the type itself. The {@link #findType findType}
 	 * method is used for this.
@@ -218,7 +218,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * Definitions which include state fields are sometimes in scope (from
 	 * within operation bodies) and sometimes not (in function bodies). So the
 	 * scope parameter is used to indicate what sorts of definitions should be
-	 * considered in the lookup. The {@link POStateDefinition} subclass uses this
+	 * considered in the lookup. The {@link TCStateDefinition} subclass uses this
 	 * to decide whether to consider its state definitions as in scope.
 	 *
 	 * @param sought The name of the definition sought.
@@ -262,9 +262,9 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * Find whether this definition contains a definition of a type name. This
 	 * is very similar to {@link #findName findName}, except that there is no
 	 * need for a scope parameter since state definitions' types are always in
-	 * scope. The method is implemented by the {@link POTypeDefinition} class, by
-	 * {@link POStateDefinition} (when module state is referred to as a
-	 * record type), and by {@link com.fujitsu.vdmj.ast.modules.ASTImportedType TCImportedType}
+	 * scope. The method is implemented by the {@link TCTypeDefinition} class, by
+	 * {@link TCStateDefinition} (when module state is referred to as a
+	 * record type), and by {@link com.fujitsu.vdmj.ast.modules.TCImportedType TCImportedType}
 	 * definitions.
 	 *
 	 * @param name The name of the type definition being sought.
@@ -436,7 +436,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * Generate a local definition for "self". Note that this assumes the
 	 * setClassDefinition method has been called.
 	 *
-	 * @return a POLocalDefinition for "self".
+	 * @return a TCLocalDefinition for "self".
 	 */
 	protected TCDefinition getSelfDefinition()
 	{
@@ -492,7 +492,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	}
 	
 	/**
-	 * Check a PODefinitionList for incompatible duplicate pattern definitions.
+	 * Check a TCDefinitionList for incompatible duplicate pattern definitions.
 	 */
 	public TCDefinitionList checkDuplicatePatterns(TCDefinitionList defs)
 	{

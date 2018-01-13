@@ -58,17 +58,6 @@ public abstract class INStatement extends INNode implements Serializable
 	abstract public String toString();
 
 	/**
-	 * Whether the statement probably produces side effects. This is used during
-	 * PO generation for operations. The method will produce false positives
-	 * (saying that side effects are produced, when they are not), but no false
-	 * negatives.
-	 */
-	public boolean hasSideEffects()
-	{
-		return true;
-	}
-
-	/**
 	 * Find a statement starting on the given line. Single statements just
 	 * compare their location to lineno, but block statements and statements
 	 * with sub-statements iterate over their branches.

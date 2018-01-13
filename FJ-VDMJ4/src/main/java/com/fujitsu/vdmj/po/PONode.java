@@ -27,7 +27,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.MappedObject;
 
 /**
- * The abstract root of all Proof Obligation nodes. The class extends ExtendableNode to allow
+ * The abstract root of all Proof Obligation nodes. The class extends MappedObject to allow
  * the AST to be extended.
  */
 abstract public class PONode extends MappedObject

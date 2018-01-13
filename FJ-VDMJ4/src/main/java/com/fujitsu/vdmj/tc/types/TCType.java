@@ -99,7 +99,7 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 
 	/**
 	 * Resolve the type. After syntax checking, all named type references are
-	 * created as {@link com.fujitsu.vdmj.ast.types.ASTUnresolvedType}, which simply have a name.
+	 * created as {@link com.fujitsu.vdmj.ast.types.TCUnresolvedType}, which simply have a name.
 	 * The process of resolving a type in a given {@link Environment} will
 	 * lookup any UnresolvedTypes and replace them with the type of the actual
 	 * definition. This process is performed across all of the subtypes of a
@@ -214,12 +214,12 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 
 	public boolean isVoid()
 	{
-		return false;	// ASTVoidType and ASTVoidReturnType are void.
+		return false;	// TCVoidType and TCVoidReturnType are void.
 	}
 
 	public boolean hasVoid()
 	{
-		return false;	// ASTVoidType and ASTVoidReturnType are void.
+		return false;	// TCVoidType and TCVoidReturnType are void.
 	}
 
 	/**

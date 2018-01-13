@@ -51,9 +51,9 @@ public class TCInheritedDefinition extends TCDefinition
 	private void checkSuperDefinition()
 	{
 		// This is used to get over the case where an inherited definition
-		// is a POValueDefinition that has since been replaced with a new
-		// POLocalDefinition. It would be better to somehow list the
-		// inherited definitions that refer to a POLocalDefinition and update
+		// is a TCValueDefinition that has since been replaced with a new
+		// TCLocalDefinition. It would be better to somehow list the
+		// inherited definitions that refer to a TCLocalDefinition and update
 		// them...
 
 		if (superdef instanceof TCUntypedDefinition)
