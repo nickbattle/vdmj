@@ -87,7 +87,7 @@ abstract public class TCImport extends TCNode implements Serializable
 	}
 
 	/**
-	 * @see com.fujitsu.vdmj.ast.definitions.PODefinition#report
+	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#report
 	 */
 
 	public void report(int number, String msg)
@@ -96,7 +96,7 @@ abstract public class TCImport extends TCNode implements Serializable
 	}
 
 	/**
-	 * @see com.fujitsu.vdmj.ast.definitions.PODefinition#detail
+	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#detail
 	 */
 
 	public void detail(String tag, Object obj)
@@ -105,7 +105,7 @@ abstract public class TCImport extends TCNode implements Serializable
 	}
 
 	/**
-	 * @see com.fujitsu.vdmj.ast.definitions.PODefinition#detail2
+	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#detail2
 	 */
 
 	public void detail2(String tag1, Object obj1, String tag2, Object obj2)

@@ -86,7 +86,7 @@ public class TCClassType extends TCType
 			for (TCDefinition d: classdef.getDefinitions())
 			{
 				// There is a problem resolving ParameterTypes via a TCFunctionType
-				// when this is not being done via POExplicitFunctionDefinition
+				// when this is not being done via TCExplicitFunctionDefinition
 				// which extends the environment with the type names that
 				// are in scope. So we skip these here.
 

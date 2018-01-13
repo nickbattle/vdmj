@@ -128,7 +128,7 @@ public class TCClassDefinition extends TCDefinition
 
 	/**
 	 * Link the class hierarchy and generate the invariant operation.
-	 * @see com.fujitsu.vdmj.ast.definitions.ASTDefinition#implicitDefinitions(com.fujitsu.vdmj.typechecker.Environment)
+	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#implicitDefinitions(com.fujitsu.vdmj.typechecker.Environment)
 	 */
 	@Override
 	public void implicitDefinitions(Environment publicClasses)
@@ -497,7 +497,7 @@ public class TCClassDefinition extends TCDefinition
 	 * Get a list of all definitions for this class, including the local
 	 * definitions as well as those inherited.
 	 *
-	 * @see com.fujitsu.vdmj.ast.definitions.ASTDefinition#getDefinitions()
+	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#getDefinitions()
 	 */
 	@Override
 	public TCDefinitionList getDefinitions()
@@ -849,7 +849,7 @@ public class TCClassDefinition extends TCDefinition
 				
 				if (d instanceof TCValueDefinition)
 				{
-					// POValueDefinition body always a static context
+					// TCValueDefinition body always a static context
 					FlatCheckedEnvironment checked = new FlatCheckedEnvironment(new TCDefinitionList(), base, NameScope.NAMES);
 					checked.setStatic(true);
 					env = checked;

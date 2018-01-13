@@ -62,7 +62,7 @@ public class POClassDefinition extends PODefinition
 
 	/**
 	 * Get a list of the names of the variables defined locally.
-	 * @see org.INDefinition.vdmj.definitions.Definition#getVariableNames()
+	 * @see org.PODefinition.vdmj.definitions.Definition#getVariableNames()
 	 */
 	@Override
 	public TCNameList getVariableNames()
@@ -72,7 +72,7 @@ public class POClassDefinition extends PODefinition
 
 	/**
 	 * Get this class' POClassType.
-	 * @see org.INDefinition.vdmj.definitions.Definition#getType()
+	 * @see org.PODefinition.vdmj.definitions.Definition#getType()
 	 */
 	@Override
 	public TCType getType()

@@ -175,7 +175,7 @@ public abstract class TCExpression extends TCNode implements Serializable
 	}
 
 	/**
-	 * @see org.INDefinition.vdmj.definitions.Definition#report
+	 * @see org.TCDefinition.vdmj.definitions.Definition#report
 	 */
 	public void report(int number, String msg)
 	{
@@ -183,7 +183,7 @@ public abstract class TCExpression extends TCNode implements Serializable
 	}
 
 	/**
-	 * @see org.INDefinition.vdmj.definitions.Definition#warning
+	 * @see org.TCDefinition.vdmj.definitions.Definition#warning
 	 */
 	public void warning(int number, String msg)
 	{
@@ -210,7 +210,7 @@ public abstract class TCExpression extends TCNode implements Serializable
 	}
 
 	/**
-	 * @see org.INDefinition.vdmj.definitions.Definition#detail
+	 * @see org.TCDefinition.vdmj.definitions.Definition#detail
 	 */
 
 	public void detail(String tag, Object obj)
@@ -227,7 +227,7 @@ public abstract class TCExpression extends TCNode implements Serializable
 	}
 
 	/**
-	 * @see org.INDefinition.vdmj.definitions.Definition#detail2
+	 * @see org.TCDefinition.vdmj.definitions.Definition#detail2
 	 */
 
 	public void detail2(String tag1, Object obj1, String tag2, Object obj2)
