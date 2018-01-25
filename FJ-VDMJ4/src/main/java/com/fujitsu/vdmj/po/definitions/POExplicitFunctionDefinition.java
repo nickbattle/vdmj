@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.pog.FuncPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POFunctionResultContext;
+import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
@@ -65,9 +66,8 @@ public class POExplicitFunctionDefinition extends PODefinition
 	public final TCType actualResult;
 	public final boolean isUndefined;
 	public final boolean recursive;
-	public final int measureLexical;
-	public final PODefinition measuredef;
-	public final TCNameToken measure;
+	public final POExplicitFunctionDefinition measureDef;
+	public final TCNameToken measureName;
 
 	public POExplicitFunctionDefinition(TCNameToken name,
 		TCNameList typeParams, TCFunctionType type,
@@ -78,9 +78,8 @@ public class POExplicitFunctionDefinition extends PODefinition
 		POExplicitFunctionDefinition postdef,
 		PODefinitionListList paramDefinitionList,
 		boolean recursive,
-		int measureLexical,
-		PODefinition measuredef,
-		TCNameToken measure)
+		POExplicitFunctionDefinition measureDef,
+		TCNameToken measureName)
 	{
 		super(name.getLocation(), name);
 
@@ -93,13 +92,12 @@ public class POExplicitFunctionDefinition extends PODefinition
 		this.expectedResult = expectedResult;
 		this.actualResult = actualResult;
 		this.isUndefined = isUndefined;
-		this.measuredef = measuredef;
+		this.measureDef = measureDef;
 		this.predef = predef;
 		this.postdef = postdef;
 		this.paramDefinitionList = paramDefinitionList;
 		this.recursive = recursive;
-		this.measureLexical = measureLexical;
-		this.measure = measure;
+		this.measureName = measureName;
 	}
 
 	@Override
@@ -170,6 +168,13 @@ public class POExplicitFunctionDefinition extends PODefinition
 			ctxt.push(new POFunctionResultContext(this));
 			obligations.addAll(postcondition.getProofObligations(ctxt));
 			ctxt.pop();
+			ctxt.pop();
+		}
+		
+		if (measureDef != null && measureName != null && measureName.getName().startsWith("measure_"))
+		{
+			ctxt.push(new PONameContext(new TCNameList(measureName)));
+			obligations.addAll(measureDef.getProofObligations(ctxt));
 			ctxt.pop();
 		}
 

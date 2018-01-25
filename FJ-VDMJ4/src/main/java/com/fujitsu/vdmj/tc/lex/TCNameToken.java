@@ -203,6 +203,11 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 	{
 		return new TCNameToken(l, getModule(), "init_" + getName(), false, false);
 	}
+
+	public TCNameToken getMeasureName(LexLocation l)
+	{
+		return new TCNameToken(l, getModule(), "measure_" + getName(), false, false);
+	}
 	
 	public TCNameToken getResultName(LexLocation l)
 	{

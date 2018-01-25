@@ -18,7 +18,7 @@ map ASTEqualsDefinition{location, pattern, typebind, bind, test} to TCEqualsDefi
 map ASTExplicitFunctionDefinition{accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measure} to TCExplicitFunctionDefinition(accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measure);
 map ASTExplicitOperationDefinition{accessSpecifier, name, type, parameterPatterns, precondition, postcondition, body} to TCExplicitOperationDefinition(accessSpecifier, name, type, parameterPatterns, precondition, postcondition, body);
 map ASTExternalDefinition{state, readOnly} to TCExternalDefinition(state, readOnly);
-map ASTImplicitFunctionDefinition{accessSpecifier, name, typeParams, parameterPatterns, result, body, precondition, postcondition, measure} to TCImplicitFunctionDefinition(accessSpecifier, name, typeParams, parameterPatterns, result, body, precondition, postcondition, measure);
+map ASTImplicitFunctionDefinition{accessSpecifier, name, typeParams, parameterPatterns, result, body, precondition, postcondition, measureExp} to TCImplicitFunctionDefinition(accessSpecifier, name, typeParams, parameterPatterns, result, body, precondition, postcondition, measureExp);
 map ASTImplicitOperationDefinition{accessSpecifier, name, parameterPatterns, result, body, externals, precondition, postcondition, errors} to TCImplicitOperationDefinition(accessSpecifier, name, parameterPatterns, result, body, externals, precondition, postcondition, errors);
 map ASTImportedDefinition{location, def} to TCImportedDefinition(location, def);
 map ASTInheritedDefinition{accessSpecifier, name, superdef} to TCInheritedDefinition(accessSpecifier, name, superdef);

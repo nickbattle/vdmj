@@ -75,7 +75,7 @@ public class INTixeStmtAlternative
 				}
 				else
 				{
-					setbind.abort(4049, "Value " + exval + " is not in set bind", ctxt);
+					evalContext = null;
 				}
 			}
 			else if (patternBind.bind instanceof INSeqBind)
@@ -90,7 +90,7 @@ public class INTixeStmtAlternative
 				}
 				else
 				{
-					seqbind.abort(4049, "Value " + exval + " is not in seq bind", ctxt);
+					evalContext = null;
 				}
 			}
 			else
