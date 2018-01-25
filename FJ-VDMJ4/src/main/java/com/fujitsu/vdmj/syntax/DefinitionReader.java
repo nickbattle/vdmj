@@ -827,7 +827,7 @@ public class DefinitionReader extends SyntaxReader
 		ASTExpression body = readFunctionBody();
 		ASTExpression precondition = null;
 		ASTExpression postcondition = null;
-		LexNameToken measure = null;
+		ASTExpression measure = null;
 
 		if (lastToken().is(Token.PRE))
 		{
@@ -844,7 +844,19 @@ public class DefinitionReader extends SyntaxReader
 		if (lastToken().is(Token.MEASURE))
 		{
 			nextToken();
-			measure = readNameToken("Expecting name after 'measure'");
+			
+			if (lastToken().is(Token.IS))
+			{
+				nextToken();
+				checkFor(Token.NOT, 2125, "Expecting 'is not yet specified'");
+				checkFor(Token.YET, 2125, "Expecting 'is not yet specified'");
+				checkFor(Token.SPECIFIED, 2126, "Expecting 'is not yet specified'");
+				measure = new ASTNotYetSpecifiedExpression(lastToken().location);
+			}
+			else
+			{
+				measure = getExpressionReader().readExpression();
+			}
 		}
 
 		return new ASTExplicitFunctionDefinition(
@@ -916,7 +928,7 @@ public class DefinitionReader extends SyntaxReader
 		ASTExpression body = null;
 		ASTExpression precondition = null;
 		ASTExpression postcondition = null;
-		LexNameToken measure = null;
+		ASTExpression measure = null;
 
 		if (lastToken().is(Token.EQUALSEQUALS))		// extended implicit function
 		{
@@ -947,7 +959,19 @@ public class DefinitionReader extends SyntaxReader
 		if (lastToken().is(Token.MEASURE))
 		{
 			nextToken();
-			measure = readNameToken("Expecting name after 'measure'");
+			
+			if (lastToken().is(Token.IS))
+			{
+				nextToken();
+				checkFor(Token.NOT, 2125, "Expecting 'is not yet specified'");
+				checkFor(Token.YET, 2125, "Expecting 'is not yet specified'");
+				checkFor(Token.SPECIFIED, 2126, "Expecting 'is not yet specified'");
+				measure = new ASTNotYetSpecifiedExpression(lastToken().location);
+			}
+			else
+			{
+				measure = getExpressionReader().readExpression();
+			}
 		}
 
 		return new ASTImplicitFunctionDefinition(

@@ -60,7 +60,9 @@ public class INImplicitFunctionDefinition extends INDefinition
 	public final INExpression body;
 	public final INExpression precondition;
 	public final INExpression postcondition;
-	public final TCNameToken measure;
+	public final TCNameToken measureName;
+	public final INExpression measureExp;
+	public final INExplicitFunctionDefinition measureDef;
 	public final INExplicitFunctionDefinition predef;
 	public final INExplicitFunctionDefinition postdef;
 	public final INClassDefinition classdef;
@@ -74,7 +76,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 		INPatternTypePair result,
 		INExpression body,
 		INExpression precondition,
-		INExpression postcondition, TCNameToken measure,
+		INExpression postcondition, INExpression measureExp, TCNameToken measureName, INExplicitFunctionDefinition measureDef,
 		INExplicitFunctionDefinition predef, INExplicitFunctionDefinition postdef,
 		INClassDefinition classdef)
 	{
@@ -86,7 +88,9 @@ public class INImplicitFunctionDefinition extends INDefinition
 		this.body = body;
 		this.precondition = precondition;
 		this.postcondition = postcondition;
-		this.measure = measure;
+		this.measureName = measureName;
+		this.measureExp = measureExp;
+		this.measureDef = measureDef;
 		this.predef = predef;
 		this.postdef = postdef;
 		this.classdef = classdef;
@@ -190,6 +194,11 @@ public class INImplicitFunctionDefinition extends INDefinition
 		{
 			nvl.add(new NameValuePair(postdef.name, postfunc));
 			postfunc.uninstantiated = (typeParams != null);
+		}
+
+		if (measureDef != null && measureDef.name.getName().startsWith("measure_"))
+		{
+			nvl.add(new NameValuePair(measureDef.name, new FunctionValue(measureDef, null, null, null)));
 		}
 
 		if (Settings.dialect == Dialect.VDM_SL)

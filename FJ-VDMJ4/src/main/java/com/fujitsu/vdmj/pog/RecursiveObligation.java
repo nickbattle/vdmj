@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.util.Utils;
 
 public class RecursiveObligation extends ProofObligation
@@ -38,8 +40,9 @@ public class RecursiveObligation extends ProofObligation
 	{
 		super(apply.location, POType.RECURSIVE, ctxt);
 		StringBuilder sb = new StringBuilder();
+		int measureLexical = getLex(def.measureDef);
 
-		sb.append(def.measuredef.name.getName());
+		sb.append(def.measureName.getName());
 		
 		if (def.typeParams != null)
 		{
@@ -65,10 +68,10 @@ public class RecursiveObligation extends ProofObligation
 		}
 
 		sb.append(")");
-		sb.append(def.measureLexical > 0 ? " LEX" + def.measureLexical + "> " : " > ");
-		sb.append(apply.getMeasureApply(def.measure));
+		String lhs = sb.toString();
+		String rhs = apply.getMeasureApply(def.measureName);
 
-		value = ctxt.getObligation(sb.toString());
+		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
 	}
 
 	public RecursiveObligation(
@@ -76,8 +79,9 @@ public class RecursiveObligation extends ProofObligation
 	{
 		super(def.location, POType.RECURSIVE, ctxt);
 		StringBuilder sb = new StringBuilder();
-
-		sb.append(def.measuredef);
+		int measureLexical = getLex(def.measureDef);
+		
+		sb.append(def.measureName);
 		sb.append("(");
 
 		for (POPatternListTypePair pltp: def.parameterPatterns)
@@ -86,12 +90,55 @@ public class RecursiveObligation extends ProofObligation
 		}
 
 		sb.append(")");
-		sb.append(def.measureLexical > 0 ? " LEX" + def.measureLexical + "> " : " > ");
-		sb.append(def.measuredef);
-		sb.append("(");
-		sb.append(apply.args);
-		sb.append(")");
+		
+		String lhs = sb.toString();
+		String rhs = def.measureName + "(" + apply.args + ")";
 
-		value = ctxt.getObligation(sb.toString());
+		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
+	}
+	
+	private int getLex(POExplicitFunctionDefinition mdef)
+	{
+		TCFunctionType ftype = (TCFunctionType) mdef.getType();
+		
+		if (ftype.result instanceof TCProductType)
+		{
+			TCProductType type = (TCProductType)ftype.result;
+			return type.types.size();
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	private String greater(int lexical, String lhs, String rhs)
+	{
+		if (lexical > 0)
+		{
+			StringBuilder sb = new StringBuilder();
+			
+			sb.append("(let lhs = ");
+			sb.append(lhs);
+			sb.append(", rhs = ");
+			sb.append(rhs);
+			sb.append(" in ");
+			
+			String kw = "if";
+			
+			for (int i=1; i < lexical; i++)
+			{
+				sb.append(String.format("%s lhs.#%d <> rhs.#%d then lhs.#%d > rhs.#%d ", kw, i, i, i, i)); 
+				kw = "elseif";
+			}
+			
+			sb.append(String.format("else lhs.#%d > rhs.#%d)", lexical, lexical));
+			
+			return sb.toString();
+		}
+		else
+		{
+			return lhs + " > " + rhs;
+		}
 	}
 }

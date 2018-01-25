@@ -111,7 +111,7 @@ public class INTrapStatement extends INStatement
     				}
     				else
     				{
-    					abort(4050, "Value " + exval + " is not in set bind", ctxt);
+    					throw e;
     				}
     			}
     			else if (patternBind.bind instanceof INSeqBind)
@@ -127,7 +127,7 @@ public class INTrapStatement extends INStatement
     				}
     				else
     				{
-    					abort(4050, "Value " + exval + " is not in seq bind", ctxt);
+    					throw e;
     				}
     			}
     			else
@@ -141,7 +141,7 @@ public class INTrapStatement extends INStatement
 			}
 			catch (ValueException ve)
 			{
-				abort(ve);
+				throw e;
 			}
 			catch (PatternMatchException pe)
 			{
