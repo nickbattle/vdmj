@@ -46,6 +46,7 @@ import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.Value;
 
 public class Delegate implements Serializable
@@ -123,6 +124,8 @@ public class Delegate implements Serializable
 			{
 				if (d.name.getName().equals(mname))
 				{
+					plist = null;
+					
     	 			if (d.isOperation())
     	 			{
     	 				if (d instanceof INExplicitOperationDefinition)
@@ -135,8 +138,6 @@ public class Delegate implements Serializable
     	 					INImplicitOperationDefinition e = (INImplicitOperationDefinition)d;
     	 					plist = e.getParamPatternList();
     	 				}
-
-    	 				break;
     	 			}
     	 			else if (d.isFunction())
     	 			{
@@ -150,7 +151,10 @@ public class Delegate implements Serializable
     	 					INImplicitFunctionDefinition e = (INImplicitFunctionDefinition)d;
     	 					plist = e.getParamPatternList().get(0);
     	 				}
-
+    	 			}
+    	 			
+    	 			if (toTitle(mname, plist).equals(title))
+    	 			{
     	 				break;
     	 			}
 				}
@@ -266,5 +270,10 @@ public class Delegate implements Serializable
 		}
 
 		out.defaultWriteObject();
+	}
+
+	private String toTitle(String mname, INPatternList paramPatterns)
+	{
+		return mname + Utils.listToString("(", paramPatterns, ", ", ")");
 	}
 }
