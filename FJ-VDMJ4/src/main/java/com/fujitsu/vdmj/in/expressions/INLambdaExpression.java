@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.patterns.INPatternList;
+import com.fujitsu.vdmj.in.types.Instantiate;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -63,8 +64,9 @@ public class INLambdaExpression extends INExpression
 		// context (but without the context chain).
 
 		Context free = ctxt.getVisibleVariables();
+		TCFunctionType ftype = (TCFunctionType) Instantiate.instantiate(type, ctxt, ctxt);
 
-		return new FunctionValue(location, "lambda", type, paramPatterns, expression, free);
+		return new FunctionValue(location, "lambda", ftype, paramPatterns, expression, free);
 	}
 
 	@Override
