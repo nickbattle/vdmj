@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -56,6 +57,11 @@ public class TCTailExpression extends TCUnaryExpression
 		{
 			report(3179, "Argument to 'tl' is not a sequence");
 			return new TCSeqType(location, new TCUnknownType(location));
+		}
+		else if (etype instanceof TCSeq1Type)
+		{
+			TCSeq1Type s = (TCSeq1Type)etype;
+			etype = new TCSeqType(s.location, s.seqof);
 		}
 
 		return etype;
