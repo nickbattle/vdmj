@@ -69,13 +69,13 @@ public class TCFuncInstantiationExpression extends TCExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		// If there are no type qualifiers passed because the TCly function value
+		// If there are no type qualifiers passed because the poly function value
 		// is being accessed alone (not applied). In this case, the null qualifier
 		// will cause TCVariableExpression to search for anything that matches the
 		// name alone. If there is precisely one, it is selected; if there are
 		// several, this is an ambiguity error.
 		//
-		// Note that a TCly function is hard to identify from the actual types
+		// Note that a poly function is hard to identify from the actual types
 		// passed here because the number of parameters may not equal the number
 		// of type parameters.
 

@@ -109,12 +109,12 @@ public class TCVariableExpression extends TCExpression
     		{
     			// We may be looking for a bare function/op "x", when in fact
     			// there is one with a qualified name "x(args)". So we check
-    			// the TCssible matches - if there is precisely one, we pick it,
+    			// the possible matches - if there is precisely one, we pick it,
     			// else we raise an ambiguity error.
 
-				for (TCDefinition TCssible: env.findMatches(name))
+				for (TCDefinition possible: env.findMatches(name))
 				{
-					if (TCssible.isFunctionOrOperation())
+					if (possible.isFunctionOrOperation())
 					{
 						if (vardef != null)
 						{
@@ -123,11 +123,11 @@ public class TCVariableExpression extends TCExpression
 							break;
 						}
 
-						vardef = TCssible;
+						vardef = possible;
 
 						// Set the qualifier so that it will find it at runtime.
 
-						TCType pt = TCssible.getType();
+						TCType pt = possible.getType();
 
 						if (pt instanceof TCFunctionType)
 						{
@@ -177,7 +177,7 @@ public class TCVariableExpression extends TCExpression
 			result = result.typeResolve(env, null);
 			
 			// If a constraint is passed in, we can raise an error if it is
-			// not TCssible for the type to match the constraint (rather than
+			// not possible for the type to match the constraint (rather than
 			// certain, as checkConstraint would).
 			
 			return possibleConstraint(constraint, result);
