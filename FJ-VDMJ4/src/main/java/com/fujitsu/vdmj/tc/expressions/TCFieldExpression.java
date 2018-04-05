@@ -126,11 +126,11 @@ public class TCFieldExpression extends TCExpression
 			{
 				// We might be selecting a bare function or operation, without
 				// applying it (ie. no qualifiers). In this case, if there is
-				// precisely one TCssibility, we choose it.
+				// precisely one possibility, we choose it.
 
-				for (TCDefinition TCssible: env.findMatches(memberName))
+				for (TCDefinition possible: env.findMatches(memberName))
 				{
-					if (TCssible.isFunctionOrOperation())
+					if (possible.isFunctionOrOperation())
 					{
 						if (fdef != null)
 						{
@@ -139,7 +139,7 @@ public class TCFieldExpression extends TCExpression
 						}
 						else
 						{
-							fdef = TCssible;
+							fdef = possible;
 						}
 					}
 				}

@@ -136,7 +136,7 @@ public abstract class TCExpression extends TCNode implements Serializable
 
 	/**
 	 * Check that a type possibly meets a constraint. This is used in various value types to
-	 * verify that a constraining type could TCssibly met (see typeCheck methods).
+	 * verify that a constraining type could possibly met (see typeCheck methods).
 	 */
 	protected TCType possibleConstraint(TCType constraint, TCType actual)
 	{

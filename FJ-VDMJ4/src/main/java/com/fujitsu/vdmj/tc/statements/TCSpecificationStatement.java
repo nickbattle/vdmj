@@ -45,13 +45,13 @@ public class TCSpecificationStatement extends TCStatement
 
 	public TCSpecificationStatement(LexLocation location,
 		TCExternalClauseList externals, TCExpression precondition,
-		TCExpression TCstcondition, TCErrorCaseList errors)
+		TCExpression postcondition, TCErrorCaseList errors)
 	{
 		super(location);
 
 		this.externals = externals;
 		this.precondition = precondition;
-		this.postcondition = TCstcondition;
+		this.postcondition = postcondition;
 		this.errors = errors;
 	}
 

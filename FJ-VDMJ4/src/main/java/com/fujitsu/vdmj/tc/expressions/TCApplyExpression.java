@@ -210,7 +210,7 @@ public class TCApplyExpression extends TCExpression
 		}
 
 		// If a constraint is passed in, we can raise an error if it is
-		// not TCssible for the type to match the constraint (rather than
+		// not possible for the type to match the constraint (rather than
 		// certain, as checkConstraint would).
 		
 		return possibleConstraint(constraint, results.getType(location));
@@ -290,7 +290,7 @@ public class TCApplyExpression extends TCExpression
 				
 				if (fat.instantiated != null && !fat.instantiated)
 				{
-					// Cannot pass uninstantiated TClymorphic function arguments
+					// Cannot pass uninstantiated polymorphic function arguments
 					args.get(i-1).concern(isSimple, 3354, "Function argument must be instantiated");
 				}
 			}
