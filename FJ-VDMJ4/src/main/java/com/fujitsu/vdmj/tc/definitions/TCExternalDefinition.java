@@ -56,7 +56,7 @@ public class TCExternalDefinition extends TCDefinition
 			return (sought.equals(oldname)) ? this : null;
 		}
 
-		return (sought.equals(state.name)) ? this : null;
+		return state.findName(sought, scope) != null ? this : null;	// (sought.equals(state.name)) ? this : null;
 	}
 
 	@Override
