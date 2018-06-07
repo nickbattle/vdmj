@@ -864,6 +864,10 @@ public class ExpressionReader extends SyntaxReader
 				ASTExpression exp = readExpression();
 				checkFor(Token.KET, 2124, "Expecting ')'");
 				return exp;
+				
+			case AT:
+				nextToken();
+				return readAnnotatedExpression();
 
 			case SET_OPEN:
 				nextToken();
@@ -943,6 +947,27 @@ public class ExpressionReader extends SyntaxReader
 				throwMessage(2034, "Unexpected token in expression");
 				return null;
 		}
+	}
+
+	private ASTExpression readAnnotatedExpression() throws LexException, ParserException
+	{
+		LexIdentifierToken name = readIdToken("Expecting @Annotation name");
+		checkFor(Token.BRA, 2206, "Expecting '(' after annotation name");
+		ASTExpressionList args = new ASTExpressionList();
+		ExpressionReader er = getExpressionReader();
+	
+		if (lastToken().isNot(Token.KET))
+		{
+			args.add(er.readExpression());
+	
+			while (ignore(Token.COMMA))
+			{
+				args.add(er.readExpression());
+			}
+		}
+	
+		checkFor(Token.KET, 2124, "Expecting ')' after args");
+		return new ASTAnnotatedExpression(name.location, name, args, readConnectiveExpression());
 	}
 
 	private ASTExpression readTimeExpression(LexLocation location) throws LexException

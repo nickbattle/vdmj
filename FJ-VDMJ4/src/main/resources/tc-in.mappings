@@ -162,6 +162,8 @@ map TCUnaryMinusExpression{location, exp} to INUnaryMinusExpression(location, ex
 map TCUnaryPlusExpression{location, exp} to INUnaryPlusExpression(location, exp);
 map TCUndefinedExpression{location} to INUndefinedExpression(location);
 map TCVariableExpression{name} to INVariableExpression(name);
+map TCAnnotatedExpression{location, name, args, expression} to INAnnotatedExpression(location, name, args, expression);
+
 
 # lex
 unmapped com.fujitsu.vdmj.ast.lex.LexIntegerToken;
@@ -279,6 +281,8 @@ map TCTixeStmtAlternative{patternBind, statement} to INTixeStmtAlternative(patte
 map TCTixeStmtAlternativeList{} to INTixeStmtAlternativeList(this);
 map TCTrapStatement{location, patternBind, with, body} to INTrapStatement(location, patternBind, with, body);
 map TCWhileStatement{location, exp, statement} to INWhileStatement(location, exp, statement);
+map TCAnnotatedStatement{location, name, args, statement} to INAnnotatedStatement(location, name, args, statement);
+
 
 # traces
 package com.fujitsu.vdmj.tc.traces to com.fujitsu.vdmj.in.traces;

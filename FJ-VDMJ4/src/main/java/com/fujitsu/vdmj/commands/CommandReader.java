@@ -713,6 +713,7 @@ abstract public class CommandReader
 			isEnabled("Dynamic type checks", Settings.dynamictypechecks);
 			isEnabled("Pre/post/inv exceptions", Settings.exceptions);
 			isEnabled("Measure checks", Settings.measureChecks);
+			isEnabled("Annotations", Settings.annotations);
 		}
 		else
 		{
@@ -749,14 +750,18 @@ abstract public class CommandReader
 	    		{
 	    			Settings.measureChecks = setting;
 	    		}
+	    		else if (parts[1].equals("annotations"))
+	    		{
+	    			Settings.annotations = setting;
+	    		}
 				else
 				{
-					println("Usage: set [<pre|post|inv|dtc|exceptions|measures> <on|off>]");
+					println("Usage: set [<pre|post|inv|dtc|exceptions|measures|annotations> <on|off>]");
 				}
 			}
 			else
 			{
-				println("Usage: set [<pre|post|inv|dtc|exceptions|measures> <on|off>]");
+				println("Usage: set [<pre|post|inv|dtc|exceptions|measures|annotations> <on|off>]");
 			}
 		}
 

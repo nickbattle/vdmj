@@ -160,6 +160,8 @@ map ASTUnaryMinusExpression{location, exp} to TCUnaryMinusExpression(location, e
 map ASTUnaryPlusExpression{location, exp} to TCUnaryPlusExpression(location, exp);
 map ASTUndefinedExpression{location} to TCUndefinedExpression(location);
 map ASTVariableExpression{location, name, original} to TCVariableExpression(location, name, original);
+map ASTAnnotatedExpression{location, name, args, expression} to TCAnnotatedExpression(location, name, args, expression);
+
 
 # lex
 package com.fujitsu.vdmj.ast.lex to com.fujitsu.vdmj.tc.lex;
@@ -299,6 +301,7 @@ map ASTTixeStmtAlternative{patternBind, statement} to TCTixeStmtAlternative(patt
 map ASTTixeStmtAlternativeList{} to TCTixeStmtAlternativeList(this);
 map ASTTrapStatement{location, patternBind, with, body} to TCTrapStatement(location, patternBind, with, body);
 map ASTWhileStatement{location, exp, statement} to TCWhileStatement(location, exp, statement);
+map ASTAnnotatedStatement{location, name, args, statement} to TCAnnotatedStatement(location, name, args, statement);
 
 # traces
 package com.fujitsu.vdmj.ast.traces to com.fujitsu.vdmj.tc.traces;

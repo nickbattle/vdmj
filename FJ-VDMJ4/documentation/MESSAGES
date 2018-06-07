@@ -746,6 +746,8 @@ as the expected and actual values.
 3354, "Function argument must be instantiated"
 3355, "Cyclic dependency detected"
 3356, "Import of <kind> <name> is <actual kind>"
+3357, "Unknown annotation @<name>"
+3358, "@Trace argument must be an identifier"
 
 
 4000, "Cannot instantiate abstract class <class>"
@@ -916,6 +918,7 @@ as the expected and actual values.
 4170, "Cannot convert empty set to set1"
 4171, "Cannot convert <function> to <function>"
 4172, "Values cannot be compared: <first>, <second>"
+4173, "Unknown annotation @<name>"
 
 
 5000, "Definition <name> not used"

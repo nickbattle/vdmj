@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTPatternBind;
 import com.fujitsu.vdmj.ast.patterns.ASTPatternList;
 import com.fujitsu.vdmj.ast.statements.ASTAlwaysStatement;
+import com.fujitsu.vdmj.ast.statements.ASTAnnotatedStatement;
 import com.fujitsu.vdmj.ast.statements.ASTAssignmentStatement;
 import com.fujitsu.vdmj.ast.statements.ASTAssignmentStatementList;
 import com.fujitsu.vdmj.ast.statements.ASTAtomicStatement;
@@ -107,6 +108,10 @@ public class StatementReader extends SyntaxReader
 
 		switch (token.type)
 		{
+			case AT:
+				stmt = readAnnotatedStatement(location);
+				break;
+				
 			case LET:
 				stmt = readLetStatement(token);
 				break;
@@ -231,6 +236,28 @@ public class StatementReader extends SyntaxReader
 		}
 
 		return stmt;
+	}
+
+	private ASTStatement readAnnotatedStatement(LexLocation location) throws LexException, ParserException
+	{
+		nextToken();
+		LexIdentifierToken name = readIdToken("Expecting @Annotation name");
+		checkFor(Token.BRA, 2206, "Expecting '(' after annotation name");
+		ASTExpressionList args = new ASTExpressionList();
+		ExpressionReader er = getExpressionReader();
+
+		if (lastToken().isNot(Token.KET))
+		{
+			args.add(er.readExpression());
+
+			while (ignore(Token.COMMA))
+			{
+				args.add(er.readExpression());
+			}
+		}
+
+    	checkFor(Token.KET, 2124, "Expecting ')' after args");
+		return new ASTAnnotatedStatement(location, name, args, readStatement());
 	}
 
 	private ASTStatement readExitStatement(LexLocation token)

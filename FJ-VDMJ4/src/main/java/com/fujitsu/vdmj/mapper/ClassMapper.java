@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.mapper;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -559,6 +560,21 @@ public class ClassMapper
     				}
     			}
      		}
+		}
+		catch (InvocationTargetException e)
+		{
+			if (e.getCause() instanceof Exception)
+			{
+				throw (Exception)e.getCause();
+			}
+			else if (e.getTargetException() instanceof Exception)
+			{
+				throw (Exception)e.getTargetException();
+			}
+			else
+			{
+				throw e;
+			}
 		}
 		finally
 		{
