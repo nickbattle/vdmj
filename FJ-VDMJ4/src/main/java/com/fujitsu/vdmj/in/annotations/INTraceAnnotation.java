@@ -21,39 +21,40 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.ast.statements;
+package com.fujitsu.vdmj.in.annotations;
 
-import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
-import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
-import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.values.Value;
 
-public class ASTAnnotatedStatement extends ASTStatement
+public class INTraceAnnotation extends INAnnotation
 {
-	private static final long serialVersionUID = 1L;
-
-	public final LexIdentifierToken name;
-	
-	public final ASTExpressionList args;
-
-	public final ASTStatement statement;
-	
-	public ASTAnnotatedStatement(LexLocation location, LexIdentifierToken name, ASTExpressionList args, ASTStatement statement)
+	public INTraceAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
-		super(location);
-		this.name = name;
-		this.args = args;
-		this.statement = statement;
+		super(name, args);
 	}
-
+	
 	@Override
-	public String toString()
+	public void eval(Context ctxt)
 	{
-		return "@" + name + "(" + args + ") " + statement;
-	}
-
-	@Override
-	public String kind()
-	{
-		return "annotated statement";
+		if (Settings.annotations)
+		{
+			if (args.isEmpty())
+			{
+				Console.err.println("Trace: " + name.getLocation());
+			}
+			else
+			{
+				for (INExpression arg: args)
+				{
+					Value v = arg.eval(ctxt);
+					Console.err.println("Trace: " + name.getLocation() + ", " + arg + " = " + v);
+				}
+			}
+		}
 	}
 }

@@ -21,72 +21,38 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.expressions;
+package com.fujitsu.vdmj.in.annotations;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.values.Value;
 
 public class INAnnotatedExpression extends INExpression
 {
 	private static final long serialVersionUID = 1L;
-
-	public final TCIdentifierToken name;
 	
-	public final INExpressionList args;
+	public final INAnnotation annotation;
 
-	public final INExpression statement;
+	public final INExpression expression;
 	
-	public INAnnotatedExpression(LexLocation location, TCIdentifierToken name, INExpressionList args, INExpression statement)
+	public INAnnotatedExpression(LexLocation location, INAnnotation annotation, INExpression expression)
 	{
 		super(location);
-		this.name = name;
-		this.args = args;
-		this.statement = statement;
+		this.annotation = annotation;
+		this.expression = expression;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "@" + name + "(" + args + ") " + statement;
+		return annotation + " " + expression;
 	}
 
 	@Override
 	public Value eval(Context ctxt)
 	{
-		if (Settings.annotations)
-		{
-			if (name.getName().equals("Trace"))
-			{
-				execTrace(ctxt);
-			}
-			else
-			{
-				abort(4173, "Unknown annotation @" + name, ctxt);
-			}
-		}
-		
-		return statement.eval(ctxt);
-	}
-
-	private void execTrace(Context ctxt)
-	{
-		if (args.isEmpty())
-		{
-			Console.err.println("Trace: " + location);
-		}
-		else
-		{
-			for (INExpression arg: args)
-			{
-				Value v = arg.eval(ctxt);
-				Console.err.println("Trace: " + location + ", " + arg + " = " + v);
-			}
-		}
+		annotation.eval(ctxt);
+		return expression.eval(ctxt);
 	}
 }

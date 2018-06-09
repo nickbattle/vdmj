@@ -21,13 +21,10 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.expressions;
+package com.fujitsu.vdmj.tc.annotations;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -36,54 +33,28 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 public class TCAnnotatedExpression extends TCExpression
 {
 	private static final long serialVersionUID = 1L;
-
-	public final TCIdentifierToken name;
 	
-	public final TCExpressionList args;
+	public final TCAnnotation annotation;
 
 	public final TCExpression expression;
 	
-	public TCAnnotatedExpression(LexLocation location, TCIdentifierToken name, TCExpressionList args, TCExpression expression)
+	public TCAnnotatedExpression(LexLocation location, TCAnnotation annotation, TCExpression expression)
 	{
 		super(location);
-		this.name = name;
-		this.args = args;
+		this.annotation = annotation;
 		this.expression = expression;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "@" + name + "(" + args + ") " + expression;
+		return annotation + " " + expression;
 	}
 
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		if (name.getName().equals("Trace"))
-		{
-			checkTrace(env, scope);
-		}
-		else
-		{
-			name.report(3357, "Unknown annotation @" + name);
-		}
-		
+		annotation.typeCheck(env, scope);
 		return expression.typeCheck(env, qualifiers, scope, constraint);
-	}
-
-	private void checkTrace(Environment env, NameScope scope)
-	{
-		for (TCExpression arg: args)
-		{
-			if (!(arg instanceof TCVariableExpression))
-			{
-				arg.report(3358, "@Trace argument must be an identifier");
-			}
-			else
-			{
-				arg.typeCheck(env, null, scope, null);	// Just checks scope
-			}
-		}
 	}
 }

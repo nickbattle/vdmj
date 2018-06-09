@@ -21,13 +21,10 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.statements;
+package com.fujitsu.vdmj.tc.annotations;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -36,53 +33,27 @@ public class TCAnnotatedStatement extends TCStatement
 {
 	private static final long serialVersionUID = 1L;
 
-	public final TCIdentifierToken name;
-	
-	public final TCExpressionList args;
+	public final TCAnnotation annotation;
 
 	public final TCStatement statement;
 	
-	public TCAnnotatedStatement(LexLocation location, TCIdentifierToken name, TCExpressionList args, TCStatement statement)
+	public TCAnnotatedStatement(LexLocation location, TCAnnotation annotation, TCStatement statement)
 	{
 		super(location);
-		this.name = name;
-		this.args = args;
+		this.annotation = annotation;
 		this.statement = statement;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "@" + name + "(" + args + ") " + statement;
+		return annotation + " " + statement;
 	}
 
 	@Override
 	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
 	{
-		if (name.getName().equals("Trace"))
-		{
-			checkTrace(env, scope);
-		}
-		else
-		{
-			name.report(3357, "Unknown annotation @" + name);
-		}
-		
+		annotation.typeCheck(env, scope);
 		return statement.typeCheck(env, scope, constraint);
-	}
-
-	private void checkTrace(Environment env, NameScope scope)
-	{
-		for (TCExpression arg: args)
-		{
-			if (!(arg instanceof TCVariableExpression))
-			{
-				arg.report(3358, "@Trace argument must be an identifier");
-			}
-			else
-			{
-				arg.typeCheck(env, null, scope, null);	// Just checks scope
-			}
-		}
 	}
 }

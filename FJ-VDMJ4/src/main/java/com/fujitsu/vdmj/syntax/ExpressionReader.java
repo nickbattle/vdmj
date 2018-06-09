@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.syntax;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedExpression;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
 import com.fujitsu.vdmj.ast.expressions.*;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
@@ -967,7 +968,7 @@ public class ExpressionReader extends SyntaxReader
 		}
 	
 		checkFor(Token.KET, 2124, "Expecting ')' after args");
-		return new ASTAnnotatedExpression(name.location, name, args, readConnectiveExpression());
+		return new ASTAnnotatedExpression(name.location, makeAnnotation(name, args), readConnectiveExpression());
 	}
 
 	private ASTExpression readTimeExpression(LexLocation location) throws LexException

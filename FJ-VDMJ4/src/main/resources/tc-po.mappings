@@ -162,7 +162,13 @@ map TCUnaryMinusExpression{location, exp} to POUnaryMinusExpression(location, ex
 map TCUnaryPlusExpression{location, exp} to POUnaryPlusExpression(location, exp);
 map TCUndefinedExpression{location} to POUndefinedExpression(location);
 map TCVariableExpression{name, vardef} to POVariableExpression(name, vardef);
-map TCAnnotatedExpression{location, name, args, expression} to POAnnotatedExpression(location, name, args, expression);
+
+# annotations
+package com.fujitsu.vdmj.tc.annotations to com.fujitsu.vdmj.po.annotations;
+map TCAnnotatedExpression{location, annotation, expression} to POAnnotatedExpression(location, annotation, expression);
+map TCAnnotatedStatement{location, annotation, statement} to POAnnotatedStatement(location, annotation, statement);
+map TCAnnotation{} to POAnnotation();
+map TCTraceAnnotation{name, args} to POTraceAnnotation(name, args);
 
 # lex
 unmapped com.fujitsu.vdmj.ast.lex.LexIntegerToken;
@@ -280,7 +286,6 @@ map TCTixeStmtAlternative{patternBind, statement} to POTixeStmtAlternative(patte
 map TCTixeStmtAlternativeList{} to POTixeStmtAlternativeList(this);
 map TCTrapStatement{location, patternBind, with, body} to POTrapStatement(location, patternBind, with, body);
 map TCWhileStatement{location, exp, statement} to POWhileStatement(location, exp, statement);
-map TCAnnotatedStatement{location, name, args, statement} to POAnnotatedStatement(location, name, args, statement);
 
 # traces
 package com.fujitsu.vdmj.tc.traces to com.fujitsu.vdmj.po.traces;

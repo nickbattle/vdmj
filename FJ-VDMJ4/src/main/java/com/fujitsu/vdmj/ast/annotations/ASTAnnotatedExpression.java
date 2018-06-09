@@ -21,47 +21,35 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.statements;
+package com.fujitsu.vdmj.ast.annotations;
 
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class POAnnotatedStatement extends POStatement
+public class ASTAnnotatedExpression extends ASTExpression
 {
 	private static final long serialVersionUID = 1L;
 
-	public final TCIdentifierToken name;
-	
-	public final POExpressionList args;
+	public final ASTAnnotation annotation;
 
-	public final POStatement statement;
+	public final ASTExpression expression;
 	
-	public POAnnotatedStatement(LexLocation location, TCIdentifierToken name, POExpressionList args, POStatement statement)
+	public ASTAnnotatedExpression(LexLocation location, ASTAnnotation annotation, ASTExpression expression)
 	{
 		super(location);
-		this.name = name;
-		this.args = args;
-		this.statement = statement;
+		this.annotation = annotation;
+		this.expression = expression;
 	}
 
 	@Override
 	public String toString()
 	{
-		return statement.toString();	// Note: exclude @Name
-	}
-	
-	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
-	{
-		return statement.getProofObligations(ctxt);
+		return annotation + " " + expression;
 	}
 
 	@Override
-	public boolean hasSideEffects()
+	public String kind()
 	{
-		return statement.hasSideEffects();
+		return "annotated expression";
 	}
 }

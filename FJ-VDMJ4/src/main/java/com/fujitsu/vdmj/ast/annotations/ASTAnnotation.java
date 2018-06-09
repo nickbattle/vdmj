@@ -21,41 +21,26 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.expressions;
+package com.fujitsu.vdmj.ast.annotations;
 
-import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
-public class POAnnotatedExpression extends POExpression
+public abstract class ASTAnnotation
 {
-	private static final long serialVersionUID = 1L;
-
-	public final TCIdentifierToken name;
+	public final LexIdentifierToken name;
 	
-	public final POExpressionList args;
+	public final ASTExpressionList args;
 
-	public final POExpression expression;
-	
-	public POAnnotatedExpression(LexLocation location, TCIdentifierToken name, POExpressionList args, POExpression expression)
+	public ASTAnnotation(LexIdentifierToken name, ASTExpressionList args)
 	{
-		super(location);
 		this.name = name;
 		this.args = args;
-		this.expression = expression;
 	}
 
 	@Override
 	public String toString()
 	{
-		return expression.toString();	// Note: exclude @Name
-	}
-	
-	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
-	{
-		return expression.getProofObligations(ctxt);
+		return "@" + name + "(" + args + ")";
 	}
 }

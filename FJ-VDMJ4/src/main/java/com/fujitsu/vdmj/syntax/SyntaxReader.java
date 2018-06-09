@@ -24,10 +24,13 @@
 package com.fujitsu.vdmj.syntax;
 
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
+import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
@@ -689,5 +692,21 @@ public abstract class SyntaxReader
 	public String toString()
 	{
 		return reader.toString();
+	}
+
+	protected ASTAnnotation makeAnnotation(LexIdentifierToken name, ASTExpressionList args)
+		throws ParserException, LexException
+	{
+		try
+		{
+			Class<?> clazz = Class.forName("com.fujitsu.vdmj.ast.annotations.AST" + name + "Annotation");
+			Constructor<?> ctor = clazz.getConstructor(LexIdentifierToken.class, ASTExpressionList.class);
+			return (ASTAnnotation) ctor.newInstance(name, args);
+		}
+		catch (Exception e)
+		{
+			throwMessage(9999, "Failed to instantiate AST" + name + "Annotation");
+			return null;
+		}
 	}
 }

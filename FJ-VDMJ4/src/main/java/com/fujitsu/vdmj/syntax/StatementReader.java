@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.syntax;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedStatement;
 import com.fujitsu.vdmj.ast.definitions.ASTAssignmentDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
@@ -38,7 +39,6 @@ import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTPatternBind;
 import com.fujitsu.vdmj.ast.patterns.ASTPatternList;
 import com.fujitsu.vdmj.ast.statements.ASTAlwaysStatement;
-import com.fujitsu.vdmj.ast.statements.ASTAnnotatedStatement;
 import com.fujitsu.vdmj.ast.statements.ASTAssignmentStatement;
 import com.fujitsu.vdmj.ast.statements.ASTAssignmentStatementList;
 import com.fujitsu.vdmj.ast.statements.ASTAtomicStatement;
@@ -257,7 +257,7 @@ public class StatementReader extends SyntaxReader
 		}
 
     	checkFor(Token.KET, 2124, "Expecting ')' after args");
-		return new ASTAnnotatedStatement(location, name, args, readStatement());
+		return new ASTAnnotatedStatement(location, makeAnnotation(name, args), readStatement());
 	}
 
 	private ASTStatement readExitStatement(LexLocation token)
