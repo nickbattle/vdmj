@@ -24,9 +24,12 @@
 package com.fujitsu.vdmj.in.annotations;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.Value;
+import com.fujitsu.vdmj.values.ValueList;
 
 public class INAnnotatedExpression extends INExpression
 {
@@ -52,7 +55,28 @@ public class INAnnotatedExpression extends INExpression
 	@Override
 	public Value eval(Context ctxt)
 	{
+		breakpoint.check(location, ctxt);
+
 		annotation.eval(ctxt);
 		return expression.eval(ctxt);
+	}
+	public INExpression findExpression(int lineno)
+	{
+		return (location.startLine == lineno) ? this : null;
+	}
+
+	public ValueList getValues(Context ctxt)
+	{
+		return expression.getValues(ctxt);
+	}
+	
+	public TCNameList getOldNames()
+	{
+		return expression.getOldNames();
+	}
+
+	public INExpressionList getSubExpressions()
+	{
+		return expression.getSubExpressions();
 	}
 }

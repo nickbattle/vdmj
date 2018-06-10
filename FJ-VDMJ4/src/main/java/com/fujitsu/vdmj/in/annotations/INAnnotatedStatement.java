@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
+import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
@@ -52,7 +53,19 @@ public class INAnnotatedStatement extends INStatement
 	@Override
 	public Value eval(Context ctxt)
 	{
+		breakpoint.check(location, ctxt);
+
 		annotation.eval(ctxt);
 		return statement.eval(ctxt);
+	}
+	
+	public INStatement findStatement(int lineno)
+	{
+		return statement.findStatement(lineno);
+	}
+
+	public INExpression findExpression(int lineno)
+	{
+		return statement.findExpression(lineno);
 	}
 }

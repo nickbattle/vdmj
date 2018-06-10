@@ -55,4 +55,9 @@ public class POAnnotatedExpression extends POExpression
 		annotation.pog();
 		return expression.getProofObligations(ctxt);
 	}
+
+	public String getPreName()
+	{
+		return expression.getPreName();
+	}
 }
