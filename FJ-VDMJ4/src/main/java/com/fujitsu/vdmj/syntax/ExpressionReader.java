@@ -953,21 +953,22 @@ public class ExpressionReader extends SyntaxReader
 	private ASTExpression readAnnotatedExpression() throws LexException, ParserException
 	{
 		LexIdentifierToken name = readIdToken("Expecting @Annotation name");
-		checkFor(Token.BRA, 2206, "Expecting '(' after annotation name");
 		ASTExpressionList args = new ASTExpressionList();
-		ExpressionReader er = getExpressionReader();
-	
-		if (lastToken().isNot(Token.KET))
+		
+		if (lastToken().is(Token.BRA))
 		{
+			ExpressionReader er = getExpressionReader();
+			nextToken();
 			args.add(er.readExpression());
 	
 			while (ignore(Token.COMMA))
 			{
 				args.add(er.readExpression());
 			}
-		}
 	
-		checkFor(Token.KET, 2124, "Expecting ')' after args");
+			checkFor(Token.KET, 2124, "Expecting ')' after args");
+		}
+
 		return new ASTAnnotatedExpression(name.location, makeAnnotation(name, args), readConnectiveExpression());
 	}
 

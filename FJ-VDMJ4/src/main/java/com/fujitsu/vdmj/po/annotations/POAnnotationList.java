@@ -21,31 +21,32 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.annotations;
+package com.fujitsu.vdmj.po.annotations;
 
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.po.POMappedList;
+import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 
-public abstract class TCAnnotation
+public class POAnnotationList extends POMappedList<TCAnnotation, POAnnotation>
 {
-	public final TCIdentifierToken name;
+	private static final long serialVersionUID = 1L;
 	
-	public final TCExpressionList args;
-
-	public TCAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public POAnnotationList()
 	{
-		this.name = name;
-		this.args = args;
+		super();
+	}
+	
+	public POAnnotationList(TCAnnotationList from) throws Exception
+	{
+		super(from);
 	}
 
-	@Override
-	public String toString()
+	public void pog(POContextStack ctxt)
 	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
+		for (POAnnotation annotation: this)
+		{
+			annotation.pog(ctxt);
+		}
 	}
-
-	public abstract void typeCheck(TCDefinition def, Environment env, NameScope scope);
 }

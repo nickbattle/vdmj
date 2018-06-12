@@ -16,11 +16,11 @@ map TCCPUClassDefinition{classtype, definitions, invariant, hasConstructors} to 
 map TCDefinition{} to PODefinition();
 map TCDefinitionSet{} to PODefinitionSet();
 map TCEqualsDefinition{location, pattern, typebind, bind, test, expType, defType, defs} to POEqualsDefinition(location, pattern, typebind, bind, test, expType, defType, defs);
-map TCExplicitFunctionDefinition{name, typeParams, type, paramPatternList, body, precondition, postcondition, isUndefined, expectedResult, actualResult, predef, postdef, paramDefinitionList, recursive, measureDef, measureName} to POExplicitFunctionDefinition(name, typeParams, type, paramPatternList, body, precondition, postcondition, isUndefined, expectedResult, actualResult, predef, postdef, paramDefinitionList, recursive, measureDef, measureName);
-map TCExplicitOperationDefinition{name, type, parameterPatterns, paramDefinitions, actualResult, precondition, postcondition, body, isConstructor, predef, postdef, state} to POExplicitOperationDefinition(name, type, parameterPatterns, precondition, postcondition, body, predef, postdef, paramDefinitions, state, actualResult, isConstructor);
+map TCExplicitFunctionDefinition{annotations, name, typeParams, type, paramPatternList, body, precondition, postcondition, isUndefined, expectedResult, actualResult, predef, postdef, paramDefinitionList, recursive, measureDef, measureName} to POExplicitFunctionDefinition(annotations, name, typeParams, type, paramPatternList, body, precondition, postcondition, isUndefined, expectedResult, actualResult, predef, postdef, paramDefinitionList, recursive, measureDef, measureName);
+map TCExplicitOperationDefinition{annotations, name, type, parameterPatterns, paramDefinitions, actualResult, precondition, postcondition, body, isConstructor, predef, postdef, state} to POExplicitOperationDefinition(annotations, name, type, parameterPatterns, precondition, postcondition, body, predef, postdef, paramDefinitions, state, actualResult, isConstructor);
 map TCExternalDefinition{state, readOnly} to POExternalDefinition(state, readOnly);
-map TCImplicitFunctionDefinition{name, typeParams, parameterPatterns, type, result, body, precondition, postcondition, predef, postdef, recursive, isUndefined, actualResult, measureDef, measureName} to POImplicitFunctionDefinition(name, typeParams, parameterPatterns, result, body, precondition, postcondition, type, predef, postdef, recursive, isUndefined, actualResult, measureDef, measureName);
-map TCImplicitOperationDefinition{name, parameterPatterns, result, body, externals, precondition, postcondition, errors, type, isConstructor, predef, postdef, state, actualResult} to POImplicitOperationDefinition(name, parameterPatterns, result, body, externals, precondition, postcondition, errors, type, predef, postdef, actualResult, state, isConstructor);
+map TCImplicitFunctionDefinition{annotations, name, typeParams, parameterPatterns, type, result, body, precondition, postcondition, predef, postdef, recursive, isUndefined, actualResult, measureDef, measureName} to POImplicitFunctionDefinition(annotations, name, typeParams, parameterPatterns, result, body, precondition, postcondition, type, predef, postdef, recursive, isUndefined, actualResult, measureDef, measureName);
+map TCImplicitOperationDefinition{annotations, name, parameterPatterns, result, body, externals, precondition, postcondition, errors, type, isConstructor, predef, postdef, state, actualResult} to POImplicitOperationDefinition(annotations, name, parameterPatterns, result, body, externals, precondition, postcondition, errors, type, predef, postdef, actualResult, state, isConstructor);
 map TCImportedDefinition{location, def} to POImportedDefinition(location, def);
 map TCInheritedDefinition{name, superdef} to POInheritedDefinition(name, superdef);
 map TCInstanceVariableDefinition{name, type, expression, expType} to POInstanceVariableDefinition(name, type, expression, expType);
@@ -33,8 +33,8 @@ map TCRenamedDefinition{name, def} to PORenamedDefinition(name, def);
 map TCStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression, recordType} to POStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression, recordType);
 map TCSystemDefinition{name, classtype, definitions} to POSystemDefinition(name, classtype, definitions);
 map TCThreadDefinition{statement} to POThreadDefinition(statement);
-map TCTypeDefinition{name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression} to POTypeDefinition(name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression);
-map TCValueDefinition{pattern, type, exp, expType} to POValueDefinition(pattern, type, exp, expType);
+map TCTypeDefinition{annotations, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression} to POTypeDefinition(annotations, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression);
+map TCValueDefinition{annotations, pattern, type, exp, expType} to POValueDefinition(annotations, pattern, type, exp, expType);
 map TCUntypedDefinition{location, name} to POUntypedDefinition(location, name);
 map TCQualifiedDefinition{def, type} to POQualifiedDefinition(def, type);
 
@@ -168,7 +168,9 @@ package com.fujitsu.vdmj.tc.annotations to com.fujitsu.vdmj.po.annotations;
 map TCAnnotatedExpression{location, annotation, expression} to POAnnotatedExpression(location, annotation, expression);
 map TCAnnotatedStatement{location, annotation, statement} to POAnnotatedStatement(location, annotation, statement);
 map TCAnnotation{} to POAnnotation();
+map TCAnnotationList{} to POAnnotationList(this);
 map TCTraceAnnotation{name, args} to POTraceAnnotation(name, args);
+map TCOverrideAnnotation{name, args} to POOverrideAnnotation(name, args);
 
 # lex
 unmapped com.fujitsu.vdmj.ast.lex.LexIntegerToken;

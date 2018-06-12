@@ -42,7 +42,7 @@ public abstract class INAnnotation
 	@Override
 	public String toString()
 	{
-		return "@" + name + "(" + args + ")";
+		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
 	}
 
 	public abstract void eval(Context ctxt);

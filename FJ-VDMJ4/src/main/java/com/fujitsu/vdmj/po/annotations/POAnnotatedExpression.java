@@ -52,7 +52,7 @@ public class POAnnotatedExpression extends POExpression
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		annotation.pog();
+		annotation.pog(ctxt);
 		return expression.getProofObligations(ctxt);
 	}
 

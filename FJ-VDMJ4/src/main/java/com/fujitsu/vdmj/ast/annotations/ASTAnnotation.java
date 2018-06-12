@@ -41,6 +41,6 @@ public abstract class ASTAnnotation
 	@Override
 	public String toString()
 	{
-		return "@" + name + "(" + args + ")";
+		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
 	}
 }

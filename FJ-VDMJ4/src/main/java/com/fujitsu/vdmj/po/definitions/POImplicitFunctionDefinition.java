@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.definitions;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
@@ -70,7 +71,8 @@ public class POImplicitFunctionDefinition extends PODefinition
 	public final POExplicitFunctionDefinition measureDef;
 	public final TCNameToken measureName;
 
-	public POImplicitFunctionDefinition(TCNameToken name,
+	public POImplicitFunctionDefinition(POAnnotationList annotations,
+		TCNameToken name,
 		TCNameList typeParams,
 		POPatternListTypePairList parameterPatterns,
 		POPatternTypePair result,
@@ -88,6 +90,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 	{
 		super(name.getLocation(), name);
 
+		this.annotations = annotations;
 		this.typeParams = typeParams;
 		this.parameterPatterns = parameterPatterns;
 		this.result = result;
@@ -130,6 +133,8 @@ public class POImplicitFunctionDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
+		if (annotations != null) annotations.pog(ctxt);
+
 		ProofObligationList obligations = new ProofObligationList();
 		TCNameList pids = new TCNameList();
 		boolean matchNeeded = false;

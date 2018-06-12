@@ -23,29 +23,32 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
+import com.fujitsu.vdmj.tc.TCMappedList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public abstract class TCAnnotation
+public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 {
-	public final TCIdentifierToken name;
+	private static final long serialVersionUID = 1L;
 	
-	public final TCExpressionList args;
-
-	public TCAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public TCAnnotationList()
 	{
-		this.name = name;
-		this.args = args;
+		super();
 	}
-
-	@Override
-	public String toString()
+	
+	public TCAnnotationList(ASTAnnotationList from) throws Exception
 	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
+		super(from);
 	}
-
-	public abstract void typeCheck(TCDefinition def, Environment env, NameScope scope);
+	
+	public void typeCheck(TCDefinition def, Environment env, NameScope scope)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.typeCheck(def, env, scope);
+		}
+	}
 }

@@ -21,31 +21,15 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.annotations;
+package com.fujitsu.vdmj.ast.annotations;
 
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
-public abstract class TCAnnotation
+public class ASTOverrideAnnotation extends ASTAnnotation
 {
-	public final TCIdentifierToken name;
-	
-	public final TCExpressionList args;
-
-	public TCAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public ASTOverrideAnnotation(LexIdentifierToken name, ASTExpressionList args)
 	{
-		this.name = name;
-		this.args = args;
+		super(name, args);
 	}
-
-	@Override
-	public String toString()
-	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
-	}
-
-	public abstract void typeCheck(TCDefinition def, Environment env, NameScope scope);
 }

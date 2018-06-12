@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.annotations;
 
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 public abstract class POAnnotation
@@ -41,8 +42,8 @@ public abstract class POAnnotation
 	@Override
 	public String toString()
 	{
-		return "@" + name + "(" + args + ")";
+		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
 	}
 
-	public abstract void pog();
+	public abstract void pog(POContextStack ctxt);
 }

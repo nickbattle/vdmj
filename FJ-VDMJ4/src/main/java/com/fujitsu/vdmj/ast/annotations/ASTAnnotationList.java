@@ -21,31 +21,11 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.annotations;
+package com.fujitsu.vdmj.ast.annotations;
 
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
+import java.util.Vector;
 
-public abstract class TCAnnotation
+public class ASTAnnotationList extends Vector<ASTAnnotation>
 {
-	public final TCIdentifierToken name;
-	
-	public final TCExpressionList args;
-
-	public TCAnnotation(TCIdentifierToken name, TCExpressionList args)
-	{
-		this.name = name;
-		this.args = args;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
-	}
-
-	public abstract void typeCheck(TCDefinition def, Environment env, NameScope scope);
+	private static final long serialVersionUID = 1L;
 }

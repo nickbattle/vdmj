@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -72,6 +73,9 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	
 	/** A pointer to the enclosing class definition, if any. */
 	public TCClassDefinition classDefinition = null;
+	
+	/** A list of annotations, if any */
+	public TCAnnotationList annotations = null;
 
 	/**
 	 * Create a new definition of a particular name and location.

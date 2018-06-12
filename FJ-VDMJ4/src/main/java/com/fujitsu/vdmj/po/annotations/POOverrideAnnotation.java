@@ -21,31 +21,22 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.annotations;
+package com.fujitsu.vdmj.po.annotations;
 
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
 
-public abstract class TCAnnotation
+public class POOverrideAnnotation extends POAnnotation
 {
-	public final TCIdentifierToken name;
-	
-	public final TCExpressionList args;
-
-	public TCAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public POOverrideAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
-		this.name = name;
-		this.args = args;
+		super(name, args);
 	}
 
 	@Override
-	public String toString()
+	public void pog(POContextStack ctxt)
 	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
+		// Nothing for @Override
 	}
-
-	public abstract void typeCheck(TCDefinition def, Environment env, NameScope scope);
 }

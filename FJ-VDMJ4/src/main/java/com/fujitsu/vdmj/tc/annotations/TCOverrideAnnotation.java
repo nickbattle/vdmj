@@ -23,29 +23,55 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public abstract class TCAnnotation
+public class TCOverrideAnnotation extends TCAnnotation
 {
-	public final TCIdentifierToken name;
-	
-	public final TCExpressionList args;
-
-	public TCAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public TCOverrideAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
-		this.name = name;
-		this.args = args;
+		super(name, args);
 	}
 
 	@Override
-	public String toString()
+	public void typeCheck(TCDefinition def, Environment env, NameScope scope)
 	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
+		if (Settings.dialect == Dialect.VDM_SL)
+		{
+			name.report(9999, "@Override not available in VDM-SL");
+		}
+		
+		if (!args.isEmpty())
+		{
+			name.report(9999, "@Override has no arguments");
+		}
+		
+		if (!def.isFunctionOrOperation())
+		{
+			name.report(9999, "@Override only applies to functions or operations");
+		}
+		else if (def.classDefinition != null)
+		{
+			boolean found = false;
+			
+			for (TCDefinition indef: def.classDefinition.localInheritedDefinitions)
+			{
+				if (indef.name.equals(def.name))
+				{
+					found = true;
+					break;
+				}
+			}
+			
+			if (!found)
+			{
+				name.report(9999, "Definition does not @Override superclass");
+			}
+		}
 	}
-
-	public abstract void typeCheck(TCDefinition def, Environment env, NameScope scope);
 }

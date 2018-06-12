@@ -15,14 +15,14 @@ map ASTCPUClassDefinition{name, supernames, definitions} to TCCPUClassDefinition
 map ASTDefinition{} to TCDefinition();
 map ASTDefinitionSet{} to TCDefinitionSet();
 map ASTEqualsDefinition{location, pattern, typebind, bind, test} to TCEqualsDefinition(location, pattern, typebind, bind, test);
-map ASTExplicitFunctionDefinition{accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measure} to TCExplicitFunctionDefinition(accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measure);
-map ASTExplicitOperationDefinition{accessSpecifier, name, type, parameterPatterns, precondition, postcondition, body} to TCExplicitOperationDefinition(accessSpecifier, name, type, parameterPatterns, precondition, postcondition, body);
+map ASTExplicitFunctionDefinition{annotations, accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measure} to TCExplicitFunctionDefinition(annotations, accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measure);
+map ASTExplicitOperationDefinition{annotations, accessSpecifier, name, type, parameterPatterns, precondition, postcondition, body} to TCExplicitOperationDefinition(annotations, accessSpecifier, name, type, parameterPatterns, precondition, postcondition, body);
 map ASTExternalDefinition{state, readOnly} to TCExternalDefinition(state, readOnly);
-map ASTImplicitFunctionDefinition{accessSpecifier, name, typeParams, parameterPatterns, result, body, precondition, postcondition, measureExp} to TCImplicitFunctionDefinition(accessSpecifier, name, typeParams, parameterPatterns, result, body, precondition, postcondition, measureExp);
-map ASTImplicitOperationDefinition{accessSpecifier, name, parameterPatterns, result, body, externals, precondition, postcondition, errors} to TCImplicitOperationDefinition(accessSpecifier, name, parameterPatterns, result, body, externals, precondition, postcondition, errors);
+map ASTImplicitFunctionDefinition{annotations, accessSpecifier, name, typeParams, parameterPatterns, result, body, precondition, postcondition, measureExp} to TCImplicitFunctionDefinition(annotations, accessSpecifier, name, typeParams, parameterPatterns, result, body, precondition, postcondition, measureExp);
+map ASTImplicitOperationDefinition{annotations, accessSpecifier, name, parameterPatterns, result, body, externals, precondition, postcondition, errors} to TCImplicitOperationDefinition(annotations, accessSpecifier, name, parameterPatterns, result, body, externals, precondition, postcondition, errors);
 map ASTImportedDefinition{location, def} to TCImportedDefinition(location, def);
 map ASTInheritedDefinition{accessSpecifier, name, superdef} to TCInheritedDefinition(accessSpecifier, name, superdef);
-map ASTInstanceVariableDefinition{accessSpecifier, name, type, expression} to TCInstanceVariableDefinition(accessSpecifier, name, type, expression);
+map ASTInstanceVariableDefinition{annotations, accessSpecifier, name, type, expression} to TCInstanceVariableDefinition(annotations, accessSpecifier, name, type, expression);
 map ASTLocalDefinition{location, name, type} to TCLocalDefinition(location, name, type);
 map ASTMultiBindListDefinition{location, bindings} to TCMultiBindListDefinition(location, bindings);
 map ASTMutexSyncDefinition{location, operations} to TCMutexSyncDefinition(location, operations);
@@ -32,9 +32,9 @@ map ASTRenamedDefinition{name, def} to TCRenamedDefinition(name, def);
 map ASTStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression} to TCStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression);
 map ASTSystemDefinition{name, definitions} to TCSystemDefinition(name, definitions);
 map ASTThreadDefinition{statement} to TCThreadDefinition(statement);
-map ASTTypeDefinition{accessSpecifier, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression} to TCTypeDefinition(accessSpecifier, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression);
+map ASTTypeDefinition{annotations, accessSpecifier, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression} to TCTypeDefinition(annotations, accessSpecifier, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression);
 map ASTUntypedDefinition{location, name} to TCUntypedDefinition(location, name);
-map ASTValueDefinition{accessSpecifier, pattern, type, exp} to TCValueDefinition(accessSpecifier, pattern, type, exp);
+map ASTValueDefinition{annotations, accessSpecifier, pattern, type, exp} to TCValueDefinition(annotations, accessSpecifier, pattern, type, exp);
 
 # expressions
 package com.fujitsu.vdmj.ast.expressions to com.fujitsu.vdmj.tc.expressions;
@@ -166,7 +166,9 @@ package com.fujitsu.vdmj.ast.annotations to com.fujitsu.vdmj.tc.annotations;
 map ASTAnnotatedExpression{location, annotation, expression} to TCAnnotatedExpression(location, annotation, expression);
 map ASTAnnotatedStatement{location, annotation, statement} to TCAnnotatedStatement(location, annotation, statement);
 map ASTAnnotation{} to TCAnnotation();
+map ASTAnnotationList{} to TCAnnotationList(this);
 map ASTTraceAnnotation{name, args} to TCTraceAnnotation(name, args);
+map ASTOverrideAnnotation{name, args} to TCOverrideAnnotation(name, args);
 
 # lex
 package com.fujitsu.vdmj.ast.lex to com.fujitsu.vdmj.tc.lex;

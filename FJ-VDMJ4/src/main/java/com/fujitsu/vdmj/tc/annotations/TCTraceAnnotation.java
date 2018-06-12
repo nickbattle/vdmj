@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
@@ -38,8 +39,13 @@ public class TCTraceAnnotation extends TCAnnotation
 	}
 
 	@Override
-	public void typeCheck(Environment env, NameScope scope)
+	public void typeCheck(TCDefinition def, Environment env, NameScope scope)
 	{
+		if (def != null)
+		{
+			name.report(9999, "@Trace only applies to expressions and statements");
+		}
+		
 		for (TCExpression arg: args)
 		{
 			if (!(arg instanceof TCVariableExpression))

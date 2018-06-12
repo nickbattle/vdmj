@@ -922,7 +922,7 @@ public class TCClassDefinition extends TCDefinition
 		TCStatement body = new TCClassInvariantStatement(invname, invdefs);
 		TCAccessSpecifier access = new TCAccessSpecifier(false, false, Token.PRIVATE, true);
 
-		return new TCExplicitOperationDefinition(access, invname, type, new TCPatternList(), null, null, body);
+		return new TCExplicitOperationDefinition(null, access, invname, type, new TCPatternList(), null, null, body);
 	}
 
 	@Override

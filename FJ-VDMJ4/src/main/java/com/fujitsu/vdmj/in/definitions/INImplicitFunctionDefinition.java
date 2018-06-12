@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
@@ -70,7 +71,8 @@ public class INImplicitFunctionDefinition extends INDefinition
 
 	private Map<TCTypeList, FunctionValue> polyfuncs = null;
 
-	public INImplicitFunctionDefinition(INAccessSpecifier accessSpecifier, TCNameToken name,
+	public INImplicitFunctionDefinition(INAnnotationList annotations,
+		INAccessSpecifier accessSpecifier, TCNameToken name,
 		TCNameList typeParams,
 		INPatternListTypePairList parameterPatterns,
 		INPatternTypePair result,
@@ -82,6 +84,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 	{
 		super(name.getLocation(), accessSpecifier, name);
 
+		this.annotations = annotations;
 		this.typeParams = typeParams;
 		this.parameterPatterns = parameterPatterns;
 		this.result = result;

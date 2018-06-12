@@ -21,31 +21,22 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.annotations;
+package com.fujitsu.vdmj.in.annotations;
 
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
 
-public abstract class TCAnnotation
+public class INOverrideAnnotation extends INAnnotation
 {
-	public final TCIdentifierToken name;
-	
-	public final TCExpressionList args;
-
-	public TCAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public INOverrideAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
-		this.name = name;
-		this.args = args;
+		super(name, args);
 	}
 
 	@Override
-	public String toString()
+	public void eval(Context ctxt)
 	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
+		// Nothing for @Override
 	}
-
-	public abstract void typeCheck(TCDefinition def, Environment env, NameScope scope);
 }

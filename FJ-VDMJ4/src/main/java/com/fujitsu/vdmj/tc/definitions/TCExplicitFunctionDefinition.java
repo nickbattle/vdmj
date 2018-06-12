@@ -28,6 +28,7 @@ import java.util.ListIterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSubclassResponsibilityExpression;
@@ -82,7 +83,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	public TCExplicitFunctionDefinition measureDef;
 	public TCNameToken measureName;
 
-	public TCExplicitFunctionDefinition(TCAccessSpecifier accessSpecifier, TCNameToken name,
+	public TCExplicitFunctionDefinition(TCAnnotationList annotations,
+		TCAccessSpecifier accessSpecifier, TCNameToken name,
 		TCNameList typeParams, TCFunctionType type,
 		TCPatternListList parameters, TCExpression body,
 		TCExpression precondition,
@@ -90,6 +92,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	{
 		super(Pass.DEFS, name.getLocation(), name, NameScope.GLOBAL);
 
+		this.annotations = annotations;
 		this.accessSpecifier = accessSpecifier;
 		this.typeParams = typeParams;
 		this.type = type;
@@ -229,6 +232,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.typeCheck(this, base, scope);
+
 		TCDefinitionList defs = new TCDefinitionList();
 
 		if (typeParams != null)
@@ -377,7 +382,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		TCPatternListList cpll = new TCPatternListList();
 		cpll.add(all);
 		
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, measureName,
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
 				typeParams, type.getMeasureType(isCurried, actual), cpll, measureExp, null, null, false, null);
 
 		def.classDefinition = classDefinition;
@@ -641,7 +646,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 	private TCExplicitFunctionDefinition getPreDefinition()
 	{
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getPreName(precondition.location),
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getPreName(precondition.location),
 			typeParams, type.getCurriedPreType(isCurried), paramPatternList, precondition, null, null, false, null);
 
 		def.classDefinition = classDefinition;
@@ -669,7 +674,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 		parameters.add(last);
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getPostName(postcondition.location),
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getPostName(postcondition.location),
 			typeParams, type.getCurriedPostType(isCurried), parameters, postcondition, null, null, false, null);
 
 		def.classDefinition = classDefinition;

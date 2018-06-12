@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPostOpExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPreOpExpression;
@@ -85,13 +86,15 @@ public class TCImplicitOperationDefinition extends TCDefinition
 
 	public boolean isConstructor = false;
 
-	public TCImplicitOperationDefinition(TCAccessSpecifier accessSpecifier, TCNameToken name,
+	public TCImplicitOperationDefinition(TCAnnotationList annotations,
+		TCAccessSpecifier accessSpecifier, TCNameToken name,
 		TCPatternListTypePairList parameterPatterns, TCPatternTypePair result,
 		TCStatement body, TCExternalClauseList externals, TCExpression precondition,
 		TCExpression postcondition, TCErrorCaseList errors)
 	{
 		super(Pass.DEFS, name.getLocation(), name, NameScope.GLOBAL);
 
+		this.annotations = annotations;
 		this.accessSpecifier = accessSpecifier;
 		this.parameterPatterns = parameterPatterns;
 		this.result = result;
@@ -197,6 +200,8 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.typeCheck(this, base, scope);
+
 		scope = NameScope.NAMESANDSTATE;
 		TCDefinitionList defs = new TCDefinitionList();
 		TCDefinitionList argdefs = new TCDefinitionList();
@@ -554,7 +559,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		parameters.add(plist);
 		TCExpression preop = new TCPreOpExpression(name, precondition, errors, state);
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(TCAccessSpecifier.DEFAULT, name.getPreName(precondition.location),
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, TCAccessSpecifier.DEFAULT, name.getPreName(precondition.location),
 			null, type.getPreType(state, classDefinition, accessSpecifier.isStatic),
 			parameters, preop, null, null, false, null);
 
@@ -600,7 +605,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		parameters.add(plist);
 		TCExpression postop = new TCPostOpExpression(name, precondition, postcondition, errors, state);
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getPostName(postcondition.location),
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getPostName(postcondition.location),
 			null, type.getPostType(state, classDefinition, accessSpecifier.isStatic),
 			parameters, postop,
 			null, null, false, null);

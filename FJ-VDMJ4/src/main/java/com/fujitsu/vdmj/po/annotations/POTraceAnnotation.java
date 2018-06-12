@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.annotations;
 
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 public class POTraceAnnotation extends POAnnotation
@@ -34,7 +35,7 @@ public class POTraceAnnotation extends POAnnotation
 	}
 
 	@Override
-	public void pog()
+	public void pog(POContextStack ctxt)
 	{
 		// Nothing to do for @Trace?
 	}

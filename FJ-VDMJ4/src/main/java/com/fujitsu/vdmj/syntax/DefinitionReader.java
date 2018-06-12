@@ -29,6 +29,8 @@ import java.util.Arrays;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTAccessSpecifier;
 import com.fujitsu.vdmj.ast.definitions.ASTAssignmentDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassInvariantDefinition;
@@ -403,6 +405,41 @@ public class DefinitionReader extends SyntaxReader
 
 		return new ASTAccessSpecifier(isStatic, isAsync, access, isPure);
 	}
+	
+	private ASTAnnotationList readAnnotations() throws LexException, ParserException
+	{
+		ASTAnnotationList annotations = new ASTAnnotationList();
+		
+		while (lastToken().is(Token.AT))
+		{
+			nextToken();
+			annotations.add(readAnnotation());
+		}
+		
+		return annotations;
+	}
+	
+	private ASTAnnotation readAnnotation() throws LexException, ParserException
+	{
+		LexIdentifierToken name = readIdToken("Expecting @Annotation name");
+		ASTExpressionList args = new ASTExpressionList();
+		
+		if (lastToken().is(Token.BRA))
+		{
+			ExpressionReader er = getExpressionReader();
+			nextToken();
+			args.add(er.readExpression());
+	
+			while (ignore(Token.COMMA))
+			{
+				args.add(er.readExpression());
+			}
+	
+			checkFor(Token.KET, 2124, "Expecting ')' after args");
+		}
+		
+		return makeAnnotation(name, args);
+	}
 
 	public ASTTypeDefinition readTypeDefinition() throws ParserException, LexException
 	{
@@ -515,8 +552,10 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				ASTAnnotationList annotations = readAnnotations();
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTTypeDefinition def = readTypeDefinition();
+				def.setAnnotations(annotations);
 
 				// Force all type defs (invs) to be static
 				def.setAccessSpecifier(access.getStatic(true));
@@ -546,8 +585,10 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				ASTAnnotationList annotations = readAnnotations();
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTDefinition def = readValueDefinition();
+				def.setAnnotations(annotations);
 
 				// Force all values to be static
 				def.setAccessSpecifier(access.getStatic(true));
@@ -577,8 +618,10 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				ASTAnnotationList annotations = readAnnotations();
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTDefinition def = readFunctionDefinition();
+				def.setAnnotations(annotations);
 
 				if (Settings.release == Release.VDM_10)
 				{
@@ -616,9 +659,11 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				ASTAnnotationList annotations = readAnnotations();
 				ASTAccessSpecifier access = readAccessSpecifier(dialect == Dialect.VDM_RT, true);
 				ASTDefinition def = readOperationDefinition();
 				def.setAccessSpecifier(access);
+				def.setAnnotations(annotations);
 				list.add(def);
 
 				if (!newSection())
@@ -1447,11 +1492,13 @@ public class DefinitionReader extends SyntaxReader
 		}
 		else
 		{
+			ASTAnnotationList annotations = readAnnotations();
 			ASTAccessSpecifier access = readAccessSpecifier(false, false);
 			ASTAssignmentDefinition def = getStatementReader().readAssignmentDefinition();
 			ASTInstanceVariableDefinition ivd =
 				new ASTInstanceVariableDefinition(def.name, def.type, def.expression);
 			ivd.setAccessSpecifier(access);
+			ivd.setAnnotations(annotations);
 			return ivd;
 		}
     }

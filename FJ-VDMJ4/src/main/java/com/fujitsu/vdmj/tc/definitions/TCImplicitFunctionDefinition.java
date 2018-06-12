@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.definitions;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSubclassResponsibilityExpression;
@@ -78,7 +79,8 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	public TCNameToken measureName;
 
 
-	public TCImplicitFunctionDefinition(TCAccessSpecifier accessSpecifier, TCNameToken name,
+	public TCImplicitFunctionDefinition(TCAnnotationList annotations,
+		TCAccessSpecifier accessSpecifier, TCNameToken name,
 		TCNameList typeParams, TCPatternListTypePairList parameterPatterns,
 		TCPatternTypePair result,
 		TCExpression body,
@@ -88,6 +90,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	{
 		super(Pass.DEFS, name.getLocation(), name, NameScope.GLOBAL);
 
+		this.annotations = annotations;
 		this.accessSpecifier = accessSpecifier;
 		this.typeParams = typeParams;
 		this.parameterPatterns = parameterPatterns;
@@ -217,6 +220,8 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.typeCheck(this, base, scope);
+
 		TCDefinitionList defs = new TCDefinitionList();
 		TypeComparator.checkComposeTypes(type, base, false);
 
@@ -370,7 +375,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		measureName = name.getMeasureName(measureExp.location);
 		checkMeasure(measureName, actual);
 		
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, measureName,
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
 				typeParams, type.getMeasureType(false, actual), getParamPatternList(), measureExp, null, null, false, null);
 
 		def.classDefinition = classDefinition;
@@ -531,7 +536,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 
 	private TCExplicitFunctionDefinition getPreDefinition()
 	{
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getPreName(precondition.location),
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getPreName(precondition.location),
 			typeParams, type.getPreType(), getParamPatternList(), precondition, null, null, false, null);
 
 		def.classDefinition = classDefinition;
@@ -543,7 +548,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		TCPatternListList parameters = getParamPatternList();
 		parameters.get(0).add(result.pattern);
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getPostName(postcondition.location),
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getPostName(postcondition.location),
 			typeParams, type.getPostType(),	parameters, postcondition,	null, null, false, null);
 
 		def.classDefinition = classDefinition;

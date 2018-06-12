@@ -21,31 +21,23 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.annotations;
+package com.fujitsu.vdmj.in.annotations;
 
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.in.INMappedList;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 
-public abstract class TCAnnotation
+public class INAnnotationList extends INMappedList<TCAnnotation, INAnnotation>
 {
-	public final TCIdentifierToken name;
+	private static final long serialVersionUID = 1L;
 	
-	public final TCExpressionList args;
-
-	public TCAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public INAnnotationList()
 	{
-		this.name = name;
-		this.args = args;
+		super();
 	}
-
-	@Override
-	public String toString()
+	
+	public INAnnotationList(TCAnnotationList from) throws Exception
 	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
+		super(from);
 	}
-
-	public abstract void typeCheck(TCDefinition def, Environment env, NameScope scope);
 }

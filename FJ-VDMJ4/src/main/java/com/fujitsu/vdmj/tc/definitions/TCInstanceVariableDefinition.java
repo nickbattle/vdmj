@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCUndefinedExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -45,10 +46,12 @@ public class TCInstanceVariableDefinition extends TCAssignmentDefinition
 	public final TCNameToken oldname;
 	public boolean initialized;
 
-	public TCInstanceVariableDefinition(TCAccessSpecifier accessSpecifier, TCNameToken name,
+	public TCInstanceVariableDefinition(TCAnnotationList annotations,
+		TCAccessSpecifier accessSpecifier, TCNameToken name,
 		TCType type, TCExpression expression)
 	{
 		super(accessSpecifier, name, type, expression, NameScope.VARSANDSTATE);	// State and varstate
+		this.annotations = annotations;
 		oldname = name.getOldName();
 		initialized = !(expression instanceof TCUndefinedExpression);
 	}
@@ -76,6 +79,8 @@ public class TCInstanceVariableDefinition extends TCAssignmentDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.typeCheck(this, base, scope);
+
 		if (expression instanceof TCUndefinedExpression)
 		{
 			if (accessSpecifier.isStatic)
