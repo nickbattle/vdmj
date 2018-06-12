@@ -56,7 +56,7 @@ public class TCAnnotatedExpression extends TCExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		annotation.typeCheck(null, env, scope);
+		annotation.typeCheck(this, env, scope);
 		return expression.typeCheck(env, qualifiers, scope, constraint);
 	}
 

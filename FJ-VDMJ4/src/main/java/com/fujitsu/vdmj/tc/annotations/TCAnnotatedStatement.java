@@ -54,7 +54,7 @@ public class TCAnnotatedStatement extends TCStatement
 	@Override
 	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
 	{
-		annotation.typeCheck(null, env, scope);
+		annotation.typeCheck(this, env, scope);
 		return statement.typeCheck(env, scope, constraint);
 	}
 

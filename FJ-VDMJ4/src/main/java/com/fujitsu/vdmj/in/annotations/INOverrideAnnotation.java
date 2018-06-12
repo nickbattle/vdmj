@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.in.annotations;
 
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 public class INOverrideAnnotation extends INAnnotation
@@ -32,11 +31,5 @@ public class INOverrideAnnotation extends INAnnotation
 	public INOverrideAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);
-	}
-
-	@Override
-	public void eval(Context ctxt)
-	{
-		// Nothing for @Override
 	}
 }

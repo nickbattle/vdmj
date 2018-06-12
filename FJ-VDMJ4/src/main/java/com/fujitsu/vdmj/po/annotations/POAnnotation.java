@@ -23,7 +23,10 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
@@ -45,5 +48,18 @@ public abstract class POAnnotation
 		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
 	}
 
-	public abstract void pog(POContextStack ctxt);
+	public void pog(POContextStack ctxt, PODefinition def)
+	{
+		// Do nothing
+	}
+
+	public void pog(POContextStack ctxt, POStatement stmt)
+	{
+		// Do nothing
+	}
+
+	public void pog(POContextStack ctxt, POExpression exp)
+	{
+		// Do nothing
+	}
 }

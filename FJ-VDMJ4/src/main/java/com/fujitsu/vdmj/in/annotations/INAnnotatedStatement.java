@@ -54,8 +54,7 @@ public class INAnnotatedStatement extends INStatement
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-
-		annotation.eval(ctxt);
+		annotation.eval(ctxt, this);
 		return statement.eval(ctxt);
 	}
 	

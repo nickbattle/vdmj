@@ -24,8 +24,10 @@
 package com.fujitsu.vdmj.in.annotations;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
@@ -39,7 +41,24 @@ public class INTraceAnnotation extends INAnnotation
 	}
 	
 	@Override
-	public void eval(Context ctxt)
+	public void eval(Context ctxt, INDefinition def)
+	{
+		doTrace(ctxt);
+	}
+	
+	@Override
+	public void eval(Context ctxt, INStatement stmt)
+	{
+		doTrace(ctxt);
+	}
+	
+	@Override
+	public void eval(Context ctxt, INExpression exp)
+	{
+		doTrace(ctxt);
+	}
+	
+	private void doTrace(Context ctxt)
 	{
 		if (Settings.annotations)
 		{

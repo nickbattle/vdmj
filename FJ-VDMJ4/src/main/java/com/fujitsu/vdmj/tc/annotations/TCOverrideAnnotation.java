@@ -43,17 +43,17 @@ public class TCOverrideAnnotation extends TCAnnotation
 	{
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			name.report(9999, "@Override not available in VDM-SL");
+			name.report(3360, "@Override not available in VDM-SL");
 		}
 		
 		if (!args.isEmpty())
 		{
-			name.report(9999, "@Override has no arguments");
+			name.report(3361, "@Override has no arguments");
 		}
 		
 		if (!def.isFunctionOrOperation())
 		{
-			name.report(9999, "@Override only applies to functions or operations");
+			name.report(3362, "@Override only applies to functions or operations");
 		}
 		else if (def.classDefinition != null)
 		{
@@ -70,7 +70,7 @@ public class TCOverrideAnnotation extends TCAnnotation
 			
 			if (!found)
 			{
-				name.report(9999, "Definition does not @Override superclass");
+				name.report(3363, "Definition does not @Override superclass");
 			}
 		}
 	}

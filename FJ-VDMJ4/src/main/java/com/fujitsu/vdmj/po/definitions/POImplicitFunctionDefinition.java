@@ -133,7 +133,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		if (annotations != null) annotations.pog(ctxt);
+		if (annotations != null) annotations.pog(ctxt, this);
 
 		ProofObligationList obligations = new ProofObligationList();
 		TCNameList pids = new TCNameList();

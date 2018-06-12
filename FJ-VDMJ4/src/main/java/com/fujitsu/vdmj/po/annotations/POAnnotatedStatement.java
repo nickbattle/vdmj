@@ -52,7 +52,7 @@ public class POAnnotatedStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		annotation.pog(ctxt);
+		annotation.pog(ctxt, this);
 		return statement.getProofObligations(ctxt);
 	}
 

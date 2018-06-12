@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.po.annotations;
 
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 public class POOverrideAnnotation extends POAnnotation
@@ -32,11 +31,5 @@ public class POOverrideAnnotation extends POAnnotation
 	public POOverrideAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
 		super(name, args);
-	}
-
-	@Override
-	public void pog(POContextStack ctxt)
-	{
-		// Nothing for @Override
 	}
 }

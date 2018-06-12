@@ -24,8 +24,10 @@
 package com.fujitsu.vdmj.tc.annotations;
 
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -47,5 +49,18 @@ public abstract class TCAnnotation
 		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
 	}
 
-	public abstract void typeCheck(TCDefinition def, Environment env, NameScope scope);
+	public void typeCheck(TCDefinition def, Environment env, NameScope scope)
+	{
+		// Do nothing
+	}
+	
+	public void typeCheck(TCStatement stmt, Environment env, NameScope scope)
+	{
+		// Do nothing
+	}
+	
+	public void typeCheck(TCExpression exp, Environment env, NameScope scope)
+	{
+		// Do nothing
+	}
 }

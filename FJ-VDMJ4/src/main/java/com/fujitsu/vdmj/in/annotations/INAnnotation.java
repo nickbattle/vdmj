@@ -23,7 +23,10 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
+import com.fujitsu.vdmj.in.definitions.INDefinition;
+import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
@@ -45,5 +48,18 @@ public abstract class INAnnotation
 		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
 	}
 
-	public abstract void eval(Context ctxt);
+	public void eval(Context ctxt, INDefinition def)
+	{
+		// Do nothing
+	}
+
+	public void eval(Context ctxt, INStatement stmt)
+	{
+		// Do nothing
+	}
+	
+	public void eval(Context ctxt, INExpression exp)
+	{
+		// Do nothing
+	}
 }

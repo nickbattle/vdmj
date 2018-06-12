@@ -43,7 +43,7 @@ public class TCTraceAnnotation extends TCAnnotation
 	{
 		if (def != null)
 		{
-			name.report(9999, "@Trace only applies to expressions and statements");
+			name.report(3359, "@Trace only applies to expressions and statements");
 		}
 		
 		for (TCExpression arg: args)

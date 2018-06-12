@@ -98,7 +98,7 @@ public class POTypeDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		if (annotations != null) annotations.pog(ctxt);
+		if (annotations != null) annotations.pog(ctxt, this);
 
 		ProofObligationList list = new ProofObligationList();
 

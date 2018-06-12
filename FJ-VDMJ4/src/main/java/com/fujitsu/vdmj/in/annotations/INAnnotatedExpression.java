@@ -56,8 +56,7 @@ public class INAnnotatedExpression extends INExpression
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-
-		annotation.eval(ctxt);
+		annotation.eval(ctxt, this);
 		return expression.eval(ctxt);
 	}
 	public INExpression findExpression(int lineno)
