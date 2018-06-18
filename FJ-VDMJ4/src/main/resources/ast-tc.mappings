@@ -169,6 +169,7 @@ map ASTAnnotation{} to TCAnnotation();
 map ASTAnnotationList{} to TCAnnotationList(this);
 map ASTTraceAnnotation{name, args} to TCTraceAnnotation(name, args);
 map ASTOverrideAnnotation{name, args} to TCOverrideAnnotation(name, args);
+map ASTChangesAnnotation{name, args} to TCChangesAnnotation(name, args);
 
 # lex
 package com.fujitsu.vdmj.ast.lex to com.fujitsu.vdmj.tc.lex;

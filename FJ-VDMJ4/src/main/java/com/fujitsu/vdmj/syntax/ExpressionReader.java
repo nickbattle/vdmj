@@ -958,15 +958,18 @@ public class ExpressionReader extends SyntaxReader
 		if (lastToken().is(Token.BRA))
 		{
 			ExpressionReader er = getExpressionReader();
-			nextToken();
-			args.add(er.readExpression());
-	
-			while (ignore(Token.COMMA))
+			
+			if (nextToken().isNot(Token.KET))
 			{
 				args.add(er.readExpression());
+		
+				while (ignore(Token.COMMA))
+				{
+					args.add(er.readExpression());
+				}
 			}
-	
-			checkFor(Token.KET, 2124, "Expecting ')' after args");
+			
+			checkFor(Token.KET, 2124, "Expecting ')' after annotation args");
 		}
 
 		return new ASTAnnotatedExpression(name.location, makeAnnotation(name, args), readConnectiveExpression());

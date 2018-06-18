@@ -54,8 +54,10 @@ public class INAnnotatedStatement extends INStatement
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-		annotation.eval(ctxt, this);
-		return statement.eval(ctxt);
+		annotation.before(ctxt, this);
+		Value rv = statement.eval(ctxt);
+		annotation.after(ctxt, this);
+		return rv;
 	}
 	
 	public INStatement findStatement(int lineno)

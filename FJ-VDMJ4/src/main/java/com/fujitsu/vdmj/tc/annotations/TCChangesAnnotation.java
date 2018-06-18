@@ -21,55 +21,41 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.annotations;
+package com.fujitsu.vdmj.tc.annotations;
 
-import com.fujitsu.vdmj.in.definitions.INDefinition;
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.in.statements.INStatement;
-import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
-public abstract class INAnnotation
+public class TCChangesAnnotation extends TCAnnotation
 {
-	public final TCIdentifierToken name;
-	
-	public final INExpressionList args;
-
-	public INAnnotation(TCIdentifierToken name, INExpressionList args)
+	public TCChangesAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
-		this.name = name;
-		this.args = args;
+		super(name, args);
 	}
 
 	@Override
-	public String toString()
+	public void typeCheck(TCDefinition def, Environment env, NameScope scope)
 	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
+		name.report(3359, "@Changes only applies to statements");
 	}
 
-	public void eval(Context ctxt, INDefinition def)
+	@Override
+	public void typeCheck(TCExpression exp, Environment env, NameScope scope)
 	{
-		// Do nothing
+		name.report(3359, "@Changes only applies to statements");
 	}
 
-	public void before(Context ctxt, INStatement stmt)
+	@Override
+	public void typeCheck(TCStatement stmt, Environment env, NameScope scope)
 	{
-		// Do nothing
-	}
-	
-	public void before(Context ctxt, INExpression exp)
-	{
-		// Do nothing
-	}
-
-	public void after(Context ctxt, INStatement stmt)
-	{
-		// Do nothing
-	}
-	
-	public void after(Context ctxt, INExpression exp)
-	{
-		// Do nothing
+		if (!args.isEmpty())
+		{
+			name.report(3361, "@Changes has no arguments");
+		}
 	}
 }

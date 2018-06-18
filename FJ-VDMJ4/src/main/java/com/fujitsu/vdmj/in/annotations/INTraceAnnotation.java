@@ -47,13 +47,13 @@ public class INTraceAnnotation extends INAnnotation
 	}
 	
 	@Override
-	public void eval(Context ctxt, INStatement stmt)
+	public void before(Context ctxt, INStatement stmt)
 	{
 		doTrace(ctxt);
 	}
 	
 	@Override
-	public void eval(Context ctxt, INExpression exp)
+	public void before(Context ctxt, INExpression exp)
 	{
 		doTrace(ctxt);
 	}

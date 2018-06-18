@@ -747,11 +747,11 @@ as the expected and actual values.
 3355, "Cyclic dependency detected"
 3356, "Import of <kind> <name> is <actual kind>"
 3357, "Unknown annotation @<name>"
-3358, "@Trace argument must be an identifier"
-3359, "@Trace only applies to expressions and statements"
-3360, "@Override not available in VDM-SL"
-3361, "@Override has no arguments"
-3362, "@Override only applies to functions or operations"
+3358, "@<name> argument must be an identifier"
+3359, "@<name> only applies to expressions and statements"
+3360, "@<name> not available in VDM-SL"
+3361, "@<name> has no arguments"
+3362, "@<name> only applies to functions or operations"
 3363, "Definition does not @Override superclass"
 
 
