@@ -170,7 +170,7 @@ map TCAnnotatedStatement{location, annotation, statement} to INAnnotatedStatemen
 map TCAnnotation{} to INAnnotation();
 map TCAnnotationList{} to INAnnotationList(this);
 map TCTraceAnnotation{name, args} to INTraceAnnotation(name, args);
-map TCOverrideAnnotation{name, args} to INOverrideAnnotation(name, args);
+map TCOverrideAnnotation{name, args} to INNullAnnotation(name, args);
 
 # lex
 unmapped com.fujitsu.vdmj.ast.lex.LexIntegerToken;

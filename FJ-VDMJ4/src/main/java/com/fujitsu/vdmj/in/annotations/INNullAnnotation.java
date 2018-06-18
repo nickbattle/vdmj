@@ -21,14 +21,14 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.annotations;
+package com.fujitsu.vdmj.in.annotations;
 
-import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class POOverrideAnnotation extends POAnnotation
+public class INNullAnnotation extends INAnnotation
 {
-	public POOverrideAnnotation(TCIdentifierToken name, POExpressionList args)
+	public INNullAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);
 	}
