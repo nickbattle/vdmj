@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
@@ -197,6 +198,7 @@ public class ModuleInterpreter extends Interpreter
 	{
 		scheduler.init();
 		CPUValue.init(scheduler);
+		INAnnotation.init();
 		initialContext = executableModules.creatInitialContext();
 		executableModules.initialize(initialContext);
 	}

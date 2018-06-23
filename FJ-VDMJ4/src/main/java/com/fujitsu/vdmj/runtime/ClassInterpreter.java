@@ -31,6 +31,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
@@ -177,6 +178,7 @@ public class ClassInterpreter extends Interpreter
 		CPUValue.init(scheduler);
 		BUSValue.init();
 		ObjectValue.init();
+		INAnnotation.init();
 
 		logSwapIn();
 		initialContext = executableClasses.creatInitialContext();

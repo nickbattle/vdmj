@@ -23,12 +23,12 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
-import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.values.Value;
 
 public abstract class INAnnotation
 {
@@ -41,16 +41,23 @@ public abstract class INAnnotation
 		this.name = name;
 		this.args = args;
 	}
+	
+	public static void init()
+	{
+		INChangesAnnotation.doInit();
+		INTraceAnnotation.doInit();
+		INNullAnnotation.doInit();
+	}
+	
+	protected static void doInit()
+	{
+		// Nothing by default
+	}
 
 	@Override
 	public String toString()
 	{
 		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
-	}
-
-	public void eval(Context ctxt, INDefinition def)
-	{
-		// Do nothing
 	}
 
 	public void before(Context ctxt, INStatement stmt)
@@ -63,12 +70,12 @@ public abstract class INAnnotation
 		// Do nothing
 	}
 
-	public void after(Context ctxt, INStatement stmt)
+	public void after(Context ctxt, Value rv, INStatement stmt)
 	{
 		// Do nothing
 	}
 	
-	public void after(Context ctxt, INExpression exp)
+	public void after(Context ctxt, Value rv, INExpression exp)
 	{
 		// Do nothing
 	}

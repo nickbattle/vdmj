@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.annotations;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.TCStringLiteralExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -53,9 +54,16 @@ public class TCChangesAnnotation extends TCAnnotation
 	@Override
 	public void typeCheck(TCStatement stmt, Environment env, NameScope scope)
 	{
-		if (!args.isEmpty())
+		if (args.size() == 1)
 		{
-			name.report(3361, "@Changes has no arguments");
+			if (!(args.get(0) instanceof TCStringLiteralExpression))
+			{
+				name.report(3361, "@Changes argument must be a string literal");
+			}
+		}
+		else if (args.size() > 1)
+		{
+			name.report(3361, "@Changes has one optional string argument");
 		}
 	}
 }

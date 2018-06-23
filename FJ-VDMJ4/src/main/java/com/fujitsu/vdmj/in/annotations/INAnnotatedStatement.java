@@ -56,7 +56,7 @@ public class INAnnotatedStatement extends INStatement
 		breakpoint.check(location, ctxt);
 		annotation.before(ctxt, this);
 		Value rv = statement.eval(ctxt);
-		annotation.after(ctxt, this);
+		annotation.after(ctxt, rv, this);
 		return rv;
 	}
 	

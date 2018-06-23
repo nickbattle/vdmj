@@ -28,6 +28,7 @@ import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.expressions.INStringLiteralExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
@@ -38,6 +39,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.OperationValue;
 import com.fujitsu.vdmj.values.Value;
+import com.fujitsu.vdmj.values.VoidValue;
 
 public class INChangesAnnotation extends INAnnotation
 {
@@ -49,13 +51,24 @@ public class INChangesAnnotation extends INAnnotation
 		super(name, args);
 	}
 	
+	protected static void doInit()
+	{
+		previousState.clear();
+		previousLocs.clear();
+	}
+	
 	@Override
-	public void after(Context ctxt, INStatement stmt)
+	public void after(Context ctxt, Value rv, INStatement stmt)
 	{
 		if (Settings.annotations)
 		{
-			recordChanges(ctxt.getVisibleVariables());
+			if (!(rv instanceof VoidValue))
+			{
+				header();
+				Console.err.println("RESULT = " + rv);
+			}
 			
+			recordChanges(ctxt.getVisibleVariables());
 			Context global = ctxt.getGlobal();
 			recordChanges(global);
 
@@ -85,18 +98,31 @@ public class INChangesAnnotation extends INAnnotation
 				
 				if (prevloc == null || !prevloc.equals(currloc))	// New name or different name
 				{
+					header();
 					Console.err.printf("New %s = %s\n", var, curr);
 					previousState.put(var, curr.getConstant());
 					previousLocs.put(var, currloc);
 				}
 				else if (prevloc.equals(currloc) && !prev.equals(curr))
 				{
+					header();
 					Console.err.printf("Change %s = %s\n", var, curr);
 					previousState.put(var, curr.getConstant());
 					previousLocs.put(var, currloc);
 				}
 				// else it hasn't changed
 			}
+		}
+	}
+
+	private void header()
+	{
+		Console.err.print(name.getLocation() + " ");
+		
+		if (!args.isEmpty() && args.get(0) instanceof INStringLiteralExpression)
+		{
+			INStringLiteralExpression s = (INStringLiteralExpression)args.get(0);
+			Console.err.print(s.value.value + " ");
 		}
 	}
 }

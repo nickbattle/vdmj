@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.in.annotations;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
@@ -38,12 +37,6 @@ public class INTraceAnnotation extends INAnnotation
 	public INTraceAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);
-	}
-	
-	@Override
-	public void eval(Context ctxt, INDefinition def)
-	{
-		doTrace(ctxt);
 	}
 	
 	@Override
