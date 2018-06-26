@@ -44,7 +44,7 @@ import com.fujitsu.vdmj.values.VoidValue;
 public class INChangesAnnotation extends INAnnotation
 {
 	private final static Context previousState = new Context(new LexLocation(), "@Changes", null);
-	private final static Map<TCNameToken, LexLocation> previousLocs = new HashMap<TCNameToken, LexLocation>();
+	private final static Map<TCNameToken, String> previousLocs = new HashMap<TCNameToken, String>();
 
 	public INChangesAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
@@ -92,9 +92,10 @@ public class INChangesAnnotation extends INAnnotation
 			
 			if (!(curr instanceof FunctionValue) && !(curr instanceof OperationValue))
 			{
-				LexLocation currloc = var.getLocation();
+				String currloc = getLoc(ctxt, var);
+				
 				Value prev = previousState.get(var);
-				LexLocation prevloc = previousLocs.get(var);
+				String prevloc = previousLocs.get(var);
 				
 				if (prevloc == null || !prevloc.equals(currloc))	// New name or different name
 				{
@@ -113,6 +114,12 @@ public class INChangesAnnotation extends INAnnotation
 				// else it hasn't changed
 			}
 		}
+	}
+
+	private String getLoc(Context ctxt, TCNameToken var)
+	{
+		// Note that we include the ctxt for recursion
+		return var.getLocation().toString() + System.identityHashCode(ctxt);
 	}
 
 	private void header()
