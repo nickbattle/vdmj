@@ -58,7 +58,7 @@ public class INChangesAnnotation extends INAnnotation
 	}
 	
 	@Override
-	public void after(Context ctxt, Value rv, INStatement stmt)
+	public void after(Context caller, Value rv, INStatement stmt)
 	{
 		if (Settings.annotations)
 		{
@@ -68,9 +68,9 @@ public class INChangesAnnotation extends INAnnotation
 				Console.err.println("RESULT = " + rv);
 			}
 			
-			recordChanges(ctxt.getVisibleVariables());
-			Context global = ctxt.getGlobal();
-			recordChanges(global);
+			recordChanges(caller.getVisibleVariables(), caller);
+			Context global = caller.getGlobal();
+			recordChanges(global, caller);
 
 			if (global instanceof StateContext)
 			{
@@ -78,21 +78,21 @@ public class INChangesAnnotation extends INAnnotation
 				
 				if (state != null)
 				{
-					recordChanges(state);
+					recordChanges(state, caller);
 				}
 			}
 		}
 	}
 	
-	private void recordChanges(Context ctxt)
+	private void recordChanges(Context visible, Context caller)
 	{
-		for (TCNameToken var: ctxt.keySet())
+		for (TCNameToken var: visible.keySet())
 		{
-			Value curr = ctxt.get(var);
+			Value curr = visible.get(var);
 			
 			if (!(curr instanceof FunctionValue) && !(curr instanceof OperationValue))
 			{
-				String currloc = getLoc(ctxt, var);
+				String currloc = getLoc(caller, var);
 				
 				Value prev = previousState.get(var);
 				String prevloc = previousLocs.get(var);
@@ -116,10 +116,22 @@ public class INChangesAnnotation extends INAnnotation
 		}
 	}
 
-	private String getLoc(Context ctxt, TCNameToken var)
+	private String getLoc(Context caller, TCNameToken var)
 	{
-		// Note that we include the ctxt for recursion
-		return var.getLocation().toString() + System.identityHashCode(ctxt);
+		// Find the declaring frame...
+		Context frame = caller;
+		
+		while (frame != null)
+		{
+			if (frame.get(var) != null)
+			{
+				return var.getLocation().toString() + System.identityHashCode(frame);			
+			}
+			
+			frame = frame.outer;
+		}
+		
+		return "?";
 	}
 
 	private void header()
