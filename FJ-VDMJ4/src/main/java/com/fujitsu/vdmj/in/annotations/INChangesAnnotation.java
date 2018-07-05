@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.in.annotations;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
@@ -32,9 +33,12 @@ import com.fujitsu.vdmj.in.expressions.INStringLiteralExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.runtime.ClassContext;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.OperationValue;
@@ -62,33 +66,27 @@ public class INChangesAnnotation extends INAnnotation
 	{
 		if (Settings.annotations)
 		{
+			recordChanges(caller.getVisibleNames(), caller);
+			cleanup(caller);
+
 			if (!(rv instanceof VoidValue))
 			{
 				header();
 				Console.err.println("RESULT = " + rv);
 			}
-			
-			recordChanges(caller.getVisibleVariables(), caller);
-			Context global = caller.getGlobal();
-			recordChanges(global, caller);
-
-			if (global instanceof StateContext)
-			{
-				Context state = ((StateContext)global).stateCtxt;
-				
-				if (state != null)
-				{
-					recordChanges(state, caller);
-				}
-			}
 		}
 	}
 	
-	private void recordChanges(Context visible, Context caller)
+	private void recordChanges(TCNameList visible, Context caller)
 	{
-		for (TCNameToken var: visible.keySet())
+		for (TCNameToken var: visible)
 		{
-			Value curr = visible.get(var);
+			if (var.equals(var.getSelfName()))
+			{
+				continue;	// Skip selfs
+			}
+			
+			Value curr = caller.check(var);
 			
 			if (!(curr instanceof FunctionValue) && !(curr instanceof OperationValue))
 			{
@@ -97,14 +95,25 @@ public class INChangesAnnotation extends INAnnotation
 				Value prev = previousState.get(var);
 				String prevloc = previousLocs.get(var);
 				
-				if (prevloc == null || !prevloc.equals(currloc))	// New name or different name
+				if (prevloc == null)	// New name
 				{
 					header();
 					Console.err.printf("New %s = %s\n", var, curr);
 					previousState.put(var, curr.getConstant());
 					previousLocs.put(var, currloc);
 				}
-				else if (prevloc.equals(currloc) && !prev.equals(curr))
+				else if (curr.isUndefined() && prev.isUndefined())
+				{
+					// Unchanged undefined value
+				}
+				else if (!prevloc.equals(currloc))	// Different name
+				{
+					header();
+					Console.err.printf("New %s = %s\n", var, curr);
+					previousState.put(var, curr.getConstant());
+					previousLocs.put(var, currloc);
+				}
+				else if (prevloc.equals(currloc) && !prev.toString().equals(curr.toString()))	// for undefineds
 				{
 					header();
 					Console.err.printf("Change %s = %s\n", var, curr);
@@ -112,6 +121,23 @@ public class INChangesAnnotation extends INAnnotation
 					previousLocs.put(var, currloc);
 				}
 				// else it hasn't changed
+			}
+		}
+	}
+
+	private void cleanup(Context caller)
+	{
+		Iterator<TCNameToken> iter = previousState.keySet().iterator();
+		
+		while (iter.hasNext())
+		{
+			TCNameToken var = iter.next();
+			String currloc = getLoc(caller, var);
+			
+			if (currloc == null)
+			{
+				iter.remove();
+				previousLocs.remove(var);
 			}
 		}
 	}
@@ -128,10 +154,46 @@ public class INChangesAnnotation extends INAnnotation
 				return var.getLocation().toString() + System.identityHashCode(frame);			
 			}
 			
-			frame = frame.outer;
+			if (frame instanceof StateContext && frame.outer != null)
+			{
+				Context state = ((StateContext)frame).stateCtxt;
+
+				if (state != null && state.get(var) != null)
+				{
+					return var.getLocation().toString() + System.identityHashCode(state);			
+				}
+				
+				frame = frame.getGlobal();
+			}
+			else if (frame instanceof ClassContext)
+			{
+				ClassContext clazz = (ClassContext)frame;
+
+				if (clazz != null && clazz.classdef.getStatic(var) != null)
+				{
+					return var.getLocation().toString() + System.identityHashCode(clazz.classdef);			
+				}
+				
+				frame = frame.getGlobal();
+			}
+			else if (frame instanceof ObjectContext)
+			{
+				ObjectContext object = (ObjectContext)frame;
+
+				if (object != null && object.self.get(var, var.isExplicit()) != null)
+				{
+					return var.getLocation().toString() + System.identityHashCode(object.self);			
+				}
+				
+				frame = frame.getGlobal();
+			}
+			else
+			{
+				frame = frame.outer;
+			}
 		}
 		
-		return "?";
+		return null;
 	}
 
 	private void header()
