@@ -705,7 +705,7 @@ public abstract class SyntaxReader
 		}
 		catch (Exception e)
 		{
-			throwMessage(9999, "Failed to instantiate AST" + name + "Annotation");
+			throwMessage(2334, "Failed to instantiate AST" + name + "Annotation");
 			return null;
 		}
 	}
