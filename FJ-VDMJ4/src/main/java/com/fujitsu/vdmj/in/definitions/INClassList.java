@@ -133,6 +133,7 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
 		ContextException failed = null;
 		int retries = 3;	// Potentially not enough.
 		Set<ContextException> trouble = new HashSet<ContextException>();
+		Set<TCNameToken> passed = new HashSet<TCNameToken>();
 		boolean exceptions = Settings.exceptions;
 		Settings.exceptions = false;
 
@@ -143,9 +144,18 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
 
     		for (INClassDefinition cdef: this)
     		{
+				if (passed.contains(cdef.name))
+				{
+					continue;
+				}
+
+    			long before = System.currentTimeMillis();
+    			long after;
+
     			try
     			{
-    				cdef.staticValuesInit(globalContext);
+            		cdef.staticValuesInit(globalContext);
+    				passed.add(cdef.name);
     			}
     			catch (ContextException e)
     			{
@@ -163,7 +173,26 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
     					throw e;
     				}
     			}
+    			finally
+    			{
+    				after = System.currentTimeMillis();
+    				
+            		if (Settings.verbose && (after-before) > 200)
+            		{
+            			Console.out.printf("Pass %d: %s = %.3f secs\n", (4-retries), cdef.name.getName(), (double)(after-before)/1000);
+            		}
+    			}
     		}
+    		
+        	if (Settings.verbose && !trouble.isEmpty())
+        	{
+        		Console.out.printf("Pass %d:\n", (4-retries));
+
+    			for (ContextException e: trouble)
+    			{
+    				Console.out.println(e);
+    			}        		
+        	}
 		}
 		while (--retries > 0 && failed != null);
 

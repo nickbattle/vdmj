@@ -42,6 +42,7 @@ public class Settings
 	public static boolean measureChecks = true;
 	public static boolean exceptions = false;
 	public static MathContext precision = new MathContext(100, RoundingMode.HALF_UP);
+	public static boolean verbose = false;
 
 	public static boolean usingCmdLine = false;
 }
