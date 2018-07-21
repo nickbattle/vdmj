@@ -158,7 +158,14 @@ public class INModuleList extends INMappedList<TCModule, INModule>
         			continue;
         		}
 
+        		long before = System.currentTimeMillis();
         		Set<ContextException> e = m.initialize(initialContext);
+        		long after = System.currentTimeMillis();
+        		
+        		if (Settings.verbose && (after-before) > 200)
+        		{
+        			Console.out.printf("Pass %d: %s = %.3f secs\n", (6-retries), m.name, (double)(after-before)/1000);
+        		}
 
         		if (e != null)
         		{
@@ -169,6 +176,14 @@ public class INModuleList extends INMappedList<TCModule, INModule>
         			passed.add(m.name);
         		}
      		}
+        	
+        	if (Settings.verbose)
+        	{
+    			for (ContextException e: problems)
+    			{
+    				Console.out.println(e);
+    			}        		
+        	}
 		}
 		while (--retries > 0 && !problems.isEmpty());
 
