@@ -177,8 +177,10 @@ public class INModuleList extends INMappedList<TCModule, INModule>
         		}
      		}
         	
-        	if (Settings.verbose)
+        	if (Settings.verbose && !problems.isEmpty())
         	{
+        		Console.out.printf("Pass %d:\n", (6-retries));
+
     			for (ContextException e: problems)
     			{
     				Console.out.println(e);
