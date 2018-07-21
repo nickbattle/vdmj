@@ -55,7 +55,6 @@ abstract public class VDMJ
 	protected static boolean quiet = false;
 	protected static String script = null;
 	protected static String logfile = null;
-	protected static boolean verbose = false;
 
 	public static String filecharset = Charset.defaultCharset().name();
 
@@ -131,11 +130,11 @@ abstract public class VDMJ
     		else if (arg.equals("-q"))
     		{
     			quiet = true;
-    			verbose = false;
+    			Settings.verbose = false;
     		}
     		else if (arg.equals("-verbose"))
     		{
-    			verbose = true;
+    			Settings.verbose = true;
     			quiet = false;
     		}
     		else if (arg.equals("-e"))
@@ -597,7 +596,7 @@ abstract public class VDMJ
 	
 	public static long mapperStats(long start, String mappings)
 	{
-		if (verbose)
+		if (Settings.verbose)
 		{
     		long now = System.currentTimeMillis();
     		ClassMapper mapper = ClassMapper.getInstance(mappings);

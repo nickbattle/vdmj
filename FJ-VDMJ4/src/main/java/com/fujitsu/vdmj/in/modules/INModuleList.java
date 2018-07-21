@@ -142,6 +142,7 @@ public class INModuleList extends INMappedList<TCModule, INModule>
 		StateContext initialContext = (StateContext)ctxt;
 		initialContext.setThreadState(null);
 		Set<ContextException> problems = null;
+		Set<TCIdentifierToken> passed = new HashSet<TCIdentifierToken>();
 		int retries = 5;
 		boolean exceptions = Settings.exceptions;
 		Settings.exceptions = false;
@@ -152,11 +153,20 @@ public class INModuleList extends INMappedList<TCModule, INModule>
 
         	for (INModule m: this)
     		{
+        		if (passed.contains(m.name))
+        		{
+        			continue;
+        		}
+
         		Set<ContextException> e = m.initialize(initialContext);
 
         		if (e != null)
         		{
         			problems.addAll(e);
+        		}
+        		else
+        		{
+        			passed.add(m.name);
         		}
      		}
 		}

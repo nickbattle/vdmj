@@ -133,6 +133,7 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
 		ContextException failed = null;
 		int retries = 3;	// Potentially not enough.
 		Set<ContextException> trouble = new HashSet<ContextException>();
+		Set<TCNameToken> passed = new HashSet<TCNameToken>();
 		boolean exceptions = Settings.exceptions;
 		Settings.exceptions = false;
 
@@ -145,7 +146,13 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
     		{
     			try
     			{
+    				if (passed.contains(cdef.name))
+    				{
+    					continue;
+    				}
+
     				cdef.staticValuesInit(globalContext);
+    				passed.add(cdef.name);
     			}
     			catch (ContextException e)
     			{
