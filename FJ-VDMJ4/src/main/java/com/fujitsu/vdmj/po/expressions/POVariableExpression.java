@@ -47,7 +47,7 @@ public class POVariableExpression extends POExpression
 	@Override
 	public String toString()
 	{
-		return name.getName();
+		return name.getName() + (name.isOld() ? "~" : "");
 	}
 
 	@Override

@@ -225,7 +225,7 @@ public class VDMSL extends VDMJ
 		{
    			long before = System.currentTimeMillis();
    			interpreter = getInterpreter();
-   			if (verbose) before = System.currentTimeMillis();
+   			if (Settings.verbose) before = System.currentTimeMillis();
    			interpreter.init();
 
    			if (defaultName != null)

@@ -142,6 +142,7 @@ public class INModuleList extends INMappedList<TCModule, INModule>
 		StateContext initialContext = (StateContext)ctxt;
 		initialContext.setThreadState(null);
 		Set<ContextException> problems = null;
+		Set<TCIdentifierToken> passed = new HashSet<TCIdentifierToken>();
 		int retries = 5;
 		boolean exceptions = Settings.exceptions;
 		Settings.exceptions = false;
@@ -152,13 +153,39 @@ public class INModuleList extends INMappedList<TCModule, INModule>
 
         	for (INModule m: this)
     		{
+        		if (passed.contains(m.name))
+        		{
+        			continue;
+        		}
+
+        		long before = System.currentTimeMillis();
         		Set<ContextException> e = m.initialize(initialContext);
+        		long after = System.currentTimeMillis();
+        		
+        		if (Settings.verbose && (after-before) > 200)
+        		{
+        			Console.out.printf("Pass %d: %s = %.3f secs\n", (6-retries), m.name, (double)(after-before)/1000);
+        		}
 
         		if (e != null)
         		{
         			problems.addAll(e);
         		}
+        		else
+        		{
+        			passed.add(m.name);
+        		}
      		}
+        	
+        	if (Settings.verbose && !problems.isEmpty())
+        	{
+        		Console.out.printf("Pass %d:\n", (6-retries));
+
+    			for (ContextException e: problems)
+    			{
+    				Console.out.println(e);
+    			}        		
+        	}
 		}
 		while (--retries > 0 && !problems.isEmpty());
 
