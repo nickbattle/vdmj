@@ -568,13 +568,18 @@ abstract public class Interpreter
 		boolean failed = false;
 		TraceFilter filter = new TraceFilter(count, subset, reductionType, seed);
 
-		if (filter.getFilteredCount() > 0)
+		if (filter.getFilteredCount() > 0)	// Only known for random reduction
 		{
 			writer.print("Generated " + count + " tests, reduced to " + filter.getFilteredCount() + ",");
 		}
 		else
 		{
 			writer.print("Generated " + count + " tests");
+			
+			if (subset < 1.0)
+			{
+				writer.print(", reduced by " + reductionType + ",");
+			}
 		}
 		
 		writer.println(" in " + (double)(after-before)/1000 + " secs. ");
