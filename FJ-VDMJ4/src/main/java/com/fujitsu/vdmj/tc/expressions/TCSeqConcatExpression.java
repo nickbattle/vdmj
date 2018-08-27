@@ -45,6 +45,16 @@ public class TCSeqConcatExpression extends TCBinaryExpression
 	@Override
 	public final TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
+		if (constraint != null && constraint.isSeq(location))
+		{
+			TCSeqType c = constraint.getSeq();
+			
+			if (c instanceof TCSeq1Type)	// constraint of LHS/RHS are not seq1
+			{
+				constraint = new TCSeqType(c.location, c.seqof);
+			}
+		}
+
 		ltype = left.typeCheck(env, null, scope, constraint);
 		rtype = right.typeCheck(env, null, scope, constraint);
 
