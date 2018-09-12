@@ -107,4 +107,9 @@ public class TCCaseStmtAlternative implements Serializable
 	{
 		return statement.exitCheck();
 	}
+	
+	public boolean alwaysMatches(TCType expType)
+	{
+		return pattern.alwaysMatches(expType);
+	}
 }

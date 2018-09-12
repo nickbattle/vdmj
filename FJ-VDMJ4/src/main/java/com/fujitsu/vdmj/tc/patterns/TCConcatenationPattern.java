@@ -128,4 +128,9 @@ public class TCConcatenationPattern extends TCPattern
 		list.addAll(right.findIdentifiers());
 		return list;
 	}
+
+	public boolean alwaysMatches()
+	{
+		return left.alwaysMatches() && right.alwaysMatches();
+	}
 }
