@@ -78,4 +78,17 @@ public class TCNamePatternPairList extends Vector<TCNamePatternPair>
         		return list.getType(location);		// NB. a union of types
 		}
 	}
+
+	public boolean alwaysMatches()
+	{
+		for (TCNamePatternPair npp: this)
+		{
+			if (!npp.pattern.alwaysMatches())
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
 }

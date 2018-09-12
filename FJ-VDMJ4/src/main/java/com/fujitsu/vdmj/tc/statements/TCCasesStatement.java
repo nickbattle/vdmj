@@ -79,17 +79,19 @@ public class TCCasesStatement extends TCStatement
 	{
 		expType = exp.typeCheck(env, null, scope, null);
 		TCTypeSet rtypes = new TCTypeSet();
+		boolean always = false;
 
 		for (TCCaseStmtAlternative c: cases)
 		{
 			rtypes.add(c.typeCheck(env, scope, expType, constraint));
+			always = always || c.alwaysMatches(expType);
 		}
 
 		if (others != null)
 		{
 			rtypes.add(others.typeCheck(env, scope, constraint));
 		}
-		else
+		else if (!always)
 		{
 			rtypes.add(new TCVoidType(location));
 		}
