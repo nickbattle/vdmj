@@ -36,6 +36,13 @@ public class TCSetType extends TCType
 	public TCType setof;
 	public final boolean empty;
 
+	public TCSetType(LexLocation location, TCType setof, boolean empty)
+	{
+		super(location);
+		this.setof = setof;
+		this.empty = empty;
+	}
+
 	public TCSetType(LexLocation location, TCType setof)
 	{
 		super(location);
