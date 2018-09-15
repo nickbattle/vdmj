@@ -50,13 +50,18 @@ public class TCIndicesExpression extends TCUnaryExpression
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
 		TCType etype = exp.typeCheck(env, null, scope, null);
+		boolean empty = false;
 
 		if (!etype.isSeq(location))
 		{
 			report(3109, "Argument to 'inds' is not a sequence");
 			detail("Actual type", etype);
 		}
+		else
+		{
+			empty = etype.getSeq().empty;
+		}
 
-		return checkConstraint(constraint, new TCSetType(location, new TCNaturalOneType(location)));
+		return checkConstraint(constraint, new TCSetType(location, new TCNaturalOneType(location), empty));
 	}
 }
