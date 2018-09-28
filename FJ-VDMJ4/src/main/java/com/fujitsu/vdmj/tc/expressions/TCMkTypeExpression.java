@@ -84,7 +84,7 @@ public class TCMkTypeExpression extends TCExpression
 
 		if (recordType.opaque && !location.module.equals(recordType.location.module))
 		{
-			report(3127, "Type '" + typename + "' is not a record type");
+			report(3127, "Type '" + typename + "' has no struct export");
 			return rec;
 		}
 
