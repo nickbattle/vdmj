@@ -74,7 +74,7 @@ public class INMuExpression extends INExpression
     			}
     			else
     			{
-    				fields.add(rm.tag.getName(), rm.value.eval(ctxt), !f.equalityAbstration);
+    				fields.add(rm.tag.getName(), rm.value.eval(ctxt), !f.equalityAbstraction);
     			}
      		}
 

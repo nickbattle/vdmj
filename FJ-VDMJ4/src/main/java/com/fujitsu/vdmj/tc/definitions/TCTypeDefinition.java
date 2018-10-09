@@ -328,7 +328,7 @@ public class TCTypeDefinition extends TCDefinition
 					field.tagname.report(3321, "Field type visibility less than type's definition");
 				}
 				
-				if (field.equalityAbstration && eqdef != null)
+				if (field.equalityAbstraction && eqdef != null)
 				{
 					field.tagname.warning(5018, "Field has ':-' for type with eq definition");
 				}
