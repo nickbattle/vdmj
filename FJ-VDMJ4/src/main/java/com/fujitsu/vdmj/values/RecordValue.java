@@ -62,7 +62,7 @@ public class RecordValue extends Value
 		for (Value v: values)
 		{
 			TCField f = fi.next();
-			fieldmap.add(f.tag, v.convertTo(f.type, ctxt), !f.equalityAbstration);
+			fieldmap.add(f.tag, v.convertTo(f.type, ctxt), !f.equalityAbstraction);
 		}
 		
 		checkInvariant(ctxt);
@@ -95,7 +95,7 @@ public class RecordValue extends Value
 				abort(4081, "ASTField not defined: " + f.tag, ctxt);
 			}
 
-			fieldmap.add(f.tag, v.convertTo(f.type, ctxt), !f.equalityAbstration);
+			fieldmap.add(f.tag, v.convertTo(f.type, ctxt), !f.equalityAbstraction);
 		}
 
 		checkInvariant(ctxt);
@@ -124,7 +124,7 @@ public class RecordValue extends Value
 		for (NameValuePair nvp: mapvalues)
 		{
 			TCField f = type.findField(nvp.name.getName());
-			this.fieldmap.add(nvp.name.getName(), nvp.value, !f.equalityAbstration);
+			this.fieldmap.add(nvp.name.getName(), nvp.value, !f.equalityAbstraction);
 		}
 	}
 	
@@ -259,7 +259,7 @@ public class RecordValue extends Value
     				{
 	    				for (TCField f: type.fields)
 	    				{
-	    					if (!f.equalityAbstration)
+	    					if (!f.equalityAbstraction)
 	    					{
 	    						Value fv = fieldmap.get(f.tag);
 	    						Value ofv = ot.fieldmap.get(f.tag);
@@ -334,7 +334,7 @@ public class RecordValue extends Value
 				{
 					for (TCField f: type.fields)
 					{
-						if (!f.equalityAbstration)
+						if (!f.equalityAbstraction)
 						{
 							Value fv = fieldmap.get(f.tag);
 							Value ofv = ot.fieldmap.get(f.tag);

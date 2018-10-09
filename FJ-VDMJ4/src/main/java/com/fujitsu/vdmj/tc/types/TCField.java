@@ -39,15 +39,15 @@ public class TCField extends TCNode implements Serializable
 	public final TCNameToken tagname;
 	public final String tag;
 	public TCType type;
-	public final boolean equalityAbstration;
+	public final boolean equalityAbstraction;
 
-	public TCField(TCNameToken tagname, String tag, TCType type, boolean equalityAbstration)
+	public TCField(TCNameToken tagname, String tag, TCType type, boolean equalityAbstraction)
 	{
 		this.accessibility = null;
 		this.tagname = tagname;
 		this.tag = tag;
 		this.type = type;
-		this.equalityAbstration = equalityAbstration;
+		this.equalityAbstraction = equalityAbstraction;
 	}
 
 	public void unResolve()
@@ -76,7 +76,7 @@ public class TCField extends TCNode implements Serializable
 	@Override
 	public String toString()
 	{
-		return tagname + (equalityAbstration ? ":-" : ":") + type;
+		return tagname + (equalityAbstraction ? ":-" : ":") + type;
 	}
 
 	@Override
