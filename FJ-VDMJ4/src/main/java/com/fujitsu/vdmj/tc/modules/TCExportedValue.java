@@ -40,7 +40,7 @@ public class TCExportedValue extends TCExport
 {
 	private static final long serialVersionUID = 1L;
 	public final TCNameList nameList;
-	public final TCType type;
+	public TCType type;
 
 	public TCExportedValue(LexLocation location, TCNameList nameList, TCType type)
 	{
@@ -98,7 +98,7 @@ public class TCExportedValue extends TCExport
 	@Override
 	public void typeCheck(Environment env, TCDefinitionList actualDefs)
 	{
-		TCType resolved = type.typeResolve(env, null);
+		type = type.typeResolve(env, null);
 		
 		for (TCNameToken name: nameList)
 		{
@@ -112,10 +112,10 @@ public class TCExportedValue extends TCExport
 			{
     			TCType actualType = actual.getType();
     			
-				if (actualType != null && !TypeComparator.compatible(resolved, actualType))
+				if (actualType != null && !TypeComparator.compatible(type, actualType))
 				{
 					report(3189, "Exported type does not match actual type");
-					detail2("Exported", resolved, "Actual", actualType);
+					detail2("Exported", type, "Actual", actualType);
 				}
 			}
 		}
