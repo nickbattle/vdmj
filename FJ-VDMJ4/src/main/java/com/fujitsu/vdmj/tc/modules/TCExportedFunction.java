@@ -41,7 +41,7 @@ public class TCExportedFunction extends TCExport
 {
 	private static final long serialVersionUID = 1L;
 	public final TCNameList nameList;
-	public final TCType type;
+	public TCType type;
 	public final TCNameList typeParams;
 
 	public TCExportedFunction(LexLocation location, TCNameList nameList, TCType type, TCNameList typeParams)
@@ -112,7 +112,7 @@ public class TCExportedFunction extends TCExport
 						FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
 							efd.getTypeParamDefinitions(), env, NameScope.NAMES);
 
-						TCType resolved = type.typeResolve(params, null);
+						type = type.typeResolve(params, null);
 						
 						if (efd.typeParams == null)
 						{
@@ -124,10 +124,10 @@ public class TCExportedFunction extends TCExport
 							detail2("Exported", typeParams, "Actual", efd.typeParams);
 						}
 						
-						if (actualType != null && !actualType.toString().equals(resolved.toString()))
+						if (actualType != null && !actualType.toString().equals(type.toString()))
 						{
 							report(3184, "Exported " + name + " function type incorrect");
-							detail2("Exported", resolved, "Actual", actualType);
+							detail2("Exported", type, "Actual", actualType);
 						}
 					}
 					else if (def instanceof TCImplicitFunctionDefinition)
@@ -136,7 +136,7 @@ public class TCExportedFunction extends TCExport
 						FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
 							ifd.getTypeParamDefinitions(), env, NameScope.NAMES);
 
-						TCType resolved = type.typeResolve(params, null);
+						type = type.typeResolve(params, null);
 						
 						if (ifd.typeParams == null)
 						{
@@ -148,22 +148,22 @@ public class TCExportedFunction extends TCExport
 							detail2("Exported", typeParams, "Actual", ifd.typeParams);
 						}
 						
-						if (actualType != null && !actualType.toString().equals(resolved.toString()))
+						if (actualType != null && !actualType.toString().equals(type.toString()))
 						{
 							report(3184, "Exported " + name + " function type incorrect");
-							detail2("Exported", resolved, "Actual", actualType);
+							detail2("Exported", type, "Actual", actualType);
 						}
 					}
 				}
 				else
 				{
-					TCType resolved = type.typeResolve(env, null);
+					type = type.typeResolve(env, null);
 					
 					// if (actualType != null && !TypeComparator.compatible(resolved, actualType))
-					if (actualType != null && !actualType.equals(resolved))
+					if (actualType != null && !actualType.equals(type))
 					{
 						report(3184, "Exported " + name + " function type incorrect");
-						detail2("Exported", resolved, "Actual", actualType);
+						detail2("Exported", type, "Actual", actualType);
 					}
 				}
 			}
