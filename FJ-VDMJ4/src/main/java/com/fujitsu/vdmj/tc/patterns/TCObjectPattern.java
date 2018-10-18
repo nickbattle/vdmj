@@ -191,4 +191,9 @@ public class TCObjectPattern extends TCPattern
 
 		return list;
 	}
+
+	public boolean alwaysMatches()
+	{
+		return fieldlist.alwaysMatches();
+	}
 }

@@ -37,21 +37,21 @@ public class ASTField extends ASTNode implements Serializable
 	public final LexNameToken tagname;
 	public final String tag;
 	public final ASTType type;
-	public final boolean equalityAbstration;
+	public final boolean equalityAbstraction;
 
-	public ASTField(LexNameToken tagname, String tag, ASTType type, boolean equalityAbstration)
+	public ASTField(LexNameToken tagname, String tag, ASTType type, boolean equalityAbstraction)
 	{
 		this.accessibility = null;
 		this.tagname = tagname;
 		this.tag = tag;
 		this.type = type;
-		this.equalityAbstration = equalityAbstration;
+		this.equalityAbstraction = equalityAbstraction;
 	}
 
 	@Override
 	public String toString()
 	{
-		return tagname + (equalityAbstration ? ":-" : ":") + type;
+		return tagname + (equalityAbstraction ? ":-" : ":") + type;
 	}
 
 	@Override

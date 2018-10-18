@@ -86,4 +86,9 @@ public class TCIdentifierPattern extends TCPattern
 		list.add(this);
 		return list;
 	}
+
+	public boolean alwaysMatches()
+	{
+		return true;
+	}
 }

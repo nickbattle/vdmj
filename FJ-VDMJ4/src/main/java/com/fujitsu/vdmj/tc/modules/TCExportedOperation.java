@@ -39,7 +39,7 @@ public class TCExportedOperation extends TCExport
 {
 	private static final long serialVersionUID = 1L;
 	public final TCNameList nameList;
-	public final TCType type;
+	public TCType type;
 
 	public TCExportedOperation(LexLocation location, TCNameList nameList, TCType type)
 	{
@@ -89,7 +89,7 @@ public class TCExportedOperation extends TCExport
 	@Override
 	public void typeCheck(Environment env, TCDefinitionList actualDefs)
 	{
-		TCType resolved = type.typeResolve(env, null);
+		type = type.typeResolve(env, null);
 		
 		for (TCNameToken name: nameList)
 		{
@@ -103,10 +103,10 @@ public class TCExportedOperation extends TCExport
 			{
     			TCType actualType = actual.getType();
     			
-				if (actualType != null && !TypeComparator.compatible(resolved, actualType))
+				if (actualType != null && !TypeComparator.compatible(type, actualType))
 				{
 					report(3186, "Exported operation type does not match actual type");
-					detail2("Exported", resolved, "Actual", actualType);
+					detail2("Exported", type, "Actual", actualType);
 				}
 			}
 		}

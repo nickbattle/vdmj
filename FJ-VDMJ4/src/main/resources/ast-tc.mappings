@@ -333,7 +333,7 @@ map ASTBooleanType{location} to TCBooleanType(location);
 map ASTBracketType{type} to TCBracketType(type);
 map ASTCharacterType{location} to TCCharacterType(location);
 map ASTClassType{location, classdef} to TCClassType(location, classdef);
-map ASTField{tagname, tag, type, equalityAbstration} to TCField(tagname, tag, type, equalityAbstration);
+map ASTField{tagname, tag, type, equalityAbstraction} to TCField(tagname, tag, type, equalityAbstraction);
 map ASTFieldList{} to TCFieldList(this);
 map ASTFunctionType{location, parameters, partial, result} to TCFunctionType(location, parameters, partial, result);
 map ASTInMapType{location, from, to} to TCInMapType(location, from, to);

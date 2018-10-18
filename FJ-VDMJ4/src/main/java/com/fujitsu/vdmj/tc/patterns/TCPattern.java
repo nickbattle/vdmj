@@ -117,6 +117,12 @@ public abstract class TCPattern extends TCNode implements Serializable
 	{
 		return TypeComparator.compatible(getPossibleType(), type);
 	}
+	
+	/** Test whether the pattern will always match the type passed */
+	public boolean alwaysMatches(TCType type)
+	{
+		return TypeComparator.isSubType(type, getPossibleType()) && alwaysMatches();
+	}
 
 	/**
 	 * Get a set of names for the pattern's variables. Note that if the
@@ -158,5 +164,16 @@ public abstract class TCPattern extends TCNode implements Serializable
 	public void detail2(String tag1, Object obj1, String tag2, Object obj2)
 	{
 		TypeChecker.detail2(tag1, obj1, tag2, obj2);
+	}
+
+	/**
+	 * @return True if the pattern will always match a value of the corresponding
+	 * type. For example, an identifier will always match a value, but a
+	 * sequence pattern [a,b] will only match sequences of two values, and a
+	 * constant pattern line "123" will only match the value 123.
+	 */
+	public boolean alwaysMatches()
+	{
+		return false;
 	}
 }
