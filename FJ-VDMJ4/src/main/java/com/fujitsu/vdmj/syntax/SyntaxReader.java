@@ -700,8 +700,8 @@ public abstract class SyntaxReader
 		try
 		{
 			Class<?> clazz = Class.forName("com.fujitsu.vdmj.ast.annotations.AST" + name + "Annotation");
-			Constructor<?> ctor = clazz.getConstructor(LexIdentifierToken.class, ASTExpressionList.class);
-			return (ASTAnnotation) ctor.newInstance(name, args);
+			Constructor<?> ctor = clazz.getConstructor(LexIdentifierToken.class, ASTExpressionList.class, SyntaxReader.class);
+			return (ASTAnnotation) ctor.newInstance(name, args, this);
 		}
 		catch (Exception e)
 		{
