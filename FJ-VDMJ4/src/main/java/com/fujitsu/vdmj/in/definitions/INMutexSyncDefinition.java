@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.in.definitions;
 
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.INEqualsExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INHistoryExpression;
@@ -42,9 +43,10 @@ public class INMutexSyncDefinition extends INDefinition
 	private static final long serialVersionUID = 1L;
 	public final TCNameList operations;
 
-	public INMutexSyncDefinition(LexLocation location, TCNameList operations)
+	public INMutexSyncDefinition(INAnnotationList annotations, LexLocation location, TCNameList operations)
 	{
 		super(location, null, null);
+		this.annotations = annotations;
 		this.operations = operations;
 	}
 

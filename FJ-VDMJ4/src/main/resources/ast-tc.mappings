@@ -25,9 +25,9 @@ map ASTInheritedDefinition{accessSpecifier, name, superdef} to TCInheritedDefini
 map ASTInstanceVariableDefinition{annotations, accessSpecifier, name, type, expression} to TCInstanceVariableDefinition(annotations, accessSpecifier, name, type, expression);
 map ASTLocalDefinition{location, name, type} to TCLocalDefinition(location, name, type);
 map ASTMultiBindListDefinition{location, bindings} to TCMultiBindListDefinition(location, bindings);
-map ASTMutexSyncDefinition{location, operations} to TCMutexSyncDefinition(location, operations);
-map ASTNamedTraceDefinition{location, name, terms} to TCNamedTraceDefinition(location, name, terms);
-map ASTPerSyncDefinition{location, opname, guard} to TCPerSyncDefinition(location, opname, guard);
+map ASTMutexSyncDefinition{annotations, location, operations} to TCMutexSyncDefinition(annotations, location, operations);
+map ASTNamedTraceDefinition{annotations, location, name, terms} to TCNamedTraceDefinition(annotations, location, name, terms);
+map ASTPerSyncDefinition{annotations, location, opname, guard} to TCPerSyncDefinition(annotations, location, opname, guard);
 map ASTRenamedDefinition{name, def} to TCRenamedDefinition(name, def);
 map ASTStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression} to TCStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression);
 map ASTSystemDefinition{name, definitions} to TCSystemDefinition(name, definitions);

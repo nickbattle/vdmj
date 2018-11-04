@@ -25,11 +25,10 @@ package com.fujitsu.vdmj.ast.annotations;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
-import com.fujitsu.vdmj.syntax.SyntaxReader;
 
 public class ASTOverrideAnnotation extends ASTAnnotation
 {
-	public ASTOverrideAnnotation(LexIdentifierToken name, ASTExpressionList args, SyntaxReader reader)
+	public ASTOverrideAnnotation(LexIdentifierToken name, ASTExpressionList args)
 	{
 		super(name, args);
 	}

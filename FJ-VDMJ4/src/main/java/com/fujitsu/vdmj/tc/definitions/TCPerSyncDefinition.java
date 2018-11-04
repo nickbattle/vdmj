@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -40,10 +41,11 @@ public class TCPerSyncDefinition extends TCDefinition
 	public final TCNameToken opname;
 	public final TCExpression guard;
 
-	public TCPerSyncDefinition(LexLocation location, TCNameToken opname,
+	public TCPerSyncDefinition(TCAnnotationList annotations, LexLocation location, TCNameToken opname,
 		TCExpression guard)
 	{
 		super(Pass.DEFS, location, opname.getPerName(location), NameScope.GLOBAL);
+		this.annotations = annotations;
 		this.opname = opname;
 		this.guard = guard;
 	}
@@ -87,6 +89,8 @@ public class TCPerSyncDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.typeCheck(this, base, scope);
+
 		TCClassDefinition classdef = base.findClassDefinition();
 		int opfound = 0;
 		int perfound = 0;

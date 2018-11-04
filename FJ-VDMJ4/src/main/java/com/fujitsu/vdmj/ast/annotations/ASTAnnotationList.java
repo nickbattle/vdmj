@@ -25,7 +25,25 @@ package com.fujitsu.vdmj.ast.annotations;
 
 import java.util.Vector;
 
+import com.fujitsu.vdmj.syntax.SyntaxReader;
+
 public class ASTAnnotationList extends Vector<ASTAnnotation>
 {
 	private static final long serialVersionUID = 1L;
+
+	public void before(SyntaxReader reader)
+	{
+		for (ASTAnnotation annotation: this)
+		{
+			annotation.before(reader);
+		}
+	}
+
+	public void after(SyntaxReader reader)
+	{
+		for (ASTAnnotation annotation: this)
+		{
+			annotation.after(reader);
+		}
+	}
 }

@@ -26,9 +26,9 @@ map TCInheritedDefinition{name, superdef} to POInheritedDefinition(name, superde
 map TCInstanceVariableDefinition{name, type, expression, expType} to POInstanceVariableDefinition(name, type, expression, expType);
 map TCLocalDefinition{location, name, type} to POLocalDefinition(location, name, type);
 map TCMultiBindListDefinition{location, bindings, defs} to POMultiBindListDefinition(location, bindings, defs);
-map TCMutexSyncDefinition{location, operations} to POMutexSyncDefinition(location, operations);
-map TCNamedTraceDefinition{location, name} to PONamedTraceDefinition(location, name);
-map TCPerSyncDefinition{location, opname, guard} to POPerSyncDefinition(location, opname, guard);
+map TCMutexSyncDefinition{annotations, location, operations} to POMutexSyncDefinition(annotations, location, operations);
+map TCNamedTraceDefinition{annotations, location, name} to PONamedTraceDefinition(annotations, location, name);
+map TCPerSyncDefinition{annotations, location, opname, guard} to POPerSyncDefinition(annotations, location, opname, guard);
 map TCRenamedDefinition{name, def} to PORenamedDefinition(name, def);
 map TCStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression, recordType} to POStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression, recordType);
 map TCSystemDefinition{name, classtype, definitions} to POSystemDefinition(name, classtype, definitions);

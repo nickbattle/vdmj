@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.definitions;
 
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -35,9 +36,10 @@ public class INPerSyncDefinition extends INDefinition
 	public final TCNameToken opname;
 	public final INExpression guard;
 
-	public INPerSyncDefinition(LexLocation location, TCNameToken opname, INExpression guard)
+	public INPerSyncDefinition(INAnnotationList annotations, LexLocation location, TCNameToken opname, INExpression guard)
 	{
 		super(location, null, opname.getPerName(location));
+		this.annotations = annotations;
 		this.opname = opname;
 		this.guard = guard;
 	}

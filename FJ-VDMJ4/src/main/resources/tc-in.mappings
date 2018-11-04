@@ -25,9 +25,9 @@ map TCInheritedDefinition{name, accessSpecifier, superdef} to INInheritedDefinit
 map TCInstanceVariableDefinition{accessSpecifier, name, type, expression, expType} to INInstanceVariableDefinition(accessSpecifier, name, type, expression, expType);
 map TCLocalDefinition{location, name, type, valueDefinition} to INLocalDefinition(location, name, type, valueDefinition);
 map TCMultiBindListDefinition{location, bindings, defs} to INMultiBindListDefinition(location, bindings, defs);
-map TCMutexSyncDefinition{location, operations} to INMutexSyncDefinition(location, operations);
-map TCNamedTraceDefinition{location, name, terms, classDefinition} to INNamedTraceDefinition(location, name, terms, classDefinition);
-map TCPerSyncDefinition{location, opname, guard} to INPerSyncDefinition(location, opname, guard);
+map TCMutexSyncDefinition{annotations, location, operations} to INMutexSyncDefinition(annotations, location, operations);
+map TCNamedTraceDefinition{annotations, location, name, terms, classDefinition} to INNamedTraceDefinition(annotations, location, name, terms, classDefinition);
+map TCPerSyncDefinition{annotations, location, opname, guard} to INPerSyncDefinition(annotations, location, opname, guard);
 map TCRenamedDefinition{name, def} to INRenamedDefinition(name, def);
 map TCStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression, invdef, initdef, canBeExecuted} to INStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression, invdef, initdef, canBeExecuted);
 map TCSystemDefinition{name, classtype, definitions} to INSystemDefinition(name, classtype, definitions);

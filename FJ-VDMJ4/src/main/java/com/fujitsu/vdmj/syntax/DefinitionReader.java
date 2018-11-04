@@ -556,8 +556,10 @@ public class DefinitionReader extends SyntaxReader
 			try
 			{
 				ASTAnnotationList annotations = readAnnotations();
+				annotations.before(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTTypeDefinition def = readTypeDefinition();
+				annotations.after(this);
 				def.setAnnotations(annotations);
 
 				// Force all type defs (invs) to be static
@@ -589,8 +591,10 @@ public class DefinitionReader extends SyntaxReader
 			try
 			{
 				ASTAnnotationList annotations = readAnnotations();
+				annotations.before(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTDefinition def = readValueDefinition();
+				annotations.after(this);
 				def.setAnnotations(annotations);
 
 				// Force all values to be static
@@ -622,8 +626,10 @@ public class DefinitionReader extends SyntaxReader
 			try
 			{
 				ASTAnnotationList annotations = readAnnotations();
+				annotations.before(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTDefinition def = readFunctionDefinition();
+				annotations.after(this);
 				def.setAnnotations(annotations);
 
 				if (Settings.release == Release.VDM_10)
@@ -663,8 +669,10 @@ public class DefinitionReader extends SyntaxReader
 			try
 			{
 				ASTAnnotationList annotations = readAnnotations();
+				annotations.before(this);
 				ASTAccessSpecifier access = readAccessSpecifier(dialect == Dialect.VDM_RT, true);
 				ASTDefinition def = readOperationDefinition();
+				annotations.after(this);
 				def.setAccessSpecifier(access);
 				def.setAnnotations(annotations);
 				list.add(def);
@@ -701,7 +709,11 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				ASTAnnotationList annotations = readAnnotations();
+				annotations.before(this);
 				ASTDefinition def = readInstanceVariableDefinition();
+				annotations.after(this);
+				def.setAnnotations(annotations);
 				list.add(def);
 
 				if (!newSection())
@@ -728,7 +740,11 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				ASTAnnotationList annotations = readAnnotations();
+				annotations.before(this);
 				ASTDefinition def = readNamedTraceDefinition();
+				annotations.after(this);
+				def.setAnnotations(annotations);
 				list.add(def);
 
 				if (!newSection())
@@ -754,7 +770,10 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				ASTAnnotationList annotations = readAnnotations();
+				annotations.before(this);
 				ASTDefinition def = readPermissionPredicateDefinition();
+				annotations.after(this);
 				list.add(def);
 
 				if (!newSection())

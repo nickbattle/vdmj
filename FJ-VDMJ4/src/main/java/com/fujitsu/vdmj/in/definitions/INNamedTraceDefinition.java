@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.definitions;
 
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.traces.INTraceDefinitionTerm;
 import com.fujitsu.vdmj.in.traces.INTraceDefinitionTermList;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -38,10 +39,11 @@ public class INNamedTraceDefinition extends INDefinition
 	private static final long serialVersionUID = 1L;
 	public final INTraceDefinitionTermList terms;
 
-	public INNamedTraceDefinition(LexLocation location, TCNameToken pathname,
+	public INNamedTraceDefinition(INAnnotationList annotations, LexLocation location, TCNameToken pathname,
 		INTraceDefinitionTermList terms, INClassDefinition classdef)
 	{
 		super(location,	null, pathname);
+		this.annotations = annotations;
 		this.terms = terms;
 		this.classDefinition = classdef;
 	}

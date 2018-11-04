@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.ast.annotations;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.syntax.SyntaxReader;
 
 public abstract class ASTAnnotation
 {
@@ -42,5 +43,15 @@ public abstract class ASTAnnotation
 	public String toString()
 	{
 		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
+	}
+
+	public void before(SyntaxReader reader)
+	{
+		// Nothing by default
+	}
+
+	public void after(SyntaxReader reader)
+	{
+		// Nothing by default
 	}
 }
