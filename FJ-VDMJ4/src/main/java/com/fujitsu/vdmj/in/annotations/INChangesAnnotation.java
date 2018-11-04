@@ -55,7 +55,7 @@ public class INChangesAnnotation extends INAnnotation
 		super(name, args);
 	}
 	
-	protected static void doInit()
+	public static void doInit()
 	{
 		previousState.clear();
 		previousLocs.clear();

@@ -23,6 +23,10 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
@@ -35,21 +39,34 @@ public abstract class INAnnotation
 	public final TCIdentifierToken name;
 	
 	public final INExpressionList args;
+	
+	private static final Set<Class<?>> declared = new HashSet<Class<?>>(); 
 
 	public INAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		this.name = name;
 		this.args = args;
+
+		declared.add(this.getClass());
 	}
 	
 	public static void init()
 	{
-		INChangesAnnotation.doInit();
-		INTraceAnnotation.doInit();
-		INNullAnnotation.doInit();
+		for (Class<?> clazz: declared)
+		{
+			try
+			{
+				Method doInit = clazz.getDeclaredMethod("doInit", (Class<?>[])null);
+				doInit.invoke(null, (Object[])null);
+			}
+			catch (Throwable e)
+			{
+				throw new RuntimeException(clazz.getSimpleName() + ":" + e);
+			}
+		}
 	}
 	
-	protected static void doInit()
+	public static void doInit()
 	{
 		// Nothing by default
 	}

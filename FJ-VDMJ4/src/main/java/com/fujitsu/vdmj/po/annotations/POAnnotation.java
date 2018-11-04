@@ -23,6 +23,10 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
@@ -35,11 +39,36 @@ public abstract class POAnnotation
 	public final TCIdentifierToken name;
 	
 	public final POExpressionList args;
+	
+	private static final Set<Class<?>> declared = new HashSet<Class<?>>(); 
 
 	public POAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
 		this.name = name;
 		this.args = args;
+		
+		declared.add(this.getClass());
+	}
+
+	public static void init()
+	{
+		for (Class<?> clazz: declared)
+		{
+			try
+			{
+				Method doInit = clazz.getMethod("doInit", (Class<?>[])null);
+				doInit.invoke(null, (Object[])null);
+			}
+			catch (Throwable e)
+			{
+				throw new RuntimeException(clazz.getSimpleName() + ":" + e);
+			}
+		}
+	}
+	
+	public static void doInit()
+	{
+		// Nothing by default
 	}
 
 	@Override

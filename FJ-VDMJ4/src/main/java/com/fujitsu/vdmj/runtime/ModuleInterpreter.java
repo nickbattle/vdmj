@@ -46,6 +46,7 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.scheduler.CTMainThread;
@@ -338,6 +339,7 @@ public class ModuleInterpreter extends Interpreter
 			VDMJ.mapperStats(now, PONode.MAPPINGS);
 		}
 		
+		POAnnotation.doInit();
 		return pogModules.getProofObligations();
 	}
 

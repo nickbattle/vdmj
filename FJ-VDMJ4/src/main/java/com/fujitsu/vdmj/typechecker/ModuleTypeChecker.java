@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.typechecker;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
@@ -176,6 +177,9 @@ public class ModuleTypeChecker extends TypeChecker
 				}
 			}
 		}
+		
+		// Initialise any annotations
+		TCAnnotation.init();
 
 		// Proceed to type check all definitions, considering types, values
 		// and remaining definitions, in that order.
