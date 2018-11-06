@@ -235,7 +235,14 @@ public class PatternReader extends SyntaxReader
 					if (id.name.equals("mk_"))
 					{
 						checkFor(Token.BRA, 2183, "Expecting '(' after mk_ tuple");
-						pattern = new ASTTuplePattern(token.location, readPatternList());
+						ASTPatternList args = readPatternList();
+						
+						if (args.size() <= 1)
+						{
+							throwMessage(2183, "Tuple pattern must have >1 args");
+						}
+						
+						pattern = new ASTTuplePattern(token.location, args);
 						checkFor(Token.KET, 2184, "Expecting ')' after mk_ tuple");
 					}
 					else
