@@ -107,7 +107,7 @@ map TCMkBasicExpression{type, arg} to INMkBasicExpression(type, arg);
 map TCMkTypeExpression{location, recordType, args} to INMkTypeExpression(location, recordType, args);
 map TCModExpression{left, op, right} to INModExpression(left, op, right);
 map TCMuExpression{location, record, modifiers} to INMuExpression(location, record, modifiers);
-map TCNarrowExpression{location, basictype, typename, test} to INNarrowExpression(location, basictype, typename, test);
+map TCNarrowExpression{location, basictype, typename, typedef, test} to INNarrowExpression(location, basictype, typename, typedef, test);
 map TCNewExpression{location, classname, args, classdef, ctordef} to INNewExpression(location, classname, args, classdef, ctordef);
 map TCNilExpression{location} to INNilExpression(location);
 map TCNotEqualExpression{left, op, right} to INNotEqualExpression(left, op, right);

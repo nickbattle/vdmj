@@ -39,15 +39,15 @@ public class INNarrowExpression extends INExpression
 	private static final long serialVersionUID = 1L;
 	public final TCType basictype;
 	public final TCNameToken typename;
+	public final INDefinition typedef;
 	public final INExpression test;
 
-	private INDefinition typedef = null;
-
-	public INNarrowExpression(LexLocation location, TCType basictype, TCNameToken typename, INExpression test)
+	public INNarrowExpression(LexLocation location, TCType basictype, TCNameToken typename, INDefinition typedef, INExpression test)
 	{
 		super(location);
 		this.basictype = basictype;
 		this.typename = typename;
+		this.typedef = typedef;
 		this.test = test;
 	}
 
