@@ -33,6 +33,7 @@ import java.util.Formatter;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCBracketType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
@@ -201,6 +202,10 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
     				catch (ValueException e)
     				{
     					// Union type not applicable
+    				}
+    				catch (ContextException e)
+    				{
+    					// Pre/post/invariant problems
     				}
 				}
 			}
