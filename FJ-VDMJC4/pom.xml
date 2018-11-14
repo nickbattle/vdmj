@@ -50,7 +50,7 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<Main-Class>org.overturetool.vdmjc.VDMJC</Main-Class>
+							<Main-Class>com.fujitsu.vdmjc.VDMJC</Main-Class>
 							<Implementation-Version>${maven.build.timestamp}</Implementation-Version>
 							<Class-Path>.</Class-Path>
 						</manifestEntries>
