@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFieldList;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.State;
 
@@ -97,9 +98,10 @@ public class INStateDefinition extends INDefinition
 	@Override
 	public String toString()
 	{
-		return "state " + name + "of\n" + fields +
-			(invPattern == null ? "" : "\n\tinv " + invPattern + " == " + invExpression) +
-    		(initPattern == null ? "" : "\n\tinit " + initPattern + " == " + initExpression);
+		return "state " + name + " of\n" + Utils.listToString(fields, "\n") +
+				(invPattern == null ? "" : "\n\tinv " + invPattern + " == " + invExpression) +
+	    		(initPattern == null ? "" : "\n\tinit " + initPattern + " == " + initExpression) +
+	    		"\nend";
 	}
 
 	@Override

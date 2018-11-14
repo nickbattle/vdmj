@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.ast.types.ASTFieldList;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * A class to hold a module's state definition.
@@ -56,9 +57,10 @@ public class ASTStateDefinition extends ASTDefinition
 	@Override
 	public String toString()
 	{
-		return "state " + name + "of\n" + fields +
-			(invPattern == null ? "" : "\n\tinv " + invPattern + " == " + invExpression) +
-    		(initPattern == null ? "" : "\n\tinit " + initPattern + " == " + initExpression);
+		return "state " + name + " of\n" + Utils.listToString(fields, "\n") +
+				(invPattern == null ? "" : "\n\tinv " + invPattern + " == " + invExpression) +
+	    		(initPattern == null ? "" : "\n\tinit " + initPattern + " == " + initExpression) +
+	    		"\nend";
 	}
 
 	@Override

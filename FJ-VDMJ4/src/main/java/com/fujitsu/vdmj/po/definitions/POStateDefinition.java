@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFieldList;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * A class to hold a module's state definition.
@@ -65,9 +66,10 @@ public class POStateDefinition extends PODefinition
 	@Override
 	public String toString()
 	{
-		return "state " + name + "of\n" + fields +
-			(invPattern == null ? "" : "\n\tinv " + invPattern + " == " + invExpression) +
-    		(initPattern == null ? "" : "\n\tinit " + initPattern + " == " + initExpression);
+		return "state " + name + " of\n" + Utils.listToString(fields, "\n") +
+				(invPattern == null ? "" : "\n\tinv " + invPattern + " == " + invExpression) +
+	    		(initPattern == null ? "" : "\n\tinit " + initPattern + " == " + initExpression) +
+	    		"\nend";
 	}
 
 	@Override
