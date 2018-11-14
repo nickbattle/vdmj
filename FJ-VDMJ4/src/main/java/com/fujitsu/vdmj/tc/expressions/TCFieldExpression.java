@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -79,6 +80,15 @@ public class TCFieldExpression extends TCExpression
 		{
     		TCRecordType rec = root.getRecord();
     		TCField cf = rec.findField(field.getName());
+    		
+    		// Check for state access via state record
+    		TCStateDefinition state = env.findStateDefinition();
+    		
+    		if (state != null && state.getType().equals(rec))
+    		{
+    			TCNameToken sname = new TCNameToken(field.getLocation(), rec.name.getModule(), field.getName());
+    			state.findName(sname, NameScope.STATE);		// Lookup marks as used
+    		}
 
    			if (cf != null)
    			{
