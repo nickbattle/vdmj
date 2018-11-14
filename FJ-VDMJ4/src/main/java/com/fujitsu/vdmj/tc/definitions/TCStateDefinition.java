@@ -48,6 +48,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * A class to hold a module's state definition.
@@ -108,9 +109,10 @@ public class TCStateDefinition extends TCDefinition
 	@Override
 	public String toString()
 	{
-		return "state " + name + "of\n" + fields +
+		return "state " + name + " of\n" + Utils.listToString(fields, "\n") +
 			(invPattern == null ? "" : "\n\tinv " + invPattern + " == " + invExpression) +
-    		(initPattern == null ? "" : "\n\tinit " + initPattern + " == " + initExpression);
+    		(initPattern == null ? "" : "\n\tinit " + initPattern + " == " + initExpression) +
+    		"\nend";
 	}
 	
 	@Override
