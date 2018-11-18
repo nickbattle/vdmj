@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.typechecker;
 
+import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -110,6 +111,9 @@ public class ClassTypeChecker extends TypeChecker
 		{
 			c.checkOver();
 		}
+
+		// Initialise any annotations
+		TCAnnotation.init();
 
 	    for (Pass pass: Pass.values())
 		{

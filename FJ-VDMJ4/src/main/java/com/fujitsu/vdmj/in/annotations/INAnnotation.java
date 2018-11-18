@@ -56,7 +56,7 @@ public abstract class INAnnotation
 		{
 			try
 			{
-				Method doInit = clazz.getDeclaredMethod("doInit", (Class<?>[])null);
+				Method doInit = clazz.getMethod("doInit", (Class<?>[])null);
 				doInit.invoke(null, (Object[])null);
 			}
 			catch (Throwable e)
