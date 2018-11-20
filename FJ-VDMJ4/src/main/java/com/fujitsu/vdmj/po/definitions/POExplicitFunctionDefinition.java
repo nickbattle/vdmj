@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -147,6 +148,13 @@ public class POExplicitFunctionDefinition extends PODefinition
 			{
 				matchNeeded = true;
 			}
+		}
+		
+		if (type.hasTotal())
+		{
+			ctxt.push(new POFunctionDefinitionContext(this, false));
+			obligations.add(new TotalFunctionObligation(this, ctxt));
+			ctxt.pop();
 		}
 
 		if (pids.hasDuplicates() || matchNeeded)

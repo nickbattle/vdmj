@@ -61,7 +61,8 @@ public enum POType
 	SEQ_MEMBER("sequence membership"),
 	ORDERED("ordered"),
 	STRICT_ORDER("strict order"),
-	EQUIV_RELATION("equivalence relation");
+	EQUIV_RELATION("equivalence relation"),
+	TOTAL("total function");
 
 	private String kind;
 
