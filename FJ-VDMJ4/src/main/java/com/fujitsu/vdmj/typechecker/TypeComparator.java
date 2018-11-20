@@ -463,6 +463,11 @@ public class TypeComparator
 
 				TCFunctionType fa = (TCFunctionType)to;
 				TCFunctionType fb = (TCFunctionType)from;
+				
+				if (fb.partial && !fa.partial)
+				{
+					return Result.No;
+				}
 
 				return (allCompatible(fa.parameters, fb.parameters, paramOnly) == Result.Yes &&
 						(paramOnly ||

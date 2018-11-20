@@ -275,4 +275,19 @@ public class TCFunctionType extends TCType
 		names.addAll(result.getFreeVariables(env));
 		return names;
 	}
+	
+	public boolean hasTotal()
+	{
+		boolean total = !partial;
+		TCType rtype = result;
+		
+		while (!total && rtype instanceof TCFunctionType)
+		{
+			TCFunctionType ftype = (TCFunctionType)rtype;
+			total = total || !ftype.partial;
+			rtype = ftype.result;
+		}
+		
+		return total;
+	}
 }
