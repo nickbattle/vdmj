@@ -760,17 +760,29 @@ public abstract class SyntaxReader
 	protected ASTAnnotation makeAnnotation(LexIdentifierToken name, ASTExpressionList args)
 		throws ParserException, LexException
 	{
-		try
+		String classpath = System.getProperty("vdmj.annotations", "com.fujitsu.vdmj.ast.annotations");
+		String[] packages = classpath.split(";|:");
+		
+		for (String pack: packages)
 		{
-			Class<?> clazz = Class.forName("com.fujitsu.vdmj.ast.annotations.AST" + name + "Annotation");
-			Constructor<?> ctor = clazz.getConstructor(LexIdentifierToken.class, ASTExpressionList.class);
-			return (ASTAnnotation) ctor.newInstance(name, args);
+			try
+			{
+				Class<?> clazz = Class.forName(pack + ".AST" + name + "Annotation");
+				Constructor<?> ctor = clazz.getConstructor(LexIdentifierToken.class, ASTExpressionList.class);
+				return (ASTAnnotation) ctor.newInstance(name, args);
+			}
+			catch (ClassNotFoundException e)
+			{
+				// Try the next package
+			}
+			catch (Exception e)
+			{
+				throwMessage(2334, "Failed to instantiate AST" + name + "Annotation");
+			}
 		}
-		catch (Exception e)
-		{
-			throwMessage(2334, "Failed to instantiate AST" + name + "Annotation");
-			return null;
-		}
+
+		throwMessage(2334, "Cannot find AST" + name + "Annotation on " + classpath);
+		return null;
 	}
 	
 	protected List<String> getComments()
