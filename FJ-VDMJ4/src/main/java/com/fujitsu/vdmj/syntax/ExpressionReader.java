@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedExpression;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
 import com.fujitsu.vdmj.ast.expressions.*;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
@@ -86,7 +87,7 @@ public class ExpressionReader extends SyntaxReader
 		return list;
 	}
 
-	// Constructor Family...
+	// Constructor Family... and pick up any annotations here.
 
 	public ASTExpression readExpression() throws ParserException, LexException
 	{
@@ -603,7 +604,7 @@ public class ExpressionReader extends SyntaxReader
 	private ASTExpression readApplicatorExpression()
 		throws ParserException, LexException
 	{
-		ASTExpression exp = readBasicExpression();
+		ASTExpression exp = readAnnotatedExpression();
 		boolean more = true;
 
 		while (more)
@@ -802,6 +803,30 @@ public class ExpressionReader extends SyntaxReader
 		return exp;
 	}
 
+	private ASTExpression readAnnotatedExpression() throws ParserException, LexException
+	{
+		ASTAnnotationList annotations = readAnnotations();
+		
+		for (ASTAnnotation annotation: annotations)
+		{
+			annotation.before(this);
+		}
+		
+		ASTExpression body =  readBasicExpression();
+
+		for (ASTAnnotation annotation: annotations)
+		{
+			annotation.after(this);
+		}
+		
+		for (ASTAnnotation annotation: annotations)
+		{
+			body = new ASTAnnotatedExpression(annotation.name.location, annotation, body);
+		}
+		
+		return body;
+	}
+
 	private ASTExpression readBasicExpression()
 		throws ParserException, LexException
 	{
@@ -867,10 +892,6 @@ public class ExpressionReader extends SyntaxReader
 				checkFor(Token.KET, 2124, "Expecting ')'");
 				return exp;
 				
-			case AT:
-				nextToken();
-				return readAnnotatedExpression();
-
 			case SET_OPEN:
 				nextToken();
 				return readSetOrMapExpression(token.location);
@@ -949,36 +970,6 @@ public class ExpressionReader extends SyntaxReader
 				throwMessage(2034, "Unexpected token in expression");
 				return null;
 		}
-	}
-
-	private ASTExpression readAnnotatedExpression() throws LexException, ParserException
-	{
-		LexIdentifierToken name = readIdToken("Expecting @Annotation name");
-		ASTExpressionList args = new ASTExpressionList();
-		
-		if (lastToken().is(Token.BRA))
-		{
-			ExpressionReader er = getExpressionReader();
-			
-			if (nextToken().isNot(Token.KET))
-			{
-				args.add(er.readExpression());
-		
-				while (ignore(Token.COMMA))
-				{
-					args.add(er.readExpression());
-				}
-			}
-			
-			checkFor(Token.KET, 2124, "Expecting ')' after annotation args");
-		}
-
-		ASTAnnotation annotation = makeAnnotation(name, args);
-		annotation.before(this);
-		ASTExpression body =  readConnectiveExpression();
-		annotation.after(this);
-
-		return new ASTAnnotatedExpression(name.location, annotation, body);
 	}
 
 	private ASTExpression readTimeExpression(LexLocation location) throws LexException

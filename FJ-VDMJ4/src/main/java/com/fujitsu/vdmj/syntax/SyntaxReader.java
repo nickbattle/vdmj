@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
@@ -329,6 +330,68 @@ public abstract class SyntaxReader
 
 		throwMessage(2061, message);
 		return null;
+	}
+	
+	/**
+	 * Read any annotations from the collected comments, and clear them.
+	 */
+	protected ASTAnnotationList readAnnotations() throws LexException, ParserException
+	{
+		ASTAnnotationList annotations = new ASTAnnotationList();
+		List<String> comments = getComments();
+		List<LexLocation> commlocs = getCommLocs();
+		
+		for (int i=0; i<comments.size(); i++)
+		{
+			if (comments.get(i).startsWith("@"))
+			{
+				try
+				{
+					annotations.add(readAnnotation(new LexTokenReader(comments.get(i), commlocs.get(i), reader)));
+				}
+				catch (Exception e)
+				{
+					// ignore - comment is not parsable
+				}
+			}
+		}
+		
+		return annotations;
+	}
+	
+	private ASTAnnotation readAnnotation(LexTokenReader ltr) throws LexException, ParserException
+	{
+		ltr.nextToken();
+		
+		if (ltr.nextToken().is(Token.IDENTIFIER))
+		{
+			LexIdentifierToken name = (LexIdentifierToken)ltr.getLast();  
+			ASTExpressionList args = new ASTExpressionList();
+			
+			if (ltr.nextToken().is(Token.BRA))
+			{
+				if (ltr.nextToken().isNot(Token.KET))
+				{
+					ExpressionReader er = new ExpressionReader(ltr);
+					args.add(er.readExpression());
+			
+					while (ltr.getLast().is(Token.COMMA))
+					{
+						ltr.nextToken();
+						args.add(er.readExpression());
+					}
+				}
+		
+				if (ltr.getLast().isNot(Token.KET))
+				{
+					throw new LexException(0, "Malformed @Annotation", name.location);
+				}
+			}
+
+			return makeAnnotation(name, args);
+		}
+		
+		throw new LexException(0, "Malformed @Annotation", new LexLocation());
 	}
 
 	/**
@@ -708,5 +771,15 @@ public abstract class SyntaxReader
 			throwMessage(2334, "Failed to instantiate AST" + name + "Annotation");
 			return null;
 		}
+	}
+	
+	protected List<String> getComments()
+	{
+		return reader.getComments();
+	}
+	
+	protected List<LexLocation> getCommLocs()
+	{
+		return reader.getCommLocs();
 	}
 }

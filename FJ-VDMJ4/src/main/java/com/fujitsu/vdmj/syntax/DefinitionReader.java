@@ -29,7 +29,6 @@ import java.util.Arrays;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTAccessSpecifier;
 import com.fujitsu.vdmj.ast.definitions.ASTAssignmentDefinition;
@@ -406,44 +405,6 @@ public class DefinitionReader extends SyntaxReader
 		return new ASTAccessSpecifier(isStatic, isAsync, access, isPure);
 	}
 	
-	private ASTAnnotationList readAnnotations() throws LexException, ParserException
-	{
-		ASTAnnotationList annotations = new ASTAnnotationList();
-		
-		while (lastToken().is(Token.AT))
-		{
-			nextToken();
-			annotations.add(readAnnotation());
-		}
-		
-		return annotations;
-	}
-	
-	private ASTAnnotation readAnnotation() throws LexException, ParserException
-	{
-		LexIdentifierToken name = readIdToken("Expecting @Annotation name");
-		ASTExpressionList args = new ASTExpressionList();
-		
-		if (lastToken().is(Token.BRA))
-		{
-			ExpressionReader er = getExpressionReader();
-			
-			if (nextToken().isNot(Token.KET))
-			{
-				args.add(er.readExpression());
-		
-				while (ignore(Token.COMMA))
-				{
-					args.add(er.readExpression());
-				}
-			}
-	
-			checkFor(Token.KET, 2124, "Expecting ')' after args");
-		}
-		
-		return makeAnnotation(name, args);
-	}
-
 	public ASTTypeDefinition readTypeDefinition() throws ParserException, LexException
 	{
 		LexIdentifierToken id = readIdToken("Expecting new type identifier");

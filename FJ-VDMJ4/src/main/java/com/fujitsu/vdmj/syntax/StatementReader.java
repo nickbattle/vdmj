@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedStatement;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTAssignmentDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
@@ -103,16 +104,36 @@ public class StatementReader extends SyntaxReader
 
 	public ASTStatement readStatement() throws ParserException, LexException
 	{
+		ASTAnnotationList annotations = readAnnotations();
+		
+		for (ASTAnnotation annotation: annotations)
+		{
+			annotation.before(this);
+		}
+		
+		ASTStatement stmt = readAnyStatement();
+
+		for (ASTAnnotation annotation: annotations)
+		{
+			annotation.after(this);
+		}
+		
+		for (ASTAnnotation annotation: annotations)
+		{
+			stmt = new ASTAnnotatedStatement(annotation.name.location, annotation, stmt);
+		}
+		
+		return stmt;
+	}
+
+	private ASTStatement readAnyStatement() throws ParserException, LexException
+	{
 		ASTStatement stmt = null;
 		LexToken token = lastToken();
 		LexLocation location = token.location;
 
 		switch (token.type)
 		{
-			case AT:
-				stmt = readAnnotatedStatement(location);
-				break;
-				
 			case LET:
 				stmt = readLetStatement(token);
 				break;
@@ -237,37 +258,6 @@ public class StatementReader extends SyntaxReader
 		}
 
 		return stmt;
-	}
-
-	private ASTStatement readAnnotatedStatement(LexLocation location) throws LexException, ParserException
-	{
-		nextToken();
-		LexIdentifierToken name = readIdToken("Expecting @Annotation name");
-		ASTExpressionList args = new ASTExpressionList();
-		
-		if (lastToken().is(Token.BRA))
-		{
-			ExpressionReader er = getExpressionReader();
-			
-			if (nextToken().isNot(Token.KET))
-			{
-				args.add(er.readExpression());
-		
-				while (ignore(Token.COMMA))
-				{
-					args.add(er.readExpression());
-				}
-			}
-	
-			checkFor(Token.KET, 2124, "Expecting ')' after annotation args");
-		}
-		
-		ASTAnnotation annotation = makeAnnotation(name, args);
-		annotation.before(this);
-		ASTStatement body = readStatement();
-		annotation.after(this);
-
-		return new ASTAnnotatedStatement(name.location, annotation, body);
 	}
 
 	private ASTStatement readExitStatement(LexLocation token)
