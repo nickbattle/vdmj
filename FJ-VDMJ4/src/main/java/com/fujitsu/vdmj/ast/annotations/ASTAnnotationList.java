@@ -25,6 +25,9 @@ package com.fujitsu.vdmj.ast.annotations;
 
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.ast.statements.ASTStatement;
 import com.fujitsu.vdmj.syntax.SyntaxReader;
 
 public class ASTAnnotationList extends Vector<ASTAnnotation>
@@ -39,11 +42,27 @@ public class ASTAnnotationList extends Vector<ASTAnnotation>
 		}
 	}
 
-	public void after(SyntaxReader reader)
+	public void after(SyntaxReader reader, ASTDefinition def)
 	{
 		for (ASTAnnotation annotation: this)
 		{
-			annotation.after(reader);
+			annotation.after(reader, def);
+		}
+	}
+
+	public void after(SyntaxReader reader, ASTStatement stmt)
+	{
+		for (ASTAnnotation annotation: this)
+		{
+			annotation.after(reader, stmt);
+		}
+	}
+
+	public void after(SyntaxReader reader, ASTExpression exp)
+	{
+		for (ASTAnnotation annotation: this)
+		{
+			annotation.after(reader, exp);
 		}
 	}
 }

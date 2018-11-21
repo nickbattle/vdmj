@@ -23,8 +23,11 @@
 
 package com.fujitsu.vdmj.ast.annotations;
 
+import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.ast.statements.ASTStatement;
 import com.fujitsu.vdmj.syntax.SyntaxReader;
 
 public abstract class ASTAnnotation
@@ -50,7 +53,17 @@ public abstract class ASTAnnotation
 		// Nothing by default
 	}
 
-	public void after(SyntaxReader reader)
+	public void after(SyntaxReader reader, ASTDefinition def)
+	{
+		// Nothing by default
+	}
+
+	public void after(SyntaxReader reader, ASTStatement stmt)
+	{
+		// Nothing by default
+	}
+
+	public void after(SyntaxReader reader, ASTExpression exp)
 	{
 		// Nothing by default
 	}

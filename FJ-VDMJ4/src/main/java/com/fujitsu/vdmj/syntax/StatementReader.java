@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.syntax;
 
+import java.util.Collections;
+
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedStatement;
@@ -105,18 +107,12 @@ public class StatementReader extends SyntaxReader
 	public ASTStatement readStatement() throws ParserException, LexException
 	{
 		ASTAnnotationList annotations = readAnnotations();
-		
-		for (ASTAnnotation annotation: annotations)
-		{
-			annotation.before(this);
-		}
-		
-		ASTStatement stmt = readAnyStatement();
 
-		for (ASTAnnotation annotation: annotations)
-		{
-			annotation.after(this);
-		}
+		annotations.before(this);
+		ASTStatement stmt = readAnyStatement();
+		annotations.after(this, stmt);
+		
+		Collections.reverse(annotations);	// Build the chain backwards
 		
 		for (ASTAnnotation annotation: annotations)
 		{

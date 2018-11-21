@@ -343,7 +343,7 @@ public abstract class SyntaxReader
 		
 		for (int i=0; i<comments.size(); i++)
 		{
-			if (comments.get(i).startsWith("@"))
+			if (comments.get(i).trim().startsWith("@"))
 			{
 				try
 				{
@@ -391,7 +391,7 @@ public abstract class SyntaxReader
 			return makeAnnotation(name, args);
 		}
 		
-		throw new LexException(0, "Malformed @Annotation", new LexLocation());
+		throw new LexException(0, "Comment has no @Annotation", new LexLocation());
 	}
 
 	/**

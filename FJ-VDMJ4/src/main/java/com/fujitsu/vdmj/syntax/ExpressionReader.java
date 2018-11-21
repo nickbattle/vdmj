@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.syntax;
 
+import java.util.Collections;
+
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedExpression;
@@ -806,18 +808,12 @@ public class ExpressionReader extends SyntaxReader
 	private ASTExpression readAnnotatedExpression() throws ParserException, LexException
 	{
 		ASTAnnotationList annotations = readAnnotations();
-		
-		for (ASTAnnotation annotation: annotations)
-		{
-			annotation.before(this);
-		}
-		
-		ASTExpression body =  readBasicExpression();
 
-		for (ASTAnnotation annotation: annotations)
-		{
-			annotation.after(this);
-		}
+		annotations.before(this);
+		ASTExpression body =  readBasicExpression();
+		annotations.after(this, body);
+
+		Collections.reverse(annotations);	// Build the chain backwards
 		
 		for (ASTAnnotation annotation: annotations)
 		{
