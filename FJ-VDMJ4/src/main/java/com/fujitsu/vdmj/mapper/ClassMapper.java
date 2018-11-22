@@ -28,6 +28,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -174,47 +176,55 @@ public class ClassMapper
 	}
 
 	/**
-	 * Read a mappings file and populate the mappings table. 
+	 * Read mappings file(s) from the classpath and populate the mappings table. 
 	 */
 	private void readMappings() throws Exception
 	{
-		InputStream is = getClass().getResourceAsStream("/" + configFile);
-		MappingReader reader = new MappingReader(configFile, is);
+		Enumeration<URL> urls = ClassLoader.getSystemResources(configFile);
 		
-		try
+		while (urls.hasMoreElements())
 		{
-			while (true)
+			InputStream is = urls.nextElement().openStream();
+			MappingReader reader = new MappingReader(configFile, is);
+			
+			try
 			{
-    			Mapping command = reader.readCommand();
-    			lineNo = command.lineNo;
-    
-    			switch (command.type)
-    			{
-    				case PACKAGE:
-    					processPackage(command);
-    					break;
-    					
-    				case MAP:
-    					processMap(command);
-    					break;
-    					
-    				case UNMAPPED:
-    					processUnmapped(command);
-    					break;
-    					
-    				case EOF:
-    					return;
-    					
-					case ERROR:
-						// try next line
-						errorCount++;
-						break;
-    			}
+				boolean eof = false;
+				
+				while (!eof)
+				{
+	    			Mapping command = reader.readCommand();
+	    			lineNo = command.lineNo;
+	    
+	    			switch (command.type)
+	    			{
+	    				case PACKAGE:
+	    					processPackage(command);
+	    					break;
+	    					
+	    				case MAP:
+	    					processMap(command);
+	    					break;
+	    					
+	    				case UNMAPPED:
+	    					processUnmapped(command);
+	    					break;
+	    					
+	    				case EOF:
+	    					eof = true;
+	    					break;
+	    					
+						case ERROR:
+							// try next line
+							errorCount++;
+							break;
+	    			}
+				}
 			}
-		}
-		finally
-		{
-    		reader.close();
+			finally
+			{
+	    		reader.close();
+			}
 		}
 	}
 
