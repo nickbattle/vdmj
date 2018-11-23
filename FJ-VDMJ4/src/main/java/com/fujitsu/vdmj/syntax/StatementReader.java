@@ -107,16 +107,24 @@ public class StatementReader extends SyntaxReader
 	public ASTStatement readStatement() throws ParserException, LexException
 	{
 		ASTAnnotationList annotations = readAnnotations();
+		ASTStatement stmt = null;
 
-		annotations.before(this);
-		ASTStatement stmt = readAnyStatement();
-		annotations.after(this, stmt);
-		
-		Collections.reverse(annotations);	// Build the chain backwards
-		
-		for (ASTAnnotation annotation: annotations)
+		if (!annotations.isEmpty())
 		{
-			stmt = new ASTAnnotatedStatement(annotation.name.location, annotation, stmt);
+			annotations.before(this);
+			stmt = readAnyStatement();
+			annotations.after(this, stmt);
+			
+			Collections.reverse(annotations);	// Build the chain backwards
+			
+			for (ASTAnnotation annotation: annotations)
+			{
+				stmt = new ASTAnnotatedStatement(annotation.name.location, annotation, stmt);
+			}
+		}
+		else
+		{
+			stmt = readAnyStatement();
 		}
 		
 		return stmt;

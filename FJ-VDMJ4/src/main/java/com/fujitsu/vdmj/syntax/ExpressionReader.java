@@ -808,16 +808,24 @@ public class ExpressionReader extends SyntaxReader
 	private ASTExpression readAnnotatedExpression() throws ParserException, LexException
 	{
 		ASTAnnotationList annotations = readAnnotations();
+		ASTExpression body = null;
 
-		annotations.before(this);
-		ASTExpression body =  readBasicExpression();
-		annotations.after(this, body);
-
-		Collections.reverse(annotations);	// Build the chain backwards
-		
-		for (ASTAnnotation annotation: annotations)
+		if (!annotations.isEmpty())
 		{
-			body = new ASTAnnotatedExpression(annotation.name.location, annotation, body);
+			annotations.before(this);
+			body = readBasicExpression();
+			annotations.after(this, body);
+
+			Collections.reverse(annotations);	// Build the chain backwards
+			
+			for (ASTAnnotation annotation: annotations)
+			{
+				body = new ASTAnnotatedExpression(annotation.name.location, annotation, body);
+			}
+		}
+		else
+		{
+			body = readBasicExpression();
 		}
 		
 		return body;
