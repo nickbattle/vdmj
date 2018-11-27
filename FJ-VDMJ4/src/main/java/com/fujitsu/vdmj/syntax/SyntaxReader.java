@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.ASTCommentList;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
@@ -49,7 +50,6 @@ import com.fujitsu.vdmj.messages.VDMWarning;
 /**
  * The parent class of all syntax readers.
  */
-
 public abstract class SyntaxReader
 {
 	/** The lexical analyser. */
@@ -335,19 +335,18 @@ public abstract class SyntaxReader
 	/**
 	 * Read any annotations from the collected comments, and clear them.
 	 */
-	protected ASTAnnotationList readAnnotations() throws LexException, ParserException
+	protected ASTAnnotationList readAnnotations(ASTCommentList comments) throws LexException, ParserException
 	{
 		ASTAnnotationList annotations = new ASTAnnotationList();
-		List<String> comments = getComments();
-		List<LexLocation> commlocs = getCommLocs();
 		
 		for (int i=0; i<comments.size(); i++)
 		{
-			if (comments.get(i).trim().startsWith("@"))
+			if (comments.comment(i).trim().startsWith("@"))
 			{
 				try
 				{
-					annotations.add(readAnnotation(new LexTokenReader(comments.get(i), commlocs.get(i), reader)));
+					annotations.add(readAnnotation(new LexTokenReader(
+							comments.comment(i), comments.location(i), reader)));
 				}
 				catch (Exception e)
 				{
@@ -760,7 +759,7 @@ public abstract class SyntaxReader
 	protected ASTAnnotation makeAnnotation(LexIdentifierToken name, ASTExpressionList args)
 		throws ParserException, LexException
 	{
-		String classpath = System.getProperty("vdmj.annotations", "com.fujitsu.vdmj.ast.annotations");
+		String classpath = System.getProperty("vdmj.annotations", "com.fujitsu.vdmj.ast.annotations;annotation");
 		String[] packages = classpath.split(";|:");
 		
 		for (String pack: packages)
@@ -785,13 +784,8 @@ public abstract class SyntaxReader
 		return null;
 	}
 	
-	protected List<String> getComments()
+	protected ASTCommentList getComments()
 	{
 		return reader.getComments();
-	}
-	
-	protected List<LexLocation> getCommLocs()
-	{
-		return reader.getCommLocs();
 	}
 }

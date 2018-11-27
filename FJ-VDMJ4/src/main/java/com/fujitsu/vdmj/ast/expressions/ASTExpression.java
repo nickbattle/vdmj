@@ -24,6 +24,8 @@
 package com.fujitsu.vdmj.ast.expressions;
 
 import java.io.Serializable;
+
+import com.fujitsu.vdmj.ast.ASTCommentList;
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.lex.LexLocation;
 
@@ -36,6 +38,8 @@ public abstract class ASTExpression extends ASTNode implements Serializable
 
 	/** The textual location of the expression. */
 	public final LexLocation location;
+	/** The comments that precede the expression. */
+	public ASTCommentList comments;
 
 	/**
 	 * Generate an expression at the given location.
@@ -93,4 +97,9 @@ public abstract class ASTExpression extends ASTNode implements Serializable
 	 * @return A short name for the expression.
 	 */
 	public abstract String kind();
+
+	public void setComments(ASTCommentList comments)
+	{
+		this.comments = comments;
+	}
 }

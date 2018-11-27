@@ -29,6 +29,7 @@ import java.util.Arrays;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.ASTCommentList;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTAccessSpecifier;
 import com.fujitsu.vdmj.ast.definitions.ASTAssignmentDefinition;
@@ -516,12 +517,14 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTAnnotationList annotations = readAnnotations();
+				ASTCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTTypeDefinition def = readTypeDefinition();
 				annotations.after(this, def);
 				def.setAnnotations(annotations);
+				def.setComments(comments);
 
 				// Force all type defs (invs) to be static
 				def.setAccessSpecifier(access.getStatic(true));
@@ -551,12 +554,14 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTAnnotationList annotations = readAnnotations();
+				ASTCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTDefinition def = readValueDefinition();
 				annotations.after(this, def);
 				def.setAnnotations(annotations);
+				def.setComments(comments);
 
 				// Force all values to be static
 				def.setAccessSpecifier(access.getStatic(true));
@@ -586,12 +591,14 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTAnnotationList annotations = readAnnotations();
+				ASTCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTDefinition def = readFunctionDefinition();
 				annotations.after(this, def);
 				def.setAnnotations(annotations);
+				def.setComments(comments);
 
 				if (Settings.release == Release.VDM_10)
 				{
@@ -629,13 +636,15 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTAnnotationList annotations = readAnnotations();
+				ASTCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTAccessSpecifier access = readAccessSpecifier(dialect == Dialect.VDM_RT, true);
 				ASTDefinition def = readOperationDefinition();
 				annotations.after(this, def);
 				def.setAccessSpecifier(access);
 				def.setAnnotations(annotations);
+				def.setComments(comments);
 				list.add(def);
 
 				if (!newSection())
@@ -670,11 +679,13 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTAnnotationList annotations = readAnnotations();
+				ASTCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTDefinition def = readInstanceVariableDefinition();
 				annotations.after(this, def);
 				def.setAnnotations(annotations);
+				def.setComments(comments);
 				list.add(def);
 
 				if (!newSection())
@@ -701,11 +712,13 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTAnnotationList annotations = readAnnotations();
+				ASTCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTDefinition def = readNamedTraceDefinition();
 				annotations.after(this, def);
 				def.setAnnotations(annotations);
+				def.setComments(comments);
 				list.add(def);
 
 				if (!newSection())
@@ -731,7 +744,8 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTAnnotationList annotations = readAnnotations();
+				ASTCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTDefinition def = readPermissionPredicateDefinition();
 				annotations.after(this, def);
@@ -1488,13 +1502,16 @@ public class DefinitionReader extends SyntaxReader
 		}
 		else
 		{
-			ASTAnnotationList annotations = readAnnotations();
+			ASTCommentList comments = getComments();
+			ASTAnnotationList annotations = readAnnotations(comments);
 			ASTAccessSpecifier access = readAccessSpecifier(false, false);
 			ASTAssignmentDefinition def = getStatementReader().readAssignmentDefinition();
 			ASTInstanceVariableDefinition ivd =
 				new ASTInstanceVariableDefinition(def.name, def.type, def.expression);
 			ivd.setAccessSpecifier(access);
 			ivd.setAnnotations(annotations);
+			ivd.setComments(comments);
+
 			return ivd;
 		}
     }

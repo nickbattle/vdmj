@@ -27,6 +27,7 @@ import java.util.Collections;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.ASTCommentList;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedExpression;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
@@ -807,7 +808,8 @@ public class ExpressionReader extends SyntaxReader
 
 	private ASTExpression readAnnotatedExpression() throws ParserException, LexException
 	{
-		ASTAnnotationList annotations = readAnnotations();
+		ASTCommentList comments = getComments();
+		ASTAnnotationList annotations = readAnnotations(comments);
 		ASTExpression body = null;
 
 		if (!annotations.isEmpty())
@@ -828,6 +830,7 @@ public class ExpressionReader extends SyntaxReader
 			body = readBasicExpression();
 		}
 		
+		body.setComments(comments);
 		return body;
 	}
 

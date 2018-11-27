@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.ast.definitions;
 
 import java.io.Serializable;
 
+import com.fujitsu.vdmj.ast.ASTCommentList;
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
@@ -50,6 +51,8 @@ public abstract class ASTDefinition extends ASTNode implements Serializable, Com
 	
 	/** A list of annotations, or null */
 	public ASTAnnotationList annotations = null;
+	/** A list of comments that precede the definition */
+	public ASTCommentList comments;
 
 	/**
 	 * Create a new definition of a particular name and location.
@@ -108,5 +111,13 @@ public abstract class ASTDefinition extends ASTNode implements Serializable, Com
 	public void setAnnotations(ASTAnnotationList annotations)
 	{
 		this.annotations = annotations;
+	}
+	
+	/**
+	 * Set the definition's comment list.
+	 */
+	public void setComments(ASTCommentList comments)
+	{
+		this.comments = comments;
 	}
 }

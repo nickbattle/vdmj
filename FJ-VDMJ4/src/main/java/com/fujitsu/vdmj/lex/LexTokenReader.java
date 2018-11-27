@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.ASTCommentList;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.ast.lex.LexCharacterToken;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
@@ -70,8 +71,7 @@ public class LexTokenReader extends BacktrackInputReader
 	private boolean quotedQuote = false;
 
 	/** Comments read since last getComments call */
-	private List<String> comments = new Vector<String>();
-	private List<LexLocation> commlocs = new Vector<LexLocation>();
+	private ASTCommentList comments = new ASTCommentList();
 
 	/**
 	 * An inner class to hold all the position details that need to be
@@ -86,7 +86,7 @@ public class LexTokenReader extends BacktrackInputReader
 
     	public char c;
     	public LexToken l;
-    	public List<String> co = new Vector<String>();
+    	public ASTCommentList co = new ASTCommentList();
 
     	/**
     	 * Create a Position from the outer class' current position details.
@@ -364,17 +364,10 @@ public class LexTokenReader extends BacktrackInputReader
 	/**
 	 * @return the comments read since last getComments(), and clear.
 	 */
-	public List<String> getComments()
+	public ASTCommentList getComments()
 	{
-		List<String> list = new Vector<String>(comments);
+		ASTCommentList list = new ASTCommentList(comments);
 		comments.clear();
-		return list;
-	}
-
-	public List<LexLocation> getCommLocs()
-	{
-		List<LexLocation> list = new Vector<LexLocation>(commlocs);
-		commlocs.clear();
 		return list;
 	}
 
@@ -579,7 +572,7 @@ public class LexTokenReader extends BacktrackInputReader
 				if (rdCh() == '-')
 				{
 					StringBuilder sb = new StringBuilder();
-					commlocs.add(location(linecount, charpos + 1));
+					LexLocation here = location(linecount, charpos + 1);
 					
 					while (ch != '\n' && ch != EOF)
 					{
@@ -587,7 +580,7 @@ public class LexTokenReader extends BacktrackInputReader
 						rdCh();
 					}
 
-					comments.add(sb.toString().substring(1));
+					comments.add(here, sb.toString().substring(1));
 					return nextToken();
 				}
 				else if (ch == '>')
@@ -856,7 +849,7 @@ public class LexTokenReader extends BacktrackInputReader
 				{
 					StringBuilder sb = new StringBuilder();
 					rdCh();
-					commlocs.add(location(linecount, charpos));
+					LexLocation here = location(linecount, charpos);
 					
 					while (ch != EOF)
 					{
@@ -883,7 +876,7 @@ public class LexTokenReader extends BacktrackInputReader
 					    }
 					}
 
-					comments.add(sb.toString());
+					comments.add(here, sb.toString());
 					rdCh();
 					return nextToken();
 				}

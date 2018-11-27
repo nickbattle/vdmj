@@ -27,6 +27,7 @@ import java.util.Collections;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.ASTCommentList;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedStatement;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
@@ -106,7 +107,8 @@ public class StatementReader extends SyntaxReader
 
 	public ASTStatement readStatement() throws ParserException, LexException
 	{
-		ASTAnnotationList annotations = readAnnotations();
+		ASTCommentList comments = getComments();
+		ASTAnnotationList annotations = readAnnotations(comments);
 		ASTStatement stmt = null;
 
 		if (!annotations.isEmpty())
@@ -127,6 +129,7 @@ public class StatementReader extends SyntaxReader
 			stmt = readAnyStatement();
 		}
 		
+		stmt.setComments(comments);
 		return stmt;
 	}
 
