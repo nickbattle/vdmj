@@ -580,7 +580,7 @@ public class LexTokenReader extends BacktrackInputReader
 						rdCh();
 					}
 
-					comments.add(here, sb.toString().substring(1));
+					comments.add(here, sb.toString().substring(1), false);
 					return nextToken();
 				}
 				else if (ch == '>')
@@ -876,7 +876,7 @@ public class LexTokenReader extends BacktrackInputReader
 					    }
 					}
 
-					comments.add(here, sb.toString());
+					comments.add(here, sb.toString(), true);
 					rdCh();
 					return nextToken();
 				}

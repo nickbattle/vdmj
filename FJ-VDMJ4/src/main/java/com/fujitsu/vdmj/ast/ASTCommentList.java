@@ -41,9 +41,9 @@ public class ASTCommentList extends Vector<ASTComment>
 		super();
 	}
 	
-	public void add(LexLocation location, String comment)
+	public void add(LexLocation location, String comment, boolean block)
 	{
-		this.add(new ASTComment(location, comment));
+		this.add(new ASTComment(location, comment, block));
 	}
 
 	public String comment(int i)

@@ -34,17 +34,19 @@ public class ASTComment extends ASTNode
 	
 	public final LexLocation location;
 	public final String comment;
+	public final boolean block;
 
-	public ASTComment(LexLocation location, String comment)
+	public ASTComment(LexLocation location, String comment, boolean block)
 	{
 		super();
 		
 		this.location = location;
 		this.comment = comment;
+		this.block = block;
 	}
 	
 	public String toString()
 	{
-		return "/*" + comment + "*/";
+		return block ? "/*" + comment + "*/" : "--" + comment;
 	}
 }
