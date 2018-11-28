@@ -21,19 +21,21 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.annotations;
+package annotations.tc;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCOverrideAnnotation extends TCAnnotation
+public class TCTraceAnnotation extends TCAnnotation
 {
-	public TCOverrideAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public TCTraceAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);
 	}
@@ -41,36 +43,32 @@ public class TCOverrideAnnotation extends TCAnnotation
 	@Override
 	public void typeCheck(TCDefinition def, Environment env, NameScope scope)
 	{
-		if (Settings.dialect == Dialect.VDM_SL)
+		name.report(3359, "@Trace only applies to expressions and statements");
+	}
+
+	@Override
+	public void typeCheck(TCExpression exp, Environment env, NameScope scope)
+	{
+		check(env, scope);
+	}
+
+	@Override
+	public void typeCheck(TCStatement stmt, Environment env, NameScope scope)
+	{
+		check(env, scope);
+	}
+	
+	private void check(Environment env, NameScope scope)
+	{
+		for (TCExpression arg: args)
 		{
-			name.report(3360, "@Override not available in VDM-SL");
-		}
-		
-		if (!args.isEmpty())
-		{
-			name.report(3361, "@Override has no arguments");
-		}
-		
-		if (!def.isFunctionOrOperation())
-		{
-			name.report(3362, "@Override only applies to functions or operations");
-		}
-		else if (def.classDefinition != null)
-		{
-			boolean found = false;
-			
-			for (TCDefinition indef: def.classDefinition.localInheritedDefinitions)
+			if (!(arg instanceof TCVariableExpression))
 			{
-				if (indef.name.equals(def.name))
-				{
-					found = true;
-					break;
-				}
+				arg.report(3358, "@Trace argument must be an identifier");
 			}
-			
-			if (!found)
+			else
 			{
-				name.report(3363, "Definition does not @Override superclass");
+				arg.typeCheck(env, null, scope, null);	// Just checks scope
 			}
 		}
 	}

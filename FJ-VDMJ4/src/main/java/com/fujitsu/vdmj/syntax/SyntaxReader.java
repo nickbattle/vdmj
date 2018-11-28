@@ -759,7 +759,7 @@ public abstract class SyntaxReader
 	protected ASTAnnotation makeAnnotation(LexIdentifierToken name, ASTExpressionList args)
 		throws ParserException, LexException
 	{
-		String classpath = System.getProperty("vdmj.annotations", "com.fujitsu.vdmj.ast.annotations;annotation");
+		String classpath = System.getProperty("vdmj.annotations", "com.fujitsu.vdmj.ast.annotations;annotations.ast");
 		String[] packages = classpath.split(";|:");
 		
 		for (String pack: packages)

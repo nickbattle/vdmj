@@ -21,20 +21,21 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.annotations;
+package annotations.tc;
 
+import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
+import com.fujitsu.vdmj.tc.expressions.TCStringLiteralExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCTraceAnnotation extends TCAnnotation
+public class TCChangesAnnotation extends TCAnnotation
 {
-	public TCTraceAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public TCChangesAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);
 	}
@@ -42,33 +43,28 @@ public class TCTraceAnnotation extends TCAnnotation
 	@Override
 	public void typeCheck(TCDefinition def, Environment env, NameScope scope)
 	{
-		name.report(3359, "@Trace only applies to expressions and statements");
+		name.report(3359, "@Changes only applies to statements");
 	}
 
 	@Override
 	public void typeCheck(TCExpression exp, Environment env, NameScope scope)
 	{
-		check(env, scope);
+		name.report(3359, "@Changes only applies to statements");
 	}
 
 	@Override
 	public void typeCheck(TCStatement stmt, Environment env, NameScope scope)
 	{
-		check(env, scope);
-	}
-	
-	private void check(Environment env, NameScope scope)
-	{
-		for (TCExpression arg: args)
+		if (args.size() == 1)
 		{
-			if (!(arg instanceof TCVariableExpression))
+			if (!(args.get(0) instanceof TCStringLiteralExpression))
 			{
-				arg.report(3358, "@Trace argument must be an identifier");
+				name.report(3361, "@Changes argument must be a string literal");
 			}
-			else
-			{
-				arg.typeCheck(env, null, scope, null);	// Just checks scope
-			}
+		}
+		else if (args.size() > 1)
+		{
+			name.report(3361, "@Changes has one optional string argument");
 		}
 	}
 }

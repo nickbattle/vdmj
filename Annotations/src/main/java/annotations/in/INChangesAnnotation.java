@@ -21,13 +21,14 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.annotations;
+package annotations.in;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INStringLiteralExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;

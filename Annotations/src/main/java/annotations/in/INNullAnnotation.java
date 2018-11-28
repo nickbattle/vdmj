@@ -21,14 +21,15 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.ast.annotations;
+package annotations.in;
 
-import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
-import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class ASTOverrideAnnotation extends ASTAnnotation
+public class INNullAnnotation extends INAnnotation
 {
-	public ASTOverrideAnnotation(LexIdentifierToken name, ASTExpressionList args)
+	public INNullAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);
 	}

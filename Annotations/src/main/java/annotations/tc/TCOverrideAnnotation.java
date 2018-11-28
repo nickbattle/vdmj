@@ -21,20 +21,20 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.annotations;
+package annotations.tc;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.expressions.TCStringLiteralExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCChangesAnnotation extends TCAnnotation
+public class TCOverrideAnnotation extends TCAnnotation
 {
-	public TCChangesAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public TCOverrideAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);
 	}
@@ -42,28 +42,37 @@ public class TCChangesAnnotation extends TCAnnotation
 	@Override
 	public void typeCheck(TCDefinition def, Environment env, NameScope scope)
 	{
-		name.report(3359, "@Changes only applies to statements");
-	}
-
-	@Override
-	public void typeCheck(TCExpression exp, Environment env, NameScope scope)
-	{
-		name.report(3359, "@Changes only applies to statements");
-	}
-
-	@Override
-	public void typeCheck(TCStatement stmt, Environment env, NameScope scope)
-	{
-		if (args.size() == 1)
+		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			if (!(args.get(0) instanceof TCStringLiteralExpression))
-			{
-				name.report(3361, "@Changes argument must be a string literal");
-			}
+			name.report(3360, "@Override not available in VDM-SL");
 		}
-		else if (args.size() > 1)
+		
+		if (!args.isEmpty())
 		{
-			name.report(3361, "@Changes has one optional string argument");
+			name.report(3361, "@Override has no arguments");
+		}
+		
+		if (!def.isFunctionOrOperation())
+		{
+			name.report(3362, "@Override only applies to functions or operations");
+		}
+		else if (def.classDefinition != null)
+		{
+			boolean found = false;
+			
+			for (TCDefinition indef: def.classDefinition.localInheritedDefinitions)
+			{
+				if (indef.name.equals(def.name))
+				{
+					found = true;
+					break;
+				}
+			}
+			
+			if (!found)
+			{
+				name.report(3363, "Definition does not @Override superclass");
+			}
 		}
 	}
 }

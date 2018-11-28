@@ -21,14 +21,15 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.ast.annotations;
+package annotations.po;
 
-import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
-import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class ASTTraceAnnotation extends ASTAnnotation
+public class PONullAnnotation extends POAnnotation
 {
-	public ASTTraceAnnotation(LexIdentifierToken name, ASTExpressionList args)
+	public PONullAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
 		super(name, args);
 	}

@@ -1,0 +1,10 @@
+##########################################################################################
+# The class mapping definition for the VDMJ Proof Obligation Generator. See ClassMapper.
+##########################################################################################
+
+# annotations
+package annotations.tc to annotations.po;
+map TCTraceAnnotation{name, args} to PONullAnnotation(name, args);
+map TCOverrideAnnotation{name, args} to PONullAnnotation(name, args);
+map TCChangesAnnotation{name, args} to PONullAnnotation(name, args);
+

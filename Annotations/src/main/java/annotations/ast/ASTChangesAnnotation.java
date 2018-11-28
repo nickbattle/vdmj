@@ -21,8 +21,9 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.ast.annotations;
+package annotations.ast;
 
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 

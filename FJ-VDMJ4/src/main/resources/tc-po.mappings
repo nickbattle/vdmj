@@ -169,9 +169,6 @@ map TCAnnotatedExpression{location, annotation, expression} to POAnnotatedExpres
 map TCAnnotatedStatement{location, annotation, statement} to POAnnotatedStatement(location, annotation, statement);
 map TCAnnotation{} to POAnnotation();
 map TCAnnotationList{} to POAnnotationList(this);
-map TCTraceAnnotation{name, args} to PONullAnnotation(name, args);
-map TCOverrideAnnotation{name, args} to PONullAnnotation(name, args);
-map TCChangesAnnotation{name, args} to PONullAnnotation(name, args);
 
 # lex
 unmapped com.fujitsu.vdmj.ast.lex.LexIntegerToken;

@@ -21,9 +21,10 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.annotations;
+package annotations.in;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
