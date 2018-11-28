@@ -29,10 +29,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.ast.ASTCommentList;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
@@ -335,7 +335,7 @@ public abstract class SyntaxReader
 	/**
 	 * Read any annotations from the collected comments, and clear them.
 	 */
-	protected ASTAnnotationList readAnnotations(ASTCommentList comments) throws LexException, ParserException
+	protected ASTAnnotationList readAnnotations(LexCommentList comments) throws LexException, ParserException
 	{
 		ASTAnnotationList annotations = new ASTAnnotationList();
 		
@@ -784,7 +784,7 @@ public abstract class SyntaxReader
 		return null;
 	}
 	
-	protected ASTCommentList getComments()
+	protected LexCommentList getComments()
 	{
 		return reader.getComments();
 	}

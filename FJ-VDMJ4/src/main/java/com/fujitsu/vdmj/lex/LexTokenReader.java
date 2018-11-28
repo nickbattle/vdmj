@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.ast.ASTCommentList;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.ast.lex.LexCharacterToken;
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
@@ -71,7 +71,7 @@ public class LexTokenReader extends BacktrackInputReader
 	private boolean quotedQuote = false;
 
 	/** Comments read since last getComments call */
-	private ASTCommentList comments = new ASTCommentList();
+	private LexCommentList comments = new LexCommentList();
 
 	/**
 	 * An inner class to hold all the position details that need to be
@@ -86,7 +86,7 @@ public class LexTokenReader extends BacktrackInputReader
 
     	public char c;
     	public LexToken l;
-    	public ASTCommentList co = new ASTCommentList();
+    	public LexCommentList co = new LexCommentList();
 
     	/**
     	 * Create a Position from the outer class' current position details.
@@ -364,9 +364,9 @@ public class LexTokenReader extends BacktrackInputReader
 	/**
 	 * @return the comments read since last getComments(), and clear.
 	 */
-	public ASTCommentList getComments()
+	public LexCommentList getComments()
 	{
-		ASTCommentList list = new ASTCommentList(comments);
+		LexCommentList list = new LexCommentList(comments);
 		comments.clear();
 		return list;
 	}

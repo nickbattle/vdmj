@@ -29,7 +29,6 @@ import java.util.Arrays;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.ASTCommentList;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTAccessSpecifier;
 import com.fujitsu.vdmj.ast.definitions.ASTAssignmentDefinition;
@@ -54,6 +53,7 @@ import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.expressions.ASTNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTSubclassResponsibilityExpression;
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexNameList;
@@ -517,7 +517,7 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTCommentList comments = getComments();
+				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
@@ -554,7 +554,7 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTCommentList comments = getComments();
+				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
@@ -591,7 +591,7 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTCommentList comments = getComments();
+				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
@@ -636,7 +636,7 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTCommentList comments = getComments();
+				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTAccessSpecifier access = readAccessSpecifier(dialect == Dialect.VDM_RT, true);
@@ -679,7 +679,7 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTCommentList comments = getComments();
+				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTDefinition def = readInstanceVariableDefinition();
@@ -712,7 +712,7 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTCommentList comments = getComments();
+				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTDefinition def = readNamedTraceDefinition();
@@ -744,7 +744,7 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
-				ASTCommentList comments = getComments();
+				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.before(this);
 				ASTDefinition def = readPermissionPredicateDefinition();
@@ -1502,7 +1502,7 @@ public class DefinitionReader extends SyntaxReader
 		}
 		else
 		{
-			ASTCommentList comments = getComments();
+			LexCommentList comments = getComments();
 			ASTAnnotationList annotations = readAnnotations(comments);
 			ASTAccessSpecifier access = readAccessSpecifier(false, false);
 			ASTAssignmentDefinition def = getStatementReader().readAssignmentDefinition();

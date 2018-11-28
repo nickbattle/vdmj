@@ -21,32 +21,38 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.ast;
+package com.fujitsu.vdmj.ast.lex;
+
+import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 
-/**
- * A comment within the spec. This isn't part of the grammar, as such.
- */
-public class ASTComment extends ASTNode
+public class LexCommentList extends Vector<LexComment>
 {
 	private static final long serialVersionUID = 1L;
-	
-	public final LexLocation location;
-	public final String comment;
-	public final boolean block;
 
-	public ASTComment(LexLocation location, String comment, boolean block)
+	public LexCommentList(LexCommentList comments)
+	{
+		this.addAll(comments);
+	}
+
+	public LexCommentList()
 	{
 		super();
-		
-		this.location = location;
-		this.comment = comment;
-		this.block = block;
 	}
 	
-	public String toString()
+	public void add(LexLocation location, String comment, boolean block)
 	{
-		return block ? "/*" + comment + "*/" : "--" + comment;
+		this.add(new LexComment(location, comment, block));
+	}
+
+	public String comment(int i)
+	{
+		return get(i).comment;
+	}
+
+	public LexLocation location(int i)
+	{
+		return get(i).location;
 	}
 }
