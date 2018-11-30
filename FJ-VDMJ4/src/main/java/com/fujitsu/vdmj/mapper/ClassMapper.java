@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Enumeration;
@@ -149,16 +150,20 @@ public class ClassMapper
 		public final Class<?> srcClass;
 		public final Class<?> destClass;
 		public final List<Field> srcFields;
+		public final List<Field> setterFields;
 		public final boolean unmapped;
 
 		public Constructor<?> constructor;
+		public Method[] setters;
 
-		public MapParams(int lineNo, Class<?> srcClass, Class<?> destClass, List<Field> srcFields, boolean unmapped)
+		public MapParams(int lineNo, Class<?> srcClass, Class<?> destClass,
+				List<Field> srcFields, List<Field> setterFields, boolean unmapped)
 		{
 			this.lineNo = lineNo;
 			this.srcClass = srcClass;
 			this.destClass = destClass;
 			this.srcFields = srcFields;
+			this.setterFields = setterFields;
 			this.unmapped = unmapped;	
 		}
 		
@@ -184,7 +189,8 @@ public class ClassMapper
 		
 		while (urls.hasMoreElements())
 		{
-			InputStream is = urls.nextElement().openStream();
+			URL url = urls.nextElement();
+			InputStream is = url.openStream();
 			MappingReader reader = new MappingReader(configFile, is);
 			
 			try
@@ -233,7 +239,7 @@ public class ClassMapper
 		try
 		{
 			Class<?> toIgnore = Class.forName(command.source);
-			mappings.put(toIgnore, new MapParams(lineNo, toIgnore, toIgnore, null, true));
+			mappings.put(toIgnore, new MapParams(lineNo, toIgnore, toIgnore, null, null, true));
 		}
 		catch (ClassNotFoundException e)
 		{
@@ -253,6 +259,7 @@ public class ClassMapper
 		List<String> srcParams = command.varnames;
 		String destClassname = command.destination;
 		List<String> destParams = command.paramnames;
+		List<String> destSetters = command.setnames;
 		
 		try
 		{
@@ -265,8 +272,6 @@ public class ClassMapper
 			{
 				srcFields.put(fieldname, findField(srcClass, fieldname));
 			}
-			
-			List<Field> selectedFields = new Vector<Field>();
 			
 			if (Modifier.isAbstract(srcClass.getModifiers()))
 			{
@@ -285,15 +290,30 @@ public class ClassMapper
 				error("Mapped " + destClassname + " is abstract, but source is not");
 			}
 
+			List<Field> ctorFields = new Vector<Field>();
+			List<Field> setterFields = new Vector<Field>();
+			
 			for (String field: destParams)
 			{
 				if (field.equals("this"))
 				{
-					selectedFields.add(SELF);
+					ctorFields.add(SELF);
 				}
 				else if (srcFields.containsKey(field))
 				{
-					selectedFields.add(srcFields.get(field));
+					ctorFields.add(srcFields.get(field));
+				}
+				else
+				{
+					error("Field not identified in " + srcClassname + ": " + field);
+				}
+			}
+			
+			for (String field: destSetters)
+			{
+				if (srcFields.containsKey(field))
+				{
+					setterFields.add(srcFields.get(field));
 				}
 				else
 				{
@@ -303,13 +323,21 @@ public class ClassMapper
 			
 			for (String field: srcParams)
 			{
-				if (!destParams.contains(field))
+				if (!destParams.contains(field) && !destSetters.contains(field))
 				{
-					error("Field not used in constructor " + destClassname + ": " + field);
+					error("Field not used in constructor or setters, " + destClassname + ": " + field);
 				}
 			}
 
-			mappings.put(srcClass, new MapParams(lineNo, srcClass, destClass, selectedFields, false));
+			for (String field: destParams)
+			{
+				if (destSetters.contains(field))
+				{
+					error("Field used in constructor and setter, " + destClassname + ": " + field);
+				}
+			}
+
+			mappings.put(srcClass, new MapParams(lineNo, srcClass, destClass, ctorFields, setterFields, false));
 		}
 		catch (ClassNotFoundException e)
 		{
@@ -408,9 +436,38 @@ public class ClassMapper
 					
 					System.err.println();
 				}
-				catch (NoClassDefFoundError e)
+				
+				mp.setters = new Method[mp.setterFields.size()];
+				a = 0;
+				
+				for (Field field: mp.setterFields)
 				{
-					error("No class definition found: " + mp.destClass.getSimpleName());
+					Class<?> fieldType = field.getType();
+					MapParams mapping = mappings.get(fieldType);
+					Class<?>[] argType = new Class<?>[1];
+					
+					if (mapping == null || mapping.unmapped)
+					{
+						argType[0] = fieldType;	// eg. java.lang.String unmapped
+					}
+					else
+					{
+						argType[0] = mapping.destClass;
+					}
+
+					StringBuilder name = new StringBuilder(field.getName());
+					name.setCharAt(0, Character.toUpperCase(name.charAt(0)));
+
+					try
+					{
+						lineNo = mp.lineNo;		// For error reporting :)
+						mp.setters[a++] = mp.destClass.getMethod("set" + name, argType[0]);
+					}
+					catch (NoSuchMethodException e)
+					{
+						error("No such setter: " + mp.destClass.getSimpleName() +
+								".set" + name + "(" + argType[0].getSimpleName() + ")");
+					}
 				}
 			}
 		}
@@ -556,6 +613,25 @@ public class ClassMapper
     			}
     			
     			result = (T) mp.constructor.newInstance(args);
+    			int s = 0;
+    			
+    			for (Field setter: mp.setterFields)
+    			{
+					setter.setAccessible(true);
+					Object fieldvalue = setter.get(source);
+					Object arg = null;
+					
+					if (isInProgress(fieldvalue) == null)
+					{
+						arg = convert(fieldvalue);
+					}
+					else
+					{
+						arg = null;
+					}
+					
+    				mp.setters[s++].invoke(result, arg);
+    			}
  
     			for (Field field: mp.srcFields)
     			{
@@ -568,6 +644,16 @@ public class ClassMapper
             				progress.updates.add(new Pair(result, field.getName()));
             			}
     				}
+    			}
+    			 
+    			for (Field field: mp.setterFields)
+    			{
+					Progress progress = isInProgress(field.get(source));
+
+					if (progress != null)
+					{
+        				progress.updates.add(new Pair(result, field.getName()));
+        			}
     			}
      		}
 		}

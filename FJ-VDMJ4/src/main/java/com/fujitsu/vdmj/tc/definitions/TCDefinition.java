@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.definitions;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -76,6 +77,9 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	
 	/** A list of annotations, if any */
 	public TCAnnotationList annotations = null;
+	
+	/** A list of comments preceding the definition */
+	public LexCommentList comments;
 
 	/**
 	 * Create a new definition of a particular name and location.
@@ -520,5 +524,13 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 		}
 
 		return noDuplicates.asList();
+	}
+	
+	/**
+	 * Set the comments field.
+	 */
+	public void setComments(LexCommentList comments)
+	{
+		this.comments = comments;
 	}
 }
