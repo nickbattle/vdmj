@@ -142,14 +142,14 @@ public class ClassMapper
 	
 	/**
 	 * A class to define how to construct one destPackage class, passing srcPackage
-	 * object fields to the Constructor.
+	 * object fields to the Constructor and setter methods.
 	 */
 	private static class MapParams
 	{
 		public final int lineNo;
 		public final Class<?> srcClass;
 		public final Class<?> destClass;
-		public final List<Field> srcFields;
+		public final List<Field> ctorFields;
 		public final List<Field> setterFields;
 		public final boolean unmapped;
 
@@ -157,12 +157,12 @@ public class ClassMapper
 		public Method[] setters;
 
 		public MapParams(int lineNo, Class<?> srcClass, Class<?> destClass,
-				List<Field> srcFields, List<Field> setterFields, boolean unmapped)
+				List<Field> ctorFields, List<Field> setterFields, boolean unmapped)
 		{
 			this.lineNo = lineNo;
 			this.srcClass = srcClass;
 			this.destClass = destClass;
-			this.srcFields = srcFields;
+			this.ctorFields = ctorFields;
 			this.setterFields = setterFields;
 			this.unmapped = unmapped;	
 		}
@@ -170,7 +170,8 @@ public class ClassMapper
 		@Override
 		public String toString()
 		{
-			return "map " + srcClass.getSimpleName() + " to " + destClass.getSimpleName();
+			return "map " + srcClass.getSimpleName() + " to " + destClass.getSimpleName() +
+					(setterFields.isEmpty() ? "" : " set " + setterFields);
 		}
 	}
 	
@@ -382,10 +383,10 @@ public class ClassMapper
 			}
 			else
 			{
-				Class<?>[] paramTypes = new Class<?>[mp.srcFields.size()];
+				Class<?>[] paramTypes = new Class<?>[mp.ctorFields.size()];
 				int a = 0;
 				
-				for (Field field: mp.srcFields)
+				for (Field field: mp.ctorFields)
 				{
 					Class<?> fieldType = null;
 					MapParams mapping = null;
@@ -444,15 +445,15 @@ public class ClassMapper
 				{
 					Class<?> fieldType = field.getType();
 					MapParams mapping = mappings.get(fieldType);
-					Class<?>[] argType = new Class<?>[1];
+					Class<?> argType = null;
 					
 					if (mapping == null || mapping.unmapped)
 					{
-						argType[0] = fieldType;	// eg. java.lang.String unmapped
+						argType = fieldType;	// eg. java.lang.String unmapped
 					}
 					else
 					{
-						argType[0] = mapping.destClass;
+						argType = mapping.destClass;
 					}
 
 					StringBuilder name = new StringBuilder(field.getName());
@@ -461,12 +462,12 @@ public class ClassMapper
 					try
 					{
 						lineNo = mp.lineNo;		// For error reporting :)
-						mp.setters[a++] = mp.destClass.getMethod("set" + name, argType[0]);
+						mp.setters[a++] = mp.destClass.getMethod("set" + name, argType);
 					}
 					catch (NoSuchMethodException e)
 					{
 						error("No such setter: " + mp.destClass.getSimpleName() +
-								".set" + name + "(" + argType[0].getSimpleName() + ")");
+								".set" + name + "(" + argType.getSimpleName() + ")");
 					}
 				}
 			}
@@ -587,10 +588,10 @@ public class ClassMapper
     		}
     		else
     		{
-    			Object[] args = new Object[mp.srcFields.size()];
+    			Object[] args = new Object[mp.ctorFields.size()];
     			int a = 0;
     
-    			for (Field field: mp.srcFields)
+    			for (Field field: mp.ctorFields)
     			{
     				if (field == SELF)	// ie. "this"
     				{
@@ -633,7 +634,7 @@ public class ClassMapper
     				mp.setters[s++].invoke(result, arg);
     			}
  
-    			for (Field field: mp.srcFields)
+    			for (Field field: mp.ctorFields)
     			{
     				if (field != SELF)
     				{
