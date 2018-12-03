@@ -12,7 +12,7 @@ map ASTClassDefinition{name, supernames, definitions, comments} to TCClassDefini
 map ASTClassInvariantDefinition{accessSpecifier, name, expression, comments} to TCClassInvariantDefinition(accessSpecifier, name, expression) set comments;
 map ASTClassList{} to TCClassList(this);
 map ASTCPUClassDefinition{name, supernames, definitions, comments} to TCCPUClassDefinition(name, supernames, definitions) set comments;
-map ASTDefinition{} to TCDefinition();
+map ASTDefinition{comments} to TCDefinition() set comments;
 map ASTDefinitionSet{} to TCDefinitionSet();
 map ASTEqualsDefinition{location, pattern, typebind, bind, test, comments} to TCEqualsDefinition(location, pattern, typebind, bind, test) set comments;
 map ASTExplicitFunctionDefinition{annotations, accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measure, comments} to TCExplicitFunctionDefinition(annotations, accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measure) set comments;
@@ -38,7 +38,7 @@ map ASTValueDefinition{annotations, accessSpecifier, pattern, type, exp, comment
 
 # expressions
 package com.fujitsu.vdmj.ast.expressions to com.fujitsu.vdmj.tc.expressions;
-map ASTExpression{} to TCExpression();
+map ASTExpression{comments} to TCExpression() set comments;
 map ASTExpressionList{} to TCExpressionList(this);
 map ASTAbsoluteExpression{location, exp, comments} to TCAbsoluteExpression(location, exp) set comments;
 map ASTAndExpression{left, op, right, comments} to TCAndExpression(left, op, right) set comments;
@@ -299,7 +299,7 @@ map ASTSpecificationStatement{location, externals, precondition, postcondition, 
 map ASTSporadicStatement{opname, args, comments} to TCSporadicStatement(opname, args) set comments;
 map ASTStartStatement{location, objects, comments} to TCStartStatement(location, objects) set comments;
 map ASTStateDesignator{} to TCStateDesignator();
-map ASTStatement{} to TCStatement();
+map ASTStatement{comments} to TCStatement() set comments;
 map ASTStatementList{} to TCStatementList(this);
 map ASTStopStatement{location, objects, comments} to TCStopStatement(location, objects) set comments;
 map ASTSubclassResponsibilityStatement{location, comments} to TCSubclassResponsibilityStatement(location) set comments;

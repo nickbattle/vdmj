@@ -281,9 +281,9 @@ public class ClassMapper
 					error("Source " + srcClassname + " is abstract, but mapping is not");
 				}
 				
-				if (!srcParams.isEmpty())
+				if (!destParams.isEmpty())
 				{
-					error("Abstract class cannot have parameter substitutions");
+					error("Abstract class cannot have ctor parameter substitutions");
 				}
 			}
 			else if (Modifier.isAbstract(destClass.getModifiers()))

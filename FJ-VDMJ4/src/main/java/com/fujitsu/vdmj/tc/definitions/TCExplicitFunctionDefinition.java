@@ -68,7 +68,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	public final TCExpression postcondition;
 	public final TCExpression body;
 	public final boolean isTypeInvariant;
-	public final TCExpression measureExp;
+	public final TCExpression measure;
 	public final boolean isCurried;
 
 	public TCExplicitFunctionDefinition predef;
@@ -88,7 +88,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		TCNameList typeParams, TCFunctionType type,
 		TCPatternListList parameters, TCExpression body,
 		TCExpression precondition,
-		TCExpression postcondition, boolean typeInvariant, TCExpression measureExp)
+		TCExpression postcondition, boolean typeInvariant, TCExpression measure)
 	{
 		super(Pass.DEFS, name.getLocation(), name, NameScope.GLOBAL);
 
@@ -101,7 +101,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		this.postcondition = postcondition;
 		this.body = body;
 		this.isTypeInvariant = typeInvariant;
-		this.measureExp = measureExp;
+		this.measure = measure;
 		this.isCurried = parameters.size() > 1;
 
 		type.definitions = new TCDefinitionList(this);
@@ -324,13 +324,13 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			report(3329, "Abstract function/operation must be public or protected");
 		}
 
-		if (measureExp == null && recursive)
+		if (measure == null && recursive)
 		{
 			warning(5012, "Recursive function has no measure");
 		}
-		else if (measureExp instanceof TCVariableExpression)
+		else if (measure instanceof TCVariableExpression)
 		{
-			TCVariableExpression exp = (TCVariableExpression)measureExp;
+			TCVariableExpression exp = (TCVariableExpression)measure;
 			if (base.isVDMPP()) exp.name.setTypeQualifier(getMeasureParams());
 			TCDefinition def = base.findName(exp.name, scope);
 			
@@ -343,13 +343,13 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				setMeasureExp(base, local, scope);
 			}
 		}
-		else if (measureExp instanceof TCNotYetSpecifiedExpression)
+		else if (measure instanceof TCNotYetSpecifiedExpression)
 		{
 			// Undefined measure, so ignore (without warning).
 			measureDef = null;
 			measureName = null;
 		}
-		else if (measureExp != null)
+		else if (measure != null)
 		{
 			setMeasureExp(base, local, scope);
 		}
@@ -367,8 +367,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	 */
 	private void setMeasureExp(Environment base, Environment local, NameScope scope)
 	{
-		TCType actual = measureExp.typeCheck(local, null, NameScope.NAMES, null);
-		measureName = name.getMeasureName(measureExp.location);
+		TCType actual = measure.typeCheck(local, null, NameScope.NAMES, null);
+		measureName = name.getMeasureName(measure.location);
 		checkMeasure(measureName, actual);
 		
 		// Concatenate the parameter patterns into one list for curried measures
@@ -383,7 +383,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		cpll.add(all);
 		
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
-				typeParams, type.getMeasureType(isCurried, actual), cpll, measureExp, null, null, false, null);
+				typeParams, type.getMeasureType(isCurried, actual), cpll, measure, null, null, false, null);
 
 		def.classDefinition = classDefinition;
 		def.typeResolve(base);
