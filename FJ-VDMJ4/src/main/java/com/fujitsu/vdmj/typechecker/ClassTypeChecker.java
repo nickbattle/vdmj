@@ -115,6 +115,11 @@ public class ClassTypeChecker extends TypeChecker
 		// Initialise any annotations
 		TCAnnotation.init();
 
+		for (TCClassDefinition c: classes)
+		{
+			if (c.annotations != null) c.annotations.typeCheck(c, null, NameScope.NAMES);
+		}
+
 	    for (Pass pass: Pass.values())
 		{
         	for (TCClassDefinition c: classes)

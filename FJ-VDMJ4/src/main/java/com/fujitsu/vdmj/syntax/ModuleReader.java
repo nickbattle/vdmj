@@ -25,8 +25,10 @@ package com.fujitsu.vdmj.syntax;
 
 import java.io.File;
 
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
 import com.fujitsu.vdmj.ast.definitions.ASTTypeDefinition;
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameList;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
@@ -96,7 +98,14 @@ public class ModuleReader extends SyntaxReader
     			switch (lastToken().type)
     			{
     				case MODULE:
-    					modules.add(readModule());
+    					LexCommentList comments = getComments();
+    					ASTAnnotationList annotations = readAnnotations(comments);
+    					annotations.before(this);
+    					ASTModule module = readModule();
+    					modules.add(module);
+    					annotations.after(this, module);
+    					module.setAnnotations(annotations);
+    					module.setComments(comments);
     					break;
 
     				case IDENTIFIER:

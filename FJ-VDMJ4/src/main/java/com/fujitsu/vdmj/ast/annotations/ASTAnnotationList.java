@@ -27,6 +27,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.statements.ASTStatement;
 import com.fujitsu.vdmj.syntax.SyntaxReader;
 
@@ -63,6 +64,14 @@ public class ASTAnnotationList extends Vector<ASTAnnotation>
 		for (ASTAnnotation annotation: this)
 		{
 			annotation.after(reader, exp);
+		}
+	}
+
+	public void after(SyntaxReader reader, ASTModule module)
+	{
+		for (ASTAnnotation annotation: this)
+		{
+			annotation.after(reader, module);
 		}
 	}
 }

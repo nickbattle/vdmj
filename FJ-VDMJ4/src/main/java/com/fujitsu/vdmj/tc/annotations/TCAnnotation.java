@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -89,6 +90,11 @@ public abstract class TCAnnotation
 	}
 	
 	public void typeCheck(TCExpression exp, Environment env, NameScope scope)
+	{
+		// Do nothing
+	}
+
+	public void typeCheck(TCModule m)
 	{
 		// Do nothing
 	}

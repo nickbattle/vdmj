@@ -28,9 +28,11 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.FileList;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
@@ -54,6 +56,8 @@ public class TCModule extends TCNode implements Serializable
 	public final TCDefinitionList defs;
 	/** A list of source file names for the module. */
 	public final FileList files;
+	/** A list of module annotations */
+	public final TCAnnotationList annotations;
 
 	/** Those definitions which are exported. */
 	public TCDefinitionList exportdefs;
@@ -61,13 +65,16 @@ public class TCModule extends TCNode implements Serializable
 	public TCDefinitionList importdefs;
 	/** True if the "module" is actually a flat definition file. */
 	public boolean isFlat = false;
+	/** List of comments before module */
+	public LexCommentList comments;
 
 	/**
 	 * Create a module from the given name and definitions.
 	 */
-	public TCModule(TCIdentifierToken name,
+	public TCModule(TCAnnotationList annotations, TCIdentifierToken name,
 		TCModuleImports imports, TCModuleExports exports, TCDefinitionList defs, FileList files, boolean isFlat)
 	{
+		this.annotations = annotations;
 		this.name = name;
 		this.imports = imports;
 		this.exports = exports;
@@ -93,6 +100,7 @@ public class TCModule extends TCNode implements Serializable
     		this.name = defaultName(defs.get(0).location);
  		}
 
+		this.annotations = null;
 		this.imports = null;
 		this.exports = null;
 		this.defs = defs;
@@ -261,5 +269,10 @@ public class TCModule extends TCNode implements Serializable
 				}
 			}
 		}
+	}
+	
+	public void setComments(LexCommentList comments)
+	{
+		this.comments = comments;
 	}
 }

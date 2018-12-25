@@ -107,7 +107,7 @@ public class TCModuleList extends TCMappedList<ASTModule, TCModule>
 
     			if (!imports.isEmpty())
     			{
-    				def = new TCModule(def.name, new TCModuleImports(def.name, imports), null, def.defs, new FileList(), true);
+    				def = new TCModule(null, def.name, new TCModuleImports(def.name, imports), null, def.defs, new FileList(), true);
     			}
 			}
 

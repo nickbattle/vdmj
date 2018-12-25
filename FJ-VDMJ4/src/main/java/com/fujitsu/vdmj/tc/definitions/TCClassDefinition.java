@@ -28,6 +28,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -97,10 +98,11 @@ public class TCClassDefinition extends TCDefinition
 	 * @param supernames
 	 * @param definitions
 	 */
-	public TCClassDefinition(TCNameToken className, TCNameList supernames, TCDefinitionList definitions)
+	public TCClassDefinition(TCAnnotationList annotations, TCNameToken className, TCNameList supernames, TCDefinitionList definitions)
 	{
 		super(Pass.DEFS, className.getLocation(), className, NameScope.CLASSNAME);
 
+		this.annotations = annotations;
 		this.supernames = supernames;
 		this.definitions = definitions;
 
@@ -116,12 +118,17 @@ public class TCClassDefinition extends TCDefinition
 		this.definitions.setClassDefinition(this);
 	}
 
+	public TCClassDefinition(TCNameToken className, TCNameList supernames, TCDefinitionList definitions)
+	{
+		this(null, className, supernames, definitions);		// No annotations
+	}
+	
 	/**
 	 * Create an empty dummy class for the interpreter.
 	 */
 	public TCClassDefinition()
 	{
-		this(new TCNameToken(new LexLocation(), "CLASS", "DEFAULT", false, false),
+		this(null, new TCNameToken(new LexLocation(), "CLASS", "DEFAULT", false, false),
 			 new TCNameList(),
 			 new TCDefinitionList());
 	}

@@ -181,6 +181,11 @@ public class ModuleTypeChecker extends TypeChecker
 		// Initialise any annotations
 		TCAnnotation.init();
 
+		for (TCModule m: modules)
+		{
+			if (m.annotations != null) m.annotations.typeCheck(m);
+		}
+
 		// Proceed to type check all definitions, considering types, values
 		// and remaining definitions, in that order.
 

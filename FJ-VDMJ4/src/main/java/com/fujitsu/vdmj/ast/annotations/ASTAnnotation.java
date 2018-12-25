@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.statements.ASTStatement;
 import com.fujitsu.vdmj.syntax.SyntaxReader;
 
@@ -64,6 +65,11 @@ public abstract class ASTAnnotation
 	}
 
 	public void after(SyntaxReader reader, ASTExpression exp)
+	{
+		// Nothing by default
+	}
+
+	public void after(SyntaxReader reader, ASTModule module)
 	{
 		// Nothing by default
 	}
