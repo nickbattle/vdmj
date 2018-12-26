@@ -27,8 +27,11 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.modules.TCModule;
+import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -37,6 +40,24 @@ public class TCOverrideAnnotation extends TCAnnotation
 	public TCOverrideAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);
+	}
+
+	@Override
+	public void typeCheck(TCStatement stmt, Environment env, NameScope scope)
+	{
+		name.report(3359, "@Override only applies to expressions and statements");
+	}
+
+	@Override
+	public void typeCheck(TCExpression exp, Environment env, NameScope scope)
+	{
+		name.report(3359, "@Override only applies to expressions and statements");
+	}
+
+	@Override
+	public void typeCheck(TCModule module)
+	{
+		name.report(3359, "@Override only applies to expressions and statements");
 	}
 
 	@Override

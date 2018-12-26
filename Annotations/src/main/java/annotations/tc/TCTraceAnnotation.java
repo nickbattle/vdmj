@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -42,6 +43,12 @@ public class TCTraceAnnotation extends TCAnnotation
 
 	@Override
 	public void typeCheck(TCDefinition def, Environment env, NameScope scope)
+	{
+		name.report(3359, "@Trace only applies to expressions and statements");
+	}
+
+	@Override
+	public void typeCheck(TCModule module)
 	{
 		name.report(3359, "@Trace only applies to expressions and statements");
 	}
