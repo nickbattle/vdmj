@@ -24,13 +24,51 @@
 package annotations.tc;
 
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.modules.TCModule;
+import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCNoPOGAnnotation extends TCAnnotation
 {
 	public TCNoPOGAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);
+	}
+
+	public void before(TCDefinition def, Environment env, NameScope scope)
+	{
+		if (!args.isEmpty())
+		{
+			name.report(3361, "@NoPOG has no arguments");
+		}
+	}
+	
+	public void before(TCStatement stmt, Environment env, NameScope scope)
+	{
+		if (!args.isEmpty())
+		{
+			name.report(3361, "@NoPOG has no arguments");
+		}
+	}
+	
+	public void before(TCExpression exp, Environment env, NameScope scope)
+	{
+		if (!args.isEmpty())
+		{
+			name.report(3361, "@NoPOG has no arguments");
+		}
+	}
+
+	public void before(TCModule m)
+	{
+		if (!args.isEmpty())
+		{
+			name.report(3361, "@NoPOG has no arguments");
+		}
 	}
 }
