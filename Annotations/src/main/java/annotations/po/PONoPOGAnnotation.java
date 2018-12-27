@@ -21,12 +21,9 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.annotations;
+package annotations.po;
 
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
@@ -35,76 +32,25 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public abstract class POAnnotation
+public class PONoPOGAnnotation extends POAnnotation
 {
-	public final TCIdentifierToken name;
-	
-	public final POExpressionList args;
-	
-	private static final Set<Class<?>> declared = new HashSet<Class<?>>(); 
-
-	public POAnnotation(TCIdentifierToken name, POExpressionList args)
+	public PONoPOGAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
-		this.name = name;
-		this.args = args;
-		
-		declared.add(this.getClass());
-	}
-
-	public static void init()
-	{
-		for (Class<?> clazz: declared)
-		{
-			try
-			{
-				Method doInit = clazz.getMethod("doInit", (Class<?>[])null);
-				doInit.invoke(null, (Object[])null);
-			}
-			catch (Throwable e)
-			{
-				throw new RuntimeException(clazz.getSimpleName() + ":" + e);
-			}
-		}
-	}
-	
-	public static void doInit()
-	{
-		// Nothing by default
-	}
-
-	@Override
-	public String toString()
-	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
-	}
-
-	public ProofObligationList before(POContextStack ctxt, PODefinition def)
-	{
-		return new ProofObligationList();
-	}
-
-	public ProofObligationList before(POContextStack ctxt, POStatement stmt)
-	{
-		return new ProofObligationList();
-	}
-
-	public ProofObligationList before(POContextStack ctxt, POExpression exp)
-	{
-		return new ProofObligationList();
+		super(name, args);
 	}
 
 	public void after(POContextStack ctxt, PODefinition def, ProofObligationList obligations)
 	{
-		return;
+		obligations.clear();
 	}
 
 	public void after(POContextStack ctxt, POStatement stmt, ProofObligationList obligations)
 	{
-		return;
+		obligations.clear();
 	}
 
 	public void after(POContextStack ctxt, POExpression exp, ProofObligationList obligations)
 	{
-		return;
+		obligations.clear();
 	}
 }

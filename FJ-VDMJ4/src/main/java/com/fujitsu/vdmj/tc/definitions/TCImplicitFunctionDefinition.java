@@ -220,7 +220,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		if (annotations != null) annotations.typeCheck(this, base, scope);
+		if (annotations != null) annotations.before(this, base, scope);
 
 		TCDefinitionList defs = new TCDefinitionList();
 		TypeComparator.checkComposeTypes(type, base, false);
@@ -363,6 +363,8 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		{
 			local.unusedCheck();
 		}
+
+		if (annotations != null) annotations.after(this, type, base, scope);
 	}
 
 

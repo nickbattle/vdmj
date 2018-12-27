@@ -42,25 +42,25 @@ public class TCTraceAnnotation extends TCAnnotation
 	}
 
 	@Override
-	public void typeCheck(TCDefinition def, Environment env, NameScope scope)
+	public void before(TCDefinition def, Environment env, NameScope scope)
 	{
 		name.report(3359, "@Trace only applies to expressions and statements");
 	}
 
 	@Override
-	public void typeCheck(TCModule module)
+	public void before(TCModule module)
 	{
 		name.report(3359, "@Trace only applies to expressions and statements");
 	}
 
 	@Override
-	public void typeCheck(TCExpression exp, Environment env, NameScope scope)
+	public void before(TCExpression exp, Environment env, NameScope scope)
 	{
 		check(env, scope);
 	}
 
 	@Override
-	public void typeCheck(TCStatement stmt, Environment env, NameScope scope)
+	public void before(TCStatement stmt, Environment env, NameScope scope)
 	{
 		check(env, scope);
 	}

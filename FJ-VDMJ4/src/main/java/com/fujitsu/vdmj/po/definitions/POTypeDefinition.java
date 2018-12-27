@@ -98,9 +98,8 @@ public class POTypeDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		if (annotations != null) annotations.pog(ctxt, this);
-
-		ProofObligationList list = new ProofObligationList();
+		ProofObligationList list =
+				(annotations != null) ? annotations.before(ctxt, this) : new ProofObligationList();
 
 		if (invExpression != null)
 		{
@@ -119,6 +118,7 @@ public class POTypeDefinition extends PODefinition
 			list.add(new StrictOrderObligation(this, ctxt));
 		}
 
+		if (annotations != null) annotations.after(ctxt, this, list);
 		return list;
 	}
 }

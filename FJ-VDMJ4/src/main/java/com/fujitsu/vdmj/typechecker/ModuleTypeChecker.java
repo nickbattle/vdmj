@@ -183,7 +183,7 @@ public class ModuleTypeChecker extends TypeChecker
 
 		for (TCModule m: modules)
 		{
-			if (m.annotations != null) m.annotations.typeCheck(m);
+			if (m.annotations != null) m.annotations.before(m);
 		}
 
 		// Proceed to type check all definitions, considering types, values
@@ -220,6 +220,11 @@ public class ModuleTypeChecker extends TypeChecker
 					}
 				}
 			}
+		}
+
+		for (TCModule m: modules)
+		{
+			if (m.annotations != null) m.annotations.after(m);
 		}
 
 		// Report any discrepancies between the final checked types of

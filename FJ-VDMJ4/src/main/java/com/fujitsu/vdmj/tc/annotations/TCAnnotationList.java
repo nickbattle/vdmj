@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.tc.TCMappedList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.modules.TCModule;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -45,19 +46,35 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 		super(from);
 	}
 	
-	public void typeCheck(TCDefinition def, Environment env, NameScope scope)
+	public void before(TCDefinition def, Environment env, NameScope scope)
 	{
 		for (TCAnnotation annotation: this)
 		{
-			annotation.typeCheck(def, env, scope);
+			annotation.before(def, env, scope);
 		}
 	}
 
-	public void typeCheck(TCModule m)
+	public void before(TCModule m)
 	{
 		for (TCAnnotation annotation: this)
 		{
-			annotation.typeCheck(m);
+			annotation.before(m);
+		}
+	}
+
+	public void after(TCDefinition def, TCType type, Environment env, NameScope scope)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.after(def, type, env, scope);
+		}
+	}
+
+	public void after(TCModule m)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.after(m);
 		}
 	}
 }

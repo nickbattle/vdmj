@@ -46,14 +46,16 @@ public class POAnnotatedStatement extends POStatement
 	@Override
 	public String toString()
 	{
-		return annotation + " " + statement;
+		return "/* " + annotation + " */ " + statement;
 	}
 	
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		annotation.pog(ctxt, this);
-		return statement.getProofObligations(ctxt);
+		annotation.before(ctxt, this);
+		ProofObligationList obligations = statement.getProofObligations(ctxt);
+		annotation.after(ctxt, this, obligations);
+		return obligations;
 	}
 
 	@Override

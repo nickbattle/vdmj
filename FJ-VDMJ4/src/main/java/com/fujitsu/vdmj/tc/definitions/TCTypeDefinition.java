@@ -238,7 +238,7 @@ public class TCTypeDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		if (annotations != null) annotations.typeCheck(this, base, scope);
+		if (annotations != null) annotations.before(this, base, scope);
 
 		if (invdef != null)
 		{
@@ -339,6 +339,8 @@ public class TCTypeDefinition extends TCDefinition
 				}
 			}
 		}
+
+		if (annotations != null) annotations.after(this, type, base, scope);
 	}
 
 	@Override

@@ -44,7 +44,7 @@ public class ASTAnnotatedStatement extends ASTStatement
 	@Override
 	public String toString()
 	{
-		return annotation + " " + statement;
+		return "/* " + annotation + " */ " + statement;
 	}
 
 	@Override

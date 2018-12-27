@@ -200,7 +200,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		if (annotations != null) annotations.typeCheck(this, base, scope);
+		if (annotations != null) annotations.before(this, base, scope);
 
 		scope = NameScope.NAMESANDSTATE;
 		TCDefinitionList defs = new TCDefinitionList();
@@ -452,6 +452,8 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		{
 			local.unusedCheck();
 		}
+
+		if (annotations != null) annotations.after(this, type, base, scope);
 	}
 
 	@Override

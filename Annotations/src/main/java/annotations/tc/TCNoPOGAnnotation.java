@@ -21,35 +21,16 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.ast.annotations;
+package annotations.tc;
 
-import com.fujitsu.vdmj.ast.expressions.ASTExpression;
-import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class ASTAnnotatedExpression extends ASTExpression
+public class TCNoPOGAnnotation extends TCAnnotation
 {
-	private static final long serialVersionUID = 1L;
-
-	public final ASTAnnotation annotation;
-
-	public final ASTExpression expression;
-	
-	public ASTAnnotatedExpression(LexLocation location, ASTAnnotation annotation, ASTExpression expression)
+	public TCNoPOGAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
-		super(location);
-		this.annotation = annotation;
-		this.expression = expression;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "/* " + annotation + " */ " + expression;
-	}
-
-	@Override
-	public String kind()
-	{
-		return "annotated expression";
+		super(name, args);
 	}
 }

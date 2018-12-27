@@ -113,9 +113,8 @@ public class POExplicitOperationDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		if (annotations != null) annotations.pog(ctxt, this);
-
-		ProofObligationList obligations = new ProofObligationList();
+		ProofObligationList obligations =
+				(annotations != null) ? annotations.before(ctxt, this) : new ProofObligationList();
 		TCNameList pids = new TCNameList();
 
 		for (POPattern p: parameterPatterns)
@@ -154,6 +153,7 @@ public class POExplicitOperationDefinition extends PODefinition
 			obligations.add(new SubTypeObligation(this, actualResult, ctxt));
 		}
 
+		if (annotations != null) annotations.after(ctxt, this, obligations);
 		return obligations;
 	}
 

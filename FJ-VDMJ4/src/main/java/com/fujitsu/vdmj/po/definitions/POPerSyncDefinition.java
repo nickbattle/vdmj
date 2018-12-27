@@ -69,11 +69,14 @@ public class POPerSyncDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		if (annotations != null) annotations.pog(ctxt, this);
+		ProofObligationList obligations =
+				(annotations != null) ? annotations.before(ctxt, this) : new ProofObligationList();
 
 		ctxt.push(new PONameContext(new TCNameList(opname)));
-		ProofObligationList list = guard.getProofObligations(ctxt);
+		obligations.addAll(guard.getProofObligations(ctxt));
 		ctxt.pop();
-		return list;
+		
+		if (annotations != null) annotations.after(ctxt, this, obligations);
+		return obligations;
 	}
 }

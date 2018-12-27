@@ -89,7 +89,7 @@ public class TCPerSyncDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		if (annotations != null) annotations.typeCheck(this, base, scope);
+		if (annotations != null) annotations.before(this, base, scope);
 
 		TCClassDefinition classdef = base.findClassDefinition();
 		int opfound = 0;
@@ -165,6 +165,8 @@ public class TCPerSyncDefinition extends TCDefinition
 		{
 			guard.report(3046, "Guard is not a boolean expression");
 		}
+
+		if (annotations != null) annotations.after(this, getType(), base, scope);
 	}
 
 	public TCExpression getExpression()

@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -79,22 +80,42 @@ public abstract class TCAnnotation
 		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
 	}
 
-	public void typeCheck(TCDefinition def, Environment env, NameScope scope)
+	public void before(TCDefinition def, Environment env, NameScope scope)
 	{
 		// Do nothing
 	}
 	
-	public void typeCheck(TCStatement stmt, Environment env, NameScope scope)
+	public void before(TCStatement stmt, Environment env, NameScope scope)
 	{
 		// Do nothing
 	}
 	
-	public void typeCheck(TCExpression exp, Environment env, NameScope scope)
+	public void before(TCExpression exp, Environment env, NameScope scope)
 	{
 		// Do nothing
 	}
 
-	public void typeCheck(TCModule m)
+	public void before(TCModule m)
+	{
+		// Do nothing
+	}
+
+	public void after(TCDefinition def, TCType type, Environment env, NameScope scope)
+	{
+		// Do nothing
+	}
+	
+	public void after(TCStatement stmt, TCType type, Environment env, NameScope scope)
+	{
+		// Do nothing
+	}
+	
+	public void after(TCExpression exp, TCType type, Environment env, NameScope scope)
+	{
+		// Do nothing
+	}
+
+	public void after(TCModule m)
 	{
 		// Do nothing
 	}

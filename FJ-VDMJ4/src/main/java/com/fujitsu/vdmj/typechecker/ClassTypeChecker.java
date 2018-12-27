@@ -117,7 +117,7 @@ public class ClassTypeChecker extends TypeChecker
 
 		for (TCClassDefinition c: classes)
 		{
-			if (c.annotations != null) c.annotations.typeCheck(c, null, NameScope.NAMES);
+			if (c.annotations != null) c.annotations.before(c, null, NameScope.NAMES);
 		}
 
 	    for (Pass pass: Pass.values())
@@ -144,7 +144,12 @@ public class ClassTypeChecker extends TypeChecker
     		}
 		}
 	    
-	    TCDefinitionList allDefs = new TCDefinitionList();
+		for (TCClassDefinition c: classes)
+		{
+			if (c.annotations != null) c.annotations.after(c, c.getType(), null, NameScope.NAMES);
+		}
+
+		TCDefinitionList allDefs = new TCDefinitionList();
 
     	for (TCClassDefinition c: classes)
 		{

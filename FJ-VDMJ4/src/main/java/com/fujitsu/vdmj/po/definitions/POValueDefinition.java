@@ -99,9 +99,10 @@ public class POValueDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		if (annotations != null) annotations.pog(ctxt, this);
+		ProofObligationList list =
+				(annotations != null) ? annotations.before(ctxt, this) : new ProofObligationList();
 
-		ProofObligationList list = exp.getProofObligations(ctxt);
+		list.addAll(exp.getProofObligations(ctxt));
 
 		if (!(pattern instanceof POIdentifierPattern) &&
 			!(pattern instanceof POIgnorePattern) &&

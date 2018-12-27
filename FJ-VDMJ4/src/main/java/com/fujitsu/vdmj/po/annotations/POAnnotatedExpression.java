@@ -46,14 +46,16 @@ public class POAnnotatedExpression extends POExpression
 	@Override
 	public String toString()
 	{
-		return annotation + " " + expression;
+		return "/* " + annotation + " */ " + expression;
 	}
 	
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		annotation.pog(ctxt, this);
-		return expression.getProofObligations(ctxt);
+		annotation.before(ctxt, this);
+		ProofObligationList obligations = expression.getProofObligations(ctxt);
+		annotation.after(ctxt, this, obligations);
+		return obligations;
 	}
 
 	public String getPreName()

@@ -133,9 +133,8 @@ public class POImplicitOperationDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		if (annotations != null) annotations.pog(ctxt, this);
-
-		ProofObligationList obligations = new ProofObligationList();
+		ProofObligationList obligations =
+				(annotations != null) ? annotations.before(ctxt, this) : new ProofObligationList();
 		TCNameList pids = new TCNameList();
 		boolean matchNeeded = false;
 
@@ -207,6 +206,7 @@ public class POImplicitOperationDefinition extends PODefinition
 			}
 		}
 
+		if (annotations != null) annotations.after(ctxt, this, obligations);
 		return obligations;
 	}
 
