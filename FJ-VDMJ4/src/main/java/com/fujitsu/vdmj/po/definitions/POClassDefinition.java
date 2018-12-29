@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -50,10 +51,11 @@ public class POClassDefinition extends PODefinition
 	/**
 	 * Create a class definition with the given name, type and list of local definitions.
 	 */
-	public POClassDefinition(TCNameToken className, TCClassType classtype,
+	public POClassDefinition(POAnnotationList annotations, TCNameToken className, TCClassType classtype,
 		PODefinitionList definitions, POExplicitOperationDefinition invariant, boolean hasConstructors)
 	{
 		super(className.getLocation(), className);
+		this.annotations = annotations;
 		this.classtype = classtype;
 		this.definitions = definitions;
 		this.invariant = invariant;
@@ -89,7 +91,13 @@ public class POClassDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		return definitions.getProofObligations(ctxt);
+		ProofObligationList list =
+				(annotations != null) ? annotations.before(ctxt, this) : new ProofObligationList();
+				
+		list.addAll(definitions.getProofObligations(ctxt));
+		
+		if (annotations != null) annotations.after(ctxt, this, list);
+		return list;
 	}
 
 	public PODefinitionList getInvDefs()

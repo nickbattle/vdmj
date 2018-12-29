@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.modules.POModule;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -50,6 +51,11 @@ public class PONoPOGAnnotation extends POAnnotation
 	}
 
 	public void after(POContextStack ctxt, POExpression exp, ProofObligationList obligations)
+	{
+		obligations.clear();
+	}
+
+	public void after(POModule module, ProofObligationList obligations)
 	{
 		obligations.clear();
 	}

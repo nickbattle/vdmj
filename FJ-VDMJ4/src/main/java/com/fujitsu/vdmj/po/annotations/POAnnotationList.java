@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.annotations;
 
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.modules.POModule;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
@@ -56,11 +57,31 @@ public class POAnnotationList extends POMappedList<TCAnnotation, POAnnotation>
 		return list;
 	}
 
+	public ProofObligationList before(POModule module)
+	{
+		ProofObligationList list = new ProofObligationList();
+		
+		for (POAnnotation annotation: this)
+		{
+			list.addAll(annotation.before(module));
+		}
+		
+		return list;
+	}
+
 	public void after(POContextStack ctxt, PODefinition def, ProofObligationList obligations)
 	{
 		for (POAnnotation annotation: this)
 		{
 			annotation.after(ctxt, def, obligations);
+		}
+	}
+
+	public void after(POModule module, ProofObligationList obligations)
+	{
+		for (POAnnotation annotation: this)
+		{
+			annotation.after(module, obligations);
 		}
 	}
 }

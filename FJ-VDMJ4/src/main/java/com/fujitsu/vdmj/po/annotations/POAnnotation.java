@@ -30,6 +30,7 @@ import java.util.Set;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.modules.POModule;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -93,6 +94,11 @@ public abstract class POAnnotation
 		return new ProofObligationList();
 	}
 
+	public ProofObligationList before(POModule module)
+	{
+		return new ProofObligationList();
+	}
+
 	public void after(POContextStack ctxt, PODefinition def, ProofObligationList obligations)
 	{
 		return;
@@ -104,6 +110,11 @@ public abstract class POAnnotation
 	}
 
 	public void after(POContextStack ctxt, POExpression exp, ProofObligationList obligations)
+	{
+		return;
+	}
+
+	public void after(POModule module, ProofObligationList obligations)
 	{
 		return;
 	}

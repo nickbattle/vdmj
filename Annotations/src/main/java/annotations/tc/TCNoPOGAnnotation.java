@@ -42,29 +42,25 @@ public class TCNoPOGAnnotation extends TCAnnotation
 
 	public void before(TCDefinition def, Environment env, NameScope scope)
 	{
-		if (!args.isEmpty())
-		{
-			name.report(3361, "@NoPOG has no arguments");
-		}
+		noArgs();
 	}
 	
 	public void before(TCStatement stmt, Environment env, NameScope scope)
 	{
-		if (!args.isEmpty())
-		{
-			name.report(3361, "@NoPOG has no arguments");
-		}
+		noArgs();
 	}
 	
 	public void before(TCExpression exp, Environment env, NameScope scope)
 	{
-		if (!args.isEmpty())
-		{
-			name.report(3361, "@NoPOG has no arguments");
-		}
+		noArgs();
 	}
 
 	public void before(TCModule m)
+	{
+		noArgs();
+	}
+
+	private void noArgs()
 	{
 		if (!args.isEmpty())
 		{

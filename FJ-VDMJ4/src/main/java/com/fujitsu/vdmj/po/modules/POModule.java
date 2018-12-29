@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.modules;
 import java.io.Serializable;
 
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -43,12 +44,15 @@ public class POModule extends PONode implements Serializable
 	public final TCIdentifierToken name;
 	/** A list of definitions created in the module. */
 	public final PODefinitionList defs;
+	/** A list of annotations, if any */
+	public final POAnnotationList annotations;
 
 	/**
 	 * Create a module from the given name and definitions.
 	 */
-	public POModule(TCIdentifierToken name, PODefinitionList defs)
+	public POModule(POAnnotationList annotations, TCIdentifierToken name, PODefinitionList defs)
 	{
+		this.annotations = annotations;
 		this.name = name;
 		this.defs = defs;
 	}
@@ -76,6 +80,12 @@ public class POModule extends PONode implements Serializable
 
 	public ProofObligationList getProofObligations()
 	{
-		return defs.getProofObligations(new POContextStack());
+		ProofObligationList list =
+				(annotations != null) ? annotations.before(this) : new ProofObligationList();
+				
+		list.addAll(defs.getProofObligations(new POContextStack()));
+		
+		if (annotations != null) annotations.after(this, list);
+		return list;
 	}
 }

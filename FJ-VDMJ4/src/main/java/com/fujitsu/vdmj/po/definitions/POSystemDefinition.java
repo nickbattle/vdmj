@@ -32,6 +32,6 @@ public class POSystemDefinition extends POClassDefinition
 
 	public POSystemDefinition(TCNameToken className, TCClassType ctype, PODefinitionList members)
 	{
-		super(className, ctype, members, null, false);
+		super(null, className, ctype, members, null, false);
 	}
 }
