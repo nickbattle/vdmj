@@ -328,7 +328,7 @@ abstract public class VDMJ
 			System.setProperty(dialect.name(), "1");
 		}
 
-		if (logfile != null)// && !(controller instanceof VDMRT))
+		if (logfile != null && !(controller instanceof VDMRT))
 		{
 			usage("The -log option can only be used with -vdmrt");
 		}
