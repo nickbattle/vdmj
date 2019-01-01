@@ -61,21 +61,25 @@ public class INAnnotatedExpression extends INExpression
 		annotation.after(ctxt, rv, this);
 		return rv;
 	}
+	@Override
 	public INExpression findExpression(int lineno)
 	{
 		return (location.startLine == lineno) ? this : null;
 	}
 
+	@Override
 	public ValueList getValues(Context ctxt)
 	{
 		return expression.getValues(ctxt);
 	}
 	
+	@Override
 	public TCNameList getOldNames()
 	{
 		return expression.getOldNames();
 	}
 
+	@Override
 	public INExpressionList getSubExpressions()
 	{
 		return expression.getSubExpressions();

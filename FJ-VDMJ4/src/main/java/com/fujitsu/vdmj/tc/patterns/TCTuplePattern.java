@@ -140,6 +140,7 @@ public class TCTuplePattern extends TCPattern
 		return list;
 	}
 
+	@Override
 	public boolean alwaysMatches()
 	{
 		return plist.alwaysMatches();

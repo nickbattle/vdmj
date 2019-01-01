@@ -60,11 +60,13 @@ public class INAnnotatedStatement extends INStatement
 		return rv;
 	}
 	
+	@Override
 	public INStatement findStatement(int lineno)
 	{
 		return statement.findStatement(lineno);
 	}
 
+	@Override
 	public INExpression findExpression(int lineno)
 	{
 		return statement.findExpression(lineno);

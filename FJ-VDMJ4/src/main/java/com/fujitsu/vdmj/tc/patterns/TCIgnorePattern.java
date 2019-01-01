@@ -62,6 +62,7 @@ public class TCIgnorePattern extends TCPattern
 		return new TCUnknownType(location);	// As we don't care
 	}
 
+	@Override
 	public boolean alwaysMatches()
 	{
 		return true;

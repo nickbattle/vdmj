@@ -40,21 +40,25 @@ public class TCNoPOGAnnotation extends TCAnnotation
 		super(name, args);
 	}
 
+	@Override
 	public void before(TCDefinition def, Environment env, NameScope scope)
 	{
 		noArgs();
 	}
 	
+	@Override
 	public void before(TCStatement stmt, Environment env, NameScope scope)
 	{
 		noArgs();
 	}
 	
+	@Override
 	public void before(TCExpression exp, Environment env, NameScope scope)
 	{
 		noArgs();
 	}
 
+	@Override
 	public void before(TCModule m)
 	{
 		noArgs();

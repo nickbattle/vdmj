@@ -87,6 +87,7 @@ public class TCIdentifierPattern extends TCPattern
 		return list;
 	}
 
+	@Override
 	public boolean alwaysMatches()
 	{
 		return true;

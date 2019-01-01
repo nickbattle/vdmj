@@ -62,11 +62,13 @@ public class TCAnnotatedExpression extends TCExpression
 		return type;
 	}
 
+	@Override
 	public TCDefinitionList getQualifiedDefs(Environment env)
 	{
 		return expression.getQualifiedDefs(env);
 	}
 	
+	@Override
 	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		return expression.getFreeVariables(globals, env);

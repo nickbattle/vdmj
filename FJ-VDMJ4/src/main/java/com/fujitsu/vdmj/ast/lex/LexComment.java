@@ -46,6 +46,7 @@ public class LexComment extends ASTNode
 		this.block = block;
 	}
 	
+	@Override
 	public String toString()
 	{
 		return block ? "/*" + comment + "*/" : "--" + comment;

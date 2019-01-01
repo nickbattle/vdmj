@@ -58,6 +58,7 @@ public class POAnnotatedExpression extends POExpression
 		return obligations;
 	}
 
+	@Override
 	public String getPreName()
 	{
 		return expression.getPreName();
