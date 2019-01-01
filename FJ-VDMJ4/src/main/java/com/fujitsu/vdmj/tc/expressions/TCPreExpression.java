@@ -47,7 +47,7 @@ public class TCPreExpression extends TCExpression
 	@Override
 	public String toString()
 	{
-		return "pre_(" + function + Utils.listToString(args) + ")";
+		return "pre_(" + function + (args.isEmpty() ? "" : ", " + Utils.listToString(args)) + ")";
 	}
 
 	@Override
