@@ -4,7 +4,5 @@
 
 # annotations
 package annotations.tc to annotations.po;
-map TCTraceAnnotation{name, args} to PONullAnnotation(name, args);
-map TCOverrideAnnotation{name, args} to PONullAnnotation(name, args);
-map TCNoPOGAnnotation{name, args} to PONoPOGAnnotation(name, args);
+map TCChangesAnnotation{name, args} to PONullAnnotation(name, args);
 

@@ -4,7 +4,5 @@
 
 # annotations
 package annotations.ast to annotations.tc;
-map ASTTraceAnnotation{name, args} to TCTraceAnnotation(name, args);
-map ASTOverrideAnnotation{name, args} to TCOverrideAnnotation(name, args);
-map ASTNoPOGAnnotation{name, args} to TCNoPOGAnnotation(name, args);
+map ASTChangesAnnotation{name, args} to TCChangesAnnotation(name, args);
 
