@@ -168,6 +168,8 @@ public class TCStateDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.before(this, base, scope);
+
 		if (base.findStateDefinition() != this)
 		{
 			report(3047, "Only one state definition allowed per module");
@@ -190,6 +192,8 @@ public class TCStateDefinition extends TCDefinition
 		{
 			initdef.typeCheck(base, scope);
 		}
+
+		if (annotations != null) annotations.after(this, recordType, base, scope);
 	}
 
 	@Override

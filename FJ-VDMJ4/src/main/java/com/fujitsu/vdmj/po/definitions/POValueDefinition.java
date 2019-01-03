@@ -137,6 +137,7 @@ public class POValueDefinition extends PODefinition
 			list.add(new SubTypeObligation(exp, type, expType, ctxt));
 		}
 
+		if (annotations != null) annotations.after(ctxt, this, list);
 		return list;
 	}
 }

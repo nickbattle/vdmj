@@ -1086,6 +1086,9 @@ public class DefinitionReader extends SyntaxReader
 
 	private ASTDefinition readStateDefinition() throws ParserException, LexException
 	{
+		LexCommentList comments = getComments();
+		ASTAnnotationList annotations = readAnnotations(comments);
+
 		LexIdentifierToken name = readIdToken("Expecting identifier after 'state' definition");
 		checkFor(Token.OF, 2097, "Expecting 'of' after state name");
 		ASTFieldList fieldList = getTypeReader().readFieldList();
@@ -1121,8 +1124,11 @@ public class DefinitionReader extends SyntaxReader
 		}
 
 		checkFor(Token.END, 2100, "Expecting 'end' after state definition");
-		return new ASTStateDefinition(idToName(name), fieldList,
+		ASTStateDefinition def = new ASTStateDefinition(idToName(name), fieldList,
 			invPattern, invExpression, initPattern, initExpression);
+		def.setAnnotations(annotations);
+		def.setComments(comments);
+		return def;
 	}
 
 	private ASTDefinition readOperationDefinition()
