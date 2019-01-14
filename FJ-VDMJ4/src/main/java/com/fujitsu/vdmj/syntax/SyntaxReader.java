@@ -336,12 +336,12 @@ public abstract class SyntaxReader
 	 * Read any annotations from the collected comments, and clear them. Note that we
 	 * don't parse annotations while inside the annotation parser.
 	 */
-	private static boolean readingAnnotations = false;
+	private static int readingAnnotations = 0;
 
 	protected ASTAnnotationList readAnnotations(LexCommentList comments) throws LexException, ParserException
 	{
 		ASTAnnotationList annotations = new ASTAnnotationList();
-		if (readingAnnotations) return annotations; else readingAnnotations = true;
+		if (readingAnnotations > 0) return annotations; else readingAnnotations++;
 		
 		for (int i=0; i<comments.size(); i++)
 		{
@@ -359,7 +359,7 @@ public abstract class SyntaxReader
 			}
 		}
 		
-		readingAnnotations = false;
+		readingAnnotations--;
 		return annotations;
 	}
 	
