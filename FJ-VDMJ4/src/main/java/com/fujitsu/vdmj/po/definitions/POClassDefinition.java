@@ -92,11 +92,11 @@ public class POClassDefinition extends PODefinition
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
 		ProofObligationList list =
-				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
+				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
 				
 		list.addAll(definitions.getProofObligations(ctxt));
 		
-		if (annotations != null) annotations.poAfter(this, list, ctxt);
+		if (annotations != null) annotations.poAfter(this, list);
 		return list;
 	}
 
