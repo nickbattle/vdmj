@@ -51,7 +51,7 @@ public class POAnnotationList extends POMappedList<TCAnnotation, POAnnotation>
 		
 		for (POAnnotation annotation: this)
 		{
-			list.addAll(annotation.before(ctxt, def));
+			list.addAll(annotation.poBefore(def, ctxt));
 		}
 		
 		return list;
@@ -63,7 +63,7 @@ public class POAnnotationList extends POMappedList<TCAnnotation, POAnnotation>
 		
 		for (POAnnotation annotation: this)
 		{
-			list.addAll(annotation.before(module));
+			list.addAll(annotation.poBefore(module));
 		}
 		
 		return list;
@@ -73,7 +73,7 @@ public class POAnnotationList extends POMappedList<TCAnnotation, POAnnotation>
 	{
 		for (POAnnotation annotation: this)
 		{
-			annotation.after(ctxt, def, obligations);
+			annotation.poAfter(def, obligations, ctxt);
 		}
 	}
 
@@ -81,7 +81,7 @@ public class POAnnotationList extends POMappedList<TCAnnotation, POAnnotation>
 	{
 		for (POAnnotation annotation: this)
 		{
-			annotation.after(module, obligations);
+			annotation.poAfter(module, obligations);
 		}
 	}
 }

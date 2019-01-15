@@ -41,13 +41,13 @@ public class INTraceAnnotation extends INAnnotation
 	}
 	
 	@Override
-	public void before(Context ctxt, INStatement stmt)
+	public void inBefore(INStatement stmt, Context ctxt)
 	{
 		doTrace(ctxt);
 	}
 	
 	@Override
-	public void before(Context ctxt, INExpression exp)
+	public void inBefore(INExpression exp, Context ctxt)
 	{
 		doTrace(ctxt);
 	}

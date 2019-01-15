@@ -77,22 +77,22 @@ public abstract class INAnnotation
 		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
 	}
 
-	public void before(Context ctxt, INStatement stmt)
+	public void inBefore(INStatement stmt, Context ctxt)
 	{
 		// Do nothing
 	}
 	
-	public void before(Context ctxt, INExpression exp)
+	public void inBefore(INExpression exp, Context ctxt)
 	{
 		// Do nothing
 	}
 
-	public void after(Context ctxt, Value rv, INStatement stmt)
+	public void inAfter(INStatement stmt, Value rv, Context ctxt)
 	{
 		// Do nothing
 	}
 	
-	public void after(Context ctxt, Value rv, INExpression exp)
+	public void inAfter(INExpression exp, Value rv, Context ctxt)
 	{
 		// Do nothing
 	}

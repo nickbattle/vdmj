@@ -50,7 +50,7 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 	{
 		for (TCAnnotation annotation: this)
 		{
-			annotation.before(def, env, scope);
+			annotation.tcBefore(def, env, scope);
 		}
 	}
 
@@ -58,7 +58,7 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 	{
 		for (TCAnnotation annotation: this)
 		{
-			annotation.before(m);
+			annotation.tcBefore(m);
 		}
 	}
 
@@ -66,7 +66,7 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 	{
 		for (TCAnnotation annotation: this)
 		{
-			annotation.after(def, type, env, scope);
+			annotation.tcAfter(def, type, env, scope);
 		}
 	}
 
@@ -74,7 +74,7 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 	{
 		for (TCAnnotation annotation: this)
 		{
-			annotation.after(m);
+			annotation.tcAfter(m);
 		}
 	}
 }

@@ -1,28 +1,16 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2019 Nick Battle.
  *
  *	Author: Nick Battle
  *
- *	This file is part of VDMJ.
- *
- *	VDMJ is free software: you can redistribute it and/or modify
- *	it under the terms of the GNU General Public License as published by
- *	the Free Software Foundation, either version 3 of the License, or
- *	(at your option) any later version.
- *
- *	VDMJ is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *	GNU General Public License for more details.
- *
- *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	This file is part of Overture
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.ast.annotations;
+package annotations.ast;
 
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
@@ -37,51 +25,51 @@ import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.syntax.StatementReader;
 import com.fujitsu.vdmj.syntax.SyntaxReader;
 
-public abstract class ASTAnnotation
+public class ASTTestAnnotation extends ASTAnnotation
 {
-	public final LexIdentifierToken name;
-	
-	public final ASTExpressionList args;
-
-	public ASTAnnotation(LexIdentifierToken name, ASTExpressionList args)
+	public ASTTestAnnotation(LexIdentifierToken name, ASTExpressionList args)
 	{
-		this.name = name;
-		this.args = args;
+		super(name, args);
+	}
+	
+	public static void doInit()
+	{
+		System.out.printf("doInit ASTTestAnnotation\n");
+	}
+	
+	@Override
+	public void astBefore(SyntaxReader reader)
+	{
+		System.out.printf("astBefore %s %s\n", reader.getClass().getSimpleName(), this);
 	}
 
 	@Override
-	public String toString()
-	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
-	}
-
-	public void astBefore(SyntaxReader reader)
-	{
-		// Nothing by default
-	}
-
 	public void astAfter(DefinitionReader reader, ASTDefinition def)
 	{
-		// Nothing by default
+		System.out.printf("astAfter %s\n", reader.getClass().getSimpleName(), def.getClass().getSimpleName(), this);
 	}
 
+	@Override
 	public void astAfter(StatementReader reader, ASTStatement stmt)
 	{
-		// Nothing by default
+		System.out.printf("astAfter %s %s %s\n", reader.getClass().getSimpleName(), stmt.getClass().getSimpleName(), this);
 	}
 
+	@Override
 	public void astAfter(ExpressionReader reader, ASTExpression exp)
 	{
-		// Nothing by default
+		System.out.printf("astAfter %s %s %s\n", reader.getClass().getSimpleName(), exp.getClass().getSimpleName(), this);
 	}
 
+	@Override
 	public void astAfter(ModuleReader reader, ASTModule module)
 	{
-		// Nothing by default
+		System.out.printf("astAfter %s %s %s\n", reader.getClass().getSimpleName(), module.getClass().getSimpleName(), this);
 	}
 
+	@Override
 	public void astAfter(ClassReader reader, ASTClassDefinition clazz)
 	{
-		// Nothing by default
+		System.out.printf("astAfter %s %s %s\n", reader.getClass().getSimpleName(), clazz.getClass().getSimpleName(), this);
 	}
 }

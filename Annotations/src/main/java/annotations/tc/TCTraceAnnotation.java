@@ -24,6 +24,7 @@
 package annotations.tc;
 
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
@@ -42,25 +43,31 @@ public class TCTraceAnnotation extends TCAnnotation
 	}
 
 	@Override
-	public void before(TCDefinition def, Environment env, NameScope scope)
+	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
 		name.report(6006, "@Trace only applies to expressions and statements");
 	}
 
 	@Override
-	public void before(TCModule module)
+	public void tcBefore(TCModule module)
 	{
 		name.report(6006, "@Trace only applies to expressions and statements");
 	}
 
 	@Override
-	public void before(TCExpression exp, Environment env, NameScope scope)
+	public void tcBefore(TCClassDefinition clazz)
+	{
+		name.report(6006, "@Trace only applies to expressions and statements");
+	}
+
+	@Override
+	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
 		check(env, scope);
 	}
 
 	@Override
-	public void before(TCStatement stmt, Environment env, NameScope scope)
+	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
 		check(env, scope);
 	}

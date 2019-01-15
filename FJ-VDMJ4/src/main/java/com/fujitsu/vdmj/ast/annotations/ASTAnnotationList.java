@@ -25,10 +25,16 @@ package com.fujitsu.vdmj.ast.annotations;
 
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.statements.ASTStatement;
+import com.fujitsu.vdmj.syntax.ClassReader;
+import com.fujitsu.vdmj.syntax.DefinitionReader;
+import com.fujitsu.vdmj.syntax.ExpressionReader;
+import com.fujitsu.vdmj.syntax.ModuleReader;
+import com.fujitsu.vdmj.syntax.StatementReader;
 import com.fujitsu.vdmj.syntax.SyntaxReader;
 
 public class ASTAnnotationList extends Vector<ASTAnnotation>
@@ -39,39 +45,47 @@ public class ASTAnnotationList extends Vector<ASTAnnotation>
 	{
 		for (ASTAnnotation annotation: this)
 		{
-			annotation.before(reader);
+			annotation.astBefore(reader);
 		}
 	}
 
-	public void after(SyntaxReader reader, ASTDefinition def)
+	public void after(DefinitionReader reader, ASTDefinition def)
 	{
 		for (ASTAnnotation annotation: this)
 		{
-			annotation.after(reader, def);
+			annotation.astAfter(reader, def);
 		}
 	}
 
-	public void after(SyntaxReader reader, ASTStatement stmt)
+	public void after(StatementReader reader, ASTStatement stmt)
 	{
 		for (ASTAnnotation annotation: this)
 		{
-			annotation.after(reader, stmt);
+			annotation.astAfter(reader, stmt);
 		}
 	}
 
-	public void after(SyntaxReader reader, ASTExpression exp)
+	public void after(ExpressionReader reader, ASTExpression exp)
 	{
 		for (ASTAnnotation annotation: this)
 		{
-			annotation.after(reader, exp);
+			annotation.astAfter(reader, exp);
 		}
 	}
 
-	public void after(SyntaxReader reader, ASTModule module)
+	public void after(ModuleReader reader, ASTModule module)
 	{
 		for (ASTAnnotation annotation: this)
 		{
-			annotation.after(reader, module);
+			annotation.astAfter(reader, module);
+		}
+	}
+
+	public void after(ClassReader reader, ASTClassDefinition clazz)
+	{
+		for (ASTAnnotation annotation: this)
+		{
+			annotation.astAfter(reader, clazz);
 		}
 	}
 }

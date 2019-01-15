@@ -5,4 +5,5 @@
 # annotations
 package annotations.ast to annotations.tc;
 map ASTChangesAnnotation{name, args} to TCChangesAnnotation(name, args);
+map ASTTestAnnotation{name, args} to TCTestAnnotation(name, args);
 

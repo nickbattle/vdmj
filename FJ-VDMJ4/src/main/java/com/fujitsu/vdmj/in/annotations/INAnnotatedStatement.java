@@ -54,9 +54,9 @@ public class INAnnotatedStatement extends INStatement
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-		annotation.before(ctxt, this);
+		annotation.inBefore(this, ctxt);
 		Value rv = statement.eval(ctxt);
-		annotation.after(ctxt, rv, this);
+		annotation.inAfter(this, rv, ctxt);
 		return rv;
 	}
 	

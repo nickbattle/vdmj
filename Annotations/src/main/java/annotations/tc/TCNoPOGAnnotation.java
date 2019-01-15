@@ -24,6 +24,7 @@
 package annotations.tc;
 
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
@@ -41,25 +42,31 @@ public class TCNoPOGAnnotation extends TCAnnotation
 	}
 
 	@Override
-	public void before(TCDefinition def, Environment env, NameScope scope)
+	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
 		noArgs();
 	}
 	
 	@Override
-	public void before(TCStatement stmt, Environment env, NameScope scope)
+	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
 		noArgs();
 	}
 	
 	@Override
-	public void before(TCExpression exp, Environment env, NameScope scope)
+	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
 		noArgs();
 	}
 
 	@Override
-	public void before(TCModule m)
+	public void tcBefore(TCModule m)
+	{
+		noArgs();
+	}
+
+	@Override
+	public void tcBefore(TCClassDefinition m)
 	{
 		noArgs();
 	}

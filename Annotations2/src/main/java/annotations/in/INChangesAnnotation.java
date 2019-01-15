@@ -63,7 +63,7 @@ public class INChangesAnnotation extends INAnnotation
 	}
 	
 	@Override
-	public void after(Context caller, Value rv, INStatement stmt)
+	public void inAfter(INStatement stmt, Value rv, Context caller)
 	{
 		if (Settings.annotations)
 		{

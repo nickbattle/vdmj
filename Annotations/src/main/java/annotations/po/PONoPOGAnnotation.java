@@ -41,25 +41,25 @@ public class PONoPOGAnnotation extends POAnnotation
 	}
 
 	@Override
-	public void after(POContextStack ctxt, PODefinition def, ProofObligationList obligations)
+	public void poAfter(PODefinition def, ProofObligationList obligations, POContextStack ctxt)
 	{
 		obligations.clear();
 	}
 
 	@Override
-	public void after(POContextStack ctxt, POStatement stmt, ProofObligationList obligations)
+	public void poAfter(POStatement stmt, ProofObligationList obligations, POContextStack ctxt)
 	{
 		obligations.clear();
 	}
 
 	@Override
-	public void after(POContextStack ctxt, POExpression exp, ProofObligationList obligations)
+	public void poAfter(POExpression exp, ProofObligationList obligations, POContextStack ctxt)
 	{
 		obligations.clear();
 	}
 
 	@Override
-	public void after(POModule module, ProofObligationList obligations)
+	public void poAfter(POModule module, ProofObligationList obligations)
 	{
 		obligations.clear();
 	}

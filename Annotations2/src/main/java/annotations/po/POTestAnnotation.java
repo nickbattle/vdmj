@@ -1,32 +1,16 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2019 Nick Battle.
  *
  *	Author: Nick Battle
  *
- *	This file is part of VDMJ.
- *
- *	VDMJ is free software: you can redistribute it and/or modify
- *	it under the terms of the GNU General Public License as published by
- *	the Free Software Foundation, either version 3 of the License, or
- *	(at your option) any later version.
- *
- *	VDMJ is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *	GNU General Public License for more details.
- *
- *	You should have received a copy of the GNU General Public License
- *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *	This file is part of Overture
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.annotations;
+package annotations.po;
 
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
@@ -37,96 +21,80 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public abstract class POAnnotation
+public class POTestAnnotation extends POAnnotation
 {
-	public final TCIdentifierToken name;
-	
-	public final POExpressionList args;
-	
-	private static final Set<Class<?>> declared = new HashSet<Class<?>>(); 
-
-	public POAnnotation(TCIdentifierToken name, POExpressionList args)
+	public POTestAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
-		this.name = name;
-		this.args = args;
-		
-		declared.add(this.getClass());
-	}
-
-	public static void init()
-	{
-		for (Class<?> clazz: declared)
-		{
-			try
-			{
-				Method doInit = clazz.getMethod("doInit", (Class<?>[])null);
-				doInit.invoke(null, (Object[])null);
-			}
-			catch (Throwable e)
-			{
-				throw new RuntimeException(clazz.getSimpleName() + ":" + e);
-			}
-		}
+		super(name, args);
 	}
 	
 	public static void doInit()
 	{
-		// Nothing by default
+		System.out.printf("doInit POTestAnnotation\n");
+	}
+	
+	@Override
+	public ProofObligationList poBefore(PODefinition def, POContextStack ctxt)
+	{
+		System.out.printf("poBefore %s %s\n", def.getClass().getSimpleName(), this);
+		return new ProofObligationList();
 	}
 
 	@Override
-	public String toString()
-	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
-	}
-
-	public ProofObligationList poBefore(PODefinition def, POContextStack ctxt)
-	{
-		return new ProofObligationList();
-	}
-
 	public ProofObligationList poBefore(POStatement stmt, POContextStack ctxt)
 	{
+		System.out.printf("poBefore %s %s\n", stmt.getClass().getSimpleName(), this);
 		return new ProofObligationList();
 	}
 
+	@Override
 	public ProofObligationList poBefore(POExpression exp, POContextStack ctxt)
 	{
+		System.out.printf("poBefore %s %s\n", exp.getClass().getSimpleName(), this);
 		return new ProofObligationList();
 	}
 
+	@Override
 	public ProofObligationList poBefore(POModule module)
 	{
+		System.out.printf("poBefore %s %s\n", module.getClass().getSimpleName(), this);
 		return new ProofObligationList();
 	}
 
+	@Override
 	public ProofObligationList poBefore(POClassDefinition clazz)
 	{
+		System.out.printf("poBefore %s %s\n", clazz.getClass().getSimpleName(), this);
 		return new ProofObligationList();
 	}
 
+	@Override
 	public void poAfter(PODefinition def, ProofObligationList obligations, POContextStack ctxt)
 	{
-		return;
+		System.out.printf("poAfter %s %s\n", def.getClass().getSimpleName(), this);
 	}
 
+	@Override
 	public void poAfter(POStatement stmt, ProofObligationList obligations, POContextStack ctxt)
 	{
-		return;
+		System.out.printf("poAfter %s %s\n", stmt.getClass().getSimpleName(), this);
 	}
 
+	@Override
 	public void poAfter(POExpression exp, ProofObligationList obligations, POContextStack ctxt)
 	{
-		return;
+		System.out.printf("poAfter %s %s\n", exp.getClass().getSimpleName(), this);
 	}
 
+	@Override
 	public void poAfter(POModule module, ProofObligationList obligations)
 	{
-		return;
+		System.out.printf("poAfter %s %s\n", module.getClass().getSimpleName(), this);
 	}
 
+	@Override
 	public void poAfter(POClassDefinition clazz, ProofObligationList obligations)
 	{
-		return;
+		System.out.printf("poAfter %s %s\n", clazz.getClass().getSimpleName(), this);
 	}
 }

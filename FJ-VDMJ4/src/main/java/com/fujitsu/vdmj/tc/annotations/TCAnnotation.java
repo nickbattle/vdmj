@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
@@ -80,42 +81,52 @@ public abstract class TCAnnotation
 		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
 	}
 
-	public void before(TCDefinition def, Environment env, NameScope scope)
+	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
 		// Do nothing
 	}
 	
-	public void before(TCStatement stmt, Environment env, NameScope scope)
+	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
 		// Do nothing
 	}
 	
-	public void before(TCExpression exp, Environment env, NameScope scope)
+	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
 		// Do nothing
 	}
 
-	public void before(TCModule m)
+	public void tcBefore(TCModule m)
 	{
 		// Do nothing
 	}
 
-	public void after(TCDefinition def, TCType type, Environment env, NameScope scope)
-	{
-		// Do nothing
-	}
-	
-	public void after(TCStatement stmt, TCType type, Environment env, NameScope scope)
-	{
-		// Do nothing
-	}
-	
-	public void after(TCExpression exp, TCType type, Environment env, NameScope scope)
+	public void tcBefore(TCClassDefinition clazz)
 	{
 		// Do nothing
 	}
 
-	public void after(TCModule m)
+	public void tcAfter(TCDefinition def, TCType type, Environment env, NameScope scope)
+	{
+		// Do nothing
+	}
+	
+	public void tcAfter(TCStatement stmt, TCType type, Environment env, NameScope scope)
+	{
+		// Do nothing
+	}
+	
+	public void tcAfter(TCExpression exp, TCType type, Environment env, NameScope scope)
+	{
+		// Do nothing
+	}
+
+	public void tcAfter(TCModule m)
+	{
+		// Do nothing
+	}
+
+	public void tcAfter(TCClassDefinition m)
 	{
 		// Do nothing
 	}
