@@ -45,19 +45,19 @@ public class TCOverrideAnnotation extends TCAnnotation
 	@Override
 	public void before(TCStatement stmt, Environment env, NameScope scope)
 	{
-		name.report(3359, "@Override only applies to expressions and statements");
+		name.report(6002, "@Override only applies to expressions and statements");
 	}
 
 	@Override
 	public void before(TCExpression exp, Environment env, NameScope scope)
 	{
-		name.report(3359, "@Override only applies to expressions and statements");
+		name.report(6002, "@Override only applies to expressions and statements");
 	}
 
 	@Override
 	public void before(TCModule module)
 	{
-		name.report(3359, "@Override only applies to expressions and statements");
+		name.report(6002, "@Override only applies to expressions and statements");
 	}
 
 	@Override
@@ -65,17 +65,17 @@ public class TCOverrideAnnotation extends TCAnnotation
 	{
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			name.report(3360, "@Override not available in VDM-SL");
+			name.report(6003, "@Override not available in VDM-SL");
 		}
 		
 		if (!args.isEmpty())
 		{
-			name.report(3361, "@Override has no arguments");
+			name.report(6004, "@Override has no arguments");
 		}
 		
 		if (!def.isFunctionOrOperation())
 		{
-			name.report(3362, "@Override only applies to functions or operations");
+			name.report(6002, "@Override only applies to functions or operations");
 		}
 		else if (def.classDefinition != null)
 		{
@@ -92,7 +92,7 @@ public class TCOverrideAnnotation extends TCAnnotation
 			
 			if (!found)
 			{
-				name.report(3363, "Definition does not @Override superclass");
+				name.report(6005, "Definition does not @Override superclass");
 			}
 		}
 	}

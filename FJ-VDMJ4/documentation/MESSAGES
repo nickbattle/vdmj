@@ -9,6 +9,7 @@ Messages and warnings are numbered in the following blocks:
 3000-3999	Type checking errors
 4000-4999	Runtime errors
 5000-5999	Warnings
+6000-6999	Annotation messages
 
 Several messages appear to be duplicates, but internally they are raised from
 different places in the code, and so the exact error number may be used to
