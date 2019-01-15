@@ -112,7 +112,7 @@ public class TCMutexSyncDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		if (annotations != null) annotations.before(this, base, scope);
+		if (annotations != null) annotations.tcBefore(this, base, scope);
 
 		TCClassDefinition classdef = base.findClassDefinition();
 
@@ -176,7 +176,7 @@ public class TCMutexSyncDefinition extends TCDefinition
     		}
 		}
 
-		if (annotations != null) annotations.after(this, getType(), base, scope);
+		if (annotations != null) annotations.tcAfter(this, getType(), base, scope);
 	}
 
 	public TCExpression getExpression(LexNameToken excluding)

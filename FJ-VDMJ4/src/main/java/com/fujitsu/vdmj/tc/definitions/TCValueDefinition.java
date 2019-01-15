@@ -157,7 +157,7 @@ public class TCValueDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		if (annotations != null) annotations.before(this, base, scope);
+		if (annotations != null) annotations.tcBefore(this, base, scope);
 
 		getDefinitions().setExcluded(true);
 		expType = exp.typeCheck(base, null, scope, type);
@@ -202,7 +202,7 @@ public class TCValueDefinition extends TCDefinition
 		updateDefs();
 		defs.typeCheck(base, scope);
 
-		if (annotations != null) annotations.after(this, type, base, scope);
+		if (annotations != null) annotations.tcAfter(this, type, base, scope);
 	}
 	
 	private void updateDefs()

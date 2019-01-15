@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.annotations;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.tc.TCMappedList;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -46,7 +47,7 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 		super(from);
 	}
 	
-	public void before(TCDefinition def, Environment env, NameScope scope)
+	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
 		for (TCAnnotation annotation: this)
 		{
@@ -54,7 +55,7 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 		}
 	}
 
-	public void before(TCModule m)
+	public void tcBefore(TCModule m)
 	{
 		for (TCAnnotation annotation: this)
 		{
@@ -62,7 +63,15 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 		}
 	}
 
-	public void after(TCDefinition def, TCType type, Environment env, NameScope scope)
+	public void tcBefore(TCClassDefinition clazz)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.tcBefore(clazz);
+		}
+	}
+
+	public void tcAfter(TCDefinition def, TCType type, Environment env, NameScope scope)
 	{
 		for (TCAnnotation annotation: this)
 		{
@@ -70,11 +79,19 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 		}
 	}
 
-	public void after(TCModule m)
+	public void tcAfter(TCModule m)
 	{
 		for (TCAnnotation annotation: this)
 		{
 			annotation.tcAfter(m);
+		}
+	}
+
+	public void tcAfter(TCClassDefinition clazz)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.tcAfter(clazz);
 		}
 	}
 }

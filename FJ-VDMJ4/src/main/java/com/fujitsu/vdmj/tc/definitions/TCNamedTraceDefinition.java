@@ -91,7 +91,7 @@ public class TCNamedTraceDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		if (annotations != null) annotations.before(this, base, scope);
+		if (annotations != null) annotations.tcBefore(this, base, scope);
 
 		if (base.isVDMPP())
 		{
@@ -103,6 +103,6 @@ public class TCNamedTraceDefinition extends TCDefinition
 			term.typeCheck(base, NameScope.NAMESANDSTATE);
 		}
 
-		if (annotations != null) annotations.after(this, getType(), base, scope);
+		if (annotations != null) annotations.tcAfter(this, getType(), base, scope);
 	}
 }

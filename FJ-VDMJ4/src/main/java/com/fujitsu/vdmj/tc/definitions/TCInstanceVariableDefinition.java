@@ -79,7 +79,7 @@ public class TCInstanceVariableDefinition extends TCAssignmentDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		if (annotations != null) annotations.before(this, base, scope);
+		if (annotations != null) annotations.tcBefore(this, base, scope);
 
 		if (expression instanceof TCUndefinedExpression)
 		{
@@ -103,7 +103,7 @@ public class TCInstanceVariableDefinition extends TCAssignmentDefinition
 		}
 		
 		super.typeCheck(cenv, NameScope.NAMESANDSTATE);
-		if (annotations != null) annotations.after(this, type, base, scope);
+		if (annotations != null) annotations.tcAfter(this, type, base, scope);
 	}
 
 	public void initializedCheck()

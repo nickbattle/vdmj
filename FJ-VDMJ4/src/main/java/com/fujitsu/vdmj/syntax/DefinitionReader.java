@@ -519,10 +519,10 @@ public class DefinitionReader extends SyntaxReader
 			{
 				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
-				annotations.before(this);
+				annotations.astBefore(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTTypeDefinition def = readTypeDefinition();
-				annotations.after(this, def);
+				annotations.astAfter(this, def);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
 
@@ -556,10 +556,10 @@ public class DefinitionReader extends SyntaxReader
 			{
 				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
-				annotations.before(this);
+				annotations.astBefore(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTDefinition def = readValueDefinition();
-				annotations.after(this, def);
+				annotations.astAfter(this, def);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
 
@@ -593,10 +593,10 @@ public class DefinitionReader extends SyntaxReader
 			{
 				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
-				annotations.before(this);
+				annotations.astBefore(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTDefinition def = readFunctionDefinition();
-				annotations.after(this, def);
+				annotations.astAfter(this, def);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
 
@@ -638,10 +638,10 @@ public class DefinitionReader extends SyntaxReader
 			{
 				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
-				annotations.before(this);
+				annotations.astBefore(this);
 				ASTAccessSpecifier access = readAccessSpecifier(dialect == Dialect.VDM_RT, true);
 				ASTDefinition def = readOperationDefinition();
-				annotations.after(this, def);
+				annotations.astAfter(this, def);
 				def.setAccessSpecifier(access);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
@@ -681,9 +681,9 @@ public class DefinitionReader extends SyntaxReader
 			{
 				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
-				annotations.before(this);
+				annotations.astBefore(this);
 				ASTDefinition def = readInstanceVariableDefinition();
-				annotations.after(this, def);
+				annotations.astAfter(this, def);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
 				list.add(def);
@@ -714,9 +714,9 @@ public class DefinitionReader extends SyntaxReader
 			{
 				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
-				annotations.before(this);
+				annotations.astBefore(this);
 				ASTDefinition def = readNamedTraceDefinition();
-				annotations.after(this, def);
+				annotations.astAfter(this, def);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
 				list.add(def);
@@ -746,9 +746,9 @@ public class DefinitionReader extends SyntaxReader
 			{
 				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
-				annotations.before(this);
+				annotations.astBefore(this);
 				ASTDefinition def = readPermissionPredicateDefinition();
-				annotations.after(this, def);
+				annotations.astAfter(this, def);
 				list.add(def);
 
 				if (!newSection())

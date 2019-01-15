@@ -81,11 +81,11 @@ public class POModule extends PONode implements Serializable
 	public ProofObligationList getProofObligations()
 	{
 		ProofObligationList list =
-				(annotations != null) ? annotations.before(this) : new ProofObligationList();
+				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
 				
 		list.addAll(defs.getProofObligations(new POContextStack()));
 		
-		if (annotations != null) annotations.after(this, list);
+		if (annotations != null) annotations.poAfter(this, list);
 		return list;
 	}
 }

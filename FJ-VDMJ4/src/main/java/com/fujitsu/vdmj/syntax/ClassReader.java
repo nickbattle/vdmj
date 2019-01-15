@@ -77,7 +77,7 @@ public class ClassReader extends SyntaxReader
     		{
 				LexCommentList comments = getComments();
 				ASTAnnotationList annotations = readAnnotations(comments);
-				annotations.before(this);
+				annotations.astBefore(this);
 				ASTClassDefinition clazz = null;
 
 				if (lastToken().is(Token.CLASS))
@@ -90,7 +90,7 @@ public class ClassReader extends SyntaxReader
     			}
 
 				list.add(clazz);
-				annotations.after(this, clazz);
+				annotations.astAfter(this, clazz);
 				clazz.setAnnotations(annotations);
 				clazz.setComments(comments);
     		}

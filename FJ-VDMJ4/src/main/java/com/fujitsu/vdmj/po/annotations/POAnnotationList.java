@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.annotations;
 
 import com.fujitsu.vdmj.po.POMappedList;
+import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.modules.POModule;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -45,7 +46,7 @@ public class POAnnotationList extends POMappedList<TCAnnotation, POAnnotation>
 		super(from);
 	}
 
-	public ProofObligationList before(POContextStack ctxt, PODefinition def)
+	public ProofObligationList poBefore(PODefinition def, POContextStack ctxt)
 	{
 		ProofObligationList list = new ProofObligationList();
 		
@@ -57,7 +58,7 @@ public class POAnnotationList extends POMappedList<TCAnnotation, POAnnotation>
 		return list;
 	}
 
-	public ProofObligationList before(POModule module)
+	public ProofObligationList poBefore(POModule module)
 	{
 		ProofObligationList list = new ProofObligationList();
 		
@@ -69,7 +70,19 @@ public class POAnnotationList extends POMappedList<TCAnnotation, POAnnotation>
 		return list;
 	}
 
-	public void after(POContextStack ctxt, PODefinition def, ProofObligationList obligations)
+	public ProofObligationList poBefore(POClassDefinition clazz)
+	{
+		ProofObligationList list = new ProofObligationList();
+		
+		for (POAnnotation annotation: this)
+		{
+			list.addAll(annotation.poBefore(clazz));
+		}
+		
+		return list;
+	}
+
+	public void poAfter(PODefinition def, ProofObligationList obligations, POContextStack ctxt)
 	{
 		for (POAnnotation annotation: this)
 		{
@@ -77,11 +90,19 @@ public class POAnnotationList extends POMappedList<TCAnnotation, POAnnotation>
 		}
 	}
 
-	public void after(POModule module, ProofObligationList obligations)
+	public void poAfter(POModule module, ProofObligationList obligations)
 	{
 		for (POAnnotation annotation: this)
 		{
 			annotation.poAfter(module, obligations);
+		}
+	}
+
+	public void poAfter(POClassDefinition clazz, ProofObligationList obligations)
+	{
+		for (POAnnotation annotation: this)
+		{
+			annotation.poAfter(clazz, obligations);
 		}
 	}
 }

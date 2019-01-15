@@ -100,7 +100,7 @@ public class POValueDefinition extends PODefinition
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
 		ProofObligationList list =
-				(annotations != null) ? annotations.before(ctxt, this) : new ProofObligationList();
+				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
 		list.addAll(exp.getProofObligations(ctxt));
 
@@ -137,7 +137,7 @@ public class POValueDefinition extends PODefinition
 			list.add(new SubTypeObligation(exp, type, expType, ctxt));
 		}
 
-		if (annotations != null) annotations.after(ctxt, this, list);
+		if (annotations != null) annotations.poAfter(this, list, ctxt);
 		return list;
 	}
 }

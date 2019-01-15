@@ -41,7 +41,7 @@ public class ASTAnnotationList extends Vector<ASTAnnotation>
 {
 	private static final long serialVersionUID = 1L;
 
-	public void before(SyntaxReader reader)
+	public void astBefore(SyntaxReader reader)
 	{
 		for (ASTAnnotation annotation: this)
 		{
@@ -49,7 +49,7 @@ public class ASTAnnotationList extends Vector<ASTAnnotation>
 		}
 	}
 
-	public void after(DefinitionReader reader, ASTDefinition def)
+	public void astAfter(DefinitionReader reader, ASTDefinition def)
 	{
 		for (ASTAnnotation annotation: this)
 		{
@@ -57,7 +57,7 @@ public class ASTAnnotationList extends Vector<ASTAnnotation>
 		}
 	}
 
-	public void after(StatementReader reader, ASTStatement stmt)
+	public void astAfter(StatementReader reader, ASTStatement stmt)
 	{
 		for (ASTAnnotation annotation: this)
 		{
@@ -65,7 +65,7 @@ public class ASTAnnotationList extends Vector<ASTAnnotation>
 		}
 	}
 
-	public void after(ExpressionReader reader, ASTExpression exp)
+	public void astAfter(ExpressionReader reader, ASTExpression exp)
 	{
 		for (ASTAnnotation annotation: this)
 		{
@@ -73,7 +73,7 @@ public class ASTAnnotationList extends Vector<ASTAnnotation>
 		}
 	}
 
-	public void after(ModuleReader reader, ASTModule module)
+	public void astAfter(ModuleReader reader, ASTModule module)
 	{
 		for (ASTAnnotation annotation: this)
 		{
@@ -81,7 +81,7 @@ public class ASTAnnotationList extends Vector<ASTAnnotation>
 		}
 	}
 
-	public void after(ClassReader reader, ASTClassDefinition clazz)
+	public void astAfter(ClassReader reader, ASTClassDefinition clazz)
 	{
 		for (ASTAnnotation annotation: this)
 		{

@@ -173,7 +173,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		if (annotations != null) annotations.before(this, base, scope);
+		if (annotations != null) annotations.tcBefore(this, base, scope);
 
 		scope = NameScope.NAMESANDSTATE;
 		TCTypeList ptypes = type.parameters;
@@ -330,7 +330,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 			local.unusedCheck();
 		}
 
-		if (annotations != null) annotations.after(this, type, base, scope);
+		if (annotations != null) annotations.tcAfter(this, type, base, scope);
 	}
 
 	@Override

@@ -100,10 +100,10 @@ public class ModuleReader extends SyntaxReader
     				case MODULE:
     					LexCommentList comments = getComments();
     					ASTAnnotationList annotations = readAnnotations(comments);
-    					annotations.before(this);
+    					annotations.astBefore(this);
     					ASTModule module = readModule();
     					modules.add(module);
-    					annotations.after(this, module);
+    					annotations.astAfter(this, module);
     					module.setAnnotations(annotations);
     					module.setComments(comments);
     					break;
