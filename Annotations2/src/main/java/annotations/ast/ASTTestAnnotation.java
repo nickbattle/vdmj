@@ -39,31 +39,31 @@ public class ASTTestAnnotation extends ASTAnnotation
 	@Override
 	public void astBefore(DefinitionReader reader)
 	{
-		System.out.printf("astBefore %s\n", reader.getClass().getSimpleName(), this);
+		System.out.printf("astBefore %s %s\n", reader.getClass().getSimpleName(), this);
 	}
 
 	@Override
 	public void astBefore(StatementReader reader)
 	{
-		System.out.printf("astBefore %s %s %s\n", reader.getClass().getSimpleName(), this);
+		System.out.printf("astBefore %s %s\n", reader.getClass().getSimpleName(), this);
 	}
 
 	@Override
 	public void astBefore(ExpressionReader reader)
 	{
-		System.out.printf("astBefore %s %s %s\n", reader.getClass().getSimpleName(), this);
+		System.out.printf("astBefore %s %s\n", reader.getClass().getSimpleName(), this);
 	}
 
 	@Override
 	public void astBefore(ModuleReader reader)
 	{
-		System.out.printf("astBefore %s %s %s\n", reader.getClass().getSimpleName(), this);
+		System.out.printf("astBefore %s %s\n", reader.getClass().getSimpleName(), this);
 	}
 
 	@Override
 	public void astBefore(ClassReader reader)
 	{
-		System.out.printf("astBefore %s %s %s\n", reader.getClass().getSimpleName(), this);
+		System.out.printf("astBefore %s %s\n", reader.getClass().getSimpleName(), this);
 	}
 
 
