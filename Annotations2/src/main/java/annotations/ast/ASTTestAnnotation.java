@@ -23,7 +23,6 @@ import com.fujitsu.vdmj.syntax.DefinitionReader;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.syntax.StatementReader;
-import com.fujitsu.vdmj.syntax.SyntaxReader;
 
 public class ASTTestAnnotation extends ASTAnnotation
 {
@@ -38,10 +37,35 @@ public class ASTTestAnnotation extends ASTAnnotation
 	}
 	
 	@Override
-	public void astBefore(SyntaxReader reader)
+	public void astBefore(DefinitionReader reader)
 	{
-		System.out.printf("astBefore %s %s\n", reader.getClass().getSimpleName(), this);
+		System.out.printf("astBefore %s\n", reader.getClass().getSimpleName(), this);
 	}
+
+	@Override
+	public void astBefore(StatementReader reader)
+	{
+		System.out.printf("astBefore %s %s %s\n", reader.getClass().getSimpleName(), this);
+	}
+
+	@Override
+	public void astBefore(ExpressionReader reader)
+	{
+		System.out.printf("astBefore %s %s %s\n", reader.getClass().getSimpleName(), this);
+	}
+
+	@Override
+	public void astBefore(ModuleReader reader)
+	{
+		System.out.printf("astBefore %s %s %s\n", reader.getClass().getSimpleName(), this);
+	}
+
+	@Override
+	public void astBefore(ClassReader reader)
+	{
+		System.out.printf("astBefore %s %s %s\n", reader.getClass().getSimpleName(), this);
+	}
+
 
 	@Override
 	public void astAfter(DefinitionReader reader, ASTDefinition def)

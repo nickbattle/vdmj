@@ -45,7 +45,26 @@ public class ASTAnnotationList extends Vector<ASTAnnotation>
 	{
 		for (ASTAnnotation annotation: this)
 		{
-			annotation.astBefore(reader);
+			if (reader instanceof DefinitionReader)
+			{
+				annotation.astBefore((DefinitionReader)reader);
+			}
+			else if (reader instanceof ExpressionReader)
+			{
+				annotation.astBefore((ExpressionReader)reader);
+			}
+			else if (reader instanceof StatementReader)
+			{
+				annotation.astBefore((StatementReader)reader);
+			}
+			else if (reader instanceof ModuleReader)
+			{
+				annotation.astBefore((ModuleReader)reader);
+			}
+			else if (reader instanceof ClassReader)
+			{
+				annotation.astBefore((ClassReader)reader);
+			}
 		}
 	}
 

@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.syntax.DefinitionReader;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.syntax.StatementReader;
-import com.fujitsu.vdmj.syntax.SyntaxReader;
 
 public abstract class ASTAnnotation
 {
@@ -55,7 +54,27 @@ public abstract class ASTAnnotation
 		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
 	}
 
-	public void astBefore(SyntaxReader reader)
+	public void astBefore(DefinitionReader reader)
+	{
+		// Nothing by default
+	}
+
+	public void astBefore(StatementReader reader)
+	{
+		// Nothing by default
+	}
+
+	public void astBefore(ExpressionReader reader)
+	{
+		// Nothing by default
+	}
+
+	public void astBefore(ModuleReader reader)
+	{
+		// Nothing by default
+	}
+
+	public void astBefore(ClassReader reader)
 	{
 		// Nothing by default
 	}
