@@ -170,27 +170,33 @@ public class TCStateDefinition extends TCDefinition
 	{
 		if (annotations != null) annotations.tcBefore(this, base, scope);
 
-		if (base.findStateDefinition() != this)
+		if (pass == Pass.TYPES)
 		{
-			report(3047, "Only one state definition allowed per module");
-			return;
-		}
+			if (base.findStateDefinition() != this)
+			{
+				report(3047, "Only one state definition allowed per module");
+				return;
+			}
 
-		for (TCField field: recordType.fields)
-		{
-			TypeComparator.checkComposeTypes(field.type, base, false);
-		}
-		
-		statedefs.typeCheck(base, scope);
+			for (TCField field: recordType.fields)
+			{
+				TypeComparator.checkComposeTypes(field.type, base, false);
+			}
 
-		if (invdef != null)
-		{
-			invdef.typeCheck(base, scope);
+			statedefs.typeCheck(base, scope);
+			pass = Pass.DEFS;
 		}
-
-		if (initdef != null)
+		else
 		{
-			initdef.typeCheck(base, scope);
+			if (invdef != null)
+			{
+				invdef.typeCheck(base, scope);
+			}
+
+			if (initdef != null)
+			{
+				initdef.typeCheck(base, scope);
+			}
 		}
 
 		if (annotations != null) annotations.tcAfter(this, recordType, base, scope);
