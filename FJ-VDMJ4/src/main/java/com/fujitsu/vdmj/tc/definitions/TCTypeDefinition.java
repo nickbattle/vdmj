@@ -235,102 +235,112 @@ public class TCTypeDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		if (invdef != null)
-		{
-			invdef.typeCheck(base, NameScope.NAMES);
-		}
+		// We have to perform the type check in two passes because the invariants can depend on
+		// the types of "values" that have not been set yet. Initially, pass == TYPES.
 		
-		if (eqdef != null)
+		if (pass == Pass.DEFS)		// Set below
 		{
-			eqdef.typeCheck(base, NameScope.NAMES);
-		}
-		
-		if (orddef != null)
-		{
-			orddef.typeCheck(base, NameScope.NAMES);
-		}
-		
-		// Suppress any TC errors around min/max as they can only add confusion
-		TypeChecker.suspend(true);
-		
-		if (mindef != null)
-		{
-			mindef.typeCheck(base, NameScope.NAMES);
-		}
-		
-		if (maxdef != null)
-		{
-			maxdef.typeCheck(base, NameScope.NAMES);
-		}
-
-		TypeChecker.suspend(false);
-
-		if (type.isUnion(location))
-		{
-			TCUnionType ut = type.getUnion();
-			
-			for (TCType t: ut.types)
+			if (invdef != null)
 			{
-				if (orddef != null && t instanceof TCInvariantType)
+				invdef.typeCheck(base, NameScope.NAMES);
+			}
+
+			if (eqdef != null)
+			{
+				eqdef.typeCheck(base, NameScope.NAMES);
+			}
+
+			if (orddef != null)
+			{
+				orddef.typeCheck(base, NameScope.NAMES);
+			}
+
+			// Suppress any TC errors around min/max as they can only add confusion
+			TypeChecker.suspend(true);
+
+			if (mindef != null)
+			{
+				mindef.typeCheck(base, NameScope.NAMES);
+			}
+
+			if (maxdef != null)
+			{
+				maxdef.typeCheck(base, NameScope.NAMES);
+			}
+
+			TypeChecker.suspend(false);
+		}
+		else
+		{
+			pass = Pass.DEFS;		// Come back later for the invariant functions
+			
+			if (type.isUnion(location))
+			{
+				TCUnionType ut = type.getUnion();
+				
+				for (TCType t: ut.types)
 				{
-					TCInvariantType it = (TCInvariantType) t;
-					
-					if (it.orddef != null)
+					if (orddef != null && t instanceof TCInvariantType)
 					{
-						warning(5019, "Order of union member " + t + " will be overridden");
+						TCInvariantType it = (TCInvariantType) t;
+						
+						if (it.orddef != null)
+						{
+							warning(5019, "Order of union member " + t + " will be overridden");
+						}
+					}
+					
+					if (eqdef != null && t.isEq(location))
+					{
+						warning(5020, "Equality of union member " + t + " will be overridden");
 					}
 				}
-				
-				if (eqdef != null && t.isEq(location))
+			}
+			
+			if (type instanceof TCNamedType)
+			{
+				// Rebuild the compose definitions, after we check whether they already exist
+				composeDefinitions.clear();
+				TCNamedType nt = (TCNamedType)type;
+	
+				for (TCType compose: TypeComparator.checkComposeTypes(nt.type, base, true))
 				{
-					warning(5020, "Equality of union member " + t + " will be overridden");
+					TCRecordType rtype = (TCRecordType)compose;
+					TCDefinition cdef = new TCTypeDefinition(accessSpecifier,
+							rtype.name, rtype, null, null, null, null, null, null, null, null);
+					composeDefinitions.add(cdef);
 				}
 			}
-		}
-		
-		if (type instanceof TCNamedType)
-		{
-			// Rebuild the compose definitions, after we check whether they already exist
-			composeDefinitions.clear();
-			TCNamedType nt = (TCNamedType)type;
-
-			for (TCType compose: TypeComparator.checkComposeTypes(nt.type, base, true))
-			{
-				TCRecordType rtype = (TCRecordType)compose;
-				TCDefinition cdef = new TCTypeDefinition(accessSpecifier,
-						rtype.name, rtype, null, null, null, null, null, null, null, null);
-				composeDefinitions.add(cdef);
-			}
-		}
-
-		// We have to do the "top level" here, rather than delegating to the types
-		// because the definition pointer from these top level types just refers
-		// to the definition we are checking, which is never "narrower" than itself.
-		// See the narrowerThan method in TCNamedType and TCRecordType.
-		
-		if (type instanceof TCNamedType)
-		{
-			TCNamedType ntype = (TCNamedType)type;
+	
+			// We have to do the "top level" here, rather than delegating to the types
+			// because the definition pointer from these top level types just refers
+			// to the definition we are checking, which is never "narrower" than itself.
+			// See the narrowerThan method in TCNamedType and TCRecordType.
 			
-			if (ntype.type.narrowerThan(accessSpecifier))
+			if (type instanceof TCNamedType)
 			{
-				report(3321, "Type component visibility less than type's definition");
-			}
-		}
-		else if (type instanceof TCRecordType)
-		{
-			TCRecordType rtype = (TCRecordType)type;
-			
-			for (TCField field: rtype.fields)
-			{
-				if (field.type.narrowerThan(accessSpecifier))
-				{
-					field.tagname.report(3321, "Field type visibility less than type's definition");
-				}
+				TCNamedType ntype = (TCNamedType)type;
 				
-				if (field.equalityAbstraction && eqdef != null)
+				if (ntype.type.narrowerThan(accessSpecifier))
 				{
-					field.tagname.warning(5018, "Field has ':-' for type with eq definition");
+					report(3321, "Type component visibility less than type's definition");
+				}
+			}
+			else if (type instanceof TCRecordType)
+			{
+				TCRecordType rtype = (TCRecordType)type;
+				
+				for (TCField field: rtype.fields)
+				{
+					if (field.type.narrowerThan(accessSpecifier))
+					{
+						field.tagname.report(3321, "Field type visibility less than type's definition");
+					}
+					
+					if (field.equalityAbstraction && eqdef != null)
+					{
+						field.tagname.warning(5018, "Field has ':-' for type with eq definition");
+					}
 				}
 			}
 		}

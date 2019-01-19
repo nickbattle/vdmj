@@ -43,6 +43,6 @@ public class ASTDistMergeExpression extends ASTUnaryExpression
 	@Override
 	public String kind()
 	{
-		return "dmerge";
+		return "merge";
 	}
 }
