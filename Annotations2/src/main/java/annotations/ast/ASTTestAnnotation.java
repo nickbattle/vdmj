@@ -14,7 +14,6 @@ import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
-import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.statements.ASTStatement;
@@ -26,9 +25,9 @@ import com.fujitsu.vdmj.syntax.StatementReader;
 
 public class ASTTestAnnotation extends ASTAnnotation
 {
-	public ASTTestAnnotation(LexIdentifierToken name, ASTExpressionList args)
+	public ASTTestAnnotation(LexIdentifierToken name)
 	{
-		super(name, args);
+		super(name);
 	}
 	
 	public static void doInit()

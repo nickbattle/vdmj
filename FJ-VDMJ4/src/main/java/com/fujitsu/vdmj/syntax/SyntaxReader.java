@@ -369,33 +369,14 @@ public abstract class SyntaxReader
 		
 		if (ltr.nextToken().is(Token.IDENTIFIER))
 		{
-			LexIdentifierToken name = (LexIdentifierToken)ltr.getLast();  
-			ASTExpressionList args = new ASTExpressionList();
-			
-			if (ltr.nextToken().is(Token.BRA))
-			{
-				if (ltr.nextToken().isNot(Token.KET))
-				{
-					ExpressionReader er = new ExpressionReader(ltr);
-					args.add(er.readExpression());
-			
-					while (ltr.getLast().is(Token.COMMA))
-					{
-						ltr.nextToken();
-						args.add(er.readExpression());
-					}
-				}
-		
-				if (ltr.getLast().isNot(Token.KET))
-				{
-					throw new LexException(0, "Malformed @Annotation", name.location);
-				}
-			}
-
-			return makeAnnotation(name, args);
+			LexIdentifierToken name = (LexIdentifierToken)ltr.getLast(); 
+			ASTAnnotation annotation = loadAnnotation(name);
+			ASTExpressionList args = annotation.parse(ltr);
+			annotation.setArgs(args);
+			return annotation;
 		}
 		
-		throw new LexException(0, "Comment has no @Annotation", new LexLocation());
+		throw new LexException(0, "Comment doesn't start with @Annotation", new LexLocation());
 	}
 
 	/**
@@ -761,7 +742,7 @@ public abstract class SyntaxReader
 		return reader.toString();
 	}
 
-	protected ASTAnnotation makeAnnotation(LexIdentifierToken name, ASTExpressionList args)
+	protected ASTAnnotation loadAnnotation(LexIdentifierToken name)
 		throws ParserException, LexException
 	{
 		String classpath = System.getProperty("vdmj.annotations", "com.fujitsu.vdmj.ast.annotations;annotations.ast");
@@ -772,8 +753,8 @@ public abstract class SyntaxReader
 			try
 			{
 				Class<?> clazz = Class.forName(pack + ".AST" + name + "Annotation");
-				Constructor<?> ctor = clazz.getConstructor(LexIdentifierToken.class, ASTExpressionList.class);
-				return (ASTAnnotation) ctor.newInstance(name, args);
+				Constructor<?> ctor = clazz.getConstructor(LexIdentifierToken.class);
+				return (ASTAnnotation) ctor.newInstance(name);
 			}
 			catch (ClassNotFoundException e)
 			{

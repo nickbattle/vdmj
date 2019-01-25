@@ -6,3 +6,4 @@
 package annotations.tc to annotations.in;
 map TCChangesAnnotation{name, args} to INChangesAnnotation(name, args);
 map TCTestAnnotation{name, args} to INTestAnnotation(name, args);
+map TCNullAnnotation{name, args} to INNullAnnotation(name, args);

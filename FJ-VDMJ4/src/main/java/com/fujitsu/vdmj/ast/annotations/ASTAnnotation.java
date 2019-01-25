@@ -30,28 +30,72 @@ import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.statements.ASTStatement;
+import com.fujitsu.vdmj.lex.LexException;
+import com.fujitsu.vdmj.lex.LexTokenReader;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.syntax.ClassReader;
 import com.fujitsu.vdmj.syntax.DefinitionReader;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ModuleReader;
+import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.syntax.StatementReader;
 
 public abstract class ASTAnnotation
 {
 	public final LexIdentifierToken name;
-	
-	public final ASTExpressionList args;
+	public ASTExpressionList args = null;
 
-	public ASTAnnotation(LexIdentifierToken name, ASTExpressionList args)
+	public ASTAnnotation(LexIdentifierToken name)
 	{
 		this.name = name;
+	}
+	
+	public void setArgs(ASTExpressionList args)
+	{
 		this.args = args;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "@" + name + (args.isEmpty() ? "" : "(" + args + ")");
+		return "@" + name + (args == null || args.isEmpty() ? "" : "(" + args + ")");
+	}
+	
+	protected void parseException(String message) throws LexException
+	{
+		throw new LexException(0, "Malformed @" + name.name + ": " + message, name.location);
+	}
+	
+	/**
+	 * The default parse for annotations looks for an optional list of expressions in
+	 * round brackets. This method can be overridden in particular annotations if the
+	 * default syntax is not appropriate. 
+	 */
+	public ASTExpressionList parse(LexTokenReader ltr) throws LexException, ParserException
+	{
+		ASTExpressionList args = new ASTExpressionList();
+		
+		if (ltr.nextToken().is(Token.BRA))
+		{
+			if (ltr.nextToken().isNot(Token.KET))
+			{
+				ExpressionReader er = new ExpressionReader(ltr);
+				args.add(er.readExpression());
+		
+				while (ltr.getLast().is(Token.COMMA))
+				{
+					ltr.nextToken();
+					args.add(er.readExpression());
+				}
+			}
+	
+			if (ltr.getLast().isNot(Token.KET))
+			{
+				parseException("Malformed @Annotation");
+			}
+		}
+		
+		return args;
 	}
 
 	public void astBefore(DefinitionReader reader)

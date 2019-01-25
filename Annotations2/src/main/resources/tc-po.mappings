@@ -6,4 +6,5 @@
 package annotations.tc to annotations.po;
 map TCChangesAnnotation{name, args} to PONullAnnotation(name, args);
 map TCTestAnnotation{name, args} to POTestAnnotation(name, args);
+map TCNullAnnotation{name, args} to PONullAnnotation(name, args);
 

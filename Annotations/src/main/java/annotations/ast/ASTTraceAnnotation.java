@@ -24,13 +24,12 @@
 package annotations.ast;
 
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
-import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
 public class ASTTraceAnnotation extends ASTAnnotation
 {
-	public ASTTraceAnnotation(LexIdentifierToken name, ASTExpressionList args)
+	public ASTTraceAnnotation(LexIdentifierToken name)
 	{
-		super(name, args);
+		super(name);
 	}
 }
