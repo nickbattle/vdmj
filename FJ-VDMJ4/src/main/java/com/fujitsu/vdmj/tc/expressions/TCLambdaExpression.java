@@ -76,9 +76,10 @@ public class TCLambdaExpression extends TCExpression
 		for (TCTypeBind tb: bindList)
 		{
 			mbinds.addAll(tb.getMultipleBindList());
+			tb.typeResolve(base);
 			paramDefinitions.addAll(tb.pattern.getDefinitions(tb.type, NameScope.LOCAL));
 			paramPatterns.add(tb.pattern);
-			ptypes.add(tb.type.typeResolve(base, null));
+			ptypes.add(tb.type);
 		}
 
 		paramDefinitions.implicitDefinitions(base);
