@@ -175,7 +175,7 @@ public enum Token implements Serializable
 	YET("yet", "yet", VDM_SL, VDM_PP, VDM_RT),
 	SPECIFIED("specified", "specified", VDM_SL, VDM_PP, VDM_RT),
 	PURE("pure", "pure", VDM_SL, VDM_PP, VDM_RT),
-	EQ("eq", "ord", VDM_SL, VDM_PP, VDM_RT),
+	EQ("eq", "eq", VDM_SL, VDM_PP, VDM_RT),
 	ORD("ord", "ord", VDM_SL, VDM_PP, VDM_RT),
 
 	// Expressions
