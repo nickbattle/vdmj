@@ -75,12 +75,13 @@ public class TCMuExpression extends TCExpression
 
     		for (TCRecordModifier rm: modifiers)
     		{
-    			TCType mtype = rm.value.typeCheck(env, null, scope, null);
-    			modTypes.add(mtype);
     			TCField f = recordType.findField(rm.tag.getName());
 
     			if (f != null)
     			{
+        			TCType mtype = rm.value.typeCheck(env, null, scope, f.type);
+        			modTypes.add(mtype);
+
 					if (!TypeComparator.compatible(f.type, mtype))
 					{
 						report(3130, "Modifier for " + f.tag + " should be " + f.type);
