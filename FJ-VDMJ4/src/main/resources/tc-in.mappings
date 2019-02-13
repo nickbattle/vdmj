@@ -203,7 +203,7 @@ map TCMultipleSeqBind{plist, sequence} to INMultipleSeqBind(plist, sequence);
 map TCMultipleSetBind{plist, set} to INMultipleSetBind(plist, set);
 map TCMultipleTypeBind{plist, type} to INMultipleTypeBind(plist, type);
 map TCNamePatternPair{name, pattern} to INNamePatternPair(name, pattern);
-map TCNamePatternPairList{} to INNamePatternPairList();
+map TCNamePatternPairList{} to INNamePatternPairList(this);
 map TCNilPattern{location} to INNilPattern(location);
 map TCObjectPattern{location, classname, fieldlist, type} to INObjectPattern(location, classname, fieldlist, type);
 map TCPattern{} to INPattern();

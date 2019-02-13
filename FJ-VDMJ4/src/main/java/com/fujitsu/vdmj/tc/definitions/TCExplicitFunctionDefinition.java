@@ -72,7 +72,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 	public TCExplicitFunctionDefinition predef;
 	public TCExplicitFunctionDefinition postdef;
-	public TCDefinitionListList paramDefinitionList;
+	private TCDefinitionListList paramDefinitionList;
 
 	public boolean recursive = false;
 	public boolean isUndefined = false;
