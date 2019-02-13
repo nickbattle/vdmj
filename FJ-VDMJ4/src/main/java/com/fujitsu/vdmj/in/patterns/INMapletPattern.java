@@ -23,11 +23,11 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -37,7 +37,7 @@ import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 
-public class INMapletPattern implements Serializable
+public class INMapletPattern extends INNode
 {
 	private static final long serialVersionUID = 1L;
 	public final INPattern from;

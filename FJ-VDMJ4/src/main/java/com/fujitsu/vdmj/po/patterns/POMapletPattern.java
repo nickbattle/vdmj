@@ -23,18 +23,17 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POMapletExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
-public class POMapletPattern implements Serializable
+public class POMapletPattern extends PONode
 {
 	private static final long serialVersionUID = 1L;
 	public final POPattern from;

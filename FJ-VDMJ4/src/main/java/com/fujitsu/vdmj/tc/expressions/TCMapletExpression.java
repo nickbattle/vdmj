@@ -23,15 +23,15 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
-import java.io.Serializable;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCMapletExpression implements Serializable
+public class TCMapletExpression extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

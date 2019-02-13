@@ -23,13 +23,12 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
-public class POMapletExpression implements Serializable
+public class POMapletExpression extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

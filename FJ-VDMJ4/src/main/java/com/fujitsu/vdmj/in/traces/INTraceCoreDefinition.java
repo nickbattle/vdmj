@@ -23,9 +23,7 @@
 
 package com.fujitsu.vdmj.in.traces;
 
-
-import java.io.Serializable;
-
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.traces.TraceIterator;
@@ -33,7 +31,7 @@ import com.fujitsu.vdmj.traces.TraceIterator;
 /**
  * Base class for INTraceApplyExpression and INTraceBracketedExpression.
  */
-public abstract class INTraceCoreDefinition implements Serializable
+public abstract class INTraceCoreDefinition extends INNode
 {
     private static final long serialVersionUID = 1L;
 	public final LexLocation location;

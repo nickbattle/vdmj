@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCMapType;
@@ -35,7 +36,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 
-public class TCMapletPattern implements Serializable
+public class TCMapletPattern extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 	public final TCPattern from;

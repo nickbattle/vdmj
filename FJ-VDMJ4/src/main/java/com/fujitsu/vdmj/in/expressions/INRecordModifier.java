@@ -23,14 +23,13 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
-import java.io.Serializable;
-
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.ValueList;
 
-public class INRecordModifier implements Serializable
+public class INRecordModifier extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

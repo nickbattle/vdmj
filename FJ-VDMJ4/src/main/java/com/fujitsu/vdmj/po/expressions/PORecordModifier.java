@@ -23,11 +23,10 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
-import java.io.Serializable;
-
+import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class PORecordModifier implements Serializable
+public class PORecordModifier extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

@@ -23,12 +23,12 @@
 
 package com.fujitsu.vdmj.po.traces;
 
-import java.io.Serializable;
+import com.fujitsu.vdmj.po.PONode;
 
 /**
  * Base class for POTraceApplyExpression and POTraceBracketedExpression.
  */
-public abstract class POTraceCoreDefinition implements Serializable
+public abstract class POTraceCoreDefinition extends PONode
 {
     private static final long serialVersionUID = 1L;
 

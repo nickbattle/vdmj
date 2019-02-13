@@ -23,12 +23,11 @@
 
 package com.fujitsu.vdmj.po.types;
 
-import java.io.Serializable;
-
+import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.tc.types.TCType;
 
-public class POPatternTypePair implements Serializable
+public class POPatternTypePair extends PONode
 {
 	private static final long serialVersionUID = 1L;
 	public final POPattern pattern;

@@ -23,14 +23,13 @@
 
 package com.fujitsu.vdmj.tc.types;
 
-import java.io.Serializable;
-
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCPatternTypePair implements Serializable
+public class TCPatternTypePair extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 	public final TCPattern pattern;

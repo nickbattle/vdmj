@@ -23,10 +23,10 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
-import java.io.Serializable;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class TCRecordModifier implements Serializable
+public class TCRecordModifier extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

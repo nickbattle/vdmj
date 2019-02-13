@@ -23,12 +23,15 @@
 
 package com.fujitsu.vdmj.in.traces;
 
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.Value;
 
-public class INTraceVariable implements Comparable<INTraceVariable>
+public class INTraceVariable extends INNode implements Comparable<INTraceVariable>
 {
+	private static final long serialVersionUID = 1L;
+
 	public final TCNameToken name;
 	public final Value value;
 	public final TCType type;
