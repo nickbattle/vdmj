@@ -23,11 +23,10 @@
 
 package com.fujitsu.vdmj.ast.expressions;
 
-import java.io.Serializable;
-
+import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
-public class ASTRecordModifier implements Serializable
+public class ASTRecordModifier extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

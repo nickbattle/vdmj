@@ -23,11 +23,10 @@
 
 package com.fujitsu.vdmj.ast.statements;
 
-import java.io.Serializable;
-
+import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.patterns.ASTPatternBind;
 
-public class ASTTixeStmtAlternative implements Serializable
+public class ASTTixeStmtAlternative extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 	public final ASTPatternBind patternBind;

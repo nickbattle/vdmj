@@ -23,13 +23,13 @@
 
 package com.fujitsu.vdmj.ast.statements;
 
-import java.io.Serializable;
+import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 /**
  * The root of the state designator hierarchy.
  */
-public abstract class ASTStateDesignator implements Serializable
+public abstract class ASTStateDesignator extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 
