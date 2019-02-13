@@ -23,11 +23,11 @@
 
 package com.fujitsu.vdmj.ast.statements;
 
-import java.io.Serializable;
+import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.lex.LexLocation;
 
-public class ASTCaseStmtAlternative implements Serializable
+public class ASTCaseStmtAlternative extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

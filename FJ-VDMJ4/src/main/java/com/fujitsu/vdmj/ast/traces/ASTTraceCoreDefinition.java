@@ -23,13 +23,13 @@
 
 package com.fujitsu.vdmj.ast.traces;
 
-import java.io.Serializable;
+import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 /**
  * Base class for TCTraceApplyExpression and TCTraceBracketedExpression.
  */
-public abstract class ASTTraceCoreDefinition implements Serializable
+public abstract class ASTTraceCoreDefinition extends ASTNode
 {
     private static final long serialVersionUID = 1L;
 	public final LexLocation location;

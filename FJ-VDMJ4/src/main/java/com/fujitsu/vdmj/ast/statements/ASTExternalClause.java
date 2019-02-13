@@ -23,14 +23,13 @@
 
 package com.fujitsu.vdmj.ast.statements;
 
-import java.io.Serializable;
-
+import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.lex.LexNameList;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.ast.types.ASTUnknownType;
 
-public class ASTExternalClause implements Serializable
+public class ASTExternalClause extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 	public final LexToken mode;

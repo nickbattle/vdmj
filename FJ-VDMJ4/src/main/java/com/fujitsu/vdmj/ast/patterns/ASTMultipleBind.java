@@ -23,13 +23,16 @@
 
 package com.fujitsu.vdmj.ast.patterns;
 
-import java.io.Serializable;
+import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 
 /**
  * The parent class of {@link TCMultipleSetBind} and {@link TCMultipleTypeBind}.
  */
-public abstract class ASTMultipleBind implements Serializable
+public abstract class ASTMultipleBind extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 
