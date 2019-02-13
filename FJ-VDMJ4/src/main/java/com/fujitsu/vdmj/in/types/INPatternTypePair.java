@@ -23,12 +23,11 @@
 
 package com.fujitsu.vdmj.in.types;
 
-import java.io.Serializable;
-
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.tc.types.TCType;
 
-public class INPatternTypePair implements Serializable
+public class INPatternTypePair extends INNode
 {
 	private static final long serialVersionUID = 1L;
 	public final INPattern pattern;

@@ -23,9 +23,8 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.patterns.TCExpressionPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -37,7 +36,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
-public class TCCaseStmtAlternative implements Serializable
+public class TCCaseStmtAlternative extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

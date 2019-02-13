@@ -23,13 +23,12 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.lex.LexNameList;
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.tc.types.TCType;
 
-public class POExternalClause implements Serializable
+public class POExternalClause extends PONode
 {
 	private static final long serialVersionUID = 1L;
 	public final LexToken mode;

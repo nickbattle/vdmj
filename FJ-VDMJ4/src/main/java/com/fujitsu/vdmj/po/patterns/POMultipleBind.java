@@ -23,11 +23,11 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -36,7 +36,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 /**
  * The parent class of {@link POMultipleSetBind} and {@link POMultipleTypeBind}.
  */
-public abstract class POMultipleBind implements Serializable
+public abstract class POMultipleBind extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

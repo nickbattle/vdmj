@@ -23,15 +23,14 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import java.io.Serializable;
-
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.values.Value;
 
-public class INCaseStmtAlternative implements Serializable
+public class INCaseStmtAlternative extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

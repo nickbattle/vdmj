@@ -23,8 +23,7 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
-import java.io.Serializable;
-
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
@@ -33,7 +32,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
-public class INCaseAlternative implements Serializable
+public class INCaseAlternative extends INNode
 {
 	private static final long serialVersionUID = 1L;
 

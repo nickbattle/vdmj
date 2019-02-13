@@ -23,9 +23,8 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -35,7 +34,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 /**
  * The parent class of {@link TCMultipleSetBind} and {@link TCMultipleTypeBind}.
  */
-public abstract class TCMultipleBind implements Serializable
+public abstract class TCMultipleBind extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 
