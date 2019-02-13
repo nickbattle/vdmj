@@ -23,7 +23,6 @@
 
 package annotations.in;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
@@ -54,19 +53,16 @@ public class INTraceAnnotation extends INAnnotation
 	
 	private void doTrace(Context ctxt)
 	{
-		if (Settings.annotations)
+		if (args.isEmpty())
 		{
-			if (args.isEmpty())
+			Console.err.println("Trace: " + name.getLocation());
+		}
+		else
+		{
+			for (INExpression arg: args)
 			{
-				Console.err.println("Trace: " + name.getLocation());
-			}
-			else
-			{
-				for (INExpression arg: args)
-				{
-					Value v = arg.eval(ctxt);
-					Console.err.println("Trace: " + name.getLocation() + ", " + arg + " = " + v);
-				}
+				Value v = arg.eval(ctxt);
+				Console.err.println("Trace: " + name.getLocation() + ", " + arg + " = " + v);
 			}
 		}
 	}

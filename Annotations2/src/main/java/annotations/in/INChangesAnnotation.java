@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INStringLiteralExpression;
@@ -65,16 +64,13 @@ public class INChangesAnnotation extends INAnnotation
 	@Override
 	public void inAfter(INStatement stmt, Value rv, Context caller)
 	{
-		if (Settings.annotations)
-		{
-			recordChanges(caller.getVisibleNames(), caller);
-			cleanup(caller);
+		recordChanges(caller.getVisibleNames(), caller);
+		cleanup(caller);
 
-			if (!(rv instanceof VoidValue))
-			{
-				header();
-				Console.err.println("RESULT = " + rv);
-			}
+		if (!(rv instanceof VoidValue))
+		{
+			header();
+			Console.err.println("RESULT = " + rv);
 		}
 	}
 	

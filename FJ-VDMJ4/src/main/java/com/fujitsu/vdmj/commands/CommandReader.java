@@ -752,6 +752,11 @@ abstract public class CommandReader
 	    		}
 	    		else if (parts[1].equals("annotations"))
 	    		{
+	    			if (setting != Settings.annotations)
+	    			{
+		    			println("Specification should be re-parsed (reload)");
+	    			}
+
 	    			Settings.annotations = setting;
 	    		}
 				else

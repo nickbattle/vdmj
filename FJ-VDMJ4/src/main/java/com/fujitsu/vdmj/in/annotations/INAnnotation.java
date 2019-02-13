@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
@@ -52,16 +53,19 @@ public abstract class INAnnotation
 	
 	public static void init()
 	{
-		for (Class<?> clazz: declared)
+		if (Settings.annotations)
 		{
-			try
+			for (Class<?> clazz: declared)
 			{
-				Method doInit = clazz.getMethod("doInit", (Class<?>[])null);
-				doInit.invoke(null, (Object[])null);
-			}
-			catch (Throwable e)
-			{
-				throw new RuntimeException(clazz.getSimpleName() + ":" + e);
+				try
+				{
+					Method doInit = clazz.getMethod("doInit", (Class<?>[])null);
+					doInit.invoke(null, (Object[])null);
+				}
+				catch (Throwable e)
+				{
+					throw new RuntimeException(clazz.getSimpleName() + ":" + e);
+				}
 			}
 		}
 	}

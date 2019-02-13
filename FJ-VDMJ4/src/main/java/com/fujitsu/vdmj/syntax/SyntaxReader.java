@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
@@ -341,7 +342,15 @@ public abstract class SyntaxReader
 	protected ASTAnnotationList readAnnotations(LexCommentList comments) throws LexException, ParserException
 	{
 		ASTAnnotationList annotations = new ASTAnnotationList();
-		if (readingAnnotations > 0) return annotations; else readingAnnotations++;
+
+		if (!Settings.annotations || readingAnnotations > 0)
+		{
+			return annotations;
+		}
+		else
+		{
+			readingAnnotations++;
+		}
 		
 		for (int i=0; i<comments.size(); i++)
 		{
