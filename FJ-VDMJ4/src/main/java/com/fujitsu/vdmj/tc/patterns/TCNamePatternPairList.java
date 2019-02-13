@@ -23,9 +23,10 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.util.Vector;
-
+import com.fujitsu.vdmj.ast.patterns.ASTNamePatternPair;
+import com.fujitsu.vdmj.ast.patterns.ASTNamePatternPairList;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.TCMappedList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -33,8 +34,13 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 @SuppressWarnings("serial")
-public class TCNamePatternPairList extends Vector<TCNamePatternPair>
+public class TCNamePatternPairList extends TCMappedList<ASTNamePatternPair, TCNamePatternPair>
 {
+	public TCNamePatternPairList(ASTNamePatternPairList from) throws Exception
+	{
+		super(from);
+	}
+
 	@Override
 	public String toString()
 	{

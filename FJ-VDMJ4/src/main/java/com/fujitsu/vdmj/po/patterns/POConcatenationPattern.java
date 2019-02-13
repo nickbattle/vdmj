@@ -108,6 +108,7 @@ public class POConcatenationPattern extends POPattern
 		return left.isSimple() && right.isSimple();
 	}
 
+	@Override
 	public boolean alwaysMatches()
 	{
 		return left.alwaysMatches() && right.alwaysMatches();

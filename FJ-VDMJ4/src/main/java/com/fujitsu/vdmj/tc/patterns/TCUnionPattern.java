@@ -139,6 +139,7 @@ public class TCUnionPattern extends TCPattern
 		return list;
 	}
 
+	@Override
 	public boolean alwaysMatches()
 	{
 		return left.alwaysMatches() && right.alwaysMatches();
