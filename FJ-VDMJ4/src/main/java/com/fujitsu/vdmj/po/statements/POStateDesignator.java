@@ -23,16 +23,15 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
 /**
  * The root of the state designator hierarchy.
  */
-public abstract class POStateDesignator implements Serializable
+public abstract class POStateDesignator extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

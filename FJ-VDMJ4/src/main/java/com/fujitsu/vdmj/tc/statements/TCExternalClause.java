@@ -23,15 +23,14 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
-public class TCExternalClause implements Serializable
+public class TCExternalClause extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 	public final LexToken mode;

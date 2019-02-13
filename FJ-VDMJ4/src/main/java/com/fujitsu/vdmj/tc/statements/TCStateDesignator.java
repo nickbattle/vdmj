@@ -23,9 +23,8 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -34,7 +33,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 /**
  * The root of the state designator hierarchy.
  */
-public abstract class TCStateDesignator implements Serializable
+public abstract class TCStateDesignator extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

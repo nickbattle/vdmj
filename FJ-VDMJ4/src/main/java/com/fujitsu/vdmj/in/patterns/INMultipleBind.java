@@ -23,10 +23,10 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -38,7 +38,7 @@ import com.fujitsu.vdmj.values.ValueList;
 /**
  * The parent class of {@link INMultipleSetBind} and {@link INMultipleTypeBind}.
  */
-public abstract class INMultipleBind implements Serializable
+public abstract class INMultipleBind extends INNode
 {
 	private static final long serialVersionUID = 1L;
 
@@ -78,6 +78,7 @@ public abstract class INMultipleBind implements Serializable
 	 * @see org.INDefinition.vdmj.definitions.Definition#abort
 	 */
 
+	@Override
 	public Value abort(ValueException ve)
 	{
 		throw new ContextException(ve, location);

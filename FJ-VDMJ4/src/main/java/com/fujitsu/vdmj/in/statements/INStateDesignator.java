@@ -23,21 +23,17 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import java.io.Serializable;
-
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.ContextException;
-import com.fujitsu.vdmj.runtime.ExceptionHandler;
-import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.values.Value;
 
 /**
  * The root of the state designator hierarchy.
  */
-public abstract class INStateDesignator implements Serializable
+public abstract class INStateDesignator extends INNode
 {
 	private static final long serialVersionUID = 1L;
 
@@ -58,15 +54,4 @@ public abstract class INStateDesignator implements Serializable
 	}
 
 	abstract public Value eval(Context ctxt);
-
-	public void abort(int number, String msg, Context ctxt)
-	{
-		ExceptionHandler.handle(new ContextException(number, msg, location, ctxt));
-	}
-
-	public Value abort(ValueException ve)
-	{
-		ExceptionHandler.handle(new ContextException(ve, location));
-		return null;
-	}
 }

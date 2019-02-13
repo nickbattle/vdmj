@@ -23,10 +23,9 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
@@ -37,7 +36,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
-public class TCPatternBind implements Serializable
+public class TCPatternBind extends TCNode
 {
 	private static final long serialVersionUID = 1L;
 

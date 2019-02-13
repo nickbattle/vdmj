@@ -23,11 +23,14 @@
 
 package com.fujitsu.vdmj.tc.traces;
 
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 
-public class TCTraceVariable implements Comparable<TCTraceVariable>
+public class TCTraceVariable extends TCNode implements Comparable<TCTraceVariable>
 {
+	private static final long serialVersionUID = 1L;
+
 	public final TCNameToken name;
 	public final Object value;
 	public final TCType type;

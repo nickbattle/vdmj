@@ -23,12 +23,11 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 
-public class POPatternBind implements Serializable
+public class POPatternBind extends PONode
 {
 	private static final long serialVersionUID = 1L;
 

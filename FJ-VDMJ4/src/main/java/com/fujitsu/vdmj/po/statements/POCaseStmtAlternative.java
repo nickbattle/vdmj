@@ -23,14 +23,13 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
-public class POCaseStmtAlternative implements Serializable
+public class POCaseStmtAlternative extends PONode
 {
 	private static final long serialVersionUID = 1L;
 
