@@ -23,11 +23,11 @@
 
 package com.fujitsu.vdmj.ast.patterns;
 
-import java.io.Serializable;
+import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.InternalException;
 
-public class ASTPatternBind implements Serializable
+public class ASTPatternBind extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 

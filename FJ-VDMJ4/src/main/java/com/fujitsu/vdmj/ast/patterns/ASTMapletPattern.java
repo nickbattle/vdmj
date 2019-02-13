@@ -23,9 +23,9 @@
 
 package com.fujitsu.vdmj.ast.patterns;
 
-import java.io.Serializable;
+import com.fujitsu.vdmj.ast.ASTNode;
 
-public class ASTMapletPattern implements Serializable
+public class ASTMapletPattern extends ASTNode
 {
 	private static final long serialVersionUID = 1L;
 	public final ASTPattern from;
