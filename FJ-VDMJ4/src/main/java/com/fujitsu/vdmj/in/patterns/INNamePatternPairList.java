@@ -23,11 +23,12 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
-import java.util.Vector;
-
+import com.fujitsu.vdmj.in.INMappedList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
+import com.fujitsu.vdmj.tc.patterns.TCNamePatternPair;
+import com.fujitsu.vdmj.tc.patterns.TCNamePatternPairList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -36,8 +37,13 @@ import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 
 @SuppressWarnings("serial")
-public class INNamePatternPairList extends Vector<INNamePatternPair>
+public class INNamePatternPairList extends INMappedList<TCNamePatternPair, INNamePatternPair>
 {
+	public INNamePatternPairList(TCNamePatternPairList from) throws Exception
+	{
+		super(from);
+	}
+
 	@Override
 	public String toString()
 	{

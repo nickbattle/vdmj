@@ -230,7 +230,7 @@ map ASTMultipleSeqBind{plist, sequence} to TCMultipleSeqBind(plist, sequence);
 map ASTMultipleSetBind{plist, set} to TCMultipleSetBind(plist, set);
 map ASTMultipleTypeBind{plist, type} to TCMultipleTypeBind(plist, type);
 map ASTNamePatternPair{name, pattern} to TCNamePatternPair(name, pattern);
-map ASTNamePatternPairList{} to TCNamePatternPairList();
+map ASTNamePatternPairList{} to TCNamePatternPairList(this);
 map ASTNilPattern{location} to TCNilPattern(location);
 map ASTObjectPattern{location, classname, fieldlist} to TCObjectPattern(location, classname, fieldlist);
 map ASTPattern{} to TCPattern();
