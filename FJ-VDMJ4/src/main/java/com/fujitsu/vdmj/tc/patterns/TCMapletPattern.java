@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 

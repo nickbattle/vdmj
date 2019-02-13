@@ -23,9 +23,6 @@
 
 package com.fujitsu.vdmj.tc.traces;
 
-
-import java.io.Serializable;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.typechecker.Environment;
