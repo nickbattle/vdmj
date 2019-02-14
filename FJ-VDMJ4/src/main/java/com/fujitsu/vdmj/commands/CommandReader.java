@@ -754,7 +754,7 @@ abstract public class CommandReader
 	    		{
 	    			if (setting != Settings.annotations)
 	    			{
-		    			println("Specification should be re-parsed (reload)");
+		    			println("Specification must now be re-parsed (reload)");
 	    			}
 
 	    			Settings.annotations = setting;

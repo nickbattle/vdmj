@@ -27,7 +27,6 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -57,19 +56,16 @@ public abstract class TCAnnotation
 
 	public static void init()
 	{
-		if (Settings.annotations)
+		for (Class<?> clazz: declared)
 		{
-			for (Class<?> clazz: declared)
+			try
 			{
-				try
-				{
-					Method doInit = clazz.getMethod("doInit", (Class<?>[])null);
-					doInit.invoke(null, (Object[])null);
-				}
-				catch (Throwable e)
-				{
-					throw new RuntimeException(clazz.getSimpleName() + ":" + e);
-				}
+				Method doInit = clazz.getMethod("doInit", (Class<?>[])null);
+				doInit.invoke(null, (Object[])null);
+			}
+			catch (Throwable e)
+			{
+				throw new RuntimeException(clazz.getSimpleName() + ":" + e);
 			}
 		}
 	}
