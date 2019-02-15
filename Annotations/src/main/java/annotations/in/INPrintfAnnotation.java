@@ -53,12 +53,11 @@ public class INPrintfAnnotation extends INAnnotation
 	
 	private void doPrintf(Context ctxt)
 	{
-		Object[] values = new Value[args.size()];
+		Object[] values = new Value[args.size() - 1];
 		
 		for (int p=1; p < args.size(); p++)
 		{
 			values[p-1] = args.get(p).eval(ctxt);
-			p++;
 		}
 		
 		INStringLiteralExpression fmt = (INStringLiteralExpression)args.get(0);
