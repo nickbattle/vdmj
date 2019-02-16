@@ -34,6 +34,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,6 +96,9 @@ abstract public class CommandReader
 
 	/** The seed for the trace PRNG */
 	private long traceseed = 0;
+	
+	/** The cache of loaded plugin instances */
+	private Map<String, CommandPlugin> plugins = new HashMap<String, CommandPlugin>();
 
 	/**
 	 * Create a command reader with the given interpreter and prompt.
@@ -346,7 +350,7 @@ abstract public class CommandReader
 				{
 					carryOn = doThread(line);
 				}
-				else
+				else if (!usePlugin(line))		// Attempt to load plugin
 				{
 					println("Bad command. Try 'help'");
 				}
@@ -358,6 +362,49 @@ abstract public class CommandReader
 		}
 
 		return ExitStatus.EXIT_OK;
+	}
+
+	private boolean usePlugin(String line)
+	{
+		String[] argv = line.split("\\s+");
+		CommandPlugin cmd = plugins.get(argv[0]);
+		
+		if (cmd != null)
+		{
+			return cmd.run(argv);
+		}
+		
+		String plugin = Character.toUpperCase(argv[0].charAt(0)) + argv[0].substring(1).toLowerCase() + "Plugin";
+		String[] packages = System.getProperty("vdmj.plugins", "plugins").split(";|:");
+		
+		for (String pack: packages)
+		{
+			try
+			{
+				Class<?> clazz = Class.forName(pack + "." + plugin);
+
+				if (CommandPlugin.class.isAssignableFrom(clazz))
+				{
+					cmd = (CommandPlugin)clazz.newInstance();
+					plugins.put(argv[0], cmd);
+					return cmd.run(argv);
+				}
+			}
+			catch (ClassNotFoundException e)
+			{
+				// Try next package
+			}
+			catch (InstantiationException e)
+			{
+				// Try next package
+			}
+			catch (IllegalAccessException e)
+			{
+				// Try next package
+			}
+		}
+
+		return false;
 	}
 
 	protected boolean doException(Exception e)
