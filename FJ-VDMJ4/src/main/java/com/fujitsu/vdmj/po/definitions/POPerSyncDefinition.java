@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.PONameContext;
@@ -39,9 +40,10 @@ public class POPerSyncDefinition extends PODefinition
 	public final TCNameToken opname;
 	public final POExpression guard;
 
-	public POPerSyncDefinition(LexLocation location, TCNameToken opname, POExpression guard)
+	public POPerSyncDefinition(POAnnotationList annotations, LexLocation location, TCNameToken opname, POExpression guard)
 	{
 		super(location, opname.getPerName(location));
+		this.annotations = annotations;
 		this.opname = opname;
 		this.guard = guard;
 	}
@@ -67,9 +69,14 @@ public class POPerSyncDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
+		ProofObligationList obligations =
+				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
+
 		ctxt.push(new PONameContext(new TCNameList(opname)));
-		ProofObligationList list = guard.getProofObligations(ctxt);
+		obligations.addAll(guard.getProofObligations(ctxt));
 		ctxt.pop();
-		return list;
+		
+		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
+		return obligations;
 	}
 }

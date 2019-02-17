@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -34,9 +35,10 @@ public class POMutexSyncDefinition extends PODefinition
 	private static final long serialVersionUID = 1L;
 	public final TCNameList operations;
 
-	public POMutexSyncDefinition(LexLocation location, TCNameList operations)
+	public POMutexSyncDefinition(POAnnotationList annotations, LexLocation location, TCNameList operations)
 	{
 		super(location, null);
+		this.annotations = annotations;
 		this.operations = operations;
 	}
 

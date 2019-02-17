@@ -33,6 +33,6 @@ public class POBUSClassDefinition extends POClassDefinition
 
 	public POBUSClassDefinition(TCClassType ctype, PODefinitionList defs)
 	{
-		super(new TCNameToken(new LexLocation(), "CLASS", "BUS"), ctype, defs, null, false);
+		super(null, new TCNameToken(new LexLocation(), "CLASS", "BUS"), ctype, defs, null, false);
 	}
 }

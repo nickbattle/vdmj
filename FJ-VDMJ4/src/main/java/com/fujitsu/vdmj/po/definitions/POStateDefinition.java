@@ -94,13 +94,15 @@ public class POStateDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		ProofObligationList list = new ProofObligationList();
+		ProofObligationList list =
+				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
 		if (invExpression != null)
 		{
 			list.addAll(invExpression.getProofObligations(ctxt));
 		}
 
+		if (annotations != null) annotations.poAfter(this, list, ctxt);
 		return list;
 	}
 }

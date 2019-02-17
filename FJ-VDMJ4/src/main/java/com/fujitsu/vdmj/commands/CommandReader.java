@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -364,7 +365,7 @@ abstract public class CommandReader
 		return ExitStatus.EXIT_OK;
 	}
 
-	private boolean usePlugin(String line)
+	private boolean usePlugin(String line) throws Exception
 	{
 		String[] argv = line.split("\\s+");
 		CommandPlugin cmd = plugins.get(argv[0]);
@@ -385,7 +386,8 @@ abstract public class CommandReader
 
 				if (CommandPlugin.class.isAssignableFrom(clazz))
 				{
-					cmd = (CommandPlugin)clazz.newInstance();
+					Constructor<?> ctor = clazz.getConstructor(Interpreter.class);
+					cmd = (CommandPlugin)ctor.newInstance(interpreter);
 					plugins.put(argv[0], cmd);
 					return cmd.run(argv);
 				}
@@ -795,6 +797,7 @@ abstract public class CommandReader
 			isEnabled("Dynamic type checks", Settings.dynamictypechecks);
 			isEnabled("Pre/post/inv exceptions", Settings.exceptions);
 			isEnabled("Measure checks", Settings.measureChecks);
+			isEnabled("Annotations", Settings.annotations);
 		}
 		else
 		{
@@ -831,14 +834,23 @@ abstract public class CommandReader
 	    		{
 	    			Settings.measureChecks = setting;
 	    		}
+	    		else if (parts[1].equals("annotations"))
+	    		{
+	    			if (setting != Settings.annotations)
+	    			{
+		    			println("Specification must now be re-parsed (reload)");
+	    			}
+
+	    			Settings.annotations = setting;
+	    		}
 				else
 				{
-					println("Usage: set [<pre|post|inv|dtc|exceptions|measures> <on|off>]");
+					println("Usage: set [<pre|post|inv|dtc|exceptions|measures|annotations> <on|off>]");
 				}
 			}
 			else
 			{
-				println("Usage: set [<pre|post|inv|dtc|exceptions|measures> <on|off>]");
+				println("Usage: set [<pre|post|inv|dtc|exceptions|measures|annotations> <on|off>]");
 			}
 		}
 

@@ -24,7 +24,9 @@
 package com.fujitsu.vdmj.ast.statements;
 
 import java.io.Serializable;
+
 import com.fujitsu.vdmj.ast.ASTNode;
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 /**
@@ -36,6 +38,8 @@ public abstract class ASTStatement extends ASTNode implements Serializable
 
 	/** The location of the statement. */
 	public final LexLocation location;
+	/** The comments that precede the statement */
+	public LexCommentList comments;
 
 	/**
 	 * Create a statement at the given location.
@@ -51,4 +55,9 @@ public abstract class ASTStatement extends ASTNode implements Serializable
 
 	/** A string name of the statement type, (eg "if"). */
 	abstract public String kind();
+
+	public void setComments(LexCommentList comments)
+	{
+		this.comments = comments;
+	}
 }

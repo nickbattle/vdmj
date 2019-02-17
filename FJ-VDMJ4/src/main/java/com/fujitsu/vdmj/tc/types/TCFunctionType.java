@@ -70,12 +70,16 @@ public class TCFunctionType extends TCType
 	{
 		TCTypeList cparams = new TCTypeList();
 		cparams.addAll(parameters);
-		TCFunctionType ft = this;
 		
-		while (ft.result instanceof TCFunctionType)
+		if (isCurried)
 		{
-			ft = (TCFunctionType)result;
-			cparams.addAll(ft.parameters);
+			TCFunctionType ft = this;
+			
+			while (ft.result instanceof TCFunctionType)
+			{
+				ft = (TCFunctionType)result;
+				cparams.addAll(ft.parameters);
+			}
 		}
 		
 		// Clean the return types to be precisely nat or nat-tuple.

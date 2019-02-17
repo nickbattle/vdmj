@@ -29,6 +29,7 @@ import java.util.Arrays;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTAccessSpecifier;
 import com.fujitsu.vdmj.ast.definitions.ASTAssignmentDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassInvariantDefinition;
@@ -52,6 +53,7 @@ import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.expressions.ASTNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTSubclassResponsibilityExpression;
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexNameList;
@@ -403,7 +405,7 @@ public class DefinitionReader extends SyntaxReader
 
 		return new ASTAccessSpecifier(isStatic, isAsync, access, isPure);
 	}
-
+	
 	public ASTTypeDefinition readTypeDefinition() throws ParserException, LexException
 	{
 		LexIdentifierToken id = readIdToken("Expecting new type identifier");
@@ -515,8 +517,14 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				LexCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
+				annotations.astBefore(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTTypeDefinition def = readTypeDefinition();
+				annotations.astAfter(this, def);
+				def.setAnnotations(annotations);
+				def.setComments(comments);
 
 				// Force all type defs (invs) to be static
 				def.setAccessSpecifier(access.getStatic(true));
@@ -546,8 +554,14 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				LexCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
+				annotations.astBefore(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTDefinition def = readValueDefinition();
+				annotations.astAfter(this, def);
+				def.setAnnotations(annotations);
+				def.setComments(comments);
 
 				// Force all values to be static
 				def.setAccessSpecifier(access.getStatic(true));
@@ -577,8 +591,14 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				LexCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
+				annotations.astBefore(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
 				ASTDefinition def = readFunctionDefinition();
+				annotations.astAfter(this, def);
+				def.setAnnotations(annotations);
+				def.setComments(comments);
 
 				if (Settings.release == Release.VDM_10)
 				{
@@ -616,9 +636,15 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				LexCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
+				annotations.astBefore(this);
 				ASTAccessSpecifier access = readAccessSpecifier(dialect == Dialect.VDM_RT, true);
 				ASTDefinition def = readOperationDefinition();
+				annotations.astAfter(this, def);
 				def.setAccessSpecifier(access);
+				def.setAnnotations(annotations);
+				def.setComments(comments);
 				list.add(def);
 
 				if (!newSection())
@@ -653,7 +679,13 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				LexCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
+				annotations.astBefore(this);
 				ASTDefinition def = readInstanceVariableDefinition();
+				annotations.astAfter(this, def);
+				def.setAnnotations(annotations);
+				def.setComments(comments);
 				list.add(def);
 
 				if (!newSection())
@@ -680,7 +712,13 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				LexCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
+				annotations.astBefore(this);
 				ASTDefinition def = readNamedTraceDefinition();
+				annotations.astAfter(this, def);
+				def.setAnnotations(annotations);
+				def.setComments(comments);
 				list.add(def);
 
 				if (!newSection())
@@ -706,7 +744,11 @@ public class DefinitionReader extends SyntaxReader
 		{
 			try
 			{
+				LexCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
+				annotations.astBefore(this);
 				ASTDefinition def = readPermissionPredicateDefinition();
+				annotations.astAfter(this, def);
 				list.add(def);
 
 				if (!newSection())
@@ -1044,6 +1086,9 @@ public class DefinitionReader extends SyntaxReader
 
 	private ASTDefinition readStateDefinition() throws ParserException, LexException
 	{
+		LexCommentList comments = getComments();
+		ASTAnnotationList annotations = readAnnotations(comments);
+
 		LexIdentifierToken name = readIdToken("Expecting identifier after 'state' definition");
 		checkFor(Token.OF, 2097, "Expecting 'of' after state name");
 		ASTFieldList fieldList = getTypeReader().readFieldList();
@@ -1079,8 +1124,11 @@ public class DefinitionReader extends SyntaxReader
 		}
 
 		checkFor(Token.END, 2100, "Expecting 'end' after state definition");
-		return new ASTStateDefinition(idToName(name), fieldList,
+		ASTStateDefinition def = new ASTStateDefinition(idToName(name), fieldList,
 			invPattern, invExpression, initPattern, initExpression);
+		def.setAnnotations(annotations);
+		def.setComments(comments);
+		return def;
 	}
 
 	private ASTDefinition readOperationDefinition()
@@ -1460,11 +1508,16 @@ public class DefinitionReader extends SyntaxReader
 		}
 		else
 		{
+			LexCommentList comments = getComments();
+			ASTAnnotationList annotations = readAnnotations(comments);
 			ASTAccessSpecifier access = readAccessSpecifier(false, false);
 			ASTAssignmentDefinition def = getStatementReader().readAssignmentDefinition();
 			ASTInstanceVariableDefinition ivd =
 				new ASTInstanceVariableDefinition(def.name, def.type, def.expression);
 			ivd.setAccessSpecifier(access);
+			ivd.setAnnotations(annotations);
+			ivd.setComments(comments);
+
 			return ivd;
 		}
     }

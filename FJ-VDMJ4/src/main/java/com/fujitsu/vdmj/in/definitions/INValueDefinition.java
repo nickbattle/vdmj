@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.definitions;
 
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.runtime.Context;
@@ -45,10 +46,12 @@ public class INValueDefinition extends INDefinition
 	public final TCType type;
 	public final INExpression exp;
 
-	public INValueDefinition(INAccessSpecifier accessSpecifier, TCNameToken name, INPattern p, TCType type, INExpression exp)
+	public INValueDefinition(INAnnotationList annotations,
+		INAccessSpecifier accessSpecifier, TCNameToken name, INPattern p, TCType type, INExpression exp)
 	{
 		super(p.location, accessSpecifier, name);
 
+		this.annotations = annotations;
 		this.pattern = p;
 		this.type = type;
 		this.exp = exp;

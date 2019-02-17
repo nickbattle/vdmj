@@ -215,7 +215,7 @@ public class MappingReader
 		String dest = readDotName();
 		checkFor(";", "Expecting closing semi-colon");
 		
-		return new Mapping(lineNo, Type.PACKAGE, source, null, dest, null);
+		return new Mapping(lineNo, Type.PACKAGE, source, null, dest, null, null);
 	}
 	
 	private Mapping readMap() throws IOException
@@ -240,8 +240,15 @@ public class MappingReader
 		paramnames = readList(")");
 		checkFor(")", "Expecting ')'");
 		
+		List<String> setnames = new Vector<String>();
+		if (nextStr.equals("set"))
+		{
+			rdToken();
+			setnames = readList(";");
+		}
+		
 		checkFor(";", "Expecting closing semi-colon");
-		return new Mapping(lineNo, Mapping.Type.MAP, srcClass, varnames, destClass, paramnames);
+		return new Mapping(lineNo, Mapping.Type.MAP, srcClass, varnames, destClass, paramnames, setnames);
 	}
 
 	private Mapping readUnmapped() throws IOException
@@ -252,7 +259,7 @@ public class MappingReader
 		String source = readDotName();
 		checkFor(";", "Expecting closing semi-colon");
 		
-		return new Mapping(lineNo, Type.UNMAPPED, source, null, null, null);
+		return new Mapping(lineNo, Type.UNMAPPED, source, null, null, null, null);
 	}
 
 	private List<String> readList(String term) throws IOException

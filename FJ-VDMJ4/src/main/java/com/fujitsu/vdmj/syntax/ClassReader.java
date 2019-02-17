@@ -24,10 +24,12 @@
 package com.fujitsu.vdmj.syntax;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
 import com.fujitsu.vdmj.ast.definitions.ASTSystemDefinition;
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameList;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
@@ -73,14 +75,24 @@ public class ClassReader extends SyntaxReader
 
     		while (lastToken().is(Token.CLASS) || lastToken().is(Token.SYSTEM))
     		{
-    			if (lastToken().is(Token.CLASS))
+				LexCommentList comments = getComments();
+				ASTAnnotationList annotations = readAnnotations(comments);
+				annotations.astBefore(this);
+				ASTClassDefinition clazz = null;
+
+				if (lastToken().is(Token.CLASS))
     			{
-    				list.add(readClass());
+					clazz = readClass();
     			}
     			else
     			{
-    				list.add(readSystem());
+    				clazz = readSystem();
     			}
+
+				list.add(clazz);
+				annotations.astAfter(this, clazz);
+				clazz.setAnnotations(annotations);
+				clazz.setComments(comments);
     		}
 
     		if (lastToken().isNot(Token.EOF))

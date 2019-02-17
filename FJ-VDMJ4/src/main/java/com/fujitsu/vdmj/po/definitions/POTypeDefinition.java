@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.EquivRelationObligation;
@@ -50,13 +51,14 @@ public class POTypeDefinition extends PODefinition
 	public final POPattern ordPattern2;
 	public final POExpression ordExpression;
 
-	public POTypeDefinition(TCNameToken name, TCInvariantType type,
+	public POTypeDefinition(POAnnotationList annotations, TCNameToken name, TCInvariantType type,
 		POPattern invPattern, POExpression invExpression,
 		POPattern eqPattern1, POPattern eqPattern2, POExpression eqExpression,
 		POPattern ordPattern1, POPattern ordPattern2, POExpression ordExpression)
 	{
 		super(name.getLocation(), name);
 
+		this.annotations = annotations;
 		this.type = type;
 		this.invPattern = invPattern;
 		this.invExpression = invExpression;
@@ -96,7 +98,8 @@ public class POTypeDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		ProofObligationList list = new ProofObligationList();
+		ProofObligationList list =
+				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
 		if (invExpression != null)
 		{
@@ -115,6 +118,7 @@ public class POTypeDefinition extends PODefinition
 			list.add(new StrictOrderObligation(this, ctxt));
 		}
 
+		if (annotations != null) annotations.poAfter(this, list, ctxt);
 		return list;
 	}
 }

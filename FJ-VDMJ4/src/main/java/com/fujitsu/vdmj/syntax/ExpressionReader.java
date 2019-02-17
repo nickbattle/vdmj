@@ -23,12 +23,18 @@
 
 package com.fujitsu.vdmj.syntax;
 
+import java.util.Collections;
+
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedExpression;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
 import com.fujitsu.vdmj.ast.expressions.*;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.ast.lex.LexCharacterToken;
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
@@ -84,7 +90,7 @@ public class ExpressionReader extends SyntaxReader
 		return list;
 	}
 
-	// Constructor Family...
+	// Constructor Family... and pick up any annotations here.
 
 	public ASTExpression readExpression() throws ParserException, LexException
 	{
@@ -601,7 +607,7 @@ public class ExpressionReader extends SyntaxReader
 	private ASTExpression readApplicatorExpression()
 		throws ParserException, LexException
 	{
-		ASTExpression exp = readBasicExpression();
+		ASTExpression exp = readAnnotatedExpression();
 		boolean more = true;
 
 		while (more)
@@ -800,6 +806,34 @@ public class ExpressionReader extends SyntaxReader
 		return exp;
 	}
 
+	private ASTExpression readAnnotatedExpression() throws ParserException, LexException
+	{
+		LexCommentList comments = getComments();
+		ASTAnnotationList annotations = readAnnotations(comments);
+		ASTExpression body = null;
+
+		if (!annotations.isEmpty())
+		{
+			annotations.astBefore(this);
+			body = readBasicExpression();
+			annotations.astAfter(this, body);
+
+			Collections.reverse(annotations);	// Build the chain backwards
+			
+			for (ASTAnnotation annotation: annotations)
+			{
+				body = new ASTAnnotatedExpression(annotation.name.location, annotation, body);
+			}
+		}
+		else
+		{
+			body = readBasicExpression();
+		}
+		
+		body.setComments(comments);
+		return body;
+	}
+
 	private ASTExpression readBasicExpression()
 		throws ParserException, LexException
 	{
@@ -864,7 +898,7 @@ public class ExpressionReader extends SyntaxReader
 				ASTExpression exp = readExpression();
 				checkFor(Token.KET, 2124, "Expecting ')'");
 				return exp;
-
+				
 			case SET_OPEN:
 				nextToken();
 				return readSetOrMapExpression(token.location);

@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.in.definitions;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.statements.INStatement;
@@ -56,7 +57,8 @@ public class INExplicitOperationDefinition extends INDefinition
 	public final INExplicitFunctionDefinition postdef;
 	public final INStateDefinition statedef;
 
-	public INExplicitOperationDefinition(INAccessSpecifier accessSpecifier,
+	public INExplicitOperationDefinition(INAnnotationList annotations,
+		INAccessSpecifier accessSpecifier,
 		TCNameToken name, TCOperationType type,
 		INPatternList parameters, INExpression precondition,
 		INExpression postcondition, INStatement body, boolean isConstructor,
@@ -65,6 +67,7 @@ public class INExplicitOperationDefinition extends INDefinition
 	{
 		super(name.getLocation(), accessSpecifier, name);
 
+		this.annotations = annotations;
 		this.type = type;
 		this.parameterPatterns = parameters;
 		this.precondition = precondition;

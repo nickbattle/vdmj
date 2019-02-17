@@ -34,6 +34,6 @@ public class POCPUClassDefinition extends POClassDefinition
 	public POCPUClassDefinition(TCClassType ctype, PODefinitionList defs,
 		POExplicitOperationDefinition inv, boolean ctors)
 	{
-		super(new TCNameToken(new LexLocation(), "CLASS", "CPU"), ctype, defs, inv, ctors);
+		super(null, new TCNameToken(new LexLocation(), "CLASS", "CPU"), ctype, defs, inv, ctors);
 	}
 }

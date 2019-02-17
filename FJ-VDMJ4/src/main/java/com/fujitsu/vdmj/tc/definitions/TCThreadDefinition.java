@@ -136,7 +136,7 @@ public class TCThreadDefinition extends TCDefinition
 	{
 		TCOperationType type = new TCOperationType(location);	// () ==> ()
 
-		TCExplicitOperationDefinition def = new TCExplicitOperationDefinition(TCAccessSpecifier.DEFAULT,
+		TCExplicitOperationDefinition def = new TCExplicitOperationDefinition(null, TCAccessSpecifier.DEFAULT,
 			operationName, type, new TCPatternList(), null, null, statement);
 
 		def.setAccessSpecifier(accessSpecifier);

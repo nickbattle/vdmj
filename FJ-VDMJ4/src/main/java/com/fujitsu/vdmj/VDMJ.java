@@ -219,6 +219,10 @@ abstract public class VDMJ
     		{
     			Settings.measureChecks = false;
     		}
+    		else if (arg.equals("-annotations"))
+    		{
+    			Settings.annotations = true;
+    		}
     		else if (arg.equals("-log"))
     		{
     			if (i.hasNext())
@@ -506,6 +510,7 @@ abstract public class VDMJ
 		System.err.println("-dtc: disable all dynamic type checking");
 		System.err.println("-exceptions: raise pre/post/inv violations as <RuntimeError>");
 		System.err.println("-measures: disable recursive measure checking");
+		System.err.println("-annotations: enable annotation processing");
 		System.err.println("-log <filename>: enable real-time event logging");
 		System.err.println("-remote <class>: enable remote control");
 		System.err.println("-precision <n>: set real number precision to n places");

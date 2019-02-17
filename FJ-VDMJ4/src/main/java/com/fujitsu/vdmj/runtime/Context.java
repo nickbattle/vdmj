@@ -28,6 +28,7 @@ import java.util.HashMap;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.NameValuePair;
@@ -186,6 +187,25 @@ public class Context extends HashMap<TCNameToken, Value>
 
 		visible.putAll(this);	// Overriding anything below here
 		return visible;
+	}
+	
+	/**
+	 * Get all visible variable names from the Context, with more visible
+	 * values overriding those below.
+	 * 
+	 * @return a TCNameList of checkable names.
+	 */
+	public TCNameList getVisibleNames()
+	{
+		TCNameList names = new TCNameList();
+
+		if (outer != null)
+		{
+			names.addAll(outer.getVisibleNames());
+		}
+		
+		names.addAll(keySet());
+		return names;
 	}
 
 	/**

@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -48,6 +49,9 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	
 	/** A pointer to the enclosing class definition, if any. */
 	public POClassDefinition classDefinition = null;	// Set in subclass constructors.
+	
+	/** A list of annotations, if any */
+	public POAnnotationList annotations = null;
 
 	/**
 	 * Create a new definition of a particular name and location.

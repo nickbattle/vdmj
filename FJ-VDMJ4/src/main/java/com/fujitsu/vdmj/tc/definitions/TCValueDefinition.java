@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -54,10 +55,12 @@ public class TCValueDefinition extends TCDefinition
 	private TCDefinitionList defs = null;
 	protected TCType expType = null;
 
-	public TCValueDefinition(TCAccessSpecifier accessSpecifier, TCPattern p, TCType type, TCExpression exp)
+	public TCValueDefinition(TCAnnotationList annotations,
+			TCAccessSpecifier accessSpecifier, TCPattern p, TCType type, TCExpression exp)
 	{
 		super(Pass.VALUES, p.location, null, NameScope.GLOBAL);
 
+		this.annotations = annotations;
 		this.pattern = p;
 		this.type = type;
 		this.exp = exp;
@@ -154,6 +157,8 @@ public class TCValueDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.tcBefore(this, base, scope);
+
 		getDefinitions().setExcluded(true);
 		expType = exp.typeCheck(base, null, scope, type);
 		getDefinitions().setExcluded(false);
@@ -196,6 +201,8 @@ public class TCValueDefinition extends TCDefinition
 		pattern.typeResolve(base);
 		updateDefs();
 		defs.typeCheck(base, scope);
+
+		if (annotations != null) annotations.tcAfter(this, type, base, scope);
 	}
 	
 	private void updateDefs()

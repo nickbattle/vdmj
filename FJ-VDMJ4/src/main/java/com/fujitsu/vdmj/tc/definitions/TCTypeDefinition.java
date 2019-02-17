@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -31,6 +32,7 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -81,13 +83,14 @@ public class TCTypeDefinition extends TCDefinition
 	public boolean infinite = false;
 	private TCDefinitionList composeDefinitions;
 
-	public TCTypeDefinition(TCAccessSpecifier accessSpecifier, TCNameToken name,
+	public TCTypeDefinition(TCAnnotationList annotations, TCAccessSpecifier accessSpecifier, TCNameToken name,
 		TCInvariantType type, TCPattern invPattern, TCExpression invExpression,
 		TCPattern eqPattern1, TCPattern eqPattern2, TCExpression eqExpression,
 		TCPattern ordPattern1, TCPattern ordPattern2, TCExpression ordExpression)
 	{
 		super(Pass.TYPES, name.getLocation(), name, NameScope.TYPENAME);
 
+		this.annotations = annotations;
 		this.accessSpecifier = accessSpecifier;
 		this.type = type;
 		this.invPattern = invPattern;
@@ -174,7 +177,7 @@ public class TCTypeDefinition extends TCDefinition
 			for (TCType compose: nt.type.getComposeTypes())
 			{
 				TCRecordType rtype = (TCRecordType)compose;
-				composeDefinitions.add(new TCTypeDefinition(TCAccessSpecifier.DEFAULT,
+				composeDefinitions.add(new TCTypeDefinition(null, TCAccessSpecifier.DEFAULT,
 						rtype.name, rtype, null, null, null, null, null, null, null, null));
 			}
 		}
@@ -235,6 +238,8 @@ public class TCTypeDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.tcBefore(this, base, scope);
+
 		// We have to perform the type check in two passes because the invariants can depend on
 		// the types of "values" that have not been set yet. Initially, pass == TYPES.
 		
@@ -306,7 +311,7 @@ public class TCTypeDefinition extends TCDefinition
 				for (TCType compose: TypeComparator.checkComposeTypes(nt.type, base, true))
 				{
 					TCRecordType rtype = (TCRecordType)compose;
-					TCDefinition cdef = new TCTypeDefinition(accessSpecifier,
+					TCDefinition cdef = new TCTypeDefinition(null, accessSpecifier,
 							rtype.name, rtype, null, null, null, null, null, null, null, null);
 					composeDefinitions.add(cdef);
 				}
@@ -344,6 +349,8 @@ public class TCTypeDefinition extends TCDefinition
 				}
 			}
 		}
+
+		if (annotations != null) annotations.tcAfter(this, type, base, scope);
 	}
 
 	@Override
@@ -466,7 +473,7 @@ public class TCTypeDefinition extends TCDefinition
 		TCFunctionType ftype =
 			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier,
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier,
 			name.getInvName(loc), null, ftype, parameters, invExpression, null, null, true, null);
 
 		def.classDefinition = classDefinition;
@@ -502,7 +509,7 @@ public class TCTypeDefinition extends TCDefinition
 		TCFunctionType ftype =
 			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier,
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier,
 			fname, null, ftype, parameters, exp, null, null, false, null);
 
 		def.classDefinition = classDefinition;
@@ -544,7 +551,7 @@ public class TCTypeDefinition extends TCDefinition
 			// Never reached
 		}
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier,
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier,
 			fname, null, ftype, parameters, body, null, null, false, null);
 
 		def.classDefinition = classDefinition;

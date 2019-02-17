@@ -29,8 +29,8 @@ public class Mapping
 {
 	public enum Type { MAP, UNMAPPED, PACKAGE, EOF, ERROR }
 
-	public static final Mapping EOF = new Mapping(0, Type.EOF, null, null, null, null);
-	public static final Mapping ERROR = new Mapping(0, Type.ERROR, null, null, null, null);
+	public static final Mapping EOF = new Mapping(0, Type.EOF, null, null, null, null, null);
+	public static final Mapping ERROR = new Mapping(0, Type.ERROR, null, null, null, null, null);
 	
 	public final int lineNo;
 	public final Type type;
@@ -38,8 +38,10 @@ public class Mapping
 	public final List<String> varnames;
 	public final String destination;
 	public final List<String> paramnames;
+	public final List<String> setnames;
 	
-	public Mapping(int lineNo, Type type, String srcClass, List<String> varnames, String destClass, List<String> paramnames)
+	public Mapping(int lineNo, Type type, String srcClass,
+			List<String> varnames, String destClass, List<String> paramnames, List<String> setnames)
 	{
 		this.lineNo = lineNo;
 		this.type = type;
@@ -47,5 +49,6 @@ public class Mapping
 		this.varnames = varnames;
 		this.destination = destClass;
 		this.paramnames = paramnames;
+		this.setnames = setnames;
 	}
 }

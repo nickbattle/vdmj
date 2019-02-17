@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import java.io.Serializable;
 
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -45,6 +46,9 @@ public abstract class TCExpression extends TCNode implements Serializable
 
 	/** The textual location of the expression. */
 	public final LexLocation location;
+	
+	/** A list of comments preceding the expression */
+	public LexCommentList comments;
 
 	/**
 	 * Generate an expression at the given location.
@@ -241,5 +245,13 @@ public abstract class TCExpression extends TCNode implements Serializable
 		{
 			TypeChecker.detail2(tag1, obj1, tag2, obj2);
 		}
+	}
+	
+	/**
+	 * Set the comments field.
+	 */
+	public void setComments(LexCommentList comments)
+	{
+		this.comments = comments;
 	}
 }

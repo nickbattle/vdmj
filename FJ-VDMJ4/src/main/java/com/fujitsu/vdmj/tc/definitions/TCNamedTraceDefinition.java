@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.traces.TCTraceDefinitionTerm;
@@ -41,10 +42,11 @@ public class TCNamedTraceDefinition extends TCDefinition
 	private static final long serialVersionUID = 1L;
 	public final TCTraceDefinitionTermList terms;
 
-	public TCNamedTraceDefinition(LexLocation location, TCNameToken name, TCTraceDefinitionTermList terms)
+	public TCNamedTraceDefinition(TCAnnotationList annotations, LexLocation location, TCNameToken name, TCTraceDefinitionTermList terms)
 	{
 		super(Pass.DEFS, location, name, NameScope.GLOBAL);
 
+		this.annotations = annotations;
 		this.terms = terms;
 		setAccessSpecifier(new TCAccessSpecifier(false, false, Token.PUBLIC, false));
 		markUsed();		// Traces are never called, so this makes sense
@@ -89,6 +91,8 @@ public class TCNamedTraceDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.tcBefore(this, base, scope);
+
 		if (base.isVDMPP())
 		{
 			base = new FlatEnvironment(getSelfDefinition(), base);
@@ -98,5 +102,7 @@ public class TCNamedTraceDefinition extends TCDefinition
 		{
 			term.typeCheck(base, NameScope.NAMESANDSTATE);
 		}
+
+		if (annotations != null) annotations.tcAfter(this, getType(), base, scope);
 	}
 }
