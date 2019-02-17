@@ -367,4 +367,19 @@ public class ModuleInterpreter extends Interpreter
 
 		return main.getList();
 	}
+
+	public TCModuleList getTC()
+	{
+		return checkedModules;
+	}
+
+	public INModuleList getIN()
+	{
+		return executableModules;
+	}
+
+	public POModuleList getPO()
+	{
+		return pogModules;
+	}
 }

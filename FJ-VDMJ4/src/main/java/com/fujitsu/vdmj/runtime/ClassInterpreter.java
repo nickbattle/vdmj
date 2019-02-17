@@ -493,4 +493,19 @@ public class ClassInterpreter extends Interpreter
 
 		return main.getList();
 	}
+
+	public TCClassList getTC()
+	{
+		return checkedClasses;
+	}
+
+	public INClassList getIN()
+	{
+		return executableClasses;
+	}
+
+	public POClassList getPO()
+	{
+		return pogClasses;
+	}
 }
