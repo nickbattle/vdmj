@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.definitions;
 
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.runtime.Context;
@@ -48,7 +49,7 @@ public class INTypeDefinition extends INDefinition
 	public final INExplicitFunctionDefinition mindef;
 	public final INExplicitFunctionDefinition maxdef;
 
-	public INTypeDefinition(INAccessSpecifier accessSpecifier, TCNameToken name,
+	public INTypeDefinition(INAnnotationList annotations, INAccessSpecifier accessSpecifier, TCNameToken name,
 			TCInvariantType type, INPattern invPattern, INExpression invExpression,
 			INExplicitFunctionDefinition invdef, INExplicitFunctionDefinition eqdef,
 			INExplicitFunctionDefinition orddef, INExplicitFunctionDefinition mindef,
@@ -56,6 +57,7 @@ public class INTypeDefinition extends INDefinition
 	{
 		super(name.getLocation(), accessSpecifier, name);
 
+		this.annotations = annotations;
 		this.type = type;
 		this.invPattern = invPattern;
 		this.invExpression = invExpression;

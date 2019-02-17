@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
@@ -45,6 +46,7 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.scheduler.CTMainThread;
@@ -197,6 +199,7 @@ public class ModuleInterpreter extends Interpreter
 	{
 		scheduler.init();
 		CPUValue.init(scheduler);
+		INAnnotation.init();
 		initialContext = executableModules.creatInitialContext();
 		executableModules.initialize(initialContext);
 	}
@@ -336,6 +339,7 @@ public class ModuleInterpreter extends Interpreter
 			VDMJ.mapperStats(now, PONode.MAPPINGS);
 		}
 		
+		POAnnotation.doInit();
 		return pogModules.getProofObligations();
 	}
 

@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.Value;
 
@@ -93,6 +94,28 @@ public class ClassContext extends RootContext
 		}
 
 		return v;
+	}
+	
+	@Override
+	public TCNameList getVisibleNames()
+	{
+		TCNameList names = new TCNameList();
+		
+		Context g = getGlobal();
+
+		if (g != this)
+		{
+			names.addAll(g.getVisibleNames());
+		}
+
+		if (freeVariables != null)
+		{
+			names.addAll(freeVariables.keySet());
+		}
+		
+		names.addAll(classdef.getStatics().keySet());
+		names.addAll(keySet());
+		return names;
 	}
 
 	@Override

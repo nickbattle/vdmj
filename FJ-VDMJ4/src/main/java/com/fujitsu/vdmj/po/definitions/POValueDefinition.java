@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
@@ -48,9 +49,11 @@ public class POValueDefinition extends PODefinition
 	public final POExpression exp;
 	public final TCType expType;
 
-	public POValueDefinition(POPattern p, TCType type, POExpression exp, TCType expType)
+	public POValueDefinition(POAnnotationList annotations, POPattern p, TCType type, POExpression exp, TCType expType)
 	{
 		super(p.location, null);
+		
+		this.annotations = annotations;
 		this.pattern = p;
 		this.type = type;
 		this.exp = exp;
@@ -96,7 +99,10 @@ public class POValueDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		ProofObligationList list = exp.getProofObligations(ctxt);
+		ProofObligationList list =
+				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
+
+		list.addAll(exp.getProofObligations(ctxt));
 
 		if (!(pattern instanceof POIdentifierPattern) &&
 			!(pattern instanceof POIgnorePattern) &&
@@ -131,6 +137,7 @@ public class POValueDefinition extends PODefinition
 			list.add(new SubTypeObligation(exp, type, expType, ctxt));
 		}
 
+		if (annotations != null) annotations.poAfter(this, list, ctxt);
 		return list;
 	}
 }

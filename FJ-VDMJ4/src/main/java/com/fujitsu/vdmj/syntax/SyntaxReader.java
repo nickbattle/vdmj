@@ -24,10 +24,16 @@
 package com.fujitsu.vdmj.syntax;
 
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
+import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
@@ -45,7 +51,6 @@ import com.fujitsu.vdmj.messages.VDMWarning;
 /**
  * The parent class of all syntax readers.
  */
-
 public abstract class SyntaxReader
 {
 	/** The lexical analyser. */
@@ -326,6 +331,61 @@ public abstract class SyntaxReader
 
 		throwMessage(2061, message);
 		return null;
+	}
+	
+	/**
+	 * Read any annotations from the collected comments, and clear them. Note that we
+	 * don't parse annotations while inside the annotation parser.
+	 */
+	private static int readingAnnotations = 0;
+
+	protected ASTAnnotationList readAnnotations(LexCommentList comments) throws LexException, ParserException
+	{
+		ASTAnnotationList annotations = new ASTAnnotationList();
+
+		if (!Settings.annotations || readingAnnotations > 0)
+		{
+			return annotations;
+		}
+		else
+		{
+			readingAnnotations++;
+		}
+		
+		for (int i=0; i<comments.size(); i++)
+		{
+			if (comments.comment(i).trim().startsWith("@"))
+			{
+				try
+				{
+					annotations.add(readAnnotation(new LexTokenReader(
+							comments.comment(i), comments.location(i), reader)));
+				}
+				catch (Exception e)
+				{
+					// ignore - comment is not parsable
+				}
+			}
+		}
+		
+		readingAnnotations--;
+		return annotations;
+	}
+	
+	private ASTAnnotation readAnnotation(LexTokenReader ltr) throws LexException, ParserException
+	{
+		ltr.nextToken();
+		
+		if (ltr.nextToken().is(Token.IDENTIFIER))
+		{
+			LexIdentifierToken name = (LexIdentifierToken)ltr.getLast(); 
+			ASTAnnotation annotation = loadAnnotation(name);
+			ASTExpressionList args = annotation.parse(ltr);
+			annotation.setArgs(args);
+			return annotation;
+		}
+		
+		throw new LexException(0, "Comment doesn't start with @Annotation", new LexLocation());
 	}
 
 	/**
@@ -689,5 +749,38 @@ public abstract class SyntaxReader
 	public String toString()
 	{
 		return reader.toString();
+	}
+
+	protected ASTAnnotation loadAnnotation(LexIdentifierToken name)
+		throws ParserException, LexException
+	{
+		String classpath = System.getProperty("vdmj.annotations", "com.fujitsu.vdmj.ast.annotations;annotations.ast");
+		String[] packages = classpath.split(";|:");
+		
+		for (String pack: packages)
+		{
+			try
+			{
+				Class<?> clazz = Class.forName(pack + ".AST" + name + "Annotation");
+				Constructor<?> ctor = clazz.getConstructor(LexIdentifierToken.class);
+				return (ASTAnnotation) ctor.newInstance(name);
+			}
+			catch (ClassNotFoundException e)
+			{
+				// Try the next package
+			}
+			catch (Exception e)
+			{
+				throwMessage(2334, "Failed to instantiate AST" + name + "Annotation");
+			}
+		}
+
+		throwMessage(2334, "Cannot find AST" + name + "Annotation on " + classpath);
+		return null;
+	}
+	
+	protected LexCommentList getComments()
+	{
+		return reader.getComments();
 	}
 }

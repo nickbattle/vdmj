@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.typechecker;
 
+import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -111,6 +112,14 @@ public class ClassTypeChecker extends TypeChecker
 			c.checkOver();
 		}
 
+		// Initialise any annotations
+		TCAnnotation.init();
+
+		for (TCClassDefinition c: classes)
+		{
+			if (c.annotations != null) c.annotations.tcBefore(c, null, NameScope.NAMES);
+		}
+
 	    for (Pass pass: Pass.values())
 		{
         	for (TCClassDefinition c: classes)
@@ -135,7 +144,12 @@ public class ClassTypeChecker extends TypeChecker
     		}
 		}
 	    
-	    TCDefinitionList allDefs = new TCDefinitionList();
+		for (TCClassDefinition c: classes)
+		{
+			if (c.annotations != null) c.annotations.tcAfter(c, c.getType(), null, NameScope.NAMES);
+		}
+
+		TCDefinitionList allDefs = new TCDefinitionList();
 
     	for (TCClassDefinition c: classes)
 		{

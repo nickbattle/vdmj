@@ -28,6 +28,7 @@ import java.util.ListIterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSubclassResponsibilityExpression;
@@ -67,7 +68,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	public final TCExpression postcondition;
 	public final TCExpression body;
 	public final boolean isTypeInvariant;
-	public final TCExpression measureExp;
+	public final TCExpression measure;
 	public final boolean isCurried;
 
 	public TCExplicitFunctionDefinition predef;
@@ -82,14 +83,16 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	public TCExplicitFunctionDefinition measureDef;
 	public TCNameToken measureName;
 
-	public TCExplicitFunctionDefinition(TCAccessSpecifier accessSpecifier, TCNameToken name,
+	public TCExplicitFunctionDefinition(TCAnnotationList annotations,
+		TCAccessSpecifier accessSpecifier, TCNameToken name,
 		TCNameList typeParams, TCFunctionType type,
 		TCPatternListList parameters, TCExpression body,
 		TCExpression precondition,
-		TCExpression postcondition, boolean typeInvariant, TCExpression measureExp)
+		TCExpression postcondition, boolean typeInvariant, TCExpression measure)
 	{
 		super(Pass.DEFS, name.getLocation(), name, NameScope.GLOBAL);
 
+		this.annotations = annotations;
 		this.accessSpecifier = accessSpecifier;
 		this.typeParams = typeParams;
 		this.type = type;
@@ -98,7 +101,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		this.postcondition = postcondition;
 		this.body = body;
 		this.isTypeInvariant = typeInvariant;
-		this.measureExp = measureExp;
+		this.measure = measure;
 		this.isCurried = parameters.size() > 1;
 
 		type.definitions = new TCDefinitionList(this);
@@ -229,6 +232,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.tcBefore(this, base, scope);
+
 		TCDefinitionList defs = new TCDefinitionList();
 
 		if (typeParams != null)
@@ -319,13 +324,13 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			report(3329, "Abstract function/operation must be public or protected");
 		}
 
-		if (measureExp == null && recursive)
+		if (measure == null && recursive)
 		{
 			warning(5012, "Recursive function has no measure");
 		}
-		else if (measureExp instanceof TCVariableExpression)
+		else if (measure instanceof TCVariableExpression)
 		{
-			TCVariableExpression exp = (TCVariableExpression)measureExp;
+			TCVariableExpression exp = (TCVariableExpression)measure;
 			if (base.isVDMPP()) exp.name.setTypeQualifier(getMeasureParams());
 			TCDefinition def = base.findName(exp.name, scope);
 			
@@ -338,13 +343,13 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				setMeasureExp(base, local, scope);
 			}
 		}
-		else if (measureExp instanceof TCNotYetSpecifiedExpression)
+		else if (measure instanceof TCNotYetSpecifiedExpression)
 		{
 			// Undefined measure, so ignore (without warning).
 			measureDef = null;
 			measureName = null;
 		}
-		else if (measureExp != null)
+		else if (measure != null)
 		{
 			setMeasureExp(base, local, scope);
 		}
@@ -355,6 +360,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		{
 			local.unusedCheck();
 		}
+
+		if (annotations != null) annotations.tcAfter(this, type, base, scope);
 	}
 
 	/**
@@ -362,8 +369,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	 */
 	private void setMeasureExp(Environment base, Environment local, NameScope scope)
 	{
-		TCType actual = measureExp.typeCheck(local, null, NameScope.NAMES, null);
-		measureName = name.getMeasureName(measureExp.location);
+		TCType actual = measure.typeCheck(local, null, NameScope.NAMES, null);
+		measureName = name.getMeasureName(measure.location);
 		checkMeasure(measureName, actual);
 		
 		// Concatenate the parameter patterns into one list for curried measures
@@ -377,8 +384,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		TCPatternListList cpll = new TCPatternListList();
 		cpll.add(all);
 		
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, measureName,
-				typeParams, type.getMeasureType(isCurried, actual), cpll, measureExp, null, null, false, null);
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
+				typeParams, type.getMeasureType(isCurried, actual), cpll, measure, null, null, false, null);
 
 		def.classDefinition = classDefinition;
 		def.typeResolve(base);
@@ -641,7 +648,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 	private TCExplicitFunctionDefinition getPreDefinition()
 	{
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getPreName(precondition.location),
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getPreName(precondition.location),
 			typeParams, type.getCurriedPreType(isCurried), paramPatternList, precondition, null, null, false, null);
 
 		def.classDefinition = classDefinition;
@@ -669,7 +676,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 		parameters.add(last);
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getPostName(postcondition.location),
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getPostName(postcondition.location),
 			typeParams, type.getCurriedPostType(isCurried), parameters, postcondition, null, null, false, null);
 
 		def.classDefinition = classDefinition;

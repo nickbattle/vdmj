@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.in.definitions;
 import java.io.Serializable;
 
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -56,6 +57,9 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 
 	/** A pointer to the enclosing class definition, if any. */
 	public INClassDefinition classDefinition = null;
+	
+	/** A list of annotations, if any */
+	public INAnnotationList annotations = null;
 
 	/**
 	 * Create a new definition of a particular name and location.

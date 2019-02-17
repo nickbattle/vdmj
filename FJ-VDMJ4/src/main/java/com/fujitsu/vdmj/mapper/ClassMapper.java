@@ -26,7 +26,11 @@ package com.fujitsu.vdmj.mapper;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -138,31 +142,36 @@ public class ClassMapper
 	
 	/**
 	 * A class to define how to construct one destPackage class, passing srcPackage
-	 * object fields to the Constructor.
+	 * object fields to the Constructor and setter methods.
 	 */
 	private static class MapParams
 	{
 		public final int lineNo;
 		public final Class<?> srcClass;
 		public final Class<?> destClass;
-		public final List<Field> srcFields;
+		public final List<Field> ctorFields;
+		public final List<Field> setterFields;
 		public final boolean unmapped;
 
 		public Constructor<?> constructor;
+		public Method[] setters;
 
-		public MapParams(int lineNo, Class<?> srcClass, Class<?> destClass, List<Field> srcFields, boolean unmapped)
+		public MapParams(int lineNo, Class<?> srcClass, Class<?> destClass,
+				List<Field> ctorFields, List<Field> setterFields, boolean unmapped)
 		{
 			this.lineNo = lineNo;
 			this.srcClass = srcClass;
 			this.destClass = destClass;
-			this.srcFields = srcFields;
+			this.ctorFields = ctorFields;
+			this.setterFields = setterFields;
 			this.unmapped = unmapped;	
 		}
 		
 		@Override
 		public String toString()
 		{
-			return "map " + srcClass.getSimpleName() + " to " + destClass.getSimpleName();
+			return "map " + srcClass.getSimpleName() + " to " + destClass.getSimpleName() +
+					(setterFields.isEmpty() ? "" : " set " + setterFields);
 		}
 	}
 	
@@ -173,47 +182,56 @@ public class ClassMapper
 	}
 
 	/**
-	 * Read a mappings file and populate the mappings table. 
+	 * Read mappings file(s) from the classpath and populate the mappings table. 
 	 */
 	private void readMappings() throws Exception
 	{
-		InputStream is = getClass().getResourceAsStream("/" + configFile);
-		MappingReader reader = new MappingReader(configFile, is);
+		Enumeration<URL> urls = ClassLoader.getSystemResources(configFile);
 		
-		try
+		while (urls.hasMoreElements())
 		{
-			while (true)
+			URL url = urls.nextElement();
+			InputStream is = url.openStream();
+			MappingReader reader = new MappingReader(configFile, is);
+			
+			try
 			{
-    			Mapping command = reader.readCommand();
-    			lineNo = command.lineNo;
-    
-    			switch (command.type)
-    			{
-    				case PACKAGE:
-    					processPackage(command);
-    					break;
-    					
-    				case MAP:
-    					processMap(command);
-    					break;
-    					
-    				case UNMAPPED:
-    					processUnmapped(command);
-    					break;
-    					
-    				case EOF:
-    					return;
-    					
-					case ERROR:
-						// try next line
-						errorCount++;
-						break;
-    			}
+				boolean eof = false;
+				
+				while (!eof)
+				{
+	    			Mapping command = reader.readCommand();
+	    			lineNo = command.lineNo;
+	    
+	    			switch (command.type)
+	    			{
+	    				case PACKAGE:
+	    					processPackage(command);
+	    					break;
+	    					
+	    				case MAP:
+	    					processMap(command);
+	    					break;
+	    					
+	    				case UNMAPPED:
+	    					processUnmapped(command);
+	    					break;
+	    					
+	    				case EOF:
+	    					eof = true;
+	    					break;
+	    					
+						case ERROR:
+							// try next line
+							errorCount++;
+							break;
+	    			}
+				}
 			}
-		}
-		finally
-		{
-    		reader.close();
+			finally
+			{
+	    		reader.close();
+			}
 		}
 	}
 
@@ -222,7 +240,7 @@ public class ClassMapper
 		try
 		{
 			Class<?> toIgnore = Class.forName(command.source);
-			mappings.put(toIgnore, new MapParams(lineNo, toIgnore, toIgnore, null, true));
+			mappings.put(toIgnore, new MapParams(lineNo, toIgnore, toIgnore, null, null, true));
 		}
 		catch (ClassNotFoundException e)
 		{
@@ -242,6 +260,7 @@ public class ClassMapper
 		List<String> srcParams = command.varnames;
 		String destClassname = command.destination;
 		List<String> destParams = command.paramnames;
+		List<String> destSetters = command.setnames;
 		
 		try
 		{
@@ -255,8 +274,6 @@ public class ClassMapper
 				srcFields.put(fieldname, findField(srcClass, fieldname));
 			}
 			
-			List<Field> selectedFields = new Vector<Field>();
-			
 			if (Modifier.isAbstract(srcClass.getModifiers()))
 			{
 				if (!Modifier.isAbstract(destClass.getModifiers()))
@@ -264,9 +281,9 @@ public class ClassMapper
 					error("Source " + srcClassname + " is abstract, but mapping is not");
 				}
 				
-				if (!srcParams.isEmpty())
+				if (!destParams.isEmpty())
 				{
-					error("Abstract class cannot have parameter substitutions");
+					error("Abstract class cannot have ctor parameter substitutions");
 				}
 			}
 			else if (Modifier.isAbstract(destClass.getModifiers()))
@@ -274,15 +291,30 @@ public class ClassMapper
 				error("Mapped " + destClassname + " is abstract, but source is not");
 			}
 
+			List<Field> ctorFields = new Vector<Field>();
+			List<Field> setterFields = new Vector<Field>();
+			
 			for (String field: destParams)
 			{
 				if (field.equals("this"))
 				{
-					selectedFields.add(SELF);
+					ctorFields.add(SELF);
 				}
 				else if (srcFields.containsKey(field))
 				{
-					selectedFields.add(srcFields.get(field));
+					ctorFields.add(srcFields.get(field));
+				}
+				else
+				{
+					error("Field not identified in " + srcClassname + ": " + field);
+				}
+			}
+			
+			for (String field: destSetters)
+			{
+				if (srcFields.containsKey(field))
+				{
+					setterFields.add(srcFields.get(field));
 				}
 				else
 				{
@@ -292,13 +324,21 @@ public class ClassMapper
 			
 			for (String field: srcParams)
 			{
-				if (!destParams.contains(field))
+				if (!destParams.contains(field) && !destSetters.contains(field))
 				{
-					error("Field not used in constructor " + destClassname + ": " + field);
+					error("Field not used in constructor or setters, " + destClassname + ": " + field);
 				}
 			}
 
-			mappings.put(srcClass, new MapParams(lineNo, srcClass, destClass, selectedFields, false));
+			for (String field: destParams)
+			{
+				if (destSetters.contains(field))
+				{
+					error("Field used in constructor and setter, " + destClassname + ": " + field);
+				}
+			}
+
+			mappings.put(srcClass, new MapParams(lineNo, srcClass, destClass, ctorFields, setterFields, false));
 		}
 		catch (ClassNotFoundException e)
 		{
@@ -343,10 +383,10 @@ public class ClassMapper
 			}
 			else
 			{
-				Class<?>[] paramTypes = new Class<?>[mp.srcFields.size()];
+				Class<?>[] paramTypes = new Class<?>[mp.ctorFields.size()];
 				int a = 0;
 				
-				for (Field field: mp.srcFields)
+				for (Field field: mp.ctorFields)
 				{
 					Class<?> fieldType = null;
 					MapParams mapping = null;
@@ -397,9 +437,38 @@ public class ClassMapper
 					
 					System.err.println();
 				}
-				catch (NoClassDefFoundError e)
+				
+				mp.setters = new Method[mp.setterFields.size()];
+				a = 0;
+				
+				for (Field field: mp.setterFields)
 				{
-					error("No class definition found: " + mp.destClass.getSimpleName());
+					Class<?> fieldType = field.getType();
+					MapParams mapping = mappings.get(fieldType);
+					Class<?> argType = null;
+					
+					if (mapping == null || mapping.unmapped)
+					{
+						argType = fieldType;	// eg. java.lang.String unmapped
+					}
+					else
+					{
+						argType = mapping.destClass;
+					}
+
+					StringBuilder name = new StringBuilder(field.getName());
+					name.setCharAt(0, Character.toUpperCase(name.charAt(0)));
+
+					try
+					{
+						lineNo = mp.lineNo;		// For error reporting :)
+						mp.setters[a++] = mp.destClass.getMethod("set" + name, argType);
+					}
+					catch (NoSuchMethodException e)
+					{
+						error("No such setter: " + mp.destClass.getSimpleName() +
+								".set" + name + "(" + argType.getSimpleName() + ")");
+					}
 				}
 			}
 		}
@@ -519,10 +588,10 @@ public class ClassMapper
     		}
     		else
     		{
-    			Object[] args = new Object[mp.srcFields.size()];
+    			Object[] args = new Object[mp.ctorFields.size()];
     			int a = 0;
     
-    			for (Field field: mp.srcFields)
+    			for (Field field: mp.ctorFields)
     			{
     				if (field == SELF)	// ie. "this"
     				{
@@ -545,8 +614,27 @@ public class ClassMapper
     			}
     			
     			result = (T) mp.constructor.newInstance(args);
+    			int s = 0;
+    			
+    			for (Field setter: mp.setterFields)
+    			{
+					setter.setAccessible(true);
+					Object fieldvalue = setter.get(source);
+					Object arg = null;
+					
+					if (isInProgress(fieldvalue) == null)
+					{
+						arg = convert(fieldvalue);
+					}
+					else
+					{
+						arg = null;
+					}
+					
+    				mp.setters[s++].invoke(result, arg);
+    			}
  
-    			for (Field field: mp.srcFields)
+    			for (Field field: mp.ctorFields)
     			{
     				if (field != SELF)
     				{
@@ -558,7 +646,32 @@ public class ClassMapper
             			}
     				}
     			}
+    			 
+    			for (Field field: mp.setterFields)
+    			{
+					Progress progress = isInProgress(field.get(source));
+
+					if (progress != null)
+					{
+        				progress.updates.add(new Pair(result, field.getName()));
+        			}
+    			}
      		}
+		}
+		catch (InvocationTargetException e)
+		{
+			if (e.getCause() instanceof Exception)
+			{
+				throw (Exception)e.getCause();
+			}
+			else if (e.getTargetException() instanceof Exception)
+			{
+				throw (Exception)e.getTargetException();
+			}
+			else
+			{
+				throw e;
+			}
 		}
 		finally
 		{

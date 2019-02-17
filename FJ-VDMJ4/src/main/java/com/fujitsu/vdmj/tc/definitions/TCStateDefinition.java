@@ -168,6 +168,8 @@ public class TCStateDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.tcBefore(this, base, scope);
+
 		if (pass == Pass.TYPES)
 		{
 			if (base.findStateDefinition() != this)
@@ -196,6 +198,8 @@ public class TCStateDefinition extends TCDefinition
 				initdef.typeCheck(base, scope);
 			}
 		}
+
+		if (annotations != null) annotations.tcAfter(this, recordType, base, scope);
 	}
 
 	@Override
@@ -275,7 +279,7 @@ public class TCStateDefinition extends TCDefinition
 		ptypes.add(new TCUnresolvedType(name));
 		TCFunctionType ftype = new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(TCAccessSpecifier.DEFAULT, name.getInvName(loc),
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, TCAccessSpecifier.DEFAULT, name.getInvName(loc),
 			null, ftype, parameters, invExpression, null, null, true, null);
 
 		ftype.definitions = new TCDefinitionList(def);
@@ -297,7 +301,7 @@ public class TCStateDefinition extends TCDefinition
 
 		TCExpression body = new TCStateInitExpression(this);
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(TCAccessSpecifier.DEFAULT, name.getInitName(loc),
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, TCAccessSpecifier.DEFAULT, name.getInitName(loc),
 			null, ftype, parameters, body, null, null, false, null);
 
 		ftype.definitions = new TCDefinitionList(def);

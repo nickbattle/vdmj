@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.statements;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -50,6 +51,9 @@ public abstract class TCStatement extends TCNode implements Serializable
 
 	/** The location of the statement. */
 	public final LexLocation location;
+	
+	/** A list of comments preceding the statement */
+	public LexCommentList comments;
 	
 	/**
 	 * Create a statement at the given location.
@@ -192,5 +196,13 @@ public abstract class TCStatement extends TCNode implements Serializable
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Set the comments field.
+	 */
+	public void setComments(LexCommentList comments)
+	{
+		this.comments = comments;
 	}
 }

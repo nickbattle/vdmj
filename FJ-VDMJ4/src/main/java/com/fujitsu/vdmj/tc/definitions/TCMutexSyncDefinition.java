@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCEqualsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCHistoryExpression;
@@ -46,9 +47,10 @@ public class TCMutexSyncDefinition extends TCDefinition
 	private static final long serialVersionUID = 1L;
 	public final TCNameList operations;
 
-	public TCMutexSyncDefinition(LexLocation location, TCNameList operations)
+	public TCMutexSyncDefinition(TCAnnotationList annotations, LexLocation location, TCNameList operations)
 	{
 		super(Pass.DEFS, location, null, NameScope.GLOBAL);
+		this.annotations = annotations;
 		this.operations = operations;
 	}
 
@@ -110,6 +112,8 @@ public class TCMutexSyncDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.tcBefore(this, base, scope);
+
 		TCClassDefinition classdef = base.findClassDefinition();
 
 		if (operations.isEmpty())
@@ -171,6 +175,8 @@ public class TCMutexSyncDefinition extends TCDefinition
     			}
     		}
 		}
+
+		if (annotations != null) annotations.tcAfter(this, getType(), base, scope);
 	}
 
 	public TCExpression getExpression(LexNameToken excluding)

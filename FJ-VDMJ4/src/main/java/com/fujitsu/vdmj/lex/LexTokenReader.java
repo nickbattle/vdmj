@@ -31,6 +31,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.ast.lex.LexCharacterToken;
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
@@ -69,11 +70,14 @@ public class LexTokenReader extends BacktrackInputReader
 	/** True if ch is a quoted double quote, ie. \" */
 	private boolean quotedQuote = false;
 
+	/** Comments read since last getComments call */
+	private LexCommentList comments = new LexCommentList();
+
 	/**
 	 * An inner class to hold all the position details that need to be
 	 * saved and restored on push/pop.
 	 */
-	private class Position
+	public class Position
 	{
     	public int lc;
     	public int cc;
@@ -82,11 +86,11 @@ public class LexTokenReader extends BacktrackInputReader
 
     	public char c;
     	public LexToken l;
+    	public LexCommentList co = new LexCommentList();
 
     	/**
     	 * Create a Position from the outer class' current position details.
     	 */
-
     	@SuppressWarnings("synthetic-access")
 		public Position()
 		{
@@ -97,12 +101,12 @@ public class LexTokenReader extends BacktrackInputReader
 
 			c = ch;
 			l = last;
+			co.addAll(comments);
 		}
 
 		/**
 		 * Set the outer class position details to those contained in this.
 		 */
-
 		@SuppressWarnings("synthetic-access")
 		public void set()
 		{
@@ -113,6 +117,8 @@ public class LexTokenReader extends BacktrackInputReader
 
 			ch = c;
 			last = l;
+			comments.clear();
+			comments.addAll(co);
 		}
 	}
 
@@ -211,6 +217,24 @@ public class LexTokenReader extends BacktrackInputReader
 	}
 
 	/**
+	 * Create a string based LexTokenReader, with the position details of another reader.
+	 */
+	public LexTokenReader(String content, LexLocation location, LexTokenReader reader)
+	{
+		super(content);
+		this.currentModule = reader.currentModule;
+		this.file = location.file;
+		this.dialect = reader.dialect;
+		rdCh();
+		this.linecount = location.startLine;
+		this.charpos = location.startPos;
+		this.charsread = 0;
+		this.tokensread = 0;
+		this.last = null;
+		this.comments.clear();
+	}
+
+	/**
 	 * A string representation of the current location.
 	 */
 	@Override
@@ -230,6 +254,8 @@ public class LexTokenReader extends BacktrackInputReader
 		rdCh();
 		charsread = 0;
 		tokensread = 0;
+		last = null;
+		comments.clear();
 	}
 
 	/**
@@ -333,6 +359,16 @@ public class LexTokenReader extends BacktrackInputReader
 	public int getTokensRead()
 	{
 		return tokensread;
+	}
+	
+	/**
+	 * @return the comments read since last getComments(), and clear.
+	 */
+	public LexCommentList getComments()
+	{
+		LexCommentList list = new LexCommentList(comments);
+		comments.clear();
+		return list;
 	}
 
 	/**
@@ -535,11 +571,16 @@ public class LexTokenReader extends BacktrackInputReader
 			case '-':
 				if (rdCh() == '-')
 				{
+					StringBuilder sb = new StringBuilder();
+					LexLocation here = location(linecount, charpos + 1);
+					
 					while (ch != '\n' && ch != EOF)
 					{
+						sb.append(ch);
 						rdCh();
 					}
 
+					comments.add(here, sb.toString().substring(1), false);
 					return nextToken();
 				}
 				else if (ch == '>')
@@ -806,18 +847,36 @@ public class LexTokenReader extends BacktrackInputReader
 			case '/':
 				if (rdCh() == '*')		// Block comments
 				{
-					while (ch != '/' && ch != EOF)
+					StringBuilder sb = new StringBuilder();
+					rdCh();
+					LexLocation here = location(linecount, charpos);
+					
+					while (ch != EOF)
 					{
-					    while (ch != '*' && ch != EOF) rdCh();
+					    while (ch != '*' && ch != EOF)
+					    {
+					    	sb.append(ch);
+					    	rdCh();
+					    }
 
 					    if (ch == EOF)
 					    {
 					    	throwMessage(1011, tokline, tokpos, "Unterminated block comment");
 					    }
-
-					    rdCh();
+					    else
+					    {
+						    if (rdCh() == '/')
+						    {
+						    	break;
+						    }
+						    else
+						    {
+						    	sb.append('*');
+						    }
+					    }
 					}
 
+					comments.add(here, sb.toString(), true);
 					rdCh();
 					return nextToken();
 				}

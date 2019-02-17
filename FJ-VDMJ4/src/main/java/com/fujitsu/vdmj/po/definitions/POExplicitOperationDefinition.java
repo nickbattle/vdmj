@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.definitions;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
@@ -61,7 +62,8 @@ public class POExplicitOperationDefinition extends PODefinition
 	public final TCType actualResult;
 	public final boolean isConstructor;
 
-	public POExplicitOperationDefinition(TCNameToken name, TCOperationType type,
+	public POExplicitOperationDefinition(POAnnotationList annotations,
+		TCNameToken name, TCOperationType type,
 		POPatternList parameters, POExpression precondition,
 		POExpression postcondition, POStatement body,
 		POExplicitFunctionDefinition predef,
@@ -72,6 +74,7 @@ public class POExplicitOperationDefinition extends PODefinition
 	{
 		super(name.getLocation(), name);
 
+		this.annotations = annotations;
 		this.type = type;
 		this.parameterPatterns = parameters;
 		this.precondition = precondition;
@@ -110,7 +113,8 @@ public class POExplicitOperationDefinition extends PODefinition
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		ProofObligationList obligations = new ProofObligationList();
+		ProofObligationList obligations =
+				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 		TCNameList pids = new TCNameList();
 
 		for (POPattern p: parameterPatterns)
@@ -149,6 +153,7 @@ public class POExplicitOperationDefinition extends PODefinition
 			obligations.add(new SubTypeObligation(this, actualResult, ctxt));
 		}
 
+		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;
 	}
 

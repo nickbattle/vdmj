@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.typechecker;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
@@ -176,6 +177,14 @@ public class ModuleTypeChecker extends TypeChecker
 				}
 			}
 		}
+		
+		// Initialise any annotations
+		TCAnnotation.init();
+
+		for (TCModule m: modules)
+		{
+			if (m.annotations != null) m.annotations.tcBefore(m);
+		}
 
 		// Proceed to type check all definitions, considering types, values
 		// and remaining definitions, in that order.
@@ -211,6 +220,11 @@ public class ModuleTypeChecker extends TypeChecker
 					}
 				}
 			}
+		}
+
+		for (TCModule m: modules)
+		{
+			if (m.annotations != null) m.annotations.tcAfter(m);
 		}
 
 		// Report any discrepancies between the final checked types of

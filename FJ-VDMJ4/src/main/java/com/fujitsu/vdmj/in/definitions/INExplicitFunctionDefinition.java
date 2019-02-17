@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
@@ -66,7 +67,8 @@ public class INExplicitFunctionDefinition extends INDefinition
 	
 	private Map<TCTypeList, FunctionValue> polyfuncs = null;
 
-	public INExplicitFunctionDefinition(INAccessSpecifier accessSpecifier, TCNameToken name,
+	public INExplicitFunctionDefinition(INAnnotationList annotations,
+		INAccessSpecifier accessSpecifier, TCNameToken name,
 		TCNameList typeParams, TCFunctionType type,
 		INPatternListList parameters,
 		INExpression body, INExpression precondition, INExpression postcondition,
@@ -76,6 +78,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 	{
 		super(name.getLocation(), accessSpecifier, name);
 
+		this.annotations = annotations;
 		this.typeParams = typeParams;
 		this.type = type;
 		this.paramPatternList = parameters;

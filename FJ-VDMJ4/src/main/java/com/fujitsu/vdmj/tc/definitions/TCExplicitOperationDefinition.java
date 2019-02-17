@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPostOpExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPreOpExpression;
@@ -77,13 +78,15 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	private TCType actualResult = null;
 	public boolean isConstructor = false;
 
-	public TCExplicitOperationDefinition(TCAccessSpecifier accessSpecifier, TCNameToken name,
+	public TCExplicitOperationDefinition(TCAnnotationList annotations,
+		TCAccessSpecifier accessSpecifier, TCNameToken name,
 		TCOperationType type, TCPatternList parameters,
 		TCExpression precondition, TCExpression postcondition,
 		TCStatement body)
 	{
 		super(Pass.DEFS, name.getLocation(), name, NameScope.GLOBAL);
 
+		this.annotations = annotations;
 		this.accessSpecifier = accessSpecifier;
 		this.type = type;
 		this.parameterPatterns = parameters;
@@ -170,6 +173,8 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
+		if (annotations != null) annotations.tcBefore(this, base, scope);
+
 		scope = NameScope.NAMESANDSTATE;
 		TCTypeList ptypes = type.parameters;
 		TypeComparator.checkComposeTypes(type, base, false);
@@ -324,6 +329,8 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		{
 			local.unusedCheck();
 		}
+
+		if (annotations != null) annotations.tcAfter(this, type, base, scope);
 	}
 
 	@Override
@@ -429,7 +436,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		parameters.add(plist);
 		TCPreOpExpression preop = new TCPreOpExpression(name, precondition, null, state);
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getPreName(precondition.location),
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getPreName(precondition.location),
 			null, type.getPreType(state, classDefinition, accessSpecifier.isStatic),
 			parameters, preop, null, null, false, null);
 
@@ -472,7 +479,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		parameters.add(plist);
 		TCPostOpExpression postop = new TCPostOpExpression(name, precondition, postcondition, null, state);
 
-		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(accessSpecifier, name.getPostName(postcondition.location),
+		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getPostName(postcondition.location),
 			null, type.getPostType(state, classDefinition, accessSpecifier.isStatic),
 			parameters, postop, null, null, false, null);
 

@@ -33,7 +33,7 @@ import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCElementsExpression extends TCSeqExpression
+public class TCElementsExpression extends TCSetExpression
 {
 	private static final long serialVersionUID = 1L;
 	public final TCExpression exp;

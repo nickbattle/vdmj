@@ -23,13 +23,19 @@
 
 package com.fujitsu.vdmj.syntax;
 
+import java.util.Collections;
+
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedStatement;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTAssignmentDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.expressions.ASTUndefinedExpression;
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
@@ -100,6 +106,34 @@ public class StatementReader extends SyntaxReader
 	}
 
 	public ASTStatement readStatement() throws ParserException, LexException
+	{
+		LexCommentList comments = getComments();
+		ASTAnnotationList annotations = readAnnotations(comments);
+		ASTStatement stmt = null;
+
+		if (!annotations.isEmpty())
+		{
+			annotations.astBefore(this);
+			stmt = readAnyStatement();
+			annotations.astAfter(this, stmt);
+			
+			Collections.reverse(annotations);	// Build the chain backwards
+			
+			for (ASTAnnotation annotation: annotations)
+			{
+				stmt = new ASTAnnotatedStatement(annotation.name.location, annotation, stmt);
+			}
+		}
+		else
+		{
+			stmt = readAnyStatement();
+		}
+		
+		stmt.setComments(comments);
+		return stmt;
+	}
+
+	private ASTStatement readAnyStatement() throws ParserException, LexException
 	{
 		ASTStatement stmt = null;
 		LexToken token = lastToken();

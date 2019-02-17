@@ -31,6 +31,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
@@ -45,6 +46,7 @@ import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.definitions.POClassList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.scheduler.CTMainThread;
@@ -177,6 +179,7 @@ public class ClassInterpreter extends Interpreter
 		CPUValue.init(scheduler);
 		BUSValue.init();
 		ObjectValue.init();
+		INAnnotation.init();
 
 		logSwapIn();
 		initialContext = executableClasses.creatInitialContext();
@@ -401,6 +404,7 @@ public class ClassInterpreter extends Interpreter
 			VDMJ.mapperStats(now, PONode.MAPPINGS);
 		}
 		
+		POAnnotation.doInit();
 		return pogClasses.getProofObligations();
 	}
 

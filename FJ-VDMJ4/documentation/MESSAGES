@@ -9,6 +9,7 @@ Messages and warnings are numbered in the following blocks:
 3000-3999	Type checking errors
 4000-4999	Runtime errors
 5000-5999	Warnings
+6000-6999	Annotation messages
 
 Several messages appear to be duplicates, but internally they are raised from
 different places in the code, and so the exact error number may be used to
@@ -386,6 +387,7 @@ as the expected and actual values.
 2331, "Expecting inv, eq or ord clause"
 2332, "Duplicate inv clause"
 2333, "Type eq/ord clauses not available in classic"
+2334, "Failed to instantiate AST<name>Annotation"
 
 
 3000, "Expression does not match declared type"
@@ -746,6 +748,13 @@ as the expected and actual values.
 3354, "Function argument must be instantiated"
 3355, "Cyclic dependency detected"
 3356, "Import of <kind> <name> is <actual kind>"
+3357, "Unknown annotation @<name>"
+3358, "@<name> argument must be an identifier"
+3359, "@<name> only applies to expressions and statements"
+3360, "@<name> not available in VDM-SL"
+3361, "@<name> has no arguments"
+3362, "@<name> only applies to functions or operations"
+3363, "Definition does not @Override superclass"
 
 
 4000, "Cannot instantiate abstract class <class>"
@@ -916,6 +925,7 @@ as the expected and actual values.
 4170, "Cannot convert empty set to set1"
 4171, "Cannot convert <function> to <function>"
 4172, "Values cannot be compared: <first>, <second>"
+4173, "Unknown annotation @<name>"
 
 
 5000, "Definition <name> not used"

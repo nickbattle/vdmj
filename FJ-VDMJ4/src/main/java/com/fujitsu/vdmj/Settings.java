@@ -39,6 +39,7 @@ public class Settings
 	public static boolean dynamictypechecks = true;
 	public static boolean measureChecks = true;
 	public static boolean exceptions = false;
+	public static boolean annotations = false;
 	public static boolean verbose = false;
 
 	public static boolean usingCmdLine = false;

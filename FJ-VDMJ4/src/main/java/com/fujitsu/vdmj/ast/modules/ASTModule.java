@@ -27,8 +27,10 @@ import java.io.File;
 import java.io.Serializable;
 
 import com.fujitsu.vdmj.ast.ASTNode;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.FileList;
@@ -52,6 +54,10 @@ public class ASTModule extends ASTNode implements Serializable
 	public final FileList files;
 	/** True if the module is really a flat file */
 	public final boolean isFlat;
+	/** List of annotations for the module */
+	public ASTAnnotationList annotations;
+	/** Comments that occur before the module */
+	public LexCommentList comments;
 
 	/**
 	 * Create a module from the given name and definitions.
@@ -152,5 +158,15 @@ public class ASTModule extends ASTNode implements Serializable
 		sb.append("\nend " + name.name + "\n");
 
 		return sb.toString();
+	}
+
+	public void setAnnotations(ASTAnnotationList annotations)
+	{
+		this.annotations = annotations;
+	}
+
+	public void setComments(LexCommentList comments)
+	{
+		this.comments = comments;
 	}
 }
