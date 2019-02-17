@@ -22,7 +22,16 @@
  ******************************************************************************/
 package com.fujitsu.vdmj.commands;
 
+import com.fujitsu.vdmj.runtime.Interpreter;
+
 abstract public class CommandPlugin
 {
-	abstract public boolean run(String[] argv);
+	protected final Interpreter interpreter;
+	
+	protected CommandPlugin(Interpreter interpreter)
+	{
+		this.interpreter = interpreter;
+	}
+	
+	abstract public boolean run(String[] argv) throws Exception;
 }
