@@ -1045,42 +1045,13 @@ public class ExpressionReader extends SyntaxReader
 
 				ASTExpression value = args.get(0);
 
-				switch (type)
+				if (type == Token.TOKEN)
 				{
-					case BOOL:
-						exp = new ASTMkBasicExpression(new ASTBooleanType(ve.location), value);
-						break;
-
-					case NAT:
-						exp = new ASTMkBasicExpression(new ASTNaturalType(ve.location), value);
-						break;
-
-					case NAT1:
-						exp = new ASTMkBasicExpression(new ASTNaturalOneType(ve.location), value);
-						break;
-
-					case INT:
-						exp = new ASTMkBasicExpression(new ASTIntegerType(ve.location), value);
-						break;
-
-					case RAT:
-						exp = new ASTMkBasicExpression(new ASTRationalType(ve.location), value);
-						break;
-
-					case REAL:
-						exp = new ASTMkBasicExpression(new ASTRealType(ve.location), value);
-						break;
-
-					case CHAR:
-						exp = new ASTMkBasicExpression(new ASTCharacterType(ve.location), value);
-						break;
-
-					case TOKEN:
-						exp = new ASTMkBasicExpression(new ASTTokenType(ve.location), value);
-						break;
-
-					default:
-						throwMessage(2036, "Expecting mk_<type>");
+					exp = new ASTMkBasicExpression(new ASTTokenType(ve.location), value);
+				}
+				else
+				{
+					throwMessage(2036, "Expecting mk_token");
 				}
 			}
 			else
