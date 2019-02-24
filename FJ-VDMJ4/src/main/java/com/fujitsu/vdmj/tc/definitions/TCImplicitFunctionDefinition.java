@@ -121,7 +121,8 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 				Utils.listToString("(", parameterPatterns, ", ", ")") + result +
 				(body == null ? "" : " ==\n\t" + body) +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
-				(postcondition == null ? "" : "\n\tpost " + postcondition);
+				(postcondition == null ? "" : "\n\tpost " + postcondition) +
+				(measureExp == null ? "" : "\n\tmeasure " + measureExp);
 	}
 	
 	@Override

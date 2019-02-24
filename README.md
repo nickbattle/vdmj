@@ -2,7 +2,7 @@
 # ![Fujitsu Logo](/screenshots/fujitsu.png?raw=true "Fujitsu Logo")VDMJ
 ### Description
 
-VDMJ provides basic tool support for the VDM-SL, VDM++ and VDM-RT specification languages, written in Java. It includes a parser, a type checker, an interpreter (with arbitrary precision arithmetic), a debugger, a proof obligation generator and a combinatorial test generator with coverage recording, as well as JUnit support for automatic testing.
+VDMJ provides basic tool support for the VDM-SL, VDM++ and VDM-RT specification languages, written in Java. It includes a parser, a type checker, an interpreter (with arbitrary precision arithmetic), a debugger, a proof obligation generator and a combinatorial test generator with coverage recording, as well as JUnit support for automatic testing and user definable annotations.
 
 VDMJ is a command line tool, but it is used by the ![Overture](https://github.com/overturetool/overture) project, which adds a graphical Eclipse IDE interface as well as features like code generation (see screen shots below).
 
@@ -18,12 +18,14 @@ VDMJ is a command line tool, but it is used by the ![Overture](https://github.co
 * Supports external libraries and remote control (tool integration)
 * Provides JUnit support for automatic testing of specifications
 * Supports arbitrary precision arithmetic
+* Supports user defined annotations
 
 ### Documentation
 * ![User Guide](/FJ-VDMJ4/documentation/UserGuide.pdf "User Guide")
 * ![One Page Guide](/FJ-VDMJ4/documentation/OnePageGuide.pdf "One Page Guide")
 * ![High Precision Guide](/FJ-VDMJ4/documentation/HighPrecisionGuide.pdf "High Precision Guide")
 * ![VDMJUnit Guide](/FJ-VDMJ4/documentation/VDMJUnit.pdf "VDMJUnit Guide")
+* ![Annotation Guide](/FJ-VDMJ4/documentation/AnnotationGuide.pdf "Annotation Guide")
 
 ### Screen Shots
 ![Eclipse Integration](/screenshots/eclipse.jpg?raw=true "Eclipse Integration")
