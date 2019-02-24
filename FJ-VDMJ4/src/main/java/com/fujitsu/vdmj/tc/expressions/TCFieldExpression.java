@@ -199,7 +199,7 @@ public class TCFieldExpression extends TCExpression
     		return new TCUnknownType(location);
 		}
 
-		return results.getType(location);
+		return possibleConstraint(constraint, results.getType(location));
 	}
 
 	@Override
