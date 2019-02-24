@@ -122,7 +122,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				(typeParams == null ? ": " : "[" + typeParams + "]: ") + type +
 				"\n\t" + name + params + " ==\n" + body +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
-				(postcondition == null ? "" : "\n\tpost " + postcondition);
+				(postcondition == null ? "" : "\n\tpost " + postcondition) +
+				(measure == null ? "" : "\n\tmeasure " + measure);
 	}
 	
 	@Override
