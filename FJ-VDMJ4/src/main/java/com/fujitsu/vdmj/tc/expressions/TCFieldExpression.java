@@ -193,7 +193,14 @@ public class TCFieldExpression extends TCExpression
 		{
     		if (!recOrClass)
     		{
-    			object.report(3093, "Field '" + field.getName() + "' applied to non-aggregate type");
+    			if (root instanceof TCRecordType && ((TCRecordType)root).opaque)
+    			{
+    				object.report(3093, "Field '" + field.getName() + "' applied to non-struct export");
+    			}
+    			else
+    			{
+    				object.report(3093, "Field '" + field.getName() + "' applied to non-aggregate type");
+    			}
     		}
 
     		return new TCUnknownType(location);
