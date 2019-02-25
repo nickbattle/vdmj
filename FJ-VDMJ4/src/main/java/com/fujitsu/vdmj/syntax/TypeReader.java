@@ -77,7 +77,7 @@ public class TypeReader extends SyntaxReader
 	public ASTType readType()
 		throws ParserException, LexException
 	{
-		ASTType type = readUnionType();
+		ASTType type = readDiscretionaryType();
 
 		if (lastToken().is(Token.ARROW) ||
 			lastToken().is(Token.TOTAL_FUNCTION))
@@ -86,16 +86,42 @@ public class TypeReader extends SyntaxReader
 			nextToken();
 			ASTType result = readType();
 
-			if (result instanceof ASTVoidType)
-			{
-				throwMessage(2070, "Function type cannot return void type");
-			}
-
 			type = new ASTFunctionType(token.location,
 				token.is(Token.ARROW), productExpand(type), result);
 		}
+		else if (type instanceof ASTVoidType)
+		{
+			throwMessage(2070, "Cannot use '()' type here");
+		}
 
 		return type;
+	}
+	
+	private ASTType readDiscretionaryType()
+			throws ParserException, LexException
+	{
+		LexToken token = lastToken();
+		LexLocation location = token.location;
+		ASTType type = null;
+
+		if (token.is(Token.BRA))
+		{
+			reader.push();
+
+			if (nextToken().is(Token.KET))
+			{
+				type = new ASTVoidType(location);
+				nextToken();
+				reader.unpush();
+				return type;
+			}
+			else
+			{
+				reader.pop();
+			}
+		}
+
+		return readUnionType();
 	}
 
 	private ASTType readUnionType()
@@ -370,16 +396,9 @@ public class TypeReader extends SyntaxReader
 				break;
 
 			case BRA:
-				if (nextToken().is(Token.KET))
-				{
-					type = new ASTVoidType(location);
-					nextToken();
-				}
-				else
-				{
-					type = new ASTBracketType(location, readType());
-					checkFor(Token.KET, 2256, "Bracket mismatch");
-				}
+				nextToken();
+				type = new ASTBracketType(location, readType());
+				checkFor(Token.KET, 2256, "Bracket mismatch");
 				break;
 
 			case SEQ_OPEN:
@@ -420,10 +439,10 @@ public class TypeReader extends SyntaxReader
 	public ASTOperationType readOperationType()
 		throws ParserException, LexException
 	{
-		ASTType paramtype = readType();
+		ASTType paramtype = readDiscretionaryType();
 		LexToken arrow = lastToken();
 		checkFor(Token.OPDEF, 2258, "Expecting '==>' in explicit operation type");
-		ASTType resulttype = readType();
+		ASTType resulttype = readDiscretionaryType();
 		return new ASTOperationType(arrow.location, productExpand(paramtype), resulttype);
 	}
 
