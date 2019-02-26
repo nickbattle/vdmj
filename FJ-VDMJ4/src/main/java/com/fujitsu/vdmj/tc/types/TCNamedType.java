@@ -317,8 +317,8 @@ public class TCNamedType extends TCInvariantType
 		if (other instanceof TCNamedType)
 		{
 			TCNamedType nt = (TCNamedType)other;
-    		String n1 = typename.toString();
-    		String n2 = nt.typename.toString();
+    		String n1 = typename.getModule() + typename.getName();
+    		String n2 = nt.typename.getModule() + nt.typename.getName();
     		return n1.compareTo(n2);
 		}
 		else
