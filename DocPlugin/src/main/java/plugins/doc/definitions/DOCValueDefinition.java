@@ -23,6 +23,8 @@
  
 package plugins.doc.definitions;
 
+import com.fujitsu.vdmj.typechecker.NameScope;
+
 import plugins.doc.annotations.DOCAnnotationList;
 import plugins.doc.definitions.DOCAccessSpecifier;
 import plugins.doc.definitions.DOCDefinition;
@@ -33,13 +35,15 @@ import plugins.doc.types.DOCType;
 public class DOCValueDefinition extends DOCDefinition
 {
 	private static final long serialVersionUID = 1L;
+	private final NameScope scope;
 	private final DOCPattern pattern;
 	private final DOCType type;
 	private final DOCExpression exp;
 
-	public DOCValueDefinition(DOCAnnotationList annotations, DOCAccessSpecifier accessSpecifier, DOCPattern pattern, DOCType type, DOCExpression exp)
+	public DOCValueDefinition(NameScope scope, DOCAnnotationList annotations, DOCAccessSpecifier accessSpecifier, DOCPattern pattern, DOCType type, DOCExpression exp)
 	{
 		super(pattern.location, annotations, accessSpecifier, null);
+		this.scope = scope;
 		this.pattern = pattern;
 		this.type = type;
 		this.exp = exp;
