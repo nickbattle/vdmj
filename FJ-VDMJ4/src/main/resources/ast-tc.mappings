@@ -34,7 +34,7 @@ map ASTSystemDefinition{name, definitions, comments} to TCSystemDefinition(name,
 map ASTThreadDefinition{statement, comments} to TCThreadDefinition(statement) set comments;
 map ASTTypeDefinition{annotations, accessSpecifier, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression, comments} to TCTypeDefinition(annotations, accessSpecifier, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression) set comments;
 map ASTUntypedDefinition{location, name, comments} to TCUntypedDefinition(location, name) set comments;
-map ASTValueDefinition{annotations, accessSpecifier, pattern, type, exp, comments} to TCValueDefinition(annotations, accessSpecifier, pattern, type, exp) set comments;
+map ASTValueDefinition{scope, annotations, accessSpecifier, pattern, type, exp, comments} to TCValueDefinition(scope, annotations, accessSpecifier, pattern, type, exp) set comments;
 
 # expressions
 package com.fujitsu.vdmj.ast.expressions to com.fujitsu.vdmj.tc.expressions;
@@ -372,3 +372,4 @@ unmapped java.lang.Boolean;
 unmapped java.lang.String;
 unmapped java.lang.Long;
 unmapped com.fujitsu.vdmj.mapper.FileList;
+unmapped com.fujitsu.vdmj.typechecker.NameScope;

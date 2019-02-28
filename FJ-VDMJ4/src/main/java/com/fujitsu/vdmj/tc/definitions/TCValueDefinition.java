@@ -55,10 +55,10 @@ public class TCValueDefinition extends TCDefinition
 	private TCDefinitionList defs = null;
 	protected TCType expType = null;
 
-	public TCValueDefinition(TCAnnotationList annotations,
+	public TCValueDefinition(NameScope scope, TCAnnotationList annotations,
 			TCAccessSpecifier accessSpecifier, TCPattern p, TCType type, TCExpression exp)
 	{
-		super(Pass.VALUES, p.location, null, NameScope.GLOBAL);
+		super(Pass.VALUES, p.location, null, scope);
 
 		this.annotations = annotations;
 		this.pattern = p;

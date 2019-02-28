@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
  * A class to hold a value definition.
@@ -34,14 +35,16 @@ import com.fujitsu.vdmj.lex.Token;
 public class ASTValueDefinition extends ASTDefinition
 {
 	private static final long serialVersionUID = 1L;
+	public final NameScope scope;
 	public final ASTPattern pattern;
 	public final ASTType type;
 	public final ASTExpression exp;
 
-	public ASTValueDefinition(ASTPattern p, ASTType type, ASTExpression exp)
+	public ASTValueDefinition(NameScope scope, ASTPattern p, ASTType type, ASTExpression exp)
 	{
 		super(p.location, null);
 
+		this.scope = scope;
 		this.pattern = p;
 		this.type = type;
 		this.exp = exp;
