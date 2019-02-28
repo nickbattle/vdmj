@@ -33,7 +33,7 @@ map TCSystemDefinition{name, definitions} to DOCSystemDefinition(name, definitio
 map TCThreadDefinition{statement} to DOCThreadDefinition(statement);
 map TCTypeDefinition{annotations, accessSpecifier, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression} to DOCTypeDefinition(annotations, accessSpecifier, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression);
 map TCUntypedDefinition{location, name} to DOCUntypedDefinition(location, name);
-map TCValueDefinition{annotations, accessSpecifier, pattern, type, exp} to DOCValueDefinition(annotations, accessSpecifier, pattern, type, exp);
+map TCValueDefinition{nameScope, annotations, accessSpecifier, pattern, type, exp} to DOCValueDefinition(nameScope, annotations, accessSpecifier, pattern, type, exp);
 
 #############################################################################
 package com.fujitsu.vdmj.tc.expressions to plugins.doc.expressions;
@@ -384,3 +384,4 @@ unmapped java.lang.Boolean;
 unmapped java.lang.String;
 unmapped java.lang.Long;
 unmapped com.fujitsu.vdmj.mapper.FileList;
+unmapped com.fujitsu.vdmj.typechecker.NameScope;
