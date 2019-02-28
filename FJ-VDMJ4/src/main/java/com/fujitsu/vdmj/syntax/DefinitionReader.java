@@ -112,6 +112,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.LocatedException;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
  * A syntax analyser to parse definitions.
@@ -558,7 +559,7 @@ public class DefinitionReader extends SyntaxReader
 				ASTAnnotationList annotations = readAnnotations(comments);
 				annotations.astBefore(this);
 				ASTAccessSpecifier access = readAccessSpecifier(false, false);
-				ASTDefinition def = readValueDefinition();
+				ASTDefinition def = readValueDefinition(NameScope.GLOBAL);
 				annotations.astAfter(this, def);
 				def.setAnnotations(annotations);
 				def.setComments(comments);
@@ -1054,7 +1055,7 @@ public class DefinitionReader extends SyntaxReader
 		try
 		{
         	reader.push();
-        	ASTDefinition def = readValueDefinition();
+        	ASTDefinition def = readValueDefinition(NameScope.LOCAL);
     		reader.unpush();
     		return def;
 		}
@@ -1066,7 +1067,7 @@ public class DefinitionReader extends SyntaxReader
 		}
 	}
 
-	public ASTDefinition readValueDefinition() throws ParserException, LexException
+	public ASTDefinition readValueDefinition(NameScope scope) throws ParserException, LexException
 	{
        	// Should be <pattern>[:<type>]=<expression>
 
@@ -1081,7 +1082,7 @@ public class DefinitionReader extends SyntaxReader
 
  		checkFor(Token.EQUALS, 2096, "Expecting <pattern>[:<type>]=<exp>");
 		return new ASTValueDefinition(
-			p, type, getExpressionReader().readExpression());
+			scope, p, type, getExpressionReader().readExpression());
 	}
 
 	private ASTDefinition readStateDefinition() throws ParserException, LexException
