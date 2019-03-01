@@ -24,7 +24,10 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
+import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -49,12 +52,19 @@ public class TCLenExpression extends TCUnaryExpression
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
 		TCType etype = exp.typeCheck(env, null, scope, null);
+		boolean seq1 = false;
 
 		if (!etype.isSeq(location))
 		{
 			report(3116, "Argument to 'len' is not a sequence");
 		}
+		else
+		{
+			TCSeqType st = etype.getSeq();
+			seq1 = st instanceof TCSeq1Type;
+		}
 
-		return possibleConstraint(constraint, new TCNaturalType(location));
+		return possibleConstraint(constraint,
+				seq1 ? new TCNaturalOneType(location) : new TCNaturalType(location));
 	}
 }

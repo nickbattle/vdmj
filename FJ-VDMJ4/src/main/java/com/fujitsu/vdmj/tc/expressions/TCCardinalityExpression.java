@@ -24,7 +24,10 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
+import com.fujitsu.vdmj.tc.types.TCSet1Type;
+import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -48,11 +51,20 @@ public class TCCardinalityExpression extends TCUnaryExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		if (!exp.typeCheck(env, null, scope, null).isSet(location))
+		TCType etype = exp.typeCheck(env, null, scope, null);
+		boolean set1 = false;
+		
+		if (!etype.isSet(location))
 		{
 			exp.report(3067, "Argument of 'card' is not a set");
 		}
+		else
+		{
+			TCSetType st = etype.getSet();
+			set1 = st instanceof TCSet1Type;
+		}
 
-		return possibleConstraint(constraint, new TCNaturalType(location));
+		return possibleConstraint(constraint,
+				set1 ? new TCNaturalOneType(location) : new TCNaturalType(location));
 	}
 }
