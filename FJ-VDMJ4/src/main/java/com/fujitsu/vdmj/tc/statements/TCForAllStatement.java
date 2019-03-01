@@ -30,10 +30,13 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
+import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
+import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -75,6 +78,13 @@ public class TCForAllStatement extends TCStatement
 
 			Environment local = new FlatCheckedEnvironment(defs, base, scope);
 			TCType rt = statement.typeCheck(local, scope, constraint);
+			
+			if (!(st instanceof TCSet1Type))
+			{
+				// Union with () because the loop may not be entered
+				rt = new TCUnionType(location, rt, new TCVoidType(location));
+			}
+			
 			local.unusedCheck();
 			return rt;
 		}
