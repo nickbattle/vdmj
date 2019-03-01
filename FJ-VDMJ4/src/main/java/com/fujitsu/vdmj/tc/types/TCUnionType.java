@@ -327,17 +327,22 @@ public class TCUnionType extends TCType
     		setType = new TCUnknownType(location).getSet();
 
     		TCTypeSet set = new TCTypeSet();
+    		boolean allSet1 = true;
 
     		for (TCType t: types)
     		{
     			if (t.isSet(location))
     			{
-    				set.add(t.getSet().setof);
+    				TCSetType st = t.getSet();
+    				set.add(st.setof);
+    				allSet1 = allSet1 && (st instanceof TCSet1Type);
     			}
     		}
 
     		setType = set.isEmpty() ? null :
-    			new TCSetType(location, set.getType(location));
+    			allSet1 ?
+    				new TCSet1Type(location, set.getType(location)) :
+    				new TCSetType(location, set.getType(location));
 		}
 
 		return setType;
