@@ -297,17 +297,22 @@ public class TCUnionType extends TCType
 	   		seqType = new TCUnknownType(location).getSeq();
 
 	   		TCTypeSet set = new TCTypeSet();
+	   		boolean allSeq1 = true;
 
     		for (TCType t: types)
     		{
     			if (t.isSeq(location))
     			{
-    				set.add(t.getSeq().seqof);
+    				TCSeqType st = t.getSeq();
+    				set.add(st.seqof);
+    				allSeq1 = allSeq1 && (st instanceof TCSeq1Type);
     			}
     		}
 
     		seqType = set.isEmpty() ? null :
-    			new TCSeqType(location, set.getType(location));
+    			allSeq1 ?
+   	    			new TCSeq1Type(location, set.getType(location)) :  					
+   	    			new TCSeqType(location, set.getType(location));
  		}
 
 		return seqType;

@@ -30,9 +30,13 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCPatternBind;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
+import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -44,8 +48,6 @@ public class TCForPatternBindStatement extends TCStatement
 	public final boolean reverse;
 	public final TCExpression exp;
 	public final TCStatement statement;
-
-	private TCSeqType seqType;
 
 	public TCForPatternBindStatement(LexLocation location,
 		TCPatternBind patternBind, boolean reverse, TCExpression exp, TCStatement body)
@@ -72,20 +74,27 @@ public class TCForPatternBindStatement extends TCStatement
 
 		if (stype.isSeq(location))
 		{
-			seqType = stype.getSeq();
-			patternBind.typeCheck(base, scope, seqType.seqof);
+			TCSeqType st = stype.getSeq();
+			patternBind.typeCheck(base, scope, st.seqof);
 			TCDefinitionList defs = patternBind.getDefinitions();
 			defs.typeCheck(base, scope);
 			local = new FlatCheckedEnvironment(defs, base, scope);
+			TCType rt = statement.typeCheck(local, scope, constraint);
+			
+			if (!(st instanceof TCSeq1Type))
+			{
+				// Union with () because the loop may not be entered
+				rt = new TCUnionType(location, rt, new TCVoidType(location));
+			}
+			
+			local.unusedCheck();
+			return rt;
 		}
 		else
 		{
 			exp.report(3223, "Expecting sequence type after 'in'");
+			return new TCUnknownType(location);
 		}
-
-		TCType rt = statement.typeCheck(local, scope, constraint);
-		local.unusedCheck();
-		return rt;
 	}
 
 	@Override

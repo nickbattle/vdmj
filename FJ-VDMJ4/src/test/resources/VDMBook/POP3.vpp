@@ -865,7 +865,7 @@ class POP3TestSender
 instance variables
 
 id   : seq of char;
-cmds : seq of POP3Types`ClientCommand;
+cmds : seq1 of POP3Types`ClientCommand;
 mc   : MessageChannel;
 
 operations
