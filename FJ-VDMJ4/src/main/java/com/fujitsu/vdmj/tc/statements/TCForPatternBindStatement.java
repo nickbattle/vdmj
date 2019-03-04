@@ -81,7 +81,7 @@ public class TCForPatternBindStatement extends TCStatement
 			local = new FlatCheckedEnvironment(defs, base, scope);
 			TCType rt = statement.typeCheck(local, scope, constraint);
 			
-			if (!(st instanceof TCSeq1Type))
+			if (!(st instanceof TCSeq1Type) && !(rt instanceof TCVoidType))
 			{
 				// Union with () because the loop may not be entered
 				rt = new TCUnionType(location, rt, new TCVoidType(location));
