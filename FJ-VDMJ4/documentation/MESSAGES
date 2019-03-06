@@ -956,4 +956,4 @@ as the expected and actual values.
 5025, "Strict: expecting 'exports all' clause"
 5026, "Strict: order should be inv, eq, ord"
 5027, "Strict: order should be inv, init"
-5027, "Strict: expecting semi-colon between traces"
+5028, "Strict: expecting semi-colon between traces"
