@@ -736,7 +736,7 @@ public class DefinitionReader extends SyntaxReader
 				{
 					if (ignore(Token.SEMICOLON) && Settings.strict)
 					{
-						warning(5027, "Strict: expecting semi-colon between traces", lastToken().location);
+						warning(5028, "Strict: expecting semi-colon between traces", lastToken().location);
 					}
 				}
 			}
