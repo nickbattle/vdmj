@@ -273,6 +273,10 @@ abstract public class VDMJ
     				usage("-path option requires a directory");
     			}
     		}
+    		else if (arg.equals("-strict"))
+    		{
+    			Settings.strict = true;
+    		}
     		else if (arg.startsWith("-"))
     		{
     			usage("Unknown option " + arg);
@@ -470,6 +474,7 @@ abstract public class VDMJ
 		System.err.println("-vdmpp: parse files as VDM++");
 		System.err.println("-vdmrt: parse files as VDM-RT");
 		System.err.println("-path: search path for files");
+		System.err.println("-strict: use strict grammar rules");
 		System.err.println("-v: show VDMJ jar version");
 		System.err.println("-r <release>: VDM language release");
 		System.err.println("-w: suppress warning messages");

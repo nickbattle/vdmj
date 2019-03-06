@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.lex.Dialect;
 /**
  * A class to hold global settings accessible throughout.
  */
-
 public class Settings
 {
 	public static Release release = Release.DEFAULT;
@@ -41,6 +40,7 @@ public class Settings
 	public static boolean exceptions = false;
 	public static boolean annotations = false;
 	public static boolean verbose = false;
+	public static boolean strict = false;
 
 	public static boolean usingCmdLine = false;
 }

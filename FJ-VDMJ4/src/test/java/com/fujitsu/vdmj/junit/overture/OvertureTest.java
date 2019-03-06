@@ -74,6 +74,7 @@ abstract public class OvertureTest extends TestCase
 		super.setUp();
 		Settings.dialect = Dialect.VDM_PP;
 		Settings.release = Release.DEFAULT;
+		Settings.strict = true;
 		Properties.init();
 	}
 
