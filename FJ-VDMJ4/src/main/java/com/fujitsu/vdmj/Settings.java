@@ -44,6 +44,7 @@ public class Settings
 	public static MathContext precision = new MathContext(100, RoundingMode.HALF_UP);
 	public static boolean annotations = false;
 	public static boolean verbose = false;
+	public static boolean strict = false;
 
 	public static boolean usingCmdLine = false;
 }
