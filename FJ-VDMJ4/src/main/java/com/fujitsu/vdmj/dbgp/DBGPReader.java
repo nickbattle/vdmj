@@ -408,6 +408,10 @@ public class DBGPReader extends DebugLink
 					usage("-timeinv option requires a filename");
 				}
 			}
+    		else if (arg.equals("-strict"))
+    		{
+    			Settings.strict = true;
+    		}
     		else if (arg.startsWith("-"))
     		{
     			usage("Unknown option " + arg);
@@ -583,7 +587,7 @@ public class DBGPReader extends DebugLink
 			" [-w] [-q] [-log <logfile URL>] [-c <charset>] [-r <release>]" +
 			" [-pre] [-post] [-inv] [-dtc] [-measures]" +
 			" [-coverage <dir URL>] [-default64 <base64 name>]" +
-			" [-remote <class>] {<filename URLs>}");
+			" [-remote <class>] [-strict] {<filename URLs>}");
 
 		System.exit(1);
 	}
