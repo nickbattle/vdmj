@@ -732,9 +732,9 @@ public class DefinitionReader extends SyntaxReader
 				def.setComments(comments);
 				list.add(def);
 
-				if (!newSection())
+				if (!ignore(Token.SEMICOLON) && Settings.strict)
 				{
-					if (ignore(Token.SEMICOLON) && Settings.strict)
+					if (!newSection())
 					{
 						warning(5028, "Strict: expecting semi-colon between traces", lastToken().location);
 					}
