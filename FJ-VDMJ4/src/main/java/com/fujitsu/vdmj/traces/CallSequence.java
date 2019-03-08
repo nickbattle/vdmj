@@ -159,6 +159,11 @@ public class CallSequence extends Vector<INStatement>
 		// that may be in the sequences, but those variables do need to be
 		// included in the stem match. "count" is the position ignoring any
 		// variable statements.
+		
+		if (other.size() < size())
+		{
+			return false;
+		}
 
 		int i = 0;
 		
