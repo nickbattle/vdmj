@@ -34,7 +34,7 @@ public class TraceIteratorList extends Vector<TraceIterator>
 	
 	private CallSequence[] alternatives = null;
 
-	private Integer lastAlternative = null;		// Last index that hasMoreTests, if known
+	private Integer lastAlternative = null;
 
 	public void reset()
 	{
@@ -73,13 +73,10 @@ public class TraceIteratorList extends Vector<TraceIterator>
 
 	public boolean hasMoreTests()
 	{
-		int i = (lastAlternative != null) ? lastAlternative : 0;
-
-		for (; i < size(); i++)
+		for (int i=0; i < size(); i++)
 		{
 			if (get(i).hasMoreTests())
 			{
-				lastAlternative = i;
 				return true;
 			}
 		}
@@ -110,7 +107,7 @@ public class TraceIteratorList extends Vector<TraceIterator>
         			alternatives[i] = get(i).getNextTest();
         			break;
         		}
-        		else if (i < size() - 1 && get(i+1).hasMoreTests())
+        		else if (i < size() - 1) // && get(i+1).hasMoreTests())
         		{
         			get(i).reset();
         			alternatives[i] = get(i).getNextTest();
