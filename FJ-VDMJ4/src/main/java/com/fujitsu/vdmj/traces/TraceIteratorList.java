@@ -71,9 +71,24 @@ public class TraceIteratorList extends Vector<TraceIterator>
 		return result;
 	}
 
-	public boolean hasMoreTests()
+	public boolean hasMoreSequenceTests()
 	{
 		for (int i=0; i < size(); i++)
+		{
+			if (get(i).hasMoreTests())
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	public boolean hasMoreAlternativeTests()
+	{
+		int i = (lastAlternative != null) ? lastAlternative : 0;
+		
+		for (; i<size(); i++)
 		{
 			if (get(i).hasMoreTests())
 			{
