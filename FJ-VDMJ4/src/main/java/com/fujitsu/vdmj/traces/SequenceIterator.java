@@ -65,7 +65,7 @@ public class SequenceIterator extends TraceIterator
 	@Override
 	public boolean hasMoreTests()
 	{
-		return nodes.hasMoreTests();
+		return nodes.hasMoreSequenceTests();
 	}
 
 	@Override

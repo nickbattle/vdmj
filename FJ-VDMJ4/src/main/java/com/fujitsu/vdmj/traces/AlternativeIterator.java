@@ -67,7 +67,7 @@ public class AlternativeIterator extends TraceIterator
 	@Override
 	public boolean hasMoreTests()
 	{
-		return alternatives.hasMoreTests();
+		return alternatives.hasMoreAlternativeTests();
 	}
 
 	@Override
