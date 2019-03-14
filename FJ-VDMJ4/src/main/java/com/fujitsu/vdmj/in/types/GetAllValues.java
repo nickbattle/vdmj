@@ -48,6 +48,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.values.BooleanValue;
+import com.fujitsu.vdmj.values.InvariantValue;
 import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
@@ -275,7 +276,21 @@ public class GetAllValues
 
 	private static ValueList getTCNamedType(TCNamedType type, Context ctxt) throws ValueException
 	{
-		return ofType(type.type, ctxt);
+		ValueList invs = new ValueList();
+		
+		for (Value v: ofType(type.type, ctxt))
+		{
+			try
+			{
+				invs.add(new InvariantValue(type, v, ctxt));
+			}
+			catch (ValueException e)
+			{
+				// Value does not match invariant, so ignore it
+			}
+		}
+		
+		return invs;
 	}
 
 //	private static ValueList getTCNaturalOneType(TCNaturalOneType type, Context ctxt)
