@@ -1540,7 +1540,7 @@ abstract public class CommandReader
 		println("latex|latexdoc [<files>] - generate LaTeX line coverage files");
 		println("word [<files>] - generate Word HTML line coverage files");
 		println("files - list files in the current specification");
-		println("set [<pre|post|inv|dtc|measures> <on|off>] - set runtime checks");
+		println("set [<pre|post|inv|dtc|measures|annotations> <on|off>] - set runtime checks");
 		println("reload - reload the current specification files");
 		println("load <files or dirs> - replace current loaded specification files");
 		println("save [<files>] - generate Word/ODF source extract files");
