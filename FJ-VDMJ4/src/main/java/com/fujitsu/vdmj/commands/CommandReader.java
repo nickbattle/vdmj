@@ -1577,6 +1577,7 @@ abstract public class CommandReader
 		println("files - list files in the current specification");
 		println("set [<pre|post|inv|dtc|measures> <on|off>] - set runtime checks");
 		println("precision [<#decimal places>] - set real number precision");
+		println("set [<pre|post|inv|dtc|measures|annotations> <on|off>] - set runtime checks");
 		println("reload - reload the current specification files");
 		println("load <files or dirs> - replace current loaded specification files");
 		println("save [<files>] - generate Word/ODF source extract files");
