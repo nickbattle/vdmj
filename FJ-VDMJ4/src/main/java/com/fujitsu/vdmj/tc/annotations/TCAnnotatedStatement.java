@@ -55,10 +55,10 @@ public class TCAnnotatedStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		annotation.tcBefore(this, env, scope);
-		TCType type = statement.typeCheck(env, scope, constraint);
+		TCType type = statement.typeCheck(env, scope, constraint, mandatory);
 		annotation.tcAfter(this, type, env, scope);
 		return type;
 	}

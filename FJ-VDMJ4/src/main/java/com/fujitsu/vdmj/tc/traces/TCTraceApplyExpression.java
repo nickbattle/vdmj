@@ -50,6 +50,6 @@ public class TCTraceApplyExpression extends TCTraceCoreDefinition
 	@Override
 	public void typeCheck(Environment env, NameScope scope)
 	{
-		callStatement.typeCheck(env, scope, null);
+		callStatement.typeCheck(env, scope, null, false);
 	}
 }

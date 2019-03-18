@@ -53,7 +53,7 @@ public class TCElseIfStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		if (!elseIfExp.typeCheck(env, null, scope, null).isType(TCBooleanType.class, location))
 		{
@@ -68,7 +68,7 @@ public class TCElseIfStatement extends TCStatement
 			qenv = new FlatEnvironment(qualified, env);
 		}
 
-		return thenStmt.typeCheck(qenv, scope, constraint);
+		return thenStmt.typeCheck(qenv, scope, constraint, mandatory);
 	}
 
 	@Override

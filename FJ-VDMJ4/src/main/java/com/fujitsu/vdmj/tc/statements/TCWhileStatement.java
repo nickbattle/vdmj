@@ -59,7 +59,7 @@ public class TCWhileStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		if (!exp.typeCheck(env, null, scope, null).isType(TCBooleanType.class, location))
 		{
@@ -74,7 +74,7 @@ public class TCWhileStatement extends TCStatement
 			qenv = new FlatEnvironment(qualified, env);
 		}
 
-		TCType stype = statement.typeCheck(qenv, scope, constraint);
+		TCType stype = statement.typeCheck(qenv, scope, constraint, mandatory);
 		
 		if (exp instanceof TCBooleanLiteralExpression && stype instanceof TCUnionType)
 		{

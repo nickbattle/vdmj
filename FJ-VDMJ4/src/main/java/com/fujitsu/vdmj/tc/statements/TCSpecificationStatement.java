@@ -66,7 +66,7 @@ public class TCSpecificationStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment base, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		TCDefinitionList defs = new TCDefinitionList();
 

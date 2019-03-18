@@ -57,7 +57,7 @@ public class TCDurationStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		TCDefinition encl = env.getEnclosingDefinition();
 		
@@ -75,7 +75,7 @@ public class TCDurationStatement extends TCStatement
 			detail("Actual", argType);
 		}
 
-		return statement.typeCheck(env, scope, constraint);
+		return statement.typeCheck(env, scope, constraint, mandatory);
 	}
 
 	@Override

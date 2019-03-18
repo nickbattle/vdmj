@@ -48,13 +48,13 @@ public class TCTixeStmtAlternative
 		return patternBind + " |-> " + statement;
 	}
 
-	public void typeCheck(Environment base, NameScope scope, TCType ext, TCType constraint)
+	public void typeCheck(Environment base, NameScope scope, TCType ext, TCType constraint, boolean mandatory)
 	{
 		patternBind.typeCheck(base, scope, ext);
 		TCDefinitionList defs = patternBind.getDefinitions();
 		defs.typeCheck(base, scope);
 		Environment local = new FlatCheckedEnvironment(defs, base, scope);
-		statement.typeCheck(local, scope, constraint);
+		statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();
 	}
 

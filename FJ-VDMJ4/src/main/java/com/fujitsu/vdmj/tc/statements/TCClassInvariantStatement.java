@@ -44,7 +44,7 @@ public class TCClassInvariantStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		// Definitions already checked.
 		return new TCBooleanType(location);

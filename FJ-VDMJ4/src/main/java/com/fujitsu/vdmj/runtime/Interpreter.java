@@ -446,7 +446,7 @@ abstract public class Interpreter
 		else if (tree instanceof TCStatement)
 		{
 			TCStatement stmt = (TCStatement)tree;
-			type = stmt.typeCheck(getGlobalEnvironment(), NameScope.NAMESANDSTATE, null);
+			type = stmt.typeCheck(getGlobalEnvironment(), NameScope.NAMESANDSTATE, null, false);
 		}
 		else
 		{

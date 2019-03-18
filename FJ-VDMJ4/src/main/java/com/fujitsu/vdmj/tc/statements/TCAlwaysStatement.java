@@ -53,10 +53,10 @@ public class TCAlwaysStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
-		always.typeCheck(env, scope, constraint);
-		return body.typeCheck(env, scope, constraint);
+		always.typeCheck(env, scope, constraint, false);
+		return checkReturnType(constraint, body.typeCheck(env, scope, constraint, mandatory), mandatory);
 	}
 
 	@Override
