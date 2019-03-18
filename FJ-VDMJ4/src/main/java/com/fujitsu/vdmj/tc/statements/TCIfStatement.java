@@ -108,13 +108,13 @@ public class TCIfStatement extends TCStatement
 		if (elseStmt != null)
 		{
 			rtypes.add(elseStmt.typeCheck(env, scope, constraint, mandatory));
+			return rtypes.getType(location);	// check return done in elseStmt
 		}
 		else
 		{
 			rtypes.add(new TCVoidType(location));
+			return checkReturnType(constraint, rtypes.getType(location), mandatory);
 		}
-
-		return checkReturnType(constraint, rtypes.getType(location), mandatory);
 	}
 
 	@Override

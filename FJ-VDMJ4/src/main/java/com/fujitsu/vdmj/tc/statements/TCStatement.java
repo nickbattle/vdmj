@@ -82,7 +82,7 @@ public abstract class TCStatement extends TCNode implements Serializable
 		{
 			if (actual.hasVoid() && !(constraint instanceof TCVoidType))
 			{
-				report(3328, "Statement may return void value");
+				report(3328, "Statement returns void value");
 				detail2("Actual", actual, "Expected", constraint);
 			}
 			else if (!TypeComparator.compatible(constraint, actual))
