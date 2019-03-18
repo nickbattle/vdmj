@@ -67,7 +67,7 @@ public class TCForPatternBindStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment base, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		TCType stype = exp.typeCheck(base, null, scope, null);
 		Environment local = base;
@@ -79,7 +79,7 @@ public class TCForPatternBindStatement extends TCStatement
 			TCDefinitionList defs = patternBind.getDefinitions();
 			defs.typeCheck(base, scope);
 			local = new FlatCheckedEnvironment(defs, base, scope);
-			TCType rt = statement.typeCheck(local, scope, constraint);
+			TCType rt = statement.typeCheck(local, scope, constraint, mandatory);
 			
 			if (!(st instanceof TCSeq1Type) && !(rt instanceof TCVoidType))
 			{

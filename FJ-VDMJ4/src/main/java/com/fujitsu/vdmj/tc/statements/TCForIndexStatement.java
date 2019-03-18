@@ -65,7 +65,7 @@ public class TCForIndexStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		TCType ft = from.typeCheck(env, null, scope, null);
 		TCType tt = to.typeCheck(env, null, scope, null);
@@ -92,7 +92,7 @@ public class TCForIndexStatement extends TCStatement
 
 		TCDefinition vardef = new TCLocalDefinition(var.getLocation(), var, ft);
 		Environment local = new FlatCheckedEnvironment(vardef, env, scope);
-		TCType rt = statement.typeCheck(local, scope, constraint);
+		TCType rt = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();
 		return rt;
 	}

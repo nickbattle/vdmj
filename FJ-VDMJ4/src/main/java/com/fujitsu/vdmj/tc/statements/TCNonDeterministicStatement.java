@@ -43,7 +43,7 @@ public class TCNonDeterministicStatement extends TCSimpleBlockStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		TCDefinition encl = env.getEnclosingDefinition();
 		
@@ -57,7 +57,7 @@ public class TCNonDeterministicStatement extends TCSimpleBlockStatement
 
 		for (TCStatement stmt: statements)
 		{
-			TCType stype = stmt.typeCheck(env, scope, constraint);
+			TCType stype = stmt.typeCheck(env, scope, constraint, mandatory);
 
 			if (stype instanceof TCUnionType)
 			{

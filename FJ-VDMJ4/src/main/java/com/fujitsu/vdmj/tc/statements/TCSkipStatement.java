@@ -45,8 +45,8 @@ public class TCSkipStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
-		return new TCVoidType(location);
+		return checkReturnType(constraint, new TCVoidType(location), mandatory);
 	}
 }

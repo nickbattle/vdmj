@@ -52,11 +52,11 @@ public class TCAtomicStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		for (TCAssignmentStatement stmt: assignments)
 		{
-			stmt.typeCheck(env, scope, constraint);
+			stmt.typeCheck(env, scope, constraint, mandatory);
 		}
 
 		return new TCVoidType(location);

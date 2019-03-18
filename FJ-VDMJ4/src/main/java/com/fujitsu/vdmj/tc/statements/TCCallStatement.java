@@ -62,7 +62,7 @@ public class TCCallStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		TCTypeList atypes = getArgTypes(env, scope);
 
@@ -129,7 +129,7 @@ public class TCCallStatement extends TCStatement
     		}
 
     		checkArgTypes(optype.parameters, atypes);
-    		return checkReturnType(constraint, optype.result);
+    		return checkReturnType(constraint, optype.result, mandatory);
 		}
 		else if (type.isFunction(location))
 		{
@@ -148,7 +148,7 @@ public class TCCallStatement extends TCStatement
     		}
 
     		checkArgTypes(ftype.parameters, atypes);
-    		return checkReturnType(constraint, ftype.result);
+    		return checkReturnType(constraint, ftype.result, mandatory);
 		}
 		else
 		{

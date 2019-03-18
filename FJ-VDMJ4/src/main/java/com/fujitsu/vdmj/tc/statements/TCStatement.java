@@ -67,20 +67,22 @@ public abstract class TCStatement extends TCNode implements Serializable
 	@Override
 	abstract public String toString();
 
-	/** Type check the statement and return its type. */ 
-	abstract public TCType typeCheck(Environment env, NameScope scope, TCType constraint);
+	/** Type check the statement and return its type. 
+	 * @param mandatory TODO*/ 
+	abstract public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory);
 
 	/**
 	 * Check that a return type meets a constraint. This is used in various statements
 	 * to verify that a constraining type is met (see typeCheck methods).
+	 * @param mandatory TODO
 	 */
-	protected TCType checkReturnType(TCType constraint, TCType actual)
+	protected TCType checkReturnType(TCType constraint, TCType actual, boolean mandatory)
 	{
-		if (constraint != null && !(actual instanceof TCVoidType) && !(actual.isUnknown(location)))
+		if (constraint != null && mandatory && !(actual.isUnknown(location)))
 		{
 			if (actual.hasVoid() && !(constraint instanceof TCVoidType))
 			{
-				report(3328, "Statement may return void value");
+				report(3328, "Statement returns void value");
 				detail2("Actual", actual, "Expected", constraint);
 			}
 			else if (!TypeComparator.compatible(constraint, actual))

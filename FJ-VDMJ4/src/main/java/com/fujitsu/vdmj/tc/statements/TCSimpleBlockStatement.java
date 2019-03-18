@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -65,15 +66,17 @@ abstract public class TCSimpleBlockStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		boolean notreached = false;
 		TCTypeSet rtypes = new TCTypeSet();
 		TCType last = null;
+		Iterator<TCStatement> iter = statements.iterator(); 
 
-		for (TCStatement stmt: statements)
+		while (iter.hasNext())
 		{
-			TCType stype = stmt.typeCheck(env, scope, constraint);
+			TCStatement stmt = iter.next();
+			TCType stype = stmt.typeCheck(env, scope, constraint, mandatory && !iter.hasNext());
 
 			if (notreached)
 			{

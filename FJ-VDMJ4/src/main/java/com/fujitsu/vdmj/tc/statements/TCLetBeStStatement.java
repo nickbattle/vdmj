@@ -66,7 +66,7 @@ public class TCLetBeStStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment base, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		def = new TCMultiBindListDefinition(location, bind.getMultipleBindList());
 		def.typeCheck(base, scope);
@@ -87,7 +87,7 @@ public class TCLetBeStStatement extends TCStatement
 			report(3225, "Such that clause is not boolean");
 		}
 
-		TCType r = statement.typeCheck(local, scope, constraint);
+		TCType r = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();
 		return r;
 	}

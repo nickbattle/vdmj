@@ -48,7 +48,7 @@ public class TCTraceVariableStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		FlatEnvironment flat = (FlatEnvironment)env;
 		flat.add(new TCLocalDefinition(location, var.name, var.type));

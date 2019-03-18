@@ -66,7 +66,7 @@ public class TCAssignmentStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		targetType = target.typeCheck(env);
 		expType = exp.typeCheck(env, null, scope, targetType);
@@ -94,7 +94,7 @@ public class TCAssignmentStatement extends TCStatement
 			}
 		}
 
-		return new TCVoidType(location);
+		return checkReturnType(constraint, new TCVoidType(location), mandatory);
 	}
 
 	@Override

@@ -59,7 +59,7 @@ public class TCLetDefStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		// Each local definition is in scope for later local definitions...
 
@@ -94,7 +94,7 @@ public class TCLetDefStatement extends TCStatement
 			}
 		}
 
-		TCType r = statement.typeCheck(local, scope, constraint);
+		TCType r = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck(env);
 		return r;
 	}

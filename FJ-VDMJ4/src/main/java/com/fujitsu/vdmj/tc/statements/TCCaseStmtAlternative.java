@@ -59,7 +59,7 @@ public class TCCaseStmtAlternative extends TCNode
 		return "case " + pattern + " -> " + statement;
 	}
 
-	public TCType typeCheck(Environment base, NameScope scope, TCType ctype, TCType constraint)
+	public TCType typeCheck(Environment base, NameScope scope, TCType ctype, TCType constraint, boolean mandatory)
 	{
 		if (defs == null)
 		{
@@ -97,7 +97,7 @@ public class TCCaseStmtAlternative extends TCNode
 		}
 		
 		Environment local = new FlatCheckedEnvironment(defs, base, scope);
-		TCType r = statement.typeCheck(local, scope, constraint);
+		TCType r = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();
 		return r;
 	}

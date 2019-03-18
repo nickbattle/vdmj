@@ -66,7 +66,7 @@ public class TCForAllStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment base, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		setType = set.typeCheck(base, null, scope, null);
 		pattern.typeResolve(base);
@@ -77,7 +77,7 @@ public class TCForAllStatement extends TCStatement
 			TCDefinitionList defs = pattern.getDefinitions(st.setof, NameScope.LOCAL);
 
 			Environment local = new FlatCheckedEnvironment(defs, base, scope);
-			TCType rt = statement.typeCheck(local, scope, constraint);
+			TCType rt = statement.typeCheck(local, scope, constraint, mandatory);
 			
 			if (!(st instanceof TCSet1Type) &&!(rt instanceof TCVoidType))
 			{
