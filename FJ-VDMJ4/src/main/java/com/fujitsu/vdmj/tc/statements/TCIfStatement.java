@@ -77,7 +77,7 @@ public class TCIfStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		TCType test = ifExp.typeCheck(env, null, scope, null);
 
@@ -95,26 +95,26 @@ public class TCIfStatement extends TCStatement
 		}
 
 		TCTypeSet rtypes = new TCTypeSet();
-		rtypes.add(thenStmt.typeCheck(qenv, scope, constraint));
+		rtypes.add(thenStmt.typeCheck(qenv, scope, constraint, mandatory));
 
 		if (elseList != null)
 		{
 			for (TCElseIfStatement stmt: elseList)
 			{
-				rtypes.add(stmt.typeCheck(env, scope, constraint));
+				rtypes.add(stmt.typeCheck(env, scope, constraint, mandatory));
 			}
 		}
 
 		if (elseStmt != null)
 		{
-			rtypes.add(elseStmt.typeCheck(env, scope, constraint));
+			rtypes.add(elseStmt.typeCheck(env, scope, constraint, mandatory));
+			return rtypes.getType(location);	// check return done in elseStmt
 		}
 		else
 		{
 			rtypes.add(new TCVoidType(location));
+			return checkReturnType(constraint, rtypes.getType(location), mandatory);
 		}
-
-		return rtypes.getType(location);
 	}
 
 	@Override

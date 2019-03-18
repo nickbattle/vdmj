@@ -75,7 +75,7 @@ public class TCCasesStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		expType = exp.typeCheck(env, null, scope, null);
 		TCTypeSet rtypes = new TCTypeSet();
@@ -83,13 +83,13 @@ public class TCCasesStatement extends TCStatement
 
 		for (TCCaseStmtAlternative c: cases)
 		{
-			rtypes.add(c.typeCheck(env, scope, expType, constraint));
+			rtypes.add(c.typeCheck(env, scope, expType, constraint, mandatory));
 			always = always || c.alwaysMatches(expType);
 		}
 
 		if (others != null)
 		{
-			rtypes.add(others.typeCheck(env, scope, constraint));
+			rtypes.add(others.typeCheck(env, scope, constraint, mandatory));
 		}
 		else if (!always)
 		{

@@ -341,7 +341,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 				local.add(getSelfDefinition());
 			}
 
-			actualResult = body.typeCheck(local, NameScope.NAMESANDSTATE, type.result);
+			actualResult = body.typeCheck(local, NameScope.NAMESANDSTATE, type.result, !isConstructor);
 			boolean compatible = TypeComparator.compatible(type.result, actualResult);
 
 			if ((isConstructor && !actualResult.isType(TCVoidType.class, location) && !compatible) ||

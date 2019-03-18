@@ -60,11 +60,11 @@ public class TCTrapStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment base, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		TCTypeSet rtypes = new TCTypeSet();
 
-		TCType bt = body.typeCheck(base, scope, constraint);
+		TCType bt = body.typeCheck(base, scope, constraint, mandatory);
 		rtypes.add(bt);
 
 		TCTypeSet extype = body.exitCheck();
@@ -88,7 +88,7 @@ public class TCTrapStatement extends TCStatement
 		TCDefinitionList defs = patternBind.getDefinitions();
 		defs.typeCheck(base, scope);
 		Environment local = new FlatCheckedEnvironment(defs, base, scope);
-		rtypes.add(with.typeCheck(local, scope, constraint));
+		rtypes.add(with.typeCheck(local, scope, constraint, mandatory));
 
 		return rtypes.getType(location);
 	}

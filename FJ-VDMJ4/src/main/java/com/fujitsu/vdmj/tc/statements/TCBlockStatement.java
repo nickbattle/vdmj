@@ -48,7 +48,7 @@ public class TCBlockStatement extends TCSimpleBlockStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		// Each dcl definition is in scope for later definitions...
 
@@ -65,7 +65,7 @@ public class TCBlockStatement extends TCSimpleBlockStatement
 		// local variables. At runtime (below) they have to be treated
 		// more like (updatable) state.
 
-		TCType r = super.typeCheck(local, scope, constraint);
+		TCType r = super.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck(env);
 		return r;
 	}

@@ -48,7 +48,7 @@ public class TCStartStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		TCDefinition encl = env.getEnclosingDefinition();
 		
@@ -91,7 +91,7 @@ public class TCStartStatement extends TCStatement
 			objects.report(3238, "Expression is not an object reference or set of object references");
 		}
 
-		return new TCVoidType(location);
+		return checkReturnType(constraint, new TCVoidType(location), mandatory);
 	}
 
 	@Override

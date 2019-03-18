@@ -83,7 +83,7 @@ public class TCCallObjectStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		TCType dtype = designator.typeCheck(env, null);
 
@@ -191,7 +191,7 @@ public class TCCallObjectStatement extends TCStatement
 
     		field.setTypeQualifier(optype.parameters);
 			checkArgTypes(optype.parameters, atypes);	// Not necessary?
-			return checkReturnType(constraint, optype.result);
+			return checkReturnType(constraint, optype.result, mandatory);
 		}
 		else if (type.isFunction(location))
 		{
@@ -202,7 +202,7 @@ public class TCCallObjectStatement extends TCStatement
 			ftype.typeResolve(env, null);
 			field.setTypeQualifier(ftype.parameters);
 			checkArgTypes(ftype.parameters, atypes);	// Not necessary?
-			return checkReturnType(constraint, ftype.result);
+			return checkReturnType(constraint, ftype.result, mandatory);
 		}
 		else
 		{

@@ -57,7 +57,7 @@ public class TCReturnStatement extends TCStatement
 	}
 
 	@Override
-	public TCType typeCheck(Environment env, NameScope scope, TCType constraint)
+	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		TCDefinition enclosing = env.getEnclosingDefinition();
 		boolean inConstructor = false;
@@ -80,11 +80,11 @@ public class TCReturnStatement extends TCStatement
 		
 		if (expression == null)
 		{
-			return checkReturnType(constraint, new TCVoidReturnType(location));
+			return checkReturnType(constraint, new TCVoidReturnType(location), true);
 		}
 		else
 		{
-			return checkReturnType(constraint, expression.typeCheck(env, null, scope, null));
+			return checkReturnType(constraint, expression.typeCheck(env, null, scope, null), true);
 		}
 	}
 
