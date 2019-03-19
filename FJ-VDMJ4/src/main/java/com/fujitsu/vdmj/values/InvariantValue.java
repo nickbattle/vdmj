@@ -157,7 +157,9 @@ public class InvariantValue extends ReferenceValue
 	@Override
 	public int compareTo(Value other)
 	{
-		if (ordering != null)
+		if (ordering != null &&
+			other instanceof InvariantValue &&
+			((InvariantValue)other).type.equals(type))
 		{
 			Context ctxt = Interpreter.getInstance().getInitialContext();
 			ctxt.setThreadState(null);
