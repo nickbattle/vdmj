@@ -23,6 +23,8 @@
 
 package annotations.tc;
 
+import java.util.Arrays;
+
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -85,6 +87,21 @@ public class TCPrintfAnnotation extends TCAnnotation
 				for (TCExpression arg: args)
 				{
 					arg.typeCheck(env, null, scope, null);	// Just checks scope
+				}
+				
+				TCStringLiteralExpression str = (TCStringLiteralExpression)args.get(0);
+				String format = str.value.value;
+				
+				try
+				{
+					// Try to format with string arguments to check they are all %s (up to 20)
+					Object[] args = new String[20];
+					Arrays.fill(args, "A string");
+					String.format(format, args);
+				}
+				catch (IllegalArgumentException e)
+				{
+					name.report(6008, "@Printf must use %[arg$][width]s conversions");
 				}
 			}
 			else
