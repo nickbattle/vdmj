@@ -281,12 +281,6 @@ public class TypeComparator
 			return Result.Yes;	// Not defined "yet"...?
 		}
 
-		if (from instanceof TCParameterType)
-		{
-			return Result.Yes;	// Runtime checked... Note "to" checked below
-		}
-
-
 		// Obtain the fundamental type of BracketTypes, NamedTypes and
 		// OptionalTypes.
 
@@ -356,6 +350,25 @@ public class TypeComparator
     		}
 
     		resolved = true;
+		}
+
+		if (from instanceof TCParameterType)
+		{
+			// If the to type includes the "from" parameter anywhere, then the types must be identical,
+			// otherwise they match. We can only test for that easily with toString() :-(
+			// See overture bug #562.
+			
+			String fstr = from.toString();
+			String tstr = to.toString();
+			
+			if (tstr.indexOf(fstr) >= 0)
+			{
+				return to.equals(from) ? Result.Yes : Result.No;
+			}
+			else
+			{
+				return Result.Yes;
+			}
 		}
 
 		// OK... so we have fully resolved the basic types...
