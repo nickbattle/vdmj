@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -74,7 +75,9 @@ public class TCSubseqExpression extends TCExpression
 			report(3176, "Subsequence range end is not a number");
 		}
 
-		return stype;
+		return stype.isSeq(location) ?
+				new TCSeqType(location, stype.getSeq().seqof) :	// "12345"(1,...,0) is seq not seq1
+				stype;
 	}
 
 	@Override
