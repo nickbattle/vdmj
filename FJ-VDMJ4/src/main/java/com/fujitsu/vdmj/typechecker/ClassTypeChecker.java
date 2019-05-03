@@ -113,7 +113,7 @@ public class ClassTypeChecker extends TypeChecker
 		}
 
 		// Initialise any annotations
-		TCAnnotation.init();
+		TCAnnotation.init(allClasses);
 
 		for (TCClassDefinition c: classes)
 		{

@@ -25,7 +25,9 @@ package com.fujitsu.vdmj.in.annotations;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
@@ -41,6 +43,7 @@ public abstract class INAnnotation
 	public final INExpressionList args;
 	
 	private static final Set<Class<?>> declared = new HashSet<Class<?>>(); 
+	private static final List<INAnnotation> instances = new Vector<INAnnotation>(); 
 
 	public INAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
@@ -48,9 +51,10 @@ public abstract class INAnnotation
 		this.args = args;
 
 		declared.add(this.getClass());
+		instances.add(this);
 	}
 	
-	public static void init()
+	public static void init(Context ctxt)
 	{
 		for (Class<?> clazz: declared)
 		{
@@ -64,9 +68,19 @@ public abstract class INAnnotation
 				throw new RuntimeException(clazz.getSimpleName() + ":" + e);
 			}
 		}
+		
+		for (INAnnotation annotation: instances)
+		{
+			annotation.doInit(ctxt);
+		}
 	}
 	
 	public static void doInit()
+	{
+		// Nothing by default
+	}
+
+	protected void doInit(Context ctxt)
 	{
 		// Nothing by default
 	}

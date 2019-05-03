@@ -25,7 +25,9 @@ package com.fujitsu.vdmj.tc.annotations;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -45,6 +47,7 @@ public abstract class TCAnnotation
 	public final TCExpressionList args;
 	
 	private static final Set<Class<?>> declared = new HashSet<Class<?>>(); 
+	private static final List<TCAnnotation> instances = new Vector<TCAnnotation>(); 
 
 	public TCAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -52,9 +55,10 @@ public abstract class TCAnnotation
 		this.args = args;
 		
 		declared.add(this.getClass());
+		instances.add(this);
 	}
 
-	public static void init()
+	public static void init(Environment globals)
 	{
 		for (Class<?> clazz: declared)
 		{
@@ -68,9 +72,19 @@ public abstract class TCAnnotation
 				throw new RuntimeException(clazz.getSimpleName() + ":" + e);
 			}
 		}
+		
+		for (TCAnnotation annotation: instances)
+		{
+			annotation.doInit(globals);
+		}
 	}
 	
 	public static void doInit()
+	{
+		// Nothing by default
+	}
+
+	protected void doInit(Environment globals)
 	{
 		// Nothing by default
 	}
