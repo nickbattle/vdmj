@@ -179,12 +179,12 @@ public class ClassInterpreter extends Interpreter
 		CPUValue.init(scheduler);
 		BUSValue.init();
 		ObjectValue.init();
-		INAnnotation.init();
 
 		logSwapIn();
 		initialContext = executableClasses.creatInitialContext();
 		executableClasses.initialize((StateContext) initialContext);
 		executableClasses.systemInit(scheduler, initialContext);
+		INAnnotation.init(initialContext);
 		logSwapOut();
 
 		createdValues = new NameValuePairMap();
@@ -404,7 +404,7 @@ public class ClassInterpreter extends Interpreter
 			VDMJ.mapperStats(now, PONode.MAPPINGS);
 		}
 		
-		POAnnotation.doInit();
+		POAnnotation.init();
 		return pogClasses.getProofObligations();
 	}
 

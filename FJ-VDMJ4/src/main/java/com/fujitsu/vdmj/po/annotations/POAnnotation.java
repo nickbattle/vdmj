@@ -25,7 +25,9 @@ package com.fujitsu.vdmj.po.annotations;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -44,6 +46,7 @@ public abstract class POAnnotation
 	public final POExpressionList args;
 	
 	private static final Set<Class<?>> declared = new HashSet<Class<?>>(); 
+	private static final List<POAnnotation> instances = new Vector<POAnnotation>(); 
 
 	public POAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
@@ -51,6 +54,7 @@ public abstract class POAnnotation
 		this.args = args;
 		
 		declared.add(this.getClass());
+		instances.add(this);
 	}
 
 	public static void init()
@@ -67,9 +71,19 @@ public abstract class POAnnotation
 				throw new RuntimeException(clazz.getSimpleName() + ":" + e);
 			}
 		}
+		
+		for (POAnnotation annotation: instances)
+		{
+			annotation.doInit1();
+		}
 	}
 	
 	public static void doInit()
+	{
+		// Nothing by default
+	}
+
+	public void doInit1()
 	{
 		// Nothing by default
 	}

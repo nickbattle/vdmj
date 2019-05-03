@@ -199,9 +199,9 @@ public class ModuleInterpreter extends Interpreter
 	{
 		scheduler.init();
 		CPUValue.init(scheduler);
-		INAnnotation.init();
 		initialContext = executableModules.creatInitialContext();
 		executableModules.initialize(initialContext);
+		INAnnotation.init(initialContext);
 	}
 
 	@Override
@@ -339,7 +339,7 @@ public class ModuleInterpreter extends Interpreter
 			VDMJ.mapperStats(now, PONode.MAPPINGS);
 		}
 		
-		POAnnotation.doInit();
+		POAnnotation.init();
 		return pogModules.getProofObligations();
 	}
 

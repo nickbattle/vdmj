@@ -179,7 +179,7 @@ public class ModuleTypeChecker extends TypeChecker
 		}
 		
 		// Initialise any annotations
-		TCAnnotation.init();
+		TCAnnotation.init(env);
 
 		for (TCModule m: modules)
 		{
