@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2019 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -34,12 +34,14 @@ import com.fujitsu.vdmj.tc.expressions.TCStringLiteralExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCPrintfAnnotation extends TCAnnotation
+public class TCOnFailAnnotation extends TCAnnotation
 {
-	public TCPrintfAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public TCOnFailAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);
 	}
@@ -47,38 +49,33 @@ public class TCPrintfAnnotation extends TCAnnotation
 	@Override
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
-		name.report(6009, "@Printf only applies to statements and expressions");
+		name.report(3359, "@OnFail only applies to expressions");
 	}
 
 	@Override
 	public void tcBefore(TCModule module)
 	{
-		name.report(6009, "@Printf only applies to statements and expressions");
+		name.report(3359, "@OnFail only applies to expressions");
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition clazz)
 	{
-		name.report(6009, "@Printf only applies to statements and expressions");
-	}
-
-	@Override
-	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
-	{
-		checkArgs(env, scope);
+		name.report(3359, "@OnFail only applies to expressions");
 	}
 
 	@Override
 	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
-		checkArgs(env, scope);
+		name.report(3359, "@OnFail only applies to expressions");
 	}
 
-	private void checkArgs(Environment env, NameScope scope)
+	@Override
+	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
 		if (args.isEmpty())
 		{
-			name.report(6008, "@Printf must start with a string argument");
+			name.report(6008, "@OnFail must start with a string argument");
 		}
 		else
 		{
@@ -101,13 +98,22 @@ public class TCPrintfAnnotation extends TCAnnotation
 				}
 				catch (IllegalArgumentException e)
 				{
-					name.report(6008, "@Printf must use %[arg$][width]s conversions");
+					name.report(6008, "@OnFail must use %[arg$][width]s conversions");
 				}
 			}
 			else
 			{
-				name.report(6008, "@Printf must start with a string argument");
+				name.report(6008, "@OnFail must start with a string argument");
 			}
+		}
+	}
+	
+	@Override
+	public void tcAfter(TCExpression exp, TCType type, Environment env, NameScope scope)
+	{
+		if (!(type instanceof TCBooleanType))
+		{
+			name.report(3361, "@OnFail not applied to boolean expression");
 		}
 	}
 }
