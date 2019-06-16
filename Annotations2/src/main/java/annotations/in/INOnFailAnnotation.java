@@ -54,7 +54,7 @@ public class INOnFailAnnotation extends INAnnotation
 				}
 				
 				INStringLiteralExpression fmt = (INStringLiteralExpression)args.get(0);
-				System.out.printf(fmt.value.value, values);
+				System.out.printf(fmt.value.value + " " + name.getLocation() + "\n", values);
 			}
 		}
 		catch (ValueException e)
