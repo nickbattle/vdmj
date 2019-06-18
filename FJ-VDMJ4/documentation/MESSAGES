@@ -958,3 +958,4 @@ as the expected and actual values.
 5027, "Strict: order should be inv, init"
 5028, "Strict: expecting semi-colon between traces"
 5029, "Strict: unexpected trailing semi-colon"
+5030, "Annotation is not followed by bracketed sub-expression"
