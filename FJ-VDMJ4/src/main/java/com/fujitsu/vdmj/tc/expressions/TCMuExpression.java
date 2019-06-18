@@ -84,13 +84,13 @@ public class TCMuExpression extends TCExpression
 
 					if (!TypeComparator.compatible(f.type, mtype))
 					{
-						report(3130, "Modifier for " + f.tag + " should be " + f.type);
+						rm.value.report(3130, "Modifier for " + f.tag + " should be " + f.type);
 						detail("Actual", mtype);
 					}
     			}
     			else
     			{
-    				report(3131, "Modifier tag " + rm.tag + " not found in record");
+    				rm.tag.report(3131, "Modifier tag " + rm.tag + " not found in record");
     			}
     		}
 		}
