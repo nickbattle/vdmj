@@ -147,4 +147,9 @@ public abstract class ASTAnnotation
 	{
 		// Nothing by default
 	}
+	
+	public boolean isBracketed()
+	{
+		return false;
+	}
 }

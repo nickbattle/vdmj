@@ -107,4 +107,17 @@ public class ASTAnnotationList extends Vector<ASTAnnotation>
 			annotation.astAfter(reader, clazz);
 		}
 	}
+
+	public boolean isBracketed()
+	{
+		for (ASTAnnotation annotation: this)
+		{
+			if (annotation.isBracketed())
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

@@ -32,4 +32,10 @@ public class ASTOnFailAnnotation extends ASTAnnotation
 	{
 		super(name);
 	}
+	
+	@Override
+	public boolean isBracketed()
+	{
+		return true;	// To be clear which expression is being tested
+	}
 }

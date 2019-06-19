@@ -814,7 +814,7 @@ public class ExpressionReader extends SyntaxReader
 
 		if (!annotations.isEmpty())
 		{
-			if (lastToken().isNot(Token.BRA))
+			if (lastToken().isNot(Token.BRA) && annotations.isBracketed())
 			{
 				warning(5030, "Annotation is not followed by bracketed sub-expression", lastToken().location);
 			}
