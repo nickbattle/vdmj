@@ -83,14 +83,16 @@ public class TCMultiBindListDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		defs = new TCDefinitionList();
+		TCDefinitionSet defset = new TCDefinitionSet();
 
 		for (TCMultipleBind mb: bindings)
 		{
 			TCType type = mb.typeCheck(base, scope);
-			defs.addAll(mb.getDefinitions(type, scope));
+			defset.addAll(mb.getDefinitions(type, scope));
 		}
 
+		defs = new TCDefinitionList();
+		defs.addAll(defset);
 		defs.typeCheck(base, scope);
 	}
 
