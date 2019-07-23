@@ -54,7 +54,16 @@ public class INOnFailAnnotation extends INAnnotation
 				}
 				
 				INStringLiteralExpression fmt = (INStringLiteralExpression)args.get(0);
-				System.out.printf(fmt.value.value + " " + name.getLocation() + "\n", values);
+				String fmts = fmt.value.value;
+				String location = "";
+				
+				if (fmts.endsWith("$"))
+				{
+					 location = name.getLocation().toString();
+					 fmts = fmts.substring(0, fmts.length() - 1);
+				}
+							
+				System.out.printf(fmts + location + "\n", values);
 			}
 		}
 		catch (ValueException e)
