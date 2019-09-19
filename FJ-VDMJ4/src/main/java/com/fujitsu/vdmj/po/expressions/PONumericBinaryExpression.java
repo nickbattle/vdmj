@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.pog.OrderedObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -46,7 +47,7 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		ProofObligationList obligations = new ProofObligationList();
+		ProofObligationList obligations = getNonNilObligations(ctxt);
 
 		if (ltype.isUnion(location))
 		{
@@ -60,7 +61,6 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 					break;
 				}
 			}
-			
 		}
 
 		if (rtype.isUnion(location))
@@ -83,6 +83,28 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	}
 	
 	/**
+	 * Generate non-nil obligations for optional types.
+	 */
+	private ProofObligationList getNonNilObligations(POContextStack ctxt)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+		
+		if (ltype instanceof TCOptionalType)
+		{
+			TCOptionalType op = (TCOptionalType)ltype;
+			obligations.add(new SubTypeObligation(left, op.type, ltype, ctxt));
+		}
+		
+		if (rtype instanceof TCOptionalType)
+		{
+			TCOptionalType op = (TCOptionalType)rtype;
+			obligations.add(new SubTypeObligation(right, op.type, rtype, ctxt));
+		}
+
+		return obligations;
+	}
+	
+	/**
 	 * Generate ordering obligations, as used by the comparison operators.
 	 */
 	protected ProofObligationList getOrderedObligations(POContextStack ctxt)
@@ -95,7 +117,7 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	
 	private ProofObligationList getCommonOrderedObligations(POContextStack ctxt)
 	{
-		ProofObligationList obligations = new ProofObligationList();
+		ProofObligationList obligations = getNonNilObligations(ctxt);
 		TCTypeSet lset = new TCTypeSet();
 		TCTypeSet rset = new TCTypeSet();
 		
