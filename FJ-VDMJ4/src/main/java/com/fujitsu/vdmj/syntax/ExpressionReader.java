@@ -608,6 +608,16 @@ public class ExpressionReader extends SyntaxReader
 		throws ParserException, LexException
 	{
 		ASTExpression exp = readAnnotatedExpression();
+		ASTAnnotation annotation = null;
+		
+		if (exp instanceof ASTAnnotatedExpression)
+		{
+			// Remember and re-apply the annotation while exp is rewired.
+			ASTAnnotatedExpression ae = (ASTAnnotatedExpression)exp;
+			annotation = ae.annotation;
+			exp = ae.expression;
+		}
+		
 		boolean more = true;
 
 		while (more)
@@ -794,13 +804,18 @@ public class ExpressionReader extends SyntaxReader
 		if (token.is(Token.COMP))
 		{
 			nextToken();
-			return new ASTCompExpression(exp, token, readApplicatorExpression());
+			exp = new ASTCompExpression(exp, token, readApplicatorExpression());
 		}
-
-		if (token.is(Token.STARSTAR))
+		else if (token.is(Token.STARSTAR))
 		{
 			nextToken();
-			return new ASTStarStarExpression(exp, token, readEvaluatorP6Expression());
+			exp = new ASTStarStarExpression(exp, token, readEvaluatorP6Expression());
+		}
+		
+		if (annotation != null)
+		{
+			// Re-apply annotation, now that exp has been rewired.
+			exp = new ASTAnnotatedExpression(exp.location, annotation, exp);
 		}
 
 		return exp;
