@@ -101,7 +101,8 @@ public class TCImportedType extends TCImport
 			{
 				TCType exptype = expdef.getType().typeResolve(env, null);
 
-				if (!TypeComparator.compatible(def.type, exptype))
+				// TypeComparator.compatible(def.type, exptype))
+				if (!def.type.toDetailedString().equals(exptype.toDetailedString()))
 				{
 					report(3192, "Type import of " + name + " does not match export from " + from.name);
 					detail2("Import", def.type.toDetailedString(), "Export", exptype.toDetailedString());
