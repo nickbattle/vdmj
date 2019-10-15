@@ -101,7 +101,7 @@ abstract public class ReferenceValue extends Value
 	@Override
 	public long natValue(Context ctxt) throws ValueException
 	{
-		return value.nat1Value(ctxt);
+		return value.natValue(ctxt);
 	}
 
 	@Override
