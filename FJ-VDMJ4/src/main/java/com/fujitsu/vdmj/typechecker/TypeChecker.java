@@ -214,6 +214,8 @@ abstract public class TypeChecker
 
 	public static void detail(String tag, Object obj)
 	{
+		if (suspended) return;
+
 		if (lastMessage != null)
 		{
 			lastMessage.add(tag + ": " + obj);
