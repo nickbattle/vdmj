@@ -183,7 +183,7 @@ public class TCFunctionType extends TCType
 		{
 			try
 			{
-				fixed.add(type.typeResolve(env, root));
+				fixed.add(type.typeResolve(env, null));
 			}
 			catch (TypeCheckException e)
 			{
@@ -204,7 +204,7 @@ public class TCFunctionType extends TCType
 		try
 		{
 			parameters = fixed;
-			result = result.typeResolve(env, root);
+			result = result.typeResolve(env, null);
 		}
 		catch (TypeCheckException e)
 		{
