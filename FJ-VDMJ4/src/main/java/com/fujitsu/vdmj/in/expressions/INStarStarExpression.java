@@ -103,13 +103,31 @@ public class INStarStarExpression extends INBinaryExpression
     			{
     				if (rv.intValue(ctxt).compareTo(BIG_MAX_INT) < 0)
     				{
-    					return NumericValue.valueOf(lv.intValue(ctxt).pow(rv.intValue(ctxt).intValue()), ctxt);
+    					int exp = rv.intValue(ctxt).intValue();
+    					
+    					if (exp >= 0)
+    					{
+    						return NumericValue.valueOf(lv.intValue(ctxt).pow(exp), ctxt);
+    					}
+    					else
+    					{
+    						return NumericValue.valueOf(BigDecimal.ONE.divide(lv.realValue(ctxt).pow(-exp)), ctxt);
+    					}
     				}
     			}
 
     			Apfloat ld = new Apfloat(lv.realValue(ctxt));
     			Apfloat rd = new Apfloat(rv.realValue(ctxt));
-    			Apfloat result = ApfloatMath.pow(ld, rd);
+    			Apfloat result;
+    			
+    			if (rd.intValue() >= 0)
+    			{
+    				result = ApfloatMath.pow(ld, rd);
+    			}
+    			else
+    			{
+    				result = Apfloat.ONE.divide(ApfloatMath.pow(ld, rd.negate()));
+    			}
 
     			return NumericValue.valueOf(new BigDecimal(result.toString(), Settings.precision), ctxt);
     		}

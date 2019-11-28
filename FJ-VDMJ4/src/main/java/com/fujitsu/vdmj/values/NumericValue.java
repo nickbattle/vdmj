@@ -103,12 +103,12 @@ public abstract class NumericValue extends Value
 	
 	public static boolean isInteger(Value value)
 	{
-		return value instanceof IntegerValue;
+		return value.deref() instanceof IntegerValue;
 	}
 
 	public static boolean areIntegers(Value l, Value r)
 	{
-		return (l instanceof IntegerValue && r instanceof IntegerValue);
+		return isInteger(l) && isInteger(r);
 	}
 
 	@Override
