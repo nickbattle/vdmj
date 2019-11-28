@@ -68,10 +68,39 @@ public class IntegerValue extends RationalValue
 		return super.compareTo(other);
 	}
 
+	private static final int TRAILING_ZERO_LIMIT = 10;
+	
 	@Override
 	public String toString()
 	{
-		return longVal.toString();
+		String s = longVal.toString();
+		
+		// Some large integer values are of the form 1234500000...0000, which
+		// is hard to read. So if the string value ends in enough zeros, we
+		// print the value via a BigDecimal (in exponential form) instead.
+		
+		int zeros = 0;
+		
+		for (int i = s.length()-1; i >= 0; i--)
+		{
+			if (s.charAt(i) == '0')
+			{
+				zeros++;
+			}
+			else
+			{
+				if (zeros > TRAILING_ZERO_LIMIT)
+				{
+					return new BigDecimal(longVal).stripTrailingZeros().toString();
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+		
+		return s;
 	}
 
 	@Override
