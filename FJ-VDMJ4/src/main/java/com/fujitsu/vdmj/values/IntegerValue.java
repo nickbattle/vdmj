@@ -105,8 +105,7 @@ public class IntegerValue extends RationalValue
 	@Override
 	public BigDecimal realValue(Context ctxt)
 	{
-		return new BigDecimal(longVal).setScale(
-			Settings.precision.getPrecision(), Settings.precision.getRoundingMode());
+		return new BigDecimal(longVal, Settings.precision);
 	}
 
 	@Override

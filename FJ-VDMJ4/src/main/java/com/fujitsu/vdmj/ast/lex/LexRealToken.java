@@ -37,8 +37,7 @@ public class LexRealToken extends LexToken
 	public LexRealToken(String real, LexLocation location)
 	{
 		super(location, Token.REALNUMBER);
-		value = new BigDecimal(real).setScale(
-			Settings.precision.getPrecision(), Settings.precision.getRoundingMode());
+		value = new BigDecimal(real, Settings.precision);
 	}
 
 	public LexRealToken(BigDecimal value, LexLocation location)

@@ -54,8 +54,7 @@ public class RealValue extends NumericValue
 
 	public RealValue(BigInteger value)
 	{
-		super(new BigDecimal(value).setScale(
-			Settings.precision.getPrecision(), Settings.precision.getRoundingMode()));
+		super(new BigDecimal(value, Settings.precision));
 	}
 
 	public RealValue(double value)
