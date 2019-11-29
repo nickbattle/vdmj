@@ -926,6 +926,7 @@ as the expected and actual values.
 4171, "Cannot convert <function> to <function>"
 4172, "Values cannot be compared: <first>, <second>"
 4173, "Unknown annotation @<name>"
+4174, "Stack overflow"
 
 
 5000, "Definition <name> not used"

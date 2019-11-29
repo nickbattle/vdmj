@@ -44,9 +44,11 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.runtime.ClassContext;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.RootContext;
@@ -205,27 +207,55 @@ public class OperationValue extends Value
 		}
 	}
 
+	private static Integer stackUnwind		= null;
+	private static final int UNWIND_COUNT	= 20;	// Needed by printStackFrames
+	
+	private ContextException stackOverflow(LexLocation location, StackOverflowError e, Context ctxt)
+	{
+		if (stackUnwind == null)	// First time
+		{
+			stackUnwind = new Integer(UNWIND_COUNT);
+		}
+		else if (--stackUnwind <= 0)
+		{
+			Console.out.printf("Stack overflow %s\n", location);
+			ctxt.printStackFrames(Console.out);
+			return new ContextException(4174, "Stack overflow", location, ctxt);
+		}
+		
+		throw e;	// Unwind further to make space for printStackFrames
+	}
+
 	public Value eval(LexLocation from, ValueList argValues, Context ctxt)
 		throws ValueException
 	{
-		// Note args cannot be Updateable, so we convert them here. This means
-		// that TransactionValues pass the local "new" value to the far end.
-		ValueList constValues = argValues.getConstant();
+		stackUnwind = null;
 
-		if (Settings.dialect == Dialect.VDM_RT)
+		try
 		{
-			if (!isStatic && (ctxt.threadState.CPU != self.getCPU() || isAsync))
+			// Note args cannot be Updateable, so we convert them here. This means
+			// that TransactionValues pass the local "new" value to the far end.
+			ValueList constValues = argValues.getConstant();
+
+			if (Settings.dialect == Dialect.VDM_RT)
 			{
-				return asyncEval(constValues, ctxt);
+				if (!isStatic && (ctxt.threadState.CPU != self.getCPU() || isAsync))
+				{
+					return asyncEval(constValues, ctxt);
+				}
+				else
+				{
+					return localEval(from, constValues, ctxt, true);
+				}
 			}
 			else
 			{
 				return localEval(from, constValues, ctxt, true);
 			}
 		}
-		else
+		catch (StackOverflowError e)
 		{
-			return localEval(from, constValues, ctxt, true);
+			throw stackOverflow(from, e, ctxt);
 		}
 	}
 
