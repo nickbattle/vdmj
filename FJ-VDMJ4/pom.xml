@@ -10,14 +10,11 @@
 		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
 	</properties>
 
-
 	<developers>
 		<developer>
 			<id>NickBattle</id>
 			<name>Nick Battle</name>
 			<email>nick.battle@gmail.com</email>
-			<organization>Fujitsu UK</organization>
-			<organizationUrl>http://uk.fujitsu.com</organizationUrl>
 			<roles>
 				<role>developer</role>
 			</roles>
