@@ -160,6 +160,13 @@ public class INModule extends INNode implements Serializable
 				catch (ContextException e)
 				{
 					trouble.add(e);		// Carry on...
+					
+					if (e.isStackOverflow())	// Stack overflow returns immediately
+					{
+						trouble.clear();
+						trouble.add(e);
+						return trouble;
+					}
 				}
 			}
 		}
@@ -173,6 +180,13 @@ public class INModule extends INNode implements Serializable
 			catch (ContextException e)
 			{
 				trouble.add(e);		// Carry on...
+				
+				if (e.isStackOverflow())	// Stack overflow returns immediately
+				{
+					trouble.clear();
+					trouble.add(e);
+					return trouble;
+				}
 			}
 		}
 
@@ -188,6 +202,13 @@ public class INModule extends INNode implements Serializable
 		catch (ContextException e)
 		{
 			trouble.add(e);		// Carry on...
+			
+			if (e.isStackOverflow())	// Stack overflow returns immediately
+			{
+				trouble.clear();
+				trouble.add(e);
+				return trouble;
+			}
 		}
 
 		return trouble;

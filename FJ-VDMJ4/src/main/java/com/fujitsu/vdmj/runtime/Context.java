@@ -298,7 +298,7 @@ public class Context extends HashMap<TCNameToken, Value>
 	 * @param out
 	 */
 	
-	private static final int FRAMES_LIMIT = 100;
+	private static final int FRAMES_LIMIT = 50;
 	
 	public void printStackFrames(PrintWriter out)
 	{

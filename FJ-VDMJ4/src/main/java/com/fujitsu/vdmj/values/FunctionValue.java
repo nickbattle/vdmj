@@ -41,7 +41,6 @@ import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.patterns.INPatternListList;
 import com.fujitsu.vdmj.in.types.INPatternListTypePair;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.ClassContext;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -233,25 +232,6 @@ public class FunctionValue extends Value
 		return type.toString();
 	}
 
-	private static Integer stackUnwind		= null;
-	private static final int UNWIND_COUNT	= 20;	// Needed by printStackFrames
-	
-	private ContextException stackOverflow(StackOverflowError e, Context ctxt)
-	{
-		if (stackUnwind == null)	// First time
-		{
-			stackUnwind = new Integer(UNWIND_COUNT);
-		}
-		else if (--stackUnwind <= 0)
-		{
-			Console.out.printf("Stack overflow %s\n", location);
-			ctxt.printStackFrames(Console.out);
-			return new ContextException(4174, "Stack overflow", location, ctxt);
-		}
-		
-		throw e;	// Unwind further to make space for printStackFrames
-	}
-
 	public Value eval(
 		LexLocation from, Value arg, Context ctxt) throws ValueException
 	{
@@ -262,7 +242,7 @@ public class FunctionValue extends Value
 		}
 		catch (StackOverflowError e)
 		{
-			throw stackOverflow(e, ctxt);
+			throw new ContextException(4174, "Stack overflow", location, ctxt);
 		}
 	}
 
@@ -275,7 +255,7 @@ public class FunctionValue extends Value
 		}
 		catch (StackOverflowError e)
 		{
-			throw stackOverflow(e, ctxt);
+			throw new ContextException(4174, "Stack overflow", location, ctxt);
 		}
 	}
 
@@ -295,8 +275,6 @@ public class FunctionValue extends Value
 	public Value eval(
 		LexLocation from, ValueList argValues, Context ctxt, Context sctxt) throws ValueException
 	{
-		stackUnwind = null;
-
 		if (body == null)
 		{
 			abort(4051, "Cannot apply implicit function: " + name, ctxt);

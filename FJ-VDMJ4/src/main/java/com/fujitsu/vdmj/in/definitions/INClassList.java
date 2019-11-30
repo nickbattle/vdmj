@@ -159,6 +159,14 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
     			}
     			catch (ContextException e)
     			{
+    				if (e.isStackOverflow())
+    				{
+    					trouble.clear();
+    					trouble.add(e);
+    					retries = 0;
+    					break;
+    				}
+    				
     				trouble.add(e);
     				
     				// These two exceptions mean that a member could not be
