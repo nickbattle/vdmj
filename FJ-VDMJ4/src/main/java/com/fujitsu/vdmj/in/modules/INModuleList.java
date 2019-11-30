@@ -170,6 +170,12 @@ public class INModuleList extends INMappedList<TCModule, INModule>
         		if (e != null)
         		{
         			problems.addAll(e);
+
+        			if (e.size() == 1 && e.iterator().next().isStackOverflow())
+        			{
+        				retries = 0;
+        				break;
+        			}
         		}
         		else
         		{

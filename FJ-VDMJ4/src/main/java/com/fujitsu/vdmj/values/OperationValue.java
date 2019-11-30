@@ -44,7 +44,6 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.runtime.ClassContext;
 import com.fujitsu.vdmj.runtime.Context;
@@ -207,30 +206,9 @@ public class OperationValue extends Value
 		}
 	}
 
-	private static Integer stackUnwind		= null;
-	private static final int UNWIND_COUNT	= 20;	// Needed by printStackFrames
-	
-	private ContextException stackOverflow(LexLocation location, StackOverflowError e, Context ctxt)
-	{
-		if (stackUnwind == null)	// First time
-		{
-			stackUnwind = new Integer(UNWIND_COUNT);
-		}
-		else if (--stackUnwind <= 0)
-		{
-			Console.out.printf("Stack overflow %s\n", location);
-			ctxt.printStackFrames(Console.out);
-			return new ContextException(4174, "Stack overflow", location, ctxt);
-		}
-		
-		throw e;	// Unwind further to make space for printStackFrames
-	}
-
 	public Value eval(LexLocation from, ValueList argValues, Context ctxt)
 		throws ValueException
 	{
-		stackUnwind = null;
-
 		try
 		{
 			// Note args cannot be Updateable, so we convert them here. This means
@@ -255,7 +233,7 @@ public class OperationValue extends Value
 		}
 		catch (StackOverflowError e)
 		{
-			throw stackOverflow(from, e, ctxt);
+			throw new ContextException(4174, "Stack overflow", from, ctxt);
 		}
 	}
 

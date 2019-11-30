@@ -50,4 +50,9 @@ public class ContextException extends RuntimeException
 	{
 		return getMessage();
 	}
+	
+	public boolean isStackOverflow()
+	{
+		return number == 4174;
+	}
 }

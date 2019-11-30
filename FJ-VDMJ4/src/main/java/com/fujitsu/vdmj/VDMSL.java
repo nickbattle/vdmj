@@ -241,7 +241,16 @@ public class VDMSL extends VDMJ
 		catch (ContextException e)
 		{
 			println("Initialization: " + e);
-			e.ctxt.printStackTrace(Console.out, true);
+			
+			if (e.isStackOverflow())
+			{
+				e.ctxt.printStackFrames(Console.out);
+			}
+			else
+			{
+				e.ctxt.printStackTrace(Console.out, true);
+			}
+			
 			return ExitStatus.EXIT_ERRORS;
 		}
 		catch (Exception e)
@@ -272,7 +281,15 @@ public class VDMSL extends VDMJ
 		catch (ContextException e)
 		{
 			println("Execution: " + e);
-			e.ctxt.printStackTrace(Console.out, true);
+
+			if (e.isStackOverflow())
+			{
+				e.ctxt.printStackFrames(Console.out);
+			}
+			else
+			{
+				e.ctxt.printStackTrace(Console.out, true);
+			}
 		}
 		catch (Exception e)
 		{

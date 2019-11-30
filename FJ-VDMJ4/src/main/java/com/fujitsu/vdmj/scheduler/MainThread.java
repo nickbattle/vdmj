@@ -77,6 +77,12 @@ public class MainThread extends SchedulableThread
 		{
 			setException(e);
 			suspendOthers();
+			
+			if (e.isStackOverflow())
+			{
+				e.ctxt.printStackFrames(Console.out);
+			}
+			
 			DebugLink.getInstance().stopped(e.ctxt, e.location);
 		}
 		catch (Exception e)
