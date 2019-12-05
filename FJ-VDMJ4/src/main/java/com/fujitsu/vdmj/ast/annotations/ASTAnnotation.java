@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.statements.ASTStatement;
 import com.fujitsu.vdmj.lex.LexException;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.syntax.ClassReader;
@@ -61,9 +62,9 @@ public abstract class ASTAnnotation
 		return "@" + name + (args == null || args.isEmpty() ? "" : "(" + args + ")");
 	}
 	
-	protected void parseException(String message) throws LexException
+	protected void parseException(String message, LexLocation location) throws LexException
 	{
-		throw new LexException(0, "Malformed @" + name.name + ": " + message, name.location);
+		throw new LexException(0, "Malformed @" + name.name + ": " + message, location);
 	}
 	
 	/**
@@ -91,7 +92,7 @@ public abstract class ASTAnnotation
 	
 			if (ltr.getLast().isNot(Token.KET))
 			{
-				parseException("Malformed @Annotation");
+				parseException("Expecting ')' after annotation", ltr.getLast().location);
 			}
 		}
 		
