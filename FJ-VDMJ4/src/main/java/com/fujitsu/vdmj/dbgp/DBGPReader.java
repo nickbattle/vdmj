@@ -479,6 +479,7 @@ public class DBGPReader extends DebugLink
 		else
 		{
 			System.setProperty(Settings.dialect.name(), "1");
+			System.setProperty("HIGH_PRECISION", "1");
 		}
 
 		if (Settings.dialect != Dialect.VDM_RT && logfile != null)
