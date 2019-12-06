@@ -454,6 +454,10 @@ public class DBGPReader extends DebugLink
 		{
 			usage("Missing mandatory arguments");
 		}
+		else
+		{
+			System.setProperty(Settings.dialect.name(), "1");
+		}
 
 		if (Settings.dialect != Dialect.VDM_RT && logfile != null)
 		{
