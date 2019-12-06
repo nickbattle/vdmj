@@ -67,17 +67,17 @@ public class ASTGhostAnnotation extends ASTAnnotation
 			}
 			else
 			{
-				parseException("expecting <name> = <exp>;");
+				parseException("expecting <name> = <exp>;", eqexp.location);
 			}
 		}
 		else
 		{
-			parseException("expecting <name> = <exp>;");
+			parseException("expecting <name> = <exp>;", exp.location);
 		}
 		
 		if (ltr.getLast().isNot(Token.SEMICOLON))
 		{
-			parseException("missing ;");
+			parseException("missing ;", ltr.getLast().location);
 		}
 		
 		return args;
