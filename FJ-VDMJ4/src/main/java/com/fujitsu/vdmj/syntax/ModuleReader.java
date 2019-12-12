@@ -637,7 +637,7 @@ public class ModuleReader extends SyntaxReader
 
 		if (ignore(Token.RENAMED))
 		{
-			renamed = readNameToken("Expected renamed function name");
+			renamed = readNameToken("Expected renamed function name", true);
 		}
 
 		return new ASTImportedFunction(defname, type, typeParams, renamed);
