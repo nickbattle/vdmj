@@ -399,7 +399,7 @@ public class ModuleReader extends SyntaxReader
 		throws ParserException, LexException
 	{
 		LexToken token = lastToken();
-		LexNameList nameList = readIdList(true);
+		LexNameList nameList = readIdList(false);
 		checkFor(Token.COLON, 2177, "Expecting ':' after export name");
 		ASTType type = getTypeReader().readOperationType();
 		return new ASTExportedOperation(token.location, nameList, type);
@@ -667,7 +667,7 @@ public class ModuleReader extends SyntaxReader
 	private ASTImportedOperation readImportedOperation(LexIdentifierToken from)
 		throws ParserException, LexException
 	{
-		LexNameToken name = readNameToken("Expecting imported operation name", true);
+		LexNameToken name = readNameToken("Expecting imported operation name", false);
 		LexNameToken defname = getDefName(from, name);
 		ASTType type = null;
 
