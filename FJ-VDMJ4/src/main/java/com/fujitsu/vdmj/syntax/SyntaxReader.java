@@ -263,6 +263,12 @@ public abstract class SyntaxReader
 	 */
 
 	protected LexIdentifierToken readIdToken(String message)
+			throws LexException, ParserException
+	{
+		return readIdToken(message, false);
+	}
+	
+	protected LexIdentifierToken readIdToken(String message, boolean reservedOK)
 		throws LexException, ParserException
 	{
 		LexToken tok = reader.getLast();
@@ -275,6 +281,11 @@ public abstract class SyntaxReader
 			if (id.old)
 			{
 				throwMessage(2295, "Can't use old name here", tok);
+			}
+			
+			if (!reservedOK && isReserved(id.name))
+			{
+				throwMessage(2295, "Name contains a reserved prefix", tok);
 			}
 			
 			return id;
@@ -301,6 +312,12 @@ public abstract class SyntaxReader
 	 */
 
 	protected LexNameToken readNameToken(String message)
+			throws LexException, ParserException
+	{
+		return readNameToken(message, false);
+	}
+	
+	protected LexNameToken readNameToken(String message, boolean reservedOK)
 		throws LexException, ParserException
 	{
 		LexToken tok = reader.getLast();
@@ -315,6 +332,11 @@ public abstract class SyntaxReader
 				throwMessage(2295, "Can't use old name here", tok);
 			}
 			
+			if (isReserved(name.name))
+			{
+				throwMessage(2295, "Name contains a reserved prefix", tok);
+			}
+			
 			return name;
 		}
 		else if (tok instanceof LexIdentifierToken)
@@ -324,6 +346,11 @@ public abstract class SyntaxReader
 			if (id.old)
 			{
 				throwMessage(2295, "Can't use old name here", tok);
+			}
+			
+			if (!reservedOK && isReserved(id.name))
+			{
+				throwMessage(2295, "Name contains a reserved prefix", tok);
 			}
 			
 			return new LexNameToken(reader.currentModule, id);
@@ -785,5 +812,18 @@ public abstract class SyntaxReader
 	protected LexCommentList getComments()
 	{
 		return reader.getComments();
+	}
+	
+	protected boolean isReserved(String name)
+	{
+		return
+			name.startsWith("pre_") ||
+			name.startsWith("post_") ||
+			name.startsWith("inv_") ||
+			name.startsWith("init_") ||
+			name.startsWith("eq_") ||
+			name.startsWith("ord_") ||
+			name.startsWith("min_") ||
+			name.startsWith("max_");
 	}
 }
