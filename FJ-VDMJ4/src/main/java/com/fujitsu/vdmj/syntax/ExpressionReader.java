@@ -1014,7 +1014,7 @@ public class ExpressionReader extends SyntaxReader
 		do
 		{
 			checkFor(Token.COMMA, 2128, "Expecting comma separated record modifiers");
-			LexIdentifierToken id = readIdToken("Expecting <identifier> |-> <expression>");
+			LexIdentifierToken id = readIdToken("Expecting <identifier> |-> <expression>", true);
 			checkFor(Token.MAPLET, 2129, "Expecting <identifier> |-> <expression>");
 			args.add(new ASTRecordModifier(id, readExpression()));
 		}

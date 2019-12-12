@@ -227,6 +227,11 @@ public class PatternReader extends SyntaxReader
 
 			case IDENTIFIER:
 				LexIdentifierToken id = lastIdToken();
+				
+				if (isReserved(id.name))
+				{
+					throwMessage(2295, "Name contains a reserved prefix", id);
+				}
 
 				if (id.name.startsWith("mk_"))
 				{

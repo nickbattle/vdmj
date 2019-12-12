@@ -336,7 +336,7 @@ public class ModuleReader extends SyntaxReader
 		throws ParserException, LexException
 	{
 		LexToken token = lastToken();
-		LexNameList nameList = readIdList();
+		LexNameList nameList = readIdList(false);
 		checkFor(Token.COLON, 2175, "Expecting ':' after export name");
 		ASTType type = getTypeReader().readType();
 		return new ASTExportedValue(token.location, nameList, type);
@@ -367,7 +367,7 @@ public class ModuleReader extends SyntaxReader
 		throws ParserException, LexException
 	{
 		LexToken token = lastToken();
-		LexNameList nameList = readIdList();
+		LexNameList nameList = readIdList(true);
 		LexNameList typeParams = ignoreTypeParams();
 		checkFor(Token.COLON, 2176, "Expecting ':' after export name");
 		ASTType type = getTypeReader().readType();
@@ -399,21 +399,21 @@ public class ModuleReader extends SyntaxReader
 		throws ParserException, LexException
 	{
 		LexToken token = lastToken();
-		LexNameList nameList = readIdList();
+		LexNameList nameList = readIdList(true);
 		checkFor(Token.COLON, 2177, "Expecting ':' after export name");
 		ASTType type = getTypeReader().readOperationType();
 		return new ASTExportedOperation(token.location, nameList, type);
 	}
 
-	private LexNameList readIdList()
+	private LexNameList readIdList(boolean reservedOK)
 		throws ParserException, LexException
 	{
 		LexNameList list = new LexNameList();
-		list.add(readNameToken("Expecting name list"));
+		list.add(readNameToken("Expecting name list", reservedOK));
 
 		while (ignore(Token.COMMA))
 		{
-			list.add(readNameToken("Expecting name list"));
+			list.add(readNameToken("Expecting name list", reservedOK));
 		}
 
 		return list;
@@ -621,7 +621,7 @@ public class ModuleReader extends SyntaxReader
 	private ASTImportedFunction readImportedFunction(LexIdentifierToken from)
 		throws ParserException, LexException
 	{
-		LexNameToken name =	readNameToken("Expecting imported function name");
+		LexNameToken name =	readNameToken("Expecting imported function name", true);
 		LexNameToken defname = getDefName(from, name);
 		LexNameList typeParams = ignoreTypeParams();
 
@@ -667,7 +667,7 @@ public class ModuleReader extends SyntaxReader
 	private ASTImportedOperation readImportedOperation(LexIdentifierToken from)
 		throws ParserException, LexException
 	{
-		LexNameToken name = readNameToken("Expecting imported operation name");
+		LexNameToken name = readNameToken("Expecting imported operation name", true);
 		LexNameToken defname = getDefName(from, name);
 		ASTType type = null;
 
