@@ -358,6 +358,7 @@ abstract public class VDMJ
 		else
 		{
 			System.setProperty(dialect.name(), "1");
+			System.setProperty("HIGH_PRECISION", "1");
 		}
 
 		if (logfile != null && !(controller instanceof VDMRT))
