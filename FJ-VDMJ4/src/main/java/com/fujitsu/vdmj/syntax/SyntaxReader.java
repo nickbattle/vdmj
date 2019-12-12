@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
@@ -821,9 +822,12 @@ public abstract class SyntaxReader
 			name.startsWith("post_") ||
 			name.startsWith("inv_") ||
 			name.startsWith("init_") ||
-			name.startsWith("eq_") ||
-			name.startsWith("ord_") ||
-			name.startsWith("min_") ||
-			name.startsWith("max_");
+			Settings.release == Release.VDM_10 &&
+			(
+				name.startsWith("eq_") ||
+				name.startsWith("ord_") ||
+				name.startsWith("min_") ||
+				name.startsWith("max_")
+			);
 	}
 }

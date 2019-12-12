@@ -428,7 +428,7 @@ public class StatementReader extends SyntaxReader
 		throws ParserException, LexException
 	{
 		LexNameToken name =
-			readNameToken("Expecting operation name in call statement");
+			readNameToken("Expecting operation name in call statement", true);
 
 		checkFor(Token.BRA, 2206, "Expecting '(' after call operation name");
 		ASTExpressionList args = new ASTExpressionList();
