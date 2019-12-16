@@ -294,4 +294,10 @@ public class TCFunctionType extends TCType
 		
 		return total;
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFunctionType(this, arg);
+	}
 }

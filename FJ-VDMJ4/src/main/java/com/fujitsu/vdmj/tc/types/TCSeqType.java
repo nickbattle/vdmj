@@ -131,4 +131,10 @@ public class TCSeqType extends TCType
 	{
 		return seqof.getFreeVariables(env);
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqType(this, arg);
+	}
 }

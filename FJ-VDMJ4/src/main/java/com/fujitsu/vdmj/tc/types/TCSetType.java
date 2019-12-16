@@ -138,4 +138,10 @@ public class TCSetType extends TCType
 	{
 		return setof.getFreeVariables(env);
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetType(this, arg);
+	}
 }

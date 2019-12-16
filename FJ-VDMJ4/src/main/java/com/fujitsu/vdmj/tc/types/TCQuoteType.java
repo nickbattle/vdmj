@@ -61,4 +61,10 @@ public class TCQuoteType extends TCType
 	{
 		return value.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQuoteType(this, arg);
+	}
 }

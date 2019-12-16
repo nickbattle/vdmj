@@ -73,4 +73,10 @@ public class TCParameterType extends TCType
 	{
 		return "@" + name;
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseParameterType(this, arg);
+	}
 }

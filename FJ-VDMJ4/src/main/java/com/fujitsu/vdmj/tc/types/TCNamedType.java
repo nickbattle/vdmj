@@ -400,4 +400,10 @@ public class TCNamedType extends TCInvariantType
 			return new TCNameSet();
 		}
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNamedType(this, arg);
+	}
 }

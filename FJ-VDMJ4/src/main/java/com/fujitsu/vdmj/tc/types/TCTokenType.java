@@ -39,4 +39,10 @@ public class TCTokenType extends TCBasicType
 	{
 		return "token";
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTokenType(this, arg);
+	}
 }

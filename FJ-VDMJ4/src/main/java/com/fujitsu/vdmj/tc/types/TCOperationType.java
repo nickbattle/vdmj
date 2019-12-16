@@ -252,4 +252,10 @@ public class TCOperationType extends TCType
 		list.addAll(result.getComposeTypes());
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseOperationType(this, arg);
+	}
 }

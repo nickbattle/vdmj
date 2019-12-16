@@ -59,4 +59,10 @@ public class TCVoidReturnType extends TCType
 	{
 		return "(return)";
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseVoidReturnType(this, arg);
+	}
 }

@@ -45,4 +45,10 @@ public class TCNaturalOneType extends TCNumericType
 	{
 		return 0;
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNaturalOneType(this, arg);
+	}
 }

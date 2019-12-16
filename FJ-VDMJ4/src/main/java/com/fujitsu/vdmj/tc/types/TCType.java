@@ -426,6 +426,11 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 		TypeChecker.report(number, msg, location);
 	}
 
+	public void warning(int number, String msg)
+	{
+		TypeChecker.warning(number, msg, location);
+	}
+
 	public void detail(String tag, Object obj)
 	{
 		TypeChecker.detail(tag, obj);
@@ -435,4 +440,6 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	{
 		TypeChecker.detail2(tag1, obj1, tag2, obj2);
 	}
+	
+	abstract public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg);
 }

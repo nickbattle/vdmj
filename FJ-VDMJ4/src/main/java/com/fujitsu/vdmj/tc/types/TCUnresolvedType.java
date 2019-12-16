@@ -148,4 +148,10 @@ public class TCUnresolvedType extends TCType
 	{
 		return "(unresolved " + typename.getExplicit(true) + ")";
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnresolvedType(this, arg);
+	}
 }

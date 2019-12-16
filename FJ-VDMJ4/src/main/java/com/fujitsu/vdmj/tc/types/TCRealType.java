@@ -45,4 +45,10 @@ public class TCRealType extends TCNumericType
 	{
 		return 4;
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRealType(this, arg);
+	}
 }

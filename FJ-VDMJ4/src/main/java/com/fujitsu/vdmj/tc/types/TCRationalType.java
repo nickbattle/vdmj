@@ -45,4 +45,10 @@ public class TCRationalType extends TCNumericType
 	{
 		return 3;
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRationalType(this, arg);
+	}
 }

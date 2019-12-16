@@ -148,4 +148,10 @@ public class TCMapType extends TCType
 		names.addAll(to.getFreeVariables(env));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapType(this, arg);
+	}
 }

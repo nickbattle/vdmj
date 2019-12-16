@@ -948,4 +948,10 @@ public class TCUnionType extends TCType
 	{
 		return types.getComposeTypes();
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnionType(this, arg);
+	}
 }

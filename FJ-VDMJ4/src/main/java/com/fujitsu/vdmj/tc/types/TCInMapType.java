@@ -39,4 +39,10 @@ public class TCInMapType extends TCMapType
 	{
 		return "inmap (" + from + ") to (" + to + ")";
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInMapType(this, arg);
+	}
 }

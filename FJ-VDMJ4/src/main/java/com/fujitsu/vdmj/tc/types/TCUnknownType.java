@@ -212,4 +212,10 @@ public class TCUnknownType extends TCType
 	{
 		return "?";
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnknownType(this, arg);
+	}
 }

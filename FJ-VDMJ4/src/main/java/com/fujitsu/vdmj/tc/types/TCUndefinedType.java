@@ -47,4 +47,10 @@ public class TCUndefinedType extends TCType
 	{
 		return "(undefined)";
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUndefinedType(this, arg);
+	}
 }

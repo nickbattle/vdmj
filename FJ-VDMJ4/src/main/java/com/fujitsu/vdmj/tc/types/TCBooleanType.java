@@ -39,4 +39,10 @@ public class TCBooleanType extends TCBasicType
 	{
 		return "bool";
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBooleanType(this, arg);
+	}
 }
