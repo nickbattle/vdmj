@@ -45,4 +45,10 @@ public class TCIntegerType extends TCNumericType
 	{
 		return 2;
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIntegerType(this, arg);
+	}
 }

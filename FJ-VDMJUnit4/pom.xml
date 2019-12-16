@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>com.fujitsu</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>4.2.0-P</version>
+			<version>4.3.0-P</version>
 		</dependency>
 	</dependencies>
 

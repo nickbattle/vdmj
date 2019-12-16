@@ -53,4 +53,10 @@ public class TCSet1Type extends TCSetType
 
 		return false;
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSet1Type(this, arg);
+	}
 }

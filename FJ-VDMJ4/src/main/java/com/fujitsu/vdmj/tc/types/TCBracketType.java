@@ -245,4 +245,10 @@ public class TCBracketType extends TCType
 	{
 		return type.getFreeVariables(env);
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBracketType(this, arg);
+	}
 }

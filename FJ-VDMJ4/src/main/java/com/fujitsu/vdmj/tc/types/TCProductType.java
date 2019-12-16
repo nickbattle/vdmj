@@ -167,4 +167,10 @@ public class TCProductType extends TCType
 	{
 		return types.getFreeVariables(env);
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseProductType(this, arg);
+	}
 }

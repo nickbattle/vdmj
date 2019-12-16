@@ -53,4 +53,10 @@ public class TCSeq1Type extends TCSeqType
 
 		return false;
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeq1Type(this, arg);
+	}
 }

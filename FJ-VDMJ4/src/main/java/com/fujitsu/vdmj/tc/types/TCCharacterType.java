@@ -39,4 +39,10 @@ public class TCCharacterType extends TCBasicType
 	{
 		return "char";
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCharacterType(this, arg);
+	}
 }

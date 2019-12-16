@@ -264,4 +264,10 @@ public class TCOptionalType extends TCType
 	{
 		return type.getFreeVariables(env);
 	}
+
+	@Override
+	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseOptionalType(this, arg);
+	}
 }
