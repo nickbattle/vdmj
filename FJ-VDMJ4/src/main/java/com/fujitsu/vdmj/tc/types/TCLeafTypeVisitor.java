@@ -26,8 +26,6 @@ package com.fujitsu.vdmj.tc.types;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-
 /**
  * This TCType visitor visits all of the leaves of a type tree and calls
  * the basic processing methods for the simple types. It is common for
@@ -37,19 +35,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 
 public abstract class TCLeafTypeVisitor<E, S> extends TCTypeVisitor<List<E>, S>
 {
-	@Override
-	public List<E> caseClassType(TCClassType node, S arg)
-	{
-		List<E> all = new Vector<E>();
-		
-		for (TCDefinition def: node.classdef.getDefinitions())
-		{
-			all.addAll(def.getType().apply(this, arg));
-		}
-		
-		return all;
-	}
-
 	@Override
 	public List<E> caseFunctionType(TCFunctionType node, S arg)
 	{
