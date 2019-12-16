@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.typechecker;
 
+import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -354,21 +355,15 @@ public class TypeComparator
 
 		if (from instanceof TCParameterType)
 		{
-			// If the to type includes the "from" parameter anywhere, then the types must be identical,
-			// otherwise they match. We can only test for that easily with toString() :-(
-			// See overture bug #562.
+			String fstr = from.apply(new ParameterCollector(), null).get(0);
+			List<String> tstr = to.apply(new ParameterCollector(), null);
 			
-			String fstr = from.toString();
-			String tstr = to.toString();
+			if (tstr.contains(fstr) && !(to instanceof TCParameterType))
+			{
+				from.warning(5031, "Type " + from + " must be a union");	// See bug #562
+			}
 			
-			if (tstr.indexOf(fstr) >= 0)
-			{
-				return to.equals(from) ? Result.Yes : Result.No;
-			}
-			else
-			{
-				return Result.Yes;
-			}
+			return Result.Yes;	// Runtime checked...
 		}
 
 		// OK... so we have fully resolved the basic types...
@@ -556,21 +551,15 @@ public class TypeComparator
 			}
 			else if (to instanceof TCParameterType)
 			{
-				// If the from type includes the "to" parameter anywhere, then the types must be identical,
-				// otherwise they match. We can only test for that easily with toString() :-(
-				// See overture bug #562.
+				String tstr = to.apply(new ParameterCollector(), null).get(0);
+				List<String> fstr = from.apply(new ParameterCollector(), null);
 				
-				String fstr = from.toString();
-				String tstr = to.toString();
+				if (fstr.contains(tstr) && !(from instanceof TCParameterType))
+				{
+					to.warning(5031, "Type " + to + " must be a union");	// See bug #562
+				}
 				
-				if (fstr.indexOf(tstr) >= 0)
-				{
-					return to.equals(from) ? Result.Yes : Result.No;
-				}
-				else
-				{
-					return Result.Yes;
-				}
+				return Result.Yes;	// Runtime checked...
 			}
 			else
 			{
