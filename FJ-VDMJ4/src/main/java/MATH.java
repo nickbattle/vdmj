@@ -43,56 +43,56 @@ public class MATH
 
 	public static Value sin(Value arg) throws ValueException, Exception
 	{
-		Apfloat ap = new Apfloat(arg.realValue(null));
+		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
 		Apfloat apResult = ApfloatMath.sin(ap);
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
 	public static Value cos(Value arg) throws ValueException, Exception
 	{
-		Apfloat ap = new Apfloat(arg.realValue(null));
+		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
 		Apfloat apResult = ApfloatMath.cos(ap);
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
 	public static Value tan(Value arg) throws ValueException, Exception
 	{
-		Apfloat ap = new Apfloat(arg.realValue(null));
+		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
 		Apfloat apResult = ApfloatMath.tan(ap);
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
 	public static Value cot(Value arg) throws ValueException, Exception
 	{
-		Apfloat ap = new Apfloat(arg.realValue(null));
+		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
 		Apfloat apResult = Apfloat.ONE.divide(ApfloatMath.tan(ap));
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
 	public static Value asin(Value arg) throws ValueException, Exception
 	{
-		Apfloat ap = new Apfloat(arg.realValue(null));
+		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
 		Apfloat apResult = ApfloatMath.asin(ap);
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
 	public static Value acos(Value arg) throws ValueException, Exception
 	{
-		Apfloat ap = new Apfloat(arg.realValue(null));
+		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
 		Apfloat apResult = ApfloatMath.acos(ap);
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
 	public static Value atan(Value arg) throws ValueException, Exception
 	{
-		Apfloat ap = new Apfloat(arg.realValue(null));
+		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
 		Apfloat apResult = ApfloatMath.atan(ap);
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
 	public static Value sqrt(Value arg) throws ValueException, Exception
 	{
-		Apfloat ap = new Apfloat(arg.realValue(null));
+		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
 		Apfloat apResult = ApfloatMath.sqrt(ap);
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
@@ -130,21 +130,21 @@ public class MATH
 
 	public static Value exp(Value arg) throws ValueException, Exception
 	{
-		Apfloat ap = new Apfloat(arg.realValue(null));
+		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
 		Apfloat apResult = ApfloatMath.exp(ap);
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
 	public static Value ln(Value arg) throws ValueException, Exception
 	{
-		Apfloat ap = new Apfloat(arg.realValue(null));
+		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
 		Apfloat apResult = ApfloatMath.log(ap);
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}
 
 	public static Value log(Value arg) throws ValueException, Exception
 	{
-		Apfloat ap = new Apfloat(arg.realValue(null));
+		Apfloat ap = new Apfloat(arg.realValue(null), Settings.precision.getPrecision());
 		Apfloat apResult = ApfloatMath.log(ap, new Apfloat(10));
 		return new RealValue(new BigDecimal(apResult.toString(), Settings.precision));
 	}

@@ -116,8 +116,8 @@ public class INStarStarExpression extends INBinaryExpression
     				}
     			}
 
-    			Apfloat ld = new Apfloat(lv.realValue(ctxt));
-    			Apfloat rd = new Apfloat(rv.realValue(ctxt));
+    			Apfloat ld = new Apfloat(lv.realValue(ctxt), Settings.precision.getPrecision());
+    			Apfloat rd = new Apfloat(rv.realValue(ctxt), Settings.precision.getPrecision());
     			Apfloat result;
     			
     			if (rd.intValue() >= 0)
