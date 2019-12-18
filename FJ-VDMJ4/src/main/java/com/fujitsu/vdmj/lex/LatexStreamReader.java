@@ -92,6 +92,18 @@ public class LatexStreamReader extends InputStreamReader
 
     				line = "";
     			}
+    			else if (trimmed.startsWith("#ifndef"))
+    			{
+    				String label = trimmed.substring(7).trim();
+    				ifstack.push(supress);
+
+    				if (!supress && System.getProperty(label) != null)
+    				{
+    					supress = true;
+    				}
+
+    				line = "";
+    			}
     			else if (trimmed.startsWith("#else"))
     			{
     				if (!ifstack.peek())
