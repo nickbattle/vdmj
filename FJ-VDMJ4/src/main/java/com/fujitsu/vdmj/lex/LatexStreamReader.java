@@ -104,7 +104,7 @@ public class LatexStreamReader extends InputStreamReader
 
     				line = "";
     			}
-    			else if (trimmed.startsWith("#else"))
+    			else if (trimmed.startsWith("#else") && !ifstack.isEmpty())
     			{
     				if (!ifstack.peek())
     				{
@@ -112,7 +112,7 @@ public class LatexStreamReader extends InputStreamReader
     					line = "";
     				}
     			}
-    			else if (trimmed.startsWith("#endif"))
+    			else if (trimmed.startsWith("#endif") && !ifstack.isEmpty())
     			{
     				supress = ifstack.pop();
     				line = "";
