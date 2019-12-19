@@ -16,9 +16,9 @@ function help()
 
 function check()
 {
-    if [ ! -r "$0" ]
+    if [ ! -r "$1" ]
     then
-	echo "Cannot read $0"
+	echo "Cannot read $1"
 	exit 1
     fi
 }
@@ -44,7 +44,7 @@ fi
 while [ $# -gt 0 ]
 do
     case "$1" in
-	--help|-?)
+	--help|-\?)
 	    help
 	    ;;
 	-A)
