@@ -98,8 +98,9 @@ public class TCAssignmentStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
+		// Expression may raise unknown exceptions
 		return new TCTypeSet(new TCUnknownType(location));
 	}
 

@@ -141,13 +141,13 @@ abstract public class TCSimpleBlockStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
 		TCTypeSet types = new TCTypeSet();
 
 		for (TCStatement stmt: statements)
 		{
-			types.addAll(stmt.exitCheck());
+			types.addAll(stmt.exitCheck(base));
 		}
 
 		return types;

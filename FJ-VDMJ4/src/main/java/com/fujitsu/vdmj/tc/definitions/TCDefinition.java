@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
@@ -80,6 +81,9 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	
 	/** A list of comments preceding the definition */
 	public LexCommentList comments;
+	
+	/** Used for recursive exit checking */
+	public final static TCTypeSet IN_PROGRESS = new TCTypeSet();
 
 	/**
 	 * Create a new definition of a particular name and location.

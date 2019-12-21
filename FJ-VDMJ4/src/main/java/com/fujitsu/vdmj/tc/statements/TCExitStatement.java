@@ -70,13 +70,17 @@ public class TCExitStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
 		TCTypeSet types = new TCTypeSet();
 
 		if (expression == null)
 		{
 			types.add(new TCVoidType(location));
+		}
+		else if (exptype == null)	// Not yet checked
+		{
+			types.add(new TCUnknownType(location));
 		}
 		else
 		{

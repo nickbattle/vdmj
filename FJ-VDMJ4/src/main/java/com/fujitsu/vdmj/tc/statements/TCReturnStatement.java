@@ -89,7 +89,7 @@ public class TCReturnStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
 		if (expression != null)
 		{
@@ -98,7 +98,7 @@ public class TCReturnStatement extends TCStatement
 		}
 		else
 		{
-			return super.exitCheck();
+			return super.exitCheck(base);
 		}
 	}
 

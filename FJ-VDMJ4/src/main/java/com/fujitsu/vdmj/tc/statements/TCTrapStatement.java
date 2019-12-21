@@ -67,7 +67,7 @@ public class TCTrapStatement extends TCStatement
 		TCType bt = body.typeCheck(base, scope, constraint, mandatory);
 		rtypes.add(bt);
 
-		TCTypeSet extype = body.exitCheck();
+		TCTypeSet extype = body.exitCheck(base);
 		TCType ptype = null;
 
 		if (extype.isEmpty())
@@ -94,11 +94,11 @@ public class TCTrapStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
 		TCTypeSet types = new TCTypeSet();
-		types.addAll(body.exitCheck());
-		types.addAll(with.exitCheck());
+		types.addAll(body.exitCheck(base));
+		types.addAll(with.exitCheck(base));
 		return types;
 	}
 

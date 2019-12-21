@@ -101,13 +101,13 @@ public class TCCasesStatement extends TCStatement
 
 
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
 		TCTypeSet types = new TCTypeSet();
 
 		for (TCCaseStmtAlternative c: cases)
 		{
-			types.addAll(c.exitCheck());
+			types.addAll(c.exitCheck(base));
 		}
 
 		return types;

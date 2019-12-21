@@ -100,9 +100,9 @@ public class TCWhileStatement extends TCStatement
 		return stype;
 	}
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
-		return statement.exitCheck();
+		return statement.exitCheck(base);
 	}
 
 	@Override

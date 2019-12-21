@@ -30,6 +30,8 @@ import com.fujitsu.vdmj.ast.lex.LexStringToken;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCStringLiteralExpression;
@@ -62,6 +64,7 @@ public class TCCallObjectStatement extends TCStatement
 	public final boolean explicit;
 
 	public TCNameToken field = null;
+	public TCDefinition fdef = null;
 
 	public TCCallObjectStatement(TCObjectDesignator designator, TCNameToken classname, TCIdentifierToken fieldname, TCExpressionList args)
 	{
@@ -122,7 +125,7 @@ public class TCCallObjectStatement extends TCStatement
 
 		TCTypeList atypes = getArgTypes(env, scope);
 		field.setTypeQualifier(atypes);
-		TCDefinition fdef = classenv.findName(field, scope);
+		fdef = classenv.findName(field, scope);
 
 		if (isConstructor(fdef) && !inConstructor(env))
 		{
@@ -212,9 +215,43 @@ public class TCCallObjectStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
-		// We don't know what an operation call will raise
+		if (fdef != null)
+		{
+			if (fdef instanceof TCExplicitOperationDefinition)
+			{
+				TCExplicitOperationDefinition explop = (TCExplicitOperationDefinition)fdef;
+				
+				if (explop.possibleExceptions == null)
+				{
+					explop.possibleExceptions = TCDefinition.IN_PROGRESS;
+					explop.possibleExceptions = explop.body.exitCheck(base);
+				}
+				
+				return explop.possibleExceptions;
+			}
+			else if (fdef instanceof TCImplicitOperationDefinition)
+			{
+				TCImplicitOperationDefinition implop = (TCImplicitOperationDefinition)fdef;
+				
+				if (implop.possibleExceptions == null)
+				{
+					if (implop.body != null)
+					{
+						implop.possibleExceptions = TCDefinition.IN_PROGRESS;
+						implop.possibleExceptions = implop.body.exitCheck(base);
+					}
+					else
+					{
+						return new TCTypeSet();
+					}
+				}
+				
+				return implop.possibleExceptions;
+			}
+		}
+
 		return new TCTypeSet(new TCUnknownType(location));
 	}
 

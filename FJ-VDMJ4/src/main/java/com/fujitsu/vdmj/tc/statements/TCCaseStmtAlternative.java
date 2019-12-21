@@ -102,9 +102,9 @@ public class TCCaseStmtAlternative extends TCNode
 		return r;
 	}
 
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
-		return statement.exitCheck();
+		return statement.exitCheck(base);
 	}
 	
 	public boolean alwaysMatches(TCType expType)
