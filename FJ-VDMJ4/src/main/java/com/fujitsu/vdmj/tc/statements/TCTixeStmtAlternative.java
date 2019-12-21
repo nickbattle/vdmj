@@ -58,8 +58,8 @@ public class TCTixeStmtAlternative
 		local.unusedCheck();
 	}
 
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
-		return statement.exitCheck();
+		return statement.exitCheck(base);
 	}
 }

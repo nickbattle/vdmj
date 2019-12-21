@@ -118,19 +118,19 @@ public class TCIfStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
 		TCTypeSet types = new TCTypeSet();
-		types.addAll(thenStmt.exitCheck());
+		types.addAll(thenStmt.exitCheck(base));
 
 		for (TCElseIfStatement stmt: elseList)
 		{
-			types.addAll(stmt.exitCheck());
+			types.addAll(stmt.exitCheck(base));
 		}
 
 		if (elseStmt != null)
 		{
-			types.addAll(elseStmt.exitCheck());
+			types.addAll(elseStmt.exitCheck(base));
 		}
 
 		return types;

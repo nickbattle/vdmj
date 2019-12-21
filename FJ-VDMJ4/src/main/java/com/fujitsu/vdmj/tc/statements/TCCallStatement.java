@@ -27,6 +27,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -158,9 +160,45 @@ public class TCCallStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
-		// TODO We don't know what an operation call will raise
+		TCDefinition opdef = base.findName(name, NameScope.GLOBAL);
+
+		if (opdef != null)
+		{
+			if (opdef instanceof TCExplicitOperationDefinition)
+			{
+				TCExplicitOperationDefinition explop = (TCExplicitOperationDefinition)opdef;
+				
+				if (explop.possibleExceptions == null)
+				{
+					explop.possibleExceptions = TCDefinition.IN_PROGRESS;
+					explop.possibleExceptions = explop.body.exitCheck(base);
+				}
+				
+				return explop.possibleExceptions;
+			}
+			else if (opdef instanceof TCImplicitOperationDefinition)
+			{
+				TCImplicitOperationDefinition implop = (TCImplicitOperationDefinition)opdef;
+				
+				if (implop.possibleExceptions == null)
+				{
+					if (implop.body != null)
+					{
+						implop.possibleExceptions = TCDefinition.IN_PROGRESS;
+						implop.possibleExceptions = implop.body.exitCheck(base);
+					}
+					else
+					{
+						return new TCTypeSet();
+					}
+				}
+				
+				return implop.possibleExceptions;
+			}
+		}
+
 		return new TCTypeSet(new TCUnknownType(location));
 	}
 

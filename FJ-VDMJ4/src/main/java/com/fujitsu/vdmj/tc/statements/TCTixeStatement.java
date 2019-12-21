@@ -55,9 +55,9 @@ public class TCTixeStatement extends TCStatement
 	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		TCType rt = body.typeCheck(env, scope, constraint, mandatory);
-		TCTypeSet extypes = body.exitCheck();
+		TCTypeSet extypes = body.exitCheck(env);
 
-		if (!extypes.isEmpty())
+		// if (!extypes.isEmpty())
 		{
 			TCType union = extypes.getType(location);
 
@@ -71,14 +71,14 @@ public class TCTixeStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
 		TCTypeSet types = new TCTypeSet();
-		types.addAll(body.exitCheck());
+		types.addAll(body.exitCheck(base));
 
 		for (TCTixeStmtAlternative tsa: traps)
 		{
-			types.addAll(tsa.exitCheck());
+			types.addAll(tsa.exitCheck(base));
 		}
 
 		return types;

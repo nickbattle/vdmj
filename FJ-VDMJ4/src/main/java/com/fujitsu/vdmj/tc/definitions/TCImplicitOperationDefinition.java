@@ -54,6 +54,7 @@ import com.fujitsu.vdmj.tc.types.TCPatternListTypePairList;
 import com.fujitsu.vdmj.tc.types.TCPatternTypePair;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -83,6 +84,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	public TCExplicitFunctionDefinition postdef;
 	public TCStateDefinition state;
 	public TCType actualResult;
+	public TCTypeSet possibleExceptions = null;
 
 	public boolean isConstructor = false;
 
@@ -451,6 +453,12 @@ public class TCImplicitOperationDefinition extends TCDefinition
 			!(body instanceof TCSubclassResponsibilityStatement))
 		{
 			local.unusedCheck();
+		}
+
+		if (possibleExceptions == null && body != null)
+		{
+			possibleExceptions = IN_PROGRESS;
+			possibleExceptions = body.exitCheck(base);
 		}
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);

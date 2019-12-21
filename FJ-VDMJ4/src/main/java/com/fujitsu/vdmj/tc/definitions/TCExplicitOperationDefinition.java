@@ -49,6 +49,7 @@ import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
@@ -77,6 +78,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 
 	private TCType actualResult = null;
 	public boolean isConstructor = false;
+	public TCTypeSet possibleExceptions = null;
 
 	public TCExplicitOperationDefinition(TCAnnotationList annotations,
 		TCAccessSpecifier accessSpecifier, TCNameToken name,
@@ -328,6 +330,12 @@ public class TCExplicitOperationDefinition extends TCDefinition
 			!(body instanceof TCSubclassResponsibilityStatement))
 		{
 			local.unusedCheck();
+		}
+
+		if (possibleExceptions == null)
+		{
+			possibleExceptions = IN_PROGRESS;
+			possibleExceptions = body.exitCheck(base);
 		}
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);

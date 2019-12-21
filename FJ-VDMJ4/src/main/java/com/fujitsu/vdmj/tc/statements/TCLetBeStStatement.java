@@ -93,9 +93,9 @@ public class TCLetBeStStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
-		return statement.exitCheck();
+		return statement.exitCheck(base);
 	}
 
 	@Override

@@ -60,11 +60,11 @@ public class TCAlwaysStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck()
+	public TCTypeSet exitCheck(Environment base)
 	{
 		TCTypeSet types = new TCTypeSet();
-		types.addAll(body.exitCheck());
-		types.addAll(always.exitCheck());
+		types.addAll(body.exitCheck(base));
+		types.addAll(always.exitCheck(base));
 		return types;
 	}
 
