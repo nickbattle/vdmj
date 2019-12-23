@@ -39,4 +39,10 @@ public class POAbsoluteExpression extends POUnaryExpression
 	{
 		return "(abs " + exp + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAbsoluteExpression(this, arg);
+	}
 }

@@ -51,4 +51,10 @@ public class POMkBasicExpression extends POExpression
 	{
 		return arg.getProofObligations(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMkBasicExpression(this, arg);
+	}
 }

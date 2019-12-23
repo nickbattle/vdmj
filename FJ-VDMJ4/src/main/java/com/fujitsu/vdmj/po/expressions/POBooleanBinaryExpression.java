@@ -61,4 +61,10 @@ abstract public class POBooleanBinaryExpression extends POBinaryExpression
 		obligations.addAll(right.getProofObligations(ctxt));
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBooleanBinaryExpression(this, arg);
+	}
 }

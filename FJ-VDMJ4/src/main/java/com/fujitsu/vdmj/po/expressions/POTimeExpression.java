@@ -39,4 +39,10 @@ public class POTimeExpression extends POExpression
 	{
 		return "time";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTimeExpression(this, arg);
+	}
 }

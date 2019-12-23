@@ -23,11 +23,18 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
+
 import com.fujitsu.vdmj.po.POMappedList;
+import com.fujitsu.vdmj.po.PORecursiveLoops;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
  * A class for holding a list of ClassDefinitions.
@@ -63,6 +70,8 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 	public ProofObligationList getProofObligations()
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		
+		setRecursiveLoops();
 
 		for (POClassDefinition c: this)
 		{
@@ -71,5 +80,58 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 
 		obligations.trivialCheck();
 		return obligations;
+	}
+
+	private void setRecursiveLoops()
+	{
+		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
+		
+		for (POClassDefinition c: this)
+		{
+			callmap.putAll(c.getCallMap());
+		}
+		
+		PORecursiveLoops.reset();
+		
+		for (TCNameToken sought: callmap.keySet())
+		{
+			Stack<TCNameToken> stack = new Stack<TCNameToken>();
+			stack.push(sought);
+			
+			if (PORecursiveLoops.reachable(sought, callmap.get(sought), callmap, stack))
+			{
+	    		PORecursiveLoops.put(sought, findDefinitions(stack));
+			}
+			
+			stack.pop();
+		}
+	}
+	
+	private PODefinitionList findDefinitions(Stack<TCNameToken> stack)
+	{
+		PODefinitionList list = new PODefinitionList();
+		
+		for (TCNameToken name: stack)
+		{
+			list.add(findDefinition(name));
+		}
+		
+		return list;
+	}
+
+	private PODefinition findDefinition(TCNameToken sought)
+	{
+		for (POClassDefinition clazz: this)
+		{
+			for (PODefinition def: clazz.definitions)
+			{
+				if (def.name != null && def.name.equals(sought))
+				{
+					return def;
+				}
+			}
+		}
+		
+		return null;
 	}
 }

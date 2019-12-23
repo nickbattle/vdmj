@@ -39,4 +39,10 @@ public class POSubclassResponsibilityExpression extends POExpression
 	{
 		return "is subclass responsibility";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubclassResponsibilityExpression(this, arg);
+	}
 }

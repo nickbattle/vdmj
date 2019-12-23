@@ -52,4 +52,10 @@ public class PODivideExpression extends PONumericBinaryExpression
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDivideExpression(this, arg);
+	}
 }

@@ -45,4 +45,10 @@ public class POPreExpression extends POExpression
 	{
 		return "pre_(" + function + (args.isEmpty() ? "" : ", " + Utils.listToString(args)) + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePreExpression(this, arg);
+	}
 }

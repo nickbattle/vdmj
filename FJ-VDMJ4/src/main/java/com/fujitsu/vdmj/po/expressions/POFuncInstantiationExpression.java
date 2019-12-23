@@ -71,4 +71,10 @@ public class POFuncInstantiationExpression extends POExpression
 	{
 		return function.getPreName();
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFuncInstantiationExpression(this, arg);
+	}
 }

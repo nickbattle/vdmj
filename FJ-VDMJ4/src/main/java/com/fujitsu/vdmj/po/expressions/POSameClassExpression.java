@@ -54,4 +54,10 @@ public class POSameClassExpression extends POExpression
 	{
 		return "sameclass(" + left + "," + right + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSameClassExpression(this, arg);
+	}
 }

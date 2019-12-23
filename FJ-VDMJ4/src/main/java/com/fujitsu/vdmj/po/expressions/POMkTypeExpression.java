@@ -87,4 +87,10 @@ public class POMkTypeExpression extends POExpression
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMkTypeExpression(this, arg);
+	}
 }

@@ -60,4 +60,10 @@ public class POHistoryExpression extends POExpression
 		sb.append(")");
 		return sb.toString();
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseHistoryExpression(this, arg);
+	}
 }

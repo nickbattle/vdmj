@@ -43,4 +43,10 @@ public class POLessEqualExpression extends PONumericBinaryExpression
 	{
 		return getOrderedObligations(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLessEqualExpression(this, arg);
+	}
 }

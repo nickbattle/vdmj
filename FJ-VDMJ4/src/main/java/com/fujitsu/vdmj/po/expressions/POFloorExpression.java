@@ -39,4 +39,10 @@ public class POFloorExpression extends POUnaryExpression
 	{
 		return "(floor " + exp + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFloorExpression(this, arg);
+	}
 }

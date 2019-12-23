@@ -54,4 +54,10 @@ public class POSameBaseClassExpression extends POExpression
 	{
 		return "samebaseclass(" + left + "," + right + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSameBaseClassExpression(this, arg);
+	}
 }

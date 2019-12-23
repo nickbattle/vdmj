@@ -43,4 +43,10 @@ public class POGreaterExpression extends PONumericBinaryExpression
 	{
 		return getOrderedObligations(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseGreaterExpression(this, arg);
+	}
 }

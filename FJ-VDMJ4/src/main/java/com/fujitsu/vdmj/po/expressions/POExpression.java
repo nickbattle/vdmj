@@ -110,4 +110,9 @@ public abstract class POExpression extends PONode implements Serializable
 	{
 		return null;
 	}
+
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExpression(this, arg);
+	}
 }

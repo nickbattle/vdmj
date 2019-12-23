@@ -76,4 +76,10 @@ public class POMapEnumExpression extends POMapExpression
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapEnumExpression(this, arg);
+	}
 }

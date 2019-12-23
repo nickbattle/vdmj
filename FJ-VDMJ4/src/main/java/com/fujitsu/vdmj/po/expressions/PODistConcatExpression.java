@@ -39,4 +39,10 @@ public class PODistConcatExpression extends POUnaryExpression
 	{
 		return "(conc " + exp + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDistConcatExpression(this, arg);
+	}
 }

@@ -41,4 +41,10 @@ public class POIntegerLiteralExpression extends POExpression
 	{
 		return value.toString();
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIntegerLiteralExpression(this, arg);
+	}
 }

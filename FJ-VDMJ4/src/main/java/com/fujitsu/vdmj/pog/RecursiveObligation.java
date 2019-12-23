@@ -23,6 +23,9 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.List;
+
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
@@ -39,36 +42,9 @@ public class RecursiveObligation extends ProofObligation
 		POExplicitFunctionDefinition def, POApplyExpression apply, POContextStack ctxt)
 	{
 		super(apply.location, POType.RECURSIVE, ctxt);
-		StringBuilder sb = new StringBuilder();
 		int measureLexical = getLex(def.measureDef);
 
-		sb.append(def.measureName.getName());
-		
-		if (def.typeParams != null)
-		{
-			sb.append("[");
-			
-			for (TCNameToken type: def.typeParams)
-			{
-				sb.append("@");
-				sb.append(type);
-			}
-			
-			sb.append("]");
-		}
-		
-		String sep = "";
-		sb.append("(");
-		
-		for (POPatternList plist: def.paramPatternList)
-		{
-			 sb.append(sep);
-			 sb.append(Utils.listToString(plist));
-			 sep = ", ";
-		}
-
-		sb.append(")");
-		String lhs = sb.toString();
+		String lhs = getLHS(def);
 		String rhs = apply.getMeasureApply(def.measureName);
 
 		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
@@ -78,25 +54,112 @@ public class RecursiveObligation extends ProofObligation
 		POImplicitFunctionDefinition def, POApplyExpression apply, POContextStack ctxt)
 	{
 		super(def.location, POType.RECURSIVE, ctxt);
-		StringBuilder sb = new StringBuilder();
 		int measureLexical = getLex(def.measureDef);
 		
-		sb.append(def.measureName);
-		sb.append("(");
-
-		for (POPatternListTypePair pltp: def.parameterPatterns)
-		{
-			sb.append(pltp.patterns);
-		}
-
-		sb.append(")");
-		
-		String lhs = sb.toString();
-		String rhs = def.measureName + "(" + apply.args + ")";
+		String lhs = getLHS(def);
+		String rhs = def.measureName.getName() + "(" + apply.args + ")";
 
 		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
 	}
 	
+	public RecursiveObligation(List<PODefinition> defs, POApplyExpression apply, POContextStack ctxt)
+	{
+		super(defs.get(0).location, POType.RECURSIVE, ctxt);
+		int measureLexical = getLex(getMeasureDef(defs.get(0)));
+		
+		String lhs = getLHS(defs.get(0));
+		String rhs = getMeasureName(defs.get(1)) + "(" + apply.args + ")";
+
+		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
+	}
+	
+	private String getLHS(PODefinition def)
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		if (def instanceof POExplicitFunctionDefinition)
+		{
+			POExplicitFunctionDefinition edef = (POExplicitFunctionDefinition)def;
+			sb.append(edef.measureName.getName());
+			
+			if (edef.typeParams != null)
+			{
+				sb.append("[");
+				
+				for (TCNameToken type: edef.typeParams)
+				{
+					sb.append("@");
+					sb.append(type);
+				}
+				
+				sb.append("]");
+			}
+			
+			String sep = "";
+			sb.append("(");
+			
+			for (POPatternList plist: edef.paramPatternList)
+			{
+				 sb.append(sep);
+				 sb.append(Utils.listToString(plist));
+				 sep = ", ";
+			}
+
+			sb.append(")");
+		}
+		else if (def instanceof POImplicitFunctionDefinition)
+		{
+			POImplicitFunctionDefinition idef = (POImplicitFunctionDefinition)def;
+			sb.append(idef.measureName.getName());
+			sb.append("(");
+
+			for (POPatternListTypePair pltp: idef.parameterPatterns)
+			{
+				sb.append(pltp.patterns);
+			}
+
+			sb.append(")");
+		}
+		
+		return sb.toString();
+	}
+	
+	private String getMeasureName(PODefinition def)
+	{
+		if (def instanceof POExplicitFunctionDefinition)
+		{
+			POExplicitFunctionDefinition edef = (POExplicitFunctionDefinition)def;
+			return edef.measureName.getName();
+		}
+		else if (def instanceof POImplicitFunctionDefinition)
+		{
+			POImplicitFunctionDefinition idef = (POImplicitFunctionDefinition)def;
+			return idef.measureName.getName();
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	private POExplicitFunctionDefinition getMeasureDef(PODefinition def)
+	{
+		if (def instanceof POExplicitFunctionDefinition)
+		{
+			POExplicitFunctionDefinition edef = (POExplicitFunctionDefinition)def;
+			return edef.measureDef;
+		}
+		else if (def instanceof POImplicitFunctionDefinition)
+		{
+			POImplicitFunctionDefinition idef = (POImplicitFunctionDefinition)def;
+			return idef.measureDef;
+		}
+		else
+		{
+			return null;
+		}
+	}
+
 	private int getLex(POExplicitFunctionDefinition mdef)
 	{
 		TCFunctionType ftype = (TCFunctionType) mdef.getType();

@@ -59,4 +59,10 @@ public class POSetRangeExpression extends POSetExpression
 		obligations.addAll(last.getProofObligations(ctxt));
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetRangeExpression(this, arg);
+	}
 }

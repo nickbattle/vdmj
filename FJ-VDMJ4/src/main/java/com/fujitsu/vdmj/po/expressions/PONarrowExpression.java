@@ -74,4 +74,10 @@ public class PONarrowExpression extends POExpression
 		obligations.addAll(test.getProofObligations(ctxt));
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNarrowExpression(this, arg);
+	}
 }

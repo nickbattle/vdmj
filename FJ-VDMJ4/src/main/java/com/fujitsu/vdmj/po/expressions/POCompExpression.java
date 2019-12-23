@@ -63,4 +63,10 @@ public class POCompExpression extends POBinaryExpression
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCompExpression(this, arg);
+	}
 }

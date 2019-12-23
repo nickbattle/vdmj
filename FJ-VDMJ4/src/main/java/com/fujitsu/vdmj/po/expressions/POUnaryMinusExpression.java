@@ -39,4 +39,10 @@ public class POUnaryMinusExpression extends POUnaryExpression
 	{
 		return "-" + exp;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnaryMinusExpression(this, arg);
+	}
 }

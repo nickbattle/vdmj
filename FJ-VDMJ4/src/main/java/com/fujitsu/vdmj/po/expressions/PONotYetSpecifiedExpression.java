@@ -39,4 +39,10 @@ public class PONotYetSpecifiedExpression extends POExpression
 	{
 		return "not yet specified";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotYetSpecifiedExpression(this, arg);
+	}
 }

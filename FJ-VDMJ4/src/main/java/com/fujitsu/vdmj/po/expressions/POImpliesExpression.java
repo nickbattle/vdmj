@@ -64,4 +64,10 @@ public class POImpliesExpression extends POBooleanBinaryExpression
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImpliesExpression(this, arg);
+	}
 }

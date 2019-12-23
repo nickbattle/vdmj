@@ -39,4 +39,10 @@ public class POPostOpExpression extends POExpression
 	{
 		return postexpression.toString();
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePostOpExpression(this, arg);
+	}
 }

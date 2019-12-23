@@ -94,4 +94,10 @@ public class POCasesExpression extends POExpression
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCasesExpression(this, arg);
+	}
 }

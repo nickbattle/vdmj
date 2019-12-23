@@ -38,4 +38,10 @@ public abstract class POSeqExpression extends POExpression
 	{
 		super(location);
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqExpression(this, arg);
+	}
 }

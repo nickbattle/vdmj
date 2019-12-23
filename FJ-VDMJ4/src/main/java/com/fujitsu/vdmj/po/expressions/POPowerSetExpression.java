@@ -39,4 +39,10 @@ public class POPowerSetExpression extends POUnaryExpression
 	{
 		return "(power " + exp + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePowerSetExpression(this, arg);
+	}
 }

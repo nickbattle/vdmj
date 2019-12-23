@@ -100,4 +100,10 @@ public class POVariableExpression extends POExpression
 
 		return null;	// Not a function/operation.
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseVariableExpression(this, arg);
+	}
 }

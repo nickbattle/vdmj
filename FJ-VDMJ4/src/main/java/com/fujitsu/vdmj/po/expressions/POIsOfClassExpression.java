@@ -57,4 +57,10 @@ public class POIsOfClassExpression extends POExpression
 	{
 		return "isofclass(" + classname + "," + exp + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIsOfClassExpression(this, arg);
+	}
 }

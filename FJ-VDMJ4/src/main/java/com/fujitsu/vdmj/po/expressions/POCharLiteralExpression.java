@@ -42,4 +42,10 @@ public class POCharLiteralExpression extends POExpression
 	{
 		return new CharacterValue(value.unicode).toString();
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCharLiteralExpression(this, arg);
+	}
 }
