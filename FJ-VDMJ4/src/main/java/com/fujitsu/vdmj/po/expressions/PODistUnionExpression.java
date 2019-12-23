@@ -39,4 +39,10 @@ public class PODistUnionExpression extends POUnaryExpression
 	{
 		return "(dunion " + exp + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDistUnionExpression(this, arg);
+	}
 }

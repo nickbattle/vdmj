@@ -35,4 +35,10 @@ public class POModExpression extends PONumericBinaryExpression
 	{
 		super(left, op, right, ltype, rtype);
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseModExpression(this, arg);
+	}
 }

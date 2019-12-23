@@ -49,4 +49,10 @@ public class POElementsExpression extends POSetExpression
 	{
 		return exp.getProofObligations(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseElementsExpression(this, arg);
+	}
 }

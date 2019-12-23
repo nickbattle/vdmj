@@ -39,4 +39,10 @@ public class POLenExpression extends POUnaryExpression
 	{
 		return "(len " + exp + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLenExpression(this, arg);
+	}
 }

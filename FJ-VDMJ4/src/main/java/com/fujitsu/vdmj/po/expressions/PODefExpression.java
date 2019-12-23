@@ -56,4 +56,10 @@ public class PODefExpression extends POLetDefExpression
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDefExpression(this, arg);
+	}
 }

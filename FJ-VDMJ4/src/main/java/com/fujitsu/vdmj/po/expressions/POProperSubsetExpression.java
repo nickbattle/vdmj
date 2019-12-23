@@ -35,4 +35,10 @@ public class POProperSubsetExpression extends POBinaryExpression
 	{
 		super(left, op, right, ltype, rtype);
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseProperSubsetExpression(this, arg);
+	}
 }

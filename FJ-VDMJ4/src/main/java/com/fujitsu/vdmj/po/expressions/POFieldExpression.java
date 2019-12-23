@@ -55,4 +55,10 @@ public class POFieldExpression extends POExpression
 	{
 		return object.getProofObligations(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFieldExpression(this, arg);
+	}
 }

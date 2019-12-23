@@ -42,4 +42,10 @@ public class POSelfExpression extends POExpression
 	{
 		return "self";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSelfExpression(this, arg);
+	}
 }

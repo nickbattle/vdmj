@@ -39,4 +39,10 @@ public class POReverseExpression extends POUnaryExpression
 	{
 		return "(reverse " + exp + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseReverseExpression(this, arg);
+	}
 }

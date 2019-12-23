@@ -23,6 +23,9 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
+import java.util.List;
+
+import com.fujitsu.vdmj.po.PORecursiveLoops;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
@@ -135,6 +138,16 @@ public class POApplyExpression extends POExpression
 					}
 				}
 			}
+			else if (root instanceof POVariableExpression)
+			{
+				POVariableExpression var = (POVariableExpression)root;
+				List<PODefinition> defs = PORecursiveLoops.get(var.name);
+				
+				if (defs != null)	// name is a function in a mutually recursive loop
+				{
+					obligations.add(new RecursiveObligation(defs, this, ctxt));
+				}
+			}
 		}
 
 		if (type.isSeq(location))
@@ -185,5 +198,11 @@ public class POApplyExpression extends POExpression
 		}
 		
 		return start  + Utils.listToString(args) + (close ? ")" : ", ");
+	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseApplyExpression(this, arg);
 	}
 }

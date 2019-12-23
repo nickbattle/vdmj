@@ -35,4 +35,10 @@ public class PORangeResByExpression extends POBinaryExpression
 	{
 		super(left, op, right, ltype, rtype);
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRangeResByExpression(this, arg);
+	}
 }

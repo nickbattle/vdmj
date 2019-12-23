@@ -53,4 +53,10 @@ public class POSeqEnumExpression extends POSeqExpression
 	{
 		return members.getProofObligations(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqEnumExpression(this, arg);
+	}
 }

@@ -24,6 +24,8 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
@@ -31,6 +33,7 @@ import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -107,6 +110,16 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	 * @return The primary type of this definition.
 	 */
 	abstract public TCType getType();
+	
+	/**
+	 * Get a set of function names that are called from this definition. This
+	 * is used in mutually recursive function PO generation. It is only defined
+	 * for explicit/implicit functions!
+	 */
+	public Map<TCNameToken, TCNameSet> getCallMap()
+	{
+		return new HashMap<TCNameToken, TCNameSet>();
+	}
 
 	/**
 	 * Get a list of proof obligations for the definition.

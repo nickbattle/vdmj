@@ -39,4 +39,10 @@ public class POMapRangeExpression extends POUnaryExpression
 	{
 		return "(rng " + exp + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapRangeExpression(this, arg);
+	}
 }

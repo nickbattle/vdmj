@@ -41,4 +41,10 @@ public class POStateInitExpression extends POExpression
 	{
 		return "init " + state.initPattern + " == " + state.initExpression;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStateInitExpression(this, arg);
+	}
 }

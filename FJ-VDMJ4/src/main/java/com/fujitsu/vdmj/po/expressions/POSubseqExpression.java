@@ -61,4 +61,10 @@ public class POSubseqExpression extends POExpression
 		list.addAll(to.getProofObligations(ctxt));
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubseqExpression(this, arg);
+	}
 }

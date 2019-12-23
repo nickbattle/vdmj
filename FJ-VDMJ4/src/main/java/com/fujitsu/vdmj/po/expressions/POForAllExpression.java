@@ -66,4 +66,10 @@ public class POForAllExpression extends POExpression
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForAllExpression(this, arg);
+	}
 }

@@ -59,4 +59,10 @@ public class POExists1Expression extends POExpression
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExists1Expression(this, arg);
+	}
 }

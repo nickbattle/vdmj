@@ -63,4 +63,10 @@ abstract public class POBinaryExpression extends POExpression
 	{
 		return "(" + left + " " + op + " " + right + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBinaryExpression(this, arg);
+	}
 }

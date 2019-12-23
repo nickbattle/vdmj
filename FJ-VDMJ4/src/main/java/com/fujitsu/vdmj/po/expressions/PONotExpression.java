@@ -39,4 +39,10 @@ public class PONotExpression extends POUnaryExpression
 	{
 		return "(not " + exp + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotExpression(this, arg);
+	}
 }

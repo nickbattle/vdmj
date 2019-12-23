@@ -390,10 +390,9 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 		def.classDefinition = classDefinition;
 		def.typeResolve(base);
-		
-		def.typeCheck(base, scope);
-		
 		measureDef = def;
+		
+		measureDef.typeCheck(base, scope);
 	}
 
 	/**

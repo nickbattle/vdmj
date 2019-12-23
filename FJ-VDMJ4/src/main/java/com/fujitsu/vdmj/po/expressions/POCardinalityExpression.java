@@ -39,4 +39,10 @@ public class POCardinalityExpression extends POUnaryExpression
 	{
 		return "(card " + exp + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCardinalityExpression(this, arg);
+	}
 }

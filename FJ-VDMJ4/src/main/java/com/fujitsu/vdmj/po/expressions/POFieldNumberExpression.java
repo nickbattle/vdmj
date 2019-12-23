@@ -77,4 +77,10 @@ public class POFieldNumberExpression extends POExpression
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFieldNumberExpression(this, arg);
+	}
 }

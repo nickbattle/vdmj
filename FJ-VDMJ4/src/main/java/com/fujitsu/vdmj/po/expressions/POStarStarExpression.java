@@ -63,4 +63,10 @@ public class POStarStarExpression extends POBinaryExpression
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStarStarExpression(this, arg);
+	}
 }

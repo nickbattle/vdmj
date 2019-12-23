@@ -50,4 +50,10 @@ public class PODistIntersectExpression extends POUnaryExpression
 		obligations.add(new NonEmptySetObligation(exp, ctxt));
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDistIntersectExpression(this, arg);
+	}
 }
