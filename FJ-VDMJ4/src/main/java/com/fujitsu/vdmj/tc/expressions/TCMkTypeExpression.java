@@ -138,4 +138,10 @@ public class TCMkTypeExpression extends TCExpression
 		names.addAll(args.getFreeVariables(globals, env));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMkTypeExpression(this, arg);
+	}
 }

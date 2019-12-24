@@ -24,6 +24,8 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
@@ -536,5 +538,15 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	public void setComments(LexCommentList comments)
 	{
 		this.comments = comments;
+	}
+	
+	/**
+	 * Get a set of function names that are called from this definition. This
+	 * is used in mutually recursive function processing. It is only defined
+	 * for explicit/implicit functions!
+	 */
+	public Map<TCNameToken, TCNameSet> getCallMap()
+	{
+		return new HashMap<TCNameToken, TCNameSet>();
 	}
 }

@@ -61,4 +61,10 @@ public class TCMapDomainExpression extends TCUnaryExpression
 		TCMapType mt = etype.getMap();
 		return new TCSetType(location, mt.from);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapDomainExpression(this, arg);
+	}
 }

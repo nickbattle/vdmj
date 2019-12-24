@@ -23,17 +23,8 @@
 
 package com.fujitsu.vdmj.po.modules;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-
 import com.fujitsu.vdmj.po.POMappedList;
-import com.fujitsu.vdmj.po.PORecursiveLoops;
-import com.fujitsu.vdmj.po.definitions.PODefinition;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.util.Utils;
@@ -56,8 +47,6 @@ public class POModuleList extends POMappedList<TCModule, POModule>
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		
-		setRecursiveLoops();
-
 		for (POModule m: this)
 		{
 			obligations.addAll(m.getProofObligations());
@@ -65,58 +54,5 @@ public class POModuleList extends POMappedList<TCModule, POModule>
 
 		obligations.trivialCheck();
 		return obligations;
-	}
-
-	private void setRecursiveLoops()
-	{
-		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
-		
-		for (POModule m: this)
-		{
-			callmap.putAll(m.getCallMap());
-		}
-		
-		PORecursiveLoops.reset();
-		
-		for (TCNameToken sought: callmap.keySet())
-		{
-			Stack<TCNameToken> stack = new Stack<TCNameToken>();
-			stack.push(sought);
-			
-			if (PORecursiveLoops.reachable(sought, callmap.get(sought), callmap, stack))
-			{
-	    		PORecursiveLoops.put(sought, findDefinitions(stack));
-			}
-			
-			stack.pop();
-		}
-	}
-	
-	private PODefinitionList findDefinitions(Stack<TCNameToken> stack)
-	{
-		PODefinitionList list = new PODefinitionList();
-		
-		for (TCNameToken name: stack)
-		{
-			list.add(findDefinition(name));
-		}
-		
-		return list;
-	}
-
-	private PODefinition findDefinition(TCNameToken sought)
-	{
-		for (POModule module: this)
-		{
-			for (PODefinition def: module.defs)
-			{
-				if (def.name != null && def.name.equals(sought))
-				{
-					return def;
-				}
-			}
-		}
-		
-		return null;
 	}
 }

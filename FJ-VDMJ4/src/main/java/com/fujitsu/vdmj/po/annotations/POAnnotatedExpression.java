@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.annotations;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -62,5 +63,11 @@ public class POAnnotatedExpression extends POExpression
 	public String getPreName()
 	{
 		return expression.getPreName();
+	}
+
+	@Override
+	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAnnotatedExpression(this, arg);
 	}
 }

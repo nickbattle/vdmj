@@ -67,4 +67,10 @@ public class TCPreOpExpression extends TCExpression
 	{
 		return expression.getQualifiedDefs(env);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePreOpExpression(this, arg);
+	}
 }

@@ -73,4 +73,10 @@ public class TCFieldNumberExpression extends TCExpression
 
 		return product.types.get((int)fn - 1);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFieldNumberExpression(this, arg);
+	}
 }

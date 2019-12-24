@@ -54,4 +54,10 @@ public class TCSubtractExpression extends TCNumericBinaryExpression
 			return new TCIntegerType(location);
 		}
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubtractExpression(this, arg);
+	}
 }

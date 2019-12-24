@@ -70,4 +70,10 @@ public class TCElseIfExpression extends TCExpression
 
 		return thenExp.typeCheck(qenv, null, scope, constraint);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseElseIfExpression(this, arg);
+	}
 }

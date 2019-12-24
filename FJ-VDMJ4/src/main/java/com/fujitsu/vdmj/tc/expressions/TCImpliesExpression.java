@@ -33,4 +33,10 @@ public class TCImpliesExpression extends TCBooleanBinaryExpression
 	{
 		super(left, op, right);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImpliesExpression(this, arg);
+	}
 }

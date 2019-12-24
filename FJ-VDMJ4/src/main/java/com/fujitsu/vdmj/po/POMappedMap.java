@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2019 Nick Battle.
+ *	Copyright (c) 2016 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -20,37 +20,35 @@
  *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
+
 package com.fujitsu.vdmj.po;
 
-import java.util.List;
+import java.util.Map;
 
-import com.fujitsu.vdmj.po.definitions.PODefinition;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.mapper.MappedMap;
 
-/**
- * A class to hold static data shared by VDM-SL and VDM++/RT.
- */
-public class PORecursiveLoops extends POMappedMap<TCNameToken, TCDefinitionList, TCNameToken, PODefinitionList>
+abstract public class POMappedMap<FROM_KEY, FROM, TO_KEY, TO> extends MappedMap<FROM_KEY, FROM, TO_KEY, TO>
 {
 	private static final long serialVersionUID = 1L;
-	private static PORecursiveLoops INSTANCE = null;
-	private PORecursiveMap recursiveLoops = null;
+
+	public POMappedMap(Map<FROM_KEY, FROM> from) throws Exception
+	{
+		super(PONode.MAPPINGS, from);
+	}
 	
-	public PORecursiveLoops(PORecursiveMap recursiveLoops)
+	public POMappedMap()
 	{
-		this.recursiveLoops = recursiveLoops;
-		INSTANCE = this;
+		super();
 	}
-
-	public static PORecursiveLoops getInstance()
+	
+	@Override
+	public boolean equals(Object other)
 	{
-		return INSTANCE;
-	}
-
-	public List<PODefinition> get(TCNameToken name)
-	{
-		return recursiveLoops.get(name);
+		if (other instanceof POMappedMap)
+		{
+			return super.equals(other);
+		}
+		
+		return false;
 	}
 }

@@ -61,4 +61,10 @@ public class TCAndExpression extends TCBooleanBinaryExpression
 
 		return super.typeCheck(qenv, qualifiers, scope, constraint);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAndExpression(this, arg);
+	}
 }

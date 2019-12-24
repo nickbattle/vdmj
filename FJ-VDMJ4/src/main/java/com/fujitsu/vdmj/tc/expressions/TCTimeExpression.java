@@ -65,4 +65,10 @@ public class TCTimeExpression extends TCExpression
 
 		return checkConstraint(constraint, new TCNaturalType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTimeExpression(this, arg);
+	}
 }

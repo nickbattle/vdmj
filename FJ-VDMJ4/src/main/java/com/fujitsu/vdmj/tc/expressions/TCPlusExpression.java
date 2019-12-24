@@ -85,4 +85,10 @@ public class TCPlusExpression extends TCNumericBinaryExpression
 			return new TCNaturalOneType(ln.location);
 		}
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePlusExpression(this, arg);
+	}
 }

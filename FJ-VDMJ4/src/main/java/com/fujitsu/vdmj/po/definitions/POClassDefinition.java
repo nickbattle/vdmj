@@ -23,15 +23,11 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -109,18 +105,5 @@ public class POClassDefinition extends PODefinition
 		// Body of invariant operation is a list of invdefs
 		POClassInvariantStatement body = (POClassInvariantStatement)invariant.body;
 		return body.invdefs;
-	}
-
-	@Override
-	public Map<TCNameToken, TCNameSet> getCallMap()
-	{
-		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
-		
-		for (PODefinition def: definitions)
-		{
-			callmap.putAll(def.getCallMap());
-		}
-		
-		return callmap;
 	}
 }

@@ -117,4 +117,10 @@ public class TCHistoryExpression extends TCExpression
 		sb.append(")");
 		return sb.toString();
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseHistoryExpression(this, arg);
+	}
 }

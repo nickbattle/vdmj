@@ -50,4 +50,10 @@ public class TCUndefinedExpression extends TCExpression
 	{
 		return new TCUnknownType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUndefinedExpression(this, arg);
+	}
 }

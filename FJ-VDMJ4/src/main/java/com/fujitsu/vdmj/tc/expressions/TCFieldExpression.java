@@ -214,4 +214,10 @@ public class TCFieldExpression extends TCExpression
 	{
 		return object.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFieldExpression(this, arg);
+	}
 }

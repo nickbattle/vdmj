@@ -87,4 +87,10 @@ public class TCStateInitExpression extends TCExpression
 		state.canBeExecuted = canBeExecuted;
 		return new TCBooleanType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStateInitExpression(this, arg);
+	}
 }

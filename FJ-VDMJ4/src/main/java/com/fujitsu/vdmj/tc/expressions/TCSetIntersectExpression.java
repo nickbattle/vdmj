@@ -86,4 +86,10 @@ public class TCSetIntersectExpression extends TCBinaryExpression
 
 		return result;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetIntersectExpression(this, arg);
+	}
 }

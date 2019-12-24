@@ -120,7 +120,10 @@ public class ClassTypeChecker extends TypeChecker
 			if (c.annotations != null) c.annotations.tcBefore(c);
 		}
 
-	    for (Pass pass: Pass.values())
+		// Look for recursive loops
+		classes.setRecursiveLoops();
+
+		for (Pass pass: Pass.values())
 		{
         	for (TCClassDefinition c: classes)
     		{

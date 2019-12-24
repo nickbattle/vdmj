@@ -139,4 +139,10 @@ public class TCNewExpression extends TCExpression
 
 		return checkConstraint(constraint, classdef.getType());
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNewExpression(this, arg);
+	}
 }

@@ -86,4 +86,10 @@ public class TCSetRangeExpression extends TCSetExpression
 		names.addAll(last.getFreeVariables(globals, env));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetRangeExpression(this, arg);
+	}
 }

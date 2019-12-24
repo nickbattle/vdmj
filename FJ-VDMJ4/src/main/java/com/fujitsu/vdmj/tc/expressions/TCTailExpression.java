@@ -66,4 +66,10 @@ public class TCTailExpression extends TCUnaryExpression
 
 		return etype;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTailExpression(this, arg);
+	}
 }

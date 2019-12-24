@@ -71,4 +71,10 @@ public class TCDistConcatExpression extends TCUnaryExpression
 		report(3075, "Argument of 'conc' is not a seq of seq");
 		return new TCUnknownType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDistConcatExpression(this, arg);
+	}
 }

@@ -69,4 +69,10 @@ public class TCMkBasicExpression extends TCExpression
 		names.addAll(arg.getFreeVariables(globals, env));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMkBasicExpression(this, arg);
+	}
 }

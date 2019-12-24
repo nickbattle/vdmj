@@ -61,4 +61,10 @@ public class TCMapRangeExpression extends TCUnaryExpression
 		TCMapType mt = etype.getMap();
 		return new TCSetType(location, mt.to);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapRangeExpression(this, arg);
+	}
 }

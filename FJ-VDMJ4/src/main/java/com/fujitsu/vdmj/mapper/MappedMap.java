@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2019 Nick Battle.
+ *	Copyright (c) 2016 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -20,37 +20,31 @@
  *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-package com.fujitsu.vdmj.po;
 
-import java.util.List;
+package com.fujitsu.vdmj.mapper;
 
-import com.fujitsu.vdmj.po.definitions.PODefinition;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * A class to hold static data shared by VDM-SL and VDM++/RT.
- */
-public class PORecursiveLoops extends POMappedMap<TCNameToken, TCDefinitionList, TCNameToken, PODefinitionList>
+import com.fujitsu.vdmj.mapper.ClassMapper;
+
+abstract public class MappedMap<FROM_KEY, FROM, TO_KEY, TO> extends HashMap<TO_KEY, TO>
 {
 	private static final long serialVersionUID = 1L;
-	private static PORecursiveLoops INSTANCE = null;
-	private PORecursiveMap recursiveLoops = null;
+
+	@SuppressWarnings("unchecked")
+	public MappedMap(String mappings, Map<FROM_KEY, FROM> from) throws Exception
+	{
+		ClassMapper mapper = ClassMapper.getInstance(mappings);	// NB. no init!
+		
+		for (FROM_KEY key: from.keySet())
+		{
+			put((TO_KEY)mapper.convert(key), (TO)mapper.convert(from.get(key)));
+		}
+	}
 	
-	public PORecursiveLoops(PORecursiveMap recursiveLoops)
+	public MappedMap()
 	{
-		this.recursiveLoops = recursiveLoops;
-		INSTANCE = this;
-	}
-
-	public static PORecursiveLoops getInstance()
-	{
-		return INSTANCE;
-	}
-
-	public List<PODefinition> get(TCNameToken name)
-	{
-		return recursiveLoops.get(name);
+		super();
 	}
 }

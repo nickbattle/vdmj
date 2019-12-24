@@ -67,4 +67,10 @@ public class TCLenExpression extends TCUnaryExpression
 		return possibleConstraint(constraint,
 				seq1 ? new TCNaturalOneType(location) : new TCNaturalType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLenExpression(this, arg);
+	}
 }

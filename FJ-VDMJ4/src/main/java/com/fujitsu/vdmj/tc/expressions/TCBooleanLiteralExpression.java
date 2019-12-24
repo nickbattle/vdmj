@@ -53,4 +53,10 @@ public class TCBooleanLiteralExpression extends TCExpression
 	{
 		return checkConstraint(constraint, new TCBooleanType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBooleanLiteralExpression(this, arg);
+	}
 }

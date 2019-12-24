@@ -62,4 +62,10 @@ public class TCSelfExpression extends TCExpression
 
 		return checkConstraint(constraint, cdef.getType());
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSelfExpression(this, arg);
+	}
 }

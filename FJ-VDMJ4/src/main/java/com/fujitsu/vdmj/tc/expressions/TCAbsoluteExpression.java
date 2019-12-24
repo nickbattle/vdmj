@@ -77,4 +77,10 @@ public class TCAbsoluteExpression extends TCUnaryExpression
 
 		return t;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAbsoluteExpression(this, arg);
+	}
 }

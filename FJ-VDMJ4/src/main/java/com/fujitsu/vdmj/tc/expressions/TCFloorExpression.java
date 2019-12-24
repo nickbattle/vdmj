@@ -55,4 +55,10 @@ public class TCFloorExpression extends TCUnaryExpression
 
 		return new TCIntegerType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFloorExpression(this, arg);
+	}
 }

@@ -68,4 +68,10 @@ public class TCPowerSetExpression extends TCUnaryExpression
 
 		return new TCSetType(location, new TCSetType(location, eset.setof));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePowerSetExpression(this, arg);
+	}
 }

@@ -141,7 +141,7 @@ public class POApplyExpression extends POExpression
 			else if (root instanceof POVariableExpression)
 			{
 				POVariableExpression var = (POVariableExpression)root;
-				List<PODefinition> defs = PORecursiveLoops.get(var.name);
+				List<PODefinition> defs = PORecursiveLoops.getInstance().get(var.name);
 				
 				if (defs != null)	// name is a function in a mutually recursive loop
 				{

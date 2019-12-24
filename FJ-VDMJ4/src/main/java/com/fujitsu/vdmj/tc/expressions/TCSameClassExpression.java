@@ -68,4 +68,10 @@ public class TCSameClassExpression extends TCExpression
 
 		return checkConstraint(constraint, new TCBooleanType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSameClassExpression(this, arg);
+	}
 }

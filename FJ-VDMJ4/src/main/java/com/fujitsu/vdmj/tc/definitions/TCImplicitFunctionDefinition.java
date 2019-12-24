@@ -23,11 +23,14 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.expressions.TCFunctionCallFinder;
 import com.fujitsu.vdmj.tc.expressions.TCNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
@@ -605,5 +608,25 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		}
 		
 		return names;
+	}
+	
+	@Override
+	public Map<TCNameToken, TCNameSet> getCallMap()
+	{
+		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
+		
+		if (body == null)
+		{
+			callmap.put(name, new TCNameSet());
+		}
+		else
+		{
+			TCFunctionCallFinder finder = new TCFunctionCallFinder();
+			TCNameSet found = new TCNameSet();
+			found.addAll(body.apply(finder, null));
+			callmap.put(name, found);
+		}
+		
+		return callmap;
 	}
 }

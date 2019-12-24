@@ -83,4 +83,10 @@ public class TCSetEnumExpression extends TCSetExpression
 	{
 		return members.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetEnumExpression(this, arg);
+	}
 }

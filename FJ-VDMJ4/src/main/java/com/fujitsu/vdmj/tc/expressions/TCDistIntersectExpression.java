@@ -64,4 +64,10 @@ public class TCDistIntersectExpression extends TCUnaryExpression
 		report(3076, "Argument of 'dinter' is not a set of sets");
 		return new TCUnknownType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDistIntersectExpression(this, arg);
+	}
 }

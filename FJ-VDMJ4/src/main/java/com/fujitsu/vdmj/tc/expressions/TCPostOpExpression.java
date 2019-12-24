@@ -63,4 +63,10 @@ public class TCPostOpExpression extends TCExpression
 	{
 		return postexpression.typeCheck(env, null, scope, null);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePostOpExpression(this, arg);
+	}
 }

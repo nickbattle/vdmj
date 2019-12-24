@@ -45,4 +45,10 @@ public class TCModExpression extends TCNumericBinaryExpression
 		checkNumeric(env, scope);
 		return new TCIntegerType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseModExpression(this, arg);
+	}
 }

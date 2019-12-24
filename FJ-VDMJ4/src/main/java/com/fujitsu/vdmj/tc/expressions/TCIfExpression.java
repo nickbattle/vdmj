@@ -110,4 +110,10 @@ public class TCIfExpression extends TCExpression
 	{
 		return ifExp.getFreeVariables(globals, env);		// The rest is conditional
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIfExpression(this, arg);
+	}
 }

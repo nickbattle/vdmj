@@ -45,4 +45,10 @@ public class TCGreaterEqualExpression extends TCNumericBinaryExpression
 		checkOrdered(env, scope);
 		return checkConstraint(constraint, new TCBooleanType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseGreaterEqualExpression(this, arg);
+	}
 }

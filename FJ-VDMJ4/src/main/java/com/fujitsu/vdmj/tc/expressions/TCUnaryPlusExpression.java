@@ -49,4 +49,10 @@ public class TCUnaryPlusExpression extends TCUnaryExpression
 	{
 		return exp.typeCheck(env, null, scope, constraint);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnaryPlusExpression(this, arg);
+	}
 }

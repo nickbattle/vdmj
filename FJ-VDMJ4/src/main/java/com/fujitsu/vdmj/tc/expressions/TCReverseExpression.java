@@ -59,4 +59,10 @@ public class TCReverseExpression extends TCUnaryExpression
 
 		return etype;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseReverseExpression(this, arg);
+	}
 }

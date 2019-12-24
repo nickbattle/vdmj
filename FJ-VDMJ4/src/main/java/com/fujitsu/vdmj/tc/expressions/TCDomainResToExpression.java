@@ -77,4 +77,10 @@ public class TCDomainResToExpression extends TCBinaryExpression
 
 		return rtype;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDomainResToExpression(this, arg);
+	}
 }

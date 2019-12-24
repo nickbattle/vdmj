@@ -122,4 +122,10 @@ public class TCIsExpression extends TCExpression
 	{
 		return test.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIsExpression(this, arg);
+	}
 }

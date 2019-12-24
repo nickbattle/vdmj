@@ -88,4 +88,10 @@ public class TCTupleExpression extends TCExpression
 	{
 		return args.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTupleExpression(this, arg);
+	}
 }

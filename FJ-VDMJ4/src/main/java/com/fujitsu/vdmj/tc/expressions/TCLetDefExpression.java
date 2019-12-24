@@ -121,4 +121,10 @@ public class TCLetDefExpression extends TCExpression
 		names.addAll(expression.getFreeVariables(globals, local));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLetDefExpression(this, arg);
+	}
 }

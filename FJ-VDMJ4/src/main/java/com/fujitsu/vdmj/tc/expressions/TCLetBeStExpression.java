@@ -91,4 +91,10 @@ public class TCLetBeStExpression extends TCExpression
 		names.addAll(value.getFreeVariables(globals, local));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLetBeStExpression(this, arg);
+	}
 }

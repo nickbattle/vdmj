@@ -62,4 +62,10 @@ public class TCPreExpression extends TCExpression
 
 		return new TCBooleanType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePreExpression(this, arg);
+	}
 }

@@ -61,4 +61,10 @@ public class TCMapInverseExpression extends TCUnaryExpression
 		type = etype.getMap();
 		return new TCMapType(location, type.to, type.from);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapInverseExpression(this, arg);
+	}
 }

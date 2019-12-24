@@ -33,4 +33,10 @@ public class TCEquivalentExpression extends TCBooleanBinaryExpression
 	{
 		super(left, op, right);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseEquivalentExpression(this, arg);
+	}
 }

@@ -64,4 +64,10 @@ public class TCIndicesExpression extends TCUnaryExpression
 
 		return checkConstraint(constraint, new TCSetType(location, new TCNaturalOneType(location), empty));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIndicesExpression(this, arg);
+	}
 }

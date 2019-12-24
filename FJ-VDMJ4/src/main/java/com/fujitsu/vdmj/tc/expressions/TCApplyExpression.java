@@ -424,4 +424,10 @@ public class TCApplyExpression extends TCExpression
 		names.addAll(args.getFreeVariables(globals, env));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseApplyExpression(this, arg);
+	}
 }

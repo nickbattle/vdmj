@@ -23,14 +23,11 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POFunctionCallFinder;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
@@ -46,7 +43,6 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -224,25 +220,5 @@ public class POImplicitFunctionDefinition extends PODefinition
 		}
 		
 		return list;
-	}
-	
-	@Override
-	public Map<TCNameToken, TCNameSet> getCallMap()
-	{
-		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
-		
-		if (body == null)
-		{
-			callmap.put(name, new TCNameSet());
-		}
-		else
-		{
-			POFunctionCallFinder finder = new POFunctionCallFinder();
-			TCNameSet found = new TCNameSet();
-			found.addAll(body.apply(finder, null));
-			callmap.put(name, found);
-		}
-		
-		return callmap;
 	}
 }
