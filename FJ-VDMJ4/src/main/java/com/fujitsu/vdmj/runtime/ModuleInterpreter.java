@@ -54,6 +54,7 @@ import com.fujitsu.vdmj.scheduler.MainThread;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.TCRecursiveLoops;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -336,6 +337,7 @@ public class ModuleInterpreter extends Interpreter
 		{
 			long now = System.currentTimeMillis();
 			pogModules = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedModules);
+			ClassMapper.getInstance(PONode.MAPPINGS).convert(TCRecursiveLoops.getInstance());
 			VDMJ.mapperStats(now, PONode.MAPPINGS);
 		}
 		

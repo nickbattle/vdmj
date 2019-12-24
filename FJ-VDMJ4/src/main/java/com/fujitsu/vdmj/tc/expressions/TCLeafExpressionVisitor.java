@@ -85,7 +85,11 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 			all.addAll(a.cexp.apply(this, arg));
 		}
 		
-		all.addAll(node.others.apply(this, arg));
+		if (node.others != null)
+		{
+			all.addAll(node.others.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -127,7 +131,12 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(caseBind(node.bind, arg));
-		all.addAll(node.predicate.apply(this, arg));
+		
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -141,7 +150,11 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 			all.addAll(caseMultipleBind(bind, arg));
 		}
 		
-		all.addAll(node.predicate.apply(this, arg));
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -167,7 +180,11 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 			all.addAll(caseMultipleBind(bind, arg));
 		}
 		
-		all.addAll(node.predicate.apply(this, arg));
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -197,7 +214,12 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(caseBind(node.bind, arg));
-		all.addAll(node.predicate.apply(this, arg));
+		
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -238,7 +260,12 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(caseMultipleBind(node.bind, arg));
-		all.addAll(node.suchThat.apply(this, arg));
+		
+		if (node.suchThat != null)
+		{
+			all.addAll(node.suchThat.apply(this, arg));
+		}
+		
 		all.addAll(node.value.apply(this, arg));
 		return all;
 	}
@@ -273,7 +300,11 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 			all.addAll(caseMultipleBind(mbind, arg));
 		}
 		
-		all.addAll(node.predicate.apply(this, arg));
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -381,7 +412,12 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 		List<E> all = new Vector<E>();
 		all.addAll(node.first.apply(this, arg));
 		all.addAll(caseBind(node.bind, arg));
-		all.addAll(node.predicate.apply(this, arg));
+		
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -409,7 +445,11 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 			all.addAll(caseMultipleBind(mbind, arg));
 		}
 		
-		all.addAll(node.predicate.apply(this, arg));
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 

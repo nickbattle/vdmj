@@ -24,9 +24,6 @@
 package com.fujitsu.vdmj.po.modules;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -34,8 +31,6 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
  * A class holding all the details for one module.
@@ -91,17 +86,5 @@ public class POModule extends PONode implements Serializable
 		
 		if (annotations != null) annotations.poAfter(this, list);
 		return list;
-	}
-
-	public Map<TCNameToken, TCNameSet> getCallMap()
-	{
-		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
-		
-		for (PODefinition def: defs)
-		{
-			callmap.putAll(def.getCallMap());
-		}
-		
-		return callmap;
 	}
 }

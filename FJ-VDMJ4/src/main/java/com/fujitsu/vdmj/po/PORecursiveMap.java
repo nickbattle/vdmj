@@ -20,37 +20,21 @@
  *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
+
 package com.fujitsu.vdmj.po;
 
-import java.util.List;
-
-import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.POMappedMap;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.tc.TCRecursiveMap;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-/**
- * A class to hold static data shared by VDM-SL and VDM++/RT.
- */
-public class PORecursiveLoops extends POMappedMap<TCNameToken, TCDefinitionList, TCNameToken, PODefinitionList>
+public class PORecursiveMap extends POMappedMap<TCNameToken, TCDefinitionList, TCNameToken, PODefinitionList>
 {
 	private static final long serialVersionUID = 1L;
-	private static PORecursiveLoops INSTANCE = null;
-	private PORecursiveMap recursiveLoops = null;
 	
-	public PORecursiveLoops(PORecursiveMap recursiveLoops)
+	public PORecursiveMap(TCRecursiveMap from) throws Exception
 	{
-		this.recursiveLoops = recursiveLoops;
-		INSTANCE = this;
-	}
-
-	public static PORecursiveLoops getInstance()
-	{
-		return INSTANCE;
-	}
-
-	public List<PODefinition> get(TCNameToken name)
-	{
-		return recursiveLoops.get(name);
+		super(from);
 	}
 }

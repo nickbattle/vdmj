@@ -20,27 +20,27 @@
  *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
  *
  ******************************************************************************/
-package com.fujitsu.vdmj.po.expressions;
+package com.fujitsu.vdmj.tc.expressions;
 
 import java.util.List;
 
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class POFunctionCallFinder extends POLeafExpressionVisitor<TCNameToken, Object>
+public class TCFunctionCallFinder extends TCLeafExpressionVisitor<TCNameToken, Object>
 {
 	@Override
-	public List<TCNameToken> caseExpression(POExpression node, Object arg)
+	public List<TCNameToken> caseExpression(TCExpression node, Object arg)
 	{
 		return new TCNameList();
 	}
 	
 	@Override
-	public List<TCNameToken> caseApplyExpression(POApplyExpression node, Object arg)
+	public List<TCNameToken> caseApplyExpression(TCApplyExpression node, Object arg)
 	{
-		if (node.root instanceof POVariableExpression)
+		if (node.root instanceof TCVariableExpression)
 		{
-			POVariableExpression vexp = (POVariableExpression)node.root;
+			TCVariableExpression vexp = (TCVariableExpression)node.root;
 			return new TCNameList(vexp.name);
 		}
 		else

@@ -185,6 +185,9 @@ public class ModuleTypeChecker extends TypeChecker
 		{
 			if (m.annotations != null) m.annotations.tcBefore(m);
 		}
+		
+		// Look for recursive loops
+		modules.setRecursiveLoops();
 
 		// Proceed to type check all definitions, considering types, values
 		// and remaining definitions, in that order.

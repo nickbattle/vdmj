@@ -23,13 +23,16 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.statements.TCClassInvariantStatement;
@@ -947,5 +950,18 @@ public class TCClassDefinition extends TCDefinition
 	public String kind()
 	{
 		return "class";
+	}
+
+	@Override
+	public Map<TCNameToken, TCNameSet> getCallMap()
+	{
+		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
+		
+		for (TCDefinition def: definitions)
+		{
+			callmap.putAll(def.getCallMap());
+		}
+		
+		return callmap;
 	}
 }
