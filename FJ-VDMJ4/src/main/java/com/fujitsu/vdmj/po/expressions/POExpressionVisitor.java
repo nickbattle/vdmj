@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotatedExpression;
+
 /**
  * The base type for all POExpression visitors. All methods, by default, call
  * the abstract caseExpression method, via the various intermediate default
@@ -40,6 +42,11 @@ public abstract class POExpressionVisitor<R, S>
  	public R caseAndExpression(POAndExpression node, S arg)
 	{
 		return caseBooleanBinaryExpression(node, arg);
+	}
+
+ 	public R caseAnnotatedExpression(POAnnotatedExpression node, S arg)
+	{
+		return caseExpression(node, arg);
 	}
 
  	public R caseApplyExpression(POApplyExpression node, S arg)

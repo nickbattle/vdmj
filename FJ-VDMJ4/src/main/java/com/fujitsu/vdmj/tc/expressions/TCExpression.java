@@ -254,4 +254,9 @@ public abstract class TCExpression extends TCNode implements Serializable
 	{
 		this.comments = comments;
 	}
+
+	/**
+	 * Implemented by all expressions to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg);
 }

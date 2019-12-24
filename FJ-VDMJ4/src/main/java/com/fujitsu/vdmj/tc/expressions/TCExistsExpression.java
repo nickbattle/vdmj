@@ -89,4 +89,10 @@ public class TCExistsExpression extends TCExpression
 		
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExistsExpression(this, arg);
+	}
 }

@@ -50,4 +50,10 @@ public class TCNotYetSpecifiedExpression extends TCExpression
 	{
 		return new TCUnknownType(location);	// Because we terminate anyway
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotYetSpecifiedExpression(this, arg);
+	}
 }

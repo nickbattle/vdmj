@@ -67,4 +67,10 @@ public class TCCardinalityExpression extends TCUnaryExpression
 		return possibleConstraint(constraint,
 				set1 ? new TCNaturalOneType(location) : new TCNaturalType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCardinalityExpression(this, arg);
+	}
 }

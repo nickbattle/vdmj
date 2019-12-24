@@ -51,4 +51,10 @@ public class TCNilExpression extends TCExpression
 	{
 		return checkConstraint(constraint, new TCOptionalType(location, new TCUnknownType(location)));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNilExpression(this, arg);
+	}
 }

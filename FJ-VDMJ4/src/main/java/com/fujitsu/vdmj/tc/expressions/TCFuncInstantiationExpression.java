@@ -174,4 +174,10 @@ public class TCFuncInstantiationExpression extends TCExpression
 	{
 		return function.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFuncInstantiationExpression(this, arg);
+	}
 }

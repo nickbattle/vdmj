@@ -62,4 +62,10 @@ public class TCUnaryMinusExpression extends TCUnaryExpression
 		// return checkConstraint(constraint, t);
 		return t;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnaryMinusExpression(this, arg);
+	}
 }

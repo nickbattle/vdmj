@@ -57,4 +57,10 @@ public class TCNotExpression extends TCUnaryExpression
 
 		return checkConstraint(constraint, new TCBooleanType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotExpression(this, arg);
+	}
 }

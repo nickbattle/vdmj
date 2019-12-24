@@ -70,4 +70,10 @@ public class TCMapUnionExpression extends TCBinaryExpression
 				from.getType(location), to.getType(location));
 		}
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapUnionExpression(this, arg);
+	}
 }

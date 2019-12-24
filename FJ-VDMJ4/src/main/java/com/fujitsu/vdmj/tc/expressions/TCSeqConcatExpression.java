@@ -82,4 +82,10 @@ public class TCSeqConcatExpression extends TCBinaryExpression
 			new TCSeq1Type(location, ts.getType(location)) :
 			new TCSeqType(location, ts.getType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqConcatExpression(this, arg);
+	}
 }

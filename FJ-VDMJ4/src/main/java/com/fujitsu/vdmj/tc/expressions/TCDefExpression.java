@@ -42,4 +42,10 @@ public class TCDefExpression extends TCLetDefExpression
 	{
 		return "def " + Utils.listToString(localDefs) + " in\n" + expression;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDefExpression(this, arg);
+	}
 }

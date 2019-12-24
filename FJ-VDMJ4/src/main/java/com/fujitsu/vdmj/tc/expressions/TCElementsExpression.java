@@ -77,4 +77,10 @@ public class TCElementsExpression extends TCSetExpression
 	{
 		return exp.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseElementsExpression(this, arg);
+	}
 }

@@ -213,4 +213,10 @@ public class TCVariableExpression extends TCExpression
 			return new TCNameSet();
 		}
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseVariableExpression(this, arg);
+	}
 }

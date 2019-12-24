@@ -53,4 +53,10 @@ public class TCQuoteLiteralExpression extends TCExpression
 	{
 		return checkConstraint(constraint, new TCQuoteType(location, type.value));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQuoteLiteralExpression(this, arg);
+	}
 }

@@ -71,4 +71,10 @@ public class TCDistMergeExpression extends TCUnaryExpression
 		report(3077, "Merge argument is not a set of maps");
 		return new TCMapType(location);	// Unknown types
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDistMergeExpression(this, arg);
+	}
 }

@@ -110,4 +110,10 @@ public class TCSeqCompExpression extends TCSeqExpression
 		names.addAll(bind.getFreeVariables(globals, local));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqCompExpression(this, arg);
+	}
 }

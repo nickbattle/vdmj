@@ -88,4 +88,10 @@ public class TCSubseqExpression extends TCExpression
 		names.addAll(to.getFreeVariables(globals, env));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubseqExpression(this, arg);
+	}
 }

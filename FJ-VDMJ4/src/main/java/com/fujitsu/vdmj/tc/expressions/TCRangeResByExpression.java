@@ -75,4 +75,10 @@ public class TCRangeResByExpression extends TCBinaryExpression
 
 		return ltype;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRangeResByExpression(this, arg);
+	}
 }

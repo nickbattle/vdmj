@@ -21,37 +21,37 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.expressions;
+package com.fujitsu.vdmj.tc.expressions;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.po.annotations.POAnnotatedExpression;
-import com.fujitsu.vdmj.po.definitions.PODefinition;
-import com.fujitsu.vdmj.po.definitions.POEqualsDefinition;
-import com.fujitsu.vdmj.po.definitions.POValueDefinition;
-import com.fujitsu.vdmj.po.patterns.POBind;
-import com.fujitsu.vdmj.po.patterns.POMultipleBind;
-import com.fujitsu.vdmj.po.patterns.POMultipleSeqBind;
-import com.fujitsu.vdmj.po.patterns.POMultipleSetBind;
-import com.fujitsu.vdmj.po.patterns.POSeqBind;
-import com.fujitsu.vdmj.po.patterns.POSetBind;
-import com.fujitsu.vdmj.po.patterns.POTypeBind;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotatedExpression;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCEqualsDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
+import com.fujitsu.vdmj.tc.patterns.TCBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
+import com.fujitsu.vdmj.tc.patterns.TCSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 
 /**
- * This POExpression visitor visits all of the leaves of an expression tree and calls
+ * This TCExpression visitor visits all of the leaves of an expression tree and calls
  * the basic processing methods for the simple expressions.
  */
-abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<List<E>, S>
+abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<List<E>, S>
 {
  	@Override
-	public List<E> caseApplyExpression(POApplyExpression node, S arg)
+	public List<E> caseApplyExpression(TCApplyExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.root.apply(this, arg));
 		
-		for (POExpression a: node.args)
+		for (TCExpression a: node.args)
 		{
 			all.addAll(a.apply(this, arg));
 		}
@@ -60,13 +60,13 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
  	
  	@Override
- 	public List<E> caseAnnotatedExpression(POAnnotatedExpression node, S arg)
+ 	public List<E> caseAnnotatedExpression(TCAnnotatedExpression node, S arg)
  	{
  		return node.expression.apply(this, arg);
  	}
 
  	@Override
-	public List<E> caseBinaryExpression(POBinaryExpression node, S arg)
+	public List<E> caseBinaryExpression(TCBinaryExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.left.apply(this, arg));
@@ -75,12 +75,12 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseCasesExpression(POCasesExpression node, S arg)
+	public List<E> caseCasesExpression(TCCasesExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.exp.apply(this, arg));
 		
-		for (POCaseAlternative a: node.cases)
+		for (TCCaseAlternative a: node.cases)
 		{
 			all.addAll(a.cexp.apply(this, arg));
 		}
@@ -90,15 +90,15 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseDefExpression(PODefExpression node, S arg)
+	public List<E> caseDefExpression(TCDefExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 
-		for (PODefinition def: node.localDefs)
+		for (TCDefinition def: node.localDefs)
  		{
- 			if (def instanceof POEqualsDefinition)
+ 			if (def instanceof TCEqualsDefinition)
  			{
- 				POEqualsDefinition edef = (POEqualsDefinition)def;
+ 				TCEqualsDefinition edef = (TCEqualsDefinition)def;
  				all.addAll(edef.test.apply(this, arg));
  			}
  		}
@@ -108,13 +108,13 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseElementsExpression(POElementsExpression node, S arg)
+	public List<E> caseElementsExpression(TCElementsExpression node, S arg)
 	{
 		return node.exp.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseElseIfExpression(POElseIfExpression node, S arg)
+	public List<E> caseElseIfExpression(TCElseIfExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.elseIfExp.apply(this, arg));
@@ -123,7 +123,7 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseExists1Expression(POExists1Expression node, S arg)
+	public List<E> caseExists1Expression(TCExists1Expression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(caseBind(node.bind, arg));
@@ -132,11 +132,11 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseExistsExpression(POExistsExpression node, S arg)
+	public List<E> caseExistsExpression(TCExistsExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		
-		for (POMultipleBind bind: node.bindList)
+		for (TCMultipleBind bind: node.bindList)
 		{
 			all.addAll(caseMultipleBind(bind, arg));
 		}
@@ -146,23 +146,23 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
 	@Override
-	public List<E> caseFieldExpression(POFieldExpression node, S arg)
+	public List<E> caseFieldExpression(TCFieldExpression node, S arg)
 	{
 		return node.object.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseFieldNumberExpression(POFieldNumberExpression node, S arg)
+	public List<E> caseFieldNumberExpression(TCFieldNumberExpression node, S arg)
 	{
  		return node.tuple.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseForAllExpression(POForAllExpression node, S arg)
+	public List<E> caseForAllExpression(TCForAllExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		
-		for (POMultipleBind bind: node.bindList)
+		for (TCMultipleBind bind: node.bindList)
 		{
 			all.addAll(caseMultipleBind(bind, arg));
 		}
@@ -172,19 +172,19 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseFuncInstantiationExpression(POFuncInstantiationExpression node, S arg)
+	public List<E> caseFuncInstantiationExpression(TCFuncInstantiationExpression node, S arg)
 	{
 		return node.function.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseIfExpression(POIfExpression node, S arg)
+	public List<E> caseIfExpression(TCIfExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.ifExp.apply(this, arg));
 		all.addAll(node.elseExp.apply(this, arg));
 		
-		for (POElseIfExpression elseif: node.elseList)
+		for (TCElseIfExpression elseif: node.elseList)
 		{
 			all.addAll(elseif.apply(this, arg));
 		}
@@ -193,7 +193,7 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseIotaExpression(POIotaExpression node, S arg)
+	public List<E> caseIotaExpression(TCIotaExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(caseBind(node.bind, arg));
@@ -202,29 +202,29 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseIsExpression(POIsExpression node, S arg)
+	public List<E> caseIsExpression(TCIsExpression node, S arg)
 	{
 		return node.test.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseIsOfBaseClassExpression(POIsOfBaseClassExpression node, S arg)
+	public List<E> caseIsOfBaseClassExpression(TCIsOfBaseClassExpression node, S arg)
 	{
  		return node.exp.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseIsOfClassExpression(POIsOfClassExpression node, S arg)
+	public List<E> caseIsOfClassExpression(TCIsOfClassExpression node, S arg)
 	{
  		return node.exp.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseLambdaExpression(POLambdaExpression node, S arg)
+	public List<E> caseLambdaExpression(TCLambdaExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		
-		for (POTypeBind bind: node.bindList)
+		for (TCTypeBind bind: node.bindList)
 		{
 			all.addAll(caseBind(bind, arg));
 		}
@@ -234,7 +234,7 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseLetBeStExpression(POLetBeStExpression node, S arg)
+	public List<E> caseLetBeStExpression(TCLetBeStExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(caseMultipleBind(node.bind, arg));
@@ -244,15 +244,15 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseLetDefExpression(POLetDefExpression node, S arg)
+	public List<E> caseLetDefExpression(TCLetDefExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 
-		for (PODefinition def: node.localDefs)
+		for (TCDefinition def: node.localDefs)
  		{
- 			if (def instanceof POValueDefinition)
+ 			if (def instanceof TCValueDefinition)
  			{
- 				POValueDefinition vdef = (POValueDefinition)def;
+ 				TCValueDefinition vdef = (TCValueDefinition)def;
  				all.addAll(vdef.exp.apply(this, arg));
  			}
  		}
@@ -262,13 +262,13 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseMapCompExpression(POMapCompExpression node, S arg)
+	public List<E> caseMapCompExpression(TCMapCompExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.first.left.apply(this, arg));
 		all.addAll(node.first.right.apply(this, arg));
 		
-		for (POMultipleBind mbind: node.bindings)
+		for (TCMultipleBind mbind: node.bindings)
 		{
 			all.addAll(caseMultipleBind(mbind, arg));
 		}
@@ -278,11 +278,11 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseMapEnumExpression(POMapEnumExpression node, S arg)
+	public List<E> caseMapEnumExpression(TCMapEnumExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		
-		for (POMapletExpression maplet: node.members)
+		for (TCMapletExpression maplet: node.members)
 		{
 			all.addAll(maplet.left.apply(this, arg));
 			all.addAll(maplet.right.apply(this, arg));
@@ -292,17 +292,17 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseMkBasicExpression(POMkBasicExpression node, S arg)
+	public List<E> caseMkBasicExpression(TCMkBasicExpression node, S arg)
 	{
 		return node.arg.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseMkTypeExpression(POMkTypeExpression node, S arg)
+	public List<E> caseMkTypeExpression(TCMkTypeExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		
-		for (POExpression a: node.args)
+		for (TCExpression a: node.args)
 		{
 			all.addAll(a.apply(this, arg));
 		}
@@ -311,11 +311,11 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseMuExpression(POMuExpression node, S arg)
+	public List<E> caseMuExpression(TCMuExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		
-		for (PORecordModifier modifier: node.modifiers)
+		for (TCRecordModifier modifier: node.modifiers)
 		{
 			all.addAll(modifier.value.apply(this, arg));
 		}
@@ -325,17 +325,17 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseNarrowExpression(PONarrowExpression node, S arg)
+	public List<E> caseNarrowExpression(TCNarrowExpression node, S arg)
 	{
 		return node.test.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseNewExpression(PONewExpression node, S arg)
+	public List<E> caseNewExpression(TCNewExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		
-		for (POExpression a: node.args)
+		for (TCExpression a: node.args)
 		{
 			all.addAll(a.apply(this, arg));
 		}
@@ -344,12 +344,12 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> casePreExpression(POPreExpression node, S arg)
+	public List<E> casePreExpression(TCPreExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.function.apply(this, arg));
 		
-		for (POExpression exp: node.args)
+		for (TCExpression exp: node.args)
 		{
 			all.addAll(exp.apply(this, arg));
 		}
@@ -358,7 +358,7 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSameBaseClassExpression(POSameBaseClassExpression node, S arg)
+	public List<E> caseSameBaseClassExpression(TCSameBaseClassExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.left.apply(this, arg));
@@ -367,7 +367,7 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSameClassExpression(POSameClassExpression node, S arg)
+	public List<E> caseSameClassExpression(TCSameClassExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.left.apply(this, arg));
@@ -376,7 +376,7 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSeqCompExpression(POSeqCompExpression node, S arg)
+	public List<E> caseSeqCompExpression(TCSeqCompExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.first.apply(this, arg));
@@ -386,11 +386,11 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSeqEnumExpression(POSeqEnumExpression node, S arg)
+	public List<E> caseSeqEnumExpression(TCSeqEnumExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		
-		for (POExpression m: node.members)
+		for (TCExpression m: node.members)
 		{
 			all.addAll(m.apply(this, arg));
 		}
@@ -399,12 +399,12 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSetCompExpression(POSetCompExpression node, S arg)
+	public List<E> caseSetCompExpression(TCSetCompExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.first.apply(this, arg));
 		
-		for (POMultipleBind mbind: node.bindings)
+		for (TCMultipleBind mbind: node.bindings)
 		{
 			all.addAll(caseMultipleBind(mbind, arg));
 		}
@@ -414,11 +414,11 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSetEnumExpression(POSetEnumExpression node, S arg)
+	public List<E> caseSetEnumExpression(TCSetEnumExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		
-		for (POExpression m: node.members)
+		for (TCExpression m: node.members)
 		{
 			all.addAll(m.apply(this, arg));
 		}
@@ -427,7 +427,7 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSetRangeExpression(POSetRangeExpression node, S arg)
+	public List<E> caseSetRangeExpression(TCSetRangeExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.first.apply(this, arg));
@@ -436,7 +436,7 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSubseqExpression(POSubseqExpression node, S arg)
+	public List<E> caseSubseqExpression(TCSubseqExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.from.apply(this, arg));
@@ -445,11 +445,11 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseTupleExpression(POTupleExpression node, S arg)
+	public List<E> caseTupleExpression(TCTupleExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		
-		for (POExpression m: node.args)
+		for (TCExpression m: node.args)
 		{
 			all.addAll(m.apply(this, arg));
 		}
@@ -458,43 +458,43 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseUnaryExpression(POUnaryExpression node, S arg)
+	public List<E> caseUnaryExpression(TCUnaryExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.exp.apply(this, arg));
 		return all;
 	}
 
-	private List<E> caseBind(POBind bind, S arg)
+	private List<E> caseBind(TCBind bind, S arg)
 	{
 		List<E> all = new Vector<E>();
 		
-		if (bind instanceof POSetBind)
+		if (bind instanceof TCSetBind)
 		{
-			POSetBind sbind = (POSetBind)bind;
+			TCSetBind sbind = (TCSetBind)bind;
 			all.addAll(sbind.set.apply(this, arg));
 		}
-		else if (bind instanceof POSeqBind)
+		else if (bind instanceof TCSeqBind)
 		{
-			POSeqBind sbind = (POSeqBind)bind;
+			TCSeqBind sbind = (TCSeqBind)bind;
 			all.addAll(sbind.sequence.apply(this, arg));
 		}
 		
 		return all;
 	}
 
- 	private Collection<? extends E> caseMultipleBind(POMultipleBind bind, S arg)
+ 	private Collection<? extends E> caseMultipleBind(TCMultipleBind bind, S arg)
 	{
 		List<E> all = new Vector<E>();
 		
-		if (bind instanceof POMultipleSetBind)
+		if (bind instanceof TCMultipleSetBind)
 		{
-			POMultipleSetBind sbind = (POMultipleSetBind)bind;
+			TCMultipleSetBind sbind = (TCMultipleSetBind)bind;
 			all.addAll(sbind.set.apply(this, arg));
 		}
-		else if (bind instanceof POMultipleSeqBind)
+		else if (bind instanceof TCMultipleSeqBind)
 		{
-			POMultipleSeqBind sbind = (POMultipleSeqBind)bind;
+			TCMultipleSeqBind sbind = (TCMultipleSeqBind)bind;
 			all.addAll(sbind.sequence.apply(this, arg));
 		}
 		

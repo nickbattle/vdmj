@@ -67,4 +67,10 @@ public class TCSubsetExpression extends TCBinaryExpression
 
 		return checkConstraint(constraint, new TCBooleanType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubsetExpression(this, arg);
+	}
 }

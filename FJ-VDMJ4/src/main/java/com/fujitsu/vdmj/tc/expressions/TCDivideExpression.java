@@ -45,4 +45,10 @@ public class TCDivideExpression extends TCNumericBinaryExpression
 		checkNumeric(env, scope);
 		return new TCRealType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDivideExpression(this, arg);
+	}
 }

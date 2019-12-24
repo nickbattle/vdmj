@@ -81,4 +81,10 @@ public class TCCasesExpression extends TCExpression
 	{
 		return exp.getFreeVariables(globals, env);	// The rest is conditional
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCasesExpression(this, arg);
+	}
 }

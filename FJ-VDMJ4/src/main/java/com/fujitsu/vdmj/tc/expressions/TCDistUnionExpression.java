@@ -71,4 +71,10 @@ public class TCDistUnionExpression extends TCUnaryExpression
 		report(3078, "dunion argument is not a set of sets");
 		return new TCSetType(location, new TCUnknownType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDistUnionExpression(this, arg);
+	}
 }

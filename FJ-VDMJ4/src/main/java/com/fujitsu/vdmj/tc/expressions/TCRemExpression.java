@@ -45,4 +45,10 @@ public class TCRemExpression extends TCNumericBinaryExpression
 		checkNumeric(env, scope);
 		return new TCIntegerType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRemExpression(this, arg);
+	}
 }

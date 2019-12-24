@@ -52,4 +52,10 @@ public class TCCharLiteralExpression extends TCExpression
 	{
 		return checkConstraint(constraint, new TCCharacterType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCharLiteralExpression(this, arg);
+	}
 }

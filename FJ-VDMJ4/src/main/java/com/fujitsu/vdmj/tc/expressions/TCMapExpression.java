@@ -38,4 +38,10 @@ public abstract class TCMapExpression extends TCExpression
 	{
 		super(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapExpression(this, arg);
+	}
 }

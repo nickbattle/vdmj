@@ -121,4 +121,10 @@ public class TCPlusPlusExpression extends TCBinaryExpression
 
 		return result.getType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePlusPlusExpression(this, arg);
+	}
 }

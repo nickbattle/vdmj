@@ -65,4 +65,10 @@ public class TCStringLiteralExpression extends TCExpression
 		
 		return checkConstraint(constraint, result);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStringLiteralExpression(this, arg);
+	}
 }

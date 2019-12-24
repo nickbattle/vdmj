@@ -113,4 +113,10 @@ public class TCCompExpression extends TCBinaryExpression
 
 		return results.getType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCompExpression(this, arg);
+	}
 }

@@ -50,4 +50,10 @@ public class TCSubclassResponsibilityExpression extends TCExpression
 	{
 		return new TCUnknownType(location);	// Because we terminate anyway
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubclassResponsibilityExpression(this, arg);
+	}
 }

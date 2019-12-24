@@ -88,4 +88,10 @@ public class TCForAllExpression extends TCExpression
 		
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForAllExpression(this, arg);
+	}
 }

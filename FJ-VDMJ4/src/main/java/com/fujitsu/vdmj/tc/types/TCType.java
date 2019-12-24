@@ -441,5 +441,8 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 		TypeChecker.detail2(tag1, obj1, tag2, obj2);
 	}
 	
+	/**
+	 * Implemented by all types to allow visitor processing.
+	 */
 	abstract public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg);
 }

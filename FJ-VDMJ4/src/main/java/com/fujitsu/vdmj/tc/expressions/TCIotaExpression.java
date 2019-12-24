@@ -121,4 +121,10 @@ public class TCIotaExpression extends TCExpression
 		names.addAll(bind.getFreeVariables(globals, local));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIotaExpression(this, arg);
+	}
 }

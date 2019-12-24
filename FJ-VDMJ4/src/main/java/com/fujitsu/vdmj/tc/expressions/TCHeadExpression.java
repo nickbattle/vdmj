@@ -59,4 +59,10 @@ public class TCHeadExpression extends TCUnaryExpression
 
 		return etype.getSeq().seqof;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseHeadExpression(this, arg);
+	}
 }

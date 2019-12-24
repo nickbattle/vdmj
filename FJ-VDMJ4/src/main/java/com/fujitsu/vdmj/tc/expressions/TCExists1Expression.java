@@ -88,4 +88,10 @@ public class TCExists1Expression extends TCExpression
 		names.addAll(bind.getFreeVariables(globals, local));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExists1Expression(this, arg);
+	}
 }

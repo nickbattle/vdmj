@@ -74,4 +74,10 @@ public class TCStarStarExpression extends TCBinaryExpression
 
 		return ltype;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStarStarExpression(this, arg);
+	}
 }

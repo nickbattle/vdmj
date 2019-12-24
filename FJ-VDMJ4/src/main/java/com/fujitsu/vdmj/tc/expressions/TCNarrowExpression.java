@@ -105,4 +105,10 @@ public class TCNarrowExpression extends TCExpression
 		
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNarrowExpression(this, arg);
+	}
 }

@@ -72,4 +72,10 @@ public class TCSetUnionExpression extends TCBinaryExpression
 			new TCSet1Type(location, ts.getType(location)) :
 			new TCSetType(location, ts.getType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetUnionExpression(this, arg);
+	}
 }
