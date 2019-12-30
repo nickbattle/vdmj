@@ -22,10 +22,8 @@
  ******************************************************************************/
 package com.fujitsu.vdmj.po;
 
-import java.util.List;
-
-import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
@@ -49,7 +47,7 @@ public class PORecursiveLoops extends POMappedMap<TCNameToken, TCDefinitionList,
 		return INSTANCE;
 	}
 
-	public List<PODefinition> get(TCNameToken name)
+	public PODefinitionListList get(TCNameToken name)
 	{
 		return recursiveLoops.get(name);
 	}

@@ -82,7 +82,7 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 		
 		for (TCCaseAlternative a: node.cases)
 		{
-			all.addAll(a.cexp.apply(this, arg));
+			all.addAll(a.result.apply(this, arg));
 		}
 		
 		if (node.others != null)
@@ -199,13 +199,14 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.ifExp.apply(this, arg));
-		all.addAll(node.elseExp.apply(this, arg));
+		all.addAll(node.thenExp.apply(this, arg));
 		
 		for (TCElseIfExpression elseif: node.elseList)
 		{
 			all.addAll(elseif.apply(this, arg));
 		}
 		
+		all.addAll(node.elseExp.apply(this, arg));
 		return all;
 	}
 

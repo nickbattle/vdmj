@@ -24,12 +24,12 @@
 package com.fujitsu.vdmj.po;
 
 import com.fujitsu.vdmj.po.POMappedMap;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
 import com.fujitsu.vdmj.tc.TCRecursiveMap;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class PORecursiveMap extends POMappedMap<TCNameToken, TCDefinitionList, TCNameToken, PODefinitionList>
+public class PORecursiveMap extends POMappedMap<TCNameToken, TCDefinitionListList, TCNameToken, PODefinitionListList>
 {
 	private static final long serialVersionUID = 1L;
 	

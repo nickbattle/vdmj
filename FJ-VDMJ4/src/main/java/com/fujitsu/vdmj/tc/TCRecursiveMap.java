@@ -25,10 +25,10 @@ package com.fujitsu.vdmj.tc;
 
 import java.util.HashMap;
 
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class TCRecursiveMap extends HashMap<TCNameToken, TCDefinitionList>
+public class TCRecursiveMap extends HashMap<TCNameToken, TCDefinitionListList>
 {
 	private static final long serialVersionUID = 1L;
 }

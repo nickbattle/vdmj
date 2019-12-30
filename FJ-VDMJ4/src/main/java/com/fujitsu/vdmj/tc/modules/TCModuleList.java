@@ -155,26 +155,24 @@ public class TCModuleList extends TCMappedList<ASTModule, TCModule>
 	public void setRecursiveLoops()
 	{
 		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
+		TCRecursiveLoops recursiveLoops = TCRecursiveLoops.getInstance();
 		
 		for (TCModule m: this)
 		{
 			callmap.putAll(m.getCallMap());
 		}
 		
-		TCRecursiveLoops.getInstance().reset();
+		recursiveLoops.reset();
 		
 		for (TCNameToken sought: callmap.keySet())
 		{
-			Stack<TCNameToken> stack = new Stack<TCNameToken>();
-			stack.push(sought);
-			
-			if (TCRecursiveLoops.reachable(sought, callmap.get(sought), callmap, stack))
+			for (Stack<TCNameToken> loop: recursiveLoops.reachable(sought, callmap))
 			{
-	    		TCRecursiveLoops.getInstance().put(sought, findDefinitions(stack));
+				recursiveLoops.add(sought, findDefinitions(loop));
 			}
-			
-			stack.pop();
 		}
+		
+		return;
 	}
 	
 	private TCDefinitionList findDefinitions(Stack<TCNameToken> stack)

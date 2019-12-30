@@ -82,10 +82,14 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 		
 		for (POCaseAlternative a: node.cases)
 		{
-			all.addAll(a.cexp.apply(this, arg));
+			all.addAll(a.result.apply(this, arg));
 		}
 		
-		all.addAll(node.others.apply(this, arg));
+		if (node.others != null)
+		{
+			all.addAll(node.others.apply(this, arg));
+		}
+
 		return all;
 	}
 
@@ -127,7 +131,12 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(caseBind(node.bind, arg));
-		all.addAll(node.predicate.apply(this, arg));
+		
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -141,7 +150,11 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 			all.addAll(caseMultipleBind(bind, arg));
 		}
 		
-		all.addAll(node.predicate.apply(this, arg));
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -167,7 +180,11 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 			all.addAll(caseMultipleBind(bind, arg));
 		}
 		
-		all.addAll(node.predicate.apply(this, arg));
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -182,13 +199,14 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(node.ifExp.apply(this, arg));
-		all.addAll(node.elseExp.apply(this, arg));
+		all.addAll(node.thenExp.apply(this, arg));
 		
 		for (POElseIfExpression elseif: node.elseList)
 		{
 			all.addAll(elseif.apply(this, arg));
 		}
 		
+		all.addAll(node.elseExp.apply(this, arg));
 		return all;
 	}
 
@@ -197,7 +215,12 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(caseBind(node.bind, arg));
-		all.addAll(node.predicate.apply(this, arg));
+		
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -238,7 +261,12 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	{
 		List<E> all = new Vector<E>();
 		all.addAll(caseMultipleBind(node.bind, arg));
-		all.addAll(node.suchThat.apply(this, arg));
+		
+		if (node.suchThat != null)
+		{
+			all.addAll(node.suchThat.apply(this, arg));
+		}
+		
 		all.addAll(node.value.apply(this, arg));
 		return all;
 	}
@@ -273,7 +301,11 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 			all.addAll(caseMultipleBind(mbind, arg));
 		}
 		
-		all.addAll(node.predicate.apply(this, arg));
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -381,7 +413,12 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 		List<E> all = new Vector<E>();
 		all.addAll(node.first.apply(this, arg));
 		all.addAll(caseBind(node.bind, arg));
-		all.addAll(node.predicate.apply(this, arg));
+		
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -409,7 +446,11 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 			all.addAll(caseMultipleBind(mbind, arg));
 		}
 		
-		all.addAll(node.predicate.apply(this, arg));
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, arg));
+		}
+		
 		return all;
 	}
 

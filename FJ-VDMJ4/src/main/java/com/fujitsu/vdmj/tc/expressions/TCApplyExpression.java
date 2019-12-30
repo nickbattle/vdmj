@@ -26,7 +26,10 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.tc.TCRecursiveLoops;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -54,7 +57,7 @@ public class TCApplyExpression extends TCExpression
 
 	public TCType type;
 	public TCTypeList argtypes;
-	public TCDefinition recursive;
+	public TCDefinitionListList recursive;
 
 	public TCApplyExpression(TCExpression root, TCExpressionList args)
 	{
@@ -111,28 +114,33 @@ public class TCApplyExpression extends TCExpression
 				}
 			}
 			
-			if (called != null)
+			if (called != null && func != null)
 			{
-    			if (func instanceof TCExplicitFunctionDefinition)
-    			{
-    				TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)func;
+				TCDefinitionListList loops = TCRecursiveLoops.getInstance().get(func.name);
+				
+				if (loops != null)
+				{
+					recursive = new TCDefinitionListList();
+					
+					for (TCDefinitionList loop: loops)
+					{
+						if (loop.contains(called))		// Loop through func involves this call
+						{
+							recursive.add(loop);
+						}
+					}
 
-        			if (called == def)	// The same definition
-        			{
-        				recursive = def;
-        				def.recursive = true;
-        			}
-    			}
-    			else if (func instanceof TCImplicitFunctionDefinition)
-    			{
-    				TCImplicitFunctionDefinition def = (TCImplicitFunctionDefinition)func;
-
-        			if (called == def)	// The same definition
-        			{
-        				recursive = def;
-        				def.recursive = true;
-        			}
-    			}
+	    			if (func instanceof TCExplicitFunctionDefinition)
+	    			{
+	    				TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)func;
+	      				def.recursive = true;
+	    			}
+	    			else if (func instanceof TCImplicitFunctionDefinition)
+	    			{
+	    				TCImplicitFunctionDefinition def = (TCImplicitFunctionDefinition)func;
+	       				def.recursive = true;
+	    			}
+				}
 			}
 		}
 

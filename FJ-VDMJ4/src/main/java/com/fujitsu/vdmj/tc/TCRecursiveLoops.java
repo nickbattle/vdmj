@@ -22,13 +22,17 @@
  ******************************************************************************/
 package com.fujitsu.vdmj.tc;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
@@ -50,28 +54,81 @@ public class TCRecursiveLoops extends TCNode
 		
 		return INSTANCE;
 	}
-	
+
 	public void reset()
 	{
 		recursiveLoops = new TCRecursiveMap();
 	}
 
-	public void put(TCNameToken sought, TCDefinitionList defs)
+	public void add(TCNameToken name, TCDefinitionList defs)
 	{
-		recursiveLoops.put(sought, defs);
+		TCDefinitionListList existing = get(name);
+		
+		if (existing == null)
+		{
+			TCDefinitionListList list = new TCDefinitionListList();
+			list.add(defs);
+			recursiveLoops.put(name, list);
+		}
+		else
+		{
+			existing.add(defs);
+		}
 	}
 
-	public List<TCDefinition> get(TCNameToken name)
+	public TCDefinitionListList get(TCNameToken name)
 	{
 		return recursiveLoops.get(name);
+	}
+	
+	public List<List<String>> getCycles(TCNameToken name)
+	{
+		TCDefinitionListList loops = get(name);
+		
+		if (loops == null)
+		{
+			return null;
+		}
+		
+		List<List<String>> all = new Vector<List<String>>();
+
+		for (TCDefinitionList loop: loops)
+		{
+			if (loop.size() > 2)	// ie. not f calls f
+			{
+				List<String> calls = new Vector<String>();
+
+				for (TCDefinition d: loop)
+				{
+					calls.add(d.name.getName());
+				}
+				
+				all.add(calls);
+			}
+		}
+		
+		return all;
 	}
 
 	/**
 	 * Return true if the name sought is reachable via the next set of names passed using
 	 * the dependency map. The stack passed records the path taken to find a cycle.
 	 */
-	public static boolean reachable(TCNameToken sought, TCNameSet nextset,
-		Map<TCNameToken, TCNameSet> dependencies, Stack<TCNameToken> stack)
+	public Set<Stack<TCNameToken>> reachable(TCNameToken sought,
+			Map<TCNameToken, TCNameSet> dependencies)
+	{
+		Stack<TCNameToken> stack = new Stack<TCNameToken>();
+		Set<Stack<TCNameToken>> loops = new HashSet<Stack<TCNameToken>>();
+		stack.push(sought);
+
+		reachable(sought, dependencies.get(sought), dependencies, stack, loops);
+		
+		return loops;
+	}
+
+	private boolean reachable(TCNameToken sought, TCNameSet nextset,
+		Map<TCNameToken, TCNameSet> dependencies, Stack<TCNameToken> stack,
+		Set<Stack<TCNameToken>> loops)
 	{
 		if (nextset == null)
 		{
@@ -81,8 +138,13 @@ public class TCRecursiveLoops extends TCNode
 		if (nextset.contains(sought))
 		{
 			stack.push(sought);
+			Stack<TCNameToken> loop = new Stack<TCNameToken>();
+			loop.addAll(stack);
+			loops.add(loop);
 			return true;
 		}
+		
+		boolean found = false;
 		
 		for (TCNameToken nextname: nextset)
 		{
@@ -93,14 +155,23 @@ public class TCRecursiveLoops extends TCNode
 			
 			stack.push(nextname);
 			
-			if (reachable(sought, dependencies.get(nextname), dependencies, stack))
+			if (reachable(sought, dependencies.get(nextname), dependencies, stack, loops))
 			{
-				return true;
+				Stack<TCNameToken> loop = new Stack<TCNameToken>();
+				loop.addAll(stack);
+				loops.add(loop);
+				
+				while (!stack.peek().equals(nextname))
+				{
+					stack.pop();
+				}
+				
+				found = true;
 			}
 			
 			stack.pop();
 		}
 		
-		return false;
+		return found;
 	}
 }
