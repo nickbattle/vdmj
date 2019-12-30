@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.TCRecursiveLoops;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCFunctionCallFinder;
@@ -335,6 +336,12 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		else if (measureExp == null && recursive)
 		{
 			warning(5012, "Recursive function has no measure");
+			String cycles = TCRecursiveLoops.getInstance().getCycles(name).toString();
+			
+			if (!cycles.equals("[]"))
+			{
+				detail("Cycles", cycles);
+			}
 		}
 		else if (measureExp instanceof TCVariableExpression)
 		{

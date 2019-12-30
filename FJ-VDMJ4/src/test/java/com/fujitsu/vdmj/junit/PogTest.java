@@ -168,13 +168,15 @@ public class PogTest extends TestCase
 		ProofObligationList polist = poglist.getProofObligations();
 
 		// Copy this output to re-generate the expected from the actuals...
+		int i = 0;
+
 		for (ProofObligation po: polist)
 		{
-			Console.out.println("\"" + po.value.replaceAll("\n", "\\\\n") + "\",");
+			Console.out.println(++i + " \"" + po.value.replaceAll("\n", "\\\\n") + "\",");
 		}
 
 		assertEquals("POs generated", expected.length, polist.size());
-		int i = 0;
+		i = 0;
 
 		for (ProofObligation po: polist)
 		{

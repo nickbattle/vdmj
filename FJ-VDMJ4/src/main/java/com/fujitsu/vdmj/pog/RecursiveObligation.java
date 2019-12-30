@@ -23,9 +23,8 @@
 
 package com.fujitsu.vdmj.pog;
 
-import java.util.List;
-
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
@@ -62,7 +61,7 @@ public class RecursiveObligation extends ProofObligation
 		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
 	}
 	
-	public RecursiveObligation(List<PODefinition> defs, POApplyExpression apply, POContextStack ctxt)
+	public RecursiveObligation(PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
 	{
 		super(defs.get(0).location, POType.RECURSIVE, ctxt);
 		int measureLexical = getLex(getMeasureDef(defs.get(0)));
@@ -80,7 +79,7 @@ public class RecursiveObligation extends ProofObligation
 		if (def instanceof POExplicitFunctionDefinition)
 		{
 			POExplicitFunctionDefinition edef = (POExplicitFunctionDefinition)def;
-			sb.append(edef.measureName.getName());
+			sb.append(getMeasureName(edef));
 			
 			if (edef.typeParams != null)
 			{
@@ -110,7 +109,7 @@ public class RecursiveObligation extends ProofObligation
 		else if (def instanceof POImplicitFunctionDefinition)
 		{
 			POImplicitFunctionDefinition idef = (POImplicitFunctionDefinition)def;
-			sb.append(idef.measureName.getName());
+			sb.append(getMeasureName(idef));
 			sb.append("(");
 
 			for (POPatternListTypePair pltp: idef.parameterPatterns)
@@ -129,12 +128,28 @@ public class RecursiveObligation extends ProofObligation
 		if (def instanceof POExplicitFunctionDefinition)
 		{
 			POExplicitFunctionDefinition edef = (POExplicitFunctionDefinition)def;
-			return edef.measureName.getName();
+			
+			if (edef.measureName != null)
+			{
+				return edef.measureName.getName();
+			}
+			else
+			{
+				return "measure " + edef.name.getName() + "?";
+			}
 		}
 		else if (def instanceof POImplicitFunctionDefinition)
 		{
 			POImplicitFunctionDefinition idef = (POImplicitFunctionDefinition)def;
-			return idef.measureName.getName();
+			
+			if (idef.measureName != null)
+			{
+				return idef.measureName.getName();
+			}
+			else
+			{
+				return "measure " + idef.name.getName() + "?";
+			}
 		}
 		else
 		{
@@ -162,6 +177,11 @@ public class RecursiveObligation extends ProofObligation
 
 	private int getLex(POExplicitFunctionDefinition mdef)
 	{
+		if (mdef == null)
+		{
+			return 0;
+		}
+		
 		TCFunctionType ftype = (TCFunctionType) mdef.getType();
 		
 		if (ftype.result instanceof TCProductType)

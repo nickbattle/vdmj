@@ -23,12 +23,8 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
-import java.util.List;
-
-import com.fujitsu.vdmj.po.PORecursiveLoops;
-import com.fujitsu.vdmj.po.definitions.PODefinition;
-import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
-import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionList;
+import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
 import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.MapApplyObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -51,10 +47,10 @@ public class POApplyExpression extends POExpression
 	public final POExpressionList args;
 	public final TCType type;
 	public final TCTypeList argtypes;
-	public final PODefinition recursive;
+	public final PODefinitionListList recursive;
 
 	public POApplyExpression(POExpression root, POExpressionList args,
-		TCType type, TCTypeList argtypes, PODefinition recursive)
+		TCType type, TCTypeList argtypes, PODefinitionListList recursive)
 	{
 		super(root);
 		this.root = root;
@@ -117,35 +113,11 @@ public class POApplyExpression extends POExpression
 
 		if (!type.isUnknown(location) && type.isFunction(location))
 		{
-			if (recursive != null)
+			if (recursive != null)	// name is a function in a recursive loop
 			{
-				if (recursive instanceof POExplicitFunctionDefinition)
+				for (PODefinitionList loop: recursive)
 				{
-					POExplicitFunctionDefinition def = (POExplicitFunctionDefinition)recursive;
-
-					if (def.measureName != null)
-					{
-						obligations.add(new RecursiveObligation(def, this, ctxt));
-					}
-				}
-				else if (recursive instanceof POImplicitFunctionDefinition)
-				{
-					POImplicitFunctionDefinition def = (POImplicitFunctionDefinition)recursive;
-
-					if (def.measureName != null)
-					{
-						obligations.add(new RecursiveObligation(def, this, ctxt));
-					}
-				}
-			}
-			else if (root instanceof POVariableExpression)
-			{
-				POVariableExpression var = (POVariableExpression)root;
-				List<PODefinition> defs = PORecursiveLoops.getInstance().get(var.name);
-				
-				if (defs != null)	// name is a function in a mutually recursive loop
-				{
-					obligations.add(new RecursiveObligation(defs, this, ctxt));
+					obligations.add(new RecursiveObligation(loop, this, ctxt));
 				}
 			}
 		}

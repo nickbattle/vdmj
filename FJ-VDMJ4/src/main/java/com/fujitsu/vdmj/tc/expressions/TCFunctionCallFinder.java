@@ -43,9 +43,17 @@ public class TCFunctionCallFinder extends TCLeafExpressionVisitor<TCNameToken, O
 			TCVariableExpression vexp = (TCVariableExpression)node.root;
 			return new TCNameList(vexp.name);
 		}
-		else
+		else if (node.root instanceof TCFuncInstantiationExpression)
 		{
-			return super.caseApplyExpression(node, arg);
+			TCFuncInstantiationExpression fie = (TCFuncInstantiationExpression)node.root;
+
+			if (fie.function instanceof TCVariableExpression)
+			{
+				TCVariableExpression vexp = (TCVariableExpression)fie.function;
+				return new TCNameList(vexp.name);
+			}
 		}
+
+		return super.caseApplyExpression(node, arg);
 	}
 }
