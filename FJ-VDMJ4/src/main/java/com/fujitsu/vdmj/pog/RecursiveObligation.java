@@ -205,7 +205,7 @@ public class RecursiveObligation extends ProofObligation
 			sb.append(lhs);
 			sb.append(", rhs = ");
 			sb.append(rhs);
-			sb.append(" in ");
+			sb.append(" in\n  ");
 			
 			String kw = "if";
 			

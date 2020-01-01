@@ -183,7 +183,7 @@ public class TCRecursiveLoops extends TCNode
 
 		for (TCDefinition d: cycle)
 		{
-			calls.add(d.name.getName());
+			calls.add(d.name.toString());	// ie. include PP param types
 		}
 		
 		return calls;
