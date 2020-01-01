@@ -140,7 +140,7 @@ public class PogTest extends TestCase
 		"(forall mk_(n, x):(nat1 * nat1) &\n  (not (n < 2) =>\n    id2(mk_(n, x)) > id2(mk_((n - 1), (x - 1)))))\n",
 		"(forall mk_(x, y):(nat1 * nat1) &\n  (x - y) >= 0)\n",
 		"(forall mk_(n, x):(nat1 * nat1) &\n  (not (n < 2) =>\n    ((n - 1) > 0) and ((x - 1) > 0)))\n",
-		"(forall mk_(n, x):(nat1 * nat1) &\n  (not (n < 2) =>\n    (let lhs = id3(mk_(n, x)), rhs = id3(mk_((n - 1), (x - 1))) in if lhs.#1 <> rhs.#1 then lhs.#1 > rhs.#1 else lhs.#2 > rhs.#2)))\n",
+		"(forall mk_(n, x):(nat1 * nat1) &\n  (not (n < 2) =>\n    (let lhs = id3(mk_(n, x)), rhs = id3(mk_((n - 1), (x - 1))) in\n      if lhs.#1 <> rhs.#1 then lhs.#1 > rhs.#1 else lhs.#2 > rhs.#2)))\n",
 		"1 in set dom m\n",
 		"1 in set dom m\n",
 		"2 in set dom m\n",
