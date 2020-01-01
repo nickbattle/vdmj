@@ -23,14 +23,11 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.tc.TCRecursiveLoops;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCFunctionCallFinder;
@@ -72,7 +69,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	public final TCExpression postcondition;
 	public final TCExpression body;
 	public final boolean isTypeInvariant;
-	public final TCExpression measure;
+	public final TCExpression measureExp;
 	public final boolean isCurried;
 
 	public TCExplicitFunctionDefinition predef;
@@ -105,7 +102,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		this.postcondition = postcondition;
 		this.body = body;
 		this.isTypeInvariant = typeInvariant;
-		this.measure = measure;
+		this.measureExp = measure;
 		this.isCurried = parameters.size() > 1;
 
 		type.definitions = new TCDefinitionList(this);
@@ -127,7 +124,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				"\n\t" + name + params + " ==\n" + body +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
 				(postcondition == null ? "" : "\n\tpost " + postcondition) +
-				(measure == null ? "" : "\n\tmeasure " + measure);
+				(measureExp == null ? "" : "\n\tmeasure " + measureExp);
 	}
 	
 	@Override
@@ -328,20 +325,10 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		{
 			report(3329, "Abstract function/operation must be public or protected");
 		}
-
-		if (measure == null && recursive)
+		
+		if (measureExp instanceof TCVariableExpression)
 		{
-			warning(5012, "Recursive function has no measure");
-			String cycles = TCRecursiveLoops.getInstance().getCycles(name).toString();
-			
-			if (!cycles.equals("[]"))
-			{
-				detail("Cycles", cycles);
-			}
-		}
-		else if (measure instanceof TCVariableExpression)
-		{
-			TCVariableExpression exp = (TCVariableExpression)measure;
+			TCVariableExpression exp = (TCVariableExpression)measureExp;
 			if (base.isVDMPP()) exp.name.setTypeQualifier(getMeasureParams());
 			TCDefinition def = base.findName(exp.name, scope);
 			
@@ -354,13 +341,13 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				setMeasureExp(base, local, scope);
 			}
 		}
-		else if (measure instanceof TCNotYetSpecifiedExpression)
+		else if (measureExp instanceof TCNotYetSpecifiedExpression)
 		{
 			// Undefined measure, so ignore (without warning).
 			measureDef = null;
 			measureName = null;
 		}
-		else if (measure != null)
+		else if (measureExp != null)
 		{
 			setMeasureExp(base, local, scope);
 		}
@@ -380,8 +367,8 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	 */
 	private void setMeasureExp(Environment base, Environment local, NameScope scope)
 	{
-		TCType actual = measure.typeCheck(local, null, NameScope.NAMES, null);
-		measureName = name.getMeasureName(measure.location);
+		TCType actual = measureExp.typeCheck(local, null, NameScope.NAMES, null);
+		measureName = name.getMeasureName(measureExp.location);
 		checkMeasure(measureName, actual);
 		
 		// Concatenate the parameter patterns into one list for curried measures
@@ -396,7 +383,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		cpll.add(all);
 		
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
-				typeParams, type.getMeasureType(isCurried, actual), cpll, measure, null, null, false, null);
+				typeParams, type.getMeasureType(isCurried, actual), cpll, measureExp, null, null, false, null);
 
 		def.classDefinition = classDefinition;
 		def.typeResolve(base);
@@ -741,13 +728,11 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	}
 	
 	@Override
-	public Map<TCNameToken, TCNameSet> getCallMap()
+	public TCNameSet getCallMap()
 	{
-		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
 		TCFunctionCallFinder finder = new TCFunctionCallFinder();
 		TCNameSet found = new TCNameSet();
 		found.addAll(body.apply(finder, null));
-		callmap.put(name, found);
-		return callmap;
+		return found;
 	}
 }

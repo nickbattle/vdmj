@@ -24,9 +24,7 @@
 package com.fujitsu.vdmj.tc.modules;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
@@ -37,11 +35,9 @@ import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.mapper.FileList;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.tc.TCMappedList;
-import com.fujitsu.vdmj.tc.TCRecursiveLoops;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -152,30 +148,7 @@ public class TCModuleList extends TCMappedList<ASTModule, TCModule>
 		return rv;
 	}
 
-	public void setRecursiveLoops()
-	{
-		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
-		TCRecursiveLoops recursiveLoops = TCRecursiveLoops.getInstance();
-		
-		for (TCModule m: this)
-		{
-			callmap.putAll(m.getCallMap());
-		}
-		
-		recursiveLoops.reset();
-		
-		for (TCNameToken sought: callmap.keySet())
-		{
-			for (Stack<TCNameToken> loop: recursiveLoops.reachable(sought, callmap))
-			{
-				recursiveLoops.add(sought, findDefinitions(loop));
-			}
-		}
-		
-		return;
-	}
-	
-	private TCDefinitionList findDefinitions(Stack<TCNameToken> stack)
+	public TCDefinitionList findDefinitions(Stack<TCNameToken> stack)
 	{
 		TCDefinitionList list = new TCDefinitionList();
 		

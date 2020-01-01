@@ -122,6 +122,7 @@ public class PogTest extends TestCase
 		"forall m1, m2 in set {{a} |-> a | a in set {1, 2, 3} & (a < 10)} &\n  forall d3 in set dom m1, d4 in set dom m2 &\n    d3 = d4 => m1(d3) = m2(d4)\n",
 		"forall m1, m2 in set {{1 |-> 2}, {2 |-> 3}} &\n  forall d3 in set dom m1, d4 in set dom m2 &\n    d3 = d4 => m1(d3) = m2(d4)\n",
 		"(forall n:nat &\n  (not (n = 1) =>\n    (n - 1) >= 0))\n",
+		"(forall n:nat &\n  (not (n = 1) =>\n    measure_recursive(n) > measure_recursive((n - 1))))\n",
 		"dom {1 |-> false} subset inds [2, true, 7.8]\n",
 		"is_(([2, true, 7.8] ++ {1 |-> false}), seq of ((bool | nat)))\n",
 		"(forall t:((nat * nat * nat) | (nat * nat)) &\n  not is_(t, (nat * nat)))\n",

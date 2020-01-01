@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
@@ -545,8 +543,8 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * is used in mutually recursive function processing. It is only defined
 	 * for explicit/implicit functions!
 	 */
-	public Map<TCNameToken, TCNameSet> getCallMap()
+	public TCNameSet getCallMap()
 	{
-		return new HashMap<TCNameToken, TCNameSet>();
+		return new TCNameSet();
 	}
 }
