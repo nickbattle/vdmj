@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.typechecker;
 
+import com.fujitsu.vdmj.tc.TCRecursiveLoops;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
@@ -120,8 +121,8 @@ public class ClassTypeChecker extends TypeChecker
 			if (c.annotations != null) c.annotations.tcBefore(c);
 		}
 
-		// Look for recursive loops
-		classes.setRecursiveLoops();
+		// Prepare to look for recursive loops
+		TCRecursiveLoops.getInstance().reset();
 
 		for (Pass pass: Pass.values())
 		{
@@ -146,6 +147,9 @@ public class ClassTypeChecker extends TypeChecker
 				}
     		}
 		}
+		
+		// Look for recursive loops
+		TCRecursiveLoops.getInstance().typeCheck(classes);
 	    
 		for (TCClassDefinition c: classes)
 		{

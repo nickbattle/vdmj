@@ -44,7 +44,7 @@ map TCExpression{} to POExpression();
 map TCExpressionList{} to POExpressionList(this);
 map TCAbsoluteExpression{location, exp} to POAbsoluteExpression(location, exp);
 map TCAndExpression{left, op, right, ltype, rtype} to POAndExpression(left, op, right, ltype, rtype);
-map TCApplyExpression{root, args, type, argtypes, recursive} to POApplyExpression(root, args, type, argtypes, recursive);
+map TCApplyExpression{root, args, type, argtypes, recursiveCycles} to POApplyExpression(root, args, type, argtypes, recursiveCycles);
 map TCBinaryExpression{} to POBinaryExpression();
 map TCBooleanBinaryExpression{} to POBooleanBinaryExpression();
 map TCBooleanLiteralExpression{value} to POBooleanLiteralExpression(value);

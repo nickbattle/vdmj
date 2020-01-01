@@ -135,7 +135,7 @@ public class RecursiveObligation extends ProofObligation
 			}
 			else
 			{
-				return "measure " + edef.name.getName() + "?";
+				return "measure_" + edef.name.getName();
 			}
 		}
 		else if (def instanceof POImplicitFunctionDefinition)
@@ -148,7 +148,7 @@ public class RecursiveObligation extends ProofObligation
 			}
 			else
 			{
-				return "measure " + idef.name.getName() + "?";
+				return "measure_" + idef.name.getName();
 			}
 		}
 		else

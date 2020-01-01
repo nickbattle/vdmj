@@ -154,7 +154,8 @@ functions
 		
 	public recursive: nat -> nat
 		recursive(n) ==
-			if n = 1 then 1 else n * recursive(n-1);
+			if n = 1 then 1 else n * recursive(n-1)
+	;--measure n;
 			
 	public seqmod : () -> seq of (nat | bool)
 		seqmod() == [2, true, 7.8] ++ {1 |-> false};

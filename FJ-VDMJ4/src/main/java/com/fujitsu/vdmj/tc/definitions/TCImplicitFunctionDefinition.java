@@ -23,12 +23,9 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.tc.TCRecursiveLoops;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCFunctionCallFinder;
@@ -333,16 +330,6 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		{
 			name.report(3273, "Measure not allowed for an implicit function");
 		}
-		else if (measureExp == null && recursive)
-		{
-			warning(5012, "Recursive function has no measure");
-			String cycles = TCRecursiveLoops.getInstance().getCycles(name).toString();
-			
-			if (!cycles.equals("[]"))
-			{
-				detail("Cycles", cycles);
-			}
-		}
 		else if (measureExp instanceof TCVariableExpression)
 		{
 			TCVariableExpression exp = (TCVariableExpression)measureExp;
@@ -618,22 +605,18 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	}
 	
 	@Override
-	public Map<TCNameToken, TCNameSet> getCallMap()
+	public TCNameSet getCallMap()
 	{
-		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
-		
 		if (body == null)
 		{
-			callmap.put(name, new TCNameSet());
+			return new TCNameSet();
 		}
 		else
 		{
 			TCFunctionCallFinder finder = new TCFunctionCallFinder();
 			TCNameSet found = new TCNameSet();
 			found.addAll(body.apply(finder, null));
-			callmap.put(name, found);
+			return found;
 		}
-		
-		return callmap;
 	}
 }

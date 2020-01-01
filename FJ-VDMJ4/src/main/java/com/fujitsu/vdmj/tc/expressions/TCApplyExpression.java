@@ -23,6 +23,9 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
@@ -57,7 +60,7 @@ public class TCApplyExpression extends TCExpression
 
 	public TCType type;
 	public TCTypeList argtypes;
-	public TCDefinitionListList recursive;
+	public TCDefinitionListList recursiveCycles;
 
 	public TCApplyExpression(TCExpression root, TCExpressionList args)
 	{
@@ -89,19 +92,19 @@ public class TCApplyExpression extends TCExpression
 			return type;
 		}
 
-		TCDefinition func = env.getEnclosingDefinition();
+		TCDefinition enclfunc = env.getEnclosingDefinition();
 
 		boolean inFunction = env.isFunctional();
 		boolean inOperation = !inFunction;
-		boolean inReserved = (func == null || func.name == null) ? false : func.name.isReserved();
+		boolean inReserved = (enclfunc == null || enclfunc.name == null) ? false : enclfunc.name.isReserved();
 			
 		if (inFunction)
 		{
-			TCDefinition called = getRecursiveDefinition(env, scope);
+			TCDefinition calling = getRecursiveDefinition(env, scope);
 
-			if (called instanceof TCExplicitFunctionDefinition)
+			if (calling instanceof TCExplicitFunctionDefinition)
 			{
-				TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)called;
+				TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)calling;
 				
 				if (def.isCurried)
 				{
@@ -109,38 +112,14 @@ public class TCApplyExpression extends TCExpression
 					
 					if (type instanceof TCFunctionType && ((TCFunctionType)type).result instanceof TCFunctionType)
 					{
-						called = null;
+						calling = null;
 					}
 				}
 			}
 			
-			if (called != null && func != null)
+			if (enclfunc != null && calling != null)
 			{
-				TCDefinitionListList loops = TCRecursiveLoops.getInstance().get(func.name);
-				
-				if (loops != null)
-				{
-					recursive = new TCDefinitionListList();
-					
-					for (TCDefinitionList loop: loops)
-					{
-						if (loop.contains(called))		// Loop through func involves this call
-						{
-							recursive.add(loop);
-						}
-					}
-
-	    			if (func instanceof TCExplicitFunctionDefinition)
-	    			{
-	    				TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)func;
-	      				def.recursive = true;
-	    			}
-	    			else if (func instanceof TCImplicitFunctionDefinition)
-	    			{
-	    				TCImplicitFunctionDefinition def = (TCImplicitFunctionDefinition)func;
-	       				def.recursive = true;
-	    			}
-				}
+				TCRecursiveLoops.getInstance().addApplyExp(enclfunc, this, calling);
 			}
 		}
 
@@ -183,7 +162,7 @@ public class TCApplyExpression extends TCExpression
 				report(3300, "Impure operation '" + root + "' cannot be called from here");
 				results.add(new TCUnknownType(location));
 			}
-			else if (inOperation && Settings.release == Release.VDM_10 && func != null && func.isPure() && !ot.pure)
+			else if (inOperation && Settings.release == Release.VDM_10 && enclfunc != null && enclfunc.isPure() && !ot.pure)
 			{
 				report(3339, "Cannot call impure operation '" + root + "' from a pure operation");
 				results.add(new TCUnknownType(location));
@@ -431,6 +410,65 @@ public class TCApplyExpression extends TCExpression
 		
 		names.addAll(args.getFreeVariables(globals, env));
 		return names;
+	}
+	
+	public void typeCheckCycles(TCDefinition parent, TCDefinition called)
+	{
+		TCDefinitionListList cycles = TCRecursiveLoops.getInstance().getCycles(parent.name);
+		
+		if (cycles != null)
+		{
+			List<List<String>> cycleNames = new Vector<List<String>>();
+			recursiveCycles = new TCDefinitionListList();
+			boolean mutuallyRecursive = false;
+
+			for (TCDefinitionList cycle: cycles)
+			{
+				if (cycle.contains(called))		// The parent cycle involves this apply call
+				{
+					recursiveCycles.add(cycle);
+					cycleNames.add(TCRecursiveLoops.getInstance().getCycleNames(cycle));
+					mutuallyRecursive = mutuallyRecursive || cycle.size() > 2;	// eg. [f, g, f]
+				}
+			}
+			
+			if (parent instanceof TCExplicitFunctionDefinition)
+			{
+				TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)parent;
+  				def.recursive = true;
+  				
+  				if (def.measureExp == null)
+  				{
+  					if (mutuallyRecursive)
+  					{
+  						def.warning(5012, "Mutually recursive cycle has no measure");
+  						def.detail("Cycles", cycleNames);
+  					}
+  					else
+  					{
+  						def.warning(5012, "Recursive function has no measure");
+  					}
+  				}
+			}
+			else if (parent instanceof TCImplicitFunctionDefinition)
+			{
+				TCImplicitFunctionDefinition def = (TCImplicitFunctionDefinition)parent;
+   				def.recursive = true;
+ 				
+  				if (def.measureExp == null)
+  				{
+  					if (mutuallyRecursive)
+  					{
+  						def.warning(5012, "Mutually recursive cycle has no measure");
+  						def.detail("Cycles", cycleNames);
+  					}
+  					else
+  					{
+  						def.warning(5012, "Recursive function has no measure");
+  					}
+  				}
+			}
+		}
 	}
 
 	@Override

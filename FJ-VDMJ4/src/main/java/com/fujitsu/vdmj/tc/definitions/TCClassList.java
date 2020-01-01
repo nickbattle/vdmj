@@ -24,17 +24,13 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.tc.TCMappedList;
-import com.fujitsu.vdmj.tc.TCRecursiveLoops;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -149,28 +145,7 @@ public class TCClassList extends TCMappedList<ASTClassDefinition, TCClassDefinit
 		return sb.toString();
 	}
 
-	public void setRecursiveLoops()
-	{
-		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
-		TCRecursiveLoops recursiveLoops = TCRecursiveLoops.getInstance();
-		
-		for (TCClassDefinition def: this)
-		{
-			callmap.putAll(def.getCallMap());
-		}
-		
-		recursiveLoops.reset();
-		
-		for (TCNameToken sought: callmap.keySet())
-		{
-			for (Stack<TCNameToken> loop: recursiveLoops.reachable(sought, callmap))
-			{
-				recursiveLoops.add(sought, findDefinitions(loop));
-			}
-		}
-	}
-	
-	private TCDefinitionList findDefinitions(Stack<TCNameToken> stack)
+	public TCDefinitionList findDefinitions(Stack<TCNameToken> stack)
 	{
 		TCDefinitionList list = new TCDefinitionList();
 		

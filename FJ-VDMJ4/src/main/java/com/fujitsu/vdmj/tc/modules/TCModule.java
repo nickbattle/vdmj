@@ -25,9 +25,7 @@ package com.fujitsu.vdmj.tc.modules;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
@@ -38,8 +36,6 @@ import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
@@ -278,17 +274,5 @@ public class TCModule extends TCNode implements Serializable
 	public void setComments(LexCommentList comments)
 	{
 		this.comments = comments;
-	}
-
-	public Map<TCNameToken, TCNameSet> getCallMap()
-	{
-		Map<TCNameToken, TCNameSet> callmap = new HashMap<TCNameToken, TCNameSet>();
-		
-		for (TCDefinition def: defs)
-		{
-			callmap.putAll(def.getCallMap());
-		}
-		
-		return callmap;
 	}
 }
