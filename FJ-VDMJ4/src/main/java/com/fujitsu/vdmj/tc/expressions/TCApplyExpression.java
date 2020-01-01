@@ -430,6 +430,8 @@ public class TCApplyExpression extends TCExpression
 					cycleNames.add(TCRecursiveLoops.getInstance().getCycleNames(cycle));
 					mutuallyRecursive = mutuallyRecursive || cycle.size() > 2;	// eg. [f, g, f]
 				}
+				
+				checkCycleMeasures(cycle);
 			}
 			
 			if (parent instanceof TCExplicitFunctionDefinition)
@@ -468,6 +470,45 @@ public class TCApplyExpression extends TCExpression
   					}
   				}
 			}
+		}
+	}
+
+	private void checkCycleMeasures(TCDefinitionList cycle)
+	{
+		for (int i = 0; i < cycle.size()-2; i++)
+		{
+			TCDefinition d1 = cycle.get(i);
+			TCDefinition d2 = cycle.get(i+1);
+			
+			TCType a = measureType(d1);
+			TCType b = measureType(d2);
+			
+			if (!a.equals(b))
+			{
+				d1.warning(5012, "Recursive cycle measures return different types");
+				d1.detail(d1.name.toString(), a);
+				d1.detail(d2.name.toString(), b);
+			}
+		}
+	}
+
+	private TCType measureType(TCDefinition def)
+	{
+		TCType unknown = new TCUnknownType(def.location);
+		
+		if (def instanceof TCExplicitFunctionDefinition)
+		{
+			TCExplicitFunctionDefinition expl = (TCExplicitFunctionDefinition)def;
+			return expl.measureDef != null ? expl.measureDef.type.result : unknown;
+		}
+		else if (def instanceof TCImplicitFunctionDefinition)
+		{
+			TCImplicitFunctionDefinition impl = (TCImplicitFunctionDefinition)def;
+			return impl.measureDef != null ? impl.measureDef.type.result : unknown;
+		}
+		else
+		{
+			return unknown;
 		}
 	}
 
