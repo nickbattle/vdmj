@@ -443,7 +443,7 @@ public class TCApplyExpression extends TCExpression
   				{
   					if (mutuallyRecursive)
   					{
-  						def.warning(5012, "Mutually recursive cycle has no measure");
+  						def.warning(5013, "Mutually recursive cycle has no measure");
   						def.detail("Cycle", cycleNames);
   					}
   					else
@@ -461,7 +461,7 @@ public class TCApplyExpression extends TCExpression
   				{
   					if (mutuallyRecursive)
   					{
-  						def.warning(5012, "Mutually recursive cycle has no measure");
+  						def.warning(5013, "Mutually recursive cycle has no measure");
   						def.detail("Cycle", cycleNames);
   					}
   					else
@@ -479,36 +479,38 @@ public class TCApplyExpression extends TCExpression
 		{
 			TCDefinition d1 = cycle.get(i);
 			TCDefinition d2 = cycle.get(i+1);
+			StringBuilder sb1 = new StringBuilder();
+			StringBuilder sb2 = new StringBuilder();
 			
-			TCType a = measureType(d1);
-			TCType b = measureType(d2);
+			TCType a = measureType(d1, sb1);
+			TCType b = measureType(d2, sb2);
 			
-			if (!a.equals(b))
+			if (a != null && b != null && !a.equals(b))
 			{
-				d1.warning(5012, "Recursive cycle measures return different types");
-				d1.detail(d1.name.toString(), a);
-				d1.detail(d2.name.toString(), b);
+				d1.warning(5011, "Recursive cycle measures return different types");
+				d1.detail(sb1.toString(), a);
+				d1.detail(sb2.toString(), b);
 			}
 		}
 	}
 
-	private TCType measureType(TCDefinition def)
+	private TCType measureType(TCDefinition def, StringBuilder mname)
 	{
-		TCType unknown = new TCUnknownType(def.location);
-		
 		if (def instanceof TCExplicitFunctionDefinition)
 		{
 			TCExplicitFunctionDefinition expl = (TCExplicitFunctionDefinition)def;
-			return expl.measureDef != null ? expl.measureDef.type.result : unknown;
+			if (expl.measureName != null) mname.append(expl.measureName); else mname.append(def.name.toString());
+			return expl.measureDef != null ? expl.measureDef.type.result : null;
 		}
 		else if (def instanceof TCImplicitFunctionDefinition)
 		{
 			TCImplicitFunctionDefinition impl = (TCImplicitFunctionDefinition)def;
-			return impl.measureDef != null ? impl.measureDef.type.result : unknown;
+			if (impl.measureName != null) mname.append(impl.measureName); else mname.append(def.name.toString());
+			return impl.measureDef != null ? impl.measureDef.type.result : null;
 		}
 		else
 		{
-			return unknown;
+			return null;
 		}
 	}
 
