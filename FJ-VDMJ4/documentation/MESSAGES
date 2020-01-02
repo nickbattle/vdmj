@@ -755,6 +755,7 @@ as the expected and actual values.
 3361, "@<name> has no arguments"
 3362, "@<name> only applies to functions or operations"
 3363, "Definition does not @Override superclass"
+3364, "Recursive cycle measures return different types" 
 
 
 4000, "Cannot instantiate abstract class <class>"
@@ -940,7 +941,7 @@ as the expected and actual values.
 5008, "<name/location> hides <name/location>"
 5009, "Empty set|sequence used in bind"
 5010, "State init expression cannot be executed"
-5011, "Recursive cycle measures return different types"
+5011, -
 5012, "Recursive function has no measure"
 5013, "Mutually recursive cycle has no measure"
 5014, "Uninitialized BUS ignored"

@@ -487,7 +487,7 @@ public class TCApplyExpression extends TCExpression
 			
 			if (a != null && b != null && !a.equals(b))
 			{
-				d1.warning(5011, "Recursive cycle measures return different types");
+				d1.report(3364, "Recursive cycle measures return different types");
 				d1.detail(sb1.toString(), a);
 				d1.detail(sb2.toString(), b);
 			}
