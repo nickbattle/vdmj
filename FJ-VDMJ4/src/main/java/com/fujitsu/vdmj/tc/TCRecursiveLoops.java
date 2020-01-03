@@ -223,6 +223,11 @@ public class TCRecursiveLoops extends TCNode
 			return true;
 		}
 		
+		if (System.getProperty("skip.recursion.check") != null)
+		{
+			return false;		// For now, to allow us to skip if there are issues.
+		}
+
 		boolean found = false;
 		
 		for (TCNameToken nextname: nextset)

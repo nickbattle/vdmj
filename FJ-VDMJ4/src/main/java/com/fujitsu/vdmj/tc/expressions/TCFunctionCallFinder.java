@@ -38,10 +38,12 @@ public class TCFunctionCallFinder extends TCLeafExpressionVisitor<TCNameToken, O
 	@Override
 	public List<TCNameToken> caseApplyExpression(TCApplyExpression node, Object arg)
 	{
+		TCNameList result = new TCNameList();
+
 		if (node.root instanceof TCVariableExpression)
 		{
 			TCVariableExpression vexp = (TCVariableExpression)node.root;
-			return new TCNameList(vexp.name);
+			result.add(vexp.name);
 		}
 		else if (node.root instanceof TCFuncInstantiationExpression)
 		{
@@ -50,10 +52,11 @@ public class TCFunctionCallFinder extends TCLeafExpressionVisitor<TCNameToken, O
 			if (fie.function instanceof TCVariableExpression)
 			{
 				TCVariableExpression vexp = (TCVariableExpression)fie.function;
-				return new TCNameList(vexp.name);
+				result.add(vexp.name);
 			}
 		}
 
-		return super.caseApplyExpression(node, arg);
+		result.addAll(super.caseApplyExpression(node, arg));
+		return result;
 	}
 }

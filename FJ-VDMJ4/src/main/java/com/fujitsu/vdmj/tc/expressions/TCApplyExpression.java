@@ -444,7 +444,11 @@ public class TCApplyExpression extends TCExpression
   					if (mutuallyRecursive)
   					{
   						def.warning(5013, "Mutually recursive cycle has no measure");
-  						def.detail("Cycle", cycleNames);
+  						
+  						for (List<String> cycleName: cycleNames)
+  						{
+  							def.detail("Cycle", cycleName);
+  						}
   					}
   					else
   					{
@@ -462,7 +466,11 @@ public class TCApplyExpression extends TCExpression
   					if (mutuallyRecursive)
   					{
   						def.warning(5013, "Mutually recursive cycle has no measure");
-  						def.detail("Cycle", cycleNames);
+  						
+  						for (List<String> cycleName: cycleNames)
+  						{
+  							def.detail("Cycle", cycleName);
+  						}
   					}
   					else
   					{

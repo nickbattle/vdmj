@@ -607,16 +607,24 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	@Override
 	public TCNameSet getCallMap()
 	{
-		if (body == null)
+		TCFunctionCallFinder finder = new TCFunctionCallFinder();
+		TCNameSet found = new TCNameSet();
+
+		if (body != null)
 		{
-			return new TCNameSet();
-		}
-		else
-		{
-			TCFunctionCallFinder finder = new TCFunctionCallFinder();
-			TCNameSet found = new TCNameSet();
 			found.addAll(body.apply(finder, null));
-			return found;
 		}
+		
+		if (predef != null)
+		{
+			found.addAll(predef.getCallMap());
+		}
+		
+		if (postdef != null)
+		{
+			found.addAll(postdef.getCallMap());
+		}
+
+		return found;
 	}
 }
