@@ -376,20 +376,6 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> casePreExpression(TCPreExpression node, S arg)
-	{
-		List<E> all = new Vector<E>();
-		all.addAll(node.function.apply(this, arg));
-		
-		for (TCExpression exp: node.args)
-		{
-			all.addAll(exp.apply(this, arg));
-		}
-		
-		return all;
-	}
-
- 	@Override
 	public List<E> caseSameBaseClassExpression(TCSameBaseClassExpression node, S arg)
 	{
 		List<E> all = new Vector<E>();

@@ -733,6 +733,17 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		TCFunctionCallFinder finder = new TCFunctionCallFinder();
 		TCNameSet found = new TCNameSet();
 		found.addAll(body.apply(finder, null));
+		
+		if (predef != null)
+		{
+			found.addAll(predef.getCallMap());
+		}
+		
+		if (postdef != null)
+		{
+			found.addAll(postdef.getCallMap());
+		}
+
 		return found;
 	}
 }
