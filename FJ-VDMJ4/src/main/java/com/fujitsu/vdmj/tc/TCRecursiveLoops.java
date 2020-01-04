@@ -158,17 +158,20 @@ public class TCRecursiveLoops extends TCNode
 
 	private void addCycle(TCNameToken name, TCDefinitionList defs)
 	{
-		TCDefinitionListList existing = getCycles(name);
-		
-		if (existing == null)
+		if (defs != null)
 		{
-			TCDefinitionListList list = new TCDefinitionListList();
-			list.add(defs);
-			recursiveLoops.put(name, list);
-		}
-		else
-		{
-			existing.add(defs);
+			TCDefinitionListList existing = getCycles(name);
+			
+			if (existing == null)
+			{
+				TCDefinitionListList list = new TCDefinitionListList();
+				list.add(defs);
+				recursiveLoops.put(name, list);
+			}
+			else
+			{
+				existing.add(defs);
+			}
 		}
 	}
 
@@ -220,6 +223,7 @@ public class TCRecursiveLoops extends TCNode
 			Stack<TCNameToken> loop = new Stack<TCNameToken>();
 			loop.addAll(stack);
 			loops.add(loop);
+			stack.pop();
 			return true;
 		}
 		
@@ -241,15 +245,6 @@ public class TCRecursiveLoops extends TCNode
 			
 			if (reachable(sought, dependencies.get(nextname), dependencies, stack, loops))
 			{
-				Stack<TCNameToken> loop = new Stack<TCNameToken>();
-				loop.addAll(stack);
-				loops.add(loop);
-				
-				while (!stack.peek().equals(nextname))
-				{
-					stack.pop();
-				}
-				
 				found = true;
 			}
 			

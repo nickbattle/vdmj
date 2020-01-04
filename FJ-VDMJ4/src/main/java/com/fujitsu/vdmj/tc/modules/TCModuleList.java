@@ -157,7 +157,7 @@ public class TCModuleList extends TCMappedList<ASTModule, TCModule>
 			list.add(findDefinition(name));
 		}
 		
-		return list;
+		return list.contains(null) ? null : list;	// Usually local func definitions
 	}
 
 	private TCDefinition findDefinition(TCNameToken sought)
