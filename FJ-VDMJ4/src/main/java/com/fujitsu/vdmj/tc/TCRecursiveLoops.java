@@ -48,6 +48,7 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
  */
 public class TCRecursiveLoops extends TCNode
 {
+	private static final int LOOP_SIZE_LIMIT = 8;
 	private static final long serialVersionUID = 1L;
 	private static TCRecursiveLoops INSTANCE = null;
 	
@@ -234,18 +235,21 @@ public class TCRecursiveLoops extends TCNode
 			return found;	// For now, to allow us to skip if there are issues.
 		}
 		
-		for (TCNameToken nextname: nextset)
+		if (stack.size() < LOOP_SIZE_LIMIT)
 		{
-			if (!stack.contains(nextname))	// Been here before!
+			for (TCNameToken nextname: nextset)
 			{
-				stack.push(nextname);
-				
-				if (reachable(sought, dependencies.get(nextname), dependencies, stack, loops))
+				if (!stack.contains(nextname))	// Been here before!
 				{
-					found = true;
+					stack.push(nextname);
+					
+					if (reachable(sought, dependencies.get(nextname), dependencies, stack, loops))
+					{
+						found = true;
+					}
+					
+					stack.pop();
 				}
-				
-				stack.pop();
 			}
 		}
 		
