@@ -166,7 +166,7 @@ public class TCCallStatement extends TCStatement
 	public TCTypeSet exitCheck(Environment base)
 	{
 		TCDefinition opdef = base.findName(name, NameScope.GLOBAL);
-		boolean overridable = Settings.dialect == Dialect.VDM_PP &&
+		boolean overridable = Settings.dialect != Dialect.VDM_SL &&
 				opdef != null && !opdef.accessSpecifier.access.equals(Token.PRIVATE);
 
 		if (opdef != null && !overridable)

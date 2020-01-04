@@ -218,7 +218,7 @@ public class TCCallObjectStatement extends TCStatement
 	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
-		boolean overridable = Settings.dialect == Dialect.VDM_PP &&
+		boolean overridable = Settings.dialect != Dialect.VDM_SL &&
 				fdef != null && !fdef.accessSpecifier.access.equals(Token.PRIVATE);
 
 		if (fdef != null && !overridable)
