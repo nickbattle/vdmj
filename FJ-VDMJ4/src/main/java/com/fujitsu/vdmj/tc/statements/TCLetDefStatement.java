@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -102,7 +103,19 @@ public class TCLetDefStatement extends TCStatement
 	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
-		return statement.exitCheck(base);
+		TCTypeSet result = new TCTypeSet();
+		
+		for (TCDefinition d: localDefs)
+		{
+			if (d instanceof TCValueDefinition)
+			{
+				TCValueDefinition vd = (TCValueDefinition)d;
+				result.addAll(vd.exp.exitCheck(base));
+			}
+		}
+		
+		result.addAll(statement.exitCheck(base));
+		return result;
 	}
 
 	@Override

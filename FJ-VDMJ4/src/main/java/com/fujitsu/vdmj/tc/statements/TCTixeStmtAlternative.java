@@ -27,6 +27,8 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternBind;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -50,7 +52,10 @@ public class TCTixeStmtAlternative
 
 	public void typeCheck(Environment base, NameScope scope, TCType ext, TCType constraint, boolean mandatory)
 	{
-		patternBind.typeCheck(base, scope, ext);
+		// Make a union with "?" so that pattern always matches
+		TCUnionType union = new TCUnionType(ext.location, ext, new TCUnknownType(ext.location));
+		patternBind.typeCheck(base, scope, union);
+
 		TCDefinitionList defs = patternBind.getDefinitions();
 		defs.typeCheck(base, scope);
 		Environment local = new FlatCheckedEnvironment(defs, base, scope);

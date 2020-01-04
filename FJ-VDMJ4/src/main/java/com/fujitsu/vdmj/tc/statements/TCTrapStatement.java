@@ -81,6 +81,8 @@ public class TCTrapStatement extends TCStatement
 		}
 		else
 		{
+			// Make a union with "?" so that pattern always matches
+			extype.add(new TCUnknownType(body.location));
 			ptype = extype.getType(body.location);
 		}
 
