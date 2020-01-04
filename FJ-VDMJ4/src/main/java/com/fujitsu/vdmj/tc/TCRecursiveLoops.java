@@ -216,6 +216,8 @@ public class TCRecursiveLoops extends TCNode
 		{
 			return false;
 		}
+
+		boolean found = false;
 		
 		if (nextset.contains(sought))
 		{
@@ -224,31 +226,27 @@ public class TCRecursiveLoops extends TCNode
 			loop.addAll(stack);
 			loops.add(loop);
 			stack.pop();
-			return true;
+			found = true;
 		}
 		
 		if (System.getProperty("skip.recursion.check") != null)
 		{
-			return false;		// For now, to allow us to skip if there are issues.
+			return found;	// For now, to allow us to skip if there are issues.
 		}
-
-		boolean found = false;
 		
 		for (TCNameToken nextname: nextset)
 		{
-			if (stack.contains(nextname))	// Been here before!
+			if (!stack.contains(nextname))	// Been here before!
 			{
-				return false;
+				stack.push(nextname);
+				
+				if (reachable(sought, dependencies.get(nextname), dependencies, stack, loops))
+				{
+					found = true;
+				}
+				
+				stack.pop();
 			}
-			
-			stack.push(nextname);
-			
-			if (reachable(sought, dependencies.get(nextname), dependencies, stack, loops))
-			{
-				found = true;
-			}
-			
-			stack.pop();
 		}
 		
 		return found;
