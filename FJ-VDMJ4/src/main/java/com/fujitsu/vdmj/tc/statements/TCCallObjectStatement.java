@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexStringToken;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
@@ -217,7 +218,10 @@ public class TCCallObjectStatement extends TCStatement
 	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
-		if (fdef != null)
+		boolean overridable = Settings.dialect == Dialect.VDM_PP &&
+				fdef != null && !fdef.accessSpecifier.access.equals(Token.PRIVATE);
+
+		if (fdef != null && !overridable)
 		{
 			if (fdef instanceof TCExplicitOperationDefinition)
 			{

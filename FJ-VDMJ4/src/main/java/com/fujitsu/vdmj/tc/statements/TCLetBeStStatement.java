@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCQualifiedDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
@@ -95,7 +96,22 @@ public class TCLetBeStStatement extends TCStatement
 	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
-		return statement.exitCheck(base);
+		TCTypeSet result = new TCTypeSet();
+		
+		if (def != null)
+		{
+			for (TCDefinition d: def.getDefinitions())
+			{
+				if (d instanceof TCValueDefinition)
+				{
+					TCValueDefinition vd = (TCValueDefinition)d;
+					result.addAll(vd.exp.exitCheck(base));
+				}
+			}
+		}
+		
+		result.addAll(statement.exitCheck(base));
+		return result;
 	}
 
 	@Override

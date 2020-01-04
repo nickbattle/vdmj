@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.tc.expressions.TCSelfExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.tc.types.TCVoidReturnType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -93,8 +92,7 @@ public class TCReturnStatement extends TCStatement
 	{
 		if (expression != null)
 		{
-			// TODO We don't know what an expression will raise
-			return new TCTypeSet(new TCUnknownType(location));
+			return expression.exitCheck(base);
 		}
 		else
 		{

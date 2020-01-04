@@ -26,10 +26,12 @@ package com.fujitsu.vdmj.tc.statements;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
@@ -70,6 +72,23 @@ public class TCBlockStatement extends TCSimpleBlockStatement
 		return r;
 	}
 
+	@Override
+	public TCTypeSet exitCheck(Environment base)
+	{
+		TCTypeSet types = super.exitCheck(base);
+		
+		for (TCDefinition d: assignmentDefs)
+		{
+			if (d instanceof TCAssignmentDefinition)
+			{
+				TCAssignmentDefinition ad = (TCAssignmentDefinition)d;
+				types.addAll(ad.expression.exitCheck(base));
+			}
+		}
+		
+		return types;
+	}
+	
 	@Override
 	public String toString()
 	{

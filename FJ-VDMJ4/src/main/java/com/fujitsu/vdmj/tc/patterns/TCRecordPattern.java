@@ -97,9 +97,9 @@ public class TCRecordPattern extends TCPattern
 		}
 
 		TCRecordType pattype = type.getRecord();
-		TCType using = exptype.isType(pattype.name.getName(), location);
+		// TCType using = exptype.isType(pattype.name.getName(), location);
 
-		if (using == null || !(using instanceof TCRecordType))
+		if (!exptype.isType(pattype.getClass(), pattype.location))
 		{
 			report(3201, "Matching expression is not a compatible record type");
 			detail2("Pattern type", type, "Expression type", exptype);

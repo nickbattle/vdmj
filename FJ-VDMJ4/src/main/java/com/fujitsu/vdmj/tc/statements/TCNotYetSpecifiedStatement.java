@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -48,5 +49,11 @@ public class TCNotYetSpecifiedStatement extends TCStatement
 	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		return new TCUnknownType(location);	// Because we terminate anyway
+	}
+	
+	@Override
+	public TCTypeSet exitCheck(Environment base)
+	{
+		return new TCTypeSet(new TCUnknownType(location));
 	}
 }
