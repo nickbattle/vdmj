@@ -424,14 +424,17 @@ public class TCApplyExpression extends TCExpression
 
 			for (TCDefinitionList cycle: cycles)
 			{
-				if (cycle.contains(called))		// The parent cycle involves this apply call
+				if (cycle.size() >= 2)
 				{
-					recursiveCycles.add(cycle);
-					cycleNames.add(TCRecursiveLoops.getInstance().getCycleNames(cycle));
-					mutuallyRecursive = mutuallyRecursive || cycle.size() > 2;	// eg. [f, g, f]
+					if (cycle.get(1).equals(called))		// The parent cycle involves this next apply call
+					{
+						recursiveCycles.add(cycle);
+						cycleNames.add(TCRecursiveLoops.getInstance().getCycleNames(cycle));
+						mutuallyRecursive = mutuallyRecursive || cycle.size() > 2;	// eg. [f, g, f]
+					}
+					
+					checkCycleMeasures(cycle);
 				}
-				
-				checkCycleMeasures(cycle);
 			}
 			
 			if (parent instanceof TCExplicitFunctionDefinition)
