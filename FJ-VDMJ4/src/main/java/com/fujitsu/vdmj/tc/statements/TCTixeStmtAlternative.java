@@ -65,6 +65,8 @@ public class TCTixeStmtAlternative
 
 	public TCTypeSet exitCheck(Environment base)
 	{
-		return statement.exitCheck(base);
+		TCTypeSet result = patternBind.exitCheck(base);
+		result.addAll(statement.exitCheck(base));
+		return result;
 	}
 }

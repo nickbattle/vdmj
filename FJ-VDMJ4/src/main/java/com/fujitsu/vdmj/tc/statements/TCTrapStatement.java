@@ -98,7 +98,7 @@ public class TCTrapStatement extends TCStatement
 	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
-		TCTypeSet types = new TCTypeSet();
+		TCTypeSet types = patternBind.exitCheck(base);
 		types.addAll(body.exitCheck(base));
 		types.addAll(with.exitCheck(base));
 		return types;

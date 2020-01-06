@@ -24,9 +24,11 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import java.io.Serializable;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
@@ -58,6 +60,9 @@ public abstract class TCBind extends TCNode implements Serializable
 	/** Return a set of names of free variables from this bind 
 	 * @param globals TODO*/
 	abstract public TCNameSet getFreeVariables(Environment globals, Environment env);
+	
+	/** Return a set of exceptions possibly raised by any expressions */
+	abstract public TCTypeSet exitCheck(Environment base);
 
 	/**
 	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#report

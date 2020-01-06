@@ -101,6 +101,7 @@ public class TCForPatternBindStatement extends TCStatement
 	public TCTypeSet exitCheck(Environment base)
 	{
 		TCTypeSet result = exp.exitCheck(base);
+		result.addAll(patternBind.exitCheck(base));
 		result.addAll(statement.exitCheck(base));
 		return result;
 	}

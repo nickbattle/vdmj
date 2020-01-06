@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class TCTypeBind extends TCBind
@@ -63,5 +64,11 @@ public class TCTypeBind extends TCBind
 	public TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
 		return type.getFreeVariables(env);
+	}
+
+	@Override
+	public TCTypeSet exitCheck(Environment base)
+	{
+		return new TCTypeSet();
 	}
 }
