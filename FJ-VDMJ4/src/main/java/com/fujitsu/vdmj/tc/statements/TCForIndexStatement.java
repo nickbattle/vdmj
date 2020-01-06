@@ -100,7 +100,11 @@ public class TCForIndexStatement extends TCStatement
 	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
-		return statement.exitCheck(base);
+		TCTypeSet result = from.exitCheck(base);
+		result.addAll(to.exitCheck(base));
+		if (by != null) result.addAll(by.exitCheck(base));
+		result.addAll(statement.exitCheck(base));
+		return result;
 	}
 
 	@Override

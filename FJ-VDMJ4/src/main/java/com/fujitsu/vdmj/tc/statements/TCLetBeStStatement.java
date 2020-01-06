@@ -96,7 +96,8 @@ public class TCLetBeStStatement extends TCStatement
 	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
-		TCTypeSet result = new TCTypeSet();
+		TCTypeSet result = bind.exitCheck(base);
+		if (suchThat != null) result.addAll(suchThat.exitCheck(base));
 		
 		if (def != null)
 		{

@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -68,6 +69,10 @@ public abstract class TCMultipleBind extends TCNode
 	/** Return the free variables used by this multiple bind 
 	 * @param globals TODO*/
 	abstract public TCNameSet getFreeVariables(Environment globals, Environment env);
+	
+	/** Return a set of exceptions possibly raised by any expressions */
+	abstract public TCTypeSet exitCheck(Environment base);
+
 
 	/**
 	 * Get a list of definitions for the variables in the pattern list.

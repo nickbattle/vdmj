@@ -94,7 +94,11 @@ public class TCExitChecker extends TCLeafExpressionVisitor<TCType, Environment>
 				return result;
 			}
 
-			return new TCTypeList(new TCUnknownType(node.root.location));
+			result.add(new TCUnknownType(node.root.location));
+		}
+		else
+		{
+			result.add(new TCUnknownType(node.root.location));
 		}
 
 		return result;

@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -145,6 +146,18 @@ public class TCPatternBind extends TCNode
 
 			pattern.typeResolve(base);
 			defs = pattern.getAllDefinitions(type, NameScope.LOCAL);
+		}
+	}
+	
+	public TCTypeSet exitCheck(Environment base)
+	{
+		if (bind != null)
+		{
+			return bind.exitCheck(base);
+		}
+		else
+		{
+			return new TCTypeSet();
 		}
 	}
 }
