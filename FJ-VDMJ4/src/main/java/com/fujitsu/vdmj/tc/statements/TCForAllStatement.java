@@ -98,7 +98,9 @@ public class TCForAllStatement extends TCStatement
 	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
-		return statement.exitCheck(base);
+		TCTypeSet result = set.exitCheck(base);
+		result.addAll(statement.exitCheck(base));
+		return result;
 	}
 
 	@Override

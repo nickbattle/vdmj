@@ -96,7 +96,7 @@ public class TCReturnStatement extends TCStatement
 		}
 		else
 		{
-			return super.exitCheck(base);
+			return new TCTypeSet();
 		}
 	}
 

@@ -120,7 +120,7 @@ public class TCIfStatement extends TCStatement
 	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
-		TCTypeSet types = new TCTypeSet();
+		TCTypeSet types = ifExp.exitCheck(base);
 		types.addAll(thenStmt.exitCheck(base));
 
 		for (TCElseIfStatement stmt: elseList)

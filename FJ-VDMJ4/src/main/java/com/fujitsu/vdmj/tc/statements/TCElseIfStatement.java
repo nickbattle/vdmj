@@ -74,6 +74,8 @@ public class TCElseIfStatement extends TCStatement
 	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
-		return thenStmt.exitCheck(base);
+		TCTypeSet result = elseIfExp.exitCheck(base);
+		result.addAll(thenStmt.exitCheck(base));
+		return result;
 	}
 }

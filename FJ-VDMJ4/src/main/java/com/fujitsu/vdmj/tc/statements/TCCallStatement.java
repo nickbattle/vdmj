@@ -165,6 +165,8 @@ public class TCCallStatement extends TCStatement
 	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
+		TCTypeSet result = args.exitCheck(base);
+
 		TCDefinition opdef = base.findName(name, NameScope.GLOBAL);
 		boolean overridable = Settings.dialect != Dialect.VDM_SL &&
 				opdef != null && !opdef.accessSpecifier.access.equals(Token.PRIVATE);
@@ -181,7 +183,8 @@ public class TCCallStatement extends TCStatement
 					explop.possibleExceptions = explop.body.exitCheck(base);
 				}
 				
-				return explop.possibleExceptions;
+				result.addAll(explop.possibleExceptions);
+				return result;
 			}
 			else if (opdef instanceof TCImplicitOperationDefinition)
 			{
@@ -200,11 +203,13 @@ public class TCCallStatement extends TCStatement
 					}
 				}
 				
-				return implop.possibleExceptions;
+				result.addAll(implop.possibleExceptions);
+				return result;
 			}
 		}
 
-		return new TCTypeSet(new TCUnknownType(location));
+		result.add(new TCUnknownType(location));
+		return result;
 	}
 
 	private TCTypeList getArgTypes(Environment env, NameScope scope)

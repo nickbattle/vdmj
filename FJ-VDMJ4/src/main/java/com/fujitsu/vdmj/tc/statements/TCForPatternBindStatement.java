@@ -100,7 +100,9 @@ public class TCForPatternBindStatement extends TCStatement
 	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
-		return statement.exitCheck(base);
+		TCTypeSet result = exp.exitCheck(base);
+		result.addAll(statement.exitCheck(base));
+		return result;
 	}
 
 	@Override
