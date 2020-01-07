@@ -54,7 +54,7 @@ public class TCExitChecker extends TCLeafExpressionVisitor<TCType, Environment>
 			TCVariableExpression exp = (TCVariableExpression)node.root;
 			TCDefinition opdef = base.findName(exp.name, NameScope.NAMESANDSTATE);
 
-			boolean overridable = Settings.dialect == Dialect.VDM_PP &&
+			boolean overridable = Settings.dialect != Dialect.VDM_SL &&
 					opdef != null && !opdef.accessSpecifier.access.equals(Token.PRIVATE);
 
 			if (opdef != null && !overridable)

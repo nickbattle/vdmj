@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -68,7 +69,13 @@ public class TCSeqCompExpression extends TCSeqExpression
 		def = new TCMultiBindListDefinition(location, bind.getMultipleBindList());
 		def.typeCheck(base, scope);
 
-		if (bind instanceof TCSetBind &&
+		if (bind instanceof TCTypeBind)
+		{
+			TCTypeBind tb = (TCTypeBind)bind;
+			tb.typeResolve(base);
+		}
+
+		if ((bind instanceof TCSetBind || bind instanceof TCTypeBind) &&
 			(bind.pattern.getVariableNames().size() > 1 || !def.getType().isOrdered(location)))
 		{
 			report(3155, "Sequence comprehension must define one ordered bind variable");

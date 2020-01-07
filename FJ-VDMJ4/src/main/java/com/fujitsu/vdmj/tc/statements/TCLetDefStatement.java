@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCEqualsDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -107,7 +108,12 @@ public class TCLetDefStatement extends TCStatement
 		
 		for (TCDefinition d: localDefs)
 		{
-			if (d instanceof TCValueDefinition)
+			if (d instanceof TCEqualsDefinition)
+			{
+				TCEqualsDefinition ed = (TCEqualsDefinition)d;
+				result.addAll(ed.test.exitCheck(base));
+			}
+			else if (d instanceof TCValueDefinition)
 			{
 				TCValueDefinition vd = (TCValueDefinition)d;
 				result.addAll(vd.exp.exitCheck(base));
