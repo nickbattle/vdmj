@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.types;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.fujitsu.vdmj.in.patterns.INIdentifierPattern;
@@ -290,6 +291,11 @@ public class GetAllValues
 			}
 		}
 		
+		if (type.isOrdered(type.location))
+		{
+			Collections.sort(invs);
+		}
+		
 		return invs;
 	}
 
@@ -382,6 +388,11 @@ public class GetAllValues
 			{
 				// Value does not match invariant, so ignore it
 			}
+		}
+		
+		if (type.isOrdered(type.location))
+		{
+			Collections.sort(results);
 		}
 
 		return results;
