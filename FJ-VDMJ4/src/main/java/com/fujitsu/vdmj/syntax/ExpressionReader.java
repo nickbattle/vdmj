@@ -1375,7 +1375,7 @@ public class ExpressionReader extends SyntaxReader
 		{
 			nextToken();
 			BindReader br = getBindReader();
-			ASTBind bind = br.readSetSeqBind();
+			ASTBind bind = br.readBind();
 			ASTExpression exp = null;
 
 			if (lastToken().is(Token.AMPERSAND))
