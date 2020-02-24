@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.CPUValue;
@@ -235,7 +234,7 @@ public class Context extends HashMap<TCNameToken, Value>
 	/**
 	 * Locate the Context in a chain that contains a name, if any.
 	 */
-	public Context locate(LexNameToken name)
+	public Context locate(TCNameToken name)
 	{
 		Value v = get(name);
 
