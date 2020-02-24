@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
-import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
@@ -179,7 +178,7 @@ public class TCMutexSyncDefinition extends TCDefinition
 		if (annotations != null) annotations.tcAfter(this, getType(), base, scope);
 	}
 
-	public TCExpression getExpression(LexNameToken excluding)
+	public TCExpression getExpression(TCNameToken excluding)
 	{
 		TCNameList list = null;
 

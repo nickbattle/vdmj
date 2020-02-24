@@ -579,7 +579,7 @@ abstract public class VDMJ
 
 			for (Entry<String, Charset> entry: available.entrySet())
 			{
-				println(entry.getKey() + " " + available.get(entry.getValue()).aliases());
+				println(entry.getKey() + " " + available.get(entry.getKey()).aliases());
 			}
 
 			println("");

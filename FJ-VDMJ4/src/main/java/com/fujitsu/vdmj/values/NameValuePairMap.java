@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.values;
 
 import java.util.HashMap;
-import java.util.Map.Entry;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 

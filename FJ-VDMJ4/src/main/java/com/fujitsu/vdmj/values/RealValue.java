@@ -126,7 +126,7 @@ public class RealValue extends NumericValue
 	@Override
 	public int hashCode()
 	{
-		return new Double(value).hashCode();
+		return toString().hashCode();
 	}
 
 	@Override
