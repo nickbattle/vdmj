@@ -299,4 +299,10 @@ public class TCValueDefinition extends TCDefinition
 		names.addAll(exp.getFreeVariables(globals, env));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseValueDefinition(this, arg);
+	}
 }

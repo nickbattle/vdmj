@@ -81,4 +81,10 @@ public class TCExpressionPattern extends TCPattern
 	{
 		return ANY;	// Special value meaning "any length"
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExpressionPattern(this, arg);
+	}
 }

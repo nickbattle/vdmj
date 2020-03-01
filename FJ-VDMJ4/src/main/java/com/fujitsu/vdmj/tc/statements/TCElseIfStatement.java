@@ -78,4 +78,10 @@ public class TCElseIfStatement extends TCStatement
 		result.addAll(thenStmt.exitCheck(base));
 		return result;
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseElseIfStatement(this, arg);
+	}
 }

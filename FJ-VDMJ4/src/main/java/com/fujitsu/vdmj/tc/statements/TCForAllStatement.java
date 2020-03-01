@@ -108,4 +108,10 @@ public class TCForAllStatement extends TCStatement
 	{
 		return set.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForAllStatement(this, arg);
+	}
 }

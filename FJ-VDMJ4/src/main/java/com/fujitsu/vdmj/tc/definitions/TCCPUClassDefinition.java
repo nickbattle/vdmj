@@ -72,4 +72,10 @@ public class TCCPUClassDefinition extends TCClassDefinition
 		ASTDefinitionList ast = dr.readDefinitions();
 		return ClassMapper.getInstance(TCNode.MAPPINGS).checkInit().convert(ast);	// NB. check init!!
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCPUClassDefinition(this, arg);
+	}
 }

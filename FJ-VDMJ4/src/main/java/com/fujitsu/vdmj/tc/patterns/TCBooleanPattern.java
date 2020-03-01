@@ -57,4 +57,10 @@ public class TCBooleanPattern extends TCPattern
 	{
 		return new TCBooleanType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBooleanPattern(this, arg);
+	}
 }

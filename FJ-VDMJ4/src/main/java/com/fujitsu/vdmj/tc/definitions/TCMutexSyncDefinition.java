@@ -198,4 +198,10 @@ public class TCMutexSyncDefinition extends TCDefinition
     		new LexKeywordToken(Token.EQUALS, location),
     		new TCIntegerLiteralExpression(new LexIntegerToken(0, location)));
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMutexSyncDefinition(this, arg);
+	}
 }

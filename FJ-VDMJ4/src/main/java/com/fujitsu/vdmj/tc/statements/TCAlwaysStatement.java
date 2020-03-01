@@ -76,4 +76,10 @@ public class TCAlwaysStatement extends TCStatement
 		names.addAll(body.getFreeVariables(globals, env, returns));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAlwaysStatement(this, arg);
+	}
 }

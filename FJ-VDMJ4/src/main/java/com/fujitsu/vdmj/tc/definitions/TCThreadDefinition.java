@@ -143,4 +143,10 @@ public class TCThreadDefinition extends TCDefinition
 		def.classDefinition = classDefinition;
 		return def;
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseThreadDefinition(this, arg);
+	}
 }

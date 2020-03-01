@@ -207,4 +207,9 @@ public abstract class TCStatement extends TCNode implements Serializable
 	{
 		this.comments = comments;
 	}
+
+	/**
+	 * Implemented by all definitions to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg);
 }

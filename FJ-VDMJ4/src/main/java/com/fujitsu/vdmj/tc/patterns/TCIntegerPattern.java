@@ -57,4 +57,10 @@ public class TCIntegerPattern extends TCPattern
 	{
 		return TCNumericType.typeOf(value.value, location);
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIntegerPattern(this, arg);
+	}
 }

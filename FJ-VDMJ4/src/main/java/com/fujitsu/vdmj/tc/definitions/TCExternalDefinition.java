@@ -113,4 +113,10 @@ public class TCExternalDefinition extends TCDefinition
 	{
 		return state.getVariableNames();
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExternalDefinition(this, arg);
+	}
 }

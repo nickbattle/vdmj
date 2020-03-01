@@ -247,4 +247,10 @@ public class TCQualifiedDefinition extends TCDefinition
 	{
 		return def.checkDuplicatePatterns(defs);
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQualifiedDefinition(this, arg);
+	}
 }

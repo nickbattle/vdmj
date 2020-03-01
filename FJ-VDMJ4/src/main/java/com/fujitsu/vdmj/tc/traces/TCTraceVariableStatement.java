@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.traces;
 
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
@@ -53,5 +54,11 @@ public class TCTraceVariableStatement extends TCStatement
 		FlatEnvironment flat = (FlatEnvironment)env;
 		flat.add(new TCLocalDefinition(location, var.name, var.type));
 		return var.type;
+	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTraceVariableStatement(this, arg);
 	}
 }

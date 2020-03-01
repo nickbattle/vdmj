@@ -90,4 +90,10 @@ public class TCSystemDefinition extends TCClassDefinition
 			}
 		}
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSystemDefinition(this, arg);
+	}
 }

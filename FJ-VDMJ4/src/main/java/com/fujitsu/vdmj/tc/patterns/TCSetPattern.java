@@ -138,4 +138,10 @@ public class TCSetPattern extends TCPattern
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetPattern(this, arg);
+	}
 }

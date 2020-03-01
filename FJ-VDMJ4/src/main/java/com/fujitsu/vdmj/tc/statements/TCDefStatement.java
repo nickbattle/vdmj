@@ -41,4 +41,10 @@ public class TCDefStatement extends TCLetDefStatement
 	{
 		return "def " + Utils.listToString(localDefs) + " in " + statement;
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDefStatement(this, arg);
+	}
 }

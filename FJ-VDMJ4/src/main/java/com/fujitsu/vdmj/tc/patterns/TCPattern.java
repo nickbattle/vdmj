@@ -176,4 +176,9 @@ public abstract class TCPattern extends TCNode implements Serializable
 	{
 		return false;
 	}
+
+	/**
+	 * Implemented by all definitions to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg);
 }

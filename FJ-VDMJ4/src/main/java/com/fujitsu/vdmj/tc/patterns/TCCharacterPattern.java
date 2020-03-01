@@ -57,4 +57,10 @@ public class TCCharacterPattern extends TCPattern
 	{
 		return new TCCharacterType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCharacterPattern(this, arg);
+	}
 }

@@ -152,4 +152,10 @@ public class TCMultiBindListDefinition extends TCDefinition
 	{
 		return defs == null ? new TCNameList() : defs.getVariableNames();
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultiBindListDefinition(this, arg);
+	}
 }

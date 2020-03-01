@@ -627,4 +627,10 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 
 		return found;
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImplicitFunctionDefinition(this, arg);
+	}
 }

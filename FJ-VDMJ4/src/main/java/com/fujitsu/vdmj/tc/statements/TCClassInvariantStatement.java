@@ -55,4 +55,10 @@ public class TCClassInvariantStatement extends TCStatement
 	{
 		return "instance invariant " + name;
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassInvariantStatement(this, arg);
+	}
 }

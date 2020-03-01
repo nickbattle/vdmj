@@ -66,4 +66,10 @@ public class TCBUSClassDefinition extends TCClassDefinition
 		ASTDefinitionList ast = dr.readDefinitions();
 		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);	// NB. No init!!
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBUSClassDefinition(this, arg);
+	}
 }

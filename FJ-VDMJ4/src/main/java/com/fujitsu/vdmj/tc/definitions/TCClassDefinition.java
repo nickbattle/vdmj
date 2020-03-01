@@ -948,4 +948,10 @@ public class TCClassDefinition extends TCDefinition
 	{
 		return "class";
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassDefinition(this, arg);
+	}
 }

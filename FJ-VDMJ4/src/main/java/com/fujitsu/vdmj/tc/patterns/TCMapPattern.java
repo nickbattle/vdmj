@@ -161,4 +161,10 @@ public class TCMapPattern extends TCPattern
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapPattern(this, arg);
+	}
 }

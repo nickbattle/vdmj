@@ -181,4 +181,10 @@ public class TCImportedDefinition extends TCDefinition
 	{
 		return def.deref();
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImportedDefinition(this, arg);
+	}
 }

@@ -74,4 +74,10 @@ public class TCAtomicStatement extends TCStatement
 		
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAtomicStatement(this, arg);
+	}
 }

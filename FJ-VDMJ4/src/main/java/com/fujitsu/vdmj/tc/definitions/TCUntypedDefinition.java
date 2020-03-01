@@ -80,4 +80,10 @@ public class TCUntypedDefinition extends TCDefinition
 	{
 		return new TCNameList(name);
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUntypedDefinition(this, arg);
+	}
 }

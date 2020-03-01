@@ -145,4 +145,10 @@ public class TCTuplePattern extends TCPattern
 	{
 		return plist.alwaysMatches();
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTuplePattern(this, arg);
+	}
 }

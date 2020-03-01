@@ -219,4 +219,10 @@ public class TCInheritedDefinition extends TCDefinition
 	{
 		return superdef.isSubclassResponsibility();
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInheritedDefinition(this, arg);
+	}
 }

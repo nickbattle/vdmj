@@ -547,4 +547,9 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	{
 		return new TCNameSet();
 	}
+
+	/**
+	 * Implemented by all definitions to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg);
 }

@@ -173,4 +173,10 @@ public class TCPerSyncDefinition extends TCDefinition
 	{
 		return guard;
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePerSyncDefinition(this, arg);
+	}
 }
