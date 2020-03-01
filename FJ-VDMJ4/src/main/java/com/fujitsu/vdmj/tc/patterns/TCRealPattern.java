@@ -57,4 +57,10 @@ public class TCRealPattern extends TCPattern
 	{
 		return new TCRealType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRealPattern(this, arg);
+	}
 }

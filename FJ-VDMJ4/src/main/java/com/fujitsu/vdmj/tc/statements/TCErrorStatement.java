@@ -49,4 +49,10 @@ public class TCErrorStatement extends TCStatement
 	{
 		return new TCUnknownType(location);	// Because we terminate anyway
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseErrorStatement(this, arg);
+	}
 }

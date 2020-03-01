@@ -113,4 +113,10 @@ public class TCReturnStatement extends TCStatement
 		returns.set(true);		// So everything that follows is conditional
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseReturnStatement(this, arg);
+	}
 }

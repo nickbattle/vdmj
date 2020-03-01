@@ -106,4 +106,10 @@ public class TCClassInvariantDefinition extends TCDefinition
 	{
 		return expression.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassInvariantDefinition(this, arg);
+	}
 }

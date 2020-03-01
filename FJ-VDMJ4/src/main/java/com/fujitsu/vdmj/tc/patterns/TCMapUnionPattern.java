@@ -138,4 +138,10 @@ public class TCMapUnionPattern extends TCPattern
 		list.addAll(right.findIdentifiers());
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapUnionPattern(this, arg);
+	}
 }

@@ -163,4 +163,10 @@ public class TCRecordPattern extends TCPattern
 	{
 		return plist.alwaysMatches();
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRecordPattern(this, arg);
+	}
 }

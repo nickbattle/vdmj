@@ -137,4 +137,10 @@ public class TCInstanceVariableDefinition extends TCAssignmentDefinition
 		names.addAll(expression.getFreeVariables(globals, env));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInstanceVariableDefinition(this, arg);
+	}
 }

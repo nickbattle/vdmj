@@ -64,4 +64,10 @@ public class TCStringPattern extends TCPattern
 	{
 		return new TCSeqType(location, new TCCharacterType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStringPattern(this, arg);
+	}
 }

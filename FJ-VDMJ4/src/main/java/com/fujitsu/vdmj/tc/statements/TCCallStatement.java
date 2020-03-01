@@ -254,4 +254,10 @@ public class TCCallStatement extends TCStatement
 		names.addAll(args.getFreeVariables(globals, env));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCallStatement(this, arg);
+	}
 }

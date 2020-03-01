@@ -111,4 +111,10 @@ public class TCForPatternBindStatement extends TCStatement
 	{
 		return exp.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForPatternBindStatement(this, arg);
+	}
 }

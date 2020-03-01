@@ -67,4 +67,10 @@ public class TCIgnorePattern extends TCPattern
 	{
 		return true;
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIgnorePattern(this, arg);
+	}
 }

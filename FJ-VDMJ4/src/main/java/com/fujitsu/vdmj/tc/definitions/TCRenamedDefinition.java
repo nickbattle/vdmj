@@ -194,4 +194,10 @@ public class TCRenamedDefinition extends TCDefinition
 	{
 		return def.deref();
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRenamedDefinition(this, arg);
+	}
 }

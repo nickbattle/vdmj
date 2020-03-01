@@ -677,4 +677,10 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImplicitOperationDefinition(this, arg);
+	}
 }

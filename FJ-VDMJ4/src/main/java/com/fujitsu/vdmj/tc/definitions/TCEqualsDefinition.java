@@ -222,4 +222,10 @@ public class TCEqualsDefinition extends TCDefinition
 		Environment local = new FlatEnvironment(defs, env);
 		return test.getFreeVariables(globals, local);
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseEqualsDefinition(this, arg);
+	}
 }

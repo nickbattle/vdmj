@@ -84,4 +84,10 @@ public class TCCyclesStatement extends TCStatement
 		names.addAll(statement.getFreeVariables(globals, env, returns));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCyclesStatement(this, arg);
+	}
 }

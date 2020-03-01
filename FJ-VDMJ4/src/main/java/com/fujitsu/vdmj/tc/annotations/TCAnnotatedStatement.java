@@ -28,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -79,5 +80,11 @@ public class TCAnnotatedStatement extends TCStatement
 	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
 		return statement.getFreeVariables(env, env, returns);
+	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAnnotatedStatement(this, arg);
 	}
 }

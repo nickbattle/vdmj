@@ -102,4 +102,10 @@ public class TCExitStatement extends TCStatement
 		
 		return expression.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExitStatement(this, arg);
+	}
 }

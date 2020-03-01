@@ -168,4 +168,10 @@ abstract public class TCSimpleBlockStatement extends TCStatement
 		
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSimpleBlockStatement(this, arg);
+	}
 }

@@ -92,4 +92,10 @@ public class TCIdentifierPattern extends TCPattern
 	{
 		return true;
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIdentifierPattern(this, arg);
+	}
 }

@@ -119,4 +119,10 @@ public class TCBlockStatement extends TCSimpleBlockStatement
 
 		return super.getFreeVariables(globals, local, returns);
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBlockStatement(this, arg);
+	}
 }

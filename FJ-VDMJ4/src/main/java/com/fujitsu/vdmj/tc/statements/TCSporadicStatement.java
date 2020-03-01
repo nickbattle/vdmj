@@ -145,4 +145,10 @@ public class TCSporadicStatement extends TCStatement
 	{
 		return args.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSporadicStatement(this, arg);
+	}
 }

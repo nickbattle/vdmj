@@ -57,4 +57,10 @@ public class TCQuotePattern extends TCPattern
 	{
 		return new TCQuoteType(location, value.value);
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQuotePattern(this, arg);
+	}
 }

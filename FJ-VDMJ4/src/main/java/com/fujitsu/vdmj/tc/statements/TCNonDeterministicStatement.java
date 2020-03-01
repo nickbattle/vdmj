@@ -111,4 +111,10 @@ public class TCNonDeterministicStatement extends TCSimpleBlockStatement
 		sb.append(")");
 		return sb.toString();
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNonDeterministicStatement(this, arg);
+	}
 }

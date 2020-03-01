@@ -56,4 +56,10 @@ public class TCSubclassResponsibilityStatement extends TCStatement
 	{
 		return new TCTypeSet(new TCUnknownType(location));	// Subclass may do anything!
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubclassResponsibilityStatement(this, arg);
+	}
 }

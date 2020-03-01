@@ -56,4 +56,10 @@ public class TCNotYetSpecifiedStatement extends TCStatement
 	{
 		return new TCTypeSet(new TCUnknownType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotYetSpecifiedStatement(this, arg);
+	}
 }

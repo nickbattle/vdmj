@@ -116,4 +116,10 @@ public class TCAssignmentDefinition extends TCDefinition
 	{
 		return true;
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAssignmentDefinition(this, arg);
+	}
 }

@@ -141,4 +141,10 @@ public class TCIfStatement extends TCStatement
 	{
 		return ifExp.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIfStatement(this, arg);
+	}
 }

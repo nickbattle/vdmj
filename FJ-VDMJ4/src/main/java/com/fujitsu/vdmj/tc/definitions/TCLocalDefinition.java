@@ -152,4 +152,10 @@ public class TCLocalDefinition extends TCDefinition
 		
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLocalDefinition(this, arg);
+	}
 }

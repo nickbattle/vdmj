@@ -49,4 +49,10 @@ public class TCSkipStatement extends TCStatement
 	{
 		return checkReturnType(constraint, new TCVoidType(location), mandatory);
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSkipStatement(this, arg);
+	}
 }

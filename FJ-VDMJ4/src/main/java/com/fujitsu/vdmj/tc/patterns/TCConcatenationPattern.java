@@ -134,4 +134,10 @@ public class TCConcatenationPattern extends TCPattern
 	{
 		return left.alwaysMatches() && right.alwaysMatches();
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseConcatenationPattern(this, arg);
+	}
 }

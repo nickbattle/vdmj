@@ -118,4 +118,10 @@ public class TCCasesStatement extends TCStatement
 	{
 		return exp.getFreeVariables(globals, env);	// Cases are conditional
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCasesStatement(this, arg);
+	}
 }

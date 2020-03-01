@@ -128,4 +128,10 @@ public class TCSpecificationStatement extends TCStatement
 
 		return new TCVoidType(location);
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSpecificationStatement(this, arg);
+	}
 }

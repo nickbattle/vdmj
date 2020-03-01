@@ -598,4 +598,10 @@ public class TCTypeDefinition extends TCDefinition
 		
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTypeDefinition(this, arg);
+	}
 }

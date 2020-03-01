@@ -105,4 +105,10 @@ public class TCNamedTraceDefinition extends TCDefinition
 
 		if (annotations != null) annotations.tcAfter(this, getType(), base, scope);
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNamedTraceDefinition(this, arg);
+	}
 }

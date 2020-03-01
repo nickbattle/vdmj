@@ -112,4 +112,10 @@ public class TCWhileStatement extends TCStatement
 	{
 		return exp.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseWhileStatement(this, arg);
+	}
 }

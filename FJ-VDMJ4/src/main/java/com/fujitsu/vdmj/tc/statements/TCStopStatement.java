@@ -97,4 +97,10 @@ public class TCStopStatement extends TCStatement
 	{
 		return objects.getFreeVariables(globals, env);
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStopStatement(this, arg);
+	}
 }

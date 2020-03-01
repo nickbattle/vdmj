@@ -56,4 +56,10 @@ public class TCNilPattern extends TCPattern
 	{
 		return new TCOptionalType(location, new TCUnknownType(location));
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNilPattern(this, arg);
+	}
 }

@@ -134,4 +134,10 @@ public class TCSeqPattern extends TCPattern
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqPattern(this, arg);
+	}
 }

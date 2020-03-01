@@ -129,4 +129,10 @@ public class TCLetBeStStatement extends TCStatement
 		names.addAll(statement.getFreeVariables(globals, local, returns));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLetBeStStatement(this, arg);
+	}
 }

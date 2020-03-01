@@ -89,4 +89,10 @@ public class TCTixeStatement extends TCStatement
 	{
 		return body.getFreeVariables(globals, env, returns);
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTixeStatement(this, arg);
+	}
 }

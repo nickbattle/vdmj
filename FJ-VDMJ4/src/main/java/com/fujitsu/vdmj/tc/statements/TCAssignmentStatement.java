@@ -109,4 +109,10 @@ public class TCAssignmentStatement extends TCStatement
 		names.addAll(exp.getFreeVariables(globals, env));
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAssignmentStatement(this, arg);
+	}
 }

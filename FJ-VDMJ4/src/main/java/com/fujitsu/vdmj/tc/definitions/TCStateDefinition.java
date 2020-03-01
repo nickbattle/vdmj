@@ -326,4 +326,10 @@ public class TCStateDefinition extends TCDefinition
 		
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStateDefinition(this, arg);
+	}
 }
