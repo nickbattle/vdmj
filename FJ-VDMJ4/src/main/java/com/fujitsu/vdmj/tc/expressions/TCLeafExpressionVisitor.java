@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.tc.annotations.TCAnnotatedExpression;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -43,12 +41,12 @@ import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
  * This TCExpression visitor visits all of the leaves of an expression tree and calls
  * the basic processing methods for the simple expressions.
  */
-abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<List<E>, S>
+abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S> extends TCExpressionVisitor<C, S>
 {
  	@Override
-	public List<E> caseApplyExpression(TCApplyExpression node, S arg)
+	public C caseApplyExpression(TCApplyExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.root.apply(this, arg));
 		
 		for (TCExpression a: node.args)
@@ -60,24 +58,24 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
  	
  	@Override
- 	public List<E> caseAnnotatedExpression(TCAnnotatedExpression node, S arg)
+ 	public C caseAnnotatedExpression(TCAnnotatedExpression node, S arg)
  	{
  		return node.expression.apply(this, arg);
  	}
 
  	@Override
-	public List<E> caseBinaryExpression(TCBinaryExpression node, S arg)
+	public C caseBinaryExpression(TCBinaryExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.left.apply(this, arg));
 		all.addAll(node.right.apply(this, arg));
 		return all;
 	}
 
  	@Override
-	public List<E> caseCasesExpression(TCCasesExpression node, S arg)
+	public C caseCasesExpression(TCCasesExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.exp.apply(this, arg));
 		
 		for (TCCaseAlternative a: node.cases)
@@ -94,9 +92,9 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseDefExpression(TCDefExpression node, S arg)
+	public C caseDefExpression(TCDefExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 
 		for (TCDefinition def: node.localDefs)
  		{
@@ -112,24 +110,24 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseElementsExpression(TCElementsExpression node, S arg)
+	public C caseElementsExpression(TCElementsExpression node, S arg)
 	{
 		return node.exp.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseElseIfExpression(TCElseIfExpression node, S arg)
+	public C caseElseIfExpression(TCElseIfExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.elseIfExp.apply(this, arg));
 		all.addAll(node.thenExp.apply(this, arg));
 		return all;
 	}
 
  	@Override
-	public List<E> caseExists1Expression(TCExists1Expression node, S arg)
+	public C caseExists1Expression(TCExists1Expression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(caseBind(node.bind, arg));
 		
 		if (node.predicate != null)
@@ -141,9 +139,9 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseExistsExpression(TCExistsExpression node, S arg)
+	public C caseExistsExpression(TCExistsExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCMultipleBind bind: node.bindList)
 		{
@@ -159,21 +157,21 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
 	@Override
-	public List<E> caseFieldExpression(TCFieldExpression node, S arg)
+	public C caseFieldExpression(TCFieldExpression node, S arg)
 	{
 		return node.object.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseFieldNumberExpression(TCFieldNumberExpression node, S arg)
+	public C caseFieldNumberExpression(TCFieldNumberExpression node, S arg)
 	{
  		return node.tuple.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseForAllExpression(TCForAllExpression node, S arg)
+	public C caseForAllExpression(TCForAllExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCMultipleBind bind: node.bindList)
 		{
@@ -189,15 +187,15 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseFuncInstantiationExpression(TCFuncInstantiationExpression node, S arg)
+	public C caseFuncInstantiationExpression(TCFuncInstantiationExpression node, S arg)
 	{
 		return node.function.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseIfExpression(TCIfExpression node, S arg)
+	public C caseIfExpression(TCIfExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.ifExp.apply(this, arg));
 		all.addAll(node.thenExp.apply(this, arg));
 		
@@ -211,9 +209,9 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseIotaExpression(TCIotaExpression node, S arg)
+	public C caseIotaExpression(TCIotaExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(caseBind(node.bind, arg));
 		
 		if (node.predicate != null)
@@ -225,27 +223,27 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseIsExpression(TCIsExpression node, S arg)
+	public C caseIsExpression(TCIsExpression node, S arg)
 	{
 		return node.test.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseIsOfBaseClassExpression(TCIsOfBaseClassExpression node, S arg)
+	public C caseIsOfBaseClassExpression(TCIsOfBaseClassExpression node, S arg)
 	{
  		return node.exp.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseIsOfClassExpression(TCIsOfClassExpression node, S arg)
+	public C caseIsOfClassExpression(TCIsOfClassExpression node, S arg)
 	{
  		return node.exp.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseLambdaExpression(TCLambdaExpression node, S arg)
+	public C caseLambdaExpression(TCLambdaExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCTypeBind bind: node.bindList)
 		{
@@ -257,9 +255,9 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseLetBeStExpression(TCLetBeStExpression node, S arg)
+	public C caseLetBeStExpression(TCLetBeStExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(caseMultipleBind(node.bind, arg));
 		
 		if (node.suchThat != null)
@@ -272,9 +270,9 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseLetDefExpression(TCLetDefExpression node, S arg)
+	public C caseLetDefExpression(TCLetDefExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 
 		for (TCDefinition def: node.localDefs)
  		{
@@ -290,9 +288,9 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseMapCompExpression(TCMapCompExpression node, S arg)
+	public C caseMapCompExpression(TCMapCompExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.first.left.apply(this, arg));
 		all.addAll(node.first.right.apply(this, arg));
 		
@@ -310,9 +308,9 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseMapEnumExpression(TCMapEnumExpression node, S arg)
+	public C caseMapEnumExpression(TCMapEnumExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCMapletExpression maplet: node.members)
 		{
@@ -324,15 +322,15 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseMkBasicExpression(TCMkBasicExpression node, S arg)
+	public C caseMkBasicExpression(TCMkBasicExpression node, S arg)
 	{
 		return node.arg.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseMkTypeExpression(TCMkTypeExpression node, S arg)
+	public C caseMkTypeExpression(TCMkTypeExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCExpression a: node.args)
 		{
@@ -343,9 +341,9 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseMuExpression(TCMuExpression node, S arg)
+	public C caseMuExpression(TCMuExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCRecordModifier modifier: node.modifiers)
 		{
@@ -357,15 +355,15 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseNarrowExpression(TCNarrowExpression node, S arg)
+	public C caseNarrowExpression(TCNarrowExpression node, S arg)
 	{
 		return node.test.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseNewExpression(TCNewExpression node, S arg)
+	public C caseNewExpression(TCNewExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCExpression a: node.args)
 		{
@@ -376,27 +374,27 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSameBaseClassExpression(TCSameBaseClassExpression node, S arg)
+	public C caseSameBaseClassExpression(TCSameBaseClassExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.left.apply(this, arg));
 		all.addAll(node.right.apply(this, arg));
 		return all;
 	}
 
  	@Override
-	public List<E> caseSameClassExpression(TCSameClassExpression node, S arg)
+	public C caseSameClassExpression(TCSameClassExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.left.apply(this, arg));
 		all.addAll(node.right.apply(this, arg));
 		return all;
 	}
 
  	@Override
-	public List<E> caseSeqCompExpression(TCSeqCompExpression node, S arg)
+	public C caseSeqCompExpression(TCSeqCompExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.first.apply(this, arg));
 		all.addAll(caseBind(node.bind, arg));
 		
@@ -409,9 +407,9 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSeqEnumExpression(TCSeqEnumExpression node, S arg)
+	public C caseSeqEnumExpression(TCSeqEnumExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCExpression m: node.members)
 		{
@@ -422,9 +420,9 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSetCompExpression(TCSetCompExpression node, S arg)
+	public C caseSetCompExpression(TCSetCompExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.first.apply(this, arg));
 		
 		for (TCMultipleBind mbind: node.bindings)
@@ -441,9 +439,9 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSetEnumExpression(TCSetEnumExpression node, S arg)
+	public C caseSetEnumExpression(TCSetEnumExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCExpression m: node.members)
 		{
@@ -454,27 +452,27 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSetRangeExpression(TCSetRangeExpression node, S arg)
+	public C caseSetRangeExpression(TCSetRangeExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.first.apply(this, arg));
 		all.addAll(node.last.apply(this, arg));
 		return all;
 	}
 
  	@Override
-	public List<E> caseSubseqExpression(TCSubseqExpression node, S arg)
+	public C caseSubseqExpression(TCSubseqExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.from.apply(this, arg));
 		all.addAll(node.to.apply(this, arg));
 		return all;
 	}
 
  	@Override
-	public List<E> caseTupleExpression(TCTupleExpression node, S arg)
+	public C caseTupleExpression(TCTupleExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCExpression m: node.args)
 		{
@@ -485,16 +483,16 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseUnaryExpression(TCUnaryExpression node, S arg)
+	public C caseUnaryExpression(TCUnaryExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.exp.apply(this, arg));
 		return all;
 	}
 
-	private List<E> caseBind(TCBind bind, S arg)
+	private C caseBind(TCBind bind, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		if (bind instanceof TCSetBind)
 		{
@@ -510,9 +508,9 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 		return all;
 	}
 
- 	private Collection<? extends E> caseMultipleBind(TCMultipleBind bind, S arg)
+ 	private C caseMultipleBind(TCMultipleBind bind, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		if (bind instanceof TCMultipleSetBind)
 		{
@@ -527,4 +525,6 @@ abstract public class TCLeafExpressionVisitor<E, S> extends TCExpressionVisitor<
 		
 		return all;
 	}
+	
+	abstract protected C newCollection();
 }

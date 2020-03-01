@@ -23,8 +23,7 @@
 
 package com.fujitsu.vdmj.tc.types;
 
-import java.util.List;
-import java.util.Vector;
+import java.util.Collection;
 
 /**
  * This TCType visitor visits all of the leaves of a type tree and calls
@@ -32,13 +31,12 @@ import java.util.Vector;
  * many visitors to have this functionality - eg. processing a TCMapType
  * processes its "from" and "to" types. 
  */
-
-public abstract class TCLeafTypeVisitor<E, S> extends TCTypeVisitor<List<E>, S>
+public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends TCTypeVisitor<C, S>
 {
 	@Override
-	public List<E> caseFunctionType(TCFunctionType node, S arg)
+	public C caseFunctionType(TCFunctionType node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCType param: node.parameters)
 		{
@@ -50,30 +48,30 @@ public abstract class TCLeafTypeVisitor<E, S> extends TCTypeVisitor<List<E>, S>
 	}
 
 	@Override
-	public List<E> caseInMapType(TCInMapType node, S arg)
+	public C caseInMapType(TCInMapType node, S arg)
 	{
 		return caseMapType(node, arg);
 	}
 
 	@Override
-	public List<E> caseMapType(TCMapType node, S arg)
+	public C caseMapType(TCMapType node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.from.apply(this, arg));
 		all.addAll(node.to.apply(this, arg));
 		return all;
 	}
 
 	@Override
-	public List<E> caseNamedType(TCNamedType node, S arg)
+	public C caseNamedType(TCNamedType node, S arg)
 	{
 		return node.type.apply(this, arg);
 	}
 
 	@Override
-	public List<E> caseOperationType(TCOperationType node, S arg)
+	public C caseOperationType(TCOperationType node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCType param: node.parameters)
 		{
@@ -85,15 +83,15 @@ public abstract class TCLeafTypeVisitor<E, S> extends TCTypeVisitor<List<E>, S>
 	}
 
 	@Override
-	public List<E> caseOptionalType(TCOptionalType node, S arg)
+	public C caseOptionalType(TCOptionalType node, S arg)
 	{
 		return node.type.apply(this, arg);
 	}
 
 	@Override
-	public List<E> caseProductType(TCProductType node, S arg)
+	public C caseProductType(TCProductType node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCType param: node.types)
 		{
@@ -104,9 +102,9 @@ public abstract class TCLeafTypeVisitor<E, S> extends TCTypeVisitor<List<E>, S>
 	}
 
 	@Override
-	public List<E> caseRecordType(TCRecordType node, S arg)
+	public C caseRecordType(TCRecordType node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCField field: node.fields)
 		{
@@ -117,37 +115,37 @@ public abstract class TCLeafTypeVisitor<E, S> extends TCTypeVisitor<List<E>, S>
 	}
 
 	@Override
-	public List<E> caseSeq1Type(TCSeq1Type node, S arg)
+	public C caseSeq1Type(TCSeq1Type node, S arg)
 	{
 		return caseSeqType(node, arg);
 	}
 
 	@Override
-	public List<E> caseSeqType(TCSeqType node, S arg)
+	public C caseSeqType(TCSeqType node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.seqof.apply(this, arg));
 		return all;
 	}
 
 	@Override
-	public List<E> caseSet1Type(TCSet1Type node, S arg)
+	public C caseSet1Type(TCSet1Type node, S arg)
 	{
 		return caseSetType(node, arg);
 	}
 
 	@Override
-	public List<E> caseSetType(TCSetType node, S arg)
+	public C caseSetType(TCSetType node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.setof.apply(this, arg));
 		return all;
 	}
 
 	@Override
-	public List<E> caseUnionType(TCUnionType node, S arg)
+	public C caseUnionType(TCUnionType node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (TCType param: node.types)
 		{
@@ -156,4 +154,6 @@ public abstract class TCLeafTypeVisitor<E, S> extends TCTypeVisitor<List<E>, S>
 		
 		return all;
 	}
+	
+	abstract protected C newCollection();
 }

@@ -35,19 +35,24 @@ import com.fujitsu.vdmj.tc.types.TCType;
  * that are contained in the TCType being visited. This is used by the
  * TCTypeComparator. 
  */
-
-public class ParameterCollector extends TCLeafTypeVisitor<String, Object>
+public class ParameterCollector extends TCLeafTypeVisitor<String, List<String>, Object>
 {
 	@Override
 	public List<String> caseParameterType(TCParameterType node, Object arg)
 	{
-		List <String> all = new Vector<String>();
+		List <String> all = newCollection();
 		all.add("@" + node.name);
 		return all;
 	}
 
 	@Override
 	public List<String> caseType(TCType node, Object arg)
+	{
+		return newCollection();
+	}
+
+	@Override
+	protected List<String> newCollection()
 	{
 		return new Vector<String>();
 	}

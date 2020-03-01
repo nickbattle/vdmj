@@ -22,8 +22,6 @@
  ******************************************************************************/
 package com.fujitsu.vdmj.tc.expressions;
 
-import java.util.List;
-
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
@@ -36,18 +34,18 @@ import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCExitChecker extends TCLeafExpressionVisitor<TCType, Environment>
+public class TCExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeList, Environment>
 {
 	@Override
-	public List<TCType> caseExpression(TCExpression node, Environment base)
+	public TCTypeList caseExpression(TCExpression node, Environment base)
 	{
 		return new TCTypeList();
 	}
 	
 	@Override
-	public List<TCType> caseApplyExpression(TCApplyExpression node, Environment base)
+	public TCTypeList caseApplyExpression(TCApplyExpression node, Environment base)
 	{
-		List<TCType> result = super.caseApplyExpression(node, base);
+		TCTypeList result = super.caseApplyExpression(node, base);
 
 		if (node.root instanceof TCVariableExpression)
 		{
@@ -102,5 +100,11 @@ public class TCExitChecker extends TCLeafExpressionVisitor<TCType, Environment>
 		}
 
 		return result;
+	}
+
+	@Override
+	protected TCTypeList newCollection()
+	{
+		return new TCTypeList();
 	}
 }
