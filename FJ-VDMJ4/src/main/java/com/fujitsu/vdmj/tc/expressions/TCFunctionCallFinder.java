@@ -22,23 +22,21 @@
  ******************************************************************************/
 package com.fujitsu.vdmj.tc.expressions;
 
-import java.util.List;
-
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class TCFunctionCallFinder extends TCLeafExpressionVisitor<TCNameToken, Object>
+public class TCFunctionCallFinder extends TCLeafExpressionVisitor<TCNameToken, TCNameList, Object>
 {
 	@Override
-	public List<TCNameToken> caseExpression(TCExpression node, Object arg)
+	public TCNameList caseExpression(TCExpression node, Object arg)
 	{
-		return new TCNameList();
+		return newCollection();
 	}
 	
 	@Override
-	public List<TCNameToken> caseApplyExpression(TCApplyExpression node, Object arg)
+	public TCNameList caseApplyExpression(TCApplyExpression node, Object arg)
 	{
-		TCNameList result = new TCNameList();
+		TCNameList result = newCollection();
 
 		if (node.root instanceof TCVariableExpression)
 		{
@@ -58,5 +56,11 @@ public class TCFunctionCallFinder extends TCLeafExpressionVisitor<TCNameToken, O
 
 		result.addAll(super.caseApplyExpression(node, arg));
 		return result;
+	}
+
+	@Override
+	protected TCNameList newCollection()
+	{
+		return new TCNameList();
 	}
 }
