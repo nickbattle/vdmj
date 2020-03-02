@@ -55,6 +55,7 @@ public enum Dialect implements Serializable
 			this.pattern = pattern;
 		}
 
+		@Override
 		public boolean accept(File dir, String filename)
 		{
 			return filename.matches(pattern);
