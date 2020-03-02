@@ -171,7 +171,7 @@ public class TCRecordType extends TCInvariantType
 	@Override
 	public String toDisplay()
 	{
-		return name.toString() + (opaque ? " (opaque)" : "");
+		return name.toString() + (opaque ? " /* opaque */" : "");
 	}
 
 	@Override

@@ -342,7 +342,7 @@ public class TCNamedType extends TCInvariantType
 	@Override
 	public String toDisplay()
 	{
-		return typename.toString() + (opaque ? " (opaque)" : "");
+		return typename.toString() + (opaque ? " /* opaque */" : "");
 	}
 
 	@Override
