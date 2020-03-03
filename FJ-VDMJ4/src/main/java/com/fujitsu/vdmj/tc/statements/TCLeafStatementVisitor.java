@@ -493,8 +493,5 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	
 	abstract protected C newCollection();
 
- 	protected TCLeafExpressionVisitor<E, C, S> getExpressionVisitor()
- 	{
- 		return null;	// Don't process expressions
- 	}
+ 	abstract protected TCLeafExpressionVisitor<E, C, S> getExpressionVisitor();
 }
