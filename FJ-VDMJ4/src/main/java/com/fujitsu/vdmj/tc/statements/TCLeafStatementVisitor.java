@@ -26,6 +26,8 @@ package com.fujitsu.vdmj.tc.statements;
 import java.util.Collection;
 
 import com.fujitsu.vdmj.tc.annotations.TCAnnotatedStatement;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCLeafDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
@@ -80,7 +82,16 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseBlockStatement(TCBlockStatement node, S arg)
 	{
+		TCLeafDefinitionVisitor<E, C, S> defVisitor = getDefinitionVisitor();
 		C all = newCollection();
+		
+		if (defVisitor != null)
+		{
+			for (TCDefinition def: node.assignmentDefs)
+			{
+				all.addAll(def.apply(defVisitor, arg));
+			}
+		}
 		
 		for (TCStatement statement: node.statements)
 		{
@@ -90,7 +101,7 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		return all;
 	}
 
- 	@Override
+	@Override
 	public C caseCallObjectStatement(TCCallObjectStatement node, S arg)
 	{
 		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
@@ -293,9 +304,16 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseLetDefStatement(TCLetDefStatement node, S arg)
 	{
+		TCLeafDefinitionVisitor<E, C, S> defVisitor = getDefinitionVisitor();
 		C all = newCollection();
 		
-		// TODO defs!
+		if (defVisitor != null)
+		{
+			for (TCDefinition def: node.localDefs)
+			{
+				all.addAll(def.apply(defVisitor, arg));
+			}
+		}
 		
 		all.addAll(node.statement.apply(this, arg));
 		return all;
@@ -494,4 +512,6 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	abstract protected C newCollection();
 
  	abstract protected TCLeafExpressionVisitor<E, C, S> getExpressionVisitor();
+
+ 	abstract protected TCLeafDefinitionVisitor<E, C, S> getDefinitionVisitor();
 }
