@@ -202,8 +202,15 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseExitStatement(TCExitStatement node, S arg)
 	{
-		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-		return (expVisitor != null ? node.expression.apply(expVisitor, arg) : newCollection());
+ 		if (node.expression != null)
+ 		{
+			TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
+			return (expVisitor != null ? node.expression.apply(expVisitor, arg) : newCollection());
+ 		}
+ 		else
+ 		{
+ 			return newCollection();
+ 		}
 	}
 
  	@Override
@@ -339,8 +346,15 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseReturnStatement(TCReturnStatement node, S arg)
 	{
-		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-		return (expVisitor != null ? node.expression.apply(expVisitor, arg) : newCollection());
+ 		if (node.expression != null)
+ 		{
+			TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
+			return (expVisitor != null ? node.expression.apply(expVisitor, arg) : newCollection());
+ 		}
+ 		else
+ 		{
+ 			return newCollection();
+ 		}
 	}
 
  	@Override
