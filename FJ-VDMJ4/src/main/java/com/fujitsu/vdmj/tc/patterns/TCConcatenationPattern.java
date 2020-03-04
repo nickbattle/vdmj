@@ -23,9 +23,6 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.util.List;
-import java.util.Vector;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -96,15 +93,6 @@ public class TCConcatenationPattern extends TCPattern
 		
 		return type.isUnknown(location) ? 
 			new TCSeqType(location, new TCUnknownType(location)) : type;
-	}
-
-	@Override
-	public List<TCIdentifierPattern> findIdentifiers()
-	{
-		List<TCIdentifierPattern> list = new Vector<TCIdentifierPattern>();
-		list.addAll(left.findIdentifiers());
-		list.addAll(right.findIdentifiers());
-		return list;
 	}
 
 	@Override

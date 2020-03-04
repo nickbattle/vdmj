@@ -23,9 +23,6 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.util.List;
-import java.util.Vector;
-
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
@@ -82,19 +79,6 @@ public class TCRecordPattern extends TCPattern
 	public TCType getPossibleType()
 	{
 		return type;
-	}
-
-	@Override
-	public List<TCIdentifierPattern> findIdentifiers()
-	{
-		List<TCIdentifierPattern> list = new Vector<TCIdentifierPattern>();
-
-		for (TCPattern p: plist)
-		{
-			list.addAll(p.findIdentifiers());
-		}
-
-		return list;
 	}
 
 	@Override

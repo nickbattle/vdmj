@@ -23,9 +23,6 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.util.List;
-import java.util.Vector;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -84,19 +81,6 @@ public class TCTuplePattern extends TCPattern
 		}
 
 		return list.getType(location);
-	}
-
-	@Override
-	public List<TCIdentifierPattern> findIdentifiers()
-	{
-		List<TCIdentifierPattern> list = new Vector<TCIdentifierPattern>();
-
-		for (TCPattern p: plist)
-		{
-			list.addAll(p.findIdentifiers());
-		}
-
-		return list;
 	}
 
 	@Override

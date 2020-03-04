@@ -23,9 +23,6 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.util.List;
-import java.util.Vector;
-
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCMapType;
@@ -81,16 +78,6 @@ public class TCMapletPattern extends TCNode
 
 		list.addAll(from.getVariableNames());
 		list.addAll(to.getVariableNames());
-
-		return list;
-	}
-
-	public List<TCIdentifierPattern> findIdentifiers()
-	{
-		List<TCIdentifierPattern> list = new Vector<TCIdentifierPattern>();
-
-		list.addAll(from.findIdentifiers());
-		list.addAll(to.findIdentifiers());
 
 		return list;
 	}

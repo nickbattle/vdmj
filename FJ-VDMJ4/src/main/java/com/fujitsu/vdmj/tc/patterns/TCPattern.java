@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -102,12 +100,6 @@ public abstract class TCPattern extends TCNode implements Serializable
 	protected final TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
 	{
 		return apply(new TCGetDefinitionsVisitor(), new Pair(type, scope));
-	}
-
-	/** Return a list of the contained IdentifierPatterns */
-	protected List<TCIdentifierPattern> findIdentifiers()
-	{
-		return new Vector<TCIdentifierPattern>();		// Most have none
 	}
 
 	/** Get the type(s) that could match this pattern. */
