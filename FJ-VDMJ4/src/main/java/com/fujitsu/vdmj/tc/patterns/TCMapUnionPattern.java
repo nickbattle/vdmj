@@ -28,7 +28,6 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -103,17 +102,6 @@ public class TCMapUnionPattern extends TCPattern
 		defs.addAll(right.getAllDefinitions(type, scope));
 
 		return defs;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		list.addAll(left.getAllVariableNames());
-		list.addAll(right.getAllVariableNames());
-
-		return list;
 	}
 
 	@Override

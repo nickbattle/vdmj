@@ -28,7 +28,6 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -105,19 +104,6 @@ public class TCSetPattern extends TCPattern
 		}
 
 		return defs;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (TCPattern p: plist)
-		{
-			list.addAll(p.getAllVariableNames());
-		}
-
-		return list;
 	}
 
 	@Override

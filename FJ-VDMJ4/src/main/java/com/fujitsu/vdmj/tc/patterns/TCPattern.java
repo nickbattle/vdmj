@@ -128,19 +128,13 @@ public abstract class TCPattern extends TCNode implements Serializable
 	 * Get a set of names for the pattern's variables. Note that if the
 	 * pattern includes duplicate variable names, these are collapse into one.
 	 */
-	public TCNameList getVariableNames()
+	public final TCNameList getVariableNames()
 	{
 		TCNameSet set = new TCNameSet();
-		set.addAll(getAllVariableNames());
+		set.addAll(apply(new TCGetVariablesVisitor(), null));
 		TCNameList list = new TCNameList();
 		list.addAll(set);
 		return list;
-	}
-
-	/** Get a complete list of the pattern's variable names, including duplicates. */
-	protected TCNameList getAllVariableNames()
-	{
-		return new TCNameList();	// Most are empty
 	}
 
 	/**

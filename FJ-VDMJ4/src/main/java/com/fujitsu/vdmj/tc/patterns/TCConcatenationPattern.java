@@ -28,7 +28,6 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -94,17 +93,6 @@ public class TCConcatenationPattern extends TCPattern
 		int llen = left.getLength();
 		int rlen = right.getLength();
 		return (llen == ANY || rlen == ANY) ? ANY : llen + rlen;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		list.addAll(left.getAllVariableNames());
-		list.addAll(right.getAllVariableNames());
-
-		return list;
 	}
 
 	@Override
