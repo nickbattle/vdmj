@@ -24,10 +24,8 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexRealToken;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCRealPattern extends TCPattern
 {
@@ -44,12 +42,6 @@ public class TCRealPattern extends TCPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
-	{
-		return new TCDefinitionList();
 	}
 
 	@Override

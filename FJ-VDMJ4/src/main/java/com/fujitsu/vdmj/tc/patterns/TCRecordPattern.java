@@ -23,18 +23,10 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
-
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCField;
-import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -84,64 +76,9 @@ public class TCRecordPattern extends TCPattern
 	}
 
 	@Override
-	public TCDefinitionList getAllDefinitions(TCType exptype, NameScope scope)
-	{
-		TCDefinitionList defs = new TCDefinitionList();
-
-		if (!type.isTag())
-		{
-			report(3200, "Mk_ expression is not a record type");
-			detail("Type", type);
-			return defs;
-		}
-
-		TCRecordType pattype = type.getRecord();
-		// TCType using = exptype.isType(pattype.name.getName(), location);
-
-		if (!exptype.isType(pattype.getClass(), pattype.location))
-		{
-			report(3201, "Matching expression is not a compatible record type");
-			detail2("Pattern type", type, "Expression type", exptype);
-			return defs;
-		}
-
-		// TCRecordType usingrec = (TCRecordType)using;
-
-		if (pattype.fields.size() != plist.size())
-		{
-			report(3202, "Record pattern argument/field count mismatch");
-		}
-		else
-		{
-			Iterator<TCField> patfi = pattype.fields.iterator();
-
-    		for (TCPattern p: plist)
-    		{
-    			TCField pf = patfi.next();
-    			defs.addAll(p.getAllDefinitions(pf.type, scope));
-    		}
-		}
-
-		return defs;
-	}
-
-	@Override
 	public TCType getPossibleType()
 	{
 		return type;
-	}
-
-	@Override
-	public List<TCIdentifierPattern> findIdentifiers()
-	{
-		List<TCIdentifierPattern> list = new Vector<TCIdentifierPattern>();
-
-		for (TCPattern p: plist)
-		{
-			list.addAll(p.findIdentifiers());
-		}
-
-		return list;
 	}
 
 	@Override

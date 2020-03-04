@@ -23,15 +23,10 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.util.List;
-import java.util.Vector;
-
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 
 public class TCSeqPattern extends TCPattern
@@ -81,44 +76,9 @@ public class TCSeqPattern extends TCPattern
 	}
 
 	@Override
-	public TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
-	{
-		TCDefinitionList defs = new TCDefinitionList();
-
-		if (!type.isSeq(location))
-		{
-			report(3203, "Sequence pattern is matched against " + type);
-		}
-		else
-		{
-			TCType elem = type.getSeq().seqof;
-
-    		for (TCPattern p: plist)
-    		{
-    			defs.addAll(p.getAllDefinitions(elem, scope));
-    		}
-		}
-
-		return defs;
-	}
-
-	@Override
 	public TCType getPossibleType()
 	{
 		return new TCSeqType(location, plist.getPossibleType(location));
-	}
-
-	@Override
-	public List<TCIdentifierPattern> findIdentifiers()
-	{
-		List<TCIdentifierPattern> list = new Vector<TCIdentifierPattern>();
-
-		for (TCPattern p: plist)
-		{
-			list.addAll(p.findIdentifiers());
-		}
-
-		return list;
 	}
 
 	@Override

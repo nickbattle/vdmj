@@ -23,14 +23,9 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.util.List;
-import java.util.Vector;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -38,7 +33,6 @@ import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
-import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
 
 public class TCObjectPattern extends TCPattern
@@ -122,60 +116,9 @@ public class TCObjectPattern extends TCPattern
 	}
 
 	@Override
-	public TCDefinitionList getAllDefinitions(TCType exptype, NameScope scope)
-	{
-		TCDefinitionList defs = new TCDefinitionList();
-		TCClassType pattype = type.getClassType(null);
-		TCClassType expctype = exptype.getClassType(null);
-
-		if (expctype == null || !TypeComparator.isSubType(pattype, expctype))
-		{
-			report(3333, "Matching expression is not a compatible object type");
-			detail2("Pattern type", type, "Expression type", exptype);
-			return defs;
-		}
-		
-		TCDefinitionList members = pattype.classdef.getDefinitions();
-
-		for (TCNamePatternPair npp: fieldlist)
-		{
-			TCDefinition d = members.findName(npp.name, NameScope.STATE);	// NB. state lookup
-			
-			if (d != null)
-			{
-				d = d.deref();
-			}
-			
-			if (d instanceof TCInstanceVariableDefinition)
-			{
-				defs.addAll(npp.pattern.getAllDefinitions(d.getType(), scope));
-			}
-			else
-			{
-				report(3334, npp.name.getName() + " is not a matchable field of class " + pattype);
-			}
-		}
-
-		return defs;
-	}
-
-	@Override
 	public TCType getPossibleType()
 	{
 		return type;
-	}
-
-	@Override
-	public List<TCIdentifierPattern> findIdentifiers()
-	{
-		List<TCIdentifierPattern> list = new Vector<TCIdentifierPattern>();
-
-		for (TCNamePatternPair npp: fieldlist)
-		{
-			list.addAll(npp.pattern.findIdentifiers());
-		}
-
-		return list;
 	}
 
 	@Override

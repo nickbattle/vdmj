@@ -24,10 +24,8 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
-import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCIgnorePattern extends TCPattern
 {
@@ -42,12 +40,6 @@ public class TCIgnorePattern extends TCPattern
 	public String toString()
 	{
 		return "-";
-	}
-
-	@Override
-	public TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
-	{
-		return new TCDefinitionList();
 	}
 
 	@Override

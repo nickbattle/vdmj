@@ -23,16 +23,11 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.util.List;
-import java.util.Vector;
-
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 
 public class TCMapletPattern extends TCNode
@@ -77,30 +72,12 @@ public class TCMapletPattern extends TCNode
 		return from + " |-> " + to;
 	}
 
-	public TCDefinitionList getDefinitions(TCMapType map, NameScope scope)
-	{
-		TCDefinitionList list = new TCDefinitionList();
-		list.addAll(from.getAllDefinitions(map.from, scope));
-		list.addAll(to.getAllDefinitions(map.to, scope));
-		return list;
-	}
-
 	public TCNameList getVariableNames()
 	{
 		TCNameList list = new TCNameList();
 
 		list.addAll(from.getVariableNames());
 		list.addAll(to.getVariableNames());
-
-		return list;
-	}
-
-	public List<TCIdentifierPattern> findIdentifiers()
-	{
-		List<TCIdentifierPattern> list = new Vector<TCIdentifierPattern>();
-
-		list.addAll(from.findIdentifiers());
-		list.addAll(to.findIdentifiers());
 
 		return list;
 	}
