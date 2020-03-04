@@ -27,9 +27,7 @@ import java.util.Collection;
 
 /**
  * This TCType visitor visits all of the leaves of a type tree and calls
- * the basic processing methods for the simple types. It is common for
- * many visitors to have this functionality - eg. processing a TCMapType
- * processes its "from" and "to" types. 
+ * the basic processing methods for the simple types.
  */
 public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends TCTypeVisitor<C, S>
 {

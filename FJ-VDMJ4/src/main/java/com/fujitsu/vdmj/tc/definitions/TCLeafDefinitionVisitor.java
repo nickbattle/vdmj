@@ -32,7 +32,7 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.statements.TCLeafStatementVisitor;
 
 /**
- * This TCDefinitionVisitor visits all of the leaves of a definition tree and calls
+ * This TCDefinition visitor visits all of the leaves of a definition tree and calls
  * the basic processing methods for the simple statements and expressions.
  */
 abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> extends TCDefinitionVisitor<C, S>

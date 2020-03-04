@@ -39,7 +39,7 @@ import com.fujitsu.vdmj.tc.patterns.TCSetBind;
 import com.fujitsu.vdmj.tc.traces.TCTraceVariableStatement;
 
 /**
- * This TCStatementVisitor visits all of the leaves of an statement tree and calls
+ * This TCStatement visitor visits all of the leaves of an statement tree and calls
  * the basic processing methods for the simple statements.
  */
 abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> extends TCStatementVisitor<C, S>
