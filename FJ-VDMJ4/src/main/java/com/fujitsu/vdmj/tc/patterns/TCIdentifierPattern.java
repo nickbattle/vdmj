@@ -28,7 +28,6 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -63,14 +62,6 @@ public class TCIdentifierPattern extends TCPattern
 		TCDefinitionList defs = new TCDefinitionList();
 		defs.add(new TCLocalDefinition(location, name, ptype, scope));
 		return defs;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-		list.add(name);
-		return list;
 	}
 
 	@Override

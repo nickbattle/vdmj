@@ -89,8 +89,8 @@ public class TCMapletPattern extends TCNode
 	{
 		TCNameList list = new TCNameList();
 
-		list.addAll(from.getAllVariableNames());
-		list.addAll(to.getAllVariableNames());
+		list.addAll(from.getVariableNames());
+		list.addAll(to.getVariableNames());
 
 		return list;
 	}

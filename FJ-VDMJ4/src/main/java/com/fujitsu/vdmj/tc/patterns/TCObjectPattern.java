@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -158,19 +157,6 @@ public class TCObjectPattern extends TCPattern
 		}
 
 		return defs;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (TCNamePatternPair npp: fieldlist)
-		{
-			list.addAll(npp.pattern.getAllVariableNames());
-		}
-
-		return list;
 	}
 
 	@Override

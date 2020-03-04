@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
@@ -124,19 +123,6 @@ public class TCRecordPattern extends TCPattern
 		}
 
 		return defs;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (TCPattern p: plist)
-		{
-			list.addAll(p.getAllVariableNames());
-		}
-
-		return list;
 	}
 
 	@Override
