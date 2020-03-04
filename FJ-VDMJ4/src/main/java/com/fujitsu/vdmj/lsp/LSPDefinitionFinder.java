@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
+<<<<<<< master
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 
 public class LSPDefinitionFinder
@@ -88,6 +89,50 @@ public class LSPDefinitionFinder
 							{
 								return ntype.definitions.get(0);
 							}
+=======
+
+public class LSPDefinitionFinder
+{
+	public TCDefinition find(TCModuleList modules, File file, int line, int col)
+	{
+		return find(modules, new LexLocation(file, "?", line, col, line, col));
+	}
+	
+	public TCDefinition find(TCModuleList modules, LexLocation position)
+	{
+		LSPDefinitionLocationFinder finder = new LSPDefinitionLocationFinder();
+		
+		for (TCModule module: modules)
+		{
+			// Only explicit modules have a span, called (say) "M`M"
+			LexNameToken sname = new LexNameToken(module.name.getName(), module.name.getLex());
+			LexLocation span = LexLocation.getSpan(sname);
+			
+			if (span == null || position.within(span))
+			{
+				for (TCDefinition def: module.defs)
+				{
+					Set<TCNode> nodes = def.apply(finder, position);
+					
+					if (nodes != null && !nodes.isEmpty())	// found it!
+					{
+						TCNode node = nodes.iterator().next();
+						
+						if (node instanceof TCVariableExpression)
+						{
+							TCVariableExpression vexp = (TCVariableExpression)node;
+							return vexp.getDefinition();
+						}
+						else if (node instanceof TCCallStatement)
+						{
+							TCCallStatement stmt = (TCCallStatement)node;
+							return stmt.getDefinition();
+						}
+						else if (node instanceof TCCallObjectStatement)
+						{
+							TCCallObjectStatement stmt = (TCCallObjectStatement)node;
+							return stmt.getDefinition();
+>>>>>>> 183e29f Added line/col helper methods and renamed LSPLocationFinder
 						}
 						
 						return null;	// Found node, but unable to find definition
