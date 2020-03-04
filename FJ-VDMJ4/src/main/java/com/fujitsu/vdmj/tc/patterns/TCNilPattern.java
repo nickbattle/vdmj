@@ -24,11 +24,9 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
-import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCNilPattern extends TCPattern
 {
@@ -43,12 +41,6 @@ public class TCNilPattern extends TCPattern
 	public String toString()
 	{
 		return "nil";
-	}
-
-	@Override
-	public TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
-	{
-		return new TCDefinitionList();
 	}
 
 	@Override

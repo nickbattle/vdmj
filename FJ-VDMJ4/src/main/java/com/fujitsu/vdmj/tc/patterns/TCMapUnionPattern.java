@@ -27,13 +27,11 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 
 public class TCMapUnionPattern extends TCPattern
@@ -86,22 +84,6 @@ public class TCMapUnionPattern extends TCPattern
 		int llen = left.getLength();
 		int rlen = right.getLength();
 		return (llen == ANY || rlen == ANY) ? ANY : llen + rlen;
-	}
-
-	@Override
-	public TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
-	{
-		TCDefinitionList defs = new TCDefinitionList();
-
-		if (!type.isMap(location))
-		{
-			report(3315, "Matching expression is not a map type");
-		}
-
-		defs.addAll(left.getAllDefinitions(type, scope));
-		defs.addAll(right.getAllDefinitions(type, scope));
-
-		return defs;
 	}
 
 	@Override

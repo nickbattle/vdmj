@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -62,12 +61,6 @@ public class TCExpressionPattern extends TCPattern
 			unResolve();
 			throw e;
 		}
-	}
-
-	@Override
-	public TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
-	{
-		return new TCDefinitionList();	// Exp has no bindings
 	}
 
 	@Override

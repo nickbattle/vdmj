@@ -24,10 +24,8 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCBooleanPattern extends TCPattern
 {
@@ -44,12 +42,6 @@ public class TCBooleanPattern extends TCPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
-	{
-		return new TCDefinitionList();
 	}
 
 	@Override

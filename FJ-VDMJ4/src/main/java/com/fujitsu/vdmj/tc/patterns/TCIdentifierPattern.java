@@ -26,12 +26,9 @@ package com.fujitsu.vdmj.tc.patterns;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
-import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCIdentifierPattern extends TCPattern
 {
@@ -54,14 +51,6 @@ public class TCIdentifierPattern extends TCPattern
 	public String toString()
 	{
 		return name.toString();
-	}
-
-	@Override
-	public TCDefinitionList getAllDefinitions(TCType ptype, NameScope scope)
-	{
-		TCDefinitionList defs = new TCDefinitionList();
-		defs.add(new TCLocalDefinition(location, name, ptype, scope));
-		return defs;
 	}
 
 	@Override

@@ -23,17 +23,13 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -75,29 +71,6 @@ public class TCTuplePattern extends TCPattern
 			unResolve();
 			throw e;
 		}
-	}
-
-	@Override
-	public TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
-	{
-		TCDefinitionList defs = new TCDefinitionList();
-
-		if (!type.isProduct(plist.size(), location))
-		{
-			report(3205, "Matching expression is not a product of cardinality " + plist.size());
-			detail("Actual", type);
-			return defs;
-		}
-
-		TCProductType product = type.getProduct(plist.size());
-		Iterator<TCType> ti = product.types.iterator();
-
-		for (TCPattern p: plist)
-		{
-			defs.addAll(p.getAllDefinitions(ti.next(), scope));
-		}
-
-		return defs;
 	}
 
 	@Override

@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionSet;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -58,7 +57,6 @@ public abstract class TCPattern extends TCNode implements Serializable
 	/**
 	 * Create a pattern at the given location.
 	 */
-
 	public TCPattern(LexLocation location)
 	{
 		this.location = location;
@@ -94,14 +92,17 @@ public abstract class TCPattern extends TCNode implements Serializable
 	public TCDefinitionList getDefinitions(TCType type, NameScope scope)
 	{
 		TCDefinitionSet set = new TCDefinitionSet();
-		set.addAll(getAllDefinitions(type, scope));
+		set.addAll(apply(new TCGetDefinitionsVisitor(), new Pair(type, scope)));
 		return set.asList();
 	}
 
 	/**
 	 * Get a complete list of all definitions, including duplicates.
 	 */
-	abstract protected TCDefinitionList getAllDefinitions(TCType type, NameScope scope);
+	protected final TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
+	{
+		return apply(new TCGetDefinitionsVisitor(), new Pair(type, scope));
+	}
 
 	/** Return a list of the contained IdentifierPatterns */
 	protected List<TCIdentifierPattern> findIdentifiers()
@@ -126,14 +127,12 @@ public abstract class TCPattern extends TCNode implements Serializable
 
 	/**
 	 * Get a set of names for the pattern's variables. Note that if the
-	 * pattern includes duplicate variable names, these are collapse into one.
+	 * pattern includes duplicate variable names, these are collapsed into one.
 	 */
 	public final TCNameList getVariableNames()
 	{
-		TCNameSet set = new TCNameSet();
-		set.addAll(apply(new TCGetVariablesVisitor(), null));
 		TCNameList list = new TCNameList();
-		list.addAll(set);
+		list.addAll(apply(new TCGetVariablesVisitor(), null));
 		return list;
 	}
 

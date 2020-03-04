@@ -24,11 +24,9 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexStringToken;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCCharacterType;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCStringPattern extends TCPattern
 {
@@ -51,12 +49,6 @@ public class TCStringPattern extends TCPattern
 	public int getLength()
 	{
 		return value.value.length();
-	}
-
-	@Override
-	public TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
-	{
-		return new TCDefinitionList();
 	}
 
 	@Override

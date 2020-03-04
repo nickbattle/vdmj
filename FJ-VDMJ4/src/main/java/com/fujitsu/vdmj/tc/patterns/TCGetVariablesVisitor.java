@@ -24,32 +24,32 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class TCGetVariablesVisitor extends TCLeafPatternVisitor<TCNameToken, TCNameList, Object>
+public class TCGetVariablesVisitor extends TCLeafPatternVisitor<TCNameToken, TCNameSet, Object>
 {
 	@Override
-	protected TCNameList newCollection()
+	protected TCNameSet newCollection()
 	{
-		return new TCNameList();
+		return new TCNameSet();
 	}
 
 	@Override
-	protected TCLeafExpressionVisitor<TCNameToken, TCNameList, Object> getExpressionVisitor()
+	protected TCLeafExpressionVisitor<TCNameToken, TCNameSet, Object> getExpressionVisitor()
 	{
 		return null;	// No variables in expression patterns :)
 	}
 
 	@Override
-	public TCNameList casePattern(TCPattern node, Object arg)
+	public TCNameSet casePattern(TCPattern node, Object arg)
 	{
 		return newCollection();
 	}
 	
 	@Override
-	public TCNameList caseIdentifierPattern(TCIdentifierPattern node, Object arg)
+	public TCNameSet caseIdentifierPattern(TCIdentifierPattern node, Object arg)
 	{
-		return new TCNameList(node.name);
+		return new TCNameSet(node.name);
 	}
 }

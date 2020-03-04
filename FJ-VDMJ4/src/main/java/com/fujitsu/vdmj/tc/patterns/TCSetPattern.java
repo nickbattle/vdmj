@@ -27,11 +27,9 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 
 public class TCSetPattern extends TCPattern
@@ -78,32 +76,6 @@ public class TCSetPattern extends TCPattern
 	public int getLength()
 	{
 		return plist.size();
-	}
-
-	@Override
-	public TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
-	{
-		TCDefinitionList defs = new TCDefinitionList();
-
-		if (!type.isSet(location))
-		{
-			report(3204, "Set pattern is not matched against set type");
-			detail("Actual type", type);
-		}
-		else
-		{
-			TCSetType set = type.getSet();
-
-			if (!set.empty)
-			{
-        		for (TCPattern p: plist)
-        		{
-        			defs.addAll(p.getAllDefinitions(set.setof, scope));
-        		}
-			}
-		}
-
-		return defs;
 	}
 
 	@Override
