@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexRealToken;
-import com.fujitsu.vdmj.tc.types.TCRealType;
-import com.fujitsu.vdmj.tc.types.TCType;
 
 public class TCRealPattern extends TCPattern
 {
@@ -42,12 +40,6 @@ public class TCRealPattern extends TCPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCRealType(location);
 	}
 
 	@Override

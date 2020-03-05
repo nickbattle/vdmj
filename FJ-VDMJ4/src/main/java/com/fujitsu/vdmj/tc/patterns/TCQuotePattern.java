@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexQuoteToken;
-import com.fujitsu.vdmj.tc.types.TCQuoteType;
-import com.fujitsu.vdmj.tc.types.TCType;
 
 public class TCQuotePattern extends TCPattern
 {
@@ -42,12 +40,6 @@ public class TCQuotePattern extends TCPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCQuoteType(location, value.value);
 	}
 
 	@Override

@@ -24,9 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.types.TCMapType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.util.Utils;
@@ -89,19 +86,6 @@ public class TCMapPattern extends TCPattern
 	public int getLength()
 	{
 		return maplets.size();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		TCTypeSet types = new TCTypeSet();
-		
-		for (TCMapletPattern p: maplets)
-		{
-			types.add(p.getPossibleType());
-		}
-		
-		return types.isEmpty() ? new TCMapType(location) : types.getType(location);
 	}
 
 	@Override

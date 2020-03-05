@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.util.Utils;
@@ -68,19 +66,6 @@ public class TCTuplePattern extends TCPattern
 			unResolve();
 			throw e;
 		}
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		TCTypeList list = new TCTypeList();
-
-		for (TCPattern p: plist)
-		{
-			list.add(p.getPossibleType());
-		}
-
-		return list.getType(location);
 	}
 
 	@Override

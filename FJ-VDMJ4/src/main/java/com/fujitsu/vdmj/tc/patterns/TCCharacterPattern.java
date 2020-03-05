@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexCharacterToken;
-import com.fujitsu.vdmj.tc.types.TCCharacterType;
-import com.fujitsu.vdmj.tc.types.TCType;
 
 public class TCCharacterPattern extends TCPattern
 {
@@ -42,12 +40,6 @@ public class TCCharacterPattern extends TCPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCCharacterType(location);
 	}
 
 	@Override
