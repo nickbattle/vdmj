@@ -68,12 +68,6 @@ public class TCSeqPattern extends TCPattern
 	}
 
 	@Override
-	public int getLength()
-	{
-		return plist.size();
-	}
-
-	@Override
 	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseSeqPattern(this, arg);

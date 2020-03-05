@@ -134,13 +134,8 @@ public abstract class TCPattern extends TCNode implements Serializable
 	}
 
 	/**
-	 * @return The "length" of the pattern (eg. sequence and set patterns).
+	 * Report type checking errors for patterns. 
 	 */
-	public int getLength()
-	{
-		return 1;	// Most only identify one member
-	}
-
 	public void report(int number, String msg)
 	{
 		TypeChecker.report(number, msg, location);
