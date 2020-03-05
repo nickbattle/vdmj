@@ -25,11 +25,7 @@ package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.ast.patterns.ASTNamePatternPair;
 import com.fujitsu.vdmj.ast.patterns.ASTNamePatternPairList;
-import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCMappedList;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -60,28 +56,6 @@ public class TCNamePatternPairList extends TCMappedList<ASTNamePatternPair, TCNa
 		for (TCNamePatternPair npp: this)
 		{
 			npp.pattern.typeResolve(env);
-		}
-	}
-
-	public TCType getPossibleType(LexLocation location)
-	{
-		switch (size())
-		{
-			case 0:
-				return new TCUnknownType(location);
-
-			case 1:
-				return get(0).pattern.getPossibleType();
-
-			default:
-        		TCTypeSet list = new TCTypeSet();
-
-        		for (TCNamePatternPair npp: this)
-        		{
-        			list.add(npp.pattern.getPossibleType());
-        		}
-
-        		return list.getType(location);		// NB. a union of types
 		}
 	}
 
