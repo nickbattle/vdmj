@@ -164,7 +164,7 @@ public abstract class TCPattern extends TCNode implements Serializable
 	 */
 	public boolean alwaysMatches()
 	{
-		return false;
+		return apply(new TCAlwaysMatchesVisitor(), null);
 	}
 
 	/**

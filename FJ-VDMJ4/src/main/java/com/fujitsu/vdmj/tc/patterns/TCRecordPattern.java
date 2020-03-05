@@ -76,12 +76,6 @@ public class TCRecordPattern extends TCPattern
 	}
 
 	@Override
-	public boolean alwaysMatches()
-	{
-		return plist.alwaysMatches();
-	}
-
-	@Override
 	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseRecordPattern(this, arg);
