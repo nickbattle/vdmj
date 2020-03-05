@@ -97,14 +97,19 @@ public abstract class TCPattern extends TCNode implements Serializable
 	/**
 	 * Get a complete list of all definitions, including duplicates.
 	 */
-	protected final TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
+	public TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
 	{
 		return apply(new TCGetDefinitionsVisitor(), new Pair(type, scope));
 	}
 
-	/** Get the type(s) that could match this pattern. */
-	abstract public TCType getPossibleType();
-
+	/**
+	 * Get the type(s) that match this pattern.
+	 */
+	public TCType getPossibleType()
+	{
+		return apply(new TCPossibleTypeVisitor(), null);
+	}
+	
 	/** Test whether the pattern can match the type passed */
 	public boolean matches(TCType type)
 	{

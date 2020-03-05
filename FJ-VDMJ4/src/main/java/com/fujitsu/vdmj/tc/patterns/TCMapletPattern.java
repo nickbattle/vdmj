@@ -25,8 +25,6 @@ package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.types.TCMapType;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 
@@ -80,10 +78,5 @@ public class TCMapletPattern extends TCNode
 		list.addAll(to.getVariableNames());
 
 		return list;
-	}
-	
-	public TCType getPossibleType()
-	{
-		return new TCMapType(from.location, from.getPossibleType(), to.getPossibleType());
 	}
 }

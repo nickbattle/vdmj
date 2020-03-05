@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
-import com.fujitsu.vdmj.tc.types.TCNumericType;
-import com.fujitsu.vdmj.tc.types.TCType;
 
 public class TCIntegerPattern extends TCPattern
 {
@@ -42,12 +40,6 @@ public class TCIntegerPattern extends TCPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return TCNumericType.typeOf(value.value, location);
 	}
 
 	@Override

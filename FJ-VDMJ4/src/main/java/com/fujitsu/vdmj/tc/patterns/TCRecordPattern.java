@@ -76,12 +76,6 @@ public class TCRecordPattern extends TCPattern
 	}
 
 	@Override
-	public TCType getPossibleType()
-	{
-		return type;
-	}
-
-	@Override
 	public boolean alwaysMatches()
 	{
 		return plist.alwaysMatches();

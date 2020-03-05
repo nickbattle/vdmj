@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
-import com.fujitsu.vdmj.tc.types.TCBooleanType;
-import com.fujitsu.vdmj.tc.types.TCType;
 
 public class TCBooleanPattern extends TCPattern
 {
@@ -42,12 +40,6 @@ public class TCBooleanPattern extends TCPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCBooleanType(location);
 	}
 
 	@Override

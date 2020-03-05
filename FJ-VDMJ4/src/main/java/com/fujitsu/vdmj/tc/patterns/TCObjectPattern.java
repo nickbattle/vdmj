@@ -116,12 +116,6 @@ public class TCObjectPattern extends TCPattern
 	}
 
 	@Override
-	public TCType getPossibleType()
-	{
-		return type;
-	}
-
-	@Override
 	public boolean alwaysMatches()
 	{
 		return fieldlist.alwaysMatches();

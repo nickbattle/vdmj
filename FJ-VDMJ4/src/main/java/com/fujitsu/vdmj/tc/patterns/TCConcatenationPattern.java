@@ -24,9 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.types.TCSeqType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 
@@ -80,19 +77,6 @@ public class TCConcatenationPattern extends TCPattern
 		int llen = left.getLength();
 		int rlen = right.getLength();
 		return (llen == ANY || rlen == ANY) ? ANY : llen + rlen;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		TCPatternList plist = new TCPatternList();
-		plist.add(left);
-		plist.add(right);
-		
-		TCType type = plist.getPossibleType(location);
-		
-		return type.isUnknown(location) ? 
-			new TCSeqType(location, new TCUnknownType(location)) : type;
 	}
 
 	@Override

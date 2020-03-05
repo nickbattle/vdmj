@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class TCIdentifierPattern extends TCPattern
 {
@@ -48,12 +46,6 @@ public class TCIdentifierPattern extends TCPattern
 	public String toString()
 	{
 		return name.toString();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCUnknownType(location);
 	}
 
 	@Override

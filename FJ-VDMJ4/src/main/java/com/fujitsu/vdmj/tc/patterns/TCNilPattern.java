@@ -24,9 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.types.TCOptionalType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class TCNilPattern extends TCPattern
 {
@@ -41,12 +38,6 @@ public class TCNilPattern extends TCPattern
 	public String toString()
 	{
 		return "nil";
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCOptionalType(location, new TCUnknownType(location));
 	}
 
 	@Override

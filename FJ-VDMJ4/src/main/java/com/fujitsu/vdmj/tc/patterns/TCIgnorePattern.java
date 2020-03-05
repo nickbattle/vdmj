@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class TCIgnorePattern extends TCPattern
 {
@@ -46,12 +44,6 @@ public class TCIgnorePattern extends TCPattern
 	public int getLength()
 	{
 		return ANY;	// Special value meaning "any length"
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCUnknownType(location);	// As we don't care
 	}
 
 	@Override

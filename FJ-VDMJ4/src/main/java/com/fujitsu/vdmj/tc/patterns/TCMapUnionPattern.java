@@ -24,10 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.types.TCMapType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 
@@ -81,20 +77,6 @@ public class TCMapUnionPattern extends TCPattern
 		int llen = left.getLength();
 		int rlen = right.getLength();
 		return (llen == ANY || rlen == ANY) ? ANY : llen + rlen;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		TCTypeSet list = new TCTypeSet();
-
-		list.add(left.getPossibleType());
-		list.add(right.getPossibleType());
-
-		TCType s = list.getType(location);
-
-		return s.isUnknown(location) ?
-			new TCMapType(location, new TCUnknownType(location), new TCUnknownType(location)) : s;
 	}
 
 	@Override

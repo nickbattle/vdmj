@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.types.TCSetType;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 
@@ -73,12 +71,6 @@ public class TCSetPattern extends TCPattern
 	public int getLength()
 	{
 		return plist.size();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCSetType(location, plist.getPossibleType(location));
 	}
 
 	@Override
