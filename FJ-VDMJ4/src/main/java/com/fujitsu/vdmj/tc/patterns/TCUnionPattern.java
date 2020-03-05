@@ -80,12 +80,6 @@ public class TCUnionPattern extends TCPattern
 	}
 
 	@Override
-	public boolean alwaysMatches()
-	{
-		return left.alwaysMatches() && right.alwaysMatches();
-	}
-
-	@Override
 	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseUnionPattern(this, arg);

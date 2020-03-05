@@ -116,12 +116,6 @@ public class TCObjectPattern extends TCPattern
 	}
 
 	@Override
-	public boolean alwaysMatches()
-	{
-		return fieldlist.alwaysMatches();
-	}
-
-	@Override
 	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseObjectPattern(this, arg);

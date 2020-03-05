@@ -24,14 +24,10 @@
 package com.fujitsu.vdmj.in.patterns;
 
 import com.fujitsu.vdmj.in.INMappedList;
-import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.tc.patterns.TCNamePatternPair;
 import com.fujitsu.vdmj.tc.patterns.TCNamePatternPairList;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
@@ -61,28 +57,6 @@ public class INNamePatternPairList extends INMappedList<TCNamePatternPair, INNam
 		}
 
 		return list;
-	}
-
-	public TCType getPossibleType(LexLocation location)
-	{
-		switch (size())
-		{
-			case 0:
-				return new TCUnknownType(location);
-
-			case 1:
-				return get(0).pattern.getPossibleType();
-
-			default:
-        		TCTypeSet list = new TCTypeSet();
-
-        		for (INNamePatternPair npp: this)
-        		{
-        			list.add(npp.pattern.getPossibleType());
-        		}
-
-        		return list.getType(location);		// NB. a union of types
-		}
 	}
 
 	public boolean isConstrained()

@@ -47,12 +47,6 @@ public class TCIgnorePattern extends TCPattern
 	}
 
 	@Override
-	public boolean alwaysMatches()
-	{
-		return true;
-	}
-
-	@Override
 	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseIgnorePattern(this, arg);
