@@ -72,14 +72,6 @@ public class TCMapUnionPattern extends TCPattern
 	}
 
 	@Override
-	public int getLength()
-	{
-		int llen = left.getLength();
-		int rlen = right.getLength();
-		return (llen == ANY || rlen == ANY) ? ANY : llen + rlen;
-	}
-
-	@Override
 	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseMapUnionPattern(this, arg);

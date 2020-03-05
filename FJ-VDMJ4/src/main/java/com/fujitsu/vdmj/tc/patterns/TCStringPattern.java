@@ -43,12 +43,6 @@ public class TCStringPattern extends TCPattern
 	}
 
 	@Override
-	public int getLength()
-	{
-		return value.value.length();
-	}
-
-	@Override
 	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseStringPattern(this, arg);

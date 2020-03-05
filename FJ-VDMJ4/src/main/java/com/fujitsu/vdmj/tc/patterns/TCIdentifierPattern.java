@@ -37,12 +37,6 @@ public class TCIdentifierPattern extends TCPattern
 	}
 
 	@Override
-	public int getLength()
-	{
-		return ANY;	// Special value meaning "any length"
-	}
-
-	@Override
 	public String toString()
 	{
 		return name.toString();

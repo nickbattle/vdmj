@@ -83,12 +83,6 @@ public class TCMapPattern extends TCPattern
 	}
 
 	@Override
-	public int getLength()
-	{
-		return maplets.size();
-	}
-
-	@Override
 	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseMapPattern(this, arg);

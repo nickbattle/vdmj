@@ -41,12 +41,6 @@ public class TCIgnorePattern extends TCPattern
 	}
 
 	@Override
-	public int getLength()
-	{
-		return ANY;	// Special value meaning "any length"
-	}
-
-	@Override
 	public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseIgnorePattern(this, arg);
