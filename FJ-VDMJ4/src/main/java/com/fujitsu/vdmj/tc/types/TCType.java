@@ -139,17 +139,10 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	 */
 	public TCType deBracket()
 	{
-		TCType r = this;
-
-		while (r instanceof TCBracketType)
-		{
-			r = ((TCBracketType)r).type;
-		}
-
-		return r;
+		return (TCType) deBracket(this);
 	}
 
-	public Object deBracket(Object other)
+	public Object deBracket(Object other)	// Useful in equals(Object) methods
 	{
 		while (other instanceof TCBracketType)
 		{
