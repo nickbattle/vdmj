@@ -36,19 +36,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-class EnvPair
-{
-	public final Environment globals;
-	public final Environment env;
-	
-	public EnvPair(Environment globals, Environment env)
-	{
-		this.globals = globals;
-		this.env = env;
-	}
-}
-
-public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvPair>
+public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
 	@Override
 	protected TCNameSet newCollection()
@@ -57,13 +45,13 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 
 	@Override
-	public TCNameSet caseExpression(TCExpression node, EnvPair arg)
+	public TCNameSet caseExpression(TCExpression node, EnvTriple arg)
 	{
 		return newCollection();
 	}
 
 	@Override
-	public TCNameSet caseApplyExpression(TCApplyExpression node, EnvPair arg)
+	public TCNameSet caseApplyExpression(TCApplyExpression node, EnvTriple arg)
 	{
 		TCNameSet names = new TCNameSet();
 		
@@ -87,31 +75,31 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 	
 	@Override
-	public TCNameSet caseBooleanBinaryExpression(TCBooleanBinaryExpression node, EnvPair arg)
+	public TCNameSet caseBooleanBinaryExpression(TCBooleanBinaryExpression node, EnvTriple arg)
 	{
 		return node.left.apply(this, arg);		// May not do the RHS!
 	}
 	
 	@Override
-	public TCNameSet caseCasesExpression(TCCasesExpression node, EnvPair arg)
+	public TCNameSet caseCasesExpression(TCCasesExpression node, EnvTriple arg)
 	{
 		return node.exp.apply(this, arg);		// The rest is conditional
 	}
 	
 	@Override
-	public TCNameSet caseExists1Expression(TCExists1Expression node, EnvPair arg)
+	public TCNameSet caseExists1Expression(TCExists1Expression node, EnvTriple arg)
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
-		TCNameSet names = node.predicate.apply(this, new EnvPair(arg.globals, local));
+		TCNameSet names = node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
 		names.addAll(node.bind.getFreeVariables(arg.globals, local));
 		return names;
 	}
 	
 	@Override
-	public TCNameSet caseExistsExpression(TCExistsExpression node, EnvPair arg)
+	public TCNameSet caseExistsExpression(TCExistsExpression node, EnvTriple arg)
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
-		TCNameSet names = node.predicate.apply(this, new EnvPair(arg.globals, local));
+		TCNameSet names = node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
 		
 		for (TCMultipleBind mb: node.bindList)
 		{
@@ -122,10 +110,10 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 	
 	@Override
-	public TCNameSet caseForAllExpression(TCForAllExpression node, EnvPair arg)
+	public TCNameSet caseForAllExpression(TCForAllExpression node, EnvTriple arg)
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
-		TCNameSet names = node.predicate.apply(this, new EnvPair(arg.globals, local));
+		TCNameSet names = node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
 		
 		for (TCMultipleBind mb: node.bindList)
 		{
@@ -136,22 +124,22 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 	
 	@Override
-	public TCNameSet caseIfExpression(TCIfExpression node, EnvPair arg)
+	public TCNameSet caseIfExpression(TCIfExpression node, EnvTriple arg)
 	{
 		return node.ifExp.apply(this, arg);		// The rest is conditional
 	}
 	
 	@Override
-	public TCNameSet caseIotaExpression(TCIotaExpression node, EnvPair arg)
+	public TCNameSet caseIotaExpression(TCIotaExpression node, EnvTriple arg)
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
-		TCNameSet names = node.predicate.apply(this, new EnvPair(arg.globals, local));
+		TCNameSet names = node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
 		names.addAll(node.bind.getFreeVariables(arg.globals, local));
 		return names;
 	}
 	
 	@Override
-	public TCNameSet caseLambdaExpression(TCLambdaExpression node, EnvPair arg)
+	public TCNameSet caseLambdaExpression(TCLambdaExpression node, EnvTriple arg)
 	{
 		TCNameSet names = new TCNameSet();	// Body expression is conditional
 		
@@ -164,22 +152,22 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 	
 	@Override
-	public TCNameSet caseLetBeStExpression(TCLetBeStExpression node, EnvPair arg)
+	public TCNameSet caseLetBeStExpression(TCLetBeStExpression node, EnvTriple arg)
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
 		TCNameSet names = node.bind.getFreeVariables(arg.globals, local);
 		
 		if (node.suchThat != null)
 		{
-			names.addAll(node.suchThat.apply(this, new EnvPair(arg.globals, local)));
+			names.addAll(node.suchThat.apply(this, new EnvTriple(arg.globals, local, null)));
 		}
 		
-		names.addAll(node.value.apply(this, new EnvPair(arg.globals, local)));
+		names.addAll(node.value.apply(this, new EnvTriple(arg.globals, local, null)));
 		return names;
 	}
 	
 	@Override
-	public TCNameSet caseLetDefExpression(TCLetDefExpression node, EnvPair arg)
+	public TCNameSet caseLetDefExpression(TCLetDefExpression node, EnvTriple arg)
 	{
 		Environment local = arg.env;
 		TCNameSet names = new TCNameSet();
@@ -197,19 +185,19 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 			}
 		}
 
-		names.addAll(node.expression.apply(this, new EnvPair(arg.globals, local)));
+		names.addAll(node.expression.apply(this, new EnvTriple(arg.globals, local, null)));
 		return names;
 	}
 	
 	@Override
-	public TCNameSet caseMapCompExpression(TCMapCompExpression node, EnvPair arg)
+	public TCNameSet caseMapCompExpression(TCMapCompExpression node, EnvTriple arg)
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
 		TCNameSet names = new TCNameSet();	// Note "first" is conditional
 		
 		if (node.predicate != null)
 		{
-			node.predicate.apply(this, new EnvPair(arg.globals, local));
+			node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
 		}
 		
 		for (TCMultipleBind mb: node.bindings)
@@ -221,7 +209,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 	
 	@Override
-	public TCNameSet caseMkBasicExpression(TCMkBasicExpression node, EnvPair arg)
+	public TCNameSet caseMkBasicExpression(TCMkBasicExpression node, EnvTriple arg)
 	{
 		TCNameSet names = node.type.getFreeVariables(arg.env);
 		names.addAll(node.arg.apply(this, arg));
@@ -229,7 +217,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 	
 	@Override
-	public TCNameSet caseMkTypeExpression(TCMkTypeExpression node, EnvPair arg)
+	public TCNameSet caseMkTypeExpression(TCMkTypeExpression node, EnvTriple arg)
 	{
 		TCNameSet names = new TCNameSet(node.typename);
 		
@@ -242,7 +230,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 	
 	@Override
-	public TCNameSet caseMuExpression(TCMuExpression node, EnvPair arg)
+	public TCNameSet caseMuExpression(TCMuExpression node, EnvTriple arg)
 	{
 		TCNameSet names = node.record.apply(this, arg);
 		
@@ -255,7 +243,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 	
 	@Override
-	public TCNameSet caseNarrowExpression(TCNarrowExpression node, EnvPair arg)
+	public TCNameSet caseNarrowExpression(TCNarrowExpression node, EnvTriple arg)
 	{
 		TCNameSet names = node.test.apply(this, arg);
 		
@@ -268,14 +256,14 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 	
 	@Override
-	public TCNameSet caseSeqCompExpression(TCSeqCompExpression node, EnvPair arg)
+	public TCNameSet caseSeqCompExpression(TCSeqCompExpression node, EnvTriple arg)
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
 		TCNameSet names = new TCNameSet();	// Note "first" is conditional
 		
 		if (node.predicate != null)
 		{
-			node.predicate.apply(this, new EnvPair(arg.globals, local));
+			node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
 		}
 		
 		names.addAll(node.bind.getFreeVariables(arg.globals, local));
@@ -283,14 +271,14 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 	
 	@Override
-	public TCNameSet caseSetCompExpression(TCSetCompExpression node, EnvPair arg)
+	public TCNameSet caseSetCompExpression(TCSetCompExpression node, EnvTriple arg)
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
 		TCNameSet names = new TCNameSet();	// Note "first" is conditional
 		
 		if (node.predicate != null)
 		{
-			node.predicate.apply(this, new EnvPair(arg.globals, local));
+			node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
 		}
 		
 		for (TCMultipleBind mb: node.bindings)
@@ -302,7 +290,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 	
 	@Override
-	public TCNameSet caseVariableExpression(TCVariableExpression node, EnvPair arg)
+	public TCNameSet caseVariableExpression(TCVariableExpression node, EnvTriple arg)
 	{
 		TCDefinition d = arg.globals.findName(node.name, NameScope.NAMESANDSTATE);
 		
@@ -332,7 +320,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	}
 	
 	@Override
-	public TCNameSet caseDefExpression(TCDefExpression node, EnvPair arg)
+	public TCNameSet caseDefExpression(TCDefExpression node, EnvTriple arg)
 	{
 		return caseLetDefExpression(node, arg);
 	}

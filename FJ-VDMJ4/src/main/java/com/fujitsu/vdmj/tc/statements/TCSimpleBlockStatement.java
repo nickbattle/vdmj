@@ -24,10 +24,8 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
@@ -151,22 +149,6 @@ abstract public class TCSimpleBlockStatement extends TCStatement
 		}
 
 		return types;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		TCNameSet names = new TCNameSet();
-		
-		for (TCStatement stmt: statements)
-		{
-    		if (!returns.get())
-    		{
-    			names.addAll(stmt.getFreeVariables(globals, env, returns));
-    		}
-		}
-		
-		return names;
 	}
 
 	@Override

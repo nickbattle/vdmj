@@ -174,7 +174,7 @@ public abstract class TCExpression extends TCNode implements Serializable
 	 */
 	public final TCNameSet getFreeVariables(Environment globals, Environment env)
 	{
-		return apply(new TCGetFreeVariablesVisitor(), new EnvPair(globals, env));
+		return apply(new TCGetFreeVariablesVisitor(), new EnvTriple(globals, env, null));
 	}
 
 	/**

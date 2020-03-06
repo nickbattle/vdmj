@@ -23,10 +23,7 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -74,12 +71,6 @@ public class TCAnnotatedStatement extends TCStatement
 	public TCTypeSet exitCheck(Environment base)
 	{
 		return statement.exitCheck(base);
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		return statement.getFreeVariables(env, env, returns);
 	}
 
 	@Override

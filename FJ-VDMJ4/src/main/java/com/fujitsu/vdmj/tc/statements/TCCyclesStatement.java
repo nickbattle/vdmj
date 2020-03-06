@@ -23,12 +23,9 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -75,14 +72,6 @@ public class TCCyclesStatement extends TCStatement
 		}
 
 		return statement.typeCheck(env, scope, constraint, mandatory);
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		TCNameSet names = cycles.getFreeVariables(globals, env);
-		names.addAll(statement.getFreeVariables(globals, env, returns));
-		return names;
 	}
 
 	@Override

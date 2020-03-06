@@ -23,8 +23,6 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -32,14 +30,12 @@ import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCQualifiedDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCLetBeStStatement extends TCStatement
@@ -48,7 +44,7 @@ public class TCLetBeStStatement extends TCStatement
 	public final TCMultipleBind bind;
 	public final TCExpression suchThat;
 	public final TCStatement statement;
-	private TCMultiBindListDefinition def = null;
+	public TCMultiBindListDefinition def = null;
 
 	public TCLetBeStStatement(LexLocation location, TCMultipleBind bind,
 		TCExpression suchThat, TCStatement statement)
@@ -113,21 +109,6 @@ public class TCLetBeStStatement extends TCStatement
 		
 		result.addAll(statement.exitCheck(base));
 		return result;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		Environment local = new FlatEnvironment(def, env);
-		TCNameSet names = bind.getFreeVariables(globals, local);
-		
-		if (suchThat != null)
-		{
-			names.addAll(suchThat.getFreeVariables(globals, local));
-		}
-		
-		names.addAll(statement.getFreeVariables(globals, local, returns));
-		return names;
 	}
 
 	@Override

@@ -23,10 +23,7 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -66,15 +63,6 @@ public class TCAlwaysStatement extends TCStatement
 		types.addAll(body.exitCheck(base));
 		types.addAll(always.exitCheck(base));
 		return types;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		TCNameSet names = new TCNameSet();
-		names.addAll(always.getFreeVariables(globals, env, returns));
-		names.addAll(body.getFreeVariables(globals, env, returns));
-		return names;
 	}
 
 	@Override
