@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -73,14 +72,6 @@ abstract public class TCBinaryExpression extends TCExpression
 	public String toString()
 	{
 		return "(" + left + " " + op + " " + right + ")";
-	}
-	
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		TCNameSet names = left.getFreeVariables(globals, env);
-		names.addAll(right.getFreeVariables(globals, env));
-		return names;
 	}
 	
 	protected void checkMultipleEqualities(TCType union)

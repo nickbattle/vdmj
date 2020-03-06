@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -77,14 +76,6 @@ public class TCSetRangeExpression extends TCSetExpression
 		}
 
 		return possibleConstraint(constraint, new TCSetType(first.location, ftype));
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		TCNameSet names = first.getFreeVariables(globals, env);
-		names.addAll(last.getFreeVariables(globals, env));
-		return names;
 	}
 
 	@Override

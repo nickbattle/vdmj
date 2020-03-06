@@ -27,15 +27,12 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCExistsExpression extends TCExpression
@@ -44,7 +41,7 @@ public class TCExistsExpression extends TCExpression
 	public final TCMultipleBindList bindList;
 	public final TCExpression predicate;
 	
-	private TCDefinition def = null;
+	public TCDefinition def = null;
 
 	public TCExistsExpression(LexLocation location, TCMultipleBindList bindList, TCExpression predicate)
 	{
@@ -74,20 +71,6 @@ public class TCExistsExpression extends TCExpression
 
 		local.unusedCheck();
 		return checkConstraint(constraint, new TCBooleanType(location));
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		Environment local = new FlatEnvironment(def, env);
-		TCNameSet names = predicate.getFreeVariables(globals, local);
-		
-		for (TCMultipleBind mb: bindList)
-		{
-			names.addAll(mb.getFreeVariables(globals, local));
-		}
-		
-		return names;
 	}
 
 	@Override

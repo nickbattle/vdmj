@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.typechecker.Environment;
 
 abstract public class TCUnaryExpression extends TCExpression
 {
@@ -36,11 +34,5 @@ abstract public class TCUnaryExpression extends TCExpression
 	{
 		super(location);
 		this.exp = exp;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		return exp.getFreeVariables(globals, env);
 	}
 }

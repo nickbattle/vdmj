@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -67,12 +66,6 @@ public class TCAnnotatedExpression extends TCExpression
 	public TCDefinitionList getQualifiedDefs(Environment env)
 	{
 		return expression.getQualifiedDefs(env);
-	}
-	
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		return expression.getFreeVariables(globals, env);
 	}
 
 	@Override

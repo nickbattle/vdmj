@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -70,12 +69,6 @@ public class TCElementsExpression extends TCSetExpression
 
 		TCSeqType seq = arg.getSeq();
 		return seq.empty ? new TCSetType(location) : new TCSetType(location, seq.seqof);
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		return exp.getFreeVariables(globals, env);
 	}
 
 	@Override

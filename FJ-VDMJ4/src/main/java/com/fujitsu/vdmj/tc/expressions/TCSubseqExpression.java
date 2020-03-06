@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -78,15 +77,6 @@ public class TCSubseqExpression extends TCExpression
 		return stype.isSeq(location) ?
 				new TCSeqType(location, stype.getSeq().seqof) :	// "12345"(1,...,0) is seq not seq1
 				stype;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		TCNameSet names = seq.getFreeVariables(globals, env);
-		names.addAll(from.getFreeVariables(globals, env));
-		names.addAll(to.getFreeVariables(globals, env));
-		return names;
 	}
 
 	@Override
