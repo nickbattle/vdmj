@@ -127,9 +127,8 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	/**
 	 * Get a list of free variables needed to initialize the type. This is
 	 * implemented by invariant types. 
-	 * @param env
 	 */
-	public TCNameSet getFreeVariables(Environment env)
+	public final TCNameSet getFreeVariables(Environment env)
 	{
 		return apply(new TCGetFreeVariablesVisitor(), env);
 	}

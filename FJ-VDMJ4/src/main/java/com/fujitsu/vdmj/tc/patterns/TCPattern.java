@@ -84,7 +84,7 @@ public abstract class TCPattern extends TCNode implements Serializable
 	 * Get a set of definitions for the pattern's variables. Note that if the
 	 * pattern includes duplicate variable names, these are collapse into one.
 	 */
-	public TCDefinitionList getDefinitions(TCType type, NameScope scope)
+	public final TCDefinitionList getDefinitions(TCType type, NameScope scope)
 	{
 		TCDefinitionSet set = new TCDefinitionSet();
 		set.addAll(apply(new TCGetDefinitionsVisitor(), new Pair(type, scope)));
@@ -94,7 +94,7 @@ public abstract class TCPattern extends TCNode implements Serializable
 	/**
 	 * Get a complete list of all definitions, including duplicates.
 	 */
-	public TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
+	public final TCDefinitionList getAllDefinitions(TCType type, NameScope scope)
 	{
 		return apply(new TCGetDefinitionsVisitor(), new Pair(type, scope));
 	}
@@ -102,7 +102,7 @@ public abstract class TCPattern extends TCNode implements Serializable
 	/**
 	 * Get the type(s) that match this pattern.
 	 */
-	public TCType getPossibleType()
+	public final TCType getPossibleType()
 	{
 		return apply(new TCPossibleTypeVisitor(), null);
 	}
@@ -154,7 +154,7 @@ public abstract class TCPattern extends TCNode implements Serializable
 	 * sequence pattern [a,b] will only match sequences of two values, and a
 	 * constant pattern line "123" will only match the value 123.
 	 */
-	public boolean alwaysMatches()
+	public final boolean alwaysMatches()
 	{
 		return apply(new TCAlwaysMatchesVisitor(), null);
 	}
