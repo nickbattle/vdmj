@@ -23,8 +23,6 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -34,7 +32,6 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPostOpExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPreOpExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -645,37 +642,6 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	public boolean isSubclassResponsibility()
 	{
 		return body instanceof TCSubclassResponsibilityStatement;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		TCDefinitionList defs = new TCDefinitionList();
-
-		for (TCPatternListTypePair pltp: parameterPatterns)
-		{
-			defs.addAll(pltp.getDefinitions(NameScope.LOCAL));
-		}
-
-		Environment local = new FlatEnvironment(defs, env);
-		TCNameSet names = new TCNameSet();
-		
-		if (body != null)
-		{
-			names.addAll(body.getFreeVariables(globals, local, returns));
-		}
-		
-		if (predef != null)
-		{
-			names.addAll(predef.getFreeVariables(globals, local, returns));
-		}
-		
-		if (postdef != null)
-		{
-			names.addAll(postdef.getFreeVariables(globals, local, returns));
-		}
-		
-		return names;
 	}
 
 	@Override

@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
+import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -173,13 +174,10 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 
 	/**
 	 * Return a list of free variables needed for the definition to initialise.
-	 * @param globals
-	 * @param env
-	 * @param returns
 	 */
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
+	public final TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		return new TCNameSet();
+		return apply(new TCGetFreeVariablesVisitor(), new EnvTriple(env, env, returns));
 	}
 	
 	/**

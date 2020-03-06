@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import java.util.Iterator;
 import java.util.ListIterator;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
@@ -74,7 +73,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 	public TCExplicitFunctionDefinition predef;
 	public TCExplicitFunctionDefinition postdef;
-	private TCDefinitionListList paramDefinitionList;
+	public TCDefinitionListList paramDefinitionList;
 
 	public boolean recursive = false;
 	public boolean isUndefined = false;
@@ -696,35 +695,6 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	public boolean isSubclassResponsibility()
 	{
 		return body instanceof TCSubclassResponsibilityExpression;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		TCDefinitionList defs = new TCDefinitionList();
-		
-		if (paramDefinitionList != null)
-		{
-    		for (TCDefinitionList pdef: paramDefinitionList)
-    		{
-    			defs.addAll(pdef);	// All definitions of all parameter lists
-    		}
-		}
-
-		Environment local = new FlatEnvironment(defs, env);
-		TCNameSet names = body.getFreeVariables(globals, local);
-		
-		if (predef != null)
-		{
-			names.addAll(predef.getFreeVariables(globals, local, returns));
-		}
-		
-		if (postdef != null)
-		{
-			names.addAll(postdef.getFreeVariables(globals, local, returns));
-		}
-		
-		return names;
 	}
 	
 	@Override

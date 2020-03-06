@@ -23,8 +23,6 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -35,7 +33,6 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -578,25 +575,6 @@ public class TCTypeDefinition extends TCDefinition
 	public boolean isTypeDefinition()
 	{
 		return true;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		TCNameSet names = new TCNameSet();
-		
-		if (type instanceof TCNamedType)
-		{
-			TCNamedType nt = (TCNamedType)type;
-			names.addAll(nt.type.getFreeVariables(env));
-		}
-		
-		if (invdef != null)
-		{
-			names.addAll(invdef.getFreeVariables(globals, env, returns));
-		}
-		
-		return names;
 	}
 
 	@Override

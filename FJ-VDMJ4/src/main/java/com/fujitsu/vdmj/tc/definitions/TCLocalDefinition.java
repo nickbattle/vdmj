@@ -23,11 +23,8 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -44,7 +41,7 @@ public class TCLocalDefinition extends TCDefinition
 	private static final long serialVersionUID = 1L;
 	public TCType type;
 	
-	private TCValueDefinition valueDefinition = null;
+	public TCValueDefinition valueDefinition = null;
 
 	public TCLocalDefinition(LexLocation location, TCNameToken name, TCType type)
 	{
@@ -138,19 +135,6 @@ public class TCLocalDefinition extends TCDefinition
 	public boolean isOperation()
 	{
 		return type != null && !type.isUnknown(location) && type.isOperation(location);
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		TCNameSet names = type.getFreeVariables(env);
-		
-		if (valueDefinition != null)
-		{
-			names.addAll(valueDefinition.getFreeVariables(globals, env, returns));
-		}
-		
-		return names;
 	}
 
 	@Override

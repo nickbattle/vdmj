@@ -23,13 +23,10 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCStateInitExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -43,7 +40,6 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -308,25 +304,6 @@ public class TCStateDefinition extends TCDefinition
 		return def;
 	}
 	
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		Environment local = new FlatEnvironment(this, env);
-		TCNameSet names = new TCNameSet();
-		
-		if (invdef != null)
-		{
-			names.addAll(invdef.getFreeVariables(globals, local, returns));
-		}
-		
-		if (initdef != null)
-		{
-			names.addAll(initdef.getFreeVariables(globals, local, returns));
-		}
-		
-		return names;
-	}
-
 	@Override
 	public <R, S> R apply(TCDefinitionVisitor<R, S> visitor, S arg)
 	{
