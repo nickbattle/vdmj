@@ -131,7 +131,7 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	 */
 	public TCNameSet getFreeVariables(Environment env)
 	{
-		return new TCNameSet();
+		return apply(new TCGetFreeVariablesVisitor(), env);
 	}
 
 	/**

@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -274,20 +273,6 @@ public class TCRecordType extends TCInvariantType
 		else
 		{
 			return new TCTypeList();
-		}
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment env)
-	{
-		if (env.findType(name, name.getModule()) == null)
-		{
-			// Invariant values covered in TCTypeDefinition
-			return new TCNameSet(name.getExplicit(true));
-		}
-		else
-		{
-			return new TCNameSet();
 		}
 	}
 

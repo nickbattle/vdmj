@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.types;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.util.Utils;
@@ -270,14 +269,6 @@ public class TCFunctionType extends TCType
 		list.addAll(parameters.getComposeTypes());
 		list.addAll(result.getComposeTypes());
 		return list;
-	}
-	
-	@Override
-	public TCNameSet getFreeVariables(Environment env)
-	{
-		TCNameSet names = parameters.getFreeVariables(env);
-		names.addAll(result.getFreeVariables(env));
-		return names;
 	}
 	
 	public boolean hasTotal()
