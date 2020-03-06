@@ -49,9 +49,6 @@ public abstract class TCPattern extends TCNode implements Serializable
 	/** A flag to prevent recursive type resolution problems. */
 	boolean resolved = false;
 
-	/** A value for getLength meaning "any length" */
-	protected static int ANY = -1;
-
 	/**
 	 * Create a pattern at the given location.
 	 */
@@ -163,7 +160,7 @@ public abstract class TCPattern extends TCNode implements Serializable
 	}
 
 	/**
-	 * Implemented by all definitions to allow visitor processing.
+	 * Implemented by all patterns to allow visitor processing.
 	 */
 	abstract public <R, S> R apply(TCPatternVisitor<R, S> visitor, S arg);
 }
