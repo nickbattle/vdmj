@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
@@ -95,19 +94,6 @@ public class TCLambdaExpression extends TCExpression
 
 		type = new TCFunctionType(location, ptypes, true, result);
 		return type;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		TCNameSet names = new TCNameSet();	// Body expression is conditional
-		
-		for (TCTypeBind mb: bindList)
-		{
-			names.addAll(mb.getFreeVariables(globals, env));
-		}
-		
-		return names;
 	}
 
 	@Override

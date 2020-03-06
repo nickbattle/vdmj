@@ -32,6 +32,12 @@ import java.util.Collection;
 public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends TCTypeVisitor<C, S>
 {
 	@Override
+	public C caseBracketType(TCBracketType node, S arg)
+	{
+		return node.type.apply(this, arg);
+	}
+	
+	@Override
 	public C caseFunctionType(TCFunctionType node, S arg)
 	{
 		C all = newCollection();

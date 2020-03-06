@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -390,26 +389,6 @@ public class TCApplyExpression extends TCExpression
 		}
 		
 		return start  + Utils.listToString(args) + (close ? ")" : ", ");
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		TCNameSet names = new TCNameSet();
-		
-		if (root instanceof TCVariableExpression && type != null && type.isFunction(location))
-		{
-			// If this is a global call, then we depend on the function
-			TCVariableExpression v = (TCVariableExpression)root;
-			
-			if (globals.findName(v.name, NameScope.NAMESANDSTATE) != null)
-			{
-				names.add(v.name);
-			}
-		}
-		
-		names.addAll(args.getFreeVariables(globals, env));
-		return names;
 	}
 	
 	public void typeCheckCycles(TCDefinition parent, TCDefinition called)

@@ -23,8 +23,6 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -32,12 +30,10 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCEqualsDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCLetDefStatement extends TCStatement
@@ -122,29 +118,6 @@ public class TCLetDefStatement extends TCStatement
 		
 		result.addAll(statement.exitCheck(base));
 		return result;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		Environment local = env;
-		TCNameSet names = new TCNameSet();
-
-		for (TCDefinition d: localDefs)
-		{
-			if (d instanceof TCExplicitFunctionDefinition)
-			{
-				// ignore
-			}
-			else
-			{
-				local = new FlatEnvironment(d, local);
-				names.addAll(d.getFreeVariables(globals, local, returns));
-			}
-		}
-
-		names.addAll(statement.getFreeVariables(globals, local, returns));
-		return names;
 	}
 
 	@Override

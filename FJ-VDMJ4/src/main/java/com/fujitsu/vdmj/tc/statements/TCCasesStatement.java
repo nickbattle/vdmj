@@ -23,11 +23,8 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
@@ -111,12 +108,6 @@ public class TCCasesStatement extends TCStatement
 		}
 
 		return types;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		return exp.getFreeVariables(globals, env);	// Cases are conditional
 	}
 
 	@Override

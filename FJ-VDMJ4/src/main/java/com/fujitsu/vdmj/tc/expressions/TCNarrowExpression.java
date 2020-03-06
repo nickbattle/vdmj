@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -91,19 +90,6 @@ public class TCNarrowExpression extends TCExpression
 		}
 		
 		return possibleConstraint(constraint, result);
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		TCNameSet names = test.getFreeVariables(globals, env);
-		
-		if (typename != null)
-		{
-			names.add(typename);
-		}
-		
-		return names;
 	}
 
 	@Override

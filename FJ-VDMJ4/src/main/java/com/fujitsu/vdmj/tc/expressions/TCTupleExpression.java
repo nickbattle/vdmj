@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -81,12 +80,6 @@ public class TCTupleExpression extends TCExpression
 		}
 
 		return possibleConstraint(constraint, new TCProductType(location, types));	// NB mk_() is a product
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		return args.getFreeVariables(globals, env);
 	}
 
 	@Override

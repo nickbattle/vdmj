@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInheritedDefinition;
+import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -120,13 +121,10 @@ public abstract class TCStatement extends TCNode implements Serializable
 	 * those names that are already defined in the scope - ie. which are not free variables.
 	 * The returns boolean (which is mutable) is updated by return and exit statements,
 	 * which indicate that statements that follow are conditional.
-	 * @param globals TODO
-	 * @param env
-	 * @param returns
 	 */
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
+	public final TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		return new TCNameSet();
+		return apply(new TCGetFreeVariablesVisitor(), new EnvTriple(globals, env, returns));
 	}
 
 	/**

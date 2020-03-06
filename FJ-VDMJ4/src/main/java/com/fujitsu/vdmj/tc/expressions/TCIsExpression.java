@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCQualifiedDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -115,12 +114,6 @@ public class TCIsExpression extends TCExpression
 		}
 		
 		return result;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		return test.getFreeVariables(globals, env);
 	}
 
 	@Override

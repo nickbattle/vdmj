@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.types;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 
@@ -124,12 +123,6 @@ public class TCSeqType extends TCType
 	public TCTypeList getComposeTypes()
 	{
 		return seqof.getComposeTypes();
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment env)
-	{
-		return seqof.getFreeVariables(env);
 	}
 
 	@Override

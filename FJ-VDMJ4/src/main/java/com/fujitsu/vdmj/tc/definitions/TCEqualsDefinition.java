@@ -23,12 +23,9 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -38,7 +35,6 @@ import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -56,7 +52,7 @@ public class TCEqualsDefinition extends TCDefinition
 
 	public TCType expType = null;
 	private TCType defType = null;
-	private TCDefinitionList defs = null;
+	public TCDefinitionList defs = null;
 
 	public TCEqualsDefinition(LexLocation location, TCPattern pattern,
 		TCTypeBind typebind, TCBind bind, TCExpression test)
@@ -214,13 +210,6 @@ public class TCEqualsDefinition extends TCDefinition
 	public TCNameList getVariableNames()
 	{
 		return defs == null ? new TCNameList() : defs.getVariableNames();
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		Environment local = new FlatEnvironment(defs, env);
-		return test.getFreeVariables(globals, local);
 	}
 
 	@Override

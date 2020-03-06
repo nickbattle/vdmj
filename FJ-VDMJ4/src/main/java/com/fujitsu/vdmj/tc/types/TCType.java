@@ -127,11 +127,10 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	/**
 	 * Get a list of free variables needed to initialize the type. This is
 	 * implemented by invariant types. 
-	 * @param env
 	 */
-	public TCNameSet getFreeVariables(Environment env)
+	public final TCNameSet getFreeVariables(Environment env)
 	{
-		return new TCNameSet();
+		return apply(new TCGetFreeVariablesVisitor(), env);
 	}
 
 	/**
@@ -139,17 +138,10 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	 */
 	public TCType deBracket()
 	{
-		TCType r = this;
-
-		while (r instanceof TCBracketType)
-		{
-			r = ((TCBracketType)r).type;
-		}
-
-		return r;
+		return (TCType) deBracket(this);
 	}
 
-	public Object deBracket(Object other)
+	public Object deBracket(Object other)	// Useful in equals(Object) methods
 	{
 		while (other instanceof TCBracketType)
 		{

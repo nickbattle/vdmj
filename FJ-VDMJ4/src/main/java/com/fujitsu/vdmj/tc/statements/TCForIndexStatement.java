@@ -23,13 +23,10 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -105,20 +102,6 @@ public class TCForIndexStatement extends TCStatement
 		if (by != null) result.addAll(by.exitCheck(base));
 		result.addAll(statement.exitCheck(base));
 		return result;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		TCNameSet names = from.getFreeVariables(globals, env);
-		names.addAll(to.getFreeVariables(globals, env));
-		
-		if (by != null)
-		{
-			names.addAll(by.getFreeVariables(globals, env));
-		}
-		
-		return names;
 	}
 
 	@Override

@@ -463,7 +463,7 @@ abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseSubseqExpression(TCSubseqExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = node.seq.apply(this, arg);
 		all.addAll(node.from.apply(this, arg));
 		all.addAll(node.to.apply(this, arg));
 		return all;

@@ -24,13 +24,11 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
@@ -284,20 +282,6 @@ public class TCValueDefinition extends TCDefinition
 	public boolean isValueDefinition()
 	{
 		return true;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		TCNameSet names = new TCNameSet();
-		
-		if (type != null)
-		{
-			names.addAll(type.getFreeVariables(env));
-		}
-		
-		names.addAll(exp.getFreeVariables(globals, env));
-		return names;
 	}
 
 	@Override

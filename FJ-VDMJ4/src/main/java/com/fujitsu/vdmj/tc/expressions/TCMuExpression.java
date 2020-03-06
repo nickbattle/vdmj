@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -100,19 +99,6 @@ public class TCMuExpression extends TCExpression
 		}
 
 		return rtype;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		TCNameSet names = record.getFreeVariables(globals, env);
-		
-		for (TCRecordModifier rm: modifiers)
-		{
-			names.addAll(rm.value.getFreeVariables(globals, env));
-		}
-		
-		return names;
 	}
 
 	@Override

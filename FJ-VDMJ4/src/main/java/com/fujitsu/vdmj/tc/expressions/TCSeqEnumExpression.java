@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -76,12 +75,6 @@ public class TCSeqEnumExpression extends TCSeqExpression
 			new TCSeq1Type(location, ts.getType(location));
 		
 		return possibleConstraint(constraint, rt);
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		return members.getFreeVariables(globals, env);
 	}
 
 	@Override

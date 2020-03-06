@@ -23,19 +23,15 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -97,29 +93,6 @@ public class TCLetDefExpression extends TCExpression
 		TCType r = expression.typeCheck(local, null, scope, constraint);
 		local.unusedCheck(env);
 		return r;
-	}
-
-	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		Environment local = env;
-		TCNameSet names = new TCNameSet();
-
-		for (TCDefinition d: localDefs)
-		{
-			if (d instanceof TCExplicitFunctionDefinition)
-			{
-				// ignore
-			}
-			else
-			{
-				local = new FlatEnvironment(d, local);
-				names.addAll(d.getFreeVariables(globals, local, new AtomicBoolean()));
-			}
-		}
-
-		names.addAll(expression.getFreeVariables(globals, local));
-		return names;
 	}
 
 	@Override
