@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
-import com.fujitsu.vdmj.typechecker.Environment;
 
 public class TCSetBind extends TCBind
 {
@@ -52,12 +50,6 @@ public class TCSetBind extends TCBind
 	public String toString()
 	{
 		return pattern + " in set " + set;
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		return set.exitCheck(base);
 	}
 
 	@Override

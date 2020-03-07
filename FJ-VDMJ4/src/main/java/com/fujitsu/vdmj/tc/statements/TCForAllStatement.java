@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
@@ -90,14 +89,6 @@ public class TCForAllStatement extends TCStatement
 			report(3219, "For all statement does not contain a set type");
 			return new TCUnknownType(location);
 		}
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet result = set.exitCheck(base);
-		result.addAll(statement.exitCheck(base));
-		return result;
 	}
 
 	@Override

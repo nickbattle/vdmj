@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.patterns.TCExpressionPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -100,15 +99,5 @@ public class TCCaseStmtAlternative extends TCNode
 		TCType r = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();
 		return r;
-	}
-
-	public TCTypeSet exitCheck(Environment base)
-	{
-		return statement.exitCheck(base);
-	}
-	
-	public boolean alwaysMatches(TCType expType)
-	{
-		return pattern.alwaysMatches(expType);
 	}
 }

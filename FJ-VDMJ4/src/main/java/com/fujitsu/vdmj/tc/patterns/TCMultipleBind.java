@@ -75,7 +75,10 @@ public abstract class TCMultipleBind extends TCNode
 	
 	
 	/** Return a set of exceptions possibly raised by any expressions */
-	abstract public TCTypeSet exitCheck(Environment base);
+	public final TCTypeSet exitCheck(Environment base)
+	{
+		return apply(new TCMultipleBindExitChecker(), base);
+	}
 
 	/**
 	 * Get a list of definitions for the variables in the pattern list.

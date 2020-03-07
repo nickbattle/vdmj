@@ -26,11 +26,8 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexStringToken;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCStringLiteralExpression;
@@ -42,7 +39,6 @@ import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -210,55 +206,6 @@ public class TCCallObjectStatement extends TCStatement
 			report(3210, "Object member is neither a function nor an operation");
 			return new TCUnknownType(location);
 		}
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet result = args.exitCheck(base);
-
-		boolean overridable = Settings.dialect != Dialect.VDM_SL &&
-				fdef != null && !fdef.accessSpecifier.access.equals(Token.PRIVATE);
-
-		if (fdef != null && !overridable)
-		{
-			if (fdef instanceof TCExplicitOperationDefinition)
-			{
-				TCExplicitOperationDefinition explop = (TCExplicitOperationDefinition)fdef;
-				
-				if (explop.possibleExceptions == null)
-				{
-					explop.possibleExceptions = TCDefinition.IN_PROGRESS;
-					explop.possibleExceptions = explop.body.exitCheck(base);
-				}
-				
-				result.addAll(explop.possibleExceptions);
-				return result;
-			}
-			else if (fdef instanceof TCImplicitOperationDefinition)
-			{
-				TCImplicitOperationDefinition implop = (TCImplicitOperationDefinition)fdef;
-				
-				if (implop.possibleExceptions == null)
-				{
-					if (implop.body != null)
-					{
-						implop.possibleExceptions = TCDefinition.IN_PROGRESS;
-						implop.possibleExceptions = implop.body.exitCheck(base);
-					}
-					else
-					{
-						return new TCTypeSet();
-					}
-				}
-				
-				result.addAll(implop.possibleExceptions);
-				return result;
-			}
-		}
-
-		result.add(new TCUnknownType(location));
-		return result;
 	}
 
 	private TCTypeList getArgTypes(Environment env, NameScope scope)

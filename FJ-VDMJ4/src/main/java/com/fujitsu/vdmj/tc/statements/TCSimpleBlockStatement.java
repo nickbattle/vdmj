@@ -139,19 +139,6 @@ abstract public class TCSimpleBlockStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet types = new TCTypeSet();
-
-		for (TCStatement stmt: statements)
-		{
-			types.addAll(stmt.exitCheck(base));
-		}
-
-		return types;
-	}
-
-	@Override
 	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseSimpleBlockStatement(this, arg);

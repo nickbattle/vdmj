@@ -181,12 +181,9 @@ public abstract class TCExpression extends TCNode implements Serializable
 	 * Return a list of exit types which can be thrown by the expression's op calls.
 	 * @return A possibly empty list of exit types.
 	 */
-	public TCTypeSet exitCheck(Environment base)
+	public final TCTypeSet exitCheck(Environment base)
 	{
-		TCTypeSet result = new TCTypeSet();
-		TCExitChecker checker = new TCExitChecker();
-		result.addAll(this.apply(checker, base));
-		return result;
+		return apply(new TCExitChecker(), base);
 	}
 
 	/**

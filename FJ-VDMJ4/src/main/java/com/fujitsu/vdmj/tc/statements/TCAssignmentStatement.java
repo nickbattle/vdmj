@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -91,12 +90,6 @@ public class TCAssignmentStatement extends TCStatement
 		}
 
 		return checkReturnType(constraint, new TCVoidType(location), mandatory);
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		return exp.exitCheck(base);
 	}
 
 	@Override

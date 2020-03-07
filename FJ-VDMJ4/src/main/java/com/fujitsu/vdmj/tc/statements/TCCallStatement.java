@@ -23,13 +23,8 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -37,7 +32,6 @@ import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -157,56 +151,6 @@ public class TCCallStatement extends TCStatement
 			report(3210, "Name is neither a function nor an operation");
 			return new TCUnknownType(location);
 		}
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet result = args.exitCheck(base);
-
-		TCDefinition opdef = base.findName(name, NameScope.GLOBAL);
-		boolean overridable = Settings.dialect != Dialect.VDM_SL &&
-				opdef != null && !opdef.accessSpecifier.access.equals(Token.PRIVATE);
-
-		if (opdef != null && !overridable)
-		{
-			if (opdef instanceof TCExplicitOperationDefinition)
-			{
-				TCExplicitOperationDefinition explop = (TCExplicitOperationDefinition)opdef;
-				
-				if (explop.possibleExceptions == null)
-				{
-					explop.possibleExceptions = TCDefinition.IN_PROGRESS;
-					explop.possibleExceptions = explop.body.exitCheck(base);
-				}
-				
-				result.addAll(explop.possibleExceptions);
-				return result;
-			}
-			else if (opdef instanceof TCImplicitOperationDefinition)
-			{
-				TCImplicitOperationDefinition implop = (TCImplicitOperationDefinition)opdef;
-				
-				if (implop.possibleExceptions == null)
-				{
-					if (implop.body != null)
-					{
-						implop.possibleExceptions = TCDefinition.IN_PROGRESS;
-						implop.possibleExceptions = implop.body.exitCheck(base);
-					}
-					else
-					{
-						return new TCTypeSet();
-					}
-				}
-				
-				result.addAll(implop.possibleExceptions);
-				return result;
-			}
-		}
-
-		result.add(new TCUnknownType(location));
-		return result;
 	}
 
 	private TCTypeList getArgTypes(Environment env, NameScope scope)

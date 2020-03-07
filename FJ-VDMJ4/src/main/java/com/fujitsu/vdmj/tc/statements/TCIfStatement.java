@@ -115,25 +115,6 @@ public class TCIfStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet types = ifExp.exitCheck(base);
-		types.addAll(thenStmt.exitCheck(base));
-
-		for (TCElseIfStatement stmt: elseList)
-		{
-			types.addAll(stmt.exitCheck(base));
-		}
-
-		if (elseStmt != null)
-		{
-			types.addAll(elseStmt.exitCheck(base));
-		}
-
-		return types;
-	}
-
-	@Override
 	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseIfStatement(this, arg);

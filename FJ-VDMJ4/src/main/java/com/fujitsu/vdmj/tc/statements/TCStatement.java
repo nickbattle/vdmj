@@ -111,9 +111,9 @@ public abstract class TCStatement extends TCNode implements Serializable
 	 * Return a list of exit types which can be thrown by the statement.
 	 * @return A possibly empty list of exit types.
 	 */
-	public TCTypeSet exitCheck(Environment base)
+	public final TCTypeSet exitCheck(Environment base)
 	{
-		return new TCTypeSet();
+		return apply(new TCExitChecker(), base);
 	}
 
 	/**

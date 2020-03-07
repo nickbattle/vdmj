@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -69,14 +68,6 @@ public class TCElseIfStatement extends TCStatement
 		}
 
 		return thenStmt.typeCheck(qenv, scope, constraint, mandatory);
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet result = elseIfExp.exitCheck(base);
-		result.addAll(thenStmt.exitCheck(base));
-		return result;
 	}
 
 	@Override

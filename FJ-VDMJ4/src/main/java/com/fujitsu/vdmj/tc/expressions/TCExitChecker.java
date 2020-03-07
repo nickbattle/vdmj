@@ -29,23 +29,23 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeList, Environment>
+public class TCExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeSet, Environment>
 {
 	@Override
-	public TCTypeList caseExpression(TCExpression node, Environment base)
+	public TCTypeSet caseExpression(TCExpression node, Environment base)
 	{
-		return new TCTypeList();
+		return new TCTypeSet();
 	}
 	
 	@Override
-	public TCTypeList caseApplyExpression(TCApplyExpression node, Environment base)
+	public TCTypeSet caseApplyExpression(TCApplyExpression node, Environment base)
 	{
-		TCTypeList result = super.caseApplyExpression(node, base);
+		TCTypeSet result = super.caseApplyExpression(node, base);
 
 		if (node.root instanceof TCVariableExpression)
 		{
@@ -82,7 +82,7 @@ public class TCExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeList, E
 						}
 						else
 						{
-							return new TCTypeList();
+							return new TCTypeSet();
 						}
 					}
 					
@@ -103,8 +103,8 @@ public class TCExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeList, E
 	}
 
 	@Override
-	protected TCTypeList newCollection()
+	protected TCTypeSet newCollection()
 	{
-		return new TCTypeList();
+		return new TCTypeSet();
 	}
 }
