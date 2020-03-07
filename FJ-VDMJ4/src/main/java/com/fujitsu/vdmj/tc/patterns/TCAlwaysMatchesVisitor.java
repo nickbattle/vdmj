@@ -52,19 +52,43 @@ public class TCAlwaysMatchesVisitor extends TCPatternVisitor<Boolean, Object>
 	@Override
 	public Boolean caseObjectPattern(TCObjectPattern node, Object arg)
 	{
-		return node.fieldlist.alwaysMatches();
+		for (TCNamePatternPair p: node.fieldlist)
+		{
+			if (!p.pattern.apply(this, arg))
+			{
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	@Override
 	public Boolean caseRecordPattern(TCRecordPattern node, Object arg)
 	{
-		return node.plist.alwaysMatches();
+		for (TCPattern p: node.plist)
+		{
+			if (!p.apply(this, arg))
+			{
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	@Override
 	public Boolean caseTuplePattern(TCTuplePattern node, Object arg)
 	{
-		return node.plist.alwaysMatches();
+		for (TCPattern p: node.plist)
+		{
+			if (!p.apply(this, arg))
+			{
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	@Override

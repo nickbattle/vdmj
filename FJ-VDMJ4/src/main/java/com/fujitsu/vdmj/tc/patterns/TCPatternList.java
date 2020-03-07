@@ -100,17 +100,4 @@ public class TCPatternList extends TCMappedList<ASTPattern, TCPattern>
         		return list.getType(location);		// NB. a union of types
 		}
 	}
-
-	public boolean alwaysMatches()
-	{
-		for (TCPattern p: this)
-		{
-			if (!p.alwaysMatches())
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
 }
