@@ -58,17 +58,4 @@ public class TCNamePatternPairList extends TCMappedList<ASTNamePatternPair, TCNa
 			npp.pattern.typeResolve(env);
 		}
 	}
-
-	public boolean alwaysMatches()
-	{
-		for (TCNamePatternPair npp: this)
-		{
-			if (!npp.pattern.alwaysMatches())
-			{
-				return false;
-			}
-		}
-		
-		return true;
-	}
 }
