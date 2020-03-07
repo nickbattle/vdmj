@@ -27,8 +27,6 @@ import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCMappedList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 @SuppressWarnings("serial")
@@ -87,17 +85,5 @@ public class TCTypeList extends TCMappedList<ASTType, TCType>
 		}
 		
 		return list;
-	}
-
-	public TCNameSet getFreeVariables(Environment env)
-	{
-		TCNameSet names = new TCNameSet();
-		
-		for (TCType type: this)
-		{
-			names.addAll(type.getFreeVariables(env));
-		}
-		
-		return names;
 	}
 }

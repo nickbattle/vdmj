@@ -243,7 +243,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		if (node.type instanceof TCNamedType)
 		{
 			TCNamedType nt = (TCNamedType)node.type;
-			names.addAll(nt.type.getFreeVariables(arg.env));
+			names.addAll(nt.type.apply(typeVisitor, arg.env));
 		}
 		
 		if (node.invdef != null)

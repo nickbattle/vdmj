@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -58,12 +57,5 @@ public class TCMapletExpression extends TCNode
 	public String toString()
 	{
 		return left + " |-> " + right;
-	}
-
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		TCNameSet names = left.getFreeVariables(globals, env);
-		names.addAll(right.getFreeVariables(globals, env));
-		return names;
 	}
 }
