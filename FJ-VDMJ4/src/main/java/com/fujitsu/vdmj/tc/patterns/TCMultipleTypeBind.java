@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -66,14 +65,14 @@ public class TCMultipleTypeBind extends TCMultipleBind
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		return type.getFreeVariables(env);
-	}
-
-	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
 		return new TCTypeSet();
+	}
+
+	@Override
+	public <R, S> R apply(TCMultipleBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultipleTypeBind(this, arg);
 	}
 }

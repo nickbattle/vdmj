@@ -143,9 +143,9 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	{
 		TCNameSet names = new TCNameSet();	// Body expression is conditional
 		
-		for (TCTypeBind mb: node.bindList)
+		for (TCTypeBind bind: node.bindList)
 		{
-			names.addAll(mb.getFreeVariables(arg.globals, arg.env));
+			names.addAll(bind.getFreeVariables(arg.globals, arg.env));
 		}
 		
 		return names;
