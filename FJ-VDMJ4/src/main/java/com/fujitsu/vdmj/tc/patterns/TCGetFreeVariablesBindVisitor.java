@@ -23,33 +23,38 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
-import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
+import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class TCGetVariablesVisitor extends TCLeafPatternVisitor<TCNameToken, TCNameSet, Object>
+public class TCGetFreeVariablesBindVisitor extends TCBindVisitor<TCNameSet, EnvTriple>
 {
+	private com.fujitsu.vdmj.tc.expressions.TCGetFreeVariablesVisitor expVisitor =
+		new com.fujitsu.vdmj.tc.expressions.TCGetFreeVariablesVisitor();
+
+	private com.fujitsu.vdmj.tc.types.TCGetFreeVariablesVisitor typeVisitor =
+			new com.fujitsu.vdmj.tc.types.TCGetFreeVariablesVisitor();
+
 	@Override
-	protected TCNameSet newCollection()
+	public TCNameSet caseBind(TCBind node, EnvTriple arg)
 	{
 		return new TCNameSet();
 	}
-
+	
 	@Override
-	protected TCLeafExpressionVisitor<TCNameToken, TCNameSet, Object> getExpressionVisitor()
+	public TCNameSet caseSeqBind(TCSeqBind node, EnvTriple arg)
 	{
-		return null;	// No variables in expression patterns :)
-	}
-
-	@Override
-	public TCNameSet casePattern(TCPattern node, Object arg)
-	{
-		return newCollection();
+		return node.sequence.apply(expVisitor, arg);
 	}
 	
 	@Override
-	public TCNameSet caseIdentifierPattern(TCIdentifierPattern node, Object arg)
+	public TCNameSet caseSetBind(TCSetBind node, EnvTriple arg)
 	{
-		return new TCNameSet(node.name);
+		return node.set.apply(expVisitor, arg);
+	}
+	
+	@Override
+	public TCNameSet caseTypeBind(TCTypeBind node, EnvTriple arg)
+	{
+		return node.type.apply(typeVisitor, arg.env);
 	}
 }

@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.patterns;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -66,13 +67,15 @@ public abstract class TCMultipleBind extends TCNode
 	/** Perform a type check of the bind. */
 	abstract public TCType typeCheck(Environment base, NameScope scope);
 
-	/** Return the free variables used by this multiple bind 
-	 * @param globals TODO*/
-	abstract public TCNameSet getFreeVariables(Environment globals, Environment env);
+	/** Return the free variables used by this multiple bind */ 
+	public final TCNameSet getFreeVariables(Environment globals, Environment env)
+	{
+		return apply(new TCGetFreeVariablesMultipleBindVisitor(), new EnvTriple(globals, env, null));
+	}
+	
 	
 	/** Return a set of exceptions possibly raised by any expressions */
 	abstract public TCTypeSet exitCheck(Environment base);
-
 
 	/**
 	 * Get a list of definitions for the variables in the pattern list.
@@ -96,4 +99,9 @@ public abstract class TCMultipleBind extends TCNode
 	{
 		return plist.getPossibleType(location);
 	}
+
+	/**
+	 * Implemented by all multiple binds to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(TCMultipleBindVisitor<R, S> visitor, S arg);
 }

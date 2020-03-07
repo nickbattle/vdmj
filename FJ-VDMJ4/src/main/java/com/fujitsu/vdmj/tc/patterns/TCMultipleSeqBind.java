@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -87,14 +86,14 @@ public class TCMultipleSeqBind extends TCMultipleBind
 	}
 
 	@Override
-	public TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		return sequence.getFreeVariables(globals, env);
-	}
-
-	@Override
 	public TCTypeSet exitCheck(Environment base)
 	{
 		return sequence.exitCheck(base);
+	}
+
+	@Override
+	public <R, S> R apply(TCMultipleBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultipleSeqBind(this, arg);
 	}
 }

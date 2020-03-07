@@ -126,7 +126,7 @@ public abstract class TCPattern extends TCNode implements Serializable
 	public final TCNameList getVariableNames()
 	{
 		TCNameList list = new TCNameList();
-		list.addAll(apply(new TCGetVariablesVisitor(), null));
+		list.addAll(apply(new TCGetVariableNamesVisitor(), null));
 		return list;
 	}
 

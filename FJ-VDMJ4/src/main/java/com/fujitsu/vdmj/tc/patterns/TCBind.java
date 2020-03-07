@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -47,7 +48,6 @@ public abstract class TCBind extends TCNode implements Serializable
 	/**
 	 * Create a bind at the given location with the given pattern.
 	 */
-
 	public TCBind(LexLocation location, TCPattern pattern)
 	{
 		this.location = location;
@@ -57,9 +57,11 @@ public abstract class TCBind extends TCNode implements Serializable
 	/** Return this one bind as a list of {@link TCMultipleBind}. */
 	abstract public TCMultipleBindList getMultipleBindList();
 
-	/** Return a set of names of free variables from this bind 
-	 * @param globals TODO*/
-	abstract public TCNameSet getFreeVariables(Environment globals, Environment env);
+	/** Return a set of names of free variables from this bind */ 
+	public final TCNameSet getFreeVariables(Environment globals, Environment env)
+	{
+		return apply(new TCGetFreeVariablesBindVisitor(), new EnvTriple(globals, env, null));
+	}
 	
 	/** Return a set of exceptions possibly raised by any expressions */
 	abstract public TCTypeSet exitCheck(Environment base);
@@ -87,4 +89,9 @@ public abstract class TCBind extends TCNode implements Serializable
 	{
 		TypeChecker.detail2(tag1, obj1, tag2, obj2);
 	}
+
+	/**
+	 * Implemented by all binds to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(TCBindVisitor<R, S> visitor, S arg);
 }
