@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -62,12 +61,6 @@ public class TCMultipleTypeBind extends TCMultipleBind
 		}
 
 		return type;
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		return new TCTypeSet();
 	}
 
 	@Override

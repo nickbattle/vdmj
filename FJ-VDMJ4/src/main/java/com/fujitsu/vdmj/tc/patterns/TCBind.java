@@ -64,7 +64,10 @@ public abstract class TCBind extends TCNode implements Serializable
 	}
 	
 	/** Return a set of exceptions possibly raised by any expressions */
-	abstract public TCTypeSet exitCheck(Environment base);
+	public final TCTypeSet exitCheck(Environment base)
+	{
+		return apply(new TCBindExitChecker(), base);
+	}
 
 	/**
 	 * @see com.fujitsu.vdmj.ast.definitions.TCDefinition#report

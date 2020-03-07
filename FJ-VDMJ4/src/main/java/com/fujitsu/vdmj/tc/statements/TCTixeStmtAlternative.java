@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternBind;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -61,12 +60,5 @@ public class TCTixeStmtAlternative
 		Environment local = new FlatCheckedEnvironment(defs, base, scope);
 		statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();
-	}
-
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet result = patternBind.exitCheck(base);
-		result.addAll(statement.exitCheck(base));
-		return result;
 	}
 }

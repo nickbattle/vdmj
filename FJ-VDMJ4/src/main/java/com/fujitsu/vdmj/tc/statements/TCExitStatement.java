@@ -26,9 +26,7 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
-import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -36,7 +34,7 @@ public class TCExitStatement extends TCStatement
 {
 	private static final long serialVersionUID = 1L;
 	public final TCExpression expression;
-	private TCType exptype = null;
+	public TCType exptype = null;
 
 	public TCExitStatement(LexLocation location, TCExpression expression)
 	{
@@ -64,27 +62,6 @@ public class TCExitStatement extends TCStatement
 		// type).
 
 		return new TCUnknownType(location);
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet types = new TCTypeSet();
-
-		if (expression == null)
-		{
-			types.add(new TCVoidType(location));
-		}
-		else if (exptype == null)	// Not yet checked
-		{
-			types.add(new TCUnknownType(location));
-		}
-		else
-		{
-			types.add(exptype);
-		}
-
-		return types;
 	}
 
 	@Override

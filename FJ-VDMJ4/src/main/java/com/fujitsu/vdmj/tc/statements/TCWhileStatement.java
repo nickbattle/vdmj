@@ -96,13 +96,6 @@ public class TCWhileStatement extends TCStatement
 		
 		return stype;
 	}
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet result = exp.exitCheck(base);
-		result.addAll(statement.exitCheck(base));
-		return result;
-	}
 
 	@Override
 	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)

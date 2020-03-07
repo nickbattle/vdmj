@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSelfExpression;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCVoidReturnType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -81,19 +80,6 @@ public class TCReturnStatement extends TCStatement
 		else
 		{
 			return checkReturnType(constraint, expression.typeCheck(env, null, scope, null), true);
-		}
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		if (expression != null)
-		{
-			return expression.exitCheck(base);
-		}
-		else
-		{
-			return new TCTypeSet();
 		}
 	}
 

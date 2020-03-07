@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -92,16 +91,6 @@ public class TCForIndexStatement extends TCStatement
 		TCType rt = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();
 		return rt;
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet result = from.exitCheck(base);
-		result.addAll(to.exitCheck(base));
-		if (by != null) result.addAll(by.exitCheck(base));
-		result.addAll(statement.exitCheck(base));
-		return result;
 	}
 
 	@Override

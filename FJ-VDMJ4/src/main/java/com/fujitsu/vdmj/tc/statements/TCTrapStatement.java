@@ -93,15 +93,6 @@ public class TCTrapStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet types = patternBind.exitCheck(base);
-		types.addAll(body.exitCheck(base));
-		types.addAll(with.exitCheck(base));
-		return types;
-	}
-
-	@Override
 	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseTrapStatement(this, arg);

@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.tc.patterns.TCPatternBind;
 import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
@@ -92,15 +91,6 @@ public class TCForPatternBindStatement extends TCStatement
 			exp.report(3223, "Expecting sequence type after 'in'");
 			return new TCUnknownType(location);
 		}
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet result = exp.exitCheck(base);
-		result.addAll(patternBind.exitCheck(base));
-		result.addAll(statement.exitCheck(base));
-		return result;
 	}
 
 	@Override

@@ -27,11 +27,8 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCEqualsDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -95,29 +92,6 @@ public class TCLetDefStatement extends TCStatement
 		TCType r = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck(env);
 		return r;
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet result = new TCTypeSet();
-		
-		for (TCDefinition d: localDefs)
-		{
-			if (d instanceof TCEqualsDefinition)
-			{
-				TCEqualsDefinition ed = (TCEqualsDefinition)d;
-				result.addAll(ed.test.exitCheck(base));
-			}
-			else if (d instanceof TCValueDefinition)
-			{
-				TCValueDefinition vd = (TCValueDefinition)d;
-				result.addAll(vd.exp.exitCheck(base));
-			}
-		}
-		
-		result.addAll(statement.exitCheck(base));
-		return result;
 	}
 
 	@Override

@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.tc.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -54,15 +53,6 @@ public class TCAlwaysStatement extends TCStatement
 	{
 		always.typeCheck(env, scope, constraint, false);
 		return body.typeCheck(env, scope, constraint, mandatory);
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet types = new TCTypeSet();
-		types.addAll(body.exitCheck(base));
-		types.addAll(always.exitCheck(base));
-		return types;
 	}
 
 	@Override

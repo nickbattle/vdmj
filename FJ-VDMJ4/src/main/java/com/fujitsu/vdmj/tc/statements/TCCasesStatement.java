@@ -81,7 +81,7 @@ public class TCCasesStatement extends TCStatement
 		for (TCCaseStmtAlternative c: cases)
 		{
 			rtypes.add(c.typeCheck(env, scope, expType, constraint, mandatory));
-			always = always || c.alwaysMatches(expType);
+			always = always || c.pattern.alwaysMatches(expType);
 		}
 
 		if (others != null)
@@ -94,20 +94,6 @@ public class TCCasesStatement extends TCStatement
 		}
 
 		return rtypes.getType(location);
-	}
-
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet types = exp.exitCheck(base);
-
-		for (TCCaseStmtAlternative c: cases)
-		{
-			types.addAll(c.exitCheck(base));
-		}
-
-		return types;
 	}
 
 	@Override

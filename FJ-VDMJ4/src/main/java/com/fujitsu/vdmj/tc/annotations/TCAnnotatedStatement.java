@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -65,12 +64,6 @@ public class TCAnnotatedStatement extends TCStatement
 	public boolean hasSideEffects()
 	{
 		return statement.hasSideEffects();
-	}
-
-	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		return statement.exitCheck(base);
 	}
 
 	@Override

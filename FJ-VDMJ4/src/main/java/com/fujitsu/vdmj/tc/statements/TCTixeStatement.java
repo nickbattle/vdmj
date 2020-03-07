@@ -68,20 +68,6 @@ public class TCTixeStatement extends TCStatement
 	}
 
 	@Override
-	public TCTypeSet exitCheck(Environment base)
-	{
-		TCTypeSet types = new TCTypeSet();
-		types.addAll(body.exitCheck(base));
-
-		for (TCTixeStmtAlternative tsa: traps)
-		{
-			types.addAll(tsa.exitCheck(base));
-		}
-
-		return types;
-	}
-
-	@Override
 	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseTixeStatement(this, arg);
