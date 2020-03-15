@@ -30,6 +30,8 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.statements.TCLeafStatementVisitor;
+import com.fujitsu.vdmj.tc.types.TCField;
+import com.fujitsu.vdmj.tc.types.TCLeafTypeVisitor;
 
 /**
  * This TCDefinition visitor visits all of the leaves of a definition tree and calls
@@ -41,7 +43,20 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	public C caseAssignmentDefinition(TCAssignmentDefinition node, S arg)
 	{
 		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-		return (expVisitor != null ? node.expression.apply(expVisitor, arg) : newCollection());
+		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			all.addAll(node.getType().apply(typeVisitor, arg));
+		}
+		
+		if (expVisitor != null)
+		{
+			all.addAll(node.expression.apply(expVisitor, arg));
+		}
+		
+		return all;
 	}
 
  	@Override
@@ -68,21 +83,60 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	public C caseEqualsDefinition(TCEqualsDefinition node, S arg)
 	{
 		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-		return (expVisitor != null ? node.test.apply(expVisitor, arg) : newCollection());
+		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			all.addAll(node.getType().apply(typeVisitor, arg));
+		}
+		
+		if (expVisitor != null)
+		{
+			all.addAll(node.test.apply(expVisitor, arg));
+		}
+		
+		return all;
 	}
 
  	@Override
 	public C caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, S arg)
 	{
 		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-		return (expVisitor != null ? node.body.apply(expVisitor, arg) : newCollection());
+		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			all.addAll(node.getType().apply(typeVisitor, arg));
+		}
+		
+		if (expVisitor != null)
+		{
+			all.addAll(node.body.apply(expVisitor, arg));
+		}
+		
+		return all;
 	}
 
  	@Override
 	public C caseExplicitOperationDefinition(TCExplicitOperationDefinition node, S arg)
 	{
 		TCLeafStatementVisitor<E, C, S> stmtVisitor = getStatementVisitor();
-		return (stmtVisitor != null ? node.body.apply(stmtVisitor, arg) : newCollection());
+		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			all.addAll(node.getType().apply(typeVisitor, arg));
+		}
+		
+		if (stmtVisitor != null)
+		{
+			all.addAll(node.body.apply(stmtVisitor, arg));
+		}
+		
+		return all;
 	}
 
 	@Override
@@ -97,7 +151,20 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  		if (node.body != null)
  		{
 			TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-			return (expVisitor != null ? node.body.apply(expVisitor, arg) : newCollection());
+			TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+			C all = newCollection();
+			
+			if (typeVisitor != null)
+			{
+				all.addAll(node.getType().apply(typeVisitor, arg));
+			}
+			
+			if (expVisitor != null)
+			{
+				all.addAll(node.body.apply(expVisitor, arg));
+			}
+			
+			return all;
  		}
  		else
  		{
@@ -111,7 +178,20 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  		if (node.body != null)
  		{
  			TCLeafStatementVisitor<E, C, S> stmtVisitor = getStatementVisitor();
- 			return (stmtVisitor != null ? node.body.apply(stmtVisitor, arg) : newCollection());
+ 			TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+ 			C all = newCollection();
+ 			
+ 			if (typeVisitor != null)
+ 			{
+ 				all.addAll(node.getType().apply(typeVisitor, arg));
+ 			}
+ 			
+ 			if (stmtVisitor != null)
+ 			{
+ 				all.addAll(node.body.apply(stmtVisitor, arg));
+ 			}
+ 			
+ 			return all;
  		}
  		else
  		{
@@ -136,8 +216,7 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
  		if (node.expression != null)
  		{
-			TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-			return (expVisitor != null ? node.expression.apply(expVisitor, arg) : newCollection());
+ 			return caseAssignmentDefinition(node, arg);
  		}
  		else
  		{
@@ -148,7 +227,15 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseLocalDefinition(TCLocalDefinition node, S arg)
 	{
-		return newCollection();
+		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			all.addAll(node.getType().apply(typeVisitor, arg));
+		}
+		
+		return all;
 	}
 
  	@Override
@@ -199,7 +286,16 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	public C caseStateDefinition(TCStateDefinition node, S arg)
 	{
 		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
+		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
 		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			for (TCField field: node.fields)
+			{
+				all.addAll(field.type.apply(typeVisitor, arg));
+			}
+		}
 		
 		if (expVisitor != null)
 		{
@@ -228,7 +324,13 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	public C caseTypeDefinition(TCTypeDefinition node, S arg)
 	{
 		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
+		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
 		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			all.addAll(node.type.apply(typeVisitor, arg));
+		}
 		
 		if (expVisitor != null)
 		{
@@ -261,7 +363,20 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	public C caseValueDefinition(TCValueDefinition node, S arg)
 	{
 		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-		return (expVisitor != null ? node.exp.apply(expVisitor, arg) : newCollection());
+		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			all.addAll(node.getType().apply(typeVisitor, arg));
+		}
+		
+		if (expVisitor != null)
+		{
+			all.addAll(node.exp.apply(expVisitor, arg));
+		}
+		
+		return all;
 	}
 
  	private C caseMultipleBind(TCMultipleBind bind, S arg)
@@ -291,4 +406,6 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	abstract protected TCLeafExpressionVisitor<E, C, S> getExpressionVisitor();
 
  	abstract protected TCLeafStatementVisitor<E, C, S> getStatementVisitor();
+
+ 	abstract protected TCLeafTypeVisitor<E, C, S> getTypeVisitor();
 }
