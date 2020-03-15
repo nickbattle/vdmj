@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.runtime.ExceptionHandler;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 
@@ -206,6 +207,11 @@ public class InvariantValue extends ReferenceValue
 		{
     		if (equality != null)
     		{
+    			if (other instanceof NilValue && !(type.type instanceof TCOptionalType))
+    			{
+    				return false;
+    			}
+    			
     			Context ctxt = Interpreter.getInstance().getInitialContext();
     			ctxt.setThreadState(null);
     			ctxt.threadState.setAtomic(true);
