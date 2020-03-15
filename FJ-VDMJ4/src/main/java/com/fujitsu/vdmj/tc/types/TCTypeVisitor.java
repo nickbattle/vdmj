@@ -72,6 +72,11 @@ public abstract class TCTypeVisitor<R, S>
 		return caseNumericType(node, arg);
 	}
 
+	public R caseInvariantType(TCInvariantType node, S arg)
+	{
+		return caseType(node, arg);
+	}
+
 	public R caseNumericType(TCInvariantType node, S arg)
 	{
 		return caseType(node, arg);
@@ -84,7 +89,7 @@ public abstract class TCTypeVisitor<R, S>
 
 	public R caseNamedType(TCNamedType node, S arg)
 	{
-		return caseNumericType(node, arg);
+		return caseInvariantType(node, arg);
 	}
 
 	public R caseNaturalOneType(TCNaturalOneType node, S arg)
@@ -139,7 +144,7 @@ public abstract class TCTypeVisitor<R, S>
 
 	public R caseRecordType(TCRecordType node, S arg)
 	{
-		return caseNumericType(node, arg);
+		return caseInvariantType(node, arg);
 	}
 
 	public R caseSeq1Type(TCSeq1Type node, S arg)

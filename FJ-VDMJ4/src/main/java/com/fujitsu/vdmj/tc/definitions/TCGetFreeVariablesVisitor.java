@@ -65,6 +65,12 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 	}
 
 	@Override
+	protected TCLeafTypeVisitor<TCNameToken, TCNameSet, EnvTriple> getTypeVisitor()
+	{
+		return null;
+	}
+
+	@Override
 	public TCNameSet caseDefinition(TCDefinition node, EnvTriple arg)
 	{
 		return newCollection();
