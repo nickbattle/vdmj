@@ -1,0 +1,161 @@
+{
+	"jsonrpc": "2.0",
+	"id": "1",
+	"method": "initialize",
+	"params": 
+	{
+		"processId": 24686,
+		"rootPath": "/home/nick/Projects/LSP/",
+		"rootUri": "file:///home/nick/Projects/LSP/",
+		"capabilities": 
+		{
+			"workspace": 
+			{
+				"applyEdit": true,
+				"workspaceEdit": 
+				{
+					"documentChanges": true,
+					"resourceOperations": 
+					[
+						"create",
+						"delete",
+						"rename"
+					],
+					"failureHandling": "undo"
+				},
+				"symbol": 
+				{
+					"dynamicRegistration": true
+				},
+				"executeCommand": 
+				{
+					"dynamicRegistration": true
+				},
+				"workspaceFolders": true
+			},
+			"textDocument": 
+			{
+				"synchronization": 
+				{
+					"willSave": true,
+					"willSaveWaitUntil": true,
+					"didSave": true
+				},
+				"completion": 
+				{
+					"completionItem": 
+					{
+						"snippetSupport": true,
+						"documentationFormat": 
+						[
+							"markdown",
+							"plaintext"
+						]
+					}
+				},
+				"hover": 
+				{
+					"contentFormat": 
+					[
+						"markdown",
+						"plaintext"
+					]
+				},
+				"signatureHelp": 
+				{
+				},
+				"references": 
+				{
+				},
+				"documentHighlight": 
+				{
+				},
+				"documentSymbol": 
+				{
+					"symbolKind": 
+					{
+						"valueSet": 
+						[
+							18,
+							17,
+							5,
+							14,
+							9,
+							10,
+							22,
+							24,
+							8,
+							1,
+							12,
+							11,
+							20,
+							6,
+							2,
+							3,
+							21,
+							16,
+							19,
+							25,
+							4,
+							7,
+							15,
+							23,
+							26,
+							13
+						]
+					},
+					"hierarchicalDocumentSymbolSupport": true
+				},
+				"formatting": 
+				{
+					"dynamicRegistration": true
+				},
+				"rangeFormatting": 
+				{
+				},
+				"definition": 
+				{
+					"linkSupport": true
+				},
+				"typeDefinition": 
+				{
+					"linkSupport": true
+				},
+				"codeAction": 
+				{
+					"codeActionLiteralSupport": 
+					{
+						"codeActionKind": 
+						{
+							"valueSet": 
+							[
+								"quickfix",
+								"refactor",
+								"refactor.extract",
+								"refactor.inline",
+								"refactor.rewrite",
+								"source",
+								"source.organizeImports"
+							]
+						}
+					},
+					"dynamicRegistration": true
+				},
+				"codeLens": 
+				{
+				},
+				"documentLink": 
+				{
+				},
+				"colorProvider": 
+				{
+				},
+				"rename": 
+				{
+				}
+			}
+		},
+		"clientName": "Eclipse IDE",
+		"trace": "off"
+	}
+}
