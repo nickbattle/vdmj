@@ -62,6 +62,7 @@ import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import vdmj.DAPDebugReader;
 
 public abstract class WorkspaceManager
 {
@@ -141,7 +142,7 @@ public abstract class WorkspaceManager
 			this.noDebug = noDebug;
 			long before = System.currentTimeMillis();
 			getInterpreter().init();
-			getInterpreter().setDefaultName(defaultName);
+			if (defaultName != null) getInterpreter().setDefaultName(defaultName);
 			long after = System.currentTimeMillis();
 			
 			DAPMessageList responses = new DAPMessageList(request);
@@ -456,8 +457,13 @@ public abstract class WorkspaceManager
 
 	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
 	{
+		DAPDebugReader dbg = null;
+		
 		try
 		{
+			dbg = new DAPDebugReader();
+			dbg.start();
+			
 			long before = System.currentTimeMillis();
 			Value result = getInterpreter().execute(expression);
 			long after = System.currentTimeMillis();
@@ -473,6 +479,13 @@ public abstract class WorkspaceManager
 			DAPMessageList responses = new DAPMessageList(request, e);
 			responses.add(prompt());
 			return responses;
+		}
+		finally
+		{
+			if (dbg != null)
+			{
+				dbg.interrupt();	// Stop the debugger reader.
+			}
 		}
 	}
 

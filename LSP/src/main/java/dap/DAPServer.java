@@ -48,6 +48,8 @@ import workspace.Log;
 
 public class DAPServer
 {
+	private static DAPServer INSTANCE = null;
+	
 	private final InputStream inStream;
 	private final OutputStream outStream;
 	private final DAPServerState state;
@@ -55,10 +57,16 @@ public class DAPServer
 	
 	public DAPServer(Dialect dialect, InputStream inStream, OutputStream outStream) throws IOException
 	{
+		INSTANCE = this;
 		this.inStream = inStream;
 		this.outStream = outStream;
 		this.state = new DAPServerState(dialect);
 		this.dispatcher = getDispatcher();
+	}
+	
+	public static DAPServer getInstance()
+	{
+		return INSTANCE;
 	}
 	
 	private DAPDispatcher getDispatcher() throws IOException
@@ -81,45 +89,58 @@ public class DAPServer
 	{
 		state.setRunning(true);
 		
-		BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
-		String contentLength = br.readLine();
-		br.readLine();	// blank separator
-		
-		while (state.isRunning() && contentLength != null)
+		while (state.isRunning())
 		{
-			int length = Integer.parseInt(contentLength.substring(16));	// Content-Length: NNNN
-			char[] bytes = new char[length];
-			int p = 0;
-			
-			for (int i=0; i<length; i++)
-			{
-				bytes[p++] = (char) br.read();
-			}
-
-			String message = new String(bytes);
-			Log.printf(">>> %s", message);
-			JSONReader jreader = new JSONReader(new StringReader(message));
-			DAPRequest request = new DAPRequest(jreader.readObject());
+			JSONObject message = readMessage();
+			DAPRequest request = new DAPRequest(message);
 			DAPMessageList responses = dispatcher.dispatch(request);
 			
 			if (responses != null)
 			{
 				for (JSONObject response: responses)
 				{
-					StringWriter swout = new StringWriter();
-					JSONWriter jwriter = new JSONWriter(new PrintWriter(swout));
-					jwriter.writeObject(response);
-	
-					String jout = swout.toString();
-					Log.printf("<<< %s", jout);
-					PrintWriter pwout = new PrintWriter(outStream);
-					pwout.printf("Content-Length: %d\r\n\r\n%s", jout.length(), jout);
-					pwout.flush();
+					writeMessage(response);
 				}
 			}
-				
-			contentLength = br.readLine();
-			br.readLine();	// blank separator
 		}
+	}
+	
+	public JSONObject readMessage() throws IOException
+	{
+		BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
+		String contentLength = br.readLine();
+		br.readLine();	// blank separator
+		
+		if (contentLength == null)	// EOF
+		{
+			return null;
+		}
+		
+		int length = Integer.parseInt(contentLength.substring(16));	// Content-Length: NNNN
+		char[] bytes = new char[length];
+		int p = 0;
+		
+		for (int i=0; i<length; i++)
+		{
+			bytes[p++] = (char) br.read();
+		}
+
+		String message = new String(bytes);
+		Log.printf(">>> %s", message);
+		JSONReader jreader = new JSONReader(new StringReader(message));
+		return jreader.readObject();
+	}
+	
+	public void writeMessage(JSONObject response) throws IOException
+	{
+		StringWriter swout = new StringWriter();
+		JSONWriter jwriter = new JSONWriter(new PrintWriter(swout));
+		jwriter.writeObject(response);
+
+		String jout = swout.toString();
+		Log.printf("<<< %s", jout);
+		PrintWriter pwout = new PrintWriter(outStream);
+		pwout.printf("Content-Length: %d\r\n\r\n%s", jout.length(), jout);
+		pwout.flush();
 	}
 }
