@@ -242,7 +242,12 @@ public class TCCallObjectStatement extends TCStatement
 			}
 		}
 	}
-
+	
+	public TCDefinition getDefinition()
+	{
+		return fdef;	// Note that this is only set after typeCheck
+	}
+	
 	@Override
 	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
 	{

@@ -1,0 +1,16 @@
+{
+	"type": "request",
+	"seq": 1,
+	"command": "initialize",
+	"arguments": 
+	{
+		"clientID": "lsp4e.debug",
+		"adapterID": "adapterId",
+		"linesStartAt1": true,
+		"columnsStartAt1": true,
+		"pathFormat": "path",
+		"supportsVariableType": true,
+		"supportsVariablePaging": true,
+		"supportsRunInTerminalRequest": true
+	}
+}

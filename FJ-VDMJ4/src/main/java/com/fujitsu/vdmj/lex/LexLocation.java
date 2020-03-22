@@ -177,7 +177,7 @@ public class LexLocation implements Serializable
 		return
 			(startLine > span.startLine ||
 				(startLine == span.startLine && startPos >= span.startPos)) &&
-			(startLine <= span.endLine ||
+			(startLine < span.endLine ||
 				(startLine == span.endLine && startPos < span.endPos)) &&
 			file.equals(span.file);
 	}
@@ -251,6 +251,11 @@ public class LexLocation implements Serializable
 		}
 		
 		nameSpans.put(name, span);
+	}
+	
+	public static LexLocation getSpan(LexNameToken name)
+	{
+		return nameSpans.get(name);
 	}
 	
 	public static LexNameList getSpanNames(File filename)

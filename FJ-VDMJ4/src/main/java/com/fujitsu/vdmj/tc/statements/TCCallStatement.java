@@ -44,6 +44,8 @@ public class TCCallStatement extends TCStatement
 	public final TCNameToken name;
 	public final TCExpressionList args;
 
+	private TCDefinition opdef = null;
+	
 	public TCCallStatement(TCNameToken name, TCExpressionList args)
 	{
 		super(name.getLocation());
@@ -67,7 +69,7 @@ public class TCCallStatement extends TCStatement
 			name.setTypeQualifier(atypes);
 		}
 
-		TCDefinition opdef = env.findName(name, scope);
+		opdef = env.findName(name, scope);
 
 		if (opdef == null)
 		{
@@ -186,6 +188,11 @@ public class TCCallStatement extends TCStatement
 				}
 			}
 		}
+	}
+
+	public TCDefinition getDefinition()
+	{
+		return opdef;	// Note that this is only set after typeCheck
 	}
 
 	@Override
