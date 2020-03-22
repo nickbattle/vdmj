@@ -40,6 +40,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -456,8 +457,13 @@ public abstract class WorkspaceManager
 
 	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
 	{
+		ConsoleDebugReader dbg = null;
+		
 		try
 		{
+			dbg = new ConsoleDebugReader();
+			dbg.start();
+			
 			long before = System.currentTimeMillis();
 			Value result = getInterpreter().execute(expression);
 			long after = System.currentTimeMillis();
@@ -473,6 +479,13 @@ public abstract class WorkspaceManager
 			DAPMessageList responses = new DAPMessageList(request, e);
 			responses.add(prompt());
 			return responses;
+		}
+		finally
+		{
+			if (dbg != null)
+			{
+				dbg.interrupt();	// Stop the debugger reader.
+			}
 		}
 	}
 
