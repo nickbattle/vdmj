@@ -38,7 +38,6 @@ import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
-import com.fujitsu.vdmj.lsp.LSPDefinitionFinder;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
@@ -60,6 +59,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
+import vdmj.LSPDefinitionFinder;
 
 public class WorkspaceManagerPP extends WorkspaceManager
 {

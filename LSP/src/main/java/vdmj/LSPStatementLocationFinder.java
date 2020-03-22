@@ -1,0 +1,94 @@
+/*******************************************************************************
+ *
+ *	Copyright (c) 2020 Nick Battle.
+ *
+ *	Author: Nick Battle
+ *
+ *	This file is part of VDMJ.
+ *
+ *	VDMJ is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *
+ *	VDMJ is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *
+ *	You should have received a copy of the GNU General Public License
+ *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ ******************************************************************************/
+
+package vdmj;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCLeafDefinitionVisitor;
+import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
+import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
+import com.fujitsu.vdmj.tc.statements.TCCallStatement;
+import com.fujitsu.vdmj.tc.statements.TCLeafStatementVisitor;
+import com.fujitsu.vdmj.tc.statements.TCStatement;
+
+public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, Set<TCNode>, LexLocation>
+{
+	private LSPExpressionLocationFinder expVisitor = new LSPExpressionLocationFinder();
+	private LSPDefinitionLocationFinder defVisitor = new LSPDefinitionLocationFinder();
+
+	@Override
+	protected Set<TCNode> newCollection()
+	{
+		return new HashSet<TCNode>();
+	}
+
+	@Override
+	public Set<TCNode> caseStatement(TCStatement node, LexLocation arg)
+	{
+		return newCollection();		// Default is "nothing found"
+	}
+
+ 	@Override
+	public Set<TCNode> caseCallObjectStatement(TCCallObjectStatement node, LexLocation arg)
+	{
+		Set<TCNode> all = newCollection();
+
+		if (arg.within(node.location))
+		{
+			all.add(node);
+		}
+
+		all.addAll(super.caseCallObjectStatement(node, arg));
+		return all;
+	}
+
+ 	@Override
+	public Set<TCNode> caseCallStatement(TCCallStatement node, LexLocation arg)
+	{
+		Set<TCNode> all = newCollection();
+
+		if (arg.within(node.location))
+		{
+			all.add(node);
+		}
+
+		all.addAll(super.caseCallStatement(node, arg));
+		return all;
+	}
+	
+	@Override
+	protected TCLeafExpressionVisitor<TCNode, Set<TCNode>, LexLocation> getExpressionVisitor()
+	{
+		return expVisitor;
+	}
+
+	@Override
+	protected TCLeafDefinitionVisitor<TCNode, Set<TCNode>, LexLocation> getDefinitionVisitor()
+	{
+		return defVisitor;
+	}
+}
