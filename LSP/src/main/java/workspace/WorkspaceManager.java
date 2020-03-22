@@ -141,7 +141,7 @@ public abstract class WorkspaceManager
 			this.noDebug = noDebug;
 			long before = System.currentTimeMillis();
 			getInterpreter().init();
-			getInterpreter().setDefaultName(defaultName);
+			if (defaultName != null) getInterpreter().setDefaultName(defaultName);
 			long after = System.currentTimeMillis();
 			
 			DAPMessageList responses = new DAPMessageList(request);
