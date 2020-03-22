@@ -52,6 +52,11 @@ public class TCIdentifierToken extends TCToken
 		return identifier.name;
 	}
 
+	public LexIdentifierToken getLex()
+	{
+		return identifier;
+	}
+	
 	public TCNameToken getClassName()
 	{
 		// We don't know the class name of the name of a class until we've

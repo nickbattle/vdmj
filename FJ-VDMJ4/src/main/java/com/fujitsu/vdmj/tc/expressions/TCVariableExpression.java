@@ -182,6 +182,11 @@ public class TCVariableExpression extends TCExpression
 		}
 	}
 
+	public TCDefinition getDefinition()
+	{
+		return vardef;	// Note that this is only set after typeCheck
+	}
+	
 	@Override
 	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
 	{
