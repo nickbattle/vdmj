@@ -64,7 +64,7 @@ public class DAPServer
 		this.dispatcher = getDispatcher();
 	}
 	
-	public DAPServer getInstance()
+	public static DAPServer getInstance()
 	{
 		return INSTANCE;
 	}
@@ -105,7 +105,7 @@ public class DAPServer
 		}
 	}
 	
-	private JSONObject readMessage() throws IOException
+	public JSONObject readMessage() throws IOException
 	{
 		BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
 		String contentLength = br.readLine();
@@ -131,7 +131,7 @@ public class DAPServer
 		return jreader.readObject();
 	}
 	
-	private void writeMessage(JSONObject response) throws IOException
+	public void writeMessage(JSONObject response) throws IOException
 	{
 		StringWriter swout = new StringWriter();
 		JSONWriter jwriter = new JSONWriter(new PrintWriter(swout));

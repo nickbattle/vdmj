@@ -40,7 +40,6 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
-import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -63,6 +62,7 @@ import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import vdmj.DAPDebugReader;
 
 public abstract class WorkspaceManager
 {
@@ -457,11 +457,11 @@ public abstract class WorkspaceManager
 
 	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
 	{
-		ConsoleDebugReader dbg = null;
+		DAPDebugReader dbg = null;
 		
 		try
 		{
-			dbg = new ConsoleDebugReader();
+			dbg = new DAPDebugReader();
 			dbg.start();
 			
 			long before = System.currentTimeMillis();
