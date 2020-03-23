@@ -163,6 +163,7 @@ public abstract class WorkspaceManager
 	{
 		return text("*\n" +
 				"* VDMJ " + Settings.dialect + " Interpreter\n" +
+				(noDebug ? "" : "* DEBUG enabled\n") +
 				"*\n\n");
 	}
 	
