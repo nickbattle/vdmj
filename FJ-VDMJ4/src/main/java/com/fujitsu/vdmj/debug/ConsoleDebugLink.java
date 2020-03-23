@@ -76,14 +76,14 @@ public class ConsoleDebugLink extends DebugLink
 		if (instance == null)
 		{
 			instance = new ConsoleDebugLink();
+			instance.setExecutor(new ConsoleDebugExecutor());
 		}
-		
 		return instance;
 	}
 	
-	public ConsoleDebugLink()
+	private ConsoleDebugLink()	// Private for singleton
 	{
-		// Private constructor for singleton.
+		return;
 	}
 	
 	/**
@@ -296,7 +296,7 @@ public class ConsoleDebugLink extends DebugLink
 			ctxt.setThreadState(CPUValue.vCPU);
 		}
 		
-		DebugExecutor dc = new DebugExecutor(location, ctxt);
+		debugExecutor.setBreakpoint(location, ctxt);
 		
 		while (true)
 		{
@@ -319,13 +319,13 @@ public class ConsoleDebugLink extends DebugLink
 						
 					case PRINT:
 						suspendBreaks = true;
-						response = dc.run(request);
+						response = debugExecutor.run(request);
 						writeCommand(thread, response);
 						suspendBreaks = false;
 						break;
 
 					default:
-						response = dc.run(request);
+						response = debugExecutor.run(request);
 						writeCommand(thread, response);
 				}
 			}
