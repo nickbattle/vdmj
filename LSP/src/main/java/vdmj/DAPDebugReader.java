@@ -30,6 +30,7 @@ import java.util.List;
 import com.fujitsu.vdmj.debug.ConsoleDebugLink;
 import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugLink;
+import com.fujitsu.vdmj.debug.DebugType;
 import com.fujitsu.vdmj.debug.TraceCallback;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
@@ -39,6 +40,7 @@ import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.values.OperationValue;
 
+import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.DAPServer;
 import json.JSONObject;
@@ -59,6 +61,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	{
 		server = DAPServer.getInstance();
 		link = (ConsoleDebugLink)DebugLink.getInstance();
+		link.setExecutor(new DAPDebugExecutor());
 	}
 	
 	@Override
@@ -69,9 +72,16 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		
 		while (link.waitForStop())
 		{
-			lastThread = debuggedThread;
-			debuggedThread = link.getDebugThread();		// Initially bp thread
-			while (doCommand());
+			try
+			{
+				lastThread = debuggedThread;
+				debuggedThread = link.getDebugThread();		// Initially bp thread
+				server.writeMessage(breakpointEvent(link.getBreakpoint(debuggedThread), debuggedThread));
+				while (doCommand());
+			}
+			catch (IOException e)
+			{
+			}
 		}
 	}
 
@@ -86,13 +96,20 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			{
 				lastLoc = bp.location;
 			}
-			else if (!debuggedThread.equals(lastThread) || !loc.equals(lastLoc))
+			
+			if (!debuggedThread.equals(lastThread) || !loc.equals(lastLoc))
 			{
 				lastLoc = loc;
 			}
 			
-			server.writeMessage(breakpointEvent(bp, debuggedThread));
-			DebugCommand command = parse(server.readMessage());
+			DAPRequest request = new DAPRequest(server.readMessage());
+			DebugCommand command = parse(request);
+			
+			if (command.getType() == null)	// Ignore - payload is DAP response
+			{
+				server.writeMessage((JSONObject) command.getPayload());
+				return true;
+			}
 			
 			switch (command.getType())
 			{
@@ -120,6 +137,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 							return false;
 
 						default:
+							server.writeMessage(new DAPResponse(request, true, null, response.getPayload()));
 							return true;
 					}
 				}
@@ -131,7 +149,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		}
 	}
 
-	private DebugCommand parse(JSONObject request) throws IOException
+	private DebugCommand parse(DAPRequest request) throws IOException
 	{
 		String command = request.get("command");
 		
@@ -148,9 +166,15 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				
 			case "next":
 				return DebugCommand.NEXT;
+				
+			case "stackTrace":
+				return new DebugCommand(DebugType.STACK, request.get("arguments"));
+				
+			case "setBreakpoints":
+				return new DebugCommand(null, new DAPResponse(request, false, "Unsupported at breakpoint", null));
 			
 			default:
-				throw new IOException("Unknown command");
+				return new DebugCommand(null, new DAPResponse(request, false, "Unsupported command", null));
 		}
 	}
 
