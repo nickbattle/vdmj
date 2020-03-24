@@ -101,6 +101,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	{
 		astModuleList = new ASTModuleList();
 		List<VDMMessage> errs = new Vector<VDMMessage>();
+		List<VDMMessage> warns = new Vector<VDMMessage>();
 		
 		for (Entry<URI, StringBuilder> entry: projectFiles.entrySet())
 		{
@@ -116,7 +117,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 			
 			if (mr.getWarningCount() > 0)
 			{
-				errs.addAll(mr.getWarnings());
+				warns.addAll(mr.getWarnings());
 			}
 		}
 		
@@ -134,7 +135,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 			
 			if (TypeChecker.getWarningCount() > 0)
 			{
-				errs.addAll(TypeChecker.getWarnings());
+				warns.addAll(TypeChecker.getWarnings());
 			}
 		}
 		else
@@ -147,6 +148,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 			inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(tcModuleList);
 		}
 		
+		errs.addAll(warns);
 		return diagnosticResponses(errs, null);
 	}
 
