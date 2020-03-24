@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.syntax.ParserException;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -260,6 +261,46 @@ public class DAPDebugExecutor implements DebugExecutor
 	private DebugCommand doData(DebugCommand command)
 	{
 		JSONObject arguments = (JSONObject) command.getPayload();
+		if (arguments.containsKey("frameId"))
+		{
+			return doScopes(command);
+		}
+		else
+		{
+			return doVariables(command);
+		}
+	}
+	
+	private DebugCommand doVariables(DebugCommand command)
+	{
+		JSONObject arguments = (JSONObject) command.getPayload();
+		long frameId = arguments.get("variablesReference");
+		int id = 0;
+		Context c = ctxt;
+		
+		while (id != frameId && c.outer != null)
+		{
+			c = c.outer;
+			id++;
+		}
+
+		JSONArray variables = new JSONArray();
+		
+		for (TCNameToken name: c.keySet())
+		{
+			variables.add(new JSONObject(
+				"name", name.toString(),
+				"value", c.get(name).toString(),
+				"variablesReference", 0
+			));
+		}
+		
+		return new DebugCommand(DebugType.STACK, new JSONObject("variables", variables));
+	}
+
+	private DebugCommand doScopes(DebugCommand command)
+	{
+		JSONObject arguments = (JSONObject) command.getPayload();
 		long frameId = arguments.get("frameId");
 		int id = 0;
 		Context c = ctxt;
@@ -279,7 +320,7 @@ public class DAPDebugExecutor implements DebugExecutor
 				"source", new JSONObject("path", c.location.file.getAbsolutePath())
 			));
 		
-		return new DebugCommand(DebugType.STACK, scopes);
+		return new DebugCommand(DebugType.STACK, new JSONObject("scopes", scopes));
 	}
 
 	private DebugCommand doStop()

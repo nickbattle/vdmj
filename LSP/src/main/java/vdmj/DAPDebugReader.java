@@ -173,6 +173,9 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			case "scopes":
 				return new DebugCommand(DebugType.DATA, request.get("arguments"));
 				
+			case "variables":
+				return new DebugCommand(DebugType.DATA, request.get("arguments"));
+				
 			case "setBreakpoints":
 				return new DebugCommand(null, new DAPResponse(request, false, "Unsupported at breakpoint", null));
 			
