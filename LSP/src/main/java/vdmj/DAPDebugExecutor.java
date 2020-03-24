@@ -97,6 +97,10 @@ public class DAPDebugExecutor implements DebugExecutor
 					result = doStack(request);
 					break;
 					
+				case DATA:
+					result = doData(request);
+					break;
+					
 				case STEP:
 					result = doStep();
 					break;
@@ -213,19 +217,21 @@ public class DAPDebugExecutor implements DebugExecutor
 		else
 		{
 			c = ctxt;
-			int frame = 0;
+			int frameId = 0;
 			
-			while (frame < startFrame && c.outer != null)
+			while (frameId < startFrame && c.outer != null)
 			{
 				c = c.outer;
-				frame++;
+				frameId++;
 			}
 			
 			JSONArray frames = new JSONArray();
+			LexLocation floc = breakloc;
 			
-			for (; frame < totalFrames && frame < levels; frame++)
+			for (; frameId < totalFrames && frameId < levels; frameId++)
 			{
-				frames.add(stackFrame(c));
+				frames.add(stackFrame(frameId, c, floc));
+				floc = c.location;
 				c = c.outer;
 			}
 			
@@ -235,14 +241,45 @@ public class DAPDebugExecutor implements DebugExecutor
 		return new DebugCommand(DebugType.STACK, stackResponse);
 	}
 
-	private JSONObject stackFrame(Context frame)
+	private JSONObject stackFrame(int frameId, Context frame, LexLocation floc)
 	{
+		if (floc == null)
+		{
+			floc = frame.location;
+		}
+		
 		return new JSONObject(
-			"id",		frame.threadState.threadId,
+			"id",		frameId,
 			"name",		frame.title,
-			"line",		frame.location.startLine,
-			"column",	frame.location.startPos,
-			"moduleId",	frame.location.module);
+			"source",	new JSONObject("path", floc.file.getAbsolutePath()),
+			"line",		floc.startLine,
+			"column",	floc.startPos,
+			"moduleId",	floc.module);
+	}
+
+	private DebugCommand doData(DebugCommand command)
+	{
+		JSONObject arguments = (JSONObject) command.getPayload();
+		long frameId = arguments.get("frameId");
+		int id = 0;
+		Context c = ctxt;
+		
+		while (id != frameId && c.outer != null)
+		{
+			c = c.outer;
+			id++;
+		}
+
+		JSONArray scopes = new JSONArray(
+			new JSONObject(
+				"name", "Locals",
+				"presentationHint", "locals",
+				"variablesReference", frameId,
+				"namedVariables", c.size(),
+				"source", new JSONObject("path", c.location.file.getAbsolutePath())
+			));
+		
+		return new DebugCommand(DebugType.STACK, scopes);
 	}
 
 	private DebugCommand doStop()
