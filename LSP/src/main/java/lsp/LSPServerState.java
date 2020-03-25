@@ -27,6 +27,7 @@ import workspace.WorkspaceManager;
 
 public class LSPServerState
 {
+	private boolean running = false;
 	private boolean initialized = false;
 	private WorkspaceManager manager = null;
 	
@@ -48,5 +49,15 @@ public class LSPServerState
 	public void setManager(WorkspaceManager manager)
 	{
 		this.manager = manager;
+	}
+
+	public void setRunning(boolean running)
+	{
+		this.running = running;
+	}
+
+	public boolean isRunning()
+	{
+		return running;
 	}
 }

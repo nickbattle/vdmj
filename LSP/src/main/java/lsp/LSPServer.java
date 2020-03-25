@@ -23,51 +23,42 @@
 
 package lsp;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-
 import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
-import json.JSONReader;
-import json.JSONWriter;
 import lsp.textdocument.DefinitionHandler;
 import lsp.textdocument.DidChangeHandler;
 import lsp.textdocument.DidCloseHandler;
 import lsp.textdocument.DidOpenHandler;
 import lsp.textdocument.DidSaveHandler;
 import lsp.textdocument.DocumentSymbolHandler;
+import rpc.JSONServer;
 import rpc.RPCDispatcher;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.WorkspaceManager;
 
-public class LSPServer
+public class LSPServer extends JSONServer
 {
-	private final Dialect dialect;
-	private final InputStream inStream;
-	private final OutputStream outStream;
 	private final RPCDispatcher dispatcher;
+	private final LSPServerState state;
 	
 	public LSPServer(Dialect dialect, InputStream inStream, OutputStream outStream) throws IOException
 	{
-		this.dialect = dialect;
-		this.inStream = inStream;
-		this.outStream = outStream;
+		super("LSP", inStream, outStream);
+		
+		this.state = new LSPServerState();
 		this.dispatcher = getDispatcher();
+
+		state.setManager(WorkspaceManager.getInstance(dialect));
 	}
 	
 	private RPCDispatcher getDispatcher() throws IOException
 	{
 		RPCDispatcher dispatcher = new RPCDispatcher();
-		LSPServerState state = new LSPServerState();
-		state.setManager(WorkspaceManager.getInstance(dialect));
 		
 		dispatcher.register("initialize", new InitializeHandler(state));
 		dispatcher.register("initialized", new InitializeHandler(state));
@@ -83,46 +74,24 @@ public class LSPServer
 
 		return dispatcher;
 	}
-
+	
 	public void run() throws IOException
 	{
-		BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
-		String contentLength = br.readLine();
-		br.readLine();	// blank separator
+		state.setRunning(true);
 		
-		while (contentLength != null)
+		while (state.isRunning())
 		{
-			int length = Integer.parseInt(contentLength.substring(16));	// Content-Length: NNNN
-			char[] bytes = new char[length];
-			int p = 0;
-			
-			for (int i=0; i<length; i++)
-			{
-				bytes[p++] = (char) br.read();
-			}
-
-			String message = new String(bytes);
-			JSONReader jreader = new JSONReader(new StringReader(message));
-			RPCRequest request = new RPCRequest(jreader.readObject());
+			JSONObject message = readMessage();
+			RPCRequest request = new RPCRequest(message);
 			RPCMessageList responses = dispatcher.dispatch(request);
 			
 			if (responses != null)
 			{
 				for (JSONObject response: responses)
 				{
-					StringWriter swout = new StringWriter();
-					JSONWriter jwriter = new JSONWriter(new PrintWriter(swout));
-					jwriter.writeObject(response);
-	
-					String jout = swout.toString();
-					PrintWriter pwout = new PrintWriter(outStream);
-					pwout.printf("Content-Length: %d\r\n\r\n%s", jout.length(), jout);
-					pwout.flush();
+					writeMessage(response);
 				}
 			}
-				
-			contentLength = br.readLine();
-			br.readLine();	// blank separator
 		}
 	}
 }

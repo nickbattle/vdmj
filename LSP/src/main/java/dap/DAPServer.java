@@ -23,15 +23,9 @@
 
 package dap;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-
 import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.handlers.DisconnectHandler;
@@ -42,24 +36,20 @@ import dap.handlers.SetBreakpointsHandler;
 import dap.handlers.TerminateHandler;
 import dap.handlers.ThreadsHandler;
 import json.JSONObject;
-import json.JSONReader;
-import json.JSONWriter;
-import workspace.Log;
+import rpc.JSONServer;
 
-public class DAPServer
+public class DAPServer extends JSONServer
 {
 	private static DAPServer INSTANCE = null;
 	
-	private final InputStream inStream;
-	private final OutputStream outStream;
 	private final DAPServerState state;
 	private final DAPDispatcher dispatcher;
 	
 	public DAPServer(Dialect dialect, InputStream inStream, OutputStream outStream) throws IOException
 	{
+		super("DAP", inStream, outStream);
+		
 		INSTANCE = this;
-		this.inStream = inStream;
-		this.outStream = outStream;
 		this.state = new DAPServerState(dialect);
 		this.dispatcher = getDispatcher();
 	}
@@ -103,44 +93,5 @@ public class DAPServer
 				}
 			}
 		}
-	}
-	
-	public JSONObject readMessage() throws IOException
-	{
-		BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
-		String contentLength = br.readLine();
-		br.readLine();	// blank separator
-		
-		if (contentLength == null)	// EOF
-		{
-			return null;
-		}
-		
-		int length = Integer.parseInt(contentLength.substring(16));	// Content-Length: NNNN
-		char[] bytes = new char[length];
-		int p = 0;
-		
-		for (int i=0; i<length; i++)
-		{
-			bytes[p++] = (char) br.read();
-		}
-
-		String message = new String(bytes);
-		Log.printf(">>> %s", message);
-		JSONReader jreader = new JSONReader(new StringReader(message));
-		return jreader.readObject();
-	}
-	
-	public void writeMessage(JSONObject response) throws IOException
-	{
-		StringWriter swout = new StringWriter();
-		JSONWriter jwriter = new JSONWriter(new PrintWriter(swout));
-		jwriter.writeObject(response);
-
-		String jout = swout.toString();
-		Log.printf("<<< %s", jout);
-		PrintWriter pwout = new PrintWriter(outStream);
-		pwout.printf("Content-Length: %d\r\n\r\n%s", jout.length(), jout);
-		pwout.flush();
 	}
 }
