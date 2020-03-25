@@ -24,6 +24,10 @@
 package vdmj;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugExecutor;
@@ -33,6 +37,7 @@ import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
@@ -49,6 +54,12 @@ public class DAPDebugExecutor implements DebugExecutor
 	/** The context that was active when the thread stopped. */
 	private Context ctxt;
 
+	private Map<Integer, Set<Integer>> framesToVarReferences;
+	private Map<Integer, Context> variablesReferences;
+	private int nextFrameId;
+	private int nextVariablesReference;
+
+
 	public DAPDebugExecutor()
 	{
 		interpreter = Interpreter.getInstance();
@@ -59,6 +70,8 @@ public class DAPDebugExecutor implements DebugExecutor
 	{
 		this.breakloc = breakloc;
 		this.ctxt = ctxt;
+		
+		buildCache();
 	}
 
 	/**
@@ -94,11 +107,11 @@ public class DAPDebugExecutor implements DebugExecutor
 					result = doContinue();
 					break;
 					
-				case STACK:
+				case STACK:	// frames
 					result = doStack(request);
 					break;
 					
-				case DATA:
+				case DATA:	// scopes and variablesReferences
 					result = doData(request);
 					break;
 					
@@ -200,15 +213,7 @@ public class DAPDebugExecutor implements DebugExecutor
 		long startFrame = arguments.get("startFrame");
 		long levels = arguments.get("levels");
 		
-		Context c = ctxt;
-		int totalFrames = 1;
-		
-		while (c.outer != null)
-		{
-			c = c.outer;
-			totalFrames++;
-		}
-		
+		int totalFrames = framesToVarReferences.size();
 		JSONObject stackResponse = null;
 		
 		if (startFrame >= totalFrames)	// Not enough frames for startFrame?
@@ -217,23 +222,16 @@ public class DAPDebugExecutor implements DebugExecutor
 		}
 		else
 		{
-			c = ctxt;
-			int frameId = 0;
-			
-			while (frameId < startFrame && c.outer != null)
-			{
-				c = c.outer;
-				frameId++;
-			}
-			
 			JSONArray frames = new JSONArray();
-			LexLocation floc = breakloc;
 			
-			for (; frameId < totalFrames && frameId < levels; frameId++)
+			for (int frameId = (int) startFrame; frameId < totalFrames; frameId++)
 			{
-				frames.add(stackFrame(frameId, c, floc));
-				floc = c.location;
-				c = c.outer;
+				Set<Integer> vrefs = framesToVarReferences.get(frameId);
+				Integer vref = vrefs.iterator().next();		// Any one
+				Context frame = variablesReferences.get(vref);
+				
+				frames.add(stackFrame(frameId, frame));
+				if (frames.size() >= levels) break;
 			}
 			
 			stackResponse = new JSONObject("stackFrames", frames, "totalFrames", totalFrames);
@@ -242,12 +240,9 @@ public class DAPDebugExecutor implements DebugExecutor
 		return new DebugCommand(DebugType.STACK, stackResponse);
 	}
 
-	private JSONObject stackFrame(int frameId, Context frame, LexLocation floc)
+	private JSONObject stackFrame(int frameId, Context frame)
 	{
-		if (floc == null)
-		{
-			floc = frame.location;
-		}
+		LexLocation floc = frame.location;
 		
 		return new JSONObject(
 			"id",		frameId,
@@ -271,56 +266,45 @@ public class DAPDebugExecutor implements DebugExecutor
 		}
 	}
 	
-	private DebugCommand doVariables(DebugCommand command)
-	{
-		JSONObject arguments = (JSONObject) command.getPayload();
-		long frameId = arguments.get("variablesReference");
-		int id = 0;
-		Context c = ctxt;
-		
-		while (id != frameId && c.outer != null)
-		{
-			c = c.outer;
-			id++;
-		}
-
-		JSONArray variables = new JSONArray();
-		
-		for (TCNameToken name: c.keySet())
-		{
-			variables.add(new JSONObject(
-				"name", name.toString(),
-				"value", c.get(name).toString(),
-				"variablesReference", 0
-			));
-		}
-		
-		return new DebugCommand(DebugType.STACK, new JSONObject("variables", variables));
-	}
-
 	private DebugCommand doScopes(DebugCommand command)
 	{
 		JSONObject arguments = (JSONObject) command.getPayload();
 		long frameId = arguments.get("frameId");
-		int id = 0;
-		Context c = ctxt;
+		JSONArray scopes = new JSONArray();
 		
-		while (id != frameId && c.outer != null)
+		for (Integer vref: framesToVarReferences.get((int)frameId))
 		{
-			c = c.outer;
-			id++;
-		}
-
-		JSONArray scopes = new JSONArray(
-			new JSONObject(
-				"name", "Locals",
-				"presentationHint", "locals",
-				"variablesReference", frameId,
-				"namedVariables", c.size(),
-				"source", new JSONObject("path", c.location.file.getAbsolutePath())
+			Context vars = variablesReferences.get(vref);
+			
+			scopes.add(new JSONObject(
+				"name", vars.title,
+				"presentationHint", vars.title,
+				"variablesReference", vref,
+				"namedVariables", vars.size(),
+				"source", new JSONObject("path", vars.location.file.getAbsolutePath())
 			));
+		}
 		
 		return new DebugCommand(DebugType.STACK, new JSONObject("scopes", scopes));
+	}
+
+	private DebugCommand doVariables(DebugCommand command)
+	{
+		JSONObject arguments = (JSONObject) command.getPayload();
+		long vref = arguments.get("variablesReference");
+		Context vars = variablesReferences.get((int)vref);
+		JSONArray variables = new JSONArray();
+		
+		for (TCNameToken name: vars.keySet())
+		{
+			variables.add(new JSONObject(
+				"name", name.toString(),
+				"value", vars.get(name).toString(),
+				"variablesReference", vref
+			));
+		}
+		
+		return new DebugCommand(DebugType.STACK, new JSONObject("variablesReferences", variables));
 	}
 
 	private DebugCommand doStop()
@@ -331,5 +315,68 @@ public class DAPDebugExecutor implements DebugExecutor
 	private DebugCommand doQuit()
 	{
 		return DebugCommand.QUIT;
+	}
+	
+	private void buildCache()
+	{
+		framesToVarReferences = new HashMap<Integer, Set<Integer>>();	// frameId to variablesReferences
+		variablesReferences = new HashMap<Integer, Context>();			// variablesReferences to name/values
+		
+		nextFrameId = 0;
+		nextVariablesReference = 0;
+		
+		Context c = ctxt;
+		LexLocation[] frameLoc = new LexLocation[1];
+		frameLoc[0] = breakloc;	// [0] updated by buildScopes
+		
+		while (c != null)
+		{
+			framesToVarReferences.put(nextFrameId, new HashSet<Integer>());
+			c = buildScopes(c, frameLoc);
+			nextFrameId++;
+		}
+	}
+	
+	private Context buildScopes(Context c, LexLocation[] frameLoc)
+	{
+		Context lower = buildLocals(c, frameLoc[0]);
+		
+		if (lower != null)
+		{
+			LexLocation rootLoc = lower.location;
+			lower = buildArguments((RootContext)lower, frameLoc[0]);
+			frameLoc[0] = rootLoc;	// update location
+		}
+		
+		return lower;
+	}
+	
+	private RootContext buildLocals(Context c, LexLocation frameLoc)
+	{
+		Context locals = new Context(frameLoc, "Locals", null);
+
+		while (!(c instanceof RootContext) && c != null)
+		{
+			locals.putAll(c);
+			c = c.outer;
+		}
+
+		framesToVarReferences.get(nextFrameId).add(nextVariablesReference);
+		variablesReferences.put(nextVariablesReference, locals);
+		
+		nextVariablesReference++;
+		return (RootContext) c;
+	}
+	
+	private Context buildArguments(RootContext c, LexLocation frameLoc)
+	{
+		Context arguments = new Context(frameLoc, "Arguments", null);
+		arguments.putAll(c);
+
+		framesToVarReferences.get(nextFrameId).add(nextVariablesReference);
+		variablesReferences.put(nextVariablesReference, arguments);
+		
+		nextVariablesReference++;
+		return c.outer;
 	}
 }

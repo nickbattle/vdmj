@@ -36,7 +36,7 @@ import dap.handlers.SetBreakpointsHandler;
 import dap.handlers.TerminateHandler;
 import dap.handlers.ThreadsHandler;
 import json.JSONObject;
-import rpc.JSONServer;
+import json.JSONServer;
 
 public class DAPServer extends JSONServer
 {

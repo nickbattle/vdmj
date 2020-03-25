@@ -55,8 +55,9 @@ public class Log
 		if (out != null)
 		{
 			Calendar now = new GregorianCalendar();
-			out.printf("%02d:%02d:%02d: ",
-					now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
+			out.printf("%02d:%02d:%02d.%03d: ",
+					now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE),
+					now.get(Calendar.SECOND), now.get(Calendar.MILLISECOND));
 
 			out.printf(format, args);
 			out.print("\n");

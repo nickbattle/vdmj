@@ -21,7 +21,7 @@
  *
  ******************************************************************************/
 
-package rpc;
+package json;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,9 +32,6 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import json.JSONObject;
-import json.JSONReader;
-import json.JSONWriter;
 import workspace.Log;
 
 abstract public class JSONServer

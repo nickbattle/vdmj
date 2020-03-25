@@ -29,13 +29,13 @@ import java.io.OutputStream;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
+import json.JSONServer;
 import lsp.textdocument.DefinitionHandler;
 import lsp.textdocument.DidChangeHandler;
 import lsp.textdocument.DidCloseHandler;
 import lsp.textdocument.DidOpenHandler;
 import lsp.textdocument.DidSaveHandler;
 import lsp.textdocument.DocumentSymbolHandler;
-import rpc.JSONServer;
 import rpc.RPCDispatcher;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
