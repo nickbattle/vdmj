@@ -25,9 +25,9 @@ package vdmj;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugExecutor;
@@ -40,6 +40,10 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.values.FieldValue;
+import com.fujitsu.vdmj.values.RecordValue;
+import com.fujitsu.vdmj.values.SeqValue;
+import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 
 import json.JSONArray;
@@ -50,14 +54,28 @@ public class DAPDebugExecutor implements DebugExecutor
 {
 	private static class Frame
 	{
-		public Frame()
+		public Frame(int frameId, LexLocation frameLoc)
 		{
-			this.title = "frame";
-			this.vrefs = new HashSet<Integer>();
+			this.frameId = frameId;
+			this.location = frameLoc;
 		}
 		
+		public int frameId;
+		public LexLocation location;
 		public String title;
-		public final Set<Integer> vrefs;
+		public List<Scope> scopes = new Vector<Scope>();
+	}
+	
+	private static class Scope
+	{
+		public Scope(String name, int vref)
+		{
+			this.name = name;
+			this.vref = vref;
+		}
+		
+		public String name;
+		public int vref;
 	}
 	
 	/** The interpreter */
@@ -69,8 +87,8 @@ public class DAPDebugExecutor implements DebugExecutor
 	private Context ctxt;
 
 	/** Representation of ctxt for DAP responses */
-	private Map<Integer, Frame> framesToVarReferences;
-	private Map<Integer, Context> variablesReferences;
+	private Map<Integer, Frame> ctxtFrames;
+	private Map<Integer, Object> variablesReferences;
 	private int nextFrameId;
 	private int nextVariablesReference;
 
@@ -86,7 +104,7 @@ public class DAPDebugExecutor implements DebugExecutor
 		this.breakloc = breakloc;
 		this.ctxt = ctxt;
 		
-		buildCache();
+		rebuildCache();
 	}
 
 	/**
@@ -228,7 +246,7 @@ public class DAPDebugExecutor implements DebugExecutor
 		long startFrame = arguments.get("startFrame");
 		long levels = arguments.get("levels");
 		
-		int totalFrames = framesToVarReferences.size();
+		int totalFrames = ctxtFrames.size();
 		JSONObject stackResponse = null;
 		
 		if (startFrame >= totalFrames)	// Not enough frames for startFrame?
@@ -241,11 +259,16 @@ public class DAPDebugExecutor implements DebugExecutor
 			
 			for (int frameId = (int) startFrame; frameId < totalFrames; frameId++)
 			{
-				Frame frame = framesToVarReferences.get(frameId);
-				Integer vref = frame.vrefs.iterator().next();		// Any vref
-				Context fctxt = variablesReferences.get(vref);
+				Frame frame = ctxtFrames.get(frameId);
 				
-				frames.add(stackFrame(frameId, frame, fctxt));
+				frames.add(new JSONObject(
+						"id",		frame.frameId,
+						"name",		frame.title,
+						"source",	new JSONObject("path", frame.location.file.getAbsolutePath()),
+						"line",		frame.location.startLine,
+						"column",	frame.location.startPos,
+						"moduleId",	frame.location.module));
+				
 				if (frames.size() >= levels) break;
 			}
 			
@@ -253,19 +276,6 @@ public class DAPDebugExecutor implements DebugExecutor
 		}
 		
 		return new DebugCommand(DebugType.STACK, stackResponse);
-	}
-
-	private JSONObject stackFrame(int frameId, Frame frame, Context fctxt)
-	{
-		LexLocation floc = fctxt.location;
-		
-		return new JSONObject(
-			"id",		frameId,
-			"name",		frame.title,
-			"source",	new JSONObject("path", floc.file.getAbsolutePath()),
-			"line",		floc.startLine,
-			"column",	floc.startPos,
-			"moduleId",	floc.module);
 	}
 
 	private DebugCommand doData(DebugCommand command)
@@ -285,18 +295,15 @@ public class DAPDebugExecutor implements DebugExecutor
 	{
 		JSONObject arguments = (JSONObject) command.getPayload();
 		long frameId = arguments.get("frameId");
+		Frame frame = ctxtFrames.get((int)frameId);
 		JSONArray scopes = new JSONArray();
 		
-		for (Integer vref: framesToVarReferences.get((int)frameId).vrefs)
+		for (Scope scope: frame.scopes)
 		{
-			Context vars = variablesReferences.get(vref);
-			
 			scopes.add(new JSONObject(
-				"name", vars.title,
-				"presentationHint", vars.title,
-				"variablesReference", vref,
-				"namedVariables", vars.size(),
-				"source", new JSONObject("path", vars.location.file.getAbsolutePath())
+				"name", scope.name,
+				"variablesReference", scope.vref,
+				"source", new JSONObject("path", frame.location.file.getAbsolutePath())
 			));
 		}
 		
@@ -307,18 +314,65 @@ public class DAPDebugExecutor implements DebugExecutor
 	{
 		JSONObject arguments = (JSONObject) command.getPayload();
 		long vref = arguments.get("variablesReference");
-		Context vars = variablesReferences.get((int)vref);
+		Object var = variablesReferences.get((int)vref);
+		
+		return new DebugCommand(DebugType.STACK, new JSONObject("variables", referenceToVariables(var)));
+	}
+	
+	private JSONArray referenceToVariables(Object var)
+	{
 		JSONArray variables = new JSONArray();
 		
-		for (TCNameToken name: vars.keySet())
+		if (var instanceof Context)
 		{
-			variables.add(new JSONObject(
-				"name", name.toString(),
-				"value", vars.get(name).toString()
-			));
+			Context c = (Context)var;
+			
+			for (TCNameToken name: c.keySet())
+			{
+				variables.add(new JSONObject(
+					"name", name.toString(),
+					"value", c.get(name).toString())
+				);
+			}
+		}
+		else if (var instanceof RecordValue)
+		{
+			RecordValue r = (RecordValue)var;
+			
+			for (FieldValue field: r.fieldmap)
+			{
+				variables.add(new JSONObject(
+					"name", field.name,
+					"value", field.value.toString())
+				);
+			}
+		}
+		else if (var instanceof SetValue)
+		{
+			SetValue s = (SetValue)var;
+			
+			for (Value value: s.values)
+			{
+				variables.add(new JSONObject(
+						"name", "",
+						"value", value.toString())
+					);
+			}
+		}
+		else if (var instanceof SeqValue)
+		{
+			SeqValue s = (SeqValue)var;
+			
+			for (Value value: s.values)
+			{
+				variables.add(new JSONObject(
+						"name", "",
+						"value", value.toString())
+					);
+			}
 		}
 		
-		return new DebugCommand(DebugType.STACK, new JSONObject("variables", variables));
+		return variables;
 	}
 
 	private DebugCommand doStop()
@@ -331,61 +385,61 @@ public class DAPDebugExecutor implements DebugExecutor
 		return DebugCommand.QUIT;
 	}
 	
-	private void buildCache()
+	private void rebuildCache()
 	{
-		framesToVarReferences = new HashMap<Integer, Frame>();	// frameId to frame details
-		variablesReferences = new HashMap<Integer, Context>();	// variablesReferences to name/values
+		ctxtFrames = new HashMap<Integer, Frame>();
+		variablesReferences = new HashMap<Integer, Object>();
 		
 		nextFrameId = 0;				// Zero-relative for doStack
 		nextVariablesReference = 1;		// Zero reserved?
 		
 		Context c = ctxt;
-		LexLocation[] frameLoc = new LexLocation[1];
-		frameLoc[0] = breakloc;	// [0] updated by buildScopes
+		LexLocation[] nextLoc = { breakloc };
 		
 		while (c != null)
 		{
-			framesToVarReferences.put(nextFrameId, new Frame());
-			c = buildScopes(c, frameLoc);
+			Frame frame = new Frame(nextFrameId, nextLoc[0]);
+			ctxtFrames.put(nextFrameId, frame);
+			c = buildScopes(c, frame, nextLoc);
 			nextFrameId++;
 		}
 		
 		// Dump to diags...
-		for (Integer frameId: framesToVarReferences.keySet())
+		for (Integer frameId: ctxtFrames.keySet())
 		{
-			Log.printf("======== Frame %s:", frameId);
+			Frame frame = ctxtFrames.get(frameId);
+			Log.printf("======== Frame %s = %s:", frameId, frame.title);
 			
-			for (Integer vref: framesToVarReferences.get(frameId).vrefs)
+			for (Scope scope: frame.scopes)
 			{
-				Context vars = variablesReferences.get(vref);
-				Log.printf("-------- Scope %s, vref %d:", vars.title, vref);
+				Log.printf("-------- Scope %s, vref %d:", scope.name, scope.vref);
+				c = (Context) variablesReferences.get(scope.vref);
 				
-				for (TCNameToken name: vars.keySet())
+				for (TCNameToken name: c.keySet())
 				{
-					Value value = vars.get(name);
+					Value value = c.get(name);
 					Log.printf("%s = %s", name, value);
 				}
 			}
 		}
 	}
 	
-	private Context buildScopes(Context c, LexLocation[] frameLoc)
+	private Context buildScopes(Context c, Frame frame, LexLocation[] nextLoc)
 	{
-		Context lower = buildLocals(c, frameLoc[0]);
+		Context arguments = buildLocals(c, frame);
 		
-		if (lower != null)
+		if (arguments != null)
 		{
-			LexLocation rootLoc = lower.location;
-			lower = buildArguments((RootContext)lower, frameLoc[0]);
-			frameLoc[0] = rootLoc;	// update location
+			nextLoc[0] = arguments.location;
+			arguments = buildArguments((RootContext)arguments, frame);
 		}
 		
-		return lower;
+		return arguments;
 	}
 	
-	private RootContext buildLocals(Context c, LexLocation frameLoc)
+	private RootContext buildLocals(Context c, Frame frame)
 	{
-		Context locals = new Context(frameLoc, "Locals", null);
+		Context locals = new Context(frame.location, "Locals", null);
 
 		while (!(c instanceof RootContext) && c != null)
 		{
@@ -395,26 +449,26 @@ public class DAPDebugExecutor implements DebugExecutor
 
 		if (!locals.isEmpty())
 		{
-			framesToVarReferences.get(nextFrameId).vrefs.add(nextVariablesReference);
 			variablesReferences.put(nextVariablesReference, locals);
+			frame.scopes.add(new Scope("Locals", nextVariablesReference));
 			nextVariablesReference++;
 		}
 		
 		return (RootContext) c;
 	}
 	
-	private Context buildArguments(RootContext c, LexLocation frameLoc)
+	private Context buildArguments(RootContext c, Frame frame)
 	{
 		String title = (c.outer == null ? "Globals" : "Arguments");
-		LexLocation loc = (c.outer == null ? c.location : frameLoc);
+		LexLocation loc = (c.outer == null ? c.location : frame.location);
 		Context arguments = new Context(loc, title, null);
 		arguments.putAll(c);
 
-		framesToVarReferences.get(nextFrameId).title = c.title;
-		framesToVarReferences.get(nextFrameId).vrefs.add(nextVariablesReference);
 		variablesReferences.put(nextVariablesReference, arguments);
-		
+		frame.title = c.title;
+		frame.scopes.add(new Scope(title, nextVariablesReference));
 		nextVariablesReference++;
+
 		return c.outer;
 	}
 }
