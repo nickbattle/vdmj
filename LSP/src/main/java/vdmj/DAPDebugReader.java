@@ -129,11 +129,13 @@ public class DAPDebugReader extends Thread implements TraceCallback
 					{
 						case RESUME:
 							link.resumeThreads();
+							server.writeMessage(new DAPResponse(request, true, null, response.getPayload()));
 							return false;
 
 						case STOP:
 						case QUIT:
 							link.killThreads();
+							server.writeMessage(new DAPResponse(request, true, null, response.getPayload()));
 							return false;
 
 						default:
@@ -180,7 +182,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				return new DebugCommand(null, new DAPResponse(request, false, "Unsupported at breakpoint", null));
 			
 			default:
-				return new DebugCommand(null, new DAPResponse(request, false, "Unsupported command", null));
+				return new DebugCommand(null, new DAPResponse(request, false, "Unsupported command: " + command, null));
 		}
 	}
 

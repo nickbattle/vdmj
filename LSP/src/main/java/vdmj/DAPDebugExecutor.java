@@ -201,25 +201,25 @@ public class DAPDebugExecutor implements DebugExecutor
 	private DebugCommand doStep()
 	{
    		ctxt.threadState.setBreaks(breakloc, null, null);
-   		return DebugCommand.RESUME;
+   		return DebugCommand.RESUME;		// null JSON body is ok
 	}
 
 	private DebugCommand doNext()
 	{
 		ctxt.threadState.setBreaks(breakloc, ctxt.getRoot(), null);
-   		return DebugCommand.RESUME;
+   		return DebugCommand.RESUME;		// null JSON body is ok
 	}
 
 	private DebugCommand doOut()
 	{
 		ctxt.threadState.setBreaks(breakloc, null, ctxt.getRoot().outer);
-   		return DebugCommand.RESUME;
+   		return DebugCommand.RESUME;		// null JSON body is ok
 	}
 
 	private DebugCommand doContinue()
 	{
 		ctxt.threadState.setBreaks(null, null, null);
-   		return DebugCommand.RESUME;
+   		return new DebugCommand(DebugType.RESUME, new JSONObject("allThreadsContinued", true));
 	}
 
 	private DebugCommand doStack(DebugCommand command)
