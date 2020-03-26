@@ -329,9 +329,12 @@ public class DAPDebugExecutor implements DebugExecutor
 			
 			for (TCNameToken name: c.keySet())
 			{
+				Value value = c.get(name);
+				
 				variables.add(new JSONObject(
 					"name", name.toString(),
-					"value", c.get(name).toString())
+					"value", value.toString(),
+					"variablesReference", valueToReference(value))
 				);
 			}
 		}
@@ -343,36 +346,55 @@ public class DAPDebugExecutor implements DebugExecutor
 			{
 				variables.add(new JSONObject(
 					"name", field.name,
-					"value", field.value.toString())
+					"value", field.value.toString(),
+					"variablesReference", valueToReference(field.value))
 				);
 			}
 		}
 		else if (var instanceof SetValue)
 		{
 			SetValue s = (SetValue)var;
+			int i = 1;
 			
 			for (Value value: s.values)
 			{
 				variables.add(new JSONObject(
-						"name", "",
-						"value", value.toString())
+						"name", "{" + i++ + "}",
+						"value", value.toString(),
+						"variablesReference", valueToReference(value))
 					);
 			}
 		}
 		else if (var instanceof SeqValue)
 		{
 			SeqValue s = (SeqValue)var;
+			int i = 1;
 			
 			for (Value value: s.values)
 			{
 				variables.add(new JSONObject(
-						"name", "",
-						"value", value.toString())
+						"name", "[" + i++ + "]",
+						"value", value.toString(),
+						"variablesReference", valueToReference(value))
 					);
 			}
 		}
 		
 		return variables;
+	}
+
+	private Long valueToReference(Value value)
+	{
+		if (value instanceof RecordValue ||
+			value instanceof SetValue ||
+			value instanceof SeqValue)
+		{
+			int ref = nextVariablesReference;
+			variablesReferences.put(nextVariablesReference++, value);
+			return (long) ref;
+		}
+		
+		return 0L;
 	}
 
 	private DebugCommand doStop()
@@ -466,6 +488,7 @@ public class DAPDebugExecutor implements DebugExecutor
 
 		variablesReferences.put(nextVariablesReference, arguments);
 		frame.title = c.title;
+		frame.location = loc;
 		frame.scopes.add(new Scope(title, nextVariablesReference));
 		nextVariablesReference++;
 

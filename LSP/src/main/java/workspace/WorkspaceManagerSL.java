@@ -227,7 +227,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	@Override
 	public DAPMessageList threads(DAPRequest request)
 	{
-		return new DAPMessageList(request, new JSONObject("threads", new JSONArray(1L)));
+		return new DAPMessageList(request, new JSONObject("threads", new JSONArray()));	// empty?
 	}
 
 	@Override

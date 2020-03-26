@@ -38,11 +38,11 @@ import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
-import com.fujitsu.vdmj.values.OperationValue;
 
 import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.DAPServer;
+import json.JSONArray;
 import json.JSONObject;
 
 /**
@@ -114,11 +114,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			switch (command.getType())
 			{
 				case THREADS:
-					doThreads();
-					return true;
-
-				case THREAD:
-					doThread(command);
+					server.writeMessage(doThreads(request));
 					return true;
 
 				default:
@@ -178,6 +174,9 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			case "variables":
 				return new DebugCommand(DebugType.DATA, request.get("arguments"));
 				
+			case "threads":
+				return DebugCommand.THREADS;
+				
 			case "setBreakpoints":
 				return new DebugCommand(null, new DAPResponse(request, false, "Unsupported at breakpoint", null));
 			
@@ -195,77 +194,20 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				"allThreadsStopped", true));
 	}
 
-	private void doThreads()
+	private DAPResponse doThreads(DAPRequest request)
 	{
 		List<SchedulableThread> threads = link.getThreads();
 		Collections.sort(threads);
+		JSONArray list = new JSONArray();
 		
-		if (threads.isEmpty())
+		for (SchedulableThread thread: threads)
 		{
-			Console.out.println("No threads?");
+			list.add(new JSONObject(
+				"id",	thread.getId(),
+				"name", thread.getName()));
 		}
-		else
-		{
-    		int maxName = 0;
-    		long maxNum = 0;
-    		
-    		for (SchedulableThread th: threads)
-    		{
-    			if (th.getName().length() > maxName)
-    			{
-    				maxName = th.getName().length();
-    			}
-    			
-    			if (th.getId() > maxNum)
-    			{
-    				maxNum = th.getId();
-    			}
-    		}
-    		
-    		int width = (int)Math.floor(Math.log10(maxNum)) + 1;
-    		
-    		for (SchedulableThread th: threads)
-    		{
-    			Breakpoint bp = link.getBreakpoint(th);
-    			OperationValue guard = link.getGuardOp(th);
-    			LexLocation loc = link.getLocation(th);
-    			String info = "(not started)";
-    			
-    			if (bp != null)
-    			{
-    				info = bp.toString();
-    			}
-    			else if (guard != null)
-    			{
-    				info = "sync: " + guard.name.getName() + " " + loc;
-    			}
-    			else if (loc != null)
-    			{
-    				info = loc.toString();
-    			}
-    			
-    			String format = String.format("%%%dd: %%-%ds  %%s\n", width, maxName);
-    			Console.out.printf(format, th.getId(), th.getName(), info);
-    		}
-    		
-    		Console.out.println();
-		}
-	}
-	
-	private void doThread(DebugCommand cmd)
-	{
-		Integer n = (Integer)cmd.getPayload();
-
-		for (SchedulableThread th: link.getThreads())
-		{
-			if (th.getId() == n)
-			{
-				debuggedThread = th;
-				return;
-			}
-		}
-
-		Console.out.println("No such thread Id - try 'threads'");
+		
+		return new DAPResponse(request, true, null, new JSONObject("threads", list));
 	}
 	
 	@Override
