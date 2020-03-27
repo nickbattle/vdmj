@@ -26,6 +26,7 @@ package lsp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
@@ -39,6 +40,7 @@ import lsp.textdocument.DocumentSymbolHandler;
 import rpc.RPCDispatcher;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import vdmj.DAPDebugLink;
 import workspace.WorkspaceManager;
 
 public class LSPServer extends JSONServer
@@ -54,6 +56,9 @@ public class LSPServer extends JSONServer
 		this.dispatcher = getDispatcher();
 
 		state.setManager(WorkspaceManager.getInstance(dialect));
+		
+		// Identify this class as the debug link - See DebugLink
+		System.setProperty("vdmj.debug.link", DAPDebugLink.class.getName());
 	}
 	
 	private RPCDispatcher getDispatcher() throws IOException

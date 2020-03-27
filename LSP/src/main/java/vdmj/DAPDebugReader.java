@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import com.fujitsu.vdmj.debug.ConsoleDebugLink;
 import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugType;
@@ -52,7 +51,7 @@ import workspace.Log;
 public class DAPDebugReader extends Thread implements TraceCallback
 {
 	private final DAPServer server;
-	private final ConsoleDebugLink link;
+	private final DAPDebugLink link;
 
 	private SchedulableThread debuggedThread = null;
 	private LexLocation lastLoc = null;
@@ -61,7 +60,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	public DAPDebugReader() throws Exception
 	{
 		server = DAPServer.getInstance();
-		link = (ConsoleDebugLink)DebugLink.getInstance();
+		link = (DAPDebugLink)DebugLink.getInstance();
 		link.setExecutor(new DAPDebugExecutor());
 	}
 	
