@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
+import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.FieldValue;
@@ -485,13 +486,28 @@ public class DAPDebugExecutor implements DebugExecutor
 		LexLocation loc = (c.outer == null ? c.location : frame.location);
 		Context arguments = new Context(loc, title, null);
 		arguments.putAll(c);
+		
+		if (c instanceof StateContext)
+		{
+			StateContext s = (StateContext)c;
+			
+			if (s.stateCtxt != null)	// module's state variables
+			{
+				variablesReferences.put(nextVariablesReference, s.stateCtxt);
+				frame.scopes.add(new Scope("State", nextVariablesReference));
+				nextVariablesReference++;
+			}
+		}
 
-		variablesReferences.put(nextVariablesReference, arguments);
+		if (!arguments.isEmpty())
+		{
+			variablesReferences.put(nextVariablesReference, arguments);
+			frame.scopes.add(new Scope(title, nextVariablesReference));
+			nextVariablesReference++;
+		}
+
 		frame.title = c.title;
 		frame.location = loc;
-		frame.scopes.add(new Scope(title, nextVariablesReference));
-		nextVariablesReference++;
-
 		return c.outer;
 	}
 }
