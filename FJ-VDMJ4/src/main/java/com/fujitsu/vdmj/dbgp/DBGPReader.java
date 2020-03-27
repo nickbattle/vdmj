@@ -59,6 +59,7 @@ import com.fujitsu.vdmj.VDMRT;
 import com.fujitsu.vdmj.VDMSL;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.debug.DebugLink;
+import com.fujitsu.vdmj.debug.DebugReason;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INClassList;
@@ -130,7 +131,7 @@ public class DBGPReader extends DebugLink
 
 	private int sessionId = 0;
 	private DBGPStatus status = null;
-	private DBGPReason statusReason = null;
+	private DebugReason statusReason = null;
 	private DBGPCommandType command = null;
 	private String transaction = "";
 	private DBGPFeatures features;
@@ -584,7 +585,7 @@ public class DBGPReader extends DebugLink
 		}
 		else if (reader == null)
 		{
-			reader = newThread();
+			reader = newDBGPReader();
 			threadInstances.put(name, reader);
 		}
 		
@@ -639,7 +640,7 @@ public class DBGPReader extends DebugLink
 		this.cpu = cpu;
 	}
 
-	private static DBGPReader newThread()
+	private static DBGPReader newDBGPReader()
 	{
 		DBGPReader r = new DBGPReader(host, port, ideKey, interpreter, null, null);
 		r.command = DBGPCommandType.UNKNOWN;
@@ -648,7 +649,7 @@ public class DBGPReader extends DebugLink
 	}
 
 	@Override
-	public void setCPU(CPUValue _cpu)
+	public void newThread(CPUValue _cpu)
 	{
 		this.cpu = _cpu;
 	}
@@ -689,7 +690,7 @@ public class DBGPReader extends DebugLink
 	{
 		sessionId = Math.abs(new Random().nextInt(1000000));
 		status = DBGPStatus.STARTING;
-		statusReason = DBGPReason.OK;
+		statusReason = DebugReason.OK;
 		features = new DBGPFeatures();
 
 		StringBuilder sb = new StringBuilder();
@@ -834,7 +835,7 @@ public class DBGPReader extends DebugLink
 		statusResponse(status, statusReason);
 	}
 
-	private void statusResponse(DBGPStatus s, DBGPReason reason)
+	private void statusResponse(DBGPStatus s, DebugReason reason)
 		throws IOException
 	{
 		StringBuilder sb = new StringBuilder();
@@ -1157,7 +1158,7 @@ public class DBGPReader extends DebugLink
 
 			breakContext = ctxt;
 			breakpoint = bp;
-			statusResponse(DBGPStatus.BREAK, DBGPReason.OK);
+			statusResponse(DBGPStatus.BREAK, DebugReason.OK);
 
 			run();
 
@@ -1207,11 +1208,11 @@ public class DBGPReader extends DebugLink
 	}
 
 	@Override
-	public void complete(DBGPReason reason, ContextException exception)
+	public void complete(DebugReason reason, ContextException exception)
 	{
 		try
 		{
-			if (reason == DBGPReason.OK && !connected)
+			if (reason == DebugReason.OK && !connected)
 			{
 				// We never connected and there's no problem so just complete...
 			}
@@ -1219,7 +1220,7 @@ public class DBGPReader extends DebugLink
 			{
 				connect();
 
-				if (reason == DBGPReason.EXCEPTION && exception != null)
+				if (reason == DebugReason.EXCEPTION && exception != null)
     			{
     				dyingThread(exception);
     			}
@@ -1568,14 +1569,14 @@ public class DBGPReader extends DebugLink
 			breakContext = ex.ctxt;
 			breakpoint = new Breakpoint(ex.ctxt.location);
 			status = DBGPStatus.STOPPING;
-			statusReason = DBGPReason.EXCEPTION;
+			statusReason = DebugReason.EXCEPTION;
 			errorResponse(DBGPErrorCode.EVALUATION_ERROR, ex.getMessage());
 
 			run();
 
 			breakContext = null;
 			breakpoint = null;
-			statusResponse(DBGPStatus.STOPPED, DBGPReason.EXCEPTION);
+			statusResponse(DBGPStatus.STOPPED, DebugReason.EXCEPTION);
 		}
 		catch (Exception e)
 		{
@@ -1593,7 +1594,7 @@ public class DBGPReader extends DebugLink
 			{
 				breakContext.threadState.setBreaks(null, null, null);
 				status = DBGPStatus.RUNNING;
-				statusReason = DBGPReason.OK;
+				statusReason = DebugReason.OK;
 				return false;	// run means continue
 			}
 			else
@@ -1605,7 +1606,7 @@ public class DBGPReader extends DebugLink
 		if (status == DBGPStatus.STARTING && expression == null && remoteControl == null)
 		{
 			status = DBGPStatus.RUNNING;
-			statusReason = DBGPReason.OK;
+			statusReason = DebugReason.OK;
 			return false;	// a run for a new thread, means continue
 		}
 
@@ -1624,15 +1625,15 @@ public class DBGPReader extends DebugLink
 			try
 			{
 				status = DBGPStatus.RUNNING;
-				statusReason = DBGPReason.OK;
+				statusReason = DebugReason.OK;
 				remoteControl.run(new RemoteInterpreter(interpreter));
 				stdout("Remote control completed");
-				statusResponse(DBGPStatus.STOPPED, DBGPReason.OK);
+				statusResponse(DBGPStatus.STOPPED, DebugReason.OK);
 			}
 			catch (Exception e)
 			{
 				status = DBGPStatus.STOPPED;
-				statusReason = DBGPReason.ERROR;
+				statusReason = DebugReason.ERROR;
 				errorResponse(DBGPErrorCode.INTERNAL_ERROR, e.getMessage());
 			}
 
@@ -1643,13 +1644,13 @@ public class DBGPReader extends DebugLink
     		try
     		{
     			status = DBGPStatus.RUNNING;
-    			statusReason = DBGPReason.OK;
+    			statusReason = DebugReason.OK;
     			long before = System.currentTimeMillis();
     			theAnswer = interpreter.execute(expression);
     			stdout(expression + " = " + theAnswer.toString() + "\n");
     			long after = System.currentTimeMillis();
     			stdout("Executed in " + (double)(after-before)/1000 + " secs. ");
-    			statusResponse(DBGPStatus.STOPPED, DBGPReason.OK);
+    			statusResponse(DBGPStatus.STOPPED, DebugReason.OK);
     		}
     		catch (ContextException e)
     		{
@@ -1658,7 +1659,7 @@ public class DBGPReader extends DebugLink
     		catch (Exception e)
     		{
     			status = DBGPStatus.STOPPED;
-    			statusReason = DBGPReason.ERROR;
+    			statusReason = DebugReason.ERROR;
     			errorResponse(DBGPErrorCode.EVALUATION_ERROR, e.getMessage());
     		}
 
@@ -1711,13 +1712,13 @@ public class DBGPReader extends DebugLink
 		try
 		{
 			status = DBGPStatus.RUNNING;
-			statusReason = DBGPReason.OK;
+			statusReason = DebugReason.OK;
 			String exp = c.data;	// Already base64 decoded by the parser
 			theAnswer = interpreter.execute(exp);
 			StringBuilder property = propertyResponse(exp, exp, interpreter.getDefaultName(), theAnswer);
 			StringBuilder hdr = new StringBuilder("success=\"1\"");
 			status = DBGPStatus.STOPPED;
-			statusReason = DBGPReason.OK;
+			statusReason = DebugReason.OK;
 			response(hdr, property);
 		}
 		catch (ContextException e)
@@ -1727,7 +1728,7 @@ public class DBGPReader extends DebugLink
 		catch (Exception e)
 		{
 			status = DBGPStatus.STOPPED;
-			statusReason = DBGPReason.ERROR;
+			statusReason = DebugReason.ERROR;
 			errorResponse(DBGPErrorCode.EVALUATION_ERROR, e.getMessage());
 		}
 
@@ -1749,7 +1750,7 @@ public class DBGPReader extends DebugLink
 		}
 
 		status = DBGPStatus.RUNNING;
-		statusReason = DBGPReason.OK;
+		statusReason = DebugReason.OK;
 	}
 
 	private void processStepOver(DBGPCommand c) throws DBGPException
@@ -1763,7 +1764,7 @@ public class DBGPReader extends DebugLink
 		}
 
 		status = DBGPStatus.RUNNING;
-		statusReason = DBGPReason.OK;
+		statusReason = DebugReason.OK;
 	}
 
 	private void processStepOut(DBGPCommand c) throws DBGPException
@@ -1777,13 +1778,13 @@ public class DBGPReader extends DebugLink
 		}
 
 		status = DBGPStatus.RUNNING;
-		statusReason = DBGPReason.OK;
+		statusReason = DebugReason.OK;
 	}
 
 	private void processStop(DBGPCommand c) throws DBGPException, IOException
 	{
 		checkArgs(c, 1, false);
-		statusResponse(DBGPStatus.STOPPED, DBGPReason.OK);
+		statusResponse(DBGPStatus.STOPPED, DebugReason.OK);
 		TransactionValue.commitAll();
 	}
 
@@ -2568,7 +2569,7 @@ public class DBGPReader extends DebugLink
 
 		LexLocation.clearLocations();
 		interpreter.init();
-		statusResponse(DBGPStatus.STOPPED, DBGPReason.OK);
+		statusResponse(DBGPStatus.STOPPED, DebugReason.OK);
 		cdataResponse("Global context and test coverage initialized");
 	}
 
@@ -2863,7 +2864,7 @@ public class DBGPReader extends DebugLink
 			pw.close();
 
 			cdataResponse(out.toString());
-			statusResponse(DBGPStatus.STOPPED, DBGPReason.OK);
+			statusResponse(DBGPStatus.STOPPED, DebugReason.OK);
 		}
 		catch (Exception e)
 		{

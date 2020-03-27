@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.debug;
 
 import java.lang.reflect.Method;
 
-import com.fujitsu.vdmj.dbgp.DBGPReason;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
@@ -81,7 +80,12 @@ abstract public class DebugLink
 	{
 		this.debugExecutor = debugExecutor;
 	}
-	
+
+	/**
+	 * Called by a thread when it is created.
+	 */
+	abstract public void newThread(CPUValue cpu);
+
 	/**
 	 * Called by a thread which has stopped, but not at a breakpoint. For example,
 	 * when an exception occurs or deadlock is detected, or when a waiting thread
@@ -102,16 +106,8 @@ abstract public class DebugLink
 	/**
 	 * Called by a thread which is terminating, possibly with an exception.
 	 */
-	abstract public void complete(DBGPReason reason, ContextException exception);
+	abstract public void complete(DebugReason reason, ContextException exception);
 	
-	/**
-	 * Called by a thread to set the CPU.
-	 * @param cpu
-	 */
-	public void setCPU(CPUValue cpu)
-	{
-		return;		// Ignored by default
-	}
 	
 	/**
 	 * Read and return a value from the thread's Exchange, responding with an ACK.

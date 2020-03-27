@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.fujitsu.vdmj.dbgp.DBGPReason;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
@@ -78,10 +77,11 @@ public class ConsoleDebugLink extends DebugLink
 			instance = new ConsoleDebugLink();
 			instance.setExecutor(new ConsoleDebugExecutor());
 		}
+		
 		return instance;
 	}
 	
-	private ConsoleDebugLink()	// Private for singleton
+	protected ConsoleDebugLink()
 	{
 		return;
 	}
@@ -248,6 +248,15 @@ public class ConsoleDebugLink extends DebugLink
 	}
 
 	/**
+	 * Called by a thread when it is created.
+	 */
+	@Override
+	public void newThread(CPUValue cpu)
+	{
+		return;
+	}
+
+	/**
 	 * Called by a thread which has stopped, but not at a breakpoint. For example,
 	 * when an exception occurs or deadlock is detected, or when a waiting thread
 	 * is pushed into the debugger with a suspendOthers call.
@@ -362,8 +371,11 @@ public class ConsoleDebugLink extends DebugLink
 		}
 	}
 
+	/**
+	 * Called by a thread which is terminating, possibly with an exception.
+	 */
 	@Override
-	public void complete(DBGPReason reason, ContextException exception)
+	public void complete(DebugReason reason, ContextException exception)
 	{
 		// Not used by console debugger
 	}

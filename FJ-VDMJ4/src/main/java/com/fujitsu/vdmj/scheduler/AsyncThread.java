@@ -25,8 +25,8 @@ package com.fujitsu.vdmj.scheduler;
 
 import java.lang.reflect.InvocationTargetException;
 
-import com.fujitsu.vdmj.dbgp.DBGPReason;
 import com.fujitsu.vdmj.debug.DebugLink;
+import com.fujitsu.vdmj.debug.DebugReason;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Context;
@@ -80,7 +80,7 @@ public class AsyncThread extends SchedulableThread
 
 		try
 		{
-			link.setCPU(operation.getCPU());
+			link.newThread(operation.getCPU());
     		ctxt.setThreadState(cpu);
 
 			if (breakAtStart)
@@ -97,7 +97,7 @@ public class AsyncThread extends SchedulableThread
 				request.bus.reply(new MessageResponse(result, request));
 			}
 
-			link.complete(DBGPReason.OK, null);
+			link.complete(DebugReason.OK, null);
 		}
 		catch (ValueException e)
 		{
