@@ -38,6 +38,7 @@ import dap.handlers.TerminateHandler;
 import dap.handlers.ThreadsHandler;
 import json.JSONObject;
 import json.JSONServer;
+import workspace.Log;
 
 public class DAPServer extends JSONServer
 {
@@ -84,6 +85,13 @@ public class DAPServer extends JSONServer
 		while (state.isRunning())
 		{
 			JSONObject message = readMessage();
+			
+			if (message == null)	// EOF
+			{
+				Log.printf("End of stream detected");
+				break;
+			}
+			
 			DAPRequest request = new DAPRequest(message);
 			DAPMessageList responses = dispatcher.dispatch(request);
 			

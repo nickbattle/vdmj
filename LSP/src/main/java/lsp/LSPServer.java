@@ -41,6 +41,7 @@ import rpc.RPCDispatcher;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.DAPDebugLink;
+import workspace.Log;
 import workspace.WorkspaceManager;
 
 public class LSPServer extends JSONServer
@@ -87,6 +88,13 @@ public class LSPServer extends JSONServer
 		while (state.isRunning())
 		{
 			JSONObject message = readMessage();
+			
+			if (message == null)	// EOF
+			{
+				Log.printf("End of stream detected");
+				break;
+			}
+
 			RPCRequest request = new RPCRequest(message);
 			RPCMessageList responses = dispatcher.dispatch(request);
 			

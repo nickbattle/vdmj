@@ -103,8 +103,15 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				lastLoc = loc;
 			}
 			
-			// TODO readMessage null => EOF?
-			DAPRequest request = new DAPRequest(server.readMessage());
+			JSONObject message = server.readMessage();
+			
+			if (message == null)	// EOF
+			{
+				Log.printf("End of stream detected");
+				return false;
+			}
+			
+			DAPRequest request = new DAPRequest(message);
 			DebugCommand command = parse(request);
 			
 			if (command.getType() == null)	// Ignore - payload is DAP response
@@ -146,6 +153,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		}
 		catch (IOException e)
 		{
+			Log.error(e);
 			return false;
 		}
 	}
@@ -158,6 +166,9 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		{
 			case "terminate":
 				return DebugCommand.TERMINATE;
+				
+			case "evaluate":
+				return new DebugCommand(DebugType.PRINT, request.get("arguments"));
 				
 			case "continue":
 				return DebugCommand.CONTINUE;

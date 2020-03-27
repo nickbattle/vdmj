@@ -183,24 +183,26 @@ public class DAPDebugExecutor implements DebugExecutor
 	 */
 	private DebugCommand doEvaluate(DebugCommand command)
 	{
-		String expr = (String)command.getPayload();
+		JSONObject arguments = (JSONObject) command.getPayload();
+		String expr = arguments.get("expression");
+		String answer = "?";
 
 		try
 		{
 			ctxt.threadState.setAtomic(true);
-   			return new DebugCommand(DebugType.DATA, expr + " = " + interpreter.evaluate(expr, ctxt));
-		}
+			answer = expr + " = " + interpreter.evaluate(expr, ctxt);
+ 		}
 		catch (ParserException e)
 		{
-			return new DebugCommand(DebugType.ERROR, "Syntax: " + e);
+			answer = "Syntax: " + e;
 		}
 		catch (ContextException e)
 		{
-			return new DebugCommand(DebugType.ERROR, "Runtime: " + e.getMessage());
+			answer = "Runtime: " + e.getMessage();
 		}
 		catch (RuntimeException e)
 		{
-			return new DebugCommand(DebugType.ERROR, "Runtime: " + e.getMessage());
+			answer = "Runtime: " + e.getMessage();
 		}
 		catch (Exception e)
 		{
@@ -209,12 +211,14 @@ public class DAPDebugExecutor implements DebugExecutor
 				e = (Exception)e.getCause();
 			}
 			
-			return new DebugCommand(DebugType.ERROR, "Error: " + e.getMessage());
+			answer = "Error: " + e.getMessage();
 		}
 		finally
 		{
 			ctxt.threadState.setAtomic(false);
 		}
+
+		return new DebugCommand(DebugType.DATA, new JSONObject("result", answer, "variablesReference", 0));
 	}
 
 	private DebugCommand doStep()
