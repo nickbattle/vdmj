@@ -69,4 +69,9 @@ public class Log
 	{
 		printf("ERROR: " + format, args);
 	}
+
+	public static void error(Exception e)
+	{
+		printf("EXCEPTION: %s", e.getMessage());
+	}
 }

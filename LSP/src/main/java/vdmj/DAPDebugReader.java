@@ -44,6 +44,7 @@ import dap.DAPResponse;
 import dap.DAPServer;
 import json.JSONArray;
 import json.JSONObject;
+import workspace.Log;
 
 /**
  * A class to listen for and interact with multiple threads that are being debugged.
@@ -81,6 +82,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			}
 			catch (IOException e)
 			{
+				Log.error(e);
 			}
 		}
 	}
@@ -102,6 +104,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				lastLoc = loc;
 			}
 			
+			// TODO readMessage null => EOF?
 			DAPRequest request = new DAPRequest(server.readMessage());
 			DebugCommand command = parse(request);
 			
@@ -130,6 +133,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 
 						case STOP:
 						case QUIT:
+						case TERMINATE:
 							link.killThreads();
 							server.writeMessage(new DAPResponse(request, true, null, response.getPayload()));
 							return false;
@@ -153,6 +157,9 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		
 		switch (command)
 		{
+			case "terminate":
+				return DebugCommand.TERMINATE;
+				
 			case "continue":
 				return DebugCommand.CONTINUE;
 				
