@@ -46,6 +46,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -409,6 +410,18 @@ public abstract class WorkspaceManager
 	{
 		File file = new File(uri);
 		JSONArray results = new JSONArray();
+		
+		Map<Integer, Breakpoint> breakpoints = interpreter.getBreakpoints();
+		
+		for (Integer bpno: breakpoints.keySet())
+		{
+			Breakpoint bp = breakpoints.get(bpno);
+			
+			if (bp.location.file.equals(file))
+			{
+				interpreter.clearBreakpoint(bpno);
+			}
+		}
 		
 		for (Object object: lines)
 		{

@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.FieldValue;
 import com.fujitsu.vdmj.values.RecordValue;
+import com.fujitsu.vdmj.values.ReferenceValue;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
@@ -328,6 +329,11 @@ public class DAPDebugExecutor implements DebugExecutor
 	{
 		JSONArray variables = new JSONArray();
 		
+		if (var instanceof ReferenceValue)
+		{
+			var = ((ReferenceValue)var).deref();
+		}
+		
 		if (var instanceof Context)
 		{
 			Context c = (Context)var;
@@ -390,6 +396,11 @@ public class DAPDebugExecutor implements DebugExecutor
 
 	private Long valueToReference(Value value)
 	{
+		if (value instanceof ReferenceValue)
+		{
+			value = ((ReferenceValue)value).deref();
+		}
+
 		if (value instanceof RecordValue ||
 			value instanceof SetValue ||
 			value instanceof SeqValue)

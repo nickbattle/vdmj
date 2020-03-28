@@ -61,6 +61,11 @@ public class DAPServer extends JSONServer
 		return INSTANCE;
 	}
 	
+	public DAPServerState getState()
+	{
+		return state;
+	}
+	
 	private DAPDispatcher getDispatcher() throws IOException
 	{
 		DAPDispatcher dispatcher = new DAPDispatcher();
