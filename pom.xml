@@ -8,7 +8,7 @@
 	<groupId>com.fujitsu</groupId>
 	<artifactId>vdm</artifactId>
 	<packaging>pom</packaging>
-	<version>4.3.0</version>
+	<version>4.3.0-P</version>
 
 	<!-- sub modules -->
 	<modules>
