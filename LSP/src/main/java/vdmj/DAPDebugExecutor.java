@@ -42,6 +42,10 @@ import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.FieldValue;
+import com.fujitsu.vdmj.values.FunctionValue;
+import com.fujitsu.vdmj.values.NameValuePairMap;
+import com.fujitsu.vdmj.values.ObjectValue;
+import com.fujitsu.vdmj.values.OperationValue;
 import com.fujitsu.vdmj.values.RecordValue;
 import com.fujitsu.vdmj.values.ReferenceValue;
 import com.fujitsu.vdmj.values.SeqValue;
@@ -390,6 +394,28 @@ public class DAPDebugExecutor implements DebugExecutor
 					);
 			}
 		}
+		else if (var instanceof ObjectValue)
+		{
+			ObjectValue obj = (ObjectValue)var;
+			NameValuePairMap all = obj.getMemberValues();
+			
+			for (TCNameToken name: all.keySet())
+			{
+				Value value = all.get(name);
+				
+				if (value instanceof FunctionValue ||
+					value instanceof OperationValue)
+				{
+					continue;	// skip func/op members
+				}
+				
+				variables.add(new JSONObject(
+						"name", name.toString(),
+						"value", value.toString(),
+						"variablesReference", valueToReference(value))
+					);
+			}
+		}
 		
 		return variables;
 	}
@@ -403,7 +429,8 @@ public class DAPDebugExecutor implements DebugExecutor
 
 		if (value instanceof RecordValue ||
 			value instanceof SetValue ||
-			value instanceof SeqValue)
+			value instanceof SeqValue ||
+			value instanceof ObjectValue)
 		{
 			int ref = nextVariablesReference;
 			variablesReferences.put(nextVariablesReference++, value);
