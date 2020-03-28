@@ -69,7 +69,7 @@ public class CTMainThread extends MainThread
 		try
 		{
 			DebugLink link = DebugLink.getInstance();
-			link.setCPU(CPUValue.vCPU);
+			link.newThread(CPUValue.vCPU);
 
 			for (INStatement statement: test)
 			{

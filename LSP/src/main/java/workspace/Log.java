@@ -55,8 +55,9 @@ public class Log
 		if (out != null)
 		{
 			Calendar now = new GregorianCalendar();
-			out.printf("%02d:%02d:%02d: ",
-					now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.SECOND));
+			out.printf("%02d:%02d:%02d.%03d: ",
+					now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE),
+					now.get(Calendar.SECOND), now.get(Calendar.MILLISECOND));
 
 			out.printf(format, args);
 			out.print("\n");
@@ -67,5 +68,10 @@ public class Log
 	public static void error(String format, Object... args)
 	{
 		printf("ERROR: " + format, args);
+	}
+
+	public static void error(Exception e)
+	{
+		printf("EXCEPTION: %s", e.getMessage());
 	}
 }

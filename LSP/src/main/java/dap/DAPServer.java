@@ -23,15 +23,9 @@
 
 package dap;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
-
 import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.handlers.DisconnectHandler;
@@ -39,27 +33,25 @@ import dap.handlers.EvaluateHandler;
 import dap.handlers.InitializeHandler;
 import dap.handlers.LaunchHandler;
 import dap.handlers.SetBreakpointsHandler;
+import dap.handlers.StackTraceHandler;
 import dap.handlers.TerminateHandler;
 import dap.handlers.ThreadsHandler;
 import json.JSONObject;
-import json.JSONReader;
-import json.JSONWriter;
+import json.JSONServer;
 import workspace.Log;
 
-public class DAPServer
+public class DAPServer extends JSONServer
 {
 	private static DAPServer INSTANCE = null;
 	
-	private final InputStream inStream;
-	private final OutputStream outStream;
 	private final DAPServerState state;
 	private final DAPDispatcher dispatcher;
 	
 	public DAPServer(Dialect dialect, InputStream inStream, OutputStream outStream) throws IOException
 	{
+		super("DAP", inStream, outStream);
+		
 		INSTANCE = this;
-		this.inStream = inStream;
-		this.outStream = outStream;
 		this.state = new DAPServerState(dialect);
 		this.dispatcher = getDispatcher();
 	}
@@ -79,6 +71,7 @@ public class DAPServer
 		dispatcher.register("threads", new ThreadsHandler(state));
 		dispatcher.register("setBreakpoints", new SetBreakpointsHandler(state));
 		dispatcher.register("evaluate", new EvaluateHandler(state));
+		dispatcher.register("stackTrace", new StackTraceHandler(state));
 		dispatcher.register("disconnect", new DisconnectHandler(state));
 		dispatcher.register("terminate", new TerminateHandler(state));
 
@@ -92,6 +85,13 @@ public class DAPServer
 		while (state.isRunning())
 		{
 			JSONObject message = readMessage();
+			
+			if (message == null)	// EOF
+			{
+				Log.printf("End of stream detected");
+				break;
+			}
+			
 			DAPRequest request = new DAPRequest(message);
 			DAPMessageList responses = dispatcher.dispatch(request);
 			
@@ -103,44 +103,5 @@ public class DAPServer
 				}
 			}
 		}
-	}
-	
-	public JSONObject readMessage() throws IOException
-	{
-		BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
-		String contentLength = br.readLine();
-		br.readLine();	// blank separator
-		
-		if (contentLength == null)	// EOF
-		{
-			return null;
-		}
-		
-		int length = Integer.parseInt(contentLength.substring(16));	// Content-Length: NNNN
-		char[] bytes = new char[length];
-		int p = 0;
-		
-		for (int i=0; i<length; i++)
-		{
-			bytes[p++] = (char) br.read();
-		}
-
-		String message = new String(bytes);
-		Log.printf(">>> %s", message);
-		JSONReader jreader = new JSONReader(new StringReader(message));
-		return jreader.readObject();
-	}
-	
-	public void writeMessage(JSONObject response) throws IOException
-	{
-		StringWriter swout = new StringWriter();
-		JSONWriter jwriter = new JSONWriter(new PrintWriter(swout));
-		jwriter.writeObject(response);
-
-		String jout = swout.toString();
-		Log.printf("<<< %s", jout);
-		PrintWriter pwout = new PrintWriter(outStream);
-		pwout.printf("Content-Length: %d\r\n\r\n%s", jout.length(), jout);
-		pwout.flush();
 	}
 }

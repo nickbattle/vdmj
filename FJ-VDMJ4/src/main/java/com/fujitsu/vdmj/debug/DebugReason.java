@@ -21,9 +21,9 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.dbgp;
+package com.fujitsu.vdmj.debug;
 
-public enum DBGPReason
+public enum DebugReason
 {
 	OK, ERROR, ABORTED, EXCEPTION;
 

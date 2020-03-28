@@ -25,8 +25,8 @@ package com.fujitsu.vdmj.scheduler;
 
 import java.lang.reflect.InvocationTargetException;
 
-import com.fujitsu.vdmj.dbgp.DBGPReason;
 import com.fujitsu.vdmj.debug.DebugLink;
+import com.fujitsu.vdmj.debug.DebugReason;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -78,7 +78,7 @@ public class ObjectThread extends SchedulableThread
 
 		try
 		{
-			link.setCPU(operation.getCPU());
+			link.newThread(operation.getCPU());
 			ctxt.setThreadState(operation.getCPU());
 
 			if (breakAtStart)
@@ -88,7 +88,7 @@ public class ObjectThread extends SchedulableThread
 			}
 
 			operation.eval(ctxt.location, new ValueList(), ctxt);
-			link.complete(DBGPReason.OK, null);
+			link.complete(DebugReason.OK, null);
 		}
 		catch (ValueException e)
 		{
@@ -114,7 +114,7 @@ public class ObjectThread extends SchedulableThread
 		}
 		catch (ThreadDeath e)
 		{
-			link.complete(DBGPReason.ABORTED, null);
+			link.complete(DebugReason.ABORTED, null);
 			throw e;
 		}
 		finally

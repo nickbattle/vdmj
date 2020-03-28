@@ -21,43 +21,30 @@
  *
  ******************************************************************************/
 
-package lsp;
+package dap.handlers;
 
-import workspace.WorkspaceManager;
+import java.io.IOException;
 
-public class LSPServerState
+import dap.DAPHandler;
+import dap.DAPMessageList;
+import dap.DAPRequest;
+import dap.DAPServerState;
+import json.JSONArray;
+import json.JSONObject;
+
+public class StackTraceHandler extends DAPHandler
 {
-	private boolean running = false;
-	private boolean initialized = false;
-	private WorkspaceManager manager = null;
-	
-	public boolean isInitialized()
+	public StackTraceHandler(DAPServerState state)
 	{
-		return initialized;
+		super(state);
 	}
 	
-	public void setInitialized(boolean set)
+	@Override
+	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		initialized = set;
-	}
-
-	public WorkspaceManager getManager()
-	{
-		return manager;
-	}
-
-	public void setManager(WorkspaceManager manager)
-	{
-		this.manager = manager;
-	}
-
-	public void setRunning(boolean running)
-	{
-		this.running = running;
-	}
-
-	public boolean isRunning()
-	{
-		return running;
+		// When not in a debug session, we send back and empty list
+		// Compare with DAPDebugExecutor
+		return new DAPMessageList(request, true, "",
+			new JSONObject("stackFrames", new JSONArray(), "totalFrames", 0));
 	}
 }
