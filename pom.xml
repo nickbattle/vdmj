@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.fujitsu</groupId>
+	<artifactId>vdm</artifactId>
+	<packaging>pom</packaging>
+	<version>4.3.0</version>
+
+	<!-- sub modules -->
+	<modules>
+		<module>Annotations</module>
+		<module>Annotations2</module>
+		<module>DocPlugin</module>
+		<module>FJ-VDMJ4</module>
+		<module>FJ-VDMJC4</module>
+		<module>FJ-VDMJUnit4</module>
+		<module>LSP</module>
+	</modules>
+
+</project>
