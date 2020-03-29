@@ -28,6 +28,8 @@ import java.io.IOException;
 import com.fujitsu.vdmj.debug.ConsoleDebugLink;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugReason;
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.values.CPUValue;
 
@@ -74,6 +76,13 @@ public class DAPDebugLink extends ConsoleDebugLink
 		{
 			Log.error(e);
 		}
+	}
+	
+	@Override
+	public void stopped(Context ctxt, LexLocation location, Exception ex)
+	{
+		server.stderr(ex.getMessage() + "\n");
+		super.stopped(ctxt, location, ex);
 	}
 	
 	@Override
