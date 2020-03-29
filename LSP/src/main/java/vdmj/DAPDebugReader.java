@@ -62,7 +62,6 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	{
 		server = DAPServer.getInstance();
 		link = (DAPDebugLink)DebugLink.getInstance();
-		link.setExecutor(new DAPDebugExecutor());
 	}
 	
 	@Override

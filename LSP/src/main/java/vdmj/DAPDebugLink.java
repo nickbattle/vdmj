@@ -26,6 +26,7 @@ package vdmj;
 import java.io.IOException;
 
 import com.fujitsu.vdmj.debug.ConsoleDebugLink;
+import com.fujitsu.vdmj.debug.DebugExecutor;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugReason;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -53,7 +54,6 @@ public class DAPDebugLink extends ConsoleDebugLink
 		if (instance == null)
 		{
 			instance = new DAPDebugLink();
-			instance.setExecutor(new DAPDebugExecutor());
 		}
 		
 		return instance;
@@ -62,6 +62,12 @@ public class DAPDebugLink extends ConsoleDebugLink
 	private DAPDebugLink()
 	{
 		server = DAPServer.getInstance();
+	}
+	
+	@Override
+	public DebugExecutor getExecutor()
+	{
+		return new DAPDebugExecutor();
 	}
 	
 	@Override
@@ -81,7 +87,11 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void stopped(Context ctxt, LexLocation location, Exception ex)
 	{
-		server.stderr(ex.getMessage() + "\n");
+		if (ex != null)
+		{
+			server.stderr(ex.getMessage() + "\n");
+		}
+		
 		super.stopped(ctxt, location, ex);
 	}
 	
