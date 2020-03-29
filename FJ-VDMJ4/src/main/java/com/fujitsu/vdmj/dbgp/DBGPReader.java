@@ -58,6 +58,7 @@ import com.fujitsu.vdmj.VDMPP;
 import com.fujitsu.vdmj.VDMRT;
 import com.fujitsu.vdmj.VDMSL;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.debug.DebugExecutor;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugReason;
 import com.fujitsu.vdmj.in.INNode;
@@ -3050,5 +3051,11 @@ public class DBGPReader extends DebugLink
 		}
 		
 		Properties.parser_tabstop = 1;
+	}
+
+	@Override
+	public DebugExecutor getExecutor()
+	{
+		return null;	// Not used
 	}
 }

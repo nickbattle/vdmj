@@ -39,9 +39,6 @@ import com.fujitsu.vdmj.values.CPUValue;
  */
 abstract public class DebugLink
 {
-	/** Executor to run debug commands */
-	protected DebugExecutor debugExecutor;
-	
 	/**
 	 * Get the singleton. Delegates to static methods in the concrete classes.
 	 */
@@ -74,12 +71,9 @@ abstract public class DebugLink
 	}
 	
 	/**
-	 * Set the executor to handle commands.
+	 * Get an executor to handle commands.
 	 */
-	public void setExecutor(DebugExecutor debugExecutor)
-	{
-		this.debugExecutor = debugExecutor;
-	}
+	abstract public DebugExecutor getExecutor();
 
 	/**
 	 * Called by a thread when it is created.

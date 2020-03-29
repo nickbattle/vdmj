@@ -75,7 +75,6 @@ public class ConsoleDebugLink extends DebugLink
 		if (instance == null)
 		{
 			instance = new ConsoleDebugLink();
-			instance.setExecutor(new ConsoleDebugExecutor());
 		}
 		
 		return instance;
@@ -86,6 +85,12 @@ public class ConsoleDebugLink extends DebugLink
 		return;
 	}
 	
+	@Override
+	public DebugExecutor getExecutor()
+	{
+		return new ConsoleDebugExecutor();
+	}
+
 	/**
 	 * Wait for at least one thread to stop, so that it can be debugged.
 	 */
@@ -305,7 +310,8 @@ public class ConsoleDebugLink extends DebugLink
 			ctxt.setThreadState(CPUValue.vCPU);
 		}
 		
-		debugExecutor.setBreakpoint(location, ctxt);
+		DebugExecutor exec = getExecutor();
+		exec.setBreakpoint(location, ctxt);
 		
 		while (true)
 		{
@@ -328,13 +334,13 @@ public class ConsoleDebugLink extends DebugLink
 						
 					case PRINT:
 						suspendBreaks = true;
-						response = debugExecutor.run(request);
+						response = exec.run(request);
 						writeCommand(thread, response);
 						suspendBreaks = false;
 						break;
 
 					default:
-						response = debugExecutor.run(request);
+						response = exec.run(request);
 						writeCommand(thread, response);
 				}
 			}
