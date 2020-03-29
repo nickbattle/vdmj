@@ -1136,7 +1136,7 @@ public class DBGPReader extends DebugLink
 	}
 
 	@Override
-	public void stopped(Context ctxt, LexLocation location)
+	public void stopped(Context ctxt, LexLocation location, Exception ex)
 	{
 		if (location != null && ctxt != null)	// ie. thread has started
 		{

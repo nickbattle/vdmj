@@ -262,7 +262,7 @@ public class ConsoleDebugLink extends DebugLink
 	 * is pushed into the debugger with a suspendOthers call.
 	 */
 	@Override
-	public void stopped(Context ctxt, LexLocation location)
+	public void stopped(Context ctxt, LexLocation location, Exception ex)
 	{
 		if (!debugging || suspendBreaks)	// Not attached to a debugger or local eval
 		{
@@ -355,7 +355,7 @@ public class ConsoleDebugLink extends DebugLink
 		{
 			SchedulableThread thread = (SchedulableThread)Thread.currentThread();
 			breakpoints.put(thread, bp);
-			stopped(ctxt, bp.location);
+			stopped(ctxt, bp.location, null);
 		}
 	}
 	

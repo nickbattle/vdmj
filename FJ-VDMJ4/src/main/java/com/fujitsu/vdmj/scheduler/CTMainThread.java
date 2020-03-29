@@ -95,7 +95,7 @@ public class CTMainThread extends MainThread
 				setException(e);
 				suspendOthers();
 
-				DebugLink.getInstance().stopped(e.ctxt, e.location);
+				DebugLink.getInstance().stopped(e.ctxt, e.location, e);
 				result.add(Verdict.FAILED);
 			}
 			else

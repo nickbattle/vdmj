@@ -103,13 +103,13 @@ public class AsyncThread extends SchedulableThread
 		{
 			suspendOthers();
 			ResourceScheduler.setException(e);
-			link.stopped(e.ctxt, e.ctxt.location);
+			link.stopped(e.ctxt, e.ctxt.location, e);
 		}
 		catch (ContextException e)
 		{
 			suspendOthers();
 			ResourceScheduler.setException(e);
-			link.stopped(e.ctxt, e.location);
+			link.stopped(e.ctxt, e.location, e);
 		}
 		catch (Exception e)
 		{

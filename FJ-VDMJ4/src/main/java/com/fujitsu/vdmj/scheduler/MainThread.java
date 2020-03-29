@@ -85,7 +85,7 @@ public class MainThread extends SchedulableThread
 				e.ctxt.printStackFrames(Console.out);
 			}
 			
-			DebugLink.getInstance().stopped(e.ctxt, e.location);
+			DebugLink.getInstance().stopped(e.ctxt, e.location, e);
 		}
 		catch (Exception e)
 		{
