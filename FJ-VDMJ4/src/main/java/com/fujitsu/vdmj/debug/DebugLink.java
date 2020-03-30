@@ -39,9 +39,6 @@ import com.fujitsu.vdmj.values.CPUValue;
  */
 abstract public class DebugLink
 {
-	/** Executor to run debug commands */
-	protected DebugExecutor debugExecutor;
-	
 	/**
 	 * Get the singleton. Delegates to static methods in the concrete classes.
 	 */
@@ -74,12 +71,9 @@ abstract public class DebugLink
 	}
 	
 	/**
-	 * Set the executor to handle commands.
+	 * Get an executor to handle commands.
 	 */
-	public void setExecutor(DebugExecutor debugExecutor)
-	{
-		this.debugExecutor = debugExecutor;
-	}
+	abstract public DebugExecutor getExecutor();
 
 	/**
 	 * Called by a thread when it is created.
@@ -90,8 +84,9 @@ abstract public class DebugLink
 	 * Called by a thread which has stopped, but not at a breakpoint. For example,
 	 * when an exception occurs or deadlock is detected, or when a waiting thread
 	 * is pushed into the debugger with a suspendOthers call.
+	 * @param ex TODO
 	 */
-	abstract public void stopped(Context ctxt, LexLocation location);
+	abstract public void stopped(Context ctxt, LexLocation location, Exception ex);
 	
 	/**
 	 * Called by a thread which has stopped at a breakpoint.

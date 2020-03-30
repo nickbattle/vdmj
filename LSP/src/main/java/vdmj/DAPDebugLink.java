@@ -26,8 +26,11 @@ package vdmj;
 import java.io.IOException;
 
 import com.fujitsu.vdmj.debug.ConsoleDebugLink;
+import com.fujitsu.vdmj.debug.DebugExecutor;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugReason;
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.values.CPUValue;
 
@@ -51,7 +54,6 @@ public class DAPDebugLink extends ConsoleDebugLink
 		if (instance == null)
 		{
 			instance = new DAPDebugLink();
-			instance.setExecutor(new DAPDebugExecutor());
 		}
 		
 		return instance;
@@ -63,10 +65,17 @@ public class DAPDebugLink extends ConsoleDebugLink
 	}
 	
 	@Override
+	public DebugExecutor getExecutor()
+	{
+		return new DAPDebugExecutor();
+	}
+	
+	@Override
 	public void newThread(CPUValue cpu)
 	{
 		try
 		{
+			Log.printf("New thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
 			server.writeMessage(new DAPResponse("thread",
 				new JSONObject("reason", "started", "threadId", Thread.currentThread().getId())));
 		}
@@ -77,10 +86,22 @@ public class DAPDebugLink extends ConsoleDebugLink
 	}
 	
 	@Override
+	public void stopped(Context ctxt, LexLocation location, Exception ex)
+	{
+		if (ex != null)
+		{
+			server.stderr(ex.getMessage() + "\n");
+		}
+		
+		super.stopped(ctxt, location, ex);
+	}
+	
+	@Override
 	public void complete(DebugReason reason, ContextException exception)
 	{
 		try
 		{
+			Log.printf("End thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
 			server.writeMessage(new DAPResponse("thread",
 				new JSONObject("reason", "exited", "threadId", Thread.currentThread().getId())));
 		}

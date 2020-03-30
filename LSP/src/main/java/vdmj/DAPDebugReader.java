@@ -23,7 +23,9 @@
 
 package vdmj;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,18 +33,18 @@ import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugType;
 import com.fujitsu.vdmj.debug.TraceCallback;
-import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
+import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.DAPServer;
 import json.JSONArray;
 import json.JSONObject;
+import lsp.Utils;
 import workspace.Log;
 
 /**
@@ -54,29 +56,27 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	private final DAPDebugLink link;
 
 	private SchedulableThread debuggedThread = null;
-	private LexLocation lastLoc = null;
-	private SchedulableThread lastThread = null;
 	
 	public DAPDebugReader() throws Exception
 	{
+		setName("DAPDebugReader");
+		DAPDebugExecutor.init();
 		server = DAPServer.getInstance();
 		link = (DAPDebugLink)DebugLink.getInstance();
-		link.setExecutor(new DAPDebugExecutor());
 	}
 	
 	@Override
 	public void run()
 	{
-		setName("DAPDebugReader");
 		link.setTraceCallback(this);
 		
 		while (link.waitForStop())
 		{
 			try
 			{
-				lastThread = debuggedThread;
 				debuggedThread = link.getDebugThread();		// Initially bp thread
 				server.writeMessage(breakpointEvent(link.getBreakpoint(debuggedThread), debuggedThread));
+				server.writeMessage(text("[debug]> "));
 				while (doCommand());
 			}
 			catch (IOException e)
@@ -90,29 +90,44 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	{
 		try
 		{
-			Breakpoint bp   = link.getBreakpoint(debuggedThread);
-			LexLocation loc = link.getLocation(debuggedThread);
-			
-			if (bp != null && bp.number != 0)	// Zero is used for next/step breakpoints.
-			{
-				lastLoc = bp.location;
-			}
-			
-			if (!debuggedThread.equals(lastThread) || !loc.equals(lastLoc))
-			{
-				lastLoc = loc;
-			}
-			
 			JSONObject message = server.readMessage();
 			
-			if (message == null)	// EOF
+			if (message == null)	// EOF - closed socket?
 			{
 				Log.printf("End of stream detected");
+				link.killThreads();
 				return false;
 			}
 			
 			DAPRequest request = new DAPRequest(message);
+			
+			switch ((String)request.get("command"))
+			{
+				case "threads":
+					server.writeMessage(doThreads(request));
+					return true;
+					
+				case "setBreakpoints":
+					JSONObject arguments = request.get("arguments");
+					JSONObject source = arguments.get("source");
+					URI uri = Utils.fileToURI(new File((String)source.get("path")));
+					JSONArray lines = arguments.get("lines");
+					DAPMessageList responses = server.getState().getManager().setBreakpoints(request, uri, lines);
+					
+					for (JSONObject response: responses)
+					{
+						server.writeMessage(response);
+					}
+					
+					return true;
+				
+				default:
+					// process via the debug link...
+					break;
+			}
+			
 			DebugCommand command = parse(request);
+			SchedulableThread targetThread = threadFor(request);
 			
 			if (command.getType() == null)	// Ignore - payload is DAP response
 			{
@@ -120,42 +135,78 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				return true;
 			}
 			
-			switch (command.getType())
+			DebugCommand response = link.sendCommand(targetThread, command);
+			DAPResponse dapResp = new DAPResponse(request, true, null, response.getPayload());
+
+			switch (response.getType())
 			{
-				case THREADS:
-					server.writeMessage(doThreads(request));
+				case RESUME:
+					link.resumeThreads();
+					server.writeMessage(text("\n"));
+					server.writeMessage(dapResp);
+					return false;
+
+				case STOP:
+				case QUIT:
+				case TERMINATE:
+					link.killThreads();
+					server.writeMessage(dapResp);
+					return false;
+					
+				case DATA:
+					server.writeMessage(dapResp);
+					server.writeMessage(text("[debug]> "));
 					return true;
 
 				default:
-				{
-					DebugCommand response = link.sendCommand(debuggedThread, command);
-
-					switch (response.getType())
-					{
-						case RESUME:
-							link.resumeThreads();
-							server.writeMessage(new DAPResponse(request, true, null, response.getPayload()));
-							return false;
-
-						case STOP:
-						case QUIT:
-						case TERMINATE:
-							link.killThreads();
-							server.writeMessage(new DAPResponse(request, true, null, response.getPayload()));
-							return false;
-
-						default:
-							server.writeMessage(new DAPResponse(request, true, null, response.getPayload()));
-							return true;
-					}
-				}
+					server.writeMessage(dapResp);
+					return true;
 			}
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			Log.error(e);
 			return false;
 		}
+	}
+
+	private SchedulableThread threadFor(DAPRequest request)
+	{
+		String command = request.get("command");
+		JSONObject arguments = request.get("arguments");
+		Long th = arguments.get("threadId");
+		
+		switch (command)
+		{
+			case "continue":
+			case "stepIn":
+			case "stepOut":
+			case "next":
+			case "stackTrace":
+				return findThread(th);
+				
+			case "scopes":
+			case "variables":
+			default:
+				return debuggedThread;
+		}
+	}
+
+	private SchedulableThread findThread(Long th)
+	{
+		if (th != null)
+		{
+			for (SchedulableThread thread: link.getThreads())
+			{
+				if (thread.getId() == th.longValue())
+				{
+					return thread;
+				}
+			}
+		}
+
+		Log.printf("Cannot find thread %s", th);
+		return debuggedThread;
 	}
 
 	private DebugCommand parse(DAPRequest request) throws IOException
@@ -191,12 +242,6 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			case "variables":
 				return new DebugCommand(DebugType.DATA, request.get("arguments"));
 				
-			case "threads":
-				return DebugCommand.THREADS;
-				
-			case "setBreakpoints":
-				return new DebugCommand(null, new DAPResponse(request, false, "Unsupported at breakpoint", null));
-			
 			default:
 				return new DebugCommand(null, new DAPResponse(request, false, "Unsupported command: " + command, null));
 		}
@@ -239,7 +284,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		if (tp.condition == null)
 		{
 			String s = "Reached trace point [" + tp.number + "]";
-			Console.out.println(Thread.currentThread().getName() + ": " + s);
+			text(Thread.currentThread().getName() + ": " + s);
 		}
 		else
 		{
@@ -255,7 +300,12 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			}
 			
 			String s = tp.trace + " = " + result + " at trace point [" + tp.number + "]";
-			Console.out.println(Thread.currentThread().getName() + ": " + s);
+			text(Thread.currentThread().getName() + ": " + s);
 		}
+	}
+	
+	private DAPResponse text(String message)
+	{
+		return new DAPResponse("output", new JSONObject("output", message));
 	}
 }

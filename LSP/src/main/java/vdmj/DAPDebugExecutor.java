@@ -24,25 +24,43 @@
 package vdmj;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugExecutor;
 import com.fujitsu.vdmj.debug.DebugType;
+import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INHistoryExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.runtime.ClassContext;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.syntax.ParserException;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCMutexSyncDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.FieldValue;
+import com.fujitsu.vdmj.values.FunctionValue;
+import com.fujitsu.vdmj.values.NameValuePairMap;
+import com.fujitsu.vdmj.values.ObjectValue;
+import com.fujitsu.vdmj.values.OperationValue;
 import com.fujitsu.vdmj.values.RecordValue;
+import com.fujitsu.vdmj.values.ReferenceValue;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
@@ -65,6 +83,7 @@ public class DAPDebugExecutor implements DebugExecutor
 		public LexLocation location;
 		public String title;
 		public List<Scope> scopes = new Vector<Scope>();
+		public int outerId = 0;
 	}
 	
 	private static class Scope
@@ -81,22 +100,35 @@ public class DAPDebugExecutor implements DebugExecutor
 	
 	/** The interpreter */
 	private final Interpreter interpreter;
-
 	/** The location where the thread stopped. */
 	private LexLocation breakloc;
 	/** The context that was active when the thread stopped. */
 	private Context ctxt;
+	/** The frameId of the top of the cached ctxt stack */
+	private int topFrameId;
 
 	/** Representation of ctxt for DAP responses */
-	private Map<Integer, Frame> ctxtFrames;
-	private Map<Integer, Object> variablesReferences;
-	private int nextFrameId;
-	private int nextVariablesReference;
+	private static Map<Integer, Frame> ctxtFrames;
+	private static AtomicInteger nextFrameId;
+
+	private static Map<Integer, Object> variablesReferences;
+	private static AtomicInteger nextVariablesReference;
 
 
 	public DAPDebugExecutor()
 	{
 		interpreter = Interpreter.getInstance();
+	}
+	
+	public static void init()
+	{
+		variablesReferences = Collections.synchronizedMap(new LinkedHashMap<Integer, Object>());
+		nextVariablesReference = new AtomicInteger();
+		nextVariablesReference.set(1000);	// So we can tell them apart (roughly)
+
+		ctxtFrames = new LinkedHashMap<Integer, Frame>();
+		nextFrameId = new AtomicInteger();
+		nextFrameId.set(100);
 	}
 
 	@Override
@@ -251,21 +283,16 @@ public class DAPDebugExecutor implements DebugExecutor
 		long startFrame = arguments.get("startFrame");
 		long levels = arguments.get("levels");
 		
-		int totalFrames = ctxtFrames.size();
-		JSONObject stackResponse = null;
+		JSONArray frames = new JSONArray();
+		int frameId = topFrameId;
+		int totalFrames = 0;
 		
-		if (startFrame >= totalFrames)	// Not enough frames for startFrame?
+		while (frameId != 0)
 		{
-			stackResponse = new JSONObject("stackFrames", new JSONArray(), "totalFrames", totalFrames);
-		}
-		else
-		{
-			JSONArray frames = new JSONArray();
+			Frame frame = ctxtFrames.get(frameId);
 			
-			for (int frameId = (int) startFrame; frameId < totalFrames; frameId++)
+			if (totalFrames >= startFrame && frames.size() < levels)
 			{
-				Frame frame = ctxtFrames.get(frameId);
-				
 				frames.add(new JSONObject(
 						"id",		frame.frameId,
 						"name",		frame.title,
@@ -273,13 +300,13 @@ public class DAPDebugExecutor implements DebugExecutor
 						"line",		frame.location.startLine,
 						"column",	frame.location.startPos,
 						"moduleId",	frame.location.module));
-				
-				if (frames.size() >= levels) break;
 			}
 			
-			stackResponse = new JSONObject("stackFrames", frames, "totalFrames", totalFrames);
+			totalFrames++;
+			frameId = frame.outerId;
 		}
 		
+		JSONObject stackResponse = new JSONObject("stackFrames", frames, "totalFrames", totalFrames);
 		return new DebugCommand(DebugType.STACK, stackResponse);
 	}
 
@@ -327,6 +354,11 @@ public class DAPDebugExecutor implements DebugExecutor
 	private JSONArray referenceToVariables(Object var)
 	{
 		JSONArray variables = new JSONArray();
+		
+		if (var instanceof ReferenceValue)
+		{
+			var = ((ReferenceValue)var).deref();
+		}
 		
 		if (var instanceof Context)
 		{
@@ -384,22 +416,50 @@ public class DAPDebugExecutor implements DebugExecutor
 					);
 			}
 		}
+		else if (var instanceof ObjectValue)
+		{
+			ObjectValue obj = (ObjectValue)var;
+			NameValuePairMap all = obj.getMemberValues();
+			
+			for (TCNameToken name: all.keySet())
+			{
+				Value value = all.get(name);
+				
+				if (value instanceof FunctionValue ||
+					value instanceof OperationValue)
+				{
+					continue;	// skip func/op members
+				}
+				
+				variables.add(new JSONObject(
+						"name", name.toString(),
+						"value", value.toString(),
+						"variablesReference", valueToReference(value))
+					);
+			}
+		}
 		
 		return variables;
 	}
 
 	private Long valueToReference(Value value)
 	{
+		if (value instanceof ReferenceValue)
+		{
+			value = ((ReferenceValue)value).deref();
+		}
+
 		if (value instanceof RecordValue ||
 			value instanceof SetValue ||
-			value instanceof SeqValue)
+			value instanceof SeqValue ||
+			value instanceof ObjectValue)
 		{
-			int ref = nextVariablesReference;
-			variablesReferences.put(nextVariablesReference++, value);
+			int ref = nextVariablesReference.incrementAndGet();
+			variablesReferences.put(ref, value);
 			return (long) ref;
 		}
 		
-		return 0L;
+		return 0L;	// ie. no reference
 	}
 
 	private DebugCommand doStop()
@@ -414,45 +474,76 @@ public class DAPDebugExecutor implements DebugExecutor
 	
 	private void rebuildCache()
 	{
-		ctxtFrames = new HashMap<Integer, Frame>();
-		variablesReferences = new HashMap<Integer, Object>();
-		
-		nextFrameId = 0;				// Zero-relative for doStack
-		nextVariablesReference = 1;		// Zero reserved?
+		if (topFrameId != 0)	// release any old frames
+		{
+			int frameId = topFrameId;
+			
+			while (frameId != 0)
+			{
+				Frame frame = ctxtFrames.get(frameId);
+				ctxtFrames.remove(frameId);		// TODO clear references in scopes?
+				frameId = frame.outerId;
+			}
+		}
 		
 		Context c = ctxt;
 		LexLocation[] nextLoc = { breakloc };
+		Frame prevFrame = null;
 		
 		while (c != null)
 		{
-			Frame frame = new Frame(nextFrameId, nextLoc[0]);
-			ctxtFrames.put(nextFrameId, frame);
+			int frameId = nextFrameId.incrementAndGet();
+			Frame frame = new Frame(frameId, nextLoc[0]);
+			
+			if (prevFrame == null)
+			{
+				topFrameId = frameId;
+			}
+			else
+			{
+				prevFrame.outerId = frameId;
+			}
+			
+			ctxtFrames.put(frameId, frame);
 			c = buildScopes(c, frame, nextLoc);
-			nextFrameId++;
+			prevFrame = frame;
 		}
 		
-		// Dump to diags...
-		for (Integer frameId: ctxtFrames.keySet())
+		// Dump to diags...iii
+		synchronized (Log.class)
 		{
-			Frame frame = ctxtFrames.get(frameId);
-			Log.printf("======== Frame %s = %s:", frameId, frame.title);
+			Log.printf("++++++++ THREAD %s", ctxt.threadState.threadId);
+			int frameId = topFrameId;
 			
-			for (Scope scope: frame.scopes)
+			while (frameId != 0)
 			{
-				Log.printf("-------- Scope %s, vref %d:", scope.name, scope.vref);
-				c = (Context) variablesReferences.get(scope.vref);
+				Frame frame = ctxtFrames.get(frameId);
+				Log.printf("======== Frame %d = %s:", frameId, frame.title);
 				
-				for (TCNameToken name: c.keySet())
+				for (Scope scope: frame.scopes)
 				{
-					Value value = c.get(name);
-					Log.printf("%s = %s", name, value);
+					Log.printf("-------- Scope %s, vref %d:", scope.name, scope.vref);
+					c = (Context) variablesReferences.get(scope.vref);
+					
+					for (TCNameToken name: c.keySet())
+					{
+						Value value = c.get(name);
+						Log.printf("%s = %s", name, value);
+					}
 				}
+				
+				frameId = frame.outerId;
 			}
 		}
 	}
 	
 	private Context buildScopes(Context c, Frame frame, LexLocation[] nextLoc)
 	{
+		if (c.guardOp != null)
+		{
+			buildGuards(c, frame);
+		}
+		
 		Context arguments = buildLocals(c, frame);
 		
 		if (arguments != null)
@@ -464,6 +555,81 @@ public class DAPDebugExecutor implements DebugExecutor
 		return arguments;
 	}
 	
+	private void buildGuards(Context c, Frame frame)
+	{
+		if (c instanceof ObjectContext)
+		{
+			Context guards = new Context(frame.location, "Guards", null);
+			ObjectContext octxt = (ObjectContext)c;
+			int line = breakloc.startLine;
+			String opname = c.guardOp.name.getName();
+
+			for (TCDefinition d: octxt.self.type.classdef.definitions)
+			{
+				if (d instanceof TCPerSyncDefinition)
+				{
+					try
+					{
+						TCPerSyncDefinition pdef = (TCPerSyncDefinition)d;
+						INExpression guard = ClassMapper.getInstance(INNode.MAPPINGS).convert(pdef.guard);
+
+						if (pdef.opname.getName().equals(opname) ||
+							pdef.location.startLine == line ||
+							guard.findExpression(line) != null)
+						{
+							for (INExpression sub: guard.getSubExpressions())
+							{
+								if (sub instanceof INHistoryExpression)
+								{
+									INHistoryExpression hexp = (INHistoryExpression)sub;
+									Value v = hexp.eval(octxt);
+									TCNameToken name =
+										new TCNameToken(pdef.location, octxt.self.type.name.getModule(),
+											hexp.toString());
+									guards.put(name, v);
+								}
+							}
+						}
+					}
+					catch (Exception e)
+					{
+						Log.error(e);
+					}
+				}
+				else if (d instanceof TCMutexSyncDefinition)
+				{
+					TCMutexSyncDefinition mdef = (TCMutexSyncDefinition)d;
+
+    				for (TCNameToken mop: mdef.operations)
+    				{
+    					if (mop.getName().equals(opname))
+    					{
+            				for (TCNameToken op: mdef.operations)
+            				{
+            					TCNameList ops = new TCNameList(op);
+            					INHistoryExpression hexp = new INHistoryExpression(mdef.location, Token.ACTIVE, ops);
+            					Value v = hexp.eval(octxt);
+        						TCNameToken name =
+        							new TCNameToken(mdef.location, octxt.self.type.name.getModule(),
+        								hexp.toString());
+        						guards.put(name, v);
+            				}
+
+            				break;
+    					}
+    				}
+				}
+			}
+			
+			if (!guards.isEmpty())
+			{
+				int vref = nextVariablesReference.incrementAndGet();
+				variablesReferences.put(vref, guards);
+				frame.scopes.add(new Scope("Guards", vref));
+			}
+		}
+	}
+
 	private RootContext buildLocals(Context c, Frame frame)
 	{
 		Context locals = new Context(frame.location, "Locals", null);
@@ -476,9 +642,9 @@ public class DAPDebugExecutor implements DebugExecutor
 
 		if (!locals.isEmpty())
 		{
-			variablesReferences.put(nextVariablesReference, locals);
-			frame.scopes.add(new Scope("Locals", nextVariablesReference));
-			nextVariablesReference++;
+			int vref = nextVariablesReference.incrementAndGet();
+			variablesReferences.put(vref, locals);
+			frame.scopes.add(new Scope("Locals", vref));
 		}
 		
 		return (RootContext) c;
@@ -497,17 +663,29 @@ public class DAPDebugExecutor implements DebugExecutor
 			
 			if (s.stateCtxt != null)	// module's state variables
 			{
-				variablesReferences.put(nextVariablesReference, s.stateCtxt);
-				frame.scopes.add(new Scope("State", nextVariablesReference));
-				nextVariablesReference++;
+				int vref = nextVariablesReference.incrementAndGet();
+				variablesReferences.put(vref, s.stateCtxt);
+				frame.scopes.add(new Scope("State", vref));
+			}
+		}
+		else if (c instanceof ClassContext)
+		{
+			ClassContext s = (ClassContext)c;
+			Context statics = s.classdef.getStatics();
+			
+			if (!statics.isEmpty())
+			{
+				int vref = nextVariablesReference.incrementAndGet();
+				variablesReferences.put(vref, statics);
+				frame.scopes.add(new Scope("Statics", vref));
 			}
 		}
 
 		if (!arguments.isEmpty())
 		{
-			variablesReferences.put(nextVariablesReference, arguments);
-			frame.scopes.add(new Scope(title, nextVariablesReference));
-			nextVariablesReference++;
+			int vref = nextVariablesReference.incrementAndGet();
+			variablesReferences.put(vref, arguments);
+			frame.scopes.add(new Scope(title, vref));
 		}
 
 		frame.title = c.title;

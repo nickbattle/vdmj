@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
+import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.scheduler.Signal;
@@ -75,7 +76,6 @@ public class ConsoleDebugLink extends DebugLink
 		if (instance == null)
 		{
 			instance = new ConsoleDebugLink();
-			instance.setExecutor(new ConsoleDebugExecutor());
 		}
 		
 		return instance;
@@ -86,6 +86,12 @@ public class ConsoleDebugLink extends DebugLink
 		return;
 	}
 	
+	@Override
+	public DebugExecutor getExecutor()
+	{
+		return new ConsoleDebugExecutor();
+	}
+
 	/**
 	 * Wait for at least one thread to stop, so that it can be debugged.
 	 */
@@ -213,6 +219,7 @@ public class ConsoleDebugLink extends DebugLink
 		stopped.clear();
 		breakpoints.clear();
 		locations.clear();
+		guardops.clear();
 	}
 
 	/**
@@ -262,7 +269,7 @@ public class ConsoleDebugLink extends DebugLink
 	 * is pushed into the debugger with a suspendOthers call.
 	 */
 	@Override
-	public void stopped(Context ctxt, LexLocation location)
+	public void stopped(Context ctxt, LexLocation location, Exception ex)
 	{
 		if (!debugging || suspendBreaks)	// Not attached to a debugger or local eval
 		{
@@ -281,9 +288,9 @@ public class ConsoleDebugLink extends DebugLink
 			locations.put(thread, location);
 		}
 		
-		if (ctxt != null)
+		synchronized (guardops)
 		{
-			synchronized (guardops)
+			if (ctxt != null && ctxt.guardOp != null)
 			{
 				guardops.put(thread, ctxt.guardOp);
 			}
@@ -301,18 +308,18 @@ public class ConsoleDebugLink extends DebugLink
 		
 		if (ctxt == null)		// Stopped before it started!
 		{
-			ctxt = new Context(location, "Empty Context", null);
+			ctxt = new StateContext(location, "New thread", null, null);
 			ctxt.setThreadState(CPUValue.vCPU);
 		}
 		
-		debugExecutor.setBreakpoint(location, ctxt);
+		DebugExecutor exec = getExecutor();
+		exec.setBreakpoint(location, ctxt);
 		
 		while (true)
 		{
 			try
 			{
 				DebugCommand request = readCommand(thread);
-				DebugCommand response = null;
 				
 				switch (request.getType())
 				{
@@ -328,14 +335,12 @@ public class ConsoleDebugLink extends DebugLink
 						
 					case PRINT:
 						suspendBreaks = true;
-						response = debugExecutor.run(request);
-						writeCommand(thread, response);
+						writeCommand(thread, exec.run(request));
 						suspendBreaks = false;
 						break;
 
 					default:
-						response = debugExecutor.run(request);
-						writeCommand(thread, response);
+						writeCommand(thread, exec.run(request));
 				}
 			}
 			catch (InterruptedException e)
@@ -355,7 +360,7 @@ public class ConsoleDebugLink extends DebugLink
 		{
 			SchedulableThread thread = (SchedulableThread)Thread.currentThread();
 			breakpoints.put(thread, bp);
-			stopped(ctxt, bp.location);
+			stopped(ctxt, bp.location, null);
 		}
 	}
 	

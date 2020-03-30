@@ -61,6 +61,11 @@ public class DAPServer extends JSONServer
 		return INSTANCE;
 	}
 	
+	public DAPServerState getState()
+	{
+		return state;
+	}
+	
 	private DAPDispatcher getDispatcher() throws IOException
 	{
 		DAPDispatcher dispatcher = new DAPDispatcher();
@@ -102,6 +107,32 @@ public class DAPServer extends JSONServer
 					writeMessage(response);
 				}
 			}
+		}
+	}
+	
+	public void stdout(String message)
+	{
+		try
+		{
+			writeMessage(new DAPResponse("output", new JSONObject("category", "stdout", "output", message)));
+		}
+		catch (IOException e)
+		{
+			Log.error(e);
+			Log.printf("%s", message);
+		}
+	}
+
+	public void stderr(String message)
+	{
+		try
+		{
+			writeMessage(new DAPResponse("output", new JSONObject("category", "stderr", "output", message)));
+		}
+		catch (IOException e)
+		{
+			Log.error(e);
+			Log.printf("%s", message);
 		}
 	}
 }
