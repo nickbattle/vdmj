@@ -513,14 +513,6 @@ public class DAPDebugExecutor implements DebugExecutor
 		synchronized (Log.class)
 		{
 			Log.printf("++++++++ THREAD %s", ctxt.threadState.threadId);
-			c = ctxt;
-			
-			while (c != null)
-			{
-				Log.printf("ctxt: %s %s", c.title, c.location);
-				c = c.outer;
-			}
-			
 			int frameId = topFrameId;
 			
 			while (frameId != 0)
