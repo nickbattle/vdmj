@@ -1,10 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>vdmj</groupId>
-  <artifactId>lsp</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>LSP</name>
-  <description>VDMJ LSP Server</description>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>vdmj</groupId>
+	<artifactId>lsp</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>LSP</name>
+	<description>VDMJ LSP Server</description>
+
+	<properties>
+		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
+	</properties>
+
 	<developers>
 		<developer>
 			<id>NickBattle</id>
@@ -49,6 +56,31 @@
 						<include>**/*Test.java</include>
 					</includes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.2</version>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<archive>
+								<manifestEntries>
+									<Main-Class>lsp.LSPServerSocket</Main-Class>
+									<Implementation-Version>${project.version} build ${maven.build.timestamp}</Implementation-Version>
+									<Class-Path>.</Class-Path>
+								</manifestEntries>
+							</archive>
+							<finalName>
+								${project.artifactId}-${project.version}-${maven.build.timestamp}
+							</finalName>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
