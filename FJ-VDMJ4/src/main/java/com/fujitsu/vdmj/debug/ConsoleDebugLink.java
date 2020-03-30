@@ -219,6 +219,7 @@ public class ConsoleDebugLink extends DebugLink
 		stopped.clear();
 		breakpoints.clear();
 		locations.clear();
+		guardops.clear();
 	}
 
 	/**
