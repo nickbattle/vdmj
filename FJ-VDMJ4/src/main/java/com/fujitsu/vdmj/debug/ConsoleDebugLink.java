@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
+import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.scheduler.Signal;
@@ -286,9 +287,9 @@ public class ConsoleDebugLink extends DebugLink
 			locations.put(thread, location);
 		}
 		
-		if (ctxt != null)
+		synchronized (guardops)
 		{
-			synchronized (guardops)
+			if (ctxt != null && ctxt.guardOp != null)
 			{
 				guardops.put(thread, ctxt.guardOp);
 			}
@@ -306,7 +307,7 @@ public class ConsoleDebugLink extends DebugLink
 		
 		if (ctxt == null)		// Stopped before it started!
 		{
-			ctxt = new Context(location, "Empty Context", null);
+			ctxt = new StateContext(location, "New thread", null, null);
 			ctxt.setThreadState(CPUValue.vCPU);
 		}
 		
@@ -318,7 +319,6 @@ public class ConsoleDebugLink extends DebugLink
 			try
 			{
 				DebugCommand request = readCommand(thread);
-				DebugCommand response = null;
 				
 				switch (request.getType())
 				{
@@ -334,14 +334,12 @@ public class ConsoleDebugLink extends DebugLink
 						
 					case PRINT:
 						suspendBreaks = true;
-						response = exec.run(request);
-						writeCommand(thread, response);
+						writeCommand(thread, exec.run(request));
 						suspendBreaks = false;
 						break;
 
 					default:
-						response = exec.run(request);
-						writeCommand(thread, response);
+						writeCommand(thread, exec.run(request));
 				}
 			}
 			catch (InterruptedException e)
