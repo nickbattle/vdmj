@@ -75,6 +75,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 	{
 		try
 		{
+			Log.printf("New thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
 			server.writeMessage(new DAPResponse("thread",
 				new JSONObject("reason", "started", "threadId", Thread.currentThread().getId())));
 		}
@@ -100,6 +101,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 	{
 		try
 		{
+			Log.printf("End thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
 			server.writeMessage(new DAPResponse("thread",
 				new JSONObject("reason", "exited", "threadId", Thread.currentThread().getId())));
 		}

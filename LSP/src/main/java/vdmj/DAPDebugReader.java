@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugType;
 import com.fujitsu.vdmj.debug.TraceCallback;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Tracepoint;
@@ -60,6 +59,8 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	
 	public DAPDebugReader() throws Exception
 	{
+		setName("DAPDebugReader");
+		DAPDebugExecutor.init();
 		server = DAPServer.getInstance();
 		link = (DAPDebugLink)DebugLink.getInstance();
 	}
@@ -67,7 +68,6 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	@Override
 	public void run()
 	{
-		setName("DAPDebugReader");
 		link.setTraceCallback(this);
 		
 		while (link.waitForStop())
@@ -92,9 +92,10 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		{
 			JSONObject message = server.readMessage();
 			
-			if (message == null)	// EOF
+			if (message == null)	// EOF - closed socket?
 			{
 				Log.printf("End of stream detected");
+				link.killThreads();
 				return false;
 			}
 			
@@ -126,6 +127,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			}
 			
 			DebugCommand command = parse(request);
+			SchedulableThread targetThread = threadFor(request);
 			
 			if (command.getType() == null)	// Ignore - payload is DAP response
 			{
@@ -133,7 +135,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				return true;
 			}
 			
-			DebugCommand response = link.sendCommand(debuggedThread, command);
+			DebugCommand response = link.sendCommand(targetThread, command);
 			DAPResponse dapResp = new DAPResponse(request, true, null, response.getPayload());
 
 			switch (response.getType())
@@ -166,6 +168,45 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			Log.error(e);
 			return false;
 		}
+	}
+
+	private SchedulableThread threadFor(DAPRequest request)
+	{
+		String command = request.get("command");
+		JSONObject arguments = request.get("arguments");
+		Long th = arguments.get("threadId");
+		
+		switch (command)
+		{
+			case "continue":
+			case "stepIn":
+			case "stepOut":
+			case "next":
+			case "stackTrace":
+				return findThread(th);
+				
+			case "scopes":
+			case "variables":
+			default:
+				return debuggedThread;
+		}
+	}
+
+	private SchedulableThread findThread(Long th)
+	{
+		if (th != null)
+		{
+			for (SchedulableThread thread: link.getThreads())
+			{
+				if (thread.getId() == th.longValue())
+				{
+					return thread;
+				}
+			}
+		}
+
+		Log.printf("Cannot find thread %s", th);
+		return debuggedThread;
 	}
 
 	private DebugCommand parse(DAPRequest request) throws IOException
@@ -243,7 +284,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		if (tp.condition == null)
 		{
 			String s = "Reached trace point [" + tp.number + "]";
-			Console.out.println(Thread.currentThread().getName() + ": " + s);
+			text(Thread.currentThread().getName() + ": " + s);
 		}
 		else
 		{
@@ -259,7 +300,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			}
 			
 			String s = tp.trace + " = " + result + " at trace point [" + tp.number + "]";
-			Console.out.println(Thread.currentThread().getName() + ": " + s);
+			text(Thread.currentThread().getName() + ": " + s);
 		}
 	}
 	
