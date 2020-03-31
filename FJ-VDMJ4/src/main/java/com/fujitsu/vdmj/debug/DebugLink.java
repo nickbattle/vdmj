@@ -73,7 +73,7 @@ abstract public class DebugLink
 	/**
 	 * Get an executor to handle commands.
 	 */
-	abstract public DebugExecutor getExecutor();
+	abstract public DebugExecutor getExecutor(LexLocation location, Context ctxt);
 
 	/**
 	 * Called by a thread when it is created.

@@ -3054,7 +3054,7 @@ public class DBGPReader extends DebugLink
 	}
 
 	@Override
-	public DebugExecutor getExecutor()
+	public DebugExecutor getExecutor(LexLocation location, Context ctxt)
 	{
 		return null;	// Not used
 	}

@@ -41,9 +41,9 @@ import com.fujitsu.vdmj.syntax.ParserException;
 public class ConsoleDebugExecutor implements DebugExecutor
 {
 	/** The location where the thread stopped. */
-	private LexLocation breakloc;
+	private final LexLocation breakloc;
 	/** The context that was active when the thread stopped. */
-	private Context ctxt;
+	private final Context ctxt;
 	/** The interpreter */
 	private final Interpreter interpreter;
 	
@@ -53,17 +53,9 @@ public class ConsoleDebugExecutor implements DebugExecutor
 	/** The number of stack levels moved down. */
 	private int frame = 0;
 
-	public ConsoleDebugExecutor()
+	public ConsoleDebugExecutor(LexLocation breakloc, Context ctxt)
 	{
 		this.interpreter = Interpreter.getInstance();
-	}
-
-	/**
-	 * Change the debug command handler.
-	 */
-	@Override
-	public void setBreakpoint(LexLocation breakloc, Context ctxt)
-	{
 		this.breakloc = breakloc;
 		this.ctxt = ctxt;
 	}
@@ -160,7 +152,7 @@ public class ConsoleDebugExecutor implements DebugExecutor
 		try
 		{
 			ctxt.threadState.setAtomic(true);
-   			return new DebugCommand(DebugType.DATA, expr + " = " + interpreter.evaluate(expr, getFrame()));
+   			return new DebugCommand(DebugType.PRINT, expr + " = " + interpreter.evaluate(expr, getFrame()));
 		}
 		catch (ParserException e)
 		{

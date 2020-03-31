@@ -87,9 +87,9 @@ public class ConsoleDebugLink extends DebugLink
 	}
 	
 	@Override
-	public DebugExecutor getExecutor()
+	public DebugExecutor getExecutor(LexLocation location, Context ctxt)
 	{
-		return new ConsoleDebugExecutor();
+		return new ConsoleDebugExecutor(location, ctxt);
 	}
 
 	/**
@@ -312,8 +312,7 @@ public class ConsoleDebugLink extends DebugLink
 			ctxt.setThreadState(CPUValue.vCPU);
 		}
 		
-		DebugExecutor exec = getExecutor();
-		exec.setBreakpoint(location, ctxt);
+		DebugExecutor exec = getExecutor(location, ctxt);
 		
 		while (true)
 		{
