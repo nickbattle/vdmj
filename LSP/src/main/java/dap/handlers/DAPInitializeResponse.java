@@ -27,11 +27,11 @@ import dap.DAPRequest;
 import dap.DAPResponse;
 import json.JSONObject;
 
-public class InitializeResponse extends DAPResponse
+public class DAPInitializeResponse extends DAPResponse
 {
 	private static final long serialVersionUID = 1L;
 	
-	public InitializeResponse(DAPRequest request)
+	public DAPInitializeResponse(DAPRequest request)
 	{
 		super(request, true, null, getServerCapabilities());
 	}

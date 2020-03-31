@@ -26,7 +26,6 @@ package lsp;
 import java.io.IOException;
 
 import rpc.RPCRequest;
-import rpc.RPCResponse;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 
@@ -42,14 +41,12 @@ public class InitializeHandler extends LSPHandler
 	{
 		if ("initialize".equals(request.getMethod()))
 		{
-			RPCMessageList resp = lspServerState.getManager().initialize(request);
-			resp.add(new RPCResponse(request, new InitializeResponse()));
-			return resp;
+			return lspServerState.getManager().lspInitialize(request);
 		}
 		else if ("initialized".equals(request.getMethod()))
 		{
 			lspServerState.setInitialized(true);
-			return lspServerState.getManager().initialized(request);
+			return lspServerState.getManager().lspInitialized(request);
 		}
 		
 		return new RPCMessageList(request, RPCErrors.InternalError, "Unexpected initialize message");

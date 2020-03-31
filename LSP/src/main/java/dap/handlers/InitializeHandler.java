@@ -25,7 +25,6 @@ package dap.handlers;
 
 import java.io.IOException;
 
-import dap.DAPEvent;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -43,9 +42,7 @@ public class InitializeHandler extends DAPHandler
 	{
 		if ("initialize".equals(request.get("command")))
 		{
-			DAPMessageList resp = dapServerState.getManager().initialize(request);
-			resp.add(new DAPEvent("initialized", null));
-			return resp;
+			return dapServerState.getManager().dapInitialize(request);
 		}
 		else if ("configurationDone".equals(request.get("command")))
 		{

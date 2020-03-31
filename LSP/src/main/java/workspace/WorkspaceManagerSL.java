@@ -194,17 +194,20 @@ public class WorkspaceManagerSL extends WorkspaceManager
 		JSONArray results = new JSONArray();
 		File file = new File(uri);
 		
-		for (TCModule module: tcModuleList)
+		if (tcModuleList != null)	// May be syntax errors
 		{
-			if (module.files.contains(file))
+			for (TCModule module: tcModuleList)
 			{
-				results.add(symbolInformation(module.name, SymbolKind.Module, null));
-				
-				for (TCDefinition def: module.defs)
+				if (module.files.contains(file))
 				{
-					for (TCDefinition indef: def.getDefinitions())
+					results.add(symbolInformation(module.name, SymbolKind.Module, null));
+
+					for (TCDefinition def: module.defs)
 					{
-						results.add(symbolInformation(indef.name, indef.getType(), SymbolKind.kindOf(indef), indef.location.module));
+						for (TCDefinition indef: def.getDefinitions())
+						{
+							results.add(symbolInformation(indef.name, indef.getType(), SymbolKind.kindOf(indef), indef.location.module));
+						}
 					}
 				}
 			}
