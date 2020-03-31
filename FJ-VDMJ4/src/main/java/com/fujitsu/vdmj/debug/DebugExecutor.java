@@ -23,15 +23,10 @@
 
 package com.fujitsu.vdmj.debug;
 
-import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.runtime.Context;
-
 /**
- * Implemented by classes to process one debugger command.
+ * Implemented by classes to process debugger commands in the context of one frame.
  */
 public interface DebugExecutor
 {
 	public DebugCommand run(DebugCommand request);
-	
-	public void setBreakpoint(LexLocation breakloc, Context ctxt);
 }

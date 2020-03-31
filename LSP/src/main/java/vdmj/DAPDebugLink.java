@@ -65,9 +65,9 @@ public class DAPDebugLink extends ConsoleDebugLink
 	}
 	
 	@Override
-	public DebugExecutor getExecutor()
+	public DebugExecutor getExecutor(LexLocation location, Context ctxt)
 	{
-		return new DAPDebugExecutor();
+		return new DAPDebugExecutor(location, ctxt);
 	}
 	
 	@Override

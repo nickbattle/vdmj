@@ -43,8 +43,10 @@ public enum DebugType
 	HELP,
 	PRINT,
 	
+	SCOPES,
+	VARIABLES,
+	
 	ACK,
-	DATA,
 	RESUME,
 	TERMINATE,
 	ERROR
