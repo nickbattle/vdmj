@@ -193,17 +193,20 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		JSONArray results = new JSONArray();
 		File file = new File(uri);
 		
-		for (TCClassDefinition clazz: tcClassList)
+		if (tcClassList != null)	// May be syntax errors
 		{
-			if (clazz.location.file.equals(file))
+			for (TCClassDefinition clazz: tcClassList)
 			{
-				results.add(symbolInformation(clazz.name, clazz.getType(), SymbolKind.Class, null));
-				
-				for (TCDefinition def: clazz.definitions)
+				if (clazz.location.file.equals(file))
 				{
-					for (TCDefinition indef: def.getDefinitions())
+					results.add(symbolInformation(clazz.name, clazz.getType(), SymbolKind.Class, null));
+					
+					for (TCDefinition def: clazz.definitions)
 					{
-						results.add(symbolInformation(indef.name, indef.getType(), SymbolKind.kindOf(indef), indef.location.module));
+						for (TCDefinition indef: def.getDefinitions())
+						{
+							results.add(symbolInformation(indef.name, indef.getType(), SymbolKind.kindOf(indef), indef.location.module));
+						}
 					}
 				}
 			}
