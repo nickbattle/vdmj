@@ -474,17 +474,17 @@ public class DAPDebugExecutor implements DebugExecutor
 	
 	private void rebuildCache()
 	{
-		if (topFrameId != 0)	// release any old frames
-		{
-			int frameId = topFrameId;
-			
-			while (frameId != 0)
-			{
-				Frame frame = ctxtFrames.get(frameId);
-				ctxtFrames.remove(frameId);		// TODO clear references in scopes?
-				frameId = frame.outerId;
-			}
-		}
+//		if (topFrameId != 0)	// release any old frames
+//		{
+//			int frameId = topFrameId;
+//			
+//			while (frameId != 0)
+//			{
+//				Frame frame = ctxtFrames.get(frameId);
+//				ctxtFrames.remove(frameId);		// TODO clear references in scopes?
+//				frameId = frame.outerId;
+//			}
+//		}
 		
 		Context c = ctxt;
 		LexLocation[] nextLoc = { breakloc };
