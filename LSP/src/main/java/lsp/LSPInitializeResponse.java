@@ -25,11 +25,11 @@ package lsp;
 
 import json.JSONObject;
 
-public class InitializeResponse extends JSONObject
+public class LSPInitializeResponse extends JSONObject
 {
 	private static final long serialVersionUID = 1L;
 	
-	public InitializeResponse()
+	public LSPInitializeResponse()
 	{
 		put("serverInfo", new JSONObject("name", "VDMJ LSP Server", "version", "0.1"));
 		put("capabilities", getServerCapabilities());

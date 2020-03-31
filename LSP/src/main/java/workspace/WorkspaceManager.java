@@ -53,16 +53,19 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.Value;
 
+import dap.DAPEvent;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
-import dap.handlers.InitializeResponse;
+import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
+import lsp.LSPInitializeResponse;
 import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import rpc.RPCResponse;
 import vdmj.DAPDebugReader;
 
 public abstract class WorkspaceManager
@@ -98,7 +101,7 @@ public abstract class WorkspaceManager
 		}
 	}
 
-	public RPCMessageList initialize(RPCRequest request)
+	public RPCMessageList lspInitialize(RPCRequest request)
 	{
 		try
 		{
@@ -107,7 +110,10 @@ public abstract class WorkspaceManager
 			openFiles.clear();
 			Properties.init();
 			loadProjectFiles(new File(rootUri));
-			return new RPCMessageList();
+			
+			RPCMessageList responses = new RPCMessageList();
+			responses.add(new RPCResponse(request, new LSPInitializeResponse()));
+			return responses;
 		}
 		catch (URISyntaxException e)
 		{
@@ -119,7 +125,7 @@ public abstract class WorkspaceManager
 		}
 	}
 
-	public RPCMessageList initialized(RPCRequest request)
+	public RPCMessageList lspInitialized(RPCRequest request)
 	{
 		try
 		{
@@ -131,9 +137,12 @@ public abstract class WorkspaceManager
 		}
 	}
 
-	public DAPMessageList initialize(DAPRequest request)
+	public DAPMessageList dapInitialize(DAPRequest request)
 	{
-		return new DAPMessageList(new InitializeResponse(request));
+		DAPMessageList responses = new DAPMessageList();
+		responses.add(new DAPInitializeResponse(request));
+		responses.add(new DAPEvent("initialized", null));
+		return responses;
 	}
 
 	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName)
