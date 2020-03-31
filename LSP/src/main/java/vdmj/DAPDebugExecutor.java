@@ -56,6 +56,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.FieldValue;
 import com.fujitsu.vdmj.values.FunctionValue;
+import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.NameValuePairMap;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.OperationValue;
@@ -63,6 +64,7 @@ import com.fujitsu.vdmj.values.RecordValue;
 import com.fujitsu.vdmj.values.ReferenceValue;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.SetValue;
+import com.fujitsu.vdmj.values.TupleValue;
 import com.fujitsu.vdmj.values.Value;
 
 import json.JSONArray;
@@ -101,9 +103,9 @@ public class DAPDebugExecutor implements DebugExecutor
 	/** The interpreter */
 	private final Interpreter interpreter;
 	/** The location where the thread stopped. */
-	private LexLocation breakloc;
+	private final LexLocation breakloc;
 	/** The context that was active when the thread stopped. */
-	private Context ctxt;
+	private final Context ctxt;
 	/** The frameId of the top of the cached ctxt stack */
 	private int topFrameId;
 
@@ -115,9 +117,13 @@ public class DAPDebugExecutor implements DebugExecutor
 	private static AtomicInteger nextVariablesReference;
 
 
-	public DAPDebugExecutor()
+	public DAPDebugExecutor(LexLocation breakloc, Context ctxt)
 	{
-		interpreter = Interpreter.getInstance();
+		this.interpreter = Interpreter.getInstance();
+		this.breakloc = breakloc;
+		this.ctxt = ctxt;
+		
+		buildCache();
 	}
 	
 	public static void init()
@@ -126,18 +132,9 @@ public class DAPDebugExecutor implements DebugExecutor
 		nextVariablesReference = new AtomicInteger();
 		nextVariablesReference.set(1000);	// So we can tell them apart (roughly)
 
-		ctxtFrames = new LinkedHashMap<Integer, Frame>();
+		ctxtFrames = Collections.synchronizedMap(new LinkedHashMap<Integer, Frame>());
 		nextFrameId = new AtomicInteger();
 		nextFrameId.set(100);
-	}
-
-	@Override
-	public void setBreakpoint(LexLocation breakloc, Context ctxt)
-	{
-		this.breakloc = breakloc;
-		this.ctxt = ctxt;
-		
-		rebuildCache();
 	}
 
 	/**
@@ -177,8 +174,12 @@ public class DAPDebugExecutor implements DebugExecutor
 					result = doStack(request);
 					break;
 					
-				case DATA:	// scopes and variablesReferences
-					result = doData(request);
+				case SCOPES:
+					result = doScopes(request);
+					break;
+					
+				case VARIABLES:
+					result = doVariables(request);
 					break;
 					
 				case STEP:
@@ -250,7 +251,7 @@ public class DAPDebugExecutor implements DebugExecutor
 			ctxt.threadState.setAtomic(false);
 		}
 
-		return new DebugCommand(DebugType.DATA, new JSONObject("result", answer, "variablesReference", 0));
+		return new DebugCommand(DebugType.PRINT, new JSONObject("result", answer, "variablesReference", 0));
 	}
 
 	private DebugCommand doStep()
@@ -308,19 +309,6 @@ public class DAPDebugExecutor implements DebugExecutor
 		
 		JSONObject stackResponse = new JSONObject("stackFrames", frames, "totalFrames", totalFrames);
 		return new DebugCommand(DebugType.STACK, stackResponse);
-	}
-
-	private DebugCommand doData(DebugCommand command)
-	{
-		JSONObject arguments = (JSONObject) command.getPayload();
-		if (arguments.containsKey("frameId"))
-		{
-			return doScopes(command);
-		}
-		else
-		{
-			return doVariables(command);
-		}
 	}
 	
 	private DebugCommand doScopes(DebugCommand command)
@@ -438,6 +426,34 @@ public class DAPDebugExecutor implements DebugExecutor
 					);
 			}
 		}
+		else if (var instanceof MapValue)
+		{
+			MapValue m = (MapValue)var;
+			
+			for (Value key: m.values.keySet())
+			{
+				variables.add(new JSONObject(
+					"name", key.toString(),
+					"value", m.values.get(key).toString(),
+					"variablesReference", valueToReference(m.values.get(key)))
+				);
+			}
+		}
+		else if (var instanceof TupleValue)
+		{
+			TupleValue t = (TupleValue)var;
+			int i = 1;
+			
+			for (Value value: t.values)
+			{
+				variables.add(new JSONObject(
+						"name", "#" + i++,
+						"value", value.toString(),
+						"variablesReference", valueToReference(value))
+					);
+			}
+
+		}
 		
 		return variables;
 	}
@@ -452,7 +468,9 @@ public class DAPDebugExecutor implements DebugExecutor
 		if (value instanceof RecordValue ||
 			value instanceof SetValue ||
 			value instanceof SeqValue ||
-			value instanceof ObjectValue)
+			value instanceof ObjectValue ||
+			value instanceof MapValue ||
+			value instanceof TupleValue)
 		{
 			int ref = nextVariablesReference.incrementAndGet();
 			variablesReferences.put(ref, value);
@@ -472,7 +490,7 @@ public class DAPDebugExecutor implements DebugExecutor
 		return DebugCommand.QUIT;
 	}
 	
-	private void rebuildCache()
+	private void buildCache()
 	{
 //		if (topFrameId != 0)	// release any old frames
 //		{
