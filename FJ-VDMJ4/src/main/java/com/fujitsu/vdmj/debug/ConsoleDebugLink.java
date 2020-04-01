@@ -313,8 +313,9 @@ public class ConsoleDebugLink extends DebugLink
 		}
 		
 		DebugExecutor exec = getExecutor(location, ctxt);
+		boolean stopped = true;
 		
-		while (true)
+		while (stopped)
 		{
 			try
 			{
@@ -325,12 +326,14 @@ public class ConsoleDebugLink extends DebugLink
 					case RESUME:
 						synchronized (this) // So everyone resumes when "resumeThreads" method ends
 						{
-							return;
+							stopped = false;
+							break;
 						}
 
 					case TERMINATE:
 						thread.setSignal(Signal.TERMINATE);
-						return;
+						stopped = false;
+						break;
 						
 					case PRINT:
 						suspendBreaks = true;
@@ -344,9 +347,12 @@ public class ConsoleDebugLink extends DebugLink
 			}
 			catch (InterruptedException e)
 			{
-				return;		// Being killed?
+				stopped = false;		// Being killed?
 			}
 		}
+		
+		exec.clear();	// Cached frame information no longer needed
+		return;
 	}
 	
 	/**

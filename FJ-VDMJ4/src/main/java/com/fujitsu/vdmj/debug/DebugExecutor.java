@@ -29,4 +29,6 @@ package com.fujitsu.vdmj.debug;
 public interface DebugExecutor
 {
 	public DebugCommand run(DebugCommand request);
+
+	public void clear();
 }

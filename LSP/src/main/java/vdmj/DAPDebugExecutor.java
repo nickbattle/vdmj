@@ -137,6 +137,14 @@ public class DAPDebugExecutor implements DebugExecutor
 		nextFrameId.set(100);
 	}
 
+	@Override
+	public void clear()
+	{
+		variablesReferences.clear();
+		ctxtFrames.clear();
+		// Keep "next" values until next init() call
+	}
+	
 	/**
 	 * Perform one debugger command
 	 */
@@ -492,21 +500,9 @@ public class DAPDebugExecutor implements DebugExecutor
 	
 	private void buildCache()
 	{
-//		if (topFrameId != 0)	// release any old frames
-//		{
-//			int frameId = topFrameId;
-//			
-//			while (frameId != 0)
-//			{
-//				Frame frame = ctxtFrames.get(frameId);
-//				ctxtFrames.remove(frameId);		// TODO clear references in scopes?
-//				frameId = frame.outerId;
-//			}
-//		}
-		
-		Context c = ctxt;
 		LexLocation[] nextLoc = { breakloc };
 		Frame prevFrame = null;
+		Context c = ctxt;
 		
 		while (c != null)
 		{
@@ -527,7 +523,7 @@ public class DAPDebugExecutor implements DebugExecutor
 			prevFrame = frame;
 		}
 		
-		// Dump to diags...iii
+		// Dump to diags...
 		synchronized (Log.class)
 		{
 			Log.printf("++++++++ THREAD %s", ctxt.threadState.threadId);

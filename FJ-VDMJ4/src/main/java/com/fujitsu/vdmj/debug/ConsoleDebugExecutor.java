@@ -317,4 +317,10 @@ public class ConsoleDebugExecutor implements DebugExecutor
 	
 		return fp;
 	}
+
+	@Override
+	public void clear()
+	{
+		// Nothing to clear
+	}
 }
