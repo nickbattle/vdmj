@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugType;
 import com.fujitsu.vdmj.debug.TraceCallback;
-import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
@@ -75,7 +74,6 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			try
 			{
 				debuggedThread = link.getDebugThread();
-				server.writeMessage(breakpointEvent(link.getBreakpoint(debuggedThread), debuggedThread));
 				server.writeMessage(text("[debug]> "));
 				while (doCommand());
 			}
@@ -224,15 +222,6 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			default:
 				return new DebugCommand(null, new DAPResponse(request, false, "Unsupported command: " + command, null));
 		}
-	}
-
-	private DAPResponse breakpointEvent(Breakpoint bp, SchedulableThread stoppedThread)
-	{
-		return new DAPResponse("stopped",
-			new JSONObject(
-				"reason", "breakpoint",
-				"threadId", stoppedThread.getId(),
-				"allThreadsStopped", true));
 	}
 
 	private DAPResponse doThreads(DAPRequest request)

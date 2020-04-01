@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.debug.DebugExecutor;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugReason;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.values.CPUValue;
@@ -88,12 +89,50 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void stopped(Context ctxt, LexLocation location, Exception ex)
 	{
+		String reason = "step";
+		
 		if (ex != null)
 		{
 			server.stderr(ex.getMessage() + "\n");
+			reason = "exception";
 		}
 		
+		try
+		{
+			server.writeMessage(new DAPResponse("stopped",
+					new JSONObject(
+						"reason", reason,
+						"threadId", Thread.currentThread().getId(),
+						"allThreadsStopped", true)));
+		}
+		catch (IOException e)
+		{
+			Log.error(e);
+		}
+
 		super.stopped(ctxt, location, ex);
+
+		if (ex == null)		// No continued for exceptions, as we're exiting
+		{
+			try
+			{
+				server.writeMessage(new DAPResponse("continued",
+						new JSONObject(
+							"threadId", Thread.currentThread().getId(),
+							"allThreadsContinued", true)));
+			}
+			catch (IOException e)
+			{
+				Log.error(e);
+			}
+		}
+	}
+	
+	@Override
+	public void breakpoint(Context ctxt, Breakpoint bp)
+	{
+		// Calls stopped with a null exception, which sends events
+		super.breakpoint(ctxt, bp);
 	}
 	
 	@Override
