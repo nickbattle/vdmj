@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.debug.DebugExecutor;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugReason;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.values.CPUValue;
@@ -70,6 +71,22 @@ public class DAPDebugLink extends ConsoleDebugLink
 		return new DAPDebugExecutor(location, ctxt);
 	}
 	
+	private void sendEvent(String event, String reason)
+	{
+		try
+		{
+			server.writeMessage(new DAPResponse(event,	// stopped or continued
+					new JSONObject(
+						"reason", reason,
+						"threadId", Thread.currentThread().getId(),
+						"allThreadsStopped", true)));
+		}
+		catch (IOException e)
+		{
+			Log.error(e);
+		}
+	}
+	
 	@Override
 	public void newThread(CPUValue cpu)
 	{
@@ -91,9 +108,23 @@ public class DAPDebugLink extends ConsoleDebugLink
 		if (ex != null)
 		{
 			server.stderr(ex.getMessage() + "\n");
+			sendEvent("stopped", "step");
 		}
 		
 		super.stopped(ctxt, location, ex);
+
+		if (ex != null)
+		{
+			sendEvent("continued", "step");
+		}
+	}
+	
+	@Override
+	public void breakpoint(Context ctxt, Breakpoint bp)
+	{
+		sendEvent("stopped", "step");
+		super.breakpoint(ctxt, bp);
+		sendEvent("continued", "step");
 	}
 	
 	@Override
