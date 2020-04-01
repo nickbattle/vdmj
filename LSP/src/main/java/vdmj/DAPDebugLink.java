@@ -71,22 +71,6 @@ public class DAPDebugLink extends ConsoleDebugLink
 		return new DAPDebugExecutor(location, ctxt);
 	}
 	
-	private void sendEvent(String event, String reason)
-	{
-		try
-		{
-			server.writeMessage(new DAPResponse(event,	// stopped or continued
-					new JSONObject(
-						"reason", reason,
-						"threadId", Thread.currentThread().getId(),
-						"allThreadsStopped", true)));
-		}
-		catch (IOException e)
-		{
-			Log.error(e);
-		}
-	}
-	
 	@Override
 	public void newThread(CPUValue cpu)
 	{
@@ -105,26 +89,50 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void stopped(Context ctxt, LexLocation location, Exception ex)
 	{
+		String reason = "step";
+		
 		if (ex != null)
 		{
 			server.stderr(ex.getMessage() + "\n");
-			sendEvent("stopped", "step");
+			reason = "exception";
 		}
 		
+		try
+		{
+			server.writeMessage(new DAPResponse("stopped",
+					new JSONObject(
+						"reason", reason,
+						"threadId", Thread.currentThread().getId(),
+						"allThreadsStopped", true)));
+		}
+		catch (IOException e)
+		{
+			Log.error(e);
+		}
+
 		super.stopped(ctxt, location, ex);
 
-		if (ex != null)
+		if (ex == null)		// No continued for exceptions, as we're exiting
 		{
-			sendEvent("continued", "step");
+			try
+			{
+				server.writeMessage(new DAPResponse("continued",
+						new JSONObject(
+							"threadId", Thread.currentThread().getId(),
+							"allThreadsContinued", true)));
+			}
+			catch (IOException e)
+			{
+				Log.error(e);
+			}
 		}
 	}
 	
 	@Override
 	public void breakpoint(Context ctxt, Breakpoint bp)
 	{
-		sendEvent("stopped", "step");
+		// Calls stopped with a null exception, which sends events
 		super.breakpoint(ctxt, bp);
-		sendEvent("continued", "step");
 	}
 	
 	@Override

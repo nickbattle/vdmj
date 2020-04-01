@@ -523,32 +523,31 @@ public class DAPDebugExecutor implements DebugExecutor
 			prevFrame = frame;
 		}
 		
-		// Dump to diags...
-		synchronized (Log.class)
-		{
-			Log.printf("++++++++ THREAD %s", ctxt.threadState.threadId);
-			int frameId = topFrameId;
-			
-			while (frameId != 0)
-			{
-				Frame frame = ctxtFrames.get(frameId);
-				Log.printf("======== Frame %d = %s:", frameId, frame.title);
-				
-				for (Scope scope: frame.scopes)
-				{
-					Log.printf("-------- Scope %s, vref %d:", scope.name, scope.vref);
-					c = (Context) variablesReferences.get(scope.vref);
-					
-					for (TCNameToken name: c.keySet())
-					{
-						Value value = c.get(name);
-						Log.printf("%s = %s", name, value);
-					}
-				}
-				
-				frameId = frame.outerId;
-			}
-		}
+//		synchronized (Log.class)
+//		{
+//			Log.printf("++++++++ THREAD %s", ctxt.threadState.threadId);
+//			int frameId = topFrameId;
+//			
+//			while (frameId != 0)
+//			{
+//				Frame frame = ctxtFrames.get(frameId);
+//				Log.printf("======== Frame %d = %s:", frameId, frame.title);
+//				
+//				for (Scope scope: frame.scopes)
+//				{
+//					Log.printf("-------- Scope %s, vref %d:", scope.name, scope.vref);
+//					c = (Context) variablesReferences.get(scope.vref);
+//					
+//					for (TCNameToken name: c.keySet())
+//					{
+//						Value value = c.get(name);
+//						Log.printf("%s = %s", name, value);
+//					}
+//				}
+//				
+//				frameId = frame.outerId;
+//			}
+//		}
 	}
 	
 	private Context buildScopes(Context c, Frame frame, LexLocation[] nextLoc)
