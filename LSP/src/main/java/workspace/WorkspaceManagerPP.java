@@ -206,7 +206,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 					{
 						for (TCDefinition indef: def.getDefinitions())
 						{
-							results.add(symbolInformation(indef.name + ":" + indef.getType(), indef.location, SymbolKind.kindOf(indef), indef.location.module));
+							results.add(symbolInformation(indef.name.getName() + ":" + indef.getType(), indef.location, SymbolKind.kindOf(indef), indef.location.module));
 						}
 					}
 				}
@@ -222,7 +222,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 
 					for (ASTDefinition def: clazz.definitions)
 					{
-						results.add(symbolInformation(def.name.toString(), def.name.location, SymbolKind.kindOf(def), def.location.module));
+						results.add(symbolInformation(def.name.name, def.name.location, SymbolKind.kindOf(def), def.location.module));
 					}
 				}
 			}
