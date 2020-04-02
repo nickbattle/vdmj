@@ -23,6 +23,7 @@
 
 package lsp.textdocument;
 
+import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 
 public enum SymbolKind
@@ -68,13 +69,31 @@ public enum SymbolKind
 
 	public static SymbolKind kindOf(TCDefinition def)
 	{
-		switch (def.kind())
+		return kindOf(def.kind());
+	}
+
+	public static SymbolKind kindOf(ASTDefinition def)
+	{
+		return kindOf(def.kind());
+	}
+	
+	public static SymbolKind kindOf(String kind)
+	{	
+		switch (kind)
 		{
+			case "module":
+				return Module;
+			
+			case "class":
+				return Class;
+				
 			case "explicit function":
-			case "explicit operation":
 			case "implicit function":
-			case "implicit operation":
 				return Function;
+
+			case "explicit operation":
+			case "implicit operation":
+				return Method;
 				
 			case "instance variable":
 				return Field;
