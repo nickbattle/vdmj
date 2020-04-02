@@ -42,7 +42,7 @@ public class DisconnectHandler extends DAPHandler
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
 		JSONObject arguments = request.get("arguments");
-		boolean terminateDebuggee = arguments.get("terminateDebuggee");
+		Boolean terminateDebuggee = new Boolean(arguments.get("terminateDebuggee"));
 		return dapServerState.getManager().disconnect(request, terminateDebuggee);
 	}
 }
