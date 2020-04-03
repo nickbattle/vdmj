@@ -373,13 +373,11 @@ public abstract class WorkspaceManager
 		}
 		else
 		{
-			StringBuilder buffer = projectFiles.get(uri);
+			String buffer = projectFiles.get(uri).toString();
 			
-			if (!text.trim().equals(buffer.toString().trim()))
+			if (!text.trim().equals(buffer.trim()))		// Trim for trailing newline
 			{
-				Log.error("Files different on save?");
-				Log.printf("BUFFER: %s", buffer.toString());
-				Log.printf("UPDATE: %s", text);
+				Utils.diff("File different on didSave at %d", text, buffer);
 				projectFiles.put(uri, new StringBuilder(text));
 			}
 			
