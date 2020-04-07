@@ -25,6 +25,11 @@ package lsp;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.junit.Test;
 import json.JSONObject;
 
@@ -58,5 +63,17 @@ public class LSPTest
 		int end   = Utils.findPosition(buffer, new JSONObject("line", 0L, "character", 4L));
 		buffer.replace(start, end, "");
 		assertEquals("01456789", buffer.toString());
+	}
+	
+	@Test
+	public void testURIs() throws URISyntaxException, IOException
+	{
+		File file = new File ("C:/root/path");
+		URI uri = new URI("file", "", file.getCanonicalPath(), null, null);
+		System.out.println(uri.toString());
+
+		file = new File ("relative/path");
+		uri = new URI("file", "", file.getCanonicalPath(), null, null);
+		System.out.println(uri.toString());
 	}
 }
