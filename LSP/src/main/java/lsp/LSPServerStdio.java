@@ -61,7 +61,7 @@ public class LSPServerStdio implements Runnable
 			}
 			else
 			{
-				throw new IOException("Unsupported option: " + args[a]);
+				usage();
 			}
 		}
 		
@@ -71,6 +71,12 @@ public class LSPServerStdio implements Runnable
 		}
 		
 		new LSPServerStdio(dialect).run();
+	}
+	
+	private static void usage()
+	{
+		System.err.println("Usage: LSPServerStdio [-vdmsl | -vdmpp] [-dap]");
+		System.exit(1);
 	}
 	
 	@Override
