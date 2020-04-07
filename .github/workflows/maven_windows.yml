@@ -5,9 +5,9 @@ name: Windows test with Maven
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, highprecision ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, highprecision ]
 
 jobs:
   build:
