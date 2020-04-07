@@ -39,8 +39,12 @@ public class LSPInitializeResponse extends JSONObject
 	{
 		JSONObject cap = new JSONObject();
 		cap.put("definitionProvider", true);			// Go to definition
-		// cap.put("typeDefinitionProvider", true);		// Go to type?
 		cap.put("documentSymbolProvider", true);		// Symbol information
+
+//		cap.put("completionProvider",					// Completions
+//			new JSONObject(
+//				"triggerCharacters", new JSONArray("."),
+//				"resolveProvider", false));
 		
 		cap.put("textDocumentSync",
 			new JSONObject(

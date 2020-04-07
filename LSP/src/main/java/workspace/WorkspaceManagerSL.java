@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.in.INNode;
@@ -200,13 +201,36 @@ public class WorkspaceManagerSL extends WorkspaceManager
 			{
 				if (module.files.contains(file))
 				{
-					results.add(symbolInformation(module.name, SymbolKind.Module, null));
+					results.add(symbolInformation(module.name.toString(), module.name.getLocation(), SymbolKind.Module, null));
 
 					for (TCDefinition def: module.defs)
 					{
 						for (TCDefinition indef: def.getDefinitions())
 						{
-							results.add(symbolInformation(indef.name, indef.getType(), SymbolKind.kindOf(indef), indef.location.module));
+							if (!indef.name.isOld())
+							{
+								results.add(symbolInformation(indef.name + ":" + indef.getType(),
+										indef.location, SymbolKind.kindOf(indef), indef.location.module));
+							}
+						}
+					}
+				}
+			}
+		}
+		else if (astModuleList != null)		// Try AST instead
+		{
+			for (ASTModule module: astModuleList)
+			{
+				if (module.files.contains(file))
+				{
+					results.add(symbolInformation(module.name, SymbolKind.Module, null));
+
+					for (ASTDefinition def: module.defs)
+					{
+						if (!def.name.old)
+						{
+							results.add(symbolInformation(def.name.toString(),
+									def.name.location, SymbolKind.kindOf(def), def.location.module));
 						}
 					}
 				}

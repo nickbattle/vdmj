@@ -29,6 +29,7 @@ import java.net.URI;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 import json.JSONObject;
+import workspace.Log;
 
 public class Utils
 {
@@ -98,5 +99,62 @@ public class Utils
 		}
 
 		throw new Exception("Cannot locate range");
+	}
+	
+	public static void diff(String message, String s1, String s2)
+	{
+		int shortest = s1.length() > s2.length() ? s2.length() : s1.length();
+		int start = -1;
+		StringBuilder diff1 = new StringBuilder();
+		StringBuilder diff2 = new StringBuilder();
+		
+		for (int i=0; i < shortest; i++)
+		{
+			if (s1.charAt(i) != s2.charAt(i))
+			{
+				start = i;
+				diff1.append(s1.charAt(i));
+				diff2.append(s2.charAt(i));
+			}
+			else if (start >= 0)
+			{
+				break;
+			}
+		}
+		
+		if (start >= 0)
+		{
+			Log.error(message, start);
+			Log.printf("(1): %s", quote(diff1));
+			Log.printf("(2): %s", quote(diff2));
+		}
+	}
+	
+	private static String quote(StringBuilder value)
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		for (int i=0; i<value.length(); i++)
+		{
+			char c = value.charAt(i);
+			
+			switch (c)
+			{
+    		    case '\r':	sb.append("\\r"); break;
+    		    case '\n':	sb.append("\\n"); break;
+    		    case '\t':	sb.append("\\t"); break;
+    		    case '\f':	sb.append("\\f"); break;
+    		    case '\b':	sb.append("\\b"); break;
+    		    case '\u000B':	sb.append("\\v"); break;
+
+    		    case '\"':	sb.append("\\\""); break;
+    		    case '\\':	sb.append("\\\\"); break;
+
+    		    default:
+    		    	sb.append(c);
+			}
+		}
+
+		return sb.toString();
 	}
 }

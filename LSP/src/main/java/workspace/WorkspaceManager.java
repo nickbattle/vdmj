@@ -39,6 +39,7 @@ import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
@@ -48,8 +49,6 @@ import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.Value;
 
@@ -374,11 +373,11 @@ public abstract class WorkspaceManager
 		}
 		else
 		{
-			StringBuilder buffer = projectFiles.get(uri);
+			String buffer = projectFiles.get(uri).toString();
 			
-			if (!text.trim().equals(buffer.toString().trim()))
+			if (!text.trim().equals(buffer.trim()))		// Trim for trailing newline
 			{
-				Log.error("Files different on save?");
+				Utils.diff("File different on didSave at %d", text, buffer);
 				projectFiles.put(uri, new StringBuilder(text));
 			}
 			
@@ -390,7 +389,7 @@ public abstract class WorkspaceManager
 
 	abstract public RPCMessageList documentSymbols(RPCRequest request, URI uri);
 
-	private JSONObject symbolInformation(String name, LexLocation location, SymbolKind kind, String container)
+	protected JSONObject symbolInformation(String name, LexLocation location, SymbolKind kind, String container)
 	{
 		JSONObject sym = new JSONObject(
 			"name", name,
@@ -405,14 +404,14 @@ public abstract class WorkspaceManager
 		return sym;
 	}
 
-	protected JSONObject symbolInformation(TCIdentifierToken name, SymbolKind kind, String container)
+	protected JSONObject symbolInformation(LexIdentifierToken name, SymbolKind kind, String container)
 	{
-		return symbolInformation(name.getName(), name.getLocation(), kind, container);
+		return symbolInformation(name.name, name.location, kind, container);
 	}
 	
-	protected JSONObject symbolInformation(TCNameToken name, TCType type, SymbolKind kind, String container)
+	protected JSONObject symbolInformation(LexIdentifierToken name, TCType type, SymbolKind kind, String container)
 	{
-		return symbolInformation(name.getName() + ":" + type, name.getLocation(), kind, container);
+		return symbolInformation(name.name + ":" + type, name.location, kind, container);
 	}
 
 	public DAPMessageList setBreakpoints(DAPRequest request, URI uri, JSONArray lines) throws Exception

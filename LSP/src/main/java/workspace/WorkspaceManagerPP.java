@@ -34,6 +34,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
+import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -197,16 +198,31 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		{
 			for (TCClassDefinition clazz: tcClassList)
 			{
-				if (clazz.location.file.equals(file))
+				if (clazz.name.getLocation().file.equals(file))
 				{
-					results.add(symbolInformation(clazz.name, clazz.getType(), SymbolKind.Class, null));
-					
+					results.add(symbolInformation(clazz.name.toString(), clazz.name.getLocation(), SymbolKind.Class, null));
+
 					for (TCDefinition def: clazz.definitions)
 					{
 						for (TCDefinition indef: def.getDefinitions())
 						{
-							results.add(symbolInformation(indef.name, indef.getType(), SymbolKind.kindOf(indef), indef.location.module));
+							results.add(symbolInformation(indef.name.getName() + ":" + indef.getType(), indef.location, SymbolKind.kindOf(indef), indef.location.module));
 						}
+					}
+				}
+			}
+		}
+		else if (astClassList != null)		// Try AST instead
+		{
+			for (ASTClassDefinition clazz: astClassList)
+			{
+				if (clazz.name.location.file.equals(file))
+				{
+					results.add(symbolInformation(clazz.name.toString(), clazz.location, SymbolKind.Class, null));
+
+					for (ASTDefinition def: clazz.definitions)
+					{
+						results.add(symbolInformation(def.name.name, def.name.location, SymbolKind.kindOf(def), def.location.module));
 					}
 				}
 			}
