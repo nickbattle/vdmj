@@ -83,6 +83,17 @@ public class LSPTest
 
 		try
 		{
+			file = new File("/C:/root/path");
+			uri = new URI("file", "", file.getCanonicalPath(), null, null);
+			System.out.println(uri.toString());
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.toString());
+		}
+
+		try
+		{
 			file = new File("relative/path");
 			uri = new URI("file", "", file.getCanonicalPath(), null, null);
 			System.out.println(uri.toString());

@@ -47,7 +47,7 @@ public class JSONReaderTest extends TestCase
 		{
 			r.setSeed(seed);
 			String json = getObject();
-			System.out.println(json);
+			// System.out.println(json);
 			StringReader ireader = new StringReader(json);
 	
 			JSONReader reader = new JSONReader(ireader);
@@ -57,8 +57,8 @@ public class JSONReaderTest extends TestCase
 			JSONWriter writer = new JSONWriter(new PrintWriter(out));
 			writer.writeObject(map);
 			writer.flush();
-			System.out.println(out.toString());
-			System.out.println("--------");
+			// System.out.println(out.toString());
+			// System.out.println("--------");
 			
 			String original = json.replaceAll(" ", "");
 			String after = out.toString().replaceAll(" ", "");
