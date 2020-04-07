@@ -73,6 +73,7 @@ public class LSPTest
 		try
 		{
 			file = new File("C:/root/path");
+			System.out.println(file.toURI());
 			uri = new URI("file", "", file.getCanonicalPath(), null, null);
 			System.out.println(uri.toString());
 		}
@@ -84,6 +85,7 @@ public class LSPTest
 		try
 		{
 			file = new File("/C:/root/path");
+			System.out.println(file.toURI());
 			uri = new URI("file", "", file.getCanonicalPath(), null, null);
 			System.out.println(uri.toString());
 		}
@@ -95,6 +97,7 @@ public class LSPTest
 		try
 		{
 			file = new File("relative/path");
+			System.out.println(file.toURI());
 			uri = new URI("file", "", file.getCanonicalPath(), null, null);
 			System.out.println(uri.toString());
 		}
