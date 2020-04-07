@@ -26,11 +26,10 @@ package lsp;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import org.junit.Test;
+
 import json.JSONObject;
 
 public class LSPTest
@@ -40,17 +39,17 @@ public class LSPTest
 	{
 		StringBuilder buffer = new StringBuilder("0123456789");
 		int start = Utils.findPosition(buffer, new JSONObject("line", 0L, "character", 2L));
-		int end   = Utils.findPosition(buffer, new JSONObject("line", 0L, "character", 4L));
+		int end = Utils.findPosition(buffer, new JSONObject("line", 0L, "character", 4L));
 		buffer.replace(start, end, "hello");
 		assertEquals("01hello456789", buffer.toString());
 	}
-	
+
 	@Test
 	public void testNewline() throws Exception
 	{
 		StringBuilder buffer = new StringBuilder("01234\n0123456789\n");
 		int start = Utils.findPosition(buffer, new JSONObject("line", 1L, "character", 2L));
-		int end   = Utils.findPosition(buffer, new JSONObject("line", 1L, "character", 4L));
+		int end = Utils.findPosition(buffer, new JSONObject("line", 1L, "character", 4L));
 		buffer.replace(start, end, "hello");
 		assertEquals("01234\n01hello456789\n", buffer.toString());
 	}
@@ -60,20 +59,37 @@ public class LSPTest
 	{
 		StringBuilder buffer = new StringBuilder("0123456789");
 		int start = Utils.findPosition(buffer, new JSONObject("line", 0L, "character", 2L));
-		int end   = Utils.findPosition(buffer, new JSONObject("line", 0L, "character", 4L));
+		int end = Utils.findPosition(buffer, new JSONObject("line", 0L, "character", 4L));
 		buffer.replace(start, end, "");
 		assertEquals("01456789", buffer.toString());
 	}
-	
-	@Test
-	public void testURIs() throws URISyntaxException, IOException
-	{
-		File file = new File ("C:/root/path");
-		URI uri = new URI("file", "", file.getCanonicalPath(), null, null);
-		System.out.println(uri.toString());
 
-		file = new File ("relative/path");
-		uri = new URI("file", "", file.getCanonicalPath(), null, null);
-		System.out.println(uri.toString());
+	@Test
+	public void testURIs()
+	{
+		File file = null;
+		URI uri = null;
+		
+		try
+		{
+			file = new File("C:/root/path");
+			uri = new URI("file", "", file.getCanonicalPath(), null, null);
+			System.out.println(uri.toString());
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.toString());
+		}
+
+		try
+		{
+			file = new File("relative/path");
+			uri = new URI("file", "", file.getCanonicalPath(), null, null);
+			System.out.println(uri.toString());
+		}
+		catch (Exception e)
+		{
+			System.out.println(e.toString());
+		}
 	}
 }
