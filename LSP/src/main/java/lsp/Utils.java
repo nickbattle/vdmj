@@ -35,18 +35,28 @@ import workspace.Log;
 
 public class Utils
 {
+	private static int zero(int value)
+	{
+		return value < 0 ? 0 : value;
+	}
+	
 	public static JSONObject lexLocationToPoint(LexLocation location)
 	{
 		return new JSONObject(
-			"start", new JSONObject("line", location.startLine - 1, "character", location.startPos - 1),
-			"end",   new JSONObject("line", location.startLine - 1, "character", location.startPos));
+			"start", new JSONObject("line", zero(location.startLine - 1), "character", zero(location.startPos - 1)),
+			"end",   new JSONObject("line", zero(location.startLine - 1), "character", location.startPos));
 	}
 
 	public static JSONObject lexLocationToRange(LexLocation location)
 	{
+		if (location.endPos == 0)	// not set, so use a point
+		{
+			return lexLocationToPoint(location);
+		}
+		
 		return new JSONObject(
-			"start", new JSONObject("line", location.startLine - 1, "character", location.startPos - 1),
-			"end",   new JSONObject("line", location.endLine - 1, "character", location.endPos - 1));
+			"start", new JSONObject("line", zero(location.startLine - 1), "character", zero(location.startPos - 1)),
+			"end",   new JSONObject("line", zero(location.endLine - 1), "character", zero(location.endPos - 1)));
 	}
 
 	public static JSONObject lexLocationToLocation(LexLocation location)
