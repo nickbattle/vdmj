@@ -74,13 +74,13 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	}
 
 	@Override
-	protected List<VDMMessage> parseURI(URI uri)
+	protected List<VDMMessage> parseURI(File file)
 	{
 		List<VDMMessage> errs = new Vector<VDMMessage>();
-		StringBuilder buffer = projectFiles.get(uri);
+		StringBuilder buffer = projectFiles.get(file);
 		
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
-				Dialect.VDM_PP, new File(uri), Charset.defaultCharset().displayName());
+				Dialect.VDM_PP, file, Charset.defaultCharset().displayName());
 		ClassReader cr = new ClassReader(ltr);
 		cr.readClasses();
 		
@@ -104,10 +104,10 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		List<VDMMessage> errs = new Vector<VDMMessage>();
 		List<VDMMessage> warns = new Vector<VDMMessage>();
 		
-		for (Entry<URI, StringBuilder> entry: projectFiles.entrySet())
+		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
 			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(),
-					Dialect.VDM_PP, new File(entry.getKey()), Charset.defaultCharset().displayName());
+					Dialect.VDM_PP, entry.getKey(), Charset.defaultCharset().displayName());
 			ClassReader cr = new ClassReader(ltr);
 			astClassList.addAll(cr.readClasses());
 			
@@ -153,12 +153,12 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	}
 
 	@Override
-	public RPCMessageList findDefinition(RPCRequest request, URI uri, int line, int col)
+	public RPCMessageList findDefinition(RPCRequest request, File file, int line, int col)
 	{
 		if (tcClassList != null)
 		{
 			LSPDefinitionFinder finder = new LSPDefinitionFinder();
-			TCDefinition def = finder.find(tcClassList, new File(uri), line + 1, col + 1);
+			TCDefinition def = finder.find(tcClassList, file, line + 1, col + 1);
 			
 			if (def == null)
 			{
@@ -166,7 +166,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 			}
 			else
 			{
-				URI defuri = Utils.fileToURI(def.location.file);
+				URI defuri = def.location.file.toURI();
 				
 				return new RPCMessageList(request,
 						new JSONArray(
@@ -189,10 +189,9 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	}
 
 	@Override
-	public RPCMessageList documentSymbols(RPCRequest request, URI uri)
+	public RPCMessageList documentSymbols(RPCRequest request, File file)
 	{
 		JSONArray results = new JSONArray();
-		File file = new File(uri);
 		
 		if (tcClassList != null)	// May be syntax errors
 		{

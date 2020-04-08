@@ -24,7 +24,9 @@
 package lsp;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 
@@ -50,23 +52,16 @@ public class Utils
 	public static JSONObject lexLocationToLocation(LexLocation location)
 	{
 		return new JSONObject(
-			"uri",   fileToURI(location.file).toString(),
+			"uri",   location.file.toURI().toString(),
 			"range", lexLocationToRange(location));
 	}
 
-	public static URI fileToURI(File file)
+	public static File uriToFile(String s) throws URISyntaxException, IOException
 	{
-		try
-		{
-			// Produce a URI with an empty authority, so you get "file:///..."
-			return new URI("file", "", file.getCanonicalPath(), null, null);
-		}
-		catch (Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+		URI uri = new URI(s);
+		return new File(uri).getCanonicalFile();	// Note: canonical file
 	}
-	
+
 	public static int findPosition(StringBuilder buffer, JSONObject position) throws Exception
 	{
 		long line = position.get("line");

@@ -23,13 +23,14 @@
 
 package lsp.textdocument;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.LSPServerState;
+import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
@@ -48,9 +49,9 @@ public class DidCloseHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			JSONObject text = params.get("textDocument");
-			URI uri = new URI(text.get("uri"));
+			File file = Utils.uriToFile(text.get("uri"));
 			
-			return lspServerState.getManager().closeFile(request, uri);
+			return lspServerState.getManager().closeFile(request, file);
 		}
 		catch (URISyntaxException e)
 		{

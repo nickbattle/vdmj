@@ -25,14 +25,13 @@ package dap.handlers;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServerState;
 import json.JSONArray;
 import json.JSONObject;
-import lsp.Utils;
 
 public class SetBreakpointsHandler extends DAPHandler
 {
@@ -48,10 +47,10 @@ public class SetBreakpointsHandler extends DAPHandler
 		{
 			JSONObject arguments = request.get("arguments");
 			JSONObject source = arguments.get("source");
-			URI uri = Utils.fileToURI(new File((String)source.get("path")));
+			File file = new File((String)source.get("path")).getCanonicalFile();
 			JSONArray lines = arguments.get("lines");
 			
-			return dapServerState.getManager().setBreakpoints(request, uri, lines);
+			return dapServerState.getManager().setBreakpoints(request, file, lines);
 		}
 		catch (Exception e)
 		{

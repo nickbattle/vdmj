@@ -23,13 +23,14 @@
 
 package lsp.textdocument;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.LSPServerState;
+import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
@@ -48,9 +49,9 @@ public class DocumentSymbolHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			JSONObject textDoc = params.get("textDocument");
-			URI uri = new URI(textDoc.get("uri"));
+			File file = Utils.uriToFile(textDoc.get("uri"));
 			
-			return lspServerState.getManager().documentSymbols(request, uri);
+			return lspServerState.getManager().documentSymbols(request, file);
 		}
 		catch (URISyntaxException e)
 		{
