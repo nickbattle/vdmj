@@ -83,7 +83,7 @@ public class LSPTest
 			}
 			else
 			{
-				uri = new URI("file", "", "/" + file.getCanonicalPath(), null, null);
+				uri = new URI("file", "", "\\" + file.getCanonicalPath(), null, null);
 			}
 			
 			System.out.println(uri.toString());
