@@ -76,7 +76,16 @@ public class LSPTest
 			file = new File(uri);
 			System.out.println(file.toURI());
 			System.out.println(file.getCanonicalPath());
-			uri = new URI("file", "", file.getAbsolutePath(), null, null);
+			
+			if (File.separatorChar == '/')
+			{
+				uri = new URI("file", "", file.getCanonicalPath(), null, null);
+			}
+			else
+			{
+				uri = new URI("file", "", "/" + file.getCanonicalPath(), null, null);
+			}
+			
 			System.out.println(uri.toString());
 		}
 		catch (Exception e)
