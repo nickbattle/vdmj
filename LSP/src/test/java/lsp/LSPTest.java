@@ -72,33 +72,11 @@ public class LSPTest
 		
 		try
 		{
-			file = new File("C:/root/path");
+			uri = new URI("file:///c%3A/Users/jonas/repos/vdm-lsp/Code/VDM-LSP_Java/vdm/AlarmSL");
+			file = new File(uri);
 			System.out.println(file.toURI());
-			uri = new URI("file", "", file.getCanonicalPath(), null, null);
-			System.out.println(uri.toString());
-		}
-		catch (Exception e)
-		{
-			System.out.println(e.toString());
-		}
-
-		try
-		{
-			file = new File("/C:/root/path");
-			System.out.println(file.toURI());
-			uri = new URI("file", "", file.getCanonicalPath(), null, null);
-			System.out.println(uri.toString());
-		}
-		catch (Exception e)
-		{
-			System.out.println(e.toString());
-		}
-
-		try
-		{
-			file = new File("relative/path");
-			System.out.println(file.toURI());
-			uri = new URI("file", "", file.getCanonicalPath(), null, null);
+			System.out.println(file.getCanonicalPath());
+			uri = new URI("file", "", file.getAbsolutePath(), null, null);
 			System.out.println(uri.toString());
 		}
 		catch (Exception e)
