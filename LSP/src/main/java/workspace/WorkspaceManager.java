@@ -61,6 +61,7 @@ import json.JSONObject;
 import lsp.LSPInitializeResponse;
 import lsp.Utils;
 import lsp.textdocument.SymbolKind;
+import lsp.textdocument.WatchKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
@@ -241,7 +242,7 @@ public abstract class WorkspaceManager
 		projectFiles.put(file, sb);
 	}
 	
-	protected abstract List<VDMMessage> parseURI(File file);
+	protected abstract List<VDMMessage> parseFile(File file);
 
 	protected abstract RPCMessageList checkLoadedFiles() throws Exception;
 
@@ -356,7 +357,49 @@ public abstract class WorkspaceManager
 			int start = Utils.findPosition(buffer, range.get("start"));
 			int end   = Utils.findPosition(buffer, range.get("end"));
 			buffer.replace(start, end, text);
-			return diagnosticResponses(parseURI(file), file);
+			return diagnosticResponses(parseFile(file), file);
+		}
+	}
+
+	public void changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
+	{
+		switch (type)
+		{
+			case CREATE:
+				if (!projectFiles.keySet().contains(file))	
+				{
+					Log.printf("Adding new file: %s", file);
+					loadFile(file);
+				}
+				else
+				{
+					Log.error("Created file already exists: %s", file);
+				}
+				break;
+				
+			case CHANGE:
+				if (projectFiles.keySet().contains(file))	
+				{
+					Log.printf("Ignoring file changed notification: %s", file);
+				}
+				else
+				{
+					Log.error("Changed file not loaded: %s", file);
+				}
+				break;
+				
+			case DELETE:
+				if (projectFiles.keySet().contains(file))	
+				{
+					Log.printf("Deleting file: %s", file);
+					projectFiles.remove(file);
+					checkLoadedFiles();
+				}
+				else
+				{
+					Log.error("Created file already exists: %s", file);
+				}
+				break;
 		}
 	}
 

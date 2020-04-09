@@ -24,7 +24,6 @@
 package lsp.textdocument;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 
 import json.JSONArray;
@@ -36,37 +35,34 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 
-public class DidChangeHandler extends LSPHandler
+public class DidChangeWSHandler extends LSPHandler
 {
-	public DidChangeHandler(LSPServerState state)
+	public DidChangeWSHandler(LSPServerState state)
 	{
 		super(state);
 	}
 
 	@Override
-	public RPCMessageList run(RPCRequest request) throws IOException
+	public RPCMessageList run(RPCRequest request)
 	{
 		try
 		{
 			JSONObject params = request.get("params");
-			JSONObject textDocument = params.get("textDocument");
-			File file = Utils.uriToFile(textDocument.get("uri"));
+			JSONArray changes = params.get("changes");
 			
-			JSONArray contentChanges = params.get("contentChanges");
-			RPCMessageList result = new RPCMessageList();
-			
-			for (Object contentChange: contentChanges)
+			for (Object fileEvent: changes)
 			{
-				if (contentChange instanceof JSONObject)
+				if (fileEvent instanceof JSONObject)
 				{
-					JSONObject change = (JSONObject)contentChange;
-					JSONObject range = change.get("range");
-					String text = change.get("text");
-					result.addAll(lspServerState.getManager().changeFile(request, file, range, text));
+					JSONObject change = (JSONObject)fileEvent; 
+					File file = Utils.uriToFile(change.get("uri"));
+					WatchKind type = WatchKind.kindOf(change.get("type"));
+		
+					lspServerState.getManager().changeWatchedFile(request, file, type);
 				}
 			}
 			
-			return result;
+			return null;
 		}
 		catch (URISyntaxException e)
 		{

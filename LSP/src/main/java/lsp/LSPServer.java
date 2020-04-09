@@ -33,6 +33,7 @@ import json.JSONObject;
 import json.JSONServer;
 import lsp.textdocument.DefinitionHandler;
 import lsp.textdocument.DidChangeHandler;
+import lsp.textdocument.DidChangeWSHandler;
 import lsp.textdocument.DidCloseHandler;
 import lsp.textdocument.DidOpenHandler;
 import lsp.textdocument.DidSaveHandler;
@@ -77,6 +78,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register("textDocument/didSave", new DidSaveHandler(state));
 		dispatcher.register("textDocument/definition", new DefinitionHandler(state));
 		dispatcher.register("textDocument/documentSymbol", new DocumentSymbolHandler(state));
+		dispatcher.register("workspace/didChangeWatchedFiles", new DidChangeWSHandler(state));
 
 		return dispatcher;
 	}

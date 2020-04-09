@@ -24,6 +24,7 @@
 package lsp;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
 
 import com.fujitsu.vdmj.lex.Dialect;
@@ -107,9 +108,14 @@ public class LSPServerVSCode implements Runnable
 			   socket.close();
 			}
 		}
+		catch (ConnectException e)
+		{
+			System.err.println("Connection exception: you have to start VSCode first?");
+			Log.error(e);
+		}
 		catch (IOException e)
 		{
-			Log.error("LSP Server stopped: %s", e.getMessage());
+			Log.error(e);
 		}
 	}
 }

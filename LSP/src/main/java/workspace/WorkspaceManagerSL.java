@@ -74,7 +74,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	}
 	
 	@Override
-	protected List<VDMMessage> parseURI(File file)
+	protected List<VDMMessage> parseFile(File file)
 	{
 		List<VDMMessage> errs = new Vector<VDMMessage>();
 		StringBuilder buffer = projectFiles.get(file);
