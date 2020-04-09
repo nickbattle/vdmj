@@ -110,7 +110,7 @@ public class LSPServerVSCode implements Runnable
 		}
 		catch (ConnectException e)
 		{
-			System.err.println("Connection exception: you have to start VSCode first?");
+			System.err.println("Connection exception: you have to start VSCode and open a VDM editor first?");
 			Log.error(e);
 		}
 		catch (IOException e)

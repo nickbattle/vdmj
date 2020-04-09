@@ -27,7 +27,7 @@ public enum WatchKind
 {
 	CREATE(1),
 	CHANGE(2),
-	DELETE(4);
+	DELETE(3);	// Not as spec, but VSCode does
 
 	private final int value;
 	

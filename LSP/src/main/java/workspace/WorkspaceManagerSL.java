@@ -94,6 +94,15 @@ public class WorkspaceManagerSL extends WorkspaceManager
 			errs.addAll(mr.getWarnings());
 		}
 
+		if (!errs.isEmpty())
+		{
+			Log.error("Syntax errors found in %s", file);
+		}
+		else
+		{
+			Log.printf("No syntax errors found in %s", file);
+		}
+		
 		return errs;
 	}
 
@@ -141,12 +150,17 @@ public class WorkspaceManagerSL extends WorkspaceManager
 		}
 		else
 		{
+			Log.error("Syntax errors found");
 			tcModuleList = null;
 		}
 		
 		if (errs.isEmpty())
 		{
 			inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(tcModuleList);
+		}
+		else
+		{
+			Log.error("Type checking errors found");
 		}
 		
 		errs.addAll(warns);
@@ -156,7 +170,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	@Override
 	public RPCMessageList findDefinition(RPCRequest request, File file, int line, int col)
 	{
-		if (tcModuleList != null)
+		if (!tcModuleList.isEmpty())
 		{
 			LSPDefinitionFinder finder = new LSPDefinitionFinder();
 			TCDefinition def = finder.find(tcModuleList, file, line + 1, col + 1);

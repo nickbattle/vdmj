@@ -307,18 +307,23 @@ public abstract class WorkspaceManager
 		return responses;
 	}
 	
-	public RPCMessageList openFile(RPCRequest request, File file, String text)
+	public RPCMessageList openFile(RPCRequest request, File file, String text) throws IOException
 	{
 		if (!projectFiles.keySet().contains(file))
 		{
-			return new RPCMessageList(request, "File not known");
+			Log.printf("Adding and opening new file: %s", file);
+			loadFile(file);
+			openFiles.add(file);
+			return null;
 		}
 		else if (openFiles.contains(file))
 		{
-			return new RPCMessageList(request, "File already open");
+			Log.error("File already open: %s", file);
+			return null;
 		}
 		else
 		{
+			Log.printf("Opening new file: %s", file);
 			openFiles.add(file);
 			return null;
 		}
@@ -328,14 +333,17 @@ public abstract class WorkspaceManager
 	{
 		if (!projectFiles.keySet().contains(file))
 		{
-			return new RPCMessageList(request, "File not known");
+			Log.error("File not known: %s", file);
+			return null;
 		}
 		else if (!openFiles.contains(file))
 		{
-			return new RPCMessageList(request, "File not open");
+			Log.error("File not open: %s", file);
+			return null;
 		}
 		else
 		{
+			Log.printf("Closing file: %s", file);
 			openFiles.remove(file);
 			return null;
 		}
@@ -345,11 +353,13 @@ public abstract class WorkspaceManager
 	{
 		if (!projectFiles.keySet().contains(file))
 		{
-			return new RPCMessageList(request, "File not known");
+			Log.error("File not known: %s", file);
+			return null;
 		}
 		else if (!openFiles.contains(file))
 		{
-			return new RPCMessageList(request, "File not open");
+			Log.error("File not open: %s", file);
+			return null;
 		}
 		else
 		{
@@ -397,7 +407,7 @@ public abstract class WorkspaceManager
 				}
 				else
 				{
-					Log.error("Created file already exists: %s", file);
+					Log.error("Deleted file not known: %s", file);
 				}
 				break;
 		}

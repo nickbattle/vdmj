@@ -49,8 +49,8 @@ public class LSPInitializeResponse extends JSONObject
 		cap.put("textDocumentSync",
 			new JSONObject(
 				"openClose", true,
-				"change", 2,
-				"save", new JSONObject("includeText", false)));
+				"change", 2,	// incremental
+				"save", new JSONObject("includeText", true)));
 		
 		return cap;
 	}

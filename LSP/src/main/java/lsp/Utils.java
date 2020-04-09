@@ -49,7 +49,7 @@ public class Utils
 
 	public static JSONObject lexLocationToRange(LexLocation location)
 	{
-		if (location.endPos == 0)	// not set, so use a point
+		if (location.endPos == 0)	// end is not set, so use a point
 		{
 			return lexLocationToPoint(location);
 		}
@@ -100,6 +100,19 @@ public class Utils
 		// Catch position at end of file...
 		if (currentLine == line && currentCharacter == character)
 		{
+			return buffer.length();
+		}
+		
+		// Currently, we can get positions way off the EOF because we're dropping
+		// didChange updates. This is a temporary workaround...
+		if (currentLine == line && character > currentCharacter)
+		{
+			while (currentCharacter != character)
+			{
+				buffer.append(" ");		// Replaced in the subsequent edit?
+				currentCharacter++;
+			}
+			
 			return buffer.length();
 		}
 
