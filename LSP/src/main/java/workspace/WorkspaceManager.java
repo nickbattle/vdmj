@@ -375,7 +375,14 @@ public abstract class WorkspaceManager
 				while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
 				end--;
 				
-				Log.printf("EDITED: %s", buffer.substring(start, end));
+				try
+				{
+					Log.printf("EDITED: %s", buffer.substring(start, end));
+				}
+				catch (StringIndexOutOfBoundsException e)
+				{
+					Log.printf("EDITED: ?");
+				}
 			}
 			
 			return diagnosticResponses(parseFile(file), file);
