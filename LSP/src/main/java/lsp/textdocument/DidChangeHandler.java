@@ -62,7 +62,8 @@ public class DidChangeHandler extends LSPHandler
 					JSONObject change = (JSONObject)contentChange;
 					JSONObject range = change.get("range");
 					String text = change.get("text");
-					result.addAll(lspServerState.getManager().changeFile(request, file, range, text));
+					RPCMessageList r = lspServerState.getManager().changeFile(request, file, range, text);
+					if (r != null) result.addAll(r);
 				}
 			}
 			

@@ -94,15 +94,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 			errs.addAll(cr.getWarnings());
 		}
 
-		if (!errs.isEmpty())
-		{
-			Log.error("Syntax errors found in %s", file);
-		}
-		else
-		{
-			Log.printf("No syntax errors found in %s", file);
-		}
-
+		Log.dump(errs);
 		return errs;
 	}
 
@@ -150,6 +142,8 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		else
 		{
 			Log.error("Syntax errors found");
+			Log.dump(errs);
+			Log.dump(warns);
 			tcClassList = null;
 		}
 		
@@ -160,6 +154,8 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		else
 		{
 			Log.error("Type checking errors found");
+			Log.dump(errs);
+			Log.dump(warns);
 		}
 		
 		errs.addAll(warns);

@@ -367,11 +367,22 @@ public abstract class WorkspaceManager
 			int start = Utils.findPosition(buffer, range.get("start"));
 			int end   = Utils.findPosition(buffer, range.get("end"));
 			buffer.replace(start, end, text);
+			
+			{
+				// Dump the line
+				while (start > 0 && buffer.charAt(start) != '\n') start--;
+				start++;
+				while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
+				end--;
+				
+				Log.printf("EDITED: %s", buffer.substring(start, end));
+			}
+			
 			return diagnosticResponses(parseFile(file), file);
 		}
 	}
 
-	public void changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
+	public RPCMessageList changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
 	{
 		switch (type)
 		{
@@ -390,7 +401,7 @@ public abstract class WorkspaceManager
 			case CHANGE:
 				if (projectFiles.keySet().contains(file))	
 				{
-					Log.printf("Ignoring file changed notification: %s", file);
+					return checkLoadedFiles();		// typecheck on save
 				}
 				else
 				{
@@ -411,6 +422,8 @@ public abstract class WorkspaceManager
 				}
 				break;
 		}
+		
+		return null;
 	}
 
 	public RPCMessageList saveFile(RPCRequest request, File file, String text) throws Exception

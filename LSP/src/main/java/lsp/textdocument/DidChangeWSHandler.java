@@ -49,6 +49,7 @@ public class DidChangeWSHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			JSONArray changes = params.get("changes");
+			RPCMessageList result = new RPCMessageList();
 			
 			for (Object fileEvent: changes)
 			{
@@ -57,12 +58,12 @@ public class DidChangeWSHandler extends LSPHandler
 					JSONObject change = (JSONObject)fileEvent; 
 					File file = Utils.uriToFile(change.get("uri"));
 					WatchKind type = WatchKind.kindOf(change.get("type"));
-		
-					lspServerState.getManager().changeWatchedFile(request, file, type);
+					RPCMessageList r = lspServerState.getManager().changeWatchedFile(request, file, type);
+					if (r != null) result.addAll(r);
 				}
 			}
 			
-			return null;
+			return result;
 		}
 		catch (URISyntaxException e)
 		{
