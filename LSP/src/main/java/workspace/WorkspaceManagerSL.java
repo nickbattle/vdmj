@@ -166,7 +166,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	@Override
 	public RPCMessageList findDefinition(RPCRequest request, File file, int line, int col)
 	{
-		if (!tcModuleList.isEmpty())
+		if (tcModuleList != null && !tcModuleList.isEmpty())
 		{
 			LSPDefinitionFinder finder = new LSPDefinitionFinder();
 			TCDefinition def = finder.find(tcModuleList, file, line + 1, col + 1);

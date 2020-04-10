@@ -59,7 +59,7 @@ abstract public class JSONServer
 			return null;
 		}
 		
-		String encoding = "cp1252";		// For VSCode?
+		String encoding = System.getProperty("json.encoding", "cp1252");	// For VSCode?
 		
 		if (separator.startsWith("Content-Type:"))
 		{
@@ -68,7 +68,10 @@ abstract public class JSONServer
 			if (charset > 0)
 			{
 				encoding = separator.substring(charset + "charset=".length());
-				Log.printf("Encoding = %s", encoding);
+			}
+			else
+			{
+				Log.error("Malformed header: %s", separator);
 			}
 			
 			separator = br.readLine();
@@ -78,12 +81,22 @@ abstract public class JSONServer
 			Log.error("Input stream out of sync. Expected \\r\\n got [%s]", separator);
 		}
 		
-		if (!contentLength.startsWith("Content-Length:"))
+		// Some content lengths are too long, so we make a soft match against the header,
+		// since part of it may have been read into the previous message (and ignored).
+		final String STEM = "ent-Length: ";
+		int offset = contentLength.indexOf(STEM);
+		int length = 0;
+		
+		if (offset == -1)
 		{
 			Log.error("Input stream out of sync. Expected Content-Length: got [%s]", contentLength);
+			throw new IOException("Input stream out of sync");
+		}
+		else
+		{
+			length = Integer.parseInt(contentLength.substring(offset + STEM.length()));
 		}
 		
-		int length = Integer.parseInt(contentLength.substring(16));	// Content-Length: NNNN
 		byte[] bytes = new byte[length];
 		
 		for (int i=0; i<length; i++)
@@ -103,10 +116,12 @@ abstract public class JSONServer
 		JSONWriter jwriter = new JSONWriter(new PrintWriter(swout));
 		jwriter.writeObject(response);
 
+		String encoding = System.getProperty("json.encoding", "cp1252");	// For VSCode?
+		
 		String jout = swout.toString();
 		Log.printf("<<< %s %s", prefix, jout);
-		PrintWriter pwout = new PrintWriter(new OutputStreamWriter(outStream, "UTF-8"));
-		pwout.printf("Content-Length: %d\r\n\r\n%s", jout.getBytes("UTF-8").length, jout);
+		PrintWriter pwout = new PrintWriter(new OutputStreamWriter(outStream, encoding));
+		pwout.printf("Content-Length: %d\r\n\r\n%s", jout.getBytes(encoding).length, jout);
 		pwout.flush();
 	}
 }
