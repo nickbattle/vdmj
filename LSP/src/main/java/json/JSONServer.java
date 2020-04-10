@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -51,23 +52,46 @@ abstract public class JSONServer
 	{
 		BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
 		String contentLength = br.readLine();
-		br.readLine();	// blank separator
+		String separator = br.readLine();	// blank separator
 		
-		if (contentLength == null)	// EOF
+		if (contentLength == null || separator == null)	// EOF
 		{
 			return null;
 		}
 		
+		String encoding = "cp1252";		// For VSCode?
+		
+		if (separator.startsWith("Content-Type:"))
+		{
+			int charset = separator.indexOf("charset=");
+			
+			if (charset > 0)
+			{
+				encoding = separator.substring(charset + "charset=".length());
+				Log.printf("Encoding = %s", encoding);
+			}
+			
+			separator = br.readLine();
+		}
+		else if (!separator.isEmpty())
+		{
+			Log.error("Input stream out of sync. Expected \\r\\n got [%s]", separator);
+		}
+		
+		if (!contentLength.startsWith("Content-Length:"))
+		{
+			Log.error("Input stream out of sync. Expected Content-Length: got [%s]", contentLength);
+		}
+		
 		int length = Integer.parseInt(contentLength.substring(16));	// Content-Length: NNNN
-		char[] bytes = new char[length];
-		int p = 0;
+		byte[] bytes = new byte[length];
 		
 		for (int i=0; i<length; i++)
 		{
-			bytes[p++] = (char) br.read();
+			bytes[i] = (byte) br.read();
 		}
 
-		String message = new String(bytes);
+		String message = new String(bytes, encoding);
 		Log.printf(">>> %s %s", prefix, message);
 		JSONReader jreader = new JSONReader(new StringReader(message));
 		return jreader.readObject();
@@ -81,8 +105,8 @@ abstract public class JSONServer
 
 		String jout = swout.toString();
 		Log.printf("<<< %s %s", prefix, jout);
-		PrintWriter pwout = new PrintWriter(outStream);
-		pwout.printf("Content-Length: %d\r\n\r\n%s", jout.length(), jout);
+		PrintWriter pwout = new PrintWriter(new OutputStreamWriter(outStream, "UTF-8"));
+		pwout.printf("Content-Length: %d\r\n\r\n%s", jout.getBytes("UTF-8").length, jout);
 		pwout.flush();
 	}
 }
