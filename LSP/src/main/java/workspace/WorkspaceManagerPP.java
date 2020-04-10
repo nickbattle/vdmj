@@ -179,11 +179,14 @@ public class WorkspaceManagerPP extends WorkspaceManager
 				URI defuri = def.location.file.toURI();
 				
 				return new RPCMessageList(request,
-						new JSONArray(
-							new JSONObject(
-								"targetUri", defuri.toString(),
-								"targetRange", Utils.lexLocationToRange(def.location),
-								"targetSelectionRange", Utils.lexLocationToPoint(def.location))));
+//						new JSONArray(
+//						new JSONObject(
+//							"targetUri", defuri.toString(),
+//							"targetRange", Utils.lexLocationToRange(def.location),
+//							"targetSelectionRange", Utils.lexLocationToPoint(def.location))));
+					new JSONObject(
+						"uri", defuri.toString(),
+						"range", Utils.lexLocationToRange(def.location)));
 			}
 		}
 		else
