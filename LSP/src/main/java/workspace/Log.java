@@ -36,6 +36,11 @@ public class Log
 {
 	private static PrintStream out = null;
 	
+	public static boolean logging()
+	{
+		return out != null;
+	}
+	
 	public static void init()
 	{
 		String filename = System.getProperty("log.filename");

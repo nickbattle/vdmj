@@ -368,21 +368,25 @@ public abstract class WorkspaceManager
 			int end   = Utils.findPosition(buffer, range.get("end"));
 			buffer.replace(start, end, text);
 			
+			if (Log.logging())	// dump edited line
 			{
-				// Dump the line
-				while (start > 0 && buffer.charAt(start) != '\n') start--;
-				start++;
-				while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
-				end--;
+				JSONObject position = range.get("start");
+				long line = position.get("line");
+				long count = 0;
+				start = 0;
 				
-				try
+				while (count < line)
 				{
-					Log.printf("EDITED: %s", buffer.substring(start, end));
+					if (buffer.charAt(start++) == '\n')
+					{
+						count++;
+					}
 				}
-				catch (StringIndexOutOfBoundsException e)
-				{
-					Log.printf("EDITED: ?");
-				}
+				
+				end = start;
+				while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
+				Log.printf("EDITED %d: [%s]", line+1, buffer.substring(start, end));
+				System.out.printf("EDITED %d: [%s]\n", line+1, buffer.substring(start, end));
 			}
 			
 			return diagnosticResponses(parseFile(file), file);
