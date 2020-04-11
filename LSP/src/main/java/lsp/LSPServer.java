@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
@@ -61,6 +62,7 @@ public class LSPServer extends JSONServer
 		
 		// Identify this class as the debug link - See DebugLink
 		System.setProperty("vdmj.debug.link", DAPDebugLink.class.getName());
+		Settings.annotations = true;
 	}
 	
 	private RPCDispatcher getDispatcher() throws IOException
