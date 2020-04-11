@@ -95,9 +95,6 @@ abstract public class JSONServer
 			Log.error("Input stream out of sync. Expected \\r\\n got [%s]", separator);
 		}
 		
-		int length = 0;
-		
-		
 		if (!contentLength.startsWith(CONTENT_LENGTH))
 		{
 			Log.error("Input stream out of sync. Expected Content-Length: got [%s]", contentLength);
@@ -105,13 +102,13 @@ abstract public class JSONServer
 		}
 		else
 		{
-			length = Integer.parseInt(contentLength.substring(CONTENT_LENGTH.length()).trim());
+			int length = Integer.parseInt(contentLength.substring(CONTENT_LENGTH.length()).trim());
 			byte[] bytes = new byte[length];
-			int size = inStream.read(bytes);
+			int size = 0;
 			
-			if (size != length)
+			while (size < length)
 			{
-				Log.error("Short message read: %d bytes, expecting %d", size, length);
+				size += inStream.read(bytes, size, length-size);
 			}
 			
 			String message = new String(bytes, encoding);
