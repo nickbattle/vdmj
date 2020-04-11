@@ -23,10 +23,8 @@
 
 package json;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -48,18 +46,31 @@ abstract public class JSONServer
 		this.outStream = outStream;
 	}
 	
+	private String readLine() throws IOException
+	{
+		StringBuilder sb = new StringBuilder();
+		char c = (char) inStream.read();
+		
+		while (c != '\n')
+		{
+			sb.append(c);
+			c = (char) inStream.read();
+		}
+		
+		return sb.toString().trim();
+	}
+	
 	public JSONObject readMessage() throws IOException
 	{
-		BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
-		String contentLength = br.readLine();
-		String separator = br.readLine();	// blank separator
+		String contentLength = readLine();
+		String separator = readLine();
 		
 		if (contentLength == null || separator == null)	// EOF
 		{
 			return null;
 		}
 		
-		String encoding = System.getProperty("json.encoding", "cp1252");	// For VSCode?
+		String encoding = "UTF-8";
 		
 		if (separator.startsWith("Content-Type:"))
 		{
@@ -74,40 +85,36 @@ abstract public class JSONServer
 				Log.error("Malformed header: %s", separator);
 			}
 			
-			separator = br.readLine();
+			separator = readLine();
 		}
 		else if (!separator.isEmpty())
 		{
 			Log.error("Input stream out of sync. Expected \\r\\n got [%s]", separator);
 		}
 		
-		// Some content lengths are too long, so we make a soft match against the header,
-		// since part of it may have been read into the previous message (and ignored).
-		final String STEM = "ent-Length: ";
-		int offset = contentLength.indexOf(STEM);
 		int length = 0;
+		final String HEADER = "Content-Length:";
 		
-		if (offset == -1)
+		if (!contentLength.startsWith(HEADER))
 		{
 			Log.error("Input stream out of sync. Expected Content-Length: got [%s]", contentLength);
 			throw new IOException("Input stream out of sync");
 		}
 		else
 		{
-			length = Integer.parseInt(contentLength.substring(offset + STEM.length()));
+			length = Integer.parseInt(contentLength.substring(HEADER.length()).trim());
+			byte[] bytes = new byte[length];
+			
+			for (int i=0; i<length; i++)
+			{
+				bytes[i] = (byte) inStream.read();
+			}
+	
+			String message = new String(bytes, encoding);
+			Log.printf(">>> %s %s", prefix, message);
+			JSONReader jreader = new JSONReader(new StringReader(message));
+			return jreader.readObject();
 		}
-		
-		byte[] bytes = new byte[length];
-		
-		for (int i=0; i<length; i++)
-		{
-			bytes[i] = (byte) br.read();
-		}
-
-		String message = new String(bytes, encoding);
-		Log.printf(">>> %s %s", prefix, message);
-		JSONReader jreader = new JSONReader(new StringReader(message));
-		return jreader.readObject();
 	}
 	
 	public void writeMessage(JSONObject response) throws IOException
@@ -116,12 +123,10 @@ abstract public class JSONServer
 		JSONWriter jwriter = new JSONWriter(new PrintWriter(swout));
 		jwriter.writeObject(response);
 
-		String encoding = System.getProperty("json.encoding", "cp1252");	// For VSCode?
-		
 		String jout = swout.toString();
 		Log.printf("<<< %s %s", prefix, jout);
-		PrintWriter pwout = new PrintWriter(new OutputStreamWriter(outStream, encoding));
-		pwout.printf("Content-Length: %d\r\n\r\n%s", jout.getBytes(encoding).length, jout);
+		PrintWriter pwout = new PrintWriter(new OutputStreamWriter(outStream, "UTF-8"));
+		pwout.printf("Content-Length: %d\r\n\r\n%s", jout.getBytes("UTF-8").length, jout);
 		pwout.flush();
 	}
 }
