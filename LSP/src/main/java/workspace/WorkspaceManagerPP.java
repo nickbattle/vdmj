@@ -156,6 +156,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 			Log.error("Type checking errors found");
 			Log.dump(errs);
 			Log.dump(warns);
+			inClassList = null;
 		}
 		
 		errs.addAll(warns);

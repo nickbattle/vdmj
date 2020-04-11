@@ -157,6 +157,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 			Log.error("Type checking errors found");
 			Log.dump(errs);
 			Log.dump(warns);
+			inModuleList = null;
 		}
 		
 		errs.addAll(warns);
@@ -219,7 +220,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 					{
 						for (TCDefinition indef: def.getDefinitions())
 						{
-							if (indef.name != null && !indef.name.isOld())
+							if (indef.name != null && indef.location.file.equals(file) && !indef.name.isOld())
 							{
 								results.add(symbolInformation(indef.name + ":" + indef.getType(),
 										indef.location, SymbolKind.kindOf(indef), indef.location.module));
@@ -239,7 +240,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 
 					for (ASTDefinition def: module.defs)
 					{
-						if (def.name != null && !def.name.old)
+						if (def.name != null && def.location.file.equals(file) && !def.name.old)
 						{
 							results.add(symbolInformation(def.name.toString(),
 									def.name.location, SymbolKind.kindOf(def), def.location.module));

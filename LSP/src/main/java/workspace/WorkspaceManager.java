@@ -198,10 +198,6 @@ public abstract class WorkspaceManager
 		}
 	}
 
-	public abstract Interpreter getInterpreter() throws Exception;
-
-	
-	
 	private void loadProjectFiles(File root) throws IOException
 	{
 		FilenameFilter filter = getFilenameFilter();
@@ -223,8 +219,6 @@ public abstract class WorkspaceManager
 		}
 	}
 
-	protected abstract FilenameFilter getFilenameFilter();
-
 	private void loadFile(File file) throws IOException
 	{
 		StringBuilder sb = new StringBuilder();
@@ -242,10 +236,6 @@ public abstract class WorkspaceManager
 		projectFiles.put(file, sb);
 	}
 	
-	protected abstract List<VDMMessage> parseFile(File file);
-
-	protected abstract RPCMessageList checkLoadedFiles() throws Exception;
-
 	protected RPCMessageList diagnosticResponses(List<? extends VDMMessage> list, File oneFile) throws IOException
 	{
 		Map<File, List<VDMMessage>> map = new HashMap<File, List<VDMMessage>>();
@@ -386,7 +376,7 @@ public abstract class WorkspaceManager
 				end = start;
 				while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
 				Log.printf("EDITED %d: [%s]", line+1, buffer.substring(start, end));
-				System.out.printf("EDITED %d: [%s]\n", line+1, buffer.substring(start, end));
+				// System.out.printf("EDITED %d: [%s]\n", line+1, buffer.substring(start, end));
 			}
 			
 			return diagnosticResponses(parseFile(file), file);
@@ -460,10 +450,6 @@ public abstract class WorkspaceManager
 			return checkLoadedFiles();		// typecheck on save
 		}
 	}
-
-	abstract public RPCMessageList findDefinition(RPCRequest request, File file, int line, int col) throws IOException;
-
-	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);
 
 	protected JSONObject symbolInformation(String name, LexLocation location, SymbolKind kind, String container)
 	{
@@ -544,8 +530,23 @@ public abstract class WorkspaceManager
 		
 		return new DAPMessageList(request, new JSONObject("breakpoints", results));
 	}
+	
+	/**
+	 * Abstract methods that are implemented in language specific subclasses.
+	 */
+	abstract protected FilenameFilter getFilenameFilter();
 
-	public abstract DAPMessageList threads(DAPRequest request);
+	abstract protected List<VDMMessage> parseFile(File file);
+
+	abstract protected RPCMessageList checkLoadedFiles() throws Exception;
+
+	abstract public RPCMessageList findDefinition(RPCRequest request, File file, int line, int col) throws IOException;
+
+	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);
+
+	abstract public DAPMessageList threads(DAPRequest request);
+
+	abstract public Interpreter getInterpreter() throws Exception;
 
 	public DAPMessageList disconnect(DAPRequest request, boolean terminateDebuggee)
 	{

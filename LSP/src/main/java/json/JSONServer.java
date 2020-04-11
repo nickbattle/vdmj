@@ -38,6 +38,9 @@ abstract public class JSONServer
 	private final String prefix;
 	private final InputStream inStream;
 	private final OutputStream outStream;
+
+	private final String CONTENT_LENGTH = "Content-Length:";
+	private final String CONTENT_TYPE = "Content-Type:";
 	
 	public JSONServer(String prefix, InputStream inStream, OutputStream outStream) throws IOException
 	{
@@ -72,7 +75,7 @@ abstract public class JSONServer
 		
 		String encoding = "UTF-8";
 		
-		if (separator.startsWith("Content-Type:"))
+		if (separator.startsWith(CONTENT_TYPE))
 		{
 			int charset = separator.indexOf("charset=");
 			
@@ -93,23 +96,24 @@ abstract public class JSONServer
 		}
 		
 		int length = 0;
-		final String HEADER = "Content-Length:";
 		
-		if (!contentLength.startsWith(HEADER))
+		
+		if (!contentLength.startsWith(CONTENT_LENGTH))
 		{
 			Log.error("Input stream out of sync. Expected Content-Length: got [%s]", contentLength);
 			throw new IOException("Input stream out of sync");
 		}
 		else
 		{
-			length = Integer.parseInt(contentLength.substring(HEADER.length()).trim());
+			length = Integer.parseInt(contentLength.substring(CONTENT_LENGTH.length()).trim());
 			byte[] bytes = new byte[length];
+			int size = inStream.read(bytes);
 			
-			for (int i=0; i<length; i++)
+			if (size != length)
 			{
-				bytes[i] = (byte) inStream.read();
+				Log.error("Short message read: %d bytes, expecting %d", size, length);
 			}
-	
+			
 			String message = new String(bytes, encoding);
 			Log.printf(">>> %s %s", prefix, message);
 			JSONReader jreader = new JSONReader(new StringReader(message));
@@ -126,7 +130,7 @@ abstract public class JSONServer
 		String jout = swout.toString();
 		Log.printf("<<< %s %s", prefix, jout);
 		PrintWriter pwout = new PrintWriter(new OutputStreamWriter(outStream, "UTF-8"));
-		pwout.printf("Content-Length: %d\r\n\r\n%s", jout.getBytes("UTF-8").length, jout);
+		pwout.printf("%s %d\r\n\r\n%s", CONTENT_LENGTH, jout.getBytes("UTF-8").length, jout);
 		pwout.flush();
 	}
 }

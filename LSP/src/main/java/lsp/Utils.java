@@ -103,19 +103,6 @@ public class Utils
 			return buffer.length();
 		}
 		
-		// Currently, we can get positions way off the EOF because we're dropping
-		// didChange updates. This is a temporary workaround...
-		if (currentLine == line && character > currentCharacter)
-		{
-			while (currentCharacter != character)
-			{
-				buffer.append(" ");		// Replaced in the subsequent edit?
-				currentCharacter++;
-			}
-			
-			return buffer.length();
-		}
-
 		throw new Exception("Cannot locate range");
 	}
 	
