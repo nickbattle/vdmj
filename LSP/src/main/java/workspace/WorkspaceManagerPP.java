@@ -56,7 +56,6 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
 import lsp.textdocument.SymbolKind;
-import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
@@ -173,7 +172,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 			
 			if (def == null)
 			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Definition not found");
+				return new RPCMessageList(request, null);
 			}
 			else
 			{
@@ -192,7 +191,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		}
 		else
 		{
-			return new RPCMessageList(new RPCResponse(request, "Specification has errors"));
+			return new RPCMessageList(new RPCResponse(request, null));
 		}
 	}
 
