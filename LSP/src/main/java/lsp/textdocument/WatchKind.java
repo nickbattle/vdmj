@@ -21,40 +21,31 @@
  *
  ******************************************************************************/
 
-package dap.handlers;
+package lsp.textdocument;
 
-import java.io.File;
-import java.io.IOException;
-
-import dap.DAPHandler;
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import dap.DAPServerState;
-import json.JSONArray;
-import json.JSONObject;
-
-public class SetBreakpointsHandler extends DAPHandler
+public enum WatchKind
 {
-	public SetBreakpointsHandler(DAPServerState state)
+	CREATE(1),
+	CHANGE(2),
+	DELETE(3);	// Not as spec, but VSCode does
+
+	private final int value;
+	
+	private WatchKind(int value)
 	{
-		super(state);
+		this.value = value;
 	}
 	
-	@Override
-	public DAPMessageList run(DAPRequest request) throws IOException
+	static WatchKind kindOf(long value)
 	{
-		try
+		for (WatchKind w: values())
 		{
-			JSONObject arguments = request.get("arguments");
-			JSONObject source = arguments.get("source");
-			File file = new File((String)source.get("path")).getCanonicalFile();
-			JSONArray lines = arguments.get("lines");
-			
-			return dapServerState.getManager().setBreakpoints(request, file, lines);
+			if (w.value == value)
+			{
+				return w;
+			}
 		}
-		catch (Exception e)
-		{
-			return new DAPMessageList(request, e);
-		}
+		
+		throw new IllegalArgumentException();
 	}
 }

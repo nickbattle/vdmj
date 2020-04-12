@@ -25,7 +25,6 @@ package vdmj;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,7 +42,6 @@ import dap.DAPResponse;
 import dap.DAPServer;
 import json.JSONArray;
 import json.JSONObject;
-import lsp.Utils;
 import workspace.Log;
 
 /**
@@ -108,9 +106,9 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				case "setBreakpoints":
 					JSONObject arguments = dapRequest.get("arguments");
 					JSONObject source = arguments.get("source");
-					URI uri = Utils.fileToURI(new File((String)source.get("path")));
+					File file = new File((String)source.get("path")).getCanonicalFile();
 					JSONArray lines = arguments.get("lines");
-					DAPMessageList responses = server.getState().getManager().setBreakpoints(dapRequest, uri, lines);
+					DAPMessageList responses = server.getState().getManager().setBreakpoints(dapRequest, file, lines);
 
 					for (JSONObject response: responses)
 					{

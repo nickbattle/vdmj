@@ -28,10 +28,18 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
+
+import com.fujitsu.vdmj.messages.VDMMessage;
 
 public class Log
 {
 	private static PrintStream out = null;
+	
+	public static boolean logging()
+	{
+		return out != null;
+	}
 	
 	public static void init()
 	{
@@ -73,5 +81,13 @@ public class Log
 	public static void error(Exception e)
 	{
 		printf("EXCEPTION: %s", e.getMessage());
+	}
+	
+	public static void dump(List<VDMMessage> messages)
+	{
+		for (VDMMessage m: messages)
+		{
+			Log.printf("MSG: %s", m.toString());
+		}
 	}
 }

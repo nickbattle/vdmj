@@ -56,7 +56,6 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
 import lsp.textdocument.SymbolKind;
-import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
@@ -74,13 +73,13 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	}
 	
 	@Override
-	protected List<VDMMessage> parseURI(URI uri)
+	protected List<VDMMessage> parseFile(File file)
 	{
 		List<VDMMessage> errs = new Vector<VDMMessage>();
-		StringBuilder buffer = projectFiles.get(uri);
+		StringBuilder buffer = projectFiles.get(file);
 		
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
-				Dialect.VDM_SL, new File(uri), Charset.defaultCharset().displayName());
+				Dialect.VDM_SL, file, Charset.defaultCharset().displayName());
 		ModuleReader mr = new ModuleReader(ltr);
 		mr.readModules();
 		
@@ -94,6 +93,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 			errs.addAll(mr.getWarnings());
 		}
 
+		Log.dump(errs);
 		return errs;
 	}
 
@@ -104,10 +104,10 @@ public class WorkspaceManagerSL extends WorkspaceManager
 		List<VDMMessage> errs = new Vector<VDMMessage>();
 		List<VDMMessage> warns = new Vector<VDMMessage>();
 		
-		for (Entry<URI, StringBuilder> entry: projectFiles.entrySet())
+		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
 			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(),
-					Dialect.VDM_SL, new File(entry.getKey()), Charset.defaultCharset().displayName());
+					Dialect.VDM_SL, entry.getKey(), Charset.defaultCharset().displayName());
 			ModuleReader mr = new ModuleReader(ltr);
 			astModuleList.addAll(mr.readModules());
 			
@@ -141,6 +141,9 @@ public class WorkspaceManagerSL extends WorkspaceManager
 		}
 		else
 		{
+			Log.error("Syntax errors found");
+			Log.dump(errs);
+			Log.dump(warns);
 			tcModuleList = null;
 		}
 		
@@ -148,38 +151,48 @@ public class WorkspaceManagerSL extends WorkspaceManager
 		{
 			inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(tcModuleList);
 		}
+		else
+		{
+			Log.error("Type checking errors found");
+			Log.dump(errs);
+			Log.dump(warns);
+			inModuleList = null;
+		}
 		
 		errs.addAll(warns);
 		return diagnosticResponses(errs, null);
 	}
 
 	@Override
-	public RPCMessageList findDefinition(RPCRequest request, URI uri, int line, int col)
+	public RPCMessageList findDefinition(RPCRequest request, File file, int line, int col)
 	{
-		if (tcModuleList != null)
+		if (tcModuleList != null && !tcModuleList.isEmpty())
 		{
 			LSPDefinitionFinder finder = new LSPDefinitionFinder();
-			TCDefinition def = finder.find(tcModuleList, new File(uri), line + 1, col + 1);
+			TCDefinition def = finder.find(tcModuleList, file, line + 1, col + 1);
 			
 			if (def == null)
 			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Definition not found");
+				return new RPCMessageList(request, null);
 			}
 			else
 			{
-				URI defuri = Utils.fileToURI(def.location.file);
+				URI defuri = def.location.file.toURI();
 				
 				return new RPCMessageList(request,
-						new JSONArray(
-							new JSONObject(
-								"targetUri", defuri.toString(),
-								"targetRange", Utils.lexLocationToRange(def.location),
-								"targetSelectionRange", Utils.lexLocationToPoint(def.location))));
+//						new JSONArray(
+//							new JSONObject(
+//								"targetUri", defuri.toString(),
+//								"targetRange", Utils.lexLocationToRange(def.location),
+//								"targetSelectionRange", Utils.lexLocationToPoint(def.location))));
+						new JSONObject(
+							"uri", defuri.toString(),
+							"range", Utils.lexLocationToRange(def.location)));
 			}
 		}
 		else
 		{
-			return new RPCMessageList(new RPCResponse(request, "Specification has errors"));
+			return new RPCMessageList(new RPCResponse(request, null));
 		}
 	}
 
@@ -190,10 +203,9 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	}
 
 	@Override
-	public RPCMessageList documentSymbols(RPCRequest request, URI uri)
+	public RPCMessageList documentSymbols(RPCRequest request, File file)
 	{
 		JSONArray results = new JSONArray();
-		File file = new File(uri);
 		
 		if (tcModuleList != null)	// May be syntax errors
 		{
@@ -207,7 +219,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 					{
 						for (TCDefinition indef: def.getDefinitions())
 						{
-							if (!indef.name.isOld())
+							if (indef.name != null && indef.location.file.equals(file) && !indef.name.isOld())
 							{
 								results.add(symbolInformation(indef.name + ":" + indef.getType(),
 										indef.location, SymbolKind.kindOf(indef), indef.location.module));
@@ -227,7 +239,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 
 					for (ASTDefinition def: module.defs)
 					{
-						if (!def.name.old)
+						if (def.name != null && def.location.file.equals(file) && !def.name.old)
 						{
 							results.add(symbolInformation(def.name.toString(),
 									def.name.location, SymbolKind.kindOf(def), def.location.module));

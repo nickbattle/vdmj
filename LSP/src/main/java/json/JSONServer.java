@@ -23,11 +23,10 @@
 
 package json;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -39,6 +38,9 @@ abstract public class JSONServer
 	private final String prefix;
 	private final InputStream inStream;
 	private final OutputStream outStream;
+
+	private final String CONTENT_LENGTH = "Content-Length:";
+	private final String CONTENT_TYPE = "Content-Type:";
 	
 	public JSONServer(String prefix, InputStream inStream, OutputStream outStream) throws IOException
 	{
@@ -47,30 +49,73 @@ abstract public class JSONServer
 		this.outStream = outStream;
 	}
 	
+	private String readLine() throws IOException
+	{
+		StringBuilder sb = new StringBuilder();
+		char c = (char) inStream.read();
+		
+		while (c != '\n')
+		{
+			sb.append(c);
+			c = (char) inStream.read();
+		}
+		
+		return sb.toString().trim();
+	}
+	
 	public JSONObject readMessage() throws IOException
 	{
-		BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
-		String contentLength = br.readLine();
-		br.readLine();	// blank separator
+		String contentLength = readLine();
+		String separator = readLine();
 		
-		if (contentLength == null)	// EOF
+		if (contentLength == null || separator == null)	// EOF
 		{
 			return null;
 		}
 		
-		int length = Integer.parseInt(contentLength.substring(16));	// Content-Length: NNNN
-		char[] bytes = new char[length];
-		int p = 0;
+		String encoding = "UTF-8";
 		
-		for (int i=0; i<length; i++)
+		if (separator.startsWith(CONTENT_TYPE))
 		{
-			bytes[p++] = (char) br.read();
+			int charset = separator.indexOf("charset=");
+			
+			if (charset > 0)
+			{
+				encoding = separator.substring(charset + "charset=".length());
+			}
+			else
+			{
+				Log.error("Malformed header: %s", separator);
+			}
+			
+			separator = readLine();
 		}
-
-		String message = new String(bytes);
-		Log.printf(">>> %s %s", prefix, message);
-		JSONReader jreader = new JSONReader(new StringReader(message));
-		return jreader.readObject();
+		else if (!separator.isEmpty())
+		{
+			Log.error("Input stream out of sync. Expected \\r\\n got [%s]", separator);
+		}
+		
+		if (!contentLength.startsWith(CONTENT_LENGTH))
+		{
+			Log.error("Input stream out of sync. Expected Content-Length: got [%s]", contentLength);
+			throw new IOException("Input stream out of sync");
+		}
+		else
+		{
+			int length = Integer.parseInt(contentLength.substring(CONTENT_LENGTH.length()).trim());
+			byte[] bytes = new byte[length];
+			int size = 0;
+			
+			while (size < length)
+			{
+				size += inStream.read(bytes, size, length-size);
+			}
+			
+			String message = new String(bytes, encoding);
+			Log.printf(">>> %s %s", prefix, message);
+			JSONReader jreader = new JSONReader(new StringReader(message));
+			return jreader.readObject();
+		}
 	}
 	
 	public void writeMessage(JSONObject response) throws IOException
@@ -81,8 +126,8 @@ abstract public class JSONServer
 
 		String jout = swout.toString();
 		Log.printf("<<< %s %s", prefix, jout);
-		PrintWriter pwout = new PrintWriter(outStream);
-		pwout.printf("Content-Length: %d\r\n\r\n%s", jout.length(), jout);
+		PrintWriter pwout = new PrintWriter(new OutputStreamWriter(outStream, "UTF-8"));
+		pwout.printf("%s %d\r\n\r\n%s", CONTENT_LENGTH, jout.getBytes("UTF-8").length, jout);
 		pwout.flush();
 	}
 }

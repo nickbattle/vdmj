@@ -27,12 +27,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
 import json.JSONServer;
 import lsp.textdocument.DefinitionHandler;
 import lsp.textdocument.DidChangeHandler;
+import lsp.textdocument.DidChangeWSHandler;
 import lsp.textdocument.DidCloseHandler;
 import lsp.textdocument.DidOpenHandler;
 import lsp.textdocument.DidSaveHandler;
@@ -60,6 +62,7 @@ public class LSPServer extends JSONServer
 		
 		// Identify this class as the debug link - See DebugLink
 		System.setProperty("vdmj.debug.link", DAPDebugLink.class.getName());
+		Settings.annotations = true;
 	}
 	
 	private RPCDispatcher getDispatcher() throws IOException
@@ -77,6 +80,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register("textDocument/didSave", new DidSaveHandler(state));
 		dispatcher.register("textDocument/definition", new DefinitionHandler(state));
 		dispatcher.register("textDocument/documentSymbol", new DocumentSymbolHandler(state));
+		dispatcher.register("workspace/didChangeWatchedFiles", new DidChangeWSHandler(state));
 
 		return dispatcher;
 	}

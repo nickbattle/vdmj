@@ -24,24 +24,30 @@
 package lsp;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.Socket;
+
 import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.DAPServerSocket;
 import workspace.Log;
 
-public class LSPServerStdio implements Runnable
+public class LSPServerVSCode implements Runnable
 {
 	private Dialect dialect;
+	private int port;
 
-	public LSPServerStdio(Dialect dialect)
+	public LSPServerVSCode(Dialect dialect, int port)
 	{
 		this.dialect = dialect;
+		this.port = port;
 	}
-	
-	public static void main(String[] args) throws IOException
+
+	public static void main(String[] args)
 	{
 		Dialect dialect = Dialect.VDM_SL;
 		int dapPort = -1;
+		int lspPort = -1;
 		
 		Log.init();
 
@@ -55,6 +61,10 @@ public class LSPServerStdio implements Runnable
 			{
 				dialect = Dialect.VDM_PP;
 			}
+			else if (args[a].equals("-lsp"))
+			{
+				lspPort = Integer.parseInt(args[++a]);
+			}
 			else if (args[a].equals("-dap"))
 			{
 				dapPort = Integer.parseInt(args[++a]);
@@ -65,17 +75,22 @@ public class LSPServerStdio implements Runnable
 			}
 		}
 		
+		if (lspPort < 0)
+		{
+			usage();
+		}
+		
 		if (dapPort > 0)
 		{
 			new Thread(new DAPServerSocket(dialect, dapPort), "DAP Listener").start();
 		}
 		
-		new LSPServerStdio(dialect).run();
+		new LSPServerVSCode(dialect, lspPort).run();
 	}
 	
 	private static void usage()
 	{
-		System.err.println("Usage: LSPServerStdio [-vdmsl | -vdmpp] [-dap]");
+		System.err.println("Usage: LSPServerVSCode [-vdmsl | -vdmpp] -lsp [-dap]");
 		System.exit(1);
 	}
 	
@@ -84,12 +99,23 @@ public class LSPServerStdio implements Runnable
 	{
 		try
 		{
-			Log.printf("LSP %s Server listening on stdio", dialect);
-			new LSPServer(dialect, System.in, System.out).run();
+			Socket socket = new Socket("localhost", port);
+			Log.printf("LSP %s Server listening on port %d", dialect, port);
+
+			while (true)
+			{
+			   new LSPServer(dialect, socket.getInputStream(), socket.getOutputStream()).run();
+			   socket.close();
+			}
+		}
+		catch (ConnectException e)
+		{
+			System.err.println("Connection exception: you have to start VSCode and open a VDM editor first?");
+			Log.error(e);
 		}
 		catch (IOException e)
 		{
-			Log.error("LSP Server stopped: %s", e.getMessage());
+			Log.error(e);
 		}
 	}
 }

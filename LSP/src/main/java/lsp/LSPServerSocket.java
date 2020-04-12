@@ -71,8 +71,13 @@ public class LSPServerSocket implements Runnable
 			}
 			else
 			{
-				Log.error("Usage: LSPSocketServer [-vdmsl | -vdmpp] -lsp [-dap]");
+				usage();
 			}
+		}
+		
+		if (lspPort < 0)
+		{
+			usage();
 		}
 		
 		if (dapPort > 0)
@@ -81,6 +86,12 @@ public class LSPServerSocket implements Runnable
 		}
 		
 		new LSPServerSocket(dialect, lspPort).run();
+	}
+	
+	private static void usage()
+	{
+		System.err.println("Usage: LSPServerSocket [-vdmsl | -vdmpp] -lsp [-dap]");
+		System.exit(1);
 	}
 	
 	@Override

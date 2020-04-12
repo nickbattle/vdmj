@@ -23,14 +23,15 @@
 
 package lsp.textdocument;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.LSPServerState;
+import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
@@ -49,7 +50,7 @@ public class DidChangeHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			JSONObject textDocument = params.get("textDocument");
-			URI uri = new URI(textDocument.get("uri"));
+			File file = Utils.uriToFile(textDocument.get("uri"));
 			
 			JSONArray contentChanges = params.get("contentChanges");
 			RPCMessageList result = new RPCMessageList();
@@ -61,7 +62,8 @@ public class DidChangeHandler extends LSPHandler
 					JSONObject change = (JSONObject)contentChange;
 					JSONObject range = change.get("range");
 					String text = change.get("text");
-					result = lspServerState.getManager().changeFile(request, uri, range, text);
+					RPCMessageList r = lspServerState.getManager().changeFile(request, file, range, text);
+					if (r != null) result.addAll(r);
 				}
 			}
 			

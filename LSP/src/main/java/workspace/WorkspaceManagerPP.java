@@ -56,7 +56,6 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
 import lsp.textdocument.SymbolKind;
-import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
@@ -74,13 +73,13 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	}
 
 	@Override
-	protected List<VDMMessage> parseURI(URI uri)
+	protected List<VDMMessage> parseFile(File file)
 	{
 		List<VDMMessage> errs = new Vector<VDMMessage>();
-		StringBuilder buffer = projectFiles.get(uri);
+		StringBuilder buffer = projectFiles.get(file);
 		
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
-				Dialect.VDM_PP, new File(uri), Charset.defaultCharset().displayName());
+				Dialect.VDM_PP, file, Charset.defaultCharset().displayName());
 		ClassReader cr = new ClassReader(ltr);
 		cr.readClasses();
 		
@@ -94,6 +93,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 			errs.addAll(cr.getWarnings());
 		}
 
+		Log.dump(errs);
 		return errs;
 	}
 
@@ -104,10 +104,10 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		List<VDMMessage> errs = new Vector<VDMMessage>();
 		List<VDMMessage> warns = new Vector<VDMMessage>();
 		
-		for (Entry<URI, StringBuilder> entry: projectFiles.entrySet())
+		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
 			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(),
-					Dialect.VDM_PP, new File(entry.getKey()), Charset.defaultCharset().displayName());
+					Dialect.VDM_PP, entry.getKey(), Charset.defaultCharset().displayName());
 			ClassReader cr = new ClassReader(ltr);
 			astClassList.addAll(cr.readClasses());
 			
@@ -140,6 +140,9 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		}
 		else
 		{
+			Log.error("Syntax errors found");
+			Log.dump(errs);
+			Log.dump(warns);
 			tcClassList = null;
 		}
 		
@@ -147,38 +150,48 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		{
 			inClassList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(tcClassList);
 		}
+		else
+		{
+			Log.error("Type checking errors found");
+			Log.dump(errs);
+			Log.dump(warns);
+			inClassList = null;
+		}
 		
 		errs.addAll(warns);
 		return diagnosticResponses(errs, null);
 	}
 
 	@Override
-	public RPCMessageList findDefinition(RPCRequest request, URI uri, int line, int col)
+	public RPCMessageList findDefinition(RPCRequest request, File file, int line, int col)
 	{
-		if (tcClassList != null)
+		if (tcClassList != null && !tcClassList.isEmpty())
 		{
 			LSPDefinitionFinder finder = new LSPDefinitionFinder();
-			TCDefinition def = finder.find(tcClassList, new File(uri), line + 1, col + 1);
+			TCDefinition def = finder.find(tcClassList, file, line + 1, col + 1);
 			
 			if (def == null)
 			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Definition not found");
+				return new RPCMessageList(request, null);
 			}
 			else
 			{
-				URI defuri = Utils.fileToURI(def.location.file);
+				URI defuri = def.location.file.toURI();
 				
 				return new RPCMessageList(request,
-						new JSONArray(
-							new JSONObject(
-								"targetUri", defuri.toString(),
-								"targetRange", Utils.lexLocationToRange(def.location),
-								"targetSelectionRange", Utils.lexLocationToPoint(def.location))));
+//						new JSONArray(
+//						new JSONObject(
+//							"targetUri", defuri.toString(),
+//							"targetRange", Utils.lexLocationToRange(def.location),
+//							"targetSelectionRange", Utils.lexLocationToPoint(def.location))));
+					new JSONObject(
+						"uri", defuri.toString(),
+						"range", Utils.lexLocationToRange(def.location)));
 			}
 		}
 		else
 		{
-			return new RPCMessageList(new RPCResponse(request, "Specification has errors"));
+			return new RPCMessageList(new RPCResponse(request, null));
 		}
 	}
 
@@ -189,10 +202,9 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	}
 
 	@Override
-	public RPCMessageList documentSymbols(RPCRequest request, URI uri)
+	public RPCMessageList documentSymbols(RPCRequest request, File file)
 	{
 		JSONArray results = new JSONArray();
-		File file = new File(uri);
 		
 		if (tcClassList != null)	// May be syntax errors
 		{

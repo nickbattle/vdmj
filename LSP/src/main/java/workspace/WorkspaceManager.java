@@ -29,7 +29,6 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +61,7 @@ import json.JSONObject;
 import lsp.LSPInitializeResponse;
 import lsp.Utils;
 import lsp.textdocument.SymbolKind;
+import lsp.textdocument.WatchKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
@@ -70,9 +70,9 @@ import vdmj.DAPDebugReader;
 public abstract class WorkspaceManager
 {
 	private static WorkspaceManager INSTANCE = null;
-	private URI rootUri = null;
-	protected Map<URI, StringBuilder> projectFiles = new HashMap<URI, StringBuilder>();
-	protected Set<URI> openFiles = new HashSet<URI>();
+	private File rootUri = null;
+	protected Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
+	protected Set<File> openFiles = new HashSet<File>();
 	
 	private Boolean noDebug;
 	protected Interpreter interpreter;
@@ -105,10 +105,10 @@ public abstract class WorkspaceManager
 		try
 		{
 			JSONObject params = request.get("params");
-			rootUri = new URI(params.get("rootUri"));
+			rootUri = Utils.uriToFile(params.get("rootUri"));
 			openFiles.clear();
 			Properties.init();
-			loadProjectFiles(new File(rootUri));
+			loadProjectFiles(rootUri);
 			
 			RPCMessageList responses = new RPCMessageList();
 			responses.add(new RPCResponse(request, new LSPInitializeResponse()));
@@ -198,10 +198,6 @@ public abstract class WorkspaceManager
 		}
 	}
 
-	public abstract Interpreter getInterpreter() throws Exception;
-
-	
-	
 	private void loadProjectFiles(File root) throws IOException
 	{
 		FilenameFilter filter = getFilenameFilter();
@@ -223,8 +219,6 @@ public abstract class WorkspaceManager
 		}
 	}
 
-	protected abstract FilenameFilter getFilenameFilter();
-
 	private void loadFile(File file) throws IOException
 	{
 		StringBuilder sb = new StringBuilder();
@@ -239,27 +233,23 @@ public abstract class WorkspaceManager
 		}
 	
 		br.close();
-		projectFiles.put(Utils.fileToURI(file), sb);
+		projectFiles.put(file, sb);
 	}
 	
-	protected abstract List<VDMMessage> parseURI(URI uri);
-
-	protected abstract RPCMessageList checkLoadedFiles() throws Exception;
-
-	protected RPCMessageList diagnosticResponses(List<? extends VDMMessage> list, URI oneURI)
+	protected RPCMessageList diagnosticResponses(List<? extends VDMMessage> list, File oneFile) throws IOException
 	{
-		Map<URI, List<VDMMessage>> map = new HashMap<URI, List<VDMMessage>>();
+		Map<File, List<VDMMessage>> map = new HashMap<File, List<VDMMessage>>();
 		
 		for (VDMMessage message: list)
 		{
-			URI uri = Utils.fileToURI(message.location.file);
-			List<VDMMessage> set = map.get(uri);
+			File file = message.location.file.getCanonicalFile();
+			List<VDMMessage> set = map.get(file);
 			
 			if (set == null)
 			{
 				set = new Vector<VDMMessage>();
 				set.add(message);
-				map.put(uri, set);
+				map.put(file, set);
 			}
 			else
 			{
@@ -269,26 +259,26 @@ public abstract class WorkspaceManager
 		
 		RPCMessageList responses = new RPCMessageList();
 		
-		// Only publish diags for a subset of the URIs - usually the one being edited, only.
+		// Only publish diags for a subset of the files - usually the one being edited, only.
 		// Defaults to all project files, if none specified.
-		Set<URI> urisToReport = new HashSet<URI>();
+		Set<File> filesToReport = new HashSet<File>();
 		
-		if (oneURI == null)
+		if (oneFile == null)
 		{
-			urisToReport.addAll(projectFiles.keySet());
+			filesToReport.addAll(projectFiles.keySet());
 		}
 		else
 		{
-			urisToReport.add(oneURI);
+			filesToReport.add(oneFile);
 		}
 		
-		for (URI uri: urisToReport)
+		for (File file: filesToReport)
 		{
 			JSONArray messages = new JSONArray();
 			
-			if (map.containsKey(uri))
+			if (map.containsKey(file))
 			{
-				for (VDMMessage message: map.get(uri))
+				for (VDMMessage message: map.get(file))
 				{
 					messages.add(
 						new JSONObject(
@@ -300,94 +290,166 @@ public abstract class WorkspaceManager
 				}
 			}
 			
-			JSONObject params = new JSONObject("uri", uri.toString(), "diagnostics", messages);
+			JSONObject params = new JSONObject("uri", file.toURI().toString(), "diagnostics", messages);
 			responses.add(new RPCRequest("textDocument/publishDiagnostics", params));
 		}
 		
 		return responses;
 	}
 	
-	public RPCMessageList openFile(RPCRequest request, URI uri, String text)
+	public RPCMessageList openFile(RPCRequest request, File file, String text) throws IOException
 	{
-		if (!projectFiles.keySet().contains(uri))
+		if (!projectFiles.keySet().contains(file))
 		{
-			return new RPCMessageList(request, "File not known");
+			Log.printf("Adding and opening new file: %s", file);
+			loadFile(file);
+			openFiles.add(file);
+			return null;
 		}
-		else if (openFiles.contains(uri))
+		else if (openFiles.contains(file))
 		{
-			return new RPCMessageList(request, "File already open");
+			Log.error("File already open: %s", file);
+			return null;
 		}
 		else
 		{
-			openFiles.add(uri);
+			Log.printf("Opening new file: %s", file);
+			openFiles.add(file);
 			return null;
 		}
 	}
 	
-	public RPCMessageList closeFile(RPCRequest request, URI uri)
+	public RPCMessageList closeFile(RPCRequest request, File file)
 	{
-		if (!projectFiles.keySet().contains(uri))
+		if (!projectFiles.keySet().contains(file))
 		{
-			return new RPCMessageList(request, "File not known");
+			Log.error("File not known: %s", file);
+			return null;
 		}
-		else if (!openFiles.contains(uri))
+		else if (!openFiles.contains(file))
 		{
-			return new RPCMessageList(request, "File not open");
+			Log.error("File not open: %s", file);
+			return null;
 		}
 		else
 		{
-			openFiles.remove(uri);
+			Log.printf("Closing file: %s", file);
+			openFiles.remove(file);
 			return null;
 		}
 	}
 
-	public RPCMessageList changeFile(RPCRequest request, URI uri, JSONObject range, String text) throws Exception
+	public RPCMessageList changeFile(RPCRequest request, File file, JSONObject range, String text) throws Exception
 	{
-		if (!projectFiles.keySet().contains(uri))
+		if (!projectFiles.keySet().contains(file))
 		{
-			return new RPCMessageList(request, "File not known");
+			Log.error("File not known: %s", file);
+			return null;
 		}
-		else if (!openFiles.contains(uri))
+		else if (!openFiles.contains(file))
 		{
-			return new RPCMessageList(request, "File not open");
+			Log.error("File not open: %s", file);
+			return null;
 		}
 		else
 		{
-			StringBuilder buffer = projectFiles.get(uri);
+			StringBuilder buffer = projectFiles.get(file);
 			int start = Utils.findPosition(buffer, range.get("start"));
 			int end   = Utils.findPosition(buffer, range.get("end"));
 			buffer.replace(start, end, text);
-			return diagnosticResponses(parseURI(uri), uri);
+			
+			if (Log.logging())	// dump edited line
+			{
+				JSONObject position = range.get("start");
+				long line = position.get("line");
+				long count = 0;
+				start = 0;
+				
+				while (count < line)
+				{
+					if (buffer.charAt(start++) == '\n')
+					{
+						count++;
+					}
+				}
+				
+				end = start;
+				while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
+				Log.printf("EDITED %d: [%s]", line+1, buffer.substring(start, end));
+				// System.out.printf("EDITED %d: [%s]\n", line+1, buffer.substring(start, end));
+			}
+			
+			return diagnosticResponses(parseFile(file), file);
 		}
 	}
 
-	public RPCMessageList saveFile(RPCRequest request, URI uri, String text) throws Exception
+	public RPCMessageList changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
 	{
-		if (!projectFiles.keySet().contains(uri))
+		switch (type)
+		{
+			case CREATE:
+				if (!projectFiles.keySet().contains(file))	
+				{
+					Log.printf("Adding new file: %s", file);
+					loadFile(file);
+				}
+				else
+				{
+					Log.error("Created file already exists: %s", file);
+				}
+				break;
+				
+			case CHANGE:
+				if (projectFiles.keySet().contains(file))	
+				{
+					return checkLoadedFiles();		// typecheck on save
+				}
+				else
+				{
+					Log.error("Changed file not loaded: %s", file);
+				}
+				break;
+				
+			case DELETE:
+				if (projectFiles.keySet().contains(file))	
+				{
+					Log.printf("Deleting file: %s", file);
+					projectFiles.remove(file);
+					checkLoadedFiles();
+				}
+				else
+				{
+					Log.error("Deleted file not known: %s", file);
+				}
+				break;
+		}
+		
+		return null;
+	}
+
+	public RPCMessageList saveFile(RPCRequest request, File file, String text) throws Exception
+	{
+		if (!projectFiles.keySet().contains(file))
 		{
 			return new RPCMessageList(request, "File not known");
 		}
-		else if (!openFiles.contains(uri))
+		else if (!openFiles.contains(file))
 		{
 			return new RPCMessageList(request, "File not open");
 		}
 		else
 		{
-			String buffer = projectFiles.get(uri).toString();
+			String buffer = projectFiles.get(file).toString();
 			
 			if (!text.trim().equals(buffer.trim()))		// Trim for trailing newline
 			{
 				Utils.diff("File different on didSave at %d", text, buffer);
-				projectFiles.put(uri, new StringBuilder(text));
+				projectFiles.put(file, new StringBuilder(text));
 			}
 			
 			return checkLoadedFiles();		// typecheck on save
 		}
 	}
-
-	abstract public RPCMessageList findDefinition(RPCRequest request, URI uri, int line, int col) throws IOException;
-
-	abstract public RPCMessageList documentSymbols(RPCRequest request, URI uri);
 
 	protected JSONObject symbolInformation(String name, LexLocation location, SymbolKind kind, String container)
 	{
@@ -414,9 +476,8 @@ public abstract class WorkspaceManager
 		return symbolInformation(name.name + ":" + type, name.location, kind, container);
 	}
 
-	public DAPMessageList setBreakpoints(DAPRequest request, URI uri, JSONArray lines) throws Exception
+	public DAPMessageList setBreakpoints(DAPRequest request, File file, JSONArray lines) throws Exception
 	{
-		File file = new File(uri);
 		JSONArray results = new JSONArray();
 		
 		Map<Integer, Breakpoint> breakpoints = interpreter.getBreakpoints();
@@ -469,8 +530,23 @@ public abstract class WorkspaceManager
 		
 		return new DAPMessageList(request, new JSONObject("breakpoints", results));
 	}
+	
+	/**
+	 * Abstract methods that are implemented in language specific subclasses.
+	 */
+	abstract protected FilenameFilter getFilenameFilter();
 
-	public abstract DAPMessageList threads(DAPRequest request);
+	abstract protected List<VDMMessage> parseFile(File file);
+
+	abstract protected RPCMessageList checkLoadedFiles() throws Exception;
+
+	abstract public RPCMessageList findDefinition(RPCRequest request, File file, int line, int col) throws IOException;
+
+	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);
+
+	abstract public DAPMessageList threads(DAPRequest request);
+
+	abstract public Interpreter getInterpreter() throws Exception;
 
 	public DAPMessageList disconnect(DAPRequest request, boolean terminateDebuggee)
 	{
