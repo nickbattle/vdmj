@@ -60,7 +60,15 @@ abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
  	public C caseAnnotatedExpression(TCAnnotatedExpression node, S arg)
  	{
- 		return node.expression.apply(this, arg);
+ 		C all = newCollection();
+ 		
+ 		for (TCExpression a: node.annotation.args)
+ 		{
+ 			all.addAll(a.apply(this, arg));
+ 		}
+ 		
+ 		all.addAll(node.expression.apply(this, arg));
+ 		return all;
  	}
 
  	@Override

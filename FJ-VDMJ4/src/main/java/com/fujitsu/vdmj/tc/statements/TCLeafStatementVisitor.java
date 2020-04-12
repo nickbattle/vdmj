@@ -47,7 +47,19 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseAnnotatedStatement(TCAnnotatedStatement node, S arg)
 	{
- 		return node.statement.apply(this, arg);
+ 		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
+ 		C all = newCollection();
+ 		
+ 		if (expVisitor != null)
+ 		{
+	 		for (TCExpression a: node.annotation.args)
+	 		{
+	 			all.addAll(a.apply(expVisitor, arg));
+	 		}
+ 		}
+ 		
+ 		all.addAll(node.statement.apply(this, arg));
+ 		return all;
 	}
 
 	@Override
