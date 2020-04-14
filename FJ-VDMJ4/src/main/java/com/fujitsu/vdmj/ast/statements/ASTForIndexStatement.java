@@ -59,4 +59,10 @@ public class ASTForIndexStatement extends ASTStatement
 	{
 		return "for";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForIndexStatement(this, arg);
+	}
 }

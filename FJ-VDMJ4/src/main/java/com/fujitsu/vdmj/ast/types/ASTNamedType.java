@@ -84,4 +84,10 @@ public class ASTNamedType extends ASTInvariantType
 	{
 		return typename.toString();
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNamedType(this, arg);
+	}
 }

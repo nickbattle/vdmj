@@ -96,4 +96,10 @@ public class ASTEqualsDefinition extends ASTDefinition
 	{
 		return "equals";
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseEqualsDefinition(this, arg);
+	}
 }

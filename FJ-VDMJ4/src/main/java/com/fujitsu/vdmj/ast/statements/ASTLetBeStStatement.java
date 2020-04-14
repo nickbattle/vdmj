@@ -55,4 +55,10 @@ public class ASTLetBeStStatement extends ASTStatement
 	{
 		return "let be st";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLetBeStStatement(this, arg);
+	}
 }

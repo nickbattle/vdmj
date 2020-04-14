@@ -45,4 +45,10 @@ public class ASTIndicesExpression extends ASTUnaryExpression
 	{
 		return "inds";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIndicesExpression(this, arg);
+	}
 }

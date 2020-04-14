@@ -61,4 +61,10 @@ public class ASTSpecificationStatement extends ASTStatement
 	{
 		return "specification";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSpecificationStatement(this, arg);
+	}
 }

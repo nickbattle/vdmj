@@ -45,4 +45,10 @@ public class ASTInstanceVariableDefinition extends ASTAssignmentDefinition
 	{
 		return "instance variable";
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInstanceVariableDefinition(this, arg);
+	}
 }

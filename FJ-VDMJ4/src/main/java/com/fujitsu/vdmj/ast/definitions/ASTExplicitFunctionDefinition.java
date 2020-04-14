@@ -86,4 +86,10 @@ public class ASTExplicitFunctionDefinition extends ASTDefinition
 	{
 		return "explicit function";
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExplicitFunctionDefinition(this, arg);
+	}
 }

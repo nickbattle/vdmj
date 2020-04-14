@@ -33,4 +33,10 @@ public abstract class ASTBasicType extends ASTType
 	{
 		super(location);
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBasicType(this, arg);
+	}
 }

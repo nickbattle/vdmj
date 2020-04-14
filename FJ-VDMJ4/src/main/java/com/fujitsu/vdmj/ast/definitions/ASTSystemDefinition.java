@@ -34,4 +34,10 @@ public class ASTSystemDefinition extends ASTClassDefinition
 	{
 		super(className, new LexNameList(), members);
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSystemDefinition(this, arg);
+	}
 }

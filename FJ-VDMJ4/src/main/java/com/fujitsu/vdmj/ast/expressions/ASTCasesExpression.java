@@ -55,4 +55,10 @@ public class ASTCasesExpression extends ASTExpression
 	{
 		return "cases";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCasesExpression(this, arg);
+	}
 }

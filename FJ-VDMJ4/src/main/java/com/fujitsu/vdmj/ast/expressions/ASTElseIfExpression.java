@@ -50,4 +50,10 @@ public class ASTElseIfExpression extends ASTExpression
 	{
 		return "elseif";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseElseIfExpression(this, arg);
+	}
 }

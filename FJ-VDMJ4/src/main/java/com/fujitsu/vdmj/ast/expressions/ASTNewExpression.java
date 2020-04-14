@@ -52,4 +52,10 @@ public class ASTNewExpression extends ASTExpression
 	{
 		return "new";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNewExpression(this, arg);
+	}
 }

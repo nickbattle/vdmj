@@ -45,4 +45,10 @@ public class ASTThreadIdExpression extends ASTExpression
 	{
 		return "threadid";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseThreadIdExpression(this, arg);
+	}
 }

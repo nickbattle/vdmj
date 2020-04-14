@@ -45,4 +45,10 @@ public class ASTHeadExpression extends ASTUnaryExpression
 	{
 		return "hd";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseHeadExpression(this, arg);
+	}
 }

@@ -59,4 +59,10 @@ public class ASTSetType extends ASTType
 	{
 		return setof.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetType(this, arg);
+	}
 }

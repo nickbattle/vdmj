@@ -54,4 +54,10 @@ public class ASTSeqEnumExpression extends ASTSeqExpression
 	{
 		return "seq enumeration";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqEnumExpression(this, arg);
+	}
 }

@@ -39,4 +39,10 @@ public class ASTSetUnionExpression extends ASTBinaryExpression
 	{
 		return "union";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetUnionExpression(this, arg);
+	}
 }

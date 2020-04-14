@@ -36,4 +36,10 @@ public abstract class ASTInvariantType extends ASTType
 
 	@Override
 	abstract protected String toDisplay();
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInvariantType(this, arg);
+	}
 }

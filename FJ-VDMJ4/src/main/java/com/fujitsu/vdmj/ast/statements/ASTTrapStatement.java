@@ -53,4 +53,10 @@ public class ASTTrapStatement extends ASTStatement
 	{
 		return "trap";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTrapStatement(this, arg);
+	}
 }

@@ -52,4 +52,10 @@ public class ASTIsOfClassExpression extends ASTExpression
 	{
 		return "isofclass(" + classname + "," + exp + ")";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIsOfClassExpression(this, arg);
+	}
 }

@@ -80,4 +80,10 @@ public class ASTImplicitOperationDefinition extends ASTDefinition
 	{
 		return "implicit operation";
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImplicitOperationDefinition(this, arg);
+	}
 }

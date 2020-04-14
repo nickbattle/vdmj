@@ -69,4 +69,10 @@ public class ASTCasesStatement extends ASTStatement
 		sb.append("esac");
 		return sb.toString();
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCasesStatement(this, arg);
+	}
 }

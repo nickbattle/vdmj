@@ -39,4 +39,10 @@ public class ASTCharacterType extends ASTBasicType
 	{
 		return "char";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCharacterType(this, arg);
+	}
 }

@@ -51,4 +51,10 @@ public class ASTLetDefStatement extends ASTStatement
 	{
 		return "let";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLetDefStatement(this, arg);
+	}
 }

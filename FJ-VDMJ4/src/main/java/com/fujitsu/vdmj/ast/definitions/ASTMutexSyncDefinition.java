@@ -68,4 +68,10 @@ public class ASTMutexSyncDefinition extends ASTDefinition
 	{
 		return toString().hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMutexSyncDefinition(this, arg);
+	}
 }

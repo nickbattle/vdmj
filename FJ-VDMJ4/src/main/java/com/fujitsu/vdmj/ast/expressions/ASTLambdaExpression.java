@@ -50,4 +50,10 @@ public class ASTLambdaExpression extends ASTExpression
 	{
 		return "lambda";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLambdaExpression(this, arg);
+	}
 }

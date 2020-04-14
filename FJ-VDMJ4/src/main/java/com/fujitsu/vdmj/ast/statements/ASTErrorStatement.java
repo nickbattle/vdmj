@@ -45,4 +45,10 @@ public class ASTErrorStatement extends ASTStatement
 	{
 		return "error";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseErrorStatement(this, arg);
+	}
 }

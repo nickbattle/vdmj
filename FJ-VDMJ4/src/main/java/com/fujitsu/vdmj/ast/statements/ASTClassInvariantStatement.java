@@ -50,4 +50,10 @@ public class ASTClassInvariantStatement extends ASTStatement
 	{
 		return "instance invariant " + name;
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassInvariantStatement(this, arg);
+	}
 }

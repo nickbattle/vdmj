@@ -51,4 +51,10 @@ public class ASTCyclesStatement extends ASTStatement
 	{
 		return "cycles (" + cycles + ") " + statement;
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCyclesStatement(this, arg);
+	}
 }

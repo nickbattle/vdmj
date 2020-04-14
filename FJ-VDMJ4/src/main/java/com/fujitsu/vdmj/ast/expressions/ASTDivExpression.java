@@ -39,4 +39,10 @@ public class ASTDivExpression extends ASTNumericBinaryExpression
 	{
 		return "div";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDivExpression(this, arg);
+	}
 }

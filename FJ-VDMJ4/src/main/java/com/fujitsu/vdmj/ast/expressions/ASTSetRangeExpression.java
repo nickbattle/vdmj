@@ -49,4 +49,10 @@ public class ASTSetRangeExpression extends ASTSetExpression
 	{
 		return "set range";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetRangeExpression(this, arg);
+	}
 }

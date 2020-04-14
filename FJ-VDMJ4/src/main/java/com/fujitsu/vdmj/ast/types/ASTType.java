@@ -105,4 +105,9 @@ public abstract class ASTType extends ASTNode implements Comparable<ASTType>, Se
 	{
 		return getClass().hashCode();
 	}
+	
+	/**
+	 * Implemented by all types to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg);
 }

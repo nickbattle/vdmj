@@ -39,4 +39,10 @@ public class ASTPlusExpression extends ASTNumericBinaryExpression
 	{
 		return "plus";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePlusExpression(this, arg);
+	}
 }

@@ -50,4 +50,10 @@ public class ASTWhileStatement extends ASTStatement
 	{
 		return "while";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseWhileStatement(this, arg);
+	}
 }

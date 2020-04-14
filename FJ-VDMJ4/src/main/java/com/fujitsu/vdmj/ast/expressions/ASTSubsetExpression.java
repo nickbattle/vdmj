@@ -39,4 +39,10 @@ public class ASTSubsetExpression extends ASTBinaryExpression
 	{
 		return "subset";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubsetExpression(this, arg);
+	}
 }

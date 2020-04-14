@@ -33,4 +33,10 @@ abstract public class ASTBooleanBinaryExpression extends ASTBinaryExpression
 	{
 		super(left, op, right);
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBooleanBinaryExpression(this, arg);
+	}
 }

@@ -45,4 +45,10 @@ public class ASTNotExpression extends ASTUnaryExpression
 	{
 		return "not";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotExpression(this, arg);
+	}
 }

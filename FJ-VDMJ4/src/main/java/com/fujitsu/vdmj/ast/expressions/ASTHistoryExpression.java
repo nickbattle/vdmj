@@ -66,4 +66,10 @@ public class ASTHistoryExpression extends ASTExpression
 		sb.append(")");
 		return sb.toString();
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseHistoryExpression(this, arg);
+	}
 }

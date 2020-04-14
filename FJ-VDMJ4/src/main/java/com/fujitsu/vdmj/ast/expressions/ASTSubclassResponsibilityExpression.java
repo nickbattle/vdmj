@@ -45,4 +45,10 @@ public class ASTSubclassResponsibilityExpression extends ASTExpression
 	{
 		return "subclass responsibility";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubclassResponsibilityExpression(this, arg);
+	}
 }

@@ -48,4 +48,10 @@ public class ASTTupleExpression extends ASTExpression
 	{
 		return "mk_()";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTupleExpression(this, arg);
+	}
 }

@@ -59,4 +59,10 @@ public class ASTQuoteType extends ASTType
 	{
 		return value.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQuoteType(this, arg);
+	}
 }

@@ -39,4 +39,10 @@ public class ASTSetDifferenceExpression extends ASTBinaryExpression
 	{
 		return "set difference";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetDifferenceExpression(this, arg);
+	}
 }

@@ -70,4 +70,10 @@ public class ASTClassType extends ASTType
 	{
 		return name.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassType(this, arg);
+	}
 }

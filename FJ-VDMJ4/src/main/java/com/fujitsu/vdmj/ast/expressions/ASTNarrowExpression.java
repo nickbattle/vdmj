@@ -61,4 +61,10 @@ public class ASTNarrowExpression extends ASTExpression
 	{
 		return "narrow_";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNarrowExpression(this, arg);
+	}
 }

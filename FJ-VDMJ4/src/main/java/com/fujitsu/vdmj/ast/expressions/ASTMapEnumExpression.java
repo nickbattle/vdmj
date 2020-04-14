@@ -61,4 +61,10 @@ public class ASTMapEnumExpression extends ASTMapExpression
 	{
 		return "map enumeration";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapEnumExpression(this, arg);
+	}
 }

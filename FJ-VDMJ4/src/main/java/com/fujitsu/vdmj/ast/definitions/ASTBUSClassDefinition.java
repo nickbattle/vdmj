@@ -56,4 +56,10 @@ public class ASTBUSClassDefinition extends ASTClassDefinition
 		dr.setCurrentModule("BUS");
 		return dr.readDefinitions();
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBUSClassDefinition(this, arg);
+	}
 }

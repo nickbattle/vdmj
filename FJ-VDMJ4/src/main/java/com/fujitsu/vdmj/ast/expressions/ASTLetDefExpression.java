@@ -52,4 +52,10 @@ public class ASTLetDefExpression extends ASTExpression
 	{
 		return "let def";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLetDefExpression(this, arg);
+	}
 }

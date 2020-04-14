@@ -50,4 +50,10 @@ public class ASTUntypedDefinition extends ASTDefinition
 	{
 		return "untyped";
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUntypedDefinition(this, arg);
+	}
 }

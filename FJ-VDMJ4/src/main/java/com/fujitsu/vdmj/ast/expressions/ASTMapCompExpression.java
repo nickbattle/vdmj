@@ -56,4 +56,10 @@ public class ASTMapCompExpression extends ASTMapExpression
 	{
 		return "map comprehension";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapCompExpression(this, arg);
+	}
 }

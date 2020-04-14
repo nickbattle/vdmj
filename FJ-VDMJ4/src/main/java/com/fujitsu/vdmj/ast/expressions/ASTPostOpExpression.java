@@ -59,4 +59,10 @@ public class ASTPostOpExpression extends ASTExpression
 	{
 		return "post_op";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePostOpExpression(this, arg);
+	}
 }

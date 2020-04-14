@@ -56,4 +56,10 @@ public class ASTVariableExpression extends ASTExpression
 	{
 		name = name.getExplicit(explicit);
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseVariableExpression(this, arg);
+	}
 }

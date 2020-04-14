@@ -48,4 +48,10 @@ public class ASTSelfExpression extends ASTExpression
 	{
 		return "self";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSelfExpression(this, arg);
+	}
 }

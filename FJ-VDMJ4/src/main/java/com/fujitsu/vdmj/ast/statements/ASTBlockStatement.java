@@ -56,4 +56,10 @@ public class ASTBlockStatement extends ASTSimpleBlockStatement
 		sb.append(")");
 		return sb.toString();
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBlockStatement(this, arg);
+	}
 }

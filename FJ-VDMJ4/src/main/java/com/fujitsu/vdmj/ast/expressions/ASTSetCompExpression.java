@@ -55,4 +55,10 @@ public class ASTSetCompExpression extends ASTSetExpression
 	{
 		return "set comprehension";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetCompExpression(this, arg);
+	}
 }

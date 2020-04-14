@@ -65,4 +65,10 @@ public class ASTOptionalType extends ASTType
 	{
 		return "[" + type + "]";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseOptionalType(this, arg);
+	}
 }

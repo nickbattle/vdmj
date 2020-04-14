@@ -39,4 +39,10 @@ public class ASTRemExpression extends ASTNumericBinaryExpression
 	{
 		return "rem";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRemExpression(this, arg);
+	}
 }

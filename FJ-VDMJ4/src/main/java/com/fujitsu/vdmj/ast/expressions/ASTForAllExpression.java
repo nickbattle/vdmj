@@ -51,4 +51,10 @@ public class ASTForAllExpression extends ASTExpression
 	{
 		return "forall";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForAllExpression(this, arg);
+	}
 }

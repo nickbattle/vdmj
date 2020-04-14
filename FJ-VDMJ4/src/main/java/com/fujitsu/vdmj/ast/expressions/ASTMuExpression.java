@@ -51,4 +51,10 @@ public class ASTMuExpression extends ASTExpression
 	{
 		return "mu";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMuExpression(this, arg);
+	}
 }

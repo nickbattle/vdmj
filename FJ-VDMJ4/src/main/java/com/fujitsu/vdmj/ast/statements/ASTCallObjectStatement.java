@@ -74,4 +74,10 @@ public class ASTCallObjectStatement extends ASTStatement
 	{
 		return "object call";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCallObjectStatement(this, arg);
+	}
 }

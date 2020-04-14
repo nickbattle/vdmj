@@ -71,4 +71,10 @@ public class ASTMapType extends ASTType
 	{
 		return from.hashCode() + to.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapType(this, arg);
+	}
 }

@@ -50,4 +50,10 @@ public class ASTFuncInstantiationExpression extends ASTExpression
 	{
 		return "instantiation";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFuncInstantiationExpression(this, arg);
+	}
 }

@@ -39,4 +39,10 @@ public class ASTNotEqualExpression extends ASTBinaryExpression
 	{
 		return "<>";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotEqualExpression(this, arg);
+	}
 }

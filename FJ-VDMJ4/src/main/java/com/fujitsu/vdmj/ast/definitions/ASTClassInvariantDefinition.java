@@ -51,4 +51,10 @@ public class ASTClassInvariantDefinition extends ASTDefinition
 	{
 		return "invariant";
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassInvariantDefinition(this, arg);
+	}
 }

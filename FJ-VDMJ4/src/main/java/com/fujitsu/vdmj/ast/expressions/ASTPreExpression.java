@@ -51,4 +51,10 @@ public class ASTPreExpression extends ASTExpression
 	{
 		return "pre_";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePreExpression(this, arg);
+	}
 }

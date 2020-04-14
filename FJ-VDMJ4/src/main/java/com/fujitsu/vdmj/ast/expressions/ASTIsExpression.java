@@ -61,4 +61,10 @@ public class ASTIsExpression extends ASTExpression
 	{
 		return "is_";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIsExpression(this, arg);
+	}
 }

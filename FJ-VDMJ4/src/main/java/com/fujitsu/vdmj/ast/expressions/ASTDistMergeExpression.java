@@ -45,4 +45,10 @@ public class ASTDistMergeExpression extends ASTUnaryExpression
 	{
 		return "merge";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDistMergeExpression(this, arg);
+	}
 }

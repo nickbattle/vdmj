@@ -48,4 +48,10 @@ public class ASTStopStatement extends ASTStatement
 	{
 		return kind() + "(" + objects + ")";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStopStatement(this, arg);
+	}
 }

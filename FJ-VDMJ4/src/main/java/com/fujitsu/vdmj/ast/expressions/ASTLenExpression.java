@@ -45,4 +45,10 @@ public class ASTLenExpression extends ASTUnaryExpression
 	{
 		return "len";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLenExpression(this, arg);
+	}
 }

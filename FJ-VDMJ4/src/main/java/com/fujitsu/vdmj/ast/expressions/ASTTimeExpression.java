@@ -45,4 +45,10 @@ public class ASTTimeExpression extends ASTExpression
 	{
 		return "time";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTimeExpression(this, arg);
+	}
 }

@@ -53,4 +53,10 @@ public class ASTPeriodicStatement extends ASTStatement
 	{
 		return "periodic(" + Utils.listToString(args) + ")(" + opname + ")";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePeriodicStatement(this, arg);
+	}
 }

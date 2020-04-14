@@ -62,4 +62,10 @@ abstract public class ASTSimpleBlockStatement extends ASTStatement
 	{
 		return "block";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSimpleBlockStatement(this, arg);
+	}
 }

@@ -47,4 +47,10 @@ public class ASTStateInitExpression extends ASTExpression
 	{
 		return "state init";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStateInitExpression(this, arg);
+	}
 }

@@ -85,4 +85,10 @@ public class ASTOperationType extends ASTType
 	{
 		return parameters.hashCode() + result.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseOperationType(this, arg);
+	}
 }

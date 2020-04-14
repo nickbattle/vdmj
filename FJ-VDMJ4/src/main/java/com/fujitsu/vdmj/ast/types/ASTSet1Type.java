@@ -39,4 +39,10 @@ public class ASTSet1Type extends ASTSetType
 	{
 		return "set1 of (" + setof + ")";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSet1Type(this, arg);
+	}
 }

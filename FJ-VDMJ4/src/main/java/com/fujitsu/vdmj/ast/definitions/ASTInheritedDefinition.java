@@ -51,4 +51,10 @@ public class ASTInheritedDefinition extends ASTDefinition
 	{
 		return superdef.kind();
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInheritedDefinition(this, arg);
+	}
 }

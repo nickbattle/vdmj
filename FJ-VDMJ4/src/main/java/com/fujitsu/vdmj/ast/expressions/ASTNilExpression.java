@@ -45,4 +45,10 @@ public class ASTNilExpression extends ASTExpression
 	{
 		return "nil";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNilExpression(this, arg);
+	}
 }

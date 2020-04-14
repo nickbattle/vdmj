@@ -52,4 +52,10 @@ public class ASTAssignmentStatement extends ASTStatement
 	{
 		return "assignment";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAssignmentStatement(this, arg);
+	}
 }

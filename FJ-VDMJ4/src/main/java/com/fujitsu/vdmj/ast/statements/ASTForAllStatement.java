@@ -54,4 +54,10 @@ public class ASTForAllStatement extends ASTStatement
 	{
 		return "for all";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForAllStatement(this, arg);
+	}
 }

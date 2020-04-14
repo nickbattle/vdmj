@@ -47,4 +47,10 @@ public class ASTIntegerLiteralExpression extends ASTExpression
 	{
 		return "literal";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIntegerLiteralExpression(this, arg);
+	}
 }

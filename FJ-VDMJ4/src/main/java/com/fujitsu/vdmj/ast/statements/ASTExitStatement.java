@@ -54,4 +54,10 @@ public class ASTExitStatement extends ASTStatement
 	{
 		return "exit";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExitStatement(this, arg);
+	}
 }

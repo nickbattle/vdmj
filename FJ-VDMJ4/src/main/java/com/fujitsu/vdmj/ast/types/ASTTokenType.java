@@ -39,4 +39,10 @@ public class ASTTokenType extends ASTBasicType
 	{
 		return "token";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTokenType(this, arg);
+	}
 }

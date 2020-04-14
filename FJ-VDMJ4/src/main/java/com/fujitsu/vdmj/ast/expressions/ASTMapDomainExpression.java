@@ -45,4 +45,10 @@ public class ASTMapDomainExpression extends ASTUnaryExpression
 	{
 		return "dom";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapDomainExpression(this, arg);
+	}
 }

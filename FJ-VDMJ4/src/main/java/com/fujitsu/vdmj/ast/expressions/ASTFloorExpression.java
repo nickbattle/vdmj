@@ -45,4 +45,10 @@ public class ASTFloorExpression extends ASTUnaryExpression
 	{
 		return "floor";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFloorExpression(this, arg);
+	}
 }

@@ -68,4 +68,10 @@ public class ASTStateDefinition extends ASTDefinition
 	{
 		return "state";
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStateDefinition(this, arg);
+	}
 }

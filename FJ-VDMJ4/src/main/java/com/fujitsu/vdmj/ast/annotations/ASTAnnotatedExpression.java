@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.ast.annotations;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.ast.expressions.ASTExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public class ASTAnnotatedExpression extends ASTExpression
@@ -51,5 +52,11 @@ public class ASTAnnotatedExpression extends ASTExpression
 	public String kind()
 	{
 		return "annotated expression";
+	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAnnotatedExpression(this, arg);
 	}
 }

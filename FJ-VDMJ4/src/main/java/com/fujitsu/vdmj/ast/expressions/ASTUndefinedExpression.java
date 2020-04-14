@@ -45,4 +45,10 @@ public class ASTUndefinedExpression extends ASTExpression
 	{
 		return "undefined";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUndefinedExpression(this, arg);
+	}
 }

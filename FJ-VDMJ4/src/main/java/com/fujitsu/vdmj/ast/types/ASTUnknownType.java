@@ -45,4 +45,10 @@ public class ASTUnknownType extends ASTType
 	{
 		return "?";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnknownType(this, arg);
+	}
 }

@@ -45,5 +45,10 @@ public class ASTAbsoluteExpression extends ASTUnaryExpression
 	{
 		return "abs";
 	}
-}
 
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAbsoluteExpression(this, arg);
+	}
+}

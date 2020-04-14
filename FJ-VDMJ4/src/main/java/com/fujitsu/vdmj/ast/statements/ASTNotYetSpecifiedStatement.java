@@ -45,4 +45,10 @@ public class ASTNotYetSpecifiedStatement extends ASTStatement
 	{
 		return "not specified";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotYetSpecifiedStatement(this, arg);
+	}
 }
