@@ -69,4 +69,10 @@ public class INCardinalityExpression extends INUnaryExpression
 			return abort(4065, e.getMessage(), ctxt);
 		}
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCardinalityExpression(this, arg);
+	}
 }

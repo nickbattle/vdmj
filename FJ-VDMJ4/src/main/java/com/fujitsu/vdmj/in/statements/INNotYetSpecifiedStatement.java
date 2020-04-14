@@ -122,4 +122,10 @@ public class INNotYetSpecifiedStatement extends INStatement
 
 		return abort(4041, "'is not yet specified' statement reached", ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotYetSpecifiedStatement(this, arg);
+	}
 }

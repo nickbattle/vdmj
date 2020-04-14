@@ -78,4 +78,10 @@ public class INStateInitExpression extends INExpression
 	{
 		return "init " + state.initPattern + " == " + state.initExpression;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStateInitExpression(this, arg);
+	}
 }

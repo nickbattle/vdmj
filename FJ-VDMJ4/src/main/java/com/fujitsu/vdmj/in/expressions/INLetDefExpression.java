@@ -116,4 +116,10 @@ public class INLetDefExpression extends INExpression
 		list.addAll(expression.getOldNames());
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLetDefExpression(this, arg);
+	}
 }

@@ -77,4 +77,10 @@ public class INModExpression extends INNumericBinaryExpression
 			return abort(e);
 		}
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseModExpression(this, arg);
+	}
 }

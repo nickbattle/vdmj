@@ -229,4 +229,10 @@ public class INPostOpExpression extends INExpression
 	{
 		return postexpression.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePostOpExpression(this, arg);
+	}
 }

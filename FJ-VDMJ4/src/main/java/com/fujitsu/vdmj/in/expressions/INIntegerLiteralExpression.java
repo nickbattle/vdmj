@@ -60,4 +60,10 @@ public class INIntegerLiteralExpression extends INExpression
         	return abort(e);
         }
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIntegerLiteralExpression(this, arg);
+	}
 }

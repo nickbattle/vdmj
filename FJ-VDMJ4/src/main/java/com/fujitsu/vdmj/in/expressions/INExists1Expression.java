@@ -122,4 +122,10 @@ public class INExists1Expression extends INExpression
 		list.addAll(predicate.getOldNames());
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExists1Expression(this, arg);
+	}
 }

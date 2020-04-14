@@ -182,4 +182,10 @@ public class INMapCompExpression extends INMapExpression
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapCompExpression(this, arg);
+	}
 }

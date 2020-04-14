@@ -62,4 +62,10 @@ public class INEquivalentExpression extends INBooleanBinaryExpression
         	return abort(e);
         }
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseEquivalentExpression(this, arg);
+	}
 }

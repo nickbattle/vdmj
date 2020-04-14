@@ -49,4 +49,10 @@ public class INSubclassResponsibilityExpression extends INExpression
 		breakpoint.check(location, ctxt);
 		return abort(4032, "'is subclass responsibility' expression reached", ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubclassResponsibilityExpression(this, arg);
+	}
 }

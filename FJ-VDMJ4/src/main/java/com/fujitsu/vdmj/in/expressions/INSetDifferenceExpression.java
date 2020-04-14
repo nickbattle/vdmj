@@ -65,4 +65,10 @@ public class INSetDifferenceExpression extends INBinaryExpression
 			return abort(e);
 		}
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetDifferenceExpression(this, arg);
+	}
 }

@@ -102,4 +102,10 @@ public class INCPUClassDefinition extends INClassDefinition
 	{
 		return new TCNameToken(new LexLocation(), "CPU", name);
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCPUClassDefinition(this, arg);
+	}
 }

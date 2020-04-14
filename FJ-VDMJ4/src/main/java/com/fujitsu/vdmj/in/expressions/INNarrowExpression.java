@@ -112,4 +112,10 @@ public class INNarrowExpression extends INExpression
 	{
 		return test.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNarrowExpression(this, arg);
+	}
 }

@@ -154,4 +154,9 @@ public abstract class INExpression extends INNode implements Serializable
 		subs.add(this);
 		return subs;
 	}
+
+	/**
+	 * Implemented by all expressions to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg);
 }

@@ -107,4 +107,10 @@ public class INThreadDefinition extends INDefinition
 	{
 		return operationName.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseThreadDefinition(this, arg);
+	}
 }

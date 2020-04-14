@@ -76,4 +76,10 @@ public class INElseIfStatement extends INStatement
         	return abort(e);
         }
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseElseIfStatement(this, arg);
+	}
 }

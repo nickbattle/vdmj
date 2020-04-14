@@ -825,4 +825,10 @@ public class INClassDefinition extends INDefinition
 		in.defaultReadObject();
 		guardLock = new Lock();
     }
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassDefinition(this, arg);
+	}
 }

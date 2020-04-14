@@ -49,4 +49,10 @@ public class INUnaryPlusExpression extends INUnaryExpression
 
 		return exp.eval(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnaryPlusExpression(this, arg);
+	}
 }

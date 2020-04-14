@@ -169,4 +169,10 @@ public class INApplyExpression extends INExpression
 		subs.add(this);
 		return subs;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseApplyExpression(this, arg);
+	}
 }

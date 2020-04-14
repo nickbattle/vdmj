@@ -77,4 +77,10 @@ public class INBreakpointExpression extends INExpression
 
 		return new BooleanValue(rv);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		throw new RuntimeException("Cannot call visitor on BreakpointExpression");
+	}
 }

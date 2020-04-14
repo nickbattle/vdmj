@@ -59,4 +59,10 @@ public class INDefExpression extends INLetDefExpression
 
 		return expression.eval(evalContext);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDefExpression(this, arg);
+	}
 }

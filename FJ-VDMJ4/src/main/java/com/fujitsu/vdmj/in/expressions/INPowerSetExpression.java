@@ -70,4 +70,10 @@ public class INPowerSetExpression extends INUnaryExpression
 			return abort(e);
 		}
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePowerSetExpression(this, arg);
+	}
 }

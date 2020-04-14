@@ -128,4 +128,10 @@ public class INIsExpression extends INExpression
 	{
 		return test.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIsExpression(this, arg);
+	}
 }

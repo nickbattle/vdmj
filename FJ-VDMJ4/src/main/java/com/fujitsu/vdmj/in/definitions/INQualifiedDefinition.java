@@ -36,8 +36,8 @@ import com.fujitsu.vdmj.values.ValueList;
 public class INQualifiedDefinition extends INDefinition
 {
 	private static final long serialVersionUID = 1L;
-	private final INDefinition def;
-	private final TCType type;
+	public final INDefinition def;
+	public final TCType type;
 
 	public INQualifiedDefinition(INDefinition qualifies, TCType type)
 	{
@@ -177,5 +177,11 @@ public class INQualifiedDefinition extends INDefinition
 	public boolean isUpdatable()
 	{
 		return super.isUpdatable();		// Note, not delegated
+	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQualifiedDefinition(this, arg);
 	}
 }

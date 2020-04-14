@@ -82,4 +82,10 @@ public class INBlockStatement extends INSimpleBlockStatement
 
 		return evalBlock(evalContext);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBlockStatement(this, arg);
+	}
 }

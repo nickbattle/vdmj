@@ -52,4 +52,10 @@ public class INUntypedDefinition extends INDefinition
 	{
 		return "Unknown type definition " + name;
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUntypedDefinition(this, arg);
+	}
 }

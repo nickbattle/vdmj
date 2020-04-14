@@ -122,4 +122,10 @@ public class INTixeStatement extends INStatement
 
 		return rv;
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTixeStatement(this, arg);
+	}
 }

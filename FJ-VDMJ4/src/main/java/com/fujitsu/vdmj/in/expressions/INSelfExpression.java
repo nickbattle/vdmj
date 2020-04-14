@@ -51,4 +51,10 @@ public class INSelfExpression extends INExpression
 	{
 		return "self";
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSelfExpression(this, arg);
+	}
 }

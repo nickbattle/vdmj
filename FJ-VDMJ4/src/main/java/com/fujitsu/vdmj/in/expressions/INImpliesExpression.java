@@ -67,4 +67,10 @@ public class INImpliesExpression extends INBooleanBinaryExpression
 			return abort(e);
 		}
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImpliesExpression(this, arg);
+	}
 }

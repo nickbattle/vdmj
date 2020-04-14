@@ -72,4 +72,10 @@ public class INPerSyncDefinition extends INDefinition
 	{
 		return guard;
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePerSyncDefinition(this, arg);
+	}
 }

@@ -122,4 +122,10 @@ public class INSameBaseClassExpression extends INExpression
 		list.addAll(right.getOldNames());
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSameBaseClassExpression(this, arg);
+	}
 }

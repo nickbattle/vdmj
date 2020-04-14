@@ -193,4 +193,10 @@ public class INExplicitOperationDefinition extends INDefinition
 	{
 		return body instanceof INSubclassResponsibilityStatement;
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExplicitOperationDefinition(this, arg);
+	}
 }

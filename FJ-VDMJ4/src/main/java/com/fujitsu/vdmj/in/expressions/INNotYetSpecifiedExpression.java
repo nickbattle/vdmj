@@ -182,4 +182,10 @@ public class INNotYetSpecifiedExpression extends INExpression
 			return abort(4076, e.getMessage(), ctxt, ctxt.location);
 		}
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotYetSpecifiedExpression(this, arg);
+	}
 }

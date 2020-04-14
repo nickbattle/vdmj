@@ -33,4 +33,10 @@ abstract public class INBooleanBinaryExpression extends INBinaryExpression
 	{
 		super(left, op, right);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBooleanBinaryExpression(this, arg);
+	}
 }

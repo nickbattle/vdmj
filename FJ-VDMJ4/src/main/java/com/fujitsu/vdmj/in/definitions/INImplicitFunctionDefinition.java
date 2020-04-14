@@ -285,4 +285,10 @@ public class INImplicitFunctionDefinition extends INDefinition
 	{
 		return body instanceof INSubclassResponsibilityExpression;
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImplicitFunctionDefinition(this, arg);
+	}
 }

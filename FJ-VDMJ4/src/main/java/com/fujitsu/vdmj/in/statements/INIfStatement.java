@@ -143,4 +143,10 @@ public class INIfStatement extends INStatement
         	return abort(e);
         }
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIfStatement(this, arg);
+	}
 }

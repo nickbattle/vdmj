@@ -169,4 +169,10 @@ public class INStartStatement extends INStatement
 	{
 		return "start(" + objects + ")";
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStartStatement(this, arg);
+	}
 }

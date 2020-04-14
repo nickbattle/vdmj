@@ -185,4 +185,10 @@ public class INStateDefinition extends INDefinition
 	{
 		return moduleState;
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStateDefinition(this, arg);
+	}
 }

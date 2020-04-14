@@ -127,7 +127,12 @@ public abstract class INDefinitionVisitor<R, S>
 		return caseDefinition(node, arg);
 	}
 
- 	public R caseRenamedDefinition(INRenamedDefinition node, S arg)
+ 	public R caseQualifiedDefinition(INQualifiedDefinition node, S arg)
+	{
+		return caseDefinition(node, arg);
+	}
+
+	public R caseRenamedDefinition(INRenamedDefinition node, S arg)
 	{
 		return caseDefinition(node, arg);
 	}

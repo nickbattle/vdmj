@@ -38,4 +38,10 @@ public abstract class INSeqExpression extends INExpression
 	{
 		super(location);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqExpression(this, arg);
+	}
 }

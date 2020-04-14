@@ -38,4 +38,10 @@ public abstract class INSetExpression extends INExpression
 	{
 		super(location);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetExpression(this, arg);
+	}
 }

@@ -217,4 +217,10 @@ public class INEqualsDefinition extends INDefinition
 	{
 		return true;
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseEqualsDefinition(this, arg);
+	}
 }

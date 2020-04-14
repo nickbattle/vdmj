@@ -219,4 +219,10 @@ public class INSeqCompExpression extends INSeqExpression
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqCompExpression(this, arg);
+	}
 }

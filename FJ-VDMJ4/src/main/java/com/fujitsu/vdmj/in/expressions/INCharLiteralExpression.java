@@ -51,4 +51,10 @@ public class INCharLiteralExpression extends INExpression
 		breakpoint.check(location, ctxt);
 		return new CharacterValue(value.unicode);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCharLiteralExpression(this, arg);
+	}
 }

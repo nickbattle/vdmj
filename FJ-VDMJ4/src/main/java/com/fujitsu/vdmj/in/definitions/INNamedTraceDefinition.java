@@ -82,4 +82,10 @@ public class INNamedTraceDefinition extends INDefinition
 
 		return iterators.getSequenceIterator();
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNamedTraceDefinition(this, arg);
+	}
 }

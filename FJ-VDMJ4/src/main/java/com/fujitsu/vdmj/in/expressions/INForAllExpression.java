@@ -154,4 +154,10 @@ public class INForAllExpression extends INExpression
 		list.addAll(predicate.getOldNames());
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForAllExpression(this, arg);
+	}
 }

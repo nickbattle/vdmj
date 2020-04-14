@@ -109,4 +109,10 @@ public class INSameClassExpression extends INExpression
 		list.addAll(right.getOldNames());
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSameClassExpression(this, arg);
+	}
 }

@@ -124,4 +124,10 @@ public class INSubseqExpression extends INExpression
 		list.addAll(to.getOldNames());
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubseqExpression(this, arg);
+	}
 }

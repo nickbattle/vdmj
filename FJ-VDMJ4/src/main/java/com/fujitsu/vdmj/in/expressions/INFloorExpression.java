@@ -58,4 +58,10 @@ public class INFloorExpression extends INUnaryExpression
         	return abort(e);
         }
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFloorExpression(this, arg);
+	}
 }

@@ -98,4 +98,10 @@ public class INMultiBindListDefinition extends INDefinition
 
 		return new TCUnionType(location, types);
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultiBindListDefinition(this, arg);
+	}
 }

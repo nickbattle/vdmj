@@ -82,4 +82,10 @@ public class INSporadicStatement extends INStatement
 	{
 		return "sporadic(" + Utils.listToString(args) + ")(" + opname + ")";
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSporadicStatement(this, arg);
+	}
 }

@@ -60,4 +60,10 @@ public class INBUSClassDefinition extends INClassDefinition
 	{
 		return new BUSValue((TCClassType)instance.getType(), cpus, null);
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBUSClassDefinition(this, arg);
+	}
 }

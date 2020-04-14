@@ -91,4 +91,10 @@ public class INDivExpression extends INNumericBinaryExpression
 			return (long)Math.floor(Math.abs(-lv/rv));
 		}
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDivExpression(this, arg);
+	}
 }

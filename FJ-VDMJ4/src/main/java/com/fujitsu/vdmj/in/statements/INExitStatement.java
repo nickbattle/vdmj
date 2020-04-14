@@ -77,4 +77,10 @@ public class INExitStatement extends INStatement
 	{
 		return expression == null ? null : expression.findExpression(lineno);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExitStatement(this, arg);
+	}
 }

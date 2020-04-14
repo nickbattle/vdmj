@@ -90,4 +90,10 @@ public class INPlusPlusExpression extends INBinaryExpression
 			return abort(e);
 		}
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePlusPlusExpression(this, arg);
+	}
 }

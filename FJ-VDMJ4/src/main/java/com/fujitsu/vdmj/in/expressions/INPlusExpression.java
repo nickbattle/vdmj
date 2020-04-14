@@ -82,4 +82,10 @@ public class INPlusExpression extends INNumericBinaryExpression
 		
 		return r;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePlusExpression(this, arg);
+	}
 }

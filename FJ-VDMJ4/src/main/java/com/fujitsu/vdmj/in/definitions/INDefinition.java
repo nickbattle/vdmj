@@ -246,4 +246,9 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	{
 		return accessSpecifier != null && accessSpecifier.access.equals(token);
 	}
+
+	/**
+	 * Implemented by all definitions to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg);
 }
