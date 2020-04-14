@@ -79,4 +79,10 @@ public class ASTImplicitFunctionDefinition extends ASTDefinition
 	{
 		return "implicit function";
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImplicitFunctionDefinition(this, arg);
+	}
 }

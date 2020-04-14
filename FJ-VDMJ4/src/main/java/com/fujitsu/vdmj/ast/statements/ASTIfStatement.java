@@ -70,4 +70,10 @@ public class ASTIfStatement extends ASTStatement
 	{
 		return "if";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIfStatement(this, arg);
+	}
 }

@@ -59,4 +59,10 @@ public class ASTSeqType extends ASTType
 	{
 		return seqof.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqType(this, arg);
+	}
 }

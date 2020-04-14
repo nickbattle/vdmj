@@ -54,4 +54,10 @@ public class ASTSetEnumExpression extends ASTSetExpression
 	{
 		return "set enumeration";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetEnumExpression(this, arg);
+	}
 }

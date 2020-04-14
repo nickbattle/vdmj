@@ -47,4 +47,10 @@ public class ASTQuoteLiteralExpression extends ASTExpression
 	{
 		return "quote";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQuoteLiteralExpression(this, arg);
+	}
 }

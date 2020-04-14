@@ -45,4 +45,10 @@ public class ASTPowerSetExpression extends ASTUnaryExpression
 	{
 		return "power";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePowerSetExpression(this, arg);
+	}
 }

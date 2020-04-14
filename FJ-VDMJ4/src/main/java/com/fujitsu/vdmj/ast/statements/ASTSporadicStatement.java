@@ -51,4 +51,10 @@ public class ASTSporadicStatement extends ASTStatement
 	{
 		return "sporadic(" + Utils.listToString(args) + ")(" + opname + ")";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSporadicStatement(this, arg);
+	}
 }

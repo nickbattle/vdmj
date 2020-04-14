@@ -47,4 +47,10 @@ public class ASTDefStatement extends ASTLetDefStatement
 	{
 		return "def";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDefStatement(this, arg);
+	}
 }

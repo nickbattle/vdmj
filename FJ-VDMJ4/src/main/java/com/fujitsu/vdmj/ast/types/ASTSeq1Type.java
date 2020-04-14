@@ -39,4 +39,10 @@ public class ASTSeq1Type extends ASTSeqType
 	{
 		return "seq1 of (" + seqof + ")";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeq1Type(this, arg);
+	}
 }

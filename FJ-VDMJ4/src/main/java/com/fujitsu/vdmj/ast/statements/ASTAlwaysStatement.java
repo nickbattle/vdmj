@@ -50,4 +50,10 @@ public class ASTAlwaysStatement extends ASTStatement
 	{
 		return "always";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAlwaysStatement(this, arg);
+	}
 }

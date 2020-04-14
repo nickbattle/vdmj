@@ -45,4 +45,10 @@ public class ASTTailExpression extends ASTUnaryExpression
 	{
 		return "tl";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTailExpression(this, arg);
+	}
 }

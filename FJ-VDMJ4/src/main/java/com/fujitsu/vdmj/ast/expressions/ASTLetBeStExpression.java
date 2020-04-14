@@ -54,4 +54,10 @@ public class ASTLetBeStExpression extends ASTExpression
 	{
 		return "let be st";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLetBeStExpression(this, arg);
+	}
 }

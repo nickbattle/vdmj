@@ -50,4 +50,10 @@ public class ASTIotaExpression extends ASTExpression
 	{
 		return "iota";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIotaExpression(this, arg);
+	}
 }

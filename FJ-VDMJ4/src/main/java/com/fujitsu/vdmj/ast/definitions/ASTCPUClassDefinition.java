@@ -62,4 +62,10 @@ public class ASTCPUClassDefinition extends ASTClassDefinition
 		dr.setCurrentModule("CPU");
 		return dr.readDefinitions();
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCPUClassDefinition(this, arg);
+	}
 }

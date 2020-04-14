@@ -47,4 +47,10 @@ public class ASTElementsExpression extends ASTSetExpression
 	{
 		return "elems";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseElementsExpression(this, arg);
+	}
 }

@@ -39,4 +39,10 @@ public class ASTMapUnionExpression extends ASTBinaryExpression
 	{
 		return "munion";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapUnionExpression(this, arg);
+	}
 }

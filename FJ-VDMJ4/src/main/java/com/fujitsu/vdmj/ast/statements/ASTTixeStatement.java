@@ -49,4 +49,10 @@ public class ASTTixeStatement extends ASTStatement
 	{
 		return "tixe";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTixeStatement(this, arg);
+	}
 }

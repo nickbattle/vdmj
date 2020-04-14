@@ -51,4 +51,10 @@ public class ASTDurationStatement extends ASTStatement
 	{
 		return "duration (" + duration + ") " + statement;
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDurationStatement(this, arg);
+	}
 }

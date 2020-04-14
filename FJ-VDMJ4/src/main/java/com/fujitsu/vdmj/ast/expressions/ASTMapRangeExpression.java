@@ -45,4 +45,10 @@ public class ASTMapRangeExpression extends ASTUnaryExpression
 	{
 		return "rng";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapRangeExpression(this, arg);
+	}
 }

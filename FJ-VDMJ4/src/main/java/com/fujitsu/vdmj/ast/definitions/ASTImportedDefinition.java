@@ -50,4 +50,10 @@ public class ASTImportedDefinition extends ASTDefinition
 	{
 		return "import";
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImportedDefinition(this, arg);
+	}
 }

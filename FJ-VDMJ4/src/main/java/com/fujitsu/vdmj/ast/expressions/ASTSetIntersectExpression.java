@@ -39,4 +39,10 @@ public class ASTSetIntersectExpression extends ASTBinaryExpression
 	{
 		return "intersect";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetIntersectExpression(this, arg);
+	}
 }

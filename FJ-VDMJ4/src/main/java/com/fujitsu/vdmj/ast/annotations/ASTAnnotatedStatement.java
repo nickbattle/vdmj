@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.ast.annotations;
 
 import com.fujitsu.vdmj.ast.statements.ASTStatement;
+import com.fujitsu.vdmj.ast.statements.ASTStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public class ASTAnnotatedStatement extends ASTStatement
@@ -51,5 +52,11 @@ public class ASTAnnotatedStatement extends ASTStatement
 	public String kind()
 	{
 		return "annotated statement";
+	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAnnotatedStatement(this, arg);
 	}
 }

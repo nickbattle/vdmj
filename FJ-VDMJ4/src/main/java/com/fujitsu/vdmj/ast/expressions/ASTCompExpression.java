@@ -39,4 +39,10 @@ public class ASTCompExpression extends ASTBinaryExpression
 	{
 		return "comp";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCompExpression(this, arg);
+	}
 }

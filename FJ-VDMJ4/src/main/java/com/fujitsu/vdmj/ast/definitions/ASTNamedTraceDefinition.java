@@ -60,4 +60,10 @@ public class ASTNamedTraceDefinition extends ASTDefinition
 	{
 		return pathname + " = " + terms.toString();
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNamedTraceDefinition(this, arg);
+	}
 }

@@ -33,4 +33,10 @@ public abstract class ASTNumericType extends ASTBasicType
 	{
 		super(location);
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNumericType(this, arg);
+	}
 }

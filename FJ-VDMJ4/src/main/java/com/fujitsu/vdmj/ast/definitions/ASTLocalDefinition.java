@@ -52,4 +52,10 @@ public class ASTLocalDefinition extends ASTDefinition
 	{
 		return "local";
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLocalDefinition(this, arg);
+	}
 }

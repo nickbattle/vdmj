@@ -39,4 +39,10 @@ public class ASTTimesExpression extends ASTNumericBinaryExpression
 	{
 		return "multiply";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTimesExpression(this, arg);
+	}
 }

@@ -61,4 +61,10 @@ public class ASTFieldExpression extends ASTExpression
 	{
 		return "field name";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFieldExpression(this, arg);
+	}
 }

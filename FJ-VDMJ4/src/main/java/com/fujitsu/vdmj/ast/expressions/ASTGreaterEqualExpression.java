@@ -39,4 +39,10 @@ public class ASTGreaterEqualExpression extends ASTNumericBinaryExpression
 	{
 		return ">=";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseGreaterEqualExpression(this, arg);
+	}
 }

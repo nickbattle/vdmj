@@ -45,4 +45,10 @@ public class ASTVoidReturnType extends ASTType
 	{
 		return "()";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseVoidReturnType(this, arg);
+	}
 }

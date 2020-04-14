@@ -60,4 +60,10 @@ public class ASTProductType extends ASTType
 	{
 		return types.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseProductType(this, arg);
+	}
 }

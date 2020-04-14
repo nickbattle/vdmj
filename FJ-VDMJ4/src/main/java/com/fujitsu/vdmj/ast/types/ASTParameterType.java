@@ -47,4 +47,10 @@ public class ASTParameterType extends ASTType
 	{
 		return "@" + name;
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseParameterType(this, arg);
+	}
 }

@@ -60,4 +60,9 @@ public abstract class ASTStatement extends ASTNode implements Serializable
 	{
 		this.comments = comments;
 	}
+
+	/**
+	 * Implemented by all statements to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg);
 }

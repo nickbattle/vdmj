@@ -39,4 +39,10 @@ public class ASTSeqConcatExpression extends ASTBinaryExpression
 	{
 		return "concatenation";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqConcatExpression(this, arg);
+	}
 }

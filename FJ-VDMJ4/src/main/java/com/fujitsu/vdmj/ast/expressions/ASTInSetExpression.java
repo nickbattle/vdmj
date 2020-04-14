@@ -39,4 +39,10 @@ public class ASTInSetExpression extends ASTBinaryExpression
 	{
 		return "set membership";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInSetExpression(this, arg);
+	}
 }

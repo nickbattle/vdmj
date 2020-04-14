@@ -39,4 +39,10 @@ public class ASTInMapType extends ASTMapType
 	{
 		return "inmap (" + from + ") to (" + to + ")";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInMapType(this, arg);
+	}
 }

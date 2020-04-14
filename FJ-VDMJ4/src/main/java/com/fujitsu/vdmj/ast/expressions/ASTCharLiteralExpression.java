@@ -47,4 +47,10 @@ public class ASTCharLiteralExpression extends ASTExpression
 	{
 		return "char";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCharLiteralExpression(this, arg);
+	}
 }

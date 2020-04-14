@@ -54,4 +54,10 @@ public class ASTBracketType extends ASTType
 	{
 		return type.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBracketType(this, arg);
+	}
 }

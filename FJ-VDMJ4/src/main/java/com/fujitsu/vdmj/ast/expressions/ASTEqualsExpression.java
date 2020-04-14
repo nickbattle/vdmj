@@ -39,4 +39,10 @@ public class ASTEqualsExpression extends ASTBinaryExpression
 	{
 		return "equals";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseEqualsExpression(this, arg);
+	}
 }

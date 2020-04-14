@@ -49,4 +49,10 @@ public class ASTAtomicStatement extends ASTStatement
 	{
 		return "atomic";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAtomicStatement(this, arg);
+	}
 }

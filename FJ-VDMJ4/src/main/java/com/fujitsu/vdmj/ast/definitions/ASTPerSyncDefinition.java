@@ -51,4 +51,10 @@ public class ASTPerSyncDefinition extends ASTDefinition
 	{
 		return "per " + opname + " => " + guard;
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePerSyncDefinition(this, arg);
+	}
 }

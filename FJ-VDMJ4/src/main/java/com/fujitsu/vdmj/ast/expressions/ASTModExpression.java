@@ -39,4 +39,10 @@ public class ASTModExpression extends ASTNumericBinaryExpression
 	{
 		return "mod";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseModExpression(this, arg);
+	}
 }

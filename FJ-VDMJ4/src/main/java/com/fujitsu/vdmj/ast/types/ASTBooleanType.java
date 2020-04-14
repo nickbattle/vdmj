@@ -39,4 +39,10 @@ public class ASTBooleanType extends ASTBasicType
 	{
 		return "bool";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBooleanType(this, arg);
+	}
 }

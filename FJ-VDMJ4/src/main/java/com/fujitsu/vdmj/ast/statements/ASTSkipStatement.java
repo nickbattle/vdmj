@@ -45,4 +45,10 @@ public class ASTSkipStatement extends ASTStatement
 	{
 		return "skip";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSkipStatement(this, arg);
+	}
 }

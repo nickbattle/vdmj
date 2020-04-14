@@ -102,4 +102,9 @@ public abstract class ASTExpression extends ASTNode implements Serializable
 	{
 		this.comments = comments;
 	}
+
+	/**
+	 * Implemented by all expressions to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg);
 }

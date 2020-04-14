@@ -56,4 +56,10 @@ public class ASTExternalDefinition extends ASTDefinition
 	{
 		return "external";
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExternalDefinition(this, arg);
+	}
 }

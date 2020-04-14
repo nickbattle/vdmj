@@ -51,4 +51,10 @@ public class ASTExistsExpression extends ASTExpression
 	{
 		return "exists";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExistsExpression(this, arg);
+	}
 }

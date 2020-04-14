@@ -85,4 +85,10 @@ public class ASTUnionType extends ASTType
 			return Utils.setToString(types, " | ");
 		}
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnionType(this, arg);
+	}
 }

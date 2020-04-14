@@ -39,4 +39,10 @@ public class ASTRationalType extends ASTNumericType
 	{
 		return "rat";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRationalType(this, arg);
+	}
 }

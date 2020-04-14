@@ -45,4 +45,10 @@ public class ASTCardinalityExpression extends ASTUnaryExpression
 	{
 		return "card";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCardinalityExpression(this, arg);
+	}
 }

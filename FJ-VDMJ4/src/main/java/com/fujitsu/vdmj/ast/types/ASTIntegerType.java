@@ -39,4 +39,10 @@ public class ASTIntegerType extends ASTNumericType
 	{
 		return "int";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIntegerType(this, arg);
+	}
 }

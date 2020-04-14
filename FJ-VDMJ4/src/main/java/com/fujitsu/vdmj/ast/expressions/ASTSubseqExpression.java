@@ -49,4 +49,10 @@ public class ASTSubseqExpression extends ASTExpression
 	{
 		return "subsequence";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubseqExpression(this, arg);
+	}
 }

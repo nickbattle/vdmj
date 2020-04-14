@@ -55,4 +55,10 @@ public class ASTReturnStatement extends ASTStatement
 		return "return";
 	}
 
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseReturnStatement(this, arg);
+	}
 }

@@ -45,4 +45,10 @@ public class ASTDistUnionExpression extends ASTUnaryExpression
 	{
 		return "dunion";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDistUnionExpression(this, arg);
+	}
 }

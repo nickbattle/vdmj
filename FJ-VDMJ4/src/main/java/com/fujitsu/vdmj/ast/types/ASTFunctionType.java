@@ -68,4 +68,10 @@ public class ASTFunctionType extends ASTType
 	{
 		return parameters.hashCode() + result.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFunctionType(this, arg);
+	}
 }

@@ -39,4 +39,10 @@ public class ASTNaturalType extends ASTNumericType
 	{
 		return "nat";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNaturalType(this, arg);
+	}
 }

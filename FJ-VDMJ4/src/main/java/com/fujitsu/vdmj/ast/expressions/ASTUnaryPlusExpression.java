@@ -45,4 +45,10 @@ public class ASTUnaryPlusExpression extends ASTUnaryExpression
 	{
 		return "positive";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnaryPlusExpression(this, arg);
+	}
 }

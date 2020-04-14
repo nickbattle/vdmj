@@ -120,4 +120,9 @@ public abstract class ASTDefinition extends ASTNode implements Serializable, Com
 	{
 		this.comments = comments;
 	}
+
+	/**
+	 * Implemented by all definitions to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg);
 }

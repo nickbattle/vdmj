@@ -38,4 +38,10 @@ public abstract class ASTSetExpression extends ASTExpression
 	{
 		super(location);
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetExpression(this, arg);
+	}
 }

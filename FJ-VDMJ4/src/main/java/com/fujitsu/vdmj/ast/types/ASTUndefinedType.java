@@ -45,4 +45,10 @@ public class ASTUndefinedType extends ASTType
 	{
 		return "(undefined)";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUndefinedType(this, arg);
+	}
 }

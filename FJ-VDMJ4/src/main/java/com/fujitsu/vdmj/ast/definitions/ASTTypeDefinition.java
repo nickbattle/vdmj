@@ -81,4 +81,10 @@ public class ASTTypeDefinition extends ASTDefinition
 	{
 		return "type";
 	}
+
+	@Override
+	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTypeDefinition(this, arg);
+	}
 }

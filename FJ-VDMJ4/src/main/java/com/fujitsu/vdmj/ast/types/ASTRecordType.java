@@ -108,4 +108,10 @@ public class ASTRecordType extends ASTInvariantType
 	{
 		return name.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRecordType(this, arg);
+	}
 }

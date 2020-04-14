@@ -65,4 +65,10 @@ public class ASTUnresolvedType extends ASTType
 	{
 		return "(unresolved " + typename + ")";
 	}
+
+	@Override
+	public <R, S> R apply(ASTTypeVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnresolvedType(this, arg);
+	}
 }

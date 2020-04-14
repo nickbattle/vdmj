@@ -39,4 +39,10 @@ public class ASTAndExpression extends ASTBooleanBinaryExpression
 	{
 		return "and";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAndExpression(this, arg);
+	}
 }

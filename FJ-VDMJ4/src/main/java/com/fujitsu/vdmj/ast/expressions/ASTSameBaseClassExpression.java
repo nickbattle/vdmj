@@ -49,4 +49,10 @@ public class ASTSameBaseClassExpression extends ASTExpression
 	{
 		return "samebaseclass(" + left + "," + right + ")";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSameBaseClassExpression(this, arg);
+	}
 }

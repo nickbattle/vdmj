@@ -49,4 +49,10 @@ public class ASTNonDeterministicStatement extends ASTSimpleBlockStatement
 	{
 		return "non-deterministic";
 	}
+
+	@Override
+	public <R, S> R apply(ASTStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNonDeterministicStatement(this, arg);
+	}
 }

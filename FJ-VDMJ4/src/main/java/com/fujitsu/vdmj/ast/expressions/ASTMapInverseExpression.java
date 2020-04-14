@@ -45,4 +45,10 @@ public class ASTMapInverseExpression extends ASTUnaryExpression
 	{
 		return "inverse";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapInverseExpression(this, arg);
+	}
 }

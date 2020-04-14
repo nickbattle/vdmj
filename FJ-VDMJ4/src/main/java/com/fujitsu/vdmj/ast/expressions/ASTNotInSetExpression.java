@@ -39,4 +39,10 @@ public class ASTNotInSetExpression extends ASTBinaryExpression
 	{
 		return "not in set";
 	}
+
+	@Override
+	public <R, S> R apply(ASTExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotInSetExpression(this, arg);
+	}
 }
