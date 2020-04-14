@@ -66,4 +66,10 @@ public class INReverseExpression extends INUnaryExpression
 
 		return new SeqValue(seq);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseReverseExpression(this, arg);
+	}
 }

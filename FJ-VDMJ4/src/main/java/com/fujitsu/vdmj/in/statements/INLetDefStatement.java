@@ -106,4 +106,10 @@ public class INLetDefStatement extends INStatement
 
 		return statement.eval(evalContext);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLetDefStatement(this, arg);
+	}
 }

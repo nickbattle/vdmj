@@ -52,4 +52,10 @@ public class INNonDeterministicStatement extends INSimpleBlockStatement
 		breakpoint.check(location, ctxt);
 		return evalBlock(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNonDeterministicStatement(this, arg);
+	}
 }

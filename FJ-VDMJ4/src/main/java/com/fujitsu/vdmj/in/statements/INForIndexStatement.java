@@ -125,4 +125,10 @@ public class INForIndexStatement extends INStatement
 
 		return new VoidValue();
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForIndexStatement(this, arg);
+	}
 }

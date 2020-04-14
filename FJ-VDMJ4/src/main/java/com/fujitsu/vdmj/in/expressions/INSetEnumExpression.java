@@ -92,4 +92,10 @@ public class INSetEnumExpression extends INSetExpression
 	{
 		return members.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetEnumExpression(this, arg);
+	}
 }

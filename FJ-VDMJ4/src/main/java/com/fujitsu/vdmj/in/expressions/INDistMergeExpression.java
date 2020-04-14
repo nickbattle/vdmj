@@ -79,4 +79,10 @@ public class INDistMergeExpression extends INUnaryExpression
         	return abort(e);
         }
     }
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDistMergeExpression(this, arg);
+	}
 }

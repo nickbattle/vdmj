@@ -41,4 +41,10 @@ public class ASTQuotePattern extends ASTPattern
 	{
 		return value.toString();
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQuotePattern(this, arg);
+	}
 }

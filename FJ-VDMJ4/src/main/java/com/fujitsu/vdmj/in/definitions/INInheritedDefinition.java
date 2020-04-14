@@ -150,4 +150,10 @@ public class INInheritedDefinition extends INDefinition
 	{
 		return superdef.isSubclassResponsibility();
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInheritedDefinition(this, arg);
+	}
 }

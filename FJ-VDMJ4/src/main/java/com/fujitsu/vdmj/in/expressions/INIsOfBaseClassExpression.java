@@ -116,4 +116,10 @@ public class INIsOfBaseClassExpression extends INExpression
 	{
 		return exp.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIsOfBaseClassExpression(this, arg);
+	}
 }

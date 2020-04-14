@@ -48,4 +48,10 @@ public class INErrorStatement extends INStatement
 		breakpoint.check(location, ctxt);
 		return abort(4036, "ERROR statement reached", ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseErrorStatement(this, arg);
+	}
 }

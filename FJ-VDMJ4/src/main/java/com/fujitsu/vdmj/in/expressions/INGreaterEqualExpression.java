@@ -58,4 +58,10 @@ public class INGreaterEqualExpression extends INNumericBinaryExpression
 
 		return abort(4172, "Values cannot be compared: " + lv + ", " + rv, ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseGreaterEqualExpression(this, arg);
+	}
 }

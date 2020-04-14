@@ -106,4 +106,10 @@ public class INForAllStatement extends INStatement
 
 		return new VoidValue();
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForAllStatement(this, arg);
+	}
 }

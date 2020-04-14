@@ -49,4 +49,10 @@ public class INSubclassResponsibilityStatement extends INStatement
 		breakpoint.check(location, ctxt);
 		return abort(4048, "'is subclass responsibility' statement reached", ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubclassResponsibilityStatement(this, arg);
+	}
 }

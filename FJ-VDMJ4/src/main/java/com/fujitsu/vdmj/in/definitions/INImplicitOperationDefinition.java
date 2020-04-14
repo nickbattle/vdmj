@@ -240,4 +240,10 @@ public class INImplicitOperationDefinition extends INDefinition
 	{
 		return body instanceof INSubclassResponsibilityStatement;
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImplicitOperationDefinition(this, arg);
+	}
 }

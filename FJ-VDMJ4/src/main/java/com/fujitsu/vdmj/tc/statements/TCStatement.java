@@ -207,7 +207,7 @@ public abstract class TCStatement extends TCNode implements Serializable
 	}
 
 	/**
-	 * Implemented by all definitions to allow visitor processing.
+	 * Implemented by all statements to allow visitor processing.
 	 */
 	abstract public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg);
 }

@@ -95,4 +95,10 @@ public class INFieldNumberExpression extends INExpression
 	{
 		return tuple.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFieldNumberExpression(this, arg);
+	}
 }

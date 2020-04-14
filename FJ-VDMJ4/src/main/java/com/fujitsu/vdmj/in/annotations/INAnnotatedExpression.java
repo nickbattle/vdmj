@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.in.annotations;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.expressions.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -83,5 +84,11 @@ public class INAnnotatedExpression extends INExpression
 	public INExpressionList getSubExpressions()
 	{
 		return expression.getSubExpressions();
+	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAnnotatedExpression(this, arg);
 	}
 }

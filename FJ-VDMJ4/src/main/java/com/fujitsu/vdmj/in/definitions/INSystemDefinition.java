@@ -189,4 +189,10 @@ public class INSystemDefinition extends INClassDefinition
 		abort(4135, "Cannot instantiate system class " + name, ctxt);
 		return null;
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSystemDefinition(this, arg);
+	}
 }

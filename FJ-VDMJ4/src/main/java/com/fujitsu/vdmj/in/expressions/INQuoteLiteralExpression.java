@@ -52,4 +52,10 @@ public class INQuoteLiteralExpression extends INExpression
 		breakpoint.check(location, ctxt);
 		return new QuoteValue(type.value);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQuoteLiteralExpression(this, arg);
+	}
 }

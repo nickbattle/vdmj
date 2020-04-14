@@ -59,4 +59,10 @@ public class INDefStatement extends INLetDefStatement
 
 		return statement.eval(evalContext);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDefStatement(this, arg);
+	}
 }

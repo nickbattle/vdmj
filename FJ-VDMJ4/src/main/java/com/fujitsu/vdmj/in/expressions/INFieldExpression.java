@@ -168,4 +168,10 @@ public class INFieldExpression extends INExpression
 	{
 		return object.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFieldExpression(this, arg);
+	}
 }

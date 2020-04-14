@@ -95,4 +95,10 @@ public class INPeriodicStatement extends INStatement
 	{
 		return "periodic(" + Utils.listToString(args) + ")(" + opname + ")";
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePeriodicStatement(this, arg);
+	}
 }

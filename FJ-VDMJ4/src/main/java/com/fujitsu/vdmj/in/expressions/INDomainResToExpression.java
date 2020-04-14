@@ -67,4 +67,10 @@ public class INDomainResToExpression extends INBinaryExpression
         	return abort(e);
         }
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDomainResToExpression(this, arg);
+	}
 }

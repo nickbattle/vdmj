@@ -104,4 +104,10 @@ public class INDurationStatement extends INStatement
 	{
 		return statement.findExpression(lineno);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDurationStatement(this, arg);
+	}
 }

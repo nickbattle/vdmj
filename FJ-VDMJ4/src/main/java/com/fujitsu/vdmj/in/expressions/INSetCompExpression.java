@@ -173,4 +173,10 @@ public class INSetCompExpression extends INSetExpression
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetCompExpression(this, arg);
+	}
 }

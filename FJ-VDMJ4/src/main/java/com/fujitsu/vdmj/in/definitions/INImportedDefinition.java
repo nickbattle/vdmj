@@ -125,4 +125,10 @@ public class INImportedDefinition extends INDefinition
 	{
 		return def.isUpdatable();
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImportedDefinition(this, arg);
+	}
 }

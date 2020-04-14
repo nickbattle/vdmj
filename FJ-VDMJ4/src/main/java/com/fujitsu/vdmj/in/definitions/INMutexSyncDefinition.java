@@ -109,4 +109,10 @@ public class INMutexSyncDefinition extends INDefinition
     		new LexKeywordToken(Token.EQUALS, location),
     		new INIntegerLiteralExpression(new LexIntegerToken(BigInteger.ZERO, location)));
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMutexSyncDefinition(this, arg);
+	}
 }

@@ -65,4 +65,10 @@ public class INClassInvariantDefinition extends INDefinition
 	{
 		return "inv " + expression;
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassInvariantDefinition(this, arg);
+	}
 }

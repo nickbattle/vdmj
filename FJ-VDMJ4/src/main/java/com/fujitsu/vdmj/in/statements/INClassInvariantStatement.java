@@ -74,4 +74,10 @@ public class INClassInvariantStatement extends INStatement
 	{
 		return "instance invariant " + name;
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassInvariantStatement(this, arg);
+	}
 }

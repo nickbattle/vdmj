@@ -97,4 +97,10 @@ public class INMkBasicExpression extends INExpression
 	{
 		return arg.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMkBasicExpression(this, arg);
+	}
 }

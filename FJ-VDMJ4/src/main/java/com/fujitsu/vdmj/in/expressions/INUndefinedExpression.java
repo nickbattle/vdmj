@@ -49,4 +49,10 @@ public class INUndefinedExpression extends INExpression
 		breakpoint.check(location, ctxt);
 		return new UndefinedValue();
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUndefinedExpression(this, arg);
+	}
 }

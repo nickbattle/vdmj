@@ -146,4 +146,10 @@ public class INValueDefinition extends INDefinition
 	{
 		return exp.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseValueDefinition(this, arg);
+	}
 }

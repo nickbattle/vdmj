@@ -42,4 +42,10 @@ public class ASTTuplePattern extends ASTPattern
 	{
 		return "mk_" + "(" + Utils.listToString(plist) + ")";
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTuplePattern(this, arg);
+	}
 }

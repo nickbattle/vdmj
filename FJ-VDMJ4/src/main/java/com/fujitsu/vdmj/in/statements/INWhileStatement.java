@@ -89,4 +89,10 @@ public class INWhileStatement extends INStatement
 		if (found != null) return found;
 		return statement.findExpression(lineno);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseWhileStatement(this, arg);
+	}
 }

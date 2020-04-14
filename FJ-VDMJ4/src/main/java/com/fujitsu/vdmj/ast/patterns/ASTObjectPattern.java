@@ -49,4 +49,10 @@ public class ASTObjectPattern extends ASTPattern
 	{
 		return "obj_" + type + "(" + Utils.listToString(fieldlist) + ")";
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseObjectPattern(this, arg);
+	}
 }

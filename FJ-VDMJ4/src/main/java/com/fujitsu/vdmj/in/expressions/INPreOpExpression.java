@@ -121,4 +121,10 @@ public class INPreOpExpression extends INExpression
 	{
 		return expression.toString();
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePreOpExpression(this, arg);
+	}
 }

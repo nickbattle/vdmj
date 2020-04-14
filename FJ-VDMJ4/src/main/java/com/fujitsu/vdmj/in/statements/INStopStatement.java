@@ -128,4 +128,10 @@ public class INStopStatement extends INStatement
 	{
 		return "stop(" + objects + ")";
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStopStatement(this, arg);
+	}
 }

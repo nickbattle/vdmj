@@ -166,4 +166,10 @@ public class INLetBeStExpression extends INExpression
 		list.addAll(value.getOldNames());
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLetBeStExpression(this, arg);
+	}
 }

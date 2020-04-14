@@ -79,4 +79,10 @@ public class INDivideExpression extends INNumericBinaryExpression
 			return abort(new ValueException(4134, e.getMessage(), ctxt));
 		}
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDivideExpression(this, arg);
+	}
 }

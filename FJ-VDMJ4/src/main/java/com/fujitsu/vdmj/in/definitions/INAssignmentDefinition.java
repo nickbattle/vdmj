@@ -98,4 +98,10 @@ public class INAssignmentDefinition extends INDefinition
 	{
 		return expression.getValues(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAssignmentDefinition(this, arg);
+	}
 }

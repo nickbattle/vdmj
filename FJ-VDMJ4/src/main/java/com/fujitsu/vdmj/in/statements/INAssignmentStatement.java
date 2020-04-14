@@ -110,4 +110,10 @@ public class INAssignmentStatement extends INStatement
 	{
 		return exp.findExpression(lineno);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAssignmentStatement(this, arg);
+	}
 }

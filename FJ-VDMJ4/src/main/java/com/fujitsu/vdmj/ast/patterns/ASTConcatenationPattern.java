@@ -43,4 +43,10 @@ public class ASTConcatenationPattern extends ASTPattern
 	{
 		return left + " ^ " + right;
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseConcatenationPattern(this, arg);
+	}
 }

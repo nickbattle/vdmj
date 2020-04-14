@@ -82,4 +82,10 @@ public class INVariableExpression extends INExpression
 			return new TCNameList();
 		}
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseVariableExpression(this, arg);
+	}
 }

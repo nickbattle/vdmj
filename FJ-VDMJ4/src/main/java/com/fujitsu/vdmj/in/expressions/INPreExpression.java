@@ -117,4 +117,10 @@ public class INPreExpression extends INExpression
 
 		return new BooleanValue(true);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePreExpression(this, arg);
+	}
 }

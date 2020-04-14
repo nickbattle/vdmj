@@ -74,4 +74,10 @@ public class INMapUnionExpression extends INBinaryExpression
 
 		return new MapValue(result);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapUnionExpression(this, arg);
+	}
 }

@@ -39,4 +39,10 @@ public class ASTIgnorePattern extends ASTPattern
 	{
 		return "-";
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIgnorePattern(this, arg);
+	}
 }

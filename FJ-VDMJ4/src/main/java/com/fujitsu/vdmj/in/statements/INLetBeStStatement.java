@@ -141,4 +141,10 @@ public class INLetBeStStatement extends INStatement
 
 		return abort(4040, "Let be st found no applicable bindings", ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLetBeStStatement(this, arg);
+	}
 }

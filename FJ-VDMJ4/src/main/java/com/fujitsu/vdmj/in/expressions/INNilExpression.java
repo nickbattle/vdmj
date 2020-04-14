@@ -50,4 +50,10 @@ public class INNilExpression extends INExpression
 
 		return new NilValue();
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNilExpression(this, arg);
+	}
 }

@@ -41,4 +41,10 @@ public class ASTIdentifierPattern extends ASTPattern
 	{
 		return name.toString();
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIdentifierPattern(this, arg);
+	}
 }

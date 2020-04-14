@@ -52,4 +52,10 @@ public class INBooleanLiteralExpression extends INExpression
 		breakpoint.check(location, ctxt);
 		return new BooleanValue(value.value);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBooleanLiteralExpression(this, arg);
+	}
 }

@@ -41,4 +41,10 @@ public class ASTBooleanPattern extends ASTPattern
 	{
 		return value.toString();
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBooleanPattern(this, arg);
+	}
 }

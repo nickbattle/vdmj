@@ -38,4 +38,10 @@ public abstract class INMapExpression extends INExpression
 	{
 		super(location);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapExpression(this, arg);
+	}
 }

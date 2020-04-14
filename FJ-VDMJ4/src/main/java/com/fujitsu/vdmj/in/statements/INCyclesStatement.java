@@ -105,4 +105,10 @@ public class INCyclesStatement extends INStatement
 	{
 		return statement.findExpression(lineno);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCyclesStatement(this, arg);
+	}
 }

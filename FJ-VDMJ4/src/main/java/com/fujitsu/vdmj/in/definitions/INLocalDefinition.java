@@ -89,4 +89,10 @@ public class INLocalDefinition extends INDefinition
 	{
 		return valueDefinition != null;
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLocalDefinition(this, arg);
+	}
 }

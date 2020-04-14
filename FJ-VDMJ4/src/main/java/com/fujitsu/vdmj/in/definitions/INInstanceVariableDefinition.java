@@ -55,4 +55,10 @@ public class INInstanceVariableDefinition extends INAssignmentDefinition
 		if (found != null) return found;
 		return oldname.equals(sought) ? this : null;
 	}
+
+	@Override
+	public <R, S> R apply(INDefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInstanceVariableDefinition(this, arg);
+	}
 }

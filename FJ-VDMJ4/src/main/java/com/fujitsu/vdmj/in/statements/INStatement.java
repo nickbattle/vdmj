@@ -82,4 +82,8 @@ public abstract class INStatement extends INNode implements Serializable
 	/** Evaluate the statement in the context given. */
 	abstract public Value eval(Context ctxt);
 
+	/**
+	 * Implemented by all statements to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg);
 }

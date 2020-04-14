@@ -92,4 +92,10 @@ public class INSetRangeExpression extends INSetExpression
 
 		return null;
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetRangeExpression(this, arg);
+	}
 }

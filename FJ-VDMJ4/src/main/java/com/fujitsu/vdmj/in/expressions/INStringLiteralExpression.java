@@ -51,4 +51,10 @@ public class INStringLiteralExpression extends INExpression
 		breakpoint.check(location, ctxt);
 		return new SeqValue(value);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStringLiteralExpression(this, arg);
+	}
 }

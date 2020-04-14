@@ -37,9 +37,9 @@ public class INLambdaExpression extends INExpression
 {
 	private static final long serialVersionUID = 1L;
 
-	private final TCFunctionType type;
-	private final INPatternList paramPatterns;
-	private final INExpression expression;
+	public final TCFunctionType type;
+	public final INPatternList paramPatterns;
+	public final INExpression expression;
 
 	public INLambdaExpression(LexLocation location, TCFunctionType type, INPatternList paramPatterns, INExpression expression)
 	{
@@ -88,5 +88,11 @@ public class INLambdaExpression extends INExpression
 	public TCNameList getOldNames()
 	{
 		return expression.getOldNames();
+	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLambdaExpression(this, arg);
 	}
 }

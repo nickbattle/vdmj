@@ -75,4 +75,10 @@ public class INAndExpression extends INBooleanBinaryExpression
 			return abort(e);
 		}
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAndExpression(this, arg);
+	}
 }

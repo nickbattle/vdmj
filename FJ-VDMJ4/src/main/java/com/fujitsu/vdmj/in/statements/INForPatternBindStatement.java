@@ -214,4 +214,10 @@ public class INForPatternBindStatement extends INStatement
 
 		return new VoidValue();
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForPatternBindStatement(this, arg);
+	}
 }

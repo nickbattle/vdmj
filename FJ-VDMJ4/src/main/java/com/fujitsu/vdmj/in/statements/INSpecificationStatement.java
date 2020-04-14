@@ -60,4 +60,10 @@ public class INSpecificationStatement extends INStatement
 		breakpoint.check(location, ctxt);
 		return abort(4047, "Cannot execute specification statement", ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSpecificationStatement(this, arg);
+	}
 }

@@ -116,4 +116,10 @@ public class INCasesStatement extends INStatement
 
 		return new VoidValue();
 	}
+
+	@Override
+	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCasesStatement(this, arg);
+	}
 }

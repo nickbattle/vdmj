@@ -58,4 +58,10 @@ public class INTimeExpression extends INExpression
 	{
 		return "time";
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTimeExpression(this, arg);
+	}
 }

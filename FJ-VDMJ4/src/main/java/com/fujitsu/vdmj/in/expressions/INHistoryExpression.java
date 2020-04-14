@@ -165,4 +165,10 @@ public class INHistoryExpression extends INExpression
 		sb.append(")");
 		return sb.toString();
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseHistoryExpression(this, arg);
+	}
 }

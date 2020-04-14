@@ -69,4 +69,10 @@ public class INTailExpression extends INUnaryExpression
 		seq.remove(0);
 		return new SeqValue(seq);
 	}
+
+	@Override
+	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTailExpression(this, arg);
+	}
 }
