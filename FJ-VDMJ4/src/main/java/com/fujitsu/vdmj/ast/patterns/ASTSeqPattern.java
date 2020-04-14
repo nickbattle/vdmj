@@ -41,4 +41,10 @@ public class ASTSeqPattern extends ASTPattern
 	{
 		return "[" + plist.toString() + "]";
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqPattern(this, arg);
+	}
 }

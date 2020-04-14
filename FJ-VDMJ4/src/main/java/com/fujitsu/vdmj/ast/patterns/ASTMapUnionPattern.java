@@ -43,4 +43,10 @@ public class ASTMapUnionPattern extends ASTPattern
 	{
 		return left + " union " + right;
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapUnionPattern(this, arg);
+	}
 }

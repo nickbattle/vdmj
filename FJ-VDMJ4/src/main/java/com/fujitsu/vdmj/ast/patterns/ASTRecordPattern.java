@@ -44,4 +44,10 @@ public class ASTRecordPattern extends ASTPattern
 	{
 		return "mk_" + typename.name + "(" + Utils.listToString(plist) + ")";
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRecordPattern(this, arg);
+	}
 }

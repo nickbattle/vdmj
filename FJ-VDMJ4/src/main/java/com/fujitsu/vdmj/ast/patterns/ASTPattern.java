@@ -48,4 +48,9 @@ public abstract class ASTPattern extends ASTNode implements Serializable
 
 	@Override
 	abstract public String toString();
+
+	/**
+	 * Implemented by all patterns to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg);
 }

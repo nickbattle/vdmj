@@ -39,4 +39,10 @@ public class ASTNilPattern extends ASTPattern
 	{
 		return "nil";
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNilPattern(this, arg);
+	}
 }

@@ -41,4 +41,10 @@ public class ASTSetPattern extends ASTPattern
 	{
 		return "{" + plist.toString() + "}";
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetPattern(this, arg);
+	}
 }

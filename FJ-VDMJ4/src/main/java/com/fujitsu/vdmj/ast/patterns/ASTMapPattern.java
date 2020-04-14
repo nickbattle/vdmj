@@ -49,4 +49,10 @@ public class ASTMapPattern extends ASTPattern
 			return Utils.listToString("{", maplets, ", ", "}");
 		}
 	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapPattern(this, arg);
+	}
 }
