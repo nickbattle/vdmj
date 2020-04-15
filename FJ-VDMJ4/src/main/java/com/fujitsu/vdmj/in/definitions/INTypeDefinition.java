@@ -82,37 +82,6 @@ public class INTypeDefinition extends INDefinition
 	}
 
 	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		if (invdef != null && invdef.findName(sought) != null)
-		{
-			return invdef;
-		}
-
-		if (eqdef != null && eqdef.findName(sought) != null)
-		{
-			return eqdef;
-		}
-
-		if (orddef != null && orddef.findName(sought) != null)
-		{
-			return orddef;
-		}
-
-		if (mindef != null && mindef.findName(sought) != null)
-		{
-			return mindef;
-		}
-
-		if (maxdef != null && maxdef.findName(sought) != null)
-		{
-			return maxdef;
-		}
-
-		return null;
-	}
-
-	@Override
 	public INExpression findExpression(int lineno)
 	{
 		if (invdef != null)

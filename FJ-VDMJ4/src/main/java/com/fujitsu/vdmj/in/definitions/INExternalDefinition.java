@@ -45,17 +45,6 @@ public class INExternalDefinition extends INDefinition
 	}
 
 	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		if (sought.isOld())
-		{
-			return (sought.equals(oldname)) ? this : null;
-		}
-
-		return (sought.equals(state.name)) ? this : null;
-	}
-
-	@Override
 	public String toString()
 	{
 		return (readOnly ? "ext rd " : "ext wr ") + state.name;

@@ -49,12 +49,6 @@ public class INThreadDefinition extends INDefinition
 	}
 
 	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		return operationDef.findName(sought);
-	}
-
-	@Override
 	public INExpression findExpression(int lineno)
 	{
 		return statement.findExpression(lineno);

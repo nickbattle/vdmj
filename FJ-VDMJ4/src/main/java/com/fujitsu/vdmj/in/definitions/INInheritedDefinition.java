@@ -59,31 +59,6 @@ public class INInheritedDefinition extends INDefinition
 	}
 
 	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		// The problem is, when the INInheritedDefinition is created, we
-		// don't know its fully qualified name.
-		
-		if (superdef instanceof INInheritedDefinition)
-		{
-			superdef.findName(sought);
-		}
-
-		name.setTypeQualifier(superdef.name.getTypeQualifier());
-
-		if (name.equals(sought))
-		{
-			return this;
-		}
-		else if (oldname.equals(sought))
-		{
-			return this;
-		}
-
-		return null;
-	}
-
-	@Override
 	public NameValuePairList getNamedValues(Context ctxt)
 	{
 		NameValuePairList renamed = new NameValuePairList();

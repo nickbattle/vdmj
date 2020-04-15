@@ -199,25 +199,6 @@ public class INClassDefinition extends INDefinition
 	}
 
 	/**
-	 * Find a definition within this class by name.
-	 */
-	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		for (INDefinition d: definitions)
-		{
-			INDefinition found = d.findName(sought);
-
-			if (found != null)
-			{
-				return found;
-			}
-		}
-		
-		return null;
-	}
-
-	/**
 	 * Force an initialization of the static functions/operations for the class.
 	 */
 	public void staticInit(Context ctxt)

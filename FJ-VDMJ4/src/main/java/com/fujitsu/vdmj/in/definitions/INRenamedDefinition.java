@@ -56,22 +56,6 @@ public class INRenamedDefinition extends INDefinition
 	}
 
 	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		INDefinition renamed = super.findName(sought);
-
-		if (renamed != null)
-		{
-			return renamed;
-		}
-		else
-		{
-			// Renamed definitions hide the original name
-			return null;
-		}
-	}
-
-	@Override
 	public NameValuePairList getNamedValues(Context ctxt)
 	{
 		NameValuePairList renamed = new NameValuePairList();

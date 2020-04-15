@@ -43,12 +43,6 @@ public class INClassInvariantDefinition extends INDefinition
 	}
 
 	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		return null;		// We can never find inv_C().
-	}
-
-	@Override
 	public INExpression findExpression(int lineno)
 	{
 		return expression.findExpression(lineno);

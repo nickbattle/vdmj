@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.ValueList;
@@ -87,12 +86,6 @@ public class INQualifiedDefinition extends INDefinition
 	public TCType getType()
 	{
 		return type; // NB. Not delegated!
-	}
-
-	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		return super.findName(sought);	// NB. Not delegated!
 	}
 
 	@Override

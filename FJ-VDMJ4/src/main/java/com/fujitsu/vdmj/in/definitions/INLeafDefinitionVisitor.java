@@ -324,7 +324,6 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	public C caseTypeDefinition(INTypeDefinition node, S arg)
 	{
 		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
-		INLeafDefinitionVisitor<E, C, S> defVisitor = getDefinitionVisitor();
 		
 		C all = newCollection();
 		
@@ -333,32 +332,29 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 			all.addAll(node.type.apply(typeVisitor, arg));
 		}
 		
-		if (defVisitor != null)
+		if (node.invdef != null)
 		{
-			if (node.invdef != null)
-			{
-				all.addAll(node.invdef.apply(defVisitor, arg));
-			}
+			all.addAll(node.invdef.apply(this, arg));
+		}
 
-			if (node.eqdef != null)
-			{
-				all.addAll(node.eqdef.apply(defVisitor, arg));
-			}
+		if (node.eqdef != null)
+		{
+			all.addAll(node.eqdef.apply(this, arg));
+		}
 
-			if (node.orddef != null)
-			{
-				all.addAll(node.orddef.apply(defVisitor, arg));
-			}
+		if (node.orddef != null)
+		{
+			all.addAll(node.orddef.apply(this, arg));
+		}
 
-			if (node.mindef != null)
-			{
-				all.addAll(node.mindef.apply(defVisitor, arg));
-			}
+		if (node.mindef != null)
+		{
+			all.addAll(node.mindef.apply(this, arg));
+		}
 
-			if (node.maxdef != null)
-			{
-				all.addAll(node.maxdef.apply(defVisitor, arg));
-			}
+		if (node.maxdef != null)
+		{
+			all.addAll(node.maxdef.apply(this, arg));
 		}
 		
 		return all;
@@ -413,8 +409,6 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 	
 	abstract protected C newCollection();
-
- 	abstract protected INLeafDefinitionVisitor<E, C, S> getDefinitionVisitor();
 
  	abstract protected INLeafExpressionVisitor<E, C, S> getExpressionVisitor();
 

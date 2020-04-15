@@ -55,7 +55,7 @@ public class INStateDefinition extends INDefinition
 	public FunctionValue invfunc = null;
 	public FunctionValue initfunc = null;
 
-	private final INDefinitionList statedefs;
+	public final INDefinitionList statedefs;
 	private TCRecordType recordType;
 	private State moduleState = null;
 
@@ -102,32 +102,6 @@ public class INStateDefinition extends INDefinition
 				(invPattern == null ? "" : "\n\tinv " + invPattern + " == " + invExpression) +
 	    		(initPattern == null ? "" : "\n\tinit " + initPattern + " == " + initExpression) +
 	    		"\nend";
-	}
-
-	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		if (invdef != null && invdef.findName(sought) != null)
-		{
-			return invdef;
-		}
-
-		if (initdef != null && initdef.findName(sought) != null)
-		{
-			return initdef;
-		}
-
-		for (INDefinition d: statedefs)
-		{
-			INDefinition def = d.findName(sought);
-
-			if (def != null)
-			{
-				return def;
-			}
-		}
-
-		return null;
 	}
 
 	@Override

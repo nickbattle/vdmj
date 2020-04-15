@@ -83,12 +83,6 @@ public class INMutexSyncDefinition extends INDefinition
 		return toString().hashCode();
 	}
 
-	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		return null;
-	}
-
 	public INExpression getExpression(TCNameToken excluding)
 	{
 		TCNameList list = null;
