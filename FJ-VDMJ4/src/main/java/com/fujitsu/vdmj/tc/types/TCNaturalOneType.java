@@ -51,4 +51,10 @@ public class TCNaturalOneType extends TCNumericType
 	{
 		return visitor.caseNaturalOneType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCNaturalOneType(location);
+	}
 }

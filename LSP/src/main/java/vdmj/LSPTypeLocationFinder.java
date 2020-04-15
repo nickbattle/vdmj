@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.tc.types.TCLeafTypeVisitor;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 
 public class LSPTypeLocationFinder extends TCLeafTypeVisitor<TCNode, Set<TCNode>, LexLocation>
 {
@@ -42,16 +43,22 @@ public class LSPTypeLocationFinder extends TCLeafTypeVisitor<TCNode, Set<TCNode>
 	}
 
 	@Override
-	public Set<TCNode> caseNamedType(TCNamedType node, LexLocation arg)
+	public Set<TCNode> caseUnresolvedType(TCUnresolvedType node, LexLocation arg)
 	{
 		Set<TCNode> result = newCollection();
 
-		if (arg.within(node.typename.getLocation()))
+		if (arg.within(node.location))
 		{
 			result.add(node);
 		}
 
 		return result;
+	}
+
+	@Override
+	public Set<TCNode> caseNamedType(TCNamedType node, LexLocation arg)
+	{
+		return node.type.apply(this, arg);
 	}
 	
 	@Override

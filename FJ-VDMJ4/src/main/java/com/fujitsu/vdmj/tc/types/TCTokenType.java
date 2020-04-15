@@ -45,4 +45,10 @@ public class TCTokenType extends TCBasicType
 	{
 		return visitor.caseTokenType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCTokenType(location);
+	}
 }

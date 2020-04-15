@@ -67,4 +67,10 @@ public class TCQuoteType extends TCType
 	{
 		return visitor.caseQuoteType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCQuoteType(location, value);
+	}
 }

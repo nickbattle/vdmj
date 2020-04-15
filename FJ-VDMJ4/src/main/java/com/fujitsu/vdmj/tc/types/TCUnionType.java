@@ -954,4 +954,10 @@ public class TCUnionType extends TCType
 	{
 		return visitor.caseUnionType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCUnionType(location, types.clone());
+	}
 }

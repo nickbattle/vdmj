@@ -32,12 +32,14 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
-import com.fujitsu.vdmj.tc.types.TCInvariantType;
+import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
+import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 
 public class LSPDefinitionFinder
 {
@@ -81,13 +83,17 @@ public class LSPDefinitionFinder
 							TCCallObjectStatement stmt = (TCCallObjectStatement)node;
 							return stmt.getDefinition();
 						}
-						else if (node instanceof TCInvariantType)
+						else if (node instanceof TCUnresolvedType)
 						{
-							TCInvariantType ntype = (TCInvariantType)node;
-							if (ntype.definitions != null && ntype.definitions.isEmpty())
-							{
-								return ntype.definitions.get(0);
-							}
+							TCUnresolvedType unresolved = (TCUnresolvedType)node;
+							ModuleEnvironment env = new ModuleEnvironment(module);
+							return env.findType(unresolved.typename, module.name.getName());
+						}
+						else if (node instanceof TCMkTypeExpression)
+						{
+							TCMkTypeExpression mk = (TCMkTypeExpression)node;
+							ModuleEnvironment env = new ModuleEnvironment(module);
+							return env.findType(mk.typename, module.name.getName());
 						}
 						
 						return null;	// Found node, but unable to find definition

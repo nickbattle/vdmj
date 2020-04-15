@@ -165,4 +165,10 @@ public class TCClassType extends TCType
 	{
 		return visitor.caseClassType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCClassType(location, classdef);
+	}
 }

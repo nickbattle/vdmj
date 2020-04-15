@@ -65,4 +65,10 @@ public class TCVoidType extends TCType
 	{
 		return visitor.caseVoidType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCVoidType(location);
+	}
 }

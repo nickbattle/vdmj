@@ -97,7 +97,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		this.accessSpecifier = accessSpecifier;
 		this.typeParams = typeParams;
 		this.type = type;
-		this.unresolved = type;
+		this.unresolved = (TCFunctionType) type.clone();
 		this.paramPatternList = parameters;
 		this.precondition = precondition;
 		this.postcondition = postcondition;

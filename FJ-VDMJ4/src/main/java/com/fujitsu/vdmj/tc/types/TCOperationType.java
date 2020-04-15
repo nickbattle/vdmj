@@ -258,4 +258,10 @@ public class TCOperationType extends TCType
 	{
 		return visitor.caseOperationType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCOperationType(location, parameters.clone(), result.clone());
+	}
 }

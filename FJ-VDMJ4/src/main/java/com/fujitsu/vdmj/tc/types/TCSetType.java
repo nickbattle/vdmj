@@ -137,4 +137,10 @@ public class TCSetType extends TCType
 	{
 		return visitor.caseSetType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCSetType(location, setof.clone());
+	}
 }

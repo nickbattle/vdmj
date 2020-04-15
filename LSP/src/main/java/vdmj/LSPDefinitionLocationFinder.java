@@ -29,10 +29,16 @@ import java.util.Set;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLeafDefinitionVisitor;
+import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.statements.TCLeafStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCLeafTypeVisitor;
+import com.fujitsu.vdmj.tc.types.TCNamedType;
 
 public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode, Set<TCNode>, LexLocation>
 {
@@ -46,7 +52,53 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	{
 		return newCollection();		// Nothing found
 	}
+	
+	@Override
+	public Set<TCNode> caseTypeDefinition(TCTypeDefinition node, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseTypeDefinition(node, arg);
+		
+		if (node.unresolved instanceof TCNamedType)
+		{
+			TCNamedType named = (TCNamedType)node.unresolved;
+			all.addAll(named.type.apply(typeVisitor, arg));
+		}
+		
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseExplicitFunctionDefinition(node, arg);
+		all.addAll(node.unresolved.apply(typeVisitor, arg));
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseImplicitFunctionDefinition(TCImplicitFunctionDefinition node, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseImplicitFunctionDefinition(node, arg);
+		all.addAll(node.unresolved.apply(typeVisitor, arg));
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseExplicitOperationDefinition(TCExplicitOperationDefinition node, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseExplicitOperationDefinition(node, arg);
+		all.addAll(node.unresolved.apply(typeVisitor, arg));
+		return all;
+	}
 
+	@Override
+	public Set<TCNode> caseImplicitOperationDefinition(TCImplicitOperationDefinition node, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseImplicitOperationDefinition(node, arg);
+		all.addAll(node.unresolved.apply(typeVisitor, arg));
+		return all;
+	}
+	
 	@Override
 	protected Set<TCNode> newCollection()
 	{

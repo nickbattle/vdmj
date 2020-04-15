@@ -51,4 +51,10 @@ public class TCRealType extends TCNumericType
 	{
 		return visitor.caseRealType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCRealType(location);
+	}
 }
