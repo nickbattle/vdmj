@@ -51,7 +51,6 @@ public class ASTVariableExpression extends ASTExpression
 		return "variable";
 	}
 
-	// TODO: This ought to be an immutable class.
 	public void setExplicit(boolean explicit)
 	{
 		name = name.getExplicit(explicit);

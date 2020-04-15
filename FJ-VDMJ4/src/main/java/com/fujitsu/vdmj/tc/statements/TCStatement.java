@@ -68,14 +68,14 @@ public abstract class TCStatement extends TCNode implements Serializable
 	@Override
 	abstract public String toString();
 
-	/** Type check the statement and return its type. 
-	 * @param mandatory TODO*/ 
+	/**
+	 * Type check the statement and return its type. 
+	 */
 	abstract public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory);
 
 	/**
 	 * Check that a return type meets a constraint. This is used in various statements
 	 * to verify that a constraining type is met (see typeCheck methods).
-	 * @param mandatory TODO
 	 */
 	protected TCType checkReturnType(TCType constraint, TCType actual, boolean mandatory)
 	{

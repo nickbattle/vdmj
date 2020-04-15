@@ -305,9 +305,6 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	/**
 	 * Set the definition's AccessSpecifier. This is used in VDM++ definitions
 	 * to hold  static and public/protected/private settings.
-	 * 
-	 * TODO: This method is needed, but I can't see why TC needs it?
-	 *
 	 * @param access The AccessSpecifier to set.
 	 */
 	public void setAccessSpecifier(TCAccessSpecifier access)
