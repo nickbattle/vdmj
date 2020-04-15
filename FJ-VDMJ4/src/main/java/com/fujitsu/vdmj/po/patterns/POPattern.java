@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import java.io.Serializable;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
@@ -67,10 +68,14 @@ public abstract class POPattern extends PONode implements Serializable
 
 	/**
 	 * Get a complete list of all definitions, including duplicates.
+	 * TODO as a LeafPatternVisitor? See TCGetDefinitionsVisitor.
 	 */
 	abstract protected PODefinitionList getAllDefinitions(TCType type);
 
-	/** Get the type(s) that could match this pattern. */
+	/**
+	 * Get the type(s) that could match this pattern.
+	 * TODO as a LeafPatternVisitor? See TCPossibleTypeVisitor.
+	 */
 	abstract public TCType getPossibleType();
 
 	/**
@@ -86,10 +91,12 @@ public abstract class POPattern extends PONode implements Serializable
 		return list;
 	}
 
-	/** Get a complete list of the pattern's variable names, including duplicates. */
+	/**
+	 * Get a complete list of the pattern's variable names, including duplicates.
+	 */
 	protected TCNameList getAllVariableNames()
 	{
-		return new TCNameList();	// Most are empty
+		return new TCNameList();	// TODO as a LeafPatternVisitor?
 	}
 
 	/**
@@ -130,4 +137,9 @@ public abstract class POPattern extends PONode implements Serializable
 	 * @return An expression, being a value that matches the pattern.
 	 */
 	abstract public POExpression getMatchingExpression();
+
+	/**
+	 * Implemented by all patterns to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg);
 }

@@ -37,7 +37,6 @@ public abstract class POStatement extends PONode implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-
 	/**
 	 * Create a statement at the given location.
 	 * @param location
@@ -50,7 +49,6 @@ public abstract class POStatement extends PONode implements Serializable
 	@Override
 	abstract public String toString();
 
-
 	/**
 	 * Get a list of proof obligations from the statement.
 	 *
@@ -60,16 +58,5 @@ public abstract class POStatement extends PONode implements Serializable
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
 		return new ProofObligationList();
-	}
-
-	/**
-	 * Whether the statement probably produces side effects. This is used during
-	 * PO generation for operations. The method will produce false positives
-	 * (saying that side effects are produced, when they are not), but no false
-	 * negatives.
-	 */
-	public boolean hasSideEffects()
-	{
-		return true;
 	}
 }

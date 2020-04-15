@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.po.expressions;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotatedExpression;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -43,12 +41,12 @@ import com.fujitsu.vdmj.po.patterns.POTypeBind;
  * This POExpression visitor visits all of the leaves of an expression tree and calls
  * the basic processing methods for the simple expressions.
  */
-abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<List<E>, S>
+abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> extends POExpressionVisitor<C, S>
 {
  	@Override
-	public List<E> caseApplyExpression(POApplyExpression node, S arg)
+	public C caseApplyExpression(POApplyExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.root.apply(this, arg));
 		
 		for (POExpression a: node.args)
@@ -60,24 +58,24 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
  	
  	@Override
- 	public List<E> caseAnnotatedExpression(POAnnotatedExpression node, S arg)
+ 	public C caseAnnotatedExpression(POAnnotatedExpression node, S arg)
  	{
  		return node.expression.apply(this, arg);
  	}
 
  	@Override
-	public List<E> caseBinaryExpression(POBinaryExpression node, S arg)
+	public C caseBinaryExpression(POBinaryExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.left.apply(this, arg));
 		all.addAll(node.right.apply(this, arg));
 		return all;
 	}
 
  	@Override
-	public List<E> caseCasesExpression(POCasesExpression node, S arg)
+	public C caseCasesExpression(POCasesExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.exp.apply(this, arg));
 		
 		for (POCaseAlternative a: node.cases)
@@ -94,9 +92,9 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseDefExpression(PODefExpression node, S arg)
+	public C caseDefExpression(PODefExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 
 		for (PODefinition def: node.localDefs)
  		{
@@ -112,24 +110,24 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseElementsExpression(POElementsExpression node, S arg)
+	public C caseElementsExpression(POElementsExpression node, S arg)
 	{
 		return node.exp.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseElseIfExpression(POElseIfExpression node, S arg)
+	public C caseElseIfExpression(POElseIfExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.elseIfExp.apply(this, arg));
 		all.addAll(node.thenExp.apply(this, arg));
 		return all;
 	}
 
  	@Override
-	public List<E> caseExists1Expression(POExists1Expression node, S arg)
+	public C caseExists1Expression(POExists1Expression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(caseBind(node.bind, arg));
 		
 		if (node.predicate != null)
@@ -141,9 +139,9 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseExistsExpression(POExistsExpression node, S arg)
+	public C caseExistsExpression(POExistsExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (POMultipleBind bind: node.bindList)
 		{
@@ -159,21 +157,21 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
 	@Override
-	public List<E> caseFieldExpression(POFieldExpression node, S arg)
+	public C caseFieldExpression(POFieldExpression node, S arg)
 	{
 		return node.object.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseFieldNumberExpression(POFieldNumberExpression node, S arg)
+	public C caseFieldNumberExpression(POFieldNumberExpression node, S arg)
 	{
  		return node.tuple.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseForAllExpression(POForAllExpression node, S arg)
+	public C caseForAllExpression(POForAllExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (POMultipleBind bind: node.bindList)
 		{
@@ -189,15 +187,15 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseFuncInstantiationExpression(POFuncInstantiationExpression node, S arg)
+	public C caseFuncInstantiationExpression(POFuncInstantiationExpression node, S arg)
 	{
 		return node.function.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseIfExpression(POIfExpression node, S arg)
+	public C caseIfExpression(POIfExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.ifExp.apply(this, arg));
 		all.addAll(node.thenExp.apply(this, arg));
 		
@@ -211,9 +209,9 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseIotaExpression(POIotaExpression node, S arg)
+	public C caseIotaExpression(POIotaExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(caseBind(node.bind, arg));
 		
 		if (node.predicate != null)
@@ -225,27 +223,27 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseIsExpression(POIsExpression node, S arg)
+	public C caseIsExpression(POIsExpression node, S arg)
 	{
 		return node.test.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseIsOfBaseClassExpression(POIsOfBaseClassExpression node, S arg)
+	public C caseIsOfBaseClassExpression(POIsOfBaseClassExpression node, S arg)
 	{
  		return node.exp.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseIsOfClassExpression(POIsOfClassExpression node, S arg)
+	public C caseIsOfClassExpression(POIsOfClassExpression node, S arg)
 	{
  		return node.exp.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseLambdaExpression(POLambdaExpression node, S arg)
+	public C caseLambdaExpression(POLambdaExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (POTypeBind bind: node.bindList)
 		{
@@ -257,9 +255,9 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseLetBeStExpression(POLetBeStExpression node, S arg)
+	public C caseLetBeStExpression(POLetBeStExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(caseMultipleBind(node.bind, arg));
 		
 		if (node.suchThat != null)
@@ -272,9 +270,9 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseLetDefExpression(POLetDefExpression node, S arg)
+	public C caseLetDefExpression(POLetDefExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 
 		for (PODefinition def: node.localDefs)
  		{
@@ -290,9 +288,9 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseMapCompExpression(POMapCompExpression node, S arg)
+	public C caseMapCompExpression(POMapCompExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.first.left.apply(this, arg));
 		all.addAll(node.first.right.apply(this, arg));
 		
@@ -310,9 +308,9 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseMapEnumExpression(POMapEnumExpression node, S arg)
+	public C caseMapEnumExpression(POMapEnumExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (POMapletExpression maplet: node.members)
 		{
@@ -324,15 +322,15 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseMkBasicExpression(POMkBasicExpression node, S arg)
+	public C caseMkBasicExpression(POMkBasicExpression node, S arg)
 	{
 		return node.arg.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseMkTypeExpression(POMkTypeExpression node, S arg)
+	public C caseMkTypeExpression(POMkTypeExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (POExpression a: node.args)
 		{
@@ -343,9 +341,9 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseMuExpression(POMuExpression node, S arg)
+	public C caseMuExpression(POMuExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (PORecordModifier modifier: node.modifiers)
 		{
@@ -357,15 +355,15 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseNarrowExpression(PONarrowExpression node, S arg)
+	public C caseNarrowExpression(PONarrowExpression node, S arg)
 	{
 		return node.test.apply(this, arg);
 	}
 
  	@Override
-	public List<E> caseNewExpression(PONewExpression node, S arg)
+	public C caseNewExpression(PONewExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (POExpression a: node.args)
 		{
@@ -376,9 +374,9 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> casePreExpression(POPreExpression node, S arg)
+	public C casePreExpression(POPreExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.function.apply(this, arg));
 		
 		for (POExpression exp: node.args)
@@ -390,27 +388,27 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSameBaseClassExpression(POSameBaseClassExpression node, S arg)
+	public C caseSameBaseClassExpression(POSameBaseClassExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.left.apply(this, arg));
 		all.addAll(node.right.apply(this, arg));
 		return all;
 	}
 
  	@Override
-	public List<E> caseSameClassExpression(POSameClassExpression node, S arg)
+	public C caseSameClassExpression(POSameClassExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.left.apply(this, arg));
 		all.addAll(node.right.apply(this, arg));
 		return all;
 	}
 
  	@Override
-	public List<E> caseSeqCompExpression(POSeqCompExpression node, S arg)
+	public C caseSeqCompExpression(POSeqCompExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.first.apply(this, arg));
 		all.addAll(caseBind(node.bind, arg));
 		
@@ -423,9 +421,9 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSeqEnumExpression(POSeqEnumExpression node, S arg)
+	public C caseSeqEnumExpression(POSeqEnumExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (POExpression m: node.members)
 		{
@@ -436,9 +434,9 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSetCompExpression(POSetCompExpression node, S arg)
+	public C caseSetCompExpression(POSetCompExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.first.apply(this, arg));
 		
 		for (POMultipleBind mbind: node.bindings)
@@ -455,9 +453,9 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSetEnumExpression(POSetEnumExpression node, S arg)
+	public C caseSetEnumExpression(POSetEnumExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (POExpression m: node.members)
 		{
@@ -468,27 +466,27 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseSetRangeExpression(POSetRangeExpression node, S arg)
+	public C caseSetRangeExpression(POSetRangeExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.first.apply(this, arg));
 		all.addAll(node.last.apply(this, arg));
 		return all;
 	}
 
  	@Override
-	public List<E> caseSubseqExpression(POSubseqExpression node, S arg)
+	public C caseSubseqExpression(POSubseqExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.from.apply(this, arg));
 		all.addAll(node.to.apply(this, arg));
 		return all;
 	}
 
  	@Override
-	public List<E> caseTupleExpression(POTupleExpression node, S arg)
+	public C caseTupleExpression(POTupleExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		for (POExpression m: node.args)
 		{
@@ -499,16 +497,16 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 	}
 
  	@Override
-	public List<E> caseUnaryExpression(POUnaryExpression node, S arg)
+	public C caseUnaryExpression(POUnaryExpression node, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		all.addAll(node.exp.apply(this, arg));
 		return all;
 	}
 
-	private List<E> caseBind(POBind bind, S arg)
+	private C caseBind(POBind bind, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		if (bind instanceof POSetBind)
 		{
@@ -526,7 +524,7 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 
  	private Collection<? extends E> caseMultipleBind(POMultipleBind bind, S arg)
 	{
-		List<E> all = new Vector<E>();
+		C all = newCollection();
 		
 		if (bind instanceof POMultipleSetBind)
 		{
@@ -541,4 +539,6 @@ abstract public class POLeafExpressionVisitor<E, S> extends POExpressionVisitor<
 		
 		return all;
 	}
+
+ 	abstract protected C newCollection();
 }

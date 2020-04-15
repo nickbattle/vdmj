@@ -176,4 +176,10 @@ public class INSeqPattern extends INPattern
 	{
 		return plist.getAllVariableNames();
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqPattern(this, arg);
+	}
 }

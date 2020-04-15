@@ -84,7 +84,6 @@ abstract public class DebugLink
 	 * Called by a thread which has stopped, but not at a breakpoint. For example,
 	 * when an exception occurs or deadlock is detected, or when a waiting thread
 	 * is pushed into the debugger with a suspendOthers call.
-	 * @param ex TODO
 	 */
 	abstract public void stopped(Context ctxt, LexLocation location, Exception ex);
 	

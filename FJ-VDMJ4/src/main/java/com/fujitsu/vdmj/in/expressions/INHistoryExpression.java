@@ -57,7 +57,7 @@ public class INHistoryExpression extends INExpression
 	{
 		try
 		{
-			// TODO Not very efficient to do this every time. But we can't
+			// Not very efficient to do this every time. But we can't
 			// save the list because the same TCHistoryExpression is called from
 			// different object instance contexts, and each instance has its
 			// own operation history counters...

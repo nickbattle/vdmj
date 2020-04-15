@@ -68,4 +68,10 @@ public class POExpressionPattern extends POPattern
 	{
 		return ANY;	// Special value meaning "any length"
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExpressionPattern(this, arg);
+	}
 }

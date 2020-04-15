@@ -78,4 +78,10 @@ public class INIntegerPattern extends INPattern
 	{
 		return new TCIntegerType(location);
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIntegerPattern(this, arg);
+	}
 }

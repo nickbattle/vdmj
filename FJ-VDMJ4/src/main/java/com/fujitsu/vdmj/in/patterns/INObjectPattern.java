@@ -190,4 +190,10 @@ public class INObjectPattern extends INPattern
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseObjectPattern(this, arg);
+	}
 }

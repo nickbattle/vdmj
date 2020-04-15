@@ -95,14 +95,14 @@ public abstract class INPattern extends INNode implements Serializable
 	/**
 	 * Get the type(s) that can possibly match this pattern.
 	 */
-	protected abstract TCType getPossibleType();
+	protected abstract TCType getPossibleType();	// TODO as a LeafPatternVisitor?
 
 	/**
 	 * Return a list of the contained IdentifierPatterns
 	 */
 	protected List<INIdentifierPattern> findIdentifiers()
 	{
-		return new Vector<INIdentifierPattern>();		// Most have none
+		return new Vector<INIdentifierPattern>();		// TODO as a LeafPatternVisitor
 	}
 
 	/**
@@ -123,7 +123,7 @@ public abstract class INPattern extends INNode implements Serializable
 	 */
 	protected TCNameList getAllVariableNames()
 	{
-		return new TCNameList();	// Most are empty
+		return new TCNameList();	// TODO as a LeafPatternVisitor?
 	}
 
 	/**
@@ -165,4 +165,9 @@ public abstract class INPattern extends INNode implements Serializable
 	{
 		throw new PatternMatchException(ve.number, ve.getMessage(), location);
 	}
+
+	/**
+	 * Implemented by all patterns to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg);
 }

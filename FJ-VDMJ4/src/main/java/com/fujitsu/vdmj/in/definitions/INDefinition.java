@@ -103,7 +103,7 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 * @param ctxt The context in which to evaluate the expressions.
 	 * @return A list of values read.
 	 */
-	public ValueList getValues(Context ctxt)
+	public ValueList getValues(Context ctxt)	// TODO as a LeafDefinitionVisitor?
 	{
 		return new ValueList();
 	}
@@ -113,7 +113,7 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 */
 	public TCNameList getOldNames()
 	{
-		return new TCNameList();
+		return new TCNameList(); 	// TODO as a LeafDefinitionVisitor?
 	}
 
 	/**
@@ -139,7 +139,7 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 */
 	public INStatement findStatement(int lineno)
 	{
-		return null;
+		return null;	// TODO as a LeafDefinitionVisitor?
 	}
 
 	/**
@@ -151,7 +151,7 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 */
 	public INExpression findExpression(int lineno)
 	{
-		return null;
+		return null;	// TODO as a LeafDefinitionVisitor?
 	}
 
 	/**
@@ -179,7 +179,7 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 */
 	public NameValuePairList getNamedValues(Context ctxt)
 	{
-		return new NameValuePairList();		// Overridden
+		return new NameValuePairList();		// TODO as a DefinitionVisitor?
 	}
 
 	public boolean isOperation()

@@ -78,4 +78,10 @@ public class INQuotePattern extends INPattern
 	{
 		return new TCQuoteType(location, value.value);
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQuotePattern(this, arg);
+	}
 }

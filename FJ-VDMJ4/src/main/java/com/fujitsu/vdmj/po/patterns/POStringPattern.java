@@ -71,4 +71,10 @@ public class POStringPattern extends POPattern
 	{
 		return new POStringLiteralExpression(value);
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStringPattern(this, arg);
+	}
 }

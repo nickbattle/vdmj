@@ -162,6 +162,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * "name" which can be used in its scope. For example, a function may define
 	 * pre and post conditions, which cause implicit functions to be defined in
 	 * addition to the main definition for the function itself.
+	 * TODO as a LeafDefinitionVisitor?
 	 *
 	 * @return A list of definitions.
 	 */
@@ -169,6 +170,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 
 	/**
 	 * Return a list of variable names that would be defined by the definition.
+	 * TODO as a LeafDefinitionVisitor?
 	 */
 	abstract public TCNameList getVariableNames();
 
@@ -305,9 +307,6 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	/**
 	 * Set the definition's AccessSpecifier. This is used in VDM++ definitions
 	 * to hold  static and public/protected/private settings.
-	 * 
-	 * TODO: This method is needed, but I can't see why TC needs it?
-	 *
 	 * @param access The AccessSpecifier to set.
 	 */
 	public void setAccessSpecifier(TCAccessSpecifier access)

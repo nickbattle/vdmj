@@ -91,7 +91,7 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	/**
 	 * Return a list of variable names that would be defined by the definition.
 	 */
-	abstract public TCNameList getVariableNames();
+	abstract public TCNameList getVariableNames();	// TODO as a LeafDefinitionVisitor?
 
 	/**
 	 * Return the static type of the definition. For example, the type of a

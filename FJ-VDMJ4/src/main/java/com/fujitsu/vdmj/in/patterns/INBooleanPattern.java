@@ -79,4 +79,10 @@ public class INBooleanPattern extends INPattern
 	{
 		return new TCBooleanType(location);
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBooleanPattern(this, arg);
+	}
 }

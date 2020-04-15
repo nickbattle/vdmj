@@ -116,4 +116,10 @@ public class PORecordPattern extends POPattern
 	{
 		return plist.alwaysMatches();
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRecordPattern(this, arg);
+	}
 }

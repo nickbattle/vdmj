@@ -131,4 +131,10 @@ public class POMapPattern extends POPattern
 
 		return true;
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapPattern(this, arg);
+	}
 }

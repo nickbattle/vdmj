@@ -57,10 +57,4 @@ public class POAnnotatedStatement extends POStatement
 		annotation.poAfter(this, obligations, ctxt);
 		return obligations;
 	}
-
-	@Override
-	public boolean hasSideEffects()
-	{
-		return statement.hasSideEffects();
-	}
 }

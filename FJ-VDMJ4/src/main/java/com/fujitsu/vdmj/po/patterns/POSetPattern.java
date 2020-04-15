@@ -111,4 +111,10 @@ public class POSetPattern extends POPattern
 	{
 		return plist.isSimple();
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetPattern(this, arg);
+	}
 }

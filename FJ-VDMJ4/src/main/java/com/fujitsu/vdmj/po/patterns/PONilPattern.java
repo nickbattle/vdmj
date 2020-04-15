@@ -63,4 +63,10 @@ public class PONilPattern extends POPattern
 	{
 		return new PONilExpression(location);
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNilPattern(this, arg);
+	}
 }

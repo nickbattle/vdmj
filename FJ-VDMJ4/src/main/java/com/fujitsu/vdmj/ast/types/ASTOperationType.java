@@ -56,7 +56,7 @@ public class ASTOperationType extends ASTType
 	
 	public void setPure(boolean p)
 	{
-		this.pure = p;	// TODO: pure should be final
+		this.pure = p;
 	}
 
 	@Override

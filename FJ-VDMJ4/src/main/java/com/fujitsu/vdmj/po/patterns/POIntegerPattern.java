@@ -64,4 +64,10 @@ public class POIntegerPattern extends POPattern
 	{
 		return new POIntegerLiteralExpression(value);
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIntegerPattern(this, arg);
+	}
 }

@@ -64,4 +64,10 @@ public class POQuotePattern extends POPattern
 	{
 		return new POQuoteLiteralExpression(value);
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQuotePattern(this, arg);
+	}
 }

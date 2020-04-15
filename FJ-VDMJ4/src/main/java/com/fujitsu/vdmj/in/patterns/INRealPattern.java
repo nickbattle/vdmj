@@ -78,4 +78,10 @@ public class INRealPattern extends INPattern
 	{
 		return new TCRealType(location);
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRealPattern(this, arg);
+	}
 }
