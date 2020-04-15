@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.values.NameValuePairList;
@@ -100,22 +99,6 @@ public class INEqualsDefinition extends INDefinition
 	public INExpression findExpression(int lineno)
 	{
 		return test.findExpression(lineno);
-	}
-
-	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		if (defs != null)
-		{
-			INDefinition def = defs.findName(sought);
-
-			if (def != null)
-			{
-				return def;
-			}
-		}
-
-		return null;
 	}
 
 	@Override

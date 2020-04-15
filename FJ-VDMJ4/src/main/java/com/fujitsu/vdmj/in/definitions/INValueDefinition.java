@@ -82,19 +82,6 @@ public class INValueDefinition extends INDefinition
 	}
 
 	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		if (pattern.getVariableNames().contains(sought))
-		{
-			return this;
-		}
-		else
-		{
-			return null;
-		}
-	}
-
-	@Override
 	public INExpression findExpression(int lineno)
 	{
 		return exp.findExpression(lineno);

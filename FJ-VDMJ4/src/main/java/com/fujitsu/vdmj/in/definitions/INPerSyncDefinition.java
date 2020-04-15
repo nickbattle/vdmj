@@ -57,12 +57,6 @@ public class INPerSyncDefinition extends INDefinition
 	}
 
 	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		return null;
-	}
-
-	@Override
 	public INExpression findExpression(int lineno)
 	{
 		return guard.findExpression(lineno);

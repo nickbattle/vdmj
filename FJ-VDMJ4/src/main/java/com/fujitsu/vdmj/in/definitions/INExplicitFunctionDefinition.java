@@ -138,27 +138,6 @@ public class INExplicitFunctionDefinition extends INDefinition
 	}
 
 	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		if (super.findName(sought) != null)
-		{
-			return this;
-		}
-
-		if (predef != null && predef.findName(sought) != null)
-		{
-			return predef;
-		}
-
-		if (postdef != null && postdef.findName(sought) != null)
-		{
-			return postdef;
-		}
-
-		return null;
-	}
-
-	@Override
 	public NameValuePairList getNamedValues(Context ctxt)
 	{
 		NameValuePairList nvl = new NameValuePairList();

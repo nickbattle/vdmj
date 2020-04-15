@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.in.definitions;
 
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
@@ -68,22 +67,6 @@ public class INMultiBindListDefinition extends INDefinition
 	public int hashCode()
 	{
 		return toString().hashCode();
-	}
-
-	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		if (defs != null)
-		{
-			INDefinition def = defs.findName(sought);
-
-			if (def != null)
-			{
-				return def;
-			}
-		}
-
-		return null;
 	}
 
 	@Override

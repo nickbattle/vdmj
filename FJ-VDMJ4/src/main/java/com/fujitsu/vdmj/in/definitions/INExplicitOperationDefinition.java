@@ -23,14 +23,11 @@
 
 package com.fujitsu.vdmj.in.definitions;
 
-import com.fujitsu.vdmj.Release;
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.statements.INSubclassResponsibilityStatement;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
@@ -95,30 +92,6 @@ public class INExplicitOperationDefinition extends INDefinition
 	public TCType getType()
 	{
 		return type;		// NB entire "==>" type, not result
-	}
-
-	@Override
-	public INDefinition findName(TCNameToken sought)
-	{
-		if (super.findName(sought) != null)
-		{
-			return this;
-		}
-
-		if (Settings.dialect == Dialect.VDM_SL || Settings.release == Release.CLASSIC)
-		{
-    		if (predef != null && predef.findName(sought) != null)
-    		{
-    			return predef;
-    		}
-    
-    		if (postdef != null && postdef.findName(sought) != null)
-    		{
-    			return postdef;
-    		}
-		}
-
-		return null;
 	}
 
 	@Override
