@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
@@ -87,6 +88,12 @@ public class LSPDefinitionFinder
 							TCUnresolvedType unresolved = (TCUnresolvedType)node;
 							ModuleEnvironment env = new ModuleEnvironment(module);
 							return env.findType(unresolved.typename, module.name.getName());
+						}
+						else if (node instanceof TCMkTypeExpression)
+						{
+							TCMkTypeExpression mk = (TCMkTypeExpression)node;
+							ModuleEnvironment env = new ModuleEnvironment(module);
+							return env.findType(mk.typename, module.name.getName());
 						}
 						
 						return null;	// Found node, but unable to find definition
