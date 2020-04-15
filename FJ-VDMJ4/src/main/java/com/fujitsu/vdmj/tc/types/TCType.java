@@ -414,17 +414,7 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 	
 	@Override
-	public Object clone()
-	{
-		try
-		{
-			return super.clone();
-		}
-		catch (CloneNotSupportedException e)
-		{
-			throw new RuntimeException(e);
-		}
-	}
+	abstract public TCType clone();
 
 	public void report(int number, String msg)
 	{

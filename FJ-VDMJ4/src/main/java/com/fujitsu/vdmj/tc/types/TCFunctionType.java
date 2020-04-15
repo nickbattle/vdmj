@@ -291,4 +291,10 @@ public class TCFunctionType extends TCType
 	{
 		return visitor.caseFunctionType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCFunctionType(location, parameters.clone(), partial, result.clone());
+	}
 }

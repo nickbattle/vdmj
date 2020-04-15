@@ -34,7 +34,7 @@ import com.fujitsu.vdmj.util.Utils;
 
 
 @SuppressWarnings("serial")
-public class TCTypeSet extends TreeSet<TCType>
+public class TCTypeSet extends TreeSet<TCType> implements Cloneable
 {
 	public TCTypeSet(ASTTypeSet from) throws Exception
 	{
@@ -186,5 +186,18 @@ public class TCTypeSet extends TreeSet<TCType>
 		}
 		
 		return list;
+	}
+
+	@Override
+	public TCTypeSet clone()
+	{
+		TCTypeSet set = new TCTypeSet();
+		
+		for (TCType type: this)
+		{
+			set.add((TCType)type.clone());
+		}
+		
+		return set;
 	}
 }

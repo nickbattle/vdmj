@@ -30,7 +30,7 @@ import com.fujitsu.vdmj.tc.TCMappedList;
 import com.fujitsu.vdmj.util.Utils;
 
 @SuppressWarnings("serial")
-public class TCTypeList extends TCMappedList<ASTType, TCType>
+public class TCTypeList extends TCMappedList<ASTType, TCType> implements Cloneable
 {
 	public TCTypeList(ASTTypeList from) throws Exception
 	{
@@ -85,5 +85,18 @@ public class TCTypeList extends TCMappedList<ASTType, TCType>
 		}
 		
 		return list;
+	}
+	
+	@Override
+	public TCTypeList clone()
+	{
+		TCTypeList c = new TCTypeList();
+		
+		for (TCType t: this)
+		{
+			c.add((TCType)t.clone());
+		}
+		
+		return c;
 	}
 }

@@ -53,4 +53,10 @@ public class TCUndefinedType extends TCType
 	{
 		return visitor.caseUndefinedType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCUndefinedType(location);
+	}
 }

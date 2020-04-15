@@ -45,4 +45,10 @@ public class TCBooleanType extends TCBasicType
 	{
 		return visitor.caseBooleanType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCBooleanType(location);
+	}
 }

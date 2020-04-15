@@ -130,4 +130,10 @@ public class TCSeqType extends TCType
 	{
 		return visitor.caseSeqType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCSeqType(location, seqof.clone());
+	}
 }

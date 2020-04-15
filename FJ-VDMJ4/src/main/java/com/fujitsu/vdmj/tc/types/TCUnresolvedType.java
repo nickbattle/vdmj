@@ -154,4 +154,10 @@ public class TCUnresolvedType extends TCType
 	{
 		return visitor.caseUnresolvedType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCUnresolvedType(typename);
+	}
 }

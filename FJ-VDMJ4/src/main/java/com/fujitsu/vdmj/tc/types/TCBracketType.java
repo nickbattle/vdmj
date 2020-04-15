@@ -244,4 +244,10 @@ public class TCBracketType extends TCType
 	{
 		return visitor.caseBracketType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCBracketType(type.clone());
+	}
 }

@@ -391,4 +391,10 @@ public class TCNamedType extends TCInvariantType
 	{
 		return visitor.caseNamedType(this, arg);
 	}
+
+	@Override
+	public TCType clone()
+	{
+		return new TCNamedType(typename, type.clone());
+	}
 }
