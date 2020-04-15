@@ -113,4 +113,10 @@ public class POConcatenationPattern extends POPattern
 	{
 		return left.alwaysMatches() && right.alwaysMatches();
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseConcatenationPattern(this, arg);
+	}
 }

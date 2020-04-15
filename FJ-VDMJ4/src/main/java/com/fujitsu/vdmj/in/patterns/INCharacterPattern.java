@@ -79,4 +79,10 @@ public class INCharacterPattern extends INPattern
 	{
 		return new TCCharacterType(location);
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCharacterPattern(this, arg);
+	}
 }

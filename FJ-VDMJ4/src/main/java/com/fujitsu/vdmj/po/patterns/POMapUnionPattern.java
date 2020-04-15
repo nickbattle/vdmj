@@ -113,4 +113,10 @@ public class POMapUnionPattern extends POPattern
 	{
 		return left.isSimple() && right.isSimple();
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapUnionPattern(this, arg);
+	}
 }

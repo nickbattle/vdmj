@@ -101,4 +101,10 @@ public class INIdentifierPattern extends INPattern
 		list.add(name);
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIdentifierPattern(this, arg);
+	}
 }

@@ -131,4 +131,10 @@ public class POObjectPattern extends POPattern
 	{
 		return fieldlist.alwaysMatches();
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseObjectPattern(this, arg);
+	}
 }

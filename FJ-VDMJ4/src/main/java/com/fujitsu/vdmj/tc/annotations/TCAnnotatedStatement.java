@@ -61,12 +61,6 @@ public class TCAnnotatedStatement extends TCStatement
 	}
 
 	@Override
-	public boolean hasSideEffects()
-	{
-		return statement.hasSideEffects();
-	}
-
-	@Override
 	public <R, S> R apply(TCStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseAnnotatedStatement(this, arg);

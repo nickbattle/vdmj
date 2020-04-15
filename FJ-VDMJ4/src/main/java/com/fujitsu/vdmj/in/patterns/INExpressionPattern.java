@@ -77,4 +77,10 @@ public class INExpressionPattern extends INPattern
 	{
 		return new TCUnknownType(location);
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExpressionPattern(this, arg);
+	}
 }

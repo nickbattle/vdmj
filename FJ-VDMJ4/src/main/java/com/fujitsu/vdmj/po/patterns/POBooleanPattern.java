@@ -64,4 +64,10 @@ public class POBooleanPattern extends POPattern
 	{
 		return new POBooleanLiteralExpression(value);
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBooleanPattern(this, arg);
+	}
 }

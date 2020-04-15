@@ -300,4 +300,10 @@ public class INMapUnionPattern extends INPattern
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapUnionPattern(this, arg);
+	}
 }

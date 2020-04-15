@@ -140,13 +140,15 @@ public abstract class INExpression extends INNode implements Serializable
 	 */
 	public TCNameList getOldNames()
 	{
-		return new TCNameList();	// Default for expressions with no old variables
+		return new TCNameList();	// TODO as a LeafDefinitionVisitor?
 	}
 
 	/**
 	 * Return a list of sub-expressions of this expression. This is used when
 	 * looking for history operators in permission guards. It is currently
 	 * only implemented for a few TCExpression subclasses.
+	 * 
+	 * TODO complete implementation using LeafExpressionVisitor?
 	 */
 	public INExpressionList getSubExpressions()
 	{

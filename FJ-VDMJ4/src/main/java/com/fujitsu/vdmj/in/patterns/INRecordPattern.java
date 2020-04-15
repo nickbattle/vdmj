@@ -187,4 +187,10 @@ public class INRecordPattern extends INPattern
 	{
 		return plist.getAllVariableNames();
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRecordPattern(this, arg);
+	}
 }

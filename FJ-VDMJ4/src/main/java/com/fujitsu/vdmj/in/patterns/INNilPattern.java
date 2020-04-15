@@ -71,4 +71,10 @@ public class INNilPattern extends INPattern
 	{
 		return new TCOptionalType(location, new TCUnknownType(location));
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNilPattern(this, arg);
+	}
 }

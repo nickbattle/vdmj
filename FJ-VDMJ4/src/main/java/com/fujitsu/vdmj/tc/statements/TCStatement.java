@@ -97,17 +97,6 @@ public abstract class TCStatement extends TCNode implements Serializable
 	}
 
 	/**
-	 * Whether the statement probably produces side effects. This is used during
-	 * TC generation for operations. The method will produce false positives
-	 * (saying that side effects are produced, when they are not), but no false
-	 * negatives.
-	 */
-	public boolean hasSideEffects()
-	{
-		return true;
-	}
-
-	/**
 	 * Return a list of exit types which can be thrown by the statement.
 	 * @return A possibly empty list of exit types.
 	 */

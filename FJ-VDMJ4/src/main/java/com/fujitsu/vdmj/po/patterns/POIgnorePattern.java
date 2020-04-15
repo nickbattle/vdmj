@@ -91,4 +91,10 @@ public class POIgnorePattern extends POPattern
 	{
 		return true;
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIgnorePattern(this, arg);
+	}
 }

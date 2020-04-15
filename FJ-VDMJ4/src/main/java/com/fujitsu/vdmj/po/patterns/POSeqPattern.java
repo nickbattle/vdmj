@@ -107,4 +107,10 @@ public class POSeqPattern extends POPattern
 	{
 		return plist.isSimple();
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqPattern(this, arg);
+	}
 }

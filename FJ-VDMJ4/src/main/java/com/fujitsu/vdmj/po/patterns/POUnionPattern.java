@@ -118,4 +118,10 @@ public class POUnionPattern extends POPattern
 	{
 		return left.alwaysMatches() && right.alwaysMatches();
 	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnionPattern(this, arg);
+	}
 }

@@ -73,4 +73,10 @@ public class INIgnorePattern extends INPattern
 	{
 		return new TCUnknownType(location);	// As we don't care
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIgnorePattern(this, arg);
+	}
 }

@@ -68,7 +68,7 @@ public abstract class INStatement extends INNode implements Serializable
 
 	public INStatement findStatement(int lineno)
 	{
-		return (location.startLine == lineno) ? this : null;
+		return (location.startLine == lineno) ? this : null;	// TODO as a StatementVisitor?
 	}
 
 	/**
@@ -76,7 +76,7 @@ public abstract class INStatement extends INNode implements Serializable
 	 */
 	public INExpression findExpression(int lineno)
 	{
-		return null;
+		return null;	// TODO as a StatementVisitor?
 	}
 
 	/** Evaluate the statement in the context given. */

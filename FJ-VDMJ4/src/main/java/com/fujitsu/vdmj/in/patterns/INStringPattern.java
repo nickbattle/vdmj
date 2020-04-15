@@ -85,4 +85,10 @@ public class INStringPattern extends INPattern
 	{
 		return new TCSeqType(location, new TCCharacterType(location));
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStringPattern(this, arg);
+	}
 }

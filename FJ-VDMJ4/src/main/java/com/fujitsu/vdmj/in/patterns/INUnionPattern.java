@@ -298,4 +298,10 @@ public class INUnionPattern extends INPattern
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUnionPattern(this, arg);
+	}
 }
