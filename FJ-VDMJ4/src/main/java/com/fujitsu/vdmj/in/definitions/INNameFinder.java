@@ -25,105 +25,96 @@ package com.fujitsu.vdmj.in.definitions;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.in.expressions.INLeafExpressionVisitor;
-import com.fujitsu.vdmj.in.statements.INLeafStatementVisitor;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCLeafTypeVisitor;
 
-public class INNameFinder extends INLeafDefinitionVisitor<INDefinition, INDefinitionSet, TCNameToken>
+public class INNameFinder extends INDefinitionVisitor<INDefinition, TCNameToken>
 {
 	@Override
-	protected INDefinitionSet newCollection()
-	{
-		return new INDefinitionSet();
-	}
-
-	@Override
-	public INDefinitionSet caseDefinition(INDefinition node, TCNameToken sought)
+	public INDefinition caseDefinition(INDefinition node, TCNameToken sought)
 	{
 		if (node.name != null && node.name.equals(sought))
 		{
-			return new INDefinitionSet(node);
+			return node;
 		}
 
-		return newCollection();
+		return null;
 	}
 	
 	@Override
-	public INDefinitionSet caseClassDefinition(INClassDefinition node, TCNameToken sought)
+	public INDefinition caseClassDefinition(INClassDefinition node, TCNameToken sought)
 	{
 		for (INDefinition d: node.definitions)
 		{
-			INDefinitionSet found = d.apply(this, sought);
+			INDefinition found = d.apply(this, sought);
 
-			if (!found.isEmpty())
+			if (found != null)
 			{
 				return found;
 			}
 		}
 		
-		return newCollection();
+		return null;
 	}
 	
 	@Override
-	public INDefinitionSet caseEqualsDefinition(INEqualsDefinition node, TCNameToken sought)
+	public INDefinition caseEqualsDefinition(INEqualsDefinition node, TCNameToken sought)
 	{
 		if (node.defs != null)
 		{
 			for (INDefinition def: node.defs)
 			{
-				INDefinitionSet all = def.apply(this, sought);
+				INDefinition all = def.apply(this, sought);
 				
-				if (!all.isEmpty())
+				if (all != null)
 				{
 					return all;
 				}
 			}
 		}
 
-		return newCollection();
+		return null;
 	}
 	
 	@Override
-	public INDefinitionSet caseExplicitFunctionDefinition(INExplicitFunctionDefinition node, TCNameToken sought)
+	public INDefinition caseExplicitFunctionDefinition(INExplicitFunctionDefinition node, TCNameToken sought)
 	{
-		INDefinitionSet s = caseDefinition(node, sought);
-		if (!s.isEmpty()) return s;
+		INDefinition s = caseDefinition(node, sought);
+		if (s != null) return s;
 
 		if (node.predef != null)
 		{
 			s = node.predef.apply(this, sought);
-			if (!s.isEmpty()) return s;
+			if (s != null) return s;
 		}
 
 		if (node.postdef != null)
 		{
 			s = node.postdef.apply(this, sought);
-			if (!s.isEmpty()) return s;
+			if (s != null) return s;
 		}
 
 		return s;	// empty
 	}
 	
 	@Override
-	public INDefinitionSet caseExplicitOperationDefinition(INExplicitOperationDefinition node, TCNameToken sought)
+	public INDefinition caseExplicitOperationDefinition(INExplicitOperationDefinition node, TCNameToken sought)
 	{
-		INDefinitionSet s = caseDefinition(node, sought);
-		if (!s.isEmpty()) return s;
+		INDefinition s = caseDefinition(node, sought);
+		if (s != null) return s;
 
 		if (Settings.dialect == Dialect.VDM_SL || Settings.release == Release.CLASSIC)
 		{
 			if (node.predef != null)
 			{
 				s = node.predef.apply(this, sought);
-				if (!s.isEmpty()) return s;
+				if (s != null) return s;
 			}
 
 			if (node.postdef != null)
 			{
 				s = node.postdef.apply(this, sought);
-				if (!s.isEmpty()) return s;
+				if (s != null) return s;
 			}
 		}
 
@@ -131,44 +122,44 @@ public class INNameFinder extends INLeafDefinitionVisitor<INDefinition, INDefini
 	}
 	
 	@Override
-	public INDefinitionSet caseImplicitFunctionDefinition(INImplicitFunctionDefinition node, TCNameToken sought)
+	public INDefinition caseImplicitFunctionDefinition(INImplicitFunctionDefinition node, TCNameToken sought)
 	{
-		INDefinitionSet s = caseDefinition(node, sought);
-		if (!s.isEmpty()) return s;
+		INDefinition s = caseDefinition(node, sought);
+		if (s != null) return s;
 
 		if (node.predef != null)
 		{
 			s = node.predef.apply(this, sought);
-			if (!s.isEmpty()) return s;
+			if (s != null) return s;
 		}
 
 		if (node.postdef != null)
 		{
 			s = node.postdef.apply(this, sought);
-			if (!s.isEmpty()) return s;
+			if (s != null) return s;
 		}
 
 		return s;	// empty
 	}
 	
 	@Override
-	public INDefinitionSet caseImplicitOperationDefinition(INImplicitOperationDefinition node, TCNameToken sought)
+	public INDefinition caseImplicitOperationDefinition(INImplicitOperationDefinition node, TCNameToken sought)
 	{
-		INDefinitionSet s = caseDefinition(node, sought);
-		if (!s.isEmpty()) return s;
+		INDefinition s = caseDefinition(node, sought);
+		if (s != null) return s;
 
 		if (Settings.dialect == Dialect.VDM_SL || Settings.release == Release.CLASSIC)
 		{
 			if (node.predef != null)
 			{
 				s = node.predef.apply(this, sought);
-				if (!s.isEmpty()) return s;
+				if (s != null) return s;
 			}
 
 			if (node.postdef != null)
 			{
 				s = node.postdef.apply(this, sought);
-				if (!s.isEmpty()) return s;
+				if (s != null) return s;
 			}
 		}
 
@@ -176,31 +167,31 @@ public class INNameFinder extends INLeafDefinitionVisitor<INDefinition, INDefini
 	}
 	
 	@Override
-	public INDefinitionSet caseExternalDefinition(INExternalDefinition node, TCNameToken sought)
+	public INDefinition caseExternalDefinition(INExternalDefinition node, TCNameToken sought)
 	{
 		if (sought.isOld())
 		{
 			if (sought.equals(node.oldname)) 
 			{
-				return new INDefinitionSet(node);
+				return node;
 			}
 		}
 		else if (sought.equals(node.state.name))
 		{
-			return new INDefinitionSet(node);
+			return node;
 		}
 		
-		return newCollection();
+		return null;
 	}
 	
 	@Override
-	public INDefinitionSet caseImportedDefinition(INImportedDefinition node, TCNameToken sought)
+	public INDefinition caseImportedDefinition(INImportedDefinition node, TCNameToken sought)
 	{
 		return node.def.apply(this, sought);
 	}
 
 	@Override
-	public INDefinitionSet caseInheritedDefinition(INInheritedDefinition node, TCNameToken sought)
+	public INDefinition caseInheritedDefinition(INInheritedDefinition node, TCNameToken sought)
 	{
 		// The problem is, when the INInheritedDefinition is created, we
 		// don't know its fully qualified name.
@@ -214,165 +205,147 @@ public class INNameFinder extends INLeafDefinitionVisitor<INDefinition, INDefini
 
 		if (node.name.equals(sought) || node.oldname.equals(sought))
 		{
-			return new INDefinitionSet(node);
+			return node;
 		}
 
-		return newCollection();
+		return null;
 	}
 	
 	@Override
-	public INDefinitionSet caseInstanceVariableDefinition(INInstanceVariableDefinition node, TCNameToken sought)
+	public INDefinition caseInstanceVariableDefinition(INInstanceVariableDefinition node, TCNameToken sought)
 	{
-		INDefinitionSet found = caseDefinition(node, sought);
-		if (!found.isEmpty()) return found;
+		INDefinition found = caseDefinition(node, sought);
+		if (found != null) return found;
 		
 		if (node.oldname.equals(sought))
 		{
-			return new INDefinitionSet(node);
+			return node;
 		}
 		
-		return newCollection();
+		return null;
 	}
 	
 	@Override
-	public INDefinitionSet caseMultiBindListDefinition(INMultiBindListDefinition node, TCNameToken sought)
+	public INDefinition caseMultiBindListDefinition(INMultiBindListDefinition node, TCNameToken sought)
 	{
 		if (node.defs != null)
 		{
 			for (INDefinition def: node.defs)
 			{
-				INDefinitionSet all = def.apply(this, sought);
+				INDefinition all = def.apply(this, sought);
 				
-				if (!all.isEmpty())
+				if (all != null)
 				{
 					return all;
 				}
 			}
 		}
 
-		return newCollection();
+		return null;
 	}
 
 	@Override
-	public INDefinitionSet caseQualifiedDefinition(INQualifiedDefinition node, TCNameToken sought)
+	public INDefinition caseQualifiedDefinition(INQualifiedDefinition node, TCNameToken sought)
 	{
 		return caseDefinition(node, sought);
 	}
 	
 	@Override
-	public INDefinitionSet caseRenamedDefinition(INRenamedDefinition node, TCNameToken sought)
+	public INDefinition caseRenamedDefinition(INRenamedDefinition node, TCNameToken sought)
 	{
-		INDefinitionSet renamed = caseDefinition(node, sought);
+		INDefinition renamed = caseDefinition(node, sought);
 
-		if (!renamed.isEmpty())
+		if (renamed != null)
 		{
 			return renamed;
 		}
 		else
 		{
 			// Renamed definitions hide the original name
-			return newCollection();
+			return null;
 		}
 	}
 	
 	@Override
-	public INDefinitionSet caseStateDefinition(INStateDefinition node, TCNameToken sought)
+	public INDefinition caseStateDefinition(INStateDefinition node, TCNameToken sought)
 	{
 		if (node.invdef != null)
 		{
-			INDefinitionSet s = node.invdef.apply(this, sought);
-			if (!s.isEmpty()) return s;
+			INDefinition s = node.invdef.apply(this, sought);
+			if (s != null) return s;
 		}
 
 		if (node.initdef != null)
 		{
-			INDefinitionSet s = node.initdef.apply(this, sought);
-			if (!s.isEmpty()) return s;
+			INDefinition s = node.initdef.apply(this, sought);
+			if (s != null) return s;
 		}
 
 		for (INDefinition d: node.statedefs)
 		{
-			INDefinitionSet def = d.apply(this, sought);
+			INDefinition def = d.apply(this, sought);
 
-			if (!def.isEmpty())
+			if (def != null)
 			{
 				return def;
 			}
 		}
 
-		return newCollection();
+		return null;
 	}
 	
 	@Override
-	public INDefinitionSet caseThreadDefinition(INThreadDefinition node, TCNameToken sought)
+	public INDefinition caseThreadDefinition(INThreadDefinition node, TCNameToken sought)
 	{
 		return node.operationDef.apply(this, sought);
 	}
 	
 	@Override
-	public INDefinitionSet caseTypeDefinition(INTypeDefinition node, TCNameToken sought)
+	public INDefinition caseTypeDefinition(INTypeDefinition node, TCNameToken sought)
 	{
 		if (node.invdef != null)
 		{
-			INDefinitionSet s = node.invdef.apply(this, sought);
-			if (!s.isEmpty()) return s;
+			INDefinition s = node.invdef.apply(this, sought);
+			if (s != null) return s;
 		}
 
 		if (node.eqdef != null)
 		{
-			INDefinitionSet s = node.eqdef.apply(this, sought);
-			if (!s.isEmpty()) return s;
+			INDefinition s = node.eqdef.apply(this, sought);
+			if (s != null) return s;
 		}
 
 		if (node.orddef != null)
 		{
-			INDefinitionSet s = node.orddef.apply(this, sought);
-			if (!s.isEmpty()) return s;
+			INDefinition s = node.orddef.apply(this, sought);
+			if (s != null) return s;
 		}
 
 		if (node.mindef != null)
 		{
-			INDefinitionSet s = node.mindef.apply(this, sought);
-			if (!s.isEmpty()) return s;
+			INDefinition s = node.mindef.apply(this, sought);
+			if (s != null) return s;
 		}
 
 		if (node.maxdef != null)
 		{
-			INDefinitionSet s = node.maxdef.apply(this, sought);
-			if (!s.isEmpty()) return s;
+			INDefinition s = node.maxdef.apply(this, sought);
+			if (s != null) return s;
 		}
 
-		return newCollection();
+		return null;
 	}
 	
 	@Override
-	public INDefinitionSet caseValueDefinition(INValueDefinition node, TCNameToken sought)
+	public INDefinition caseValueDefinition(INValueDefinition node, TCNameToken sought)
 	{
 		if (node.pattern.getVariableNames().contains(sought))
 		{
-			return new INDefinitionSet(node);
+			return node;
 		}
 		else
 		{
-			return newCollection();
+			return null;
 		}
-	}
-	
-	@Override
-	protected INLeafExpressionVisitor<INDefinition, INDefinitionSet, TCNameToken> getExpressionVisitor()
-	{
-		return null;
-	}
-
-	@Override
-	protected INLeafStatementVisitor<INDefinition, INDefinitionSet, TCNameToken> getStatementVisitor()
-	{
-		return null;
-	}
-
-	@Override
-	protected TCLeafTypeVisitor<INDefinition, INDefinitionSet, TCNameToken> getTypeVisitor()
-	{
-		return null;
 	}
 }

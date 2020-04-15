@@ -161,16 +161,7 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 */
 	public final INDefinition findName(TCNameToken sought)
 	{
-		INDefinitionSet s = this.apply(new INNameFinder(), sought);
-		
-		if (!s.isEmpty())
-		{
-			return s.iterator().next();
-		}
-		else
-		{
-			return null;
-		}
+		return this.apply(new INNameFinder(), sought);
 	}
 
 	/**
