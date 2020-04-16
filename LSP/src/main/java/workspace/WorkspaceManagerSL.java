@@ -180,7 +180,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 				URI defuri = def.location.file.toURI();
 				
 				return new RPCMessageList(request,
-					Boolean.getBoolean("lsp.lsp4e") ?
+					System.getProperty("lsp.lsp4e") != null ?
 						new JSONArray(
 							new JSONObject(
 								"targetUri", defuri.toString(),
