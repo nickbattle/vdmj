@@ -50,7 +50,6 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	// Note, static to avoid constructor loops!
 	private static LSPExpressionLocationFinder expVisitor = new LSPExpressionLocationFinder();
 	private static LSPStatementLocationFinder stmtVisitor = new LSPStatementLocationFinder();
-	private static LSPTypeLocationFinder typeVisitor = new LSPTypeLocationFinder();
 	
 	/**
 	 * Search for types in the unresolved list that match the LexLocation sought. If there
@@ -164,6 +163,6 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	@Override
 	protected TCLeafTypeVisitor<TCNode, Set<TCNode>, LexLocation> getTypeVisitor()
 	{
-		return typeVisitor;
+		return null;
 	}
 }
