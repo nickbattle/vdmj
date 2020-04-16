@@ -187,17 +187,4 @@ public class TCTypeSet extends TreeSet<TCType> implements Cloneable
 		
 		return list;
 	}
-
-	@Override
-	public TCTypeSet clone()
-	{
-		TCTypeSet set = new TCTypeSet();
-		
-		for (TCType type: this)
-		{
-			set.add((TCType)type.clone());
-		}
-		
-		return set;
-	}
 }

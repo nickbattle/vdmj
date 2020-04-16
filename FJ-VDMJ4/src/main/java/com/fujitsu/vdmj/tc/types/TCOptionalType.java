@@ -263,10 +263,4 @@ public class TCOptionalType extends TCType
 	{
 		return visitor.caseOptionalType(this, arg);
 	}
-
-	@Override
-	public TCType clone()
-	{
-		return new TCOptionalType(location, type.clone());
-	}
 }

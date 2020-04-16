@@ -86,17 +86,4 @@ public class TCTypeList extends TCMappedList<ASTType, TCType> implements Cloneab
 		
 		return list;
 	}
-	
-	@Override
-	public TCTypeList clone()
-	{
-		TCTypeList c = new TCTypeList();
-		
-		for (TCType t: this)
-		{
-			c.add((TCType)t.clone());
-		}
-		
-		return c;
-	}
 }

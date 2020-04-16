@@ -38,7 +38,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 /**
  * The parent class of all static type checking types.
  */
-public abstract class TCType extends TCNode implements Comparable<TCType>, Serializable, Cloneable
+public abstract class TCType extends TCNode implements Comparable<TCType>, Serializable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -413,8 +413,15 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 		return getClass().hashCode();
 	}
 	
-	@Override
-	abstract public TCType clone();
+	/**
+	 * Return a list of TCUnresolvedTypes contained within this type. This is
+	 * used for the location of type names in the LSP server. Note that the
+	 * method must be called before type resolution!
+	 */
+	public TCTypeList unresolvedTypes()
+	{
+		return this.apply(new TCUnresolvedTypeFinder(), null);
+	}
 
 	public void report(int number, String msg)
 	{

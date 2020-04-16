@@ -64,7 +64,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 {
 	private static final long serialVersionUID = 1L;
 	public TCOperationType type;
-	public final TCOperationType unresolved;
+	public final TCTypeList unresolved;
 	public final TCPatternList parameterPatterns;
 	public final TCExpression precondition;
 	public final TCExpression postcondition;
@@ -90,7 +90,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		this.annotations = annotations;
 		this.accessSpecifier = accessSpecifier;
 		this.type = type;
-		this.unresolved = (TCOperationType) type.clone();
+		this.unresolved = type.unresolvedTypes();
 		this.parameterPatterns = parameters;
 		this.precondition = precondition;
 		this.postcondition = postcondition;

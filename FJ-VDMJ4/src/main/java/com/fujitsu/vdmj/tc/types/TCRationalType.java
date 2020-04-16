@@ -51,10 +51,4 @@ public class TCRationalType extends TCNumericType
 	{
 		return visitor.caseRationalType(this, arg);
 	}
-
-	@Override
-	public TCType clone()
-	{
-		return new TCRationalType(location);
-	}
 }

@@ -45,10 +45,4 @@ public class TCCharacterType extends TCBasicType
 	{
 		return visitor.caseCharacterType(this, arg);
 	}
-
-	@Override
-	public TCType clone()
-	{
-		return new TCCharacterType(location);
-	}
 }

@@ -145,10 +145,4 @@ public class TCMapType extends TCType
 	{
 		return visitor.caseMapType(this, arg);
 	}
-
-	@Override
-	public TCType clone()
-	{
-		return new TCMapType(location, from.clone(), to.clone());
-	}
 }

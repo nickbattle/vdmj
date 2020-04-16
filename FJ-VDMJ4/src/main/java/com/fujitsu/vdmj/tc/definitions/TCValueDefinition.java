@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -48,7 +49,7 @@ public class TCValueDefinition extends TCDefinition
 	private static final long serialVersionUID = 1L;
 	public final TCPattern pattern;
 	public TCType type;
-	public final TCType unresolved;
+	public final TCTypeList unresolved;
 	public final TCExpression exp;
 
 	private TCDefinitionList defs = null;
@@ -62,7 +63,7 @@ public class TCValueDefinition extends TCDefinition
 		this.annotations = annotations;
 		this.pattern = p;
 		this.type = type;
-		this.unresolved = type.clone();
+		this.unresolved = type != null ? type.unresolvedTypes() : new TCTypeList();
 		this.exp = exp;
 
 		defs = new TCDefinitionList();	// Overwritten in typeCheck

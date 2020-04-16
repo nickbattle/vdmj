@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -40,7 +41,7 @@ public class TCLocalDefinition extends TCDefinition
 {
 	private static final long serialVersionUID = 1L;
 	public TCType type;
-	public final TCType unresolved;
+	public final TCTypeList unresolved;
 	
 	public TCValueDefinition valueDefinition = null;
 
@@ -53,7 +54,7 @@ public class TCLocalDefinition extends TCDefinition
 	{
 		super(Pass.DEFS, location, name, scope);
 		this.type = type;
-		this.unresolved = type.clone();
+		this.unresolved = type.unresolvedTypes();
 	}
 
 	@Override

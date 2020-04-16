@@ -62,7 +62,7 @@ public class TCTypeDefinition extends TCDefinition
 {
 	private static final long serialVersionUID = 1L;
 	public TCInvariantType type;
-	public final TCInvariantType unresolved;
+	public final TCTypeList unresolved;
 	public final TCPattern invPattern;
 	public final TCExpression invExpression;
 	public final TCPattern eqPattern1;
@@ -91,7 +91,7 @@ public class TCTypeDefinition extends TCDefinition
 		this.annotations = annotations;
 		this.accessSpecifier = accessSpecifier;
 		this.type = type;
-		this.unresolved = (TCInvariantType) type.clone();
+		this.unresolved = type.unresolvedTypes();
 		this.invPattern = invPattern;
 		this.invExpression = invExpression;
 		this.eqPattern1 = eqPattern1;
