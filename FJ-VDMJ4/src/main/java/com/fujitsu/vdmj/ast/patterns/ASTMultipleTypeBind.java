@@ -41,4 +41,10 @@ public class ASTMultipleTypeBind extends ASTMultipleBind
 	{
 		return plist + ":" + type;
 	}
+
+	@Override
+	public <R, S> R apply(ASTMultipleBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultipleTypeBind(this, arg);
+	}
 }

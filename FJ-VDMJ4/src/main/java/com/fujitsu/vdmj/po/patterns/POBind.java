@@ -55,4 +55,9 @@ public abstract class POBind extends PONode implements Serializable
 
 	/** Return a list of POs. */
 	abstract public ProofObligationList getProofObligations(POContextStack ctxt);
+
+	/**
+	 * Implemented by all binds to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(POBindVisitor<R, S> visitor, S arg);
 }

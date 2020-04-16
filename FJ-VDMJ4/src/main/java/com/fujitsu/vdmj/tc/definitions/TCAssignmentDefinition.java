@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -41,6 +42,7 @@ public class TCAssignmentDefinition extends TCDefinition
 	private static final long serialVersionUID = 1L;
 
 	public TCType type;
+	public final TCTypeList unresolved;
 	public final TCExpression expression;
 	public TCType expType;
 
@@ -56,6 +58,7 @@ public class TCAssignmentDefinition extends TCDefinition
 		super(Pass.VALUES, name.getLocation(), name, scope);
 		this.accessSpecifier = accessSpecifier;
 		this.type = type;
+		this.unresolved = type.unresolvedTypes();
 		this.expression = expression;
 	}
 

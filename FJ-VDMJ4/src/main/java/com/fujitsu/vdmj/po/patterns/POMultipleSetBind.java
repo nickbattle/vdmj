@@ -49,4 +49,10 @@ public class POMultipleSetBind extends POMultipleBind
 	{
 		return set.getProofObligations(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(POMultipleBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultipleSetBind(this, arg);
+	}
 }

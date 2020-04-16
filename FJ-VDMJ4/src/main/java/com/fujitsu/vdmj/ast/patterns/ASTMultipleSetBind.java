@@ -41,4 +41,10 @@ public class ASTMultipleSetBind extends ASTMultipleBind
 	{
 		return plist + " in set " + set;
 	}
+
+	@Override
+	public <R, S> R apply(ASTMultipleBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultipleSetBind(this, arg);
+	}
 }

@@ -74,4 +74,10 @@ public class INTypeBind extends INBind
 	{
 		return new TCNameList();
 	}
+
+	@Override
+	public <R, S> R apply(INBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTypeBind(this, arg);
+	}
 }

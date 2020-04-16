@@ -90,4 +90,9 @@ public abstract class POMultipleBind extends PONode
 	{
 		return plist.getPossibleType(location);
 	}
+
+	/**
+	 * Implemented by all multiple binds to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(POMultipleBindVisitor<R, S> visitor, S arg);
 }

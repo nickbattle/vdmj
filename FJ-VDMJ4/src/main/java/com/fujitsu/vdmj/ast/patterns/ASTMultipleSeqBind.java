@@ -41,4 +41,10 @@ public class ASTMultipleSeqBind extends ASTMultipleBind
 	{
 		return plist + " in seq " + sequence;
 	}
+
+	@Override
+	public <R, S> R apply(ASTMultipleBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultipleSeqBind(this, arg);
+	}
 }

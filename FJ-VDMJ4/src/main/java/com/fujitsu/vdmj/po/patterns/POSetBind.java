@@ -62,4 +62,10 @@ public class POSetBind extends POBind
 	{
 		return set.getProofObligations(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(POBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetBind(this, arg);
+	}
 }

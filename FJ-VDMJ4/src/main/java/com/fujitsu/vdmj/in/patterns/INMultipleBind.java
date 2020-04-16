@@ -83,4 +83,9 @@ public abstract class INMultipleBind extends INNode
 	{
 		throw new ContextException(ve, location);
 	}
+
+	/**
+	 * Implemented by all multiple binds to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(INMultipleBindVisitor<R, S> visitor, S arg);
 }

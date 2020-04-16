@@ -58,4 +58,9 @@ public abstract class ASTMultipleBind extends ASTNode
 		list.add(this);
 		return list;
 	}
+
+	/**
+	 * Implemented by all multiple binds to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(ASTMultipleBindVisitor<R, S> visitor, S arg);
 }

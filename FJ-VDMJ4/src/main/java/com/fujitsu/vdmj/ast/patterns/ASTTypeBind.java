@@ -35,4 +35,10 @@ public class ASTTypeBind extends ASTBind
 		super(pattern.location, pattern);
 		this.type = type;
 	}
+
+	@Override
+	public <R, S> R apply(ASTBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTypeBind(this, arg);
+	}
 }

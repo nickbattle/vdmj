@@ -73,4 +73,10 @@ public class INSeqBind extends INBind
 	{
 		return sequence.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqBind(this, arg);
+	}
 }

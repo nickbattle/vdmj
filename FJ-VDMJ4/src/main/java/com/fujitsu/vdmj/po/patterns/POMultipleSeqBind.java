@@ -49,4 +49,10 @@ public class POMultipleSeqBind extends POMultipleBind
 	{
 		return sequence.getProofObligations(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(POMultipleBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultipleSeqBind(this, arg);
+	}
 }

@@ -49,4 +49,10 @@ public class POMultipleTypeBind extends POMultipleBind
 	{
 		return new ProofObligationList();
 	}
+
+	@Override
+	public <R, S> R apply(POMultipleBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultipleTypeBind(this, arg);
+	}
 }

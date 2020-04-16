@@ -41,4 +41,10 @@ public class ASTSetBind extends ASTBind
 	{
 		return pattern + " in set " + set;
 	}
+
+	@Override
+	public <R, S> R apply(ASTBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetBind(this, arg);
+	}
 }

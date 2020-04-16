@@ -25,6 +25,12 @@ package com.fujitsu.vdmj.tc.types;
 
 public class TCUnresolvedTypeFinder extends TCLeafTypeVisitor<TCType, TCTypeList, Object>
 {
+	/**
+	 * To prevent recursive cases, where a type refers to itself, we record possible
+	 * recursive roots here, and test before recursing again. See below.
+	 */
+	private TCTypeSet recursiveSeen = new TCTypeSet();
+	
 	@Override
 	protected TCTypeList newCollection()
 	{
@@ -43,45 +49,29 @@ public class TCUnresolvedTypeFinder extends TCLeafTypeVisitor<TCType, TCTypeList
 	@Override
 	public TCTypeList caseNamedType(TCNamedType node, Object arg)
 	{
-		if (node.type instanceof TCUnresolvedType)	// N = Z
+		if (recursiveSeen.contains(node))
 		{
-			return new TCTypeList(node.type);
-		}
-		else if (node.type instanceof TCUnionType)	// N = A | B | C
-		{
-			TCUnionType union = (TCUnionType)node.type;
-			TCTypeList all = newCollection();
-			
-			for (TCType type: union.types)
-			{
-				if (type instanceof TCUnresolvedType)
-				{
-					all.add(type);
-				}
-			}
-			
-			return all;
+			return newCollection();
 		}
 		else
 		{
-			return newCollection();
+			recursiveSeen.add(node);
+			return super.caseNamedType(node, arg);
 		}
 	}
 	
 	@Override
 	public TCTypeList caseRecordType(TCRecordType node, Object arg)
 	{
-		TCTypeList all = newCollection();
-		
-		for (TCField field: node.fields)
+		if (recursiveSeen.contains(node))
 		{
-			if (field.type instanceof TCUnresolvedType)
-			{
-				all.add(field.type);	// Don't recurse
-			}
+			return newCollection();
 		}
-		
-		return all;
+		else
+		{
+			recursiveSeen.add(node);
+			return super.caseRecordType(node, arg);
+		}
 	}
 	
 	@Override
