@@ -30,9 +30,14 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCLeafDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
+import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
+import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
+import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
 import com.fujitsu.vdmj.tc.statements.TCLeafStatementVisitor;
+import com.fujitsu.vdmj.tc.statements.TCMapSeqDesignator;
+import com.fujitsu.vdmj.tc.statements.TCStateDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 
 public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, Set<TCNode>, LexLocation>
@@ -57,7 +62,9 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 	{
 		Set<TCNode> all = newCollection();
 
-		if (arg.within(node.location))
+		if (arg.within(node.location) ||
+			(node.classname != null && arg.within(node.classname.getLocation())) ||
+			(node.fieldname != null && arg.within(node.fieldname.getLocation())))
 		{
 			all.add(node);
 		}
@@ -79,6 +86,38 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 		all.addAll(super.caseCallStatement(node, arg));
 		return all;
 	}
+ 	
+ 	@Override
+ 	public Set<TCNode> caseAssignmentStatement(TCAssignmentStatement node, LexLocation arg)
+ 	{
+		Set<TCNode> all = newCollection();
+		TCStateDesignator des = node.target;
+		boolean found = false;
+		
+		while (true)
+		{
+			if (des instanceof TCIdentifierDesignator)
+			{
+				found = found || arg.within(des.location);
+				if (found) all.add(des);
+				break;
+			}
+			else if (des instanceof TCMapSeqDesignator)
+			{
+				TCMapSeqDesignator ms = (TCMapSeqDesignator)des;
+				des = ms.mapseq;
+			}
+			else if (des instanceof TCFieldDesignator)
+			{
+				TCFieldDesignator f = (TCFieldDesignator)des;
+				des = f.object;
+				found = found || arg.within(f.field.getLocation());
+			}
+		}
+
+ 		all.addAll(super.caseAssignmentStatement(node, arg));
+		return all;
+ 	}
 	
 	@Override
 	protected TCLeafExpressionVisitor<TCNode, Set<TCNode>, LexLocation> getExpressionVisitor()
