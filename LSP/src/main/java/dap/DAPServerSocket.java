@@ -59,13 +59,17 @@ public class DAPServerSocket implements Runnable
 			{
 				dialect = Dialect.VDM_PP;
 			}
+			else if (args[a].equals("-vdmrt"))
+			{
+				dialect = Dialect.VDM_RT;
+			}
 			else if (args[a].equals("-dap"))
 			{
 				dapPort = Integer.parseInt(args[++a]);
 			}
 			else
 			{
-				Log.error("Usage: DAPSocketServer [-vdmsl | -vdmpp] -dap");
+				Log.error("Usage: DAPSocketServer [-vdmsl | -vdmpp | -vdmrt] -dap");
 			}
 		}
 		

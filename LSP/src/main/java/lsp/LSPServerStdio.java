@@ -55,6 +55,10 @@ public class LSPServerStdio implements Runnable
 			{
 				dialect = Dialect.VDM_PP;
 			}
+			else if (args[a].equals("-vdmrt"))
+			{
+				dialect = Dialect.VDM_RT;
+			}
 			else if (args[a].equals("-dap"))
 			{
 				dapPort = Integer.parseInt(args[++a]);
@@ -75,7 +79,7 @@ public class LSPServerStdio implements Runnable
 	
 	private static void usage()
 	{
-		System.err.println("Usage: LSPServerStdio [-vdmsl | -vdmpp] [-dap]");
+		System.err.println("Usage: LSPServerStdio [-vdmsl | -vdmpp | -vdmrt] [-dap]");
 		System.exit(1);
 	}
 	

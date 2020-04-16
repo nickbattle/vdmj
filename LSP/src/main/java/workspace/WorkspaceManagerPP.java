@@ -79,7 +79,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		StringBuilder buffer = projectFiles.get(file);
 		
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
-				Dialect.VDM_PP, file, Charset.defaultCharset().displayName());
+				Settings.dialect, file, Charset.defaultCharset().displayName());
 		ClassReader cr = new ClassReader(ltr);
 		cr.readClasses();
 		
@@ -96,6 +96,11 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		Log.dump(errs);
 		return errs;
 	}
+	
+	protected ASTClassList extras()
+	{
+		return new ASTClassList();		// Overridden in RT to add CPU and BUS
+	}
 
 	@Override
 	protected RPCMessageList checkLoadedFiles() throws Exception
@@ -107,7 +112,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
 			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(),
-					Dialect.VDM_PP, entry.getKey(), Charset.defaultCharset().displayName());
+					Settings.dialect, entry.getKey(), Charset.defaultCharset().displayName());
 			ClassReader cr = new ClassReader(ltr);
 			astClassList.addAll(cr.readClasses());
 			
@@ -121,6 +126,8 @@ public class WorkspaceManagerPP extends WorkspaceManager
 				warns.addAll(cr.getWarnings());
 			}
 		}
+		
+		astClassList.addAll(extras());
 		
 		if (errs.isEmpty())
 		{
