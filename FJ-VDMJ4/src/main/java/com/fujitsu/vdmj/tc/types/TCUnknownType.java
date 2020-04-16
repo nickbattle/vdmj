@@ -218,10 +218,4 @@ public class TCUnknownType extends TCType
 	{
 		return visitor.caseUnknownType(this, arg);
 	}
-
-	@Override
-	public TCType clone()
-	{
-		return new TCUnknownType(location);
-	}
 }

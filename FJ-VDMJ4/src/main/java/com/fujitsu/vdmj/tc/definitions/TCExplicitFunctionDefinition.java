@@ -63,7 +63,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	private static final long serialVersionUID = 1L;
 	public final TCNameList typeParams;
 	public TCFunctionType type;
-	public final TCFunctionType unresolved;
+	public final TCTypeList unresolved;
 	public final TCPatternListList paramPatternList;
 	public final TCExpression precondition;
 	public final TCExpression postcondition;
@@ -97,7 +97,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		this.accessSpecifier = accessSpecifier;
 		this.typeParams = typeParams;
 		this.type = type;
-		this.unresolved = (TCFunctionType) type.clone();
+		this.unresolved = type.unresolvedTypes();
 		this.paramPatternList = parameters;
 		this.precondition = precondition;
 		this.postcondition = postcondition;

@@ -51,10 +51,4 @@ public class TCIntegerType extends TCNumericType
 	{
 		return visitor.caseIntegerType(this, arg);
 	}
-
-	@Override
-	public TCType clone()
-	{
-		return new TCIntegerType(location);
-	}
 }

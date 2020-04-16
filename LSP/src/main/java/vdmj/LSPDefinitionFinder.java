@@ -41,6 +41,8 @@ import com.fujitsu.vdmj.tc.statements.TCCallStatement;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 
+import workspace.Log;
+
 public class LSPDefinitionFinder
 {
 	public TCDefinition find(TCModuleList modules, File file, int line, int col)
@@ -96,13 +98,15 @@ public class LSPDefinitionFinder
 							return env.findType(mk.typename, module.name.getName());
 						}
 						
-						return null;	// Found node, but unable to find definition
+						Log.error("TCNode located, but unable to find definition %s", position);
+						return null;
 					}
 				}
 			}
 		}
 
-		return null;	// Unable to find node
+		Log.error("Unable to locate symbol %s", position);
+		return null;
 	}
 	
 	public TCDefinition find(TCClassList classes, File file, int line, int col)

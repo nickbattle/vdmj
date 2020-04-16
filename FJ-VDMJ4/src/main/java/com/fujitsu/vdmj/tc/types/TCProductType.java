@@ -166,10 +166,4 @@ public class TCProductType extends TCType
 	{
 		return visitor.caseProductType(this, arg);
 	}
-
-	@Override
-	public TCType clone()
-	{
-		return new TCProductType(location, types.clone());
-	}
 }

@@ -67,7 +67,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	public final TCExpression measureExp;
 
 	public TCFunctionType type;
-	public TCFunctionType unresolved;
+	public TCTypeList unresolved;
 	public TCExplicitFunctionDefinition predef;
 	public TCExplicitFunctionDefinition postdef;
 
@@ -109,7 +109,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 
 		// NB: implicit functions are always +> total, apparently
 		type = new TCFunctionType(location, ptypes, false, result.type);
-		unresolved = (TCFunctionType) type.clone();
+		unresolved = type.unresolvedTypes();
 		type.definitions = new TCDefinitionList(this);
 		type.instantiated = typeParams == null ? null : false;
 	}

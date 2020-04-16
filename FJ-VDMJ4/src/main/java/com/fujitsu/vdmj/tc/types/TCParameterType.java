@@ -79,10 +79,4 @@ public class TCParameterType extends TCType
 	{
 		return visitor.caseParameterType(this, arg);
 	}
-
-	@Override
-	public TCType clone()
-	{
-		return new TCParameterType(name);
-	}
 }

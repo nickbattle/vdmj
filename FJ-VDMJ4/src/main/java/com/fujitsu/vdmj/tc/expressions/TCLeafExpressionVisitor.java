@@ -287,7 +287,7 @@ abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  			if (def instanceof TCValueDefinition)
  			{
  				TCValueDefinition vdef = (TCValueDefinition)def;
- 				all.addAll(vdef.exp.apply(this, arg));
+ 				all.addAll(vdef.exp.apply(this, arg));	// TODO apply the definition visitor here?
  			}
  		}
  		

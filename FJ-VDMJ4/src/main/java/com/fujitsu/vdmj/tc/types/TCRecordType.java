@@ -281,10 +281,4 @@ public class TCRecordType extends TCInvariantType
 	{
 		return visitor.caseRecordType(this, arg);
 	}
-
-	@Override
-	public TCType clone()
-	{
-		return new TCRecordType(name, fields.clone(), composed);
-	}
 }

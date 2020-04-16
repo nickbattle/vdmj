@@ -77,7 +77,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	public final TCErrorCaseList errors;
 
 	public TCOperationType type;		// Created from params/result
-	public TCOperationType unresolved;
+	public TCTypeList unresolved;
 	public TCExplicitFunctionDefinition predef;
 	public TCExplicitFunctionDefinition postdef;
 	public TCStateDefinition state;
@@ -114,7 +114,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		type = new TCOperationType(location, ptypes,
 					(result == null ? new TCVoidType(name.getLocation()) : result.type));
 		
-		unresolved = (TCOperationType) type.clone();
+		unresolved = type.unresolvedTypes();
 		setAccessSpecifier(accessSpecifier);
 	}
 

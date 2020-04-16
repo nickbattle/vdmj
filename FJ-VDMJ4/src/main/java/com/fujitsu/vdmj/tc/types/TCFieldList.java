@@ -27,7 +27,7 @@ import com.fujitsu.vdmj.ast.types.ASTField;
 import com.fujitsu.vdmj.ast.types.ASTFieldList;
 import com.fujitsu.vdmj.tc.TCMappedList;
 
-public class TCFieldList extends TCMappedList<ASTField, TCField> implements Cloneable
+public class TCFieldList extends TCMappedList<ASTField, TCField>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -39,18 +39,5 @@ public class TCFieldList extends TCMappedList<ASTField, TCField> implements Clon
 	public TCFieldList(ASTFieldList from) throws Exception
 	{
 		super(from);
-	}
-	
-	@Override
-	public TCFieldList clone()
-	{
-		TCFieldList list = new TCFieldList();
-		
-		for (TCField field: this)
-		{
-			list.add(new TCField(field.tagname, field.tag, (TCType)field.type.clone(), field.equalityAbstraction));
-		}
-		
-		return list;
 	}
 }
