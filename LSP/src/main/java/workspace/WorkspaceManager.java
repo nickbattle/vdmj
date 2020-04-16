@@ -70,6 +70,7 @@ import vdmj.DAPDebugReader;
 public abstract class WorkspaceManager
 {
 	private static WorkspaceManager INSTANCE = null;
+
 	private File rootUri = null;
 	protected Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
 	protected Set<File> openFiles = new HashSet<File>();
@@ -92,6 +93,13 @@ public abstract class WorkspaceManager
 				if (INSTANCE == null)
 				{
 					INSTANCE = new WorkspaceManagerPP();
+				}
+				return INSTANCE;
+				
+			case VDM_RT:
+				if (INSTANCE == null)
+				{
+					INSTANCE = new WorkspaceManagerRT();
 				}
 				return INSTANCE;
 				

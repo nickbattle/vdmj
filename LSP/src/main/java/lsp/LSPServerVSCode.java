@@ -61,6 +61,10 @@ public class LSPServerVSCode implements Runnable
 			{
 				dialect = Dialect.VDM_PP;
 			}
+			else if (args[a].equals("-vdmrt"))
+			{
+				dialect = Dialect.VDM_RT;
+			}
 			else if (args[a].equals("-lsp"))
 			{
 				lspPort = Integer.parseInt(args[++a]);
@@ -90,7 +94,7 @@ public class LSPServerVSCode implements Runnable
 	
 	private static void usage()
 	{
-		System.err.println("Usage: LSPServerVSCode [-vdmsl | -vdmpp] -lsp [-dap]");
+		System.err.println("Usage: LSPServerVSCode [-vdmsl | -vdmpp | -vdmrt] -lsp [-dap]");
 		System.exit(1);
 	}
 	
