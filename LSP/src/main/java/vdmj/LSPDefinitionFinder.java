@@ -38,8 +38,12 @@ import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
+import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
+import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
+import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
 
 import workspace.Log;
 
@@ -62,6 +66,8 @@ public class LSPDefinitionFinder
 			
 			if (span == null || position.within(span))
 			{
+				ModuleEnvironment env = new ModuleEnvironment(module);
+				
 				for (TCDefinition def: module.defs)
 				{
 					Set<TCNode> nodes = def.apply(finder, position);
@@ -88,13 +94,11 @@ public class LSPDefinitionFinder
 						else if (node instanceof TCUnresolvedType)
 						{
 							TCUnresolvedType unresolved = (TCUnresolvedType)node;
-							ModuleEnvironment env = new ModuleEnvironment(module);
 							return env.findType(unresolved.typename, module.name.getName());
 						}
 						else if (node instanceof TCMkTypeExpression)
 						{
 							TCMkTypeExpression mk = (TCMkTypeExpression)node;
-							ModuleEnvironment env = new ModuleEnvironment(module);
 							return env.findType(mk.typename, module.name.getName());
 						}
 						
@@ -117,6 +121,7 @@ public class LSPDefinitionFinder
 	public TCDefinition find(TCClassList classes, LexLocation position)
 	{
 		LSPDefinitionLocationFinder finder = new LSPDefinitionLocationFinder();
+		PublicClassEnvironment globals = new PublicClassEnvironment(classes); 
 		
 		for (TCClassDefinition cdef: classes)
 		{
@@ -124,6 +129,8 @@ public class LSPDefinitionFinder
 			
 			if (span == null || position.within(span))
 			{
+				PrivateClassEnvironment env = new PrivateClassEnvironment(cdef, globals);
+				
 				for (TCDefinition def: cdef.definitions)
 				{
 					Set<TCNode> nodes = def.apply(finder, position);
@@ -147,13 +154,30 @@ public class LSPDefinitionFinder
 							TCCallObjectStatement stmt = (TCCallObjectStatement)node;
 							return stmt.getDefinition();
 						}
+						else if (node instanceof TCIdentifierDesignator)
+						{
+							TCIdentifierDesignator id = (TCIdentifierDesignator)node;
+							return env.findName(id.name, NameScope.NAMESANDSTATE);
+						}
+						else if (node instanceof TCUnresolvedType)
+						{
+							TCUnresolvedType unresolved = (TCUnresolvedType)node;
+							return env.findType(unresolved.typename, cdef.name.getName());
+						}
+						else if (node instanceof TCMkTypeExpression)
+						{
+							TCMkTypeExpression mk = (TCMkTypeExpression)node;
+							return env.findType(mk.typename, cdef.name.getName());
+						}
 						
-						return null;	// Found node, but unable to find definition
+						Log.error("TCNode located, but unable to find definition %s", position);
+						return null;
 					}
 				}
 			}
 		}
 
-		return null;	// Unable to find node
+		Log.error("Unable to locate symbol %s", position);
+		return null;
 	}
 }
