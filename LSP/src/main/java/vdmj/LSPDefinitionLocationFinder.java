@@ -34,11 +34,15 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLeafDefinitionVisitor;
+import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.statements.TCLeafStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCLeafTypeVisitor;
-import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 
 public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode, Set<TCNode>, LexLocation>
 {
@@ -46,6 +50,23 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	private static LSPExpressionLocationFinder expVisitor = new LSPExpressionLocationFinder();
 	private static LSPStatementLocationFinder stmtVisitor = new LSPStatementLocationFinder();
 	private static LSPTypeLocationFinder typeVisitor = new LSPTypeLocationFinder();
+	
+	private Set<TCNode> matchUnresolved(TCTypeList unresolvedList, LexLocation sought)
+	{
+		Set<TCNode> matched = newCollection();
+		
+		for (TCType type: unresolvedList)
+		{
+			TCUnresolvedType unresolved = (TCUnresolvedType)type;
+			
+			if (sought.within(unresolved.typename.getLocation()))
+			{
+				matched.add(unresolved);
+			}
+		}
+
+		return matched;
+	}
 
 	@Override
 	public Set<TCNode> caseDefinition(TCDefinition node, LexLocation position)
@@ -54,48 +75,58 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	}
 	
 	@Override
-	public Set<TCNode> caseTypeDefinition(TCTypeDefinition node, LexLocation arg)
+	public Set<TCNode> caseTypeDefinition(TCTypeDefinition node, LexLocation sought)
 	{
-		Set<TCNode> all = super.caseTypeDefinition(node, arg);
-		
-		if (node.unresolved instanceof TCNamedType)
-		{
-			TCNamedType named = (TCNamedType)node.unresolved;
-			all.addAll(named.type.apply(typeVisitor, arg));
-		}
-		
+		Set<TCNode> all = super.caseTypeDefinition(node, sought);
+		all.addAll(matchUnresolved(node.unresolved, sought));
 		return all;
 	}
 	
 	@Override
-	public Set<TCNode> caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, LexLocation arg)
+	public Set<TCNode> caseLocalDefinition(TCLocalDefinition node, LexLocation sought)
 	{
-		Set<TCNode> all = super.caseExplicitFunctionDefinition(node, arg);
-		all.addAll(node.unresolved.apply(typeVisitor, arg));
+		Set<TCNode> all = super.caseLocalDefinition(node, sought);
+		all.addAll(matchUnresolved(node.unresolved, sought));
 		return all;
 	}
 	
 	@Override
-	public Set<TCNode> caseImplicitFunctionDefinition(TCImplicitFunctionDefinition node, LexLocation arg)
+	public Set<TCNode> caseValueDefinition(TCValueDefinition node, LexLocation sought)
 	{
-		Set<TCNode> all = super.caseImplicitFunctionDefinition(node, arg);
-		all.addAll(node.unresolved.apply(typeVisitor, arg));
+		Set<TCNode> all = super.caseValueDefinition(node, sought);
+		all.addAll(matchUnresolved(node.unresolved, sought));
 		return all;
 	}
 	
 	@Override
-	public Set<TCNode> caseExplicitOperationDefinition(TCExplicitOperationDefinition node, LexLocation arg)
+	public Set<TCNode> caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, LexLocation sought)
 	{
-		Set<TCNode> all = super.caseExplicitOperationDefinition(node, arg);
-		all.addAll(node.unresolved.apply(typeVisitor, arg));
+		Set<TCNode> all = super.caseExplicitFunctionDefinition(node, sought);
+		all.addAll(matchUnresolved(node.unresolved, sought));
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseImplicitFunctionDefinition(TCImplicitFunctionDefinition node, LexLocation sought)
+	{
+		Set<TCNode> all = super.caseImplicitFunctionDefinition(node, sought);
+		all.addAll(matchUnresolved(node.unresolved, sought));
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseExplicitOperationDefinition(TCExplicitOperationDefinition node, LexLocation sought)
+	{
+		Set<TCNode> all = super.caseExplicitOperationDefinition(node, sought);
+		all.addAll(matchUnresolved(node.unresolved, sought));
 		return all;
 	}
 
 	@Override
-	public Set<TCNode> caseImplicitOperationDefinition(TCImplicitOperationDefinition node, LexLocation arg)
+	public Set<TCNode> caseImplicitOperationDefinition(TCImplicitOperationDefinition node, LexLocation sought)
 	{
-		Set<TCNode> all = super.caseImplicitOperationDefinition(node, arg);
-		all.addAll(node.unresolved.apply(typeVisitor, arg));
+		Set<TCNode> all = super.caseImplicitOperationDefinition(node, sought);
+		all.addAll(matchUnresolved(node.unresolved, sought));
 		return all;
 	}
 	

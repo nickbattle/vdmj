@@ -28,10 +28,15 @@ import java.util.Set;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
+import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
+import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 
 public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode, Set<TCNode>, LexLocation>
 {
@@ -71,5 +76,31 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 		}
 
 		return result;
+	}
+	
+	@Override
+	public Set<TCNode> caseLetDefExpression(TCLetDefExpression node, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseLetDefExpression(node, arg);
+
+		for (TCDefinition def: node.localDefs)
+ 		{
+ 			if (def instanceof TCValueDefinition)
+ 			{
+ 				TCValueDefinition vdef = (TCValueDefinition)def;
+ 				
+ 				for (TCType type: vdef.unresolved)
+ 				{
+ 					TCUnresolvedType unresolved = (TCUnresolvedType)type;
+ 					
+ 					if (arg.within(unresolved.typename.getLocation()))
+ 					{
+ 						all.add(unresolved);
+ 					}
+ 				}
+ 			}
+ 		}
+ 		
+		return all;
 	}
 }
