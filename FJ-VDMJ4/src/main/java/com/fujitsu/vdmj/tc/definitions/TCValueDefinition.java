@@ -48,6 +48,7 @@ public class TCValueDefinition extends TCDefinition
 	private static final long serialVersionUID = 1L;
 	public final TCPattern pattern;
 	public TCType type;
+	public final TCType unresolved;
 	public final TCExpression exp;
 
 	private TCDefinitionList defs = null;
@@ -61,6 +62,7 @@ public class TCValueDefinition extends TCDefinition
 		this.annotations = annotations;
 		this.pattern = p;
 		this.type = type;
+		this.unresolved = type.clone();
 		this.exp = exp;
 
 		defs = new TCDefinitionList();	// Overwritten in typeCheck

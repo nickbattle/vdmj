@@ -40,6 +40,7 @@ public class TCLocalDefinition extends TCDefinition
 {
 	private static final long serialVersionUID = 1L;
 	public TCType type;
+	public final TCType unresolved;
 	
 	public TCValueDefinition valueDefinition = null;
 
@@ -52,6 +53,7 @@ public class TCLocalDefinition extends TCDefinition
 	{
 		super(Pass.DEFS, location, name, scope);
 		this.type = type;
+		this.unresolved = type.clone();
 	}
 
 	@Override
