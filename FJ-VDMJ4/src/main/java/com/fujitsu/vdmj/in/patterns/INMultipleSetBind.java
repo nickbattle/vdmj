@@ -93,4 +93,10 @@ public class INMultipleSetBind extends INMultipleBind
 	{
 		return set.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INMultipleBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultipleSetBind(this, arg);
+	}
 }

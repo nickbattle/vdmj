@@ -64,4 +64,10 @@ public class INMultipleTypeBind extends INMultipleBind
 	{
 		return new TCNameList();
 	}
+
+	@Override
+	public <R, S> R apply(INMultipleBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultipleTypeBind(this, arg);
+	}
 }

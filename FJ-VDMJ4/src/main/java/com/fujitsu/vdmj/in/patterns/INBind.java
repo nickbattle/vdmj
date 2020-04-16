@@ -62,4 +62,9 @@ public abstract class INBind extends INNode implements Serializable
 	
 	/** Return a list of all old values read by the bind evaluation. */
 	abstract public TCNameList getOldNames();
+
+	/**
+	 * Implemented by all binds to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(INBindVisitor<R, S> visitor, S arg);
 }

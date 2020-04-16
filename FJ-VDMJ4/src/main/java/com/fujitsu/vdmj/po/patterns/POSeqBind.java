@@ -62,4 +62,10 @@ public class POSeqBind extends POBind
 	{
 		return sequence.getProofObligations(ctxt);
 	}
+
+	@Override
+	public <R, S> R apply(POBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqBind(this, arg);
+	}
 }

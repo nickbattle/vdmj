@@ -62,4 +62,10 @@ public class POTypeBind extends POBind
 	{
 		return new ProofObligationList();
 	}
+
+	@Override
+	public <R, S> R apply(POBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTypeBind(this, arg);
+	}
 }

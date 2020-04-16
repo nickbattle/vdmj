@@ -95,4 +95,10 @@ public class INSetBind extends INBind
 	{
 		return set.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetBind(this, arg);
+	}
 }

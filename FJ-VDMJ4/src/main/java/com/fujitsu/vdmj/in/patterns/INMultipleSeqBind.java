@@ -71,4 +71,10 @@ public class INMultipleSeqBind extends INMultipleBind
 	{
 		return sequence.getOldNames();
 	}
+
+	@Override
+	public <R, S> R apply(INMultipleBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultipleSeqBind(this, arg);
+	}
 }

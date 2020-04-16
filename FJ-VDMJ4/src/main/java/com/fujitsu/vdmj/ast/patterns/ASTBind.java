@@ -47,4 +47,9 @@ public abstract class ASTBind extends ASTNode implements Serializable
 		this.location = location;
 		this.pattern = pattern;
 	}
+
+	/**
+	 * Implemented by all binds to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(ASTBindVisitor<R, S> visitor, S arg);
 }

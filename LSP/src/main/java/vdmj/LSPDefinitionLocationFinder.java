@@ -28,6 +28,7 @@ import java.util.Set;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
@@ -51,6 +52,10 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	private static LSPStatementLocationFinder stmtVisitor = new LSPStatementLocationFinder();
 	private static LSPTypeLocationFinder typeVisitor = new LSPTypeLocationFinder();
 	
+	/**
+	 * Search for types in the unresolved list that match the LexLocation sought. If there
+	 * are any matches, there should only be one!
+	 */
 	private Set<TCNode> matchUnresolved(TCTypeList unresolvedList, LexLocation sought)
 	{
 		Set<TCNode> matched = newCollection();
@@ -72,6 +77,14 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	public Set<TCNode> caseDefinition(TCDefinition node, LexLocation position)
 	{
 		return newCollection();		// Nothing found
+	}
+	
+	@Override
+	public Set<TCNode> caseAssignmentDefinition(TCAssignmentDefinition node, LexLocation sought)
+	{
+		Set<TCNode> all = super.caseAssignmentDefinition(node, sought);
+		all.addAll(matchUnresolved(node.unresolved, sought));
+		return all;
 	}
 	
 	@Override

@@ -21,28 +21,28 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.patterns;
+package com.fujitsu.vdmj.ast.patterns;
 
 /**
- * The base type for all TCMultipleBind visitors. All methods, by default, call
+ * The base type for all ASTMultipleBind visitors. All methods, by default, call
  * the abstract caseMultipleBind method, via the various intermediate default
  * methods for their parent types.
  */
-public abstract class TCMultipleBindVisitor<R, S>
+public abstract class ASTMultipleBindVisitor<R, S>
 {
- 	abstract public R caseMultipleBind(TCMultipleBind node, S arg);
+ 	abstract public R caseMultipleBind(ASTMultipleBind node, S arg);
 
- 	public R caseMultipleSeqBind(TCMultipleSeqBind node, S arg)
+ 	public R caseMultipleSeqBind(ASTMultipleSeqBind node, S arg)
 	{
 		return caseMultipleBind(node, arg);
 	}
 
- 	public R caseMultipleSetBind(TCMultipleSetBind node, S arg)
+ 	public R caseMultipleSetBind(ASTMultipleSetBind node, S arg)
 	{
 		return caseMultipleBind(node, arg);
 	}
 
- 	public R caseMultipleTypeBind(TCMultipleTypeBind node, S arg)
+ 	public R caseMultipleTypeBind(ASTMultipleTypeBind node, S arg)
 	{
 		return caseMultipleBind(node, arg);
 	}

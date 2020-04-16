@@ -41,4 +41,10 @@ public class ASTSeqBind extends ASTBind
 	{
 		return pattern + " in seq " + sequence;
 	}
+
+	@Override
+	public <R, S> R apply(ASTBindVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSeqBind(this, arg);
+	}
 }

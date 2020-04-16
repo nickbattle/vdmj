@@ -21,28 +21,28 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.patterns;
+package com.fujitsu.vdmj.in.patterns;
 
 /**
- * The base type for all TCMultipleBind visitors. All methods, by default, call
+ * The base type for all INMultipleBind visitors. All methods, by default, call
  * the abstract caseMultipleBind method, via the various intermediate default
  * methods for their parent types.
  */
-public abstract class TCMultipleBindVisitor<R, S>
+public abstract class INMultipleBindVisitor<R, S>
 {
- 	abstract public R caseMultipleBind(TCMultipleBind node, S arg);
+ 	abstract public R caseMultipleBind(INMultipleBind node, S arg);
 
- 	public R caseMultipleSeqBind(TCMultipleSeqBind node, S arg)
+ 	public R caseMultipleSeqBind(INMultipleSeqBind node, S arg)
 	{
 		return caseMultipleBind(node, arg);
 	}
 
- 	public R caseMultipleSetBind(TCMultipleSetBind node, S arg)
+ 	public R caseMultipleSetBind(INMultipleSetBind node, S arg)
 	{
 		return caseMultipleBind(node, arg);
 	}
 
- 	public R caseMultipleTypeBind(TCMultipleTypeBind node, S arg)
+ 	public R caseMultipleTypeBind(INMultipleTypeBind node, S arg)
 	{
 		return caseMultipleBind(node, arg);
 	}
