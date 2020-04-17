@@ -25,7 +25,7 @@ package com.fujitsu.vdmj.tc.patterns;
 
 import java.util.Collection;
 
-import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
 
 /**
  * This TCPattern visitor visits all of the leaves of a pattern tree and calls
@@ -47,7 +47,7 @@ public abstract class TCLeafPatternVisitor<E, C extends Collection<E>, S> extend
  	@Override
 	public C caseExpressionPattern(TCExpressionPattern node, S arg)
 	{
-		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
+		TCExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
 		return (expVisitor != null ? node.exp.apply(expVisitor, arg) : newCollection());
 	}
 
@@ -154,5 +154,5 @@ public abstract class TCLeafPatternVisitor<E, C extends Collection<E>, S> extend
 
  	abstract protected C newCollection();
 
- 	abstract protected TCLeafExpressionVisitor<E, C, S> getExpressionVisitor();
+ 	abstract protected TCExpressionVisitor<C, S> getExpressionVisitor();
 }

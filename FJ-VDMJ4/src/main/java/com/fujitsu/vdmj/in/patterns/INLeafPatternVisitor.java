@@ -25,7 +25,7 @@ package com.fujitsu.vdmj.in.patterns;
 
 import java.util.Collection;
 
-import com.fujitsu.vdmj.in.expressions.INLeafExpressionVisitor;
+import com.fujitsu.vdmj.in.expressions.INExpressionVisitor;
 
 /**
  * This TCPattern visitor visits all of the leaves of a pattern tree and calls
@@ -47,7 +47,7 @@ public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extend
  	@Override
 	public C caseExpressionPattern(INExpressionPattern node, S arg)
 	{
-		INLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
 		return (expVisitor != null ? node.exp.apply(expVisitor, arg) : newCollection());
 	}
 
@@ -154,5 +154,5 @@ public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extend
 
  	abstract protected C newCollection();
 
- 	abstract protected INLeafExpressionVisitor<E, C, S> getExpressionVisitor();
+ 	abstract protected INExpressionVisitor<C, S> getExpressionVisitor();
 }

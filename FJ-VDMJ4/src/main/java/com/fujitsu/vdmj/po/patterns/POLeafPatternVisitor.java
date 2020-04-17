@@ -25,7 +25,7 @@ package com.fujitsu.vdmj.po.patterns;
 
 import java.util.Collection;
 
-import com.fujitsu.vdmj.po.expressions.POLeafExpressionVisitor;
+import com.fujitsu.vdmj.po.expressions.POExpressionVisitor;
 
 /**
  * This POPattern visitor visits all of the leaves of a pattern tree and calls
@@ -47,7 +47,7 @@ public abstract class POLeafPatternVisitor<E, C extends Collection<E>, S> extend
  	@Override
 	public C caseExpressionPattern(POExpressionPattern node, S arg)
 	{
-		POLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
+		POExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
 		return (expVisitor != null ? node.exp.apply(expVisitor, arg) : newCollection());
 	}
 
@@ -154,5 +154,5 @@ public abstract class POLeafPatternVisitor<E, C extends Collection<E>, S> extend
 
  	abstract protected C newCollection();
 
- 	abstract protected POLeafExpressionVisitor<E, C, S> getExpressionVisitor();
+ 	abstract protected POExpressionVisitor<C, S> getExpressionVisitor();
 }
