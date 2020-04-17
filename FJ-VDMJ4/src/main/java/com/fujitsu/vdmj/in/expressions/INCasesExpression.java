@@ -131,25 +131,6 @@ public class INCasesExpression extends INExpression
 	}
 
 	@Override
-	public INExpressionList getSubExpressions()
-	{
-		INExpressionList subs = exp.getSubExpressions();
-
-		for (INCaseAlternative c: cases)
-		{
-			subs.addAll(c.getSubExpressions());
-		}
-
-		if (others != null)
-		{
-			subs.addAll(others.getSubExpressions());
-		}
-
-		subs.add(this);
-		return subs;
-	}
-
-	@Override
 	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseCasesExpression(this, arg);

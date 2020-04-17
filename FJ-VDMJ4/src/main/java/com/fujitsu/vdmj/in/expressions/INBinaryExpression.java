@@ -79,15 +79,6 @@ abstract public class INBinaryExpression extends INExpression
 	}
 
 	@Override
-	public INExpressionList getSubExpressions()
-	{
-		INExpressionList subs = left.getSubExpressions();
-		subs.addAll(right.getSubExpressions());
-		subs.add(this);
-		return subs;
-	}
-
-	@Override
 	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseBinaryExpression(this, arg);
