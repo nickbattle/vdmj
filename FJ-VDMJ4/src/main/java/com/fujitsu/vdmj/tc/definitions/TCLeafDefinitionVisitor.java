@@ -25,13 +25,13 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import java.util.Collection;
 
-import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
-import com.fujitsu.vdmj.tc.statements.TCLeafStatementVisitor;
+import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCField;
-import com.fujitsu.vdmj.tc.types.TCLeafTypeVisitor;
+import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
 
 /**
  * This TCDefinition visitor visits all of the leaves of a definition tree and calls
@@ -42,8 +42,8 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseAssignmentDefinition(TCAssignmentDefinition node, S arg)
 	{
-		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		TCExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		TCTypeVisitor<C, S> typeVisitor = getTypeVisitor();
 		C all = newCollection();
 		
 		if (typeVisitor != null)
@@ -75,15 +75,15 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseClassInvariantDefinition(TCClassInvariantDefinition node, S arg)
 	{
-		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
+		TCExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
 		return (expVisitor != null ? node.expression.apply(expVisitor, arg) : newCollection());
 	}
 
  	@Override
 	public C caseEqualsDefinition(TCEqualsDefinition node, S arg)
 	{
-		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		TCExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		TCTypeVisitor<C, S> typeVisitor = getTypeVisitor();
 		C all = newCollection();
 		
 		if (typeVisitor != null)
@@ -102,8 +102,8 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, S arg)
 	{
-		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		TCExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		TCTypeVisitor<C, S> typeVisitor = getTypeVisitor();
 		C all = newCollection();
 		
 		if (typeVisitor != null)
@@ -122,8 +122,8 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseExplicitOperationDefinition(TCExplicitOperationDefinition node, S arg)
 	{
-		TCLeafStatementVisitor<E, C, S> stmtVisitor = getStatementVisitor();
-		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		TCStatementVisitor<C, S> stmtVisitor = getStatementVisitor();
+		TCTypeVisitor<C, S> typeVisitor = getTypeVisitor();
 		C all = newCollection();
 		
 		if (typeVisitor != null)
@@ -150,8 +150,8 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
  		if (node.body != null)
  		{
-			TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-			TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+			TCExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+			TCTypeVisitor<C, S> typeVisitor = getTypeVisitor();
 			C all = newCollection();
 			
 			if (typeVisitor != null)
@@ -177,8 +177,8 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
  		if (node.body != null)
  		{
- 			TCLeafStatementVisitor<E, C, S> stmtVisitor = getStatementVisitor();
- 			TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+ 			TCStatementVisitor<C, S> stmtVisitor = getStatementVisitor();
+ 			TCTypeVisitor<C, S> typeVisitor = getTypeVisitor();
  			C all = newCollection();
  			
  			if (typeVisitor != null)
@@ -227,7 +227,7 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseLocalDefinition(TCLocalDefinition node, S arg)
 	{
-		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		TCTypeVisitor<C, S> typeVisitor = getTypeVisitor();
 		C all = newCollection();
 		
 		if (typeVisitor != null)
@@ -266,7 +266,7 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C casePerSyncDefinition(TCPerSyncDefinition node, S arg)
 	{
-		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
+		TCExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
 		return (expVisitor != null ? node.guard.apply(expVisitor, arg) : newCollection());
 	}
 
@@ -285,8 +285,8 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseStateDefinition(TCStateDefinition node, S arg)
 	{
-		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		TCExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		TCTypeVisitor<C, S> typeVisitor = getTypeVisitor();
 		C all = newCollection();
 		
 		if (typeVisitor != null)
@@ -316,15 +316,15 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseThreadDefinition(TCThreadDefinition node, S arg)
 	{
-		TCLeafStatementVisitor<E, C, S> stmtVisitor = getStatementVisitor();
+		TCStatementVisitor<C, S> stmtVisitor = getStatementVisitor();
 		return (stmtVisitor != null ? node.statement.apply(stmtVisitor, arg) : newCollection());
 	}
 
  	@Override
 	public C caseTypeDefinition(TCTypeDefinition node, S arg)
 	{
-		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		TCExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		TCTypeVisitor<C, S> typeVisitor = getTypeVisitor();
 		C all = newCollection();
 		
 		if (typeVisitor != null)
@@ -362,8 +362,8 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseValueDefinition(TCValueDefinition node, S arg)
 	{
-		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
-		TCLeafTypeVisitor<E, C, S> typeVisitor = getTypeVisitor();
+		TCExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		TCTypeVisitor<C, S> typeVisitor = getTypeVisitor();
 		C all = newCollection();
 		
 		if (typeVisitor != null)
@@ -381,7 +381,7 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 
  	private C caseMultipleBind(TCMultipleBind bind, S arg)
 	{
-		TCLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
+		TCExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
 		C all = newCollection();
 		
 		if (expVisitor != null)
@@ -403,9 +403,9 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	
 	abstract protected C newCollection();
 
- 	abstract protected TCLeafExpressionVisitor<E, C, S> getExpressionVisitor();
+ 	abstract protected TCExpressionVisitor<C, S> getExpressionVisitor();
 
- 	abstract protected TCLeafStatementVisitor<E, C, S> getStatementVisitor();
+ 	abstract protected TCStatementVisitor<C, S> getStatementVisitor();
 
- 	abstract protected TCLeafTypeVisitor<E, C, S> getTypeVisitor();
+ 	abstract protected TCTypeVisitor<C, S> getTypeVisitor();
 }
