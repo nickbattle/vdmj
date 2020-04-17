@@ -23,7 +23,10 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import com.fujitsu.vdmj.in.definitions.INLeafDefinitionVisitor;
+import com.fujitsu.vdmj.in.definitions.INAssignmentDefinition;
+import com.fujitsu.vdmj.in.definitions.INDefinition;
+import com.fujitsu.vdmj.in.definitions.INDefinitionVisitor;
+import com.fujitsu.vdmj.in.definitions.INValueDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INExpressionVisitor;
@@ -90,8 +93,47 @@ public class INStatementExpressionFinder extends INLeafStatementVisitor<INExpres
 	}
 
 	@Override
-	protected INLeafDefinitionVisitor<INExpression, INExpressionList, Integer> getDefinitionVisitor()
+	protected INDefinitionVisitor<INExpressionList, Integer> getDefinitionVisitor()
 	{
-		return null;
+		return new INDefinitionVisitor<INExpressionList, Integer>()
+		{
+			@Override
+			public INExpressionList caseDefinition(INDefinition node, Integer lineno)
+			{
+				return new INExpressionList();
+			}
+			
+			/**
+			 * Assignment definitions are "dcl var:type := exp"
+			 */
+			@Override
+			public INExpressionList caseAssignmentDefinition(INAssignmentDefinition node, Integer lineno)
+			{
+				INExpressionList list = newCollection();
+				
+				if (node.expression.location.startLine == lineno)
+				{
+					list.add(node.expression);		// Could apply exp visitor...
+				}
+
+				return list;
+			}
+			
+			/**
+			 * Value definitions are in let def statements.
+			 */
+			@Override
+			public INExpressionList caseValueDefinition(INValueDefinition node, Integer lineno)
+			{
+				INExpressionList list = newCollection();
+				
+				if (node.exp.location.startLine == lineno)
+				{
+					list.add(node.exp);		// Could apply exp visitor...
+				}
+
+				return list;
+			}
+		};
 	}
 }
