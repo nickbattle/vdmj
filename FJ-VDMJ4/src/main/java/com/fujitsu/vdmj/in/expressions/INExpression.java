@@ -144,17 +144,13 @@ public abstract class INExpression extends INNode implements Serializable
 	}
 
 	/**
-	 * Return a list of sub-expressions of this expression. This is used when
-	 * looking for history operators in permission guards. It is currently
-	 * only implemented for a few TCExpression subclasses.
-	 * 
-	 * TODO complete implementation using LeafExpressionVisitor?
+	 * Return a list of history sub-expressions of this expression. This is used when
+	 * looking for history operators in permission guards. The result is guaranteed
+	 * to only contain INHistoryExpressions (if any).
 	 */
-	public INExpressionList getSubExpressions()
+	public final INExpressionList getHistoryExpressions()
 	{
-		INExpressionList subs = new INExpressionList();
-		subs.add(this);
-		return subs;
+		return this.apply(new INHistoryExpressionFinder(), null);
 	}
 
 	/**

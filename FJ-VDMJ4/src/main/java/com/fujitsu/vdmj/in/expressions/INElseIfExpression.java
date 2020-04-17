@@ -91,15 +91,6 @@ public class INElseIfExpression extends INExpression
 	}
 
 	@Override
-	public INExpressionList getSubExpressions()
-	{
-		INExpressionList subs = elseIfExp.getSubExpressions();
-		subs.addAll(thenExp.getSubExpressions());
-		subs.add(this);
-		return subs;
-	}
-
-	@Override
 	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseElseIfExpression(this, arg);

@@ -160,26 +160,6 @@ public class INIfExpression extends INExpression
 	}
 
 	@Override
-	public INExpressionList getSubExpressions()
-	{
-		INExpressionList subs = ifExp.getSubExpressions();
-		subs.addAll(thenExp.getSubExpressions());
-
-		for (INElseIfExpression elif: elseList)
-		{
-			subs.addAll(elif.getSubExpressions());
-		}
-
-		if (elseExp != null)
-		{
-			subs.addAll(elseExp.getSubExpressions());
-		}
-
-		subs.add(this);
-		return subs;
-	}
-
-	@Override
 	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseIfExpression(this, arg);

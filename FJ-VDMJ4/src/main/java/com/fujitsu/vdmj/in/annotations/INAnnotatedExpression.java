@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.in.annotations;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
@@ -78,12 +77,6 @@ public class INAnnotatedExpression extends INExpression
 	public TCNameList getOldNames()
 	{
 		return expression.getOldNames();
-	}
-
-	@Override
-	public INExpressionList getSubExpressions()
-	{
-		return expression.getSubExpressions();
 	}
 
 	@Override

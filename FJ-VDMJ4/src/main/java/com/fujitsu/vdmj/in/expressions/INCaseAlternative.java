@@ -81,9 +81,4 @@ public class INCaseAlternative extends INNode
 	{
 		return result.getOldNames();
 	}
-
-	public INExpressionList getSubExpressions()
-	{
-		return result.getSubExpressions();
-	}
 }

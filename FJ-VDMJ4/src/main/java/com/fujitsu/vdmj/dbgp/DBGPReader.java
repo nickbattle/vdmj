@@ -2170,17 +2170,14 @@ public class DBGPReader extends DebugLink
 								pdef.location.startLine == line ||
 								guard.findExpression(line) != null)
 							{
-	            				for (INExpression sub: guard.getSubExpressions())
+	            				for (INExpression sub: guard.getHistoryExpressions())
 	            				{
-	            					if (sub instanceof INHistoryExpression)
-	            					{
-	            						INHistoryExpression hexp = (INHistoryExpression)sub;
-	            						Value v = hexp.eval(octxt);
-                						TCNameToken name =
-                							new TCNameToken(pdef.location, octxt.self.type.name.getModule(),
-                								hexp.toString());
-	            						vars.put(name, v);
-	            					}
+            						INHistoryExpression hexp = (INHistoryExpression)sub;
+            						Value v = hexp.eval(octxt);
+            						TCNameToken name =
+            							new TCNameToken(pdef.location, octxt.self.type.name.getModule(),
+            								hexp.toString());
+            						vars.put(name, v);
 	            				}
 							}
 						}

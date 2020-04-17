@@ -84,16 +84,4 @@ public class INExpressionList extends INMappedList<TCExpression, INExpression>
 
 		return list;
 	}
-
-	public INExpressionList getSubExpressions()
-	{
-		INExpressionList list = new INExpressionList();
-
-		for (INExpression exp: this)
-		{
-			list.addAll(exp.getSubExpressions());
-		}
-
-		return list;
-	}
 }
