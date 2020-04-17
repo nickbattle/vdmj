@@ -179,7 +179,7 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 */
 	public NameValuePairList getNamedValues(Context ctxt)
 	{
-		return new NameValuePairList();		// TODO as a DefinitionVisitor?
+		return new NameValuePairList();
 	}
 
 	public boolean isOperation()

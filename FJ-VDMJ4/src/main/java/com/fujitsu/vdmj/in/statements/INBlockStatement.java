@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.in.statements;
 
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INDefinitionList;
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.values.Value;
@@ -58,14 +57,6 @@ public class INBlockStatement extends INSimpleBlockStatement
 		sb.append(super.toString());
 		sb.append(")");
 		return sb.toString();
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = assignmentDefs.findExpression(lineno);
-		if (found != null) return found;
-		return super.findExpression(lineno);
 	}
 
 	@Override

@@ -42,10 +42,17 @@ import com.fujitsu.vdmj.in.patterns.INSetBind;
  */
 abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> extends INExpressionVisitor<C, S>
 {
+	private final boolean allNodes;
+	
+	public INLeafExpressionVisitor(boolean allNodes)
+	{
+		this.allNodes = allNodes;
+	}
+	
  	@Override
 	public C caseApplyExpression(INApplyExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.root.apply(this, arg));
 		
 		for (INExpression a: node.args)
@@ -59,7 +66,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
  	public C caseAnnotatedExpression(INAnnotatedExpression node, S arg)
  	{
- 		C all = newCollection();
+ 		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
  		
  		for (INExpression a: node.annotation.args)
  		{
@@ -73,7 +80,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseBinaryExpression(INBinaryExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.left.apply(this, arg));
 		all.addAll(node.right.apply(this, arg));
 		return all;
@@ -82,7 +89,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseCasesExpression(INCasesExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.exp.apply(this, arg));
 		
 		for (INCaseAlternative a: node.cases)
@@ -101,7 +108,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseDefExpression(INDefExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 
 		for (INDefinition def: node.localDefs)
  		{
@@ -119,13 +126,15 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseElementsExpression(INElementsExpression node, S arg)
 	{
-		return node.exp.apply(this, arg);
+ 		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(node.exp.apply(this, arg));
+		return all;
 	}
 
  	@Override
 	public C caseElseIfExpression(INElseIfExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.elseIfExp.apply(this, arg));
 		all.addAll(node.thenExp.apply(this, arg));
 		return all;
@@ -134,7 +143,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseExists1Expression(INExists1Expression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(caseBind(node.bind, arg));
 		
 		if (node.predicate != null)
@@ -148,7 +157,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseExistsExpression(INExistsExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		
 		for (INMultipleBind bind: node.bindList)
 		{
@@ -166,19 +175,23 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	@Override
 	public C caseFieldExpression(INFieldExpression node, S arg)
 	{
-		return node.object.apply(this, arg);
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(node.object.apply(this, arg));
+		return all;
 	}
 
  	@Override
 	public C caseFieldNumberExpression(INFieldNumberExpression node, S arg)
 	{
- 		return node.tuple.apply(this, arg);
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
+ 		all.addAll(node.tuple.apply(this, arg));
+ 		return all;
 	}
 
  	@Override
 	public C caseForAllExpression(INForAllExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		
 		for (INMultipleBind bind: node.bindList)
 		{
@@ -196,13 +209,15 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseFuncInstantiationExpression(INFuncInstantiationExpression node, S arg)
 	{
-		return node.function.apply(this, arg);
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(node.function.apply(this, arg));
+ 		return all;
 	}
 
  	@Override
 	public C caseIfExpression(INIfExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.ifExp.apply(this, arg));
 		all.addAll(node.thenExp.apply(this, arg));
 		
@@ -218,7 +233,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseIotaExpression(INIotaExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(caseBind(node.bind, arg));
 		
 		if (node.predicate != null)
@@ -232,25 +247,31 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseIsExpression(INIsExpression node, S arg)
 	{
-		return node.test.apply(this, arg);
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(node.test.apply(this, arg));
+ 		return all;
 	}
 
  	@Override
 	public C caseIsOfBaseClassExpression(INIsOfBaseClassExpression node, S arg)
 	{
- 		return node.exp.apply(this, arg);
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
+ 		all.addAll(node.exp.apply(this, arg));
+ 		return all;
 	}
 
  	@Override
 	public C caseIsOfClassExpression(INIsOfClassExpression node, S arg)
 	{
- 		return node.exp.apply(this, arg);
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
+ 		all.addAll(node.exp.apply(this, arg));
+ 		return all;
 	}
 
  	@Override
 	public C caseLambdaExpression(INLambdaExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.expression.apply(this, arg));
 		return all;
 	}
@@ -258,7 +279,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseLetBeStExpression(INLetBeStExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(caseMultipleBind(node.bind, arg));
 		
 		if (node.suchThat != null)
@@ -273,7 +294,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseLetDefExpression(INLetDefExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 
 		for (INDefinition def: node.localDefs)
  		{
@@ -291,7 +312,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseMapCompExpression(INMapCompExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.first.left.apply(this, arg));
 		all.addAll(node.first.right.apply(this, arg));
 		
@@ -311,7 +332,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseMapEnumExpression(INMapEnumExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		
 		for (INMapletExpression maplet: node.members)
 		{
@@ -325,13 +346,15 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseMkBasicExpression(INMkBasicExpression node, S arg)
 	{
-		return node.arg.apply(this, arg);
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(node.arg.apply(this, arg));
+ 		return all;
 	}
 
  	@Override
 	public C caseMkTypeExpression(INMkTypeExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		
 		for (INExpression a: node.args)
 		{
@@ -344,7 +367,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseMuExpression(INMuExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		
 		for (INRecordModifier modifier: node.modifiers)
 		{
@@ -358,13 +381,15 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseNarrowExpression(INNarrowExpression node, S arg)
 	{
-		return node.test.apply(this, arg);
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(node.test.apply(this, arg));
+ 		return all;
 	}
 
  	@Override
 	public C caseNewExpression(INNewExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		
 		for (INExpression a: node.args)
 		{
@@ -377,7 +402,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseSameBaseClassExpression(INSameBaseClassExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.left.apply(this, arg));
 		all.addAll(node.right.apply(this, arg));
 		return all;
@@ -386,7 +411,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseSameClassExpression(INSameClassExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.left.apply(this, arg));
 		all.addAll(node.right.apply(this, arg));
 		return all;
@@ -395,7 +420,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseSeqCompExpression(INSeqCompExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.first.apply(this, arg));
 		all.addAll(caseBind(node.bind, arg));
 		
@@ -410,7 +435,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseSeqEnumExpression(INSeqEnumExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		
 		for (INExpression m: node.members)
 		{
@@ -423,7 +448,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseSetCompExpression(INSetCompExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.first.apply(this, arg));
 		
 		for (INMultipleBind mbind: node.bindings)
@@ -442,7 +467,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseSetEnumExpression(INSetEnumExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		
 		for (INExpression m: node.members)
 		{
@@ -455,7 +480,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseSetRangeExpression(INSetRangeExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.first.apply(this, arg));
 		all.addAll(node.last.apply(this, arg));
 		return all;
@@ -473,7 +498,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseTupleExpression(INTupleExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		
 		for (INExpression m: node.args)
 		{
@@ -486,7 +511,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseUnaryExpression(INUnaryExpression node, S arg)
 	{
-		C all = newCollection();
+		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.exp.apply(this, arg));
 		return all;
 	}
@@ -528,4 +553,9 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	}
 	
 	abstract protected C newCollection();
+	
+	protected C caseNonLeafNode(INExpression node, S arg)
+	{
+		throw new RuntimeException("caseNonLeafNode must be overridden if allNodes is set");
+	}
 }

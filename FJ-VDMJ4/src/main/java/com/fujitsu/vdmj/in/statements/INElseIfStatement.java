@@ -49,20 +49,6 @@ public class INElseIfStatement extends INStatement
 	}
 
 	@Override
-	public INStatement findStatement(int lineno)
-	{
-		INStatement found = super.findStatement(lineno);
-		if (found != null) return found;
-		return thenStmt.findStatement(lineno);
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return thenStmt.findExpression(lineno);
-	}
-
-	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);

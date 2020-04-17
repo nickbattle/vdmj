@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.values.Value;
@@ -56,35 +55,6 @@ abstract public class INSimpleBlockStatement extends INStatement
 
 		sb.append("\n");
 		return sb.toString();
-	}
-
-	@Override
-	public INStatement findStatement(int lineno)
-	{
-		if (location.startLine == lineno) return this;
-		INStatement found = null;
-
-		for (INStatement stmt: statements)
-		{
-			found = stmt.findStatement(lineno);
-			if (found != null) break;
-		}
-
-		return found;
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = null;
-
-		for (INStatement stmt: statements)
-		{
-			found = stmt.findExpression(lineno);
-			if (found != null) break;
-		}
-
-		return found;
 	}
 
 	@Override

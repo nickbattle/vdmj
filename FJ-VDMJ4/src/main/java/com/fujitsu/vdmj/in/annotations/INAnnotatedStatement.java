@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.statements.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -61,18 +60,6 @@ public class INAnnotatedStatement extends INStatement
 		return rv;
 	}
 	
-	@Override
-	public INStatement findStatement(int lineno)
-	{
-		return statement.findStatement(lineno);
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return statement.findExpression(lineno);
-	}
-
 	@Override
 	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
 	{

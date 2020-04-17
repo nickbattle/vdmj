@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.in.statements;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INDefinitionList;
 import com.fujitsu.vdmj.in.definitions.INExplicitFunctionDefinition;
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -53,27 +52,6 @@ public class INLetDefStatement extends INStatement
 	public String toString()
 	{
 		return "let " + localDefs + " in " + statement;
-	}
-
-	@Override
-	public INStatement findStatement(int lineno)
-	{
-		INStatement found = super.findStatement(lineno);
-		if (found != null) return found;
-
-		found = localDefs.findStatement(lineno);
-		if (found != null) return found;
-
-		return statement.findStatement(lineno);
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = localDefs.findExpression(lineno);
-		if (found != null) return found;
-
-		return statement.findExpression(lineno);
 	}
 
 	@Override

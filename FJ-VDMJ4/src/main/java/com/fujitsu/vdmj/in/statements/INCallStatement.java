@@ -109,12 +109,6 @@ public class INCallStatement extends INStatement
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return args.findExpression(lineno);
-	}
-
-	@Override
 	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseCallStatement(this, arg);

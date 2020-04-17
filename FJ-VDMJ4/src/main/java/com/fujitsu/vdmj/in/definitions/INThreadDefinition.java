@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.in.definitions;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.runtime.Context;
@@ -46,18 +45,6 @@ public class INThreadDefinition extends INDefinition
 		this.statement = statement;
 		this.operationName = TCNameToken.getThreadName(statement.location);
 		this.operationDef = operationDef;
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return statement.findExpression(lineno);
-	}
-
-	@Override
-	public INStatement findStatement(int lineno)
-	{
-		return statement.findStatement(lineno);
 	}
 
 	@Override

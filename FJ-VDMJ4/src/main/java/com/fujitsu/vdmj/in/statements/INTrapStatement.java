@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternBind;
 import com.fujitsu.vdmj.in.patterns.INSeqBind;
 import com.fujitsu.vdmj.in.patterns.INSetBind;
@@ -56,24 +55,6 @@ public class INTrapStatement extends INStatement
 	public String toString()
 	{
 		return "trap " + patternBind + " with " + with + " in " + body;
-	}
-
-	@Override
-	public INStatement findStatement(int lineno)
-	{
-		INStatement found = super.findStatement(lineno);
-		if (found != null) return found;
-		found = body.findStatement(lineno);
-		if (found != null) return found;
-		return with.findStatement(lineno);
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = body.findExpression(lineno);
-		if (found != null) return found;
-		return with.findExpression(lineno);
 	}
 
 	@Override
