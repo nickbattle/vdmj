@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.in.definitions;
 import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
-import com.fujitsu.vdmj.in.statements.INErrorCase;
 import com.fujitsu.vdmj.in.statements.INErrorCaseList;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.statements.INSubclassResponsibilityStatement;
@@ -114,33 +113,6 @@ public class INImplicitOperationDefinition extends INDefinition
 	public TCType getType()
 	{
 		return type;
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		if (predef != null)
-		{
-			INExpression found = predef.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		if (postdef != null)
-		{
-			INExpression found = postdef.findExpression(lineno);
-			if (found != null) return found;
-		}
-		
-		if (errors != null)
-		{
-			for (INErrorCase err: errors)
-			{
-				INExpression found = err.findExpression(lineno);
-				if (found != null) return found;
-			}
-		}
-
-		return body == null ? null : body.findExpression(lineno);
 	}
 
 	@Override

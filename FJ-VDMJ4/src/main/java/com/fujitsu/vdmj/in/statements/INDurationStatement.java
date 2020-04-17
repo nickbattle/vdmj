@@ -94,18 +94,6 @@ public class INDurationStatement extends INStatement
 	}
 
 	@Override
-	public INStatement findStatement(int lineno)
-	{
-		return statement.findStatement(lineno);
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return statement.findExpression(lineno);
-	}
-
-	@Override
 	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseDurationStatement(this, arg);

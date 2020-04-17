@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ExitException;
@@ -46,38 +45,6 @@ public class INTixeStatement extends INStatement
 	public String toString()
 	{
 		return "tixe {" + traps + "} in " + body;
-	}
-
-	@Override
-	public INStatement findStatement(int lineno)
-	{
-		INStatement found = super.findStatement(lineno);
-		if (found != null) return found;
-		found = body.findStatement(lineno);
-		if (found != null) return found;
-
-		for (INTixeStmtAlternative tsa: traps)
-		{
-			found = tsa.statement.findStatement(lineno);
-			if (found != null) break;
-		}
-
-		return found;
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = body.findExpression(lineno);
-		if (found != null) return found;
-
-		for (INTixeStmtAlternative tsa: traps)
-		{
-			found = tsa.statement.findExpression(lineno);
-			if (found != null) break;
-		}
-
-		return found;
 	}
 
 	@Override

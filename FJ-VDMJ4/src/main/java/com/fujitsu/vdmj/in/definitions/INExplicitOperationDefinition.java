@@ -109,7 +109,7 @@ public class INExplicitOperationDefinition extends INDefinition
 			if (found != null) return found;
 		}
 
-		return body.findExpression(lineno);
+		return body.findExpressionNew(lineno);
 	}
 
 	@Override

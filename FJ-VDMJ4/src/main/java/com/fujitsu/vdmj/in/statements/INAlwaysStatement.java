@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ExitException;
@@ -47,24 +46,6 @@ public class INAlwaysStatement extends INStatement
 	public String toString()
 	{
 		return "always " + always + " in " + body;
-	}
-
-	@Override
-	public INStatement findStatement(int lineno)
-	{
-		INStatement found = super.findStatement(lineno);
-		if (found != null) return found;
-		found = always.findStatement(lineno);
-		if (found != null) return found;
-		return body.findStatement(lineno);
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = always.findExpression(lineno);
-		if (found != null) return found;
-		return body.findExpression(lineno);
 	}
 
 	@Override

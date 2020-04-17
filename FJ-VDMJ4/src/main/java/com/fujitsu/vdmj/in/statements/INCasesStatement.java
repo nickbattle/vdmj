@@ -68,35 +68,6 @@ public class INCasesStatement extends INStatement
 	}
 
 	@Override
-	public INStatement findStatement(int lineno)
-	{
-		INStatement found = super.findStatement(lineno);
-		if (found != null) return found;
-
-		for (INCaseStmtAlternative stmt: cases)
-		{
-			found = stmt.statement.findStatement(lineno);
-			if (found != null) break;
-		}
-
-		return found;
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = null;
-
-		for (INCaseStmtAlternative stmt: cases)
-		{
-			found = stmt.statement.findExpression(lineno);
-			if (found != null) break;
-		}
-
-		return found;
-	}
-
-	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);

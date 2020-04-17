@@ -75,22 +75,6 @@ public class INWhileStatement extends INStatement
 	}
 
 	@Override
-	public INStatement findStatement(int lineno)
-	{
-		INStatement found = super.findStatement(lineno);
-		if (found != null) return found;
-		return statement.findStatement(lineno);
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = exp.findExpression(lineno);
-		if (found != null) return found;
-		return statement.findExpression(lineno);
-	}
-
-	@Override
 	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseWhileStatement(this, arg);

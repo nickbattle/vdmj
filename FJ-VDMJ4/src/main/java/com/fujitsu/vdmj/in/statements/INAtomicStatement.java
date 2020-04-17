@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.in.statements;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -53,35 +52,6 @@ public class INAtomicStatement extends INStatement
 	public String toString()
 	{
 		return "atomic (" + Utils.listToString(assignments) + ")";
-	}
-
-	@Override
-	public INStatement findStatement(int lineno)
-	{
-		INStatement found = super.findStatement(lineno);
-		if (found != null) return found;
-
-		for (INAssignmentStatement stmt: assignments)
-		{
-			found = stmt.findStatement(lineno);
-			if (found != null) break;
-		}
-
-		return found;
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = null;
-
-		for (INAssignmentStatement stmt: assignments)
-		{
-			found = stmt.findExpression(lineno);
-			if (found != null) break;
-		}
-
-		return found;
 	}
 
 	@Override

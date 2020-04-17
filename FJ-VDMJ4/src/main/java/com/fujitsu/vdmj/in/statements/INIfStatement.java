@@ -70,48 +70,6 @@ public class INIfStatement extends INStatement
 	}
 
 	@Override
-	public INStatement findStatement(int lineno)
-	{
-		INStatement found = super.findStatement(lineno);
-		if (found != null) return found;
-		found = thenStmt.findStatement(lineno);
-		if (found != null) return found;
-
-		for (INElseIfStatement stmt: elseList)
-		{
-			found = stmt.findStatement(lineno);
-			if (found != null) return found;
-		}
-
-		if (elseStmt != null)
-		{
-			found = elseStmt.findStatement(lineno);
-		}
-
-		return found;
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = thenStmt.findExpression(lineno);
-		if (found != null) return found;
-
-		for (INElseIfStatement stmt: elseList)
-		{
-			found = stmt.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		if (elseStmt != null)
-		{
-			found = elseStmt.findExpression(lineno);
-		}
-
-		return found;
-	}
-
-	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);

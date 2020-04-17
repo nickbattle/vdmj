@@ -118,12 +118,6 @@ public class INStopStatement extends INStatement
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return objects.findExpression(lineno);
-	}
-
-	@Override
 	public String toString()
 	{
 		return "stop(" + objects + ")";

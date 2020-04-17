@@ -25,6 +25,11 @@ package com.fujitsu.vdmj.in.expressions;
 
 public class INHistoryExpressionFinder extends INLeafExpressionVisitor<INExpression, INExpressionList, Object>
 {
+	public INHistoryExpressionFinder()
+	{
+		super(false);
+	}
+
 	@Override
 	protected INExpressionList newCollection()
 	{
