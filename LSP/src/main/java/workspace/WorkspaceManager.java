@@ -165,13 +165,13 @@ public abstract class WorkspaceManager
 			DAPMessageList responses = new DAPMessageList(request);
 			responses.add(heading());
 			responses.add(text("Initialized in " + (double)(after-before)/1000 + " secs.\n"));
-			responses.add(prompt());
+			prompt(responses);
 			return responses;
 		}
 		catch (Exception e)
 		{
 			DAPMessageList responses = new DAPMessageList(request, e);
-			responses.add(prompt());
+			prompt(responses);
 			return responses;
 		}
 	}
@@ -184,9 +184,12 @@ public abstract class WorkspaceManager
 				"*\n\n");
 	}
 	
-	protected DAPResponse prompt()
+	protected void prompt(DAPMessageList list)
 	{
-		return text(interpreter.getDefaultName() + "> ");
+		if (System.getProperty("lsp.prompts") != null)
+		{
+			list.add(text(interpreter.getDefaultName() + "> "));
+		}
 	}
 	
 	protected DAPResponse text(String message)
@@ -577,13 +580,13 @@ public abstract class WorkspaceManager
 			String answer = "= " + result;
 			DAPMessageList responses = new DAPMessageList(request, new JSONObject("result", answer, "variablesReference", 0));
 			responses.add(text("Executed in " + (double)(after-before)/1000 + " secs.\n"));
-			responses.add(prompt());
+			prompt(responses);
 			return responses;
 		}
 		catch (Exception e)
 		{
 			DAPMessageList responses = new DAPMessageList(request, e);
-			responses.add(prompt());
+			prompt(responses);
 			return responses;
 		}
 		finally

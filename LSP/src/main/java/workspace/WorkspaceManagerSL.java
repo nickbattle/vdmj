@@ -282,7 +282,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 				{
 					interpreter.setDefaultName(expression);
 					DAPMessageList responses = new DAPMessageList(request);
-					responses.add(prompt());
+					prompt(responses);
 					return responses;
 				}
 			}
@@ -292,7 +292,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 		catch (Exception e)
 		{
 			DAPMessageList responses = new DAPMessageList(request, e);
-			responses.add(prompt());
+			prompt(responses);
 			return responses;
 		}
 	}
