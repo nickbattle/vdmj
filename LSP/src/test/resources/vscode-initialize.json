@@ -1,0 +1,107 @@
+16: 59: 39.851: >>>LSP
+{
+	"jsonrpc": "2.0",
+	"id": 0,
+	"method": "initialize",
+	"params": 
+	{
+		"processId": 8917,
+		"rootPath": "/home/nick/Digital Twins/VSCodeWorkspaceSL",
+		"rootUri": "file:///home/nick/Digital%20Twins/VSCodeWorkspaceSL",
+		"capabilities": 
+		{
+			"workspace": 
+			{
+				"applyEdit": true,
+				"didChangeConfiguration": 
+				{
+					"dynamicRegistration": true
+				},
+				"didChangeWatchedFiles": 
+				{
+					"dynamicRegistration": true
+				},
+				"symbol": 
+				{
+					"dynamicRegistration": true
+				},
+				"executeCommand": 
+				{
+					"dynamicRegistration": true
+				}
+			},
+			"textDocument": 
+			{
+				"synchronization": 
+				{
+					"dynamicRegistration": true,
+					"willSave": true,
+					"willSaveWaitUntil": true,
+					"didSave": true
+				},
+				"completion": 
+				{
+					"dynamicRegistration": true,
+					"completionItem": 
+					{
+						"snippetSupport": true,
+						"commitCharactersSupport": true
+					}
+				},
+				"hover": 
+				{
+					"dynamicRegistration": true
+				},
+				"signatureHelp": 
+				{
+					"dynamicRegistration": true
+				},
+				"definition": 
+				{
+					"dynamicRegistration": true
+				},
+				"references": 
+				{
+					"dynamicRegistration": true
+				},
+				"documentHighlight": 
+				{
+					"dynamicRegistration": true
+				},
+				"documentSymbol": 
+				{
+					"dynamicRegistration": true
+				},
+				"codeAction": 
+				{
+					"dynamicRegistration": true
+				},
+				"codeLens": 
+				{
+					"dynamicRegistration": true
+				},
+				"formatting": 
+				{
+					"dynamicRegistration": true
+				},
+				"rangeFormatting": 
+				{
+					"dynamicRegistration": true
+				},
+				"onTypeFormatting": 
+				{
+					"dynamicRegistration": true
+				},
+				"rename": 
+				{
+					"dynamicRegistration": true
+				},
+				"documentLink": 
+				{
+					"dynamicRegistration": true
+				}
+			}
+		},
+		"trace": "off"
+	}
+}

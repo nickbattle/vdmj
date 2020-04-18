@@ -32,6 +32,8 @@ import com.fujitsu.vdmj.lex.Dialect;
 import dap.DAPServerSocket;
 import workspace.Log;
 
+// TODO Remove this class, as it was only temporary while VScode debugging
+// required a different Socket bind.
 public class LSPServerVSCode implements Runnable
 {
 	private Dialect dialect;
