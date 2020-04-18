@@ -1,0 +1,20 @@
+17: 00: 36.842: >>>DAP
+{
+	"command": "initialize",
+	"arguments": 
+	{
+		"clientID": "vscode",
+		"clientName": "Visual Studio Code",
+		"adapterID": "vdm",
+		"pathFormat": "path",
+		"linesStartAt1": true,
+		"columnsStartAt1": true,
+		"supportsVariableType": true,
+		"supportsVariablePaging": true,
+		"supportsRunInTerminalRequest": true,
+		"locale": "en-gb",
+		"supportsProgressReporting": true
+	},
+	"type": "request",
+	"seq": 1
+}
