@@ -72,7 +72,8 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			try
 			{
 				debuggedThread = link.getDebugThread();
-				server.writeMessage(text("[debug]> "));
+				prompt();
+				
 				while (doCommand());
 			}
 			catch (IOException e)
@@ -81,7 +82,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			}
 		}
 	}
-
+	
 	private boolean doCommand()
 	{
 		try
@@ -134,7 +135,6 @@ public class DAPDebugReader extends Thread implements TraceCallback
 					{
 						case RESUME:
 							link.resumeThreads();
-							server.writeMessage(text("\n"));
 							server.writeMessage(dapResponse);
 							return false;
 
@@ -147,7 +147,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 
 						case PRINT:
 							server.writeMessage(dapResponse);
-							server.writeMessage(text("[debug]> "));
+							prompt();
 							return true;
 
 						default:
@@ -247,31 +247,46 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	@Override
 	public void tracepoint(Context ctxt, Tracepoint tp)
 	{
-		if (tp.condition == null)
+		try
 		{
-			String s = "Reached trace point [" + tp.number + "]";
-			text(Thread.currentThread().getName() + ": " + s);
+			if (tp.condition == null)
+			{
+				String s = "Reached trace point [" + tp.number + "]";
+				text(Thread.currentThread().getName() + ": " + s);
+			}
+			else
+			{
+				String result = null;
+				
+				try
+				{
+					result = tp.condition.eval(ctxt).toString();
+				}
+				catch (Exception e)
+				{
+					result = e.getMessage();
+				}
+				
+				String s = tp.trace + " = " + result + " at trace point [" + tp.number + "]";
+				text(Thread.currentThread().getName() + ": " + s);
+			}
 		}
-		else
+		catch (IOException e)
 		{
-			String result = null;
-			
-			try
-			{
-				result = tp.condition.eval(ctxt).toString();
-			}
-			catch (Exception e)
-			{
-				result = e.getMessage();
-			}
-			
-			String s = tp.trace + " = " + result + " at trace point [" + tp.number + "]";
-			text(Thread.currentThread().getName() + ": " + s);
+			Log.error(e);
 		}
 	}
 	
-	private DAPResponse text(String message)
+	private void prompt() throws IOException
 	{
-		return new DAPResponse("output", new JSONObject("output", message));
+		text("[debug]> ");
+	}
+
+	private void text(String message) throws IOException
+	{
+		if (System.getProperty("lsp.prompts") != null)
+		{
+			server.writeMessage(new DAPResponse("output", new JSONObject("output", message)));
+		}
 	}
 }

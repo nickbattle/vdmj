@@ -41,7 +41,7 @@ abstract public class JSONServer
 
 	private final String CONTENT_LENGTH = "Content-Length:";
 	private final String CONTENT_TYPE = "Content-Type:";
-	private final int EOF = -1;
+	private final char EOF = (char) -1;
 	
 	public JSONServer(String prefix, InputStream inStream, OutputStream outStream) throws IOException
 	{
@@ -55,7 +55,7 @@ abstract public class JSONServer
 		StringBuilder sb = new StringBuilder();
 		char c = (char) inStream.read();
 		
-		while (c != '\n'  && c != EOF)
+		while (c != '\n' && c != EOF)
 		{
 			sb.append(c);
 			c = (char) inStream.read();

@@ -290,21 +290,28 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 		}
 	}
 
-	private synchronized void sleep(Context ctxt, LexLocation location)
+	private  void sleep(Context ctxt, LexLocation location)
 	{
 		while (true)
 		{
     		try
     		{
-   				wait();
-   				
-   				if (stopCalled && state == RunState.RUNNING)
-   				{
-   					// stopThread made us RUNNABLE, now we're running, so die
-   					throw new ThreadDeath();
-   				}
-   				
- 				return;
+    			/**
+    			 * Only synchronize on the wait, and handle any interrupted signal without
+    			 * holding the thread lock. This avoids lock problems in the debugger.
+    			 */
+    			synchronized (this)
+    			{
+    				wait();
+
+    				if (stopCalled && state == RunState.RUNNING)
+    				{
+    					// stopThread made us RUNNABLE, now we're running, so die
+    					throw new ThreadDeath();
+    				}
+
+    				return;
+    			}
     		}
     		catch (InterruptedException e)
     		{
