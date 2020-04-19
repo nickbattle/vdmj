@@ -79,10 +79,12 @@ public class DAPServerSocket implements Runnable
 	@Override
 	public void run()
 	{
+		ServerSocket socket = null;
+
 		try
 		{
-			ServerSocket socket = new ServerSocket(port, 10);
-
+			socket = new ServerSocket(port, 10);
+			
 			while (true)
 			{
 				Log.printf("DAP %s Server listening on port %d", dialect, port);
@@ -97,12 +99,20 @@ public class DAPServerSocket implements Runnable
 					Log.error("DAP Server stopped: %s", e.getMessage());
 				}
 
-				socket.close();
+				conn.close();
 			}
 		}
 		catch (IOException e)
 		{
-			Log.error("DAP Server socket error: %s", e.getMessage());
+			try
+			{
+				Log.error("DAP Server socket error: %s", e.getMessage());
+				if (socket != null) socket.close();
+			}
+			catch (IOException e1)
+			{
+				// Ignore
+			}
 		}
 	}
 }

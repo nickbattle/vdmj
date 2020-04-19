@@ -101,9 +101,11 @@ public class LSPServerSocket implements Runnable
 	@Override
 	public void run()
 	{
+		ServerSocket socket = null;
+
 		try
 		{
-			ServerSocket socket = new ServerSocket(port, 10);
+			socket = new ServerSocket(port, 10);
 
 			while (true)
 			{
@@ -119,12 +121,20 @@ public class LSPServerSocket implements Runnable
 					Log.error("LSP Server stopped: %s", e.getMessage());
 				}
 				
-				socket.close();
+				conn.close();
 			}
 		}
 		catch (IOException e)
 		{
-			Log.error("LSP Server socket error: %s", e.getMessage());
+			try
+			{
+				Log.error("LSP Server socket error: %s", e.getMessage());
+				if (socket != null) socket.close();
+			}
+			catch (IOException e1)
+			{
+				// Ignore
+			}
 		}
 	}
 }
