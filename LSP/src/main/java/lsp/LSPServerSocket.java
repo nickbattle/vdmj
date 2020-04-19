@@ -104,18 +104,27 @@ public class LSPServerSocket implements Runnable
 		try
 		{
 			ServerSocket socket = new ServerSocket(port, 10);
-			Log.printf("LSP %s Server listening on port %d", dialect, port);
 
 			while (true)
 			{
+				Log.printf("LSP %s Server listening on port %d", dialect, port);
 				Socket conn = socket.accept();
-				new LSPServer(dialect, conn.getInputStream(), conn.getOutputStream()).run();
+				
+				try
+				{
+					new LSPServer(dialect, conn.getInputStream(), conn.getOutputStream()).run();
+				}
+				catch (IOException e)
+				{
+					Log.error("LSP Server stopped: %s", e.getMessage());
+				}
+				
 				socket.close();
 			}
 		}
 		catch (IOException e)
 		{
-			Log.error("LSP Server stopped: %s", e.getMessage());
+			Log.error("LSP Server socket error: %s", e.getMessage());
 		}
 	}
 }
