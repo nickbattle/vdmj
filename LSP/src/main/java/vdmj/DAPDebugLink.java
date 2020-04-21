@@ -33,6 +33,9 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
+import com.fujitsu.vdmj.runtime.Stoppoint;
+import com.fujitsu.vdmj.scheduler.MainThread;
+import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.values.CPUValue;
 
 import dap.DAPResponse;
@@ -93,22 +96,38 @@ public class DAPDebugLink extends ConsoleDebugLink
 		{
 			return;
 		}
-
-		String reason = "step";
+		
+		Breakpoint bp = getBreakpoint((SchedulableThread) Thread.currentThread());
+		String reason = null;
 		
 		if (ex != null)
 		{
 			server.stderr(ex.getMessage() + "\n");
 			reason = "exception";
 		}
+		else if (bp != null)
+		{
+			if (bp instanceof Stoppoint)
+			{
+				reason = "breakpoint";
+			}
+			else
+			{
+				reason = "step";	// Next, step in or step out
+			}
+		}
+		else
+		{
+			reason = null;	// No reason displayed
+		}
 		
 		try
 		{
 			server.writeMessage(new DAPResponse("stopped",
 					new JSONObject(
-						"reason", reason,
-						"threadId", Thread.currentThread().getId(),
-						"allThreadsStopped", true)));
+							"reason", reason,
+							"threadId", Thread.currentThread().getId(),
+							"allThreadsStopped", false)));	// false if we send all events
 		}
 		catch (IOException e)
 		{
@@ -117,7 +136,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 
 		super.stopped(ctxt, location, ex);
 
-		if (ex == null)		// No continued for exceptions, as we're exiting
+		if (ex == null && Thread.currentThread() instanceof MainThread)
 		{
 			try
 			{
