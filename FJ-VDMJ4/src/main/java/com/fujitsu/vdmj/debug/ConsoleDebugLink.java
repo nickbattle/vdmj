@@ -45,8 +45,11 @@ import com.fujitsu.vdmj.values.OperationValue;
 public class ConsoleDebugLink extends DebugLink
 {
 	/** True if we are attached to a debugger */
-	private static boolean debugging = false;
+	protected static boolean debugging = false;
 
+	/** True, if we're suspending breakpoints in an evaluation */
+	protected boolean suspendBreaks = false;
+	
 	/** Singleton instance */
 	private static DebugLink instance;
 	
@@ -65,9 +68,6 @@ public class ConsoleDebugLink extends DebugLink
 	/** The trace callback, if any */
 	private TraceCallback callback = null;
 
-	/** True, if we're suspending breakpoints in an evaluation */
-	private boolean suspendBreaks = false;
-	
 	/**
 	 * Get the singleton. 
 	 */
@@ -254,6 +254,12 @@ public class ConsoleDebugLink extends DebugLink
 		this.callback = callback;
 	}
 
+	
+	/********************************************************************************
+	 * Methods above here are called from the DebugReader thread; methods
+	 * below are called from the ScheduledThreads that stop.
+	 *******************************************************************************/
+	
 	/**
 	 * Called by a thread when it is created.
 	 */
