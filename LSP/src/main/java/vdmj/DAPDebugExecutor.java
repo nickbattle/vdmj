@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -664,6 +665,32 @@ public class DAPDebugExecutor implements DebugExecutor
 	{
 		String title = (c.outer == null ? "Globals" : "Arguments");
 		LexLocation loc = (c.outer == null ? c.location : frame.location);
+		
+		// Flat specs have a default location of "?" for the outer context.
+		// That causes problems in the client, so we try to replace it with
+		// the start of an arbitrary definition's file.
+		
+		if (loc.file.getName().equals("?") && !c.isEmpty())
+		{
+			for (Entry<TCNameToken, Value> entry: c.entrySet())
+			{
+				if (entry.getValue() instanceof OperationValue)
+				{
+					OperationValue op = (OperationValue)entry.getValue();
+					loc = op.name.getLocation();
+					loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
+					break;
+				}
+				else if (entry.getValue() instanceof FunctionValue)
+				{
+					FunctionValue fn = (FunctionValue)entry.getValue();
+					loc = fn.location;
+					loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
+					break;
+				}
+			}
+		}
+		
 		Context arguments = new Context(loc, title, null);
 		arguments.putAll(c);
 		
