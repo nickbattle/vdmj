@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.scheduler.Signal;
 import com.fujitsu.vdmj.values.CPUValue;
+import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.OperationValue;
 
 /**
@@ -309,7 +310,10 @@ public class ConsoleDebugLink extends DebugLink
 		
 		if (location == null)	// Stopped before it started!
 		{
-			location = new LexLocation();
+			// Create a location from the class type
+			SchedulableThread th = (SchedulableThread) Thread.currentThread();
+			ObjectValue obj = th.getObject();
+			location = obj.type.location;
 		}
 		
 		if (ctxt == null)		// Stopped before it started!
