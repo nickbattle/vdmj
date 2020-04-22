@@ -600,6 +600,8 @@ public abstract class WorkspaceManager
 
 	public DAPMessageList terminate(DAPRequest request, Boolean restart)
 	{
-		return new DAPMessageList(request);
+		DAPMessageList result = new DAPMessageList(request);
+		result.add(text("\nSession terminated.\n"));
+		return result;
 	}
 }

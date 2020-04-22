@@ -41,6 +41,7 @@ public class DAPInitializeResponse extends DAPResponse
 		JSONObject cap = new JSONObject();
 		cap.put("supportsConfigurationDoneRequest", true);
 		cap.put("supportsTerminateRequest", true);
+		cap.put("supportsCancelRequest", false);
 		return cap;
 	}
 }

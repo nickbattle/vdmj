@@ -72,9 +72,11 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			try
 			{
 				debuggedThread = link.getDebugThread();
+				Log.printf("----------------- DEBUG STOP in %s", debuggedThread.getName());
 				prompt();
 				
 				while (doCommand());
+				Log.printf("----------------- RESUME");
 			}
 			catch (IOException e)
 			{
