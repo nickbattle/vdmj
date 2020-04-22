@@ -97,7 +97,8 @@ public class DAPDebugLink extends ConsoleDebugLink
 			return;
 		}
 		
-		Breakpoint bp = getBreakpoint((SchedulableThread) Thread.currentThread());
+		SchedulableThread thread = (SchedulableThread) Thread.currentThread();
+		Breakpoint bp = getBreakpoint(thread);
 		String reason = null;
 		
 		if (ex != null)
@@ -127,7 +128,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 					new JSONObject(
 							"reason", reason,
 							"threadId", Thread.currentThread().getId(),
-							"allThreadsStopped", false)));	// false if we send all events
+							"allThreadsStopped", SchedulableThread.getThreadCount() == 1)));
 		}
 		catch (IOException e)
 		{
