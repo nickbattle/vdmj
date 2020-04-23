@@ -81,6 +81,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			catch (IOException e)
 			{
 				Log.error(e);
+				break;
 			}
 		}
 	}
