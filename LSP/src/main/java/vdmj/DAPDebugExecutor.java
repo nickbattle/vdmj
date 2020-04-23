@@ -327,13 +327,21 @@ public class DAPDebugExecutor implements DebugExecutor
 		Frame frame = ctxtFrames.get((int)frameId);
 		JSONArray scopes = new JSONArray();
 		
-		for (Scope scope: frame.scopes)
+		if (frame != null)	// vscode bug? Sometimes sends request for invalid frameId
 		{
-			scopes.add(new JSONObject(
-				"name", scope.name,
-				"variablesReference", scope.vref,
-				"source", new JSONObject("path", frame.location.file.getAbsolutePath())
-			));
+			for (Scope scope: frame.scopes)
+			{
+				scopes.add(new JSONObject(
+					"name", scope.name,
+					"variablesReference", scope.vref,
+					"source", new JSONObject("path", frame.location.file.getAbsolutePath())
+				));
+			}
+		}
+		else
+		{
+			Log.error("Invalid frameId in scopes request: %d", frameId);
+			// return an empty scopes array
 		}
 		
 		return new DebugCommand(DebugType.STACK, new JSONObject("scopes", scopes));
