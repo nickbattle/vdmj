@@ -155,4 +155,22 @@ public class TCWarningAnnotation extends TCAnnotation
 			}
 		}
 	}
+	
+	@Override
+	public void doClose()
+	{
+		Iterator<VDMWarning> witer = TypeChecker.getWarnings().iterator();
+		int startLine = name.getLocation().startLine;
+		
+		while (witer.hasNext())
+		{
+			VDMWarning w = witer.next();
+			
+			if (w.location.startLine == startLine + 1 && suppressed.contains((long)w.number))
+			{
+				// Warning is on the line after the one we annotated, so remove it
+				witer.remove();
+			}
+		}
+	}
 }
