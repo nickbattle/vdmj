@@ -26,6 +26,7 @@ package lsp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketException;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -85,6 +86,12 @@ public class LSPServer extends JSONServer
 		return dispatcher;
 	}
 	
+	@Override
+	protected void setTimeout(int timeout) throws SocketException
+	{
+		// Ignored for stdio comms?
+	}
+
 	public void run() throws IOException
 	{
 		state.setRunning(true);

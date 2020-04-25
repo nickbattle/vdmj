@@ -25,6 +25,7 @@ package vdmj;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.Collections;
 import java.util.List;
 
@@ -49,6 +50,7 @@ import workspace.Log;
  */
 public class DAPDebugReader extends Thread implements TraceCallback
 {
+	private static final int TIMEOUT = 200;		// Before we suspect trouble
 	private final DAPServer server;
 	private final DAPDebugLink link;
 
@@ -75,21 +77,49 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				Log.printf("----------------- DEBUG STOP in %s", debuggedThread.getName());
 				prompt();
 				
-				while (doCommand());
+				if (doCommand(true))	// timeout first command
+				{
+					while (doCommand(false));
+				}
+				
 				Log.printf("----------------- RESUME");
 			}
 			catch (IOException e)
 			{
 				Log.error(e);
+				break;
 			}
 		}
 	}
 	
-	private boolean doCommand()
+	private boolean doCommand(boolean timed)
 	{
 		try
 		{
-			JSONObject dapMessage = server.readMessage();
+			JSONObject dapMessage = null;
+			int retries = 2;
+			
+			while (--retries > 0)
+			{
+				try
+				{
+					dapMessage = server.readMessage(timed ? TIMEOUT : 0);
+				}
+				catch (SocketTimeoutException e)
+				{
+					Log.error(e);
+					Log.error("Expecting request from client?");
+					
+					// Trying kicking the client with an event to say all threads stopped
+					List<SchedulableThread> threads = link.getThreads();
+					
+					server.writeMessage(new DAPResponse("stopped",
+							new JSONObject(
+									"reason", "step",
+									"threadId", threads.get(0).getId(),
+									"allThreadsStopped", "true")));
+				}
+			}
 
 			if (dapMessage == null)	// EOF - closed socket?
 			{

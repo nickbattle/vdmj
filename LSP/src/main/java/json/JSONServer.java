@@ -30,6 +30,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.SocketException;
 
 import workspace.Log;
 
@@ -64,6 +65,21 @@ abstract public class JSONServer
 		if (c == EOF) throw new IOException("End of stream");
 		
 		return sb.toString().trim();
+	}
+	
+	abstract protected void setTimeout(int timeout) throws SocketException;
+
+	public JSONObject readMessage(int timeout) throws IOException
+	{
+		try
+		{
+			setTimeout(timeout);
+			return readMessage();
+		}
+		finally
+		{
+			setTimeout(0);	// ie. no timeout
+		}
 	}
 	
 	public JSONObject readMessage() throws IOException
