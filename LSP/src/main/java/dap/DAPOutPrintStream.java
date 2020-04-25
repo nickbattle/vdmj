@@ -26,11 +26,11 @@ package dap;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-public class DAPPrintStream extends PrintStream
+public class DAPOutPrintStream extends PrintStream
 {
 	private final DAPServer server;
 	
-	public DAPPrintStream(DAPServer server, OutputStream out)
+	public DAPOutPrintStream(DAPServer server, OutputStream out)
 	{
 		super(out, true);
 		this.server = server;

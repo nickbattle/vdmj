@@ -578,9 +578,8 @@ public abstract class WorkspaceManager
 			dbg.start();
 			
 			long before = System.currentTimeMillis();
-			PrintStream dapConsole = DAPServer.getInstance().getPrintStream();
-			System.setOut(dapConsole);	// see finally
-			System.setErr(dapConsole);	// see finally
+			System.setOut(DAPServer.getInstance().getOutPrintStream());
+			System.setErr(DAPServer.getInstance().getErrPrintStream());
 			Value result = getInterpreter().execute(expression);
 			long after = System.currentTimeMillis();
 			
