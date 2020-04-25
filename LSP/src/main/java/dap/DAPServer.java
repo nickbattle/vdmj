@@ -24,6 +24,7 @@
 package dap;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.Socket;
 import java.net.SocketException;
 
@@ -143,5 +144,10 @@ public class DAPServer extends JSONServer
 			Log.error(e);
 			Log.printf("%s", message);
 		}
+	}
+
+	public PrintStream getPrintStream() throws IOException
+	{
+		return new DAPPrintStream(this, socket.getOutputStream());
 	}
 }

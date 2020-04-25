@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,6 +56,7 @@ import dap.DAPEvent;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
+import dap.DAPServer;
 import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
@@ -567,6 +569,8 @@ public abstract class WorkspaceManager
 	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
 	{
 		DAPDebugReader dbg = null;
+		PrintStream stdout = System.out;
+		PrintStream stderr = System.err;
 		
 		try
 		{
@@ -574,11 +578,15 @@ public abstract class WorkspaceManager
 			dbg.start();
 			
 			long before = System.currentTimeMillis();
+			PrintStream dapConsole = DAPServer.getInstance().getPrintStream();
+			System.setOut(dapConsole);	// see finally
+			System.setErr(dapConsole);	// see finally
 			Value result = getInterpreter().execute(expression);
 			long after = System.currentTimeMillis();
 			
 			String answer = "= " + result;
-			DAPMessageList responses = new DAPMessageList(request, new JSONObject("result", answer, "variablesReference", 0));
+			DAPMessageList responses = new DAPMessageList(request,
+					new JSONObject("result", answer, "variablesReference", 0));
 			responses.add(text("Executed in " + (double)(after-before)/1000 + " secs.\n"));
 			prompt(responses);
 			return responses;
@@ -591,6 +599,9 @@ public abstract class WorkspaceManager
 		}
 		finally
 		{
+			System.setOut(stdout);
+			System.setErr(stderr);
+			
 			if (dbg != null)
 			{
 				dbg.interrupt();	// Stop the debugger reader.
