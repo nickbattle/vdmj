@@ -426,6 +426,11 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 		signal = sig;
 		interrupt();
 	}
+	
+	public Signal getSignal()
+	{
+		return signal;
+	}
 
 	public ObjectValue getObject()
 	{
