@@ -146,8 +146,13 @@ public class DAPServer extends JSONServer
 		}
 	}
 
-	public PrintStream getPrintStream() throws IOException
+	public PrintStream getOutPrintStream() throws IOException
 	{
-		return new DAPPrintStream(this, socket.getOutputStream());
+		return new DAPOutPrintStream(this, socket.getOutputStream());
+	}
+
+	public PrintStream getErrPrintStream() throws IOException
+	{
+		return new DAPErrPrintStream(this, socket.getOutputStream());
 	}
 }
