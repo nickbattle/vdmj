@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.values.Value;
@@ -55,14 +54,14 @@ public class INTraceAnnotation extends INAnnotation
 	{
 		if (args.isEmpty())
 		{
-			Console.err.println("Trace: " + name.getLocation());
+			System.err.println("Trace: " + name.getLocation());
 		}
 		else
 		{
 			for (INExpression arg: args)
 			{
 				Value v = arg.eval(ctxt);
-				Console.err.println("Trace: " + name.getLocation() + ", " + arg + " = " + v);
+				System.err.println("Trace: " + name.getLocation() + ", " + arg + " = " + v);
 			}
 		}
 	}

@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INStringLiteralExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.ClassContext;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ObjectContext;
@@ -70,7 +69,7 @@ public class INChangesAnnotation extends INAnnotation
 		if (!(rv instanceof VoidValue))
 		{
 			header();
-			Console.err.println("RESULT = " + rv);
+			System.err.println("RESULT = " + rv);
 		}
 	}
 	
@@ -95,7 +94,7 @@ public class INChangesAnnotation extends INAnnotation
 				if (prevloc == null)	// New name
 				{
 					header();
-					Console.err.printf("New %s = %s\n", var, curr);
+					System.err.printf("New %s = %s\n", var, curr);
 					previousState.put(var, curr.getConstant());
 					previousLocs.put(var, currloc);
 				}
@@ -106,14 +105,14 @@ public class INChangesAnnotation extends INAnnotation
 				else if (!prevloc.equals(currloc))	// Different name
 				{
 					header();
-					Console.err.printf("New %s = %s\n", var, curr);
+					System.err.printf("New %s = %s\n", var, curr);
 					previousState.put(var, curr.getConstant());
 					previousLocs.put(var, currloc);
 				}
 				else if (prevloc.equals(currloc) && !prev.toString().equals(curr.toString()))	// for undefineds
 				{
 					header();
-					Console.err.printf("Change %s = %s\n", var, curr);
+					System.err.printf("Change %s = %s\n", var, curr);
 					previousState.put(var, curr.getConstant());
 					previousLocs.put(var, currloc);
 				}
@@ -195,12 +194,12 @@ public class INChangesAnnotation extends INAnnotation
 
 	private void header()
 	{
-		Console.err.print(name.getLocation() + " ");
+		System.err.print(name.getLocation() + " ");
 		
 		if (!args.isEmpty() && args.get(0) instanceof INStringLiteralExpression)
 		{
 			INStringLiteralExpression s = (INStringLiteralExpression)args.get(0);
-			Console.err.print(s.value.value + " ");
+			System.err.print(s.value.value + " ");
 		}
 	}
 }
