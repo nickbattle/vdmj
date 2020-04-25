@@ -8,4 +8,5 @@ map TCTraceAnnotation{name, args} to PONullAnnotation(name, args);
 map TCOverrideAnnotation{name, args} to PONullAnnotation(name, args);
 map TCNoPOGAnnotation{name, args} to PONoPOGAnnotation(name, args);
 map TCPrintfAnnotation{name, args} to PONullAnnotation(name, args);
+map TCWarningAnnotation{name, args} to PONullAnnotation(name, args);
 
