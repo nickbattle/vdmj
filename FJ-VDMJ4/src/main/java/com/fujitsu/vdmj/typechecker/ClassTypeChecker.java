@@ -150,11 +150,6 @@ public class ClassTypeChecker extends TypeChecker
 		
 		// Look for recursive loops
 		TCRecursiveLoops.getInstance().typeCheck(classes);
-	    
-		for (TCClassDefinition c: classes)
-		{
-			if (c.annotations != null) c.annotations.tcAfter(c);
-		}
 
 		TCDefinitionList allDefs = new TCDefinitionList();
 
@@ -163,6 +158,12 @@ public class ClassTypeChecker extends TypeChecker
 			c.initializedCheck();
 			c.unusedCheck();
 	    	allDefs.addAll(c.getDefinitions());
+		}
+	    
+    	// Post process annotations
+		for (TCClassDefinition c: classes)
+		{
+			if (c.annotations != null) c.annotations.tcAfter(c);
 		}
     	
     	cyclicDependencyCheck(allDefs);
