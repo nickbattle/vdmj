@@ -24,8 +24,9 @@
 package dap;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.Socket;
+import java.net.SocketException;
+
 import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.handlers.DisconnectHandler;
@@ -46,14 +47,16 @@ public class DAPServer extends JSONServer
 	
 	private final DAPServerState state;
 	private final DAPDispatcher dispatcher;
+	private final Socket socket;
 	
-	public DAPServer(Dialect dialect, InputStream inStream, OutputStream outStream) throws IOException
+	public DAPServer(Dialect dialect, Socket socket) throws IOException
 	{
-		super("DAP", inStream, outStream);
+		super("DAP", socket.getInputStream(), socket.getOutputStream());
 		
 		INSTANCE = this;
 		this.state = new DAPServerState(dialect);
 		this.dispatcher = getDispatcher();
+		this.socket = socket;
 	}
 	
 	public static DAPServer getInstance()
@@ -81,6 +84,12 @@ public class DAPServer extends JSONServer
 		dispatcher.register("terminate", new TerminateHandler(state));
 
 		return dispatcher;
+	}
+
+	@Override
+	protected void setTimeout(int timeout) throws SocketException
+	{
+		socket.setSoTimeout(timeout);
 	}
 
 	public void run() throws IOException

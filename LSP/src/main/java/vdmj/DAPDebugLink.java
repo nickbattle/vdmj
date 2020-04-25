@@ -137,7 +137,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 
 		super.stopped(ctxt, location, ex);
 
-		if (ex == null && Thread.currentThread() instanceof MainThread)
+		if (ex == null && thread instanceof MainThread && thread.getSignal() == null)
 		{
 			try
 			{

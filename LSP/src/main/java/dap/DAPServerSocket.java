@@ -92,7 +92,7 @@ public class DAPServerSocket implements Runnable
 				
 				try
 				{
-					new DAPServer(dialect, conn.getInputStream(), conn.getOutputStream()).run();
+					new DAPServer(dialect, conn).run();
 				}
 				catch (IOException e)
 				{
