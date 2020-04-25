@@ -229,11 +229,6 @@ public class ModuleTypeChecker extends TypeChecker
 		// Prepare to look for recursive loops
 		TCRecursiveLoops.getInstance().typeCheck(modules);
 
-		for (TCModule m: modules)
-		{
-			if (m.annotations != null) m.annotations.tcAfter(m);
-		}
-
 		// Report any discrepancies between the final checked types of
 		// definitions and their explicit imported types.
 
@@ -264,6 +259,12 @@ public class ModuleTypeChecker extends TypeChecker
 		{
 			m.importdefs.unusedCheck();
 			m.defs.unusedCheck();
+		}
+
+    	// Post process annotations
+		for (TCModule m: modules)
+		{
+			if (m.annotations != null) m.annotations.tcAfter(m);
 		}
     	
     	// Check for inter-definition cyclic dependencies before initialization
