@@ -266,7 +266,10 @@ public class ModuleTypeChecker extends TypeChecker
 		{
 			if (m.annotations != null) m.annotations.tcAfter(m);
 		}
-    	
+
+		// Close any annotations
+		TCAnnotation.close();
+
     	// Check for inter-definition cyclic dependencies before initialization
     	cyclicDependencyCheck(checkDefs);
 	}

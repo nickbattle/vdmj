@@ -144,4 +144,17 @@ public abstract class TCAnnotation
 	{
 		// Do nothing
 	}
+	
+	public static void close()
+	{
+		for (TCAnnotation annotation: instances)
+		{
+			annotation.doClose();
+		}
+	}
+	
+	public void doClose()
+	{
+		// Nothing by default
+	}
 }
