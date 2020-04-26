@@ -87,7 +87,7 @@ public class TCWarningAnnotation extends TCAnnotation
 	{
 		if (args.isEmpty())
 		{
-			name.report(6007, "@Warning must have one or more numeric arguments");
+			name.report(6010, "@Warning must have one or more numeric arguments");
 		}
 		
 		warningCount = TypeChecker.getWarningCount();
@@ -97,7 +97,7 @@ public class TCWarningAnnotation extends TCAnnotation
 		{
 			if (!(arg instanceof TCIntegerLiteralExpression))
 			{
-				arg.report(6007, "@Warning arguments must be warning number literals");
+				arg.report(6010, "@Warning arguments must be warning number literals");
 			}
 			else
 			{
