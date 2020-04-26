@@ -230,7 +230,7 @@ public class PatternReader extends SyntaxReader
 				
 				if (isReserved(id.name))
 				{
-					throwMessage(2295, "Name contains a reserved prefix", id);
+					throwMessage(2295, "Name " + id.name + " contains a reserved prefix", id);
 				}
 
 				if (id.name.startsWith("mk_"))

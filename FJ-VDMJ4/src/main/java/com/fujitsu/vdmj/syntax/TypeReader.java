@@ -205,7 +205,7 @@ public class TypeReader extends SyntaxReader
 
 				if (tagid.old)
 				{
-					throwMessage(2295, "Can't use old name here", tag);
+					throwMessage(2295, "Can't use old name " + tagid + " here", tag);
 				}
 				
 				LexNameToken tagname = idToName(tagid);
@@ -224,7 +224,7 @@ public class TypeReader extends SyntaxReader
 
 				if (tagid.old)
 				{
-					throwMessage(2295, "Can't use old name here", tag);
+					throwMessage(2295, "Can't use old name " + tagid + " here", tag);
 				}
 
 				LexNameToken tagname = idToName(tagid);

@@ -199,7 +199,7 @@ public abstract class SyntaxReader
 			
 			if (id.old)
 			{
-				throwMessage(2295, "Can't use old name here", tok);
+				throwMessage(2295, "Can't use old name " + id + " here", tok);
 			}
 			
 			return id;
@@ -231,7 +231,7 @@ public abstract class SyntaxReader
 			
 			if (name.old)
 			{
-				throwMessage(2295, "Can't use old name here", tok);
+				throwMessage(2295, "Can't use old name " + name + " here", tok);
 			}
 			
 			return name;
@@ -242,7 +242,7 @@ public abstract class SyntaxReader
 			
 			if (id.old)
 			{
-				throwMessage(2295, "Can't use old name here", tok);
+				throwMessage(2295, "Can't use old name " + id + " here", tok);
 			}
 			
 			return new LexNameToken(reader.currentModule, id);
@@ -281,12 +281,12 @@ public abstract class SyntaxReader
 			
 			if (id.old)
 			{
-				throwMessage(2295, "Can't use old name here", tok);
+				throwMessage(2295, "Can't use old name " + id + " here", tok);
 			}
 			
 			if (!reservedOK && isReserved(id.name))
 			{
-				throwMessage(2295, "Name contains a reserved prefix", tok);
+				throwMessage(2295, "Name " + id + " contains a reserved prefix", tok);
 			}
 			
 			return id;
@@ -330,12 +330,12 @@ public abstract class SyntaxReader
 			
 			if (name.old)
 			{
-				throwMessage(2295, "Can't use old name here", tok);
+				throwMessage(2295, "Can't use old name " + name + " here", tok);
 			}
 			
 			if (isReserved(name.name))
 			{
-				throwMessage(2295, "Name contains a reserved prefix", tok);
+				throwMessage(2295, "Name " + name + " contains a reserved prefix", tok);
 			}
 			
 			return name;
@@ -346,12 +346,12 @@ public abstract class SyntaxReader
 			
 			if (id.old)
 			{
-				throwMessage(2295, "Can't use old name here", tok);
+				throwMessage(2295, "Can't use old name " + id + " here", tok);
 			}
 			
 			if (!reservedOK && isReserved(id.name))
 			{
-				throwMessage(2295, "Name contains a reserved prefix", tok);
+				throwMessage(2295, "Name " + id + " contains a reserved prefix", tok);
 			}
 			
 			return new LexNameToken(reader.currentModule, id);
