@@ -23,6 +23,7 @@
 
 package annotations.tc;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -160,13 +161,16 @@ public class TCWarningAnnotation extends TCAnnotation
 	public void doClose()
 	{
 		Iterator<VDMWarning> witer = TypeChecker.getWarnings().iterator();
-		int startLine = name.getLocation().startLine;
+		int myLine = name.getLocation().startLine;
+		File myFile = name.getLocation().file;
 		
 		while (witer.hasNext())
 		{
 			VDMWarning w = witer.next();
 			
-			if (w.location.startLine == startLine + 1 && suppressed.contains((long)w.number))
+			if (w.location.startLine == myLine + 1 &&
+				w.location.file.equals(myFile) &&
+				suppressed.contains((long)w.number))
 			{
 				// Warning is on the line after the one we annotated, so remove it
 				witer.remove();
