@@ -143,4 +143,17 @@ public abstract class POAnnotation
 	{
 		return;
 	}
+	
+	public static void close()
+	{
+		for (POAnnotation annotation: instances)
+		{
+			annotation.doClose();
+		}
+	}
+	
+	public void doClose()
+	{
+		// Nothing by default
+	}
 }

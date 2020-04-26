@@ -342,7 +342,9 @@ public class ModuleInterpreter extends Interpreter
 		}
 		
 		POAnnotation.init();
-		return pogModules.getProofObligations();
+		ProofObligationList list = pogModules.getProofObligations();
+		POAnnotation.close();
+		return list;
 	}
 
 	@Override
