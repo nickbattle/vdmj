@@ -405,7 +405,9 @@ public class ClassInterpreter extends Interpreter
 		}
 		
 		POAnnotation.init();
-		return pogClasses.getProofObligations();
+		ProofObligationList list = pogClasses.getProofObligations();
+		POAnnotation.close();
+		return list;
 	}
 
 	private void logSwapIn()
