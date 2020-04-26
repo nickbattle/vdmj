@@ -1660,7 +1660,7 @@ public class ExpressionReader extends SyntaxReader
 
 		if (classname.old)
 		{
-			throwMessage(2295, "Can't use old name here", classname);
+			throwMessage(2295, "Can't use old name " + classname + " here", classname);
 		}
 
 		return new ASTIsOfBaseClassExpression(start, classname, args.get(1));
@@ -1687,7 +1687,7 @@ public class ExpressionReader extends SyntaxReader
 
 		if (classname.old)
 		{
-			throwMessage(2295, "Can't use old name here", classname);
+			throwMessage(2295, "Can't use old name " + classname + " here", classname);
 		}
 
 		return new ASTIsOfClassExpression(start, classname, args.get(1));

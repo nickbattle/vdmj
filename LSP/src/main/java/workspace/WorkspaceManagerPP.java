@@ -279,7 +279,8 @@ public class WorkspaceManagerPP extends WorkspaceManager
 				if (m.name.name.equals(expression))
 				{
 					interpreter.setDefaultName(expression);
-					DAPMessageList responses = new DAPMessageList(request);
+					DAPMessageList responses = new DAPMessageList(request,
+							new JSONObject("result", "Default class set to " + expression, "variablesReference", 0));
 					prompt(responses);
 					return responses;
 				}
