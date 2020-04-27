@@ -156,6 +156,11 @@ public abstract class WorkspaceManager
 
 	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName)
 	{
+		if (!canExecute())
+		{
+			return new DAPMessageList(request, text("Cannot start interpreter: errors exist?"));
+		}
+		
 		try
 		{
 			this.noDebug = noDebug;
@@ -178,12 +183,15 @@ public abstract class WorkspaceManager
 		}
 	}
 	
-	private DAPResponse heading()
+	protected abstract boolean canExecute();
+
+	protected DAPResponse heading() throws Exception
 	{
 		return text("*\n" +
 				"* VDMJ " + Settings.dialect + " Interpreter\n" +
 				(noDebug ? "" : "* DEBUG enabled\n") +
-				"*\n\n");
+				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
+				" is " + getInterpreter().getDefaultName() + "\n");
 	}
 	
 	protected void prompt(DAPMessageList list)
