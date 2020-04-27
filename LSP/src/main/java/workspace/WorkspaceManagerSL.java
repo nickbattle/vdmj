@@ -266,6 +266,13 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	}
 
 	@Override
+	public DAPMessageList terminate(DAPRequest request, Boolean restart)
+	{
+		interpreter = null;
+		return super.terminate(request, restart);
+	}
+	
+	@Override
 	public DAPMessageList threads(DAPRequest request)
 	{
 		return new DAPMessageList(request, new JSONObject("threads", new JSONArray()));	// empty?
@@ -286,6 +293,21 @@ public class WorkspaceManagerSL extends WorkspaceManager
 					prompt(responses);
 					return responses;
 				}
+			}
+			
+			if (inModuleList == null)
+			{
+				DAPMessageList responses = new DAPMessageList(request,
+						new JSONObject("result", "No specification loaded?", "variablesReference", 0));
+				prompt(responses);
+				return responses;
+			}
+			else if (getInterpreter().getIN() != inModuleList)
+			{
+				DAPMessageList responses = new DAPMessageList(request,
+						new JSONObject("result", "Specification has changed - reload", "variablesReference", 0));
+				prompt(responses);
+				return responses;
 			}
 			
 			return super.evaluate(request, expression, context);

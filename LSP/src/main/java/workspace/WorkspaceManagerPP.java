@@ -264,6 +264,13 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	}
 
 	@Override
+	public DAPMessageList terminate(DAPRequest request, Boolean restart)
+	{
+		interpreter = null;
+		return super.terminate(request, restart);
+	}
+
+	@Override
 	public DAPMessageList threads(DAPRequest request)
 	{
 		return new DAPMessageList(request, new JSONObject("threads", new JSONArray()));	// empty?

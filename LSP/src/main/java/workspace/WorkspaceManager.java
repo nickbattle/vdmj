@@ -178,12 +178,13 @@ public abstract class WorkspaceManager
 		}
 	}
 	
-	private DAPResponse heading()
+	protected DAPResponse heading() throws Exception
 	{
 		return text("*\n" +
 				"* VDMJ " + Settings.dialect + " Interpreter\n" +
 				(noDebug ? "" : "* DEBUG enabled\n") +
-				"*\n\n");
+				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
+				" is " + getInterpreter().getDefaultName() + "\n");
 	}
 	
 	protected void prompt(DAPMessageList list)
