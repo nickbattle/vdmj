@@ -191,6 +191,10 @@ public class MappingReader
     		{
     			return readPackage();
     		}
+    		else if (nextStr.equals("init"))
+    		{
+    			return readInit();
+    		}
     		else
     		{
     			error("Expecting map, unmap or package");
@@ -202,6 +206,19 @@ public class MappingReader
 			// Syntax error or file IO.
 			return Mapping.ERROR;
 		}
+	}
+
+	private Mapping readInit() throws IOException
+	{
+		int lineNo = linecount;
+		
+		rdToken();
+		String method = readDotName();
+		checkFor("(", "Expecting '('");
+		checkFor(")", "Expecting ')'");
+		checkFor(";", "Expecting closing semi-colon");
+		
+		return new Mapping(lineNo, Type.INIT, method, null, null, null, null);
 	}
 
 	private Mapping readPackage() throws IOException

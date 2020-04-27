@@ -27,7 +27,7 @@ import java.util.List;
 
 public class Mapping
 {
-	public enum Type { MAP, UNMAPPED, PACKAGE, EOF, ERROR }
+	public enum Type { MAP, UNMAPPED, PACKAGE, INIT, EOF, ERROR }
 
 	public static final Mapping EOF = new Mapping(0, Type.EOF, null, null, null, null, null);
 	public static final Mapping ERROR = new Mapping(0, Type.ERROR, null, null, null, null, null);

@@ -81,6 +81,18 @@ public class ClassMapper
 		inProgress.clear();
 		converted.clear();
 		
+		for (Method m: initializers)
+		{
+			try
+			{
+				m.invoke(null, (Object[])null);
+			}
+			catch (Exception e)
+			{
+				throw new RuntimeException("Error in mapping initialzer", e);
+			}
+		}
+		
 		return this;	// Convenient for getInstance().init().convert(obj)
 	}
 
@@ -139,6 +151,9 @@ public class ClassMapper
 
 	/** The set of class mappings for one loaded file */
 	private final Map<Class<?>, MapParams> mappings = new HashMap<Class<?>, MapParams>();
+	
+	/** A list of methods to call in the init() processing */
+	private final List<Method> initializers = new Vector<Method>();
 	
 	/**
 	 * A class to define how to construct one destPackage class, passing srcPackage
@@ -217,6 +232,10 @@ public class ClassMapper
 	    					processUnmapped(command);
 	    					break;
 	    					
+	    				case INIT:
+	    					processInit(command);
+	    					break;
+	    					
 	    				case EOF:
 	    					eof = true;
 	    					break;
@@ -232,6 +251,46 @@ public class ClassMapper
 			{
 	    		reader.close();
 			}
+		}
+	}
+
+	private void processInit(Mapping command)
+	{
+		String classname  = null;
+		String methodname = null;
+
+		try
+		{
+			int end = command.source.lastIndexOf('.');
+			
+			if (end > 0)
+			{
+				classname  = command.source.substring(0, end);
+				methodname = command.source.substring(end + 1);
+				Class<?> initClass = Class.forName(classname);
+				Method initMethod = initClass.getMethod(methodname, (Class<?>[])null);
+				
+				if (!Modifier.isStatic(initMethod.getModifiers()))
+				{
+					error("Init method is not static: " + classname + "." + methodname + "()");
+				}
+				else
+				{
+					initializers.add(initMethod);
+				}
+			}
+			else
+			{
+				error("Init entry malformed: " + command.source);
+			}
+		}
+		catch (ClassNotFoundException e)
+		{
+			error("No such class: " + classname);
+		}
+		catch (NoSuchMethodException e)
+		{
+			error("Cannot find method: " + classname + "." + methodname + "()");
 		}
 	}
 
