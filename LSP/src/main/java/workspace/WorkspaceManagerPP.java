@@ -264,6 +264,12 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	}
 
 	@Override
+	protected boolean canExecute()
+	{
+		return inClassList != null;
+	}
+
+	@Override
 	public DAPMessageList terminate(DAPRequest request, Boolean restart)
 	{
 		interpreter = null;
@@ -291,6 +297,21 @@ public class WorkspaceManagerPP extends WorkspaceManager
 					prompt(responses);
 					return responses;
 				}
+			}
+			
+			if (!canExecute())
+			{
+				DAPMessageList responses = new DAPMessageList(request,
+						new JSONObject("result", "Cannot start interpreter: errors exist?", "variablesReference", 0));
+				prompt(responses);
+				return responses;
+			}
+			else if (getInterpreter().getIN() != inClassList)
+			{
+				DAPMessageList responses = new DAPMessageList(request,
+						new JSONObject("result", "Specification has changed: try restart", "variablesReference", 0));
+				prompt(responses);
+				return responses;
 			}
 			
 			return super.evaluate(request, expression, context);

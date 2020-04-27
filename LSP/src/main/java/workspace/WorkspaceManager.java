@@ -156,6 +156,11 @@ public abstract class WorkspaceManager
 
 	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName)
 	{
+		if (!canExecute())
+		{
+			return new DAPMessageList(request, text("Cannot start interpreter: errors exist?"));
+		}
+		
 		try
 		{
 			this.noDebug = noDebug;
@@ -178,6 +183,8 @@ public abstract class WorkspaceManager
 		}
 	}
 	
+	protected abstract boolean canExecute();
+
 	protected DAPResponse heading() throws Exception
 	{
 		return text("*\n" +
