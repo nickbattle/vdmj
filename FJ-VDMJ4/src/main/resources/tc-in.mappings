@@ -2,6 +2,9 @@
 # The class mapping definition for the VDMJ Interpreter. See ClassMapper.
 ##########################################################################################
 
+# initializers, called by ClassMapper.init()
+init com.fujitsu.vdmj.in.annotations.INAnnotation.reset();
+
 # definitions
 package com.fujitsu.vdmj.tc.definitions to com.fujitsu.vdmj.in.definitions;
 map TCDefinitionList{} to INDefinitionList(this);

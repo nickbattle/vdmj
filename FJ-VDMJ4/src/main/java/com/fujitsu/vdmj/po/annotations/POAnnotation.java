@@ -45,7 +45,7 @@ public abstract class POAnnotation
 	
 	public final POExpressionList args;
 	
-	private static final Set<Class<?>> declared = new HashSet<Class<?>>(); 
+	private static final Set<Class<? extends POAnnotation>> declared = new HashSet<Class<? extends POAnnotation>>(); 
 	private static final List<POAnnotation> instances = new Vector<POAnnotation>(); 
 
 	public POAnnotation(TCIdentifierToken name, POExpressionList args)
@@ -55,6 +55,12 @@ public abstract class POAnnotation
 		
 		declared.add(this.getClass());
 		instances.add(this);
+	}
+	
+	public static void reset()
+	{
+		declared.clear();
+		instances.clear();
 	}
 
 	public static void init()

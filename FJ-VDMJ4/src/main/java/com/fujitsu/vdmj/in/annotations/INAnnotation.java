@@ -42,7 +42,7 @@ public abstract class INAnnotation
 	
 	public final INExpressionList args;
 	
-	private static final Set<Class<?>> declared = new HashSet<Class<?>>(); 
+	private static final Set<Class<? extends INAnnotation>> declared = new HashSet<Class<? extends INAnnotation>>(); 
 	private static final List<INAnnotation> instances = new Vector<INAnnotation>(); 
 
 	public INAnnotation(TCIdentifierToken name, INExpressionList args)
@@ -54,6 +54,12 @@ public abstract class INAnnotation
 		instances.add(this);
 	}
 	
+	public static void reset()
+	{
+		declared.clear();
+		instances.clear();
+	}
+
 	public static void init(Context ctxt)
 	{
 		for (Class<?> clazz: declared)

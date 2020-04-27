@@ -46,7 +46,7 @@ public abstract class TCAnnotation
 	
 	public final TCExpressionList args;
 	
-	private static final Set<Class<?>> declared = new HashSet<Class<?>>(); 
+	private static final Set<Class<? extends TCAnnotation>> declared = new HashSet<Class<? extends TCAnnotation>>(); 
 	private static final List<TCAnnotation> instances = new Vector<TCAnnotation>(); 
 
 	public TCAnnotation(TCIdentifierToken name, TCExpressionList args)
@@ -56,6 +56,12 @@ public abstract class TCAnnotation
 		
 		declared.add(this.getClass());
 		instances.add(this);
+	}
+	
+	public static void reset()
+	{
+		declared.clear();
+		instances.clear();
 	}
 
 	public static void init(Environment globals)

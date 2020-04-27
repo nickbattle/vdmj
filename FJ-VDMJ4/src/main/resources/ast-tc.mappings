@@ -2,6 +2,9 @@
 # The class mapping definition for the VDMJ Type Checker. See ClassMapper.
 ##########################################################################################
 
+# initializers, called by ClassMapper.init()
+init com.fujitsu.vdmj.tc.annotations.TCAnnotation.reset();
+
 # definitions
 package com.fujitsu.vdmj.ast.definitions to com.fujitsu.vdmj.tc.definitions;
 map ASTDefinitionList{} to TCDefinitionList(this);
