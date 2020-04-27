@@ -97,23 +97,8 @@ public class ClassMapper
 	}
 
 	/**
-	 * Initialise the progress stack and converted objects map, but only if no conversion is
-	 * in progress.
-	 */
-	public ClassMapper checkInit()
-	{
-		if (inProgress.isEmpty())
-		{
-			init();
-		}
-		
-		return this;	// Convenient for getInstance().checkInit().convert(obj)
-	}
-
-	/**
 	 * Fields used during the processing of the configuration file
 	 */
-	
 	private final String configFile;
 	private Field SELF;
 	private String srcPackage = "";
