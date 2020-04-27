@@ -70,7 +70,7 @@ public class TCCPUClassDefinition extends TCClassDefinition
 		DefinitionReader dr = new DefinitionReader(ltr);
 		dr.setCurrentModule("CPU");
 		ASTDefinitionList ast = dr.readDefinitions();
-		return ClassMapper.getInstance(TCNode.MAPPINGS).checkInit().convert(ast);	// NB. check init!!
+		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);	// NB. no init!!
 	}
 
 	@Override
