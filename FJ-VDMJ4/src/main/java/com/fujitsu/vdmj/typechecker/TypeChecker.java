@@ -210,6 +210,10 @@ abstract public class TypeChecker
 			warnings.add(warning);
 			lastMessage = warning;
 		}
+		else
+		{
+			lastMessage = null;
+		}
 	}
 
 	public static void detail(String tag, Object obj)
