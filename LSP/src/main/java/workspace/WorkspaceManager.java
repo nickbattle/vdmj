@@ -158,7 +158,9 @@ public abstract class WorkspaceManager
 	{
 		if (!canExecute())
 		{
-			return new DAPMessageList(request, text("Cannot start interpreter: errors exist?"));
+			DAPMessageList responses = new DAPMessageList(request);
+			responses.add(text("Cannot start interpreter: errors exist?"));
+			return responses;
 		}
 		
 		try
