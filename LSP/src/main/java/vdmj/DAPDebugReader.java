@@ -84,7 +84,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				
 				Log.printf("----------------- RESUME");
 			}
-			catch (IOException e)
+			catch (Exception e)
 			{
 				Log.error(e);
 				break;
@@ -92,7 +92,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		}
 	}
 	
-	private boolean doCommand(boolean timed)
+	private boolean doCommand(boolean timed) throws Exception
 	{
 		try
 		{
@@ -191,7 +191,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		catch (Exception e)
 		{
 			Log.error(e);
-			return false;
+			throw e;
 		}
 	}
 
