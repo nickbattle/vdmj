@@ -271,7 +271,9 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		if (predef != null)
 		{
 			TCBooleanType expected = new TCBooleanType(location);
-			TCType b = predef.body.typeCheck(local, null, NameScope.NAMES, expected);
+			Environment pre = new FlatEnvironment(new TCDefinitionList(), local);
+			pre.setEnclosingDefinition(predef);
+			TCType b = predef.body.typeCheck(pre, null, NameScope.NAMES, expected);
 
 			if (!b.isType(TCBooleanType.class, location))
 			{
@@ -291,11 +293,13 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		{
 			TCPattern rp = new TCIdentifierPattern(name.getResultName(location));
 			TCDefinitionList rdefs = rp.getDefinitions(expectedResult, NameScope.NAMES);
-			FlatCheckedEnvironment post =
-				new FlatCheckedEnvironment(rdefs, local, NameScope.NAMES);
-
+			FlatCheckedEnvironment post = new FlatCheckedEnvironment(rdefs, local, NameScope.NAMES);
+			post.setStatic(accessSpecifier);
+			post.setEnclosingDefinition(postdef);
+			post.setFunctional(true);
 			TCBooleanType expected = new TCBooleanType(location);
 			TCType b = postdef.body.typeCheck(post, null, NameScope.NAMES, expected);
+			// post.unusedCheck(); This would detect unused RESULTs 
 
 			if (!b.isType(TCBooleanType.class, location))
 			{

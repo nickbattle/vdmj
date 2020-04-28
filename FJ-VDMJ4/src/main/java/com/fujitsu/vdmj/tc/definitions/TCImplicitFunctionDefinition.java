@@ -251,6 +251,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		if (predef != null)
 		{
 			FlatEnvironment pre = new FlatEnvironment(argdefs, base);
+			pre.setEnclosingDefinition(predef);
 			TCBooleanType expected = new TCBooleanType(location);
 			TCType b = predef.body.typeCheck(pre, null, NameScope.NAMES, expected);
 
@@ -306,10 +307,9 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			if (result != null)
 			{
 	    		TCDefinitionList postdefs = result.getDefinitions();
-	    		FlatCheckedEnvironment post =
-	    			new FlatCheckedEnvironment(postdefs, local, NameScope.NAMES);
+	    		FlatCheckedEnvironment post = new FlatCheckedEnvironment(postdefs, local, NameScope.NAMES);
 	    		post.setStatic(accessSpecifier);
-	    		post.setEnclosingDefinition(this);
+	    		post.setEnclosingDefinition(postdef);
 	    		post.setFunctional(true);
 				b = postdef.body.typeCheck(post, null, NameScope.NAMES, expected);
 				post.unusedCheck();
