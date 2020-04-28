@@ -59,7 +59,7 @@ public class TCApplyExpression extends TCExpression
 
 	public TCType type;
 	public TCTypeList argtypes;
-	public TCDefinitionListList recursiveCycles;
+	public TCDefinitionListList recursiveCycles;	// Used by PO
 
 	public TCApplyExpression(TCExpression root, TCExpressionList args)
 	{
@@ -405,15 +405,20 @@ public class TCApplyExpression extends TCExpression
 			{
 				if (cycle.size() >= 2)
 				{
-					if (cycle.get(1).equals(called))		// The parent cycle involves this next apply call
+					if (cycle.get(1).equals(called))	// The parent cycle involves this next apply call
 					{
 						recursiveCycles.add(cycle);
 						cycleNames.add(TCRecursiveLoops.getInstance().getCycleNames(cycle));
-						mutuallyRecursive = mutuallyRecursive || cycle.size() > 2;	// eg. [f, g, f]
+						mutuallyRecursive = mutuallyRecursive || cycle.size() > 2;	// eg. [f, g, f] not [f, f]
+						checkCycleMeasures(cycle);
 					}
-					
-					checkCycleMeasures(cycle);
 				}
+			}
+			
+			if (cycleNames.isEmpty())
+			{
+				// No recursion via this "called" apply
+				return;
 			}
 			
 			if (parent instanceof TCExplicitFunctionDefinition)
