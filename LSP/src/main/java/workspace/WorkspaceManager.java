@@ -259,6 +259,11 @@ public abstract class WorkspaceManager
 		projectFiles.put(file, sb);
 	}
 	
+	private void unloadFile(File file)
+	{
+		projectFiles.remove(file);
+	}
+	
 	protected RPCMessageList diagnosticResponses(List<? extends VDMMessage> list, File oneFile) throws IOException
 	{
 		Map<File, List<VDMMessage>> map = new HashMap<File, List<VDMMessage>>();
@@ -320,13 +325,14 @@ public abstract class WorkspaceManager
 		return responses;
 	}
 	
-	public RPCMessageList openFile(RPCRequest request, File file, String text) throws IOException
+	public RPCMessageList openFile(RPCRequest request, File file, String text) throws Exception
 	{
 		if (!projectFiles.keySet().contains(file))
 		{
 			Log.printf("Adding and opening new file: %s", file);
 			loadFile(file);
 			openFiles.add(file);
+			checkLoadedFiles();
 			return null;
 		}
 		else if (openFiles.contains(file))
@@ -342,7 +348,7 @@ public abstract class WorkspaceManager
 		}
 	}
 	
-	public RPCMessageList closeFile(RPCRequest request, File file)
+	public RPCMessageList closeFile(RPCRequest request, File file) throws Exception
 	{
 		if (!projectFiles.keySet().contains(file))
 		{
@@ -358,6 +364,12 @@ public abstract class WorkspaceManager
 		{
 			Log.printf("Closing file: %s", file);
 			openFiles.remove(file);
+			
+			if (!file.exists())		// Probably a rename close?
+			{
+				unloadFile(file);
+			}
+			
 			return null;
 		}
 	}
@@ -437,7 +449,7 @@ public abstract class WorkspaceManager
 				if (projectFiles.keySet().contains(file))	
 				{
 					Log.printf("Deleting file: %s", file);
-					projectFiles.remove(file);
+					unloadFile(file);
 					checkLoadedFiles();
 				}
 				else

@@ -235,7 +235,9 @@ public class RecordValue extends Value
     			{
     				if (equality != null)
     				{
-    					Context ctxt = Interpreter.getInstance().getInitialContext();
+    					// To avoid inheriting prepost settings from the global context, we copy it
+    					Context ctxt = new Context(equality.location, "equals evaluation", null);
+    					ctxt.putAll(Interpreter.getInstance().getInitialContext());
     					ctxt.setThreadState(null);
     					ctxt.threadState.setAtomic(true);
 
@@ -298,7 +300,9 @@ public class RecordValue extends Value
 			{
 				if (ordering != null)
 				{
-	    			Context ctxt = Interpreter.getInstance().getInitialContext();
+					// To avoid inheriting prepost settings from the global context, we copy it
+					Context ctxt = new Context(ordering.location, "ordering evaluation", null);
+					ctxt.putAll(Interpreter.getInstance().getInitialContext());
 					ctxt.setThreadState(null);
 					ctxt.threadState.setAtomic(true);
 
