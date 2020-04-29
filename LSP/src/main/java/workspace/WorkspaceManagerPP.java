@@ -209,6 +209,12 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	{
 		return Dialect.VDM_PP.getFilter();
 	}
+	
+	@Override
+	protected String[] getFilenameFilters()
+	{
+		return new String[] { "**/*.vpp", "**/*.vdmpp" }; 
+	}
 
 	@Override
 	public RPCMessageList documentSymbols(RPCRequest request, File file)

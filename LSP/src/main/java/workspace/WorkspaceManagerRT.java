@@ -44,6 +44,12 @@ public class WorkspaceManagerRT extends WorkspaceManagerPP
 	{
 		return Dialect.VDM_RT.getFilter();
 	}
+	
+	@Override
+	protected String[] getFilenameFilters()
+	{
+		return new String[] { "**/*.vpp", "**/*.vdmrt" }; 
+	}
 
 	@Override
 	protected ASTClassList extras()

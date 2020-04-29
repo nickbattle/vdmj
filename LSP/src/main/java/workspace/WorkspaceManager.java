@@ -151,6 +151,13 @@ public abstract class WorkspaceManager
 
 	private RPCRequest lspDynamicRegistrations()
 	{
+		JSONArray watchers = new JSONArray();
+		
+		for (String glob: getFilenameFilters())
+		{
+			watchers.add(new JSONObject("globPattern", glob));
+		}
+		
 		return new RPCRequest(-1L, "client/registerCapability",
 			new JSONObject(
 				"registrations",
@@ -159,13 +166,8 @@ public abstract class WorkspaceManager
 							"id", "12345",
 							"method", "workspace/didChangeWatchedFiles",
 							"registerOptions",
-								new JSONObject(
-									"watchers",
-										new JSONArray(
-											new JSONObject("globPattern", "**/*.vdmsl"),
-											new JSONObject("globPattern", "**/*.vdmpp"),
-											new JSONObject("globPattern", "**/*.vdmrt")
-			))))));
+								new JSONObject("watchers", watchers)
+			))));
 	}
 
 	public DAPMessageList dapInitialize(DAPRequest request)
@@ -583,6 +585,8 @@ public abstract class WorkspaceManager
 	 * Abstract methods that are implemented in language specific subclasses.
 	 */
 	abstract protected FilenameFilter getFilenameFilter();
+
+	abstract protected String[] getFilenameFilters();
 
 	abstract protected List<VDMMessage> parseFile(File file);
 
