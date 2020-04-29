@@ -49,6 +49,8 @@ import workspace.WorkspaceManager;
 
 public class LSPServer extends JSONServer
 {
+	private static LSPServer INSTANCE = null;
+
 	private final RPCDispatcher dispatcher;
 	private final LSPServerState state;
 	
@@ -56,14 +58,20 @@ public class LSPServer extends JSONServer
 	{
 		super("LSP", inStream, outStream);
 		
+		INSTANCE = this;
 		this.state = new LSPServerState();
 		this.dispatcher = getDispatcher();
-
+		
 		state.setManager(WorkspaceManager.getInstance(dialect));
 		
 		// Identify this class as the debug link - See DebugLink
 		System.setProperty("vdmj.debug.link", DAPDebugLink.class.getName());
 		Settings.annotations = true;
+	}
+	
+	public static LSPServer getInstance()
+	{
+		return INSTANCE;
 	}
 	
 	private RPCDispatcher getDispatcher() throws IOException
@@ -106,14 +114,23 @@ public class LSPServer extends JSONServer
 				break;
 			}
 
-			RPCRequest request = new RPCRequest(message);
-			RPCMessageList responses = dispatcher.dispatch(request);
+			Long id = message.get("id");
 			
-			if (responses != null)
+			if (id != null && id.longValue() == -1)
 			{
-				for (JSONObject response: responses)
+				Log.printf("Ignoring RPC reply", message);
+			}
+			else
+			{
+				RPCRequest request = new RPCRequest(message);
+				RPCMessageList responses = dispatcher.dispatch(request);
+				
+				if (responses != null)
 				{
-					writeMessage(response);
+					for (JSONObject response: responses)
+					{
+						writeMessage(response);
+					}
 				}
 			}
 		}

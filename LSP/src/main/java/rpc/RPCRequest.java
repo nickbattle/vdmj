@@ -52,7 +52,7 @@ public class RPCRequest extends JSONObject
 		put("params", params);
 	}
 	
-	public RPCRequest(String id, String method, Object params)
+	public RPCRequest(Long id, String method, Object params)
 	{
 		this(method, params);
 		put("id", id);
