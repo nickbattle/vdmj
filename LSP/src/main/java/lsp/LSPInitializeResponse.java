@@ -38,8 +38,8 @@ public class LSPInitializeResponse extends JSONObject
 	private JSONObject getServerCapabilities()
 	{
 		JSONObject cap = new JSONObject();
-		cap.put("definitionProvider", true);			// Go to definition
-		cap.put("documentSymbolProvider", true);		// Symbol information
+		cap.put("definitionProvider", true);			// Go to definition for F12
+		cap.put("documentSymbolProvider", true);		// Symbol information for Outline view
 
 //		cap.put("completionProvider",					// Completions
 //			new JSONObject(
@@ -49,8 +49,16 @@ public class LSPInitializeResponse extends JSONObject
 		cap.put("textDocumentSync",
 			new JSONObject(
 				"openClose", true,
-				"change", 2,	// incremental
-				"save", new JSONObject("includeText", true)));
+				"change", 2		// incremental
+				// "save", new JSONObject("includeText", true)	// done by watched files registration
+			));
+		
+//		cap.put("workspace",
+//			new JSONObject(
+//				"workspaceFolders",
+//					new JSONObject(
+//						"supported", true,
+//						"changeNotifications", true)));
 		
 		return cap;
 	}

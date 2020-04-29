@@ -138,12 +138,34 @@ public abstract class WorkspaceManager
 	{
 		try
 		{
-			return checkLoadedFiles();
+			RPCMessageList response = new RPCMessageList();
+			response.add(lspDynamicRegistrations());
+			response.addAll(checkLoadedFiles());
+			return response;
 		}
 		catch (Exception e)
 		{
 			return new RPCMessageList(request, e.getMessage());
 		}
+	}
+
+	private RPCRequest lspDynamicRegistrations()
+	{
+		return new RPCRequest(-1L, "client/registerCapability",
+			new JSONObject(
+				"registrations",
+					new JSONArray(
+						new JSONObject(
+							"id", "12345",
+							"method", "workspace/didChangeWatchedFiles",
+							"registerOptions",
+								new JSONObject(
+									"watchers",
+										new JSONArray(
+											new JSONObject("globPattern", "**/*.vdmsl"),
+											new JSONObject("globPattern", "**/*.vdmpp"),
+											new JSONObject("globPattern", "**/*.vdmrt")
+			))))));
 	}
 
 	public DAPMessageList dapInitialize(DAPRequest request)
@@ -263,7 +285,7 @@ public abstract class WorkspaceManager
 	{
 		projectFiles.remove(file);
 	}
-	
+
 	protected RPCMessageList diagnosticResponses(List<? extends VDMMessage> list, File oneFile) throws IOException
 	{
 		Map<File, List<VDMMessage>> map = new HashMap<File, List<VDMMessage>>();
@@ -329,23 +351,20 @@ public abstract class WorkspaceManager
 	{
 		if (!projectFiles.keySet().contains(file))
 		{
-			Log.printf("Adding and opening new file: %s", file);
-			loadFile(file);
+			Log.printf("Opening new file: %s", file);
 			openFiles.add(file);
-			checkLoadedFiles();
-			return null;
 		}
 		else if (openFiles.contains(file))
 		{
 			Log.error("File already open: %s", file);
-			return null;
 		}
 		else
 		{
 			Log.printf("Opening new file: %s", file);
 			openFiles.add(file);
-			return null;
 		}
+		
+		return null;
 	}
 	
 	public RPCMessageList closeFile(RPCRequest request, File file) throws Exception
@@ -353,25 +372,18 @@ public abstract class WorkspaceManager
 		if (!projectFiles.keySet().contains(file))
 		{
 			Log.error("File not known: %s", file);
-			return null;
 		}
 		else if (!openFiles.contains(file))
 		{
 			Log.error("File not open: %s", file);
-			return null;
 		}
 		else
 		{
 			Log.printf("Closing file: %s", file);
 			openFiles.remove(file);
-			
-			if (!file.exists())		// Probably a rename close?
-			{
-				unloadFile(file);
-			}
-			
-			return null;
 		}
+		
+		return null;
 	}
 
 	public RPCMessageList changeFile(RPCRequest request, File file, JSONObject range, String text) throws Exception
@@ -418,14 +430,14 @@ public abstract class WorkspaceManager
 		}
 	}
 
-	public RPCMessageList changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
+	public void changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
 	{
 		switch (type)
 		{
 			case CREATE:
 				if (!projectFiles.keySet().contains(file))	
 				{
-					Log.printf("Adding new file: %s", file);
+					Log.printf("Created new file: %s", file);
 					loadFile(file);
 				}
 				else
@@ -435,11 +447,7 @@ public abstract class WorkspaceManager
 				break;
 				
 			case CHANGE:
-				if (projectFiles.keySet().contains(file))	
-				{
-					return checkLoadedFiles();		// typecheck on save
-				}
-				else
+				if (!projectFiles.keySet().contains(file))	
 				{
 					Log.error("Changed file not loaded: %s", file);
 				}
@@ -448,9 +456,8 @@ public abstract class WorkspaceManager
 			case DELETE:
 				if (projectFiles.keySet().contains(file))	
 				{
-					Log.printf("Deleting file: %s", file);
+					Log.printf("Deleted file: %s", file);
 					unloadFile(file);
-					checkLoadedFiles();
 				}
 				else
 				{
@@ -458,10 +465,16 @@ public abstract class WorkspaceManager
 				}
 				break;
 		}
-		
-		return null;
 	}
 
+	public RPCMessageList afterChangeWatchedFiles(RPCRequest request) throws Exception
+	{
+		return checkLoadedFiles();
+	}
+
+	/**
+	 * This is currently done via watched file events above.
+	 */
 	public RPCMessageList saveFile(RPCRequest request, File file, String text) throws Exception
 	{
 		if (!projectFiles.keySet().contains(file))
