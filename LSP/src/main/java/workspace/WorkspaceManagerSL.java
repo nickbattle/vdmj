@@ -203,6 +203,12 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	{
 		return Dialect.VDM_SL.getFilter();
 	}
+	
+	@Override
+	protected String[] getFilenameFilters()
+	{
+		return new String[] { "**/*.vdm", "**/*.vdmsl" }; 
+	}
 
 	@Override
 	public RPCMessageList documentSymbols(RPCRequest request, File file)
