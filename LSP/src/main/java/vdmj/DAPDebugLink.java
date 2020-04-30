@@ -100,26 +100,34 @@ public class DAPDebugLink extends ConsoleDebugLink
 		SchedulableThread thread = (SchedulableThread) Thread.currentThread();
 		Breakpoint bp = getBreakpoint(thread);
 		String reason = null;
+		boolean focusHint = true;
+		String text = null;
 		
 		if (ex != null)
 		{
 			server.stderr(ex.getMessage() + "\n");
 			reason = "exception";
+			text = ex.getMessage();
 		}
 		else if (bp != null)
 		{
 			if (bp instanceof Stoppoint)
 			{
 				reason = "breakpoint";
+				focusHint = false;
+				text = bp.toString();
 			}
 			else
 			{
 				reason = "step";	// Next, step in or step out
+				focusHint = false;
+				text = "stepping";
 			}
 		}
 		else
 		{
 			reason = null;	// No reason displayed
+			text = null;
 		}
 		
 		try
@@ -128,6 +136,8 @@ public class DAPDebugLink extends ConsoleDebugLink
 					new JSONObject(
 							"reason", reason,
 							"threadId", Thread.currentThread().getId(),
+							"preserveFocusHint", focusHint,
+							"text", text,
 							"allThreadsStopped", SchedulableThread.getThreadCount() == 1)));
 		}
 		catch (IOException e)

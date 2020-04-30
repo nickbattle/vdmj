@@ -301,19 +301,27 @@ public class DAPDebugExecutor implements DebugExecutor
 		{
 			Frame frame = ctxtFrames.get(frameId);
 			
-			if (totalFrames >= startFrame && frames.size() < levels)
+			if (frame != null)	// vscode bug? Sometimes sends late? request for invalid frameId
 			{
-				frames.add(new JSONObject(
-						"id",		frame.frameId,
-						"name",		frame.title,
-						"source",	new JSONObject("path", frame.location.file.getAbsolutePath()),
-						"line",		frame.location.startLine,
-						"column",	frame.location.startPos,
-						"moduleId",	frame.location.module));
+				if (totalFrames >= startFrame && frames.size() < levels)
+				{
+					frames.add(new JSONObject(
+							"id",		frame.frameId,
+							"name",		frame.title,
+							"source",	new JSONObject("path", frame.location.file.getAbsolutePath()),
+							"line",		frame.location.startLine,
+							"column",	frame.location.startPos,
+							"moduleId",	frame.location.module));
+				}
+				
+				totalFrames++;
+				frameId = frame.outerId;
 			}
-			
-			totalFrames++;
-			frameId = frame.outerId;
+			else
+			{
+				Log.error("Invalid frameId in stack request: %d", frameId);
+				frameId = 0;
+			}
 		}
 		
 		JSONObject stackResponse = new JSONObject("stackFrames", frames, "totalFrames", totalFrames);

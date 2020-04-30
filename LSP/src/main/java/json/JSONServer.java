@@ -69,7 +69,7 @@ abstract public class JSONServer
 	
 	abstract protected void setTimeout(int timeout) throws SocketException;
 
-	public JSONObject readMessage(int timeout) throws IOException
+	public synchronized JSONObject readMessage(int timeout) throws IOException
 	{
 		try
 		{
@@ -82,7 +82,7 @@ abstract public class JSONServer
 		}
 	}
 	
-	public JSONObject readMessage() throws IOException
+	public synchronized JSONObject readMessage() throws IOException
 	{
 		String contentLength = readLine();
 		String separator = readLine();
@@ -137,7 +137,7 @@ abstract public class JSONServer
 		}
 	}
 	
-	public void writeMessage(JSONObject response) throws IOException
+	public synchronized void writeMessage(JSONObject response) throws IOException
 	{
 		StringWriter swout = new StringWriter();
 		JSONWriter jwriter = new JSONWriter(new PrintWriter(swout));
