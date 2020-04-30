@@ -104,6 +104,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				try
 				{
 					dapMessage = server.readMessage(timed ? TIMEOUT : 0);
+					break;
 				}
 				catch (SocketTimeoutException e)
 				{
