@@ -41,7 +41,6 @@ import com.fujitsu.vdmj.in.expressions.INHistoryExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.ClassContext;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -152,15 +151,6 @@ public class DAPDebugExecutor implements DebugExecutor
 	@Override
 	public DebugCommand run(DebugCommand request)
 	{
-   		try
-		{
-			interpreter.setDefaultName(breakloc.module);
-		}
-		catch (Exception e)
-		{
-			throw new InternalException(52, "Cannot set default name at breakpoint");
-		}
-   		
    		DebugCommand result = null;
 
    		try
@@ -228,9 +218,11 @@ public class DAPDebugExecutor implements DebugExecutor
 		JSONObject arguments = (JSONObject) command.getPayload();
 		String expr = arguments.get("expression");
 		String answer = "?";
+		String savedName = interpreter.getDefaultName();
 
 		try
 		{
+			interpreter.setDefaultName(breakloc.module);
 			ctxt.threadState.setAtomic(true);
 			answer = expr + " = " + interpreter.evaluate(expr, ctxt);
  		}
@@ -257,6 +249,15 @@ public class DAPDebugExecutor implements DebugExecutor
 		}
 		finally
 		{
+			try
+			{
+				interpreter.setDefaultName(savedName);
+			}
+			catch (Exception e)
+			{
+				Log.error(e);
+			}
+
 			ctxt.threadState.setAtomic(false);
 		}
 
