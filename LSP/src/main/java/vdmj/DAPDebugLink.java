@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Stoppoint;
 import com.fujitsu.vdmj.scheduler.MainThread;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
+import com.fujitsu.vdmj.scheduler.Signal;
 import com.fujitsu.vdmj.values.CPUValue;
 
 import dap.DAPResponse;
@@ -146,7 +147,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 		}
 
 		super.stopped(ctxt, location, ex);
-
+		
 		if (ex == null && thread instanceof MainThread && thread.getSignal() == null)
 		{
 			try
@@ -170,6 +171,13 @@ public class DAPDebugLink extends ConsoleDebugLink
 		{
 			// Calls stopped with a null exception, which sends events
 			super.breakpoint(ctxt, bp);
+
+			SchedulableThread thread = (SchedulableThread) Thread.currentThread();
+			
+			if (thread.getSignal() == Signal.TERMINATE)
+			{
+				throw new ThreadDeath();	// Just die, as we're not continuing.
+			}
 		}
 	}
 	
