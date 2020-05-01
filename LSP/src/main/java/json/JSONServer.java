@@ -62,7 +62,7 @@ abstract public class JSONServer
 			c = (char) inStream.read();
 		}
 		
-		if (c == EOF) throw new IOException("End of stream");
+		if (c == EOF) return null;
 		
 		return sb.toString().trim();
 	}

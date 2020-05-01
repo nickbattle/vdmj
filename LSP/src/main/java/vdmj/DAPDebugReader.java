@@ -50,7 +50,7 @@ import workspace.Log;
  */
 public class DAPDebugReader extends Thread implements TraceCallback
 {
-	private static final int TIMEOUT = 200;		// Before we suspect trouble
+	private static final int TIMEOUT = 500;		// Before we suspect trouble, in ms
 	private final DAPServer server;
 	private final DAPDebugLink link;
 
@@ -87,6 +87,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			catch (Exception e)
 			{
 				Log.error(e);
+				link.killThreads();
 				break;
 			}
 		}
@@ -94,105 +95,95 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	
 	private boolean doCommand(boolean timed) throws Exception
 	{
-		try
+		JSONObject dapMessage = null;
+		int retries = 2;
+		boolean timedOut = false;
+
+		while (--retries > 0)
 		{
-			JSONObject dapMessage = null;
-			int retries = 2;
-			
-			while (--retries > 0)
+			try
 			{
-				try
-				{
-					dapMessage = server.readMessage(timed ? TIMEOUT : 0);
-					break;
-				}
-				catch (SocketTimeoutException e)
-				{
-					Log.error(e);
-					Log.error("Expecting request from client?");
-					
-					// Trying kicking the client with an event to say all threads stopped
-					List<SchedulableThread> threads = link.getThreads();
-					
-					server.writeMessage(new DAPResponse("stopped",
-							new JSONObject(
-									"reason", "step",
-									"threadId", threads.get(0).getId(),
-									"allThreadsStopped", "true")));
-				}
+				dapMessage = server.readMessage(timed ? TIMEOUT : 0);
+				timedOut = false;
+				break;
 			}
-
-			if (dapMessage == null)	// EOF - closed socket?
+			catch (SocketTimeoutException e)
 			{
-				Log.printf("End of stream detected");
-				link.killThreads();
-				return false;
-			}
-
-			DAPRequest dapRequest = new DAPRequest(dapMessage);
-
-			switch ((String)dapRequest.get("command"))
-			{
-				case "threads":
-					server.writeMessage(doThreads(dapRequest));
-					return true;
-
-				case "setBreakpoints":
-					JSONObject arguments = dapRequest.get("arguments");
-					JSONObject source = arguments.get("source");
-					File file = new File((String)source.get("path")).getCanonicalFile();
-					JSONArray lines = arguments.get("lines");
-					DAPMessageList responses = server.getState().getManager().setBreakpoints(dapRequest, file, lines);
-
-					for (JSONObject response: responses)
-					{
-						server.writeMessage(response);
-					}
-
-					return true;
-
-				default:
-					DebugCommand command = parse(dapRequest);
-					SchedulableThread targetThread = threadFor(dapRequest);
-
-					if (command.getType() == null)	// Ignore - payload is DAP response
-					{
-						server.writeMessage((JSONObject) command.getPayload());
-						return true;
-					}
-
-					DebugCommand response = link.sendCommand(targetThread, command);
-					DAPResponse dapResponse = new DAPResponse(dapRequest, true, null, response.getPayload());
-
-					switch (response.getType())
-					{
-						case RESUME:
-							link.resumeThreads();
-							server.writeMessage(dapResponse);
-							return false;
-
-						case STOP:
-						case QUIT:
-						case TERMINATE:
-							link.killThreads();
-							server.writeMessage(dapResponse);
-							return false;
-
-						case PRINT:
-							server.writeMessage(dapResponse);
-							prompt();
-							return true;
-
-						default:
-							server.writeMessage(dapResponse);
-							return true;
-					}
+				Log.error(e);
+				Log.error("Expecting request from client?");
+				timedOut = true;
 			}
 		}
-		catch (Exception e)
+		
+		if (timedOut)
 		{
-			Log.error(e);
-			throw e;
+			throw new Exception("Closing debug session on socket timeout");
+		}
+
+		if (dapMessage == null)	// EOF - closed socket?
+		{
+			Log.printf("End of stream detected");
+			throw new Exception("Closing debug session on socket close");
+		}
+
+		DAPRequest dapRequest = new DAPRequest(dapMessage);
+
+		switch ((String)dapRequest.get("command"))
+		{
+			case "threads":
+				server.writeMessage(doThreads(dapRequest));
+				return true;
+
+			case "setBreakpoints":
+				JSONObject arguments = dapRequest.get("arguments");
+				JSONObject source = arguments.get("source");
+				File file = new File((String)source.get("path")).getCanonicalFile();
+				JSONArray lines = arguments.get("lines");
+				DAPMessageList responses = server.getState().getManager().setBreakpoints(dapRequest, file, lines);
+
+				for (JSONObject response: responses)
+				{
+					server.writeMessage(response);
+				}
+
+				return true;
+
+			default:
+				DebugCommand command = parse(dapRequest);
+				SchedulableThread targetThread = threadFor(dapRequest);
+
+				if (command.getType() == null)	// Ignore - payload is DAP response
+				{
+					server.writeMessage((JSONObject) command.getPayload());
+					return true;
+				}
+
+				DebugCommand response = link.sendCommand(targetThread, command);
+				DAPResponse dapResponse = new DAPResponse(dapRequest, true, null, response.getPayload());
+
+				switch (response.getType())
+				{
+					case RESUME:
+						link.resumeThreads();
+						server.writeMessage(dapResponse);
+						return false;
+
+					case STOP:
+					case QUIT:
+					case TERMINATE:
+						link.killThreads();
+						server.writeMessage(dapResponse);
+						return false;
+
+					case PRINT:
+						server.writeMessage(dapResponse);
+						prompt();
+						return true;
+
+					default:
+						server.writeMessage(dapResponse);
+						return true;
+				}
 		}
 	}
 
