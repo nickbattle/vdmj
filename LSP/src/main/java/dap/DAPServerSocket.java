@@ -99,6 +99,7 @@ public class DAPServerSocket implements Runnable
 					Log.error("DAP Server stopped: %s", e.getMessage());
 				}
 
+				Log.printf("DAP %s Server closing port %d", dialect, port);
 				conn.close();
 			}
 		}

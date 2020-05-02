@@ -204,4 +204,9 @@ public class DAPDebugLink extends ConsoleDebugLink
 			Log.error(e);
 		}
 	}
+
+	public void reset()
+	{
+		instance = null;
+	}
 }

@@ -91,6 +91,8 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				break;
 			}
 		}
+		
+		link.reset();
 	}
 	
 	private boolean doCommand(boolean timed) throws Exception

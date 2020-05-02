@@ -89,6 +89,7 @@ public class LSPServerSocket implements Runnable
 			new Thread(new DAPServerSocket(dialect, dapPort), "DAP Listener").start();
 		}
 		
+		Thread.currentThread().setName("LSP Listener");
 		new LSPServerSocket(dialect, lspPort).run();
 	}
 	
@@ -121,6 +122,7 @@ public class LSPServerSocket implements Runnable
 					Log.error("LSP Server stopped: %s", e.getMessage());
 				}
 				
+				Log.printf("LSP %s Server closing port %d", dialect, port);
 				conn.close();
 			}
 		}
