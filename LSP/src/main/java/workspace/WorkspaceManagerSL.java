@@ -280,7 +280,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	@Override
 	public DAPMessageList terminate(DAPRequest request, Boolean restart)
 	{
-		interpreter = null;
+		// interpreter = null;
 		return super.terminate(request, restart);
 	}
 	

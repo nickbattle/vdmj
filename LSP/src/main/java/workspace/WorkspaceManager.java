@@ -190,6 +190,15 @@ public abstract class WorkspaceManager
 		try
 		{
 			this.noDebug = noDebug;
+			
+			if (noDebug && interpreter != null)		// clear any old breakpoints
+			{
+				for (Integer bpno: interpreter.getBreakpoints().keySet())
+				{
+					interpreter.clearBreakpoint(bpno);
+				}
+			}
+			
 			long before = System.currentTimeMillis();
 			getInterpreter().init();
 			if (defaultName != null) getInterpreter().setDefaultName(defaultName);
