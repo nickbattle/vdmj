@@ -74,6 +74,7 @@ public class LSPServerStdio implements Runnable
 			new Thread(new DAPServerSocket(dialect, dapPort), "DAP Listener").start();
 		}
 		
+		Thread.currentThread().setName("LSP Listener");
 		new LSPServerStdio(dialect).run();
 	}
 	

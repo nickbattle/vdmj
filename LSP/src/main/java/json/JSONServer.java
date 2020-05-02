@@ -23,10 +23,10 @@
 
 package json;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -142,11 +142,21 @@ abstract public class JSONServer
 		StringWriter swout = new StringWriter();
 		JSONWriter jwriter = new JSONWriter(new PrintWriter(swout));
 		jwriter.writeObject(response);
+		byte[] jout = swout.toString().getBytes("UTF-8");
+		
+		ByteArrayOutputStream message = new ByteArrayOutputStream(); 
+		message.write(CONTENT_LENGTH.getBytes("UTF-8"));
+		message.write(' ');
+		message.write(Integer.toString(jout.length).getBytes("UTF-8"));
+		message.write('\r');
+		message.write('\n');
+		message.write('\r');
+		message.write('\n');
+		message.write(jout);
+		
+		outStream.write(message.toByteArray());		// Avoid multiple packets
+		outStream.flush();
 
-		String jout = swout.toString();
-		Log.printf("<<< %s %s", prefix, jout);
-		PrintWriter pwout = new PrintWriter(new OutputStreamWriter(outStream, "UTF-8"));
-		pwout.printf("%s %d\r\n\r\n%s", CONTENT_LENGTH, jout.getBytes("UTF-8").length, jout);
-		pwout.flush();
+		Log.printf("<<< %s %s", prefix, swout);
 	}
 }

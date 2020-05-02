@@ -337,7 +337,7 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 				break;
 				
 			case DEADLOCKED:
-				DebugLink.getInstance().stopped(ctxt, location, null);
+				DebugLink.getInstance().stopped(ctxt, location, new Exception("DEADLOCK detected"));
 				throw new ThreadDeath();
 		}
 	}
