@@ -276,13 +276,6 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	{
 		return inModuleList != null;
 	}
-
-	@Override
-	public DAPMessageList terminate(DAPRequest request, Boolean restart)
-	{
-		// interpreter = null;
-		return super.terminate(request, restart);
-	}
 	
 	@Override
 	public DAPMessageList threads(DAPRequest request)

@@ -191,14 +191,6 @@ public abstract class WorkspaceManager
 		{
 			this.noDebug = noDebug;
 			
-			if (noDebug && interpreter != null)		// clear any old breakpoints
-			{
-				for (Integer bpno: interpreter.getBreakpoints().keySet())
-				{
-					interpreter.clearBreakpoint(bpno);
-				}
-			}
-			
 			long before = System.currentTimeMillis();
 			getInterpreter().init();
 			if (defaultName != null) getInterpreter().setDefaultName(defaultName);
@@ -658,6 +650,22 @@ public abstract class WorkspaceManager
 
 	public DAPMessageList terminate(DAPRequest request, Boolean restart)
 	{
+		if (interpreter != null)
+		{
+			// Clear the BPs since they are embedded in the tree and the next
+			// launch may have noDebug set.
+			
+			Set<Integer> bps = new HashSet<Integer>();
+			bps.addAll(interpreter.getBreakpoints().keySet());
+			
+			for (Integer bpno: bps)
+			{
+				interpreter.clearBreakpoint(bpno);
+			}
+			
+			interpreter = null;
+		}
+
 		DAPMessageList result = new DAPMessageList(request);
 		result.add(text("\nSession terminated.\n"));
 		return result;
