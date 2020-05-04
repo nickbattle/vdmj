@@ -179,7 +179,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 */
 	public final TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		return apply(new TCGetFreeVariablesVisitor(), new EnvTriple(env, env, returns));
+		return apply(new TCGetFreeVariablesVisitor(), new EnvTriple(globals, env, returns));
 	}
 	
 	/**
