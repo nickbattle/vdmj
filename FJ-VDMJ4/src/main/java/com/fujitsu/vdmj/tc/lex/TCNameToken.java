@@ -25,6 +25,8 @@ package com.fujitsu.vdmj.tc.lex;
 
 import java.io.Serializable;
 
+import com.fujitsu.vdmj.Release;
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -216,15 +218,20 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 	
 	public boolean isReserved()
 	{
-		return
-			getName().startsWith("pre_") ||
-			getName().startsWith("post_") ||
-			getName().startsWith("inv_") ||
-			getName().startsWith("init_") ||
-			getName().startsWith("eq_") ||
-			getName().startsWith("ord_") ||
-			getName().startsWith("min_") ||
-			getName().startsWith("max_");
+		String name = getName();
+		
+		return	name.startsWith("pre_") ||
+				name.startsWith("post_") ||
+				name.startsWith("inv_") ||
+				name.startsWith("init_") ||
+				name.startsWith("measure_") ||
+				Settings.release == Release.VDM_10 &&
+				(
+					name.startsWith("eq_") ||
+					name.startsWith("ord_") ||
+					name.startsWith("min_") ||
+					name.startsWith("max_")
+				);
 	}
 
 	public TCNameToken getExplicit(boolean explicit)

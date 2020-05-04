@@ -822,6 +822,7 @@ public abstract class SyntaxReader
 			name.startsWith("post_") ||
 			name.startsWith("inv_") ||
 			name.startsWith("init_") ||
+			name.startsWith("measure_") ||
 			Settings.release == Release.VDM_10 &&
 			(
 				name.startsWith("eq_") ||
