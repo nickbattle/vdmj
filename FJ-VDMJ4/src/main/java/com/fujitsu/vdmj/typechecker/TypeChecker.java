@@ -106,6 +106,17 @@ abstract public class TypeChecker
     				if (Settings.verbose)
     				{
     					Console.out.println(name.getExplicit(true) + " => " + freevars);
+
+    					for (TCNameToken freevar: freevars)
+    					{
+    						TCDefinition fdef = globals.findName(freevar, NameScope.NAMESANDSTATE);
+    						
+    						if (fdef != null && fdef.name != null &&
+    							name.getLocation().isLater(fdef.name.getLocation()))
+    						{
+    							Console.out.println("WARNING: " + freevar + " declared after " + name);
+    						}
+    					}
     				}
     			}
 			}

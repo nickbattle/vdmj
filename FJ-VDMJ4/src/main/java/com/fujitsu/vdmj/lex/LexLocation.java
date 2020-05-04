@@ -181,6 +181,14 @@ public class LexLocation implements Serializable
 				(startLine == span.endLine && startPos < span.endPos)) &&
 			file.equals(span.file);
 	}
+	
+	/**
+	 * Check whether a location is later in the same file as this location.
+	 */
+	public boolean isLater(LexLocation other)
+	{
+		return file.equals(other.file) && other.startLine > startLine;
+	}
 
 	public void executable(boolean exe)
 	{
