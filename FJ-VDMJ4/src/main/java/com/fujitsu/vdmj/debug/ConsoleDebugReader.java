@@ -110,6 +110,11 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 					doThread(command);
 					return true;
 
+				case STOP:
+				case QUIT:
+					link.killThreads();
+					return false;
+
 				default:
 				{
 					DebugCommand response = link.sendCommand(debuggedThread, command);
@@ -118,11 +123,6 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 					{
 						case RESUME:
 							link.resumeThreads();
-							return false;
-
-						case STOP:
-						case QUIT:
-							link.killThreads();
 							return false;
 
 						default:
