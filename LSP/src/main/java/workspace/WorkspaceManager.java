@@ -602,9 +602,11 @@ public abstract class WorkspaceManager
 
 	abstract public Interpreter getInterpreter() throws Exception;
 
-	public DAPMessageList disconnect(DAPRequest request, boolean terminateDebuggee)
+	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
-		return new DAPMessageList(request);
+		DAPMessageList result = new DAPMessageList(request);
+		result.add(0, text("\nSession disconnected.\n"));
+		return result;
 	}
 
 	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
