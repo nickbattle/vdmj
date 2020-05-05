@@ -75,6 +75,7 @@ public class ObjectThread extends SchedulableThread
 	public void body()
 	{
 		DebugLink link = DebugLink.getInstance();
+		DebugReason completeReason = DebugReason.OK;
 
 		try
 		{
@@ -88,7 +89,6 @@ public class ObjectThread extends SchedulableThread
 			}
 
 			operation.eval(ctxt.location, new ValueList(), ctxt);
-			link.complete(DebugReason.OK, null);
 		}
 		catch (ValueException e)
 		{
@@ -114,12 +114,13 @@ public class ObjectThread extends SchedulableThread
 		}
 		catch (ThreadDeath e)
 		{
-			link.complete(DebugReason.ABORTED, null);
+			completeReason = DebugReason.ABORTED;
 			throw e;
 		}
 		finally
 		{
 			TransactionValue.commitAll();
+			link.complete(completeReason, null);
 		}
 	}
 }

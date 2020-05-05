@@ -127,6 +127,7 @@ public class PeriodicThread extends SchedulableThread
 			nextTime(), sporadic).start();
 
 		DebugLink link = DebugLink.getInstance();
+		DebugReason completeReason = DebugReason.OK;
 		link.newThread(operation.getCPU());
 
 		try
@@ -145,9 +146,7 @@ public class PeriodicThread extends SchedulableThread
     			operation.name.getLocation(), new ValueList(), ctxt, true);
 
     		object.decPeriodicCount();
-    		
-    		link.complete(DebugReason.OK, null);
-		}
+ 		}
 		catch (ValueException e)
 		{
 			suspendOthers();
@@ -172,12 +171,13 @@ public class PeriodicThread extends SchedulableThread
 		}
 		catch (ThreadDeath e)
 		{
-			link.complete(DebugReason.ABORTED, null);
+			completeReason = DebugReason.ABORTED;
 			throw e;
 		}
 		finally
 		{
 			TransactionValue.commitAll();
+    		link.complete(completeReason, null);
 		}
 	}
 

@@ -68,12 +68,13 @@ public class MainThread extends SchedulableThread
 	@Override
 	public void body()
 	{
+		DebugLink link = DebugLink.getInstance();
+		DebugReason completeReason = DebugReason.OK;
+
 		try
 		{
-			DebugLink link = DebugLink.getInstance();
 			link.newThread(CPUValue.vCPU);
 			result = expression.eval(ctxt);
-			link.complete(DebugReason.OK, null);
 		}
 		catch (ContextException e)
 		{
@@ -85,7 +86,7 @@ public class MainThread extends SchedulableThread
 				e.ctxt.printStackFrames(Console.out);
 			}
 			
-			DebugLink.getInstance().stopped(e.ctxt, e.location, e);
+			link.stopped(e.ctxt, e.location, e);
 		}
 		catch (Exception e)
 		{
@@ -97,9 +98,15 @@ public class MainThread extends SchedulableThread
 			setException(e);
 			suspendOthers();
 		}
+		catch (ThreadDeath e)
+		{
+			completeReason = DebugReason.ABORTED;
+			throw e;
+		}
 		finally
 		{
 			TransactionValue.commitAll();
+			link.complete(completeReason, null);
 		}
 	}
 
