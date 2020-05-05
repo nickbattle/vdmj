@@ -129,6 +129,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		}
 
 		DAPRequest dapRequest = new DAPRequest(dapMessage);
+		DAPResponse dapResponse = null;
 
 		switch ((String)dapRequest.get("command"))
 		{
@@ -150,6 +151,13 @@ public class DAPDebugReader extends Thread implements TraceCallback
 
 				return true;
 
+			case "terminate":
+			case "disconnect":
+				link.killThreads();
+				dapResponse = new DAPResponse(dapRequest, true, null, null);
+				server.writeMessage(dapResponse);
+				return false;
+				
 			default:
 				DebugCommand command = parse(dapRequest);
 				SchedulableThread targetThread = threadFor(dapRequest);
@@ -161,19 +169,12 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				}
 
 				DebugCommand response = link.sendCommand(targetThread, command);
-				DAPResponse dapResponse = new DAPResponse(dapRequest, true, null, response.getPayload());
+				dapResponse = new DAPResponse(dapRequest, true, null, response.getPayload());
 
 				switch (response.getType())
 				{
 					case RESUME:
 						link.resumeThreads();
-						server.writeMessage(dapResponse);
-						return false;
-
-					case STOP:
-					case QUIT:
-					case TERMINATE:
-						link.killThreads();
 						server.writeMessage(dapResponse);
 						return false;
 
@@ -216,9 +217,6 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		
 		switch (command)
 		{
-			case "terminate":
-				return DebugCommand.TERMINATE;
-				
 			case "evaluate":
 				return new DebugCommand(DebugType.PRINT, request.get("arguments"));
 				

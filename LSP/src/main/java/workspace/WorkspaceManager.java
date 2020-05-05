@@ -531,7 +531,7 @@ public abstract class WorkspaceManager
 	{
 		JSONArray results = new JSONArray();
 		
-		Map<Integer, Breakpoint> breakpoints = interpreter.getBreakpoints();
+		Map<Integer, Breakpoint> breakpoints = getInterpreter().getBreakpoints();
 		
 		for (Integer bpno: breakpoints.keySet())
 		{

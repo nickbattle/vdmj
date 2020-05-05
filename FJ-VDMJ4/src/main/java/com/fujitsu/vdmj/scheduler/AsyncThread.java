@@ -77,6 +77,7 @@ public class AsyncThread extends SchedulableThread
 		LexLocation from = self.type.classdef.location;
 		Context ctxt = new ObjectContext(from, "async", global, self);
 		DebugLink link = DebugLink.getInstance();
+		DebugReason completeReason = DebugReason.OK;
 
 		try
 		{
@@ -96,8 +97,6 @@ public class AsyncThread extends SchedulableThread
 			{
 				request.bus.reply(new MessageResponse(result, request));
 			}
-
-			link.complete(DebugReason.OK, null);
 		}
 		catch (ValueException e)
 		{
@@ -121,9 +120,15 @@ public class AsyncThread extends SchedulableThread
 			ResourceScheduler.setException(e);
 			SchedulableThread.signalAll(Signal.SUSPEND);
 		}
+		catch (ThreadDeath e)
+		{
+			completeReason = DebugReason.ABORTED;
+			throw e;
+		}
 		finally
 		{
 			TransactionValue.commitAll();
+			link.complete(completeReason, null);
 		}
 	}
 }

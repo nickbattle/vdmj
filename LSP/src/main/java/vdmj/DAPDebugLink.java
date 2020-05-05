@@ -171,6 +171,13 @@ public class DAPDebugLink extends ConsoleDebugLink
 				Log.error(e);
 			}
 		}
+		
+		// Threads that have no started do not send completed events on "stop", so
+		// do that here.
+		if (ctxt == null && thread.getSignal() == Signal.TERMINATE)
+		{
+			complete(DebugReason.ABORTED, null);
+		}
 	}
 	
 	@Override
