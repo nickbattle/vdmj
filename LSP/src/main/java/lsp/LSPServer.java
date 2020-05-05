@@ -113,8 +113,8 @@ public class LSPServer extends JSONServer
 				Log.printf("End of stream detected");
 				break;
 			}
-
-			Long id = message.get("id");
+			
+			Long id = Utils.getLong(message, "id");
 			
 			if (id != null && id.longValue() == -1)
 			{
