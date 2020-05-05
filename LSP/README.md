@@ -21,7 +21,22 @@ The log.filename option sends full logging to a file of your choice. This includ
 20:43:18.322: <<< LSP { "jsonrpc" : "2.0", "method" : "textDocument/publishDiagnostics", "params" : { "uri" : "file:/home/nick/Digital%20Twins/VSCode/VSCodeWorkspacePP/factorial.vdmpp", "diagnostics" : [  ] } }
 20:43:18.324: >>> LSP {"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///home/nick/Digital%20Twins/VSCode/VSCodeWorkspacePP/factorial.vdmpp","languageId":"VDM_PP","version":1,"text":"..."}}}
 20:43:18.326: Opening new file: /home/nick/Digital Twins/VSCode/VSCodeWorkspacePP/factorial.vdmpp
-
+...
+20:53:35.725: >>> DAP {"command":"initialize","arguments":{"clientID":"vscode","clientName":"Visual Studio Code","adapterID":"vdm","pathFormat":"path","linesStartAt1":true,"columnsStartAt1":true,"supportsVariableType":true,"supportsVariablePaging":true,"supportsRunInTerminalRequest":true,"locale":"en-gb","supportsProgressReporting":true},"type":"request","seq":1}
+20:53:35.732: <<< DAP { "type" : "response", "seq" : 1, "request_seq" : 1, "command" : "initialize", "success" : true, "body" : { "supportsConfigurationDoneRequest" : true, "supportsTerminateRequest" : true, "supportsCancelRequest" : false } }
+20:53:35.734: <<< DAP { "seq" : 1, "type" : "event", "event" : "initialized" }
+20:53:35.738: >>> DAP {"command":"launch","arguments":{"type":"vdm","request":"launch","name":"Launch VDM Debug","stopOnEntry":true,"noDebug":false,"defaultName":"Factorial","__sessionId":"8cc86c21-3ec4-47d2-bc82-20ee691987c0"},"type":"request","seq":2}
+20:53:35.768: <<< DAP { "type" : "response", "seq" : 2, "request_seq" : 2, "command" : "launch", "success" : true }
+20:53:35.768: <<< DAP { "type" : "event", "seq" : 3, "event" : "output", "body" : { "output" : "*\n* VDMJ VDM_PP Interpreter\n* DEBUG enabled\n*\n\nDefault class is Factorial\n" } }
+20:53:35.769: <<< DAP { "type" : "event", "seq" : 4, "event" : "output", "body" : { "output" : "Initialized in 0.025 secs.\n" } }
+20:53:35.770: >>> DAP {"command":"setBreakpoints","arguments":{"source":{"name":"debugging.vdmpp","path":"/home/nick/Digital Twins/VSCode/VSCodeWorkspacePP/debugging.vdmpp"},"lines":[28],"breakpoints":[{"line":28}],"sourceModified":false},"type":"request","seq":3}
+20:53:35.776: <<< DAP { "type" : "response", "seq" : 5, "request_seq" : 3, "command" : "setBreakpoints", "success" : true, "body" : { "breakpoints" : [ { "verified" : true } ] } }
+20:53:35.777: >>> DAP {"command":"setBreakpoints","arguments":{"source":{"name":"factorial.vdmpp","path":"/home/nick/Digital Twins/VSCode/VSCodeWorkspacePP/factorial.vdmpp"},"lines":[40,54],"breakpoints":[{"line":40},{"line":54}],"sourceModified":false},"type":"request","seq":4}
+20:53:35.780: <<< DAP { "type" : "response", "seq" : 6, "request_seq" : 4, "command" : "setBreakpoints", "success" : true, "body" : { "breakpoints" : [ { "verified" : true }, { "verified" : true } ] } }
+20:53:35.885: >>> DAP {"command":"configurationDone","type":"request","seq":5}
+20:53:35.886: <<< DAP { "type" : "response", "seq" : 7, "request_seq" : 5, "command" : "configurationDone", "success" : true }
+20:53:35.891: >>> DAP {"command":"threads","type":"request","seq":6}
+20:53:35.892: <<< DAP { "type" : "response", "seq" : 8, "request_seq" : 6, "command" : "threads", "success" : true, "body" : { "threads" : [  ] } }
 ```
 
 For more information, contact @nickbattle.
