@@ -82,7 +82,7 @@ abstract public class JSONServer
 		}
 	}
 	
-	public synchronized JSONObject readMessage() throws IOException
+	public JSONObject readMessage() throws IOException
 	{
 		String contentLength = readLine();
 		String separator = readLine();
