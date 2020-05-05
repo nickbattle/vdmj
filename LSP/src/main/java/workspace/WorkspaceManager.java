@@ -532,8 +532,9 @@ public abstract class WorkspaceManager
 		JSONArray results = new JSONArray();
 		
 		Map<Integer, Breakpoint> breakpoints = getInterpreter().getBreakpoints();
+		Set<Integer> bps = new HashSet<Integer>(breakpoints.keySet());
 		
-		for (Integer bpno: breakpoints.keySet())
+		for (Integer bpno: bps)
 		{
 			Breakpoint bp = breakpoints.get(bpno);
 			
@@ -655,8 +656,7 @@ public abstract class WorkspaceManager
 			// Clear the BPs since they are embedded in the tree and the next
 			// launch may have noDebug set.
 			
-			Set<Integer> bps = new HashSet<Integer>();
-			bps.addAll(interpreter.getBreakpoints().keySet());
+			Set<Integer> bps = new HashSet<Integer>(interpreter.getBreakpoints().keySet());
 			
 			for (Integer bpno: bps)
 			{
