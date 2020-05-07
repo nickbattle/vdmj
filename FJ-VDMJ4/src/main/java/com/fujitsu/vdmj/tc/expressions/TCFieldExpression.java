@@ -44,6 +44,7 @@ public class TCFieldExpression extends TCExpression
 	public final TCExpression object;
 	public final TCIdentifierToken field;
 	public TCNameToken memberName;
+	public TCType root;
 
 	public TCFieldExpression(TCExpression object, TCIdentifierToken field, TCNameToken memberName)
 	{
@@ -63,7 +64,7 @@ public class TCFieldExpression extends TCExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		TCType root = object.typeCheck(env, null, scope, null);
+		root = object.typeCheck(env, null, scope, null);
 
 		if (root.isUnknown(location))
 		{
