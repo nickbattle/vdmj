@@ -30,6 +30,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServerState;
 import json.JSONObject;
+import lsp.Utils;
 
 public class DisconnectHandler extends DAPHandler
 {
@@ -42,7 +43,7 @@ public class DisconnectHandler extends DAPHandler
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
 		JSONObject arguments = request.get("arguments");
-		Boolean terminateDebuggee = new Boolean(arguments.get("terminateDebuggee"));
+		Boolean terminateDebuggee = Utils.getBoolean(arguments, "terminateDebuggee");
 		return dapServerState.getManager().disconnect(request, terminateDebuggee);
 	}
 }

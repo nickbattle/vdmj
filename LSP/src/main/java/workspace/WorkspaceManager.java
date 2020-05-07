@@ -532,8 +532,9 @@ public abstract class WorkspaceManager
 		JSONArray results = new JSONArray();
 		
 		Map<Integer, Breakpoint> breakpoints = getInterpreter().getBreakpoints();
+		Set<Integer> bps = new HashSet<Integer>(breakpoints.keySet());
 		
-		for (Integer bpno: breakpoints.keySet())
+		for (Integer bpno: bps)
 		{
 			Breakpoint bp = breakpoints.get(bpno);
 			
@@ -601,9 +602,11 @@ public abstract class WorkspaceManager
 
 	abstract public Interpreter getInterpreter() throws Exception;
 
-	public DAPMessageList disconnect(DAPRequest request, boolean terminateDebuggee)
+	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
-		return new DAPMessageList(request);
+		DAPMessageList result = new DAPMessageList(request);
+		result.add(0, text("\nSession disconnected.\n"));
+		return result;
 	}
 
 	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
@@ -655,8 +658,7 @@ public abstract class WorkspaceManager
 			// Clear the BPs since they are embedded in the tree and the next
 			// launch may have noDebug set.
 			
-			Set<Integer> bps = new HashSet<Integer>();
-			bps.addAll(interpreter.getBreakpoints().keySet());
+			Set<Integer> bps = new HashSet<Integer>(interpreter.getBreakpoints().keySet());
 			
 			for (Integer bpno: bps)
 			{

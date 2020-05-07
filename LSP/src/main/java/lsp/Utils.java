@@ -162,4 +162,48 @@ public class Utils
 
 		return sb.toString();
 	}
+	
+	public static Long getLong(JSONObject message, String field)	// eg. "id" is number | string
+	{
+		Object raw = message.get(field);
+
+		if (raw == null)
+		{
+			return null;
+		}
+		else if (raw instanceof String)
+		{
+			return Long.parseLong((String)raw);
+		}
+		else if (raw instanceof Long)
+		{
+			return (Long)raw;
+		}
+		else
+		{
+			throw new RuntimeException("Field " + field + " unexpected type: " + raw.getClass().getSimpleName());
+		}
+	}
+
+	public static Boolean getBoolean(JSONObject message, String field)
+	{
+		Object raw = message.get(field);
+
+		if (raw == null)
+		{
+			return null;
+		}
+		else if (raw instanceof String)
+		{
+			return Boolean.parseBoolean((String)raw);
+		}
+		else if (raw instanceof Boolean)
+		{
+			return (Boolean)raw;
+		}
+		else
+		{
+			throw new RuntimeException("Field " + field + " unexpected type: " + raw.getClass().getSimpleName());
+		}
+	}
 }

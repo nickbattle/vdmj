@@ -46,6 +46,7 @@ public class TCFuncInstantiationExpression extends TCExpression
 {
 	private static final long serialVersionUID = 1L;
 	public final TCExpression function;
+	public final TCTypeList unresolved;
 	public TCTypeList actualTypes;
 	public TCFunctionType type;
 
@@ -57,6 +58,12 @@ public class TCFuncInstantiationExpression extends TCExpression
 		super(function);
 		this.function = function;
 		this.actualTypes = types;
+		this.unresolved = new TCTypeList();
+		
+		for (TCType type: types)
+		{
+			unresolved.addAll(type.unresolvedTypes());
+		}
 	}
 
 	@Override

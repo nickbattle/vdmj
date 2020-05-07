@@ -49,6 +49,7 @@ public class DidChangeWSHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			JSONArray changes = params.get("changes");
+			RPCMessageList responses = new RPCMessageList();
 			
 			for (Object fileEvent: changes)
 			{
@@ -58,11 +59,20 @@ public class DidChangeWSHandler extends LSPHandler
 					File file = Utils.uriToFile(change.get("uri"));
 					WatchKind type = WatchKind.kindOf(change.get("type"));
 					lspServerState.getManager().changeWatchedFile(request, file, type);
+					
+					if (type == WatchKind.DELETE)
+					{
+						// clear all diagnostics from deleted files
+						JSONObject diags = new JSONObject("uri", file.toURI().toString(), "diagnostics", new JSONArray());
+						responses.add(new RPCRequest("textDocument/publishDiagnostics", diags));
+					}
 				}
 			}
 			
 			// Do type checking after the changes are processed
-			return lspServerState.getManager().afterChangeWatchedFiles(request);
+			responses.addAll(lspServerState.getManager().afterChangeWatchedFiles(request));
+			
+			return responses;
 		}
 		catch (URISyntaxException e)
 		{
