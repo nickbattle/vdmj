@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCFieldExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.modules.TCModule;
@@ -39,6 +40,8 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
+import com.fujitsu.vdmj.tc.types.TCClassType;
+import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -100,6 +103,16 @@ public class LSPDefinitionFinder
 						{
 							TCMkTypeExpression mk = (TCMkTypeExpression)node;
 							return env.findType(mk.typename, module.name.getName());
+						}
+						else if (node instanceof TCFieldExpression)
+						{
+							TCFieldExpression field = (TCFieldExpression)node;
+							
+							if (field.root.isRecord(field.location))
+							{
+					    		TCRecordType rec = field.root.getRecord();
+					    		return env.findType(rec.name, module.name.getName());
+							}
 						}
 						
 						Log.error("TCNode located, but unable to find definition %s", position);
@@ -169,7 +182,22 @@ public class LSPDefinitionFinder
 							TCMkTypeExpression mk = (TCMkTypeExpression)node;
 							return env.findType(mk.typename, cdef.name.getName());
 						}
-						
+						else if (node instanceof TCFieldExpression)
+						{
+							TCFieldExpression field = (TCFieldExpression)node;
+							
+							if (field.root.isRecord(field.location))
+							{
+					    		TCRecordType rec = field.root.getRecord();
+					    		return env.findType(rec.name, cdef.name.getName());
+							}
+							else if (field.root.isClass(env))
+							{
+					    		TCClassType cls = field.root.getClassType(env);
+					    		return cls.findName(field.memberName, NameScope.VARSANDNAMES);
+							}
+						}
+
 						Log.error("TCNode located, but unable to find definition %s", position);
 						return null;
 					}
