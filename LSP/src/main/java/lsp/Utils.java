@@ -69,7 +69,7 @@ public class Utils
 	public static File uriToFile(String s) throws URISyntaxException, IOException
 	{
 		URI uri = new URI(s);
-		return new File(uri).getCanonicalFile();	// Note: canonical file
+		return new File(uri).getAbsoluteFile();
 	}
 
 	public static int findPosition(StringBuilder buffer, JSONObject position) throws Exception
