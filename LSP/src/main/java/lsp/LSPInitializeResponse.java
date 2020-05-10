@@ -23,6 +23,7 @@
 
 package lsp;
 
+import json.JSONArray;
 import json.JSONObject;
 
 public class LSPInitializeResponse extends JSONObject
@@ -41,10 +42,10 @@ public class LSPInitializeResponse extends JSONObject
 		cap.put("definitionProvider", true);			// Go to definition for F12
 		cap.put("documentSymbolProvider", true);		// Symbol information for Outline view
 
-//		cap.put("completionProvider",					// Completions
-//			new JSONObject(
-//				"triggerCharacters", new JSONArray("."),
-//				"resolveProvider", false));
+		cap.put("completionProvider",					// Completions
+			new JSONObject(
+				"triggerCharacters", new JSONArray("."),
+				"resolveProvider", false));
 		
 		cap.put("textDocumentSync",
 			new JSONObject(

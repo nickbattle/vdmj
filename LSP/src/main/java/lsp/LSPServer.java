@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
 import json.JSONServer;
+import lsp.textdocument.CompletionHandler;
 import lsp.textdocument.DefinitionHandler;
 import lsp.textdocument.DidChangeHandler;
 import lsp.textdocument.DidChangeWSHandler;
@@ -89,6 +90,8 @@ public class LSPServer extends JSONServer
 		dispatcher.register("textDocument/didSave", new DidSaveHandler(state));
 		dispatcher.register("textDocument/definition", new DefinitionHandler(state));
 		dispatcher.register("textDocument/documentSymbol", new DocumentSymbolHandler(state));
+		dispatcher.register("textDocument/completion", new CompletionHandler(state));
+
 		dispatcher.register("workspace/didChangeWatchedFiles", new DidChangeWSHandler(state));
 
 		return dispatcher;
