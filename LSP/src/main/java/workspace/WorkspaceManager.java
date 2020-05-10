@@ -49,6 +49,12 @@ import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.types.TCClassType;
+import com.fujitsu.vdmj.tc.types.TCField;
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCOperationType;
+import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.Value;
 
@@ -502,6 +508,52 @@ public abstract class WorkspaceManager
 		}
 	}
 
+	public RPCMessageList completion(RPCRequest request, File file, int zline, int zcol)
+	{
+		JSONArray result = new JSONArray();
+		TCDefinition def = findDefinition(file, zline, zcol - 2);
+
+		if (def != null)
+		{
+			if (def.getType() instanceof TCRecordType)
+			{
+				TCRecordType rtype = (TCRecordType)def.getType();
+				
+				for (TCField field: rtype.fields)
+				{
+					result.add(new JSONObject("label", field.tag, "detail", field.type.toString()));
+				}
+			}
+			else if (def.getType() instanceof TCClassType)
+			{
+				TCClassType ctype = (TCClassType)def.getType();
+				
+				for (TCDefinition field: ctype.classdef.definitions)
+				{
+					if (field.name != null)
+					{
+						TCType ftype = field.getType();
+						
+						if (ftype instanceof TCOperationType || ftype instanceof TCFunctionType)
+						{
+							result.add(new JSONObject(
+								"label", field.name.toString(),		// Include types
+								"detail", ftype.toString()));
+						}
+						else
+						{
+							result.add(new JSONObject(
+								"label", field.name.getName(),
+								"detail", ftype.toString()));
+						}
+					}
+				}
+			}
+		}
+		
+		return new RPCMessageList(request, result);
+	}
+
 	protected JSONObject symbolInformation(String name, LexLocation location, SymbolKind kind, String container)
 	{
 		JSONObject sym = new JSONObject(
@@ -594,7 +646,9 @@ public abstract class WorkspaceManager
 
 	abstract protected RPCMessageList checkLoadedFiles() throws Exception;
 
-	abstract public RPCMessageList findDefinition(RPCRequest request, File file, int line, int col) throws IOException;
+	abstract public TCDefinition findDefinition(File file, int zline, int zcol);
+
+	abstract public RPCMessageList findDefinition(RPCRequest request, File file, int zline, int zcol) throws IOException;
 
 	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);
 

@@ -58,7 +58,6 @@ import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import rpc.RPCResponse;
 import vdmj.LSPDefinitionFinder;
 
 public class WorkspaceManagerPP extends WorkspaceManager
@@ -170,37 +169,43 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	}
 
 	@Override
-	public RPCMessageList findDefinition(RPCRequest request, File file, int line, int col)
+	public TCDefinition findDefinition(File file, int zline, int zcol)
 	{
 		if (tcClassList != null && !tcClassList.isEmpty())
 		{
 			LSPDefinitionFinder finder = new LSPDefinitionFinder();
-			TCDefinition def = finder.find(tcClassList, file, line + 1, col + 1);
-			
-			if (def == null)
-			{
-				return new RPCMessageList(request, null);
-			}
-			else
-			{
-				URI defuri = def.location.file.toURI();
-				
-				return new RPCMessageList(request,
-					System.getProperty("lsp.lsp4e") != null ?
-						new JSONArray(
-							new JSONObject(
-								"targetUri", defuri.toString(),
-								"targetRange", Utils.lexLocationToRange(def.location),
-								"targetSelectionRange", Utils.lexLocationToPoint(def.location)))
-						:
-						new JSONObject(
-							"uri", defuri.toString(),
-							"range", Utils.lexLocationToRange(def.location)));
-			}
+			return finder.find(tcClassList, file, zline + 1, zcol + 1);		// Convert from zero-relative
 		}
 		else
 		{
-			return new RPCMessageList(new RPCResponse(request, null));
+			return null;
+		}
+	}
+
+	@Override
+	public RPCMessageList findDefinition(RPCRequest request, File file, int zline, int zcol)
+	{
+		TCDefinition def = findDefinition(file, zline, zcol);
+		
+		if (def == null)
+		{
+			return new RPCMessageList(request, null);
+		}
+		else
+		{
+			URI defuri = def.location.file.toURI();
+			
+			return new RPCMessageList(request,
+				System.getProperty("lsp.lsp4e") != null ?
+					new JSONArray(
+						new JSONObject(
+							"targetUri", defuri.toString(),
+							"targetRange", Utils.lexLocationToRange(def.location),
+							"targetSelectionRange", Utils.lexLocationToPoint(def.location)))
+					:
+					new JSONObject(
+						"uri", defuri.toString(),
+						"range", Utils.lexLocationToRange(def.location)));
 		}
 	}
 
@@ -249,7 +254,11 @@ public class WorkspaceManagerPP extends WorkspaceManager
 
 					for (ASTDefinition def: clazz.definitions)
 					{
-						results.add(symbolInformation(def.name.name, def.name.location, SymbolKind.kindOf(def), def.location.module));
+						if (def.name != null)
+						{
+							results.add(symbolInformation(def.name.name, def.name.location,
+									SymbolKind.kindOf(def), def.location.module));
+						}
 					}
 				}
 			}

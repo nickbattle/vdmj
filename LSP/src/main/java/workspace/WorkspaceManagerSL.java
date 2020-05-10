@@ -58,7 +58,6 @@ import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import rpc.RPCResponse;
 import vdmj.LSPDefinitionFinder;
 
 public class WorkspaceManagerSL extends WorkspaceManager
@@ -164,37 +163,43 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	}
 
 	@Override
-	public RPCMessageList findDefinition(RPCRequest request, File file, int line, int col)
+	public TCDefinition findDefinition(File file, int zline, int zcol)
 	{
 		if (tcModuleList != null && !tcModuleList.isEmpty())
 		{
 			LSPDefinitionFinder finder = new LSPDefinitionFinder();
-			TCDefinition def = finder.find(tcModuleList, file, line + 1, col + 1);
-			
-			if (def == null)
-			{
-				return new RPCMessageList(request, null);
-			}
-			else
-			{
-				URI defuri = def.location.file.toURI();
-				
-				return new RPCMessageList(request,
-					System.getProperty("lsp.lsp4e") != null ?
-						new JSONArray(
-							new JSONObject(
-								"targetUri", defuri.toString(),
-								"targetRange", Utils.lexLocationToRange(def.location),
-								"targetSelectionRange", Utils.lexLocationToPoint(def.location)))
-						:
-						new JSONObject(
-							"uri", defuri.toString(),
-							"range", Utils.lexLocationToRange(def.location)));
-			}
+			return finder.find(tcModuleList, file, zline + 1, zcol + 1);
 		}
 		else
 		{
-			return new RPCMessageList(new RPCResponse(request, null));
+			return null;
+		}
+	}
+
+	@Override
+	public RPCMessageList findDefinition(RPCRequest request, File file, int zline, int zcol)
+	{
+		TCDefinition def = findDefinition(file, zline, zcol);
+		
+		if (def == null)
+		{
+			return new RPCMessageList(request, null);
+		}
+		else
+		{
+			URI defuri = def.location.file.toURI();
+			
+			return new RPCMessageList(request,
+				System.getProperty("lsp.lsp4e") != null ?
+					new JSONArray(
+						new JSONObject(
+							"targetUri", defuri.toString(),
+							"targetRange", Utils.lexLocationToRange(def.location),
+							"targetSelectionRange", Utils.lexLocationToPoint(def.location)))
+					:
+					new JSONObject(
+						"uri", defuri.toString(),
+						"range", Utils.lexLocationToRange(def.location)));
 		}
 	}
 
