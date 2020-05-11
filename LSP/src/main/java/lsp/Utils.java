@@ -76,12 +76,17 @@ public class Utils
 	{
 		long line = position.get("line");
 		long character = position.get("character");
+		return findPosition(buffer, line, character);
+	}
+		
+	public static int findPosition(StringBuilder buffer, long zline, long zcol)
+	{
 		long currentLine = 0;
 		long currentCharacter = 0;
 
 		for (int i=0; i<buffer.length(); i++)
 		{
-			if (currentLine == line && currentCharacter == character)
+			if (currentLine == zline && currentCharacter == zcol)
 			{
 				return i;
 			}
@@ -98,12 +103,12 @@ public class Utils
 		}
 		
 		// Catch position at end of file...
-		if (currentLine == line && currentCharacter == character)
+		if (currentLine == zline && currentCharacter == zcol)
 		{
 			return buffer.length();
 		}
 		
-		throw new Exception("Cannot locate range");
+		throw new RuntimeException("Cannot locate range");
 	}
 	
 	public static void diff(String message, String s1, String s2)

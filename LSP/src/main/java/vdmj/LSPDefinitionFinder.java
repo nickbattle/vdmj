@@ -52,12 +52,31 @@ import workspace.Log;
 
 public class LSPDefinitionFinder
 {
-	public TCDefinition find(TCModuleList modules, File file, int line, int col)
+	public static class Found
 	{
-		return find(modules, new LexLocation(file, "?", line, col, line, col));
+		public TCModule module;
+		public TCClassDefinition classdef;
+		public TCNode node;
+		
+		public Found(TCModule module, TCClassDefinition clssdef, TCNode node)
+		{
+			this.module = module;
+			this.classdef = clssdef;
+			this.node = node;
+		}
 	}
 	
-	public TCDefinition find(TCModuleList modules, LexLocation position)
+	public Found findLocation(TCModuleList modules, File file, int line, int col)
+	{
+		return findLocation(modules, new LexLocation(file, "?", line, col, line, col));
+	}
+	
+	public Found findLocation(TCClassList classes, File file, int line, int col)
+	{
+		return findLocation(classes, new LexLocation(file, "?", line, col, line, col));
+	}
+
+	public Found findLocation(TCModuleList modules, LexLocation position)
 	{
 		LSPDefinitionLocationFinder finder = new LSPDefinitionLocationFinder();
 		
@@ -69,8 +88,6 @@ public class LSPDefinitionFinder
 			
 			if (span == null || position.within(span))
 			{
-				ModuleEnvironment env = new ModuleEnvironment(module);
-				
 				for (TCDefinition def: module.defs)
 				{
 					Set<TCNode> nodes = def.apply(finder, position);
@@ -78,63 +95,18 @@ public class LSPDefinitionFinder
 					if (nodes != null && !nodes.isEmpty())	// found it!
 					{
 						TCNode node = nodes.iterator().next();
-						
-						if (node instanceof TCVariableExpression)
-						{
-							TCVariableExpression vexp = (TCVariableExpression)node;
-							return vexp.getDefinition();
-						}
-						else if (node instanceof TCCallStatement)
-						{
-							TCCallStatement stmt = (TCCallStatement)node;
-							return stmt.getDefinition();
-						}
-						else if (node instanceof TCCallObjectStatement)
-						{
-							TCCallObjectStatement stmt = (TCCallObjectStatement)node;
-							return stmt.getDefinition();
-						}
-						else if (node instanceof TCUnresolvedType)
-						{
-							TCUnresolvedType unresolved = (TCUnresolvedType)node;
-							return env.findType(unresolved.typename, module.name.getName());
-						}
-						else if (node instanceof TCMkTypeExpression)
-						{
-							TCMkTypeExpression mk = (TCMkTypeExpression)node;
-							return env.findType(mk.typename, module.name.getName());
-						}
-						else if (node instanceof TCFieldExpression)
-						{
-							TCFieldExpression field = (TCFieldExpression)node;
-							
-							if (field.root.isRecord(field.location))
-							{
-					    		TCRecordType rec = field.root.getRecord();
-					    		return env.findType(rec.name, module.name.getName());
-							}
-						}
-						
-						Log.error("TCNode located, but unable to find definition %s", position);
-						return null;
+						return new Found(module, null, node);
 					}
 				}
 			}
 		}
 
-		Log.error("Unable to locate symbol %s", position);
 		return null;
 	}
 	
-	public TCDefinition find(TCClassList classes, File file, int line, int col)
-	{
-		return find(classes, new LexLocation(file, "?", line, col, line, col));
-	}
-	
-	public TCDefinition find(TCClassList classes, LexLocation position)
+	public Found findLocation(TCClassList classes, LexLocation position)
 	{
 		LSPDefinitionLocationFinder finder = new LSPDefinitionLocationFinder();
-		PublicClassEnvironment globals = new PublicClassEnvironment(classes); 
 		
 		for (TCClassDefinition cdef: classes)
 		{
@@ -142,8 +114,6 @@ public class LSPDefinitionFinder
 			
 			if (span == null || position.within(span))
 			{
-				PrivateClassEnvironment env = new PrivateClassEnvironment(cdef, globals);
-				
 				for (TCDefinition def: cdef.definitions)
 				{
 					Set<TCNode> nodes = def.apply(finder, position);
@@ -151,61 +121,145 @@ public class LSPDefinitionFinder
 					if (nodes != null && !nodes.isEmpty())	// found it!
 					{
 						TCNode node = nodes.iterator().next();
-						
-						if (node instanceof TCVariableExpression)
-						{
-							TCVariableExpression vexp = (TCVariableExpression)node;
-							return vexp.getDefinition();
-						}
-						else if (node instanceof TCCallStatement)
-						{
-							TCCallStatement stmt = (TCCallStatement)node;
-							return stmt.getDefinition();
-						}
-						else if (node instanceof TCCallObjectStatement)
-						{
-							TCCallObjectStatement stmt = (TCCallObjectStatement)node;
-							return stmt.getDefinition();
-						}
-						else if (node instanceof TCIdentifierDesignator)
-						{
-							TCIdentifierDesignator id = (TCIdentifierDesignator)node;
-							return env.findName(id.name, NameScope.NAMESANDSTATE);
-						}
-						else if (node instanceof TCUnresolvedType)
-						{
-							TCUnresolvedType unresolved = (TCUnresolvedType)node;
-							return env.findType(unresolved.typename, cdef.name.getName());
-						}
-						else if (node instanceof TCMkTypeExpression)
-						{
-							TCMkTypeExpression mk = (TCMkTypeExpression)node;
-							return env.findType(mk.typename, cdef.name.getName());
-						}
-						else if (node instanceof TCFieldExpression)
-						{
-							TCFieldExpression field = (TCFieldExpression)node;
-							
-							if (field.root.isRecord(field.location))
-							{
-					    		TCRecordType rec = field.root.getRecord();
-					    		return env.findType(rec.name, cdef.name.getName());
-							}
-							else if (field.root.isClass(env))
-							{
-					    		TCClassType cls = field.root.getClassType(env);
-					    		return cls.findName(field.memberName, NameScope.VARSANDNAMES);
-							}
-						}
-
-						Log.error("TCNode located, but unable to find definition %s", position);
-						return null;
+						return new Found(null, cdef, node);
 					}
 				}
 			}
 		}
 
-		Log.error("Unable to locate symbol %s", position);
 		return null;
+	}
+	
+	public TCDefinition findDefinition(TCModuleList modules, File file, int line, int col)
+	{
+		return findDefinition(modules, new LexLocation(file, "?", line, col, line, col));
+	}
+	
+	public TCDefinition findDefinition(TCModuleList modules, LexLocation position)
+	{
+		Found found = findLocation(modules, position);
+		
+		if (found != null)
+		{
+			TCModule module = found.module;
+			ModuleEnvironment env = new ModuleEnvironment(module);
+			TCNode node = found.node;
+			
+			if (node instanceof TCVariableExpression)
+			{
+				TCVariableExpression vexp = (TCVariableExpression)node;
+				return vexp.getDefinition();
+			}
+			else if (node instanceof TCCallStatement)
+			{
+				TCCallStatement stmt = (TCCallStatement)node;
+				return stmt.getDefinition();
+			}
+			else if (node instanceof TCCallObjectStatement)
+			{
+				TCCallObjectStatement stmt = (TCCallObjectStatement)node;
+				return stmt.getDefinition();
+			}
+			else if (node instanceof TCUnresolvedType)
+			{
+				TCUnresolvedType unresolved = (TCUnresolvedType)node;
+				return env.findType(unresolved.typename, module.name.getName());
+			}
+			else if (node instanceof TCMkTypeExpression)
+			{
+				TCMkTypeExpression mk = (TCMkTypeExpression)node;
+				return env.findType(mk.typename, module.name.getName());
+			}
+			else if (node instanceof TCFieldExpression)
+			{
+				TCFieldExpression field = (TCFieldExpression)node;
+				
+				if (field.root.isRecord(field.location))
+				{
+		    		TCRecordType rec = field.root.getRecord();
+		    		return env.findType(rec.name, module.name.getName());
+				}
+			}
+			
+			Log.error("TCNode located, but unable to find definition %s", position);
+			return null;
+		}
+		else
+		{
+			Log.error("Unable to locate symbol %s", position);
+			return null;
+		}
+	}
+	
+	public TCDefinition findDefinition(TCClassList classes, File file, int line, int col)
+	{
+		return findDefinition(classes, new LexLocation(file, "?", line, col, line, col));
+	}
+	
+	public TCDefinition findDefinition(TCClassList classes, LexLocation position)
+	{
+		Found found = findLocation(classes, position);
+		
+		if (found != null)
+		{
+			TCClassDefinition cdef = found.classdef;
+			PublicClassEnvironment globals = new PublicClassEnvironment(classes); 
+			PrivateClassEnvironment env = new PrivateClassEnvironment(cdef, globals);
+			TCNode node = found.node;
+			
+			if (node instanceof TCVariableExpression)
+			{
+				TCVariableExpression vexp = (TCVariableExpression)node;
+				return vexp.getDefinition();
+			}
+			else if (node instanceof TCCallStatement)
+			{
+				TCCallStatement stmt = (TCCallStatement)node;
+				return stmt.getDefinition();
+			}
+			else if (node instanceof TCCallObjectStatement)
+			{
+				TCCallObjectStatement stmt = (TCCallObjectStatement)node;
+				return stmt.getDefinition();
+			}
+			else if (node instanceof TCIdentifierDesignator)
+			{
+				TCIdentifierDesignator id = (TCIdentifierDesignator)node;
+				return env.findName(id.name, NameScope.NAMESANDSTATE);
+			}
+			else if (node instanceof TCUnresolvedType)
+			{
+				TCUnresolvedType unresolved = (TCUnresolvedType)node;
+				return env.findType(unresolved.typename, cdef.name.getName());
+			}
+			else if (node instanceof TCMkTypeExpression)
+			{
+				TCMkTypeExpression mk = (TCMkTypeExpression)node;
+				return env.findType(mk.typename, cdef.name.getName());
+			}
+			else if (node instanceof TCFieldExpression)
+			{
+				TCFieldExpression field = (TCFieldExpression)node;
+				
+				if (field.root.isRecord(field.location))
+				{
+		    		TCRecordType rec = field.root.getRecord();
+		    		return env.findType(rec.name, cdef.name.getName());
+				}
+				else if (field.root.isClass(env))
+				{
+		    		TCClassType cls = field.root.getClassType(env);
+		    		return cls.findName(field.memberName, NameScope.VARSANDNAMES);
+				}
+			}
+
+			Log.error("TCNode located, but unable to find definition %s", position);
+			return null;
+		}
+		else
+		{
+			Log.error("Unable to locate symbol %s", position);
+			return null;
+		}
 	}
 }
