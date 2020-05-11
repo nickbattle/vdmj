@@ -70,6 +70,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPInitializeResponse;
 import lsp.Utils;
+import lsp.textdocument.CompletionItemKind;
 import lsp.textdocument.SymbolKind;
 import lsp.textdocument.WatchKind;
 import rpc.RPCMessageList;
@@ -414,7 +415,11 @@ public abstract class WorkspaceManager
 			StringBuilder buffer = projectFiles.get(file);
 			int start = Utils.findPosition(buffer, range.get("start"));
 			int end   = Utils.findPosition(buffer, range.get("end"));
-			buffer.replace(start, end, text);
+			
+			if (start >= 0 && end >= 0)
+			{
+				buffer.replace(start, end, text);
+			}
 			
 			if (Log.logging())	// dump edited line
 			{
@@ -434,7 +439,6 @@ public abstract class WorkspaceManager
 				end = start;
 				while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
 				Log.printf("EDITED %d: [%s]", line+1, buffer.substring(start, end));
-				// System.out.printf("EDITED %d: [%s]\n", line+1, buffer.substring(start, end));
 			}
 			
 			return diagnosticResponses(parseFile(file), file);
@@ -523,7 +527,10 @@ public abstract class WorkspaceManager
 				
 				for (TCField field: rtype.fields)
 				{
-					result.add(new JSONObject("label", field.tag, "detail", field.type.toString()));
+					result.add(new JSONObject(
+						"label", field.tag,
+						"kind", CompletionItemKind.kindOf(def).getValue(),
+						"detail", field.type.toString()));
 				}
 			}
 			else if (def.getType() instanceof TCClassType)
@@ -540,12 +547,14 @@ public abstract class WorkspaceManager
 						{
 							result.add(new JSONObject(
 								"label", field.name.toString(),		// Include types
+								"kind", CompletionItemKind.kindOf(field).getValue(),
 								"detail", ftype.toString()));
 						}
 						else
 						{
 							result.add(new JSONObject(
 								"label", field.name.getName(),
+								"kind", CompletionItemKind.kindOf(field).getValue(),
 								"detail", ftype.toString()));
 						}
 					}
@@ -556,24 +565,29 @@ public abstract class WorkspaceManager
 		{
 			StringBuilder buffer = projectFiles.get(file);
 			int position = Utils.findPosition(buffer, zline, zcol);
-			int start = position - 1;
 			
-			while (start >= 0 && Character.isJavaIdentifierPart(buffer.charAt(start)))
+			if (position >= 0)
 			{
-				start--;
-			}
-			
-			String word = buffer.subSequence(start + 1, position).toString();
-			
-			if (!word.isEmpty())
-			{
-				Log.printf("Trying to complete '%s'", word);
+				int start = position - 1;
 				
-				for (TCDefinition defn: lookupDefinition(word))
+				while (start >= 0 && Character.isJavaIdentifierPart(buffer.charAt(start)))
 				{
-					result.add(new JSONObject(
-							"label", defn.name.getName(),
-							"detail", defn.getType().toString()));
+					start--;
+				}
+				
+				String word = buffer.subSequence(start + 1, position).toString();
+				
+				if (!word.isEmpty())
+				{
+					Log.printf("Trying to complete '%s'", word);
+					
+					for (TCDefinition defn: lookupDefinition(word))
+					{
+						result.add(new JSONObject(
+								"label", defn.name.getName(),
+								"kind", CompletionItemKind.kindOf(defn).getValue(),
+								"detail", defn.getType().toString()));
+					}
 				}
 			}
 		}
