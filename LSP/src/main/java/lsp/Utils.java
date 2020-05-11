@@ -72,6 +72,11 @@ public class Utils
 		return new File(uri).getAbsoluteFile();
 	}
 
+	public static File pathToFile(String s) throws URISyntaxException, IOException
+	{
+		return new File(s).getAbsoluteFile();
+	}
+
 	public static int findPosition(StringBuilder buffer, JSONObject position) throws Exception
 	{
 		long line = position.get("line");

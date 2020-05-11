@@ -43,6 +43,7 @@ import dap.DAPResponse;
 import dap.DAPServer;
 import json.JSONArray;
 import json.JSONObject;
+import lsp.Utils;
 import workspace.Log;
 
 /**
@@ -140,7 +141,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			case "setBreakpoints":
 				JSONObject arguments = dapRequest.get("arguments");
 				JSONObject source = arguments.get("source");
-				File file = new File((String)source.get("path")).getCanonicalFile();
+				File file = Utils.pathToFile(source.get("path"));
 				JSONArray lines = arguments.get("lines");
 				DAPMessageList responses = server.getState().getManager().setBreakpoints(dapRequest, file, lines);
 

@@ -304,7 +304,7 @@ public abstract class WorkspaceManager
 		
 		for (VDMMessage message: list)
 		{
-			File file = message.location.file.getCanonicalFile();
+			File file = message.location.file.getAbsoluteFile();
 			List<VDMMessage> set = map.get(file);
 			
 			if (set == null)

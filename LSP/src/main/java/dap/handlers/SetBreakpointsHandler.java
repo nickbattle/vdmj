@@ -32,6 +32,7 @@ import dap.DAPRequest;
 import dap.DAPServerState;
 import json.JSONArray;
 import json.JSONObject;
+import lsp.Utils;
 
 public class SetBreakpointsHandler extends DAPHandler
 {
@@ -47,7 +48,7 @@ public class SetBreakpointsHandler extends DAPHandler
 		{
 			JSONObject arguments = request.get("arguments");
 			JSONObject source = arguments.get("source");
-			File file = new File((String)source.get("path")).getCanonicalFile();
+			File file = Utils.pathToFile(source.get("path"));
 			JSONArray lines = arguments.get("lines");
 			
 			return dapServerState.getManager().setBreakpoints(request, file, lines);
