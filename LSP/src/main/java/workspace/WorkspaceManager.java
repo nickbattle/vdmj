@@ -583,10 +583,19 @@ public abstract class WorkspaceManager
 					
 					for (TCDefinition defn: lookupDefinition(word))
 					{
+						TCType ftype = defn.getType();
+						String insert = defn.name.getName();
+						
+						if (defn.isFunctionOrOperation())
+						{
+							insert = insert + ftype.toString().replaceAll("( ->| \\+>| ==>).*", ")");
+						}
+						
 						result.add(new JSONObject(
 								"label", defn.name.getName(),
 								"kind", CompletionItemKind.kindOf(defn).getValue(),
-								"detail", defn.getType().toString()));
+								"detail", ftype.toString(),
+								"insertText", insert));
 					}
 				}
 			}
