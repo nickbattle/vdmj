@@ -49,7 +49,9 @@ import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -550,6 +552,31 @@ public abstract class WorkspaceManager
 				}
 			}
 		}
+		else
+		{
+			StringBuilder buffer = projectFiles.get(file);
+			int position = Utils.findPosition(buffer, zline, zcol);
+			int start = position - 1;
+			
+			while (start >= 0 && Character.isJavaIdentifierPart(buffer.charAt(start)))
+			{
+				start--;
+			}
+			
+			String word = buffer.subSequence(start + 1, position).toString();
+			
+			if (!word.isEmpty())
+			{
+				Log.printf("Trying to complete '%s'", word);
+				
+				for (TCDefinition defn: lookupDefinition(word))
+				{
+					result.add(new JSONObject(
+							"label", defn.name.getName(),
+							"detail", defn.getType().toString()));
+				}
+			}
+		}
 		
 		return new RPCMessageList(request, result);
 	}
@@ -646,9 +673,13 @@ public abstract class WorkspaceManager
 
 	abstract protected RPCMessageList checkLoadedFiles() throws Exception;
 
-	abstract public TCDefinition findDefinition(File file, int zline, int zcol);
+	abstract protected TCNode findLocation(File file, int zline, int zcol);
+
+	abstract protected TCDefinition findDefinition(File file, int zline, int zcol);
 
 	abstract public RPCMessageList findDefinition(RPCRequest request, File file, int zline, int zcol) throws IOException;
+
+	protected abstract TCDefinitionList lookupDefinition(String startsWith);
 
 	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);
 

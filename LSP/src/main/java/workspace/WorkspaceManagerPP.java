@@ -47,6 +47,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
@@ -59,6 +60,7 @@ import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.LSPDefinitionFinder;
+import vdmj.LSPDefinitionFinder.Found;
 
 public class WorkspaceManagerPP extends WorkspaceManager
 {
@@ -169,12 +171,29 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	}
 
 	@Override
-	public TCDefinition findDefinition(File file, int zline, int zcol)
+	protected TCNode findLocation(File file, int zline, int zcol)
 	{
 		if (tcClassList != null && !tcClassList.isEmpty())
 		{
 			LSPDefinitionFinder finder = new LSPDefinitionFinder();
-			return finder.find(tcClassList, file, zline + 1, zcol + 1);		// Convert from zero-relative
+			Found found = finder.findLocation(tcClassList, file, zline + 1, zcol + 1);
+			
+			if (found != null)
+			{
+				return found.node;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	protected TCDefinition findDefinition(File file, int zline, int zcol)
+	{
+		if (tcClassList != null && !tcClassList.isEmpty())
+		{
+			LSPDefinitionFinder finder = new LSPDefinitionFinder();
+			return finder.findDefinition(tcClassList, file, zline + 1, zcol + 1);		// Convert from zero-relative
 		}
 		else
 		{
@@ -207,6 +226,30 @@ public class WorkspaceManagerPP extends WorkspaceManager
 						"uri", defuri.toString(),
 						"range", Utils.lexLocationToRange(def.location)));
 		}
+	}
+
+	@Override
+	protected TCDefinitionList lookupDefinition(String startsWith)
+	{
+		TCDefinitionList results = new TCDefinitionList();
+		
+		for (TCClassDefinition cdef: tcClassList)
+		{
+			if (cdef.name.getName().startsWith(startsWith))
+			{
+				results.add(cdef);	// Add classes as well
+			}
+			
+			for (TCDefinition def: cdef.definitions)
+			{
+				if (def.name != null && def.name.getName().startsWith(startsWith))
+				{
+					results.add(def);
+				}
+			}
+		}
+		
+		return results;
 	}
 
 	@Override

@@ -45,6 +45,7 @@ import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
@@ -59,6 +60,7 @@ import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.LSPDefinitionFinder;
+import vdmj.LSPDefinitionFinder.Found;
 
 public class WorkspaceManagerSL extends WorkspaceManager
 {
@@ -163,12 +165,29 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	}
 
 	@Override
-	public TCDefinition findDefinition(File file, int zline, int zcol)
+	protected TCNode findLocation(File file, int zline, int zcol)
 	{
 		if (tcModuleList != null && !tcModuleList.isEmpty())
 		{
 			LSPDefinitionFinder finder = new LSPDefinitionFinder();
-			return finder.find(tcModuleList, file, zline + 1, zcol + 1);
+			Found found = finder.findLocation(tcModuleList, file, zline + 1, zcol + 1);
+			
+			if (found != null)
+			{
+				return found.node;
+			}
+		}
+
+		return null;
+	}
+
+	@Override
+	protected TCDefinition findDefinition(File file, int zline, int zcol)
+	{
+		if (tcModuleList != null && !tcModuleList.isEmpty())
+		{
+			LSPDefinitionFinder finder = new LSPDefinitionFinder();
+			return finder.findDefinition(tcModuleList, file, zline + 1, zcol + 1);
 		}
 		else
 		{
@@ -201,6 +220,25 @@ public class WorkspaceManagerSL extends WorkspaceManager
 						"uri", defuri.toString(),
 						"range", Utils.lexLocationToRange(def.location)));
 		}
+	}
+
+	@Override
+	protected TCDefinitionList lookupDefinition(String startsWith)
+	{
+		TCDefinitionList results = new TCDefinitionList();
+		
+		for (TCModule module: tcModuleList)
+		{
+			for (TCDefinition def: module.defs)
+			{
+				if (def.name != null && def.name.getName().startsWith(startsWith))
+				{
+					results.add(def);
+				}
+			}
+		}
+		
+		return results;
 	}
 
 	@Override
