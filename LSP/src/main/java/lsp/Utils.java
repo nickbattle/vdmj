@@ -108,7 +108,8 @@ public class Utils
 			return buffer.length();
 		}
 		
-		throw new RuntimeException("Cannot locate range");
+		Log.error("Cannot locate line %d character %s in buffer length %d", zline, zcol, buffer.length());
+		return -1;
 	}
 	
 	public static void diff(String message, String s1, String s2)
