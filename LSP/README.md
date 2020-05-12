@@ -43,3 +43,4 @@ For more information, contact @nickbattle.
 
 ![vscode session 1](images/vscode_screen.png)
 ![vscode session 2](images/completion_definitions.png)
+![vscode session 3](images/annotation_example.png)
