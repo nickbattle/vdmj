@@ -29,9 +29,9 @@ public enum WatchKind
 	CHANGE(2),
 	DELETE(3);	// Not as spec, but VSCode does
 
-	private final int value;
+	private final long value;
 	
-	private WatchKind(int value)
+	private WatchKind(long value)
 	{
 		this.value = value;
 	}

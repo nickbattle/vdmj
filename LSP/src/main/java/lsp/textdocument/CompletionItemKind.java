@@ -54,14 +54,14 @@ public enum CompletionItemKind
 	Operator(24),
 	TypeParameter(25);
 	
-	private final int value;
+	private final long value;
 	
-	private CompletionItemKind(int value)
+	private CompletionItemKind(long value)
 	{
 		this.value = value;
 	}
 	
-	public int getValue()
+	public Long getValue()
 	{
 		return value;
 	}

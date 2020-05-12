@@ -65,10 +65,12 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.DAPServer;
+import dap.DAPServerState;
 import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPInitializeResponse;
+import lsp.LSPServerState;
 import lsp.Utils;
 import lsp.textdocument.CompletionItemKind;
 import lsp.textdocument.SymbolKind;
@@ -88,6 +90,9 @@ public abstract class WorkspaceManager
 	
 	private Boolean noDebug;
 	protected Interpreter interpreter;
+
+	protected LSPServerState lspServerState;
+	protected DAPServerState dapServerState;
 	
 	public static WorkspaceManager getInstance(Dialect dialect) throws IOException
 	{
@@ -117,6 +122,16 @@ public abstract class WorkspaceManager
 			default:
 				throw new IOException("Unsupported dialect: " + dialect);
 		}
+	}
+
+	public void setLSPState(LSPServerState lspServerState)
+	{
+		this.lspServerState = lspServerState;
+	}
+
+	public void setDAPState(DAPServerState dapServerState)
+	{
+		this.dapServerState = dapServerState;
 	}
 
 	public RPCMessageList lspInitialize(RPCRequest request)
@@ -191,7 +206,8 @@ public abstract class WorkspaceManager
 	{
 		if (!canExecute())
 		{
-			DAPMessageList responses = new DAPMessageList(request);
+			DAPMessageList responses = new DAPMessageList();
+			responses.add(new DAPResponse(request, false, "Specification has errors, cannot launch", null));
 			responses.add(text("Cannot start interpreter: errors exist?"));
 			return responses;
 		}
@@ -712,6 +728,21 @@ public abstract class WorkspaceManager
 
 	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
+		if (interpreter != null)
+		{
+			// Clear the BPs since they are embedded in the tree and the next
+			// launch may have noDebug set.
+			
+			Set<Integer> bps = new HashSet<Integer>(interpreter.getBreakpoints().keySet());
+			
+			for (Integer bpno: bps)
+			{
+				interpreter.clearBreakpoint(bpno);
+			}
+			
+			interpreter = null;
+		}
+
 		DAPMessageList result = new DAPMessageList(request);
 		result.add(0, text("\nSession disconnected.\n"));
 		return result;

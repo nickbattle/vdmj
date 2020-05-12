@@ -55,14 +55,14 @@ public enum SymbolKind
 	Operator(25),
 	TypeParameter(26);
 	
-	private final int value;
+	private final long value;
 	
-	private SymbolKind(int value)
+	private SymbolKind(long value)
 	{
 		this.value = value;
 	}
 	
-	public int getValue()
+	public Long getValue()
 	{
 		return value;
 	}
