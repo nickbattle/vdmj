@@ -41,7 +41,10 @@ import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
 import com.fujitsu.vdmj.tc.types.TCClassType;
+import com.fujitsu.vdmj.tc.types.TCField;
+import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -172,16 +175,32 @@ public class LSPDefinitionFinder
 			}
 			else if (node instanceof TCFieldExpression)
 			{
-				TCFieldExpression field = (TCFieldExpression)node;
+				TCFieldExpression fexp = (TCFieldExpression)node;
 				
-				if (field.root.isRecord(field.location))
+				if (fexp.root.isRecord(fexp.location))
 				{
-		    		TCRecordType rec = field.root.getRecord();
-		    		return env.findType(rec.name, module.name.getName());
+		    		TCRecordType rec = fexp.root.getRecord();
+		    		TCField field = rec.findField(fexp.field.getName());
+		    		
+		    		if (field != null)
+		    		{
+			    		TCType type = field.type;
+			    		
+			    		while (type instanceof TCOptionalType)
+			    		{
+			    			type = ((TCOptionalType)type).type;
+			    		}
+			    		
+			    		if (type != null && type.definitions != null)
+			    		{
+			    			return type.definitions.get(0);
+			    		}
+		    		}
 				}
 			}
 			
-			Log.error("TCNode located, but unable to find definition %s", position);
+			Log.error("TCNode located, but unable to find definition of %s %s",
+							node.getClass().getSimpleName(), position);
 			return null;
 		}
 		else
