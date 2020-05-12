@@ -1,45 +1,121 @@
-# VDMJ LSP Server
+# VDMJ LSP/DAP Server
 
 This project contains a developmental LSP/DAP language server for the VDM dialects supported by VDMJ.
-It is intended to work with the vscode client, but it also works with lsp4e.
+It is intended to work with the VS Code IDE client, but it should also work with "lsp4e" in Eclipse.
+The testing has focused on VS Code.
 
-The server is started with -vdmsl, -vdmpp or -vdmrt to define the dialect to use, and -lsp and -dap options to pass the ports to listen on. It must include the VDMJ jar as well as LSP, and the annotations jars if you want to support them:
+## Installation
+
+Firstly, install VS Code itself. See [https://code.visualstudio.com/](https://code.visualstudio.com/). 
+
+When this project is finished, the LSP/DAP server and the VS Code clients will be combined into complete
+extensions and made available via the extensions Marketplace. But while the project is under test,
+the two parts - the dialect clients and the LSP/DAP server - must be installed manually, as follows:
+
+- Obtain the ZIP of **debug** VDM clients (see @nickbattle)
+- Unzip the three clients directly into the .vscode/extensions folder of your installation.
+
+To install the LSP/DAP server either extract the VDMJ Github repository and "mvn clean install" at the
+top level, or obtain the following jars from the VDMJ [Releases](https://github.com/nickbattle/vdmj/releases/tag/4.3.0-1) page.
+
+- `vdmj-4.3.0-<date>.jar`
+- `annotations-1.0.0-<date>.jar`
+- `annotations2-1.0.0-<date>.jar`
+- `lsp-0.0.1-SNAPSHOT-<date>.jar`
+
+The LSP/DAP server is executed by starting Java with these four jars. The main class is lsp.LSPServerSocket.
+
+`Usage: LSPServerSocket [-vdmsl | -vdmpp | -vdmrt] -lsp <port> -dap <port>`
+
+So one VDM dialect **must** be passed, along with the listening port for the LSP and DAP protocols. For example:
+
+`java -cp <jars> lsp.LSPServerSocket -vdmsl -lsp 8000 -dap 8001`
+
+Optionally, `-Dlog.filename=/some/file.log` may be specified to log server activity. This is recommended!
+
+## Editing VDM Specifications
+
+The easiest way to use the LSP server is to start the server (above), **before** starting VS Code. Strictly, the
+IDE does not need the server until a file is opened, but since VS Code remembers the open files from your last
+session, it usually needs the server immediately. If the server is not available, VS Code will log the error and
+then **stop talking to the server**. So the only option is to exit the IDE and restart it **after** starting the
+server.
+
+The server is expecting to use VS Code folders rather than multi-root workspaces.
+
+To start a new project folder, open VS Code and "Open Folder..." from the File menu. You can create a new folder,
+or open an existing one. The server will treat **all** files in the folder or subfolders (recursively) as part of
+your specification, as long as the files match the file extension for your dialect (eg. `*.vdmsl`, `*.vdmpp` or `*.vdmrt`).
+Other files in the folder will be ignored.
+
+File creation and deletion, moving and so on should work correctly.
+
+Syntax errors are returned for the file being edited as you type; the whole specification is type-checked when you
+save a file.
+
+The F12 key will navigate from a symbol name to its definition (eg. from a function call to its definition).
+
+Typing a "." after a record variable will offer field names to complete the expression, though the specification
+must be cleanly type-checked for this to work. Typing CTRL-SPACE will offer global names with which to complete
+the name you are typing.
+
+If you **close** the folder or open a new one, the server will be **told to shutdown**, so it may need to be restarted.
+
+## Execution
+
+To evaluate expressions against the specification for debugging, open the "Run..." panel. Initially, if there is
+no `.vscode/launch.json` file in your folder, you will be prompted to create one. Select the "VDM Debug"
+confguration; the default settings can be accepted. You can then launch the interpreter using the "Run" menu,
+or just by pressing F5. You cannot start the interpreter if there are type checking errors (warnings are ok).
+
+The debug console opens and allows you to enter multiple expressions to evaluate:
+
 ```
-java -Dlog.filename=/dev/tty
-    -cp annotations-1.0.0.jar:annotations2-1.0.0.jar:vdmj-4.3.0.jar:lsp-0.0.1-SNAPSHOT-200505.jar
-    lsp.LSPServerSocket -vdmpp -lsp 8000 -dap 8001
-```
-The log.filename option sends full logging to a file of your choice. This includes all LSP and DAP messages, as well as some internals:
-```
-20:43:11.024: LSP VDM_PP Server listening on port 8000
-20:43:11.034: DAP VDM_PP Server listening on port 8001
-20:43:17.561: >>> LSP {"jsonrpc":"2.0","id":0,"method":"initialize","params":{"processId":29453,"rootPath":"/home/nick/Digital Twins/VSCode/VSCodeWorkspacePP","rootUri":"file:///home/nick/Digital%20Twins/VSCode/VSCodeWorkspacePP","capabilities":{"workspace":{"applyEdit":true,"didChangeConfiguration":{"dynamicRegistration":true},"didChangeWatchedFiles":{"dynamicRegistration":true},"symbol":{"dynamicRegistration":true},"executeCommand":{"dynamicRegistration":true}},"textDocument":{"synchronization":{"dynamicRegistration":true,"willSave":true,"willSaveWaitUntil":true,"didSave":true},"completion":{"dynamicRegistration":true,"completionItem":{"snippetSupport":true,"commitCharactersSupport":true}},"hover":{"dynamicRegistration":true},"signatureHelp":{"dynamicRegistration":true},"definition":{"dynamicRegistration":true},"references":{"dynamicRegistration":true},"documentHighlight":{"dynamicRegistration":true},"documentSymbol":{"dynamicRegistration":true},"codeAction":{"dynamicRegistration":true},"codeLens":{"dynamicRegistration":true},"formatting":{"dynamicRegistration":true},"rangeFormatting":{"dynamicRegistration":true},"onTypeFormatting":{"dynamicRegistration":true},"rename":{"dynamicRegistration":true},"documentLink":{"dynamicRegistration":true}}},"trace":"off"}}
-20:43:17.603: <<< LSP { "jsonrpc" : "2.0", "result" : { "serverInfo" : { "name" : "VDMJ LSP Server", "version" : "0.1" }, "capabilities" : { "definitionProvider" : true, "documentSymbolProvider" : true, "textDocumentSync" : { "openClose" : true, "change" : 2 } } }, "id" : 0 }
-20:43:17.648: >>> LSP {"jsonrpc":"2.0","method":"initialized","params":{}}
-20:43:18.317: <<< LSP { "jsonrpc" : "2.0", "method" : "client/registerCapability", "params" : { "registrations" : [ { "id" : "12345", "method" : "workspace/didChangeWatchedFiles", "registerOptions" : { "watchers" : [ { "globPattern" : "**/*.vpp" }, { "globPattern" : "**/*.vdmpp" } ] } } ] }, "id" : -1 }
-20:43:18.320: <<< LSP { "jsonrpc" : "2.0", "method" : "textDocument/publishDiagnostics", "params" : { "uri" : "file:/home/nick/Digital%20Twins/VSCode/VSCodeWorkspacePP/debugging.vdmpp", "diagnostics" : [  ] } }
-20:43:18.322: <<< LSP { "jsonrpc" : "2.0", "method" : "textDocument/publishDiagnostics", "params" : { "uri" : "file:/home/nick/Digital%20Twins/VSCode/VSCodeWorkspacePP/factorial.vdmpp", "diagnostics" : [  ] } }
-20:43:18.324: >>> LSP {"jsonrpc":"2.0","method":"textDocument/didOpen","params":{"textDocument":{"uri":"file:///home/nick/Digital%20Twins/VSCode/VSCodeWorkspacePP/factorial.vdmpp","languageId":"VDM_PP","version":1,"text":"..."}}}
-20:43:18.326: Opening new file: /home/nick/Digital Twins/VSCode/VSCodeWorkspacePP/factorial.vdmpp
-...
-20:53:35.725: >>> DAP {"command":"initialize","arguments":{"clientID":"vscode","clientName":"Visual Studio Code","adapterID":"vdm","pathFormat":"path","linesStartAt1":true,"columnsStartAt1":true,"supportsVariableType":true,"supportsVariablePaging":true,"supportsRunInTerminalRequest":true,"locale":"en-gb","supportsProgressReporting":true},"type":"request","seq":1}
-20:53:35.732: <<< DAP { "type" : "response", "seq" : 1, "request_seq" : 1, "command" : "initialize", "success" : true, "body" : { "supportsConfigurationDoneRequest" : true, "supportsTerminateRequest" : true, "supportsCancelRequest" : false } }
-20:53:35.734: <<< DAP { "seq" : 1, "type" : "event", "event" : "initialized" }
-20:53:35.738: >>> DAP {"command":"launch","arguments":{"type":"vdm","request":"launch","name":"Launch VDM Debug","stopOnEntry":true,"noDebug":false,"defaultName":"Factorial","__sessionId":"8cc86c21-3ec4-47d2-bc82-20ee691987c0"},"type":"request","seq":2}
-20:53:35.768: <<< DAP { "type" : "response", "seq" : 2, "request_seq" : 2, "command" : "launch", "success" : true }
-20:53:35.768: <<< DAP { "type" : "event", "seq" : 3, "event" : "output", "body" : { "output" : "*\n* VDMJ VDM_PP Interpreter\n* DEBUG enabled\n*\n\nDefault class is Factorial\n" } }
-20:53:35.769: <<< DAP { "type" : "event", "seq" : 4, "event" : "output", "body" : { "output" : "Initialized in 0.025 secs.\n" } }
-20:53:35.770: >>> DAP {"command":"setBreakpoints","arguments":{"source":{"name":"debugging.vdmpp","path":"/home/nick/Digital Twins/VSCode/VSCodeWorkspacePP/debugging.vdmpp"},"lines":[28],"breakpoints":[{"line":28}],"sourceModified":false},"type":"request","seq":3}
-20:53:35.776: <<< DAP { "type" : "response", "seq" : 5, "request_seq" : 3, "command" : "setBreakpoints", "success" : true, "body" : { "breakpoints" : [ { "verified" : true } ] } }
-20:53:35.777: >>> DAP {"command":"setBreakpoints","arguments":{"source":{"name":"factorial.vdmpp","path":"/home/nick/Digital Twins/VSCode/VSCodeWorkspacePP/factorial.vdmpp"},"lines":[40,54],"breakpoints":[{"line":40},{"line":54}],"sourceModified":false},"type":"request","seq":4}
-20:53:35.780: <<< DAP { "type" : "response", "seq" : 6, "request_seq" : 4, "command" : "setBreakpoints", "success" : true, "body" : { "breakpoints" : [ { "verified" : true }, { "verified" : true } ] } }
-20:53:35.885: >>> DAP {"command":"configurationDone","type":"request","seq":5}
-20:53:35.886: <<< DAP { "type" : "response", "seq" : 7, "request_seq" : 5, "command" : "configurationDone", "success" : true }
-20:53:35.891: >>> DAP {"command":"threads","type":"request","seq":6}
-20:53:35.892: <<< DAP { "type" : "response", "seq" : 8, "request_seq" : 6, "command" : "threads", "success" : true, "body" : { "threads" : [  ] } }
+*
+* VDMJ VDM_SL Interpreter
+* DEBUG enabled
+*
+
+Default module is DEFAULT
+Initialized in 0.001 secs.
+fac(10)
+= 3628800
+Executed in 6.105 secs.
+1+1
+= 2
+Executed in 0.003 secs.
+
 ```
 
-For more information, contact @nickbattle.
+If breakpoints have been set, the evaluation will stop and can be single stepped (over, in, out) or continued,
+stack frames and values viewed and watched, using standard VS Code controls.
+
+CTRL-F5 launches a session with debugging disabled (breakpoints are ignored).
+
+You can modify a specification while debugging, but the changes you make will not take effect until you start a
+new debug session. You will be given an error if you attempt a new expression evaluation without a restart. 
+
+## Problems
+
+Various things do not work perfectly yet:
+
+- The F12 navigation does not work correctly for a few expressions that involve types. For example, you cannot
+navigate to the `Clock` definition in the expression `is_(var, Clock)`. But most common type usage is OK,
+like record field definitions or function signatures.
+- The "." field completion is awkward to use because it requires the spec to be type-checked. So if you type
+`var.field`, the field part will not be offered unless you type `var`, then save the spec to type check it, and
+then type ".".
+- If you click the "Stop" (Shift-F5) debugging button, the session is usually closed and the debug console says
+so. But if you click Stop at a breakpoint or an exception that has been caught, control returns to the debug
+console and the session is still active. Clicking Stop once again will stop for real.
+- If the LSP server gets confused, the best way forward is to stop the IDE and server, restart the server and restart
+the IDE. VS Code remembers where you were and you are unlikely to lose work.
+- The `log.filename` output is quite verbose, so be careful about log file sizes. Note that (on Linux systems)
+you can set the filename to `/dev/tty` to just spool to the terminal.
+
+
+
+For more information or if you have problems, contact @nickbattle.
 
 ![vscode session 1](images/vscode_screen.png)
 ![vscode session 2](images/completion_definitions.png)
