@@ -41,4 +41,5 @@ The log.filename option sends full logging to a file of your choice. This includ
 
 For more information, contact @nickbattle.
 
-![vscode session](images/vscode_screen.png)
+![vscode session 1](images/vscode_screen.png)
+![vscode session 2](images/completion_definitions.png)

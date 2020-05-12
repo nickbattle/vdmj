@@ -49,6 +49,7 @@ public class LSPServerState
 	public void setManager(WorkspaceManager manager)
 	{
 		this.manager = manager;
+		manager.setLSPState(this);
 	}
 
 	public void setRunning(boolean running)

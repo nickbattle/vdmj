@@ -355,6 +355,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 				DAPMessageList responses = new DAPMessageList(request,
 						new JSONObject("result", "Cannot start interpreter: errors exist?", "variablesReference", 0));
 				prompt(responses);
+				dapServerState.setRunning(false);
 				return responses;
 			}
 			else if (getInterpreter().getIN() != inClassList)

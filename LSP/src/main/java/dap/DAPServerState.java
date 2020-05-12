@@ -39,6 +39,7 @@ public class DAPServerState
 	{
 		this.dialect = dialect;
 		this.manager = WorkspaceManager.getInstance(dialect);
+		manager.setDAPState(this);
 	}
 	
 	public WorkspaceManager getManager()
