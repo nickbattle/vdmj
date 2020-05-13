@@ -1,7 +1,7 @@
 # VDMJ LSP/DAP Server
 
 This project contains a developmental LSP/DAP language server for the VDM dialects supported by VDMJ.
-It is intended to work with the VS Code IDE client, but it should also work with "lsp4e" in Eclipse.
+It is intended to work with the VS Code IDE client, but it should also work with `lsp4e` in Eclipse.
 The testing has focused on VS Code.
 
 ## Installation
@@ -12,10 +12,10 @@ When this project is finished, the LSP/DAP server and the VS Code clients will b
 extensions and made available via the extensions Marketplace. But while the project is under test,
 the two parts - the dialect clients and the LSP/DAP server - must be installed manually, as follows:
 
-- Obtain the ZIP of **debug** VDM clients (see @nickbattle)
+- Obtain the ZIP of **debug** VDM VS Code clients (see @nickbattle)
 - Unzip the three clients directly into the .vscode/extensions folder of your installation.
 
-To install the LSP/DAP server either extract the VDMJ Github repository and "mvn clean install" at the
+To install the LSP/DAP server, either extract the VDMJ Github repository and "mvn clean install" at the
 top level, or obtain the following jars from the VDMJ [Releases](https://github.com/nickbattle/vdmj/releases/tag/4.3.0-1) page.
 
 - `vdmj-4.3.0-<date>.jar`
@@ -23,11 +23,11 @@ top level, or obtain the following jars from the VDMJ [Releases](https://github.
 - `annotations2-1.0.0-<date>.jar`
 - `lsp-0.0.1-SNAPSHOT-<date>.jar`
 
-The LSP/DAP server is executed by starting Java with these four jars. The main class is lsp.LSPServerSocket.
+The LSP/DAP server is executed by starting Java with these four jars. The annotations jars are optional, but useful. The main class is lsp.LSPServerSocket.
 
 `Usage: LSPServerSocket [-vdmsl | -vdmpp | -vdmrt] -lsp <port> -dap <port>`
 
-So one VDM dialect **must** be passed, along with the listening port for the LSP and DAP protocols. For example:
+Note that one VDM dialect **must** be passed, along with the listening port for the LSP and DAP protocols. For example:
 
 `java -cp <jars> lsp.LSPServerSocket -vdmsl -lsp 8000 -dap 8001`
 
@@ -41,30 +41,28 @@ session, it usually needs the server immediately. If the server is not available
 then **stop talking to the server**. So the only option is to exit the IDE and restart it **after** starting the
 server.
 
-The server is expecting to use VS Code folders rather than multi-root workspaces.
+The LSP server uses VS Code folders rather than multi-root workspaces.
 
-To start a new project folder, open VS Code and "Open Folder..." from the File menu. You can create a new folder,
-or open an existing one. The server will treat **all** files in the folder or subfolders (recursively) as part of
-your specification, as long as the files match the file extension for your dialect (eg. `*.vdmsl`, `*.vdmpp` or `*.vdmrt`).
-Other files in the folder will be ignored.
+To start a new project folder, open VS Code and `Open Folder...` from the File menu. You can create a new folder,
+or open an existing one. The server will treat **all** files in the folder and subfolders (recursively) as part of
+the same specification, as long as the files match the file extension for the chosen dialect (eg. `*.vdmsl`, `*.vdmpp` or `*.vdmrt`). Other files in the folder will be ignored.
 
-File creation and deletion, moving and so on should work correctly.
+File and folder creation and deletion, moving and so on should work correctly.
 
-Syntax errors are returned for the file being edited as you type; the whole specification is type-checked when you
+Syntax errors are displayed for the file being edited as you type; the whole specification is type-checked when you
 save a file.
 
 The F12 key will navigate from a symbol name to its definition (eg. from a function call to its definition).
 
-Typing a "." after a record variable will offer field names to complete the expression, though the specification
-must be cleanly type-checked for this to work. Typing CTRL-SPACE will offer global names with which to complete
-the name you are typing.
+Typing a "." after a record variable will offer field names to complete the expression. Typing CTRL-SPACE will offer
+global names with which to complete the name you are typing.
 
-If you **close** the folder or open a new one, the server will be **told to shutdown**, so it may need to be restarted.
+If you **close** the project folder or open a new one, the LSP server will be **told to shutdown**, so it will need to be restarted.
 
 ## Execution
 
-To evaluate expressions against the specification for debugging, open the "Run..." panel. Initially, if there is
-no `.vscode/launch.json` file in your folder, you will be prompted to create one. Select the "VDM Debug"
+To evaluate expressions against the specification for debugging, open the `Run...` panel. Initially, if there is
+no `.vscode/launch.json` file in your folder, you will be prompted to create one. Select the `VDM Debug`
 confguration; the default settings can be accepted. You can then launch the interpreter using the "Run" menu,
 or just by pressing F5. You cannot start the interpreter if there are type checking errors (warnings are ok).
 
@@ -86,14 +84,18 @@ Executed in 6.105 secs.
 Executed in 0.003 secs.
 
 ```
+The default module or class can be changed by typing the name (eg. evaluate "A" to change the default to module A).
 
 If breakpoints have been set, the evaluation will stop and can be single stepped (over, in, out) or continued,
-stack frames and values viewed and watched, using standard VS Code controls.
+stack frames and values viewed and watched, using standard VS Code controls. Multi-threaded VDM++ debugging should
+work correctly.
 
-CTRL-F5 launches a session with debugging disabled (breakpoints are ignored).
+CTRL-F5 launches a session with debugging disabled (breakpoints will be ignored).
 
 You can modify a specification while debugging, but the changes you make will not take effect until you start a
-new debug session. You will be given an error if you attempt a new expression evaluation without a restart. 
+new debug session. You will be given an error if you attempt a new expression evaluation without a restart.
+
+There are some screenshots below.
 
 ## Problems
 
@@ -105,9 +107,9 @@ like record field definitions or function signatures.
 - The "." field completion is awkward to use because it requires the spec to be type-checked. So if you type
 `var.field`, the field part will not be offered unless you type `var`, then save the spec to type check it, and
 then type ".".
-- If you click the "Stop" (Shift-F5) debugging button, the session is usually closed and the debug console says
-so. But if you click Stop at a breakpoint or an exception that has been caught, control returns to the debug
-console and the session is still active. Clicking Stop once again will stop for real.
+- If you click the `Stop` (Shift-F5 or the red square) debugging button, the session is usually closed and the debug
+console says so. But if you click `Stop` at a breakpoint or an exception that has been caught, control returns to the debug
+console and the session is still active. Clicking `Stop` once again will stop for real.
 - If the LSP server gets confused, the best way forward is to stop the IDE and server, restart the server and restart
 the IDE. VS Code remembers where you were and you are unlikely to lose work.
 - The `log.filename` output is quite verbose, so be careful about log file sizes. Note that (on Linux systems)
