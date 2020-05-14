@@ -94,6 +94,7 @@ import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.runtime.Tracepoint;
+import com.fujitsu.vdmj.scheduler.MainThread;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -1247,16 +1248,19 @@ public class DBGPReader extends DebugLink
 		{
 			threadInstances.remove(Thread.currentThread().getName());
 			
-			try
+			if (!(Thread.currentThread() instanceof MainThread))	// Don't close main link to client
 			{
-				if (socket != null)
+				try
 				{
-					socket.close();
+					if (socket != null)
+					{
+						socket.close();
+					}
 				}
-			}
-			catch (IOException e)
-			{
-				// ?
+				catch (IOException e)
+				{
+					// ?
+				}
 			}
 		}
 	}
