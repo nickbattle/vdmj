@@ -198,7 +198,7 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
 
     			for (ContextException e: trouble)
     			{
-    				Console.out.println(e);
+    				Console.out.println(e.toString());
     			}        		
         	}
 		}
@@ -210,7 +210,7 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
 
 			for (ContextException e: trouble)
 			{
-				Console.err.println(e);
+				Console.err.println(e.toString());
 
 				if (e.number != 4034)	// Not in scope err
 				{

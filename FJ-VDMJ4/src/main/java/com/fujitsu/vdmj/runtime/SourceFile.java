@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.ast.lex.LexNameList;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 
@@ -116,7 +117,7 @@ public class SourceFile
 		}
 	}
 	
-	public void printCoverage(PrintWriter out)
+	public void printCoverage(ConsoleWriter out)
 	{
 		List<Integer> hitlist = LexLocation.getHitList(filename);
 		List<Integer> srclist = LexLocation.getSourceList(filename);

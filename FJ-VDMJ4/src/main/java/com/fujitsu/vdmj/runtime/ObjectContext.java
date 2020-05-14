@@ -23,9 +23,8 @@
 
 package com.fujitsu.vdmj.runtime;
 
-import java.io.PrintWriter;
-
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.ObjectValue;
@@ -138,7 +137,7 @@ public class ObjectContext extends RootContext
 	}
 
 	@Override
-	public void printStackTrace(PrintWriter out, boolean variables)
+	public void printStackTrace(ConsoleWriter out, boolean variables)
 	{
 		if (outer == null)		// Don't expand initial context
 		{

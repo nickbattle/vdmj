@@ -25,20 +25,38 @@ package com.fujitsu.vdmj.dbgp;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 import com.fujitsu.vdmj.dbgp.DBGPReader;
 import com.fujitsu.vdmj.dbgp.DBGPRedirect;
+import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.messages.ConsoleWriter;
 
-abstract public class Redirector extends PrintWriter
+abstract public class Redirector implements ConsoleWriter
 {
+	protected final PrintWriter out;
 	protected DBGPRedirect type;
 	protected DBGPReader dbgp;
 
-	public Redirector(OutputStreamWriter out)
+	public Redirector(PrintWriter out)
 	{
-		super(out, true);
+		this.out = out;
 		this.type = DBGPRedirect.DISABLE;
 		this.dbgp = null;
+	}
+
+	public static void initRedirectors(String cs)
+	{
+		try
+		{
+			Console.init(cs,
+				new StdoutRedirector(new PrintWriter(new OutputStreamWriter(System.out, cs))),
+				new StderrRedirector(new PrintWriter(new OutputStreamWriter(System.err, cs))));
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			System.err.println("Console encoding exception: " + e);
+		}
 	}
 
 	public void redirect(DBGPRedirect t, DBGPReader d)
@@ -46,19 +64,31 @@ abstract public class Redirector extends PrintWriter
 		this.type = t;
 		this.dbgp = d;
 	}
+	
+	@Override
+	abstract public void print(String line);
 
 	@Override
 	public void println(String line)
 	{
 		print(line + "\n");
-		flush();
 	}
 
 	@Override
-	public PrintWriter printf(String format, Object ... args)
+	public void printf(String format, Object ... args)
 	{
 		print(String.format(format, args));
-		flush();
-		return this;
+	}
+
+	@Override
+	public void println()
+	{
+		print("\n");
+	}
+
+	@Override
+	public void close()
+	{
+		out.close();
 	}
 }

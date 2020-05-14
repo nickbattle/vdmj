@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.messages.ConsolePrintWriter;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
@@ -175,7 +176,7 @@ abstract public class OvertureTest extends TestCase
 		}
 		catch (ContextException e)
 		{
-			Console.out.println(e);
+			Console.out.println(e.toString());
 			actual.add(new VDMError(e));
 			checkErrors(actual);
 		}
@@ -277,7 +278,7 @@ abstract public class OvertureTest extends TestCase
 		}
 		catch (ContextException e)
 		{
-			Console.out.println(e);
+			Console.out.println(e.toString());
 
 			if (e.number != error)
 			{
@@ -338,7 +339,7 @@ abstract public class OvertureTest extends TestCase
 			Interpreter interpreter = new ClassInterpreter(runnable, checked);
 			interpreter.init();
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			PrintWriter pw = new PrintWriter(out);
+			ConsolePrintWriter pw = new ConsolePrintWriter(out);
 			// TraceStatement.setOutput(pw);
 			Interpreter.setTraceOutput(pw);
 
@@ -360,7 +361,7 @@ abstract public class OvertureTest extends TestCase
 		}
 		catch (ContextException e)
 		{
-			Console.out.println(e);
+			Console.out.println(e.toString());
 
 			if (e.number != error)
 			{

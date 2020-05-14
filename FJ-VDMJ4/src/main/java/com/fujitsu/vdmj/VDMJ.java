@@ -166,7 +166,7 @@ abstract public class VDMJ
     		{
     			if (i.hasNext())
     			{
-    				Console.setCharset(validateCharset(i.next()));
+    				Console.init(validateCharset(i.next()));
     			}
     			else
     			{
@@ -554,13 +554,11 @@ abstract public class VDMJ
 	protected static void print(String m)
 	{
 		Console.out.print(m);
-		Console.out.flush();
 	}
 
 	protected static void println(String m)
 	{
 		Console.out.println(m);
-		Console.out.flush();
 	}
 
 	protected String plural(int n, String s, String pl)

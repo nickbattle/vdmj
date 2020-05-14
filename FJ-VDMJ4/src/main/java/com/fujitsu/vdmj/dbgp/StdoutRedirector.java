@@ -24,11 +24,13 @@
 package com.fujitsu.vdmj.dbgp;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+
+import com.fujitsu.vdmj.messages.Console;
 
 public class StdoutRedirector extends Redirector
 {
-	public StdoutRedirector(OutputStreamWriter out)
+	public StdoutRedirector(PrintWriter out)
 	{
 		super(out);
 	}
@@ -41,11 +43,11 @@ public class StdoutRedirector extends Redirector
     		switch (type)
     		{
     			case DISABLE:
-    				super.print(line);
+    				out.print(line);
     				break;
 
     			case COPY:
-    				super.print(line);
+    				out.print(line);
     				dbgp.stdout(line);
     				break;
 
@@ -56,7 +58,15 @@ public class StdoutRedirector extends Redirector
 		}
 		catch (IOException e)
 		{
-			super.print(line);		// Better than ignoring it??
+			out.print(line);		// Better than ignoring it??
+		}
+	}
+	
+	public static void directStdout(DBGPReader reader, DBGPRedirect redirect)
+	{
+		if (Console.out instanceof Redirector)
+		{
+			((Redirector)Console.out).redirect(redirect, reader);
 		}
 	}
 }

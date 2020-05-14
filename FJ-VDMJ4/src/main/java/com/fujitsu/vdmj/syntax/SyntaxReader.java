@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.syntax;
 
-import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
@@ -43,6 +42,7 @@ import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.LocatedException;
 import com.fujitsu.vdmj.messages.VDMError;
@@ -760,7 +760,7 @@ public abstract class SyntaxReader
 	 * Print errors and warnings to the PrintWriter passed.
 	 */
 
-	public void printErrors(PrintWriter out)
+	public void printErrors(ConsoleWriter out)
 	{
 		for (VDMError e: getErrors())
 		{
@@ -768,7 +768,7 @@ public abstract class SyntaxReader
 		}
 	}
 
-	public void printWarnings(PrintWriter out)
+	public void printWarnings(ConsoleWriter out)
 	{
 		for (VDMWarning w: getWarnings())
 		{

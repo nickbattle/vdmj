@@ -26,14 +26,9 @@ package com.fujitsu.vdmj.messages;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-
-import com.fujitsu.vdmj.dbgp.DBGPReader;
-import com.fujitsu.vdmj.dbgp.DBGPRedirect;
-import com.fujitsu.vdmj.dbgp.Redirector;
-import com.fujitsu.vdmj.dbgp.StderrRedirector;
-import com.fujitsu.vdmj.dbgp.StdoutRedirector;
 
 public class Console
 {
@@ -41,10 +36,10 @@ public class Console
 	public static String charset;
 
 	/** A print writer for stdout that uses a given encoding. */
-	public static Redirector out;
+	public static ConsoleWriter out;
 
 	/** A print writer for stderr that uses a given encoding. */
-	public static Redirector err;
+	public static ConsoleWriter err;
 
 	/** A buffered reader for stdin that uses a given encoding. */
 	public static BufferedReader in;
@@ -54,33 +49,32 @@ public class Console
 		init(Charset.defaultCharset().name());
 	}
 
-	public static void setCharset(String cs)
-	{
-		init(cs);
-	}
-
-	private static void init(String cs)
+	public static void init(String cs)
 	{
 		try
 		{
-			charset = cs;
-			out = new StdoutRedirector(new OutputStreamWriter(System.out, charset));
-			err = new StderrRedirector(new OutputStreamWriter(System.err, charset));
-			in = new BufferedReader(new InputStreamReader(System.in, charset));
+			init(cs,
+				new ConsolePrintWriter(new PrintWriter(new OutputStreamWriter(System.out, cs))),
+				new ConsolePrintWriter(new PrintWriter(new OutputStreamWriter(System.err, cs))));
 		}
 		catch (UnsupportedEncodingException e)
 		{
 			System.err.println("Console encoding exception: " + e);
 		}
 	}
-
-	public static synchronized void directStdout(DBGPReader reader, DBGPRedirect redirect)
+	
+	public static void init(String cs, ConsoleWriter stdout, ConsoleWriter stderr)
 	{
-		out.redirect(redirect, reader);
-	}
-
-	public static synchronized void directStderr(DBGPReader reader, DBGPRedirect redirect)
-	{
-		err.redirect(redirect, reader);
+		try
+		{
+			charset = cs;
+			out = stdout;
+			err = stderr;
+			in = new BufferedReader(new InputStreamReader(System.in, charset));
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			System.err.println("Console encoding exception: " + e);
+		}
 	}
 }

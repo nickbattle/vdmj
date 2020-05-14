@@ -289,7 +289,6 @@ public class Breakpoint implements Serializable
 	protected void print(String line)
 	{
 		Console.out.print(line);
-		Console.out.flush();
 	}
 
 	protected void println(String line)

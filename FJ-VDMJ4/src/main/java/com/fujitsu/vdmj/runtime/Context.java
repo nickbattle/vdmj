@@ -23,12 +23,12 @@
 
 package com.fujitsu.vdmj.runtime;
 
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.CPUValue;
@@ -301,7 +301,7 @@ public class Context extends HashMap<TCNameToken, Value>
 	private static final int FRAMES_LIMIT	= 50;	// Top count
 	private static final int TAIL_LIMIT		= 5;	// Bottom count
 	
-	public void printStackFrames(PrintWriter out)
+	public void printStackFrames(ConsoleWriter out)
 	{
 		Context frame = this;
 		out.print(format("\t", frame));
@@ -344,7 +344,7 @@ public class Context extends HashMap<TCNameToken, Value>
 		out.println("In context of " + frame.title);
 	}
 
-	public void printStackTrace(PrintWriter out, boolean variables)
+	public void printStackTrace(ConsoleWriter out, boolean variables)
 	{
 		if (outer == null)		// Don't expand initial context
 		{
