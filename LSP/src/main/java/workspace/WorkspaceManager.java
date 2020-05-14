@@ -29,7 +29,6 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,6 +44,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.Breakpoint;
@@ -751,8 +751,6 @@ public abstract class WorkspaceManager
 	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
 	{
 		DAPDebugReader dbg = null;
-		PrintStream stdout = System.out;
-		PrintStream stderr = System.err;
 		
 		try
 		{
@@ -760,8 +758,9 @@ public abstract class WorkspaceManager
 			dbg.start();
 			
 			long before = System.currentTimeMillis();
-			System.setOut(DAPServer.getInstance().getOutPrintStream());
-			System.setErr(DAPServer.getInstance().getErrPrintStream());
+			Console.init("UTF-8",
+					DAPServer.getInstance().getOutConsoleWriter(),
+					DAPServer.getInstance().getErrConsoleWriter());
 			Value result = getInterpreter().execute(expression);
 			long after = System.currentTimeMillis();
 			
@@ -780,9 +779,8 @@ public abstract class WorkspaceManager
 		}
 		finally
 		{
-			System.setOut(stdout);
-			System.setErr(stderr);
-			
+			Console.init("UTF-8");
+
 			if (dbg != null)
 			{
 				dbg.interrupt();	// Stop the debugger reader.

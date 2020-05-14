@@ -24,11 +24,11 @@
 package dap;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.Socket;
 import java.net.SocketException;
 
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.messages.ConsoleWriter;
 
 import dap.handlers.DisconnectHandler;
 import dap.handlers.EvaluateHandler;
@@ -146,13 +146,13 @@ public class DAPServer extends JSONServer
 		}
 	}
 
-	public PrintStream getOutPrintStream() throws IOException
+	public ConsoleWriter getOutConsoleWriter() throws IOException
 	{
-		return new DAPOutPrintStream(this, socket.getOutputStream());
+		return new DAPOutConsoleWriter(this);
 	}
 
-	public PrintStream getErrPrintStream() throws IOException
+	public ConsoleWriter getErrConsoleWriter() throws IOException
 	{
-		return new DAPErrPrintStream(this, socket.getOutputStream());
+		return new DAPErrConsoleWriter(this);
 	}
 }

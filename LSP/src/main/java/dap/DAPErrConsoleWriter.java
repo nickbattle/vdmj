@@ -23,16 +23,14 @@
 
 package dap;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
+import com.fujitsu.vdmj.messages.ConsoleWriter;
 
-public class DAPErrPrintStream extends PrintStream
+public class DAPErrConsoleWriter implements ConsoleWriter
 {
 	private final DAPServer server;
 	
-	public DAPErrPrintStream(DAPServer server, OutputStream out)
+	public DAPErrConsoleWriter(DAPServer server)
 	{
-		super(out, true);
 		this.server = server;
 	}
 	
@@ -49,9 +47,20 @@ public class DAPErrPrintStream extends PrintStream
 	}
 	
 	@Override
-	public PrintStream printf(String format, Object... args)
+	public void printf(String format, Object... args)
 	{
 		server.stderr(String.format(format, args));
-		return this;
+	}
+
+	@Override
+	public void println()
+	{
+		server.stderr("\n");
+	}
+
+	@Override
+	public void close()
+	{
+		// ignore
 	}
 }
