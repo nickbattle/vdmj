@@ -25,7 +25,7 @@ package com.fujitsu.vdmj.dbgp;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import com.fujitsu.vdmj.dbgp.DBGPReader;
 import com.fujitsu.vdmj.dbgp.DBGPRedirect;
@@ -45,18 +45,11 @@ abstract public class Redirector implements ConsoleWriter
 		this.dbgp = null;
 	}
 
-	public static void initRedirectors(String cs)
+	public static void initRedirectors()	// Note: dbgp doesn't use charset
 	{
-		try
-		{
-			Console.init(cs,
-				new StdoutRedirector(new PrintWriter(new OutputStreamWriter(System.out, cs))),
-				new StderrRedirector(new PrintWriter(new OutputStreamWriter(System.err, cs))));
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			System.err.println("Console encoding exception: " + e);
-		}
+		Console.init(Charset.defaultCharset().name(),
+			new StdoutRedirector(new PrintWriter(new OutputStreamWriter(System.out))),
+			new StderrRedirector(new PrintWriter(new OutputStreamWriter(System.err))));
 	}
 
 	public void redirect(DBGPRedirect t, DBGPReader d)

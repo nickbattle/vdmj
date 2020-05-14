@@ -172,7 +172,8 @@ public class DBGPReader extends DebugLink
 		String remoteName = null;
 		Class<RemoteControl> remoteClass = null;
 
-		Properties.init();		// Read properties file, if any
+		Properties.init();				// Read properties file, if any
+		Redirector.initRedirectors();	// Allow stdio redirection to client
 
 		for (Iterator<String> i = largs.iterator(); i.hasNext();)
 		{
