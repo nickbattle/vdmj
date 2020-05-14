@@ -7,5 +7,4 @@ package annotations.ast to annotations.tc;
 map ASTChangesAnnotation{name, args} to TCChangesAnnotation(name, args);
 map ASTTestAnnotation{name, args} to TCTestAnnotation(name, args);
 map ASTGhostAnnotation{name, args} to TCNullAnnotation(name, args);
-map ASTOnFailAnnotation{name, args} to TCOnFailAnnotation(name, args);
 

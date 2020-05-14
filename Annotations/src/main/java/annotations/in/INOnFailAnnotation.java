@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INStringLiteralExpression;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
@@ -63,7 +64,7 @@ public class INOnFailAnnotation extends INAnnotation
 					 fmts = fmts.substring(0, fmts.length() - 1);
 				}
 							
-				System.out.printf(fmts + location + "\n", values);
+				Console.out.printf(fmts + location + "\n", values);
 			}
 		}
 		catch (ValueException e)

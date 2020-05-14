@@ -27,7 +27,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +47,7 @@ import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.scheduler.ResourceScheduler;
@@ -479,9 +479,9 @@ abstract public class Interpreter
 		return null;
 	}
 
-	private static PrintWriter writer = null;
+	private static ConsoleWriter writer = null;
 
-	public static void setTraceOutput(PrintWriter pw)
+	public static void setTraceOutput(ConsoleWriter pw)
 	{
 		writer = pw;
 	}

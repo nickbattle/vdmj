@@ -123,7 +123,6 @@ public class MainThread extends SchedulableThread
 	public void setException(Exception e)
 	{
 		Console.err.println(e.getMessage());
-		Console.err.flush();
 		exception = e;
 	}
 	

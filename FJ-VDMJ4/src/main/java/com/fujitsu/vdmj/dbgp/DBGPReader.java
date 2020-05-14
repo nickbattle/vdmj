@@ -80,6 +80,7 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.messages.ConsolePrintWriter;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -95,6 +96,7 @@ import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.runtime.Tracepoint;
+import com.fujitsu.vdmj.scheduler.MainThread;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -172,7 +174,8 @@ public class DBGPReader extends DebugLink
 		String remoteName = null;
 		Class<RemoteControl> remoteClass = null;
 
-		Properties.init();		// Read properties file, if any
+		Properties.init();				// Read properties file, if any
+		Redirector.initRedirectors();	// Allow stdio redirection to client
 
 		for (Iterator<String> i = largs.iterator(); i.hasNext();)
 		{
@@ -726,7 +729,7 @@ public class DBGPReader extends DebugLink
 		sb.append("idekey=\"" + ideKey + "\" ");
 		sb.append("session=\"" + sessionId + "\" ");
 		sb.append("thread=\"");
-		sb.append(Thread.currentThread().getName());
+		sb.append(Thread.currentThread().getId());
 
 		if (cpu != null)
 		{
@@ -1269,16 +1272,19 @@ public class DBGPReader extends DebugLink
 		{
 			threadInstances.remove(Thread.currentThread().getName());
 			
-			try
+			if (!(Thread.currentThread() instanceof MainThread))	// Don't close main link to client
 			{
-				if (socket != null)
+				try
 				{
-					socket.close();
+					if (socket != null)
+					{
+						socket.close();
+					}
 				}
-			}
-			catch (IOException e)
-			{
-				// ?
+				catch (IOException e)
+				{
+					// ?
+				}
 			}
 		}
 	}
@@ -2456,7 +2462,7 @@ public class DBGPReader extends DebugLink
 		}
 
 		DBGPRedirect redirect = DBGPRedirect.lookup(option.value);
-		Console.directStdout(this, redirect);
+		StdoutRedirector.directStdout(this, redirect);
 
 		response(new StringBuilder("success=\"1\""), null);
 	}
@@ -2472,7 +2478,7 @@ public class DBGPReader extends DebugLink
 		}
 
 		DBGPRedirect redirect = DBGPRedirect.lookup(option.value);
-		Console.directStderr(this, redirect);
+		StderrRedirector.directStderr(this, redirect);
 
 		response(new StringBuilder("success=\"1\""), null);
 	}
@@ -2664,7 +2670,7 @@ public class DBGPReader extends DebugLink
 		}
 
 		OutputStream out = new ByteArrayOutputStream();
-		PrintWriter pw = new PrintWriter(out);
+		ConsolePrintWriter pw = new ConsolePrintWriter(out);
 		pw.println("Stopped [" + Thread.currentThread().getName() + "] " + breakpoint.location);
 		breakContext.printStackTrace(pw, true);
 		pw.close();
@@ -2849,7 +2855,7 @@ public class DBGPReader extends DebugLink
 		else
 		{
 			OutputStream out = new ByteArrayOutputStream();
-			PrintWriter pw = new PrintWriter(out);
+			ConsolePrintWriter pw = new ConsolePrintWriter(out);
 			source.printCoverage(pw);
 			pw.close();
 			cdataResponse(out.toString());
@@ -2882,7 +2888,7 @@ public class DBGPReader extends DebugLink
 			boolean debug = Boolean.parseBoolean(parts[3]);
 
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			PrintWriter pw = new PrintWriter(out);
+			ConsolePrintWriter pw = new ConsolePrintWriter(out);
 			Interpreter.setTraceOutput(pw);
 			breaksSuspended = !debug;
 			interpreter.runtrace(parts[0], startTest, endTest, debug);

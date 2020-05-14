@@ -96,7 +96,6 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 			while (command == null)
 			{
     			Console.out.printf("%s> ", debuggedThread.getName());
-    			Console.out.flush();
     			command = DebugParser.parse(Console.in.readLine().trim());
 			}
 			
@@ -126,7 +125,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 							return false;
 
 						default:
-							Console.out.println(response); // toString of commands are sensible
+							Console.out.println(response.toString());	// toString of commands are sensible
 							return true;
 					}
 				}

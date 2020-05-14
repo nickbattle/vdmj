@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.ConsolePrintWriter;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -212,7 +213,7 @@ public class ConsoleDebugExecutor implements DebugExecutor
 		sb.append("\n");
 		
 		StringWriter sw = new StringWriter();
-		getFrame().printStackTrace(new PrintWriter(sw), true);
+		getFrame().printStackTrace(new ConsolePrintWriter(new PrintWriter(sw)), true);
 		sb.append(sw.toString());
 		
 		return new DebugCommand(DebugType.STACK, sb.toString());

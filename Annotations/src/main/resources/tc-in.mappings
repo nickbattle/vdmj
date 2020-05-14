@@ -9,3 +9,4 @@ map TCOverrideAnnotation{name, args} to INNullAnnotation(name, args);
 map TCNoPOGAnnotation{name, args} to INNullAnnotation(name, args);
 map TCPrintfAnnotation{name, args} to INPrintfAnnotation(name, args);
 map TCWarningAnnotation{name, args} to INNullAnnotation(name, args);
+map TCOnFailAnnotation{name, args} to INOnFailAnnotation(name, args);

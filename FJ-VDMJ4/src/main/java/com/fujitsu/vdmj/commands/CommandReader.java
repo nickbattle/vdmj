@@ -58,6 +58,8 @@ import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.messages.ConsolePrintWriter;
+import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -562,13 +564,13 @@ abstract public class CommandReader
 
 		try
 		{
-			PrintWriter out = null;
+			ConsoleWriter out = null;
 			
 			if (!debug && traceoutput != null)
 			{
 				try
 				{
-					out = new PrintWriter(traceoutput);
+					out = new ConsolePrintWriter(traceoutput);
 					Interpreter.setTraceOutput(out);
 					println("Trace output sent to " + traceoutput);
 				}
@@ -1858,7 +1860,6 @@ abstract public class CommandReader
 	protected void print(String m)
 	{
 		Console.out.print(m);
-		Console.out.flush();	// As it's not a complete line
 	}
 
 	protected void println(String m)

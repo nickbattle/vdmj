@@ -21,37 +21,16 @@
  *
  ******************************************************************************/
 
-package dap;
+package com.fujitsu.vdmj.messages;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-
-public class DAPOutPrintStream extends PrintStream
+/**
+ * The operations supported by the Console.out stream.
+ */
+public interface ConsoleWriter
 {
-	private final DAPServer server;
-	
-	public DAPOutPrintStream(DAPServer server, OutputStream out)
-	{
-		super(out, true);
-		this.server = server;
-	}
-	
-	@Override
-	public void println(String message)
-	{
-		server.stdout(message + "\n");
-	}
-	
-	@Override
-	public void print(String message)
-	{
-		server.stdout(message);
-	}
-	
-	@Override
-	public PrintStream printf(String format, Object... args)
-	{
-		server.stdout(String.format(format, args));
-		return this;
-	}
+	public void print(String line);
+	public void println(String line);
+	public void printf(String format, Object ... args);
+	public void println();
+	public void close();
 }

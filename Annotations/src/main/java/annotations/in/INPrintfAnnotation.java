@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INStringLiteralExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.values.Value;
@@ -61,6 +62,6 @@ public class INPrintfAnnotation extends INAnnotation
 		}
 		
 		INStringLiteralExpression fmt = (INStringLiteralExpression)args.get(0);
-		System.out.printf(fmt.value.value, values);
+		Console.out.printf(fmt.value.value, values);
 	}
 }

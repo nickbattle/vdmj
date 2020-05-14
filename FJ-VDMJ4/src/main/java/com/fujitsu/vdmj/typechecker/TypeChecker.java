@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.typechecker;
 
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
@@ -269,7 +269,7 @@ abstract public class TypeChecker
 		return warnings;
 	}
 
-	public static void printErrors(PrintWriter out)
+	public static void printErrors(ConsoleWriter out)
 	{
 		for (VDMError e: errors)
 		{
@@ -277,7 +277,7 @@ abstract public class TypeChecker
 		}
 	}
 
-	public static void printWarnings(PrintWriter out)
+	public static void printWarnings(ConsoleWriter out)
 	{
 		for (VDMWarning w: warnings)
 		{

@@ -189,7 +189,7 @@ public class INModuleList extends INMappedList<TCModule, INModule>
 
     			for (ContextException e: problems)
     			{
-    				Console.out.println(e);
+    				Console.out.println(e.toString());
     			}        		
         	}
 		}
@@ -201,7 +201,7 @@ public class INModuleList extends INMappedList<TCModule, INModule>
 
 			for (ContextException e: problems)
 			{
-				Console.err.println(e);
+				Console.err.println(e.toString());
 
 				if (e.number != 4034)	// Not in scope err
 				{

@@ -63,10 +63,7 @@ public class IO implements Serializable
 	public static Value writeval(Value tval)
 	{
 		String text = tval.toString();
-
 		Console.out.print(text);
-		Console.out.flush();
-
 		return new BooleanValue(true);
 	}
 
@@ -141,7 +138,6 @@ public class IO implements Serializable
 		if (filename.equals("[]"))
 		{
 			Console.out.print(text);
-			Console.out.flush();
 		}
 		else
 		{
@@ -208,14 +204,12 @@ public class IO implements Serializable
 	public static Value print(Value v)
 	{
 		Console.out.printf("%s", stringOf(v));
-		Console.out.flush();
 		return new VoidValue();
 	}
 
 	public static Value println(Value v)
 	{
 		Console.out.printf("%s\n", stringOf(v));
-		Console.out.flush();
 		return new VoidValue();
 	}
 
@@ -225,7 +219,6 @@ public class IO implements Serializable
 		String format = stringOf(fv);
 		ValueList values = vs.seqValue(null);
 		Console.out.printf(format, values.toArray());
-		Console.out.flush();
 		return new VoidValue();
 	}
 }
