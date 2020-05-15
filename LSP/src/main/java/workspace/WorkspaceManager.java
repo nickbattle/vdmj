@@ -44,7 +44,6 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.Breakpoint;
@@ -58,13 +57,11 @@ import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.values.Value;
 
 import dap.DAPEvent;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
-import dap.DAPServer;
 import dap.DAPServerState;
 import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
@@ -78,7 +75,6 @@ import lsp.textdocument.WatchKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
-import vdmj.DAPDebugReader;
 
 public abstract class WorkspaceManager
 {
@@ -726,6 +722,8 @@ public abstract class WorkspaceManager
 
 	abstract public Interpreter getInterpreter() throws Exception;
 
+	abstract public DAPMessageList evaluate(DAPRequest request, String expression, String context);
+
 	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
 		if (interpreter != null)
@@ -746,46 +744,6 @@ public abstract class WorkspaceManager
 		DAPMessageList result = new DAPMessageList(request);
 		result.add(0, text("\nSession disconnected.\n"));
 		return result;
-	}
-
-	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
-	{
-		DAPDebugReader dbg = null;
-		
-		try
-		{
-			dbg = new DAPDebugReader();
-			dbg.start();
-			
-			long before = System.currentTimeMillis();
-			Console.init("UTF-8",
-					DAPServer.getInstance().getOutConsoleWriter(),
-					DAPServer.getInstance().getErrConsoleWriter());
-			Value result = getInterpreter().execute(expression);
-			long after = System.currentTimeMillis();
-			
-			String answer = "= " + result;
-			DAPMessageList responses = new DAPMessageList(request,
-					new JSONObject("result", answer, "variablesReference", 0));
-			responses.add(text("Executed in " + (double)(after-before)/1000 + " secs.\n"));
-			prompt(responses);
-			return responses;
-		}
-		catch (Exception e)
-		{
-			DAPMessageList responses = new DAPMessageList(request, e);
-			prompt(responses);
-			return responses;
-		}
-		finally
-		{
-			Console.init("UTF-8");
-
-			if (dbg != null)
-			{
-				dbg.interrupt();	// Stop the debugger reader.
-			}
-		}
 	}
 
 	public DAPMessageList terminate(DAPRequest request, Boolean restart)

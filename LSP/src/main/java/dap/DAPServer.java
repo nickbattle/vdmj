@@ -28,6 +28,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
 
 import dap.handlers.DisconnectHandler;
@@ -96,7 +97,8 @@ public class DAPServer extends JSONServer
 	public void run() throws IOException
 	{
 		state.setRunning(true);
-		
+		Console.init("UTF-8", getOutConsoleWriter(), getErrConsoleWriter());
+
 		while (state.isRunning())
 		{
 			JSONObject message = readMessage();
@@ -118,6 +120,8 @@ public class DAPServer extends JSONServer
 				}
 			}
 		}
+
+		Console.init("UTF-8");
 	}
 	
 	public void stdout(String message)
