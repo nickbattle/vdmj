@@ -61,6 +61,7 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.LSPDefinitionFinder;
 import vdmj.LSPDefinitionFinder.Found;
+import vdmj.commands.Command;
 
 public class WorkspaceManagerSL extends WorkspaceManager
 {
@@ -331,18 +332,6 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	{
 		try
 		{
-			for (ASTModule m: astModuleList)
-			{
-				if (m.name.name.equals(expression))
-				{
-					interpreter.setDefaultName(expression);
-					DAPMessageList responses = new DAPMessageList(request,
-						new JSONObject("result", "Default module set to " + expression, "variablesReference", 0));
-					prompt(responses);
-					return responses;
-				}
-			}
-			
 			if (!canExecute())
 			{
 				DAPMessageList responses = new DAPMessageList(request,
@@ -359,7 +348,8 @@ public class WorkspaceManagerSL extends WorkspaceManager
 				return responses;
 			}
 			
-			return super.evaluate(request, expression, context);
+			Command command = Command.parse(expression);
+			return command.run(request);
 		}
 		catch (Exception e)
 		{
