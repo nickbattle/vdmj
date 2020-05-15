@@ -20,10 +20,9 @@ top level, or obtain the following jars from the VDMJ [Releases](https://github.
 
 - `vdmj-4.3.0-<date>.jar`
 - `annotations-1.0.0-<date>.jar`
-- `annotations2-1.0.0-<date>.jar`
 - `lsp-0.0.1-SNAPSHOT-<date>.jar`
 
-The LSP/DAP server is executed by starting Java with these four jars. The annotations jars are optional, but useful. The main class is lsp.LSPServerSocket.
+The LSP/DAP server is executed by starting Java with these jars on the classpath. The annotations jar is optional, but useful. The main class is lsp.LSPServerSocket.
 
 `Usage: LSPServerSocket [-vdmsl | -vdmpp | -vdmrt] -lsp <port> -dap <port>`
 
@@ -76,16 +75,21 @@ The debug console opens and allows you to enter multiple expressions to evaluate
 
 Default module is DEFAULT
 Initialized in 0.001 secs.
-fac(10)
+
+help
+default <name> - set the default class or module name
+print <exp> - evaluate an expression
+help [<command>] - information about commands
+
+print fac(10)
 = 3628800
 Executed in 6.105 secs.
-1+1
+
+p 1+1
 = 2
 Executed in 0.003 secs.
 
 ```
-The default module or class can be changed by typing the name (eg. evaluate "A" to change the default to module A).
-
 If breakpoints have been set, the evaluation will stop and can be single stepped (over, in, out) or continued,
 stack frames and values viewed and watched, using standard VS Code controls. Multi-threaded VDM++ debugging should
 work correctly.
