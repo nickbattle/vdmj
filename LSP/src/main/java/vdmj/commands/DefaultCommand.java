@@ -37,7 +37,7 @@ public class DefaultCommand extends Command
 	
 	private String defaultName;
 
-	public DefaultCommand(String line) throws IllegalArgumentException
+	public DefaultCommand(String line)
 	{
 		String[] parts = line.split("\\s+");
 		

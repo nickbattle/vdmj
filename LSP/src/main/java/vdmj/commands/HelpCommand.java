@@ -33,7 +33,7 @@ public class HelpCommand extends Command
 	
 	private String command = null;
 
-	public HelpCommand(String line) throws IllegalArgumentException
+	public HelpCommand(String line)
 	{
 		String[] parts = line.split("\\s+");
 		
