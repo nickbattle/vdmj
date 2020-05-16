@@ -92,7 +92,7 @@ public abstract class WorkspaceManager
 	protected LSPServerState lspServerState;
 	protected DAPServerState dapServerState;
 	
-	public static WorkspaceManager getInstance(Dialect dialect) throws IOException
+	public static WorkspaceManager createInstance(Dialect dialect) throws IOException
 	{
 		switch (dialect)
 		{
@@ -120,6 +120,11 @@ public abstract class WorkspaceManager
 			default:
 				throw new IOException("Unsupported dialect: " + dialect);
 		}
+	}
+	
+	public static WorkspaceManager getInstance()
+	{
+		return INSTANCE;
 	}
 
 	public void setLSPState(LSPServerState lspServerState)

@@ -21,44 +21,12 @@
  *
  ******************************************************************************/
 
-package dap;
+package vdmj.commands;
 
-import java.io.IOException;
-
-import com.fujitsu.vdmj.lex.Dialect;
-
-import workspace.WorkspaceManager;
-
-public class DAPServerState
+public class QCommand extends QuitCommand
 {
-	private final Dialect dialect;
-	private final WorkspaceManager manager;
-	private boolean running;
-	
-	public DAPServerState(Dialect dialect) throws IOException
+	public QCommand(String line) throws Exception
 	{
-		this.dialect = dialect;
-		this.manager = WorkspaceManager.createInstance(dialect);
-		manager.setDAPState(this);
-	}
-	
-	public WorkspaceManager getManager()
-	{
-		return manager;
-	}
-	
-	public Dialect getDialect()
-	{
-		return dialect;
-	}
-
-	public boolean isRunning()
-	{
-		return running;
-	}
-	
-	public void setRunning(boolean running)
-	{
-		this.running = running;
+		super(line);
 	}
 }

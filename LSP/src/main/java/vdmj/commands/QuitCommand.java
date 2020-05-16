@@ -25,55 +25,26 @@ package vdmj.commands;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
+import dap.DAPServer;
+import workspace.WorkspaceManager;
 
-public class HelpCommand extends Command
+public class QuitCommand extends Command
 {
-	public static final String USAGE = "Usage: help [command]";
-	public static final String[] HELP = { "help", "help [<command>] - information about commands" };
+	public static final String[] HELP = { "quit", "quit - end the debugging session" };
+	public static final String USAGE = "Usage: quit";
 	
-	private String command = null;
-
-	public HelpCommand(String line) throws IllegalArgumentException
+	public QuitCommand(String line)
 	{
-		String[] parts = line.split("\\s+");
-		
-		if (parts.length == 2)
-		{
-			this.command = parts[1];
-		}
-		else if (parts.length != 1)
+		if (!line.equals("quit") && !line.equals("q"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
 	}
-	
-	private static String[][] entries =
-	{
-		DefaultCommand.HELP,
-		PrintCommand.HELP,
-		SetCommand.HELP,
-		HelpCommand.HELP,
-		QuitCommand.HELP
-	};
-	
+
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		StringBuilder sb = new StringBuilder();
-		
-		for (String[] help: entries)
-		{
-			if (command == null || command.equals(help[0]))
-			{
-				sb.append(help[1] + "\n");
-			}
-		}
-		
-		if (sb.length() == 0)
-		{
-			sb.append("Unknown command '" + command + "'");
-		}
-		
-		return new DAPMessageList(request, false, sb.toString(), null);
+		DAPServer.getInstance().getState().setRunning(false);
+		return WorkspaceManager.getInstance().terminate(request, false);
 	}
 }

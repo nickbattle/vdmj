@@ -63,7 +63,7 @@ public class LSPServer extends JSONServer
 		this.state = new LSPServerState();
 		this.dispatcher = getDispatcher();
 		
-		state.setManager(WorkspaceManager.getInstance(dialect));
+		state.setManager(WorkspaceManager.createInstance(dialect));
 		
 		// Identify this class as the debug link - See DebugLink
 		System.setProperty("vdmj.debug.link", DAPDebugLink.class.getName());
