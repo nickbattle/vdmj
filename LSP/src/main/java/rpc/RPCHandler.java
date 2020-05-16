@@ -28,4 +28,6 @@ import java.io.IOException;
 public interface RPCHandler
 {
 	public RPCMessageList run(RPCRequest request) throws IOException;
+
+	public void response(RPCResponse message);
 }

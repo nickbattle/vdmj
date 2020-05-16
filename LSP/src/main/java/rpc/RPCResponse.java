@@ -41,10 +41,10 @@ public class RPCResponse extends JSONObject
 		put("id", request.get("id"));
 	}
 	
-	public RPCResponse(Object result)
+	public RPCResponse(JSONObject result)
 	{
 		this();
-		put("result", result);		// No id, used for notifications
+		putAll(result);
 	}
 	
 	public RPCResponse(RPCRequest request, RPCErrors error, String message)

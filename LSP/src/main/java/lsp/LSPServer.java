@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -42,8 +44,10 @@ import lsp.textdocument.DidOpenHandler;
 import lsp.textdocument.DidSaveHandler;
 import lsp.textdocument.DocumentSymbolHandler;
 import rpc.RPCDispatcher;
+import rpc.RPCHandler;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import rpc.RPCResponse;
 import vdmj.DAPDebugLink;
 import workspace.Log;
 import workspace.WorkspaceManager;
@@ -54,6 +58,7 @@ public class LSPServer extends JSONServer
 
 	private final RPCDispatcher dispatcher;
 	private final LSPServerState state;
+	private final Map<Long, RPCHandler> responseHandlers;
 	
 	public LSPServer(Dialect dialect, InputStream inStream, OutputStream outStream) throws IOException
 	{
@@ -62,6 +67,7 @@ public class LSPServer extends JSONServer
 		INSTANCE = this;
 		this.state = new LSPServerState();
 		this.dispatcher = getDispatcher();
+		this.responseHandlers = new HashMap<Long, RPCHandler>();
 		
 		state.setManager(WorkspaceManager.createInstance(dialect));
 		
@@ -79,7 +85,7 @@ public class LSPServer extends JSONServer
 	{
 		RPCDispatcher dispatcher = new RPCDispatcher();
 		
-		dispatcher.register("initialize", new InitializeHandler(state));
+		dispatcher.register("initialize", "client/registerCapability", new InitializeHandler(state));
 		dispatcher.register("initialized", new InitializeHandler(state));
 		dispatcher.register("shutdown", new ShutdownHandler(state));
 		dispatcher.register("exit", new ExitHandler(state));
@@ -93,7 +99,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register("textDocument/completion", new CompletionHandler(state));
 
 		dispatcher.register("workspace/didChangeWatchedFiles", new DidChangeWSHandler(state));
-
+		
 		return dispatcher;
 	}
 	
@@ -106,6 +112,7 @@ public class LSPServer extends JSONServer
 	public void run() throws IOException
 	{
 		state.setRunning(true);
+		responseHandlers.clear();
 		
 		while (state.isRunning())
 		{
@@ -117,11 +124,20 @@ public class LSPServer extends JSONServer
 				break;
 			}
 			
-			Long id = Utils.getLong(message, "id");
-			
-			if (id != null && id.longValue() == -1)
+			if (message.get("method") == null && message.get("id") != null)		// A response
 			{
-				Log.printf("Ignoring RPC reply", message);
+				Long id = message.get("id");
+				RPCHandler handler = responseHandlers.get(id);
+				
+				if (handler != null)
+				{
+					handler.response(new RPCResponse(message));
+					responseHandlers.remove(id);
+				}
+				else
+				{
+					Log.error("Unhandled response, id=%d", id);
+				}
 			}
 			else
 			{
@@ -133,6 +149,12 @@ public class LSPServer extends JSONServer
 					for (JSONObject response: responses)
 					{
 						writeMessage(response);
+						
+						if (response.get("method") != null && response.get("id") != null)	// A request
+						{
+							RPCRequest req = new RPCRequest(response);
+							responseHandlers.put(response.get("id"), dispatcher.getHandler(req));
+						}
 					}
 				}
 			}

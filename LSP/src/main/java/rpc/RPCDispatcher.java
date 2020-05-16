@@ -35,12 +35,23 @@ public class RPCDispatcher
 	{
 		handlers.put(method, handler);
 	}
+	
+	public void register(String method1, String method2, RPCHandler handler)
+	{
+		handlers.put(method1, handler);
+		handlers.put(method2, handler);
+	}
+	
+	public RPCHandler getHandler(RPCRequest request)
+	{
+		return handlers.get(request.getMethod());
+	}
 
 	public RPCMessageList dispatch(RPCRequest request)
 	{
 		try
 		{
-			RPCHandler handler = handlers.get(request.getMethod());
+			RPCHandler handler = getHandler(request);
 			
 			if (handler == null)
 			{

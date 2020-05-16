@@ -185,7 +185,7 @@ public abstract class WorkspaceManager
 			watchers.add(new JSONObject("globPattern", glob));
 		}
 		
-		return new RPCRequest(-1L, "client/registerCapability",
+		return new RPCRequest(0L, "client/registerCapability",
 			new JSONObject(
 				"registrations",
 					new JSONArray(

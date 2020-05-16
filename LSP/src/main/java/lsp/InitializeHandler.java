@@ -26,6 +26,8 @@ package lsp;
 import java.io.IOException;
 
 import rpc.RPCRequest;
+import rpc.RPCResponse;
+import workspace.Log;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 
@@ -50,5 +52,12 @@ public class InitializeHandler extends LSPHandler
 		}
 		
 		return new RPCMessageList(request, RPCErrors.InternalError, "Unexpected initialize message");
+	}
+	
+	@Override
+	public void response(RPCResponse message)
+	{
+		// Response to dynamic registrations
+		Log.printf("Response to id %d received", (Long)message.get("id"));
 	}
 }
