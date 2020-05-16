@@ -39,7 +39,7 @@ public class PrintCommand extends Command
 	
 	private String expression;
 
-	public PrintCommand(String line) throws Exception
+	public PrintCommand(String line)
 	{
 		String[] parts = line.split("\\s+", 2);
 		

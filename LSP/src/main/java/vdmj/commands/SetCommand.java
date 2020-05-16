@@ -35,7 +35,7 @@ public class SetCommand extends Command
 	private String option = null;
 	private Boolean setting = null;
 
-	public SetCommand(String line) throws IllegalArgumentException
+	public SetCommand(String line)
 	{
 		String[] parts = line.split("\\s+");
 		
