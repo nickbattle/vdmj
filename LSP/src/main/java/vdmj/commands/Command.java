@@ -61,6 +61,11 @@ abstract public class Command
 			Log.error(e);
 			return new ErrorCommand("Error: " + e.getTargetException().getMessage());
 		}
+		catch (IllegalArgumentException e)
+		{
+			Log.error(e);
+			return new ErrorCommand(e.getMessage());
+		}
 		catch (Exception e)
 		{
 			Log.error(e);
@@ -69,8 +74,6 @@ abstract public class Command
 	}
 
 	public abstract DAPMessageList run(DAPRequest request);
-	
-	protected abstract void usage() throws Exception;
 	
 	protected DAPResponse stdout(String message)
 	{
