@@ -58,6 +58,11 @@ public class RPCTest extends TestCase
 				Long subtrahend = params.get("subtrahend");
 				return new RPCMessageList(new RPCResponse(request, minuend.longValue() - subtrahend.longValue()));
 			}
+
+			@Override
+			public void response(RPCResponse message)
+			{
+			}
 		});
 		
 		RPCMessageList responses = d.dispatch(new RPCRequest(map));
@@ -89,6 +94,11 @@ public class RPCTest extends TestCase
 				Long minuend = params.index(0);
 				Long subtrahend = params.index(1);
 				return new RPCMessageList(new RPCResponse(request, minuend.longValue() - subtrahend.longValue()));
+			}
+
+			@Override
+			public void response(RPCResponse message)
+			{
 			}
 		});
 		

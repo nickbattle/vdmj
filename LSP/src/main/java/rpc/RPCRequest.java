@@ -31,6 +31,8 @@ public class RPCRequest extends JSONObject
 {
 	private static final long serialVersionUID = 1L;
 	
+	private static long nextId = 1;
+	
 	public RPCRequest(JSONObject request) throws IOException
 	{
 		String version = request.get("jsonrpc");
@@ -55,7 +57,7 @@ public class RPCRequest extends JSONObject
 	public RPCRequest(Long id, String method, Object params)
 	{
 		this(method, params);
-		put("id", id);
+		put("id", id == 0 ? nextId++ : id);
 	}
 	
 	public String getMethod()

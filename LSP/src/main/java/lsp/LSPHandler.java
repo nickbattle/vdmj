@@ -28,6 +28,7 @@ import java.io.IOException;
 import rpc.RPCHandler;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import rpc.RPCResponse;
 
 abstract public class LSPHandler implements RPCHandler
 {
@@ -40,4 +41,10 @@ abstract public class LSPHandler implements RPCHandler
 
 	@Override
 	abstract public RPCMessageList run(RPCRequest request) throws IOException;
+	
+	@Override
+	public void response(RPCResponse message)
+	{
+		// Ignore
+	}
 }
