@@ -58,13 +58,16 @@ abstract public class Command
 		}
 		catch (InvocationTargetException e)
 		{
-			Log.error(e);
-			return new ErrorCommand("Error: " + e.getTargetException().getMessage());
-		}
-		catch (IllegalArgumentException e)
-		{
-			Log.error(e);
-			return new ErrorCommand(e.getMessage());
+			Log.error(e.getTargetException());
+			
+			if (e.getTargetException() instanceof IllegalArgumentException)
+			{
+				return new ErrorCommand(e.getTargetException().getMessage());
+			}
+			else
+			{
+				return new ErrorCommand("Error: " + e.getTargetException().getMessage());
+			}
 		}
 		catch (Exception e)
 		{

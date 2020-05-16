@@ -51,6 +51,7 @@ public class HelpCommand extends Command
 	{
 		DefaultCommand.HELP,
 		PrintCommand.HELP,
+		SetCommand.HELP,
 		HelpCommand.HELP
 	};
 	
