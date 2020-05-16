@@ -113,6 +113,10 @@ public class SetCommand extends Command
 
     			Settings.annotations = setting;
     			break;
+    			
+    		default:
+    			sb.append(USAGE);
+    			break;
 		}
 		
 		return new DAPMessageList(request, false, sb.toString(), null);
