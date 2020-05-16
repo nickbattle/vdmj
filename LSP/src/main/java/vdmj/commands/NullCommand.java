@@ -33,10 +33,4 @@ public class NullCommand extends Command
 	{
 		return new DAPMessageList(request, false, "Enter a command, or try 'help'", null);
 	}
-
-	@Override
-	protected void usage() throws Exception
-	{
-		// None
-	}
 }

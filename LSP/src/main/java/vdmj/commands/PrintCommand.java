@@ -34,6 +34,9 @@ import workspace.Log;
 
 public class PrintCommand extends Command
 {
+	public static final String USAGE = "Usage: print <expression>";
+	public static final String[] HELP = { "print", "print <exp> - evaluate an expression" };
+	
 	private String expression;
 
 	public PrintCommand(String line) throws Exception
@@ -46,7 +49,7 @@ public class PrintCommand extends Command
 		}
 		else
 		{
-			usage();
+			throw new IllegalArgumentException(USAGE);
 		}
 	}
 	
@@ -79,16 +82,5 @@ public class PrintCommand extends Command
 				dbg.interrupt();	// Stop the debugger reader.
 			}
 		}
-	}
-
-	@Override
-	protected void usage() throws Exception
-	{
-		throw new Exception("Usage: print <expression>");
-	}
-
-	public static String[] help()
-	{
-		return new String[] { "print", "print <exp> - evaluate an expression" };
 	}
 }

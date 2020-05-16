@@ -61,7 +61,6 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.LSPDefinitionFinder;
 import vdmj.LSPDefinitionFinder.Found;
-import vdmj.commands.Command;
 
 public class WorkspaceManagerSL extends WorkspaceManager
 {
@@ -305,11 +304,19 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	}
 
 	@Override
-	public ModuleInterpreter getInterpreter() throws Exception
+	public ModuleInterpreter getInterpreter()
 	{
 		if (interpreter == null)
 		{
-			interpreter = new ModuleInterpreter(inModuleList, tcModuleList);
+			try
+			{
+				interpreter = new ModuleInterpreter(inModuleList, tcModuleList);
+			}
+			catch (Exception e)
+			{
+				Log.error(e);
+				interpreter = null;
+			}
 		}
 		
 		return (ModuleInterpreter) interpreter;
@@ -318,44 +325,18 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	@Override
 	protected boolean canExecute()
 	{
-		return inModuleList != null;
+		return getInterpreter() != null;	// inModuleList != null;
+	}
+	
+	@Override
+	protected boolean hasChanged() throws Exception
+	{
+		return getInterpreter() != null && getInterpreter().getIN() != inModuleList;
 	}
 	
 	@Override
 	public DAPMessageList threads(DAPRequest request)
 	{
 		return new DAPMessageList(request, new JSONObject("threads", new JSONArray()));	// empty?
-	}
-
-	@Override
-	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
-	{
-		try
-		{
-			if (!canExecute())
-			{
-				DAPMessageList responses = new DAPMessageList(request,
-						new JSONObject("result", "Cannot start interpreter: errors exist?", "variablesReference", 0));
-				prompt(responses);
-				dapServerState.setRunning(false);
-				return responses;
-			}
-			else if (getInterpreter().getIN() != inModuleList)
-			{
-				DAPMessageList responses = new DAPMessageList(request,
-						new JSONObject("result", "Specification has changed: try restart", "variablesReference", 0));
-				prompt(responses);
-				return responses;
-			}
-			
-			Command command = Command.parse(expression);
-			return command.run(request);
-		}
-		catch (Exception e)
-		{
-			DAPMessageList responses = new DAPMessageList(request, e);
-			prompt(responses);
-			return responses;
-		}
 	}
 }

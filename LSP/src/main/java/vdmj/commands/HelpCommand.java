@@ -28,9 +28,12 @@ import dap.DAPRequest;
 
 public class HelpCommand extends Command
 {
+	public static final String USAGE = "Usage: help [command]";
+	public static final String[] HELP = { "help", "help [<command>] - information about commands" };
+	
 	private String command = null;
 
-	public HelpCommand(String line) throws Exception
+	public HelpCommand(String line) throws IllegalArgumentException
 	{
 		String[] parts = line.split("\\s+");
 		
@@ -40,15 +43,16 @@ public class HelpCommand extends Command
 		}
 		else if (parts.length != 1)
 		{
-			usage();
+			throw new IllegalArgumentException(USAGE);
 		}
 	}
 	
 	private static String[][] entries =
 	{
-		DefaultCommand.help(),
-		PrintCommand.help(),
-		HelpCommand.help()
+		DefaultCommand.HELP,
+		PrintCommand.HELP,
+		SetCommand.HELP,
+		HelpCommand.HELP
 	};
 	
 	@Override
@@ -70,16 +74,5 @@ public class HelpCommand extends Command
 		}
 		
 		return new DAPMessageList(request, false, sb.toString(), null);
-	}
-
-	@Override
-	protected void usage() throws Exception
-	{
-		throw new Exception("Usage: help [command]");
-	}
-
-	public static String[] help()
-	{
-		return new String[] { "help", "help [<command>] - information about commands" };
 	}
 }

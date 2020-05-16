@@ -40,10 +40,17 @@ public class LaunchHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		JSONObject arguments = request.get("arguments");
-		boolean noDebug = arguments.get("noDebug");
-		String defaultName = arguments.get("defaultName");
+		try
+		{
+			JSONObject arguments = request.get("arguments");
+			boolean noDebug = arguments.get("noDebug");
+			String defaultName = arguments.get("defaultName");
 
-		return dapServerState.getManager().launch(request, noDebug, defaultName);
+			return dapServerState.getManager().launch(request, noDebug, defaultName);
+		}
+		catch (Exception e)
+		{
+			return new DAPMessageList(request, e);
+		}
 	}
 }

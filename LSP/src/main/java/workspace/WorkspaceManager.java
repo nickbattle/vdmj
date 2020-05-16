@@ -75,6 +75,8 @@ import lsp.textdocument.WatchKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
+import vdmj.commands.Command;
+import vdmj.commands.PrintCommand;
 
 public abstract class WorkspaceManager
 {
@@ -198,13 +200,16 @@ public abstract class WorkspaceManager
 		return responses;
 	}
 
-	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName)
+	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName) throws Exception
 	{
+		checkLoadedFiles();
+		
 		if (!canExecute())
 		{
 			DAPMessageList responses = new DAPMessageList();
 			responses.add(new DAPResponse(request, false, "Specification has errors, cannot launch", null));
-			responses.add(text("Cannot start interpreter: errors exist?"));
+			responses.add(text("Specification has errors, cannot launch"));
+			clearInterpreter();
 			return responses;
 		}
 		
@@ -231,7 +236,11 @@ public abstract class WorkspaceManager
 		}
 	}
 	
+	/** True if we have an interpreter that we can use. */
 	protected abstract boolean canExecute();
+	
+	/** True if the spec has been updated since the interpreter was created. */
+	protected abstract boolean hasChanged() throws Exception;
 
 	protected DAPResponse heading() throws Exception
 	{
@@ -697,6 +706,42 @@ public abstract class WorkspaceManager
 		return new DAPMessageList(request, new JSONObject("breakpoints", results));
 	}
 	
+	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
+	{
+		try
+		{
+			Command command = Command.parse(expression);
+
+			if (command instanceof PrintCommand)	// ie. evaluate something
+			{
+				if (!canExecute())
+				{
+					DAPMessageList responses = new DAPMessageList(request,
+							new JSONObject("result", "Cannot start interpreter: errors exist?", "variablesReference", 0));
+					prompt(responses);
+					dapServerState.setRunning(false);
+					clearInterpreter();
+					return responses;
+				}
+				else if (hasChanged())
+				{
+					DAPMessageList responses = new DAPMessageList(request,
+							new JSONObject("result", "Specification has changed: try restart", "variablesReference", 0));
+					prompt(responses);
+					return responses;
+				}
+			}
+			
+			return command.run(request);
+		}
+		catch (Exception e)
+		{
+			DAPMessageList responses = new DAPMessageList(request, e);
+			prompt(responses);
+			return responses;
+		}
+	}
+
 	/**
 	 * Abstract methods that are implemented in language specific subclasses.
 	 */
@@ -720,27 +765,11 @@ public abstract class WorkspaceManager
 
 	abstract public DAPMessageList threads(DAPRequest request);
 
-	abstract public Interpreter getInterpreter() throws Exception;
-
-	abstract public DAPMessageList evaluate(DAPRequest request, String expression, String context);
+	abstract public Interpreter getInterpreter();
 
 	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
-		if (interpreter != null)
-		{
-			// Clear the BPs since they are embedded in the tree and the next
-			// launch may have noDebug set.
-			
-			Set<Integer> bps = new HashSet<Integer>(interpreter.getBreakpoints().keySet());
-			
-			for (Integer bpno: bps)
-			{
-				interpreter.clearBreakpoint(bpno);
-			}
-			
-			interpreter = null;
-		}
-
+		clearInterpreter();
 		DAPMessageList result = new DAPMessageList(request);
 		result.add(0, text("\nSession disconnected.\n"));
 		return result;
@@ -748,6 +777,14 @@ public abstract class WorkspaceManager
 
 	public DAPMessageList terminate(DAPRequest request, Boolean restart)
 	{
+		clearInterpreter();
+		DAPMessageList result = new DAPMessageList(request);
+		result.add(text("\nSession terminated.\n"));
+		return result;
+	}
+	
+	protected void clearInterpreter()
+	{
 		if (interpreter != null)
 		{
 			// Clear the BPs since they are embedded in the tree and the next
@@ -762,9 +799,5 @@ public abstract class WorkspaceManager
 			
 			interpreter = null;
 		}
-
-		DAPMessageList result = new DAPMessageList(request);
-		result.add(text("\nSession terminated.\n"));
-		return result;
 	}
 }

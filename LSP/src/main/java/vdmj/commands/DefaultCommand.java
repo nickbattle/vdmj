@@ -32,9 +32,12 @@ import workspace.Log;
 
 public class DefaultCommand extends Command
 {
+	public static final String USAGE = "Usage: default <default module or class>";
+	public static final String[] HELP =	{ "default", "default <name> - set the default class or module name" };
+	
 	private String defaultName;
 
-	public DefaultCommand(String line) throws Exception
+	public DefaultCommand(String line) throws IllegalArgumentException
 	{
 		String[] parts = line.split("\\s+");
 		
@@ -44,7 +47,7 @@ public class DefaultCommand extends Command
 		}
 		else
 		{
-			usage();
+			throw new IllegalArgumentException(USAGE);
 		}
 	}
 	
@@ -62,16 +65,5 @@ public class DefaultCommand extends Command
 			Log.error(e);
 			return new DAPMessageList(request, e);
 		}
-	}
-
-	@Override
-	protected void usage() throws Exception
-	{
-		throw new Exception("Usage: default <default module or class>");
-	}
-
-	public static String[] help()
-	{
-		return new String[]	{ "default", "default <name> - set the default class or module name" };
 	}
 }
