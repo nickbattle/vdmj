@@ -78,9 +78,9 @@ public class Log
 		printf("ERROR: " + format, args);
 	}
 
-	public static void error(Exception e)
+	public static void error(Throwable throwable)
 	{
-		printf("EXCEPTION: %s", e.getMessage());
+		printf("EXCEPTION: %s", throwable.getMessage());
 	}
 	
 	public static void dump(List<VDMMessage> messages)
