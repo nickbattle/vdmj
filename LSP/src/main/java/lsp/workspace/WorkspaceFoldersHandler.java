@@ -21,31 +21,25 @@
  *
  ******************************************************************************/
 
-package lsp.textdocument;
+package lsp.workspace;
 
-public enum WatchKind
+import java.io.IOException;
+
+import lsp.LSPHandler;
+import lsp.LSPServerState;
+import rpc.RPCMessageList;
+import rpc.RPCRequest;
+
+public class WorkspaceFoldersHandler extends LSPHandler
 {
-	CREATE(1),
-	CHANGE(2),
-	DELETE(3);	// Not as spec, but VSCode does
-
-	private final long value;
-	
-	private WatchKind(long value)
+	public WorkspaceFoldersHandler(LSPServerState state)
 	{
-		this.value = value;
+		super(state);
 	}
-	
-	public static WatchKind kindOf(long value)
+
+	@Override
+	public RPCMessageList request(RPCRequest request) throws IOException
 	{
-		for (WatchKind w: values())
-		{
-			if (w.value == value)
-			{
-				return w;
-			}
-		}
-		
-		throw new IllegalArgumentException();
+		return null;	// Not used
 	}
 }

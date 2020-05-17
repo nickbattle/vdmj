@@ -21,7 +21,7 @@
  *
  ******************************************************************************/
 
-package lsp.textdocument;
+package lsp.workspace;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -31,6 +31,7 @@ import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.LSPServerState;
 import lsp.Utils;
+import lsp.textdocument.WatchKind;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;

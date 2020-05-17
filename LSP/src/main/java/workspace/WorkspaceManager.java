@@ -167,6 +167,7 @@ public abstract class WorkspaceManager
 		{
 			RPCMessageList response = new RPCMessageList();
 			response.add(lspDynamicRegistrations());
+			response.add(lspWorkspaceFolders());
 			response.addAll(checkLoadedFiles());
 			return response;
 		}
@@ -174,6 +175,11 @@ public abstract class WorkspaceManager
 		{
 			return new RPCMessageList(request, e.getMessage());
 		}
+	}
+
+	private RPCRequest lspWorkspaceFolders()
+	{
+		return new RPCRequest(0L, "workspace/workspaceFolders", new JSONObject());
 	}
 
 	private RPCRequest lspDynamicRegistrations()

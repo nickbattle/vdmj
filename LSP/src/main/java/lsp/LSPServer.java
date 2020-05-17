@@ -38,11 +38,12 @@ import json.JSONServer;
 import lsp.textdocument.CompletionHandler;
 import lsp.textdocument.DefinitionHandler;
 import lsp.textdocument.DidChangeHandler;
-import lsp.textdocument.DidChangeWSHandler;
 import lsp.textdocument.DidCloseHandler;
 import lsp.textdocument.DidOpenHandler;
 import lsp.textdocument.DidSaveHandler;
 import lsp.textdocument.DocumentSymbolHandler;
+import lsp.workspace.DidChangeWSHandler;
+import lsp.workspace.WorkspaceFoldersHandler;
 import rpc.RPCDispatcher;
 import rpc.RPCHandler;
 import rpc.RPCMessageList;
@@ -85,8 +86,9 @@ public class LSPServer extends JSONServer
 	{
 		RPCDispatcher dispatcher = new RPCDispatcher();
 		
-		dispatcher.register("initialize", "client/registerCapability", new InitializeHandler(state));
+		dispatcher.register("initialize", new InitializeHandler(state));
 		dispatcher.register("initialized", new InitializeHandler(state));
+		dispatcher.register("client/registerCapability", new InitializeHandler(state));
 		dispatcher.register("shutdown", new ShutdownHandler(state));
 		dispatcher.register("exit", new ExitHandler(state));
 
@@ -99,6 +101,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register("textDocument/completion", new CompletionHandler(state));
 
 		dispatcher.register("workspace/didChangeWatchedFiles", new DidChangeWSHandler(state));
+		dispatcher.register("workspace/workspaceFolders", new WorkspaceFoldersHandler(state));
 		
 		return dispatcher;
 	}

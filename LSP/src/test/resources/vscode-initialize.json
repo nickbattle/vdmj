@@ -1,13 +1,13 @@
-16: 59: 39.851: >>>LSP
+16: 49: 32.087: >>>LSP
 {
 	"jsonrpc": "2.0",
 	"id": 0,
 	"method": "initialize",
 	"params": 
 	{
-		"processId": 8917,
-		"rootPath": "/home/nick/Digital Twins/VSCodeWorkspaceSL",
-		"rootUri": "file:///home/nick/Digital%20Twins/VSCodeWorkspaceSL",
+		"processId": 26507,
+		"rootPath": "/home/nick/Digital Twins/VSCode/TestSL1",
+		"rootUri": "file:///home/nick/Digital%20Twins/VSCode/TestSL1",
 		"capabilities": 
 		{
 			"workspace": 
