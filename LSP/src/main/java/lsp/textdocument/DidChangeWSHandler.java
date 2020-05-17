@@ -43,7 +43,7 @@ public class DidChangeWSHandler extends LSPHandler
 	}
 
 	@Override
-	public RPCMessageList run(RPCRequest request)
+	public RPCMessageList request(RPCRequest request)
 	{
 		try
 		{

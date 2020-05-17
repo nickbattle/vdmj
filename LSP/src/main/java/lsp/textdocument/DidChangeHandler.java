@@ -44,7 +44,7 @@ public class DidChangeHandler extends LSPHandler
 	}
 
 	@Override
-	public RPCMessageList run(RPCRequest request) throws IOException
+	public RPCMessageList request(RPCRequest request) throws IOException
 	{
 		try
 		{
