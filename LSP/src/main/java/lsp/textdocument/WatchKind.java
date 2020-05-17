@@ -36,7 +36,7 @@ public enum WatchKind
 		this.value = value;
 	}
 	
-	static WatchKind kindOf(long value)
+	public static WatchKind kindOf(long value)
 	{
 		for (WatchKind w: values())
 		{

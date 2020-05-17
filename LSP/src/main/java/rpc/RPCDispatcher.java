@@ -59,7 +59,7 @@ public class RPCDispatcher
 			}
 			else
 			{
-				return handler.run(request);
+				return handler.request(request);
 			}
 		}
 		catch (IOException e)

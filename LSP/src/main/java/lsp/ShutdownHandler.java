@@ -36,7 +36,7 @@ public class ShutdownHandler extends LSPHandler
 	}
 
 	@Override
-	public RPCMessageList run(RPCRequest request) throws IOException
+	public RPCMessageList request(RPCRequest request) throws IOException
 	{
 		lspServerState.setInitialized(false);
 		return new RPCMessageList(request);

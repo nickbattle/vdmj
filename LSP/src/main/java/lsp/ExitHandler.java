@@ -36,7 +36,7 @@ public class ExitHandler extends LSPHandler
 	}
 
 	@Override
-	public RPCMessageList run(RPCRequest request) throws IOException
+	public RPCMessageList request(RPCRequest request) throws IOException
 	{
 		System.exit(lspServerState.isInitialized() ? 1 : 0);
 		return null;

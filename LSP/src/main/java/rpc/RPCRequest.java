@@ -57,7 +57,8 @@ public class RPCRequest extends JSONObject
 	public RPCRequest(Long id, String method, Object params)
 	{
 		this(method, params);
-		put("id", id == 0 ? nextId++ : id);
+		if (id != 0) nextId = id;
+		put("id", nextId++);
 	}
 	
 	public String getMethod()

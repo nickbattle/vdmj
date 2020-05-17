@@ -51,7 +51,7 @@ public class RPCTest extends TestCase
 		d.register("subtract", new RPCHandler()
 		{
 			@Override
-			public RPCMessageList run(RPCRequest request) throws IOException
+			public RPCMessageList request(RPCRequest request) throws IOException
 			{
 				JSONObject params = request.get("params");
 				Long minuend = params.get("minuend");
@@ -88,7 +88,7 @@ public class RPCTest extends TestCase
 		d.register("subtract", new RPCHandler()
 		{
 			@Override
-			public RPCMessageList run(RPCRequest request) throws IOException
+			public RPCMessageList request(RPCRequest request) throws IOException
 			{
 				JSONArray params = request.get("params");
 				Long minuend = params.index(0);

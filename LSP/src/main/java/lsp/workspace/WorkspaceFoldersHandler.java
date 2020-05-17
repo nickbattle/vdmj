@@ -21,23 +21,18 @@
  *
  ******************************************************************************/
 
-package lsp.textdocument;
+package lsp.workspace;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 
-import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.LSPServerState;
-import lsp.Utils;
-import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 
-public class DidSaveHandler extends LSPHandler
+public class WorkspaceFoldersHandler extends LSPHandler
 {
-	public DidSaveHandler(LSPServerState state)
+	public WorkspaceFoldersHandler(LSPServerState state)
 	{
 		super(state);
 	}
@@ -45,22 +40,6 @@ public class DidSaveHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request) throws IOException
 	{
-		try
-		{
-			JSONObject params = request.get("params");
-			JSONObject textDoc = params.get("textDocument");
-			File file = Utils.uriToFile(textDoc.get("uri"));
-			String text = params.get("text");
-			
-			return lspServerState.getManager().saveFile(request, file, text);
-		}
-		catch (URISyntaxException e)
-		{
-			return new RPCMessageList(request, "URI syntax error");
-		}
-		catch (Exception e)
-		{
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
+		return null;	// Not used
 	}
 }

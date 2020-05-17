@@ -29,6 +29,7 @@ import rpc.RPCHandler;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
+import workspace.Log;
 
 abstract public class LSPHandler implements RPCHandler
 {
@@ -40,11 +41,11 @@ abstract public class LSPHandler implements RPCHandler
 	}
 
 	@Override
-	abstract public RPCMessageList run(RPCRequest request) throws IOException;
+	abstract public RPCMessageList request(RPCRequest request) throws IOException;
 	
 	@Override
 	public void response(RPCResponse message)
 	{
-		// Ignore
+		Log.printf("Response to id %d ignored", (Long)message.get("id"));
 	}
 }
