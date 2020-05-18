@@ -41,19 +41,30 @@ public class InitializeHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request) throws IOException
 	{
-		if ("initialize".equals(request.getMethod()))
+		switch (request.getMethod())
 		{
-			return lspServerState.getManager().lspInitialize(request);
-		}
-		else if ("initialized".equals(request.getMethod()))
-		{
-			lspServerState.setInitialized(true);
-			return lspServerState.getManager().lspInitialized(request);
-		}
+			case "initialize":
+				return initialize(request);
+
+			case "initialized":
+				return initialized(request);
 		
-		return new RPCMessageList(request, RPCErrors.InternalError, "Unexpected initialize message");
+			default:
+				return new RPCMessageList(request, RPCErrors.InternalError, "Unexpected initialize message");
+		}
 	}
 	
+	private RPCMessageList initialize(RPCRequest request)
+	{
+		return lspServerState.getManager().lspInitialize(request);
+	}
+
+	private RPCMessageList initialized(RPCRequest request)
+	{
+		lspServerState.setInitialized(true);
+		return lspServerState.getManager().lspInitialized(request);
+	}
+
 	@Override
 	public void response(RPCResponse message)
 	{

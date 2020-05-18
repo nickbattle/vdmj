@@ -102,6 +102,7 @@ public class LSPServer extends JSONServer
 
 		dispatcher.register("workspace/didChangeWatchedFiles", new DidChangeWSHandler(state));
 		dispatcher.register("workspace/workspaceFolders", new WorkspaceFoldersHandler(state));
+		dispatcher.register("workspace/didChangeWorkspaceFolders", new DidChangeWSHandler(state));
 		
 		return dispatcher;
 	}

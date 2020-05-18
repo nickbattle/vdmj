@@ -46,6 +46,26 @@ public class DidChangeWSHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
+		switch (request.getMethod())
+		{
+			case "workspace/didChangeWatchedFiles":
+				return didChangeWatchedFiles(request);
+			
+			case "workspace/didChangeWorkspaceFolders":
+				return didChangeWorkspaceFolders(request);
+				
+			default:
+				return new RPCMessageList(request, RPCErrors.InternalError, "Unexpected workspace message");
+		}
+	}
+	
+	private RPCMessageList didChangeWorkspaceFolders(RPCRequest request)
+	{
+		return new RPCMessageList(request, RPCErrors.InvalidRequest, request.getMethod());
+	}
+
+	private RPCMessageList didChangeWatchedFiles(RPCRequest request)
+	{
 		try
 		{
 			JSONObject params = request.get("params");
