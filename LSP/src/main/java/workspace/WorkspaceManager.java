@@ -82,7 +82,7 @@ public abstract class WorkspaceManager
 {
 	private static WorkspaceManager INSTANCE = null;
 
-	private File rootUri = null;
+	private List<File> roots = new Vector<File>();
 	protected Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
 	protected Set<File> openFiles = new HashSet<File>();
 	
@@ -142,10 +142,11 @@ public abstract class WorkspaceManager
 		try
 		{
 			JSONObject params = request.get("params");
-			rootUri = Utils.uriToFile(params.get("rootUri"));
+			getRoots().clear();
+			getRoots().add(Utils.uriToFile(params.get("rootUri")));	// TODO workspace folders
 			openFiles.clear();
 			Properties.init();
-			loadProjectFiles(rootUri);
+			loadAllProjectFiles();
 			
 			RPCMessageList responses = new RPCMessageList();
 			responses.add(new RPCResponse(request, new LSPInitializeResponse()));
@@ -245,6 +246,11 @@ public abstract class WorkspaceManager
 		}
 	}
 	
+	public List<File> getRoots()
+	{
+		return roots;
+	}
+
 	/** True if we have an interpreter that we can use. */
 	protected abstract boolean canExecute();
 	
@@ -274,6 +280,14 @@ public abstract class WorkspaceManager
 		catch (Exception e)
 		{
 			return new DAPMessageList(request, e);
+		}
+	}
+
+	private void loadAllProjectFiles() throws IOException
+	{
+		for (File root: getRoots())
+		{
+			loadProjectFiles(root);
 		}
 	}
 
@@ -501,6 +515,21 @@ public abstract class WorkspaceManager
 					Log.error("Deleted file not known: %s", file);
 				}
 				break;
+		}
+	}
+
+	public RPCMessageList changeFolders(RPCRequest request, List<File> newRoots)
+	{
+		try
+		{
+			roots.clear();
+			projectFiles.clear();
+			loadAllProjectFiles();
+			return checkLoadedFiles();
+		}
+		catch (Exception e)
+		{
+			return new RPCMessageList(request, e.getMessage());
 		}
 	}
 

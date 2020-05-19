@@ -24,7 +24,10 @@
 package lsp.workspace;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Vector;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -35,6 +38,7 @@ import lsp.textdocument.WatchKind;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.Log;
 
 public class DidChangeWSHandler extends LSPHandler
 {
@@ -61,7 +65,50 @@ public class DidChangeWSHandler extends LSPHandler
 	
 	private RPCMessageList didChangeWorkspaceFolders(RPCRequest request)
 	{
-		return new RPCMessageList(request, RPCErrors.InvalidRequest, request.getMethod());
+		JSONObject params = request.get("params");
+		JSONObject event = params.get("event");
+		JSONArray added = event.get("added");
+		JSONArray removed = event.get("removed");
+		List<File> newRoots = new Vector<File>(lspServerState.getManager().getRoots());
+		
+		try
+		{
+			for (int i=0; i<added.size(); i++)
+			{
+				JSONObject item = (JSONObject) added.get(i);
+				String uri = item.get("uri");
+				File folder = Utils.uriToFile(uri);
+				
+				if (!newRoots.contains(folder))
+				{
+					newRoots.add(folder);
+					Log.printf("Adding folder %s", folder);
+				}
+			}
+
+			for (int i=0; i<removed.size(); i++)
+			{
+				JSONObject item = (JSONObject) removed.get(i);
+				String uri = item.get("uri");
+				File folder = Utils.uriToFile(uri);
+				
+				if (newRoots.contains(folder))
+				{
+					newRoots.remove(folder);
+					Log.printf("Removing folder %s", folder);
+				}
+			}
+
+			return lspServerState.getManager().changeFolders(request, newRoots);
+		}
+		catch (IOException e)
+		{
+			return new RPCMessageList(request, RPCErrors.InvalidRequest, request.getMethod());
+		}
+		catch (URISyntaxException e)
+		{
+			return new RPCMessageList(request, RPCErrors.InvalidRequest, request.getMethod());
+		}
 	}
 
 	private RPCMessageList didChangeWatchedFiles(RPCRequest request)

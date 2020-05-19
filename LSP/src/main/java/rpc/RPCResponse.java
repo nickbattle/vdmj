@@ -59,4 +59,21 @@ public class RPCResponse extends JSONObject
 		this();
 		put("error", new JSONObject("code", error.getValue(), "message", message));
 	}
+	
+	public boolean isError()
+	{
+		return get("error") != null;
+	}
+	
+	public String getError()
+	{
+		JSONObject error = get("error");
+		
+		if (error != null)
+		{
+			return error.get("message");
+		}
+		
+		return "success";
+	}
 }

@@ -23,12 +23,19 @@
 
 package lsp.workspace;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
+import json.JSONArray;
+import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.LSPServerState;
+import lsp.Utils;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import rpc.RPCResponse;
+import workspace.Log;
 
 public class WorkspaceFoldersHandler extends LSPHandler
 {
@@ -41,5 +48,41 @@ public class WorkspaceFoldersHandler extends LSPHandler
 	public RPCMessageList request(RPCRequest request) throws IOException
 	{
 		return null;	// Not used
+	}
+	
+	@Override
+	public void response(RPCResponse message)
+	{
+		if (message.isError())
+		{
+			Log.error("Error response received: %s", message.getError());
+			return;
+		}
+		
+		JSONArray result = message.get("result");
+		List<File> roots = lspServerState.getManager().getRoots();
+		
+		try
+		{
+			for (int i=0; i<result.size(); i++)
+			{
+				JSONObject item = result.index(i);
+				String uri = item.get("uri");
+				File file = Utils.uriToFile(uri);
+				
+				if (roots.contains(file))
+				{
+					Log.printf("Roots contains %s", uri);
+				}
+				else
+				{
+					Log.printf("Roots does NOT contain %s", uri);
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+		}
 	}
 }
