@@ -236,13 +236,11 @@ public abstract class WorkspaceManager
 			DAPMessageList responses = new DAPMessageList(request);
 			responses.add(heading());
 			responses.add(text("Initialized in " + (double)(after-before)/1000 + " secs.\n"));
-			prompt(responses);
 			return responses;
 		}
 		catch (Exception e)
 		{
 			DAPMessageList responses = new DAPMessageList(request, e);
-			prompt(responses);
 			return responses;
 		}
 	}
@@ -260,14 +258,6 @@ public abstract class WorkspaceManager
 				(noDebug ? "" : "* DEBUG enabled\n") +
 				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
 				" is " + getInterpreter().getDefaultName() + "\n");
-	}
-	
-	protected void prompt(DAPMessageList list)
-	{
-		if (System.getProperty("lsp.prompts") != null)
-		{
-			list.add(text(interpreter.getDefaultName() + "> "));
-		}
 	}
 	
 	protected DAPResponse text(String message)
@@ -729,7 +719,6 @@ public abstract class WorkspaceManager
 				{
 					DAPMessageList responses = new DAPMessageList(request,
 							new JSONObject("result", "Cannot start interpreter: errors exist?", "variablesReference", 0));
-					prompt(responses);
 					dapServerState.setRunning(false);
 					clearInterpreter();
 					return responses;
@@ -738,7 +727,6 @@ public abstract class WorkspaceManager
 				{
 					DAPMessageList responses = new DAPMessageList(request,
 							new JSONObject("result", "Specification has changed: try restart", "variablesReference", 0));
-					prompt(responses);
 					return responses;
 				}
 			}
@@ -748,7 +736,6 @@ public abstract class WorkspaceManager
 		catch (Exception e)
 		{
 			DAPMessageList responses = new DAPMessageList(request, e);
-			prompt(responses);
 			return responses;
 		}
 	}
