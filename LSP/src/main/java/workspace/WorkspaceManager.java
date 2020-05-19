@@ -72,6 +72,7 @@ import lsp.Utils;
 import lsp.textdocument.CompletionItemKind;
 import lsp.textdocument.SymbolKind;
 import lsp.textdocument.WatchKind;
+import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
@@ -82,7 +83,8 @@ public abstract class WorkspaceManager
 {
 	private static WorkspaceManager INSTANCE = null;
 
-	private File rootUri = null;
+	private JSONObject clientCapabilities;
+	private List<File> roots = new Vector<File>();
 	protected Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
 	protected Set<File> openFiles = new HashSet<File>();
 	
@@ -91,6 +93,7 @@ public abstract class WorkspaceManager
 
 	protected LSPServerState lspServerState;
 	protected DAPServerState dapServerState;
+
 	
 	public static WorkspaceManager createInstance(Dialect dialect) throws IOException
 	{
@@ -142,10 +145,12 @@ public abstract class WorkspaceManager
 		try
 		{
 			JSONObject params = request.get("params");
-			rootUri = Utils.uriToFile(params.get("rootUri"));
+			getRoots().clear();
+			getRoots().add(Utils.uriToFile(params.get("rootUri")));	// TODO workspace folders
+			clientCapabilities = params.get("capabilities");
 			openFiles.clear();
 			Properties.init();
-			loadProjectFiles(rootUri);
+			loadAllProjectFiles();
 			
 			RPCMessageList responses = new RPCMessageList();
 			responses.add(new RPCResponse(request, new LSPInitializeResponse()));
@@ -153,11 +158,12 @@ public abstract class WorkspaceManager
 		}
 		catch (URISyntaxException e)
 		{
-			return new RPCMessageList(request, "Malformed URI");
+			return new RPCMessageList(request, RPCErrors.InvalidRequest, "Malformed URI");
 		}
 		catch (Exception e)
 		{
-			return new RPCMessageList(request, e.getMessage());
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
 
@@ -167,13 +173,19 @@ public abstract class WorkspaceManager
 		{
 			RPCMessageList response = new RPCMessageList();
 			response.add(lspDynamicRegistrations());
-			response.add(lspWorkspaceFolders());
+			
+			if (getClientCapability("workspace.workspaceFolders"))
+			{
+				response.add(lspWorkspaceFolders());
+			}
+			
 			response.addAll(checkLoadedFiles());
 			return response;
 		}
 		catch (Exception e)
 		{
-			return new RPCMessageList(request, e.getMessage());
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
 
@@ -236,17 +248,52 @@ public abstract class WorkspaceManager
 			DAPMessageList responses = new DAPMessageList(request);
 			responses.add(heading());
 			responses.add(text("Initialized in " + (double)(after-before)/1000 + " secs.\n"));
-			prompt(responses);
 			return responses;
 		}
 		catch (Exception e)
 		{
+			Log.error(e);
 			DAPMessageList responses = new DAPMessageList(request, e);
-			prompt(responses);
 			return responses;
 		}
 	}
 	
+	public List<File> getRoots()
+	{
+		return roots;
+	}
+	
+	public boolean getClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
+	{
+		String[] parts = dotName.split(".");
+		JSONObject json = clientCapabilities;
+		
+		for (String part: parts)
+		{
+			if (json.containsKey(part))
+			{
+				Object obj = json.get(part);
+				
+				if (obj instanceof JSONObject)
+				{
+					json = (JSONObject) obj;
+				}
+				else if (obj instanceof Boolean)
+				{
+					Log.printf("Client capability %s = %s", dotName, obj);
+					return (Boolean) obj;
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+		
+		Log.printf("Missing client capability: %s", dotName);
+		return false;
+	}
+
 	/** True if we have an interpreter that we can use. */
 	protected abstract boolean canExecute();
 	
@@ -260,14 +307,6 @@ public abstract class WorkspaceManager
 				(noDebug ? "" : "* DEBUG enabled\n") +
 				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
 				" is " + getInterpreter().getDefaultName() + "\n");
-	}
-	
-	protected void prompt(DAPMessageList list)
-	{
-		if (System.getProperty("lsp.prompts") != null)
-		{
-			list.add(text(interpreter.getDefaultName() + "> "));
-		}
 	}
 	
 	protected DAPResponse text(String message)
@@ -284,6 +323,14 @@ public abstract class WorkspaceManager
 		catch (Exception e)
 		{
 			return new DAPMessageList(request, e);
+		}
+	}
+
+	private void loadAllProjectFiles() throws IOException
+	{
+		for (File root: getRoots())
+		{
+			loadProjectFiles(root);
 		}
 	}
 
@@ -514,6 +561,22 @@ public abstract class WorkspaceManager
 		}
 	}
 
+	public RPCMessageList changeFolders(RPCRequest request, List<File> newRoots)
+	{
+		try
+		{
+			roots.clear();
+			projectFiles.clear();
+			loadAllProjectFiles();
+			return checkLoadedFiles();
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
 	public RPCMessageList afterChangeWatchedFiles(RPCRequest request) throws Exception
 	{
 		return checkLoadedFiles();
@@ -729,7 +792,6 @@ public abstract class WorkspaceManager
 				{
 					DAPMessageList responses = new DAPMessageList(request,
 							new JSONObject("result", "Cannot start interpreter: errors exist?", "variablesReference", 0));
-					prompt(responses);
 					dapServerState.setRunning(false);
 					clearInterpreter();
 					return responses;
@@ -738,7 +800,6 @@ public abstract class WorkspaceManager
 				{
 					DAPMessageList responses = new DAPMessageList(request,
 							new JSONObject("result", "Specification has changed: try restart", "variablesReference", 0));
-					prompt(responses);
 					return responses;
 				}
 			}
@@ -747,8 +808,8 @@ public abstract class WorkspaceManager
 		}
 		catch (Exception e)
 		{
+			Log.error(e);
 			DAPMessageList responses = new DAPMessageList(request, e);
-			prompt(responses);
 			return responses;
 		}
 	}
