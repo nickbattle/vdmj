@@ -265,7 +265,7 @@ public abstract class WorkspaceManager
 	
 	public boolean getClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
 	{
-		String[] parts = dotName.split(".");
+		String[] parts = dotName.split("\\.");
 		JSONObject json = clientCapabilities;
 		
 		for (String part: parts)
