@@ -24,7 +24,6 @@
 package lsp.workspace;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Vector;
@@ -65,48 +64,45 @@ public class DidChangeWSHandler extends LSPHandler
 	
 	private RPCMessageList didChangeWorkspaceFolders(RPCRequest request)
 	{
-		JSONObject params = request.get("params");
-		JSONObject event = params.get("event");
-		JSONArray added = event.get("added");
-		JSONArray removed = event.get("removed");
-		List<File> newRoots = new Vector<File>(lspServerState.getManager().getRoots());
-		
 		try
 		{
+			JSONObject params = request.get("params");
+			JSONObject event = params.get("event");
+			JSONArray added = event.get("added");
+			JSONArray removed = event.get("removed");
+			List<File> newRoots = new Vector<File>(lspServerState.getManager().getRoots());
+		
 			for (int i=0; i<added.size(); i++)
 			{
-				JSONObject item = (JSONObject) added.get(i);
+				JSONObject item = added.index(i);
 				String uri = item.get("uri");
 				File folder = Utils.uriToFile(uri);
 				
 				if (!newRoots.contains(folder))
 				{
 					newRoots.add(folder);
-					Log.printf("Adding folder %s", folder);
+					Log.printf("Adding workspace folder %s", folder);
 				}
 			}
 
 			for (int i=0; i<removed.size(); i++)
 			{
-				JSONObject item = (JSONObject) removed.get(i);
+				JSONObject item = removed.index(i);
 				String uri = item.get("uri");
 				File folder = Utils.uriToFile(uri);
 				
 				if (newRoots.contains(folder))
 				{
 					newRoots.remove(folder);
-					Log.printf("Removing folder %s", folder);
+					Log.printf("Removing workspace folder %s", folder);
 				}
 			}
 
 			return lspServerState.getManager().changeFolders(request, newRoots);
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
-			return new RPCMessageList(request, RPCErrors.InvalidRequest, request.getMethod());
-		}
-		catch (URISyntaxException e)
-		{
+			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InvalidRequest, request.getMethod());
 		}
 	}
@@ -144,10 +140,11 @@ public class DidChangeWSHandler extends LSPHandler
 		}
 		catch (URISyntaxException e)
 		{
-			return new RPCMessageList(request, "URI syntax error");
+			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
 		}
 		catch (Exception e)
 		{
+			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}

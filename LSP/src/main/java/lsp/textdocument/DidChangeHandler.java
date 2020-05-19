@@ -24,7 +24,6 @@
 package lsp.textdocument;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 
 import json.JSONArray;
@@ -35,6 +34,7 @@ import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.Log;
 
 public class DidChangeHandler extends LSPHandler
 {
@@ -44,7 +44,7 @@ public class DidChangeHandler extends LSPHandler
 	}
 
 	@Override
-	public RPCMessageList request(RPCRequest request) throws IOException
+	public RPCMessageList request(RPCRequest request)
 	{
 		try
 		{
@@ -71,10 +71,11 @@ public class DidChangeHandler extends LSPHandler
 		}
 		catch (URISyntaxException e)
 		{
-			return new RPCMessageList(request, "URI syntax error");
+			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
 		}
 		catch (Exception e)
 		{
+			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}

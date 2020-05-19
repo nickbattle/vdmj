@@ -23,8 +23,6 @@
 
 package lsp;
 
-import java.io.IOException;
-
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import workspace.Log;
@@ -39,7 +37,7 @@ public class InitializeHandler extends LSPHandler
 	}
 
 	@Override
-	public RPCMessageList request(RPCRequest request) throws IOException
+	public RPCMessageList request(RPCRequest request)
 	{
 		switch (request.getMethod())
 		{

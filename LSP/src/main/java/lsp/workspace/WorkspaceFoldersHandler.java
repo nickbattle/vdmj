@@ -24,7 +24,6 @@
 package lsp.workspace;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import json.JSONArray;
@@ -45,9 +44,9 @@ public class WorkspaceFoldersHandler extends LSPHandler
 	}
 
 	@Override
-	public RPCMessageList request(RPCRequest request) throws IOException
+	public RPCMessageList request(RPCRequest request)
 	{
-		return null;	// Not used
+		return null;	// Not used - see response megthod
 	}
 	
 	@Override

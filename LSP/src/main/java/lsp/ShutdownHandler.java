@@ -23,8 +23,6 @@
 
 package lsp;
 
-import java.io.IOException;
-
 import rpc.RPCRequest;
 import rpc.RPCMessageList;
 
@@ -36,7 +34,7 @@ public class ShutdownHandler extends LSPHandler
 	}
 
 	@Override
-	public RPCMessageList request(RPCRequest request) throws IOException
+	public RPCMessageList request(RPCRequest request)
 	{
 		lspServerState.setInitialized(false);
 		return new RPCMessageList(request);
