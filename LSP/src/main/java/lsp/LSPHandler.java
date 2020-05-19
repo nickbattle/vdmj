@@ -46,6 +46,14 @@ abstract public class LSPHandler implements RPCHandler
 	@Override
 	public void response(RPCResponse message)
 	{
-		Log.printf("Response to id %d ignored", (Long)message.get("id"));
+		if (message.isError())
+		{
+			Log.error("Error response to id %d received: %s", (Long)message.get("id"), message.getError());
+			return;
+		}
+		else
+		{
+			Log.printf("Successful response to id %d ignored", (Long)message.get("id"));
+		}
 	}
 }
