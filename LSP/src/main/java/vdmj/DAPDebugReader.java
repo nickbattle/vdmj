@@ -274,7 +274,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		{
 			if (tp.condition == null)
 			{
-				String s = "Reached trace point " + tp.location;
+				String s = "Reached trace point " + tp.location + "\n";
 				text(Thread.currentThread().getName() + ": " + s);
 			}
 			else
@@ -290,7 +290,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 					result = e.getMessage();
 				}
 				
-				String s = tp.trace + " = " + result + " at trace point " + tp.location;
+				String s = tp.trace + " = " + result + " at trace point " + tp.location + "\n";
 				text(Thread.currentThread().getName() + ": " + s);
 			}
 		}

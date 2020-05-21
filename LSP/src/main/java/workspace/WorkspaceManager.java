@@ -769,7 +769,7 @@ public abstract class WorkspaceManager
 					{
 						interpreter.clearBreakpoint(exp.breakpoint.number);
 						
-						if (logMessage == null)
+						if (logMessage == null || logMessage.isEmpty())
 						{
 							interpreter.setBreakpoint(exp, condition);
 						}
@@ -786,7 +786,7 @@ public abstract class WorkspaceManager
 				{
 					interpreter.clearBreakpoint(stmt.breakpoint.number);
 					
-					if (logMessage == null)
+					if (logMessage == null || logMessage.isEmpty())
 					{
 						interpreter.setBreakpoint(stmt, condition);
 					}
