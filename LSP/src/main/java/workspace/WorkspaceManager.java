@@ -748,10 +748,12 @@ public abstract class WorkspaceManager
 			String logMessage = breakpoint.get("logMessage");
 			String condition = breakpoint.get("condition");
 			
-			if (condition == null)
+			if (condition == null || condition.isEmpty())
 			{
 				condition = breakpoint.get("hitCondition");
 			}
+			
+			if (condition != null && condition.isEmpty()) condition = null;
 
 			if (!noDebug)	// debugging allowed!
 			{
