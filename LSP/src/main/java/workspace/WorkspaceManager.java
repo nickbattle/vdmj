@@ -724,16 +724,16 @@ public abstract class WorkspaceManager
 		return symbolInformation(name.name + ":" + type, name.location, kind, container);
 	}
 
-	public DAPMessageList setBreakpoints(DAPRequest request, File file, JSONArray lines) throws Exception
+	public DAPMessageList setBreakpoints(DAPRequest request, File file, JSONArray breakpoints) throws Exception
 	{
 		JSONArray results = new JSONArray();
 		
-		Map<Integer, Breakpoint> breakpoints = getInterpreter().getBreakpoints();
-		Set<Integer> bps = new HashSet<Integer>(breakpoints.keySet());
+		Map<Integer, Breakpoint> existing = getInterpreter().getBreakpoints();
+		Set<Integer> bps = new HashSet<Integer>(existing.keySet());
 		
 		for (Integer bpno: bps)
 		{
-			Breakpoint bp = breakpoints.get(bpno);
+			Breakpoint bp = existing.get(bpno);
 			
 			if (bp.location.file.equals(file))
 			{
@@ -741,17 +741,25 @@ public abstract class WorkspaceManager
 			}
 		}
 		
-		for (Object object: lines)
+		for (Object object: breakpoints)
 		{
-			int line = ((Long)object).intValue();
+			JSONObject breakpoint = (JSONObject) object;
+			long line = breakpoint.get("line");
+			String logMessage = breakpoint.get("logMessage");
+			String condition = breakpoint.get("condition");
+			
+			if (condition == null)
+			{
+				condition = breakpoint.get("hitCondition");
+			}
 
 			if (!noDebug)	// debugging allowed!
 			{
-				INStatement stmt = interpreter.findStatement(file, line);
+				INStatement stmt = interpreter.findStatement(file, (int)line);
 				
 				if (stmt == null)
 				{
-					INExpression exp = interpreter.findExpression(file, line);
+					INExpression exp = interpreter.findExpression(file, (int)line);
 		
 					if (exp == null)
 					{
@@ -760,14 +768,34 @@ public abstract class WorkspaceManager
 					else
 					{
 						interpreter.clearBreakpoint(exp.breakpoint.number);
-						interpreter.setBreakpoint(exp, null);
+						
+						if (logMessage == null || logMessage.isEmpty())
+						{
+							interpreter.setBreakpoint(exp, condition);
+						}
+						else
+						{
+							if (condition != null) Log.error("Ignoring tracepoint condition " + condition);
+							interpreter.setTracepoint(exp, logMessage);
+						}
+						
 						results.add(new JSONObject("verified", true));
 					}
 				}
 				else
 				{
 					interpreter.clearBreakpoint(stmt.breakpoint.number);
-					interpreter.setBreakpoint(stmt, null);
+					
+					if (logMessage == null || logMessage.isEmpty())
+					{
+						interpreter.setBreakpoint(stmt, condition);
+					}
+					else
+					{
+						if (condition != null) Log.error("Ignoring tracepoint condition " + condition);
+						interpreter.setTracepoint(stmt, logMessage);
+					}
+
 					results.add(new JSONObject("verified", true));
 				}
 			}

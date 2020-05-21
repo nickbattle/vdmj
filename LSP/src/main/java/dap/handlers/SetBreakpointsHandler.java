@@ -49,9 +49,9 @@ public class SetBreakpointsHandler extends DAPHandler
 			JSONObject arguments = request.get("arguments");
 			JSONObject source = arguments.get("source");
 			File file = Utils.pathToFile(source.get("path"));
-			JSONArray lines = arguments.get("lines");
+			JSONArray breakpoints = arguments.get("breakpoints");
 			
-			return dapServerState.getManager().setBreakpoints(request, file, lines);
+			return dapServerState.getManager().setBreakpoints(request, file, breakpoints);
 		}
 		catch (Exception e)
 		{

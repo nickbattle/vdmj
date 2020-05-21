@@ -76,7 +76,6 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			{
 				debuggedThread = link.getDebugThread();
 				Log.printf("----------------- DEBUG STOP in %s", debuggedThread.getName());
-				prompt();
 				
 				if (doCommand(true))	// timeout first command
 				{
@@ -181,7 +180,6 @@ public class DAPDebugReader extends Thread implements TraceCallback
 
 					case PRINT:
 						server.writeMessage(dapResponse);
-						prompt();
 						return true;
 
 					default:
@@ -276,7 +274,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		{
 			if (tp.condition == null)
 			{
-				String s = "Reached trace point [" + tp.number + "]";
+				String s = "Reached trace point " + tp.location + "\n";
 				text(Thread.currentThread().getName() + ": " + s);
 			}
 			else
@@ -292,7 +290,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 					result = e.getMessage();
 				}
 				
-				String s = tp.trace + " = " + result + " at trace point [" + tp.number + "]";
+				String s = tp.trace + " = " + result + " at trace point " + tp.location + "\n";
 				text(Thread.currentThread().getName() + ": " + s);
 			}
 		}
@@ -302,16 +300,8 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		}
 	}
 	
-	private void prompt() throws IOException
-	{
-		text("[debug]> ");
-	}
-
 	private void text(String message) throws IOException
 	{
-		if (System.getProperty("lsp.prompts") != null)
-		{
-			server.writeMessage(new DAPResponse("output", new JSONObject("output", message)));
-		}
+		server.writeMessage(new DAPResponse("output", new JSONObject("output", message)));
 	}
 }
