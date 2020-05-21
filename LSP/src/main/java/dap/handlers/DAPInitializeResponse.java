@@ -42,6 +42,10 @@ public class DAPInitializeResponse extends DAPResponse
 		cap.put("supportsConfigurationDoneRequest", true);
 		cap.put("supportsTerminateRequest", true);
 		cap.put("supportsCancelRequest", false);
+
+		cap.put("supportsConditionalBreakpoints", true);
+		cap.put("supportsHitConditionalBreakpoints", true);
+		cap.put("supportsLogPoints", true);
 		return cap;
 	}
 }
