@@ -61,10 +61,11 @@ public class INAnnotatedExpression extends INExpression
 		annotation.inAfter(this, rv, ctxt);
 		return rv;
 	}
+
 	@Override
 	public INExpression findExpression(int lineno)
 	{
-		return (location.startLine == lineno) ? this : null;
+		return expression.findExpression(lineno);
 	}
 
 	@Override
