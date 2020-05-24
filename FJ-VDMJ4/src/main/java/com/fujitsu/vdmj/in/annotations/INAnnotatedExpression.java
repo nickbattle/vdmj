@@ -65,6 +65,7 @@ public class INAnnotatedExpression extends INExpression
 	@Override
 	public INExpression findExpression(int lineno)
 	{
+		if (location.startLine == lineno) return this;
 		return expression.findExpression(lineno);
 	}
 
