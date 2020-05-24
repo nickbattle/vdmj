@@ -815,7 +815,7 @@ public class ExpressionReader extends SyntaxReader
 		if (annotation != null)
 		{
 			// Re-apply annotation, now that exp has been rewired.
-			exp = new ASTAnnotatedExpression(exp.location, annotation, exp);
+			exp = new ASTAnnotatedExpression(annotation.name.location, annotation, exp);
 		}
 
 		return exp;
