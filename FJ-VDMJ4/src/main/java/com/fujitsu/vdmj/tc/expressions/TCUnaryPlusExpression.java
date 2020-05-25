@@ -47,7 +47,14 @@ public class TCUnaryPlusExpression extends TCUnaryExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		return exp.typeCheck(env, null, scope, constraint);
+		TCType t = exp.typeCheck(env, null, scope, constraint);
+		
+		if (!t.isNumeric(location))
+		{
+			report(3289, "'+' expression must be numeric");
+		}
+		
+		return t;
 	}
 
 	@Override
