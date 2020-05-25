@@ -57,6 +57,10 @@ public class TCUnaryMinusExpression extends TCUnaryExpression
 			t = new TCIntegerType(location);
 			checkConstraint(constraint, t);
 		}
+		else if (!t.isNumeric(location))
+		{
+			report(3288, "'-' expression must be numeric");
+		}
 
 		// Can't constrain the type, as we don't know whether the value is +ive or -ive
 		// return checkConstraint(constraint, t);

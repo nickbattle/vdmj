@@ -679,8 +679,8 @@ as the expected and actual values.
 3285, "System class can only define a default constructor"
 3286, "Constructor cannot be 'async', 'static' or 'pure'"
 3287, "Periodic/sporadic thread must have 4/3 argument(s)"
-3288, -
-3289, -
+3288, "'-' expression must be numeric"
+3289, "'+' expression must be numeric"
 3290, "Argument to setPriority must be an operation"
 3291, "Argument to setPriority cannot be a constructor"
 3292, "Constructor is not accessible"
