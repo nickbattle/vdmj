@@ -223,7 +223,7 @@ public abstract class WorkspaceManager
 		return responses;
 	}
 
-	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName) throws Exception
+	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName, String command) throws Exception
 	{
 		checkLoadedFiles();
 		
@@ -248,6 +248,39 @@ public abstract class WorkspaceManager
 			DAPMessageList responses = new DAPMessageList(request);
 			responses.add(heading());
 			responses.add(text("Initialized in " + (double)(after-before)/1000 + " secs.\n"));
+			
+			if (command != null)
+			{
+				DAPMessageList eval = evaluate(request, command, "repl");
+				
+				if (eval != null && !eval.isEmpty())
+				{
+					JSONObject body = eval.get(0).get("body");
+					Boolean success = eval.get(0).get("success");
+					responses.add(text(command + "\n"));
+					
+					if (success && body != null)
+					{
+						String result = body.get("result");
+						responses.add(text(result));
+					}
+					else
+					{
+						String result = eval.get(0).get("message");
+						responses.add(text(result));
+					}
+				}
+				else
+				{
+					Log.error("Cannot evaluate command %s", command);
+					responses.add(text("Cannot evaluate command " + command));
+				}
+
+				responses.add(text("\nEvaluation complete.\n"));
+				// clearInterpreter();
+				// dapServerState.setRunning(false);	// disconnect afterwards
+			}
+			
 			return responses;
 		}
 		catch (Exception e)
