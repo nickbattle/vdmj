@@ -336,7 +336,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	}
 	
 	@Override
-	protected boolean hasChanged() throws Exception
+	protected boolean hasChanged()
 	{
 		return getInterpreter() != null && getInterpreter().getIN() != inClassList;
 	}

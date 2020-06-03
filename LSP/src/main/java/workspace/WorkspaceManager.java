@@ -62,6 +62,7 @@ import dap.DAPEvent;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
+import dap.DAPServer;
 import dap.DAPServerState;
 import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
@@ -231,7 +232,7 @@ public abstract class WorkspaceManager
 		{
 			DAPMessageList responses = new DAPMessageList();
 			responses.add(new DAPResponse(request, false, "Specification has errors, cannot launch", null));
-			responses.add(text("Specification has errors, cannot launch"));
+			stderr("Specification has errors, cannot launch");
 			clearInterpreter();
 			return responses;
 		}
@@ -246,39 +247,30 @@ public abstract class WorkspaceManager
 			long after = System.currentTimeMillis();
 			
 			DAPMessageList responses = new DAPMessageList(request);
-			responses.add(heading());
-			responses.add(text("Initialized in " + (double)(after-before)/1000 + " secs.\n"));
+			heading();
+			stdout("Initialized in " + (double)(after-before)/1000 + " secs.\n");
 			
 			if (command != null)
 			{
 				DAPMessageList eval = evaluate(request, command, "repl");
 				
-				if (eval != null && !eval.isEmpty())
+				JSONObject body = eval.get(0).get("body");
+				Boolean success = eval.get(0).get("success");
+				stdout(command + "\n");
+				
+				if (success && body != null)
 				{
-					JSONObject body = eval.get(0).get("body");
-					Boolean success = eval.get(0).get("success");
-					responses.add(text(command + "\n"));
-					
-					if (success && body != null)
-					{
-						String result = body.get("result");
-						responses.add(text(result));
-					}
-					else
-					{
-						String result = eval.get(0).get("message");
-						responses.add(text(result));
-					}
+					stdout(body.get("result"));
 				}
 				else
 				{
-					Log.error("Cannot evaluate command %s", command);
-					responses.add(text("Cannot evaluate command " + command));
+					stderr(eval.get(0).get("message"));
 				}
 
-				responses.add(text("\nEvaluation complete.\n"));
-				// clearInterpreter();
-				// dapServerState.setRunning(false);	// disconnect afterwards
+				stdout("\nEvaluation complete.\n");
+				clearInterpreter();
+				pause(200);							// allow stdout/err to get back
+				dapServerState.setRunning(false);	// disconnect afterwards
 			}
 			
 			return responses;
@@ -291,6 +283,18 @@ public abstract class WorkspaceManager
 		}
 	}
 	
+	private void pause(int ms)
+	{
+		try
+		{
+			Thread.sleep(ms);
+		}
+		catch (InterruptedException e)
+		{
+			// ignore
+		}
+	}
+
 	public List<File> getRoots()
 	{
 		return roots;
@@ -331,20 +335,25 @@ public abstract class WorkspaceManager
 	protected abstract boolean canExecute();
 	
 	/** True if the spec has been updated since the interpreter was created. */
-	protected abstract boolean hasChanged() throws Exception;
+	protected abstract boolean hasChanged();
 
-	protected DAPResponse heading() throws Exception
+	private void heading() throws Exception
 	{
-		return text("*\n" +
+		stdout("*\n" +
 				"* VDMJ " + Settings.dialect + " Interpreter\n" +
 				(noDebug ? "" : "* DEBUG enabled\n") +
 				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
 				" is " + getInterpreter().getDefaultName() + "\n");
 	}
 	
-	protected DAPResponse text(String message)
+	protected void stdout(String message)
 	{
-		return new DAPResponse("output", new JSONObject("output", message));
+		DAPServer.getInstance().stdout(message);
+	}
+	
+	protected void stderr(String message)
+	{
+		DAPServer.getInstance().stderr(message);
 	}
 	
 	public DAPMessageList configurationDone(DAPRequest request) throws IOException
@@ -845,36 +854,27 @@ public abstract class WorkspaceManager
 	
 	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
 	{
-		try
-		{
-			Command command = Command.parse(expression);
+		Command command = Command.parse(expression);
 
-			if (command instanceof PrintCommand)	// ie. evaluate something
-			{
-				if (!canExecute())
-				{
-					DAPMessageList responses = new DAPMessageList(request,
-							new JSONObject("result", "Cannot start interpreter: errors exist?", "variablesReference", 0));
-					dapServerState.setRunning(false);
-					clearInterpreter();
-					return responses;
-				}
-				else if (hasChanged())
-				{
-					DAPMessageList responses = new DAPMessageList(request,
-							new JSONObject("result", "Specification has changed: try restart", "variablesReference", 0));
-					return responses;
-				}
-			}
-			
-			return command.run(request);
-		}
-		catch (Exception e)
+		if (command instanceof PrintCommand)	// ie. evaluate something
 		{
-			Log.error(e);
-			DAPMessageList responses = new DAPMessageList(request, e);
-			return responses;
+			if (!canExecute())
+			{
+				DAPMessageList responses = new DAPMessageList(request,
+						new JSONObject("result", "Cannot start interpreter: errors exist?", "variablesReference", 0));
+				dapServerState.setRunning(false);
+				clearInterpreter();
+				return responses;
+			}
+			else if (hasChanged())
+			{
+				DAPMessageList responses = new DAPMessageList(request,
+						new JSONObject("result", "Specification has changed: try restart", "variablesReference", 0));
+				return responses;
+			}
 		}
+		
+		return command.run(request);
 	}
 
 	/**
@@ -904,17 +904,17 @@ public abstract class WorkspaceManager
 
 	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
+		stdout("\nSession disconnected.\n");
 		clearInterpreter();
 		DAPMessageList result = new DAPMessageList(request);
-		result.add(0, text("\nSession disconnected.\n"));
 		return result;
 	}
 
 	public DAPMessageList terminate(DAPRequest request, Boolean restart)
 	{
+		stdout("\nSession terminated.\n");
 		clearInterpreter();
 		DAPMessageList result = new DAPMessageList(request);
-		result.add(text("\nSession terminated.\n"));
 		return result;
 	}
 	

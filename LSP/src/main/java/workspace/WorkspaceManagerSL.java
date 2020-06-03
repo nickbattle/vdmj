@@ -329,7 +329,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	}
 	
 	@Override
-	protected boolean hasChanged() throws Exception
+	protected boolean hasChanged()
 	{
 		return getInterpreter() != null && getInterpreter().getIN() != inModuleList;
 	}
