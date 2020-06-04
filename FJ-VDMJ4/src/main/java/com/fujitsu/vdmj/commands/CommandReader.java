@@ -897,7 +897,26 @@ abstract public class CommandReader
 	{
 		LexLocation.clearLocations();
 		println("Cleared all coverage information");
-		interpreter.init();
+		ConsoleDebugReader dbg = null;
+
+		try
+		{
+			dbg = new ConsoleDebugReader();
+			dbg.start();
+			interpreter.init();
+		}
+		catch (Exception e)
+		{
+			println("Initialization failed: " + e.getMessage());
+		}
+		finally
+		{
+			if (dbg != null)
+			{
+				dbg.interrupt();
+			}
+		}
+		
 		println("Global context initialized");
 		return true;
 	}
