@@ -27,17 +27,16 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.INMappedList;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.runtime.StateContext;
+import com.fujitsu.vdmj.scheduler.InitThread;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
@@ -139,80 +138,27 @@ public class INModuleList extends INMappedList<TCModule, INModule>
 
 	public void initialize(RootContext ctxt)
 	{
-		StateContext initialContext = (StateContext)ctxt;
-		initialContext.setThreadState(null);
-		Set<ContextException> problems = null;
-		Set<TCIdentifierToken> passed = new HashSet<TCIdentifierToken>();
-		int retries = 5;
-		boolean exceptions = Settings.exceptions;
-		Settings.exceptions = false;
-
-		do
+		try
 		{
-			problems = new HashSet<ContextException>();
-
-        	for (INModule m: this)
-    		{
-        		if (passed.contains(m.name))
-        		{
-        			continue;
-        		}
-
-        		long before = System.currentTimeMillis();
-        		Set<ContextException> e = m.initialize(initialContext);
-        		long after = System.currentTimeMillis();
-        		
-        		if (Settings.verbose && (after-before) > 200)
-        		{
-        			Console.out.printf("Pass %d: %s = %.3f secs\n", (6-retries), m.name, (double)(after-before)/1000);
-        		}
-
-        		if (e != null)
-        		{
-        			problems.addAll(e);
-
-        			if (e.size() == 1 && e.iterator().next().isStackOverflow())
-        			{
-        				retries = 0;
-        				break;
-        			}
-        		}
-        		else
-        		{
-        			passed.add(m.name);
-        		}
-     		}
-        	
-        	if (Settings.verbose && !problems.isEmpty())
-        	{
-        		Console.out.printf("Pass %d:\n", (6-retries));
-
-    			for (ContextException e: problems)
-    			{
-    				Console.out.println(e.toString());
-    			}        		
-        	}
-		}
-		while (--retries > 0 && !problems.isEmpty());
-
-		if (!problems.isEmpty())
-		{
-			ContextException toThrow = problems.iterator().next();
-
-			for (ContextException e: problems)
+			InitThread initThread = new InitThread(this, ctxt);
+			initThread.start();
+			initThread.join();
+			
+			Exception e = initThread.getException();
+			
+			if (e instanceof ContextException)
 			{
-				Console.err.println(e.toString());
-
-				if (e.number != 4034)	// Not in scope err
-				{
-					toThrow = e;
-				}
+				throw (ContextException)e;
 			}
-
-			throw toThrow;
+			else if (e != null)
+			{
+				throw new RuntimeException(e);
+			}
 		}
-
-		Settings.exceptions = exceptions;
+		catch (InterruptedException e)
+		{
+			// ignore
+		}
 	}
 
 	public INNamedTraceDefinition findTraceDefinition(TCNameToken name)

@@ -77,6 +77,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
+import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
 
@@ -322,15 +323,30 @@ public abstract class WorkspaceManager
 	{
 		try
 		{
-			heading();
-			stdout("Initialized in ... ");
+			DAPDebugReader dbg = null;
+			
+			try
+			{
+				dbg = new DAPDebugReader();		// Allow debugging of init sequence
+				dbg.start();
+				
+				heading();
+				stdout("Initialized in ... ");
 
-			long before = System.currentTimeMillis();
-			getInterpreter().init();
-			if (defaultName != null) getInterpreter().setDefaultName(defaultName);
-			long after = System.currentTimeMillis();
+				long before = System.currentTimeMillis();
+				getInterpreter().init();
+				if (defaultName != null) getInterpreter().setDefaultName(defaultName);
+				long after = System.currentTimeMillis();
 
-			stdout((double)(after-before)/1000 + " secs.\n");
+				stdout((double)(after-before)/1000 + " secs.\n");
+			}
+			finally
+			{
+				if (dbg != null)
+				{
+					dbg.interrupt();
+				}
+			}
 
 			if (launchCommand != null)
 			{

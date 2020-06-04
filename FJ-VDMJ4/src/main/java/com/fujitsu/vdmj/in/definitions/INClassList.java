@@ -27,20 +27,18 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.INMappedList;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.runtime.StateContext;
+import com.fujitsu.vdmj.scheduler.InitThread;
 import com.fujitsu.vdmj.scheduler.ResourceScheduler;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.TransactionValue;
 
 /**
@@ -116,114 +114,29 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
 
 	public void initialize(StateContext globalContext)
 	{
-		globalContext.setThreadState(CPUValue.vCPU);
-
-		// Initialize all the functions/operations first because the values
-		// "statics" can call them.
-
-		for (INClassDefinition cdef: this)
+		try
 		{
-			cdef.staticInit(globalContext);
-		}
-
-		// Values can forward reference each other, which means that we don't
-		// know what order to initialize the classes in. So we have a crude
-		// retry mechanism, looking for "forward reference" like exceptions.
-
-		ContextException failed = null;
-		int retries = 3;	// Potentially not enough.
-		Set<ContextException> trouble = new HashSet<ContextException>();
-		Set<TCNameToken> passed = new HashSet<TCNameToken>();
-		boolean exceptions = Settings.exceptions;
-		Settings.exceptions = false;
-
-		do
-		{
-			failed = null;
-			trouble.clear();
-
-    		for (INClassDefinition cdef: this)
-    		{
-				if (passed.contains(cdef.name))
-				{
-					continue;
-				}
-
-    			long before = System.currentTimeMillis();
-    			long after;
-
-    			try
-    			{
-            		cdef.staticValuesInit(globalContext);
-    				passed.add(cdef.name);
-    			}
-    			catch (ContextException e)
-    			{
-    				if (e.isStackOverflow())
-    				{
-    					trouble.clear();
-    					trouble.add(e);
-    					retries = 0;
-    					break;
-    				}
-    				
-    				trouble.add(e);
-    				
-    				// These two exceptions mean that a member could not be
-    				// found, which may be a forward reference, so we retry...
-
-    				if (e.number == 4034 || e.number == 6)
-    				{
-    					failed = e;
-    				}
-    				else
-    				{
-    					throw e;
-    				}
-    			}
-    			finally
-    			{
-    				after = System.currentTimeMillis();
-    				
-            		if (Settings.verbose && (after-before) > 200)
-            		{
-            			Console.out.printf("Pass %d: %s = %.3f secs\n", (4-retries), cdef.name.getName(), (double)(after-before)/1000);
-            		}
-    			}
-    		}
-    		
-        	if (Settings.verbose && !trouble.isEmpty())
-        	{
-        		Console.out.printf("Pass %d:\n", (4-retries));
-
-    			for (ContextException e: trouble)
-    			{
-    				Console.out.println(e.toString());
-    			}        		
-        	}
-		}
-		while (--retries > 0 && failed != null);
-
-		if (!trouble.isEmpty())
-		{
-			ContextException toThrow = trouble.iterator().next();
-
-			for (ContextException e: trouble)
+			InitThread initThread = new InitThread(this, globalContext);
+			initThread.start();
+			initThread.join();
+			
+			Exception e = initThread.getException();
+			
+			if (e instanceof ContextException)
 			{
-				Console.err.println(e.toString());
-
-				if (e.number != 4034)	// Not in scope err
-				{
-					toThrow = e;
-				}
+				throw (ContextException)e;
 			}
-
-			throw toThrow;
+			else if (e != null)
+			{
+				throw new RuntimeException(e);
+			}
 		}
-
-		Settings.exceptions = exceptions;
+		catch (InterruptedException e)
+		{
+			// ignore
+		}
 	}
-
+	
 	public INStatement findStatement(File file, int lineno)
 	{
 		for (INClassDefinition c: this)
