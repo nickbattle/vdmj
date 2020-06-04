@@ -95,6 +95,8 @@ public abstract class WorkspaceManager
 	protected LSPServerState lspServerState;
 	protected DAPServerState dapServerState;
 
+	private String launchCommand;
+
 	
 	public static WorkspaceManager createInstance(Dialect dialect) throws IOException
 	{
@@ -252,25 +254,7 @@ public abstract class WorkspaceManager
 			
 			if (command != null)
 			{
-				DAPMessageList eval = evaluate(request, command, "repl");
-				
-				JSONObject body = eval.get(0).get("body");
-				Boolean success = eval.get(0).get("success");
-				stdout(command + "\n");
-				
-				if (success && body != null)
-				{
-					stdout(body.get("result"));
-				}
-				else
-				{
-					stderr(eval.get(0).get("message"));
-				}
-
-				stdout("\nEvaluation complete.\n");
-				clearInterpreter();
-				pause(200);							// allow stdout/err to get back
-				dapServerState.setRunning(false);	// disconnect afterwards
+				this.launchCommand = command;
 			}
 			
 			return responses;
@@ -280,18 +264,6 @@ public abstract class WorkspaceManager
 			Log.error(e);
 			DAPMessageList responses = new DAPMessageList(request, e);
 			return responses;
-		}
-	}
-	
-	private void pause(int ms)
-	{
-		try
-		{
-			Thread.sleep(ms);
-		}
-		catch (InterruptedException e)
-		{
-			// ignore
 		}
 	}
 
@@ -360,11 +332,37 @@ public abstract class WorkspaceManager
 	{
 		try
 		{
+			if (launchCommand != null)
+			{
+				stdout("\n" + launchCommand + "\n");
+				DAPMessageList eval = evaluate(request, launchCommand, "repl");
+				
+				JSONObject body = eval.get(0).get("body");
+				Boolean success = eval.get(0).get("success");
+				
+				if (success && body != null)
+				{
+					stdout(body.get("result"));
+				}
+				else
+				{
+					stderr(eval.get(0).get("message"));
+				}
+
+				stdout("\nEvaluation complete.\n");
+				clearInterpreter();
+				dapServerState.setRunning(false);	// disconnect afterwards
+			}
+
 			return new DAPMessageList(request);
 		}
 		catch (Exception e)
 		{
 			return new DAPMessageList(request, e);
+		}
+		finally
+		{
+			launchCommand = null;
 		}
 	}
 
