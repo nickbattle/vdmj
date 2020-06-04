@@ -96,6 +96,7 @@ public abstract class WorkspaceManager
 	protected DAPServerState dapServerState;
 
 	private String launchCommand;
+	private String defaultName;
 
 	
 	public static WorkspaceManager createInstance(Dialect dialect) throws IOException
@@ -241,23 +242,12 @@ public abstract class WorkspaceManager
 		
 		try
 		{
+			// These values are used in configurationDone
 			this.noDebug = noDebug;
+			this.defaultName = defaultName;
+			this.launchCommand = command;
 			
-			long before = System.currentTimeMillis();
-			getInterpreter().init();
-			if (defaultName != null) getInterpreter().setDefaultName(defaultName);
-			long after = System.currentTimeMillis();
-			
-			DAPMessageList responses = new DAPMessageList(request);
-			heading();
-			stdout("Initialized in " + (double)(after-before)/1000 + " secs.\n");
-			
-			if (command != null)
-			{
-				this.launchCommand = command;
-			}
-			
-			return responses;
+			return new DAPMessageList(request);
 		}
 		catch (Exception e)
 		{
@@ -332,6 +322,16 @@ public abstract class WorkspaceManager
 	{
 		try
 		{
+			heading();
+			stdout("Initialized in ... ");
+
+			long before = System.currentTimeMillis();
+			getInterpreter().init();
+			if (defaultName != null) getInterpreter().setDefaultName(defaultName);
+			long after = System.currentTimeMillis();
+
+			stdout((double)(after-before)/1000 + " secs.\n");
+
 			if (launchCommand != null)
 			{
 				stdout("\n" + launchCommand + "\n");
