@@ -23,58 +23,66 @@
 
 package vdmj.commands;
 
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.runtime.Interpreter;
+
 import dap.DAPMessageList;
 import dap.DAPRequest;
+import json.JSONObject;
+import vdmj.DAPDebugReader;
+import workspace.Log;
 
-public class HelpCommand extends Command
+public class InitCommand extends Command
 {
-	public static final String USAGE = "Usage: help [command]";
-	public static final String[] HELP = { "help", "help [<command>] - information about commands" };
+	public static final String USAGE = "Usage: init";
+	public static final String[] HELP =	{ "init", "init - re-initialize the specification" };
 	
-	private String command = null;
-
-	public HelpCommand(String line)
+	public InitCommand(String line)
 	{
 		String[] parts = line.split("\\s+");
 		
-		if (parts.length == 2)
-		{
-			this.command = parts[1];
-		}
-		else if (parts.length != 1)
+		if (parts.length != 1)
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
 	}
 	
-	private static String[][] entries =
-	{
-		DefaultCommand.HELP,
-		PrintCommand.HELP,
-		SetCommand.HELP,
-		HelpCommand.HELP,
-		InitCommand.HELP,
-		QuitCommand.HELP
-	};
-	
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		StringBuilder sb = new StringBuilder();
-		
-		for (String[] help: entries)
+		try
 		{
-			if (command == null || command.equals(help[0]))
+			StringBuilder sb = new StringBuilder();
+			LexLocation.clearLocations();
+			sb.append("Cleared all coverage information\n");
+			DAPDebugReader dbg = null;
+
+			try
 			{
-				sb.append(help[1] + "\n");
+				dbg = new DAPDebugReader();
+				dbg.start();
+				Interpreter.getInstance().init();
 			}
+			catch (Exception e)
+			{
+				sb.append("Initialization failed: " + e.getMessage() + "\n");
+			}
+			finally
+			{
+				if (dbg != null)
+				{
+					dbg.interrupt();
+				}
+			}
+			
+			sb.append("Global context initialized\n");
+			
+			return new DAPMessageList(request, new JSONObject("result", sb.toString()));
 		}
-		
-		if (sb.length() == 0)
+		catch (Exception e)
 		{
-			sb.append("Unknown command '" + command + "'");
+			Log.error(e);
+			return new DAPMessageList(request, e);
 		}
-		
-		return new DAPMessageList(request, false, sb.toString(), null);
 	}
 }
