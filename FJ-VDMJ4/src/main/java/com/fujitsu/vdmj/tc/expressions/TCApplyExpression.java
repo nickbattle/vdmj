@@ -221,7 +221,7 @@ public class TCApplyExpression extends TCExpression
 		{
 			TCIntegerLiteralExpression index = (TCIntegerLiteralExpression)args.get(0);
 			
-			if (index.value.value <= 0)		// Common enough to explicitly check!
+			if (index.value.value.signum() <= 0)	// Common enough to explicitly check!
 			{
 				concern(isSimple, 3056, "Sequence application argument must > 0");	
 			}
