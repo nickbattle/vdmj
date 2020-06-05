@@ -216,6 +216,16 @@ public class TCApplyExpression extends TCExpression
 		{
 			concern(isSimple, 3268, "Empty sequence cannot be applied");
 		}
+		
+		if (args.size() == 1 && args.get(0) instanceof TCIntegerLiteralExpression)
+		{
+			TCIntegerLiteralExpression index = (TCIntegerLiteralExpression)args.get(0);
+			
+			if (index.value.value <= 0)		// Common enough to explicitly check!
+			{
+				concern(isSimple, 3056, "Sequence application argument must > 0");	
+			}
+		}
 
 		return seq.seqof;
 	}
