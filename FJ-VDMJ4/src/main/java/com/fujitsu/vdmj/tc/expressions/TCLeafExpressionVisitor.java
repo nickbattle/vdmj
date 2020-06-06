@@ -380,6 +380,12 @@ abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		return all;
 	}
+ 	
+ 	@Override
+ 	public C casePreOpExpression(TCPreOpExpression node, S arg)
+ 	{
+ 		return node.expression.apply(this, arg);
+ 	}
 
  	@Override
 	public C caseSameBaseClassExpression(TCSameBaseClassExpression node, S arg)
