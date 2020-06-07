@@ -365,6 +365,32 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 		
 		return all;
 	}
+ 	
+ 	@Override
+ 	public C casePostOpExpression(ASTPostOpExpression node, S arg)
+ 	{
+ 		return node.postexpression.apply(this, arg);
+ 	}
+ 	
+ 	@Override
+ 	public C casePreExpression(ASTPreExpression node, S arg)
+ 	{
+		C all = newCollection();
+		all.addAll(node.function.apply(this, arg));
+		
+		for (ASTExpression exp: node.args)
+		{
+			all.addAll(exp.apply(this, arg));
+		}
+		
+		return all;
+ 	}
+
+ 	@Override
+ 	public C casePreOpExpression(ASTPreOpExpression node, S arg)
+ 	{
+ 		return node.expression.apply(this, arg);
+ 	}
 
  	@Override
 	public C caseSameBaseClassExpression(ASTSameBaseClassExpression node, S arg)

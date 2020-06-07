@@ -372,6 +372,12 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		return all;
 	}
+ 	
+ 	@Override
+ 	public C casePostOpExpression(POPostOpExpression node, S arg)
+ 	{
+ 		return node.postexpression.apply(this, arg);
+ 	}
 
  	@Override
 	public C casePreExpression(POPreExpression node, S arg)
@@ -386,6 +392,12 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		return all;
 	}
+ 	
+ 	@Override
+ 	public C casePreOpExpression(POPreOpExpression node, S arg)
+ 	{
+ 		return node.expression.apply(this, arg);
+ 	}
 
  	@Override
 	public C caseSameBaseClassExpression(POSameBaseClassExpression node, S arg)
