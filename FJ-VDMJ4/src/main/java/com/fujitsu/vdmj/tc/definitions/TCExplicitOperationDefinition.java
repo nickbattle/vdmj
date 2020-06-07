@@ -261,9 +261,15 @@ public class TCExplicitOperationDefinition extends TCDefinition
 
 		if (postdef != null)
 		{
-			TCPattern rp = new TCIdentifierPattern(name.getResultName(location));
-			TCDefinitionList rdefs = rp.getDefinitions(type.result, NameScope.NAMESANDANYSTATE);
+			TCDefinitionList rdefs = new TCDefinitionList();
 			FlatEnvironment post = new FlatEnvironment(rdefs, local);
+			
+			if (!(type.result instanceof TCVoidType))
+			{
+				TCPattern rp = new TCIdentifierPattern(name.getResultName(location));
+				rdefs.addAll(rp.getDefinitions(type.result, NameScope.NAMESANDANYSTATE));
+			}
+			
 			post.setEnclosingDefinition(postdef);
 			post.setFunctional(true);
 			TCBooleanType expected = new TCBooleanType(location);
