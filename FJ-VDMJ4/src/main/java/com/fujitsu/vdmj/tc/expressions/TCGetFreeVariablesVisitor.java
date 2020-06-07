@@ -60,7 +60,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 			// If this is a global call, then we depend on the function
 			TCVariableExpression v = (TCVariableExpression)node.root;
 			
-			if (arg.globals.findName(v.name, NameScope.NAMESANDSTATE) != null)
+			if (arg.globals.findName(v.name, NameScope.NAMESANDANYSTATE) != null)
 			{
 				names.add(v.name);
 			}
@@ -292,7 +292,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	@Override
 	public TCNameSet caseVariableExpression(TCVariableExpression node, EnvTriple arg)
 	{
-		TCDefinition d = arg.globals.findName(node.name, NameScope.NAMESANDSTATE);
+		TCDefinition d = arg.globals.findName(node.name, NameScope.NAMESANDANYSTATE);
 		
 		if (d != null && d.isFunction())
 		{
@@ -309,7 +309,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 			}
 		}
 		
-		if (arg.env.findName(node.name, NameScope.NAMESANDSTATE) == null)
+		if (arg.env.findName(node.name, NameScope.NAMESANDANYSTATE) == null)
 		{
 			return new TCNameSet(node.name.getExplicit(true));
 		}

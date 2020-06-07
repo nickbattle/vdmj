@@ -382,6 +382,26 @@ abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	}
  	
  	@Override
+ 	public C casePostOpExpression(TCPostOpExpression node, S arg)
+ 	{
+ 		return node.postexpression.apply(this, arg);
+ 	}
+	
+ 	@Override
+ 	public C casePreExpression(TCPreExpression node, S arg)
+ 	{
+		C all = newCollection();
+		all.addAll(node.function.apply(this, arg));
+		
+		for (TCExpression exp: node.args)
+		{
+			all.addAll(exp.apply(this, arg));
+		}
+		
+		return all;
+ 	}
+
+ 	@Override
  	public C casePreOpExpression(TCPreOpExpression node, S arg)
  	{
  		return node.expression.apply(this, arg);
