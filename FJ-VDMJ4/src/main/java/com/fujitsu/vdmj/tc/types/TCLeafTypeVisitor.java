@@ -31,6 +31,14 @@ import java.util.Collection;
  */
 public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends TCTypeVisitor<C, S>
 {
+	/**
+	 * We have to collect the nodes that have already been visited since types can be recursive,
+	 * and the visitor will otherwise blow the stack. Note that this means you need a new visitor
+	 * instance for every use (or only re-use with care!). This is tested and modified in the
+	 * NamedType and RecordType entries.
+	 */
+	private TCTypeSet done = new TCTypeSet();
+	
 	@Override
 	public C caseBracketType(TCBracketType node, S arg)
 	{
@@ -69,7 +77,15 @@ public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends T
 	@Override
 	public C caseNamedType(TCNamedType node, S arg)
 	{
-		return node.type.apply(this, arg);
+		if (done.contains(node))
+		{
+			return newCollection();
+		}
+		else
+		{
+			done.add(node);
+			return node.type.apply(this, arg);
+		}
 	}
 
 	@Override
@@ -108,14 +124,22 @@ public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends T
 	@Override
 	public C caseRecordType(TCRecordType node, S arg)
 	{
-		C all = newCollection();
-		
-		for (TCField field: node.fields)
+		if (done.contains(node))
 		{
-			all.addAll(field.type.apply(this, arg));
+			return newCollection();
 		}
-		
-		return all;
+		else
+		{
+			done.add(node);
+			C all = newCollection();
+			
+			for (TCField field: node.fields)
+			{
+				all.addAll(field.type.apply(this, arg));
+			}
+			
+			return all;
+		}
 	}
 
 	@Override
