@@ -69,6 +69,7 @@ public abstract class ASTLeafTypeVisitor<E, C extends Collection<E>, S> extends 
 	@Override
 	public C caseNamedType(ASTNamedType node, S arg)
 	{
+		// NB. This won't recurse, unlike TCType, because the node.type is unresolved
 		return node.type.apply(this, arg);
 	}
 
@@ -112,6 +113,7 @@ public abstract class ASTLeafTypeVisitor<E, C extends Collection<E>, S> extends 
 		
 		for (ASTField field: node.fields)
 		{
+			// NB. This won't recurse, unlike TCType, because the field.type is unresolved
 			all.addAll(field.type.apply(this, arg));
 		}
 		

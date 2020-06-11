@@ -37,7 +37,7 @@ public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends T
 	 * instance for every use (or only re-use with care!). This is tested and modified in the
 	 * NamedType and RecordType entries.
 	 */
-	private TCTypeSet done = new TCTypeSet();
+	protected TCTypeSet done = new TCTypeSet();
 	
 	@Override
 	public C caseBracketType(TCBracketType node, S arg)

@@ -44,28 +44,46 @@ public class TCGetFreeVariablesVisitor extends TCLeafTypeVisitor<TCNameToken, TC
 	@Override
 	public TCNameSet caseNamedType(TCNamedType node, Environment env)
 	{
-		if (env.findType(node.typename, node.typename.getModule()) == null)
+		if (done.contains(node))
 		{
-			// Invariant values covered in TCTypeDefinition
-			return new TCNameSet(node.typename.getExplicit(true));
+			return newCollection();
 		}
 		else
 		{
-			return new TCNameSet();
+			done.add(node);
+
+			if (env.findType(node.typename, node.typename.getModule()) == null)
+			{
+				// Invariant values covered in TCTypeDefinition
+				return new TCNameSet(node.typename.getExplicit(true));
+			}
+			else
+			{
+				return new TCNameSet();
+			}
 		}
 	}
 	
 	@Override
 	public TCNameSet caseRecordType(TCRecordType node, Environment env)
 	{
-		if (env.findType(node.name, node.name.getModule()) == null)
+		if (done.contains(node))
 		{
-			// Invariant values covered in TCTypeDefinition
-			return new TCNameSet(node.name.getExplicit(true));
+			return newCollection();
 		}
 		else
 		{
-			return new TCNameSet();
+			done.add(node);
+
+			if (env.findType(node.name, node.name.getModule()) == null)
+			{
+				// Invariant values covered in TCTypeDefinition
+				return new TCNameSet(node.name.getExplicit(true));
+			}
+			else
+			{
+				return new TCNameSet();
+			}
 		}
 	}
 }
