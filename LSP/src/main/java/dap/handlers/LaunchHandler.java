@@ -43,9 +43,14 @@ public class LaunchHandler extends DAPHandler
 		try
 		{
 			JSONObject arguments = request.get("arguments");
-			boolean noDebug = arguments.get("noDebug");
+			Boolean noDebug = arguments.get("noDebug");
 			String defaultName = arguments.get("defaultName");
 			String command = arguments.get("command");
+			
+			if (noDebug == null)
+			{
+				noDebug = Boolean.FALSE;
+			}
 
 			return dapServerState.getManager().launch(request, noDebug, defaultName, command);
 		}
