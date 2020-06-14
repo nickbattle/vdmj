@@ -44,15 +44,8 @@ public class TCRangeResByExpression extends TCBinaryExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		TCType rngConstraint = null;
-		
-		if (constraint != null && constraint.isMap(location))
-		{
-			rngConstraint = new TCSetType(location, constraint.getMap().to);
-		}
-
 		ltype = left.typeCheck(env, null, scope, constraint);
-		rtype = right.typeCheck(env, null, scope, rngConstraint);
+		rtype = right.typeCheck(env, null, scope, null);	// restriction can be anything
 
 		if (!ltype.isMap(location))
 		{

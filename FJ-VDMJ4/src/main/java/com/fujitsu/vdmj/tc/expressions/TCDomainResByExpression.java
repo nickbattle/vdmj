@@ -44,14 +44,7 @@ public class TCDomainResByExpression extends TCBinaryExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		TCType domConstraint = null;
-		
-		if (constraint != null && constraint.isMap(location))
-		{
-			domConstraint = new TCSetType(location, constraint.getMap().from);
-		}
-
-		ltype = left.typeCheck(env, null, scope, domConstraint);
+		ltype = left.typeCheck(env, null, scope, null);		// restriction can be anything
 		rtype = right.typeCheck(env, null, scope, constraint);
 
 		if (!ltype.isSet(location))
