@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.runtime;
 
 import com.fujitsu.vdmj.debug.DebugLink;
+import com.fujitsu.vdmj.in.expressions.INBreakpointExpression;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 /**
@@ -36,6 +37,11 @@ public class Tracepoint extends Breakpoint
 	public Tracepoint(LexLocation location, int number, String trace) throws Exception
 	{
 		super(location, number, trace);
+		
+		if (condition instanceof INBreakpointExpression)
+		{
+			throw new Exception("Trace cannot use hit-count expressions");
+		}
 	}
 
 	@Override
