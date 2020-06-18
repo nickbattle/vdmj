@@ -101,6 +101,12 @@ abstract public class CommandReader
 	/** The cache of loaded plugin instances */
 	private Map<String, CommandPlugin> plugins = new HashMap<String, CommandPlugin>();
 
+	/** The script command input file, if any */
+	private BufferedReader scriptReader = null;
+	
+	/** The script command filename, if any */
+	private File scriptFile = null;
+
 	/**
 	 * Create a command reader with the given interpreter and prompt.
 	 *
@@ -145,8 +151,8 @@ abstract public class CommandReader
 
 			try
 			{
-				print(prompt);
-				line = Console.in.readLine();
+				prompt();
+				line = readLine();
 
 				if (line == null)
 				{
@@ -167,7 +173,10 @@ abstract public class CommandReader
 					continue;
 				}
 
-				lastline = line;
+				if (scriptReader == null)	// Don't remember script lines!
+				{
+					lastline = line;
+				}
 
 				if (line.equals("quit") || line.equals("q"))
 				{
@@ -199,10 +208,6 @@ abstract public class CommandReader
 				{
 					carryOn = doSet(line);
 				}
-				else if (line.equals("stop"))
-				{
-					carryOn = doStop(line);
-				}
 				else if (line.equals("help") || line.equals("?"))
 				{
 					doHelp(line);
@@ -211,33 +216,9 @@ abstract public class CommandReader
 				{
 					carryOn = doAssert(line);
 				}
-				else if(line.equals("continue") || line.equals("c"))
+				else if (line.startsWith("script"))
 				{
-					carryOn = doContinue(line);
-				}
-				else if(line.equals("stack"))
-				{
-					carryOn = doStack(line);
-				}
-				else if(line.equals("up"))
-				{
-					carryOn = doUp(line);
-				}
-				else if(line.equals("down"))
-				{
-					carryOn = doDown(line);
-				}
-				else if(line.equals("step") || line.equals("s"))
-				{
-					carryOn = doStep(line);
-				}
-				else if(line.equals("next") || line.equals("n"))
-				{
-					carryOn = doNext(line);
-				}
-				else if(line.equals("out") || line.equals("o"))
-				{
-					carryOn = doOut(line);
+					carryOn = doScript(line);
 				}
 				else if(line.startsWith("trace"))
 				{
@@ -343,10 +324,6 @@ abstract public class CommandReader
 				{
 					carryOn = doFilter(line);
 				}
-				else if (line.startsWith("thread"))		// thread or threads
-				{
-					carryOn = doThread(line);
-				}
 				else if (!usePlugin(line))		// Attempt to load plugin
 				{
 					println("Bad command. Try 'help'");
@@ -359,6 +336,55 @@ abstract public class CommandReader
 		}
 
 		return ExitStatus.EXIT_OK;
+	}
+	
+	private void prompt()
+	{
+		if (scriptFile == null)
+		{
+			print(prompt);
+		}
+		else
+		{
+			print(scriptFile.getName() + prompt);
+		}
+	}
+	
+	private String readLine() throws IOException
+	{
+		StringBuilder line = new StringBuilder();
+		line.append("\\");
+		
+		do
+		{
+			line.deleteCharAt(line.length() - 1);	// Remove trailing backslash
+			
+			if (scriptReader != null)
+			{
+				String part = scriptReader.readLine();
+				
+				if (part != null)
+				{
+					line.append(part);
+					println(part);
+				}
+				else
+				{
+					scriptReader.close();
+					scriptReader = null;	// EOF
+					scriptFile = null;
+					println("END");
+					break;
+				}
+			}
+			else
+			{
+				line.append(Console.in.readLine());
+			}
+		}
+		while (line.length() > 0 && line.charAt(line.length() - 1) == '\\');
+		
+		return line.toString();
 	}
 
 	private boolean usePlugin(String line) throws Exception
@@ -719,11 +745,6 @@ abstract public class CommandReader
 		}
 
 		return false;
-	}
-
-	protected boolean doStop(String line)
-	{
-		return notAvailable(line);
 	}
 
 	protected boolean doModules(String line)
@@ -1348,46 +1369,6 @@ abstract public class CommandReader
 		return true;
 	}
 
-	protected boolean doStep(String line)
-	{
-		return notAvailable(line);
-	}
-
-	protected boolean doNext(String line)
-	{
-		return notAvailable(line);
-	}
-
-	protected boolean doOut(String line)
-	{
-		return notAvailable(line);
-	}
-
-	protected boolean doStack(String line)
-	{
-		return notAvailable(line);
-	}
-
-	protected boolean doUp(String line)
-	{
-		return notAvailable(line);
-	}
-
-	protected boolean doDown(String line)
-	{
-		return notAvailable(line);
-	}
-
-	protected boolean doContinue(String line)
-	{
-		return notAvailable(line);
-	}
-
-	protected boolean doThread(String line)
-	{
-		return notAvailable(line);
-	}
-
 	protected boolean doAssert(String line)
 	{
 		File filename = null;
@@ -1410,6 +1391,41 @@ abstract public class CommandReader
 		}
 
 		assertFile(filename);
+		return true;
+	}
+
+	protected boolean doScript(String line)
+	{
+		if (scriptReader != null)
+		{
+			println("Cannot call a script within a script!");
+			return true;
+		}
+		
+		try
+		{
+			String[] parts = line.split("\\s+");
+			
+			if (parts.length != 2)
+			{
+				println("Usage: script <filename>");
+				scriptReader = null;
+				scriptFile = null;
+			}
+			else
+			{
+				scriptFile = new File(parts[1]);
+				scriptReader = new BufferedReader(
+					new InputStreamReader(new FileInputStream(scriptFile), VDMJ.filecharset));
+			}
+		}
+		catch (Exception e)
+		{
+			println("Cannot read file: " + e.getMessage());
+			scriptReader = null;
+			scriptFile = null;
+		}
+
 		return true;
 	}
 
@@ -1568,6 +1584,7 @@ abstract public class CommandReader
 		println("runalltraces [<name>] - run all CT traces in class/module name");
 		println("filter %age | <reduction type> - reduce CT trace(s)");
 		println("assert <file> - run assertions from a file");
+		println("script <file> - run commands from a file");
 		println("init - re-initialize the global environment");
 		println("env - list the global symbols in the default environment");
 		println("pog [<function/operation>] - generate proof obligations");
