@@ -45,6 +45,8 @@ import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
  * The root of the breakpoint class hierarchy.
@@ -120,6 +122,8 @@ public class Breakpoint implements Serializable
         			reader.setCurrentModule(location.module);
         			ASTExpression ast = reader.readExpression();
         			TCExpression tc = ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+        			Environment env = Interpreter.getInstance().getGlobalEnvironment();
+        			tc.typeCheck(env, null, NameScope.GLOBAL, null);
         			condition = ClassMapper.getInstance(INNode.MAPPINGS).convert(tc);
         			break;
 			}

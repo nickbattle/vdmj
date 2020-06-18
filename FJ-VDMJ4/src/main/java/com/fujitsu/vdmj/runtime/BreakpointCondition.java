@@ -25,5 +25,18 @@ package com.fujitsu.vdmj.runtime;
 
 public enum BreakpointCondition
 {
-	EQ, GT, GE, MOD
+	EQ("="), GT(">"), GE(">="), MOD("multiple of");
+	
+	private final String text;
+	
+	BreakpointCondition(String text)
+	{
+		this.text = text;
+	}
+
+	@Override
+	public String toString()
+	{
+		return text;
+	}
 }

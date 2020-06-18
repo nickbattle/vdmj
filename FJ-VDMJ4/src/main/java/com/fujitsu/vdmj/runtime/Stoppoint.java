@@ -32,9 +32,9 @@ public class Stoppoint extends Breakpoint
 {
 	private static final long serialVersionUID = 1L;
 
-	public Stoppoint(LexLocation location, int number, String trace) throws Exception
+	public Stoppoint(LexLocation location, int number, String condition) throws Exception
 	{
-		super(location, number, trace);
+		super(location, number, condition);
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class Stoppoint extends Breakpoint
 		else
 		{
 			return "break [" + number + "] " +
-				(trace == null ? "" : "when \"" + trace + "\" ") +
+				(condition == null ? "" : "when \"" + condition + "\" ") +
 				super.toString();
 		}
 	}
