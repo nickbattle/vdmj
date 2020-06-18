@@ -1661,7 +1661,13 @@ abstract public class CommandReader
 			}
 			else
 			{
-				interpreter.clearBreakpoint(exp.breakpoint.number);
+				Breakpoint old = interpreter.clearBreakpoint(exp.breakpoint.number);
+				
+				if (old != null)
+				{
+					println("Overwriting [" + old.number + "] " + old.location);
+				}
+				
 				Breakpoint bp = interpreter.setBreakpoint(exp, condition);
 				println("Created " + bp);
 				println(interpreter.getSourceLine(bp.location));
@@ -1669,7 +1675,13 @@ abstract public class CommandReader
 		}
 		else
 		{
-			interpreter.clearBreakpoint(stmt.breakpoint.number);
+			Breakpoint old = interpreter.clearBreakpoint(stmt.breakpoint.number);
+			
+			if (old != null)
+			{
+				println("Overwriting [" + old.number + "] " + old.location);
+			}
+			
 			Breakpoint bp = interpreter.setBreakpoint(stmt, condition);
 			println("Created " + bp);
 			println(interpreter.getSourceLine(bp.location));
@@ -1718,7 +1730,13 @@ abstract public class CommandReader
 				exp = bexp.left;
 			}
 			
-			interpreter.clearBreakpoint(exp.breakpoint.number);
+			Breakpoint old = interpreter.clearBreakpoint(exp.breakpoint.number);
+			
+			if (old != null)
+			{
+				println("Overwriting [" + old.number + "] " + old.location);
+			}
+			
 			Breakpoint bp = interpreter.setBreakpoint(exp, condition);
 			println("Created " + bp);
 			println(interpreter.getSourceLine(bp.location));
@@ -1727,7 +1745,13 @@ abstract public class CommandReader
 		{
 			OperationValue ov = (OperationValue)v;
 			INStatement stmt = ov.body;
-			interpreter.clearBreakpoint(stmt.breakpoint.number);
+			Breakpoint old = interpreter.clearBreakpoint(stmt.breakpoint.number);
+			
+			if (old != null)
+			{
+				println("Overwriting [" + old.number + "] " + old.location);
+			}
+			
 			Breakpoint bp = interpreter.setBreakpoint(stmt, condition);
 			println("Created " + bp);
 			println(interpreter.getSourceLine(bp.location));
@@ -1789,7 +1813,13 @@ abstract public class CommandReader
 			}
 			else
 			{
-				interpreter.clearBreakpoint(exp.breakpoint.number);
+				Breakpoint old = interpreter.clearBreakpoint(exp.breakpoint.number);
+				
+				if (old != null)
+				{
+					println("Overwriting [" + old.number + "] " + old.location);
+				}
+				
 				Breakpoint bp = interpreter.setTracepoint(exp, trace);
 				println("Created " + bp);
 				println(interpreter.getSourceLine(bp.location));
@@ -1797,7 +1827,13 @@ abstract public class CommandReader
 		}
 		else
 		{
-			interpreter.clearBreakpoint(stmt.breakpoint.number);
+			Breakpoint old = interpreter.clearBreakpoint(stmt.breakpoint.number);
+			
+			if (old != null)
+			{
+				println("Overwriting [" + old.number + "] " + old.location);
+			}
+
 			Breakpoint bp = interpreter.setTracepoint(stmt, trace);
 			println("Created " + bp);
 			println(interpreter.getSourceLine(bp.location));
