@@ -196,6 +196,11 @@ public class InvariantValue extends ReferenceValue
 				ctxt.threadState.setAtomic(false);
 			}
 		}
+		else if (equality != null && equals(other))
+		{
+			// Works with Maps of invariants that define "eq" (ValueMap is a TreeMap)
+			return 0;
+		}
 		else
 		{
 			return super.compareTo(other);
