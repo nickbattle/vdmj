@@ -110,11 +110,18 @@ public class INSetCompExpression extends INSetExpression
 					}
 				}
 
-				if (matches &&
-					(predicate == null ||
-					 predicate.eval(evalContext).boolValue(ctxt)))
+				try
 				{
-					set.add(first.eval(evalContext));
+					if (matches &&
+						(predicate == null ||
+						 predicate.eval(evalContext).boolValue(ctxt)))
+					{
+						set.add(first.eval(evalContext));
+					}
+				}
+				catch (ValueException e)
+				{
+					predicate.abort(e);
 				}
 			}
 
