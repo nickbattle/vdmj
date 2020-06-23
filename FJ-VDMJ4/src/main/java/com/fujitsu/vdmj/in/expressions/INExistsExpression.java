@@ -113,9 +113,16 @@ public class INExistsExpression extends INExpression
 					}
 				}
 
-				if (matches && predicate.eval(evalContext).boolValue(ctxt))
+				try
 				{
-					return new BooleanValue(true);
+					if (matches && predicate.eval(evalContext).boolValue(ctxt))
+					{
+						return new BooleanValue(true);
+					}
+				}
+				catch (ValueException e)
+				{
+					predicate.abort(e);
 				}
 			}
 		}

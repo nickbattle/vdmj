@@ -86,7 +86,7 @@ public class INIotaExpression extends INExpression
 			}
 	        catch (ValueException e)
 	        {
-	        	abort(e);
+	        	predicate.abort(e);
 	        }
 			catch (PatternMatchException e)
 			{

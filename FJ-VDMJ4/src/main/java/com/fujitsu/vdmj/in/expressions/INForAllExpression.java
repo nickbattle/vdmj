@@ -113,9 +113,16 @@ public class INForAllExpression extends INExpression
 					}
 				}
 
-				if (matches && !predicate.eval(evalContext).boolValue(ctxt))
+				try
 				{
-					return new BooleanValue(false);
+					if (matches && !predicate.eval(evalContext).boolValue(ctxt))
+					{
+						return new BooleanValue(false);
+					}
+				}
+				catch (ValueException e)
+				{
+					predicate.abort(e);
 				}
 			}
 		}

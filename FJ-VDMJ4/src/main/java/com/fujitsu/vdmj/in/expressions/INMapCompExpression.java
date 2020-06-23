@@ -110,20 +110,27 @@ public class INMapCompExpression extends INMapExpression
 					}
 				}
 
-				if (matches &&
-					(predicate == null ||
-					 predicate.eval(evalContext).boolValue(ctxt)))
+				try
 				{
-					Value dom = first.left.eval(evalContext);
-					Value rng = first.right.eval(evalContext);
-					first.location.hit();
-
-					Value old = map.put(dom, rng);
-
-					if (old != null && !old.equals(rng))
+					if (matches &&
+						(predicate == null ||
+						 predicate.eval(evalContext).boolValue(ctxt)))
 					{
-						abort(4016, "Duplicate map keys have different values: " + dom, ctxt);
+						Value dom = first.left.eval(evalContext);
+						Value rng = first.right.eval(evalContext);
+						first.location.hit();
+
+						Value old = map.put(dom, rng);
+
+						if (old != null && !old.equals(rng))
+						{
+							abort(4016, "Duplicate map keys have different values: " + dom, ctxt);
+						}
 					}
+				}
+				catch (ValueException e)
+				{
+					predicate.abort(e);
 				}
 			}
 		}

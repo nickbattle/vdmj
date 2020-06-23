@@ -112,17 +112,20 @@ public class INSeqCompExpression extends INSeqExpression
 
     				evalContext.putList(nvpl);
 
-    				if (predicate == null || predicate.eval(evalContext).boolValue(ctxt))
-    				{
-    					Value out = first.eval(evalContext);
-   						seq.add(sortOn);
-   						map.put(sortOn, out);
-    				}
+    				try
+					{
+						if (predicate == null || predicate.eval(evalContext).boolValue(ctxt))
+						{
+							Value out = first.eval(evalContext);
+							seq.add(sortOn);
+							map.put(sortOn, out);
+						}
+					}
+					catch (ValueException e)
+					{
+						predicate.abort(e);
+					}
 				}
-			}
-			catch (ValueException e)
-			{
-				abort(e);
 			}
 			catch (PatternMatchException e)
 			{
