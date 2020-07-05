@@ -28,6 +28,7 @@ import java.util.Set;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
@@ -38,19 +39,28 @@ import com.fujitsu.vdmj.tc.definitions.TCLeafDefinitionVisitor;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
-import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
-import com.fujitsu.vdmj.tc.statements.TCLeafStatementVisitor;
-import com.fujitsu.vdmj.tc.types.TCLeafTypeVisitor;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 
 public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode, Set<TCNode>, LexLocation>
 {
-	// Note, static to avoid constructor loops!
-	private static LSPExpressionLocationFinder expVisitor = new LSPExpressionLocationFinder();
-	private static LSPStatementLocationFinder stmtVisitor = new LSPStatementLocationFinder();
+	private LSPExpressionLocationFinder expVisitor = new LSPExpressionLocationFinder(this);
+	private LSPStatementLocationFinder stmtVisitor = new LSPStatementLocationFinder(this);
 	
+	protected LSPDefinitionLocationFinder(TCVisitorSet<TCNode, Set<TCNode>, LexLocation> visitors)
+	{
+		super(visitors);
+	}
+
+	public LSPDefinitionLocationFinder()
+	{
+		super(null);
+	}
+
 	/**
 	 * Search for types in the unresolved list that match the LexLocation sought. If there
 	 * are any matches, there should only be one!
@@ -149,19 +159,19 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	}
 	
 	@Override
-	protected TCLeafExpressionVisitor<TCNode, Set<TCNode>, LexLocation> getExpressionVisitor()
+	public TCExpressionVisitor<Set<TCNode>, LexLocation> getExpressionVisitor()
 	{
 		return expVisitor;
 	}
 	
 	@Override
-	protected TCLeafStatementVisitor<TCNode, Set<TCNode>, LexLocation> getStatementVisitor()
+	public TCStatementVisitor<Set<TCNode>, LexLocation> getStatementVisitor()
 	{
 		return stmtVisitor;
 	}
 
 	@Override
-	protected TCLeafTypeVisitor<TCNode, Set<TCNode>, LexLocation> getTypeVisitor()
+	public TCTypeVisitor<Set<TCNode>, LexLocation> getTypeVisitor()
 	{
 		return null;
 	}

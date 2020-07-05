@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
@@ -36,6 +37,16 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeSet, Environment>
 {
+	public TCExitChecker(TCVisitorSet<TCType, TCTypeSet, Environment> visitors)
+	{
+		super(visitors);
+	}
+
+	public TCExitChecker()
+	{
+		super(null);
+	}
+
 	@Override
 	public TCTypeSet caseExpression(TCExpression node, Environment base)
 	{

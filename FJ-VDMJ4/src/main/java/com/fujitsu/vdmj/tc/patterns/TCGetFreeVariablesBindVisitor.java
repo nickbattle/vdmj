@@ -55,6 +55,6 @@ public class TCGetFreeVariablesBindVisitor extends TCBindVisitor<TCNameSet, EnvT
 	@Override
 	public TCNameSet caseTypeBind(TCTypeBind node, EnvTriple arg)
 	{
-		return node.type.apply(typeVisitor, arg.env);
+		return node.type.apply(typeVisitor, arg);
 	}
 }

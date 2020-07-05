@@ -25,12 +25,27 @@ package com.fujitsu.vdmj.tc.types;
 
 import java.util.Collection;
 
+import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionVisitor;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.patterns.TCPatternVisitor;
+import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
+
 /**
  * This TCType visitor visits all of the leaves of a type tree and calls
  * the basic processing methods for the simple types.
  */
-public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends TCTypeVisitor<C, S>
+public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S>
+	extends TCTypeVisitor<C, S>
+	implements TCVisitorSet<E, C, S>
 {
+	protected final TCVisitorSet<E, C, S> visitorSet;
+	
+	protected TCLeafTypeVisitor(TCVisitorSet<E, C, S> visitors)
+	{
+		this.visitorSet = visitors;
+	}
+
 	/**
 	 * We have to collect the nodes that have already been visited since types can be recursive,
 	 * and the visitor will otherwise blow the stack. Note that this means you need a new visitor
@@ -184,4 +199,34 @@ public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends T
 	}
 	
 	abstract protected C newCollection();
+
+ 	@Override
+	public TCDefinitionVisitor<C, S> getDefinitionVisitor()
+ 	{
+ 		return null;
+ 	}
+
+ 	@Override
+	public TCExpressionVisitor<C, S> getExpressionVisitor()
+ 	{
+ 		return null;
+ 	}
+ 	
+ 	@Override
+	public TCStatementVisitor<C, S> getStatementVisitor()
+ 	{
+ 		return null;
+ 	}
+
+ 	@Override
+	public TCPatternVisitor<C, S> getPatternVisitor()
+ 	{
+ 		return null;
+ 	}
+ 	
+ 	@Override
+	public TCTypeVisitor<C, S> getTypeVisitor()
+ 	{
+ 		return null;
+ 	}
 }

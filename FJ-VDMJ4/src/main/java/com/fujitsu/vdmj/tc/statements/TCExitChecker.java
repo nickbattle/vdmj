@@ -26,12 +26,12 @@ package com.fujitsu.vdmj.tc.statements;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCEqualsDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCLeafDefinitionVisitor;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
@@ -45,8 +45,18 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Environment>
 {
+	public TCExitChecker(TCVisitorSet<TCType, TCTypeSet, Environment> visitors)
+	{
+		super(visitors);
+	}
+
+	public TCExitChecker()
+	{
+		super(null);
+	}
+
 	private TCLeafExpressionVisitor<TCType, TCTypeSet, Environment> expVisitor =
-			new com.fujitsu.vdmj.tc.expressions.TCExitChecker();
+			new com.fujitsu.vdmj.tc.expressions.TCExitChecker(this);
 
 	@Override
 	protected TCTypeSet newCollection()
@@ -55,15 +65,9 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 	}
 
 	@Override
-	protected TCLeafExpressionVisitor<TCType, TCTypeSet, Environment> getExpressionVisitor()
+	public TCLeafExpressionVisitor<TCType, TCTypeSet, Environment> getExpressionVisitor()
 	{
 		return expVisitor;
-	}
-
-	@Override
-	protected TCLeafDefinitionVisitor<TCType, TCTypeSet, Environment> getDefinitionVisitor()
-	{
-		return null;
 	}
 
 	@Override

@@ -23,9 +23,9 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCLeafDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
@@ -36,6 +36,16 @@ import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 
 public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
+	public TCGetFreeVariablesVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	{
+		super(visitors);
+	}
+
+	public TCGetFreeVariablesVisitor()
+	{
+		super(null);
+	}
+
 	private TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple> expVisitor =
 		new com.fujitsu.vdmj.tc.expressions.TCGetFreeVariablesVisitor();
 
@@ -46,15 +56,9 @@ public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToke
 	}
 
 	@Override
-	protected TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple> getExpressionVisitor()
+	public TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple> getExpressionVisitor()
 	{
 		return expVisitor;
-	}
-
-	@Override
-	protected TCLeafDefinitionVisitor<TCNameToken, TCNameSet, EnvTriple> getDefinitionVisitor()
-	{
-		return null;
 	}
 
 	@Override

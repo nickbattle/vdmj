@@ -21,28 +21,21 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.patterns;
+package com.fujitsu.vdmj.tc;
 
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import java.util.Collection;
 
-public class TCGetVariableNamesVisitor extends TCLeafPatternVisitor<TCNameToken, TCNameSet, Object>
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionVisitor;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.patterns.TCPatternVisitor;
+import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
+import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
+
+public interface TCVisitorSet<E, C extends Collection<E>, S>
 {
-	@Override
-	protected TCNameSet newCollection()
-	{
-		return new TCNameSet();
-	}
-
-	@Override
-	public TCNameSet casePattern(TCPattern node, Object arg)
-	{
-		return newCollection();
-	}
-	
-	@Override
-	public TCNameSet caseIdentifierPattern(TCIdentifierPattern node, Object arg)
-	{
-		return new TCNameSet(node.name);
-	}
+ 	public TCDefinitionVisitor<C, S> getDefinitionVisitor();
+ 	public TCExpressionVisitor<C, S> getExpressionVisitor();
+ 	public TCStatementVisitor<C, S> getStatementVisitor();
+ 	public TCPatternVisitor<C, S> getPatternVisitor();
+ 	public TCTypeVisitor<C, S> getTypeVisitor();
 }

@@ -23,29 +23,40 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.expressions.EnvTriple;
-import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.statements.TCLeafStatementVisitor;
-import com.fujitsu.vdmj.tc.types.TCLeafTypeVisitor;
+import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
+import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
-	private TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple> expVisitor =
-		new com.fujitsu.vdmj.tc.expressions.TCGetFreeVariablesVisitor();
+	private TCExpressionVisitor<TCNameSet, EnvTriple> expVisitor =
+		new com.fujitsu.vdmj.tc.expressions.TCGetFreeVariablesVisitor(this);
 	
-	private TCLeafStatementVisitor<TCNameToken, TCNameSet, EnvTriple> stmtVisitor =
-		new com.fujitsu.vdmj.tc.statements.TCGetFreeVariablesVisitor();
+	private TCStatementVisitor<TCNameSet, EnvTriple> stmtVisitor =
+		new com.fujitsu.vdmj.tc.statements.TCGetFreeVariablesVisitor(this);
 
-	private TCLeafTypeVisitor<TCNameToken, TCNameSet, Environment> typeVisitor =
-			new com.fujitsu.vdmj.tc.types.TCGetFreeVariablesVisitor();
+	private TCTypeVisitor<TCNameSet, EnvTriple> typeVisitor =
+		new com.fujitsu.vdmj.tc.types.TCGetFreeVariablesVisitor(this);
 	
+	protected TCGetFreeVariablesVisitor()
+	{
+		super(null);
+	}
+
+	protected TCGetFreeVariablesVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	{
+		super(visitors);
+	}
+
 	@Override
 	protected TCNameSet newCollection()
 	{
@@ -53,21 +64,21 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 	}
 
 	@Override
-	protected TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple> getExpressionVisitor()
+	public TCExpressionVisitor<TCNameSet, EnvTriple> getExpressionVisitor()
 	{
-		return expVisitor;
+		return (visitorSet == null) ? expVisitor : visitorSet.getExpressionVisitor();
 	}
 
 	@Override
-	protected TCLeafStatementVisitor<TCNameToken, TCNameSet, EnvTriple> getStatementVisitor()
+	public TCStatementVisitor<TCNameSet, EnvTriple> getStatementVisitor()
 	{
-		return stmtVisitor;
+		return (visitorSet == null) ? stmtVisitor : visitorSet.getStatementVisitor();
 	}
 
 	@Override
-	protected TCLeafTypeVisitor<TCNameToken, TCNameSet, EnvTriple> getTypeVisitor()
+	public TCTypeVisitor<TCNameSet, EnvTriple> getTypeVisitor()
 	{
-		return null;
+		return (visitorSet == null) ? typeVisitor : visitorSet.getTypeVisitor();
 	}
 
 	@Override
@@ -204,7 +215,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 	public TCNameSet caseInstanceVariableDefinition(TCInstanceVariableDefinition node, EnvTriple arg)
 	{
 		TCNameSet names = new TCNameSet();
-		names.addAll(node.type.apply(typeVisitor, arg.env));
+		names.addAll(node.type.apply(typeVisitor, arg));
 		names.addAll(node.expression.apply(expVisitor, arg));
 		return names;
 	}
@@ -212,7 +223,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 	@Override
 	public TCNameSet caseLocalDefinition(TCLocalDefinition node, EnvTriple arg)
 	{
-		TCNameSet names = node.type.apply(typeVisitor, arg.env);
+		TCNameSet names = node.type.apply(typeVisitor, arg);
 		
 		if (node.valueDefinition != null)
 		{
@@ -249,7 +260,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		if (node.type instanceof TCNamedType)
 		{
 			TCNamedType nt = (TCNamedType)node.type;
-			names.addAll(nt.type.apply(typeVisitor, arg.env));
+			names.addAll(nt.type.apply(typeVisitor, arg));
 		}
 		
 		if (node.invdef != null)
@@ -267,7 +278,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		
 		if (node.type != null)
 		{
-			names.addAll(node.type.apply(typeVisitor, arg.env));
+			names.addAll(node.type.apply(typeVisitor, arg));
 		}
 		
 		names.addAll(node.exp.apply(expVisitor, arg));

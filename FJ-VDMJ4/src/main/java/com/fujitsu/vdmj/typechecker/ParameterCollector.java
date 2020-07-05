@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.typechecker;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.types.TCLeafTypeVisitor;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -37,6 +38,16 @@ import com.fujitsu.vdmj.tc.types.TCType;
  */
 public class ParameterCollector extends TCLeafTypeVisitor<String, List<String>, Object>
 {
+	protected ParameterCollector(TCVisitorSet<String, List<String>, Object> visitors)
+	{
+		super(visitors);
+	}
+
+	public ParameterCollector()
+	{
+		super(null);
+	}
+
 	@Override
 	public List<String> caseParameterType(TCParameterType node, Object arg)
 	{

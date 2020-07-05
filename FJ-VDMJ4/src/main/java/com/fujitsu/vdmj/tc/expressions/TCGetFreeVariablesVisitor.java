@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCRenamedDefinition;
@@ -38,6 +39,16 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
+	public TCGetFreeVariablesVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	{
+		super(visitors);
+	}
+
+	public TCGetFreeVariablesVisitor()
+	{
+		super(null);
+	}
+
 	@Override
 	protected TCNameSet newCollection()
 	{

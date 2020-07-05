@@ -55,7 +55,6 @@ public class TCGetFreeVariablesMultipleBindVisitor extends TCMultipleBindVisitor
 	@Override
 	public TCNameSet caseMultipleTypeBind(TCMultipleTypeBind node, EnvTriple arg)
 	{
-		return node.type.apply(typeVisitor, arg.env);
+		return node.type.apply(typeVisitor, arg);
 	}
-
 }

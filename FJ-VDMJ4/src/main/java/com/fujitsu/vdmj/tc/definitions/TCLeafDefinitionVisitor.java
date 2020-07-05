@@ -25,10 +25,12 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import java.util.Collection;
 
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCPatternVisitor;
 import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
@@ -37,8 +39,17 @@ import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
  * This TCDefinition visitor visits all of the leaves of a definition tree and calls
  * the basic processing methods for the simple statements and expressions.
  */
-abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> extends TCDefinitionVisitor<C, S>
+abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S>
+	extends TCDefinitionVisitor<C, S>
+	implements TCVisitorSet<E, C, S>
 {
+	protected final TCVisitorSet<E, C, S> visitorSet;
+	
+	protected TCLeafDefinitionVisitor(TCVisitorSet<E, C, S> visitors)
+	{
+		this.visitorSet = visitors;
+	}
+	
  	@Override
 	public C caseAssignmentDefinition(TCAssignmentDefinition node, S arg)
 	{
@@ -448,10 +459,34 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 	
 	abstract protected C newCollection();
+	
+ 	@Override
+	public TCDefinitionVisitor<C, S> getDefinitionVisitor()
+ 	{
+ 		return null;
+ 	}
+	
+ 	@Override
+	public TCExpressionVisitor<C, S> getExpressionVisitor()
+ 	{
+ 		return null;
+ 	}
+ 	
+ 	@Override
+	public TCStatementVisitor<C, S> getStatementVisitor()
+ 	{
+ 		return null;
+ 	}
 
- 	abstract protected TCExpressionVisitor<C, S> getExpressionVisitor();
-
- 	abstract protected TCStatementVisitor<C, S> getStatementVisitor();
-
- 	abstract protected TCTypeVisitor<C, S> getTypeVisitor();
+ 	@Override
+	public TCPatternVisitor<C, S> getPatternVisitor()
+ 	{
+ 		return null;
+ 	}
+ 	
+ 	@Override
+	public TCTypeVisitor<C, S> getTypeVisitor()
+ 	{
+ 		return null;
+ 	}
 }

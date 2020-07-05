@@ -23,12 +23,23 @@
 
 package com.fujitsu.vdmj.tc.types;
 
+import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.typechecker.Environment;
 
-public class TCGetFreeVariablesVisitor extends TCLeafTypeVisitor<TCNameToken, TCNameSet, Environment>
+public class TCGetFreeVariablesVisitor extends TCLeafTypeVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
+	public TCGetFreeVariablesVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	{
+		super(visitors);
+	}
+
+	public TCGetFreeVariablesVisitor()
+	{
+		super(null);
+	}
+
 	@Override
 	protected TCNameSet newCollection()
 	{
@@ -36,13 +47,13 @@ public class TCGetFreeVariablesVisitor extends TCLeafTypeVisitor<TCNameToken, TC
 	}
 
 	@Override
-	public TCNameSet caseType(TCType node, Environment env)
+	public TCNameSet caseType(TCType node, EnvTriple arg)
 	{
 		return newCollection();		// Default has no names
 	}
 
 	@Override
-	public TCNameSet caseNamedType(TCNamedType node, Environment env)
+	public TCNameSet caseNamedType(TCNamedType node, EnvTriple arg)
 	{
 		if (done.contains(node))
 		{
@@ -52,7 +63,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafTypeVisitor<TCNameToken, TC
 		{
 			done.add(node);
 
-			if (env.findType(node.typename, node.typename.getModule()) == null)
+			if (arg.env.findType(node.typename, node.typename.getModule()) == null)
 			{
 				// Invariant values covered in TCTypeDefinition
 				return new TCNameSet(node.typename.getExplicit(true));
@@ -65,7 +76,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafTypeVisitor<TCNameToken, TC
 	}
 	
 	@Override
-	public TCNameSet caseRecordType(TCRecordType node, Environment env)
+	public TCNameSet caseRecordType(TCRecordType node, EnvTriple arg)
 	{
 		if (done.contains(node))
 		{
@@ -75,7 +86,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafTypeVisitor<TCNameToken, TC
 		{
 			done.add(node);
 
-			if (env.findType(node.name, node.name.getModule()) == null)
+			if (arg.env.findType(node.name, node.name.getModule()) == null)
 			{
 				// Invariant values covered in TCTypeDefinition
 				return new TCNameSet(node.name.getExplicit(true));

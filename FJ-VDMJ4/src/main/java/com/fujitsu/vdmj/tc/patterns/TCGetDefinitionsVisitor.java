@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
-import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCMapType;
@@ -62,12 +61,6 @@ public class TCGetDefinitionsVisitor extends TCLeafPatternVisitor<TCDefinition, 
 	protected TCDefinitionList newCollection()
 	{
 		return new TCDefinitionList();
-	}
-
-	@Override
-	protected TCLeafExpressionVisitor<TCDefinition, TCDefinitionList, Pair> getExpressionVisitor()
-	{
-		return null;	// No variables in expression patterns :)
 	}
 
 	@Override

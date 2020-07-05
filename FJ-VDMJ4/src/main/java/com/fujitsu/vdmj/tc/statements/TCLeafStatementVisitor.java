@@ -24,7 +24,7 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import java.util.Collection;
-
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotatedStatement;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionVisitor;
@@ -34,17 +34,28 @@ import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCPatternVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCSetBind;
 import com.fujitsu.vdmj.tc.traces.TCTraceVariableStatement;
+import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
 
 /**
  * This TCStatement visitor visits all of the leaves of an statement tree and calls
  * the basic processing methods for the simple statements.
  */
-abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> extends TCStatementVisitor<C, S>
+abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S>
+	extends TCStatementVisitor<C, S>
+	implements TCVisitorSet<E, C, S>
 {
- 	@Override
+	protected final TCVisitorSet<E, C, S> visitorSet;
+	
+ 	protected TCLeafStatementVisitor(TCVisitorSet<E, C, S> visitors)
+	{
+		this.visitorSet = visitors;
+	}
+
+	@Override
 	public C caseAnnotatedStatement(TCAnnotatedStatement node, S arg)
 	{
  		TCExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
@@ -537,7 +548,33 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	
 	abstract protected C newCollection();
 
- 	abstract protected TCExpressionVisitor<C, S> getExpressionVisitor();
+ 	@Override
+	public TCDefinitionVisitor<C, S> getDefinitionVisitor()
+ 	{
+ 		return null;
+ 	}
 
- 	abstract protected TCDefinitionVisitor<C, S> getDefinitionVisitor();
+ 	@Override
+	public TCExpressionVisitor<C, S> getExpressionVisitor()
+ 	{
+ 		return null;
+ 	}
+ 	
+ 	@Override
+	public TCStatementVisitor<C, S> getStatementVisitor()
+ 	{
+ 		return null;
+ 	}
+
+ 	@Override
+	public TCPatternVisitor<C, S> getPatternVisitor()
+ 	{
+ 		return null;
+ 	}
+
+ 	@Override
+	public TCTypeVisitor<C, S> getTypeVisitor()
+ 	{
+ 		return null;
+ 	}
 }

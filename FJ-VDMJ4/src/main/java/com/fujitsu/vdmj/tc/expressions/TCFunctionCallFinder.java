@@ -22,11 +22,22 @@
  ******************************************************************************/
 package com.fujitsu.vdmj.tc.expressions;
 
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class TCFunctionCallFinder extends TCLeafExpressionVisitor<TCNameToken, TCNameList, Object>
 {
+	protected TCFunctionCallFinder(TCVisitorSet<TCNameToken, TCNameList, Object> visitors)
+	{
+		super(visitors);
+	}
+
+	public TCFunctionCallFinder()
+	{
+		super(null);
+	}
+
 	@Override
 	public TCNameList caseExpression(TCExpression node, Object arg)
 	{

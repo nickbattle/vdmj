@@ -25,13 +25,19 @@ package com.fujitsu.vdmj.tc.patterns;
 
 import java.util.Collection;
 
+import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
+import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
 
 /**
  * This TCPattern visitor visits all of the leaves of a pattern tree and calls
  * the basic processing methods for the simple patterns.
  */
-public abstract class TCLeafPatternVisitor<E, C extends Collection<E>, S> extends TCPatternVisitor<C, S>
+public abstract class TCLeafPatternVisitor<E, C extends Collection<E>, S>
+	extends TCPatternVisitor<C, S>
+	implements TCVisitorSet<E, C, S>
 {
  	@Override
 	public C caseConcatenationPattern(TCConcatenationPattern node, S arg)
@@ -154,5 +160,34 @@ public abstract class TCLeafPatternVisitor<E, C extends Collection<E>, S> extend
 
  	abstract protected C newCollection();
 
- 	abstract protected TCExpressionVisitor<C, S> getExpressionVisitor();
+	
+ 	@Override
+	public TCDefinitionVisitor<C, S> getDefinitionVisitor()
+ 	{
+ 		return null;
+ 	}
+	
+ 	@Override
+	public TCExpressionVisitor<C, S> getExpressionVisitor()
+ 	{
+ 		return null;
+ 	}
+ 	
+ 	@Override
+	public TCStatementVisitor<C, S> getStatementVisitor()
+ 	{
+ 		return null;
+ 	}
+
+ 	@Override
+	public TCPatternVisitor<C, S> getPatternVisitor()
+ 	{
+ 		return null;
+ 	}
+ 	
+ 	@Override
+	public TCTypeVisitor<C, S> getTypeVisitor()
+ 	{
+ 		return null;
+ 	}
 }
