@@ -45,7 +45,7 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 {
 	public LSPExpressionLocationFinder(TCVisitorSet<TCNode, Set<TCNode>, LexLocation> visitors)
 	{
-		super(visitors);
+		visitorSet = visitors;
 	}
 
 	@Override

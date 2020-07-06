@@ -28,14 +28,9 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class TCFunctionCallFinder extends TCLeafExpressionVisitor<TCNameToken, TCNameList, Object>
 {
-	protected TCFunctionCallFinder(TCVisitorSet<TCNameToken, TCNameList, Object> visitors)
-	{
-		super(visitors);
-	}
-
 	public TCFunctionCallFinder()
 	{
-		super(null);
+		visitorSet = new TCVisitorSet<TCNameToken, TCNameList, Object>() {};
 	}
 
 	@Override

@@ -38,47 +38,55 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
-	private TCExpressionVisitor<TCNameSet, EnvTriple> expVisitor =
-		new com.fujitsu.vdmj.tc.expressions.TCGetFreeVariablesVisitor(this);
-	
-	private TCStatementVisitor<TCNameSet, EnvTriple> stmtVisitor =
-		new com.fujitsu.vdmj.tc.statements.TCGetFreeVariablesVisitor(this);
-
-	private TCTypeVisitor<TCNameSet, EnvTriple> typeVisitor =
-		new com.fujitsu.vdmj.tc.types.TCGetFreeVariablesVisitor(this);
-	
-	protected TCGetFreeVariablesVisitor()
+	private static class VisitorSet extends TCVisitorSet<TCNameToken, TCNameSet, EnvTriple>
 	{
-		super(null);
+		private final TCGetFreeVariablesVisitor defVisitor;
+		private final TCExpressionVisitor<TCNameSet, EnvTriple> expVisitor;
+		private final TCStatementVisitor<TCNameSet, EnvTriple> stmtVisitor;
+		private final TCTypeVisitor<TCNameSet, EnvTriple> typeVisitor;
+
+		public VisitorSet(TCGetFreeVariablesVisitor parent)
+		{
+			defVisitor = parent;
+			expVisitor = new com.fujitsu.vdmj.tc.expressions.TCGetFreeVariablesVisitor(this);
+			stmtVisitor = new com.fujitsu.vdmj.tc.statements.TCGetFreeVariablesVisitor(this);
+			typeVisitor = new com.fujitsu.vdmj.tc.types.TCGetFreeVariablesVisitor(this);
+		}
+		
+		@Override
+		public TCDefinitionVisitor<TCNameSet, EnvTriple> getDefinitionVisitor()
+		{
+			return defVisitor;
+		}
+
+		@Override
+		public TCExpressionVisitor<TCNameSet, EnvTriple> getExpressionVisitor()
+	 	{
+	 		return expVisitor;
+	 	}
+	 	
+		@Override
+		public TCStatementVisitor<TCNameSet, EnvTriple> getStatementVisitor()
+	 	{
+	 		return stmtVisitor;
+	 	}
+	 	
+		@Override
+		public TCTypeVisitor<TCNameSet, EnvTriple> getTypeVisitor()
+	 	{
+	 		return typeVisitor;
+	 	}
 	}
 
-	protected TCGetFreeVariablesVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	protected TCGetFreeVariablesVisitor()
 	{
-		super(visitors);
+		visitorSet = new VisitorSet(this);
 	}
 
 	@Override
 	protected TCNameSet newCollection()
 	{
 		return new TCNameSet();
-	}
-
-	@Override
-	public TCExpressionVisitor<TCNameSet, EnvTriple> getExpressionVisitor()
-	{
-		return (visitorSet == null) ? expVisitor : visitorSet.getExpressionVisitor();
-	}
-
-	@Override
-	public TCStatementVisitor<TCNameSet, EnvTriple> getStatementVisitor()
-	{
-		return (visitorSet == null) ? stmtVisitor : visitorSet.getStatementVisitor();
-	}
-
-	@Override
-	public TCTypeVisitor<TCNameSet, EnvTriple> getTypeVisitor()
-	{
-		return (visitorSet == null) ? typeVisitor : visitorSet.getTypeVisitor();
 	}
 
 	@Override
@@ -91,7 +99,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 	public TCNameSet caseEqualsDefinition(TCEqualsDefinition node, EnvTriple arg)
 	{
 		Environment local = new FlatEnvironment(node.defs, arg.env);
-		return node.test.apply(expVisitor, new EnvTriple(arg.globals, local, arg.returns));
+		return node.test.apply(visitorSet.getExpressionVisitor(), new EnvTriple(arg.globals, local, arg.returns));
 	}
 	
 	@Override
@@ -108,7 +116,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		}
 
 		Environment local = new FlatEnvironment(defs, arg.env);
-		TCNameSet names = node.body.apply(expVisitor, new EnvTriple(arg.globals, local, arg.returns));
+		TCNameSet names = node.body.apply(visitorSet.getExpressionVisitor(), new EnvTriple(arg.globals, local, arg.returns));
 		
 		if (node.predef != null)
 		{
@@ -134,7 +142,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		}
 
 		Environment local = new FlatEnvironment(defs, arg.env);
-		TCNameSet names = node.body.apply(stmtVisitor, new EnvTriple(arg.globals, local, arg.returns));
+		TCNameSet names = node.body.apply(visitorSet.getStatementVisitor(), new EnvTriple(arg.globals, local, arg.returns));
 		
 		if (node.predef != null)
 		{
@@ -164,7 +172,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		
 		if (node.body != null)
 		{
-			names.addAll(node.body.apply(expVisitor, new EnvTriple(arg.globals, local, arg.returns)));
+			names.addAll(node.body.apply(visitorSet.getExpressionVisitor(), new EnvTriple(arg.globals, local, arg.returns)));
 		}
 		
 		if (node.predef != null)
@@ -195,7 +203,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		
 		if (node.body != null)
 		{
-			names.addAll(node.body.apply(stmtVisitor, new EnvTriple(arg.globals, local, arg.returns)));
+			names.addAll(node.body.apply(visitorSet.getStatementVisitor(), new EnvTriple(arg.globals, local, arg.returns)));
 		}
 		
 		if (node.predef != null)
@@ -215,15 +223,15 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 	public TCNameSet caseInstanceVariableDefinition(TCInstanceVariableDefinition node, EnvTriple arg)
 	{
 		TCNameSet names = new TCNameSet();
-		names.addAll(node.type.apply(typeVisitor, arg));
-		names.addAll(node.expression.apply(expVisitor, arg));
+		names.addAll(node.type.apply(visitorSet.getTypeVisitor(), arg));
+		names.addAll(node.expression.apply(visitorSet.getExpressionVisitor(), arg));
 		return names;
 	}
 	
 	@Override
 	public TCNameSet caseLocalDefinition(TCLocalDefinition node, EnvTriple arg)
 	{
-		TCNameSet names = node.type.apply(typeVisitor, arg);
+		TCNameSet names = node.type.apply(visitorSet.getTypeVisitor(), arg);
 		
 		if (node.valueDefinition != null)
 		{
@@ -260,7 +268,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		if (node.type instanceof TCNamedType)
 		{
 			TCNamedType nt = (TCNamedType)node.type;
-			names.addAll(nt.type.apply(typeVisitor, arg));
+			names.addAll(nt.type.apply(visitorSet.getTypeVisitor(), arg));
 		}
 		
 		if (node.invdef != null)
@@ -278,10 +286,10 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		
 		if (node.type != null)
 		{
-			names.addAll(node.type.apply(typeVisitor, arg));
+			names.addAll(node.type.apply(visitorSet.getTypeVisitor(), arg));
 		}
 		
-		names.addAll(node.exp.apply(expVisitor, arg));
+		names.addAll(node.exp.apply(visitorSet.getExpressionVisitor(), arg));
 		return names;
 	}
 }

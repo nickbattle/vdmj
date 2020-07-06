@@ -39,12 +39,12 @@ public class TCExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeSet, En
 {
 	public TCExitChecker(TCVisitorSet<TCType, TCTypeSet, Environment> visitors)
 	{
-		super(visitors);
+		visitorSet = visitors;
 	}
 
 	public TCExitChecker()
 	{
-		super(null);
+		visitorSet = new TCVisitorSet<TCType, TCTypeSet, Environment>() {};
 	}
 
 	@Override

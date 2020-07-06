@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.patterns;
 
 import java.util.Iterator;
 
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
@@ -57,6 +58,11 @@ class Pair
 
 public class TCGetDefinitionsVisitor extends TCLeafPatternVisitor<TCDefinition, TCDefinitionList, Pair>
 {
+	public TCGetDefinitionsVisitor()
+	{
+		visitorSet = new TCVisitorSet<TCDefinition, TCDefinitionList, Pair>() {};
+	}
+	
 	@Override
 	protected TCDefinitionList newCollection()
 	{

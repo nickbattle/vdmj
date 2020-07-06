@@ -23,11 +23,17 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class TCGetVariableNamesVisitor extends TCLeafPatternVisitor<TCNameToken, TCNameSet, Object>
 {
+	public TCGetVariableNamesVisitor()
+	{
+		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, Object>() {};
+	}
+	
 	@Override
 	protected TCNameSet newCollection()
 	{

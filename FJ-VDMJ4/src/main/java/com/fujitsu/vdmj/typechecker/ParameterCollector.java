@@ -38,14 +38,9 @@ import com.fujitsu.vdmj.tc.types.TCType;
  */
 public class ParameterCollector extends TCLeafTypeVisitor<String, List<String>, Object>
 {
-	protected ParameterCollector(TCVisitorSet<String, List<String>, Object> visitors)
-	{
-		super(visitors);
-	}
-
 	public ParameterCollector()
 	{
-		super(null);
+		visitorSet = new TCVisitorSet<String, List<String>, Object>() {};
 	}
 
 	@Override

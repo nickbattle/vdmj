@@ -45,29 +45,31 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Environment>
 {
-	public TCExitChecker(TCVisitorSet<TCType, TCTypeSet, Environment> visitors)
+	private static class VisitorSet extends TCVisitorSet<TCType, TCTypeSet, Environment>
 	{
-		super(visitors);
+		private final TCLeafExpressionVisitor<TCType, TCTypeSet, Environment> expVisitor;
+
+		public VisitorSet()
+		{
+			expVisitor = new com.fujitsu.vdmj.tc.expressions.TCExitChecker(this);
+		}
+
+		@Override
+		public TCLeafExpressionVisitor<TCType, TCTypeSet, Environment> getExpressionVisitor()
+		{
+			return expVisitor;
+		}
 	}
 
 	public TCExitChecker()
 	{
-		super(null);
+		visitorSet = new VisitorSet();
 	}
-
-	private TCLeafExpressionVisitor<TCType, TCTypeSet, Environment> expVisitor =
-			new com.fujitsu.vdmj.tc.expressions.TCExitChecker(this);
 
 	@Override
 	protected TCTypeSet newCollection()
 	{
 		return new TCTypeSet();
-	}
-
-	@Override
-	public TCLeafExpressionVisitor<TCType, TCTypeSet, Environment> getExpressionVisitor()
-	{
-		return expVisitor;
 	}
 
 	@Override
@@ -100,7 +102,7 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 		
 		for (TCExpression arg : node.args)
 		{
-			result.addAll(arg.apply(expVisitor, base));
+			result.addAll(arg.apply(visitorSet.getExpressionVisitor(), base));
 		}
 
 		boolean overridable = Settings.dialect != Dialect.VDM_SL &&
@@ -154,7 +156,7 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 		
 		for (TCExpression arg : node.args)
 		{
-			result.addAll(arg.apply(expVisitor, base));
+			result.addAll(arg.apply(visitorSet.getExpressionVisitor(), base));
 		}
 
 

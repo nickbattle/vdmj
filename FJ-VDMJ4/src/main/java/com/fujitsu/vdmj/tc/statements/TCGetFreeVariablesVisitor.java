@@ -36,29 +36,36 @@ import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 
 public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
+	private static class VisitorSet extends TCVisitorSet<TCNameToken, TCNameSet, EnvTriple>
+	{
+		private TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple> expVisitor;
+		
+		public VisitorSet()
+		{
+			expVisitor = new com.fujitsu.vdmj.tc.expressions.TCGetFreeVariablesVisitor(this);
+		}
+
+		@Override
+		public TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple> getExpressionVisitor()
+		{
+			return expVisitor;
+		}
+	}
+
 	public TCGetFreeVariablesVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
 	{
-		super(visitors);
+		visitorSet = visitors;
 	}
 
 	public TCGetFreeVariablesVisitor()
 	{
-		super(null);
+		visitorSet = new VisitorSet();
 	}
-
-	private TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple> expVisitor =
-		new com.fujitsu.vdmj.tc.expressions.TCGetFreeVariablesVisitor();
 
 	@Override
 	protected TCNameSet newCollection()
 	{
 		return new TCNameSet();
-	}
-
-	@Override
-	public TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple> getExpressionVisitor()
-	{
-		return expVisitor;
 	}
 
 	@Override
@@ -87,7 +94,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToke
 		
 		for (TCExpression a: node.args)
 		{
-			names.addAll(a.apply(expVisitor, arg));
+			names.addAll(a.apply(visitorSet.getExpressionVisitor(), arg));
 		}
 		
 		return names;
@@ -96,7 +103,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToke
 	@Override
 	public TCNameSet caseCasesStatement(TCCasesStatement node, EnvTriple arg)
 	{
-		return node.exp.apply(expVisitor, arg);		// Cases are conditional
+		return node.exp.apply(visitorSet.getExpressionVisitor(), arg);		// Cases are conditional
 	}
 	
 	@Override
@@ -109,24 +116,24 @@ public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToke
 			return new TCNameSet();
 		}
 		
-		return node.expression.apply(expVisitor, arg);
+		return node.expression.apply(visitorSet.getExpressionVisitor(), arg);
 	}
 	
 	@Override
 	public TCNameSet caseForAllStatement(TCForAllStatement node, EnvTriple arg)
 	{
-		return node.set.apply(expVisitor, arg);
+		return node.set.apply(visitorSet.getExpressionVisitor(), arg);
 	}
 	
 	@Override
 	public TCNameSet caseForIndexStatement(TCForIndexStatement node, EnvTriple arg)
 	{
-		TCNameSet names = node.from.apply(expVisitor, arg);
-		names.addAll(node.to.apply(expVisitor, arg));
+		TCNameSet names = node.from.apply(visitorSet.getExpressionVisitor(), arg);
+		names.addAll(node.to.apply(visitorSet.getExpressionVisitor(), arg));
 		
 		if (node.by != null)
 		{
-			names.addAll(node.by.apply(expVisitor, arg));
+			names.addAll(node.by.apply(visitorSet.getExpressionVisitor(), arg));
 		}
 		
 		return names;
@@ -135,13 +142,13 @@ public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToke
 	@Override
 	public TCNameSet caseForPatternBindStatement(TCForPatternBindStatement node, EnvTriple arg)
 	{
-		return node.exp.apply(expVisitor, arg);
+		return node.exp.apply(visitorSet.getExpressionVisitor(), arg);
 	}
 	
 	@Override
 	public TCNameSet caseIfStatement(TCIfStatement node, EnvTriple arg)
 	{
-		return node.ifExp.apply(expVisitor, arg);
+		return node.ifExp.apply(visitorSet.getExpressionVisitor(), arg);
 	}
 	
 	@Override
@@ -152,7 +159,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToke
 		
 		if (node.suchThat != null)
 		{
-			names.addAll(node.suchThat.apply(expVisitor, new EnvTriple(arg.globals, local, arg.returns)));
+			names.addAll(node.suchThat.apply(visitorSet.getExpressionVisitor(), new EnvTriple(arg.globals, local, arg.returns)));
 		}
 		
 		names.addAll(node.statement.apply(this, new EnvTriple(arg.globals, local, arg.returns)));
@@ -189,7 +196,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToke
 		
 		if (node.expression != null)
 		{
-			names.addAll(node.expression.apply(expVisitor, arg));
+			names.addAll(node.expression.apply(visitorSet.getExpressionVisitor(), arg));
 		}
 		
 		arg.returns.set(true);		// So everything that follows is conditional
@@ -233,6 +240,6 @@ public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToke
 	@Override
 	public TCNameSet caseWhileStatement(TCWhileStatement node, EnvTriple arg)
 	{
-		return node.exp.apply(expVisitor, arg);
+		return node.exp.apply(visitorSet.getExpressionVisitor(), arg);
 	}
 }

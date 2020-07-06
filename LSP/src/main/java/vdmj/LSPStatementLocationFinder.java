@@ -29,8 +29,6 @@ import java.util.Set;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionVisitor;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
@@ -43,12 +41,9 @@ import com.fujitsu.vdmj.tc.statements.TCStatement;
 
 public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, Set<TCNode>, LexLocation>
 {
-	private LSPExpressionLocationFinder expVisitor = new LSPExpressionLocationFinder(this);
-	private LSPDefinitionLocationFinder defVisitor = new LSPDefinitionLocationFinder(this);
-
 	public LSPStatementLocationFinder(TCVisitorSet<TCNode, Set<TCNode>, LexLocation> visitors)
 	{
-		super(visitors);
+		visitorSet = visitors;
 	}
 
 	@Override
@@ -124,16 +119,4 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
  		all.addAll(super.caseAssignmentStatement(node, arg));
 		return all;
  	}
-	
-	@Override
-	public TCExpressionVisitor<Set<TCNode>, LexLocation> getExpressionVisitor()
-	{
-		return expVisitor;
-	}
-
-	@Override
-	public TCDefinitionVisitor<Set<TCNode>, LexLocation> getDefinitionVisitor()
-	{
-		return defVisitor;
-	}
 }

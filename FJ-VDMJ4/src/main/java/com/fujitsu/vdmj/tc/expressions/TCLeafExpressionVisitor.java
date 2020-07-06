@@ -28,34 +28,23 @@ import java.util.Collection;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotatedExpression;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.definitions.TCEqualsDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
-import com.fujitsu.vdmj.tc.patterns.TCPatternVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
-import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
-import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
 
 /**
  * This TCExpression visitor visits all of the leaves of an expression tree and calls
  * the basic processing methods for the simple expressions.
  */
-abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S>
-	extends TCExpressionVisitor<C, S>
-	implements TCVisitorSet<E, C, S>
+abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S> extends TCExpressionVisitor<C, S>
 {
-	protected final TCVisitorSet<E, C, S> visitorSet;
-	
-	protected TCLeafExpressionVisitor(TCVisitorSet<E, C, S> visitors)
-	{
-		this.visitorSet = visitors;
-	}
+	protected TCVisitorSet<E, C, S> visitorSet;
 	
  	@Override
 	public C caseApplyExpression(TCApplyExpression node, S arg)
@@ -575,34 +564,4 @@ abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S>
 	}
 	
 	abstract protected C newCollection();
-	
- 	@Override
-	public TCDefinitionVisitor<C, S> getDefinitionVisitor()
- 	{
- 		return null;
- 	}
-	
- 	@Override
-	public TCExpressionVisitor<C, S> getExpressionVisitor()
- 	{
- 		return null;
- 	}
- 	
- 	@Override
-	public TCStatementVisitor<C, S> getStatementVisitor()
- 	{
- 		return null;
- 	}
-
- 	@Override
-	public TCPatternVisitor<C, S> getPatternVisitor()
- 	{
- 		return null;
- 	}
-
- 	@Override
-	public TCTypeVisitor<C, S> getTypeVisitor()
- 	{
- 		return null;
- 	}
 }

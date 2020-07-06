@@ -27,14 +27,9 @@ import com.fujitsu.vdmj.tc.TCVisitorSet;
 
 public class TCUnresolvedTypeFinder extends TCLeafTypeVisitor<TCType, TCTypeList, Object>
 {
-	protected TCUnresolvedTypeFinder(TCVisitorSet<TCType, TCTypeList, Object> visitors)
-	{
-		super(visitors);
-	}
-
 	public TCUnresolvedTypeFinder()
 	{
-		super(null);
+		visitorSet = new TCVisitorSet<TCType, TCTypeList, Object>() {};
 	}
 
 	@Override
