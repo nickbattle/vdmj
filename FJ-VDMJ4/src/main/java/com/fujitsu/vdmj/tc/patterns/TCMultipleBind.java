@@ -26,8 +26,6 @@ package com.fujitsu.vdmj.tc.patterns;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.expressions.EnvTriple;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -67,13 +65,6 @@ public abstract class TCMultipleBind extends TCNode
 	/** Perform a type check of the bind. */
 	abstract public TCType typeCheck(Environment base, NameScope scope);
 
-	/** Return the free variables used by this multiple bind */ 
-	public final TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		return apply(new TCGetFreeVariablesMultipleBindVisitor(), new EnvTriple(globals, env, null));
-	}
-	
-	
 	/** Return a set of exceptions possibly raised by any expressions */
 	public final TCTypeSet exitCheck(Environment base)
 	{

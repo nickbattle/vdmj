@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -36,30 +35,9 @@ import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 
 public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
-	private static class VisitorSet extends TCVisitorSet<TCNameToken, TCNameSet, EnvTriple>
-	{
-		private TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple> expVisitor;
-		
-		public VisitorSet()
-		{
-			expVisitor = new com.fujitsu.vdmj.tc.expressions.TCGetFreeVariablesVisitor(this);
-		}
-
-		@Override
-		public TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple> getExpressionVisitor()
-		{
-			return expVisitor;
-		}
-	}
-
 	public TCGetFreeVariablesVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
 	{
 		visitorSet = visitors;
-	}
-
-	public TCGetFreeVariablesVisitor()
-	{
-		visitorSet = new VisitorSet();
 	}
 
 	@Override
@@ -155,7 +133,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToke
 	public TCNameSet caseLetBeStStatement(TCLetBeStStatement node, EnvTriple arg)
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
-		TCNameSet names = node.bind.getFreeVariables(arg.globals, local);
+		TCNameSet names = node.bind.apply(visitorSet.getMultiBindVisitor(), new EnvTriple(arg.globals, local, arg.returns));
 		
 		if (node.suchThat != null)
 		{
@@ -181,7 +159,8 @@ public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToke
 			else
 			{
 				local = new FlatEnvironment(d, local);
-				names.addAll(d.getFreeVariables(arg.globals, local, arg.returns));
+				names.addAll(d.apply(visitorSet.getDefinitionVisitor(),
+						new EnvTriple(arg.globals, local, arg.returns)));
 			}
 		}
 

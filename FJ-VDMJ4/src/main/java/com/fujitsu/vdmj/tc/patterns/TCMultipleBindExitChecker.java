@@ -23,13 +23,13 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
+import com.fujitsu.vdmj.tc.expressions.TCExitChecker;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class TCMultipleBindExitChecker extends TCMultipleBindVisitor<TCTypeSet, Environment>
 {
-	private com.fujitsu.vdmj.tc.expressions.TCExitChecker expVisitor =
-			new com.fujitsu.vdmj.tc.expressions.TCExitChecker();
+	private TCExitChecker expVisitor = new TCExitChecker();
 
 	@Override
 	public TCTypeSet caseMultipleBind(TCMultipleBind node, Environment arg)

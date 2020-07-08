@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.statements;
 
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -33,8 +32,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInheritedDefinition;
-import com.fujitsu.vdmj.tc.expressions.EnvTriple;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
@@ -103,17 +100,6 @@ public abstract class TCStatement extends TCNode implements Serializable
 	public final TCTypeSet exitCheck(Environment base)
 	{
 		return apply(new TCExitChecker(), base);
-	}
-
-	/**
-	 * Search the statement for its free variables, if any. The environment passed contains
-	 * those names that are already defined in the scope - ie. which are not free variables.
-	 * The returns boolean (which is mutable) is updated by return and exit statements,
-	 * which indicate that statements that follow are conditional.
-	 */
-	public final TCNameSet getFreeVariables(Environment globals, Environment env, AtomicBoolean returns)
-	{
-		return apply(new TCGetFreeVariablesVisitor(), new EnvTriple(globals, env, returns));
 	}
 
 	/**

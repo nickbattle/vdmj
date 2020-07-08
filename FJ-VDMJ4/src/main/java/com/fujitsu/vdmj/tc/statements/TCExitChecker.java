@@ -48,10 +48,12 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 	private static class VisitorSet extends TCVisitorSet<TCType, TCTypeSet, Environment>
 	{
 		private final TCLeafExpressionVisitor<TCType, TCTypeSet, Environment> expVisitor;
+		private final TCStatementVisitor<TCTypeSet, Environment> stmtVisitor;
 
-		public VisitorSet()
+		public VisitorSet(TCExitChecker parent)
 		{
 			expVisitor = new com.fujitsu.vdmj.tc.expressions.TCExitChecker(this);
+			stmtVisitor = parent;
 		}
 
 		@Override
@@ -59,11 +61,17 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 		{
 			return expVisitor;
 		}
+		
+		@Override
+		public TCStatementVisitor<TCTypeSet, Environment> getStatementVisitor()
+		{
+			return stmtVisitor;
+		}
 	}
 
 	public TCExitChecker()
 	{
-		visitorSet = new VisitorSet();
+		visitorSet = new VisitorSet(this);
 	}
 
 	@Override
@@ -88,7 +96,7 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 			if (d instanceof TCAssignmentDefinition)
 			{
 				TCAssignmentDefinition ad = (TCAssignmentDefinition)d;
-				types.addAll(ad.expression.exitCheck(base));
+				types.addAll(ad.expression.apply(visitorSet.getExpressionVisitor(), base));
 			}
 		}
 		
@@ -117,7 +125,7 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 				if (explop.possibleExceptions == null)
 				{
 					explop.possibleExceptions = TCDefinition.IN_PROGRESS;
-					explop.possibleExceptions = explop.body.exitCheck(base);
+					explop.possibleExceptions = explop.body.apply(visitorSet.getStatementVisitor(), base);
 				}
 				
 				result.addAll(explop.possibleExceptions);
@@ -132,7 +140,7 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 					if (implop.body != null)
 					{
 						implop.possibleExceptions = TCDefinition.IN_PROGRESS;
-						implop.possibleExceptions = implop.body.exitCheck(base);
+						implop.possibleExceptions = implop.body.apply(visitorSet.getStatementVisitor(), base);
 					}
 					else
 					{
@@ -173,7 +181,7 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 				if (explop.possibleExceptions == null)
 				{
 					explop.possibleExceptions = TCDefinition.IN_PROGRESS;
-					explop.possibleExceptions = explop.body.exitCheck(base);
+					explop.possibleExceptions = explop.body.apply(visitorSet.getStatementVisitor(), base);
 				}
 				
 				result.addAll(explop.possibleExceptions);
@@ -188,7 +196,7 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 					if (implop.body != null)
 					{
 						implop.possibleExceptions = TCDefinition.IN_PROGRESS;
-						implop.possibleExceptions = implop.body.exitCheck(base);
+						implop.possibleExceptions = implop.body.apply(visitorSet.getStatementVisitor(), base);
 					}
 					else
 					{
@@ -208,7 +216,7 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 	@Override
 	public TCTypeSet caseCasesStatement(TCCasesStatement node, Environment base)
 	{
-		TCTypeSet types = node.exp.exitCheck(base);
+		TCTypeSet types = node.exp.apply(visitorSet.getExpressionVisitor(), base);
 
 		for (TCCaseStmtAlternative c: node.cases)
 		{
@@ -243,7 +251,10 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 	public TCTypeSet caseLetBeStStatement(TCLetBeStStatement node, Environment base)
 	{
 		TCTypeSet result = node.bind.exitCheck(base);
-		if (node.suchThat != null) result.addAll(node.suchThat.exitCheck(base));
+		if (node.suchThat != null)
+		{
+			result.addAll(node.suchThat.apply(visitorSet.getExpressionVisitor(), base));
+		}
 		
 		if (node.def != null)
 		{
@@ -252,12 +263,12 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 				if (d instanceof TCValueDefinition)
 				{
 					TCValueDefinition vd = (TCValueDefinition)d;
-					result.addAll(vd.exp.exitCheck(base));
+					result.addAll(vd.exp.apply(visitorSet.getExpressionVisitor(), base));
 				}
 			}
 		}
 		
-		result.addAll(node.statement.exitCheck(base));
+		result.addAll(node.statement.apply(this, base));
 		return result;
 	}
 	
@@ -271,16 +282,16 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 			if (d instanceof TCEqualsDefinition)
 			{
 				TCEqualsDefinition ed = (TCEqualsDefinition)d;
-				result.addAll(ed.test.exitCheck(base));
+				result.addAll(ed.test.apply(visitorSet.getExpressionVisitor(), base));
 			}
 			else if (d instanceof TCValueDefinition)
 			{
 				TCValueDefinition vd = (TCValueDefinition)d;
-				result.addAll(vd.exp.exitCheck(base));
+				result.addAll(vd.exp.apply(visitorSet.getExpressionVisitor(), base));
 			}
 		}
 		
-		result.addAll(node.statement.exitCheck(base));
+		result.addAll(node.statement.apply(this, base));
 		return result;
 	}
 	

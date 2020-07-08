@@ -27,8 +27,6 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.expressions.EnvTriple;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
@@ -57,12 +55,6 @@ public abstract class TCBind extends TCNode implements Serializable
 	/** Return this one bind as a list of {@link TCMultipleBind}. */
 	abstract public TCMultipleBindList getMultipleBindList();
 
-	/** Return a set of names of free variables from this bind */ 
-	public final TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		return apply(new TCGetFreeVariablesBindVisitor(), new EnvTriple(globals, env, null));
-	}
-	
 	/** Return a set of exceptions possibly raised by any expressions */
 	public final TCTypeSet exitCheck(Environment base)
 	{

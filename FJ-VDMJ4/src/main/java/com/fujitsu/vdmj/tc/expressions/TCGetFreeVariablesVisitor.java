@@ -44,11 +44,6 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 		visitorSet = visitors;
 	}
 
-	public TCGetFreeVariablesVisitor()
-	{
-		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, EnvTriple>() {};
-	}
-
 	@Override
 	protected TCNameSet newCollection()
 	{
@@ -102,7 +97,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
 		TCNameSet names = node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
-		names.addAll(node.bind.getFreeVariables(arg.globals, local));
+		names.addAll(node.bind.apply(visitorSet.getBindVisitor(), new EnvTriple(arg.globals, local, null)));
 		return names;
 	}
 	
@@ -114,7 +109,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 		
 		for (TCMultipleBind mb: node.bindList)
 		{
-			names.addAll(mb.getFreeVariables(arg.globals, local));
+			names.addAll(mb.apply(visitorSet.getMultiBindVisitor(), new EnvTriple(arg.globals, local, null)));
 		}
 		
 		return names;
@@ -128,7 +123,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 		
 		for (TCMultipleBind mb: node.bindList)
 		{
-			names.addAll(mb.getFreeVariables(arg.globals, local));
+			names.addAll(mb.apply(visitorSet.getMultiBindVisitor(), new EnvTriple(arg.globals, local, null)));
 		}
 		
 		return names;
@@ -145,7 +140,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
 		TCNameSet names = node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
-		names.addAll(node.bind.getFreeVariables(arg.globals, local));
+		names.addAll(node.bind.apply(visitorSet.getBindVisitor(), new EnvTriple(arg.globals, local, null)));
 		return names;
 	}
 	
@@ -156,7 +151,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 		
 		for (TCTypeBind bind: node.bindList)
 		{
-			names.addAll(bind.getFreeVariables(arg.globals, arg.env));
+			names.addAll(bind.apply(visitorSet.getBindVisitor(), arg));
 		}
 		
 		return names;
@@ -166,7 +161,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	public TCNameSet caseLetBeStExpression(TCLetBeStExpression node, EnvTriple arg)
 	{
 		Environment local = new FlatEnvironment(node.def, arg.env);
-		TCNameSet names = node.bind.getFreeVariables(arg.globals, local);
+		TCNameSet names = node.bind.apply(visitorSet.getMultiBindVisitor(), new EnvTriple(arg.globals, local, null));
 		
 		if (node.suchThat != null)
 		{
@@ -192,7 +187,8 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 			else
 			{
 				local = new FlatEnvironment(d, local);
-				names.addAll(d.getFreeVariables(arg.globals, local, new AtomicBoolean()));
+				names.addAll(d.apply(visitorSet.getDefinitionVisitor(),
+						new EnvTriple(arg.globals, local, new AtomicBoolean())));
 			}
 		}
 
@@ -213,7 +209,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 		
 		for (TCMultipleBind mb: node.bindings)
 		{
-			names.addAll(mb.getFreeVariables(arg.globals, local));
+			names.addAll(mb.apply(visitorSet.getMultiBindVisitor(), new EnvTriple(arg.globals, local, null)));
 		}
 		
 		return names;
@@ -222,7 +218,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 	@Override
 	public TCNameSet caseMkBasicExpression(TCMkBasicExpression node, EnvTriple arg)
 	{
-		TCNameSet names = node.type.getFreeVariables(arg.env);
+		TCNameSet names = node.type.apply(visitorSet.getTypeVisitor(), arg);
 		names.addAll(node.arg.apply(this, arg));
 		return names;
 	}
@@ -277,7 +273,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 			node.predicate.apply(this, new EnvTriple(arg.globals, local, null));
 		}
 		
-		names.addAll(node.bind.getFreeVariables(arg.globals, local));
+		names.addAll(node.bind.apply(visitorSet.getBindVisitor(), new EnvTriple(arg.globals, local, null)));
 		return names;
 	}
 	
@@ -294,7 +290,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameTok
 		
 		for (TCMultipleBind mb: node.bindings)
 		{
-			names.addAll(mb.getFreeVariables(arg.globals, local));
+			names.addAll(mb.apply(visitorSet.getMultiBindVisitor(), new EnvTriple(arg.globals, local, null)));
 		}
 		
 		return names;

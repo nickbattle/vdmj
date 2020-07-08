@@ -25,42 +25,16 @@ package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.expressions.EnvTriple;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
 
 public class TCGetFreeVariablesBindVisitor extends TCBindVisitor<TCNameSet, EnvTriple>
 {
-	private static class VisitorSet extends TCVisitorSet<TCNameToken, TCNameSet, EnvTriple>
-	{
-		private final TCExpressionVisitor<TCNameSet, EnvTriple> expVisitor;
-		private final TCTypeVisitor<TCNameSet, EnvTriple> typeVisitor;
-		
-		public VisitorSet()
-		{
-			expVisitor = new com.fujitsu.vdmj.tc.expressions.TCGetFreeVariablesVisitor(this);
-			typeVisitor = new com.fujitsu.vdmj.tc.types.TCGetFreeVariablesVisitor(this);
-		}
-		
-		@Override
-		public TCExpressionVisitor<TCNameSet, EnvTriple> getExpressionVisitor()
-		{
-			return expVisitor;
-		}
-		
-		@Override
-		public TCTypeVisitor<TCNameSet, EnvTriple> getTypeVisitor()
-		{
-			return typeVisitor;
-		}
-	}
-
-	private final VisitorSet visitorSet;
+	private final TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitorSet;
 	
-	public TCGetFreeVariablesBindVisitor()
+	public TCGetFreeVariablesBindVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
 	{
-		visitorSet = new VisitorSet();
+		visitorSet = visitors;
 	}
 
 	@Override

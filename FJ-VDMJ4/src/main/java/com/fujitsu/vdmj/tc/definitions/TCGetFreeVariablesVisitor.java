@@ -28,6 +28,10 @@ import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.TCBindVisitor;
+import com.fujitsu.vdmj.tc.patterns.TCGetFreeVariablesBindVisitor;
+import com.fujitsu.vdmj.tc.patterns.TCGetFreeVariablesMultipleBindVisitor;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBindVisitor;
 import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
@@ -44,6 +48,8 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		private final TCExpressionVisitor<TCNameSet, EnvTriple> expVisitor;
 		private final TCStatementVisitor<TCNameSet, EnvTriple> stmtVisitor;
 		private final TCTypeVisitor<TCNameSet, EnvTriple> typeVisitor;
+		private final TCBindVisitor<TCNameSet, EnvTriple> bindVisitor;
+		private final TCMultipleBindVisitor<TCNameSet, EnvTriple> mbindVisitor;
 
 		public VisitorSet(TCGetFreeVariablesVisitor parent)
 		{
@@ -51,6 +57,8 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 			expVisitor = new com.fujitsu.vdmj.tc.expressions.TCGetFreeVariablesVisitor(this);
 			stmtVisitor = new com.fujitsu.vdmj.tc.statements.TCGetFreeVariablesVisitor(this);
 			typeVisitor = new com.fujitsu.vdmj.tc.types.TCGetFreeVariablesVisitor(this);
+			bindVisitor = new TCGetFreeVariablesBindVisitor(this);
+			mbindVisitor = new TCGetFreeVariablesMultipleBindVisitor(this); 
 		}
 		
 		@Override
@@ -76,6 +84,18 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 	 	{
 	 		return typeVisitor;
 	 	}
+		
+		@Override
+		public TCBindVisitor<TCNameSet, EnvTriple> getBindVisitor()
+		{
+			return bindVisitor;
+		}
+		
+		@Override
+		public TCMultipleBindVisitor<TCNameSet, EnvTriple> getMultiBindVisitor()
+		{
+			return mbindVisitor;
+		}
 	}
 
 	protected TCGetFreeVariablesVisitor()

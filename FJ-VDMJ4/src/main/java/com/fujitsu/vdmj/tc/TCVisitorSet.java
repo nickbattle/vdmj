@@ -27,6 +27,8 @@ import java.util.Collection;
 
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.patterns.TCBindVisitor;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBindVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCPatternVisitor;
 import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
@@ -66,4 +68,14 @@ abstract public class TCVisitorSet<E, C extends Collection<E>, S>
  	{
  		return null;
  	}
+
+	public TCBindVisitor<C, S> getBindVisitor()
+	{
+		return null;
+	}
+
+	public TCMultipleBindVisitor<C, S> getMultiBindVisitor()
+	{
+		return null;
+	}
 }
