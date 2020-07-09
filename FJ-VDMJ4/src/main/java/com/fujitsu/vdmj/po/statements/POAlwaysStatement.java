@@ -54,4 +54,10 @@ public class POAlwaysStatement extends POStatement
 		obligations.addAll(body.getProofObligations(ctxt));
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAlwaysStatement(this, arg);
+	}
 }

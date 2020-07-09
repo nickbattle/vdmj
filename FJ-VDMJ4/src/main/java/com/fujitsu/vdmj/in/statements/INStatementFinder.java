@@ -23,14 +23,14 @@
 
 package com.fujitsu.vdmj.in.statements;
 
-import com.fujitsu.vdmj.in.definitions.INDefinitionVisitor;
-import com.fujitsu.vdmj.in.expressions.INExpressionVisitor;
+import com.fujitsu.vdmj.in.INVisitorSet;
 
 public class INStatementFinder extends INLeafStatementVisitor<INStatement, INStatementList, Integer>
 {
 	public INStatementFinder()
 	{
 		super(true);	// So we visit the nodes as well as the leaves
+		visitorSet = new INVisitorSet<INStatement, INStatementList, Integer>() {};
 	}
 
 	@Override
@@ -56,17 +56,5 @@ public class INStatementFinder extends INLeafStatementVisitor<INStatement, INSta
 		}
 
 		return list;
-	}
-
-	@Override
-	protected INExpressionVisitor<INStatementList, Integer> getExpressionVisitor()
-	{
-		return null;
-	}
-
-	@Override
-	protected INDefinitionVisitor<INStatementList, Integer> getDefinitionVisitor()
-	{
-		return null;
 	}
 }

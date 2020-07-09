@@ -23,11 +23,14 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import com.fujitsu.vdmj.in.INVisitorSet;
+
 public class INHistoryExpressionFinder extends INLeafExpressionVisitor<INExpression, INExpressionList, Object>
 {
 	public INHistoryExpressionFinder()
 	{
 		super(false);
+		visitorSet = new INVisitorSet<INExpression, INExpressionList, Object>() {};
 	}
 
 	@Override

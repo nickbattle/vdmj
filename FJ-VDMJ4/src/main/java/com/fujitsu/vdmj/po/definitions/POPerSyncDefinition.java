@@ -79,4 +79,10 @@ public class POPerSyncDefinition extends PODefinition
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePerSyncDefinition(this, arg);
+	}
 }

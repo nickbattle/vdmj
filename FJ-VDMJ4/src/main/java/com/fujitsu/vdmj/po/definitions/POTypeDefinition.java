@@ -121,4 +121,10 @@ public class POTypeDefinition extends PODefinition
 		if (annotations != null) annotations.poAfter(this, list, ctxt);
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTypeDefinition(this, arg);
+	}
 }

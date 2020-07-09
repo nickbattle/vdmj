@@ -39,4 +39,10 @@ public class POSubclassResponsibilityStatement extends POStatement
 	{
 		return "is subclass responsibility";
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSubclassResponsibilityStatement(this, arg);
+	}
 }

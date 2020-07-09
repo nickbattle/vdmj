@@ -59,4 +59,9 @@ public abstract class POStatement extends PONode implements Serializable
 	{
 		return new ProofObligationList();
 	}
+
+	/**
+	 * Implemented by all definitions to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg);
 }

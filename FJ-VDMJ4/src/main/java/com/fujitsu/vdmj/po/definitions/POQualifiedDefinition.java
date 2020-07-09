@@ -31,7 +31,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 public class POQualifiedDefinition extends PODefinition
 {
 	private static final long serialVersionUID = 1L;
-	private final PODefinition def;
+	public final PODefinition def;
 	private final TCType type;
 
 	public POQualifiedDefinition(PODefinition qualifies, TCType type)
@@ -82,5 +82,11 @@ public class POQualifiedDefinition extends PODefinition
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
 		return def.getProofObligations(ctxt);
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQualifiedDefinition(this, arg);
 	}
 }

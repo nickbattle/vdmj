@@ -208,4 +208,10 @@ public class POExplicitFunctionDefinition extends PODefinition
 	{
 		return paramPatternList;
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExplicitFunctionDefinition(this, arg);
+	}
 }

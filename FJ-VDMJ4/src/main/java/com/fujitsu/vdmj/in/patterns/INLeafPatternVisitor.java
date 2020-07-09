@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.in.patterns;
 
 import java.util.Collection;
 
+import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.expressions.INExpressionVisitor;
 
 /**
@@ -33,6 +34,8 @@ import com.fujitsu.vdmj.in.expressions.INExpressionVisitor;
  */
 public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extends INPatternVisitor<C, S>
 {
+	protected INVisitorSet<E, C, S> visitorSet;
+	
  	@Override
 	public C caseConcatenationPattern(INConcatenationPattern node, S arg)
 	{
@@ -47,7 +50,7 @@ public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extend
  	@Override
 	public C caseExpressionPattern(INExpressionPattern node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		return (expVisitor != null ? node.exp.apply(expVisitor, arg) : newCollection());
 	}
 
@@ -153,6 +156,4 @@ public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extend
 	}
 
  	abstract protected C newCollection();
-
- 	abstract protected INExpressionVisitor<C, S> getExpressionVisitor();
 }

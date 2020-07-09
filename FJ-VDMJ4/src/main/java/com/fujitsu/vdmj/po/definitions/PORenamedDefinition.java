@@ -60,4 +60,10 @@ public class PORenamedDefinition extends PODefinition
 		both.add(def.name);
 		return both;
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRenamedDefinition(this, arg);
+	}
 }

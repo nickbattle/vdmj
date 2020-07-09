@@ -54,4 +54,10 @@ public class POElseIfStatement extends POStatement
 		obligations.addAll(thenStmt.getProofObligations(ctxt));
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseElseIfStatement(this, arg);
+	}
 }

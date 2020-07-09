@@ -39,4 +39,10 @@ public class POSkipStatement extends POStatement
 	{
 		return "skip";
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSkipStatement(this, arg);
+	}
 }

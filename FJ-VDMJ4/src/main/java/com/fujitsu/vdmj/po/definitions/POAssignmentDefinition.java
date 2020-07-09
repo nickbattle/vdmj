@@ -83,4 +83,10 @@ public class POAssignmentDefinition extends PODefinition
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAssignmentDefinition(this, arg);
+	}
 }

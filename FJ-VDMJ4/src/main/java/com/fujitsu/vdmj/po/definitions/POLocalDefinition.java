@@ -60,4 +60,10 @@ public class POLocalDefinition extends PODefinition
 	{
 		return new TCNameList(name);
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLocalDefinition(this, arg);
+	}
 }

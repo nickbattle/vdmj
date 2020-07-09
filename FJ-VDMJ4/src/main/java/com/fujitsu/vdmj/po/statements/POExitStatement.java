@@ -57,4 +57,10 @@ public class POExitStatement extends POStatement
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExitStatement(this, arg);
+	}
 }

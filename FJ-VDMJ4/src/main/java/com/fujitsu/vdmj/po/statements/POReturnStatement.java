@@ -56,4 +56,10 @@ public class POReturnStatement extends POStatement
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseReturnStatement(this, arg);
+	}
 }

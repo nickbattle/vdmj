@@ -43,4 +43,10 @@ public class PONonDeterministicStatement extends POSimpleBlockStatement
 		sb.append(")");
 		return sb.toString();
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNonDeterministicStatement(this, arg);
+	}
 }

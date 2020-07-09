@@ -127,7 +127,12 @@ public abstract class PODefinitionVisitor<R, S>
 		return caseDefinition(node, arg);
 	}
 
- 	public R caseRenamedDefinition(PORenamedDefinition node, S arg)
+ 	public R caseQualifiedDefinition(POQualifiedDefinition node, S arg)
+	{
+ 		return caseDefinition(node, arg);
+	}
+
+	public R caseRenamedDefinition(PORenamedDefinition node, S arg)
 	{
 		return caseDefinition(node, arg);
 	}

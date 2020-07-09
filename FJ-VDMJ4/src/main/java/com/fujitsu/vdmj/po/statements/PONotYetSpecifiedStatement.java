@@ -39,4 +39,10 @@ public class PONotYetSpecifiedStatement extends POStatement
 	{
 		return "is not yet specified";
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotYetSpecifiedStatement(this, arg);
+	}
 }

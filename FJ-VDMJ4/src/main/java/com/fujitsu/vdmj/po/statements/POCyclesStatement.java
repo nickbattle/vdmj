@@ -44,4 +44,10 @@ public class POCyclesStatement extends POStatement
 	{
 		return "cycles (" + cycles + ") " + statement;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCyclesStatement(this, arg);
+	}
 }

@@ -38,4 +38,10 @@ public class POInstanceVariableDefinition extends POAssignmentDefinition
 	{
 		super(name, type, expression, expType);
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInstanceVariableDefinition(this, arg);
+	}
 }

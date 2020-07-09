@@ -59,4 +59,10 @@ public class POUntypedDefinition extends PODefinition
 	{
 		return new TCNameList(name);
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseUntypedDefinition(this, arg);
+	}
 }

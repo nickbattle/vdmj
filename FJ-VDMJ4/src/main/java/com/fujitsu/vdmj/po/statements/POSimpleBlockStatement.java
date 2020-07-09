@@ -73,4 +73,10 @@ abstract public class POSimpleBlockStatement extends POStatement
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSimpleBlockStatement(this, arg);
+	}
 }

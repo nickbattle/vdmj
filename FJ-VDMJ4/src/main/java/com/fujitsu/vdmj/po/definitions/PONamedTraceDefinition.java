@@ -57,4 +57,10 @@ public class PONamedTraceDefinition extends PODefinition
 	{
 		return name.getName();
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNamedTraceDefinition(this, arg);
+	}
 }

@@ -88,4 +88,10 @@ public class POMultiBindListDefinition extends PODefinition
 	{
 		return defs == null ? new TCNameList() : defs.getVariableNames();
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMultiBindListDefinition(this, arg);
+	}
 }

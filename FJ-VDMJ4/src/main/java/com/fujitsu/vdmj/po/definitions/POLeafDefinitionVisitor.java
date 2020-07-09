@@ -21,31 +21,31 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.definitions;
+package com.fujitsu.vdmj.po.definitions;
 
 import java.util.Collection;
 
-import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.expressions.INExpressionVisitor;
-import com.fujitsu.vdmj.in.patterns.INMultipleBind;
-import com.fujitsu.vdmj.in.patterns.INMultipleSeqBind;
-import com.fujitsu.vdmj.in.patterns.INMultipleSetBind;
-import com.fujitsu.vdmj.in.statements.INStatementVisitor;
+import com.fujitsu.vdmj.po.POVisitorSet;
+import com.fujitsu.vdmj.po.expressions.POExpressionVisitor;
+import com.fujitsu.vdmj.po.patterns.POMultipleBind;
+import com.fujitsu.vdmj.po.patterns.POMultipleSeqBind;
+import com.fujitsu.vdmj.po.patterns.POMultipleSetBind;
+import com.fujitsu.vdmj.po.statements.POStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
 
 /**
- * This INDefinition visitor visits all of the leaves of a definition tree and calls
+ * This PODefinition visitor visits all of the leaves of a definition tree and calls
  * the basic processing methods for the simple statements and expressions.
  */
-abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> extends INDefinitionVisitor<C, S>
+abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> extends PODefinitionVisitor<C, S>
 {
-	protected INVisitorSet<E, C, S> visitorSet;
+	protected POVisitorSet<E, C, S> visitorSet;
 
  	@Override
-	public C caseAssignmentDefinition(INAssignmentDefinition node, S arg)
+	public C caseAssignmentDefinition(POAssignmentDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
@@ -63,11 +63,11 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 
  	@Override
-	public C caseClassDefinition(INClassDefinition node, S arg)
+	public C caseClassDefinition(POClassDefinition node, S arg)
 	{
  		C all = newCollection();
  		
- 		for (INDefinition def: node.definitions)
+ 		for (PODefinition def: node.definitions)
  		{
  			all.addAll(def.apply(this, arg));
  		}
@@ -76,16 +76,16 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 
  	@Override
-	public C caseClassInvariantDefinition(INClassInvariantDefinition node, S arg)
+	public C caseClassInvariantDefinition(POClassInvariantDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		return (expVisitor != null ? node.expression.apply(expVisitor, arg) : newCollection());
 	}
 
  	@Override
-	public C caseEqualsDefinition(INEqualsDefinition node, S arg)
+	public C caseEqualsDefinition(POEqualsDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
@@ -103,9 +103,9 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 
  	@Override
-	public C caseExplicitFunctionDefinition(INExplicitFunctionDefinition node, S arg)
+	public C caseExplicitFunctionDefinition(POExplicitFunctionDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
@@ -123,9 +123,9 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 
  	@Override
-	public C caseExplicitOperationDefinition(INExplicitOperationDefinition node, S arg)
+	public C caseExplicitOperationDefinition(POExplicitOperationDefinition node, S arg)
 	{
-		INStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
+		POStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
@@ -143,17 +143,17 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 
 	@Override
-	public C caseExternalDefinition(INExternalDefinition node, S arg)
+	public C caseExternalDefinition(POExternalDefinition node, S arg)
 	{
 		return newCollection();
 	}
 
  	@Override
-	public C caseImplicitFunctionDefinition(INImplicitFunctionDefinition node, S arg)
+	public C caseImplicitFunctionDefinition(POImplicitFunctionDefinition node, S arg)
 	{
  		if (node.body != null)
  		{
-			INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+			POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 			TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 			C all = newCollection();
 			
@@ -176,11 +176,11 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 
  	@Override
-	public C caseImplicitOperationDefinition(INImplicitOperationDefinition node, S arg)
+	public C caseImplicitOperationDefinition(POImplicitOperationDefinition node, S arg)
 	{
  		if (node.body != null)
  		{
- 			INStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
+ 			POStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
  			TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
  			C all = newCollection();
  			
@@ -203,19 +203,19 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 
  	@Override
-	public C caseImportedDefinition(INImportedDefinition node, S arg)
+	public C caseImportedDefinition(POImportedDefinition node, S arg)
 	{
 		return newCollection();
 	}
 
  	@Override
-	public C caseInheritedDefinition(INInheritedDefinition node, S arg)
+	public C caseInheritedDefinition(POInheritedDefinition node, S arg)
 	{
 		return newCollection();
 	}
 
  	@Override
-	public C caseInstanceVariableDefinition(INInstanceVariableDefinition node, S arg)
+	public C caseInstanceVariableDefinition(POInstanceVariableDefinition node, S arg)
 	{
  		if (node.expression != null)
  		{
@@ -228,7 +228,7 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 
  	@Override
-	public C caseLocalDefinition(INLocalDefinition node, S arg)
+	public C caseLocalDefinition(POLocalDefinition node, S arg)
 	{
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
@@ -242,11 +242,11 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 
  	@Override
-	public C caseMultiBindListDefinition(INMultiBindListDefinition node, S arg)
+	public C caseMultiBindListDefinition(POMultiBindListDefinition node, S arg)
 	{
  		C all = newCollection();
  		
-		for (INMultipleBind bind: node.bindings)
+		for (POMultipleBind bind: node.bindings)
  		{
  			all.addAll(caseMultipleBind(bind, arg));
  		}
@@ -255,40 +255,40 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 
  	@Override
-	public C caseMutexSyncDefinition(INMutexSyncDefinition node, S arg)
+	public C caseMutexSyncDefinition(POMutexSyncDefinition node, S arg)
 	{
 		return newCollection();
 	}
 
  	@Override
-	public C caseNamedTraceDefinition(INNamedTraceDefinition node, S arg)
+	public C caseNamedTraceDefinition(PONamedTraceDefinition node, S arg)
 	{
 		return newCollection();
 	}
 
  	@Override
-	public C casePerSyncDefinition(INPerSyncDefinition node, S arg)
+	public C casePerSyncDefinition(POPerSyncDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		return (expVisitor != null ? node.guard.apply(expVisitor, arg) : newCollection());
 	}
 
  	@Override
-	public C caseQualifiedDefinition(INQualifiedDefinition node, S arg)
+	public C caseQualifiedDefinition(POQualifiedDefinition node, S arg)
 	{
 		return node.def.apply(this, arg);
 	}
 
  	@Override
-	public C caseRenamedDefinition(INRenamedDefinition node, S arg)
+	public C caseRenamedDefinition(PORenamedDefinition node, S arg)
 	{
 		return newCollection();
 	}
 
  	@Override
-	public C caseStateDefinition(INStateDefinition node, S arg)
+	public C caseStateDefinition(POStateDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
@@ -317,14 +317,14 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	}
 
  	@Override
-	public C caseThreadDefinition(INThreadDefinition node, S arg)
+	public C caseThreadDefinition(POThreadDefinition node, S arg)
 	{
-		INStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
+		POStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
 		return (stmtVisitor != null ? node.statement.apply(stmtVisitor, arg) : newCollection());
 	}
 
  	@Override
-	public C caseTypeDefinition(INTypeDefinition node, S arg)
+	public C caseTypeDefinition(POTypeDefinition node, S arg)
 	{
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		
@@ -335,44 +335,19 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 			all.addAll(node.type.apply(typeVisitor, arg));
 		}
 		
-		if (node.invdef != null)
-		{
-			all.addAll(node.invdef.apply(this, arg));
-		}
-
-		if (node.eqdef != null)
-		{
-			all.addAll(node.eqdef.apply(this, arg));
-		}
-
-		if (node.orddef != null)
-		{
-			all.addAll(node.orddef.apply(this, arg));
-		}
-
-		if (node.mindef != null)
-		{
-			all.addAll(node.mindef.apply(this, arg));
-		}
-
-		if (node.maxdef != null)
-		{
-			all.addAll(node.maxdef.apply(this, arg));
-		}
-		
 		return all;
 	}
 
  	@Override
-	public C caseUntypedDefinition(INUntypedDefinition node, S arg)
+	public C caseUntypedDefinition(POUntypedDefinition node, S arg)
 	{
 		return newCollection();
 	}
 
  	@Override
-	public C caseValueDefinition(INValueDefinition node, S arg)
+	public C caseValueDefinition(POValueDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
@@ -389,21 +364,21 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		return all;
 	}
 
- 	private C caseMultipleBind(INMultipleBind bind, S arg)
+ 	private C caseMultipleBind(POMultipleBind bind, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		C all = newCollection();
 		
 		if (expVisitor != null)
 		{
-			if (bind instanceof INMultipleSetBind)
+			if (bind instanceof POMultipleSetBind)
 			{
-				INMultipleSetBind sbind = (INMultipleSetBind)bind;
+				POMultipleSetBind sbind = (POMultipleSetBind)bind;
 				all.addAll(sbind.set.apply(expVisitor, arg));
 			}
-			else if (bind instanceof INMultipleSeqBind)
+			else if (bind instanceof POMultipleSeqBind)
 			{
-				INMultipleSeqBind sbind = (INMultipleSeqBind)bind;
+				POMultipleSeqBind sbind = (POMultipleSeqBind)bind;
 				all.addAll(sbind.sequence.apply(expVisitor, arg));
 			}
 		}

@@ -106,4 +106,10 @@ public class POClassDefinition extends PODefinition
 		POClassInvariantStatement body = (POClassInvariantStatement)invariant.body;
 		return body.invdefs;
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassDefinition(this, arg);
+	}
 }

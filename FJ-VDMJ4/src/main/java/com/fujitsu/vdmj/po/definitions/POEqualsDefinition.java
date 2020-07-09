@@ -167,4 +167,10 @@ public class POEqualsDefinition extends PODefinition
 		list.addAll(test.getProofObligations(ctxt));
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseEqualsDefinition(this, arg);
+	}
 }

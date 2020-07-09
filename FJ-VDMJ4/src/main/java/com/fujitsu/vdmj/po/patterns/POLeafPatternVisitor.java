@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.patterns;
 
 import java.util.Collection;
 
+import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.expressions.POExpressionVisitor;
 
 /**
@@ -33,6 +34,8 @@ import com.fujitsu.vdmj.po.expressions.POExpressionVisitor;
  */
 public abstract class POLeafPatternVisitor<E, C extends Collection<E>, S> extends POPatternVisitor<C, S>
 {
+	protected POVisitorSet<E, C, S> visitorSet;
+
  	@Override
 	public C caseConcatenationPattern(POConcatenationPattern node, S arg)
 	{
@@ -47,7 +50,7 @@ public abstract class POLeafPatternVisitor<E, C extends Collection<E>, S> extend
  	@Override
 	public C caseExpressionPattern(POExpressionPattern node, S arg)
 	{
-		POExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		return (expVisitor != null ? node.exp.apply(expVisitor, arg) : newCollection());
 	}
 
@@ -153,6 +156,4 @@ public abstract class POLeafPatternVisitor<E, C extends Collection<E>, S> extend
 	}
 
  	abstract protected C newCollection();
-
- 	abstract protected POExpressionVisitor<C, S> getExpressionVisitor();
 }

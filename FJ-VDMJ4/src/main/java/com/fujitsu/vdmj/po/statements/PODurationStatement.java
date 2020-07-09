@@ -44,4 +44,10 @@ public class PODurationStatement extends POStatement
 	{
 		return "duration (" + duration + ") " + statement;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDurationStatement(this, arg);
+	}
 }

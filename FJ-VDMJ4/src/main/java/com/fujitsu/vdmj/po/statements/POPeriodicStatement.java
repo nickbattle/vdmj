@@ -45,4 +45,10 @@ public class POPeriodicStatement extends POStatement
 	{
 		return "periodic(" + Utils.listToString(args) + ")(" + opname + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePeriodicStatement(this, arg);
+	}
 }

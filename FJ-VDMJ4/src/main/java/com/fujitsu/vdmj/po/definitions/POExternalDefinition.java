@@ -59,4 +59,10 @@ public class POExternalDefinition extends PODefinition
 	{
 		return state.getVariableNames();
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExternalDefinition(this, arg);
+	}
 }

@@ -52,4 +52,10 @@ public class POBlockStatement extends POSimpleBlockStatement
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBlockStatement(this, arg);
+	}
 }

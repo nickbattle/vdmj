@@ -34,4 +34,10 @@ public class POSystemDefinition extends POClassDefinition
 	{
 		super(null, className, ctype, members, null, false);
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSystemDefinition(this, arg);
+	}
 }

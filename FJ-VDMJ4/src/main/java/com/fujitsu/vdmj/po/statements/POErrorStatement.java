@@ -39,4 +39,10 @@ public class POErrorStatement extends POStatement
 	{
 		return "error";
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseErrorStatement(this, arg);
+	}
 }

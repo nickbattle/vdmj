@@ -117,4 +117,9 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	{
 		return new ProofObligationList();
 	}
+
+	/**
+	 * Implemented by all definitions to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg);
 }

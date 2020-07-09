@@ -163,4 +163,10 @@ public class POExplicitOperationDefinition extends PODefinition
 		list.add(parameterPatterns);
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExplicitOperationDefinition(this, arg);
+	}
 }

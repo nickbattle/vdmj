@@ -45,4 +45,10 @@ public class POSporadicStatement extends POStatement
 	{
 		return "sporadic(" + Utils.listToString(args) + ")(" + opname + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSporadicStatement(this, arg);
+	}
 }

@@ -234,4 +234,10 @@ public class POImplicitOperationDefinition extends PODefinition
 		return plist;
 	}
 
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImplicitOperationDefinition(this, arg);
+	}
 }

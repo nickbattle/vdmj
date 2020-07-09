@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.in.expressions;
 
 import java.util.Collection;
 
+import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.annotations.INAnnotatedExpression;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INEqualsDefinition;
@@ -42,6 +43,7 @@ import com.fujitsu.vdmj.in.patterns.INSetBind;
  */
 abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> extends INExpressionVisitor<C, S>
 {
+	protected INVisitorSet<E, C, S> visitorSet;
 	private final boolean allNodes;
 	
 	public INLeafExpressionVisitor(boolean allNodes)

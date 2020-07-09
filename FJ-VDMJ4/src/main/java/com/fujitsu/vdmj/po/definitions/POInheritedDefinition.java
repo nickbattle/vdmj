@@ -65,4 +65,10 @@ public class POInheritedDefinition extends PODefinition
 
 		return names;
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInheritedDefinition(this, arg);
+	}
 }

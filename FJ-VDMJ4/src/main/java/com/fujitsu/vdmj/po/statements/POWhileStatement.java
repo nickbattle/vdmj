@@ -57,4 +57,10 @@ public class POWhileStatement extends POStatement
 		obligations.addAll(statement.getProofObligations(ctxt));
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseWhileStatement(this, arg);
+	}
 }

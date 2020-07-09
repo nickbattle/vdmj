@@ -79,4 +79,10 @@ public class POThreadDefinition extends PODefinition
 	{
 		return operationName.hashCode();
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseThreadDefinition(this, arg);
+	}
 }

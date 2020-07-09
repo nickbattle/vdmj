@@ -36,4 +36,10 @@ public class POCPUClassDefinition extends POClassDefinition
 	{
 		super(null, new TCNameToken(new LexLocation(), "CLASS", "CPU"), ctype, defs, inv, ctors);
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCPUClassDefinition(this, arg);
+	}
 }

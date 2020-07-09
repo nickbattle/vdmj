@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.expressions;
 
 import java.util.Collection;
 
+import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.annotations.POAnnotatedExpression;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POEqualsDefinition;
@@ -43,6 +44,8 @@ import com.fujitsu.vdmj.po.patterns.POTypeBind;
  */
 abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> extends POExpressionVisitor<C, S>
 {
+	protected POVisitorSet<E, C, S> visitorSet;
+
  	@Override
 	public C caseApplyExpression(POApplyExpression node, S arg)
 	{

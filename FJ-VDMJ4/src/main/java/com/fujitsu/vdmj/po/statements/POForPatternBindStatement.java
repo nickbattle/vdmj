@@ -95,4 +95,10 @@ public class POForPatternBindStatement extends POStatement
 		list.addAll(statement.getProofObligations(ctxt));
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForPatternBindStatement(this, arg);
+	}
 }

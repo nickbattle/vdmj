@@ -87,4 +87,10 @@ public class POTrapStatement extends POStatement
 		list.addAll(body.getProofObligations(ctxt));
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTrapStatement(this, arg);
+	}
 }

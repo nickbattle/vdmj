@@ -35,4 +35,10 @@ public class POBUSClassDefinition extends POClassDefinition
 	{
 		super(null, new TCNameToken(new LexLocation(), "CLASS", "BUS"), ctype, defs, null, false);
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBUSClassDefinition(this, arg);
+	}
 }

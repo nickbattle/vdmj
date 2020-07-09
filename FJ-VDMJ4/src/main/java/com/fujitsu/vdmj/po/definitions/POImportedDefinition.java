@@ -58,4 +58,10 @@ public class POImportedDefinition extends PODefinition
 	{
 		return def.getVariableNames();
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImportedDefinition(this, arg);
+	}
 }

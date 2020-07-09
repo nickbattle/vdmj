@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.annotations;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.POStatement;
+import com.fujitsu.vdmj.po.statements.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -56,5 +57,11 @@ public class POAnnotatedStatement extends POStatement
 		ProofObligationList obligations = statement.getProofObligations(ctxt);
 		annotation.poAfter(this, obligations, ctxt);
 		return obligations;
+	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAnnotatedStatement(this, arg);
 	}
 }

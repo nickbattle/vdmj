@@ -44,4 +44,10 @@ public class POClassInvariantStatement extends POStatement
 	{
 		return "instance invariant " + name;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassInvariantStatement(this, arg);
+	}
 }

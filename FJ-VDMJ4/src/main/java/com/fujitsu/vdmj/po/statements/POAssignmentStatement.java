@@ -89,4 +89,10 @@ public class POAssignmentStatement extends POStatement
 
 		return obligations;
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseAssignmentStatement(this, arg);
+	}
 }

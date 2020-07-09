@@ -77,4 +77,10 @@ public class POClassInvariantDefinition extends PODefinition
 
 		return list;
 	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassInvariantDefinition(this, arg);
+	}
 }

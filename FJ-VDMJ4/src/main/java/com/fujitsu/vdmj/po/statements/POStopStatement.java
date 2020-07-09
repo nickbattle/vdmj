@@ -50,4 +50,10 @@ public class POStopStatement extends POStatement
 	{
 		return "stop(" + objects + ")";
 	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStopStatement(this, arg);
+	}
 }

@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.statements;
 
+import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.definitions.INAssignmentDefinition;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INDefinitionVisitor;
@@ -37,9 +38,90 @@ import com.fujitsu.vdmj.in.expressions.INLeafExpressionVisitor;
  */
 public class INStatementExpressionFinder extends INLeafStatementVisitor<INExpression, INExpressionList, Integer>
 {
+	private class VisitorSet extends INVisitorSet<INExpression, INExpressionList, Integer>
+	{
+		@Override
+		public INExpressionVisitor<INExpressionList, Integer> getExpressionVisitor()
+		{
+			return new INLeafExpressionVisitor<INExpression, INExpressionList, Integer>(true)
+			{
+				@Override
+				protected INExpressionList newCollection()
+				{
+					return new INExpressionList();
+				}
+
+				@Override
+				protected INExpressionList caseNonLeafNode(INExpression node, Integer lineno)
+				{
+					return caseExpression(node, lineno);
+				}
+
+				@Override
+				public INExpressionList caseExpression(INExpression node, Integer lineno)
+				{
+					INExpressionList list = newCollection();
+					
+					if (node.location.startLine == lineno)
+					{
+						list.add(node);
+					}
+
+					return list;
+				}
+			};
+		}
+
+		@Override
+		public INDefinitionVisitor<INExpressionList, Integer> getDefinitionVisitor()
+		{
+			return new INDefinitionVisitor<INExpressionList, Integer>()
+			{
+				@Override
+				public INExpressionList caseDefinition(INDefinition node, Integer lineno)
+				{
+					return new INExpressionList();
+				}
+				
+				/**
+				 * Assignment definitions are "dcl var:type := exp"
+				 */
+				@Override
+				public INExpressionList caseAssignmentDefinition(INAssignmentDefinition node, Integer lineno)
+				{
+					INExpressionList list = newCollection();
+					
+					if (node.expression.location.startLine == lineno)
+					{
+						list.add(node.expression);		// Could apply exp visitor...
+					}
+
+					return list;
+				}
+				
+				/**
+				 * Value definitions are in let def statements.
+				 */
+				@Override
+				public INExpressionList caseValueDefinition(INValueDefinition node, Integer lineno)
+				{
+					INExpressionList list = newCollection();
+					
+					if (node.exp.location.startLine == lineno)
+					{
+						list.add(node.exp);		// Could apply exp visitor...
+					}
+
+					return list;
+				}
+			};
+		}
+	}
+	
 	public INStatementExpressionFinder()
 	{
 		super(true);	// So we visit the nodes as well as the leaves
+		visitorSet = new VisitorSet();
 	}
 
 	@Override
@@ -58,82 +140,5 @@ public class INStatementExpressionFinder extends INLeafStatementVisitor<INExpres
 	public INExpressionList caseStatement(INStatement node, Integer lineno)
 	{
 		return newCollection();
-	}
-
-	@Override
-	protected INExpressionVisitor<INExpressionList, Integer> getExpressionVisitor()
-	{
-		return new INLeafExpressionVisitor<INExpression, INExpressionList, Integer>(true)
-		{
-			@Override
-			protected INExpressionList newCollection()
-			{
-				return new INExpressionList();
-			}
-
-			@Override
-			protected INExpressionList caseNonLeafNode(INExpression node, Integer lineno)
-			{
-				return caseExpression(node, lineno);
-			}
-
-			@Override
-			public INExpressionList caseExpression(INExpression node, Integer lineno)
-			{
-				INExpressionList list = newCollection();
-				
-				if (node.location.startLine == lineno)
-				{
-					list.add(node);
-				}
-
-				return list;
-			}
-		};
-	}
-
-	@Override
-	protected INDefinitionVisitor<INExpressionList, Integer> getDefinitionVisitor()
-	{
-		return new INDefinitionVisitor<INExpressionList, Integer>()
-		{
-			@Override
-			public INExpressionList caseDefinition(INDefinition node, Integer lineno)
-			{
-				return new INExpressionList();
-			}
-			
-			/**
-			 * Assignment definitions are "dcl var:type := exp"
-			 */
-			@Override
-			public INExpressionList caseAssignmentDefinition(INAssignmentDefinition node, Integer lineno)
-			{
-				INExpressionList list = newCollection();
-				
-				if (node.expression.location.startLine == lineno)
-				{
-					list.add(node.expression);		// Could apply exp visitor...
-				}
-
-				return list;
-			}
-			
-			/**
-			 * Value definitions are in let def statements.
-			 */
-			@Override
-			public INExpressionList caseValueDefinition(INValueDefinition node, Integer lineno)
-			{
-				INExpressionList list = newCollection();
-				
-				if (node.exp.location.startLine == lineno)
-				{
-					list.add(node.exp);		// Could apply exp visitor...
-				}
-
-				return list;
-			}
-		};
 	}
 }

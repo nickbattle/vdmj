@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.in.statements;
 
 import java.util.Collection;
 
+import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.annotations.INAnnotatedStatement;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INDefinitionVisitor;
@@ -43,6 +44,7 @@ import com.fujitsu.vdmj.in.patterns.INSetBind;
  */
 abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> extends INStatementVisitor<C, S>
 {
+	protected INVisitorSet<E, C, S> visitorSet;
 	private final boolean allNodes;
 	
 	public INLeafStatementVisitor(boolean allNodes)
@@ -54,7 +56,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseAnnotatedStatement(INAnnotatedStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
- 		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+ 		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
  		
  		if (expVisitor != null)
  		{
@@ -81,7 +83,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseAssignmentStatement(INAssignmentStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -108,7 +110,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseBlockStatement(INBlockStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INDefinitionVisitor<C, S> defVisitor = getDefinitionVisitor();
+		INDefinitionVisitor<C, S> defVisitor = visitorSet.getDefinitionVisitor();
 		
 		if (defVisitor != null)
 		{
@@ -130,7 +132,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseCallObjectStatement(INCallObjectStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -147,7 +149,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseCallStatement(INCallStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -177,7 +179,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseCyclesStatement(INCyclesStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -192,7 +194,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseDurationStatement(INDurationStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -207,7 +209,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseElseIfStatement(INElseIfStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -231,7 +233,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		
  		if (node.expression != null)
  		{
-			INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+			INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 			
 			if (expVisitor != null)
 			{
@@ -246,7 +248,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseForAllStatement(INForAllStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -261,7 +263,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseForIndexStatement(INForIndexStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -282,7 +284,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseForPatternBindStatement(INForPatternBindStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		all.addAll(caseBind(node.patternBind.bind, arg));
 		
 		if (expVisitor != null)
@@ -298,7 +300,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseIfStatement(INIfStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -327,7 +329,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseLetBeStStatement(INLetBeStStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		all.addAll(caseMultipleBind(node.bind, arg));
 		
 		if (expVisitor != null && node.suchThat != null)
@@ -343,7 +345,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseLetDefStatement(INLetDefStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INDefinitionVisitor<C, S> defVisitor = getDefinitionVisitor();
+		INDefinitionVisitor<C, S> defVisitor = visitorSet.getDefinitionVisitor();
 		
 		if (defVisitor != null)
 		{
@@ -361,7 +363,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C casePeriodicStatement(INPeriodicStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -381,7 +383,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		
  		if (node.expression != null)
  		{
-			INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+			INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 			
 			if (expVisitor != null)
 			{
@@ -415,7 +417,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseSpecificationStatement(INSpecificationStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -437,7 +439,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseSporadicStatement(INSporadicStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -454,7 +456,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseStartStatement(INStartStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -468,7 +470,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseStopStatement(INStopStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -512,7 +514,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseWhileStatement(INWhileStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
 		if (expVisitor != null)
 		{
@@ -525,7 +527,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 
 	private C caseBind(INBind bind, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		C all = newCollection();
 		
 		if (expVisitor != null)
@@ -547,7 +549,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 
  	private C caseMultipleBind(INMultipleBind bind, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = getExpressionVisitor();
+		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		C all = newCollection();
 		
 		if (expVisitor != null)
@@ -573,8 +575,4 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	{
 		throw new RuntimeException("caseNonLeafNode must be overridden if allNodes is set");
 	}
-
- 	abstract protected INExpressionVisitor<C, S> getExpressionVisitor();
-
- 	abstract protected INDefinitionVisitor<C, S> getDefinitionVisitor();
 }
