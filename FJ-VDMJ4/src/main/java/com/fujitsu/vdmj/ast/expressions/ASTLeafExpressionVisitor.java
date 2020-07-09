@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.ast.expressions;
 
 import java.util.Collection;
 
+import com.fujitsu.vdmj.ast.ASTVisitorSet;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTEqualsDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
@@ -42,6 +43,8 @@ import com.fujitsu.vdmj.ast.patterns.ASTTypeBind;
  */
 abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> extends ASTExpressionVisitor<C, S>
 {
+	protected ASTVisitorSet<E, C, S> visitorSet;
+
  	@Override
 	public C caseApplyExpression(ASTApplyExpression node, S arg)
 	{

@@ -25,7 +25,8 @@ package com.fujitsu.vdmj.ast.patterns;
 
 import java.util.Collection;
 
-import com.fujitsu.vdmj.ast.expressions.ASTLeafExpressionVisitor;
+import com.fujitsu.vdmj.ast.ASTVisitorSet;
+import com.fujitsu.vdmj.ast.expressions.ASTExpressionVisitor;
 
 /**
  * This TCPattern visitor visits all of the leaves of a pattern tree and calls
@@ -33,6 +34,8 @@ import com.fujitsu.vdmj.ast.expressions.ASTLeafExpressionVisitor;
  */
 public abstract class ASTLeafPatternVisitor<E, C extends Collection<E>, S> extends ASTPatternVisitor<C, S>
 {
+	protected ASTVisitorSet<E, C, S> visitorSet;
+
  	@Override
 	public C caseConcatenationPattern(ASTConcatenationPattern node, S arg)
 	{
@@ -47,7 +50,7 @@ public abstract class ASTLeafPatternVisitor<E, C extends Collection<E>, S> exten
  	@Override
 	public C caseExpressionPattern(ASTExpressionPattern node, S arg)
 	{
-		ASTLeafExpressionVisitor<E, C, S> expVisitor = getExpressionVisitor();
+		ASTExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		return (expVisitor != null ? node.exp.apply(expVisitor, arg) : newCollection());
 	}
 
@@ -153,6 +156,4 @@ public abstract class ASTLeafPatternVisitor<E, C extends Collection<E>, S> exten
 	}
 
  	abstract protected C newCollection();
-
- 	abstract protected ASTLeafExpressionVisitor<E, C, S> getExpressionVisitor();
 }

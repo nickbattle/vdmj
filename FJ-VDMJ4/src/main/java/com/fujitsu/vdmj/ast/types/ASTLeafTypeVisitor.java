@@ -25,12 +25,16 @@ package com.fujitsu.vdmj.ast.types;
 
 import java.util.Collection;
 
+import com.fujitsu.vdmj.ast.ASTVisitorSet;
+
 /**
  * This TCType visitor visits all of the leaves of a type tree and calls
  * the basic processing methods for the simple types.
  */
 public abstract class ASTLeafTypeVisitor<E, C extends Collection<E>, S> extends ASTTypeVisitor<C, S>
 {
+	protected ASTVisitorSet<E, C, S> visitorSet;
+
 	@Override
 	public C caseBracketType(ASTBracketType node, S arg)
 	{
