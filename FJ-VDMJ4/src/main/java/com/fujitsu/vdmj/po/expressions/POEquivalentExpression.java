@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POEquivalentExpression extends POBooleanBinaryExpression

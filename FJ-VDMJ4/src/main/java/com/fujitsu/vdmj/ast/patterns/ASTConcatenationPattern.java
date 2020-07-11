@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.ast.patterns;
 
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTPatternVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public class ASTConcatenationPattern extends ASTPattern

@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -64,5 +65,11 @@ public class POInheritedDefinition extends PODefinition
 		}
 
 		return names;
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInheritedDefinition(this, arg);
 	}
 }

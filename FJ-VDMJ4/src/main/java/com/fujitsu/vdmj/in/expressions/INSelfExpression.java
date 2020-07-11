@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;

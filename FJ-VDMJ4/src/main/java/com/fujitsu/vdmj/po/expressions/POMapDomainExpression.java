@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 
 public class POMapDomainExpression extends POUnaryExpression
 {

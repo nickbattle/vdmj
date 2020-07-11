@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;

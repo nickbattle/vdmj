@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.ast.patterns;
 
 import com.fujitsu.vdmj.ast.ASTNode;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTMultipleBindVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;

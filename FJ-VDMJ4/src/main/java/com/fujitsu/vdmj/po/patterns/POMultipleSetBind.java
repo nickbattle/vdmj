@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 

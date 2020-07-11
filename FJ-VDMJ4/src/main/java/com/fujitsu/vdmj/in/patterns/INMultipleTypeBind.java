@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
+import com.fujitsu.vdmj.in.patterns.visitors.INMultipleBindVisitor;
 import com.fujitsu.vdmj.in.types.GetAllValues;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;

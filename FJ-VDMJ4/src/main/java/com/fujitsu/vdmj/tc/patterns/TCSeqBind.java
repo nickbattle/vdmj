@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCBindVisitor;
 
 public class TCSeqBind extends TCBind
 {

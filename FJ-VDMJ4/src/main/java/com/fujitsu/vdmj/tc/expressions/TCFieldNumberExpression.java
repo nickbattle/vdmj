@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;

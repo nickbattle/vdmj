@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -59,4 +60,9 @@ public abstract class POStatement extends PONode implements Serializable
 	{
 		return new ProofObligationList();
 	}
+
+	/**
+	 * Implemented by all definitions to allow visitor processing.
+	 */
+	abstract public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg);
 }

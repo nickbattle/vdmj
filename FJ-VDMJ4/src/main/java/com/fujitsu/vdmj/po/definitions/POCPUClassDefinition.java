@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 
@@ -35,5 +36,11 @@ public class POCPUClassDefinition extends POClassDefinition
 		POExplicitOperationDefinition inv, boolean ctors)
 	{
 		super(null, new TCNameToken(new LexLocation(), "CLASS", "CPU"), ctype, defs, inv, ctors);
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCPUClassDefinition(this, arg);
 	}
 }

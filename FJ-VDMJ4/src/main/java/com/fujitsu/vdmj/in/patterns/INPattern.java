@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;

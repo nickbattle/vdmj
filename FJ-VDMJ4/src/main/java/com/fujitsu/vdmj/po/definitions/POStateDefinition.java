@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -104,5 +105,11 @@ public class POStateDefinition extends PODefinition
 
 		if (annotations != null) annotations.poAfter(this, list, ctxt);
 		return list;
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseStateDefinition(this, arg);
 	}
 }

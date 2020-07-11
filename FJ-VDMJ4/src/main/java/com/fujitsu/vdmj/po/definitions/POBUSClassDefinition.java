@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 
@@ -34,5 +35,11 @@ public class POBUSClassDefinition extends POClassDefinition
 	public POBUSClassDefinition(TCClassType ctype, PODefinitionList defs)
 	{
 		super(null, new TCNameToken(new LexLocation(), "CLASS", "BUS"), ctype, defs, null, false);
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBUSClassDefinition(this, arg);
 	}
 }

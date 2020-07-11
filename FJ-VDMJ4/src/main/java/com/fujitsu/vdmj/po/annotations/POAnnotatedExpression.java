@@ -25,7 +25,7 @@ package com.fujitsu.vdmj.po.annotations;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POExpressionVisitor;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 

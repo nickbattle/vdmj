@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.ast.expressions;
 
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
+import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.util.Utils;
 

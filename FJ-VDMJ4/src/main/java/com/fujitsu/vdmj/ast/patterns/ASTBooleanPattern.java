@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.ast.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTPatternVisitor;
 
 public class ASTBooleanPattern extends ASTPattern
 {

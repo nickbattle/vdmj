@@ -32,6 +32,7 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;

@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 
 public class PONotYetSpecifiedStatement extends POStatement
 {
@@ -38,5 +39,11 @@ public class PONotYetSpecifiedStatement extends POStatement
 	public String toString()
 	{
 		return "is not yet specified";
+	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNotYetSpecifiedStatement(this, arg);
 	}
 }

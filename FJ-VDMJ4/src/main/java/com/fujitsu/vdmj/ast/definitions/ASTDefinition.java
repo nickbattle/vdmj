@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
+import com.fujitsu.vdmj.ast.definitions.visitors.ASTDefinitionVisitor;
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.LexLocation;

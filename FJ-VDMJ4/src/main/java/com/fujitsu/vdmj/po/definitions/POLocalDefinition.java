@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -59,5 +60,11 @@ public class POLocalDefinition extends PODefinition
 	public TCNameList getVariableNames()
 	{
 		return new TCNameList(name);
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseLocalDefinition(this, arg);
 	}
 }

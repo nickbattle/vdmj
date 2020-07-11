@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexQuoteToken;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCQuoteType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;

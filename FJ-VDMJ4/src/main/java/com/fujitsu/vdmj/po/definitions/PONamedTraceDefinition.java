@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
@@ -56,5 +57,11 @@ public class PONamedTraceDefinition extends PODefinition
 	public String toString()
 	{
 		return name.getName();
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNamedTraceDefinition(this, arg);
 	}
 }

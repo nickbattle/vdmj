@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.ast.statements;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
+import com.fujitsu.vdmj.ast.statements.visitors.ASTStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public class ASTForAllStatement extends ASTStatement

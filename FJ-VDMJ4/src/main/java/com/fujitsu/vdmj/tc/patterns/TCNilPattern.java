@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 
 public class TCNilPattern extends TCPattern
 {

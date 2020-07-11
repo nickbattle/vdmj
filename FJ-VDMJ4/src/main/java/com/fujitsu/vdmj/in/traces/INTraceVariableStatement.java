@@ -24,7 +24,7 @@
 package com.fujitsu.vdmj.in.traces;
 
 import com.fujitsu.vdmj.in.statements.INStatement;
-import com.fujitsu.vdmj.in.statements.INStatementVisitor;
+import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.VoidValue;

@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.pog.CasesExhaustiveObligation;
 import com.fujitsu.vdmj.pog.POContextStack;

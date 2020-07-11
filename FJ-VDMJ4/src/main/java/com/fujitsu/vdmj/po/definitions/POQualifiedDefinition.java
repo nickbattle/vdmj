@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -31,7 +32,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 public class POQualifiedDefinition extends PODefinition
 {
 	private static final long serialVersionUID = 1L;
-	private final PODefinition def;
+	public final PODefinition def;
 	private final TCType type;
 
 	public POQualifiedDefinition(PODefinition qualifies, TCType type)
@@ -82,5 +83,11 @@ public class POQualifiedDefinition extends PODefinition
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
 		return def.getProofObligations(ctxt);
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQualifiedDefinition(this, arg);
 	}
 }

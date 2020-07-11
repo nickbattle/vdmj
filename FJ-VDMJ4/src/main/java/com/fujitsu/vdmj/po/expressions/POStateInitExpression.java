@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 
 public class POStateInitExpression extends POExpression
 {

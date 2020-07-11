@@ -31,6 +31,7 @@ import org.apfloat.ApfloatMath;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.values.FunctionValue;

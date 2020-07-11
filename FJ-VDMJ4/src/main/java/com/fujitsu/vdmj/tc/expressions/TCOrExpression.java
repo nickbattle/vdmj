@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 
 public class TCOrExpression extends TCBooleanBinaryExpression
 {

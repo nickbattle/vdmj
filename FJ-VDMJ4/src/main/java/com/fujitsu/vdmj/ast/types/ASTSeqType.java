@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.ast.types;
 
+import com.fujitsu.vdmj.ast.types.visitors.ASTTypeVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public class ASTSeqType extends ASTType

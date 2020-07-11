@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.ast.definitions;
 
+import com.fujitsu.vdmj.ast.definitions.visitors.ASTDefinitionVisitor;
 import com.fujitsu.vdmj.ast.lex.LexNameList;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 

@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.types;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 public class TCNaturalType extends TCNumericType
 {

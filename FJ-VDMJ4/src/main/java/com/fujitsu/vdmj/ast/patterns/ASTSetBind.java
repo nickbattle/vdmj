@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.ast.patterns;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTBindVisitor;
 
 public class ASTSetBind extends ASTBind
 {

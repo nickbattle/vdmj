@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.ast.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTPatternVisitor;
 import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.ast.types.ASTUnresolvedType;
 import com.fujitsu.vdmj.lex.LexLocation;

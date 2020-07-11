@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.ast.expressions;
 
+import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 

@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -78,5 +79,11 @@ public class POThreadDefinition extends PODefinition
 	public int hashCode()
 	{
 		return operationName.hashCode();
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseThreadDefinition(this, arg);
 	}
 }

@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -105,5 +106,11 @@ public class POClassDefinition extends PODefinition
 		// Body of invariant operation is a list of invdefs
 		POClassInvariantStatement body = (POClassInvariantStatement)invariant.body;
 		return body.invdefs;
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseClassDefinition(this, arg);
 	}
 }

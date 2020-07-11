@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.BreakpointCondition;
 import com.fujitsu.vdmj.runtime.Context;

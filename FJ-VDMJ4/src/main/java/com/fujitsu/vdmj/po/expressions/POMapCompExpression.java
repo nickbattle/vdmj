@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.po.patterns.POMultipleBindList;
 import com.fujitsu.vdmj.po.patterns.POMultipleTypeBind;

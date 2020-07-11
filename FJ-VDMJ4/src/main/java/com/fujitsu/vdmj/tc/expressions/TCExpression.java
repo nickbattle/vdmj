@@ -29,10 +29,9 @@ import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
@@ -168,24 +167,6 @@ public abstract class TCExpression extends TCNode implements Serializable
 		return new TCDefinitionList();
 	}
 	
-	/**
-	 * Search the expression for its free variables, if any. The environment passed contains
-	 * those names that are already defined in the scope - ie. which are not free variables.
-	 */
-	public final TCNameSet getFreeVariables(Environment globals, Environment env)
-	{
-		return apply(new TCGetFreeVariablesVisitor(), new EnvTriple(globals, env, null));
-	}
-
-	/**
-	 * Return a list of exit types which can be thrown by the expression's op calls.
-	 * @return A possibly empty list of exit types.
-	 */
-	public final TCTypeSet exitCheck(Environment base)
-	{
-		return apply(new TCExitChecker(), base);
-	}
-
 	/**
 	 * @see org.TCDefinition.vdmj.definitions.Definition#report
 	 */

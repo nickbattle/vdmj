@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;

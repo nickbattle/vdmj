@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -37,5 +38,11 @@ public class POInstanceVariableDefinition extends POAssignmentDefinition
 	public POInstanceVariableDefinition(TCNameToken name, TCType type, POExpression expression, TCType expType)
 	{
 		super(name, type, expression, expType);
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInstanceVariableDefinition(this, arg);
 	}
 }

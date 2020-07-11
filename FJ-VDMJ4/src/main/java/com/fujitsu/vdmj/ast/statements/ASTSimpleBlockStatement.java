@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.ast.statements;
 
+import com.fujitsu.vdmj.ast.statements.visitors.ASTStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 abstract public class ASTSimpleBlockStatement extends ASTStatement

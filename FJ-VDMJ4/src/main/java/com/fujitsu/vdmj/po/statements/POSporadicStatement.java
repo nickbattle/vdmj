@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -44,5 +45,11 @@ public class POSporadicStatement extends POStatement
 	public String toString()
 	{
 		return "sporadic(" + Utils.listToString(args) + ")(" + opname + ")";
+	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSporadicStatement(this, arg);
 	}
 }

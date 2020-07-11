@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 
 public class PODurationStatement extends POStatement
 {
@@ -43,5 +44,11 @@ public class PODurationStatement extends POStatement
 	public String toString()
 	{
 		return "duration (" + duration + ") " + statement;
+	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseDurationStatement(this, arg);
 	}
 }

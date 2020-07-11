@@ -28,22 +28,23 @@ import java.util.Set;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.definitions.TCLeafDefinitionVisitor;
-import com.fujitsu.vdmj.tc.expressions.TCLeafExpressionVisitor;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
 import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
-import com.fujitsu.vdmj.tc.statements.TCLeafStatementVisitor;
 import com.fujitsu.vdmj.tc.statements.TCMapSeqDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStateDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.tc.statements.visitors.TCLeafStatementVisitor;
 
 public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, Set<TCNode>, LexLocation>
 {
-	private LSPExpressionLocationFinder expVisitor = new LSPExpressionLocationFinder();
-	private LSPDefinitionLocationFinder defVisitor = new LSPDefinitionLocationFinder();
+	public LSPStatementLocationFinder(TCVisitorSet<TCNode, Set<TCNode>, LexLocation> visitors)
+	{
+		visitorSet = visitors;
+	}
 
 	@Override
 	protected Set<TCNode> newCollection()
@@ -118,16 +119,4 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
  		all.addAll(super.caseAssignmentStatement(node, arg));
 		return all;
  	}
-	
-	@Override
-	protected TCLeafExpressionVisitor<TCNode, Set<TCNode>, LexLocation> getExpressionVisitor()
-	{
-		return expVisitor;
-	}
-
-	@Override
-	protected TCLeafDefinitionVisitor<TCNode, Set<TCNode>, LexLocation> getDefinitionVisitor()
-	{
-		return defVisitor;
-	}
 }

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
@@ -162,5 +163,11 @@ public class POExplicitOperationDefinition extends PODefinition
 		List<POPatternList> list = new Vector<POPatternList>();
 		list.add(parameterPatterns);
 		return list;
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExplicitOperationDefinition(this, arg);
 	}
 }

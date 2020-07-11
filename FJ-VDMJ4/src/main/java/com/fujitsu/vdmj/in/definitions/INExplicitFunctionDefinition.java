@@ -28,6 +28,7 @@ import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.annotations.INAnnotationList;
+import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;

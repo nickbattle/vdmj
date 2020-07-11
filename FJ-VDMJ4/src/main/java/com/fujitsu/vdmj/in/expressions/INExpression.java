@@ -26,6 +26,8 @@ package com.fujitsu.vdmj.in.expressions;
 import java.io.Serializable;
 
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
+import com.fujitsu.vdmj.in.expressions.visitors.INHistoryExpressionFinder;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;

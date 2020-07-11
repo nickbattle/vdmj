@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.in.definitions;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 

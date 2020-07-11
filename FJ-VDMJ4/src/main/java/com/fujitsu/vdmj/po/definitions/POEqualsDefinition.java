@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POBind;
 import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
@@ -166,5 +167,11 @@ public class POEqualsDefinition extends PODefinition
 
 		list.addAll(test.getProofObligations(ctxt));
 		return list;
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseEqualsDefinition(this, arg);
 	}
 }

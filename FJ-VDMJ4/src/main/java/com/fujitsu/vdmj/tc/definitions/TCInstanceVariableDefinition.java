@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
+import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCUndefinedExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;

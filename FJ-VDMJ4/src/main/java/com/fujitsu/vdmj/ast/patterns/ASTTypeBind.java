@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.ast.patterns;
 
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTBindVisitor;
 import com.fujitsu.vdmj.ast.types.ASTType;
 
 public class ASTTypeBind extends ASTBind

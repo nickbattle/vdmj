@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 
 abstract public class INBooleanBinaryExpression extends INBinaryExpression
 {

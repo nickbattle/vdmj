@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import com.fujitsu.vdmj.ast.lex.LexRealToken;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;

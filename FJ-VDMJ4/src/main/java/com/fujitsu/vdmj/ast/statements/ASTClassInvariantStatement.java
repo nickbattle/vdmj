@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.ast.statements;
 
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.ast.statements.visitors.ASTStatementVisitor;
 
 public class ASTClassInvariantStatement extends ASTStatement
 {

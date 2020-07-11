@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.syntax.DefinitionReader;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 

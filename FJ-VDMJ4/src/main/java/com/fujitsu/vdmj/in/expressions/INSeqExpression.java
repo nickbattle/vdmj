@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public abstract class INSeqExpression extends INExpression

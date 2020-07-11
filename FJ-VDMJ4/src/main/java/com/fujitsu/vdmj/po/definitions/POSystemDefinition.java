@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.po.definitions;
 
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 
@@ -33,5 +34,11 @@ public class POSystemDefinition extends POClassDefinition
 	public POSystemDefinition(TCNameToken className, TCClassType ctype, PODefinitionList members)
 	{
 		super(null, className, ctype, members, null, false);
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSystemDefinition(this, arg);
 	}
 }

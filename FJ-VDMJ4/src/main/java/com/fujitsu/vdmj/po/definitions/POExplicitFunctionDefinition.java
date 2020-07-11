@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.definitions;
 
 import java.util.List;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
@@ -207,5 +208,11 @@ public class POExplicitFunctionDefinition extends PODefinition
 	public List<POPatternList> getParamPatternList()
 	{
 		return paramPatternList;
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExplicitFunctionDefinition(this, arg);
 	}
 }

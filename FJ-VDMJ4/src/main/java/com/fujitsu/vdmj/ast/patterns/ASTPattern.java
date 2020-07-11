@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.ast.patterns;
 import java.io.Serializable;
 
 import com.fujitsu.vdmj.ast.ASTNode;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTPatternVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 /**

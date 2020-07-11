@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.PONameContext;
@@ -78,5 +79,11 @@ public class POPerSyncDefinition extends PODefinition
 		
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;
+	}
+
+	@Override
+	public <R, S> R apply(PODefinitionVisitor<R, S> visitor, S arg)
+	{
+		return visitor.casePerSyncDefinition(this, arg);
 	}
 }

@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.patterns.POPatternBind;
 import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllSequenceContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -94,5 +95,11 @@ public class POForPatternBindStatement extends POStatement
 
 		list.addAll(statement.getProofObligations(ctxt));
 		return list;
+	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseForPatternBindStatement(this, arg);
 	}
 }

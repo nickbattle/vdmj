@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.patterns.INPattern;

@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
@@ -72,5 +73,11 @@ public class POCallObjectStatement extends POStatement
 		}
 
 		return obligations;
+	}
+
+	@Override
+	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCallObjectStatement(this, arg);
 	}
 }
