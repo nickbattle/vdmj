@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.ast.expressions;
 
 import com.fujitsu.vdmj.ast.definitions.ASTStateDefinition;
+import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
 
 public class ASTStateInitExpression extends ASTExpression
 {

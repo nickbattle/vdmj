@@ -25,13 +25,13 @@ package com.fujitsu.vdmj.po;
 
 import java.util.Collection;
 
-import com.fujitsu.vdmj.po.definitions.PODefinitionVisitor;
-import com.fujitsu.vdmj.po.expressions.POExpressionVisitor;
-import com.fujitsu.vdmj.po.patterns.POBindVisitor;
-import com.fujitsu.vdmj.po.patterns.POMultipleBindVisitor;
-import com.fujitsu.vdmj.po.patterns.POPatternVisitor;
-import com.fujitsu.vdmj.po.statements.POStatementVisitor;
-import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
+import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.POBindVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
+import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 /**
  * A collection of visitors to pass between types of Leaf visitor as they process a tree.

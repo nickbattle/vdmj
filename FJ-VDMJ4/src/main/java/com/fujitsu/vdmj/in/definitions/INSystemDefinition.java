@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.in.definitions;
 import java.util.HashMap;
 
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.runtime.Context;

@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.ast.types;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.ast.types.visitors.ASTTypeVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public class ASTClassType extends ASTType

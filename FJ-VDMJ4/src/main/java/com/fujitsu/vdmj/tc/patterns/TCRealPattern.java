@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexRealToken;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 
 public class TCRealPattern extends TCPattern
 {

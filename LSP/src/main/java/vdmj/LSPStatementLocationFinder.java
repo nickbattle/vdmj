@@ -34,10 +34,10 @@ import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
 import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
-import com.fujitsu.vdmj.tc.statements.TCLeafStatementVisitor;
 import com.fujitsu.vdmj.tc.statements.TCMapSeqDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStateDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.tc.statements.visitors.TCLeafStatementVisitor;
 
 public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, Set<TCNode>, LexLocation>
 {

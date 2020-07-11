@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.statements;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 
 public class POErrorStatement extends POStatement
 {

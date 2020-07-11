@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.in.patterns;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;

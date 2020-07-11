@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.in.patterns.INPatternBind;
 import com.fujitsu.vdmj.in.patterns.INSeqBind;
 import com.fujitsu.vdmj.in.patterns.INSetBind;
 import com.fujitsu.vdmj.in.patterns.INTypeBind;
+import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;

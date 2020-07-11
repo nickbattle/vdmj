@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.in.statements;
 import com.fujitsu.vdmj.in.definitions.INClassInvariantDefinition;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INDefinitionList;
+import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;

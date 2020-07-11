@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;

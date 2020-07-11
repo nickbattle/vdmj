@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 
 public class TCIdentifierPattern extends TCPattern
 {

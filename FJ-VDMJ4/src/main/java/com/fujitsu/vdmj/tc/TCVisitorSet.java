@@ -25,13 +25,13 @@ package com.fujitsu.vdmj.tc;
 
 import java.util.Collection;
 
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionVisitor;
-import com.fujitsu.vdmj.tc.expressions.TCExpressionVisitor;
-import com.fujitsu.vdmj.tc.patterns.TCBindVisitor;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleBindVisitor;
-import com.fujitsu.vdmj.tc.patterns.TCPatternVisitor;
-import com.fujitsu.vdmj.tc.statements.TCStatementVisitor;
-import com.fujitsu.vdmj.tc.types.TCTypeVisitor;
+import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCBindVisitor;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindVisitor;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
+import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
+import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 /**
  * A collection of visitors to pass between types of Leaf visitor as they process a tree.

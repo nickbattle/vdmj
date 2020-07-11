@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.ast.statements;
 
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
+import com.fujitsu.vdmj.ast.statements.visitors.ASTStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public class ASTLetDefStatement extends ASTStatement

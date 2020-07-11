@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.ast.types;
 
 import com.fujitsu.vdmj.ast.lex.LexQuoteToken;
+import com.fujitsu.vdmj.ast.types.visitors.ASTTypeVisitor;
 
 public class ASTQuoteType extends ASTType
 {

@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;

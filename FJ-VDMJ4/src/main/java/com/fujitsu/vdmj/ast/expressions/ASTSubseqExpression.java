@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.ast.expressions;
 
+import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
+
 public class ASTSubseqExpression extends ASTExpression
 {
 	private static final long serialVersionUID = 1L;

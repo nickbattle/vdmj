@@ -25,13 +25,13 @@ package com.fujitsu.vdmj.ast;
 
 import java.util.Collection;
 
-import com.fujitsu.vdmj.ast.definitions.ASTDefinitionVisitor;
-import com.fujitsu.vdmj.ast.expressions.ASTExpressionVisitor;
-import com.fujitsu.vdmj.ast.patterns.ASTBindVisitor;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleBindVisitor;
-import com.fujitsu.vdmj.ast.patterns.ASTPatternVisitor;
-import com.fujitsu.vdmj.ast.statements.ASTStatementVisitor;
-import com.fujitsu.vdmj.ast.types.ASTTypeVisitor;
+import com.fujitsu.vdmj.ast.definitions.visitors.ASTDefinitionVisitor;
+import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTBindVisitor;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTMultipleBindVisitor;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTPatternVisitor;
+import com.fujitsu.vdmj.ast.statements.visitors.ASTStatementVisitor;
+import com.fujitsu.vdmj.ast.types.visitors.ASTTypeVisitor;
 
 /**
  * A collection of visitors to pass between types of Leaf visitor as they process a tree.

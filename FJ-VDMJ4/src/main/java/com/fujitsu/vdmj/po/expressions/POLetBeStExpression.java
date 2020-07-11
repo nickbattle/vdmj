@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POMultiBindListDefinition;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.pog.LetBeExistsObligation;
 import com.fujitsu.vdmj.pog.POForAllContext;

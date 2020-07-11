@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.ast.statements;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.ast.statements.visitors.ASTStatementVisitor;
 import com.fujitsu.vdmj.util.Utils;
 
 public class ASTCallObjectStatement extends ASTStatement

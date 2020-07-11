@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.ast.types;
 
 import java.io.Serializable;
 import com.fujitsu.vdmj.ast.ASTNode;
+import com.fujitsu.vdmj.ast.types.visitors.ASTTypeVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 /**

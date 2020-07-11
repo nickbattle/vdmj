@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.expressions;
 
 import java.util.Iterator;
 
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;

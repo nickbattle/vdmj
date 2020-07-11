@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.patterns;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.po.patterns.visitors.POBindVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;

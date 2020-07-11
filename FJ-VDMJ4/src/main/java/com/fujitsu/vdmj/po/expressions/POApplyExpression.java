@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionListList;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.MapApplyObligation;
 import com.fujitsu.vdmj.pog.POContextStack;

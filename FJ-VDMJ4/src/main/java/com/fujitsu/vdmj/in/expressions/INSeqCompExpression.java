@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.in.expressions;
 
 import java.util.Collections;
 
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.patterns.INBind;
 import com.fujitsu.vdmj.in.patterns.INSetBind;
 import com.fujitsu.vdmj.lex.LexLocation;

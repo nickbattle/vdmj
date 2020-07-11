@@ -24,7 +24,7 @@
 package com.fujitsu.vdmj.ast.annotations;
 
 import com.fujitsu.vdmj.ast.statements.ASTStatement;
-import com.fujitsu.vdmj.ast.statements.ASTStatementVisitor;
+import com.fujitsu.vdmj.ast.statements.visitors.ASTStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public class ASTAnnotatedStatement extends ASTStatement

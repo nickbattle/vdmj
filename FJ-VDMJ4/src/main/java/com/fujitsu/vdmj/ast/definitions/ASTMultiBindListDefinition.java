@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.ast.definitions;
 
+import com.fujitsu.vdmj.ast.definitions.visitors.ASTDefinitionVisitor;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleBindList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.util.Utils;

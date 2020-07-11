@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.definitions.INStateDefinition;
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.statements.INErrorCase;
 import com.fujitsu.vdmj.in.statements.INErrorCaseList;
 import com.fujitsu.vdmj.runtime.Context;

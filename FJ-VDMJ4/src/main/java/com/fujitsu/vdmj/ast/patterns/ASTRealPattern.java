@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.ast.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexRealToken;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTPatternVisitor;
 
 public class ASTRealPattern extends ASTPattern
 {

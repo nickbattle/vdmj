@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.definitions.INExplicitFunctionDefinition;
 import com.fujitsu.vdmj.in.definitions.INImplicitFunctionDefinition;
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.types.Instantiate;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;

@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
+
 public class POPostOpExpression extends POExpression
 {
 	private static final long serialVersionUID = 1L;

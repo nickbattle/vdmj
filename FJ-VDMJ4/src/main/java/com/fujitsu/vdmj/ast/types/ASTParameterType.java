@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.ast.types;
 
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.ast.types.visitors.ASTTypeVisitor;
 
 public class ASTParameterType extends ASTType
 {

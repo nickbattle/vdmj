@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.ast.expressions;
 
+import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 
 public class ASTEqualsExpression extends ASTBinaryExpression

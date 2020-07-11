@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
+import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 
 public class POBooleanLiteralExpression extends POExpression
 {

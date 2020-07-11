@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.ast.definitions;
 
 import java.util.List;
 
+import com.fujitsu.vdmj.ast.definitions.visitors.ASTDefinitionVisitor;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.traces.ASTTraceDefinitionTermList;
 import com.fujitsu.vdmj.lex.LexLocation;

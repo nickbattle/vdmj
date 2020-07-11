@@ -24,7 +24,7 @@
 package com.fujitsu.vdmj.ast.annotations;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
-import com.fujitsu.vdmj.ast.expressions.ASTExpressionVisitor;
+import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public class ASTAnnotatedExpression extends ASTExpression

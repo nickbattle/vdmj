@@ -55,6 +55,7 @@ import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.tc.types.TCVoidReturnType;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
+import com.fujitsu.vdmj.tc.types.visitors.ParameterCollector;
 
 
 /**
