@@ -28,11 +28,10 @@ import com.fujitsu.vdmj.in.definitions.INAssignmentDefinition;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INValueDefinition;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
-import com.fujitsu.vdmj.in.expressions.INBinaryExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionFinder;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
-import com.fujitsu.vdmj.in.expressions.visitors.INLeafExpressionVisitor;
 import com.fujitsu.vdmj.in.statements.INStatement;
 
 /**
@@ -42,47 +41,12 @@ public class INStatementExpressionFinder extends INLeafStatementVisitor<INExpres
 {
 	private class VisitorSet extends INVisitorSet<INExpression, INExpressionList, Integer>
 	{
+		private final INExpressionVisitor<INExpressionList, Integer> expVisitor = new INExpressionFinder();
+
 		@Override
 		public INExpressionVisitor<INExpressionList, Integer> getExpressionVisitor()
 		{
-			return new INLeafExpressionVisitor<INExpression, INExpressionList, Integer>(true)
-			{
-				@Override
-				protected INExpressionList newCollection()
-				{
-					return new INExpressionList();
-				}
-
-				@Override
-				protected INExpressionList caseNonLeafNode(INExpression node, Integer lineno)
-				{
-					return caseExpression(node, lineno);
-				}
-
-			 	@Override
-				public INExpressionList caseBinaryExpression(INBinaryExpression node, Integer lineno)
-				{
-			 		// Note, we override to avoid caseNonLeafNode call, because binary expressions
-			 		// skip the breakpoint check, and so shouldn't be selected in the find.
-			 		INExpressionList all = newCollection();
-					all.addAll(node.left.apply(this, lineno));
-					all.addAll(node.right.apply(this, lineno));
-					return all;
-				}
-
-				@Override
-				public INExpressionList caseExpression(INExpression node, Integer lineno)
-				{
-					INExpressionList list = newCollection();
-					
-					if (node.location.startLine == lineno)
-					{
-						list.add(node);
-					}
-
-					return list;
-				}
-			};
+			return expVisitor;
 		}
 
 		@Override

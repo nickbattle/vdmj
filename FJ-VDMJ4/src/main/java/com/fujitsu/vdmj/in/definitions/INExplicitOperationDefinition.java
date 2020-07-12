@@ -114,12 +114,6 @@ public class INExplicitOperationDefinition extends INDefinition
 	}
 
 	@Override
-	public INStatement findStatement(int lineno)
-	{
-		return body.findStatement(lineno);
-	}
-
-	@Override
 	public NameValuePairList getNamedValues(Context ctxt)
 	{
 		NameValuePairList nvl = new NameValuePairList();
