@@ -51,15 +51,6 @@ public class INElementsExpression extends INSetExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		return exp.findExpression(lineno);
-	}
-
-	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);

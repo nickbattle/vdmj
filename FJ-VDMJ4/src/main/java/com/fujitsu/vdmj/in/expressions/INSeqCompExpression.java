@@ -185,18 +185,6 @@ public class INSeqCompExpression extends INSeqExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		found = first.findExpression(lineno);
-		if (found != null) return found;
-
-		return predicate == null ? null : predicate.findExpression(lineno);
-	}
-
-	@Override
 	public ValueList getValues(Context ctxt)
 	{
 		ValueList list = first.getValues(ctxt);

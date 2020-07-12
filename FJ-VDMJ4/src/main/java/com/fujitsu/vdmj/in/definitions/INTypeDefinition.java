@@ -83,42 +83,6 @@ public class INTypeDefinition extends INDefinition
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		if (invdef != null)
-		{
-			INExpression found = invdef.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		if (eqdef != null)
-		{
-			INExpression found = eqdef.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		if (orddef != null)
-		{
-			INExpression found = orddef.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		if (mindef != null)
-		{
-			INExpression found = mindef.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		if (maxdef != null)
-		{
-			INExpression found = maxdef.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		return null;
-	}
-
-	@Override
 	public NameValuePairList getNamedValues(Context ctxt)
 	{
 		NameValuePairList nvl = new NameValuePairList();

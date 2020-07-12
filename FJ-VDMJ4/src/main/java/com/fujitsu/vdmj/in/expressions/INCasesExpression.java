@@ -56,25 +56,6 @@ public class INCasesExpression extends INExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		found = exp.findExpression(lineno);
-		if (found != null) return found;
-
-		for (INCaseAlternative c: cases)
-		{
-			found = c.result.findExpression(lineno);
-			if (found != null) break;
-		}
-
-		return found != null ? found :
-				others != null ? others.findExpression(lineno) : null;
-	}
-
-	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);

@@ -21,38 +21,45 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.statements.visitors;
+package com.fujitsu.vdmj.in.definitions.visitors;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.in.statements.INStatementList;
+import com.fujitsu.vdmj.in.statements.visitors.INStatementFinder;
+import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 
 /**
- * Find an expression by line number within a statement.
+ * Find an statement by line number within a definition.
  */
-public class INStatementExpressionFinder extends INLeafStatementVisitor<INExpression, INExpressionList, Integer>
+public class INDefinitionStatementFinder extends INLeafDefinitionVisitor<INStatement, INStatementList, Integer>
 {
-	public INStatementExpressionFinder(INVisitorSet<INExpression, INExpressionList, Integer> visitors)
+	private class VisitorSet extends INVisitorSet<INStatement, INStatementList, Integer>
 	{
-		super(true);	// So we visit the nodes as well as the leaves
-		visitorSet = visitors;
+		private INStatementVisitor<INStatementList, Integer> stmtVisitor = new INStatementFinder();
+
+		@Override
+		public INStatementVisitor<INStatementList, Integer> getStatementVisitor()
+		{
+			return stmtVisitor;
+		}
+	}
+	
+	public INDefinitionStatementFinder()
+	{
+		super();
+		visitorSet = new VisitorSet();
 	}
 
 	@Override
-	protected INExpressionList newCollection()
+	protected INStatementList newCollection()
 	{
-		return new INExpressionList();
+		return new INStatementList();
 	}
 
 	@Override
-	protected INExpressionList caseNonLeafNode(INStatement node, Integer arg)
-	{
-		return caseStatement(node, arg);
-	}
-
-	@Override
-	public INExpressionList caseStatement(INStatement node, Integer lineno)
+	public INStatementList caseDefinition(INDefinition node, Integer lineno)
 	{
 		return newCollection();
 	}

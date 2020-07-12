@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.in.definitions;
 
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
-import com.fujitsu.vdmj.in.expressions.INEqualsExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.runtime.Context;
@@ -103,28 +102,6 @@ public class INStateDefinition extends INDefinition
 				(invPattern == null ? "" : "\n\tinv " + invPattern + " == " + invExpression) +
 	    		(initPattern == null ? "" : "\n\tinit " + initPattern + " == " + initExpression) +
 	    		"\nend";
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		if (invExpression != null)
-		{
-			INExpression found = invExpression.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		if (initExpression != null)
-		{
-			if (initExpression instanceof INEqualsExpression)
-			{
-				INEqualsExpression ee = (INEqualsExpression)initExpression;
-				INExpression found = ee.right.findExpression(lineno);
-				if (found != null) return found;
-			}
-		}
-
-		return null;
 	}
 
 	@Override

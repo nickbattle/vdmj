@@ -44,12 +44,6 @@ public class INClassInvariantDefinition extends INDefinition
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return expression.findExpression(lineno);
-	}
-
-	@Override
 	public TCType getType()
 	{
 		return new TCBooleanType(location);

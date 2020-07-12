@@ -60,15 +60,6 @@ public class INExistsExpression extends INExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		return predicate.findExpression(lineno);
-	}
-
-	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);

@@ -96,30 +96,6 @@ public class INExplicitOperationDefinition extends INDefinition
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		if (predef != null)
-		{
-			INExpression found = predef.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		if (postdef != null)
-		{
-			INExpression found = postdef.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		return body.findExpressionNew(lineno);
-	}
-
-	@Override
-	public INStatement findStatement(int lineno)
-	{
-		return body.findStatement(lineno);
-	}
-
-	@Override
 	public NameValuePairList getNamedValues(Context ctxt)
 	{
 		NameValuePairList nvl = new NameValuePairList();

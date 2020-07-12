@@ -90,24 +90,6 @@ public class INSubseqExpression extends INExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		found = seq.findExpression(lineno);
-		if (found != null) return found;
-
-		found = from.findExpression(lineno);
-		if (found != null) return found;
-
-		found = to.findExpression(lineno);
-		if (found != null) return found;
-
-		return null;
-	}
-
-	@Override
 	public ValueList getValues(Context ctxt)
 	{
 		ValueList list = seq.getValues(ctxt);

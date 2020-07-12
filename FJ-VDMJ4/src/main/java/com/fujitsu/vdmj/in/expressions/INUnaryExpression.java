@@ -41,15 +41,6 @@ abstract public class INUnaryExpression extends INExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		return exp.findExpression(lineno);
-	}
-
-	@Override
 	public ValueList getValues(Context ctxt)
 	{
 		return exp.getValues(ctxt);

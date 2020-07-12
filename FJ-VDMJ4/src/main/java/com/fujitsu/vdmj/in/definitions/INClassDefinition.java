@@ -28,13 +28,12 @@ import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
@@ -164,18 +163,6 @@ public class INClassDefinition extends INDefinition
 				(supernames.isEmpty() ? "" : " is subclass of " + supernames) + "\n" +
 				definitions.toString() +
 				"end " + name.getName() + "\n";
-	}
-
-	@Override
-	public INStatement findStatement(int lineno)
-	{
-		return definitions.findStatement(lineno);
-	}
-
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return definitions.findExpression(lineno);
 	}
 
 	/**

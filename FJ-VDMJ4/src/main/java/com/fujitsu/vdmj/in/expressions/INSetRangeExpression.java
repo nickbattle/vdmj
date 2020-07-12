@@ -79,21 +79,6 @@ public class INSetRangeExpression extends INSetExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		found = first.findExpression(lineno);
-		if (found != null) return found;
-
-		found = last.findExpression(lineno);
-		if (found != null) return found;
-
-		return null;
-	}
-
-	@Override
 	public <R, S> R apply(INExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseSetRangeExpression(this, arg);

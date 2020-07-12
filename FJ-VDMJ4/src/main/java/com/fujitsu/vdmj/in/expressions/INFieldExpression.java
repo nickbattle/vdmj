@@ -107,15 +107,6 @@ public class INFieldExpression extends INExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		return object.findExpression(lineno);
-	}
-
-	@Override
 	public ValueList getValues(Context ctxt)
 	{
 		ValueList values = object.getValues(ctxt);

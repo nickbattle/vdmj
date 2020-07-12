@@ -27,9 +27,13 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.annotations.INAnnotationList;
+import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionExpressionFinder;
+import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionStatementFinder;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.runtime.Context;
@@ -138,9 +142,10 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 * @param lineno The line number to look for.
 	 * @return A statement that starts on the line, or null if there is none.
 	 */
-	public INStatement findStatement(int lineno)
+	public final INStatement findStatement(int lineno)
 	{
-		return null;	// TODO as a LeafDefinitionVisitor?
+		INStatementList all = this.apply(new INDefinitionStatementFinder(), lineno);
+		return all.isEmpty() ? null : all.get(0);
 	}
 
 	/**
@@ -150,9 +155,10 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	 * @param lineno The line number to look for.
 	 * @return An expression that starts on the line, or null if there is none.
 	 */
-	public INExpression findExpression(int lineno)
+	public final INExpression findExpression(int lineno)
 	{
-		return null;	// TODO as a LeafDefinitionVisitor?
+		INExpressionList all = this.apply(new INDefinitionExpressionFinder(), lineno);
+		return all.isEmpty() ? null : all.get(0);
 	}
 
 	/**

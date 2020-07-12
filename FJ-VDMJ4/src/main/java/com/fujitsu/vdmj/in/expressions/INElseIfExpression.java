@@ -52,15 +52,6 @@ public class INElseIfExpression extends INExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		return thenExp.findExpression(lineno);
-	}
-
-	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
