@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.in.expressions;
 import java.io.Serializable;
 
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionFinder;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.expressions.visitors.INHistoryExpressionFinder;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -117,7 +118,8 @@ public abstract class INExpression extends INNode implements Serializable
 	 */
 	public INExpression findExpression(int lineno)
 	{
-		return (location.startLine == lineno) ? this : null;
+		INExpressionList all = this.apply(new INExpressionFinder(), lineno);
+		return all.isEmpty() ? null : all.get(0);
 	}
 
 	/**

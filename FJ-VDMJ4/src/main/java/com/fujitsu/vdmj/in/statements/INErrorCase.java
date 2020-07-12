@@ -44,11 +44,4 @@ public class INErrorCase
 	{
 		return "(" + name + ": " + left + "->" + right + ")";
 	}
-
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = left.findExpression(lineno);
-		if (found != null) return found;
-		return right.findExpression(lineno);
-	}
 }
