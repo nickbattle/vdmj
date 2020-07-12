@@ -117,6 +117,24 @@ public class INImplicitOperationDefinition extends INDefinition
 	}
 
 	@Override
+	public INExpression findExpression(int lineno)
+	{
+		if (predef != null)
+		{
+			INExpression found = predef.findExpression(lineno);
+			if (found != null) return found;
+		}
+
+		if (postdef != null)
+		{
+			INExpression found = postdef.findExpression(lineno);
+			if (found != null) return found;
+		}
+
+		return body.findExpression(lineno);
+	}
+
+	@Override
 	public INStatement findStatement(int lineno)
 	{
 		return body == null ? null : body.findStatement(lineno);

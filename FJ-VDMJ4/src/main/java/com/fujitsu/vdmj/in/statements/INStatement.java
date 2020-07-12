@@ -79,7 +79,7 @@ public abstract class INStatement extends INNode implements Serializable
 	 * Find an expression starting at this statement.
 	 * @param lineno  
 	 */
-	public INExpression findExpressionNew(int lineno)
+	public INExpression findExpression(int lineno)
 	{
 		INExpressionList all = this.apply(new INStatementExpressionFinder(), lineno);
 		return all.isEmpty() ? null : all.get(0);

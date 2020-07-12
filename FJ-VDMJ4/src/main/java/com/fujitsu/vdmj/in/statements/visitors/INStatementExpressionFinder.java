@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.in.definitions.INAssignmentDefinition;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INValueDefinition;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
+import com.fujitsu.vdmj.in.expressions.INBinaryExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
@@ -56,6 +57,17 @@ public class INStatementExpressionFinder extends INLeafStatementVisitor<INExpres
 				protected INExpressionList caseNonLeafNode(INExpression node, Integer lineno)
 				{
 					return caseExpression(node, lineno);
+				}
+
+			 	@Override
+				public INExpressionList caseBinaryExpression(INBinaryExpression node, Integer lineno)
+				{
+			 		// Note, we override to avoid caseNonLeafNode call, because binary expressions
+			 		// skip the breakpoint check, and so shouldn't be selected in the find.
+			 		INExpressionList all = newCollection();
+					all.addAll(node.left.apply(this, lineno));
+					all.addAll(node.right.apply(this, lineno));
+					return all;
 				}
 
 				@Override
