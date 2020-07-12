@@ -220,12 +220,6 @@ public class INPostOpExpression extends INExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return postexpression.findExpression(lineno);
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		return postexpression.getOldNames();

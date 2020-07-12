@@ -165,12 +165,6 @@ public class INClassDefinition extends INDefinition
 				"end " + name.getName() + "\n";
 	}
 
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return definitions.findExpression(lineno);
-	}
-
 	/**
 	 * Return the name of the constructor for this class, given a list of
 	 * parameter types.

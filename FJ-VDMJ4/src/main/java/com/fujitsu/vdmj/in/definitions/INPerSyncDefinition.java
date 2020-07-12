@@ -57,12 +57,6 @@ public class INPerSyncDefinition extends INDefinition
 		return "per " + opname + " => " + guard;
 	}
 
-	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return guard.findExpression(lineno);
-	}
-
 	public INExpression getExpression()
 	{
 		return guard;

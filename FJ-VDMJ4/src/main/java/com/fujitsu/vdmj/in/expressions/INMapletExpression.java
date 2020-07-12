@@ -50,12 +50,6 @@ public class INMapletExpression extends INNode implements Serializable
 		return left + " |-> " + right;
 	}
 
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = left.findExpression(lineno);
-		return (found == null) ? right.findExpression(lineno) : found;
-	}
-
 	public ValueList getValues(Context ctxt)
 	{
 		ValueList list = left.getValues(ctxt);

@@ -147,6 +147,21 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 		if (expVisitor != null)
 		{
 			all.addAll(node.body.apply(expVisitor, arg));
+			
+			if (node.precondition != null)
+			{
+				all.addAll(node.precondition.apply(expVisitor, arg));
+			}
+			
+			if (node.postcondition != null)
+			{
+				all.addAll(node.postcondition.apply(expVisitor, arg));
+			}
+			
+			if (node.measure != null)
+			{
+				all.addAll(node.measure.apply(expVisitor, arg));
+			}
 		}
 		
 		return all;
@@ -155,6 +170,7 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseExplicitOperationDefinition(ASTExplicitOperationDefinition node, S arg)
 	{
+		ASTExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		ASTStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
 		ASTTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
@@ -169,6 +185,19 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 			all.addAll(node.body.apply(stmtVisitor, arg));
 		}
 		
+		if (expVisitor != null)
+		{
+			if (node.precondition != null)
+			{
+				all.addAll(node.precondition.apply(expVisitor, arg));
+			}
+			
+			if (node.postcondition != null)
+			{
+				all.addAll(node.postcondition.apply(expVisitor, arg));
+			}
+		}
+		
 		return all;
 	}
 
@@ -181,79 +210,97 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseImplicitFunctionDefinition(ASTImplicitFunctionDefinition node, S arg)
 	{
- 		if (node.body != null)
- 		{
-			ASTExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-			ASTTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-			C all = newCollection();
-			
-			if (typeVisitor != null)
+		ASTExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+		ASTTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
+		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			ASTTypeList ptypes = new ASTTypeList();
+
+			for (ASTPatternListTypePair ptp: node.parameterPatterns)
 			{
-				ASTTypeList ptypes = new ASTTypeList();
-
-				for (ASTPatternListTypePair ptp: node.parameterPatterns)
+				for (int i=0; i<ptp.patterns.size(); i++)
 				{
-					for (int i=0; i<ptp.patterns.size(); i++)
-					{
-						ptypes.add(ptp.type);
-					}
+					ptypes.add(ptp.type);
 				}
-
-				// NB: implicit functions are always +> total, apparently
-				ASTFunctionType type = new ASTFunctionType(node.location, false, ptypes, node.result.type);
-				all.addAll(type.apply(typeVisitor, arg));
 			}
-			
-			if (expVisitor != null)
+
+			// NB: implicit functions are always +> total, apparently
+			ASTFunctionType type = new ASTFunctionType(node.location, false, ptypes, node.result.type);
+			all.addAll(type.apply(typeVisitor, arg));
+		}
+		
+		if (expVisitor != null)
+		{
+			if (node.body != null)
 			{
 				all.addAll(node.body.apply(expVisitor, arg));
 			}
 			
-			return all;
- 		}
- 		else
- 		{
- 			return newCollection();
- 		}
+			if (node.precondition != null)
+			{
+				all.addAll(node.precondition.apply(expVisitor, arg));
+			}
+			
+			if (node.postcondition != null)
+			{
+				all.addAll(node.postcondition.apply(expVisitor, arg));
+			}
+			
+			if (node.measureExp != null)
+			{
+				all.addAll(node.measureExp.apply(expVisitor, arg));
+			}
+		}
+		
+		return all;
 	}
 
  	@Override
 	public C caseImplicitOperationDefinition(ASTImplicitOperationDefinition node, S arg)
 	{
- 		if (node.body != null)
- 		{
- 			ASTStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
- 			ASTTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
- 			C all = newCollection();
- 			
- 			if (typeVisitor != null)
- 			{
-				ASTTypeList ptypes = new ASTTypeList();
+		ASTExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+		ASTStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
+		ASTTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
+		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			ASTTypeList ptypes = new ASTTypeList();
 
-				for (ASTPatternListTypePair ptp: node.parameterPatterns)
+			for (ASTPatternListTypePair ptp: node.parameterPatterns)
+			{
+				for (int i=0; i<ptp.patterns.size(); i++)
 				{
-					for (int i=0; i<ptp.patterns.size(); i++)
-					{
-						ptypes.add(ptp.type);
-					}
+					ptypes.add(ptp.type);
 				}
+			}
 
-				// NB: implicit functions are always +> total, apparently
-				ASTFunctionType type = new ASTFunctionType(node.location, false, ptypes, node.result.type);
-				all.addAll(type.apply(typeVisitor, arg));
- 			}
- 			
- 			if (stmtVisitor != null)
- 			{
- 				all.addAll(node.body.apply(stmtVisitor, arg));
- 			}
- 			
- 			return all;
- 		}
- 		else
- 		{
- 			return newCollection();
- 		}
+			// NB: implicit functions are always +> total, apparently
+			ASTFunctionType type = new ASTFunctionType(node.location, false, ptypes, node.result.type);
+			all.addAll(type.apply(typeVisitor, arg));
+		}
+		
+		if (node.body != null && stmtVisitor != null)
+		{
+			all.addAll(node.body.apply(stmtVisitor, arg));
+		}
+		
+		if (expVisitor != null)
+		{
+			if (node.precondition != null)
+			{
+				all.addAll(node.precondition.apply(expVisitor, arg));
+			}
+			
+			if (node.postcondition != null)
+			{
+				all.addAll(node.postcondition.apply(expVisitor, arg));
+			}
+		}
+
+		return all;
 	}
 
  	@Override

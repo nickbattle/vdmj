@@ -50,17 +50,6 @@ public class INExpressionList extends INMappedList<TCExpression, INExpression>
 		return Utils.listToString(this);
 	}
 
-	public INExpression findExpression(int lineno)
-	{
-		for (INExpression exp: this)
-		{
-			INExpression found = exp.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		return null;
-	}
-
 	public ValueList getValues(Context ctxt)
 	{
 		ValueList list = new ValueList();

@@ -65,15 +65,6 @@ public class INSeqEnumExpression extends INSeqExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		return members.findExpression(lineno);
-	}
-
-	@Override
 	public ValueList getValues(Context ctxt)
 	{
 		return members.getValues(ctxt);

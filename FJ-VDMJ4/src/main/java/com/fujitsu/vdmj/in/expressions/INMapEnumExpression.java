@@ -81,21 +81,6 @@ public class INMapEnumExpression extends INMapExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		for (INMapletExpression m: members)
-		{
-			found = m.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		return null;
-	}
-
-	@Override
 	public ValueList getValues(Context ctxt)
 	{
 		ValueList list = new ValueList();

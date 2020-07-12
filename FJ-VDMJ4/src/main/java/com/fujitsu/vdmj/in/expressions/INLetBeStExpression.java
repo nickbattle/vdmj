@@ -65,21 +65,6 @@ public class INLetBeStExpression extends INExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		if (suchThat != null)
-		{
-			found = suchThat.findExpression(lineno);
-			if (found != null) return found;
-		}
-
-		return value.findExpression(lineno);
-	}
-
-	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);

@@ -24,14 +24,8 @@
 package com.fujitsu.vdmj.in.statements.visitors;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.definitions.INAssignmentDefinition;
-import com.fujitsu.vdmj.in.definitions.INDefinition;
-import com.fujitsu.vdmj.in.definitions.INValueDefinition;
-import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.in.expressions.visitors.INExpressionFinder;
-import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.statements.INStatement;
 
 /**
@@ -39,66 +33,10 @@ import com.fujitsu.vdmj.in.statements.INStatement;
  */
 public class INStatementExpressionFinder extends INLeafStatementVisitor<INExpression, INExpressionList, Integer>
 {
-	private class VisitorSet extends INVisitorSet<INExpression, INExpressionList, Integer>
-	{
-		private final INExpressionVisitor<INExpressionList, Integer> expVisitor = new INExpressionFinder();
-
-		@Override
-		public INExpressionVisitor<INExpressionList, Integer> getExpressionVisitor()
-		{
-			return expVisitor;
-		}
-
-		@Override
-		public INDefinitionVisitor<INExpressionList, Integer> getDefinitionVisitor()
-		{
-			return new INDefinitionVisitor<INExpressionList, Integer>()
-			{
-				@Override
-				public INExpressionList caseDefinition(INDefinition node, Integer lineno)
-				{
-					return new INExpressionList();
-				}
-				
-				/**
-				 * Assignment definitions are "dcl var:type := exp"
-				 */
-				@Override
-				public INExpressionList caseAssignmentDefinition(INAssignmentDefinition node, Integer lineno)
-				{
-					INExpressionList list = newCollection();
-					
-					if (node.expression.location.startLine == lineno)
-					{
-						list.add(node.expression);		// Could apply exp visitor...
-					}
-
-					return list;
-				}
-				
-				/**
-				 * Value definitions are in let def statements.
-				 */
-				@Override
-				public INExpressionList caseValueDefinition(INValueDefinition node, Integer lineno)
-				{
-					INExpressionList list = newCollection();
-					
-					if (node.exp.location.startLine == lineno)
-					{
-						list.add(node.exp);		// Could apply exp visitor...
-					}
-
-					return list;
-				}
-			};
-		}
-	}
-	
-	public INStatementExpressionFinder()
+	public INStatementExpressionFinder(INVisitorSet<INExpression, INExpressionList, Integer> visitors)
 	{
 		super(true);	// So we visit the nodes as well as the leaves
-		visitorSet = new VisitorSet();
+		visitorSet = visitors;
 	}
 
 	@Override

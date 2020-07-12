@@ -83,12 +83,6 @@ public class INValueDefinition extends INDefinition
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return exp.findExpression(lineno);
-	}
-
-	@Override
 	public TCType getType()
 	{
 		return type;

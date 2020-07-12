@@ -46,18 +46,6 @@ abstract public class INBinaryExpression extends INExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-//		TCExpression found = super.findExpression(lineno);
-//		if (found != null) return found;
-
-		INExpression found = left.findExpression(lineno);
-		if (found != null) return found;
-
-		return right.findExpression(lineno);
-	}
-
-	@Override
 	public String toString()
 	{
 		return "(" + left + " " + op + " " + right + ")";

@@ -40,6 +40,12 @@ public class INExpressionFinder extends INLeafExpressionVisitor<INExpression, IN
 		visitorSet = new INVisitorSet<INExpression, INExpressionList, Integer>() {};
 	}
 
+	public INExpressionFinder(INVisitorSet<INExpression, INExpressionList, Integer> visitors)
+	{
+		super(true);	// So we visit the nodes as well as the leaves
+		visitorSet = visitors;
+	}
+
 	@Override
 	protected INExpressionList newCollection()
 	{

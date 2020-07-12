@@ -79,15 +79,6 @@ public class INMkBasicExpression extends INExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		return arg.findExpression(lineno);
-	}
-
-	@Override
 	public ValueList getValues(Context ctxt)
 	{
 		return arg.getValues(ctxt);

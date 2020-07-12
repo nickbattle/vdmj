@@ -144,6 +144,21 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 			all.addAll(node.body.apply(expVisitor, arg));
 		}
 		
+		if (node.predef != null)
+		{
+			all.addAll(node.predef.apply(this, arg));
+		}
+		
+		if (node.postdef != null)
+		{
+			all.addAll(node.postdef.apply(this, arg));
+		}
+		
+		if (node.measureDef != null)
+		{
+			all.addAll(node.measureDef.apply(this, arg));
+		}
+
 		return all;
 	}
 
@@ -164,6 +179,16 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 			all.addAll(node.body.apply(stmtVisitor, arg));
 		}
 		
+		if (node.predef != null)
+		{
+			all.addAll(node.predef.apply(this, arg));
+		}
+		
+		if (node.postdef != null)
+		{
+			all.addAll(node.postdef.apply(this, arg));
+		}
+		
 		return all;
 	}
 
@@ -176,55 +201,66 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseImplicitFunctionDefinition(POImplicitFunctionDefinition node, S arg)
 	{
- 		if (node.body != null)
- 		{
-			POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-			TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-			C all = newCollection();
-			
-			if (typeVisitor != null)
-			{
-				all.addAll(node.getType().apply(typeVisitor, arg));
-			}
-			
-			if (expVisitor != null)
-			{
-				all.addAll(node.body.apply(expVisitor, arg));
-			}
-			
-			return all;
- 		}
- 		else
- 		{
- 			return newCollection();
- 		}
+		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
+		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			all.addAll(node.getType().apply(typeVisitor, arg));
+		}
+		
+ 		if (node.body != null && expVisitor != null)
+		{
+			all.addAll(node.body.apply(expVisitor, arg));
+		}
+
+		if (node.predef != null)
+		{
+			all.addAll(node.predef.apply(this, arg));
+		}
+		
+		if (node.postdef != null)
+		{
+			all.addAll(node.postdef.apply(this, arg));
+		}
+		
+		if (node.measureDef != null)
+		{
+			all.addAll(node.measureDef.apply(this, arg));
+		}
+		
+		return all;
 	}
 
  	@Override
 	public C caseImplicitOperationDefinition(POImplicitOperationDefinition node, S arg)
 	{
- 		if (node.body != null)
- 		{
- 			POStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
- 			TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
- 			C all = newCollection();
- 			
- 			if (typeVisitor != null)
- 			{
- 				all.addAll(node.getType().apply(typeVisitor, arg));
- 			}
- 			
- 			if (stmtVisitor != null)
- 			{
- 				all.addAll(node.body.apply(stmtVisitor, arg));
- 			}
- 			
- 			return all;
- 		}
- 		else
- 		{
- 			return newCollection();
- 		}
+		POStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
+		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
+		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			all.addAll(node.getType().apply(typeVisitor, arg));
+		}
+		
+		if (stmtVisitor != null && node.body != null)
+		{
+			all.addAll(node.body.apply(stmtVisitor, arg));
+		}
+
+		if (node.predef != null)
+		{
+			all.addAll(node.predef.apply(this, arg));
+		}
+		
+		if (node.postdef != null)
+		{
+			all.addAll(node.postdef.apply(this, arg));
+		}
+		
+		return all;
 	}
 
  	@Override

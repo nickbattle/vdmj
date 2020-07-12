@@ -97,12 +97,6 @@ public class INEqualsDefinition extends INDefinition
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		return test.findExpression(lineno);
-	}
-
-	@Override
 	public NameValuePairList getNamedValues(Context ctxt)
 	{
 		Value v = test.eval(ctxt);

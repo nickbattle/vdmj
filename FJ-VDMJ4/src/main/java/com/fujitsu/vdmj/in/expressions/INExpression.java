@@ -116,7 +116,7 @@ public abstract class INExpression extends INNode implements Serializable
 	 * @param lineno The line number to locate.
 	 * @return An expression starting on the line, or null.
 	 */
-	public INExpression findExpression(int lineno)
+	public final INExpression findExpression(int lineno)
 	{
 		INExpressionList all = this.apply(new INExpressionFinder(), lineno);
 		return all.isEmpty() ? null : all.get(0);

@@ -26,10 +26,6 @@ package com.fujitsu.vdmj.in.statements;
 import java.io.Serializable;
 
 import com.fujitsu.vdmj.in.INNode;
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.in.statements.visitors.INStatementExpressionFinder;
-import com.fujitsu.vdmj.in.statements.visitors.INStatementFinder;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
@@ -60,30 +56,6 @@ public abstract class INStatement extends INNode implements Serializable
 
 	@Override
 	abstract public String toString();
-
-	/**
-	 * Find a statement starting on the given line. Single statements just
-	 * compare their location to lineno, but block statements and statements
-	 * with sub-statements iterate over their branches.
-	 *
-	 * @param lineno The line number to locate.
-	 * @return A statement starting on the line, or null.
-	 */
-	public INStatement findStatement(int lineno)
-	{
-		INStatementList all = this.apply(new INStatementFinder(), lineno);
-		return all.isEmpty() ? null : all.get(0);
-	}
-
-	/**
-	 * Find an expression starting at this statement.
-	 * @param lineno  
-	 */
-	public INExpression findExpression(int lineno)
-	{
-		INExpressionList all = this.apply(new INStatementExpressionFinder(), lineno);
-		return all.isEmpty() ? null : all.get(0);
-	}
 
 	/** Evaluate the statement in the context given. */
 	abstract public Value eval(Context ctxt);

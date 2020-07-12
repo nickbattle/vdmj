@@ -75,21 +75,6 @@ public class INSameClassExpression extends INExpression
 	}
 
 	@Override
-	public INExpression findExpression(int lineno)
-	{
-		INExpression found = super.findExpression(lineno);
-		if (found != null) return found;
-
-		found = left.findExpression(lineno);
-		if (found != null) return found;
-
-		found = right.findExpression(lineno);
-		if (found != null) return found;
-
-		return null;
-	}
-
-	@Override
 	public String toString()
 	{
 		return "sameclass(" + left + "," + right + ")";
