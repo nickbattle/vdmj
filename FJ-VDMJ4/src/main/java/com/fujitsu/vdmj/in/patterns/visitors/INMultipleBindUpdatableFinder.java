@@ -21,7 +21,7 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.expressions.visitors;
+package com.fujitsu.vdmj.in.patterns.visitors;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;

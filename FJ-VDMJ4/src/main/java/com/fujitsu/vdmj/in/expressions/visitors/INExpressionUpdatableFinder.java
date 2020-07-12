@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.in.expressions.INVariableExpression;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.patterns.visitors.INBindUpdatableFinder;
 import com.fujitsu.vdmj.in.patterns.visitors.INBindVisitor;
+import com.fujitsu.vdmj.in.patterns.visitors.INMultipleBindUpdatableFinder;
 import com.fujitsu.vdmj.in.patterns.visitors.INMultipleBindVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
