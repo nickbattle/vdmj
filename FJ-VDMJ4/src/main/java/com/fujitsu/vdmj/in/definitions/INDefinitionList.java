@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.NameValuePairList;
-import com.fujitsu.vdmj.values.ValueList;
 
 /**
  * A class to hold a list of Definitions.
@@ -126,18 +125,6 @@ public class INDefinitionList extends INMappedList<TCDefinition, INDefinition>
 		}
 
 		return sb.toString();
-	}
-
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = new ValueList();
-
-		for (INDefinition d: this)
-		{
-			list.addAll(d.getValues(ctxt));
-		}
-
-		return list;
 	}
 
 	public TCNameList getOldNames()

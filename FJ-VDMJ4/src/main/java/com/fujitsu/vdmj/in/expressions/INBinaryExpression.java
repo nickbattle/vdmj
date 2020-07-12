@@ -25,9 +25,7 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.values.ValueList;
 
 abstract public class INBinaryExpression extends INExpression
 {
@@ -49,14 +47,6 @@ abstract public class INBinaryExpression extends INExpression
 	public String toString()
 	{
 		return "(" + left + " " + op + " " + right + ")";
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = left.getValues(ctxt);
-		list.addAll(right.getValues(ctxt));
-		return list;
 	}
 	
 	@Override

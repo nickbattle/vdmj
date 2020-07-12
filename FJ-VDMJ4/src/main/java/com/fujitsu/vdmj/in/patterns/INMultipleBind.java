@@ -69,9 +69,6 @@ public abstract class INMultipleBind extends INNode
 	/** Get a list of all the possible values to bind the variables to. */ 
 	abstract public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException;
 
-	/** Return a list of all values read by the bind evaluation. */
-	abstract public ValueList getValues(Context ctxt);
-
 	/** Return a list of old names used by the bind. */
 	abstract public TCNameList getOldNames();
 

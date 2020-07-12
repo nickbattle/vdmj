@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INIsOfBaseClassExpression extends INExpression
 {
@@ -95,12 +94,6 @@ public class INIsOfBaseClassExpression extends INExpression
 	public String toString()
 	{
 		return "isofbaseclass(" + baseclass + "," + exp + ")";
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return exp.getValues(ctxt);
 	}
 
 	@Override

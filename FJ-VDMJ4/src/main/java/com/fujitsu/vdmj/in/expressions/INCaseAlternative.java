@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INCaseAlternative extends INNode
 {
@@ -70,11 +69,6 @@ public class INCaseAlternative extends INNode
 		}
 
 		return null;
-	}
-
-	public ValueList getValues(Context ctxt)
-	{
-		return result.getValues(ctxt);
 	}
 
 	public TCNameList getOldNames()

@@ -64,12 +64,6 @@ public class INSeqBind extends INBind
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return sequence.getValues(ctxt);
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		return sequence.getOldNames();

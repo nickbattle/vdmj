@@ -43,7 +43,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.NameValuePairList;
-import com.fujitsu.vdmj.values.ValueList;
 
 /**
  * The abstract parent of all definitions. A definition can represent a data
@@ -101,16 +100,6 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	public int hashCode()
 	{
 		return name.hashCode();		// Used for sets of definitions (see equals).
-	}
-
-	/**
-	 * Return a list of external values that are read by the definition.
-	 * @param ctxt The context in which to evaluate the expressions.
-	 * @return A list of values read.
-	 */
-	public ValueList getValues(Context ctxt)	// TODO as a LeafDefinitionVisitor?
-	{
-		return new ValueList();
 	}
 
 	/**

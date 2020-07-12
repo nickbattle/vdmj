@@ -25,9 +25,7 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.values.ValueList;
 
 abstract public class INUnaryExpression extends INExpression
 {
@@ -38,12 +36,6 @@ abstract public class INUnaryExpression extends INExpression
 	{
 		super(location);
 		this.exp = exp;
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return exp.getValues(ctxt);
 	}
 
 	@Override

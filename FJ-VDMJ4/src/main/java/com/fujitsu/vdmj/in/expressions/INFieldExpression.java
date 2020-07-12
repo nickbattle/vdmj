@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ExceptionHandler;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
@@ -35,9 +34,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.FieldMap;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.RecordValue;
-import com.fujitsu.vdmj.values.UpdatableValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INFieldExpression extends INExpression
 {
@@ -78,7 +75,7 @@ public class INFieldExpression extends INExpression
         }
 	}
 	
-	private Value evaluate(Context ctxt) throws ValueException
+	public Value evaluate(Context ctxt) throws ValueException
 	{
 		Value v = object.eval(ctxt);
 		TCType objtype = null;
@@ -104,55 +101,6 @@ public class INFieldExpression extends INExpression
 		}
 
 		return r;
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList values = object.getValues(ctxt);
-		
-		try
-		{
-			// This evaluation should not affect scheduling as we are trying to
-			// discover the sync variables to listen to only.
-			
-			ctxt.threadState.setAtomic(true);
-			Value r = evaluate(ctxt);
-
-			if (r instanceof UpdatableValue)
-			{
-				values.add(r);
-			}
-			
-			return values;
-		}
-		catch (ContextException e)
-		{
-			if (e.number == 4034 || e.number == 4097 || e.number == 4105)
-			{
-				return values;	// Non existent variable or can't get value
-			}
-			else
-			{
-				throw e;
-			}
-		}
-		catch (ValueException e)
-		{
-			if (e.number == 4097 || e.number == 4105)
-			{
-				return values;	// Cannot get record/object value of ... 
-			}
-			else
-			{
-				abort(e);
-				return null;
-			}
-		}
-		finally
-		{
-			ctxt.threadState.setAtomic(false);
-		}
 	}
 
 	@Override

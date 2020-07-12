@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INIfExpression extends INExpression
 {
@@ -96,25 +95,6 @@ public class INIfExpression extends INExpression
         {
         	return abort(e);
         }
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = ifExp.getValues(ctxt);
-		list.addAll(thenExp.getValues(ctxt));
-
-		for (INElseIfExpression elif: elseList)
-		{
-			list.addAll(elif.getValues(ctxt));
-		}
-
-		if (elseExp != null)
-		{
-			list.addAll(elseExp.getValues(ctxt));
-		}
-
-		return list;
 	}
 
 	@Override

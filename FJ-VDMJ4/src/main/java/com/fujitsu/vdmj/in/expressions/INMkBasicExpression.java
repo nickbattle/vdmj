@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.types.TCTokenType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.TokenValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INMkBasicExpression extends INExpression
 {
@@ -76,12 +75,6 @@ public class INMkBasicExpression extends INExpression
 		}
 
 		return v;
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return arg.getValues(ctxt);
 	}
 
 	@Override

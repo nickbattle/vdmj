@@ -126,20 +126,6 @@ public class INLetBeStExpression extends INExpression
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = bind.getValues(ctxt);
-
-		if (suchThat != null)
-		{
-			list.addAll(suchThat.getValues(ctxt));
-		}
-
-		list.addAll(value.getValues(ctxt));
-		return list;
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		TCNameList list = bind.getOldNames();

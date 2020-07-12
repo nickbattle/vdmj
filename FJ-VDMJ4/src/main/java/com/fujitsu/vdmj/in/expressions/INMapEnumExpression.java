@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueMap;
 
 public class INMapEnumExpression extends INMapExpression
@@ -78,19 +77,6 @@ public class INMapEnumExpression extends INMapExpression
 		}
 
 		return new MapValue(map);
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = new ValueList();
-
-		for (INMapletExpression maplet: members)
-		{
-			list.addAll(maplet.getValues(ctxt));
-		}
-
-		return list;
 	}
 
 	@Override

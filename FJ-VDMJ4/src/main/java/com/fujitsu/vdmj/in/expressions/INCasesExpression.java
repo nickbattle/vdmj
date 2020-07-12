@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INCasesExpression extends INExpression
 {
@@ -74,24 +73,6 @@ public class INCasesExpression extends INExpression
 		}
 
 		return abort(4004, "No cases apply for " + val, ctxt);
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = exp.getValues(ctxt);
-
-		for (INCaseAlternative c: cases)
-		{
-			list.addAll(c.getValues(ctxt));
-		}
-
-		if (others != null)
-		{
-			list.addAll(others.getValues(ctxt));
-		}
-
-		return list;
 	}
 
 	@Override

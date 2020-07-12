@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 /**
  * A class to hold a value definition.
@@ -115,12 +114,6 @@ public class INValueDefinition extends INDefinition
 	public boolean isValueDefinition()
 	{
 		return true;
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return exp.getValues(ctxt);
 	}
 
 	@Override

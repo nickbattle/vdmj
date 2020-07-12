@@ -65,12 +65,6 @@ public class INTypeBind extends INBind
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return new ValueList();
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		return new TCNameList();

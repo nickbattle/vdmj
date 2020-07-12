@@ -58,9 +58,6 @@ public abstract class INBind extends INNode implements Serializable
 	/** Return a list of all possible values for the bind. */ 
 	abstract public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException;
 
-	/** Return a list of all values read by the bind evaluation. */
-	abstract public ValueList getValues(Context ctxt);
-	
 	/** Return a list of all old values read by the bind evaluation. */
 	abstract public TCNameList getOldNames();
 

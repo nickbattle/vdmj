@@ -135,14 +135,6 @@ public class INApplyExpression extends INExpression
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = args.getValues(ctxt);
-		list.addAll(root.getValues(ctxt));
-		return list;
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		TCNameList list = args.getOldNames();

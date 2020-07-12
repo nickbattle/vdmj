@@ -27,9 +27,7 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.values.UpdatableValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INVariableExpression extends INExpression
 {
@@ -54,21 +52,6 @@ public class INVariableExpression extends INExpression
 	{
 		breakpoint.check(location, ctxt);
 		return ctxt.lookup(name);
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		Value v = ctxt.check(name);
-
-		if (v == null || !(v instanceof UpdatableValue))
-		{
-			return new ValueList();
-		}
-		else
-		{
-			return new ValueList(v);
-		}
 	}
 
 	@Override

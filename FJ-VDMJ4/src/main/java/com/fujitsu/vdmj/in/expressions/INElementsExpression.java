@@ -69,12 +69,6 @@ public class INElementsExpression extends INSetExpression
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return exp.getValues(ctxt);
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		return exp.getOldNames();

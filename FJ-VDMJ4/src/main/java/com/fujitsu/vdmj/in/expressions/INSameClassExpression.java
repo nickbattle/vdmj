@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INSameClassExpression extends INExpression
 {
@@ -78,14 +77,6 @@ public class INSameClassExpression extends INExpression
 	public String toString()
 	{
 		return "sameclass(" + left + "," + right + ")";
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = left.getValues(ctxt);
-		list.addAll(right.getValues(ctxt));
-		return list;
 	}
 
 	@Override

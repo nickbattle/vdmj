@@ -185,20 +185,6 @@ public class INSeqCompExpression extends INSeqExpression
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = first.getValues(ctxt);
-		list.addAll(bind.getValues(ctxt));
-
-		if (predicate != null)
-		{
-			list.addAll(predicate.getValues(ctxt));
-		}
-
-		return list;
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		TCNameList list = first.getOldNames();

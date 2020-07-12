@@ -76,12 +76,6 @@ public class INMkTypeExpression extends INExpression
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return args.getValues(ctxt);
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		return args.getOldNames();

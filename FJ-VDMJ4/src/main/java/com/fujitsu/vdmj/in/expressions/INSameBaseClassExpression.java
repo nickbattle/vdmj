@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INSameBaseClassExpression extends INExpression
 {
@@ -91,14 +90,6 @@ public class INSameBaseClassExpression extends INExpression
 	public String toString()
 	{
 		return "samebaseclass(" + left + "," + right + ")";
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = left.getValues(ctxt);
-		list.addAll(right.getValues(ctxt));
-		return list;
 	}
 
 	@Override

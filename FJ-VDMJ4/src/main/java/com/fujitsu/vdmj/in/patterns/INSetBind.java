@@ -86,12 +86,6 @@ public class INSetBind extends INBind
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return set.getValues(ctxt);
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		return set.getOldNames();

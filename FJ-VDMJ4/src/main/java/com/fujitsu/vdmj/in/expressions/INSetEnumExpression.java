@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
 public class INSetEnumExpression extends INSetExpression
@@ -71,12 +70,6 @@ public class INSetEnumExpression extends INSetExpression
 		{
 			return abort(e);
 		}
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return members.getValues(ctxt);
 	}
 
 	@Override
