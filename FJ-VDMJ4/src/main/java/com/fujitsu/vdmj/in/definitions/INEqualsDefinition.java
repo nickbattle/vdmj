@@ -176,19 +176,6 @@ public class INEqualsDefinition extends INDefinition
 
 		return nvpl;
 	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = test.getValues(ctxt);
-
-		if (bind != null)
-		{
-			list.addAll(bind.getValues(ctxt));
-		}
-
-		return list;
-	}
 	
 	@Override
 	public boolean isUpdatable()

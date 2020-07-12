@@ -26,9 +26,7 @@ package com.fujitsu.vdmj.in.expressions;
 import java.io.Serializable;
 
 import com.fujitsu.vdmj.in.INNode;
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INMapletExpression extends INNode implements Serializable
 {
@@ -48,13 +46,6 @@ public class INMapletExpression extends INNode implements Serializable
 	public String toString()
 	{
 		return left + " |-> " + right;
-	}
-
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = left.getValues(ctxt);
-		list.addAll(right.getValues(ctxt));
-		return list;
 	}
 
 	public TCNameList getOldNames()

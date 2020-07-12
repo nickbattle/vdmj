@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.NameValuePairList;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INQualifiedDefinition extends INDefinition
 {
@@ -67,12 +66,6 @@ public class INQualifiedDefinition extends INDefinition
 	public int hashCode()
 	{
 		return def.hashCode();
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return def.getValues(ctxt);
 	}
 
 	@Override

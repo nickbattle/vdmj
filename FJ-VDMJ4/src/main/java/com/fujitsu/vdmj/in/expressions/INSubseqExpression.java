@@ -90,15 +90,6 @@ public class INSubseqExpression extends INExpression
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = seq.getValues(ctxt);
-		list.addAll(from.getValues(ctxt));
-		list.addAll(to.getValues(ctxt));
-		return list;
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		TCNameList list = seq.getOldNames();

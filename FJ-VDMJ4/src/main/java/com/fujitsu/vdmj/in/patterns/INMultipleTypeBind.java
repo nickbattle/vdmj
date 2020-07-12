@@ -55,12 +55,6 @@ public class INMultipleTypeBind extends INMultipleBind
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return new ValueList();
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		return new TCNameList();

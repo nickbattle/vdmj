@@ -27,6 +27,7 @@ import java.io.Serializable;
 
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionFinder;
+import com.fujitsu.vdmj.in.expressions.visitors.INExpressionUpdatableFinder;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.expressions.visitors.INHistoryExpressionFinder;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -130,9 +131,9 @@ public abstract class INExpression extends INNode implements Serializable
 	 * @param ctxt	The context in which to search for values.
 	 * @return  A list of values read by the expression.
 	 */
-	public ValueList getValues(Context ctxt)
+	public final ValueList getValues(Context ctxt)
 	{
-		return new ValueList();  // Default, for expressions with no variables
+		return this.apply(new INExpressionUpdatableFinder(), ctxt);
 	}
 	
 	/**

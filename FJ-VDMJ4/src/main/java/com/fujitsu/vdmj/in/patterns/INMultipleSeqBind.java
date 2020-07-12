@@ -62,12 +62,6 @@ public class INMultipleSeqBind extends INMultipleBind
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return sequence.getValues(ctxt);
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		return sequence.getOldNames();

@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.RecordValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INNarrowExpression extends INExpression
 {
@@ -91,12 +90,6 @@ public class INNarrowExpression extends INExpression
 		}
 		
 		return v;
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return test.getValues(ctxt);
 	}
 
 	@Override

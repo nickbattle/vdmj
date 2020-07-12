@@ -100,14 +100,6 @@ public class INExists1Expression extends INExpression
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = bind.getValues(ctxt);
-		list.addAll(predicate.getValues(ctxt));
-		return list;
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		TCNameList list = bind.getOldNames();

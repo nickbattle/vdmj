@@ -77,12 +77,6 @@ public class INFieldNumberExpression extends INExpression
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return tuple.getValues(ctxt);
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		return tuple.getOldNames();

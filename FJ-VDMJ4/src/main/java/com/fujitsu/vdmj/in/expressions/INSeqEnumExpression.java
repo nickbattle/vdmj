@@ -65,12 +65,6 @@ public class INSeqEnumExpression extends INSeqExpression
 	}
 
 	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return members.getValues(ctxt);
-	}
-
-	@Override
 	public TCNameList getOldNames()
 	{
 		return members.getOldNames();

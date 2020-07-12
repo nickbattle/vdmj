@@ -37,7 +37,6 @@ import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INFuncInstantiationExpression extends INExpression
 {
@@ -125,12 +124,6 @@ public class INFuncInstantiationExpression extends INExpression
 		{
 			return abort(e);
 		}
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return function.getValues(ctxt);
 	}
 
 	@Override

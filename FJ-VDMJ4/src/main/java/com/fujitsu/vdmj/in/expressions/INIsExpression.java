@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.RecordValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INIsExpression extends INExpression
 {
@@ -107,12 +106,6 @@ public class INIsExpression extends INExpression
 		}
 
 		return new BooleanValue(false);
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return test.getValues(ctxt);
 	}
 
 	@Override

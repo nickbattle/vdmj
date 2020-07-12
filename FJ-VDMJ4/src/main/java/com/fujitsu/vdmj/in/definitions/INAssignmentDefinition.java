@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 /**
  * A class to represent assignable variable definitions.
@@ -86,12 +85,6 @@ public class INAssignmentDefinition extends INDefinition
 	public TCType getType()
 	{
 		return type;
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return expression.getValues(ctxt);
 	}
 
 	@Override

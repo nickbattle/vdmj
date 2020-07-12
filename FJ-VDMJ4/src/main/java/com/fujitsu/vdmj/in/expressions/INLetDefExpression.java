@@ -37,7 +37,6 @@ import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INLetDefExpression extends INExpression
 {
@@ -88,14 +87,6 @@ public class INLetDefExpression extends INExpression
 		}
 
 		return expression.eval(evalContext);
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = localDefs.getValues(ctxt);
-		list.addAll(expression.getValues(ctxt));
-		return list;
 	}
 
 	@Override

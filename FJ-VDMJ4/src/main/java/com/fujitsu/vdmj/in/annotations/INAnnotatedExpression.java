@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INAnnotatedExpression extends INExpression
 {
@@ -60,12 +59,6 @@ public class INAnnotatedExpression extends INExpression
 		Value rv = expression.eval(ctxt);
 		annotation.inAfter(this, rv, ctxt);
 		return rv;
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return expression.getValues(ctxt);
 	}
 	
 	@Override

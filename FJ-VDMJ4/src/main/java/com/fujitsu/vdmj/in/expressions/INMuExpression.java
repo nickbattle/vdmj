@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FieldMap;
 import com.fujitsu.vdmj.values.RecordValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INMuExpression extends INExpression
 {
@@ -85,19 +84,6 @@ public class INMuExpression extends INExpression
 		{
 			return abort(e);
 		}
-	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = record.getValues(ctxt);
-
-		for (INRecordModifier rm: modifiers)
-		{
-			list.addAll(rm.getValues(ctxt));
-		}
-
-		return list;
 	}
 
 	@Override

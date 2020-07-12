@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
 
 public class INLambdaExpression extends INExpression
 {
@@ -69,13 +68,7 @@ public class INLambdaExpression extends INExpression
 
 		return new FunctionValue(location, "lambda", ftype, paramPatterns, expression, free);
 	}
-
-	@Override
-	public ValueList getValues(Context ctxt)
-	{
-		return expression.getValues(ctxt);
-	}
-
+	
 	@Override
 	public TCNameList getOldNames()
 	{

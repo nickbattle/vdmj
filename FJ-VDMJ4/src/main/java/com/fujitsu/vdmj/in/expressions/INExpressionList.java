@@ -24,12 +24,10 @@
 package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.INMappedList;
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.util.Utils;
-import com.fujitsu.vdmj.values.ValueList;
 
 @SuppressWarnings("serial")
 public class INExpressionList extends INMappedList<TCExpression, INExpression>
@@ -48,18 +46,6 @@ public class INExpressionList extends INMappedList<TCExpression, INExpression>
 	public String toString()
 	{
 		return Utils.listToString(this);
-	}
-
-	public ValueList getValues(Context ctxt)
-	{
-		ValueList list = new ValueList();
-
-		for (INExpression exp: this)
-		{
-			list.addAll(exp.getValues(ctxt));
-		}
-
-		return list;
 	}
 
 	public TCNameList getOldNames()
