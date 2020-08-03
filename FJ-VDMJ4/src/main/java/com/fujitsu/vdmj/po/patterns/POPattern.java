@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionSet;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetAllDefinitionsVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetAllVarNamesVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetPossibleTypeVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
@@ -71,9 +72,11 @@ public abstract class POPattern extends PONode implements Serializable
 
 	/**
 	 * Get a complete list of all definitions, including duplicates.
-	 * TODO as a LeafPatternVisitor? See TCGetDefinitionsVisitor.
 	 */
-	abstract protected PODefinitionList getAllDefinitions(TCType type);
+	protected final PODefinitionList getAllDefinitions(TCType type)
+	{
+		return apply(new POGetAllDefinitionsVisitor(), type);
+	}
 
 	/**
 	 * Get the type(s) that could match this pattern.

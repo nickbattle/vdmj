@@ -24,12 +24,10 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POSeqEnumExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.types.TCType;
 
 
 public class POSeqPattern extends POPattern
@@ -66,20 +64,6 @@ public class POSeqPattern extends POPattern
 	public int getLength()
 	{
 		return plist.size();
-	}
-
-	@Override
-	public PODefinitionList getAllDefinitions(TCType type)
-	{
-		PODefinitionList defs = new PODefinitionList();
-		TCType elem = type.getSeq().seqof;
-
-		for (POPattern p: plist)
-		{
-			defs.addAll(p.getAllDefinitions(elem));
-		}
-
-		return defs;
 	}
 
 	@Override

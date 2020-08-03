@@ -27,11 +27,9 @@ import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqConcatExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POConcatenationPattern extends POPattern
 {
@@ -58,14 +56,6 @@ public class POConcatenationPattern extends POPattern
 		LexToken op = new LexKeywordToken(Token.CONCATENATE, location);
 		return new POSeqConcatExpression(
 			left.getMatchingExpression(), op, right.getMatchingExpression(), null, null);
-	}
-
-	@Override
-	public PODefinitionList getAllDefinitions(TCType type)
-	{
-		PODefinitionList list = left.getAllDefinitions(type);
-		list.addAll(right.getAllDefinitions(type));
-		return list;
 	}
 
 	@Override

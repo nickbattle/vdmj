@@ -28,11 +28,9 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.tc.types.TCType;
 
 /**
  * The parent class of {@link POMultipleSetBind} and {@link POMultipleTypeBind}.
@@ -63,24 +61,6 @@ public abstract class POMultipleBind extends PONode
 		List<POMultipleBind> list = new Vector<POMultipleBind>();
 		list.add(this);
 		return list;
-	}
-
-	/**
-	 * Get a list of definitions for the variables in the pattern list.
-	 *
-	 * @param type The type of the bind.
-	 * @return A list of definitions for all the patterns' variables.
-	 */
-	public PODefinitionList getDefinitions(TCType type)
-	{
-		PODefinitionList defs = new PODefinitionList();
-
-		for (POPattern p: plist)
-		{
-			defs.addAll(p.getAllDefinitions(type));
-		}
-
-		return defs;
 	}
 
 	/** Get a list of POs. */

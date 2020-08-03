@@ -23,16 +23,11 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import java.util.Iterator;
-
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POMkTypeExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCField;
-import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -68,22 +63,6 @@ public class PORecordPattern extends POPattern
 		}
 
 		return new POMkTypeExpression(typename, list, null, null);
-	}
-
-	@Override
-	public PODefinitionList getAllDefinitions(TCType exptype)
-	{
-		PODefinitionList defs = new PODefinitionList();
-		TCRecordType pattype = type.getRecord();
-		Iterator<TCField> patfi = pattype.fields.iterator();
-
-		for (POPattern p: plist)
-		{
-			TCField pf = patfi.next();
-			defs.addAll(p.getAllDefinitions(pf.type));
-		}
-
-		return defs;
 	}
 
 	@Override
