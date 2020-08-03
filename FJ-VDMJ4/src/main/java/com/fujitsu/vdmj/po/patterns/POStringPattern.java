@@ -28,8 +28,6 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POStringLiteralExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.types.TCCharacterType;
-import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POStringPattern extends POPattern
@@ -59,12 +57,6 @@ public class POStringPattern extends POPattern
 	public PODefinitionList getAllDefinitions(TCType type)
 	{
 		return new PODefinitionList();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCSeqType(location, new TCCharacterType(location));
 	}
 
 	@Override

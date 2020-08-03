@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class POIgnorePattern extends POPattern
 {
@@ -73,12 +72,6 @@ public class POIgnorePattern extends POPattern
 	public int getLength()
 	{
 		return ANY;	// Special value meaning "any length"
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCUnknownType(location);	// As we don't care
 	}
 
 	@Override

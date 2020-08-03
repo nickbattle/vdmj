@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class POIdentifierPattern extends POPattern
 {
@@ -61,12 +60,6 @@ public class POIdentifierPattern extends POPattern
 		PODefinitionList defs = new PODefinitionList();
 		defs.add(new POLocalDefinition(location, name, ptype));
 		return defs;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCUnknownType(location);
 	}
 
 	@Override

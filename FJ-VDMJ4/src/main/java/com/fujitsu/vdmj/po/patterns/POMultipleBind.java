@@ -86,12 +86,6 @@ public abstract class POMultipleBind extends PONode
 	/** Get a list of POs. */
 	abstract public ProofObligationList getProofObligations(POContextStack ctxt);
 
-	
-	public TCType getPossibleType()
-	{
-		return plist.getPossibleType(location);
-	}
-
 	/**
 	 * Implemented by all multiple binds to allow visitor processing.
 	 */

@@ -31,9 +31,7 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POSeqConcatExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class POConcatenationPattern extends POPattern
 {
@@ -76,19 +74,6 @@ public class POConcatenationPattern extends POPattern
 		int llen = left.getLength();
 		int rlen = right.getLength();
 		return (llen == ANY || rlen == ANY) ? ANY : llen + rlen;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		POPatternList plist = new POPatternList();
-		plist.add(left);
-		plist.add(right);
-		
-		TCType type = plist.getPossibleType(location);
-		
-		return type.isUnknown(location) ? 
-			new TCSeqType(location, new TCUnknownType(location)) : type;
 	}
 
 	@Override

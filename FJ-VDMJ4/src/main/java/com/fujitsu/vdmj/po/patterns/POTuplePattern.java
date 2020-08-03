@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.po.expressions.POTupleExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POTuplePattern extends POPattern
@@ -79,19 +78,6 @@ public class POTuplePattern extends POPattern
 		}
 
 		return defs;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		TCTypeList list = new TCTypeList();
-
-		for (POPattern p: plist)
-		{
-			list.add(p.getPossibleType());
-		}
-
-		return list.getType(location);
 	}
 
 	@Override

@@ -31,10 +31,7 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POMapUnionExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 
 public class POMapUnionPattern extends POPattern
@@ -81,20 +78,6 @@ public class POMapUnionPattern extends POPattern
 		defs.addAll(right.getAllDefinitions(type));
 
 		return defs;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		TCTypeSet list = new TCTypeSet();
-
-		list.add(left.getPossibleType());
-		list.add(right.getPossibleType());
-
-		TCType s = list.getType(location);
-
-		return s.isUnknown(location) ?
-			new TCMapType(location, new TCUnknownType(location), new TCUnknownType(location)) : s;
 	}
 
 	@Override

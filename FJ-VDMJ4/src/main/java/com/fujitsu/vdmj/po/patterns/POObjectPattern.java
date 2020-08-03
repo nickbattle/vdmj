@@ -102,12 +102,6 @@ public class POObjectPattern extends POPattern
 	}
 
 	@Override
-	public TCType getPossibleType()
-	{
-		return type;
-	}
-
-	@Override
 	public boolean isSimple()
 	{
 		return fieldlist.isSimple();

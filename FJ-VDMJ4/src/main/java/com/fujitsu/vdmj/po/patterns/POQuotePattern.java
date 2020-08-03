@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POQuoteLiteralExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.types.TCQuoteType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POQuotePattern extends POPattern
@@ -52,12 +51,6 @@ public class POQuotePattern extends POPattern
 	public PODefinitionList getAllDefinitions(TCType type)
 	{
 		return new PODefinitionList();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCQuoteType(location, value.value);
 	}
 
 	@Override

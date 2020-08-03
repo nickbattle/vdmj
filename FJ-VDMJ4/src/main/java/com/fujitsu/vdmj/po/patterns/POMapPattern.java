@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.po.expressions.POMapletExpressionList;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POMapPattern extends POPattern
@@ -93,19 +92,6 @@ public class POMapPattern extends POPattern
 		}
 
 		return defs;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		TCTypeSet types = new TCTypeSet();
-		
-		for (POMapletPattern p: maplets)
-		{
-			types.add(p.getPossibleType());
-		}
-		
-		return types.isEmpty() ? new TCMapType(location) : types.getType(location);
 	}
 
 	@Override

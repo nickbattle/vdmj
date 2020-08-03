@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionSet;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetAllVarNamesVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetPossibleTypeVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -76,9 +77,11 @@ public abstract class POPattern extends PONode implements Serializable
 
 	/**
 	 * Get the type(s) that could match this pattern.
-	 * TODO as a LeafPatternVisitor? See TCPossibleTypeVisitor.
 	 */
-	abstract public TCType getPossibleType();
+	public final TCType getPossibleType()
+	{
+		return apply(new POGetPossibleTypeVisitor(), null);
+	}
 
 	/**
 	 * Get a set of names for the pattern's variables. Note that if the

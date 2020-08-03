@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class POExpressionPattern extends POPattern
 {
@@ -50,12 +49,6 @@ public class POExpressionPattern extends POPattern
 	public PODefinitionList getAllDefinitions(TCType type)
 	{
 		return new PODefinitionList();	// Exp has no bindings
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCUnknownType(location);
 	}
 
 	@Override

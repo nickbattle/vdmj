@@ -23,14 +23,10 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.util.Utils;
 
 @SuppressWarnings("serial")
@@ -49,28 +45,6 @@ public class POPatternList extends POMappedList<TCPattern, POPattern>
 	public String toString()
 	{
 		return Utils.listToString(this);
-	}
-
-	public TCType getPossibleType(LexLocation location)
-	{
-		switch (size())
-		{
-			case 0:
-				return new TCUnknownType(location);
-
-			case 1:
-				return get(0).getPossibleType();
-
-			default:
-        		TCTypeSet list = new TCTypeSet();
-
-        		for (POPattern p: this)
-        		{
-        			list.add(p.getPossibleType());
-        		}
-
-        		return list.getType(location);		// NB. a union of types
-		}
 	}
 
 	public POExpressionList getMatchingExpressionList()

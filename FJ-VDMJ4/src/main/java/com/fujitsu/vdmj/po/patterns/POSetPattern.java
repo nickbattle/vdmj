@@ -88,12 +88,6 @@ public class POSetPattern extends POPattern
 	}
 
 	@Override
-	public TCType getPossibleType()
-	{
-		return new TCSetType(location, plist.getPossibleType(location));
-	}
-
-	@Override
 	public boolean isSimple()
 	{
 		return plist.isSimple();
