@@ -24,15 +24,10 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POMapEnumExpression;
 import com.fujitsu.vdmj.po.expressions.POMapletExpressionList;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.types.TCMapType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POMapPattern extends POPattern
@@ -76,50 +71,6 @@ public class POMapPattern extends POPattern
 	public int getLength()
 	{
 		return maplets.size();
-	}
-
-	@Override
-	public PODefinitionList getAllDefinitions(TCType type)
-	{
-		PODefinitionList defs = new PODefinitionList();
-
-		TCMapType map = type.getMap();
-
-		if (!map.empty)
-		{
-    		for (POMapletPattern p: maplets)
-    		{
-    			defs.addAll(p.getDefinitions(map));
-    		}
-		}
-
-		return defs;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (POMapletPattern p: maplets)
-		{
-			list.addAll(p.getVariableNames());
-		}
-
-		return list;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		TCTypeSet types = new TCTypeSet();
-		
-		for (POMapletPattern p: maplets)
-		{
-			types.add(p.getPossibleType());
-		}
-		
-		return types.isEmpty() ? new TCMapType(location) : types.getType(location);
 	}
 
 	@Override

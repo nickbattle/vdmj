@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 /**
@@ -53,12 +52,6 @@ public class POExternalDefinition extends PODefinition
 	public TCType getType()
 	{
 		return state.getType();
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return state.getVariableNames();
 	}
 
 	@Override

@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -98,12 +97,6 @@ public class TCLocalDefinition extends TCDefinition
 	public TCDefinitionList getDefinitions()
 	{
 		return new TCDefinitionList(this);
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList(name);
 	}
 
 	@Override

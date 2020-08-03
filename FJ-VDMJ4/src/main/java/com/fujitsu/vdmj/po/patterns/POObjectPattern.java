@@ -24,21 +24,14 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.PONewExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
-import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POObjectPattern extends POPattern
@@ -75,50 +68,6 @@ public class POObjectPattern extends POPattern
 		// Note... this may not actually match obj_C(...)
 		return new PONewExpression(location,
 			new TCIdentifierToken(classname.getLocation(), classname.getName(), false), list);
-	}
-
-	@Override
-	public PODefinitionList getAllDefinitions(TCType exptype)
-	{
-		PODefinitionList defs = new PODefinitionList();
-		TCClassType pattype = type.getClassType(null);
-		TCDefinitionList members = pattype.classdef.getDefinitions();
-
-		for (PONamePatternPair npp: fieldlist)
-		{
-			TCDefinition d = members.findName(npp.name, NameScope.STATE);	// NB. state lookup
-			
-			if (d != null)
-			{
-				d = d.deref();
-			}
-			
-			if (d instanceof TCInstanceVariableDefinition)
-			{
-				defs.addAll(npp.pattern.getAllDefinitions(d.getType()));
-			}
-		}
-
-		return defs;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (PONamePatternPair npp: fieldlist)
-		{
-			list.addAll(npp.pattern.getAllVariableNames());
-		}
-
-		return list;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return type;
 	}
 
 	@Override

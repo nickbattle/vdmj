@@ -515,12 +515,6 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		return defs;
 	}
 
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList(name);
-	}
-
 	public TCPatternListList getParamPatternList()
 	{
 		TCPatternListList parameters = new TCPatternListList();

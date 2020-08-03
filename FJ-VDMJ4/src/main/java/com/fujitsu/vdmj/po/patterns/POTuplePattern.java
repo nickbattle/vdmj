@@ -23,18 +23,11 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import java.util.Iterator;
-
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POTupleExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.types.TCProductType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POTuplePattern extends POPattern
@@ -65,47 +58,6 @@ public class POTuplePattern extends POPattern
 		}
 
 		return new POTupleExpression(location, list, null);
-	}
-
-	@Override
-	public PODefinitionList getAllDefinitions(TCType type)
-	{
-		PODefinitionList defs = new PODefinitionList();
-		TCProductType product = type.getProduct(plist.size());
-		Iterator<TCType> ti = product.types.iterator();
-
-		for (POPattern p: plist)
-		{
-			defs.addAll(p.getAllDefinitions(ti.next()));
-		}
-
-		return defs;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (POPattern p: plist)
-		{
-			list.addAll(p.getAllVariableNames());
-		}
-
-		return list;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		TCTypeList list = new TCTypeList();
-
-		for (POPattern p: plist)
-		{
-			list.add(p.getPossibleType());
-		}
-
-		return list.getType(location);
 	}
 
 	@Override

@@ -50,12 +50,6 @@ public class POMutexSyncDefinition extends PODefinition
 	}
 
 	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList();
-	}
-
-	@Override
 	public String toString()
 	{
 		return "mutex(" +

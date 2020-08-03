@@ -39,7 +39,6 @@ import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.pog.ValueBindingObligation;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
@@ -103,12 +102,6 @@ public class POEqualsDefinition extends PODefinition
 	public int hashCode()
 	{
 		return toString().hashCode();
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return defs == null ? new TCNameList() : defs.getVariableNames();
 	}
 
 	@Override

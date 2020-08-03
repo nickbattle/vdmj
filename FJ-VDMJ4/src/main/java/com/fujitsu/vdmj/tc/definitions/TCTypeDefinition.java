@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -438,13 +437,6 @@ public class TCTypeDefinition extends TCDefinition
 		}
 
 		return defs;
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		// This is only used in VDM++ type inheritance
-		return new TCNameList(name);
 	}
 
 	private TCExplicitFunctionDefinition getInvDefinition()

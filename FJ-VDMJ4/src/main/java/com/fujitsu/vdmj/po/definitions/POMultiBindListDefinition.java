@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.po.definitions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.patterns.POMultipleBindList;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
@@ -82,12 +81,6 @@ public class POMultiBindListDefinition extends PODefinition
 		}
 
 		return new TCUnionType(location, types);
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return defs == null ? new TCNameList() : defs.getVariableNames();
 	}
 
 	@Override

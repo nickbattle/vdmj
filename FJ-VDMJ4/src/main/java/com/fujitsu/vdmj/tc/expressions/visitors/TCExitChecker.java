@@ -45,11 +45,6 @@ public class TCExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeSet, En
 		visitorSet = visitors;
 	}
 
-	public TCExitChecker()
-	{
-		visitorSet = new TCVisitorSet<TCType, TCTypeSet, Environment>() {};
-	}
-
 	@Override
 	public TCTypeSet caseExpression(TCExpression node, Environment base)
 	{

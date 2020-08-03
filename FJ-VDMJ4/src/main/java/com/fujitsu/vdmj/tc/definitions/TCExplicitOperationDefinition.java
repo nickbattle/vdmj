@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPostOpExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPreOpExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -425,12 +424,6 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		}
 
 		return defs;
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList(name);
 	}
 
 	private TCExplicitFunctionDefinition getPreDefinition(Environment base)

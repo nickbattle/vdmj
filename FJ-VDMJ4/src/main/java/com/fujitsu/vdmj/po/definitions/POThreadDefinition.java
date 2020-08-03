@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.statements.POStatement;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -49,12 +48,6 @@ public class POThreadDefinition extends PODefinition
 	public TCType getType()
 	{
 		return new TCUnknownType(location);
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList(operationName);
 	}
 
 	@Override

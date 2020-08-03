@@ -30,6 +30,9 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionSet;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetAllDefinitionsVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetAllVarNamesVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetPossibleTypeVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -69,15 +72,19 @@ public abstract class POPattern extends PONode implements Serializable
 
 	/**
 	 * Get a complete list of all definitions, including duplicates.
-	 * TODO as a LeafPatternVisitor? See TCGetDefinitionsVisitor.
 	 */
-	abstract protected PODefinitionList getAllDefinitions(TCType type);
+	protected final PODefinitionList getAllDefinitions(TCType type)
+	{
+		return apply(new POGetAllDefinitionsVisitor(), type);
+	}
 
 	/**
 	 * Get the type(s) that could match this pattern.
-	 * TODO as a LeafPatternVisitor? See TCPossibleTypeVisitor.
 	 */
-	abstract public TCType getPossibleType();
+	public final TCType getPossibleType()
+	{
+		return apply(new POGetPossibleTypeVisitor(), null);
+	}
 
 	/**
 	 * Get a set of names for the pattern's variables. Note that if the
@@ -95,9 +102,9 @@ public abstract class POPattern extends PONode implements Serializable
 	/**
 	 * Get a complete list of the pattern's variable names, including duplicates.
 	 */
-	protected TCNameList getAllVariableNames()
+	protected final TCNameList getAllVariableNames()
 	{
-		return new TCNameList();	// TODO as a LeafPatternVisitor?
+		return apply(new POGetAllVarNamesVisitor(), null);
 	}
 
 	/**

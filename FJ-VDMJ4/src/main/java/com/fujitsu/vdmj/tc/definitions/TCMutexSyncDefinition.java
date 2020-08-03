@@ -69,12 +69,6 @@ public class TCMutexSyncDefinition extends TCDefinition
 	}
 
 	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList();
-	}
-
-	@Override
 	public String toString()
 	{
 		return "mutex(" +

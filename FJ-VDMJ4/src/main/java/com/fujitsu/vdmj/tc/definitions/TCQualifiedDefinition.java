@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -34,7 +33,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 public class TCQualifiedDefinition extends TCDefinition
 {
 	private static final long serialVersionUID = 1L;
-	private final TCDefinition def;
+	public final TCDefinition def;
 	private final TCType type;
 
 	public TCQualifiedDefinition(TCDefinition qualifies, TCType type)
@@ -91,12 +90,6 @@ public class TCQualifiedDefinition extends TCDefinition
 	public TCDefinitionList getDefinitions()
 	{
 		return def.getDefinitions();
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return def.getVariableNames();
 	}
 
 	@Override

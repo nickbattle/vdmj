@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -61,12 +60,6 @@ public class TCPerSyncDefinition extends TCDefinition
 	public TCType getType()
 	{
 		return new TCBooleanType(location);
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList();
 	}
 
 	@Override

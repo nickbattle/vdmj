@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POMapletExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCMapType;
@@ -55,14 +54,6 @@ public class POMapletPattern extends PONode
 	{
 		LexToken op = new LexKeywordToken(Token.MAPLET, from.location);
 		return new POMapletExpression(op.location, from.getMatchingExpression(), to.getMatchingExpression());
-	}
-
-	public PODefinitionList getDefinitions(TCMapType map)
-	{
-		PODefinitionList list = new PODefinitionList();
-		list.addAll(from.getAllDefinitions(map.from));
-		list.addAll(to.getAllDefinitions(map.to));
-		return list;
 	}
 
 	public TCNameList getVariableNames()

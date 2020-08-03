@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -56,12 +55,6 @@ public class POAssignmentDefinition extends PODefinition
 	public String toString()
 	{
 		return name + ":" + type + " := " + expression;
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList(name);
 	}
 
 	@Override

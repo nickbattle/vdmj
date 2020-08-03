@@ -24,13 +24,9 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.PONilExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.types.TCOptionalType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class PONilPattern extends POPattern
 {
@@ -45,18 +41,6 @@ public class PONilPattern extends POPattern
 	public String toString()
 	{
 		return "nil";
-	}
-
-	@Override
-	public PODefinitionList getAllDefinitions(TCType type)
-	{
-		return new PODefinitionList();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCOptionalType(location, new TCUnknownType(location));
 	}
 
 	@Override

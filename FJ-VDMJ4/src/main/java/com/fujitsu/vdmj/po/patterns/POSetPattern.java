@@ -24,14 +24,10 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POSetEnumExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.types.TCSetType;
-import com.fujitsu.vdmj.tc.types.TCType;
 
 
 public class POSetPattern extends POPattern
@@ -68,43 +64,6 @@ public class POSetPattern extends POPattern
 	public int getLength()
 	{
 		return plist.size();
-	}
-
-	@Override
-	public PODefinitionList getAllDefinitions(TCType type)
-	{
-		PODefinitionList defs = new PODefinitionList();
-
-		TCSetType set = type.getSet();
-
-		if (!set.empty)
-		{
-    		for (POPattern p: plist)
-    		{
-    			defs.addAll(p.getAllDefinitions(set.setof));
-    		}
-		}
-
-		return defs;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (POPattern p: plist)
-		{
-			list.addAll(p.getAllVariableNames());
-		}
-
-		return list;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCSetType(location, plist.getPossibleType(location));
 	}
 
 	@Override

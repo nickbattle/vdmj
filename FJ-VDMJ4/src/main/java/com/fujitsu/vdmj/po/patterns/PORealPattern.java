@@ -24,12 +24,9 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexRealToken;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.PORealLiteralExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.types.TCRealType;
-import com.fujitsu.vdmj.tc.types.TCType;
 
 public class PORealPattern extends POPattern
 {
@@ -46,18 +43,6 @@ public class PORealPattern extends POPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public PODefinitionList getAllDefinitions(TCType type)
-	{
-		return new PODefinitionList();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCRealType(location);
 	}
 
 	@Override

@@ -24,13 +24,10 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class POIgnorePattern extends POPattern
 {
@@ -64,21 +61,9 @@ public class POIgnorePattern extends POPattern
 	}
 
 	@Override
-	public PODefinitionList getAllDefinitions(TCType type)
-	{
-		return new PODefinitionList();
-	}
-
-	@Override
 	public int getLength()
 	{
 		return ANY;	// Special value meaning "any length"
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCUnknownType(location);	// As we don't care
 	}
 
 	@Override

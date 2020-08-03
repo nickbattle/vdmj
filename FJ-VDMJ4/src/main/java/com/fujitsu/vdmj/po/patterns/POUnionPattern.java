@@ -27,15 +27,9 @@ import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POSetUnionExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.types.TCSetType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 
 public class POUnionPattern extends POPattern
 {
@@ -70,42 +64,6 @@ public class POUnionPattern extends POPattern
 		int llen = left.getLength();
 		int rlen = right.getLength();
 		return (llen == ANY || rlen == ANY) ? ANY : llen + rlen;
-	}
-
-	@Override
-	public PODefinitionList getAllDefinitions(TCType type)
-	{
-		PODefinitionList defs = new PODefinitionList();
-
-		defs.addAll(left.getAllDefinitions(type));
-		defs.addAll(right.getAllDefinitions(type));
-
-		return defs;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		list.addAll(left.getAllVariableNames());
-		list.addAll(right.getAllVariableNames());
-
-		return list;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		TCTypeSet list = new TCTypeSet();
-
-		list.add(left.getPossibleType());
-		list.add(right.getPossibleType());
-
-		TCType s = list.getType(location);
-
-		return s.isUnknown(location) ?
-			new TCSetType(location, new TCUnknownType(location)) : s;
 	}
 
 	@Override

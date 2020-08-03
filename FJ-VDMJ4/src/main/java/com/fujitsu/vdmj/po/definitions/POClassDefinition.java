@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -61,16 +60,6 @@ public class POClassDefinition extends PODefinition
 		this.definitions = definitions;
 		this.invariant = invariant;
 		this.hasConstructors = hasConstructors;
-	}
-
-	/**
-	 * Get a list of the names of the variables defined locally.
-	 * @see org.PODefinition.vdmj.definitions.Definition#getVariableNames()
-	 */
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return definitions.getVariableNames();
 	}
 
 	/**

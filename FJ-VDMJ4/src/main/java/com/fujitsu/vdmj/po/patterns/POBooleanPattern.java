@@ -24,12 +24,9 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
-import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.types.TCBooleanType;
-import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POBooleanPattern extends POPattern
 {
@@ -46,18 +43,6 @@ public class POBooleanPattern extends POPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public PODefinitionList getAllDefinitions(TCType type)
-	{
-		return new PODefinitionList();
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCBooleanType(location);
 	}
 
 	@Override

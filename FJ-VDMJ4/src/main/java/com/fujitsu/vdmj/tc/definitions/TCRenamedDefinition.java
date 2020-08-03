@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -91,14 +90,6 @@ public class TCRenamedDefinition extends TCDefinition
 	public TCDefinitionList getDefinitions()
 	{
 		return new TCDefinitionList(this);
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		TCNameList both = new TCNameList(name);
-		both.add(def.name);
-		return both;
 	}
 
 	@Override

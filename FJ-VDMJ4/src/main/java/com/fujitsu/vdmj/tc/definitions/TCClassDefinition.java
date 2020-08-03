@@ -546,15 +546,6 @@ public class TCClassDefinition extends TCDefinition
 	}
 
 	/**
-	 * Get a list of the names of the variables defined locally.
-	 */
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return definitions.getVariableNames();
-	}
-
-	/**
 	 * Get this class' TCClassType.
 	 */
 	@Override

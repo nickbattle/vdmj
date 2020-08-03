@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCGetFreeVariablesVisitor;
+import com.fujitsu.vdmj.tc.definitions.visitors.TCGetVariableNamesVisitor;
 import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -164,7 +165,6 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * "name" which can be used in its scope. For example, a function may define
 	 * pre and post conditions, which cause implicit functions to be defined in
 	 * addition to the main definition for the function itself.
-	 * TODO as a LeafDefinitionVisitor?
 	 *
 	 * @return A list of definitions.
 	 */
@@ -172,9 +172,11 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 
 	/**
 	 * Return a list of variable names that would be defined by the definition.
-	 * TODO as a LeafDefinitionVisitor?
 	 */
-	abstract public TCNameList getVariableNames();
+	public final TCNameList getVariableNames()
+	{
+		return apply(new TCGetVariableNamesVisitor(), null);
+	}
 
 	/**
 	 * Return a list of free variables needed for the definition to initialise.

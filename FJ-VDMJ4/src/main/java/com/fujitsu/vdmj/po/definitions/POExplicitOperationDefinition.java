@@ -32,9 +32,9 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.statements.POStatement;
-import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.OperationPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
@@ -103,12 +103,6 @@ public class POExplicitOperationDefinition extends PODefinition
 	public TCType getType()
 	{
 		return type;		// NB entire "==>" type, not result
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList(name);
 	}
 
 	@Override

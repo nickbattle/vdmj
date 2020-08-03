@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
@@ -43,7 +42,7 @@ public class TCThreadDefinition extends TCDefinition
 	private static final long serialVersionUID = 1L;
 	public final TCStatement statement;
 	private TCNameToken operationName = null;
-	private TCExplicitOperationDefinition operationDef = null;
+	public TCExplicitOperationDefinition operationDef = null;
 
 	public TCThreadDefinition(TCStatement statement)
 	{
@@ -83,12 +82,6 @@ public class TCThreadDefinition extends TCDefinition
 	public TCType getType()
 	{
 		return new TCUnknownType(location);
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList(operationDef.name);
 	}
 
 	@Override

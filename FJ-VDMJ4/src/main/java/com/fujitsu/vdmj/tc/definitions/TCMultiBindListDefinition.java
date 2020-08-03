@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
@@ -44,7 +43,7 @@ public class TCMultiBindListDefinition extends TCDefinition
 {
 	private static final long serialVersionUID = 1L;
 	public final TCMultipleBindList bindings;
-	private TCDefinitionList defs = null;
+	public TCDefinitionList defs = null;
 
 	public TCMultiBindListDefinition(LexLocation location, TCMultipleBindList bindings)
 	{
@@ -146,12 +145,6 @@ public class TCMultiBindListDefinition extends TCDefinition
 	public TCDefinitionList getDefinitions()
 	{
 		return defs == null ? new TCDefinitionList() : defs;
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return defs == null ? new TCNameList() : defs.getVariableNames();
 	}
 
 	@Override

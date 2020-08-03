@@ -63,7 +63,7 @@ public class TCPossibleTypeVisitor extends TCPatternVisitor<TCType, Object>
 	@Override
 	public TCType casePattern(TCPattern node, Object arg)
 	{
-		return null;	// Never called
+		throw new RuntimeException("Missing TCPossibleTypeVisitor method");
 	}
 	
 	@Override

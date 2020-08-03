@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import java.util.List;
+
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
@@ -124,12 +125,6 @@ public class POExplicitFunctionDefinition extends PODefinition
 	public TCType getType()
 	{
 		return type;		// NB entire "->" type, not the result
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList(name);
 	}
 
 	@Override
