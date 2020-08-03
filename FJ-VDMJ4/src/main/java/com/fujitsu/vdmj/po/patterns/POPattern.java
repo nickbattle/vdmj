@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.PODefinitionSet;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetAllVarNamesVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -95,9 +96,9 @@ public abstract class POPattern extends PONode implements Serializable
 	/**
 	 * Get a complete list of the pattern's variable names, including duplicates.
 	 */
-	protected TCNameList getAllVariableNames()
+	protected final TCNameList getAllVariableNames()
 	{
-		return new TCNameList();	// TODO as a LeafPatternVisitor?
+		return apply(new POGetAllVarNamesVisitor(), null);
 	}
 
 	/**
