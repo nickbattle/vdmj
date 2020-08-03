@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.pog.ValueBindingObligation;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
@@ -89,12 +88,6 @@ public class POValueDefinition extends PODefinition
 	public TCType getType()
 	{
 		return type;
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return pattern.getVariableNames();
 	}
 
 	@Override

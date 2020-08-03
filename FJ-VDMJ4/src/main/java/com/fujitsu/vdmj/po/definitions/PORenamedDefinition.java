@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -52,14 +51,6 @@ public class PORenamedDefinition extends PODefinition
 	public String toString()
 	{
 		return def + " renamed " + name;
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		TCNameList both = new TCNameList(name);
-		both.add(def.name);
-		return both;
 	}
 
 	@Override

@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.po.definitions;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POQualifiedDefinition extends PODefinition
@@ -65,12 +64,6 @@ public class POQualifiedDefinition extends PODefinition
 	public int hashCode()
 	{
 		return def.hashCode();
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return def.getVariableNames();
 	}
 
 	@Override

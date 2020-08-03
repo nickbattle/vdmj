@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 /**
@@ -51,18 +50,6 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 	public PODefinitionList(POExplicitOperationDefinition invariant)
 	{
 		add(invariant);
-	}
-
-	public TCNameList getVariableNames()
-	{
-		TCNameList variableNames = new TCNameList();
-
-		for (PODefinition d: this)
-		{
-			variableNames.addAll(d.getVariableNames());
-		}
-
-		return variableNames;
 	}
 
 	@Override

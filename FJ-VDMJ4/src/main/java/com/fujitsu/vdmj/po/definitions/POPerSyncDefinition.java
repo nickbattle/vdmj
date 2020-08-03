@@ -56,12 +56,6 @@ public class POPerSyncDefinition extends PODefinition
 	}
 
 	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList();
-	}
-
-	@Override
 	public String toString()
 	{
 		return "per " + opname + " => " + guard;

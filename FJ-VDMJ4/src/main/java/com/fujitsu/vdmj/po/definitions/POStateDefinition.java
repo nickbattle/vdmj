@@ -28,9 +28,7 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFieldList;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -77,19 +75,6 @@ public class POStateDefinition extends PODefinition
 	public TCType getType()
 	{
 		return recordType;
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		TCNameList names = new TCNameList();
-		
-		for (TCField field: fields)
-		{
-			names.add(field.tagname);
-		}
-		
-		return names;
 	}
 
 	@Override

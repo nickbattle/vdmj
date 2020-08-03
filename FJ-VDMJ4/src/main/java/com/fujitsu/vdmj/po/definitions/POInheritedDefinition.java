@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -52,19 +51,6 @@ public class POInheritedDefinition extends PODefinition
 	public String toString()
 	{
 		return superdef.toString();
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		TCNameList names = new TCNameList();
-
-		for (TCNameToken vn: superdef.getVariableNames())
-		{
-			names.add(vn.getModifiedName(name.getModule()));
-		}
-
-		return names;
 	}
 
 	@Override

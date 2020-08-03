@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
+import com.fujitsu.vdmj.po.definitions.visitors.POGetVariableNamesVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -92,7 +93,12 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	/**
 	 * Return a list of variable names that would be defined by the definition.
 	 */
-	abstract public TCNameList getVariableNames();	// TODO as a LeafDefinitionVisitor?
+	public final TCNameList getVariableNames()
+	{
+		TCNameList list = new TCNameList();
+		list.addAll(apply(new POGetVariableNamesVisitor(), null));
+		return list;
+	}
 
 	/**
 	 * Return the static type of the definition. For example, the type of a

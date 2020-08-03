@@ -126,12 +126,6 @@ public class POImplicitOperationDefinition extends PODefinition
 	}
 
 	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList(name);
-	}
-
-	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
 		ProofObligationList obligations =

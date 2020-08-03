@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.pog.EquivRelationObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StrictOrderObligation;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -87,13 +86,6 @@ public class POTypeDefinition extends PODefinition
 	public TCType getType()
 	{
 		return type;
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		// This is only used in VDM++ type inheritance
-		return new TCNameList(name);
 	}
 
 	@Override
