@@ -643,12 +643,6 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		return defs;
 	}
 
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList(name);
-	}
-
 	private TCExplicitFunctionDefinition getPreDefinition()
 	{
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, name.getPreName(precondition.location),

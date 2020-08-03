@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -49,7 +48,7 @@ public class TCInheritedDefinition extends TCDefinition
 		setClassDefinition(def.classDefinition);
 	}
 
-	private void checkSuperDefinition()
+	public void checkSuperDefinition()
 	{
 		// This is used to get over the case where an inherited definition
 		// is a TCValueDefinition that has since been replaced with a new
@@ -108,20 +107,6 @@ public class TCInheritedDefinition extends TCDefinition
 	public TCDefinitionList getDefinitions()
 	{
 		return superdef.getDefinitions();
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		TCNameList names = new TCNameList();
-		checkSuperDefinition();
-
-		for (TCNameToken vn: superdef.getVariableNames())
-		{
-			names.add(vn.getModifiedName(name.getModule()));
-		}
-
-		return names;
 	}
 
 	@Override

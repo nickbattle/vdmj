@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.definitions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -205,12 +204,6 @@ public class TCEqualsDefinition extends TCDefinition
 	public TCDefinitionList getDefinitions()
 	{
 		return defs == null ? new TCDefinitionList() : defs;
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return defs == null ? new TCNameList() : defs.getVariableNames();
 	}
 
 	@Override

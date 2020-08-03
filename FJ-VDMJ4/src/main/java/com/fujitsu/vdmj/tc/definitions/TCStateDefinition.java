@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCStateInitExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -62,7 +61,7 @@ public class TCStateDefinition extends TCDefinition
 	public TCExplicitFunctionDefinition invdef = null;
 	public TCExplicitFunctionDefinition initdef = null;
 
-	private final TCDefinitionList statedefs;
+	public final TCDefinitionList statedefs;
 	private TCRecordType recordType;
 	public boolean canBeExecuted = true;
 
@@ -255,12 +254,6 @@ public class TCStateDefinition extends TCDefinition
 	public TCDefinitionList getDefinitions()
 	{
 		return statedefs;
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return statedefs.getVariableNames();
 	}
 
 	private TCExplicitFunctionDefinition getInvDefinition()

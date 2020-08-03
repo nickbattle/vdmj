@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -60,12 +59,6 @@ public class TCClassInvariantDefinition extends TCDefinition
 	public TCDefinitionList getDefinitions()
 	{
 		return new TCDefinitionList();
-	}
-
-	@Override
-	public TCNameList getVariableNames()
-	{
-		return new TCNameList();
 	}
 
 	@Override
