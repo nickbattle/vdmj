@@ -175,9 +175,7 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 */
 	public final TCNameList getVariableNames()
 	{
-		TCNameList list = new TCNameList();
-		list.addAll(apply(new TCGetVariableNamesVisitor(), null));
-		return list;
+		return apply(new TCGetVariableNamesVisitor(), null);
 	}
 
 	/**
