@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.annotations;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -60,12 +59,6 @@ public class TCAnnotatedExpression extends TCExpression
 		TCType type = expression.typeCheck(env, qualifiers, scope, constraint);
 		annotation.tcAfter(this, type, env, scope);
 		return type;
-	}
-
-	@Override
-	public TCDefinitionList getQualifiedDefs(Environment env)
-	{
-		return expression.getQualifiedDefs(env);
 	}
 
 	@Override

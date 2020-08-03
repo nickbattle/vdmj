@@ -23,7 +23,6 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -61,12 +60,6 @@ public class TCPreOpExpression extends TCExpression
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
 		return expression.typeCheck(env, null, scope, null);
-	}
-
-	@Override
-	public TCDefinitionList getQualifiedDefs(Environment env)
-	{
-		return expression.getQualifiedDefs(env);
 	}
 
 	@Override

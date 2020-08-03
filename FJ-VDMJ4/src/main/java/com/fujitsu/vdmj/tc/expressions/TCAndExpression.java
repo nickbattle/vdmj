@@ -40,14 +40,6 @@ public class TCAndExpression extends TCBooleanBinaryExpression
 	{
 		super(left, op, right);
 	}
-
-	@Override
-	public TCDefinitionList getQualifiedDefs(Environment env)
-	{
-		TCDefinitionList result = left.getQualifiedDefs(env);
-		result.addAll(right.getQualifiedDefs(env));
-		return result;
-	}
 	
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)

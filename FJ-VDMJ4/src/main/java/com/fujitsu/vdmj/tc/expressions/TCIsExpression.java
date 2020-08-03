@@ -25,8 +25,6 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCQualifiedDefinition;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
@@ -43,7 +41,7 @@ public class TCIsExpression extends TCExpression
 	public final TCNameToken typename;
 	public final TCExpression test;
 
-	private TCDefinition typedef = null;
+	public TCDefinition typedef = null;
 
 	public TCIsExpression(LexLocation location, TCNameToken typename, TCType type, TCExpression test)
 	{
@@ -81,40 +79,6 @@ public class TCIsExpression extends TCExpression
 		}
 
 		return checkConstraint(constraint, new TCBooleanType(location));
-	}
-
-	@Override
-	public TCDefinitionList getQualifiedDefs(Environment env)
-	{
-		TCDefinitionList result = new TCDefinitionList();
-		
-		if (test instanceof TCVariableExpression)
-		{
-			TCVariableExpression exp = (TCVariableExpression)test;
-			TCDefinition existing = env.findName(exp.name, NameScope.NAMESANDSTATE);
-			
-			if (existing != null && existing.nameScope.matches(NameScope.NAMES))
-			{
-        		if (basictype != null)
-        		{
-       				result.add(new TCQualifiedDefinition(existing, basictype));
-        		}
-        		else if (typename != null)
-        		{
-        			if (typedef == null)
-        			{
-        				typedef = env.findType(typename, location.module);
-        			}
-
-        			if (typedef != null)
-        			{
-        				result.add(new TCQualifiedDefinition(existing, typedef.getType()));
-        			}
-        		}
-			}
-		}
-		
-		return result;
 	}
 
 	@Override

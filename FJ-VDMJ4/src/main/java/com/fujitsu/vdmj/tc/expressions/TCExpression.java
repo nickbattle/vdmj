@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCQualifiedDefinitionFinder;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -160,11 +161,10 @@ public abstract class TCExpression extends TCNode implements Serializable
 	 * Search the expression for anything which qualifies the type of a definition,
 	 * like "is_real(a)", and produce a list of QualifiedDefinitions to add to the
 	 * environment.
-	 * TODO as a LeafExpressionVisitor?
 	 */
-	public TCDefinitionList getQualifiedDefs(Environment env)
+	public final TCDefinitionList getQualifiedDefs(Environment env)
 	{
-		return new TCDefinitionList();
+		return apply(new TCQualifiedDefinitionFinder(), env);
 	}
 	
 	/**
