@@ -35,6 +35,10 @@ import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCBindExitChecker;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCBindVisitor;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindExitChecker;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindVisitor;
 import com.fujitsu.vdmj.tc.statements.TCBlockStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
@@ -60,10 +64,14 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 	{
 		private final TCLeafExpressionVisitor<TCType, TCTypeSet, Environment> expVisitor;
 		private final TCStatementVisitor<TCTypeSet, Environment> stmtVisitor;
+		private final TCBindVisitor<TCTypeSet, Environment> bindVisitor;
+		private final TCMultipleBindVisitor<TCTypeSet, Environment> mbindVisitor;
 
 		public VisitorSet(TCExitChecker parent)
 		{
 			expVisitor = new com.fujitsu.vdmj.tc.expressions.visitors.TCExitChecker(this);
+			bindVisitor = new TCBindExitChecker(this);
+			mbindVisitor = new TCMultipleBindExitChecker(this);
 			stmtVisitor = parent;
 		}
 
@@ -77,6 +85,18 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 		public TCStatementVisitor<TCTypeSet, Environment> getStatementVisitor()
 		{
 			return stmtVisitor;
+		}
+		
+		@Override
+		public TCBindVisitor<TCTypeSet, Environment> getBindVisitor()
+		{
+			return bindVisitor;
+		}
+		
+		@Override
+		public TCMultipleBindVisitor<TCTypeSet, Environment> getMultiBindVisitor()
+		{
+			return mbindVisitor;
 		}
 	}
 
@@ -261,7 +281,7 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 	@Override
 	public TCTypeSet caseLetBeStStatement(TCLetBeStStatement node, Environment base)
 	{
-		TCTypeSet result = node.bind.exitCheck(base);
+		TCTypeSet result = node.bind.apply(visitorSet.getMultiBindVisitor(), base);
 		if (node.suchThat != null)
 		{
 			result.addAll(node.suchThat.apply(visitorSet.getExpressionVisitor(), base));

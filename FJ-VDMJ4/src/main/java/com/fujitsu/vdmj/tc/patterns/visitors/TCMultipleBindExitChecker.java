@@ -23,17 +23,23 @@
 
 package com.fujitsu.vdmj.tc.patterns.visitors;
 
-import com.fujitsu.vdmj.tc.expressions.visitors.TCExitChecker;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class TCMultipleBindExitChecker extends TCMultipleBindVisitor<TCTypeSet, Environment>
 {
-	private TCExitChecker expVisitor = new TCExitChecker();
+	private TCVisitorSet<TCType, TCTypeSet, Environment> visitorSet;
+
+	public TCMultipleBindExitChecker(TCVisitorSet<TCType, TCTypeSet, Environment> visitors)
+	{
+		visitorSet = visitors;
+	}
 
 	@Override
 	public TCTypeSet caseMultipleBind(TCMultipleBind node, Environment arg)
@@ -44,13 +50,13 @@ public class TCMultipleBindExitChecker extends TCMultipleBindVisitor<TCTypeSet, 
 	@Override
 	public TCTypeSet caseMultipleSeqBind(TCMultipleSeqBind node, Environment base)
 	{
-		return node.sequence.apply(expVisitor, base);
+		return node.sequence.apply(visitorSet.getExpressionVisitor(), base);
 	}
 
 	@Override
 	public TCTypeSet caseMultipleSetBind(TCMultipleSetBind node, Environment base)
 	{
-		return node.set.apply(expVisitor, base);
+		return node.set.apply(visitorSet.getExpressionVisitor(), base);
 	}
 	
 	@Override

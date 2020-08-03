@@ -165,7 +165,6 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	 * "name" which can be used in its scope. For example, a function may define
 	 * pre and post conditions, which cause implicit functions to be defined in
 	 * addition to the main definition for the function itself.
-	 * TODO as a LeafDefinitionVisitor?
 	 *
 	 * @return A list of definitions.
 	 */

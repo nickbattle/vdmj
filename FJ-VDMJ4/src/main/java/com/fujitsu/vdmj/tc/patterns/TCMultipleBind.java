@@ -26,10 +26,8 @@ package com.fujitsu.vdmj.tc.patterns;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindExitChecker;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -66,12 +64,6 @@ public abstract class TCMultipleBind extends TCNode
 
 	/** Perform a type check of the bind. */
 	abstract public TCType typeCheck(Environment base, NameScope scope);
-
-	/** Return a set of exceptions possibly raised by any expressions */
-	public final TCTypeSet exitCheck(Environment base)
-	{
-		return apply(new TCMultipleBindExitChecker(), base);
-	}
 
 	/**
 	 * Get a list of definitions for the variables in the pattern list.

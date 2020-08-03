@@ -23,17 +23,23 @@
 
 package com.fujitsu.vdmj.tc.patterns.visitors;
 
-import com.fujitsu.vdmj.tc.expressions.visitors.TCExitChecker;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class TCBindExitChecker extends TCBindVisitor<TCTypeSet, Environment>
 {
-	private TCExitChecker expVisitor = new TCExitChecker();
+	private TCVisitorSet<TCType, TCTypeSet, Environment> visitorSet;
+
+	public TCBindExitChecker(TCVisitorSet<TCType, TCTypeSet, Environment> visitors)
+	{
+		visitorSet = visitors;
+	}
 
 	@Override
 	public TCTypeSet caseBind(TCBind node, Environment arg)
@@ -44,13 +50,13 @@ public class TCBindExitChecker extends TCBindVisitor<TCTypeSet, Environment>
 	@Override
 	public TCTypeSet caseSeqBind(TCSeqBind node, Environment base)
 	{
-		return node.sequence.apply(expVisitor, base);
+		return node.sequence.apply(visitorSet.getExpressionVisitor(), base);
 	}
 
 	@Override
 	public TCTypeSet caseSetBind(TCSetBind node, Environment base)
 	{
-		return node.set.apply(expVisitor, base);
+		return node.set.apply(visitorSet.getExpressionVisitor(), base);
 	}
 	
 	@Override
