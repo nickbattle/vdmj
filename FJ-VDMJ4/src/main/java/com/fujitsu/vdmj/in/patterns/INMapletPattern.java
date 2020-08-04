@@ -30,8 +30,6 @@ import java.util.Vector;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
-import com.fujitsu.vdmj.tc.types.TCMapType;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
@@ -94,10 +92,5 @@ public class INMapletPattern extends INNode
 
 		return (from.getPossibleType() instanceof TCUnionType ||
 				to.getPossibleType() instanceof TCUnionType);
-	}
-	
-	public TCType getPossibleType()
-	{
-		return new TCMapType(from.location, from.getPossibleType(), to.getPossibleType());
 	}
 }

@@ -31,8 +31,6 @@ import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.types.TCBooleanType;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 
@@ -73,12 +71,6 @@ public class INBooleanPattern extends INPattern
 
 		result.add(new NameValuePairList());
 		return result;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return new TCBooleanType(location);
 	}
 
 	@Override

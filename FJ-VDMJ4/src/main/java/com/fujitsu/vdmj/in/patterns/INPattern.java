@@ -25,10 +25,11 @@ package com.fujitsu.vdmj.in.patterns;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.patterns.visitors.INFindIdentifiersVisitor;
 import com.fujitsu.vdmj.in.patterns.visitors.INGetAllVarNamesVisitor;
+import com.fujitsu.vdmj.in.patterns.visitors.INGetPossibleTypeVisitor;
 import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
@@ -97,14 +98,17 @@ public abstract class INPattern extends INNode implements Serializable
 	/**
 	 * Get the type(s) that can possibly match this pattern.
 	 */
-	protected abstract TCType getPossibleType();	// TODO as a LeafPatternVisitor?
+	protected final TCType getPossibleType()
+	{
+		return apply(new INGetPossibleTypeVisitor(), null);
+	}
 
 	/**
 	 * Return a list of the contained IdentifierPatterns
 	 */
-	protected List<INIdentifierPattern> findIdentifiers()
+	protected final List<INIdentifierPattern> findIdentifiers()
 	{
-		return new Vector<INIdentifierPattern>();		// TODO as a LeafPatternVisitor
+		return apply(new INFindIdentifiersVisitor(), null);
 	}
 
 	/**

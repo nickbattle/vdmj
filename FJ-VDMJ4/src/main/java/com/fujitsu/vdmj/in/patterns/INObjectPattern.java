@@ -160,25 +160,6 @@ public class INObjectPattern extends INPattern
 	}
 
 	@Override
-	public List<INIdentifierPattern> findIdentifiers()
-	{
-		List<INIdentifierPattern> list = new Vector<INIdentifierPattern>();
-
-		for (INNamePatternPair npp: fieldlist)
-		{
-			list.addAll(npp.pattern.findIdentifiers());
-		}
-
-		return list;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return type;
-	}
-
-	@Override
 	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseObjectPattern(this, arg);

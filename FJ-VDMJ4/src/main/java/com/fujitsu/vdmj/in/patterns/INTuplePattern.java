@@ -32,8 +32,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.util.Permutor;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.NameValuePair;
@@ -138,35 +136,9 @@ public class INTuplePattern extends INPattern
 	}
 
 	@Override
-	public TCType getPossibleType()
-	{
-		TCTypeList list = new TCTypeList();
-
-		for (INPattern p: plist)
-		{
-			list.add(p.getPossibleType());
-		}
-
-		return list.getType(location);
-	}
-
-	@Override
 	public boolean isConstrained()
 	{
 		return plist.isConstrained();
-	}
-
-	@Override
-	public List<INIdentifierPattern> findIdentifiers()
-	{
-		List<INIdentifierPattern> list = new Vector<INIdentifierPattern>();
-
-		for (INPattern p: plist)
-		{
-			list.addAll(p.findIdentifiers());
-		}
-
-		return list;
 	}
 
 	@Override

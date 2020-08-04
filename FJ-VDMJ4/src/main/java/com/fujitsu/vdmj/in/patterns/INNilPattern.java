@@ -30,9 +30,6 @@ import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
-import com.fujitsu.vdmj.tc.types.TCOptionalType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.NilValue;
 import com.fujitsu.vdmj.values.Value;
@@ -65,12 +62,6 @@ public class INNilPattern extends INPattern
 
 		result.add(new NameValuePairList());
 		return result;
-	}
-
-	@Override
-	protected TCType getPossibleType()
-	{
-		return new TCOptionalType(location, new TCUnknownType(location));
 	}
 
 	@Override

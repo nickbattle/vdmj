@@ -34,10 +34,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.types.TCMapType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.util.Permutor;
 import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.NameValuePair;
@@ -266,29 +262,6 @@ public class INMapUnionPattern extends INPattern
 	public boolean isConstrained()
 	{
 		return left.isConstrained() || right.isConstrained();
-	}
-
-	@Override
-	public List<INIdentifierPattern> findIdentifiers()
-	{
-		List<INIdentifierPattern> list = new Vector<INIdentifierPattern>();
-		list.addAll(left.findIdentifiers());
-		list.addAll(right.findIdentifiers());
-		return list;
-	}
-
-	@Override
-	protected TCType getPossibleType()
-	{
-		TCTypeSet list = new TCTypeSet();
-
-		list.add(left.getPossibleType());
-		list.add(right.getPossibleType());
-
-		TCType s = list.getType(location);
-
-		return s.isUnknown(location) ?
-			new TCMapType(location, new TCUnknownType(location), new TCUnknownType(location)) : s;
 	}
 
 	@Override

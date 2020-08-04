@@ -29,8 +29,6 @@ import java.util.Vector;
 import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 
@@ -67,12 +65,6 @@ public class INIgnorePattern extends INPattern
 	public boolean isConstrained()
 	{
 		return false;
-	}
-
-	@Override
-	protected TCType getPossibleType()
-	{
-		return new TCUnknownType(location);	// As we don't care
 	}
 
 	@Override

@@ -164,25 +164,6 @@ public class INRecordPattern extends INPattern
 	}
 
 	@Override
-	public List<INIdentifierPattern> findIdentifiers()
-	{
-		List<INIdentifierPattern> list = new Vector<INIdentifierPattern>();
-
-		for (INPattern p: plist)
-		{
-			list.addAll(p.findIdentifiers());
-		}
-
-		return list;
-	}
-
-	@Override
-	protected TCType getPossibleType()
-	{
-		return type;
-	}
-
-	@Override
 	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseRecordPattern(this, arg);
