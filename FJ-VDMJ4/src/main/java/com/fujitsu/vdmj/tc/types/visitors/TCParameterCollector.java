@@ -35,9 +35,9 @@ import com.fujitsu.vdmj.tc.types.TCType;
  * that are contained in the TCType being visited. This is used by the
  * TCTypeComparator. 
  */
-public class ParameterCollector extends TCLeafTypeVisitor<String, List<String>, Object>
+public class TCParameterCollector extends TCLeafTypeVisitor<String, List<String>, Object>
 {
-	public ParameterCollector()
+	public TCParameterCollector()
 	{
 		visitorSet = new TCVisitorSet<String, List<String>, Object>() {};
 	}
