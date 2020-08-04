@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.types.Instantiate;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.Value;
@@ -67,12 +66,6 @@ public class INLambdaExpression extends INExpression
 		TCFunctionType ftype = (TCFunctionType) Instantiate.instantiate(type, ctxt, ctxt);
 
 		return new FunctionValue(location, "lambda", ftype, paramPatterns, expression, free);
-	}
-	
-	@Override
-	public TCNameList getOldNames()
-	{
-		return expression.getOldNames();
 	}
 
 	@Override

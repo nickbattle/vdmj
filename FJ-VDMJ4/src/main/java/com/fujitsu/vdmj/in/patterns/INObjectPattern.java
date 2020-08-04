@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -158,38 +157,6 @@ public class INObjectPattern extends INPattern
 	public boolean isConstrained()
 	{
 		return fieldlist.isConstrained();
-	}
-
-	@Override
-	public List<INIdentifierPattern> findIdentifiers()
-	{
-		List<INIdentifierPattern> list = new Vector<INIdentifierPattern>();
-
-		for (INNamePatternPair npp: fieldlist)
-		{
-			list.addAll(npp.pattern.findIdentifiers());
-		}
-
-		return list;
-	}
-
-	@Override
-	public TCType getPossibleType()
-	{
-		return type;
-	}
-	
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (INNamePatternPair npp: fieldlist)
-		{
-			list.addAll(npp.pattern.getAllVariableNames());
-		}
-
-		return list;
 	}
 
 	@Override

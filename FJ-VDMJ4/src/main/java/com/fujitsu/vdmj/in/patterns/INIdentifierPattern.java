@@ -28,10 +28,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
@@ -79,28 +76,6 @@ public class INIdentifierPattern extends INPattern
 	public void setConstrained(boolean c)
 	{
 		constrained = c;
-	}
-
-	@Override
-	public List<INIdentifierPattern> findIdentifiers()
-	{
-		List<INIdentifierPattern> list = new Vector<INIdentifierPattern>();
-		list.add(this);
-		return list;
-	}
-
-	@Override
-	protected TCType getPossibleType()
-	{
-		return new TCUnknownType(location);
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-		list.add(name);
-		return list;
 	}
 
 	@Override

@@ -31,9 +31,6 @@ import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.types.TCCharacterType;
-import com.fujitsu.vdmj.tc.types.TCSeqType;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 
@@ -79,12 +76,6 @@ public class INStringPattern extends INPattern
 
 		result.add(new NameValuePairList());
 		return result;
-	}
-
-	@Override
-	protected TCType getPossibleType()
-	{
-		return new TCSeqType(location, new TCCharacterType(location));
 	}
 
 	@Override

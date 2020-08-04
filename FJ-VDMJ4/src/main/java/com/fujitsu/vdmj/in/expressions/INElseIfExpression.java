@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.Value;
 
 public class INElseIfExpression extends INExpression
@@ -63,14 +62,6 @@ public class INElseIfExpression extends INExpression
         {
         	return abort(e);
         }
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = elseIfExp.getOldNames();
-		list.addAll(thenExp.getOldNames());
-		return list;
 	}
 
 	@Override

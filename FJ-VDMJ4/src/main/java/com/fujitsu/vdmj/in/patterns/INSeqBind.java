@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.visitors.INBindVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.ValueList;
 
 public class INSeqBind extends INBind
@@ -61,12 +60,6 @@ public class INSeqBind extends INBind
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
 		return sequence.eval(ctxt).seqValue(ctxt);
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return sequence.getOldNames();
 	}
 
 	@Override

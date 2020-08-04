@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.SeqValue;
@@ -182,20 +181,6 @@ public class INSeqCompExpression extends INSeqExpression
 		}
 
 		return new SeqValue(seq);
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = first.getOldNames();
-		list.addAll(bind.getOldNames());
-
-		if (predicate != null)
-		{
-			list.addAll(predicate.getOldNames());
-		}
-
-		return list;
 	}
 
 	@Override

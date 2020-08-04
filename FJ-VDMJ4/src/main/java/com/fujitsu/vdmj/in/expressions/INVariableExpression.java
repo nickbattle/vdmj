@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.Value;
 
@@ -52,19 +51,6 @@ public class INVariableExpression extends INExpression
 	{
 		breakpoint.check(location, ctxt);
 		return ctxt.lookup(name);
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		if (name.isOld())
-		{
-			return new TCNameList(name);
-		}
-		else
-		{
-			return new TCNameList();
-		}
 	}
 
 	@Override

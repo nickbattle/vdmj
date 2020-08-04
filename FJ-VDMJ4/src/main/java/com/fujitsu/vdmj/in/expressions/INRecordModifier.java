@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 
 public class INRecordModifier extends INNode
 {
@@ -44,10 +43,5 @@ public class INRecordModifier extends INNode
 	public String toString()
 	{
 		return tag + " |-> " + value;
-	}
-
-	public TCNameList getOldNames()
-	{
-		return value.getOldNames();
 	}
 }

@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -101,14 +100,6 @@ public class INIotaExpression extends INExpression
 		}
 
 		return abort(4014, "Iota does not select a result", ctxt);
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = bind.getOldNames();
-		list.addAll(predicate.getOldNames());
-		return list;
 	}
 
 	@Override

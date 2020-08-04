@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2019 Nick Battle.
+ *	Copyright (c) 2020 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -21,44 +21,44 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.types.visitors;
+package com.fujitsu.vdmj.in.expressions.visitors;
 
-import java.util.List;
-import java.util.Vector;
+import com.fujitsu.vdmj.in.INVisitorSet;
+import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INVariableExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-import com.fujitsu.vdmj.tc.TCVisitorSet;
-import com.fujitsu.vdmj.tc.types.TCParameterType;
-import com.fujitsu.vdmj.tc.types.TCType;
-
-/**
- * This visitor produces a list of names for any parameter types
- * that are contained in the TCType being visited. This is used by the
- * TCTypeComparator. 
- */
-public class ParameterCollector extends TCLeafTypeVisitor<String, List<String>, Object>
+public class INOldNamesFinder extends INLeafExpressionVisitor<TCNameToken, TCNameList, Object>
 {
-	public ParameterCollector()
+	public INOldNamesFinder()
 	{
-		visitorSet = new TCVisitorSet<String, List<String>, Object>() {};
+		super(false);
+		visitorSet = new INVisitorSet<TCNameToken, TCNameList, Object>() {};
 	}
 
 	@Override
-	public List<String> caseParameterType(TCParameterType node, Object arg)
+	protected TCNameList newCollection()
 	{
-		List <String> all = newCollection();
-		all.add("@" + node.name);
-		return all;
+		return new TCNameList();
 	}
 
 	@Override
-	public List<String> caseType(TCType node, Object arg)
+	public TCNameList caseExpression(INExpression node, Object arg)
 	{
 		return newCollection();
 	}
 
 	@Override
-	protected List<String> newCollection()
+	public TCNameList caseVariableExpression(INVariableExpression node, Object arg)
 	{
-		return new Vector<String>();
+		if (node.name.isOld())
+		{
+			return new TCNameList(node.name);
+		}
+		else
+		{
+			return new TCNameList();
+		}
 	}
 }

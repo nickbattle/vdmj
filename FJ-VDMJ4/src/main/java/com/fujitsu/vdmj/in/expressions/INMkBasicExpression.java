@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.in.expressions;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCTokenType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.TokenValue;
@@ -75,12 +74,6 @@ public class INMkBasicExpression extends INExpression
 		}
 
 		return v;
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return arg.getOldNames();
 	}
 
 	@Override

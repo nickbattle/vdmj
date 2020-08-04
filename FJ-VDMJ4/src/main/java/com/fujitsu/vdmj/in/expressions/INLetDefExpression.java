@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.in.definitions.INExplicitFunctionDefinition;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FunctionValue;
@@ -87,14 +86,6 @@ public class INLetDefExpression extends INExpression
 		}
 
 		return expression.eval(evalContext);
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = localDefs.getOldNames();
-		list.addAll(expression.getOldNames());
-		return list;
 	}
 
 	@Override

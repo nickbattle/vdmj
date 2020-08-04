@@ -32,11 +32,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.types.TCSetType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.util.Permutor;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
@@ -261,43 +256,9 @@ public class INUnionPattern extends INPattern
 	}
 
 	@Override
-	public TCType getPossibleType()
-	{
-		TCTypeSet list = new TCTypeSet();
-
-		list.add(left.getPossibleType());
-		list.add(right.getPossibleType());
-
-		TCType s = list.getType(location);
-
-		return s.isUnknown(location) ?
-			new TCSetType(location, new TCUnknownType(location)) : s;
-	}
-
-	@Override
 	public boolean isConstrained()
 	{
 		return left.isConstrained() || right.isConstrained();
-	}
-
-	@Override
-	public List<INIdentifierPattern> findIdentifiers()
-	{
-		List<INIdentifierPattern> list = new Vector<INIdentifierPattern>();
-		list.addAll(left.findIdentifiers());
-		list.addAll(right.findIdentifiers());
-		return list;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		list.addAll(left.getAllVariableNames());
-		list.addAll(right.getAllVariableNames());
-
-		return list;
 	}
 
 	@Override

@@ -103,16 +103,4 @@ public class INPatternList extends INMappedList<TCPattern, INPattern>
 
 		return names.hasDuplicates();	// No duplicates => not constrained
 	}
-	
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (INPattern p: this)
-		{
-			list.addAll(p.getAllVariableNames());
-		}
-
-		return list;
-	}
 }

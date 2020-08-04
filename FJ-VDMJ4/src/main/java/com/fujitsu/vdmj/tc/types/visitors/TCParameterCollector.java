@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2019 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -21,38 +21,44 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.patterns.visitors;
+package com.fujitsu.vdmj.tc.types.visitors;
 
-import com.fujitsu.vdmj.po.POVisitorSet;
-import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
-import com.fujitsu.vdmj.po.patterns.POPattern;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import java.util.List;
+import java.util.Vector;
 
-public class POGetAllVarNamesVisitor extends POLeafPatternVisitor<TCNameToken, TCNameList, Object>
+import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
+import com.fujitsu.vdmj.tc.types.TCType;
+
+/**
+ * This visitor produces a list of names for any parameter types
+ * that are contained in the TCType being visited. This is used by the
+ * TCTypeComparator. 
+ */
+public class TCParameterCollector extends TCLeafTypeVisitor<String, List<String>, Object>
 {
-	public POGetAllVarNamesVisitor()
+	public TCParameterCollector()
 	{
-		visitorSet = new POVisitorSet<TCNameToken, TCNameList, Object>() {};
-	}
-	
-	@Override
-	protected TCNameList newCollection()
-	{
-		return new TCNameList();
+		visitorSet = new TCVisitorSet<String, List<String>, Object>() {};
 	}
 
 	@Override
-	public TCNameList casePattern(POPattern node, Object arg)
+	public List<String> caseParameterType(TCParameterType node, Object arg)
+	{
+		List <String> all = newCollection();
+		all.add("@" + node.name);
+		return all;
+	}
+
+	@Override
+	public List<String> caseType(TCType node, Object arg)
 	{
 		return newCollection();
 	}
-	
+
 	@Override
-	public TCNameList caseIdentifierPattern(POIdentifierPattern node, Object arg)
+	protected List<String> newCollection()
 	{
-		TCNameList list = newCollection();
-		list.add(node.name);
-		return list;
+		return new Vector<String>();
 	}
 }

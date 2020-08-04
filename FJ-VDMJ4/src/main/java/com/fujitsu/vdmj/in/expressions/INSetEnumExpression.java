@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
@@ -70,12 +69,6 @@ public class INSetEnumExpression extends INSetExpression
 		{
 			return abort(e);
 		}
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return members.getOldNames();
 	}
 
 	@Override

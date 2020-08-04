@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.BooleanValue;
@@ -106,12 +105,6 @@ public class INIsExpression extends INExpression
 		}
 
 		return new BooleanValue(false);
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return test.getOldNames();
 	}
 
 	@Override

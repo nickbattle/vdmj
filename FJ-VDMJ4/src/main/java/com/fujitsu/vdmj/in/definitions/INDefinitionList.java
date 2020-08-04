@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.NameValuePairList;
 
@@ -125,18 +124,6 @@ public class INDefinitionList extends INMappedList<TCDefinition, INDefinition>
 		}
 
 		return sb.toString();
-	}
-
-	public TCNameList getOldNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (INDefinition d: this)
-		{
-			list.addAll(d.getOldNames());
-		}
-
-		return list;
 	}
 
 	public boolean hasSubclassResponsibility()

@@ -55,7 +55,7 @@ import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.tc.types.TCVoidReturnType;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
-import com.fujitsu.vdmj.tc.types.visitors.ParameterCollector;
+import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 
 
 /**
@@ -356,8 +356,8 @@ public class TypeComparator
 
 		if (from instanceof TCParameterType)
 		{
-			String fstr = from.apply(new ParameterCollector(), null).get(0);
-			List<String> tstr = to.apply(new ParameterCollector(), null);
+			String fstr = from.apply(new TCParameterCollector(), null).get(0);
+			List<String> tstr = to.apply(new TCParameterCollector(), null);
 			
 			if (tstr.contains(fstr) && !(to instanceof TCParameterType))
 			{
@@ -552,8 +552,8 @@ public class TypeComparator
 			}
 			else if (to instanceof TCParameterType)
 			{
-				String tstr = to.apply(new ParameterCollector(), null).get(0);
-				List<String> fstr = from.apply(new ParameterCollector(), null);
+				String tstr = to.apply(new TCParameterCollector(), null).get(0);
+				List<String> fstr = from.apply(new TCParameterCollector(), null);
 				
 				if (fstr.contains(tstr) && !(from instanceof TCParameterType))
 				{

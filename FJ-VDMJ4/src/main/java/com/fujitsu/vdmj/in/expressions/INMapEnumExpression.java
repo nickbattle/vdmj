@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.in.expressions;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.Value;
@@ -77,19 +76,6 @@ public class INMapEnumExpression extends INMapExpression
 		}
 
 		return new MapValue(map);
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (INMapletExpression maplet: members)
-		{
-			list.addAll(maplet.getOldNames());
-		}
-
-		return list;
 	}
 
 	@Override

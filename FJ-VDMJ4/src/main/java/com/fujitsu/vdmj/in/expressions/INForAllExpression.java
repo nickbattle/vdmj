@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.NameValuePair;
@@ -124,20 +123,6 @@ public class INForAllExpression extends INExpression
 	    }
 
 		return new BooleanValue(true);
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (INMultipleBind mb: bindList)
-		{
-			list.addAll(mb.getOldNames());
-		}
-
-		list.addAll(predicate.getOldNames());
-		return list;
 	}
 
 	@Override

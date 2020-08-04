@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.in.definitions;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.NameValuePairList;
 
@@ -66,12 +65,6 @@ public class INQualifiedDefinition extends INDefinition
 	public int hashCode()
 	{
 		return def.hashCode();
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return def.getOldNames();
 	}
 
 	@Override

@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FieldMap;
@@ -84,19 +83,6 @@ public class INMuExpression extends INExpression
 		{
 			return abort(e);
 		}
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = record.getOldNames();
-
-		for (INRecordModifier rm: modifiers)
-		{
-			list.addAll(rm.getOldNames());
-		}
-
-		return list;
 	}
 
 	@Override

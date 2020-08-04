@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.values.BooleanValue;
@@ -90,14 +89,6 @@ public class INSameBaseClassExpression extends INExpression
 	public String toString()
 	{
 		return "samebaseclass(" + left + "," + right + ")";
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = left.getOldNames();
-		list.addAll(right.getOldNames());
-		return list;
 	}
 
 	@Override

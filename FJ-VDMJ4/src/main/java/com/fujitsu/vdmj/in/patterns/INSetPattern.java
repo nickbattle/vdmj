@@ -32,9 +32,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.types.TCSetType;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.util.Permutor;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
@@ -206,31 +203,6 @@ public class INSetPattern extends INPattern
 		}
 
 		return plist.isConstrained();
-	}
-
-	@Override
-	public List<INIdentifierPattern> findIdentifiers()
-	{
-		List<INIdentifierPattern> list = new Vector<INIdentifierPattern>();
-
-		for (INPattern p: plist)
-		{
-			list.addAll(p.findIdentifiers());
-		}
-
-		return list;
-	}
-
-	@Override
-	protected TCType getPossibleType()
-	{
-		return new TCSetType(location, plist.getPossibleType(location));
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		return plist.getAllVariableNames();
 	}
 
 	@Override

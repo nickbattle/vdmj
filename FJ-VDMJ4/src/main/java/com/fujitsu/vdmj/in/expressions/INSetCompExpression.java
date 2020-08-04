@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
@@ -132,24 +131,6 @@ public class INSetCompExpression extends INSetExpression
 		{
 			return abort(e);
 		}
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = first.getOldNames();
-
-		for (INMultipleBind mb: bindings)
-		{
-			list.addAll(mb.getOldNames());
-		}
-
-		if (predicate != null)
-		{
-			list.addAll(predicate.getOldNames());
-		}
-
-		return list;
 	}
 
 	@Override

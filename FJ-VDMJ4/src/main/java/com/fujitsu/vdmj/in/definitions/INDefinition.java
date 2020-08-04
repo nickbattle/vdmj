@@ -38,7 +38,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -100,14 +99,6 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	public int hashCode()
 	{
 		return name.hashCode();		// Used for sets of definitions (see equals).
-	}
-
-	/**
-	 * Return a list of old names used by the definition.
-	 */
-	public TCNameList getOldNames()
-	{
-		return new TCNameList(); 	// TODO as a LeafDefinitionVisitor?
 	}
 
 	/**

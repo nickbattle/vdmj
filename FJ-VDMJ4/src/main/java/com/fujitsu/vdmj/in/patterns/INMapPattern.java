@@ -34,10 +34,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.types.TCMapType;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.util.Permutor;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.NameValuePair;
@@ -200,45 +196,6 @@ public class INMapPattern extends INPattern
 		}
 
 		return false;
-	}
-
-	@Override
-	public List<INIdentifierPattern> findIdentifiers()
-	{
-		List<INIdentifierPattern> list = new Vector<INIdentifierPattern>();
-
-		for (INMapletPattern p: maplets)
-		{
-			list.addAll(p.findIdentifiers());
-		}
-
-		return list;
-	}
-
-	@Override
-	protected TCType getPossibleType()
-	{
-		TCTypeSet types = new TCTypeSet();
-		
-		for (INMapletPattern p: maplets)
-		{
-			types.add(p.getPossibleType());
-		}
-		
-		return types.isEmpty() ? new TCMapType(location) : types.getType(location);
-	}
-	
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (INMapletPattern p: maplets)
-		{
-			list.addAll(p.getAllVariableNames());
-		}
-
-		return list;
 	}
 
 	@Override

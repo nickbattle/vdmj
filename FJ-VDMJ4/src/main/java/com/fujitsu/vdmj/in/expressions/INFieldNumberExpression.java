@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ExceptionHandler;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -74,12 +73,6 @@ public class INFieldNumberExpression extends INExpression
         {
         	return abort(e);
         }
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return tuple.getOldNames();
 	}
 
 	@Override

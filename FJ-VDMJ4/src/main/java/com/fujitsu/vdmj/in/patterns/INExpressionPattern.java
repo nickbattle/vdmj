@@ -30,8 +30,6 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 
@@ -71,12 +69,6 @@ public class INExpressionPattern extends INPattern
 	public int getLength()
 	{
 		return ANY;	// Special value meaning "any length"
-	}
-
-	@Override
-	protected TCType getPossibleType()
-	{
-		return new TCUnknownType(location);
 	}
 
 	@Override

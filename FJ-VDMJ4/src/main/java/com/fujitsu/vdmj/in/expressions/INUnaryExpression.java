@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 
 abstract public class INUnaryExpression extends INExpression
 {
@@ -36,12 +35,6 @@ abstract public class INUnaryExpression extends INExpression
 	{
 		super(location);
 		this.exp = exp;
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return exp.getOldNames();
 	}
 
 	@Override

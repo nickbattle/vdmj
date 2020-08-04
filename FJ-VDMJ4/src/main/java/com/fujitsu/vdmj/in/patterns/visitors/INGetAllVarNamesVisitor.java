@@ -21,19 +21,19 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.po.patterns.visitors;
+package com.fujitsu.vdmj.in.patterns.visitors;
 
-import com.fujitsu.vdmj.po.POVisitorSet;
-import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
-import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.in.INVisitorSet;
+import com.fujitsu.vdmj.in.patterns.INIdentifierPattern;
+import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class POGetAllVarNamesVisitor extends POLeafPatternVisitor<TCNameToken, TCNameList, Object>
+public class INGetAllVarNamesVisitor extends INLeafPatternVisitor<TCNameToken, TCNameList, Object>
 {
-	public POGetAllVarNamesVisitor()
+	public INGetAllVarNamesVisitor()
 	{
-		visitorSet = new POVisitorSet<TCNameToken, TCNameList, Object>() {};
+		visitorSet = new INVisitorSet<TCNameToken, TCNameList, Object>() {};
 	}
 	
 	@Override
@@ -43,13 +43,13 @@ public class POGetAllVarNamesVisitor extends POLeafPatternVisitor<TCNameToken, T
 	}
 
 	@Override
-	public TCNameList casePattern(POPattern node, Object arg)
+	public TCNameList casePattern(INPattern node, Object arg)
 	{
 		return newCollection();
 	}
 	
 	@Override
-	public TCNameList caseIdentifierPattern(POIdentifierPattern node, Object arg)
+	public TCNameList caseIdentifierPattern(INIdentifierPattern node, Object arg)
 	{
 		TCNameList list = newCollection();
 		list.add(node.name);

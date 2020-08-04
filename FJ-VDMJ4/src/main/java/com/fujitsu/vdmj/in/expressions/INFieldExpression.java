@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ExceptionHandler;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.FieldMap;
@@ -101,12 +100,6 @@ public class INFieldExpression extends INExpression
 		}
 
 		return r;
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return object.getOldNames();
 	}
 
 	@Override

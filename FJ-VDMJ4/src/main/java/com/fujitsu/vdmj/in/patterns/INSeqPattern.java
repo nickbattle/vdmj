@@ -32,9 +32,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.types.TCSeqType;
-import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.util.Permutor;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
@@ -152,30 +149,6 @@ public class INSeqPattern extends INPattern
 	public boolean isConstrained()
 	{
 		return plist.isConstrained();
-	}
-
-	@Override
-	public List<INIdentifierPattern> findIdentifiers()
-	{
-		List<INIdentifierPattern> list = new Vector<INIdentifierPattern>();
-
-		for (INPattern p: plist)
-		{
-			list.addAll(p.findIdentifiers());
-		}
-
-		return list;
-	}
-	@Override
-	protected TCType getPossibleType()
-	{
-		return new TCSeqType(location, plist.getPossibleType(location));
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		return plist.getAllVariableNames();
 	}
 
 	@Override
