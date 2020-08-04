@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 
 abstract public class INBinaryExpression extends INExpression
 {
@@ -47,14 +46,6 @@ abstract public class INBinaryExpression extends INExpression
 	public String toString()
 	{
 		return "(" + left + " " + op + " " + right + ")";
-	}
-	
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = left.getOldNames();
-		list.addAll(right.getOldNames());
-		return list;
 	}
 
 	@Override

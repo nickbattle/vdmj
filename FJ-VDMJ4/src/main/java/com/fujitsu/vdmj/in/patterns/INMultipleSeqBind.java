@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.visitors.INMultipleBindVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.ValueList;
 
 public class INMultipleSeqBind extends INMultipleBind
@@ -59,12 +58,6 @@ public class INMultipleSeqBind extends INMultipleBind
 			abort(e);
 			return null;
 		}
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return sequence.getOldNames();
 	}
 
 	@Override

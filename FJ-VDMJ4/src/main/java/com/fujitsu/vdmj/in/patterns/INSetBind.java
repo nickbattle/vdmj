@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.visitors.INBindVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
@@ -83,12 +82,6 @@ public class INSetBind extends INBind
 		}
 
 		return results;
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return set.getOldNames();
 	}
 
 	@Override

@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionFinder;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionUpdatableFinder;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.expressions.visitors.INHistoryExpressionFinder;
+import com.fujitsu.vdmj.in.expressions.visitors.INOldNamesFinder;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
@@ -143,9 +144,9 @@ public abstract class INExpression extends INNode implements Serializable
 	 * 
 	 * @return A list of old variable names.
 	 */
-	public TCNameList getOldNames()
+	public final TCNameList getOldNames()
 	{
-		return new TCNameList();	// TODO as a LeafDefinitionVisitor?
+		return apply(new INOldNamesFinder(), null);
 	}
 
 	/**

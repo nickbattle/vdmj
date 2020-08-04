@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.runtime.ClassContext;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.values.BooleanValue;
@@ -217,12 +216,6 @@ public class INPostOpExpression extends INExpression
 	public String toString()
 	{
 		return postexpression.toString();
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return postexpression.getOldNames();
 	}
 
 	@Override

@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -68,9 +67,6 @@ public abstract class INMultipleBind extends INNode
 
 	/** Get a list of all the possible values to bind the variables to. */ 
 	abstract public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException;
-
-	/** Return a list of old names used by the bind. */
-	abstract public TCNameList getOldNames();
 
 	/**
 	 * @see org.INDefinition.vdmj.definitions.Definition#abort

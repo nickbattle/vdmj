@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.Value;
 
 public class INCaseAlternative extends INNode
@@ -69,10 +68,5 @@ public class INCaseAlternative extends INNode
 		}
 
 		return null;
-	}
-
-	public TCNameList getOldNames()
-	{
-		return result.getOldNames();
 	}
 }

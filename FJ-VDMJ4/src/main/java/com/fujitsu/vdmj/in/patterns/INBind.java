@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.in.patterns.visitors.INBindVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.ValueList;
 
 /**
@@ -57,9 +56,6 @@ public abstract class INBind extends INNode implements Serializable
 
 	/** Return a list of all possible values for the bind. */ 
 	abstract public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException;
-
-	/** Return a list of all old values read by the bind evaluation. */
-	abstract public TCNameList getOldNames();
 
 	/**
 	 * Implemented by all binds to allow visitor processing.

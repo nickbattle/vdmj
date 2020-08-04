@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.ObjectValue;
@@ -94,12 +93,6 @@ public class INIsOfBaseClassExpression extends INExpression
 	public String toString()
 	{
 		return "isofbaseclass(" + baseclass + "," + exp + ")";
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return exp.getOldNames();
 	}
 
 	@Override

@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.in.expressions;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.MapValue;
@@ -132,14 +131,6 @@ public class INApplyExpression extends INExpression
 		{
 			return abort(e);
 		}
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = args.getOldNames();
-		list.addAll(root.getOldNames());
-		return list;
 	}
 
 	@Override

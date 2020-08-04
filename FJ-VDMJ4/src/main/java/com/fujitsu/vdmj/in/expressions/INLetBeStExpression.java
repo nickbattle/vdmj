@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Quantifier;
@@ -123,20 +122,6 @@ public class INLetBeStExpression extends INExpression
         }
 
 		return abort(4015, "Let be st found no applicable bindings", ctxt);
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = bind.getOldNames();
-
-		if (suchThat != null)
-		{
-			list.addAll(suchThat.getOldNames());
-		}
-
-		list.addAll(value.getOldNames());
-		return list;
 	}
 
 	@Override

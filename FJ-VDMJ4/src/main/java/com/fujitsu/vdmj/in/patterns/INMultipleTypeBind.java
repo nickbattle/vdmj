@@ -27,7 +27,6 @@ import com.fujitsu.vdmj.in.patterns.visitors.INMultipleBindVisitor;
 import com.fujitsu.vdmj.in.types.GetAllValues;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -52,12 +51,6 @@ public class INMultipleTypeBind extends INMultipleBind
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
 		return GetAllValues.ofType(type, ctxt);
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		return new TCNameList();
 	}
 
 	@Override

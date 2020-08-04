@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.in.expressions;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.Value;
 
@@ -73,24 +72,6 @@ public class INCasesExpression extends INExpression
 		}
 
 		return abort(4004, "No cases apply for " + val, ctxt);
-	}
-
-	@Override
-	public TCNameList getOldNames()
-	{
-		TCNameList list = exp.getOldNames();
-
-		for (INCaseAlternative c: cases)
-		{
-			list.addAll(c.getOldNames());
-		}
-
-		if (others != null)
-		{
-			list.addAll(others.getOldNames());
-		}
-
-		return list;
 	}
 
 	@Override
