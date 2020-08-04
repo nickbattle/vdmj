@@ -24,10 +24,7 @@
 package com.fujitsu.vdmj.in.expressions.visitors;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.definitions.INDefinition;
-import com.fujitsu.vdmj.in.definitions.INValueDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INLetDefExpression;
 import com.fujitsu.vdmj.in.expressions.INVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -63,23 +60,5 @@ public class INOldNamesFinder extends INLeafExpressionVisitor<TCNameToken, TCNam
 		{
 			return new TCNameList();
 		}
-	}
-	
-	@Override
-	public TCNameList caseLetDefExpression(INLetDefExpression node, Object arg)
-	{
-		TCNameList list = node.expression.apply(this, arg);
-
-		// Process value defs here rather than creating a definition visitor
-		for (INDefinition def: node.localDefs)
-		{
-			if (def instanceof INValueDefinition)
-			{
-				INValueDefinition vdef = (INValueDefinition)def;
-				list.addAll(vdef.exp.apply(this, arg));
-			}
-		}
-		
-		return list;
 	}
 }
