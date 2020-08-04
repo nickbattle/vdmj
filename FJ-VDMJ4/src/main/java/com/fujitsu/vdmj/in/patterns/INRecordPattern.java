@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -181,12 +180,6 @@ public class INRecordPattern extends INPattern
 	protected TCType getPossibleType()
 	{
 		return type;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		return plist.getAllVariableNames();
 	}
 
 	@Override

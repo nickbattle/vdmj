@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -286,17 +285,6 @@ public class INUnionPattern extends INPattern
 		List<INIdentifierPattern> list = new Vector<INIdentifierPattern>();
 		list.addAll(left.findIdentifiers());
 		list.addAll(right.findIdentifiers());
-		return list;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		list.addAll(left.getAllVariableNames());
-		list.addAll(right.getAllVariableNames());
-
 		return list;
 	}
 

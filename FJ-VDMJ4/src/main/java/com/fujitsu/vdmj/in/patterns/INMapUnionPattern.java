@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -290,17 +289,6 @@ public class INMapUnionPattern extends INPattern
 
 		return s.isUnknown(location) ?
 			new TCMapType(location, new TCUnknownType(location), new TCUnknownType(location)) : s;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		list.addAll(left.getAllVariableNames());
-		list.addAll(right.getAllVariableNames());
-
-		return list;
 	}
 
 	@Override

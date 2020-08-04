@@ -28,7 +28,6 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -93,14 +92,6 @@ public class INIdentifierPattern extends INPattern
 	protected TCType getPossibleType()
 	{
 		return new TCUnknownType(location);
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-		list.add(name);
-		return list;
 	}
 
 	@Override

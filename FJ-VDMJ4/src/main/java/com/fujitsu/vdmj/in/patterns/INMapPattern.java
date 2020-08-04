@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -226,19 +225,6 @@ public class INMapPattern extends INPattern
 		}
 		
 		return types.isEmpty() ? new TCMapType(location) : types.getType(location);
-	}
-	
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		TCNameList list = new TCNameList();
-
-		for (INMapletPattern p: maplets)
-		{
-			list.addAll(p.getAllVariableNames());
-		}
-
-		return list;
 	}
 
 	@Override

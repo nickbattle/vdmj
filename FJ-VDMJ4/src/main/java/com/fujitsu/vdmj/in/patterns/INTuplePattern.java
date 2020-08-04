@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.util.Permutor;
@@ -168,12 +167,6 @@ public class INTuplePattern extends INPattern
 		}
 
 		return list;
-	}
-
-	@Override
-	public TCNameList getAllVariableNames()
-	{
-		return plist.getAllVariableNames();
 	}
 
 	@Override
