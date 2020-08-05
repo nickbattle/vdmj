@@ -201,23 +201,19 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseImplicitFunctionDefinition(TCImplicitFunctionDefinition node, S arg)
 	{
- 		C all = newCollection();
-
- 		if (node.body != null)
- 		{
-			TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-			TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-			
-			if (typeVisitor != null)
-			{
-				all.addAll(node.getType().apply(typeVisitor, arg));
-			}
-			
-			if (expVisitor != null)
-			{
-				all.addAll(node.body.apply(expVisitor, arg));
-			}
- 		}
+		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
+		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
+		C all = newCollection();
+		
+		if (typeVisitor != null)
+		{
+			all.addAll(node.getType().apply(typeVisitor, arg));
+		}
+		
+		if (expVisitor != null && node.body != null)
+		{
+			all.addAll(node.body.apply(expVisitor, arg));
+		}
 		
 		if (node.predef != null)
 		{
@@ -240,25 +236,19 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseImplicitOperationDefinition(TCImplicitOperationDefinition node, S arg)
 	{
+		TCStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
+		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
-
-		if (node.body != null)
- 		{
- 			TCStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
- 			TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-  			
- 			if (typeVisitor != null)
- 			{
- 				all.addAll(node.getType().apply(typeVisitor, arg));
- 			}
- 			
- 			if (stmtVisitor != null)
- 			{
- 				all.addAll(node.body.apply(stmtVisitor, arg));
- 			}
- 			
- 			return all;
- 		}
+		
+		if (typeVisitor != null)
+		{
+			all.addAll(node.getType().apply(typeVisitor, arg));
+		}
+		
+		if (stmtVisitor != null && node.body != null)
+		{
+			all.addAll(node.body.apply(stmtVisitor, arg));
+		}
 
  		if (node.predef != null)
 		{
