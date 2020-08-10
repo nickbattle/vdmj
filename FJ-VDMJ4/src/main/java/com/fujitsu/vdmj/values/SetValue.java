@@ -43,7 +43,7 @@ public class SetValue extends Value
 		this.values = new ValueSet();
 	}
 
-	public SetValue(ValueSet values) throws ValueException
+	public SetValue(ValueSet values)
 	{
 		// We arrange that VDMJ set values usually have sorted contents.
 		// This guarantees deterministic behaviour in places that would
@@ -52,7 +52,7 @@ public class SetValue extends Value
 		this(values, true);
 	}
 
-	public SetValue(ValueSet values, boolean sort) throws ValueException
+	public SetValue(ValueSet values, boolean sort)
 	{
 		if (sort)
 		{
@@ -85,14 +85,7 @@ public class SetValue extends Value
 			nset.add(v);
 		}
 
-		try
-		{
-			return UpdatableValue.factory(new SetValue(nset, false), listeners);
-		}
-		catch (ValueException e)
-		{
-			return null;	// Not reached
-		}
+		return UpdatableValue.factory(new SetValue(nset, false), listeners);
 	}
 
 	@Override
@@ -106,14 +99,7 @@ public class SetValue extends Value
 			nset.add(v);
 		}
 
-		try
-		{
-			return new SetValue(nset, false);
-		}
-		catch (ValueException e)
-		{
-			return null;	// Not reached
-		}
+		return new SetValue(nset, false);
 	}
 
 	@Override
@@ -152,14 +138,7 @@ public class SetValue extends Value
 
 		for (ValueSet v: psets)
 		{
-			try
-			{
-				rs.add(new SetValue(v, false));		// NB not re-sorted!
-			}
-			catch (ValueException e)
-			{
-				// Not reached
-			}
+			rs.add(new SetValue(v, false));		// NB not re-sorted!
 		}
 
 		return rs;
@@ -200,13 +179,6 @@ public class SetValue extends Value
 	@Override
 	public Object clone()
 	{
-		try
-		{
-			return new SetValue((ValueSet)values.clone(), false);
-		}
-		catch (ValueException e)
-		{
-			return null;	// Not reached
-		}
+		return new SetValue((ValueSet)values.clone(), false);
 	}
 }

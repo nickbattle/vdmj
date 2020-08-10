@@ -26,7 +26,7 @@ package com.fujitsu.vdmj.in.expressions;
 import com.fujitsu.vdmj.in.definitions.INExplicitFunctionDefinition;
 import com.fujitsu.vdmj.in.definitions.INImplicitFunctionDefinition;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
-import com.fujitsu.vdmj.in.types.Instantiate;
+import com.fujitsu.vdmj.in.types.INInstantiate;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -98,7 +98,7 @@ public class INFuncInstantiationExpression extends INExpression
     			if (ptype.toString().indexOf('@') >= 0)		// Really need type.isPolymorphic
     			{
     				// Resolve any @T types referred to in the type parameters
-    				ptype = Instantiate.instantiate(ptype, ctxt, ctxt);
+    				ptype = INInstantiate.instantiate(ptype, ctxt, ctxt);
     			}
     			
     			argtypes.add(ptype);

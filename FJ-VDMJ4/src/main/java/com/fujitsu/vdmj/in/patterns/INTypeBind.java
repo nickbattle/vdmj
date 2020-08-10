@@ -24,7 +24,8 @@
 package com.fujitsu.vdmj.in.patterns;
 
 import com.fujitsu.vdmj.in.patterns.visitors.INBindVisitor;
-import com.fujitsu.vdmj.in.types.GetAllValues;
+import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
+import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -60,7 +61,14 @@ public class INTypeBind extends INBind
 	@Override
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
-		return GetAllValues.ofType(type, ctxt);
+		try
+		{
+			return type.apply(new INGetAllValuesVisitor(), ctxt);
+		}
+		catch (InternalException e)		// Used while visitors don't have exceptions
+		{
+			throw new ValueException(e.number, e.getMessage(), ctxt);
+		}
 	}
 
 	@Override
