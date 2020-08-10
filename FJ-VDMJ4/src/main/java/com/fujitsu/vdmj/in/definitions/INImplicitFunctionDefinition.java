@@ -37,7 +37,7 @@ import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.types.INPatternListTypePair;
 import com.fujitsu.vdmj.in.types.INPatternListTypePairList;
 import com.fujitsu.vdmj.in.types.INPatternTypePair;
-import com.fujitsu.vdmj.in.types.Instantiate;
+import com.fujitsu.vdmj.in.types.INInstantiate;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -209,7 +209,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 			postfv = postdef.getPolymorphicValue(actualTypes, params, ctxt);
 		}
 
-		TCFunctionType ftype = (TCFunctionType)Instantiate.instantiate(getType(), params, ctxt);
+		TCFunctionType ftype = (TCFunctionType)INInstantiate.instantiate(getType(), params, ctxt);
 		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, null);
 
 		polyfuncs.put(actualTypes, rv);

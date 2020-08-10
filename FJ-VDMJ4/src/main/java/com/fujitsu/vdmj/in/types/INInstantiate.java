@@ -21,49 +21,31 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.patterns;
+package com.fujitsu.vdmj.in.types;
 
-import com.fujitsu.vdmj.in.patterns.visitors.INMultipleBindVisitor;
-import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
+import com.fujitsu.vdmj.in.types.visitors.INInstantiateVisitor;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.ValueException;
+import com.fujitsu.vdmj.runtime.ContextException;
+import com.fujitsu.vdmj.runtime.ExceptionHandler;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.values.ValueList;
 
-public class INMultipleTypeBind extends INMultipleBind
+public class INInstantiate
 {
-	private static final long serialVersionUID = 1L;
-	public final TCType type;
-
-	public INMultipleTypeBind(INPatternList plist, TCType type)
-	{
-		super(plist);
-		this.type = type;
-	}
-
-	@Override
-	public String toString()
-	{
-		return plist + ":" + type;
-	}
-
-	@Override
-	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
+	/**
+	 * Return an instantiated type, using the @T parameters in scope of "params". The extra
+	 * context passed is just for reporting the ContextException (which may differ).
+	 */
+	public static TCType instantiate(TCType type, Context params, Context ctxt)
 	{
 		try
 		{
-			return type.apply(new INGetAllValuesVisitor(), ctxt);
+			return type.apply(new INInstantiateVisitor(), params);
 		}
-		catch (InternalException e)		// Used while visitors don't have exceptions
+		catch (InternalException e)	// visitor exception
 		{
-			throw new ValueException(e.number, e.getMessage(), ctxt);
+			ExceptionHandler.handle(new ContextException(4008, e.getMessage(), type.location, ctxt));
+			return null;
 		}
-	}
-
-	@Override
-	public <R, S> R apply(INMultipleBindVisitor<R, S> visitor, S arg)
-	{
-		return visitor.caseMultipleTypeBind(this, arg);
 	}
 }
