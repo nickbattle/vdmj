@@ -154,6 +154,7 @@ public abstract class WorkspaceManager
 			getRoots().add(Utils.uriToFile(params.get("rootUri")));	// TODO workspace folders
 			clientCapabilities = params.get("capabilities");
 			openFiles.clear();
+			System.setProperty("parser.tabstop", "1");	// Forced, for LSP location offsets
 			Properties.init();
 			loadAllProjectFiles();
 			
