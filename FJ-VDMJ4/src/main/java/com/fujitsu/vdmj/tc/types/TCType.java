@@ -128,7 +128,8 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	 */
 	public void unResolve()
 	{
-		if (resolveErrors++ < MAX_RESOLVE_ERRORS) { resolved = false; return; }
+		if (resolveErrors++ > MAX_RESOLVE_ERRORS) return;
+		resolved = false;
 	}
 
 	/**
