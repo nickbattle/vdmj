@@ -47,6 +47,11 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	public final LexLocation location;
 	/** True if the type's and its subtype's names have been resolved. */
 	public boolean resolved = false;
+	/** Count of resolution errors so far */
+	protected long resolveErrors = 0;
+	/** Maximum resolution errors before aborting */
+	protected static final long MAX_RESOLVE_ERRORS = 100;
+	
 	/** The type's possible definition(s) (if a named type) */
 	public transient TCDefinitionList definitions = null;
 	
@@ -118,11 +123,12 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	/**
 	 * Clear the recursive "resolved" flag. This does a deep search of a
 	 * type structure, clearing the flag. It is used when type checking
-	 * errors require multiple passes of the type tree.
+	 * errors require multiple passes of the type tree. If there are too
+	 * many errors, we are probably looping, so we leave the flag set.
 	 */
 	public void unResolve()
 	{
-		resolved = false;
+		if (resolveErrors++ < MAX_RESOLVE_ERRORS) { resolved = false; return; }
 	}
 
 	/**

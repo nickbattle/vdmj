@@ -83,6 +83,7 @@ public class TCProductType extends TCType
 	@Override
 	public void unResolve()
 	{
+		if (resolveErrors++ < MAX_RESOLVE_ERRORS) { resolved = false; return; }
 		if (!resolved) return; else { resolved = false; }
 
 		for (TCType t: types)
