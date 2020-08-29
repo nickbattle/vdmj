@@ -117,6 +117,8 @@ public class TCProductType extends TCType
 					// Add extra messages to the exception for each product member
 					problem.addExtra(e);
 				}
+
+				resolved = true;	// See bug #26
 			}
 		}
 		

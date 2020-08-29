@@ -24,8 +24,6 @@
 package com.fujitsu.vdmj.tc.types.visitors;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
-import com.fujitsu.vdmj.tc.types.TCNamedType;
-import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
@@ -49,37 +47,6 @@ public class TCUnresolvedTypeFinder extends TCLeafTypeVisitor<TCType, TCTypeList
 		return new TCTypeList(node);
 	}
 
-	/**
-	 * To avoid infinite type loops, we stop searching at "named" types and records.
-	 */
-	@Override
-	public TCTypeList caseNamedType(TCNamedType node, Object arg)
-	{
-		if (done.contains(node))
-		{
-			return newCollection();
-		}
-		else
-		{
-			done.add(node);
-			return super.caseNamedType(node, arg);
-		}
-	}
-	
-	@Override
-	public TCTypeList caseRecordType(TCRecordType node, Object arg)
-	{
-		if (done.contains(node))
-		{
-			return newCollection();
-		}
-		else
-		{
-			done.add(node);
-			return super.caseRecordType(node, arg);
-		}
-	}
-	
 	@Override
 	public TCTypeList caseType(TCType node, Object arg)
 	{

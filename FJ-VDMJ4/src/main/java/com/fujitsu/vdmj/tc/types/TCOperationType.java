@@ -173,6 +173,7 @@ public class TCOperationType extends TCType
 				}
 
 				fixed.add(new TCUnknownType(location));	// Parameter count must be right
+				resolved = true;	// See bug #26
 			}
 		}
 

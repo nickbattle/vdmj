@@ -102,6 +102,7 @@ public class TCClassType extends TCType
 				}
 
 				d.getType().typeResolve(self, root);
+				resolved = true;	// recursively cleared?
 			}
 
 			return this;

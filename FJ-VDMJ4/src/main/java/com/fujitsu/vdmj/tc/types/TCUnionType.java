@@ -909,6 +909,8 @@ public class TCUnionType extends TCType
 					// Add extra messages to the exception for each union member
 					problem.addExtra(e);
 				}
+
+				resolved = true;	// See bug #26
 			}
 
 			if (root != null)

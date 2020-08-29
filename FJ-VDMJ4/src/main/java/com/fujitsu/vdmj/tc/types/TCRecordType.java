@@ -152,6 +152,8 @@ public class TCRecordType extends TCInvariantType
 					// Add extra messages to the exception for each field
 					problem.addExtra(e);
 				}
+
+				resolved = true;	// See bug #26
 			}
 
 			if (root != null)
