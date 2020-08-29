@@ -57,7 +57,6 @@ public class TCBracketType extends TCType
 	@Override
 	public void unResolve()
 	{
-		if (resolveErrors++ > MAX_RESOLVE_ERRORS) return;
 		if (!resolved) return; else { resolved = false; }
 		type.unResolve();
 	}

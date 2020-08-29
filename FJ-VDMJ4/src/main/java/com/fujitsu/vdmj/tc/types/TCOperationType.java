@@ -136,7 +136,6 @@ public class TCOperationType extends TCType
 	@Override
 	public void unResolve()
 	{
-		if (resolveErrors++ > MAX_RESOLVE_ERRORS) return;
 		if (!resolved) return; else { resolved = false; }
 
 		for (TCType type: parameters)
@@ -174,6 +173,7 @@ public class TCOperationType extends TCType
 				}
 
 				fixed.add(new TCUnknownType(location));	// Parameter count must be right
+				resolved = true;	// See bug #26
 			}
 		}
 

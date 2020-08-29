@@ -83,7 +83,6 @@ public class TCProductType extends TCType
 	@Override
 	public void unResolve()
 	{
-		if (resolveErrors++ > MAX_RESOLVE_ERRORS) return;
 		if (!resolved) return; else { resolved = false; }
 
 		for (TCType t: types)
@@ -118,6 +117,8 @@ public class TCProductType extends TCType
 					// Add extra messages to the exception for each product member
 					problem.addExtra(e);
 				}
+
+				resolved = true;	// See bug #26
 			}
 		}
 		

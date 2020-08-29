@@ -47,10 +47,6 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	public final LexLocation location;
 	/** True if the type's and its subtype's names have been resolved. */
 	public boolean resolved = false;
-	/** Count of resolution errors so far */
-	protected long resolveErrors = 0;
-	/** Maximum resolution errors before aborting */
-	protected static final long MAX_RESOLVE_ERRORS = 100;
 	
 	/** The type's possible definition(s) (if a named type) */
 	public transient TCDefinitionList definitions = null;
@@ -128,7 +124,6 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	 */
 	public void unResolve()
 	{
-		if (resolveErrors++ > MAX_RESOLVE_ERRORS) return;
 		resolved = false;
 	}
 

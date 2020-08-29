@@ -107,7 +107,6 @@ public class TCRecordType extends TCInvariantType
 	@Override
 	public void unResolve()
 	{
-		if (resolveErrors++ > MAX_RESOLVE_ERRORS) return;
 		if (!resolved) return; else { resolved = false; }
 
 		for (TCField f: fields)
@@ -153,6 +152,8 @@ public class TCRecordType extends TCInvariantType
 					// Add extra messages to the exception for each field
 					problem.addExtra(e);
 				}
+
+				resolved = true;	// See bug #26
 			}
 
 			if (root != null)

@@ -59,8 +59,6 @@ public class TCClassType extends TCType
 	@Override
 	public void unResolve()
 	{
-		if (resolveErrors++ > MAX_RESOLVE_ERRORS) return;
-
 		if (resolved)
 		{
     		resolved = false;
@@ -104,6 +102,7 @@ public class TCClassType extends TCType
 				}
 
 				d.getType().typeResolve(self, root);
+				resolved = true;	// recursively cleared?
 			}
 
 			return this;
