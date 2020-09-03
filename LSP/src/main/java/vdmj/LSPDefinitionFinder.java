@@ -179,12 +179,23 @@ public class LSPDefinitionFinder
 				if (fexp.root.isRecord(fexp.location))
 				{
 		    		TCRecordType rec = fexp.root.getRecord();
-		    		TCField field = rec.findField(fexp.field.getName());
-		    		
-		    		if (field != null)
-		    		{
-		    			return new TCLocalDefinition(field.tagname.getLocation(), field.tagname, field.type);
-		    		}
+
+		    		if (rec.name.getName().equals("?"))		// union of records with same field tags
+					{
+						if (fexp.root.definitions != null)
+						{
+							return fexp.root.definitions.get(0);
+						}
+					}
+					else
+					{
+			    		TCField field = rec.findField(fexp.field.getName());
+			    		
+			    		if (field != null)
+			    		{
+			    			return new TCLocalDefinition(field.tagname.getLocation(), field.tagname, field.type);
+			    		}
+					}
 				}
 			}
 			
@@ -252,12 +263,23 @@ public class LSPDefinitionFinder
 				if (fexp.root.isRecord(fexp.location))
 				{
 		    		TCRecordType rec = fexp.root.getRecord();
-		    		TCField field = rec.findField(fexp.field.getName());
-		    		
-		    		if (field != null)
-		    		{
-		    			return new TCLocalDefinition(field.tagname.getLocation(), field.tagname, field.type);
-		    		}
+
+		    		if (rec.name.getName().equals("?"))		// union of records with same field tags
+					{
+						if (fexp.root.definitions != null)
+						{
+							return fexp.root.definitions.get(0);
+						}
+					}
+					else
+					{
+			    		TCField field = rec.findField(fexp.field.getName());
+			    		
+			    		if (field != null)
+			    		{
+			    			return new TCLocalDefinition(field.tagname.getLocation(), field.tagname, field.type);
+			    		}
+					}
 				}
 				else if (fexp.root.isClass(env))
 				{
