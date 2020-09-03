@@ -106,7 +106,7 @@ There are some screenshots below.
 Various things do not work perfectly yet:
 
 - The F12 navigation does not work correctly for a few expressions that involve types. For example, you cannot
-navigate to the `Clock` definition in the expression `is_(var, Clock)`. But most common type usage is OK,
+navigate to the `Clock` definition in the expression `is_(var, Clock | Timer)`. But most common type usage is OK,
 like record field definitions or function signatures.
 - The "." field completion is awkward to use because it requires the spec to be type-checked. So if you type
 `var.field`, the field part will not be offered unless you type `var`, then save the spec to type check it, and
