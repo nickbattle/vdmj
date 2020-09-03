@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.tc.annotations.TCAnnotatedExpression;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCEqualsDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
+import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.expressions.TCBinaryExpression;
 import com.fujitsu.vdmj.tc.expressions.TCCaseAlternative;
@@ -280,7 +281,16 @@ abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseIsExpression(TCIsExpression node, S arg)
 	{
-		return node.test.apply(this, arg);
+ 		TCDefinitionVisitor<C, S> defVisitor = visitorSet.getDefinitionVisitor();
+ 		C all = newCollection();
+ 		
+ 		if (defVisitor != null && node.typedef != null)
+ 		{
+ 			all.addAll(node.typedef.apply(defVisitor, arg));
+ 		}
+ 		
+		all.addAll(node.test.apply(this, arg));
+		return all;
 	}
 
  	@Override
