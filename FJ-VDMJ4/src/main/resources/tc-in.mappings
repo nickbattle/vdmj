@@ -247,7 +247,7 @@ map TCCaseStmtAlternative{pattern, statement} to INCaseStmtAlternative(pattern, 
 map TCCaseStmtAlternativeList{} to INCaseStmtAlternativeList(this);
 map TCClassInvariantStatement{name, invdefs} to INClassInvariantStatement(name, invdefs);
 map TCCyclesStatement{location, cycles, statement} to INCyclesStatement(location, cycles, statement);
-map TCDefStatement{location, localDefs, statement} to INDefStatement(location, localDefs, statement);
+map TCDefStatement{location, equalsDefs, statement} to INDefStatement(location, equalsDefs, statement);
 map TCDurationStatement{location, duration, statement} to INDurationStatement(location, duration, statement);
 map TCElseIfStatement{location, elseIfExp, thenStmt} to INElseIfStatement(location, elseIfExp, thenStmt);
 map TCElseIfStatementList{} to INElseIfStatementList(this);

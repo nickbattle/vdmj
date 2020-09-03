@@ -122,7 +122,7 @@ public abstract class TCStatementVisitor<R, S>
 
  	public R caseDefStatement(TCDefStatement node, S arg)
 	{
-		return caseLetDefStatement(node, arg);
+		return caseStatement(node, arg);
 	}
 
  	public R caseDurationStatement(TCDurationStatement node, S arg)

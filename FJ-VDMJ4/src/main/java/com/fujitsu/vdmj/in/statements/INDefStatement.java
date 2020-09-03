@@ -31,19 +31,23 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.Value;
 
-public class INDefStatement extends INLetDefStatement
+public class INDefStatement extends INStatement
 {
 	private static final long serialVersionUID = 1L;
+	public final INDefinitionList equalsDefs;
+	public final INStatement statement;
 
 	public INDefStatement(LexLocation location, INDefinitionList equalsDefs, INStatement statement)
 	{
-		super(location, equalsDefs, statement);
+		super(location);
+		this.equalsDefs = equalsDefs;
+		this.statement = statement;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "def " + Utils.listToString(localDefs) + " in " + statement;
+		return "def " + Utils.listToString(equalsDefs) + " in " + statement;
 	}
 
 	@Override
@@ -53,7 +57,7 @@ public class INDefStatement extends INLetDefStatement
 
 		Context evalContext = new Context(location, "def statement", ctxt);
 
-		for (INDefinition d: localDefs)
+		for (INDefinition d: equalsDefs)
 		{
 			evalContext.putList(d.getNamedValues(evalContext));
 		}

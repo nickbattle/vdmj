@@ -31,25 +31,29 @@ import com.fujitsu.vdmj.pog.POScopeContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.util.Utils;
 
-public class PODefStatement extends POLetDefStatement
+public class PODefStatement extends POStatement
 {
 	private static final long serialVersionUID = 1L;
+	public final PODefinitionList equalsDefs;
+	public final POStatement statement;
 
 	public PODefStatement(LexLocation location, PODefinitionList equalsDefs, POStatement statement)
 	{
-		super(location, equalsDefs, statement);
+		super(location);
+		this.equalsDefs = equalsDefs;
+		this.statement = statement;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "def " + Utils.listToString(localDefs) + " in " + statement;
+		return "def " + Utils.listToString(equalsDefs) + " in " + statement;
 	}
 
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt)
 	{
-		ProofObligationList obligations = localDefs.getProofObligations(ctxt);
+		ProofObligationList obligations = equalsDefs.getProofObligations(ctxt);
 
 		ctxt.push(new POScopeContext());
 		obligations.addAll(statement.getProofObligations(ctxt));

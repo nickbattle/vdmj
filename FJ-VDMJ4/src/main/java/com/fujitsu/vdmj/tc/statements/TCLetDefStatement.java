@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCLetDefStatement extends TCStatement
@@ -40,11 +41,10 @@ public class TCLetDefStatement extends TCStatement
 	public final TCDefinitionList localDefs;
 	public final TCStatement statement;
 
-	public TCLetDefStatement(LexLocation location,
-		TCDefinitionList localDefs, TCStatement statement)
+	public TCLetDefStatement(LexLocation location, TCDefinitionList equals, TCStatement statement)
 	{
 		super(location);
-		this.localDefs = localDefs;
+		this.localDefs = equals;
 		this.statement = statement;
 	}
 
@@ -59,7 +59,7 @@ public class TCLetDefStatement extends TCStatement
 	{
 		// Each local definition is in scope for later local definitions...
 
-		Environment local = env;
+		Environment local = new FlatEnvironment(env, true);		// Functional context only
 
 		for (TCDefinition d: localDefs)
 		{
@@ -90,7 +90,7 @@ public class TCLetDefStatement extends TCStatement
 			}
 		}
 
-		TCType r = statement.typeCheck(local, scope, constraint, mandatory);
+		TCType r = statement.typeCheck(new FlatEnvironment(local, false), scope, constraint, mandatory);
 		local.unusedCheck(env);
 		return r;
 	}
