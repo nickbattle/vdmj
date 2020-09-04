@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCLetBeStStatement extends TCStatement
@@ -65,7 +66,7 @@ public class TCLetBeStStatement extends TCStatement
 	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		def = new TCMultiBindListDefinition(location, bind.getMultipleBindList());
-		def.typeCheck(base, scope);
+		def.typeCheck(new FlatEnvironment(base, true), scope);	// NB. functional context
 		
 		// Definitions create by the let statement are not references to state, so they
 		// cannot be updated. Therefore we wrap them in a local TCQualifiedDefinition.
