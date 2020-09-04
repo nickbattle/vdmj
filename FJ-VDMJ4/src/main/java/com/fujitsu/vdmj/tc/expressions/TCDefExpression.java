@@ -24,8 +24,13 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.util.Utils;
 
 public class TCDefExpression extends TCLetDefExpression
@@ -42,6 +47,19 @@ public class TCDefExpression extends TCLetDefExpression
 	public String toString()
 	{
 		return "def " + Utils.listToString(localDefs) + " in\n" + expression;
+	}
+	
+	@Override
+	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
+	{
+		TCDefinition encl = env.getEnclosingDefinition();
+		
+		if (encl != null && !encl.isOperation())
+		{
+			warning(5032, "Def expression not within an operation");
+		}
+		
+		return super.typeCheck(env, qualifiers, scope, constraint);
 	}
 
 	@Override
