@@ -89,7 +89,7 @@ public class TCLambdaExpression extends TCExpression
 		def.typeCheck(base, scope);
 		Environment local = new FlatCheckedEnvironment(def, base, scope);
 		local.setEnclosingDefinition(def); 	// Prevent recursive checks
-		local.setFunctional(true);
+		local.setFunctional(true, true);
 		TCType result = expression.typeCheck(local, null, scope, null);
 		local.unusedCheck();
 

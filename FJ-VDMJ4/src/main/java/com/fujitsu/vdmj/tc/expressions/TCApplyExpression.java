@@ -159,7 +159,15 @@ public class TCApplyExpression extends TCExpression
 
 			if (inFunction && Settings.release == Release.VDM_10 && !ot.pure)
 			{
-				report(3300, "Impure operation '" + root + "' cannot be called from here");
+				if (env.isFunctionalError())
+				{
+					report(3300, "Impure operation '" + root + "' cannot be called from here");
+				}
+				else
+				{
+					warning(3300, "Impure operation '" + root + "' cannot be called from here");
+				}
+				
 				results.add(new TCUnknownType(location));
 			}
 			else if (inOperation && Settings.release == Release.VDM_10 && enclfunc != null && enclfunc.isPure() && !ot.pure)

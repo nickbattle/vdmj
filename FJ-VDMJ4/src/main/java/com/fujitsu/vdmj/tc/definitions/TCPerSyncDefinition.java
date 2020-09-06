@@ -146,7 +146,7 @@ public class TCPerSyncDefinition extends TCDefinition
 
 		FlatCheckedEnvironment local = new FlatCheckedEnvironment(this, base, scope);
 		local.setEnclosingDefinition(this);	// Prevent op calls
-		local.setFunctional(true);
+		local.setFunctional(true, true);
 		
 		if (isStatic != null)
 		{

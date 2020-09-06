@@ -66,7 +66,7 @@ public class TCLetBeStStatement extends TCStatement
 	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		def = new TCMultiBindListDefinition(location, bind.getMultipleBindList());
-		def.typeCheck(new FlatEnvironment(base, true), scope);	// NB. functional context
+		def.typeCheck(new FlatEnvironment(base, true, false), scope);	// NB. functional context
 		
 		// Definitions create by the let statement are not references to state, so they
 		// cannot be updated. Therefore we wrap them in a local TCQualifiedDefinition.

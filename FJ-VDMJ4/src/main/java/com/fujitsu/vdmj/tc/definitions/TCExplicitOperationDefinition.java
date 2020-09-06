@@ -203,7 +203,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		FlatCheckedEnvironment checked = (FlatCheckedEnvironment)local;
 		checked.setStatic(accessSpecifier);
 		checked.setEnclosingDefinition(this);
-		checked.setFunctional(false);
+		checked.setFunctional(false, false);
 
 		if (base.isVDMPP())
 		{
@@ -241,7 +241,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 		{
 			FlatEnvironment pre = new FlatEnvironment(new TCDefinitionList(), local);
 			pre.setEnclosingDefinition(predef);
-			pre.setFunctional(true);
+			pre.setFunctional(true, true);
 			TCBooleanType expected = new TCBooleanType(location);
 			TCType b = predef.body.typeCheck(pre, null, NameScope.NAMESANDSTATE, expected);
 
@@ -271,7 +271,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 			}
 			
 			post.setEnclosingDefinition(postdef);
-			post.setFunctional(true);
+			post.setFunctional(true, true);
 			TCBooleanType expected = new TCBooleanType(location);
 			TCType b = postdef.body.typeCheck(post, null, NameScope.NAMESANDANYSTATE, expected);
 

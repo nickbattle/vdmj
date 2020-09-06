@@ -283,7 +283,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		local.setLimitStateScope(limitStateScope);
 		checked.setStatic(accessSpecifier);
 		checked.setEnclosingDefinition(this);
-		checked.setFunctional(false);
+		checked.setFunctional(false, false);
 
 		if (base.isVDMPP())
 		{
@@ -317,7 +317,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 			FlatEnvironment pre = new FlatEnvironment(argdefs, base);
 			pre.setLimitStateScope(limitStateScope);
 			pre.setEnclosingDefinition(predef);
-			pre.setFunctional(true);
+			pre.setFunctional(true, true);
 			TCBooleanType expected = new TCBooleanType(location);
 			TCType b = predef.body.typeCheck(pre, null, NameScope.NAMESANDSTATE, expected);
 
@@ -407,7 +407,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	    			new FlatCheckedEnvironment(postdefs, local, NameScope.NAMESANDANYSTATE);
 	    		post.setStatic(accessSpecifier);
 	    		post.setEnclosingDefinition(postdef);
-	    		post.setFunctional(true);
+	    		post.setFunctional(true, true);
 				b = postdef.body.typeCheck(post, null, NameScope.NAMESANDANYSTATE, expected);
 				post.unusedCheck();
 			}
@@ -415,7 +415,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 			{
 	    		FlatEnvironment post = new FlatEnvironment(new TCDefinitionList(), local);
 	    		post.setEnclosingDefinition(postdef);
-	    		post.setFunctional(true);
+	    		post.setFunctional(true, true);
 				b = postdef.body.typeCheck(post, null, NameScope.NAMESANDANYSTATE, expected);
 			}
 

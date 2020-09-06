@@ -59,7 +59,7 @@ public class TCLetDefStatement extends TCStatement
 	{
 		// Each local definition is in scope for later local definitions...
 
-		Environment local = new FlatEnvironment(env, true);		// Functional context only
+		Environment local = new FlatEnvironment(env, true, false);		// Functional context only
 
 		for (TCDefinition d: localDefs)
 		{
@@ -90,7 +90,7 @@ public class TCLetDefStatement extends TCStatement
 			}
 		}
 
-		TCType r = statement.typeCheck(new FlatEnvironment(local, false), scope, constraint, mandatory);
+		TCType r = statement.typeCheck(new FlatEnvironment(local, false, false), scope, constraint, mandatory);
 		local.unusedCheck(env);
 		return r;
 	}
