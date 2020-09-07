@@ -260,7 +260,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		FlatCheckedEnvironment checked = (FlatCheckedEnvironment)local;
 		checked.setStatic(accessSpecifier);
 		checked.setEnclosingDefinition(this);
-		checked.setFunctional(true);
+		checked.setFunctional(true, true);
 
 		defs.typeCheck(local, scope);
 
@@ -297,7 +297,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			FlatCheckedEnvironment post = new FlatCheckedEnvironment(rdefs, local, NameScope.NAMES);
 			post.setStatic(accessSpecifier);
 			post.setEnclosingDefinition(postdef);
-			post.setFunctional(true);
+			post.setFunctional(true, true);
 			TCBooleanType expected = new TCBooleanType(location);
 			TCType b = postdef.body.typeCheck(post, null, NameScope.NAMES, expected);
 			// post.unusedCheck(); This would detect unused RESULTs 

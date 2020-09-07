@@ -247,7 +247,7 @@ map TCCaseStmtAlternative{pattern, statement} to POCaseStmtAlternative(pattern, 
 map TCCaseStmtAlternativeList{} to POCaseStmtAlternativeList(this);
 map TCClassInvariantStatement{name, invdefs} to POClassInvariantStatement(name, invdefs);
 map TCCyclesStatement{location, cycles, statement} to POCyclesStatement(location, cycles, statement);
-map TCDefStatement{location, localDefs, statement} to PODefStatement(location, localDefs, statement);
+map TCDefStatement{location, equalsDefs, statement} to PODefStatement(location, equalsDefs, statement);
 map TCDurationStatement{location, duration, statement} to PODurationStatement(location, duration, statement);
 map TCElseIfStatement{location, elseIfExp, thenStmt} to POElseIfStatement(location, elseIfExp, thenStmt);
 map TCElseIfStatementList{} to POElseIfStatementList(this);

@@ -121,7 +121,7 @@ public abstract class POStatementVisitor<R, S>
 
  	public R caseDefStatement(PODefStatement node, S arg)
 	{
-		return caseLetDefStatement(node, arg);
+		return caseStatement(node, arg);
 	}
 
  	public R caseDurationStatement(PODurationStatement node, S arg)

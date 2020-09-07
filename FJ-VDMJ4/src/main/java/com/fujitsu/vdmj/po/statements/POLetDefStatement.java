@@ -36,8 +36,7 @@ public class POLetDefStatement extends POStatement
 	public final PODefinitionList localDefs;
 	public final POStatement statement;
 
-	public POLetDefStatement(LexLocation location,
-		PODefinitionList localDefs, POStatement statement)
+	public POLetDefStatement(LexLocation location, PODefinitionList localDefs, POStatement statement)
 	{
 		super(location);
 		this.localDefs = localDefs;

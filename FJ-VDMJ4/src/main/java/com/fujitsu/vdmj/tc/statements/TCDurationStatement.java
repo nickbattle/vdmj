@@ -64,7 +64,7 @@ public class TCDurationStatement extends TCStatement
 			report(3346, "Cannot use duration in pure operations");
 		}
 		
-		Environment functional = new FlatEnvironment(env, true);
+		Environment functional = new FlatEnvironment(env, true, true);
 		TCType argType = duration.typeCheck(functional, null, scope, null);
 		
 		if (!TypeComparator.compatible(new TCNaturalType(location), argType))

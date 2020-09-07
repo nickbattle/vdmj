@@ -82,7 +82,7 @@ public class TCClassInvariantDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		Environment functional = new FlatEnvironment(base, true);
+		Environment functional = new FlatEnvironment(base, true, true);
 		functional.setEnclosingDefinition(this);
 		TCType type = expression.typeCheck(functional, null, NameScope.NAMESANDSTATE, new TCBooleanType(location));
 

@@ -245,7 +245,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		FlatCheckedEnvironment checked = (FlatCheckedEnvironment)local;
 		checked.setStatic(accessSpecifier);
 		checked.setEnclosingDefinition(this);
-		checked.setFunctional(true);
+		checked.setFunctional(true, true);
 
 		defs.typeCheck(local, scope);
 
@@ -311,7 +311,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	    		FlatCheckedEnvironment post = new FlatCheckedEnvironment(postdefs, local, NameScope.NAMES);
 	    		post.setStatic(accessSpecifier);
 	    		post.setEnclosingDefinition(postdef);
-	    		post.setFunctional(true);
+	    		post.setFunctional(true, true);
 				b = postdef.body.typeCheck(post, null, NameScope.NAMES, expected);
 				post.unusedCheck();
 			}

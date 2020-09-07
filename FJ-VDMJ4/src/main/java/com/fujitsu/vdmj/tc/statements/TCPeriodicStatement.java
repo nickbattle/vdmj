@@ -62,7 +62,7 @@ public class TCPeriodicStatement extends TCStatement
 		}
 		else
 		{
-			Environment functional = new FlatEnvironment(env, true);
+			Environment functional = new FlatEnvironment(env, true, true);
 
 			for (TCExpression arg: args)
 			{

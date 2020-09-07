@@ -63,7 +63,7 @@ public class TCCyclesStatement extends TCStatement
 			report(3346, "Cannot use cycles in pure operations");
 		}
 		
-		Environment functional = new FlatEnvironment(env, true);
+		Environment functional = new FlatEnvironment(env, true, true);
 		TCType argType = cycles.typeCheck(functional, null, scope, null);
 		
 		if (!TypeComparator.compatible(new TCNaturalType(location), argType))

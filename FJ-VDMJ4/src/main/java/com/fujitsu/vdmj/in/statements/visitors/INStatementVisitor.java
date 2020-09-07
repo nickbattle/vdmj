@@ -121,7 +121,7 @@ public abstract class INStatementVisitor<R, S>
 
  	public R caseDefStatement(INDefStatement node, S arg)
 	{
-		return caseLetDefStatement(node, arg);
+		return caseStatement(node, arg);
 	}
 
  	public R caseDurationStatement(INDurationStatement node, S arg)
