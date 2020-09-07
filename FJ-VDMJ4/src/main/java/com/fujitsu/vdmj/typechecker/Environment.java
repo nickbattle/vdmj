@@ -149,16 +149,16 @@ abstract public class Environment
 		return outer == null ? false : outer.isFunctionalError();
 	}
 	
-	public void setFunctional(boolean functional, boolean errors)
+	public void setFunctional(Boolean functional, Boolean errors)
 	{
-		if (functional)
+		isFunctional = functional;
+
+		if (functional != null && functional)
 		{
-			isFunctional = functional;
 			isFunctionalError = errors;
 		}
 		else
 		{
-			isFunctional = false;
 			isFunctionalError = false;
 		}
 	}
