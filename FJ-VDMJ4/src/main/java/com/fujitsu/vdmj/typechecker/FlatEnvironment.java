@@ -57,7 +57,7 @@ public class FlatEnvironment extends Environment
 		this.definitions = new TCDefinitionList(one);
 	}
 
-	public FlatEnvironment(Environment env, boolean functional, boolean errors)
+	public FlatEnvironment(Environment env, Boolean functional, Boolean errors)
 	{
 		this(new TCDefinitionList(), env);
 		setFunctional(functional, errors);

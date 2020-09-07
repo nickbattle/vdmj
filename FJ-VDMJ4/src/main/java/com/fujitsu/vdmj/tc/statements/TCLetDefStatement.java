@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -59,7 +60,7 @@ public class TCLetDefStatement extends TCStatement
 	{
 		// Each local definition is in scope for later local definitions...
 
-		Environment local = new FlatEnvironment(env, true, false);		// Functional context only
+		Environment local = new FlatEnvironment(env, Settings.strict, false);	// Functional only, if -strict
 
 		for (TCDefinition d: localDefs)
 		{

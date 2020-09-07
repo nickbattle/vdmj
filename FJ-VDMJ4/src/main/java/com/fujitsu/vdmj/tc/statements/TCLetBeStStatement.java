@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -66,7 +67,7 @@ public class TCLetBeStStatement extends TCStatement
 	public TCType typeCheck(Environment base, NameScope scope, TCType constraint, boolean mandatory)
 	{
 		def = new TCMultiBindListDefinition(location, bind.getMultipleBindList());
-		def.typeCheck(new FlatEnvironment(base, true, false), scope);	// NB. functional context
+		def.typeCheck(new FlatEnvironment(base, Settings.strict, false), scope);	// NB. functional if -strict
 		
 		// Definitions create by the let statement are not references to state, so they
 		// cannot be updated. Therefore we wrap them in a local TCQualifiedDefinition.
