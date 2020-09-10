@@ -963,3 +963,7 @@ as the expected and actual values.
 5030, "Annotation is not followed by bracketed sub-expression"
 5031, "Type @<name> must be a union"
 5032, "Def expression not within an operation"
+5033, "Impure operation '<name>' cannot be called from here"
+5034, "Cannot use 'new' in a functional context"
+5035, "Cannot use 'threadid' in a functional context"
+5036, "Cannot use 'time' in a functional context"
