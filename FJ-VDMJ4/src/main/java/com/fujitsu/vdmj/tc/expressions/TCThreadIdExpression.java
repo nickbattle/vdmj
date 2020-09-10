@@ -61,7 +61,14 @@ public class TCThreadIdExpression extends TCExpression
 
 		if (Settings.release == Release.VDM_10 && env.isFunctional())
 		{
-			report(3348, "Cannot use 'threadid' in a functional context");
+			if (env.isFunctionalError())
+			{
+				report(3348, "Cannot use 'threadid' in a functional context");
+			}
+			else
+			{
+				warning(5035, "Cannot use 'threadid' in a functional context");
+			}
 		}
 
 		return checkConstraint(constraint, new TCNaturalType(location));

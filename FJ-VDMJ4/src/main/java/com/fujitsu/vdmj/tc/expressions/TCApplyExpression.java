@@ -165,7 +165,7 @@ public class TCApplyExpression extends TCExpression
 				}
 				else
 				{
-					warning(3300, "Impure operation '" + root + "' cannot be called from here");
+					warning(5033, "Impure operation '" + root + "' cannot be called from here");
 				}
 				
 				results.add(new TCUnknownType(location));
