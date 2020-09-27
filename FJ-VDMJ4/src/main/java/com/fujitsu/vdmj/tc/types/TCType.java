@@ -304,6 +304,13 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 		return false;
 	}
 
+	public static boolean isFunctionType(TCType type, LexLocation from)
+	{
+		return type.isFunction(from) &&
+			!(type instanceof TCOptionalType) &&	// eg. nil is not a function
+			!(type instanceof TCUnknownType);		// eg. ? is not a function
+	}
+
 	/**
 	 * @param from
 	 */

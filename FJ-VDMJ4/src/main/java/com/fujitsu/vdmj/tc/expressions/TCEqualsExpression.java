@@ -56,6 +56,11 @@ public class TCEqualsExpression extends TCBinaryExpression
 		{
 			checkMultipleEqualities(rtype);
 		}
+		
+		if (TCType.isFunctionType(rtype, location) || TCType.isFunctionType(ltype, location))
+		{
+			warning(5037, "Function equality cannot be reliably computed");
+		}
 
 		if (!TypeComparator.compatible(ltype, rtype) || !TypeComparator.compatible(rtype, ltype))
 		{
