@@ -69,7 +69,7 @@ public class FunctionValue extends Value
 	public final INExpression body;
 	public final FunctionValue precondition;
 	public final FunctionValue postcondition;
-	public final Context freeVariables;
+	public Context freeVariables;
 	public final INClassDefinition classdef;
 
 	// Causes parameter assignments to check their invariants (if any).
@@ -349,6 +349,11 @@ public class FunctionValue extends Value
 
 		evalContext.putAll(args);
 
+		if (freeVariables != null)
+		{
+			evalContext.putAll(freeVariables);
+		}
+		
 		if (paramPatternList.size() == 1)
 		{
 			if (precondition != null && Settings.prechecks)
@@ -543,11 +548,6 @@ public class FunctionValue extends Value
 					newpost = postcondition.curry(evalContext);
 				}
 
-				if (freeVariables != null)
-				{
-					evalContext.putAll(freeVariables);
-				}
-				
 				// Curried arguments are collected so that we can invoke any measure functions
 				// once we reach the final apply that does not return a function.
 				
@@ -607,14 +607,54 @@ public class FunctionValue extends Value
 		{
 			Value val = ((Value)other).deref();
 
-			if (val instanceof CompFunctionValue || val instanceof IterFunctionValue)
+			if (val == this)
+			{
+				return true;	// Same object!
+			}
+			else if (val instanceof CompFunctionValue || val instanceof IterFunctionValue)
 			{
 				return false;	// Play safe - we can't really tell
 			}
 			else if (val instanceof FunctionValue)
     		{
     			FunctionValue ov = (FunctionValue)val;
-    			return ov.type.equals(type) &&		// Param and result types same
+    			boolean fvars;
+    			
+    			if (ov.freeVariables != null)
+    			{
+    				if (freeVariables != null)
+    				{
+    					fvars = true;
+
+    					// Compare "my" fvs with the other's (ie. mine can be a subset)
+    					for (TCNameToken key: freeVariables.keySet())
+    					{
+    						Value myval = freeVariables.get(key);
+    						
+    						if (!(myval instanceof ParameterValue))		// Ignore parameters
+    						{
+	    						Value oval = ov.freeVariables.get(key);
+	
+	    						if (oval == null || !myval.equals(oval))
+	    						{
+	    							fvars = false;
+	    							break;
+	    						}
+    						}
+    					}
+    				}
+    				else
+    				{
+    					fvars = false;
+    				}
+    			}
+    			else
+    			{
+    				fvars = (freeVariables == null);
+    			}
+    			
+    			return fvars &&						// Free variables the same
+    				   ov.type.equals(type) &&		// Param and result types same
     				   ov.body.equals(body);		// Not ideal - a string comparison in fact
     		}
 		}
