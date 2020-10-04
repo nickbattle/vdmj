@@ -77,6 +77,11 @@ public class TCSetCompExpression extends TCSetExpression
 		}
 
 		TCType etype = first.typeCheck(local, null, scope, elemConstraint);
+		
+		if (TCType.isFunctionType(etype, location))
+		{
+			first.warning(5037, "Function equality cannot be reliably computed");
+		}
 
 		if (predicate != null)
 		{

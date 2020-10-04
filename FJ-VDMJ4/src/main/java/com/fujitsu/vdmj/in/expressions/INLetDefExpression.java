@@ -70,14 +70,20 @@ public class INLetDefExpression extends INExpression
 		{
 			NameValuePairList values = d.getNamedValues(evalContext);
 
-			if (self != null && d instanceof INExplicitFunctionDefinition)
+			if (d instanceof INExplicitFunctionDefinition)
 			{
 				for (NameValuePair nvp: values)
 				{
 					if (nvp.value instanceof FunctionValue)
 					{
 						FunctionValue fv = (FunctionValue)nvp.value;
-						fv.setSelf(self);
+						if (self != null) fv.setSelf(self);
+						
+						if (fv.name.equals(d.name.getName()))
+						{
+							fv.freeVariables = ctxt.getVisibleVariables();
+							fv.freeVariables.put(d.name, fv);
+						}
 					}
 				}
 			}

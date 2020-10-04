@@ -70,6 +70,11 @@ public class TCSetEnumExpression extends TCSetExpression
 			TCType mt = ex.typeCheck(env, null, scope, elemConstraint);
 			ts.add(mt);
 			types.add(mt);
+
+			if (members.size() > 1 && TCType.isFunctionType(mt, location))
+			{
+				ex.warning(5037, "Function equality cannot be reliably computed");
+			}
 		}
 
 		TCType rt = ts.isEmpty() ? new TCSetType(location) :

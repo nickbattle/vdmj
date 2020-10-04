@@ -304,6 +304,30 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 		return false;
 	}
 
+	public static boolean isFunctionType(TCType type, LexLocation from)
+	{
+		if (type instanceof TCUnionType)
+		{
+			TCUnionType union = (TCUnionType)type;
+			
+			for (TCType element: union.types)
+			{
+				if (isFunctionType(element, from))
+				{
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		else
+		{
+			return type.isFunction(from) &&
+				!(type instanceof TCOptionalType) &&	// eg. nil is not a function
+				!(type instanceof TCUnknownType);		// eg. ? is not a function
+		}
+	}
+
 	/**
 	 * @param from
 	 */

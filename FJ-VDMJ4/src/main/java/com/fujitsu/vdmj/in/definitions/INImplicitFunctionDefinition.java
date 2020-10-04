@@ -132,7 +132,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 	public NameValuePairList getNamedValues(Context ctxt)
 	{
 		NameValuePairList nvl = new NameValuePairList();
-		Context free = ctxt.getVisibleVariables();
+		Context free = null;	// ctxt.getVisibleVariables();
 
 		FunctionValue prefunc =
 			(predef == null) ? null : new FunctionValue(predef, null, null, free);
@@ -169,7 +169,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
 			// This is needed for recursive local functions
-			free.putList(nvl);
+			// free.putList(nvl);
 		}
 
 		return nvl;

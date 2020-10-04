@@ -967,3 +967,4 @@ as the expected and actual values.
 5034, "Cannot use 'new' in a functional context"
 5035, "Cannot use 'threadid' in a functional context"
 5036, "Cannot use 'time' in a functional context"
+5037, "Function equality cannot be reliably computed"
