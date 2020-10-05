@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
 import json.JSONServer;
+import lsp.lspx.POGHandler;
 import lsp.textdocument.CompletionHandler;
 import lsp.textdocument.DefinitionHandler;
 import lsp.textdocument.DidChangeHandler;
@@ -86,9 +87,7 @@ public class LSPServer extends JSONServer
 	{
 		RPCDispatcher dispatcher = new RPCDispatcher();
 		
-		dispatcher.register("initialize", new InitializeHandler(state));
-		dispatcher.register("initialized", new InitializeHandler(state));
-		dispatcher.register("client/registerCapability", new InitializeHandler(state));
+		dispatcher.register(new InitializeHandler(state), "initialize", "initialized", "client/registerCapability");
 		dispatcher.register("shutdown", new ShutdownHandler(state));
 		dispatcher.register("exit", new ExitHandler(state));
 
@@ -103,7 +102,9 @@ public class LSPServer extends JSONServer
 		dispatcher.register("workspace/didChangeWatchedFiles", new DidChangeWSHandler(state));
 		dispatcher.register("workspace/workspaceFolders", new WorkspaceFoldersHandler(state));
 		dispatcher.register("workspace/didChangeWorkspaceFolders", new DidChangeWSHandler(state));
-		
+
+		dispatcher.register(new POGHandler(state), "lspx/POG/generate", "lspx/POG/generate");
+
 		return dispatcher;
 	}
 	

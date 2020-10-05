@@ -36,10 +36,12 @@ public class RPCDispatcher
 		handlers.put(method, handler);
 	}
 	
-	public void register(String method1, String method2, RPCHandler handler)
+	public void register(RPCHandler handler, String... methods)
 	{
-		handlers.put(method1, handler);
-		handlers.put(method2, handler);
+		for (String method: methods)
+		{
+			handlers.put(method, handler);
+		}
 	}
 	
 	public RPCHandler getHandler(RPCRequest request)

@@ -1,0 +1,4 @@
+functions
+	f: nat * nat -> nat
+	f(a, b) == a/b;
+ 
