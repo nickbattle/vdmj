@@ -173,6 +173,9 @@ public class WorkspaceManagerPP extends WorkspaceManager
 			inClassList = null;
 		}
 		
+		poClassList = null;		// Created from TC on generate method
+		poGeneratedList = null;
+		
 		errs.addAll(warns);
 		return diagnosticResponses(errs, null);
 	}
