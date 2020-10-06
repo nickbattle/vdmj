@@ -103,7 +103,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register("workspace/workspaceFolders", new WorkspaceFoldersHandler(state));
 		dispatcher.register("workspace/didChangeWorkspaceFolders", new DidChangeWSHandler(state));
 
-		dispatcher.register(new POGHandler(state), "lspx/POG/generate", "lspx/POG/generate");
+		dispatcher.register(new POGHandler(state), "lspx/POG/generate", "lspx/POG/retrieve");
 
 		return dispatcher;
 	}
