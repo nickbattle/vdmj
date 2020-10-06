@@ -23,7 +23,6 @@
 
 package json;
 
-import java.util.Arrays;
 import java.util.Vector;
 
 public class JSONArray extends Vector<Object>
@@ -32,7 +31,25 @@ public class JSONArray extends Vector<Object>
 
 	public JSONArray(Object... args)
 	{
-		addAll(Arrays.asList(args));
+		for (Object arg: args)
+		{
+			add(arg);
+		}
+	}
+	
+	@Override
+	public boolean add(Object value)
+	{
+		if (value instanceof Integer)
+		{
+			value = ((Integer)value).longValue();
+		}
+		else if (value instanceof Short)
+		{
+			value = ((Short)value).longValue();
+		}
+		
+		return super.add(value);
 	}
 	
 	@SuppressWarnings("unchecked")
