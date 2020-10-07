@@ -48,7 +48,7 @@ public class RPCTest extends TestCase
 		JSONObject map = reader.readObject();
 		RPCDispatcher d = new RPCDispatcher();
 
-		d.register("subtract", new RPCHandler()
+		d.register(new RPCHandler()
 		{
 			@Override
 			public RPCMessageList request(RPCRequest request) throws IOException
@@ -63,7 +63,7 @@ public class RPCTest extends TestCase
 			public void response(RPCResponse message)
 			{
 			}
-		});
+		}, "subtract");
 		
 		RPCMessageList responses = d.dispatch(new RPCRequest(map));
 		StringWriter out = new StringWriter();
@@ -85,7 +85,7 @@ public class RPCTest extends TestCase
 		JSONObject map = reader.readObject();
 		RPCDispatcher d = new RPCDispatcher();
 
-		d.register("subtract", new RPCHandler()
+		d.register(new RPCHandler()
 		{
 			@Override
 			public RPCMessageList request(RPCRequest request) throws IOException
@@ -100,7 +100,7 @@ public class RPCTest extends TestCase
 			public void response(RPCResponse message)
 			{
 			}
-		});
+		}, "subtract");
 		
 		RPCMessageList responses = d.dispatch(new RPCRequest(map));
 		StringWriter out = new StringWriter();

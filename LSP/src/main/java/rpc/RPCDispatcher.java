@@ -31,7 +31,7 @@ public class RPCDispatcher
 {
 	private Map<String, RPCHandler> handlers = new HashMap<String, RPCHandler>();
 	
-	public void register(String method, RPCHandler handler)
+	public void register(RPCHandler handler, String method)
 	{
 		handlers.put(method, handler);
 	}
