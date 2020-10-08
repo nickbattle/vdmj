@@ -56,13 +56,14 @@ public enum POType
 	WHILE_LOOP("while loop termination"),
 	OP_POST_CONDITION("operation post condition"),
 	OPERATION_PATTERNS("operation parameter patterns"),
-	OP_SATISFIABILITY("operation satifiability"),
+	OP_SATISFIABILITY("operation satisfiability"),
 	SET_MEMBER("set membership"),
 	SEQ_MEMBER("sequence membership"),
 	ORDERED("ordered"),
 	STRICT_ORDER("strict order"),
 	EQUIV_RELATION("equivalence relation"),
-	TOTAL("total function");
+	TOTAL("total function"),
+	INV_SATISFIABILITY("invariant satisfiability");
 
 	private String kind;
 

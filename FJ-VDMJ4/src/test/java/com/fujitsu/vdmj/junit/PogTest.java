@@ -64,6 +64,7 @@ public class PogTest extends TestCase
 
 	private String[] expected =
 	{
+		"exists a : seq of (nat1) & (a <> [])\n",
 		"forall m1, m2 in set {{1 |-> 2}, {2 |-> 3}} &\n  forall d3 in set dom m1, d4 in set dom m2 &\n    d3 = d4 => m1(d3) = m2(d4)\n",
 		"-- After instance variable initializers\n(iv < 10)\n",
 		"forall arg1:(int * int), arg2:seq of (int) &\n  (exists bind1:(int * int), i:int, j:int & (arg1 = bind1) and (mk_(i, j) = bind1))\n  and (exists bind1:seq of (int), k:int & (arg2 = bind1) and ([k] = bind1))\n",
@@ -146,7 +147,7 @@ public class PogTest extends TestCase
 		"2 in set dom m\n",
 		"3 in set dom m\n",
 		"while (x > 0) do ...\n",
-		"-- After iv := (iv + 1)\n(iv < 10)\n"
+		"-- After iv := (iv + 1)\n(iv < 10)\n",
 	};
 
 	public void testPOG() throws Exception
