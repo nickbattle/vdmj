@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.EquivRelationObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.StrictOrderObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
@@ -97,6 +98,7 @@ public class POTypeDefinition extends PODefinition
 		if (invExpression != null)
 		{
 			list.addAll(invExpression.getProofObligations(ctxt));
+			list.add(new SatisfiabilityObligation(this, ctxt));
 		}
 
 		if (eqExpression != null)

@@ -30,8 +30,10 @@ import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
+import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.po.types.POPatternTypePair;
+import com.fujitsu.vdmj.tc.types.TCNamedType;
 
 public class SatisfiabilityObligation extends ProofObligation
 {
@@ -101,6 +103,48 @@ public class SatisfiabilityObligation extends ProofObligation
 		appendStatePatterns(sb, stateDefinition, false, false);
 		sb.append(")");
 
+		value = ctxt.getObligation(sb.toString());
+	}
+
+	public SatisfiabilityObligation(POTypeDefinition typedef, POContextStack ctxt)
+	{
+		super(typedef.location, POType.INV_SATISFIABILITY, ctxt);
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("exists ");
+		separator = "";
+		sb.append(typedef.invPattern);
+		sb.append(" : ");
+		
+		if (typedef.type instanceof TCNamedType)
+		{
+			TCNamedType nt = (TCNamedType)typedef.type;
+			sb.append(nt.type);
+		}
+		else
+		{
+			sb.append(typedef.type);
+		}
+		
+		sb.append(" & ");
+		sb.append(typedef.invExpression);
+		
+		value = ctxt.getObligation(sb.toString());
+	}
+
+	public SatisfiabilityObligation(POStateDefinition statedef, POContextStack ctxt)
+	{
+		super(statedef.location, POType.INV_SATISFIABILITY, ctxt);
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("exists ");
+		separator = "";
+		sb.append(statedef.invPattern);
+		sb.append(" : ");
+		sb.append(statedef.name);
+		sb.append(" & ");
+		sb.append(statedef.invExpression);
+		
 		value = ctxt.getObligation(sb.toString());
 	}
 
