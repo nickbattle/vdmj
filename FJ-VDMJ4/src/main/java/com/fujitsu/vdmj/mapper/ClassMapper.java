@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.mapper;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -191,51 +192,76 @@ public class ClassMapper
 		while (urls.hasMoreElements())
 		{
 			URL url = urls.nextElement();
-			InputStream is = url.openStream();
-			MappingReader reader = new MappingReader(configFile, is);
-			
-			try
+			readMapping(configFile, url.openStream());
+		}
+		
+		/**
+		 * You can add extra file locations by setting the vdmj.mappingpath property.
+		 * This allows more than one mapping file of the same name to be included within
+		 * one jar file.
+		 */
+		String mappingPath = System.getProperty("vdmj.mappingpath");
+		
+		if (mappingPath != null)
+		{
+			for (String classpath: mappingPath.split(File.pathSeparator))
 			{
-				boolean eof = false;
+				String filename = classpath + File.separator + configFile;
+				InputStream is = getClass().getResourceAsStream(filename);
 				
-				while (!eof)
+				if (is != null)
 				{
-	    			Mapping command = reader.readCommand();
-	    			lineNo = command.lineNo;
-	    
-	    			switch (command.type)
-	    			{
-	    				case PACKAGE:
-	    					processPackage(command);
-	    					break;
-	    					
-	    				case MAP:
-	    					processMap(command);
-	    					break;
-	    					
-	    				case UNMAPPED:
-	    					processUnmapped(command);
-	    					break;
-	    					
-	    				case INIT:
-	    					processInit(command);
-	    					break;
-	    					
-	    				case EOF:
-	    					eof = true;
-	    					break;
-	    					
-						case ERROR:
-							// try next line
-							errorCount++;
-							break;
-	    			}
+					readMapping(filename, is);
 				}
 			}
-			finally
+		}
+	}
+
+	private void readMapping(String filename, InputStream is) throws Exception
+	{
+		MappingReader reader = new MappingReader(filename, is);
+		
+		try
+		{
+			boolean eof = false;
+			
+			while (!eof)
 			{
-	    		reader.close();
+    			Mapping command = reader.readCommand();
+    			lineNo = command.lineNo;
+    
+    			switch (command.type)
+    			{
+    				case PACKAGE:
+    					processPackage(command);
+    					break;
+    					
+    				case MAP:
+    					processMap(command);
+    					break;
+    					
+    				case UNMAPPED:
+    					processUnmapped(command);
+    					break;
+    					
+    				case INIT:
+    					processInit(command);
+    					break;
+    					
+    				case EOF:
+    					eof = true;
+    					break;
+    					
+					case ERROR:
+						// try next line
+						errorCount++;
+						break;
+    			}
 			}
+		}
+		finally
+		{
+    		reader.close();
 		}
 	}
 

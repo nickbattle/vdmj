@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
 import json.JSONServer;
+import lsp.lspx.POGHandler;
 import lsp.textdocument.CompletionHandler;
 import lsp.textdocument.DefinitionHandler;
 import lsp.textdocument.DidChangeHandler;
@@ -86,24 +87,24 @@ public class LSPServer extends JSONServer
 	{
 		RPCDispatcher dispatcher = new RPCDispatcher();
 		
-		dispatcher.register("initialize", new InitializeHandler(state));
-		dispatcher.register("initialized", new InitializeHandler(state));
-		dispatcher.register("client/registerCapability", new InitializeHandler(state));
-		dispatcher.register("shutdown", new ShutdownHandler(state));
-		dispatcher.register("exit", new ExitHandler(state));
+		dispatcher.register(new InitializeHandler(state), "initialize", "initialized", "client/registerCapability");
+		dispatcher.register(new ShutdownHandler(state), "shutdown");
+		dispatcher.register(new ExitHandler(state), "exit");
 
-		dispatcher.register("textDocument/didOpen", new DidOpenHandler(state));
-		dispatcher.register("textDocument/didClose", new DidCloseHandler(state));
-		dispatcher.register("textDocument/didChange", new DidChangeHandler(state));
-		dispatcher.register("textDocument/didSave", new DidSaveHandler(state));
-		dispatcher.register("textDocument/definition", new DefinitionHandler(state));
-		dispatcher.register("textDocument/documentSymbol", new DocumentSymbolHandler(state));
-		dispatcher.register("textDocument/completion", new CompletionHandler(state));
+		dispatcher.register(new DidOpenHandler(state), "textDocument/didOpen");
+		dispatcher.register(new DidCloseHandler(state), "textDocument/didClose");
+		dispatcher.register(new DidChangeHandler(state), "textDocument/didChange");
+		dispatcher.register(new DidSaveHandler(state), "textDocument/didSave");
+		dispatcher.register(new DefinitionHandler(state), "textDocument/definition");
+		dispatcher.register(new DocumentSymbolHandler(state), "textDocument/documentSymbol");
+		dispatcher.register(new CompletionHandler(state), "textDocument/completion");
 
-		dispatcher.register("workspace/didChangeWatchedFiles", new DidChangeWSHandler(state));
-		dispatcher.register("workspace/workspaceFolders", new WorkspaceFoldersHandler(state));
-		dispatcher.register("workspace/didChangeWorkspaceFolders", new DidChangeWSHandler(state));
-		
+		dispatcher.register(new DidChangeWSHandler(state), "workspace/didChangeWatchedFiles");
+		dispatcher.register(new WorkspaceFoldersHandler(state), "workspace/workspaceFolders");
+		dispatcher.register(new DidChangeWSHandler(state), "workspace/didChangeWorkspaceFolders");
+
+		dispatcher.register(new POGHandler(state), "lspx/POG/generate", "lspx/POG/retrieve");
+
 		return dispatcher;
 	}
 	

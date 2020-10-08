@@ -47,6 +47,21 @@ public class JSONObject extends LinkedHashMap<String, Object>	// Order preservin
 		}
 	}
 	
+	@Override
+	public Object put(String name, Object value)
+	{
+		if (value instanceof Integer)
+		{
+			value = ((Integer)value).longValue();
+		}
+		else if (value instanceof Short)
+		{
+			value = ((Short)value).longValue();
+		}
+		
+		return super.put(name, value);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public <T> T get(String name)
 	{

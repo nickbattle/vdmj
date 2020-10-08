@@ -41,6 +41,10 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.definitions.POClassList;
+import com.fujitsu.vdmj.pog.ProofObligation;
+import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.syntax.ClassReader;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -57,6 +61,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
 import lsp.textdocument.SymbolKind;
+import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.LSPDefinitionFinder;
@@ -67,6 +72,8 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	private ASTClassList astClassList = null;
 	private TCClassList tcClassList = null;
 	private INClassList inClassList = null;
+	private POClassList poClassList = null;
+	private ProofObligationList poGeneratedList;
 
 	public WorkspaceManagerPP()
 	{
@@ -165,6 +172,9 @@ public class WorkspaceManagerPP extends WorkspaceManager
 			Log.dump(warns);
 			inClassList = null;
 		}
+		
+		poClassList = null;		// Created from TC on generate method
+		poGeneratedList = null;
 		
 		errs.addAll(warns);
 		return diagnosticResponses(errs, null);
@@ -345,5 +355,79 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	public DAPMessageList threads(DAPRequest request)
 	{
 		return new DAPMessageList(request, new JSONObject("threads", new JSONArray()));	// empty?
+	}
+
+	@Override
+	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range)
+	{
+		if (tcClassList == null)	// No type clean tree
+		{
+			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
+		}
+		
+		try
+		{
+			if (poClassList == null)
+			{
+				poClassList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcClassList);
+				poGeneratedList = poClassList.getProofObligations();
+				poGeneratedList.renumber();
+			}
+			
+			JSONArray results = new JSONArray();
+			
+			for (ProofObligation po: poGeneratedList)
+			{
+				if (file != null && !po.location.file.equals(file))
+				{
+					continue;
+				}
+				else if (range != null && !Utils.lexLocationInRange(po.location, file, range))
+				{
+					continue;
+				}
+				
+				results.add(
+					new JSONObject(
+						"id",		new Long(po.number),
+						"kind", 	po.kind.toString(),
+						"name",		po.name,
+						"location",	Utils.lexLocationToLocation(po.location)));
+			}
+			
+			return new RPCMessageList(request, results);
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	@Override
+	public RPCMessageList pogRetrieve(RPCRequest request, JSONArray ids)
+	{
+		if (poGeneratedList == null)	// Haven't re-called pogGenerate
+		{
+			return new RPCMessageList(request, RPCErrors.InternalError, "POs not generated since last change");
+		}
+
+		JSONArray results = new JSONArray();
+
+		for (int i=0; i<ids.size(); i++)
+		{
+			long id = (Long)ids.get(i);
+			ProofObligation po = poGeneratedList.get((int) id-1);	// eg. PO 1 is get(0)
+
+			results.add(
+				new JSONObject(
+					"id",		new Long(po.number),
+					"kind", 	po.kind.toString(),
+					"name",		po.name,
+					"location",	Utils.lexLocationToLocation(po.location),
+					"source",	po.value));
+		}
+
+		return new RPCMessageList(request, results);
 	}
 }

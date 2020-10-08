@@ -1,0 +1,6 @@
+class A
+functions
+	f: nat * nat -> nat
+	f(a, b) == a/b;
+
+end A

@@ -114,6 +114,27 @@ public class JSONReaderTest extends TestCase
 		assertEquals(map.get("abc"), "\uABCD");
 	}
 	
+	@Test
+	public void testNumbers()
+	{
+		long lvalue = 123;
+		int ivalue = 456;
+		short svalue = 789;
+		
+		JSONArray array = new JSONArray(lvalue, ivalue, svalue);
+		
+		for (Object v: array)
+		{
+			assertTrue(v instanceof Long);
+		}
+		
+		JSONObject object = new JSONObject("lvalue", lvalue, "ivalue", ivalue, "svalue", svalue);
+		
+		assertTrue(object.get("lvalue") instanceof Long);
+		assertTrue(object.get("ivalue") instanceof Long);
+		assertTrue(object.get("svalue") instanceof Long);
+	}
+	
 	
 	private String getWS()
 	{
@@ -205,15 +226,16 @@ public class JSONReaderTest extends TestCase
 		StringBuilder sb = new StringBuilder();
 		sb.append(getWS());
 
-		switch (r.nextInt(7))
+		switch (r.nextInt(8))
 		{
 			case 0: sb.append(r.nextLong()); break;
-			case 1: sb.append(r.nextDouble() * Math.pow(10, r.nextInt(50) + 1)); break; 
-			case 2: sb.append(r.nextBoolean()); break;
-			case 3: sb.append(getArray()); break;
-			case 4: sb.append(getObject()); break;
-			case 5: sb.append(getString()); break;
-			case 6: sb.append("null");
+			case 1: sb.append(r.nextInt()); break;
+			case 2: sb.append(r.nextDouble() * Math.pow(10, r.nextInt(50) + 1)); break; 
+			case 3: sb.append(r.nextBoolean()); break;
+			case 4: sb.append(getArray()); break;
+			case 5: sb.append(getObject()); break;
+			case 6: sb.append(getString()); break;
+			case 7: sb.append("null");
 		}
 		
 		sb.append(getWS());

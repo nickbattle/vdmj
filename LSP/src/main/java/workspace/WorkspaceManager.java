@@ -130,6 +130,11 @@ public abstract class WorkspaceManager
 		}
 	}
 	
+	public static void reset()
+	{
+		INSTANCE = null;
+	}
+	
 	public static WorkspaceManager getInstance()
 	{
 		return INSTANCE;
@@ -917,6 +922,13 @@ public abstract class WorkspaceManager
 
 	abstract public Interpreter getInterpreter();
 
+	abstract public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range);
+
+	public abstract RPCMessageList pogRetrieve(RPCRequest request, JSONArray ids);
+
+	/**
+	 * Termination and cleanup methods.
+	 */
 	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
 		stdout("\nSession disconnected.\n");

@@ -65,6 +65,27 @@ public class Utils
 			"uri",   location.file.toURI().toString(),
 			"range", lexLocationToRange(location));
 	}
+	
+	public static LexLocation rangeToLexLocation(File file, JSONObject range)
+	{
+		JSONObject start = range.get("start");
+		Long startLine = start.get("line");
+		Long startPos = start.get("character");
+		
+		JSONObject end = range.get("end");
+		Long endLine = end.get("line");
+		Long endPos = end.get("character");
+		
+		return new LexLocation(file, "?",
+				startLine.intValue() + 1, startPos.intValue() + 1,
+				endLine.intValue() + 1, endPos.intValue() + 1);
+	}
+	
+	public static boolean lexLocationInRange(LexLocation location, File file, JSONObject range)
+	{
+		LexLocation rangeLoc = rangeToLexLocation(file, range);
+		return location.within(rangeLoc);
+	}
 
 	public static File uriToFile(String s) throws URISyntaxException, IOException
 	{
