@@ -45,7 +45,7 @@ public class POContextStack extends Stack<POContext>
 			{
 				result.append(prefix);
 				result.append(name);
-				prefix = ", ";
+				prefix = "; ";
 			}
 		}
 

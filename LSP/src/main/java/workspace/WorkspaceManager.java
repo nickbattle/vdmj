@@ -185,7 +185,7 @@ public abstract class WorkspaceManager
 			RPCMessageList response = new RPCMessageList();
 			response.add(lspDynamicRegistrations());
 			
-			if (getClientCapability("workspace.workspaceFolders"))
+			if (hasClientCapability("workspace.workspaceFolders"))
 			{
 				response.add(lspWorkspaceFolders());
 			}
@@ -269,10 +269,18 @@ public abstract class WorkspaceManager
 		return roots;
 	}
 	
-	public boolean getClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
+	public boolean hasClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
+	{
+		Boolean cap = getClientCapability(dotName);
+		return cap != null && cap;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getClientCapability(String dotName)
 	{
 		String[] parts = dotName.split("\\.");
 		JSONObject json = clientCapabilities;
+		String last = parts[parts.length - 1];
 		
 		for (String part: parts)
 		{
@@ -280,14 +288,18 @@ public abstract class WorkspaceManager
 			{
 				Object obj = json.get(part);
 				
-				if (obj instanceof JSONObject)
+				if (part.equals(last))
+				{
+					Log.printf("Client capability %s = %s", dotName, obj);
+					return (T)obj;
+				}
+				else if (obj instanceof JSONObject)
 				{
 					json = (JSONObject) obj;
 				}
-				else if (obj instanceof Boolean)
+				else
 				{
-					Log.printf("Client capability %s = %s", dotName, obj);
-					return (Boolean) obj;
+					break;	// Path includes non-object
 				}
 			}
 			else
@@ -297,7 +309,7 @@ public abstract class WorkspaceManager
 		}
 		
 		Log.printf("Missing client capability: %s", dotName);
-		return false;
+		return null;
 	}
 
 	/** True if we have an interpreter that we can use. */
@@ -923,8 +935,6 @@ public abstract class WorkspaceManager
 	abstract public Interpreter getInterpreter();
 
 	abstract public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range);
-
-	public abstract RPCMessageList pogRetrieve(RPCRequest request, JSONArray ids);
 
 	/**
 	 * Termination and cleanup methods.

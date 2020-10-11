@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.POClassList;
+import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
@@ -73,7 +74,6 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	private TCClassList tcClassList = null;
 	private INClassList inClassList = null;
 	private POClassList poClassList = null;
-	private ProofObligationList poGeneratedList;
 
 	public WorkspaceManagerPP()
 	{
@@ -173,11 +173,19 @@ public class WorkspaceManagerPP extends WorkspaceManager
 			inClassList = null;
 		}
 		
-		poClassList = null;		// Created from TC on generate method
-		poGeneratedList = null;
-		
 		errs.addAll(warns);
-		return diagnosticResponses(errs, null);
+		RPCMessageList result = diagnosticResponses(errs, null);
+		
+		if (hasClientCapability("experimental.proofObligationGeneration"))
+		{
+			poClassList = null;
+			result.add(new RPCRequest("lspx/POG/updated",
+					new JSONObject(
+						"uri",			getRoots().get(0).toURI().toString(),
+						"successful",	tcClassList != null)));
+		}
+		
+		return result;
 	}
 
 	@Override
@@ -370,10 +378,10 @@ public class WorkspaceManagerPP extends WorkspaceManager
 			if (poClassList == null)
 			{
 				poClassList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcClassList);
-				poGeneratedList = poClassList.getProofObligations();
-				poGeneratedList.renumber();
 			}
 			
+			ProofObligationList poGeneratedList = poClassList.getProofObligations();
+			poGeneratedList.renumber();
 			JSONArray results = new JSONArray();
 			
 			for (ProofObligation po: poGeneratedList)
@@ -382,17 +390,22 @@ public class WorkspaceManagerPP extends WorkspaceManager
 				{
 					continue;
 				}
-				else if (range != null && !Utils.lexLocationInRange(po.location, file, range))
-				{
-					continue;
-				}
 				
+				JSONArray name = new JSONArray(po.location.module);
+				
+				for (String part: po.name.split(";\\s+"))
+				{
+					name.add(part);
+				}
+
 				results.add(
 					new JSONObject(
 						"id",		new Long(po.number),
 						"kind", 	po.kind.toString(),
-						"name",		po.name,
-						"location",	Utils.lexLocationToLocation(po.location)));
+						"name",		name,
+						"location",	Utils.lexLocationToLocation(po.location),
+						"source",	po.value,
+						"proved",	po.status != POStatus.UNPROVED));
 			}
 			
 			return new RPCMessageList(request, results);
@@ -402,32 +415,5 @@ public class WorkspaceManagerPP extends WorkspaceManager
 			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
-	}
-
-	@Override
-	public RPCMessageList pogRetrieve(RPCRequest request, JSONArray ids)
-	{
-		if (poGeneratedList == null)	// Haven't re-called pogGenerate
-		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "POs not generated since last change");
-		}
-
-		JSONArray results = new JSONArray();
-
-		for (int i=0; i<ids.size(); i++)
-		{
-			long id = (Long)ids.get(i);
-			ProofObligation po = poGeneratedList.get((int) id-1);	// eg. PO 1 is get(0)
-
-			results.add(
-				new JSONObject(
-					"id",		new Long(po.number),
-					"kind", 	po.kind.toString(),
-					"name",		po.name,
-					"location",	Utils.lexLocationToLocation(po.location),
-					"source",	po.value));
-		}
-
-		return new RPCMessageList(request, results);
 	}
 }
