@@ -43,13 +43,10 @@ public class ConfigBase
 			{
 				fis = ConfigBase.class.getResourceAsStream("/" + resource);
 
-				if (fis == null)
+				if (fis != null)
 				{
-					// properties file is not on the classpath
-					return;
+					props.load(fis);
 				}
-
-				props.load(fis);
 			}
     		catch (Exception ex)
     		{
