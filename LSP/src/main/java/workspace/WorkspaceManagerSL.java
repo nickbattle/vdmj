@@ -379,7 +379,9 @@ public class WorkspaceManagerSL extends WorkspaceManager
 			
 			for (ProofObligation po: poGeneratedList)
 			{
-				if (file != null && !po.location.file.equals(file))
+				if (file != null &&
+					!po.location.file.equals(file) &&
+					!po.location.file.getParentFile().equals(file))		// folder
 				{
 					continue;
 				}
