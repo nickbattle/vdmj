@@ -86,7 +86,7 @@ public class POGTest
 		state.setManager(manager);
 		
 		File testdir = new File("src/test/resources/pogtest_pp");
-		File file = new File(testdir, "pogtest.vdmpp");
+		// File file = new File(testdir, "pogtest.vdmpp");
 
 		JSONObject params = new JSONObject(
 				"rootUri",		testdir.toURI().toString(),
@@ -104,7 +104,7 @@ public class POGTest
 		POGHandler handler = new POGHandler(state);
 		
 		RPCRequest request = new RPCRequest(789L, "lspx/POG/generate",
-				new JSONObject("uri", file.toURI().toString()));
+				new JSONObject("uri", testdir.toURI().toString()));
 		
 		RPCMessageList response = handler.request(request);
 		writer.writeObject(request);
