@@ -67,4 +67,32 @@ public class JSONObject extends LinkedHashMap<String, Object>	// Order preservin
 	{
 		return (T)super.get(name);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getPath(String dotName)
+	{
+		int dot = dotName.indexOf('.');
+		String part = (dot == -1) ? dotName : dotName.substring(0, dot);
+		String tail = (dot == -1) ? null : dotName.substring(dot + 1);
+		Object obj = this.get(part);
+		
+		if (tail == null)
+		{
+			return (T) obj;
+		}
+		else if (obj instanceof JSONObject)
+		{
+			JSONObject json = (JSONObject)obj;
+			return (T)json.getPath(tail);
+		}
+		else if (obj instanceof JSONArray)
+		{
+			JSONArray json = (JSONArray)obj;
+			return (T)json.getPath(tail);
+		}
+		else
+		{
+			return null;
+		}
+	}
 }

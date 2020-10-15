@@ -278,38 +278,18 @@ public abstract class WorkspaceManager
 	@SuppressWarnings("unchecked")
 	public <T> T getClientCapability(String dotName)
 	{
-		String[] parts = dotName.split("\\.");
-		JSONObject json = clientCapabilities;
-		String last = parts[parts.length - 1];
+		T capability = clientCapabilities.getPath(dotName);
 		
-		for (String part: parts)
+		if (capability != null)
 		{
-			if (json.containsKey(part))
-			{
-				Object obj = json.get(part);
-				
-				if (part.equals(last))
-				{
-					Log.printf("Client capability %s = %s", dotName, obj);
-					return (T)obj;
-				}
-				else if (obj instanceof JSONObject)
-				{
-					json = (JSONObject) obj;
-				}
-				else
-				{
-					break;	// Path includes non-object
-				}
-			}
-			else
-			{
-				break;
-			}
+			Log.printf("Client capability %s = %s", dotName, capability);
+			return capability;
 		}
-		
-		Log.printf("Missing client capability: %s", dotName);
-		return null;
+		else
+		{
+			Log.printf("Missing client capability: %s", dotName);
+			return null;
+		}
 	}
 
 	/** True if we have an interpreter that we can use. */
