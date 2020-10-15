@@ -160,5 +160,15 @@ public class POGTest
 		dump(notify.get(1));
 		assertEquals("lspx/POG/updated", notify.get(1).getPath("method"));
 		assertEquals(false, notify.get(1).getPath("params.successful"));
+
+		POGHandler handler = new POGHandler(state);
+		RPCRequest request = new RPCRequest(789L, "lspx/POG/generate",
+				new JSONObject("uri", testdir.toURI().toString()));
+		
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+
+		dump(response.get(0));
+		assertEquals("Type checking errors found", response.get(0).getPath("error.message"));
 	}	
 }
