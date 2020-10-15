@@ -164,6 +164,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 			Log.error("Type checking errors found");
 			Log.dump(errs);
 			Log.dump(warns);
+			tcModuleList = null;
 			inModuleList = null;
 		}
 		

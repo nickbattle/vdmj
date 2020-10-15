@@ -82,12 +82,10 @@ public class POGTest
 	public void testSL() throws Exception
 	{
 		setupWorkspace(Dialect.VDM_SL);
-		
 		File testdir = new File("src/test/resources/pogtest_sl");
-		File file = new File(testdir, "pogtest.vdmsl");
 		RPCMessageList notify = initialize(testdir);
-
 		assertEquals(2, notify.size());
+
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
@@ -97,11 +95,13 @@ public class POGTest
 		assertEquals(true, notify.get(1).getPath("params.successful"));
 
 		POGHandler handler = new POGHandler(state);
+		File file = new File(testdir, "pogtest.vdmsl");
 		RPCRequest request = new RPCRequest(123L, "lspx/POG/generate",
 				new JSONObject("uri", file.toURI().toString()));
 		
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
+
 		dump(response.get(0));
 		assertEquals("non-zero", response.get(0).getPath("result.[0].kind"));
 		assertEquals("total function", response.get(0).getPath("result.[1].kind"));
@@ -114,11 +114,10 @@ public class POGTest
 	public void testPP() throws Exception
 	{
 		setupWorkspace(Dialect.VDM_PP);
-		
 		File testdir = new File("src/test/resources/pogtest_pp");
 		RPCMessageList notify = initialize(testdir);
-
 		assertEquals(2, notify.size());
+
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
@@ -128,12 +127,12 @@ public class POGTest
 		assertEquals(true, notify.get(1).getPath("params.successful"));
 		
 		POGHandler handler = new POGHandler(state);
-		
 		RPCRequest request = new RPCRequest(789L, "lspx/POG/generate",
 				new JSONObject("uri", testdir.toURI().toString()));
 		
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
+
 		dump(response.get(0));
 		assertEquals("non-zero", response.get(0).getPath("result.[0].kind"));
 		assertEquals("total function", response.get(0).getPath("result.[1].kind"));
@@ -141,4 +140,25 @@ public class POGTest
 		assertEquals("recursive function", response.get(0).getPath("result.[3].kind"));
 		assertEquals("subtype", response.get(0).getPath("result.[4].kind"));
 	}
+	
+	@Test
+	public void testSLErrors() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_SL);
+		File testdir = new File("src/test/resources/pogerrors_sl");
+		RPCMessageList notify = initialize(testdir);
+		assertEquals(2, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		Object array = notify.get(0).getPath("params.diagnostics");
+		assertTrue(array instanceof JSONArray);
+		JSONArray diags = (JSONArray)array;
+		assertEquals(1, diags.size());
+		assertEquals("Unable to resolve type name 'nt'", notify.get(0).getPath("params.diagnostics.[0].message"));
+		
+		dump(notify.get(1));
+		assertEquals("lspx/POG/updated", notify.get(1).getPath("method"));
+		assertEquals(false, notify.get(1).getPath("params.successful"));
+	}	
 }
