@@ -84,6 +84,9 @@ import vdmj.commands.PrintCommand;
 public abstract class WorkspaceManager
 {
 	private static WorkspaceManager INSTANCE = null;
+	
+	private List<WorkspacePlugin> plugins = new Vector<WorkspacePlugin>();
+	private Map<String, List<WorkspacePlugin>> pluginEvents = new HashMap<String, List<WorkspacePlugin>>();
 
 	private JSONObject clientCapabilities;
 	private List<File> roots = new Vector<File>();
@@ -99,8 +102,10 @@ public abstract class WorkspaceManager
 	private String launchCommand;
 	private String defaultName;
 
-	
-	public static WorkspaceManager createInstance(Dialect dialect) throws IOException
+	/**
+	 * This is called by both LSP and DAP servers (and there is a race!) 
+	 */
+	public static synchronized WorkspaceManager createInstance(Dialect dialect) throws IOException
 	{
 		switch (dialect)
 		{
@@ -132,7 +137,44 @@ public abstract class WorkspaceManager
 	
 	public static void reset()
 	{
-		INSTANCE = null;
+		if (INSTANCE != null)
+		{
+			INSTANCE.plugins.clear();
+			INSTANCE.pluginEvents.clear();
+			INSTANCE = null;
+		}
+	}
+	
+	public void registerPlugin(WorkspacePlugin plugin)
+	{
+		plugins.add(plugin);
+		plugin.init();
+	}
+	
+	public void registerForEvent(String event, WorkspacePlugin plugin)
+	{
+		List<WorkspacePlugin> plugins = pluginEvents.get(event);
+		
+		if (plugins == null)
+		{
+			plugins = new Vector<WorkspacePlugin>();
+			pluginEvents.put(event, plugins);
+		}
+		
+		plugins.add(plugin);
+	}
+	
+	public RPCMessageList processEvent(String event)
+	{
+		List<WorkspacePlugin> plugins = pluginEvents.get(event);
+		RPCMessageList results = new RPCMessageList();
+		
+		for (WorkspacePlugin plugin: plugins)
+		{
+			results.addAll(plugin.processEvent(event));
+		}
+		
+		return results;
 	}
 	
 	public static WorkspaceManager getInstance()

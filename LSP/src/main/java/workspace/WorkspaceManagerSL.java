@@ -78,6 +78,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	public WorkspaceManagerSL()
 	{
 		Settings.dialect = Dialect.VDM_SL;
+		registerPlugin(new ASTPlugin(this));
 	}
 	
 	@Override
