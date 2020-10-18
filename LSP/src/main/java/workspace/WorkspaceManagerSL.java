@@ -67,6 +67,7 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.LSPDefinitionFinder;
 import vdmj.LSPDefinitionFinder.Found;
+import workspace.plugins.ASTPluginSL;
 
 public class WorkspaceManagerSL extends WorkspaceManager
 {
@@ -78,32 +79,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	public WorkspaceManagerSL()
 	{
 		Settings.dialect = Dialect.VDM_SL;
-		registerPlugin(new ASTPlugin(this));
-	}
-	
-	@Override
-	protected List<VDMMessage> parseFile(File file)
-	{
-		List<VDMMessage> errs = new Vector<VDMMessage>();
-		StringBuilder buffer = projectFiles.get(file);
-		
-		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
-				Dialect.VDM_SL, file, Charset.defaultCharset().displayName());
-		ModuleReader mr = new ModuleReader(ltr);
-		mr.readModules();
-		
-		if (mr.getErrorCount() > 0)
-		{
-			errs.addAll(mr.getErrors());
-		}
-		
-		if (mr.getWarningCount() > 0)
-		{
-			errs.addAll(mr.getWarnings());
-		}
-
-		Log.dump(errs);
-		return errs;
+		registerPlugin(new ASTPluginSL(this));
 	}
 
 	@Override

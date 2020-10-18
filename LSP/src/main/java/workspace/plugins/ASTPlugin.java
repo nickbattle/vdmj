@@ -21,12 +21,17 @@
  *
  ******************************************************************************/
 
-package workspace;
+package workspace.plugins;
 
-import rpc.RPCErrors;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import rpc.RPCMessageList;
+import workspace.WorkspaceManager;
+import workspace.WorkspacePlugin;
 
-public class ASTPlugin extends WorkspacePlugin
+abstract public class ASTPlugin extends WorkspacePlugin
 {
 	public ASTPlugin(WorkspaceManager manager)
 	{
@@ -40,20 +45,29 @@ public class ASTPlugin extends WorkspacePlugin
 	}
 
 	@Override
-	protected RPCMessageList processEvent(String event)
+	protected RPCMessageList processEvent(String event, Object... args) throws Exception
 	{
 		switch (event)
 		{
 			case "reparse":
-				return reparseEvent();
+				if (args.length == 1 && args[0] instanceof File)
+				{
+					return reparseEvent((File)args[0]);
+				}
+				else
+				{
+					return errorResult();
+				}
 			
 			default:
-				return new RPCMessageList(null, RPCErrors.InternalError, "?");
+				return errorResult();
 		}
 	}
 
-	private RPCMessageList reparseEvent()
+	private RPCMessageList reparseEvent(File file) throws IOException
 	{
-		return new RPCMessageList();
+		return messages.diagnosticResponses(parseFile(file), file);
 	}
+	
+	abstract protected List<VDMMessage> parseFile(File file);
 }

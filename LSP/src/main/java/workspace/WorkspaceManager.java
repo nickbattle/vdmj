@@ -164,14 +164,14 @@ public abstract class WorkspaceManager
 		plugins.add(plugin);
 	}
 	
-	public RPCMessageList processEvent(String event)
+	public RPCMessageList processEvent(String event, Object... args) throws Exception
 	{
 		List<WorkspacePlugin> plugins = pluginEvents.get(event);
 		RPCMessageList results = new RPCMessageList();
 		
 		for (WorkspacePlugin plugin: plugins)
 		{
-			results.addAll(plugin.processEvent(event));
+			results.addAll(plugin.processEvent(event, args));
 		}
 		
 		return results;
@@ -180,6 +180,11 @@ public abstract class WorkspaceManager
 	public static WorkspaceManager getInstance()
 	{
 		return INSTANCE;
+	}
+	
+	public Map<File, StringBuilder> getProjectFiles()
+	{
+		return projectFiles;
 	}
 
 	public void setLSPState(LSPServerState lspServerState)
@@ -596,30 +601,35 @@ public abstract class WorkspaceManager
 				buffer.replace(start, end, text);
 			}
 			
-			if (Log.logging())	// dump edited line
+			if (Log.logging())	// dump edited line details
 			{
-				JSONObject position = range.get("start");
-				long line = position.get("line");
-				long count = 0;
-				start = 0;
-				
-				while (count < line)
-				{
-					if (buffer.charAt(start++) == '\n')
-					{
-						count++;
-					}
-				}
-				
-				end = start;
-				while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
-				Log.printf("EDITED %d: [%s]", line+1, buffer.substring(start, end));
+				dumpEdit(range, buffer);
 			}
 			
-			return diagnosticResponses(parseFile(file), file);
+			return processEvent("reparse", file);
 		}
 	}
 
+	private void dumpEdit(JSONObject range, StringBuilder buffer)
+	{
+		JSONObject position = range.get("start");
+		long line = position.get("line");
+		long count = 0;
+		int start = 0;
+		
+		while (count < line)
+		{
+			if (buffer.charAt(start++) == '\n')
+			{
+				count++;
+			}
+		}
+		
+		int end = start;
+		while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
+		Log.printf("EDITED %d: [%s]", line+1, buffer.substring(start, end));
+	}
+	
 	public void changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
 	{
 		switch (type)
@@ -937,8 +947,6 @@ public abstract class WorkspaceManager
 	abstract protected FilenameFilter getFilenameFilter();
 
 	abstract protected String[] getFilenameFilters();
-
-	abstract protected List<VDMMessage> parseFile(File file);
 
 	abstract protected RPCMessageList checkLoadedFiles() throws Exception;
 

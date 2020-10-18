@@ -67,6 +67,7 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.LSPDefinitionFinder;
 import vdmj.LSPDefinitionFinder.Found;
+import workspace.plugins.ASTPluginPP;
 
 public class WorkspaceManagerPP extends WorkspaceManager
 {
@@ -78,31 +79,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	public WorkspaceManagerPP()
 	{
 		Settings.dialect = Dialect.VDM_PP;
-	}
-
-	@Override
-	protected List<VDMMessage> parseFile(File file)
-	{
-		List<VDMMessage> errs = new Vector<VDMMessage>();
-		StringBuilder buffer = projectFiles.get(file);
-		
-		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
-				Settings.dialect, file, Charset.defaultCharset().displayName());
-		ClassReader cr = new ClassReader(ltr);
-		cr.readClasses();
-		
-		if (cr.getErrorCount() > 0)
-		{
-			errs.addAll(cr.getErrors());
-		}
-		
-		if (cr.getWarningCount() > 0)
-		{
-			errs.addAll(cr.getWarnings());
-		}
-
-		Log.dump(errs);
-		return errs;
+		registerPlugin(new ASTPluginPP(this));
 	}
 	
 	protected ASTClassList extras()

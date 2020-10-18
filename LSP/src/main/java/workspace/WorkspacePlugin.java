@@ -23,18 +23,27 @@
 
 package workspace;
 
+import lsp.LSPMessageUtils;
+import rpc.RPCErrors;
 import rpc.RPCMessageList;
 
 abstract public class WorkspacePlugin
 {
 	protected final WorkspaceManager manager;
+	protected final LSPMessageUtils messages;
 	
 	public WorkspacePlugin(WorkspaceManager manager)
 	{
 		this.manager = manager;
+		messages = new LSPMessageUtils();
+	}
+	
+	protected RPCMessageList errorResult()
+	{
+		return new RPCMessageList(null, RPCErrors.InternalError, "?");
 	}
 	
 	abstract public void init();
 
-	abstract protected RPCMessageList processEvent(String event);
+	abstract protected RPCMessageList processEvent(String event, Object... args) throws Exception;
 }
