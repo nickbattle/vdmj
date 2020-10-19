@@ -24,48 +24,51 @@
 package workspace.plugins;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.messages.VDMMessage;
-import com.fujitsu.vdmj.syntax.ClassReader;
-import workspace.Log;
+import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import workspace.WorkspaceManager;
+import workspace.WorkspacePlugin;
 
-public class ASTPluginRT extends ASTPlugin
+abstract public class TCPlugin extends WorkspacePlugin
 {
-	public ASTPluginRT(WorkspaceManager manager)
+	protected List<VDMMessage> errs = new Vector<VDMMessage>();
+	protected List<VDMMessage> warns = new Vector<VDMMessage>();
+	
+	public TCPlugin(WorkspaceManager manager)
 	{
 		super(manager);
 	}
+	
+	@Override
+	public String getName()
+	{
+		return "TC";
+	}
 
 	@Override
-	protected List<VDMMessage> parseFile(File file)
+	public void init()
 	{
-		List<VDMMessage> errs = new Vector<VDMMessage>();
-		Map<File, StringBuilder> projectFiles = manager.getProjectFiles();
-		StringBuilder buffer = projectFiles.get(file);
-		
-		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
-				Dialect.VDM_RT, file, Charset.defaultCharset().displayName());
-		ClassReader cr = new ClassReader(ltr);
-		cr.readClasses();
-		
-		if (cr.getErrorCount() > 0)
-		{
-			errs.addAll(cr.getErrors());
-		}
-		
-		if (cr.getWarningCount() > 0)
-		{
-			errs.addAll(cr.getWarnings());
-		}
+	}
 
-		Log.dump(errs);
+	public void preCheck()
+	{
+		errs.clear();
+		warns.clear();
+	}
+	
+	public List<VDMMessage> getErrs()
+	{
 		return errs;
 	}
+	
+	public List<VDMMessage> getWarns()
+	{
+		return warns;
+	}
+	
+	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);
 }

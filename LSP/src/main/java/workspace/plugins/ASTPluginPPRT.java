@@ -31,13 +31,12 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
-import com.fujitsu.vdmj.ast.modules.ASTModule;
-import com.fujitsu.vdmj.ast.modules.ASTModuleList;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.messages.VDMMessage;
-import com.fujitsu.vdmj.syntax.ModuleReader;
+import com.fujitsu.vdmj.syntax.ClassReader;
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
@@ -45,11 +44,11 @@ import rpc.RPCRequest;
 import workspace.Log;
 import workspace.WorkspaceManager;
 
-public class ASTPluginSL extends ASTPlugin
+public class ASTPluginPPRT extends ASTPlugin
 {
-	private ASTModuleList astModuleList = null;
+	private ASTClassList astClassList = null;
 	
-	public ASTPluginSL(WorkspaceManager manager)
+	public ASTPluginPPRT(WorkspaceManager manager)
 	{
 		super(manager);
 	}
@@ -58,7 +57,7 @@ public class ASTPluginSL extends ASTPlugin
 	public void preCheck()
 	{
 		super.preCheck();
-		astModuleList = new ASTModuleList();
+		astClassList = new ASTClassList();
 	}
 	
 	@Override
@@ -69,9 +68,9 @@ public class ASTPluginSL extends ASTPlugin
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
 			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(),
-					Dialect.VDM_SL, entry.getKey(), Charset.defaultCharset().displayName());
-			ModuleReader mr = new ModuleReader(ltr);
-			astModuleList.addAll(mr.readModules());
+					Settings.dialect, entry.getKey(), Charset.defaultCharset().displayName());
+			ClassReader mr = new ClassReader(ltr);
+			astClassList.addAll(mr.readClasses());
 			
 			if (mr.getErrorCount() > 0)
 			{
@@ -87,9 +86,9 @@ public class ASTPluginSL extends ASTPlugin
 		return errs.isEmpty();
 	}
 	
-	public ASTModuleList getASTModules()
+	public ASTClassList getASTClasses()
 	{
-		return astModuleList;
+		return astClassList;
 	}
 	
 	@Override
@@ -101,17 +100,17 @@ public class ASTPluginSL extends ASTPlugin
 		
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
 				Settings.dialect, file, Charset.defaultCharset().displayName());
-		ModuleReader mr = new ModuleReader(ltr);
-		mr.readModules();
+		ClassReader cr = new ClassReader(ltr);
+		cr.readClasses();
 		
-		if (mr.getErrorCount() > 0)
+		if (cr.getErrorCount() > 0)
 		{
-			errs.addAll(mr.getErrors());
+			errs.addAll(cr.getErrors());
 		}
 		
-		if (mr.getWarningCount() > 0)
+		if (cr.getWarningCount() > 0)
 		{
-			errs.addAll(mr.getWarnings());
+			errs.addAll(cr.getWarnings());
 		}
 
 		Log.dump(errs);
@@ -123,20 +122,20 @@ public class ASTPluginSL extends ASTPlugin
 	{
 		JSONArray results = new JSONArray();
 		
-		if (astModuleList != null)	// May be syntax errors
+		if (astClassList != null)	// May be syntax errors
 		{
-			for (ASTModule module: astModuleList)
+			for (ASTClassDefinition clazz: astClassList)
 			{
-				if (module.files.contains(file))
+				if (clazz.name.location.file.equals(file))
 				{
-					results.add(messages.symbolInformation(module.name, SymbolKind.Module, null));
+					results.add(messages.symbolInformation(clazz.name.toString(), clazz.location, SymbolKind.Class, null));
 
-					for (ASTDefinition def: module.defs)
+					for (ASTDefinition def: clazz.definitions)
 					{
-						if (def.name != null && def.location.file.equals(file) && !def.name.old)
+						if (def.name != null)
 						{
-							results.add(messages.symbolInformation(def.name.toString(),
-									def.name.location, SymbolKind.kindOf(def), def.location.module));
+							results.add(messages.symbolInformation(def.name.name, def.name.location,
+									SymbolKind.kindOf(def), def.location.module));
 						}
 					}
 				}

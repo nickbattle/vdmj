@@ -21,29 +21,30 @@
  *
  ******************************************************************************/
 
-package workspace;
+package workspace.plugins;
 
-import lsp.LSPMessageUtils;
-import rpc.RPCErrors;
-import rpc.RPCMessageList;
+import workspace.WorkspaceManager;
+import workspace.WorkspacePlugin;
 
-abstract public class WorkspacePlugin
+abstract public class INPlugin extends WorkspacePlugin
 {
-	protected final WorkspaceManager manager;
-	protected final LSPMessageUtils messages;
-	
-	public WorkspacePlugin(WorkspaceManager manager)
+	public INPlugin(WorkspaceManager manager)
 	{
-		this.manager = manager;
-		messages = new LSPMessageUtils();
+		super(manager);
 	}
 	
-	protected RPCMessageList errorResult()
+	@Override
+	public String getName()
 	{
-		return new RPCMessageList(null, RPCErrors.InternalError, "?");
+		return "IN";
 	}
 
-	abstract protected String getName();
-	
-	abstract public void init();
+	@Override
+	public void init()
+	{
+	}
+
+	public void preCheck()
+	{
+	}
 }

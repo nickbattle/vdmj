@@ -32,11 +32,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 
@@ -95,5 +99,30 @@ public class LSPMessageUtils
 		}
 		
 		return responses;
+	}
+	
+	public JSONObject symbolInformation(String name, LexLocation location, SymbolKind kind, String container)
+	{
+		JSONObject sym = new JSONObject(
+			"name", name,
+			"kind", kind.getValue(),
+			"location", Utils.lexLocationToLocation(location));
+		
+		if (container != null)
+		{
+			sym.put("container", container);
+		}
+		
+		return sym;
+	}
+
+	public JSONObject symbolInformation(LexIdentifierToken name, SymbolKind kind, String container)
+	{
+		return symbolInformation(name.name, name.location, kind, container);
+	}
+	
+	public JSONObject symbolInformation(LexIdentifierToken name, TCType type, SymbolKind kind, String container)
+	{
+		return symbolInformation(name.name + ":" + type, name.location, kind, container);
 	}
 }

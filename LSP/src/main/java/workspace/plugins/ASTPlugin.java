@@ -26,48 +26,58 @@ package workspace.plugins;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Vector;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import workspace.WorkspaceManager;
 import workspace.WorkspacePlugin;
 
-abstract public class ASTPlugin extends WorkspacePlugin
+public abstract class ASTPlugin extends WorkspacePlugin
 {
+	protected List<VDMMessage> errs = new Vector<VDMMessage>();
+	protected List<VDMMessage> warns = new Vector<VDMMessage>();
+
 	public ASTPlugin(WorkspaceManager manager)
 	{
 		super(manager);
+	}
+	
+	@Override
+	public String getName()
+	{
+		return "AST";
 	}
 
 	@Override
 	public void init()
 	{
-		manager.registerForEvent("reparse", this);
 	}
 
-	@Override
-	protected RPCMessageList processEvent(String event, Object... args) throws Exception
-	{
-		switch (event)
-		{
-			case "reparse":
-				if (args.length == 1 && args[0] instanceof File)
-				{
-					return reparseEvent((File)args[0]);
-				}
-				else
-				{
-					return errorResult();
-				}
-			
-			default:
-				return errorResult();
-		}
-	}
-
-	private RPCMessageList reparseEvent(File file) throws IOException
+	public RPCMessageList fileChanged(File file) throws IOException
 	{
 		return messages.diagnosticResponses(parseFile(file), file);
 	}
 	
+	public void preCheck()
+	{
+		errs.clear();
+		warns.clear();
+	}
+	
+	abstract public boolean checkLoadedFiles();
+	
+	public List<VDMMessage> getErrs()
+	{
+		return errs;
+	}
+	
+	public List<VDMMessage> getWarns()
+	{
+		return warns;
+	}
+	
 	abstract protected List<VDMMessage> parseFile(File file);
+
+	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);
 }

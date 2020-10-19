@@ -80,12 +80,14 @@ import rpc.RPCResponse;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
+import workspace.plugins.ASTPlugin;
+import workspace.plugins.TCPlugin;
 
 public abstract class WorkspaceManager
 {
 	private static WorkspaceManager INSTANCE = null;
 	
-	private List<WorkspacePlugin> plugins = new Vector<WorkspacePlugin>();
+	private Map<String, WorkspacePlugin> plugins = new HashMap<String, WorkspacePlugin>();
 	private Map<String, List<WorkspacePlugin>> pluginEvents = new HashMap<String, List<WorkspacePlugin>>();
 
 	private JSONObject clientCapabilities;
@@ -101,6 +103,11 @@ public abstract class WorkspaceManager
 
 	private String launchCommand;
 	private String defaultName;
+	
+	protected WorkspaceManager()
+	{
+	}
+
 
 	/**
 	 * This is called by both LSP and DAP servers (and there is a race!) 
@@ -147,7 +154,7 @@ public abstract class WorkspaceManager
 	
 	public void registerPlugin(WorkspacePlugin plugin)
 	{
-		plugins.add(plugin);
+		plugins.put(plugin.getName(), plugin);
 		plugin.init();
 	}
 	
@@ -164,19 +171,6 @@ public abstract class WorkspaceManager
 		plugins.add(plugin);
 	}
 	
-	public RPCMessageList processEvent(String event, Object... args) throws Exception
-	{
-		List<WorkspacePlugin> plugins = pluginEvents.get(event);
-		RPCMessageList results = new RPCMessageList();
-		
-		for (WorkspacePlugin plugin: plugins)
-		{
-			results.addAll(plugin.processEvent(event, args));
-		}
-		
-		return results;
-	}
-	
 	public static WorkspaceManager getInstance()
 	{
 		return INSTANCE;
@@ -185,6 +179,12 @@ public abstract class WorkspaceManager
 	public Map<File, StringBuilder> getProjectFiles()
 	{
 		return projectFiles;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getPlugin(String name)
+	{
+		return (T)plugins.get(name);
 	}
 
 	public void setLSPState(LSPServerState lspServerState)
@@ -606,7 +606,8 @@ public abstract class WorkspaceManager
 				dumpEdit(range, buffer);
 			}
 			
-			return processEvent("reparse", file);
+			ASTPlugin ast = getPlugin("AST");
+			return ast.fileChanged(file);
 		}
 	}
 
@@ -958,7 +959,19 @@ public abstract class WorkspaceManager
 
 	protected abstract TCDefinitionList lookupDefinition(String startsWith);
 
-	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);
+	public RPCMessageList documentSymbols(RPCRequest request, File file) throws Exception
+	{
+		TCPlugin tc = getPlugin("TC");
+		RPCMessageList symbols = tc.documentSymbols(request, file);
+		
+		if (symbols == null)
+		{
+			ASTPlugin ast = getPlugin("AST");
+			symbols = ast.documentSymbols(request, file);
+		}
+		
+		return symbols;
+	}
 
 	abstract public DAPMessageList threads(DAPRequest request);
 

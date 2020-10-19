@@ -26,19 +26,12 @@ package workspace;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URI;
-import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
-import com.fujitsu.vdmj.ast.modules.ASTModule;
-import com.fujitsu.vdmj.ast.modules.ASTModuleList;
-import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.po.PONode;
@@ -47,31 +40,27 @@ import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
-import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
-import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
-import com.fujitsu.vdmj.typechecker.TypeChecker;
-
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
-import lsp.textdocument.SymbolKind;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.LSPDefinitionFinder;
 import vdmj.LSPDefinitionFinder.Found;
 import workspace.plugins.ASTPluginSL;
+import workspace.plugins.INPluginSL;
+import workspace.plugins.TCPluginSL;
 
 public class WorkspaceManagerSL extends WorkspaceManager
 {
-	private ASTModuleList astModuleList = null;
 	private TCModuleList tcModuleList = null;
 	private INModuleList inModuleList = null;
 	private POModuleList poModuleList = null;
@@ -80,72 +69,50 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	{
 		Settings.dialect = Dialect.VDM_SL;
 		registerPlugin(new ASTPluginSL(this));
+		registerPlugin(new TCPluginSL(this));
 	}
 
 	@Override
 	protected RPCMessageList checkLoadedFiles() throws Exception
 	{
-		astModuleList = new ASTModuleList();
-		List<VDMMessage> errs = new Vector<VDMMessage>();
-		List<VDMMessage> warns = new Vector<VDMMessage>();
+		ASTPluginSL ast = getPlugin("AST");
+		TCPluginSL tc = getPlugin("TC");
+		INPluginSL in = getPlugin("IN");
 		
-		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
-		{
-			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(),
-					Dialect.VDM_SL, entry.getKey(), Charset.defaultCharset().displayName());
-			ModuleReader mr = new ModuleReader(ltr);
-			astModuleList.addAll(mr.readModules());
-			
-			if (mr.getErrorCount() > 0)
-			{
-				errs.addAll(mr.getErrors());
-			}
-			
-			if (mr.getWarningCount() > 0)
-			{
-				warns.addAll(mr.getWarnings());
-			}
-		}
+		ast.preCheck();
+		tc.preCheck();
+		in.preCheck();
 		
-		if (errs.isEmpty())
+		if (ast.checkLoadedFiles())
 		{
-			tcModuleList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(astModuleList);
-			tcModuleList.combineDefaults();
-			TypeChecker tc = new ModuleTypeChecker(tcModuleList);
-			tc.typeCheck();
-			
-			if (TypeChecker.getErrorCount() > 0)
+			if (tc.checkLoadedFiles(ast.getASTModules()))
 			{
-				errs.addAll(TypeChecker.getErrors());
+				if (in.checkLoadedFiles(tc.getTCModules()))
+				{
+					Log.printf("Loaded files checked successfully");
+				}
+				else
+				{
+					Log.error("Failed to create interpreter");
+				}
 			}
-			
-			if (TypeChecker.getWarningCount() > 0)
+			else
 			{
-				warns.addAll(TypeChecker.getWarnings());
+				Log.error("Type checking errors found");
+				Log.dump(tc.getErrs());
+				Log.dump(tc.getWarns());
 			}
 		}
 		else
 		{
 			Log.error("Syntax errors found");
-			Log.dump(errs);
-			Log.dump(warns);
-			tcModuleList = null;
+			Log.dump(ast.getErrs());
+			Log.dump(ast.getWarns());
 		}
 		
-		if (errs.isEmpty())
-		{
-			inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(tcModuleList);
-		}
-		else
-		{
-			Log.error("Type checking errors found");
-			Log.dump(errs);
-			Log.dump(warns);
-			tcModuleList = null;
-			inModuleList = null;
-		}
-		
-		errs.addAll(warns);
+		List<VDMMessage> errs = new Vector<VDMMessage>();
+		errs.addAll(ast.getErrs());
+		errs.addAll(tc.getErrs());
 		RPCMessageList result = diagnosticResponses(errs, null);
 		
 		if (hasClientCapability("experimental.proofObligationGeneration"))
@@ -249,55 +216,55 @@ public class WorkspaceManagerSL extends WorkspaceManager
 		return new String[] { "**/*.vdm", "**/*.vdmsl" }; 
 	}
 
-	@Override
-	public RPCMessageList documentSymbols(RPCRequest request, File file)
-	{
-		JSONArray results = new JSONArray();
-		
-		if (tcModuleList != null)	// May be syntax errors
-		{
-			for (TCModule module: tcModuleList)
-			{
-				if (module.files.contains(file))
-				{
-					results.add(symbolInformation(module.name.toString(), module.name.getLocation(), SymbolKind.Module, null));
-
-					for (TCDefinition def: module.defs)
-					{
-						for (TCDefinition indef: def.getDefinitions())
-						{
-							if (indef.name != null && indef.location.file.equals(file) && !indef.name.isOld())
-							{
-								results.add(symbolInformation(indef.name + ":" + indef.getType(),
-										indef.location, SymbolKind.kindOf(indef), indef.location.module));
-							}
-						}
-					}
-				}
-			}
-		}
-		else if (astModuleList != null)		// Try AST instead
-		{
-			for (ASTModule module: astModuleList)
-			{
-				if (module.files.contains(file))
-				{
-					results.add(symbolInformation(module.name, SymbolKind.Module, null));
-
-					for (ASTDefinition def: module.defs)
-					{
-						if (def.name != null && def.location.file.equals(file) && !def.name.old)
-						{
-							results.add(symbolInformation(def.name.toString(),
-									def.name.location, SymbolKind.kindOf(def), def.location.module));
-						}
-					}
-				}
-			}
-		}
-		
-		return new RPCMessageList(request, results);
-	}
+//	@Override
+//	public RPCMessageList documentSymbols(RPCRequest request, File file)
+//	{
+//		JSONArray results = new JSONArray();
+//		
+//		if (tcModuleList != null)	// May be syntax errors
+//		{
+//			for (TCModule module: tcModuleList)
+//			{
+//				if (module.files.contains(file))
+//				{
+//					results.add(symbolInformation(module.name.toString(), module.name.getLocation(), SymbolKind.Module, null));
+//
+//					for (TCDefinition def: module.defs)
+//					{
+//						for (TCDefinition indef: def.getDefinitions())
+//						{
+//							if (indef.name != null && indef.location.file.equals(file) && !indef.name.isOld())
+//							{
+//								results.add(symbolInformation(indef.name + ":" + indef.getType(),
+//										indef.location, SymbolKind.kindOf(indef), indef.location.module));
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
+//		else if (astModuleList != null)		// Try AST instead
+//		{
+//			for (ASTModule module: astModuleList)
+//			{
+//				if (module.files.contains(file))
+//				{
+//					results.add(symbolInformation(module.name, SymbolKind.Module, null));
+//
+//					for (ASTDefinition def: module.defs)
+//					{
+//						if (def.name != null && def.location.file.equals(file) && !def.name.old)
+//						{
+//							results.add(symbolInformation(def.name.toString(),
+//									def.name.location, SymbolKind.kindOf(def), def.location.module));
+//						}
+//					}
+//				}
+//			}
+//		}
+//		
+//		return new RPCMessageList(request, results);
+//	}
 
 	@Override
 	public ModuleInterpreter getInterpreter()

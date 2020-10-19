@@ -21,29 +21,43 @@
  *
  ******************************************************************************/
 
-package workspace;
+package workspace.plugins;
 
-import lsp.LSPMessageUtils;
-import rpc.RPCErrors;
-import rpc.RPCMessageList;
+import com.fujitsu.vdmj.in.modules.INModuleList;
+import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.modules.TCModuleList;
+import workspace.WorkspaceManager;
+import workspace.WorkspacePlugin;
 
-abstract public class WorkspacePlugin
+public class INPluginSL extends WorkspacePlugin
 {
-	protected final WorkspaceManager manager;
-	protected final LSPMessageUtils messages;
+	private INModuleList inModuleList = null;
 	
-	public WorkspacePlugin(WorkspaceManager manager)
+	public INPluginSL(WorkspaceManager manager)
 	{
-		this.manager = manager;
-		messages = new LSPMessageUtils();
+		super(manager);
 	}
 	
-	protected RPCMessageList errorResult()
+	@Override
+	public String getName()
 	{
-		return new RPCMessageList(null, RPCErrors.InternalError, "?");
+		return "IN";
 	}
 
-	abstract protected String getName();
+	@Override
+	public void init()
+	{
+	}
+
+	public void preCheck()
+	{
+		inModuleList = new INModuleList();
+	}
 	
-	abstract public void init();
+	public boolean checkLoadedFiles(TCModuleList tcModuleList) throws Exception
+	{
+		inModuleList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(tcModuleList);
+		return true;
+	}
 }
