@@ -916,6 +916,19 @@ public abstract class WorkspaceManager
 
 	abstract public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range);
 
+	protected JSONArray splitPO(String value)
+	{
+		String[] parts = value.trim().split("\\n\\s+");
+		JSONArray array = new JSONArray();
+		
+		for (String part: parts)
+		{
+			array.add(part);
+		}
+		
+		return array;
+	}
+	
 	/**
 	 * Termination and cleanup methods.
 	 */

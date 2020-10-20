@@ -181,9 +181,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		{
 			poClassList = null;
 			result.add(new RPCRequest("lspx/POG/updated",
-					new JSONObject(
-						"uri",			getRoots().get(0).toURI().toString(),
-						"successful",	tcClassList != null)));
+					new JSONObject("successful", tcClassList != null)));
 		}
 		
 		return result;
@@ -407,7 +405,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 						"kind", 	po.kind.toString(),
 						"name",		name,
 						"location",	Utils.lexLocationToLocation(po.location),
-						"source",	po.value,
+						"source",	splitPO(po.value),
 						"proved",	po.status != POStatus.UNPROVED));
 			}
 			
