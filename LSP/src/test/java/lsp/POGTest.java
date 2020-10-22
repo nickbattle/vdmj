@@ -142,6 +142,37 @@ public class POGTest
 	}
 	
 	@Test
+	public void testRT() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_RT);
+		File testdir = new File("src/test/resources/pogtest_rt");
+		RPCMessageList notify = initialize(testdir);
+		assertEquals(2, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+		
+		dump(notify.get(1));
+		assertEquals("lspx/POG/updated", notify.get(1).getPath("method"));
+		assertEquals(true, notify.get(1).getPath("params.successful"));
+		
+		POGHandler handler = new POGHandler(state);
+		RPCRequest request = new RPCRequest(789L, "lspx/POG/generate",
+				new JSONObject("uri", testdir.toURI().toString()));
+		
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+
+		dump(response.get(0));
+		assertEquals("non-zero", response.get(0).getPath("result.[0].kind"));
+		assertEquals("total function", response.get(0).getPath("result.[1].kind"));
+		assertEquals("non-zero", response.get(0).getPath("result.[2].kind"));
+		assertEquals("recursive function", response.get(0).getPath("result.[3].kind"));
+		assertEquals("subtype", response.get(0).getPath("result.[4].kind"));
+	}
+	
+	@Test
 	public void testSLErrors() throws Exception
 	{
 		setupWorkspace(Dialect.VDM_SL);

@@ -1,0 +1,12 @@
+class A
+values
+	Z = 0;
+	mk_(ONE, TWO) = mk_(123/Z, 123);
+
+functions
+	f: nat * nat -> nat
+	f(a, b) ==
+		if a > b then a/b else f(b, a)
+	measure a;
+
+end A

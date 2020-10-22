@@ -914,7 +914,7 @@ public abstract class WorkspaceManager
 
 	abstract public Interpreter getInterpreter();
 
-	abstract public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range);
+	abstract public RPCMessageList pogGenerate(RPCRequest request, File file);
 
 	protected JSONArray splitPO(String value)
 	{

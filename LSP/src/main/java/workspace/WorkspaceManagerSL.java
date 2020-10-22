@@ -358,7 +358,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	}
 
 	@Override
-	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range)
+	public RPCMessageList pogGenerate(RPCRequest request, File file)
 	{
 		if (tcModuleList == null)	// No type clean tree
 		{

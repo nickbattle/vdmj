@@ -62,9 +62,7 @@ public class POGHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			File file = Utils.uriToFile(params.get("uri"));
-			JSONObject range = params.get("range");
-			
-			return lspServerState.getManager().pogGenerate(request, file, range);
+			return lspServerState.getManager().pogGenerate(request, file);
 		}
 		catch (URISyntaxException e)
 		{
