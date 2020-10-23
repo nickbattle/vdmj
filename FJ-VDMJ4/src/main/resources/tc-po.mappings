@@ -274,7 +274,7 @@ map TCObjectIdentifierDesignator{name} to POObjectIdentifierDesignator(name);
 map TCObjectNewDesignator{expression} to POObjectNewDesignator(expression);
 map TCObjectSelfDesignator{location} to POObjectSelfDesignator(location);
 map TCPeriodicStatement{opname, args} to POPeriodicStatement(opname, args);
-map TCReturnStatement{expression} to POReturnStatement(expression);
+map TCReturnStatement{location, expression} to POReturnStatement(location, expression);
 map TCSkipStatement{location} to POSkipStatement(location);
 map TCSpecificationStatement{location, externals, precondition, postcondition, errors} to POSpecificationStatement(location, externals, precondition, postcondition, errors);
 map TCSporadicStatement{opname, args} to POSporadicStatement(opname, args);
