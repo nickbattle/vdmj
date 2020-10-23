@@ -185,7 +185,7 @@ public abstract class WorkspaceManager
 			RPCMessageList response = new RPCMessageList();
 			response.add(lspDynamicRegistrations());
 			
-			if (getClientCapability("workspace.workspaceFolders"))
+			if (hasClientCapability("workspace.workspaceFolders"))
 			{
 				response.add(lspWorkspaceFolders());
 			}
@@ -269,35 +269,27 @@ public abstract class WorkspaceManager
 		return roots;
 	}
 	
-	public boolean getClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
+	public boolean hasClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
 	{
-		String[] parts = dotName.split("\\.");
-		JSONObject json = clientCapabilities;
+		Boolean cap = getClientCapability(dotName);
+		return cap != null && cap;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getClientCapability(String dotName)
+	{
+		T capability = clientCapabilities.getPath(dotName);
 		
-		for (String part: parts)
+		if (capability != null)
 		{
-			if (json.containsKey(part))
-			{
-				Object obj = json.get(part);
-				
-				if (obj instanceof JSONObject)
-				{
-					json = (JSONObject) obj;
-				}
-				else if (obj instanceof Boolean)
-				{
-					Log.printf("Client capability %s = %s", dotName, obj);
-					return (Boolean) obj;
-				}
-			}
-			else
-			{
-				break;
-			}
+			Log.printf("Client capability %s = %s", dotName, capability);
+			return capability;
 		}
-		
-		Log.printf("Missing client capability: %s", dotName);
-		return false;
+		else
+		{
+			Log.printf("Missing client capability: %s", dotName);
+			return null;
+		}
 	}
 
 	/** True if we have an interpreter that we can use. */
@@ -922,10 +914,21 @@ public abstract class WorkspaceManager
 
 	abstract public Interpreter getInterpreter();
 
-	abstract public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range);
+	abstract public RPCMessageList pogGenerate(RPCRequest request, File file);
 
-	public abstract RPCMessageList pogRetrieve(RPCRequest request, JSONArray ids);
-
+	protected JSONArray splitPO(String value)
+	{
+		String[] parts = value.trim().split("\\n\\s+");
+		JSONArray array = new JSONArray();
+		
+		for (String part: parts)
+		{
+			array.add(part);
+		}
+		
+		return array;
+	}
+	
 	/**
 	 * Termination and cleanup methods.
 	 */

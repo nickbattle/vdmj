@@ -57,4 +57,39 @@ public class JSONArray extends Vector<Object>
 	{
 		return (T)super.get(i);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getPath(String dotName)
+	{
+		int dot = dotName.indexOf('.');
+		String part = (dot == -1) ? dotName : dotName.substring(0, dot);
+		String tail = (dot == -1) ? null : dotName.substring(dot + 1);
+
+		if (part.matches("\\[\\d+\\]"))
+		{
+			int index = Integer.parseInt(part.substring(1, part.length() - 1));
+			
+			if (index < size())
+			{
+				Object obj = get(index);
+				
+				if (tail == null)
+				{
+					return (T)obj;
+				}
+				else if (obj instanceof JSONObject)
+				{
+					JSONObject json = (JSONObject)obj;
+					return (T)json.getPath(tail);
+				}
+				else if (obj instanceof JSONArray)
+				{
+					JSONArray json = (JSONArray)obj;
+					return (T)json.getPath(tail);
+				}
+			}
+		}
+
+		return null;
+	}
 }

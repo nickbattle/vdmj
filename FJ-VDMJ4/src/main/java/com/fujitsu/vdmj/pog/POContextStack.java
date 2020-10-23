@@ -45,7 +45,7 @@ public class POContextStack extends Stack<POContext>
 			{
 				result.append(prefix);
 				result.append(name);
-				prefix = ", ";
+				prefix = "; ";
 			}
 		}
 
@@ -85,14 +85,14 @@ public class POContextStack extends Stack<POContext>
 	private String indentNewLines(String line, String indent)
 	{
 		StringBuilder sb = new StringBuilder();
-		String[] parts = line.split("\n");
+		String[] parts = line.split("\n\\s*");
 		String prefix = "";
 
 		for (int i=0; i<parts.length; i++)
 		{
 			sb.append(prefix);
 			sb.append(parts[i]);
-			prefix = "\n" + indent;
+			prefix = " ";	// Make everything in a PO one line, was "\n" + indent;
 		}
 
 		return sb.toString();

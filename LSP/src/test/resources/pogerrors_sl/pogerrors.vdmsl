@@ -1,0 +1,6 @@
+functions
+	f: nat * typeA -> nat
+	f(a, b) == a/b;
+
+types
+	typeA = nt;

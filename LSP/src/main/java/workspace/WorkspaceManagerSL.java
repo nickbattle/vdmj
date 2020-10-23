@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.modules.POModuleList;
+import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
@@ -73,7 +74,6 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	private TCModuleList tcModuleList = null;
 	private INModuleList inModuleList = null;
 	private POModuleList poModuleList = null;
-	private ProofObligationList poGeneratedList;
 
 	public WorkspaceManagerSL()
 	{
@@ -164,14 +164,21 @@ public class WorkspaceManagerSL extends WorkspaceManager
 			Log.error("Type checking errors found");
 			Log.dump(errs);
 			Log.dump(warns);
+			tcModuleList = null;
 			inModuleList = null;
 		}
 		
-		poModuleList = null;		// Created from TC on generate method
-		poGeneratedList = null;
-		
 		errs.addAll(warns);
-		return diagnosticResponses(errs, null);
+		RPCMessageList result = diagnosticResponses(errs, null);
+		
+		if (hasClientCapability("experimental.proofObligationGeneration"))
+		{
+			poModuleList = null;
+			result.add(new RPCRequest("lspx/POG/updated",
+					new JSONObject("successful", tcModuleList != null)));
+		}
+		
+		return result;
 	}
 
 	@Override
@@ -351,7 +358,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	}
 
 	@Override
-	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range)
+	public RPCMessageList pogGenerate(RPCRequest request, File file)
 	{
 		if (tcModuleList == null)	// No type clean tree
 		{
@@ -363,29 +370,36 @@ public class WorkspaceManagerSL extends WorkspaceManager
 			if (poModuleList == null)
 			{
 				poModuleList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcModuleList);
-				poGeneratedList = poModuleList.getProofObligations();
-				poGeneratedList.renumber();
 			}
 			
+			ProofObligationList poGeneratedList = poModuleList.getProofObligations();
+			poGeneratedList.renumber();
 			JSONArray results = new JSONArray();
 			
 			for (ProofObligation po: poGeneratedList)
 			{
-				if (file != null && !po.location.file.equals(file))
-				{
-					continue;
-				}
-				else if (range != null && !Utils.lexLocationInRange(po.location, file, range))
+				if (file != null &&
+					!po.location.file.equals(file) &&
+					!po.location.file.getParentFile().equals(file))		// folder
 				{
 					continue;
 				}
 				
+				JSONArray name = new JSONArray(po.location.module);
+				
+				for (String part: po.name.split(";\\s+"))
+				{
+					name.add(part);
+				}
+
 				results.add(
 					new JSONObject(
 						"id",		new Long(po.number),
 						"kind", 	po.kind.toString(),
-						"name",		po.name,
-						"location",	Utils.lexLocationToLocation(po.location)));
+						"name",		name,
+						"location",	Utils.lexLocationToLocation(po.location),
+						"source",	splitPO(po.value),
+						"proved",	po.status != POStatus.UNPROVED));
 			}
 			
 			return new RPCMessageList(request, results);
@@ -395,32 +409,5 @@ public class WorkspaceManagerSL extends WorkspaceManager
 			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
-	}
-
-	@Override
-	public RPCMessageList pogRetrieve(RPCRequest request, JSONArray ids)
-	{
-		if (poGeneratedList == null)	// Haven't re-called pogGenerate
-		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "POs not generated since last change");
-		}
-
-		JSONArray results = new JSONArray();
-
-		for (int i=0; i<ids.size(); i++)
-		{
-			long id = (Long)ids.get(i);
-			ProofObligation po = poGeneratedList.get((int) id-1);	// eg. PO 1 is get(0)
-
-			results.add(
-				new JSONObject(
-					"id",		new Long(po.number),
-					"kind", 	po.kind.toString(),
-					"name",		po.name,
-					"location",	Utils.lexLocationToLocation(po.location),
-					"source",	po.value));
-		}
-
-		return new RPCMessageList(request, results);
 	}
 }

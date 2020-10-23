@@ -27,7 +27,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.LSPServerState;
@@ -52,9 +51,6 @@ public class POGHandler extends LSPHandler
 			case "lspx/POG/generate":
 				return generate(request);
 
-			case "lspx/POG/retrieve":
-				return retrieve(request);
-		
 			default:
 				return new RPCMessageList(request, RPCErrors.MethodNotFound, "Unexpected lspx/POG method");
 		}
@@ -66,9 +62,7 @@ public class POGHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			File file = Utils.uriToFile(params.get("uri"));
-			JSONObject range = params.get("range");
-			
-			return lspServerState.getManager().pogGenerate(request, file, range);
+			return lspServerState.getManager().pogGenerate(request, file);
 		}
 		catch (URISyntaxException e)
 		{
@@ -79,13 +73,5 @@ public class POGHandler extends LSPHandler
 			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
-	}
-
-	private RPCMessageList retrieve(RPCRequest request)
-	{
-		JSONObject params = request.get("params");
-		JSONArray ids = params.get("ids");
-		
-		return lspServerState.getManager().pogRetrieve(request, ids);
 	}
 }

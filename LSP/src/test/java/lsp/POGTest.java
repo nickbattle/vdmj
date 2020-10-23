@@ -23,7 +23,11 @@
 
 package lsp;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.junit.Test;
@@ -40,95 +44,162 @@ import workspace.WorkspaceManager;
 
 public class POGTest
 {
+	private WorkspaceManager manager = null;
+	private LSPServerState state = null;
+
+	private void setupWorkspace(Dialect dialect) throws IOException
+	{
+		WorkspaceManager.reset();
+		manager = WorkspaceManager.createInstance(dialect);
+		state = new LSPServerState();
+		state.setManager(manager);
+	}
+	
+	private RPCMessageList initialize(File root) throws Exception
+	{
+		JSONObject params = new JSONObject(
+				"rootUri",		root.toURI().toString(),
+				"capabilities",	new JSONObject(
+					"experimental", new JSONObject(
+						"proofObligationGeneration", true)));
+		
+		RPCMessageList result = manager.lspInitialize(new RPCRequest(0L, "initialize", params));
+		assertEquals("init result", (Object)null, result.get(0).get("error"));		
+		
+		return manager.afterChangeWatchedFiles(null);	// Cause parse and typecheck
+	}
+	
+	private void dump(JSONObject obj) throws IOException
+	{
+		PrintWriter pw = new PrintWriter(System.out);
+		JSONWriter writer = new JSONWriter(pw);
+		writer.writeObject(obj);
+		pw.println();
+		writer.flush();
+	}
+	
 	@Test
 	public void testSL() throws Exception
 	{
-		WorkspaceManager.reset();
-		WorkspaceManager manager = WorkspaceManager.createInstance(Dialect.VDM_SL);
-		LSPServerState state = new LSPServerState();
-		state.setManager(manager);
-		
+		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/pogtest_sl");
-		File file = new File(testdir, "pogtest.vdmsl");
+		RPCMessageList notify = initialize(testdir);
+		assertEquals(2, notify.size());
 
-		JSONObject params = new JSONObject("rootUri", testdir.toURI().toString());
-		RPCRequest initRequest = new RPCRequest(0L, "initialize", params);
-		manager.lspInitialize(initRequest);
-		manager.afterChangeWatchedFiles(null);	// Cause parse and typecheck
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
+		dump(notify.get(1));
+		assertEquals("lspx/POG/updated", notify.get(1).getPath("method"));
+		assertEquals(true, notify.get(1).getPath("params.successful"));
+
 		POGHandler handler = new POGHandler(state);
-		JSONWriter writer = new JSONWriter(new PrintWriter(System.out));
-		
+		File file = new File(testdir, "pogtest.vdmsl");
 		RPCRequest request = new RPCRequest(123L, "lspx/POG/generate",
 				new JSONObject("uri", file.toURI().toString()));
 		
 		RPCMessageList response = handler.request(request);
-		writer.writeObject(request);
-		writer.writeObject(response.get(0));
-		writer.flush();
-		
-		JSONArray ids = new JSONArray();
-		JSONArray pos = response.get(0).get("result");
-		
-		for (int i=0; i<pos.size(); i++)
-		{
-			JSONObject po = pos.index(i);
-			ids.add(po.get("id"));
-		}
-		
-		RPCRequest request2 = new RPCRequest(456L, "lspx/POG/retrieve", new JSONObject("ids", ids));
+		assertEquals(1, response.size());
 
-		RPCMessageList response2 = handler.request(request2);
-		writer.writeObject(request2);
-		writer.writeObject(response2.get(0));
-		writer.flush();
+		dump(response.get(0));
+		assertEquals("non-zero", response.get(0).getPath("result.[0].kind"));
+		assertEquals("total function", response.get(0).getPath("result.[1].kind"));
+		assertEquals("non-zero", response.get(0).getPath("result.[2].kind"));
+		assertEquals("recursive function", response.get(0).getPath("result.[3].kind"));
+		assertEquals("subtype", response.get(0).getPath("result.[4].kind"));
 	}
 	
 	@Test
 	public void testPP() throws Exception
 	{
-		WorkspaceManager.reset();
-		WorkspaceManager manager = WorkspaceManager.createInstance(Dialect.VDM_PP);
-		LSPServerState state = new LSPServerState();
-		state.setManager(manager);
-		
+		setupWorkspace(Dialect.VDM_PP);
 		File testdir = new File("src/test/resources/pogtest_pp");
-		File file = new File(testdir, "pogtest.vdmpp");
+		RPCMessageList notify = initialize(testdir);
+		assertEquals(2, notify.size());
 
-		JSONObject params = new JSONObject("rootUri", testdir.toURI().toString());
-		RPCRequest initRequest = new RPCRequest(0L, "initialize", params);
-		manager.lspInitialize(initRequest);
-		manager.afterChangeWatchedFiles(null);	// Cause parse and typecheck
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+		
+		dump(notify.get(1));
+		assertEquals("lspx/POG/updated", notify.get(1).getPath("method"));
+		assertEquals(true, notify.get(1).getPath("params.successful"));
 		
 		POGHandler handler = new POGHandler(state);
-		JSONWriter writer = new JSONWriter(new PrintWriter(System.out));
-		
 		RPCRequest request = new RPCRequest(789L, "lspx/POG/generate",
-				new JSONObject(
-						"uri", file.toURI().toString(),
-						"range", new JSONObject(
-							"start", new JSONObject("line", 2L, "character", 0L),
-							"end",   new JSONObject("line", 2L, "character", 100L))));
+				new JSONObject("uri", testdir.toURI().toString()));
 		
 		RPCMessageList response = handler.request(request);
-		writer.writeObject(request);
-		writer.writeObject(response.get(0));
-		writer.flush();
-		
-		JSONArray ids = new JSONArray();
-		JSONArray pos = response.get(0).get("result");
-		
-		for (int i=0; i<pos.size(); i++)
-		{
-			JSONObject po = pos.index(i);
-			ids.add(po.get("id"));
-		}
-		
-		RPCRequest request2 = new RPCRequest(987L, "lspx/POG/retrieve", new JSONObject("ids", ids));
+		assertEquals(1, response.size());
 
-		RPCMessageList response2 = handler.request(request2);
-		writer.writeObject(request2);
-		writer.writeObject(response2.get(0));
-		writer.flush();
+		dump(response.get(0));
+		assertEquals("non-zero", response.get(0).getPath("result.[0].kind"));
+		assertEquals("total function", response.get(0).getPath("result.[1].kind"));
+		assertEquals("non-zero", response.get(0).getPath("result.[2].kind"));
+		assertEquals("recursive function", response.get(0).getPath("result.[3].kind"));
+		assertEquals("subtype", response.get(0).getPath("result.[4].kind"));
 	}
+	
+	@Test
+	public void testRT() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_RT);
+		File testdir = new File("src/test/resources/pogtest_rt");
+		RPCMessageList notify = initialize(testdir);
+		assertEquals(2, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+		
+		dump(notify.get(1));
+		assertEquals("lspx/POG/updated", notify.get(1).getPath("method"));
+		assertEquals(true, notify.get(1).getPath("params.successful"));
+		
+		POGHandler handler = new POGHandler(state);
+		RPCRequest request = new RPCRequest(789L, "lspx/POG/generate",
+				new JSONObject("uri", testdir.toURI().toString()));
+		
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+
+		dump(response.get(0));
+		assertEquals("non-zero", response.get(0).getPath("result.[0].kind"));
+		assertEquals("total function", response.get(0).getPath("result.[1].kind"));
+		assertEquals("non-zero", response.get(0).getPath("result.[2].kind"));
+		assertEquals("recursive function", response.get(0).getPath("result.[3].kind"));
+		assertEquals("subtype", response.get(0).getPath("result.[4].kind"));
+	}
+	
+	@Test
+	public void testSLErrors() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_SL);
+		File testdir = new File("src/test/resources/pogerrors_sl");
+		RPCMessageList notify = initialize(testdir);
+		assertEquals(2, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		Object array = notify.get(0).getPath("params.diagnostics");
+		assertTrue(array instanceof JSONArray);
+		JSONArray diags = (JSONArray)array;
+		assertEquals(1, diags.size());
+		assertEquals("Unable to resolve type name 'nt'", notify.get(0).getPath("params.diagnostics.[0].message"));
+		
+		dump(notify.get(1));
+		assertEquals("lspx/POG/updated", notify.get(1).getPath("method"));
+		assertEquals(false, notify.get(1).getPath("params.successful"));
+
+		POGHandler handler = new POGHandler(state);
+		RPCRequest request = new RPCRequest(789L, "lspx/POG/generate",
+				new JSONObject("uri", testdir.toURI().toString()));
+		
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+
+		dump(response.get(0));
+		assertEquals("Type checking errors found", response.get(0).getPath("error.message"));
+	}	
 }

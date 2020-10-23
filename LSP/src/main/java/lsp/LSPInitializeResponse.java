@@ -61,6 +61,10 @@ public class LSPInitializeResponse extends JSONObject
 						"supported", true,
 						"changeNotifications", true)));
 		
+		cap.put("experimental",
+				new JSONObject(
+					"proofObligationProvider", true));
+
 		return cap;
 	}
 }
