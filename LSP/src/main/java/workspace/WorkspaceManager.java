@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,7 +46,6 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCClassType;
@@ -73,7 +73,6 @@ import lsp.textdocument.WatchKind;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import rpc.RPCResponse;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
@@ -90,14 +89,14 @@ public abstract class WorkspaceManager
 
 	private JSONObject clientCapabilities;
 	private List<File> roots = new Vector<File>();
-	protected Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
-	protected Set<File> openFiles = new HashSet<File>();
+	private Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
+	private Set<File> openFiles = new HashSet<File>();
 	
 	private Boolean noDebug;
 	protected Interpreter interpreter;
 
-	protected LSPServerState lspServerState;
-	protected DAPServerState dapServerState;
+	// private LSPServerState lspServerState;
+	private DAPServerState dapServerState;
 
 	private String launchCommand;
 	private String defaultName;
@@ -140,6 +139,9 @@ public abstract class WorkspaceManager
 		}
 	}
 	
+	/**
+	 * This is only used by unit testing.
+	 */
 	public static void reset()
 	{
 		if (INSTANCE != null)
@@ -178,7 +180,7 @@ public abstract class WorkspaceManager
 
 	public void setLSPState(LSPServerState lspServerState)
 	{
-		this.lspServerState = lspServerState;
+		// this.lspServerState = lspServerState;
 	}
 
 	public void setDAPState(DAPServerState dapServerState)
@@ -186,6 +188,10 @@ public abstract class WorkspaceManager
 		this.dapServerState = dapServerState;
 	}
 
+	/**
+	 * LSP methods...
+	 */
+	
 	public RPCMessageList lspInitialize(RPCRequest request)
 	{
 		try
@@ -199,9 +205,7 @@ public abstract class WorkspaceManager
 			Properties.init();
 			loadAllProjectFiles();
 			
-			RPCMessageList responses = new RPCMessageList();
-			responses.add(new RPCResponse(request, new LSPInitializeResponse()));
-			return responses;
+			return new RPCMessageList(request, new LSPInitializeResponse());
 		}
 		catch (URISyntaxException e)
 		{
@@ -262,155 +266,6 @@ public abstract class WorkspaceManager
 			))));
 	}
 
-	public DAPMessageList dapInitialize(DAPRequest request)
-	{
-		DAPMessageList responses = new DAPMessageList();
-		responses.add(new DAPInitializeResponse(request));
-		responses.add(new DAPEvent("initialized", null));
-		return responses;
-	}
-
-	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName, String command) throws Exception
-	{
-		checkLoadedFiles();
-		
-		if (!canExecute())
-		{
-			DAPMessageList responses = new DAPMessageList();
-			responses.add(new DAPResponse(request, false, "Specification has errors, cannot launch", null));
-			stderr("Specification has errors, cannot launch");
-			clearInterpreter();
-			return responses;
-		}
-		
-		try
-		{
-			// These values are used in configurationDone
-			this.noDebug = noDebug;
-			this.defaultName = defaultName;
-			this.launchCommand = command;
-			
-			return new DAPMessageList(request);
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			DAPMessageList responses = new DAPMessageList(request, e);
-			return responses;
-		}
-	}
-
-	public boolean hasClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
-	{
-		Boolean cap = getClientCapability(dotName);
-		return cap != null && cap;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <T> T getClientCapability(String dotName)
-	{
-		T capability = clientCapabilities.getPath(dotName);
-		
-		if (capability != null)
-		{
-			Log.printf("Client capability %s = %s", dotName, capability);
-			return capability;
-		}
-		else
-		{
-			Log.printf("Missing client capability: %s", dotName);
-			return null;
-		}
-	}
-
-	/** True if we have an interpreter that we can use. */
-	protected abstract boolean canExecute();
-	
-	/** True if the spec has been updated since the interpreter was created. */
-	protected abstract boolean hasChanged();
-
-	private void heading() throws Exception
-	{
-		stdout("*\n" +
-				"* VDMJ " + Settings.dialect + " Interpreter\n" +
-				(noDebug ? "" : "* DEBUG enabled\n") +
-				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
-				" is " + getInterpreter().getDefaultName() + "\n");
-	}
-	
-	protected void stdout(String message)
-	{
-		DAPServer.getInstance().stdout(message);
-	}
-	
-	protected void stderr(String message)
-	{
-		DAPServer.getInstance().stderr(message);
-	}
-	
-	public DAPMessageList configurationDone(DAPRequest request) throws IOException
-	{
-		try
-		{
-			DAPDebugReader dbg = null;
-			
-			try
-			{
-				dbg = new DAPDebugReader();		// Allow debugging of init sequence
-				dbg.start();
-				
-				heading();
-				stdout("Initialized in ... ");
-
-				long before = System.currentTimeMillis();
-				getInterpreter().init();
-				if (defaultName != null) getInterpreter().setDefaultName(defaultName);
-				long after = System.currentTimeMillis();
-
-				stdout((double)(after-before)/1000 + " secs.\n");
-			}
-			finally
-			{
-				if (dbg != null)
-				{
-					dbg.interrupt();
-				}
-			}
-
-			if (launchCommand != null)
-			{
-				stdout("\n" + launchCommand + "\n");
-				DAPMessageList eval = evaluate(request, launchCommand, "repl");
-				
-				JSONObject body = eval.get(0).get("body");
-				Boolean success = eval.get(0).get("success");
-				
-				if (success && body != null)
-				{
-					stdout(body.get("result"));
-				}
-				else
-				{
-					stderr(eval.get(0).get("message"));
-				}
-
-				stdout("\nEvaluation complete.\n");
-				clearInterpreter();
-				dapServerState.setRunning(false);	// disconnect afterwards
-			}
-
-			return new DAPMessageList(request);
-		}
-		catch (Exception e)
-		{
-			return new DAPMessageList(request, e);
-		}
-		finally
-		{
-			launchCommand = null;
-		}
-	}
-
 	private void loadAllProjectFiles() throws IOException
 	{
 		for (File root: getRoots())
@@ -456,11 +311,69 @@ public abstract class WorkspaceManager
 		br.close();
 		projectFiles.put(file, sb);
 	}
+
+	private RPCMessageList checkLoadedFiles() throws Exception
+	{
+		ASTPlugin ast = getPlugin("AST");
+		TCPlugin tc = getPlugin("TC");
+		INPlugin in = getPlugin("IN");
+		
+		ast.preCheck();
+		tc.preCheck();
+		in.preCheck();
+		
+		if (ast.checkLoadedFiles())
+		{
+			if (tc.checkLoadedFiles(ast.getAST()))
+			{
+				if (in.checkLoadedFiles(tc.getTC()))
+				{
+					Log.printf("Loaded files checked successfully");
+				}
+				else
+				{
+					Log.error("Failed to create interpreter");
+				}
+			}
+			else
+			{
+				Log.error("Type checking errors found");
+				Log.dump(tc.getErrs());
+				Log.dump(tc.getWarns());
+			}
+		}
+		else
+		{
+			Log.error("Syntax errors found");
+			Log.dump(ast.getErrs());
+			Log.dump(ast.getWarns());
+		}
+		
+		List<VDMMessage> errs = new Vector<VDMMessage>();
+		errs.addAll(ast.getErrs());
+		errs.addAll(tc.getErrs());
+		LSPMessageUtils utils = new LSPMessageUtils();
+		RPCMessageList result = utils.diagnosticResponses(errs);
+		
+		if (hasClientCapability("experimental.proofObligationGeneration"))
+		{
+			POPlugin po = getPlugin("PO");
+			po.preCheck();
 	
+			result.add(new RPCRequest("lspx/POG/updated",
+					new JSONObject(
+						"uri",			getRoots().get(0).toURI().toString(),
+						"successful",	tc.getErrs().isEmpty())));
+		}
+		
+		return result;
+	}
+
 	private void unloadFile(File file)
 	{
 		projectFiles.remove(file);
 	}
+
 
 	public RPCMessageList openFile(RPCRequest request, File file, String text) throws Exception
 	{
@@ -481,7 +394,7 @@ public abstract class WorkspaceManager
 		
 		return null;
 	}
-	
+
 	public RPCMessageList closeFile(RPCRequest request, File file) throws Exception
 	{
 		if (!projectFiles.keySet().contains(file))
@@ -615,11 +528,51 @@ public abstract class WorkspaceManager
 		}
 	}
 
+	public RPCMessageList documentSymbols(RPCRequest request, File file) throws Exception
+	{
+		TCPlugin tc = getPlugin("TC");
+		RPCMessageList symbols = tc.documentSymbols(request, file);
+		
+		if (symbols == null)
+		{
+			ASTPlugin ast = getPlugin("AST");
+			symbols = ast.documentSymbols(request, file);
+		}
+		
+		return symbols;
+	}
+
+	public RPCMessageList findDefinition(RPCRequest request, File file, int zline, int zcol)
+	{
+		TCDefinition def = findDefinition(file, zline, zcol);
+		
+		if (def == null)
+		{
+			return new RPCMessageList(request, null);
+		}
+		else
+		{
+			URI defuri = def.location.file.toURI();
+			
+			return new RPCMessageList(request,
+				System.getProperty("lsp.lsp4e") != null ?
+					new JSONArray(
+						new JSONObject(
+							"targetUri", defuri.toString(),
+							"targetRange", Utils.lexLocationToRange(def.location),
+							"targetSelectionRange", Utils.lexLocationToPoint(def.location)))
+					:
+					new JSONObject(
+						"uri", defuri.toString(),
+						"range", Utils.lexLocationToRange(def.location)));
+		}
+	}
+
 	public RPCMessageList completion(RPCRequest request, File file, int zline, int zcol)
 	{
 		JSONArray result = new JSONArray();
 		TCDefinition def = findDefinition(file, zline, zcol - 2);
-
+	
 		if (def != null)
 		{
 			if (def.getType() instanceof TCRecordType)
@@ -704,7 +657,199 @@ public abstract class WorkspaceManager
 		
 		return new RPCMessageList(request, result);
 	}
+	
+	/**
+	 * Abstract LSP methods that are implemented in language specific subclasses.
+	 */
+	abstract protected FilenameFilter getFilenameFilter();
 
+	abstract protected String[] getFilenameFilters();
+
+	abstract protected TCDefinition findDefinition(File file, int zline, int zcol);
+
+	abstract protected TCDefinitionList lookupDefinition(String startsWith);
+
+
+	/**
+	 * DAP methods...
+	 */
+
+	public DAPMessageList dapInitialize(DAPRequest request)
+	{
+		DAPMessageList responses = new DAPMessageList();
+		responses.add(new DAPInitializeResponse(request));
+		responses.add(new DAPEvent("initialized", null));
+		return responses;
+	}
+
+	public DAPMessageList configurationDone(DAPRequest request) throws IOException
+	{
+		try
+		{
+			DAPDebugReader dbg = null;
+			
+			try
+			{
+				dbg = new DAPDebugReader();		// Allow debugging of init sequence
+				dbg.start();
+				
+				heading();
+				stdout("Initialized in ... ");
+	
+				long before = System.currentTimeMillis();
+				getInterpreter().init();
+				if (defaultName != null) getInterpreter().setDefaultName(defaultName);
+				long after = System.currentTimeMillis();
+	
+				stdout((double)(after-before)/1000 + " secs.\n");
+			}
+			finally
+			{
+				if (dbg != null)
+				{
+					dbg.interrupt();
+				}
+			}
+	
+			if (launchCommand != null)
+			{
+				stdout("\n" + launchCommand + "\n");
+				DAPMessageList eval = evaluate(request, launchCommand, "repl");
+				
+				JSONObject body = eval.get(0).get("body");
+				Boolean success = eval.get(0).get("success");
+				
+				if (success && body != null)
+				{
+					stdout(body.get("result"));
+				}
+				else
+				{
+					stderr(eval.get(0).get("message"));
+				}
+	
+				stdout("\nEvaluation complete.\n");
+				clearInterpreter();
+				dapServerState.setRunning(false);	// disconnect afterwards
+			}
+	
+			return new DAPMessageList(request);
+		}
+		catch (Exception e)
+		{
+			return new DAPMessageList(request, e);
+		}
+		finally
+		{
+			launchCommand = null;
+		}
+	}
+
+	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName, String command) throws Exception
+	{
+		checkLoadedFiles();
+		
+		if (!canExecute())
+		{
+			DAPMessageList responses = new DAPMessageList();
+			responses.add(new DAPResponse(request, false, "Specification has errors, cannot launch", null));
+			stderr("Specification has errors, cannot launch");
+			clearInterpreter();
+			return responses;
+		}
+		
+		try
+		{
+			// These values are used in configurationDone
+			this.noDebug = noDebug;
+			this.defaultName = defaultName;
+			this.launchCommand = command;
+			
+			return new DAPMessageList(request);
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new DAPMessageList(request, e);
+		}
+	}
+
+	public boolean hasClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
+	{
+		Boolean cap = getClientCapability(dotName);
+		return cap != null && cap;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getClientCapability(String dotName)
+	{
+		T capability = clientCapabilities.getPath(dotName);
+		
+		if (capability != null)
+		{
+			Log.printf("Client capability %s = %s", dotName, capability);
+			return capability;
+		}
+		else
+		{
+			Log.printf("Missing client capability: %s", dotName);
+			return null;
+		}
+	}
+	
+	public Interpreter getInterpreter()
+	{
+		if (interpreter == null)
+		{
+			try
+			{
+				TCPlugin tc = getPlugin("TC");
+				INPlugin in = getPlugin("IN");
+				interpreter = in.getInterpreter(tc.getTC());
+			}
+			catch (Exception e)
+			{
+				Log.error(e);
+				interpreter = null;
+			}
+		}
+		
+		return interpreter;
+	}
+
+	private boolean canExecute()
+	{
+		return getInterpreter() != null;
+	}
+	
+	private boolean hasChanged()
+	{
+		INPlugin in = getPlugin("IN");
+		return getInterpreter() != null && getInterpreter().getIN() != in.getIN();
+	}
+
+	/**
+	 * Methods to write direct to stdout/stderr, while a DAP command is being executed.
+	 */
+	private void heading() throws Exception
+	{
+		stdout("*\n" +
+				"* VDMJ " + Settings.dialect + " Interpreter\n" +
+				(noDebug ? "" : "* DEBUG enabled\n") +
+				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
+				" is " + getInterpreter().getDefaultName() + "\n");
+	}
+	
+	private void stdout(String message)
+	{
+		DAPServer.getInstance().stdout(message);
+	}
+	
+	private void stderr(String message)
+	{
+		DAPServer.getInstance().stderr(message);
+	}
+	
 	public DAPMessageList setBreakpoints(DAPRequest request, File file, JSONArray breakpoints) throws Exception
 	{
 		JSONArray results = new JSONArray();
@@ -816,123 +961,7 @@ public abstract class WorkspaceManager
 		return command.run(request);
 	}
 
-	private RPCMessageList checkLoadedFiles() throws Exception
-	{
-		ASTPlugin ast = getPlugin("AST");
-		TCPlugin tc = getPlugin("TC");
-		INPlugin in = getPlugin("IN");
-		
-		ast.preCheck();
-		tc.preCheck();
-		in.preCheck();
-		
-		if (ast.checkLoadedFiles())
-		{
-			if (tc.checkLoadedFiles(ast.getAST()))
-			{
-				if (in.checkLoadedFiles(tc.getTC()))
-				{
-					Log.printf("Loaded files checked successfully");
-				}
-				else
-				{
-					Log.error("Failed to create interpreter");
-				}
-			}
-			else
-			{
-				Log.error("Type checking errors found");
-				Log.dump(tc.getErrs());
-				Log.dump(tc.getWarns());
-			}
-		}
-		else
-		{
-			Log.error("Syntax errors found");
-			Log.dump(ast.getErrs());
-			Log.dump(ast.getWarns());
-		}
-		
-		List<VDMMessage> errs = new Vector<VDMMessage>();
-		errs.addAll(ast.getErrs());
-		errs.addAll(tc.getErrs());
-		LSPMessageUtils utils = new LSPMessageUtils();
-		RPCMessageList result = utils.diagnosticResponses(errs);
-		
-		if (hasClientCapability("experimental.proofObligationGeneration"))
-		{
-			POPlugin po = getPlugin("PO");
-			po.preCheck();
-
-			result.add(new RPCRequest("lspx/POG/updated",
-					new JSONObject(
-						"uri",			getRoots().get(0).toURI().toString(),
-						"successful",	tc.getErrs().isEmpty())));
-		}
-		
-		return result;
-	}
-
-	/**
-	 * Abstract methods that are implemented in language specific subclasses.
-	 */
-	abstract protected FilenameFilter getFilenameFilter();
-
-	abstract protected String[] getFilenameFilters();
-
-	abstract protected TCNode findLocation(File file, int zline, int zcol);
-
-	abstract protected TCDefinition findDefinition(File file, int zline, int zcol);
-
-	abstract public RPCMessageList findDefinition(RPCRequest request, File file, int zline, int zcol) throws IOException;
-
-	protected abstract TCDefinitionList lookupDefinition(String startsWith);
-
-	public RPCMessageList documentSymbols(RPCRequest request, File file) throws Exception
-	{
-		TCPlugin tc = getPlugin("TC");
-		RPCMessageList symbols = tc.documentSymbols(request, file);
-		
-		if (symbols == null)
-		{
-			ASTPlugin ast = getPlugin("AST");
-			symbols = ast.documentSymbols(request, file);
-		}
-		
-		return symbols;
-	}
-
 	abstract public DAPMessageList threads(DAPRequest request);
-
-	abstract public Interpreter getInterpreter();
-
-	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range)
-	{
-		TCPlugin tc = getPlugin("TC");
-		
-		if (!tc.getErrs().isEmpty())	// No type clean tree
-		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
-		}
-		
-		try
-		{
-			POPlugin po = getPlugin("PO");
-
-			if (po.getPO() == null)
-			{
-				po.checkLoadedFiles(tc.getTC());
-			}
-			
-			JSONArray results = po.getObligations(file);
-			return new RPCMessageList(request, results);
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
-	}
 
 	/**
 	 * Termination and cleanup methods.
@@ -953,7 +982,7 @@ public abstract class WorkspaceManager
 		return result;
 	}
 	
-	protected void clearInterpreter()
+	private void clearInterpreter()
 	{
 		if (interpreter != null)
 		{
@@ -968,6 +997,38 @@ public abstract class WorkspaceManager
 			}
 			
 			interpreter = null;
+		}
+	}
+
+	/**
+	 * LSPX extensions...
+	 */
+
+	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range)
+	{
+		TCPlugin tc = getPlugin("TC");
+		
+		if (!tc.getErrs().isEmpty())	// No type clean tree
+		{
+			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
+		}
+		
+		try
+		{
+			POPlugin po = getPlugin("PO");
+	
+			if (po.getPO() == null)
+			{
+				po.checkLoadedFiles(tc.getTC());
+			}
+			
+			JSONArray results = po.getObligations(file);
+			return new RPCMessageList(request, results);
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
 }

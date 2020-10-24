@@ -26,6 +26,10 @@ package workspace.plugins;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.runtime.ClassInterpreter;
+import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.tc.definitions.TCClassList;
+
 import workspace.WorkspaceManager;
 
 public class INPluginPR extends INPlugin
@@ -66,5 +70,11 @@ public class INPluginPR extends INPlugin
 	public <T> T getIN()
 	{
 		return (T)inClassList;
+	}
+
+	@Override
+	public <T> Interpreter getInterpreter(T tcClassList) throws Exception
+	{
+		return new ClassInterpreter(inClassList, (TCClassList)tcClassList);
 	}
 }

@@ -23,6 +23,8 @@
 
 package workspace.plugins;
 
+import com.fujitsu.vdmj.runtime.Interpreter;
+
 import workspace.WorkspaceManager;
 import workspace.WorkspacePlugin;
 
@@ -51,4 +53,6 @@ abstract public class INPlugin extends WorkspacePlugin
 	abstract public <T> T getIN();
 	
 	abstract public <T> boolean checkLoadedFiles(T tcList) throws Exception;
+	
+	abstract public <T> Interpreter getInterpreter(T tcList) throws Exception;
 }
