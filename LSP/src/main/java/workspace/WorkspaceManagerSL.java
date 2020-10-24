@@ -29,10 +29,6 @@ import java.net.URI;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.po.modules.POModuleList;
-import com.fujitsu.vdmj.pog.POStatus;
-import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -44,7 +40,6 @@ import dap.DAPRequest;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
-import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.LSPDefinitionFinder;
@@ -52,7 +47,6 @@ import vdmj.LSPDefinitionFinder.Found;
 import workspace.plugins.ASTPluginSL;
 import workspace.plugins.INPlugin;
 import workspace.plugins.INPluginSL;
-import workspace.plugins.POPlugin;
 import workspace.plugins.POPluginSL;
 import workspace.plugins.TCPlugin;
 import workspace.plugins.TCPluginSL;
@@ -206,66 +200,5 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	public DAPMessageList threads(DAPRequest request)
 	{
 		return new DAPMessageList(request, new JSONObject("threads", new JSONArray()));	// empty?
-	}
-
-	@Override
-	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range)
-	{
-		TCPlugin plugin = getPlugin("TC");
-		TCModuleList tcModuleList = plugin.getTC();
-		
-		if (!plugin.getErrs().isEmpty())	// No type clean tree
-		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
-		}
-		
-		try
-		{
-			POPlugin plugin2 = getPlugin("PO");
-			POModuleList poModuleList = plugin2.getPO();
-
-			if (poModuleList == null)
-			{
-				plugin2.generate(tcModuleList);
-				poModuleList = plugin2.getPO();
-			}
-			
-			ProofObligationList poGeneratedList = poModuleList.getProofObligations();
-			poGeneratedList.renumber();
-			JSONArray results = new JSONArray();
-			
-			for (ProofObligation po: poGeneratedList)
-			{
-				if (file != null &&
-					!po.location.file.equals(file) &&
-					!po.location.file.getParentFile().equals(file))		// folder
-				{
-					continue;
-				}
-				
-				JSONArray name = new JSONArray(po.location.module);
-				
-				for (String part: po.name.split(";\\s+"))
-				{
-					name.add(part);
-				}
-
-				results.add(
-					new JSONObject(
-						"id",		new Long(po.number),
-						"kind", 	po.kind.toString(),
-						"name",		name,
-						"location",	Utils.lexLocationToLocation(po.location),
-						"source",	po.value,
-						"proved",	po.status != POStatus.UNPROVED));
-			}
-			
-			return new RPCMessageList(request, results);
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
 	}
 }

@@ -237,7 +237,7 @@ public class WorkspaceManagerPP extends WorkspaceManager
 
 			if (poClassList == null)
 			{
-				plugin2.generate(tcClassList);
+				plugin2.checkLoadedFiles(tcClassList);
 				poClassList = plugin2.getPO();
 			}
 			

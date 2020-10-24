@@ -26,6 +26,7 @@ package workspace.plugins;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.modules.POModuleList;
+import com.fujitsu.vdmj.pog.ProofObligationList;
 
 import workspace.WorkspaceManager;
 
@@ -38,6 +39,12 @@ public class POPluginSL extends POPlugin
 		super(manager);
 	}
 
+	@Override
+	public void preCheck()
+	{
+		poModuleList = null;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getPO()
@@ -46,9 +53,15 @@ public class POPluginSL extends POPlugin
 	}
 
 	@Override
-	public <T> boolean generate(T tcList) throws Exception
+	public <T> boolean checkLoadedFiles(T tcList) throws Exception
 	{
 		poModuleList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcList);
 		return true;
+	}
+
+	@Override
+	protected ProofObligationList getProofObligations()
+	{
+		return poModuleList.getProofObligations();
 	}
 }

@@ -46,6 +46,11 @@ import rpc.RPCRequest;
 
 public class LSPMessageUtils
 {
+	public RPCMessageList diagnosticResponses(List<? extends VDMMessage> list) throws IOException
+	{
+		return diagnosticResponses(list, (Set<File>)null);
+	}
+	
 	public RPCMessageList diagnosticResponses(List<? extends VDMMessage> list, File file) throws IOException
 	{
 		Set<File> filesToReport = new HashSet<File>();
@@ -75,6 +80,11 @@ public class LSPMessageUtils
 		}
 		
 		RPCMessageList responses = new RPCMessageList();
+		
+		if (filesToReport == null)	// All of them
+		{
+			filesToReport = map.keySet();
+		}
 		
 		for (File file: filesToReport)
 		{

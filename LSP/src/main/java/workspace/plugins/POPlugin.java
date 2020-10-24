@@ -23,6 +23,15 @@
 
 package workspace.plugins;
 
+import java.io.File;
+
+import com.fujitsu.vdmj.pog.POStatus;
+import com.fujitsu.vdmj.pog.ProofObligation;
+import com.fujitsu.vdmj.pog.ProofObligationList;
+
+import json.JSONArray;
+import json.JSONObject;
+import lsp.Utils;
 import workspace.WorkspaceManager;
 import workspace.WorkspacePlugin;
 
@@ -44,11 +53,46 @@ abstract public class POPlugin extends WorkspacePlugin
 	{
 	}
 
-	public void preCheck()
-	{
-	}
+	abstract public void preCheck();
 
 	abstract public <T> T getPO();
 	
-	abstract public <T> boolean generate(T poList) throws Exception;
+	abstract public <T> boolean checkLoadedFiles(T poList) throws Exception;
+	
+	abstract protected ProofObligationList getProofObligations();
+	
+	public JSONArray getObligations(File file)
+	{
+		ProofObligationList poGeneratedList = getProofObligations();
+		poGeneratedList.renumber();
+		JSONArray results = new JSONArray();
+		
+		for (ProofObligation po: poGeneratedList)
+		{
+			if (file != null &&
+				!po.location.file.equals(file) &&
+				!po.location.file.getParentFile().equals(file))		// folder
+			{
+				continue;
+			}
+			
+			JSONArray name = new JSONArray(po.location.module);
+			
+			for (String part: po.name.split(";\\s+"))
+			{
+				name.add(part);
+			}
+
+			results.add(
+				new JSONObject(
+					"id",		new Long(po.number),
+					"kind", 	po.kind.toString(),
+					"name",		name,
+					"location",	Utils.lexLocationToLocation(po.location),
+					"source",	po.value,
+					"proved",	po.status != POStatus.UNPROVED));
+		}
+		
+		return results;
+	}
 }

@@ -38,13 +38,10 @@ import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -68,10 +65,10 @@ import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPInitializeResponse;
+import lsp.LSPMessageUtils;
 import lsp.LSPServerState;
 import lsp.Utils;
 import lsp.textdocument.CompletionItemKind;
-import lsp.textdocument.SymbolKind;
 import lsp.textdocument.WatchKind;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
@@ -90,7 +87,6 @@ public abstract class WorkspaceManager
 	private static WorkspaceManager INSTANCE = null;
 	
 	private Map<String, WorkspacePlugin> plugins = new HashMap<String, WorkspacePlugin>();
-	private Map<String, List<WorkspacePlugin>> pluginEvents = new HashMap<String, List<WorkspacePlugin>>();
 
 	private JSONObject clientCapabilities;
 	private List<File> roots = new Vector<File>();
@@ -149,7 +145,6 @@ public abstract class WorkspaceManager
 		if (INSTANCE != null)
 		{
 			INSTANCE.plugins.clear();
-			INSTANCE.pluginEvents.clear();
 			INSTANCE = null;
 		}
 	}
@@ -160,24 +155,16 @@ public abstract class WorkspaceManager
 		plugin.init();
 	}
 	
-	public void registerForEvent(String event, WorkspacePlugin plugin)
-	{
-		List<WorkspacePlugin> plugins = pluginEvents.get(event);
-		
-		if (plugins == null)
-		{
-			plugins = new Vector<WorkspacePlugin>();
-			pluginEvents.put(event, plugins);
-		}
-		
-		plugins.add(plugin);
-	}
-	
 	public static WorkspaceManager getInstance()
 	{
 		return INSTANCE;
 	}
 	
+	public List<File> getRoots()
+	{
+		return roots;
+	}
+
 	public Map<File, StringBuilder> getProjectFiles()
 	{
 		return projectFiles;
@@ -313,11 +300,6 @@ public abstract class WorkspaceManager
 		}
 	}
 
-	public List<File> getRoots()
-	{
-		return roots;
-	}
-	
 	public boolean hasClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
 	{
 		Boolean cap = getClientCapability(dotName);
@@ -480,67 +462,6 @@ public abstract class WorkspaceManager
 		projectFiles.remove(file);
 	}
 
-	protected RPCMessageList diagnosticResponses(List<? extends VDMMessage> list, File oneFile) throws IOException
-	{
-		Map<File, List<VDMMessage>> map = new HashMap<File, List<VDMMessage>>();
-		
-		for (VDMMessage message: list)
-		{
-			File file = message.location.file.getAbsoluteFile();
-			List<VDMMessage> set = map.get(file);
-			
-			if (set == null)
-			{
-				set = new Vector<VDMMessage>();
-				set.add(message);
-				map.put(file, set);
-			}
-			else
-			{
-				set.add(message);
-			}
-		}
-		
-		RPCMessageList responses = new RPCMessageList();
-		
-		// Only publish diags for a subset of the files - usually the one being edited, only.
-		// Defaults to all project files, if none specified.
-		Set<File> filesToReport = new HashSet<File>();
-		
-		if (oneFile == null)
-		{
-			filesToReport.addAll(projectFiles.keySet());
-		}
-		else
-		{
-			filesToReport.add(oneFile);
-		}
-		
-		for (File file: filesToReport)
-		{
-			JSONArray messages = new JSONArray();
-			
-			if (map.containsKey(file))
-			{
-				for (VDMMessage message: map.get(file))
-				{
-					messages.add(
-						new JSONObject(
-							"range",	Utils.lexLocationToRange(message.location),
-							"severity", (message instanceof VDMError ? 1 : 2),
-							"code", 	message.number,
-							"message",	message.toProblemString().replaceAll("\n", ", ")));
-					
-				}
-			}
-			
-			JSONObject params = new JSONObject("uri", file.toURI().toString(), "diagnostics", messages);
-			responses.add(new RPCRequest("textDocument/publishDiagnostics", params));
-		}
-		
-		return responses;
-	}
-	
 	public RPCMessageList openFile(RPCRequest request, File file, String text) throws Exception
 	{
 		if (!projectFiles.keySet().contains(file))
@@ -603,36 +524,12 @@ public abstract class WorkspaceManager
 				buffer.replace(start, end, text);
 			}
 			
-			if (Log.logging())	// dump edited line details
-			{
-				dumpEdit(range, buffer);
-			}
-			
+			Log.dumpEdit(range, buffer);
 			ASTPlugin ast = getPlugin("AST");
 			return ast.fileChanged(file);
 		}
 	}
 
-	private void dumpEdit(JSONObject range, StringBuilder buffer)
-	{
-		JSONObject position = range.get("start");
-		long line = position.get("line");
-		long count = 0;
-		int start = 0;
-		
-		while (count < line)
-		{
-			if (buffer.charAt(start++) == '\n')
-			{
-				count++;
-			}
-		}
-		
-		int end = start;
-		while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
-		Log.printf("EDITED %d: [%s]", line+1, buffer.substring(start, end));
-	}
-	
 	public void changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
 	{
 		switch (type)
@@ -808,31 +705,6 @@ public abstract class WorkspaceManager
 		return new RPCMessageList(request, result);
 	}
 
-	protected JSONObject symbolInformation(String name, LexLocation location, SymbolKind kind, String container)
-	{
-		JSONObject sym = new JSONObject(
-			"name", name,
-			"kind", kind.getValue(),
-			"location", Utils.lexLocationToLocation(location));
-		
-		if (container != null)
-		{
-			sym.put("container", container);
-		}
-		
-		return sym;
-	}
-
-	protected JSONObject symbolInformation(LexIdentifierToken name, SymbolKind kind, String container)
-	{
-		return symbolInformation(name.name, name.location, kind, container);
-	}
-	
-	protected JSONObject symbolInformation(LexIdentifierToken name, TCType type, SymbolKind kind, String container)
-	{
-		return symbolInformation(name.name + ":" + type, name.location, kind, container);
-	}
-
 	public DAPMessageList setBreakpoints(DAPRequest request, File file, JSONArray breakpoints) throws Exception
 	{
 		JSONArray results = new JSONArray();
@@ -944,7 +816,7 @@ public abstract class WorkspaceManager
 		return command.run(request);
 	}
 
-	protected RPCMessageList checkLoadedFiles() throws Exception
+	private RPCMessageList checkLoadedFiles() throws Exception
 	{
 		ASTPlugin ast = getPlugin("AST");
 		TCPlugin tc = getPlugin("TC");
@@ -984,12 +856,13 @@ public abstract class WorkspaceManager
 		List<VDMMessage> errs = new Vector<VDMMessage>();
 		errs.addAll(ast.getErrs());
 		errs.addAll(tc.getErrs());
-		RPCMessageList result = diagnosticResponses(errs, null);
+		LSPMessageUtils utils = new LSPMessageUtils();
+		RPCMessageList result = utils.diagnosticResponses(errs);
 		
 		if (hasClientCapability("experimental.proofObligationGeneration"))
 		{
 			POPlugin po = getPlugin("PO");
-			po.init();
+			po.preCheck();
 
 			result.add(new RPCRequest("lspx/POG/updated",
 					new JSONObject(
@@ -1033,7 +906,33 @@ public abstract class WorkspaceManager
 
 	abstract public Interpreter getInterpreter();
 
-	abstract public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range);
+	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range)
+	{
+		TCPlugin tc = getPlugin("TC");
+		
+		if (!tc.getErrs().isEmpty())	// No type clean tree
+		{
+			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
+		}
+		
+		try
+		{
+			POPlugin po = getPlugin("PO");
+
+			if (po.getPO() == null)
+			{
+				po.checkLoadedFiles(tc.getTC());
+			}
+			
+			JSONArray results = po.getObligations(file);
+			return new RPCMessageList(request, results);
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
 
 	/**
 	 * Termination and cleanup methods.
