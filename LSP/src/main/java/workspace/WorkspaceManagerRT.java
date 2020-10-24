@@ -26,21 +26,13 @@ package workspace;
 import java.io.FilenameFilter;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.lex.Dialect;
-
-import workspace.plugins.ASTPluginPR;
-import workspace.plugins.TCPluginPR;
 
 public class WorkspaceManagerRT extends WorkspaceManagerPP
 {
 	public WorkspaceManagerRT()
 	{
 		Settings.dialect = Dialect.VDM_RT;
-		registerPlugin(new ASTPluginPR(this));
-		registerPlugin(new TCPluginPR(this));
 	}
 	
 	@Override
@@ -53,22 +45,5 @@ public class WorkspaceManagerRT extends WorkspaceManagerPP
 	protected String[] getFilenameFilters()
 	{
 		return new String[] { "**/*.vpp", "**/*.vdmrt" }; 
-	}
-
-	@Override
-	protected ASTClassList extras()
-	{
-		try
-		{
-			ASTClassList ex = new ASTClassList();
-			ex.add(new ASTCPUClassDefinition());
-			ex.add(new ASTBUSClassDefinition());
-			return ex;
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return null;
-		}
 	}
 }

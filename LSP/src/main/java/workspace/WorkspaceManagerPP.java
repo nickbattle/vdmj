@@ -26,16 +26,11 @@ package workspace;
 import java.io.File;
 import java.io.FilenameFilter;
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import json.JSONArray;
-import json.JSONObject;
 import vdmj.LSPDefinitionFinder;
 import workspace.plugins.ASTPluginPR;
 import workspace.plugins.INPluginPR;
@@ -54,11 +49,6 @@ public class WorkspaceManagerPP extends WorkspaceManager
 		registerPlugin(new POPluginPR(this));
 	}
 	
-	protected ASTClassList extras()
-	{
-		return new ASTClassList();		// Overridden in RT to add CPU and BUS
-	}
-
 	@Override
 	protected TCDefinition findDefinition(File file, int zline, int zcol)
 	{
@@ -112,11 +102,5 @@ public class WorkspaceManagerPP extends WorkspaceManager
 	protected String[] getFilenameFilters()
 	{
 		return new String[] { "**/*.vpp", "**/*.vdmpp" }; 
-	}
-
-	@Override
-	public DAPMessageList threads(DAPRequest request)
-	{
-		return new DAPMessageList(request, new JSONObject("threads", new JSONArray()));	// empty?
 	}
 }

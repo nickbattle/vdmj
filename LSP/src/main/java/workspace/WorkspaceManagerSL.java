@@ -31,10 +31,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import json.JSONArray;
-import json.JSONObject;
 import vdmj.LSPDefinitionFinder;
 import workspace.plugins.ASTPluginSL;
 import workspace.plugins.INPluginSL;
@@ -101,11 +97,5 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	protected String[] getFilenameFilters()
 	{
 		return new String[] { "**/*.vdm", "**/*.vdmsl" }; 
-	}
-
-	@Override
-	public DAPMessageList threads(DAPRequest request)
-	{
-		return new DAPMessageList(request, new JSONObject("threads", new JSONArray()));	// empty?
 	}
 }

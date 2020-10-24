@@ -240,6 +240,29 @@ public abstract class WorkspaceManager
 		}
 	}
 
+	public boolean hasClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
+	{
+		Boolean cap = getClientCapability(dotName);
+		return cap != null && cap;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getClientCapability(String dotName)
+	{
+		T capability = clientCapabilities.getPath(dotName);
+		
+		if (capability != null)
+		{
+			Log.printf("Client capability %s = %s", dotName, capability);
+			return capability;
+		}
+		else
+		{
+			Log.printf("Missing client capability: %s", dotName);
+			return null;
+		}
+	}
+
 	private RPCRequest lspWorkspaceFolders()
 	{
 		return new RPCRequest(0L, "workspace/workspaceFolders", new JSONObject());
@@ -373,7 +396,6 @@ public abstract class WorkspaceManager
 	{
 		projectFiles.remove(file);
 	}
-
 
 	public RPCMessageList openFile(RPCRequest request, File file, String text) throws Exception
 	{
@@ -774,29 +796,6 @@ public abstract class WorkspaceManager
 		}
 	}
 
-	public boolean hasClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
-	{
-		Boolean cap = getClientCapability(dotName);
-		return cap != null && cap;
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <T> T getClientCapability(String dotName)
-	{
-		T capability = clientCapabilities.getPath(dotName);
-		
-		if (capability != null)
-		{
-			Log.printf("Client capability %s = %s", dotName, capability);
-			return capability;
-		}
-		else
-		{
-			Log.printf("Missing client capability: %s", dotName);
-			return null;
-		}
-	}
-	
 	public Interpreter getInterpreter()
 	{
 		if (interpreter == null)
@@ -961,7 +960,10 @@ public abstract class WorkspaceManager
 		return command.run(request);
 	}
 
-	abstract public DAPMessageList threads(DAPRequest request);
+	public DAPMessageList threads(DAPRequest request)
+	{
+		return new DAPMessageList(request, new JSONObject("threads", new JSONArray()));	// empty?
+	}
 
 	/**
 	 * Termination and cleanup methods.

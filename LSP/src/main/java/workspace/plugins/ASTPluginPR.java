@@ -31,9 +31,12 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ClassReader;
@@ -72,6 +75,11 @@ public class ASTPluginPR extends ASTPlugin
 			ClassReader mr = new ClassReader(ltr);
 			astClassList.addAll(mr.readClasses());
 			
+			if (Settings.dialect == Dialect.VDM_RT)
+			{
+				astClassList.addAll(extras());
+			}
+			
 			if (mr.getErrorCount() > 0)
 			{
 				errs.addAll(mr.getErrors());
@@ -85,7 +93,23 @@ public class ASTPluginPR extends ASTPlugin
 		
 		return errs.isEmpty();
 	}
-	
+
+	private ASTClassList extras()
+	{
+		try
+		{
+			ASTClassList ex = new ASTClassList();
+			ex.add(new ASTCPUClassDefinition());
+			ex.add(new ASTBUSClassDefinition());
+			return ex;
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return null;
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getAST()
