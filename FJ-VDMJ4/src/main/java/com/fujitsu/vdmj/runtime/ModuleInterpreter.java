@@ -372,18 +372,24 @@ public class ModuleInterpreter extends Interpreter
 		return main.getList();
 	}
 
-	public TCModuleList getTC()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends List<?>> T getTC()
 	{
-		return checkedModules;
+		return (T)checkedModules;
 	}
 
-	public INModuleList getIN()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends List<?>> T getIN()
 	{
-		return executableModules;
+		return (T)executableModules;
 	}
 
-	public POModuleList getPO()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends List<?>> T getPO()
 	{
-		return pogModules;
+		return (T)pogModules;
 	}
 }
