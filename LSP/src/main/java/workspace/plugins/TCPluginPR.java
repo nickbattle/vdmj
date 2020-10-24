@@ -24,7 +24,6 @@
 package workspace.plugins;
 
 import java.io.File;
-import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -39,11 +38,11 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.WorkspaceManager;
 
-public class TCPluginPPRT extends TCPlugin
+public class TCPluginPR extends TCPlugin
 {
 	private TCClassList tcClassList = null;
 	
-	public TCPluginPPRT(WorkspaceManager manager)
+	public TCPluginPR(WorkspaceManager manager)
 	{
 		super(manager);
 	}
@@ -66,7 +65,8 @@ public class TCPluginPPRT extends TCPlugin
 		tcClassList = new TCClassList();
 	}
 	
-	public boolean checkLoadedFiles(ASTClassList astClassList) throws Exception
+	@Override
+	public <T> boolean checkLoadedFiles(T astClassList) throws Exception
 	{
 		tcClassList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(astClassList);
 		TypeChecker tc = new ClassTypeChecker(tcClassList);
@@ -85,9 +85,11 @@ public class TCPluginPPRT extends TCPlugin
 		return errs.isEmpty();
 	}
 
-	public TCClassList getTCClasses()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getTC()
 	{
-		return tcClassList;
+		return (T)tcClassList;
 	}
 	
 	@Override

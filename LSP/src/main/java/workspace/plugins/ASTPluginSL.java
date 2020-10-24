@@ -87,9 +87,11 @@ public class ASTPluginSL extends ASTPlugin
 		return errs.isEmpty();
 	}
 	
-	public ASTModuleList getASTModules()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getAST()
 	{
-		return astModuleList;
+		return (T)astModuleList;
 	}
 	
 	@Override

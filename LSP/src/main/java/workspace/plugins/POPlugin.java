@@ -23,18 +23,12 @@
 
 package workspace.plugins;
 
-import com.fujitsu.vdmj.in.definitions.INClassList;
-import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import workspace.WorkspaceManager;
 import workspace.WorkspacePlugin;
 
-public class INPluginPPRT extends WorkspacePlugin
+abstract public class POPlugin extends WorkspacePlugin
 {
-	private INClassList inClassList = null;
-	
-	public INPluginPPRT(WorkspaceManager manager)
+	public POPlugin(WorkspaceManager manager)
 	{
 		super(manager);
 	}
@@ -42,7 +36,7 @@ public class INPluginPPRT extends WorkspacePlugin
 	@Override
 	public String getName()
 	{
-		return "IN";
+		return "PO";
 	}
 
 	@Override
@@ -52,12 +46,9 @@ public class INPluginPPRT extends WorkspacePlugin
 
 	public void preCheck()
 	{
-		inClassList = new INClassList();
 	}
+
+	abstract public <T> T getPO();
 	
-	public boolean checkLoadedFiles(TCClassList tcClassList) throws Exception
-	{
-		inClassList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(tcClassList);
-		return true;
-	}
+	abstract public <T> boolean generate(T poList) throws Exception;
 }

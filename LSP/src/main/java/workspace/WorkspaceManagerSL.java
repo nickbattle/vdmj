@@ -26,15 +26,9 @@ package workspace;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URI;
-import java.util.List;
-import java.util.Vector;
-
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.messages.VDMMessage;
-import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -56,80 +50,30 @@ import rpc.RPCRequest;
 import vdmj.LSPDefinitionFinder;
 import vdmj.LSPDefinitionFinder.Found;
 import workspace.plugins.ASTPluginSL;
+import workspace.plugins.INPlugin;
 import workspace.plugins.INPluginSL;
+import workspace.plugins.POPlugin;
+import workspace.plugins.POPluginSL;
+import workspace.plugins.TCPlugin;
 import workspace.plugins.TCPluginSL;
 
 public class WorkspaceManagerSL extends WorkspaceManager
 {
-	private TCModuleList tcModuleList = null;
-	private INModuleList inModuleList = null;
-	private POModuleList poModuleList = null;
-
 	public WorkspaceManagerSL()
 	{
 		Settings.dialect = Dialect.VDM_SL;
 		registerPlugin(new ASTPluginSL(this));
 		registerPlugin(new TCPluginSL(this));
-	}
-
-	@Override
-	protected RPCMessageList checkLoadedFiles() throws Exception
-	{
-		ASTPluginSL ast = getPlugin("AST");
-		TCPluginSL tc = getPlugin("TC");
-		INPluginSL in = getPlugin("IN");
-		
-		ast.preCheck();
-		tc.preCheck();
-		in.preCheck();
-		
-		if (ast.checkLoadedFiles())
-		{
-			if (tc.checkLoadedFiles(ast.getASTModules()))
-			{
-				if (in.checkLoadedFiles(tc.getTCModules()))
-				{
-					Log.printf("Loaded files checked successfully");
-				}
-				else
-				{
-					Log.error("Failed to create interpreter");
-				}
-			}
-			else
-			{
-				Log.error("Type checking errors found");
-				Log.dump(tc.getErrs());
-				Log.dump(tc.getWarns());
-			}
-		}
-		else
-		{
-			Log.error("Syntax errors found");
-			Log.dump(ast.getErrs());
-			Log.dump(ast.getWarns());
-		}
-		
-		List<VDMMessage> errs = new Vector<VDMMessage>();
-		errs.addAll(ast.getErrs());
-		errs.addAll(tc.getErrs());
-		RPCMessageList result = diagnosticResponses(errs, null);
-		
-		if (hasClientCapability("experimental.proofObligationGeneration"))
-		{
-			poModuleList = null;
-			result.add(new RPCRequest("lspx/POG/updated",
-					new JSONObject(
-						"uri",			getRoots().get(0).toURI().toString(),
-						"successful",	tcModuleList != null)));
-		}
-		
-		return result;
+		registerPlugin(new INPluginSL(this));
+		registerPlugin(new POPluginSL(this));
 	}
 
 	@Override
 	protected TCNode findLocation(File file, int zline, int zcol)
 	{
+		TCPlugin plugin = getPlugin("TC");
+		TCModuleList tcModuleList = plugin.getTC();
+		
 		if (tcModuleList != null && !tcModuleList.isEmpty())
 		{
 			LSPDefinitionFinder finder = new LSPDefinitionFinder();
@@ -147,6 +91,9 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	@Override
 	protected TCDefinition findDefinition(File file, int zline, int zcol)
 	{
+		TCPlugin plugin = getPlugin("TC");
+		TCModuleList tcModuleList = plugin.getTC();
+		
 		if (tcModuleList != null && !tcModuleList.isEmpty())
 		{
 			LSPDefinitionFinder finder = new LSPDefinitionFinder();
@@ -188,6 +135,8 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	@Override
 	protected TCDefinitionList lookupDefinition(String startsWith)
 	{
+		TCPlugin plugin = getPlugin("TC");
+		TCModuleList tcModuleList = plugin.getTC();
 		TCDefinitionList results = new TCDefinitionList();
 		
 		for (TCModule module: tcModuleList)
@@ -216,56 +165,6 @@ public class WorkspaceManagerSL extends WorkspaceManager
 		return new String[] { "**/*.vdm", "**/*.vdmsl" }; 
 	}
 
-//	@Override
-//	public RPCMessageList documentSymbols(RPCRequest request, File file)
-//	{
-//		JSONArray results = new JSONArray();
-//		
-//		if (tcModuleList != null)	// May be syntax errors
-//		{
-//			for (TCModule module: tcModuleList)
-//			{
-//				if (module.files.contains(file))
-//				{
-//					results.add(symbolInformation(module.name.toString(), module.name.getLocation(), SymbolKind.Module, null));
-//
-//					for (TCDefinition def: module.defs)
-//					{
-//						for (TCDefinition indef: def.getDefinitions())
-//						{
-//							if (indef.name != null && indef.location.file.equals(file) && !indef.name.isOld())
-//							{
-//								results.add(symbolInformation(indef.name + ":" + indef.getType(),
-//										indef.location, SymbolKind.kindOf(indef), indef.location.module));
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
-//		else if (astModuleList != null)		// Try AST instead
-//		{
-//			for (ASTModule module: astModuleList)
-//			{
-//				if (module.files.contains(file))
-//				{
-//					results.add(symbolInformation(module.name, SymbolKind.Module, null));
-//
-//					for (ASTDefinition def: module.defs)
-//					{
-//						if (def.name != null && def.location.file.equals(file) && !def.name.old)
-//						{
-//							results.add(symbolInformation(def.name.toString(),
-//									def.name.location, SymbolKind.kindOf(def), def.location.module));
-//						}
-//					}
-//				}
-//			}
-//		}
-//		
-//		return new RPCMessageList(request, results);
-//	}
-
 	@Override
 	public ModuleInterpreter getInterpreter()
 	{
@@ -273,6 +172,10 @@ public class WorkspaceManagerSL extends WorkspaceManager
 		{
 			try
 			{
+				TCPlugin plugin = getPlugin("TC");
+				TCModuleList tcModuleList = plugin.getTC();
+				INPlugin plugin2 = getPlugin("IN");
+				INModuleList inModuleList = plugin2.getIN();
 				interpreter = new ModuleInterpreter(inModuleList, tcModuleList);
 			}
 			catch (Exception e)
@@ -294,7 +197,9 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	@Override
 	protected boolean hasChanged()
 	{
-		return getInterpreter() != null && getInterpreter().getIN() != inModuleList;
+		INPlugin plugin = getPlugin("IN");
+		INModuleList inModuleList = plugin.getIN();
+		return getInterpreter() != null && getInterpreter().getIN() != inModuleList;	// TODO won't have changed??
 	}
 	
 	@Override
@@ -306,16 +211,23 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	@Override
 	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range)
 	{
-		if (tcModuleList == null)	// No type clean tree
+		TCPlugin plugin = getPlugin("TC");
+		TCModuleList tcModuleList = plugin.getTC();
+		
+		if (!plugin.getErrs().isEmpty())	// No type clean tree
 		{
 			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
 		}
 		
 		try
 		{
+			POPlugin plugin2 = getPlugin("PO");
+			POModuleList poModuleList = plugin2.getPO();
+
 			if (poModuleList == null)
 			{
-				poModuleList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcModuleList);
+				plugin2.generate(tcModuleList);
+				poModuleList = plugin2.getPO();
 			}
 			
 			ProofObligationList poGeneratedList = poModuleList.getProofObligations();

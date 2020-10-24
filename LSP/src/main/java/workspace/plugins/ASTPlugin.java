@@ -77,6 +77,8 @@ public abstract class ASTPlugin extends WorkspacePlugin
 		return warns;
 	}
 	
+	abstract public <T> T getAST();
+	
 	abstract protected List<VDMMessage> parseFile(File file);
 
 	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);

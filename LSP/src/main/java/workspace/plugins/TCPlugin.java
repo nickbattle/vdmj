@@ -70,5 +70,9 @@ abstract public class TCPlugin extends WorkspacePlugin
 		return warns;
 	}
 	
+	abstract public <T> T getTC();
+	
+	abstract public <T> boolean checkLoadedFiles(T ast) throws Exception;
+
 	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);
 }

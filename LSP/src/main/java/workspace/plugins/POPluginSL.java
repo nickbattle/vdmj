@@ -23,32 +23,32 @@
 
 package workspace.plugins;
 
-import workspace.WorkspaceManager;
-import workspace.WorkspacePlugin;
+import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.modules.POModuleList;
 
-abstract public class INPlugin extends WorkspacePlugin
+import workspace.WorkspaceManager;
+
+public class POPluginSL extends POPlugin
 {
-	public INPlugin(WorkspaceManager manager)
+	private POModuleList poModuleList;
+
+	public POPluginSL(WorkspaceManager manager)
 	{
 		super(manager);
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	@Override
-	public String getName()
+	public <T> T getPO()
 	{
-		return "IN";
+		return (T) poModuleList;
 	}
 
 	@Override
-	public void init()
+	public <T> boolean generate(T tcList) throws Exception
 	{
+		poModuleList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcList);
+		return true;
 	}
-
-	public void preCheck()
-	{
-	}
-	
-	abstract public <T> T getIN();
-	
-	abstract public <T> boolean checkLoadedFiles(T tcList) throws Exception;
 }

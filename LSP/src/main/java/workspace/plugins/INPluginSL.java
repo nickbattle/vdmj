@@ -23,14 +23,12 @@
 
 package workspace.plugins;
 
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import workspace.WorkspaceManager;
-import workspace.WorkspacePlugin;
 
-public class INPluginSL extends WorkspacePlugin
+public class INPluginSL extends INPlugin
 {
 	private INModuleList inModuleList = null;
 	
@@ -50,14 +48,23 @@ public class INPluginSL extends WorkspacePlugin
 	{
 	}
 
+	@Override
 	public void preCheck()
 	{
 		inModuleList = new INModuleList();
 	}
 	
-	public boolean checkLoadedFiles(TCModuleList tcModuleList) throws Exception
+	@Override
+	public <T> boolean checkLoadedFiles(T tcModuleList) throws Exception
 	{
-		inModuleList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(tcModuleList);
+		inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(tcModuleList);
 		return true;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getIN()
+	{
+		return (T)inModuleList;
 	}
 }

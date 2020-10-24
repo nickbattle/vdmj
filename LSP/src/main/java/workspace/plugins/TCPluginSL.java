@@ -24,7 +24,6 @@
 package workspace.plugins;
 
 import java.io.File;
-import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -66,7 +65,8 @@ public class TCPluginSL extends TCPlugin
 		tcModuleList = new TCModuleList();
 	}
 	
-	public boolean checkLoadedFiles(ASTModuleList astModuleList) throws Exception
+	@Override
+	public <T> boolean checkLoadedFiles(T astModuleList) throws Exception
 	{
 		tcModuleList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(astModuleList);
 		tcModuleList.combineDefaults();
@@ -86,9 +86,11 @@ public class TCPluginSL extends TCPlugin
 		return errs.isEmpty();
 	}
 
-	public TCModuleList getTCModules()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getTC()
 	{
-		return tcModuleList;
+		return (T)tcModuleList;
 	}
 	
 	@Override

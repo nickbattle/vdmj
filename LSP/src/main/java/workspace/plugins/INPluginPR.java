@@ -23,12 +23,16 @@
 
 package workspace.plugins;
 
+import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.definitions.INClassList;
+import com.fujitsu.vdmj.mapper.ClassMapper;
 import workspace.WorkspaceManager;
-import workspace.WorkspacePlugin;
 
-abstract public class INPlugin extends WorkspacePlugin
+public class INPluginPR extends INPlugin
 {
-	public INPlugin(WorkspaceManager manager)
+	private INClassList inClassList = null;
+	
+	public INPluginPR(WorkspaceManager manager)
 	{
 		super(manager);
 	}
@@ -44,11 +48,23 @@ abstract public class INPlugin extends WorkspacePlugin
 	{
 	}
 
+	@Override
 	public void preCheck()
 	{
+		inClassList = new INClassList();
 	}
 	
-	abstract public <T> T getIN();
-	
-	abstract public <T> boolean checkLoadedFiles(T tcList) throws Exception;
+	@Override
+	public <T> boolean checkLoadedFiles(T tcClassList) throws Exception
+	{
+		inClassList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(tcClassList);
+		return true;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getIN()
+	{
+		return (T)inClassList;
+	}
 }

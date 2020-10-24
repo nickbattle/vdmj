@@ -81,6 +81,8 @@ import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
 import workspace.plugins.ASTPlugin;
+import workspace.plugins.INPlugin;
+import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
 
 public abstract class WorkspaceManager
@@ -942,14 +944,68 @@ public abstract class WorkspaceManager
 		return command.run(request);
 	}
 
+	protected RPCMessageList checkLoadedFiles() throws Exception
+	{
+		ASTPlugin ast = getPlugin("AST");
+		TCPlugin tc = getPlugin("TC");
+		INPlugin in = getPlugin("IN");
+		
+		ast.preCheck();
+		tc.preCheck();
+		in.preCheck();
+		
+		if (ast.checkLoadedFiles())
+		{
+			if (tc.checkLoadedFiles(ast.getAST()))
+			{
+				if (in.checkLoadedFiles(tc.getTC()))
+				{
+					Log.printf("Loaded files checked successfully");
+				}
+				else
+				{
+					Log.error("Failed to create interpreter");
+				}
+			}
+			else
+			{
+				Log.error("Type checking errors found");
+				Log.dump(tc.getErrs());
+				Log.dump(tc.getWarns());
+			}
+		}
+		else
+		{
+			Log.error("Syntax errors found");
+			Log.dump(ast.getErrs());
+			Log.dump(ast.getWarns());
+		}
+		
+		List<VDMMessage> errs = new Vector<VDMMessage>();
+		errs.addAll(ast.getErrs());
+		errs.addAll(tc.getErrs());
+		RPCMessageList result = diagnosticResponses(errs, null);
+		
+		if (hasClientCapability("experimental.proofObligationGeneration"))
+		{
+			POPlugin po = getPlugin("PO");
+			po.init();
+
+			result.add(new RPCRequest("lspx/POG/updated",
+					new JSONObject(
+						"uri",			getRoots().get(0).toURI().toString(),
+						"successful",	tc.getErrs().isEmpty())));
+		}
+		
+		return result;
+	}
+
 	/**
 	 * Abstract methods that are implemented in language specific subclasses.
 	 */
 	abstract protected FilenameFilter getFilenameFilter();
 
 	abstract protected String[] getFilenameFilters();
-
-	abstract protected RPCMessageList checkLoadedFiles() throws Exception;
 
 	abstract protected TCNode findLocation(File file, int zline, int zcol);
 

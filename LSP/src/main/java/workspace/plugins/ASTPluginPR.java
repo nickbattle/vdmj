@@ -44,11 +44,11 @@ import rpc.RPCRequest;
 import workspace.Log;
 import workspace.WorkspaceManager;
 
-public class ASTPluginPPRT extends ASTPlugin
+public class ASTPluginPR extends ASTPlugin
 {
 	private ASTClassList astClassList = null;
 	
-	public ASTPluginPPRT(WorkspaceManager manager)
+	public ASTPluginPR(WorkspaceManager manager)
 	{
 		super(manager);
 	}
@@ -86,9 +86,11 @@ public class ASTPluginPPRT extends ASTPlugin
 		return errs.isEmpty();
 	}
 	
-	public ASTClassList getASTClasses()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getAST()
 	{
-		return astClassList;
+		return (T)astClassList;
 	}
 	
 	@Override

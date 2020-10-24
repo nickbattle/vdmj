@@ -31,16 +31,16 @@ import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.lex.Dialect;
 
-import workspace.plugins.ASTPluginPPRT;
-import workspace.plugins.TCPluginPPRT;
+import workspace.plugins.ASTPluginPR;
+import workspace.plugins.TCPluginPR;
 
 public class WorkspaceManagerRT extends WorkspaceManagerPP
 {
 	public WorkspaceManagerRT()
 	{
 		Settings.dialect = Dialect.VDM_RT;
-		registerPlugin(new ASTPluginPPRT(this));
-		registerPlugin(new TCPluginPPRT(this));
+		registerPlugin(new ASTPluginPR(this));
+		registerPlugin(new TCPluginPR(this));
 	}
 	
 	@Override
