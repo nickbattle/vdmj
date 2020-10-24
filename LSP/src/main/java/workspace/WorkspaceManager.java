@@ -353,7 +353,7 @@ public abstract class WorkspaceManager
 		errs.addAll(ast.getErrs());
 		errs.addAll(tc.getErrs());
 		LSPMessageUtils utils = new LSPMessageUtils();
-		RPCMessageList result = utils.diagnosticResponses(errs);
+		RPCMessageList result = utils.diagnosticResponses(errs, projectFiles.keySet());
 		
 		if (hasClientCapability("experimental.proofObligationGeneration"))
 		{
