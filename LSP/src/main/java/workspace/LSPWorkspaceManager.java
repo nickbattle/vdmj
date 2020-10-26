@@ -321,11 +321,13 @@ public abstract class LSPWorkspaceManager
 			Log.dump(ast.getWarns());
 		}
 		
-		List<VDMMessage> errs = new Vector<VDMMessage>();
-		errs.addAll(ast.getErrs());
-		errs.addAll(tc.getErrs());
+		List<VDMMessage> diags = new Vector<VDMMessage>();
+		diags.addAll(ast.getErrs());
+		diags.addAll(tc.getErrs());
+		diags.addAll(ast.getWarns());
+		diags.addAll(tc.getWarns());
 		LSPMessageUtils utils = new LSPMessageUtils();
-		RPCMessageList result = utils.diagnosticResponses(errs, projectFiles.keySet());
+		RPCMessageList result = utils.diagnosticResponses(diags, projectFiles.keySet());
 		
 		if (hasClientCapability("experimental.proofObligationGeneration"))
 		{
