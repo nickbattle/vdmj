@@ -146,8 +146,23 @@ public abstract class LSPWorkspaceManager
 		try
 		{
 			JSONObject params = request.get("params");
-			getRoots().clear();
-			getRoots().add(Utils.uriToFile(params.get("rootUri")));	// TODO workspace folders
+			JSONArray folders = params.get("workspaceFolders");
+			roots.clear();
+			
+			if (folders != null)
+			{
+				for (int i=0; i<folders.size(); i++)
+				{
+					JSONObject folder = folders.index(i);
+					roots.add(Utils.uriToFile(folder.get("uri")));
+					Log.printf("Adding workspace folder %s", (String)folder.get("uri"));
+				}
+			}
+			else
+			{
+				roots.add(Utils.uriToFile(params.get("rootUri")));
+			}
+			
 			clientCapabilities = params.get("capabilities");
 			openFiles.clear();
 			System.setProperty("parser.tabstop", "1");	// Forced, for LSP location offsets
