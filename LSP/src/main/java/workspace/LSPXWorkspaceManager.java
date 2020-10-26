@@ -28,7 +28,6 @@ import java.io.File;
 import com.fujitsu.vdmj.Settings;
 
 import json.JSONArray;
-import json.JSONObject;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
@@ -90,7 +89,7 @@ public class LSPXWorkspaceManager
 	 * LSPX extensions...
 	 */
 
-	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range)
+	public RPCMessageList pogGenerate(RPCRequest request, File file)
 	{
 		TCPlugin tc = registry.getPlugin("TC");
 		

@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -33,9 +34,9 @@ public class POReturnStatement extends POStatement
 	private static final long serialVersionUID = 1L;
 	public final POExpression expression;
 
-	public POReturnStatement(POExpression expression)
+	public POReturnStatement(LexLocation location, POExpression expression)
 	{
-		super(expression.location);
+		super(location);
 		this.expression = expression;
 	}
 

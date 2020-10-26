@@ -333,9 +333,7 @@ public abstract class LSPWorkspaceManager
 			po.preCheck();
 	
 			result.add(new RPCRequest("lspx/POG/updated",
-					new JSONObject(
-						"uri",			getRoots().get(0).toURI().toString(),
-						"successful",	tc.getErrs().isEmpty())));
+					new JSONObject("successful", tc.getErrs().isEmpty())));
 		}
 		
 		return result;

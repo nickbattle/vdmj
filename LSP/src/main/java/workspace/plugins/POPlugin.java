@@ -59,6 +59,19 @@ abstract public class POPlugin extends AnalysisPlugin
 	
 	abstract protected ProofObligationList getProofObligations();
 	
+	protected JSONArray splitPO(String value)
+	{
+		String[] parts = value.trim().split("\\n\\s+");
+		JSONArray array = new JSONArray();
+		
+		for (String part: parts)
+		{
+			array.add(part);
+		}
+		
+		return array;
+	}
+
 	public JSONArray getObligations(File file)
 	{
 		ProofObligationList poGeneratedList = getProofObligations();
@@ -87,7 +100,7 @@ abstract public class POPlugin extends AnalysisPlugin
 					"kind", 	po.kind.toString(),
 					"name",		name,
 					"location",	Utils.lexLocationToLocation(po.location),
-					"source",	po.value,
+					"source",	splitPO(po.value),
 					"proved",	po.status != POStatus.UNPROVED));
 		}
 		
