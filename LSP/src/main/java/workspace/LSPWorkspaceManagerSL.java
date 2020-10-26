@@ -25,7 +25,6 @@ package workspace;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -41,7 +40,6 @@ public class LSPWorkspaceManagerSL extends LSPWorkspaceManager
 {
 	public LSPWorkspaceManagerSL()
 	{
-		Settings.dialect = Dialect.VDM_SL;
 		registry.registerPlugin(new ASTPluginSL(this));
 		registry.registerPlugin(new TCPluginSL(this));
 		registry.registerPlugin(new INPluginSL(this));

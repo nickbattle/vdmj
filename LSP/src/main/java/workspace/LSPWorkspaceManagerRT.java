@@ -25,14 +25,13 @@ package workspace;
 
 import java.io.FilenameFilter;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
 public class LSPWorkspaceManagerRT extends LSPWorkspaceManagerPP
 {
 	public LSPWorkspaceManagerRT()
 	{
-		Settings.dialect = Dialect.VDM_RT;
+		super();
 	}
 	
 	@Override

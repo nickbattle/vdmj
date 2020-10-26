@@ -23,12 +23,12 @@
 
 package workspace;
 
-import workspace.plugins.POPluginSL;
+import workspace.plugins.POPluginPR;
 
 public class LSPXWorkspaceManagerRT extends LSPXWorkspaceManager
 {
 	public LSPXWorkspaceManagerRT()
 	{
-		registry.registerPlugin(new POPluginSL());
+		registry.registerPlugin(new POPluginPR());
 	}
 }
