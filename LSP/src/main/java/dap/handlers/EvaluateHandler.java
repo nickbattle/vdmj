@@ -30,6 +30,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServerState;
 import json.JSONObject;
+import workspace.DAPWorkspaceManager;
 
 public class EvaluateHandler extends DAPHandler
 {
@@ -44,6 +45,6 @@ public class EvaluateHandler extends DAPHandler
 		JSONObject arguments = request.get("arguments");
 		String expression = arguments.get("expression");
 		String context = arguments.get("context");
-		return dapServerState.getManager().evaluate(request, expression, context);
+		return DAPWorkspaceManager.getInstance().evaluate(request, expression, context);
 	}
 }

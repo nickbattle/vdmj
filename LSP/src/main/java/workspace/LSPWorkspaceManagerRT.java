@@ -21,45 +21,29 @@
  *
  ******************************************************************************/
 
-package workspace.plugins;
+package workspace;
 
-import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.definitions.POClassList;
-import com.fujitsu.vdmj.pog.ProofObligationList;
+import java.io.FilenameFilter;
 
-public class POPluginPR extends POPlugin
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
+
+public class LSPWorkspaceManagerRT extends LSPWorkspaceManagerPP
 {
-	private POClassList poClassList;
-
-	public POPluginPR()
+	public LSPWorkspaceManagerRT()
 	{
-		super();
+		Settings.dialect = Dialect.VDM_RT;
 	}
-
+	
 	@Override
-	public void preCheck()
+	protected FilenameFilter getFilenameFilter()
 	{
-		poClassList = null;
+		return Dialect.VDM_RT.getFilter();
 	}
-
-	@SuppressWarnings("unchecked")
+	
 	@Override
-	public <T> T getPO()
+	protected String[] getFilenameFilters()
 	{
-		return (T) poClassList;
-	}
-
-	@Override
-	public <T> boolean checkLoadedFiles(T tcList) throws Exception
-	{
-		poClassList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcList);
-		return true;
-	}
-
-	@Override
-	protected ProofObligationList getProofObligations()
-	{
-		return poClassList.getProofObligations();
+		return new String[] { "**/*.vpp", "**/*.vdmrt" }; 
 	}
 }

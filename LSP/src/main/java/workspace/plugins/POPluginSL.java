@@ -28,15 +28,13 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
-import workspace.WorkspaceManager;
-
 public class POPluginSL extends POPlugin
 {
 	private POModuleList poModuleList;
 
-	public POPluginSL(WorkspaceManager manager)
+	public POPluginSL()
 	{
-		super(manager);
+		super();
 	}
 
 	@Override

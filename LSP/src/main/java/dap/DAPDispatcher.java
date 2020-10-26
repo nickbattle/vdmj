@@ -31,9 +31,12 @@ public class DAPDispatcher
 {
 	private Map<String, DAPHandler> handlers = new HashMap<String, DAPHandler>();
 	
-	public void register(String method, DAPHandler handler)
+	public void register(DAPHandler handler, String... methods)
 	{
-		handlers.put(method, handler);
+		for (String method: methods)
+		{
+			handlers.put(method, handler);
+		}
 	}
 
 	public DAPMessageList dispatch(DAPRequest request)

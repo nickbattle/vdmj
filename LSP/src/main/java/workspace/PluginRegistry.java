@@ -23,27 +23,52 @@
 
 package workspace;
 
-import java.io.FilenameFilter;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.lex.Dialect;
+import workspace.plugins.AnalysisPlugin;
 
-public class WorkspaceManagerRT extends WorkspaceManagerPP
+public class PluginRegistry
 {
-	public WorkspaceManagerRT()
+	private static PluginRegistry INSTANCE = null;
+	private final Map<String, AnalysisPlugin> plugins;
+
+	private PluginRegistry()
 	{
-		Settings.dialect = Dialect.VDM_RT;
+		plugins = new HashMap<String, AnalysisPlugin>();
+	}
+
+	public static synchronized PluginRegistry getInstance()
+	{
+		if (INSTANCE == null)
+		{
+			INSTANCE = new PluginRegistry();
+		}
+		
+		return INSTANCE;
 	}
 	
-	@Override
-	protected FilenameFilter getFilenameFilter()
+	/**
+	 * This is only used by unit testing.
+	 */
+	public static void reset()
 	{
-		return Dialect.VDM_RT.getFilter();
+		if (INSTANCE != null)
+		{
+			INSTANCE.plugins.clear();
+			INSTANCE = null;
+		}
 	}
 	
-	@Override
-	protected String[] getFilenameFilters()
+	public void registerPlugin(AnalysisPlugin plugin)
 	{
-		return new String[] { "**/*.vpp", "**/*.vdmrt" }; 
+		plugins.put(plugin.getName(), plugin);
+		plugin.init();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getPlugin(String name)
+	{
+		return (T)plugins.get(name);
 	}
 }

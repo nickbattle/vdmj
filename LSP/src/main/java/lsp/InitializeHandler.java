@@ -25,6 +25,7 @@ package lsp;
 
 import rpc.RPCRequest;
 import rpc.RPCResponse;
+import workspace.LSPWorkspaceManager;
 import workspace.Log;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
@@ -54,13 +55,13 @@ public class InitializeHandler extends LSPHandler
 	
 	private RPCMessageList initialize(RPCRequest request)
 	{
-		return lspServerState.getManager().lspInitialize(request);
+		return LSPWorkspaceManager.getInstance().lspInitialize(request);
 	}
 
 	private RPCMessageList initialized(RPCRequest request)
 	{
 		lspServerState.setInitialized(true);
-		return lspServerState.getManager().lspInitialized(request);
+		return LSPWorkspaceManager.getInstance().lspInitialized(request);
 	}
 
 	@Override

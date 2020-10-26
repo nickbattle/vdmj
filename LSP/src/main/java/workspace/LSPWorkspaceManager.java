@@ -40,12 +40,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.statements.INStatement;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.VDMMessage;
-import com.fujitsu.vdmj.runtime.Breakpoint;
-import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCClassType;
@@ -55,13 +50,6 @@ import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
-import dap.DAPEvent;
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import dap.DAPResponse;
-import dap.DAPServer;
-import dap.DAPServerState;
-import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPInitializeResponse;
@@ -73,69 +61,55 @@ import lsp.textdocument.WatchKind;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import vdmj.DAPDebugReader;
-import vdmj.commands.Command;
-import vdmj.commands.PrintCommand;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.INPlugin;
 import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
 
-public abstract class WorkspaceManager
+public abstract class LSPWorkspaceManager
 {
-	private static WorkspaceManager INSTANCE = null;
-	
-	private Map<String, WorkspacePlugin> plugins = new HashMap<String, WorkspacePlugin>();
+	private static LSPWorkspaceManager INSTANCE = null;
+	protected final PluginRegistry registry;
 
 	private JSONObject clientCapabilities;
 	private List<File> roots = new Vector<File>();
 	private Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
 	private Set<File> openFiles = new HashSet<File>();
 	
-	private Boolean noDebug;
-	protected Interpreter interpreter;
-
 	// private LSPServerState lspServerState;
-	private DAPServerState dapServerState;
-
-	private String launchCommand;
-	private String defaultName;
 	
-	protected WorkspaceManager()
+	protected LSPWorkspaceManager()
 	{
+		registry = PluginRegistry.getInstance();
 	}
 
-
-	/**
-	 * This is called by both LSP and DAP servers (and there is a race!) 
-	 */
-	public static synchronized WorkspaceManager createInstance(Dialect dialect) throws IOException
+	public static synchronized LSPWorkspaceManager getInstance()
 	{
-		switch (dialect)
+		switch (Settings.dialect)
 		{
 			case VDM_SL:
 				if (INSTANCE == null)
 				{
-					INSTANCE = new WorkspaceManagerSL();
+					INSTANCE = new LSPWorkspaceManagerSL();
 				}
 				return INSTANCE;
 				
 			case VDM_PP:
 				if (INSTANCE == null)
 				{
-					INSTANCE = new WorkspaceManagerPP();
+					INSTANCE = new LSPWorkspaceManagerPP();
 				}
 				return INSTANCE;
 				
 			case VDM_RT:
 				if (INSTANCE == null)
 				{
-					INSTANCE = new WorkspaceManagerRT();
+					INSTANCE = new LSPWorkspaceManagerRT();
 				}
 				return INSTANCE;
 				
 			default:
-				throw new IOException("Unsupported dialect: " + dialect);
+				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
 		}
 	}
 	
@@ -144,22 +118,8 @@ public abstract class WorkspaceManager
 	 */
 	public static void reset()
 	{
-		if (INSTANCE != null)
-		{
-			INSTANCE.plugins.clear();
-			INSTANCE = null;
-		}
-	}
-	
-	public void registerPlugin(WorkspacePlugin plugin)
-	{
-		plugins.put(plugin.getName(), plugin);
-		plugin.init();
-	}
-	
-	public static WorkspaceManager getInstance()
-	{
-		return INSTANCE;
+		PluginRegistry.reset();
+		INSTANCE = null;
 	}
 	
 	public List<File> getRoots()
@@ -172,20 +132,9 @@ public abstract class WorkspaceManager
 		return projectFiles;
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <T> T getPlugin(String name)
-	{
-		return (T)plugins.get(name);
-	}
-
 	public void setLSPState(LSPServerState lspServerState)
 	{
-		// this.lspServerState = lspServerState;
-	}
-
-	public void setDAPState(DAPServerState dapServerState)
-	{
-		this.dapServerState = dapServerState;
+		// this.lspServerState = lspServerState;	-- Not used?
 	}
 
 	/**
@@ -335,11 +284,11 @@ public abstract class WorkspaceManager
 		projectFiles.put(file, sb);
 	}
 
-	private RPCMessageList checkLoadedFiles() throws Exception
+	public RPCMessageList checkLoadedFiles() throws Exception
 	{
-		ASTPlugin ast = getPlugin("AST");
-		TCPlugin tc = getPlugin("TC");
-		INPlugin in = getPlugin("IN");
+		ASTPlugin ast = registry.getPlugin("AST");
+		TCPlugin tc = registry.getPlugin("TC");
+		INPlugin in = registry.getPlugin("IN");
 		
 		ast.preCheck();
 		tc.preCheck();
@@ -380,7 +329,7 @@ public abstract class WorkspaceManager
 		
 		if (hasClientCapability("experimental.proofObligationGeneration"))
 		{
-			POPlugin po = getPlugin("PO");
+			POPlugin po = registry.getPlugin("PO");
 			po.preCheck();
 	
 			result.add(new RPCRequest("lspx/POG/updated",
@@ -460,7 +409,7 @@ public abstract class WorkspaceManager
 			}
 			
 			Log.dumpEdit(range, buffer);
-			ASTPlugin ast = getPlugin("AST");
+			ASTPlugin ast = registry.getPlugin("AST");
 			return ast.fileChanged(file);
 		}
 	}
@@ -552,12 +501,12 @@ public abstract class WorkspaceManager
 
 	public RPCMessageList documentSymbols(RPCRequest request, File file) throws Exception
 	{
-		TCPlugin tc = getPlugin("TC");
+		TCPlugin tc = registry.getPlugin("TC");
 		RPCMessageList symbols = tc.documentSymbols(request, file);
 		
 		if (symbols == null)
 		{
-			ASTPlugin ast = getPlugin("AST");
+			ASTPlugin ast = registry.getPlugin("AST");
 			symbols = ast.documentSymbols(request, file);
 		}
 		
@@ -690,347 +639,4 @@ public abstract class WorkspaceManager
 	abstract protected TCDefinition findDefinition(File file, int zline, int zcol);
 
 	abstract protected TCDefinitionList lookupDefinition(String startsWith);
-
-
-	/**
-	 * DAP methods...
-	 */
-
-	public DAPMessageList dapInitialize(DAPRequest request)
-	{
-		DAPMessageList responses = new DAPMessageList();
-		responses.add(new DAPInitializeResponse(request));
-		responses.add(new DAPEvent("initialized", null));
-		return responses;
-	}
-
-	public DAPMessageList configurationDone(DAPRequest request) throws IOException
-	{
-		try
-		{
-			DAPDebugReader dbg = null;
-			
-			try
-			{
-				dbg = new DAPDebugReader();		// Allow debugging of init sequence
-				dbg.start();
-				
-				heading();
-				stdout("Initialized in ... ");
-	
-				long before = System.currentTimeMillis();
-				getInterpreter().init();
-				if (defaultName != null) getInterpreter().setDefaultName(defaultName);
-				long after = System.currentTimeMillis();
-	
-				stdout((double)(after-before)/1000 + " secs.\n");
-			}
-			finally
-			{
-				if (dbg != null)
-				{
-					dbg.interrupt();
-				}
-			}
-	
-			if (launchCommand != null)
-			{
-				stdout("\n" + launchCommand + "\n");
-				DAPMessageList eval = evaluate(request, launchCommand, "repl");
-				
-				JSONObject body = eval.get(0).get("body");
-				Boolean success = eval.get(0).get("success");
-				
-				if (success && body != null)
-				{
-					stdout(body.get("result"));
-				}
-				else
-				{
-					stderr(eval.get(0).get("message"));
-				}
-	
-				stdout("\nEvaluation complete.\n");
-				clearInterpreter();
-				dapServerState.setRunning(false);	// disconnect afterwards
-			}
-	
-			return new DAPMessageList(request);
-		}
-		catch (Exception e)
-		{
-			return new DAPMessageList(request, e);
-		}
-		finally
-		{
-			launchCommand = null;
-		}
-	}
-
-	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName, String command) throws Exception
-	{
-		checkLoadedFiles();
-		
-		if (!canExecute())
-		{
-			DAPMessageList responses = new DAPMessageList();
-			responses.add(new DAPResponse(request, false, "Specification has errors, cannot launch", null));
-			stderr("Specification has errors, cannot launch");
-			clearInterpreter();
-			return responses;
-		}
-		
-		try
-		{
-			// These values are used in configurationDone
-			this.noDebug = noDebug;
-			this.defaultName = defaultName;
-			this.launchCommand = command;
-			
-			return new DAPMessageList(request);
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new DAPMessageList(request, e);
-		}
-	}
-
-	public Interpreter getInterpreter()
-	{
-		if (interpreter == null)
-		{
-			try
-			{
-				TCPlugin tc = getPlugin("TC");
-				INPlugin in = getPlugin("IN");
-				interpreter = in.getInterpreter(tc.getTC());
-			}
-			catch (Exception e)
-			{
-				Log.error(e);
-				interpreter = null;
-			}
-		}
-		
-		return interpreter;
-	}
-
-	private boolean canExecute()
-	{
-		return getInterpreter() != null;
-	}
-	
-	private boolean hasChanged()
-	{
-		INPlugin in = getPlugin("IN");
-		return getInterpreter() != null && getInterpreter().getIN() != in.getIN();
-	}
-
-	/**
-	 * Methods to write direct to stdout/stderr, while a DAP command is being executed.
-	 */
-	private void heading() throws Exception
-	{
-		stdout("*\n" +
-				"* VDMJ " + Settings.dialect + " Interpreter\n" +
-				(noDebug ? "" : "* DEBUG enabled\n") +
-				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
-				" is " + getInterpreter().getDefaultName() + "\n");
-	}
-	
-	private void stdout(String message)
-	{
-		DAPServer.getInstance().stdout(message);
-	}
-	
-	private void stderr(String message)
-	{
-		DAPServer.getInstance().stderr(message);
-	}
-	
-	public DAPMessageList setBreakpoints(DAPRequest request, File file, JSONArray breakpoints) throws Exception
-	{
-		JSONArray results = new JSONArray();
-		
-		Map<Integer, Breakpoint> existing = getInterpreter().getBreakpoints();
-		Set<Integer> bps = new HashSet<Integer>(existing.keySet());
-		
-		for (Integer bpno: bps)
-		{
-			Breakpoint bp = existing.get(bpno);
-			
-			if (bp.location.file.equals(file))
-			{
-				interpreter.clearBreakpoint(bpno);
-			}
-		}
-		
-		for (Object object: breakpoints)
-		{
-			JSONObject breakpoint = (JSONObject) object;
-			long line = breakpoint.get("line");
-			String logMessage = breakpoint.get("logMessage");
-			String condition = breakpoint.get("condition");
-			
-			if (condition == null || condition.isEmpty())
-			{
-				condition = breakpoint.get("hitCondition");
-			}
-			
-			if (condition != null && condition.isEmpty()) condition = null;
-
-			if (!noDebug)	// debugging allowed!
-			{
-				INStatement stmt = interpreter.findStatement(file, (int)line);
-				
-				if (stmt == null)
-				{
-					INExpression exp = interpreter.findExpression(file, (int)line);
-		
-					if (exp == null)
-					{
-						results.add(new JSONObject("verified", false));
-					}
-					else
-					{
-						interpreter.clearBreakpoint(exp.breakpoint.number);
-						
-						if (logMessage == null || logMessage.isEmpty())
-						{
-							interpreter.setBreakpoint(exp, condition);
-						}
-						else
-						{
-							if (condition != null) Log.error("Ignoring tracepoint condition " + condition);
-							interpreter.setTracepoint(exp, logMessage);
-						}
-						
-						results.add(new JSONObject("verified", true));
-					}
-				}
-				else
-				{
-					interpreter.clearBreakpoint(stmt.breakpoint.number);
-					
-					if (logMessage == null || logMessage.isEmpty())
-					{
-						interpreter.setBreakpoint(stmt, condition);
-					}
-					else
-					{
-						if (condition != null) Log.error("Ignoring tracepoint condition " + condition);
-						interpreter.setTracepoint(stmt, logMessage);
-					}
-
-					results.add(new JSONObject("verified", true));
-				}
-			}
-			else
-			{
-				results.add(new JSONObject("verified", false));
-			}
-		}
-		
-		return new DAPMessageList(request, new JSONObject("breakpoints", results));
-	}
-	
-	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
-	{
-		Command command = Command.parse(expression);
-
-		if (command instanceof PrintCommand)	// ie. evaluate something
-		{
-			if (!canExecute())
-			{
-				DAPMessageList responses = new DAPMessageList(request,
-						new JSONObject("result", "Cannot start interpreter: errors exist?", "variablesReference", 0));
-				dapServerState.setRunning(false);
-				clearInterpreter();
-				return responses;
-			}
-			else if (hasChanged())
-			{
-				DAPMessageList responses = new DAPMessageList(request,
-						new JSONObject("result", "Specification has changed: try restart", "variablesReference", 0));
-				return responses;
-			}
-		}
-		
-		return command.run(request);
-	}
-
-	public DAPMessageList threads(DAPRequest request)
-	{
-		return new DAPMessageList(request, new JSONObject("threads", new JSONArray()));	// empty?
-	}
-
-	/**
-	 * Termination and cleanup methods.
-	 */
-	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
-	{
-		stdout("\nSession disconnected.\n");
-		clearInterpreter();
-		DAPMessageList result = new DAPMessageList(request);
-		return result;
-	}
-
-	public DAPMessageList terminate(DAPRequest request, Boolean restart)
-	{
-		stdout("\nSession terminated.\n");
-		clearInterpreter();
-		DAPMessageList result = new DAPMessageList(request);
-		return result;
-	}
-	
-	private void clearInterpreter()
-	{
-		if (interpreter != null)
-		{
-			// Clear the BPs since they are embedded in the tree and the next
-			// launch may have noDebug set.
-			
-			Set<Integer> bps = new HashSet<Integer>(interpreter.getBreakpoints().keySet());
-			
-			for (Integer bpno: bps)
-			{
-				interpreter.clearBreakpoint(bpno);
-			}
-			
-			interpreter = null;
-		}
-	}
-
-	/**
-	 * LSPX extensions...
-	 */
-
-	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range)
-	{
-		TCPlugin tc = getPlugin("TC");
-		
-		if (!tc.getErrs().isEmpty())	// No type clean tree
-		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
-		}
-		
-		try
-		{
-			POPlugin po = getPlugin("PO");
-	
-			if (po.getPO() == null)
-			{
-				po.checkLoadedFiles(tc.getTC());
-			}
-			
-			JSONArray results = po.getObligations(file);
-			return new RPCMessageList(request, results);
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
-	}
 }

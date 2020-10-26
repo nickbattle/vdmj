@@ -23,27 +23,12 @@
 
 package workspace;
 
-import lsp.LSPMessageUtils;
-import rpc.RPCErrors;
-import rpc.RPCMessageList;
+import workspace.plugins.POPluginPR;
 
-abstract public class WorkspacePlugin
+public class LSPXWorkspaceManagerPR extends LSPXWorkspaceManager
 {
-	protected final WorkspaceManager manager;
-	protected final LSPMessageUtils messages;
-	
-	public WorkspacePlugin(WorkspaceManager manager)
+	public LSPXWorkspaceManagerPR()
 	{
-		this.manager = manager;
-		messages = new LSPMessageUtils();
+		registry.registerPlugin(new POPluginPR());
 	}
-	
-	protected RPCMessageList errorResult()
-	{
-		return new RPCMessageList(null, RPCErrors.InternalError, "?");
-	}
-
-	abstract protected String getName();
-	
-	abstract public void init();
 }

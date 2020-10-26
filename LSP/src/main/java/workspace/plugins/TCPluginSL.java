@@ -36,13 +36,13 @@ import json.JSONArray;
 import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import workspace.WorkspaceManager;
+import workspace.LSPWorkspaceManager;
 
 public class TCPluginSL extends TCPlugin
 {
 	private TCModuleList tcModuleList = null;
 	
-	public TCPluginSL(WorkspaceManager manager)
+	public TCPluginSL(LSPWorkspaceManager manager)
 	{
 		super(manager);
 	}

@@ -32,14 +32,12 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
-import workspace.WorkspaceManager;
-import workspace.WorkspacePlugin;
 
-abstract public class POPlugin extends WorkspacePlugin
+abstract public class POPlugin extends AnalysisPlugin
 {
-	public POPlugin(WorkspaceManager manager)
+	public POPlugin()
 	{
-		super(manager);
+		super();
 	}
 	
 	@Override

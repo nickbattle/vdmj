@@ -23,43 +23,25 @@
 
 package workspace.plugins;
 
-import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.definitions.POClassList;
-import com.fujitsu.vdmj.pog.ProofObligationList;
+import lsp.LSPMessageUtils;
+import rpc.RPCErrors;
+import rpc.RPCMessageList;
 
-public class POPluginPR extends POPlugin
+abstract public class AnalysisPlugin
 {
-	private POClassList poClassList;
-
-	public POPluginPR()
+	protected final LSPMessageUtils messages;
+	
+	public AnalysisPlugin()
 	{
-		super();
+		messages = new LSPMessageUtils();
+	}
+	
+	protected RPCMessageList errorResult()
+	{
+		return new RPCMessageList(null, RPCErrors.InternalError, "?");
 	}
 
-	@Override
-	public void preCheck()
-	{
-		poClassList = null;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getPO()
-	{
-		return (T) poClassList;
-	}
-
-	@Override
-	public <T> boolean checkLoadedFiles(T tcList) throws Exception
-	{
-		poClassList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcList);
-		return true;
-	}
-
-	@Override
-	protected ProofObligationList getProofObligations()
-	{
-		return poClassList.getProofObligations();
-	}
+	abstract public String getName();
+	
+	abstract public void init();
 }

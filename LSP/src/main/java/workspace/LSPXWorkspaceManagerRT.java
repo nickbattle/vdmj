@@ -21,45 +21,14 @@
  *
  ******************************************************************************/
 
-package workspace.plugins;
+package workspace;
 
-import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.definitions.POClassList;
-import com.fujitsu.vdmj.pog.ProofObligationList;
+import workspace.plugins.POPluginSL;
 
-public class POPluginPR extends POPlugin
+public class LSPXWorkspaceManagerRT extends LSPXWorkspaceManager
 {
-	private POClassList poClassList;
-
-	public POPluginPR()
+	public LSPXWorkspaceManagerRT()
 	{
-		super();
-	}
-
-	@Override
-	public void preCheck()
-	{
-		poClassList = null;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> T getPO()
-	{
-		return (T) poClassList;
-	}
-
-	@Override
-	public <T> boolean checkLoadedFiles(T tcList) throws Exception
-	{
-		poClassList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcList);
-		return true;
-	}
-
-	@Override
-	protected ProofObligationList getProofObligations()
-	{
-		return poClassList.getProofObligations();
+		registry.registerPlugin(new POPluginSL());
 	}
 }

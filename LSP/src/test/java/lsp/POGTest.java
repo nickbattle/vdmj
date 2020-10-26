@@ -32,6 +32,7 @@ import java.io.PrintWriter;
 
 import org.junit.Test;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONArray;
@@ -40,19 +41,22 @@ import json.JSONWriter;
 import lsp.lspx.POGHandler;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import workspace.WorkspaceManager;
+import workspace.LSPWorkspaceManager;
+import workspace.LSPXWorkspaceManager;
 
 public class POGTest
 {
-	private WorkspaceManager manager = null;
+	private LSPWorkspaceManager lspManager = null;
 	private LSPServerState state = null;
 
 	private void setupWorkspace(Dialect dialect) throws IOException
 	{
-		WorkspaceManager.reset();
-		manager = WorkspaceManager.createInstance(dialect);
+		Settings.dialect = dialect;
+		LSPWorkspaceManager.reset();
+		LSPXWorkspaceManager.reset();
+		lspManager = LSPWorkspaceManager.getInstance();
+		LSPXWorkspaceManager.getInstance();
 		state = new LSPServerState();
-		state.setManager(manager);
 	}
 	
 	private RPCMessageList initialize(File root) throws Exception
@@ -63,10 +67,10 @@ public class POGTest
 					"experimental", new JSONObject(
 						"proofObligationGeneration", true)));
 		
-		RPCMessageList result = manager.lspInitialize(new RPCRequest(0L, "initialize", params));
+		RPCMessageList result = lspManager.lspInitialize(new RPCRequest(0L, "initialize", params));
 		assertEquals("init result", (Object)null, result.get(0).get("error"));		
 		
-		return manager.afterChangeWatchedFiles(null);	// Cause parse and typecheck
+		return lspManager.afterChangeWatchedFiles(null);	// Cause parse and typecheck
 	}
 	
 	private void dump(JSONObject obj) throws IOException

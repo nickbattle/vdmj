@@ -34,25 +34,23 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import vdmj.LSPDefinitionFinder;
 import workspace.plugins.ASTPluginSL;
 import workspace.plugins.INPluginSL;
-import workspace.plugins.POPluginSL;
 import workspace.plugins.TCPlugin;
 import workspace.plugins.TCPluginSL;
 
-public class WorkspaceManagerSL extends WorkspaceManager
+public class LSPWorkspaceManagerSL extends LSPWorkspaceManager
 {
-	public WorkspaceManagerSL()
+	public LSPWorkspaceManagerSL()
 	{
 		Settings.dialect = Dialect.VDM_SL;
-		registerPlugin(new ASTPluginSL(this));
-		registerPlugin(new TCPluginSL(this));
-		registerPlugin(new INPluginSL(this));
-		registerPlugin(new POPluginSL(this));
+		registry.registerPlugin(new ASTPluginSL(this));
+		registry.registerPlugin(new TCPluginSL(this));
+		registry.registerPlugin(new INPluginSL(this));
 	}
 
 	@Override
 	protected TCDefinition findDefinition(File file, int zline, int zcol)
 	{
-		TCPlugin plugin = getPlugin("TC");
+		TCPlugin plugin = registry.getPlugin("TC");
 		TCModuleList tcModuleList = plugin.getTC();
 		
 		if (tcModuleList != null && !tcModuleList.isEmpty())
@@ -69,7 +67,7 @@ public class WorkspaceManagerSL extends WorkspaceManager
 	@Override
 	protected TCDefinitionList lookupDefinition(String startsWith)
 	{
-		TCPlugin plugin = getPlugin("TC");
+		TCPlugin plugin = registry.getPlugin("TC");
 		TCModuleList tcModuleList = plugin.getTC();
 		TCDefinitionList results = new TCDefinitionList();
 		

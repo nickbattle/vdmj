@@ -34,6 +34,7 @@ import lsp.Utils;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
+import workspace.LSPWorkspaceManager;
 import workspace.Log;
 
 public class WorkspaceFoldersHandler extends LSPHandler
@@ -59,7 +60,7 @@ public class WorkspaceFoldersHandler extends LSPHandler
 		}
 		
 		JSONArray result = message.get("result");
-		List<File> roots = lspServerState.getManager().getRoots();
+		List<File> roots = LSPWorkspaceManager.getInstance().getRoots();
 		
 		try
 		{

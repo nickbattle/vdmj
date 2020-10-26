@@ -30,17 +30,18 @@ import java.util.Vector;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import workspace.WorkspaceManager;
-import workspace.WorkspacePlugin;
+import workspace.LSPWorkspaceManager;
 
-public abstract class ASTPlugin extends WorkspacePlugin
+public abstract class ASTPlugin extends AnalysisPlugin
 {
-	protected List<VDMMessage> errs = new Vector<VDMMessage>();
-	protected List<VDMMessage> warns = new Vector<VDMMessage>();
+	protected final LSPWorkspaceManager lspManager;
+	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
+	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
 
-	public ASTPlugin(WorkspaceManager manager)
+	public ASTPlugin(LSPWorkspaceManager manager)
 	{
-		super(manager);
+		super();
+		this.lspManager = manager;
 	}
 	
 	@Override

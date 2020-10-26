@@ -33,6 +33,7 @@ import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.LSPWorkspaceManager;
 import workspace.Log;
 
 public class DocumentSymbolHandler extends LSPHandler
@@ -51,7 +52,7 @@ public class DocumentSymbolHandler extends LSPHandler
 			JSONObject textDoc = params.get("textDocument");
 			File file = Utils.uriToFile(textDoc.get("uri"));
 			
-			return lspServerState.getManager().documentSymbols(request, file);
+			return LSPWorkspaceManager.getInstance().documentSymbols(request, file);
 		}
 		catch (URISyntaxException e)
 		{

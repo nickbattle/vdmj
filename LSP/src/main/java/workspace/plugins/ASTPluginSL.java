@@ -42,14 +42,14 @@ import json.JSONArray;
 import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.LSPWorkspaceManager;
 import workspace.Log;
-import workspace.WorkspaceManager;
 
 public class ASTPluginSL extends ASTPlugin
 {
 	private ASTModuleList astModuleList = null;
 	
-	public ASTPluginSL(WorkspaceManager manager)
+	public ASTPluginSL(LSPWorkspaceManager manager)
 	{
 		super(manager);
 	}
@@ -64,7 +64,7 @@ public class ASTPluginSL extends ASTPlugin
 	@Override
 	public boolean checkLoadedFiles()
 	{
-		Map<File, StringBuilder> projectFiles = manager.getProjectFiles();
+		Map<File, StringBuilder> projectFiles = lspManager.getProjectFiles();
 		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
@@ -98,7 +98,7 @@ public class ASTPluginSL extends ASTPlugin
 	protected List<VDMMessage> parseFile(File file)
 	{
 		List<VDMMessage> errs = new Vector<VDMMessage>();
-		Map<File, StringBuilder> projectFiles = manager.getProjectFiles();
+		Map<File, StringBuilder> projectFiles = lspManager.getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
