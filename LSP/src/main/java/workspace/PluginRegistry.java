@@ -21,42 +21,54 @@
  *
  ******************************************************************************/
 
-package dap;
+package workspace;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DAPDispatcher
+import workspace.plugins.AnalysisPlugin;
+
+public class PluginRegistry
 {
-	private Map<String, DAPHandler> handlers = new HashMap<String, DAPHandler>();
-	
-	public void register(DAPHandler handler, String... methods)
+	private static PluginRegistry INSTANCE = null;
+	private final Map<String, AnalysisPlugin> plugins;
+
+	private PluginRegistry()
 	{
-		for (String method: methods)
-		{
-			handlers.put(method, handler);
-		}
+		plugins = new HashMap<String, AnalysisPlugin>();
 	}
 
-	public DAPMessageList dispatch(DAPRequest request)
+	public static synchronized PluginRegistry getInstance()
 	{
-		try
+		if (INSTANCE == null)
 		{
-			DAPHandler handler = handlers.get(request.get("command"));
-			
-			if (handler == null)
-			{
-				return new DAPMessageList(request, false, "Command not found", null);
-			}
-			else
-			{
-				return handler.run(request);
-			}
+			INSTANCE = new PluginRegistry();
 		}
-		catch (IOException e)
+		
+		return INSTANCE;
+	}
+	
+	/**
+	 * This is only used by unit testing.
+	 */
+	public static void reset()
+	{
+		if (INSTANCE != null)
 		{
-			return new DAPMessageList(request, e);
+			INSTANCE.plugins.clear();
+			INSTANCE = null;
 		}
+	}
+	
+	public void registerPlugin(AnalysisPlugin plugin)
+	{
+		plugins.put(plugin.getName(), plugin);
+		plugin.init();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getPlugin(String name)
+	{
+		return (T)plugins.get(name);
 	}
 }

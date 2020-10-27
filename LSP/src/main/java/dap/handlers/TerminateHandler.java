@@ -30,6 +30,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServerState;
 import json.JSONObject;
+import workspace.DAPWorkspaceManager;
 
 public class TerminateHandler extends DAPHandler
 {
@@ -43,7 +44,7 @@ public class TerminateHandler extends DAPHandler
 	{
 		JSONObject arguments = request.get("arguments");
 		Boolean restart = arguments.get("restart");
-		DAPMessageList result = dapServerState.getManager().terminate(request, restart);
+		DAPMessageList result = DAPWorkspaceManager.getInstance().terminate(request, restart);
 		dapServerState.setRunning(false);
 		return result;
 	}

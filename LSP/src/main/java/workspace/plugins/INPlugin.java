@@ -21,42 +21,40 @@
  *
  ******************************************************************************/
 
-package dap;
+package workspace.plugins;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import com.fujitsu.vdmj.runtime.Interpreter;
 
-public class DAPDispatcher
+import workspace.LSPWorkspaceManager;
+
+abstract public class INPlugin extends AnalysisPlugin
 {
-	private Map<String, DAPHandler> handlers = new HashMap<String, DAPHandler>();
+	protected final LSPWorkspaceManager lspManager;
 	
-	public void register(DAPHandler handler, String... methods)
+	public INPlugin(LSPWorkspaceManager manager)
 	{
-		for (String method: methods)
-		{
-			handlers.put(method, handler);
-		}
+		super();
+		this.lspManager = manager;
+	}
+	
+	@Override
+	public String getName()
+	{
+		return "IN";
 	}
 
-	public DAPMessageList dispatch(DAPRequest request)
+	@Override
+	public void init()
 	{
-		try
-		{
-			DAPHandler handler = handlers.get(request.get("command"));
-			
-			if (handler == null)
-			{
-				return new DAPMessageList(request, false, "Command not found", null);
-			}
-			else
-			{
-				return handler.run(request);
-			}
-		}
-		catch (IOException e)
-		{
-			return new DAPMessageList(request, e);
-		}
 	}
+
+	public void preCheck()
+	{
+	}
+	
+	abstract public <T> T getIN();
+	
+	abstract public <T> boolean checkLoadedFiles(T tcList) throws Exception;
+	
+	abstract public <T> Interpreter getInterpreter(T tcList) throws Exception;
 }

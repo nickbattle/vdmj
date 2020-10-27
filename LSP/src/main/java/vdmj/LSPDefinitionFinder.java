@@ -70,16 +70,6 @@ public class LSPDefinitionFinder
 		}
 	}
 	
-	public Found findLocation(TCModuleList modules, File file, int line, int col)
-	{
-		return findLocation(modules, new LexLocation(file, "?", line, col, line, col));
-	}
-	
-	public Found findLocation(TCClassList classes, File file, int line, int col)
-	{
-		return findLocation(classes, new LexLocation(file, "?", line, col, line, col));
-	}
-
 	public Found findLocation(TCModuleList modules, LexLocation position)
 	{
 		LSPDefinitionLocationFinder finder = new LSPDefinitionLocationFinder();

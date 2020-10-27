@@ -31,6 +31,7 @@ import lsp.LSPHandler;
 import lsp.LSPServerState;
 import lsp.Utils;
 import rpc.RPCRequest;
+import workspace.LSPWorkspaceManager;
 import workspace.Log;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
@@ -55,7 +56,7 @@ public class DefinitionHandler extends LSPHandler
 			Long line = position.get("line");
 			Long col = position.get("character");
 			
-			return lspServerState.getManager().findDefinition(request, file, line.intValue(), col.intValue());
+			return LSPWorkspaceManager.getInstance().findDefinition(request, file, line.intValue(), col.intValue());
 		}
 		catch (URISyntaxException e)
 		{

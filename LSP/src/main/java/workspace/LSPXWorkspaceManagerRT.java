@@ -21,42 +21,14 @@
  *
  ******************************************************************************/
 
-package dap;
+package workspace;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import workspace.plugins.POPluginPR;
 
-public class DAPDispatcher
+public class LSPXWorkspaceManagerRT extends LSPXWorkspaceManager
 {
-	private Map<String, DAPHandler> handlers = new HashMap<String, DAPHandler>();
-	
-	public void register(DAPHandler handler, String... methods)
+	public LSPXWorkspaceManagerRT()
 	{
-		for (String method: methods)
-		{
-			handlers.put(method, handler);
-		}
-	}
-
-	public DAPMessageList dispatch(DAPRequest request)
-	{
-		try
-		{
-			DAPHandler handler = handlers.get(request.get("command"));
-			
-			if (handler == null)
-			{
-				return new DAPMessageList(request, false, "Command not found", null);
-			}
-			else
-			{
-				return handler.run(request);
-			}
-		}
-		catch (IOException e)
-		{
-			return new DAPMessageList(request, e);
-		}
+		registry.registerPlugin(new POPluginPR());
 	}
 }

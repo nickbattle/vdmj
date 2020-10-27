@@ -33,6 +33,7 @@ import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.LSPWorkspaceManager;
 import workspace.Log;
 
 public class CompletionHandler extends LSPHandler
@@ -54,7 +55,7 @@ public class CompletionHandler extends LSPHandler
 			Long line = position.get("line");
 			Long character = position.get("character");
 			
-			return lspServerState.getManager().completion(request, file, line.intValue(), character.intValue());
+			return LSPWorkspaceManager.getInstance().completion(request, file, line.intValue(), character.intValue());
 		}
 		catch (URISyntaxException e)
 		{

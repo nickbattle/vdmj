@@ -23,13 +23,10 @@
 
 package lsp;
 
-import workspace.WorkspaceManager;
-
 public class LSPServerState
 {
 	private boolean running = false;
 	private boolean initialized = false;
-	private WorkspaceManager manager = null;
 	
 	public boolean isInitialized()
 	{
@@ -39,17 +36,6 @@ public class LSPServerState
 	public void setInitialized(boolean set)
 	{
 		initialized = set;
-	}
-
-	public WorkspaceManager getManager()
-	{
-		return manager;
-	}
-
-	public void setManager(WorkspaceManager manager)
-	{
-		this.manager = manager;
-		manager.setLSPState(this);
 	}
 
 	public void setRunning(boolean running)

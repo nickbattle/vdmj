@@ -32,6 +32,8 @@ import java.util.List;
 
 import com.fujitsu.vdmj.messages.VDMMessage;
 
+import json.JSONObject;
+
 public class Log
 {
 	private static PrintStream out = null;
@@ -88,6 +90,29 @@ public class Log
 		for (VDMMessage m: messages)
 		{
 			Log.printf("MSG: %s", m.toString());
+		}
+	}
+	
+	public static void dumpEdit(JSONObject range, StringBuilder buffer)
+	{
+		if (logging())
+		{
+			JSONObject position = range.get("start");
+			long line = position.get("line");
+			long count = 0;
+			int start = 0;
+			
+			while (count < line)
+			{
+				if (buffer.charAt(start++) == '\n')
+				{
+					count++;
+				}
+			}
+			
+			int end = start;
+			while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
+			Log.printf("EDITED %d: [%s]", line+1, buffer.substring(start, end));
 		}
 	}
 }

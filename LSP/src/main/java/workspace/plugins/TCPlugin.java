@@ -21,48 +21,59 @@
  *
  ******************************************************************************/
 
-package lsp.textdocument;
+package workspace.plugins;
 
 import java.io.File;
-import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Vector;
 
-import json.JSONObject;
-import lsp.LSPHandler;
-import lsp.LSPServerState;
-import lsp.Utils;
-import rpc.RPCErrors;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.LSPWorkspaceManager;
-import workspace.Log;
 
-public class DidOpenHandler extends LSPHandler
+abstract public class TCPlugin extends AnalysisPlugin
 {
-	public DidOpenHandler(LSPServerState state)
+	protected final LSPWorkspaceManager lspManager; 
+	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
+	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
+	
+	public TCPlugin(LSPWorkspaceManager manager)
 	{
-		super(state);
+		super();
+		this.lspManager = manager;
+	}
+	
+	@Override
+	public String getName()
+	{
+		return "TC";
 	}
 
 	@Override
-	public RPCMessageList request(RPCRequest request)
+	public void init()
 	{
-		try
-		{
-			JSONObject params = request.get("params");
-			JSONObject textDoc = params.get("textDocument");
-			File file = Utils.uriToFile(textDoc.get("uri"));
-			String text = textDoc.get("text");
-			
-			return LSPWorkspaceManager.getInstance().openFile(request, file, text);
-		}
-		catch (URISyntaxException e)
-		{
-			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
 	}
+
+	public void preCheck()
+	{
+		errs.clear();
+		warns.clear();
+	}
+	
+	public List<VDMMessage> getErrs()
+	{
+		return errs;
+	}
+	
+	public List<VDMMessage> getWarns()
+	{
+		return warns;
+	}
+	
+	abstract public <T> T getTC();
+	
+	abstract public <T> boolean checkLoadedFiles(T ast) throws Exception;
+
+	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);
 }

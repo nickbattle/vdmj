@@ -31,6 +31,7 @@ import dap.DAPRequest;
 import dap.DAPServerState;
 import json.JSONObject;
 import lsp.Utils;
+import workspace.DAPWorkspaceManager;
 
 public class DisconnectHandler extends DAPHandler
 {
@@ -44,6 +45,6 @@ public class DisconnectHandler extends DAPHandler
 	{
 		JSONObject arguments = request.get("arguments");
 		Boolean terminateDebuggee = Utils.getBoolean(arguments, "terminateDebuggee");
-		return dapServerState.getManager().disconnect(request, terminateDebuggee);
+		return DAPWorkspaceManager.getInstance().disconnect(request, terminateDebuggee);
 	}
 }

@@ -21,42 +21,45 @@
  *
  ******************************************************************************/
 
-package dap;
+package workspace.plugins;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.definitions.POClassList;
+import com.fujitsu.vdmj.pog.ProofObligationList;
 
-public class DAPDispatcher
+public class POPluginPR extends POPlugin
 {
-	private Map<String, DAPHandler> handlers = new HashMap<String, DAPHandler>();
-	
-	public void register(DAPHandler handler, String... methods)
+	private POClassList poClassList;
+
+	public POPluginPR()
 	{
-		for (String method: methods)
-		{
-			handlers.put(method, handler);
-		}
+		super();
 	}
 
-	public DAPMessageList dispatch(DAPRequest request)
+	@Override
+	public void preCheck()
 	{
-		try
-		{
-			DAPHandler handler = handlers.get(request.get("command"));
-			
-			if (handler == null)
-			{
-				return new DAPMessageList(request, false, "Command not found", null);
-			}
-			else
-			{
-				return handler.run(request);
-			}
-		}
-		catch (IOException e)
-		{
-			return new DAPMessageList(request, e);
-		}
+		poClassList = null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getPO()
+	{
+		return (T) poClassList;
+	}
+
+	@Override
+	public <T> boolean checkLoadedFiles(T tcList) throws Exception
+	{
+		poClassList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcList);
+		return true;
+	}
+
+	@Override
+	protected ProofObligationList getProofObligations()
+	{
+		return poClassList.getProofObligations();
 	}
 }

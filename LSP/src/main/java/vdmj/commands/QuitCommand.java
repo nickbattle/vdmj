@@ -26,7 +26,7 @@ package vdmj.commands;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServer;
-import workspace.WorkspaceManager;
+import workspace.DAPWorkspaceManager;
 
 public class QuitCommand extends Command
 {
@@ -45,6 +45,6 @@ public class QuitCommand extends Command
 	public DAPMessageList run(DAPRequest request)
 	{
 		DAPServer.getInstance().getState().setRunning(false);
-		return WorkspaceManager.getInstance().terminate(request, false);
+		return DAPWorkspaceManager.getInstance().terminate(request, false);
 	}
 }

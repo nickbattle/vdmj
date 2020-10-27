@@ -21,42 +21,28 @@
  *
  ******************************************************************************/
 
-package dap;
+package workspace;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.FilenameFilter;
 
-public class DAPDispatcher
+import com.fujitsu.vdmj.lex.Dialect;
+
+public class LSPWorkspaceManagerRT extends LSPWorkspaceManagerPP
 {
-	private Map<String, DAPHandler> handlers = new HashMap<String, DAPHandler>();
-	
-	public void register(DAPHandler handler, String... methods)
+	public LSPWorkspaceManagerRT()
 	{
-		for (String method: methods)
-		{
-			handlers.put(method, handler);
-		}
+		super();
 	}
-
-	public DAPMessageList dispatch(DAPRequest request)
+	
+	@Override
+	protected FilenameFilter getFilenameFilter()
 	{
-		try
-		{
-			DAPHandler handler = handlers.get(request.get("command"));
-			
-			if (handler == null)
-			{
-				return new DAPMessageList(request, false, "Command not found", null);
-			}
-			else
-			{
-				return handler.run(request);
-			}
-		}
-		catch (IOException e)
-		{
-			return new DAPMessageList(request, e);
-		}
+		return Dialect.VDM_RT.getFilter();
+	}
+	
+	@Override
+	protected String[] getFilenameFilters()
+	{
+		return new String[] { "**/*.vpp", "**/*.vdmrt" }; 
 	}
 }

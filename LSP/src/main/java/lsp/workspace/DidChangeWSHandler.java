@@ -37,6 +37,7 @@ import lsp.textdocument.WatchKind;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.LSPWorkspaceManager;
 import workspace.Log;
 
 public class DidChangeWSHandler extends LSPHandler
@@ -70,7 +71,7 @@ public class DidChangeWSHandler extends LSPHandler
 			JSONObject event = params.get("event");
 			JSONArray added = event.get("added");
 			JSONArray removed = event.get("removed");
-			List<File> newRoots = new Vector<File>(lspServerState.getManager().getRoots());
+			List<File> newRoots = new Vector<File>(LSPWorkspaceManager.getInstance().getRoots());
 		
 			for (int i=0; i<added.size(); i++)
 			{
@@ -98,7 +99,7 @@ public class DidChangeWSHandler extends LSPHandler
 				}
 			}
 
-			return lspServerState.getManager().changeFolders(request, newRoots);
+			return LSPWorkspaceManager.getInstance().changeFolders(request, newRoots);
 		}
 		catch (Exception e)
 		{
@@ -122,7 +123,7 @@ public class DidChangeWSHandler extends LSPHandler
 					JSONObject change = (JSONObject)fileEvent; 
 					File file = Utils.uriToFile(change.get("uri"));
 					WatchKind type = WatchKind.kindOf(change.get("type"));
-					lspServerState.getManager().changeWatchedFile(request, file, type);
+					LSPWorkspaceManager.getInstance().changeWatchedFile(request, file, type);
 					
 					if (type == WatchKind.DELETE)
 					{
@@ -134,7 +135,7 @@ public class DidChangeWSHandler extends LSPHandler
 			}
 			
 			// Do type checking after the changes are processed
-			responses.addAll(lspServerState.getManager().afterChangeWatchedFiles(request));
+			responses.addAll(LSPWorkspaceManager.getInstance().afterChangeWatchedFiles(request));
 			
 			return responses;
 		}

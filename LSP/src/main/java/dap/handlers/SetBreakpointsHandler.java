@@ -33,6 +33,7 @@ import dap.DAPServerState;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
+import workspace.DAPWorkspaceManager;
 
 public class SetBreakpointsHandler extends DAPHandler
 {
@@ -51,7 +52,7 @@ public class SetBreakpointsHandler extends DAPHandler
 			File file = Utils.pathToFile(source.get("path"));
 			JSONArray breakpoints = arguments.get("breakpoints");
 			
-			return dapServerState.getManager().setBreakpoints(request, file, breakpoints);
+			return DAPWorkspaceManager.getInstance().setBreakpoints(request, file, breakpoints);
 		}
 		catch (Exception e)
 		{

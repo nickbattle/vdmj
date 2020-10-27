@@ -29,6 +29,7 @@ import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServerState;
+import workspace.DAPWorkspaceManager;
 
 public class InitializeHandler extends DAPHandler
 {
@@ -42,11 +43,11 @@ public class InitializeHandler extends DAPHandler
 	{
 		if ("initialize".equals(request.get("command")))
 		{
-			return dapServerState.getManager().dapInitialize(request);
+			return DAPWorkspaceManager.getInstance().dapInitialize(request);
 		}
 		else if ("configurationDone".equals(request.get("command")))
 		{
-			return dapServerState.getManager().configurationDone(request);
+			return DAPWorkspaceManager.getInstance().configurationDone(request);
 		}
 		
 		return new DAPMessageList(request, false, "Unexpected initialise message", null);

@@ -41,6 +41,7 @@ import dap.handlers.TerminateHandler;
 import dap.handlers.ThreadsHandler;
 import json.JSONObject;
 import json.JSONServer;
+import workspace.DAPWorkspaceManager;
 import workspace.Log;
 
 public class DAPServer extends JSONServer
@@ -59,6 +60,8 @@ public class DAPServer extends JSONServer
 		this.state = new DAPServerState(dialect);
 		this.dispatcher = getDispatcher();
 		this.socket = socket;
+		
+		DAPWorkspaceManager.getInstance();		// Just set up
 	}
 	
 	public static DAPServer getInstance()
@@ -75,15 +78,15 @@ public class DAPServer extends JSONServer
 	{
 		DAPDispatcher dispatcher = new DAPDispatcher();
 		
-		dispatcher.register("initialize", new InitializeHandler(state));
-		dispatcher.register("launch", new LaunchHandler(state));
-		dispatcher.register("configurationDone", new InitializeHandler(state));
-		dispatcher.register("threads", new ThreadsHandler(state));
-		dispatcher.register("setBreakpoints", new SetBreakpointsHandler(state));
-		dispatcher.register("evaluate", new EvaluateHandler(state));
-		dispatcher.register("stackTrace", new StackTraceHandler(state));
-		dispatcher.register("disconnect", new DisconnectHandler(state));
-		dispatcher.register("terminate", new TerminateHandler(state));
+		dispatcher.register(new InitializeHandler(state), "initialize");
+		dispatcher.register(new LaunchHandler(state), "launch");
+		dispatcher.register(new InitializeHandler(state), "configurationDone");
+		dispatcher.register(new ThreadsHandler(state), "threads");
+		dispatcher.register(new SetBreakpointsHandler(state), "setBreakpoints");
+		dispatcher.register(new EvaluateHandler(state), "evaluate");
+		dispatcher.register(new StackTraceHandler(state), "stackTrace");
+		dispatcher.register(new DisconnectHandler(state), "disconnect");
+		dispatcher.register(new TerminateHandler(state), "terminate");
 
 		return dispatcher;
 	}

@@ -29,6 +29,7 @@ import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServerState;
+import workspace.DAPWorkspaceManager;
 
 public class ThreadsHandler extends DAPHandler
 {
@@ -40,6 +41,6 @@ public class ThreadsHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		return dapServerState.getManager().threads(request);
+		return DAPWorkspaceManager.getInstance().threads(request);
 	}
 }

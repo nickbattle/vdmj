@@ -21,42 +21,27 @@
  *
  ******************************************************************************/
 
-package dap;
+package workspace.plugins;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import lsp.LSPMessageUtils;
+import rpc.RPCErrors;
+import rpc.RPCMessageList;
 
-public class DAPDispatcher
+abstract public class AnalysisPlugin
 {
-	private Map<String, DAPHandler> handlers = new HashMap<String, DAPHandler>();
+	protected final LSPMessageUtils messages;
 	
-	public void register(DAPHandler handler, String... methods)
+	public AnalysisPlugin()
 	{
-		for (String method: methods)
-		{
-			handlers.put(method, handler);
-		}
+		messages = new LSPMessageUtils();
+	}
+	
+	protected RPCMessageList errorResult()
+	{
+		return new RPCMessageList(null, RPCErrors.InternalError, "?");
 	}
 
-	public DAPMessageList dispatch(DAPRequest request)
-	{
-		try
-		{
-			DAPHandler handler = handlers.get(request.get("command"));
-			
-			if (handler == null)
-			{
-				return new DAPMessageList(request, false, "Command not found", null);
-			}
-			else
-			{
-				return handler.run(request);
-			}
-		}
-		catch (IOException e)
-		{
-			return new DAPMessageList(request, e);
-		}
-	}
+	abstract public String getName();
+	
+	abstract public void init();
 }
