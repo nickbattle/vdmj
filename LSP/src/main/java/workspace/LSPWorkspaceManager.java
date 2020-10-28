@@ -76,7 +76,7 @@ public abstract class LSPWorkspaceManager
 	private Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
 	private Set<File> openFiles = new HashSet<File>();
 	
-	// private LSPServerState lspServerState;
+	protected final LSPMessageUtils messages = new LSPMessageUtils();
 	
 	protected LSPWorkspaceManager()
 	{
@@ -514,20 +514,6 @@ public abstract class LSPWorkspaceManager
 		}
 	}
 
-	public RPCMessageList documentSymbols(RPCRequest request, File file) throws Exception
-	{
-		TCPlugin tc = registry.getPlugin("TC");
-		RPCMessageList symbols = tc.documentSymbols(request, file);
-		
-		if (symbols == null)
-		{
-			ASTPlugin ast = registry.getPlugin("AST");
-			symbols = ast.documentSymbols(request, file);
-		}
-		
-		return symbols;
-	}
-
 	public RPCMessageList findDefinition(RPCRequest request, File file, int zline, int zcol)
 	{
 		TCDefinition def = findDefinition(file, zline, zcol);
@@ -650,6 +636,8 @@ public abstract class LSPWorkspaceManager
 	abstract protected FilenameFilter getFilenameFilter();
 
 	abstract protected String[] getFilenameFilters();
+
+	abstract public RPCMessageList documentSymbols(RPCRequest request, File file) throws Exception;
 
 	abstract protected TCDefinition findDefinition(File file, int zline, int zcol);
 
