@@ -70,17 +70,17 @@ public abstract class LSPWorkspaceManager
 {
 	private static LSPWorkspaceManager INSTANCE = null;
 	protected final PluginRegistry registry;
+	protected final LSPMessageUtils messages;
 
 	private JSONObject clientCapabilities;
 	private List<File> roots = new Vector<File>();
 	private Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
 	private Set<File> openFiles = new HashSet<File>();
 	
-	protected final LSPMessageUtils messages = new LSPMessageUtils();
-	
 	protected LSPWorkspaceManager()
 	{
 		registry = PluginRegistry.getInstance();
+		messages = new LSPMessageUtils();
 	}
 
 	public static synchronized LSPWorkspaceManager getInstance()
@@ -92,25 +92,27 @@ public abstract class LSPWorkspaceManager
 				{
 					INSTANCE = new LSPWorkspaceManagerSL();
 				}
-				return INSTANCE;
+				break;
 				
 			case VDM_PP:
 				if (INSTANCE == null)
 				{
 					INSTANCE = new LSPWorkspaceManagerPP();
 				}
-				return INSTANCE;
+				break;
 				
 			case VDM_RT:
 				if (INSTANCE == null)
 				{
 					INSTANCE = new LSPWorkspaceManagerRT();
 				}
-				return INSTANCE;
+				break;
 				
 			default:
 				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
 		}
+
+		return INSTANCE;
 	}
 	
 	/**
@@ -305,6 +307,7 @@ public abstract class LSPWorkspaceManager
 		TCPlugin tc = registry.getPlugin("TC");
 		INPlugin in = registry.getPlugin("IN");
 		
+		Log.printf("Checking loaded files...");
 		ast.preCheck();
 		tc.preCheck();
 		in.preCheck();
@@ -353,6 +356,7 @@ public abstract class LSPWorkspaceManager
 					new JSONObject("successful", tc.getErrs().isEmpty())));
 		}
 		
+		Log.printf("Checked loaded files.");
 		return result;
 	}
 

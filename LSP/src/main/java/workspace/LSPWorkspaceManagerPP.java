@@ -62,7 +62,7 @@ public class LSPWorkspaceManagerPP extends LSPWorkspaceManager
 		TCClassList tcClassList = tc.getTC();
 		JSONArray results = new JSONArray();
 		
-		if (tcClassList != null)	// May be syntax errors
+		if (!tcClassList.isEmpty())	// May be syntax errors
 		{
 			for (TCClassDefinition clazz: tcClassList)
 			{
@@ -87,7 +87,7 @@ public class LSPWorkspaceManagerPP extends LSPWorkspaceManager
 			ASTPlugin ast = registry.getPlugin("AST");
 			ASTClassList astClassList = ast.getAST();
 
-			if (astClassList != null)	// May be syntax errors
+			if (!astClassList.isEmpty())	// May be syntax errors
 			{
 				for (ASTClassDefinition clazz: astClassList)
 				{

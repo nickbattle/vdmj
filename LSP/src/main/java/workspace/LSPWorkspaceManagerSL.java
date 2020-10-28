@@ -62,7 +62,7 @@ public class LSPWorkspaceManagerSL extends LSPWorkspaceManager
 		TCModuleList tcModuleList = tc.getTC();
 		JSONArray results = new JSONArray();
 		
-		if (tcModuleList != null)	// May be syntax errors
+		if (!tcModuleList.isEmpty())	// May be syntax errors
 		{
 			for (TCModule module: tcModuleList)
 			{
@@ -90,7 +90,7 @@ public class LSPWorkspaceManagerSL extends LSPWorkspaceManager
 			ASTPlugin ast = registry.getPlugin("AST");
 			ASTModuleList astModuleList = ast.getAST();
 
-			if (astModuleList != null)	// May be syntax errors
+			if (!astModuleList.isEmpty())	// May be syntax errors
 			{
 				for (ASTModule module: astModuleList)
 				{

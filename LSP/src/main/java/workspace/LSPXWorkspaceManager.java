@@ -53,25 +53,27 @@ public class LSPXWorkspaceManager
 				{
 					INSTANCE = new LSPXWorkspaceManagerSL();
 				}
-				return INSTANCE;
+				break;
 				
 			case VDM_PP:
 				if (INSTANCE == null)
 				{
 					INSTANCE = new LSPXWorkspaceManagerPR();
 				}
-				return INSTANCE;
+				break;
 				
 			case VDM_RT:
 				if (INSTANCE == null)
 				{
 					INSTANCE = new LSPXWorkspaceManagerRT();
 				}
-				return INSTANCE;
+				break;
 				
 			default:
 				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
 		}
+
+		return INSTANCE;
 	}
 	
 	/**
