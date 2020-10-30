@@ -65,7 +65,7 @@ public class LSPXWorkspaceManager
 			case VDM_PP:
 				if (INSTANCE == null)
 				{
-					INSTANCE = new LSPXWorkspaceManagerPR();
+					INSTANCE = new LSPXWorkspaceManagerPP();
 				}
 				break;
 				

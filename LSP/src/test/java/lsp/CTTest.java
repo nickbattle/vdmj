@@ -68,4 +68,58 @@ public class CTTest extends LSPTest
 		assertEquals("B`TB2", response.get(0).getPath("result.[1].traces.[1].name"));
 		assertEquals("B`TB3", response.get(0).getPath("result.[1].traces.[2].name"));
 	}
+
+	@Test
+	public void testPP() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_PP);
+		File testdir = new File("src/test/resources/cttest_pp");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+		
+		CTHandler handler = new CTHandler(state);
+		RPCRequest request = new RPCRequest(123L, "lspx/CT/traces", new JSONObject());
+		
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+
+		dump(response.get(0));
+		assertEquals("A",     response.get(0).getPath("result.[0].name"));
+		assertEquals("A`TA",  response.get(0).getPath("result.[0].traces.[0].name"));
+		assertEquals("B",     response.get(0).getPath("result.[1].name"));
+		assertEquals("B`TB1", response.get(0).getPath("result.[1].traces.[0].name"));
+		assertEquals("B`TB2", response.get(0).getPath("result.[1].traces.[1].name"));
+		assertEquals("B`TB3", response.get(0).getPath("result.[1].traces.[2].name"));
+	}
+
+	@Test
+	public void testRT() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_RT);
+		File testdir = new File("src/test/resources/cttest_rt");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+		
+		CTHandler handler = new CTHandler(state);
+		RPCRequest request = new RPCRequest(123L, "lspx/CT/traces", new JSONObject());
+		
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+
+		dump(response.get(0));
+		assertEquals("A",     response.get(0).getPath("result.[0].name"));
+		assertEquals("A`TA",  response.get(0).getPath("result.[0].traces.[0].name"));
+		assertEquals("B",     response.get(0).getPath("result.[1].name"));
+		assertEquals("B`TB1", response.get(0).getPath("result.[1].traces.[0].name"));
+		assertEquals("B`TB2", response.get(0).getPath("result.[1].traces.[1].name"));
+		assertEquals("B`TB3", response.get(0).getPath("result.[1].traces.[2].name"));
+	}
 }
