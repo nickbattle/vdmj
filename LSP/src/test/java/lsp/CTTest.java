@@ -43,7 +43,7 @@ public class CTTest extends LSPTest
 			"experimental", new JSONObject("combinatorialTest", true));
 
 	@Test
-	public void testSL() throws Exception
+	public void testTracesSL() throws Exception
 	{
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/cttest_sl");
@@ -70,7 +70,33 @@ public class CTTest extends LSPTest
 	}
 
 	@Test
-	public void testPP() throws Exception
+	public void testGenerateSL() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_SL);
+		File testdir = new File("src/test/resources/cttest_sl");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+		
+		CTHandler handler = new CTHandler(state);
+		RPCRequest request = new RPCRequest(123L, "lspx/CT/generate", new JSONObject("name", "A`TA"));
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
+
+		request = new RPCRequest(123L, "lspx/CT/generate", new JSONObject("name", "B`TB1"));
+		response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals(new Long(5), response.get(0).getPath("result.numberOfTests"));
+	}
+
+	@Test
+	public void testTracesPP() throws Exception
 	{
 		setupWorkspace(Dialect.VDM_PP);
 		File testdir = new File("src/test/resources/cttest_pp");
@@ -97,7 +123,33 @@ public class CTTest extends LSPTest
 	}
 
 	@Test
-	public void testRT() throws Exception
+	public void testGeneratePP() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_PP);
+		File testdir = new File("src/test/resources/cttest_pp");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+		
+		CTHandler handler = new CTHandler(state);
+		RPCRequest request = new RPCRequest(123L, "lspx/CT/generate", new JSONObject("name", "A`TA"));
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
+
+		request = new RPCRequest(123L, "lspx/CT/generate", new JSONObject("name", "B`TB1"));
+		response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals(new Long(5), response.get(0).getPath("result.numberOfTests"));
+	}
+
+	@Test
+	public void testTracesRT() throws Exception
 	{
 		setupWorkspace(Dialect.VDM_RT);
 		File testdir = new File("src/test/resources/cttest_rt");
@@ -122,4 +174,31 @@ public class CTTest extends LSPTest
 		assertEquals("B`TB2", response.get(0).getPath("result.[1].traces.[1].name"));
 		assertEquals("B`TB3", response.get(0).getPath("result.[1].traces.[2].name"));
 	}
+
+	@Test
+	public void testGenerateRT() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_RT);
+		File testdir = new File("src/test/resources/cttest_rt");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+		
+		CTHandler handler = new CTHandler(state);
+		RPCRequest request = new RPCRequest(123L, "lspx/CT/generate", new JSONObject("name", "A`TA"));
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
+
+		request = new RPCRequest(123L, "lspx/CT/generate", new JSONObject("name", "B`TB1"));
+		response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals(new Long(5), response.get(0).getPath("result.numberOfTests"));
+	}
+
 }

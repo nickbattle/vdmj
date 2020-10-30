@@ -24,7 +24,6 @@
 package lsp.lspx;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URISyntaxException;
 
 import json.JSONObject;
@@ -75,7 +74,7 @@ public class CTHandler extends LSPHandler
 		{
 			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
@@ -84,7 +83,17 @@ public class CTHandler extends LSPHandler
 
 	private RPCMessageList generate(RPCRequest request)
 	{
-		return new RPCMessageList(request, RPCErrors.InternalError, "Not yet implemented");
+		try
+		{
+			JSONObject params = request.get("params");
+			String name = params.get("name");
+			return LSPXWorkspaceManager.getInstance().ctGenerate(request, name);
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
 	}
 
 	private RPCMessageList execute(RPCRequest request)
