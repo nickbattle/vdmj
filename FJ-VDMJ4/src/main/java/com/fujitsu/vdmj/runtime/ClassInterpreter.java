@@ -297,7 +297,7 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@Override
-	protected INNamedTraceDefinition findTraceDefinition(TCNameToken name)
+	public INNamedTraceDefinition findTraceDefinition(TCNameToken name)
 	{
 		INDefinition d = executableClasses.findName(name);
 
@@ -441,7 +441,7 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@Override
-	protected Context getTraceContext(INClassDefinition classdef) throws ValueException
+	public Context getTraceContext(INClassDefinition classdef) throws ValueException
 	{
 		ObjectValue object = null;
 

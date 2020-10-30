@@ -486,9 +486,9 @@ abstract public class Interpreter
 		writer = pw;
 	}
 
-	abstract protected INNamedTraceDefinition findTraceDefinition(TCNameToken name);
+	abstract public INNamedTraceDefinition findTraceDefinition(TCNameToken name);
 
-	abstract protected Context getTraceContext(INClassDefinition classdef) throws ValueException;
+	abstract public Context getTraceContext(INClassDefinition classdef) throws ValueException;
 
 	public void runtrace(String name, int startTest, int endTest, boolean debug)
 		throws Exception
