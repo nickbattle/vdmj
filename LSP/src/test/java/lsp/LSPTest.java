@@ -24,73 +24,54 @@
 package lsp;
 
 import static org.junit.Assert.assertEquals;
-
 import java.io.File;
-import java.net.URI;
+import java.io.IOException;
+import java.io.PrintWriter;
 
-import org.junit.Test;
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
+import json.JSONWriter;
+import rpc.RPCMessageList;
+import rpc.RPCRequest;
+import workspace.LSPWorkspaceManager;
+import workspace.LSPXWorkspaceManager;
 
-public class LSPTest
+abstract public class LSPTest
 {
-	@Test
-	public void testSimple() throws Exception
-	{
-		StringBuilder buffer = new StringBuilder("0123456789");
-		int start = Utils.findPosition(buffer, new JSONObject("line", 0L, "character", 2L));
-		int end = Utils.findPosition(buffer, new JSONObject("line", 0L, "character", 4L));
-		buffer.replace(start, end, "hello");
-		assertEquals("01hello456789", buffer.toString());
-	}
+	protected LSPWorkspaceManager lspManager = null;
+	protected LSPXWorkspaceManager lspxManager = null;
+	protected LSPServerState state = null;
 
-	@Test
-	public void testNewline() throws Exception
+	protected void setupWorkspace(Dialect dialect) throws IOException
 	{
-		StringBuilder buffer = new StringBuilder("01234\n0123456789\n");
-		int start = Utils.findPosition(buffer, new JSONObject("line", 1L, "character", 2L));
-		int end = Utils.findPosition(buffer, new JSONObject("line", 1L, "character", 4L));
-		buffer.replace(start, end, "hello");
-		assertEquals("01234\n01hello456789\n", buffer.toString());
+		Settings.dialect = dialect;
+		LSPWorkspaceManager.reset();
+		LSPXWorkspaceManager.reset();
+		lspManager = LSPWorkspaceManager.getInstance();
+		lspxManager = LSPXWorkspaceManager.getInstance();
+		state = new LSPServerState();
 	}
-
-	@Test
-	public void testDelete() throws Exception
+	
+	protected RPCMessageList initialize(File root, JSONObject capabilities) throws Exception
 	{
-		StringBuilder buffer = new StringBuilder("0123456789");
-		int start = Utils.findPosition(buffer, new JSONObject("line", 0L, "character", 2L));
-		int end = Utils.findPosition(buffer, new JSONObject("line", 0L, "character", 4L));
-		buffer.replace(start, end, "");
-		assertEquals("01456789", buffer.toString());
-	}
-
-	@Test
-	public void testURIs()
-	{
-		File file = null;
-		URI uri = null;
+		JSONObject params = new JSONObject(
+				"rootUri",		root.toURI().toString(),
+				"capabilities",	capabilities);
 		
-		try
-		{
-			uri = new URI("file:///c%3A/Users/jonas/repos/vdm-lsp/Code/VDM-LSP_Java/vdm/AlarmSL");
-			file = new File(uri);
-			System.out.println(file.toURI());
-			System.out.println(file.getCanonicalPath());
-			
-			if (File.separatorChar == '/')
-			{
-				uri = new URI("file", "", file.getCanonicalPath(), null, null);
-			}
-			else
-			{
-				uri = new URI("file", "", "\\" + file.getCanonicalPath(), null, null);
-			}
-			
-			System.out.println(uri.toString());
-		}
-		catch (Exception e)
-		{
-			System.out.println(e.toString());
-		}
+		RPCMessageList result = lspManager.lspInitialize(new RPCRequest(0L, "initialize", params));
+		assertEquals("init result", (Object)null, result.get(0).get("error"));		
+		
+		return lspManager.afterChangeWatchedFiles(null);	// Cause parse and typecheck
+	}
+	
+	protected void dump(JSONObject obj) throws IOException
+	{
+		PrintWriter pw = new PrintWriter(System.out);
+		JSONWriter writer = new JSONWriter(pw);
+		writer.writeObject(obj);
+		pw.println();
+		writer.flush();
 	}
 }

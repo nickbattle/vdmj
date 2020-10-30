@@ -21,16 +21,35 @@
  *
  ******************************************************************************/
 
-package workspace;
+package workspace.plugins;
 
-import workspace.plugins.CTPluginSL;
-import workspace.plugins.POPluginSL;
+import java.util.Map;
 
-public class LSPXWorkspaceManagerSL extends LSPXWorkspaceManager
+import com.fujitsu.vdmj.tc.lex.TCNameList;
+
+abstract public class CTPlugin extends AnalysisPlugin
 {
-	public LSPXWorkspaceManagerSL()
+	public CTPlugin()
 	{
-		registry.registerPlugin(new POPluginSL());
-		registry.registerPlugin(new CTPluginSL());
+		super();
 	}
+	
+	@Override
+	public String getName()
+	{
+		return "CT";
+	}
+
+	@Override
+	public void init()
+	{
+	}
+
+	abstract public void preCheck();
+
+	abstract public <T> boolean checkLoadedFiles(T inList) throws Exception;
+
+	abstract public Map<String, TCNameList> getTraceNames();
+
+	abstract public <T> T getCT();
 }

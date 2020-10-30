@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
 import json.JSONServer;
+import lsp.lspx.CTHandler;
 import lsp.lspx.POGHandler;
 import lsp.textdocument.CompletionHandler;
 import lsp.textdocument.DefinitionHandler;
@@ -107,6 +108,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register(new DidChangeWSHandler(state), "workspace/didChangeWorkspaceFolders");
 
 		dispatcher.register(new POGHandler(state), "lspx/POG/generate");
+		dispatcher.register(new CTHandler(state), "lspx/CT/traces", "lspx/CT/generate", "lspx/CT/execute");
 
 		return dispatcher;
 	}

@@ -62,6 +62,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.plugins.ASTPlugin;
+import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
 import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
@@ -354,6 +355,13 @@ public abstract class LSPWorkspaceManager
 	
 			result.add(new RPCRequest("lspx/POG/updated",
 					new JSONObject("successful", tc.getErrs().isEmpty())));
+		}
+		
+		if (hasClientCapability("experimental.combinatorialTest"))
+		{
+			CTPlugin ct = registry.getPlugin("CT");
+			ct.preCheck();
+			// No notification? Rest of processing done on CT method calls
 		}
 		
 		Log.printf("Checked loaded files.");

@@ -24,13 +24,20 @@
 package workspace;
 
 import java.io.File;
+import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
+import json.JSONObject;
+import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.plugins.CTPlugin;
+import workspace.plugins.INPlugin;
 import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
 
@@ -110,6 +117,51 @@ public class LSPXWorkspaceManager
 			}
 			
 			JSONArray results = po.getObligations(file);
+			return new RPCMessageList(request, results);
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	public RPCMessageList ctTraces(RPCRequest request, File project)
+	{
+		TCPlugin tc = registry.getPlugin("TC");
+		
+		if (!tc.getErrs().isEmpty())	// No type clean tree
+		{
+			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
+		}
+		
+		try
+		{
+			CTPlugin ct = registry.getPlugin("CT");
+			INPlugin in = registry.getPlugin("IN");
+	
+			if (ct.getCT() == null)
+			{
+				ct.checkLoadedFiles(in.getIN());
+			}
+			
+			Map<String, TCNameList> nameMap = ct.getTraceNames();
+			JSONArray results = new JSONArray();
+			
+			for (String module: nameMap.keySet())
+			{
+				JSONArray array = new JSONArray();
+				
+				for (TCNameToken name: nameMap.get(module))
+				{
+					array.add(new JSONObject(
+						"name",		name.getExplicit(true).toString(),
+						"location",	Utils.lexLocationToLocation(name.getLocation())));
+				}
+				
+				results.add(new JSONObject("name", module, "traces", array));
+			}
+			
 			return new RPCMessageList(request, results);
 		}
 		catch (Exception e)
