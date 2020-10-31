@@ -23,12 +23,43 @@
 
 package workspace.plugins;
 
+import java.util.List;
 import java.util.Map;
 
+import com.fujitsu.vdmj.in.definitions.INClassDefinition;
+import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
+import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.traces.CallSequence;
+import com.fujitsu.vdmj.traces.TraceFilter;
+import com.fujitsu.vdmj.traces.TraceIterator;
+import com.fujitsu.vdmj.traces.TraceReductionType;
+import com.fujitsu.vdmj.traces.Verdict;
+
+import json.JSONArray;
+import json.JSONObject;
+import lsp.LSPServer;
+import rpc.RPCRequest;
+import workspace.DAPWorkspaceManager;
+import workspace.Log;
 
 abstract public class CTPlugin extends AnalysisPlugin
 {
+	protected TraceIterator traceIterator = null;
+	protected INClassDefinition traceClassDef = null;
+	protected Context traceContext = null;
+	protected int traceCount = 0;
+	protected TCNameToken traceName = null;
+	protected TraceFilter traceFilter = null;
+	
+	protected int testNumber = 0;
+	protected TraceExecutor traceExecutor = null;
+	protected boolean completed = false;
+	
+	private static final int BATCH_SIZE = 10;
+	
 	public CTPlugin()
 	{
 		super();
@@ -52,4 +83,193 @@ abstract public class CTPlugin extends AnalysisPlugin
 	abstract public Map<String, TCNameList> getTraceNames();
 
 	abstract public <T> T getCT();
+	
+	public int generate(TCNameToken tracename) throws Exception
+	{
+		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+		interpreter.init();
+		INNamedTraceDefinition tracedef = interpreter.findTraceDefinition(tracename);
+
+		if (tracedef == null)
+		{
+			Log.error("Trace %s not found", tracename);
+			throw new Exception("Trace " + tracename + " not found");
+		}
+
+		long before = System.currentTimeMillis();
+		traceName = tracename;
+		traceClassDef = tracedef.classDefinition;
+		traceContext = interpreter.getTraceContext(traceClassDef);
+		traceIterator = tracedef.getIterator(traceContext);
+		traceCount = traceIterator.count();
+		long after = System.currentTimeMillis();
+
+		Log.printf("Generated %d traces in %.3f secs.", traceCount, (double)(after-before)/1000);
+		return traceCount;
+	}
+
+	public void setFilter(TraceReductionType rType, float subset, long seed)
+	{
+		traceFilter = new TraceFilter(traceCount, subset, rType, seed);
+	}
+
+	public JSONArray execute(Object token, int startTest, int endTest) throws Exception
+	{
+		if (endTest > traceCount)
+		{
+			throw new Exception("Trace " + traceName + " only has " + traceCount + " tests");
+		}
+		
+		if (endTest == 0)		// To the end of the tests, if specified as zero
+		{
+			endTest = traceCount;
+		}
+		
+		if (startTest > 0)		// Suppress any reduction if a range specified
+		{
+			traceFilter = new TraceFilter(traceCount, 1.0F, TraceReductionType.NONE, 0);
+		}
+
+		for (int i=1; i < startTest && traceIterator.hasMoreTests(); i++)
+		{
+			traceIterator.getNextTest();	// Skip first N tests
+		}
+		
+		testNumber = 1;
+		completed = false;
+		JSONArray batch = runBatch(BATCH_SIZE, endTest);
+		
+		if (traceIterator.hasMoreTests())
+		{
+			traceExecutor  = new TraceExecutor(token, endTest);
+			traceExecutor.start();
+		}
+		
+		return batch;
+	}
+	
+	public synchronized boolean completed()
+	{
+		return completed;
+	}
+	
+	private JSONArray runBatch(int batchSize, int endTest) throws Exception
+	{
+		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+		JSONArray array = new JSONArray();
+
+		while (traceIterator.hasMoreTests() && batchSize > 0 && testNumber <= endTest)
+		{
+			CallSequence test = traceIterator.getNextTest();
+			
+			if (traceFilter.isRemoved(test, testNumber))
+			{
+				// skip
+			}
+			else
+			{
+				String callString = test.getCallString(traceContext);
+				
+				if (traceFilter.getFilteredBy(test) > 0)
+				{
+	    			Log.printf("Test " + testNumber + " = " + callString);
+					Log.printf("Test " + testNumber + " FILTERED by test " + traceFilter.getFilteredBy(test));
+					array.add(new JSONObject(
+							"id", testNumber,
+							"verdict", jsonVerdict(Verdict.SKIPPED),
+							"sequence", callString));
+				}
+				else
+				{
+	    			interpreter.init();	// Initialize completely between every run...
+	    			List<Object> result = interpreter.runOneTrace(traceClassDef, test, false);
+	    			traceFilter.update(result, test, testNumber);
+	
+	    			Log.printf("Test " + testNumber + " = " + callString);
+	    			Log.printf("Result = " + result);
+					array.add(new JSONObject(
+							"id", testNumber,
+							"verdict", getVerdict(result),
+							"sequence", callString));
+				}
+
+				batchSize--;
+			}
+			
+			testNumber++;
+		}
+		
+		return array;
+	}
+	
+	private int getVerdict(List<Object> result) throws Exception
+	{
+		for (int i = result.size()-1; i > 0; i--)
+		{
+			if (result.get(i) instanceof Verdict)
+			{
+				return jsonVerdict((Verdict)result.get(i));
+			}
+		}
+		
+		throw new Exception("No verdict returned?");
+	}
+	
+	private int jsonVerdict(Verdict v) throws Exception
+	{
+		switch (v)
+		{
+			case PASSED:		return 1;
+			case FAILED:		return 2;
+			case INCONCLUSIVE:	return 3;
+			case SKIPPED:		return 4;
+
+			default: throw new Exception("Unknown verdict: " + v);
+		}
+	}
+	
+	private class TraceExecutor extends Thread
+	{
+		private Object progressToken;
+		private int endTest;
+
+		public TraceExecutor(Object progressToken, int endTest)
+		{
+			setName("CT TestExecutor");
+			this.progressToken = progressToken;
+			this.endTest = endTest;
+		}
+		
+		@Override
+		public void run()
+		{
+			LSPServer server = LSPServer.getInstance();
+			
+			try
+			{
+				while (traceIterator.hasMoreTests())
+				{
+					JSONArray batch = runBatch(BATCH_SIZE, endTest);
+					JSONObject params = new JSONObject("token", progressToken, "value", batch);
+					
+					if (server != null)
+					{
+						server.writeMessage(new RPCRequest("$/progress", params));
+					}
+				}
+
+				if (server != null)
+				{
+					server.writeMessage(new RPCRequest("$/progress",
+						new JSONObject("token", progressToken, "value", null)));
+				}
+				
+				completed = true;
+			}
+			catch (Exception e)
+			{
+				Log.error(e);
+			}
+		}
+	}
 }

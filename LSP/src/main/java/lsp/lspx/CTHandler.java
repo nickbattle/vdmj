@@ -26,6 +26,9 @@ package lsp.lspx;
 import java.io.File;
 import java.net.URISyntaxException;
 
+import com.fujitsu.vdmj.traces.TraceReductionType;
+
+import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.LSPServerState;
@@ -98,6 +101,61 @@ public class CTHandler extends LSPHandler
 
 	private RPCMessageList execute(RPCRequest request)
 	{
-		return new RPCMessageList(request, RPCErrors.InternalError, "Not yet implemented");
+		try
+		{
+			JSONObject params = request.get("params");
+			String name = params.get("name");
+			JSONArray filter = params.get("filter");
+			JSONObject range = params.get("range");
+			Object token = params.get("workDoneToken");
+			
+			TraceReductionType rType = TraceReductionType.NONE;
+			float subset = 1.0F;
+			long seed = 0;
+
+			if (filter != null)
+			{
+				for (int i=0; i<filter.size(); i++)
+				{
+					JSONObject option = filter.index(i);
+					String key = option.get("key");
+					Object value = option.get("value");
+					
+					switch (key)
+					{
+						case "trace filtering":
+							rType = TraceReductionType.valueOf((String)value);
+							break;
+							
+						case "subset limitation":
+							subset = ((Long)value).intValue()/100;
+							break;
+							
+						case "trace filtering seed":
+							seed = (Long)value;
+							break;
+							
+						default:
+							return new RPCMessageList(request, RPCErrors.InternalError, "Unknown key: " + key);
+					}
+				}
+			}
+			
+			int start = 0;		// Zero => not set
+			int end = 0;
+			
+			if (range != null)
+			{
+				start = range.get("start");
+				end = range.get("end");
+			}
+			
+			return LSPXWorkspaceManager.getInstance().ctExecute(request, name, token, rType, subset, seed, start, end);
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
 	}
 }

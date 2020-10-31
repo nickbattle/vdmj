@@ -29,14 +29,12 @@ import java.util.Map;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
-import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.traces.TraceIterator;
+import com.fujitsu.vdmj.traces.TraceReductionType;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -198,39 +196,71 @@ abstract public class LSPXWorkspaceManager
 				ct.checkLoadedFiles(in.getIN());
 			}
 			
-			LexTokenReader ltr = new LexTokenReader(name, Dialect.VDM_SL);
-			LexToken token = ltr.nextToken();
-			ltr.close();
-
-			if (token.is(Token.NAME))
-			{
-				TCNameToken tracename = new TCNameToken((LexNameToken) token);
-				Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
-				interpreter.init();
-				INNamedTraceDefinition tracedef = interpreter.findTraceDefinition(tracename);
-
-				if (tracedef == null)
-				{
-					throw new Exception("Trace " + tracename + " not found");
-				}
-
-				long before = System.currentTimeMillis();
-				TraceIterator tests = tracedef.getIterator(interpreter.getTraceContext(tracedef.classDefinition));
-				int count = tests.count();
-				long after = System.currentTimeMillis();
-				Log.printf("Generated %d traces in %g secs.", count, (double)(after-before)/1000);
-
-				return new RPCMessageList(request, new JSONObject("numberOfTests", count));
-			}
-			else
-			{
-				return new RPCMessageList(request, RPCErrors.InvalidParams, "Name not fully qualified");
-			}
+			TCNameToken tracename = stringToName(name);
+			int count = ct.generate(tracename);
+			return new RPCMessageList(request, new JSONObject("numberOfTests", count));
 		}
 		catch (Exception e)
 		{
 			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	public RPCMessageList ctExecute(RPCRequest request, String name,
+			Object progressToken, TraceReductionType rType, float subset, long seed, int start, int end)
+	{
+		TCPlugin tc = registry.getPlugin("TC");
+		
+		if (!tc.getErrs().isEmpty())	// No type clean tree
+		{
+			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
+		}
+		
+		try
+		{
+			CTPlugin ct = registry.getPlugin("CT");
+			ct.setFilter(rType, subset, seed);
+			JSONArray firstBatch = ct.execute(progressToken, start, end);
+			return new RPCMessageList(request, firstBatch);
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+	
+	/**
+	 * This is useful in unit tests to wait for the TraceExecution thread to complete
+	 * before doing more tests.
+	 */
+	public void waitForTraceComplete()
+	{
+		try
+		{
+			CTPlugin ct = registry.getPlugin("CT");
+			while(!ct.completed());
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+		}
+	}
+	
+	private TCNameToken stringToName(String name) throws Exception
+	{
+		LexTokenReader ltr = new LexTokenReader(name, Dialect.VDM_SL);
+		LexToken token = ltr.nextToken();
+		ltr.close();
+
+		if (token.is(Token.NAME))
+		{
+			return new TCNameToken((LexNameToken) token);
+		}
+		else
+		{
+			throw new Exception("Name is not fully qualified: " + name);
 		}
 	}
 }

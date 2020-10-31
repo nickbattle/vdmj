@@ -96,6 +96,32 @@ public class CTTest extends LSPTest
 	}
 
 	@Test
+	public void testExecuteSL() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_SL);
+		File testdir = new File("src/test/resources/cttest_sl");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+		
+		CTHandler handler = new CTHandler(state);
+		RPCRequest request = new RPCRequest(123L, "lspx/CT/generate", new JSONObject("name", "A`TA"));
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
+
+		request = new RPCRequest(123L, "lspx/CT/execute", new JSONObject("name", "A`TA", "workDoneToken", 999));
+		response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		JSONArray result = response.get(0).getPath("result");
+		assertEquals(10, result.size());
+		
+		lspxManager.waitForTraceComplete();
+	}
+
+	@Test
 	public void testTracesPP() throws Exception
 	{
 		setupWorkspace(Dialect.VDM_PP);
@@ -146,6 +172,32 @@ public class CTTest extends LSPTest
 		assertEquals(1, response.size());
 		dump(response.get(0));
 		assertEquals(new Long(5), response.get(0).getPath("result.numberOfTests"));
+	}
+
+	@Test
+	public void testExecutePP() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_PP);
+		File testdir = new File("src/test/resources/cttest_pp");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+		
+		CTHandler handler = new CTHandler(state);
+		RPCRequest request = new RPCRequest(123L, "lspx/CT/generate", new JSONObject("name", "A`TA"));
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
+
+		request = new RPCRequest(123L, "lspx/CT/execute", new JSONObject("name", "A`TA"));
+		response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		JSONArray result = response.get(0).getPath("result");
+		assertEquals(10, result.size());
+		
+		lspxManager.waitForTraceComplete();
 	}
 
 	@Test
@@ -201,4 +253,29 @@ public class CTTest extends LSPTest
 		assertEquals(new Long(5), response.get(0).getPath("result.numberOfTests"));
 	}
 
+	@Test
+	public void testExecuteRT() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_RT);
+		File testdir = new File("src/test/resources/cttest_rt");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+		
+		CTHandler handler = new CTHandler(state);
+		RPCRequest request = new RPCRequest(123L, "lspx/CT/generate", new JSONObject("name", "A`TA"));
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
+
+		request = new RPCRequest(123L, "lspx/CT/execute", new JSONObject("name", "A`TA"));
+		response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		JSONArray result = response.get(0).getPath("result");
+		assertEquals(10, result.size());
+		
+		lspxManager.waitForTraceComplete();
+	}
 }

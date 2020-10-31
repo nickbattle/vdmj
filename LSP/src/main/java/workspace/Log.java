@@ -59,7 +59,12 @@ public class Log
 			}
 		}
 	}
-	
+
+	public static void init(PrintStream stream)
+	{
+		out = stream;
+	}
+
 	public synchronized static void printf(String format, Object... args)
 	{
 		if (out != null)

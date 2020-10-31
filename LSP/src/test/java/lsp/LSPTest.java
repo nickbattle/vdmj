@@ -37,6 +37,7 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
+import workspace.Log;
 
 abstract public class LSPTest
 {
@@ -52,6 +53,7 @@ abstract public class LSPTest
 		lspManager = LSPWorkspaceManager.getInstance();
 		lspxManager = LSPXWorkspaceManager.getInstance();
 		state = new LSPServerState();
+		Log.init(System.out);
 	}
 	
 	protected RPCMessageList initialize(File root, JSONObject capabilities) throws Exception
