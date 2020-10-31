@@ -23,6 +23,7 @@
 
 package workspace;
 
+import workspace.plugins.CTPluginSL;
 import workspace.plugins.POPluginSL;
 
 public class LSPXWorkspaceManagerSL extends LSPXWorkspaceManager
@@ -30,5 +31,6 @@ public class LSPXWorkspaceManagerSL extends LSPXWorkspaceManager
 	public LSPXWorkspaceManagerSL()
 	{
 		registry.registerPlugin(new POPluginSL());
+		registry.registerPlugin(new CTPluginSL());
 	}
 }

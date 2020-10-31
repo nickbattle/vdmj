@@ -1,0 +1,24 @@
+class A
+operations
+	op: nat ==> ()
+	op(-) == skip;
+
+traces
+	TA:
+		let a in set {1, ..., 5} in
+		let b in set {1, ..., 5} in
+		(
+			op(a); op(b)
+		);
+end A
+
+class B
+operations
+	op: nat ==> ()
+	op(-) == skip;
+
+traces
+	TB1: op(1){1, 5};
+	TB2: op(2){1, 5};
+	TB3: op(3){1, 5};
+end B

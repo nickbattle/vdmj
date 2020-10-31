@@ -297,7 +297,7 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@Override
-	protected INNamedTraceDefinition findTraceDefinition(TCNameToken name)
+	public INNamedTraceDefinition findTraceDefinition(TCNameToken name)
 	{
 		return executableModules.findTraceDefinition(name);
 	}
@@ -348,7 +348,7 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@Override
-	protected Context getTraceContext(INClassDefinition classdef) throws ValueException
+	public Context getTraceContext(INClassDefinition classdef) throws ValueException
 	{
 		Context mainContext = new StateContext(defaultModule.name.getLocation(),
 				"module scope",	null, defaultModule.getStateContext());
@@ -360,7 +360,7 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@Override
-	protected List<Object> runOneTrace(INClassDefinition classdef, CallSequence test, boolean debug)
+	public List<Object> runOneTrace(INClassDefinition classdef, CallSequence test, boolean debug)
 	{
 		clearBreakpointHits();
 

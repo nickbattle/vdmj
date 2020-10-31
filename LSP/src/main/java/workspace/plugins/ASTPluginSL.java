@@ -31,17 +31,11 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
-import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ModuleReader;
-import json.JSONArray;
-import lsp.textdocument.SymbolKind;
-import rpc.RPCMessageList;
-import rpc.RPCRequest;
 import workspace.LSPWorkspaceManager;
 import workspace.Log;
 
@@ -118,33 +112,5 @@ public class ASTPluginSL extends ASTPlugin
 
 		Log.dump(errs);
 		return errs;
-	}
-
-	@Override
-	public RPCMessageList documentSymbols(RPCRequest request, File file)
-	{
-		JSONArray results = new JSONArray();
-		
-		if (astModuleList != null)	// May be syntax errors
-		{
-			for (ASTModule module: astModuleList)
-			{
-				if (module.files.contains(file))
-				{
-					results.add(messages.symbolInformation(module.name, SymbolKind.Module, null));
-
-					for (ASTDefinition def: module.defs)
-					{
-						if (def.name != null && def.location.file.equals(file) && !def.name.old)
-						{
-							results.add(messages.symbolInformation(def.name.toString(),
-									def.name.location, SymbolKind.kindOf(def), def.location.module));
-						}
-					}
-				}
-			}
-		}
-		
-		return new RPCMessageList(request, results);
 	}
 }

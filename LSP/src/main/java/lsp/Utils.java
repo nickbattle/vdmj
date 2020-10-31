@@ -89,13 +89,27 @@ public class Utils
 
 	public static File uriToFile(String s) throws URISyntaxException, IOException
 	{
-		URI uri = new URI(s);
-		return new File(uri).getAbsoluteFile();
+		if (s == null)
+		{
+			return null;
+		}
+		else
+		{
+			URI uri = new URI(s);
+			return new File(uri).getAbsoluteFile();
+		}
 	}
 
 	public static File pathToFile(String s) throws URISyntaxException, IOException
 	{
-		return new File(s).getAbsoluteFile();
+		if (s == null)
+		{
+			return null;
+		}
+		else
+		{
+			return new File(s).getAbsoluteFile();
+		}
 	}
 
 	public static int findPosition(StringBuilder buffer, JSONObject position) throws Exception

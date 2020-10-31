@@ -23,13 +23,10 @@
 
 package workspace.plugins;
 
-import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.messages.VDMMessage;
-import rpc.RPCMessageList;
-import rpc.RPCRequest;
 import workspace.LSPWorkspaceManager;
 
 abstract public class TCPlugin extends AnalysisPlugin
@@ -74,6 +71,4 @@ abstract public class TCPlugin extends AnalysisPlugin
 	abstract public <T> T getTC();
 	
 	abstract public <T> boolean checkLoadedFiles(T ast) throws Exception;
-
-	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);
 }

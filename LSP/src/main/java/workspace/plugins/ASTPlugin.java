@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Vector;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import rpc.RPCMessageList;
-import rpc.RPCRequest;
 import workspace.LSPWorkspaceManager;
 
 public abstract class ASTPlugin extends AnalysisPlugin
@@ -81,6 +80,4 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	abstract public <T> T getAST();
 	
 	abstract protected List<VDMMessage> parseFile(File file);
-
-	abstract public RPCMessageList documentSymbols(RPCRequest request, File file);
 }

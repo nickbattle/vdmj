@@ -52,6 +52,7 @@ import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -715,7 +716,15 @@ public class FunctionValue extends Value
 							measureName, measureValues, classdef);
 
 					restricted.typeValues = typeValues;
-					return restricted;
+					
+					if (to instanceof TCNamedType)
+					{
+						return new InvariantValue((TCNamedType)to, restricted, ctxt);
+					}
+					else
+					{
+						return restricted;
+					}
 				}
 			}
 		}

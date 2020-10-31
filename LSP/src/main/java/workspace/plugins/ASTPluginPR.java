@@ -33,17 +33,11 @@ import java.util.Map.Entry;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ClassReader;
-import json.JSONArray;
-import lsp.textdocument.SymbolKind;
-import rpc.RPCMessageList;
-import rpc.RPCRequest;
 import workspace.LSPWorkspaceManager;
 import workspace.Log;
 
@@ -141,33 +135,5 @@ public class ASTPluginPR extends ASTPlugin
 
 		Log.dump(errs);
 		return errs;
-	}
-
-	@Override
-	public RPCMessageList documentSymbols(RPCRequest request, File file)
-	{
-		JSONArray results = new JSONArray();
-		
-		if (astClassList != null)	// May be syntax errors
-		{
-			for (ASTClassDefinition clazz: astClassList)
-			{
-				if (clazz.name.location.file.equals(file))
-				{
-					results.add(messages.symbolInformation(clazz.name.toString(), clazz.location, SymbolKind.Class, null));
-
-					for (ASTDefinition def: clazz.definitions)
-					{
-						if (def.name != null)
-						{
-							results.add(messages.symbolInformation(def.name.name, def.name.location,
-									SymbolKind.kindOf(def), def.location.module));
-						}
-					}
-				}
-			}
-		}
-		
-		return new RPCMessageList(request, results);
 	}
 }

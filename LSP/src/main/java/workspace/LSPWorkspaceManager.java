@@ -62,6 +62,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.plugins.ASTPlugin;
+import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
 import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
@@ -70,17 +71,17 @@ public abstract class LSPWorkspaceManager
 {
 	private static LSPWorkspaceManager INSTANCE = null;
 	protected final PluginRegistry registry;
+	protected final LSPMessageUtils messages;
 
 	private JSONObject clientCapabilities;
 	private List<File> roots = new Vector<File>();
 	private Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
 	private Set<File> openFiles = new HashSet<File>();
 	
-	// private LSPServerState lspServerState;
-	
 	protected LSPWorkspaceManager()
 	{
 		registry = PluginRegistry.getInstance();
+		messages = new LSPMessageUtils();
 	}
 
 	public static synchronized LSPWorkspaceManager getInstance()
@@ -92,25 +93,27 @@ public abstract class LSPWorkspaceManager
 				{
 					INSTANCE = new LSPWorkspaceManagerSL();
 				}
-				return INSTANCE;
+				break;
 				
 			case VDM_PP:
 				if (INSTANCE == null)
 				{
 					INSTANCE = new LSPWorkspaceManagerPP();
 				}
-				return INSTANCE;
+				break;
 				
 			case VDM_RT:
 				if (INSTANCE == null)
 				{
 					INSTANCE = new LSPWorkspaceManagerRT();
 				}
-				return INSTANCE;
+				break;
 				
 			default:
 				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
 		}
+
+		return INSTANCE;
 	}
 	
 	/**
@@ -305,6 +308,7 @@ public abstract class LSPWorkspaceManager
 		TCPlugin tc = registry.getPlugin("TC");
 		INPlugin in = registry.getPlugin("IN");
 		
+		Log.printf("Checking loaded files...");
 		ast.preCheck();
 		tc.preCheck();
 		in.preCheck();
@@ -353,6 +357,14 @@ public abstract class LSPWorkspaceManager
 					new JSONObject("successful", tc.getErrs().isEmpty())));
 		}
 		
+		if (hasClientCapability("experimental.combinatorialTest"))
+		{
+			CTPlugin ct = registry.getPlugin("CT");
+			ct.preCheck();
+			// No notification? Rest of processing done on CT method calls
+		}
+		
+		Log.printf("Checked loaded files.");
 		return result;
 	}
 
@@ -514,20 +526,6 @@ public abstract class LSPWorkspaceManager
 		}
 	}
 
-	public RPCMessageList documentSymbols(RPCRequest request, File file) throws Exception
-	{
-		TCPlugin tc = registry.getPlugin("TC");
-		RPCMessageList symbols = tc.documentSymbols(request, file);
-		
-		if (symbols == null)
-		{
-			ASTPlugin ast = registry.getPlugin("AST");
-			symbols = ast.documentSymbols(request, file);
-		}
-		
-		return symbols;
-	}
-
 	public RPCMessageList findDefinition(RPCRequest request, File file, int zline, int zcol)
 	{
 		TCDefinition def = findDefinition(file, zline, zcol);
@@ -650,6 +648,8 @@ public abstract class LSPWorkspaceManager
 	abstract protected FilenameFilter getFilenameFilter();
 
 	abstract protected String[] getFilenameFilters();
+
+	abstract public RPCMessageList documentSymbols(RPCRequest request, File file) throws Exception;
 
 	abstract protected TCDefinition findDefinition(File file, int zline, int zcol);
 

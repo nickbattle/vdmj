@@ -297,7 +297,7 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@Override
-	protected INNamedTraceDefinition findTraceDefinition(TCNameToken name)
+	public INNamedTraceDefinition findTraceDefinition(TCNameToken name)
 	{
 		INDefinition d = executableClasses.findName(name);
 
@@ -441,7 +441,7 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@Override
-	protected Context getTraceContext(INClassDefinition classdef) throws ValueException
+	public Context getTraceContext(INClassDefinition classdef) throws ValueException
 	{
 		ObjectValue object = null;
 
@@ -457,7 +457,7 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@Override
-	protected List<Object> runOneTrace(INClassDefinition classdef, CallSequence test, boolean debug)
+	public List<Object> runOneTrace(INClassDefinition classdef, CallSequence test, boolean debug)
 	{
 		List<Object> list = new Vector<Object>();
 		Context ctxt = null;

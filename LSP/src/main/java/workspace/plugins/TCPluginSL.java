@@ -23,19 +23,12 @@
 
 package workspace.plugins;
 
-import java.io.File;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
-import json.JSONArray;
-import lsp.textdocument.SymbolKind;
-import rpc.RPCMessageList;
-import rpc.RPCRequest;
 import workspace.LSPWorkspaceManager;
 
 public class TCPluginSL extends TCPlugin
@@ -91,39 +84,5 @@ public class TCPluginSL extends TCPlugin
 	public <T> T getTC()
 	{
 		return (T)tcModuleList;
-	}
-	
-	@Override
-	public RPCMessageList documentSymbols(RPCRequest request, File file)
-	{
-		JSONArray results = new JSONArray();
-		
-		if (tcModuleList != null)	// May be syntax errors
-		{
-			for (TCModule module: tcModuleList)
-			{
-				if (module.files.contains(file))
-				{
-					results.add(messages.symbolInformation(module.name.toString(),
-							module.name.getLocation(), SymbolKind.Module, null));
-
-					for (TCDefinition def: module.defs)
-					{
-						for (TCDefinition indef: def.getDefinitions())
-						{
-							if (indef.name != null && indef.location.file.equals(file) && !indef.name.isOld())
-							{
-								results.add(messages.symbolInformation(indef.name + ":" + indef.getType(),
-										indef.location, SymbolKind.kindOf(indef), indef.location.module));
-							}
-						}
-					}
-				}
-			}
-			
-			return new RPCMessageList(request, results);
-		}
-
-		return null;	// No symbols available
 	}
 }
