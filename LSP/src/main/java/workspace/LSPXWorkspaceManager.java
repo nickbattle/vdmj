@@ -208,7 +208,7 @@ abstract public class LSPXWorkspaceManager
 	}
 
 	public RPCMessageList ctExecute(RPCRequest request, String name,
-			Object progressToken, TraceReductionType rType, float subset, long seed, int start, int end)
+			Object progressToken, TraceReductionType rType, float subset, long seed, long start, long end)
 	{
 		TCPlugin tc = registry.getPlugin("TC");
 		

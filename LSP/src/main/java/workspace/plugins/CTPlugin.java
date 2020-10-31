@@ -113,7 +113,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		traceFilter = new TraceFilter(traceCount, subset, rType, seed);
 	}
 
-	public JSONArray execute(Object token, int startTest, int endTest) throws Exception
+	public JSONArray execute(Object token, long startTest, long endTest) throws Exception
 	{
 		if (endTest > traceCount)
 		{
@@ -135,7 +135,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 			traceIterator.getNextTest();	// Skip first N tests
 		}
 		
-		testNumber = 1;
+		testNumber = (int)startTest;
 		completed = false;
 		JSONArray batch = runBatch(BATCH_SIZE, endTest);
 		
@@ -143,6 +143,10 @@ abstract public class CTPlugin extends AnalysisPlugin
 		{
 			traceExecutor  = new TraceExecutor(token, endTest);
 			traceExecutor.start();
+		}
+		else
+		{
+			completed = true;
 		}
 		
 		return batch;
@@ -153,7 +157,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		return completed;
 	}
 	
-	private JSONArray runBatch(int batchSize, int endTest) throws Exception
+	private JSONArray runBatch(int batchSize, long endTest) throws Exception
 	{
 		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
 		JSONArray array = new JSONArray();
@@ -231,9 +235,9 @@ abstract public class CTPlugin extends AnalysisPlugin
 	private class TraceExecutor extends Thread
 	{
 		private Object progressToken;
-		private int endTest;
+		private long endTest;
 
-		public TraceExecutor(Object progressToken, int endTest)
+		public TraceExecutor(Object progressToken, long endTest)
 		{
 			setName("CT TestExecutor");
 			this.progressToken = progressToken;

@@ -123,12 +123,12 @@ public class CTHandler extends LSPHandler
 					
 					switch (key)
 					{
-						case "trace filtering":
+						case "trace reduction type":
 							rType = TraceReductionType.valueOf((String)value);
 							break;
 							
 						case "subset limitation":
-							subset = ((Long)value).intValue()/100;
+							subset = ((Long)value).floatValue()/100;
 							break;
 							
 						case "trace filtering seed":
@@ -141,8 +141,8 @@ public class CTHandler extends LSPHandler
 				}
 			}
 			
-			int start = 0;		// Zero => not set
-			int end = 0;
+			long start = 0;		// Zero => not set
+			long end = 0;
 			
 			if (range != null)
 			{
