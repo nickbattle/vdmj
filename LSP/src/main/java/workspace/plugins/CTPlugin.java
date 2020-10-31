@@ -56,7 +56,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 	
 	protected int testNumber = 0;
 	protected TraceExecutor traceExecutor = null;
-	protected boolean completed = false;
+	protected boolean completed = true;
 	
 	private static final int BATCH_SIZE = 10;
 	

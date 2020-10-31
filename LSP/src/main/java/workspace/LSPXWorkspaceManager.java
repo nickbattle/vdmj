@@ -110,7 +110,7 @@ abstract public class LSPXWorkspaceManager
 		
 		if (!tc.getErrs().isEmpty())	// No type clean tree
 		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
+			return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
 		}
 		
 		try
@@ -138,7 +138,7 @@ abstract public class LSPXWorkspaceManager
 		
 		if (!tc.getErrs().isEmpty())	// No type clean tree
 		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
+			return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
 		}
 		
 		try
@@ -183,13 +183,18 @@ abstract public class LSPXWorkspaceManager
 		
 		if (!tc.getErrs().isEmpty())	// No type clean tree
 		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
+			return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
 		}
 		
 		try
 		{
 			CTPlugin ct = registry.getPlugin("CT");
 			INPlugin in = registry.getPlugin("IN");
+			
+			if (!ct.completed())
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
+			}
 	
 			if (ct.getCT() == null)
 			{
@@ -214,12 +219,18 @@ abstract public class LSPXWorkspaceManager
 		
 		if (!tc.getErrs().isEmpty())	// No type clean tree
 		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
+			return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
 		}
 		
 		try
 		{
 			CTPlugin ct = registry.getPlugin("CT");
+			
+			if (!ct.completed())
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
+			}
+
 			ct.setFilter(rType, subset, seed);
 			JSONArray firstBatch = ct.execute(progressToken, start, end);
 			return new RPCMessageList(request, firstBatch);
