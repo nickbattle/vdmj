@@ -642,7 +642,7 @@ abstract public class Interpreter
 		return !failed;
 	}
 
-	abstract protected List<Object> runOneTrace(INClassDefinition classDefinition, CallSequence test, boolean debug);
+	public abstract List<Object> runOneTrace(INClassDefinition classDefinition, CallSequence test, boolean debug);
 	
 	abstract public <T extends List<?>> T getTC();
 	abstract public <T extends List<?>> T getIN();
