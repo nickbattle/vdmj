@@ -106,15 +106,15 @@ abstract public class LSPXWorkspaceManager
 
 	public RPCMessageList pogGenerate(RPCRequest request, File file)
 	{
-		TCPlugin tc = registry.getPlugin("TC");
-		
-		if (!tc.getErrs().isEmpty())	// No type clean tree
-		{
-			return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
-		}
-		
 		try
 		{
+			TCPlugin tc = registry.getPlugin("TC");
+			
+			if (!tc.getErrs().isEmpty())	// No type clean tree
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
+			}
+			
 			POPlugin po = registry.getPlugin("PO");
 	
 			if (po.getPO() == null)
@@ -134,15 +134,15 @@ abstract public class LSPXWorkspaceManager
 
 	public RPCMessageList ctTraces(RPCRequest request, File project)
 	{
-		TCPlugin tc = registry.getPlugin("TC");
-		
-		if (!tc.getErrs().isEmpty())	// No type clean tree
-		{
-			return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
-		}
-		
 		try
 		{
+			TCPlugin tc = registry.getPlugin("TC");
+			
+			if (!tc.getErrs().isEmpty())	// No type clean tree
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
+			}
+			
 			CTPlugin ct = registry.getPlugin("CT");
 			INPlugin in = registry.getPlugin("IN");
 	
@@ -179,15 +179,15 @@ abstract public class LSPXWorkspaceManager
 
 	public RPCMessageList ctGenerate(RPCRequest request, String name)
 	{
-		TCPlugin tc = registry.getPlugin("TC");
-		
-		if (!tc.getErrs().isEmpty())	// No type clean tree
-		{
-			return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
-		}
-		
 		try
 		{
+			TCPlugin tc = registry.getPlugin("TC");
+			
+			if (!tc.getErrs().isEmpty())	// No type clean tree
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
+			}
+			
 			CTPlugin ct = registry.getPlugin("CT");
 			INPlugin in = registry.getPlugin("IN");
 			
@@ -215,15 +215,15 @@ abstract public class LSPXWorkspaceManager
 	public RPCMessageList ctExecute(RPCRequest request, String name,
 			Object progressToken, TraceReductionType rType, float subset, long seed, long start, long end)
 	{
-		TCPlugin tc = registry.getPlugin("TC");
-		
-		if (!tc.getErrs().isEmpty())	// No type clean tree
-		{
-			return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
-		}
-		
 		try
 		{
+			TCPlugin tc = registry.getPlugin("TC");
+			
+			if (!tc.getErrs().isEmpty())	// No type clean tree
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
+			}
+			
 			CTPlugin ct = registry.getPlugin("CT");
 			
 			if (!ct.generated())
