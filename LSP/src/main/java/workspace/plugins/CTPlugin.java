@@ -130,18 +130,20 @@ abstract public class CTPlugin extends AnalysisPlugin
 			traceFilter = new TraceFilter(traceCount, 1.0F, TraceReductionType.NONE, 0);
 		}
 
+		traceIterator.reset();
+		testNumber = (int)startTest;
+		completed = false;
+
 		for (int i=1; i < startTest && traceIterator.hasMoreTests(); i++)
 		{
 			traceIterator.getNextTest();	// Skip first N tests
 		}
 		
-		testNumber = (int)startTest;
-		completed = false;
 		JSONArray batch = runBatch(BATCH_SIZE, endTest);
 		
 		if (traceIterator.hasMoreTests())
 		{
-			traceExecutor  = new TraceExecutor(token, endTest);
+			traceExecutor = new TraceExecutor(token, endTest);
 			traceExecutor.start();
 		}
 		else
@@ -157,6 +159,11 @@ abstract public class CTPlugin extends AnalysisPlugin
 		return completed;
 	}
 	
+	public boolean generated()
+	{
+		return traceIterator != null;
+	}
+
 	private JSONArray runBatch(int batchSize, long endTest) throws Exception
 	{
 		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();

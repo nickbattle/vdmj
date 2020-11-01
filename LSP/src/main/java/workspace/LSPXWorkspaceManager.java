@@ -226,6 +226,11 @@ abstract public class LSPXWorkspaceManager
 		{
 			CTPlugin ct = registry.getPlugin("CT");
 			
+			if (!ct.generated())
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace not generated");
+			}
+
 			if (!ct.completed())
 			{
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
@@ -251,7 +256,11 @@ abstract public class LSPXWorkspaceManager
 		try
 		{
 			CTPlugin ct = registry.getPlugin("CT");
-			while(!ct.completed());
+
+			while(!ct.completed())
+			{
+				pause(100);
+			}
 		}
 		catch (Exception e)
 		{
@@ -259,6 +268,18 @@ abstract public class LSPXWorkspaceManager
 		}
 	}
 	
+	private void pause(int millis)
+	{
+		try
+		{
+			Thread.sleep(millis);
+		}
+		catch (InterruptedException e)
+		{
+			// Ignore
+		}
+	}
+
 	private TCNameToken stringToName(String name) throws Exception
 	{
 		LexTokenReader ltr = new LexTokenReader(name, Dialect.VDM_SL);
