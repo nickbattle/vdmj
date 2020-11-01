@@ -284,7 +284,7 @@ public class CTTest extends LSPTest
 		assertEquals(1, response.size());
 		dump(response.get(0));
 		JSONArray result = response.get(0).getPath("result");
-		assertEquals(10, result.size());
+		assertEquals(25, result.size());
 		
 		lspxManager.waitForTraceComplete();
 	}

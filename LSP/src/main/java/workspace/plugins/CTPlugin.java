@@ -120,13 +120,18 @@ abstract public class CTPlugin extends AnalysisPlugin
 			throw new Exception("Trace " + traceName + " only has " + traceCount + " tests");
 		}
 		
-		if (endTest == 0)		// To the end of the tests, if specified as zero
+		if (endTest == 0)			// To the end of the tests, if specified as zero
 		{
 			endTest = traceCount;
 		}
 		
-		if (startTest > 0)		// Suppress any reduction if a range specified
+		if (startTest == 0)
 		{
+			startTest = 1;
+		}
+		else
+		{
+			// Suppress any reduction if a range specified
 			traceFilter = new TraceFilter(traceCount, 1.0F, TraceReductionType.NONE, 0);
 		}
 
@@ -139,7 +144,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 			traceIterator.getNextTest();	// Skip first N tests
 		}
 		
-		JSONArray batch = runBatch(BATCH_SIZE, endTest);
+		JSONArray batch = runBatch(token == null ? traceCount : BATCH_SIZE, endTest);
 		
 		if (traceIterator.hasMoreTests())
 		{
