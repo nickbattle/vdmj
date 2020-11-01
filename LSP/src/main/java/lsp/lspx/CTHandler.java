@@ -70,7 +70,7 @@ public class CTHandler extends LSPHandler
 		try
 		{
 			JSONObject params = request.get("params");
-			File project = Utils.uriToFile(params.get("uri"));
+			File project = params == null ? null : Utils.uriToFile(params.get("uri"));
 			return LSPXWorkspaceManager.getInstance().ctTraces(request, project);
 		}
 		catch (URISyntaxException e)

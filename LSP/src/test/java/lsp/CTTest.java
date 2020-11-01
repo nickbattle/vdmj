@@ -55,7 +55,7 @@ public class CTTest extends LSPTest
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
 		CTHandler handler = new CTHandler(state);
-		RPCRequest request = new RPCRequest(123L, "lspx/CT/traces", new JSONObject());
+		RPCRequest request = new RPCRequest(123L, "lspx/CT/traces", null);
 		
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
