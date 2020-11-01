@@ -144,18 +144,17 @@ abstract public class CTPlugin extends AnalysisPlugin
 			traceIterator.getNextTest();	// Skip first N tests
 		}
 		
-		JSONArray batch = runBatch(token == null ? traceCount : BATCH_SIZE, endTest);
+		JSONArray batch = new JSONArray();
 		
 		if (traceIterator.hasMoreTests())
 		{
 			traceExecutor = new TraceExecutor(token, endTest);
 			traceExecutor.start();
-		}
-		else
-		{
-			completed = true;
+			traceExecutor.join();
+			batch = traceExecutor.getResponses();
 		}
 		
+		completed = true;
 		return batch;
 	}
 	
@@ -248,12 +247,26 @@ abstract public class CTPlugin extends AnalysisPlugin
 	{
 		private Object progressToken;
 		private long endTest;
+		private JSONArray responses;
+		private boolean cancelled;
 
 		public TraceExecutor(Object progressToken, long endTest)
 		{
 			setName("CT TestExecutor");
 			this.progressToken = progressToken;
 			this.endTest = endTest;
+			this.responses = new JSONArray();
+			this.cancelled = false;
+		}
+		
+		public JSONArray getResponses() throws InterruptedException
+		{
+			if (cancelled)
+			{
+				throw new InterruptedException("Trace execution cancelled");
+			}
+			
+			return responses;
 		}
 		
 		@Override
@@ -266,25 +279,39 @@ abstract public class CTPlugin extends AnalysisPlugin
 				while (traceIterator.hasMoreTests())
 				{
 					JSONArray batch = runBatch(BATCH_SIZE, endTest);
-					JSONObject params = new JSONObject("token", progressToken, "value", batch);
+					Thread.sleep(0);	// cancelled?
 					
-					if (server != null)
+					if (progressToken == null)
 					{
-						server.writeMessage(new RPCRequest("$/progress", params));
+						responses.addAll(batch);
+					}
+					else
+					{
+						JSONObject params = new JSONObject("token", progressToken, "value", batch);
+						
+						if (server == null)
+						{
+							Log.printf("Sending intermediate results");
+						}
+						else
+						{
+							server.writeMessage(new RPCRequest("$/progress", params));
+						}
 					}
 				}
-
-				if (server != null)
-				{
-					server.writeMessage(new RPCRequest("$/progress",
-						new JSONObject("token", progressToken, "value", null)));
-				}
-				
-				completed = true;
+			}
+			catch (InterruptedException e)
+			{
+				Log.printf("CT Test Executor interrupted");
+				cancelled = true;
 			}
 			catch (Exception e)
 			{
 				Log.error(e);
+			}
+			finally
+			{
+				completed = true;
 			}
 		}
 	}

@@ -34,7 +34,11 @@ public enum RPCErrors
 	serverErrorStart(-32099),
 	serverErrorEnd(-32000),
 	ServerNotInitialized(-32002),
-	UnknownErrorCode(-32001);
+	UnknownErrorCode(-32001),
+	
+	// LSP extensions?
+	RequestCancelled(-32800),
+	ContentModified(-32801);
 
 	private final Long value;
 

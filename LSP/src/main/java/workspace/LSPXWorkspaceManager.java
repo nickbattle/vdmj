@@ -205,6 +205,11 @@ abstract public class LSPXWorkspaceManager
 			int count = ct.generate(tracename);
 			return new RPCMessageList(request, new JSONObject("numberOfTests", count));
 		}
+		catch (InterruptedException e)	// generate was cancelled
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.RequestCancelled, e.getMessage());
+		}
 		catch (Exception e)
 		{
 			Log.error(e);
@@ -239,6 +244,11 @@ abstract public class LSPXWorkspaceManager
 			ct.setFilter(rType, subset, seed);
 			JSONArray firstBatch = ct.execute(progressToken, start, end);
 			return new RPCMessageList(request, firstBatch);
+		}
+		catch (InterruptedException e)	// execute was cancelled
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.RequestCancelled, e.getMessage());
 		}
 		catch (Exception e)
 		{

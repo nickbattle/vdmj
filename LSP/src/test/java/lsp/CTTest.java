@@ -120,7 +120,7 @@ public class CTTest extends LSPTest
 		assertEquals(1, response.size());
 		dump(response.get(0));
 		JSONArray result = response.get(0).getPath("result");
-		assertEquals(10, result.size());
+		assertEquals(0, result.size());
 		
 		lspxManager.waitForTraceComplete();
 	}
@@ -205,7 +205,7 @@ public class CTTest extends LSPTest
 		assertEquals(1, response.size());
 		dump(response.get(0));
 		JSONArray result = response.get(0).getPath("result");
-		assertEquals(3, result.size());
+		assertEquals(0, result.size());
 		
 		lspxManager.waitForTraceComplete();
 	}
