@@ -54,6 +54,13 @@ public class RPCResponse extends JSONObject
 		put("id", request.get("id"));
 	}
 	
+	public RPCResponse(RPCRequest request, RPCErrors error, String message, Object data)
+	{
+		this();
+		put("error", new JSONObject("code", error.getValue(), "message", message, "data", data));
+		put("id", request.get("id"));
+	}
+	
 	public RPCResponse(RPCErrors error, String message)
 	{
 		this();

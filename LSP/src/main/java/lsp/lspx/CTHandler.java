@@ -107,7 +107,7 @@ public class CTHandler extends LSPHandler
 			String name = params.get("name");
 			JSONArray filter = params.get("filter");
 			JSONObject range = params.get("range");
-			Object token = params.get("workDoneToken");
+			Object token = params.get("partialResultToken");
 			
 			TraceReductionType rType = TraceReductionType.NONE;
 			float subset = 1.0F;

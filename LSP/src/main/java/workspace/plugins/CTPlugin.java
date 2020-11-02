@@ -43,6 +43,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.CancellableThread;
 import lsp.LSPServer;
+import rpc.RPCErrors;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import workspace.DAPWorkspaceManager;
@@ -206,7 +207,6 @@ abstract public class CTPlugin extends AnalysisPlugin
 					else
 					{
 						JSONObject params = new JSONObject("token", progressToken, "value", batch);
-						
 						Log.printf("Sending intermediate results");
 						send(server, new RPCRequest("$/progress", params));
 					}
@@ -220,13 +220,29 @@ abstract public class CTPlugin extends AnalysisPlugin
 				
 				if (progressToken == null)
 				{
-					Log.printf("Sending %s results", cancelled ? "pre-cancel" : "complete");
-					send(server, new RPCResponse(request, responses));
+					if (cancelled)
+					{
+						Log.printf("Sending cancelled results");
+						send(server, new RPCResponse(request, RPCErrors.RequestCancelled, "Trace cancelled", responses));
+					}
+					else
+					{
+						Log.printf("Sending complete results");
+						send(server, new RPCResponse(request, responses));
+					}
 				}
 				else
 				{
-					Log.printf("Sending final null result");
-					send(server, new RPCResponse(request, null));
+					if (cancelled)
+					{
+						Log.printf("Sending cancelled null result");
+						send(server, new RPCResponse(request, RPCErrors.RequestCancelled, "Trace cancelled", null));
+					}
+					else
+					{
+						Log.printf("Sending final null result");
+						send(server, new RPCResponse(request, null));
+					}
 				}
 			}
 			catch (Exception e)

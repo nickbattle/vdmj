@@ -112,9 +112,9 @@ public class CTTest extends LSPTest
 		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
 
 		request = new RPCRequest(123L, "lspx/CT/execute", new JSONObject(
-				"name",				"A`TA",
-				"range",			new JSONObject("start", 5, "end", 25),
-				"workDoneToken",	999));
+				"name",					"A`TA",
+				"range",				new JSONObject("start", 5, "end", 25),
+				"partialResultToken",	999));
 		
 		response = handler.request(request);
 		assertEquals(null, response);	// backgrounded
@@ -222,11 +222,11 @@ public class CTTest extends LSPTest
 		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
 
 		request = new RPCRequest(123L, "lspx/CT/execute", new JSONObject(
-				"name",				"A`TA",
-				"filter",			new JSONArray(
+				"name",					"A`TA",
+				"filter",				new JSONArray(
 						new JSONObject("key", "trace reduction type", "value", "RANDOM"),
 						new JSONObject("key", "subset limitation", "value", 10)),	// ie. 10%
-				"workDoneToken",	999));
+				"partialResultToken",	999));
 
 		response = handler.request(request);
 		assertEquals(null, response);	// backgrounded
