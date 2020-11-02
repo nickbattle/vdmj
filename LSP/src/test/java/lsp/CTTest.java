@@ -55,7 +55,7 @@ public class CTTest extends LSPTest
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
 		CTHandler handler = new CTHandler(state);
-		RPCRequest request = new RPCRequest(123L, "lspx/CT/traces", new JSONObject());
+		RPCRequest request = new RPCRequest(123L, "lspx/CT/traces", null);
 		
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
@@ -112,17 +112,44 @@ public class CTTest extends LSPTest
 		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
 
 		request = new RPCRequest(123L, "lspx/CT/execute", new JSONObject(
-				"name",				"A`TA",
-				"range",			new JSONObject("start", 5, "end", 25),
-				"workDoneToken",	999));
+				"name",					"A`TA",
+				"range",				new JSONObject("start", 5, "end", 25),
+				"partialResultToken",	999));
 		
 		response = handler.request(request);
-		assertEquals(1, response.size());
-		dump(response.get(0));
-		JSONArray result = response.get(0).getPath("result");
-		assertEquals(10, result.size());
+		assertEquals(null, response);	// backgrounded
 		
-		lspxManager.waitForTraceComplete();
+		Thread background = CancellableThread.find(123L);
+		background.join();
+	}
+
+	@Test
+	public void testExecuteAlarmSL() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_SL);
+		File testdir = new File("src/test/resources/ctalarm_sl");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+		
+		CTHandler handler = new CTHandler(state);
+		RPCRequest request = new RPCRequest(123L, "lspx/CT/generate", new JSONObject("name", "DEFAULT`Test1"));
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+		assertEquals(new Long(160), response.get(0).getPath("result.numberOfTests"));
+
+		request = new RPCRequest(123L, "lspx/CT/execute", new JSONObject("name", "DEFAULT`Test1"));
+		response = handler.request(request);
+		assertEquals(null, response);	// backgrounded
+		
+		CancelHandler cancelHandler = new CancelHandler(state);
+		request = new RPCRequest("$/cancelRequest", new JSONObject("id", 123L));
+		response = cancelHandler.request(request);
+		assertEquals(null, response);	// notify
+		
+		Thread background = CancellableThread.find(123L);
+		background.join();
 	}
 
 	@Test
@@ -195,19 +222,17 @@ public class CTTest extends LSPTest
 		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
 
 		request = new RPCRequest(123L, "lspx/CT/execute", new JSONObject(
-				"name",				"A`TA",
-				"filter",			new JSONArray(
+				"name",					"A`TA",
+				"filter",				new JSONArray(
 						new JSONObject("key", "trace reduction type", "value", "RANDOM"),
 						new JSONObject("key", "subset limitation", "value", 10)),	// ie. 10%
-				"workDoneToken",	999));
+				"partialResultToken",	999));
 
 		response = handler.request(request);
-		assertEquals(1, response.size());
-		dump(response.get(0));
-		JSONArray result = response.get(0).getPath("result");
-		assertEquals(3, result.size());
+		assertEquals(null, response);	// backgrounded
 		
-		lspxManager.waitForTraceComplete();
+		Thread background = CancellableThread.find(123L);
+		background.join();
 	}
 
 	@Test
@@ -281,11 +306,9 @@ public class CTTest extends LSPTest
 
 		request = new RPCRequest(123L, "lspx/CT/execute", new JSONObject("name", "A`TA"));
 		response = handler.request(request);
-		assertEquals(1, response.size());
-		dump(response.get(0));
-		JSONArray result = response.get(0).getPath("result");
-		assertEquals(10, result.size());
+		assertEquals(null, response);	// backgrounded
 		
-		lspxManager.waitForTraceComplete();
+		Thread background = CancellableThread.find(123L);
+		background.join();
 	}
 }

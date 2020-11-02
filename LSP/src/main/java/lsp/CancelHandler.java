@@ -21,34 +21,25 @@
  *
  ******************************************************************************/
 
-package rpc;
+package lsp;
 
-public enum RPCErrors
+import rpc.RPCRequest;
+import json.JSONObject;
+import rpc.RPCMessageList;
+
+public class CancelHandler extends LSPHandler
 {
-	// Defined by JSON RPC
-	ParseError(-32700),
-	InvalidRequest(-32600),
-	MethodNotFound(-32601),
-	InvalidParams(-32602),
-	InternalError(-32603),
-	serverErrorStart(-32099),
-	serverErrorEnd(-32000),
-	ServerNotInitialized(-32002),
-	UnknownErrorCode(-32001),
-	
-	// LSP extensions?
-	RequestCancelled(-32800),
-	ContentModified(-32801);
-
-	private final Long value;
-
-	RPCErrors(long value)
+	public CancelHandler(LSPServerState state)
 	{
-		this.value = value;
+		super(state);
 	}
-	
-	public long getValue()
+
+	@Override
+	public RPCMessageList request(RPCRequest request)
 	{
-		return value;
+		JSONObject params = request.get("params");
+		Object id = params.get("id");
+		CancellableThread.cancel(id);
+		return null;
 	}
 }

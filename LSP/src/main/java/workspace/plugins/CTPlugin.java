@@ -23,6 +23,7 @@
 
 package workspace.plugins;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +41,11 @@ import com.fujitsu.vdmj.traces.Verdict;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.CancellableThread;
 import lsp.LSPServer;
+import rpc.RPCErrors;
 import rpc.RPCRequest;
+import rpc.RPCResponse;
 import workspace.DAPWorkspaceManager;
 import workspace.Log;
 
@@ -113,43 +117,48 @@ abstract public class CTPlugin extends AnalysisPlugin
 		traceFilter = new TraceFilter(traceCount, subset, rType, seed);
 	}
 
-	public JSONArray execute(Object token, long startTest, long endTest) throws Exception
+	public JSONArray execute(RPCRequest request, Object token, long startTest, long endTest) throws Exception
 	{
 		if (endTest > traceCount)
 		{
 			throw new Exception("Trace " + traceName + " only has " + traceCount + " tests");
 		}
 		
-		if (endTest == 0)		// To the end of the tests, if specified as zero
+		if (endTest == 0)			// To the end of the tests, if specified as zero
 		{
 			endTest = traceCount;
 		}
 		
-		if (startTest > 0)		// Suppress any reduction if a range specified
+		if (startTest == 0)
 		{
+			startTest = 1;
+		}
+		else
+		{
+			// Suppress any reduction if a range specified
 			traceFilter = new TraceFilter(traceCount, 1.0F, TraceReductionType.NONE, 0);
 		}
+
+		traceIterator.reset();
+		testNumber = (int)startTest;
+		completed = false;
 
 		for (int i=1; i < startTest && traceIterator.hasMoreTests(); i++)
 		{
 			traceIterator.getNextTest();	// Skip first N tests
 		}
 		
-		testNumber = (int)startTest;
-		completed = false;
-		JSONArray batch = runBatch(BATCH_SIZE, endTest);
-		
 		if (traceIterator.hasMoreTests())
 		{
-			traceExecutor  = new TraceExecutor(token, endTest);
+			traceExecutor = new TraceExecutor(request, token, endTest);
 			traceExecutor.start();
+			return null;
 		}
 		else
 		{
 			completed = true;
+			return new JSONArray();		// Empty result
 		}
-		
-		return batch;
 	}
 	
 	public synchronized boolean completed()
@@ -157,95 +166,31 @@ abstract public class CTPlugin extends AnalysisPlugin
 		return completed;
 	}
 	
-	private JSONArray runBatch(int batchSize, long endTest) throws Exception
+	public boolean generated()
 	{
-		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
-		JSONArray array = new JSONArray();
-
-		while (traceIterator.hasMoreTests() && batchSize > 0 && testNumber <= endTest)
-		{
-			CallSequence test = traceIterator.getNextTest();
-			
-			if (traceFilter.isRemoved(test, testNumber))
-			{
-				// skip
-			}
-			else
-			{
-				String callString = test.getCallString(traceContext);
-				
-				if (traceFilter.getFilteredBy(test) > 0)
-				{
-	    			Log.printf("Test " + testNumber + " = " + callString);
-					Log.printf("Test " + testNumber + " FILTERED by test " + traceFilter.getFilteredBy(test));
-					array.add(new JSONObject(
-							"id", testNumber,
-							"verdict", jsonVerdict(Verdict.SKIPPED),
-							"sequence", callString));
-				}
-				else
-				{
-	    			interpreter.init();	// Initialize completely between every run...
-	    			List<Object> result = interpreter.runOneTrace(traceClassDef, test, false);
-	    			traceFilter.update(result, test, testNumber);
-	
-	    			Log.printf("Test " + testNumber + " = " + callString);
-	    			Log.printf("Result = " + result);
-					array.add(new JSONObject(
-							"id", testNumber,
-							"verdict", getVerdict(result),
-							"sequence", callString));
-				}
-
-				batchSize--;
-			}
-			
-			testNumber++;
-		}
-		
-		return array;
+		return traceIterator != null;
 	}
-	
-	private int getVerdict(List<Object> result) throws Exception
-	{
-		for (int i = result.size()-1; i > 0; i--)
-		{
-			if (result.get(i) instanceof Verdict)
-			{
-				return jsonVerdict((Verdict)result.get(i));
-			}
-		}
-		
-		throw new Exception("No verdict returned?");
-	}
-	
-	private int jsonVerdict(Verdict v) throws Exception
-	{
-		switch (v)
-		{
-			case PASSED:		return 1;
-			case FAILED:		return 2;
-			case INCONCLUSIVE:	return 3;
-			case SKIPPED:		return 4;
 
-			default: throw new Exception("Unknown verdict: " + v);
-		}
-	}
-	
-	private class TraceExecutor extends Thread
+	private class TraceExecutor extends CancellableThread
 	{
-		private Object progressToken;
-		private long endTest;
+		private final RPCRequest request;
+		private final Object progressToken;
+		private final long endTest;
+		private final JSONArray responses;
 
-		public TraceExecutor(Object progressToken, long endTest)
+		public TraceExecutor(RPCRequest request, Object progressToken, long endTest)
 		{
-			setName("CT TestExecutor");
+			super(request.get("id"));
+			this.request = request;
 			this.progressToken = progressToken;
 			this.endTest = endTest;
+			this.responses = new JSONArray();
+
+			setName("TraceExecutor");
 		}
 		
 		@Override
-		public void run()
+		public void body()
 		{
 			LSPServer server = LSPServer.getInstance();
 			
@@ -254,26 +199,163 @@ abstract public class CTPlugin extends AnalysisPlugin
 				while (traceIterator.hasMoreTests())
 				{
 					JSONArray batch = runBatch(BATCH_SIZE, endTest);
-					JSONObject params = new JSONObject("token", progressToken, "value", batch);
 					
-					if (server != null)
+					if (progressToken == null)
 					{
-						server.writeMessage(new RPCRequest("$/progress", params));
+						responses.addAll(batch);
+					}
+					else
+					{
+						JSONObject params = new JSONObject("token", progressToken, "value", batch);
+						Log.printf("Sending intermediate results");
+						send(server, new RPCRequest("$/progress", params));
+					}
+
+					if (cancelled)
+					{
+						Log.printf("%s cancelled", getName());
+						break;
 					}
 				}
-
-				if (server != null)
-				{
-					server.writeMessage(new RPCRequest("$/progress",
-						new JSONObject("token", progressToken, "value", null)));
-				}
 				
-				completed = true;
+				if (progressToken == null)
+				{
+					if (cancelled)
+					{
+						Log.printf("Sending cancelled results");
+						send(server, new RPCResponse(request, RPCErrors.RequestCancelled, "Trace cancelled", responses));
+					}
+					else
+					{
+						Log.printf("Sending complete results");
+						send(server, new RPCResponse(request, responses));
+					}
+				}
+				else
+				{
+					if (cancelled)
+					{
+						Log.printf("Sending cancelled null result");
+						send(server, new RPCResponse(request, RPCErrors.RequestCancelled, "Trace cancelled", null));
+					}
+					else
+					{
+						Log.printf("Sending final null result");
+						send(server, new RPCResponse(request, null));
+					}
+				}
 			}
 			catch (Exception e)
 			{
 				Log.error(e);
 			}
+			finally
+			{
+				completed = true;
+			}
+		}
+		
+		private void send(LSPServer server, JSONObject response) throws IOException
+		{
+			if (server == null)		// Unit testing
+			{
+				Log.printf("%s", response.toString());
+			}
+			else
+			{
+				server.writeMessage(response);
+			}
+		}
+
+		private JSONArray runBatch(int batchSize, long endTest) throws Exception
+		{
+			Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+			JSONArray array = new JSONArray();
+		
+			while (traceIterator.hasMoreTests() && batchSize > 0 && testNumber <= endTest)
+			{
+				CallSequence test = traceIterator.getNextTest();
+				
+				if (traceFilter.isRemoved(test, testNumber))
+				{
+					// skip
+				}
+				else
+				{
+					String callString = test.getCallString(traceContext);
+					
+					if (traceFilter.getFilteredBy(test) > 0)
+					{
+		    			Log.printf("Test " + testNumber + " = " + callString);
+						Log.printf("Test " + testNumber + " FILTERED by test " + traceFilter.getFilteredBy(test));
+						array.add(new JSONObject(
+								"id", testNumber,
+								"verdict", jsonVerdict(Verdict.SKIPPED),
+								"sequence", jsonResultPairs(callString, null)));
+					}
+					else
+					{
+		    			interpreter.init();	// Initialize completely between every run...
+		    			List<Object> result = interpreter.runOneTrace(traceClassDef, test, false);
+		    			traceFilter.update(result, test, testNumber);
+		
+		    			Log.printf("Test " + testNumber + " = " + callString);
+		    			Log.printf("Result = " + result);
+						array.add(new JSONObject(
+								"id", testNumber,
+								"verdict", getVerdict(result),
+								"sequence", jsonResultPairs(callString, result)));
+					}
+		
+					batchSize--;
+				}
+				
+				testNumber++;
+			}
+			
+			return array;
+		}
+
+		private int getVerdict(List<Object> result) throws Exception
+		{
+			for (int i = result.size()-1; i > 0; i--)
+			{
+				if (result.get(i) instanceof Verdict)
+				{
+					return jsonVerdict((Verdict)result.get(i));
+				}
+			}
+			
+			throw new Exception("No verdict returned?");
+		}
+
+		private int jsonVerdict(Verdict v) throws Exception
+		{
+			switch (v)
+			{
+				case PASSED:		return 1;
+				case FAILED:		return 2;
+				case INCONCLUSIVE:	return 3;
+				case SKIPPED:		return 4;
+		
+				default: throw new Exception("Unknown verdict: " + v);
+			}
+		}
+
+		private JSONArray jsonResultPairs(String callSeq, List<Object> results)
+		{
+			JSONArray array = new JSONArray();
+			String[] calls = callSeq.split(";\\s+");
+			
+			for (int i=0; i<calls.length; i++)
+			{
+				array.add(new JSONObject("case", calls[i], "result",
+					results == null ? null :
+						i >= results.size() ? null :
+							results.get(i).toString()));
+			}
+			
+			return array;
 		}
 	}
 }

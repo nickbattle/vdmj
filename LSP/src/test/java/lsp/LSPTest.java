@@ -35,6 +35,7 @@ import json.JSONObject;
 import json.JSONWriter;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.DAPWorkspaceManager;
 import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
 import workspace.Log;
@@ -43,6 +44,7 @@ abstract public class LSPTest
 {
 	protected LSPWorkspaceManager lspManager = null;
 	protected LSPXWorkspaceManager lspxManager = null;
+	protected DAPWorkspaceManager dapManager = null;
 	protected LSPServerState state = null;
 
 	protected void setupWorkspace(Dialect dialect) throws IOException
@@ -50,8 +52,10 @@ abstract public class LSPTest
 		Settings.dialect = dialect;
 		LSPWorkspaceManager.reset();
 		LSPXWorkspaceManager.reset();
+		DAPWorkspaceManager.reset();
 		lspManager = LSPWorkspaceManager.getInstance();
 		lspxManager = LSPXWorkspaceManager.getInstance();
+		dapManager = DAPWorkspaceManager.getInstance();
 		state = new LSPServerState();
 		Log.init(System.out);
 	}
