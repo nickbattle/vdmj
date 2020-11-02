@@ -94,6 +94,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register(new InitializeHandler(state), "initialize", "initialized", "client/registerCapability");
 		dispatcher.register(new ShutdownHandler(state), "shutdown");
 		dispatcher.register(new ExitHandler(state), "exit");
+		dispatcher.register(new CancelHandler(state), "$/cancelRequest");
 
 		dispatcher.register(new DidOpenHandler(state), "textDocument/didOpen");
 		dispatcher.register(new DidCloseHandler(state), "textDocument/didClose");

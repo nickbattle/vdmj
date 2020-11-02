@@ -117,10 +117,10 @@ public class CTTest extends LSPTest
 				"workDoneToken",	999));
 		
 		response = handler.request(request);
-		assertEquals(1, response.size());
-		dump(response.get(0));
-		JSONArray result = response.get(0).getPath("result");
-		assertEquals(0, result.size());
+		assertEquals(null, response);	// backgrounded
+		
+		Thread background = CancellableThread.find(123L);
+		background.join();
 	}
 
 	@Test
@@ -140,12 +140,16 @@ public class CTTest extends LSPTest
 		assertEquals(new Long(160), response.get(0).getPath("result.numberOfTests"));
 
 		request = new RPCRequest(123L, "lspx/CT/execute", new JSONObject("name", "DEFAULT`Test1"));
-		
 		response = handler.request(request);
-		assertEquals(1, response.size());
-		dump(response.get(0));
-		JSONArray result = response.get(0).getPath("result");
-		assertEquals(160, result.size());
+		assertEquals(null, response);	// backgrounded
+		
+		CancelHandler cancelHandler = new CancelHandler(state);
+		request = new RPCRequest("$/cancelRequest", new JSONObject("id", 123L));
+		response = cancelHandler.request(request);
+		assertEquals(null, response);	// notify
+		
+		Thread background = CancellableThread.find(123L);
+		background.join();
 	}
 
 	@Test
@@ -225,10 +229,10 @@ public class CTTest extends LSPTest
 				"workDoneToken",	999));
 
 		response = handler.request(request);
-		assertEquals(1, response.size());
-		dump(response.get(0));
-		JSONArray result = response.get(0).getPath("result");
-		assertEquals(0, result.size());
+		assertEquals(null, response);	// backgrounded
+		
+		Thread background = CancellableThread.find(123L);
+		background.join();
 	}
 
 	@Test
@@ -302,9 +306,9 @@ public class CTTest extends LSPTest
 
 		request = new RPCRequest(123L, "lspx/CT/execute", new JSONObject("name", "A`TA"));
 		response = handler.request(request);
-		assertEquals(1, response.size());
-		dump(response.get(0));
-		JSONArray result = response.get(0).getPath("result");
-		assertEquals(25, result.size());
+		assertEquals(null, response);	// backgrounded
+		
+		Thread background = CancellableThread.find(123L);
+		background.join();
 	}
 }

@@ -242,8 +242,16 @@ abstract public class LSPXWorkspaceManager
 			}
 
 			ct.setFilter(rType, subset, seed);
-			JSONArray firstBatch = ct.execute(progressToken, start, end);
-			return new RPCMessageList(request, firstBatch);
+			JSONArray batch = ct.execute(request, progressToken, start, end);
+			
+			if (batch == null)	// Running in background
+			{
+				return null;
+			}
+			else
+			{
+				return new RPCMessageList(request, batch);
+			}
 		}
 		catch (InterruptedException e)	// execute was cancelled
 		{
