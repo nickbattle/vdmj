@@ -68,8 +68,11 @@ public class CTMainThread extends MainThread
 	{
 		try
 		{
-			DebugLink link = DebugLink.getInstance();
-			link.newThread(CPUValue.vCPU);
+			if (debug)
+			{
+				DebugLink link = DebugLink.getInstance();
+				link.newThread(CPUValue.vCPU);
+			}
 
 			for (INStatement statement: test)
 			{
