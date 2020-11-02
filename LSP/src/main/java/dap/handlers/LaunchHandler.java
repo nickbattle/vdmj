@@ -29,6 +29,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServerState;
 import json.JSONObject;
+import workspace.DAPWorkspaceManager;
 
 public class LaunchHandler extends DAPHandler
 {
@@ -52,7 +53,7 @@ public class LaunchHandler extends DAPHandler
 				noDebug = Boolean.FALSE;
 			}
 
-			return dapServerState.getManager().launch(request, noDebug, defaultName, command);
+			return DAPWorkspaceManager.getInstance().launch(request, noDebug, defaultName, command);
 		}
 		catch (Exception e)
 		{

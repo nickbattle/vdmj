@@ -27,63 +27,27 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-
 import org.junit.Test;
 
 import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONArray;
 import json.JSONObject;
-import json.JSONWriter;
 import lsp.lspx.POGHandler;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import workspace.WorkspaceManager;
 
-public class POGTest
+public class POGTest extends LSPTest
 {
-	private WorkspaceManager manager = null;
-	private LSPServerState state = null;
+	private JSONObject capabilities = new JSONObject(
+			"experimental", new JSONObject("proofObligationGeneration", true));
 
-	private void setupWorkspace(Dialect dialect) throws IOException
-	{
-		WorkspaceManager.reset();
-		manager = WorkspaceManager.createInstance(dialect);
-		state = new LSPServerState();
-		state.setManager(manager);
-	}
-	
-	private RPCMessageList initialize(File root) throws Exception
-	{
-		JSONObject params = new JSONObject(
-				"rootUri",		root.toURI().toString(),
-				"capabilities",	new JSONObject(
-					"experimental", new JSONObject(
-						"proofObligationGeneration", true)));
-		
-		RPCMessageList result = manager.lspInitialize(new RPCRequest(0L, "initialize", params));
-		assertEquals("init result", (Object)null, result.get(0).get("error"));		
-		
-		return manager.afterChangeWatchedFiles(null);	// Cause parse and typecheck
-	}
-	
-	private void dump(JSONObject obj) throws IOException
-	{
-		PrintWriter pw = new PrintWriter(System.out);
-		JSONWriter writer = new JSONWriter(pw);
-		writer.writeObject(obj);
-		pw.println();
-		writer.flush();
-	}
-	
 	@Test
 	public void testSL() throws Exception
 	{
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/pogtest_sl");
-		RPCMessageList notify = initialize(testdir);
+		RPCMessageList notify = initialize(testdir, capabilities);
 		assertEquals(2, notify.size());
 
 		dump(notify.get(0));
@@ -115,7 +79,7 @@ public class POGTest
 	{
 		setupWorkspace(Dialect.VDM_PP);
 		File testdir = new File("src/test/resources/pogtest_pp");
-		RPCMessageList notify = initialize(testdir);
+		RPCMessageList notify = initialize(testdir, capabilities);
 		assertEquals(2, notify.size());
 
 		dump(notify.get(0));
@@ -146,7 +110,7 @@ public class POGTest
 	{
 		setupWorkspace(Dialect.VDM_RT);
 		File testdir = new File("src/test/resources/pogtest_rt");
-		RPCMessageList notify = initialize(testdir);
+		RPCMessageList notify = initialize(testdir, capabilities);
 		assertEquals(2, notify.size());
 
 		dump(notify.get(0));
@@ -177,7 +141,7 @@ public class POGTest
 	{
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/pogerrors_sl");
-		RPCMessageList notify = initialize(testdir);
+		RPCMessageList notify = initialize(testdir, capabilities);
 		assertEquals(2, notify.size());
 
 		dump(notify.get(0));

@@ -27,31 +27,17 @@ import java.io.IOException;
 
 import com.fujitsu.vdmj.lex.Dialect;
 
-import workspace.WorkspaceManager;
+import workspace.DAPWorkspaceManager;
 
 public class DAPServerState
 {
-	private final Dialect dialect;
-	private final WorkspaceManager manager;
 	private boolean running;
 	
 	public DAPServerState(Dialect dialect) throws IOException
 	{
-		this.dialect = dialect;
-		this.manager = WorkspaceManager.createInstance(dialect);
-		manager.setDAPState(this);
+		DAPWorkspaceManager.getInstance().setDAPState(this);
 	}
 	
-	public WorkspaceManager getManager()
-	{
-		return manager;
-	}
-	
-	public Dialect getDialect()
-	{
-		return dialect;
-	}
-
 	public boolean isRunning()
 	{
 		return running;

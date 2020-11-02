@@ -486,9 +486,9 @@ abstract public class Interpreter
 		writer = pw;
 	}
 
-	abstract protected INNamedTraceDefinition findTraceDefinition(TCNameToken name);
+	abstract public INNamedTraceDefinition findTraceDefinition(TCNameToken name);
 
-	abstract protected Context getTraceContext(INClassDefinition classdef) throws ValueException;
+	abstract public Context getTraceContext(INClassDefinition classdef) throws ValueException;
 
 	public void runtrace(String name, int startTest, int endTest, boolean debug)
 		throws Exception
@@ -642,5 +642,9 @@ abstract public class Interpreter
 		return !failed;
 	}
 
-	abstract protected List<Object> runOneTrace(INClassDefinition classDefinition, CallSequence test, boolean debug);
+	public abstract List<Object> runOneTrace(INClassDefinition classDefinition, CallSequence test, boolean debug);
+	
+	abstract public <T extends List<?>> T getTC();
+	abstract public <T extends List<?>> T getIN();
+	abstract public <T extends List<?>> T getPO();
 }

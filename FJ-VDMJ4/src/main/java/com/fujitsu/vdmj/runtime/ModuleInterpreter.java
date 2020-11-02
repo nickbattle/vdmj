@@ -297,7 +297,7 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@Override
-	protected INNamedTraceDefinition findTraceDefinition(TCNameToken name)
+	public INNamedTraceDefinition findTraceDefinition(TCNameToken name)
 	{
 		return executableModules.findTraceDefinition(name);
 	}
@@ -348,7 +348,7 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@Override
-	protected Context getTraceContext(INClassDefinition classdef) throws ValueException
+	public Context getTraceContext(INClassDefinition classdef) throws ValueException
 	{
 		Context mainContext = new StateContext(defaultModule.name.getLocation(),
 				"module scope",	null, defaultModule.getStateContext());
@@ -360,7 +360,7 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@Override
-	protected List<Object> runOneTrace(INClassDefinition classdef, CallSequence test, boolean debug)
+	public List<Object> runOneTrace(INClassDefinition classdef, CallSequence test, boolean debug)
 	{
 		clearBreakpointHits();
 
@@ -372,18 +372,24 @@ public class ModuleInterpreter extends Interpreter
 		return main.getList();
 	}
 
-	public TCModuleList getTC()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends List<?>> T getTC()
 	{
-		return checkedModules;
+		return (T)checkedModules;
 	}
 
-	public INModuleList getIN()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends List<?>> T getIN()
 	{
-		return executableModules;
+		return (T)executableModules;
 	}
 
-	public POModuleList getPO()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends List<?>> T getPO()
 	{
-		return pogModules;
+		return (T)pogModules;
 	}
 }

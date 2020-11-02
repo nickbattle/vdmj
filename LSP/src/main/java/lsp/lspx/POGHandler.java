@@ -34,6 +34,7 @@ import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.LSPXWorkspaceManager;
 import workspace.Log;
 
 public class POGHandler extends LSPHandler
@@ -62,7 +63,7 @@ public class POGHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			File file = Utils.uriToFile(params.get("uri"));
-			return lspServerState.getManager().pogGenerate(request, file);
+			return LSPXWorkspaceManager.getInstance().pogGenerate(request, file);
 		}
 		catch (URISyntaxException e)
 		{

@@ -297,7 +297,7 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@Override
-	protected INNamedTraceDefinition findTraceDefinition(TCNameToken name)
+	public INNamedTraceDefinition findTraceDefinition(TCNameToken name)
 	{
 		INDefinition d = executableClasses.findName(name);
 
@@ -441,7 +441,7 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@Override
-	protected Context getTraceContext(INClassDefinition classdef) throws ValueException
+	public Context getTraceContext(INClassDefinition classdef) throws ValueException
 	{
 		ObjectValue object = null;
 
@@ -457,7 +457,7 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@Override
-	protected List<Object> runOneTrace(INClassDefinition classdef, CallSequence test, boolean debug)
+	public List<Object> runOneTrace(INClassDefinition classdef, CallSequence test, boolean debug)
 	{
 		List<Object> list = new Vector<Object>();
 		Context ctxt = null;
@@ -496,18 +496,24 @@ public class ClassInterpreter extends Interpreter
 		return main.getList();
 	}
 
-	public TCClassList getTC()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends List<?>> T getTC()
 	{
-		return checkedClasses;
+		return (T)checkedClasses;
 	}
 
-	public INClassList getIN()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends List<?>> T getIN()
 	{
-		return executableClasses;
+		return (T)executableClasses;
 	}
 
-	public POClassList getPO()
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends List<?>> T getPO()
 	{
-		return pogClasses;
+		return (T)pogClasses;
 	}
 }

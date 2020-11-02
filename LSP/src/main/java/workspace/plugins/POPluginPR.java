@@ -21,50 +21,45 @@
  *
  ******************************************************************************/
 
-package workspace;
+package workspace.plugins;
 
-import java.io.FilenameFilter;
+import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.definitions.POClassList;
+import com.fujitsu.vdmj.pog.ProofObligationList;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.lex.Dialect;
-
-public class WorkspaceManagerRT extends WorkspaceManagerPP
+public class POPluginPR extends POPlugin
 {
-	public WorkspaceManagerRT()
+	private POClassList poClassList;
+
+	public POPluginPR()
 	{
 		super();
-		Settings.dialect = Dialect.VDM_RT;
-	}
-	
-	@Override
-	protected FilenameFilter getFilenameFilter()
-	{
-		return Dialect.VDM_RT.getFilter();
-	}
-	
-	@Override
-	protected String[] getFilenameFilters()
-	{
-		return new String[] { "**/*.vpp", "**/*.vdmrt" }; 
 	}
 
 	@Override
-	protected ASTClassList extras()
+	public void preCheck()
 	{
-		try
-		{
-			ASTClassList ex = new ASTClassList();
-			ex.add(new ASTCPUClassDefinition());
-			ex.add(new ASTBUSClassDefinition());
-			return ex;
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return null;
-		}
+		poClassList = null;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getPO()
+	{
+		return (T) poClassList;
+	}
+
+	@Override
+	public <T> boolean checkLoadedFiles(T tcList) throws Exception
+	{
+		poClassList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcList);
+		return true;
+	}
+
+	@Override
+	protected ProofObligationList getProofObligations()
+	{
+		return poClassList.getProofObligations();
 	}
 }

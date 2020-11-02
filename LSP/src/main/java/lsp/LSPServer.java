@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
 import json.JSONServer;
+import lsp.lspx.CTHandler;
 import lsp.lspx.POGHandler;
 import lsp.textdocument.CompletionHandler;
 import lsp.textdocument.DefinitionHandler;
@@ -51,8 +52,9 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import vdmj.DAPDebugLink;
+import workspace.LSPWorkspaceManager;
+import workspace.LSPXWorkspaceManager;
 import workspace.Log;
-import workspace.WorkspaceManager;
 
 public class LSPServer extends JSONServer
 {
@@ -70,12 +72,14 @@ public class LSPServer extends JSONServer
 		this.state = new LSPServerState();
 		this.dispatcher = getDispatcher();
 		this.responseHandlers = new HashMap<Long, RPCHandler>();
-		
-		state.setManager(WorkspaceManager.createInstance(dialect));
-		
+
 		// Identify this class as the debug link - See DebugLink
 		System.setProperty("vdmj.debug.link", DAPDebugLink.class.getName());
 		Settings.annotations = true;
+		Settings.dialect = dialect;
+
+		LSPWorkspaceManager.getInstance().setLSPState(state);
+		LSPXWorkspaceManager.getInstance();		// Just set up
 	}
 	
 	public static LSPServer getInstance()
@@ -90,6 +94,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register(new InitializeHandler(state), "initialize", "initialized", "client/registerCapability");
 		dispatcher.register(new ShutdownHandler(state), "shutdown");
 		dispatcher.register(new ExitHandler(state), "exit");
+		dispatcher.register(new CancelHandler(state), "$/cancelRequest");
 
 		dispatcher.register(new DidOpenHandler(state), "textDocument/didOpen");
 		dispatcher.register(new DidCloseHandler(state), "textDocument/didClose");
@@ -104,6 +109,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register(new DidChangeWSHandler(state), "workspace/didChangeWorkspaceFolders");
 
 		dispatcher.register(new POGHandler(state), "lspx/POG/generate");
+		dispatcher.register(new CTHandler(state), "lspx/CT/traces", "lspx/CT/generate", "lspx/CT/execute");
 
 		return dispatcher;
 	}
