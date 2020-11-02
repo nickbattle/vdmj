@@ -192,7 +192,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 					array.add(new JSONObject(
 							"id", testNumber,
 							"verdict", jsonVerdict(Verdict.SKIPPED),
-							"sequence", callString));
+							"sequence", jsonResultPairs(callString, null)));
 				}
 				else
 				{
@@ -205,7 +205,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 					array.add(new JSONObject(
 							"id", testNumber,
 							"verdict", getVerdict(result),
-							"sequence", callString));
+							"sequence", jsonResultPairs(callString, result)));
 				}
 
 				batchSize--;
@@ -241,6 +241,22 @@ abstract public class CTPlugin extends AnalysisPlugin
 
 			default: throw new Exception("Unknown verdict: " + v);
 		}
+	}
+	
+	private JSONArray jsonResultPairs(String callSeq, List<Object> results)
+	{
+		JSONArray array = new JSONArray();
+		String[] calls = callSeq.split(";\\s+");
+		
+		for (int i=0; i<calls.length; i++)
+		{
+			array.add(new JSONObject("case", calls[i], "result",
+				results == null ? null :
+					i >= results.size() ? null :
+						results.get(i).toString()));
+		}
+		
+		return array;
 	}
 	
 	private class TraceExecutor extends Thread
