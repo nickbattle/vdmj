@@ -257,39 +257,6 @@ abstract public class LSPXWorkspaceManager
 		}
 	}
 	
-	/**
-	 * This is useful in unit tests to wait for the TraceExecution thread to complete
-	 * before doing more tests.
-	 */
-	public void waitForTraceComplete()
-	{
-		try
-		{
-			CTPlugin ct = registry.getPlugin("CT");
-
-			while(!ct.completed())
-			{
-				pause(100);
-			}
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-		}
-	}
-	
-	private void pause(int millis)
-	{
-		try
-		{
-			Thread.sleep(millis);
-		}
-		catch (InterruptedException e)
-		{
-			// Ignore
-		}
-	}
-
 	private TCNameToken stringToName(String name) throws Exception
 	{
 		LexTokenReader ltr = new LexTokenReader(name, Dialect.VDM_SL);
