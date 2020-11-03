@@ -167,7 +167,7 @@ public class TCGetDefinitionsVisitor extends TCLeafPatternVisitor<TCDefinition, 
 
 		TCRecordType pattype = node.type.getRecord();
 
-		if (!arg.ptype.isType(pattype.getClass(), pattype.location))
+		if (!TypeComparator.compatible(pattype, arg.ptype))
 		{
 			TypeChecker.report(3201, "Matching expression is not a compatible record type", node.location);
 			TypeChecker.detail2("Pattern type", node.type, "Expression type", arg.ptype);
