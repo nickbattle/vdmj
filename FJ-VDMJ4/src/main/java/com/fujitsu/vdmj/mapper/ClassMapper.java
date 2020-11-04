@@ -187,8 +187,8 @@ public class ClassMapper
 	 */
 	private void readMappings() throws Exception
 	{
-		Enumeration<URL> urls = ClassLoader.getSystemResources(configFile);
-		
+		Enumeration<URL> urls = this.getClass().getClassLoader().getResources(configFile);
+
 		while (urls.hasMoreElements())
 		{
 			URL url = urls.nextElement();
