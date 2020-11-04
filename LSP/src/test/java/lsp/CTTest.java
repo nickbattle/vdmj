@@ -113,7 +113,7 @@ public class CTTest extends LSPTest
 
 		request = new RPCRequest(123L, "lspx/CT/execute", new JSONObject(
 				"name",					"A`TA",
-				"range",				new JSONObject("start", 5, "end", 25),
+				"range",				new JSONObject("start", 5, "end", 10),
 				"partialResultToken",	999));
 		
 		response = handler.request(request);

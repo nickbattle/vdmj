@@ -196,7 +196,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 			
 			try
 			{
-				while (traceIterator.hasMoreTests())
+				while (traceIterator.hasMoreTests() && testNumber < endTest)
 				{
 					JSONArray batch = runBatch(BATCH_SIZE, endTest);
 					
