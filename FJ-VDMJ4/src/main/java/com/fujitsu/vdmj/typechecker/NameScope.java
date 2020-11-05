@@ -48,6 +48,7 @@ public enum NameScope implements Serializable
 
 	NAMES(3),
 	NAMESANDSTATE(7),
+	NAMESSTATETYPES(23),
 	NAMESANDANYSTATE(15),
 	VARSANDSTATE(68),
 	VARSANDNAMES(67);
