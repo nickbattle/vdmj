@@ -1,16 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.fujitsu</groupId>
 	<artifactId>vdmjc</artifactId>
 	<name>The VDMJC Client</name>
 	<version>4.0.0</version>
-
-	<properties>
-		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
-	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
-
+	
+	<parent>
+		<groupId>com.fujitsu</groupId>
+		<artifactId>vdmj-suite</artifactId>
+		<version>4</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 
 	<developers>
 		<developer>
