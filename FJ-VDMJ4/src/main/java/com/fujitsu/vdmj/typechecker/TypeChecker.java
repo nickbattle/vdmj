@@ -109,7 +109,7 @@ abstract public class TypeChecker
 
     					for (TCNameToken freevar: freevars)
     					{
-    						TCDefinition fdef = globals.findName(freevar, NameScope.NAMESSTATETYPES);
+    						TCDefinition fdef = globals.findName(freevar, NameScope.ANYTHING);
     						
     						if (fdef != null && fdef.name != null &&
     							name.getLocation().isLater(fdef.name.getLocation()))
