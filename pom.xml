@@ -7,6 +7,7 @@
 
 	<groupId>com.fujitsu</groupId>
 	<artifactId>vdmj-suite</artifactId>
+	<name>VDMJ Suite</name>
 	<packaging>pom</packaging>
 	<version>4</version>
 	
