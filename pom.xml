@@ -54,8 +54,8 @@
 	</distributionManagement>
 
 	<scm>
-		<connection>scm:git:https://github.com/nickbattle/vdmj.git</connection>
-		<developerConnection>scm:git:https://github.com/nickbattle/vdmj.git</developerConnection>
+		<connection>scm:git:https://github.com/nickbattle</connection>
+		<developerConnection>scm:git:https://github.com/nickbattle</developerConnection>
 	</scm>
 
 </project>
