@@ -1,0 +1,12 @@
+<servers>
+	<server>
+		<id>vdmj.overture.au.dk-central</id>
+		<username>into-cps</username>
+		<password>7skaCI25fT7E</password>
+	</server>
+	<server>
+		<id>vdmj.overture.au.dk-snapshots</id>
+		<username>into-cps</username>
+		<password>7skaCI25fT7E</password>
+	</server>
+</servers> 
