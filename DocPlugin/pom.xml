@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>com.fujitsu</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4</version>
+		<version>4.3.0</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -23,7 +23,7 @@
 		<dependency>
 			<groupId>com.fujitsu</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>${vdmj.version}</version>
+			<version>${revision}</version>
 		</dependency>
 	</dependencies>
 

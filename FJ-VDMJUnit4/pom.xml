@@ -3,12 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>vdmjunit</artifactId>
 	<name>VDMJUnit</name>
-	<version>4.0.0</version>
 	
 	<parent>
 		<groupId>com.fujitsu</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4</version>
+		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -34,7 +33,7 @@
 		<dependency>
 			<groupId>com.fujitsu</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>${vdmj.version}</version>
+			<version>${revision}</version>
 		</dependency>
 	</dependencies>
 
