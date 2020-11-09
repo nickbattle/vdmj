@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.in.expressions.INApplyExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INNewExpression;
+import com.fujitsu.vdmj.in.expressions.INVariableExpression;
 import com.fujitsu.vdmj.in.statements.INCallObjectStatement;
 import com.fujitsu.vdmj.in.statements.INCallStatement;
 import com.fujitsu.vdmj.in.statements.INStatement;
@@ -39,6 +40,8 @@ import com.fujitsu.vdmj.runtime.Context;
 @SuppressWarnings("serial")
 public class CallSequence extends Vector<INStatement>
 {
+	private static final int MAXARGLEN = 50;	// Limits arg expansion
+
 	public String getCallString(Context context)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -81,17 +84,50 @@ public class CallSequence extends Vector<INStatement>
 		sb.append("(");
 		String comma = "";
 
-		for (INExpression e: args)
+		for (INExpression argExp: args)
 		{
 			sb.append(comma);
+			String argStr = null;
 			
-			if (e instanceof INApplyExpression || e instanceof INNewExpression)
+			if (argExp instanceof INVariableExpression)
 			{
-				sb.append(e.toString());	// Don't actually execute these things!
+				INVariableExpression var = (INVariableExpression)argExp;
+				argStr = var.name.getName();	// Remove module/class
 			}
 			else
 			{
-				sb.append(e.eval(ctxt));
+				argStr = argExp.toString();
+			}
+			
+			if (argExp instanceof INApplyExpression || argExp instanceof INNewExpression)
+			{
+				sb.append(argStr);	// Don't even try to execute these things!
+			}
+			else
+			{
+				try
+				{
+					String evalStr = argExp.eval(ctxt).toString();
+					
+					if (evalStr.length() > MAXARGLEN)
+					{
+						sb.append(argStr);	// Value is just too long (eg. large maps)
+					}
+					else
+					{
+						sb.append(evalStr);
+					}
+				}
+				catch (Exception ex)
+				{
+					// If the value includes mk_R() expressions, we may not be able to resolve the type,
+					// either because the type R is not explicit (like mk_M`R) or because the type may
+					// have been exported from its module as a "struct" and so mk_R(x) is not legal.
+					// Note that a RecordValue's toString does not explicitly expand the module name.
+					// So we exclude anything with mk_R expressions too...
+
+					sb.append(argStr);	// Something failed while trying to evaluate the arg
+				}
 			}
 			
 			comma = ", ";
