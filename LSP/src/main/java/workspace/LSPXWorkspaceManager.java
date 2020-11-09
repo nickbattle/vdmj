@@ -145,11 +145,7 @@ abstract public class LSPXWorkspaceManager
 			
 			CTPlugin ct = registry.getPlugin("CT");
 			INPlugin in = registry.getPlugin("IN");
-	
-			if (ct.getCT() == null)
-			{
-				ct.checkLoadedFiles(in.getIN());
-			}
+			ct.checkLoadedFiles(in.getIN());
 			
 			Map<String, TCNameList> nameMap = ct.getTraceNames();
 			JSONArray results = new JSONArray();
@@ -196,11 +192,7 @@ abstract public class LSPXWorkspaceManager
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
 			}
 	
-			if (ct.getCT() == null)
-			{
-				ct.checkLoadedFiles(in.getIN());
-			}
-			
+			ct.checkLoadedFiles(in.getIN());
 			TCNameToken tracename = stringToName(name);
 			int count = ct.generate(tracename);
 			return new RPCMessageList(request, new JSONObject("numberOfTests", count));

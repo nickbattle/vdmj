@@ -2,13 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>vdmj</artifactId>
-	<version>4.3.0-P-SNAPSHOT</version>
 	<name>VDMJ</name>
 	
 	<parent>
 		<groupId>com.fujitsu</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4</version>
+		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 

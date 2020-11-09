@@ -2,16 +2,14 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>vdmj</groupId>
 	<artifactId>lsp</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>LSP</name>
 	<description>VDMJ LSP Server</description>
 	
 	<parent>
 		<groupId>com.fujitsu</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4</version>
+		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -36,7 +34,7 @@
 		<dependency>
 			<groupId>com.fujitsu</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>${vdmj.version}</version>
+			<version>${revision}</version>
 		</dependency>
 	</dependencies>
 

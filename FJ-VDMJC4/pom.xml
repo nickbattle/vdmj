@@ -3,12 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>vdmjc</artifactId>
 	<name>The VDMJC Client</name>
-	<version>4.0.0</version>
 	
 	<parent>
 		<groupId>com.fujitsu</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4</version>
+		<version>${revision}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 

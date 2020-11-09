@@ -271,6 +271,8 @@ abstract public class CTPlugin extends AnalysisPlugin
 		{
 			Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
 			JSONArray array = new JSONArray();
+			
+			Log.printf("Starting batch at test number %d...", testNumber);
 		
 			while (traceIterator.hasMoreTests() && batchSize > 0 && testNumber <= endTest)
 			{
@@ -286,8 +288,6 @@ abstract public class CTPlugin extends AnalysisPlugin
 					
 					if (traceFilter.getFilteredBy(test) > 0)
 					{
-		    			Log.printf("Test " + testNumber + " = " + callString);
-						Log.printf("Test " + testNumber + " FILTERED by test " + traceFilter.getFilteredBy(test));
 						array.add(new JSONObject(
 								"id", testNumber,
 								"verdict", jsonVerdict(Verdict.SKIPPED),
@@ -299,8 +299,6 @@ abstract public class CTPlugin extends AnalysisPlugin
 		    			List<Object> result = interpreter.runOneTrace(traceClassDef, test, false);
 		    			traceFilter.update(result, test, testNumber);
 		
-		    			Log.printf("Test " + testNumber + " = " + callString);
-		    			Log.printf("Result = " + result);
 						array.add(new JSONObject(
 								"id", testNumber,
 								"verdict", getVerdict(result),
@@ -313,6 +311,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 				testNumber++;
 			}
 			
+			Log.printf("Completed batch at test number %d", testNumber);
 			return array;
 		}
 
