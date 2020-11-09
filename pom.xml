@@ -15,6 +15,7 @@
 		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	    <vdmj.version>4.3.0-SNAPSHOT</vdmj.version>
+		<maven.deploy.skip>true</maven.deploy.skip>
 	</properties>
 
 	<!-- sub modules -->
