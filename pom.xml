@@ -12,9 +12,9 @@
 	<version>${revision}</version>	<!-- This version is used for all modules -->
 	
 	<properties>
-		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
+	    <maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	    <revision>4.3.0-P</revision>	<!-- CHANGE VERSION HERE -->
+	    <revision>4.3.0-P</revision>	<!-- CHANGE VERSION HERE, AND MODULE'S PARENT POMs -->
 	</properties>
 
 	<!-- sub modules -->
