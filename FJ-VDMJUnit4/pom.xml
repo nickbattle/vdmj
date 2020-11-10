@@ -81,6 +81,7 @@
 					<finalName>
 						${project.artifactId}-${project.version}-${maven.build.timestamp}
 					</finalName>
+					<source>8</source>
 				</configuration>
 			</plugin>
 		</plugins>
