@@ -47,7 +47,7 @@ map TCExpression{} to INExpression();
 map TCExpressionList{} to INExpressionList(this);
 map TCAbsoluteExpression{location, exp} to INAbsoluteExpression(location, exp);
 map TCAndExpression{left, op, right} to INAndExpression(left, op, right);
-map TCApplyExpression{root, args} to INApplyExpression(root, args);
+map TCApplyExpression{root, args, type} to INApplyExpression(root, args, type);
 map TCBinaryExpression{} to INBinaryExpression();
 map TCBooleanBinaryExpression{} to INBooleanBinaryExpression();
 map TCBooleanLiteralExpression{value} to INBooleanLiteralExpression(value);
