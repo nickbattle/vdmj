@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCStringLiteralExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
@@ -75,18 +76,31 @@ public class TCOnFailAnnotation extends TCAnnotation
 	{
 		if (args.isEmpty())
 		{
-			name.report(6008, "@OnFail must start with a string argument");
+			name.report(6008, "@OnFail([errno,] \"format\", args...)");
 		}
 		else
 		{
-			if (args.get(0) instanceof TCStringLiteralExpression)
+			if (args.get(0) instanceof TCStringLiteralExpression ||
+				args.get(0) instanceof TCIntegerLiteralExpression &&
+				args.size() > 1 &&
+				args.get(1) instanceof TCStringLiteralExpression)
 			{
 				for (TCExpression arg: args)
 				{
 					arg.typeCheck(env, null, scope, null);	// Just checks scope
 				}
 				
-				TCStringLiteralExpression str = (TCStringLiteralExpression)args.get(0);
+				TCStringLiteralExpression str = null;
+				
+				if (args.get(0) instanceof TCStringLiteralExpression)
+				{
+					str = (TCStringLiteralExpression)args.get(0);
+				}
+				else
+				{
+					str = (TCStringLiteralExpression)args.get(1);
+				}
+				
 				String format = str.value.value;
 				
 				try
@@ -98,12 +112,12 @@ public class TCOnFailAnnotation extends TCAnnotation
 				}
 				catch (IllegalArgumentException e)
 				{
-					name.report(6008, "@OnFail must use %[arg$][width]s conversions");
+					name.report(6008, "@OnFail must only use %[arg$][width]s conversions");
 				}
 			}
 			else
 			{
-				name.report(6008, "@OnFail must start with a string argument");
+				name.report(6008, "@OnFail([errno,] \"format\", args...)");
 			}
 		}
 	}

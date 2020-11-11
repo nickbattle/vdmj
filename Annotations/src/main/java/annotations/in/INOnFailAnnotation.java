@@ -26,6 +26,7 @@ package annotations.in;
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.expressions.INIntegerLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INStringLiteralExpression;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
@@ -47,24 +48,34 @@ public class INOnFailAnnotation extends INAnnotation
 		{
 			if (!rv.boolValue(ctxt))	// ONLY if we fail!
 			{
-				Object[] values = new Value[args.size() - 1];
+				String errno = "";
+				int offset = 1;			// By default, args(1) is the 1st
 				
-				for (int p=1; p < args.size(); p++)
+				if (args.get(0) instanceof INIntegerLiteralExpression)
 				{
-					values[p-1] = args.get(p).eval(ctxt);
+					INIntegerLiteralExpression num = (INIntegerLiteralExpression)args.get(0);
+					errno = String.format("%04d: ", num.value.value);
+					offset = 2;
 				}
 				
-				INStringLiteralExpression fmt = (INStringLiteralExpression)args.get(0);
-				String fmts = fmt.value.value;
+				Object[] values = new Value[args.size() - offset];
+				
+				for (int p = offset; p < args.size(); p++)
+				{
+					values[p - offset] = args.get(p).eval(ctxt);
+				}
+				
+				INStringLiteralExpression fmt = (INStringLiteralExpression)args.get(offset - 1);
+				String format = fmt.value.value;
 				String location = "";
 				
-				if (fmts.endsWith("$"))
+				if (format.endsWith("$"))	// Add @OnFail location to output
 				{
 					 location = name.getLocation().toString();
-					 fmts = fmts.substring(0, fmts.length() - 1);
+					 format = format.substring(0, format.length() - 1);
 				}
 							
-				Console.out.printf(fmts + location + "\n", values);
+				Console.out.printf(errno + format + location + "\n", values);
 			}
 		}
 		catch (ValueException e)
