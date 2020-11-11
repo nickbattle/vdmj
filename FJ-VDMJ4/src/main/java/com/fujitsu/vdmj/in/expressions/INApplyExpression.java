@@ -26,6 +26,9 @@ package com.fujitsu.vdmj.in.expressions;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
+import com.fujitsu.vdmj.tc.types.TCMapType;
+import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.MapValue;
@@ -40,19 +43,14 @@ public class INApplyExpression extends INExpression
 
 	public final INExpression root;
 	public final INExpressionList args;
+	public final TCType type;
 
-	public INApplyExpression(INExpression root)
-	{
-		super(root);
-		this.root = root;
-		this.args = new INExpressionList();	// ie. "()"
-	}
-
-	public INApplyExpression(INExpression root, INExpressionList args)
+	public INApplyExpression(INExpression root, INExpressionList args, TCType type)
 	{
 		super(root);
 		this.root = root;
 		this.args = args;
+		this.type = type;
 	}
 
 	@Override
@@ -112,13 +110,14 @@ public class INApplyExpression extends INExpression
     		}
 			else if (object instanceof SeqValue)
     		{
-    			Value arg = args.get(0).eval(ctxt);
+    			Value arg = args.get(0).eval(ctxt).convertTo(new TCNaturalOneType(location), ctxt);
     			SeqValue sv = (SeqValue)object;
     			return sv.get(arg, ctxt);
     		}
 			else if (object instanceof MapValue)
     		{
-    			Value arg = args.get(0).eval(ctxt);
+				TCMapType mtype = type.getMap();
+    			Value arg = args.get(0).eval(ctxt).convertTo(mtype.from, ctxt);
     			MapValue mv = (MapValue)object;
     			return mv.lookup(arg, ctxt);
     		}
