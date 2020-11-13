@@ -357,11 +357,10 @@ public abstract class LSPWorkspaceManager
 					new JSONObject("successful", tc.getErrs().isEmpty())));
 		}
 		
-		if (hasClientCapability("experimental.combinatorialTest"))
+		if (hasClientCapability("experimental.combinatorialTesting"))
 		{
 			CTPlugin ct = registry.getPlugin("CT");
 			ct.preCheck();
-			// No notification? Rest of processing done on CT method calls
 		}
 		
 		Log.printf("Checked loaded files.");

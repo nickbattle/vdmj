@@ -44,15 +44,11 @@ import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
-import rpc.RPCErrors;
-import rpc.RPCMessageList;
-import rpc.RPCRequest;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
-import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
 
 public class DAPWorkspaceManager
@@ -165,6 +161,7 @@ public class DAPWorkspaceManager
 		}
 		catch (Exception e)
 		{
+			Log.error(e);
 			return new DAPMessageList(request, e);
 		}
 		finally
@@ -429,38 +426,6 @@ public class DAPWorkspaceManager
 			}
 			
 			interpreter = null;
-		}
-	}
-
-	/**
-	 * LSPX extensions...
-	 */
-
-	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range)
-	{
-		TCPlugin tc = registry.getPlugin("TC");
-		
-		if (!tc.getErrs().isEmpty())	// No type clean tree
-		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
-		}
-		
-		try
-		{
-			POPlugin po = registry.getPlugin("PO");
-	
-			if (po.getPO() == null)
-			{
-				po.checkLoadedFiles(tc.getTC());
-			}
-			
-			JSONArray results = po.getObligations(file);
-			return new RPCMessageList(request, results);
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
 }
