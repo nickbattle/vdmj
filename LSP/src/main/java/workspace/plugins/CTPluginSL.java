@@ -39,6 +39,7 @@ public class CTPluginSL extends CTPlugin
 	@Override
 	public void preCheck()
 	{
+		super.preCheck();
 		inModuleList = null;
 	}
 
