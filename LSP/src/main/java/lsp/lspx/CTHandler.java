@@ -104,10 +104,11 @@ public class CTHandler extends LSPHandler
 		try
 		{
 			JSONObject params = request.get("params");
-			String name = params.get("name");
+			String tracename = params.get("name");
 			JSONArray filter = params.get("filter");
 			JSONObject range = params.get("range");
-			Object token = params.get("partialResultToken");
+			Object partialResultToken = params.get("partialResultToken");
+			Object workDoneToken = params.get("workDoneToken");
 			
 			TraceReductionType rType = TraceReductionType.NONE;
 			float subset = 1.0F;
@@ -150,7 +151,8 @@ public class CTHandler extends LSPHandler
 				end = range.get("end");
 			}
 			
-			return LSPXWorkspaceManager.getInstance().ctExecute(request, name, token, rType, subset, seed, start, end);
+			return LSPXWorkspaceManager.getInstance().ctExecute(request, tracename,
+					partialResultToken, workDoneToken, rType, subset, seed, start, end);
 		}
 		catch (Exception e)
 		{

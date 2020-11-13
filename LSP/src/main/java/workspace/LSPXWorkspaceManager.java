@@ -27,11 +27,6 @@ import java.io.File;
 import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.lex.LexNameToken;
-import com.fujitsu.vdmj.ast.lex.LexToken;
-import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.lex.LexTokenReader;
-import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.traces.TraceReductionType;
@@ -193,7 +188,7 @@ abstract public class LSPXWorkspaceManager
 			}
 	
 			ct.checkLoadedFiles(in.getIN());
-			TCNameToken tracename = stringToName(name);
+			TCNameToken tracename = Utils.stringToName(name);
 			int count = ct.generate(tracename);
 			return new RPCMessageList(request, new JSONObject("numberOfTests", count));
 		}
@@ -210,7 +205,8 @@ abstract public class LSPXWorkspaceManager
 	}
 
 	public RPCMessageList ctExecute(RPCRequest request, String name,
-			Object progressToken, TraceReductionType rType, float subset, long seed, long start, long end)
+			Object progressToken, Object workDoneToken,
+			TraceReductionType rType, float subset, long seed, long start, long end)
 	{
 		try
 		{
@@ -234,7 +230,8 @@ abstract public class LSPXWorkspaceManager
 			}
 
 			ct.setFilter(rType, subset, seed);
-			JSONArray batch = ct.execute(request, progressToken, start, end);
+			TCNameToken tracename = Utils.stringToName(name);
+			JSONArray batch = ct.execute(request, tracename, progressToken, workDoneToken, start, end);
 			
 			if (batch == null)	// Running in background
 			{
@@ -254,22 +251,6 @@ abstract public class LSPXWorkspaceManager
 		{
 			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
-	}
-	
-	private TCNameToken stringToName(String name) throws Exception
-	{
-		LexTokenReader ltr = new LexTokenReader(name, Dialect.VDM_SL);
-		LexToken token = ltr.nextToken();
-		ltr.close();
-
-		if (token.is(Token.NAME))
-		{
-			return new TCNameToken((LexNameToken) token);
-		}
-		else
-		{
-			throw new Exception("Name is not fully qualified: " + name);
 		}
 	}
 }
