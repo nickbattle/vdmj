@@ -117,8 +117,16 @@ abstract public class CTPlugin extends AnalysisPlugin
 		traceFilter = new TraceFilter(traceCount, subset, rType, seed);
 	}
 
-	public JSONArray execute(RPCRequest request, Object token, long startTest, long endTest) throws Exception
+	public JSONArray execute(RPCRequest request, TCNameToken tracename,
+			Object progressToken, Object workDoneToken,
+			long startTest, long endTest) throws Exception
 	{
+		if (!tracename.equals(traceName))
+		{
+			Log.printf("Pre-generating new tracename %s", tracename);
+			generate(tracename);
+		}
+		
 		if (endTest > traceCount)
 		{
 			throw new Exception("Trace " + traceName + " only has " + traceCount + " tests");
@@ -129,7 +137,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 			endTest = traceCount;
 		}
 		
-		if (startTest == 0)
+		if (startTest == 0)			// From the start, if specified as zero
 		{
 			startTest = 1;
 		}
@@ -145,12 +153,12 @@ abstract public class CTPlugin extends AnalysisPlugin
 
 		for (int i=1; i < startTest && traceIterator.hasMoreTests(); i++)
 		{
-			traceIterator.getNextTest();	// Skip first N tests
+			traceIterator.getNextTest();	// Skip first N-1 tests
 		}
 		
 		if (traceIterator.hasMoreTests())
 		{
-			traceExecutor = new TraceExecutor(request, token, endTest);
+			traceExecutor = new TraceExecutor(request, progressToken, endTest);
 			traceExecutor.start();
 			return null;
 		}
@@ -159,6 +167,28 @@ abstract public class CTPlugin extends AnalysisPlugin
 			completed = true;
 			return new JSONArray();		// Empty result
 		}
+	}
+	
+	public JSONObject runtrace(TCNameToken tracename, long testNumber) throws Exception
+	{
+		traceIterator.reset();
+
+		for (int i=1; i < testNumber && traceIterator.hasMoreTests(); i++)
+		{
+			traceIterator.getNextTest();	// Skip first N-1 tests
+		}
+
+		CallSequence test = traceIterator.getNextTest();
+		String callString = test.getCallString(traceContext);
+		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+
+		interpreter.init();
+		List<Object> result = interpreter.runOneTrace(traceClassDef, test, false);
+
+		return new JSONObject(
+				"id", testNumber,
+				"verdict", getVerdict(result),
+				"sequence", jsonResultPairs(callString, result));
 	}
 	
 	public synchronized boolean completed()
@@ -314,47 +344,47 @@ abstract public class CTPlugin extends AnalysisPlugin
 			Log.printf("Completed batch at test number %d", testNumber);
 			return array;
 		}
+	}
 
-		private int getVerdict(List<Object> result) throws Exception
+	private int getVerdict(List<Object> result) throws Exception
+	{
+		for (int i = result.size()-1; i > 0; i--)
 		{
-			for (int i = result.size()-1; i > 0; i--)
+			if (result.get(i) instanceof Verdict)
 			{
-				if (result.get(i) instanceof Verdict)
-				{
-					return jsonVerdict((Verdict)result.get(i));
-				}
+				return jsonVerdict((Verdict)result.get(i));
 			}
-			
-			throw new Exception("No verdict returned?");
 		}
-
-		private int jsonVerdict(Verdict v) throws Exception
-		{
-			switch (v)
-			{
-				case PASSED:		return 1;
-				case FAILED:		return 2;
-				case INCONCLUSIVE:	return 3;
-				case SKIPPED:		return 4;
 		
-				default: throw new Exception("Unknown verdict: " + v);
-			}
-		}
+		throw new Exception("No verdict returned?");
+	}
 
-		private JSONArray jsonResultPairs(String callSeq, List<Object> results)
+	private int jsonVerdict(Verdict v) throws Exception
+	{
+		switch (v)
 		{
-			JSONArray array = new JSONArray();
-			String[] calls = callSeq.split(";\\s+");
-			
-			for (int i=0; i<calls.length; i++)
-			{
-				array.add(new JSONObject("case", calls[i], "result",
-					results == null ? null :
-						i >= results.size() ? null :
-							results.get(i).toString()));
-			}
-			
-			return array;
+			case PASSED:		return 1;
+			case FAILED:		return 2;
+			case INCONCLUSIVE:	return 3;
+			case SKIPPED:		return 4;
+	
+			default: throw new Exception("Unknown verdict: " + v);
 		}
+	}
+
+	private JSONArray jsonResultPairs(String callSeq, List<Object> results)
+	{
+		JSONArray array = new JSONArray();
+		String[] calls = callSeq.split(";\\s+");
+		
+		for (int i=0; i<calls.length; i++)
+		{
+			array.add(new JSONObject("case", calls[i], "result",
+				results == null ? null :
+					i >= results.size() ? null :
+						results.get(i).toString()));
+		}
+		
+		return array;
 	}
 }

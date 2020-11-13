@@ -64,7 +64,7 @@ public class LSPInitializeResponse extends JSONObject
 		cap.put("experimental",
 				new JSONObject(
 					"proofObligationProvider", true,
-					"combinatorialTestProvider", true));
+					"combinatorialTestProvider", new JSONObject("workDoneProgress", true)));
 
 		return cap;
 	}

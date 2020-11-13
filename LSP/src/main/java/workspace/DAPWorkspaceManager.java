@@ -43,12 +43,14 @@ import dap.DAPServerState;
 import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
+import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
+import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
 import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
@@ -198,6 +200,30 @@ public class DAPWorkspaceManager
 			Log.error(e);
 			return new DAPMessageList(request, e);
 		}
+	}
+
+	public JSONObject ctRuntrace(DAPRequest request, String name, long testNumber) throws Exception
+	{
+		TCPlugin tc = registry.getPlugin("TC");
+		
+		if (!tc.getErrs().isEmpty())
+		{
+			throw new Exception("Type checking errors found");
+		}
+		
+		CTPlugin ct = registry.getPlugin("CT");
+		
+		if (!ct.generated())
+		{
+			throw new Exception("Trace not generated");
+		}
+
+		if (!ct.completed())
+		{
+			throw new Exception("Trace still running");
+		}
+
+		return ct.runtrace(Utils.stringToName(name), testNumber);
 	}
 
 	public Interpreter getInterpreter()

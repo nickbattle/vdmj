@@ -28,7 +28,13 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.LexTokenReader;
+import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONObject;
 import workspace.Log;
@@ -85,6 +91,22 @@ public class Utils
 	{
 		LexLocation rangeLoc = rangeToLexLocation(file, range);
 		return location.within(rangeLoc);
+	}
+
+	public static TCNameToken stringToName(String name) throws Exception
+	{
+		LexTokenReader ltr = new LexTokenReader(name, Dialect.VDM_SL);
+		LexToken token = ltr.nextToken();
+		ltr.close();
+
+		if (token.is(Token.NAME))
+		{
+			return new TCNameToken((LexNameToken) token);
+		}
+		else
+		{
+			throw new Exception("Name is not fully qualified: " + name);
+		}
 	}
 
 	public static File uriToFile(String s) throws URISyntaxException, IOException
