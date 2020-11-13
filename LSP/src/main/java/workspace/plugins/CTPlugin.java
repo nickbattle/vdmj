@@ -82,7 +82,18 @@ abstract public class CTPlugin extends AnalysisPlugin
 
 	public void preCheck()
 	{
-		DAPWorkspaceManager.reset();	// clear interpreter
+		if (traceExecutor != null && !completed)
+		{
+			try
+			{
+				traceExecutor.setCancelled();
+				traceExecutor.join();
+			}
+			catch (InterruptedException e)
+			{
+				// Ignore
+			}
+		}
 	}
 
 	abstract public <T> boolean checkLoadedFiles(T inList) throws Exception;
@@ -322,6 +333,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 			finally
 			{
 				completed = true;
+				traceExecutor = null;
 			}
 		}
 		

@@ -47,6 +47,7 @@ import lsp.Utils;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
+import workspace.plugins.ASTPlugin;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
 import workspace.plugins.TCPlugin;
@@ -245,7 +246,10 @@ public class DAPWorkspaceManager
 
 	private boolean canExecute()
 	{
-		return getInterpreter() != null;
+		ASTPlugin ast = registry.getPlugin("AST");
+		TCPlugin tc = registry.getPlugin("TC");
+		
+		return ast.getErrs().isEmpty() && tc.getErrs().isEmpty();
 	}
 	
 	private boolean hasChanged()
