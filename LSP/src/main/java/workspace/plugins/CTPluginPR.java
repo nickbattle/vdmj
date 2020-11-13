@@ -40,6 +40,7 @@ public class CTPluginPR extends CTPlugin
 	public void preCheck()
 	{
 		inClassList = null;
+		super.preCheck();
 	}
 
 	@Override

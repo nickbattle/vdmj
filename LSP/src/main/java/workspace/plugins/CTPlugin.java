@@ -80,7 +80,10 @@ abstract public class CTPlugin extends AnalysisPlugin
 	{
 	}
 
-	abstract public void preCheck();
+	public void preCheck()
+	{
+		DAPWorkspaceManager.reset();	// clear interpreter
+	}
 
 	abstract public <T> boolean checkLoadedFiles(T inList) throws Exception;
 
@@ -158,7 +161,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		
 		if (traceIterator.hasMoreTests())
 		{
-			traceExecutor = new TraceExecutor(request, progressToken, endTest);
+			traceExecutor = new TraceExecutor(request, progressToken, workDoneToken, startTest, endTest);
 			traceExecutor.start();
 			return null;
 		}
@@ -205,14 +208,19 @@ abstract public class CTPlugin extends AnalysisPlugin
 	{
 		private final RPCRequest request;
 		private final Object progressToken;
+		private final Object workDoneToken;
+		private final long startTest;
 		private final long endTest;
 		private final JSONArray responses;
 
-		public TraceExecutor(RPCRequest request, Object progressToken, long endTest)
+		public TraceExecutor(RPCRequest request, Object progressToken, Object workDoneToken,
+			long startTest, long endTest)
 		{
 			super(request.get("id"));
 			this.request = request;
 			this.progressToken = progressToken;
+			this.workDoneToken = workDoneToken;
+			this.startTest = startTest;
 			this.endTest = endTest;
 			this.responses = new JSONArray();
 
@@ -223,12 +231,44 @@ abstract public class CTPlugin extends AnalysisPlugin
 		public void body()
 		{
 			LSPServer server = LSPServer.getInstance();
+			long percentDone = -1;	// ie. not started
 			
 			try
 			{
 				while (traceIterator.hasMoreTests() && testNumber < endTest)
 				{
 					JSONArray batch = runBatch(BATCH_SIZE, endTest);
+					
+					if (workDoneToken != null)
+					{
+						long done = (100 * (testNumber - startTest - 1))/(endTest - startTest);
+						
+						if (done != percentDone)	// Only if changed %age
+						{
+							JSONObject value = null;
+							
+							if (percentDone < 0)
+							{
+								value = new JSONObject(
+									"kind",			"begin",
+									"title",		"Executing Combinatorial Tests",
+									"message",		"Processing " + traceName,
+									"percentage",	done);
+							}
+							else
+							{
+								value = new JSONObject(
+									"kind",			"report",
+									"message",		"Processing " + traceName,
+									"percentage",	done);
+							}
+							
+							JSONObject params = new JSONObject("token", workDoneToken, "value", value);
+							Log.printf("Sending work done = %d%%", done);
+							send(server, new RPCRequest("$/progress", params));
+							percentDone = done;
+						}
+					}
 					
 					if (progressToken == null)
 					{
