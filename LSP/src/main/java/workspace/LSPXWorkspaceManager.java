@@ -37,8 +37,8 @@ import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.plugins.ASTPlugin;
 import workspace.plugins.CTPlugin;
-import workspace.plugins.INPlugin;
 import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
 
@@ -111,12 +111,6 @@ abstract public class LSPXWorkspaceManager
 			}
 			
 			POPlugin po = registry.getPlugin("PO");
-	
-			if (po.getPO() == null)
-			{
-				po.checkLoadedFiles(tc.getTC());
-			}
-			
 			JSONArray results = po.getObligations(file);
 			return new RPCMessageList(request, results);
 		}
@@ -131,17 +125,13 @@ abstract public class LSPXWorkspaceManager
 	{
 		try
 		{
-			TCPlugin tc = registry.getPlugin("TC");
-			
-			if (!tc.getErrs().isEmpty())	// No type clean tree
+			if (specHasErrors())
 			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification has errors");
 			}
 			
+			DAPWorkspaceManager.getInstance().refreshInterpreter();
 			CTPlugin ct = registry.getPlugin("CT");
-			INPlugin in = registry.getPlugin("IN");
-			ct.checkLoadedFiles(in.getIN());
-			
 			Map<String, TCNameList> nameMap = ct.getTraceNames();
 			JSONArray results = new JSONArray();
 			
@@ -172,22 +162,19 @@ abstract public class LSPXWorkspaceManager
 	{
 		try
 		{
-			TCPlugin tc = registry.getPlugin("TC");
-			
-			if (!tc.getErrs().isEmpty())	// No type clean tree
+			if (specHasErrors())
 			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification has errors");
 			}
 			
 			CTPlugin ct = registry.getPlugin("CT");
-			INPlugin in = registry.getPlugin("IN");
 			
-			if (!ct.completed())
+			if (ct.isRunning())
 			{
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
 			}
 	
-			ct.checkLoadedFiles(in.getIN());
+			DAPWorkspaceManager.getInstance().refreshInterpreter();
 			TCNameToken tracename = Utils.stringToName(name);
 			int count = ct.generate(tracename);
 			return new RPCMessageList(request, new JSONObject("numberOfTests", count));
@@ -210,25 +197,19 @@ abstract public class LSPXWorkspaceManager
 	{
 		try
 		{
-			TCPlugin tc = registry.getPlugin("TC");
-			
-			if (!tc.getErrs().isEmpty())	// No type clean tree
+			if (specHasErrors())
 			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification has errors");
 			}
 			
 			CTPlugin ct = registry.getPlugin("CT");
 			
-			if (!ct.generated())
-			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace not generated");
-			}
-
-			if (!ct.completed())
+			if (ct.isRunning())
 			{
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
 			}
 
+			DAPWorkspaceManager.getInstance().refreshInterpreter();
 			ct.setFilter(rType, subset, seed);
 			TCNameToken tracename = Utils.stringToName(name);
 			JSONArray batch = ct.execute(request, tracename, progressToken, workDoneToken, start, end);
@@ -252,5 +233,13 @@ abstract public class LSPXWorkspaceManager
 			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
+	}
+	
+	private boolean specHasErrors()
+	{
+		ASTPlugin ast = registry.getPlugin("AST");
+		TCPlugin tc = registry.getPlugin("TC");
+		
+		return !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
 	}
 }

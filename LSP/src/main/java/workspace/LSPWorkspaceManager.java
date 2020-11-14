@@ -307,11 +307,23 @@ public abstract class LSPWorkspaceManager
 		ASTPlugin ast = registry.getPlugin("AST");
 		TCPlugin tc = registry.getPlugin("TC");
 		INPlugin in = registry.getPlugin("IN");
+		POPlugin po = registry.getPlugin("PO");
+		CTPlugin ct = registry.getPlugin("CT");
 		
 		Log.printf("Checking loaded files...");
 		ast.preCheck();
 		tc.preCheck();
 		in.preCheck();
+		
+		if (hasClientCapability("experimental.proofObligationGeneration"))
+		{
+			po.preCheck();
+		}
+		
+		if (hasClientCapability("experimental.combinatorialTesting"))
+		{
+			ct.preCheck();
+		}
 		
 		if (ast.checkLoadedFiles())
 		{
@@ -350,19 +362,17 @@ public abstract class LSPWorkspaceManager
 		
 		if (hasClientCapability("experimental.proofObligationGeneration"))
 		{
-			POPlugin po = registry.getPlugin("PO");
-			po.preCheck();
-	
+			po.checkLoadedFiles(tc.getTC());
+
 			result.add(new RPCRequest("lspx/POG/updated",
 					new JSONObject("successful", tc.getErrs().isEmpty())));
 		}
 		
 		if (hasClientCapability("experimental.combinatorialTesting"))
 		{
-			CTPlugin ct = registry.getPlugin("CT");
-			ct.preCheck();
+			ct.checkLoadedFiles(in.getIN());
 		}
-		
+
 		Log.printf("Checked loaded files.");
 		return result;
 	}

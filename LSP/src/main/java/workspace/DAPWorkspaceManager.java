@@ -173,8 +173,6 @@ public class DAPWorkspaceManager
 
 	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName, String command) throws Exception
 	{
-		LSPWorkspaceManager.getInstance().checkLoadedFiles();
-		
 		if (!canExecute())
 		{
 			DAPMessageList responses = new DAPMessageList();
@@ -202,23 +200,26 @@ public class DAPWorkspaceManager
 
 	public JSONObject ctRuntrace(DAPRequest request, String name, long testNumber) throws Exception
 	{
-		TCPlugin tc = registry.getPlugin("TC");
-		
-		if (!tc.getErrs().isEmpty())
-		{
-			throw new Exception("Type checking errors found");
-		}
-		
 		CTPlugin ct = registry.getPlugin("CT");
 		
-		if (!ct.generated())
+		if (ct.isRunning())
 		{
-			throw new Exception("Trace not generated");
+			Log.error("Previous trace is still running...");
+			throw new Exception("Trace still running");
 		}
 
-		if (!ct.completed())
+		/**
+		 * If the specification has been modified since we last ran (or nothing has yet run),
+		 * we have to re-create the interpreter, otherwise the old interpreter (with the old tree)
+		 * is used to "generate" the trace names, so changes are not picked up. Note that a
+		 * new tree will have no breakpoints, so if you had any set via a launch, they will be
+		 * ignored.
+		 */
+		refreshInterpreter();
+		
+		if (specHasErrors())
 		{
-			throw new Exception("Trace still running");
+			throw new Exception("Specification has errors");
 		}
 
 		return ct.runtrace(Utils.stringToName(name), testNumber);
@@ -368,6 +369,17 @@ public class DAPWorkspaceManager
 	
 	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
 	{
+		CTPlugin ct = registry.getPlugin("CT");
+		
+		if (ct.isRunning())
+		{
+			DAPMessageList responses = new DAPMessageList(request,
+					new JSONObject("result", "Cannot start interpreter: trace still running?", "variablesReference", 0));
+			dapServerState.setRunning(false);
+			clearInterpreter();
+			return responses;
+		}
+		
 		Command command = Command.parse(expression);
 
 		if (command instanceof PrintCommand)	// ie. evaluate something
@@ -431,5 +443,22 @@ public class DAPWorkspaceManager
 			
 			interpreter = null;
 		}
+	}
+	
+	public void refreshInterpreter()
+	{
+		if (hasChanged())
+		{
+			Log.printf("Specification has changed, resetting interpreter");
+			interpreter = null;
+		}
+	}
+	
+	private boolean specHasErrors()
+	{
+		ASTPlugin ast = registry.getPlugin("AST");
+		TCPlugin tc = registry.getPlugin("TC");
+		
+		return !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
 	}
 }
