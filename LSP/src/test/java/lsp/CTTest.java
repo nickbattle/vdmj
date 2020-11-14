@@ -40,7 +40,7 @@ import rpc.RPCRequest;
 public class CTTest extends LSPTest
 {
 	private JSONObject capabilities = new JSONObject(
-			"experimental", new JSONObject("combinatorialTest", true));
+			"experimental", new JSONObject("combinatorialTesting", true));
 
 	@Test
 	public void testTracesSL() throws Exception
