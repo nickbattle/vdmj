@@ -69,7 +69,7 @@ abstract public class CancellableThread extends Thread
 		}
 	}
 	
-	private void setCancelled()
+	public void setCancelled()
 	{
 		cancelled = true;
 		Log.printf("Thread %s cancel sent", myId.toString());

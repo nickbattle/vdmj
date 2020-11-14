@@ -60,7 +60,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 	
 	protected int testNumber = 0;
 	protected TraceExecutor traceExecutor = null;
-	protected boolean completed = true;
+	protected boolean traceRunning = false;
 	
 	private static final int BATCH_SIZE = 10;
 	
@@ -82,7 +82,18 @@ abstract public class CTPlugin extends AnalysisPlugin
 
 	public void preCheck()
 	{
-		DAPWorkspaceManager.reset();	// clear interpreter
+		if (traceExecutor != null && traceRunning)
+		{
+			try
+			{
+				traceExecutor.setCancelled();
+				traceExecutor.join();
+			}
+			catch (InterruptedException e)
+			{
+				// Ignore
+			}
+		}
 	}
 
 	abstract public <T> boolean checkLoadedFiles(T inList) throws Exception;
@@ -152,7 +163,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 
 		traceIterator.reset();
 		testNumber = (int)startTest;
-		completed = false;
+		traceRunning = true;
 
 		for (int i=1; i < startTest && traceIterator.hasMoreTests(); i++)
 		{
@@ -167,13 +178,19 @@ abstract public class CTPlugin extends AnalysisPlugin
 		}
 		else
 		{
-			completed = true;
+			traceRunning = false;
 			return new JSONArray();		// Empty result
 		}
 	}
 	
 	public JSONObject runtrace(TCNameToken tracename, long testNumber) throws Exception
 	{
+		if (!tracename.equals(traceName))
+		{
+			Log.printf("Pre-generating new tracename %s", tracename);
+			generate(tracename);
+		}
+		
 		traceIterator.reset();
 
 		for (int i=1; i < testNumber && traceIterator.hasMoreTests(); i++)
@@ -194,14 +211,9 @@ abstract public class CTPlugin extends AnalysisPlugin
 				"sequence", jsonResultPairs(callString, result));
 	}
 	
-	public synchronized boolean completed()
+	public synchronized boolean isRunning()
 	{
-		return completed;
-	}
-	
-	public boolean generated()
-	{
-		return traceIterator != null;
+		return traceRunning;
 	}
 
 	private class TraceExecutor extends CancellableThread
@@ -321,7 +333,8 @@ abstract public class CTPlugin extends AnalysisPlugin
 			}
 			finally
 			{
-				completed = true;
+				traceRunning = false;
+				traceExecutor = null;
 			}
 		}
 		

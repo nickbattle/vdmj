@@ -44,15 +44,12 @@ import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
-import rpc.RPCErrors;
-import rpc.RPCMessageList;
-import rpc.RPCRequest;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
+import workspace.plugins.ASTPlugin;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
-import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
 
 public class DAPWorkspaceManager
@@ -165,6 +162,7 @@ public class DAPWorkspaceManager
 		}
 		catch (Exception e)
 		{
+			Log.error(e);
 			return new DAPMessageList(request, e);
 		}
 		finally
@@ -175,8 +173,6 @@ public class DAPWorkspaceManager
 
 	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName, String command) throws Exception
 	{
-		LSPWorkspaceManager.getInstance().checkLoadedFiles();
-		
 		if (!canExecute())
 		{
 			DAPMessageList responses = new DAPMessageList();
@@ -204,23 +200,26 @@ public class DAPWorkspaceManager
 
 	public JSONObject ctRuntrace(DAPRequest request, String name, long testNumber) throws Exception
 	{
-		TCPlugin tc = registry.getPlugin("TC");
-		
-		if (!tc.getErrs().isEmpty())
-		{
-			throw new Exception("Type checking errors found");
-		}
-		
 		CTPlugin ct = registry.getPlugin("CT");
 		
-		if (!ct.generated())
+		if (ct.isRunning())
 		{
-			throw new Exception("Trace not generated");
+			Log.error("Previous trace is still running...");
+			throw new Exception("Trace still running");
 		}
 
-		if (!ct.completed())
+		/**
+		 * If the specification has been modified since we last ran (or nothing has yet run),
+		 * we have to re-create the interpreter, otherwise the old interpreter (with the old tree)
+		 * is used to "generate" the trace names, so changes are not picked up. Note that a
+		 * new tree will have no breakpoints, so if you had any set via a launch, they will be
+		 * ignored.
+		 */
+		refreshInterpreter();
+		
+		if (specHasErrors())
 		{
-			throw new Exception("Trace still running");
+			throw new Exception("Specification has errors");
 		}
 
 		return ct.runtrace(Utils.stringToName(name), testNumber);
@@ -248,7 +247,10 @@ public class DAPWorkspaceManager
 
 	private boolean canExecute()
 	{
-		return getInterpreter() != null;
+		ASTPlugin ast = registry.getPlugin("AST");
+		TCPlugin tc = registry.getPlugin("TC");
+		
+		return ast.getErrs().isEmpty() && tc.getErrs().isEmpty();
 	}
 	
 	private boolean hasChanged()
@@ -367,6 +369,17 @@ public class DAPWorkspaceManager
 	
 	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
 	{
+		CTPlugin ct = registry.getPlugin("CT");
+		
+		if (ct.isRunning())
+		{
+			DAPMessageList responses = new DAPMessageList(request,
+					new JSONObject("result", "Cannot start interpreter: trace still running?", "variablesReference", 0));
+			dapServerState.setRunning(false);
+			clearInterpreter();
+			return responses;
+		}
+		
 		Command command = Command.parse(expression);
 
 		if (command instanceof PrintCommand)	// ie. evaluate something
@@ -431,36 +444,21 @@ public class DAPWorkspaceManager
 			interpreter = null;
 		}
 	}
-
-	/**
-	 * LSPX extensions...
-	 */
-
-	public RPCMessageList pogGenerate(RPCRequest request, File file, JSONObject range)
+	
+	public void refreshInterpreter()
 	{
+		if (hasChanged())
+		{
+			Log.printf("Specification has changed, resetting interpreter");
+			interpreter = null;
+		}
+	}
+	
+	private boolean specHasErrors()
+	{
+		ASTPlugin ast = registry.getPlugin("AST");
 		TCPlugin tc = registry.getPlugin("TC");
 		
-		if (!tc.getErrs().isEmpty())	// No type clean tree
-		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "Type checking errors found");
-		}
-		
-		try
-		{
-			POPlugin po = registry.getPlugin("PO");
-	
-			if (po.getPO() == null)
-			{
-				po.checkLoadedFiles(tc.getTC());
-			}
-			
-			JSONArray results = po.getObligations(file);
-			return new RPCMessageList(request, results);
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
+		return !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
 	}
 }
