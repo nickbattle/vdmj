@@ -210,9 +210,8 @@ abstract public class LSPXWorkspaceManager
 			}
 
 			DAPWorkspaceManager.getInstance().refreshInterpreter();
-			ct.setFilter(rType, subset, seed);
 			TCNameToken tracename = Utils.stringToName(name);
-			JSONArray batch = ct.execute(request, tracename, progressToken, workDoneToken, start, end);
+			JSONArray batch = ct.execute(request, tracename, progressToken, workDoneToken, rType, subset, seed, start, end);
 			
 			if (batch == null)	// Running in background
 			{
