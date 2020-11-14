@@ -126,13 +126,9 @@ abstract public class CTPlugin extends AnalysisPlugin
 		return traceCount;
 	}
 
-	public void setFilter(TraceReductionType rType, float subset, long seed)
-	{
-		traceFilter = new TraceFilter(traceCount, subset, rType, seed);
-	}
-
 	public JSONArray execute(RPCRequest request, TCNameToken tracename,
 			Object progressToken, Object workDoneToken,
+			TraceReductionType rType, float subset, long seed,
 			long startTest, long endTest) throws Exception
 	{
 		if (!tracename.equals(traceName))
@@ -151,9 +147,10 @@ abstract public class CTPlugin extends AnalysisPlugin
 			endTest = traceCount;
 		}
 		
-		if (startTest == 0)			// From the start, if specified as zero
+		if (startTest <= 1)			// From the start, if specified as zero
 		{
 			startTest = 1;
+			traceFilter = new TraceFilter(traceCount, subset, rType, seed);
 		}
 		else
 		{

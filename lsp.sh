@@ -25,9 +25,9 @@ function latest()
 
 java -Xmx2g -Dlog.filename=/dev/tty \
     -cp \
-$(latest "Annotations/target/annotations-1.0.0-*.jar"):\
-$(latest "FJ-VDMJ4/target/vdmj-4.3.0-P-??????.jar"):\
-$(latest "LSP/target/lsp-0.0.1-SNAPSHOT-*.jar") \
+$(latest "Annotations/target/annotations-P-4.4.0-*.jar"):\
+$(latest "FJ-VDMJ4/target/vdmj-4.4.0-P-SNAPSHOT-??????.jar"):\
+$(latest "LSP/target/lsp-4.4.0-P-*.jar") \
     lsp.LSPServerSocket $1 -lsp 8000 -dap 8001
 
 exit 0
