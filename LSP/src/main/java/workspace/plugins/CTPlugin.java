@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.traces.Verdict;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.CancellableThread;
+import lsp.LSPException;
 import lsp.LSPServer;
 import rpc.RPCErrors;
 import rpc.RPCRequest;
@@ -102,7 +103,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 
 	abstract public <T> T getCT();
 	
-	public int generate(TCNameToken tracename) throws Exception
+	public int generate(TCNameToken tracename) throws LSPException
 	{
 		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
 		interpreter.init();
@@ -111,25 +112,32 @@ abstract public class CTPlugin extends AnalysisPlugin
 		if (tracedef == null)
 		{
 			Log.error("Trace %s not found", tracename);
-			throw new Exception("Trace " + tracename + " not found");
+			throw new LSPException(RPCErrors.ContentModified, "Trace " + tracename + " not found");
 		}
 
-		long before = System.currentTimeMillis();
-		traceName = tracename;
-		traceClassDef = tracedef.classDefinition;
-		traceContext = interpreter.getTraceContext(traceClassDef);
-		traceIterator = tracedef.getIterator(traceContext);
-		traceCount = traceIterator.count();
-		long after = System.currentTimeMillis();
+		try
+		{
+			long before = System.currentTimeMillis();
+			traceName = tracename;
+			traceClassDef = tracedef.classDefinition;
+			traceContext = interpreter.getTraceContext(traceClassDef);
+			traceIterator = tracedef.getIterator(traceContext);
+			traceCount = traceIterator.count();
+			long after = System.currentTimeMillis();
 
-		Log.printf("Generated %d traces in %.3f secs.", traceCount, (double)(after-before)/1000);
-		return traceCount;
+			Log.printf("Generated %d traces in %.3f secs.", traceCount, (double)(after-before)/1000);
+			return traceCount;
+		}
+		catch (Exception e)
+		{
+			throw new LSPException(RPCErrors.InternalError, e.getMessage());
+		}
 	}
 
 	public JSONArray execute(RPCRequest request, TCNameToken tracename,
 			Object progressToken, Object workDoneToken,
 			TraceReductionType rType, float subset, long seed,
-			long startTest, long endTest) throws Exception
+			long startTest, long endTest) throws LSPException
 	{
 		if (!tracename.equals(traceName))
 		{
@@ -139,7 +147,8 @@ abstract public class CTPlugin extends AnalysisPlugin
 		
 		if (endTest > traceCount)
 		{
-			throw new Exception("Trace " + traceName + " only has " + traceCount + " tests");
+			throw new LSPException(RPCErrors.InvalidParams,
+					"Trace " + traceName + " only has " + traceCount + " tests");
 		}
 		
 		if (endTest == 0)			// To the end of the tests, if specified as zero
@@ -180,7 +189,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		}
 	}
 	
-	public JSONObject runtrace(TCNameToken tracename, long testNumber) throws Exception
+	public JSONObject runtrace(TCNameToken tracename, long testNumber) throws LSPException
 	{
 		if (!tracename.equals(traceName))
 		{
@@ -200,7 +209,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
 
 		interpreter.init();
-		List<Object> result = interpreter.runOneTrace(traceClassDef, test, false);
+		List<Object> result = interpreter.runOneTrace(traceClassDef, test, true);
 
 		return new JSONObject(
 				"id", testNumber,
@@ -396,7 +405,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		}
 	}
 
-	private int getVerdict(List<Object> result) throws Exception
+	private int getVerdict(List<Object> result) throws LSPException
 	{
 		for (int i = result.size()-1; i > 0; i--)
 		{
@@ -406,10 +415,10 @@ abstract public class CTPlugin extends AnalysisPlugin
 			}
 		}
 		
-		throw new Exception("No verdict returned?");
+		throw new LSPException(RPCErrors.InternalError, "No verdict returned?");
 	}
 
-	private int jsonVerdict(Verdict v) throws Exception
+	private int jsonVerdict(Verdict v) throws LSPException
 	{
 		switch (v)
 		{
@@ -418,7 +427,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 			case INCONCLUSIVE:	return 3;
 			case SKIPPED:		return 4;
 	
-			default: throw new Exception("Unknown verdict: " + v);
+			default: throw new LSPException(RPCErrors.InternalError, "Unknown verdict: " + v);
 		}
 	}
 

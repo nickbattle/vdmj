@@ -99,52 +99,49 @@ public class CTMainThread extends MainThread
 				suspendOthers();
 
 				DebugLink.getInstance().stopped(e.ctxt, e.location, e);
-				result.add(Verdict.FAILED);
 			}
-			else
+
+			// These exceptions are inconclusive if they occur
+			// in a call directly from the test because it could
+			// be a test error, but if the test call has made
+			// further call(s), then they are real failures.
+
+			switch (e.number)
 			{
-				// These exceptions are inconclusive if they occur
-				// in a call directly from the test because it could
-				// be a test error, but if the test call has made
-				// further call(s), then they are real failures.
+				case 4055:	// precondition fails for functions
 
-    			switch (e.number)
-    			{
-    				case 4055:	// precondition fails for functions
+					if (e.ctxt.outer != null && e.ctxt.outer.outer == ctxt)
+					{
+						result.add(Verdict.INCONCLUSIVE);
+					}
+					else
+					{
+						result.add(Verdict.FAILED);
+					}
+					break;
 
-    					if (e.ctxt.outer != null && e.ctxt.outer.outer == ctxt)
-    					{
-    						result.add(Verdict.INCONCLUSIVE);
-    					}
-    					else
-    					{
-    						result.add(Verdict.FAILED);
-    					}
-    					break;
+				case 4071:	// precondition fails for operations
 
-    				case 4071:	// precondition fails for operations
+					if (e.ctxt.outer == ctxt)
+					{
+						result.add(Verdict.INCONCLUSIVE);
+					}
+					else
+					{
+						result.add(Verdict.FAILED);
+					}
+					break;
 
-    					if (e.ctxt.outer == ctxt)
-    					{
-    						result.add(Verdict.INCONCLUSIVE);
-    					}
-    					else
-    					{
-    						result.add(Verdict.FAILED);
-    					}
-    					break;
-
-    				default:
-    					if (e.ctxt == ctxt)
-    					{
-    						result.add(Verdict.INCONCLUSIVE);
-    					}
-    					else
-    					{
-    						result.add(Verdict.FAILED);
-    					}
-    					break;
-    			}
+				default:
+					if (e.ctxt == ctxt)
+					{
+						result.add(Verdict.INCONCLUSIVE);
+					}
+					else
+					{
+						result.add(Verdict.FAILED);
+					}
+					break;
 			}
 		}
 		catch (Throwable e)
