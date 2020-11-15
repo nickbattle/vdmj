@@ -27,18 +27,21 @@ import java.io.File;
 import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.traces.TraceReductionType;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.LSPException;
 import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.CTPlugin;
+import workspace.plugins.INPlugin;
 import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
 
@@ -127,7 +130,7 @@ abstract public class LSPXWorkspaceManager
 		{
 			if (specHasErrors())
 			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification has errors");
+				return new RPCMessageList(request, RPCErrors.ContentModified, "Specification has errors");
 			}
 			
 			DAPWorkspaceManager.getInstance().refreshInterpreter();
@@ -164,7 +167,7 @@ abstract public class LSPXWorkspaceManager
 		{
 			if (specHasErrors())
 			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification has errors");
+				return new RPCMessageList(request, RPCErrors.ContentModified, "Specification has errors");
 			}
 			
 			CTPlugin ct = registry.getPlugin("CT");
@@ -179,10 +182,10 @@ abstract public class LSPXWorkspaceManager
 			int count = ct.generate(tracename);
 			return new RPCMessageList(request, new JSONObject("numberOfTests", count));
 		}
-		catch (InterruptedException e)	// generate was cancelled
+		catch (LSPException e)
 		{
 			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.RequestCancelled, e.getMessage());
+			return new RPCMessageList(request, e.getError(), e.getMessage());
 		}
 		catch (Exception e)
 		{
@@ -199,7 +202,12 @@ abstract public class LSPXWorkspaceManager
 		{
 			if (specHasErrors())
 			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification has errors");
+				return new RPCMessageList(request, RPCErrors.ContentModified, "Specification has errors");
+			}
+			
+			if (hasChanged())	// Since generate
+			{
+				return new RPCMessageList(request, RPCErrors.ContentModified, "Specification has changed");
 			}
 			
 			CTPlugin ct = registry.getPlugin("CT");
@@ -211,7 +219,8 @@ abstract public class LSPXWorkspaceManager
 
 			DAPWorkspaceManager.getInstance().refreshInterpreter();
 			TCNameToken tracename = Utils.stringToName(name);
-			JSONArray batch = ct.execute(request, tracename, progressToken, workDoneToken, rType, subset, seed, start, end);
+			JSONArray batch = ct.execute(request, tracename, progressToken, workDoneToken,
+					rType, subset, seed, start, end);
 			
 			if (batch == null)	// Running in background
 			{
@@ -222,10 +231,10 @@ abstract public class LSPXWorkspaceManager
 				return new RPCMessageList(request, batch);
 			}
 		}
-		catch (InterruptedException e)	// execute was cancelled
+		catch (LSPException e)
 		{
 			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.RequestCancelled, e.getMessage());
+			return new RPCMessageList(request, e.getError(), e.getMessage());
 		}
 		catch (Exception e)
 		{
@@ -240,5 +249,12 @@ abstract public class LSPXWorkspaceManager
 		TCPlugin tc = registry.getPlugin("TC");
 		
 		return !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
+	}
+	
+	private boolean hasChanged()
+	{
+		INPlugin in = registry.getPlugin("IN");
+		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+		return interpreter != null && interpreter.getIN() != in.getIN();
 	}
 }

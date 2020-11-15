@@ -43,7 +43,9 @@ import dap.DAPServerState;
 import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
+import lsp.LSPException;
 import lsp.Utils;
+import rpc.RPCErrors;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
@@ -198,14 +200,14 @@ public class DAPWorkspaceManager
 		}
 	}
 
-	public JSONObject ctRuntrace(DAPRequest request, String name, long testNumber) throws Exception
+	public JSONObject ctRuntrace(DAPRequest request, String name, long testNumber) throws LSPException
 	{
 		CTPlugin ct = registry.getPlugin("CT");
 		
 		if (ct.isRunning())
 		{
 			Log.error("Previous trace is still running...");
-			throw new Exception("Trace still running");
+			throw new LSPException(RPCErrors.InvalidRequest, "Trace still running");
 		}
 
 		/**
@@ -219,7 +221,7 @@ public class DAPWorkspaceManager
 		
 		if (specHasErrors())
 		{
-			throw new Exception("Specification has errors");
+			throw new LSPException(RPCErrors.ContentModified, "Specification has errors");
 		}
 
 		return ct.runtrace(Utils.stringToName(name), testNumber);
