@@ -36,11 +36,13 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	protected final LSPWorkspaceManager lspManager;
 	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
 	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
+	protected boolean dirty;
 
 	public ASTPlugin(LSPWorkspaceManager manager)
 	{
 		super();
 		this.lspManager = manager;
+		this.dirty = false;
 	}
 	
 	@Override
@@ -80,4 +82,9 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	abstract public <T> T getAST();
 	
 	abstract protected List<VDMMessage> parseFile(File file);
+
+	public boolean isDirty()
+	{
+		return dirty;
+	}
 }

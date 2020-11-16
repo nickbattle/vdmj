@@ -60,6 +60,7 @@ public class ASTPluginPR extends ASTPlugin
 	@Override
 	public boolean checkLoadedFiles()
 	{
+		dirty = false;
 		Map<File, StringBuilder> projectFiles = lspManager.getProjectFiles();
 		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
@@ -114,6 +115,8 @@ public class ASTPluginPR extends ASTPlugin
 	@Override
 	protected List<VDMMessage> parseFile(File file)
 	{
+		dirty = true;	// Until saved.
+
 		List<VDMMessage> errs = new Vector<VDMMessage>();
 		Map<File, StringBuilder> projectFiles = lspManager.getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);

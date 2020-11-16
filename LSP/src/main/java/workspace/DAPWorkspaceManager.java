@@ -260,6 +260,12 @@ public class DAPWorkspaceManager
 		INPlugin in = registry.getPlugin("IN");
 		return getInterpreter() != null && getInterpreter().getIN() != in.getIN();
 	}
+	
+	private boolean isDirty()
+	{
+		ASTPlugin ast = registry.getPlugin("AST");
+		return ast.isDirty();
+	}
 
 	/**
 	 * Methods to write direct to stdout/stderr, while a DAP command is being executed.
@@ -399,6 +405,10 @@ public class DAPWorkspaceManager
 				DAPMessageList responses = new DAPMessageList(request,
 						new JSONObject("result", "Specification has changed: try restart", "variablesReference", 0));
 				return responses;
+			}
+			else if (isDirty())
+			{
+				stderr("WARNING: specification has unsaved changes");
 			}
 		}
 		
