@@ -142,8 +142,8 @@ public class CTHandler extends LSPHandler
 				}
 			}
 			
-			long start = 0;		// Zero => not set
-			long end = 0;
+			Long start = null;
+			Long end = null;
 			
 			if (range != null)
 			{

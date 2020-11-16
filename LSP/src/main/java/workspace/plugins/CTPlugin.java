@@ -137,7 +137,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 	public JSONArray execute(RPCRequest request, TCNameToken tracename,
 			Object progressToken, Object workDoneToken,
 			TraceReductionType rType, float subset, long seed,
-			long startTest, long endTest) throws LSPException
+			Long startTest, Long endTest) throws LSPException
 	{
 		if (!tracename.equals(traceName))
 		{
@@ -145,20 +145,26 @@ abstract public class CTPlugin extends AnalysisPlugin
 			generate(tracename);
 		}
 		
-		if (endTest > traceCount)
+		if (startTest == null && endTest != null && endTest != traceCount)
+		{
+			throw new LSPException(RPCErrors.ContentModified,
+					"Trace " + traceName + " has " + traceCount + " tests");
+		}
+		
+		if (endTest != null && endTest > traceCount)
 		{
 			throw new LSPException(RPCErrors.InvalidParams,
 					"Trace " + traceName + " only has " + traceCount + " tests");
 		}
 		
-		if (endTest == 0)			// To the end of the tests, if specified as zero
+		if (endTest == null)		// To the end of the tests, if not specified
 		{
-			endTest = traceCount;
+			endTest = (long) traceCount;
 		}
 		
-		if (startTest <= 1)			// From the start, if specified as zero
+		if (startTest == null || startTest == 1)
 		{
-			startTest = 1;
+			startTest = 1L;
 			traceFilter = new TraceFilter(traceCount, subset, rType, seed);
 		}
 		else
@@ -168,7 +174,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		}
 
 		traceIterator.reset();
-		testNumber = (int)startTest;
+		testNumber = startTest.intValue();
 		traceRunning = true;
 
 		for (int i=1; i < startTest && traceIterator.hasMoreTests(); i++)

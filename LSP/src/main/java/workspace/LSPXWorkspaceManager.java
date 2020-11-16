@@ -196,7 +196,7 @@ abstract public class LSPXWorkspaceManager
 
 	public RPCMessageList ctExecute(RPCRequest request, String name,
 			Object progressToken, Object workDoneToken,
-			TraceReductionType rType, float subset, long seed, long start, long end)
+			TraceReductionType rType, float subset, long seed, Long start, Long end)
 	{
 		try
 		{
@@ -207,7 +207,7 @@ abstract public class LSPXWorkspaceManager
 			
 			if (hasChanged())	// Since generate
 			{
-				return new RPCMessageList(request, RPCErrors.ContentModified, "Specification has changed");
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification has changed");
 			}
 			
 			CTPlugin ct = registry.getPlugin("CT");
