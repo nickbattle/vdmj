@@ -51,7 +51,7 @@ public class TCThreadDefinition extends TCDefinition
 		this.statement = statement;
 		this.operationName = TCNameToken.getThreadName(statement.location);
 
-		setAccessSpecifier(new TCAccessSpecifier(false, false, Token.PROTECTED, false));
+		setAccessSpecifier(new TCAccessSpecifier(false, false, Token.PUBLIC, false));
 	}
 
 	@Override
