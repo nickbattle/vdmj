@@ -204,22 +204,22 @@ abstract public class LSPXWorkspaceManager
 			{
 				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
 			}
-			
-			if (hasChanged())	// Since generate
-			{
-				Log.error("The spec has changed since generate, but executing trace anyway");
-				// return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification has changed");
-			}
-			
+
+			TCNameToken tracename = Utils.stringToName(name);
 			CTPlugin ct = registry.getPlugin("CT");
-			
+
 			if (ct.isRunning())
 			{
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
 			}
 
+			if (hasChanged())
+			{
+				Log.error("The spec has changed since generate, so re-generating");
+				ct.generate(tracename);
+			}
+			
 			DAPWorkspaceManager.getInstance().refreshInterpreter();
-			TCNameToken tracename = Utils.stringToName(name);
 			JSONArray batch = ct.execute(request, tracename, progressToken, workDoneToken,
 					rType, subset, seed, start, end);
 			
