@@ -130,7 +130,7 @@ abstract public class LSPXWorkspaceManager
 		{
 			if (specHasErrors())
 			{
-				return new RPCMessageList(request, RPCErrors.ContentModified, "Specification has errors");
+				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
 			}
 			
 			DAPWorkspaceManager.getInstance().refreshInterpreter();
@@ -167,7 +167,7 @@ abstract public class LSPXWorkspaceManager
 		{
 			if (specHasErrors())
 			{
-				return new RPCMessageList(request, RPCErrors.ContentModified, "Specification has errors");
+				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
 			}
 			
 			CTPlugin ct = registry.getPlugin("CT");
@@ -202,12 +202,13 @@ abstract public class LSPXWorkspaceManager
 		{
 			if (specHasErrors())
 			{
-				return new RPCMessageList(request, RPCErrors.ContentModified, "Specification has errors");
+				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
 			}
 			
 			if (hasChanged())	// Since generate
 			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification has changed");
+				Log.error("The spec has changed since generate, but executing trace anyway");
+				// return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification has changed");
 			}
 			
 			CTPlugin ct = registry.getPlugin("CT");
