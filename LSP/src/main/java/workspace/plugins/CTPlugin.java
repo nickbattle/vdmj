@@ -153,7 +153,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		
 		if (endTest != null && endTest > traceCount)
 		{
-			throw new LSPException(RPCErrors.InvalidParams,
+			throw new LSPException(RPCErrors.ContentModified,
 					"Trace " + traceName + " only has " + traceCount + " tests");
 		}
 		
