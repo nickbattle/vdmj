@@ -56,6 +56,15 @@ import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleSeqBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleSetBind;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
+import com.fujitsu.vdmj.in.traces.INTraceApplyExpression;
+import com.fujitsu.vdmj.in.traces.INTraceBracketedExpression;
+import com.fujitsu.vdmj.in.traces.INTraceConcurrentExpression;
+import com.fujitsu.vdmj.in.traces.INTraceCoreDefinition;
+import com.fujitsu.vdmj.in.traces.INTraceDefinition;
+import com.fujitsu.vdmj.in.traces.INTraceDefinitionTerm;
+import com.fujitsu.vdmj.in.traces.INTraceLetBeStBinding;
+import com.fujitsu.vdmj.in.traces.INTraceLetDefBinding;
+import com.fujitsu.vdmj.in.traces.INTraceRepeatDefinition;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
@@ -324,7 +333,86 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseNamedTraceDefinition(INNamedTraceDefinition node, S arg)
 	{
-		return newCollection();
+		C all = newCollection();
+		
+		for (INTraceDefinitionTerm term: node.terms)
+		{
+			for (INTraceDefinition tdef: term)
+			{
+				all.addAll(caseTraceDefinition(tdef, arg));
+			}
+		}
+		
+		return all;
+	}
+ 	
+ 	private C caseTraceDefinition(INTraceDefinition tdef, S arg)
+ 	{
+		C all = newCollection();
+		
+		if (tdef instanceof INTraceLetDefBinding)
+		{
+			INTraceLetDefBinding letdef = (INTraceLetDefBinding)tdef;
+			
+			for (INDefinition ldef: letdef.localDefs)
+			{
+				all.addAll(ldef.apply(this, arg));
+			}
+			
+			all.addAll(caseTraceDefinition(letdef.body, arg));
+		}
+		else if (tdef instanceof INTraceLetBeStBinding)
+		{
+			INTraceLetBeStBinding letbe = (INTraceLetBeStBinding)tdef;
+			all.addAll(caseMultipleBind(letbe.bind, arg));
+			all.addAll(caseTraceDefinition(letbe.body, arg));
+		}
+		else if (tdef instanceof INTraceRepeatDefinition)
+		{
+			INTraceRepeatDefinition repeat = (INTraceRepeatDefinition)tdef;
+			all.addAll(caseTraceCoreDefinition(repeat.core, arg));
+		}
+
+		return all;
+ 	}
+
+ 	private C caseTraceCoreDefinition(INTraceCoreDefinition core, S arg)
+	{
+		C all = newCollection();
+		
+		if (core instanceof INTraceApplyExpression)
+		{
+			INStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
+			
+			if (stmtVisitor != null)
+			{
+				INTraceApplyExpression apply = (INTraceApplyExpression)core;
+				all.addAll(apply.callStatement.apply(stmtVisitor, arg));
+			}
+		}
+		else if (core instanceof INTraceBracketedExpression)
+		{
+			INTraceBracketedExpression bexp = (INTraceBracketedExpression)core;
+			
+			for (INTraceDefinitionTerm term: bexp.terms)
+			{
+				for (INTraceDefinition tdef: term)
+				{
+					all.addAll(caseTraceDefinition(tdef, arg));
+				}
+			}
+		}
+		else if (core instanceof INTraceConcurrentExpression)
+		{
+			INTraceConcurrentExpression cexp = (INTraceConcurrentExpression)core;
+			
+			for (INTraceDefinition tdef: cexp.defs)
+			{
+				all.addAll(caseTraceDefinition(tdef, arg));
+			}
+		}
+		
+		return all;
 	}
 
  	@Override

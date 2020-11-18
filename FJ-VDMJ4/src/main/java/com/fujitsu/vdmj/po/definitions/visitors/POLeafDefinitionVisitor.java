@@ -324,7 +324,7 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseNamedTraceDefinition(PONamedTraceDefinition node, S arg)
 	{
-		return newCollection();
+		return newCollection();		// No POs in trace?
 	}
 
  	@Override
