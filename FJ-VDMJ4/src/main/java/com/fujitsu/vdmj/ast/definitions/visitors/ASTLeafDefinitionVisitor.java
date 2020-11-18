@@ -55,6 +55,15 @@ import com.fujitsu.vdmj.ast.patterns.ASTMultipleBind;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleSeqBind;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleSetBind;
 import com.fujitsu.vdmj.ast.statements.visitors.ASTStatementVisitor;
+import com.fujitsu.vdmj.ast.traces.ASTTraceApplyExpression;
+import com.fujitsu.vdmj.ast.traces.ASTTraceBracketedExpression;
+import com.fujitsu.vdmj.ast.traces.ASTTraceConcurrentExpression;
+import com.fujitsu.vdmj.ast.traces.ASTTraceCoreDefinition;
+import com.fujitsu.vdmj.ast.traces.ASTTraceDefinition;
+import com.fujitsu.vdmj.ast.traces.ASTTraceDefinitionTerm;
+import com.fujitsu.vdmj.ast.traces.ASTTraceLetBeStBinding;
+import com.fujitsu.vdmj.ast.traces.ASTTraceLetDefBinding;
+import com.fujitsu.vdmj.ast.traces.ASTTraceRepeatDefinition;
 import com.fujitsu.vdmj.ast.types.ASTField;
 import com.fujitsu.vdmj.ast.types.ASTFunctionType;
 import com.fujitsu.vdmj.ast.types.ASTPatternListTypePair;
@@ -364,7 +373,86 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseNamedTraceDefinition(ASTNamedTraceDefinition node, S arg)
 	{
-		return newCollection();
+		C all = newCollection();
+		
+		for (ASTTraceDefinitionTerm term: node.terms)
+		{
+			for (ASTTraceDefinition tdef: term)
+			{
+				all.addAll(caseTraceDefinition(tdef, arg));
+			}
+		}
+		
+		return all;
+	}
+ 	
+ 	private C caseTraceDefinition(ASTTraceDefinition tdef, S arg)
+ 	{
+		C all = newCollection();
+		
+		if (tdef instanceof ASTTraceLetDefBinding)
+		{
+			ASTTraceLetDefBinding letdef = (ASTTraceLetDefBinding)tdef;
+			
+			for (ASTDefinition ldef: letdef.localDefs)
+			{
+				all.addAll(ldef.apply(this, arg));
+			}
+			
+			all.addAll(caseTraceDefinition(letdef.body, arg));
+		}
+		else if (tdef instanceof ASTTraceLetBeStBinding)
+		{
+			ASTTraceLetBeStBinding letbe = (ASTTraceLetBeStBinding)tdef;
+			all.addAll(caseMultipleBind(letbe.bind, arg));
+			all.addAll(caseTraceDefinition(letbe.body, arg));
+		}
+		else if (tdef instanceof ASTTraceRepeatDefinition)
+		{
+			ASTTraceRepeatDefinition repeat = (ASTTraceRepeatDefinition)tdef;
+			all.addAll(caseTraceCoreDefinition(repeat.core, arg));
+		}
+
+		return all;
+ 	}
+
+ 	private C caseTraceCoreDefinition(ASTTraceCoreDefinition core, S arg)
+	{
+		C all = newCollection();
+		
+		if (core instanceof ASTTraceApplyExpression)
+		{
+			ASTStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
+			
+			if (stmtVisitor != null)
+			{
+				ASTTraceApplyExpression apply = (ASTTraceApplyExpression)core;
+				all.addAll(apply.callStatement.apply(stmtVisitor, arg));
+			}
+		}
+		else if (core instanceof ASTTraceBracketedExpression)
+		{
+			ASTTraceBracketedExpression bexp = (ASTTraceBracketedExpression)core;
+			
+			for (ASTTraceDefinitionTerm term: bexp.terms)
+			{
+				for (ASTTraceDefinition tdef: term)
+				{
+					all.addAll(caseTraceDefinition(tdef, arg));
+				}
+			}
+		}
+		else if (core instanceof ASTTraceConcurrentExpression)
+		{
+			ASTTraceConcurrentExpression cexp = (ASTTraceConcurrentExpression)core;
+			
+			for (ASTTraceDefinition tdef: cexp.defs)
+			{
+				all.addAll(caseTraceDefinition(tdef, arg));
+			}
+		}
+		
+		return all;
 	}
 
  	@Override

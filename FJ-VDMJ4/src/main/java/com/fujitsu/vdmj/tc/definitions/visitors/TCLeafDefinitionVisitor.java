@@ -56,6 +56,15 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
+import com.fujitsu.vdmj.tc.traces.TCTraceApplyExpression;
+import com.fujitsu.vdmj.tc.traces.TCTraceBracketedExpression;
+import com.fujitsu.vdmj.tc.traces.TCTraceConcurrentExpression;
+import com.fujitsu.vdmj.tc.traces.TCTraceCoreDefinition;
+import com.fujitsu.vdmj.tc.traces.TCTraceDefinition;
+import com.fujitsu.vdmj.tc.traces.TCTraceDefinitionTerm;
+import com.fujitsu.vdmj.tc.traces.TCTraceLetBeStBinding;
+import com.fujitsu.vdmj.tc.traces.TCTraceLetDefBinding;
+import com.fujitsu.vdmj.tc.traces.TCTraceRepeatDefinition;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
@@ -324,10 +333,89 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseNamedTraceDefinition(TCNamedTraceDefinition node, S arg)
 	{
-		return newCollection();
+		C all = newCollection();
+		
+		for (TCTraceDefinitionTerm term: node.terms)
+		{
+			for (TCTraceDefinition tdef: term)
+			{
+				all.addAll(caseTraceDefinition(tdef, arg));
+			}
+		}
+		
+		return all;
+	}
+ 	
+ 	private C caseTraceDefinition(TCTraceDefinition tdef, S arg)
+ 	{
+		C all = newCollection();
+		
+		if (tdef instanceof TCTraceLetDefBinding)
+		{
+			TCTraceLetDefBinding letdef = (TCTraceLetDefBinding)tdef;
+			
+			for (TCDefinition ldef: letdef.localDefs)
+			{
+				all.addAll(ldef.apply(this, arg));
+			}
+			
+			all.addAll(caseTraceDefinition(letdef.body, arg));
+		}
+		else if (tdef instanceof TCTraceLetBeStBinding)
+		{
+			TCTraceLetBeStBinding letbe = (TCTraceLetBeStBinding)tdef;
+			all.addAll(caseMultipleBind(letbe.bind, arg));
+			all.addAll(caseTraceDefinition(letbe.body, arg));
+		}
+		else if (tdef instanceof TCTraceRepeatDefinition)
+		{
+			TCTraceRepeatDefinition repeat = (TCTraceRepeatDefinition)tdef;
+			all.addAll(caseTraceCoreDefinition(repeat.core, arg));
+		}
+
+		return all;
+ 	}
+
+ 	private C caseTraceCoreDefinition(TCTraceCoreDefinition core, S arg)
+	{
+		C all = newCollection();
+		
+		if (core instanceof TCTraceApplyExpression)
+		{
+			TCStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
+			
+			if (stmtVisitor != null)
+			{
+				TCTraceApplyExpression apply = (TCTraceApplyExpression)core;
+				all.addAll(apply.callStatement.apply(stmtVisitor, arg));
+			}
+		}
+		else if (core instanceof TCTraceBracketedExpression)
+		{
+			TCTraceBracketedExpression bexp = (TCTraceBracketedExpression)core;
+			
+			for (TCTraceDefinitionTerm term: bexp.terms)
+			{
+				for (TCTraceDefinition tdef: term)
+				{
+					all.addAll(caseTraceDefinition(tdef, arg));
+				}
+			}
+		}
+		else if (core instanceof TCTraceConcurrentExpression)
+		{
+			TCTraceConcurrentExpression cexp = (TCTraceConcurrentExpression)core;
+			
+			for (TCTraceDefinition tdef: cexp.defs)
+			{
+				all.addAll(caseTraceDefinition(tdef, arg));
+			}
+		}
+		
+		return all;
 	}
 
- 	@Override
+	@Override
 	public C casePerSyncDefinition(TCPerSyncDefinition node, S arg)
 	{
 		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
