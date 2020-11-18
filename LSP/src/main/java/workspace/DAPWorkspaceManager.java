@@ -457,13 +457,16 @@ public class DAPWorkspaceManager
 		}
 	}
 	
-	public void refreshInterpreter()
+	public boolean refreshInterpreter()
 	{
 		if (hasChanged())
 		{
 			Log.printf("Specification has changed, resetting interpreter");
 			interpreter = null;
+			return true;
 		}
+		
+		return false;
 	}
 	
 	private boolean specHasErrors()

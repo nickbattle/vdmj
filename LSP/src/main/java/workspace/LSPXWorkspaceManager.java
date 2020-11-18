@@ -27,7 +27,6 @@ import java.io.File;
 import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.traces.TraceReductionType;
@@ -41,7 +40,6 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.CTPlugin;
-import workspace.plugins.INPlugin;
 import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
 
@@ -213,13 +211,12 @@ abstract public class LSPXWorkspaceManager
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
 			}
 
-			if (hasChanged())
+			if (DAPWorkspaceManager.getInstance().refreshInterpreter())
 			{
 				Log.error("The spec has changed since generate, so re-generating");
 				ct.generate(tracename);
 			}
 			
-			DAPWorkspaceManager.getInstance().refreshInterpreter();
 			JSONArray batch = ct.execute(request, tracename, progressToken, workDoneToken,
 					rType, subset, seed, start, end);
 			
@@ -250,12 +247,5 @@ abstract public class LSPXWorkspaceManager
 		TCPlugin tc = registry.getPlugin("TC");
 		
 		return !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
-	}
-	
-	private boolean hasChanged()
-	{
-		INPlugin in = registry.getPlugin("IN");
-		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
-		return interpreter != null && interpreter.getIN() != in.getIN();
 	}
 }
