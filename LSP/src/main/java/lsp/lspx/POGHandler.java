@@ -49,11 +49,11 @@ public class POGHandler extends LSPHandler
 	{
 		switch (request.getMethod())
 		{
-			case "lspx/POG/generate":
+			case "slsp/POG/generate":
 				return generate(request);
 
 			default:
-				return new RPCMessageList(request, RPCErrors.MethodNotFound, "Unexpected lspx/POG method");
+				return new RPCMessageList(request, RPCErrors.MethodNotFound, "Unexpected slsp/POG method");
 		}
 	}
 
