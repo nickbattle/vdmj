@@ -51,17 +51,17 @@ public class CTHandler extends LSPHandler
 	{
 		switch (request.getMethod())
 		{
-			case "lspx/CT/traces":
+			case "slsp/CT/traces":
 				return traces(request);
 
-			case "lspx/CT/generate":
+			case "slsp/CT/generate":
 				return generate(request);
 
-			case "lspx/CT/execute":
+			case "slsp/CT/execute":
 				return execute(request);
 
 			default:
-				return new RPCMessageList(request, RPCErrors.MethodNotFound, "Unexpected lspx/CT method");
+				return new RPCMessageList(request, RPCErrors.MethodNotFound, "Unexpected slsp/CT method");
 		}
 	}
 
