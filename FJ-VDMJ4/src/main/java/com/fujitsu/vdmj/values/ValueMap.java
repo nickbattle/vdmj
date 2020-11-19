@@ -91,11 +91,11 @@ public class ValueMap implements Map<Value, Value>
 
 	public boolean isInjective()
 	{
-		for (int i=0; i<range.size(); i++)
+		for (int i=0; i<size; i++)
 		{
 			Value v = range.get(i);
 			
-			for (int j=i+1; j<range.size(); j++)
+			for (int j=i+1; j<size; j++)
 			{
 				if (range.get(j).equals(v))
 				{
@@ -114,7 +114,7 @@ public class ValueMap implements Map<Value, Value>
 		sb.append("{");
 		String prefix = "";
 
-		for (int i=0; i<domain.size(); i++)
+		for (int i=0; i<size; i++)
 		{
 			sb.append(prefix);
 			sb.append(domain.get(i));
@@ -254,7 +254,7 @@ public class ValueMap implements Map<Value, Value>
 		
 		for (int i=0; i<size; i++)
 		{
-			if (domain.get(i).equals(key))
+			if (domain.get(i).equals(key))	// NB. uses "eq" 
 			{
 				old = range.get(i);
 				range.set(i, value);
