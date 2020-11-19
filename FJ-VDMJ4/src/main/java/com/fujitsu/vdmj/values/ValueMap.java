@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2020 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -23,13 +23,11 @@
 
 package com.fujitsu.vdmj.values;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.traces.PermuteArray;
@@ -37,14 +35,50 @@ import com.fujitsu.vdmj.traces.PermuteArray;
 /**
  * A map of value/values.
  * 
- * NOTE! In order to allow maps of values with an "eq" clause, we have to use a
- * TreeMap, which uses compareTo, rather than a HashMap that uses equals/hashCode.
- * The problem is that we only have "eq" and not a hashCode function defined,
- * which produces inconsistent results with a HashMap.
+ * NOTE! In order to allow maps of values with "eq/ord" clauses, we cannot use
+ * standard Java HashMaps or TreeMaps, as these may break if the user wants
+ * eq/ord clauses that do not meet the Java contracts for equals() and compareTo().
  */
 @SuppressWarnings("serial")
-public class ValueMap extends TreeMap<Value, Value>
+public class ValueMap implements Map<Value, Value>
 {
+	private static class Entry implements Map.Entry<Value, Value>
+	{
+		private Value key;
+		private Value value;
+		
+		public Entry(Value key, Value value)
+		{
+			this.key = key;
+			this.value = value;
+		}
+		
+		@Override
+		public Value getKey()
+		{
+			return key;
+		}
+
+		@Override
+		public Value getValue()
+		{
+			return value;
+		}
+
+		@Override
+		public Value setValue(Value value)
+		{
+			Value old = value;
+			this.value = value;
+			return old;
+		}
+	}
+	
+	// These will always be the same size!
+	private List<Value> domain = new Vector<Value>();
+	private List<Value> range = new Vector<Value>();
+	private int size = 0;
+	
 	public ValueMap()
 	{
 		super();
@@ -55,15 +89,22 @@ public class ValueMap extends TreeMap<Value, Value>
 		putAll(from);
 	}
 
-	public ValueMap(Value k, Value v)
-	{
-		put(k, v);
-	}
-
 	public boolean isInjective()
 	{
-		Set<Value> rng = new HashSet<Value>(values());
-		return keySet().size() == rng.size();
+		for (int i=0; i<range.size(); i++)
+		{
+			Value v = range.get(i);
+			
+			for (int j=i+1; j<range.size(); j++)
+			{
+				if (range.get(j).equals(v))
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	@Override
@@ -73,12 +114,12 @@ public class ValueMap extends TreeMap<Value, Value>
 		sb.append("{");
 		String prefix = "";
 
-		for (Value key: this.keySet())
+		for (int i=0; i<domain.size(); i++)
 		{
 			sb.append(prefix);
-			sb.append(key);
+			sb.append(domain.get(i));
 			sb.append(" |-> ");
-			sb.append(get(key));
+			sb.append(range.get(i));
 			prefix = ", ";
 		}
 
@@ -91,10 +132,10 @@ public class ValueMap extends TreeMap<Value, Value>
 	{
 		ValueMap copy = new ValueMap();
 
-		for (Value k: this.keySet())
+		for (int i=0; i<size; i++)
 		{
-			Value kcopy = (Value)k.clone();
-			Value vcopy = (Value)get(k).clone();
+			Value kcopy = (Value)domain.get(i).clone();
+			Value vcopy = (Value)range.get(i).clone();
 			copy.put(kcopy, vcopy);
 		}
 
@@ -102,22 +143,18 @@ public class ValueMap extends TreeMap<Value, Value>
 	}
 
 	/**
-	 * Returns a list of maps, with the map entries in all possible orders. This means
-	 * that the Java Maps used have to be "Linked" Maps so that their order is preserved.
-	 * This means that we cannot simply use ValueMaps, which are TreeMaps (sorted).
+	 * Returns a list of maps, with the map entries in all possible orders.
 	 */
-	public List<Map<Value, Value>> permutedMaps()
+	public List<ValueMap> permutedMaps()
 	{
 		// This is a 1st order permutation, which does not take account of the possible
 		// nesting of maps or the presence of other permutable values with them (sets).
 
-		List<Map<Value, Value>> results = new Vector<Map<Value, Value>>();
-		Object[] entries = entrySet().toArray();
-		int size = entries.length;
+		List<ValueMap> results = new Vector<ValueMap>();
 
 		if (size == 0)
 		{
-			results.add(new LinkedHashMap<Value, Value>());	// Just {|->}
+			results.add(new ValueMap());	// Just {|->}
 		}
 		else
 		{
@@ -125,14 +162,12 @@ public class ValueMap extends TreeMap<Value, Value>
 
 			while (p.hasNext())
 			{
-				Map<Value, Value> m = new LinkedHashMap<Value, Value>();
+				ValueMap m = new ValueMap();
 				int[] perm = p.next();
 
-				for (int i=0; i<size; i++)
+				for (int i=0; i<perm.length; i++)
 				{
-					@SuppressWarnings("unchecked")
-					Entry<Value, Value> entry = (Entry<Value, Value>)entries[perm[i]];
-					m.put(entry.getKey(), entry.getValue());
+					m.put(domain.get(perm[i]), range.get(perm[i]));
 				}
 
 				results.add(m);
@@ -140,5 +175,159 @@ public class ValueMap extends TreeMap<Value, Value>
 		}
 
 		return results;
+	}
+
+	@Override
+	public int size()
+	{
+		return size;
+	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if (other == this)
+		{
+			return true;
+		}
+		else if (other instanceof ValueMap)
+		{
+			ValueMap vmap = (ValueMap)other;
+			
+			if (size != vmap.size)
+			{
+				return false;
+			}
+			
+			for (int i=0; i<size; i++)
+			{
+				if (!range.get(i).equals(vmap.get(domain.get(i))))
+				{
+					return false;
+				}
+			}
+			
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	@Override
+	public boolean isEmpty()
+	{
+		return domain.isEmpty();
+	}
+
+	@Override
+	public boolean containsKey(Object key)
+	{
+		return domain.contains(key);
+	}
+
+	@Override
+	public boolean containsValue(Object value)
+	{
+		return range.contains(value);
+	}
+
+	@Override
+	public Value get(Object key)
+	{
+		for (int i=0; i<size; i++)
+		{
+			if (domain.get(i).equals(key))	// NB. uses "eq" 
+			{
+				return range.get(i);
+			}
+		}
+		
+		return null;
+	}
+
+	@Override
+	public Value put(Value key, Value value)
+	{
+		Value old = null;
+		
+		for (int i=0; i<size; i++)
+		{
+			if (domain.get(i).equals(key))
+			{
+				old = range.get(i);
+				range.set(i, value);
+				return old;
+			}
+		}
+
+		domain.add(key);
+		range.add(value);
+		size++;
+		
+		return null;
+	}
+
+	@Override
+	public Value remove(Object key)
+	{
+		Value old = null;
+		
+		for (int i=0; i<size; i++)
+		{
+			if (domain.get(i).equals(key))
+			{
+				old = range.get(i);
+				domain.remove(i);
+				range.remove(i);
+				size--;
+			}
+		}
+		
+		return old;
+	}
+
+	@Override
+	public void putAll(Map<? extends Value, ? extends Value> m)
+	{
+		for (Value key: m.keySet())
+		{
+			put(key, m.get(key));
+		}
+	}
+
+	@Override
+	public void clear()
+	{
+		domain.clear();
+		range.clear();
+		size = 0;
+	}
+
+	@Override
+	public Set<Value> keySet()
+	{
+		return new LinkedHashSet<Value>(domain);
+	}
+
+	@Override
+	public Collection<Value> values()
+	{
+		return range;
+	}
+
+	@Override
+	public Set<Map.Entry<Value, Value>> entrySet()
+	{
+		// NOTE this uses a LinkedHashSet to give a predictable iterator order
+		Set<Map.Entry<Value, Value>> set = new LinkedHashSet<Map.Entry<Value, Value>>();
+		
+		for (int i=0; i<size; i++)
+		{
+			set.add(new Entry(domain.get(i), range.get(i)));
+		}
+		
+		return set;
 	}
 }

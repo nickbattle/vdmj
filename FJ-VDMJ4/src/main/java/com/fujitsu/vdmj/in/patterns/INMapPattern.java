@@ -25,7 +25,6 @@ package com.fujitsu.vdmj.in.patterns;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
@@ -98,7 +97,7 @@ public class INMapPattern extends INPattern
 		// are not constrained however, the initial ordering will be
 		// fine.
 
-		List<Map<Value, Value>> allMaps;
+		List<ValueMap> allMaps;
 
 		if (isConstrained())
 		{
@@ -106,7 +105,7 @@ public class INMapPattern extends INPattern
 		}
 		else
 		{
-			allMaps = new Vector<Map<Value, Value>>();
+			allMaps = new Vector<ValueMap>();
 			allMaps.add(values);
 		}
 
@@ -119,7 +118,7 @@ public class INMapPattern extends INPattern
 			return finalResults;
 		}
 
-		for (Map<Value, Value> mapPerm: allMaps)
+		for (ValueMap mapPerm: allMaps)
 		{
 			Iterator<Entry<Value, Value>> iter = mapPerm.entrySet().iterator();
 
@@ -136,7 +135,7 @@ public class INMapPattern extends INPattern
 					counts[i++] = pnvps.size();
 				}
 			}
-			catch (Exception e)
+			catch (Exception e)		// Pattern match or value conversion fails
 			{
 				continue;
 			}
