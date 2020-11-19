@@ -49,7 +49,7 @@ public class TCCPUClassDefinition extends TCClassDefinition
 	public TCCPUClassDefinition() throws Exception
 	{
 		super(
-			new TCNameToken(new LexLocation(), "CLASS", "CPU", false, false),
+			new TCNameToken(LexLocation.ANY, "CLASS", "CPU", false, false),
 			new TCNameList(),
 			operationDefs());
 	}
@@ -64,14 +64,21 @@ public class TCCPUClassDefinition extends TCClassDefinition
 		"	deploy(obj, name) == is not yet specified; " +
 		"public setPriority: ? * nat ==> () " +
 		"	setPriority(opname, priority) == is not yet specified;";
+	
+	private static TCDefinitionList operationDefs = null;
 
 	private static TCDefinitionList operationDefs() throws Exception
 	{
-		LexTokenReader ltr = new LexTokenReader(defs, Dialect.VDM_PP);
-		DefinitionReader dr = new DefinitionReader(ltr);
-		dr.setCurrentModule("CPU");
-		ASTDefinitionList ast = dr.readDefinitions();
-		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);	// NB. no init!!
+		if (operationDefs == null)
+		{
+			LexTokenReader ltr = new LexTokenReader(defs, Dialect.VDM_PP);
+			DefinitionReader dr = new DefinitionReader(ltr);
+			dr.setCurrentModule("CPU");
+			ASTDefinitionList ast = dr.readDefinitions();
+			operationDefs = ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);	// NB. no init!!
+		}
+		
+		return operationDefs;
 	}
 
 	@Override
