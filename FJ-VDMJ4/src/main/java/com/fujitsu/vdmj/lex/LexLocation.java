@@ -55,6 +55,9 @@ public class LexLocation implements Serializable
 	/** A map of f/op/class names to their lexical span, for coverage. */
 	private static Map<LexNameToken, LexLocation> nameSpans = new HashMap<LexNameToken, LexLocation>();
 
+	/** A dummy location meaning "nowhere" */
+	public static final LexLocation ANY = new LexLocation();
+	
 	/** True if the location is executable. */
 	private boolean executable = false;
 

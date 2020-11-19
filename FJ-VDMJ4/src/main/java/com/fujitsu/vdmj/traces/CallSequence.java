@@ -46,7 +46,7 @@ public class CallSequence extends Vector<INStatement>
 	{
 		StringBuilder sb = new StringBuilder();
 		String sep = "";
-		Context ctxt = new Context(new LexLocation(), "traces", context);
+		Context ctxt = new Context(LexLocation.ANY, "traces", context);
 		ctxt.setThreadState(null);
 
 		for (INStatement stmt: this)

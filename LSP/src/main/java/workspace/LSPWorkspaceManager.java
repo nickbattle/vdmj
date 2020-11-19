@@ -364,7 +364,7 @@ public abstract class LSPWorkspaceManager
 		{
 			po.checkLoadedFiles(tc.getTC());
 
-			result.add(new RPCRequest("lspx/POG/updated",
+			result.add(new RPCRequest("slsp/POG/updated",
 					new JSONObject("successful", tc.getErrs().isEmpty())));
 		}
 		

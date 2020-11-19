@@ -31,14 +31,7 @@ public abstract class TraceIterator
 	
 	public void setVariables(INTraceVariableList inTraceVariableList)
 	{
-		if (this.variables == null)
-		{
-			this.variables = inTraceVariableList;
-		}
-		else
-		{
-			this.variables.addAll(inTraceVariableList);
-		}
+		this.variables = inTraceVariableList;
 	}
 
 	public CallSequence getVariables()
