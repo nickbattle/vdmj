@@ -14,7 +14,7 @@
 	<properties>
 	    <maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	    <revision>4.4.0-P-SNAPSHOT</revision>	<!-- CHANGE VERSION HERE, AND MODULE'S PARENT POMs -->
+	    <revision>4.4.0-P</revision>	<!-- CHANGE VERSION HERE, AND MODULE'S PARENT POMs -->
 	</properties>
 
 	<!-- sub modules -->
