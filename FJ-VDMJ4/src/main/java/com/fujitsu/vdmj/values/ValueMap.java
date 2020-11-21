@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Fujitsu Services Ltd.
+ *	Copyright (c) 2016 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -24,7 +24,9 @@
 package com.fujitsu.vdmj.values;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,49 +37,15 @@ import com.fujitsu.vdmj.traces.PermuteArray;
 /**
  * A map of value/values.
  * 
- * NOTE! In order to allow maps of values with "eq/ord" clauses, we cannot use
- * standard Java HashMaps or TreeMaps, as these may break if the user wants
- * eq/ord clauses that do not meet the Java contracts for equals() and compareTo().
+ * NOTE! As soon as an Invariant/Record value is added that defines "eq", we switch to
+ * using an InvariantValueMap delegate, which only uses equals(). The problem is that
+ * we only have "eq" and not a hashCode function defined, can which produce inconsistent
+ * results with a HashMap (or TreeMap, with "ord" clauses).
  */
 @SuppressWarnings("serial")
-public class ValueMap implements Map<Value, Value>
+public class ValueMap extends HashMap<Value, Value>
 {
-	private static class Entry implements Map.Entry<Value, Value>
-	{
-		private Value key;
-		private Value value;
-		
-		public Entry(Value key, Value value)
-		{
-			this.key = key;
-			this.value = value;
-		}
-		
-		@Override
-		public Value getKey()
-		{
-			return key;
-		}
-
-		@Override
-		public Value getValue()
-		{
-			return value;
-		}
-
-		@Override
-		public Value setValue(Value value)
-		{
-			Value old = value;
-			this.value = value;
-			return old;
-		}
-	}
-	
-	// These will always be the same size!
-	private List<Value> domain = new Vector<Value>();
-	private List<Value> range = new Vector<Value>();
-	private int size = 0;
+	private InvariantValueMap delegate = null;
 	
 	public ValueMap()
 	{
@@ -89,37 +57,34 @@ public class ValueMap implements Map<Value, Value>
 		putAll(from);
 	}
 
+	public ValueMap(Value k, Value v)
+	{
+		put(k, v);
+	}
+
 	public boolean isInjective()
 	{
-		for (int i=0; i<size; i++)
-		{
-			Value v = range.get(i);
-			
-			for (int j=i+1; j<size; j++)
-			{
-				if (range.get(j).equals(v))
-				{
-					return false;
-				}
-			}
-		}
+		if (delegate != null) return delegate.isInjective();
 
-		return true;
+		Set<Value> rng = new HashSet<Value>(values());
+		return keySet().size() == rng.size();
 	}
 
 	@Override
 	public String toString()
 	{
+		if (delegate != null) return delegate.toString();
+
 		StringBuilder sb = new StringBuilder();
 		sb.append("{");
 		String prefix = "";
 
-		for (int i=0; i<size; i++)
+		for (Value key: this.keySet())
 		{
 			sb.append(prefix);
-			sb.append(domain.get(i));
+			sb.append(key);
 			sb.append(" |-> ");
-			sb.append(range.get(i));
+			sb.append(get(key));
 			prefix = ", ";
 		}
 
@@ -130,12 +95,14 @@ public class ValueMap implements Map<Value, Value>
 	@Override
 	public Object clone()
 	{
+		if (delegate != null) return delegate.clone();
+
 		ValueMap copy = new ValueMap();
 
-		for (int i=0; i<size; i++)
+		for (Value k: this.keySet())
 		{
-			Value kcopy = (Value)domain.get(i).clone();
-			Value vcopy = (Value)range.get(i).clone();
+			Value kcopy = (Value)k.clone();
+			Value vcopy = (Value)get(k).clone();
 			copy.put(kcopy, vcopy);
 		}
 
@@ -143,18 +110,24 @@ public class ValueMap implements Map<Value, Value>
 	}
 
 	/**
-	 * Returns a list of maps, with the map entries in all possible orders.
+	 * Returns a list of maps, with the map entries in all possible orders. This means
+	 * that the Java Maps used have to be "Linked" Maps so that their order is preserved.
+	 * This means that we cannot simply use ValueMaps, which are TreeMaps (sorted).
 	 */
-	public List<ValueMap> permutedMaps()
+	public List<Map<Value, Value>> permutedMaps()
 	{
+		if (delegate != null) return delegate.permutedMaps();
+
 		// This is a 1st order permutation, which does not take account of the possible
 		// nesting of maps or the presence of other permutable values with them (sets).
 
-		List<ValueMap> results = new Vector<ValueMap>();
+		List<Map<Value, Value>> results = new Vector<Map<Value, Value>>();
+		Object[] entries = entrySet().toArray();
+		int size = entries.length;
 
 		if (size == 0)
 		{
-			results.add(new ValueMap());	// Just {|->}
+			results.add(new LinkedHashMap<Value, Value>());	// Just {|->}
 		}
 		else
 		{
@@ -162,12 +135,14 @@ public class ValueMap implements Map<Value, Value>
 
 			while (p.hasNext())
 			{
-				ValueMap m = new ValueMap();
+				Map<Value, Value> m = new LinkedHashMap<Value, Value>();
 				int[] perm = p.next();
 
-				for (int i=0; i<perm.length; i++)
+				for (int i=0; i<size; i++)
 				{
-					m.put(domain.get(perm[i]), range.get(perm[i]));
+					@SuppressWarnings("unchecked")
+					Entry<Value, Value> entry = (Entry<Value, Value>)entries[perm[i]];
+					m.put(entry.getKey(), entry.getValue());
 				}
 
 				results.add(m);
@@ -177,157 +152,108 @@ public class ValueMap implements Map<Value, Value>
 		return results;
 	}
 
+	/**
+	 * Remaining methods are simply delegated or passed up.
+	 */
+
 	@Override
 	public int size()
 	{
-		return size;
+		if (delegate != null) return delegate.size(); else return super.size();
 	}
 	
 	@Override
 	public boolean equals(Object other)
 	{
-		if (other == this)
-		{
-			return true;
-		}
-		else if (other instanceof ValueMap)
-		{
-			ValueMap vmap = (ValueMap)other;
-			
-			if (size != vmap.size)
-			{
-				return false;
-			}
-			
-			for (int i=0; i<size; i++)
-			{
-				if (!range.get(i).equals(vmap.get(domain.get(i))))
-				{
-					return false;
-				}
-			}
-			
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		if (delegate != null) return delegate.equals(other); else return super.equals(other);
 	}
 
 	@Override
 	public boolean isEmpty()
 	{
-		return domain.isEmpty();
+		if (delegate != null) return delegate.isEmpty(); else return super.isEmpty();
 	}
 
 	@Override
 	public boolean containsKey(Object key)
 	{
-		return domain.contains(key);
+		if (delegate != null) return delegate.containsKey(key); else return super.containsKey(key);
 	}
 
 	@Override
 	public boolean containsValue(Object value)
 	{
-		return range.contains(value);
+		if (delegate != null) return delegate.containsValue(value); else return super.containsValue(value);
 	}
 
 	@Override
 	public Value get(Object key)
 	{
-		for (int i=0; i<size; i++)
-		{
-			if (domain.get(i).equals(key))	// NB. uses "eq" 
-			{
-				return range.get(i);
-			}
-		}
-		
-		return null;
+		if (delegate != null) return delegate.get(key); else return super.get(key);
 	}
 
 	@Override
 	public Value put(Value key, Value value)
 	{
-		Value old = null;
+		if (delegate != null) return delegate.put(key, value);
 		
-		for (int i=0; i<size; i++)
+		if (key instanceof InvariantValue)
 		{
-			if (domain.get(i).equals(key))	// NB. uses "eq" 
+			InvariantValue ivalue = (InvariantValue)key;
+			
+			if (ivalue.equality != null)	// defines "eq"
 			{
-				old = range.get(i);
-				range.set(i, value);
-				return old;
+				delegate = new InvariantValueMap(this);
+				return delegate.put(key, value);
+			}
+		}
+		else if (key instanceof RecordValue)
+		{
+			RecordValue rvalue = (RecordValue)key;
+			
+			if (rvalue.equality != null)	// defines "eq"
+			{
+				delegate = new InvariantValueMap(this);
+				return delegate.put(key, value);
 			}
 		}
 
-		domain.add(key);
-		range.add(value);
-		size++;
-		
-		return null;
+		return super.put(key, value);
 	}
 
 	@Override
 	public Value remove(Object key)
 	{
-		Value old = null;
-		
-		for (int i=0; i<size; i++)
-		{
-			if (domain.get(i).equals(key))
-			{
-				old = range.get(i);
-				domain.remove(i);
-				range.remove(i);
-				size--;
-			}
-		}
-		
-		return old;
+		if (delegate != null) return delegate.remove(key); else return super.remove(key);
 	}
 
 	@Override
 	public void putAll(Map<? extends Value, ? extends Value> m)
 	{
-		for (Value key: m.keySet())
-		{
-			put(key, m.get(key));
-		}
+		if (delegate != null) delegate.putAll(m); else super.putAll(m);
 	}
 
 	@Override
 	public void clear()
 	{
-		domain.clear();
-		range.clear();
-		size = 0;
+		if (delegate != null) delegate.clear(); else super.clear();
 	}
 
 	@Override
 	public Set<Value> keySet()
 	{
-		return new LinkedHashSet<Value>(domain);
+		if (delegate != null) return delegate.keySet(); else return super.keySet();
 	}
 
 	@Override
 	public Collection<Value> values()
 	{
-		return range;
+		if (delegate != null) return delegate.values(); else return super.values();
 	}
 
 	@Override
 	public Set<Map.Entry<Value, Value>> entrySet()
 	{
-		// NOTE this uses a LinkedHashSet to give a predictable iterator order
-		Set<Map.Entry<Value, Value>> set = new LinkedHashSet<Map.Entry<Value, Value>>();
-		
-		for (int i=0; i<size; i++)
-		{
-			set.add(new Entry(domain.get(i), range.get(i)));
-		}
-		
-		return set;
+		if (delegate != null) return delegate.entrySet(); else return super.entrySet();
 	}
 }
