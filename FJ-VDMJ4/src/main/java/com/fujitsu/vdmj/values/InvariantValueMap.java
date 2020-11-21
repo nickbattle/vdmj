@@ -209,6 +209,25 @@ public class InvariantValueMap implements Map<Value, Value>
 			
 			return true;
 		}
+		else if (other instanceof ValueMap)
+		{
+			ValueMap vmap = (ValueMap)other;
+			
+			if (size != vmap.size())
+			{
+				return false;
+			}
+			
+			for (int i=0; i<size; i++)
+			{
+				if (!range.get(i).equals(vmap.get(domain.get(i))))
+				{
+					return false;
+				}
+			}
+			
+			return true;
+		}
 		else
 		{
 			return false;
