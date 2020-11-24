@@ -2,6 +2,9 @@
 # Start an LSP server
 #
 
+VERSION=4.4.1-SNAPSHOT
+JAVA64_VMOPTS="-Xmx3000m -Xss5m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote"
+
 if [ $# -ne 1 ]
 then
     echo "Usage: lsp.sh [-vdmsl | -vdmpp | -vdmrt]"
@@ -23,11 +26,11 @@ function latest()
     ls -t $1 | head -1
 }
 
-java -Xmx2g -Dlog.filename=/dev/tty \
+java ${JAVA64_VMOPTS} -Dlog.filename=/dev/tty \
     -cp \
-$(latest "Annotations/target/annotations-4.4.0-*.jar"):\
-$(latest "FJ-VDMJ4/target/vdmj-4.4.0-SNAPSHOT-??????.jar"):\
-$(latest "LSP/target/lsp-4.4.0-*.jar") \
+$(latest "Annotations/target/annotations-${VERSION}-*.jar"):\
+$(latest "FJ-VDMJ4/target/vdmj-${VERSION}-??????.jar"):\
+$(latest "LSP/target/lsp-${VERSION}-*.jar") \
     lsp.LSPServerSocket $1 -lsp 8000 -dap 8001
 
 exit 0
