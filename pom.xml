@@ -25,6 +25,7 @@
 		<module>FJ-VDMJC4</module>
 		<module>FJ-VDMJUnit4</module>
 		<module>LSP</module>
+		<module>stdlib</module>
 	</modules>
 
 	<build>
