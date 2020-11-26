@@ -63,17 +63,27 @@ public class ASTPluginPR extends ASTPlugin
 		dirty = false;
 		Map<File, StringBuilder> projectFiles = lspManager.getProjectFiles();
 		
+		if (Settings.dialect == Dialect.VDM_RT)
+		{
+			try
+			{
+				// Add CPU and BUS up front, to be overwritten if they are explicitly defined
+				astClassList.add(new ASTCPUClassDefinition());
+				astClassList.add(new ASTBUSClassDefinition());
+			}
+			catch (Exception e)
+			{
+				Log.error(e);
+				return false;
+			}
+		}
+		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
 			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(),
 					Settings.dialect, entry.getKey(), Charset.defaultCharset().displayName());
 			ClassReader mr = new ClassReader(ltr);
 			astClassList.addAll(mr.readClasses());
-			
-			if (Settings.dialect == Dialect.VDM_RT)
-			{
-				astClassList.addAll(extras());
-			}
 			
 			if (mr.getErrorCount() > 0)
 			{
@@ -87,22 +97,6 @@ public class ASTPluginPR extends ASTPlugin
 		}
 		
 		return errs.isEmpty();
-	}
-
-	private ASTClassList extras()
-	{
-		try
-		{
-			ASTClassList ex = new ASTClassList();
-			ex.add(new ASTCPUClassDefinition());
-			ex.add(new ASTBUSClassDefinition());
-			return ex;
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return null;
-		}
 	}
 
 	@SuppressWarnings("unchecked")
