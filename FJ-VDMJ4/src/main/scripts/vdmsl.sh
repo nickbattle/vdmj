@@ -3,14 +3,30 @@
 # Execute VDMJ jar with various options
 #####################################################################################
 
+# Change these to flip VDMJ version
+MVERSION="4.4.1-SNAPSHOT"
+PVERSION="4.4.1-P-SNAPSHOT"
+
+# The Maven repository directory containing VDMJ jars
+MAVENREPO=~/.m2/repository/com/fujitsu
+
+# Location of the stdlib files, if any
+LIBDIR="$HOME/lib/stdlib"
+
+# Location of the vdmj.properties file, if any
+PROPDIR="$HOME/lib"
+
+# Details for 64-bit Java
+JAVA64="/usr/bin/java"
+JAVA64_VMOPTS="-Xmx3000m -Xss1m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote"
+
 function help()
 {
     echo "Usage: $0 [--help|-?] [-P] [-A] <VDMJ options>"
     echo "-P use high precision VDMJ"
     echo "-A use annotation libraries and options"
     echo "Java options are $JAVA64 $JAVA64_VMOPTS"
-    echo "VDMJ installation is $JARDIR"
-    echo "VDMJ options are $VDMJ_VMOPTS $VDMJ_OPTS"
+    echo "VDMJ options are $VDMJ_OPTS"
     exit 0
 }
 
@@ -23,18 +39,21 @@ function check()
     fi
 }
 
-# The installation directory containing VDMJ jars
-JARDIR=~/lib
 
-# Details for 64-bit Java
-JAVA64="/usr/bin/java"
-JAVA64_VMOPTS="-Xmx3000m -Xss5m"
+# Just warn if a later version is available in Maven
+LATEST=$(ls $MAVENREPO/vdmj | grep "^[0-9].[0-9].[0-9]" | tail -1)
 
-# Set defaults as standard precision without annotations
-PRECISION=""
-VDMJ_OPTS="-path $JARDIR/stdlib"
-VERSION="4.3.0"
-ANNOTATIONS_VERSION=""
+if [ "$MVERSION" != "$LATEST" ]
+then
+    echo "WARNING: Latest VDMJ version is $LATEST, not $MVERSION"
+fi
+
+
+# Set defaults as standard precision, maybe a snapshot, without annotations
+VDMJ_OPTS="-path $LIBDIR"
+
+# Chosen version defaults to "master"
+VERSION=$MVERSION
 
 if [ $# -eq 0 ]
 then help
@@ -48,10 +67,10 @@ do
 	    help
 	    ;;
 	-A)
-	    ANNOTATIONS_VERSION="1.0.0"
+	    ANNOTATIONS_VERSION=$VERSION
 	    ;;
 	-P)
-	    PRECISION="-P"
+	    VERSION=$PVERSION
 	    ;;
 	*)
 	    VDMJ_OPTS="$VDMJ_OPTS $1"
@@ -60,16 +79,16 @@ do
 done
 
 # Locate the jars
-VDMJ_JAR=$JARDIR/vdmj-${VERSION}${PRECISION}.jar
+VDMJ_JAR=$MAVENREPO/vdmj/${VERSION}/vdmj-${VERSION}.jar
 check "$VDMJ_JAR"
-CLASSPATH="$VDMJ_JAR"
+CLASSPATH="$VDMJ_JAR:$PROPDIR"
 MAIN="com.fujitsu.vdmj.VDMJ"
 
 if [ $ANNOTATIONS_VERSION ]
 then
-    ANNOTATIONS_JAR=$JARDIR/annotations-$ANNOTATIONS_VERSION.jar
+    ANNOTATIONS_JAR=$MAVENREPO/annotations/${VERSION}/annotations-${VERSION}.jar
     check "$ANNOTATIONS_JAR"
-    ANNOTATIONS2_JAR=$JARDIR/annotations2-$ANNOTATIONS_VERSION.jar
+    ANNOTATIONS2_JAR=$MAVENREPO/annotations2/${VERSION}/annotations2-${VERSION}.jar
     check "$ANNOTATIONS2_JAR"
     VDMJ_OPTS="$VDMJ_OPTS -annotations"
     VDMJ_VMOPTS="$VDMJ_VMOPTS -Dannotations.debug"
@@ -84,5 +103,5 @@ DIALECT=$(basename $0)
 export RLWRAP_HOME=~/.vdmj
 
 # Execute the JVM...
-exec rlwrap "$JAVA64" $JAVA_VMOPTS $VDMJ_VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJ_OPTS "$@"
+exec rlwrap "$JAVA64" $JAVA64_VMOPTS $VDMJ_VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJ_OPTS "$@"
 
