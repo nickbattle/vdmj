@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 abstract public class ReferenceValue extends Value
 {
@@ -230,5 +231,11 @@ abstract public class ReferenceValue extends Value
 	public String toString()
 	{
 		return value.toString();
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseReferenceValue(this, arg);
 	}
 }

@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCTokenType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class TokenValue extends Value
 {
@@ -91,5 +92,11 @@ public class TokenValue extends Value
 	public Object clone()
 	{
 		return new TokenValue(value);
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTokenValue(this, arg);
 	}
 }

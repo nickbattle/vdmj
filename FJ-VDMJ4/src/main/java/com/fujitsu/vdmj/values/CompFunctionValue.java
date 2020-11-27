@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class CompFunctionValue extends FunctionValue
 {
@@ -137,5 +138,11 @@ public class CompFunctionValue extends FunctionValue
 	public Object clone()
 	{
 		return new CompFunctionValue((FunctionValue)ff1.clone(), (FunctionValue)ff2.clone());
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCompFunctionValue(this, arg);
 	}
 }

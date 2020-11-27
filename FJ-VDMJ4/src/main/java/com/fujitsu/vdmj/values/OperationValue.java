@@ -66,6 +66,7 @@ import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.util.Utils;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 
 public class OperationValue extends Value
@@ -787,5 +788,11 @@ public class OperationValue extends Value
 	public String toTitle()
 	{
 		return name.getName() + Utils.listToString("(", paramPatterns, ", ", ")");
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseOperationValue(this, arg);
 	}
 }

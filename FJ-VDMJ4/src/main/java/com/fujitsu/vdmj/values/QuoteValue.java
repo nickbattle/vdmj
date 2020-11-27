@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCQuoteType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class QuoteValue extends Value
 {
@@ -104,5 +105,11 @@ public class QuoteValue extends Value
 	public Object clone()
 	{
 		return new QuoteValue(value);
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseQuoteValue(this, arg);
 	}
 }

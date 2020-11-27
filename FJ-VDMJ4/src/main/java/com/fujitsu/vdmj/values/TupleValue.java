@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.util.Utils;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 
 public class TupleValue extends Value
@@ -175,5 +176,11 @@ public class TupleValue extends Value
 	public Object clone()
 	{
 		return new TupleValue((ValueList)values.clone());
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTupleValue(this, arg);
 	}
 }

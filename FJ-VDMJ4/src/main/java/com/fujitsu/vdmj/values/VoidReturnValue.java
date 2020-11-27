@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.values;
 
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
+
 public class VoidReturnValue extends VoidValue
 {
 	private static final long serialVersionUID = 1L;
@@ -37,5 +39,11 @@ public class VoidReturnValue extends VoidValue
 	public Object clone()
 	{
 		return new VoidReturnValue();
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseVoidReturnValue(this, arg);
 	}
 }

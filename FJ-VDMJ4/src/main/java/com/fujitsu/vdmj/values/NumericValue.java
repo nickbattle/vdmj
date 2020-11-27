@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.tc.types.TCRationalType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public abstract class NumericValue extends Value
 {
@@ -190,4 +191,10 @@ public abstract class NumericValue extends Value
 	abstract public int hashCode();
 	@Override
 	abstract public String toString();
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNumericValue(this, arg);
+	}
 }

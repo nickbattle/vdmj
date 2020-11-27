@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class BooleanValue extends Value
 {
@@ -97,5 +98,11 @@ public class BooleanValue extends Value
 	public Object clone()
 	{
 		return new BooleanValue(value);
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBooleanValue(this, arg);
 	}
 }
