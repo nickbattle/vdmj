@@ -75,7 +75,7 @@ public static
 public static
     srand:int ==> ()
     srand(a) ==
-    let - = MATH`srand2(a) in skip
+    def - = MATH`srand2(a) in skip
     pre a >= -1;
 
 public static

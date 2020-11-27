@@ -10,9 +10,6 @@ PVERSION="4.4.1-P-SNAPSHOT"
 # The Maven repository directory containing VDMJ jars
 MAVENREPO=~/.m2/repository/com/fujitsu
 
-# Location of the stdlib files, if any
-LIBDIR="$HOME/lib/stdlib"
-
 # Location of the vdmj.properties file, if any
 PROPDIR="$HOME/lib"
 
@@ -49,9 +46,6 @@ then
 fi
 
 
-# Set defaults as standard precision, maybe a snapshot, without annotations
-VDMJ_OPTS="-path $LIBDIR"
-
 # Chosen version defaults to "master"
 VERSION=$MVERSION
 
@@ -80,8 +74,11 @@ done
 
 # Locate the jars
 VDMJ_JAR=$MAVENREPO/vdmj/${VERSION}/vdmj-${VERSION}.jar
+STDLIB_JAR=$MAVENREPO/stdlib/${VERSION}/stdlib-${VERSION}.jar
 check "$VDMJ_JAR"
+check "$STDLIB_JAR"
 CLASSPATH="$VDMJ_JAR:$PROPDIR"
+VDMJ_OPTS="-path $STDLIB_JAR $VDMJ_OPTS"
 MAIN="com.fujitsu.vdmj.VDMJ"
 
 if [ $ANNOTATIONS_VERSION ]

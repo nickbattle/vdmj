@@ -24,6 +24,10 @@
 package com.fujitsu.vdmj;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -39,6 +43,7 @@ import java.util.Map.Entry;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.zip.ZipEntry;
 
 import com.fujitsu.vdmj.Settings;
 
@@ -263,18 +268,18 @@ abstract public class VDMJ
     			{
        				File path = new File(i.next());
        				
-       				if (path.isDirectory())
+       				if (path.isDirectory() || (path.isFile() && path.getName().endsWith(".jar")))
        				{
        					pathnames.add(path);
        				}
        				else
        				{
-       					usage(path + " is not a directory");
+       					usage(path + " is not a directory or a jar file");
        				}
     			}
     			else
     			{
-    				usage("-path option requires a directory");
+    				usage("-path option requires a directory or a jar file");
     			}
     		}
     		else if (arg.equals("-precision"))
@@ -332,6 +337,53 @@ abstract public class VDMJ
     					
     					for (File path: pathnames)
     					{
+    						if (path.getName().endsWith(".jar"))	// Usually stdlib jar
+    						{
+    							JarFile jar = null;
+    							
+    							try
+								{
+									jar = new JarFile(path);
+									ZipEntry entry = jar.getEntry(file.getName());	// Use base name
+									
+									if (entry != null)
+									{
+										File temp = File.createTempFile(file.getName() + ".", null);
+										temp.deleteOnExit();
+										OutputStream out = new FileOutputStream(temp);
+										InputStream in = jar.getInputStream(entry);
+										byte[] buf = new byte[8192];
+									    int length;
+
+									    while ((length = in.read(buf)) > 0)
+									    {
+									        out.write(buf, 0, length);
+									    }
+									    
+									    in.close();
+									    out.close();
+									    
+		    							filenames.add(temp);
+		    							OK = true;
+		    							break;
+									}
+								}
+								catch (IOException e)
+								{
+									// Ignore
+								}
+    							finally
+    							{
+    								try
+									{
+										jar.close();
+									}
+									catch (IOException e)
+									{
+									}
+    							}
+    						}
+    						
     						File pfile = new File(path, arg);
     						
     						if (pfile.exists())
