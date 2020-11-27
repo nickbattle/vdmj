@@ -16,6 +16,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INIntegerLiteralExpression;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.values.Value;
 
@@ -35,8 +36,8 @@ public class INLimitAnnotation extends INAnnotation
 		
 		if (count > limit.value.value.longValue())
 		{
-			System.out.printf("WARNING: Value count %d has exceeded the limit of %d at %s\n",
-								count, limit.value.value.longValue(), aexp.expression.location);
+			String msg = String.format("@Limit Value count %d has exceeded the limit of %d", count, limit.value.value.longValue());
+			throw new ContextException(9999, msg, aexp.expression.location, ctxt);
 		}
 	}
 }
