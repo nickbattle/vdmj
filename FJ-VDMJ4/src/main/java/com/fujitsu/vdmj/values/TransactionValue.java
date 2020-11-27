@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.runtime.ExceptionHandler;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 /**
  * A class to hold an updatable value that can be modified by VDM-RT
@@ -340,5 +341,11 @@ public class TransactionValue extends UpdatableValue
 	public synchronized String toString()
 	{
 		return select().toString();
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseTransactionValue(this, arg);
 	}
 }

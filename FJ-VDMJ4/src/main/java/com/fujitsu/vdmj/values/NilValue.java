@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class NilValue extends Value
 {
@@ -82,5 +83,11 @@ public class NilValue extends Value
 	public Object clone()
 	{
 		return new NilValue();
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseNilValue(this, arg);
 	}
 }

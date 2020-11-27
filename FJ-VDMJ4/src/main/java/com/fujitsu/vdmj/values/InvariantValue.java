@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class InvariantValue extends ReferenceValue
 {
@@ -270,5 +271,11 @@ public class InvariantValue extends ReferenceValue
 		{
 			return super.hashCode();
 		}
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseInvariantValue(this, arg);
 	}
 }

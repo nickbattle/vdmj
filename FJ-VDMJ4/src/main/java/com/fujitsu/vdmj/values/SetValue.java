@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 
 public class SetValue extends Value
@@ -180,5 +181,11 @@ public class SetValue extends Value
 	public Object clone()
 	{
 		return new SetValue((ValueSet)values.clone(), false);
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseSetValue(this, arg);
 	}
 }

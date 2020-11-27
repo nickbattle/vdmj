@@ -58,6 +58,7 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class FunctionValue extends Value
 {
@@ -760,5 +761,11 @@ public class FunctionValue extends Value
 	{
 		INPatternList paramPatterns = paramPatternList.get(0);
 		return name + Utils.listToString("(", paramPatterns, ", ", ")");
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseFunctionValue(this, arg);
 	}
 }

@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 /**
  * The parent of all runtime values.
@@ -454,4 +455,6 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 		abort(4105, "Can't get object value of " + kind(), ctxt);
 		return null;
 	}
+
+	abstract public <R, S> R apply(ValueVisitor<R, S> visitor, S arg);
 }

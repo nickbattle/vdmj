@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class RecordValue extends Value
 {
@@ -418,5 +419,11 @@ public class RecordValue extends Value
 	public Object clone()
 	{
 		return new RecordValue(type, (FieldMap)fieldmap.clone(), invariant, equality, ordering);
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseRecordValue(this, arg);
 	}
 }

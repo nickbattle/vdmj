@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.scheduler.SchedulingPolicy;
 import com.fujitsu.vdmj.tc.definitions.TCCPUClassDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class CPUValue extends ObjectValue
 {
@@ -142,5 +143,11 @@ public class CPUValue extends ObjectValue
 		{
 			// Can't happen
 		}
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCPUValue(this, arg);
 	}
 }

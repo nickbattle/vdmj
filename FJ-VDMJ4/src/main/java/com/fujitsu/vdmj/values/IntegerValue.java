@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class IntegerValue extends RationalValue
 {
@@ -173,5 +174,11 @@ public class IntegerValue extends RationalValue
 		{
 			throw new InternalException(5, "Illegal clone");
 		}
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseIntegerValue(this, arg);
 	}
 }

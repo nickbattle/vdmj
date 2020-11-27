@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.scheduler.MessageResponse;
 import com.fujitsu.vdmj.scheduler.ResourceScheduler;
 import com.fujitsu.vdmj.scheduler.SchedulingPolicy;
 import com.fujitsu.vdmj.tc.types.TCClassType;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class BUSValue extends ObjectValue
 {
@@ -207,5 +208,11 @@ public class BUSValue extends ObjectValue
 	public static BUSValue lookupBUS(CPUValue from, CPUValue to)
 	{
 		return cpumap[from.getNumber()][to.getNumber()];
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseBUSValue(this, arg);
 	}
 }

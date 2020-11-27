@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCCharacterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 public class CharacterValue extends Value
 {
@@ -124,5 +125,11 @@ public class CharacterValue extends Value
 	public Object clone()
 	{
 		return new CharacterValue(unicode);
+	}
+
+	@Override
+	public <R, S> R apply(ValueVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseCharacterValue(this, arg);
 	}
 }
