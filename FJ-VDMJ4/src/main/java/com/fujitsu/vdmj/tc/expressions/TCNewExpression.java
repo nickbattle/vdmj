@@ -112,7 +112,7 @@ public class TCNewExpression extends TCExpression
 			argtypes.add(a.typeCheck(env, null, scope, null));
 		}
 
-		TCDefinition opdef = classdef.findConstructor(argtypes);
+		TCDefinition opdef = classdef.findConstructor(argtypes, this);
 
 		if (opdef == null)
 		{
