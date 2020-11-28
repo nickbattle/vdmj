@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -92,6 +93,10 @@ public class TCClassDefinition extends TCDefinition
 	/** True if the class has a sync section with per or mutex defs. */
 	public boolean hasPermissions = false;
 
+	/** Temp location of expression calling findName, for error reporting */
+	private TCExpression findFrom = null;
+	
+	
 	/**
 	 * Create a class definition with the given name, list of superclass names,
 	 * and list of local definitions.
@@ -669,7 +674,15 @@ public class TCClassDefinition extends TCDefinition
 					if (!def.location.equals(found.location) &&
 						def.isFunctionOrOperation())
 					{
-						sought.report(3010, "Name " + sought + " is ambiguous");
+						if (findFrom != null)
+						{
+							findFrom.report(3010, "Name " + sought + " is ambiguous");
+						}
+						else
+						{
+							sought.report(3010, "Name " + sought + " is ambiguous");
+						}
+
 						detail2("1", def.location, "2", found.location);
 						break;
 					}
@@ -770,8 +783,9 @@ public class TCClassDefinition extends TCDefinition
 	 * Find a constructor definition for this class, given a list of parameter
 	 * types.
 	 */
-	public TCDefinition findConstructor(TCTypeList argtypes)
+	public TCDefinition findConstructor(TCTypeList argtypes, TCExpression  findFrom)
 	{
+		this.findFrom = findFrom;
 		TCNameToken constructor = getCtorName(argtypes);
 		return findName(constructor, NameScope.NAMES);
 	}
