@@ -787,7 +787,9 @@ public class TCClassDefinition extends TCDefinition
 	{
 		this.findFrom = findFrom;
 		TCNameToken constructor = getCtorName(argtypes);
-		return findName(constructor, NameScope.NAMES);
+		TCDefinition d = findName(constructor, NameScope.NAMES);
+		findFrom = null;
+		return d;
 	}
 
 	/**
