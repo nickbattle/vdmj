@@ -176,19 +176,28 @@ public class SourceFile
 
 	public void printLatexCoverage(PrintWriter out, boolean headers)
 	{
-		printLatexCoverage(out, headers, false);
+		printLatexCoverage(out, headers, false, true);
 	}
 
-	public void printLatexCoverage(PrintWriter out, boolean headers, boolean modelOnly)
+	public void printLatexCoverage(PrintWriter out, boolean headers, boolean modelOnly, boolean coverage)
 	{
-		Map<Integer, List<LexLocation>> hits =
-					LexLocation.getMissLocations(filename);
+		Map<Integer, List<LexLocation>> hits = null;
+		
+		if (coverage)
+		{
+			hits = LexLocation.getMissLocations(filename);
+		}
 
 		if (headers)
 		{
-    		out.println("\\documentclass[a4paper]{article}");
-    		out.println("\\input{overture}");
-    		out.println("\\begin{document}");
+			out.println("\\documentclass[a4paper]{article}");
+			out.println("\\usepackage{longtable}");
+			out.println("\\usepackage[color]{vdmlisting}");
+			out.println("\\usepackage{fullpage}");
+			out.println("\\usepackage{hyperref}");
+			out.println("\\begin{document}");
+			out.println("\\title{}");
+			out.println("\\author{}");
 		}
 
 		if (!hasVdm_al)
@@ -220,8 +229,16 @@ public class SourceFile
 			}
 
 			String spaced = detab(line, Properties.parser_tabstop);
-			List<LexLocation> list = hits.get(lnum);
-			out.println(markup(spaced, list));
+			
+			if (coverage)
+			{
+				List<LexLocation> list = hits.get(lnum);
+				out.println(markup(spaced, list));
+			}
+			else
+			{
+				out.println(spaced);
+			}
 
 			if (line.contains("\\end{vdm_al}"))
 			{
@@ -234,38 +251,41 @@ public class SourceFile
 			out.println("\\end{vdm_al}");
 		}
 
-		out.println("\\bigskip");
-		out.println("\\begin{longtable}{|l|r|r|}");
-		out.println("\\hline");
-		out.println("Function or operation & Coverage & Calls \\\\");
-		out.println("\\hline");
-		out.println("\\hline");
-
-		long total = 0;
-
-		LexNameList spans = LexLocation.getSpanNames(filename);
-		Collections.sort(spans);
-
-		for (LexNameToken name: spans)
+		if (coverage)
 		{
-			long calls = LexLocation.getSpanCalls(name);
-			total += calls;
-
-			out.println(latexQuote(name.toString()) + " & " +
-				LexLocation.getSpanPercent(name) + "\\% & " +
-				calls + " \\\\");
+			out.println("\\bigskip");
+			out.println("\\begin{longtable}{|l|r|r|}");
 			out.println("\\hline");
+			out.println("Function or operation & Coverage & Calls \\\\");
+			out.println("\\hline");
+			out.println("\\hline");
+	
+			long total = 0;
+	
+			LexNameList spans = LexLocation.getSpanNames(filename);
+			Collections.sort(spans);
+	
+			for (LexNameToken name: spans)
+			{
+				long calls = LexLocation.getSpanCalls(name);
+				total += calls;
+	
+				out.println(latexQuote(name.toString()) + " & " +
+					LexLocation.getSpanPercent(name) + "\\% & " +
+					calls + " \\\\");
+				out.println("\\hline");
+			}
+	
+			out.println("\\hline");
+			out.println(latexQuote(filename.getName()) +
+				" & " + LexLocation.getHitPercent(filename) +
+				"\\% & " + total + " \\\\");
+	
+			out.println("\\hline");
+			out.println("\\end{longtable}");
 		}
 
-		out.println("\\hline");
-		out.println(latexQuote(filename.getName()) +
-			" & " + LexLocation.getHitPercent(filename) +
-			"\\% & " + total + " \\\\");
-
-		out.println("\\hline");
-		out.println("\\end{longtable}");
-
-		if (headers || endDocFound)
+		if (headers || !endDocFound)
 		{
 			out.println("\\end{document}");
 		}
