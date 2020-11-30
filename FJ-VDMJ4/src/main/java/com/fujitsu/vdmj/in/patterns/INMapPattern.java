@@ -136,7 +136,7 @@ public class INMapPattern extends INPattern
 					counts[i++] = pnvps.size();
 				}
 			}
-			catch (Exception e)
+			catch (Exception e)		// Pattern match or value conversion fails
 			{
 				continue;
 			}
