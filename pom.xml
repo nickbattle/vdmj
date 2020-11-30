@@ -26,6 +26,7 @@
 		<module>vdmjunit</module>
 		<module>lsp</module>
 		<module>stdlib</module>
+		<module>cmd-plugins</module>
 	</modules>
 
 	<build>
