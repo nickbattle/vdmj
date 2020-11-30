@@ -271,7 +271,11 @@ public abstract class LSPWorkspaceManager
 		
 		for (File file: files)
 		{
-			if (file.isDirectory())
+			if (file.getName().startsWith("."))
+			{
+				continue;	// ignore .generated, .vscode etc
+			}
+			else if (file.isDirectory())
 			{
 				loadProjectFiles(file);
 			}
