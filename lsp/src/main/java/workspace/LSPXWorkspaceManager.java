@@ -255,36 +255,49 @@ abstract public class LSPXWorkspaceManager
 	public RPCMessageList translateLaTeX(RPCRequest request, File file, File saveUri)
 	{
 		File responseFile = null;
+		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+		Map<File, StringBuilder> filemap = manager.getProjectFiles();
 
-		if (file == null)	// translate whole project
+		try
 		{
-			LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
-			Map<File, StringBuilder> filemap = manager.getProjectFiles();
-			
-			for (File pfile: filemap.keySet())
+			if (file == null)	// translate whole project
 			{
-				try
+				for (File pfile: filemap.keySet())
 				{
-					SourceFile source = new SourceFile(pfile);
-					File outfile = new File(saveUri, pfile.getName().toString());
-					
-					PrintWriter out = new PrintWriter(outfile);
-					source.printLatexCoverage(out, true, true, false);
-					out.close();
+					fileToLaTeX(saveUri, pfile);
 				}
-				catch (IOException e)
+
+				responseFile = saveUri;		// ??
+			}
+			else
+			{
+				if (filemap.containsKey(file))
 				{
-					return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+					fileToLaTeX(saveUri, file);
+					responseFile = file;
+				}
+				else
+				{
+					return new RPCMessageList(request, RPCErrors.InvalidParams, "No such file in project");
 				}
 			}
-			
-			responseFile = saveUri;		// ??
+
+			return new RPCMessageList(request, new JSONObject("uri", responseFile.toURI().toString()));
 		}
-		else
+		catch (IOException e)
 		{
-			// TODO!
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
+	}
+	
+	private void fileToLaTeX(File saveUri, File file) throws IOException
+	{
+		SourceFile source = new SourceFile(file);
+		String texname = file.getName().replaceAll("\\.vdm..$", ".tex");
+		File outfile = new File(saveUri, texname);
 		
-		return new RPCMessageList(request, new JSONObject("uri", responseFile.toURI().toString()));
+		PrintWriter out = new PrintWriter(outfile);
+		source.printLatexCoverage(out, true, true, false);
+		out.close();
 	}
 }
