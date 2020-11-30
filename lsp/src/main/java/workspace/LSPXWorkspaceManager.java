@@ -24,9 +24,12 @@
 package workspace;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.traces.TraceReductionType;
@@ -247,5 +250,41 @@ abstract public class LSPXWorkspaceManager
 		TCPlugin tc = registry.getPlugin("TC");
 		
 		return !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
+	}
+
+	public RPCMessageList translateLaTeX(RPCRequest request, File file, File saveUri)
+	{
+		File responseFile = null;
+
+		if (file == null)	// translate whole project
+		{
+			LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+			Map<File, StringBuilder> filemap = manager.getProjectFiles();
+			
+			for (File pfile: filemap.keySet())
+			{
+				try
+				{
+					SourceFile source = new SourceFile(pfile);
+					File outfile = new File(saveUri, pfile.getName().toString());
+					
+					PrintWriter out = new PrintWriter(outfile);
+					source.printLatexCoverage(out, true, true, false);
+					out.close();
+				}
+				catch (IOException e)
+				{
+					return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+				}
+			}
+			
+			responseFile = saveUri;		// ??
+		}
+		else
+		{
+			// TODO!
+		}
+		
+		return new RPCMessageList(request, new JSONObject("uri", responseFile.toURI().toString()));
 	}
 }

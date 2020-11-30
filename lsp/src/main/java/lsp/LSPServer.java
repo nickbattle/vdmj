@@ -37,6 +37,7 @@ import json.JSONObject;
 import json.JSONServer;
 import lsp.lspx.CTHandler;
 import lsp.lspx.POGHandler;
+import lsp.lspx.TranslateHandler;
 import lsp.textdocument.CompletionHandler;
 import lsp.textdocument.DefinitionHandler;
 import lsp.textdocument.DidChangeHandler;
@@ -110,6 +111,7 @@ public class LSPServer extends JSONServer
 
 		dispatcher.register(new POGHandler(state), "slsp/POG/generate");
 		dispatcher.register(new CTHandler(state), "slsp/CT/traces", "slsp/CT/generate", "slsp/CT/execute");
+		dispatcher.register(new TranslateHandler(state), "slsp/translate");
 
 		return dispatcher;
 	}
