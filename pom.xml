@@ -19,11 +19,11 @@
 
 	<!-- sub modules -->
 	<modules>
-		<module>Annotations</module>
-		<module>Annotations2</module>
-		<module>FJ-VDMJ4</module>
-		<module>FJ-VDMJC4</module>
-		<module>FJ-VDMJUnit4</module>
+		<module>annotations</module>
+		<module>annotations2</module>
+		<module>vdmj</module>
+		<module>vdmjc</module>
+		<module>vdmjunit</module>
 		<module>LSP</module>
 		<module>stdlib</module>
 	</modules>
