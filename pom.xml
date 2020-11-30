@@ -24,7 +24,7 @@
 		<module>vdmj</module>
 		<module>vdmjc</module>
 		<module>vdmjunit</module>
-		<module>LSP</module>
+		<module>lsp</module>
 		<module>stdlib</module>
 	</modules>
 
