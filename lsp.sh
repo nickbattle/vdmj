@@ -28,9 +28,9 @@ function latest()
 
 java ${JAVA64_VMOPTS} -Dlog.filename=/dev/tty \
     -cp \
-$(latest "Annotations/target/annotations-${VERSION}-*.jar"):\
-$(latest "FJ-VDMJ4/target/vdmj-${VERSION}-??????.jar"):\
-$(latest "LSP/target/lsp-${VERSION}-*.jar") \
+$(latest "annotations/target/annotations-${VERSION}-*.jar"):\
+$(latest "vdmj/target/vdmj-${VERSION}-??????.jar"):\
+$(latest "lsp/target/lsp-${VERSION}-*.jar") \
     lsp.LSPServerSocket $1 -lsp 8000 -dap 8001
 
 exit 0
