@@ -75,9 +75,11 @@ done
 # Locate the jars
 VDMJ_JAR=$MAVENREPO/vdmj/${VERSION}/vdmj-${VERSION}.jar
 STDLIB_JAR=$MAVENREPO/stdlib/${VERSION}/stdlib-${VERSION}.jar
+PLUGINS_JAR=$MAVENREPO/cmd-plugins/${VERSION}/cmd-plugins-${VERSION}.jar
 check "$VDMJ_JAR"
 check "$STDLIB_JAR"
-CLASSPATH="$VDMJ_JAR:$PROPDIR"
+check "$PLUGINS_JAR"
+CLASSPATH="$VDMJ_JAR:$PLUGINS_JAR:$PROPDIR"
 VDMJ_OPTS="-path $STDLIB_JAR $VDMJ_OPTS"
 MAIN="com.fujitsu.vdmj.VDMJ"
 

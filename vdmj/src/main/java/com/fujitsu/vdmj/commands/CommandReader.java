@@ -1639,6 +1639,13 @@ abstract public class CommandReader
 		println("reload - reload the current specification files");
 		println("load <files or dirs> - replace current loaded specification files");
 		println("save [<files>] - generate Word/ODF source extract files");
+		
+		for (String cmd: plugins.keySet())
+		{
+			CommandPlugin plugin = plugins.get(cmd);
+			println(plugin.help());
+		}
+		
 		println("quit - leave the interpreter");
 	}
 

@@ -34,4 +34,6 @@ abstract public class CommandPlugin
 	}
 	
 	abstract public boolean run(String[] argv) throws Exception;
+
+	abstract public String help();
 }

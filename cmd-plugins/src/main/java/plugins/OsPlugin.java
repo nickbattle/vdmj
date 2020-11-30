@@ -46,4 +46,10 @@ public class OsPlugin extends CommandPlugin
 		
 		return true;	// Even if command failed
 	}
+
+	@Override
+	public String help()
+	{
+		return "os <command> [<args>] - run an operating system command";
+	}
 }
