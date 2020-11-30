@@ -63,7 +63,7 @@ public class TranslateTest extends LSPTest
 		RPCRequest request = new RPCRequest(123L, "slsp/translate",
 				new JSONObject(
 					"uri", file.toURI().toString(),
-					"language", 1L,
+					"language", "latex",
 					"saveUri",	testdir.toURI().toString()));
 		
 		RPCMessageList response = handler.request(request);
@@ -76,7 +76,7 @@ public class TranslateTest extends LSPTest
 		request = new RPCRequest(123L, "slsp/translate",
 				new JSONObject(
 					"uri", file.toURI().toString(),
-					"language", 1L,
+					"language", "latex",
 					"saveUri",	file.toURI().toString()));
 		
 		response = handler.request(request);
@@ -89,7 +89,7 @@ public class TranslateTest extends LSPTest
 		request = new RPCRequest(123L, "slsp/translate",
 				new JSONObject(
 					"uri", file.toURI().toString(),
-					"language", 1L,
+					"language", "latex",
 					"saveUri",	new File("???!!!").toURI().toString()));
 		
 		response = handler.request(request);
@@ -104,7 +104,7 @@ public class TranslateTest extends LSPTest
 		request = new RPCRequest(123L, "slsp/translate",
 				new JSONObject(
 					"uri", file.toURI().toString(),
-					"language", 123L,
+					"language", "Chinese",
 					"saveUri",	empty.toUri().toString()));
 		
 		response = handler.request(request);
@@ -134,15 +134,35 @@ public class TranslateTest extends LSPTest
 		RPCRequest request = new RPCRequest(123L, "slsp/translate",
 				new JSONObject(
 					"uri", null,
-					"language", 1L,
+					"language", "latex",
 					"saveUri",	empty.toURI().toString()));
 
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		
+		assertEquals(empty.toURI().toString(), response.get(0).getPath("result.uri"));
+
 		for (File f: empty.listFiles())
 		{
+			assertTrue(f.getName().matches("^.*\\.tex$"));
+			f.delete();
+		}
+		
+		File file = new File(testdir, "pogtest.vdmsl");
+		request = new RPCRequest(123L, "slsp/translate",
+				new JSONObject(
+					"uri", file.toURI().toString(),
+					"language", "latex",
+					"saveUri",	empty.toURI().toString()));
+
+		response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals(file.toURI().toString(), response.get(0).getPath("result.uri"));
+
+		for (File f: empty.listFiles())
+		{
+			assertTrue(f.getName().matches("^.*\\.tex$"));
 			f.delete();
 		}
 		

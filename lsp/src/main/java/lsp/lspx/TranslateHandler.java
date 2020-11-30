@@ -64,7 +64,7 @@ public class TranslateHandler extends LSPHandler
 			JSONObject params = request.get("params");
 			File file = Utils.uriToFile(params.get("uri"));
 			File saveUri = Utils.uriToFile(params.get("saveUri"));
-			long language = params.get("language");
+			String language = params.get("language");
 			
 			if (saveUri.exists())
 			{
@@ -85,9 +85,9 @@ public class TranslateHandler extends LSPHandler
 				return new RPCMessageList(request, RPCErrors.InvalidParams, "saveUri does not exist");
 			}
 			
-			switch ((int)language)
+			switch (language)
 			{
-				case 1:
+				case "latex":
 					return LSPXWorkspaceManager.getInstance().translateLaTeX(request, file, saveUri);
 				
 				default:
