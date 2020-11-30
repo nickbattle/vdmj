@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>vdmjunit</artifactId>
+	<name>VDMJUnit</name>
+	
+	<parent>
+		<groupId>com.fujitsu</groupId>
+		<artifactId>vdmj-suite</artifactId>
+		<version>4.4.1-P-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<developers>
+		<developer>
+			<id>NickBattle</id>
+			<name>Nick Battle</name>
+			<email>nick.battle@gmail.com</email>
+			<organization>Fujitsu UK</organization>
+			<organizationUrl>http://uk.fujitsu.com</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fujitsu</groupId>
+			<artifactId>vdmj</artifactId>
+			<version>${revision}</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<includes>
+						<include>**/*Test.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<archive>
+						<manifestEntries>
+							<Implementation-Version>${maven.build.timestamp}
+							</Implementation-Version>
+							<Class-Path>.</Class-Path>
+						</manifestEntries>
+					</archive>
+					<finalName>
+						${project.artifactId}-${project.version}-${maven.build.timestamp}
+					</finalName>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<finalName>
+						${project.artifactId}-${project.version}-${maven.build.timestamp}
+					</finalName>
+					<source>8</source>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
