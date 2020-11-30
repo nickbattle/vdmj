@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2008, 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2016 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -90,7 +90,7 @@ public class INCPUClassDefinition extends INClassDefinition
     		SeqValue opname = (SeqValue)octxt.lookup(varName("opname"));
     		NaturalValue priority = (NaturalValue)octxt.check(varName("priority"));
 
-    		cpu.setPriority(opname.stringValue(ctxt), priority.intValue(ctxt));
+    		cpu.setPriority(opname.stringValue(ctxt), priority.intValue(ctxt).longValue());
    			return new VoidValue();
 		}
 		catch (Exception e)

@@ -33,6 +33,8 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -323,6 +325,10 @@ abstract public class CommandReader
 				else if (line.startsWith("filter"))
 				{
 					carryOn = doFilter(line);
+				}
+				else if (line.startsWith("precision"))
+				{
+					carryOn = doPrecision(line);
 				}
 				else if (!usePlugin(line))		// Attempt to load plugin
 				{
@@ -767,6 +773,35 @@ abstract public class CommandReader
 		}
 
 		return true;
+	}
+
+	protected boolean doPrecision(String line)
+	{
+		String parts[] = line.split("\\s+");
+
+		switch (parts.length)
+		{
+		case 2:
+			int scale = Integer.parseInt(parts[1]);
+			
+			if (scale < 10)
+			{
+				println("Precision must be >10");
+				return true;
+			}
+			
+			Settings.precision = new MathContext(scale, RoundingMode.HALF_UP);
+			println("Decimal precision = " + Settings.precision.getPrecision());
+			return true;
+			
+		case 1:
+			println("Decimal precision = " + Settings.precision.getPrecision());
+			return true;
+			
+		default:
+			println("Usage: precision <#decimal places>");
+			return true;
+		}
 	}
 
 	private void isEnabled(String name, boolean flag)
@@ -1598,6 +1633,8 @@ abstract public class CommandReader
 		println("latex|latexdoc [<files>] - generate LaTeX line coverage files");
 		println("word [<files>] - generate Word HTML line coverage files");
 		println("files - list files in the current specification");
+		println("set [<pre|post|inv|dtc|measures> <on|off>] - set runtime checks");
+		println("precision [<#decimal places>] - set real number precision");
 		println("set [<pre|post|inv|dtc|measures|annotations> <on|off>] - set runtime checks");
 		println("reload - reload the current specification files");
 		println("load <files or dirs> - replace current loaded specification files");

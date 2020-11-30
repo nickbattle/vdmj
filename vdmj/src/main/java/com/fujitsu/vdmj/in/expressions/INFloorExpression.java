@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import java.math.RoundingMode;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
@@ -52,7 +53,16 @@ public class INFloorExpression extends INUnaryExpression
 
 		try
 		{
-			return NumericValue.valueOf(Math.floor(exp.eval(ctxt).realValue(ctxt)), ctxt);
+			Value v = exp.eval(ctxt);
+			
+			if (NumericValue.isInteger(v))
+			{
+				return v;
+			}
+			else
+			{
+				return NumericValue.valueOf(v.realValue(ctxt).setScale(0, RoundingMode.FLOOR), ctxt);
+			}
         }
         catch (ValueException e)
         {

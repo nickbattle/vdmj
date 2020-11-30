@@ -52,8 +52,16 @@ public class INUnaryMinusExpression extends INUnaryExpression
 
 		try
 		{
-			double v = exp.eval(ctxt).realValue(ctxt);
-			return NumericValue.valueOf(-v, ctxt);
+			Value v = exp.eval(ctxt);
+			
+			if (NumericValue.isInteger(v))
+			{
+				return NumericValue.valueOf(v.intValue(ctxt).negate(), ctxt);
+			}
+			else
+			{
+    			return NumericValue.valueOf(v.realValue(ctxt).negate(), ctxt);
+			}
 		}
 		catch (ValueException e)
 		{

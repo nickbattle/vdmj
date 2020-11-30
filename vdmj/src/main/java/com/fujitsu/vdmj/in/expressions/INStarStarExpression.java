@@ -23,6 +23,13 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import org.apfloat.Apfloat;
+import org.apfloat.ApfloatMath;
+
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
@@ -37,6 +44,8 @@ import com.fujitsu.vdmj.values.ValueMap;
 public class INStarStarExpression extends INBinaryExpression
 {
 	private static final long serialVersionUID = 1L;
+
+	private static final BigInteger BIG_MAX_INT = new BigInteger(Integer.toString(Integer.MAX_VALUE));
 
 	public INStarStarExpression(INExpression left, LexToken op, INExpression right)
 	{
@@ -57,7 +66,7 @@ public class INStarStarExpression extends INBinaryExpression
     		if (lv instanceof MapValue)
     		{
     			ValueMap map = lv.mapValue(ctxt);
-    			long n = rv.intValue(ctxt);
+    			long n = rv.intValue(ctxt).longValue();
     			ValueMap result = new ValueMap();
 
     			for (Value k: map.keySet())
@@ -87,14 +96,41 @@ public class INStarStarExpression extends INBinaryExpression
     		else if (lv instanceof FunctionValue)
     		{
     			return new IterFunctionValue(
-    				lv.functionValue(ctxt), rv.intValue(ctxt));
+    				lv.functionValue(ctxt), rv.intValue(ctxt).longValue());
     		}
     		else if (lv instanceof NumericValue)
     		{
-    			double ld = lv.realValue(ctxt);
-    			double rd = rv.realValue(ctxt);
+    			if (NumericValue.areIntegers(lv, rv))
+    			{
+    				if (rv.intValue(ctxt).compareTo(BIG_MAX_INT) < 0)
+    				{
+    					int exp = rv.intValue(ctxt).intValue();
+    					
+    					if (exp >= 0)
+    					{
+    						return NumericValue.valueOf(lv.intValue(ctxt).pow(exp), ctxt);
+    					}
+    					else
+    					{
+    						return NumericValue.valueOf(BigDecimal.ONE.divide(lv.realValue(ctxt).pow(-exp)), ctxt);
+    					}
+    				}
+    			}
 
-    			return NumericValue.valueOf(Math.pow(ld, rd), ctxt);
+    			Apfloat ld = new Apfloat(lv.realValue(ctxt), Settings.precision.getPrecision());
+    			Apfloat rd = new Apfloat(rv.realValue(ctxt), Settings.precision.getPrecision());
+    			Apfloat result;
+    			
+    			if (rd.intValue() >= 0)
+    			{
+    				result = ApfloatMath.pow(ld, rd);
+    			}
+    			else
+    			{
+    				result = Apfloat.ONE.divide(ApfloatMath.pow(ld, rd.negate()));
+    			}
+
+    			return NumericValue.valueOf(new BigDecimal(result.toString(), Settings.precision), ctxt);
     		}
 
     		return abort(4031,

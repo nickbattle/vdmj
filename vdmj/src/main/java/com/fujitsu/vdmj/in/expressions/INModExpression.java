@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
@@ -63,15 +65,22 @@ public class INModExpression extends INNumericBinaryExpression
 			 * is positive.
 			 */
 
-    		double lv = left.eval(ctxt).intValue(ctxt);
-    		double rv = right.eval(ctxt).intValue(ctxt);
+    		BigInteger lv = left.eval(ctxt).intValue(ctxt);
+    		BigInteger rv = right.eval(ctxt).intValue(ctxt);
 
-    		if (rv == 0)
+    		if (rv.equals(BigInteger.ZERO))
     		{
     			throw new ValueException(4134, "Infinite or NaN trouble", ctxt);
     		}
-
-    		return NumericValue.valueOf(lv - rv * (long)Math.floor(lv/rv), ctxt);
+    		
+    		if (rv.signum() < 0)
+    		{
+    			return NumericValue.valueOf(lv.mod(rv.abs()).subtract(rv.abs()), ctxt);
+    		}
+    		else
+    		{
+    			return NumericValue.valueOf(lv.mod(rv), ctxt);
+    		}
 		}
 		catch (ValueException e)
 		{

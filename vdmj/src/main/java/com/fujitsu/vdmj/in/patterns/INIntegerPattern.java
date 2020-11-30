@@ -58,7 +58,7 @@ public class INIntegerPattern extends INPattern
 
 		try
 		{
-			if (expval.intValue(ctxt) != value.value)
+			if (!expval.intValue(ctxt).equals(value.value))
 			{
 				patternFail(4111, "Integer pattern match failed");
 			}

@@ -23,21 +23,24 @@
 
 package com.fujitsu.vdmj.ast.lex;
 
+import java.math.BigDecimal;
+
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 
 public class LexRealToken extends LexToken
 {
 	private static final long serialVersionUID = 1L;
-	public final double value;
+	public final BigDecimal value;
 
 	public LexRealToken(String real, LexLocation location)
 	{
 		super(location, Token.REALNUMBER);
-		value = Double.parseDouble(real);
+		value = new BigDecimal(real, Settings.precision);
 	}
 
-	public LexRealToken(double value, LexLocation location)
+	public LexRealToken(BigDecimal value, LexLocation location)
 	{
 		super(location, Token.REALNUMBER);
 		this.value = value;
@@ -46,6 +49,6 @@ public class LexRealToken extends LexToken
 	@Override
 	public String toString()
 	{
-		return Double.toString(value);
+		return value.stripTrailingZeros().toString();
 	}
 }

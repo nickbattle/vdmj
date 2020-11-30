@@ -145,7 +145,7 @@ public class Breakpoint implements Serializable
 		}
 
 		LexIntegerToken num = (LexIntegerToken)arg;
-		return new INBreakpointExpression(this, cond, num.value);
+		return new INBreakpointExpression(this, cond, num.value.longValue());
 	}
 
 	@Override

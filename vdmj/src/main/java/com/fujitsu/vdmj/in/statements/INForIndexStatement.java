@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.in.statements;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -67,19 +69,20 @@ public class INForIndexStatement extends INStatement
 
 		try
 		{
-			long fval = from.eval(ctxt).intValue(ctxt);
-			long tval = to.eval(ctxt).intValue(ctxt);
-			long bval = (by == null) ? 1 : by.eval(ctxt).intValue(ctxt);
+			BigInteger fval = from.eval(ctxt).intValue(ctxt);
+			BigInteger tval = to.eval(ctxt).intValue(ctxt);
+			BigInteger bval = (by == null) ? BigInteger.ONE : by.eval(ctxt).intValue(ctxt);
 
-			if (bval == 0)
+			if (bval.equals(BigInteger.ZERO))
 			{
 				abort(4038, "Loop, from " + fval + " to " + tval + " by " + bval +
 						" will never terminate", ctxt);
 			}
 
-			for (long value = fval;
-				 (bval > 0 && value <= tval) || (bval < 0 && value >= tval);
-				 value += bval)
+			for (BigInteger value = fval;
+				 (bval.compareTo(BigInteger.ZERO) > 0 && value.compareTo(tval) <= 0) ||
+				 (bval.compareTo(BigInteger.ZERO) < 0 && value.compareTo(tval) >= 0);
+				 value = value.add(bval))
 			{
 				Context evalContext = new Context(location, "for index", ctxt);
 				evalContext.put(var, new IntegerValue(value));

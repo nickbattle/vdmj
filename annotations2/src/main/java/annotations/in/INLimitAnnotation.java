@@ -34,7 +34,7 @@ public class INLimitAnnotation extends INAnnotation
 		INIntegerLiteralExpression limit = (INIntegerLiteralExpression) args.get(0);
 		long count = value.apply(new CountVisitor(), null);
 		
-		if (count > limit.value.value)
+		if (count > limit.value.value.longValue())
 		{
 			String msg = String.format("@Limit Value count %d has exceeded the limit of %d", count, limit.value.value);
 			throw new ContextException(9999, msg, aexp.expression.location, ctxt);

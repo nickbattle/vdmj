@@ -84,7 +84,7 @@ public class INObjectApplyDesignator extends INObjectDesignator
 			{
 				ValueList seq = v.seqValue(ctxt);
 				Value a = args.get(0).eval(ctxt);
-				int i = (int)a.intValue(ctxt)-1;
+				int i = (int)a.intValue(ctxt).intValue()-1;
 
 				if (!seq.inbounds(i))
 				{

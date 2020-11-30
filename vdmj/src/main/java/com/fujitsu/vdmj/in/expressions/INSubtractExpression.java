@@ -23,6 +23,10 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
@@ -52,37 +56,21 @@ public class INSubtractExpression extends INNumericBinaryExpression
 
 			if (NumericValue.areIntegers(l, r))
 			{
-				long lv = l.intValue(ctxt);
-				long rv = r.intValue(ctxt);
-				long diff = subtractExact(lv, rv, ctxt);
-				return NumericValue.valueOf(diff, ctxt);
+				BigInteger lv = l.intValue(ctxt);
+				BigInteger rv = r.intValue(ctxt);
+				return NumericValue.valueOf(lv.subtract(rv), ctxt);
 			}
 			else
 			{
-				double lv = l.realValue(ctxt);
-				double rv = r.realValue(ctxt);
-	    		return NumericValue.valueOf(lv - rv, ctxt);
+        		BigDecimal lv = l.realValue(ctxt);
+        		BigDecimal rv = r.realValue(ctxt);
+        		return NumericValue.valueOf(lv.subtract(rv, Settings.precision), ctxt);
 			}
 		}
 		catch (ValueException e)
 		{
 			return abort(e);
 		}
-	}
-	
-	// This is included in Java 8 Math.java
-	private long subtractExact(long x, long y, Context ctxt) throws ValueException
-	{
-		long r = x - y;
-		// HD 2-12 Overflow iff the arguments have different signs and
-		// the sign of the result is different than the sign of x
-
-		if (((x ^ y) & (x ^ r)) < 0)
-		{
-			throw new ValueException(4169, "Arithmetic overflow", ctxt);
-		}
-
-		return r;
 	}
 
 	@Override

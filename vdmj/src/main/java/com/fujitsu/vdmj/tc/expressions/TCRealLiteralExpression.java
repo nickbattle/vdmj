@@ -23,6 +23,9 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import com.fujitsu.vdmj.ast.lex.LexRealToken;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
@@ -56,13 +59,13 @@ public class TCRealLiteralExpression extends TCExpression
 	{
 		TCType result;
 		
-		if (Math.round(value.value) == value.value)
+		if (value.value.setScale(0, RoundingMode.HALF_UP).compareTo(value.value) == 0)
 		{
-    		if (value.value < 0)
+    		if (value.value.compareTo(BigDecimal.ZERO) < 0)
     		{
     			result = new TCIntegerType(location);
     		}
-    		else if (value.value == 0)
+    		else if (value.value.equals(BigDecimal.ZERO))
     		{
     			result = new TCNaturalType(location);
     		}

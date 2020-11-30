@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -42,6 +44,8 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.zip.ZipEntry;
+
+import com.fujitsu.vdmj.Settings;
 
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -278,6 +282,26 @@ abstract public class VDMJ
     				usage("-path option requires a directory or a jar file");
     			}
     		}
+    		else if (arg.equals("-precision"))
+    		{
+    			if (i.hasNext())
+    			{
+       				int precision = Integer.parseInt(i.next());
+       				
+       				if (precision < 10)
+       				{
+       					usage("Precision argument must be >= 10");
+       				}
+       				else
+       				{
+       					Settings.precision = new MathContext(precision, RoundingMode.HALF_UP);
+       				}
+    			}
+    			else
+    			{
+    				usage("-precision option requires a value");
+    			}
+    		}
     		else if (arg.equals("-strict"))
     		{
     			Settings.strict = true;
@@ -386,6 +410,7 @@ abstract public class VDMJ
 		else
 		{
 			System.setProperty(dialect.name(), "1");
+			System.setProperty("HIGH_PRECISION", "1");
 		}
 
 		if (logfile != null && !(controller instanceof VDMRT))
@@ -546,6 +571,7 @@ abstract public class VDMJ
 		System.err.println("-annotations: enable annotation processing");
 		System.err.println("-log <filename>: enable real-time event logging");
 		System.err.println("-remote <class>: enable remote control");
+		System.err.println("-precision <n>: set real number precision to n places");
 		System.err.println("-verbose: display detailed startup information");
 
 		System.exit(1);

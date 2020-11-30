@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2008, 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2016 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -73,7 +73,7 @@ public class INDurationStatement extends INStatement
 				try
 				{
 					ctxt.threadState.setAtomic(true);
-					step = duration.eval(ctxt).intValue(ctxt);
+					step = duration.eval(ctxt).intValue(ctxt).longValue();
 				}
 				finally
 				{

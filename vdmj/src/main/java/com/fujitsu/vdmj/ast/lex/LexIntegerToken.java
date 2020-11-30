@@ -23,15 +23,17 @@
 
 package com.fujitsu.vdmj.ast.lex;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 
 public class LexIntegerToken extends LexToken
 {
 	private static final long serialVersionUID = 1L;
-	public final long value;
+	public final BigInteger value;
 
-	public LexIntegerToken(long value, LexLocation location)
+	public LexIntegerToken(BigInteger value, LexLocation location)
 	{
 		super(location, Token.NUMBER);
 		this.value = value;
@@ -40,12 +42,12 @@ public class LexIntegerToken extends LexToken
 	public LexIntegerToken(String value, LexLocation location)
 	{
 		super(location, Token.NUMBER);
-		this.value = Long.parseLong(value);
+		this.value = new BigInteger(value);
 	}
 
 	@Override
 	public String toString()
 	{
-		return Long.toString(value);
+		return value.toString();
 	}
 }

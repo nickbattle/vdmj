@@ -23,6 +23,9 @@
 
 package com.fujitsu.vdmj.values;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCRationalType;
@@ -34,12 +37,12 @@ public class RationalValue extends RealValue
 {
 	private static final long serialVersionUID = 1L;
 
-	public RationalValue(double value) throws Exception
+	public RationalValue(BigDecimal value) throws Exception
 	{
 		super(value);
 	}
 
-	public RationalValue(long value)
+	public RationalValue(BigInteger value)
 	{
 		super(value);
 	}

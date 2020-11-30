@@ -24,6 +24,8 @@
 package com.fujitsu.vdmj.values;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Formattable;
 import java.util.FormattableFlags;
 import java.util.Formatter;
@@ -148,7 +150,8 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 	 *
 	 * @throws ValueException Cannot perform the type conversion.
 	 */
-	public final Value convertTo(TCType to, Context ctxt) throws ValueException
+
+	public Value convertTo(TCType to, Context ctxt) throws ValueException
 	{
 		if (Settings.dynamictypechecks)
 		{
@@ -173,11 +176,6 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 		}
 	}
 
-	/**
-	 * Methods to convert a Value to a different type. Note that the main method above
-	 * is final, with the atomic lock, whereas these methods are protected as they are
-	 * implemented by the various Value subclasses. 
-	 */
 	public Value convertValueTo(TCType to, Context ctxt) throws ValueException
 	{
 		return convertValueTo(to, ctxt, new TCTypeSet());
@@ -271,6 +269,7 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 	 * @param ctxt The context used
 	 * @throws ValueException
 	 */
+
 	public void set(LexLocation location, Value newval, Context ctxt) throws ValueException
 	{
 		abort(4088, "Set not permitted for " + kind(), ctxt);
@@ -320,6 +319,7 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 	 *
 	 * @return The primitive value
 	 */
+
 	public Value deref()
 	{
 		return this;
@@ -334,6 +334,7 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 	 * @param listeners The listener to inform of updates to the value.
 	 * @return An UpdatableValue for this one.
 	 */
+
 	public Value getUpdatable(ValueListenerList listeners)
 	{
 		return UpdatableValue.factory(this, listeners);
@@ -347,39 +348,40 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 	 *
 	 * @return A simple value
 	 */
+
 	public Value getConstant()
 	{
 		return this;
 	}
 
-	public double realValue(Context ctxt) throws ValueException
+	public BigDecimal realValue(Context ctxt) throws ValueException
 	{
 		abort(4089, "Can't get real value of " + kind(), ctxt);
-		return 0;
+		return BigDecimal.ZERO;
 	}
 
-	public double ratValue(Context ctxt) throws ValueException
+	public BigDecimal ratValue(Context ctxt) throws ValueException
 	{
 		abort(4090, "Can't get rat value of " + kind(), ctxt);
-		return 0;
+		return BigDecimal.ZERO;
 	}
 
-	public long intValue(Context ctxt) throws ValueException
+	public BigInteger intValue(Context ctxt) throws ValueException
 	{
 		abort(4091, "Can't get int value of " + kind(), ctxt);
-		return 0;
+		return BigInteger.ZERO;
 	}
 
-	public long natValue(Context ctxt) throws ValueException
+	public BigInteger natValue(Context ctxt) throws ValueException
 	{
 		abort(4092, "Can't get nat value of " + kind(), ctxt);
-		return 0;
+		return BigInteger.ZERO;
 	}
 
-	public long nat1Value(Context ctxt) throws ValueException
+	public BigInteger nat1Value(Context ctxt) throws ValueException
 	{
 		abort(4093, "Can't get nat1 value of " + kind(), ctxt);
-		return 0;
+		return BigInteger.ZERO;
 	}
 
 	public boolean boolValue(Context ctxt) throws ValueException
