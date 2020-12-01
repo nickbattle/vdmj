@@ -56,6 +56,7 @@ import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.visitors.ValueVisitor;
@@ -690,6 +691,10 @@ public class FunctionValue extends Value
 			if (type.equals(to) || to.isUnknown(location))
 			{
 				return this;
+			}
+			else if (to instanceof TCUnionType)
+			{
+				return super.convertValueTo(to, ctxt, done);
 			}
 			else
 			{
