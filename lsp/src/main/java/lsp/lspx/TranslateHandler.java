@@ -49,7 +49,7 @@ public class TranslateHandler extends LSPHandler
 	{
 		switch (request.getMethod())
 		{
-			case "slsp/translate":
+			case "slsp/TR/translate":
 				return translate(request);
 
 			default:
@@ -64,7 +64,7 @@ public class TranslateHandler extends LSPHandler
 			JSONObject params = request.get("params");
 			File file = Utils.uriToFile(params.get("uri"));
 			File saveUri = Utils.uriToFile(params.get("saveUri"));
-			String language = params.get("language");
+			String language = params.get("languageId");
 			
 			if (saveUri.exists())
 			{
