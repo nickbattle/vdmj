@@ -111,7 +111,7 @@ public class LSPServer extends JSONServer
 
 		dispatcher.register(new POGHandler(state), "slsp/POG/generate");
 		dispatcher.register(new CTHandler(state), "slsp/CT/traces", "slsp/CT/generate", "slsp/CT/execute");
-		dispatcher.register(new TranslateHandler(state), "slsp/translate");
+		dispatcher.register(new TranslateHandler(state), "slsp/TR/translate");
 
 		return dispatcher;
 	}
