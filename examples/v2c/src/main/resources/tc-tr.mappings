@@ -1,0 +1,67 @@
+
+#############################################################################
+package com.fujitsu.vdmj.tc.definitions to examples.v2c.tr.definitions;
+#############################################################################
+
+map TCDefinition{} to TRDefinition();
+map TCDefinitionList{} to TRDefinitionList(this);
+map TCClassDefinition{name, definitions} to TRClassDefinition(name, definitions);
+map TCClassList{} to TRClassList(this);
+map TCValueDefinition{pattern, type, exp} to TRValueDefinition(pattern, type, exp);
+
+#############################################################################
+package com.fujitsu.vdmj.tc.expressions to examples.v2c.tr.expressions;
+#############################################################################
+
+map TCExpression{} to TRExpression();
+map TCIntegerLiteralExpression{} to TRLiteralExpression(this);
+map TCRealLiteralExpression{} to TRLiteralExpression(this);
+map TCPlusExpression{left, right} to TRPlusExpression(left, right);
+map TCIfExpression{ifExp, thenExp, elseExp} to TRIfExpression(ifExp, thenExp, elseExp);
+map TCEqualsExpression{left, right} to TREqualsExpression(left, right);
+map TCVariableExpression{name} to TRVariableExpression(name);
+
+#############################################################################
+package com.fujitsu.vdmj.tc.lex to examples.v2c.tr.lex;
+#############################################################################
+
+unmapped com.fujitsu.vdmj.tc.lex.TCNameToken;
+unmapped com.fujitsu.vdmj.tc.lex.TCNameList;
+unmapped com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+unmapped com.fujitsu.vdmj.ast.lex.LexIntegerToken;
+unmapped com.fujitsu.vdmj.ast.lex.LexRealToken;
+
+#############################################################################
+package com.fujitsu.vdmj.tc.modules to examples.v2c.tr.modules;
+#############################################################################
+
+map TCModuleList{} to TRModuleList(this);
+map TCModule{name, defs} to TRModule(name, defs);
+
+#############################################################################
+package com.fujitsu.vdmj.tc.patterns to examples.v2c.tr.patterns;
+#############################################################################
+
+unmapped com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
+
+#############################################################################
+package com.fujitsu.vdmj.tc.types to examples.v2c.tr.types;
+#############################################################################
+
+map TCType{} to TRType();
+map TCTypeList{} to TRTypeList(this);
+map TCFunctionType{} to TRNumericType(this);
+map TCNaturalOneType{} to TRNumericType(this);
+map TCNaturalType{} to TRNumericType(this);
+map TCIntegerType{} to TRNumericType(this);
+map TCRationalType{} to TRNumericType(this);
+map TCRealType{} to TRNumericType(this);
+
+#############################################################################
+# Classes that are not mapped
+#############################################################################
+
+unmapped java.lang.Boolean;
+unmapped java.lang.String;
+unmapped java.lang.Long;
+unmapped com.fujitsu.vdmj.mapper.FileList;
