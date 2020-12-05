@@ -23,40 +23,52 @@
 
 package examples.v2c.tr.definitions;
 
-import com.fujitsu.vdmj.ast.lex.LexComment;
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-import examples.v2c.tr.TRNode;
+import examples.v2c.tr.expressions.TRExpression;
+import examples.v2c.tr.patterns.TRNameList;
+import examples.v2c.tr.types.TRFunctionType;
+import examples.v2c.tr.types.TRTypeList;
 
-public abstract class TRDefinition extends TRNode
+public class TRExplicitFunctionDefinition extends TRDefinition
 {
 	private static final long serialVersionUID = 1L;
-	protected final LexCommentList comments;
+	private final TCNameToken name;
+	private final TRFunctionType type;
+	private final TRNameList parameters;
+	private final TRExpression body;
 	
-	protected TRDefinition(LexCommentList comments)
+	public TRExplicitFunctionDefinition(LexCommentList comments, TCNameToken name, TRFunctionType type, TRNameList parameters, TRExpression body)
 	{
-		this.comments = comments;
+		super(comments);
+		this.name = name;
+		this.type = type;
+		this.parameters = parameters;
+		this.body = body;
 	}
-	
+
+	@Override
 	public String translate()
 	{
 		StringBuilder sb = new StringBuilder();
 		
-		for (LexComment c: comments)
+		sb.append(super.translate());
+		sb.append(type.getResult().translate() + " " + name.getName() + "(");
+		TRTypeList ptypes = type.getParameters();
+		
+		for (int i=0; i<ptypes.size(); i++)
 		{
-			if (c.block)
-			{
-				sb.append(c.toString());
-			}
-			else
-			{
-				sb.append("//");
-				sb.append(c.comment);
-			}
-			
-			sb.append("\n");
+			sb.append(ptypes.get(i).translate());
+			sb.append(" ");
+			sb.append(parameters.get(i));
 		}
-
+		
+		sb.append(")\n");
+		sb.append("{\n    return ");
+		sb.append(body.translate());
+		sb.append(";\n}\n");
+		
 		return sb.toString();
 	}
 }

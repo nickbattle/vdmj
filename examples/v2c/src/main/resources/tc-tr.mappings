@@ -5,21 +5,31 @@ package com.fujitsu.vdmj.tc.definitions to examples.v2c.tr.definitions;
 
 map TCDefinition{} to TRDefinition();
 map TCDefinitionList{} to TRDefinitionList(this);
-map TCClassDefinition{name, definitions} to TRClassDefinition(name, definitions);
+map TCClassDefinition{comments, name, definitions} to TRClassDefinition(comments, name, definitions);
 map TCClassList{} to TRClassList(this);
-map TCValueDefinition{pattern, type, exp} to TRValueDefinition(pattern, type, exp);
+map TCValueDefinition{comments, pattern, type, exp} to TRValueDefinition(comments, pattern, type, exp);
+map TCExplicitFunctionDefinition{comments, name, type, paramPatternList, body} to TRExplicitFunctionDefinition(comments, name, type, paramPatternList, body);
 
 #############################################################################
 package com.fujitsu.vdmj.tc.expressions to examples.v2c.tr.expressions;
 #############################################################################
 
 map TCExpression{} to TRExpression();
+map TCExpressionList{} to TRExpressionList(this);
 map TCIntegerLiteralExpression{} to TRLiteralExpression(this);
 map TCRealLiteralExpression{} to TRLiteralExpression(this);
 map TCPlusExpression{left, right} to TRPlusExpression(left, right);
+map TCSubtractExpression{left, right} to TRSubtractExpression(left, right);
+map TCTimesExpression{left, right} to TRTimesExpression(left, right);
+map TCDivideExpression{left, right} to TRDivideExpression(left, right);
 map TCIfExpression{ifExp, thenExp, elseExp} to TRIfExpression(ifExp, thenExp, elseExp);
 map TCEqualsExpression{left, right} to TREqualsExpression(left, right);
 map TCVariableExpression{name} to TRVariableExpression(name);
+map TCLessExpression{left, op, right} to TRCompareExpression(left, op, right);
+map TCLessEqualExpression{left, op, right} to TRCompareExpression(left, op, right);
+map TCGreaterExpression{left, op, right} to TRCompareExpression(left, op, right);
+map TCGreaterEqualExpression{left, op, right} to TRCompareExpression(left, op, right);
+map TCApplyExpression{root, args} to TRApplyExpression(root, args);
 
 #############################################################################
 package com.fujitsu.vdmj.tc.lex to examples.v2c.tr.lex;
@@ -30,6 +40,8 @@ unmapped com.fujitsu.vdmj.tc.lex.TCNameList;
 unmapped com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 unmapped com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 unmapped com.fujitsu.vdmj.ast.lex.LexRealToken;
+unmapped com.fujitsu.vdmj.ast.lex.LexKeywordToken;
+unmapped com.fujitsu.vdmj.ast.lex.LexCommentList;
 
 #############################################################################
 package com.fujitsu.vdmj.tc.modules to examples.v2c.tr.modules;
@@ -42,6 +54,7 @@ map TCModule{name, defs} to TRModule(name, defs);
 package com.fujitsu.vdmj.tc.patterns to examples.v2c.tr.patterns;
 #############################################################################
 
+map TCPatternListList{} to TRNameList(this); 
 unmapped com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 
 #############################################################################
@@ -50,7 +63,7 @@ package com.fujitsu.vdmj.tc.types to examples.v2c.tr.types;
 
 map TCType{} to TRType();
 map TCTypeList{} to TRTypeList(this);
-map TCFunctionType{} to TRNumericType(this);
+map TCFunctionType{parameters, result} to TRFunctionType(parameters, result);
 map TCNaturalOneType{} to TRNumericType(this);
 map TCNaturalType{} to TRNumericType(this);
 map TCIntegerType{} to TRNumericType(this);

@@ -21,42 +21,24 @@
  *
  ******************************************************************************/
 
-package examples.v2c.tr.definitions;
+package examples.v2c.tr.expressions;
 
-import com.fujitsu.vdmj.ast.lex.LexComment;
-import com.fujitsu.vdmj.ast.lex.LexCommentList;
+import com.fujitsu.vdmj.ast.lex.LexToken;
 
-import examples.v2c.tr.TRNode;
-
-public abstract class TRDefinition extends TRNode
+public class TRCompareExpression extends TRBinaryExpression
 {
 	private static final long serialVersionUID = 1L;
-	protected final LexCommentList comments;
+	private final LexToken op;
 	
-	protected TRDefinition(LexCommentList comments)
+	public TRCompareExpression(TRExpression left, LexToken op, TRExpression right)
 	{
-		this.comments = comments;
+		super(left, right);
+		this.op = op;
 	}
-	
+
+	@Override
 	public String translate()
 	{
-		StringBuilder sb = new StringBuilder();
-		
-		for (LexComment c: comments)
-		{
-			if (c.block)
-			{
-				sb.append(c.toString());
-			}
-			else
-			{
-				sb.append("//");
-				sb.append(c.comment);
-			}
-			
-			sb.append("\n");
-		}
-
-		return sb.toString();
+		return left.translate() + " " + op + " " + right.translate();
 	}
 }

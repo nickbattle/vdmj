@@ -40,5 +40,4 @@ public class TRPlusExpression extends TRExpression
 	{
 		return left.translate() + " + " + right.translate();
 	}
-
 }

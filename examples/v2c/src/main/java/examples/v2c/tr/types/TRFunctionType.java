@@ -21,42 +21,33 @@
  *
  ******************************************************************************/
 
-package examples.v2c.tr.definitions;
+package examples.v2c.tr.types;
 
-import com.fujitsu.vdmj.ast.lex.LexComment;
-import com.fujitsu.vdmj.ast.lex.LexCommentList;
-
-import examples.v2c.tr.TRNode;
-
-public abstract class TRDefinition extends TRNode
+public class TRFunctionType extends TRType
 {
 	private static final long serialVersionUID = 1L;
-	protected final LexCommentList comments;
+	private final TRTypeList parameters;
+	private final TRType result;
 	
-	protected TRDefinition(LexCommentList comments)
+	public TRFunctionType(TRTypeList parameters, TRType result)
 	{
-		this.comments = comments;
+		this.parameters = parameters;
+		this.result = result;
 	}
-	
+
+	@Override
 	public String translate()
 	{
-		StringBuilder sb = new StringBuilder();
-		
-		for (LexComment c: comments)
-		{
-			if (c.block)
-			{
-				sb.append(c.toString());
-			}
-			else
-			{
-				sb.append("//");
-				sb.append(c.comment);
-			}
-			
-			sb.append("\n");
-		}
-
-		return sb.toString();
+		return result.translate() + " (*)(" + parameters.translate() + ")";
+	}
+	
+	public TRTypeList getParameters()
+	{
+		return parameters;
+	}
+	
+	public TRType getResult()
+	{
+		return result;
 	}
 }

@@ -23,6 +23,7 @@
 
 package examples.v2c.tr.definitions;
 
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 
 import examples.v2c.tr.expressions.TRExpression;
@@ -35,8 +36,9 @@ public class TRValueDefinition extends TRDefinition
 	private final TRType type;
 	private final TRExpression exp;
 	
-	public TRValueDefinition(TCPattern pattern, TRType type, TRExpression exp)
+	public TRValueDefinition(LexCommentList comments, TCPattern pattern, TRType type, TRExpression exp)
 	{
+		super(comments);
 		this.pattern = pattern.toString();
 		this.type = type;
 		this.exp = exp;
@@ -45,6 +47,6 @@ public class TRValueDefinition extends TRDefinition
 	@Override
 	public String translate()
 	{
-		return type.translate() + " " + pattern + " = " + exp.translate() + ";\n";
+		return super.translate() + type.translate() + " " + pattern + " = " + exp.translate() + ";\n";
 	}
 }

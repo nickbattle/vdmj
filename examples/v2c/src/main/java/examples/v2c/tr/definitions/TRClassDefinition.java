@@ -23,6 +23,7 @@
 
 package examples.v2c.tr.definitions;
 
+import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class TRClassDefinition extends TRDefinition
@@ -31,8 +32,9 @@ public class TRClassDefinition extends TRDefinition
 	private final TCNameToken name;
 	private final TRDefinitionList definitions;
 	
-	public TRClassDefinition(TCNameToken name, TRDefinitionList definitions)
+	public TRClassDefinition(LexCommentList comments, TCNameToken name, TRDefinitionList definitions)
 	{
+		super(comments);
 		this.name = name;
 		this.definitions = definitions;
 	}
@@ -40,6 +42,7 @@ public class TRClassDefinition extends TRDefinition
 	@Override
 	public String translate()
 	{
-		return "// Class " + name + "\n" + definitions.translate();
+		String header = super.translate();
+		return (header.isEmpty() ? "// Class " + name + "\n" : header) + definitions.translate();
 	}
 }

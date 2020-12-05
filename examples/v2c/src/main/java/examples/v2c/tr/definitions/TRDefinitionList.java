@@ -40,10 +40,13 @@ public class TRDefinitionList extends TRMappedList<TCDefinition, TRDefinition>
 	public String translate()
 	{
 		StringBuilder sb = new StringBuilder();
+		Class<?> last = null;
 		
 		for (TRDefinition def: this)
 		{
+			if (last != null && def.getClass() != last) sb.append("\n");
 			sb.append(def.translate());
+			last = def.getClass();
 		}
 		
 		return sb.toString();

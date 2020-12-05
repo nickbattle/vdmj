@@ -21,42 +21,23 @@
  *
  ******************************************************************************/
 
-package examples.v2c.tr.definitions;
+package examples.v2c.tr.expressions;
 
-import com.fujitsu.vdmj.ast.lex.LexComment;
-import com.fujitsu.vdmj.ast.lex.LexCommentList;
-
-import examples.v2c.tr.TRNode;
-
-public abstract class TRDefinition extends TRNode
+public class TRApplyExpression extends TRExpression
 {
 	private static final long serialVersionUID = 1L;
-	protected final LexCommentList comments;
+	private final TRExpression root;
+	private final TRExpressionList args;
 	
-	protected TRDefinition(LexCommentList comments)
+	public TRApplyExpression(TRExpression root, TRExpressionList args)
 	{
-		this.comments = comments;
+		this.root = root;
+		this.args = args;
 	}
-	
+
+	@Override
 	public String translate()
 	{
-		StringBuilder sb = new StringBuilder();
-		
-		for (LexComment c: comments)
-		{
-			if (c.block)
-			{
-				sb.append(c.toString());
-			}
-			else
-			{
-				sb.append("//");
-				sb.append(c.comment);
-			}
-			
-			sb.append("\n");
-		}
-
-		return sb.toString();
+		return root.translate() + "(" + args.translate() + ")";
 	}
 }

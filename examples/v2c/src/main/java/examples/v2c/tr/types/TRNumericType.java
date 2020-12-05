@@ -23,7 +23,6 @@
 
 package examples.v2c.tr.types;
 
-import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
@@ -35,11 +34,6 @@ public class TRNumericType extends TRType
 {
 	private static final long serialVersionUID = 1L;
 	private final TCType type;
-
-	public TRNumericType(TCFunctionType type)
-	{
-		this.type = type;
-	}
 
 	public TRNumericType(TCNaturalType type)
 	{
