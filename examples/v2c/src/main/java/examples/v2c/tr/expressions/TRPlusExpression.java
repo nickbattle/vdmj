@@ -23,16 +23,13 @@
 
 package examples.v2c.tr.expressions;
 
-public class TRPlusExpression extends TRExpression
+public class TRPlusExpression extends TRBinaryExpression
 {
 	private static final long serialVersionUID = 1L;
-	private final TRExpression left;
-	private final TRExpression right;
 	
 	public TRPlusExpression(TRExpression left, TRExpression right)
 	{
-		this.left = left;
-		this.right = right;
+		super(left, right);
 	}
 
 	@Override
