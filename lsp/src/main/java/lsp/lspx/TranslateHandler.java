@@ -90,6 +90,9 @@ public class TranslateHandler extends LSPHandler
 				case "latex":
 					return LSPXWorkspaceManager.getInstance().translateLaTeX(request, file, saveUri);
 				
+				case "word":
+					return LSPXWorkspaceManager.getInstance().translateWord(request, file, saveUri);
+				
 				default:
 					return new RPCMessageList(request, RPCErrors.InvalidParams, "Unsupported language");
 			}

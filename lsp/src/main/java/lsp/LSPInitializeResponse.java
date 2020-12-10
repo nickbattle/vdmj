@@ -65,7 +65,8 @@ public class LSPInitializeResponse extends JSONObject
 				new JSONObject(
 					"proofObligationProvider", true,
 					"combinatorialTestProvider", new JSONObject("workDoneProgress", true),
-					"translateProvider", new JSONObject("languageId", "latex", "workDoneProgress", false)));
+					"translateProvider", new JSONObject(
+							"languageId", new JSONArray("latex", "word"), "workDoneProgress", false)));
 
 		return cap;
 	}
