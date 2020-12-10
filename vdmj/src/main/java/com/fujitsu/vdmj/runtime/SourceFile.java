@@ -342,6 +342,11 @@ public class SourceFile
 
 	public void printWordCoverage(PrintWriter out)
 	{
+		printWordCoverage(out, false, true);
+	}
+	
+	public void printWordCoverage(PrintWriter out, boolean modelOnly, boolean coverage)
+	{
 		Map<Integer, List<LexLocation>> hits =
 					LexLocation.getMissLocations(filename);
 
@@ -374,41 +379,45 @@ public class SourceFile
 		{
 			String line = lines.get(lnum - 1);
 			String spaced = detab(line, Properties.parser_tabstop);
-			List<LexLocation> list = hits.get(lnum);
+			List<LexLocation> list = coverage ? hits.get(lnum) : null;
 			out.println(markupHTML(spaced, list));
 		}
 
-		out.println(htmlLine());
-		out.println(htmlLine());
-		out.println(htmlLine());
-
-		out.println("<div align=center>");
-		out.println("<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=\"60%\" style='width:60.0%;border-collapse:collapse'>");
-		out.println(rowHTML(true, "Function or Operation", "Coverage", "Calls"));
-
-		long total = 0;
-
-		LexNameList spans = LexLocation.getSpanNames(filename);
-		Collections.sort(spans);
-
-		for (LexNameToken name: spans)
+		if (!modelOnly)
 		{
-			long calls = LexLocation.getSpanCalls(name);
-			total += calls;
-
-			out.println(rowHTML(false,
-				htmlQuote(name.toString()),
-				Float.toString(LexLocation.getSpanPercent(name)) + "%",
-				Long.toString(calls)));
+			out.println(htmlLine());
+			out.println(htmlLine());
+			out.println(htmlLine());
+	
+			out.println("<div align=center>");
+			out.println("<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=\"60%\" style='width:60.0%;border-collapse:collapse'>");
+			out.println(rowHTML(true, "Function or Operation", "Coverage", "Calls"));
+	
+			long total = 0;
+	
+			LexNameList spans = LexLocation.getSpanNames(filename);
+			Collections.sort(spans);
+	
+			for (LexNameToken name: spans)
+			{
+				long calls = LexLocation.getSpanCalls(name);
+				total += calls;
+	
+				out.println(rowHTML(false,
+					htmlQuote(name.toString()),
+					Float.toString(LexLocation.getSpanPercent(name)) + "%",
+					Long.toString(calls)));
+			}
+	
+			out.println(rowHTML(true,
+				htmlQuote(filename.getName()),
+				Float.toString(LexLocation.getHitPercent(filename)) + "%",
+				Long.toString(total)));
+	
+			out.println("</table>");
+			out.println("</div>");
 		}
-
-		out.println(rowHTML(true,
-			htmlQuote(filename.getName()),
-			Float.toString(LexLocation.getHitPercent(filename)) + "%",
-			Long.toString(total)));
-
-		out.println("</table>");
-		out.println("</div>");
+		
 		out.println("</div>");
 		out.println("</body>");
 		out.println("</html>");
