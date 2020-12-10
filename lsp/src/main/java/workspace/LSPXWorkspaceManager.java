@@ -300,4 +300,53 @@ abstract public class LSPXWorkspaceManager
 		source.printLatexCoverage(out, true, true, false);
 		out.close();
 	}
+
+	public RPCMessageList translateWord(RPCRequest request, File file, File saveUri)
+	{
+		File responseFile = null;
+		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+		Map<File, StringBuilder> filemap = manager.getProjectFiles();
+
+		try
+		{
+			if (file == null)	// translate whole project
+			{
+				for (File pfile: filemap.keySet())
+				{
+					fileToWord(saveUri, pfile);
+				}
+
+				responseFile = saveUri;		// ??
+			}
+			else
+			{
+				if (filemap.containsKey(file))
+				{
+					fileToWord(saveUri, file);
+					responseFile = file;
+				}
+				else
+				{
+					return new RPCMessageList(request, RPCErrors.InvalidParams, "No such file in project");
+				}
+			}
+
+			return new RPCMessageList(request, new JSONObject("uri", responseFile.toURI().toString()));
+		}
+		catch (IOException e)
+		{
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	private void fileToWord(File saveUri, File file) throws IOException
+	{
+		SourceFile source = new SourceFile(file);
+		String texname = file.getName().replaceAll("\\.vdm..$", ".doc");
+		File outfile = new File(saveUri, texname);
+		
+		PrintWriter out = new PrintWriter(outfile);
+		source.printWordCoverage(out, true, false);
+		out.close();
+	}
 }
