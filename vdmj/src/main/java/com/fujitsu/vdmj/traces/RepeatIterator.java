@@ -25,10 +25,13 @@ package com.fujitsu.vdmj.traces;
 
 import java.util.Arrays;
 
+import com.fujitsu.vdmj.in.statements.INSkipStatement;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.util.Permutor;
 
 public class RepeatIterator extends TraceIterator
 {
+	private static final INSkipStatement SKIP = new INSkipStatement(LexLocation.ANY);
 	private final TraceIterator repeat;
 	private final int from;
 	private final int to;
@@ -93,6 +96,11 @@ public class RepeatIterator extends TraceIterator
 		{
 			permutor = null;
 
+			if (repeatValue == 0)		// ie. "?" or zero times
+			{
+				test.add(SKIP);
+			}
+			
 			if (repeatValue < to)
 			{
 				repeatValue++;

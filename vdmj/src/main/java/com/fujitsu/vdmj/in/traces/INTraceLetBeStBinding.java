@@ -48,6 +48,7 @@ import com.fujitsu.vdmj.values.ValueList;
 public class INTraceLetBeStBinding extends INTraceDefinition
 {
     private static final long serialVersionUID = 1L;
+	private static final INSkipStatement SKIP = new INSkipStatement(LexLocation.ANY);
 	public final INMultipleBind bind;
 	public final INExpression stexp;
 	public final INTraceDefinition body;
@@ -95,7 +96,7 @@ public class INTraceLetBeStBinding extends INTraceDefinition
 
 			if (quantifiers.finished())		// No entries at all
 			{
-				return new StatementIterator(new INSkipStatement(location));
+				return new StatementIterator(SKIP);
 			}
 
 			while (quantifiers.hasNext())
