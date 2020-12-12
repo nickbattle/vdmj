@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.in.expressions.INNewExpression;
 import com.fujitsu.vdmj.in.expressions.INVariableExpression;
 import com.fujitsu.vdmj.in.statements.INCallObjectStatement;
 import com.fujitsu.vdmj.in.statements.INCallStatement;
+import com.fujitsu.vdmj.in.statements.INSkipStatement;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.traces.INTraceVariableStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -70,6 +71,12 @@ public class CallSequence extends Vector<INStatement>
        			sb.append(cos.designator);
        			sb.append(".");
        			sb.append(opArgs(cos.fieldname.getName(), cos.args, ctxt));
+       			sep = "; ";
+    		}
+    		else if (stmt instanceof INSkipStatement)
+    		{
+       			sb.append(sep);
+    			sb.append("skip");
        			sep = "; ";
     		}
 		}
