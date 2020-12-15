@@ -792,7 +792,7 @@ public class ExpressionReader extends SyntaxReader
 		// are always qualified (ie. x refers to C`x where it was declared, not
 		// an overriding version lower down).
 
-		if (exp instanceof ASTVariableExpression)
+		if (Settings.dialect != Dialect.VDM_SL && exp instanceof ASTVariableExpression)
 		{
 			ASTVariableExpression ve = (ASTVariableExpression)exp;
 			ve.setExplicit(true);
