@@ -501,6 +501,9 @@ abstract public class Interpreter
 		float subset, TraceReductionType reductionType, long seed)
 		throws Exception
 	{
+		// Trace names have / substituted for _ to make a valid name during the parse
+		name = name.replaceAll("/", "_");
+
 		LexTokenReader ltr = new LexTokenReader(name, Dialect.VDM_SL);
 		LexToken token = ltr.nextToken();
 		ltr.close();
