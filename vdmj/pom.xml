@@ -91,6 +91,7 @@
                                 <include>documentation/**.pdf</include>
                                 <include>documentation/MESSAGES</include>
                                 <include>documentation/UserGuideTests.zip</include>
+                                <include>src/main/scripts/vdmsl.sh</include>
                             </includes>
                             <classifier>docs</classifier>
 							<finalName>
