@@ -194,7 +194,7 @@ public abstract class LSPWorkspaceManager
 			
 			if (hasClientCapability("workspace.workspaceFolders"))
 			{
-				response.add(lspWorkspaceFolders());
+				// response.add(lspWorkspaceFolders());
 			}
 			
 			response.addAll(checkLoadedFiles());
@@ -230,10 +230,10 @@ public abstract class LSPWorkspaceManager
 		}
 	}
 
-	private RPCRequest lspWorkspaceFolders()
-	{
-		return new RPCRequest(0L, "workspace/workspaceFolders", new JSONObject());
-	}
+//	private RPCRequest lspWorkspaceFolders()
+//	{
+//		return new RPCRequest(0L, "workspace/workspaceFolders", new JSONObject());
+//	}
 
 	private RPCRequest lspDynamicRegistrations()
 	{
