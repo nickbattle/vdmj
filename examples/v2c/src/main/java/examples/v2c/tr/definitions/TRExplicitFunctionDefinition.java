@@ -56,12 +56,15 @@ public class TRExplicitFunctionDefinition extends TRDefinition
 		sb.append(super.translate());
 		sb.append(type.getResult().translate() + " " + name.getName() + "(");
 		TRTypeList ptypes = type.getParameters();
+		String sep = "";
 		
 		for (int i=0; i<ptypes.size(); i++)
 		{
+			sb.append(sep);
 			sb.append(ptypes.get(i).translate());
 			sb.append(" ");
 			sb.append(parameters.get(i));
+			sep = ", ";
 		}
 		
 		sb.append(")\n");
