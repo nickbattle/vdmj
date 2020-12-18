@@ -511,12 +511,17 @@ abstract public class CommandReader
 
 		if (parts.length != 2)
 		{
-			println("Usage: filter %age | RANDOM | SHAPES_NOVARS | SHAPES_VARNAMES | SHAPES_VARVALUES");
+			println("Usage: filter %age | RANDOM | SHAPES_NOVARS | SHAPES_VARNAMES | SHAPES_VARVALUES | NONE");
 		}
 		else
 		{
 			try
 			{
+				if (parts[1].endsWith("%"))
+				{
+					parts[1] = parts[1].substring(0, parts[1].lastIndexOf('%'));
+				}
+				
 				float val = Float.parseFloat(parts[1]) / 100.0F;
 
 				if (val > 1 || val <= 0)
@@ -544,7 +549,7 @@ abstract public class CommandReader
 				}
 				catch (Exception e1)
 				{
-					println("Usage: filter %age | RANDOM | SHAPES_NOVARS | SHAPES_VARNAMES | SHAPES_VARVALUES");
+					println("Usage: filter %age | RANDOM | SHAPES_NOVARS | SHAPES_VARNAMES | SHAPES_VARVALUES | NONE");
 				}
 			}
 		}
@@ -726,7 +731,7 @@ abstract public class CommandReader
 			try
 			{
 				traceseed = Long.parseLong(parts[1]);
-				println("Seed now set to " + traceseed);
+				println("Trace filter currently " + reduction*100 + "% " + reductionType + " (seed " + traceseed + ")");
 			}
 			catch (NumberFormatException e)
 			{
