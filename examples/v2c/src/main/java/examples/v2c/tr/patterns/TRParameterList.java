@@ -28,11 +28,11 @@ import java.util.Vector;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
 
-public class TRNameList extends Vector<String>
+public class TRParameterList extends Vector<String>
 {
 	private static final long serialVersionUID = 1L;
 
-	public TRNameList(TCPatternListList list)
+	public TRParameterList(TCPatternListList list)
 	{
 		for (TCPattern p: list.get(0))	// Only the first - no curried sets!
 		{

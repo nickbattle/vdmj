@@ -54,7 +54,7 @@ map TCModule{name, defs} to TRModule(name, defs);
 package com.fujitsu.vdmj.tc.patterns to examples.v2c.tr.patterns;
 #############################################################################
 
-map TCPatternListList{} to TRNameList(this); 
+map TCPatternListList{} to TRParameterList(this); 
 unmapped com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 
 #############################################################################

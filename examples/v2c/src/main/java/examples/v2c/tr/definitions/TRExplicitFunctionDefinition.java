@@ -27,7 +27,7 @@ import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import examples.v2c.tr.expressions.TRExpression;
-import examples.v2c.tr.patterns.TRNameList;
+import examples.v2c.tr.patterns.TRParameterList;
 import examples.v2c.tr.types.TRFunctionType;
 import examples.v2c.tr.types.TRTypeList;
 
@@ -36,10 +36,10 @@ public class TRExplicitFunctionDefinition extends TRDefinition
 	private static final long serialVersionUID = 1L;
 	private final TCNameToken name;
 	private final TRFunctionType type;
-	private final TRNameList parameters;
+	private final TRParameterList parameters;
 	private final TRExpression body;
 	
-	public TRExplicitFunctionDefinition(LexCommentList comments, TCNameToken name, TRFunctionType type, TRNameList parameters, TRExpression body)
+	public TRExplicitFunctionDefinition(LexCommentList comments, TCNameToken name, TRFunctionType type, TRParameterList parameters, TRExpression body)
 	{
 		super(comments);
 		this.name = name;
