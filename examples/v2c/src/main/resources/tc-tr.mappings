@@ -1,0 +1,107 @@
+# ==================================================
+# The ClassMapper configuration for the TR example
+# ==================================================
+#
+# This file is named in the TRNode.MAPPINGS field, and is used by the ClassMapper to
+# turn a type checked TC tree into a tree of TR classes. Each line indicates how to
+# construct a TR class from the corresponding TC class.
+#
+# A package line sets the source and destination packages for the lines that follow.
+#
+# A map line identifies a set of fields in a source class, and then uses those fields
+# to identify a particular constructor call for the target. Alternatively, the target
+# can use "this", which just passes the source object to the constructor. Note that
+# the arguments to the constructor (apart from "this") are mapped before they are passed.
+# So before TRPlusExpression(left, right) is called, the left and right arguments are
+# themselves converted to TR classes, as can be seen in the constructor.
+#
+# Abstract classes have to be mentioned if there are any constructors with abstract
+# parameters. But these do not have to have any parameters defined. For example
+# map TCDefinition{} to TRDefinition().
+#
+# If a TC class can be used in the TR tree without translation, these have to be
+# mentioned as "unmapped" lines. Note that unmapped lines have to have the full
+# package-qualified class name.
+#
+# The mapping process is initiated by using the ClassMapper. See TranslatePlugin.java.
+#
+
+#############################################################################
+package com.fujitsu.vdmj.tc.definitions to examples.v2c.tr.definitions;
+#############################################################################
+
+map TCDefinition{} to TRDefinition();
+map TCDefinitionList{} to TRDefinitionList(this);
+map TCClassDefinition{comments, name, definitions} to TRClassDefinition(comments, name, definitions);
+map TCClassList{} to TRClassList(this);
+map TCValueDefinition{comments, pattern, type, exp} to TRValueDefinition(comments, pattern, type, exp);
+map TCExplicitFunctionDefinition{comments, name, type, paramPatternList, body} to TRExplicitFunctionDefinition(comments, name, type, paramPatternList, body);
+
+#############################################################################
+package com.fujitsu.vdmj.tc.expressions to examples.v2c.tr.expressions;
+#############################################################################
+
+map TCExpression{} to TRExpression();
+map TCExpressionList{} to TRExpressionList(this);
+map TCIntegerLiteralExpression{} to TRLiteralExpression(this);
+map TCRealLiteralExpression{} to TRLiteralExpression(this);
+map TCPlusExpression{left, right} to TRPlusExpression(left, right);
+map TCSubtractExpression{left, right} to TRSubtractExpression(left, right);
+map TCTimesExpression{left, right} to TRTimesExpression(left, right);
+map TCDivideExpression{left, right} to TRDivideExpression(left, right);
+map TCIfExpression{ifExp, thenExp, elseExp} to TRIfExpression(ifExp, thenExp, elseExp);
+map TCEqualsExpression{left, right} to TREqualsExpression(left, right);
+map TCVariableExpression{name} to TRVariableExpression(name);
+map TCLessExpression{left, op, right} to TRCompareExpression(left, op, right);
+map TCLessEqualExpression{left, op, right} to TRCompareExpression(left, op, right);
+map TCGreaterExpression{left, op, right} to TRCompareExpression(left, op, right);
+map TCGreaterEqualExpression{left, op, right} to TRCompareExpression(left, op, right);
+map TCApplyExpression{root, args} to TRApplyExpression(root, args);
+
+#############################################################################
+package com.fujitsu.vdmj.tc.lex to examples.v2c.tr.lex;
+#############################################################################
+
+unmapped com.fujitsu.vdmj.tc.lex.TCNameToken;
+unmapped com.fujitsu.vdmj.tc.lex.TCNameList;
+unmapped com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+unmapped com.fujitsu.vdmj.ast.lex.LexIntegerToken;
+unmapped com.fujitsu.vdmj.ast.lex.LexRealToken;
+unmapped com.fujitsu.vdmj.ast.lex.LexKeywordToken;
+unmapped com.fujitsu.vdmj.ast.lex.LexCommentList;
+
+#############################################################################
+package com.fujitsu.vdmj.tc.modules to examples.v2c.tr.modules;
+#############################################################################
+
+map TCModuleList{} to TRModuleList(this);
+map TCModule{name, defs} to TRModule(name, defs);
+
+#############################################################################
+package com.fujitsu.vdmj.tc.patterns to examples.v2c.tr.patterns;
+#############################################################################
+
+map TCPatternListList{} to TRParameterList(this); 
+unmapped com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
+
+#############################################################################
+package com.fujitsu.vdmj.tc.types to examples.v2c.tr.types;
+#############################################################################
+
+map TCType{} to TRType();
+map TCTypeList{} to TRTypeList(this);
+map TCFunctionType{parameters, result} to TRFunctionType(parameters, result);
+map TCNaturalOneType{} to TRNumericType(this);
+map TCNaturalType{} to TRNumericType(this);
+map TCIntegerType{} to TRNumericType(this);
+map TCRationalType{} to TRNumericType(this);
+map TCRealType{} to TRNumericType(this);
+
+#############################################################################
+# Classes that are not mapped
+#############################################################################
+
+unmapped java.lang.Boolean;
+unmapped java.lang.String;
+unmapped java.lang.Long;
+unmapped com.fujitsu.vdmj.mapper.FileList;
