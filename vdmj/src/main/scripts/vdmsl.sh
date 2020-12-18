@@ -10,20 +10,19 @@ PVERSION="4.4.1-P-SNAPSHOT"
 # The Maven repository directory containing VDMJ jars
 MAVENREPO=~/.m2/repository/com/fujitsu
 
-# Location of the vdmj.properties file, if any
+# Location of the vdmj.properties file, if any. Override with -D.
 PROPDIR="$HOME/lib"
 
 # Details for 64-bit Java
 JAVA64="/usr/bin/java"
-JAVA64_VMOPTS="-Xmx3000m -Xss1m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote"
+VM_OPTS="-Xmx3000m -Xss1m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote"
 
 function help()
 {
-    echo "Usage: $0 [--help|-?] [-P] [-A] <VDMJ options>"
+    echo "Usage: $0 [--help|-?] [-P] [-A] <VM and VDMJ options>"
     echo "-P use high precision VDMJ"
     echo "-A use annotation libraries and options"
-    echo "Java options are $JAVA64 $JAVA64_VMOPTS"
-    echo "VDMJ options are $VDMJ_OPTS"
+    echo "Default VM options are $JAVA64 $VM_OPTS"
     exit 0
 }
 
@@ -35,7 +34,6 @@ function check()
 	exit 1
     fi
 }
-
 
 # Just warn if a later version is available in Maven
 LATEST=$(ls $MAVENREPO/vdmj | grep "^[0-9].[0-9].[0-9]" | tail -1)
@@ -66,6 +64,9 @@ do
 	-P)
 	    VERSION=$PVERSION
 	    ;;
+	-D*|-X*)
+	    VM_OPTS="$VM_OPTS $1"
+	    ;;
 	*)
 	    VDMJ_OPTS="$VDMJ_OPTS $1"
     esac
@@ -90,7 +91,7 @@ then
     ANNOTATIONS2_JAR=$MAVENREPO/annotations2/${VERSION}/annotations2-${VERSION}.jar
     check "$ANNOTATIONS2_JAR"
     VDMJ_OPTS="$VDMJ_OPTS -annotations"
-    VDMJ_VMOPTS="$VDMJ_VMOPTS -Dannotations.debug"
+    VM_OPTS="$VM_OPTS -Dannotations.debug"
     CLASSPATH="$CLASSPATH:$ANNOTATIONS_JAR:$ANNOTATIONS2_JAR"
 fi
 
@@ -102,5 +103,5 @@ DIALECT=$(basename $0)
 export RLWRAP_HOME=~/.vdmj
 
 # Execute the JVM...
-exec rlwrap "$JAVA64" $JAVA64_VMOPTS $VDMJ_VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJ_OPTS "$@"
+exec rlwrap "$JAVA64" $VM_OPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJ_OPTS "$@"
 

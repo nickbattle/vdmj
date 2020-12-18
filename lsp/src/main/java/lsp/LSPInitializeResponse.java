@@ -54,12 +54,12 @@ public class LSPInitializeResponse extends JSONObject
 				// "save", new JSONObject("includeText", true)	// done by watched files registration
 			));
 		
-		cap.put("workspace",
-			new JSONObject(
-				"workspaceFolders",
-					new JSONObject(
-						"supported", true,
-						"changeNotifications", true)));
+//		cap.put("workspace",
+//			new JSONObject(
+//				"workspaceFolders",
+//					new JSONObject(
+//						"supported", true,
+//						"changeNotifications", true)));
 		
 		cap.put("experimental",
 				new JSONObject(

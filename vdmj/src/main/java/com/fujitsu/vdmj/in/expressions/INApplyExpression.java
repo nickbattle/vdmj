@@ -56,7 +56,15 @@ public class INApplyExpression extends INExpression
 	@Override
 	public String toString()
 	{
-		return root + "("+ Utils.listToString(args) + ")";
+		if (root instanceof INVariableExpression)
+		{
+			INVariableExpression ve = (INVariableExpression)root;
+			return ve.name.getName() + "("+ Utils.listToString(args) + ")";
+		}
+		else
+		{
+			return root + "("+ Utils.listToString(args) + ")";
+		}
 	}
 
 	@Override
