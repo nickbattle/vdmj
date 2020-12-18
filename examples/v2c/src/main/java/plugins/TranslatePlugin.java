@@ -35,13 +35,39 @@ import examples.v2c.tr.TRNode;
 import examples.v2c.tr.definitions.TRClassList;
 import examples.v2c.tr.modules.TRModuleList;
 
+/**
+ * All command line plugins must extend CommandPlugin and be in the class "plugins" by
+ * default. The packages searched for plugins can be changed using the "vdmj.plugins"
+ * JVM property.
+ */
 public class TranslatePlugin extends CommandPlugin
 {
+	/**
+	 * The constructor is called from the command line interpreter when the user first types
+	 * "translate <args>". It is passed an instance of the runtime interpreter, which is
+	 * saved in a protected field by the superclass.
+	 * 
+	 * @param interpreter
+	 */
 	public TranslatePlugin(Interpreter interpreter)
 	{
 		super(interpreter);
 	}
-
+	
+	/**
+	 * The run method is called whenever the user types "translate <args>" in the VDMJ command
+	 * line interpreter (CommandReader.java). Note that this class has access to the "interpreter"
+	 * instance that is running, which is passed during construction (above).
+	 * 
+	 * The example run method uses the ClassMapper to turn the type checked tree (from the interpreter)
+	 * into a "TR" tree. This uses the mappings file defined in the TRNode root class, which all
+	 * translatable classes must extend.
+	 * 
+	 * After converting the TC tree to a TR tree, this is then used to translate the specification
+	 * into "C". The result, a String, is just printed to stdout, which appears in the user console
+	 * session. By returning "true", the method indicates that the command executed successfully
+	 * without errors. If it returns "false", the command line interpreter will say "Unknown command".
+	 */
 	@Override
 	public boolean run(String[] argv) throws Exception
 	{
@@ -67,6 +93,11 @@ public class TranslatePlugin extends CommandPlugin
 		}
 	}
 
+	/**
+	 * Once this plugin is loaded (but not before) the following help line is added to the general
+	 * "help" output in the command line. The format is the same as the other help lines, with
+	 * an indication of what arguments the command takes, and a one line description.
+	 */
 	@Override
 	public String help()
 	{

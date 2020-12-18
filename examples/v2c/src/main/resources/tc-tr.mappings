@@ -1,3 +1,30 @@
+# ==================================================
+# The ClassMapper configuration for the TR example
+# ==================================================
+#
+# This file is named in the TRNode.MAPPINGS field, and is used by the ClassMapper to
+# turn a type checked TC tree into a tree of TR classes. Each line indicates how to
+# construct a TR class from the corresponding TC class.
+#
+# A package line sets the source and destination packages for the lines that follow.
+#
+# A map line identifies a set of fields in a source class, and then uses those fields
+# to identify a particular constructor call for the target. Alternatively, the target
+# can use "this", which just passes the source object to the constructor. Note that
+# the arguments to the constructor (apart from "this") are mapped before they are passed.
+# So before TRPlusExpression(left, right) is called, the left and right arguments are
+# themselves converted to TR classes, as can be seen in the constructor.
+#
+# Abstract classes have to be mentioned if there are any constructors with abstract
+# parameters. But these do not have to have any parameters defined. For example
+# map TCDefinition{} to TRDefinition().
+#
+# If a TC class can be used in the TR tree without translation, these have to be
+# mentioned as "unmapped" lines. Note that unmapped lines have to have the full
+# package-qualified class name.
+#
+# The mapping process is initiated by using the ClassMapper. See TranslatePlugin.java.
+#
 
 #############################################################################
 package com.fujitsu.vdmj.tc.definitions to examples.v2c.tr.definitions;
