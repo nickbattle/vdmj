@@ -26,7 +26,7 @@ function latest()
     ls -t $1 | head -1
 }
 
-java ${JAVA64_VMOPTS} -Dlog.filename=/dev/tty \
+java ${JAVA64_VMOPTS} -Dlog.filename=/dev/stdout \
     -cp \
 $(latest "annotations/target/annotations-${VERSION}-*.jar"):\
 $(latest "vdmj/target/vdmj-${VERSION}-??????.jar"):\
