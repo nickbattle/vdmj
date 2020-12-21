@@ -3,7 +3,7 @@
 #
 
 VERSION=4.4.1-P-SNAPSHOT
-JAVA64_VMOPTS="-Xmx3000m -Xss5m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote"
+JAVA64_VMOPTS="-Xmx3000m -Xss1m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote"
 
 if [ $# -ne 1 ]
 then
