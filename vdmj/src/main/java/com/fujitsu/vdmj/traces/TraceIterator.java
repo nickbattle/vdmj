@@ -31,7 +31,16 @@ public abstract class TraceIterator
 	
 	public void setVariables(INTraceVariableList inTraceVariableList)
 	{
-		this.variables = inTraceVariableList;
+		if (variables == null)
+		{
+			variables = inTraceVariableList;
+		}
+		else
+		{
+			// Variables might not be null if there are nested "let" traces that
+			// add variables to the same iterator.
+			variables.addAll(inTraceVariableList);
+		}
 	}
 
 	public CallSequence getVariables()
