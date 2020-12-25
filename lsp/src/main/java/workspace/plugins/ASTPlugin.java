@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 import com.fujitsu.vdmj.messages.VDMMessage;
+
+import json.JSONArray;
 import rpc.RPCMessageList;
 import workspace.LSPWorkspaceManager;
 
@@ -87,4 +89,6 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	{
 		return dirty;
 	}
+
+	abstract public JSONArray documentSymbols(File file);
 }

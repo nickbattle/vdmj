@@ -23,12 +23,19 @@
 
 package workspace.plugins;
 
+import java.io.File;
+
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
+import json.JSONArray;
+import lsp.textdocument.SymbolKind;
+import vdmj.LSPDefinitionFinder;
 import workspace.LSPWorkspaceManager;
 
 public class TCPluginSL extends TCPlugin
@@ -84,5 +91,51 @@ public class TCPluginSL extends TCPlugin
 	public <T> T getTC()
 	{
 		return (T)tcModuleList;
+	}
+	
+	@Override
+	public JSONArray documentSymbols(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (!tcModuleList.isEmpty())	// May be syntax errors
+		{
+			for (TCModule module: tcModuleList)
+			{
+				if (module.files.contains(file))
+				{
+					results.add(messages.symbolInformation(module.name.toString(),
+							module.name.getLocation(), SymbolKind.Module, null));
+
+					for (TCDefinition def: module.defs)
+					{
+						for (TCDefinition indef: def.getDefinitions())
+						{
+							if (indef.name != null && indef.location.file.equals(file) && !indef.name.isOld())
+							{
+								results.add(messages.symbolInformation(indef.name + ":" + indef.getType(),
+										indef.location, SymbolKind.kindOf(indef), indef.location.module));
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
+	}
+	
+	@Override
+	public TCDefinition findDefinition(File file, int zline, int zcol)
+	{
+		if (tcModuleList != null && !tcModuleList.isEmpty())
+		{
+			LSPDefinitionFinder finder = new LSPDefinitionFinder();
+			return finder.findDefinition(tcModuleList, file, zline + 1, zcol + 1);
+		}
+		else
+		{
+			return null;
+		}
 	}
 }

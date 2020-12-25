@@ -26,21 +26,13 @@ package workspace;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 
-import json.JSONArray;
-import lsp.textdocument.SymbolKind;
-import rpc.RPCMessageList;
-import rpc.RPCRequest;
 import vdmj.LSPDefinitionFinder;
-import workspace.plugins.ASTPlugin;
 import workspace.plugins.ASTPluginPR;
 import workspace.plugins.INPluginPR;
 import workspace.plugins.TCPlugin;
@@ -53,62 +45,6 @@ public class LSPWorkspaceManagerPP extends LSPWorkspaceManager
 		registry.registerPlugin(new ASTPluginPR(this));
 		registry.registerPlugin(new TCPluginPR(this));
 		registry.registerPlugin(new INPluginPR(this));
-	}
-	
-	@Override
-	public RPCMessageList documentSymbols(RPCRequest request, File file)
-	{
-		TCPlugin tc = registry.getPlugin("TC");
-		TCClassList tcClassList = tc.getTC();
-		JSONArray results = new JSONArray();
-		
-		if (!tcClassList.isEmpty())	// May be syntax errors
-		{
-			for (TCClassDefinition clazz: tcClassList)
-			{
-				if (clazz.name.getLocation().file.equals(file))
-				{
-					results.add(messages.symbolInformation(clazz.name.toString(),
-							clazz.name.getLocation(), SymbolKind.Class, null));
-
-					for (TCDefinition def: clazz.definitions)
-					{
-						for (TCDefinition indef: def.getDefinitions())
-						{
-							results.add(messages.symbolInformation(indef.name.getName() + ":" + indef.getType(),
-									indef.location, SymbolKind.kindOf(indef), indef.location.module));
-						}
-					}
-				}
-			}
-		}
-		else
-		{
-			ASTPlugin ast = registry.getPlugin("AST");
-			ASTClassList astClassList = ast.getAST();
-
-			if (!astClassList.isEmpty())	// May be syntax errors
-			{
-				for (ASTClassDefinition clazz: astClassList)
-				{
-					if (clazz.name.location.file.equals(file))
-					{
-						results.add(messages.symbolInformation(clazz.name.toString(), clazz.location, SymbolKind.Class, null));
-
-						for (ASTDefinition def: clazz.definitions)
-						{
-							if (def.name != null)
-							{
-								results.add(messages.symbolInformation(def.name.name, def.name.location,
-										SymbolKind.kindOf(def), def.location.module));
-							}
-						}
-					}
-				}
-			}
-		}
-		
-		return new RPCMessageList(request, results);
 	}
 
 	@Override

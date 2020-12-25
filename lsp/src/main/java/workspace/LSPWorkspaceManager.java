@@ -654,17 +654,33 @@ public abstract class LSPWorkspaceManager
 		
 		return new RPCMessageList(request, result);
 	}
+
+	public RPCMessageList documentSymbols(RPCRequest request, File file)
+	{
+		TCPlugin tc = registry.getPlugin("TC");
+		JSONArray results = tc.documentSymbols(file);
+
+		if (results.isEmpty())
+		{
+			ASTPlugin ast = registry.getPlugin("AST");
+			results = ast.documentSymbols(file);
+		}
+		
+		return new RPCMessageList(request, results);
+	}
 	
+	protected TCDefinition findDefinition(File file, int zline, int zcol)
+	{
+		TCPlugin plugin = registry.getPlugin("TC");
+		return plugin.findDefinition(file, zline, zcol);
+	}
+
 	/**
 	 * Abstract LSP methods that are implemented in language specific subclasses.
 	 */
 	abstract protected FilenameFilter getFilenameFilter();
 
 	abstract protected String[] getFilenameFilters();
-
-	abstract public RPCMessageList documentSymbols(RPCRequest request, File file) throws Exception;
-
-	abstract protected TCDefinition findDefinition(File file, int zline, int zcol);
 
 	abstract protected TCDefinitionList lookupDefinition(String startsWith);
 }

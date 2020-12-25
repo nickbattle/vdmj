@@ -23,12 +23,19 @@
 
 package workspace.plugins;
 
+import java.io.File;
+
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
+import json.JSONArray;
+import lsp.textdocument.SymbolKind;
+import vdmj.LSPDefinitionFinder;
 import workspace.LSPWorkspaceManagerPP;
 
 public class TCPluginPR extends TCPlugin
@@ -83,5 +90,48 @@ public class TCPluginPR extends TCPlugin
 	public <T> T getTC()
 	{
 		return (T)tcClassList;
+	}
+	
+	@Override
+	public JSONArray documentSymbols(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (!tcClassList.isEmpty())	// May be syntax errors
+		{
+			for (TCClassDefinition clazz: tcClassList)
+			{
+				if (clazz.name.getLocation().file.equals(file))
+				{
+					results.add(messages.symbolInformation(clazz.name.toString(),
+							clazz.name.getLocation(), SymbolKind.Class, null));
+
+					for (TCDefinition def: clazz.definitions)
+					{
+						for (TCDefinition indef: def.getDefinitions())
+						{
+							results.add(messages.symbolInformation(indef.name.getName() + ":" + indef.getType(),
+									indef.location, SymbolKind.kindOf(indef), indef.location.module));
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
+	}
+
+	@Override
+	public TCDefinition findDefinition(File file, int zline, int zcol)
+	{
+		if (tcClassList != null && !tcClassList.isEmpty())
+		{
+			LSPDefinitionFinder finder = new LSPDefinitionFinder();
+			return finder.findDefinition(tcClassList, file, zline + 1, zcol + 1);		// Convert from zero-relative
+		}
+		else
+		{
+			return null;
+		}
 	}
 }

@@ -23,10 +23,14 @@
 
 package workspace.plugins;
 
+import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+
+import json.JSONArray;
 import workspace.LSPWorkspaceManager;
 
 abstract public class TCPlugin extends AnalysisPlugin
@@ -71,4 +75,8 @@ abstract public class TCPlugin extends AnalysisPlugin
 	abstract public <T> T getTC();
 	
 	abstract public <T> boolean checkLoadedFiles(T ast) throws Exception;
+
+	abstract public JSONArray documentSymbols(File file);
+
+	abstract public TCDefinition findDefinition(File file, int zline, int zcol);
 }
