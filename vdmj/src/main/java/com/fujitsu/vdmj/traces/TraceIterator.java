@@ -38,8 +38,9 @@ public abstract class TraceIterator
 		else
 		{
 			// Variables might not be null if there are nested "let" traces that
-			// add variables to the same iterator.
-			variables.addAll(inTraceVariableList);
+			// add variables to the same iterator. New items are added at the start,
+			// because older (deeper) items can override them.
+			variables.addAll(0, inTraceVariableList);
 		}
 	}
 

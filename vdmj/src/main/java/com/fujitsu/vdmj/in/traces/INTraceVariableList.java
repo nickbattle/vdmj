@@ -23,7 +23,7 @@
 
 package com.fujitsu.vdmj.in.traces;
 
-import java.util.TreeSet;
+import java.util.LinkedList;
 
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INDefinitionList;
@@ -33,7 +33,7 @@ import com.fujitsu.vdmj.traces.CallSequence;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.Value;
 
-public class INTraceVariableList extends TreeSet<INTraceVariable>
+public class INTraceVariableList extends LinkedList<INTraceVariable>
 {
 	private static final long serialVersionUID = 1L;
 
