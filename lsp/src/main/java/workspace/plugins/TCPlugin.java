@@ -29,20 +29,18 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 
 import json.JSONArray;
-import workspace.LSPWorkspaceManager;
 
 abstract public class TCPlugin extends AnalysisPlugin
 {
-	protected final LSPWorkspaceManager lspManager; 
 	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
 	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
 	
-	public TCPlugin(LSPWorkspaceManager manager)
+	public TCPlugin()
 	{
 		super();
-		this.lspManager = manager;
 	}
 	
 	@Override
@@ -79,4 +77,6 @@ abstract public class TCPlugin extends AnalysisPlugin
 	abstract public JSONArray documentSymbols(File file);
 
 	abstract public TCDefinition findDefinition(File file, int zline, int zcol);
+
+	abstract public TCDefinitionList lookupDefinition(String startsWith);
 }

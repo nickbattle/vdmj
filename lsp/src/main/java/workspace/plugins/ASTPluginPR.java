@@ -24,6 +24,7 @@
 package workspace.plugins;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
@@ -49,9 +50,9 @@ public class ASTPluginPR extends ASTPlugin
 {
 	private ASTClassList astClassList = null;
 	
-	public ASTPluginPR(LSPWorkspaceManager manager)
+	public ASTPluginPR()
 	{
-		super(manager);
+		super();
 	}
 	
 	@Override
@@ -65,7 +66,7 @@ public class ASTPluginPR extends ASTPlugin
 	public boolean checkLoadedFiles()
 	{
 		dirty = false;
-		Map<File, StringBuilder> projectFiles = lspManager.getProjectFiles();
+		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		
 		if (Settings.dialect == Dialect.VDM_RT)
 		{
@@ -116,7 +117,7 @@ public class ASTPluginPR extends ASTPlugin
 		dirty = true;	// Until saved.
 
 		List<VDMMessage> errs = new Vector<VDMMessage>();
-		Map<File, StringBuilder> projectFiles = lspManager.getProjectFiles();
+		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
@@ -164,5 +165,24 @@ public class ASTPluginPR extends ASTPlugin
 		}
 		
 		return results;
+	}
+
+	@Override
+	public FilenameFilter getFilenameFilter()
+	{
+		return Settings.dialect.getFilter();
+	}
+	
+	@Override
+	public String[] getFilenameFilters()
+	{
+		if (Settings.dialect == Dialect.VDM_RT)
+		{
+			return new String[] { "**/*.vpp", "**/*.vdmrt" };
+		}
+		else
+		{
+			return new String[] { "**/*.vpp", "**/*.vdmpp" };
+		}
 	}
 }

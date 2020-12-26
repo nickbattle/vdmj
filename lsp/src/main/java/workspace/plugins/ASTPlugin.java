@@ -24,6 +24,7 @@
 package workspace.plugins;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
@@ -31,19 +32,16 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 
 import json.JSONArray;
 import rpc.RPCMessageList;
-import workspace.LSPWorkspaceManager;
 
 public abstract class ASTPlugin extends AnalysisPlugin
 {
-	protected final LSPWorkspaceManager lspManager;
 	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
 	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
 	protected boolean dirty;
 
-	public ASTPlugin(LSPWorkspaceManager manager)
+	public ASTPlugin()
 	{
 		super();
-		this.lspManager = manager;
 		this.dirty = false;
 	}
 	
@@ -91,4 +89,8 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	}
 
 	abstract public JSONArray documentSymbols(File file);
+
+	abstract public FilenameFilter getFilenameFilter();
+
+	abstract public String[] getFilenameFilters();
 }

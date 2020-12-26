@@ -28,6 +28,7 @@ import java.io.File;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
@@ -36,15 +37,14 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
-import workspace.LSPWorkspaceManager;
 
 public class TCPluginSL extends TCPlugin
 {
 	private TCModuleList tcModuleList = null;
 	
-	public TCPluginSL(LSPWorkspaceManager manager)
+	public TCPluginSL()
 	{
-		super(manager);
+		super();
 	}
 	
 	@Override
@@ -137,5 +137,24 @@ public class TCPluginSL extends TCPlugin
 		{
 			return null;
 		}
+	}
+
+	@Override
+	public TCDefinitionList lookupDefinition(String startsWith)
+	{
+		TCDefinitionList results = new TCDefinitionList();
+		
+		for (TCModule module: tcModuleList)
+		{
+			for (TCDefinition def: module.defs)
+			{
+				if (def.name != null && def.name.getName().startsWith(startsWith))
+				{
+					results.add(def);
+				}
+			}
+		}
+		
+		return results;
 	}
 }

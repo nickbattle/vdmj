@@ -24,6 +24,7 @@
 package workspace.plugins;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
@@ -47,9 +48,9 @@ public class ASTPluginSL extends ASTPlugin
 {
 	private ASTModuleList astModuleList = null;
 	
-	public ASTPluginSL(LSPWorkspaceManager manager)
+	public ASTPluginSL()
 	{
-		super(manager);
+		super();
 	}
 	
 	@Override
@@ -63,7 +64,7 @@ public class ASTPluginSL extends ASTPlugin
 	public boolean checkLoadedFiles()
 	{
 		dirty = false;
-		Map<File, StringBuilder> projectFiles = lspManager.getProjectFiles();
+		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
@@ -99,7 +100,7 @@ public class ASTPluginSL extends ASTPlugin
 		dirty = true;	// Until saved.
 
 		List<VDMMessage> errs = new Vector<VDMMessage>();
-		Map<File, StringBuilder> projectFiles = lspManager.getProjectFiles();
+		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
@@ -147,5 +148,17 @@ public class ASTPluginSL extends ASTPlugin
 		}
 		
 		return results;
+	}
+
+	@Override
+	public FilenameFilter getFilenameFilter()
+	{
+		return Dialect.VDM_SL.getFilter();
+	}
+	
+	@Override
+	public String[] getFilenameFilters()
+	{
+		return new String[] { "**/*.vdm", "**/*.vdmsl" }; 
 	}
 }
