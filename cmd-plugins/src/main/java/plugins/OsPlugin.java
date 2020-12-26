@@ -24,6 +24,7 @@
 package plugins;
 
 import com.fujitsu.vdmj.commands.CommandPlugin;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
 public class OsPlugin extends CommandPlugin
@@ -36,6 +37,12 @@ public class OsPlugin extends CommandPlugin
 	@Override
 	public boolean run(String[] argv) throws Exception
 	{
+		if (argv.length == 1)
+		{
+			Console.out.println(help());
+			return true;
+		}
+		
 		String[] cmd = new String[argv.length - 1];
 		System.arraycopy(argv, 1, cmd, 0, cmd.length);		
 		
@@ -43,6 +50,11 @@ public class OsPlugin extends CommandPlugin
 		pb.inheritIO();
 		Process p = pb.start();
 		p.waitFor();
+		
+		if (p.exitValue() != 0)
+		{
+			Console.err.println("Process exit code = " + p.exitValue());
+		}
 		
 		return true;	// Even if command failed
 	}
