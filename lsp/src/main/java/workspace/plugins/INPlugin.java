@@ -25,16 +25,11 @@ package workspace.plugins;
 
 import com.fujitsu.vdmj.runtime.Interpreter;
 
-import workspace.LSPWorkspaceManager;
-
 abstract public class INPlugin extends AnalysisPlugin
 {
-	protected final LSPWorkspaceManager lspManager;
-	
-	public INPlugin(LSPWorkspaceManager manager)
+	public INPlugin()
 	{
 		super();
-		this.lspManager = manager;
 	}
 	
 	@Override

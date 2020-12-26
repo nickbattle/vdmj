@@ -62,12 +62,18 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.plugins.ASTPlugin;
+import workspace.plugins.ASTPluginPR;
+import workspace.plugins.ASTPluginSL;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
+import workspace.plugins.INPluginPR;
+import workspace.plugins.INPluginSL;
 import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
+import workspace.plugins.TCPluginPR;
+import workspace.plugins.TCPluginSL;
 
-public abstract class LSPWorkspaceManager
+public class LSPWorkspaceManager
 {
 	private static LSPWorkspaceManager INSTANCE = null;
 	protected final PluginRegistry registry;
@@ -78,7 +84,7 @@ public abstract class LSPWorkspaceManager
 	private Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
 	private Set<File> openFiles = new HashSet<File>();
 	
-	protected LSPWorkspaceManager()
+	private LSPWorkspaceManager()
 	{
 		registry = PluginRegistry.getInstance();
 		messages = new LSPMessageUtils();
@@ -86,31 +92,29 @@ public abstract class LSPWorkspaceManager
 
 	public static synchronized LSPWorkspaceManager getInstance()
 	{
-		switch (Settings.dialect)
+		if (INSTANCE == null)
 		{
-			case VDM_SL:
-				if (INSTANCE == null)
-				{
-					INSTANCE = new LSPWorkspaceManagerSL();
-				}
-				break;
-				
-			case VDM_PP:
-				if (INSTANCE == null)
-				{
-					INSTANCE = new LSPWorkspaceManagerPP();
-				}
-				break;
-				
-			case VDM_RT:
-				if (INSTANCE == null)
-				{
-					INSTANCE = new LSPWorkspaceManagerRT();
-				}
-				break;
-				
-			default:
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+			INSTANCE = new LSPWorkspaceManager();
+			PluginRegistry _registry = PluginRegistry.getInstance();
+			
+			switch (Settings.dialect)
+			{
+				case VDM_SL:
+					_registry.registerPlugin(new ASTPluginSL());
+					_registry.registerPlugin(new TCPluginSL());
+					_registry.registerPlugin(new INPluginSL());
+					break;
+					
+				case VDM_PP:
+				case VDM_RT:
+					_registry.registerPlugin(new ASTPluginPR());
+					_registry.registerPlugin(new TCPluginPR());
+					_registry.registerPlugin(new INPluginPR());
+					break;
+					
+				default:
+					throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+			}
 		}
 
 		return INSTANCE;
@@ -654,17 +658,42 @@ public abstract class LSPWorkspaceManager
 		
 		return new RPCMessageList(request, result);
 	}
+
+	public RPCMessageList documentSymbols(RPCRequest request, File file)
+	{
+		TCPlugin tc = registry.getPlugin("TC");
+		JSONArray results = tc.documentSymbols(file);
+
+		if (results.isEmpty())
+		{
+			ASTPlugin ast = registry.getPlugin("AST");
+			results = ast.documentSymbols(file);
+		}
+		
+		return new RPCMessageList(request, results);
+	}
 	
-	/**
-	 * Abstract LSP methods that are implemented in language specific subclasses.
-	 */
-	abstract protected FilenameFilter getFilenameFilter();
+	private TCDefinition findDefinition(File file, int zline, int zcol)
+	{
+		TCPlugin plugin = registry.getPlugin("TC");
+		return plugin.findDefinition(file, zline, zcol);
+	}
 
-	abstract protected String[] getFilenameFilters();
+	private TCDefinitionList lookupDefinition(String startsWith)
+	{
+		TCPlugin plugin = registry.getPlugin("TC");
+		return plugin.lookupDefinition(startsWith);
+	}
 
-	abstract public RPCMessageList documentSymbols(RPCRequest request, File file) throws Exception;
+	private FilenameFilter getFilenameFilter()
+	{
+		ASTPlugin ast = registry.getPlugin("AST");
+		return ast.getFilenameFilter();
+	}
 
-	abstract protected TCDefinition findDefinition(File file, int zline, int zcol);
-
-	abstract protected TCDefinitionList lookupDefinition(String startsWith);
+	private String[] getFilenameFilters()
+	{
+		ASTPlugin ast = registry.getPlugin("AST");
+		return ast.getFilenameFilters();
+	}
 }

@@ -23,21 +23,28 @@
 
 package workspace.plugins;
 
+import java.io.File;
+
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
-import workspace.LSPWorkspaceManager;
+import json.JSONArray;
+import lsp.textdocument.SymbolKind;
+import vdmj.LSPDefinitionFinder;
 
 public class TCPluginSL extends TCPlugin
 {
 	private TCModuleList tcModuleList = null;
 	
-	public TCPluginSL(LSPWorkspaceManager manager)
+	public TCPluginSL()
 	{
-		super(manager);
+		super();
 	}
 	
 	@Override
@@ -84,5 +91,70 @@ public class TCPluginSL extends TCPlugin
 	public <T> T getTC()
 	{
 		return (T)tcModuleList;
+	}
+	
+	@Override
+	public JSONArray documentSymbols(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (!tcModuleList.isEmpty())	// May be syntax errors
+		{
+			for (TCModule module: tcModuleList)
+			{
+				if (module.files.contains(file))
+				{
+					results.add(messages.symbolInformation(module.name.toString(),
+							module.name.getLocation(), SymbolKind.Module, null));
+
+					for (TCDefinition def: module.defs)
+					{
+						for (TCDefinition indef: def.getDefinitions())
+						{
+							if (indef.name != null && indef.location.file.equals(file) && !indef.name.isOld())
+							{
+								results.add(messages.symbolInformation(indef.name + ":" + indef.getType(),
+										indef.location, SymbolKind.kindOf(indef), indef.location.module));
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
+	}
+	
+	@Override
+	public TCDefinition findDefinition(File file, int zline, int zcol)
+	{
+		if (tcModuleList != null && !tcModuleList.isEmpty())
+		{
+			LSPDefinitionFinder finder = new LSPDefinitionFinder();
+			return finder.findDefinition(tcModuleList, file, zline + 1, zcol + 1);
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	@Override
+	public TCDefinitionList lookupDefinition(String startsWith)
+	{
+		TCDefinitionList results = new TCDefinitionList();
+		
+		for (TCModule module: tcModuleList)
+		{
+			for (TCDefinition def: module.defs)
+			{
+				if (def.name != null && def.name.getName().startsWith(startsWith))
+				{
+					results.add(def);
+				}
+			}
+		}
+		
+		return results;
 	}
 }

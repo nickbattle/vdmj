@@ -24,6 +24,7 @@
 package workspace.plugins;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +32,15 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ModuleReader;
+import json.JSONArray;
+import lsp.textdocument.SymbolKind;
 import workspace.LSPWorkspaceManager;
 import workspace.Log;
 
@@ -43,9 +48,9 @@ public class ASTPluginSL extends ASTPlugin
 {
 	private ASTModuleList astModuleList = null;
 	
-	public ASTPluginSL(LSPWorkspaceManager manager)
+	public ASTPluginSL()
 	{
-		super(manager);
+		super();
 	}
 	
 	@Override
@@ -59,7 +64,7 @@ public class ASTPluginSL extends ASTPlugin
 	public boolean checkLoadedFiles()
 	{
 		dirty = false;
-		Map<File, StringBuilder> projectFiles = lspManager.getProjectFiles();
+		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
@@ -95,7 +100,7 @@ public class ASTPluginSL extends ASTPlugin
 		dirty = true;	// Until saved.
 
 		List<VDMMessage> errs = new Vector<VDMMessage>();
-		Map<File, StringBuilder> projectFiles = lspManager.getProjectFiles();
+		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
@@ -115,5 +120,45 @@ public class ASTPluginSL extends ASTPlugin
 
 		Log.dump(errs);
 		return errs;
+	}
+	
+	@Override
+	public JSONArray documentSymbols(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (!astModuleList.isEmpty())	// May be syntax errors
+		{
+			for (ASTModule module: astModuleList)
+			{
+				if (module.files.contains(file))
+				{
+					results.add(messages.symbolInformation(module.name, SymbolKind.Module, null));
+
+					for (ASTDefinition def: module.defs)
+					{
+						if (def.name != null && def.location.file.equals(file) && !def.name.old)
+						{
+							results.add(messages.symbolInformation(def.name.toString(),
+									def.name.location, SymbolKind.kindOf(def), def.location.module));
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
+	}
+
+	@Override
+	public FilenameFilter getFilenameFilter()
+	{
+		return Dialect.VDM_SL.getFilter();
+	}
+	
+	@Override
+	public String[] getFilenameFilters()
+	{
+		return new String[] { "**/*.vdm", "**/*.vdmsl" }; 
 	}
 }

@@ -30,15 +30,13 @@ import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 
-import workspace.LSPWorkspaceManagerPP;
-
 public class INPluginPR extends INPlugin
 {
 	private INClassList inClassList = null;
 	
-	public INPluginPR(LSPWorkspaceManagerPP manager)
+	public INPluginPR()
 	{
-		super(manager);
+		super();
 	}
 	
 	@Override

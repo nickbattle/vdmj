@@ -23,22 +23,24 @@
 
 package workspace.plugins;
 
+import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.messages.VDMMessage;
-import workspace.LSPWorkspaceManager;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+
+import json.JSONArray;
 
 abstract public class TCPlugin extends AnalysisPlugin
 {
-	protected final LSPWorkspaceManager lspManager; 
 	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
 	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
 	
-	public TCPlugin(LSPWorkspaceManager manager)
+	public TCPlugin()
 	{
 		super();
-		this.lspManager = manager;
 	}
 	
 	@Override
@@ -71,4 +73,10 @@ abstract public class TCPlugin extends AnalysisPlugin
 	abstract public <T> T getTC();
 	
 	abstract public <T> boolean checkLoadedFiles(T ast) throws Exception;
+
+	abstract public JSONArray documentSymbols(File file);
+
+	abstract public TCDefinition findDefinition(File file, int zline, int zcol);
+
+	abstract public TCDefinitionList lookupDefinition(String startsWith);
 }

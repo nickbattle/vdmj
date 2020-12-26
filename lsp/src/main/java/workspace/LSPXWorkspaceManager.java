@@ -43,10 +43,14 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.CTPlugin;
+import workspace.plugins.CTPluginPR;
+import workspace.plugins.CTPluginSL;
 import workspace.plugins.POPlugin;
+import workspace.plugins.POPluginPR;
+import workspace.plugins.POPluginSL;
 import workspace.plugins.TCPlugin;
 
-abstract public class LSPXWorkspaceManager
+public class LSPXWorkspaceManager
 {
 	private static LSPXWorkspaceManager INSTANCE = null;
 	protected final PluginRegistry registry;
@@ -58,31 +62,27 @@ abstract public class LSPXWorkspaceManager
 
 	public static synchronized LSPXWorkspaceManager getInstance()
 	{
-		switch (Settings.dialect)
+		if (INSTANCE == null)
 		{
-			case VDM_SL:
-				if (INSTANCE == null)
-				{
-					INSTANCE = new LSPXWorkspaceManagerSL();
-				}
-				break;
-				
-			case VDM_PP:
-				if (INSTANCE == null)
-				{
-					INSTANCE = new LSPXWorkspaceManagerPP();
-				}
-				break;
-				
-			case VDM_RT:
-				if (INSTANCE == null)
-				{
-					INSTANCE = new LSPXWorkspaceManagerRT();
-				}
-				break;
-				
-			default:
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+			PluginRegistry _registry = PluginRegistry.getInstance();
+			INSTANCE = new LSPXWorkspaceManager();
+			
+			switch (Settings.dialect)
+			{
+				case VDM_SL:
+					_registry.registerPlugin(new POPluginSL());
+					_registry.registerPlugin(new CTPluginSL());
+					break;
+					
+				case VDM_PP:
+				case VDM_RT:
+					_registry.registerPlugin(new POPluginPR());
+					_registry.registerPlugin(new CTPluginPR());
+					break;
+					
+				default:
+					throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+			}
 		}
 
 		return INSTANCE;

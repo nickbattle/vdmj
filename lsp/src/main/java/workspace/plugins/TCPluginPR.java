@@ -23,21 +23,28 @@
 
 package workspace.plugins;
 
+import java.io.File;
+
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
-import workspace.LSPWorkspaceManagerPP;
+import json.JSONArray;
+import lsp.textdocument.SymbolKind;
+import vdmj.LSPDefinitionFinder;
 
 public class TCPluginPR extends TCPlugin
 {
 	private TCClassList tcClassList = null;
 	
-	public TCPluginPR(LSPWorkspaceManagerPP manager)
+	public TCPluginPR()
 	{
-		super(manager);
+		super();
 	}
 	
 	@Override
@@ -83,5 +90,72 @@ public class TCPluginPR extends TCPlugin
 	public <T> T getTC()
 	{
 		return (T)tcClassList;
+	}
+	
+	@Override
+	public JSONArray documentSymbols(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (!tcClassList.isEmpty())	// May be syntax errors
+		{
+			for (TCClassDefinition clazz: tcClassList)
+			{
+				if (clazz.name.getLocation().file.equals(file))
+				{
+					results.add(messages.symbolInformation(clazz.name.toString(),
+							clazz.name.getLocation(), SymbolKind.Class, null));
+
+					for (TCDefinition def: clazz.definitions)
+					{
+						for (TCDefinition indef: def.getDefinitions())
+						{
+							results.add(messages.symbolInformation(indef.name.getName() + ":" + indef.getType(),
+									indef.location, SymbolKind.kindOf(indef), indef.location.module));
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
+	}
+
+	@Override
+	public TCDefinition findDefinition(File file, int zline, int zcol)
+	{
+		if (tcClassList != null && !tcClassList.isEmpty())
+		{
+			LSPDefinitionFinder finder = new LSPDefinitionFinder();
+			return finder.findDefinition(tcClassList, file, zline + 1, zcol + 1);		// Convert from zero-relative
+		}
+		else
+		{
+			return null;
+		}
+	}
+
+	@Override
+	public TCDefinitionList lookupDefinition(String startsWith)
+	{
+		TCDefinitionList results = new TCDefinitionList();
+		
+		for (TCClassDefinition cdef: tcClassList)
+		{
+			if (cdef.name.getName().startsWith(startsWith))
+			{
+				results.add(cdef);	// Add classes as well
+			}
+			
+			for (TCDefinition def: cdef.definitions)
+			{
+				if (def.name != null && def.name.getName().startsWith(startsWith))
+				{
+					results.add(def);
+				}
+			}
+		}
+		
+		return results;
 	}
 }
