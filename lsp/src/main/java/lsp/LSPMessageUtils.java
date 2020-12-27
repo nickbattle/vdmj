@@ -100,7 +100,7 @@ public class LSPMessageUtils
 			}
 			
 			JSONObject params = new JSONObject("uri", file.toURI().toString(), "diagnostics", messages);
-			responses.add(new RPCRequest("textDocument/publishDiagnostics", params));
+			responses.add(RPCRequest.notification("textDocument/publishDiagnostics", params));
 		}
 		
 		return responses;

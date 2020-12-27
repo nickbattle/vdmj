@@ -60,7 +60,7 @@ public class POGTest extends LSPTest
 
 		POGHandler handler = new POGHandler();
 		File file = new File(testdir, "pogtest.vdmsl");
-		RPCRequest request = new RPCRequest(123L, "slsp/POG/generate",
+		RPCRequest request = RPCRequest.create(123L, "slsp/POG/generate",
 				new JSONObject("uri", file.toURI().toString()));
 		
 		RPCMessageList response = handler.request(request);
@@ -91,7 +91,7 @@ public class POGTest extends LSPTest
 		assertEquals(true, notify.get(1).getPath("params.successful"));
 		
 		POGHandler handler = new POGHandler();
-		RPCRequest request = new RPCRequest(789L, "slsp/POG/generate",
+		RPCRequest request = RPCRequest.create(789L, "slsp/POG/generate",
 				new JSONObject("uri", testdir.toURI().toString()));
 		
 		RPCMessageList response = handler.request(request);
@@ -122,7 +122,7 @@ public class POGTest extends LSPTest
 		assertEquals(true, notify.get(1).getPath("params.successful"));
 		
 		POGHandler handler = new POGHandler();
-		RPCRequest request = new RPCRequest(789L, "slsp/POG/generate",
+		RPCRequest request = RPCRequest.create(789L, "slsp/POG/generate",
 				new JSONObject("uri", testdir.toURI().toString()));
 		
 		RPCMessageList response = handler.request(request);
@@ -157,7 +157,7 @@ public class POGTest extends LSPTest
 		assertEquals(false, notify.get(1).getPath("params.successful"));
 
 		POGHandler handler = new POGHandler();
-		RPCRequest request = new RPCRequest(789L, "slsp/POG/generate",
+		RPCRequest request = RPCRequest.create(789L, "slsp/POG/generate",
 				new JSONObject("uri", testdir.toURI().toString()));
 		
 		RPCMessageList response = handler.request(request);

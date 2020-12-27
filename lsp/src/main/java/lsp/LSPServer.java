@@ -141,7 +141,7 @@ public class LSPServer extends JSONServer
 				
 				if (handler != null)
 				{
-					handler.response(new RPCResponse(message));
+					handler.response(RPCResponse.create(message));
 					responseHandlers.remove(id);
 				}
 				else
@@ -151,7 +151,7 @@ public class LSPServer extends JSONServer
 			}
 			else
 			{
-				RPCRequest request = new RPCRequest(message);
+				RPCRequest request = RPCRequest.create(message);
 				RPCMessageList responses = dispatcher.dispatch(request);
 				
 				if (responses != null)
@@ -162,7 +162,7 @@ public class LSPServer extends JSONServer
 						
 						if (response.get("method") != null && response.get("id") != null)	// A request
 						{
-							RPCRequest req = new RPCRequest(response);
+							RPCRequest req = RPCRequest.create(response);
 							responseHandlers.put(response.get("id"), dispatcher.getHandler(req));
 						}
 					}

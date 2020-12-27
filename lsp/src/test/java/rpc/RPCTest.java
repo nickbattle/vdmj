@@ -56,7 +56,7 @@ public class RPCTest extends TestCase
 				JSONObject params = request.get("params");
 				Long minuend = params.get("minuend");
 				Long subtrahend = params.get("subtrahend");
-				return new RPCMessageList(new RPCResponse(request, minuend.longValue() - subtrahend.longValue()));
+				return new RPCMessageList(RPCResponse.result(request, minuend.longValue() - subtrahend.longValue()));
 			}
 
 			@Override
@@ -65,7 +65,7 @@ public class RPCTest extends TestCase
 			}
 		}, "subtract");
 		
-		RPCMessageList responses = d.dispatch(new RPCRequest(map));
+		RPCMessageList responses = d.dispatch(RPCRequest.create(map));
 		StringWriter out = new StringWriter();
 		JSONWriter writer = new JSONWriter(new PrintWriter(out));
 		writer.writeObject(responses.get(0));
@@ -93,7 +93,7 @@ public class RPCTest extends TestCase
 				JSONArray params = request.get("params");
 				Long minuend = params.index(0);
 				Long subtrahend = params.index(1);
-				return new RPCMessageList(new RPCResponse(request, minuend.longValue() - subtrahend.longValue()));
+				return new RPCMessageList(RPCResponse.result(request, minuend.longValue() - subtrahend.longValue()));
 			}
 
 			@Override
@@ -102,7 +102,7 @@ public class RPCTest extends TestCase
 			}
 		}, "subtract");
 		
-		RPCMessageList responses = d.dispatch(new RPCRequest(map));
+		RPCMessageList responses = d.dispatch(RPCRequest.create(map));
 		StringWriter out = new StringWriter();
 		JSONWriter writer = new JSONWriter(new PrintWriter(out));
 		writer.writeObject(responses.get(0));
@@ -121,7 +121,7 @@ public class RPCTest extends TestCase
 		JSONReader reader = new JSONReader(ireader);
 		JSONObject map = reader.readObject();
 		RPCDispatcher d = new RPCDispatcher();
-		RPCMessageList responses = d.dispatch(new RPCRequest(map));
+		RPCMessageList responses = d.dispatch(RPCRequest.create(map));
 		StringWriter out = new StringWriter();
 		JSONWriter writer = new JSONWriter(new PrintWriter(out));
 		writer.writeObject(responses.get(0));

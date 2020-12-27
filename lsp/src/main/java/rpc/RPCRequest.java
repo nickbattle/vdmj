@@ -30,35 +30,56 @@ import json.JSONObject;
 public class RPCRequest extends JSONObject
 {
 	private static final long serialVersionUID = 1L;
-	
 	private static long nextId = 1;
 	
-	public RPCRequest(JSONObject request) throws IOException
-	{
-		String version = request.get("jsonrpc");
-		
-		if (!"2.0".equals(version))
-		{
-			throw new IOException("Unsupported JSON version - expecting 2.0");
-		}
-		else
-		{
-			putAll(request);
-		}
-	}
-	
-	public RPCRequest(String method, Object params)
+	private RPCRequest(String method, Object params)
 	{
 		put("jsonrpc", "2.0");
 		put("method", method);
 		put("params", params);
 	}
 	
-	public RPCRequest(Long id, String method, Object params)
+	private RPCRequest(JSONObject request) throws IOException
 	{
-		this(method, params);
-		if (id != 0) nextId = id;
-		put("id", nextId++);
+		String version = request.get("jsonrpc");
+		
+		if (!"2.0".equals(version))
+		{
+			throw new IOException("Unsupported JSON RPC version - expecting 2.0");
+		}
+		else
+		{
+			putAll(request);
+		}
+	}
+
+	/**
+	 * Public methods below used to create messages.
+	 */
+	
+	public static RPCRequest create(JSONObject request) throws IOException
+	{
+		return new RPCRequest(request);
+	}
+	
+	public static RPCRequest notification(String method, Object params)
+	{
+		return new RPCRequest(method, params);	// Note: no id field.
+	}
+	
+	public synchronized static RPCRequest create(String method, Object params)
+	{
+		RPCRequest request = new RPCRequest(method, params);
+		request.put("id", nextId++);
+		return request;
+	}
+	
+	public synchronized static RPCRequest create(Long id, String method, Object params)
+	{
+		nextId = id;
+		RPCRequest request = new RPCRequest(method, params);
+		request.put("id", nextId++);
+		return request;
 	}
 	
 	public String getMethod()

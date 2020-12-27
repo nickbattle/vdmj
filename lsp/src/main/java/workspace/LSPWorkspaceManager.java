@@ -242,7 +242,7 @@ public class LSPWorkspaceManager
 			watchers.add(new JSONObject("globPattern", glob));
 		}
 		
-		return new RPCRequest(0L, "client/registerCapability",
+		return RPCRequest.create("client/registerCapability",
 			new JSONObject(
 				"registrations",
 					new JSONArray(
@@ -366,7 +366,7 @@ public class LSPWorkspaceManager
 		{
 			po.checkLoadedFiles(tc.getTC());
 
-			result.add(new RPCRequest("slsp/POG/updated",
+			result.add(RPCRequest.notification("slsp/POG/updated",
 					new JSONObject("successful", tc.getErrs().isEmpty())));
 		}
 		

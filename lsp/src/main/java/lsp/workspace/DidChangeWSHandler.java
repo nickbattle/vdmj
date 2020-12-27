@@ -128,7 +128,7 @@ public class DidChangeWSHandler extends LSPHandler
 					{
 						// clear all diagnostics from deleted files
 						JSONObject diags = new JSONObject("uri", file.toURI().toString(), "diagnostics", new JSONArray());
-						responses.add(new RPCRequest("textDocument/publishDiagnostics", diags));
+						responses.add(RPCRequest.notification("textDocument/publishDiagnostics", diags));
 					}
 				}
 			}

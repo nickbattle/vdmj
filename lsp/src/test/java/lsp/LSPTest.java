@@ -64,7 +64,7 @@ abstract public class LSPTest
 				"rootUri",		root.toURI().toString(),
 				"capabilities",	capabilities);
 		
-		RPCMessageList result = lspManager.lspInitialize(new RPCRequest(0L, "initialize", params));
+		RPCMessageList result = lspManager.lspInitialize(RPCRequest.create("initialize", params));
 		assertEquals("init result", (Object)null, result.get(0).get("error"));		
 		
 		return lspManager.afterChangeWatchedFiles(null);	// Cause parse and typecheck
