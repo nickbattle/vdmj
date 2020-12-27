@@ -29,9 +29,9 @@ import rpc.RPCMessageList;
 
 public class CancelHandler extends LSPHandler
 {
-	public CancelHandler(LSPServerState state)
+	public CancelHandler()
 	{
-		super(state);
+		super();
 	}
 
 	@Override

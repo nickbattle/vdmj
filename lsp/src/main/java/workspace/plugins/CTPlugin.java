@@ -289,7 +289,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 							
 							JSONObject params = new JSONObject("token", workDoneToken, "value", value);
 							Log.printf("Sending work done = %d%%", done);
-							send(server, new RPCRequest("$/progress", params));
+							send(server, RPCRequest.notification("$/progress", params));
 							percentDone = done;
 						}
 					}
@@ -302,7 +302,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 					{
 						JSONObject params = new JSONObject("token", progressToken, "value", batch);
 						Log.printf("Sending intermediate results");
-						send(server, new RPCRequest("$/progress", params));
+						send(server, RPCRequest.notification("$/progress", params));
 					}
 
 					if (cancelled)
@@ -317,12 +317,12 @@ abstract public class CTPlugin extends AnalysisPlugin
 					if (cancelled)
 					{
 						Log.printf("Sending cancelled results");
-						send(server, new RPCResponse(request, RPCErrors.RequestCancelled, "Trace cancelled", responses));
+						send(server, RPCResponse.error(request, RPCErrors.RequestCancelled, "Trace cancelled", responses));
 					}
 					else
 					{
 						Log.printf("Sending complete results");
-						send(server, new RPCResponse(request, responses));
+						send(server, RPCResponse.result(request, responses));
 					}
 				}
 				else
@@ -330,12 +330,12 @@ abstract public class CTPlugin extends AnalysisPlugin
 					if (cancelled)
 					{
 						Log.printf("Sending cancelled null result");
-						send(server, new RPCResponse(request, RPCErrors.RequestCancelled, "Trace cancelled", null));
+						send(server, RPCResponse.error(request, RPCErrors.RequestCancelled, "Trace cancelled", null));
 					}
 					else
 					{
 						Log.printf("Sending final null result");
-						send(server, new RPCResponse(request, null));
+						send(server, RPCResponse.result(request));
 					}
 				}
 			}

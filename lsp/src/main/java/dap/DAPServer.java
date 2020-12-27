@@ -48,16 +48,16 @@ public class DAPServer extends JSONServer
 {
 	private static DAPServer INSTANCE = null;
 	
-	private final DAPServerState state;
 	private final DAPDispatcher dispatcher;
 	private final Socket socket;
+	
+	private boolean running = false;
 	
 	public DAPServer(Dialect dialect, Socket socket) throws IOException
 	{
 		super("DAP", socket.getInputStream(), socket.getOutputStream());
 		
 		INSTANCE = this;
-		this.state = new DAPServerState(dialect);
 		this.dispatcher = getDispatcher();
 		this.socket = socket;
 		
@@ -69,24 +69,19 @@ public class DAPServer extends JSONServer
 		return INSTANCE;
 	}
 	
-	public DAPServerState getState()
-	{
-		return state;
-	}
-	
 	private DAPDispatcher getDispatcher() throws IOException
 	{
 		DAPDispatcher dispatcher = new DAPDispatcher();
 		
-		dispatcher.register(new InitializeHandler(state), "initialize");
-		dispatcher.register(new LaunchHandler(state), "launch");
-		dispatcher.register(new InitializeHandler(state), "configurationDone");
-		dispatcher.register(new ThreadsHandler(state), "threads");
-		dispatcher.register(new SetBreakpointsHandler(state), "setBreakpoints");
-		dispatcher.register(new EvaluateHandler(state), "evaluate");
-		dispatcher.register(new StackTraceHandler(state), "stackTrace");
-		dispatcher.register(new DisconnectHandler(state), "disconnect");
-		dispatcher.register(new TerminateHandler(state), "terminate");
+		dispatcher.register(new InitializeHandler(), "initialize");
+		dispatcher.register(new LaunchHandler(), "launch");
+		dispatcher.register(new InitializeHandler(), "configurationDone");
+		dispatcher.register(new ThreadsHandler(), "threads");
+		dispatcher.register(new SetBreakpointsHandler(), "setBreakpoints");
+		dispatcher.register(new EvaluateHandler(), "evaluate");
+		dispatcher.register(new StackTraceHandler(), "stackTrace");
+		dispatcher.register(new DisconnectHandler(), "disconnect");
+		dispatcher.register(new TerminateHandler(), "terminate");
 
 		return dispatcher;
 	}
@@ -96,13 +91,23 @@ public class DAPServer extends JSONServer
 	{
 		socket.setSoTimeout(timeout);
 	}
+	
+	public boolean isRunning()
+	{
+		return running;
+	}
+
+	public void setRunning(boolean arg)
+	{
+		running = arg;
+	}
 
 	public void run() throws IOException
 	{
-		state.setRunning(true);
+		running = true;
 		Console.init("UTF-8", getOutConsoleWriter(), getErrConsoleWriter());
 
-		while (state.isRunning())
+		while (running)
 		{
 			JSONObject message = readMessage();
 			

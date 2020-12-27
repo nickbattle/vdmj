@@ -31,11 +31,8 @@ import workspace.Log;
 
 abstract public class LSPHandler implements RPCHandler
 {
-	protected LSPServerState lspServerState;
-
-	public LSPHandler(LSPServerState state)
+	public LSPHandler()
 	{
-		this.lspServerState = state;
 	}
 
 	@Override

@@ -44,7 +44,7 @@ public class QuitCommand extends Command
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		DAPServer.getInstance().getState().setRunning(false);
+		DAPServer.getInstance().setRunning(false);
 		return DAPWorkspaceManager.getInstance().terminate(request, false);
 	}
 }

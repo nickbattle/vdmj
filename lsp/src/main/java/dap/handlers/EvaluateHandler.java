@@ -28,15 +28,14 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPServerState;
 import json.JSONObject;
 import workspace.DAPWorkspaceManager;
 
 public class EvaluateHandler extends DAPHandler
 {
-	public EvaluateHandler(DAPServerState state)
+	public EvaluateHandler()
 	{
-		super(state);
+		super();
 	}
 	
 	@Override

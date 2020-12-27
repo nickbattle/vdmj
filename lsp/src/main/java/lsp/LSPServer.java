@@ -53,7 +53,6 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import vdmj.DAPDebugLink;
-import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
 import workspace.Log;
 
@@ -62,15 +61,14 @@ public class LSPServer extends JSONServer
 	private static LSPServer INSTANCE = null;
 
 	private final RPCDispatcher dispatcher;
-	private final LSPServerState state;
 	private final Map<Long, RPCHandler> responseHandlers;
+	private boolean initialized = false;
 	
 	public LSPServer(Dialect dialect, InputStream inStream, OutputStream outStream) throws IOException
 	{
 		super("LSP", inStream, outStream);
 		
 		INSTANCE = this;
-		this.state = new LSPServerState();
 		this.dispatcher = getDispatcher();
 		this.responseHandlers = new HashMap<Long, RPCHandler>();
 
@@ -79,7 +77,6 @@ public class LSPServer extends JSONServer
 		Settings.annotations = true;
 		Settings.dialect = dialect;
 
-		LSPWorkspaceManager.getInstance().setLSPState(state);
 		LSPXWorkspaceManager.getInstance();		// Just set up
 	}
 	
@@ -92,26 +89,26 @@ public class LSPServer extends JSONServer
 	{
 		RPCDispatcher dispatcher = new RPCDispatcher();
 		
-		dispatcher.register(new InitializeHandler(state), "initialize", "initialized", "client/registerCapability");
-		dispatcher.register(new ShutdownHandler(state), "shutdown");
-		dispatcher.register(new ExitHandler(state), "exit");
-		dispatcher.register(new CancelHandler(state), "$/cancelRequest");
+		dispatcher.register(new InitializeHandler(), "initialize", "initialized", "client/registerCapability");
+		dispatcher.register(new ShutdownHandler(), "shutdown");
+		dispatcher.register(new ExitHandler(), "exit");
+		dispatcher.register(new CancelHandler(), "$/cancelRequest");
 
-		dispatcher.register(new DidOpenHandler(state), "textDocument/didOpen");
-		dispatcher.register(new DidCloseHandler(state), "textDocument/didClose");
-		dispatcher.register(new DidChangeHandler(state), "textDocument/didChange");
-		dispatcher.register(new DidSaveHandler(state), "textDocument/didSave");
-		dispatcher.register(new DefinitionHandler(state), "textDocument/definition");
-		dispatcher.register(new DocumentSymbolHandler(state), "textDocument/documentSymbol");
-		dispatcher.register(new CompletionHandler(state), "textDocument/completion");
+		dispatcher.register(new DidOpenHandler(), "textDocument/didOpen");
+		dispatcher.register(new DidCloseHandler(), "textDocument/didClose");
+		dispatcher.register(new DidChangeHandler(), "textDocument/didChange");
+		dispatcher.register(new DidSaveHandler(), "textDocument/didSave");
+		dispatcher.register(new DefinitionHandler(), "textDocument/definition");
+		dispatcher.register(new DocumentSymbolHandler(), "textDocument/documentSymbol");
+		dispatcher.register(new CompletionHandler(), "textDocument/completion");
 
-		dispatcher.register(new DidChangeWSHandler(state), "workspace/didChangeWatchedFiles");
-		dispatcher.register(new WorkspaceFoldersHandler(state), "workspace/workspaceFolders");
-		dispatcher.register(new DidChangeWSHandler(state), "workspace/didChangeWorkspaceFolders");
+		dispatcher.register(new DidChangeWSHandler(), "workspace/didChangeWatchedFiles");
+		dispatcher.register(new WorkspaceFoldersHandler(), "workspace/workspaceFolders");
+		dispatcher.register(new DidChangeWSHandler(), "workspace/didChangeWorkspaceFolders");
 
-		dispatcher.register(new POGHandler(state), "slsp/POG/generate");
-		dispatcher.register(new CTHandler(state), "slsp/CT/traces", "slsp/CT/generate", "slsp/CT/execute");
-		dispatcher.register(new TranslateHandler(state), "slsp/TR/translate");
+		dispatcher.register(new POGHandler(), "slsp/POG/generate");
+		dispatcher.register(new CTHandler(), "slsp/CT/traces", "slsp/CT/generate", "slsp/CT/execute");
+		dispatcher.register(new TranslateHandler(), "slsp/TR/translate");
 
 		return dispatcher;
 	}
@@ -124,10 +121,10 @@ public class LSPServer extends JSONServer
 
 	public void run() throws IOException
 	{
-		state.setRunning(true);
+		boolean running = true;
 		responseHandlers.clear();
 		
-		while (state.isRunning())
+		while (running)
 		{
 			JSONObject message = readMessage();
 			
@@ -144,7 +141,7 @@ public class LSPServer extends JSONServer
 				
 				if (handler != null)
 				{
-					handler.response(new RPCResponse(message));
+					handler.response(RPCResponse.create(message));
 					responseHandlers.remove(id);
 				}
 				else
@@ -154,7 +151,7 @@ public class LSPServer extends JSONServer
 			}
 			else
 			{
-				RPCRequest request = new RPCRequest(message);
+				RPCRequest request = RPCRequest.create(message);
 				RPCMessageList responses = dispatcher.dispatch(request);
 				
 				if (responses != null)
@@ -165,12 +162,22 @@ public class LSPServer extends JSONServer
 						
 						if (response.get("method") != null && response.get("id") != null)	// A request
 						{
-							RPCRequest req = new RPCRequest(response);
+							RPCRequest req = RPCRequest.create(response);
 							responseHandlers.put(response.get("id"), dispatcher.getHandler(req));
 						}
 					}
 				}
 			}
 		}
+	}
+
+	public boolean isInitialized()
+	{
+		return initialized;
+	}
+	
+	public void setInitialized(boolean set)
+	{
+		initialized = set;
 	}
 }

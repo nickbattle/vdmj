@@ -45,7 +45,6 @@ abstract public class LSPTest
 	protected LSPWorkspaceManager lspManager = null;
 	protected LSPXWorkspaceManager lspxManager = null;
 	protected DAPWorkspaceManager dapManager = null;
-	protected LSPServerState state = null;
 
 	protected void setupWorkspace(Dialect dialect) throws IOException
 	{
@@ -56,7 +55,6 @@ abstract public class LSPTest
 		lspManager = LSPWorkspaceManager.getInstance();
 		lspxManager = LSPXWorkspaceManager.getInstance();
 		dapManager = DAPWorkspaceManager.getInstance();
-		state = new LSPServerState();
 		Log.init(System.out);
 	}
 	
@@ -66,7 +64,7 @@ abstract public class LSPTest
 				"rootUri",		root.toURI().toString(),
 				"capabilities",	capabilities);
 		
-		RPCMessageList result = lspManager.lspInitialize(new RPCRequest(0L, "initialize", params));
+		RPCMessageList result = lspManager.lspInitialize(RPCRequest.create("initialize", params));
 		assertEquals("init result", (Object)null, result.get(0).get("error"));		
 		
 		return lspManager.afterChangeWatchedFiles(null);	// Cause parse and typecheck

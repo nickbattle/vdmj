@@ -39,13 +39,13 @@ public class RPCMessageList extends Vector<JSONObject>
 	// Empty response to request
 	public RPCMessageList(RPCRequest request)
 	{
-		add(new RPCResponse(request, null));
+		add(RPCResponse.result(request));
 	}
 
 	// Non-empty response to request
 	public RPCMessageList(RPCRequest request, Object result)
 	{
-		add(new RPCResponse(request, result));
+		add(RPCResponse.result(request, result));
 	}
 	
 	// Specific response
@@ -57,6 +57,6 @@ public class RPCMessageList extends Vector<JSONObject>
 	// Error response to request
 	public RPCMessageList(RPCRequest request, RPCErrors error, String method)
 	{
-		add(new RPCResponse(request, error, method));
+		add(RPCResponse.error(request, error, method));
 	}
 }

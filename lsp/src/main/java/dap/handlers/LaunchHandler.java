@@ -27,15 +27,14 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPServerState;
 import json.JSONObject;
 import workspace.DAPWorkspaceManager;
 
 public class LaunchHandler extends DAPHandler
 {
-	public LaunchHandler(DAPServerState state)
+	public LaunchHandler()
 	{
-		super(state);
+		super();
 	}
 
 	@Override

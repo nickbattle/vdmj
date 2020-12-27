@@ -57,10 +57,10 @@ public class TranslateTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 
-		TranslateHandler handler = new TranslateHandler(state);
+		TranslateHandler handler = new TranslateHandler();
 		File file = new File(testdir, "pogtest.vdmsl");
 
-		RPCRequest request = new RPCRequest(123L, "slsp/TR/translate",
+		RPCRequest request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
 					"uri", file.toURI().toString(),
 					"languageId", "latex",
@@ -73,7 +73,7 @@ public class TranslateTest extends LSPTest
 		assertEquals("saveUri is not empty", response.get(0).getPath("error.message"));
 		assertEquals(new Long(-32602), response.get(0).getPath("error.code"));
 
-		request = new RPCRequest(123L, "slsp/TR/translate",
+		request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
 					"uri", file.toURI().toString(),
 					"languageId", "latex",
@@ -86,7 +86,7 @@ public class TranslateTest extends LSPTest
 		assertEquals("saveUri is not a folder", response.get(0).getPath("error.message"));
 		assertEquals(new Long(-32602), response.get(0).getPath("error.code"));
 
-		request = new RPCRequest(123L, "slsp/TR/translate",
+		request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
 					"uri", file.toURI().toString(),
 					"languageId", "latex",
@@ -101,7 +101,7 @@ public class TranslateTest extends LSPTest
 		
 		Path empty = Files.createTempDirectory("test");
 
-		request = new RPCRequest(123L, "slsp/TR/translate",
+		request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
 					"uri", file.toURI().toString(),
 					"languageId", "Chinese",
@@ -128,10 +128,10 @@ public class TranslateTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 
-		TranslateHandler handler = new TranslateHandler(state);
+		TranslateHandler handler = new TranslateHandler();
 		File empty = Files.createTempDirectory("test").toFile();
 
-		RPCRequest request = new RPCRequest(123L, "slsp/TR/translate",
+		RPCRequest request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
 					"uri", null,
 					"languageId", "latex",
@@ -149,7 +149,7 @@ public class TranslateTest extends LSPTest
 		}
 		
 		File file = new File(testdir, "pogtest.vdmsl");
-		request = new RPCRequest(123L, "slsp/TR/translate",
+		request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
 					"uri", file.toURI().toString(),
 					"languageId", "latex",

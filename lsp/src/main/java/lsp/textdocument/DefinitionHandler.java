@@ -28,7 +28,6 @@ import java.net.URISyntaxException;
 
 import json.JSONObject;
 import lsp.LSPHandler;
-import lsp.LSPServerState;
 import lsp.Utils;
 import rpc.RPCRequest;
 import workspace.LSPWorkspaceManager;
@@ -38,9 +37,9 @@ import rpc.RPCMessageList;
 
 public class DefinitionHandler extends LSPHandler
 {
-	public DefinitionHandler(LSPServerState state)
+	public DefinitionHandler()
 	{
-		super(state);
+		super();
 	}
 
 	@Override

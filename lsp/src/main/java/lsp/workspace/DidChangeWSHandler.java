@@ -31,7 +31,6 @@ import java.util.Vector;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
-import lsp.LSPServerState;
 import lsp.Utils;
 import lsp.textdocument.WatchKind;
 import rpc.RPCErrors;
@@ -42,9 +41,9 @@ import workspace.Log;
 
 public class DidChangeWSHandler extends LSPHandler
 {
-	public DidChangeWSHandler(LSPServerState state)
+	public DidChangeWSHandler()
 	{
-		super(state);
+		super();
 	}
 
 	@Override
@@ -129,7 +128,7 @@ public class DidChangeWSHandler extends LSPHandler
 					{
 						// clear all diagnostics from deleted files
 						JSONObject diags = new JSONObject("uri", file.toURI().toString(), "diagnostics", new JSONArray());
-						responses.add(new RPCRequest("textDocument/publishDiagnostics", diags));
+						responses.add(RPCRequest.notification("textDocument/publishDiagnostics", diags));
 					}
 				}
 			}

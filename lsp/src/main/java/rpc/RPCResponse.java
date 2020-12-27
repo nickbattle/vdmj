@@ -34,37 +34,63 @@ public class RPCResponse extends JSONObject
 		put("jsonrpc", "2.0");
 	}
 	
-	public RPCResponse(RPCRequest request, Object result)
+	private RPCResponse(RPCRequest request, Object result)
 	{
 		this();
 		put("result", result);
 		put("id", request.get("id"));
 	}
-	
-	public RPCResponse(JSONObject result)
+
+	private RPCResponse(RPCRequest request, RPCErrors error, String message, Object data)
+	{
+		this();
+		JSONObject params = new JSONObject("code", error.getValue());
+		if (message != null) params.put("message", message);
+		if (data != null) params.put("data", data);
+		put("error", params);
+		put("id", request.get("id"));
+	}
+
+	private RPCResponse(JSONObject result)
 	{
 		this();
 		putAll(result);
 	}
 	
-	public RPCResponse(RPCRequest request, RPCErrors error, String message)
+	/**
+	 * Public methods below used to create messages.
+	 */
+	
+	public static RPCResponse create(JSONObject result)
 	{
-		this();
-		put("error", new JSONObject("code", error.getValue(), "message", message));
-		put("id", request.get("id"));
+		return new RPCResponse(result);
 	}
 	
-	public RPCResponse(RPCRequest request, RPCErrors error, String message, Object data)
+	public static RPCResponse result(RPCRequest request, Object result)
 	{
-		this();
-		put("error", new JSONObject("code", error.getValue(), "message", message, "data", data));
-		put("id", request.get("id"));
+		return new RPCResponse(request, result);
+	}
+
+	public static RPCResponse result(RPCRequest request)
+	{
+		return new RPCResponse(request, null);
+	}
+
+	public static RPCResponse error(RPCRequest request, RPCErrors error, String message)
+	{
+		return new RPCResponse(request, error, message, null);
 	}
 	
-	public RPCResponse(RPCErrors error, String message)
+	public static RPCResponse error(RPCRequest request, RPCErrors error, String message, Object data)
 	{
-		this();
-		put("error", new JSONObject("code", error.getValue(), "message", message));
+		return new RPCResponse(request, error, message, data);
+	}
+	
+	public static RPCResponse error(RPCErrors error, String message)
+	{
+		RPCResponse response = new RPCResponse();
+		response.put("error", new JSONObject("code", error.getValue(), "message", message));
+		return response;
 	}
 	
 	public boolean isError()

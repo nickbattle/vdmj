@@ -39,7 +39,6 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.DAPServer;
-import dap.DAPServerState;
 import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
@@ -61,7 +60,6 @@ public class DAPWorkspaceManager
 	
 	private Boolean noDebug;
 	private Interpreter interpreter;
-	private DAPServerState dapServerState;
 	private String launchCommand;
 	private String defaultName;
 	
@@ -89,12 +87,6 @@ public class DAPWorkspaceManager
 		{
 			INSTANCE = null;
 		}
-	}
-	
-
-	public void setDAPState(DAPServerState dapServerState)
-	{
-		this.dapServerState = dapServerState;
 	}
 
 	/**
@@ -157,7 +149,7 @@ public class DAPWorkspaceManager
 	
 				stdout("\nEvaluation complete.\n");
 				clearInterpreter();
-				dapServerState.setRunning(false);	// disconnect afterwards
+				DAPServer.getInstance().setRunning(false);	// disconnect afterwards
 			}
 	
 			return new DAPMessageList(request);
@@ -383,7 +375,7 @@ public class DAPWorkspaceManager
 		{
 			DAPMessageList responses = new DAPMessageList(request,
 					new JSONObject("result", "Cannot start interpreter: trace still running?", "variablesReference", 0));
-			dapServerState.setRunning(false);
+			DAPServer.getInstance().setRunning(false);
 			clearInterpreter();
 			return responses;
 		}
@@ -396,7 +388,7 @@ public class DAPWorkspaceManager
 			{
 				DAPMessageList responses = new DAPMessageList(request,
 						new JSONObject("result", "Cannot start interpreter: errors exist?", "variablesReference", 0));
-				dapServerState.setRunning(false);
+				DAPServer.getInstance().setRunning(false);
 				clearInterpreter();
 				return responses;
 			}

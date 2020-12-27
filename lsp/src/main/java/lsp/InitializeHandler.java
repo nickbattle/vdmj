@@ -32,9 +32,9 @@ import rpc.RPCMessageList;
 
 public class InitializeHandler extends LSPHandler
 {
-	public InitializeHandler(LSPServerState state)
+	public InitializeHandler()
 	{
-		super(state);
+		super();
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class InitializeHandler extends LSPHandler
 
 	private RPCMessageList initialized(RPCRequest request)
 	{
-		lspServerState.setInitialized(true);
+		LSPServer.getInstance().setInitialized(true);
 		return LSPWorkspaceManager.getInstance().lspInitialized(request);
 	}
 
