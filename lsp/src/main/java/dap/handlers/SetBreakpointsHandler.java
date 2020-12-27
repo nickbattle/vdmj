@@ -29,7 +29,6 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPServerState;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
@@ -37,9 +36,9 @@ import workspace.DAPWorkspaceManager;
 
 public class SetBreakpointsHandler extends DAPHandler
 {
-	public SetBreakpointsHandler(DAPServerState state)
+	public SetBreakpointsHandler()
 	{
-		super(state);
+		super();
 	}
 	
 	@Override

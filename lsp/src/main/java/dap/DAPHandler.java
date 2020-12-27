@@ -27,11 +27,8 @@ import java.io.IOException;
 
 abstract public class DAPHandler
 {
-	protected DAPServerState dapServerState;
-
-	public DAPHandler(DAPServerState state)
+	public DAPHandler()
 	{
-		this.dapServerState = state;
 	}
 
 	public DAPMessageList run(DAPRequest request) throws IOException

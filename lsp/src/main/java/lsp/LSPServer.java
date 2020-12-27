@@ -62,7 +62,6 @@ public class LSPServer extends JSONServer
 
 	private final RPCDispatcher dispatcher;
 	private final Map<Long, RPCHandler> responseHandlers;
-	private boolean running = false;
 	private boolean initialized = false;
 	
 	public LSPServer(Dialect dialect, InputStream inStream, OutputStream outStream) throws IOException
@@ -122,7 +121,7 @@ public class LSPServer extends JSONServer
 
 	public void run() throws IOException
 	{
-		running = true;
+		boolean running = true;
 		responseHandlers.clear();
 		
 		while (running)

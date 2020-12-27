@@ -28,14 +28,13 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPServerState;
 import workspace.DAPWorkspaceManager;
 
 public class ThreadsHandler extends DAPHandler
 {
-	public ThreadsHandler(DAPServerState state)
+	public ThreadsHandler()
 	{
-		super(state);
+		super();
 	}
 	
 	@Override

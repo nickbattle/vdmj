@@ -28,15 +28,15 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPServerState;
+import dap.DAPServer;
 import json.JSONObject;
 import workspace.DAPWorkspaceManager;
 
 public class TerminateHandler extends DAPHandler
 {
-	public TerminateHandler(DAPServerState state)
+	public TerminateHandler()
 	{
-		super(state);
+		super();
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public class TerminateHandler extends DAPHandler
 		JSONObject arguments = request.get("arguments");
 		Boolean restart = arguments.get("restart");
 		DAPMessageList result = DAPWorkspaceManager.getInstance().terminate(request, restart);
-		dapServerState.setRunning(false);
+		DAPServer.getInstance().setRunning(false);
 		return result;
 	}
 }

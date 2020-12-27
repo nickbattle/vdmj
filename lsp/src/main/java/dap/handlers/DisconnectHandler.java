@@ -28,16 +28,15 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPServerState;
 import json.JSONObject;
 import lsp.Utils;
 import workspace.DAPWorkspaceManager;
 
 public class DisconnectHandler extends DAPHandler
 {
-	public DisconnectHandler(DAPServerState state)
+	public DisconnectHandler()
 	{
-		super(state);
+		super();
 	}
 	
 	@Override

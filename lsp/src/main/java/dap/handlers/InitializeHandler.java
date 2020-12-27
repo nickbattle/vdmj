@@ -28,14 +28,13 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPServerState;
 import workspace.DAPWorkspaceManager;
 
 public class InitializeHandler extends DAPHandler
 {
-	public InitializeHandler(DAPServerState state)
+	public InitializeHandler()
 	{
-		super(state);
+		super();
 	}
 
 	@Override

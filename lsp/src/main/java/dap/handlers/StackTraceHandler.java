@@ -28,15 +28,14 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPServerState;
 import json.JSONArray;
 import json.JSONObject;
 
 public class StackTraceHandler extends DAPHandler
 {
-	public StackTraceHandler(DAPServerState state)
+	public StackTraceHandler()
 	{
-		super(state);
+		super();
 	}
 	
 	@Override
