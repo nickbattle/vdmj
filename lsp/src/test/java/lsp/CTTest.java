@@ -54,7 +54,7 @@ public class CTTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
-		CTHandler handler = new CTHandler(state);
+		CTHandler handler = new CTHandler();
 		RPCRequest request = new RPCRequest(123L, "slsp/CT/traces", null);
 		
 		RPCMessageList response = handler.request(request);
@@ -81,7 +81,7 @@ public class CTTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
-		CTHandler handler = new CTHandler(state);
+		CTHandler handler = new CTHandler();
 		RPCRequest request = new RPCRequest(123L, "slsp/CT/generate", new JSONObject("name", "A`TA"));
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
@@ -105,7 +105,7 @@ public class CTTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
-		CTHandler handler = new CTHandler(state);
+		CTHandler handler = new CTHandler();
 		RPCRequest request = new RPCRequest(123L, "slsp/CT/generate", new JSONObject("name", "A`TA"));
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
@@ -133,7 +133,7 @@ public class CTTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
-		CTHandler handler = new CTHandler(state);
+		CTHandler handler = new CTHandler();
 		RPCRequest request = new RPCRequest(123L, "slsp/CT/generate", new JSONObject("name", "DEFAULT`Test1"));
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
@@ -143,7 +143,7 @@ public class CTTest extends LSPTest
 		response = handler.request(request);
 		assertEquals(null, response);	// backgrounded
 		
-		CancelHandler cancelHandler = new CancelHandler(state);
+		CancelHandler cancelHandler = new CancelHandler();
 		request = new RPCRequest("$/cancelRequest", new JSONObject("id", 123L));
 		response = cancelHandler.request(request);
 		assertEquals(null, response);	// notify
@@ -164,7 +164,7 @@ public class CTTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
-		CTHandler handler = new CTHandler(state);
+		CTHandler handler = new CTHandler();
 		RPCRequest request = new RPCRequest(123L, "slsp/CT/traces", new JSONObject());
 		
 		RPCMessageList response = handler.request(request);
@@ -191,7 +191,7 @@ public class CTTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
-		CTHandler handler = new CTHandler(state);
+		CTHandler handler = new CTHandler();
 		RPCRequest request = new RPCRequest(123L, "slsp/CT/generate", new JSONObject("name", "A`TA"));
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
@@ -215,7 +215,7 @@ public class CTTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
-		CTHandler handler = new CTHandler(state);
+		CTHandler handler = new CTHandler();
 		RPCRequest request = new RPCRequest(123L, "slsp/CT/generate", new JSONObject("name", "A`TA"));
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
@@ -247,7 +247,7 @@ public class CTTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
-		CTHandler handler = new CTHandler(state);
+		CTHandler handler = new CTHandler();
 		RPCRequest request = new RPCRequest(123L, "slsp/CT/traces", new JSONObject());
 		
 		RPCMessageList response = handler.request(request);
@@ -274,7 +274,7 @@ public class CTTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
-		CTHandler handler = new CTHandler(state);
+		CTHandler handler = new CTHandler();
 		RPCRequest request = new RPCRequest(123L, "slsp/CT/generate", new JSONObject("name", "A`TA"));
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
@@ -298,7 +298,7 @@ public class CTTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
-		CTHandler handler = new CTHandler(state);
+		CTHandler handler = new CTHandler();
 		RPCRequest request = new RPCRequest(123L, "slsp/CT/generate", new JSONObject("name", "A`TA"));
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());

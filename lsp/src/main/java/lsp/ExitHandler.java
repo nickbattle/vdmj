@@ -28,15 +28,15 @@ import rpc.RPCMessageList;
 
 public class ExitHandler extends LSPHandler
 {
-	public ExitHandler(LSPServerState state)
+	public ExitHandler()
 	{
-		super(state);
+		super();
 	}
 
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		System.exit(lspServerState.isInitialized() ? 1 : 0);
+		System.exit(LSPServer.getInstance().isInitialized() ? 1 : 0);
 		return null;
 	}
 }

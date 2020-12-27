@@ -45,7 +45,6 @@ abstract public class LSPTest
 	protected LSPWorkspaceManager lspManager = null;
 	protected LSPXWorkspaceManager lspxManager = null;
 	protected DAPWorkspaceManager dapManager = null;
-	protected LSPServerState state = null;
 
 	protected void setupWorkspace(Dialect dialect) throws IOException
 	{
@@ -56,7 +55,6 @@ abstract public class LSPTest
 		lspManager = LSPWorkspaceManager.getInstance();
 		lspxManager = LSPXWorkspaceManager.getInstance();
 		dapManager = DAPWorkspaceManager.getInstance();
-		state = new LSPServerState();
 		Log.init(System.out);
 	}
 	

@@ -57,7 +57,7 @@ public class TranslateTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 
-		TranslateHandler handler = new TranslateHandler(state);
+		TranslateHandler handler = new TranslateHandler();
 		File file = new File(testdir, "pogtest.vdmsl");
 
 		RPCRequest request = new RPCRequest(123L, "slsp/TR/translate",
@@ -128,7 +128,7 @@ public class TranslateTest extends LSPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 
-		TranslateHandler handler = new TranslateHandler(state);
+		TranslateHandler handler = new TranslateHandler();
 		File empty = Files.createTempDirectory("test").toFile();
 
 		RPCRequest request = new RPCRequest(123L, "slsp/TR/translate",

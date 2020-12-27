@@ -54,7 +54,6 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPInitializeResponse;
 import lsp.LSPMessageUtils;
-import lsp.LSPServerState;
 import lsp.Utils;
 import lsp.textdocument.CompletionItemKind;
 import lsp.textdocument.WatchKind;
@@ -139,11 +138,6 @@ public class LSPWorkspaceManager
 		return projectFiles;
 	}
 	
-	public void setLSPState(LSPServerState lspServerState)
-	{
-		// this.lspServerState = lspServerState;	-- Not used?
-	}
-
 	/**
 	 * LSP methods...
 	 */

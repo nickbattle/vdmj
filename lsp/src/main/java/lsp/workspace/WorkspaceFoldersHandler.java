@@ -29,7 +29,6 @@ import java.util.List;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
-import lsp.LSPServerState;
 import lsp.Utils;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
@@ -39,9 +38,9 @@ import workspace.Log;
 
 public class WorkspaceFoldersHandler extends LSPHandler
 {
-	public WorkspaceFoldersHandler(LSPServerState state)
+	public WorkspaceFoldersHandler()
 	{
-		super(state);
+		super();
 	}
 
 	@Override

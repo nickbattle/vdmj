@@ -58,7 +58,7 @@ public class POGTest extends LSPTest
 		assertEquals("slsp/POG/updated", notify.get(1).getPath("method"));
 		assertEquals(true, notify.get(1).getPath("params.successful"));
 
-		POGHandler handler = new POGHandler(state);
+		POGHandler handler = new POGHandler();
 		File file = new File(testdir, "pogtest.vdmsl");
 		RPCRequest request = new RPCRequest(123L, "slsp/POG/generate",
 				new JSONObject("uri", file.toURI().toString()));
@@ -90,7 +90,7 @@ public class POGTest extends LSPTest
 		assertEquals("slsp/POG/updated", notify.get(1).getPath("method"));
 		assertEquals(true, notify.get(1).getPath("params.successful"));
 		
-		POGHandler handler = new POGHandler(state);
+		POGHandler handler = new POGHandler();
 		RPCRequest request = new RPCRequest(789L, "slsp/POG/generate",
 				new JSONObject("uri", testdir.toURI().toString()));
 		
@@ -121,7 +121,7 @@ public class POGTest extends LSPTest
 		assertEquals("slsp/POG/updated", notify.get(1).getPath("method"));
 		assertEquals(true, notify.get(1).getPath("params.successful"));
 		
-		POGHandler handler = new POGHandler(state);
+		POGHandler handler = new POGHandler();
 		RPCRequest request = new RPCRequest(789L, "slsp/POG/generate",
 				new JSONObject("uri", testdir.toURI().toString()));
 		
@@ -156,7 +156,7 @@ public class POGTest extends LSPTest
 		assertEquals("slsp/POG/updated", notify.get(1).getPath("method"));
 		assertEquals(false, notify.get(1).getPath("params.successful"));
 
-		POGHandler handler = new POGHandler(state);
+		POGHandler handler = new POGHandler();
 		RPCRequest request = new RPCRequest(789L, "slsp/POG/generate",
 				new JSONObject("uri", testdir.toURI().toString()));
 		

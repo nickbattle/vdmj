@@ -28,7 +28,6 @@ import java.net.URISyntaxException;
 
 import json.JSONObject;
 import lsp.LSPHandler;
-import lsp.LSPServerState;
 import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
@@ -38,9 +37,9 @@ import workspace.Log;
 
 public class DidSaveHandler extends LSPHandler
 {
-	public DidSaveHandler(LSPServerState state)
+	public DidSaveHandler()
 	{
-		super(state);
+		super();
 	}
 
 	@Override

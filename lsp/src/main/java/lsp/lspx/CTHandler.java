@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.traces.TraceReductionType;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
-import lsp.LSPServerState;
 import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
@@ -41,9 +40,9 @@ import workspace.Log;
 
 public class CTHandler extends LSPHandler
 {
-	public CTHandler(LSPServerState state)
+	public CTHandler()
 	{
-		super(state);
+		super();
 	}
 
 	@Override

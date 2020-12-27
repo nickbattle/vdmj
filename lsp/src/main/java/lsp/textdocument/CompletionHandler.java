@@ -28,7 +28,6 @@ import java.net.URISyntaxException;
 
 import json.JSONObject;
 import lsp.LSPHandler;
-import lsp.LSPServerState;
 import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
@@ -38,9 +37,9 @@ import workspace.Log;
 
 public class CompletionHandler extends LSPHandler
 {
-	public CompletionHandler(LSPServerState state)
+	public CompletionHandler()
 	{
-		super(state);
+		super();
 	}
 
 	@Override

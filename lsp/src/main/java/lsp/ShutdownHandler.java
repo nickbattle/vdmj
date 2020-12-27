@@ -28,15 +28,15 @@ import rpc.RPCMessageList;
 
 public class ShutdownHandler extends LSPHandler
 {
-	public ShutdownHandler(LSPServerState state)
+	public ShutdownHandler()
 	{
-		super(state);
+		super();
 	}
 
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		lspServerState.setInitialized(false);
+		LSPServer.getInstance().setInitialized(false);
 		return new RPCMessageList(request);
 	}
 }
