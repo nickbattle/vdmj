@@ -41,8 +41,8 @@ import com.fujitsu.vdmj.runtime.Context;
 @SuppressWarnings("serial")
 public class CallSequence extends Vector<INStatement>
 {
-	private static final int MAXARGLEN = 50;	// Limits arg expansion
-
+	private static int MAXARGLEN = Integer.getInteger("vdmj.maxarglen", 50);	// Limits arg expansion
+	
 	public String getCallString(Context context)
 	{
 		StringBuilder sb = new StringBuilder();
