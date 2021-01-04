@@ -25,6 +25,7 @@
 		<module>vdmjc</module>
 		<module>vdmjunit</module>
 		<module>lsp</module>
+		<module>dbgp</module>
 		<module>stdlib</module>
 		<module>cmd-plugins</module>
 	</modules>
