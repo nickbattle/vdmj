@@ -183,18 +183,8 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void breakpoint(Context ctxt, Breakpoint bp)
 	{
-		if (debugging && !suspendBreaks)
-		{
-			// Calls stopped with a null exception, which sends events
-			super.breakpoint(ctxt, bp);
-
-			SchedulableThread thread = (SchedulableThread) Thread.currentThread();
-			
-			if (thread.getSignal() == Signal.TERMINATE)
-			{
-				throw new ThreadDeath();	// Just die, as we're not continuing.
-			}
-		}
+		// Calls stopped with a null exception, which sends events
+		super.breakpoint(ctxt, bp);
 	}
 	
 	@Override

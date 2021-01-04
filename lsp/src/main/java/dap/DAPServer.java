@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.messages.ConsoleWriter;
 
 import dap.handlers.DisconnectHandler;
 import dap.handlers.EvaluateHandler;
+import dap.handlers.IgnoreHandler;
 import dap.handlers.InitializeHandler;
 import dap.handlers.LaunchHandler;
 import dap.handlers.SetBreakpointsHandler;
@@ -82,6 +83,10 @@ public class DAPServer extends JSONServer
 		dispatcher.register(new StackTraceHandler(), "stackTrace");
 		dispatcher.register(new DisconnectHandler(), "disconnect");
 		dispatcher.register(new TerminateHandler(), "terminate");
+		
+		// These commands should only be sent to the debug handler, but sometimes they
+		// arrive late when we are stopping an execution. So we silently ignore them.
+		dispatcher.register(new IgnoreHandler(),  "scopes");
 
 		return dispatcher;
 	}
