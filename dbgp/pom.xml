@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>com.fujitsu</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>4.4.0</version>
+			<version>${revision}</version>
 		</dependency>
 	</dependencies>
 
