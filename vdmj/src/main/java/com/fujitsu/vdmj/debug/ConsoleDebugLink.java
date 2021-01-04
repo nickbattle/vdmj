@@ -376,6 +376,11 @@ public class ConsoleDebugLink extends DebugLink
 			SchedulableThread thread = (SchedulableThread)Thread.currentThread();
 			breakpoints.put(thread, bp);
 			stopped(ctxt, bp.location, null);
+			
+			if (thread.getSignal() == Signal.TERMINATE)
+			{
+				throw new ThreadDeath();	// Just die, as we're not continuing.
+			}
 		}
 	}
 	
