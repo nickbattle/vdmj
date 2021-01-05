@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.commands;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,6 +38,7 @@ import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
+import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 /**
  * A class to read and perform class related commands from standard input.
@@ -85,6 +87,44 @@ public class ClassCommandReader extends CommandReader
 			}
 		}
 
+		return true;
+	}
+	
+	@Override
+	protected boolean doThreads(String line)
+	{
+		List<SchedulableThread> list = SchedulableThread.getAllThreads();
+		
+		if (list.isEmpty())
+		{
+			println("No threads running");
+			return true;
+		}
+		
+   		int maxName = 0;
+		long maxNum = 0;
+		
+		for (SchedulableThread th: list)
+		{
+			if (th.getName().length() > maxName)
+			{
+				maxName = th.getName().length();
+			}
+			
+			if (th.getId() > maxNum)
+			{
+				maxNum = th.getId();
+			}
+		}
+		
+		int width = (int)Math.floor(Math.log10(maxNum)) + 1;
+		
+		for (SchedulableThread th: list)
+		{
+			String format = String.format("%%%dd: %%-%ds  %%s", width, maxName);
+			println(String.format(format, th.getId(), th.getName(), th.getRunState()));
+		}
+		
 		return true;
 	}
 
@@ -187,6 +227,7 @@ public class ClassCommandReader extends CommandReader
 	protected void doHelp(String line)
 	{
 		println("classes - list the loaded class names");
+		println("threads - list the running threads");
 		println("default <class> - set the default class name");
 		println("create <id> := <exp> - create a named variable");
 

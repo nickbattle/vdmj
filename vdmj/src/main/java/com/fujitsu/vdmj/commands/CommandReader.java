@@ -330,6 +330,10 @@ abstract public class CommandReader
 				{
 					carryOn = doPrecision(line);
 				}
+				else if (line.equals("threads"))
+				{
+					carryOn = doThreads(line);
+				}
 				else if (!usePlugin(line))		// Attempt to load plugin
 				{
 					println("Bad command. Try 'help'");
@@ -764,6 +768,11 @@ abstract public class CommandReader
 	}
 
 	protected boolean doClasses(String line)
+	{
+		return notAvailable(line);
+	}
+
+	protected boolean doThreads(String line)
 	{
 		return notAvailable(line);
 	}

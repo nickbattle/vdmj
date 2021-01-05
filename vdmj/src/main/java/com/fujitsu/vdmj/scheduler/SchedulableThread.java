@@ -416,6 +416,11 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 		}
 	}
 	
+	public static List<SchedulableThread> getAllThreads()
+	{
+		return allThreads;
+	}
+	
 	public static int getThreadCount()
 	{
 		return threadCount;		// Number of non-bus threads
