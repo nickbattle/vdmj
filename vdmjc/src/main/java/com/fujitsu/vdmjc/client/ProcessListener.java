@@ -69,7 +69,7 @@ public class ProcessListener extends Thread
 
 			pargs.add("java");
 			pargs.add("-cp");
-			pargs.add(Config.vdmj_jar);
+			pargs.add(Config.vdmj_jar + File.pathSeparator + Config.dbgp_jar);
 
 			if (Config.vdmj_jvm.length() > 0)
 			{
