@@ -21,16 +21,14 @@ else
     esac
 fi
 
-function latest()
-{
-    ls -t $1 | head -1
-}
+# The Maven repository directory containing jars
+MAVENREPO=~/.m2/repository/com/fujitsu
+VDMJ_JAR=$MAVENREPO/vdmj/${VERSION}/vdmj-${VERSION}.jar
+ANNOTATIONS_JAR=$MAVENREPO/annotations/${VERSION}/annotations-${VERSION}.jar
+LSP_JAR=$MAVENREPO/lsp/${VERSION}/lsp-${VERSION}.jar
 
 java ${JAVA64_VMOPTS} -Dlog.filename=/dev/stdout \
-    -cp \
-$(latest "annotations/target/annotations-${VERSION}-*.jar"):\
-$(latest "vdmj/target/vdmj-${VERSION}-??????.jar"):\
-$(latest "lsp/target/lsp-${VERSION}-*.jar") \
+    -cp $VDMJ_JAR:$ANNOTATIONS_JAR:$LSP_JAR \
     lsp.LSPServerSocket $1 -lsp 8000 -dap 8001
 
 exit 0
