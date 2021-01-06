@@ -50,7 +50,7 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<Main-Class>com.fujitsu.vdmjc.VDMJC</Main-Class>
+							<Main-Class>com.fujitsu.vdmjc.DBGPC</Main-Class>
 							<Implementation-Version>${maven.build.timestamp}</Implementation-Version>
 							<Class-Path>.</Class-Path>
 						</manifestEntries>
