@@ -22,10 +22,10 @@
 		<module>annotations</module>
 		<module>annotations2</module>
 		<module>vdmj</module>
-		<module>vdmjc</module>
 		<module>vdmjunit</module>
 		<module>lsp</module>
 		<module>dbgp</module>
+		<module>dbgpc</module>
 		<module>stdlib</module>
 		<module>cmd-plugins</module>
 	</modules>
