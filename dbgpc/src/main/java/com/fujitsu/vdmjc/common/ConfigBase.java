@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2017 Fujitsu Services Ltd.
+ *	Copyright (c) 2016 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -23,10 +23,9 @@
 
 package com.fujitsu.vdmjc.common;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.net.URL;
 import java.util.Properties;
 
 public class ConfigBase
@@ -35,52 +34,63 @@ public class ConfigBase
 
 	public static void init(String resource, Class<?> target) throws Exception
 	{
-		FileInputStream fis = null;
+		InputStream fis = null;
+		String propertyFile = resource;
 
 		try
 		{
-    		URL rurl = ConfigBase.class.getResource("/" + resource);
+    		try
+			{
+				fis = ConfigBase.class.getResourceAsStream("/" + resource);
 
-    		if (rurl == null)
+				if (fis != null)
+				{
+					props.load(fis);
+				}
+			}
+    		catch (Exception ex)
     		{
-    			throw new Exception(resource + " is not on the classpath");
+    			throw new Exception(propertyFile + ": " + ex.getMessage());
     		}
 
-    		String propertyFile = rurl.getPath();
-			fis = new FileInputStream(propertyFile);
-			props.load(fis);
+    		String pname = "?";
+    		String value = "?";
 
-			for (Field f : target.getFields())
+			try
 			{
-				String pname = f.getName().replace('_', '.');
-				Class<?> type = f.getType();
-				String value = System.getProperty(pname);	// Overrides
-				
-				if (value == null)
+				for (Field f : target.getFields())
 				{
-					value = props.getProperty(pname);
-				}
-
-				if (value != null)
-				{
-					if (type == Integer.TYPE)
+					pname = f.getName().replace('_', '.');
+					Class<?> type = f.getType();
+					value = getProperty(pname, null);
+					
+					if (value != null)
 					{
-						f.setInt(target, Integer.parseInt(value));
-					}
-					else if (type == Boolean.TYPE)
-					{
-						f.setBoolean(target, Boolean.parseBoolean(value));
-					}
-					else if (type == String.class)
-					{
-						f.set(target, value);
+						if (type == Integer.TYPE)
+						{
+							f.setInt(target, Integer.parseInt(value));
+						}
+						else if (type == Boolean.TYPE)
+						{
+							f.setBoolean(target, Boolean.parseBoolean(value));
+						}
+						else if (type == String.class)
+						{
+							f.set(target, value);
+						}
+						else
+						{
+							throw new Exception("Cannot process " + pname +
+								", Java type " + type + " unsupported");
+						}
 					}
 				}
 			}
-		}
-		catch (Exception ex)
-		{
-			throw new Exception("Config exception : " + ex.getMessage());
+			catch (Exception ex)
+			{
+				throw new Exception(propertyFile +
+					": (" +	pname + " = " + value + ") " + ex.getMessage());
+			}
 		}
 		finally
 		{
@@ -96,5 +106,17 @@ public class ConfigBase
 				}
 			}
 		}
+	}
+
+	public static String getProperty(String key, String def)
+	{
+		String value = System.getProperty(key, def);	// Overrides
+		
+		if (value == null)
+		{
+			value = props.getProperty(key, def);
+		}
+
+		return value;
 	}
 }
