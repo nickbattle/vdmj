@@ -39,7 +39,7 @@ import com.fujitsu.vdmjc.client.Dialect;
 import com.fujitsu.vdmjc.client.Release;
 import com.fujitsu.vdmjc.config.Config;
 
-public class VDMJC
+public class DBGPC
 {
 	public static void main(String[] args)
 	{
@@ -81,7 +81,7 @@ public class VDMJC
 		    			}
 		    			else
 		    			{
-		    				System.out.println("VDMJC jar version " + version);
+		    				System.out.println("DBGPC jar version " + version);
 		    			}
 		    		}
 		    		else if (arg.equals("-path"))
@@ -106,7 +106,7 @@ public class VDMJC
 		    		}
 					else if (arg.startsWith("-"))
 					{
-						System.err.println("Usage: VDMJC [-v | -vdmpp | -vdmsl | -vdmrt | -path] [command]");
+						System.err.println("Usage: DBGPC [-v | -vdmpp | -vdmsl | -vdmrt | -path] [command]");
 						System.exit(1);
 					}
 					else
@@ -144,8 +144,8 @@ public class VDMJC
 	{
 		try
 		{
-			String path = VDMJC.class.getName().replaceAll("\\.", "/");
-			URL url = VDMJC.class.getResource("/" + path + ".class");
+			String path = DBGPC.class.getName().replaceAll("\\.", "/");
+			URL url = DBGPC.class.getResource("/" + path + ".class");
 			JarURLConnection conn = (JarURLConnection)url.openConnection();
 		    JarFile jar = conn.getJarFile();
 			Manifest mf = jar.getManifest();

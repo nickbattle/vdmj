@@ -50,12 +50,11 @@ public class Config extends ConfigBase
 	 * uses the properties file passed to update the static fields above.
 	 * @throws Exception
 	 */
-
 	public static void init()
 	{
 		try
 		{
-			init("vdmjc.properties", Config.class);
+			init("dbgpc.properties", Config.class);
 		}
 		catch (Exception e)
 		{
