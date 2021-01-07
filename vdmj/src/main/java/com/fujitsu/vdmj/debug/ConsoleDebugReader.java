@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import com.fujitsu.vdmj.commands.BreakpointReader;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Breakpoint;
@@ -45,10 +46,12 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 	private SchedulableThread debuggedThread = null;
 	private LexLocation lastLoc = null;
 	private SchedulableThread lastThread = null;
+	private BreakpointReader bpreader = null;
 	
 	public ConsoleDebugReader() throws Exception
 	{
 		link = (ConsoleDebugLink)DebugLink.getInstance();
+		bpreader = new BreakpointReader(Interpreter.getInstance());
 	}
 	
 	@Override
@@ -113,6 +116,10 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 				case QUIT:
 					link.killThreads();
 					return false;
+					
+				case BREAKPOINT:
+					doBreakpoint(command);
+					return true;
 
 				default:
 				{
@@ -125,7 +132,8 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 							return false;
 
 						default:
-							Console.out.println(response.toString());	// toString of commands are sensible
+							Console.out.print(response.toString());	// toString of commands are sensible
+							Console.out.println("--");
 							return true;
 					}
 				}
@@ -135,6 +143,13 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 		{
 			return false;
 		}
+	}
+
+	private void doBreakpoint(DebugCommand command)
+	{
+		String line = command.getPayload();
+		bpreader.doCommand(line);
+		Console.out.println("--");
 	}
 
 	private void doThreads()
@@ -190,7 +205,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
     			Console.out.printf(format, th.getId(), th.getName(), info);
     		}
     		
-    		Console.out.println();
+    		Console.out.println("--");
 		}
 	}
 	

@@ -37,24 +37,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.VDMJ;
-import com.fujitsu.vdmj.in.expressions.INBinaryExpression;
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.ast.lex.LexNameToken;
-import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
-import com.fujitsu.vdmj.lex.LexTokenReader;
-import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsolePrintWriter;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
@@ -62,17 +53,13 @@ import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.DebuggerException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.syntax.ParserException;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.traces.TraceReductionType;
 import com.fujitsu.vdmj.values.BooleanValue;
-import com.fujitsu.vdmj.values.FunctionValue;
-import com.fujitsu.vdmj.values.OperationValue;
 import com.fujitsu.vdmj.values.Value;
 
 /**
@@ -85,6 +72,9 @@ abstract public class CommandReader
 
 	/** The prompt for the user. */
 	protected final String prompt;
+	
+	/** The breakpoint command reader */
+	protected final BreakpointReader bpreader;
 
 	/** The degree of trace reduction. */
 	private float reduction = 1.0F;
@@ -117,6 +107,7 @@ abstract public class CommandReader
 	{
 		this.interpreter = interpreter;
 		this.prompt = prompt;
+		this.bpreader = new BreakpointReader(interpreter);
 	}
 
 	/**
@@ -220,75 +211,75 @@ abstract public class CommandReader
 				{
 					carryOn = doScript(line);
 				}
-				else if(line.startsWith("trace"))
+				else if (line.startsWith("trace"))
 				{
 					carryOn = doTrace(line);
 				}
-				else if(line.startsWith("break"))
+				else if (line.startsWith("break"))
 				{
 					carryOn = doBreak(line);
 				}
-				else if(line.equals("list"))
+				else if (line.equals("list"))
 				{
 					carryOn = doList(line);
 				}
-				else if(line.equals("source"))
+				else if (line.equals("source"))
 				{
 					carryOn = doSource(line);
 				}
-				else if(line.startsWith("coverage"))
+				else if (line.startsWith("coverage"))
 				{
 					carryOn = doCoverage(line);
 				}
-				else if(line.startsWith("latexdoc"))
+				else if (line.startsWith("latexdoc"))
 				{
 					carryOn = doLatex(line, true);
 				}
-				else if(line.startsWith("latex"))
+				else if (line.startsWith("latex"))
 				{
 					carryOn = doLatex(line, false);
 				}
-				else if(line.startsWith("word"))
+				else if (line.startsWith("word"))
 				{
 					carryOn = doWord(line);
 				}
-				else if(line.startsWith("remove"))
+				else if (line.startsWith("remove"))
 				{
 					carryOn = doRemove(line);
 				}
-				else if(line.equals("init"))
+				else if (line.equals("init"))
 				{
 					carryOn = doInit(line);
 				}
-				else if(line.equals("env"))
+				else if (line.equals("env"))
 				{
 					carryOn = doEnv(line);
 				}
-				else if(line.equals("state"))
+				else if (line.equals("state"))
 				{
 					carryOn = doState(line);
 				}
-				else if(line.startsWith("default"))
+				else if (line.startsWith("default"))
 				{
 					carryOn = doDefault(line);
 				}
-				else if(line.equals("classes"))
+				else if (line.equals("classes"))
 				{
 					carryOn = doClasses(line);
 				}
-				else if(line.startsWith("create"))
+				else if (line.startsWith("create"))
 				{
 					carryOn = doCreate(line);
 				}
-				else if(line.equals("modules"))
+				else if (line.equals("modules"))
 				{
 					carryOn = doModules(line);
 				}
-				else if(line.startsWith("pog"))
+				else if (line.startsWith("pog"))
 				{
 					carryOn = doPog(line);
 				}
-				else if(line.startsWith("log"))
+				else if (line.startsWith("log"))
 				{
 					carryOn = doLog(line);
 				}
@@ -967,46 +958,6 @@ abstract public class CommandReader
 		return notAvailable(line);
 	}
 
-	protected boolean doRemove(String line)
-	{
-		String parts[] = line.split("\\s+");
-
-		if (parts.length != 2)
-		{
-			println("Usage: remove <breakpoint#>");
-			return true;
-		}
-
-		int bpno = Integer.parseInt(parts[1]);
-		Breakpoint old = interpreter.clearBreakpoint(bpno);
-
-		if (old != null)
-		{
-			println("Cleared " + old);
-			println(interpreter.getSourceLine(old.location));
-		}
-		else
-		{
-			println("Breakpoint [" + bpno + "] not set");
-		}
-
-		return true;
-	}
-
-	protected boolean doList(@SuppressWarnings("unused") String line)
-	{
-		Map<Integer, Breakpoint> map = interpreter.getBreakpoints();
-
-		for (Entry<Integer, Breakpoint> entry: map.entrySet())
-		{
-			Breakpoint bp = entry.getValue();
-			println(bp.toString());
-			println(interpreter.getSourceLine(bp.location));
-		}
-
-		return true;
-	}
-
 	protected boolean doSource(String line)
 	{
 		return notAvailable(line);
@@ -1323,63 +1274,27 @@ abstract public class CommandReader
 		return true;
 	}
 
+	protected boolean doList(String line)
+	{
+		bpreader.doList(line);
+		return true;
+	}
+
+	protected boolean doRemove(String line)
+	{
+		bpreader.doRemove(line);
+		return true;
+	}
+
 	protected boolean doBreak(String line) throws Exception
 	{
-		Pattern p1 = Pattern.compile("^break ([\\w._/\\\\]++)?:?(\\d+) ?(.+)?$");
-		Matcher m = p1.matcher(line);
-
-		if (m.matches())
-		{
-			String g1 = m.group(1);
-			File file = g1 == null ? null : new File(g1);
-			setBreakpoint(file, Integer.parseInt(m.group(2)), m.group(3));
-		}
-		else
-		{
-			Pattern p2 = Pattern.compile("^break ([\\w`$%']+) ?(.+)?$");
-			m = p2.matcher(line);
-
-			if (m.matches())
-			{
-				setBreakpoint(m.group(1), m.group(2));
-			}
-			else
-			{
-	    		println("Usage: break [<file>:]<lineno> [<condition>]");
-	    		println("   or: break <function/operation> [<condition>]");
-			}
-		}
-
+		bpreader.doBreak(line);
 		return true;
 	}
 
 	protected boolean doTrace(String line) throws Exception
 	{
-		Pattern p1 = Pattern.compile("^trace ([\\w._/\\\\]++)?:?(\\d+) ?(.+)?$");
-		Matcher m = p1.matcher(line);
-
-		if (m.matches())
-		{
-			String g1 = m.group(1);
-			File file = g1 == null ? null : new File(g1);
-			setTracepoint(file, Integer.parseInt(m.group(2)), m.group(3));
-		}
-		else
-		{
-			Pattern p2 = Pattern.compile("^trace ([\\w`$%']+) ?(.+)?$");
-			m = p2.matcher(line);
-
-			if (m.matches())
-			{
-				setTracepoint(m.group(1), m.group(2));
-			}
-			else
-			{
-	    		println("Usage: trace [<file>:]<lineno> [<expression>]");
-	    		println("   or: trace <function/operation> [<expression>]");
-			}
-		}
-
+		bpreader.doTrace(line);
 		return true;
 	}
 
@@ -1635,282 +1550,6 @@ abstract public class CommandReader
 	{
 		println("Command not available in this context");
 		return true;
-	}
-
-	/**
-	 * Set a breakpoint at the given file and line with a condition.
-	 *
-	 * @param file The file name
-	 * @param line The line number
-	 * @param condition Any condition for the breakpoint, or null
-	 * @throws Exception Problems parsing condition.
-	 */
-	private void setBreakpoint(File file, int line, String condition)
-		throws Exception
-	{
-		if (file == null)
-		{
-			file = interpreter.getDefaultFile();
-		}
-		
-		if (file == null || file.getPath().equals("?"))
-		{
-			Set<File> files = interpreter.getSourceFiles();
-			
-			if (files.size() > 1)
-			{
-				println("Assuming file " + file.getPath());
-			}
-			else if (files.isEmpty())
-			{
-				println("No files defined");
-				return;
-			}
-
-			file = files.iterator().next();
-		}
-
-		INStatement stmt = interpreter.findStatement(file, line);
-
-		if (stmt == null)
-		{
-			INExpression exp = interpreter.findExpression(file, line);
-
-			if (exp == null)
-			{
-				println("No breakable expressions or statements at " + file + ":" + line);
-			}
-			else
-			{
-				Breakpoint old = interpreter.clearBreakpoint(exp.breakpoint.number);
-				
-				if (old != null)
-				{
-					println("Overwriting [" + old.number + "] " + old.location);
-				}
-				
-				Breakpoint bp = interpreter.setBreakpoint(exp, condition);
-				println("Created " + bp);
-				println(interpreter.getSourceLine(bp.location));
-			}
-		}
-		else
-		{
-			Breakpoint old = interpreter.clearBreakpoint(stmt.breakpoint.number);
-			
-			if (old != null)
-			{
-				println("Overwriting [" + old.number + "] " + old.location);
-			}
-			
-			Breakpoint bp = interpreter.setBreakpoint(stmt, condition);
-			println("Created " + bp);
-			println(interpreter.getSourceLine(bp.location));
-		}
-	}
-
-	/**
-	 * Set a breakpoint at the given function or operation name with
-	 * a condition.
-	 *
-	 * @param name The function or operation name.
-	 * @param condition Any condition for the breakpoint, or null.
-	 * @throws Exception Problems parsing condition.
-	 */
-	private void setBreakpoint(String name, String condition)
-		throws Exception
-	{
-		LexTokenReader ltr = new LexTokenReader(name, Dialect.VDM_SL);
-		LexToken token = ltr.nextToken();
-		ltr.close();
-
-		Value v = null;
-
-		if (token.is(Token.IDENTIFIER))
-		{
-			LexIdentifierToken id = (LexIdentifierToken)token;
-			TCNameToken lnt = new TCNameToken(id.location, interpreter.getDefaultName(), id.name);
-			v = interpreter.findGlobal(lnt);
-		}
-		else if (token.is(Token.NAME))
-		{
-			v = interpreter.findGlobal(new TCNameToken((LexNameToken)token));
-		}
-
-		if (v instanceof FunctionValue)
-		{
-			FunctionValue fv = (FunctionValue)v;
-			INExpression exp = fv.body;
-			
-			while (exp instanceof INBinaryExpression)
-			{
-				// None of the binary expressions check their BP, to avoid excessive stepping
-				// when going through (say) a chain of "and" clauses. So if we've picked a
-				// binary expression here, we move the BP to the left hand.
-				INBinaryExpression bexp = (INBinaryExpression)exp;
-				exp = bexp.left;
-			}
-			
-			Breakpoint old = interpreter.clearBreakpoint(exp.breakpoint.number);
-			
-			if (old != null)
-			{
-				println("Overwriting [" + old.number + "] " + old.location);
-			}
-			
-			Breakpoint bp = interpreter.setBreakpoint(exp, condition);
-			println("Created " + bp);
-			println(interpreter.getSourceLine(bp.location));
-		}
-		else if (v instanceof OperationValue)
-		{
-			OperationValue ov = (OperationValue)v;
-			INStatement stmt = ov.body;
-			Breakpoint old = interpreter.clearBreakpoint(stmt.breakpoint.number);
-			
-			if (old != null)
-			{
-				println("Overwriting [" + old.number + "] " + old.location);
-			}
-			
-			Breakpoint bp = interpreter.setBreakpoint(stmt, condition);
-			println("Created " + bp);
-			println(interpreter.getSourceLine(bp.location));
-		}
-		else if (v == null)
-		{
-			println(name + " is not visible or not found");
-		}
-		else
-		{
-			println(name + " is not a function or operation");
-		}
-	}
-
-	/**
-	 * Set a tracepoint at the given file and line. Tracepoints without
-	 * a condition just print "Reached [n]", where [n] is the breakpoint
-	 * number.
-	 *
-	 * @param file The file name
-	 * @param line The line number
-	 * @param trace Any expression to evaluate at the tracepoint, or null
-	 * @throws Exception Problems parsing condition.
-	 */
-	private void setTracepoint(File file, int line, String trace)
-		throws Exception
-	{
-		if (file == null)
-		{
-			file = interpreter.getDefaultFile();
-		}
-
-		if (file == null || file.getPath().equals("?"))
-		{
-			Set<File> files = interpreter.getSourceFiles();
-			
-			if (files.size() > 1)
-			{
-				println("Assuming file " + file.getPath());
-			}
-			else if (files.isEmpty())
-			{
-				println("No files defined");
-				return;
-			}
-
-			file = files.iterator().next();
-		}
-
-		INStatement stmt = interpreter.findStatement(file, line);
-
-		if (stmt == null)
-		{
-			INExpression exp = interpreter.findExpression(file, line);
-
-			if (exp == null)
-			{
-				println("No breakable expressions or statements at " + file + ":" + line);
-			}
-			else
-			{
-				Breakpoint old = interpreter.clearBreakpoint(exp.breakpoint.number);
-				
-				if (old != null)
-				{
-					println("Overwriting [" + old.number + "] " + old.location);
-				}
-				
-				Breakpoint bp = interpreter.setTracepoint(exp, trace);
-				println("Created " + bp);
-				println(interpreter.getSourceLine(bp.location));
-			}
-		}
-		else
-		{
-			Breakpoint old = interpreter.clearBreakpoint(stmt.breakpoint.number);
-			
-			if (old != null)
-			{
-				println("Overwriting [" + old.number + "] " + old.location);
-			}
-
-			Breakpoint bp = interpreter.setTracepoint(stmt, trace);
-			println("Created " + bp);
-			println(interpreter.getSourceLine(bp.location));
-		}
-	}
-
-	/**
-	 * Set a tracepoint at the given function or operation name. Tracepoints
-	 * without a condition just print "Reached [n]", where [n] is the
-	 * breakpoint number.
-	 *
-	 * @param name The function or operation name.
-	 * @param trace Any trace for the tracepoint
-	 * @throws Exception Problems parsing condition.
-	 */
-	private void setTracepoint(String name, String trace) throws Exception
-	{
-		LexTokenReader ltr = new LexTokenReader(name, Dialect.VDM_SL);
-		LexToken token = ltr.nextToken();
-		ltr.close();
-
-		Value v = null;
-
-		if (token.is(Token.IDENTIFIER))
-		{
-			LexIdentifierToken id = (LexIdentifierToken)token;
-			TCNameToken lnt = new TCNameToken(id.location, interpreter.getDefaultName(), id.name);
-			v = interpreter.findGlobal(lnt);
-		}
-		else if (token.is(Token.NAME))
-		{
-			v = interpreter.findGlobal(new TCNameToken((LexNameToken)token));
-		}
-
-		if (v instanceof FunctionValue)
-		{
-			FunctionValue fv = (FunctionValue)v;
-			INExpression exp = fv.body;
-			interpreter.clearBreakpoint(exp.breakpoint.number);
-			Breakpoint bp = interpreter.setTracepoint(exp, trace);
-			println("Created " + bp);
-			println(interpreter.getSourceLine(bp.location));
-		}
-		else if (v instanceof OperationValue)
-		{
-			OperationValue ov = (OperationValue)v;
-			INStatement stmt = ov.body;
-			interpreter.clearBreakpoint(stmt.breakpoint.number);
-			Breakpoint bp = interpreter.setTracepoint(stmt, trace);
-			println("Created " + bp);
-			println(interpreter.getSourceLine(bp.location));
-		}
-		else
-		{
-			println(name + " is not a function or operation");
-		}
 	}
 
 	protected void print(String m)
