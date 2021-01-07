@@ -65,9 +65,10 @@ public class DebugCommand
 		return type;
 	}
 	
-	public Object getPayload()
+	@SuppressWarnings("unchecked")
+	public <T> T getPayload()
 	{
-		return payload;
+		return (T)payload;
 	}
 	
 	@Override

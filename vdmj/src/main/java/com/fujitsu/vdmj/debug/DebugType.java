@@ -49,5 +49,7 @@ public enum DebugType
 	ACK,
 	RESUME,
 	TERMINATE,
-	ERROR
+	ERROR,
+	
+	BREAKPOINT
 }

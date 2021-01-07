@@ -301,6 +301,12 @@ public class ConsoleDebugExecutor implements DebugExecutor
 		sb.append("stop - terminate the execution immediately\n");
 		sb.append("threads - list active threads\n");
 		sb.append("thread <n> - select active thread to debug\n");
+		sb.append("break [<file>:]<line#> [<condition>] - create a breakpoint\n");
+		sb.append("break <function/operation> [<condition>] - create a breakpoint\n");
+		sb.append("trace [<file>:]<line#> [<exp>] - create a tracepoint\n");
+		sb.append("trace <function/operation> [<exp>] - create a tracepoint\n");
+		sb.append("remove <breakpoint#> - remove a trace/breakpoint\n");
+		sb.append("list - list breakpoints\n");
 		
 		return new DebugCommand(DebugType.HELP, sb.toString());
 	}
