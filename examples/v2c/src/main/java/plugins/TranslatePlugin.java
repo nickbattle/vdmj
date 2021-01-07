@@ -65,32 +65,40 @@ public class TranslatePlugin extends CommandPlugin
 	 * 
 	 * After converting the TC tree to a TR tree, this is then used to translate the specification
 	 * into "C". The result, a String, is just printed to stdout, which appears in the user console
-	 * session. By returning "true", the method indicates that the command executed successfully
-	 * without errors. If it returns "false", the command line interpreter will say "Unknown command".
+	 * session. By returning "true", the method indicates that the command was processed, even if
+	 * it failed. If it returns "false", the command line interpreter will say "Unknown command".
 	 */
 	@Override
-	public boolean run(String[] argv) throws Exception
+	public boolean run(String[] argv)
 	{
-		if (interpreter instanceof ModuleInterpreter)
+		try
 		{
-			ModuleInterpreter minterpreter = (ModuleInterpreter)interpreter;
-			TCModuleList tclist = minterpreter.getTC();
-			TRModuleList trModules = ClassMapper.getInstance(TRNode.MAPPINGS).init().convert(tclist);
-			System.out.println(trModules.translate());
-			return true;
+			if (interpreter instanceof ModuleInterpreter)
+			{
+				ModuleInterpreter minterpreter = (ModuleInterpreter)interpreter;
+				TCModuleList tclist = minterpreter.getTC();
+				TRModuleList trModules = ClassMapper.getInstance(TRNode.MAPPINGS).init().convert(tclist);
+				System.out.println(trModules.translate());
+			}
+			else if (interpreter instanceof ClassInterpreter)
+			{
+				ClassInterpreter cinterpreter = (ClassInterpreter)interpreter;
+				TCClassList tclist = cinterpreter.getTC();
+				TRClassList trClasses = ClassMapper.getInstance(TRNode.MAPPINGS).init().convert(tclist);
+				System.out.println(trClasses.translate());
+			}
+			else
+			{
+				System.out.println("Unknown interpreter type?");
+			}
 		}
-		else if (interpreter instanceof ClassInterpreter)
+		catch (Exception e)
 		{
-			ClassInterpreter cinterpreter = (ClassInterpreter)interpreter;
-			TCClassList tclist = cinterpreter.getTC();
-			TRClassList trClasses = ClassMapper.getInstance(TRNode.MAPPINGS).init().convert(tclist);
-			System.out.println(trClasses.translate());
-			return true;
+			System.out.println("Specification contains untranslatable clauses:");
+			System.out.println(e.getMessage());
 		}
-		else
-		{
-			return false;
-		}
+
+		return true;
 	}
 
 	/**
@@ -101,6 +109,6 @@ public class TranslatePlugin extends CommandPlugin
 	@Override
 	public String help()
 	{
-		return "translate <language> [<files>] - translate the VDM specification to <language>";
+		return "translate - translate the VDM specification";
 	}
 }
