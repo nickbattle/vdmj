@@ -153,19 +153,19 @@ public class ConsoleDebugExecutor implements DebugExecutor
 		try
 		{
 			ctxt.threadState.setAtomic(true);
-   			return new DebugCommand(DebugType.PRINT, expr + " = " + interpreter.evaluate(expr, getFrame()));
+   			return new DebugCommand(DebugType.PRINT, expr + " = " + interpreter.evaluate(expr, getFrame()) + "\n");
 		}
 		catch (ParserException e)
 		{
-			return new DebugCommand(DebugType.ERROR, "Syntax: " + e);
+			return new DebugCommand(DebugType.ERROR, "Syntax: " + e + "\n");
 		}
 		catch (ContextException e)
 		{
-			return new DebugCommand(DebugType.ERROR, "Runtime: " + e.getMessage());
+			return new DebugCommand(DebugType.ERROR, "Runtime: " + e.getMessage() + "\n");
 		}
 		catch (RuntimeException e)
 		{
-			return new DebugCommand(DebugType.ERROR, "Runtime: " + e.getMessage());
+			return new DebugCommand(DebugType.ERROR, "Runtime: " + e.getMessage() + "\n");
 		}
 		catch (Exception e)
 		{
@@ -174,7 +174,7 @@ public class ConsoleDebugExecutor implements DebugExecutor
 				e = (Exception)e.getCause();
 			}
 			
-			return new DebugCommand(DebugType.ERROR, "Error: " + e.getMessage());
+			return new DebugCommand(DebugType.ERROR, "Error: " + e.getMessage() + "\n");
 		}
 		finally
 		{
@@ -223,13 +223,13 @@ public class ConsoleDebugExecutor implements DebugExecutor
 	{
 		if (frame == 0)
 		{
-			return new DebugCommand(DebugType.UP, "Already at first frame");
+			return new DebugCommand(DebugType.UP, "Already at first frame\n");
 		}
 		else
 		{
 			frame--;
 			Context fp = getFrame();
-			return new DebugCommand(DebugType.UP, "In context of " + fp.title + " " + fp.location);
+			return new DebugCommand(DebugType.UP, "In context of " + fp.title + " " + fp.location + "\n");
 		}
 	}
 
@@ -239,13 +239,13 @@ public class ConsoleDebugExecutor implements DebugExecutor
 
 		if (fp.outer == null)
 		{
-			return new DebugCommand(DebugType.DOWN, "Already at last frame");
+			return new DebugCommand(DebugType.DOWN, "Already at last frame\n");
 		}
 		else
 		{
 			frame++;
 			fp = getFrame();
-			return new DebugCommand(DebugType.DOWN, "In context of " + fp.title + " " + fp.location);
+			return new DebugCommand(DebugType.DOWN, "In context of " + fp.title + " " + fp.location + "\n");
 		}
 	}
 
@@ -255,7 +255,7 @@ public class ConsoleDebugExecutor implements DebugExecutor
 		
 		if (loc.module.equals("?"))
 		{
-			return new DebugCommand(DebugType.ERROR, "No source");
+			return new DebugCommand(DebugType.ERROR, "No source\n");
 		}
 		
 		File file = loc.file;
