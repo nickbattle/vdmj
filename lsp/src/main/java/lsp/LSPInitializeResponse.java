@@ -44,7 +44,7 @@ public class LSPInitializeResponse extends JSONObject
 
 		cap.put("completionProvider",					// Completions
 			new JSONObject(
-				"triggerCharacters", new JSONArray("."),
+				"triggerCharacters", new JSONArray(".", "`"),
 				"resolveProvider", false));
 		
 		cap.put("textDocumentSync",

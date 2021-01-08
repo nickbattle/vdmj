@@ -146,11 +146,21 @@ public class TCPluginSL extends TCPlugin
 		
 		for (TCModule module: tcModuleList)
 		{
-			for (TCDefinition def: module.defs)
+			if (module.name.getName().startsWith(startsWith))
 			{
-				if (def.name != null && def.name.getName().startsWith(startsWith))
+				for (TCDefinition def: module.defs)
 				{
 					results.add(def);
+				}
+			}
+			else
+			{
+				for (TCDefinition def: module.defs)
+				{
+					if (def.name != null && def.name.getName().startsWith(startsWith))
+					{
+						results.add(def);
+					}
 				}
 			}
 		}
