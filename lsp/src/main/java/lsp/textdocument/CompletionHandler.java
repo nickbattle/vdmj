@@ -50,11 +50,14 @@ public class CompletionHandler extends LSPHandler
 			JSONObject params = request.get("params");
 			JSONObject text = params.get("textDocument");
 			JSONObject position = params.get("position");
+			JSONObject context = params.get("context");
+			CompletionTriggerKind triggerKind = CompletionTriggerKind.kindOf(context.get("triggerKind"));
+			
 			File file = Utils.uriToFile(text.get("uri"));
 			Long line = position.get("line");
 			Long character = position.get("character");
 			
-			return LSPWorkspaceManager.getInstance().completion(request, file, line.intValue(), character.intValue());
+			return LSPWorkspaceManager.getInstance().completion(request, triggerKind, file, line.intValue(), character.intValue());
 		}
 		catch (URISyntaxException e)
 		{

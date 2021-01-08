@@ -56,6 +56,7 @@ import lsp.LSPInitializeResponse;
 import lsp.LSPMessageUtils;
 import lsp.Utils;
 import lsp.textdocument.CompletionItemKind;
+import lsp.textdocument.CompletionTriggerKind;
 import lsp.textdocument.WatchKind;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
@@ -563,7 +564,8 @@ public class LSPWorkspaceManager
 		}
 	}
 
-	public RPCMessageList completion(RPCRequest request, File file, int zline, int zcol)
+	public RPCMessageList completion(RPCRequest request,
+			CompletionTriggerKind triggerKind, File file, int zline, int zcol)
 	{
 		JSONArray result = new JSONArray();
 		TCDefinition def = findDefinition(file, zline, zcol - 2);
@@ -617,14 +619,29 @@ public class LSPWorkspaceManager
 			
 			if (position >= 0)
 			{
-				int start = position - 1;
+				int start = 0;
+				int end = 0;
+				
+				switch (triggerKind)
+				{
+					case INVOKED:
+						start = position - 1;	// eg. the "t" in "root"
+						end = position;
+						break;
+						
+					case TRIGGERCHARACTER:
+					case INCOMPLETE:
+						start = position - 2;	// eg. the "t" in "root."
+						end = position - 1;
+						break;
+				}
 				
 				while (start >= 0 && Character.isJavaIdentifierPart(buffer.charAt(start)))
 				{
 					start--;
 				}
 				
-				String word = buffer.subSequence(start + 1, position).toString();
+				String word = buffer.subSequence(start + 1, end).toString();
 				
 				if (!word.isEmpty())
 				{
