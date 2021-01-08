@@ -148,19 +148,19 @@ public class LSPWorkspaceManager
 		try
 		{
 			JSONObject params = request.get("params");
-			JSONArray folders = params.get("workspaceFolders");
+//			JSONArray folders = params.get("workspaceFolders");
 			roots.clear();
 			
-			if (folders != null)
-			{
-				for (int i=0; i<folders.size(); i++)
-				{
-					JSONObject folder = folders.index(i);
-					roots.add(Utils.uriToFile(folder.get("uri")));
-					Log.printf("Adding workspace folder %s", (String)folder.get("uri"));
-				}
-			}
-			else
+//			if (folders != null)
+//			{
+//				for (int i=0; i<folders.size(); i++)
+//				{
+//					JSONObject folder = folders.index(i);
+//					roots.add(Utils.uriToFile(folder.get("uri")));
+//					Log.printf("Adding workspace folder %s", (String)folder.get("uri"));
+//				}
+//			}
+//			else
 			{
 				roots.add(Utils.uriToFile(params.get("rootUri")));
 			}
