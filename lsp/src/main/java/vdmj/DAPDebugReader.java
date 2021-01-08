@@ -214,11 +214,24 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	private DebugCommand parse(DAPRequest request) throws IOException
 	{
 		String command = request.get("command");
+		JSONObject arguments = request.get("arguments");
 		
 		switch (command)
 		{
 			case "evaluate":
-				return new DebugCommand(DebugType.PRINT, request.get("arguments"));
+				if ("variables".equals(arguments.get("context")))
+				{
+					// In the variables context, the expression sent to evaluate is already
+					// the value of the variable, so just send it back as the result.
+
+					return new DebugCommand(null,
+						new DAPResponse(request, true, null,
+							new JSONObject("result", arguments.get("expression"), "variablesReference", 0)));
+				}
+				else
+				{
+					return new DebugCommand(DebugType.PRINT, arguments);
+				}
 				
 			case "continue":
 				return DebugCommand.CONTINUE;
@@ -233,16 +246,17 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				return DebugCommand.NEXT;
 				
 			case "stackTrace":
-				return new DebugCommand(DebugType.STACK, request.get("arguments"));
+				return new DebugCommand(DebugType.STACK, arguments);
 			
 			case "scopes":
-				return new DebugCommand(DebugType.SCOPES, request.get("arguments"));
+				return new DebugCommand(DebugType.SCOPES, arguments);
 				
 			case "variables":
-				return new DebugCommand(DebugType.VARIABLES, request.get("arguments"));
+				return new DebugCommand(DebugType.VARIABLES, arguments);
 				
 			default:
-				return new DebugCommand(null, new DAPResponse(request, false, "Unsupported command: " + command, null));
+				return new DebugCommand(null,
+					new DAPResponse(request, false, "Unsupported command: " + command, null));
 		}
 	}
 
