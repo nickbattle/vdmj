@@ -145,6 +145,11 @@ public class TCPluginPR extends TCPlugin
 			if (cdef.name.getName().startsWith(startsWith))
 			{
 				results.add(cdef);	// Add classes as well
+
+				for (TCDefinition def: cdef.definitions)
+				{
+					results.add(def);
+				}
 			}
 			
 			for (TCDefinition def: cdef.definitions)
