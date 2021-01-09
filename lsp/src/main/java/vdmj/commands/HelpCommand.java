@@ -52,6 +52,7 @@ public class HelpCommand extends Command
 		DefaultCommand.HELP,
 		PrintCommand.HELP,
 		SetCommand.HELP,
+		PrecisionCommand.HELP,
 		HelpCommand.HELP,
 		InitCommand.HELP,
 		QuitCommand.HELP
