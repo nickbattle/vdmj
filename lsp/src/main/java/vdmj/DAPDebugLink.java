@@ -78,6 +78,11 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void newThread(CPUValue cpu)
 	{
+		if (server == null)
+		{
+			return;		// Not started via a debugger
+		}
+		
 		try
 		{
 			Log.printf("New thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
@@ -93,7 +98,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void stopped(Context ctxt, LexLocation location, Exception ex)
 	{
-		if (!debugging || suspendBreaks)	// Not attached to a debugger or local eval
+		if (!debugging || suspendBreaks || server == null)	// Not attached to a debugger or local eval
 		{
 			return;
 		}
@@ -183,6 +188,11 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void breakpoint(Context ctxt, Breakpoint bp)
 	{
+		if (server == null)
+		{
+			return;		// Not started via a debugger
+		}
+		
 		// Calls stopped with a null exception, which sends events
 		super.breakpoint(ctxt, bp);
 	}
@@ -190,6 +200,11 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void complete(DebugReason reason, ContextException exception)
 	{
+		if (server == null)
+		{
+			return;		// Not started via a debugger
+		}
+		
 		try
 		{
 			Log.printf("End thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
