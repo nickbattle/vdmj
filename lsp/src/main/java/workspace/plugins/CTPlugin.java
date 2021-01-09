@@ -259,13 +259,13 @@ abstract public class CTPlugin extends AnalysisPlugin
 			
 			try
 			{
-				while (traceIterator.hasMoreTests() && testNumber < endTest)
+				while (traceIterator.hasMoreTests() && testNumber <= endTest)
 				{
 					JSONArray batch = runBatch(BATCH_SIZE, endTest);
 					
 					if (workDoneToken != null)
 					{
-						long done = (100 * (testNumber - startTest - 1))/(endTest - startTest);
+						long done = (100 * (testNumber - startTest - 1))/(endTest - startTest + 1);
 						
 						if (done != percentDone)	// Only if changed %age
 						{
