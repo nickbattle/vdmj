@@ -34,11 +34,13 @@ import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCFieldExpression;
 import com.fujitsu.vdmj.tc.expressions.TCFuncInstantiationExpression;
+import com.fujitsu.vdmj.tc.expressions.TCHistoryExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 
@@ -154,6 +156,22 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 			all.add(node);
 		}
 		// Can't find basic type as yet...!
+	
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseHistoryExpression(TCHistoryExpression node, LexLocation arg)
+	{
+		Set<TCNode> all = newCollection();
+		
+		for (TCNameToken opname: node.opnames)
+		{
+			if (arg.within(opname.getLocation()))
+			{
+				all.add(opname);
+			}
+		}
 	
 		return all;
 	}

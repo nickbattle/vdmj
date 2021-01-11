@@ -36,11 +36,14 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCMutexSyncDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCLeafDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -173,6 +176,35 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	{
 		Set<TCNode> all = super.caseImplicitOperationDefinition(node, sought);
 		all.addAll(matchUnresolved(node.unresolved, sought));
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseMutexSyncDefinition(TCMutexSyncDefinition node, LexLocation sought)
+	{
+		Set<TCNode> all =  super.caseMutexSyncDefinition(node, sought);
+		
+		for (TCNameToken opname: node.operations)
+		{
+			if (sought.within(opname.getLocation()))
+			{
+				all.add(opname);
+			}
+		}
+		
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> casePerSyncDefinition(TCPerSyncDefinition node, LexLocation sought)
+	{
+		Set<TCNode> all =  super.casePerSyncDefinition(node, sought);
+		
+		if (sought.within(node.opname.getLocation()))
+		{
+			all.add(node.opname);
+		}
+		
 		return all;
 	}
 	
