@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.tc.expressions.TCFieldExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
@@ -185,7 +186,7 @@ public class LSPDefinitionFinder
 		}
 	}
 	
-	private TCDefinition findDefinition(TCNode node, Environment env, String name)
+	private TCDefinition findDefinition(TCNode node, Environment env, String fromModule)
 	{
 		if (node instanceof TCVariableExpression)
 		{
@@ -210,12 +211,12 @@ public class LSPDefinitionFinder
 		else if (node instanceof TCUnresolvedType)
 		{
 			TCUnresolvedType unresolved = (TCUnresolvedType)node;
-			return env.findType(unresolved.typename, name);
+			return env.findType(unresolved.typename, fromModule);
 		}
 		else if (node instanceof TCMkTypeExpression)
 		{
 			TCMkTypeExpression mk = (TCMkTypeExpression)node;
-			return env.findType(mk.typename, name);
+			return env.findType(mk.typename, fromModule);
 		}
 		else if (node instanceof TCFieldExpression)
 		{
@@ -251,7 +252,25 @@ public class LSPDefinitionFinder
 		else if (node instanceof TCIsExpression)
 		{
 			TCIsExpression isex = (TCIsExpression)node;
-			return env.findType(isex.typename, name);
+			return env.findType(isex.typename, fromModule);
+		}
+		else if (node instanceof TCNameToken)
+		{
+			TCNameToken name = (TCNameToken)node;
+			TCClassDefinition classdef = env.findClassDefinition();
+
+			if (classdef != null && classdef.getDefinitions() != null)	// eg. per => and mutex names
+			{
+				for (TCDefinition def: classdef.getDefinitions())
+				{
+					if (def.name != null && def.name.matches(name))
+					{
+						return def;
+					}
+				}
+			}
+			
+			return env.findName(name, NameScope.VARSANDNAMES);
 		}
 		
 		return null;
