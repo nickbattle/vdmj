@@ -228,6 +228,14 @@ public class DAPDebugReader extends Thread implements TraceCallback
 						new DAPResponse(request, true, null,
 							new JSONObject("result", arguments.get("expression"), "variablesReference", 0)));
 				}
+				else if ("".equals(arguments.get("expression")))
+				{
+					// User has typed Enter at a debug stop and sent a blank evaluation.
+					// Send message back as an error.
+					
+					return new DebugCommand(null,
+						new DAPResponse(request, false, "Enter expression to evaluate", null));
+				}
 				else
 				{
 					return new DebugCommand(DebugType.PRINT, arguments);
