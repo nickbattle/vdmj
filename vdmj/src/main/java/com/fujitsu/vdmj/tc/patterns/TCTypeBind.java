@@ -25,17 +25,20 @@ package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.patterns.visitors.TCBindVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class TCTypeBind extends TCBind
 {
 	private static final long serialVersionUID = 1L;
 	public TCType type;
+	public final TCTypeList unresolved;
 
 	public TCTypeBind(TCPattern pattern, TCType type)
 	{
 		super(pattern.location, pattern);
 		this.type = type;
+		this.unresolved = type.unresolvedTypes();
 	}
 
 	public void typeResolve(Environment env)
