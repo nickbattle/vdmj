@@ -348,6 +348,7 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	
  	private C caseTraceDefinition(TCTraceDefinition tdef, S arg)
  	{
+		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		C all = newCollection();
 		
 		if (tdef instanceof TCTraceLetDefBinding)
@@ -364,6 +365,12 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		else if (tdef instanceof TCTraceLetBeStBinding)
 		{
 			TCTraceLetBeStBinding letbe = (TCTraceLetBeStBinding)tdef;
+
+			if (letbe.stexp != null && expVisitor != null)
+			{
+				all.addAll(letbe.stexp.apply(expVisitor, arg));
+			}
+			
 			all.addAll(caseMultipleBind(letbe.bind, arg));
 			all.addAll(caseTraceDefinition(letbe.body, arg));
 		}
