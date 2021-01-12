@@ -25,9 +25,6 @@ package lsp.workspace;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Vector;
-
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
@@ -54,56 +51,8 @@ public class DidChangeWSHandler extends LSPHandler
 			case "workspace/didChangeWatchedFiles":
 				return didChangeWatchedFiles(request);
 			
-			case "workspace/didChangeWorkspaceFolders":
-				return didChangeWorkspaceFolders(request);
-				
 			default:
 				return new RPCMessageList(request, RPCErrors.InternalError, "Unexpected workspace message");
-		}
-	}
-	
-	private RPCMessageList didChangeWorkspaceFolders(RPCRequest request)
-	{
-		try
-		{
-			JSONObject params = request.get("params");
-			JSONObject event = params.get("event");
-			JSONArray added = event.get("added");
-			JSONArray removed = event.get("removed");
-			List<File> newRoots = new Vector<File>(LSPWorkspaceManager.getInstance().getRoots());
-		
-			for (int i=0; i<added.size(); i++)
-			{
-				JSONObject item = added.index(i);
-				String uri = item.get("uri");
-				File folder = Utils.uriToFile(uri);
-				
-				if (!newRoots.contains(folder))
-				{
-					newRoots.add(folder);
-					Log.printf("Adding workspace folder %s", folder);
-				}
-			}
-
-			for (int i=0; i<removed.size(); i++)
-			{
-				JSONObject item = removed.index(i);
-				String uri = item.get("uri");
-				File folder = Utils.uriToFile(uri);
-				
-				if (newRoots.contains(folder))
-				{
-					newRoots.remove(folder);
-					Log.printf("Removing workspace folder %s", folder);
-				}
-			}
-
-			return LSPWorkspaceManager.getInstance().changeFolders(request, newRoots);
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.InvalidRequest, request.getMethod());
 		}
 	}
 

@@ -80,7 +80,7 @@ public class LSPWorkspaceManager
 	protected final LSPMessageUtils messages;
 
 	private JSONObject clientCapabilities;
-	private List<File> roots = new Vector<File>();
+	private File rootUri = null;
 	private Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
 	private Set<File> openFiles = new HashSet<File>();
 	
@@ -129,9 +129,9 @@ public class LSPWorkspaceManager
 		INSTANCE = null;
 	}
 	
-	public List<File> getRoots()
+	public File getRoot()
 	{
-		return roots;
+		return rootUri;
 	}
 
 	public Map<File, StringBuilder> getProjectFiles()
@@ -148,23 +148,7 @@ public class LSPWorkspaceManager
 		try
 		{
 			JSONObject params = request.get("params");
-//			JSONArray folders = params.get("workspaceFolders");
-			roots.clear();
-			
-//			if (folders != null)
-//			{
-//				for (int i=0; i<folders.size(); i++)
-//				{
-//					JSONObject folder = folders.index(i);
-//					roots.add(Utils.uriToFile(folder.get("uri")));
-//					Log.printf("Adding workspace folder %s", (String)folder.get("uri"));
-//				}
-//			}
-//			else
-			{
-				roots.add(Utils.uriToFile(params.get("rootUri")));
-			}
-			
+			rootUri = Utils.uriToFile(params.get("rootUri"));
 			clientCapabilities = params.get("capabilities");
 			openFiles.clear();
 			System.setProperty("parser.tabstop", "1");	// Forced, for LSP location offsets
@@ -229,18 +213,14 @@ public class LSPWorkspaceManager
 		}
 	}
 
-//	private RPCRequest lspWorkspaceFolders()
-//	{
-//		return new RPCRequest(0L, "workspace/workspaceFolders", new JSONObject());
-//	}
-
 	private RPCRequest lspDynamicRegistrations()
 	{
 		JSONArray watchers = new JSONArray();
 		
 		for (String glob: getFilenameFilters())
 		{
-			watchers.add(new JSONObject("globPattern", glob));
+			// Add the rootUri so that we only notice changes in our own project
+			watchers.add(new JSONObject("globPattern", rootUri.getAbsolutePath() + "/" + glob));
 		}
 		
 		return RPCRequest.create("client/registerCapability",
@@ -257,10 +237,7 @@ public class LSPWorkspaceManager
 
 	private void loadAllProjectFiles() throws IOException
 	{
-		for (File root: getRoots())
-		{
-			loadProjectFiles(root);
-		}
+		loadProjectFiles(rootUri);
 	}
 
 	private void loadProjectFiles(File root) throws IOException
@@ -494,7 +471,6 @@ public class LSPWorkspaceManager
 	{
 		try
 		{
-			roots.clear();
 			projectFiles.clear();
 			loadAllProjectFiles();
 			return checkLoadedFiles();
