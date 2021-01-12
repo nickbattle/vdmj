@@ -46,7 +46,6 @@ import lsp.textdocument.DidOpenHandler;
 import lsp.textdocument.DidSaveHandler;
 import lsp.textdocument.DocumentSymbolHandler;
 import lsp.workspace.DidChangeWSHandler;
-import lsp.workspace.WorkspaceFoldersHandler;
 import rpc.RPCDispatcher;
 import rpc.RPCHandler;
 import rpc.RPCMessageList;
@@ -103,8 +102,6 @@ public class LSPServer extends JSONServer
 		dispatcher.register(new CompletionHandler(), "textDocument/completion");
 
 		dispatcher.register(new DidChangeWSHandler(), "workspace/didChangeWatchedFiles");
-		dispatcher.register(new WorkspaceFoldersHandler(), "workspace/workspaceFolders");
-		dispatcher.register(new DidChangeWSHandler(), "workspace/didChangeWorkspaceFolders");
 
 		dispatcher.register(new POGHandler(), "slsp/POG/generate");
 		dispatcher.register(new CTHandler(), "slsp/CT/traces", "slsp/CT/generate", "slsp/CT/execute");
