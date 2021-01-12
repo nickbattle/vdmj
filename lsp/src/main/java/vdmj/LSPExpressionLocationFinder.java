@@ -31,8 +31,11 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCExists1Expression;
+import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCFieldExpression;
+import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
 import com.fujitsu.vdmj.tc.expressions.TCFuncInstantiationExpression;
 import com.fujitsu.vdmj.tc.expressions.TCHistoryExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
@@ -41,7 +44,11 @@ import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
+import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 
 public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode, Set<TCNode>, LexLocation>
@@ -49,6 +56,27 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 	public LSPExpressionLocationFinder(TCVisitorSet<TCNode, Set<TCNode>, LexLocation> visitors)
 	{
 		visitorSet = visitors;
+	}
+
+	/**
+	 * Search for types in the unresolved list that match the LexLocation sought. If there
+	 * are any matches, there should only be one!
+	 */
+	private Set<TCNode> matchUnresolved(TCTypeList unresolvedList, LexLocation sought)
+	{
+		Set<TCNode> matched = newCollection();
+		
+		for (TCType type: unresolvedList)
+		{
+			TCUnresolvedType unresolved = (TCUnresolvedType)type;
+			
+			if (sought.within(unresolved.typename.getLocation()))
+			{
+				matched.add(unresolved);
+			}
+		}
+
+		return matched;
 	}
 
 	@Override
@@ -173,6 +201,54 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 			}
 		}
 	
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseExistsExpression(TCExistsExpression node, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseExistsExpression(node, arg);
+		
+		for (TCMultipleBind bind: node.bindList)
+		{
+			if (bind instanceof TCMultipleTypeBind)
+			{
+				TCMultipleTypeBind mbind = (TCMultipleTypeBind)bind;
+				all.addAll(matchUnresolved(mbind.unresolved, arg));
+			}
+		}
+
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseExists1Expression(TCExists1Expression node, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseExists1Expression(node, arg);
+		
+		if (node.bind instanceof TCTypeBind)
+		{
+			TCTypeBind tbind = (TCTypeBind)node.bind;
+			all.addAll(matchUnresolved(tbind.unresolved, arg));
+		}
+
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseForAllExpression(TCForAllExpression node, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseForAllExpression(node, arg);
+		
+		for (TCMultipleBind bind: node.bindList)
+		{
+			if (bind instanceof TCMultipleTypeBind)
+			{
+				TCMultipleTypeBind mbind = (TCMultipleTypeBind)bind;
+				all.addAll(matchUnresolved(mbind.unresolved, arg));
+			}
+		}
+
 		return all;
 	}
 }

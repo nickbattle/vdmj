@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.patterns;
 
 import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -33,11 +34,13 @@ public class TCMultipleTypeBind extends TCMultipleBind
 {
 	private static final long serialVersionUID = 1L;
 	public TCType type;
+	public final TCTypeList unresolved;
 
 	public TCMultipleTypeBind(TCPatternList plist, TCType type)
 	{
 		super(plist);
 		this.type = type;
+		this.unresolved = type.unresolvedTypes();
 	}
 
 	@Override
