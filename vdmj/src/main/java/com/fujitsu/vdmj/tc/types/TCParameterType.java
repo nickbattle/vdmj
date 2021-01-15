@@ -35,6 +35,7 @@ public class TCParameterType extends TCType
 {
 	private static final long serialVersionUID = 1L;
 	public final TCNameToken name;
+	private TCDefinition paramdef = null;
 
 	public TCParameterType(TCNameToken pname)
 	{
@@ -47,14 +48,19 @@ public class TCParameterType extends TCType
 	{
 		if (resolved) return this; else resolved = true;
 
-		TCDefinition p = env.findName(name, NameScope.NAMES);
+		paramdef = env.findName(name, NameScope.NAMES);
 
-		if (p == null || !(p.getType() instanceof TCParameterType))
+		if (paramdef == null || !(paramdef.getType() instanceof TCParameterType))
 		{
 			report(3433, "Parameter type @" + name + " not defined");
 		}
 
 		return this;
+	}
+	
+	public TCDefinition getDefinition()
+	{
+		return paramdef;	// Note that this is only set after typeRsolution
 	}
 	
 	@Override

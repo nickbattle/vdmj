@@ -45,9 +45,6 @@ import com.fujitsu.vdmj.tc.definitions.visitors.TCLeafDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
-import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 
 public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode, Set<TCNode>, LexLocation>
 {
@@ -88,27 +85,6 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 		visitorSet = new VisitorSet(this);
 	}
 
-	/**
-	 * Search for types in the unresolved list that match the LexLocation sought. If there
-	 * are any matches, there should only be one!
-	 */
-	private Set<TCNode> matchUnresolved(TCTypeList unresolvedList, LexLocation sought)
-	{
-		Set<TCNode> matched = newCollection();
-		
-		for (TCType type: unresolvedList)
-		{
-			TCUnresolvedType unresolved = (TCUnresolvedType)type;
-			
-			if (sought.within(unresolved.typename.getLocation()))
-			{
-				matched.add(unresolved);
-			}
-		}
-
-		return matched;
-	}
-
 	@Override
 	public Set<TCNode> caseDefinition(TCDefinition node, LexLocation position)
 	{
@@ -119,7 +95,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	public Set<TCNode> caseAssignmentDefinition(TCAssignmentDefinition node, LexLocation sought)
 	{
 		Set<TCNode> all = super.caseAssignmentDefinition(node, sought);
-		all.addAll(matchUnresolved(node.unresolved, sought));
+		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}
 	
@@ -127,7 +103,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	public Set<TCNode> caseTypeDefinition(TCTypeDefinition node, LexLocation sought)
 	{
 		Set<TCNode> all = super.caseTypeDefinition(node, sought);
-		all.addAll(matchUnresolved(node.unresolved, sought));
+		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}
 	
@@ -135,7 +111,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	public Set<TCNode> caseLocalDefinition(TCLocalDefinition node, LexLocation sought)
 	{
 		Set<TCNode> all = super.caseLocalDefinition(node, sought);
-		all.addAll(matchUnresolved(node.unresolved, sought));
+		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}
 	
@@ -143,7 +119,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	public Set<TCNode> caseValueDefinition(TCValueDefinition node, LexLocation sought)
 	{
 		Set<TCNode> all = super.caseValueDefinition(node, sought);
-		all.addAll(matchUnresolved(node.unresolved, sought));
+		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}
 	
@@ -151,7 +127,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	public Set<TCNode> caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, LexLocation sought)
 	{
 		Set<TCNode> all = super.caseExplicitFunctionDefinition(node, sought);
-		all.addAll(matchUnresolved(node.unresolved, sought));
+		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}
 	
@@ -159,7 +135,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	public Set<TCNode> caseImplicitFunctionDefinition(TCImplicitFunctionDefinition node, LexLocation sought)
 	{
 		Set<TCNode> all = super.caseImplicitFunctionDefinition(node, sought);
-		all.addAll(matchUnresolved(node.unresolved, sought));
+		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}
 	
@@ -167,7 +143,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	public Set<TCNode> caseExplicitOperationDefinition(TCExplicitOperationDefinition node, LexLocation sought)
 	{
 		Set<TCNode> all = super.caseExplicitOperationDefinition(node, sought);
-		all.addAll(matchUnresolved(node.unresolved, sought));
+		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}
 
@@ -175,7 +151,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	public Set<TCNode> caseImplicitOperationDefinition(TCImplicitOperationDefinition node, LexLocation sought)
 	{
 		Set<TCNode> all = super.caseImplicitOperationDefinition(node, sought);
-		all.addAll(matchUnresolved(node.unresolved, sought));
+		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}
 	
