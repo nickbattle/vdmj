@@ -44,6 +44,8 @@ import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCLeafDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 
 public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode, Set<TCNode>, LexLocation>
@@ -188,5 +190,22 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	protected Set<TCNode> newCollection()
 	{
 		return new HashSet<TCNode>();
+	}
+	
+	@Override
+ 	protected Set<TCNode> caseMultipleBind(TCMultipleBind bind, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseMultipleBind(bind, arg);
+		
+		if (all.isEmpty())
+		{
+			if (bind instanceof TCMultipleTypeBind)
+			{
+				TCMultipleTypeBind mbind = (TCMultipleTypeBind)bind;
+				all.addAll(mbind.unresolved.matchUnresolved(arg));
+			}
+		}
+		
+		return all;
 	}
 }

@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
@@ -206,6 +207,40 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 			}
 		}
 
+		return all;
+	}
+
+	@Override
+	protected Set<TCNode> caseBind(TCBind bind, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseBind(bind, arg);
+		
+		if (all.isEmpty())
+		{
+			if (bind instanceof TCTypeBind)
+			{
+				TCTypeBind tbind = (TCTypeBind)bind;
+				all.addAll(tbind.unresolved.matchUnresolved(arg));
+			}
+		}
+		
+		return all;
+	}
+
+	@Override
+ 	protected Set<TCNode> caseMultipleBind(TCMultipleBind bind, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseMultipleBind(bind, arg);
+		
+		if (all.isEmpty())
+		{
+			if (bind instanceof TCMultipleTypeBind)
+			{
+				TCMultipleTypeBind mbind = (TCMultipleTypeBind)bind;
+				all.addAll(mbind.unresolved.matchUnresolved(arg));
+			}
+		}
+		
 		return all;
 	}
 }
