@@ -23,10 +23,14 @@
 
 package com.fujitsu.vdmj.tc.types;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCMappedList;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.util.Utils;
 
 @SuppressWarnings("serial")
@@ -85,5 +89,38 @@ public class TCTypeList extends TCMappedList<ASTType, TCType> implements Cloneab
 		}
 		
 		return list;
+	}
+
+	/**
+	 * Search for types in the unresolved list that match the LexLocation sought. If there
+	 * are any matches, there should only be one!
+	 */
+	public Set<TCNode> matchUnresolved(LexLocation sought)
+	{
+		Set<TCNode> matched = new HashSet<TCNode>();
+		
+		for (TCType type: this)
+		{
+			if (type instanceof TCUnresolvedType)
+			{
+				TCUnresolvedType unresolved = (TCUnresolvedType)type;
+				
+				if (sought.within(unresolved.typename.getLocation()))
+				{
+					matched.add(unresolved);
+				}
+			}
+			else if (type instanceof TCParameterType)
+			{
+				TCParameterType paramtype = (TCParameterType)type;
+				
+				if (sought.within(paramtype.name.getLocation()))
+				{
+					matched.add(paramtype);
+				}
+			}
+		}
+
+		return matched;
 	}
 }

@@ -45,6 +45,7 @@ import com.fujitsu.vdmj.tc.statements.TCCallStatement;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCField;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -212,6 +213,11 @@ public class LSPDefinitionFinder
 		{
 			TCUnresolvedType unresolved = (TCUnresolvedType)node;
 			return env.findType(unresolved.typename, fromModule);
+		}
+		else if (node instanceof TCParameterType)
+		{
+			TCParameterType paramtype = (TCParameterType)node;
+			return paramtype.getDefinition();
 		}
 		else if (node instanceof TCMkTypeExpression)
 		{

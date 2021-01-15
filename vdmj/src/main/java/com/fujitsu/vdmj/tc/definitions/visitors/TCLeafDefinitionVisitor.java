@@ -538,7 +538,12 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		return all;
 	}
 
- 	private C caseMultipleBind(TCMultipleBind bind, S arg)
+ 	/**
+ 	 * This multiple bind case covers the common expression visitor
+ 	 * cases, but they can be overridden, perhaps to use the (m)bind visitorSet
+ 	 * entry if required. 
+ 	 */
+ 	protected C caseMultipleBind(TCMultipleBind bind, S arg)
 	{
 		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		C all = newCollection();

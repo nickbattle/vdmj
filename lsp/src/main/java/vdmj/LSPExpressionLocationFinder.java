@@ -44,39 +44,16 @@ import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
-import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 
 public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode, Set<TCNode>, LexLocation>
 {
 	public LSPExpressionLocationFinder(TCVisitorSet<TCNode, Set<TCNode>, LexLocation> visitors)
 	{
 		visitorSet = visitors;
-	}
-
-	/**
-	 * Search for types in the unresolved list that match the LexLocation sought. If there
-	 * are any matches, there should only be one!
-	 */
-	private Set<TCNode> matchUnresolved(TCTypeList unresolvedList, LexLocation sought)
-	{
-		Set<TCNode> matched = newCollection();
-		
-		for (TCType type: unresolvedList)
-		{
-			TCUnresolvedType unresolved = (TCUnresolvedType)type;
-			
-			if (sought.within(unresolved.typename.getLocation()))
-			{
-				matched.add(unresolved);
-			}
-		}
-
-		return matched;
 	}
 
 	@Override
@@ -127,16 +104,7 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
  			if (def instanceof TCValueDefinition)
  			{
  				TCValueDefinition vdef = (TCValueDefinition)def;
- 				
- 				for (TCType type: vdef.unresolved)
- 				{
- 					TCUnresolvedType unresolved = (TCUnresolvedType)type;
- 					
- 					if (arg.within(unresolved.typename.getLocation()))
- 					{
- 						all.add(unresolved);
- 					}
- 				}
+				all.addAll(vdef.unresolved.matchUnresolved(arg));
  			}
  		}
  		
@@ -147,17 +115,7 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 	public Set<TCNode> caseFuncInstantiationExpression(TCFuncInstantiationExpression node, LexLocation arg)
 	{
 		Set<TCNode> all = super.caseFuncInstantiationExpression(node, arg);
-
-		for (TCType type: node.unresolved)
-		{
-			TCUnresolvedType unresolved = (TCUnresolvedType)type;
-			
-			if (arg.within(unresolved.typename.getLocation()))
-			{
-				all.add(unresolved);
-			}
-		}
-		
+		all.addAll(node.unresolved.matchUnresolved(arg));
 		return all;
 	}
 	
@@ -214,7 +172,7 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 			if (bind instanceof TCMultipleTypeBind)
 			{
 				TCMultipleTypeBind mbind = (TCMultipleTypeBind)bind;
-				all.addAll(matchUnresolved(mbind.unresolved, arg));
+				all.addAll(mbind.unresolved.matchUnresolved(arg));
 			}
 		}
 
@@ -229,7 +187,7 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 		if (node.bind instanceof TCTypeBind)
 		{
 			TCTypeBind tbind = (TCTypeBind)node.bind;
-			all.addAll(matchUnresolved(tbind.unresolved, arg));
+			all.addAll(tbind.unresolved.matchUnresolved(arg));
 		}
 
 		return all;
@@ -245,10 +203,44 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 			if (bind instanceof TCMultipleTypeBind)
 			{
 				TCMultipleTypeBind mbind = (TCMultipleTypeBind)bind;
-				all.addAll(matchUnresolved(mbind.unresolved, arg));
+				all.addAll(mbind.unresolved.matchUnresolved(arg));
 			}
 		}
 
+		return all;
+	}
+
+	@Override
+	protected Set<TCNode> caseBind(TCBind bind, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseBind(bind, arg);
+		
+		if (all.isEmpty())
+		{
+			if (bind instanceof TCTypeBind)
+			{
+				TCTypeBind tbind = (TCTypeBind)bind;
+				all.addAll(tbind.unresolved.matchUnresolved(arg));
+			}
+		}
+		
+		return all;
+	}
+
+	@Override
+ 	protected Set<TCNode> caseMultipleBind(TCMultipleBind bind, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseMultipleBind(bind, arg);
+		
+		if (all.isEmpty())
+		{
+			if (bind instanceof TCMultipleTypeBind)
+			{
+				TCMultipleTypeBind mbind = (TCMultipleTypeBind)bind;
+				all.addAll(mbind.unresolved.matchUnresolved(arg));
+			}
+		}
+		
 		return all;
 	}
 }

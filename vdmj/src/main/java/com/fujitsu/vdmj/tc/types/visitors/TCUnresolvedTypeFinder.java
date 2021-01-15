@@ -24,6 +24,7 @@
 package com.fujitsu.vdmj.tc.types.visitors;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
@@ -41,6 +42,12 @@ public class TCUnresolvedTypeFinder extends TCLeafTypeVisitor<TCType, TCTypeList
 		return new TCTypeList();
 	}
 	
+	@Override
+	public TCTypeList caseParameterType(TCParameterType node, Object arg)
+	{
+		return new TCTypeList(node);
+	}
+
 	@Override
 	public TCTypeList caseUnresolvedType(TCUnresolvedType node, Object arg)
 	{
