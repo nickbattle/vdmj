@@ -140,15 +140,17 @@ public class InitThread extends SchedulableThread
 	{
 		StateContext initialContext = (StateContext)globalContext;
 		initialContext.setThreadState(null);
-		Set<ContextException> problems = null;
+		Set<ContextException> problems = new HashSet<ContextException>();
 		Set<TCIdentifierToken> passed = new HashSet<TCIdentifierToken>();
 		int retries = 5;
+		int lastProblemCount;
 		boolean exceptions = Settings.exceptions;
 		Settings.exceptions = false;
 
 		do
 		{
-			problems = new HashSet<ContextException>();
+			lastProblemCount = problems.isEmpty() ? Integer.MAX_VALUE : problems.size();
+			problems.clear();
 
         	for (INModule m: modules)
     		{
@@ -191,8 +193,13 @@ public class InitThread extends SchedulableThread
     				Console.out.println(e.toString());
     			}        		
         	}
+
+        	if (problems.size() == lastProblemCount)
+			{
+				retries--;
+			}
 		}
-		while (--retries > 0 && !problems.isEmpty());
+		while ((retries > 0 || problems.size() < lastProblemCount) && !problems.isEmpty());
 
 		if (!problems.isEmpty())
 		{
@@ -232,6 +239,7 @@ public class InitThread extends SchedulableThread
 
 		ContextException failed = null;
 		int retries = 3;	// Potentially not enough.
+		int lastProblemCount;
 		Set<ContextException> trouble = new HashSet<ContextException>();
 		Set<TCNameToken> passed = new HashSet<TCNameToken>();
 		boolean exceptions = Settings.exceptions;
@@ -239,6 +247,7 @@ public class InitThread extends SchedulableThread
 
 		do
 		{
+			lastProblemCount = trouble.isEmpty() ? Integer.MAX_VALUE : trouble.size();
 			failed = null;
 			trouble.clear();
 
@@ -301,8 +310,13 @@ public class InitThread extends SchedulableThread
     				Console.out.println(e.toString());
     			}        		
         	}
+
+			if (trouble.size() == lastProblemCount)
+			{
+				retries--;
+			}
 		}
-		while (--retries > 0 && failed != null);
+		while ((retries > 0 || trouble.size() < lastProblemCount) && !trouble.isEmpty() && failed != null);
 
 		if (!trouble.isEmpty())
 		{
