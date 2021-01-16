@@ -46,6 +46,11 @@ import rpc.RPCRequest;
 
 public class LSPMessageUtils
 {
+	public RPCMessageList diagnosticResponses(List<? extends VDMMessage> list) throws IOException
+	{
+		return diagnosticResponses(list, (Set<File>)null);	// All files mention in list
+	}
+	
 	public RPCMessageList diagnosticResponses(List<? extends VDMMessage> list, File file) throws IOException
 	{
 		Set<File> filesToReport = new HashSet<File>();
@@ -76,7 +81,7 @@ public class LSPMessageUtils
 		
 		RPCMessageList responses = new RPCMessageList();
 		
-		if (filesToReport == null)	// All of them
+		if (filesToReport == null)	// All of the file mentioned
 		{
 			filesToReport = map.keySet();
 		}
@@ -104,6 +109,18 @@ public class LSPMessageUtils
 		}
 		
 		return responses;
+	}
+	
+	public Set<File> filesOfMessages(List<VDMMessage> list)
+	{
+		Set<File> set = new HashSet<File>();
+		
+		for (VDMMessage message: list)
+		{
+			set.add(message.location.file.getAbsoluteFile());
+		}
+
+		return set;
 	}
 	
 	public JSONObject symbolInformation(String name, LexLocation location, SymbolKind kind, String container)

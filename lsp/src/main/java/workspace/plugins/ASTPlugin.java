@@ -31,7 +31,6 @@ import java.util.Vector;
 import com.fujitsu.vdmj.messages.VDMMessage;
 
 import json.JSONArray;
-import rpc.RPCMessageList;
 
 public abstract class ASTPlugin extends AnalysisPlugin
 {
@@ -56,9 +55,9 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	{
 	}
 
-	public RPCMessageList fileChanged(File file) throws IOException
+	public List<VDMMessage> fileChanged(File file) throws IOException
 	{
-		return messages.diagnosticResponses(parseFile(file), file);
+		return parseFile(file);
 	}
 	
 	public void preCheck()

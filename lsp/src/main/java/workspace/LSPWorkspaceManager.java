@@ -337,8 +337,7 @@ public class LSPWorkspaceManager
 		diags.addAll(tc.getErrs());
 		diags.addAll(ast.getWarns());
 		diags.addAll(tc.getWarns());
-		LSPMessageUtils utils = new LSPMessageUtils();
-		RPCMessageList result = utils.diagnosticResponses(diags, projectFiles.keySet());
+		RPCMessageList result = messages.diagnosticResponses(diags, projectFiles.keySet());
 		
 		if (hasClientCapability("experimental.proofObligationGeneration"))
 		{
@@ -426,7 +425,17 @@ public class LSPWorkspaceManager
 			
 			Log.dumpEdit(range, buffer);
 			ASTPlugin ast = registry.getPlugin("AST");
-			return ast.fileChanged(file);
+			List<VDMMessage> errors = ast.fileChanged(file);
+			
+			// Add TC errors as these need to be seen until the next save
+			TCPlugin tc = registry.getPlugin("TC");
+			errors.addAll(tc.getErrs());
+			errors.addAll(tc.getWarns());
+			
+			// We report on this file, plus the files with tc errors (if any).
+			Set<File> files = messages.filesOfMessages(errors);
+			files.add(file);
+			return messages.diagnosticResponses(errors, files);
 		}
 	}
 
