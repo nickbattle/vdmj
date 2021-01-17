@@ -416,6 +416,22 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 		}
 	}
 	
+	public static MainThread getMainThread()
+	{
+		synchronized (allThreads)
+		{
+    		for (SchedulableThread th: allThreads)
+    		{
+   				if (th instanceof MainThread)
+   				{
+   					return (MainThread)th;
+   				}
+    		}
+    		
+    		return null;
+		}
+	}
+
 	public static List<SchedulableThread> getAllThreads()
 	{
 		return allThreads;
