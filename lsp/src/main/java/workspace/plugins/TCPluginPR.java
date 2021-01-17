@@ -146,13 +146,16 @@ public class TCPluginPR extends TCPlugin
 			{
 				results.add(cdef);	// Add classes as well
 
-				for (TCDefinition def: cdef.definitions)
+				for (TCDefinition def: cdef.definitions.singleDefinitions())
 				{
-					results.add(def);
+					if (def.name != null)
+					{
+						results.add(def);
+					}
 				}
 			}
 			
-			for (TCDefinition def: cdef.definitions)
+			for (TCDefinition def: cdef.definitions.singleDefinitions())
 			{
 				if (def.name != null && def.name.getName().startsWith(startsWith))
 				{
