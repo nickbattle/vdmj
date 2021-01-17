@@ -153,10 +153,17 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				return true;
 
 			case "terminate":
+				link.killThreads();
+				dapResponse = new DAPResponse(dapRequest, true, null, null);
+				server.writeMessage(dapResponse);
+				server.stdout("Debug session terminated");
+				return false;
+				
 			case "disconnect":
 				link.killThreads();
 				dapResponse = new DAPResponse(dapRequest, true, null, null);
 				server.writeMessage(dapResponse);
+				server.stdout("Debug session disconnected");
 				return false;
 				
 			default:
@@ -293,38 +300,26 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	@Override
 	public void tracepoint(Context ctxt, Tracepoint tp)
 	{
-		try
+		if (tp.condition == null)
 		{
-			if (tp.condition == null)
-			{
-				String s = "Reached trace point " + tp.location + "\n";
-				text(Thread.currentThread().getName() + ": " + s);
-			}
-			else
-			{
-				String result = null;
-				
-				try
-				{
-					result = tp.condition.eval(ctxt).toString();
-				}
-				catch (Exception e)
-				{
-					result = e.getMessage();
-				}
-				
-				String s = tp.trace + " = " + result + " at trace point " + tp.location + "\n";
-				text(Thread.currentThread().getName() + ": " + s);
-			}
+			String s = "Reached trace point " + tp.location + "\n";
+			server.stdout(Thread.currentThread().getName() + ": " + s);
 		}
-		catch (IOException e)
+		else
 		{
-			Log.error(e);
+			String result = null;
+			
+			try
+			{
+				result = tp.condition.eval(ctxt).toString();
+			}
+			catch (Exception e)
+			{
+				result = e.getMessage();
+			}
+			
+			String s = tp.trace + " = " + result + " at trace point " + tp.location + "\n";
+			server.stdout(Thread.currentThread().getName() + ": " + s);
 		}
-	}
-	
-	private void text(String message) throws IOException
-	{
-		server.writeMessage(new DAPResponse("output", new JSONObject("output", message)));
 	}
 }
