@@ -111,12 +111,12 @@ public class DAPDebugLink extends ConsoleDebugLink
 		
 		if (ex != null)
 		{
-			server.stderr(ex.getMessage() + "\n");
+			// server.stderr(ex.getMessage() + "\n");
 			text = ex.getMessage();
 			
 			if (text.equals("DEADLOCK detected"))	// see SchedulableThread
 			{
-				reason = "deadlock";
+				reason = "exception";	// "deadlock" not recognised
 				text = text + " " + location;
 			}
 			else
