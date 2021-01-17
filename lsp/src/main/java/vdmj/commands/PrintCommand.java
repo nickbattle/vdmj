@@ -73,7 +73,9 @@ public class PrintCommand extends Command
 		catch (Exception e)
 		{
 			Log.error(e);
-			return new DAPMessageList(request, e);
+			DAPMessageList messages = new DAPMessageList(request, e);
+			messages.add(stdout("Execution terminated."));
+			return messages;
 		}
 		finally
 		{
