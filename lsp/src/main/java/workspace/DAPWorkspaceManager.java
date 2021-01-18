@@ -28,10 +28,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import dap.DAPEvent;
@@ -39,6 +37,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.DAPServer;
+import dap.InitExecutor;
 import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
@@ -61,7 +60,6 @@ public class DAPWorkspaceManager
 	private Boolean noDebug;
 	private Interpreter interpreter;
 	private String launchCommand;
-	private String defaultName;
 	private DAPDebugReader debugReader;
 	
 	protected DAPWorkspaceManager()
@@ -106,38 +104,13 @@ public class DAPWorkspaceManager
 	{
 		try
 		{
-			DAPDebugReader dbg = null;
+			InitExecutor exec = new InitExecutor("init", request);
+			exec.start();
 			
-			try
-			{
-				dbg = new DAPDebugReader();		// Allow debugging of init sequence
-				setDebugReader(dbg);
-				dbg.start();
-				
-				heading();
-				stdout("Initialized in ... ");
-	
-				long before = System.currentTimeMillis();
-				getInterpreter().init();
-				if (defaultName != null) getInterpreter().setDefaultName(defaultName);
-				long after = System.currentTimeMillis();
-	
-				stdout((double)(after-before)/1000 + " secs.\n");
-			}
-			finally
-			{
-				if (dbg != null)
-				{
-					dbg.interrupt();
-				}
-				
-				setDebugReader(null);
-			}
-	
 			if (launchCommand != null)
 			{
 				stdout("\n" + launchCommand + "\n");
-				DAPMessageList eval = evaluate(request, launchCommand, "repl", true);
+				DAPMessageList eval = evaluate(request, launchCommand, "repl");
 				
 				JSONObject body = eval.get(0).get("body");
 				Boolean success = eval.get(0).get("success");
@@ -185,7 +158,6 @@ public class DAPWorkspaceManager
 		{
 			// These values are used in configurationDone
 			this.noDebug = noDebug;
-			this.defaultName = defaultName;
 			this.launchCommand = command;
 			
 			return new DAPMessageList(request);
@@ -264,18 +236,6 @@ public class DAPWorkspaceManager
 		return ast.isDirty();
 	}
 
-	/**
-	 * Methods to write direct to stdout/stderr, while a DAP command is being executed.
-	 */
-	private void heading() throws Exception
-	{
-		stdout("*\n" +
-				"* VDMJ " + Settings.dialect + " Interpreter\n" +
-				(noDebug ? "" : "* DEBUG enabled\n") +
-				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
-				" is " + getInterpreter().getDefaultName() + "\n");
-	}
-	
 	private void stdout(String message)
 	{
 		DAPServer.getInstance().stdout(message);
@@ -372,7 +332,7 @@ public class DAPWorkspaceManager
 		return new DAPMessageList(request, new JSONObject("breakpoints", results));
 	}
 	
-	public DAPMessageList evaluate(DAPRequest request, String expression, String context, boolean wait)
+	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
 	{
 		CTPlugin ct = registry.getPlugin("CT");
 		
@@ -409,7 +369,7 @@ public class DAPWorkspaceManager
 			}
 		}
 		
-		return command.run(request, wait);
+		return command.run(request);
 	}
 
 	public DAPMessageList threads(DAPRequest request)
@@ -482,5 +442,10 @@ public class DAPWorkspaceManager
 	public DAPDebugReader getDebugReader()
 	{
 		return debugReader;
+	}
+	
+	public boolean getNoDebug()
+	{
+		return noDebug;
 	}
 }

@@ -29,9 +29,9 @@ import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
+import lsp.CancellableThread;
 import lsp.Utils;
 import vdmj.DAPDebugReader;
-import vdmj.commands.PrintCommand;
 import workspace.DAPWorkspaceManager;
 
 public class DisconnectHandler extends DAPHandler
@@ -55,7 +55,7 @@ public class DisconnectHandler extends DAPHandler
 			}
 			else
 			{
-				PrintCommand.setCancelled();	// Async cancel from user
+				CancellableThread.cancel("print");	// Async cancel from user
 			}
 
 			return null;

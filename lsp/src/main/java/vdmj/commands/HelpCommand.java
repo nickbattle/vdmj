@@ -58,7 +58,7 @@ public class HelpCommand extends Command
 	};
 	
 	@Override
-	public DAPMessageList run(DAPRequest request, boolean wait)
+	public DAPMessageList run(DAPRequest request)
 	{
 		StringBuilder sb = new StringBuilder();
 		

@@ -30,8 +30,8 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServer;
 import json.JSONObject;
+import lsp.CancellableThread;
 import vdmj.DAPDebugReader;
-import vdmj.commands.PrintCommand;
 import workspace.DAPWorkspaceManager;
 
 public class TerminateHandler extends DAPHandler
@@ -55,7 +55,7 @@ public class TerminateHandler extends DAPHandler
 			}
 			else	// Async cancel from user
 			{
-				PrintCommand.setCancelled();
+				CancellableThread.cancel("print");
 				return new DAPMessageList(request);		// Say success
 			}
 

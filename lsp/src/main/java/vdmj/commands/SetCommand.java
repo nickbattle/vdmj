@@ -58,7 +58,7 @@ public class SetCommand extends Command
 	private StringBuilder sb;
 	
 	@Override
-	public DAPMessageList run(DAPRequest request, boolean wait)
+	public DAPMessageList run(DAPRequest request)
 	{
 		sb = new StringBuilder();
 		

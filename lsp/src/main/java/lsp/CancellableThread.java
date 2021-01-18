@@ -31,7 +31,7 @@ import workspace.Log;
 abstract public class CancellableThread extends Thread
 {
 	private static final Map<Object, CancellableThread> active = new HashMap<Object, CancellableThread>();
-	private final Object myId;
+	protected final Object myId;
 	protected boolean cancelled = false;
 	
 	public CancellableThread(Object myId)
