@@ -76,7 +76,7 @@ abstract public class Command
 		}
 	}
 
-	public abstract DAPMessageList run(DAPRequest request);
+	public abstract DAPMessageList run(DAPRequest request, boolean wait);
 	
 	protected DAPResponse stdout(String message)
 	{

@@ -111,6 +111,7 @@ public class DAPWorkspaceManager
 			try
 			{
 				dbg = new DAPDebugReader();		// Allow debugging of init sequence
+				setDebugReader(dbg);
 				dbg.start();
 				
 				heading();
@@ -129,12 +130,14 @@ public class DAPWorkspaceManager
 				{
 					dbg.interrupt();
 				}
+				
+				setDebugReader(null);
 			}
 	
 			if (launchCommand != null)
 			{
 				stdout("\n" + launchCommand + "\n");
-				DAPMessageList eval = evaluate(request, launchCommand, "repl");
+				DAPMessageList eval = evaluate(request, launchCommand, "repl", true);
 				
 				JSONObject body = eval.get(0).get("body");
 				Boolean success = eval.get(0).get("success");
@@ -147,10 +150,11 @@ public class DAPWorkspaceManager
 				{
 					stderr(eval.get(0).get("message"));
 				}
-	
+				
 				stdout("\nEvaluation complete.\n");
 				clearInterpreter();
 				DAPServer.getInstance().setRunning(false);	// disconnect afterwards
+				return null;
 			}
 	
 			return new DAPMessageList(request);
@@ -368,7 +372,7 @@ public class DAPWorkspaceManager
 		return new DAPMessageList(request, new JSONObject("breakpoints", results));
 	}
 	
-	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
+	public DAPMessageList evaluate(DAPRequest request, String expression, String context, boolean wait)
 	{
 		CTPlugin ct = registry.getPlugin("CT");
 		
@@ -405,7 +409,7 @@ public class DAPWorkspaceManager
 			}
 		}
 		
-		return command.run(request);
+		return command.run(request, wait);
 	}
 
 	public DAPMessageList threads(DAPRequest request)

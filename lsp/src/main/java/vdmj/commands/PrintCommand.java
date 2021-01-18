@@ -97,9 +97,9 @@ public class PrintCommand extends Command
 			}
 			catch (Exception e)
 			{
-				Log.error(e);
 				try
 				{
+					Log.error(e);
 					server.writeMessage(new DAPResponse(request, false, e.getMessage(), null));
 					server.writeMessage(stdout("Execution terminated."));
 				}
@@ -129,7 +129,7 @@ public class PrintCommand extends Command
 	}
 	
 	@Override
-	public DAPMessageList run(DAPRequest request)
+	public DAPMessageList run(DAPRequest request, boolean wait)
 	{
 		if (executor != null)
 		{
@@ -137,11 +137,48 @@ public class PrintCommand extends Command
 		}
 		else
 		{
-			executor = new ExpressionExecutor(request, expression);
-			executor.start();
+			if (!wait)
+			{
+				executor = new ExpressionExecutor(request, expression);
+				executor.start();
+				return null;
+			}
+			else
+			{
+				DAPDebugReader dbg = null;
+				DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+
+				try
+				{
+					dbg = new DAPDebugReader();
+					manager.setDebugReader(dbg);
+					dbg.start();
+					
+					long before = System.currentTimeMillis();
+					Value result = Interpreter.getInstance().execute(expression);
+					long after = System.currentTimeMillis();
+					
+					String answer = "= " + result + "\nExecuted in " + (double)(after-before)/1000 + " secs.\n";
+					return new DAPMessageList(request, new JSONObject("result", answer, "variablesReference", 0));
+				}
+				catch (Exception e)
+				{
+					Log.error(e);
+					DAPMessageList messages = new DAPMessageList(request, e);
+					messages.add(stdout("Execution terminated."));
+					return messages;
+				}
+				finally
+				{
+					if (dbg != null)
+					{
+						dbg.interrupt();	// Stop the debugger reader.
+					}
+					
+					manager.setDebugReader(null);
+				}
+			}
 		}
-		
-		return null;
 	}
 	
 	public static void setCancelled()

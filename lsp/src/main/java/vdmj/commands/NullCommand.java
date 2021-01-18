@@ -29,7 +29,7 @@ import dap.DAPRequest;
 public class NullCommand extends Command
 {
 	@Override
-	public DAPMessageList run(DAPRequest request)
+	public DAPMessageList run(DAPRequest request, boolean wait)
 	{
 		return new DAPMessageList(request, false, "Enter a command, or try 'help'", null);
 	}

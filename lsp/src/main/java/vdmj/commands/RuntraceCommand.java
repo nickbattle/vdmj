@@ -55,7 +55,7 @@ public class RuntraceCommand extends Command
 	}
 	
 	@Override
-	public DAPMessageList run(DAPRequest request)
+	public DAPMessageList run(DAPRequest request, boolean wait)
 	{
 		DAPDebugReader dbg = null;
 		

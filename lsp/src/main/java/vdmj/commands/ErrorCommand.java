@@ -36,7 +36,7 @@ public class ErrorCommand extends Command
 	}
 
 	@Override
-	public DAPMessageList run(DAPRequest request)
+	public DAPMessageList run(DAPRequest request, boolean wait)
 	{
 		return new DAPMessageList(request, false, message, null);
 	}

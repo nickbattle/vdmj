@@ -52,7 +52,7 @@ public class DefaultCommand extends Command
 	}
 	
 	@Override
-	public DAPMessageList run(DAPRequest request)
+	public DAPMessageList run(DAPRequest request, boolean wait)
 	{
 		try
 		{
