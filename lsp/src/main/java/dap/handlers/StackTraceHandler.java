@@ -30,6 +30,8 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONArray;
 import json.JSONObject;
+import vdmj.DAPDebugReader;
+import workspace.DAPWorkspaceManager;
 
 public class StackTraceHandler extends DAPHandler
 {
@@ -41,9 +43,19 @@ public class StackTraceHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		// When not in a debug session, we send back and empty list
-		// Compare with DAPDebugExecutor
-		return new DAPMessageList(request, true, "",
-			new JSONObject("stackFrames", new JSONArray(), "totalFrames", 0));
+		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPDebugReader debugReader = manager.getDebugReader();
+		
+		if (debugReader != null && debugReader.isListening())
+		{
+			debugReader.handle(request);
+			return null;
+		}
+		else
+		{
+			// When not in a debug session, we send back and empty list
+			return new DAPMessageList(request, true, "",
+				new JSONObject("stackFrames", new JSONArray(), "totalFrames", 0));
+		}
 	}
 }

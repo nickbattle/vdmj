@@ -30,6 +30,8 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServer;
 import json.JSONObject;
+import vdmj.DAPDebugReader;
+import vdmj.commands.PrintCommand;
 import workspace.DAPWorkspaceManager;
 
 public class TerminateHandler extends DAPHandler
@@ -42,10 +44,30 @@ public class TerminateHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		JSONObject arguments = request.get("arguments");
-		Boolean restart = arguments.get("restart");
-		DAPMessageList result = DAPWorkspaceManager.getInstance().terminate(request, restart);
-		DAPServer.getInstance().setRunning(false);
-		return result;
+		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPDebugReader debugReader = manager.getDebugReader();
+		
+		if (debugReader != null)
+		{
+			if (debugReader.isListening())
+			{
+				debugReader.handle(request);
+			}
+			else	// Async cancel from user
+			{
+				PrintCommand.setCancelled();
+				return new DAPMessageList(request);		// Say success
+			}
+
+			return null;
+		}
+		else
+		{
+			JSONObject arguments = request.get("arguments");
+			Boolean restart = arguments.get("restart");
+			DAPMessageList result = DAPWorkspaceManager.getInstance().terminate(request, restart);
+			DAPServer.getInstance().setRunning(false);
+			return result;
+		}
 	}
 }

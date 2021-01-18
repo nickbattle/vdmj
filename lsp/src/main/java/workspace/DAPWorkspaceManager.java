@@ -62,6 +62,7 @@ public class DAPWorkspaceManager
 	private Interpreter interpreter;
 	private String launchCommand;
 	private String defaultName;
+	private DAPDebugReader debugReader;
 	
 	protected DAPWorkspaceManager()
 	{
@@ -417,7 +418,6 @@ public class DAPWorkspaceManager
 	 */
 	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
-		PrintCommand.setCancelled();
 		stdout("\nSession disconnected.\n");
 		clearInterpreter();
 		DAPMessageList result = new DAPMessageList(request);
@@ -426,12 +426,8 @@ public class DAPWorkspaceManager
 
 	public DAPMessageList terminate(DAPRequest request, Boolean restart)
 	{
-		if (!PrintCommand.setCancelled())	// Terminate if not executing anything
-		{
-			stdout("\nSession terminated.\n");
-			clearInterpreter();
-		}
-		
+		stdout("\nSession terminated.\n");
+		clearInterpreter();
 		DAPMessageList result = new DAPMessageList(request);
 		return result;
 	}
@@ -472,5 +468,15 @@ public class DAPWorkspaceManager
 		TCPlugin tc = registry.getPlugin("TC");
 		
 		return !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
+	}
+
+	public void setDebugReader(DAPDebugReader debugReader)
+	{
+		this.debugReader = debugReader;
+	}
+	
+	public DAPDebugReader getDebugReader()
+	{
+		return debugReader;
 	}
 }

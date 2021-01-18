@@ -36,6 +36,7 @@ import dap.DAPServer;
 import json.JSONObject;
 import lsp.CancellableThread;
 import vdmj.DAPDebugReader;
+import workspace.DAPWorkspaceManager;
 import workspace.Log;
 
 public class PrintCommand extends Command
@@ -77,10 +78,12 @@ public class PrintCommand extends Command
 		{
 			DAPDebugReader dbg = null;
 			DAPServer server = DAPServer.getInstance();
+			DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
 			
 			try
 			{
 				dbg = new DAPDebugReader();
+				manager.setDebugReader(dbg);
 				dbg.start();
 				
 				long before = System.currentTimeMillis();
@@ -112,6 +115,7 @@ public class PrintCommand extends Command
 					dbg.interrupt();	// Stop the debugger reader.
 				}
 				
+				manager.setDebugReader(null);
 				executor = null;
 			}
 		}
@@ -140,24 +144,15 @@ public class PrintCommand extends Command
 		return null;
 	}
 	
-	public static boolean setCancelled()
+	public static void setCancelled()
 	{
-		if (executor == null)
+		if (executor != null)
 		{
-			return false;
+			executor.setCancelled();
 		}
 		else
 		{
-			try
-			{
-				executor.setCancelled();
-				executor.join();
-				return true;
-			}
-			catch (InterruptedException e)
-			{
-				return true;
-			}
+			Log.error("Can't interrupt evaluation: no executor");
 		}
 	}
 }

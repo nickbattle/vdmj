@@ -25,15 +25,14 @@ package dap;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketException;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
 
+import dap.handlers.DebuggingHandler;
 import dap.handlers.DisconnectHandler;
 import dap.handlers.EvaluateHandler;
-import dap.handlers.IgnoreHandler;
 import dap.handlers.InitializeHandler;
 import dap.handlers.LaunchHandler;
 import dap.handlers.SetBreakpointsHandler;
@@ -50,7 +49,6 @@ public class DAPServer extends JSONServer
 	private static DAPServer INSTANCE = null;
 	
 	private final DAPDispatcher dispatcher;
-	private final Socket socket;
 	
 	private boolean running = false;
 	
@@ -60,7 +58,6 @@ public class DAPServer extends JSONServer
 		
 		INSTANCE = this;
 		this.dispatcher = getDispatcher();
-		this.socket = socket;
 		
 		DAPWorkspaceManager.getInstance();		// Just set up
 	}
@@ -84,19 +81,12 @@ public class DAPServer extends JSONServer
 		dispatcher.register(new DisconnectHandler(), "disconnect");
 		dispatcher.register(new TerminateHandler(), "terminate");
 		
-		// These commands should only be sent to the debug handler, but sometimes they
-		// arrive late when we are stopping an execution. So we silently ignore them.
-		dispatcher.register(new IgnoreHandler(),  "scopes");
+		dispatcher.register(new DebuggingHandler(),
+			"continue", "stepIn", "stepOut", "next", "scopes", "variables");
 
 		return dispatcher;
 	}
 
-	@Override
-	protected void setTimeout(int timeout) throws SocketException
-	{
-		socket.setSoTimeout(timeout);
-	}
-	
 	public boolean isRunning()
 	{
 		return running;

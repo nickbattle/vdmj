@@ -26,7 +26,6 @@ package lsp;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,12 +109,6 @@ public class LSPServer extends JSONServer
 		return dispatcher;
 	}
 	
-	@Override
-	protected void setTimeout(int timeout) throws SocketException
-	{
-		// Ignored for stdio comms?
-	}
-
 	public void run() throws IOException
 	{
 		boolean running = true;

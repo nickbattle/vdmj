@@ -29,6 +29,7 @@ import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
+import vdmj.DAPDebugReader;
 import workspace.DAPWorkspaceManager;
 
 public class EvaluateHandler extends DAPHandler
@@ -41,9 +42,20 @@ public class EvaluateHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		JSONObject arguments = request.get("arguments");
-		String expression = arguments.get("expression");
-		String context = arguments.get("context");
-		return DAPWorkspaceManager.getInstance().evaluate(request, expression, context);
+		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPDebugReader debugReader = manager.getDebugReader();
+		
+		if (debugReader != null && debugReader.isListening())
+		{
+			debugReader.handle(request);
+			return null;
+		}
+		else
+		{
+			JSONObject arguments = request.get("arguments");
+			String expression = arguments.get("expression");
+			String context = arguments.get("context");
+			return manager.evaluate(request, expression, context);
+		}
 	}
 }
