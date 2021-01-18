@@ -417,6 +417,7 @@ public class DAPWorkspaceManager
 	 */
 	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
+		PrintCommand.setCancelled();
 		stdout("\nSession disconnected.\n");
 		clearInterpreter();
 		DAPMessageList result = new DAPMessageList(request);
@@ -425,8 +426,12 @@ public class DAPWorkspaceManager
 
 	public DAPMessageList terminate(DAPRequest request, Boolean restart)
 	{
-		stdout("\nSession terminated.\n");
-		clearInterpreter();
+		if (!PrintCommand.setCancelled())	// Terminate if not executing anything
+		{
+			stdout("\nSession terminated.\n");
+			clearInterpreter();
+		}
+		
 		DAPMessageList result = new DAPMessageList(request);
 		return result;
 	}

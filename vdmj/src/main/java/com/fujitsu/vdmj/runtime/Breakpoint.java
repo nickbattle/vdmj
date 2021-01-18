@@ -66,6 +66,9 @@ public class Breakpoint implements Serializable
 
 	/** The number of times this breakpoint has been reached. */
 	public long hits = 0;
+	
+	/** Set true by an external cancel action */
+	private static boolean execCancelled = false;
 
 	public Breakpoint(LexLocation location)
 	{
@@ -159,6 +162,11 @@ public class Breakpoint implements Serializable
 		hits = 0;
 	}
 
+	public static synchronized void setExecCancelled()
+	{
+		execCancelled = true;
+	}
+	
 	/**
 	 * Check whether to stop. The implementation in Breakpoint is used to check
 	 * for the "step" and "next" commands, using the stepline, nextctxt and
@@ -175,6 +183,12 @@ public class Breakpoint implements Serializable
 		location.hit();
 		hits++;
 
+		if (execCancelled)
+		{
+			execCancelled = false;
+			throw new ContextException(9999, "Execution cancelled", location, ctxt);
+		}
+		
 		ThreadState state = ctxt.threadState;
 
 		if (Settings.dialect != Dialect.VDM_SL)
