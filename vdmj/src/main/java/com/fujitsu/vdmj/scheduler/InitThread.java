@@ -112,12 +112,6 @@ public class InitThread extends SchedulableThread
 		{
 			setException(e);
 			suspendOthers();
-			
-			if (e.isStackOverflow())
-			{
-				e.ctxt.printStackFrames(Console.out);
-			}
-			
 			link.stopped(e.ctxt, e.location, e);
 		}
 		catch (Exception e)

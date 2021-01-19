@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.MainThread;
@@ -77,10 +78,24 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 			LexLocation loc = link.getLocation(debuggedThread);
 			
 			MainThread mainThread = SchedulableThread.getMainThread();
+			Exception mainEx = mainThread != null ? mainThread.getException() : null;
 			
-			if (mainThread != null && mainThread.getException() != null)
+			if (mainEx instanceof ContextException)
 			{
-				Console.out.println(mainThread.getException().getMessage());
+				ContextException cex = (ContextException)mainEx;
+				
+				if (cex.isStackOverflow())
+				{
+					cex.ctxt.printStackFrames(Console.out);
+				}
+				else
+				{
+					Console.out.println(mainEx.getMessage());
+				}
+			}
+			else if (mainEx != null)
+			{
+				Console.out.println("Exception: " + mainEx.getMessage());
 			}
 			else if (bp != null && bp.number != 0)	// Zero is used for next/step breakpoints.
 			{
