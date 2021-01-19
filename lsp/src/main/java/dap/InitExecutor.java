@@ -27,7 +27,6 @@ import java.io.IOException;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.runtime.Interpreter;
 
 public class InitExecutor extends AsyncExecutor
 {
@@ -47,7 +46,7 @@ public class InitExecutor extends AsyncExecutor
 				"* VDMJ " + Settings.dialect + " Interpreter\n" +
 				(manager.getNoDebug() ? "" : "* DEBUG enabled\n") +
 				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
-				" is " + Interpreter.getInstance().getDefaultName() + "\n");
+				" is " + manager.getInterpreter().getDefaultName() + "\n");
 		
 		server.stdout("Initialized in ... ");
 	}
@@ -55,7 +54,7 @@ public class InitExecutor extends AsyncExecutor
 	@Override
 	protected void exec() throws Exception
 	{
-		Interpreter.getInstance().init();
+		manager.getInterpreter().init();
 	}
 
 	@Override
@@ -70,7 +69,7 @@ public class InitExecutor extends AsyncExecutor
 				launchCommand = launchCommand.substring(launchCommand.indexOf(' ') + 1);
 			}
 			
-			String launchResult = Interpreter.getInstance().execute(launchCommand).toString();
+			String launchResult = manager.getInterpreter().execute(launchCommand).toString();
 			server.stdout(launchCommand + " = " + launchResult + "\n");
 			server.stdout("Evaluation complete.\n");
 		}

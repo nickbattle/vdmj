@@ -25,8 +25,6 @@ package dap;
 
 import java.io.IOException;
 
-import com.fujitsu.vdmj.runtime.Interpreter;
-
 import json.JSONObject;
 
 public class ExpressionExecutor extends AsyncExecutor
@@ -50,7 +48,7 @@ public class ExpressionExecutor extends AsyncExecutor
 	@Override
 	protected void exec() throws Exception
 	{
-		answer = Interpreter.getInstance().execute(expression).toString();
+		answer = manager.getInterpreter().execute(expression).toString();
 	}
 
 	@Override
