@@ -55,8 +55,8 @@ public class TerminateHandler extends DAPHandler
 			}
 			else	// Async cancel from user
 			{
-				CancellableThread.cancel("print");
-				return new DAPMessageList(request);		// Say success
+				CancellableThread.cancelAll();
+				return new DAPMessageList(request);
 			}
 
 			return null;

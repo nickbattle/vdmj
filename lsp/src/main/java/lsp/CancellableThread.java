@@ -69,6 +69,15 @@ abstract public class CancellableThread extends Thread
 		}
 	}
 	
+	public static void cancelAll()
+	{
+		for (Object id: active.keySet())
+		{
+			Log.printf("Cancelling %s", id.toString());
+			cancel(id);
+		}
+	}
+	
 	public void setCancelled()
 	{
 		cancelled = true;
