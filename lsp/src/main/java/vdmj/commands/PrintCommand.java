@@ -26,7 +26,6 @@ package vdmj.commands;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.ExpressionExecutor;
-import dap.AsyncExecutor;
 
 public class PrintCommand extends Command
 {
@@ -34,7 +33,6 @@ public class PrintCommand extends Command
 	public static final String[] HELP = { "print", "print <exp> - evaluate an expression" };
 	
 	private String expression;
-	private static AsyncExecutor executor;
 
 	public PrintCommand(String line)
 	{
@@ -53,13 +51,15 @@ public class PrintCommand extends Command
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		if (executor != null)
+		String current = ExpressionExecutor.currentlyRunning();
+		
+		if (current != null)
 		{
-			return new DAPMessageList(request, false, "Still executing " + expression, null);
+			return new DAPMessageList(request, false, "Still executing " + current, null);
 		}
 		else
 		{
-			executor = new ExpressionExecutor("print", request, expression);
+			ExpressionExecutor executor = new ExpressionExecutor("print", request, expression);
 			executor.start();
 			return null;
 		}

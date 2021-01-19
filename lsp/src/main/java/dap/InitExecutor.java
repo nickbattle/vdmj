@@ -29,26 +29,27 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
-import json.JSONObject;
-
 public class InitExecutor extends AsyncExecutor
 {
-	public InitExecutor(String id, DAPRequest request)
+	private String launchCommand;
+
+	public InitExecutor(String id, DAPRequest request, String launchCommand)
 	{
 		super(id, request);
+		this.launchCommand = launchCommand;
 	}
 
 	@Override
 	protected void head() throws IOException
 	{
-		server.writeMessage(new DAPResponse("output", new JSONObject("output",
+		server.stdout(
 				"*\n" +
 				"* VDMJ " + Settings.dialect + " Interpreter\n" +
 				(manager.getNoDebug() ? "" : "* DEBUG enabled\n") +
 				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
-				" is " + Interpreter.getInstance().getDefaultName() + "\n")));
+				" is " + Interpreter.getInstance().getDefaultName() + "\n");
 		
-		server.writeMessage(new DAPResponse("output", new JSONObject("output", "Initialized in ... ")));
+		server.stdout("Initialized in ... ");
 	}
 
 	@Override
@@ -58,15 +59,39 @@ public class InitExecutor extends AsyncExecutor
 	}
 
 	@Override
-	protected void tail(double time) throws IOException
+	protected void tail(double time) throws Exception
 	{
-		server.writeMessage(new DAPResponse("output", new JSONObject("output", time + " secs.\n")));
+		server.stdout(time + " secs.\n");
+
+		if (launchCommand != null)
+		{
+			if (launchCommand.startsWith("p ") || launchCommand.startsWith("print "))
+			{
+				launchCommand = launchCommand.substring(launchCommand.indexOf(' ') + 1);
+			}
+			
+			String launchResult = Interpreter.getInstance().execute(launchCommand).toString();
+			server.stdout(launchCommand + " = " + launchResult + "\n");
+			server.stdout("Evaluation complete.\n");
+		}
 	}
 
 	@Override
 	protected void error(Exception e) throws IOException
 	{
-		server.writeMessage(new DAPResponse(request, false, e.getMessage(), null));
-		server.writeMessage(new DAPResponse("output", new JSONObject("output", "Init terminated.")));
+		server.stderr(e.getMessage());
+		server.stdout("Init terminated.");
+		manager.clearInterpreter();
+		server.setRunning(false);	// disconnect afterwards
+	}
+
+	@Override
+	protected void clean()
+	{
+		if (launchCommand != null)
+		{
+			manager.clearInterpreter();
+			server.setRunning(false);	// disconnect afterwards
+		}
 	}
 }

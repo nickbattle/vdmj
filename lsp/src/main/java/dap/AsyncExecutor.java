@@ -26,6 +26,7 @@ package dap;
 import java.io.IOException;
 
 import com.fujitsu.vdmj.runtime.Breakpoint;
+
 import lsp.CancellableThread;
 import vdmj.DAPDebugReader;
 import workspace.DAPWorkspaceManager;
@@ -76,6 +77,8 @@ public abstract class AsyncExecutor extends CancellableThread
 		}
 		finally
 		{
+			clean();
+			
 			if (dbg != null)
 			{
 				dbg.interrupt();	// Stop the debugger reader.
@@ -89,9 +92,11 @@ public abstract class AsyncExecutor extends CancellableThread
 
 	protected abstract void exec() throws Exception;
 
-	protected abstract void tail(double time) throws IOException;
+	protected abstract void tail(double time) throws Exception;
 
 	protected abstract void error(Exception e) throws IOException;
+
+	protected abstract void clean();
 
 	@Override
 	public void setCancelled()

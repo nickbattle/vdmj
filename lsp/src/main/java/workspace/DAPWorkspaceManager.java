@@ -100,49 +100,6 @@ public class DAPWorkspaceManager
 		return responses;
 	}
 
-	public DAPMessageList configurationDone(DAPRequest request) throws IOException
-	{
-		try
-		{
-			InitExecutor exec = new InitExecutor("init", request);
-			exec.start();
-			
-			if (launchCommand != null)
-			{
-				stdout("\n" + launchCommand + "\n");
-				DAPMessageList eval = evaluate(request, launchCommand, "repl");
-				
-				JSONObject body = eval.get(0).get("body");
-				Boolean success = eval.get(0).get("success");
-				
-				if (success && body != null)
-				{
-					stdout(body.get("result"));
-				}
-				else
-				{
-					stderr(eval.get(0).get("message"));
-				}
-				
-				stdout("\nEvaluation complete.\n");
-				clearInterpreter();
-				DAPServer.getInstance().setRunning(false);	// disconnect afterwards
-				return null;
-			}
-	
-			return new DAPMessageList(request);
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new DAPMessageList(request, e);
-		}
-		finally
-		{
-			launchCommand = null;
-		}
-	}
-
 	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName, String command) throws Exception
 	{
 		if (!canExecute())
@@ -166,6 +123,25 @@ public class DAPWorkspaceManager
 		{
 			Log.error(e);
 			return new DAPMessageList(request, e);
+		}
+	}
+
+	public DAPMessageList configurationDone(DAPRequest request) throws IOException
+	{
+		try
+		{
+			InitExecutor exec = new InitExecutor("init", request, launchCommand);
+			exec.start();
+			return new DAPMessageList(request);
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new DAPMessageList(request, e);
+		}
+		finally
+		{
+			launchCommand = null;
 		}
 	}
 
@@ -396,7 +372,7 @@ public class DAPWorkspaceManager
 		return result;
 	}
 	
-	private void clearInterpreter()
+	public void clearInterpreter()
 	{
 		if (interpreter != null)
 		{

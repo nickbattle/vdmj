@@ -33,6 +33,7 @@ public class ExpressionExecutor extends AsyncExecutor
 {
 	private final String expression;
 	private String answer;
+	private static String running = null;
 
 	public ExpressionExecutor(String id, DAPRequest request, String expression)
 	{
@@ -43,7 +44,7 @@ public class ExpressionExecutor extends AsyncExecutor
 	@Override
 	protected void head()
 	{
-		// Nothing
+		running = expression;
 	}
 
 	@Override
@@ -64,6 +65,17 @@ public class ExpressionExecutor extends AsyncExecutor
 	protected void error(Exception e) throws IOException
 	{
 		server.writeMessage(new DAPResponse(request, false, e.getMessage(), null));
-		server.writeMessage(new DAPResponse("output", new JSONObject("output", "Execution terminated.")));
+		server.stdout("Execution terminated.");
+	}
+
+	@Override
+	protected void clean()
+	{
+		running = null;
+	}
+	
+	public static String currentlyRunning()
+	{
+		return running;
 	}
 }

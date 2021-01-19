@@ -29,7 +29,6 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.InitExecutor;
-import json.JSONObject;
 
 public class InitCommand extends Command
 {
@@ -49,25 +48,25 @@ public class InitCommand extends Command
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		InitExecutor exec = new InitExecutor("init", request)
+		InitExecutor exec = new InitExecutor("init", request, null)
 		{
 			@Override
 			protected void head() throws IOException
 			{
+				// No header
 			}
 			
 			@Override
 			protected void tail(double time) throws IOException
 			{
-				server.writeMessage(new DAPResponse("output",
-						new JSONObject("output", "Global context initialized in " + time + " secs.\n")));
+				server.stdout("Global context initialized in " + time + " secs.\n");
 			}
 
 			@Override
 			protected void error(Exception e) throws IOException
 			{
 				server.writeMessage(new DAPResponse(request, false, e.getMessage(), null));
-				server.writeMessage(new DAPResponse("output", new JSONObject("output", "Init terminated.")));
+				server.stdout("Init terminated.");
 			}
 		};
 		
