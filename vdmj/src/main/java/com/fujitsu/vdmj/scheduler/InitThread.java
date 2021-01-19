@@ -172,7 +172,8 @@ public class InitThread extends SchedulableThread
         		{
         			problems.addAll(e);
 
-        			if (e.size() == 1 && e.iterator().next().isStackOverflow())
+        			if (e.size() == 1 &&
+        				(e.iterator().next().isStackOverflow() || e.iterator().next().isUserCancel()))
         			{
         				retries = 0;
         				break;
@@ -268,7 +269,7 @@ public class InitThread extends SchedulableThread
     			}
     			catch (ContextException e)
     			{
-    				if (e.isStackOverflow())
+    				if (e.isStackOverflow() || e.isUserCancel())
     				{
     					trouble.clear();
     					trouble.add(e);
