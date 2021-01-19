@@ -81,16 +81,16 @@ public class InitExecutor extends AsyncExecutor
 		server.stderr(e.getMessage());
 		server.stdout("Init terminated.");
 		manager.clearInterpreter();
-		server.setRunning(false);	// disconnect afterwards
+		server.writeMessage(new DAPEvent("terminated", null));
 	}
 
 	@Override
-	protected void clean()
+	protected void clean() throws IOException
 	{
 		if (launchCommand != null)
 		{
 			manager.clearInterpreter();
-			server.setRunning(false);	// disconnect afterwards
+			server.writeMessage(new DAPEvent("terminated", null));
 		}
 	}
 }

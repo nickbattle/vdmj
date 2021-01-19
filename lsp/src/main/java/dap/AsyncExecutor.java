@@ -77,7 +77,14 @@ public abstract class AsyncExecutor extends CancellableThread
 		}
 		finally
 		{
-			clean();
+			try
+			{
+				clean();
+			}
+			catch (IOException e)
+			{
+				// ignore
+			}
 			
 			if (dbg != null)
 			{
@@ -96,7 +103,7 @@ public abstract class AsyncExecutor extends CancellableThread
 
 	protected abstract void error(Exception e) throws IOException;
 
-	protected abstract void clean();
+	protected abstract void clean() throws IOException;
 
 	@Override
 	public void setCancelled()
