@@ -186,7 +186,7 @@ public class Breakpoint implements Serializable
 		if (execCancelled)
 		{
 			execCancelled = false;
-			throw new ContextException(9999, "Execution cancelled", location, ctxt);
+			throw new ContextException(4175, "Execution cancelled", location, ctxt);
 		}
 		
 		ThreadState state = ctxt.threadState;
