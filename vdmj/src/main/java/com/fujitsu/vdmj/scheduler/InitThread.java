@@ -89,7 +89,7 @@ public class InitThread extends SchedulableThread
 	@Override
 	public synchronized void reschedule(Context ctxt, LexLocation location)
 	{
-		// ignore during initialize
+		notify();	// Wakes up the sleep in start method
 	}
 
 	@Override
