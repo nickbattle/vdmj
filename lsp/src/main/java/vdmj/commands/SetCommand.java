@@ -26,6 +26,7 @@ package vdmj.commands;
 import com.fujitsu.vdmj.Settings;
 import dap.DAPMessageList;
 import dap.DAPRequest;
+import json.JSONObject;
 
 public class SetCommand extends Command
 {
@@ -76,42 +77,50 @@ public class SetCommand extends Command
 				
     		case "pre":
     			Settings.prechecks = setting;
+				isEnabled("Preconditions", Settings.prechecks);
     			break;
     			
     		case "post":
     			Settings.postchecks = setting;
+				isEnabled("Postconditions", Settings.postchecks);
     			break;
 
     		case "inv":
     			Settings.invchecks = setting;
+				isEnabled("Invariants", Settings.invchecks);
     			break;
     			
     		case "dtc":
     			// NB. Do both
     			Settings.invchecks = setting;
     			Settings.dynamictypechecks = setting;
+				isEnabled("Invariants", Settings.invchecks);
+				isEnabled("Dynamic type checks", Settings.dynamictypechecks);
     			break;
     			
     		case "exceptions":
     			Settings.exceptions = setting;
+				isEnabled("Pre/post/inv exceptions", Settings.exceptions);
     			break;
     			
     		case "measures":
-    			if (setting != Settings.measureChecks)
+    			Settings.measureChecks = setting;
+				isEnabled("Measure checks", Settings.measureChecks);
+
+				if (setting != Settings.measureChecks)
     			{
 	    			sb.append("Specification must now be reloaded to take effect");
     			}
-
-    			Settings.measureChecks = setting;
     			break;
     			
     		case "annotations":
-    			if (setting != Settings.annotations)
+    			Settings.annotations = setting;
+				isEnabled("Annotations", Settings.annotations);
+
+				if (setting != Settings.annotations)
     			{
 	    			sb.append("Specification must now be reloaded to take effect");
     			}
-
-    			Settings.annotations = setting;
     			break;
     			
     		default:
@@ -119,7 +128,7 @@ public class SetCommand extends Command
     			break;
 		}
 		
-		return new DAPMessageList(request, false, sb.toString(), null);
+		return new DAPMessageList(request, new JSONObject("result", sb.toString()));
 	}
 	
 	private void isEnabled(String name, boolean flag)

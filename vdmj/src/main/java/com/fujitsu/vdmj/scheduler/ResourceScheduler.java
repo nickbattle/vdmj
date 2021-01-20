@@ -27,8 +27,6 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.fujitsu.vdmj.messages.Console;
-
 public class ResourceScheduler implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -120,8 +118,8 @@ public class ResourceScheduler implements Serializable
     		{
     			if (resource.hasActive())
     			{
-   					Console.err.println("DEADLOCK detected");
 					SchedulableThread.signalAll(Signal.DEADLOCKED);
+					main.setException(new Exception("DEADLOCK detected"));
 
 					while (main.isAlive())
 					{

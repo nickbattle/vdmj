@@ -23,21 +23,16 @@
 
 package vdmj.commands;
 
-import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.values.Value;
-
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import json.JSONObject;
-import vdmj.DAPDebugReader;
-import workspace.Log;
+import dap.ExpressionExecutor;
 
 public class PrintCommand extends Command
 {
 	public static final String USAGE = "Usage: print <expression>";
 	public static final String[] HELP = { "print", "print <exp> - evaluate an expression" };
 	
-	private String expression;
+	public final String expression;
 
 	public PrintCommand(String line)
 	{
@@ -56,33 +51,17 @@ public class PrintCommand extends Command
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		DAPDebugReader dbg = null;
+		String current = ExpressionExecutor.currentlyRunning();
 		
-		try
+		if (current != null)
 		{
-			dbg = new DAPDebugReader();
-			dbg.start();
-			
-			long before = System.currentTimeMillis();
-			Value result = Interpreter.getInstance().execute(expression);
-			long after = System.currentTimeMillis();
-			
-			String answer = "= " + result + "\nExecuted in " + (double)(after-before)/1000 + " secs.\n";
-			return new DAPMessageList(request, new JSONObject("result", answer, "variablesReference", 0));
+			return new DAPMessageList(request, false, "Still executing " + current, null);
 		}
-		catch (Exception e)
+		else
 		{
-			Log.error(e);
-			DAPMessageList messages = new DAPMessageList(request, e);
-			messages.add(stdout("Execution terminated."));
-			return messages;
-		}
-		finally
-		{
-			if (dbg != null)
-			{
-				dbg.interrupt();	// Stop the debugger reader.
-			}
+			ExpressionExecutor executor = new ExpressionExecutor("print", request, expression);
+			executor.start();
+			return null;
 		}
 	}
 }

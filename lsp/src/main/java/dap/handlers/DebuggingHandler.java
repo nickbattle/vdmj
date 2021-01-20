@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2021 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -28,15 +28,13 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import json.JSONObject;
-import lsp.CancellableThread;
-import lsp.Utils;
 import vdmj.DAPDebugReader;
 import workspace.DAPWorkspaceManager;
+import workspace.Log;
 
-public class DisconnectHandler extends DAPHandler
+public class DebuggingHandler extends DAPHandler
 {
-	public DisconnectHandler()
+	public DebuggingHandler()
 	{
 		super();
 	}
@@ -47,24 +45,15 @@ public class DisconnectHandler extends DAPHandler
 		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
 		DAPDebugReader debugReader = manager.getDebugReader();
 		
-		if (debugReader != null)
+		if (debugReader != null && debugReader.isListening())
 		{
-			if (debugReader.isListening())
-			{
-				debugReader.handle(request);
-			}
-			else
-			{
-				CancellableThread.cancel("print");	// Async cancel from user
-			}
-
+			debugReader.handle(request);
 			return null;
 		}
 		else
 		{
-			JSONObject arguments = request.get("arguments");
-			Boolean terminateDebuggee = Utils.getBoolean(arguments, "terminateDebuggee");
-			return DAPWorkspaceManager.getInstance().disconnect(request, terminateDebuggee);
+			Log.error("Ignoring debugging request %s", request.toString());
+			return new DAPMessageList(request, false, null, null);
 		}
 	}
 }

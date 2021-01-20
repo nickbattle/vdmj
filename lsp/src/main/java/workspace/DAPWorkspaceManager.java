@@ -28,10 +28,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import dap.DAPEvent;
@@ -39,6 +37,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.DAPServer;
+import dap.InitExecutor;
 import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
@@ -62,6 +61,7 @@ public class DAPWorkspaceManager
 	private Interpreter interpreter;
 	private String launchCommand;
 	private String defaultName;
+	private DAPDebugReader debugReader;
 	
 	protected DAPWorkspaceManager()
 	{
@@ -101,70 +101,6 @@ public class DAPWorkspaceManager
 		return responses;
 	}
 
-	public DAPMessageList configurationDone(DAPRequest request) throws IOException
-	{
-		try
-		{
-			DAPDebugReader dbg = null;
-			
-			try
-			{
-				dbg = new DAPDebugReader();		// Allow debugging of init sequence
-				dbg.start();
-				
-				heading();
-				stdout("Initialized in ... ");
-	
-				long before = System.currentTimeMillis();
-				getInterpreter().init();
-				if (defaultName != null) getInterpreter().setDefaultName(defaultName);
-				long after = System.currentTimeMillis();
-	
-				stdout((double)(after-before)/1000 + " secs.\n");
-			}
-			finally
-			{
-				if (dbg != null)
-				{
-					dbg.interrupt();
-				}
-			}
-	
-			if (launchCommand != null)
-			{
-				stdout("\n" + launchCommand + "\n");
-				DAPMessageList eval = evaluate(request, launchCommand, "repl");
-				
-				JSONObject body = eval.get(0).get("body");
-				Boolean success = eval.get(0).get("success");
-				
-				if (success && body != null)
-				{
-					stdout(body.get("result"));
-				}
-				else
-				{
-					stderr(eval.get(0).get("message"));
-				}
-	
-				stdout("\nEvaluation complete.\n");
-				clearInterpreter();
-				DAPServer.getInstance().setRunning(false);	// disconnect afterwards
-			}
-	
-			return new DAPMessageList(request);
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new DAPMessageList(request, e);
-		}
-		finally
-		{
-			launchCommand = null;
-		}
-	}
-
 	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName, String command) throws Exception
 	{
 		if (!canExecute())
@@ -180,8 +116,8 @@ public class DAPWorkspaceManager
 		{
 			// These values are used in configurationDone
 			this.noDebug = noDebug;
-			this.defaultName = defaultName;
 			this.launchCommand = command;
+			this.defaultName = defaultName;
 			
 			return new DAPMessageList(request);
 		}
@@ -189,6 +125,25 @@ public class DAPWorkspaceManager
 		{
 			Log.error(e);
 			return new DAPMessageList(request, e);
+		}
+	}
+
+	public DAPMessageList configurationDone(DAPRequest request) throws IOException
+	{
+		try
+		{
+			InitExecutor exec = new InitExecutor("init", request, launchCommand, defaultName);
+			exec.start();
+			return new DAPMessageList(request);
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new DAPMessageList(request, e);
+		}
+		finally
+		{
+			launchCommand = null;
 		}
 	}
 
@@ -259,18 +214,6 @@ public class DAPWorkspaceManager
 		return ast.isDirty();
 	}
 
-	/**
-	 * Methods to write direct to stdout/stderr, while a DAP command is being executed.
-	 */
-	private void heading() throws Exception
-	{
-		stdout("*\n" +
-				"* VDMJ " + Settings.dialect + " Interpreter\n" +
-				(noDebug ? "" : "* DEBUG enabled\n") +
-				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
-				" is " + getInterpreter().getDefaultName() + "\n");
-	}
-	
 	private void stdout(String message)
 	{
 		DAPServer.getInstance().stdout(message);
@@ -431,7 +374,7 @@ public class DAPWorkspaceManager
 		return result;
 	}
 	
-	private void clearInterpreter()
+	public void clearInterpreter()
 	{
 		if (interpreter != null)
 		{
@@ -467,5 +410,20 @@ public class DAPWorkspaceManager
 		TCPlugin tc = registry.getPlugin("TC");
 		
 		return !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
+	}
+
+	public void setDebugReader(DAPDebugReader debugReader)
+	{
+		this.debugReader = debugReader;
+	}
+	
+	public DAPDebugReader getDebugReader()
+	{
+		return debugReader;
+	}
+	
+	public boolean getNoDebug()
+	{
+		return noDebug;
 	}
 }

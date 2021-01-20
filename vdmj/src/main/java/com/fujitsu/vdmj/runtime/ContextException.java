@@ -55,4 +55,9 @@ public class ContextException extends RuntimeException
 	{
 		return number == 4174;
 	}
+	
+	public boolean isUserCancel()
+	{
+		return number == 4175;
+	}
 }

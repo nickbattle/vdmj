@@ -31,13 +31,14 @@ import workspace.Log;
 abstract public class CancellableThread extends Thread
 {
 	private static final Map<Object, CancellableThread> active = new HashMap<Object, CancellableThread>();
-	private final Object myId;
+	protected final Object myId;
 	protected boolean cancelled = false;
 	
 	public CancellableThread(Object myId)
 	{
 		this.myId = myId;
 		active.put(myId, this);
+		setName("Cancellable-" + myId.toString());
 	}
 	
 	@Override
@@ -45,13 +46,13 @@ abstract public class CancellableThread extends Thread
 	{
 		try
 		{
-			Log.printf("Starting CancellableThread %s", getName());
+			Log.printf("Starting %s", getName());
 			body();
 		}
 		finally
 		{
 			active.remove(myId);
-			Log.printf("Completed CancellableThread %s", getName());
+			Log.printf("Completed %s", getName());
 		}
 	}
 	
@@ -61,11 +62,20 @@ abstract public class CancellableThread extends Thread
 		
 		if (thread == null)
 		{
-			Log.error("Cannot cancel thread %s", id.toString());
+			Log.error("Cannot cancel thread id %s", id.toString());
 		}
 		else
 		{
 			thread.setCancelled();
+		}
+	}
+	
+	public static void cancelAll()
+	{
+		for (Object id: active.keySet())
+		{
+			Log.printf("Cancelling %s", id.toString());
+			cancel(id);
 		}
 	}
 	

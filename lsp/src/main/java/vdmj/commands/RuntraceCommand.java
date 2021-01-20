@@ -36,8 +36,8 @@ public class RuntraceCommand extends Command
 	public static final String USAGE = "Usage: runtrace <trace> <number>";
 	public static final String[] HELP = { "runtrace", "runtrace <trace> <number> - run one test from a trace" };
 	
-	private String tracename;
-	private final long testNumber;
+	public final String tracename;
+	public final long testNumber;
 
 	public RuntraceCommand(String line)
 	{
@@ -85,7 +85,7 @@ public class RuntraceCommand extends Command
 		}
 	}
 
-	private String display(JSONObject result)
+	public String display(JSONObject result)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("Test ");

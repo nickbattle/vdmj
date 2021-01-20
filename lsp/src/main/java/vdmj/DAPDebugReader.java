@@ -25,9 +25,9 @@ package vdmj;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Exchanger;
 
 import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugLink;
@@ -52,10 +52,10 @@ import workspace.Log;
  */
 public class DAPDebugReader extends Thread implements TraceCallback
 {
-	private static final int TIMEOUT = 500;		// Before we suspect trouble, in ms
 	private final DAPServer server;
 	private final DAPDebugLink link;
 
+	private Exchanger<JSONObject> exchanger = null;
 	private SchedulableThread debuggedThread = null;
 	
 	public DAPDebugReader() throws Exception
@@ -64,6 +64,24 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		DAPDebugExecutor.init();
 		server = DAPServer.getInstance();
 		link = (DAPDebugLink)DebugLink.getInstance();
+	}
+	
+	public boolean isListening()
+	{
+		return exchanger != null;
+	}
+
+	public void handle(JSONObject request)
+	{
+		try
+		{
+			exchanger.exchange(request);	// Send to debugger thread
+			exchanger.exchange(null);		// Wait for it to be processed
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+		}
 	}
 	
 	@Override
@@ -75,15 +93,14 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		{
 			try
 			{
+				exchanger = new Exchanger<JSONObject>();
 				debuggedThread = link.getDebugThread();
 				Log.printf("----------------- DEBUG STOP in %s", debuggedThread.getName());
 				
-				if (doCommand(true))	// timeout first command
-				{
-					while (doCommand(false));
-				}
+				while (doCommand());
 				
 				Log.printf("----------------- RESUME");
+				exchanger = null;
 			}
 			catch (Exception e)
 			{
@@ -96,47 +113,19 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		link.reset();
 	}
 	
-	private boolean doCommand(boolean timed) throws Exception
+	private boolean doCommand() throws Exception
 	{
-		JSONObject dapMessage = null;
-		int retries = 2;
-		boolean timedOut = false;
-
-		while (--retries > 0)
-		{
-			try
-			{
-				dapMessage = server.readMessage(timed ? TIMEOUT : 0);
-				timedOut = false;
-				break;
-			}
-			catch (SocketTimeoutException e)
-			{
-				Log.error(e);
-				Log.error("Expecting request from client?");
-				timedOut = true;
-			}
-		}
-		
-		if (timedOut)
-		{
-			throw new Exception("Closing debug session on socket timeout");
-		}
-
-		if (dapMessage == null)	// EOF - closed socket?
-		{
-			Log.printf("End of stream detected");
-			throw new Exception("Closing debug session on socket close");
-		}
-
+		JSONObject dapMessage = exchanger.exchange(null);
 		DAPRequest dapRequest = new DAPRequest(dapMessage);
 		DAPResponse dapResponse = null;
+		boolean result = true;
 
 		switch ((String)dapRequest.get("command"))
 		{
 			case "threads":
 				server.writeMessage(doThreads(dapRequest));
-				return true;
+				result = true;
+				break;
 
 			case "setBreakpoints":
 				JSONObject arguments = dapRequest.get("arguments");
@@ -150,21 +139,24 @@ public class DAPDebugReader extends Thread implements TraceCallback
 					server.writeMessage(response);
 				}
 
-				return true;
+				result = true;
+				break;
 
 			case "terminate":
 				link.killThreads();
 				dapResponse = new DAPResponse(dapRequest, true, null, null);
 				server.writeMessage(dapResponse);
 				server.stdout("Debug session terminated");
-				return false;
+				result = false;
+				break;
 				
 			case "disconnect":
 				link.killThreads();
 				dapResponse = new DAPResponse(dapRequest, true, null, null);
 				server.writeMessage(dapResponse);
 				server.stdout("Debug session disconnected");
-				return false;
+				result = false;
+				break;
 				
 			default:
 				DebugCommand command = parse(dapRequest);
@@ -173,28 +165,36 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				if (command.getType() == null)	// Ignore - payload is DAP response
 				{
 					server.writeMessage((JSONObject) command.getPayload());
-					return true;
+					result = true;
 				}
-
-				DebugCommand response = link.sendCommand(targetThread, command);
-				dapResponse = new DAPResponse(dapRequest, true, null, response.getPayload());
-
-				switch (response.getType())
+				else
 				{
-					case RESUME:
-						link.resumeThreads();
-						server.writeMessage(dapResponse);
-						return false;
-
-					case PRINT:
-						server.writeMessage(dapResponse);
-						return true;
-
-					default:
-						server.writeMessage(dapResponse);
-						return true;
+					DebugCommand response = link.sendCommand(targetThread, command);
+					dapResponse = new DAPResponse(dapRequest, true, null, response.getPayload());
+	
+					switch (response.getType())
+					{
+						case RESUME:
+							link.resumeThreads();
+							server.writeMessage(dapResponse);
+							result = false;
+							break;
+	
+						case PRINT:
+							server.writeMessage(dapResponse);
+							result = true;
+							break;
+	
+						default:
+							server.writeMessage(dapResponse);
+							result = true;
+							break;
+					}
 				}
 		}
+		
+		exchanger.exchange(null);	// Let handle return
+		return result;
 	}
 
 	private SchedulableThread threadFor(DAPRequest request)

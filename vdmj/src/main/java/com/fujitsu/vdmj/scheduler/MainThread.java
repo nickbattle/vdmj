@@ -28,7 +28,6 @@ import java.lang.reflect.InvocationTargetException;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugReason;
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.values.CPUValue;
@@ -80,12 +79,6 @@ public class MainThread extends SchedulableThread
 		{
 			setException(e);
 			suspendOthers();
-			
-			if (e.isStackOverflow())
-			{
-				e.ctxt.printStackFrames(Console.out);
-			}
-			
 			link.stopped(e.ctxt, e.location, e);
 		}
 		catch (Exception e)

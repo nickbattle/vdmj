@@ -161,7 +161,7 @@ public class INModule extends INNode implements Serializable
 				{
 					trouble.add(e);		// Carry on...
 					
-					if (e.isStackOverflow())	// Stack overflow returns immediately
+					if (e.isStackOverflow() || e.isUserCancel())
 					{
 						trouble.clear();
 						trouble.add(e);
@@ -181,7 +181,7 @@ public class INModule extends INNode implements Serializable
 			{
 				trouble.add(e);		// Carry on...
 				
-				if (e.isStackOverflow())	// Stack overflow returns immediately
+				if (e.isStackOverflow() || e.isUserCancel())
 				{
 					trouble.clear();
 					trouble.add(e);
@@ -203,7 +203,7 @@ public class INModule extends INNode implements Serializable
 		{
 			trouble.add(e);		// Carry on...
 			
-			if (e.isStackOverflow())	// Stack overflow returns immediately
+			if (e.isStackOverflow() || e.isUserCancel())
 			{
 				trouble.clear();
 				trouble.add(e);

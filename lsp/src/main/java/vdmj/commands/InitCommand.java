@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2021 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -23,14 +23,13 @@
 
 package vdmj.commands;
 
-import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.runtime.Interpreter;
+import java.io.IOException;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
+import dap.DAPResponse;
+import dap.InitExecutor;
 import json.JSONObject;
-import vdmj.DAPDebugReader;
-import workspace.Log;
 
 public class InitCommand extends Command
 {
@@ -50,39 +49,32 @@ public class InitCommand extends Command
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		try
+		InitExecutor exec = new InitExecutor("init", request, null, null)
 		{
-			StringBuilder sb = new StringBuilder();
-			LexLocation.clearLocations();
-			sb.append("Cleared all coverage information\n");
-			DAPDebugReader dbg = null;
+			@Override
+			protected void head() throws IOException
+			{
+				// No header
+			}
+			
+			@Override
+			protected void tail(double time) throws IOException
+			{
+				String output =
+					"Global context initialized in " + time + " secs.\n" +
+					"Cleared all coverage information";
+				server.writeMessage(new DAPResponse(request, true, null, new JSONObject("result", output)));
+			}
 
-			try
+			@Override
+			protected void error(Exception e) throws IOException
 			{
-				dbg = new DAPDebugReader();
-				dbg.start();
-				Interpreter.getInstance().init();
+				server.writeMessage(new DAPResponse(request, false, e.getMessage(), null));
+				server.stdout("Init terminated.");
 			}
-			catch (Exception e)
-			{
-				sb.append("Initialization failed: " + e.getMessage() + "\n");
-			}
-			finally
-			{
-				if (dbg != null)
-				{
-					dbg.interrupt();
-				}
-			}
-			
-			sb.append("Global context initialized\n");
-			
-			return new DAPMessageList(request, new JSONObject("result", sb.toString()));
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new DAPMessageList(request, e);
-		}
+		};
+		
+		exec.start();
+		return null;
 	}
 }

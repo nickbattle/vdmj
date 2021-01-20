@@ -32,6 +32,7 @@ import dap.DAPRequest;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
+import vdmj.DAPDebugReader;
 import workspace.DAPWorkspaceManager;
 
 public class SetBreakpointsHandler extends DAPHandler
@@ -46,12 +47,23 @@ public class SetBreakpointsHandler extends DAPHandler
 	{
 		try
 		{
-			JSONObject arguments = request.get("arguments");
-			JSONObject source = arguments.get("source");
-			File file = Utils.pathToFile(source.get("path"));
-			JSONArray breakpoints = arguments.get("breakpoints");
+			DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+			DAPDebugReader debugReader = manager.getDebugReader();
 			
-			return DAPWorkspaceManager.getInstance().setBreakpoints(request, file, breakpoints);
+			if (debugReader != null && debugReader.isListening())
+			{
+				debugReader.handle(request);
+				return null;
+			}
+			else
+			{
+				JSONObject arguments = request.get("arguments");
+				JSONObject source = arguments.get("source");
+				File file = Utils.pathToFile(source.get("path"));
+				JSONArray breakpoints = arguments.get("breakpoints");
+				
+				return DAPWorkspaceManager.getInstance().setBreakpoints(request, file, breakpoints);
+			}
 		}
 		catch (Exception e)
 		{

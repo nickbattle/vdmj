@@ -28,6 +28,7 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
+import vdmj.DAPDebugReader;
 import workspace.DAPWorkspaceManager;
 
 public class ThreadsHandler extends DAPHandler
@@ -40,6 +41,17 @@ public class ThreadsHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		return DAPWorkspaceManager.getInstance().threads(request);
+		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPDebugReader debugReader = manager.getDebugReader();
+		
+		if (debugReader != null && debugReader.isListening())
+		{
+			debugReader.handle(request);
+			return null;
+		}
+		else
+		{
+			return manager.threads(request);
+		}
 	}
 }
