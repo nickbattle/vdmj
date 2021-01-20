@@ -29,6 +29,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.InitExecutor;
+import json.JSONObject;
 
 public class InitCommand extends Command
 {
@@ -59,8 +60,10 @@ public class InitCommand extends Command
 			@Override
 			protected void tail(double time) throws IOException
 			{
-				server.stdout("Global context initialized in " + time + " secs.\n");
-				server.writeMessage(new DAPResponse(request, true, null, null));
+				String output =
+					"Global context initialized in " + time + " secs.\n" +
+					"Cleared all coverage information";
+				server.writeMessage(new DAPResponse(request, true, null, new JSONObject("result", output)));
 			}
 
 			@Override

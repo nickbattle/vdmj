@@ -25,6 +25,7 @@ package vdmj.commands;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
+import json.JSONObject;
 
 public class HelpCommand extends Command
 {
@@ -75,6 +76,6 @@ public class HelpCommand extends Command
 			sb.append("Unknown command '" + command + "'");
 		}
 		
-		return new DAPMessageList(request, false, sb.toString(), null);
+		return new DAPMessageList(request, new JSONObject("result", sb.toString()));
 	}
 }

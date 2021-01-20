@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 
 import json.JSONObject;
 import vdmj.commands.Command;
@@ -61,6 +62,7 @@ public class InitExecutor extends AsyncExecutor
 	@Override
 	protected void exec() throws Exception
 	{
+		LexLocation.clearLocations();
 		manager.getInterpreter().init();
 		
 		if (defaultName != null)
