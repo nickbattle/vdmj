@@ -23,7 +23,6 @@
 
 package workspace;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -268,21 +267,16 @@ public class LSPWorkspaceManager
 	private void loadFile(File file) throws IOException
 	{
 		StringBuilder sb = new StringBuilder();
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-		String line = br.readLine();
-	
-		while (line != null)
-		{
-			sb.append(line);
-			sb.append('\n');
-			line = br.readLine();
-		}
-	
-		br.close();
+		InputStreamReader isr = new InputStreamReader(new FileInputStream(file));
+		char[] data = new char[(int)file.length() + 1];
+		int size = isr.read(data);
+		sb.append(data, 0, size);
+		isr.close();
+		
 		projectFiles.put(file, sb);
 	}
 
-	public RPCMessageList checkLoadedFiles() throws Exception
+	private RPCMessageList checkLoadedFiles() throws Exception
 	{
 		ASTPlugin ast = registry.getPlugin("AST");
 		TCPlugin tc = registry.getPlugin("TC");
@@ -365,6 +359,7 @@ public class LSPWorkspaceManager
 	{
 		if (!projectFiles.keySet().contains(file))
 		{
+			// Should be covered by changeWatchedFile below, but to be safe...
 			Log.printf("Opening new file: %s", file);
 			openFiles.add(file);
 		}
@@ -374,8 +369,17 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
-			Log.printf("Opening new file: %s", file);
+			Log.printf("Opening known file: %s", file);
 			openFiles.add(file);
+		}
+		
+		StringBuilder existing = projectFiles.get(file);
+		
+		if (existing == null || !existing.toString().equals(text))
+		{
+			if (existing != null) Utils.diff("File different on didOpen at %d", text, existing.toString());
+			projectFiles.put(file, new StringBuilder(text));
+			checkLoadedFiles();
 		}
 		
 		return null;
@@ -511,14 +515,7 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
-			String buffer = projectFiles.get(file).toString();
-			
-			if (!text.trim().equals(buffer.trim()))		// Trim for trailing newline
-			{
-				Utils.diff("File different on didSave at %d", text, buffer);
-				projectFiles.put(file, new StringBuilder(text));
-			}
-			
+			projectFiles.put(file, new StringBuilder(text));
 			return checkLoadedFiles();		// typecheck on save
 		}
 	}
