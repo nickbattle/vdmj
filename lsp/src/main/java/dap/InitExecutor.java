@@ -28,14 +28,21 @@ import java.io.IOException;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
+import json.JSONObject;
+import vdmj.commands.Command;
+import vdmj.commands.PrintCommand;
+import vdmj.commands.RuntraceCommand;
+
 public class InitExecutor extends AsyncExecutor
 {
-	private String launchCommand;
+	private final String launchCommand;
+	private final String defaultName;
 
-	public InitExecutor(String id, DAPRequest request, String launchCommand)
+	public InitExecutor(String id, DAPRequest request, String launchCommand, String defaultName)
 	{
 		super(id, request);
 		this.launchCommand = launchCommand;
+		this.defaultName = defaultName;
 	}
 
 	@Override
@@ -55,23 +62,38 @@ public class InitExecutor extends AsyncExecutor
 	protected void exec() throws Exception
 	{
 		manager.getInterpreter().init();
+		
+		if (defaultName != null)
+		{
+			manager.getInterpreter().setDefaultName(defaultName);
+		}
 	}
 
 	@Override
 	protected void tail(double time) throws Exception
 	{
-		server.stdout(time + " secs.\n");
+		server.stdout(time + " secs.\n\n");	// Init time
 
 		if (launchCommand != null)
 		{
-			if (launchCommand.startsWith("p ") || launchCommand.startsWith("print "))
-			{
-				launchCommand = launchCommand.substring(launchCommand.indexOf(' ') + 1);
-			}
+			Command command = Command.parse(launchCommand);
 			
-			String launchResult = manager.getInterpreter().execute(launchCommand).toString();
-			server.stdout(launchCommand + " = " + launchResult + "\n");
-			server.stdout("Evaluation complete.\n");
+			if (command instanceof PrintCommand)
+			{
+				PrintCommand pcmd = (PrintCommand)command;
+				String launchResult = manager.getInterpreter().execute(pcmd.expression).toString();
+				server.stdout(pcmd.expression + " = " + launchResult + "\n");
+			}
+			else if (command instanceof RuntraceCommand)
+			{
+				RuntraceCommand rcmd = (RuntraceCommand)command;
+				JSONObject result = manager.ctRuntrace(request, rcmd.tracename, rcmd.testNumber);
+				server.stdout(rcmd.display(result) + "\n");
+			}
+			else
+			{
+				server.stderr("Unsupported command: " + launchCommand + "\n");
+			}
 		}
 	}
 

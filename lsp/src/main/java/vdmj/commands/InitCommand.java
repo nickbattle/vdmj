@@ -48,7 +48,7 @@ public class InitCommand extends Command
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		InitExecutor exec = new InitExecutor("init", request, null)
+		InitExecutor exec = new InitExecutor("init", request, null, null)
 		{
 			@Override
 			protected void head() throws IOException
@@ -60,6 +60,7 @@ public class InitCommand extends Command
 			protected void tail(double time) throws IOException
 			{
 				server.stdout("Global context initialized in " + time + " secs.\n");
+				server.writeMessage(new DAPResponse(request, true, null, null));
 			}
 
 			@Override

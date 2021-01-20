@@ -60,6 +60,7 @@ public class DAPWorkspaceManager
 	private Boolean noDebug;
 	private Interpreter interpreter;
 	private String launchCommand;
+	private String defaultName;
 	private DAPDebugReader debugReader;
 	
 	protected DAPWorkspaceManager()
@@ -116,6 +117,7 @@ public class DAPWorkspaceManager
 			// These values are used in configurationDone
 			this.noDebug = noDebug;
 			this.launchCommand = command;
+			this.defaultName = defaultName;
 			
 			return new DAPMessageList(request);
 		}
@@ -130,7 +132,7 @@ public class DAPWorkspaceManager
 	{
 		try
 		{
-			InitExecutor exec = new InitExecutor("init", request, launchCommand);
+			InitExecutor exec = new InitExecutor("init", request, launchCommand, defaultName);
 			exec.start();
 			return new DAPMessageList(request);
 		}

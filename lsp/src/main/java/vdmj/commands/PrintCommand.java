@@ -32,7 +32,7 @@ public class PrintCommand extends Command
 	public static final String USAGE = "Usage: print <expression>";
 	public static final String[] HELP = { "print", "print <exp> - evaluate an expression" };
 	
-	private String expression;
+	public final String expression;
 
 	public PrintCommand(String line)
 	{
