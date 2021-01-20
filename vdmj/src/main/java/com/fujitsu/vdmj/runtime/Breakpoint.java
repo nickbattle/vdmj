@@ -167,6 +167,11 @@ public class Breakpoint implements Serializable
 		execCancelled = true;
 	}
 	
+	private static synchronized boolean isExecCancelled()	// Needs sync for Java 11
+	{
+		return execCancelled;
+	}
+	
 	/**
 	 * Check whether to stop. The implementation in Breakpoint is used to check
 	 * for the "step" and "next" commands, using the stepline, nextctxt and
@@ -183,7 +188,7 @@ public class Breakpoint implements Serializable
 		location.hit();
 		hits++;
 
-		if (execCancelled)
+		if (isExecCancelled())
 		{
 			execCancelled = false;
 			throw new ContextException(4175, "Execution cancelled", location, ctxt);

@@ -38,6 +38,7 @@ abstract public class CancellableThread extends Thread
 	{
 		this.myId = myId;
 		active.put(myId, this);
+		setName("Cancellable-" + myId.toString());
 	}
 	
 	@Override
@@ -45,13 +46,13 @@ abstract public class CancellableThread extends Thread
 	{
 		try
 		{
-			Log.printf("Starting CancellableThread %s", getName());
+			Log.printf("Starting %s", getName());
 			body();
 		}
 		finally
 		{
 			active.remove(myId);
-			Log.printf("Completed CancellableThread %s", getName());
+			Log.printf("Completed %s", getName());
 		}
 	}
 	
@@ -61,7 +62,7 @@ abstract public class CancellableThread extends Thread
 		
 		if (thread == null)
 		{
-			Log.error("Cannot cancel thread %s", id.toString());
+			Log.error("Cannot cancel thread id %s", id.toString());
 		}
 		else
 		{
