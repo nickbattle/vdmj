@@ -146,7 +146,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				link.killThreads();
 				dapResponse = new DAPResponse(dapRequest, true, null, null);
 				server.writeMessage(dapResponse);
-				server.stdout("Debug session terminated");
+				server.stdout("Debug session terminated\n");
 				result = false;
 				break;
 				
@@ -154,7 +154,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				link.killThreads();
 				dapResponse = new DAPResponse(dapRequest, true, null, null);
 				server.writeMessage(dapResponse);
-				server.stdout("Debug session disconnected");
+				server.stdout("Debug session disconnected\n");
 				result = false;
 				break;
 				
