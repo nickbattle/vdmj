@@ -25,13 +25,17 @@ package workspace;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.scheduler.SchedulableThread;
+
 import dap.DAPEvent;
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -352,7 +356,18 @@ public class DAPWorkspaceManager
 
 	public DAPMessageList threads(DAPRequest request)
 	{
-		return new DAPMessageList(request, new JSONObject("threads", new JSONArray()));	// empty?
+		List<SchedulableThread> threads = SchedulableThread.getAllThreads();
+		Collections.sort(threads);
+		JSONArray list = new JSONArray();
+		
+		for (SchedulableThread thread: threads)
+		{
+			list.add(new JSONObject(
+				"id",	thread.getId(),
+				"name", thread.getName()));
+		}
+		
+		return new DAPMessageList(request, new JSONObject("threads", list));
 	}
 
 	/**
