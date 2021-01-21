@@ -83,7 +83,7 @@ public abstract class AsyncExecutor extends CancellableThread
 			}
 			catch (IOException e)
 			{
-				// ignore
+				Log.error(e);
 			}
 			
 			if (dbg != null)

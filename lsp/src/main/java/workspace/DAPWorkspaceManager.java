@@ -368,7 +368,17 @@ public class DAPWorkspaceManager
 
 	public DAPMessageList terminate(DAPRequest request, Boolean restart)
 	{
-		stdout("\nSession terminated.\n");
+		if (restart)
+		{
+			stdout("\nSession restarting...\n");
+			LSPWorkspaceManager lsp = LSPWorkspaceManager.getInstance();
+			lsp.restart();
+		}
+		else
+		{
+			stdout("\nSession terminated.\n");
+		}
+		
 		clearInterpreter();
 		DAPMessageList result = new DAPMessageList(request);
 		return result;

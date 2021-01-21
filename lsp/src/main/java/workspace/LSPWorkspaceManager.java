@@ -53,6 +53,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPInitializeResponse;
 import lsp.LSPMessageUtils;
+import lsp.LSPServer;
 import lsp.Utils;
 import lsp.textdocument.CompletionItemKind;
 import lsp.textdocument.CompletionTriggerKind;
@@ -688,5 +689,23 @@ public class LSPWorkspaceManager
 	{
 		ASTPlugin ast = registry.getPlugin("AST");
 		return ast.getFilenameFilters();
+	}
+
+	public void restart()	// Called from DAP manager
+	{
+		try
+		{
+			RPCMessageList messages = checkLoadedFiles();
+			LSPServer server = LSPServer.getInstance();
+			
+			for (JSONObject response: messages)
+			{
+				server.writeMessage(response);
+			}
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+		}
 	}
 }

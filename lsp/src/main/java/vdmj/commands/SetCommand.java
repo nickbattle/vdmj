@@ -62,6 +62,7 @@ public class SetCommand extends Command
 	public DAPMessageList run(DAPRequest request)
 	{
 		sb = new StringBuilder();
+		boolean changed = false;
 		
 		switch (option)
 		{
@@ -104,20 +105,22 @@ public class SetCommand extends Command
     			break;
     			
     		case "measures":
+    			changed = (setting != Settings.measureChecks);
     			Settings.measureChecks = setting;
 				isEnabled("Measure checks", Settings.measureChecks);
 
-				if (setting != Settings.measureChecks)
+				if (changed)
     			{
 	    			sb.append("Specification must now be reloaded to take effect");
     			}
     			break;
     			
     		case "annotations":
+    			changed = (setting != Settings.annotations);
     			Settings.annotations = setting;
 				isEnabled("Annotations", Settings.annotations);
 
-				if (setting != Settings.annotations)
+				if (changed)
     			{
 	    			sb.append("Specification must now be reloaded to take effect");
     			}
