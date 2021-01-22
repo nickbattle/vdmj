@@ -67,6 +67,13 @@ public class Utils
 			"end",   new JSONObject("line", zero(location.endLine - 1), "character", zero(location.endPos - 1)));
 	}
 
+	public static JSONObject lexLocationsToRange(LexLocation from, LexLocation to)
+	{
+		return new JSONObject(
+			"start", new JSONObject("line", zero(from.startLine - 1), "character", zero(from.startPos - 1)),
+			"end",   new JSONObject("line", zero(to.endLine - 1), "character", zero(to.endPos - 1)));
+	}
+	
 	public static JSONObject lexLocationToLocation(LexLocation location)
 	{
 		return new JSONObject(

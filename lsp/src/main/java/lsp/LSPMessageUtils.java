@@ -36,6 +36,10 @@ import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 import json.JSONArray;
@@ -146,5 +150,83 @@ public class LSPMessageUtils
 	public JSONObject symbolInformation(LexIdentifierToken name, TCType type, SymbolKind kind, String container)
 	{
 		return symbolInformation(name.name + ":" + type, name.location, kind, container);
+	}
+	
+	/**
+	 * These methods ought to produce a hierarchical outline, but it doesn't work as yet :-(
+	 */
+	public JSONArray documentSymbols(TCModule module, File file)
+	{
+		LexLocation from = null;
+		LexLocation to = null;
+		TCDefinitionList list = new TCDefinitionList();
+
+		for (TCDefinition def: module.defs)
+		{
+			if (def.location.file.equals(file))	// DEFAULT spans files
+			{
+				if (from == null)
+				{
+					from = def.location;
+					to = def.location;
+				}
+				else
+				{
+					to = def.location;
+				}
+				
+				list.add(def);
+			}
+		}
+		
+		return new JSONArray(new JSONObject(
+			"name",				module.name.getName(),
+			"kind",				SymbolKind.Module.getValue(),
+			"range",			Utils.lexLocationsToRange(from, to),
+			"selectionRange",	Utils.lexLocationsToRange(from, to),
+			"children",			documentSymbols(list)));
+	}
+
+	public JSONObject documentSymbols(TCClassDefinition clazz)
+	{
+		return new JSONObject(
+			"name",				clazz.name.getName(),
+			"kind",				SymbolKind.Class.getValue(),
+			"range",			Utils.lexLocationToRange(LexLocation.getSpan(clazz.name.getLex())),
+			"selectionRange",	Utils.lexLocationToRange(clazz.name.getLocation()),
+			"children",			documentSymbols(clazz.definitions));
+	}
+
+	private JSONArray documentSymbols(TCDefinitionList defs)
+	{
+		JSONArray symbols = new JSONArray();
+
+		for (TCDefinition def: defs)
+		{
+			symbols.add(documentSymbolsTop(def));
+		}
+		
+		return symbols;
+	}
+
+	private JSONArray documentSymbolsTop(TCDefinition top)
+	{
+		JSONArray symbols = new JSONArray();
+
+		for (TCDefinition def: top.getDefinitions())
+		{
+			symbols.add(documentSymbolsDef(def));
+		}
+		
+		return symbols;
+	}
+
+	private JSONObject documentSymbolsDef(TCDefinition def)
+	{
+		return new JSONObject(
+			"name",				def.name.getName(),
+			"kind",				SymbolKind.kindOf(def).getValue(),
+			"range",			Utils.lexLocationToRange(def.name.getLocation()),
+			"selectionRange",	Utils.lexLocationToRange(def.name.getLocation()));
 	}
 }
