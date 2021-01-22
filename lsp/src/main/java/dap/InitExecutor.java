@@ -103,7 +103,7 @@ public class InitExecutor extends AsyncExecutor
 	protected void error(Exception e) throws IOException
 	{
 		server.stderr(e.getMessage());
-		server.stdout("Init terminated.");
+		server.stdout("Init terminated.\n");
 		manager.clearInterpreter();
 		server.writeMessage(new DAPEvent("terminated", null));
 	}

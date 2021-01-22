@@ -444,10 +444,14 @@ abstract public class CTPlugin extends AnalysisPlugin
 		
 		for (int i=0; i<calls.length; i++)
 		{
-			array.add(new JSONObject("case", calls[i], "result",
-				results == null ? null :
-					i >= results.size() ? null :
-						results.get(i).toString()));
+			String result = null;
+			
+			if (results != null && i < results.size())
+			{
+				result = results.get(i).toString();
+			}
+			
+			array.add(new JSONObject("case", calls[i], "result", result));
 		}
 		
 		return array;
