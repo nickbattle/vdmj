@@ -136,6 +136,11 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
  			if (expv != null)
  			{
 				all.addAll(des.expression.apply(expv, arg));
+				
+				if (arg.within(des.expression.classname.getLocation()))
+				{
+					all.add(des.expression.classname);
+				}
  			}
  	 	}
  		else if (node instanceof TCObjectSelfDesignator)
