@@ -29,12 +29,20 @@ import java.util.Set;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
 import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
 import com.fujitsu.vdmj.tc.statements.TCMapSeqDesignator;
+import com.fujitsu.vdmj.tc.statements.TCObjectApplyDesignator;
+import com.fujitsu.vdmj.tc.statements.TCObjectDesignator;
+import com.fujitsu.vdmj.tc.statements.TCObjectFieldDesignator;
+import com.fujitsu.vdmj.tc.statements.TCObjectIdentifierDesignator;
+import com.fujitsu.vdmj.tc.statements.TCObjectNewDesignator;
+import com.fujitsu.vdmj.tc.statements.TCObjectSelfDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStateDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.visitors.TCLeafStatementVisitor;
@@ -61,20 +69,84 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
  	@Override
 	public Set<TCNode> caseCallObjectStatement(TCCallObjectStatement node, LexLocation arg)
 	{
-		Set<TCNode> all = newCollection();
-
-		if (arg.within(node.location) ||
-			(node.classname != null && arg.within(node.classname.getLocation())) ||
-			(node.fieldname != null && arg.within(node.fieldname.getLocation())))
+		Set<TCNode> all = caseObjectDesignator(node.designator, arg);
+		
+		if (node.classname != null && arg.within(node.classname.getLocation()))
 		{
-			all.add(node);
+			all.add(node.classname);
 		}
-
+		
+		if (node.field != null && arg.within(node.field.getLocation()))
+		{
+			all.add(node.field);
+		}
+		
 		all.addAll(super.caseCallObjectStatement(node, arg));
 		return all;
 	}
 
- 	@Override
+ 	private Set<TCNode> caseObjectDesignator(TCObjectDesignator node, LexLocation arg)
+	{
+ 		Set<TCNode> all = newCollection();
+ 		
+ 		if (node instanceof TCObjectApplyDesignator)
+ 		{
+ 			TCObjectApplyDesignator apply = (TCObjectApplyDesignator)node;
+ 			TCExpressionVisitor<Set<TCNode>, LexLocation> expv = visitorSet.getExpressionVisitor();
+ 			
+ 			if (expv != null)
+ 			{
+ 				for (TCExpression a: apply.args)
+ 				{
+ 					all.addAll(a.apply(expv, arg));
+ 				}
+ 			}
+ 			
+ 			all.addAll(caseObjectDesignator(apply.object, arg));
+ 		}
+ 		else if (node instanceof TCObjectFieldDesignator)
+ 	 	{
+ 			TCObjectFieldDesignator field = (TCObjectFieldDesignator)node;
+ 			
+			if (field.classname != null && arg.within(field.classname.getLocation()))
+			{
+				all.add(field.classname);
+			}
+			else if (field.fieldname != null && arg.within(field.fieldname.getLocation()))
+			{
+				all.add(field.fieldname);
+			}
+ 			
+ 			all.addAll(caseObjectDesignator(field.object, arg));
+ 	 	}
+ 		else if (node instanceof TCObjectIdentifierDesignator)
+ 	 	{
+ 			TCObjectIdentifierDesignator id = (TCObjectIdentifierDesignator)node;
+ 			
+ 			if (arg.within(id.name.getLocation()))
+ 			{
+ 				all.add(id.name);
+ 			}
+ 	 	}
+ 		else if (node instanceof TCObjectNewDesignator)
+ 	 	{
+ 			TCObjectNewDesignator des = (TCObjectNewDesignator)node;
+ 			TCExpressionVisitor<Set<TCNode>, LexLocation> expv = visitorSet.getExpressionVisitor();
+ 			
+ 			if (expv != null)
+ 			{
+				all.addAll(des.expression.apply(expv, arg));
+ 			}
+ 	 	}
+ 		else if (node instanceof TCObjectSelfDesignator)
+ 	 	{
+ 			// ignore!
+ 	 	}
+ 	 	
+ 		return all;
+	}
+
+	@Override
 	public Set<TCNode> caseCallStatement(TCCallStatement node, LexLocation arg)
 	{
 		Set<TCNode> all = newCollection();
