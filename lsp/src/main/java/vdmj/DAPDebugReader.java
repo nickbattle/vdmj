@@ -119,7 +119,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		
 		try
 		{
-			exchanger.exchange(null);
+			dapMessage = exchanger.exchange(null);
 		}
 		catch (InterruptedException e)	// eg. via QuitCommand
 		{
