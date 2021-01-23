@@ -77,4 +77,10 @@ public class InitCommand extends Command
 		exec.start();
 		return null;
 	}
+
+	@Override
+	public boolean notWhenRunning()
+	{
+		return true;
+	}
 }

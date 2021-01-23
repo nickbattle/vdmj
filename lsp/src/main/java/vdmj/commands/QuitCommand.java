@@ -23,10 +23,14 @@
 
 package vdmj.commands;
 
+import dap.AsyncExecutor;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServer;
+import lsp.CancellableThread;
+import vdmj.DAPDebugReader;
 import workspace.DAPWorkspaceManager;
+import workspace.Log;
 
 public class QuitCommand extends Command
 {
@@ -44,7 +48,51 @@ public class QuitCommand extends Command
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
+		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+
+		if (AsyncExecutor.currentlyRunning() != null)
+		{
+			CancellableThread.cancelAll();
+			DAPDebugReader debugReader = manager.getDebugReader();
+			
+			if (debugReader != null)
+			{
+				int retries = 5;
+				
+				while (retries-- > 0 && !debugReader.isListening())
+				{
+					pause(200);
+				}
+				
+				if (retries > 0)
+				{
+					debugReader.interrupt();	// Cause exchange to trip
+					retries = 5;
+					
+					while (retries-- > 0 && manager.getDebugReader() != null)
+					{
+						pause(200);
+					}
+					
+					if (retries == 0)
+					{
+						Log.error("DAPDebugReader interrupt did not work?");
+					}
+				}
+				else
+				{
+					Log.error("DAPDebugReader did not catch interruption?");
+				}
+			}
+		}
+		
 		DAPServer.getInstance().setRunning(false);
-		return DAPWorkspaceManager.getInstance().terminate(request, false);
+		return manager.terminate(request, false);
+	}
+	
+	@Override
+	public boolean notWhenRunning()
+	{
+		return false;
 	}
 }

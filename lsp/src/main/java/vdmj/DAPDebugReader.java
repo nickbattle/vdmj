@@ -115,7 +115,19 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	
 	private boolean doCommand() throws Exception
 	{
-		JSONObject dapMessage = exchanger.exchange(null);
+		JSONObject dapMessage = null;
+		
+		try
+		{
+			exchanger.exchange(null);
+		}
+		catch (InterruptedException e)	// eg. via QuitCommand
+		{
+			Log.printf("DAPDebugReader exchange interrupted");
+			link.killThreads();
+			return false;
+		}
+		
 		DAPRequest dapRequest = new DAPRequest(dapMessage);
 		DAPResponse dapResponse = null;
 		boolean result = true;

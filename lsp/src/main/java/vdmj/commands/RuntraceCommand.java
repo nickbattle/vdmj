@@ -131,4 +131,10 @@ public class RuntraceCommand extends Command
 		
 		return sb.toString();
 	}
+
+	@Override
+	public boolean notWhenRunning()
+	{
+		return true;
+	}
 }

@@ -33,4 +33,10 @@ public class NullCommand extends Command
 	{
 		return new DAPMessageList(request, false, "Enter a command, or try 'help'", null);
 	}
+
+	@Override
+	public boolean notWhenRunning()
+	{
+		return false;
+	}
 }
