@@ -23,7 +23,6 @@
 
 package vdmj.commands;
 
-import dap.AsyncExecutor;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.ExpressionExecutor;
