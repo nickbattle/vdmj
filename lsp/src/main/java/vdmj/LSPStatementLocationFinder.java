@@ -139,7 +139,14 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 				
 				if (arg.within(des.expression.classname.getLocation()))
 				{
-					all.add(des.expression.classname);
+					if (des.expression.ctordef != null)
+					{
+						all.add(des.expression.ctordef.name);
+					}
+					else
+					{
+						all.add(des.expression.classname);	// Anon ctor
+					}
 				}
  			}
  	 	}
