@@ -170,6 +170,7 @@ public class InitThread extends SchedulableThread
         				(e.iterator().next().isStackOverflow() || e.iterator().next().isUserCancel()))
         			{
         				retries = 0;
+        				lastProblemCount = 0;
         				break;
         			}
         		}

@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.tc.expressions.TCFieldExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
@@ -208,6 +209,11 @@ public class LSPDefinitionFinder
 		{
 			TCIdentifierDesignator id = (TCIdentifierDesignator)node;
 			return env.findName(id.name, NameScope.NAMESANDSTATE);
+		}
+		else if (node instanceof TCIdentifierToken)
+		{
+			TCIdentifierToken id = (TCIdentifierToken)node;
+			return env.findType(new TCNameToken(id.getLocation(), fromModule, id.getName()), fromModule);
 		}
 		else if (node instanceof TCUnresolvedType)
 		{

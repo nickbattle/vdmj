@@ -66,4 +66,10 @@ public class DefaultCommand extends Command
 			return new DAPMessageList(request, e);
 		}
 	}
+
+	@Override
+	public boolean notWhenRunning()
+	{
+		return true;
+	}
 }

@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
+import dap.AsyncExecutor;
 import dap.DAPEvent;
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -328,6 +329,13 @@ public class DAPWorkspaceManager
 		}
 		
 		Command command = Command.parse(expression);
+		
+		if (command.notWhenRunning() && AsyncExecutor.currentlyRunning() != null)
+		{
+			DAPMessageList responses = new DAPMessageList(request,
+					new JSONObject("result", "Still running " + AsyncExecutor.currentlyRunning(), "variablesReference", 0));
+			return responses;
+		}
 
 		if (command instanceof PrintCommand)	// ie. evaluate something
 		{
@@ -335,7 +343,6 @@ public class DAPWorkspaceManager
 			{
 				DAPMessageList responses = new DAPMessageList(request,
 						new JSONObject("result", "Cannot start interpreter: errors exist?", "variablesReference", 0));
-				DAPServer.getInstance().setRunning(false);
 				clearInterpreter();
 				return responses;
 			}

@@ -23,6 +23,7 @@
 
 package vdmj.commands;
 
+import dap.AsyncExecutor;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.ExpressionExecutor;
@@ -51,17 +52,14 @@ public class PrintCommand extends Command
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		String current = ExpressionExecutor.currentlyRunning();
-		
-		if (current != null)
-		{
-			return new DAPMessageList(request, false, "Still executing " + current, null);
-		}
-		else
-		{
-			ExpressionExecutor executor = new ExpressionExecutor("print", request, expression);
-			executor.start();
-			return null;
-		}
+		ExpressionExecutor executor = new ExpressionExecutor("print", request, expression);
+		executor.start();
+		return null;
+	}
+
+	@Override
+	public boolean notWhenRunning()
+	{
+		return true;
 	}
 }

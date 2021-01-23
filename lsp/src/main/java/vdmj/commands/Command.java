@@ -77,9 +77,23 @@ abstract public class Command
 	}
 
 	public abstract DAPMessageList run(DAPRequest request);
+
+	public abstract boolean notWhenRunning();
 	
 	protected DAPResponse stdout(String message)
 	{
 		return new DAPResponse("output", new JSONObject("output", message));
+	}
+	
+	protected void pause(long ms)
+	{
+		try
+		{
+			Thread.sleep(ms);
+		}
+		catch (InterruptedException e)
+		{
+			// ignore
+		}
 	}
 }

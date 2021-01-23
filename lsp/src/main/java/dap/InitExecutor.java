@@ -49,6 +49,8 @@ public class InitExecutor extends AsyncExecutor
 	@Override
 	protected void head() throws IOException
 	{
+		running = "initialization";
+		
 		server.stdout(
 				"*\n" +
 				"* VDMJ " + Settings.dialect + " Interpreter\n" +
@@ -111,6 +113,8 @@ public class InitExecutor extends AsyncExecutor
 	@Override
 	protected void clean() throws IOException
 	{
+		running = null;
+
 		if (launchCommand != null)
 		{
 			manager.clearInterpreter();

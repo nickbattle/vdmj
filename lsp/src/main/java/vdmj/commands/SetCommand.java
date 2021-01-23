@@ -138,4 +138,10 @@ public class SetCommand extends Command
 	{
 		sb.append(name + (flag ? " are enabled" : " are disabled") + "\n");
 	}
+
+	@Override
+	public boolean notWhenRunning()
+	{
+		return true;
+	}
 }

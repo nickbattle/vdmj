@@ -40,4 +40,10 @@ public class ErrorCommand extends Command
 	{
 		return new DAPMessageList(request, false, message, null);
 	}
+
+	@Override
+	public boolean notWhenRunning()
+	{
+		return false;
+	}
 }

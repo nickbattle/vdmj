@@ -79,4 +79,10 @@ public class HelpCommand extends Command
 		
 		return new DAPMessageList(request, new JSONObject("result", sb.toString()));
 	}
+
+	@Override
+	public boolean notWhenRunning()
+	{
+		return false;
+	}
 }

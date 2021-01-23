@@ -31,7 +31,6 @@ public class ExpressionExecutor extends AsyncExecutor
 {
 	private final String expression;
 	private String answer;
-	private static String running = null;
 
 	public ExpressionExecutor(String id, DAPRequest request, String expression)
 	{
@@ -70,10 +69,5 @@ public class ExpressionExecutor extends AsyncExecutor
 	protected void clean()
 	{
 		running = null;
-	}
-	
-	public static String currentlyRunning()
-	{
-		return running;
 	}
 }

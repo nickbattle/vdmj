@@ -271,7 +271,12 @@ public class LSPWorkspaceManager
 		InputStreamReader isr = new InputStreamReader(new FileInputStream(file));
 		char[] data = new char[(int)file.length() + 1];
 		int size = isr.read(data);
-		sb.append(data, 0, size);
+		
+		if (size > 0)	// not empty file
+		{
+			sb.append(data, 0, size);
+		}
+		
 		isr.close();
 		
 		projectFiles.put(file, sb);
