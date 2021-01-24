@@ -124,6 +124,11 @@ public class InitThread extends SchedulableThread
 			setException(e);
 			suspendOthers();
 		}
+		catch (Throwable th)	// Java errors not caught above
+		{
+			setException(new Exception("Internal error: " + th.getMessage()));
+			suspendOthers();
+		}
 		finally
 		{
 			TransactionValue.commitAll();

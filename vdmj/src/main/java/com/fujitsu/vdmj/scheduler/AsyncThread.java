@@ -125,6 +125,11 @@ public class AsyncThread extends SchedulableThread
 			completeReason = DebugReason.ABORTED;
 			throw e;
 		}
+		catch (Throwable th)	// Java errors not caught above
+		{
+			ResourceScheduler.setException(new Exception("Internal error: " + th.getMessage()));
+			SchedulableThread.signalAll(Signal.SUSPEND);
+		}
 		finally
 		{
 			TransactionValue.commitAll();
