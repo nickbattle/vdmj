@@ -111,7 +111,7 @@ public abstract class AsyncExecutor extends CancellableThread
 	public void setCancelled()
 	{
 		super.setCancelled();
-		Breakpoint.setExecCancelled();
+		Breakpoint.setExecInterrupt(Breakpoint.TERMINATE);
 	}
 	
 	public static String currentlyRunning()

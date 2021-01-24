@@ -35,6 +35,7 @@ import dap.handlers.DisconnectHandler;
 import dap.handlers.EvaluateHandler;
 import dap.handlers.InitializeHandler;
 import dap.handlers.LaunchHandler;
+import dap.handlers.PauseHandler;
 import dap.handlers.SetBreakpointsHandler;
 import dap.handlers.StackTraceHandler;
 import dap.handlers.TerminateHandler;
@@ -80,6 +81,7 @@ public class DAPServer extends JSONServer
 		dispatcher.register(new StackTraceHandler(), "stackTrace");
 		dispatcher.register(new DisconnectHandler(), "disconnect");
 		dispatcher.register(new TerminateHandler(), "terminate");
+		dispatcher.register(new PauseHandler(), "pause");
 		
 		dispatcher.register(new DebuggingHandler(),
 			"continue", "stepIn", "stepOut", "next", "scopes", "variables");
