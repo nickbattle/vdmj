@@ -174,6 +174,11 @@ public class PeriodicThread extends SchedulableThread
 			completeReason = DebugReason.ABORTED;
 			throw e;
 		}
+		catch (Throwable th)	// Java errors not caught above
+		{
+			ResourceScheduler.setException(new Exception(th.getMessage()));
+			SchedulableThread.signalAll(Signal.SUSPEND);
+		}
 		finally
 		{
 			TransactionValue.commitAll();
