@@ -127,7 +127,7 @@ public class AsyncThread extends SchedulableThread
 		}
 		catch (Throwable th)	// Java errors not caught above
 		{
-			ResourceScheduler.setException(new Exception(th.getMessage()));
+			ResourceScheduler.setException(new Exception("Internal error: " + th.getMessage()));
 			SchedulableThread.signalAll(Signal.SUSPEND);
 		}
 		finally
