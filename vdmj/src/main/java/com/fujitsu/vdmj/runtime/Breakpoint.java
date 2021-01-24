@@ -67,8 +67,11 @@ public class Breakpoint implements Serializable
 	/** The number of times this breakpoint has been reached. */
 	public long hits = 0;
 	
-	/** Set true by an external cancel action */
-	private static boolean execCancelled = false;
+	/** Set true by an external cancel or pause action */
+	private static int execInterrupt = 0;
+	public static final int NONE = 0;
+	public static final int PAUSE = 1;
+	public static final int TERMINATE = 2;
 
 	public Breakpoint(LexLocation location)
 	{
@@ -162,14 +165,14 @@ public class Breakpoint implements Serializable
 		hits = 0;
 	}
 
-	public static synchronized void setExecCancelled()
+	public static synchronized void setExecInterrupt(int level)
 	{
-		execCancelled = true;
+		execInterrupt = level;
 	}
 	
-	private static synchronized boolean isExecCancelled()	// Needs sync for Java 11
+	private static synchronized int execInterruptLevel()	// Needs sync for Java 11
 	{
-		return execCancelled;
+		return execInterrupt;
 	}
 	
 	/**
@@ -188,10 +191,26 @@ public class Breakpoint implements Serializable
 		location.hit();
 		hits++;
 
-		if (isExecCancelled())
+		switch (execInterruptLevel())
 		{
-			execCancelled = false;
-			throw new ContextException(4175, "Execution cancelled", location, ctxt);
+			case NONE:
+				break;
+				
+			case PAUSE:
+    			try
+    			{
+    				execInterrupt = 0;
+    				enterDebugger(ctxt);
+    			}
+    			catch (DebuggerException e)
+    			{
+    				throw e;
+    			}
+				break;
+
+			case TERMINATE:
+				execInterrupt = 0;
+				throw new ContextException(4175, "Execution cancelled", location, ctxt);
 		}
 		
 		ThreadState state = ctxt.threadState;
