@@ -73,6 +73,8 @@ work correctly.
 
 CTRL-F5 launches a session with debugging disabled (breakpoints will be ignored).
 
+You can "pause" or "stop" an expression evaluation using the UI buttons. A paused specification traps into the debugger and can be stepped and resumed; a stopped specification acts as though an error has occurred, trapping into the debugger but not allowing you to continue.
+
 You can modify a specification while debugging, but the changes you make will not take effect until you start a
 new debug session. You will be given an error if you attempt a new expression evaluation without a restart.
 
