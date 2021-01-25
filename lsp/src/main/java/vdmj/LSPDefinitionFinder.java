@@ -213,7 +213,15 @@ public class LSPDefinitionFinder
 		else if (node instanceof TCIdentifierToken)
 		{
 			TCIdentifierToken id = (TCIdentifierToken)node;
-			return env.findType(new TCNameToken(id.getLocation(), fromModule, id.getName()), fromModule);
+			TCNameToken name = new TCNameToken(id.getLocation(), fromModule, id.getName());
+			TCDefinition def = env.findType(name, fromModule);
+			
+			if (def == null)
+			{
+				def = env.findName(name, NameScope.NAMESANDSTATE);
+			}
+			
+			return def;
 		}
 		else if (node instanceof TCUnresolvedType)
 		{
