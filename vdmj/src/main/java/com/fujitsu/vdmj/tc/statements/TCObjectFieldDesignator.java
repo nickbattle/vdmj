@@ -44,7 +44,7 @@ public class TCObjectFieldDesignator extends TCObjectDesignator
 	public final TCNameToken classname;
 	public final TCIdentifierToken fieldname;
 
-	private TCNameToken field = null;
+	public TCNameToken field = null;
 
 	public TCObjectFieldDesignator(TCObjectDesignator object, TCNameToken classname, TCIdentifierToken fieldname)
 	{

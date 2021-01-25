@@ -106,18 +106,14 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
  		}
  		else if (node instanceof TCObjectFieldDesignator)
  	 	{
- 			TCObjectFieldDesignator field = (TCObjectFieldDesignator)node;
+ 			TCObjectFieldDesignator fdes = (TCObjectFieldDesignator)node;
  			
-			if (field.classname != null && arg.within(field.classname.getLocation()))
+			if (fdes.field != null && arg.within(fdes.field.getLocation()))
 			{
-				all.add(field.classname);
-			}
-			else if (field.fieldname != null && arg.within(field.fieldname.getLocation()))
-			{
-				all.add(field.fieldname);
+				all.add(fdes.field);
 			}
  			
- 			all.addAll(caseObjectDesignator(field.object, arg));
+ 			all.addAll(caseObjectDesignator(fdes.object, arg));
  	 	}
  		else if (node instanceof TCObjectIdentifierDesignator)
  	 	{
