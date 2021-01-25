@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugExecutor;
 import com.fujitsu.vdmj.debug.DebugType;
@@ -224,15 +223,15 @@ public class DAPDebugExecutor implements DebugExecutor
 		{
 			interpreter.setDefaultName(breakloc.module);
 			ctxt.threadState.setAtomic(true);
-			answer = expr + " = " + interpreter.evaluate(expr, ctxt);
+			answer = interpreter.evaluate(expr, ctxt).toString();
  		}
 		catch (ParserException e)
 		{
-			answer = "Syntax: " + e;
+			answer = simplify(e.getMessage());
 		}
 		catch (ContextException e)
 		{
-			answer = "Runtime: " + e.getMessage();
+			answer = simplify(e.getMessage());
 		}
 		catch (RuntimeException e)
 		{
@@ -246,6 +245,10 @@ public class DAPDebugExecutor implements DebugExecutor
 			}
 			
 			answer = "Error: " + e.getMessage();
+		}
+		catch (Throwable th)
+		{
+			answer = "Error: " + th.getMessage();
 		}
 		finally
 		{
@@ -262,6 +265,18 @@ public class DAPDebugExecutor implements DebugExecutor
 		}
 
 		return new DebugCommand(DebugType.PRINT, new JSONObject("result", answer, "variablesReference", 0));
+	}
+
+	private String simplify(String message)
+	{
+		if (message.startsWith("Error 4034:"))	// Not in scope
+		{
+			return "not available";		// Default text in VSC watches
+		}
+		else
+		{
+			return message;
+		}
 	}
 
 	private DebugCommand doStep()
