@@ -275,7 +275,15 @@ public class LSPDefinitionFinder
 			{
 				for (TCDefinition def: classdef.getDefinitions())
 				{
-					if (def.name != null && def.name.equals(name))
+					if (def.name != null && def.name.equals(name))	// Different overloads
+					{
+						return def;
+					}
+				}
+
+				for (TCDefinition def: classdef.getDefinitions())
+				{
+					if (def.name != null && def.name.matches(name))	// eg. for per/sync names
 					{
 						return def;
 					}
