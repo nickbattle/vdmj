@@ -46,6 +46,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
 import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
+import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -166,7 +167,8 @@ public class TCCallObjectStatement extends TCStatement
 		}
 		else if (fdef == null)
 		{
-			report(3209, "Member " + field + " is not in scope");
+			// Use raw method, so we can use field's location
+			TypeChecker.report(3209, "Member " + field + " is not in scope", field.getLocation());
 			return new TCUnknownType(location);
 		}
 		else if (fdef.isStatic() && !env.isStatic())
