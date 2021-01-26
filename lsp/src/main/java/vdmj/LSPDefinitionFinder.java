@@ -107,7 +107,7 @@ public class LSPDefinitionFinder
 					}
 				}
 				
-				if (module.exportdefs != null)
+				if (module.exports != null)
 				{
 					for (TCExport exp: module.exports.exports)
 					{
