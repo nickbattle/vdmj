@@ -46,6 +46,7 @@ import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 
 public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode, Set<TCNode>, LexLocation>
@@ -55,12 +56,14 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 		private final LSPDefinitionLocationFinder defVisitor;
 		private final LSPExpressionLocationFinder expVisitor;
 		private final LSPStatementLocationFinder stmtVisitor;
+		private final LSPPatternLocationFinder patVisitor;
 
 		public VisitorSet(LSPDefinitionLocationFinder parent)
 		{
 			defVisitor = parent;
 			expVisitor = new LSPExpressionLocationFinder(this);
 			stmtVisitor = new LSPStatementLocationFinder(this);
+			patVisitor = new LSPPatternLocationFinder();
 		}
 		
 		@Override
@@ -80,6 +83,12 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	 	{
 	 		return stmtVisitor;
 	 	}
+		
+		@Override
+		public TCPatternVisitor<Set<TCNode>, LexLocation> getPatternVisitor()
+		{
+			return patVisitor;
+		}
 	}
 
 	public LSPDefinitionLocationFinder()
@@ -193,7 +202,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	}
 	
 	@Override
- 	protected Set<TCNode> caseMultipleBind(TCMultipleBind bind, LexLocation arg)
+	protected Set<TCNode> caseMultipleBind(TCMultipleBind bind, LexLocation arg)
 	{
 		Set<TCNode> all = super.caseMultipleBind(bind, arg);
 		

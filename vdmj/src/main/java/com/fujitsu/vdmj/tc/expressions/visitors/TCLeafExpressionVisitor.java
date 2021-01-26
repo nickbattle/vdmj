@@ -82,6 +82,7 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 
 /**
  * This TCExpression visitor visits all of the leaves of an expression tree and calls
@@ -131,11 +132,17 @@ abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseCasesExpression(TCCasesExpression node, S arg)
 	{
+ 		TCPatternVisitor<C, S> patternVisitor = visitorSet.getPatternVisitor();
 		C all = newCollection();
 		all.addAll(node.exp.apply(this, arg));
 		
 		for (TCCaseAlternative a: node.cases)
 		{
+			if (patternVisitor != null)
+			{
+				all.addAll(a.pattern.apply(patternVisitor, arg));
+			}
+			
 			all.addAll(a.result.apply(this, arg));
 		}
 		

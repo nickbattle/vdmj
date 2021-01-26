@@ -25,6 +25,7 @@ package com.fujitsu.vdmj.tc.modules;
 
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.modules.visitors.TCImportExportVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class TCImportedOperation extends TCImportedValue
@@ -54,5 +55,11 @@ public class TCImportedOperation extends TCImportedValue
 	public String kind()
 	{
 		return "operation";
+	}
+
+	@Override
+	public <R, S> R apply(TCImportExportVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImportedOperation(this, arg);
 	}
 }

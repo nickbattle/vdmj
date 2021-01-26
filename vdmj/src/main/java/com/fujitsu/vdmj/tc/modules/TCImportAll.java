@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCImportedDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.modules.visitors.TCImportExportVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class TCImportAll extends TCImport
@@ -82,5 +83,11 @@ public class TCImportAll extends TCImport
 	public String kind()
 	{
 		return "all";
+	}
+
+	@Override
+	public <R, S> R apply(TCImportExportVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImportAll(this, arg);
 	}
 }

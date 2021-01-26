@@ -30,7 +30,9 @@ import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCUntypedDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.modules.visitors.TCImportExportVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -41,12 +43,14 @@ public class TCExportedValue extends TCExport
 	private static final long serialVersionUID = 1L;
 	public final TCNameList nameList;
 	public TCType type;
+	public final TCTypeList unresolved;
 
 	public TCExportedValue(LexLocation location, TCNameList nameList, TCType type)
 	{
 		super(location);
 		this.nameList = nameList;
 		this.type = type;
+		this.unresolved = (type == null) ? new TCTypeList() : type.unresolvedTypes();
 	}
 
 	@Override
@@ -119,5 +123,11 @@ public class TCExportedValue extends TCExport
 				}
 			}
 		}
+	}
+
+	@Override
+	public <R, S> R apply(TCImportExportVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExportedValue(this, arg);
 	}
 }

@@ -39,6 +39,11 @@ import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.modules.TCExport;
+import com.fujitsu.vdmj.tc.modules.TCImport;
+import com.fujitsu.vdmj.tc.modules.TCImportFromModule;
+import com.fujitsu.vdmj.tc.modules.TCImportedType;
+import com.fujitsu.vdmj.tc.modules.TCImportedValue;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
@@ -76,6 +81,7 @@ public class LSPDefinitionFinder
 	public Found findLocation(TCModuleList modules, LexLocation position)
 	{
 		LSPDefinitionLocationFinder finder = new LSPDefinitionLocationFinder();
+		LSPImportExportLocationFinder ieFinder = new LSPImportExportLocationFinder();
 		
 		for (TCModule module: modules)
 		{
@@ -85,6 +91,45 @@ public class LSPDefinitionFinder
 			
 			if (span == null || position.within(span))
 			{
+				if (module.imports != null)
+				{
+					for (TCImportFromModule def: module.imports.imports)
+					{
+						if (position.within(def.name.getLocation()))	// module itself
+						{
+							TCModule m = modules.findModule(def.name);
+							
+							if (m != null)
+							{
+								return new Found(module, null, new LSPModuleDefinition(m));
+							}
+						}
+						
+						for (TCImport imp: def.signatures)
+						{
+							TCNode node = imp.apply(ieFinder, position);
+							
+							if (node != null)	// found it!
+							{
+								return new Found(module, null, node);
+							}
+						}
+					}
+				}
+				
+				if (module.exports != null)
+				{
+					for (TCExport exp: module.exports.exports)
+					{
+						TCNode node = exp.apply(ieFinder, position);
+						
+						if (node != null)	// found it!
+						{
+							return new Found(module, null, node);
+						}
+					}
+				}
+
 				for (TCDefinition def: module.defs)
 				{
 					Set<TCNode> nodes = def.apply(finder, position);
@@ -140,7 +185,7 @@ public class LSPDefinitionFinder
 		{
 			TCModule module = found.module;
 			ModuleEnvironment env = new ModuleEnvironment(module);
-			TCDefinition result = findDefinition(found.node, env, module.name.getName());
+			TCDefinition result = lookupNodeDefinition(found.node, env, module.name.getName());
 
 			if (result == null)
 			{
@@ -171,7 +216,7 @@ public class LSPDefinitionFinder
 			TCClassDefinition cdef = found.classdef;
 			PublicClassEnvironment globals = new PublicClassEnvironment(classes); 
 			PrivateClassEnvironment env = new PrivateClassEnvironment(cdef, globals);
-			TCDefinition result = findDefinition(found.node, env, cdef.name.getName());
+			TCDefinition result = lookupNodeDefinition(found.node, env, cdef.name.getName());
 
 			if (result == null)
 			{
@@ -188,7 +233,7 @@ public class LSPDefinitionFinder
 		}
 	}
 	
-	private TCDefinition findDefinition(TCNode node, Environment env, String fromModule)
+	private TCDefinition lookupNodeDefinition(TCNode node, Environment env, String fromModule)
 	{
 		if (node instanceof TCVariableExpression)
 		{
@@ -298,7 +343,28 @@ public class LSPDefinitionFinder
 				}
 			}
 			
-			return env.findName(name, NameScope.VARSANDNAMES);
+			TCDefinition def = env.findName(name, NameScope.VARSANDNAMES);
+			
+			if (def != null)
+			{
+				return def;
+			}
+			
+			return env.findType(name, fromModule);
+		}
+		else if (node instanceof TCImportedValue)	// Covers operations and functions too
+		{
+			TCImportedValue imp = (TCImportedValue)node;
+			return imp.from.exportdefs.findName(imp.name, NameScope.NAMES);
+		}
+		else if (node instanceof TCImportedType)
+		{
+			TCImportedType imp = (TCImportedType)node;
+			return imp.from.exportdefs.findType(imp.name, fromModule);
+		}
+		else if (node instanceof LSPModuleDefinition)
+		{
+			return (LSPModuleDefinition)node;	// ie. the module itself
 		}
 		
 		return null;
