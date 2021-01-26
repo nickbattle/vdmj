@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.visitors.TCImportExportVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -44,12 +45,14 @@ public class TCExportedFunction extends TCExport
 	public final TCNameList nameList;
 	public TCType type;
 	public final TCNameList typeParams;
+	public final TCTypeList unresolved;
 
 	public TCExportedFunction(LexLocation location, TCNameList nameList, TCType type, TCNameList typeParams)
 	{
 		super(location);
 		this.nameList = nameList;
 		this.type = type;
+		this.unresolved = (type == null) ? new TCTypeList() : type.unresolvedTypes();
 		this.typeParams = typeParams;
 	}
 
