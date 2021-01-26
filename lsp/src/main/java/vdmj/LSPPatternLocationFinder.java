@@ -29,60 +29,36 @@ import java.util.Set;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
-import com.fujitsu.vdmj.tc.patterns.TCPatternList;
-import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
 import com.fujitsu.vdmj.tc.patterns.TCRecordPattern;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCLeafPatternVisitor;
 
 /**
  * Lookup a LexLocation within a pattern, looking for record pattern matches.
- * TODO: This ought to be a PatternVisitor within the TCLeafXXXVisitor framework,
- * but the leaf visitors do not currently process patterns or binds.
  */
-public class LSPPatternLocationFinder
+public class LSPPatternLocationFinder extends TCLeafPatternVisitor<TCNode, Set<TCNode>, LexLocation>
 {
+	@Override
 	protected Set<TCNode> newCollection()
 	{
 		return new HashSet<TCNode>();
 	}
 
-	public Set<TCNode> patternCheck(TCPatternListList paramPatternList, LexLocation arg)
+	@Override
+	public Set<TCNode> casePattern(TCPattern node, LexLocation arg)
 	{
-		Set<TCNode> all = newCollection();
-
-		for (TCPatternList list: paramPatternList)
-		{
-			all.addAll(patternCheck(list, arg));
-		}
-		
-		return all;
-	}
-
-	public Set<TCNode> patternCheck(TCPatternList list, LexLocation arg)
-	{
-		Set<TCNode> all = newCollection();
-
-		for (TCPattern p: list)
-		{
-			all.addAll(patternCheck(p, arg));
-		}
-		
-		return all;
+		return newCollection();
 	}
 	
-	public Set<TCNode> patternCheck(TCPattern p, LexLocation arg)
+	@Override
+	public Set<TCNode> caseRecordPattern(TCRecordPattern node, LexLocation arg)
 	{
-		Set<TCNode> all = newCollection();
+		Set<TCNode> all = super.caseRecordPattern(node, arg);
 
-		if (p instanceof TCRecordPattern)
+		if (arg.within(node.typename.getLocation()))
 		{
-			TCRecordPattern r = (TCRecordPattern)p;
-			
-			if (arg.within(r.typename.getLocation()))
-			{
-				all.add(r.typename);
-			}
+			all.add(node.typename);
 		}
-
+		
 		return all;
 	}
 }

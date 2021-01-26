@@ -46,8 +46,8 @@ import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
-import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
 
 public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode, Set<TCNode>, LexLocation>
 {
@@ -56,12 +56,14 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 		private final LSPDefinitionLocationFinder defVisitor;
 		private final LSPExpressionLocationFinder expVisitor;
 		private final LSPStatementLocationFinder stmtVisitor;
+		private final LSPPatternLocationFinder patVisitor;
 
 		public VisitorSet(LSPDefinitionLocationFinder parent)
 		{
 			defVisitor = parent;
 			expVisitor = new LSPExpressionLocationFinder(this);
 			stmtVisitor = new LSPStatementLocationFinder(this);
+			patVisitor = new LSPPatternLocationFinder();
 		}
 		
 		@Override
@@ -81,14 +83,17 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	 	{
 	 		return stmtVisitor;
 	 	}
+		
+		@Override
+		public TCPatternVisitor<Set<TCNode>, LexLocation> getPatternVisitor()
+		{
+			return patVisitor;
+		}
 	}
-
-	private final LSPPatternLocationFinder patternFinder;
 
 	public LSPDefinitionLocationFinder()
 	{
 		visitorSet = new VisitorSet(this);
-		patternFinder = new LSPPatternLocationFinder();
 	}
 
 	@Override
@@ -126,7 +131,6 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	{
 		Set<TCNode> all = super.caseValueDefinition(node, sought);
 		all.addAll(node.unresolved.matchUnresolved(sought));
-		all.addAll(patternFinder.patternCheck(node.pattern, sought));
 		return all;
 	}
 	
@@ -135,7 +139,6 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	{
 		Set<TCNode> all = super.caseExplicitFunctionDefinition(node, sought);
 		all.addAll(node.unresolved.matchUnresolved(sought));
-		all.addAll(patternFinder.patternCheck(node.paramPatternList, sought));
 		return all;
 	}
 	
@@ -144,12 +147,6 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	{
 		Set<TCNode> all = super.caseImplicitFunctionDefinition(node, sought);
 		all.addAll(node.unresolved.matchUnresolved(sought));
-		
-		for (TCPatternListTypePair pair: node.parameterPatterns)
-		{
-			all.addAll(patternFinder.patternCheck(pair.patterns, sought));
-		}
-		
 		return all;
 	}
 	
@@ -158,7 +155,6 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	{
 		Set<TCNode> all = super.caseExplicitOperationDefinition(node, sought);
 		all.addAll(node.unresolved.matchUnresolved(sought));
-		all.addAll(patternFinder.patternCheck(node.parameterPatterns, sought));
 		return all;
 	}
 
@@ -167,12 +163,6 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	{
 		Set<TCNode> all = super.caseImplicitOperationDefinition(node, sought);
 		all.addAll(node.unresolved.matchUnresolved(sought));
-		
-		for (TCPatternListTypePair pair: node.parameterPatterns)
-		{
-			all.addAll(patternFinder.patternCheck(pair.patterns, sought));
-		}
-
 		return all;
 	}
 	
