@@ -96,8 +96,8 @@ Two options are available to translate VDM source into LaTeX or Word formats. Ri
 
 Various things do not work perfectly yet:
 
-- The F12 navigation does not work correctly for a few expressions, but most common type usage is OK, like record field definitions or function signatures.
-- The "." field completion is awkward to use because it requires the spec to be cleanly type-checked. So if you type `var.field`, the field part will not be offered unless you type `var`, then save the spec to type check it, and then type ".".
+- The F12 navigate to definition works in most cases, but if you find any examples that don't, please raise an issue.
+- The "." or "```" field completion is awkward to use because it requires the spec to be cleanly type-checked. So if you type `var.field`, the field part will not be offered unless you type `var`, then save the spec to type check it, and then type ".".
 - If you click the `Stop` (Shift-F5 or the red square) debugging button, the session is usually closed and the debug console says so. But if you click `Stop` at a breakpoint or an exception that has been caught, control returns to the debug console and the session is still active. Clicking `Stop` once again will stop for real.
 
 
