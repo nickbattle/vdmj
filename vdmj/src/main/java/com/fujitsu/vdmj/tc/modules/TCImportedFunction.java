@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.modules.visitors.TCImportExportVisitor;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -152,5 +153,11 @@ public class TCImportedFunction extends TCImportedValue
 	public String kind()
 	{
 		return "function";
+	}
+
+	@Override
+	public <R, S> R apply(TCImportExportVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImportedFunction(this, arg);
 	}
 }

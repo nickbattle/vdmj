@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.tc.definitions.TCImportedDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCRenamedDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.modules.visitors.TCImportExportVisitor;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -121,5 +122,11 @@ public class TCImportedType extends TCImport
 	public String kind()
 	{
 		return "type";
+	}
+
+	@Override
+	public <R, S> R apply(TCImportExportVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseImportedType(this, arg);
 	}
 }

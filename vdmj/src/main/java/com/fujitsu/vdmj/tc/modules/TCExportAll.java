@@ -27,6 +27,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
+import com.fujitsu.vdmj.tc.modules.visitors.TCImportExportVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class TCExportAll extends TCExport
@@ -70,5 +71,11 @@ public class TCExportAll extends TCExport
 	public void typeCheck(Environment env, TCDefinitionList actualDefs)
 	{
 		return;		// Implicitly OK.
+	}
+
+	@Override
+	public <R, S> R apply(TCImportExportVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseExportAll(this, arg);
 	}
 }
