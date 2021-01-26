@@ -23,6 +23,8 @@
 
 package vdmj;
 
+import java.util.Set;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -32,6 +34,7 @@ import com.fujitsu.vdmj.tc.modules.TCExportedOperation;
 import com.fujitsu.vdmj.tc.modules.TCExportedType;
 import com.fujitsu.vdmj.tc.modules.TCExportedValue;
 import com.fujitsu.vdmj.tc.modules.TCImport;
+import com.fujitsu.vdmj.tc.modules.TCImportedValue;
 import com.fujitsu.vdmj.tc.modules.visitors.TCImportExportVisitor;
 
 public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode, LexLocation>
@@ -53,7 +56,16 @@ public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode,
 			}
 		}
 		
-		return null;
+		Set<TCNode> set = node.unresolved.matchUnresolved(arg);
+		
+		if (set.isEmpty())
+		{
+			return null;
+		}
+		else
+		{
+			return set.iterator().next();
+		}
 	}
 	
 	@Override
@@ -67,7 +79,16 @@ public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode,
 			}
 		}
 		
-		return null;
+		Set<TCNode> set = node.unresolved.matchUnresolved(arg);
+		
+		if (set.isEmpty())
+		{
+			return null;
+		}
+		else
+		{
+			return set.iterator().next();
+		}
 	}
 	
 	@Override
@@ -81,7 +102,16 @@ public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode,
 			}
 		}
 		
-		return null;
+		Set<TCNode> set = node.unresolved.matchUnresolved(arg);
+		
+		if (set.isEmpty())
+		{
+			return null;
+		}
+		else
+		{
+			return set.iterator().next();
+		}
 	}
 	
 	@Override
@@ -94,7 +124,7 @@ public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode,
 		
 		return null;
 	}
-
+	
 	@Override
 	public TCNode caseImport(TCImport node, LexLocation arg)
 	{
@@ -105,6 +135,20 @@ public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode,
 		else if (node.renamed != null && arg.within(node.renamed.getLocation()))
 		{
 			return node;
+		}
+		else if (node instanceof TCImportedValue)
+		{
+			TCImportedValue imp = (TCImportedValue)node;
+			Set<TCNode> set = imp.unresolved.matchUnresolved(arg);
+			
+			if (set.isEmpty())
+			{
+				return null;
+			}
+			else
+			{
+				return set.iterator().next();
+			}
 		}
 		else
 		{
