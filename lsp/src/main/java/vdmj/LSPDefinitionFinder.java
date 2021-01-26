@@ -95,6 +95,16 @@ public class LSPDefinitionFinder
 				{
 					for (TCImportFromModule def: module.imports.imports)
 					{
+						if (position.within(def.name.getLocation()))	// module itself
+						{
+							TCModule m = modules.findModule(def.name);
+							
+							if (m != null)
+							{
+								return new Found(module, null, new LSPModuleDefinition(m));
+							}
+						}
+						
 						for (TCImport imp: def.signatures)
 						{
 							TCNode node = imp.apply(ieFinder, position);
@@ -351,6 +361,10 @@ public class LSPDefinitionFinder
 		{
 			TCImportedType imp = (TCImportedType)node;
 			return imp.from.exportdefs.findType(imp.name, fromModule);
+		}
+		else if (node instanceof LSPModuleDefinition)
+		{
+			return (LSPModuleDefinition)node;	// ie. the module itself
 		}
 		
 		return null;
