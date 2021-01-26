@@ -24,7 +24,6 @@
 package com.fujitsu.vdmj.tc.definitions.visitors;
 
 import java.util.Collection;
-
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -55,6 +54,10 @@ import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCPattern;
+import com.fujitsu.vdmj.tc.patterns.TCPatternList;
+import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.traces.TCTraceApplyExpression;
 import com.fujitsu.vdmj.tc.traces.TCTraceBracketedExpression;
@@ -66,6 +69,7 @@ import com.fujitsu.vdmj.tc.traces.TCTraceLetBeStBinding;
 import com.fujitsu.vdmj.tc.traces.TCTraceLetDefBinding;
 import com.fujitsu.vdmj.tc.traces.TCTraceRepeatDefinition;
 import com.fujitsu.vdmj.tc.types.TCField;
+import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 /**
@@ -141,7 +145,13 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
+		TCPatternVisitor<C, S> patternVisitor = visitorSet.getPatternVisitor();
 		C all = newCollection();
+		
+		if (patternVisitor != null)
+		{
+			all.addAll(patternCheck(patternVisitor, node.paramPatternList, arg));
+		}
 		
 		if (typeVisitor != null)
 		{
@@ -176,7 +186,13 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		TCStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
+		TCPatternVisitor<C, S> patternVisitor = visitorSet.getPatternVisitor();
 		C all = newCollection();
+		
+		if (patternVisitor != null)
+		{
+			patternCheck(patternVisitor, node.parameterPatterns, arg);
+		}
 		
 		if (typeVisitor != null)
 		{
@@ -212,8 +228,17 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
+		TCPatternVisitor<C, S> patternVisitor = visitorSet.getPatternVisitor();
 		C all = newCollection();
 		
+		if (patternVisitor != null)
+		{
+			for (TCPatternListTypePair pair: node.parameterPatterns)
+			{
+				all.addAll(patternCheck(patternVisitor, pair.patterns, arg));
+			}
+		}
+
 		if (typeVisitor != null)
 		{
 			all.addAll(node.getType().apply(typeVisitor, arg));
@@ -247,7 +272,16 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		TCStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
+		TCPatternVisitor<C, S> patternVisitor = visitorSet.getPatternVisitor();
 		C all = newCollection();
+		
+		if (patternVisitor != null)
+		{
+			for (TCPatternListTypePair pair: node.parameterPatterns)
+			{
+				all.addAll(patternCheck(patternVisitor, pair.patterns, arg));
+			}
+		}
 		
 		if (typeVisitor != null)
 		{
@@ -523,7 +557,13 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
+		TCPatternVisitor<C, S> patternVisitor = visitorSet.getPatternVisitor();
 		C all = newCollection();
+		
+		if (patternVisitor != null)
+		{
+			all.addAll(node.pattern.apply(patternVisitor, arg));
+		}
 		
 		if (typeVisitor != null)
 		{
@@ -560,6 +600,30 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 				TCMultipleSeqBind sbind = (TCMultipleSeqBind)bind;
 				all.addAll(sbind.sequence.apply(expVisitor, arg));
 			}
+		}
+		
+		return all;
+	}
+
+	protected C patternCheck(TCPatternVisitor<C, S> patternVisitor, TCPatternListList paramPatternList, S arg)
+	{
+		C all = newCollection();
+
+		for (TCPatternList list: paramPatternList)
+		{
+			all.addAll(patternCheck(patternVisitor, list, arg));
+		}
+		
+		return all;
+	}
+
+	protected C patternCheck(TCPatternVisitor<C, S> patternVisitor, TCPatternList list, S arg)
+	{
+		C all = newCollection();
+
+		for (TCPattern p: list)
+		{
+			all.addAll(p.apply(patternVisitor, arg));
 		}
 		
 		return all;
