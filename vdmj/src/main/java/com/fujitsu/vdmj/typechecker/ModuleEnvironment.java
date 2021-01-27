@@ -51,7 +51,7 @@ public class ModuleEnvironment extends Environment
 
 		for (TCDefinition d: module.defs)
 		{
-			sb.append(d.name);
+			sb.append(d.name == null ? d : d.name);
 			sb.append("\n");
 		}
 
