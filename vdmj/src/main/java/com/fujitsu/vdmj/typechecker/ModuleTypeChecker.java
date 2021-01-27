@@ -129,14 +129,12 @@ public class ModuleTypeChecker extends TypeChecker
 		// other definitions so that they are found first.
 
 		TCDefinitionList alldefs = new TCDefinitionList();
-		TCDefinitionList checkDefs = new TCDefinitionList();
 
 		for (TCModule m: modules)
 		{
 			for (TCDefinition d: m.importdefs)
 			{
 				alldefs.add(d);
-				checkDefs.add(d);
 			}
 		}
 
@@ -145,7 +143,6 @@ public class ModuleTypeChecker extends TypeChecker
 			for (TCDefinition d: m.defs)
 			{
 				alldefs.add(d);
-				checkDefs.add(d);
 			}
 		}
 
@@ -154,33 +151,36 @@ public class ModuleTypeChecker extends TypeChecker
 			m.checkOver();
 		}
 
-		// Attempt type resolution of unchecked definitions from all executableModules.
+		// Attempt type resolution of definitions from all modules.
 
-		Environment env =
-			new FlatCheckedEnvironment(alldefs, NameScope.NAMESANDSTATE);
-
-		for (TCDefinition d: checkDefs)
+		for (TCModule m: modules)
 		{
-			try
+			TypeComparator.setCurrentModule(m.name.getName());
+			Environment env = new ModuleEnvironment(m);
+
+			for (TCDefinition d: m.defs)
 			{
-				d.typeResolve(env);
-			}
-			catch (TypeCheckException te)
-			{
-				report(3430, te.getMessage(), te.location);
-				
-				if (te.extras != null)
+				try
 				{
-					for (TypeCheckException e: te.extras)
+					d.typeResolve(env);
+				}
+				catch (TypeCheckException te)
+				{
+					report(3430, te.getMessage(), te.location);
+					
+					if (te.extras != null)
 					{
-						report(3430, e.getMessage(), e.location);
+						for (TypeCheckException e: te.extras)
+						{
+							report(3430, e.getMessage(), e.location);
+						}
 					}
 				}
 			}
 		}
 		
 		// Initialise any annotations
-		TCAnnotation.init(env);
+		TCAnnotation.init(new FlatCheckedEnvironment(alldefs, NameScope.NAMESANDSTATE));
 
 		for (TCModule m: modules)
 		{
@@ -271,6 +271,6 @@ public class ModuleTypeChecker extends TypeChecker
 		TCAnnotation.close();
 
     	// Check for inter-definition cyclic dependencies before initialization
-    	cyclicDependencyCheck(checkDefs);
+    	cyclicDependencyCheck(alldefs);
 	}
 }
