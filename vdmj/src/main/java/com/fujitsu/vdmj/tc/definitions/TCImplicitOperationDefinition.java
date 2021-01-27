@@ -206,6 +206,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		scope = NameScope.NAMESANDSTATE;
 		TCDefinitionList defs = new TCDefinitionList();
 		TCDefinitionList argdefs = new TCDefinitionList();
+		TypeComparator.checkImports(base, unresolved, location.module);
 		TypeComparator.checkComposeTypes(type, base, false);
 
 		for (TCPatternListTypePair ptp: parameterPatterns)

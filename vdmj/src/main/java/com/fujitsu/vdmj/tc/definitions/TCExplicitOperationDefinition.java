@@ -179,6 +179,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 
 		scope = NameScope.NAMESANDSTATE;
 		TCTypeList ptypes = type.parameters;
+		TypeComparator.checkImports(base, unresolved, location.module);
 		TypeComparator.checkComposeTypes(type, base, false);
 
 		if (parameterPatterns.size() > ptypes.size())

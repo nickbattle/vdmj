@@ -42,6 +42,7 @@ public class TCIsExpression extends TCExpression
 	public final TCExpression test;
 
 	public TCDefinition typedef = null;
+	public TCTypeList unresolved = null;
 
 	public TCIsExpression(LexLocation location, TCNameToken typename, TCType type, TCExpression test)
 	{
@@ -49,6 +50,11 @@ public class TCIsExpression extends TCExpression
 		this.basictype = type;
 		this.typename = typename;
 		this.test = test;
+		
+		if (basictype != null)
+		{
+			unresolved = type.unresolvedTypes();
+		}
 	}
 
 	@Override
@@ -66,6 +72,7 @@ public class TCIsExpression extends TCExpression
 		{
 			basictype = basictype.typeResolve(env, null);
 			TypeComparator.checkComposeTypes(basictype, env, false);
+			TypeComparator.checkImports(env, unresolved, location.module);
 		}
 
 		if (typename != null)

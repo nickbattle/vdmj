@@ -151,29 +151,28 @@ public class ModuleTypeChecker extends TypeChecker
 			m.checkOver();
 		}
 
-		// Attempt type resolution of definitions from all modules.
+		// Attempt type resolution of definitions from all modules. We have to resolve module types
+		// against all possible types (rather than per module) because the resolution process chases
+		// the full tree of subtypes, which may cross multiple modules. Subsequently, the typecheck
+		// process verifies that the types used within a module are imported, if necessary.
 
-		for (TCModule m: modules)
+		Environment allenv = new FlatCheckedEnvironment(alldefs, NameScope.NAMESANDSTATE);
+
+		for (TCDefinition d: alldefs)
 		{
-			TypeComparator.setCurrentModule(m.name.getName());
-			Environment env = new ModuleEnvironment(m);
-
-			for (TCDefinition d: m.defs)
+			try
 			{
-				try
+				d.typeResolve(allenv);
+			}
+			catch (TypeCheckException te)
+			{
+				report(3430, te.getMessage(), te.location);
+				
+				if (te.extras != null)
 				{
-					d.typeResolve(env);
-				}
-				catch (TypeCheckException te)
-				{
-					report(3430, te.getMessage(), te.location);
-					
-					if (te.extras != null)
+					for (TypeCheckException e: te.extras)
 					{
-						for (TypeCheckException e: te.extras)
-						{
-							report(3430, e.getMessage(), e.location);
-						}
+						report(3430, e.getMessage(), e.location);
 					}
 				}
 			}

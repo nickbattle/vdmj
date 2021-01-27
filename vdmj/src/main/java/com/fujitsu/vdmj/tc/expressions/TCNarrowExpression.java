@@ -43,6 +43,7 @@ public class TCNarrowExpression extends TCExpression
 
 	private TCDefinition typedef = null;
 	private TCType exptype = null;
+	public TCTypeList unresolved = null;
 
 	public TCNarrowExpression(LexLocation location, TCNameToken typename, TCType type, TCExpression test)
 	{
@@ -50,6 +51,11 @@ public class TCNarrowExpression extends TCExpression
 		this.basictype = type;
 		this.typename = typename;
 		this.test = test;
+		
+		if (basictype != null)
+		{
+			unresolved = basictype.unresolvedTypes();
+		}
 	}
 
 	@Override
@@ -68,6 +74,7 @@ public class TCNarrowExpression extends TCExpression
 		{
 			basictype = basictype.typeResolve(env, null);
 			result = basictype;
+			TypeComparator.checkImports(env, unresolved, location.module);
 			TypeComparator.checkComposeTypes(basictype, env, false);
 		}
 		else
