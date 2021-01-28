@@ -161,6 +161,8 @@ public class TCFuncInstantiationExpression extends TCExpression
 
     				set.add(type);
     			}
+    			
+    			TypeComparator.checkImports(env, unresolved, location.module);
 			}
 
 			if (!set.isEmpty())
