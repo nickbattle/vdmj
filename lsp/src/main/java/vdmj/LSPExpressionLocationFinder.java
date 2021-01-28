@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.tc.expressions.TCHistoryExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
+import com.fujitsu.vdmj.tc.expressions.TCNarrowExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNewExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
@@ -160,9 +161,29 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 		
 		if (node.typename != null && arg.within(node.typename.getLocation()))
 		{
-			all.add(node);
+			all.add(node.typename);
 		}
-		// Can't find basic type as yet...!
+		else if (node.unresolved != null)
+		{
+			all.addAll(node.unresolved.matchUnresolved(arg));
+		}
+	
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseNarrowExpression(TCNarrowExpression node, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseNarrowExpression(node, arg);
+		
+		if (node.typename != null && arg.within(node.typename.getLocation()))
+		{
+			all.add(node.typename);
+		}
+		else if (node.unresolved != null)
+		{
+			all.addAll(node.unresolved.matchUnresolved(arg));
+		}
 	
 		return all;
 	}

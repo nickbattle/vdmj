@@ -61,12 +61,6 @@ public class TCPatternBind extends TCNode
 		{
 			this.pattern = null;
 			this.bind = bind;
-			
-			if (bind instanceof TCTypeBind)
-			{
-				TCTypeBind tbind = (TCTypeBind)bind;
-				unresolved = tbind.type.unresolvedTypes();
-			}
 		}
 		else
 		{
@@ -97,6 +91,7 @@ public class TCPatternBind extends TCNode
 			if (bind instanceof TCTypeBind)
 			{
 				TCTypeBind typebind = (TCTypeBind)bind;
+				unresolved = typebind.type.unresolvedTypes();
 				typebind.typeResolve(base);
 				
 				TypeComparator.checkImports(base, unresolved, location.module);
