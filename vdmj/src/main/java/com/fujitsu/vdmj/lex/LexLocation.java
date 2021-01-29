@@ -65,13 +65,23 @@ public class LexLocation implements Serializable
 	public final File file;
 	/** The module/class name of the token. */
 	public final String module;
+	
+	/**
+	 * The line and character positions of a LexLocation are 1-relative. That is,
+	 * the first character of the first line of a spec is line 1, char 1. The
+	 * end markers are that of the last character of the range, not one beyond. So
+	 * at token "abc" at the start of line 1 would be startPos=1, endPos=3.
+	 * 
+	 * Line or character positions of zero indicate that they are not set.
+	 */
+	
 	/** The line number of the start of the token. */
 	public final int startLine;
 	/** The character position of the start of the token. */
 	public final int startPos;
 	/** The last line of the token. */
 	public final int endLine;
-	/** The character position of the end of the token. */
+	/** The position of the last character of the token. */
 	public final int endPos;
 
 	/** The number of times the location has been executed. */
@@ -181,7 +191,7 @@ public class LexLocation implements Serializable
 			(startLine > span.startLine ||
 				(startLine == span.startLine && startPos >= span.startPos)) &&
 			(startLine < span.endLine ||
-				(startLine == span.endLine && startPos < span.endPos)) &&
+				(startLine == span.endLine && startPos <= span.endPos)) &&
 			file.equals(span.file);
 	}
 	

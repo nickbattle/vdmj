@@ -104,8 +104,11 @@ public class TCPluginSL extends TCPlugin
 			{
 				if (module.files.contains(file))
 				{
-					results.add(messages.symbolInformation(module.name.toString(),
+					if (module.name.getLocation().file.equals(file))
+					{
+						results.add(messages.symbolInformation(module.name.toString(),
 							module.name.getLocation(), SymbolKind.Module, null));
+					}
 
 					for (TCDefinition def: module.defs)
 					{
