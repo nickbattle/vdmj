@@ -129,14 +129,12 @@ public class ModuleTypeChecker extends TypeChecker
 		// other definitions so that they are found first.
 
 		TCDefinitionList alldefs = new TCDefinitionList();
-		TCDefinitionList checkDefs = new TCDefinitionList();
 
 		for (TCModule m: modules)
 		{
 			for (TCDefinition d: m.importdefs)
 			{
 				alldefs.add(d);
-				checkDefs.add(d);
 			}
 		}
 
@@ -145,7 +143,6 @@ public class ModuleTypeChecker extends TypeChecker
 			for (TCDefinition d: m.defs)
 			{
 				alldefs.add(d);
-				checkDefs.add(d);
 			}
 		}
 
@@ -154,16 +151,18 @@ public class ModuleTypeChecker extends TypeChecker
 			m.checkOver();
 		}
 
-		// Attempt type resolution of unchecked definitions from all executableModules.
+		// Attempt type resolution of definitions from all modules. We have to resolve module types
+		// against all possible types (rather than per module) because the resolution process chases
+		// the full tree of subtypes, which may cross multiple modules. Subsequently, the typecheck
+		// process verifies that the types used within a module are imported, if necessary.
 
-		Environment env =
-			new FlatCheckedEnvironment(alldefs, NameScope.NAMESANDSTATE);
+		Environment allenv = new FlatCheckedEnvironment(alldefs, NameScope.NAMESANDSTATE);
 
-		for (TCDefinition d: checkDefs)
+		for (TCDefinition d: alldefs)
 		{
 			try
 			{
-				d.typeResolve(env);
+				d.typeResolve(allenv);
 			}
 			catch (TypeCheckException te)
 			{
@@ -180,7 +179,7 @@ public class ModuleTypeChecker extends TypeChecker
 		}
 		
 		// Initialise any annotations
-		TCAnnotation.init(env);
+		TCAnnotation.init(new FlatCheckedEnvironment(alldefs, NameScope.NAMESANDSTATE));
 
 		for (TCModule m: modules)
 		{
@@ -271,6 +270,6 @@ public class ModuleTypeChecker extends TypeChecker
 		TCAnnotation.close();
 
     	// Check for inter-definition cyclic dependencies before initialization
-    	cyclicDependencyCheck(checkDefs);
+    	cyclicDependencyCheck(alldefs);
 	}
 }

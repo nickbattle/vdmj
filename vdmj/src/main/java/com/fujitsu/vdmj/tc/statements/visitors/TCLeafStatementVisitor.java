@@ -526,7 +526,7 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		return newCollection();
 	}
 
-	private C caseBind(TCBind bind, S arg)
+	protected C caseBind(TCBind bind, S arg)
 	{
 		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		C all = newCollection();
@@ -548,7 +548,7 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		return all;
 	}
 
- 	private C caseMultipleBind(TCMultipleBind bind, S arg)
+ 	protected C caseMultipleBind(TCMultipleBind bind, S arg)
 	{
 		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		C all = newCollection();

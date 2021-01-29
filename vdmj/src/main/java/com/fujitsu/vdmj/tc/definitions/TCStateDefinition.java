@@ -64,6 +64,7 @@ public class TCStateDefinition extends TCDefinition
 	public final TCDefinitionList statedefs;
 	private TCRecordType recordType;
 	public boolean canBeExecuted = true;
+	public TCTypeList unresolved = new TCTypeList();
 
 	public TCStateDefinition(TCNameToken name, TCFieldList fields, TCPattern invPattern,
 		TCExpression invExpression, TCPattern initPattern, TCExpression initExpression)
@@ -80,6 +81,8 @@ public class TCStateDefinition extends TCDefinition
 
 		for (TCField f: fields)
 		{
+			unresolved.addAll(f.type.unresolvedTypes());
+			
 			statedefs.add(new TCLocalDefinition(f.tagname.getLocation(),
 				f.tagname, f.type, NameScope.STATE));
 
@@ -179,6 +182,7 @@ public class TCStateDefinition extends TCDefinition
 				TypeComparator.checkComposeTypes(field.type, base, false);
 			}
 
+			TypeComparator.checkImports(base, unresolved, location.module);
 			statedefs.typeCheck(base, scope);
 			pass = Pass.DEFS;
 		}

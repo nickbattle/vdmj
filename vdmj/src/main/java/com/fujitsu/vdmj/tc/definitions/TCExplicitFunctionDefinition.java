@@ -245,6 +245,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			defs.addAll(getTypeParamDefinitions());
 		}
 		
+		TypeComparator.checkImports(base, unresolved, location.module);
 		TypeComparator.checkComposeTypes(type, base, false);
 
 		expectedResult = checkParams(paramPatternList.listIterator(), type);
