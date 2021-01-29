@@ -544,7 +544,7 @@ public class LSPWorkspaceManager
 						new JSONObject(
 							"targetUri", defuri.toString(),
 							"targetRange", Utils.lexLocationToRange(def.location),
-							"targetSelectionRange", Utils.lexLocationToPoint(def.location)))
+							"targetSelectionRange", Utils.lexLocationToPosition(def.location)))
 					:
 					new JSONObject(
 						"uri", defuri.toString(),

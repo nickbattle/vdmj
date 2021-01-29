@@ -395,7 +395,7 @@ public class LexTokenReader extends BacktrackInputReader
 		if (c == '\n')
 		{
 			linecount++;
-			lasteol = charpos + 1;	// See location method
+			lasteol = charpos;	// See location method
 			charpos = 0;
 		}
 		else if (c == '\t')
@@ -1031,7 +1031,7 @@ public class LexTokenReader extends BacktrackInputReader
 	 */
 	private LexLocation location(int tokline, int tokpos)
 	{
-		if (charpos == 0 && linecount == tokline + 1)
+		if (charpos == 0 && linecount == tokline + 1)	// token at the end of a line
 		{
 			return new LexLocation(
 					file, currentModule, tokline, tokpos, tokline, lasteol);
@@ -1039,7 +1039,7 @@ public class LexTokenReader extends BacktrackInputReader
 		else
 		{
 			return new LexLocation(
-					file, currentModule, tokline, tokpos, linecount, charpos);
+					file, currentModule, tokline, tokpos, linecount, charpos-1);
 		}
 	}
 
