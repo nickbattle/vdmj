@@ -217,11 +217,10 @@ public class LSPWorkspaceManager
 	{
 		JSONArray watchers = new JSONArray();
 		
-		for (String glob: getFilenameFilters())
-		{
-			// Add the rootUri so that we only notice changes in our own project
-			watchers.add(new JSONObject("globPattern", rootUri.getAbsolutePath() + "/" + glob));
-		}
+		// Add the rootUri so that we only notice changes in our own project.
+		// We watch for all files/dirs and deal with filtering in changedWatchedFiles,
+		// otherwise directory deletions are not notified.
+		watchers.add(new JSONObject("globPattern", rootUri.getAbsolutePath() + "/**"));
 		
 		return RPCRequest.create("client/registerCapability",
 			new JSONObject(
@@ -356,11 +355,6 @@ public class LSPWorkspaceManager
 		return result;
 	}
 
-	private void unloadFile(File file)
-	{
-		projectFiles.remove(file);
-	}
-
 	public RPCMessageList openFile(RPCRequest request, File file, String text) throws Exception
 	{
 		if (!projectFiles.keySet().contains(file))
@@ -451,53 +445,52 @@ public class LSPWorkspaceManager
 
 	public void changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
 	{
+		FilenameFilter filter = getFilenameFilter();
+
 		switch (type)
 		{
 			case CREATE:
-				if (!projectFiles.keySet().contains(file))	
+				if (file.isDirectory())
+				{
+					Log.printf("New directory created: %s", file);
+				}
+				else if (!filter.accept(file.getParentFile(), file.getName()))
+				{
+					Log.printf("Ignoring non-project file: %s", file);
+				}
+				else if (!projectFiles.keySet().contains(file))	
 				{
 					Log.printf("Created new file: %s", file);
 					loadFile(file);
 				}
 				else
 				{
-					Log.error("Created file already exists: %s", file);
+					// Usually because a didOpen gets in first, on creation
+					Log.error("Created file already known: %s", file);
 				}
 				break;
 				
 			case CHANGE:
-				if (!projectFiles.keySet().contains(file))	
+				if (file.isDirectory())
 				{
-					Log.error("Changed file not loaded: %s", file);
+					Log.printf("Directory changed: %s", file);
+				}
+				else if (!filter.accept(file.getParentFile(), file.getName()))
+				{
+					Log.printf("Ignoring non-project file change: %s", file);
+				}
+				else if (!projectFiles.keySet().contains(file))	
+				{
+					Log.error("Changed file not known: %s", file);
 				}
 				break;
 				
 			case DELETE:
-				if (projectFiles.keySet().contains(file))	
-				{
-					Log.printf("Deleted file: %s", file);
-					unloadFile(file);
-				}
-				else
-				{
-					Log.error("Deleted file not known: %s", file);
-				}
+				// Since the file is deleted, we don't know what it was so we have to rebuild
+				Log.printf("Deleted %s (dir/file?), rebuilding", file);
+				projectFiles.clear();
+				loadAllProjectFiles();
 				break;
-		}
-	}
-
-	public RPCMessageList changeFolders(RPCRequest request, List<File> newRoots)
-	{
-		try
-		{
-			projectFiles.clear();
-			loadAllProjectFiles();
-			return checkLoadedFiles();
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
 
@@ -688,12 +681,6 @@ public class LSPWorkspaceManager
 	{
 		ASTPlugin ast = registry.getPlugin("AST");
 		return ast.getFilenameFilter();
-	}
-
-	private String[] getFilenameFilters()
-	{
-		ASTPlugin ast = registry.getPlugin("AST");
-		return ast.getFilenameFilters();
 	}
 
 	public void restart()	// Called from DAP manager
