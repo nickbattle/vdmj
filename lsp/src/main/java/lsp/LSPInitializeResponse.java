@@ -47,7 +47,7 @@ public class LSPInitializeResponse extends JSONObject
 				"triggerCharacters", new JSONArray(".", "`"),
 				"resolveProvider", false));
 		
-		cap.put("textDocumentSync",
+		cap.put("textDocumentSync",						// Note: save covered by watched files
 			new JSONObject(
 				"openClose", true,
 				"change", 2		// incremental
