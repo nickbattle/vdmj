@@ -66,6 +66,7 @@ public class POGHandler extends LSPHandler
 		}
 		catch (URISyntaxException e)
 		{
+			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
 		}
 		catch (IOException e)

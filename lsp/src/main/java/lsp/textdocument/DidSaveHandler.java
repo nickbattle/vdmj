@@ -29,7 +29,6 @@ import java.net.URISyntaxException;
 import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.Utils;
-import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.LSPWorkspaceManager;
@@ -52,16 +51,17 @@ public class DidSaveHandler extends LSPHandler
 			File file = Utils.uriToFile(textDoc.get("uri"));
 			String text = params.get("text");
 			
-			return LSPWorkspaceManager.getInstance().saveFile(request, file, text);
+			LSPWorkspaceManager.getInstance().saveFile(request, file, text);
 		}
 		catch (URISyntaxException e)
 		{
-			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
+			Log.error(e);
 		}
 		catch (Exception e)
 		{
 			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
+
+		return null;
 	}
 }

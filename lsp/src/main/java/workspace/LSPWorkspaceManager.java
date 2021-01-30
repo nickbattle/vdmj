@@ -159,6 +159,7 @@ public class LSPWorkspaceManager
 		}
 		catch (URISyntaxException e)
 		{
+			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InvalidRequest, "Malformed URI");
 		}
 		catch (Exception e)
@@ -174,12 +175,6 @@ public class LSPWorkspaceManager
 		{
 			RPCMessageList response = new RPCMessageList();
 			response.add(lspDynamicRegistrations());
-			
-			if (hasClientCapability("workspace.workspaceFolders"))
-			{
-				// response.add(lspWorkspaceFolders());
-			}
-			
 			response.addAll(checkLoadedFiles("initialized"));
 			return response;
 		}
@@ -236,6 +231,8 @@ public class LSPWorkspaceManager
 
 	private void loadAllProjectFiles() throws IOException
 	{
+		Log.printf("Loading all project files under %s", rootUri);
+		projectFiles.clear();
 		loadProjectFiles(rootUri);
 	}
 
@@ -359,7 +356,6 @@ public class LSPWorkspaceManager
 	{
 		if (!projectFiles.keySet().contains(file))
 		{
-			// Should be covered by changeWatchedFile below, but to be safe...
 			Log.printf("Opening new file: %s", file);
 			openFiles.add(file);
 		}
@@ -488,7 +484,6 @@ public class LSPWorkspaceManager
 			case DELETE:
 				// Since the file is deleted, we don't know what it was so we have to rebuild
 				Log.printf("Deleted %s (dir/file?), rebuilding", file);
-				projectFiles.clear();
 				loadAllProjectFiles();
 				break;
 		}
@@ -500,22 +495,27 @@ public class LSPWorkspaceManager
 	}
 
 	/**
-	 * This is currently done via watched file events above.
+	 * This is currently done via watched file events above. Note that this method
+	 * is a notification, so cannot return errors.
 	 */
-	public RPCMessageList saveFile(RPCRequest request, File file, String text) throws Exception
+	public void saveFile(RPCRequest request, File file, String text) throws Exception
 	{
 		if (!projectFiles.keySet().contains(file))
 		{
-			return new RPCMessageList(request, "File not known");
+			Log.error("File not known: %s", file);
 		}
 		else if (!openFiles.contains(file))
 		{
-			return new RPCMessageList(request, "File not open");
+			Log.error("File not open: %s", file);
 		}
 		else
 		{
-			projectFiles.put(file, new StringBuilder(text));
-			return checkLoadedFiles("saved");
+			if (text != null)
+			{
+				projectFiles.put(file, new StringBuilder(text));
+			}
+			
+			checkLoadedFiles("saved");
 		}
 	}
 
