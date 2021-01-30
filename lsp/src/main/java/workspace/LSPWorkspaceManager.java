@@ -180,7 +180,7 @@ public class LSPWorkspaceManager
 				// response.add(lspWorkspaceFolders());
 			}
 			
-			response.addAll(checkLoadedFiles());
+			response.addAll(checkLoadedFiles("initialized"));
 			return response;
 		}
 		catch (Exception e)
@@ -281,7 +281,7 @@ public class LSPWorkspaceManager
 		projectFiles.put(file, sb);
 	}
 
-	private RPCMessageList checkLoadedFiles() throws Exception
+	private RPCMessageList checkLoadedFiles(String reason) throws Exception
 	{
 		ASTPlugin ast = registry.getPlugin("AST");
 		TCPlugin tc = registry.getPlugin("TC");
@@ -289,7 +289,7 @@ public class LSPWorkspaceManager
 		POPlugin po = registry.getPlugin("PO");
 		CTPlugin ct = registry.getPlugin("CT");
 		
-		Log.printf("Checking loaded files...");
+		Log.printf("Checking loaded files (%s)...", reason);
 		ast.preCheck();
 		tc.preCheck();
 		in.preCheck();
@@ -379,7 +379,7 @@ public class LSPWorkspaceManager
 		{
 			if (existing != null) Utils.diff("File different on didOpen at %d", text, existing.toString());
 			projectFiles.put(file, new StringBuilder(text));
-			checkLoadedFiles();
+			checkLoadedFiles("file out of sync");
 		}
 		
 		return null;
@@ -466,7 +466,7 @@ public class LSPWorkspaceManager
 				else
 				{
 					// Usually because a didOpen gets in first, on creation
-					Log.error("Created file already known: %s", file);
+					Log.printf("Created file already added: %s", file);
 				}
 				break;
 				
@@ -496,7 +496,7 @@ public class LSPWorkspaceManager
 
 	public RPCMessageList afterChangeWatchedFiles(RPCRequest request) throws Exception
 	{
-		return checkLoadedFiles();
+		return checkLoadedFiles("after change watched");
 	}
 
 	/**
@@ -515,7 +515,7 @@ public class LSPWorkspaceManager
 		else
 		{
 			projectFiles.put(file, new StringBuilder(text));
-			return checkLoadedFiles();		// typecheck on save
+			return checkLoadedFiles("saved");
 		}
 	}
 
@@ -687,7 +687,7 @@ public class LSPWorkspaceManager
 	{
 		try
 		{
-			RPCMessageList messages = checkLoadedFiles();
+			RPCMessageList messages = checkLoadedFiles("restart");
 			LSPServer server = LSPServer.getInstance();
 			
 			for (JSONObject response: messages)
