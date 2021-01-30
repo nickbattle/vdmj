@@ -154,7 +154,7 @@ public class TCValueDefinition extends TCDefinition
 			updateDefs();
 		}
 	}
-
+	
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
@@ -175,6 +175,7 @@ public class TCValueDefinition extends TCDefinition
 		}
 		else if (type != null && !(type instanceof TCUnknownType))
 		{
+			TypeComparator.checkImports(base, unresolved, location.module);
 			TypeComparator.checkComposeTypes(type, base, false);
 			
 			if (!TypeComparator.compatible(type, expType))

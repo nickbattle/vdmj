@@ -63,6 +63,8 @@ public class LexTokenReader extends BacktrackInputReader
 	private int charsread;
 	/** The number of tokens read since the last push. */
 	private int tokensread;
+	/** The position of the last newline */
+	private int lasteol;
 
 	/** The next character to process. */
 	private char ch;
@@ -80,13 +82,14 @@ public class LexTokenReader extends BacktrackInputReader
 	 */
 	public class Position
 	{
-    	public int lc;
-    	public int cc;
-    	public int cr;
-    	public int tr;
+    	public final int lc;
+    	public final int cc;
+    	public final int cr;
+    	public final int tr;
+    	public final int le;
 
-    	public char c;
-    	public LexToken l;
+    	public final char c;
+    	public final LexToken l;
     	public LexCommentList co = new LexCommentList();
 
     	/**
@@ -99,6 +102,7 @@ public class LexTokenReader extends BacktrackInputReader
 			cc = charpos;
 			cr = charsread;
 			tr = tokensread;
+			le = lasteol;
 
 			c = ch;
 			l = last;
@@ -115,6 +119,7 @@ public class LexTokenReader extends BacktrackInputReader
 			charpos = cc;
 			charsread = cr;
 			tokensread = tr;
+			lasteol = le;
 
 			ch = c;
 			last = l;
@@ -229,6 +234,7 @@ public class LexTokenReader extends BacktrackInputReader
 		rdCh();
 		this.linecount = location.startLine;
 		this.charpos = location.startPos;
+		this.lasteol = 0;
 		this.charsread = 0;
 		this.tokensread = 0;
 		this.last = null;
@@ -253,6 +259,7 @@ public class LexTokenReader extends BacktrackInputReader
 	{
 		linecount = 1;
 		charpos = 0;
+		lasteol = 0;
 		rdCh();
 		charsread = 0;
 		tokensread = 0;
@@ -389,6 +396,7 @@ public class LexTokenReader extends BacktrackInputReader
 		if (c == '\n')
 		{
 			linecount++;
+			lasteol = charpos;	// See location method
 			charpos = 0;
 		}
 		else if (c == '\t')
@@ -1024,8 +1032,16 @@ public class LexTokenReader extends BacktrackInputReader
 	 */
 	private LexLocation location(int tokline, int tokpos)
 	{
-		return new LexLocation(
-			file, currentModule, tokline, tokpos, linecount, charpos);
+		if (charpos == 0 && linecount == tokline + 1)	// token at the end of a line
+		{
+			return new LexLocation(
+					file, currentModule, tokline, tokpos, tokline, lasteol);
+		}
+		else
+		{
+			return new LexLocation(
+					file, currentModule, tokline, tokpos, linecount, charpos-1);
+		}
 	}
 
 	/**

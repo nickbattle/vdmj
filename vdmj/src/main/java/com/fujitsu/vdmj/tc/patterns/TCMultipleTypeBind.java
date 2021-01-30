@@ -56,6 +56,7 @@ public class TCMultipleTypeBind extends TCMultipleBind
 		type = type.typeResolve(base, null);
 		TCType ptype = getPossibleType();
 		
+		TypeComparator.checkImports(base, unresolved, location.module);
 		TypeComparator.checkComposeTypes(type, base, false);
 
 		if (!TypeComparator.compatible(ptype, type))

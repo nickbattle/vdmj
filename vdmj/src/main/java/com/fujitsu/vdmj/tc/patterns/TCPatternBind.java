@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -45,6 +46,7 @@ public class TCPatternBind extends TCNode
 	public final TCBind bind;
 
 	private TCDefinitionList defs = null;
+	public TCTypeList unresolved = null;
 
 	public TCPatternBind(LexLocation location, TCPattern pattern, TCBind bind)
 	{
@@ -89,8 +91,10 @@ public class TCPatternBind extends TCNode
 			if (bind instanceof TCTypeBind)
 			{
 				TCTypeBind typebind = (TCTypeBind)bind;
+				unresolved = typebind.type.unresolvedTypes();
 				typebind.typeResolve(base);
 				
+				TypeComparator.checkImports(base, unresolved, location.module);
 				TypeComparator.checkComposeTypes(typebind.type, base, false);
 
 				if (!TypeComparator.compatible(typebind.type, type))

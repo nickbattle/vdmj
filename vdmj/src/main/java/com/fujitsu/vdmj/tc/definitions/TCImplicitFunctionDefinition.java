@@ -226,6 +226,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		if (annotations != null) annotations.tcBefore(this, base, scope);
 
 		TCDefinitionList defs = new TCDefinitionList();
+		TypeComparator.checkImports(base, unresolved, location.module);
 		TypeComparator.checkComposeTypes(type, base, false);
 
 		if (typeParams != null)

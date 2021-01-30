@@ -26,6 +26,8 @@ package com.fujitsu.vdmj.typechecker;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -1075,6 +1077,32 @@ public class TypeComparator
 		return undefined;
 	}
 	
+	/**
+	 * Check that all of the named and record types within the passed type are
+	 * accessible from the module. The types passed will be UnresolvedTypes.
+	 */
+	public static void checkImports(Environment env, TCTypeList types, String fromModule)
+	{
+		if (Settings.dialect != Dialect.VDM_SL)
+		{
+			return;
+		}
+		
+		for (TCType type: types)
+		{
+			if (type instanceof TCUnresolvedType)
+			{
+				TCUnresolvedType utype = (TCUnresolvedType)type;
+				
+				if (env.findType(utype.typename, fromModule) == null)
+				{
+					TypeChecker.report(3430,
+						"Unable to resolve type name '" + utype.typename + "'", type.location);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Calculate the intersection of two types.
 	 */

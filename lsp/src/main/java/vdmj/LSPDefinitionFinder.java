@@ -174,11 +174,7 @@ public class LSPDefinitionFinder
 	
 	public TCDefinition findDefinition(TCModuleList modules, File file, int line, int col)
 	{
-		return findDefinition(modules, new LexLocation(file, "?", line, col, line, col));
-	}
-	
-	public TCDefinition findDefinition(TCModuleList modules, LexLocation position)
-	{
+		LexLocation position = new LexLocation(file, "?", line, col, line, col);
 		Found found = findLocation(modules, position);
 		
 		if (found != null)
@@ -204,11 +200,7 @@ public class LSPDefinitionFinder
 	
 	public TCDefinition findDefinition(TCClassList classes, File file, int line, int col)
 	{
-		return findDefinition(classes, new LexLocation(file, "?", line, col, line, col));
-	}
-	
-	public TCDefinition findDefinition(TCClassList classes, LexLocation position)
-	{
+		LexLocation position = new LexLocation(file, "?", line, col, line, col);
 		Found found = findLocation(classes, position);
 		
 		if (found != null)

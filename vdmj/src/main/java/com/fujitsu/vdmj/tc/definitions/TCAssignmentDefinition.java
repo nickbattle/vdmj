@@ -94,6 +94,7 @@ public class TCAssignmentDefinition extends TCDefinition
 		expType = expression.typeCheck(base, null, scope, type);
 		getDefinitions().setExcluded(false);
 		
+		TypeComparator.checkImports(base, unresolved, location.module);
 		TypeComparator.checkComposeTypes(type, base, false);
 
 		if (expType instanceof TCVoidType)

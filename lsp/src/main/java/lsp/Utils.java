@@ -48,30 +48,46 @@ public class Utils
 		return value < 0 ? 0 : value;
 	}
 	
-	public static JSONObject lexLocationToPoint(LexLocation location)
+	/**
+	 * Note that LSP Positions and Ranges are zero-based, whereas LexLocations are 1-based.
+	 * Ranges are also end-exclusive.
+	 */
+	
+	public static JSONObject lexLocationToPosition(LexLocation location)
 	{
 		return new JSONObject(
-			"start", new JSONObject("line", zero(location.startLine - 1), "character", zero(location.startPos - 1)),
-			"end",   new JSONObject("line", zero(location.startLine - 1), "character", location.startPos));
+			"start", new JSONObject(
+				"line", zero(location.startLine - 1),
+				"character", zero(location.startPos - 1)));
 	}
 
 	public static JSONObject lexLocationToRange(LexLocation location)
 	{
-		if (location.endPos == 0)	// end is not set, so use a point
+		if (location.endPos == 0)	// end is not set, so use a position
 		{
-			return lexLocationToPoint(location);
+			return lexLocationToPosition(location);
 		}
 		
 		return new JSONObject(
-			"start", new JSONObject("line", zero(location.startLine - 1), "character", zero(location.startPos - 1)),
-			"end",   new JSONObject("line", zero(location.endLine - 1), "character", zero(location.endPos - 1)));
+			"start", new JSONObject(
+				"line", zero(location.startLine - 1),
+				"character", zero(location.startPos - 1)),
+			
+			"end",   new JSONObject(
+				"line", zero(location.endLine - 1),
+				"character", zero(location.endPos)));	// end excluded!
 	}
 
 	public static JSONObject lexLocationsToRange(LexLocation from, LexLocation to)
 	{
 		return new JSONObject(
-			"start", new JSONObject("line", zero(from.startLine - 1), "character", zero(from.startPos - 1)),
-			"end",   new JSONObject("line", zero(to.endLine - 1), "character", zero(to.endPos - 1)));
+			"start", new JSONObject(
+				"line", zero(from.startLine - 1),
+				"character", zero(from.startPos - 1)),
+			
+			"end",   new JSONObject(
+				"line", zero(to.endLine - 1),
+				"character", zero(to.endPos)));		// end excluded!
 	}
 	
 	public static JSONObject lexLocationToLocation(LexLocation location)

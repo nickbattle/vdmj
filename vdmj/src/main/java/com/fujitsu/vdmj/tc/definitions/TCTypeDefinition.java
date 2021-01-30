@@ -300,7 +300,9 @@ public class TCTypeDefinition extends TCDefinition
 					}
 				}
 			}
-			
+
+			TypeComparator.checkImports(base, unresolved, location.module);
+
 			if (type instanceof TCNamedType)
 			{
 				// Rebuild the compose definitions, after we check whether they already exist
