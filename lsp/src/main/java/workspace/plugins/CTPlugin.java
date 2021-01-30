@@ -411,7 +411,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		}
 	}
 
-	private int getVerdict(List<Object> result) throws LSPException
+	private long getVerdict(List<Object> result) throws LSPException
 	{
 		for (int i = result.size()-1; i > 0; i--)
 		{
@@ -424,7 +424,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		throw new LSPException(RPCErrors.InternalError, "No verdict returned?");
 	}
 
-	private int jsonVerdict(Verdict v) throws LSPException
+	private long jsonVerdict(Verdict v) throws LSPException
 	{
 		switch (v)
 		{
