@@ -67,7 +67,7 @@ public class InitCommand extends Command
 			}
 
 			@Override
-			protected void error(Exception e) throws IOException
+			protected void error(Throwable e) throws IOException
 			{
 				server.writeMessage(new DAPResponse(request, false, e.getMessage(), null));
 				server.stdout("Init terminated.");

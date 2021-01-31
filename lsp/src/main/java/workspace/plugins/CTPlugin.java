@@ -339,7 +339,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 					}
 				}
 			}
-			catch (Exception e)
+			catch (Throwable e)
 			{
 				Log.error(e);
 			}

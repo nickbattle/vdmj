@@ -102,7 +102,7 @@ public class InitExecutor extends AsyncExecutor
 	}
 
 	@Override
-	protected void error(Exception e) throws IOException
+	protected void error(Throwable e) throws IOException
 	{
 		server.stderr(e.getMessage());
 		server.stdout("Init terminated.\n");
