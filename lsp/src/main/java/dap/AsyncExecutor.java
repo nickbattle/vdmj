@@ -65,7 +65,7 @@ public abstract class AsyncExecutor extends CancellableThread
 			
 			tail((double)(after-before)/1000);
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
 			try
 			{
@@ -103,7 +103,7 @@ public abstract class AsyncExecutor extends CancellableThread
 
 	protected abstract void tail(double time) throws Exception;
 
-	protected abstract void error(Exception e) throws IOException;
+	protected abstract void error(Throwable e) throws IOException;
 
 	protected abstract void clean() throws IOException;
 
