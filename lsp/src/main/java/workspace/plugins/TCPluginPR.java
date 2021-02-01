@@ -26,6 +26,7 @@ package workspace.plugins;
 import java.io.File;
 
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
@@ -68,9 +69,19 @@ public class TCPluginPR extends TCPlugin
 	@Override
 	public <T> boolean checkLoadedFiles(T astClassList) throws Exception
 	{
-		tcClassList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(astClassList);
-		TypeChecker tc = new ClassTypeChecker(tcClassList);
-		tc.typeCheck();
+		try
+		{
+			tcClassList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(astClassList);
+			TypeChecker tc = new ClassTypeChecker(tcClassList);
+			tc.typeCheck();
+		}
+		catch (InternalException e)
+		{
+			if (e.number != 10)		// Too many errors
+			{
+				throw e;
+			}
+		}
 		
 		if (TypeChecker.getErrorCount() > 0)
 		{
