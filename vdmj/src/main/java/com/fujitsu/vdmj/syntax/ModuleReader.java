@@ -137,7 +137,7 @@ public class ModuleReader extends SyntaxReader
 	{
 		TCImportList types = new TCImportList();
 		TCNameToken all = new TCNameToken(name.getLocation(), name.getName(), "all", false, false);
-		types.add(new TCImportAll(all));
+		types.add(new TCImportAll(all, true));
 		return new TCImportFromModule(name, types);
 	}
 

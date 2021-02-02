@@ -39,11 +39,16 @@ public class TCImportAll extends TCImport
 
 	public TCImportAll(TCNameToken name)
 	{
+		this(name, false);
+	}
+
+	public TCImportAll(TCNameToken name, boolean used)
+	{
 		super(name, null);
 		
 		// This is set up once and re-used when the getDefinitions are rebuilt at the
 		// end of the typecheck, so that the final unusedCheck reflects the typechecking.
-		importAllUsed = new AtomicBoolean(false);
+		importAllUsed = new AtomicBoolean(used);
 	}
 
 	@Override
