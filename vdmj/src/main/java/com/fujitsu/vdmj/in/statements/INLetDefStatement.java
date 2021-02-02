@@ -62,7 +62,8 @@ public class INLetDefStatement extends INStatement
 		Context evalContext = new Context(location, "let statement", ctxt);
 
 		TCNameToken sname = new TCNameToken(location, location.module, "self");
-		ObjectValue self = (ObjectValue)ctxt.check(sname);
+		Value var = ctxt.check(sname);
+		ObjectValue self = (var instanceof ObjectValue) ? (ObjectValue)var : null;
 
 		for (INDefinition d: localDefs)
 		{
