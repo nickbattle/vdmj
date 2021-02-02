@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.tc.modules;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCImportedDefinition;
@@ -33,10 +35,15 @@ import com.fujitsu.vdmj.typechecker.Environment;
 public class TCImportAll extends TCImport
 {
 	private static final long serialVersionUID = 1L;
+	private final AtomicBoolean importAllUsed;
 
 	public TCImportAll(TCNameToken name)
 	{
 		super(name, null);
+		
+		// This is set up once and re-used when the getDefinitions are rebuilt at the
+		// end of the typecheck, so that the final unusedCheck reflects the typechecking.
+		importAllUsed = new AtomicBoolean(false);
 	}
 
 	@Override
@@ -53,8 +60,8 @@ public class TCImportAll extends TCImport
 
 		for (TCDefinition d: from.exportdefs)
 		{
-			TCDefinition id = new TCImportedDefinition(location, d);
-			id.markUsed();	// So imports all is quiet
+			// Note, importAllUsed is saved between calls to getDefinitions
+			TCDefinition id = new TCImportedDefinition(location, d, importAllUsed);
 			imported.add(id);
 		}
 

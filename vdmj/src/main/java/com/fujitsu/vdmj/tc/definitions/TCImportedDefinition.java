@@ -23,6 +23,8 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -38,11 +40,18 @@ public class TCImportedDefinition extends TCDefinition
 {
 	private static final long serialVersionUID = 1L;
 	public final TCDefinition def;
+	private final AtomicBoolean importAllUsed;
 
-	public TCImportedDefinition(LexLocation location, TCDefinition def)
+	public TCImportedDefinition(LexLocation location, TCDefinition def, AtomicBoolean importAllUsed)
 	{
 		super(Pass.DEFS, location, def.name, def.nameScope);
 		this.def = def;
+		this.importAllUsed = importAllUsed;
+	}
+
+	public TCImportedDefinition(LexLocation location, TCDefinition def)
+	{
+		this(location, def, null);
 	}
 
 	@Override
@@ -80,6 +89,41 @@ public class TCImportedDefinition extends TCDefinition
 	{
 		used = true;
 		def.markUsed();
+		
+		if (importAllUsed != null)
+		{
+			importAllUsed.set(true);
+		}
+	}
+	
+	@Override
+	public boolean isUsed()
+	{
+		if (importAllUsed != null)
+		{
+			return importAllUsed.get();
+		}
+		else
+		{
+			return used;
+		}
+	}
+	
+	@Override
+	public void unusedCheck()
+	{
+		if (importAllUsed != null)
+		{
+			if (!isUsed())
+			{
+				warning(5000, "Imports from '" + def.location.module + "' are not used");
+				markUsed();		// To avoid multiple warnings
+			}
+		}
+		else
+		{
+			super.unusedCheck();
+		}
 	}
 
 	@Override

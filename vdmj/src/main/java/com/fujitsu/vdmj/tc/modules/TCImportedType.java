@@ -73,7 +73,7 @@ public class TCImportedType extends TCImport
 			}
 			else
 			{
-				expdef = new TCImportedDefinition(name.getLocation(), expdef);
+				expdef = new TCImportedDefinition(name.getLocation(), expdef, null);
 			}
 
 			list.add(expdef);
