@@ -206,7 +206,7 @@ public class ClassMapper
 		{
 			for (String classpath: mappingPath.split(File.pathSeparator))
 			{
-				String filename = classpath + File.separator + configFile;
+				String filename = classpath + "/" + configFile;		// NB. Use slash here!
 				InputStream is = getClass().getResourceAsStream(filename);
 				
 				if (is != null)
