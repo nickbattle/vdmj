@@ -64,7 +64,8 @@ public class INLetDefExpression extends INExpression
 		Context evalContext = new Context(location, "let expression", ctxt);
 
 		TCNameToken sname = new TCNameToken(location, location.module, "self");
-		ObjectValue self = (ObjectValue)ctxt.check(sname);
+		Value var = ctxt.check(sname);
+		ObjectValue self = (var instanceof ObjectValue) ? (ObjectValue)var : null;
 
 		for (INDefinition d: localDefs)
 		{
