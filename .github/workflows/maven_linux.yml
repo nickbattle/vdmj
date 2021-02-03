@@ -33,7 +33,7 @@ jobs:
         - name: Configure deploy for snapshots
           run: echo "SERVER_ID=vdmj.overture.au.dk-snapshots" >> $GITHUB_ENV
         - name: Environment variables
-          run: echo ${{ env.SERVER_ID }}
+          run: echo ${{ env.SERVER_ID }} ${{ secrets.ARTIFACTORY_USERNAME }}
         - name: Set up JDK
           uses: actions/setup-java@v1
           with:
