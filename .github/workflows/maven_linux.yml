@@ -22,3 +22,24 @@ jobs:
         java-version: 1.8
     - name: Test with Maven
       run: mvn test
+
+      
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/development'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+        - uses: actions/checkout@v2
+        - name: Configure deploy for snapshots
+          run: echo "SERVER_ID=vdmj.overture.au.dk-snapshots" >> $GITHUB_ENV
+        - name: Environment variables
+          run: echo ${{ env.SERVER_ID }}
+        - name: Set up JDK
+          uses: actions/setup-java@v1
+          with:
+            java-version: 1.8
+        - name: Deploy
+          run: mvn -B deploy
+          env:
+            MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+            MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
