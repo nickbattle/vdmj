@@ -21,7 +21,7 @@ jobs:
       with:
         java-version: 1.8
     - name: Test and package with Maven
-      run: mvn clean package
+      run: mvn test
 
       
   deploy:
@@ -42,7 +42,7 @@ jobs:
             server-username: MAVEN_USERNAME
             server-password: MAVEN_PASSWORD
         - name: Deploy
-          run: mvn -X -B deploy
+          run: mvn -B deploy
           env:
             MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
             MAVEN_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
