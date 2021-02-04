@@ -29,7 +29,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
         - name: Getting POM version
-          run: echo "POM_VERSION=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_ENV
+          run: |
+            VER=$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)
+            echo "POM_VERSION=$VER" >> $GITHUB_ENV
         - name: Checking out  
           uses: actions/checkout@v2
         - name: Configure deploy for snapshots
