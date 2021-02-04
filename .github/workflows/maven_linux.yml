@@ -24,13 +24,15 @@ jobs:
       run: mvn test
 
   prepare:
+    needs: build
+    runs-on: ubuntu-latest
     steps:
       - name: Getting POM version
         run: ( echo -n "POM_VERSION="; mvn -q -Dexec.executable="echo" -Dexec.args='${project.version}' --non-recursive exec:exec ) >> $GITHUB_ENV
       
   deploy:
-    if: github.event_name == 'push' && contains(${{env.POM_VERSION}}, "SNAPSHOT")
-    needs: build
+    if: github.event_name == 'push' && contains(${{ env.POM_VERSION }}, "SNAPSHOT")
+    needs: prepare
     runs-on: ubuntu-latest
     steps:
         - uses: actions/checkout@v2
