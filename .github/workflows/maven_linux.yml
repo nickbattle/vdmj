@@ -28,11 +28,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+        - name: Checking out  
+          uses: actions/checkout@v2
         - name: Getting POM version
           id: get_version
           run: echo "::set-output name=version::$(mvn -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)"
-        - name: Checking out  
-          uses: actions/checkout@v2
         - name: Configure deploy for snapshots
           run: echo "SERVER_ID=vdmj.overture.au.dk-snapshots" >> $GITHUB_ENV
         - name: Check variables
