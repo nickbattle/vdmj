@@ -34,6 +34,10 @@ jobs:
           uses: actions/checkout@v2
         - name: Configure deploy for snapshots
           run: echo "SERVER_ID=vdmj.overture.au.dk-snapshots" >> $GITHUB_ENV
+        - name: Check variables
+          run: |
+            echo ${{ env.SERVER_ID }}
+            echo ${{ env.POM_VERSION }}
         - name: Set up JDK
           if: contains(${{ env.POM_VERSION }}, "SNAPSHOT" )
           uses: actions/setup-java@v1
