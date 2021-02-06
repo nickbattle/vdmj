@@ -23,15 +23,17 @@
 
 package workspace;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,7 +83,7 @@ public class LSPWorkspaceManager
 
 	private JSONObject clientCapabilities;
 	private File rootUri = null;
-	private Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
+	private Map<File, StringBuilder> projectFiles = new LinkedHashMap<File, StringBuilder>();
 	private Set<File> openFiles = new HashSet<File>();
 	
 	private LSPWorkspaceManager()
@@ -231,9 +233,30 @@ public class LSPWorkspaceManager
 
 	private void loadAllProjectFiles() throws IOException
 	{
-		Log.printf("Loading all project files under %s", rootUri);
 		projectFiles.clear();
-		loadProjectFiles(rootUri);
+		File ordering = new File(rootUri, ".vscode/ordering");
+		
+		if (ordering.exists())
+		{
+			Log.printf("Loading ordered project files from %s", ordering);
+			BufferedReader br = new BufferedReader(new FileReader(ordering));
+			String source = br.readLine();
+			
+			while (source != null)
+			{
+				Log.printf("Loading %s", source);
+				File file = new File(rootUri, source);
+				loadFile(file);
+				source = br.readLine();
+			}
+			
+			br.close();
+		}
+		else
+		{
+			Log.printf("Loading all project files under %s", rootUri);
+			loadProjectFiles(rootUri);
+		}
 	}
 
 	private void loadProjectFiles(File root) throws IOException
