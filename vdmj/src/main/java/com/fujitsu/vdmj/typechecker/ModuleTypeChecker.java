@@ -210,13 +210,13 @@ public class ModuleTypeChecker extends TypeChecker
 						}
 						catch (TypeCheckException te)
 						{
-							report(3431, te.getMessage(), te.location);
+							report(3430, te.getMessage(), te.location);
 							
 		    				if (te.extras != null)
 		    				{
 		    					for (TypeCheckException ex: te.extras)
 		    					{
-		    						report(3431, ex.getMessage(), ex.location);
+		    						report(3430, ex.getMessage(), ex.location);
 		    					}
 		    				}
 						}
