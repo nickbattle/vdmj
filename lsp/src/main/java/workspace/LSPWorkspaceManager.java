@@ -23,15 +23,17 @@
 
 package workspace;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,8 +83,9 @@ public class LSPWorkspaceManager
 
 	private JSONObject clientCapabilities;
 	private File rootUri = null;
-	private Map<File, StringBuilder> projectFiles = new HashMap<File, StringBuilder>();
+	private Map<File, StringBuilder> projectFiles = new LinkedHashMap<File, StringBuilder>();
 	private Set<File> openFiles = new HashSet<File>();
+	private boolean orderedFiles = false;
 	
 	private LSPWorkspaceManager()
 	{
@@ -231,9 +234,48 @@ public class LSPWorkspaceManager
 
 	private void loadAllProjectFiles() throws IOException
 	{
-		Log.printf("Loading all project files under %s", rootUri);
 		projectFiles.clear();
-		loadProjectFiles(rootUri);
+		File ordering = new File(rootUri, ".vscode/ordering");
+		orderedFiles = ordering.exists();
+		
+		if (orderedFiles)
+		{
+			Log.printf("Loading ordered project files from %s", ordering);
+			BufferedReader br = null;
+			
+			try
+			{
+				br = new BufferedReader(new FileReader(ordering));
+				String source = br.readLine();
+				
+				while (source != null)
+				{
+					Log.printf("Loading %s", source);
+					File file = new File(rootUri, source);
+					
+					if (file.exists())
+					{
+						loadFile(file);
+					}
+					else
+					{
+						Log.error("Ordering file not found: " + file);
+						sendMessage(1L, "Ordering file not found: " + file);
+					}
+					
+					source = br.readLine();
+				}
+			}
+			finally
+			{
+				if (br != null)	br.close();
+			}
+		}
+		else
+		{
+			Log.printf("Loading all project files under %s", rootUri);
+			loadProjectFiles(rootUri);
+		}
 	}
 
 	private void loadProjectFiles(File root) throws IOException
@@ -371,9 +413,18 @@ public class LSPWorkspaceManager
 		
 		StringBuilder existing = projectFiles.get(file);
 		
-		if (existing == null || !existing.toString().equals(text))
+		if (orderedFiles && existing == null)
 		{
-			if (existing != null) Utils.diff("File different on didOpen at %d", text, existing.toString());
+			Log.error("File not in ordering list: %s", file);
+			sendMessage(1L, "Ordering file out of date? " + file);
+		}
+		else if (existing == null || !existing.toString().equals(text))
+		{
+			if (existing != null)
+			{
+				Log.printf("File different on didOpen?");
+			}
+			
 			projectFiles.put(file, new StringBuilder(text));
 			checkLoadedFiles("file out of sync");
 		}
@@ -439,6 +490,8 @@ public class LSPWorkspaceManager
 		}
 	}
 
+	private boolean rebuildAfterWatch = false;
+	
 	public void changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
 	{
 		FilenameFilter filter = getFilenameFilter();
@@ -450,14 +503,27 @@ public class LSPWorkspaceManager
 				{
 					Log.printf("New directory created: %s", file);
 				}
+				else if (file.equals(new File(rootUri, ".vscode/ordering")))
+				{
+					Log.printf("Created ordering file, rebuilding");
+					rebuildAfterWatch = true;
+				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
 					Log.printf("Ignoring non-project file: %s", file);
 				}
 				else if (!projectFiles.keySet().contains(file))	
 				{
-					Log.printf("Created new file: %s", file);
-					loadFile(file);
+					if (orderedFiles)
+					{
+						Log.error("File not in ordering list: %s", file);
+						sendMessage(1L, "Ordering file out of date? " + file);
+					}
+					else
+					{
+						Log.printf("Created new file: %s", file);
+						loadFile(file);
+					}
 				}
 				else
 				{
@@ -470,6 +536,11 @@ public class LSPWorkspaceManager
 				if (file.isDirectory())
 				{
 					Log.printf("Directory changed: %s", file);
+				}
+				else if (file.equals(new File(rootUri, ".vscode/ordering")))
+				{
+					Log.printf("Updated ordering file, rebuilding");
+					rebuildAfterWatch = true;
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
@@ -484,13 +555,19 @@ public class LSPWorkspaceManager
 			case DELETE:
 				// Since the file is deleted, we don't know what it was so we have to rebuild
 				Log.printf("Deleted %s (dir/file?), rebuilding", file);
-				loadAllProjectFiles();
+				rebuildAfterWatch = true;
 				break;
 		}
 	}
 
 	public RPCMessageList afterChangeWatchedFiles(RPCRequest request) throws Exception
 	{
+		if (rebuildAfterWatch)
+		{
+			loadAllProjectFiles();
+			rebuildAfterWatch = false;
+		}
+		
 		return checkLoadedFiles("after change watched");
 	}
 
@@ -681,6 +758,12 @@ public class LSPWorkspaceManager
 	{
 		ASTPlugin ast = registry.getPlugin("AST");
 		return ast.getFilenameFilter();
+	}
+	
+	private void sendMessage(Long type, String message) throws IOException
+	{
+		LSPServer.getInstance().writeMessage(RPCRequest.notification("window/showMessage",
+				new JSONObject("type", type, "message", message)));
 	}
 
 	public void restart()	// Called from DAP manager
