@@ -72,13 +72,6 @@ public class DidChangeWSHandler extends LSPHandler
 					File file = Utils.uriToFile(change.get("uri"));
 					WatchKind type = WatchKind.kindOf(change.get("type"));
 					LSPWorkspaceManager.getInstance().changeWatchedFile(request, file, type);
-					
-					if (type == WatchKind.DELETE)
-					{
-						// clear all diagnostics from deleted files
-						JSONObject diags = new JSONObject("uri", file.toURI().toString(), "diagnostics", new JSONArray());
-						responses.add(RPCRequest.notification("textDocument/publishDiagnostics", diags));
-					}
 				}
 			}
 			
