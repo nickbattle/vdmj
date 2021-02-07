@@ -564,6 +564,14 @@ public class LSPWorkspaceManager
 	{
 		if (rebuildAfterWatch)
 		{
+			LSPServer server = LSPServer.getInstance();
+			
+			for (File source: projectFiles.keySet())
+			{
+				JSONObject noerrs = new JSONObject("uri", source.toURI().toString(), "diagnostics", new JSONArray());
+				server.writeMessage(RPCRequest.notification("textDocument/publishDiagnostics", noerrs));
+			}
+
 			loadAllProjectFiles();
 			rebuildAfterWatch = false;
 		}
