@@ -31,11 +31,14 @@ public class DAPResponse extends JSONObject
 {
 	private static final long serialVersionUID = 1L;
 	
-	private static int nextSequence = 0;
+	private static Long nextSequence = 0L;
 	
 	private void addSequence()
 	{
-		put("seq", ++nextSequence);
+		synchronized (nextSequence)
+		{
+			put("seq", ++nextSequence);
+		}
 	}
 	
 	public DAPResponse(JSONObject request) throws IOException
