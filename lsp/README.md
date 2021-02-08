@@ -19,6 +19,8 @@ Once a folder has been created, it can be saved as a "workspace" and more folder
 
 Most standard VS Code actions should work, but note:
 
+- You must open a VDM file in a folder before you can do any other work, like launching an executable session or performing a combinatorial test. You can close it again afterwards, but the LSP server only starts when the first file is opened.
+
 - Syntax errors are displayed for the file being edited as you type; the whole specification is type-checked when you save a file.
 
 - The F12 key will navigate from a symbol name to its definition (eg. from a function call to its definition).
