@@ -23,62 +23,56 @@
 
 package vdmj.commands;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.definitions.INClassDefinition;
+import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.runtime.ClassInterpreter;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
+import workspace.Log;
 
-public class HelpCommand extends Command
+public class ClassesCommand extends Command
 {
-	public static final String USAGE = "Usage: help [command]";
-	public static final String[] HELP = { "help", "help [<command>] - information about commands" };
+	public static final String USAGE = "Usage: classes";
+	public static final String[] HELP =	{ "classes", "classes - list the modules in the specification" };
 	
-	private String command = null;
-
-	public HelpCommand(String line)
+	public ClassesCommand(String line)
 	{
-		String[] parts = line.split("\\s+");
-		
-		if (parts.length == 2)
-		{
-			this.command = parts[1];
-		}
-		else if (parts.length != 1)
+		if (!line.trim().equals("classes"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
 	}
 	
-	private static String[][] entries =
-	{
-		DefaultCommand.HELP,
-		ModulesCommand.HELP,
-		ClassesCommand.HELP,
-		PrintCommand.HELP,
-		SetCommand.HELP,
-		HelpCommand.HELP,
-		InitCommand.HELP,
-		QuitCommand.HELP
-	};
-	
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		StringBuilder sb = new StringBuilder();
-		
-		for (String[] help: entries)
+		try
 		{
-			if (command == null || command.equals(help[0]))
+			if (Settings.dialect == Dialect.VDM_SL)
 			{
-				sb.append(help[1] + "\n");
+				return new DAPMessageList(request,
+						new JSONObject("result", "Command not available for VDM-SL"));			
 			}
+			
+			ClassInterpreter  m = (ClassInterpreter) Interpreter.getInstance();
+			StringBuilder sb = new StringBuilder();
+			
+			for (INClassDefinition module: m.getClasses())
+			{
+				sb.append(module.name.toString());
+				sb.append("\n");
+			}
+
+			return new DAPMessageList(request, new JSONObject("result", sb.toString()));
 		}
-		
-		if (sb.length() == 0)
+		catch (Exception e)
 		{
-			sb.append("Unknown command '" + command + "'");
+			Log.error(e);
+			return new DAPMessageList(request, e);
 		}
-		
-		return new DAPMessageList(request, new JSONObject("result", sb.toString()));
 	}
 
 	@Override
