@@ -231,11 +231,13 @@ public class LSPWorkspaceManager
 								new JSONObject("watchers", watchers)
 			))));
 	}
+	
+	private static final String ORDERING = ".vscode/ordering";
 
 	private void loadAllProjectFiles() throws IOException
 	{
 		projectFiles.clear();
-		File ordering = new File(rootUri, ".vscode/ordering");
+		File ordering = new File(rootUri, ORDERING);
 		orderedFiles = ordering.exists();
 		
 		if (orderedFiles)
@@ -250,8 +252,9 @@ public class LSPWorkspaceManager
 				
 				while (source != null)
 				{
-					Log.printf("Loading %s", source);
-					File file = new File(rootUri, source);
+					// Use canonical file to allow "./folder/file"
+					File file = new File(rootUri, source).getCanonicalFile();
+					Log.printf("Loading %s", file);
 					
 					if (file.exists())
 					{
