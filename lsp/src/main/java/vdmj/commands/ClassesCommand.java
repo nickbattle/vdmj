@@ -36,7 +36,7 @@ import workspace.Log;
 public class ClassesCommand extends Command
 {
 	public static final String USAGE = "Usage: classes";
-	public static final String[] HELP =	{ "classes", "classes - list the modules in the specification" };
+	public static final String[] HELP =	{ "classes", "classes - list the classes in the specification" };
 	
 	public ClassesCommand(String line)
 	{
@@ -54,7 +54,7 @@ public class ClassesCommand extends Command
 			if (Settings.dialect == Dialect.VDM_SL)
 			{
 				return new DAPMessageList(request,
-						new JSONObject("result", "Command not available for VDM-SL"));			
+						false, "Command not available for VDM-SL", null);			
 			}
 			
 			ClassInterpreter  m = (ClassInterpreter) Interpreter.getInstance();

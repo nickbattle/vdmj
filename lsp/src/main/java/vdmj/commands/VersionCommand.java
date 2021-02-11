@@ -23,25 +23,27 @@
 
 package vdmj.commands;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.in.modules.INModule;
-import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.runtime.ModuleInterpreter;
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+
+import com.fujitsu.vdmj.VDMJ;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import workspace.Log;
 
-public class ModulesCommand extends Command
+public class VersionCommand extends Command
 {
-	public static final String USAGE = "Usage: modules";
-	public static final String[] HELP =	{ "modules", "modules - list the modules in the specification" };
+	public static final String USAGE = "Usage: version";
+	public static final String[] HELP =	{ "version", "version - show the VDMJ version and build" };
 	
-	public ModulesCommand(String line)
+	public VersionCommand(String line)
 	{
-		if (!line.trim().equals("modules"))
+		if (!line.trim().equals("version"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
@@ -52,27 +54,20 @@ public class ModulesCommand extends Command
 	{
 		try
 		{
-			if (Settings.dialect != Dialect.VDM_SL)
-			{
-				return new DAPMessageList(request,
-						false, "Command only available for VDM-SL", null);			
-			}
-			
-			ModuleInterpreter  m = (ModuleInterpreter) Interpreter.getInstance();
-			StringBuilder sb = new StringBuilder();
-			
-			for (INModule module: m.getModules())
-			{
-				sb.append(module.name.toString());
-				sb.append("\n");
-			}
+			String path = VDMJ.class.getName().replaceAll("\\.", "/");
+			URL url = VDMJ.class.getResource("/" + path + ".class");
+			JarURLConnection conn = (JarURLConnection)url.openConnection();
+		    JarFile jar = conn.getJarFile();
+			Manifest mf = jar.getManifest();
+			String version = (String)mf.getMainAttributes().get(Attributes.Name.IMPLEMENTATION_VERSION);
 
-			return new DAPMessageList(request, new JSONObject("result", sb.toString()));
+			return new DAPMessageList(request,
+					new JSONObject("result", "VDMJ version " + version));
 		}
 		catch (Exception e)
 		{
 			Log.error(e);
-			return new DAPMessageList(request, e);
+			return new DAPMessageList(request, false, "Cannot determine VDMJ version", null);
 		}
 	}
 

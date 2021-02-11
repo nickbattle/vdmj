@@ -58,6 +58,7 @@ public class HelpCommand extends Command
 		PrecisionCommand.HELP,
 		HelpCommand.HELP,
 		InitCommand.HELP,
+		VersionCommand.HELP,
 		QuitCommand.HELP
 	};
 	
