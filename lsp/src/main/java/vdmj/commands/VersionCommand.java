@@ -23,63 +23,52 @@
 
 package vdmj.commands;
 
+import java.net.JarURLConnection;
+import java.net.URL;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+
+import com.fujitsu.vdmj.VDMJ;
+
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
+import workspace.Log;
 
-public class HelpCommand extends Command
+public class VersionCommand extends Command
 {
-	public static final String USAGE = "Usage: help [command]";
-	public static final String[] HELP = { "help", "help [<command>] - information about commands" };
+	public static final String USAGE = "Usage: version";
+	public static final String[] HELP =	{ "version", "version - show the VDMJ version and build" };
 	
-	private String command = null;
-
-	public HelpCommand(String line)
+	public VersionCommand(String line)
 	{
-		String[] parts = line.split("\\s+");
-		
-		if (parts.length == 2)
-		{
-			this.command = parts[1];
-		}
-		else if (parts.length != 1)
+		if (!line.trim().equals("version"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
 	}
 	
-	private static String[][] entries =
-	{
-		DefaultCommand.HELP,
-		ModulesCommand.HELP,
-		ClassesCommand.HELP,
-		PrintCommand.HELP,
-		SetCommand.HELP,
-		HelpCommand.HELP,
-		InitCommand.HELP,
-		VersionCommand.HELP,
-		QuitCommand.HELP
-	};
-	
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		StringBuilder sb = new StringBuilder();
-		
-		for (String[] help: entries)
+		try
 		{
-			if (command == null || command.equals(help[0]))
-			{
-				sb.append(help[1] + "\n");
-			}
+			String path = VDMJ.class.getName().replaceAll("\\.", "/");
+			URL url = VDMJ.class.getResource("/" + path + ".class");
+			JarURLConnection conn = (JarURLConnection)url.openConnection();
+		    JarFile jar = conn.getJarFile();
+			Manifest mf = jar.getManifest();
+			String version = (String)mf.getMainAttributes().get(Attributes.Name.IMPLEMENTATION_VERSION);
+
+			return new DAPMessageList(request,
+					new JSONObject("result", "VDMJ version " + version));
 		}
-		
-		if (sb.length() == 0)
+		catch (Exception e)
 		{
-			sb.append("Unknown command '" + command + "'");
+			Log.error(e);
+			return new DAPMessageList(request, false, "Cannot determine VDMJ version", null);
 		}
-		
-		return new DAPMessageList(request, new JSONObject("result", sb.toString()));
 	}
 
 	@Override
