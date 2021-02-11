@@ -5,7 +5,7 @@ name: Linux test and SNAPSHOT deploy with Maven
 
 on:
   push:
-    branches: [ master, highprecision, development ]
+    branches: [ master, highprecision ]
   pull_request:
     branches: [ master, highprecision ]
 
@@ -40,7 +40,7 @@ jobs:
             echo ${{ env.SERVER_ID }}
             echo ${{ steps.get_version.outputs.version }}
         - name: Set up JDK
-          if: contains(${{ steps.get_version.outputs.version }}, "SNAPSHOT" )
+          if: contains(${{ steps.get_version.outputs.version }}, 'SNAPSHOT' )
           uses: actions/setup-java@v1
           with:
             java-version: 1.8
@@ -48,7 +48,7 @@ jobs:
             server-username: MAVEN_USERNAME
             server-password: MAVEN_PASSWORD
         - name: Deploy
-          if: contains(${{ steps.get_version.outputs.version }}, "SNAPSHOT" )
+          if: contains(${{ steps.get_version.outputs.version }}, 'SNAPSHOT' )
           run: mvn -B deploy
           env:
             MAVEN_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
