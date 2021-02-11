@@ -54,7 +54,7 @@ public class ClassesCommand extends Command
 			if (Settings.dialect == Dialect.VDM_SL)
 			{
 				return new DAPMessageList(request,
-						new JSONObject("result", "Command not available for VDM-SL"));			
+						false, "Command not available for VDM-SL", null);			
 			}
 			
 			ClassInterpreter  m = (ClassInterpreter) Interpreter.getInstance();

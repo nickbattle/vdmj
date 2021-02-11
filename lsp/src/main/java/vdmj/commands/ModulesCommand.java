@@ -55,7 +55,7 @@ public class ModulesCommand extends Command
 			if (Settings.dialect != Dialect.VDM_SL)
 			{
 				return new DAPMessageList(request,
-						new JSONObject("result", "Command only available for VDM-SL"));			
+						false, "Command only available for VDM-SL", null);			
 			}
 			
 			ModuleInterpreter  m = (ModuleInterpreter) Interpreter.getInstance();
