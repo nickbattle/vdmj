@@ -168,7 +168,7 @@ public class InitThread extends SchedulableThread
         			Console.out.printf("Pass %d: %s = %.3f secs\n", (6-retries), m.name, (double)(after-before)/1000);
         		}
 
-        		if (e != null)
+        		if (e != null && !e.isEmpty())
         		{
         			problems.addAll(e);
 
