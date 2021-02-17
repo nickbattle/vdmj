@@ -774,6 +774,8 @@ public class LexTokenReader extends BacktrackInputReader
 					if (ch == '>')
 					{
 						unpush();
+						rdCh();
+						rdch = false;
 						last = new LexQuoteToken(name, location(tokline, tokpos));
 						type = Token.QUOTE;
 					}
