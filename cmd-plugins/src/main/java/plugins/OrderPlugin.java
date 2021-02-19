@@ -31,20 +31,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.commands.CommandPlugin;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.modules.TCImportFromModule;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 
 public class OrderPlugin extends CommandPlugin
 {
@@ -83,55 +76,38 @@ public class OrderPlugin extends CommandPlugin
     			
     private void moduleOrder(TCModuleList modules)
     {
-		TCDefinitionList alldefs = new TCDefinitionList();
-
-		for (TCModule m: modules)
-		{
-			for (TCDefinition d: m.importdefs)
-			{
-				alldefs.add(d);
-			}
-		}
-
-		for (TCModule m: modules)
-		{
-			for (TCDefinition d: m.defs)
-			{
-				alldefs.add(d);
-			}
-		}
-
-		Environment globals = new FlatEnvironment(alldefs, null);
 		Set<String> allModules = new HashSet<String>();
 
 		for (TCModule m: modules)
 		{
-			TCNameSet freevars = new TCNameSet();
-			
-	    	for (TCDefinition def: m.defs)
-	    	{
-	    		Environment empty = new FlatEnvironment(new TCDefinitionList());
-				freevars.addAll(def.getFreeVariables(globals, empty, new AtomicBoolean(false)));
-	    	}
-	    	
 	    	String myname = m.name.getName();
 	    	allModules.add(myname);
-	    	
-	    	for (TCNameToken var: freevars)
-	    	{
-	    		add(myname, var.getModule());
-	    	}
-	    }
-
-		for (String name: allModules)
-		{
-			if (usedBy.get(name) == null)
+			
+			if (m.imports != null)
 			{
-				startpoints.add(name);
+		    	for (TCImportFromModule ifm: m.imports.imports)
+		    	{
+					add(myname, ifm.name.getName());
+		    	}
+			}
+			else
+			{
+				uses.put(myname, new HashSet<String>());
+			}
+	    }
+		
+		for (String module: allModules)
+		{
+			if (usedBy.get(module) == null)
+			{
+				startpoints.add(module);
+				usedBy.put(module, new HashSet<String>());
 			}
 		}
-		
-		Console.out.println("Startpoints = " + startpoints);
+
+		Console.out.println("startpoints = " + startpoints);
+		Console.out.println("uses = " + uses);
+		Console.out.println("usedBy = " + usedBy);
 		
 		if (startpoints.isEmpty())
 		{
