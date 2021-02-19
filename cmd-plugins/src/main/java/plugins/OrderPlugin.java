@@ -24,6 +24,7 @@
 
 package plugins;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +49,8 @@ import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 public class OrderPlugin extends CommandPlugin
 {
 	private List<String> startpoints = new Vector<String>();
+	private Map<String, Set<String>> uses = new HashMap<String, Set<String>>();
+	private Map<String, Set<String>> usedBy  = new HashMap<String, Set<String>>();
 	
 	public OrderPlugin(Interpreter interpreter)
 	{
@@ -58,6 +61,8 @@ public class OrderPlugin extends CommandPlugin
 	public boolean run(String[] argv) throws Exception
 	{
 		startpoints.clear();
+		uses.clear();
+		usedBy.clear();
 		
 		for (int i=1; i < argv.length; i++)
 		{
@@ -67,6 +72,10 @@ public class OrderPlugin extends CommandPlugin
 		if (interpreter instanceof ModuleInterpreter)
 		{
 			moduleOrder(interpreter.getTC());
+		}
+		else
+		{
+			// classes!
 		}
 
 		return true;	// Even if command failed
@@ -92,8 +101,6 @@ public class OrderPlugin extends CommandPlugin
 			}
 		}
 
-		Map<String, Set<String>> uses = new HashMap<String, Set<String>>();
-		Map<String, Set<String>> usedBy  = new HashMap<String, Set<String>>();
 		Environment globals = new FlatEnvironment(alldefs, null);
 		Set<String> allModules = new HashSet<String>();
 
@@ -107,93 +114,94 @@ public class OrderPlugin extends CommandPlugin
 				freevars.addAll(def.getFreeVariables(globals, empty, new AtomicBoolean(false)));
 	    	}
 	    	
-	    	Set<String> depnames = new HashSet<String>();
 	    	String myname = m.name.getName();
 	    	allModules.add(myname);
 	    	
-	    	for (TCNameToken name: freevars)
+	    	for (TCNameToken var: freevars)
 	    	{
-	    		depnames.add(name.getModule());		// Just module names
+	    		add(myname, var.getModule());
 	    	}
-	    	
-	    	uses.put(myname, depnames);
-	    	
-	    	for (String depname: depnames)
-	    	{
-	    		Set<String> curr = usedBy.get(depname);
-	    		
-	    		if (curr == null)
-	    		{
-	    			curr = new HashSet<String>();
-	    			usedBy.put(depname, curr);
-	    		}
-	    		
-	    		curr.add(myname);
-	    	}
-		}
+	    }
 
+		for (String name: allModules)
+		{
+			if (usedBy.get(name) == null)
+			{
+				startpoints.add(name);
+			}
+		}
+		
+		Console.out.println("Startpoints = " + startpoints);
+		
 		if (startpoints.isEmpty())
 		{
-			for (TCModule m: modules)
-			{
-				String name = m.name.getName();
-				
-				if (usedBy.get(name) == null)
-				{
-					startpoints.add(name);
-				}
-			}
-			
-			if (startpoints.isEmpty())
-			{
-				Console.out.println("Module dependencies have cycles");
-				Console.out.println("Run 'order <start modules>'");
-				Console.out.println("Where start modules are the least dependent.");
-				return;
-			}
+			Console.out.println("Module dependencies have cycles");
+			Console.out.println("Run 'order <start modules>'");
+			Console.out.println("Where start modules have fewest imports (or none).");
+			return;
 		}
-		else
+
+		boolean failed = false;
+		
+		for (String name: startpoints)
 		{
-			boolean failed = false;
-			
-			for (String name: startpoints)
+			if (!allModules.contains(name))
 			{
-				if (!allModules.contains(name))
-				{
-					Console.out.println("Unknown module: " + name);
-					failed = true;
-				}
-			}
-			
-			if (failed)
-			{
-				return;
+				Console.out.println("Unknown module: " + name);
+				failed = true;
 			}
 		}
 		
-		List<String> ordering = new Vector<String>();
+		if (failed)
+		{
+			return;
+		}
 		
+		//	See https://en.wikipedia.org/wiki/Topological_sorting#Kahn's_algorithm
+		//
+		//	L ← Empty list that will contain the sorted elements
+		//	S ← Set of all nodes with no incoming edge
+		//
+		//	while S is not empty do
+		//	    remove a node n from S
+		//	    add n to L
+		//	    for each node m with an edge e from n to m do
+		//	        remove edge e from the graph
+		//	        if m has no other incoming edges then
+		//	            insert m into S
+		//
+		//	if graph has edges then
+		//	    return error   (graph has at least one cycle)
+		//	else 
+		//	    return L   (a topologically sorted order)
+
+		List<String> ordering = new Vector<String>();
+
 		while (!startpoints.isEmpty())
 		{
-		    String node = startpoints.remove(0);
-	    	ordering.add(node);
-	    	Set<String> usedBySet = usedBy.get(node);
+		    String n = startpoints.remove(0);
+		    ordering.add(n);
+		    Set<String> usesSet = uses.get(n);
 	    	
-	    	if (usedBySet != null)
-	    	{
-		    	for (String next: usedBySet)
-		    	{
-					if (!ordering.contains(next) && !startpoints.contains(next))
-					{
-						startpoints.add(next);
-					}
-			    }
-	    	}
+		    if (usesSet != null)
+		    {
+		    	Set<String> copy = new HashSet<String>(usesSet);
+		    	
+		    	for (String m: copy)
+		    	{	
+	    			if (delete(n, m) == 0 && !ordering.contains(m))
+			    	{
+						startpoints.add(m);
+				    }
+		    	}
+		    }
 		}
+		
+		Collections.reverse(ordering);
 		
 		for (String name: ordering)
 		{
-			Console.out.println(name);
+	    	Console.out.println(name);
 		}
 		
 		for (String name: allModules)
@@ -203,6 +211,38 @@ public class OrderPlugin extends CommandPlugin
 				Console.out.println("Missing: " + name);
 			}
 		}
+    }
+    
+    private int delete(String from, String to)
+	{
+    	uses.get(from).remove(to);
+    	usedBy.get(to).remove(from);
+    	return usedBy.get(to).size();	// remaining size
+	}
+
+	private void add(String from, String to)
+    {
+    	if (!from.equals(to))
+    	{
+	    	Set<String> set = uses.get(from);
+	    	
+	    	if (set == null)
+	    	{
+	    		set = new HashSet<String>();
+	    		uses.put(from, set);
+	    	}
+	    	
+    		set.add(to);
+    		set = usedBy.get(to);
+	    	
+	    	if (set == null)
+	    	{
+	    		set = new HashSet<String>();
+	    		usedBy.put(to, set);
+	    	}
+	    	
+    		set.add(from);
+    	}
     }
 
 	@Override
