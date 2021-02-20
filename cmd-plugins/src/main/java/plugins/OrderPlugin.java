@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2021 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -24,12 +24,15 @@
 
 package plugins;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.Vector;
 import com.fujitsu.vdmj.commands.CommandPlugin;
 import com.fujitsu.vdmj.messages.Console;
@@ -96,9 +99,19 @@ public class OrderPlugin extends CommandPlugin
 			}
 	    }
 		
+		// First remove any cycles
+		int count = 0;
+		
+		for (String start: allModules)
+		{
+			count += removeCycles(start, new Stack<String>());
+		}
+
+		Console.out.println("Removed " + count + " cycles");
+
 		for (String module: allModules)
 		{
-			if (usedBy.get(module) == null)
+			if (usedBy.get(module) == null || usedBy.get(module).isEmpty())
 			{
 				startpoints.add(module);
 				usedBy.put(module, new HashSet<String>());
@@ -106,31 +119,33 @@ public class OrderPlugin extends CommandPlugin
 		}
 
 		Console.out.println("startpoints = " + startpoints);
-		Console.out.println("uses = " + uses);
-		Console.out.println("usedBy = " + usedBy);
+		// graphOf(uses, "uses.dot");
+		// graphOf(usedBy, "usedby.dot");
 		
 		if (startpoints.isEmpty())
 		{
-			Console.out.println("Module dependencies have cycles");
+			Console.out.println("No dependency startpoints found");
 			Console.out.println("Run 'order <start modules>'");
 			Console.out.println("Where start modules have fewest imports (or none).");
 			return;
 		}
-
-		boolean failed = false;
-		
-		for (String name: startpoints)
+		else
 		{
-			if (!allModules.contains(name))
+			boolean failed = false;
+			
+			for (String name: startpoints)
 			{
-				Console.out.println("Unknown module: " + name);
-				failed = true;
+				if (!allModules.contains(name))
+				{
+					Console.out.println("Unknown module: " + name);
+					failed = true;
+				}
 			}
-		}
-		
-		if (failed)
-		{
-			return;
+			
+			if (failed)
+			{
+				return;
+			}
 		}
 		
 		//	See https://en.wikipedia.org/wiki/Topological_sorting#Kahn's_algorithm
@@ -165,7 +180,7 @@ public class OrderPlugin extends CommandPlugin
 		    	
 		    	for (String m: copy)
 		    	{	
-	    			if (delete(n, m) == 0 && !ordering.contains(m))
+	    			if (delete(n, m) == 0) // && !ordering.contains(m))
 			    	{
 						startpoints.add(m);
 				    }
@@ -189,7 +204,70 @@ public class OrderPlugin extends CommandPlugin
 		}
     }
     
-    private int delete(String from, String to)
+    /**
+     * Create a "dot" language version of the graph for the graphviz tool.
+     */
+    public void graphOf(Map<String, Set<String>> map, String filename)
+	{
+    	try
+		{
+			FileWriter fw = new FileWriter(filename); 
+			StringBuilder sb = new StringBuilder();
+			sb.append("digraph G {\n");
+
+			for (String key: map.keySet())
+			{
+				Set<String> nextSet = map.get(key);
+				
+				for (String next: nextSet)
+				{
+					sb.append("\t");
+					sb.append(key);
+					sb.append(" -> ");
+					sb.append(next);
+					sb.append(";\n");
+				}
+			}
+			
+			sb.append("}\n");
+			fw.write(sb.toString());
+			fw.close();
+		}
+		catch (IOException e)
+		{
+			Console.out.println("Cannot write " + filename + ": " + e);
+		}
+	}
+
+	private int removeCycles(String start, Stack<String> stack)
+	{
+    	int count = 0;
+    	Set<String> nextSet = new HashSet<String>(uses.get(start));
+    	
+    	if (!nextSet.isEmpty())
+    	{
+	    	stack.push(start);
+	    	
+	    	for (String next: nextSet)
+	    	{
+	    		if (stack.contains(next))
+	    		{
+	    			delete(start, next);
+	    			count = count + 1;
+	    		}
+	    		else
+	    		{
+	    			count += removeCycles(next, stack);
+	    		}
+	    	}
+	    	
+	    	stack.pop();
+    	}
+    	
+    	return count;
+	}
+
+	private int delete(String from, String to)
 	{
     	uses.get(from).remove(to);
     	usedBy.get(to).remove(from);
