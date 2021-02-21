@@ -26,6 +26,7 @@ package plugins;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,9 +45,9 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
 public class OrderPlugin extends CommandPlugin
 {
-	private List<String> startpoints = new Vector<String>();
 	private Map<String, Set<String>> uses = new HashMap<String, Set<String>>();
 	private Map<String, Set<String>> usedBy  = new HashMap<String, Set<String>>();
+	private String outputfile;
 	
 	public OrderPlugin(Interpreter interpreter)
 	{
@@ -56,15 +57,20 @@ public class OrderPlugin extends CommandPlugin
 	@Override
 	public boolean run(String[] argv) throws Exception
 	{
-		startpoints.clear();
+		outputfile = null;
 		uses.clear();
 		usedBy.clear();
 		
-		for (int i=1; i < argv.length; i++)
+		if (argv.length == 2)
 		{
-			startpoints.add(argv[i]);
+			outputfile = argv[1];
 		}
-
+		else if (argv.length != 1)
+		{
+			help();
+			return true;
+		}
+		
 		if (interpreter instanceof ModuleInterpreter)
 		{
 			moduleOrder(interpreter.getTC());
@@ -77,11 +83,12 @@ public class OrderPlugin extends CommandPlugin
 		return true;	// Even if command failed
 	}
     			
-    private void moduleOrder(TCModuleList modules)
+    private void moduleOrder(TCModuleList moduleList)
     {
 		Set<String> allModules = new HashSet<String>();
+		Console.out.println("Generating dependency graph");
 
-		for (TCModule m: modules)
+		for (TCModule m: moduleList)
 		{
 	    	String myname = m.name.getName();
 	    	allModules.add(myname);
@@ -99,7 +106,12 @@ public class OrderPlugin extends CommandPlugin
 			}
 	    }
 		
-		// First remove any cycles
+		/*
+		 * First remove any cycles. For some reason it's not enough to search from
+		 * the startpoints, so we just search from everywhere. It's reasonably
+		 * quick.
+		 */
+		Console.out.println("Checking for cyclic dependencies");
 		int count = 0;
 		
 		for (String start: allModules)
@@ -108,6 +120,12 @@ public class OrderPlugin extends CommandPlugin
 		}
 
 		Console.out.println("Removed " + count + " cycles");
+		
+		/*
+		 * The startpoints are where there are no incoming links to a node. So
+		 * the usedBy entry is blank (removed cycles) or null.
+		 */
+		List<String> startpoints = new Vector<String>();
 
 		for (String module: allModules)
 		{
@@ -118,34 +136,14 @@ public class OrderPlugin extends CommandPlugin
 			}
 		}
 
-		Console.out.println("startpoints = " + startpoints);
-		// graphOf(uses, "uses.dot");
-		// graphOf(usedBy, "usedby.dot");
-		
 		if (startpoints.isEmpty())
 		{
-			Console.out.println("No dependency startpoints found");
-			Console.out.println("Run 'order <start modules>'");
-			Console.out.println("Where start modules have fewest imports (or none).");
+			Console.out.println("No dependency startpoints found?");
 			return;
 		}
 		else
 		{
-			boolean failed = false;
-			
-			for (String name: startpoints)
-			{
-				if (!allModules.contains(name))
-				{
-					Console.out.println("Unknown module: " + name);
-					failed = true;
-				}
-			}
-			
-			if (failed)
-			{
-				return;
-			}
+			Console.out.println("Ordering from startpoints: " + startpoints);
 		}
 		
 		//	See https://en.wikipedia.org/wiki/Topological_sorting#Kahn's_algorithm
@@ -180,7 +178,7 @@ public class OrderPlugin extends CommandPlugin
 		    	
 		    	for (String m: copy)
 		    	{	
-	    			if (delete(n, m) == 0) // && !ordering.contains(m))
+	    			if (delete(n, m) == 0)
 			    	{
 						startpoints.add(m);
 				    }
@@ -189,17 +187,49 @@ public class OrderPlugin extends CommandPlugin
 		}
 		
 		Collections.reverse(ordering);
+		List<String> filenames = new Vector<String>();
 		
 		for (String name: ordering)
 		{
-	    	Console.out.println(name);
+			for (TCModule m: moduleList)
+			{
+				if (m.name.getName().equals(name))
+				{
+					String file = m.name.getLocation().file.toString();
+					
+					if (!filenames.contains(file))	// files with >= two modules
+					{
+						filenames.add(file);
+					}
+					break;
+				}
+			}
 		}
 		
-		for (String name: allModules)
+		if (outputfile == null)
 		{
-			if (!ordering.contains(name))
+			for (String name: filenames)
 			{
-				Console.out.println("Missing: " + name);
+		    	Console.out.println(name);
+			}
+		}
+		else
+		{
+			try
+			{
+				PrintWriter fw = new PrintWriter(new FileWriter(outputfile)); 
+				
+				for (String name: filenames)
+				{
+			    	fw.println(name);
+				}
+
+				fw.close();
+				Console.out.println("Order written to " + outputfile);
+			}
+			catch (IOException e)
+			{
+				Console.out.println("Cannot write " + outputfile + ": " + e);
 			}
 		}
     }
@@ -252,6 +282,7 @@ public class OrderPlugin extends CommandPlugin
 	    	{
 	    		if (stack.contains(next))
 	    		{
+	    			Console.out.println("Removing link " + start + " -> " + next);
 	    			delete(start, next);
 	    			count = count + 1;
 	    		}
@@ -302,6 +333,6 @@ public class OrderPlugin extends CommandPlugin
 	@Override
 	public String help()
 	{
-		return "order [start points] - print optimal module/class order";
+		return "order [filename] - print/save optimal module/class order";
 	}
 }
