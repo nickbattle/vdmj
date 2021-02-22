@@ -255,6 +255,7 @@ map TCErrorCase{name, left, right} to POErrorCase(name, left, right);
 map TCErrorCaseList{} to POErrorCaseList(this);
 map TCErrorStatement{location} to POErrorStatement(location);
 map TCExitStatement{location, expression} to POExitStatement(location, expression);
+map TCExternalClause{mode, identifiers, type} to POExternalClause(mode, identifiers, type);
 map TCExternalClauseList{} to POExternalClauseList(this);
 map TCFieldDesignator{object, field} to POFieldDesignator(object, field);
 map TCForAllStatement{location, pattern, set, statement} to POForAllStatement(location, pattern, set, statement);
