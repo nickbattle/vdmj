@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.runtime;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
@@ -363,10 +364,24 @@ public class ModuleInterpreter extends Interpreter
 	@Override
 	public List<Object> runOneTrace(INClassDefinition classdef, CallSequence test, boolean debug)
 	{
+		List<Object> list = new Vector<Object>();
+		Context ctxt = null;
+
+		try
+		{
+			ctxt = getTraceContext(classdef);
+		}
+		catch (ValueException e)
+		{
+			list.add(e.getMessage());
+			return list;
+		}
+
+		ctxt.setThreadState(CPUValue.vCPU);
 		clearBreakpointHits();
 
 		// scheduler.reset();
-		CTMainThread main = new CTMainThread(test, initialContext, debug);
+		CTMainThread main = new CTMainThread(test, ctxt, debug);
 		main.start();
 		scheduler.start(main);
 
