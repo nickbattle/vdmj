@@ -46,8 +46,10 @@ import com.fujitsu.vdmj.tc.patterns.visitors.TCGetFreeVariablesBindVisitor;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCGetFreeVariablesMultipleBindVisitor;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindVisitor;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
+import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
+import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
@@ -302,6 +304,15 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		{
 			TCNamedType nt = (TCNamedType)node.type;
 			names.addAll(nt.type.apply(visitorSet.getTypeVisitor(), arg));
+		}
+		else if (node.type instanceof TCRecordType)
+		{
+			TCRecordType rt = (TCRecordType)node.type;
+			
+			for (TCField field: rt.fields)
+			{
+				names.addAll(field.type.apply(visitorSet.getTypeVisitor(), arg));
+			}
 		}
 		
 		if (node.invdef != null)

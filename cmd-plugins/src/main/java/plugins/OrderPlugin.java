@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2021 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -24,30 +24,31 @@
 
 package plugins;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+import java.util.Stack;
 import java.util.Vector;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import com.fujitsu.vdmj.commands.CommandPlugin;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.modules.TCImportFromModule;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
-import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 
 public class OrderPlugin extends CommandPlugin
 {
+	private Map<String, Set<String>> uses = new HashMap<String, Set<String>>();
+	private Map<String, Set<String>> usedBy  = new HashMap<String, Set<String>>();
+	private String outputfile;
+	
 	public OrderPlugin(Interpreter interpreter)
 	{
 		super(interpreter);
@@ -56,133 +57,282 @@ public class OrderPlugin extends CommandPlugin
 	@Override
 	public boolean run(String[] argv) throws Exception
 	{
-		if (argv.length != 1)
+		outputfile = null;
+		uses.clear();
+		usedBy.clear();
+		
+		if (argv.length == 2)
 		{
-			Console.out.println(help());
+			outputfile = argv[1];
+		}
+		else if (argv.length != 1)
+		{
+			help();
 			return true;
 		}
-
+		
 		if (interpreter instanceof ModuleInterpreter)
 		{
 			moduleOrder(interpreter.getTC());
+		}
+		else
+		{
+			// classes!
 		}
 
 		return true;	// Even if command failed
 	}
     			
-    private void moduleOrder(TCModuleList modules)
+    private void moduleOrder(TCModuleList moduleList)
     {
-		TCDefinitionList alldefs = new TCDefinitionList();
+		Set<String> allModules = new HashSet<String>();
+		Console.out.println("Generating dependency graph");
 
-		for (TCModule m: modules)
+		for (TCModule m: moduleList)
 		{
-			for (TCDefinition d: m.importdefs)
+	    	String myname = m.name.getName();
+	    	allModules.add(myname);
+			
+			if (m.imports != null)
 			{
-				alldefs.add(d);
+		    	for (TCImportFromModule ifm: m.imports.imports)
+		    	{
+					add(myname, ifm.name.getName());
+		    	}
 			}
+			else
+			{
+				uses.put(myname, new HashSet<String>());
+			}
+	    }
+		
+		/*
+		 * First remove any cycles. For some reason it's not enough to search from
+		 * the startpoints, so we just search from everywhere. It's reasonably
+		 * quick.
+		 */
+		Console.out.println("Checking for cyclic dependencies");
+		int count = 0;
+		
+		for (String start: allModules)
+		{
+			count += removeCycles(start, new Stack<String>());
 		}
 
-		for (TCModule m: modules)
-		{
-			for (TCDefinition d: m.defs)
-			{
-				alldefs.add(d);
-			}
-		}
-
-		Map<String, Set<String>> dependencies = new HashMap<String, Set<String>>();
-		Environment globals = new FlatEnvironment(alldefs, null);
+		Console.out.println("Removed " + count + " cycles");
+		
+		/*
+		 * The startpoints are where there are no incoming links to a node. So
+		 * the usedBy entry is blank (removed cycles) or null.
+		 */
 		List<String> startpoints = new Vector<String>();
 
-		for (TCModule m: modules)
+		for (String module: allModules)
 		{
-			TCNameSet freevars = new TCNameSet();
-			
-	    	for (TCDefinition def: m.defs)
-	    	{
-	    		Environment empty = new FlatEnvironment(new TCDefinitionList());
-				freevars.addAll(def.getFreeVariables(globals, empty, new AtomicBoolean(false)));
-	    	}
-	    	
-	    	Set<String> modnames = new HashSet<String>();
-	    	String myname = m.name.getName();
-	    	
-	    	for (TCNameToken name: freevars)
-	    	{
-	    		modnames.add(name.getModule());
-	    	}
-	    	
-	    	dependencies.put(myname, modnames);
-	    	
-	    	if (modnames.isEmpty() || modnames.size() == 1 && modnames.contains(myname))
-	    	{
-	    		startpoints.add(myname);
-	    	}
-		}
-		
-		if (startpoints.isEmpty())	// complex loops, so choose smallest dependencies
-		{
-			int min = Integer.MAX_VALUE;
-			
-			for (String name: dependencies.keySet())
+			if (usedBy.get(module) == null || usedBy.get(module).isEmpty())
 			{
-				int size = dependencies.get(name).size();
-				
-				if (size < min)
-				{
-					min = size;
-					startpoints.clear();
-					startpoints.add(name);
-				}
-				else if (size == min)
-				{
-					startpoints.add(name);
-				}
+				startpoints.add(module);
+				usedBy.put(module, new HashSet<String>());
 			}
 		}
+
+		if (startpoints.isEmpty())
+		{
+			Console.out.println("No dependency startpoints found?");
+			return;
+		}
+		else
+		{
+			Console.out.println("Ordering from startpoints: " + startpoints);
+		}
 		
-		// This is Kuhn's algorithm for topological sorting (but allowing loops)
-	
-		List<String> ordering = new Vector<String>(dependencies.size());
-		
+		//	See https://en.wikipedia.org/wiki/Topological_sorting#Kahn's_algorithm
+		//
+		//	L ← Empty list that will contain the sorted elements
+		//	S ← Set of all nodes with no incoming edge
+		//
+		//	while S is not empty do
+		//	    remove a node n from S
+		//	    add n to L
+		//	    for each node m with an edge e from n to m do
+		//	        remove edge e from the graph
+		//	        if m has no other incoming edges then
+		//	            insert m into S
+		//
+		//	if graph has edges then
+		//	    return error   (graph has at least one cycle)
+		//	else 
+		//	    return L   (a topologically sorted order)
+
+		List<String> ordering = new Vector<String>();
+
 		while (!startpoints.isEmpty())
 		{
-		    String node = startpoints.remove(0);
-		    
-		    if (!ordering.contains(node))
+		    String n = startpoints.remove(0);
+		    ordering.add(n);
+		    Set<String> usesSet = uses.get(n);
+	    	
+		    if (usesSet != null)
 		    {
-		    	ordering.add(node);
-		    }
-		    
-			for (Entry<String, Set<String>> pair: dependencies.entrySet())
-		    {
-				String key = pair.getKey();
-				Set<String> deps = pair.getValue();
-				
-				if (deps.contains(node))
-				{
-					deps.remove(node);
-					
-					if (deps.isEmpty() || deps.size() == 1 && deps.contains(key))
-					{
-						if (!startpoints.contains(key))
-						{
-							startpoints.add(key);
-						}
-					}
-				}
+		    	Set<String> copy = new HashSet<String>(usesSet);
+		    	
+		    	for (String m: copy)
+		    	{	
+	    			if (delete(n, m) == 0)
+			    	{
+						startpoints.add(m);
+				    }
+		    	}
 		    }
 		}
+		
+		Collections.reverse(ordering);
+		List<String> filenames = new Vector<String>();
 		
 		for (String name: ordering)
 		{
-			Console.out.println(name);
+			for (TCModule m: moduleList)
+			{
+				if (m.name.getName().equals(name))
+				{
+					String file = m.name.getLocation().file.toString();
+					
+					if (!filenames.contains(file))	// files with >= two modules
+					{
+						filenames.add(file);
+					}
+					break;
+				}
+			}
 		}
+		
+		if (outputfile == null)
+		{
+			for (String name: filenames)
+			{
+		    	Console.out.println(name);
+			}
+		}
+		else
+		{
+			try
+			{
+				PrintWriter fw = new PrintWriter(new FileWriter(outputfile)); 
+				
+				for (String name: filenames)
+				{
+			    	fw.println(name);
+				}
+
+				fw.close();
+				Console.out.println("Order written to " + outputfile);
+			}
+			catch (IOException e)
+			{
+				Console.out.println("Cannot write " + outputfile + ": " + e);
+			}
+		}
+    }
+    
+    /**
+     * Create a "dot" language version of the graph for the graphviz tool.
+     */
+    public void graphOf(Map<String, Set<String>> map, String filename)
+	{
+    	try
+		{
+			FileWriter fw = new FileWriter(filename); 
+			StringBuilder sb = new StringBuilder();
+			sb.append("digraph G {\n");
+
+			for (String key: map.keySet())
+			{
+				Set<String> nextSet = map.get(key);
+				
+				for (String next: nextSet)
+				{
+					sb.append("\t");
+					sb.append(key);
+					sb.append(" -> ");
+					sb.append(next);
+					sb.append(";\n");
+				}
+			}
+			
+			sb.append("}\n");
+			fw.write(sb.toString());
+			fw.close();
+		}
+		catch (IOException e)
+		{
+			Console.out.println("Cannot write " + filename + ": " + e);
+		}
+	}
+
+	private int removeCycles(String start, Stack<String> stack)
+	{
+    	int count = 0;
+    	Set<String> nextSet = new HashSet<String>(uses.get(start));
+    	
+    	if (!nextSet.isEmpty())
+    	{
+	    	stack.push(start);
+	    	
+	    	for (String next: nextSet)
+	    	{
+	    		if (stack.contains(next))
+	    		{
+	    			Console.out.println("Removing link " + start + " -> " + next);
+	    			delete(start, next);
+	    			count = count + 1;
+	    		}
+	    		else
+	    		{
+	    			count += removeCycles(next, stack);
+	    		}
+	    	}
+	    	
+	    	stack.pop();
+    	}
+    	
+    	return count;
+	}
+
+	private int delete(String from, String to)
+	{
+    	uses.get(from).remove(to);
+    	usedBy.get(to).remove(from);
+    	return usedBy.get(to).size();	// remaining size
+	}
+
+	private void add(String from, String to)
+    {
+    	if (!from.equals(to))
+    	{
+	    	Set<String> set = uses.get(from);
+	    	
+	    	if (set == null)
+	    	{
+	    		set = new HashSet<String>();
+	    		uses.put(from, set);
+	    	}
+	    	
+    		set.add(to);
+    		set = usedBy.get(to);
+	    	
+	    	if (set == null)
+	    	{
+	    		set = new HashSet<String>();
+	    		usedBy.put(to, set);
+	    	}
+	    	
+    		set.add(from);
+    	}
     }
 
 	@Override
 	public String help()
 	{
-		return "order - print optimal module/class order";
+		return "order [filename] - print/save optimal module/class order";
 	}
 }

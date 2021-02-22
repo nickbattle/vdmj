@@ -24,19 +24,19 @@
 
 package com.fujitsu.vdmj.po.statements;
 
-import com.fujitsu.vdmj.ast.lex.LexNameList;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POExternalClause extends PONode
 {
 	private static final long serialVersionUID = 1L;
 	public final LexToken mode;
-	public final LexNameList identifiers;
+	public final TCNameList identifiers;
 	public final TCType type;
 
-	public POExternalClause(LexToken mode, LexNameList names, TCType type)
+	public POExternalClause(LexToken mode, TCNameList names, TCType type)
 	{
 		this.mode = mode;
 		this.identifiers = names;
