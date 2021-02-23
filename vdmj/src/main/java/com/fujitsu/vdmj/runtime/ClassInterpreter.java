@@ -24,7 +24,11 @@
 
 package com.fujitsu.vdmj.runtime;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
@@ -196,16 +200,50 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@Override
-	public void traceInit()
+	public void traceInit() throws Exception
 	{
-		SchedulableThread.terminateAll();
-		scheduler.reset();
+		if (System.getProperty("vdmj.traces.savestate") != null)
+		{
+			SchedulableThread.terminateAll();
+	
+			scheduler.init();
+			SystemClock.init();
+			CPUValue.init(scheduler);
+			BUSValue.init();
+			ObjectValue.init();
+			logSwapIn();
+			
+			if (savedInitialContext == null)
+			{
+				initialContext = executableClasses.creatInitialContext();
+				executableClasses.initialize((StateContext)initialContext);
+				
+				savedInitialContext = new ByteArrayOutputStream();
+				ObjectOutputStream oos = new ObjectOutputStream(savedInitialContext);
+				oos.writeObject(initialContext);
+				oos.close();
+			}
+			else
+			{
+				ByteArrayInputStream is = new ByteArrayInputStream(savedInitialContext.toByteArray());
+				ObjectInputStream ois = new ObjectInputStream(is);
+				initialContext = (RootContext)ois.readObject();
+			}
 
-		SystemClock.init();
-		initialContext = executableClasses.creatInitialContext();
-		executableClasses.initialize((StateContext) initialContext);
-		createdValues = new NameValuePairMap();
-		createdDefinitions = new TCDefinitionSet();
+			executableClasses.systemInit(scheduler, initialContext);
+			INAnnotation.init(initialContext);
+			logSwapOut();
+	
+			createdValues = new NameValuePairMap();
+			createdDefinitions = new TCDefinitionSet();
+	
+			scheduler.reset();	// Required before a run, as well as init above
+			BUSValue.start();	// Start any BUS threads first...
+		}
+		else
+		{
+			init();
+		}
 	}
 
 	@Override

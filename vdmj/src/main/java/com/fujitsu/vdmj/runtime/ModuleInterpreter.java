@@ -24,11 +24,14 @@
 
 package com.fujitsu.vdmj.runtime;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
-
 import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexToken;
@@ -208,11 +211,36 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@Override
-	public void traceInit()
+	public void traceInit() throws Exception
 	{
-		scheduler.reset();
-		initialContext = executableModules.creatInitialContext();
-		executableModules.initialize(initialContext);
+		if (System.getProperty("vdmj.traces.savestate") != null)
+		{
+			scheduler.init();
+			CPUValue.init(scheduler);
+			
+			if (savedInitialContext == null)
+			{
+				initialContext = executableModules.creatInitialContext();
+				executableModules.initialize(initialContext);
+				
+				savedInitialContext = new ByteArrayOutputStream();
+				ObjectOutputStream oos = new ObjectOutputStream(savedInitialContext);
+				oos.writeObject(initialContext);
+				oos.close();
+			}
+			else
+			{
+				ByteArrayInputStream is = new ByteArrayInputStream(savedInitialContext.toByteArray());
+				ObjectInputStream ois = new ObjectInputStream(is);
+				initialContext = (RootContext)ois.readObject();
+			}
+			
+			INAnnotation.init(initialContext);
+		}
+		else
+		{
+			init();
+		}
 	}
 
 	@Override

@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.runtime;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -90,6 +91,9 @@ abstract public class Interpreter
 
 	/** A static instance pointer to the interpreter. */
 	protected static Interpreter instance = null;
+
+	/** The saved initial context for trace execution */
+	protected ByteArrayOutputStream savedInitialContext;
 
 	/**
 	 * Create an Interpreter.
@@ -172,7 +176,7 @@ abstract public class Interpreter
 	 * thorough than the full init, since it does not reset the scheduler
 	 * for example.
 	 */
-	abstract public void traceInit();
+	abstract public void traceInit() throws Exception;
 
 	/**
 	 * Parse the line passed, type check it and evaluate it as an expression
@@ -610,7 +614,7 @@ abstract public class Interpreter
 			{
 				// test.typeCheck(this, environment);	// Not needed with new traces?
 				
-    			init();	// Initialize completely between every run...
+    			traceInit();	// Initialize completely between every run...
     			List<Object> result = runOneTrace(tracedef.classDefinition, test, debug);
     			filter.update(result, test, testNumber);
 
@@ -633,6 +637,7 @@ abstract public class Interpreter
 		}
 
 		init();
+		savedInitialContext = null;
 		Settings.usingCmdLine = wasCMD;
 		
 		if (excluded > 0)

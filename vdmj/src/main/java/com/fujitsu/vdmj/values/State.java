@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.values;
 
+import java.io.Serializable;
+
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.INStateDefinition;
 import com.fujitsu.vdmj.in.expressions.INEqualsExpression;
@@ -35,8 +37,9 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 
-public class State implements ValueListener
+public class State implements ValueListener, Serializable
 {
+	private static final long serialVersionUID = 1L;
 	public final INStateDefinition definition;
 	public final UpdatableValue recordValue;
 	public final Context context;
