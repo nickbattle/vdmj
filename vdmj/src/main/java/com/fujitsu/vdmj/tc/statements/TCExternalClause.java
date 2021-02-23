@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -37,12 +38,14 @@ public class TCExternalClause extends TCNode
 	public final LexToken mode;
 	public final TCNameList identifiers;
 	public TCType type;
+	public final TCTypeList unresolved;
 
 	public TCExternalClause(LexToken mode, TCNameList names, TCType type)
 	{
 		this.mode = mode;
 		this.identifiers = names;
 		this.type = (type == null) ? new TCUnknownType(names.get(0).getLocation()) : type;
+		this.unresolved = type.unresolvedTypes();
 	}
 
 	public void typeResolve(Environment base)
