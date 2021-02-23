@@ -90,31 +90,31 @@ public class INTypeDefinition extends INDefinition
 
 		if (invdef != null)
 		{
-			FunctionValue invfunc =	new FunctionValue(invdef, null, null, ctxt);
+			FunctionValue invfunc =	new FunctionValue(invdef, null, null, null);
 			nvl.add(new NameValuePair(invdef.name, invfunc));
 		}
 
 		if (eqdef != null)
 		{
-			FunctionValue eqfunc =	new FunctionValue(eqdef, null, null, ctxt);
+			FunctionValue eqfunc =	new FunctionValue(eqdef, null, null, null);
 			nvl.add(new NameValuePair(eqdef.name, eqfunc));
 		}
 
 		if (orddef != null)
 		{
-			FunctionValue ordfunc =	new FunctionValue(orddef, null, null, ctxt);
+			FunctionValue ordfunc =	new FunctionValue(orddef, null, null, null);
 			nvl.add(new NameValuePair(orddef.name, ordfunc));
 		}
 
 		if (mindef != null)
 		{
-			FunctionValue minfunc =	new FunctionValue(mindef, null, null, ctxt);
+			FunctionValue minfunc =	new FunctionValue(mindef, null, null, null);
 			nvl.add(new NameValuePair(mindef.name, minfunc));
 		}
 
 		if (maxdef != null)
 		{
-			FunctionValue maxfunc =	new FunctionValue(maxdef, null, null, ctxt);
+			FunctionValue maxfunc =	new FunctionValue(maxdef, null, null, null);
 			nvl.add(new NameValuePair(maxdef.name, maxfunc));
 		}
 
