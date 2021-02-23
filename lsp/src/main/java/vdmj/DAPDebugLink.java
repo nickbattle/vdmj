@@ -114,6 +114,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 		{
 			// server.stderr(ex.getMessage() + "\n");
 			text = ex.getMessage();
+			focusHint = false;
 			
 			if (text.equals("DEADLOCK detected"))	// see SchedulableThread
 			{
