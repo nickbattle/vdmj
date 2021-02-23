@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.in.definitions;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
@@ -35,7 +34,6 @@ import com.fujitsu.vdmj.in.expressions.INSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.patterns.INPatternListList;
 import com.fujitsu.vdmj.in.types.INInstantiate;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -125,15 +123,14 @@ public class INExplicitFunctionDefinition extends INDefinition
 	public NameValuePairList getNamedValues(Context ctxt)
 	{
 		NameValuePairList nvl = new NameValuePairList();
-		Context free = null;	// ctxt.getVisibleVariables();
 
 		FunctionValue prefunc =
-			(predef == null) ? null : new FunctionValue(predef, null, null, free);
+			(predef == null) ? null : new FunctionValue(predef, null, null, null);
 
 		FunctionValue postfunc =
-			(postdef == null) ? null : new FunctionValue(postdef, null, null, free);
+			(postdef == null) ? null : new FunctionValue(postdef, null, null, null);
 
-		FunctionValue func = new FunctionValue(this, prefunc, postfunc, free);
+		FunctionValue func = new FunctionValue(this, prefunc, postfunc, null);
 		func.isStatic = accessSpecifier.isStatic;;
 		func.uninstantiated = (typeParams != null);
 		nvl.add(new NameValuePair(name, func));
@@ -153,12 +150,6 @@ public class INExplicitFunctionDefinition extends INDefinition
 		if (measureDef != null && measureDef.name.getName().startsWith("measure_"))
 		{
 			nvl.add(new NameValuePair(measureDef.name, new FunctionValue(measureDef, null, null, null)));
-		}
-
-		if (Settings.dialect == Dialect.VDM_SL)
-		{
-			// This is needed for recursive local functions
-			// free.putList(nvl);
 		}
 
 		return nvl;

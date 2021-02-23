@@ -351,12 +351,13 @@ public class FunctionValue extends Value
 			evalContext.put(new TCNameToken(location, location.module, "self"), self);
 		}
 
-		evalContext.putAll(args);
-
 		if (freeVariables != null)
 		{
 			evalContext.putAll(freeVariables);
 		}
+
+		// Note, args overwrite free variables.
+		evalContext.putAll(args);
 		
 		if (paramPatternList.size() == 1)
 		{

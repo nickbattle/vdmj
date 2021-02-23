@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
@@ -39,7 +38,6 @@ import com.fujitsu.vdmj.in.types.INPatternListTypePair;
 import com.fujitsu.vdmj.in.types.INPatternListTypePairList;
 import com.fujitsu.vdmj.in.types.INPatternTypePair;
 import com.fujitsu.vdmj.in.types.INInstantiate;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -133,19 +131,18 @@ public class INImplicitFunctionDefinition extends INDefinition
 	public NameValuePairList getNamedValues(Context ctxt)
 	{
 		NameValuePairList nvl = new NameValuePairList();
-		Context free = null;	// ctxt.getVisibleVariables();
 
 		FunctionValue prefunc =
-			(predef == null) ? null : new FunctionValue(predef, null, null, free);
+			(predef == null) ? null : new FunctionValue(predef, null, null, null);
 
 		FunctionValue postfunc =
-			(postdef == null) ? null : new FunctionValue(postdef, null, null, free);
+			(postdef == null) ? null : new FunctionValue(postdef, null, null, null);
 
 		// Note, body may be null if it is really implicit. This is caught
 		// when the function is invoked. The value is needed to implement
 		// the pre_() expression for implicit functions.
 
-		FunctionValue func = new FunctionValue(this, prefunc, postfunc, free);
+		FunctionValue func = new FunctionValue(this, prefunc, postfunc, null);
 		func.isStatic = accessSpecifier.isStatic;
 		func.uninstantiated = (typeParams != null);
 		nvl.add(new NameValuePair(name, func));
@@ -165,12 +162,6 @@ public class INImplicitFunctionDefinition extends INDefinition
 		if (measureDef != null && measureDef.name.getName().startsWith("measure_"))
 		{
 			nvl.add(new NameValuePair(measureDef.name, new FunctionValue(measureDef, null, null, null)));
-		}
-
-		if (Settings.dialect == Dialect.VDM_SL)
-		{
-			// This is needed for recursive local functions
-			// free.putList(nvl);
 		}
 
 		return nvl;
