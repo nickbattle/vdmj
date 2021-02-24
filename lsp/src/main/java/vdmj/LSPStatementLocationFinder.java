@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
@@ -45,6 +46,8 @@ import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
+import com.fujitsu.vdmj.tc.statements.TCErrorCase;
+import com.fujitsu.vdmj.tc.statements.TCExternalClause;
 import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
 import com.fujitsu.vdmj.tc.statements.TCMapSeqDesignator;
@@ -54,6 +57,7 @@ import com.fujitsu.vdmj.tc.statements.TCObjectFieldDesignator;
 import com.fujitsu.vdmj.tc.statements.TCObjectIdentifierDesignator;
 import com.fujitsu.vdmj.tc.statements.TCObjectNewDesignator;
 import com.fujitsu.vdmj.tc.statements.TCObjectSelfDesignator;
+import com.fujitsu.vdmj.tc.statements.TCSpecificationStatement;
 import com.fujitsu.vdmj.tc.statements.TCStateDesignator;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.visitors.TCLeafStatementVisitor;
@@ -269,6 +273,41 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 				{
 					all.addAll(p.apply(patternVisitor, arg));
 				}
+			}
+		}
+		
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseSpecificationStatement(TCSpecificationStatement node, LexLocation sought)
+	{
+		Set<TCNode> all =  super.caseSpecificationStatement(node, sought);
+		
+		if (node.externals != null)
+		{
+			for (TCExternalClause ext: node.externals)
+			{
+				for (TCNameToken name: ext.identifiers)
+				{
+					if (sought.within(name.getLocation()))
+					{
+						all.add(name);
+					}
+				}
+				
+				all.addAll(ext.unresolved.matchUnresolved(sought));
+			}
+		}
+		
+		if (node.errors != null)
+		{
+			TCExpressionVisitor<Set<TCNode>, LexLocation> expVisitor = visitorSet.getExpressionVisitor();
+			
+			for (TCErrorCase error: node.errors)
+			{
+				all.addAll(error.left.apply(expVisitor, sought));
+				all.addAll(error.right.apply(expVisitor, sought));
 			}
 		}
 		
