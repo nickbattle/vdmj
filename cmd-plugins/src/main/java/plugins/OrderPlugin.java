@@ -24,6 +24,7 @@
 
 package plugins;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -35,16 +36,27 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.fujitsu.vdmj.commands.CommandPlugin;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCClassList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.lex.TCNameSet;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCImportFromModule;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 
 public class OrderPlugin extends CommandPlugin
 {
+	private Map<String, File> nameToFile = new HashMap<String, File>();
 	private Map<String, Set<String>> uses = new HashMap<String, Set<String>>();
 	private Map<String, Set<String>> usedBy  = new HashMap<String, Set<String>>();
 	private String outputfile;
@@ -60,6 +72,7 @@ public class OrderPlugin extends CommandPlugin
 		outputfile = null;
 		uses.clear();
 		usedBy.clear();
+		nameToFile.clear();
 		
 		if (argv.length == 2)
 		{
@@ -77,21 +90,57 @@ public class OrderPlugin extends CommandPlugin
 		}
 		else
 		{
-			// classes!
+			classOrder(interpreter.getTC());
 		}
 
 		return true;	// Even if command failed
 	}
     			
-    private void moduleOrder(TCModuleList moduleList)
+    private void classOrder(TCClassList classList)
+	{
+		Console.out.println("Generating dependency graph");
+		
+		TCDefinitionList allDefs = new TCDefinitionList();
+
+    	for (TCClassDefinition c: classList)
+		{
+	    	nameToFile.put(c.name.getName(), c.name.getLocation().file);
+	    	allDefs.addAll(c.getDefinitions());
+		}
+
+    	Environment globals = new FlatEnvironment(allDefs, null);
+
+    	for (TCDefinition def: allDefs)
+    	{
+    		Environment empty = new FlatEnvironment(new TCDefinitionList());
+			TCNameSet freevars = def.getFreeVariables(globals, empty, new AtomicBoolean(false));
+			String myname = def.name.getModule();
+	    	
+	    	for (TCNameToken dep: freevars)
+	    	{
+				add(myname, dep.getModule());
+	    	}
+	    }
+    	
+    	for (String cname: nameToFile.keySet())
+    	{
+    		if (!uses.containsKey(cname))
+    		{
+    			uses.put(cname, new HashSet<String>());
+    		}
+    	}
+		
+		processGraph();
+	}
+
+	private void moduleOrder(TCModuleList moduleList)
     {
-		Set<String> allModules = new HashSet<String>();
 		Console.out.println("Generating dependency graph");
 
 		for (TCModule m: moduleList)
 		{
 	    	String myname = m.name.getName();
-	    	allModules.add(myname);
+	    	nameToFile.put(myname, m.name.getLocation().file);
 			
 			if (m.imports != null)
 			{
@@ -106,6 +155,11 @@ public class OrderPlugin extends CommandPlugin
 			}
 	    }
 		
+		processGraph();
+    }
+	
+    private void processGraph()
+    {
 		/*
 		 * First remove any cycles. For some reason it's not enough to search from
 		 * the startpoints, so we just search from everywhere. It's reasonably
@@ -114,7 +168,7 @@ public class OrderPlugin extends CommandPlugin
 		Console.out.println("Checking for cyclic dependencies");
 		int count = 0;
 		
-		for (String start: allModules)
+		for (String start: nameToFile.keySet())
 		{
 			count += removeCycles(start, new Stack<String>());
 		}
@@ -127,7 +181,7 @@ public class OrderPlugin extends CommandPlugin
 		 */
 		List<String> startpoints = new Vector<String>();
 
-		for (String module: allModules)
+		for (String module: nameToFile.keySet())
 		{
 			if (usedBy.get(module) == null || usedBy.get(module).isEmpty())
 			{
@@ -191,11 +245,11 @@ public class OrderPlugin extends CommandPlugin
 		
 		for (String name: ordering)
 		{
-			for (TCModule m: moduleList)
+			for (String module: nameToFile.keySet())
 			{
-				if (m.name.getName().equals(name))
+				if (module.equals(name))
 				{
-					String file = m.name.getLocation().file.toString();
+					String file = nameToFile.get(module).toString();
 					
 					if (!filenames.contains(file))	// files with >= two modules
 					{
