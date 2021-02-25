@@ -350,7 +350,10 @@ public class DAPDebugExecutor implements DebugExecutor
 		if (location.file.getName().equals("?") ||
 			location.file.getName().equals("console"))
 		{
-			return new JSONObject("sourceReference", 0);
+			return new JSONObject(
+				"name", location.file.getName(),
+				"origin", "Debug Console",
+				"sourceReference", 0);		// See SourceHandler
 		}
 		else
 		{

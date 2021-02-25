@@ -43,7 +43,8 @@ public class SourceHandler extends DAPHandler
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
 		JSONObject arguments = request.get("arguments");
-		Long reference = arguments.get("sourceReference");
+		JSONObject source = arguments.get("source");
+		Long reference = source.get("sourceReference");
 		String result = null;
 		
 		switch (reference.intValue())
