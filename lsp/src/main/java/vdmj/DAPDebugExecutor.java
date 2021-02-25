@@ -325,7 +325,7 @@ public class DAPDebugExecutor implements DebugExecutor
 					frames.add(new JSONObject(
 							"id",		frame.frameId,
 							"name",		frame.title,
-							"source",	new JSONObject("path", frame.location.file.getAbsolutePath()),
+							"source",	locationToSource(frame.location),
 							"line",		frame.location.startLine,
 							"column",	frame.location.startPos,
 							"moduleId",	frame.location.module));
@@ -345,6 +345,19 @@ public class DAPDebugExecutor implements DebugExecutor
 		return new DebugCommand(DebugType.STACK, stackResponse);
 	}
 	
+	private JSONObject locationToSource(LexLocation location)
+	{
+		if (location.file.getName().equals("?") ||
+			location.file.getName().equals("console"))
+		{
+			return new JSONObject("sourceReference", 0);
+		}
+		else
+		{
+			return new JSONObject("path", location.file.getAbsolutePath());
+		}
+	}
+	
 	private DebugCommand doScopes(DebugCommand command)
 	{
 		JSONObject arguments = (JSONObject) command.getPayload();
@@ -359,7 +372,7 @@ public class DAPDebugExecutor implements DebugExecutor
 				scopes.add(new JSONObject(
 					"name", scope.name,
 					"variablesReference", scope.vref,
-					"source", new JSONObject("path", frame.location.file.getAbsolutePath())
+					"source", locationToSource(frame.location)
 				));
 			}
 		}
@@ -673,39 +686,23 @@ public class DAPDebugExecutor implements DebugExecutor
 		String title = (c.outer == null ? "Globals" : "Arguments");
 		LexLocation loc = (c.outer == null ? c.location : frame.location);
 		
-		// Flat SL specs have a default location of "?" for the outer context.
-		// That causes problems in the client, so we try to replace it with
-		// the start of an arbitrary definition's file.
-		
 		if (c == ctxt)	// Stopped in base context (init)
 		{
 			loc = breakloc;
 		}
 		else if (loc.file.getName().equals("?"))
 		{
+			// Flat SL specs have a default location of "?" for the outer context.
+			// That causes problems in the client, so we try to replace it with
+			// the start of an arbitrary definition's file.
+			
 			if (c.isEmpty())
 			{
 				loc = frame.location;
 			}
 			else
 			{
-				for (Entry<TCNameToken, Value> entry: c.entrySet())
-				{
-					if (entry.getValue() instanceof OperationValue)
-					{
-						OperationValue op = (OperationValue)entry.getValue();
-						loc = op.name.getLocation();
-						loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
-						break;
-					}
-					else if (entry.getValue() instanceof FunctionValue)
-					{
-						FunctionValue fn = (FunctionValue)entry.getValue();
-						loc = fn.location;
-						loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
-						break;
-					}
-				}
+				loc = locationFromCtxt(c);
 			}
 		}
 		
@@ -746,5 +743,30 @@ public class DAPDebugExecutor implements DebugExecutor
 		frame.title = c.title;
 		frame.location = loc;
 		return c.outer;
+	}
+	
+	private LexLocation locationFromCtxt(Context c)
+	{
+		LexLocation loc = c.location;
+		
+		for (Entry<TCNameToken, Value> entry: c.entrySet())
+		{
+			if (entry.getValue() instanceof OperationValue)
+			{
+				OperationValue op = (OperationValue)entry.getValue();
+				loc = op.name.getLocation();
+				loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
+				break;
+			}
+			else if (entry.getValue() instanceof FunctionValue)
+			{
+				FunctionValue fn = (FunctionValue)entry.getValue();
+				loc = fn.location;
+				loc = new LexLocation(loc.file, "DEFAULT", 0, 0, 0, 0);
+				break;
+			}
+		}
+		
+		return loc;
 	}
 }

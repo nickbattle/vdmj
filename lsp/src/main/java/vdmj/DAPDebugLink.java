@@ -55,7 +55,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 	/**
 	 * Get the singleton. 
 	 */
-	public static DebugLink getInstance()
+	public synchronized static DebugLink getInstance()
 	{
 		if (instance == null)
 		{
