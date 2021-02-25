@@ -409,8 +409,11 @@ public class DAPDebugExecutor implements DebugExecutor
 		if (var instanceof Context)
 		{
 			Context c = (Context)var;
+			TCNameList sorted = new TCNameList();
+			sorted.addAll(c.keySet());
+			Collections.sort(sorted);
 			
-			for (TCNameToken name: c.keySet())
+			for (TCNameToken name: sorted)
 			{
 				Value value = c.get(name);
 				
