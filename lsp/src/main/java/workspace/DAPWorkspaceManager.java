@@ -391,6 +391,8 @@ public class DAPWorkspaceManager
 
 	public DAPMessageList terminate(DAPRequest request, Boolean restart)
 	{
+		DAPMessageList result = new DAPMessageList(request);
+
 		if (restart)
 		{
 			stdout("\nSession restarting...\n");
@@ -400,10 +402,11 @@ public class DAPWorkspaceManager
 		else
 		{
 			stdout("\nSession terminated.\n");
+			result.add(new DAPResponse("terminated", null));
+			result.add(new DAPResponse("exit", new JSONObject("exitCode", 0L)));
 		}
 		
 		clearInterpreter();
-		DAPMessageList result = new DAPMessageList(request);
 		return result;
 	}
 	
