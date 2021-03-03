@@ -236,6 +236,19 @@ public class FunctionValue extends Value
 		return type.toString();
 	}
 
+	public void setSelf(ObjectValue self)
+	{
+		if (!isStatic)
+		{
+			this.self = self;
+	
+			if (measure != null)
+			{
+				measure.setSelf(self);
+			}
+		}
+	}
+
 	public Value eval(
 		LexLocation from, Value arg, Context ctxt) throws ValueException
 	{
@@ -263,20 +276,7 @@ public class FunctionValue extends Value
 		}
 	}
 
-	public void setSelf(ObjectValue self)
-	{
-		if (!isStatic)
-		{
-			this.self = self;
-
-			if (measure != null)
-			{
-				measure.setSelf(self);
-			}
-		}
-	}
-
-	public Value eval(
+	private Value eval(
 		LexLocation from, ValueList argValues, Context ctxt, Context sctxt) throws ValueException
 	{
 		if (body == null)
