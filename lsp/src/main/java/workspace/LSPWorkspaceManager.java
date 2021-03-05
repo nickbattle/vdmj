@@ -494,11 +494,14 @@ public class LSPWorkspaceManager
 		}
 	}
 
-	private boolean rebuildAfterWatch = false;
-	
-	public void changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
+	/**
+	 * The action code returned indicates whether the change watched file requires the
+	 * specification to be reloaded and rechecked(2), just re-checked(1), or nothing(0). 
+	 */
+	public int changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
 	{
 		FilenameFilter filter = getFilenameFilter();
+		int actionCode = 0;
 
 		switch (type)
 		{
@@ -506,15 +509,17 @@ public class LSPWorkspaceManager
 				if (file.isDirectory())
 				{
 					Log.printf("New directory created: %s", file);
+					actionCode = 0;
 				}
 				else if (file.equals(new File(rootUri, ".vscode/ordering")))
 				{
 					Log.printf("Created ordering file, rebuilding");
-					rebuildAfterWatch = true;
+					actionCode = 2;		// Rebuild and re-check
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
 					Log.printf("Ignoring non-project file: %s", file);
+					actionCode = 0;
 				}
 				else if (!projectFiles.keySet().contains(file))	
 				{
@@ -522,17 +527,20 @@ public class LSPWorkspaceManager
 					{
 						Log.error("File not in ordering list: %s", file);
 						sendMessage(1L, "Ordering file out of date? " + file);
+						actionCode = 0;
 					}
 					else
 					{
 						Log.printf("Created new file: %s", file);
 						loadFile(file);
+						actionCode = 1;	// Just re-check
 					}
 				}
 				else
 				{
 					// Usually because a didOpen gets in first, on creation
 					Log.printf("Created file already added: %s", file);
+					actionCode = 0;		// Already re-built by openFile
 				}
 				break;
 				
@@ -540,33 +548,38 @@ public class LSPWorkspaceManager
 				if (file.isDirectory())
 				{
 					Log.printf("Directory changed: %s", file);
+					actionCode = 0;
 				}
 				else if (file.equals(new File(rootUri, ".vscode/ordering")))
 				{
 					Log.printf("Updated ordering file, rebuilding");
-					rebuildAfterWatch = true;
+					actionCode = 2;		// Rebuild and re-check
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
 					Log.printf("Ignoring non-project file change: %s", file);
+					actionCode = 0;
 				}
 				else if (!projectFiles.keySet().contains(file))	
 				{
 					Log.error("Changed file not known: %s", file);
+					actionCode = 2;		// Try rebuilding?
 				}
 				break;
 				
 			case DELETE:
 				// Since the file is deleted, we don't know what it was so we have to rebuild
 				Log.printf("Deleted %s (dir/file?), rebuilding", file);
-				rebuildAfterWatch = true;
+				actionCode = 2;		// Rebuild and re-check
 				break;
 		}
+		
+		return actionCode;
 	}
 
-	public RPCMessageList afterChangeWatchedFiles(RPCRequest request) throws Exception
+	public RPCMessageList afterChangeWatchedFiles(RPCRequest request, int actionCode) throws Exception
 	{
-		if (rebuildAfterWatch)
+		if (actionCode == 2)
 		{
 			LSPServer server = LSPServer.getInstance();
 			
@@ -577,10 +590,16 @@ public class LSPWorkspaceManager
 			}
 
 			loadAllProjectFiles();
-			rebuildAfterWatch = false;
 		}
 		
-		return checkLoadedFiles("after change watched");
+		if (actionCode > 0)
+		{
+			return checkLoadedFiles("after change watched");
+		}
+		else
+		{
+			return new RPCMessageList(request);
+		}
 	}
 
 	/**

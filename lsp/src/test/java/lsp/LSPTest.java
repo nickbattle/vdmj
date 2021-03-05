@@ -68,7 +68,7 @@ abstract public class LSPTest
 		RPCMessageList result = lspManager.lspInitialize(RPCRequest.create("initialize", params));
 		assertEquals("init result", (Object)null, result.get(0).get("error"));		
 		
-		return lspManager.afterChangeWatchedFiles(null);	// Cause parse and typecheck
+		return lspManager.afterChangeWatchedFiles(null, 1);	// Cause parse and typecheck
 	}
 	
 	protected void dump(JSONObject obj) throws IOException
