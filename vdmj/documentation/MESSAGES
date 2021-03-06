@@ -60,6 +60,8 @@ as the expected and actual values.
 1009, "Unexpected character 'c'"
 1010, "Expecting <digits>[.<digits>][e<+-><digits>]"
 1011, "Unterminated block comment"
+1012, "Deprecated nested block comment"
+1013, "Illegal nested block comment"
 
 
 2000, "Expecting 'in set' or 'in seq' after pattern in set binding"

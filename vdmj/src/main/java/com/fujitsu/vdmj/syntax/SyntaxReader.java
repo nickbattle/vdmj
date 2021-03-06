@@ -96,12 +96,7 @@ public abstract class SyntaxReader
 	{
 		this.reader = reader;
 		this.dialect = reader.dialect;
-	}
-
-	protected SyntaxReader()
-	{
-		this.reader = null;
-		this.dialect = null;
+		reader.setSyntaxReader(this);
 	}
 
 	/**
@@ -678,8 +673,7 @@ public abstract class SyntaxReader
 	/**
 	 * Report a warning. Unlike errors, this does no token recovery.
 	 */
-
-	protected void warning(int no, String msg, LexLocation location)
+	public void warning(int no, String msg, LexLocation location)
 	{
 		VDMWarning vdmwarning = new VDMWarning(no, msg, location);
 		warnings.add(vdmwarning);
@@ -691,6 +685,20 @@ public abstract class SyntaxReader
 		}
 	}
 
+	/**
+	 * Report an error. Unlike errors, this does no token recovery.
+	 */
+	public void report(int no, String msg, LexLocation location)
+	{
+		VDMError vdmerror = new VDMError(no, msg, location);
+		errors.add(vdmerror);
+
+		if (errors.size() >= MAX-1)
+		{
+			errors.add(new VDMError(9, "Too many syntax errors", location));
+			throw new InternalException(9, "Too many syntax errors");
+		}
+	}
 
 	/**
 	 * @return The error count from all readers that can raise errors.

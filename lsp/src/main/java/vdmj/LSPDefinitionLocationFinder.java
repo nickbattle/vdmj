@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCMutexSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
@@ -194,6 +195,14 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 			}
 		}
 		
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseStateDefinition(TCStateDefinition node, LexLocation sought)
+	{
+		Set<TCNode> all = super.caseStateDefinition(node, sought);
+		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}
 	

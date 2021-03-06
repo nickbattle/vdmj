@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.ast.lex.LexRealToken;
 import com.fujitsu.vdmj.ast.lex.LexStringToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.syntax.SyntaxReader;
 
 /**
  * The main lexical analyser class.
@@ -135,6 +136,10 @@ public class LexTokenReader extends BacktrackInputReader
 	/** An end of file symbol. */
 	private static final char EOF = (char)-1;
 
+	/** The primary SyntaxReader (ie. class or module) using this reader */
+	private SyntaxReader syntaxReader = null;
+
+	
 	/**
 	 * Create a LexTokenReader for the filename passed.
 	 *
@@ -198,22 +203,8 @@ public class LexTokenReader extends BacktrackInputReader
 	/**
 	 * Create a LexTokenReader to read content which originates from a file
 	 * which is not yet saved and enable the source of the file to be set.
-	 * This is used in the IDE to provide while typing outline and parse error
-	 * info.
-	 */
-	public LexTokenReader(String content, Dialect dialect, File file)
-	{
-		super(content);
-		this.file = file;
-		this.dialect = dialect;
-		init();
-	}
-
-	/**
-	 * Create a LexTokenReader to read content which originates from a file
-	 * which is not yet saved and enable the source of the file to be set.
-	 * This is used in the IDE to provide while typing outline and parse error
-	 * info.
+	 * This is used in the IDE to provide outline and parse error
+	 * info while typing.
 	 */
 	public LexTokenReader(String content, Dialect dialect, File file, String charset)
 	{
@@ -232,6 +223,7 @@ public class LexTokenReader extends BacktrackInputReader
 		this.currentModule = reader.currentModule;
 		this.file = location.file;
 		this.dialect = reader.dialect;
+		this.syntaxReader = reader.syntaxReader;
 		rdCh();
 		this.linecount = location.startLine;
 		this.charpos = location.startPos;
@@ -864,6 +856,7 @@ public class LexTokenReader extends BacktrackInputReader
 					rdCh();
 					LexLocation here = location(linecount, charpos);
 					int nestedCount = 0;
+					int nestingSupport = Integer.getInteger("vdmj.parser.nesting", 0);
 					
 					while (ch != EOF)
 					{
@@ -883,7 +876,27 @@ public class LexTokenReader extends BacktrackInputReader
 
 					    	if (rdCh() == '*')
 						    {
-						    	nestedCount++;
+					    		switch (nestingSupport)
+					    		{
+					    			case 3:	// ignored - ie. original behaviour, no nest count
+					    				break;
+					    				
+					    			case 2:	// error
+					    				nestedCount++;
+					    				report(1013, "Illegal nested block comment", location(linecount, charpos-1));
+					    				break;
+					    				
+					    			case 1:	// warning
+					    				warning(1012, "Deprecated nested block comment", location(linecount, charpos-1));
+					    				nestedCount++;
+					    				break;
+					    				
+					    			case 0:	// supported
+					    			default:
+								    	nestedCount++;
+					    				break;
+					    		}
+					    		
 						    	sb.append('*');
 						    	rdCh();
 						    }
@@ -1273,5 +1286,33 @@ public class LexTokenReader extends BacktrackInputReader
 		}
 
 		return id.toString();
+	}
+
+	/**
+	 * These methods allow the LexTokenReader to report an error or warning to
+	 * its enclosing SyntaxReader, if any.
+	 */
+	public void setSyntaxReader(SyntaxReader syntaxReader)
+	{
+		if (this.syntaxReader == null)
+		{
+			this.syntaxReader = syntaxReader;
+		}
+	}
+	
+	private void warning(int no, String msg, LexLocation location)
+	{
+		if (syntaxReader != null)
+		{
+			syntaxReader.warning(no, msg, location);
+		}
+	}
+
+	private void report(int no, String msg, LexLocation location)
+	{
+		if (syntaxReader != null)
+		{
+			syntaxReader.report(no, msg, location);
+		}
 	}
 }
