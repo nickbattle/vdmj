@@ -395,7 +395,7 @@ abstract public class CommandReader
 		}
 		
 		String plugin = Character.toUpperCase(argv[0].charAt(0)) + argv[0].substring(1).toLowerCase() + "Plugin";
-		String[] packages = Properties.cmd_plugins_path.split(";|:");
+		String[] packages = Properties.cmd_plugin_packages.split(";|:");
 		
 		for (String pack: packages)
 		{

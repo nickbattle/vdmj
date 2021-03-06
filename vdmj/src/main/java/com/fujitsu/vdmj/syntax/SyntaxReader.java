@@ -796,7 +796,7 @@ public abstract class SyntaxReader
 	protected ASTAnnotation loadAnnotation(LexIdentifierToken name)
 		throws ParserException, LexException
 	{
-		String classpath = Properties.annotations_path;
+		String classpath = Properties.annotations_packages;
 		String[] packages = classpath.split(";|:");
 		
 		for (String pack: packages)

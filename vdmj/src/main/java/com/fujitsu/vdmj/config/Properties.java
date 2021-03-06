@@ -39,8 +39,8 @@ public class Properties
 	/** Nesting of block comments: 0-3 = support, warning, error, ignore. */
 	public static int parser_comment_nesting = 0;
 	
-	/** The search path for annotation classes to load. */
-	public static String annotations_path = "com.fujitsu.vdmj.ast.annotations;annotations.ast";
+	/** The package list for annotation classes to load. */
+	public static String annotations_packages = "com.fujitsu.vdmj.ast.annotations;annotations.ast";
 	
 	/** Enable annotation debugging. */
 	public static boolean annotations_debug = false;
@@ -98,7 +98,7 @@ public class Properties
 
 	
 	/** The packages for command plugins to load from. */
-	public static String cmd_plugins_path = "plugins";
+	public static String cmd_plugin_packages = "plugins";
 	
 	/** The class name for the DebugLink */
 	public static String debug_link_class = null;
@@ -123,7 +123,7 @@ public class Properties
 			parser_tabstop = get(vdmj, "vdmj.parser.tabstop", parser_tabstop);
 			parser_comment_nesting = get(vdmj, "vdmj.parser.comment_nesting", parser_comment_nesting);
 			mapping_search_path = get(vdmj, "vdmj.mapping.search_path", mapping_search_path);
-			annotations_path = get(vdmj, "vdmj.annotations.path", annotations_path);
+			annotations_packages = get(vdmj, "vdmj.annotations.packages", annotations_packages);
 			annotations_debug = get(vdmj, "vdmj.annotations.debug", annotations_debug);
 			tc_skip_recursive_check = get(vdmj, "vdmj.tc.skip_recursive_check", tc_skip_recursive_check);
 			tc_skip_cyclic_check = get(vdmj, "vdmj.tc.skip_cyclic_check", tc_skip_cyclic_check);
@@ -144,7 +144,7 @@ public class Properties
 			rt_diags_guards = get(vdmj, "vdmj.rt.diags_guards", rt_diags_guards);
 			rt_diags_timestep = get(vdmj, "vdmj.rt.diags_timestep", rt_diags_timestep);
 			
-			cmd_plugins_path = get(vdmj, "vdmj.cmd.plugins_path", cmd_plugins_path);
+			cmd_plugin_packages = get(vdmj, "vdmj.cmd.plugin_packages", cmd_plugin_packages);
 			debug_link_class = get(vdmj, "vdmj.debug.link_class", null);
 		}
 		catch (Exception e)
