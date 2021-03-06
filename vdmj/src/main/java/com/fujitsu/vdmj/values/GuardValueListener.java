@@ -48,7 +48,7 @@ public class GuardValueListener implements ValueListener, Serializable
 	@Override
 	public void changedValue(LexLocation location, Value value, Context ctxt) throws ValueException
 	{
-		if (Properties.diags_guards)
+		if (Properties.rt_diags_guards)
 		{
 			if (Settings.dialect == Dialect.VDM_PP)
 			{

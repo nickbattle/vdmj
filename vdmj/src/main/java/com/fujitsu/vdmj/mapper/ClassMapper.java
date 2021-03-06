@@ -41,6 +41,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.config.Properties;
+
 /**
  * A class to map classes and extend trees of objects. 
  */
@@ -201,7 +203,7 @@ public class ClassMapper
 		 * This allows more than one mapping file of the same name to be included within
 		 * one jar file.
 		 */
-		String mappingPath = System.getProperty("vdmj.mappingpath");
+		String mappingPath = Properties.mapping_search_path;
 		
 		if (mappingPath != null)
 		{

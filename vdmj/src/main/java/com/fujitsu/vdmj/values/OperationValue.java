@@ -756,7 +756,7 @@ public class OperationValue extends Value
 	 */
 	private void debug(String string)
 	{
-		if (Properties.diags_guards)
+		if (Properties.rt_diags_guards)
 		{
 			if (Settings.dialect == Dialect.VDM_PP)
 			{

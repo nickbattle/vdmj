@@ -32,6 +32,7 @@ import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
@@ -55,20 +56,11 @@ abstract public class TypeChecker
 	private static List<VDMWarning> warnings = new Vector<VDMWarning>();
 	private static VDMMessage lastMessage = null;
 	private static boolean suspended = false;
-	private static int MAX = 100;
+	private static int MAX = Properties.tc_max_errors;
 	
 	public TypeChecker()
 	{
 		clearErrors();
-		
-		try
-		{
-			MAX = Integer.parseInt(System.getProperty("max.errors", "100"));
-		}
-		catch (NumberFormatException e)
-		{
-			MAX = 100;
-		}
 	}
 
 	abstract public void typeCheck();
@@ -79,7 +71,7 @@ abstract public class TypeChecker
 	 */
 	protected void cyclicDependencyCheck(TCDefinitionList defs)
 	{
-		if (System.getProperty("skip.cyclic.check") != null)
+		if (Properties.tc_skip_cyclic_check)
 		{
 			return;		// For now, to allow us to skip if there are issues.
 		}

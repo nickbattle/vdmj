@@ -4,8 +4,8 @@
 #####################################################################################
 
 # Change these to flip version
-MVERSION="4.4.2-SNAPSHOT"
-PVERSION="4.4.2-P-SNAPSHOT"
+MVERSION="4.4.3-SNAPSHOT"
+PVERSION="4.4.3-P-SNAPSHOT"
 
 # The Maven repository directory containing jars
 MAVENREPO=~/.m2/repository/com/fujitsu
@@ -77,7 +77,7 @@ DBGPC_JAR=$MAVENREPO/dbgpc/${VERSION}/dbgpc-${VERSION}.jar
 check "$VDMJ_JAR"
 check "$DBGP_JAR"
 check "$DBGPC_JAR"
-JARS="-Dvdmj.jar=$VDMJ_JAR -Ddbgp.jar=$DBGP_JAR"
+JARS="-Ddbgp.vdmj_jar=$VDMJ_JAR -Ddbgp.dbgp_jar=$DBGP_JAR"
 
 # Keep rlwrap output in a separate folder
 export RLWRAP_HOME=~/.dbgpc

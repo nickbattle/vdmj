@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.VDMJ;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
@@ -400,7 +401,7 @@ abstract public class CommandReader
 		}
 		
 		String plugin = Character.toUpperCase(argv[0].charAt(0)) + argv[0].substring(1).toLowerCase() + "Plugin";
-		String[] packages = System.getProperty("vdmj.plugins", "plugins").split(";|:");
+		String[] packages = Properties.cmd_plugin_packages.split(";|:");
 		
 		for (String pack: packages)
 		{

@@ -155,7 +155,7 @@ public class LSPWorkspaceManager
 			rootUri = Utils.uriToFile(params.get("rootUri"));
 			clientCapabilities = params.get("capabilities");
 			openFiles.clear();
-			System.setProperty("parser.tabstop", "1");	// Forced, for LSP location offsets
+			System.setProperty("vdmj.parser.tabstop", "1");	// Forced, for LSP location offsets
 			Properties.init();
 			loadAllProjectFiles();
 			

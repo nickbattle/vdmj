@@ -410,7 +410,7 @@ abstract public class VDMJ
 		}
 		else
 		{
-			System.setProperty(dialect.name(), "1");
+			System.setProperty(dialect.name(), "1");	// For #ifdef processing
 			System.setProperty("HIGH_PRECISION", "1");
 		}
 
