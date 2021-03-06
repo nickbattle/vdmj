@@ -855,7 +855,7 @@ public class LexTokenReader extends BacktrackInputReader
 					rdCh();
 					LexLocation here = location(linecount, charpos);
 					int nestedCount = 0;
-					int nestingSupport = Integer.getInteger("vdmj.parser.nesting", 0);
+					int nestingSupport = Properties.parser_comment_nesting;
 					
 					while (ch != EOF)
 					{

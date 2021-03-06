@@ -63,6 +63,7 @@ import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionSet;
@@ -202,7 +203,7 @@ public class ClassInterpreter extends Interpreter
 	@Override
 	public void traceInit() throws Exception
 	{
-		if (System.getProperty("vdmj.traces.savestate") != null)
+		if (Properties.traces_save_state)
 		{
 			SchedulableThread.terminateAll();
 	

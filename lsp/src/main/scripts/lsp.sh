@@ -11,8 +11,8 @@ function usage()
     exit 1
 }
 
-MVERSION=4.4.2-SNAPSHOT
-PVERSION=4.4.2-P-SNAPSHOT
+MVERSION=4.4.3-SNAPSHOT
+PVERSION=4.4.3-P-SNAPSHOT
 VERSION=$MVERSION
 
 # The Maven repository directory containing jars
@@ -54,7 +54,7 @@ VDMJ_JAR=$MAVENREPO/vdmj/${VERSION}/vdmj-${VERSION}.jar
 ANNOTATIONS_JAR=$MAVENREPO/annotations/${VERSION}/annotations-${VERSION}.jar
 LSP_JAR=$MAVENREPO/lsp/${VERSION}/lsp-${VERSION}.jar
 
-java ${JAVA64_VMOPTS} -Dlog.filename=/dev/stdout \
+java ${JAVA64_VMOPTS} -Dlsp.log.filename=/dev/stdout \
     -cp $VDMJ_JAR:$ANNOTATIONS_JAR:$LSP_JAR \
     lsp.LSPServerSocket $DIALECT -lsp 8000 -dap 8001
 

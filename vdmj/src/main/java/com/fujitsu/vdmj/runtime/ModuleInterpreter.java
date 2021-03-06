@@ -35,6 +35,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
@@ -213,7 +214,7 @@ public class ModuleInterpreter extends Interpreter
 	@Override
 	public void traceInit() throws Exception
 	{
-		if (System.getProperty("vdmj.traces.savestate") != null)
+		if (Properties.traces_save_state)
 		{
 			scheduler.init();
 			CPUValue.init(scheduler);

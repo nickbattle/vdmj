@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -388,7 +389,7 @@ public abstract class SyntaxReader
 				}
 				catch (Exception e)
 				{
-					if (System.getProperty("annotations.debug") != null)
+					if (Properties.annotations_debug)
 					{
 						Console.err.println("Annotations: " + e);
 					}
@@ -795,7 +796,7 @@ public abstract class SyntaxReader
 	protected ASTAnnotation loadAnnotation(LexIdentifierToken name)
 		throws ParserException, LexException
 	{
-		String classpath = System.getProperty("vdmj.annotations", "com.fujitsu.vdmj.ast.annotations;annotations.ast");
+		String classpath = Properties.annotations_path;
 		String[] packages = classpath.split(";|:");
 		
 		for (String pack: packages)

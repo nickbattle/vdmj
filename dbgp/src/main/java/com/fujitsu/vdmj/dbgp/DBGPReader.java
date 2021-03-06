@@ -154,7 +154,7 @@ public class DBGPReader extends DebugLink
 	public static void main(String[] args)
 	{
 		// Identify this class as the debug link - See DebugLink
-		System.setProperty("vdmj.debug.link", DBGPReader.class.getName());
+		System.setProperty("vdmj.debug.link_class", DBGPReader.class.getName());
 		
 		String host = null;
 		int port = -1;

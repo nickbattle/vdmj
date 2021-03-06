@@ -254,7 +254,7 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 
     		do
     		{
-        		if (Properties.diags_timestep)
+        		if (Properties.rt_diags_timestep)
         		{
         			RTLogger.log(String.format("-- %s Waiting to move time by %d",
         				this, timestep));

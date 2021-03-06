@@ -46,7 +46,7 @@ public class Log
 	
 	public static void init()
 	{
-		String filename = System.getProperty("log.filename");
+		String filename = System.getProperty("lsp.log.filename");
 		
 		if (filename != null)
 		{

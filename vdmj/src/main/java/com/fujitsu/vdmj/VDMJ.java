@@ -386,7 +386,7 @@ abstract public class VDMJ
 		}
 		else
 		{
-			System.setProperty(dialect.name(), "1");
+			System.setProperty(dialect.name(), "1");	// For #ifdef processing
 		}
 
 		if (logfile != null && !(controller instanceof VDMRT))

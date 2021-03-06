@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.traces;
 
 import java.util.Vector;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.expressions.INApplyExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
@@ -42,8 +43,6 @@ import com.fujitsu.vdmj.runtime.Context;
 @SuppressWarnings("serial")
 public class CallSequence extends Vector<INStatement>
 {
-	private static int MAXARGLEN = Integer.getInteger("vdmj.maxarglen", 50);	// Limits arg expansion
-	
 	public String getCallString(Context context)
 	{
 		StringBuilder sb = new StringBuilder();
@@ -117,7 +116,7 @@ public class CallSequence extends Vector<INStatement>
 				{
 					String evalStr = argExp.eval(ctxt).toString();
 					
-					if (evalStr.length() > MAXARGLEN)
+					if (evalStr.length() > Properties.traces_max_arg_length)
 					{
 						sb.append(argStr);	// Value is just too long (eg. large maps)
 					}

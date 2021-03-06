@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -231,7 +232,7 @@ public class TCRecursiveLoops extends TCNode
 			found = true;
 		}
 		
-		if (System.getProperty("skip.recursion.check") != null)
+		if (Properties.tc_skip_recursive_check)
 		{
 			return found;	// For now, to allow us to skip if there are issues.
 		}

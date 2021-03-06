@@ -72,7 +72,7 @@ public class LSPServer extends JSONServer
 		this.responseHandlers = new HashMap<Long, RPCHandler>();
 
 		// Identify this class as the debug link - See DebugLink
-		System.setProperty("vdmj.debug.link", DAPDebugLink.class.getName());
+		System.setProperty("vdmj.debug.link_class", DAPDebugLink.class.getName());
 		Settings.annotations = true;
 		Settings.dialect = dialect;
 

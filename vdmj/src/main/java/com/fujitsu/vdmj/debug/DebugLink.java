@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.debug;
 
 import java.lang.reflect.Method;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
@@ -45,7 +46,7 @@ abstract public class DebugLink
 	 */
 	public static DebugLink getInstance()
 	{
-		String linkClass = System.getProperty("vdmj.debug.link");
+		String linkClass = Properties.debug_link_class;
 		
 		if (linkClass != null)
 		{

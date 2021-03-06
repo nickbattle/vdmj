@@ -48,7 +48,7 @@ public class SystemClock
 		wallTime += duration;
 
 		if (Settings.dialect == Dialect.VDM_RT &&
-			Properties.diags_timestep)
+			Properties.rt_diags_timestep)
 		{
 			RTLogger.log(String.format("-- Moved time by %d", duration));
 		}
