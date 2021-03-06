@@ -392,6 +392,7 @@ public abstract class SyntaxReader
 					if (Properties.annotations_debug)
 					{
 						Console.err.println("Annotations: " + e);
+						e.printStackTrace();
 					}
 				}
 			}
