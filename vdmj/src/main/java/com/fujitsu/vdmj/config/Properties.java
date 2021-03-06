@@ -212,6 +212,10 @@ public class Properties
 			{
 				value = local.getProperty(key);
 			}
+			else
+			{
+				value = def;
+			}
 		}
 		
 		return value;

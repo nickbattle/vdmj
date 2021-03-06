@@ -134,6 +134,10 @@ public class Config
 			{
 				value = local.getProperty(key);
 			}
+			else
+			{
+				value = def;
+			}
 		}
 		
 		return value;

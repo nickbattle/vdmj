@@ -565,6 +565,10 @@ public class LSPWorkspaceManager
 					Log.error("Changed file not known: %s", file);
 					actionCode = 2;		// Try rebuilding?
 				}
+				else
+				{
+					actionCode = 1;		// Simple file change/save
+				}
 				break;
 				
 			case DELETE:
