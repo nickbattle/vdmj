@@ -29,6 +29,7 @@ import java.util.Set;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCRecordPattern;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCLeafPatternVisitor;
@@ -38,6 +39,11 @@ import com.fujitsu.vdmj.tc.patterns.visitors.TCLeafPatternVisitor;
  */
 public class LSPPatternLocationFinder extends TCLeafPatternVisitor<TCNode, Set<TCNode>, LexLocation>
 {
+	public LSPPatternLocationFinder(TCVisitorSet<TCNode, Set<TCNode>, LexLocation> visitors)
+	{
+		visitorSet = visitors;
+	}
+
 	@Override
 	protected Set<TCNode> newCollection()
 	{
