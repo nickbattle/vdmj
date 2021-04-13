@@ -167,6 +167,24 @@ public class TranslateTest extends LSPTest
 			f.delete();
 		}
 		
+		File coverage = new File(testdir, "pogtest.vdmsl");
+		request = RPCRequest.create(123L, "slsp/TR/translate",
+				new JSONObject(
+					"uri", coverage.toURI().toString(),
+					"languageId", "coverage",
+					"saveUri",	empty.toURI().toString()));
+
+		response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals(coverage.toURI().toString(), response.get(0).getPath("result.uri"));
+
+		for (File f: empty.listFiles())
+		{
+			assertTrue(f.getName().matches("^.*\\.vdmsl\\.covtbl$"));
+			f.delete();
+		}
+		
 		empty.delete();
 	}
 }
