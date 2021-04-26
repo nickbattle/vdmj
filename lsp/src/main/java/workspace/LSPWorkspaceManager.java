@@ -502,13 +502,25 @@ public class LSPWorkspaceManager
 	{
 		FilenameFilter filter = getFilenameFilter();
 		int actionCode = 0;
+		boolean ignoreDotPath = false;
 
+		if (file.getAbsolutePath().startsWith(rootUri.getAbsolutePath()))
+		{
+			char firstCh = file.getAbsolutePath().charAt(rootUri.getAbsolutePath().length() + 1);
+			ignoreDotPath = (firstCh == '.');
+		}
+		
 		switch (type)
 		{
 			case CREATE:
 				if (file.isDirectory())
 				{
 					Log.printf("New directory created: %s", file);
+					actionCode = 0;
+				}
+				else if (ignoreDotPath)
+				{
+					Log.printf("Ignoring file on dot path");
 					actionCode = 0;
 				}
 				else if (file.equals(new File(rootUri, ".vscode/ordering")))
@@ -548,6 +560,11 @@ public class LSPWorkspaceManager
 				if (file.isDirectory())
 				{
 					Log.printf("Directory changed: %s", file);
+					actionCode = 0;
+				}
+				else if (ignoreDotPath)
+				{
+					Log.printf("Ignoring file on dot path");
 					actionCode = 0;
 				}
 				else if (file.equals(new File(rootUri, ".vscode/ordering")))
