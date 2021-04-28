@@ -1,11 +1,12 @@
 Building VDMJ
+=============
 
 VDMJ is designed to be built with Maven (see http://maven.apache.org/).
 
 In practice, after checking out the source, this means you just need to sit at the root
-directory (where the pom.xml file is located) and run the command "mvn install". This
-will build the VDMJ jar file in the target folder, as well as running the internal test
-suite.
+directory (where the pom.xml file is located) and run the command "mvn clean install".
+This will build the VDMJ jar file in the vdmj target folder, as well as running the internal
+test suite.
 
 To prepare VDMJ for work with Eclipse, the command "mvn eclipse:eclipse" from the top
 level folder will build an Eclipse project file and allow the project to be imported.
@@ -15,3 +16,60 @@ from the pom.xml file.
 Maven installs VDMJ in the com.fujitsu group.
 
 For information on a particular release, see https://github.com/nickbattle/vdmj/releases.
+
+Running VDMJ
+============
+
+The whole of the core language is in a single jar called vdmj-<version>.jar, which is
+created in the target folder by the Maven build. That can be executed directly as follows:
+
+$ java -jar vdmj-4.4.3-SNAPSHOT-210413.jar -vdmsl -i
+Initialized 1 module in 0.489 secs. 
+Interpreter started
+>
+
+Additional jars are available to add standard libraries, and annotations. These are built
+in the target folders of the corresponding vdmj-suite. So if the jars were all in one
+locations, you could run:
+
+$ java -cp vdmj-4.4.3-SNAPSHOT-210413.jar:annotations-4.4.3-SNAPSHOT-210413.jar \
+     com.fujitsu.vdmj.VDMJ -vdmsl -annotations -i
+Initialized 1 module in 0.454 secs. 
+Interpreter started
+> set
+Preconditions are enabled
+Postconditions are enabled
+Invariants are enabled
+Dynamic type checks are enabled
+Pre/post/inv exceptions are disabled
+Measure checks are enabled
+Annotations are enabled
+> 
+
+But this is quite awkward, so a bash script is provided in vdmj/src/main/scripts called
+"vdmsl.sh". This is intended to be used as the target of a symlink, and locates the jars
+in the standard Maven build location (ie. $HOME/.m2/repository/com/fujitsu/vdmj). The
+script has arguments to add annotations or the high-precision jars to the execution:
+
+lrwxrwxrwx 1 nick users  65 Nov 30 11:41 vdmpp -> vdmj-suite/vdmj/src/main/scripts/vdmsl.sh
+lrwxrwxrwx 1 nick users  65 Nov 30 11:41 vdmrt -> vdmj-suite/vdmj/src/main/scripts/vdmsl.sh
+lrwxrwxrwx 1 nick users  65 Nov 30 11:41 vdmsl -> vdmj-suite/vdmj/src/main/scripts/vdmsl.sh
+
+The script uses the symlink filename as the VDM dialect. So you can run it as follows:
+
+$ vdmsl
+Usage: /home/nick/bin/vdmsl [--help|-?] [-P] [-A] <VM and VDMJ options>
+-P use high precision VDMJ
+-A use annotation libraries and options
+Default VM options are /usr/bin/java -Xmx3000m -Xss1m -Djava.rmi.server.hostname=localhost
+  -Dcom.sun.management.jmxremote
+$
+
+$ vdmsl -i test.vdm
+Parsed 1 module in 0.077 secs. No syntax errors
+Type checked 1 module in 0.257 secs. No type errors
+Initialized 1 module in 0.165 secs. 
+Interpreter started
+> q
+Bye
+

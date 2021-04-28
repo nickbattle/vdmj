@@ -123,7 +123,7 @@ public class Delegate implements Serializable
 
 			for (INDefinition d: definitions)
 			{
-				if (d.name.getName().equals(mname))
+				if (d.name != null && d.name.getName().equals(mname))
 				{
 					plist = null;
 					
@@ -177,7 +177,7 @@ public class Delegate implements Serializable
 					else
 					{
 						throw new InternalException(56,
-							"Native method cannot use pattern arguments: " + title);
+							"Native method must use identifier parameters: " + title);
 					}
 				}
 

@@ -350,4 +350,53 @@ public class LSPXWorkspaceManager
 		source.printWordCoverage(out, true, false);
 		out.close();
 	}
+	
+	public RPCMessageList translateCoverage(RPCRequest request, File file, File saveUri)
+	{
+		File responseFile = null;
+		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+		Map<File, StringBuilder> filemap = manager.getProjectFiles();
+
+		try
+		{
+			if (file == null)	// translate whole project
+			{
+				for (File pfile: filemap.keySet())
+				{
+					fileToCoverage(saveUri, pfile);
+				}
+
+				responseFile = saveUri;		// ??
+			}
+			else
+			{
+				if (filemap.containsKey(file))
+				{
+					fileToCoverage(saveUri, file);
+					responseFile = file;
+				}
+				else
+				{
+					return new RPCMessageList(request, RPCErrors.InvalidParams, "No such file in project");
+				}
+			}
+
+			return new RPCMessageList(request, new JSONObject("uri", responseFile.toURI().toString()));
+		}
+		catch (IOException e)
+		{
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	private void fileToCoverage(File saveUri, File file) throws IOException
+	{
+		SourceFile source = new SourceFile(file);
+		String texname = file.getName() + ".covtbl";
+		File outfile = new File(saveUri, texname);
+		
+		PrintWriter out = new PrintWriter(outfile);
+		source.writeCoverage(out);
+		out.close();
+	}
 }

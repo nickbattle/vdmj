@@ -67,7 +67,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 			defVisitor = parent;
 			expVisitor = new LSPExpressionLocationFinder(this);
 			stmtVisitor = new LSPStatementLocationFinder(this);
-			patVisitor = new LSPPatternLocationFinder();
+			patVisitor = new LSPPatternLocationFinder(this);
 		}
 		
 		@Override
