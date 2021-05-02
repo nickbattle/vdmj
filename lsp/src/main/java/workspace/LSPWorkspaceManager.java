@@ -289,7 +289,7 @@ public class LSPWorkspaceManager
 		
 		for (File file: files)
 		{
-			if (file.getName().startsWith("."))
+			if (onDotPath(file))
 			{
 				continue;	// ignore .generated, .vscode etc
 			}
@@ -322,6 +322,22 @@ public class LSPWorkspaceManager
 		isr.close();
 		
 		projectFiles.put(file, sb);
+	}
+	
+	private boolean onDotPath(File file)
+	{
+		// Ignore files on "dot" paths
+		String[] parts = file.getAbsolutePath().split(File.separator);
+		
+		for (String part: parts)
+		{
+			if (!part.isEmpty() && part.charAt(0) == '.')
+			{
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	private RPCMessageList checkLoadedFiles(String reason) throws Exception
@@ -400,6 +416,11 @@ public class LSPWorkspaceManager
 
 	public RPCMessageList openFile(RPCRequest request, File file, String text) throws Exception
 	{
+		if (onDotPath(file))
+		{
+			Log.printf("Ignoring dot path file", file);
+			return null;
+		}
 		if (!projectFiles.keySet().contains(file))
 		{
 			Log.printf("Opening new file: %s", file);
@@ -438,7 +459,11 @@ public class LSPWorkspaceManager
 
 	public RPCMessageList closeFile(RPCRequest request, File file) throws Exception
 	{
-		if (!projectFiles.keySet().contains(file))
+		if (onDotPath(file))
+		{
+			Log.printf("Ignoring dot path file", file);
+		}
+		else if (!projectFiles.keySet().contains(file))
 		{
 			Log.error("File not known: %s", file);
 		}
@@ -457,7 +482,12 @@ public class LSPWorkspaceManager
 
 	public RPCMessageList changeFile(RPCRequest request, File file, JSONObject range, String text) throws Exception
 	{
-		if (!projectFiles.keySet().contains(file))
+		if (onDotPath(file))
+		{
+			Log.printf("Ignoring dot path file", file);
+			return null;
+		}
+		else if (!projectFiles.keySet().contains(file))
 		{
 			Log.error("File not known: %s", file);
 			return null;
@@ -502,13 +532,7 @@ public class LSPWorkspaceManager
 	{
 		FilenameFilter filter = getFilenameFilter();
 		int actionCode = 0;
-		boolean ignoreDotPath = false;
-
-		if (file.getAbsolutePath().startsWith(rootUri.getAbsolutePath()))
-		{
-			char firstCh = file.getAbsolutePath().charAt(rootUri.getAbsolutePath().length() + 1);
-			ignoreDotPath = (firstCh == '.');
-		}
+		boolean ignoreDotPath = onDotPath(file);
 		
 		switch (type)
 		{
@@ -629,7 +653,11 @@ public class LSPWorkspaceManager
 	 */
 	public void saveFile(RPCRequest request, File file, String text) throws Exception
 	{
-		if (!projectFiles.keySet().contains(file))
+		if (onDotPath(file))
+		{
+			Log.printf("Ignoring dot path file", file);
+		}
+		else if (!projectFiles.keySet().contains(file))
 		{
 			Log.error("File not known: %s", file);
 		}
