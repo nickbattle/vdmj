@@ -37,7 +37,7 @@ public class Properties
 	public static int parser_tabstop = 4;
 	
 	/** Nesting of block comments: 0-3 = support, warning, error, ignore. */
-	public static int parser_comment_nesting = 0;
+	public static int parser_comment_nesting = 3;
 	
 	/** The package list for annotation classes to load. */
 	public static String annotations_packages = "com.fujitsu.vdmj.ast.annotations;annotations.ast";
