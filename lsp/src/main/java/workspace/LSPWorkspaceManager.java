@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
@@ -327,7 +328,7 @@ public class LSPWorkspaceManager
 	private boolean onDotPath(File file)
 	{
 		// Ignore files on "dot" paths
-		String[] parts = file.getAbsolutePath().split(File.separator);
+		String[] parts = file.getAbsolutePath().split(Pattern.quote(File.separator));
 		
 		for (String part: parts)
 		{
