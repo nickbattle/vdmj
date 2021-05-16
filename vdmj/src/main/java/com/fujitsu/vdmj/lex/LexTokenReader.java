@@ -538,7 +538,7 @@ public class LexTokenReader extends BacktrackInputReader
 				try
 				{
 					String s = v.toString();
-					// Long.parseLong(s);	// Not checked for High Precision
+					// Long.parseLong(s, base);	// Not checked for High Precision
 					return s;
 				}
 				catch (NumberFormatException e)
