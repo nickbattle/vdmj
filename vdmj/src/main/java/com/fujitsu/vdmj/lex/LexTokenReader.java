@@ -277,8 +277,7 @@ public class LexTokenReader extends BacktrackInputReader
 	private void throwMessage(int number, int line, int pos, String msg)
 		throws LexException
 	{
-		throw new LexException(number, msg,
-			new LexLocation(file, currentModule, line, pos, line, pos));
+		throw new LexException(number, msg, location(line, pos));
 	}
 
 	/**
@@ -520,7 +519,8 @@ public class LexTokenReader extends BacktrackInputReader
 	{
 		StringBuilder v = new StringBuilder();
 		int n = value(ch);
-		//long v = n;
+		int line = linecount;
+		int pos = charpos;
 		v.append(ch);
 
 		if (n < 0 || n >= base)
@@ -543,11 +543,10 @@ public class LexTokenReader extends BacktrackInputReader
 				}
 				catch (NumberFormatException e)
 				{
-					throwMessage(1014, "Cannot convert [" + v + "] in base " + base);
+					throwMessage(1014, line, pos, "Cannot convert [" + v + "] in base " + base);
 				}
 			}
 
-			// v = (v * base) + n;
 			v.append(ch);
 		}
 	}
