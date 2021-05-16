@@ -535,7 +535,16 @@ public class LexTokenReader extends BacktrackInputReader
 
 			if (n < 0 || n >= base)
 			{
-				return v.toString();
+				try
+				{
+					String s = v.toString();
+					Long.parseLong(s);	// Just check
+					return s;
+				}
+				catch (NumberFormatException e)
+				{
+					throwMessage(1014, "Cannot convert [" + v + "] in base " + base);
+				}
 			}
 
 			// v = (v * base) + n;

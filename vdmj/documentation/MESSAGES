@@ -62,6 +62,7 @@ as the expected and actual values.
 1011, "Unterminated block comment"
 1012, "Deprecated nested block comment"
 1013, "Illegal nested block comment"
+1014, "Cannot convert <string> in base <n>"
 
 
 2000, "Expecting 'in set' or 'in seq' after pattern in set binding"
