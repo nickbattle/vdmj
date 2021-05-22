@@ -159,7 +159,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				link.killThreads();
 				dapResponse = new DAPResponse(dapRequest, true, null, null);
 				server.writeMessage(dapResponse);
-				server.stdout("Debug session terminated\n");
+				server.stdout("Debug session terminated (RESTART is advised)\n");
 				result = false;
 				break;
 				
