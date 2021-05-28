@@ -177,7 +177,7 @@ public class TranslateTest extends LSPTest
 		response = handler.request(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		assertEquals(coverage.toURI().toString(), response.get(0).getPath("result.uri"));
+		assertEquals(empty.toURI()+"pogtest.vdmsl.covtbl", response.get(0).getPath("result.uri"));
 
 		for (File f: empty.listFiles())
 		{
