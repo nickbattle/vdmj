@@ -372,8 +372,7 @@ public class LSPXWorkspaceManager
 			{
 				if (filemap.containsKey(file))
 				{
-					fileToCoverage(saveUri, file);
-					responseFile = file;
+					responseFile = fileToCoverage(saveUri, file);
 				}
 				else
 				{
@@ -389,7 +388,7 @@ public class LSPXWorkspaceManager
 		}
 	}
 
-	private void fileToCoverage(File saveUri, File file) throws IOException
+	private File fileToCoverage(File saveUri, File file) throws IOException
 	{
 		SourceFile source = new SourceFile(file);
 		String texname = file.getName() + ".covtbl";
@@ -398,5 +397,7 @@ public class LSPXWorkspaceManager
 		PrintWriter out = new PrintWriter(outfile);
 		source.writeCoverage(out);
 		out.close();
+
+		return outfile;
 	}
 }
