@@ -274,8 +274,7 @@ public class LSPXWorkspaceManager
 			{
 				if (filemap.containsKey(file))
 				{
-					fileToLaTeX(saveUri, file);
-					responseFile = file;
+					responseFile = fileToLaTeX(saveUri, file);
 				}
 				else
 				{
@@ -291,7 +290,7 @@ public class LSPXWorkspaceManager
 		}
 	}
 	
-	private void fileToLaTeX(File saveUri, File file) throws IOException
+	private File fileToLaTeX(File saveUri, File file) throws IOException
 	{
 		SourceFile source = new SourceFile(file);
 		String texname = file.getName().replaceAll("\\.vdm..$", ".tex");
@@ -300,6 +299,8 @@ public class LSPXWorkspaceManager
 		PrintWriter out = new PrintWriter(outfile);
 		source.printLatexCoverage(out, true, true, false);
 		out.close();
+
+		return outfile;
 	}
 
 	public RPCMessageList translateWord(RPCRequest request, File file, File saveUri)
@@ -323,8 +324,7 @@ public class LSPXWorkspaceManager
 			{
 				if (filemap.containsKey(file))
 				{
-					fileToWord(saveUri, file);
-					responseFile = file;
+					responseFile = fileToWord(saveUri, file);
 				}
 				else
 				{
@@ -340,7 +340,7 @@ public class LSPXWorkspaceManager
 		}
 	}
 
-	private void fileToWord(File saveUri, File file) throws IOException
+	private File fileToWord(File saveUri, File file) throws IOException
 	{
 		SourceFile source = new SourceFile(file);
 		String texname = file.getName().replaceAll("\\.vdm..$", ".doc");
@@ -349,6 +349,8 @@ public class LSPXWorkspaceManager
 		PrintWriter out = new PrintWriter(outfile);
 		source.printWordCoverage(out, true, false);
 		out.close();
+		
+		return  outfile;
 	}
 	
 	public RPCMessageList translateCoverage(RPCRequest request, File file, File saveUri)
