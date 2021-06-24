@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.in.definitions.INStateDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.FileList;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -309,8 +310,8 @@ public class INModule extends INNode implements Serializable
 		return false;
 	}
 
-	public Value invokeDelegate(Context ctxt)
+	public Value invokeDelegate(Context ctxt, Token section)
 	{
-		return delegate.invokeDelegate(delegateObject, ctxt);
+		return delegate.invokeDelegate(delegateObject, ctxt, section);
 	}
 }

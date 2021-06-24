@@ -46,6 +46,8 @@ as the expected and actual values.
 0068, "Periodic threads overlapping"
 0069, "Definition <name> is not <type>, actual <type>"
 0070, "Definition <name> not found"
+0071, "Native method marked as @VDMOperation: <name>"
+0072, "Native method marked as @VDMFunction: <name>"
 
 
 1000, "Malformed quoted character"

@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.in.definitions.INImplicitOperationDefinition;
 import com.fujitsu.vdmj.in.patterns.INIdentifierPattern;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -216,7 +217,7 @@ public class Delegate implements Serializable
 		return m;
 	}
 
-	public Value invokeDelegate(Object delegateObject, Context ctxt)
+	public Value invokeDelegate(Object delegateObject, Context ctxt, Token section)
 	{
 		Method m = getDelegateMethod(ctxt.title);
 
@@ -225,6 +226,17 @@ public class Delegate implements Serializable
 		{
 			throw new InternalException(64,
 				"Native method should be static: " + m.getName());
+		}
+		
+		if (section == Token.FUNCTIONS && m.getAnnotation(VDMOperation.class) != null)
+		{
+			throw new InternalException(72,
+					"Native method marked as @VDMOperation: " + m.getName());
+		}
+		else if (section == Token.OPERATIONS && m.getAnnotation(VDMFunction.class) != null)
+		{
+			throw new InternalException(71,
+					"Native method marked as @VDMFunction: " + m.getName());
 		}
 
 		TCNameList anames = delegateArgs.get(ctxt.title);

@@ -39,6 +39,8 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.VDMFunction;
+import com.fujitsu.vdmj.runtime.VDMOperation;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -55,12 +57,12 @@ import com.fujitsu.vdmj.values.VoidValue;
 /**
  * This class contains the code for native IO operations.
  */
-
 public class IO implements Serializable
 {
     private static final long serialVersionUID = 1L;
 	private static String lastError = "";
 
+	@VDMFunction
 	public static Value writeval(Value tval)
 	{
 		String text = tval.toString();
@@ -68,6 +70,7 @@ public class IO implements Serializable
 		return new BooleanValue(true);
 	}
 
+	@VDMFunction
 	public static Value fwriteval(Value fval, Value tval, Value dval)
 	{
 		String filename = stringOf(fval);
@@ -94,7 +97,10 @@ public class IO implements Serializable
 	// Note that this method is not callable via the native interface, since it
 	// need access to the Context to call any type invariants involved while
 	// reading the data.
+	//
+	// See the INNotYetSpecifiedExpression class.
 	
+	@VDMFunction
 	public static Value freadval(Value fval, Context ctxt)
 	{
 		ValueList result = new ValueList();
@@ -131,6 +137,7 @@ public class IO implements Serializable
 		return new TupleValue(result);
 	}
 
+	@VDMOperation
 	public static Value fecho(Value fval, Value tval, Value dval)
 	{
 		String text = stringOf(tval);
@@ -162,6 +169,7 @@ public class IO implements Serializable
 		return new BooleanValue(true);
 	}
 
+	@VDMOperation
 	public static Value ferror()
 	{
 		return new SeqValue(lastError);
@@ -202,18 +210,21 @@ public class IO implements Serializable
 		}
 	}
 
+	@VDMOperation
 	public static Value print(Value v)
 	{
 		Console.out.printf("%s", stringOf(v));
 		return new VoidValue();
 	}
 
+	@VDMOperation
 	public static Value println(Value v)
 	{
 		Console.out.printf("%s\n", stringOf(v));
 		return new VoidValue();
 	}
 
+	@VDMOperation
 	public static Value printf(Value fv, Value vs)
 		throws ValueException
 	{

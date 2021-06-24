@@ -780,14 +780,14 @@ public class INClassDefinition extends INDefinition
 		return delegate.newInstance();
 	}
 
-	public Value invokeDelegate(Object delegateObject, Context ctxt)
+	public Value invokeDelegate(Object delegateObject, Context ctxt, Token section)
 	{
-		return delegate.invokeDelegate(delegateObject, ctxt);
+		return delegate.invokeDelegate(delegateObject, ctxt, section);
 	}
 
-	public Value invokeDelegate(Context ctxt)
+	public Value invokeDelegate(Context ctxt, Token section)
 	{
-		return delegate.invokeDelegate(null, ctxt);
+		return delegate.invokeDelegate(null, ctxt, section);
 	}
 
 	private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException
