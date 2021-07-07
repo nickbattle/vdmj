@@ -440,6 +440,7 @@ public class JSONReader
 		
 		if (ch == '}')	// Empty object allowed
 		{
+			rdCh();
 			return map;
 		}
 		
