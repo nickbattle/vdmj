@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -69,7 +70,7 @@ public class INNotYetSpecifiedStatement extends INStatement
 			{
 				if (module.hasDelegate())
 				{
-					return module.invokeDelegate(ctxt);
+					return module.invokeDelegate(ctxt, Token.OPERATIONS);
 				}
 			}
 		}
@@ -86,7 +87,7 @@ public class INNotYetSpecifiedStatement extends INStatement
     			{
     				if (cls.hasDelegate())
     				{
-    					return cls.invokeDelegate(ctxt);
+    					return cls.invokeDelegate(ctxt, Token.OPERATIONS);
     				}
     			}
     		}
@@ -94,7 +95,7 @@ public class INNotYetSpecifiedStatement extends INStatement
     		{
     			if (self.hasDelegate())
     			{
-    				return self.invokeDelegate(ctxt);
+    				return self.invokeDelegate(ctxt, Token.OPERATIONS);
     			}
     		}
 		}

@@ -34,6 +34,7 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ObjectContext;
@@ -546,9 +547,9 @@ public class ObjectValue extends Value
 		return false;
 	}
 
-	public Value invokeDelegate(Context ctxt)
+	public Value invokeDelegate(Context ctxt, Token section)
 	{
-		return classdef.invokeDelegate(delegateObject, ctxt);
+		return classdef.invokeDelegate(delegateObject, ctxt, section);
 	}
 
 	public static void init()

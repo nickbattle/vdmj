@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Context;
@@ -116,7 +117,7 @@ public class INNotYetSpecifiedExpression extends INExpression
 			{
 				if (module.hasDelegate())
 				{
-					return module.invokeDelegate(ctxt);
+					return module.invokeDelegate(ctxt, Token.FUNCTIONS);
 				}
 			}
 		}
@@ -133,7 +134,7 @@ public class INNotYetSpecifiedExpression extends INExpression
     			{
     				if (cls.hasDelegate())
     				{
-    					return cls.invokeDelegate(ctxt);
+    					return cls.invokeDelegate(ctxt, Token.FUNCTIONS);
     				}
     			}
     		}
@@ -141,7 +142,7 @@ public class INNotYetSpecifiedExpression extends INExpression
     		{
     			if (self.hasDelegate())
     			{
-    				return self.invokeDelegate(ctxt);
+    				return self.invokeDelegate(ctxt, Token.FUNCTIONS);
     			}
     		}
 		}

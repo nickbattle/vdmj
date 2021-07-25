@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.VDMFunction;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -48,6 +49,7 @@ import com.fujitsu.vdmj.values.ValueSet;
 
 public class VDMUtil
 {
+	@VDMFunction
 	public static Value set2seq(Value arg) throws ValueException
 	{
 		ValueSet set = arg.setValue(null);
@@ -56,11 +58,13 @@ public class VDMUtil
 		return new SeqValue(list);
 	}
 
+	@VDMFunction
 	public static Value val2seq_of_char(Value arg)
 	{
 		return new SeqValue(arg.toString());
 	}
 
+	@VDMFunction
 	public static Value seq_of_char2val_(Value arg)
 	{
 		ValueList result = new ValueList();
@@ -100,6 +104,7 @@ public class VDMUtil
 		return new TupleValue(result);
 	}
 	
+	@VDMFunction
 	public static Value classname(Value arg)
 	{
 		Value a = arg.deref();
