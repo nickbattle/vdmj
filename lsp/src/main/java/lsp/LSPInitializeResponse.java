@@ -24,6 +24,7 @@
 
 package lsp;
 
+import dap.DAPServerSocket;
 import json.JSONArray;
 import json.JSONObject;
 
@@ -59,7 +60,8 @@ public class LSPInitializeResponse extends JSONObject
 					"proofObligationProvider", true,
 					"combinatorialTestProvider", new JSONObject("workDoneProgress", true),
 					"translateProvider", new JSONObject(
-							"languageId", new JSONArray("latex", "word", "coverage"), "workDoneProgress", false)));
+							"languageId", new JSONArray("latex", "word", "coverage"), "workDoneProgress", false),
+					"dapServer", new JSONObject("port", DAPServerSocket.getPort())));
 
 		return cap;
 	}

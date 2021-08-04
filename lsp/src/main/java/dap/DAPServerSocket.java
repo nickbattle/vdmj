@@ -35,12 +35,12 @@ import workspace.Log;
 public class DAPServerSocket implements Runnable
 {
 	private Dialect dialect;
-	private int port;
+	private static int port;
 
 	public DAPServerSocket(Dialect dialect, int port)
 	{
 		this.dialect = dialect;
-		this.port = port;
+		DAPServerSocket.port = port;
 	}
 
 	public static void main(String[] args)
@@ -85,6 +85,7 @@ public class DAPServerSocket implements Runnable
 		try
 		{
 			socket = new ServerSocket(port, 10);
+			port = socket.getLocalPort();	// In case of zero allocated
 			
 			while (true)
 			{
@@ -116,5 +117,10 @@ public class DAPServerSocket implements Runnable
 				// Ignore
 			}
 		}
+	}
+	
+	public static int getPort()
+	{
+		return port;	// Allocated port
 	}
 }
