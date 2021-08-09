@@ -98,7 +98,7 @@ public abstract class AsyncExecutor extends CancellableThread
 		}
 	}
 	
-	protected abstract void head() throws IOException;
+	protected abstract void head() throws Exception;
 
 	protected abstract void exec() throws Exception;
 
