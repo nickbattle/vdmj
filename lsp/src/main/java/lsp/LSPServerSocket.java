@@ -85,7 +85,7 @@ public class LSPServerSocket implements Runnable
 			usage();
 		}
 		
-		if (dapPort > 0)
+		if (dapPort >= 0)	// Zero selects any free port
 		{
 			new Thread(new DAPServerSocket(dialect, dapPort), "DAP Listener").start();
 		}
@@ -111,7 +111,7 @@ public class LSPServerSocket implements Runnable
 
 			while (true)
 			{
-				Log.printf("LSP %s Server listening on port %d", dialect, port);
+				Log.printf("LSP %s Server listening on port %d", dialect, socket.getLocalPort());
 				Socket conn = socket.accept();
 				
 				try
@@ -123,7 +123,7 @@ public class LSPServerSocket implements Runnable
 					Log.error("LSP Server stopped: %s", e.getMessage());
 				}
 				
-				Log.printf("LSP %s Server closing port %d", dialect, port);
+				Log.printf("LSP %s Server closing port %d", dialect, socket.getLocalPort());
 				conn.close();
 			}
 		}

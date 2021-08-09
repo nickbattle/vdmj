@@ -70,7 +70,7 @@ public class LSPServerStdio implements Runnable
 			}
 		}
 		
-		if (dapPort > 0)
+		if (dapPort >= 0)	// Zero selects any free port
 		{
 			new Thread(new DAPServerSocket(dialect, dapPort), "DAP Listener").start();
 		}
