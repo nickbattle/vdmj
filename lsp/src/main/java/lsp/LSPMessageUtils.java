@@ -156,7 +156,7 @@ public class LSPMessageUtils
 	/**
 	 * These methods ought to produce a hierarchical outline, but it doesn't work as yet :-(
 	 */
-	public JSONArray documentSymbols(TCModule module, File file)
+	public JSONObject documentSymbols(TCModule module, File file)
 	{
 		LexLocation from = null;
 		LexLocation to = null;
@@ -180,12 +180,12 @@ public class LSPMessageUtils
 			}
 		}
 		
-		return new JSONArray(new JSONObject(
+		return new JSONObject(
 			"name",				module.name.getName(),
 			"kind",				SymbolKind.Module.getValue(),
 			"range",			Utils.lexLocationsToRange(from, to),
 			"selectionRange",	Utils.lexLocationsToRange(from, to),
-			"children",			documentSymbols(list)));
+			"children",			documentSymbols(list));
 	}
 
 	public JSONObject documentSymbols(TCClassDefinition clazz)
@@ -204,28 +204,47 @@ public class LSPMessageUtils
 
 		for (TCDefinition def: defs)
 		{
-			symbols.add(documentSymbolsTop(def));
+			JSONObject symbol = documentSymbolsTop(def);
+			if (symbol != null) symbols.add(symbol);
 		}
 		
 		return symbols;
 	}
 
-	private JSONArray documentSymbolsTop(TCDefinition top)
+	private JSONObject documentSymbolsTop(TCDefinition top)
 	{
-		JSONArray symbols = new JSONArray();
-
-		for (TCDefinition def: top.getDefinitions())
+		JSONObject result = null;
+		TCDefinitionList alldefs = top.getDefinitions();
+		
+		if (!alldefs.isEmpty())
 		{
-			symbols.add(documentSymbolsDef(def));
+			TCDefinition head = alldefs.remove(0);
+			result = documentSymbolsDef(head);
+	
+			if (!alldefs.isEmpty())
+			{
+				JSONArray children = new JSONArray();
+				
+				for (TCDefinition def: alldefs)
+				{
+					if (def.name != null && !def.name.isOld())
+					{
+						children.add(documentSymbolsDef(def));
+					}
+				}
+				
+				result.put("children", children);
+			}
 		}
 		
-		return symbols;
+		return result;
 	}
 
 	private JSONObject documentSymbolsDef(TCDefinition def)
 	{
 		return new JSONObject(
 			"name",				def.name.getName(),
+			"detail",			def.getType().toString(),
 			"kind",				SymbolKind.kindOf(def).getValue(),
 			"range",			Utils.lexLocationToRange(def.name.getLocation()),
 			"selectionRange",	Utils.lexLocationToRange(def.name.getLocation()));

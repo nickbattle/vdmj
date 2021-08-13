@@ -36,6 +36,8 @@ import json.JSONArray;
 
 abstract public class TCPlugin extends AnalysisPlugin
 {
+	protected static final boolean STRUCTURED_SYMBOLS = true;
+
 	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
 	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
 	
