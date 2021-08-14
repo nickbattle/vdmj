@@ -33,7 +33,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
+import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTStateDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.ast.modules.ASTModule;
+import com.fujitsu.vdmj.ast.types.ASTField;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
@@ -154,7 +165,7 @@ public class LSPMessageUtils
 	}
 	
 	/**
-	 * These methods ought to produce a hierarchical outline, but it doesn't work as yet :-(
+	 * These methods produce a hierarchical outline
 	 */
 	public JSONObject documentSymbols(TCModule module, File file)
 	{
@@ -248,5 +259,133 @@ public class LSPMessageUtils
 			"kind",				SymbolKind.kindOf(def).getValue(),
 			"range",			Utils.lexLocationToRange(def.name.getLocation()),
 			"selectionRange",	Utils.lexLocationToRange(def.name.getLocation()));
+	}
+
+	/**
+	 * Structured outlines for an AST tree, as far as we can. 
+	 */
+	public JSONObject documentSymbols(ASTModule module, File file)
+	{
+		LexLocation from = null;
+		LexLocation to = null;
+		ASTDefinitionList list = new ASTDefinitionList();
+
+		for (ASTDefinition def: module.defs)
+		{
+			if (def.location.file.equals(file))	// DEFAULT spans files
+			{
+				if (from == null)
+				{
+					from = def.location;
+					to = def.location;
+				}
+				else
+				{
+					to = def.location;
+				}
+				
+				list.add(def);
+			}
+		}
+		
+		return new JSONObject(
+			"name",				module.name.name,
+			"kind",				SymbolKind.Module.getValue(),
+			"range",			Utils.lexLocationsToRange(from, to),
+			"selectionRange",	Utils.lexLocationsToRange(from, to),
+			"children",			documentSymbols(list));
+	}
+
+	public JSONObject documentSymbols(ASTClassDefinition clazz)
+	{
+		return new JSONObject(
+			"name",				clazz.name.getName(),
+			"kind",				SymbolKind.Class.getValue(),
+			"range",			Utils.lexLocationToRange(clazz.name.location),
+			"selectionRange",	Utils.lexLocationToRange(clazz.name.location),
+			"children",			documentSymbols(clazz.definitions));
+	}
+
+	private JSONArray documentSymbols(ASTDefinitionList defs)
+	{
+		JSONArray symbols = new JSONArray();
+
+		for (ASTDefinition def: defs)
+		{
+			symbols.add(documentSymbolsDef(def));
+		}
+		
+		return symbols;
+	}
+
+	private JSONObject documentSymbolsDef(ASTDefinition def)
+	{
+		String name = def.name == null ? null : def.name.toString();
+		
+		if (name == null)
+		{
+			if (def instanceof ASTValueDefinition)
+			{
+				ASTValueDefinition vdef = (ASTValueDefinition)def;
+				name = vdef.pattern.toString();
+			}
+			else
+			{
+				name = def.toString();
+			}
+		}
+		
+		String detail = "";
+		JSONArray children = null;
+		
+		if (def instanceof ASTExplicitFunctionDefinition)
+		{
+			ASTExplicitFunctionDefinition fdef = (ASTExplicitFunctionDefinition)def;
+			detail = fdef.type.toString();
+		}
+		else if (def instanceof ASTImplicitFunctionDefinition)
+		{
+			ASTImplicitFunctionDefinition fdef = (ASTImplicitFunctionDefinition)def;
+			detail = fdef.parameterPatterns + " ==> " + fdef.result;
+		}
+		else if (def instanceof ASTExplicitOperationDefinition)
+		{
+			ASTExplicitOperationDefinition opdef = (ASTExplicitOperationDefinition)def;
+			detail = opdef.type.toString();
+		}
+		else if (def instanceof ASTImplicitOperationDefinition)
+		{
+			ASTImplicitOperationDefinition opdef = (ASTImplicitOperationDefinition)def;
+			detail = opdef.parameterPatterns + " ==> " + opdef.result;
+		}
+		else if (def instanceof ASTStateDefinition)
+		{
+			ASTStateDefinition sdef = (ASTStateDefinition)def;
+			children = new JSONArray();
+			
+			for (ASTField field: sdef.fields)
+			{
+				children.add(new JSONObject(
+						"name",				field.tag,
+						"detail",			field.type.toString(),
+						"kind",				SymbolKind.Field.getValue(),
+						"range",			Utils.lexLocationToRange(field.tagname.location),
+						"selectionRange",	Utils.lexLocationToRange(field.tagname.location)));
+			}
+		}
+		
+		JSONObject result = new JSONObject(
+			"name",				name,
+			"detail",			detail,
+			"kind",				SymbolKind.kindOf(def).getValue(),
+			"range",			Utils.lexLocationToRange(def.location),
+			"selectionRange",	Utils.lexLocationToRange(def.location));
+		
+		if (children != null)
+		{
+			result.put("children", children);
+		}
+		
+		return result;
 	}
 }

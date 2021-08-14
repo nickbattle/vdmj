@@ -35,6 +35,8 @@ import json.JSONArray;
 
 public abstract class ASTPlugin extends AnalysisPlugin
 {
+	protected static final boolean STRUCTURED_OUTLINE = true;
+
 	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
 	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
 	protected boolean dirty;

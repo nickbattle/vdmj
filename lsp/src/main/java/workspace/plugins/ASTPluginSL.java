@@ -134,14 +134,21 @@ public class ASTPluginSL extends ASTPlugin
 			{
 				if (module.files.contains(file))
 				{
-					results.add(messages.symbolInformation(module.name, SymbolKind.Module, null));
-
-					for (ASTDefinition def: module.defs)
+					if (STRUCTURED_OUTLINE)
 					{
-						if (def.name != null && def.location.file.equals(file) && !def.name.old)
+						results.add(messages.documentSymbols(module, file));
+					}
+					else
+					{
+						results.add(messages.symbolInformation(module.name, SymbolKind.Module, null));
+	
+						for (ASTDefinition def: module.defs)
 						{
-							results.add(messages.symbolInformation(def.name.toString(),
-									def.name.location, SymbolKind.kindOf(def), def.location.module));
+							if (def.name != null && def.location.file.equals(file) && !def.name.old)
+							{
+								results.add(messages.symbolInformation(def.name.toString(),
+										def.name.location, SymbolKind.kindOf(def), def.location.module));
+							}
 						}
 					}
 				}
