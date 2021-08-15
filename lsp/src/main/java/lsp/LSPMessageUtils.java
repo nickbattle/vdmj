@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +41,7 @@ import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTPerSyncDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTStateDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
@@ -51,6 +53,10 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCMutexSyncDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -229,15 +235,47 @@ public class LSPMessageUtils
 		
 		if (!alldefs.isEmpty())
 		{
-			TCDefinition head = alldefs.remove(0);
-			result = documentSymbolsDef(head);
-	
-			if (!alldefs.isEmpty())
+			Iterator<TCDefinition> iter = alldefs.iterator();
+			
+			if (top instanceof TCStateDefinition)
+			{
+				result = documentSymbolsDef(top);
+				iter.next();	// Ignore state record
+			}
+			else if (top instanceof TCValueDefinition && alldefs.size() > 1)
+			{
+				TCValueDefinition vdef = (TCValueDefinition)top;
+				
+				result = new JSONObject(
+						"name",				vdef.pattern.toString(),
+						"kind",				SymbolKind.Array.getValue(),
+						"range",			Utils.lexLocationToRange(vdef.location),
+						"selectionRange",	Utils.lexLocationToRange(vdef.location));
+			}
+			else if (top instanceof TCPerSyncDefinition || top instanceof TCMutexSyncDefinition)
+			{
+				result = new JSONObject(
+						"name",				top.toString(),
+						"kind",				SymbolKind.Enum.getValue(),
+						"range",			Utils.lexLocationToRange(top.location),
+						"selectionRange",	Utils.lexLocationToRange(top.location));
+				
+				iter.next();	// Ignore def
+			}
+			else
+			{
+				TCDefinition head = iter.next();	// 1st def is usually the root
+				result = documentSymbolsDef(head);
+			}
+			
+			if (iter.hasNext())
 			{
 				JSONArray children = new JSONArray();
 				
-				for (TCDefinition def: alldefs)
+				while (iter.hasNext())
 				{
+					TCDefinition def = iter.next();
+					
 					if (def.name != null && !def.name.isOld())
 					{
 						children.add(documentSymbolsDef(def));
@@ -372,6 +410,10 @@ public class LSPMessageUtils
 						"range",			Utils.lexLocationToRange(field.tagname.location),
 						"selectionRange",	Utils.lexLocationToRange(field.tagname.location)));
 			}
+		}
+		else if (def instanceof ASTPerSyncDefinition)
+		{
+			name = def.toString();
 		}
 		
 		JSONObject result = new JSONObject(

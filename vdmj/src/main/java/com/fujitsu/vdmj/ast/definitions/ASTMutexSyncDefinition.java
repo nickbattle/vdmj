@@ -43,7 +43,7 @@ public class ASTMutexSyncDefinition extends ASTDefinition
 	@Override
 	public String kind()
 	{
-		return "mutex predicate";
+		return "mutex";
 	}
 
 	@Override

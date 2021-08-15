@@ -78,7 +78,7 @@ public enum SymbolKind
 		return kindOf(def.kind());
 	}
 	
-	public static SymbolKind kindOf(String kind)
+	private static SymbolKind kindOf(String kind)
 	{	
 		switch (kind)
 		{
@@ -94,16 +94,23 @@ public enum SymbolKind
 
 			case "explicit operation":
 			case "implicit operation":
-				return Method;
+			case "trace":
+				return Property;		// To look different to functions on VSCode!
 				
 			case "instance variable":
 				return Field;
 				
 			case "value":
+			case "local":
 				return Constant;
 				
 			case "type":
+			case "state":
 				return Struct;
+			
+			case "sync":
+			case "mutex":
+				return Enum;
 				
 			default:
 				return Object;	// Null is "blank" on the Outline!

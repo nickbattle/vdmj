@@ -58,7 +58,7 @@ public class TCMutexSyncDefinition extends TCDefinition
 	@Override
 	public TCDefinitionList getDefinitions()
 	{
-		return new TCDefinitionList();
+		return new TCDefinitionList(this);
 	}
 
 	@Override

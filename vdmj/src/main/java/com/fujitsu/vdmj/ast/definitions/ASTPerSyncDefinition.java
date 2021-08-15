@@ -45,7 +45,7 @@ public class ASTPerSyncDefinition extends ASTDefinition
 	@Override
 	public String kind()
 	{
-		return "permission predicate";
+		return "sync";
 	}
 
 	@Override
