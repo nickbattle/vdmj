@@ -116,20 +116,28 @@ public class TCPluginSL extends TCPlugin
 			{
 				if (module.files.contains(file))
 				{
-					if (module.name.getLocation().file.equals(file))
+					if (STRUCTURED_SYMBOLS)
 					{
-						results.add(messages.symbolInformation(module.name.toString(),
-							module.name.getLocation(), SymbolKind.Module, null));
+						 // Add nested structural information, rather than a flat outline.
+						results.add(messages.documentSymbols(module, file));
 					}
-
-					for (TCDefinition def: module.defs)
+					else
 					{
-						for (TCDefinition indef: def.getDefinitions())
+						if (module.name.getLocation().file.equals(file))
 						{
-							if (indef.name != null && indef.location.file.equals(file) && !indef.name.isOld())
+							results.add(messages.symbolInformation(module.name.toString(),
+								module.name.getLocation(), SymbolKind.Module, null));
+						}
+	
+						for (TCDefinition def: module.defs)
+						{
+							for (TCDefinition indef: def.getDefinitions())
 							{
-								results.add(messages.symbolInformation(indef.name + ":" + indef.getType(),
-										indef.location, SymbolKind.kindOf(indef), indef.location.module));
+								if (indef.name != null && indef.location.file.equals(file) && !indef.name.isOld())
+								{
+									results.add(messages.symbolInformation(indef.name + ":" + indef.getType(),
+											indef.location, SymbolKind.kindOf(indef), indef.location.module));
+								}
 							}
 						}
 					}

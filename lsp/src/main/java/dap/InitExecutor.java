@@ -48,9 +48,14 @@ public class InitExecutor extends AsyncExecutor
 	}
 
 	@Override
-	protected void head() throws IOException
+	protected void head() throws Exception
 	{
 		running = "initialization";
+		
+		if (defaultName != null)
+		{
+			manager.getInterpreter().setDefaultName(defaultName);
+		}
 		
 		server.stdout(
 				"*\n" +
@@ -67,11 +72,6 @@ public class InitExecutor extends AsyncExecutor
 	{
 		LexLocation.clearLocations();
 		manager.getInterpreter().init();
-		
-		if (defaultName != null)
-		{
-			manager.getInterpreter().setDefaultName(defaultName);
-		}
 	}
 
 	@Override

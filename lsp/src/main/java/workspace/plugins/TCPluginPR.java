@@ -115,15 +115,23 @@ public class TCPluginPR extends TCPlugin
 			{
 				if (clazz.name.getLocation().file.equals(file))
 				{
-					results.add(messages.symbolInformation(clazz.name.toString(),
-							clazz.name.getLocation(), SymbolKind.Class, null));
-
-					for (TCDefinition def: clazz.definitions)
+					if (STRUCTURED_SYMBOLS)
 					{
-						for (TCDefinition indef: def.getDefinitions())
+						 // Add nested structural information, rather than a flat outline.
+						results.add(messages.documentSymbols(clazz));
+					}
+					else
+					{
+						results.add(messages.symbolInformation(clazz.name.toString(),
+								clazz.name.getLocation(), SymbolKind.Class, null));
+	
+						for (TCDefinition def: clazz.definitions)
 						{
-							results.add(messages.symbolInformation(indef.name.getName() + ":" + indef.getType(),
-									indef.location, SymbolKind.kindOf(indef), indef.location.module));
+							for (TCDefinition indef: def.getDefinitions())
+							{
+								results.add(messages.symbolInformation(indef.name.getName() + ":" + indef.getType(),
+										indef.location, SymbolKind.kindOf(indef), indef.location.module));
+							}
 						}
 					}
 				}

@@ -151,14 +151,21 @@ public class ASTPluginPR extends ASTPlugin
 			{
 				if (clazz.name.location.file.equals(file))
 				{
-					results.add(messages.symbolInformation(clazz.name.toString(), clazz.location, SymbolKind.Class, null));
-
-					for (ASTDefinition def: clazz.definitions)
+					if (STRUCTURED_OUTLINE)
 					{
-						if (def.name != null)
+						results.add(messages.documentSymbols(clazz));
+					}
+					else
+					{
+						results.add(messages.symbolInformation(clazz.name.toString(), clazz.location, SymbolKind.Class, null));
+	
+						for (ASTDefinition def: clazz.definitions)
 						{
-							results.add(messages.symbolInformation(def.name.name, def.name.location,
-									SymbolKind.kindOf(def), def.location.module));
+							if (def.name != null)
+							{
+								results.add(messages.symbolInformation(def.name.name, def.name.location,
+										SymbolKind.kindOf(def), def.location.module));
+							}
 						}
 					}
 				}

@@ -867,7 +867,7 @@ public class DefinitionReader extends SyntaxReader
 
 		if (!name.equals(funcName))
 		{
-			throwMessage(2019, "Expecting identifier " + funcName.name + " after type in definition");
+			throwMessage(2019, "Expecting identifier " + funcName.name + " after type in definition", name);
 		}
 
 		if (lastToken().isNot(Token.BRA))
@@ -1192,7 +1192,7 @@ public class DefinitionReader extends SyntaxReader
 
 		if (!name.equals(opName))
 		{
-			throwMessage(2022, "Expecting name " + opName.name + " after type in definition");
+			throwMessage(2022, "Expecting name " + opName.name + " after type in definition", name);
 		}
 
 		if (lastToken().isNot(Token.BRA))

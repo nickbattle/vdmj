@@ -80,6 +80,17 @@ public class TCStateDefinition extends TCDefinition
 
 		statedefs = new TCDefinitionList();
 
+		recordType = new TCRecordType(name, fields, false);
+		TCLocalDefinition recordDefinition = null;
+
+		recordDefinition = new TCLocalDefinition(location, name, recordType, NameScope.STATE);
+		recordDefinition.markUsed();	// Can't be exported anyway
+		statedefs.add(recordDefinition);
+
+		recordDefinition = new TCLocalDefinition(location, name.getOldName(), recordType, NameScope.STATE);
+		recordDefinition.markUsed();	// Can't be exported anyway
+		statedefs.add(recordDefinition);
+
 		for (TCField f: fields)
 		{
 			unresolved.addAll(f.type.unresolvedTypes());
@@ -93,17 +104,6 @@ public class TCStateDefinition extends TCDefinition
 			ld.markUsed();		// Else we moan about unused ~x names
 			statedefs.add(ld);
 		}
-
-		recordType = new TCRecordType(name, fields, false);
-		TCLocalDefinition recordDefinition = null;
-
-		recordDefinition = new TCLocalDefinition(location, name, recordType, NameScope.STATE);
-		recordDefinition.markUsed();	// Can't be exported anyway
-		statedefs.add(recordDefinition);
-
-		recordDefinition = new TCLocalDefinition(location, name.getOldName(), recordType, NameScope.STATE);
-		recordDefinition.markUsed();	// Can't be exported anyway
-		statedefs.add(recordDefinition);
 	}
 
 	@Override

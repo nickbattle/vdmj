@@ -28,18 +28,35 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
+import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTPerSyncDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTStateDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.ast.modules.ASTModule;
+import com.fujitsu.vdmj.ast.types.ASTField;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCMutexSyncDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -154,9 +171,9 @@ public class LSPMessageUtils
 	}
 	
 	/**
-	 * These methods ought to produce a hierarchical outline, but it doesn't work as yet :-(
+	 * These methods produce a hierarchical outline
 	 */
-	public JSONArray documentSymbols(TCModule module, File file)
+	public JSONObject documentSymbols(TCModule module, File file)
 	{
 		LexLocation from = null;
 		LexLocation to = null;
@@ -180,12 +197,12 @@ public class LSPMessageUtils
 			}
 		}
 		
-		return new JSONArray(new JSONObject(
+		return new JSONObject(
 			"name",				module.name.getName(),
 			"kind",				SymbolKind.Module.getValue(),
 			"range",			Utils.lexLocationsToRange(from, to),
 			"selectionRange",	Utils.lexLocationsToRange(from, to),
-			"children",			documentSymbols(list)));
+			"children",			documentSymbols(list));
 	}
 
 	public JSONObject documentSymbols(TCClassDefinition clazz)
@@ -204,17 +221,134 @@ public class LSPMessageUtils
 
 		for (TCDefinition def: defs)
 		{
-			symbols.add(documentSymbolsTop(def));
+			JSONObject symbol = documentSymbolsTop(def);
+			if (symbol != null) symbols.add(symbol);
 		}
 		
 		return symbols;
 	}
 
-	private JSONArray documentSymbolsTop(TCDefinition top)
+	private JSONObject documentSymbolsTop(TCDefinition top)
+	{
+		JSONObject result = null;
+		TCDefinitionList alldefs = top.getDefinitions();
+		
+		if (!alldefs.isEmpty())
+		{
+			Iterator<TCDefinition> iter = alldefs.iterator();
+			
+			if (top instanceof TCStateDefinition)
+			{
+				result = documentSymbolsDef(top);
+				iter.next();	// Ignore state record
+			}
+			else if (top instanceof TCValueDefinition && alldefs.size() > 1)
+			{
+				TCValueDefinition vdef = (TCValueDefinition)top;
+				
+				result = new JSONObject(
+						"name",				vdef.pattern.toString(),
+						"kind",				SymbolKind.Array.getValue(),
+						"range",			Utils.lexLocationToRange(vdef.location),
+						"selectionRange",	Utils.lexLocationToRange(vdef.location));
+			}
+			else if (top instanceof TCPerSyncDefinition || top instanceof TCMutexSyncDefinition)
+			{
+				result = new JSONObject(
+						"name",				top.toString(),
+						"kind",				SymbolKind.Enum.getValue(),
+						"range",			Utils.lexLocationToRange(top.location),
+						"selectionRange",	Utils.lexLocationToRange(top.location));
+				
+				iter.next();	// Ignore def
+			}
+			else
+			{
+				TCDefinition head = iter.next();	// 1st def is usually the root
+				result = documentSymbolsDef(head);
+			}
+			
+			if (iter.hasNext())
+			{
+				JSONArray children = new JSONArray();
+				
+				while (iter.hasNext())
+				{
+					TCDefinition def = iter.next();
+					
+					if (def.name != null && !def.name.isOld())
+					{
+						children.add(documentSymbolsDef(def));
+					}
+				}
+				
+				result.put("children", children);
+			}
+		}
+		
+		return result;
+	}
+
+	private JSONObject documentSymbolsDef(TCDefinition def)
+	{
+		return new JSONObject(
+			"name",				def.name.getName(),
+			"detail",			def.getType().toString(),
+			"kind",				SymbolKind.kindOf(def).getValue(),
+			"range",			Utils.lexLocationToRange(def.name.getLocation()),
+			"selectionRange",	Utils.lexLocationToRange(def.name.getLocation()));
+	}
+
+	/**
+	 * Structured outlines for an AST tree, as far as we can. 
+	 */
+	public JSONObject documentSymbols(ASTModule module, File file)
+	{
+		LexLocation from = null;
+		LexLocation to = null;
+		ASTDefinitionList list = new ASTDefinitionList();
+
+		for (ASTDefinition def: module.defs)
+		{
+			if (def.location.file.equals(file))	// DEFAULT spans files
+			{
+				if (from == null)
+				{
+					from = def.location;
+					to = def.location;
+				}
+				else
+				{
+					to = def.location;
+				}
+				
+				list.add(def);
+			}
+		}
+		
+		return new JSONObject(
+			"name",				module.name.name,
+			"kind",				SymbolKind.Module.getValue(),
+			"range",			Utils.lexLocationsToRange(from, to),
+			"selectionRange",	Utils.lexLocationsToRange(from, to),
+			"children",			documentSymbols(list));
+	}
+
+	public JSONObject documentSymbols(ASTClassDefinition clazz)
+	{
+		return new JSONObject(
+			"name",				clazz.name.getName(),
+			"kind",				SymbolKind.Class.getValue(),
+			"range",			Utils.lexLocationToRange(clazz.name.location),
+			"selectionRange",	Utils.lexLocationToRange(clazz.name.location),
+			"children",			documentSymbols(clazz.definitions));
+	}
+
+	private JSONArray documentSymbols(ASTDefinitionList defs)
 	{
 		JSONArray symbols = new JSONArray();
 
-		for (TCDefinition def: top.getDefinitions())
+		for (ASTDefinition def: defs)
 		{
 			symbols.add(documentSymbolsDef(def));
 		}
@@ -222,12 +356,78 @@ public class LSPMessageUtils
 		return symbols;
 	}
 
-	private JSONObject documentSymbolsDef(TCDefinition def)
+	private JSONObject documentSymbolsDef(ASTDefinition def)
 	{
-		return new JSONObject(
-			"name",				def.name.getName(),
+		String name = def.name == null ? null : def.name.toString();
+		
+		if (name == null)
+		{
+			if (def instanceof ASTValueDefinition)
+			{
+				ASTValueDefinition vdef = (ASTValueDefinition)def;
+				name = vdef.pattern.toString();
+			}
+			else
+			{
+				name = def.toString();
+			}
+		}
+		
+		String detail = "";
+		JSONArray children = null;
+		
+		if (def instanceof ASTExplicitFunctionDefinition)
+		{
+			ASTExplicitFunctionDefinition fdef = (ASTExplicitFunctionDefinition)def;
+			detail = fdef.type.toString();
+		}
+		else if (def instanceof ASTImplicitFunctionDefinition)
+		{
+			ASTImplicitFunctionDefinition fdef = (ASTImplicitFunctionDefinition)def;
+			detail = fdef.parameterPatterns + " ==> " + fdef.result;
+		}
+		else if (def instanceof ASTExplicitOperationDefinition)
+		{
+			ASTExplicitOperationDefinition opdef = (ASTExplicitOperationDefinition)def;
+			detail = opdef.type.toString();
+		}
+		else if (def instanceof ASTImplicitOperationDefinition)
+		{
+			ASTImplicitOperationDefinition opdef = (ASTImplicitOperationDefinition)def;
+			detail = opdef.parameterPatterns + " ==> " + opdef.result;
+		}
+		else if (def instanceof ASTStateDefinition)
+		{
+			ASTStateDefinition sdef = (ASTStateDefinition)def;
+			children = new JSONArray();
+			
+			for (ASTField field: sdef.fields)
+			{
+				children.add(new JSONObject(
+						"name",				field.tag,
+						"detail",			field.type.toString(),
+						"kind",				SymbolKind.Field.getValue(),
+						"range",			Utils.lexLocationToRange(field.tagname.location),
+						"selectionRange",	Utils.lexLocationToRange(field.tagname.location)));
+			}
+		}
+		else if (def instanceof ASTPerSyncDefinition)
+		{
+			name = def.toString();
+		}
+		
+		JSONObject result = new JSONObject(
+			"name",				name,
+			"detail",			detail,
 			"kind",				SymbolKind.kindOf(def).getValue(),
-			"range",			Utils.lexLocationToRange(def.name.getLocation()),
-			"selectionRange",	Utils.lexLocationToRange(def.name.getLocation()));
+			"range",			Utils.lexLocationToRange(def.location),
+			"selectionRange",	Utils.lexLocationToRange(def.location));
+		
+		if (children != null)
+		{
+			result.put("children", children);
+		}
+		
+		return result;
 	}
 }
