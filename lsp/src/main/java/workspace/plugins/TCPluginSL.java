@@ -25,7 +25,6 @@
 package workspace.plugins;
 
 import java.io.File;
-
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -37,6 +36,7 @@ import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
 import json.JSONArray;
+import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
 
@@ -116,31 +116,7 @@ public class TCPluginSL extends TCPlugin
 			{
 				if (module.files.contains(file))
 				{
-					if (STRUCTURED_SYMBOLS)
-					{
-						 // Add nested structural information, rather than a flat outline.
-						results.add(messages.documentSymbols(module, file));
-					}
-					else
-					{
-						if (module.name.getLocation().file.equals(file))
-						{
-							results.add(messages.symbolInformation(module.name.toString(),
-								module.name.getLocation(), SymbolKind.Module, null));
-						}
-	
-						for (TCDefinition def: module.defs)
-						{
-							for (TCDefinition indef: def.getDefinitions())
-							{
-								if (indef.name != null && indef.location.file.equals(file) && !indef.name.isOld())
-								{
-									results.add(messages.symbolInformation(indef.name + ":" + indef.getType(),
-											indef.location, SymbolKind.kindOf(indef), indef.location.module));
-								}
-							}
-						}
-					}
+					results.add(documentSymbols(module, file));
 				}
 			}
 		}
@@ -148,6 +124,25 @@ public class TCPluginSL extends TCPlugin
 		return results;
 	}
 	
+	private JSONObject documentSymbols(TCModule module, File file)
+	{
+		JSONArray symbols = new JSONArray();
+
+		for (TCDefinition def: module.defs)
+		{
+			JSONObject symbol = documentSymbolsTop(def);
+			if (symbol != null) symbols.add(symbol);
+		}
+
+		return messages.documentSymbol(
+			module.name.getName(),
+			"",
+			SymbolKind.Module,
+			module.name.getLocation(),
+			module.name.getLocation(),
+			symbols);
+	}
+
 	@Override
 	public TCDefinition findDefinition(File file, int zline, int zcol)
 	{

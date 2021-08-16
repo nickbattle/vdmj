@@ -33,7 +33,6 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -134,23 +133,13 @@ public class ASTPluginSL extends ASTPlugin
 			{
 				if (module.files.contains(file))
 				{
-					if (STRUCTURED_OUTLINE)
-					{
-						results.add(messages.documentSymbols(module, file));
-					}
-					else
-					{
-						results.add(messages.symbolInformation(module.name, SymbolKind.Module, null));
-	
-						for (ASTDefinition def: module.defs)
-						{
-							if (def.name != null && def.location.file.equals(file) && !def.name.old)
-							{
-								results.add(messages.symbolInformation(def.name.toString(),
-										def.name.location, SymbolKind.kindOf(def), def.location.module));
-							}
-						}
-					}
+					results.add(messages.documentSymbol(
+							module.name.name,
+							"",
+							SymbolKind.Module,
+							module.name.location,
+							module.name.location,
+							documentSymbols(module.defs)));
 				}
 			}
 		}

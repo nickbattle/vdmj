@@ -29,9 +29,22 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
+
+import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
+import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTPerSyncDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTStateDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
+import com.fujitsu.vdmj.ast.types.ASTField;
 import com.fujitsu.vdmj.messages.VDMMessage;
 
 import json.JSONArray;
+import json.JSONObject;
+import lsp.textdocument.SymbolKind;
 
 public abstract class ASTPlugin extends AnalysisPlugin
 {
@@ -95,4 +108,91 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	abstract public FilenameFilter getFilenameFilter();
 
 	abstract public String[] getFilenameFilters();
+	
+	/**
+	 * Common methods for hierarchical outlines.
+	 */
+	protected JSONArray documentSymbols(ASTDefinitionList defs)
+	{
+		JSONArray symbols = new JSONArray();
+
+		for (ASTDefinition def: defs)
+		{
+			symbols.add(documentSymbolsDef(def));
+		}
+		
+		return symbols;
+	}
+
+	private JSONObject documentSymbolsDef(ASTDefinition def)
+	{
+		String name = def.name == null ? null : def.name.toString();
+		
+		if (name == null)
+		{
+			if (def instanceof ASTValueDefinition)
+			{
+				ASTValueDefinition vdef = (ASTValueDefinition)def;
+				name = vdef.pattern.toString();
+			}
+			else
+			{
+				name = def.toString();
+			}
+		}
+		
+		String detail = "";
+		JSONArray children = null;
+		
+		if (def instanceof ASTExplicitFunctionDefinition)
+		{
+			ASTExplicitFunctionDefinition fdef = (ASTExplicitFunctionDefinition)def;
+			detail = fdef.type.toString();
+		}
+		else if (def instanceof ASTImplicitFunctionDefinition)
+		{
+			ASTImplicitFunctionDefinition fdef = (ASTImplicitFunctionDefinition)def;
+			detail = fdef.parameterPatterns + " ==> " + fdef.result;
+		}
+		else if (def instanceof ASTExplicitOperationDefinition)
+		{
+			ASTExplicitOperationDefinition opdef = (ASTExplicitOperationDefinition)def;
+			detail = opdef.type.toString();
+		}
+		else if (def instanceof ASTImplicitOperationDefinition)
+		{
+			ASTImplicitOperationDefinition opdef = (ASTImplicitOperationDefinition)def;
+			detail = opdef.parameterPatterns + " ==> " + opdef.result;
+		}
+		else if (def instanceof ASTStateDefinition)
+		{
+			ASTStateDefinition sdef = (ASTStateDefinition)def;
+			children = new JSONArray();
+			
+			for (ASTField field: sdef.fields)
+			{
+				children.add(messages.documentSymbol(
+						field.tag,
+						field.type.toString(),
+						SymbolKind.Field,
+						field.tagname.location,
+						field.tagname.location));
+			}
+		}
+		else if (def instanceof ASTPerSyncDefinition)
+		{
+			name = def.toString();
+		}
+
+		// Replace "(unresolved TypeName)" with "TypeName"
+		detail = detail.replaceAll("\\(unresolved ([^)]+)\\)", "$1");
+		
+		return messages.documentSymbol(
+			name,
+			detail,
+			SymbolKind.kindOf(def),
+			def.location,
+			def.location,
+			children);
+	}
 }
