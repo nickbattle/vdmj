@@ -37,7 +37,6 @@ import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.messages.VDMMessage;
@@ -151,30 +150,20 @@ public class ASTPluginPR extends ASTPlugin
 			{
 				if (clazz.name.location.file.equals(file))
 				{
-					if (STRUCTURED_OUTLINE)
-					{
-						results.add(messages.documentSymbols(clazz));
-					}
-					else
-					{
-						results.add(messages.symbolInformation(clazz.name.toString(), clazz.location, SymbolKind.Class, null));
-	
-						for (ASTDefinition def: clazz.definitions)
-						{
-							if (def.name != null)
-							{
-								results.add(messages.symbolInformation(def.name.name, def.name.location,
-										SymbolKind.kindOf(def), def.location.module));
-							}
-						}
-					}
+					results.add(messages.documentSymbol(
+							clazz.name.getName(),
+							"",
+							SymbolKind.Class,
+							clazz.name.location,
+							clazz.name.location,
+							documentSymbols(clazz.definitions)));
 				}
 			}
 		}
 		
 		return results;
 	}
-
+	
 	@Override
 	public FilenameFilter getFilenameFilter()
 	{
