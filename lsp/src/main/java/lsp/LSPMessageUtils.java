@@ -58,6 +58,7 @@ import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.modules.TCModule;
+import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 import json.JSONArray;
@@ -291,9 +292,22 @@ public class LSPMessageUtils
 
 	private JSONObject documentSymbolsDef(TCDefinition def)
 	{
+		TCType type = def.getType();
+		String detail = null;
+		
+		if (type instanceof TCNamedType)
+		{
+			TCNamedType ntype = (TCNamedType)type;
+			detail = ntype.type.toString();
+		}
+		else
+		{
+			detail = type.toString();
+		}
+		
 		return new JSONObject(
 			"name",				def.name.getName(),
-			"detail",			def.getType().toString(),
+			"detail",			detail,
 			"kind",				SymbolKind.kindOf(def).getValue(),
 			"range",			Utils.lexLocationToRange(def.name.getLocation()),
 			"selectionRange",	Utils.lexLocationToRange(def.name.getLocation()));

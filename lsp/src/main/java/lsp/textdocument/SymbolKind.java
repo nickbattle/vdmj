@@ -90,6 +90,7 @@ public enum SymbolKind
 				
 			case "explicit function":
 			case "implicit function":
+			case "invariant":
 				return Function;
 
 			case "explicit operation":
