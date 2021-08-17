@@ -105,7 +105,13 @@ abstract public class TCPlugin extends AnalysisPlugin
 			
 			if (top instanceof TCStateDefinition)
 			{
-				result = documentSymbolsDef(top);
+				result = messages.documentSymbol(
+						top.name.getName(),
+						"",
+						SymbolKind.Struct,
+						top.name.getLocation(),
+						top.name.getLocation());
+
 				iter.next();	// Ignore state record
 			}
 			else if (top instanceof TCValueDefinition && alldefs.size() > 1)
@@ -115,11 +121,12 @@ abstract public class TCPlugin extends AnalysisPlugin
 				result = messages.documentSymbol(
 						vdef.pattern.toString(),
 						"",
-						SymbolKind.Array,
+						SymbolKind.Struct,
 						vdef.location,
 						vdef.location);
 			}
-			else if (top instanceof TCPerSyncDefinition || top instanceof TCMutexSyncDefinition)
+			else if (top instanceof TCPerSyncDefinition ||
+					 top instanceof TCMutexSyncDefinition)
 			{
 				result = messages.documentSymbol(
 						top.toString(),
