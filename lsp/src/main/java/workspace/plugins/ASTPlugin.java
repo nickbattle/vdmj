@@ -38,8 +38,12 @@ import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTPerSyncDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTStateDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTTypeDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
+import com.fujitsu.vdmj.ast.patterns.ASTIdentifierPattern;
 import com.fujitsu.vdmj.ast.types.ASTField;
+import com.fujitsu.vdmj.ast.types.ASTNamedType;
+import com.fujitsu.vdmj.ast.types.ASTRecordType;
 import com.fujitsu.vdmj.messages.VDMMessage;
 
 import json.JSONArray;
@@ -127,6 +131,7 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	private JSONObject documentSymbolsDef(ASTDefinition def)
 	{
 		String name = def.name == null ? null : def.name.toString();
+		SymbolKind kind = SymbolKind.kindOf(def);
 		
 		if (name == null)
 		{
@@ -134,6 +139,11 @@ public abstract class ASTPlugin extends AnalysisPlugin
 			{
 				ASTValueDefinition vdef = (ASTValueDefinition)def;
 				name = vdef.pattern.toString();
+				
+				if (!(vdef.pattern instanceof ASTIdentifierPattern))
+				{
+					kind = SymbolKind.Struct;
+				}
 			}
 			else
 			{
@@ -179,6 +189,31 @@ public abstract class ASTPlugin extends AnalysisPlugin
 						field.tagname.location));
 			}
 		}
+		else if (def instanceof ASTTypeDefinition)
+		{
+			ASTTypeDefinition tdef = (ASTTypeDefinition)def;
+			
+			if (tdef.type instanceof ASTNamedType)
+			{
+				ASTNamedType ntype = (ASTNamedType)tdef.type;
+				detail = ntype.type.toString();
+			}
+			else if (tdef.type instanceof ASTRecordType)
+			{
+				ASTRecordType rtype = (ASTRecordType)tdef.type;
+				children = new JSONArray();
+				
+				for (ASTField field: rtype.fields)
+				{
+					children.add(messages.documentSymbol(
+							field.tag,
+							field.type.toString(),
+							SymbolKind.Field,
+							field.tagname.location,
+							field.tagname.location));
+				}
+			}
+		}
 		else if (def instanceof ASTPerSyncDefinition)
 		{
 			name = def.toString();
@@ -190,7 +225,7 @@ public abstract class ASTPlugin extends AnalysisPlugin
 		return messages.documentSymbol(
 			name,
 			detail,
-			SymbolKind.kindOf(def),
+			kind,
 			def.location,
 			def.location,
 			children);

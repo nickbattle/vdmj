@@ -37,7 +37,9 @@ import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
+import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 import json.JSONArray;
@@ -102,6 +104,7 @@ abstract public class TCPlugin extends AnalysisPlugin
 		if (!alldefs.isEmpty())
 		{
 			Iterator<TCDefinition> iter = alldefs.iterator();
+			JSONArray children = new JSONArray();
 			
 			if (top instanceof TCStateDefinition)
 			{
@@ -147,9 +150,20 @@ abstract public class TCPlugin extends AnalysisPlugin
 					TCNamedType ntype = (TCNamedType)type;
 					detail = ntype.type.toString();
 				}
-				else
+				else if (type instanceof TCRecordType)
 				{
-					detail = type.toString();
+					TCRecordType rtype = (TCRecordType)type;
+					detail = "";
+					
+					for (TCField field: rtype.fields)
+					{
+						children.add(messages.documentSymbol(
+							field.tag,
+							field.type.toString(),
+							SymbolKind.Field,
+							field.tagname.getLocation(),
+							field.tagname.getLocation()));
+					}
 				}
 				
 				result = messages.documentSymbol(
@@ -169,8 +183,6 @@ abstract public class TCPlugin extends AnalysisPlugin
 			
 			if (iter.hasNext())
 			{
-				JSONArray children = new JSONArray();
-				
 				while (iter.hasNext())
 				{
 					TCDefinition def = iter.next();
@@ -180,7 +192,10 @@ abstract public class TCPlugin extends AnalysisPlugin
 						children.add(documentSymbolsDef(def));
 					}
 				}
-				
+			}
+			
+			if (!children.isEmpty())
+			{
 				result.put("children", children);
 			}
 		}
