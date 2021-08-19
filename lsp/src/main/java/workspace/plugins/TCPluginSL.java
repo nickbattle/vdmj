@@ -25,6 +25,8 @@
 package workspace.plugins;
 
 import java.io.File;
+
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -133,13 +135,20 @@ public class TCPluginSL extends TCPlugin
 			JSONObject symbol = documentSymbolsTop(def);
 			if (symbol != null) symbols.add(symbol);
 		}
+		
+		LexLocation location = module.name.getLocation();
+		
+		if (location.file.getName().equals("?"))	// A combined default module
+		{
+			location = new LexLocation(file, "DEFAULT", 1, 1, 1, 1);
+		}
 
 		return messages.documentSymbol(
 			module.name.getName(),
 			"",
 			SymbolKind.Module,
-			module.name.getLocation(),
-			module.name.getLocation(),
+			location,
+			location,
 			symbols);
 	}
 

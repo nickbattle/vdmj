@@ -205,6 +205,57 @@ public class Utils
 		return -1;
 	}
 	
+	public static JSONObject getEndPosition(StringBuilder buffer)
+	{
+		long currentLine = 0;
+		long currentCharacter = 0;
+
+		for (int i=0; i<buffer.length(); i++)
+		{
+			if (buffer.charAt(i) == '\n')
+			{
+				currentLine++;
+				currentCharacter = 0;
+			}
+			else
+			{
+				currentCharacter++;
+			}
+		}
+		
+		return new JSONObject(
+					"line", currentLine,
+					"character", currentCharacter);
+	}
+	
+	public static JSONObject getLineEndPosition(StringBuilder buffer, int zline)
+	{
+		long currentLine = 0;
+		long currentCharacter = 0;
+
+		for (int i=0; i<buffer.length(); i++)
+		{
+			if (buffer.charAt(i) == '\n')
+			{
+				if (currentLine == zline)
+				{
+					break;
+				}
+				
+				currentLine++;
+				currentCharacter = 0;
+			}
+			else
+			{
+				currentCharacter++;
+			}
+		}
+		
+		return new JSONObject(
+					"line", currentLine,
+					"character", currentCharacter);
+	}
+	
 	public static void diff(String message, String s1, String s2)
 	{
 		int shortest = s1.length() > s2.length() ? s2.length() : s1.length();

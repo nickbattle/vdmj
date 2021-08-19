@@ -116,6 +116,14 @@ public class LexLocation implements Serializable
 	{
 		this(new File("?"), "?", 0, 0, 0, 0);
 	}
+	
+	/**
+	 * Create a location at the start of a file.
+	 */
+	public LexLocation(File file)
+	{
+		this(file, file.getName(), 1, 1, 1, 1);
+	}
 
 	@Override
 	public String toString()
