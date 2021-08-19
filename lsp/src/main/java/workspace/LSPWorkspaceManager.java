@@ -863,7 +863,7 @@ public class LSPWorkspaceManager
 			
 			JSONObject range = symbol.get("range");
 			range.put("start", startLine(start));
-			range.put("end", beforeNext(nextstart, symbol.getPath("selectionRange.end")));
+			range.put("end", beforeNext(nextstart));
 			
 			JSONArray children = symbol.get("children");
 			
@@ -880,20 +880,10 @@ public class LSPWorkspaceManager
 		return new JSONObject("line", line, "character", 0);
 	}
 	
-	private JSONObject beforeNext(JSONObject next, JSONObject endselection)
+	private JSONObject beforeNext(JSONObject next)
 	{
-		long nline = next.get("line");
-		long eline = endselection.get("line");
-		long echar = endselection.get("character");
-		
-		if (nline == eline || nline - 1 == eline)
-		{
-			return new JSONObject("line", eline, "character", echar + 1);
-		}
-		else
-		{
-			return new JSONObject("line", nline - 1, "character", 0);
-		}
+		long line = next.get("line");
+		return new JSONObject("line", line - 1, "character", 999999999);
 	}
 	
 	private TCDefinition findDefinition(File file, int zline, int zcol)
