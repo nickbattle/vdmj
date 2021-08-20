@@ -64,10 +64,10 @@ public class Utils
 
 	public static JSONObject lexLocationToRange(LexLocation location)
 	{
-		if (location.endPos == 0)	// end is not set, so use a position
-		{
-			return lexLocationToPosition(location);
-		}
+//		if (location.endPos == 0)	// end is not set, so use a position
+//		{
+//			return lexLocationToPosition(location);
+//		}
 		
 		return new JSONObject(
 			"start", new JSONObject(
