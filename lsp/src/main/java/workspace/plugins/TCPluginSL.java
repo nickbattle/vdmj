@@ -132,8 +132,11 @@ public class TCPluginSL extends TCPlugin
 
 		for (TCDefinition def: module.defs)
 		{
-			JSONObject symbol = documentSymbolsTop(def);
-			if (symbol != null) symbols.add(symbol);
+			if (def.location.file.equals(file))		// DEFAULT module spans files
+			{
+				JSONObject symbol = documentSymbolsTop(def);
+				if (symbol != null) symbols.add(symbol);
+			}
 		}
 		
 		LexLocation location = module.name.getLocation();

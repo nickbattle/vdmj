@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -865,6 +866,8 @@ public class LSPWorkspaceManager
 			range.put("start", startLine(start));
 			range.put("end", beforeNext(nextstart));
 			
+			verifyRange(symbol.get("name"), range, symbol.getPath("selectionRange"));
+			
 			JSONArray children = symbol.get("children");
 			
 			if (children != null)
@@ -874,6 +877,20 @@ public class LSPWorkspaceManager
 		}
 	}
 	
+	private void verifyRange(String name, JSONObject range, JSONObject selectionRange)
+	{
+		File file = new File("?");
+		LexLocation rloc = Utils.rangeToLexLocation(file, range);
+		LexLocation sloc = Utils.rangeToLexLocation(file, selectionRange);
+		
+		if (!sloc.within(rloc))
+		{
+			Log.error("Selection not within range at symbol %s", name);
+			Log.error("Range %s", range);
+			Log.error("Selection %s", selectionRange);
+		}
+	}
+
 	private JSONObject startLine(JSONObject position)
 	{
 		long line = position.get("line");
