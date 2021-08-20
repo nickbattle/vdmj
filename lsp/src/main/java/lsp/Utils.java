@@ -64,19 +64,28 @@ public class Utils
 
 	public static JSONObject lexLocationToRange(LexLocation location)
 	{
-//		if (location.endPos == 0)	// end is not set, so use a position
-//		{
-//			return lexLocationToPosition(location);
-//		}
-		
-		return new JSONObject(
-			"start", new JSONObject(
-				"line", zero(location.startLine - 1),
-				"character", zero(location.startPos - 1)),
-			
-			"end",   new JSONObject(
-				"line", zero(location.endLine - 1),
-				"character", zero(location.endPos)));	// end excluded!
+		if (location.endPos == 0)	// end is not set, so use a single char range
+		{
+			return new JSONObject(
+					"start", new JSONObject(
+						"line", zero(location.startLine - 1),
+						"character", zero(location.startPos - 1)),
+					
+					"end",   new JSONObject(
+						"line", zero(location.startLine - 1),
+						"character", zero(location.startPos)));	// One character
+		}
+		else
+		{
+			return new JSONObject(
+				"start", new JSONObject(
+					"line", zero(location.startLine - 1),
+					"character", zero(location.startPos - 1)),
+				
+				"end",   new JSONObject(
+					"line", zero(location.endLine - 1),
+					"character", zero(location.endPos)));	// end excluded!
+		}
 	}
 
 	public static JSONObject lexLocationsToRange(LexLocation from, LexLocation to)

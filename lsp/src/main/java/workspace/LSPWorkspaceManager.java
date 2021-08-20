@@ -824,7 +824,7 @@ public class LSPWorkspaceManager
 		if (!results.isEmpty())
 		{
 			 StringBuilder buffer = projectFiles.get(file);
-			 fixRanges(results, Utils.getEndPosition(buffer));
+			 fixRanges(results, afterLine(Utils.getEndPosition(buffer)));
 		}
 		
 		return new RPCMessageList(request, results);
@@ -891,6 +891,12 @@ public class LSPWorkspaceManager
 		}
 	}
 
+	private JSONObject afterLine(JSONObject position)
+	{
+		long line = position.get("line");
+		return new JSONObject("line", line+1, "character", 0);
+	}
+	
 	private JSONObject startLine(JSONObject position)
 	{
 		long line = position.get("line");
