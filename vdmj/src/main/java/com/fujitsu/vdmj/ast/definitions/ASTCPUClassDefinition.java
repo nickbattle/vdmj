@@ -41,7 +41,7 @@ public class ASTCPUClassDefinition extends ASTClassDefinition
 	public ASTCPUClassDefinition() throws ParserException, LexException
 	{
 		super(
-			new LexNameToken("CLASS", "CPU", new LexLocation()),
+			new LexNameToken("CLASS", "CPU", LexLocation.ANY),
 			new LexNameList(),
 			operationDefs());
 	}

@@ -94,7 +94,7 @@ public class TCModule extends TCNode implements Serializable
 	{
 		if (defs.isEmpty())
 		{
-			this.name =	defaultName(new LexLocation());
+			this.name =	defaultName(LexLocation.ANY);
 		}
 		else
 		{

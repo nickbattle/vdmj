@@ -126,7 +126,7 @@ public class INModuleList extends INMappedList<TCModule, INModule>
 		if (isEmpty())
 		{
 			initialContext = new StateContext(
-				new LexLocation(), "global environment");
+				LexLocation.ANY, "global environment");
 		}
 		else
 		{

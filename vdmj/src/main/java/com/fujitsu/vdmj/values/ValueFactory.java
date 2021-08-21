@@ -150,7 +150,7 @@ public class ValueFactory
 	private static TCType getType(String module, String name) throws ValueException
 	{
 		Interpreter i = Interpreter.getInstance();
-		TCNameToken tcname = new TCNameToken(new LexLocation(), module, name);
+		TCNameToken tcname = new TCNameToken(LexLocation.ANY, module, name);
 		TCDefinition def = i.getGlobalEnvironment().findType(tcname, i.getDefaultName());
 		
 		if (def == null)

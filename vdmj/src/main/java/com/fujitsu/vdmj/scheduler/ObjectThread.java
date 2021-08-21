@@ -86,7 +86,7 @@ public class ObjectThread extends SchedulableThread
 			if (breakAtStart)
 			{
 				// Step at the first location you check (start of body)
-				ctxt.threadState.setBreaks(new LexLocation(), null, null);
+				ctxt.threadState.setBreaks(LexLocation.ANY, null, null);
 			}
 
 			operation.eval(ctxt.location, new ValueList(), ctxt);

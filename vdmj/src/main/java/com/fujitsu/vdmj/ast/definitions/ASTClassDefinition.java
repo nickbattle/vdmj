@@ -67,7 +67,7 @@ public class ASTClassDefinition extends ASTDefinition
 	 */
 	public ASTClassDefinition()
 	{
-		this(new LexNameToken("CLASS", "DEFAULT", new LexLocation()),
+		this(new LexNameToken("CLASS", "DEFAULT", LexLocation.ANY),
 			new LexNameList(), new ASTDefinitionList());
 	}
 

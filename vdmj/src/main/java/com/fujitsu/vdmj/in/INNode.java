@@ -49,7 +49,7 @@ abstract public class INNode extends MappedObject implements Serializable
 	
 	protected INNode()
 	{
-		this.location = new LexLocation();	// Some INNodes don't care
+		this.location = LexLocation.ANY;	// Some INNodes don't care
 	}
 
 	protected INNode(LexLocation location)

@@ -34,8 +34,7 @@ public class StatementIterator extends TraceIterator
 
 	private boolean done = false;
 	
-	private static final LexLocation NOWHERE = new LexLocation();
-	private static final Breakpoint DUMMY = new Breakpoint(NOWHERE);
+	private static final Breakpoint DUMMY = new Breakpoint(LexLocation.ANY);
 
 	public StatementIterator(INStatement newStatement)
 	{

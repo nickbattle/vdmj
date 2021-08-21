@@ -102,7 +102,7 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
 		if (isEmpty())
 		{
 			globalContext = new StateContext(
-				new LexLocation(), "global environment");
+				LexLocation.ANY, "global environment");
 		}
 		else
 		{

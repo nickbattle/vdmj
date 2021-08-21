@@ -41,7 +41,7 @@ public class ASTBUSClassDefinition extends ASTClassDefinition
 	public ASTBUSClassDefinition() throws ParserException, LexException
 	{
 		super(
-			new LexNameToken("CLASS", "BUS", new LexLocation()),
+			new LexNameToken("CLASS", "BUS", LexLocation.ANY),
 			new LexNameList(),
 			operationDefs());
 	}

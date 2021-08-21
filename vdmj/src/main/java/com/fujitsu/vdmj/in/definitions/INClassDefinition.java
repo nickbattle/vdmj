@@ -139,7 +139,7 @@ public class INClassDefinition extends INDefinition
 	 */
 	public INClassDefinition()
 	{
-		this(new TCNameToken(new LexLocation(), "CLASS", "DEFAULT"), new TCClassType(new LexLocation(), new TCClassDefinition()),
+		this(new TCNameToken(LexLocation.ANY, "CLASS", "DEFAULT"), new TCClassType(LexLocation.ANY, new TCClassDefinition()),
 			new TCNameList(), new INDefinitionList(), new INDefinitionList(), new INDefinitionList(),
 			new INClassList(), null, false);
 
