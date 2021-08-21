@@ -222,6 +222,7 @@ public class ClassReader extends SyntaxReader
 				throwMessage(2007, "Expecting 'end " + classId.name + "'");
 			}
 
+			LexLocation.addSpan(className, lastToken());
 			return new ASTSystemDefinition(className, members);
 		}
 		else
