@@ -70,14 +70,23 @@ public class DidChangeWSHandler extends LSPHandler
 			{
 				if (fileEvent instanceof JSONObject)
 				{
-					JSONObject change = (JSONObject)fileEvent; 
-					File file = Utils.uriToFile(change.get("uri"));
-					WatchKind type = WatchKind.kindOf(change.get("type"));
-					int code = LSPWorkspaceManager.getInstance().changeWatchedFile(request, file, type);
+					JSONObject change = (JSONObject)fileEvent;
+					String uri = change.get("uri");
 					
-					if (code > actionCode)
+					if (uri.startsWith("file"))
 					{
-						actionCode = code;
+						WatchKind type = WatchKind.kindOf(change.get("type"));
+						File file = Utils.uriToFile(uri);
+						int code = LSPWorkspaceManager.getInstance().changeWatchedFile(request, file, type);
+						
+						if (code > actionCode)
+						{
+							actionCode = code;
+						}
+					}
+					else
+					{
+						Log.printf("WARNING: ignoring non-file URI", uri);
 					}
 				}
 			}

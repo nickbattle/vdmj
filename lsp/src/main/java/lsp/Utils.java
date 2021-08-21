@@ -64,19 +64,28 @@ public class Utils
 
 	public static JSONObject lexLocationToRange(LexLocation location)
 	{
-		if (location.endPos == 0)	// end is not set, so use a position
+		if (location.endPos == 0)	// end is not set, so use a single char range
 		{
-			return lexLocationToPosition(location);
+			return new JSONObject(
+					"start", new JSONObject(
+						"line", zero(location.startLine - 1),
+						"character", zero(location.startPos - 1)),
+					
+					"end",   new JSONObject(
+						"line", zero(location.startLine - 1),
+						"character", zero(location.startPos)));	// One character
 		}
-		
-		return new JSONObject(
-			"start", new JSONObject(
-				"line", zero(location.startLine - 1),
-				"character", zero(location.startPos - 1)),
-			
-			"end",   new JSONObject(
-				"line", zero(location.endLine - 1),
-				"character", zero(location.endPos)));	// end excluded!
+		else
+		{
+			return new JSONObject(
+				"start", new JSONObject(
+					"line", zero(location.startLine - 1),
+					"character", zero(location.startPos - 1)),
+				
+				"end",   new JSONObject(
+					"line", zero(location.endLine - 1),
+					"character", zero(location.endPos)));	// end excluded!
+		}
 	}
 
 	public static JSONObject lexLocationsToRange(LexLocation from, LexLocation to)
@@ -203,6 +212,57 @@ public class Utils
 		
 		Log.error("Cannot locate line %d character %s in buffer length %d", zline, zcol, buffer.length());
 		return -1;
+	}
+	
+	public static JSONObject getEndPosition(StringBuilder buffer)
+	{
+		long currentLine = 0;
+		long currentCharacter = 0;
+
+		for (int i=0; i<buffer.length(); i++)
+		{
+			if (buffer.charAt(i) == '\n')
+			{
+				currentLine++;
+				currentCharacter = 0;
+			}
+			else
+			{
+				currentCharacter++;
+			}
+		}
+		
+		return new JSONObject(
+					"line", currentLine,
+					"character", currentCharacter);
+	}
+	
+	public static JSONObject getLineEndPosition(StringBuilder buffer, int zline)
+	{
+		long currentLine = 0;
+		long currentCharacter = 0;
+
+		for (int i=0; i<buffer.length(); i++)
+		{
+			if (buffer.charAt(i) == '\n')
+			{
+				if (currentLine == zline)
+				{
+					break;
+				}
+				
+				currentLine++;
+				currentCharacter = 0;
+			}
+			else
+			{
+				currentCharacter++;
+			}
+		}
+		
+		return new JSONObject(
+					"line", currentLine,
+					"character", currentCharacter);
 	}
 	
 	public static void diff(String message, String s1, String s2)

@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -685,21 +686,21 @@ public class LSPWorkspaceManager
 		{
 			return new RPCMessageList(request, null);
 		}
+		else if (def.location.file.getName().equals("console") ||
+				 def.location.file.getName().equals("?"))
+		{
+			// This happens for pseudo-symbols like CPU and BUS in RT
+			return new RPCMessageList(request, null);
+		}
 		else
 		{
 			URI defuri = def.location.file.toURI();
 			
 			return new RPCMessageList(request,
-				System.getProperty("lsp.lsp4e") != null ?
-					new JSONArray(
-						new JSONObject(
-							"targetUri", defuri.toString(),
-							"targetRange", Utils.lexLocationToRange(def.location),
-							"targetSelectionRange", Utils.lexLocationToPosition(def.location)))
-					:
+				new JSONArray(
 					new JSONObject(
 						"uri", defuri.toString(),
-						"range", Utils.lexLocationToRange(def.location)));
+						"range", Utils.lexLocationToRange(def.location))));
 		}
 	}
 
@@ -820,7 +821,92 @@ public class LSPWorkspaceManager
 			results = ast.documentSymbols(file);
 		}
 		
+		if (!results.isEmpty())
+		{
+			 StringBuilder buffer = projectFiles.get(file);
+			 fixRanges(results, afterLine(Utils.getEndPosition(buffer)));
+		}
+		
 		return new RPCMessageList(request, results);
+	}
+	
+	/**
+	 * Fix the "range" fields of the DocumentSymbol array passed in, such that each
+	 * range starts at the selectionRange and ends at the start of the next symbol,
+	 * or the end passed (for the last one). Recurse into any children.
+	 */
+	private void fixRanges(JSONArray symbols, JSONObject endPosition)
+	{
+		for (int s = 0; s < symbols.size(); s++)
+		{
+			JSONObject symbol = symbols.index(s);
+			JSONObject start = symbol.getPath("selectionRange.start");
+
+			JSONObject nextstart = null;
+			
+			for (int n = s + 1; n <= symbols.size(); n++)
+			{
+				if (n == symbols.size())
+				{
+					nextstart = endPosition;
+				}
+				else
+				{
+					JSONObject next = symbols.index(n);
+					nextstart = next.getPath("selectionRange.start");
+				}
+				
+				if (!nextstart.get("line").equals(start.get("line")))
+				{
+					break;	// Guaranteed exit for endPosition
+				}
+			}
+			
+			JSONObject range = symbol.get("range");
+			range.put("start", startLine(start));
+			range.put("end", beforeNext(nextstart));
+			
+			verifyRange(symbol.get("name"), range, symbol.getPath("selectionRange"));
+			
+			JSONArray children = symbol.get("children");
+			
+			if (children != null)
+			{
+				fixRanges(children, nextstart);
+			}
+		}
+	}
+	
+	private void verifyRange(String name, JSONObject range, JSONObject selectionRange)
+	{
+		File file = new File("?");
+		LexLocation rloc = Utils.rangeToLexLocation(file, range);
+		LexLocation sloc = Utils.rangeToLexLocation(file, selectionRange);
+		
+		if (!sloc.within(rloc))
+		{
+			Log.error("Selection not within range at symbol %s", name);
+			Log.error("Range %s", range);
+			Log.error("Selection %s", selectionRange);
+		}
+	}
+
+	private JSONObject afterLine(JSONObject position)
+	{
+		long line = position.get("line");
+		return new JSONObject("line", line+1, "character", 0);
+	}
+	
+	private JSONObject startLine(JSONObject position)
+	{
+		long line = position.get("line");
+		return new JSONObject("line", line, "character", 0);
+	}
+	
+	private JSONObject beforeNext(JSONObject next)
+	{
+		long line = next.get("line");
+		return new JSONObject("line", line - 1, "character", 999999999);
 	}
 	
 	private TCDefinition findDefinition(File file, int zline, int zcol)

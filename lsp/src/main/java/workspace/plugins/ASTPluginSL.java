@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ModuleReader;
@@ -65,6 +66,7 @@ public class ASTPluginSL extends ASTPlugin
 	{
 		dirty = false;
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
+		LexLocation.resetLocations();
 		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{

@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ClassReader;
@@ -67,6 +68,7 @@ public class ASTPluginPR extends ASTPlugin
 	{
 		dirty = false;
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
+		LexLocation.resetLocations();
 		
 		if (Settings.dialect == Dialect.VDM_RT)
 		{
