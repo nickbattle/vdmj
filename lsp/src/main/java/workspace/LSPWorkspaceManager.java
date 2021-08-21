@@ -686,21 +686,21 @@ public class LSPWorkspaceManager
 		{
 			return new RPCMessageList(request, null);
 		}
+		else if (def.location.file.getName().equals("console") ||
+				 def.location.file.getName().equals("?"))
+		{
+			// This happens for pseudo-symbols like CPU and BUS in RT
+			return new RPCMessageList(request, null);
+		}
 		else
 		{
 			URI defuri = def.location.file.toURI();
 			
 			return new RPCMessageList(request,
-				System.getProperty("lsp.lsp4e") != null ?
-					new JSONArray(
-						new JSONObject(
-							"targetUri", defuri.toString(),
-							"targetRange", Utils.lexLocationToRange(def.location),
-							"targetSelectionRange", Utils.lexLocationToPosition(def.location)))
-					:
+				new JSONArray(
 					new JSONObject(
 						"uri", defuri.toString(),
-						"range", Utils.lexLocationToRange(def.location)));
+						"range", Utils.lexLocationToRange(def.location))));
 		}
 	}
 
