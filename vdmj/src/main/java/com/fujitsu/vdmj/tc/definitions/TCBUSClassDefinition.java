@@ -50,7 +50,7 @@ public class TCBUSClassDefinition extends TCClassDefinition
 	public TCBUSClassDefinition() throws Exception
 	{
 		super(
-			new TCNameToken(new LexLocation(), "CLASS", "BUS", false, false),	// No AST?
+			new TCNameToken(LexLocation.ANY, "CLASS", "BUS", false, false),	// No AST?
 			new TCNameList(),
 			operationDefs());
 	}

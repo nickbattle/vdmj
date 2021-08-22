@@ -261,8 +261,8 @@ public abstract class VDMJUnitTest
 	 */
 	protected void assertVDM(String message, Value result, String assertion) throws Exception
 	{
-		Context ctxt = new Context(new LexLocation(), "Assertion context", interpreter.getInitialContext());
-		TCNameToken rname = new TCNameToken(new LexLocation(), interpreter.getDefaultName(), "RESULT");
+		Context ctxt = new Context(LexLocation.ANY, "Assertion context", interpreter.getInitialContext());
+		TCNameToken rname = new TCNameToken(LexLocation.ANY, interpreter.getDefaultName(), "RESULT");
 		ctxt.put(rname, result);
 		Value res = interpreter.evaluate(assertion, ctxt);
 		

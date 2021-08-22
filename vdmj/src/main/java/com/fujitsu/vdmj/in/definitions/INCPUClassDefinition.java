@@ -102,7 +102,7 @@ public class INCPUClassDefinition extends INClassDefinition
 
 	private static TCNameToken varName(String name)
 	{
-		return new TCNameToken(new LexLocation(), "CPU", name);
+		return new TCNameToken(LexLocation.ANY, "CPU", name);
 	}
 
 	@Override

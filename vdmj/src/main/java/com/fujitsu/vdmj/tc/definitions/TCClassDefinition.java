@@ -135,7 +135,7 @@ public class TCClassDefinition extends TCDefinition
 	 */
 	public TCClassDefinition()
 	{
-		this(null, new TCNameToken(new LexLocation(), "CLASS", "DEFAULT", false, false),
+		this(null, new TCNameToken(LexLocation.ANY, "CLASS", "DEFAULT", false, false),
 			 new TCNameList(),
 			 new TCDefinitionList());
 	}

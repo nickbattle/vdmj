@@ -258,7 +258,7 @@ public class ClassInterpreter extends Interpreter
 		
 		if (!end.is(Token.EOF))
 		{
-			throw new ParserException(2330, "Tokens found after expression at " + end, new LexLocation(), 0);
+			throw new ParserException(2330, "Tokens found after expression at " + end, LexLocation.ANY, 0);
 		}
 
 		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);

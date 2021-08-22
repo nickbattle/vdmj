@@ -42,7 +42,7 @@ abstract public class PONode extends MappedObject
 
 	protected PONode()
 	{
-		this.location = new LexLocation();	// Some nodes don't care
+		this.location = LexLocation.ANY;	// Some nodes don't care
 	}
 
 	protected PONode(LexLocation location)

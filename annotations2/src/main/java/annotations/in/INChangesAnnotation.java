@@ -47,7 +47,7 @@ import com.fujitsu.vdmj.values.VoidValue;
 
 public class INChangesAnnotation extends INAnnotation
 {
-	private final static Context previousState = new Context(new LexLocation(), "@Changes", null);
+	private final static Context previousState = new Context(LexLocation.ANY, "@Changes", null);
 	private final static Map<TCNameToken, String> previousLocs = new HashMap<TCNameToken, String>();
 
 	public INChangesAnnotation(TCIdentifierToken name, INExpressionList args)

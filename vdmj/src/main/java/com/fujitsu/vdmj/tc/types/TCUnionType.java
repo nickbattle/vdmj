@@ -491,7 +491,7 @@ public class TCUnionType extends TCType
     			return null;
     		}
 
-    		TCNameToken classname = new TCNameToken(new LexLocation(), "CLASS", classString, false, false);
+    		TCNameToken classname = new TCNameToken(LexLocation.ANY, "CLASS", classString, false, false);
     		
     		for (TCType t: types)
     		{

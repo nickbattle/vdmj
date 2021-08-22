@@ -88,7 +88,7 @@ public class AsyncThread extends SchedulableThread
 			if (breakAtStart)
 			{
 				// Step at the first location you check (start of body)
-				ctxt.threadState.setBreaks(new LexLocation(), null, null);
+				ctxt.threadState.setBreaks(LexLocation.ANY, null, null);
 			}
 
     		Value result = operation.localEval(

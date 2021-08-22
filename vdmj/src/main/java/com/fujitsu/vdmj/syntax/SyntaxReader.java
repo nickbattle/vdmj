@@ -415,7 +415,7 @@ public abstract class SyntaxReader
 			return annotation;
 		}
 		
-		throw new LexException(0, "Comment doesn't start with @Annotation", new LexLocation());
+		throw new LexException(0, "Comment doesn't start with @Annotation", LexLocation.ANY);
 	}
 
 	/**

@@ -83,7 +83,7 @@ public class INModule extends INNode implements Serializable
 	{
 		if (defs.isEmpty())
 		{
-			this.name =	defaultName(new LexLocation());
+			this.name =	defaultName(LexLocation.ANY);
 		}
 		else
 		{
