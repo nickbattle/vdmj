@@ -19,7 +19,6 @@ module CSV
 --  * A relative path is relative to the debugger or if running in the 
 --      Overture IDE relative to the project root.
 --
-imports from IO types filedirective renamed filedirective;
 exports all
 definitions
 
@@ -33,7 +32,7 @@ functions
  *  else <append> will append output to the existing file
  * @return true if successful else false
  */
-fwriteval:seq1 of char * seq of ? * filedirective -> bool
+fwriteval:seq1 of char * seq of ? * (<start>|<append>) -> bool
 fwriteval(filename,val,fdir) == is not yet specified;
 
 /**

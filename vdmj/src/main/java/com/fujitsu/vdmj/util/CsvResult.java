@@ -2,7 +2,7 @@
  *
  *	Copyright (c) 2016 Aarhus University.
  *
- *	Author: Nick Battle and others
+ *	Author: Kenneth Lausdahl
  *
  *	This file is part of VDMJ.
  *

@@ -1,4 +1,4 @@
-class CSV is subclass of IO
+class CSV
 
 --  Overture STANDARD LIBRARY: INPUT/OUTPUT
 --      --------------------------------------------
@@ -31,7 +31,7 @@ functions
  *  else <append> will append output to the existing file
  * @return true if successful else false
  */
-public static fwriteval:seq1 of char * seq of ? * filedirective -> bool
+public static fwriteval:seq1 of char * seq of ? * (<start>|<append>) -> bool
 fwriteval(filename,val,fdir) == is not yet specified;
 
 /**
