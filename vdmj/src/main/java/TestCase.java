@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ExitException;
 import com.fujitsu.vdmj.runtime.StateContext;
+import com.fujitsu.vdmj.runtime.VDMOperation;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.OperationValue;
@@ -54,6 +55,7 @@ public class TestCase {
     private final static String xmlReportSuiteTemplate = "<testsuite xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd\" name=\"%s\" time=\"0.0\" tests=\"0\" errors=\"0\" skipped=\"0\" failures=\"0\"/>";
     private final static String vdmUnitReportEnable = "vdm.unit.report";
 
+    @VDMOperation
     public static Value reflectionRunTest(Value obj, Value name)
             throws Exception {
         String methodName = name.toString().replaceAll("\"", "").trim();

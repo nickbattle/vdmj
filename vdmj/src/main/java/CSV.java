@@ -40,6 +40,8 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.VDMFunction;
+import com.fujitsu.vdmj.runtime.VDMOperation;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -65,6 +67,7 @@ public class CSV implements Serializable
 	private static final long serialVersionUID = 1L;
 	private static String lastError = "";
 
+	@VDMOperation
 	public static Value ferror()
 	{
 		return new SeqValue(lastError);
@@ -81,6 +84,7 @@ public class CSV implements Serializable
 	 *            append to or start a new file
 	 * @return
 	 */
+	@VDMFunction
 	public static Value fwriteval(Value fval, Value tval, Value dval)
 	{
 		File file = getFile(fval);
@@ -127,6 +131,7 @@ public class CSV implements Serializable
 	 *            the line index
 	 * @return true + seq of ? or false and nil
 	 */
+	@VDMFunction
 	public static Value freadval(Value fval, Value indexVal)
 	{
 		ValueList result = new ValueList();
@@ -191,6 +196,7 @@ public class CSV implements Serializable
 	 *            name of the file
 	 * @return int value with count
 	 */
+	@VDMFunction
 	public static Value flinecount(Value fval)
 	{
 		ValueList result = new ValueList();
@@ -230,8 +236,7 @@ public class CSV implements Serializable
 		return lines;
 	}
 
-	private static String getLine(File file, long index)
-			throws IOException
+	private static String getLine(File file, long index) throws IOException
 	{
 		BufferedReader bufRdr = new BufferedReader(new FileReader(file));
 		String line = null;

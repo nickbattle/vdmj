@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.StateContext;
+import com.fujitsu.vdmj.runtime.VDMOperation;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
@@ -36,6 +37,7 @@ import com.fujitsu.vdmj.values.ValueSet;
 
 public class TestRunner
 {
+	@VDMOperation
 	public static Value collectTests(Value obj)
 	{
 		List<String> tests = new Vector<String>();

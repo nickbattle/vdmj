@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.StateContext;
+import com.fujitsu.vdmj.runtime.VDMOperation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.values.NameValuePair;
@@ -42,6 +43,7 @@ import com.fujitsu.vdmj.values.ValueList;
 
 public class TestSuite
 {
+	@VDMOperation
 	public static Value getTestMethodNamed(Value test)
 	{
 		List<String> tests = new Vector<String>();
@@ -67,6 +69,7 @@ public class TestSuite
 		return new SeqValue(vals);
 	}
 
+	@VDMOperation
 	public static Value createTests(Value test) throws Exception
 	{
 		List<String> tests = new Vector<String>();
