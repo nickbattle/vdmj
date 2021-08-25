@@ -160,7 +160,17 @@ public class OrderPlugin extends CommandPlugin
 	
     private void processGraph()
     {
-		/*
+    	/**
+    	 * If the output file looks like a DOT file, just write the DOT
+    	 * format without the cyclic removal.
+    	 */
+    	if (outputfile != null && outputfile.endsWith(".dot"))
+    	{
+    		graphOf(uses, outputfile);
+    		return;
+    	}
+    	
+		/**
 		 * First remove any cycles. For some reason it's not enough to search from
 		 * the startpoints, so we just search from everywhere. It's reasonably
 		 * quick.
@@ -295,6 +305,8 @@ public class OrderPlugin extends CommandPlugin
 	{
     	try
 		{
+			Console.out.println("Writing Graphviz DOT file to " + filename);
+
 			FileWriter fw = new FileWriter(filename); 
 			StringBuilder sb = new StringBuilder();
 			sb.append("digraph G {\n");
