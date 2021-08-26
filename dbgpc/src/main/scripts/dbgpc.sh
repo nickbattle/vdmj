@@ -4,8 +4,8 @@
 #####################################################################################
 
 # Change these to flip version
-MVERSION="4.4.3-SNAPSHOT"
-PVERSION="4.4.3-P-SNAPSHOT"
+MVERSION="4.4.4-SNAPSHOT"
+PVERSION="4.4.4-P-SNAPSHOT"
 
 # The Maven repository directory containing jars
 MAVENREPO=~/.m2/repository/com/fujitsu
