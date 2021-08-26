@@ -4,8 +4,8 @@
 #####################################################################################
 
 # Change these to flip VDMJ version
-MVERSION="4.4.3-SNAPSHOT"
-PVERSION="4.4.3-P-SNAPSHOT"
+MVERSION="4.4.3"
+PVERSION="4.4.3-P"
 
 # The Maven repository directory containing VDMJ jars
 MAVENREPO=~/.m2/repository/com/fujitsu

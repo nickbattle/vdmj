@@ -8,7 +8,7 @@
 	<parent>
 		<groupId>com.fujitsu</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4.4.3-P-SNAPSHOT</version>
+		<version>4.4.3-P</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
