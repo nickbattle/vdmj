@@ -4,7 +4,7 @@
 #####################################################################################
 
 # Change these to flip version
-MVERSION="4.4.3-SNAPSHOT"
+MVERSION="4.4.3"
 PVERSION="4.4.3-P-SNAPSHOT"
 
 # The Maven repository directory containing jars
