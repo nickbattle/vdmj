@@ -178,7 +178,7 @@ public class IO implements Serializable
 	// We need this because the toString of the Value converts special
 	// characters back to their quoted form.
 
-	private static String stringOf(Value val)
+	public static String stringOf(Value val)
 	{
 		StringBuilder s = new StringBuilder();
 		val = val.deref();

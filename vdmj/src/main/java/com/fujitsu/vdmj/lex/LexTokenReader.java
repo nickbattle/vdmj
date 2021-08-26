@@ -509,13 +509,19 @@ public class LexTokenReader extends BacktrackInputReader
 
 	/**
 	 * Read a number of the given base. Parsing terminates when a character
-	 * not within the number base is read.
+	 * not within the number base is read. The overload has a check parameter,
+	 * which is false during the parse of reals, below.
 	 *
 	 * @param base	The base of the number (eg. 10 for reading decimals)
 	 * @return The integer value of the number read.
 	 * @throws LexException
 	 */
 	private String rdNumber(int base) throws LexException
+	{
+		return rdNumber(base, true);
+	}
+	
+	private String rdNumber(int base, boolean check) throws LexException
 	{
 		StringBuilder v = new StringBuilder();
 		int n = value(ch);
@@ -1101,7 +1107,7 @@ public class LexTokenReader extends BacktrackInputReader
 	private LexToken rdReal(int tokline, int tokpos) throws LexException
 	{
 		String floatSyntax = "Expecting <digits>[.<digits>][e<+-><digits>]";
-		String value = rdNumber(10);
+		String value = rdNumber(10, false);
 		String fraction = null;
 		String exponent = null;
 		boolean negative = false;
@@ -1114,7 +1120,7 @@ public class LexTokenReader extends BacktrackInputReader
 
 			if (ch >= '0' && ch <= '9')
 			{
-				fraction = rdNumber(10);
+				fraction = rdNumber(10, false);
 				exponent = "0";
 			}
 			else
@@ -1136,14 +1142,14 @@ public class LexTokenReader extends BacktrackInputReader
 				case '+':
 				{
 					rdCh();
-					exponent = rdNumber(10);
+					exponent = rdNumber(10, false);
 					break;
 				}
 
 				case '-':
 				{
 					rdCh();
-					exponent = rdNumber(10);
+					exponent = rdNumber(10, false);
 					negative = true;
 					break;
 				}
@@ -1151,7 +1157,7 @@ public class LexTokenReader extends BacktrackInputReader
 				case '0': case '1': case '2': case '3': case '4':
 				case '5': case '6': case '7': case '8': case '9':
 				{
-					exponent = rdNumber(10);
+					exponent = rdNumber(10, false);
 					break;
 				}
 
