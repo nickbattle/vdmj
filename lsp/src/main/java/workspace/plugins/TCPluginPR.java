@@ -25,6 +25,8 @@
 package workspace.plugins;
 
 import java.io.File;
+import java.io.IOException;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
@@ -35,6 +37,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
+import com.fujitsu.vdmj.util.DependencyOrder;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -187,5 +190,16 @@ public class TCPluginPR extends TCPlugin
 		}
 		
 		return results;
+	}
+
+	@Override
+	public void saveDependencies(File saveUri) throws IOException
+	{
+		if (tcClassList != null)
+		{
+			DependencyOrder order = new DependencyOrder();
+			order.classOrder(tcClassList);
+			order.graphOf(saveUri);
+		}
 	}
 }

@@ -25,6 +25,7 @@
 package workspace.plugins;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -93,6 +94,8 @@ abstract public class TCPlugin extends AnalysisPlugin
 
 	abstract public TCDefinitionList lookupDefinition(String startsWith);
 	
+	abstract public void saveDependencies(File saveUri) throws IOException;
+
 	/**
 	 * Common methods for hierarchical outlines.
 	 */

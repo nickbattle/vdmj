@@ -402,4 +402,19 @@ public class LSPXWorkspaceManager
 
 		return outfile;
 	}
+	
+	public RPCMessageList translateDependencies(RPCRequest request, File file, File saveUri)
+	{
+		try
+		{
+			TCPlugin tc = registry.getPlugin("TC");
+			File result = new File(saveUri, "dependencies.dot");
+			tc.saveDependencies(result);
+			return new RPCMessageList(request, new JSONObject("uri", result.toURI().toString()));
+		}
+		catch (IOException e)
+		{
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
 }
