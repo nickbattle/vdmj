@@ -47,9 +47,9 @@ import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 
 public class DependencyOrder
 {
-	private Map<String, File> nameToFile = new HashMap<String, File>();
-	private Map<String, Set<String>> uses = new HashMap<String, Set<String>>();
-	private Map<String, Set<String>> usedBy  = new HashMap<String, Set<String>>();
+	protected Map<String, File> nameToFile = new HashMap<String, File>();
+	protected Map<String, Set<String>> uses = new HashMap<String, Set<String>>();
+	protected Map<String, Set<String>> usedBy  = new HashMap<String, Set<String>>();
 	
 	public DependencyOrder()
 	{
