@@ -61,8 +61,13 @@ public class DependencyOrder
 
     	for (TCClassDefinition c: classList)
 		{
-	    	nameToFile.put(c.name.getName(), c.name.getLocation().file);
-	    	allDefs.addAll(c.getDefinitions());
+    		String name = c.name.getName();
+    		
+    		if (!name.equals("CPU") && !name.equals("BUS"))
+    		{
+    			nameToFile.put(name, c.name.getLocation().file);
+    			allDefs.addAll(c.getDefinitions());
+    		}
 		}
 
     	Environment globals = new FlatEnvironment(allDefs, null);
@@ -71,7 +76,7 @@ public class DependencyOrder
     	{
     		Environment empty = new FlatEnvironment(new TCDefinitionList());
 			TCNameSet freevars = def.getFreeVariables(globals, empty, new AtomicBoolean(false));
-			String myname = def.name.getModule();
+			String myname = def.location.module;
 	    	
 	    	for (TCNameToken dep: freevars)
 	    	{
