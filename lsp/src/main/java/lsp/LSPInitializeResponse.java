@@ -60,7 +60,7 @@ public class LSPInitializeResponse extends JSONObject
 					"proofObligationProvider", true,
 					"combinatorialTestProvider", new JSONObject("workDoneProgress", true),
 					"translateProvider", new JSONObject(
-							"languageId", new JSONArray("latex", "word", "coverage", "dependencies"),
+							"languageId", new JSONArray("latex", "word", "coverage", "graphviz"),
 							"workDoneProgress", false),
 					"dapServer", new JSONObject("port", DAPServerSocket.getPort())));
 

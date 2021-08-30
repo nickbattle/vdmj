@@ -403,7 +403,7 @@ public class LSPXWorkspaceManager
 		return outfile;
 	}
 	
-	public RPCMessageList translateDependencies(RPCRequest request, File file, File saveUri)
+	public RPCMessageList translateGraphviz(RPCRequest request, File file, File saveUri)
 	{
 		try
 		{

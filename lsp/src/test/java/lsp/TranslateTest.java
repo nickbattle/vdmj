@@ -206,7 +206,7 @@ public class TranslateTest extends LSPTest
 		RPCRequest request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
 					"uri", null,
-					"languageId", "dependencies",
+					"languageId", "graphviz",
 					"saveUri",	empty.toURI().toString()));
 
 		RPCMessageList response = handler.request(request);
@@ -241,7 +241,7 @@ public class TranslateTest extends LSPTest
 		RPCRequest request = RPCRequest.create(123L, "slsp/TR/translate",
 				new JSONObject(
 					"uri", null,
-					"languageId", "dependencies",
+					"languageId", "graphviz",
 					"saveUri",	empty.toURI().toString()));
 
 		RPCMessageList response = handler.request(request);
