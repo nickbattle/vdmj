@@ -29,6 +29,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.RTLogger;
 
 import dap.DAPMessageList;
@@ -68,6 +70,12 @@ public class LogCommand extends Command
 	{
 		String message = null;
 		
+		if (Settings.dialect != Dialect.VDM_RT)
+		{
+			return new DAPMessageList(request,
+					false, "Command only available for VDM-RT", null);			
+		}
+
 		if (logfile == null)
 		{
 			RTLogger.enable(false);
