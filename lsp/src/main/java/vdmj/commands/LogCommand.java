@@ -42,13 +42,17 @@ public class LogCommand extends Command
 	public static final String USAGE = "Usage: log [<file> | off]";
 	public static final String[] HELP =	{ "log", "log [<file> | off] - control RT logging" };
 	
-	private File logfile = null;
+	private String logfile = null;
 	
 	public LogCommand(String line)
 	{
 		String[] parts = line.split("\\s+");
 		
-		if (parts.length == 2)
+		if (line.equals("log"))
+		{
+			logfile = "";
+		}
+		else if (parts.length == 2)
 		{
 			if (parts[1].equals("off"))
 			{
@@ -56,7 +60,7 @@ public class LogCommand extends Command
 			}
 			else
 			{
-				logfile = new File(parts[1]);
+				logfile = parts[1];
 			}
 		}
 		else
@@ -81,13 +85,26 @@ public class LogCommand extends Command
 			RTLogger.enable(false);
 			message = "RT event logging disabled";
 		}
+		else if (logfile.equals(""))
+		{
+			message = "";
+			
+			if (RTLogger.getLogSize() > 0)
+			{
+				message = "Flushing " + RTLogger.getLogSize() + " RT events";
+			}
+
+			RTLogger.setLogfile(null);
+			message = message + "\nRT events now logged to the console";
+		}
 		else
 		{
 			try
 			{
+				File file = new File(logfile);
 				PrintWriter p = new PrintWriter(new FileOutputStream(logfile, false));
 				RTLogger.setLogfile(p);
-				message = "RT events now logged to " + logfile;
+				message = "RT events now logged to " + file.getAbsolutePath();
 			}
 			catch (FileNotFoundException e)
 			{
