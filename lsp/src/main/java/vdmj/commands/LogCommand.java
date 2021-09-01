@@ -24,69 +24,75 @@
 
 package vdmj.commands;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+
+import com.fujitsu.vdmj.messages.RTLogger;
+
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 
-public class HelpCommand extends Command
+public class LogCommand extends Command
 {
-	public static final String USAGE = "Usage: help [command]";
-	public static final String[] HELP = { "help", "help [<command>] - information about commands" };
+	public static final String USAGE = "Usage: log [<file> | off]";
+	public static final String[] HELP =	{ "log", "log [<file> | off] - control RT logging" };
 	
-	private String command = null;
-
-	public HelpCommand(String line)
+	private File logfile = null;
+	
+	public LogCommand(String line)
 	{
 		String[] parts = line.split("\\s+");
 		
 		if (parts.length == 2)
 		{
-			this.command = parts[1];
+			if (parts[1].equals("off"))
+			{
+				logfile = null;
+			}
+			else
+			{
+				logfile = new File(parts[1]);
+			}
 		}
-		else if (parts.length != 1)
+		else
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
 	}
 	
-	private static String[][] entries =
-	{
-		DefaultCommand.HELP,
-		ModulesCommand.HELP,
-		ClassesCommand.HELP,
-		PrintCommand.HELP,
-		SetCommand.HELP,
-		LogCommand.HELP,
-		HelpCommand.HELP,
-		InitCommand.HELP,
-		VersionCommand.HELP,
-		QuitCommand.HELP
-	};
-	
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		StringBuilder sb = new StringBuilder();
+		String message = null;
 		
-		for (String[] help: entries)
+		if (logfile == null)
 		{
-			if (command == null || command.equals(help[0]))
+			RTLogger.enable(false);
+			message = "RT event logging disabled";
+		}
+		else
+		{
+			try
 			{
-				sb.append(help[1] + "\n");
+				PrintWriter p = new PrintWriter(new FileOutputStream(logfile, false));
+				RTLogger.setLogfile(p);
+				message = "RT events now logged to " + logfile;
+			}
+			catch (FileNotFoundException e)
+			{
+				 message = "Cannot create RT event log: " + e.getMessage();
 			}
 		}
 		
-		if (sb.length() == 0)
-		{
-			sb.append("Unknown command '" + command + "'");
-		}
-		
-		return new DAPMessageList(request, new JSONObject("result", sb.toString()));
+		return new DAPMessageList(request, new JSONObject("result", message));
 	}
-
+	
 	@Override
 	public boolean notWhenRunning()
 	{
-		return false;
+		return true;
 	}
 }
