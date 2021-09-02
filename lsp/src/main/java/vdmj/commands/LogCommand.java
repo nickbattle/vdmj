@@ -91,11 +91,11 @@ public class LogCommand extends Command
 			
 			if (RTLogger.getLogSize() > 0)
 			{
-				message = "Flushing " + RTLogger.getLogSize() + " RT events";
+				message = "Flushing " + RTLogger.getLogSize() + " RT events\n";
 			}
 
 			RTLogger.setLogfile(null);
-			message = message + "\nRT events now logged to the console";
+			message = message + "RT events now logged to the console";
 		}
 		else
 		{
