@@ -108,11 +108,12 @@ public class LSPXWorkspaceManager
 	{
 		try
 		{
+			ASTPlugin ast = registry.getPlugin("AST");
 			TCPlugin tc = registry.getPlugin("TC");
 			
-			if (!tc.getErrs().isEmpty())	// No type clean tree
+			if (!ast.getErrs().isEmpty() || !tc.getErrs().isEmpty())	// No clean tree
 			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
 			}
 			
 			POPlugin po = registry.getPlugin("PO");
