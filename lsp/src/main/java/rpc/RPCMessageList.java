@@ -56,8 +56,8 @@ public class RPCMessageList extends Vector<JSONObject>
 	}
 
 	// Error response to request
-	public RPCMessageList(RPCRequest request, RPCErrors error, String method)
+	public RPCMessageList(RPCRequest request, RPCErrors error, String message)
 	{
-		add(RPCResponse.error(request, error, method));
+		add(RPCResponse.error(request, error, message));
 	}
 }
