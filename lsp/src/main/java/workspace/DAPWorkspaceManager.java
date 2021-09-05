@@ -397,7 +397,7 @@ public class DAPWorkspaceManager
 		DAPMessageList result = new DAPMessageList(request);
 		RTLogger.dump(true);
 
-		if (restart)
+		if (restart && canExecute())
 		{
 			stdout("\nSession restarting...\n");
 			LSPWorkspaceManager lsp = LSPWorkspaceManager.getInstance();
@@ -405,6 +405,11 @@ public class DAPWorkspaceManager
 		}
 		else
 		{
+			if (restart)
+			{
+				stdout("Cannot restart: specification has errors");
+			}
+			
 			stdout("\nSession terminated.\n");
 			result.add(new DAPResponse("terminated", null));
 			result.add(new DAPResponse("exit", new JSONObject("exitCode", 0L)));
