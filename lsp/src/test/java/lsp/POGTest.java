@@ -165,6 +165,6 @@ public class POGTest extends LSPTest
 		assertEquals(1, response.size());
 
 		dump(response.get(0));
-		assertEquals("Type checking errors found", response.get(0).getPath("error.message"));
+		assertEquals("Specification errors found", response.get(0).getPath("error.message"));
 	}	
 }
