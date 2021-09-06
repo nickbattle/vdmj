@@ -1,0 +1,17 @@
+module A
+imports from B all
+exports all
+definitions
+values
+	A = B`A;
+	B = 0;
+end A
+
+module B
+imports from A all
+exports all
+definitions
+values
+	A = 0;
+	B = A`B;
+end B

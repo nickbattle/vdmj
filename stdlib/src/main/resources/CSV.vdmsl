@@ -55,9 +55,9 @@ freadval(f,index) == is not yet specified;
  *
  * @param filename the name of the file
  * @return mk_(success,@p) if successful success will be 
- * set to true else false. @p will hold nil if unsuccessful or the line count.
+ * set to true else false. @p will hold nil if unsuccessful.
  */
-flinecount: seq1 of char -> bool * int
+flinecount: seq1 of char -> bool * [nat]
 flinecount(f) == is not yet specified;
 
 operations

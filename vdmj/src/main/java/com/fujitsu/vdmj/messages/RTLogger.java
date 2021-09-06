@@ -145,6 +145,8 @@ public class RTLogger
     		if (close)
     		{
     			logfile.close();
+    			logfile = null;
+    			cached = null;
     		}
 		}
 	}

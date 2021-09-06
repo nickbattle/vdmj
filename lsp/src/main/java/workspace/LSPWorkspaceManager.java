@@ -684,6 +684,21 @@ public class LSPWorkspaceManager
 		
 		if (def == null)
 		{
+			ASTPlugin ast = registry.getPlugin("AST");
+			TCPlugin tc = registry.getPlugin("TC");
+			
+			if (!ast.getErrs().isEmpty() || !tc.getErrs().isEmpty())
+			{
+				try
+				{
+					sendMessage(1L, "Specification contains errors. Cannot locate symbols.");
+				}
+				catch (IOException e)
+				{
+					// ignore
+				}
+			}
+
 			return new RPCMessageList(request, null);
 		}
 		else if (def.location.file.getName().equals("console") ||

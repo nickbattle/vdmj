@@ -108,11 +108,12 @@ public class LSPXWorkspaceManager
 	{
 		try
 		{
+			ASTPlugin ast = registry.getPlugin("AST");
 			TCPlugin tc = registry.getPlugin("TC");
 			
-			if (!tc.getErrs().isEmpty())	// No type clean tree
+			if (!ast.getErrs().isEmpty() || !tc.getErrs().isEmpty())	// No clean tree
 			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Type checking errors found");
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
 			}
 			
 			POPlugin po = registry.getPlugin("PO");
@@ -401,5 +402,20 @@ public class LSPXWorkspaceManager
 		out.close();
 
 		return outfile;
+	}
+	
+	public RPCMessageList translateGraphviz(RPCRequest request, File file, File saveUri)
+	{
+		try
+		{
+			TCPlugin tc = registry.getPlugin("TC");
+			File result = new File(saveUri, "dependencies.dot");
+			tc.saveDependencies(result);
+			return new RPCMessageList(request, new JSONObject("uri", result.toURI().toString()));
+		}
+		catch (IOException e)
+		{
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
 	}
 }

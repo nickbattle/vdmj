@@ -25,7 +25,7 @@
 package com.fujitsu.vdmj.ast.lex;
 
 import java.math.BigInteger;
-
+import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 
@@ -40,7 +40,7 @@ public class LexIntegerToken extends LexToken
 		this.value = value;
 	}
 
-	public LexIntegerToken(String value, LexLocation location)
+	public LexIntegerToken(String value, LexLocation location) throws LexException
 	{
 		super(location, Token.NUMBER);
 		this.value = new BigInteger(value);

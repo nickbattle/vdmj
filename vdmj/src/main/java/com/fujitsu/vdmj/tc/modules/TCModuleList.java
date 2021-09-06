@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.FileList;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.tc.TCMappedList;
@@ -105,7 +106,11 @@ public class TCModuleList extends TCMappedList<ASTModule, TCModule>
     			{
     				if (!m.isFlat)
     				{
-    					imports.add(ModuleReader.importAll(m.name));
+    					// Make an identifier with the location's module as DEFAULT
+    					LexLocation mloc = m.name.getLocation();
+    					LexLocation defloc = new LexLocation(mloc.file, "DEFAULT", mloc.startLine, mloc.startPos, 0, 0);
+    					TCIdentifierToken defid = new TCIdentifierToken(defloc, m.name.getName(), false);
+    					imports.add(ModuleReader.importAll(defid));
     				}
     			}
 

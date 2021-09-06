@@ -1,0 +1,11 @@
+class A
+values
+	public A = B`A;
+	public B = 0;
+end A
+
+class B
+values
+	public A = 0;
+	public B = A`B;
+end B

@@ -25,6 +25,7 @@
 package workspace.plugins;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
@@ -36,6 +37,7 @@ import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
+import com.fujitsu.vdmj.util.DependencyOrder;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -199,5 +201,16 @@ public class TCPluginSL extends TCPlugin
 		}
 		
 		return results;
+	}
+
+	@Override
+	public void saveDependencies(File saveUri) throws IOException
+	{
+		if (tcModuleList != null)
+		{
+			DependencyOrder order = new DependencyOrder();
+			order.moduleOrder(tcModuleList);
+			order.graphOf(saveUri);
+		}
 	}
 }

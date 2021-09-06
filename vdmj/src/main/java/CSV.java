@@ -50,7 +50,7 @@ import com.fujitsu.vdmj.util.CsvResult;
 import com.fujitsu.vdmj.util.CsvValueBuilder;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.CPUValue;
-import com.fujitsu.vdmj.values.IntegerValue;
+import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.NilValue;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.TupleValue;
@@ -207,7 +207,7 @@ public class CSV implements Serializable
 			long count = getLineCount(file);
 
 			result.add(new BooleanValue(true));
-			result.add(new IntegerValue(count));
+			result.add(new NaturalValue(count));
 		} catch (Exception e)
 		{
 			lastError = e.toString();

@@ -184,6 +184,76 @@ public class TranslateTest extends LSPTest
 			assertTrue(f.getName().matches("^.*\\.vdmsl\\.covtbl$"));
 			f.delete();
 		}
+
+		empty.delete();
+	}
+
+	@Test
+	public void testDepsSL() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_SL);
+		File testdir = new File("src/test/resources/deptest_sl");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+
+		TranslateHandler handler = new TranslateHandler();
+		File empty = Files.createTempDirectory("test").toFile();
+		
+		RPCRequest request = RPCRequest.create(123L, "slsp/TR/translate",
+				new JSONObject(
+					"uri", null,
+					"languageId", "graphviz",
+					"saveUri",	empty.toURI().toString()));
+
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals(empty.toURI()+"dependencies.dot", response.get(0).getPath("result.uri"));
+
+		for (File f: empty.listFiles())
+		{
+			assertTrue(f.getName().matches("^.*\\.dot$"));
+			f.delete();
+		}
+		
+		empty.delete();
+	}
+
+	@Test
+	public void testDepsPP() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_PP);
+		File testdir = new File("src/test/resources/deptest_pp");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+
+		TranslateHandler handler = new TranslateHandler();
+		File empty = Files.createTempDirectory("test").toFile();
+		
+		RPCRequest request = RPCRequest.create(123L, "slsp/TR/translate",
+				new JSONObject(
+					"uri", null,
+					"languageId", "graphviz",
+					"saveUri",	empty.toURI().toString()));
+
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals(empty.toURI()+"dependencies.dot", response.get(0).getPath("result.uri"));
+
+		for (File f: empty.listFiles())
+		{
+			assertTrue(f.getName().matches("^.*\\.dot$"));
+			f.delete();
+		}
 		
 		empty.delete();
 	}

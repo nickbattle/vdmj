@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
@@ -101,6 +102,7 @@ public class DAPWorkspaceManager
 
 	public DAPMessageList dapInitialize(DAPRequest request)
 	{
+		RTLogger.enable(false);
 		DAPMessageList responses = new DAPMessageList();
 		responses.add(new DAPInitializeResponse(request));
 		responses.add(new DAPEvent("initialized", null));
@@ -383,6 +385,7 @@ public class DAPWorkspaceManager
 	 */
 	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
+		RTLogger.dump(true);
 		stdout("\nSession disconnected.\n");
 		clearInterpreter();
 		DAPMessageList result = new DAPMessageList(request);
@@ -392,8 +395,9 @@ public class DAPWorkspaceManager
 	public DAPMessageList terminate(DAPRequest request, Boolean restart)
 	{
 		DAPMessageList result = new DAPMessageList(request);
+		RTLogger.dump(true);
 
-		if (restart)
+		if (restart && canExecute())
 		{
 			stdout("\nSession restarting...\n");
 			LSPWorkspaceManager lsp = LSPWorkspaceManager.getInstance();
@@ -401,6 +405,11 @@ public class DAPWorkspaceManager
 		}
 		else
 		{
+			if (restart)
+			{
+				stdout("Cannot restart: specification has errors");
+			}
+			
 			stdout("\nSession terminated.\n");
 			result.add(new DAPResponse("terminated", null));
 			result.add(new DAPResponse("exit", new JSONObject("exitCode", 0L)));
