@@ -57,27 +57,15 @@ public class DependencyOrder
     			
     public void classOrder(TCClassList classList)
 	{
-//		TCDefinitionList allDefs = new TCDefinitionList();
-
-//    	for (TCClassDefinition c: classList)
-//		{
-//    		String name = c.name.getName();
-//    		
-//    		if (!name.equals("CPU") && !name.equals("BUS"))
-//    		{
-//    			nameToFile.put(name, c.name.getLocation().file);
-//    			allDefs.addAll(c.getDefinitions());
-//    		}
-//		}
-
     	for (TCClassDefinition c: classList)
 		{
     		String classname = c.name.getName();
-			nameToFile.put(classname, c.name.getLocation().file);
     		
     		if (!classname.equals("CPU") && !classname.equals("BUS"))
     		{
-		    	for (TCDefinition def: c.getDefinitions())
+    			nameToFile.put(classname, c.name.getLocation().file);
+
+    			for (TCDefinition def: c.getDefinitions())
 		    	{
 		        	Environment globals = new FlatEnvironment(new TCDefinitionList());
 		    		Environment empty = new FlatEnvironment(new TCDefinitionList());
