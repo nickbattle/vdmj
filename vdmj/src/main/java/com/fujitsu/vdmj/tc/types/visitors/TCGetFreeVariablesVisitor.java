@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -94,6 +95,19 @@ public class TCGetFreeVariablesVisitor extends TCLeafTypeVisitor<TCNameToken, TC
 			{
 				return new TCNameSet();
 			}
+		}
+	}
+	
+	@Override
+	public TCNameSet caseClassType(TCClassType node, EnvTriple arg)
+	{
+		if (arg.env.findType(node.name, node.name.getModule()) == null)
+		{
+			return new TCNameSet(node.name);
+		}
+		else
+		{
+			return new TCNameSet();
 		}
 	}
 }
