@@ -57,32 +57,28 @@ public class DependencyOrder
     			
     public void classOrder(TCClassList classList)
 	{
-		TCDefinitionList allDefs = new TCDefinitionList();
-
     	for (TCClassDefinition c: classList)
 		{
-    		String name = c.name.getName();
+    		String classname = c.name.getName();
     		
-    		if (!name.equals("CPU") && !name.equals("BUS"))
+    		if (!classname.equals("CPU") && !classname.equals("BUS"))
     		{
-    			nameToFile.put(name, c.name.getLocation().file);
-    			allDefs.addAll(c.getDefinitions());
+    			nameToFile.put(classname, c.name.getLocation().file);
+
+    			for (TCDefinition def: c.getDefinitions())
+		    	{
+		        	Environment globals = new FlatEnvironment(new TCDefinitionList());
+		    		Environment empty = new FlatEnvironment(new TCDefinitionList());
+					TCNameSet freevars = def.getFreeVariables(globals, empty, new AtomicBoolean(false));
+			    	
+			    	for (TCNameToken dep: freevars)
+			    	{
+			    		String m = dep.getModule();
+						add(classname, m.equals("CLASS") ? dep.getName() : m);
+			    	}
+			    }
     		}
 		}
-
-    	Environment globals = new FlatEnvironment(allDefs, null);
-
-    	for (TCDefinition def: allDefs)
-    	{
-    		Environment empty = new FlatEnvironment(new TCDefinitionList());
-			TCNameSet freevars = def.getFreeVariables(globals, empty, new AtomicBoolean(false));
-			String myname = def.location.module;
-	    	
-	    	for (TCNameToken dep: freevars)
-	    	{
-				add(myname, dep.getModule());
-	    	}
-	    }
     	
     	for (String cname: nameToFile.keySet())
     	{
