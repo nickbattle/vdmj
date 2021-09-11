@@ -326,6 +326,7 @@ public class LSPXWorkspaceManager
 		SourceFile source = new SourceFile(file);
 		String texname = file.getName().replaceAll("\\.vdm..$", ".tex");
 		File subfolder = getSubFolder(saveUri, file);
+		subfolder.mkdir();
 		File outfile = new File(subfolder, texname);
 		
 		PrintWriter out = new PrintWriter(outfile);
@@ -388,6 +389,7 @@ public class LSPXWorkspaceManager
 		SourceFile source = new SourceFile(file);
 		String wordname = file.getName().replaceAll("\\.vdm..$", ".doc");
 		File subfolder = getSubFolder(saveUri, file);
+		subfolder.mkdir();
 		File outfile = new File(subfolder, wordname);
 		
 		PrintWriter out = new PrintWriter(outfile);
@@ -450,6 +452,7 @@ public class LSPXWorkspaceManager
 		SourceFile source = new SourceFile(file);
 		String covname = file.getName() + ".covtbl";
 		File subfolder = getSubFolder(saveUri, file);
+		subfolder.mkdir();
 		File outfile = new File(subfolder, covname);
 		
 		PrintWriter out = new PrintWriter(outfile);
