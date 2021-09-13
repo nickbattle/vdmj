@@ -254,6 +254,25 @@ public class LSPXWorkspaceManager
 		return !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
 	}
 
+	/**
+	 * Create a subfolder within saveUri matching the folder part of file passed.
+	 */
+	private File getSubFolder(File saveUri, File file)
+	{
+		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+		File root = manager.getRoot();
+		
+		if (file.getParent().startsWith(root.getPath()))
+		{
+			int r = root.getPath().length();
+			return new File(saveUri.getPath() + File.separator + file.getParent().substring(r));
+		}
+		else
+		{
+			return saveUri;		// Should never happen?
+		}
+	}
+
 	public RPCMessageList translateLaTeX(RPCRequest request, File file, File saveUri)
 	{
 		File responseFile = null;
@@ -271,16 +290,27 @@ public class LSPXWorkspaceManager
 
 				responseFile = saveUri;		// ??
 			}
+			else if (file.isDirectory())
+			{
+				String subfolder = file.getPath();
+				
+				for (File pfile: filemap.keySet())
+				{
+					if (pfile.getPath().startsWith(subfolder))
+					{
+						fileToLaTeX(saveUri, pfile);
+					}
+				}
+
+				responseFile = file;		// ??
+			}
+			else if (filemap.containsKey(file))
+			{
+				responseFile = fileToLaTeX(saveUri, file);
+			}
 			else
 			{
-				if (filemap.containsKey(file))
-				{
-					responseFile = fileToLaTeX(saveUri, file);
-				}
-				else
-				{
-					return new RPCMessageList(request, RPCErrors.InvalidParams, "No such file in project");
-				}
+				return new RPCMessageList(request, RPCErrors.InvalidParams, "No such file in project");
 			}
 
 			return new RPCMessageList(request, new JSONObject("uri", responseFile.toURI().toString()));
@@ -295,7 +325,9 @@ public class LSPXWorkspaceManager
 	{
 		SourceFile source = new SourceFile(file);
 		String texname = file.getName().replaceAll("\\.vdm..$", ".tex");
-		File outfile = new File(saveUri, texname);
+		File subfolder = getSubFolder(saveUri, file);
+		subfolder.mkdirs();
+		File outfile = new File(subfolder, texname);
 		
 		PrintWriter out = new PrintWriter(outfile);
 		source.printLatexCoverage(out, true, true, false);
@@ -321,16 +353,27 @@ public class LSPXWorkspaceManager
 
 				responseFile = saveUri;		// ??
 			}
+			else if (file.isDirectory())
+			{
+				String subfolder = file.getPath();
+				
+				for (File pfile: filemap.keySet())
+				{
+					if (pfile.getPath().startsWith(subfolder))
+					{
+						fileToWord(saveUri, pfile);
+					}
+				}
+
+				responseFile = file;		// ??
+			}
+			else if (filemap.containsKey(file))
+			{
+				responseFile = fileToWord(saveUri, file);
+			}
 			else
 			{
-				if (filemap.containsKey(file))
-				{
-					responseFile = fileToWord(saveUri, file);
-				}
-				else
-				{
-					return new RPCMessageList(request, RPCErrors.InvalidParams, "No such file in project");
-				}
+				return new RPCMessageList(request, RPCErrors.InvalidParams, "No such file in project");
 			}
 
 			return new RPCMessageList(request, new JSONObject("uri", responseFile.toURI().toString()));
@@ -344,8 +387,10 @@ public class LSPXWorkspaceManager
 	private File fileToWord(File saveUri, File file) throws IOException
 	{
 		SourceFile source = new SourceFile(file);
-		String texname = file.getName().replaceAll("\\.vdm..$", ".doc");
-		File outfile = new File(saveUri, texname);
+		String wordname = file.getName().replaceAll("\\.vdm..$", ".doc");
+		File subfolder = getSubFolder(saveUri, file);
+		subfolder.mkdirs();
+		File outfile = new File(subfolder, wordname);
 		
 		PrintWriter out = new PrintWriter(outfile);
 		source.printWordCoverage(out, true, false);
@@ -371,16 +416,27 @@ public class LSPXWorkspaceManager
 
 				responseFile = saveUri;		// ??
 			}
+			else if (file.isDirectory())
+			{
+				String subfolder = file.getPath();
+				
+				for (File pfile: filemap.keySet())
+				{
+					if (pfile.getPath().startsWith(subfolder))
+					{
+						fileToCoverage(saveUri, pfile);
+					}
+				}
+
+				responseFile = file;		// ??
+			}
+			else if (filemap.containsKey(file))
+			{
+				responseFile = fileToCoverage(saveUri, file);
+			}
 			else
 			{
-				if (filemap.containsKey(file))
-				{
-					responseFile = fileToCoverage(saveUri, file);
-				}
-				else
-				{
-					return new RPCMessageList(request, RPCErrors.InvalidParams, "No such file in project");
-				}
+				return new RPCMessageList(request, RPCErrors.InvalidParams, "No such file in project");
 			}
 
 			return new RPCMessageList(request, new JSONObject("uri", responseFile.toURI().toString()));
@@ -394,8 +450,10 @@ public class LSPXWorkspaceManager
 	private File fileToCoverage(File saveUri, File file) throws IOException
 	{
 		SourceFile source = new SourceFile(file);
-		String texname = file.getName() + ".covtbl";
-		File outfile = new File(saveUri, texname);
+		String covname = file.getName() + ".covtbl";
+		File subfolder = getSubFolder(saveUri, file);
+		subfolder.mkdirs();
+		File outfile = new File(subfolder, covname);
 		
 		PrintWriter out = new PrintWriter(outfile);
 		source.writeCoverage(out);
