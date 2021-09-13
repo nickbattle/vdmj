@@ -81,11 +81,24 @@ abstract public class POPlugin extends AnalysisPlugin
 		
 		for (ProofObligation po: poGeneratedList)
 		{
-			if (file != null &&
-				!po.location.file.equals(file) &&
-				!po.location.file.getParentFile().equals(file))		// folder
+			if (file != null)
 			{
-				continue;
+				if (file.isFile())
+				{
+					if (!po.location.file.equals(file))
+					{
+						continue;
+					}
+				}
+				else if (file.isDirectory())
+				{
+					String path = file.getPath();
+					
+					if (!po.location.file.getPath().startsWith(path))
+					{
+						continue;
+					}
+				}
 			}
 			
 			JSONArray name = new JSONArray(po.location.module);
