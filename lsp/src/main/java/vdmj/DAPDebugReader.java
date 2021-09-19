@@ -133,7 +133,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		DAPResponse dapResponse = null;
 		boolean result = true;
 
-		switch ((String)dapRequest.get("command"))
+		switch (dapRequest.getCommand())
 		{
 			case "threads":
 				server.writeMessage(doThreads(dapRequest));
@@ -233,7 +233,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 
 	private DebugCommand parse(DAPRequest request) throws IOException
 	{
-		String command = request.get("command");
+		String command = request.getCommand();
 		JSONObject arguments = request.get("arguments");
 		
 		switch (command)

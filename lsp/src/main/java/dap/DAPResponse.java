@@ -45,7 +45,7 @@ public class DAPResponse extends JSONObject
 		put("type", "response");
 		addSequence();
 		put("request_seq", request.get("seq"));
-		put("command", request.get("command"));
+		put("command", request.getCommand());
 
 		put("success", success);
 		if (message != null) put("message", message);
