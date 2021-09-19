@@ -39,7 +39,6 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 import dap.AsyncExecutor;
-import dap.DAPEvent;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
@@ -105,7 +104,7 @@ public class DAPWorkspaceManager
 		RTLogger.enable(false);
 		DAPMessageList responses = new DAPMessageList();
 		responses.add(new DAPInitializeResponse(request));
-		responses.add(new DAPEvent("initialized", null));
+		responses.add(new DAPResponse("initialized", null));
 		return responses;
 	}
 
