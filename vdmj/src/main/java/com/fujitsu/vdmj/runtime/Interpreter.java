@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Vector;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
@@ -235,6 +236,24 @@ abstract public class Interpreter
 	{
 		return breakpoints;
 	}
+	
+	/**
+	 * @return The list of Catchpoints currently set.
+	 */
+	public List<Catchpoint> getCatchpoints()
+	{
+		List<Catchpoint> catchers = new Vector<Catchpoint>();
+		
+		for (Breakpoint bp: breakpoints.values())
+		{
+			if (bp instanceof Catchpoint)
+			{
+				catchers.add((Catchpoint) bp);
+			}
+		}
+		
+		return catchers;
+	} 
 
 	/**
 	 * Get a line of a source file.
@@ -394,6 +413,21 @@ abstract public class Interpreter
 	}
 
 	/**
+	 * Set an exception catchpoint. This stops execution at the point that a matching
+	 * exception is thrown.
+	 *
+	 * @param exp The exception value at which to stop, or null for any exception.
+	 * @return The Breakpoint object created.
+	 * @throws Exception 
+	 */
+	public Breakpoint setCatchpoint(String value) throws Exception
+	{
+		Catchpoint catcher = new Catchpoint(value, ++nextbreakpoint);
+		breakpoints.put(nextbreakpoint, catcher);
+		return catcher;
+	}
+
+	/**
 	 * Clear the breakpoint given by the number.
 	 *
 	 * @param bpno The breakpoint number to remove.
@@ -403,7 +437,7 @@ abstract public class Interpreter
 	{
 		Breakpoint old = breakpoints.remove(bpno);
 
-		if (old != null)
+		if (old != null && old.location != LexLocation.ANY)
 		{
 			INStatement stmt = findStatement(old.location.file, old.location.startLine);
 

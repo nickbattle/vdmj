@@ -29,8 +29,10 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.runtime.Catchpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ExitException;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.values.UndefinedValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -70,8 +72,26 @@ public class INExitStatement extends INStatement
 		{
 			v = new UndefinedValue();
 		}
+		
+		check(location, ctxt, v);
 
 		throw new ExitException(v, location, ctxt);			// BANG!!
+	}
+	
+	/**
+	 * Check whether the interpreter has any catchpoints that we should trigger.
+	 */
+	private void check(LexLocation execl, Context ctxt, Value thrown)
+	{
+		Interpreter interpreter = Interpreter.getInstance();
+		
+		for (Catchpoint cp: interpreter.getCatchpoints())
+		{
+			if (cp.check(execl, ctxt, thrown))
+			{
+				break;	// Just handle one?
+			}
+		}
 	}
 
 	@Override

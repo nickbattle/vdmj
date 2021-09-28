@@ -77,9 +77,16 @@ public class INTrapStatement extends INStatement
 			{
     			if (patternBind.pattern != null)
     			{
-    				Context evalContext = new Context(location, "trap pattern", ctxt);
-    				evalContext.putList(patternBind.pattern.getNamedValues(exval, ctxt));
-    				rv = with.eval(evalContext);
+    				if (!exval.isUndefined())	// "exit" throws the undefined value
+    				{
+	    				Context evalContext = new Context(location, "trap pattern", ctxt);
+	    				evalContext.putList(patternBind.pattern.getNamedValues(exval, ctxt));
+	    				rv = with.eval(evalContext);
+    				}
+    				else
+    				{
+    					throw e;
+    				}
     			}
     			else if (patternBind.bind instanceof INSetBind)
     			{

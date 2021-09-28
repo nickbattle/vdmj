@@ -61,8 +61,15 @@ public class INTixeStmtAlternative
 		{
 			if (patternBind.pattern != null)
 			{
-				evalContext = new Context(location, "tixe pattern", ctxt);
-				evalContext.putList(patternBind.pattern.getNamedValues(exval, ctxt));
+				if (!exval.isUndefined())	// "exit" throws the undefined value
+				{
+					evalContext = new Context(location, "tixe pattern", ctxt);
+					evalContext.putList(patternBind.pattern.getNamedValues(exval, ctxt));
+				}
+				else
+				{
+					evalContext = null;
+				}
 			}
 			else if (patternBind.bind instanceof INSetBind)
 			{

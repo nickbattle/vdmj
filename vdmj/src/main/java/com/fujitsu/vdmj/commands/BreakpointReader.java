@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.in.expressions.INBinaryExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
@@ -74,6 +75,10 @@ public class BreakpointReader
 			else if (line.startsWith("trace"))
 			{
 				return doTrace(line);
+			}
+			else if (line.startsWith("catch"))
+			{
+				return doCatch(line);
 			}
 			else if (line.startsWith("list"))
 			{
@@ -112,7 +117,11 @@ public class BreakpointReader
 		{
 			Breakpoint bp = entry.getValue();
 			println(bp.toString());
-			println(interpreter.getSourceLine(bp.location));
+			
+			if (bp.location != LexLocation.ANY)		// Not Catchpoints
+			{
+				println(interpreter.getSourceLine(bp.location));
+			}
 		}
 
 		return true;
@@ -134,7 +143,11 @@ public class BreakpointReader
 		if (old != null)
 		{
 			println("Cleared " + old);
-			println(interpreter.getSourceLine(old.location));
+			
+			if (old.location != LexLocation.ANY)
+			{
+				println(interpreter.getSourceLine(old.location));
+			}
 		}
 		else
 		{
@@ -201,6 +214,23 @@ public class BreakpointReader
 			}
 		}
 
+		return true;
+	}
+
+	public boolean doCatch(String line) throws Exception
+	{
+		String parts[] = line.split("\\s+");
+
+		if (parts.length == 1)
+		{
+			setCatchpoint(null);
+			return true;
+		}
+		else
+		{
+			setCatchpoint(parts[1]);
+		}
+		
 		return true;
 	}
 	
@@ -478,5 +508,11 @@ public class BreakpointReader
 		{
 			println(name + " is not a function or operation");
 		}
+	}
+
+	private void setCatchpoint(String value) throws Exception
+	{
+		Breakpoint bp = interpreter.setCatchpoint(value);
+		println("Created " + bp);
 	}
 }
