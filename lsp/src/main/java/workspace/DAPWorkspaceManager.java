@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.runtime.Breakpoint;
+import com.fujitsu.vdmj.runtime.Catchpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
@@ -328,6 +329,34 @@ public class DAPWorkspaceManager
 		return new DAPMessageList(request, new JSONObject("breakpoints", results));
 	}
 	
+	public DAPMessageList setExceptionBreakpoints(DAPRequest request, JSONArray filterOptions) throws Exception
+	{
+		Map<Integer, Breakpoint> existing = getInterpreter().getBreakpoints();
+		Set<Integer> bps = new HashSet<Integer>(existing.keySet());
+		
+		for (Integer bpno: bps)
+		{
+			Breakpoint bp = existing.get(bpno);
+			
+			if (bp instanceof Catchpoint)
+			{
+				interpreter.clearBreakpoint(bpno);
+			}
+		}
+		
+		JSONArray results = new JSONArray();
+
+		for (int i=0; i<filterOptions.size(); i++)
+		{
+			JSONObject filterOption = filterOptions.index(i);
+			String condition = filterOption.get("condition");
+			interpreter.setCatchpoint(condition);
+			results.add(new JSONArray(new JSONObject("verified", true)));
+		}
+
+		return new DAPMessageList(request, new JSONObject("breakpoints", results));
+	}
+
 	private String expressionList(String trace)
 	{
 		// Turn a string like "Weight = {x} kilos" into [ "Weight = ", x, " kilos" ]

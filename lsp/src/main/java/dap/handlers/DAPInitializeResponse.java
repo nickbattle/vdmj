@@ -26,6 +26,7 @@ package dap.handlers;
 
 import dap.DAPRequest;
 import dap.DAPResponse;
+import json.JSONArray;
 import json.JSONObject;
 
 public class DAPInitializeResponse extends DAPResponse
@@ -47,6 +48,17 @@ public class DAPInitializeResponse extends DAPResponse
 		cap.put("supportsConditionalBreakpoints", true);
 		cap.put("supportsHitConditionalBreakpoints", true);
 		cap.put("supportsLogPoints", true);
+		
+		cap.put("supportsExceptionFilterOptions", true);
+		cap.put("exceptionBreakpointFilters",
+				new JSONArray(
+					new JSONObject(
+						"filter",				"VDM Exceptions",
+						"label",				"VDM Exceptions",
+						"description",			"Catch VDM exit statements",
+						"supportsCondition",	true,
+						"conditionDescription",	"The exit value to catch")));
+		
 		return cap;
 	}
 }

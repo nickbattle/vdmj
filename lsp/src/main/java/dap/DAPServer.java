@@ -78,7 +78,7 @@ public class DAPServer extends JSONServer
 		dispatcher.register(new LaunchHandler(), "launch");
 		dispatcher.register(new InitializeHandler(), "configurationDone");
 		dispatcher.register(new ThreadsHandler(), "threads");
-		dispatcher.register(new SetBreakpointsHandler(), "setBreakpoints");
+		dispatcher.register(new SetBreakpointsHandler(), "setBreakpoints", "setExceptionBreakpoints");
 		dispatcher.register(new EvaluateHandler(), "evaluate");
 		dispatcher.register(new StackTraceHandler(), "stackTrace");
 		dispatcher.register(new DisconnectHandler(), "disconnect");

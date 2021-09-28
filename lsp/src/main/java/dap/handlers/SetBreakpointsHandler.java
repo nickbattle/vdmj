@@ -46,6 +46,22 @@ public class SetBreakpointsHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
+		switch (request.getCommand())
+		{
+			case "setBreakpoints":
+				return setBreakpoints(request);
+
+			case "setExceptionBreakpoints":
+				return setExceptionBreakpoints(request);
+		
+			default:
+				return new DAPMessageList(request, false, "Unexpected breakpoint request", null);
+		}
+
+	}
+	
+	private DAPMessageList setBreakpoints(DAPRequest request) throws IOException
+	{
 		try
 		{
 			DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
@@ -64,6 +80,31 @@ public class SetBreakpointsHandler extends DAPHandler
 				JSONArray breakpoints = arguments.get("breakpoints");
 				
 				return DAPWorkspaceManager.getInstance().setBreakpoints(request, file, breakpoints);
+			}
+		}
+		catch (Exception e)
+		{
+			return new DAPMessageList(request, e);
+		}
+	}
+	
+	private DAPMessageList setExceptionBreakpoints(DAPRequest request) throws IOException
+	{
+		try
+		{
+			DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+			DAPDebugReader debugReader = manager.getDebugReader();
+			
+			if (debugReader != null && debugReader.isListening())
+			{
+				debugReader.handle(request);
+				return null;
+			}
+			else
+			{
+				JSONObject arguments = request.get("arguments");
+				JSONArray filterOptions = arguments.get("filterOptions");
+				return DAPWorkspaceManager.getInstance().setExceptionBreakpoints(request, filterOptions);
 			}
 		}
 		catch (Exception e)
