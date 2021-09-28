@@ -98,7 +98,7 @@ public class DebugParser
 				String args = request.substring(request.indexOf(' ') + 1);
 				return new DebugCommand(DebugType.PRINT, args);
 			}
-			else if (request.startsWith("break") || request.startsWith("trace") ||
+			else if (request.startsWith("break") || request.startsWith("trace") || request.startsWith("catch") ||
 					 request.startsWith("list")  || request.startsWith("remove"))
 			{
 				return new DebugCommand(DebugType.BREAKPOINT, request);

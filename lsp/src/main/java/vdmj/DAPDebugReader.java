@@ -143,6 +143,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				break;
 
 			case "setBreakpoints":
+			{
 				JSONObject arguments = dapRequest.get("arguments");
 				JSONObject source = arguments.get("source");
 				File file = Utils.pathToFile(source.get("path"));
@@ -156,6 +157,22 @@ public class DAPDebugReader extends Thread implements TraceCallback
 
 				result = true;
 				break;
+			}
+
+			case "setExceptionBreakpoints":
+			{
+				JSONObject arguments = dapRequest.get("arguments");
+				JSONArray filterOptions = arguments.get("filterOptions");
+				DAPMessageList responses = DAPWorkspaceManager.getInstance().setExceptionBreakpoints(dapRequest, filterOptions);
+
+				for (JSONObject response: responses)
+				{
+					server.writeMessage(response);
+				}
+
+				result = true;
+				break;
+			}
 
 			case "terminate":
 				link.killThreads();
