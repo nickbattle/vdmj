@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Breakpoint;
+import com.fujitsu.vdmj.runtime.Catchpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.FunctionValue;
@@ -118,7 +119,7 @@ public class BreakpointReader
 			Breakpoint bp = entry.getValue();
 			println(bp.toString());
 			
-			if (bp.location != LexLocation.ANY)		// Not Catchpoints
+			if (!(bp instanceof Catchpoint))
 			{
 				println(interpreter.getSourceLine(bp.location));
 			}
@@ -144,7 +145,7 @@ public class BreakpointReader
 		{
 			println("Cleared " + old);
 			
-			if (old.location != LexLocation.ANY)
+			if (!(old instanceof Catchpoint))
 			{
 				println(interpreter.getSourceLine(old.location));
 			}

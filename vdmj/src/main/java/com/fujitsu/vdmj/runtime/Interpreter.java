@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
@@ -55,6 +56,7 @@ import com.fujitsu.vdmj.messages.VDMErrorsException;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.scheduler.ResourceScheduler;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
+import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -422,6 +424,18 @@ abstract public class Interpreter
 	 */
 	public Breakpoint setCatchpoint(String value) throws Exception
 	{
+		/**
+		 * Parse the expression, so the string value is "canonical".
+		 */
+		if (value != null)
+		{
+			LexTokenReader ltr = new LexTokenReader(value, Dialect.VDM_SL);
+			ltr.nextToken();
+			ExpressionReader er = new ExpressionReader(ltr);
+			ASTExpression exp = er.readExpression();
+			value = exp.toString();
+		}
+
 		Catchpoint catcher = new Catchpoint(value, ++nextbreakpoint);
 		breakpoints.put(nextbreakpoint, catcher);
 		return catcher;
@@ -437,7 +451,7 @@ abstract public class Interpreter
 	{
 		Breakpoint old = breakpoints.remove(bpno);
 
-		if (old != null && old.location != LexLocation.ANY)
+		if (old != null && !(old instanceof Catchpoint))
 		{
 			INStatement stmt = findStatement(old.location.file, old.location.startLine);
 

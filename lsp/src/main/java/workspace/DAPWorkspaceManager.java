@@ -331,17 +331,9 @@ public class DAPWorkspaceManager
 	
 	public DAPMessageList setExceptionBreakpoints(DAPRequest request, JSONArray filterOptions) throws Exception
 	{
-		Map<Integer, Breakpoint> existing = getInterpreter().getBreakpoints();
-		Set<Integer> bps = new HashSet<Integer>(existing.keySet());
-		
-		for (Integer bpno: bps)
+		for (Catchpoint cp: getInterpreter().getCatchpoints())
 		{
-			Breakpoint bp = existing.get(bpno);
-			
-			if (bp instanceof Catchpoint)
-			{
-				interpreter.clearBreakpoint(bpno);
-			}
+			interpreter.clearBreakpoint(cp.number);
 		}
 		
 		JSONArray results = new JSONArray();
