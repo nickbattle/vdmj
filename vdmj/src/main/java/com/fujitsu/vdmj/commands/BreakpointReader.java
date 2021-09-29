@@ -39,7 +39,6 @@ import com.fujitsu.vdmj.in.expressions.INBinaryExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
@@ -220,16 +219,16 @@ public class BreakpointReader
 
 	public boolean doCatch(String line) throws Exception
 	{
-		String parts[] = line.split("\\s+");
+		int space = line.trim().indexOf(" ");
 
-		if (parts.length == 1)
+		if (space == -1)
 		{
 			setCatchpoint(null);
 			return true;
 		}
 		else
 		{
-			setCatchpoint(parts[1]);
+			setCatchpoint(line.substring(space + 1));
 		}
 		
 		return true;
@@ -513,7 +512,9 @@ public class BreakpointReader
 
 	private void setCatchpoint(String value) throws Exception
 	{
-		Breakpoint bp = interpreter.setCatchpoint(value);
-		println("Created " + bp);
+		for (Breakpoint bp: interpreter.setCatchpoint(value))
+		{
+			println("Created " + bp);
+		}
 	}
 }

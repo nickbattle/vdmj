@@ -276,7 +276,7 @@ public class DAPWorkspaceManager
 		
 					if (exp == null)
 					{
-						results.add(new JSONObject("verified", false));
+						results.add(new JSONObject("verified", false, "message", "No statement or expression here"));
 					}
 					else
 					{
@@ -329,7 +329,7 @@ public class DAPWorkspaceManager
 		return new DAPMessageList(request, new JSONObject("breakpoints", results));
 	}
 	
-	public DAPMessageList setExceptionBreakpoints(DAPRequest request, JSONArray filterOptions) throws Exception
+	public DAPMessageList setExceptionBreakpoints(DAPRequest request, JSONArray filterOptions)
 	{
 		for (Catchpoint cp: getInterpreter().getCatchpoints())
 		{
@@ -341,9 +341,28 @@ public class DAPWorkspaceManager
 		for (int i=0; i<filterOptions.size(); i++)
 		{
 			JSONObject filterOption = filterOptions.index(i);
-			String condition = filterOption.get("condition");
-			interpreter.setCatchpoint(condition);
-			results.add(new JSONArray(new JSONObject("verified", true)));
+			
+			if (filterOption.get("filterId").equals("VDM Exceptions"))
+			{
+				try
+				{
+					String condition = filterOption.get("condition");
+					interpreter.setCatchpoint(condition);
+					results.add(new JSONObject("verified", true));
+				}
+				catch (Exception e)
+				{
+					String error = "Illegal condition: " + e.getMessage(); 
+					Log.error(error);
+					results.add(new JSONObject("verified", false, "message", error));
+				}
+			}
+			else
+			{
+				String error = "Unknown filterOption Id " + filterOption.get("filterId");
+				Log.error(error);
+				results.add(new JSONObject("verified", false, "message", error));
+			}
 		}
 
 		return new DAPMessageList(request, new JSONObject("breakpoints", results));
