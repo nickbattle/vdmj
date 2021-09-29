@@ -50,6 +50,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.LexTokenReader;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
@@ -418,27 +419,39 @@ abstract public class Interpreter
 	 * Set an exception catchpoint. This stops execution at the point that a matching
 	 * exception is thrown.
 	 *
-	 * @param exp The exception value at which to stop, or null for any exception.
+	 * @param exp The exception value(s) at which to stop, or null for any exception.
 	 * @return The Breakpoint object created.
 	 * @throws Exception 
 	 */
-	public Breakpoint setCatchpoint(String value) throws Exception
+	public List<Breakpoint> setCatchpoint(String value) throws Exception
 	{
+		List<Breakpoint> values = new Vector<Breakpoint>();
+		
 		/**
-		 * Parse the expression, so the string value is "canonical".
+		 * Parse each expression, so the string value is "canonical".
 		 */
 		if (value != null)
 		{
 			LexTokenReader ltr = new LexTokenReader(value, Dialect.VDM_SL);
 			ltr.nextToken();
 			ExpressionReader er = new ExpressionReader(ltr);
-			ASTExpression exp = er.readExpression();
-			value = exp.toString();
+			
+			while (ltr.getLast().isNot(Token.EOF))
+			{
+				ASTExpression exp = er.readExpression();
+				Catchpoint catcher = new Catchpoint(exp.toString(), ++nextbreakpoint);
+				breakpoints.put(nextbreakpoint, catcher);
+				values.add(catcher);
+			}
 		}
-
-		Catchpoint catcher = new Catchpoint(value, ++nextbreakpoint);
-		breakpoints.put(nextbreakpoint, catcher);
-		return catcher;
+		else
+		{
+			Catchpoint catcher = new Catchpoint(null, ++nextbreakpoint);
+			breakpoints.put(nextbreakpoint, catcher);
+			values.add(catcher);
+		}
+		
+		return values;
 	}
 
 	/**

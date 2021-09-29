@@ -55,9 +55,9 @@ public class DAPInitializeResponse extends DAPResponse
 					new JSONObject(
 						"filter",				"VDM Exceptions",
 						"label",				"VDM Exceptions",
-						"description",			"Catch VDM exit statements",
+						"description",			"Catch VDM exit statements. By default, catches all exception values.",
 						"supportsCondition",	true,
-						"conditionDescription",	"The exit value to catch")));
+						"conditionDescription",	"Space separated exit value(s) to catch")));
 		
 		return cap;
 	}
