@@ -44,7 +44,7 @@ public class DAPDispatcher
 	{
 		try
 		{
-			DAPHandler handler = handlers.get(request.get("command"));
+			DAPHandler handler = handlers.get(request.getCommand());
 			
 			if (handler == null)
 			{

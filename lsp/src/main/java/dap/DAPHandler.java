@@ -36,9 +36,4 @@ abstract public class DAPHandler
 	{
 		return new DAPMessageList(request, false, "Unhandled request", null);
 	}
-
-	public void run(DAPEvent request) throws IOException
-	{
-		return;
-	}
 }

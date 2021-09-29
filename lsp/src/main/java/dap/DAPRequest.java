@@ -46,11 +46,8 @@ public class DAPRequest extends JSONObject
 		}
 	}
 	
-	public DAPRequest(int seq, String command, Object arguments)
+	public String getCommand()
 	{
-		put("seq", seq);
-		put("type", "request");
-		put("command", command);
-		if (arguments != null) put("arguments", arguments);
+		return get("command");
 	}
 }

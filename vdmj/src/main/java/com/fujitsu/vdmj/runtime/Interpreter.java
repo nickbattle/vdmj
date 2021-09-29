@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Vector;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
@@ -43,6 +44,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
@@ -54,6 +56,7 @@ import com.fujitsu.vdmj.messages.VDMErrorsException;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.scheduler.ResourceScheduler;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
+import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -235,6 +238,24 @@ abstract public class Interpreter
 	{
 		return breakpoints;
 	}
+	
+	/**
+	 * @return The list of Catchpoints currently set.
+	 */
+	public List<Catchpoint> getCatchpoints()
+	{
+		List<Catchpoint> catchers = new Vector<Catchpoint>();
+		
+		for (Breakpoint bp: breakpoints.values())
+		{
+			if (bp instanceof Catchpoint)
+			{
+				catchers.add((Catchpoint) bp);
+			}
+		}
+		
+		return catchers;
+	} 
 
 	/**
 	 * Get a line of a source file.
@@ -394,6 +415,33 @@ abstract public class Interpreter
 	}
 
 	/**
+	 * Set an exception catchpoint. This stops execution at the point that a matching
+	 * exception is thrown.
+	 *
+	 * @param exp The exception value at which to stop, or null for any exception.
+	 * @return The Breakpoint object created.
+	 * @throws Exception 
+	 */
+	public Breakpoint setCatchpoint(String value) throws Exception
+	{
+		/**
+		 * Parse the expression, so the string value is "canonical".
+		 */
+		if (value != null)
+		{
+			LexTokenReader ltr = new LexTokenReader(value, Dialect.VDM_SL);
+			ltr.nextToken();
+			ExpressionReader er = new ExpressionReader(ltr);
+			ASTExpression exp = er.readExpression();
+			value = exp.toString();
+		}
+
+		Catchpoint catcher = new Catchpoint(value, ++nextbreakpoint);
+		breakpoints.put(nextbreakpoint, catcher);
+		return catcher;
+	}
+
+	/**
 	 * Clear the breakpoint given by the number.
 	 *
 	 * @param bpno The breakpoint number to remove.
@@ -403,7 +451,7 @@ abstract public class Interpreter
 	{
 		Breakpoint old = breakpoints.remove(bpno);
 
-		if (old != null)
+		if (old != null && !(old instanceof Catchpoint))
 		{
 			INStatement stmt = findStatement(old.location.file, old.location.startLine);
 

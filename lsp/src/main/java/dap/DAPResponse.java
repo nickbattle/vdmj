@@ -24,8 +24,6 @@
 
 package dap;
 
-import java.io.IOException;
-
 import json.JSONObject;
 
 public class DAPResponse extends JSONObject
@@ -42,26 +40,12 @@ public class DAPResponse extends JSONObject
 		}
 	}
 	
-	public DAPResponse(JSONObject request) throws IOException
-	{
-		String type = request.get("type");
-		
-		if (!"response".equals(type))
-		{
-			throw new IOException("Expecting type 'request'");
-		}
-		else
-		{
-			putAll(request);
-		}
-	}
-	
 	public DAPResponse(DAPRequest request, boolean success, String message, Object body)
 	{
 		put("type", "response");
 		addSequence();
 		put("request_seq", request.get("seq"));
-		put("command", request.get("command"));
+		put("command", request.getCommand());
 
 		put("success", success);
 		if (message != null) put("message", message);

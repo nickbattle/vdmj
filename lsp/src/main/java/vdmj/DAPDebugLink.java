@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugReason;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
+import com.fujitsu.vdmj.runtime.Catchpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Stoppoint;
@@ -131,6 +132,12 @@ public class DAPDebugLink extends ConsoleDebugLink
 			if (bp instanceof Stoppoint)
 			{
 				reason = "breakpoint";
+				focusHint = false;
+				text = bp.toString();
+			}
+			else if (bp instanceof Catchpoint)
+			{
+				reason = "exception";
 				focusHint = false;
 				text = bp.toString();
 			}

@@ -108,7 +108,7 @@ public class InitExecutor extends AsyncExecutor
 		server.stderr(e.getMessage());
 		server.stdout("Init terminated.\n");
 		manager.clearInterpreter();
-		server.writeMessage(new DAPEvent("terminated", null));
+		server.writeMessage(new DAPResponse("terminated", null));
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public class InitExecutor extends AsyncExecutor
 		if (launchCommand != null)
 		{
 			manager.clearInterpreter();
-			server.writeMessage(new DAPEvent("terminated", null));
+			server.writeMessage(new DAPResponse("terminated", null));
 		}
 	}
 }

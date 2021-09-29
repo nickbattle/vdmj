@@ -31,15 +31,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.runtime.Breakpoint;
+import com.fujitsu.vdmj.runtime.Catchpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 import dap.AsyncExecutor;
-import dap.DAPEvent;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
@@ -105,7 +108,7 @@ public class DAPWorkspaceManager
 		RTLogger.enable(false);
 		DAPMessageList responses = new DAPMessageList();
 		responses.add(new DAPInitializeResponse(request));
-		responses.add(new DAPEvent("initialized", null));
+		responses.add(new DAPResponse("initialized", null));
 		return responses;
 	}
 
@@ -285,8 +288,12 @@ public class DAPWorkspaceManager
 						}
 						else
 						{
-							if (condition != null) Log.error("Ignoring tracepoint condition " + condition);
-							interpreter.setTracepoint(exp, logMessage);
+							if (condition != null)
+							{
+								Log.error("Ignoring tracepoint condition " + condition);
+							}
+							
+							interpreter.setTracepoint(exp, expressionList(logMessage));
 						}
 						
 						results.add(new JSONObject("verified", true));
@@ -302,8 +309,12 @@ public class DAPWorkspaceManager
 					}
 					else
 					{
-						if (condition != null) Log.error("Ignoring tracepoint condition " + condition);
-						interpreter.setTracepoint(stmt, logMessage);
+						if (condition != null)
+						{
+							Log.error("Ignoring tracepoint condition " + condition);
+						}
+						
+						interpreter.setTracepoint(stmt, expressionList(logMessage));
 					}
 
 					results.add(new JSONObject("verified", true));
@@ -316,6 +327,52 @@ public class DAPWorkspaceManager
 		}
 		
 		return new DAPMessageList(request, new JSONObject("breakpoints", results));
+	}
+	
+	public DAPMessageList setExceptionBreakpoints(DAPRequest request, JSONArray filterOptions) throws Exception
+	{
+		for (Catchpoint cp: getInterpreter().getCatchpoints())
+		{
+			interpreter.clearBreakpoint(cp.number);
+		}
+		
+		JSONArray results = new JSONArray();
+
+		for (int i=0; i<filterOptions.size(); i++)
+		{
+			JSONObject filterOption = filterOptions.index(i);
+			String condition = filterOption.get("condition");
+			interpreter.setCatchpoint(condition);
+			results.add(new JSONArray(new JSONObject("verified", true)));
+		}
+
+		return new DAPMessageList(request, new JSONObject("breakpoints", results));
+	}
+
+	private String expressionList(String trace)
+	{
+		// Turn a string like "Weight = {x} kilos" into [ "Weight = ", x, " kilos" ]
+		
+		Pattern p = Pattern.compile("\\{([^{]*)\\}");
+		Matcher m = p.matcher(trace);
+		StringBuffer sb = new StringBuffer();
+		sb.append("[");
+		String sep = "";
+		
+		while(m.find())
+		{
+			sb.append(sep);
+			sb.append(" \"");
+		    m.appendReplacement(sb, "\", " + m.group(1));
+		    sep = ",";
+		}
+		
+		sb.append(sep);
+		sb.append(" \"");
+		m.appendTail(sb);
+		sb.append("\" ]");
+		
+		return sb.toString();
 	}
 	
 	public DAPMessageList evaluate(DAPRequest request, String expression, String context)

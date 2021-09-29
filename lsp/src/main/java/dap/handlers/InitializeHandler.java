@@ -41,11 +41,11 @@ public class InitializeHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		if ("initialize".equals(request.get("command")))
+		if ("initialize".equals(request.getCommand()))
 		{
 			return DAPWorkspaceManager.getInstance().dapInitialize(request);
 		}
-		else if ("configurationDone".equals(request.get("command")))
+		else if ("configurationDone".equals(request.getCommand()))
 		{
 			return DAPWorkspaceManager.getInstance().configurationDone(request);
 		}

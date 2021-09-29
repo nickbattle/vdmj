@@ -34,6 +34,8 @@ import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugType;
 import com.fujitsu.vdmj.debug.TraceCallback;
+import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INSeqEnumExpression;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Tracepoint;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
@@ -133,7 +135,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		DAPResponse dapResponse = null;
 		boolean result = true;
 
-		switch ((String)dapRequest.get("command"))
+		switch (dapRequest.getCommand())
 		{
 			case "threads":
 				server.writeMessage(doThreads(dapRequest));
@@ -141,6 +143,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				break;
 
 			case "setBreakpoints":
+			{
 				JSONObject arguments = dapRequest.get("arguments");
 				JSONObject source = arguments.get("source");
 				File file = Utils.pathToFile(source.get("path"));
@@ -154,6 +157,22 @@ public class DAPDebugReader extends Thread implements TraceCallback
 
 				result = true;
 				break;
+			}
+
+			case "setExceptionBreakpoints":
+			{
+				JSONObject arguments = dapRequest.get("arguments");
+				JSONArray filterOptions = arguments.get("filterOptions");
+				DAPMessageList responses = DAPWorkspaceManager.getInstance().setExceptionBreakpoints(dapRequest, filterOptions);
+
+				for (JSONObject response: responses)
+				{
+					server.writeMessage(response);
+				}
+
+				result = true;
+				break;
+			}
 
 			case "terminate":
 				link.killThreads();
@@ -233,7 +252,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 
 	private DebugCommand parse(DAPRequest request) throws IOException
 	{
-		String command = request.get("command");
+		String command = request.getCommand();
 		JSONObject arguments = request.get("arguments");
 		
 		switch (command)
@@ -320,19 +339,44 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		}
 		else
 		{
-			String result = null;
+			String message = null;
 			
 			try
 			{
-				result = tp.condition.eval(ctxt).toString();
+				// A trace like "Weight = {x} kilos" is [ "Weight = ", x, " kilos" ]
+				
+				if (tp.condition instanceof INSeqEnumExpression)
+				{
+					INSeqEnumExpression seq = (INSeqEnumExpression)tp.condition;
+					StringBuilder sb = new StringBuilder();
+					
+					for (INExpression exp: seq.members)
+					{
+						String v = exp.eval(ctxt).toString();
+						
+						if (v.startsWith("\""))
+						{
+							sb.append(v.substring(1, v.length()-1));
+						}
+						else if (!exp.toString().equals("\"\""))
+						{
+							sb.append(v);
+						}
+					}
+					
+					message = sb.toString();
+				}
+				else
+				{
+					message = tp.trace + " = " + tp.condition.eval(ctxt).toString();
+				}
 			}
 			catch (Exception e)
 			{
-				result = e.getMessage();
+				message = e.getMessage();
 			}
 			
-			String s = tp.trace + " = " + result + " at trace point " + tp.location + "\n";
-			server.stdout(Thread.currentThread().getName() + ": " + s);
+			server.stdout(Thread.currentThread().getName() + ": " + message + "\n");
 		}
 	}
 }

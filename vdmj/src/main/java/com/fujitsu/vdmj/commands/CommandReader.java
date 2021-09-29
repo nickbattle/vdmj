@@ -223,6 +223,10 @@ abstract public class CommandReader
 				{
 					carryOn = doBreak(line);
 				}
+				else if (line.startsWith("catch"))
+				{
+					carryOn = doCatch(line);
+				}
 				else if (line.equals("list"))
 				{
 					carryOn = doList(line);
@@ -1335,6 +1339,12 @@ abstract public class CommandReader
 		return true;
 	}
 
+	protected boolean doCatch(String line) throws Exception
+	{
+		bpreader.doCatch(line);
+		return true;
+	}
+
 	protected boolean doAssert(String line)
 	{
 		File filename = null;
@@ -1558,6 +1568,7 @@ abstract public class CommandReader
 		println("break <function/operation> [<condition>] - create a breakpoint");
 		println("trace [<file>:]<line#> [<exp>] - create a tracepoint");
 		println("trace <function/operation> [<exp>] - create a tracepoint");
+		println("catch [<exp>] - create an exception catchpoint");
 		println("remove <breakpoint#> - remove a trace/breakpoint");
 		println("list - list breakpoints");
 		println("coverage clear|write <dir>|merge <dir>|<filenames> - handle line coverage");
