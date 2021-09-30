@@ -26,6 +26,8 @@ package com.fujitsu.vdmj.runtime;
 
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.types.TCClassType;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -57,10 +59,10 @@ public class Catchpoint extends Breakpoint
 	{
 		boolean matched = false;
 		
-		if (thrown instanceof ObjectValue)		// Just use the class name
+		if (thrown instanceof ObjectValue)
 		{
 			ObjectValue obj = (ObjectValue)thrown;
-			matched = obj.type.name.getName().equals(value);
+			matched = hasSupertype(obj.type, value);	// Just use the class name
 		}
 		else
 		{
@@ -88,5 +90,27 @@ public class Catchpoint extends Breakpoint
 	public String toString()
 	{
 		return "catch [" + number + "] " + (value == null ? "(all exceptions)" : "value = " + value);
+	}
+	
+	private boolean hasSupertype(TCClassType type, String name)
+	{
+		if (type.name.getName().equals(name))
+		{
+			return true;
+		}
+		else
+		{
+			for (TCType stype: type.classdef.supertypes)
+			{
+				TCClassType sclass = (TCClassType)stype;
+
+				if (hasSupertype(sclass, name))
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }
