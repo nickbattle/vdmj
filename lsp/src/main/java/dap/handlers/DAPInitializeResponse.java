@@ -53,7 +53,7 @@ public class DAPInitializeResponse extends DAPResponse
 		cap.put("exceptionBreakpointFilters",
 				new JSONArray(
 					new JSONObject(
-						"filter",				"VDM Exceptions",
+						"filter",				"VDM_Exceptions",	// NB. no spaces!
 						"label",				"VDM Exceptions",
 						"description",			"Catch VDM exit statements. By default, catches all exception values.",
 						"supportsCondition",	true,

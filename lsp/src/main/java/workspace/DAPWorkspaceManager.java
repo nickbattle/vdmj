@@ -337,31 +337,40 @@ public class DAPWorkspaceManager
 		}
 		
 		JSONArray results = new JSONArray();
-
-		for (int i=0; i<filterOptions.size(); i++)
+		
+		if (filterOptions == null)
 		{
-			JSONObject filterOption = filterOptions.index(i);
-			
-			if (filterOption.get("filterId").equals("VDM Exceptions"))
+			String error = "No filterOptions";
+			Log.error(error);
+			results.add(new JSONObject("verified", false, "message", error));
+		}
+		else
+		{
+			for (int i=0; i<filterOptions.size(); i++)
 			{
-				try
+				JSONObject filterOption = filterOptions.index(i);
+				
+				if (filterOption.get("filterId").equals("VDM_Exceptions"))
 				{
-					String condition = filterOption.get("condition");
-					interpreter.setCatchpoint(condition);
-					results.add(new JSONObject("verified", true));
+					try
+					{
+						String condition = filterOption.get("condition");
+						interpreter.setCatchpoint(condition);
+						results.add(new JSONObject("verified", true));
+					}
+					catch (Exception e)
+					{
+						String error = "Illegal condition: " + e.getMessage(); 
+						Log.error(error);
+						results.add(new JSONObject("verified", false, "message", error));
+					}
 				}
-				catch (Exception e)
+				else
 				{
-					String error = "Illegal condition: " + e.getMessage(); 
+					String error = "Unknown filterOption Id " + filterOption.get("filterId");
 					Log.error(error);
 					results.add(new JSONObject("verified", false, "message", error));
 				}
-			}
-			else
-			{
-				String error = "Unknown filterOption Id " + filterOption.get("filterId");
-				Log.error(error);
-				results.add(new JSONObject("verified", false, "message", error));
 			}
 		}
 
