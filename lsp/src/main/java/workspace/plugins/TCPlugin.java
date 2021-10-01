@@ -96,6 +96,8 @@ abstract public class TCPlugin extends AnalysisPlugin
 	
 	abstract public void saveDependencies(File saveUri) throws IOException;
 
+	abstract public JSONArray documentLenses(File file);
+
 	/**
 	 * Common methods for hierarchical outlines.
 	 */

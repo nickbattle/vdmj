@@ -845,6 +845,13 @@ public class LSPWorkspaceManager
 		return new RPCMessageList(request, results);
 	}
 	
+	public RPCMessageList codeLens(RPCRequest request, File file)
+	{
+		TCPlugin tc = registry.getPlugin("TC");
+		JSONArray lenses = tc.documentLenses(file);
+		return new RPCMessageList(request, lenses);
+	}
+
 	/**
 	 * Fix the "range" fields of the DocumentSymbol array passed in, such that each
 	 * range starts at the selectionRange and ends at the start of the next symbol,

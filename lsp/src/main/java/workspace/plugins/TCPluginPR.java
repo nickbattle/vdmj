@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.util.DependencyOrder;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
 
@@ -201,5 +202,38 @@ public class TCPluginPR extends TCPlugin
 			order.classOrder(tcClassList);
 			order.graphOf(saveUri);
 		}
+	}
+
+	@Override
+	public JSONArray documentLenses(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (!tcClassList.isEmpty())	// May be syntax errors
+		{
+			for (TCClassDefinition clazz: tcClassList)
+			{
+				if (clazz.name.getLocation().file.equals(file))
+				{
+					for (TCDefinition def: clazz.definitions)
+					{
+						if (def.isCallableFunction() || def.isCallableOperation())
+						{
+							results.add(
+									new JSONObject(
+										"range", Utils.lexLocationToRange(def.location),
+										"command", new JSONObject("title", "Launch", "command", "???")));
+								
+								results.add(
+									new JSONObject(
+										"range", Utils.lexLocationToRange(def.location),
+										"command", new JSONObject("title", "Debug", "command", "???")));
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
 	}
 }

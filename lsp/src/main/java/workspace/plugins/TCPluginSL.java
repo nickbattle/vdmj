@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.util.DependencyOrder;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
 
@@ -212,5 +213,38 @@ public class TCPluginSL extends TCPlugin
 			order.moduleOrder(tcModuleList);
 			order.graphOf(saveUri);
 		}
+	}
+
+	@Override
+	public JSONArray documentLenses(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (!tcModuleList.isEmpty())
+		{
+			for (TCModule module: tcModuleList)
+			{
+				if (module.files.contains(file))
+				{
+					for (TCDefinition def: module.defs)
+					{
+						if (def.isCallableFunction() || def.isCallableOperation())
+						{
+							results.add(
+								new JSONObject(
+									"range", Utils.lexLocationToRange(def.location),
+									"command", new JSONObject("title", "Launch", "command", "???")));
+							
+							results.add(
+								new JSONObject(
+									"range", Utils.lexLocationToRange(def.location),
+									"command", new JSONObject("title", "Debug", "command", "???")));
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
 	}
 }
