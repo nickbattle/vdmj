@@ -43,12 +43,12 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 import dap.AsyncExecutor;
+import dap.DAPInitializeResponse;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.DAPServer;
 import dap.InitExecutor;
-import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPException;

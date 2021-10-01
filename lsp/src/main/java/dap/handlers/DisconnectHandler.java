@@ -65,7 +65,7 @@ public class DisconnectHandler extends DAPHandler
 		{
 			JSONObject arguments = request.get("arguments");
 			Boolean terminateDebuggee = Utils.getBoolean(arguments, "terminateDebuggee");
-			return DAPWorkspaceManager.getInstance().disconnect(request, terminateDebuggee);
+			return manager.disconnect(request, terminateDebuggee);
 		}
 	}
 }

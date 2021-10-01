@@ -22,10 +22,8 @@
  *
  ******************************************************************************/
 
-package dap.handlers;
+package dap;
 
-import dap.DAPRequest;
-import dap.DAPResponse;
 import json.JSONArray;
 import json.JSONObject;
 
