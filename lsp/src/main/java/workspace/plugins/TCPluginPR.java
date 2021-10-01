@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -219,15 +220,22 @@ public class TCPluginPR extends TCPlugin
 					{
 						if (def.isCallableFunction() || def.isCallableOperation())
 						{
-							results.add(
+							if (def.accessSpecifier.access == Token.PUBLIC)
+							{
+								results.add(
 									new JSONObject(
 										"range", Utils.lexLocationToRange(def.location),
-										"command", new JSONObject("title", "Launch", "command", "???")));
+										"command", new JSONObject(
+												"title", "Launch",
+												"command", "workbench.action.debug.configure")));
 								
 								results.add(
 									new JSONObject(
 										"range", Utils.lexLocationToRange(def.location),
-										"command", new JSONObject("title", "Debug", "command", "???")));
+										"command", new JSONObject(
+												"title", "Debug",
+												"command", "workbench.action.debug.configure")));
+							}
 						}
 					}
 				}

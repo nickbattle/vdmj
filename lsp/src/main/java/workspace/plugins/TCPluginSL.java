@@ -233,12 +233,16 @@ public class TCPluginSL extends TCPlugin
 							results.add(
 								new JSONObject(
 									"range", Utils.lexLocationToRange(def.location),
-									"command", new JSONObject("title", "Launch", "command", "???")));
+									"command", new JSONObject(
+											"title", "Launch",
+											"command", "workbench.action.debug.configure")));
 							
 							results.add(
 								new JSONObject(
 									"range", Utils.lexLocationToRange(def.location),
-									"command", new JSONObject("title", "Debug", "command", "???")));
+									"command", new JSONObject(
+											"title", "Debug",
+											"command", "workbench.action.debug.configure")));
 						}
 					}
 				}
