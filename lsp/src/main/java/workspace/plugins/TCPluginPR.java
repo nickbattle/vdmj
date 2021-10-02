@@ -45,6 +45,7 @@ import json.JSONObject;
 import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
+import workspace.LSPWorkspaceManager;
 
 public class TCPluginPR extends TCPlugin
 {
@@ -209,6 +210,7 @@ public class TCPluginPR extends TCPlugin
 	public JSONArray documentLenses(File file)
 	{
 		JSONArray results = new JSONArray();
+		String name = LSPWorkspaceManager.getInstance().getClientInfo("name");
 		
 		if (!tcClassList.isEmpty())	// May be syntax errors
 		{
@@ -218,27 +220,47 @@ public class TCPluginPR extends TCPlugin
 				{
 					for (TCDefinition def: clazz.definitions)
 					{
-						if (def.isCallableFunction() || def.isCallableOperation())
+						if (def.location.file.equals(file))
 						{
-							if (def.accessSpecifier.access == Token.PUBLIC)
+							if ("vscode".equals(name))
 							{
-								results.add(
-									new JSONObject(
-										"range", Utils.lexLocationToRange(def.location),
-										"command", new JSONObject(
-												"title", "Launch",
-												"command", "workbench.action.debug.configure")));
-								
-								results.add(
-									new JSONObject(
-										"range", Utils.lexLocationToRange(def.location),
-										"command", new JSONObject(
-												"title", "Debug",
-												"command", "workbench.action.debug.configure")));
+								results.addAll(launchDebugLensVSCode(def));
 							}
+							
+							// etc for other lenses...
 						}
 					}
 				}
+			}
+		}
+		
+		return results;
+	}
+	
+	/**
+	 * Note this lens is VSCode specific, because it includes a VSCode command.
+	 */
+	private JSONArray launchDebugLensVSCode(TCDefinition def)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (def.isCallableFunction() || def.isCallableOperation())
+		{
+			if (def.accessSpecifier.access == Token.PUBLIC)	// Not private or protected
+			{
+				results.add(
+					new JSONObject(
+						"range", Utils.lexLocationToRange(def.location),
+						"command", new JSONObject(
+								"title", "Launch",
+								"command", "workbench.action.debug.configure")));
+					
+				results.add(
+					new JSONObject(
+						"range", Utils.lexLocationToRange(def.location),
+						"command", new JSONObject(
+								"title", "Debug",
+								"command", "workbench.action.debug.configure")));
 			}
 		}
 		

@@ -28,6 +28,11 @@ import rpc.RPCRequest;
 import rpc.RPCResponse;
 import workspace.LSPWorkspaceManager;
 import workspace.Log;
+
+import java.io.File;
+import java.net.URISyntaxException;
+
+import json.JSONObject;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 
@@ -56,7 +61,25 @@ public class InitializeHandler extends LSPHandler
 	
 	private RPCMessageList initialize(RPCRequest request)
 	{
-		return LSPWorkspaceManager.getInstance().lspInitialize(request);
+		try
+		{
+			JSONObject params = request.get("params");
+			JSONObject clientInfo = params.get("clientInfo");
+			File rootUri = Utils.uriToFile(params.get("rootUri"));
+			JSONObject clientCapabilities = params.get("capabilities");
+	
+			return LSPWorkspaceManager.getInstance().lspInitialize(request, clientInfo, rootUri, clientCapabilities);
+		}
+		catch (URISyntaxException e)
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
 	}
 
 	private RPCMessageList initialized(RPCRequest request)

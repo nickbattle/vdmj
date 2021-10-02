@@ -67,6 +67,7 @@ public class DAPWorkspaceManager
 	private static DAPWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
 	
+	private JSONObject clientCapabilities;
 	private Boolean noDebug;
 	private Interpreter interpreter;
 	private String launchCommand;
@@ -103,9 +104,10 @@ public class DAPWorkspaceManager
 	 * DAP methods...
 	 */
 
-	public DAPMessageList dapInitialize(DAPRequest request)
+	public DAPMessageList dapInitialize(DAPRequest request, JSONObject clientCapabilities)
 	{
 		RTLogger.enable(false);
+		this.clientCapabilities = clientCapabilities;
 		DAPMessageList responses = new DAPMessageList();
 		responses.add(new DAPInitializeResponse(request));
 		responses.add(new DAPResponse("initialized", null));
@@ -155,6 +157,29 @@ public class DAPWorkspaceManager
 		finally
 		{
 			launchCommand = null;
+		}
+	}
+
+	public boolean hasClientCapability(String dotName)
+	{
+		Boolean cap = getClientCapability(dotName);
+		return cap != null && cap;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getClientCapability(String dotName)
+	{
+		T capability = clientCapabilities.getPath(dotName);
+		
+		if (capability != null)
+		{
+			Log.printf("Client capability %s = %s", dotName, capability);
+			return capability;
+		}
+		else
+		{
+			Log.printf("Missing client capability: %s", dotName);
+			return null;
 		}
 	}
 

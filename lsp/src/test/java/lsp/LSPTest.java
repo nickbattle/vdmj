@@ -61,11 +61,8 @@ abstract public class LSPTest
 	
 	protected RPCMessageList initialize(File root, JSONObject capabilities) throws Exception
 	{
-		JSONObject params = new JSONObject(
-				"rootUri",		root.toURI().toString(),
-				"capabilities",	capabilities);
-		
-		RPCMessageList result = lspManager.lspInitialize(RPCRequest.create("initialize", params));
+		RPCMessageList result = lspManager.lspInitialize(RPCRequest.create("initialize", null),
+				new JSONObject(), root.getAbsoluteFile(), capabilities);
 		assertEquals("init result", (Object)null, result.get(0).get("error"));		
 		
 		return lspManager.afterChangeWatchedFiles(null, 1);	// Cause parse and typecheck

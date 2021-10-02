@@ -32,7 +32,6 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -84,6 +83,7 @@ public class LSPWorkspaceManager
 	protected final PluginRegistry registry;
 	protected final LSPMessageUtils messages;
 
+	private JSONObject clientInfo;
 	private JSONObject clientCapabilities;
 	private File rootUri = null;
 	private Map<File, StringBuilder> projectFiles = new LinkedHashMap<File, StringBuilder>();
@@ -149,30 +149,19 @@ public class LSPWorkspaceManager
 	 * LSP methods...
 	 */
 	
-	public RPCMessageList lspInitialize(RPCRequest request)
+	public RPCMessageList lspInitialize(RPCRequest request, JSONObject clientInfo, File rootUri, JSONObject clientCapabilities)
+		throws IOException
 	{
-		try
-		{
-			JSONObject params = request.get("params");
-			rootUri = Utils.uriToFile(params.get("rootUri"));
-			clientCapabilities = params.get("capabilities");
-			openFiles.clear();
-			System.setProperty("vdmj.parser.tabstop", "1");	// Forced, for LSP location offsets
-			Properties.init();
-			loadAllProjectFiles();
-			
-			return new RPCMessageList(request, new LSPInitializeResponse());
-		}
-		catch (URISyntaxException e)
-		{
-			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.InvalidRequest, "Malformed URI");
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
+		this.clientInfo = clientInfo;
+		this.rootUri = rootUri;
+		this.clientCapabilities = clientCapabilities;
+		this.openFiles.clear();
+		
+		System.setProperty("vdmj.parser.tabstop", "1");	// Forced, for LSP location offsets
+		Properties.init();
+		loadAllProjectFiles();
+		
+		return new RPCMessageList(request, new LSPInitializeResponse());
 	}
 
 	public RPCMessageList lspInitialized(RPCRequest request)
@@ -212,6 +201,11 @@ public class LSPWorkspaceManager
 			Log.printf("Missing client capability: %s", dotName);
 			return null;
 		}
+	}
+	
+	public <T> T getClientInfo(String key)
+	{
+		return clientInfo.get(key);
 	}
 
 	private RPCRequest lspDynamicRegistrations()
