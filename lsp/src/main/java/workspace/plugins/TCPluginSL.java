@@ -224,9 +224,9 @@ public class TCPluginSL extends TCPlugin
 		{
 			for (TCModule module: tcModuleList)
 			{
-				if (module.files.contains(file))
+				for (TCDefinition def: module.defs)
 				{
-					for (TCDefinition def: module.defs)
+					if (def.location.file.equals(file))
 					{
 						if (def.isCallableFunction() || def.isCallableOperation())
 						{
