@@ -70,6 +70,17 @@ public class JSONObject extends LinkedHashMap<String, Object>	// Order preservin
 	}
 	
 	@SuppressWarnings("unchecked")
+	public <T> T get(String name, T defvalue)
+	{
+		if (containsKey(name))
+		{
+			return(T)super.get(name);
+		}
+		
+		return defvalue;
+	}
+	
+	@SuppressWarnings("unchecked")
 	public <T> T getPath(String dotName)
 	{
 		int dot = dotName.indexOf('.');
