@@ -44,15 +44,10 @@ public class LaunchHandler extends DAPHandler
 		try
 		{
 			JSONObject arguments = request.get("arguments");
-			Boolean noDebug = arguments.get("noDebug");
+			Boolean noDebug = arguments.get("noDebug", false);
 			String defaultName = arguments.get("defaultName");
 			String command = arguments.get("command");
 			
-			if (noDebug == null)
-			{
-				noDebug = Boolean.FALSE;
-			}
-
 			return DAPWorkspaceManager.getInstance().launch(request, noDebug, defaultName, command);
 		}
 		catch (Exception e)
