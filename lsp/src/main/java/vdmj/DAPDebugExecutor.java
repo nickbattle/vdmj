@@ -307,8 +307,8 @@ public class DAPDebugExecutor implements DebugExecutor
 	private DebugCommand doStack(DebugCommand command)
 	{
 		JSONObject arguments = (JSONObject) command.getPayload();
-		long startFrame = arguments.get("startFrame");
-		long levels = arguments.get("levels");
+		Long startFrame = arguments.get("startFrame", 0L);
+		Long levels = arguments.get("levels", 0L);
 		
 		JSONArray frames = new JSONArray();
 		int frameId = topFrameId;
@@ -320,7 +320,7 @@ public class DAPDebugExecutor implements DebugExecutor
 			
 			if (frame != null)	// vscode bug? Sometimes sends late? request for invalid frameId
 			{
-				if (totalFrames >= startFrame && frames.size() < levels)
+				if (totalFrames >= startFrame && (frames.size() < levels || levels == 0))
 				{
 					frames.add(new JSONObject(
 							"id",		frame.frameId,
