@@ -66,7 +66,7 @@ public class TerminateHandler extends DAPHandler
 		{
 			JSONObject arguments = request.get("arguments");
 			Boolean restart = arguments.get("restart");
-			DAPMessageList result = DAPWorkspaceManager.getInstance().terminate(request, restart);
+			DAPMessageList result = manager.terminate(request, restart);
 			DAPServer.getInstance().setRunning(false);
 			return result;
 		}

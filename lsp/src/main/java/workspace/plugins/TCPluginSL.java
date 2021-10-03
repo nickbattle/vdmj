@@ -41,8 +41,10 @@ import com.fujitsu.vdmj.util.DependencyOrder;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
+import workspace.LSPWorkspaceManager;
 
 public class TCPluginSL extends TCPlugin
 {
@@ -212,5 +214,59 @@ public class TCPluginSL extends TCPlugin
 			order.moduleOrder(tcModuleList);
 			order.graphOf(saveUri);
 		}
+	}
+
+	@Override
+	public JSONArray documentLenses(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (!tcModuleList.isEmpty())
+		{
+			for (TCModule module: tcModuleList)
+			{
+				for (TCDefinition def: module.defs)
+				{
+					if (def.location.file.equals(file))
+					{
+						results.addAll(launchDebugLensVSCode(def));
+						// etc for other lenses...
+					}
+				}
+			}
+		}
+		
+		return results;
+	}
+	
+	/**
+	 * Note this lens is VSCode specific, because it includes a VSCode command.
+	 */
+	private JSONArray launchDebugLensVSCode(TCDefinition def)
+	{
+		JSONArray results = new JSONArray();
+		String name = LSPWorkspaceManager.getInstance().getClientInfo("name");
+		
+		if ("vscode".equals(name))
+		{
+			if (def.isCallableFunction() || def.isCallableOperation())
+			{
+				results.add(
+					new JSONObject(
+						"range", Utils.lexLocationToRange(def.location),
+						"command", new JSONObject(
+								"title", "Launch",
+								"command", "workbench.action.debug.configure")));
+					
+				results.add(
+					new JSONObject(
+						"range", Utils.lexLocationToRange(def.location),
+						"command", new JSONObject(
+								"title", "Debug",
+								"command", "workbench.action.debug.configure")));
+			}
+		}
+		
+		return results;
 	}
 }

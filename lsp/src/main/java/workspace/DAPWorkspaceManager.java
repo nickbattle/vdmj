@@ -43,12 +43,12 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 import dap.AsyncExecutor;
+import dap.DAPInitializeResponse;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.DAPServer;
 import dap.InitExecutor;
-import dap.handlers.DAPInitializeResponse;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPException;
@@ -67,6 +67,7 @@ public class DAPWorkspaceManager
 	private static DAPWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
 	
+	private JSONObject clientCapabilities;
 	private Boolean noDebug;
 	private Interpreter interpreter;
 	private String launchCommand;
@@ -103,9 +104,10 @@ public class DAPWorkspaceManager
 	 * DAP methods...
 	 */
 
-	public DAPMessageList dapInitialize(DAPRequest request)
+	public DAPMessageList dapInitialize(DAPRequest request, JSONObject clientCapabilities)
 	{
 		RTLogger.enable(false);
+		this.clientCapabilities = clientCapabilities;
 		DAPMessageList responses = new DAPMessageList();
 		responses.add(new DAPInitializeResponse(request));
 		responses.add(new DAPResponse("initialized", null));
@@ -155,6 +157,29 @@ public class DAPWorkspaceManager
 		finally
 		{
 			launchCommand = null;
+		}
+	}
+
+	public boolean hasClientCapability(String dotName)
+	{
+		Boolean cap = getClientCapability(dotName);
+		return cap != null && cap;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getClientCapability(String dotName)
+	{
+		T capability = clientCapabilities.getPath(dotName);
+		
+		if (capability != null)
+		{
+			Log.printf("Client capability %s = %s", dotName, capability);
+			return capability;
+		}
+		else
+		{
+			Log.printf("Missing client capability: %s", dotName);
+			return null;
 		}
 	}
 
@@ -337,31 +362,40 @@ public class DAPWorkspaceManager
 		}
 		
 		JSONArray results = new JSONArray();
-
-		for (int i=0; i<filterOptions.size(); i++)
+		
+		if (filterOptions == null)
 		{
-			JSONObject filterOption = filterOptions.index(i);
-			
-			if (filterOption.get("filterId").equals("VDM Exceptions"))
+			String error = "No filterOptions";
+			Log.error(error);
+			results.add(new JSONObject("verified", false, "message", error));
+		}
+		else
+		{
+			for (int i=0; i<filterOptions.size(); i++)
 			{
-				try
+				JSONObject filterOption = filterOptions.index(i);
+				
+				if (filterOption.get("filterId").equals("VDM_Exceptions"))
 				{
-					String condition = filterOption.get("condition");
-					interpreter.setCatchpoint(condition);
-					results.add(new JSONObject("verified", true));
+					try
+					{
+						String condition = filterOption.get("condition");
+						interpreter.setCatchpoint(condition);
+						results.add(new JSONObject("verified", true));
+					}
+					catch (Exception e)
+					{
+						String error = "Illegal condition: " + e.getMessage(); 
+						Log.error(error);
+						results.add(new JSONObject("verified", false, "message", error));
+					}
 				}
-				catch (Exception e)
+				else
 				{
-					String error = "Illegal condition: " + e.getMessage(); 
+					String error = "Unknown filterOption Id " + filterOption.get("filterId");
 					Log.error(error);
 					results.add(new JSONObject("verified", false, "message", error));
 				}
-			}
-			else
-			{
-				String error = "Unknown filterOption Id " + filterOption.get("filterId");
-				Log.error(error);
-				results.add(new JSONObject("verified", false, "message", error));
 			}
 		}
 

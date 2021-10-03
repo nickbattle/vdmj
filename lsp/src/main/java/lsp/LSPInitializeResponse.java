@@ -55,6 +55,9 @@ public class LSPInitializeResponse extends JSONObject
 				"change", 2		// incremental
 			));
 		
+		cap.put("codeLensProvider",
+			new JSONObject("resolveProvider", false));
+		
 		cap.put("experimental",
 				new JSONObject(
 					"proofObligationProvider", true,

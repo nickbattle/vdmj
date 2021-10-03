@@ -25,11 +25,12 @@
 package dap.handlers;
 
 import java.io.IOException;
-
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
+import json.JSONObject;
 import workspace.DAPWorkspaceManager;
+import workspace.Log;
 
 public class InitializeHandler extends DAPHandler
 {
@@ -43,13 +44,40 @@ public class InitializeHandler extends DAPHandler
 	{
 		if ("initialize".equals(request.getCommand()))
 		{
-			return DAPWorkspaceManager.getInstance().dapInitialize(request);
+			return initialize(request);
 		}
 		else if ("configurationDone".equals(request.getCommand()))
 		{
-			return DAPWorkspaceManager.getInstance().configurationDone(request);
+			return configurationDone(request);
 		}
 		
 		return new DAPMessageList(request, false, "Unexpected initialise message", null);
+	}
+	
+	private DAPMessageList initialize(DAPRequest request)
+	{
+		try
+		{
+			JSONObject arguments = request.get("arguments");
+			return DAPWorkspaceManager.getInstance().dapInitialize(request, arguments);
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new DAPMessageList(request, false, e.getMessage(), null);
+		}
+	}
+	
+	private DAPMessageList configurationDone(DAPRequest request)
+	{
+		try
+		{
+			return DAPWorkspaceManager.getInstance().configurationDone(request);
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new DAPMessageList(request, false, e.getMessage(), null);
+		}
 	}
 }

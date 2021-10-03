@@ -38,6 +38,7 @@ import json.JSONServer;
 import lsp.lspx.CTHandler;
 import lsp.lspx.POGHandler;
 import lsp.lspx.TranslateHandler;
+import lsp.textdocument.CodeLensHandler;
 import lsp.textdocument.CompletionHandler;
 import lsp.textdocument.DefinitionHandler;
 import lsp.textdocument.DidChangeHandler;
@@ -101,6 +102,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register(new DefinitionHandler(), "textDocument/definition");
 		dispatcher.register(new DocumentSymbolHandler(), "textDocument/documentSymbol");
 		dispatcher.register(new CompletionHandler(), "textDocument/completion");
+		dispatcher.register(new CodeLensHandler(), "textDocument/codeLens");
 
 		dispatcher.register(new DidChangeWSHandler(), "workspace/didChangeWatchedFiles");
 

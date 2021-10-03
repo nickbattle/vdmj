@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -41,8 +42,10 @@ import com.fujitsu.vdmj.util.DependencyOrder;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
+import workspace.LSPWorkspaceManager;
 
 public class TCPluginPR extends TCPlugin
 {
@@ -201,5 +204,65 @@ public class TCPluginPR extends TCPlugin
 			order.classOrder(tcClassList);
 			order.graphOf(saveUri);
 		}
+	}
+
+	@Override
+	public JSONArray documentLenses(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (!tcClassList.isEmpty())	// May be syntax errors
+		{
+			for (TCClassDefinition clazz: tcClassList)
+			{
+				if (clazz.name.getLocation().file.equals(file))
+				{
+					for (TCDefinition def: clazz.definitions)
+					{
+						if (def.location.file.equals(file))
+						{
+							results.addAll(launchDebugLensVSCode(def));
+							// etc for other lenses...
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
+	}
+	
+	/**
+	 * Note this lens is VSCode specific, because it includes a VSCode command.
+	 */
+	private JSONArray launchDebugLensVSCode(TCDefinition def)
+	{
+		JSONArray results = new JSONArray();
+		String name = LSPWorkspaceManager.getInstance().getClientInfo("name");
+		
+		if ("vscode".equals(name))
+		{
+			if (def.isCallableFunction() || def.isCallableOperation())
+			{
+				if (def.accessSpecifier.access == Token.PUBLIC)	// Not private or protected
+				{
+					results.add(
+						new JSONObject(
+							"range", Utils.lexLocationToRange(def.location),
+							"command", new JSONObject(
+									"title", "Launch",
+									"command", "workbench.action.debug.configure")));
+						
+					results.add(
+						new JSONObject(
+							"range", Utils.lexLocationToRange(def.location),
+							"command", new JSONObject(
+									"title", "Debug",
+									"command", "workbench.action.debug.configure")));
+				}
+			}
+		}
+		
+		return results;
 	}
 }

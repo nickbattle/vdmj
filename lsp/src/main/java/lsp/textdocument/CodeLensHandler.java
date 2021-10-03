@@ -22,23 +22,23 @@
  *
  ******************************************************************************/
 
-package lsp;
-
-import rpc.RPCRequest;
-import rpc.RPCResponse;
-import workspace.LSPWorkspaceManager;
-import workspace.Log;
+package lsp.textdocument;
 
 import java.io.File;
 import java.net.URISyntaxException;
 
 import json.JSONObject;
+import lsp.LSPHandler;
+import lsp.Utils;
+import rpc.RPCRequest;
+import workspace.LSPWorkspaceManager;
+import workspace.Log;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 
-public class InitializeHandler extends LSPHandler
+public class CodeLensHandler extends LSPHandler
 {
-	public InitializeHandler()
+	public CodeLensHandler()
 	{
 		super();
 	}
@@ -46,29 +46,13 @@ public class InitializeHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		switch (request.getMethod())
-		{
-			case "initialize":
-				return initialize(request);
-
-			case "initialized":
-				return initialized(request);
-		
-			default:
-				return new RPCMessageList(request, RPCErrors.InternalError, "Unexpected initialize message");
-		}
-	}
-	
-	private RPCMessageList initialize(RPCRequest request)
-	{
 		try
 		{
 			JSONObject params = request.get("params");
-			JSONObject clientInfo = params.get("clientInfo");
-			File rootUri = Utils.uriToFile(params.get("rootUri"));
-			JSONObject clientCapabilities = params.get("capabilities");
-	
-			return LSPWorkspaceManager.getInstance().lspInitialize(request, clientInfo, rootUri, clientCapabilities);
+			JSONObject textDocument = params.get("textDocument");
+			File file = Utils.uriToFile(textDocument.get("uri"));
+			
+			return LSPWorkspaceManager.getInstance().codeLens(request, file);
 		}
 		catch (URISyntaxException e)
 		{
@@ -80,18 +64,5 @@ public class InitializeHandler extends LSPHandler
 			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
-	}
-
-	private RPCMessageList initialized(RPCRequest request)
-	{
-		LSPServer.getInstance().setInitialized(true);
-		return LSPWorkspaceManager.getInstance().lspInitialized(request);
-	}
-
-	@Override
-	public void response(RPCResponse message)
-	{
-		// Response to dynamic registrations
-		Log.printf("Response to id %d received", (Long)message.get("id"));
 	}
 }

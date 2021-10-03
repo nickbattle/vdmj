@@ -104,7 +104,7 @@ public class SetBreakpointsHandler extends DAPHandler
 			{
 				JSONObject arguments = request.get("arguments");
 				JSONArray filterOptions = arguments.get("filterOptions");
-				return DAPWorkspaceManager.getInstance().setExceptionBreakpoints(request, filterOptions);
+				return manager.setExceptionBreakpoints(request, filterOptions);
 			}
 		}
 		catch (Exception e)
