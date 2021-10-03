@@ -220,7 +220,6 @@ public class TCPluginSL extends TCPlugin
 	public JSONArray documentLenses(File file)
 	{
 		JSONArray results = new JSONArray();
-		String name = LSPWorkspaceManager.getInstance().getClientInfo("name");
 		
 		if (!tcModuleList.isEmpty())
 		{
@@ -230,11 +229,7 @@ public class TCPluginSL extends TCPlugin
 				{
 					if (def.location.file.equals(file))
 					{
-						if ("vscode".equals(name))
-						{
-							results.addAll(launchDebugLensVSCode(def));
-						}
-						
+						results.addAll(launchDebugLensVSCode(def));
 						// etc for other lenses...
 					}
 				}
@@ -250,22 +245,26 @@ public class TCPluginSL extends TCPlugin
 	private JSONArray launchDebugLensVSCode(TCDefinition def)
 	{
 		JSONArray results = new JSONArray();
+		String name = LSPWorkspaceManager.getInstance().getClientInfo("name");
 		
-		if (def.isCallableFunction() || def.isCallableOperation())
+		if ("vscode".equals(name))
 		{
-			results.add(
-				new JSONObject(
-					"range", Utils.lexLocationToRange(def.location),
-					"command", new JSONObject(
-							"title", "Launch",
-							"command", "workbench.action.debug.configure")));
-				
-			results.add(
-				new JSONObject(
-					"range", Utils.lexLocationToRange(def.location),
-					"command", new JSONObject(
-							"title", "Debug",
-							"command", "workbench.action.debug.configure")));
+			if (def.isCallableFunction() || def.isCallableOperation())
+			{
+				results.add(
+					new JSONObject(
+						"range", Utils.lexLocationToRange(def.location),
+						"command", new JSONObject(
+								"title", "Launch",
+								"command", "workbench.action.debug.configure")));
+					
+				results.add(
+					new JSONObject(
+						"range", Utils.lexLocationToRange(def.location),
+						"command", new JSONObject(
+								"title", "Debug",
+								"command", "workbench.action.debug.configure")));
+			}
 		}
 		
 		return results;

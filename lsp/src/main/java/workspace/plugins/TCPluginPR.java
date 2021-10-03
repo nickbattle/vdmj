@@ -210,7 +210,6 @@ public class TCPluginPR extends TCPlugin
 	public JSONArray documentLenses(File file)
 	{
 		JSONArray results = new JSONArray();
-		String name = LSPWorkspaceManager.getInstance().getClientInfo("name");
 		
 		if (!tcClassList.isEmpty())	// May be syntax errors
 		{
@@ -222,11 +221,7 @@ public class TCPluginPR extends TCPlugin
 					{
 						if (def.location.file.equals(file))
 						{
-							if ("vscode".equals(name))
-							{
-								results.addAll(launchDebugLensVSCode(def));
-							}
-							
+							results.addAll(launchDebugLensVSCode(def));
 							// etc for other lenses...
 						}
 					}
@@ -243,24 +238,28 @@ public class TCPluginPR extends TCPlugin
 	private JSONArray launchDebugLensVSCode(TCDefinition def)
 	{
 		JSONArray results = new JSONArray();
+		String name = LSPWorkspaceManager.getInstance().getClientInfo("name");
 		
-		if (def.isCallableFunction() || def.isCallableOperation())
+		if ("vscode".equals(name))
 		{
-			if (def.accessSpecifier.access == Token.PUBLIC)	// Not private or protected
+			if (def.isCallableFunction() || def.isCallableOperation())
 			{
-				results.add(
-					new JSONObject(
-						"range", Utils.lexLocationToRange(def.location),
-						"command", new JSONObject(
-								"title", "Launch",
-								"command", "workbench.action.debug.configure")));
-					
-				results.add(
-					new JSONObject(
-						"range", Utils.lexLocationToRange(def.location),
-						"command", new JSONObject(
-								"title", "Debug",
-								"command", "workbench.action.debug.configure")));
+				if (def.accessSpecifier.access == Token.PUBLIC)	// Not private or protected
+				{
+					results.add(
+						new JSONObject(
+							"range", Utils.lexLocationToRange(def.location),
+							"command", new JSONObject(
+									"title", "Launch",
+									"command", "workbench.action.debug.configure")));
+						
+					results.add(
+						new JSONObject(
+							"range", Utils.lexLocationToRange(def.location),
+							"command", new JSONObject(
+									"title", "Debug",
+									"command", "workbench.action.debug.configure")));
+				}
 			}
 		}
 		
