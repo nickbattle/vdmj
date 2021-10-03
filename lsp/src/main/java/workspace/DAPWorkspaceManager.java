@@ -49,6 +49,7 @@ import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.DAPServer;
 import dap.InitExecutor;
+import dap.RemoteControlExecutor;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPException;
@@ -73,6 +74,7 @@ public class DAPWorkspaceManager
 	private String launchCommand;
 	private String defaultName;
 	private DAPDebugReader debugReader;
+	private String remoteControl;
 	
 	protected DAPWorkspaceManager()
 	{
@@ -114,7 +116,8 @@ public class DAPWorkspaceManager
 		return responses;
 	}
 
-	public DAPMessageList launch(DAPRequest request, boolean noDebug, String defaultName, String command) throws Exception
+	public DAPMessageList launch(DAPRequest request,
+			boolean noDebug, String defaultName, String command, String remoteControl) throws Exception
 	{
 		if (!canExecute())
 		{
@@ -131,6 +134,7 @@ public class DAPWorkspaceManager
 			this.noDebug = noDebug;
 			this.launchCommand = command;
 			this.defaultName = defaultName;
+			this.remoteControl = remoteControl;
 			
 			return new DAPMessageList(request);
 		}
@@ -145,8 +149,17 @@ public class DAPWorkspaceManager
 	{
 		try
 		{
-			InitExecutor exec = new InitExecutor("init", request, launchCommand, defaultName);
-			exec.start();
+			if (remoteControl != null)
+			{
+				RemoteControlExecutor exec = new RemoteControlExecutor("remote", request, remoteControl, defaultName);
+				exec.start();
+			}
+			else
+			{
+				InitExecutor exec = new InitExecutor("init", request, launchCommand, defaultName);
+				exec.start();
+			}
+			
 			return new DAPMessageList(request);
 		}
 		catch (Exception e)
@@ -157,6 +170,7 @@ public class DAPWorkspaceManager
 		finally
 		{
 			launchCommand = null;
+			remoteControl = null;
 		}
 	}
 
