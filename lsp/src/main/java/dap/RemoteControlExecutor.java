@@ -60,7 +60,7 @@ public class RemoteControlExecutor extends AsyncExecutor
 				(manager.getNoDebug() ? "" : "* DEBUG enabled\n") +
 				"*\n\nDefault " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class") +
 				" is " + manager.getInterpreter().getDefaultName() + "\n" +
-				"Remote control = " + remoteControl + "\n");
+				"Remote control class = " + remoteControl + "\n");
 		
 		server.stdout("Initialized in ... ");
 	}
@@ -90,7 +90,7 @@ public class RemoteControlExecutor extends AsyncExecutor
 		}
 		catch (ClassNotFoundException e)
 		{
-			throw new Exception("Cannot locate " + remoteControl + " on the CLASSPATH");
+			throw new Exception("Cannot locate class " + remoteControl + " on the CLASSPATH");
 		}
 		catch (ClassCastException e)
 		{
