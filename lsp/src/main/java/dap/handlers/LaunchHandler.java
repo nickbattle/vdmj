@@ -47,8 +47,9 @@ public class LaunchHandler extends DAPHandler
 			Boolean noDebug = arguments.get("noDebug", false);
 			String defaultName = arguments.get("defaultName");
 			String command = arguments.get("command");
+			String remoteControl = arguments.get("remoteControl");
 			
-			return DAPWorkspaceManager.getInstance().launch(request, noDebug, defaultName, command);
+			return DAPWorkspaceManager.getInstance().launch(request, noDebug, defaultName, command, remoteControl);
 		}
 		catch (Exception e)
 		{
