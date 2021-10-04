@@ -83,6 +83,9 @@ public class RemoteControlExecutor extends AsyncExecutor
 			Class<RemoteControl> remoteClass = (Class<RemoteControl>) ClassLoader.getSystemClassLoader().loadClass(remoteControl);
 			RemoteControl remote = remoteClass.newInstance();
 			Interpreter i = Interpreter.getInstance();
+
+			running = remoteControl;
+			server.stdout("Starting " + remoteControl + "\n");
 			remote.run(new RemoteInterpreter(i));
 		}
 		catch (ClassNotFoundException e)
@@ -103,9 +106,7 @@ public class RemoteControlExecutor extends AsyncExecutor
 	protected void error(Throwable e) throws IOException
 	{
 		server.stderr(e.getMessage());
-		server.stdout("Init terminated.\n");
-		manager.clearInterpreter();
-		server.writeMessage(new DAPResponse("terminated", null));
+		server.stdout("Remote control terminated.\n");
 	}
 
 	@Override
