@@ -53,8 +53,10 @@ import dap.RemoteControlExecutor;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPException;
+import lsp.LSPServer;
 import lsp.Utils;
 import rpc.RPCErrors;
+import rpc.RPCRequest;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
@@ -274,6 +276,19 @@ public class DAPWorkspaceManager
 		DAPServer.getInstance().stderr(message);
 	}
 	
+	private void sendMessage(Long type, String message)
+	{
+		try
+		{
+			LSPServer.getInstance().writeMessage(RPCRequest.notification("window/showMessage",
+					new JSONObject("type", type, "message", message)));
+		}
+		catch (IOException e)
+		{
+			Log.error("Failed sending message: ", message);
+		}
+	}
+	
 	public DAPMessageList setBreakpoints(DAPRequest request, File file, JSONArray breakpoints) throws Exception
 	{
 		JSONArray results = new JSONArray();
@@ -402,6 +417,7 @@ public class DAPWorkspaceManager
 						String error = "Illegal condition: " + e.getMessage(); 
 						Log.error(error);
 						results.add(new JSONObject("verified", false, "message", error));
+						sendMessage(1L, error);
 					}
 				}
 				else
@@ -409,6 +425,7 @@ public class DAPWorkspaceManager
 					String error = "Unknown filterOption Id " + filterOption.get("filterId");
 					Log.error(error);
 					results.add(new JSONObject("verified", false, "message", error));
+					sendMessage(1L, error);
 				}
 			}
 		}
