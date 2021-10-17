@@ -99,6 +99,9 @@ public class TranslateHandler extends LSPHandler
 				case "graphviz":
 					return LSPXWorkspaceManager.getInstance().translateGraphviz(request, file, saveUri);
 				
+				case "isabelle":
+					return LSPXWorkspaceManager.getInstance().translateIsabelle(request);
+				
 				default:
 					return new RPCMessageList(request, RPCErrors.InvalidParams, "Unsupported language");
 			}

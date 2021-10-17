@@ -24,9 +24,12 @@
 
 package workspace.plugins;
 
+import java.io.File;
+
 import lsp.LSPMessageUtils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
+import rpc.RPCRequest;
 
 abstract public class AnalysisPlugin
 {
@@ -45,4 +48,10 @@ abstract public class AnalysisPlugin
 	abstract public String getName();
 	
 	abstract public void init();
+
+	public File analyse(RPCRequest request) throws Exception
+	{
+		// This is implemented by external analysis plugins
+		return null;
+	}
 }
