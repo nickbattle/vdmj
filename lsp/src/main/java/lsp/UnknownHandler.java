@@ -25,7 +25,7 @@
 package lsp;
 
 import rpc.RPCRequest;
-import workspace.LSPWorkspaceManager;
+import workspace.LSPXWorkspaceManager;
 import rpc.RPCMessageList;
 
 public class UnknownHandler extends LSPHandler
@@ -38,7 +38,7 @@ public class UnknownHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+		LSPXWorkspaceManager manager = LSPXWorkspaceManager.getInstance();
 		return manager.unhandledMethod(request);
 	}
 }

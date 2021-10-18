@@ -115,7 +115,22 @@ public class LSPXWorkspaceManager
 
 		return INSTANCE;
 	}
-	
+
+	public RPCMessageList unhandledMethod(RPCRequest request)
+	{
+		AnalysisPlugin plugin = PluginRegistry.getInstance().getPluginForMethod(request.getMethod());
+		
+		if (plugin == null)
+		{
+			Log.error("No external plugin registered for " + request.getMethod());
+			return new RPCMessageList(request, RPCErrors.MethodNotFound, request.getMethod());
+		}
+		else
+		{
+			return plugin.analyse(request);
+		}
+	}
+
 	/**
 	 * This is only used by unit testing.
 	 */

@@ -57,6 +57,11 @@ public class ISAPluginSL extends ISAPlugin
 			TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
 			TCModuleList tclist = tc.getTC();
 			
+			if (tclist == null || tclist.isEmpty())
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification is not checked");
+			}
+			
 			for (TCModule module: tclist)
 			{
 				File outfile = new File(saveUri, module.name.getName() + ".thy");
