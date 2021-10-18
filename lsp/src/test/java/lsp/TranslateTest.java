@@ -293,4 +293,31 @@ public class TranslateTest extends LSPTest
 		
 		empty.delete();
 	}
+
+	@Test
+	public void testUnknown() throws Exception
+	{
+		setupWorkspace(Dialect.VDM_SL);
+		File testdir = new File("src/test/resources/pogtest_sl");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+
+		UnknownHandler handler = new UnknownHandler();
+
+		RPCRequest request = RPCRequest.create(123L, "slsp/unknown",
+				new JSONObject(
+					"uri", null,
+					"languageId", "unknown",
+					"saveUri",	"?"));
+
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals("slsp/unknown", response.get(0).getPath("error.message"));
+		assertEquals(new Long(-32601), response.get(0).getPath("error.code"));
+	}
 }

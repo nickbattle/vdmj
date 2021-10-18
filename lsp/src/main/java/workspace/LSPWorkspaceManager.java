@@ -68,6 +68,7 @@ import rpc.RPCRequest;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.ASTPluginPR;
 import workspace.plugins.ASTPluginSL;
+import workspace.plugins.AnalysisPlugin;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
 import workspace.plugins.INPluginPR;
@@ -964,6 +965,21 @@ public class LSPWorkspaceManager
 		catch (Exception e)
 		{
 			Log.error(e);
+		}
+	}
+
+	public RPCMessageList unhandledMethod(RPCRequest request)
+	{
+		AnalysisPlugin plugin = PluginRegistry.getInstance().getPluginForMethod(request.getMethod());
+		
+		if (plugin == null)
+		{
+			Log.error("No external plugin registered for " + request.getMethod());
+			return new RPCMessageList(request, RPCErrors.MethodNotFound, request.getMethod());
+		}
+		else
+		{
+			return plugin.analyse(request);
 		}
 	}
 }

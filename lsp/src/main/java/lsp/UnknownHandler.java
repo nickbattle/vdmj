@@ -25,15 +25,12 @@
 package lsp;
 
 import rpc.RPCRequest;
-import workspace.Log;
-import workspace.PluginRegistry;
-import workspace.plugins.AnalysisPlugin;
-import rpc.RPCErrors;
+import workspace.LSPWorkspaceManager;
 import rpc.RPCMessageList;
 
-public class ExternalPluginHandler extends LSPHandler
+public class UnknownHandler extends LSPHandler
 {
-	public ExternalPluginHandler()
+	public UnknownHandler()
 	{
 		super();
 	}
@@ -41,16 +38,7 @@ public class ExternalPluginHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		AnalysisPlugin plugin = PluginRegistry.getInstance().getPluginForMethod(request.getMethod());
-		
-		if (plugin == null)
-		{
-			Log.error("No external plugin registered for " + request.getMethod());
-			return new RPCMessageList(request, RPCErrors.MethodNotFound, request.getMethod());
-		}
-		else
-		{
-			return plugin.analyse(request);
-		}
+		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+		return manager.unhandledMethod(request);
 	}
 }
