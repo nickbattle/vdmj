@@ -22,47 +22,35 @@
  *
  ******************************************************************************/
 
-package workspace.plugins;
+package lsp;
 
-import lsp.LSPMessageUtils;
+import rpc.RPCRequest;
+import workspace.Log;
+import workspace.PluginRegistry;
+import workspace.plugins.AnalysisPlugin;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
-import rpc.RPCRequest;
 
-abstract public class AnalysisPlugin
+public class ExternalPluginHandler extends LSPHandler
 {
-	protected final LSPMessageUtils messages;
-	
-	public AnalysisPlugin()
+	public ExternalPluginHandler()
 	{
-		messages = new LSPMessageUtils();
-	}
-	
-	protected RPCMessageList errorResult()
-	{
-		return new RPCMessageList(null, RPCErrors.InternalError, "?");
+		super();
 	}
 
-	abstract public String getName();
-	
-	abstract public void init();
-	
-	/**
-	 * External plugins claim to support specific LSP messages. This method
-	 * identifies whether the plugin supports the name passed.
-	 */
-	public boolean supportsMethod(String method)
+	@Override
+	public RPCMessageList request(RPCRequest request)
 	{
-		return false;
-	}
-
-	/**
-	 * External plugins override this method to implement their functionality.
-	 * @param request
-	 * @return responses
-	 */
-	public RPCMessageList analyse(RPCRequest request)
-	{
-		return new RPCMessageList(null, RPCErrors.InternalError, "Plugin does not support analysis");
+		AnalysisPlugin plugin = PluginRegistry.getInstance().getPluginForMethod(request.getMethod());
+		
+		if (plugin == null)
+		{
+			Log.error("No external plugin registered for " + request.getMethod());
+			return new RPCMessageList(request, RPCErrors.MethodNotFound, request.getMethod());
+		}
+		else
+		{
+			return plugin.analyse(request);
+		}
 	}
 }

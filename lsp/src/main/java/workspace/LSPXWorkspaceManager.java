@@ -506,15 +506,15 @@ public class LSPXWorkspaceManager
 	
 	public RPCMessageList translateIsabelle(RPCRequest request)
 	{
-		try
+		AnalysisPlugin isa = registry.getPlugin("ISA");
+		
+		if (isa != null)
 		{
-			AnalysisPlugin isa = registry.getPlugin("ISA");
-			File result = isa.analyse(request);
-			return new RPCMessageList(request, new JSONObject("uri", result.toURI().toString()));
+			return isa.analyse(request);
 		}
-		catch (Exception e)
+		else
 		{
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+			return new RPCMessageList(request, RPCErrors.InternalError, "ISA plugin not available");
 		}
 	}
 }

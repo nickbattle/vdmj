@@ -257,4 +257,40 @@ public class TranslateTest extends LSPTest
 		
 		empty.delete();
 	}
+
+	@Test
+	public void testIsabelle() throws Exception
+	{
+		System.setProperty("lspx.plugins", "plugins.ISAPluginSL");
+		setupWorkspace(Dialect.VDM_SL);
+		File testdir = new File("src/test/resources/pogtest_sl");
+		RPCMessageList notify = initialize(testdir, capabilities);
+		assertEquals(1, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+
+		TranslateHandler handler = new TranslateHandler();
+		File empty = Files.createTempDirectory("test").toFile();
+
+		RPCRequest request = RPCRequest.create(123L, "slsp/TR/translate",
+				new JSONObject(
+					"uri", null,
+					"languageId", "isabelle",
+					"saveUri",	empty.toURI().toString()));
+
+		RPCMessageList response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals(empty.toURI().toString(), response.get(0).getPath("result.uri"));
+
+		for (File f: empty.listFiles())
+		{
+			assertTrue(f.getName().matches("^.*\\.thy$"));
+			f.delete();
+		}
+		
+		empty.delete();
+	}
 }

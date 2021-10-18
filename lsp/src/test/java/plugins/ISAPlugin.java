@@ -22,47 +22,26 @@
  *
  ******************************************************************************/
 
-package workspace.plugins;
+package plugins;
 
-import lsp.LSPMessageUtils;
-import rpc.RPCErrors;
-import rpc.RPCMessageList;
-import rpc.RPCRequest;
+import workspace.plugins.AnalysisPlugin;
 
-abstract public class AnalysisPlugin
+public abstract class ISAPlugin extends AnalysisPlugin
 {
-	protected final LSPMessageUtils messages;
-	
-	public AnalysisPlugin()
+	public ISAPlugin()
 	{
-		messages = new LSPMessageUtils();
+		super();
 	}
 	
-	protected RPCMessageList errorResult()
+	@Override
+	public String getName()
 	{
-		return new RPCMessageList(null, RPCErrors.InternalError, "?");
-	}
-
-	abstract public String getName();
-	
-	abstract public void init();
-	
-	/**
-	 * External plugins claim to support specific LSP messages. This method
-	 * identifies whether the plugin supports the name passed.
-	 */
-	public boolean supportsMethod(String method)
-	{
-		return false;
+		return "ISA";
 	}
 
-	/**
-	 * External plugins override this method to implement their functionality.
-	 * @param request
-	 * @return responses
-	 */
-	public RPCMessageList analyse(RPCRequest request)
+	@Override
+	public void init()
 	{
-		return new RPCMessageList(null, RPCErrors.InternalError, "Plugin does not support analysis");
+		// Ignore
 	}
 }

@@ -72,4 +72,18 @@ public class PluginRegistry
 	{
 		return (T)plugins.get(name);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getPluginForMethod(String method)
+	{
+		for (AnalysisPlugin plugin: plugins.values())
+		{
+			if (plugin.supportsMethod(method))
+			{
+				return (T)plugin;
+			}
+		}
+		
+		return null;
+	}
 }
