@@ -27,6 +27,7 @@ package workspace;
 import java.util.HashMap;
 import java.util.Map;
 
+import json.JSONObject;
 import workspace.plugins.AnalysisPlugin;
 
 public class PluginRegistry
@@ -85,5 +86,17 @@ public class PluginRegistry
 		}
 		
 		return null;
+	}
+
+	public JSONObject getExperimentalOptions()
+	{
+		JSONObject options = new JSONObject();
+		
+		for (AnalysisPlugin plugin: plugins.values())
+		{
+			options.putAll(plugin.getExperimentalOptions());
+		}
+		
+		return options;
 	}
 }

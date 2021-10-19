@@ -24,6 +24,7 @@
 
 package plugins;
 
+import json.JSONObject;
 import workspace.plugins.AnalysisPlugin;
 
 public abstract class ISAPlugin extends AnalysisPlugin
@@ -43,5 +44,11 @@ public abstract class ISAPlugin extends AnalysisPlugin
 	public void init()
 	{
 		// Ignore
+	}
+	
+	@Override
+	public JSONObject getExperimentalOptions()
+	{
+		return new JSONObject("isabelle", "server-option");
 	}
 }
