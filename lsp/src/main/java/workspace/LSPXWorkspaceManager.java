@@ -28,9 +28,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -46,11 +48,7 @@ import rpc.RPCRequest;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.AnalysisPlugin;
 import workspace.plugins.CTPlugin;
-import workspace.plugins.CTPluginPR;
-import workspace.plugins.CTPluginSL;
 import workspace.plugins.POPlugin;
-import workspace.plugins.POPluginPR;
-import workspace.plugins.POPluginSL;
 import workspace.plugins.TCPlugin;
 
 public class LSPXWorkspaceManager
@@ -67,25 +65,11 @@ public class LSPXWorkspaceManager
 	{
 		if (INSTANCE == null)
 		{
-			PluginRegistry _registry = PluginRegistry.getInstance();
 			INSTANCE = new LSPXWorkspaceManager();
 			
-			switch (Settings.dialect)
-			{
-				case VDM_SL:
-					_registry.registerPlugin(new POPluginSL());
-					_registry.registerPlugin(new CTPluginSL());
-					break;
-					
-				case VDM_PP:
-				case VDM_RT:
-					_registry.registerPlugin(new POPluginPR());
-					_registry.registerPlugin(new CTPluginPR());
-					break;
-					
-				default:
-					throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
-			}
+			PluginRegistry registry = PluginRegistry.getInstance();
+			registry.registerPlugin(POPlugin.factory(Settings.dialect));
+			registry.registerPlugin(CTPlugin.factory(Settings.dialect));
 			
 			/**
 			 * Load external plugins, given a list of names.
@@ -99,15 +83,38 @@ public class LSPXWorkspaceManager
 					try
 					{
 						Class<?> clazz = Class.forName(plugin);
-						Constructor<?> ctor = clazz.getConstructor();
-						AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
-						_registry.registerPlugin(instance);
-						Log.printf("Registered LSPX plugin %s", plugin);
+
+						try
+						{
+							Method factory = clazz.getMethod("factory", Dialect.class);
+							AnalysisPlugin instance = (AnalysisPlugin)factory.invoke(null, Settings.dialect);
+							registry.registerPlugin(instance);
+							Log.printf("Registered LSPX plugin %s", plugin);
+						}
+						catch (NoSuchMethodException e)		// Try default constructor
+						{
+							try
+							{
+								Constructor<?> ctor = clazz.getConstructor();
+								AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
+								registry.registerPlugin(instance);
+								Log.printf("Registered LSPX plugin %s", plugin);
+							}
+							catch (Throwable th)
+							{
+								Log.error(th);
+								Log.error("Cannot register LSPX plugin %s", plugin);
+							}
+						}
+						catch (Exception e)
+						{
+							Log.error(e);
+							Log.error("Plugin %s factory failed", plugin);
+						}
 					}
-					catch (Throwable e)
+					catch (ClassNotFoundException e)
 					{
-						Log.error(e);
-						Log.error("Cannot register LSPX plugin %s", plugin);
+						Log.error("Plugin class %s not found", plugin);
 					}
 				}
 			}

@@ -26,6 +26,8 @@ package workspace.plugins;
 
 import java.io.File;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -33,10 +35,28 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
+import workspace.Log;
 
 abstract public class POPlugin extends AnalysisPlugin
 {
-	public POPlugin()
+	public static POPlugin factory(Dialect dialect)
+	{
+		switch (dialect)
+		{
+			case VDM_SL:
+				return new POPluginSL();
+				
+			case VDM_PP:
+			case VDM_RT:
+				return new POPluginPR();
+				
+			default:
+				Log.error("Unknown dialect " + dialect);
+				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+		}
+	}
+
+	protected POPlugin()
 	{
 		super();
 	}

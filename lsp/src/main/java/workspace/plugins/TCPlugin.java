@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -62,7 +64,24 @@ abstract public class TCPlugin extends AnalysisPlugin
 	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
 	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
 	
-	public TCPlugin()
+	public static TCPlugin factory(Dialect dialect)
+	{
+		switch (dialect)
+		{
+			case VDM_SL:
+				return new TCPluginSL();
+				
+			case VDM_PP:
+			case VDM_RT:
+				return new TCPluginPR();
+				
+			default:
+				Log.error("Unknown dialect " + dialect);
+				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+		}
+	}
+
+	protected TCPlugin()
 	{
 		super();
 	}

@@ -24,12 +24,29 @@
 
 package plugins;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
+
 import json.JSONObject;
+import workspace.Log;
 import workspace.plugins.AnalysisPlugin;
 
 public abstract class ISAPlugin extends AnalysisPlugin
 {
-	public ISAPlugin()
+	public static ISAPlugin factory(Dialect dialect)
+	{
+		switch (dialect)
+		{
+			case VDM_SL:
+				return new ISAPluginSL();
+				
+			default:
+				Log.error("Unknown dialect " + dialect);
+				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+		}
+	}
+
+	protected ISAPlugin()
 	{
 		super();
 	}
