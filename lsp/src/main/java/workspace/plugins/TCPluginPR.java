@@ -251,14 +251,16 @@ public class TCPluginPR extends TCPlugin
 							"range", Utils.lexLocationToRange(def.location),
 							"command", new JSONObject(
 									"title", "Launch",
-									"command", "workbench.action.debug.configure")));
+									"command", CODE_LENS_COMMAND,
+									"arguments", launchArgs(def, false))));
 						
 					results.add(
 						new JSONObject(
 							"range", Utils.lexLocationToRange(def.location),
 							"command", new JSONObject(
 									"title", "Debug",
-									"command", "workbench.action.debug.configure")));
+									"command", CODE_LENS_COMMAND,
+									"arguments", launchArgs(def, true))));
 				}
 			}
 		}

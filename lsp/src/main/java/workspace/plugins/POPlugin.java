@@ -51,6 +51,12 @@ abstract public class POPlugin extends AnalysisPlugin
 	public void init()
 	{
 	}
+	
+	@Override
+	public JSONObject getExperimentalOptions()
+	{
+		return new JSONObject("proofObligationProvider", true);
+	}
 
 	abstract public void preCheck();
 

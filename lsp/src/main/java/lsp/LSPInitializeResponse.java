@@ -27,6 +27,7 @@ package lsp;
 import dap.DAPServerSocket;
 import json.JSONArray;
 import json.JSONObject;
+import workspace.PluginRegistry;
 
 public class LSPInitializeResponse extends JSONObject
 {
@@ -58,14 +59,20 @@ public class LSPInitializeResponse extends JSONObject
 		cap.put("codeLensProvider",
 			new JSONObject("resolveProvider", false));
 		
-		cap.put("experimental",
+		/**
+		 * Experimental responses are partly fixed, from the implicit Server functions, and
+		 * party added by registered plugins.
+		 */
+		JSONObject experimental = 
 				new JSONObject(
-					"proofObligationProvider", true,
-					"combinatorialTestProvider", new JSONObject("workDoneProgress", true),
-					"translateProvider", new JSONObject(
-							"languageId", new JSONArray("latex", "word", "coverage", "graphviz"),
-							"workDoneProgress", false),
-					"dapServer", new JSONObject("port", DAPServerSocket.getPort())));
+						"translateProvider", new JSONObject(
+								"languageId", new JSONArray("latex", "word", "coverage", "graphviz", "isabelle"),
+								"workDoneProgress", false),
+						"dapServer", new JSONObject("port", DAPServerSocket.getPort()));
+		
+		experimental.putAll(PluginRegistry.getInstance().getExperimentalOptions());
+		
+		cap.put("experimental", experimental);
 
 		return cap;
 	}

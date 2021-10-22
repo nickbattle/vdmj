@@ -741,9 +741,22 @@ public class ClassMapper
 			{
 				throw (Exception)e.getTargetException();
 			}
+			else if (e.getTargetException() instanceof ExceptionInInitializerError)
+			{
+				ExceptionInInitializerError err = (ExceptionInInitializerError)e.getTargetException();
+				
+				if (err.getException() instanceof Exception)
+				{
+					throw (Exception)err.getException();
+				}
+				else
+				{
+					throw new Exception(err.getException());
+				}
+			}
 			else
 			{
-				throw e;
+				throw new Exception(e.getTargetException());
 			}
 		}
 		finally

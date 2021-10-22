@@ -24,9 +24,11 @@
 
 package workspace.plugins;
 
+import json.JSONObject;
 import lsp.LSPMessageUtils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
+import rpc.RPCRequest;
 
 abstract public class AnalysisPlugin
 {
@@ -45,4 +47,32 @@ abstract public class AnalysisPlugin
 	abstract public String getName();
 	
 	abstract public void init();
+	
+	/**
+	 * External plugins claim to support specific LSP messages. This method
+	 * identifies whether the plugin supports the name passed.
+	 */
+	public boolean supportsMethod(String method)
+	{
+		return false;
+	}
+
+	/**
+	 * External plugins override this method to implement their functionality.
+	 * @param request
+	 * @return responses
+	 */
+	public RPCMessageList analyse(RPCRequest request)
+	{
+		return new RPCMessageList(null, RPCErrors.InternalError, "Plugin does not support analysis");
+	}
+
+	/**
+	 * All plugins can register experimental options that are sent back to the Client
+	 * in the experimental section of the initialize response.
+	 */
+	public JSONObject getExperimentalOptions()
+	{
+		return new JSONObject();
+	}
 }

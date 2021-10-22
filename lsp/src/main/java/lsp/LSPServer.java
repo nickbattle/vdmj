@@ -110,6 +110,8 @@ public class LSPServer extends JSONServer
 		dispatcher.register(new CTHandler(), "slsp/CT/traces", "slsp/CT/generate", "slsp/CT/execute");
 		dispatcher.register(new TranslateHandler(), "slsp/TR/translate");
 
+		dispatcher.register(new UnknownHandler());	// Called for unknown methods
+		
 		return dispatcher;
 	}
 	

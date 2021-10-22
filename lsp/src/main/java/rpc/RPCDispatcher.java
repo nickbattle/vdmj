@@ -31,23 +31,39 @@ import java.util.Map;
 public class RPCDispatcher
 {
 	private Map<String, RPCHandler> handlers = new HashMap<String, RPCHandler>();
+	private RPCHandler unknownHandler = null;
 	
 	public void register(RPCHandler handler, String method)
 	{
-		handlers.put(method, handler);
-	}
-	
-	public void register(RPCHandler handler, String... methods)
-	{
-		for (String method: methods)
+		if (method == null)
+		{
+			unknownHandler = handler;
+		}
+		else
 		{
 			handlers.put(method, handler);
 		}
 	}
 	
+	public void register(RPCHandler handler, String... methods)
+	{
+		if (methods.length == 0)
+		{
+			unknownHandler = handler;
+		}
+		else
+		{
+			for (String method: methods)
+			{
+				handlers.put(method, handler);
+			}
+		}
+	}
+	
 	public RPCHandler getHandler(RPCRequest request)
 	{
-		return handlers.get(request.getMethod());
+		RPCHandler handler = handlers.get(request.getMethod());
+		return handler == null ? unknownHandler : handler;
 	}
 
 	public RPCMessageList dispatch(RPCRequest request)

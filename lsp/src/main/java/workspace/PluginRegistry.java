@@ -27,6 +27,7 @@ package workspace;
 import java.util.HashMap;
 import java.util.Map;
 
+import json.JSONObject;
 import workspace.plugins.AnalysisPlugin;
 
 public class PluginRegistry
@@ -71,5 +72,31 @@ public class PluginRegistry
 	public <T> T getPlugin(String name)
 	{
 		return (T)plugins.get(name);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> T getPluginForMethod(String method)
+	{
+		for (AnalysisPlugin plugin: plugins.values())
+		{
+			if (plugin.supportsMethod(method))
+			{
+				return (T)plugin;
+			}
+		}
+		
+		return null;
+	}
+
+	public JSONObject getExperimentalOptions()
+	{
+		JSONObject options = new JSONObject();
+		
+		for (AnalysisPlugin plugin: plugins.values())
+		{
+			options.putAll(plugin.getExperimentalOptions());
+		}
+		
+		return options;
 	}
 }

@@ -81,6 +81,12 @@ abstract public class CTPlugin extends AnalysisPlugin
 	public void init()
 	{
 	}
+	
+	@Override
+	public JSONObject getExperimentalOptions()
+	{
+		return new JSONObject("combinatorialTestProvider", new JSONObject("workDoneProgress", true));
+	}
 
 	public void preCheck()
 	{

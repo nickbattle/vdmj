@@ -27,6 +27,7 @@ package workspace;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
 import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
@@ -43,6 +44,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.plugins.ASTPlugin;
+import workspace.plugins.AnalysisPlugin;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.CTPluginPR;
 import workspace.plugins.CTPluginSL;
@@ -84,11 +86,51 @@ public class LSPXWorkspaceManager
 				default:
 					throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
 			}
+			
+			/**
+			 * Load external plugins, given a list of names.
+			 */
+			if (System.getProperty("lspx.plugins") != null)
+			{
+				String[] plugins = System.getProperty("lspx.plugins").split("\\s+,\\s+");
+				
+				for (String plugin: plugins)
+				{
+					try
+					{
+						Class<?> clazz = Class.forName(plugin);
+						Constructor<?> ctor = clazz.getConstructor();
+						AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
+						_registry.registerPlugin(instance);
+						Log.printf("Registered LSPX plugin %s", plugin);
+					}
+					catch (Throwable e)
+					{
+						Log.error(e);
+						Log.error("Cannot register LSPX plugin %s", plugin);
+					}
+				}
+			}
 		}
 
 		return INSTANCE;
 	}
-	
+
+	public RPCMessageList unhandledMethod(RPCRequest request)
+	{
+		AnalysisPlugin plugin = PluginRegistry.getInstance().getPluginForMethod(request.getMethod());
+		
+		if (plugin == null)
+		{
+			Log.error("No external plugin registered for " + request.getMethod());
+			return new RPCMessageList(request, RPCErrors.MethodNotFound, request.getMethod());
+		}
+		else
+		{
+			return plugin.analyse(request);
+		}
+	}
+
 	/**
 	 * This is only used by unit testing.
 	 */
@@ -474,6 +516,20 @@ public class LSPXWorkspaceManager
 		catch (IOException e)
 		{
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+	
+	public RPCMessageList translateIsabelle(RPCRequest request)
+	{
+		AnalysisPlugin isa = registry.getPlugin("ISA");
+		
+		if (isa != null)
+		{
+			return isa.analyse(request);
+		}
+		else
+		{
+			return new RPCMessageList(request, RPCErrors.InternalError, "ISA plugin not available");
 		}
 	}
 }
