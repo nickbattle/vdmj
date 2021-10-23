@@ -24,11 +24,32 @@
 
 package workspace.plugins;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.Interpreter;
+
+import workspace.Log;
 
 abstract public class INPlugin extends AnalysisPlugin
 {
-	public INPlugin()
+	public static INPlugin factory(Dialect dialect)
+	{
+		switch (dialect)
+		{
+			case VDM_SL:
+				return new INPluginSL();
+				
+			case VDM_PP:
+			case VDM_RT:
+				return new INPluginPR();
+				
+			default:
+				Log.error("Unknown dialect " + dialect);
+				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+		}
+	}
+
+	protected INPlugin()
 	{
 		super();
 	}

@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package lsp;
+package plugins;
 
 import static org.junit.Assert.assertEquals;
 import java.io.File;

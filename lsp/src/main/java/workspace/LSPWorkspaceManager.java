@@ -66,16 +66,10 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.plugins.ASTPlugin;
-import workspace.plugins.ASTPluginPR;
-import workspace.plugins.ASTPluginSL;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
-import workspace.plugins.INPluginPR;
-import workspace.plugins.INPluginSL;
 import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
-import workspace.plugins.TCPluginPR;
-import workspace.plugins.TCPluginSL;
 
 public class LSPWorkspaceManager
 {
@@ -101,26 +95,11 @@ public class LSPWorkspaceManager
 		if (INSTANCE == null)
 		{
 			INSTANCE = new LSPWorkspaceManager();
-			PluginRegistry _registry = PluginRegistry.getInstance();
 			
-			switch (Settings.dialect)
-			{
-				case VDM_SL:
-					_registry.registerPlugin(new ASTPluginSL());
-					_registry.registerPlugin(new TCPluginSL());
-					_registry.registerPlugin(new INPluginSL());
-					break;
-					
-				case VDM_PP:
-				case VDM_RT:
-					_registry.registerPlugin(new ASTPluginPR());
-					_registry.registerPlugin(new TCPluginPR());
-					_registry.registerPlugin(new INPluginPR());
-					break;
-					
-				default:
-					throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
-			}
+			PluginRegistry registry = PluginRegistry.getInstance();
+			registry.registerPlugin(ASTPlugin.factory(Settings.dialect));
+			registry.registerPlugin(TCPlugin.factory(Settings.dialect));
+			registry.registerPlugin(INPlugin.factory(Settings.dialect));
 		}
 
 		return INSTANCE;

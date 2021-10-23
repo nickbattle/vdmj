@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
 import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
@@ -44,11 +45,13 @@ import com.fujitsu.vdmj.ast.patterns.ASTIdentifierPattern;
 import com.fujitsu.vdmj.ast.types.ASTField;
 import com.fujitsu.vdmj.ast.types.ASTNamedType;
 import com.fujitsu.vdmj.ast.types.ASTRecordType;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.VDMMessage;
 
 import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
+import workspace.Log;
 
 public abstract class ASTPlugin extends AnalysisPlugin
 {
@@ -57,8 +60,25 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
 	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
 	protected boolean dirty;
+	
+	public static ASTPlugin factory(Dialect dialect)
+	{
+		switch (dialect)
+		{
+			case VDM_SL:
+				return new ASTPluginSL();
+				
+			case VDM_PP:
+			case VDM_RT:
+				return new ASTPluginPR();
+				
+			default:
+				Log.error("Unknown dialect " + dialect);
+				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+		}
+	}
 
-	public ASTPlugin()
+	protected ASTPlugin()
 	{
 		super();
 		this.dirty = false;

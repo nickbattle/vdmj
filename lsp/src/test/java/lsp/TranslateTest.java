@@ -31,6 +31,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.fujitsu.vdmj.lex.Dialect;
@@ -45,6 +46,12 @@ public class TranslateTest extends LSPTest
 {
 	private JSONObject capabilities = new JSONObject(
 			"experimental", new JSONObject("translate", true));
+	
+	@Before
+	public void setUp()
+	{
+		System.clearProperty("lspx.plugins");
+	}
 
 	@Test
 	public void testSLErrors() throws Exception
@@ -261,7 +268,7 @@ public class TranslateTest extends LSPTest
 	@Test
 	public void testIsabelle() throws Exception
 	{
-		System.setProperty("lspx.plugins", "plugins.ISAPluginSL");
+		System.setProperty("lspx.plugins", "plugins.ISAPluginSL, plugins.AnotherPlugin");
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/pogtest_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
@@ -297,6 +304,7 @@ public class TranslateTest extends LSPTest
 	@Test
 	public void testUnknown() throws Exception
 	{
+		System.setProperty("lspx.plugins", "plugins.AnotherPlugin");
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/pogtest_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
@@ -319,5 +327,13 @@ public class TranslateTest extends LSPTest
 		dump(response.get(0));
 		assertEquals("slsp/unknown", response.get(0).getPath("error.message"));
 		assertEquals(new Long(-32601), response.get(0).getPath("error.code"));
+
+		request = RPCRequest.create(123L, "slsp/another", new JSONObject());
+
+		response = handler.request(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals("Plugin does not support analysis", response.get(0).getPath("error.message"));
+		assertEquals(new Long(-32603), response.get(0).getPath("error.code"));
 	}
 }

@@ -24,29 +24,11 @@
 
 package plugins;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.lex.Dialect;
-
-import json.JSONObject;
-import workspace.Log;
 import workspace.plugins.AnalysisPlugin;
 
-public abstract class ISAPlugin extends AnalysisPlugin
+public class AnotherPlugin extends AnalysisPlugin
 {
-	public static ISAPlugin factory(Dialect dialect)
-	{
-		switch (dialect)
-		{
-			case VDM_SL:
-				return new ISAPluginSL();
-				
-			default:
-				Log.error("Unknown dialect " + dialect);
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
-		}
-	}
-
-	protected ISAPlugin()
+	public AnotherPlugin()
 	{
 		super();
 	}
@@ -54,7 +36,7 @@ public abstract class ISAPlugin extends AnalysisPlugin
 	@Override
 	public String getName()
 	{
-		return "ISA";
+		return "Another";
 	}
 
 	@Override
@@ -64,8 +46,8 @@ public abstract class ISAPlugin extends AnalysisPlugin
 	}
 	
 	@Override
-	public JSONObject getExperimentalOptions()
+	public boolean supportsMethod(String method)
 	{
-		return new JSONObject("isabelle", "server-option");
+		return method.equals("slsp/another");
 	}
 }

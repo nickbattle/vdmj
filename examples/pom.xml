@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.fujitsu</groupId>
+		<artifactId>vdmj-suite</artifactId>
+		<version>4.4.4-P-SNAPSHOT</version>
+	</parent>
+
+	<groupId>com.fujitsu</groupId>
+	<artifactId>examples</artifactId>
+	<name>VDMJ Suite Examples</name>
+	<packaging>pom</packaging>
+	<version>4.4.4-P-SNAPSHOT</version>	<!-- This version is inherited by all modules -->
+	
+	<properties>
+	    <maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
+	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	    <revision>4.4.4-P-SNAPSHOT</revision>	<!-- CHANGE VERSION HERE, AND MODULE'S PARENT POMs -->
+	</properties>
+
+	<!-- sub modules -->
+	<modules>
+		<module>v2c</module>
+	</modules>
+</project>

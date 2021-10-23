@@ -28,8 +28,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -66,7 +68,24 @@ abstract public class CTPlugin extends AnalysisPlugin
 	
 	private static final int BATCH_SIZE = 10;
 	
-	public CTPlugin()
+	public static CTPlugin factory(Dialect dialect)
+	{
+		switch (dialect)
+		{
+			case VDM_SL:
+				return new CTPluginSL();
+				
+			case VDM_PP:
+			case VDM_RT:
+				return new CTPluginPR();
+				
+			default:
+				Log.error("Unknown dialect " + dialect);
+				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+		}
+	}
+
+	protected CTPlugin()
 	{
 		super();
 	}
