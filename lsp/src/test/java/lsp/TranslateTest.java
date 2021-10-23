@@ -31,6 +31,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.fujitsu.vdmj.lex.Dialect;
@@ -45,6 +46,12 @@ public class TranslateTest extends LSPTest
 {
 	private JSONObject capabilities = new JSONObject(
 			"experimental", new JSONObject("translate", true));
+	
+	@Before
+	public void setUp()
+	{
+		System.clearProperty("lspx.plugins");
+	}
 
 	@Test
 	public void testSLErrors() throws Exception

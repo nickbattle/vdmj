@@ -28,6 +28,7 @@
 		<module>dbgpc</module>
 		<module>stdlib</module>
 		<module>cmd-plugins</module>
+		<module>examples</module>
 	</modules>
 
 	<build>
