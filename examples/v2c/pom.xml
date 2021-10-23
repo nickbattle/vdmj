@@ -10,7 +10,7 @@
 	</parent>
 	
 	<artifactId>v2c</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1-P-SNAPSHOT</version>
 	<name>V2C</name>
 	<description>Example VDM to C class mapper implementation</description>
 	
