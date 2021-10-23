@@ -44,4 +44,10 @@ public class AnotherPlugin extends AnalysisPlugin
 	{
 		// Ignore
 	}
+	
+	@Override
+	public boolean supportsMethod(String method)
+	{
+		return method.equals("slsp/another");
+	}
 }

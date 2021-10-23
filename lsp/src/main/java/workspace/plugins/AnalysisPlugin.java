@@ -64,7 +64,7 @@ abstract public class AnalysisPlugin
 	 */
 	public RPCMessageList analyse(RPCRequest request)
 	{
-		return new RPCMessageList(null, RPCErrors.InternalError, "Plugin does not support analysis");
+		return new RPCMessageList(request, RPCErrors.InternalError, "Plugin does not support analysis");
 	}
 
 	/**

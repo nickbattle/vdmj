@@ -77,15 +77,22 @@ public class PluginRegistry
 	@SuppressWarnings("unchecked")
 	public <T> T getPluginForMethod(String method)
 	{
+		T result = null;
+		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			if (plugin.supportsMethod(method))
 			{
-				return (T)plugin;
+				if (result != null)
+				{
+					Log.error("Multiple plugins support %s", method);
+				}
+				
+				result = (T)plugin;
 			}
 		}
 		
-		return null;
+		return result;
 	}
 
 	public JSONObject getExperimentalOptions()
