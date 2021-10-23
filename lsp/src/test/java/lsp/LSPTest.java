@@ -53,10 +53,10 @@ abstract public class LSPTest
 		LSPWorkspaceManager.reset();
 		LSPXWorkspaceManager.reset();
 		DAPWorkspaceManager.reset();
+		Log.init(System.out);
 		lspManager = LSPWorkspaceManager.getInstance();
 		lspxManager = LSPXWorkspaceManager.getInstance();
 		dapManager = DAPWorkspaceManager.getInstance();
-		Log.init(System.out);
 	}
 	
 	protected RPCMessageList initialize(File root, JSONObject capabilities) throws Exception

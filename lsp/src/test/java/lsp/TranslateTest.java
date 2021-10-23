@@ -261,7 +261,7 @@ public class TranslateTest extends LSPTest
 	@Test
 	public void testIsabelle() throws Exception
 	{
-		System.setProperty("lspx.plugins", "plugins.ISAPluginSL");
+		System.setProperty("lspx.plugins", "plugins.ISAPluginSL, plugins.AnotherPlugin");
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/pogtest_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
