@@ -22,6 +22,8 @@ import com.fujitsu.vdmj.values.Value;
 
 public class INLimitAnnotation extends INAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public INLimitAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);

@@ -37,6 +37,8 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCNoPOGAnnotation extends TCAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public TCNoPOGAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);

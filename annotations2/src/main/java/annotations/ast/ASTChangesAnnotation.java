@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
 public class ASTChangesAnnotation extends ASTAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public ASTChangesAnnotation(LexIdentifierToken name)
 	{
 		super(name);

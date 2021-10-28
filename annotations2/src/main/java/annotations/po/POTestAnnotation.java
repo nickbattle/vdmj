@@ -23,6 +23,8 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 public class POTestAnnotation extends POAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public POTestAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
 		super(name, args);
