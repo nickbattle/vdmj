@@ -27,8 +27,10 @@ package com.fujitsu.vdmj.lex;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.fujitsu.vdmj.lex.Dialect.VDM_PP;
 import static com.fujitsu.vdmj.lex.Dialect.VDM_RT;
@@ -354,5 +356,10 @@ public enum Token implements Serializable
 	public String toString()
 	{
 		return display;
+	}
+	
+	public Set<Dialect> getDialects()
+	{
+		return new HashSet<Dialect>(dialects);
 	}
 }
