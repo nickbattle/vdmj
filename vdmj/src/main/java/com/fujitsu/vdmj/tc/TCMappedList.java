@@ -26,9 +26,10 @@ package com.fujitsu.vdmj.tc;
 
 import java.util.List;
 
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.mapper.MappedList;
 
-abstract public class TCMappedList<FROM, TO> extends MappedList<FROM, TO>
+abstract public class TCMappedList<FROM extends Mappable, TO extends Mappable> extends MappedList<FROM, TO>
 {
 	private static final long serialVersionUID = 1L;
 

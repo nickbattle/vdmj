@@ -25,8 +25,9 @@
 package com.fujitsu.vdmj.ast.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.mapper.Mappable;
 
-public class ASTNamePatternPair
+public class ASTNamePatternPair implements Mappable
 {
 	public final LexNameToken name;
 	public final ASTPattern pattern;

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2021 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,25 +22,9 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.patterns;
+package com.fujitsu.vdmj.mapper;
 
-import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
-
-public class TCNamePatternPair implements Mappable
+public interface Mappable
 {
-	public final TCNameToken name;
-	public final TCPattern pattern;
-	
-	public TCNamePatternPair(TCNameToken name, TCPattern pattern)
-	{
-		this.name = name;
-		this.pattern = pattern;
-	}
-	
-	@Override
-	public String toString()
-	{
-		return name + " |-> " + pattern;
-	}
+	// A label to indicate that a class can be used by the ClassMapper
 }

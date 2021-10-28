@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -41,8 +42,10 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public abstract class TCAnnotation
+public abstract class TCAnnotation extends TCNode
 {
+	private static final long serialVersionUID = 1L;
+
 	public final TCIdentifierToken name;
 	
 	public final TCExpressionList args;

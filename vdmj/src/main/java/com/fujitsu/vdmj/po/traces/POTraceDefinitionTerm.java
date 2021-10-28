@@ -26,10 +26,12 @@ package com.fujitsu.vdmj.po.traces;
 
 import java.util.Vector;
 
+import com.fujitsu.vdmj.mapper.Mappable;
+
 /**
  * A class representing a sequence of trace definitions.
  */
 @SuppressWarnings("serial")
-public class POTraceDefinitionTerm extends Vector<POTraceDefinition>
+public class POTraceDefinitionTerm extends Vector<POTraceDefinition> implements Mappable
 {
 }

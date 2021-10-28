@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.ast.annotations;
 
+import com.fujitsu.vdmj.ast.ASTNode;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
@@ -42,8 +43,9 @@ import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.syntax.StatementReader;
 
-public abstract class ASTAnnotation
+public abstract class ASTAnnotation extends ASTNode
 {
+	private static final long serialVersionUID = 1L;
 	public final LexIdentifierToken name;
 	public ASTExpressionList args = null;
 

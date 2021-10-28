@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
@@ -40,8 +41,10 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public abstract class POAnnotation
+public abstract class POAnnotation extends PONode
 {
+	private static final long serialVersionUID = 1L;
+
 	public final TCIdentifierToken name;
 	
 	public final POExpressionList args;

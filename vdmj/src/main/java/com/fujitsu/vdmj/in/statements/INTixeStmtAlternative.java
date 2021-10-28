@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.in.patterns.INSeqBind;
 import com.fujitsu.vdmj.in.patterns.INSetBind;
 import com.fujitsu.vdmj.in.patterns.INTypeBind;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -36,7 +37,7 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
-public class INTixeStmtAlternative
+public class INTixeStmtAlternative implements Mappable
 {
 	public final INPatternBind patternBind;
 	public final INStatement statement;

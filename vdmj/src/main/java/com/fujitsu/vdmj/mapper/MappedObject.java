@@ -26,7 +26,7 @@ package com.fujitsu.vdmj.mapper;
 
 import java.io.Serializable;
 
-public abstract class MappedObject implements Serializable
+public abstract class MappedObject implements Serializable, Mappable
 {
 	private static final long serialVersionUID = 1L;
 	private static long nextUniqueId = 0;

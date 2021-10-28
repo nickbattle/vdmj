@@ -25,9 +25,10 @@
 package com.fujitsu.vdmj.in.statements;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class INErrorCase
+public class INErrorCase implements Mappable
 {
 	public final TCIdentifierToken name;
 	public final INExpression left;
