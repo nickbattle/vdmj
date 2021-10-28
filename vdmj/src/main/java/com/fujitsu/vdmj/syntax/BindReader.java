@@ -148,7 +148,7 @@ public class BindReader extends SyntaxReader
 		}
 		else
 		{
-			throwMessage(2001, "Expecting 'in set' or 'in seq' in set bind");
+			throwMessage(2001, "Expecting 'in set' or 'in seq' in bind");
 		}
 		
 		return null;	// Not reached
