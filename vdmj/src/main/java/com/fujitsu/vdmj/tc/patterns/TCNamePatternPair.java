@@ -24,9 +24,10 @@
 
 package com.fujitsu.vdmj.tc.patterns;
 
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class TCNamePatternPair
+public class TCNamePatternPair implements Mappable
 {
 	public final TCNameToken name;
 	public final TCPattern pattern;

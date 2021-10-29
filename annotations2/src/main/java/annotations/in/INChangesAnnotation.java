@@ -47,6 +47,7 @@ import com.fujitsu.vdmj.values.VoidValue;
 
 public class INChangesAnnotation extends INAnnotation
 {
+	private static final long serialVersionUID = 1L;
 	private final static Context previousState = new Context(LexLocation.ANY, "@Changes", null);
 	private final static Map<TCNameToken, String> previousLocs = new HashMap<TCNameToken, String>();
 

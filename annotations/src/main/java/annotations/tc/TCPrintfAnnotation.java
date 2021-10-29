@@ -40,6 +40,8 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCPrintfAnnotation extends TCAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public TCPrintfAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);

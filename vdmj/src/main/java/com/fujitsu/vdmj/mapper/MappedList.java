@@ -29,7 +29,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.mapper.ClassMapper;
 
-abstract public class MappedList<FROM, TO> extends Vector<TO>
+abstract public class MappedList<FROM extends Mappable, TO extends Mappable> extends Vector<TO> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 

@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternBind;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -33,7 +34,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCTixeStmtAlternative
+public class TCTixeStmtAlternative implements Mappable
 {
 	public final TCPatternBind patternBind;
 	public final TCStatement statement;

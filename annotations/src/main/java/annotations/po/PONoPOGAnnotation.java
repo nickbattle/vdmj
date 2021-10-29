@@ -36,6 +36,8 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 public class PONoPOGAnnotation extends POAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public PONoPOGAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
 		super(name, args);

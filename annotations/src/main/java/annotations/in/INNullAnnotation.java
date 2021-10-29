@@ -30,6 +30,8 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 public class INNullAnnotation extends INAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public INNullAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);

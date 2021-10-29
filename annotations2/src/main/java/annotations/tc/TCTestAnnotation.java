@@ -24,6 +24,8 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCTestAnnotation extends TCAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public TCTestAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);

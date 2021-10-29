@@ -1376,7 +1376,24 @@ public class ExpressionReader extends SyntaxReader
 		{
 			nextToken();
 			BindReader br = getBindReader();
-			ASTBind bind = br.readBind();
+			ASTBind bind = null;
+			
+			try
+			{
+				bind = br.readBind();
+			}
+			catch (ParserException e)
+			{
+				if (e.number == 2001)	// Probably using a multibind here?
+				{
+					throwMessage(2001, "Expecting single ordered bind in seq comprehension");
+				}
+				else
+				{
+					throw e;
+				}
+			}
+			
 			ASTExpression exp = null;
 
 			if (lastToken().is(Token.AMPERSAND))

@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
 public class ASTWarningAnnotation extends ASTAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public ASTWarningAnnotation(LexIdentifierToken name)
 	{
 		super(name);

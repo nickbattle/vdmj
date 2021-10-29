@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2021 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,17 +22,9 @@
  *
  ******************************************************************************/
 
-package annotations.ast;
+package com.fujitsu.vdmj.mapper;
 
-import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
-import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
-
-public class ASTChangesAnnotation extends ASTAnnotation
+public interface Mappable
 {
-	private static final long serialVersionUID = 1L;
-
-	public ASTChangesAnnotation(LexIdentifierToken name)
-	{
-		super(name);
-	}
+	// A label to indicate that a class can be used by the ClassMapper
 }

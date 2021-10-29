@@ -41,6 +41,8 @@ import com.fujitsu.vdmj.syntax.ParserException;
  */
 public class ASTGhostAnnotation extends ASTAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public ASTGhostAnnotation(LexIdentifierToken name)
 	{
 		super(name);

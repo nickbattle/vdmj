@@ -24,10 +24,11 @@
 
 package com.fujitsu.vdmj.tc.statements;
 
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class TCErrorCase
+public class TCErrorCase implements Mappable
 {
 	public final TCIdentifierToken name;
 	public final TCExpression left;

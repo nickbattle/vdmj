@@ -38,6 +38,8 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCLimitAnnotation extends TCAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public TCLimitAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);

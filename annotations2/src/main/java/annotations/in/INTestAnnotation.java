@@ -20,6 +20,8 @@ import com.fujitsu.vdmj.values.Value;
 
 public class INTestAnnotation extends INAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public INTestAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);

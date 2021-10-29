@@ -30,6 +30,8 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 public class PONullAnnotation extends POAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public PONullAnnotation(TCIdentifierToken name, POExpressionList args)
 	{
 		super(name, args);

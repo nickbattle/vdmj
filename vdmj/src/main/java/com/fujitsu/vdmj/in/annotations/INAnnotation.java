@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
@@ -37,8 +38,10 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.values.Value;
 
-public abstract class INAnnotation
+public abstract class INAnnotation extends INNode
 {
+	private static final long serialVersionUID = 1L;
+
 	public final TCIdentifierToken name;
 	
 	public final INExpressionList args;

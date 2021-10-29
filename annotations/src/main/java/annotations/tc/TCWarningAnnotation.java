@@ -46,6 +46,7 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 
 public class TCWarningAnnotation extends TCAnnotation
 {
+	private static final long serialVersionUID = 1L;
 	private int warningCount = 0;
 	private Set<Long> suppressed;
 	

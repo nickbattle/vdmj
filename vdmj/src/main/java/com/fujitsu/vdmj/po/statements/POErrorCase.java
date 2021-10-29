@@ -24,10 +24,11 @@
 
 package com.fujitsu.vdmj.po.statements;
 
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class POErrorCase
+public class POErrorCase implements Mappable
 {
 	public final TCIdentifierToken name;
 	public final POExpression left;

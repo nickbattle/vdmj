@@ -43,6 +43,8 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCOnFailAnnotation extends TCAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public TCOnFailAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);

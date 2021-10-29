@@ -36,6 +36,8 @@ import com.fujitsu.vdmj.values.Value;
 
 public class INPrintfAnnotation extends INAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public INPrintfAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);

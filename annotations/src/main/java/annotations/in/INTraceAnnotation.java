@@ -35,6 +35,8 @@ import com.fujitsu.vdmj.values.Value;
 
 public class INTraceAnnotation extends INAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public INTraceAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);

@@ -25,6 +25,8 @@ import com.fujitsu.vdmj.syntax.StatementReader;
 
 public class ASTTestAnnotation extends ASTAnnotation
 {
+	private static final long serialVersionUID = 1L;
+
 	public ASTTestAnnotation(LexIdentifierToken name)
 	{
 		super(name);
