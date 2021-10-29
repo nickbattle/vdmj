@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.fujitsu.vdmj.messages.RTLogger;
+import com.fujitsu.vdmj.scheduler.SystemClock.TimeUnit;
 
 public class BUSResource extends Resource
 {
@@ -37,7 +38,7 @@ public class BUSResource extends Resource
 
 	private final int busNumber;
 	private final ControlQueue cq;
-	private final double speed;
+	private final double speed;		// Measured in Hz
 	private final List<CPUResource> cpus;
 	private final List<MessagePacket> messages;
 
@@ -234,11 +235,11 @@ public class BUSResource extends Resource
 	{
 		if (speed == 0)
 		{
-			return 0;			// Infinitely fast virtual bus
+			return 0;	// Infinitely fast virtual bus
 		}
 		else
 		{
-			return bytes;		// For now...
+			return SystemClock.timeToInternal(TimeUnit.seconds, new Double(bytes) / speed); // bytes/s
 		}
 	}
 
