@@ -1,7 +1,7 @@
 system SYS
 instance variables
 	static public obj1 : A := new A();
-	cpu1:CPU := new CPU(<FP>, 1E6);
+	cpu1:CPU := new CPU(<FP>, 1E9);
 
 operations
 	SYS: () ==> SYS
@@ -28,7 +28,7 @@ operations
 		dcl now:nat := time;
 		
 		if last > 0
-		then let interval = now - last in
+		then let interval = (now - last) in
 			counts(interval+1) := counts(interval+1) + 1;
 			
 		last := now
@@ -48,7 +48,7 @@ operations
 	test() ==
 	(
 		SYS`obj1.run();
-		duration(100000) skip;
+		duration(10000) skip;
 		
 		if elems SYS`obj1.counts(1, ..., 49) <> {0}
 		then exit "Sporadic has some short intervals";
