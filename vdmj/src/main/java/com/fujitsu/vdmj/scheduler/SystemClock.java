@@ -66,7 +66,7 @@ public class SystemClock
 		decisecond(Math.pow(10, -1), "ds"),
 		centisecond(Math.pow(10, -2), "cs"),
 		millisecond(Math.pow(10, -3), "ms"),
-		microsecond(Math.pow(10, -6), "micros"),
+		microsecond(Math.pow(10, -6), "\u03BCs"),	// mu s :-)
 		nanosecond(Math.pow(10, -9), "ns");
 
 		private final Double value;
