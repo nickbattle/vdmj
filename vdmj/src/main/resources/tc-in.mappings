@@ -177,7 +177,6 @@ map TCAnnotationList{} to INAnnotationList(this);
 unmapped com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 unmapped com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 unmapped com.fujitsu.vdmj.ast.lex.LexCharacterToken;
-unmapped com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 unmapped com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 unmapped com.fujitsu.vdmj.ast.lex.LexQuoteToken;
 unmapped com.fujitsu.vdmj.ast.lex.LexRealToken;

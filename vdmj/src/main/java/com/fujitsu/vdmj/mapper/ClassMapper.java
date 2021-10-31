@@ -313,7 +313,15 @@ public class ClassMapper
 		try
 		{
 			Class<?> toIgnore = Class.forName(command.source);
-			mappings.put(toIgnore, new MapParams(lineNo, toIgnore, toIgnore, null, null, true));
+			
+			if (mappings.containsKey(toIgnore))
+			{
+				error("Class is already mapped: " + toIgnore.getName());
+			}
+			else
+			{
+				mappings.put(toIgnore, new MapParams(lineNo, toIgnore, toIgnore, null, null, true));
+			}
 		}
 		catch (ClassNotFoundException e)
 		{
@@ -411,7 +419,14 @@ public class ClassMapper
 				}
 			}
 
-			mappings.put(srcClass, new MapParams(lineNo, srcClass, destClass, ctorFields, setterFields, false));
+			if (mappings.containsKey(srcClass))
+			{
+				error("Class is already mapped: " + srcClass.getName());
+			}
+			else
+			{
+				mappings.put(srcClass, new MapParams(lineNo, srcClass, destClass, ctorFields, setterFields, false));
+			}
 		}
 		catch (ClassNotFoundException e)
 		{
