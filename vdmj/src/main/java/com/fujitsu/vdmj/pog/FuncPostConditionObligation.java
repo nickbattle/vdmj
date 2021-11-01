@@ -120,8 +120,13 @@ public class FuncPostConditionObligation extends ProofObligation
 
 		sb.append(postdef.name.getName());
 		sb.append("(");
-		sb.append(params);
-		sb.append(", ");
+		
+		if (params.length() != 0)	// ie. fn has args
+		{
+			sb.append(params);
+			sb.append(", ");
+		}
+		
 		sb.append(body);
 		sb.append(")");
 
