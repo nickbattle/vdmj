@@ -38,10 +38,13 @@ public class FuncPostConditionObligation extends ProofObligation
 		super(func.location, POType.FUNC_POST_CONDITION, ctxt);
 
 		StringBuilder params = new StringBuilder();
+		String sep = "";
 
 		for (POPatternList pl: func.paramPatternList)
 		{
+			params.append(sep);
 			params.append(pl.getMatchingExpressionList());
+			sep = ", ";
 		}
 
 		String body = null;
