@@ -170,12 +170,15 @@ abstract public class CommandReader
 				{
 					lastline = line;
 				}
+				
+				// Command is the first word on the line
+				String cmd = line.indexOf(' ') == -1 ? line : line.substring(0, line.indexOf(' '));
 
-				if (line.equals("quit") || line.equals("q"))
+				if (cmd.equals("quit") || cmd.equals("q"))
 				{
 					carryOn = doQuit(line);
 				}
-				else if (line.startsWith("reload"))
+				else if (cmd.equals("reload"))
 				{
 					carryOn = doReLoad(line);
 
@@ -184,7 +187,7 @@ abstract public class CommandReader
 						return ExitStatus.RELOAD;
 					}
 				}
-				else if (line.startsWith("load"))
+				else if (cmd.equals("load"))
 				{
 					carryOn = doLoad(line, filenames);
 
@@ -193,135 +196,135 @@ abstract public class CommandReader
 						return ExitStatus.RELOAD;
 					}
 				}
-				else if (line.equals("files"))
+				else if (cmd.equals("files"))
 				{
 					carryOn = doFiles();
 				}
-				else if (line.startsWith("set"))
+				else if (cmd.equals("set"))
 				{
 					carryOn = doSet(line);
 				}
-				else if (line.equals("help") || line.equals("?"))
+				else if (cmd.equals("help") || cmd.equals("?"))
 				{
 					doHelp(line);
 				}
-				else if (line.startsWith("assert"))
+				else if (cmd.equals("assert"))
 				{
 					carryOn = doAssert(line);
 				}
-				else if (line.startsWith("script"))
+				else if (cmd.equals("script"))
 				{
 					carryOn = doScript(line);
 				}
-				else if (line.startsWith("trace"))
+				else if (cmd.equals("trace"))
 				{
 					carryOn = doTrace(line);
 				}
-				else if (line.startsWith("break"))
+				else if (cmd.equals("break"))
 				{
 					carryOn = doBreak(line);
 				}
-				else if (line.startsWith("catch"))
+				else if (cmd.equals("catch"))
 				{
 					carryOn = doCatch(line);
 				}
-				else if (line.equals("list"))
+				else if (cmd.equals("list"))
 				{
 					carryOn = doList(line);
 				}
-				else if (line.equals("source"))
+				else if (cmd.equals("source"))
 				{
 					carryOn = doSource(line);
 				}
-				else if (line.startsWith("coverage"))
+				else if (cmd.equals("coverage"))
 				{
 					carryOn = doCoverage(line);
 				}
-				else if (line.startsWith("latexdoc"))
+				else if (cmd.equals("latexdoc"))
 				{
 					carryOn = doLatex(line, true);
 				}
-				else if (line.startsWith("latex"))
+				else if (cmd.equals("latex"))
 				{
 					carryOn = doLatex(line, false);
 				}
-				else if (line.startsWith("word"))
+				else if (cmd.equals("word"))
 				{
 					carryOn = doWord(line);
 				}
-				else if (line.startsWith("remove"))
+				else if (cmd.equals("remove"))
 				{
 					carryOn = doRemove(line);
 				}
-				else if (line.equals("init"))
+				else if (cmd.equals("init"))
 				{
 					carryOn = doInit(line);
 				}
-				else if (line.equals("env"))
+				else if (cmd.equals("env"))
 				{
 					carryOn = doEnv(line);
 				}
-				else if (line.equals("state"))
+				else if (cmd.equals("state"))
 				{
 					carryOn = doState(line);
 				}
-				else if (line.startsWith("default"))
+				else if (cmd.equals("default"))
 				{
 					carryOn = doDefault(line);
 				}
-				else if (line.equals("classes"))
+				else if (cmd.equals("classes"))
 				{
 					carryOn = doClasses(line);
 				}
-				else if (line.startsWith("create"))
+				else if (cmd.equals("create"))
 				{
 					carryOn = doCreate(line);
 				}
-				else if (line.equals("modules"))
+				else if (cmd.equals("modules"))
 				{
 					carryOn = doModules(line);
 				}
-				else if (line.startsWith("pog"))
+				else if (cmd.equals("pog"))
 				{
 					carryOn = doPog(line);
 				}
-				else if (line.startsWith("log"))
+				else if (cmd.equals("log"))
 				{
 					carryOn = doLog(line);
 				}
-				else if (line.startsWith("print ") || line.startsWith("p "))
+				else if (cmd.equals("print") || cmd.equals("p"))
 				{
 					carryOn = doEvaluate(line);
 				}
-				else if (line.startsWith("runtrace ") || line.startsWith("rt "))
+				else if (cmd.equals("runtrace") || cmd.equals("rt"))
 				{
 					carryOn = doRuntrace(line, false);
 				}
-				else if (line.startsWith("debugtrace ") || line.startsWith("dt "))
+				else if (cmd.equals("debugtrace") || cmd.equals("dt"))
 				{
 					carryOn = doRuntrace(line, true);
 				}
-				else if (line.startsWith("runalltraces"))
+				else if (cmd.equals("runalltraces"))
 				{
 					carryOn = doAllTraces(line);
 				}
-				else if (line.startsWith("savetrace"))
+				else if (cmd.equals("savetrace"))
 				{
 					carryOn = doSavetrace(line);
 				}
-				else if (line.startsWith("seedtrace"))
+				else if (cmd.equals("seedtrace"))
 				{
 					carryOn = doSeedtrace(line);
 				}
-				else if (line.startsWith("save"))
+				else if (cmd.equals("save"))
 				{
 					carryOn = doSave(line);
 				}
-				else if (line.startsWith("filter"))
+				else if (cmd.equals("filter"))
 				{
 					carryOn = doFilter(line);
 				}
-				else if (line.equals("threads"))
+				else if (cmd.equals("threads"))
 				{
 					carryOn = doThreads(line);
 				}
