@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.scheduler;
 
 import com.fujitsu.vdmj.messages.RTLogger;
+import com.fujitsu.vdmj.scheduler.SystemClock.TimeUnit;
 import com.fujitsu.vdmj.values.ObjectValue;
 
 public class CPUResource extends Resource
@@ -202,7 +203,7 @@ public class CPUResource extends Resource
 
 	public long getCyclesDuration(long cycles)
 	{
-		return isVirtual() ? 0 : (long)(cycles/clock + 1);	// Same as VDMTools
+		return isVirtual() ? 0 : SystemClock.timeToInternal(TimeUnit.seconds, new Double(cycles) / clock);
 	}
 
 	public int getNumber()
