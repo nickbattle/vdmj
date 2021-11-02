@@ -50,7 +50,7 @@ public class FuncPostConditionObligation extends ProofObligation
 			body = func.body.toString();
 		}
 
-		value = ctxt.getObligation(generate(func.predef, func.postdef, null, body));
+		value = ctxt.getObligation(generate(func.predef, func.postdef, body));
 	}
 
 	public FuncPostConditionObligation(POImplicitFunctionDefinition func, POContextStack ctxt)
@@ -87,13 +87,13 @@ public class FuncPostConditionObligation extends ProofObligation
 			body = func.body.toString();
 		}
 
-		value = ctxt.getObligation(generate(func.predef, func.postdef, params, body));
+		value = ctxt.getObligation(generate(func.predef, func.postdef, body));
 	}
 
 	private String generate(
 		POExplicitFunctionDefinition predef,
 		POExplicitFunctionDefinition postdef,
-		StringBuilder params, String body)
+		String body)
 	{
 		StringBuilder sb = new StringBuilder();
 
