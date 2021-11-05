@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.tc.patterns;
 import com.fujitsu.vdmj.ast.patterns.ASTTypeBind;
 import com.fujitsu.vdmj.ast.patterns.ASTTypeBindList;
 import com.fujitsu.vdmj.tc.TCMappedList;
+import com.fujitsu.vdmj.util.Utils;
 
 public class TCTypeBindList extends TCMappedList<ASTTypeBind, TCTypeBind>
 {
@@ -40,5 +41,11 @@ public class TCTypeBindList extends TCMappedList<ASTTypeBind, TCTypeBind>
 	public TCTypeBindList()
 	{
 		super();
+	}
+	
+	@Override
+	public String toString()
+	{
+		return Utils.listToString(this);
 	}
 }
