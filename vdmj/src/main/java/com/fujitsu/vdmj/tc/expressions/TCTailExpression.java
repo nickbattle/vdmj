@@ -63,7 +63,7 @@ public class TCTailExpression extends TCUnaryExpression
 		else if (etype instanceof TCSeq1Type)
 		{
 			TCSeq1Type s = (TCSeq1Type)etype;
-			etype = new TCSeqType(s.location, s.seqof);
+			return new TCSeqType(s.location, s.seqof);	// eg. tl [1] is [].
 		}
 
 		return etype;
