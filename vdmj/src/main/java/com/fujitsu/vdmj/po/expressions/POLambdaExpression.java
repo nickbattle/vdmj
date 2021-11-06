@@ -80,6 +80,12 @@ public class POLambdaExpression extends POExpression
 
 		return obligations;
 	}
+	
+	@Override
+	public String getPreName()
+	{
+		return "";	// lambdas are functions without preconditions
+	}
 
 	@Override
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)

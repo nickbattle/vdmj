@@ -107,10 +107,14 @@ public abstract class POExpression extends PONode implements Serializable
 	 * a function expression that identifies a function with a precondition.
 	 * This is used during proof obligation generation. It is implemented in
 	 * the VariableExpression class.
+	 * 
+	 * null => expression is not a function.
+	 * "" => expression is a function without a precondition.
+	 * "pre_<name>" => expression is a function with a precondition.
 	 */
 	public String getPreName()
 	{
-		return null;
+		return null;	// Not a function, by default
 	}
 
 	/**
