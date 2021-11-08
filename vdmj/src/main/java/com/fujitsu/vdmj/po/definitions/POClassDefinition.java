@@ -95,6 +95,8 @@ public class POClassDefinition extends PODefinition
 		Environment env = new PrivateClassEnvironment(tcdef);
 		list.addAll(definitions.getProofObligations(ctxt, env));
 		
+		list.typeCheck(tcdef);
+		
 		if (annotations != null) annotations.poAfter(this, list);
 		return list;
 	}
