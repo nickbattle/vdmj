@@ -24,9 +24,7 @@
 
 package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.ast.expressions.ASTMapCompExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.util.Utils;
 
 public class MapSetOfCompatibleObligation extends ProofObligation
 {
@@ -35,14 +33,6 @@ public class MapSetOfCompatibleObligation extends ProofObligation
 		super(exp.location, POType.MAP_SET_OF_COMPATIBLE, ctxt);
 		StringBuilder sb = new StringBuilder();
 		append(sb, exp.toString());
-		value = ctxt.getObligation(sb.toString());
-	}
-
-	public MapSetOfCompatibleObligation(ASTMapCompExpression exp, POContextStack ctxt)
-	{
-		super(exp.location, POType.MAP_SET_OF_COMPATIBLE, ctxt);
-		StringBuilder sb = new StringBuilder();
-		append(sb, mapCompAsSet(exp));
 		value = ctxt.getObligation(sb.toString());
 	}
 
@@ -61,11 +51,5 @@ public class MapSetOfCompatibleObligation extends ProofObligation
 									d2 + " in set dom " + m2 + " &\n");
 		sb.append("    " + d1 + " = " + d2 + " => " +
 						m1 + "(" + d1 + ") = " + m2 + "(" + d2 + ")");
-	}
-
-	private String mapCompAsSet(ASTMapCompExpression exp)
-	{
-		return "{{" + exp.first + "} | " + Utils.listToString(exp.bindings) +
-			(exp.predicate == null ? "}" : " & " + exp.predicate + "}");
 	}
 }

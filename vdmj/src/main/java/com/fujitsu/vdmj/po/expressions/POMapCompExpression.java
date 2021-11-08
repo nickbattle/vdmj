@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.po.patterns.POMultipleBindList;
 import com.fujitsu.vdmj.po.patterns.POMultipleTypeBind;
 import com.fujitsu.vdmj.pog.FiniteMapObligation;
-import com.fujitsu.vdmj.pog.MapSetOfCompatibleObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POForAllPredicateContext;
@@ -69,8 +68,6 @@ public class POMapCompExpression extends POMapExpression
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-
-		obligations.add(new MapSetOfCompatibleObligation(this, ctxt));
 
 		ctxt.push(new POForAllPredicateContext(this));
 		obligations.addAll(first.getProofObligations(ctxt, env));

@@ -67,7 +67,7 @@ public class PogTest extends TestCase
 	{
 		"exists a : seq of (nat1) & (a <> [])\n",
 		"forall m1, m2 in set {{1 |-> 2}, {2 |-> 3}} & forall d3 in set dom m1, d4 in set dom m2 & d3 = d4 => m1(d3) = m2(d4)\n",
-		"-- After instance variable initializers (iv < 10)\n",
+		"true -- After instance variable initializers (iv < 10)\n",
 		"forall arg1:(int * int), arg2:seq of (int) & (exists bind1:(int * int), i:int, j:int & (arg1 = bind1) and (mk_(i, j) = bind1)) and (exists bind1:seq of (int), k:int & (arg2 = bind1) and ([k] = bind1))\n",
 		"(forall mk_(i, j):(int * int), [k]:seq of (int) &\n  i in set dom m)\n",
 		"(forall mk_(i, j):(int * int) &\n  i in set dom m)\n",
@@ -116,13 +116,12 @@ public class PogTest extends TestCase
 		"(forall i:int &\n  i <> 0)\n",
 		"(forall i:int &\n  is_int((123 / i)))\n",
 		"(forall i:int &\n  i <> 0)\n",
-		"forall m1, m2 in set {a |-> b | a:int, b in set {1, 2, 3} & (a < 10)} & forall d3 in set dom m1, d4 in set dom m2 & d3 = d4 => m1(d3) = m2(d4)\n",
 		"exists finmap1:map nat to (map (int) to (nat1)) & forall a:int, b in set {1, 2, 3} & (a < 10) => exists findex2 in set dom finmap1 & finmap1(findex2) = {a |-> b}\n",
 		"exists finmap1:map nat to (int) & forall a:int, b in set {1, 2, 3} & (a < 10) => exists findex2 in set dom finmap1 & finmap1(findex2) = (a + b)\n",
 		"(forall a:map (int) to (int), b:map (int) to (int) &\n  forall ldom1 in set dom a, rdom2 in set dom b & ldom1 = rdom2 => a(ldom1) = b(rdom2))\n",
 		"(forall x:int &\n  forall m1, m2 in set {{1 |-> 2}, {2 |-> 3}, {x |-> 4}} & forall d3 in set dom m1, d4 in set dom m2 & d3 = d4 => m1(d3) = m2(d4))\n",
-		"forall m1, m2 in set {{a} |-> a | a in set {1, 2, 3} & (a < 10)} & forall d3 in set dom m1, d4 in set dom m2 & d3 = d4 => m1(d3) = m2(d4)\n",
 		"forall m1, m2 in set {{1 |-> 2}, {2 |-> 3}} & forall d3 in set dom m1, d4 in set dom m2 & d3 = d4 => m1(d3) = m2(d4)\n",
+		"(forall n:nat &\n  is_(measure_recursive(n), nat))\n",
 		"(forall n:nat &\n  (not (n = 1) =>\n    (n - 1) >= 0))\n",
 		"(forall n:nat &\n  (not (n = 1) =>\n    measure_recursive(n) > measure_recursive((n - 1))))\n",
 		"dom {1 |-> false} subset inds [2, true, 7.8]\n",
@@ -147,8 +146,8 @@ public class PogTest extends TestCase
 		"1 in set dom m\n",
 		"2 in set dom m\n",
 		"3 in set dom m\n",
-		"while (x > 0) do ...\n",
-		"-- After iv := (iv + 1) (iv < 10)\n",
+		"true -- while (x > 0) do ...\n",
+		"true -- After iv := (iv + 1) (iv < 10)\n"
 	};
 
 	public void testPOG() throws Exception
