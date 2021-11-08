@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
+import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
 
 /**
  * A class for holding a list of ClassDefinitions.
@@ -36,15 +37,19 @@ import com.fujitsu.vdmj.tc.definitions.TCClassList;
 public class POClassList extends POMappedList<TCClassDefinition, POClassDefinition>
 {
 	private static final long serialVersionUID = 1L;
+	
+	private final TCClassList tcclasses;
 
 	public POClassList()
 	{
 		super();
+		tcclasses = null;
 	}
 
 	public POClassList(TCClassList from) throws Exception
 	{
 		super(from);
+		tcclasses = from;
 	}
 
 	@Override
@@ -67,7 +72,7 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 		
 		for (POClassDefinition c: this)
 		{
-			obligations.addAll(c.getProofObligations(new POContextStack(), null));
+			obligations.addAll(c.getProofObligations(new POContextStack(), new PublicClassEnvironment(tcclasses)));
 		}
 
 		obligations.trivialCheck();

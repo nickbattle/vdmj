@@ -91,7 +91,6 @@ public class POModule extends PONode implements Serializable
 		
 		Environment env = new ModuleEnvironment(tcmodule);
 		list.addAll(defs.getProofObligations(new POContextStack(), env));
-		
 		list.typeCheck(tcmodule);
 		
 		if (annotations != null) annotations.poAfter(this, list);

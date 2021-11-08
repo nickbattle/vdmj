@@ -159,6 +159,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		if (TypeChecker.getErrorCount() > 0)
 		{
+			Console.err.println(obligation.getValue());
 			TypeChecker.printErrors(Console.err);
 			throw new ParserException(2330, "PO has type errors?", obligation.location, 0);
 		}

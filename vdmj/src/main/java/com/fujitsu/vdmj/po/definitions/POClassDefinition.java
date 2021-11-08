@@ -87,14 +87,13 @@ public class POClassDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt, Environment ignore)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment publicEnv)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
 		
-		Environment env = new PrivateClassEnvironment(tcdef);
+		Environment env = new PrivateClassEnvironment(tcdef, publicEnv);
 		list.addAll(definitions.getProofObligations(ctxt, env));
-		
 		list.typeCheck(tcdef);
 		
 		if (annotations != null) annotations.poAfter(this, list);
