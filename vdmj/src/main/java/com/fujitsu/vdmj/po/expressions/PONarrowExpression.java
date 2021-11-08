@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 public class PONarrowExpression extends POExpression
@@ -61,7 +62,7 @@ public class PONarrowExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		
@@ -73,7 +74,7 @@ public class PONarrowExpression extends POExpression
 			obligations.add(new SubTypeObligation(test, expected, exptype, ctxt));
 		}
 
-		obligations.addAll(test.getProofObligations(ctxt));
+		obligations.addAll(test.getProofObligations(ctxt, env));
 		return obligations;
 	}
 

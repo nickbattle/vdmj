@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  * A class to hold a list of Definitions.
@@ -70,14 +71,14 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 		return sb.toString();
 	}
 
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		for (PODefinition d: this)
 		{
 			ctxt.push(new PONameContext(d.getVariableNames()));
-			obligations.addAll(d.getProofObligations(ctxt));
+			obligations.addAll(d.getProofObligations(ctxt, env));
 			ctxt.pop();
 		}
 

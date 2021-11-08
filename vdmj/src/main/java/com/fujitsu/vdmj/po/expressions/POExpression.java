@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  *	The parent class of all VDM expressions.
@@ -94,10 +95,11 @@ public abstract class POExpression extends PONode implements Serializable
 	 * Get a list of proof obligations from the expression.
 	 *
 	 * @param ctxt The call context.
+	 * @param env TODO
 	 * @return The list of proof obligations.
 	 */
 
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		return new ProofObligationList();
 	}

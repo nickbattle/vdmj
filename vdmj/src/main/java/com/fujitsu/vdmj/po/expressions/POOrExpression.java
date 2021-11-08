@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POOrExpression extends POBooleanBinaryExpression
 {
@@ -44,7 +45,7 @@ public class POOrExpression extends POBooleanBinaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
@@ -62,10 +63,10 @@ public class POOrExpression extends POBooleanBinaryExpression
 			ctxt.pop();
 		}
 
-		obligations.addAll(left.getProofObligations(ctxt));
+		obligations.addAll(left.getProofObligations(ctxt, env));
 
 		ctxt.push(new PONotImpliesContext(left));
-		obligations.addAll(right.getProofObligations(ctxt));
+		obligations.addAll(right.getProofObligations(ctxt, env));
 		ctxt.pop();
 
 		return obligations;

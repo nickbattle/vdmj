@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.NonEmptySetObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class PODistIntersectExpression extends POUnaryExpression
 {
@@ -46,9 +47,9 @@ public class PODistIntersectExpression extends POUnaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = super.getProofObligations(ctxt);
+		ProofObligationList obligations = super.getProofObligations(ctxt, env);
 		obligations.add(new NonEmptySetObligation(exp, ctxt));
 		return obligations;
 	}

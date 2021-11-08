@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POElementsExpression extends POSetExpression
 {
@@ -47,9 +48,9 @@ public class POElementsExpression extends POSetExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		return exp.getProofObligations(ctxt);
+		return exp.getProofObligations(ctxt, env);
 	}
 
 	@Override

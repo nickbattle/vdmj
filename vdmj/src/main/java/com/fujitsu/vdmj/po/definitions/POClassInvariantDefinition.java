@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  * A VDM class invariant definition.
@@ -61,7 +62,7 @@ public class POClassInvariantDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 

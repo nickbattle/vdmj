@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  * The abstract parent of all definitions. A definition can represent a data
@@ -119,9 +120,10 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	 * Get a list of proof obligations for the definition.
 	 *
 	 * @param ctxt The call context.
+	 * @param env TODO
 	 * @return A list of POs.
 	 */
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		return new ProofObligationList();
 	}

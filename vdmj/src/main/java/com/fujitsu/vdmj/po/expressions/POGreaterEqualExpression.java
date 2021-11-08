@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POGreaterEqualExpression extends PONumericBinaryExpression
 {
@@ -41,9 +42,9 @@ public class POGreaterEqualExpression extends PONumericBinaryExpression
 	}
 	
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		return getOrderedObligations(ctxt);
+		return getOrderedObligations(ctxt, env);
 	}
 
 	@Override

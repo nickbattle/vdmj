@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POTixeStmtAlternative implements Mappable
 {
@@ -51,7 +52,7 @@ public class POTixeStmtAlternative implements Mappable
 		return patternBind + " |-> " + statement;
 	}
 
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 
@@ -66,20 +67,20 @@ public class POTixeStmtAlternative implements Mappable
 		else if (patternBind.bind instanceof POSetBind)
 		{
 			POSetBind bind = (POSetBind)patternBind.bind;
-			list.addAll(bind.set.getProofObligations(ctxt));
+			list.addAll(bind.set.getProofObligations(ctxt, env));
 
 			list.add(new SetMemberObligation(bind.pattern.getMatchingExpression(), bind.set, ctxt));
 		}
 		else if (patternBind.bind instanceof POSeqBind)
 		{
 			POSeqBind bind = (POSeqBind)patternBind.bind;
-			list.addAll(bind.sequence.getProofObligations(ctxt));
+			list.addAll(bind.sequence.getProofObligations(ctxt, env));
 
 			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 		}
 
 
-		list.addAll(statement.getProofObligations(ctxt));
+		list.addAll(statement.getProofObligations(ctxt, env));
 		return list;
 	}
 }

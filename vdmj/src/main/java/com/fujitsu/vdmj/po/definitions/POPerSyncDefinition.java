@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POPerSyncDefinition extends PODefinition
 {
@@ -63,13 +64,13 @@ public class POPerSyncDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
 		ctxt.push(new PONameContext(new TCNameList(opname)));
-		obligations.addAll(guard.getProofObligations(ctxt));
+		obligations.addAll(guard.getProofObligations(ctxt, env));
 		ctxt.pop();
 		
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);

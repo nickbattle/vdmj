@@ -11,11 +11,11 @@ map TCDefinitionList{} to PODefinitionList(this);
 map TCDefinitionListList{} to PODefinitionListList(this);
 map TCAccessSpecifier{isStatic, isAsync, access, isPure} to POAccessSpecifier(isStatic, isAsync, access, isPure);
 map TCAssignmentDefinition{ name, type, expression, expType} to POAssignmentDefinition(name, type, expression, expType);
-map TCBUSClassDefinition{classtype, definitions} to POBUSClassDefinition(classtype, definitions);
-map TCClassDefinition{annotations, name, classtype, definitions, invariant, hasConstructors} to POClassDefinition(annotations, name, classtype, definitions, invariant, hasConstructors);
+map TCBUSClassDefinition{classtype, definitions} to POBUSClassDefinition(classtype, definitions, this);
+map TCClassDefinition{annotations, name, classtype, definitions, invariant, hasConstructors} to POClassDefinition(annotations, name, classtype, definitions, invariant, hasConstructors, this);
 map TCClassInvariantDefinition{name, expression, classDefinition} to POClassInvariantDefinition(name, expression, classDefinition);
 map TCClassList{} to POClassList(this);
-map TCCPUClassDefinition{classtype, definitions, invariant, hasConstructors} to POCPUClassDefinition(classtype, definitions, invariant, hasConstructors);
+map TCCPUClassDefinition{classtype, definitions, invariant, hasConstructors} to POCPUClassDefinition(classtype, definitions, invariant, hasConstructors, this);
 map TCDefinition{} to PODefinition();
 map TCDefinitionSet{} to PODefinitionSet();
 map TCEqualsDefinition{location, pattern, typebind, bind, test, expType, defType, defs} to POEqualsDefinition(location, pattern, typebind, bind, test, expType, defType, defs);
@@ -34,7 +34,7 @@ map TCNamedTraceDefinition{annotations, location, name} to PONamedTraceDefinitio
 map TCPerSyncDefinition{annotations, location, opname, guard} to POPerSyncDefinition(annotations, location, opname, guard);
 map TCRenamedDefinition{name, def} to PORenamedDefinition(name, def);
 map TCStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression, recordType} to POStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression, recordType);
-map TCSystemDefinition{name, classtype, definitions} to POSystemDefinition(name, classtype, definitions);
+map TCSystemDefinition{name, classtype, definitions} to POSystemDefinition(name, classtype, definitions, this);
 map TCThreadDefinition{statement} to POThreadDefinition(statement);
 map TCTypeDefinition{annotations, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression} to POTypeDefinition(annotations, name, type, invPattern, invExpression, eqPattern1, eqPattern2, eqExpression, ordPattern1, ordPattern2, ordExpression);
 map TCValueDefinition{annotations, pattern, type, exp, expType} to POValueDefinition(annotations, pattern, type, exp, expType);
@@ -190,7 +190,7 @@ unmapped com.fujitsu.vdmj.tc.lex.TCNameList;
 # modules
 package com.fujitsu.vdmj.tc.modules to com.fujitsu.vdmj.po.modules;
 map TCModuleList{} to POModuleList(this);
-map TCModule{annotations, name, defs} to POModule(annotations, name, defs);
+map TCModule{annotations, name, defs} to POModule(annotations, name, defs, this);
 
 # patterns
 package com.fujitsu.vdmj.tc.patterns to com.fujitsu.vdmj.po.patterns;

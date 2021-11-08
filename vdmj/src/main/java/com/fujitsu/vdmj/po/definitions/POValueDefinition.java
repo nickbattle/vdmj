@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.pog.ValueBindingObligation;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 /**
@@ -92,12 +93,12 @@ public class POValueDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
-		list.addAll(exp.getProofObligations(ctxt));
+		list.addAll(exp.getProofObligations(ctxt, env));
 
 		if (!(pattern instanceof POIdentifierPattern) &&
 			!(pattern instanceof POIgnorePattern) &&

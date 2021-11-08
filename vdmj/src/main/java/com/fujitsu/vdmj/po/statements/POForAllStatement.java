@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POForAllStatement extends POStatement
 {
@@ -54,10 +55,10 @@ public class POForAllStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = set.getProofObligations(ctxt);
-		obligations.addAll(statement.getProofObligations(ctxt));
+		ProofObligationList obligations = set.getProofObligations(ctxt, env);
+		obligations.addAll(statement.getProofObligations(ctxt, env));
 		return obligations;
 	}
 

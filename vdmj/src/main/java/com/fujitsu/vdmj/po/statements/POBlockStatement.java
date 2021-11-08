@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POScopeContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POBlockStatement extends POSimpleBlockStatement
 {
@@ -44,12 +45,12 @@ public class POBlockStatement extends POSimpleBlockStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = assignmentDefs.getProofObligations(ctxt);
+		ProofObligationList obligations = assignmentDefs.getProofObligations(ctxt, env);
 
 		ctxt.push(new POScopeContext());
-		obligations.addAll(super.getProofObligations(ctxt));
+		obligations.addAll(super.getProofObligations(ctxt, env));
 		ctxt.pop();
 
 		return obligations;

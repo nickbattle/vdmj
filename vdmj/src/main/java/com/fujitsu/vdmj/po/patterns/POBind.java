@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.patterns.visitors.POBindVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  * The parent class of {@link POSetBind} and {@link POTypeBind}.
@@ -56,7 +57,7 @@ public abstract class POBind extends PONode implements Serializable
 	abstract public List<POMultipleBind> getMultipleBindList();
 
 	/** Return a list of POs. */
-	abstract public ProofObligationList getProofObligations(POContextStack ctxt);
+	abstract public ProofObligationList getProofObligations(POContextStack ctxt, Environment env);
 
 	/**
 	 * Implemented by all binds to allow visitor processing.

@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.pog.POForAllPredicateContext;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POSeqCompExpression extends POSeqExpression
 {
@@ -56,20 +57,20 @@ public class POSeqCompExpression extends POSeqExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		ctxt.push(new POForAllPredicateContext(this));
-		obligations.addAll(first.getProofObligations(ctxt));
+		obligations.addAll(first.getProofObligations(ctxt, env));
 		ctxt.pop();
 
-		obligations.addAll(bind.getProofObligations(ctxt));
+		obligations.addAll(bind.getProofObligations(ctxt, env));
 
 		if (predicate != null)
 		{
     		ctxt.push(new POForAllContext(this));
-    		obligations.addAll(predicate.getProofObligations(ctxt));
+    		obligations.addAll(predicate.getProofObligations(ctxt, env));
     		ctxt.pop();
 		}
 

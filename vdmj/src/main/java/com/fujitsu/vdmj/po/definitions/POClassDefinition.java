@@ -29,9 +29,12 @@ import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.statements.POClassInvariantStatement;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
 
 /**
  * A class to represent a VDM++ class definition.
@@ -48,12 +51,15 @@ public class POClassDefinition extends PODefinition
 	public final POExplicitOperationDefinition invariant;
 	/** True is we have constructors */
 	public final boolean hasConstructors;
+	/** The TCClassDefinition for typecheck */
+	public final TCClassDefinition tcdef;
 
 	/**
 	 * Create a class definition with the given name, type and list of local definitions.
 	 */
 	public POClassDefinition(POAnnotationList annotations, TCNameToken className, TCClassType classtype,
-		PODefinitionList definitions, POExplicitOperationDefinition invariant, boolean hasConstructors)
+		PODefinitionList definitions, POExplicitOperationDefinition invariant, boolean hasConstructors,
+		TCClassDefinition tcdef)
 	{
 		super(className.getLocation(), className);
 		this.annotations = annotations;
@@ -61,6 +67,7 @@ public class POClassDefinition extends PODefinition
 		this.definitions = definitions;
 		this.invariant = invariant;
 		this.hasConstructors = hasConstructors;
+		this.tcdef = tcdef;
 	}
 
 	/**
@@ -80,12 +87,13 @@ public class POClassDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment ignore)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
-				
-		list.addAll(definitions.getProofObligations(ctxt));
+		
+		Environment env = new PrivateClassEnvironment(tcdef);
+		list.addAll(definitions.getProofObligations(ctxt, env));
 		
 		if (annotations != null) annotations.poAfter(this, list);
 		return list;

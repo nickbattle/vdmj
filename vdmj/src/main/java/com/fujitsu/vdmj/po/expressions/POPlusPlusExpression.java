@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqModificationObligation;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POPlusPlusExpression extends POBinaryExpression
 {
@@ -42,9 +43,9 @@ public class POPlusPlusExpression extends POBinaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = super.getProofObligations(ctxt);
+		ProofObligationList obligations = super.getProofObligations(ctxt, env);
 
 		if (ltype.isSeq(location))
 		{

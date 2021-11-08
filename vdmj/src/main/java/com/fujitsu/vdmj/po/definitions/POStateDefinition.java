@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFieldList;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 /**
@@ -80,14 +81,14 @@ public class POStateDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
 		if (invExpression != null)
 		{
-			list.addAll(invExpression.getProofObligations(ctxt));
+			list.addAll(invExpression.getProofObligations(ctxt, env));
 			list.add(new SatisfiabilityObligation(this, ctxt));
 		}
 

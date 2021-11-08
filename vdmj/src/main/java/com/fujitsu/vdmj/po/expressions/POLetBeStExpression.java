@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POForAllPredicateContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POLetBeStExpression extends POExpression
 {
@@ -61,21 +62,21 @@ public class POLetBeStExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		obligations.add(new LetBeExistsObligation(this, ctxt));
-		obligations.addAll(bind.getProofObligations(ctxt));
+		obligations.addAll(bind.getProofObligations(ctxt, env));
 
 		if (suchThat != null)
 		{
 			ctxt.push(new POForAllContext(this));
-			obligations.addAll(suchThat.getProofObligations(ctxt));
+			obligations.addAll(suchThat.getProofObligations(ctxt, env));
 			ctxt.pop();
 		}
 
 		ctxt.push(new POForAllPredicateContext(this));
-		obligations.addAll(value.getProofObligations(ctxt));
+		obligations.addAll(value.getProofObligations(ctxt, env));
 		ctxt.pop();
 
 		return obligations;

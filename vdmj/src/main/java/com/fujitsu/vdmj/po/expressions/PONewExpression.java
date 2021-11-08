@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 public class PONewExpression extends POExpression
@@ -51,9 +52,9 @@ public class PONewExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		return args.getProofObligations(ctxt);
+		return args.getProofObligations(ctxt, env);
 	}
 
 	@Override

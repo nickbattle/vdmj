@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 /**
@@ -106,7 +107,7 @@ public class POEqualsDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 
@@ -150,16 +151,16 @@ public class POEqualsDefinition extends PODefinition
 		}
 		else if (bind instanceof POSetBind)
 		{
-			list.addAll(((POSetBind)bind).set.getProofObligations(ctxt));
+			list.addAll(((POSetBind)bind).set.getProofObligations(ctxt, env));
 			list.add(new SetMemberObligation(test, ((POSetBind)bind).set, ctxt));
 		}
 		else if (bind instanceof POSeqBind)
 		{
-			list.addAll(((POSeqBind)bind).sequence.getProofObligations(ctxt));
+			list.addAll(((POSeqBind)bind).sequence.getProofObligations(ctxt, env));
 			list.add(new SeqMemberObligation(test, ((POSeqBind)bind).sequence, ctxt));
 		}
 
-		list.addAll(test.getProofObligations(ctxt));
+		list.addAll(test.getProofObligations(ctxt, env));
 		return list;
 	}
 

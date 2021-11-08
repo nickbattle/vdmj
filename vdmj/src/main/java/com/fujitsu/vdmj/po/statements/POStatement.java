@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  * The parent class of all statements.
@@ -55,9 +56,10 @@ public abstract class POStatement extends PONode implements Serializable
 	 * Get a list of proof obligations from the statement.
 	 *
 	 * @param ctxt The call context.
+	 * @param env TODO
 	 * @return The list of proof obligations.
 	 */
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		return new ProofObligationList();
 	}

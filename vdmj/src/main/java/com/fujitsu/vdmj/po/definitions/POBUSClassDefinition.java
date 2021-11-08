@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
+import com.fujitsu.vdmj.tc.definitions.TCBUSClassDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 
@@ -33,9 +34,9 @@ public class POBUSClassDefinition extends POClassDefinition
 {
 	private static final long serialVersionUID = 1L;
 
-	public POBUSClassDefinition(TCClassType ctype, PODefinitionList defs)
+	public POBUSClassDefinition(TCClassType ctype, PODefinitionList defs, TCBUSClassDefinition tcdef)
 	{
-		super(null, new TCNameToken(LexLocation.ANY, "CLASS", "BUS"), ctype, defs, null, false);
+		super(null, new TCNameToken(LexLocation.ANY, "CLASS", "BUS"), ctype, defs, null, false, tcdef);
 	}
 
 	@Override

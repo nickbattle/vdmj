@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.UniqueExistenceObligation;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POIotaExpression extends POExpression
 {
@@ -52,13 +53,13 @@ public class POIotaExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = bind.getProofObligations(ctxt);
+		ProofObligationList obligations = bind.getProofObligations(ctxt, env);
 		obligations.add(new UniqueExistenceObligation(this, ctxt));
 
 		ctxt.push(new POForAllContext(this));
-		obligations.addAll(predicate.getProofObligations(ctxt));
+		obligations.addAll(predicate.getProofObligations(ctxt, env));
 		ctxt.pop();
 
 		return obligations;

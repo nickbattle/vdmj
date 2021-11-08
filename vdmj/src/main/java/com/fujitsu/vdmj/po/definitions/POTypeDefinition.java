@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.pog.StrictOrderObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  * A class to hold a type definition.
@@ -91,26 +92,26 @@ public class POTypeDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
 		if (invExpression != null)
 		{
-			list.addAll(invExpression.getProofObligations(ctxt));
+			list.addAll(invExpression.getProofObligations(ctxt, env));
 			list.add(new SatisfiabilityObligation(this, ctxt));
 		}
 
 		if (eqExpression != null)
 		{
-			list.addAll(eqExpression.getProofObligations(ctxt));
+			list.addAll(eqExpression.getProofObligations(ctxt, env));
 			list.add(new EquivRelationObligation(this, ctxt));
 		}
 
 		if (ordExpression != null)
 		{
-			list.addAll(ordExpression.getProofObligations(ctxt));
+			list.addAll(ordExpression.getProofObligations(ctxt, env));
 			list.add(new StrictOrderObligation(this, ctxt));
 		}
 

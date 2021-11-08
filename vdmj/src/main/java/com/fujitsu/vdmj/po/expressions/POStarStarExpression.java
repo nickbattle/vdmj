@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.pog.MapIterationObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POStarStarExpression extends POBinaryExpression
 {
@@ -43,7 +44,7 @@ public class POStarStarExpression extends POBinaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 

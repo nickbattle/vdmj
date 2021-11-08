@@ -45,6 +45,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -129,7 +130,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
@@ -164,7 +165,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 		if (precondition != null)
 		{
 			ctxt.push(new POFunctionDefinitionContext(this, false));
-			obligations.addAll(precondition.getProofObligations(ctxt));
+			obligations.addAll(precondition.getProofObligations(ctxt, env));
 			ctxt.pop();
 		}
 
@@ -173,7 +174,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 			ctxt.push(new POFunctionDefinitionContext(this, false));
 			obligations.add(new FuncPostConditionObligation(this, ctxt));
 			ctxt.push(new POFunctionResultContext(this));
-			obligations.addAll(postcondition.getProofObligations(ctxt));
+			obligations.addAll(postcondition.getProofObligations(ctxt, env));
 			ctxt.pop();
 			ctxt.pop();
 		}
@@ -181,12 +182,12 @@ public class POExplicitFunctionDefinition extends PODefinition
 		if (measureDef != null && measureName != null && measureName.getName().startsWith("measure_"))
 		{
 			ctxt.push(new PONameContext(new TCNameList(measureName)));
-			obligations.addAll(measureDef.getProofObligations(ctxt));
+			obligations.addAll(measureDef.getProofObligations(ctxt, env));
 			ctxt.pop();
 		}
 
 		ctxt.push(new POFunctionDefinitionContext(this, true));
-		obligations.addAll(body.getProofObligations(ctxt));
+		obligations.addAll(body.getProofObligations(ctxt, env));
 
 		if (isUndefined ||
 			!TypeComparator.isSubType(actualResult, expectedResult))

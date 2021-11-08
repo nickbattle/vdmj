@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.PONotImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POIfExpression extends POExpression
 {
@@ -74,23 +75,23 @@ public class POIfExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = ifExp.getProofObligations(ctxt);
+		ProofObligationList obligations = ifExp.getProofObligations(ctxt, env);
 
 		ctxt.push(new POImpliesContext(ifExp));
-		obligations.addAll(thenExp.getProofObligations(ctxt));
+		obligations.addAll(thenExp.getProofObligations(ctxt, env));
 		ctxt.pop();
 
 		ctxt.push(new PONotImpliesContext(ifExp));	// not (ifExp) =>
 
 		for (POElseIfExpression exp: elseList)
 		{
-			obligations.addAll(exp.getProofObligations(ctxt));
+			obligations.addAll(exp.getProofObligations(ctxt, env));
 			ctxt.push(new PONotImpliesContext(exp.elseIfExp));
 		}
 
-		obligations.addAll(elseExp.getProofObligations(ctxt));
+		obligations.addAll(elseExp.getProofObligations(ctxt, env));
 
 		for (int i=0; i<elseList.size(); i++)
 		{

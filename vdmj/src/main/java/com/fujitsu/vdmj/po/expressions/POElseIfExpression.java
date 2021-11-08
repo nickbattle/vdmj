@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POElseIfExpression extends POExpression
 {
@@ -50,10 +51,10 @@ public class POElseIfExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ctxt.push(new POImpliesContext(elseIfExp));
-		ProofObligationList obligations = thenExp.getProofObligations(ctxt);
+		ProofObligationList obligations = thenExp.getProofObligations(ctxt, env);
 		ctxt.pop();
 
 		return obligations;

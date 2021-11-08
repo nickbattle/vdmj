@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
+import com.fujitsu.vdmj.tc.definitions.TCCPUClassDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 
@@ -34,9 +35,9 @@ public class POCPUClassDefinition extends POClassDefinition
 	private static final long serialVersionUID = 1L;
 
 	public POCPUClassDefinition(TCClassType ctype, PODefinitionList defs,
-		POExplicitOperationDefinition inv, boolean ctors)
+		POExplicitOperationDefinition inv, boolean ctors, TCCPUClassDefinition tcdef)
 	{
-		super(null, new TCNameToken(LexLocation.ANY, "CLASS", "CPU"), ctype, defs, inv, ctors);
+		super(null, new TCNameToken(LexLocation.ANY, "CLASS", "CPU"), ctype, defs, inv, ctors, tcdef);
 	}
 
 	@Override

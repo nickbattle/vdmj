@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.pog.TupleSelectObligation;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POFieldNumberExpression extends POExpression
 {
@@ -55,9 +56,9 @@ public class POFieldNumberExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList list = tuple.getProofObligations(ctxt);
+		ProofObligationList list = tuple.getProofObligations(ctxt, env);
 
 		if (type instanceof TCUnionType)
 		{

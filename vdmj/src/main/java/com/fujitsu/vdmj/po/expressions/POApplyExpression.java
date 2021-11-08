@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -69,7 +70,7 @@ public class POApplyExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
@@ -129,11 +130,11 @@ public class POApplyExpression extends POExpression
 			obligations.add(new SeqApplyObligation(root, args.get(0), ctxt));
 		}
 
-		obligations.addAll(root.getProofObligations(ctxt));
+		obligations.addAll(root.getProofObligations(ctxt, env));
 
 		for (POExpression arg: args)
 		{
-			obligations.addAll(arg.getProofObligations(ctxt));
+			obligations.addAll(arg.getProofObligations(ctxt, env));
 		}
 
 		return obligations;

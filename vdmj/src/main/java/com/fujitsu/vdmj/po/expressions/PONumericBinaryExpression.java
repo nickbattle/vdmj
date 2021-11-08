@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 abstract public class PONumericBinaryExpression extends POBinaryExpression
@@ -47,7 +48,7 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = getNonNilObligations(ctxt);
 
@@ -79,8 +80,8 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 			}
 		}
 
-		obligations.addAll(left.getProofObligations(ctxt));
-		obligations.addAll(right.getProofObligations(ctxt));
+		obligations.addAll(left.getProofObligations(ctxt, env));
+		obligations.addAll(right.getProofObligations(ctxt, env));
 		return obligations;
 	}
 	
@@ -109,11 +110,11 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	/**
 	 * Generate ordering obligations, as used by the comparison operators.
 	 */
-	protected ProofObligationList getOrderedObligations(POContextStack ctxt)
+	protected ProofObligationList getOrderedObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = getCommonOrderedObligations(ctxt);
-		obligations.addAll(left.getProofObligations(ctxt));
-		obligations.addAll(right.getProofObligations(ctxt));
+		obligations.addAll(left.getProofObligations(ctxt, env));
+		obligations.addAll(right.getProofObligations(ctxt, env));
 		return obligations;
 	}
 	

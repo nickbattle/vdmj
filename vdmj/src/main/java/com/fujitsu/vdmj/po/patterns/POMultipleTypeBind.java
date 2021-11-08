@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POMultipleTypeBind extends POMultipleBind
 {
@@ -47,7 +48,7 @@ public class POMultipleTypeBind extends POMultipleBind
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		return new ProofObligationList();
 	}

@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POSetEnumExpression extends POSetExpression
@@ -51,9 +52,9 @@ public class POSetEnumExpression extends POSetExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		return members.getProofObligations(ctxt);
+		return members.getProofObligations(ctxt, env);
 	}
 
 	@Override
