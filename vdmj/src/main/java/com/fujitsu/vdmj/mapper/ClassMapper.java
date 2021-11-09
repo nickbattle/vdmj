@@ -440,14 +440,19 @@ public class ClassMapper
 	
 	private Field findField(Class<?> src, String field) throws NoSuchFieldException, SecurityException
 	{
-		try
+		if (src.getSuperclass() != null)
 		{
-			return src.getDeclaredField(field);
+			try
+			{
+				return findField(src.getSuperclass(), field);
+			}
+			catch (NoSuchFieldException e)
+			{
+				// drop through
+			}
 		}
-		catch (NoSuchFieldException e)
-		{
-			return src.getField(field);
-		}
+		
+		return src.getDeclaredField(field);
 	}
 
 	/**
@@ -782,7 +787,7 @@ public class ClassMapper
 			{
 				for (Pair pair: progress.updates)
 				{
-					Field f = pair.object.getClass().getField(pair.fieldname);
+					Field f = findField(pair.object.getClass(), pair.fieldname);
 					f.setAccessible(true);
 					f.set(pair.object, result);
 				}
