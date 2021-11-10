@@ -26,11 +26,13 @@ package com.fujitsu.vdmj.ast.definitions;
 
 import java.util.Vector;
 
+import com.fujitsu.vdmj.mapper.Mappable;
+
 /**
  * A class to hold a list of Definitions.
  */
 @SuppressWarnings("serial")
-public class ASTDefinitionList extends Vector<ASTDefinition>
+public class ASTDefinitionList extends Vector<ASTDefinition> implements Mappable
 {
 	public ASTDefinitionList()
 	{

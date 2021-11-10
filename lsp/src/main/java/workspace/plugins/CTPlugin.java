@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -123,11 +124,11 @@ abstract public class CTPlugin extends AnalysisPlugin
 		}
 	}
 
-	abstract public <T> boolean checkLoadedFiles(T inList) throws Exception;
+	abstract public <T extends Mappable> boolean checkLoadedFiles(T inList) throws Exception;
 
 	abstract public Map<String, TCNameList> getTraceNames();
 
-	abstract public <T> T getCT();
+	abstract public <T extends Mappable> T getCT();
 	
 	public int generate(TCNameToken tracename) throws LSPException
 	{

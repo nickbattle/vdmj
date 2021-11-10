@@ -26,11 +26,13 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import java.util.Vector;
 
+import com.fujitsu.vdmj.mapper.Mappable;
+
 /**
  * A class to hold a list of lists of Definitions.
  */
 @SuppressWarnings("serial")
-public class TCDefinitionListList extends Vector<TCDefinitionList>
+public class TCDefinitionListList extends Vector<TCDefinitionList> implements Mappable
 {
 	public TCDefinitionListList()
 	{

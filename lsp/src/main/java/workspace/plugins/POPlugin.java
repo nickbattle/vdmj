@@ -28,6 +28,7 @@ import java.io.File;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -80,9 +81,9 @@ abstract public class POPlugin extends AnalysisPlugin
 
 	abstract public void preCheck();
 
-	abstract public <T> T getPO();
+	abstract public <T extends Mappable> T getPO();
 	
-	abstract public <T> boolean checkLoadedFiles(T poList) throws Exception;
+	abstract public <T extends Mappable> boolean checkLoadedFiles(T poList) throws Exception;
 	
 	abstract protected ProofObligationList getProofObligations();
 	

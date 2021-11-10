@@ -26,9 +26,11 @@ package com.fujitsu.vdmj.po;
 
 import java.util.Map;
 
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.mapper.MappedMap;
 
-abstract public class POMappedMap<FROM_KEY, FROM, TO_KEY, TO> extends MappedMap<FROM_KEY, FROM, TO_KEY, TO>
+abstract public class POMappedMap<FROM_KEY extends Mappable, FROM extends Mappable,
+	TO_KEY extends Mappable, TO extends Mappable> extends MappedMap<FROM_KEY, FROM, TO_KEY, TO>
 {
 	private static final long serialVersionUID = 1L;
 

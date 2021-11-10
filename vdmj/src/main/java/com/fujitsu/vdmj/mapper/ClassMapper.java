@@ -622,6 +622,10 @@ public class ClassMapper
 	
 	/**
 	 * Private class to hold an object/field pair to update (see Progress class).
+	 * 
+	 * Note that this is done by field name, because the ctor Fields in the mapping
+	 * refer to the source class. 99% of the time, we pop the Progress without doing
+	 * a lookup anyway.
 	 */
 	private static class Pair
 	{

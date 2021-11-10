@@ -29,7 +29,8 @@ import java.util.Map;
 
 import com.fujitsu.vdmj.mapper.ClassMapper;
 
-abstract public class MappedMap<FROM_KEY, FROM, TO_KEY, TO> extends HashMap<TO_KEY, TO>
+abstract public class MappedMap<FROM_KEY extends Mappable, FROM extends Mappable,
+	TO_KEY extends Mappable, TO extends Mappable> extends HashMap<TO_KEY, TO>
 {
 	private static final long serialVersionUID = 1L;
 

@@ -46,6 +46,7 @@ import com.fujitsu.vdmj.ast.types.ASTField;
 import com.fujitsu.vdmj.ast.types.ASTNamedType;
 import com.fujitsu.vdmj.ast.types.ASTRecordType;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 
 import json.JSONArray;
@@ -118,7 +119,7 @@ public abstract class ASTPlugin extends AnalysisPlugin
 		return warns;
 	}
 	
-	abstract public <T> T getAST();
+	abstract public <T extends Mappable> T getAST();
 	
 	abstract protected List<VDMMessage> parseFile(File file);
 
