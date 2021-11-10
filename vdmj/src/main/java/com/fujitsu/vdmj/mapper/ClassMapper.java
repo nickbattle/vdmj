@@ -624,17 +624,19 @@ public class ClassMapper
 	 * Private class to hold an object/field pair to update (see Progress class).
 	 * 
 	 * Note that this is done by field name, because the ctor Fields in the mapping
-	 * refer to the source class. 99% of the time, we pop the Progress without doing
-	 * a lookup anyway.
+	 * refer to the source class. This implies that the target ctor has to create a
+	 * field of the same name, so that the finally clause can update the field.
+	 * 
+	 * 99% of the time, we pop the Progress without doing a lookup anyway.
 	 */
 	private static class Pair
 	{
-		public final Object object;
+		public final Object target;
 		public final String fieldname;
 		
 		public Pair(Object object, String fieldname)
 		{
-			this.object = object;
+			this.target = object;
 			this.fieldname = fieldname;
 		}
 	}
@@ -791,9 +793,21 @@ public class ClassMapper
 			{
 				for (Pair pair: progress.updates)
 				{
-					Field f = findField(pair.object.getClass(), pair.fieldname);
-					f.setAccessible(true);
-					f.set(pair.object, result);
+					try
+					{
+						Field f = findField(pair.target.getClass(), pair.fieldname);
+						f.setAccessible(true);
+						f.set(pair.target, result);
+					}
+					catch (NoSuchFieldException e)
+					{
+						// This happens if a self-referencing source field is passed to the target ctor,
+						// but the target field name is not the same as the source field name, or the
+						// value isn't stored at all.
+						
+						throw new Exception("Class " + pair.target.getClass().getSimpleName()
+								+ " must construct field " + pair.fieldname);
+					}
 				}
 			}
 			
