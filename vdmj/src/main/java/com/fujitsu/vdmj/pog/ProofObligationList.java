@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
@@ -34,6 +36,7 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -155,6 +158,24 @@ public class ProofObligationList extends Vector<ProofObligation>
 		if (!potype.isType(TCBooleanType.class, obligation.location))
 		{
 			throw new ParserException(2330, "PO is not boolean?", obligation.location, 0);
+		}
+		
+		// Weed out errors that we can cope with
+		
+		List<VDMError> errs = TypeChecker.getErrors();
+		Iterator<VDMError> iter = errs.iterator();
+		
+		while (iter.hasNext())
+		{
+			switch (iter.next().number)
+			{
+				case 3336:	// "Illegal use of RESULT reserved identifier"
+					iter.remove();
+					break;
+					
+				default:	// fine
+					break;
+			}
 		}
 		
 		if (TypeChecker.getErrorCount() > 0)
