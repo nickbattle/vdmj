@@ -470,7 +470,19 @@ public class ClassMapper
 			{
 				continue;	// fine, it's not mapped
 			}
-			else if (Modifier.isAbstract(entry.getModifiers()))
+			
+			if (!mp.srcClass.getPackage().getName().startsWith("com.fujitsu.vdmj.ast") &&
+				!Mappable.class.isAssignableFrom(mp.srcClass))
+			{
+				error("map source class is not Mappable: " + mp.srcClass.getName());
+			}
+			
+			if (!Mappable.class.isAssignableFrom(mp.destClass))
+			{
+				error("map target class is not Mappable: " + mp.destClass.getName());
+			}
+			
+			if (Modifier.isAbstract(entry.getModifiers()))
 			{
 				continue;	// fine, it will never be instantiated anyway
 			}

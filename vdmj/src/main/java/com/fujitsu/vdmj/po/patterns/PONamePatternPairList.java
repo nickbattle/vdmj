@@ -24,18 +24,24 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import java.util.Vector;
-
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.tc.patterns.TCNamePatternPair;
+import com.fujitsu.vdmj.tc.patterns.TCNamePatternPairList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.util.Utils;
 
 @SuppressWarnings("serial")
-public class PONamePatternPairList extends Vector<PONamePatternPair>
+public class PONamePatternPairList extends POMappedList<TCNamePatternPair, PONamePatternPair>
 {
+	public PONamePatternPairList(TCNamePatternPairList list) throws Exception
+	{
+		super(list);
+	}
+	
 	@Override
 	public String toString()
 	{

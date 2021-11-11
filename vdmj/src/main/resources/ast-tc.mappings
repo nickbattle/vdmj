@@ -16,7 +16,6 @@ map ASTClassInvariantDefinition{accessSpecifier, name, expression, comments} to 
 map ASTClassList{} to TCClassList(this);
 map ASTCPUClassDefinition{name, supernames, definitions, comments} to TCCPUClassDefinition(name, supernames, definitions) set comments;
 map ASTDefinition{comments} to TCDefinition() set comments;
-map ASTDefinitionSet{} to TCDefinitionSet();
 map ASTEqualsDefinition{location, pattern, typebind, bind, test, comments} to TCEqualsDefinition(location, pattern, typebind, bind, test) set comments;
 map ASTExplicitFunctionDefinition{annotations, accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measure, comments} to TCExplicitFunctionDefinition(annotations, accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measure) set comments;
 map ASTExplicitOperationDefinition{annotations, accessSpecifier, name, type, parameterPatterns, precondition, postcondition, body, comments} to TCExplicitOperationDefinition(annotations, accessSpecifier, name, type, parameterPatterns, precondition, postcondition, body) set comments;

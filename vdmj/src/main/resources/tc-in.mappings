@@ -16,7 +16,6 @@ map TCClassInvariantDefinition{name, expression} to INClassInvariantDefinition(n
 map TCClassList{} to INClassList(this);
 map TCCPUClassDefinition{name, classtype, supernames, definitions} to INCPUClassDefinition(name, classtype, supernames, definitions);
 map TCDefinition{} to INDefinition();
-map TCDefinitionSet{} to INDefinitionSet();
 map TCEqualsDefinition{location, pattern, typebind, bind, test, defType, defs} to INEqualsDefinition(location, pattern, typebind, bind, test, defType, defs);
 map TCExplicitFunctionDefinition{annotations, accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measureName, measureDef, predef, postdef, classDefinition} to INExplicitFunctionDefinition(annotations, accessSpecifier, name, typeParams, type, paramPatternList, body, precondition, postcondition, isTypeInvariant, measureName, measureDef, predef, postdef, classDefinition);
 map TCExplicitOperationDefinition{annotations, accessSpecifier, name, type, parameterPatterns, precondition, postcondition, body, isConstructor, predef, postdef, state, classDefinition} to INExplicitOperationDefinition(annotations, accessSpecifier, name, type, parameterPatterns, precondition, postcondition, body, isConstructor, predef, postdef, state, classDefinition);

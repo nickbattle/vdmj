@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.mapper.MappedMap;
 
 abstract public class POMappedMap<FROM_KEY extends Mappable, FROM extends Mappable,
 	TO_KEY extends Mappable, TO extends Mappable> extends MappedMap<FROM_KEY, FROM, TO_KEY, TO>
+	implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 

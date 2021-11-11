@@ -30,13 +30,15 @@ import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.ast.types.ASTTypeSet;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.util.Utils;
 
 
 @SuppressWarnings("serial")
-public class TCTypeSet extends TreeSet<TCType> implements Cloneable
+public class TCTypeSet extends TreeSet<TCType> implements Cloneable, Mappable
 {
+	// This ought to be a MappedSet
 	public TCTypeSet(ASTTypeSet from) throws Exception
 	{
 		ClassMapper mapper = ClassMapper.getInstance(TCNode.MAPPINGS);

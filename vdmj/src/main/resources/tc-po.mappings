@@ -17,7 +17,6 @@ map TCClassInvariantDefinition{name, expression, classDefinition} to POClassInva
 map TCClassList{} to POClassList(this);
 map TCCPUClassDefinition{classtype, definitions, invariant, hasConstructors} to POCPUClassDefinition(classtype, definitions, invariant, hasConstructors, this);
 map TCDefinition{} to PODefinition();
-map TCDefinitionSet{} to PODefinitionSet();
 map TCEqualsDefinition{location, pattern, typebind, bind, test, expType, defType, defs} to POEqualsDefinition(location, pattern, typebind, bind, test, expType, defType, defs);
 map TCExplicitFunctionDefinition{annotations, name, typeParams, type, paramPatternList, body, precondition, postcondition, isUndefined, expectedResult, actualResult, predef, postdef, paramDefinitionList, recursive, measureDef, measureName} to POExplicitFunctionDefinition(annotations, name, typeParams, type, paramPatternList, body, precondition, postcondition, isUndefined, expectedResult, actualResult, predef, postdef, paramDefinitionList, recursive, measureDef, measureName);
 map TCExplicitOperationDefinition{annotations, name, type, parameterPatterns, paramDefinitions, actualResult, precondition, postcondition, body, isConstructor, predef, postdef, state} to POExplicitOperationDefinition(annotations, name, type, parameterPatterns, precondition, postcondition, body, predef, postdef, paramDefinitions, state, actualResult, isConstructor);
@@ -212,7 +211,7 @@ map TCMultipleSeqBind{plist, sequence} to POMultipleSeqBind(plist, sequence);
 map TCMultipleSetBind{plist, set} to POMultipleSetBind(plist, set);
 map TCMultipleTypeBind{plist, type} to POMultipleTypeBind(plist, type);
 map TCNamePatternPair{name, pattern} to PONamePatternPair(name, pattern);
-map TCNamePatternPairList{} to PONamePatternPairList();
+map TCNamePatternPairList{} to PONamePatternPairList(this);
 map TCNilPattern{location} to PONilPattern(location);
 map TCObjectPattern{location, classname, fieldlist} to POObjectPattern(location, classname, fieldlist);
 map TCPattern{} to POPattern();
