@@ -77,7 +77,7 @@ public class TCDomainResToExpression extends TCBinaryExpression
 			}
 		}
 
-		return rtype;
+		return setType(rtype);
 	}
 
 	@Override

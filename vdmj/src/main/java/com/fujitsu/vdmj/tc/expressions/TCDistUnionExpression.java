@@ -66,12 +66,12 @@ public class TCDistUnionExpression extends TCUnaryExpression
 
 			if (set.setof.isSet(location))
 			{
-				return set.setof;
+				return setType(set.setof);
 			}
 		}
 
 		report(3078, "dunion argument is not a set of sets");
-		return new TCSetType(location, new TCUnknownType(location));
+		return setType(new TCSetType(location, new TCUnknownType(location)));
 	}
 
 	@Override

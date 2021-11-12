@@ -71,7 +71,7 @@ public class TCFieldExpression extends TCExpression
 		if (root.isUnknown(location))
 		{
 			memberName = new TCNameToken(field.getLocation(), "?", "?", true);
-			return root;
+			return setType(root);
 		}
 
 		TCTypeSet results = new TCTypeSet();
@@ -205,7 +205,7 @@ public class TCFieldExpression extends TCExpression
     			}
     		}
 
-    		return new TCUnknownType(location);
+    		return setType(new TCUnknownType(location));
 		}
 
 		return possibleConstraint(constraint, results.getType(location));

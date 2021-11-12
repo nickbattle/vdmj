@@ -94,7 +94,7 @@ public class TCLetDefExpression extends TCExpression
 
 		TCType r = expression.typeCheck(local, null, scope, constraint);
 		local.unusedCheck(env);
-		return r;
+		return setType(r);
 	}
 
 	@Override

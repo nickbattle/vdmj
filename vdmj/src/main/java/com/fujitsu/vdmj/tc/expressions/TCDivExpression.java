@@ -45,7 +45,7 @@ public class TCDivExpression extends TCNumericBinaryExpression
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
 		checkNumeric(env, scope);
-		return new TCIntegerType(location);
+		return setType(new TCIntegerType(location));
 	}
 
 	@Override

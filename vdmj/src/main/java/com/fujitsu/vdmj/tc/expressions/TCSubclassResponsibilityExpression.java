@@ -50,7 +50,7 @@ public class TCSubclassResponsibilityExpression extends TCExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		return new TCUnknownType(location);	// Because we terminate anyway
+		return setType(new TCUnknownType(location));	// Because we terminate anyway
 	}
 
 	@Override

@@ -100,7 +100,7 @@ public class TCSeqCompExpression extends TCSeqExpression
 		}
 
 		local.unusedCheck();
-		return new TCSeqType(location, etype);
+		return setType(new TCSeqType(location, etype));
 	}
 
 	@Override

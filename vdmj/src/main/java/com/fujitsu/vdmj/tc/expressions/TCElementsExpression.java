@@ -66,11 +66,11 @@ public class TCElementsExpression extends TCSetExpression
 		if (!arg.isSeq(location))
 		{
 			report(3085, "Argument of 'elems' is not a sequence");
-			return new TCSetType(location, new TCUnknownType(location));
+			return setType(new TCSetType(location, new TCUnknownType(location)));
 		}
 
 		TCSeqType seq = arg.getSeq();
-		return seq.empty ? new TCSetType(location) : new TCSetType(location, seq.seqof);
+		return setType(seq.empty ? new TCSetType(location) : new TCSetType(location, seq.seqof));
 	}
 
 	@Override

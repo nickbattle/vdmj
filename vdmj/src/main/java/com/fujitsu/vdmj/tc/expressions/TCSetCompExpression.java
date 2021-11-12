@@ -94,7 +94,7 @@ public class TCSetCompExpression extends TCSetExpression
 
 		local.unusedCheck();
 		setType = new TCSetType(location, etype);
-		return setType;
+		return setType(setType);
 	}
 
 	@Override

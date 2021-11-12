@@ -103,7 +103,7 @@ public class TCIfExpression extends TCExpression
 
 		rtypes.add(elseExp.typeCheck(env, null, scope, constraint));
 
-		return rtypes.getType(location);
+		return setType(rtypes.getType(location));
 	}
 
 	@Override

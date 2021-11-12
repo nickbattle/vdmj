@@ -70,9 +70,9 @@ public class TCSetUnionExpression extends TCBinaryExpression
 		rof = ((TCSetType)rof).setof;
 		TCTypeSet ts = new TCTypeSet(lof, rof);
 		
-		return set1 ?
+		return setType(set1 ?
 			new TCSet1Type(location, ts.getType(location)) :
-			new TCSetType(location, ts.getType(location));
+			new TCSetType(location, ts.getType(location)));
 	}
 
 	@Override

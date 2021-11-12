@@ -66,12 +66,12 @@ public class TCDistMergeExpression extends TCUnaryExpression
 
 			if (!set.empty && set.setof.isMap(location))
 			{
-				return set.setof;
+				return setType(set.setof);
 			}
 		}
 
 		report(3077, "Merge argument is not a set of maps");
-		return new TCMapType(location);	// Unknown types
+		return setType(new TCMapType(location));	// Unknown types
 	}
 
 	@Override

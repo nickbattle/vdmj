@@ -95,7 +95,7 @@ public class TCLambdaExpression extends TCExpression
 		local.unusedCheck();
 
 		type = new TCFunctionType(location, ptypes, true, result);
-		return type;
+		return setType(type);
 	}
 
 	@Override

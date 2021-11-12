@@ -59,7 +59,7 @@ public class TCAnnotatedExpression extends TCExpression
 		annotation.tcBefore(this, env, scope);
 		TCType type = expression.typeCheck(env, qualifiers, scope, constraint);
 		annotation.tcAfter(this, type, env, scope);
-		return type;
+		return setType(type);
 	}
 
 	@Override

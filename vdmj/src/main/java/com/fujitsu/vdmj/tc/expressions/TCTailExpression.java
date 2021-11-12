@@ -58,15 +58,15 @@ public class TCTailExpression extends TCUnaryExpression
 		if (!etype.isSeq(location))
 		{
 			report(3179, "Argument to 'tl' is not a sequence");
-			return new TCSeqType(location, new TCUnknownType(location));
+			return setType(new TCSeqType(location, new TCUnknownType(location)));
 		}
 		else if (etype instanceof TCSeq1Type)
 		{
 			TCSeq1Type s = (TCSeq1Type)etype;
-			return new TCSeqType(s.location, s.seqof);	// eg. tl [1] is [].
+			return setType(new TCSeqType(s.location, s.seqof));	// eg. tl [1] is [].
 		}
 
-		return etype;
+		return setType(etype);
 	}
 
 	@Override

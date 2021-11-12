@@ -62,7 +62,7 @@ public class TCPreExpression extends TCExpression
 			a.typeCheck(env, null, scope, null);
 		}
 
-		return new TCBooleanType(location);
+		return setType(new TCBooleanType(location));
 	}
 
 	@Override

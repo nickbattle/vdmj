@@ -66,7 +66,7 @@ public class TCUnaryMinusExpression extends TCUnaryExpression
 
 		// Can't constrain the type, as we don't know whether the value is +ive or -ive
 		// return checkConstraint(constraint, t);
-		return t;
+		return setType(t);
 	}
 
 	@Override

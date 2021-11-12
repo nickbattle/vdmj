@@ -60,7 +60,7 @@ public class TCPreOpExpression extends TCExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		return expression.typeCheck(env, null, scope, null);
+		return setType(expression.typeCheck(env, null, scope, null));
 	}
 
 	@Override

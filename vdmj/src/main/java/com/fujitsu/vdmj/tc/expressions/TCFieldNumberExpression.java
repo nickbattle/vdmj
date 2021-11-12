@@ -61,7 +61,7 @@ public class TCFieldNumberExpression extends TCExpression
 		if (!type.isProduct(location))
 		{
 			tuple.report(3094, "Field '#" + field + "' applied to non-tuple type");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
 		TCProductType product = type.getProduct();
@@ -70,10 +70,10 @@ public class TCFieldNumberExpression extends TCExpression
 		if (fn > product.types.size() || fn < 1)
 		{
 			tuple.report(3095, "Field number does not match tuple size");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
-		return product.types.get((int)fn - 1);
+		return setType(product.types.get((int)fn - 1));
 	}
 
 	@Override

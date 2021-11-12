@@ -42,17 +42,17 @@ public class PONarrowExpression extends POExpression
 	public final TCNameToken typename;
 	public final POExpression test;
 	public final PODefinition typedef;
-	public final TCType exptype;
+	public final TCType testtype;
 
 	public PONarrowExpression(LexLocation location, TCType basictype, TCNameToken typename, POExpression test,
-		PODefinition typedef, TCType exptype)
+		PODefinition typedef, TCType testtype)
 	{
 		super(location);
 		this.basictype = basictype;
 		this.typename = typename;
 		this.test = test;
 		this.typedef = typedef;
-		this.exptype = exptype;
+		this.testtype = testtype;
 	}
 
 	@Override
@@ -69,9 +69,9 @@ public class PONarrowExpression extends POExpression
 		TCType expected = (typedef == null ? basictype : typedef.getType());
 		ctxt.noteType(test, expected);
 
-		if (!TypeComparator.isSubType(exptype, expected))
+		if (!TypeComparator.isSubType(testtype, expected))
 		{
-			obligations.add(new SubTypeObligation(test, expected, exptype, ctxt));
+			obligations.add(new SubTypeObligation(test, expected, testtype, ctxt));
 		}
 
 		obligations.addAll(test.getProofObligations(ctxt, env));

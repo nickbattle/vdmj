@@ -56,10 +56,10 @@ public class TCReverseExpression extends TCUnaryExpression
 		if (!etype.isSeq(location))
 		{
 			report(3295, "Argument to 'reverse' is not a sequence");
-			return new TCSeqType(location, new TCUnknownType(location));
+			return setType(new TCSeqType(location, new TCUnknownType(location)));
 		}
 
-		return etype;
+		return setType(etype);
 	}
 
 	@Override

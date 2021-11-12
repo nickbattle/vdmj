@@ -70,7 +70,7 @@ public class TCMkTypeExpression extends TCExpression
 		if (typeDef == null)
 		{
 			report(3126, "Unknown type '" + typename + "' in constructor");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
 		TCType rec = typeDef.getType();
@@ -78,7 +78,7 @@ public class TCMkTypeExpression extends TCExpression
 		if (!(rec instanceof TCRecordType))
 		{
 			report(3127, "Type '" + typename + "' is not a record type");
-			return rec;
+			return setType(rec);
 		}
 
 		recordType = (TCRecordType)rec;
@@ -86,7 +86,7 @@ public class TCMkTypeExpression extends TCExpression
 		if (recordType.opaque && !location.module.equals(recordType.location.module))
 		{
 			report(3127, "Type '" + typename + "' has no struct export");
-			return rec;
+			return setType(rec);
 		}
 
 		if (typename.isExplicit())
@@ -107,7 +107,7 @@ public class TCMkTypeExpression extends TCExpression
 		if (recordType.fields.size() != args.size())
 		{
 			report(3128, "Record and constructor do not have same number of fields");
-			return rec;
+			return setType(rec);
 		}
 
 		int i=0;

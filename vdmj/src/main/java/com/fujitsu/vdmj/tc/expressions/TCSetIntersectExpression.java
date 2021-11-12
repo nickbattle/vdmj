@@ -86,7 +86,7 @@ public class TCSetIntersectExpression extends TCBinaryExpression
 			}
 		}
 
-		return result;
+		return setType(result);
 	}
 
 	@Override

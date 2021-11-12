@@ -58,7 +58,7 @@ public class TCCompExpression extends TCBinaryExpression
     		{
     			report(3068, "Right hand of map 'comp' is not a map");
     			detail("Type", rtype);
-    			return new TCMapType(location);	// Unknown types
+    			return setType(new TCMapType(location));	// Unknown types
     		}
 
     		TCMapType lm = ltype.getMap();
@@ -79,7 +79,7 @@ public class TCCompExpression extends TCBinaryExpression
     		{
     			report(3070, "Right hand of function 'comp' is not a function");
     			detail("Type", rtype);
-    			return new TCUnknownType(location);
+    			return setType(new TCUnknownType(location));
     		}
     		else
     		{
@@ -110,10 +110,10 @@ public class TCCompExpression extends TCBinaryExpression
 		{
 			report(3074, "Left hand of 'comp' is neither a map nor a function");
 			detail("Type", ltype);
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
-		return results.getType(location);
+		return setType(results.getType(location));
 	}
 
 	@Override

@@ -76,9 +76,9 @@ public class TCSubseqExpression extends TCExpression
 			report(3176, "Subsequence range end is not a number");
 		}
 
-		return stype.isSeq(location) ?
+		return setType(stype.isSeq(location) ?
 				new TCSeqType(location, stype.getSeq().seqof) :	// "12345"(1,...,0) is seq not seq1
-				stype;
+				stype);
 	}
 
 	@Override

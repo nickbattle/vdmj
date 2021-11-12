@@ -52,13 +52,13 @@ public class TCMapUnionExpression extends TCBinaryExpression
 		{
 			report(3123, "Left hand of 'munion' is not a map");
 			detail("Type", ltype);
-			return new TCMapType(location);	// Unknown types
+			return setType(new TCMapType(location));	// Unknown types
 		}
 		else if (!rtype.isMap(location))
 		{
 			report(3124, "Right hand of 'munion' is not a map");
 			detail("Type", rtype);
-			return ltype;
+			return setType(ltype);
 		}
 		else
 		{
@@ -68,8 +68,8 @@ public class TCMapUnionExpression extends TCBinaryExpression
 			TCTypeSet from = new TCTypeSet(ml.from, mr.from);
 			TCTypeSet to = new TCTypeSet(ml.to, mr.to);
 
-			return new TCMapType(location,
-				from.getType(location), to.getType(location));
+			return setType(new TCMapType(location,
+				from.getType(location), to.getType(location)));
 		}
 	}
 

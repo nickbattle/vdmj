@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
@@ -39,13 +40,15 @@ import com.fujitsu.vdmj.typechecker.Environment;
 public abstract class POExpression extends PONode implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	
+	/** The type of this subexpression */
+	private TCType exptype;
 
 	/**
 	 * Generate an expression at the given location.
 	 *
 	 * @param location	The location of the new expression.
 	 */
-
 	public POExpression(LexLocation location)
 	{
 		super(location);
@@ -117,6 +120,19 @@ public abstract class POExpression extends PONode implements Serializable
 	public String getPreName()
 	{
 		return null;	// Not a function, by default
+	}
+	
+	/**
+	 * Get and set the exptype. This is used by the ClassMapper.
+	 */
+	public void setExptype(TCType exptype)
+	{
+		this.exptype = exptype;
+	}
+	
+	public TCType getExptype()
+	{
+		return exptype;
 	}
 
 	/**

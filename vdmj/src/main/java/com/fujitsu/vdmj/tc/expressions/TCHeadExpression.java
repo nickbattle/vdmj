@@ -56,10 +56,10 @@ public class TCHeadExpression extends TCUnaryExpression
 		if (!etype.isSeq(location))
 		{
 			report(3104, "Argument to 'hd' is not a sequence");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
-		return etype.getSeq().seqof;
+		return setType(etype.getSeq().seqof);
 	}
 
 	@Override

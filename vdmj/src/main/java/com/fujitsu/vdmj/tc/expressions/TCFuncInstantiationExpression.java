@@ -91,7 +91,7 @@ public class TCFuncInstantiationExpression extends TCExpression
 
 		if (ftype.isUnknown(location))
 		{
-			return ftype;
+			return setType(ftype);
 		}
 
 		if (ftype.isFunction(location))
@@ -168,7 +168,7 @@ public class TCFuncInstantiationExpression extends TCExpression
 
 			if (!set.isEmpty())
 			{
-				return set.getType(location);
+				return setType(set.getType(location));
 			}
 		}
 		else
@@ -176,7 +176,7 @@ public class TCFuncInstantiationExpression extends TCExpression
 			report(3103, "Function instantiation does not yield a function");
 		}
 
-		return new TCUnknownType(location);
+		return setType(new TCUnknownType(location));
 	}
 
 	@Override

@@ -57,11 +57,11 @@ public class TCMapDomainExpression extends TCUnaryExpression
 		if (!etype.isMap(location))
 		{
 			report(3120, "Argument to 'dom' is not a map");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
 		TCMapType mt = etype.getMap();
-		return new TCSetType(location, mt.from);
+		return setType(new TCSetType(location, mt.from));
 	}
 
 	@Override

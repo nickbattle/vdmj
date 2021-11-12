@@ -55,7 +55,7 @@ public class TCFloorExpression extends TCUnaryExpression
 			report(3096, "Argument to floor is not numeric");
 		}
 
-		return new TCIntegerType(location);
+		return setType(new TCIntegerType(location));
 	}
 
 	@Override

@@ -110,7 +110,7 @@ public class TCIotaExpression extends TCExpression
 		}
 
 		local.unusedCheck();
-		return rt;
+		return setType(rt);
 	}
 
 	@Override
