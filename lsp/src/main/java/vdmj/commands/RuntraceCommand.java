@@ -28,11 +28,10 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONArray;
 import json.JSONObject;
-import vdmj.DAPDebugReader;
+import lsp.LSPException;
 import workspace.DAPWorkspaceManager;
-import workspace.Log;
 
-public class RuntraceCommand extends Command
+public class RuntraceCommand extends Command implements InitRunnable
 {
 	public static final String USAGE = "Usage: runtrace <trace> <number>";
 	public static final String[] HELP = { "runtrace", "runtrace <trace> <number> - run one test from a trace" };
@@ -58,35 +57,32 @@ public class RuntraceCommand extends Command
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		DAPDebugReader dbg = null;
-		
-		try
-		{
-			dbg = new DAPDebugReader();
-			dbg.start();
-			
-			long before = System.currentTimeMillis();
-			JSONObject result = DAPWorkspaceManager.getInstance().ctRuntrace(request, tracename, testNumber);
-			long after = System.currentTimeMillis();
-			
-			String answer = display(result) + "\nExecuted in " + (double)(after-before)/1000 + " secs.\n";
-			return new DAPMessageList(request, new JSONObject("result", answer, "variablesReference", 0));
-		}
-		catch (Exception e)
-		{
-			Log.error(e);
-			return new DAPMessageList(request, e);
-		}
-		finally
-		{
-			if (dbg != null)
-			{
-				dbg.interrupt();	// Stop the debugger reader.
-			}
-		}
+		return new DAPMessageList(request, false, "Cannot use runtrace from the console", null);
 	}
 
-	public String display(JSONObject result)
+	@Override
+	public String initRun(DAPRequest request)
+	{
+		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		JSONObject result;
+		try
+		{
+			result = manager.ctRunOneTrace(request, tracename, testNumber);
+			return display(result);
+		}
+		catch (LSPException e)
+		{
+			return "Cannot run trace: " + e.getMessage();
+		}
+	}
+	
+	@Override
+	public String format(String result)
+	{
+		return result;	// All done by display
+	}
+
+	private String display(JSONObject result)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("Test ");

@@ -161,7 +161,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		}
 	}
 
-	public JSONArray execute(RPCRequest request, TCNameToken tracename,
+	public JSONArray runTraceRange(RPCRequest request, TCNameToken tracename,
 			Object progressToken, Object workDoneToken,
 			TraceReductionType rType, float subset, long seed,
 			Long startTest, Long endTest) throws LSPException
@@ -222,7 +222,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		}
 	}
 	
-	public JSONObject runtrace(TCNameToken tracename, long testNumber) throws LSPException
+	public JSONObject runOneTrace(TCNameToken tracename, long testNumber) throws LSPException
 	{
 		if (!tracename.equals(traceName))
 		{
@@ -241,7 +241,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		String callString = test.getCallString(traceContext);
 		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
 
-		interpreter.init();
+		// interpreter.init();  Not needed as we run from InitExecutor only
 		List<Object> result = interpreter.runOneTrace(traceClassDef, test, true);
 
 		return new JSONObject(

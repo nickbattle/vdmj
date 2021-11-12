@@ -271,7 +271,7 @@ public class LSPXWorkspaceManager
 				ct.generate(tracename);
 			}
 			
-			JSONArray batch = ct.execute(request, tracename, progressToken, workDoneToken,
+			JSONArray batch = ct.runTraceRange(request, tracename, progressToken, workDoneToken,
 					rType, subset, seed, start, end);
 			
 			if (batch == null)	// Running in background

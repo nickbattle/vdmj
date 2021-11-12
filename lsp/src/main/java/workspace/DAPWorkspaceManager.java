@@ -199,7 +199,7 @@ public class DAPWorkspaceManager
 		}
 	}
 
-	public JSONObject ctRuntrace(DAPRequest request, String name, long testNumber) throws LSPException
+	public JSONObject ctRunOneTrace(DAPRequest request, String name, long testNumber) throws LSPException
 	{
 		CTPlugin ct = registry.getPlugin("CT");
 		
@@ -223,7 +223,7 @@ public class DAPWorkspaceManager
 			throw new LSPException(RPCErrors.ContentModified, "Specification has errors");
 		}
 
-		return ct.runtrace(Utils.stringToName(name), testNumber);
+		return ct.runOneTrace(Utils.stringToName(name), testNumber);
 	}
 
 	public Interpreter getInterpreter()
