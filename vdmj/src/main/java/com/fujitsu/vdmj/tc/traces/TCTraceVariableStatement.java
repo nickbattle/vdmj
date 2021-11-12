@@ -54,7 +54,7 @@ public class TCTraceVariableStatement extends TCStatement
 	{
 		FlatEnvironment flat = (FlatEnvironment)env;
 		flat.add(new TCLocalDefinition(location, var.name, var.type));
-		return var.type;
+		return setType(var.type);
 	}
 
 	@Override

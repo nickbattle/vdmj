@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
@@ -39,6 +40,9 @@ import com.fujitsu.vdmj.typechecker.Environment;
 public abstract class POStatement extends PONode implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+
+	/** The type of this sub-expression */
+	private TCType stmttype;
 
 	/**
 	 * Create a statement at the given location.
@@ -62,6 +66,21 @@ public abstract class POStatement extends PONode implements Serializable
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		return new ProofObligationList();
+	}
+
+	/**
+	 * Get and set the statement type field.
+	 * The setter returns the type too, so return T can change to return setType(T). 
+	 */
+	public TCType getStmttype()
+	{
+		return stmttype;
+	}
+	
+	public TCType setStmttype(TCType stmttype)
+	{
+		this.stmttype = stmttype;
+		return stmttype;
 	}
 
 	/**

@@ -81,8 +81,8 @@ public class TCNonDeterministicStatement extends TCSimpleBlockStatement
 			warning(5016, "Some statements will not be reached");
 		}
 
-		return rtypes.isEmpty() ?
-			new TCVoidType(location) : rtypes.getType(location);
+		return setType(rtypes.isEmpty() ?
+			new TCVoidType(location) : rtypes.getType(location));
 	}
 
 	private boolean addOne(TCTypeSet rtypes, TCType add)

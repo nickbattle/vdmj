@@ -107,7 +107,7 @@ public class TCIfStatement extends TCStatement
 		if (elseStmt != null)
 		{
 			rtypes.add(elseStmt.typeCheck(env, scope, constraint, mandatory));
-			return rtypes.getType(location);	// check return done in elseStmt
+			return setType(rtypes.getType(location));	// check return done in elseStmt
 		}
 		else
 		{

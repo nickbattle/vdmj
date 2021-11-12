@@ -94,7 +94,7 @@ public class TCLetDefStatement extends TCStatement
 
 		TCType r = statement.typeCheck(new FlatEnvironment(local, false, false), scope, constraint, mandatory);
 		local.unusedCheck(env);
-		return r;
+		return setType(r);
 	}
 
 	@Override

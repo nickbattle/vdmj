@@ -124,8 +124,8 @@ abstract public class TCSimpleBlockStatement extends TCStatement
 			rtypes.add(new TCVoidType(location));
 		}
 
-		return rtypes.isEmpty() ?
-			new TCVoidType(location) : rtypes.getType(location);
+		return setType(rtypes.isEmpty() ?
+			new TCVoidType(location) : rtypes.getType(location));
 	}
 
 	private void addOne(TCTypeSet rtypes, TCType add)
