@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.statements;
 
 import java.io.Serializable;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -35,6 +36,7 @@ import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInheritedDefinition;
 import com.fujitsu.vdmj.tc.statements.visitors.TCExitChecker;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
+import com.fujitsu.vdmj.tc.types.TCQuoteType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
@@ -102,7 +104,15 @@ public abstract class TCStatement extends TCNode implements Serializable
 	 */
 	public final TCTypeSet exitCheck(Environment base)
 	{
-		return apply(new TCExitChecker(), base);
+		TCTypeSet possible = new TCTypeSet();
+		
+		if (Settings.exceptions)	// Internal constraint violations raise <RuntimeError>
+		{
+			possible.add(new TCQuoteType(location, "RuntimeError"));
+		}
+		
+		possible.addAll(apply(new TCExitChecker(), base));
+		return possible;
 	}
 
 	/**
