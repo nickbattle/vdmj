@@ -58,7 +58,7 @@ public class TCAtomicStatement extends TCStatement
 			stmt.typeCheck(env, scope, constraint, mandatory);
 		}
 
-		return new TCVoidType(location);
+		return setType(new TCVoidType(location));
 	}
 
 	@Override

@@ -95,7 +95,7 @@ public class TCCasesStatement extends TCStatement
 			rtypes.add(new TCVoidType(location));
 		}
 
-		return rtypes.getType(location);
+		return setType(rtypes.getType(location));
 	}
 
 	@Override

@@ -73,7 +73,7 @@ public class TCCyclesStatement extends TCStatement
 			detail("Actual", argType);
 		}
 
-		return statement.typeCheck(env, scope, constraint, mandatory);
+		return setType(statement.typeCheck(env, scope, constraint, mandatory));
 	}
 
 	@Override

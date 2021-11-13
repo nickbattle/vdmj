@@ -84,12 +84,12 @@ public class TCForAllStatement extends TCStatement
 			}
 			
 			local.unusedCheck();
-			return rt;
+			return setType(rt);
 		}
 		else
 		{
 			report(3219, "For all statement does not contain a set type");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 	}
 

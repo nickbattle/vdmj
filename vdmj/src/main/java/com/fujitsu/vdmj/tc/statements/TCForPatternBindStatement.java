@@ -86,12 +86,12 @@ public class TCForPatternBindStatement extends TCStatement
 			}
 			
 			local.unusedCheck();
-			return rt;
+			return setType(rt);
 		}
 		else
 		{
 			exp.report(3223, "Expecting sequence type after 'in'");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 	}
 

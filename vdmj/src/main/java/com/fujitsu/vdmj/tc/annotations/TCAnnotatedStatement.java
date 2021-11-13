@@ -58,7 +58,7 @@ public class TCAnnotatedStatement extends TCStatement
 		annotation.tcBefore(this, env, scope);
 		TCType type = statement.typeCheck(env, scope, constraint, mandatory);
 		annotation.tcAfter(this, type, env, scope);
-		return type;
+		return setType(type);
 	}
 
 	@Override

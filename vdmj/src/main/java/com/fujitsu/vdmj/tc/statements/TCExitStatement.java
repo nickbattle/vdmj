@@ -63,7 +63,7 @@ public class TCExitStatement extends TCStatement
 		// type error (should return the same type as the definition return
 		// type).
 
-		return new TCUnknownType(location);
+		return setType(new TCUnknownType(location));
 	}
 
 	@Override

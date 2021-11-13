@@ -90,7 +90,7 @@ public class TCCallObjectStatement extends TCStatement
 		if (!dtype.isClass(env))
 		{
 			report(3207, "Object designator is not an object type");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
 		TCClassType ctype = dtype.getClassType(env);
@@ -127,7 +127,7 @@ public class TCCallObjectStatement extends TCStatement
 		if (isConstructor(fdef) && !inConstructor(env))
 		{
 			report(3337, "Cannot call a constructor from here");
-			return new TCUnknownType(location);				
+			return setType(new TCUnknownType(location));				
 		}
 
 		// Special code for the deploy method of CPU
@@ -140,7 +140,7 @@ public class TCCallObjectStatement extends TCStatement
 				args.get(0).report(3280, "Argument to deploy must be an object");
 			}
 
-			return new TCVoidType(location);
+			return setType(new TCVoidType(location));
 		}
 		else if (Settings.dialect == Dialect.VDM_RT &&
 			field.getModule().equals("CPU") && field.getName().equals("setPriority"))
@@ -164,13 +164,13 @@ public class TCCallObjectStatement extends TCStatement
     			}
 			}
 
-			return new TCVoidType(location);
+			return setType(new TCVoidType(location));
 		}
 		else if (fdef == null)
 		{
 			// Use raw method, so we can use field's location
 			TypeChecker.report(3209, "Member " + field + " is not in scope", field.getLocation());
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 		else if (fdef.isStatic() && !env.isStatic())
 		{
@@ -208,7 +208,7 @@ public class TCCallObjectStatement extends TCStatement
 		else
 		{
 			report(3210, "Object member is neither a function nor an operation");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 	}
 

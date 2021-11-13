@@ -58,6 +58,9 @@ public abstract class TCStatement extends TCNode implements Serializable
 	/** A list of comments preceding the statement */
 	public LexCommentList comments;
 	
+	/** The type of this sub-expression */
+	private TCType stmttype;
+
 	/**
 	 * Create a statement at the given location.
 	 * @param location
@@ -95,7 +98,7 @@ public abstract class TCStatement extends TCNode implements Serializable
 			}
 		}
 
-		return actual;
+		return setType(actual);
 	}
 
 	/**
@@ -192,6 +195,21 @@ public abstract class TCStatement extends TCNode implements Serializable
 	public void setComments(LexCommentList comments)
 	{
 		this.comments = comments;
+	}
+
+	/**
+	 * Get and set the statement type field.
+	 * The setter returns the type too, so return T can change to return setType(T). 
+	 */
+	public TCType getType()
+	{
+		return stmttype;
+	}
+	
+	public TCType setType(TCType stmttype)
+	{
+		this.stmttype = stmttype;
+		return stmttype;
 	}
 
 	/**
