@@ -64,7 +64,7 @@ public class TCDefStatement extends TCStatement
 
 		TCType r = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck(env);
-		return r;
+		return setType(r);
 	}
 
 	@Override

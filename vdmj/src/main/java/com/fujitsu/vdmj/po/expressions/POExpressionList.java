@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 
@@ -50,13 +51,13 @@ public class POExpressionList extends POMappedList<TCExpression, POExpression>
 		return Utils.listToString(this);
 	}
 
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 
 		for (POExpression e: this)
 		{
-			list.addAll(e.getProofObligations(ctxt));
+			list.addAll(e.getProofObligations(ctxt, env));
 		}
 
 		return list;

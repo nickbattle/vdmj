@@ -68,7 +68,7 @@ public class TCDomainResByExpression extends TCBinaryExpression
 			}
 		}
 
-		return rtype;
+		return setType(rtype);
 	}
 
 	@Override

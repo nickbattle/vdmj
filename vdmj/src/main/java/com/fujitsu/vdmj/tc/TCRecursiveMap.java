@@ -26,10 +26,11 @@ package com.fujitsu.vdmj.tc;
 
 import java.util.HashMap;
 
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionListList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class TCRecursiveMap extends HashMap<TCNameToken, TCDefinitionListList>
+public class TCRecursiveMap extends HashMap<TCNameToken, TCDefinitionListList> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 }

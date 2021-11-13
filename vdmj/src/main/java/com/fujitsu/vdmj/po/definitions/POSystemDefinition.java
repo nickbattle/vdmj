@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
+import com.fujitsu.vdmj.tc.definitions.TCSystemDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 
@@ -32,9 +33,9 @@ public class POSystemDefinition extends POClassDefinition
 {
 	private static final long serialVersionUID = 1L;
 
-	public POSystemDefinition(TCNameToken className, TCClassType ctype, PODefinitionList members)
+	public POSystemDefinition(TCNameToken className, TCClassType ctype, PODefinitionList members, TCSystemDefinition tcdef)
 	{
-		super(null, className, ctype, members, null, false);
+		super(null, className, ctype, members, null, false, tcdef);
 	}
 
 	@Override

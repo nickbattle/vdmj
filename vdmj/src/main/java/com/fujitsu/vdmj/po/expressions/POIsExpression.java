@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POIsExpression extends POExpression
 {
@@ -57,7 +58,7 @@ public class POIsExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		if (typedef != null)
 		{
@@ -68,7 +69,7 @@ public class POIsExpression extends POExpression
 			ctxt.noteType(test, basictype);
 		}
 
-		return test.getProofObligations(ctxt);
+		return test.getProofObligations(ctxt, env);
 	}
 
 	@Override

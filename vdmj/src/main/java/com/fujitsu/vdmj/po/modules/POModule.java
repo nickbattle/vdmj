@@ -32,6 +32,9 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.modules.TCModule;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 
 /**
  * A class holding all the details for one module.
@@ -46,15 +49,18 @@ public class POModule extends PONode implements Serializable
 	public final PODefinitionList defs;
 	/** A list of annotations, if any */
 	public final POAnnotationList annotations;
+	/** The TC module, for type checking */
+	public final TCModule tcmodule;
 
 	/**
 	 * Create a module from the given name and definitions.
 	 */
-	public POModule(POAnnotationList annotations, TCIdentifierToken name, PODefinitionList defs)
+	public POModule(POAnnotationList annotations, TCIdentifierToken name, PODefinitionList defs, TCModule tcmodule)
 	{
 		this.annotations = annotations;
 		this.name = name;
 		this.defs = defs;
+		this.tcmodule = tcmodule;
 	}
 
 	@Override
@@ -82,8 +88,10 @@ public class POModule extends PONode implements Serializable
 	{
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
-				
-		list.addAll(defs.getProofObligations(new POContextStack()));
+		
+		Environment env = new ModuleEnvironment(tcmodule);
+		list.addAll(defs.getProofObligations(new POContextStack(), env));
+		list.typeCheck(tcmodule);
 		
 		if (annotations != null) annotations.poAfter(this, list);
 		return list;

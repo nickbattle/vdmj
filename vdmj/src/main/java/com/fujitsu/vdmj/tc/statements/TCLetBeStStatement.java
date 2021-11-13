@@ -88,7 +88,7 @@ public class TCLetBeStStatement extends TCStatement
 
 		TCType r = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();
-		return r;
+		return setType(r);
 	}
 
 	@Override

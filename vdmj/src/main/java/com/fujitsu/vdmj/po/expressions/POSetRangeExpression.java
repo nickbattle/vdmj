@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POSetRangeExpression extends POSetExpression
 {
@@ -55,10 +56,10 @@ public class POSetRangeExpression extends POSetExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = first.getProofObligations(ctxt);
-		obligations.addAll(last.getProofObligations(ctxt));
+		ProofObligationList obligations = first.getProofObligations(ctxt, env);
+		obligations.addAll(last.getProofObligations(ctxt, env));
 		return obligations;
 	}
 

@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.messages.RTLogger;
 public class SystemClock
 {
 	private static long wallTime = 0;
+	final static double PRECISION = 100000000.0d;
 
 	public static synchronized long getWallTime()
 	{
@@ -52,5 +53,55 @@ public class SystemClock
 		{
 			RTLogger.log(String.format("-- Moved time by %d", duration));
 		}
+	}
+
+	/**
+	 * Time unit enumeration used to specify units used in the VDM syntax.
+	 * This change has come from Overture.
+	 * @author kela
+	 */
+	public enum TimeUnit
+	{
+		seconds(1.0, "s"),
+		decisecond(Math.pow(10, -1), "ds"),
+		centisecond(Math.pow(10, -2), "cs"),
+		millisecond(Math.pow(10, -3), "ms"),
+		microsecond(Math.pow(10, -6), "\u03BCs"),	// mu s :-)
+		nanosecond(Math.pow(10, -9), "ns");
+
+		private final Double value;
+		private final String symbol;
+
+		private TimeUnit(Double value, String symbol)
+		{
+			this.value = value;
+			this.symbol = symbol;
+		}
+
+		public Double getValue()
+		{
+			return value;
+		}
+
+		@Override
+		public String toString()
+		{
+			return symbol + " factor: " + value;
+		}
+	}
+
+	/**
+	 * Utility method to convert a value in the given unit to the internal time
+	 * 
+	 * @param unit
+	 *            The unit of the time parameter
+	 * @param time
+	 *            The time to convert
+	 * @return The internal time representation of the parameter
+	 */
+	public static long timeToInternal(TimeUnit unit, Double time)
+	{
+		return Math.round(time * unit.getValue()
+				/ TimeUnit.nanosecond.getValue());
 	}
 }

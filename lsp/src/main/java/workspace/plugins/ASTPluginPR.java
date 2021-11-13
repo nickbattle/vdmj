@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ClassReader;
 import json.JSONArray;
@@ -108,7 +109,7 @@ public class ASTPluginPR extends ASTPlugin
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getAST()
+	public <T extends Mappable> T getAST()
 	{
 		return (T)astClassList;
 	}

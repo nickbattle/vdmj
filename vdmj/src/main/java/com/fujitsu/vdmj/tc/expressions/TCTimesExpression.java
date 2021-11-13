@@ -55,31 +55,31 @@ public class TCTimesExpression extends TCNumericBinaryExpression
 
 		if (ln instanceof TCRealType)
 		{
-			return ln;
+			return setType(ln);
 		}
 		else if (rn instanceof TCRealType)
 		{
-			return rn;
+			return setType(rn);
 		}
 		else if (ln instanceof TCIntegerType)
 		{
-			return ln;
+			return setType(ln);
 		}
 		else if (rn instanceof TCIntegerType)
 		{
-			return rn;
+			return setType(rn);
 		}
 		else if (ln instanceof TCNaturalType)
 		{
-			return ln;
+			return setType(ln);
 		}
 		else if (rn instanceof TCNaturalType)
 		{
-			return rn;
+			return setType(rn);
 		}
 		else
 		{
-			return new TCNaturalOneType(ln.location);
+			return setType(new TCNaturalOneType(ln.location));
 		}
 	}
 

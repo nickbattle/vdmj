@@ -313,7 +313,15 @@ public class ClassMapper
 		try
 		{
 			Class<?> toIgnore = Class.forName(command.source);
-			mappings.put(toIgnore, new MapParams(lineNo, toIgnore, toIgnore, null, null, true));
+			
+			if (mappings.containsKey(toIgnore))
+			{
+				error("Class is already mapped: " + toIgnore.getName());
+			}
+			else
+			{
+				mappings.put(toIgnore, new MapParams(lineNo, toIgnore, toIgnore, null, null, true));
+			}
 		}
 		catch (ClassNotFoundException e)
 		{
@@ -411,7 +419,14 @@ public class ClassMapper
 				}
 			}
 
-			mappings.put(srcClass, new MapParams(lineNo, srcClass, destClass, ctorFields, setterFields, false));
+			if (mappings.containsKey(srcClass))
+			{
+				error("Class is already mapped: " + srcClass.getName());
+			}
+			else
+			{
+				mappings.put(srcClass, new MapParams(lineNo, srcClass, destClass, ctorFields, setterFields, false));
+			}
 		}
 		catch (ClassNotFoundException e)
 		{
@@ -425,14 +440,19 @@ public class ClassMapper
 	
 	private Field findField(Class<?> src, String field) throws NoSuchFieldException, SecurityException
 	{
-		try
+		if (src.getSuperclass() != null)
 		{
-			return src.getDeclaredField(field);
+			try
+			{
+				return findField(src.getSuperclass(), field);
+			}
+			catch (NoSuchFieldException e)
+			{
+				// drop through
+			}
 		}
-		catch (NoSuchFieldException e)
-		{
-			return src.getField(field);
-		}
+		
+		return src.getDeclaredField(field);
 	}
 
 	/**
@@ -450,7 +470,19 @@ public class ClassMapper
 			{
 				continue;	// fine, it's not mapped
 			}
-			else if (Modifier.isAbstract(entry.getModifiers()))
+			
+			if (!mp.srcClass.getPackage().getName().startsWith("com.fujitsu.vdmj.ast") &&
+				!Mappable.class.isAssignableFrom(mp.srcClass))
+			{
+				error("map source class is not Mappable: " + mp.srcClass.getName());
+			}
+			
+			if (!Mappable.class.isAssignableFrom(mp.destClass))
+			{
+				error("map target class is not Mappable: " + mp.destClass.getName());
+			}
+			
+			if (Modifier.isAbstract(entry.getModifiers()))
 			{
 				continue;	// fine, it will never be instantiated anyway
 			}
@@ -602,15 +634,21 @@ public class ClassMapper
 	
 	/**
 	 * Private class to hold an object/field pair to update (see Progress class).
+	 * 
+	 * Note that this is done by field name, because the ctor Fields in the mapping
+	 * refer to the source class. This implies that the target ctor has to create a
+	 * field of the same name, so that the finally clause can update the field.
+	 * 
+	 * 99% of the time, we pop the Progress without doing a lookup anyway.
 	 */
 	private static class Pair
 	{
-		public final Object object;
+		public final Object target;
 		public final String fieldname;
 		
 		public Pair(Object object, String fieldname)
 		{
-			this.object = object;
+			this.target = object;
 			this.fieldname = fieldname;
 		}
 	}
@@ -767,9 +805,21 @@ public class ClassMapper
 			{
 				for (Pair pair: progress.updates)
 				{
-					Field f = pair.object.getClass().getField(pair.fieldname);
-					f.setAccessible(true);
-					f.set(pair.object, result);
+					try
+					{
+						Field f = findField(pair.target.getClass(), pair.fieldname);
+						f.setAccessible(true);
+						f.set(pair.target, result);
+					}
+					catch (NoSuchFieldException e)
+					{
+						// This happens if a self-referencing source field is passed to the target ctor,
+						// but the target field name is not the same as the source field name, or the
+						// value isn't stored at all.
+						
+						throw new Exception("Class " + pair.target.getClass().getSimpleName()
+								+ " must construct field " + pair.fieldname);
+					}
 				}
 			}
 			

@@ -63,7 +63,6 @@ public class INExplicitFunctionDefinition extends INDefinition
 	public final boolean isCurried;
 	public final INExplicitFunctionDefinition predef;
 	public final INExplicitFunctionDefinition postdef;
-	public final INClassDefinition classdef;
 	
 	private Map<TCTypeList, FunctionValue> polyfuncs = null;
 
@@ -91,7 +90,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 		this.isCurried = parameters.size() > 1;
 		this.predef = predef;
 		this.postdef = postdef;
-		this.classdef = classdef;
+		this.classDefinition = classdef;
 
 		type.instantiated = (typeParams == null) ? null : false;
 	}

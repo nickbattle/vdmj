@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POForAllPredicateContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCSetType;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POSetCompExpression extends POSetExpression
@@ -63,19 +64,19 @@ public class POSetCompExpression extends POSetExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		ctxt.push(new POForAllPredicateContext(this));
-		obligations.addAll(first.getProofObligations(ctxt));
+		obligations.addAll(first.getProofObligations(ctxt, env));
 		ctxt.pop();
 
 		boolean finiteTest = false;
 
 		for (POMultipleBind mb: bindings)
 		{
-			obligations.addAll(mb.getProofObligations(ctxt));
+			obligations.addAll(mb.getProofObligations(ctxt, env));
 
 			if (mb instanceof POMultipleTypeBind)
 			{
@@ -91,7 +92,7 @@ public class POSetCompExpression extends POSetExpression
 		if (predicate != null)
 		{
     		ctxt.push(new POForAllContext(this));
-    		obligations.addAll(predicate.getProofObligations(ctxt));
+    		obligations.addAll(predicate.getProofObligations(ctxt, env));
     		ctxt.pop();
 		}
 

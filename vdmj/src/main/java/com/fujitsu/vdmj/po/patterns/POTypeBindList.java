@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.patterns;
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBindList;
+import com.fujitsu.vdmj.util.Utils;
 
 public class POTypeBindList extends POMappedList<TCTypeBind, POTypeBind>
 {
@@ -40,5 +41,11 @@ public class POTypeBindList extends POMappedList<TCTypeBind, POTypeBind>
 	public POTypeBindList()
 	{
 		super();
+	}
+	
+	@Override
+	public String toString()
+	{
+		return Utils.listToString(this);
 	}
 }

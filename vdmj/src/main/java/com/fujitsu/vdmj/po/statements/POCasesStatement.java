@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POCasesStatement extends POStatement
 {
@@ -70,7 +71,7 @@ public class POCasesStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		boolean hasIgnore = false;
@@ -82,12 +83,12 @@ public class POCasesStatement extends POStatement
 				hasIgnore = true;
 			}
 
-			obligations.addAll(alt.getProofObligations(ctxt));
+			obligations.addAll(alt.getProofObligations(ctxt, env));
 		}
 
 		if (others != null && !hasIgnore)
 		{
-			obligations.addAll(others.getProofObligations(ctxt));
+			obligations.addAll(others.getProofObligations(ctxt, env));
 		}
 
 		return obligations;

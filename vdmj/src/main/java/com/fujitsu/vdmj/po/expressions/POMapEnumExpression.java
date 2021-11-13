@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.pog.MapSeqOfCompatibleObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POMapEnumExpression extends POMapExpression
@@ -62,13 +63,13 @@ public class POMapEnumExpression extends POMapExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList list = new ProofObligationList();
 
 		for (POMapletExpression maplet: members)
 		{
-			list.addAll(maplet.getProofObligations(ctxt));
+			list.addAll(maplet.getProofObligations(ctxt, env));
 		}
 
 		if (members.size() > 1)

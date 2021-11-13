@@ -31,6 +31,8 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
  *	The parent class of all VDM expressions.
@@ -38,13 +40,15 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 public abstract class POExpression extends PONode implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	
+	/** The type of this subexpression */
+	private TCType exptype;
 
 	/**
 	 * Generate an expression at the given location.
 	 *
 	 * @param location	The location of the new expression.
 	 */
-
 	public POExpression(LexLocation location)
 	{
 		super(location);
@@ -94,10 +98,11 @@ public abstract class POExpression extends PONode implements Serializable
 	 * Get a list of proof obligations from the expression.
 	 *
 	 * @param ctxt The call context.
+	 * @param env TODO
 	 * @return The list of proof obligations.
 	 */
 
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		return new ProofObligationList();
 	}
@@ -107,10 +112,27 @@ public abstract class POExpression extends PONode implements Serializable
 	 * a function expression that identifies a function with a precondition.
 	 * This is used during proof obligation generation. It is implemented in
 	 * the VariableExpression class.
+	 * 
+	 * null => expression is not a function.
+	 * "" => expression is a function without a precondition.
+	 * "pre_<name>" => expression is a function with a precondition.
 	 */
 	public String getPreName()
 	{
-		return null;
+		return null;	// Not a function, by default
+	}
+	
+	/**
+	 * Get and set the exptype. This is used by the ClassMapper.
+	 */
+	public void setExptype(TCType exptype)
+	{
+		this.exptype = exptype;
+	}
+	
+	public TCType getExptype()
+	{
+		return exptype;
 	}
 
 	/**

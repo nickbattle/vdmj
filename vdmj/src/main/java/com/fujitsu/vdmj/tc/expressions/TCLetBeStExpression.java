@@ -74,7 +74,7 @@ public class TCLetBeStExpression extends TCExpression
 
 		TCType r = value.typeCheck(local, null, scope, constraint);
 		local.unusedCheck();
-		return r;
+		return setType(r);
 	}
 
 	@Override

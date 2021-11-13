@@ -87,7 +87,7 @@ public class TCStateInitExpression extends TCExpression
 		}
 
 		state.canBeExecuted = canBeExecuted;
-		return new TCBooleanType(location);
+		return setType(new TCBooleanType(location));
 	}
 
 	@Override

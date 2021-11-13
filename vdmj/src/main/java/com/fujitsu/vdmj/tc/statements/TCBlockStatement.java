@@ -65,7 +65,7 @@ public class TCBlockStatement extends TCSimpleBlockStatement
 
 		TCType r = super.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck(env);
-		return r;
+		return setType(r);
 	}
 	
 	@Override

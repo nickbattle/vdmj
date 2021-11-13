@@ -56,7 +56,7 @@ public class TCUnaryPlusExpression extends TCUnaryExpression
 			report(3289, "'+' expression must be numeric");
 		}
 		
-		return t;
+		return setType(t);
 	}
 
 	@Override

@@ -43,7 +43,7 @@ public class TCNarrowExpression extends TCExpression
 	public final TCExpression test;
 
 	private TCDefinition typedef = null;
-	private TCType exptype = null;
+	private TCType testtype = null;
 	public TCTypeList unresolved = null;
 
 	public TCNarrowExpression(LexLocation location, TCNameToken typename, TCType type, TCExpression test)
@@ -68,7 +68,7 @@ public class TCNarrowExpression extends TCExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		exptype = test.typeCheck(env, null, scope, null);
+		testtype = test.typeCheck(env, null, scope, null);
 		TCType result = null;
 
 		if (basictype != null)
@@ -93,7 +93,7 @@ public class TCNarrowExpression extends TCExpression
 			}
 		}
 		
-		if (!TypeComparator.compatible(result, exptype))
+		if (!TypeComparator.compatible(result, testtype))
 		{
 			report(3317, "Expression can never match narrow type");
 		}

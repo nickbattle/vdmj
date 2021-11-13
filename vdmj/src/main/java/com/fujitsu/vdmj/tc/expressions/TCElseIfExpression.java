@@ -70,7 +70,7 @@ public class TCElseIfExpression extends TCExpression
 			qenv = new FlatEnvironment(qualified, env);
 		}
 
-		return thenExp.typeCheck(qenv, null, scope, constraint);
+		return setType(thenExp.typeCheck(qenv, null, scope, constraint));
 	}
 
 	@Override

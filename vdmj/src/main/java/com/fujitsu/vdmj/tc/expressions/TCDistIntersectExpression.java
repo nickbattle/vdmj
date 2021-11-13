@@ -59,12 +59,12 @@ public class TCDistIntersectExpression extends TCUnaryExpression
 
 			if (set.empty || set.setof.isSet(location))
 			{
-				return set.setof;
+				return setType(set.setof);
 			}
 		}
 
 		report(3076, "Argument of 'dinter' is not a set of sets");
-		return new TCUnknownType(location);
+		return setType(new TCUnknownType(location));
 	}
 
 	@Override

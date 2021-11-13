@@ -40,7 +40,7 @@ public class StateInvariantObligation extends ProofObligation
 		super(ass.location, POType.STATE_INVARIANT, ctxt);
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append("-- After ");
+		sb.append("true -- After ");
 		sb.append(ass);
 		sb.append("\n");
 
@@ -69,7 +69,7 @@ public class StateInvariantObligation extends ProofObligation
 	{
 		super(def.location, POType.STATE_INVARIANT, ctxt);
 		StringBuilder sb = new StringBuilder();
-		sb.append("-- After instance variable initializers\n");
+		sb.append("true -- After instance variable initializers\n");
 		sb.append(invDefs(def.classDefinition));
 
     	value = ctxt.getObligation(sb.toString());
@@ -81,7 +81,7 @@ public class StateInvariantObligation extends ProofObligation
 	{
 		super(def.location, POType.STATE_INVARIANT, ctxt);
 		StringBuilder sb = new StringBuilder();
-		sb.append("-- After ");
+		sb.append("true -- After ");
 		sb.append(def.name);
 		sb.append(" constructor body\n");
 		sb.append(invDefs(def.classDefinition));
@@ -95,7 +95,7 @@ public class StateInvariantObligation extends ProofObligation
 	{
 		super(def.location, POType.STATE_INVARIANT, ctxt);
 		StringBuilder sb = new StringBuilder();
-		sb.append("-- After ");
+		sb.append("true -- After ");
 		sb.append(def.name);
 		sb.append(" constructor body\n");
 		sb.append(invDefs(def.classDefinition));

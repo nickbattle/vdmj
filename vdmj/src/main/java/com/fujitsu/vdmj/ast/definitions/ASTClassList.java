@@ -29,10 +29,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.mapper.Mappable;
+
 /**
  * A class for holding a list of ClassDefinitions.
  */
-public class ASTClassList extends Vector<ASTClassDefinition>
+public class ASTClassList extends Vector<ASTClassDefinition> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 

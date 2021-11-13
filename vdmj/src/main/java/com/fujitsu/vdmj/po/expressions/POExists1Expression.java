@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.patterns.POBind;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POExists1Expression extends POExpression
 {
@@ -51,12 +52,12 @@ public class POExists1Expression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = bind.getProofObligations(ctxt);
+		ProofObligationList obligations = bind.getProofObligations(ctxt, env);
 
 		ctxt.push(new POForAllContext(this));
-		obligations.addAll(predicate.getProofObligations(ctxt));
+		obligations.addAll(predicate.getProofObligations(ctxt, env));
 		ctxt.pop();
 
 		return obligations;

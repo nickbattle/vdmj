@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.statements;
 
 import java.io.Serializable;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -35,6 +36,7 @@ import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCInheritedDefinition;
 import com.fujitsu.vdmj.tc.statements.visitors.TCExitChecker;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
+import com.fujitsu.vdmj.tc.types.TCQuoteType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
@@ -56,6 +58,9 @@ public abstract class TCStatement extends TCNode implements Serializable
 	/** A list of comments preceding the statement */
 	public LexCommentList comments;
 	
+	/** The type of this sub-expression */
+	private TCType stmttype;
+
 	/**
 	 * Create a statement at the given location.
 	 * @param location
@@ -93,7 +98,7 @@ public abstract class TCStatement extends TCNode implements Serializable
 			}
 		}
 
-		return actual;
+		return setType(actual);
 	}
 
 	/**
@@ -102,7 +107,15 @@ public abstract class TCStatement extends TCNode implements Serializable
 	 */
 	public final TCTypeSet exitCheck(Environment base)
 	{
-		return apply(new TCExitChecker(), base);
+		TCTypeSet possible = new TCTypeSet();
+		
+		if (Settings.exceptions)	// Internal constraint violations raise <RuntimeError>
+		{
+			possible.add(new TCQuoteType(location, "RuntimeError"));
+		}
+		
+		possible.addAll(apply(new TCExitChecker(), base));
+		return possible;
 	}
 
 	/**
@@ -182,6 +195,21 @@ public abstract class TCStatement extends TCNode implements Serializable
 	public void setComments(LexCommentList comments)
 	{
 		this.comments = comments;
+	}
+
+	/**
+	 * Get and set the statement type field.
+	 * The setter returns the type too, so return T can change to return setType(T). 
+	 */
+	public TCType getType()
+	{
+		return stmttype;
+	}
+	
+	public TCType setType(TCType stmttype)
+	{
+		this.stmttype = stmttype;
+		return stmttype;
 	}
 
 	/**

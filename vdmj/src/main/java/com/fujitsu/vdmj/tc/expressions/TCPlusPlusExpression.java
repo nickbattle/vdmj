@@ -77,7 +77,7 @@ public class TCPlusPlusExpression extends TCBinaryExpression
     		{
     			concern(unique, 3141, "Right hand of '++' is not a map");
     			detail(unique, "Type", rtype);
-    			return new TCMapType(location);	// Unknown types
+    			return setType(new TCMapType(location));	// Unknown types
     		}
 
     		TCMapType lm = ltype.getMap();
@@ -118,10 +118,10 @@ public class TCPlusPlusExpression extends TCBinaryExpression
 		if (result.isEmpty())
 		{
 			report(3144, "Left of '++' is neither a map nor a sequence");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
-		return result.getType(location);
+		return setType(result.getType(location));
 	}
 
 	@Override

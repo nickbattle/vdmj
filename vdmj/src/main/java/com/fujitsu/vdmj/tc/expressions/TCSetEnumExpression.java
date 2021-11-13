@@ -78,7 +78,7 @@ public class TCSetEnumExpression extends TCSetExpression
 			}
 		}
 
-		TCType rt = ts.isEmpty() ? new TCSetType(location) :
+		TCType rt = members.isEmpty() ? new TCSetType(location) :
 					new TCSet1Type(location, ts.getType(location));
 		
 		return possibleConstraint(constraint, rt);

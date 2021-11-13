@@ -66,7 +66,6 @@ public class INImplicitFunctionDefinition extends INDefinition
 	public final INExplicitFunctionDefinition measureDef;
 	public final INExplicitFunctionDefinition predef;
 	public final INExplicitFunctionDefinition postdef;
-	public final INClassDefinition classdef;
 	public final TCFunctionType type;
 
 	private Map<TCTypeList, FunctionValue> polyfuncs = null;
@@ -96,7 +95,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 		this.measureDef = measureDef;
 		this.predef = predef;
 		this.postdef = postdef;
-		this.classdef = classdef;
+		this.classDefinition = classdef;
 
 		TCTypeList ptypes = new TCTypeList();
 

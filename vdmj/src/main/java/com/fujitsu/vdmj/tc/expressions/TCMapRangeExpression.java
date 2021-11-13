@@ -57,11 +57,11 @@ public class TCMapRangeExpression extends TCUnaryExpression
 		if (!etype.isMap(location))
 		{
 			report(3122, "Argument to 'rng' is not a map");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
 		TCMapType mt = etype.getMap();
-		return new TCSetType(location, mt.to);
+		return setType(new TCSetType(location, mt.to));
 	}
 
 	@Override

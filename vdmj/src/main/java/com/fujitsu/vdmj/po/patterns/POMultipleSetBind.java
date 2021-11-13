@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POMultipleBindVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POMultipleSetBind extends POMultipleBind
 {
@@ -47,9 +48,9 @@ public class POMultipleSetBind extends POMultipleBind
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		return set.getProofObligations(ctxt);
+		return set.getProofObligations(ctxt, env);
 	}
 
 	@Override

@@ -49,11 +49,11 @@ public class TCSubtractExpression extends TCNumericBinaryExpression
 
 		if (ltype instanceof TCRealType || rtype instanceof TCRealType)
 		{
-			return new TCRealType(location);
+			return setType(new TCRealType(location));
 		}
 		else
 		{
-			return new TCIntegerType(location);
+			return setType(new TCIntegerType(location));
 		}
 	}
 

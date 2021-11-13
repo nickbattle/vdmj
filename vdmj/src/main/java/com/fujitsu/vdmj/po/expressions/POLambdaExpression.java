@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POLambdaExpression extends POExpression
 {
@@ -65,20 +66,26 @@ public class POLambdaExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		for (POTypeBind tb: bindList)
 		{
-			obligations.addAll(tb.getProofObligations(ctxt));
+			obligations.addAll(tb.getProofObligations(ctxt, env));
 		}
 
 		ctxt.push(new POForAllContext(this));
-		obligations.addAll(expression.getProofObligations(ctxt));
+		obligations.addAll(expression.getProofObligations(ctxt, env));
 		ctxt.pop();
 
 		return obligations;
+	}
+	
+	@Override
+	public String getPreName()
+	{
+		return "";	// lambdas are functions without preconditions
 	}
 
 	@Override

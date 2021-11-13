@@ -90,7 +90,7 @@ public class TCApplyExpression extends TCExpression
 
 		if (type.isUnknown(location))
 		{
-			return type;
+			return setType(type);
 		}
 
 		TCDefinition enclfunc = env.getEnclosingDefinition();
@@ -202,7 +202,7 @@ public class TCApplyExpression extends TCExpression
 		if (results.isEmpty())
 		{
 			report(3054, "Type " + type + " cannot be applied");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
 		// If a constraint is passed in, we can raise an error if it is

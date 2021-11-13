@@ -81,12 +81,12 @@ public class TCVariableExpression extends TCExpression
         			{
         				report(3180, "Inaccessible member " + name + " of class " +
         					vardef.classDefinition.name.getName());
-        				return new TCUnknownType(location);
+        				return setType(new TCUnknownType(location));
         			}
         			else if (!vardef.isStatic() && env.isStatic())
             		{
             			report(3181, "Cannot access " + name + " from a static context");
-            			return new TCUnknownType(location);
+            			return setType(new TCUnknownType(location));
             		}
     			}
     		}
@@ -152,7 +152,7 @@ public class TCVariableExpression extends TCExpression
 		{
 			report(3182, "Name '" + name + "' is not in scope");
 			env.listAlternatives(name);
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 		else
 		{
@@ -165,7 +165,7 @@ public class TCVariableExpression extends TCExpression
 				if (ptype.name.equals(name))	// Referring to "T" of @T
 				{
 					report(3351, "Type parameter '" + name.getName() + "' cannot be used here");
-					return new TCUnknownType(location);
+					return setType(new TCUnknownType(location));
 				}
 			}
 			

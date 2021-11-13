@@ -74,7 +74,7 @@ public class TCCasesExpression extends TCExpression
 			rtypes.add(others.typeCheck(env, null, scope, constraint));
 		}
 
-		return rtypes.getType(location);
+		return setType(rtypes.getType(location));
 	}
 
 	@Override

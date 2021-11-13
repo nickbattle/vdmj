@@ -68,7 +68,7 @@ public class TCMapEnumExpression extends TCMapExpression
 
 		if (members.isEmpty())
 		{
-			return new TCMapType(location);
+			return setType(new TCMapType(location));
 		}
 
 		TCTypeSet dom = new TCTypeSet();

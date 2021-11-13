@@ -27,8 +27,9 @@ package vdmj.commands;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.ExpressionExecutor;
+import workspace.DAPWorkspaceManager;
 
-public class PrintCommand extends Command
+public class PrintCommand extends Command implements InitRunnable
 {
 	public static final String USAGE = "Usage: print <expression>";
 	public static final String[] HELP = { "print", "print <exp> - evaluate an expression" };
@@ -55,6 +56,26 @@ public class PrintCommand extends Command
 		ExpressionExecutor executor = new ExpressionExecutor("print", request, expression);
 		executor.start();
 		return null;
+	}
+
+	@Override
+	public String initRun(DAPRequest request)
+	{
+		try
+		{
+			DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+			return manager.getInterpreter().execute(expression).toString();
+		}
+		catch (Exception e)
+		{
+			return "Cannot evaluate " + expression + " : " + e.getMessage();
+		}
+	}
+	
+	@Override
+	public String format(String result)
+	{
+		return expression + " = " + result;
 	}
 
 	@Override

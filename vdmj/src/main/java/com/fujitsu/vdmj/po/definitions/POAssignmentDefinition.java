@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 /**
@@ -65,10 +66,10 @@ public class POAssignmentDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
-		obligations.addAll(expression.getProofObligations(ctxt));
+		obligations.addAll(expression.getProofObligations(ctxt, env));
 
 		if (!TypeComparator.isSubType(ctxt.checkType(expression, expType), type))
 		{

@@ -51,6 +51,9 @@ public abstract class TCExpression extends TCNode implements Serializable
 	
 	/** A list of comments preceding the expression */
 	public LexCommentList comments;
+	
+	/** The type of this sub-expression */
+	private TCType exptype;
 
 	/**
 	 * Generate an expression at the given location.
@@ -137,7 +140,7 @@ public abstract class TCExpression extends TCNode implements Serializable
 			}
 		}
 
-		return actual;
+		return setType(actual);
 	}
 
 	/**
@@ -155,7 +158,7 @@ public abstract class TCExpression extends TCNode implements Serializable
 			}
 		}
 
-		return actual;
+		return setType(actual);
 	}
 
 	/**
@@ -243,6 +246,21 @@ public abstract class TCExpression extends TCNode implements Serializable
 	public void setComments(LexCommentList comments)
 	{
 		this.comments = comments;
+	}
+	
+	/**
+	 * Get and set the sub-expression type field.
+	 * The setter returns the type too, so return T can change to return setType(T). 
+	 */
+	public TCType getType()
+	{
+		return exptype;
+	}
+	
+	public TCType setType(TCType exptype)
+	{
+		this.exptype = exptype;
+		return exptype;
 	}
 
 	/**

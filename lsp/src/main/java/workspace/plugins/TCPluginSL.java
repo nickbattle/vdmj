@@ -29,6 +29,7 @@ import java.io.IOException;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -74,7 +75,7 @@ public class TCPluginSL extends TCPlugin
 	}
 	
 	@Override
-	public <T> boolean checkLoadedFiles(T astModuleList) throws Exception
+	public <T extends Mappable> boolean checkLoadedFiles(T astModuleList) throws Exception
 	{
 		try
 		{
@@ -106,7 +107,7 @@ public class TCPluginSL extends TCPlugin
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getTC()
+	public <T extends Mappable> T getTC()
 	{
 		return (T)tcModuleList;
 	}

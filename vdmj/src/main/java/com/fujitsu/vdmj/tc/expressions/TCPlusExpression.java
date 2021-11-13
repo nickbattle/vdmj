@@ -56,35 +56,35 @@ public class TCPlusExpression extends TCNumericBinaryExpression
 
 		if (ln instanceof TCRealType)
 		{
-			return ln;
+			return setType(ln);
 		}
 		else if (rn instanceof TCRealType)
 		{
-			return rn;
+			return setType(rn);
 		}
 		else if (ln instanceof TCRationalType)
 		{
-			return ln;
+			return setType(ln);
 		}
 		else if (rn instanceof TCRationalType)
 		{
-			return rn;
+			return setType(rn);
 		}
 		else if (ln instanceof TCIntegerType)
 		{
-			return ln;
+			return setType(ln);
 		}
 		else if (rn instanceof TCIntegerType)
 		{
-			return rn;
+			return setType(rn);
 		}
 		else if (ln instanceof TCNaturalType && rn instanceof TCNaturalType)
 		{
-			return ln;
+			return setType(ln);
 		}
 		else
 		{
-			return new TCNaturalOneType(ln.location);
+			return setType(new TCNaturalOneType(ln.location));
 		}
 	}
 

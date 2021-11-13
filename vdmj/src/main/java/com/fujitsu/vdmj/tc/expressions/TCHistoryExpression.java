@@ -97,7 +97,7 @@ public class TCHistoryExpression extends TCExpression
 			}
 		}
 	
-		return new TCNaturalType(location);
+		return setType(new TCNaturalType(location));
 	}
 
 	@Override

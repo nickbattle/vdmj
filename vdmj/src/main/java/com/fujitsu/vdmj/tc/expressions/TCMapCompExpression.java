@@ -88,7 +88,7 @@ public class TCMapCompExpression extends TCMapExpression
 
 		maptype = first.typeCheck(local, scope, domConstraint, rngConstraint);	// The map from/to type
 		local.unusedCheck();
-		return maptype;
+		return setType(maptype);
 	}
 
 	@Override

@@ -25,6 +25,7 @@
 package workspace.plugins;
 
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -46,13 +47,13 @@ public class POPluginSL extends POPlugin
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getPO()
+	public <T extends Mappable> T getPO()
 	{
 		return (T) poModuleList;
 	}
 
 	@Override
-	public <T> boolean checkLoadedFiles(T tcList) throws Exception
+	public <T extends Mappable> boolean checkLoadedFiles(T tcList) throws Exception
 	{
 		poModuleList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcList);
 		return true;

@@ -77,7 +77,7 @@ public class TCCallStatement extends TCStatement
 		{
 			report(3213, "Operation " + name + " is not in scope");
 			env.listAlternatives(name);
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
 		if (env.isVDMPP() && name.isExplicit())
@@ -91,20 +91,20 @@ public class TCCallStatement extends TCStatement
 			if (!self.hasSupertype(ctype) && !opdef.isStatic())
 			{
 				report(3324, "Operation " + name + " is not static");
-				return new TCUnknownType(location);				
+				return setType(new TCUnknownType(location));				
 			}
 		}
 		
 		if (isConstructor(opdef) && !inConstructor(env))
 		{
 			report(3337, "Cannot call a constructor from here");
-			return new TCUnknownType(location);				
+			return setType(new TCUnknownType(location));				
 		}
 
 		if (!opdef.isStatic() && env.isStatic())
 		{
 			report(3214, "Cannot call " + name + " from static context");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
 		TCType type = opdef.getType();
@@ -153,7 +153,7 @@ public class TCCallStatement extends TCStatement
 		else
 		{
 			report(3210, "Name is neither a function nor an operation");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 	}
 

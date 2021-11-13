@@ -68,7 +68,7 @@ public class TCRangeResByExpression extends TCBinaryExpression
 			}
 		}
 
-		return ltype;
+		return setType(ltype);
 	}
 
 	@Override

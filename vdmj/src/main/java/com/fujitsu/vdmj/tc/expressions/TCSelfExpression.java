@@ -59,7 +59,7 @@ public class TCSelfExpression extends TCExpression
 		if (cdef == null)
 		{
 			report(3154, name + " not in scope");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
 		return checkConstraint(constraint, cdef.getType());

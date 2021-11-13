@@ -91,7 +91,7 @@ public class TCTrapStatement extends TCStatement
 		Environment local = new FlatCheckedEnvironment(defs, base, scope);
 		rtypes.add(with.typeCheck(local, scope, constraint, mandatory));
 
-		return rtypes.getType(location);
+		return setType(rtypes.getType(location));
 	}
 
 	@Override

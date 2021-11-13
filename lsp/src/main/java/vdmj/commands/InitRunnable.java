@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2021 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,46 +22,13 @@
  *
  ******************************************************************************/
 
-package workspace.plugins;
+package vdmj.commands;
 
-import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.definitions.POClassList;
-import com.fujitsu.vdmj.pog.ProofObligationList;
+import dap.DAPRequest;
 
-public class POPluginPR extends POPlugin
+public interface InitRunnable
 {
-	private POClassList poClassList;
-
-	public POPluginPR()
-	{
-		super();
-	}
-
-	@Override
-	public void preCheck()
-	{
-		poClassList = null;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Mappable> T getPO()
-	{
-		return (T) poClassList;
-	}
-
-	@Override
-	public <T extends Mappable> boolean checkLoadedFiles(T tcList) throws Exception
-	{
-		poClassList = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(tcList);
-		return true;
-	}
-
-	@Override
-	protected ProofObligationList getProofObligations()
-	{
-		return poClassList.getProofObligations();
-	}
+	public String initRun(DAPRequest request);
+	
+	public String format(String result);
 }

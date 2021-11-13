@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
 
 abstract public class ProofObligation implements Comparable<ProofObligation>
 {
@@ -38,6 +39,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public POTrivialProof proof;
 
 	private int var = 1;
+	private TCExpression checkedExpression;
 
 	public ProofObligation(LexLocation location, POType kind, POContextStack ctxt)
 	{
@@ -82,5 +84,15 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public int compareTo(ProofObligation other)
 	{
 		return number - other.number;
+	}
+
+	public void setCheckedExpression(TCExpression checkedExpression)
+	{
+		this.checkedExpression = checkedExpression;
+	}
+	
+	public TCExpression getCheckedExpression()
+	{
+		return checkedExpression;
 	}
 }

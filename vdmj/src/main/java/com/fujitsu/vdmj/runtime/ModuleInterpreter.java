@@ -249,7 +249,7 @@ public class ModuleInterpreter extends Interpreter
 	{
 		LexTokenReader ltr = new LexTokenReader(line, Dialect.VDM_SL, Console.charset);
 		ExpressionReader reader = new ExpressionReader(ltr);
-		reader.setCurrentModule(getDefaultName());
+		reader.setCurrentModule(module);
 		ASTExpression ast = reader.readExpression();
 		LexToken end = ltr.getLast();
 		

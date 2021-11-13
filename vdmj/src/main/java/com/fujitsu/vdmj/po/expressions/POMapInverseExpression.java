@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.pog.InvariantObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCMapType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POMapInverseExpression extends POUnaryExpression
 {
@@ -49,9 +50,9 @@ public class POMapInverseExpression extends POUnaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList list = super.getProofObligations(ctxt);
+		ProofObligationList list = super.getProofObligations(ctxt, env);
 
 		if (!type.empty)
 		{

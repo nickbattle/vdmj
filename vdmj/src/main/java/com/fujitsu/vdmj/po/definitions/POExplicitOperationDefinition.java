@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -107,7 +108,7 @@ public class POExplicitOperationDefinition extends PODefinition
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
@@ -125,16 +126,16 @@ public class POExplicitOperationDefinition extends PODefinition
 
 		if (precondition != null)
 		{
-			obligations.addAll(precondition.getProofObligations(ctxt));
+			obligations.addAll(precondition.getProofObligations(ctxt, env));
 		}
 
 		if (postcondition != null)
 		{
-			obligations.addAll(postcondition.getProofObligations(ctxt));
+			obligations.addAll(postcondition.getProofObligations(ctxt, env));
 			obligations.add(new OperationPostConditionObligation(this, ctxt));
 		}
 
-		obligations.addAll(body.getProofObligations(ctxt));
+		obligations.addAll(body.getProofObligations(ctxt, env));
 
 		if (isConstructor &&
 			classDefinition != null &&

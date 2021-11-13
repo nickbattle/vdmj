@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POImpliesExpression extends POBooleanBinaryExpression
 {
@@ -44,9 +45,9 @@ public class POImpliesExpression extends POBooleanBinaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = left.getProofObligations(ctxt);
+		ProofObligationList obligations = left.getProofObligations(ctxt, env);
 
 		if (ltype.isUnion(location))
 		{
@@ -61,7 +62,7 @@ public class POImpliesExpression extends POBooleanBinaryExpression
 		}
 
 		ctxt.push(new POImpliesContext(left));
-		obligations.addAll(right.getProofObligations(ctxt));
+		obligations.addAll(right.getProofObligations(ctxt, env));
 		ctxt.pop();
 
 		return obligations;

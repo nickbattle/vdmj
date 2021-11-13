@@ -50,7 +50,7 @@ public class TCUndefinedExpression extends TCExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
-		return new TCUnknownType(location);
+		return setType(new TCUnknownType(location));
 	}
 
 	@Override

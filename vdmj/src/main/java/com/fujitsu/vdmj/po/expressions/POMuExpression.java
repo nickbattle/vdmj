@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -61,14 +62,14 @@ public class POMuExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList list = record.getProofObligations(ctxt);
+		ProofObligationList list = record.getProofObligations(ctxt, env);
 		int i = 0;
 
 		for (PORecordModifier rm: modifiers)
 		{
-			list.addAll(rm.value.getProofObligations(ctxt));
+			list.addAll(rm.value.getProofObligations(ctxt, env));
 
 			TCField f = recordType.findField(rm.tag.getName());
 			TCType mtype = modTypes.get(i++);

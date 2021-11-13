@@ -71,10 +71,10 @@ public class TCStarStarExpression extends TCBinaryExpression
 		else
 		{
 			report(3173, "First arg of '**' must be a map, function or number");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
-		return ltype;
+		return setType(ltype);
 	}
 
 	@Override

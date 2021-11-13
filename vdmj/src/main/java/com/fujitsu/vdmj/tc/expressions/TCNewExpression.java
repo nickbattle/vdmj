@@ -71,7 +71,7 @@ public class TCNewExpression extends TCExpression
 		if (cdef == null || !(cdef instanceof TCClassDefinition))
 		{
 			report(3133, "Class name " + classname + " not in scope");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 		
 		if (Settings.release == Release.VDM_10 && env.isFunctional())

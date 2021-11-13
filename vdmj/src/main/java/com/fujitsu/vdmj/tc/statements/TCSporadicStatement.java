@@ -82,7 +82,7 @@ public class TCSporadicStatement extends TCStatement
 		if (opdef == null)
 		{
 			report(3228, opname + " is not in scope");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
 		// Operation must be "() ==> ()"
@@ -130,7 +130,7 @@ public class TCSporadicStatement extends TCStatement
 			report(3232, opname + " is not an operation name");
 		}
 
-		return new TCVoidType(location);
+		return setType(new TCVoidType(location));
 	}
 
 	@Override

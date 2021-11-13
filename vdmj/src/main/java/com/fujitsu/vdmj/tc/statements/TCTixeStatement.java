@@ -66,7 +66,7 @@ public class TCTixeStatement extends TCStatement
     		}
 		}
 
-		return rt;
+		return setType(rt);
 	}
 
 	@Override

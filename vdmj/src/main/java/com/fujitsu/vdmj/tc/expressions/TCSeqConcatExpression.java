@@ -80,9 +80,9 @@ public class TCSeqConcatExpression extends TCBinaryExpression
 		rof = ((TCSeqType)rof).seqof;
 		TCTypeSet ts = new TCTypeSet(lof, rof);
 		
-		return seq1 ?
+		return setType(seq1 ?
 			new TCSeq1Type(location, ts.getType(location)) :
-			new TCSeqType(location, ts.getType(location));
+			new TCSeqType(location, ts.getType(location)));
 	}
 
 	@Override

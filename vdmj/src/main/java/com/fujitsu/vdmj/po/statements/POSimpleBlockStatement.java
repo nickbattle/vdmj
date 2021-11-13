@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 
 abstract public class POSimpleBlockStatement extends POStatement
@@ -64,13 +65,13 @@ abstract public class POSimpleBlockStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		for (POStatement stmt: statements)
 		{
-			obligations.addAll(stmt.getProofObligations(ctxt));
+			obligations.addAll(stmt.getProofObligations(ctxt, env));
 		}
 
 		return obligations;

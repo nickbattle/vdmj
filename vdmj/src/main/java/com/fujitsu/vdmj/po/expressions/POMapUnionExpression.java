@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.pog.MapCompatibleObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POMapUnionExpression extends POBinaryExpression
 {
@@ -42,9 +43,9 @@ public class POMapUnionExpression extends POBinaryExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = super.getProofObligations(ctxt);
+		ProofObligationList obligations = super.getProofObligations(ctxt, env);
 		obligations.add(new MapCompatibleObligation(left, right, ctxt));
 		return obligations;
 	}

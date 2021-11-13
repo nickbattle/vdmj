@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.WhileLoopObligation;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POWhileStatement extends POStatement
 {
@@ -51,12 +52,12 @@ public class POWhileStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		obligations.add(new WhileLoopObligation(this, ctxt));
-		obligations.addAll(exp.getProofObligations(ctxt));
-		obligations.addAll(statement.getProofObligations(ctxt));
+		obligations.addAll(exp.getProofObligations(ctxt, env));
+		obligations.addAll(statement.getProofObligations(ctxt, env));
 		return obligations;
 	}
 

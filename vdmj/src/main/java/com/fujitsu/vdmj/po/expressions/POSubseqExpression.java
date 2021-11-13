@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POSubseqExpression extends POExpression
 {
@@ -56,11 +57,11 @@ public class POSubseqExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList list = seq.getProofObligations(ctxt);
-		list.addAll(from.getProofObligations(ctxt));
-		list.addAll(to.getProofObligations(ctxt));
+		ProofObligationList list = seq.getProofObligations(ctxt, env);
+		list.addAll(from.getProofObligations(ctxt, env));
+		list.addAll(to.getProofObligations(ctxt, env));
 		return list;
 	}
 

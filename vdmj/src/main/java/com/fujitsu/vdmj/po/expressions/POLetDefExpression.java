@@ -27,9 +27,10 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
-import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POLetDefExpression extends POExpression
@@ -52,12 +53,12 @@ public class POLetDefExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = localDefs.getProofObligations(ctxt);
+		ProofObligationList obligations = localDefs.getProofObligations(ctxt, env);
 
 		ctxt.push(new POLetDefContext(this));
-		obligations.addAll(expression.getProofObligations(ctxt));
+		obligations.addAll(expression.getProofObligations(ctxt, env));
 		ctxt.pop();
 
 		return obligations;

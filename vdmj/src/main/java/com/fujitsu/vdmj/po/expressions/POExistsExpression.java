@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.patterns.POMultipleBindList;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POExistsExpression extends POExpression
 {
@@ -52,17 +53,17 @@ public class POExistsExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
 		for (POMultipleBind mb: bindList)
 		{
-			obligations.addAll(mb.getProofObligations(ctxt));
+			obligations.addAll(mb.getProofObligations(ctxt, env));
 		}
 
 		ctxt.push(new POForAllContext(this));
-		obligations.addAll(predicate.getProofObligations(ctxt));
+		obligations.addAll(predicate.getProofObligations(ctxt, env));
 		ctxt.pop();
 
 		return obligations;

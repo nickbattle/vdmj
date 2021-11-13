@@ -25,8 +25,6 @@
 package com.fujitsu.vdmj.traces;
 
 import com.fujitsu.vdmj.in.statements.INStatement;
-import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.runtime.Breakpoint;
 
 public class StatementIterator extends TraceIterator
 {
@@ -34,12 +32,9 @@ public class StatementIterator extends TraceIterator
 
 	private boolean done = false;
 	
-	private static final Breakpoint DUMMY = new Breakpoint(LexLocation.ANY);
-
 	public StatementIterator(INStatement newStatement)
 	{
 		this.statement = newStatement;
-		statement.breakpoint = DUMMY;	// Reduce garbage
 	}
 
 	@Override

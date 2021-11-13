@@ -63,12 +63,12 @@ public class TCPowerSetExpression extends TCUnaryExpression
 		if (!etype.isSet(location))
 		{
 			report(3145, "Argument to 'power' is not a set");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 		
 		TCSetType eset = etype.getSet();
 
-		return new TCSetType(location, new TCSetType(location, eset.setof));
+		return setType(new TCSetType(location, new TCSetType(location, eset.setof)));
 	}
 
 	@Override

@@ -96,7 +96,7 @@ public class TCWhileStatement extends TCStatement
 			}
 		}
 		
-		return stype;
+		return setType(stype);
 	}
 
 	@Override

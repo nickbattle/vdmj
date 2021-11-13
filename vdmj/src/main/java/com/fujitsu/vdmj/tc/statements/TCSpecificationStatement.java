@@ -128,7 +128,7 @@ public class TCSpecificationStatement extends TCStatement
 			postcondition.report(3234, "postcondition is not a boolean expression");
 		}
 
-		return new TCVoidType(location);
+		return setType(new TCVoidType(location));
 	}
 
 	@Override

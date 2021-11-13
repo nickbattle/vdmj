@@ -66,12 +66,12 @@ public class TCDistConcatExpression extends TCUnaryExpression
 
 			if (inner.isSeq(location))
 			{
-				return inner.getSeq();
+				return setType(inner.getSeq());
 			}
 		}
 
 		report(3075, "Argument of 'conc' is not a seq of seq");
-		return new TCUnknownType(location);
+		return setType(new TCUnknownType(location));
 	}
 
 	@Override

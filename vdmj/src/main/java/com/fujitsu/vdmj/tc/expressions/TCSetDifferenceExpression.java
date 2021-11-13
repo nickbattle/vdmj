@@ -68,11 +68,11 @@ public class TCSetDifferenceExpression extends TCBinaryExpression
 		if (ltype instanceof TCSet1Type)
 		{
 			TCSet1Type set1 = (TCSet1Type)ltype;
-			return new TCSetType(location, set1.setof);
+			return setType(new TCSetType(location, set1.setof));
 		}
 		else
 		{
-			return ltype;
+			return setType(ltype);
 		}
 	}
 

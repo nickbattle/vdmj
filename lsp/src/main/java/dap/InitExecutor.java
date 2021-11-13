@@ -30,10 +30,8 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 
-import json.JSONObject;
 import vdmj.commands.Command;
-import vdmj.commands.PrintCommand;
-import vdmj.commands.RuntraceCommand;
+import vdmj.commands.InitRunnable;
 
 public class InitExecutor extends AsyncExecutor
 {
@@ -83,21 +81,16 @@ public class InitExecutor extends AsyncExecutor
 		{
 			Command command = Command.parse(launchCommand);
 			
-			if (command instanceof PrintCommand)
+			if (command instanceof InitRunnable)
 			{
-				PrintCommand pcmd = (PrintCommand)command;
-				String launchResult = manager.getInterpreter().execute(pcmd.expression).toString();
-				server.stdout(pcmd.expression + " = " + launchResult + "\n");
-			}
-			else if (command instanceof RuntraceCommand)
-			{
-				RuntraceCommand rcmd = (RuntraceCommand)command;
-				JSONObject result = manager.ctRuntrace(request, rcmd.tracename, rcmd.testNumber);
-				server.stdout(rcmd.display(result) + "\n");
+				InitRunnable initcmd = (InitRunnable)command;
+				running = launchCommand;
+				String launchResult = initcmd.initRun(request);
+				server.stdout(initcmd.format(launchResult) + "\n");
 			}
 			else
 			{
-				server.stderr("Unsupported command: " + launchCommand + "\n");
+				server.stderr("Unsupported init command: " + launchCommand + "\n");
 			}
 		}
 	}

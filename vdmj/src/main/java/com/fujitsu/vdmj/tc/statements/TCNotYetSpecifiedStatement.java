@@ -49,7 +49,7 @@ public class TCNotYetSpecifiedStatement extends TCStatement
 	@Override
 	public TCType typeCheck(Environment env, NameScope scope, TCType constraint, boolean mandatory)
 	{
-		return new TCUnknownType(location);	// Because we terminate anyway
+		return setType(new TCUnknownType(location));	// Because we terminate anyway
 	}
 
 	@Override

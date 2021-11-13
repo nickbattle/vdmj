@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 
 public class CTPluginPR extends CTPlugin
@@ -45,7 +46,7 @@ public class CTPluginPR extends CTPlugin
 	}
 
 	@Override
-	public <T> boolean checkLoadedFiles(T inList) throws Exception
+	public <T extends Mappable> boolean checkLoadedFiles(T inList) throws Exception
 	{
 		inClassList = (INClassList) inList;
 		return true;
@@ -81,7 +82,7 @@ public class CTPluginPR extends CTPlugin
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getCT()
+	public <T extends Mappable> T getCT()
 	{
 		return (T)inClassList;
 	}

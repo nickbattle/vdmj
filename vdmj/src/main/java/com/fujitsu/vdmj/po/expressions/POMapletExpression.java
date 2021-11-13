@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POMapletExpression extends PONode
 {
@@ -50,10 +51,10 @@ public class POMapletExpression extends PONode
 		return left + " |-> " + right;
 	}
 
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList list = left.getProofObligations(ctxt);
-		list.addAll(right.getProofObligations(ctxt));
+		ProofObligationList list = left.getProofObligations(ctxt, env);
+		list.addAll(right.getProofObligations(ctxt, env));
 		return list;
 	}
 }

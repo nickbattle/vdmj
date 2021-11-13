@@ -32,6 +32,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -113,9 +114,9 @@ abstract public class TCPlugin extends AnalysisPlugin
 		return warns;
 	}
 	
-	abstract public <T> T getTC();
+	abstract public <T extends Mappable> T getTC();
 	
-	abstract public <T> boolean checkLoadedFiles(T ast) throws Exception;
+	abstract public <T extends Mappable> boolean checkLoadedFiles(T ast) throws Exception;
 
 	abstract public JSONArray documentSymbols(File file);
 

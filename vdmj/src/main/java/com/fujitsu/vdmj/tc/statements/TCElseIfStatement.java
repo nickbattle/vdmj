@@ -69,7 +69,7 @@ public class TCElseIfStatement extends TCStatement
 			qenv = new FlatEnvironment(qualified, env);
 		}
 
-		return thenStmt.typeCheck(qenv, scope, constraint, mandatory);
+		return setType(thenStmt.typeCheck(qenv, scope, constraint, mandatory));
 	}
 
 	@Override

@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -123,11 +124,11 @@ abstract public class CTPlugin extends AnalysisPlugin
 		}
 	}
 
-	abstract public <T> boolean checkLoadedFiles(T inList) throws Exception;
+	abstract public <T extends Mappable> boolean checkLoadedFiles(T inList) throws Exception;
 
 	abstract public Map<String, TCNameList> getTraceNames();
 
-	abstract public <T> T getCT();
+	abstract public <T extends Mappable> T getCT();
 	
 	public int generate(TCNameToken tracename) throws LSPException
 	{
@@ -160,7 +161,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		}
 	}
 
-	public JSONArray execute(RPCRequest request, TCNameToken tracename,
+	public JSONArray runTraceRange(RPCRequest request, TCNameToken tracename,
 			Object progressToken, Object workDoneToken,
 			TraceReductionType rType, float subset, long seed,
 			Long startTest, Long endTest) throws LSPException
@@ -221,7 +222,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		}
 	}
 	
-	public JSONObject runtrace(TCNameToken tracename, long testNumber) throws LSPException
+	public JSONObject runOneTrace(TCNameToken tracename, long testNumber) throws LSPException
 	{
 		if (!tracename.equals(traceName))
 		{
@@ -240,7 +241,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		String callString = test.getCallString(traceContext);
 		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
 
-		interpreter.init();
+		// interpreter.init();  Not needed as we run from InitExecutor only
 		List<Object> result = interpreter.runOneTrace(traceClassDef, test, true);
 
 		return new JSONObject(

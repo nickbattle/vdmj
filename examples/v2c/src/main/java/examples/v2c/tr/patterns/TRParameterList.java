@@ -26,10 +26,11 @@ package examples.v2c.tr.patterns;
 
 import java.util.Vector;
 
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
 
-public class TRParameterList extends Vector<String>
+public class TRParameterList extends Vector<String> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 

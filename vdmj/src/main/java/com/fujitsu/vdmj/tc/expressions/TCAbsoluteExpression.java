@@ -77,7 +77,7 @@ public class TCAbsoluteExpression extends TCUnaryExpression
 			t = new TCNaturalType(t.location);
 		}
 
-		return t;
+		return setType(t);
 	}
 
 	@Override

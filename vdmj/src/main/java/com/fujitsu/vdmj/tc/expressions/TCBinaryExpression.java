@@ -66,7 +66,7 @@ abstract public class TCBinaryExpression extends TCExpression
 			report(3066, "Right hand of " + op + " is not " + expected);
 		}
 
-		return expected;
+		return setType(expected);
 	}
 
 	@Override

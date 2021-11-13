@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.pog.CasesExhaustiveObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POCasesExpression extends POExpression
@@ -60,7 +61,7 @@ public class POCasesExpression extends POExpression
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
@@ -75,13 +76,13 @@ public class POCasesExpression extends POExpression
 			}
 
 			// PONotCaseContext pushed by the POCaseAlternative...
-			obligations.addAll(alt.getProofObligations(ctxt, expType));
+			obligations.addAll(alt.getProofObligations(ctxt, expType, env));
 			count++;
 		}
 
 		if (others != null)
 		{
-			obligations.addAll(others.getProofObligations(ctxt));
+			obligations.addAll(others.getProofObligations(ctxt, env));
 		}
 
 		for (int i=0; i<count; i++)

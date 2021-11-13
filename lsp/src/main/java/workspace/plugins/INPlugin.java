@@ -26,6 +26,7 @@ package workspace.plugins;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
 import workspace.Log;
@@ -69,9 +70,9 @@ abstract public class INPlugin extends AnalysisPlugin
 	{
 	}
 	
-	abstract public <T> T getIN();
+	abstract public <T extends Mappable> T getIN();
 	
-	abstract public <T> boolean checkLoadedFiles(T tcList) throws Exception;
+	abstract public <T extends Mappable> boolean checkLoadedFiles(T tcList) throws Exception;
 	
-	abstract public <T> Interpreter getInterpreter(T tcList) throws Exception;
+	abstract public <T extends Mappable> Interpreter getInterpreter(T tcList) throws Exception;
 }

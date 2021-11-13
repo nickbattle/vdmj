@@ -66,7 +66,7 @@ public class TCMuExpression extends TCExpression
 
 		if (rtype instanceof TCUnknownType)
 		{
-			return rtype;
+			return setType(rtype);
 		}
 
 		if (rtype.isRecord(location))
@@ -100,7 +100,7 @@ public class TCMuExpression extends TCExpression
 			report(3132, "mu operation on non-record type");
 		}
 
-		return rtype;
+		return setType(rtype);
 	}
 
 	@Override

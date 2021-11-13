@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POScopeContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POForIndexStatement extends POStatement
 {
@@ -60,18 +61,18 @@ public class POForIndexStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = from.getProofObligations(ctxt);
-		obligations.addAll(to.getProofObligations(ctxt));
+		ProofObligationList obligations = from.getProofObligations(ctxt, env);
+		obligations.addAll(to.getProofObligations(ctxt, env));
 
 		if (by != null)
 		{
-			obligations.addAll(by.getProofObligations(ctxt));
+			obligations.addAll(by.getProofObligations(ctxt, env));
 		}
 
 		ctxt.push(new POScopeContext());
-		obligations.addAll(statement.getProofObligations(ctxt));
+		obligations.addAll(statement.getProofObligations(ctxt, env));
 		ctxt.pop();
 
 		return obligations;

@@ -30,6 +30,7 @@ import java.io.IOException;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -75,7 +76,7 @@ public class TCPluginPR extends TCPlugin
 	}
 	
 	@Override
-	public <T> boolean checkLoadedFiles(T astClassList) throws Exception
+	public <T extends Mappable> boolean checkLoadedFiles(T astClassList) throws Exception
 	{
 		try
 		{
@@ -106,7 +107,7 @@ public class TCPluginPR extends TCPlugin
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getTC()
+	public <T extends Mappable> T getTC()
 	{
 		return (T)tcClassList;
 	}

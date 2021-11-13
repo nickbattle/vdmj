@@ -27,6 +27,7 @@ package workspace.plugins;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
@@ -58,7 +59,7 @@ public class INPluginSL extends INPlugin
 	}
 	
 	@Override
-	public <T> boolean checkLoadedFiles(T tcModuleList) throws Exception
+	public <T extends Mappable> boolean checkLoadedFiles(T tcModuleList) throws Exception
 	{
 		inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(tcModuleList);
 		return true;
@@ -66,13 +67,13 @@ public class INPluginSL extends INPlugin
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getIN()
+	public <T extends Mappable> T getIN()
 	{
 		return (T)inModuleList;
 	}
 
 	@Override
-	public <T> Interpreter getInterpreter(T tcModuleList) throws Exception
+	public <T extends Mappable> Interpreter getInterpreter(T tcModuleList) throws Exception
 	{
 		return new ModuleInterpreter(inModuleList, (TCModuleList) tcModuleList);
 	}

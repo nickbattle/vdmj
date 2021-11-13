@@ -57,11 +57,11 @@ public class TCMapInverseExpression extends TCUnaryExpression
 		if (!etype.isMap(location))
 		{
 			report(3111, "Argument to 'inverse' is not a map");
-			return new TCUnknownType(location);
+			return setType(new TCUnknownType(location));
 		}
 
 		type = etype.getMap();
-		return new TCMapType(location, type.to, type.from);
+		return setType(new TCMapType(location, type.to, type.from));
 	}
 
 	@Override

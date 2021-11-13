@@ -92,7 +92,7 @@ public class TCForIndexStatement extends TCStatement
 		Environment local = new FlatCheckedEnvironment(vardef, env, scope);
 		TCType rt = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();
-		return rt;
+		return setType(rt);
 	}
 
 	@Override

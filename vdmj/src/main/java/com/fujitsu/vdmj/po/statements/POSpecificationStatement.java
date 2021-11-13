@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POSpecificationStatement extends POStatement
 {
@@ -61,7 +62,7 @@ public class POSpecificationStatement extends POStatement
 	}
 
 	@Override
-	public ProofObligationList getProofObligations(POContextStack ctxt)
+	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
 
@@ -69,19 +70,19 @@ public class POSpecificationStatement extends POStatement
 		{
 			for (POErrorCase err: errors)
 			{
-				obligations.addAll(err.left.getProofObligations(ctxt));
-				obligations.addAll(err.right.getProofObligations(ctxt));
+				obligations.addAll(err.left.getProofObligations(ctxt, env));
+				obligations.addAll(err.right.getProofObligations(ctxt, env));
 			}
 		}
 
 		if (precondition != null)
 		{
-			obligations.addAll(precondition.getProofObligations(ctxt));
+			obligations.addAll(precondition.getProofObligations(ctxt, env));
 		}
 
 		if (postcondition != null)
 		{
-			obligations.addAll(postcondition.getProofObligations(ctxt));
+			obligations.addAll(postcondition.getProofObligations(ctxt, env));
 		}
 
 		return obligations;
