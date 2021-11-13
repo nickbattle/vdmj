@@ -122,7 +122,7 @@ public class TCMkTypeExpression extends TCExpression
 
 			if (!TypeComparator.compatible(fieldType, argType))
 			{
-				report(3129, "Constructor field " + i + " is of wrong type");
+				arg.report(3129, "Constructor field " + i + " is of wrong type");
 				detail2("Expected", fieldType, "Actual", argType);
 			}
 
