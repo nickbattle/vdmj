@@ -42,9 +42,14 @@ import com.fujitsu.vdmj.ast.definitions.ASTStateDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTTypeDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
 import com.fujitsu.vdmj.ast.patterns.ASTIdentifierPattern;
+import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.ast.types.ASTField;
+import com.fujitsu.vdmj.ast.types.ASTFunctionType;
 import com.fujitsu.vdmj.ast.types.ASTNamedType;
+import com.fujitsu.vdmj.ast.types.ASTOperationType;
+import com.fujitsu.vdmj.ast.types.ASTPatternListTypePair;
 import com.fujitsu.vdmj.ast.types.ASTRecordType;
+import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
@@ -133,6 +138,9 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	abstract public FilenameFilter getFilenameFilter();
 
 	abstract public String[] getFilenameFilters();
+	
+	abstract public JSONArray documentLenses(File file);
+
 	
 	/**
 	 * Common methods for hierarchical outlines.
@@ -250,5 +258,106 @@ public abstract class ASTPlugin extends AnalysisPlugin
 			def.location,
 			def.location,
 			children);
+	}
+
+	protected JSONArray launchArgs(ASTDefinition def, boolean debug)
+	{
+		JSONArray result = new JSONArray();
+		JSONObject launchArgs = new JSONObject();
+		
+		launchArgs.put("name", (debug ? "Debug " : "Launch ") + def.name.getName());
+		launchArgs.put("defaultName", def.name.getModule());
+		launchArgs.put("type", "vdm");
+		launchArgs.put("request", "launch");
+		launchArgs.put("noDebug", !debug);		// Note: inverted :)
+		launchArgs.put("remoteControl", null);
+		
+		/**
+		 * Rather than adding a command, like "print func(nat, nat)", we send back the
+		 * name and parameter name/type pairs, to allow the Client to create a GUI.
+		 */
+		switch (def.kind())
+		{
+			case "explicit function":
+			{
+				ASTExplicitFunctionDefinition exdef = (ASTExplicitFunctionDefinition) def;
+				launchArgs.put("applyName", exdef.name.getName());
+				JSONArray params = new JSONArray();
+				launchArgs.put("applyArgs", params);
+				
+				ASTFunctionType ftype = (ASTFunctionType) exdef.type;
+				ASTTypeList ptypes = ftype.parameters;
+				int i = 0;
+				
+				for (ASTPattern p: exdef.paramPatternList.get(0))	// Curried?
+				{
+					params.add(new JSONObject("name", p.toString(), "type", ptypes.get(i++).toString()));
+				}
+				break;
+			}
+		
+			case "implicit function":
+			{
+				ASTImplicitFunctionDefinition imdef = (ASTImplicitFunctionDefinition) def;
+				launchArgs.put("applyName", imdef.name.getName());
+				JSONArray params = new JSONArray();
+				launchArgs.put("applyArgs", params);
+				
+				for (ASTPatternListTypePair param: imdef.parameterPatterns)
+				{
+					for (ASTPattern p: param.patterns)
+					{
+						params.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
+					}
+				}
+				break;
+			}
+				
+			case "explicit operation":
+			{
+				ASTExplicitOperationDefinition exop = (ASTExplicitOperationDefinition) def;
+				launchArgs.put("applyName", exop.name.getName());
+				JSONArray params = new JSONArray();
+				launchArgs.put("applyArgs", params);
+				
+				ASTOperationType ftype = (ASTOperationType) exop.type;
+				ASTTypeList ptypes = ftype.parameters;
+				int i = 0;
+				
+				for (ASTPattern p: exop.parameterPatterns)
+				{
+					params.add(new JSONObject("name", p.toString(), "type", ptypes.get(i++).toString()));
+				}
+				break;
+			}
+				
+			case "implicit operation":
+			{
+				ASTImplicitOperationDefinition imdef = (ASTImplicitOperationDefinition) def;
+				launchArgs.put("applyName", imdef.name.getName());
+				JSONArray params = new JSONArray();
+				launchArgs.put("applyArgs", params);
+				
+				for (ASTPatternListTypePair param: imdef.parameterPatterns)
+				{
+					for (ASTPattern p: param.patterns)
+					{
+						params.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
+					}
+				}
+				break;
+			}
+				
+			default:
+			{
+				Log.error("Unknown launch code lens kind: " +  def.kind());
+				launchArgs.put("applyName", def.name.getName());
+				launchArgs.put("applyArgs", new JSONArray());
+				break;
+			}
+		}
+
+   		result.add(launchArgs);
+    	return result;
 	}
 }

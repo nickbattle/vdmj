@@ -248,8 +248,6 @@ abstract public class TCPlugin extends AnalysisPlugin
 			def.name.getLocation());
 	}
 	
-	protected final String CODE_LENS_COMMAND = "vdm-vscode.addRunConfiguration";
-	
 	protected JSONArray launchArgs(TCDefinition def, boolean debug)
 	{
 		JSONArray result = new JSONArray();

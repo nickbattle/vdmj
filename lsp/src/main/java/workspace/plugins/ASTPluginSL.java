@@ -33,6 +33,11 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -41,7 +46,10 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ModuleReader;
+
 import json.JSONArray;
+import json.JSONObject;
+import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import workspace.LSPWorkspaceManager;
 import workspace.Log;
@@ -49,6 +57,7 @@ import workspace.Log;
 public class ASTPluginSL extends ASTPlugin
 {
 	private ASTModuleList astModuleList = null;
+	private ASTModuleList dirtyModuleList = null;
 	
 	public ASTPluginSL()
 	{
@@ -101,6 +110,7 @@ public class ASTPluginSL extends ASTPlugin
 	protected List<VDMMessage> parseFile(File file)
 	{
 		dirty = true;	// Until saved.
+		dirtyModuleList = null;
 
 		List<VDMMessage> errs = new Vector<VDMMessage>();
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
@@ -109,7 +119,7 @@ public class ASTPluginSL extends ASTPlugin
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
 				Settings.dialect, file, Charset.defaultCharset().displayName());
 		ModuleReader mr = new ModuleReader(ltr);
-		mr.readModules();
+		dirtyModuleList = mr.readModules();
 		
 		if (mr.getErrorCount() > 0)
 		{
@@ -160,5 +170,64 @@ public class ASTPluginSL extends ASTPlugin
 	public String[] getFilenameFilters()
 	{
 		return new String[] { "**/*.vdm", "**/*.vdmsl" }; 
+	}
+
+	@Override
+	public JSONArray documentLenses(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (dirtyModuleList != null && !dirtyModuleList.isEmpty())
+		{
+			for (ASTModule module: dirtyModuleList)
+			{
+				for (ASTDefinition def: module.defs)
+				{
+					if (def.location.file.equals(file))
+					{
+						results.addAll(launchDebugLensVSCode(def));
+						// etc for other lenses...
+					}
+				}
+			}
+		}
+		
+		return results;
+	}
+	
+	/**
+	 * Note this lens is VSCode specific, because it includes a VSCode command.
+	 */
+	private JSONArray launchDebugLensVSCode(ASTDefinition def)
+	{
+		JSONArray results = new JSONArray();
+		String name = LSPWorkspaceManager.getInstance().getClientInfo("name");
+		
+		if ("vscode".equals(name))
+		{
+			if (def instanceof ASTExplicitFunctionDefinition ||
+				def instanceof ASTImplicitFunctionDefinition ||
+				def instanceof ASTExplicitOperationDefinition ||
+				def instanceof ASTImplicitOperationDefinition)
+			{
+				results.add(
+					new JSONObject(
+						"range", Utils.lexLocationToRange(def.location),
+						"command", new JSONObject(
+								"title", "Launch",
+								"command", CODE_LENS_COMMAND,
+								"arguments", launchArgs(def, false))));
+					
+				results.add(
+					new JSONObject(
+						"range", Utils.lexLocationToRange(def.location),
+						"command", new JSONObject(
+								"title", "Debug",
+								"command", CODE_LENS_COMMAND,
+								"arguments", launchArgs(def, true))));
+			}
+		}
+		
+		return results;
 	}
 }

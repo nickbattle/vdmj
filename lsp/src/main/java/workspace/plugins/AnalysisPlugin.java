@@ -33,6 +33,7 @@ import rpc.RPCRequest;
 abstract public class AnalysisPlugin
 {
 	protected final LSPMessageUtils messages;
+	protected final String CODE_LENS_COMMAND = "vdm-vscode.addRunConfiguration";
 	
 	public AnalysisPlugin()
 	{
