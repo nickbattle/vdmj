@@ -36,25 +36,15 @@ import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCMutexSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
-import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCField;
-import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
-import com.fujitsu.vdmj.tc.types.TCOperationType;
-import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeList;
-
 import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
@@ -246,106 +236,5 @@ abstract public class TCPlugin extends AnalysisPlugin
 			SymbolKind.kindOf(def),
 			def.name.getLocation(),
 			def.name.getLocation());
-	}
-	
-	protected JSONArray launchArgs(TCDefinition def, boolean debug)
-	{
-		JSONArray result = new JSONArray();
-		JSONObject launchArgs = new JSONObject();
-		
-		launchArgs.put("name", (debug ? "Debug " : "Launch ") + def.name.getName());
-		launchArgs.put("defaultName", def.name.getModule());
-		launchArgs.put("type", "vdm");
-		launchArgs.put("request", "launch");
-		launchArgs.put("noDebug", !debug);		// Note: inverted :)
-		launchArgs.put("remoteControl", null);
-		
-		/**
-		 * Rather than adding a command, like "print func(nat, nat)", we send back the
-		 * name and parameter name/type pairs, to allow the Client to create a GUI.
-		 */
-		switch (def.kind())
-		{
-			case "explicit function":
-			{
-				TCExplicitFunctionDefinition exdef = (TCExplicitFunctionDefinition) def;
-				launchArgs.put("applyName", exdef.name.getName());
-				JSONArray params = new JSONArray();
-				launchArgs.put("applyArgs", params);
-				
-				TCFunctionType ftype = (TCFunctionType) exdef.getType();
-				TCTypeList ptypes = ftype.parameters;
-				int i = 0;
-				
-				for (TCPattern p: exdef.paramPatternList.get(0))	// Curried?
-				{
-					params.add(new JSONObject("name", p.toString(), "type", ptypes.get(i++).toString()));
-				}
-				break;
-			}
-		
-			case "implicit function":
-			{
-				TCImplicitFunctionDefinition imdef = (TCImplicitFunctionDefinition) def;
-				launchArgs.put("applyName", imdef.name.getName());
-				JSONArray params = new JSONArray();
-				launchArgs.put("applyArgs", params);
-				
-				for (TCPatternListTypePair param: imdef.parameterPatterns)
-				{
-					for (TCPattern p: param.patterns)
-					{
-						params.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
-					}
-				}
-				break;
-			}
-				
-			case "explicit operation":
-			{
-				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition) def;
-				launchArgs.put("applyName", exop.name.getName());
-				JSONArray params = new JSONArray();
-				launchArgs.put("applyArgs", params);
-				
-				TCOperationType ftype = (TCOperationType) exop.getType();
-				TCTypeList ptypes = ftype.parameters;
-				int i = 0;
-				
-				for (TCPattern p: exop.parameterPatterns)
-				{
-					params.add(new JSONObject("name", p.toString(), "type", ptypes.get(i++).toString()));
-				}
-				break;
-			}
-				
-			case "implicit operation":
-			{
-				TCImplicitOperationDefinition imdef = (TCImplicitOperationDefinition) def;
-				launchArgs.put("applyName", imdef.name.getName());
-				JSONArray params = new JSONArray();
-				launchArgs.put("applyArgs", params);
-				
-				for (TCPatternListTypePair param: imdef.parameterPatterns)
-				{
-					for (TCPattern p: param.patterns)
-					{
-						params.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
-					}
-				}
-				break;
-			}
-				
-			default:
-			{
-				Log.error("Unknown launch code lens kind: " +  def.kind());
-				launchArgs.put("applyName", def.name.getName());
-				launchArgs.put("applyArgs", new JSONArray());
-				break;
-			}
-		}
-
-   		result.add(launchArgs);
-    	return result;
 	}
 }

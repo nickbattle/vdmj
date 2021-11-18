@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.InternalException;
@@ -43,10 +42,9 @@ import com.fujitsu.vdmj.util.DependencyOrder;
 
 import json.JSONArray;
 import json.JSONObject;
-import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
-import workspace.LSPWorkspaceManager;
+import workspace.lenses.CodeLens;
 
 public class TCPluginPR extends TCPlugin
 {
@@ -222,46 +220,12 @@ public class TCPluginPR extends TCPlugin
 					{
 						if (def.location.file.equals(file))
 						{
-							results.addAll(launchDebugLensVSCode(def));
-							// etc for other lenses...
+							for (CodeLens lens: CodeLens.getLenses())
+							{
+								results.addAll(lens.codeLenses(def, file));
+							}
 						}
 					}
-				}
-			}
-		}
-		
-		return results;
-	}
-	
-	/**
-	 * Note this lens is VSCode specific, because it includes a VSCode command.
-	 */
-	private JSONArray launchDebugLensVSCode(TCDefinition def)
-	{
-		JSONArray results = new JSONArray();
-		String name = LSPWorkspaceManager.getInstance().getClientInfo("name");
-		
-		if ("vscode".equals(name))
-		{
-			if (def.isCallableFunction() || def.isCallableOperation())
-			{
-				if (def.accessSpecifier.access == Token.PUBLIC)	// Not private or protected
-				{
-					results.add(
-						new JSONObject(
-							"range", Utils.lexLocationToRange(def.location),
-							"command", new JSONObject(
-									"title", "Launch",
-									"command", CODE_LENS_COMMAND,
-									"arguments", launchArgs(def, false))));
-						
-					results.add(
-						new JSONObject(
-							"range", Utils.lexLocationToRange(def.location),
-							"command", new JSONObject(
-									"title", "Debug",
-									"command", CODE_LENS_COMMAND,
-									"arguments", launchArgs(def, true))));
 				}
 			}
 		}
