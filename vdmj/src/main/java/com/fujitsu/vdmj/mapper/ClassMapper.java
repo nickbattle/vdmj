@@ -814,11 +814,13 @@ public class ClassMapper
 					catch (NoSuchFieldException e)
 					{
 						// This happens if a self-referencing source field is passed to the target ctor,
-						// but the target field name is not the same as the source field name, or the
-						// value isn't stored at all.
+						// but the target field name is not the same as the ctor parameter name (or the
+						// value isn't stored by the ctor at all). The patch-up of self-ref fields (above)
+						// is done by field name, so we assume the field name is the same as the ctor
+						// parameter name.
 						
 						throw new Exception("Class " + pair.target.getClass().getSimpleName()
-								+ " must construct field " + pair.fieldname);
+								+ " must construct a field called " + pair.fieldname);
 					}
 				}
 			}
