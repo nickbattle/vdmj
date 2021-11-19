@@ -173,6 +173,7 @@ public class TCValueDefinition extends TCDefinition
 		if (expType instanceof TCVoidType)
 		{
 			exp.report(3048, "Expression does not return a value");
+			type = new TCUnknownType(location);
 		}
 		else if (type != null && !(type instanceof TCUnknownType))
 		{
