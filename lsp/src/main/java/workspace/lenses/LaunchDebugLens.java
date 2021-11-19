@@ -143,21 +143,11 @@ public class LaunchDebugLens extends CodeLens
 			
 			if (launchName != null)
 			{
-				results.add(
-					new JSONObject(
-						"range", Utils.lexLocationToRange(def.location),
-						"command", new JSONObject(
-								"title", "Launch",
-								"command", CODE_LENS_COMMAND,
-								"arguments", launchArgs(launchName, defaultName, false, applyName, applyArgs))));
+				results.add(makeLens(def.location, "Launch", CODE_LENS_COMMAND,
+						launchArgs(launchName, defaultName, false, applyName, applyArgs)));
 					
-				results.add(
-					new JSONObject(
-						"range", Utils.lexLocationToRange(def.location),
-						"command", new JSONObject(
-								"title", "Debug",
-								"command", CODE_LENS_COMMAND,
-								"arguments", launchArgs(launchName, defaultName, true, applyName, applyArgs))));
+				results.add(makeLens(def.location, "Launch", CODE_LENS_COMMAND,
+						launchArgs(launchName, defaultName, true, applyName, applyArgs)));
 			}
 		}
 		
