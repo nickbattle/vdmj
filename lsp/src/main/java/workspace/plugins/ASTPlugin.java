@@ -59,7 +59,6 @@ import workspace.lenses.LaunchDebugLens;
 public abstract class ASTPlugin extends AnalysisPlugin
 {
 	protected static final boolean STRUCTURED_OUTLINE = true;
-	private static CodeLens lens = new LaunchDebugLens();
 
 	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
 	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
@@ -107,7 +106,7 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	public List<CodeLens> getCodeLenses()
 	{
 		List<CodeLens> lenses = new Vector<CodeLens>();
-		lenses.add(lens);
+		lenses.add(new LaunchDebugLens());
 		return lenses;
 	}
 

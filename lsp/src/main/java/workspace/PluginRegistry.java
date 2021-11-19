@@ -112,13 +112,13 @@ public class PluginRegistry
 	
 	public List<CodeLens> getCodeLenses()
 	{
-		List<CodeLens> options = new Vector<CodeLens>();
+		List<CodeLens> lenses = new Vector<CodeLens>();
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
-			options.addAll(plugin.getCodeLenses());
+			lenses.addAll(plugin.getCodeLenses());
 		}
 		
-		return options;
+		return lenses;
 	}
 }
