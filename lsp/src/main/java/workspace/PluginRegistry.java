@@ -25,9 +25,12 @@
 package workspace;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import json.JSONObject;
+import workspace.lenses.CodeLens;
 import workspace.plugins.AnalysisPlugin;
 
 public class PluginRegistry
@@ -105,5 +108,17 @@ public class PluginRegistry
 		}
 		
 		return options;
+	}
+	
+	public List<CodeLens> getCodeLenses()
+	{
+		List<CodeLens> lenses = new Vector<CodeLens>();
+		
+		for (AnalysisPlugin plugin: plugins.values())
+		{
+			lenses.addAll(plugin.getCodeLenses());
+		}
+		
+		return lenses;
 	}
 }

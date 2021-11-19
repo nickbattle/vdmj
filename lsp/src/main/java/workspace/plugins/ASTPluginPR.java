@@ -37,20 +37,25 @@ import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
+import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ClassReader;
+
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
 import workspace.LSPWorkspaceManager;
 import workspace.Log;
+import workspace.PluginRegistry;
+import workspace.lenses.CodeLens;
 
 public class ASTPluginPR extends ASTPlugin
 {
 	private ASTClassList astClassList = null;
+	private ASTClassList dirtyClassList = null;
 	
 	public ASTPluginPR()
 	{
@@ -68,6 +73,8 @@ public class ASTPluginPR extends ASTPlugin
 	public boolean checkLoadedFiles()
 	{
 		dirty = false;
+		dirtyClassList = null;
+		
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		LexLocation.resetLocations();
 		
@@ -126,7 +133,7 @@ public class ASTPluginPR extends ASTPlugin
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
 				Settings.dialect, file, Charset.defaultCharset().displayName());
 		ClassReader cr = new ClassReader(ltr);
-		cr.readClasses();
+		dirtyClassList = cr.readClasses();
 		
 		if (cr.getErrorCount() > 0)
 		{
@@ -184,5 +191,35 @@ public class ASTPluginPR extends ASTPlugin
 		{
 			return new String[] { "**/*.vpp", "**/*.vdmpp" };
 		}
+	}
+
+	@Override
+	public JSONArray documentLenses(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (dirtyClassList != null && !dirtyClassList.isEmpty())	// May be syntax errors
+		{
+			List<CodeLens> lenses = PluginRegistry.getInstance().getCodeLenses();
+			
+			for (ASTClassDefinition clazz: dirtyClassList)
+			{
+				if (clazz.name.location.file.equals(file))
+				{
+					for (ASTDefinition def: clazz.definitions)
+					{
+						if (def.location.file.equals(file))
+						{
+							for (CodeLens lens: lenses)
+							{
+								results.addAll(lens.codeLenses(def, file));
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
 	}
 }

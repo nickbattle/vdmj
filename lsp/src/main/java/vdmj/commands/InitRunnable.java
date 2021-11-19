@@ -26,6 +26,13 @@ package vdmj.commands;
 
 import dap.DAPRequest;
 
+/**
+ * Commands that implement this interface can be executed from the InitThread,
+ * which calls the initRun method rather than the Command's usual run method.
+ * The difference is because the InitThread has already done all of the setup
+ * to create a Executor and can return the result DAP messages. So this interface
+ * just deals with Strings. 
+ */
 public interface InitRunnable
 {
 	public String initRun(DAPRequest request);

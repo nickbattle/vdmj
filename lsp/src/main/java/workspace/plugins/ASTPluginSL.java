@@ -33,6 +33,7 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -41,14 +42,18 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ModuleReader;
+
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
 import workspace.LSPWorkspaceManager;
 import workspace.Log;
+import workspace.PluginRegistry;
+import workspace.lenses.CodeLens;
 
 public class ASTPluginSL extends ASTPlugin
 {
 	private ASTModuleList astModuleList = null;
+	private ASTModuleList dirtyModuleList = null;
 	
 	public ASTPluginSL()
 	{
@@ -101,6 +106,7 @@ public class ASTPluginSL extends ASTPlugin
 	protected List<VDMMessage> parseFile(File file)
 	{
 		dirty = true;	// Until saved.
+		dirtyModuleList = null;
 
 		List<VDMMessage> errs = new Vector<VDMMessage>();
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
@@ -109,7 +115,7 @@ public class ASTPluginSL extends ASTPlugin
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
 				Settings.dialect, file, Charset.defaultCharset().displayName());
 		ModuleReader mr = new ModuleReader(ltr);
-		mr.readModules();
+		dirtyModuleList = mr.readModules();
 		
 		if (mr.getErrorCount() > 0)
 		{
@@ -160,5 +166,32 @@ public class ASTPluginSL extends ASTPlugin
 	public String[] getFilenameFilters()
 	{
 		return new String[] { "**/*.vdm", "**/*.vdmsl" }; 
+	}
+
+	@Override
+	public JSONArray documentLenses(File file)
+	{
+		JSONArray results = new JSONArray();
+		
+		if (dirtyModuleList != null && !dirtyModuleList.isEmpty())
+		{
+			List<CodeLens> lenses = PluginRegistry.getInstance().getCodeLenses();
+			
+			for (ASTModule module: dirtyModuleList)
+			{
+				for (ASTDefinition def: module.defs)
+				{
+					if (def.location.file.equals(file))
+					{
+						for (CodeLens lens: lenses)
+						{
+							results.addAll(lens.codeLenses(def, file));
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
 	}
 }

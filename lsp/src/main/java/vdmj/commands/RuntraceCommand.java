@@ -63,11 +63,10 @@ public class RuntraceCommand extends Command implements InitRunnable
 	@Override
 	public String initRun(DAPRequest request)
 	{
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
-		JSONObject result;
 		try
 		{
-			result = manager.ctRunOneTrace(request, tracename, testNumber);
+			DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+			JSONObject result = manager.ctRunOneTrace(request, tracename, testNumber);
 			return display(result);
 		}
 		catch (LSPException e)

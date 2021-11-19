@@ -24,15 +24,20 @@
 
 package workspace.plugins;
 
+import java.util.List;
+import java.util.Vector;
+
 import json.JSONObject;
 import lsp.LSPMessageUtils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.lenses.CodeLens;
 
 abstract public class AnalysisPlugin
 {
 	protected final LSPMessageUtils messages;
+	protected final String CODE_LENS_COMMAND = "vdm-vscode.addRunConfiguration";
 	
 	public AnalysisPlugin()
 	{
@@ -74,5 +79,13 @@ abstract public class AnalysisPlugin
 	public JSONObject getExperimentalOptions()
 	{
 		return new JSONObject();
+	}
+	
+	/**
+	 * Plugins can add code lenses by overriding this method.
+	 */
+	public List<CodeLens> getCodeLenses()
+	{
+		return new Vector<CodeLens>();
 	}
 }

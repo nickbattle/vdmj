@@ -26,6 +26,7 @@ package workspace.plugins;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
@@ -42,10 +43,10 @@ import com.fujitsu.vdmj.util.DependencyOrder;
 
 import json.JSONArray;
 import json.JSONObject;
-import lsp.Utils;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
-import workspace.LSPWorkspaceManager;
+import workspace.PluginRegistry;
+import workspace.lenses.CodeLens;
 
 public class TCPluginSL extends TCPlugin
 {
@@ -224,49 +225,20 @@ public class TCPluginSL extends TCPlugin
 		
 		if (!tcModuleList.isEmpty())
 		{
+			List<CodeLens> lenses = PluginRegistry.getInstance().getCodeLenses();
+			
 			for (TCModule module: tcModuleList)
 			{
 				for (TCDefinition def: module.defs)
 				{
 					if (def.location.file.equals(file))
 					{
-						results.addAll(launchDebugLensVSCode(def));
-						// etc for other lenses...
+						for (CodeLens lens: lenses)
+						{
+							results.addAll(lens.codeLenses(def, file));
+						}
 					}
 				}
-			}
-		}
-		
-		return results;
-	}
-	
-	/**
-	 * Note this lens is VSCode specific, because it includes a VSCode command.
-	 */
-	private JSONArray launchDebugLensVSCode(TCDefinition def)
-	{
-		JSONArray results = new JSONArray();
-		String name = LSPWorkspaceManager.getInstance().getClientInfo("name");
-		
-		if ("vscode".equals(name))
-		{
-			if (def.isCallableFunction() || def.isCallableOperation())
-			{
-				results.add(
-					new JSONObject(
-						"range", Utils.lexLocationToRange(def.location),
-						"command", new JSONObject(
-								"title", "Launch",
-								"command", CODE_LENS_COMMAND,
-								"arguments", launchArgs(def, false))));
-					
-				results.add(
-					new JSONObject(
-						"range", Utils.lexLocationToRange(def.location),
-						"command", new JSONObject(
-								"title", "Debug",
-								"command", CODE_LENS_COMMAND,
-								"arguments", launchArgs(def, true))));
 			}
 		}
 		
