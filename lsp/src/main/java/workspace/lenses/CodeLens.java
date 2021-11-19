@@ -35,17 +35,6 @@ import json.JSONArray;
  */
 abstract public class CodeLens
 {
-	private static CodeLens[] lenses =
-	{
-		new LaunchDebugLens()
-		// register new lenses here
-	};
-	
-	public static CodeLens[] getLenses()
-	{
-		return lenses;
-	}
-	
 	abstract public JSONArray codeLenses(ASTDefinition definition, File file);
 	abstract public JSONArray codeLenses(TCDefinition definition, File file);
 }

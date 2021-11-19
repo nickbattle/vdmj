@@ -53,10 +53,13 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import workspace.Log;
+import workspace.lenses.CodeLens;
+import workspace.lenses.LaunchDebugLens;
 
 public abstract class ASTPlugin extends AnalysisPlugin
 {
 	protected static final boolean STRUCTURED_OUTLINE = true;
+	private static CodeLens lens = new LaunchDebugLens();
 
 	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
 	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
@@ -94,6 +97,18 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
+	}
+	
+	/**
+	 * We register the launch/debug code lens here. It could have been in the TCPlugin.
+	 * Just an arbitrary choice, unless we divide the AST/TC sides of CodeLens.
+	 */
+	@Override
+	public List<CodeLens> getCodeLenses()
+	{
+		List<CodeLens> lenses = new Vector<CodeLens>();
+		lenses.add(lens);
+		return lenses;
 	}
 
 	public List<VDMMessage> fileChanged(File file) throws IOException

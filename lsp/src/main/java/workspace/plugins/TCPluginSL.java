@@ -26,6 +26,7 @@ package workspace.plugins;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
@@ -44,6 +45,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
+import workspace.PluginRegistry;
 import workspace.lenses.CodeLens;
 
 public class TCPluginSL extends TCPlugin
@@ -223,13 +225,15 @@ public class TCPluginSL extends TCPlugin
 		
 		if (!tcModuleList.isEmpty())
 		{
+			List<CodeLens> lenses = PluginRegistry.getInstance().getCodeLenses();
+			
 			for (TCModule module: tcModuleList)
 			{
 				for (TCDefinition def: module.defs)
 				{
 					if (def.location.file.equals(file))
 					{
-						for (CodeLens lens: CodeLens.getLenses())
+						for (CodeLens lens: lenses)
 						{
 							results.addAll(lens.codeLenses(def, file));
 						}
