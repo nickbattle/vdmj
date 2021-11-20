@@ -54,7 +54,6 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 import json.JSONArray;
 import json.JSONObject;
-import workspace.LSPWorkspaceManager;
 
 public class LaunchDebugLens extends CodeLens
 {
@@ -65,7 +64,7 @@ public class LaunchDebugLens extends CodeLens
 	{
 		JSONArray results = new JSONArray();
 		
-		if (isVSCode() && isPublic(def))
+		if ("vscode".equals(getClientName()) && isPublic(def))
 		{
 			String launchName = null;
 			String defaultName = null;
@@ -158,7 +157,7 @@ public class LaunchDebugLens extends CodeLens
 	{
 		JSONArray results = new JSONArray();
 		
-		if (isVSCode() && isPublic(def))
+		if ("vscode".equals(getClientName()) && isPublic(def))
 		{
 			String launchName = null;
 			String defaultName = null;
@@ -246,12 +245,6 @@ public class LaunchDebugLens extends CodeLens
 		return results;
 	}
 	
-	private boolean isVSCode()
-	{
-		String name = LSPWorkspaceManager.getInstance().getClientInfo("name");
-		return "vscode".equals(name);
-	}
-	
 	private boolean isPublic(ASTDefinition def)
 	{
 		if (Settings.dialect != Dialect.VDM_SL)
@@ -296,7 +289,6 @@ public class LaunchDebugLens extends CodeLens
 	private JSONArray launchArgs(String launchName, String defaultName,
 			boolean debug, String applyName, List<Param> applyArgs)
 	{
-		JSONArray result = new JSONArray();
 		JSONObject launchArgs = new JSONObject();
 		
 		launchArgs.put("name", (debug ? "Debug " : "Launch ") + launchName);
@@ -315,7 +307,6 @@ public class LaunchDebugLens extends CodeLens
 			args.add(p.toJSON());
 		}
 
-   		result.add(launchArgs);
-    	return result;
+    	return new JSONArray(launchArgs);
 	}
 }
