@@ -96,10 +96,16 @@ public class LSPWorkspaceManager
 		{
 			INSTANCE = new LSPWorkspaceManager();
 			
+			/**
+			 * Register the built-in plugins. Others are registered in LSPXWorkspaceManager,
+			 * when the client capabilities have been received.
+			 */
 			PluginRegistry registry = PluginRegistry.getInstance();
 			registry.registerPlugin(ASTPlugin.factory(Settings.dialect));
 			registry.registerPlugin(TCPlugin.factory(Settings.dialect));
 			registry.registerPlugin(INPlugin.factory(Settings.dialect));
+			
+			Log.printf("Created LSPWorkspaceManager");
 		}
 
 		return INSTANCE;
@@ -135,6 +141,8 @@ public class LSPWorkspaceManager
 		this.rootUri = rootUri;
 		this.clientCapabilities = clientCapabilities;
 		this.openFiles.clear();
+		
+		LSPXWorkspaceManager.getInstance().enablePlugins();
 		
 		System.setProperty("vdmj.parser.tabstop", "1");	// Forced, for LSP location offsets
 		Properties.init();

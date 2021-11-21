@@ -69,6 +69,7 @@ public class PluginRegistry
 	{
 		plugins.put(plugin.getName(), plugin);
 		plugin.init();
+		Log.printf("Registered analysis plugin: %s", plugin.getName());
 	}
 	
 	@SuppressWarnings("unchecked")

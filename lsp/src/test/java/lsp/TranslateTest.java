@@ -45,7 +45,7 @@ import rpc.RPCRequest;
 public class TranslateTest extends LSPTest
 {
 	private JSONObject capabilities = new JSONObject(
-			"experimental", new JSONObject("translate", true));
+			"experimental", new JSONObject("translateProvider", true));
 	
 	@Before
 	public void setUp()
