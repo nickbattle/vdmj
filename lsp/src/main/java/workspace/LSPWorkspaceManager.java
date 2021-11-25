@@ -530,7 +530,7 @@ public class LSPWorkspaceManager
 					Log.printf("Ignoring file on dot path");
 					actionCode = 0;
 				}
-				else if (file.equals(new File(rootUri, ".vscode/ordering")))
+				else if (file.equals(new File(rootUri, ORDERING)))
 				{
 					Log.printf("Created ordering file, rebuilding");
 					actionCode = 2;		// Rebuild and re-check
@@ -574,7 +574,7 @@ public class LSPWorkspaceManager
 					Log.printf("Ignoring file on dot path");
 					actionCode = 0;
 				}
-				else if (file.equals(new File(rootUri, ".vscode/ordering")))
+				else if (file.equals(new File(rootUri, ORDERING)))
 				{
 					Log.printf("Updated ordering file, rebuilding");
 					actionCode = 2;		// Rebuild and re-check
