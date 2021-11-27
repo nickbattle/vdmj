@@ -57,6 +57,8 @@ public class ClassMapper
 	 */
 	private final Stack<Progress> inProgress = new Stack<Progress>();
 	
+	private boolean dumpedProgress = false;
+
 	private final Map<Long, Object> converted = new HashMap<Long, Object>();
 	
 	private long loadTimeMs;
@@ -84,6 +86,7 @@ public class ClassMapper
 	{
 		inProgress.clear();
 		converted.clear();
+		dumpedProgress = false;
 		
 		for (Method m: initializers)
 		{
@@ -143,7 +146,7 @@ public class ClassMapper
 	
 	/** A list of methods to call in the init() processing */
 	private final List<Method> initializers = new Vector<Method>();
-	
+
 	/**
 	 * A class to define how to construct one destPackage class, passing srcPackage
 	 * object fields to the Constructor and setter methods.
@@ -174,8 +177,56 @@ public class ClassMapper
 		@Override
 		public String toString()
 		{
-			return "map " + srcClass.getSimpleName() + " to " + destClass.getSimpleName() +
-					(setterFields.isEmpty() ? "" : " set " + setterFields);
+			if (unmapped)
+			{
+				return "unmapped " + srcClass.getName() + ";";
+			}
+			else
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.append("map ");
+				sb.append(srcClass.getSimpleName());
+				sb.append("{");
+				String sep = "";
+				
+				for (Field setter: ctorFields)
+				{
+					sb.append(sep);
+					sb.append(setter.getName());
+					sep = ", ";
+				}
+				
+				sb.append("}");
+				sb.append(" to ");
+				sb.append(destClass.getSimpleName());
+				sb.append("(");
+				sep = "";
+				
+				for (Field setter: ctorFields)
+				{
+					sb.append(sep);
+					sb.append(setter.getName());
+					sep = ", ";
+				}
+				
+				sb.append(")");
+				
+				if (!setterFields.isEmpty())
+				{
+					sb.append(" set ");
+					sep = "";
+					
+					for (Field setter: setterFields)
+					{
+						sb.append(sep);
+						sb.append(setter.getName());
+						sep = ", ";
+					}
+				}
+				
+				sb.append(";");
+				return sb.toString();
+			}
 		}
 	}
 	
@@ -618,17 +669,36 @@ public class ClassMapper
 	{
 		public final Object source;
 		public final List<Pair> updates;
+		public final String message;
 		
-		public Progress(Object source)
+		public Progress(Object source, String message)
 		{
 			this.source = source;
 			this.updates = new Vector<Pair>();
+			this.message = message;
+		}
+		
+		private String addStringOf(String fieldname, String prefix)
+		{
+			try
+			{
+				Field field = source.getClass().getField(fieldname);
+				field.setAccessible(true);
+				Object value = field.get(source);
+				return prefix + value.toString();
+			}
+			catch (Exception e)
+			{
+				return "";
+			}
 		}
 		
 		@Override
 		public String toString()
 		{
-			return source.getClass().getSimpleName();
+			return message + " " + source.getClass().getSimpleName() +
+					addStringOf("name", ", name=") + addStringOf("location", " ") +
+					(updates.isEmpty() ? "" : ", updates " + updates.toString());
 		}
 	}
 	
@@ -651,13 +721,35 @@ public class ClassMapper
 			this.target = object;
 			this.fieldname = fieldname;
 		}
+		
+		@Override
+		public String toString()
+		{
+			return target.getClass().getSimpleName() + "[" + fieldname + "]";
+		}
 	}
 	
 	/**
 	 * Perform a recursive mapping for a source object/tree to a destination object/tree.
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> T convert(Object source) throws Exception
+	{
+		String message = "Converting";
+		
+		if (source instanceof List)
+		{
+			message = "Converting list";
+		}
+		else if (source instanceof Map)
+		{
+			message = "Converting map";
+		}
+		
+		return convert(source, message);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T> T convert(Object source, String message) throws Exception
 	{
 		if (source == null)
 		{
@@ -684,7 +776,7 @@ public class ClassMapper
 		
 		try
 		{
-    		inProgress.push(new Progress(source));
+    		inProgress.push(new Progress(source, message));
     		
     		Class<?> srcClass = source.getClass();
     		MapParams mp = mappings.get(srcClass);
@@ -715,7 +807,7 @@ public class ClassMapper
     					
     					if (isInProgress(fieldvalue) == null)
     					{
-    						args[a++] = convert(fieldvalue);
+    						args[a++] = convert(fieldvalue, "Field " + field.getName());
     					}
     					else
     					{
@@ -735,7 +827,7 @@ public class ClassMapper
 					
 					if (isInProgress(fieldvalue) == null)
 					{
-						arg = convert(fieldvalue);
+						arg = convert(fieldvalue, "Setter " + setter.getName());
 					}
 					else
 					{
@@ -771,30 +863,15 @@ public class ClassMapper
 		}
 		catch (InvocationTargetException e)
 		{
+			dumpProgress(e.getCause());		// Help the user sort out where the problem is!
+			
 			if (e.getCause() instanceof Exception)
 			{
 				throw (Exception)e.getCause();
 			}
-			else if (e.getTargetException() instanceof Exception)
-			{
-				throw (Exception)e.getTargetException();
-			}
-			else if (e.getTargetException() instanceof ExceptionInInitializerError)
-			{
-				ExceptionInInitializerError err = (ExceptionInInitializerError)e.getTargetException();
-				
-				if (err.getException() instanceof Exception)
-				{
-					throw (Exception)err.getException();
-				}
-				else
-				{
-					throw new Exception(err.getException());
-				}
-			}
 			else
 			{
-				throw new Exception(e.getTargetException());
+				throw new Exception(e.getCause());
 			}
 		}
 		finally
@@ -833,6 +910,32 @@ public class ClassMapper
 		}
 		
 		return result;
+	}
+
+	private void dumpProgress(Throwable throwable)
+	{
+		if (!dumpedProgress)
+		{
+			if (!inProgress.isEmpty())
+			{
+				System.err.println("ClassMapper conversion stack...");
+				Progress top = inProgress.peek();
+				MapParams target = mappings.get(top.source.getClass());
+				
+				for (Progress item: inProgress)
+				{
+					System.err.println(item.toString());
+				}
+				
+				if (target != null)
+				{
+					System.err.println(target.toString());
+				}
+			}
+			
+			System.err.println("FAILED: " + throwable.toString());
+			dumpedProgress = true;
+		}
 	}
 
 	/**
