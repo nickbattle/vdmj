@@ -255,6 +255,8 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		{
 			FlatEnvironment pre = new FlatEnvironment(argdefs, base);
 			pre.setEnclosingDefinition(predef);
+			predef.paramDefinitionList = predef.getParamDefinitions();
+
 			TCBooleanType expected = new TCBooleanType(location);
 			TCType b = predef.body.typeCheck(pre, null, NameScope.NAMES, expected);
 
@@ -306,6 +308,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		{
 			TCType b = null;
 			TCBooleanType expected = new TCBooleanType(location);
+			postdef.paramDefinitionList = postdef.getParamDefinitions();
 
 			if (result != null)
 			{

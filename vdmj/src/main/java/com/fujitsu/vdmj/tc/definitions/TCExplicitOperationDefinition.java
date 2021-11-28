@@ -244,6 +244,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 			FlatEnvironment pre = new FlatEnvironment(new TCDefinitionList(), local);
 			pre.setEnclosingDefinition(predef);
 			pre.setFunctional(true, true);
+			predef.paramDefinitionList = predef.getParamDefinitions();
 			TCBooleanType expected = new TCBooleanType(location);
 			TCType b = predef.body.typeCheck(pre, null, NameScope.NAMESANDSTATE, expected);
 
@@ -274,6 +275,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 			
 			post.setEnclosingDefinition(postdef);
 			post.setFunctional(true, true);
+			postdef.paramDefinitionList = postdef.getParamDefinitions();
 			TCBooleanType expected = new TCBooleanType(location);
 			TCType b = postdef.body.typeCheck(post, null, NameScope.NAMESANDANYSTATE, expected);
 

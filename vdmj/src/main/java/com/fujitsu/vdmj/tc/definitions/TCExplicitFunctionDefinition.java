@@ -271,11 +271,18 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			local.add(getSelfDefinition());
 		}
 
+		/**
+		 * The pre/post definitions could be typechecked directly, but we want
+		 * special processing to give specific errors and to add qualified
+		 * definitions.
+		 */
 		if (predef != null)
 		{
 			TCBooleanType expected = new TCBooleanType(location);
 			Environment pre = new FlatEnvironment(new TCDefinitionList(), local);
 			pre.setEnclosingDefinition(predef);
+			predef.paramDefinitionList = predef.getParamDefinitions();
+			
 			TCType b = predef.body.typeCheck(pre, null, NameScope.NAMES, expected);
 
 			if (!b.isType(TCBooleanType.class, location))
@@ -300,6 +307,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			post.setStatic(accessSpecifier);
 			post.setEnclosingDefinition(postdef);
 			post.setFunctional(true, true);
+			postdef.paramDefinitionList = postdef.getParamDefinitions();
 			TCBooleanType expected = new TCBooleanType(location);
 			TCType b = postdef.body.typeCheck(post, null, NameScope.NAMES, expected);
 			// post.unusedCheck(); This would detect unused RESULTs 
@@ -552,7 +560,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		return ftype.result;
 	}
 
-	private TCDefinitionListList getParamDefinitions()
+	public TCDefinitionListList getParamDefinitions()
 	{
 		TCDefinitionListList defList = new TCDefinitionListList();
 		TCFunctionType ftype = type;	// Start with the overall function
