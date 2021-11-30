@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POCharLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.expressions.POFuncInstantiationExpression;
 import com.fujitsu.vdmj.po.expressions.POMapEnumExpression;
 import com.fujitsu.vdmj.po.expressions.POMapletExpression;
 import com.fujitsu.vdmj.po.expressions.POMkTypeExpression;
@@ -70,8 +71,10 @@ import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 public class SubTypeObligation extends ProofObligation
@@ -95,8 +98,20 @@ public class SubTypeObligation extends ProofObligation
 			func.body instanceof POSubclassResponsibilityExpression)
 		{
 			// We have to say "f(a)" because we have no body
-
-			POExpression root = new POVariableExpression(func.name, null);
+			POExpression root = new POVariableExpression(func.name, null);;
+			
+			if (func.typeParams != null)
+			{
+				TCTypeList actuals = new TCTypeList();
+				
+				for (TCNameToken p: func.typeParams)
+				{
+					actuals.add(new TCUnknownType(p.getLocation()));	// "?"
+				}
+				
+				root = new POFuncInstantiationExpression(root, actuals, func.type, func, null);
+			}
+			
 			POExpressionList args = new POExpressionList();
 
 			for (POPattern p: func.paramPatternList.get(0))

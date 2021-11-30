@@ -80,7 +80,8 @@ public class POContextStack extends Stack<POContext>
 		result.append(tail);
 		result.append("\n");
 
-		return result.toString();
+		// Finally, we change any polymorphic types to "?" for now
+		return result.toString().replaceAll("@\\w+", "?");
 	}
 
 	private String indentNewLines(String line, String indent)
