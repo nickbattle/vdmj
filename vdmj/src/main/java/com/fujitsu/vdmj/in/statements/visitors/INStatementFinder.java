@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.in.statements.visitors;
 
-import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.statements.INStatementList;
 
@@ -32,8 +31,7 @@ public class INStatementFinder extends INLeafStatementVisitor<INStatement, INSta
 {
 	public INStatementFinder()
 	{
-		super(true);	// So we visit the nodes as well as the leaves
-		visitorSet = new INVisitorSet<INStatement, INStatementList, Integer>() {};
+		super(true);	// So we visit the nodes as well as the leaves, default visitorSet
 	}
 
 	@Override

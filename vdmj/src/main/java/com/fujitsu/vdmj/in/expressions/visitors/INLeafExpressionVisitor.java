@@ -88,7 +88,21 @@ import com.fujitsu.vdmj.in.patterns.INSetBind;
  */
 abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> extends INExpressionVisitor<C, S>
 {
-	protected INVisitorSet<E, C, S> visitorSet;
+	protected INVisitorSet<E, C, S> visitorSet = new INVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
+
 	private final boolean allNodes;
 	
 	public INLeafExpressionVisitor(boolean allNodes)

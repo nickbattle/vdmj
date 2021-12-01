@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.in.patterns.visitors;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.patterns.INIdentifierPattern;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 
@@ -35,7 +34,7 @@ public class INFindIdentifiersVisitor extends INLeafPatternVisitor<INIdentifierP
 {
 	public INFindIdentifiersVisitor()
 	{
-		visitorSet = new INVisitorSet<INIdentifierPattern, List<INIdentifierPattern>, Object>() {};
+		// default visitorSet
 	}
 	
 	@Override

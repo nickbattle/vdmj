@@ -39,7 +39,20 @@ import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
  */
 public abstract class INLeafBindVisitor<E, C extends Collection<E>, S> extends INBindVisitor<C, S>
 {
-	protected INVisitorSet<E, C, S> visitorSet;
+	protected INVisitorSet<E, C, S> visitorSet = new INVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 
  	@Override
 	public C caseSeqBind(INSeqBind node, S arg)

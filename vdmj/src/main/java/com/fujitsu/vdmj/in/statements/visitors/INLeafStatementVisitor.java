@@ -78,7 +78,21 @@ import com.fujitsu.vdmj.in.statements.INWhileStatement;
  */
 abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> extends INStatementVisitor<C, S>
 {
-	protected INVisitorSet<E, C, S> visitorSet;
+	protected INVisitorSet<E, C, S> visitorSet = new INVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
+	
 	private final boolean allNodes;
 	
 	public INLeafStatementVisitor(boolean allNodes)

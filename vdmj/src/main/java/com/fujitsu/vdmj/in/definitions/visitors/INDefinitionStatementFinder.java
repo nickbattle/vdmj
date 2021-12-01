@@ -29,28 +29,28 @@ import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementFinder;
-import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 
 /**
  * Find an statement by line number within a definition.
  */
 public class INDefinitionStatementFinder extends INLeafDefinitionVisitor<INStatement, INStatementList, Integer>
 {
-	private class VisitorSet extends INVisitorSet<INStatement, INStatementList, Integer>
-	{
-		private INStatementVisitor<INStatementList, Integer> stmtVisitor = new INStatementFinder();
-
-		@Override
-		public INStatementVisitor<INStatementList, Integer> getStatementVisitor()
-		{
-			return stmtVisitor;
-		}
-	}
-	
 	public INDefinitionStatementFinder()
 	{
-		super();
-		visitorSet = new VisitorSet();
+		visitorSet = new INVisitorSet<INStatement, INStatementList, Integer>()
+		{
+			@Override
+			protected void setVisitors()
+			{
+				statementVisitor = new INStatementFinder();
+			}
+
+			@Override
+			protected INStatementList newCollection()
+			{
+				return INDefinitionStatementFinder.this.newCollection();
+			}
+		};
 	}
 
 	@Override

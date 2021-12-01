@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.in.expressions.visitors;
 
-import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INHistoryExpression;
@@ -34,7 +33,7 @@ public class INHistoryExpressionFinder extends INLeafExpressionVisitor<INExpress
 	public INHistoryExpressionFinder()
 	{
 		super(false);
-		visitorSet = new INVisitorSet<INExpression, INExpressionList, Object>() {};
+		// default visitorSet
 	}
 
 	@Override

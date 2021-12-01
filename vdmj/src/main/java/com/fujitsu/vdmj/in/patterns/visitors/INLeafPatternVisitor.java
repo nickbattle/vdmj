@@ -48,7 +48,20 @@ import com.fujitsu.vdmj.in.patterns.INUnionPattern;
  */
 public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extends INPatternVisitor<C, S>
 {
-	protected INVisitorSet<E, C, S> visitorSet;
+	protected INVisitorSet<E, C, S> visitorSet = new INVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 	
  	@Override
 	public C caseConcatenationPattern(INConcatenationPattern node, S arg)

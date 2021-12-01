@@ -35,7 +35,21 @@ public class INOldNamesFinder extends INLeafExpressionVisitor<TCNameToken, TCNam
 	public INOldNamesFinder()
 	{
 		super(false);
-		visitorSet = new INVisitorSet<TCNameToken, TCNameList, Object>() {};
+
+		visitorSet = new INVisitorSet<TCNameToken, TCNameList, Object>()
+		{
+			@Override
+			protected void setVisitors()
+			{
+				// None
+			}
+
+			@Override
+			protected TCNameList newCollection()
+			{
+				return null;
+			}
+		};
 	}
 
 	@Override
