@@ -53,8 +53,7 @@ import com.fujitsu.vdmj.ast.definitions.ASTUntypedDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
 import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleBind;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleSeqBind;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleSetBind;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTMultipleBindVisitor;
 import com.fujitsu.vdmj.ast.statements.visitors.ASTStatementVisitor;
 import com.fujitsu.vdmj.ast.traces.ASTTraceApplyExpression;
 import com.fujitsu.vdmj.ast.traces.ASTTraceBracketedExpression;
@@ -355,11 +354,15 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseMultiBindListDefinition(ASTMultiBindListDefinition node, S arg)
 	{
+ 		ASTMultipleBindVisitor<C, S> mbVisitor = visitorSet.getMultiBindVisitor();
  		C all = newCollection();
  		
-		for (ASTMultipleBind bind: node.bindings)
+ 		if (mbVisitor != null)
  		{
- 			all.addAll(caseMultipleBind(bind, arg));
+			for (ASTMultipleBind mbind: node.bindings)
+	 		{
+	 			all.addAll(mbind.apply(mbVisitor, arg));
+	 		}
  		}
 		
 		return all;
@@ -404,8 +407,14 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 		}
 		else if (tdef instanceof ASTTraceLetBeStBinding)
 		{
+			ASTMultipleBindVisitor<C, S> mbVisitor = visitorSet.getMultiBindVisitor();
 			ASTTraceLetBeStBinding letbe = (ASTTraceLetBeStBinding)tdef;
-			all.addAll(caseMultipleBind(letbe.bind, arg));
+			
+			if (mbVisitor != null)
+			{
+				all.addAll(letbe.bind.apply(mbVisitor, arg));
+			}
+			
 			all.addAll(caseTraceDefinition(letbe.body, arg));
 		}
 		else if (tdef instanceof ASTTraceRepeatDefinition)
@@ -561,28 +570,6 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 		if (expVisitor != null)
 		{
 			all.addAll(node.exp.apply(expVisitor, arg));
-		}
-		
-		return all;
-	}
-
- 	private C caseMultipleBind(ASTMultipleBind bind, S arg)
-	{
-		ASTExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		C all = newCollection();
-		
-		if (expVisitor != null)
-		{
-			if (bind instanceof ASTMultipleSetBind)
-			{
-				ASTMultipleSetBind sbind = (ASTMultipleSetBind)bind;
-				all.addAll(sbind.set.apply(expVisitor, arg));
-			}
-			else if (bind instanceof ASTMultipleSeqBind)
-			{
-				ASTMultipleSeqBind sbind = (ASTMultipleSeqBind)bind;
-				all.addAll(sbind.sequence.apply(expVisitor, arg));
-			}
 		}
 		
 		return all;

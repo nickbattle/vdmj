@@ -43,7 +43,7 @@ import com.fujitsu.vdmj.ast.patterns.ASTTuplePattern;
 import com.fujitsu.vdmj.ast.patterns.ASTUnionPattern;
 
 /**
- * This TCPattern visitor visits all of the leaves of a pattern tree and calls
+ * This ASTPattern visitor visits all of the leaves of a pattern tree and calls
  * the basic processing methods for the simple patterns.
  */
 public abstract class ASTLeafPatternVisitor<E, C extends Collection<E>, S> extends ASTPatternVisitor<C, S>

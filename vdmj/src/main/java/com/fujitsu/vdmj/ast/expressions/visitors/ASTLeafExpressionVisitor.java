@@ -74,13 +74,10 @@ import com.fujitsu.vdmj.ast.expressions.ASTSetRangeExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTSubseqExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTTupleExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTUnaryExpression;
-import com.fujitsu.vdmj.ast.patterns.ASTBind;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleBind;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleSeqBind;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleSetBind;
-import com.fujitsu.vdmj.ast.patterns.ASTSeqBind;
-import com.fujitsu.vdmj.ast.patterns.ASTSetBind;
 import com.fujitsu.vdmj.ast.patterns.ASTTypeBind;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTBindVisitor;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTMultipleBindVisitor;
 
 /**
  * This TCExpression visitor visits all of the leaves of an expression tree and calls
@@ -168,8 +165,13 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseExists1Expression(ASTExists1Expression node, S arg)
 	{
+ 		ASTBindVisitor<C, S> bindVisitor = visitorSet.getBindVisitor();
 		C all = newCollection();
-		all.addAll(caseBind(node.bind, arg));
+		
+		if (bindVisitor != null)
+		{
+			all.addAll(node.bind.apply(bindVisitor, arg));
+		}
 		
 		if (node.predicate != null)
 		{
@@ -182,11 +184,15 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseExistsExpression(ASTExistsExpression node, S arg)
 	{
+ 		ASTMultipleBindVisitor<C, S> mbindVisitor = visitorSet.getMultiBindVisitor();
 		C all = newCollection();
 		
-		for (ASTMultipleBind bind: node.bindList)
+		if (mbindVisitor != null)
 		{
-			all.addAll(caseMultipleBind(bind, arg));
+			for (ASTMultipleBind bind: node.bindList)
+			{
+				all.addAll(bind.apply(mbindVisitor, arg));
+			}
 		}
 		
 		if (node.predicate != null)
@@ -212,11 +218,15 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseForAllExpression(ASTForAllExpression node, S arg)
 	{
+ 		ASTMultipleBindVisitor<C, S> mbindVisitor = visitorSet.getMultiBindVisitor();
 		C all = newCollection();
 		
-		for (ASTMultipleBind bind: node.bindList)
+		if (mbindVisitor != null)
 		{
-			all.addAll(caseMultipleBind(bind, arg));
+			for (ASTMultipleBind bind: node.bindList)
+			{
+				all.addAll(bind.apply(mbindVisitor, arg));
+			}
 		}
 		
 		if (node.predicate != null)
@@ -252,8 +262,13 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseIotaExpression(ASTIotaExpression node, S arg)
 	{
+ 		ASTBindVisitor<C, S> bindVisitor = visitorSet.getBindVisitor();
 		C all = newCollection();
-		all.addAll(caseBind(node.bind, arg));
+		
+		if (bindVisitor != null)
+		{
+			all.addAll(node.bind.apply(bindVisitor, arg));
+		}
 		
 		if (node.predicate != null)
 		{
@@ -284,11 +299,15 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseLambdaExpression(ASTLambdaExpression node, S arg)
 	{
+ 		ASTBindVisitor<C, S> bindVisitor = visitorSet.getBindVisitor();
 		C all = newCollection();
 		
-		for (ASTTypeBind bind: node.bindList)
+		if (bindVisitor != null)
 		{
-			all.addAll(caseBind(bind, arg));
+			for (ASTTypeBind bind: node.bindList)
+			{
+				all.addAll(bind.apply(bindVisitor, arg));
+			}
 		}
 		
 		all.addAll(node.expression.apply(this, arg));
@@ -298,8 +317,13 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseLetBeStExpression(ASTLetBeStExpression node, S arg)
 	{
+ 		ASTMultipleBindVisitor<C, S> mbindVisitor = visitorSet.getMultiBindVisitor();
 		C all = newCollection();
-		all.addAll(caseMultipleBind(node.bind, arg));
+		
+		if (mbindVisitor != null)
+		{
+			all.addAll(node.bind.apply(mbindVisitor, arg));
+		}
 		
 		if (node.suchThat != null)
 		{
@@ -331,13 +355,17 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseMapCompExpression(ASTMapCompExpression node, S arg)
 	{
+ 		ASTMultipleBindVisitor<C, S> mbindVisitor = visitorSet.getMultiBindVisitor();
 		C all = newCollection();
 		all.addAll(node.first.left.apply(this, arg));
 		all.addAll(node.first.right.apply(this, arg));
 		
-		for (ASTMultipleBind mbind: node.bindings)
+		if (mbindVisitor != null)
 		{
-			all.addAll(caseMultipleBind(mbind, arg));
+			for (ASTMultipleBind mbind: node.bindings)
+			{
+				all.addAll(mbind.apply(mbindVisitor, arg));
+			}
 		}
 		
 		if (node.predicate != null)
@@ -461,9 +489,14 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseSeqCompExpression(ASTSeqCompExpression node, S arg)
 	{
+ 		ASTBindVisitor<C, S> bindVisitor = visitorSet.getBindVisitor();
 		C all = newCollection();
 		all.addAll(node.first.apply(this, arg));
-		all.addAll(caseBind(node.bind, arg));
+		
+		if (bindVisitor != null)
+		{
+			all.addAll(node.bind.apply(bindVisitor, arg));
+		}
 		
 		if (node.predicate != null)
 		{
@@ -489,12 +522,16 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseSetCompExpression(ASTSetCompExpression node, S arg)
 	{
+ 		ASTMultipleBindVisitor<C, S> mbindVisitor = visitorSet.getMultiBindVisitor();
 		C all = newCollection();
 		all.addAll(node.first.apply(this, arg));
 		
-		for (ASTMultipleBind mbind: node.bindings)
+		if (mbindVisitor != null)
 		{
-			all.addAll(caseMultipleBind(mbind, arg));
+			for (ASTMultipleBind mbind: node.bindings)
+			{
+				all.addAll(mbind.apply(mbindVisitor, arg));
+			}
 		}
 		
 		if (node.predicate != null)
@@ -557,41 +594,5 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 		return all;
 	}
 
-	private C caseBind(ASTBind bind, S arg)
-	{
-		C all = newCollection();
-		
-		if (bind instanceof ASTSetBind)
-		{
-			ASTSetBind sbind = (ASTSetBind)bind;
-			all.addAll(sbind.set.apply(this, arg));
-		}
-		else if (bind instanceof ASTSeqBind)
-		{
-			ASTSeqBind sbind = (ASTSeqBind)bind;
-			all.addAll(sbind.sequence.apply(this, arg));
-		}
-		
-		return all;
-	}
-
- 	private C caseMultipleBind(ASTMultipleBind bind, S arg)
-	{
-		C all = newCollection();
-		
-		if (bind instanceof ASTMultipleSetBind)
-		{
-			ASTMultipleSetBind sbind = (ASTMultipleSetBind)bind;
-			all.addAll(sbind.set.apply(this, arg));
-		}
-		else if (bind instanceof ASTMultipleSeqBind)
-		{
-			ASTMultipleSeqBind sbind = (ASTMultipleSeqBind)bind;
-			all.addAll(sbind.sequence.apply(this, arg));
-		}
-		
-		return all;
-	}
-	
 	abstract protected C newCollection();
 }
