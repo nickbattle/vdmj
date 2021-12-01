@@ -48,7 +48,20 @@ import com.fujitsu.vdmj.po.patterns.POUnionPattern;
  */
 public abstract class POLeafPatternVisitor<E, C extends Collection<E>, S> extends POPatternVisitor<C, S>
 {
-	protected POVisitorSet<E, C, S> visitorSet;
+	protected POVisitorSet<E, C, S> visitorSet = new POVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 
  	@Override
 	public C caseConcatenationPattern(POConcatenationPattern node, S arg)

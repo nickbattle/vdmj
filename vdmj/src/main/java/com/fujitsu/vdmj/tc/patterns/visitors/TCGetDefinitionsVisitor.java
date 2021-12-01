@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.patterns.visitors;
 
 import java.util.Iterator;
 
-import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCInstanceVariableDefinition;

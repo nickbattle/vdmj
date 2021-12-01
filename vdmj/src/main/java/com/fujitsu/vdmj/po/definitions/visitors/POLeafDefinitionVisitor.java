@@ -66,7 +66,20 @@ import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
  */
 abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> extends PODefinitionVisitor<C, S>
 {
-	protected POVisitorSet<E, C, S> visitorSet;
+	protected POVisitorSet<E, C, S> visitorSet = new POVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 
  	@Override
 	public C caseAssignmentDefinition(POAssignmentDefinition node, S arg)
