@@ -58,20 +58,7 @@ public class TCGetDefinitionsVisitor extends TCLeafPatternVisitor<TCDefinition, 
 {
 	public TCGetDefinitionsVisitor()
 	{
-		visitorSet = new TCVisitorSet<TCDefinition, TCDefinitionList, Pair>()
-		{
-			@Override
-			protected void setVisitors()
-			{
-				// None
-			}
-
-			@Override
-			protected TCDefinitionList newCollection()
-			{
-				return null;
-			}
-		};
+		// default visitorSet
 	}
 	
 	@Override

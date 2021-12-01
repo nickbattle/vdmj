@@ -69,7 +69,20 @@ import com.fujitsu.vdmj.ast.statements.ASTWhileStatement;
  */
 abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> extends ASTStatementVisitor<C, S>
 {
-	protected ASTVisitorSet<E, C, S> visitorSet;
+	protected ASTVisitorSet<E, C, S> visitorSet = new ASTVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 
 	@Override
 	public C caseAlwaysStatement(ASTAlwaysStatement node, S arg)

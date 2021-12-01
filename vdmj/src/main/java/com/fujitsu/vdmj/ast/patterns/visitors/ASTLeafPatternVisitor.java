@@ -47,7 +47,20 @@ import com.fujitsu.vdmj.ast.patterns.ASTUnionPattern;
  */
 public abstract class ASTLeafPatternVisitor<E, C extends Collection<E>, S> extends ASTPatternVisitor<C, S>
 {
-	protected ASTVisitorSet<E, C, S> visitorSet;
+	protected ASTVisitorSet<E, C, S> visitorSet = new ASTVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 
  	@Override
 	public C caseConcatenationPattern(ASTConcatenationPattern node, S arg)

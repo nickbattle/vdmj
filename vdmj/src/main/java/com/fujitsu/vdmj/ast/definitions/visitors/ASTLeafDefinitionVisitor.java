@@ -74,7 +74,20 @@ import com.fujitsu.vdmj.ast.types.ASTUnknownType;
  */
 abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> extends ASTDefinitionVisitor<C, S>
 {
-	protected ASTVisitorSet<E, C, S> visitorSet;
+	protected ASTVisitorSet<E, C, S> visitorSet = new ASTVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 
  	@Override
 	public C caseAssignmentDefinition(ASTAssignmentDefinition node, S arg)

@@ -78,7 +78,20 @@ import com.fujitsu.vdmj.tc.traces.TCTraceVariableStatement;
  */
 abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> extends TCStatementVisitor<C, S>
 {
-	protected TCVisitorSet<E, C, S> visitorSet;
+	protected TCVisitorSet<E, C, S> visitorSet = new TCVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 	
 	@Override
 	public C caseAnnotatedStatement(TCAnnotatedStatement node, S arg)

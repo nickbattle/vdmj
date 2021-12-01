@@ -83,7 +83,20 @@ import com.fujitsu.vdmj.ast.patterns.ASTTypeBind;
  */
 abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> extends ASTExpressionVisitor<C, S>
 {
-	protected ASTVisitorSet<E, C, S> visitorSet;
+	protected ASTVisitorSet<E, C, S> visitorSet = new ASTVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 
  	@Override
 	public C caseApplyExpression(ASTApplyExpression node, S arg)

@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.tc.definitions.visitors;
 
 import java.util.Collection;
+
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -79,7 +80,20 @@ import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
  */
 abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> extends TCDefinitionVisitor<C, S>
 {
-	protected TCVisitorSet<E, C, S> visitorSet;
+	protected TCVisitorSet<E, C, S> visitorSet = new TCVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 	
  	@Override
 	public C caseAssignmentDefinition(TCAssignmentDefinition node, S arg)

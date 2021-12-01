@@ -48,7 +48,20 @@ import com.fujitsu.vdmj.tc.patterns.TCUnionPattern;
  */
 public abstract class TCLeafPatternVisitor<E, C extends Collection<E>, S> extends TCPatternVisitor<C, S>
 {
-	protected TCVisitorSet<E, C, S> visitorSet;
+	protected TCVisitorSet<E, C, S> visitorSet = new TCVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 	
 	@Override
 	public C caseConcatenationPattern(TCConcatenationPattern node, S arg)

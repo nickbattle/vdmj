@@ -23,7 +23,6 @@
  ******************************************************************************/
 package com.fujitsu.vdmj.tc.expressions.visitors;
 
-import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCFuncInstantiationExpression;
@@ -35,20 +34,7 @@ public class TCFunctionCallFinder extends TCLeafExpressionVisitor<TCNameToken, T
 {
 	public TCFunctionCallFinder()
 	{
-		visitorSet = new TCVisitorSet<TCNameToken, TCNameList, Object>()
-		{
-			@Override
-			protected void setVisitors()
-			{
-				// None!
-			}
-
-			@Override
-			protected TCNameList newCollection()
-			{
-				return null;
-			}
-		};
+		// default visitorSet
 	}
 
 	@Override

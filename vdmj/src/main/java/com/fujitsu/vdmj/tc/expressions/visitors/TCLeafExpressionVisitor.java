@@ -91,7 +91,20 @@ import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
  */
 abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S> extends TCExpressionVisitor<C, S>
 {
-	protected TCVisitorSet<E, C, S> visitorSet;
+	protected TCVisitorSet<E, C, S> visitorSet = new TCVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 	
  	@Override
 	public C caseApplyExpression(TCApplyExpression node, S arg)

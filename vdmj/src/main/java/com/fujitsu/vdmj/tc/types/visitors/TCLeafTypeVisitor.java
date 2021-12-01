@@ -51,7 +51,20 @@ import com.fujitsu.vdmj.tc.types.TCUnionType;
  */
 public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends TCTypeVisitor<C, S>
 {
-	protected TCVisitorSet<E, C, S> visitorSet;
+	protected TCVisitorSet<E, C, S> visitorSet = new TCVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 	
 	/**
 	 * We have to collect the nodes that have already been visited since types can be recursive,

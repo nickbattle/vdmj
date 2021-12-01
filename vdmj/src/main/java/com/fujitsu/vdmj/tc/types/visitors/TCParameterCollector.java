@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.tc.types.visitors;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -40,20 +39,7 @@ public class TCParameterCollector extends TCLeafTypeVisitor<String, List<String>
 {
 	public TCParameterCollector()
 	{
-		visitorSet = new TCVisitorSet<String, List<String>, Object>()
-		{
-			@Override
-			protected void setVisitors()
-			{
-				// None
-			}
-
-			@Override
-			protected List<String> newCollection()
-			{
-				return null;
-			}
-		};
+		// default visitorSet
 	}
 
 	@Override

@@ -38,7 +38,20 @@ import com.fujitsu.vdmj.ast.patterns.ASTTypeBind;
  */
 public abstract class ASTLeafBindVisitor<E, C extends Collection<E>, S> extends ASTBindVisitor<C, S>
 {
-	protected ASTVisitorSet<E, C, S> visitorSet;
+	protected ASTVisitorSet<E, C, S> visitorSet = new ASTVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			// None
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return null;
+		}
+	};
 
  	@Override
 	abstract public C caseBind(ASTBind node, S arg);
