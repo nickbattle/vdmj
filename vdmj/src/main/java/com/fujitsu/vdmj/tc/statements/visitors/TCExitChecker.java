@@ -35,11 +35,8 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCBindExitChecker;
-import com.fujitsu.vdmj.tc.patterns.visitors.TCBindVisitor;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindExitChecker;
-import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindVisitor;
 import com.fujitsu.vdmj.tc.statements.TCBlockStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
@@ -61,49 +58,25 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Environment>
 {
-	private static class VisitorSet extends TCVisitorSet<TCType, TCTypeSet, Environment>
-	{
-		private final TCLeafExpressionVisitor<TCType, TCTypeSet, Environment> expVisitor;
-		private final TCStatementVisitor<TCTypeSet, Environment> stmtVisitor;
-		private final TCBindVisitor<TCTypeSet, Environment> bindVisitor;
-		private final TCMultipleBindVisitor<TCTypeSet, Environment> mbindVisitor;
-
-		public VisitorSet(TCExitChecker parent)
-		{
-			expVisitor = new com.fujitsu.vdmj.tc.expressions.visitors.TCExitChecker(this);
-			bindVisitor = new TCBindExitChecker(this);
-			mbindVisitor = new TCMultipleBindExitChecker(this);
-			stmtVisitor = parent;
-		}
-
-		@Override
-		public TCLeafExpressionVisitor<TCType, TCTypeSet, Environment> getExpressionVisitor()
-		{
-			return expVisitor;
-		}
-		
-		@Override
-		public TCStatementVisitor<TCTypeSet, Environment> getStatementVisitor()
-		{
-			return stmtVisitor;
-		}
-		
-		@Override
-		public TCBindVisitor<TCTypeSet, Environment> getBindVisitor()
-		{
-			return bindVisitor;
-		}
-		
-		@Override
-		public TCMultipleBindVisitor<TCTypeSet, Environment> getMultiBindVisitor()
-		{
-			return mbindVisitor;
-		}
-	}
-
 	public TCExitChecker()
 	{
-		visitorSet = new VisitorSet(this);
+		visitorSet = new TCVisitorSet<TCType, TCTypeSet, Environment>()
+		{
+			@Override
+			protected void setVisitors()
+			{
+				expressionVisitor = new com.fujitsu.vdmj.tc.expressions.visitors.TCExitChecker(this);
+				bindVisitor = new TCBindExitChecker(this);
+				multiBindVisitor = new TCMultipleBindExitChecker(this);
+				statementVisitor = TCExitChecker.this;
+			}
+
+			@Override
+			protected TCTypeSet newCollection()
+			{
+				return TCExitChecker.this.newCollection();
+			}
+		};
 	}
 
 	@Override

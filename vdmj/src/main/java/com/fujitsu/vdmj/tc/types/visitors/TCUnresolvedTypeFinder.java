@@ -34,7 +34,20 @@ public class TCUnresolvedTypeFinder extends TCLeafTypeVisitor<TCType, TCTypeList
 {
 	public TCUnresolvedTypeFinder()
 	{
-		visitorSet = new TCVisitorSet<TCType, TCTypeList, Object>() {};
+		visitorSet = new TCVisitorSet<TCType, TCTypeList, Object>()
+		{
+			@Override
+			protected void setVisitors()
+			{
+				// None
+			}
+
+			@Override
+			protected TCTypeList newCollection()
+			{
+				return null;
+			}
+		};
 	}
 
 	@Override

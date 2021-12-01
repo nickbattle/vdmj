@@ -38,84 +38,41 @@ import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.EnvTriple;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.patterns.visitors.TCBindVisitor;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCGetFreeVariablesBindVisitor;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCGetFreeVariablesMultipleBindVisitor;
-import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindVisitor;
-import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
-import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
-	private static class VisitorSet extends TCVisitorSet<TCNameToken, TCNameSet, EnvTriple>
-	{
-		private final TCGetFreeVariablesVisitor defVisitor;
-		private final TCExpressionVisitor<TCNameSet, EnvTriple> expVisitor;
-		private final TCStatementVisitor<TCNameSet, EnvTriple> stmtVisitor;
-		private final TCTypeVisitor<TCNameSet, EnvTriple> typeVisitor;
-		private final TCBindVisitor<TCNameSet, EnvTriple> bindVisitor;
-		private final TCMultipleBindVisitor<TCNameSet, EnvTriple> mbindVisitor;
-
-		public VisitorSet(TCGetFreeVariablesVisitor parent)
-		{
-			defVisitor = parent;
-			expVisitor = new com.fujitsu.vdmj.tc.expressions.visitors.TCGetFreeVariablesVisitor(this);
-			stmtVisitor = new com.fujitsu.vdmj.tc.statements.visitors.TCGetFreeVariablesVisitor(this);
-			typeVisitor = new com.fujitsu.vdmj.tc.types.visitors.TCGetFreeVariablesVisitor(this);
-			bindVisitor = new TCGetFreeVariablesBindVisitor(this);
-			mbindVisitor = new TCGetFreeVariablesMultipleBindVisitor(this); 
-		}
-		
-		@Override
-		public TCDefinitionVisitor<TCNameSet, EnvTriple> getDefinitionVisitor()
-		{
-			return defVisitor;
-		}
-
-		@Override
-		public TCExpressionVisitor<TCNameSet, EnvTriple> getExpressionVisitor()
-	 	{
-	 		return expVisitor;
-	 	}
-	 	
-		@Override
-		public TCStatementVisitor<TCNameSet, EnvTriple> getStatementVisitor()
-	 	{
-	 		return stmtVisitor;
-	 	}
-	 	
-		@Override
-		public TCTypeVisitor<TCNameSet, EnvTriple> getTypeVisitor()
-	 	{
-	 		return typeVisitor;
-	 	}
-		
-		@Override
-		public TCBindVisitor<TCNameSet, EnvTriple> getBindVisitor()
-		{
-			return bindVisitor;
-		}
-		
-		@Override
-		public TCMultipleBindVisitor<TCNameSet, EnvTriple> getMultiBindVisitor()
-		{
-			return mbindVisitor;
-		}
-	}
-
 	public TCGetFreeVariablesVisitor()
 	{
-		visitorSet = new VisitorSet(this);
+		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, EnvTriple>()
+		{
+			@Override
+			protected void setVisitors()
+			{
+				definitionVisitor = TCGetFreeVariablesVisitor.this;
+				expressionVisitor = new com.fujitsu.vdmj.tc.expressions.visitors.TCGetFreeVariablesVisitor(this);
+				statementVisitor = new com.fujitsu.vdmj.tc.statements.visitors.TCGetFreeVariablesVisitor(this);
+				typeVisitor = new com.fujitsu.vdmj.tc.types.visitors.TCGetFreeVariablesVisitor(this);
+				bindVisitor = new TCGetFreeVariablesBindVisitor(this);
+				multiBindVisitor = new TCGetFreeVariablesMultipleBindVisitor(this); 
+			}
+
+			@Override
+			protected TCNameSet newCollection()
+			{
+				return TCGetFreeVariablesVisitor.this.newCollection();
+			}
+		};
 	}
 
 	@Override

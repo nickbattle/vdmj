@@ -42,62 +42,35 @@ import com.fujitsu.vdmj.tc.definitions.TCPerSyncDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
-import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCLeafDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
-import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 import com.fujitsu.vdmj.tc.statements.TCErrorCase;
 import com.fujitsu.vdmj.tc.statements.TCExternalClause;
-import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 
 public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode, Set<TCNode>, LexLocation>
 {
-	private static class VisitorSet extends TCVisitorSet<TCNode, Set<TCNode>, LexLocation>
-	{
-		private final LSPDefinitionLocationFinder defVisitor;
-		private final LSPExpressionLocationFinder expVisitor;
-		private final LSPStatementLocationFinder stmtVisitor;
-		private final LSPPatternLocationFinder patVisitor;
-
-		public VisitorSet(LSPDefinitionLocationFinder parent)
-		{
-			defVisitor = parent;
-			expVisitor = new LSPExpressionLocationFinder(this);
-			stmtVisitor = new LSPStatementLocationFinder(this);
-			patVisitor = new LSPPatternLocationFinder(this);
-		}
-		
-		@Override
-		public TCDefinitionVisitor<Set<TCNode>, LexLocation> getDefinitionVisitor()
-		{
-			return defVisitor;
-		}
-
-		@Override
-		public TCExpressionVisitor<Set<TCNode>, LexLocation> getExpressionVisitor()
-	 	{
-	 		return expVisitor;
-	 	}
-	 	
-		@Override
-		public TCStatementVisitor<Set<TCNode>, LexLocation> getStatementVisitor()
-	 	{
-	 		return stmtVisitor;
-	 	}
-		
-		@Override
-		public TCPatternVisitor<Set<TCNode>, LexLocation> getPatternVisitor()
-		{
-			return patVisitor;
-		}
-	}
-
 	public LSPDefinitionLocationFinder()
 	{
-		visitorSet = new VisitorSet(this);
+		visitorSet = new TCVisitorSet<TCNode, Set<TCNode>, LexLocation>()
+		{
+			@Override
+			protected void setVisitors()
+			{
+				definitionVisitor = LSPDefinitionLocationFinder.this;
+				expressionVisitor = new LSPExpressionLocationFinder(this);
+				statementVisitor = new LSPStatementLocationFinder(this);
+				patternVisitor = new LSPPatternLocationFinder(this);
+			}
+
+			@Override
+			protected Set<TCNode> newCollection()
+			{
+				return LSPDefinitionLocationFinder.this.newCollection();
+			}
+		};
 	}
 
 	@Override

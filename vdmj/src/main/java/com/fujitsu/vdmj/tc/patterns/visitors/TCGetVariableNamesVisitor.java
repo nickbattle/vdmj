@@ -34,7 +34,20 @@ public class TCGetVariableNamesVisitor extends TCLeafPatternVisitor<TCNameToken,
 {
 	public TCGetVariableNamesVisitor()
 	{
-		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, Object>() {};
+		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, Object>()
+		{
+			@Override
+			protected void setVisitors()
+			{
+				// None
+			}
+
+			@Override
+			protected TCNameSet newCollection()
+			{
+				return null;
+			}
+		};
 	}
 	
 	@Override

@@ -35,7 +35,20 @@ public class TCFunctionCallFinder extends TCLeafExpressionVisitor<TCNameToken, T
 {
 	public TCFunctionCallFinder()
 	{
-		visitorSet = new TCVisitorSet<TCNameToken, TCNameList, Object>() {};
+		visitorSet = new TCVisitorSet<TCNameToken, TCNameList, Object>()
+		{
+			@Override
+			protected void setVisitors()
+			{
+				// None!
+			}
+
+			@Override
+			protected TCNameList newCollection()
+			{
+				return null;
+			}
+		};
 	}
 
 	@Override

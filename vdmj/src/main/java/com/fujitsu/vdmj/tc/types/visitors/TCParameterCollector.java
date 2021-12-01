@@ -40,7 +40,20 @@ public class TCParameterCollector extends TCLeafTypeVisitor<String, List<String>
 {
 	public TCParameterCollector()
 	{
-		visitorSet = new TCVisitorSet<String, List<String>, Object>() {};
+		visitorSet = new TCVisitorSet<String, List<String>, Object>()
+		{
+			@Override
+			protected void setVisitors()
+			{
+				// None
+			}
+
+			@Override
+			protected List<String> newCollection()
+			{
+				return null;
+			}
+		};
 	}
 
 	@Override

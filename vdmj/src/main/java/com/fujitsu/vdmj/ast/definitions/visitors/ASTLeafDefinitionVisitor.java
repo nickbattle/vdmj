@@ -119,9 +119,7 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseExplicitFunctionDefinition(ASTExplicitFunctionDefinition node, S arg)
 	{
-		C all = newCollection();
-		
-		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
+		C all = visitorSet.applyTypeVisitor(node.type, arg);
 		all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
 		
 		if (node.precondition != null)
@@ -145,9 +143,7 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseExplicitOperationDefinition(ASTExplicitOperationDefinition node, S arg)
 	{
-		C all = newCollection();
-		
-		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
+		C all = visitorSet.applyTypeVisitor(node.type, arg);
 		all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
 		
 		if (node.precondition != null)
@@ -173,7 +169,6 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 	public C caseImplicitFunctionDefinition(ASTImplicitFunctionDefinition node, S arg)
 	{
 		C all = newCollection();
-		
 		ASTTypeList ptypes = new ASTTypeList();
 
 		for (ASTPatternListTypePair ptp: node.parameterPatterns)
@@ -215,7 +210,6 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 	public C caseImplicitOperationDefinition(ASTImplicitOperationDefinition node, S arg)
 	{
 		C all = newCollection();
-		
 		ASTTypeList ptypes = new ASTTypeList();
 
 		for (ASTPatternListTypePair ptp: node.parameterPatterns)
@@ -422,9 +416,7 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseTypeDefinition(ASTTypeDefinition node, S arg)
 	{
-		C all = newCollection();
-		
-		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
+		C all = visitorSet.applyTypeVisitor(node.type, arg);
 		
 		if (node.invExpression != null)
 		{
