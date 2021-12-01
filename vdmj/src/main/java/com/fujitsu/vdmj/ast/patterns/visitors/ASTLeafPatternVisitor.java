@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.ast.patterns.visitors;
 import java.util.Collection;
 
 import com.fujitsu.vdmj.ast.ASTVisitorSet;
-import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
 import com.fujitsu.vdmj.ast.patterns.ASTConcatenationPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTExpressionPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTMapPattern;
@@ -64,8 +63,7 @@ public abstract class ASTLeafPatternVisitor<E, C extends Collection<E>, S> exten
  	@Override
 	public C caseExpressionPattern(ASTExpressionPattern node, S arg)
 	{
-		ASTExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		return (expVisitor != null ? node.exp.apply(expVisitor, arg) : newCollection());
+		return visitorSet.applyExpressionVisitor(node.exp, arg);
 	}
 
  	@Override
