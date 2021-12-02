@@ -31,10 +31,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
-import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCLeafMultipleBindVisitor;
 
 public class LSPMultipleBindLocationFinder extends TCLeafMultipleBindVisitor<TCNode, Set<TCNode>, LexLocation>
@@ -60,31 +57,5 @@ public class LSPMultipleBindLocationFinder extends TCLeafMultipleBindVisitor<TCN
 	public Set<TCNode> caseMultipleTypeBind(TCMultipleTypeBind node, LexLocation arg)
 	{
 		return node.unresolved.matchUnresolved(arg);
-	}
-	
-	@Override
-	public Set<TCNode> caseMultipleSetBind(TCMultipleSetBind node, LexLocation arg)
-	{
-		Set<TCNode> all = visitorSet.applyExpressionVisitor(node.set, arg);
-		
-		for (TCPattern p: node.plist)
-		{
-			all.addAll(visitorSet.applyPatternVisitor(p, arg));
-		}
-		
-		return all;
-	}
-	
-	@Override
-	public Set<TCNode> caseMultipleSeqBind(TCMultipleSeqBind node, LexLocation arg)
-	{
-		Set<TCNode> all = visitorSet.applyExpressionVisitor(node.sequence, arg);
-		
-		for (TCPattern p: node.plist)
-		{
-			all.addAll(visitorSet.applyPatternVisitor(p, arg));
-		}
-		
-		return all;
 	}
 }

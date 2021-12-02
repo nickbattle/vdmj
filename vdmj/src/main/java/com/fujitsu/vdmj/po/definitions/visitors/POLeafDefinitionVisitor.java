@@ -53,6 +53,9 @@ import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
 import com.fujitsu.vdmj.po.definitions.POUntypedDefinition;
 import com.fujitsu.vdmj.po.definitions.POValueDefinition;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
+import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCField;
 
 /**
@@ -118,6 +121,14 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = newCollection();
 		
+		for (POPatternList plist: node.paramPatternList)
+		{
+			for (POPattern p: plist)
+			{
+				all.addAll(visitorSet.applyPatternVisitor(p, arg));
+			}
+		}
+
 		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
 		
@@ -144,6 +155,11 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = newCollection();
 		
+		for (POPattern p: node.parameterPatterns)
+		{
+			all.addAll(visitorSet.applyPatternVisitor(p, arg));
+		}
+
 		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
 		all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
 		
@@ -171,6 +187,16 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = visitorSet.applyTypeVisitor(node.getType(), arg);
 		
+		for (POPatternListTypePair ptp: node.parameterPatterns)
+		{
+			all.addAll(visitorSet.applyTypeVisitor(ptp.type, arg));
+
+			for (POPattern p: ptp.patterns)
+			{
+				all.addAll(visitorSet.applyPatternVisitor(p, arg));
+			}
+		}
+
  		if (node.body != null)
 		{
 			all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
@@ -199,6 +225,16 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = visitorSet.applyTypeVisitor(node.getType(), arg);
 		
+		for (POPatternListTypePair ptp: node.parameterPatterns)
+		{
+			all.addAll(visitorSet.applyTypeVisitor(ptp.type, arg));
+
+			for (POPattern p: ptp.patterns)
+			{
+				all.addAll(visitorSet.applyPatternVisitor(p, arg));
+			}
+		}
+
 		if (node.body != null)
 		{
 			all.addAll(visitorSet.applyStatementVisitor(node.body, arg));

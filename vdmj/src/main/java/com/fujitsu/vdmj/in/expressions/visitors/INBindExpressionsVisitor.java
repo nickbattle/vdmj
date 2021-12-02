@@ -33,6 +33,10 @@ import com.fujitsu.vdmj.in.patterns.INSetBind;
 import com.fujitsu.vdmj.in.patterns.INTypeBind;
 import com.fujitsu.vdmj.in.patterns.visitors.INLeafBindVisitor;
 
+/**
+ * This is a helper-visitor that just applies the expression visitor of the
+ * visitorSet to any components of a TCBind that involve expressions.
+ */
 public class INBindExpressionsVisitor<E, C extends Collection<E>, S> extends INLeafBindVisitor<E, C, S>
 {
 	public INBindExpressionsVisitor(INVisitorSet<E, C, S> visitorSet)

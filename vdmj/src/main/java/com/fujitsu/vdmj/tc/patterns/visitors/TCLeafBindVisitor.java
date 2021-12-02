@@ -59,19 +59,28 @@ public abstract class TCLeafBindVisitor<E, C extends Collection<E>, S> extends T
  	@Override
 	public C caseSeqBind(TCSeqBind node, S arg)
 	{
-		return caseBind(node, arg);
+ 		C all = newCollection();
+		all.addAll(visitorSet.applyExpressionVisitor(node.sequence, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
+ 		return all;
 	}
 
  	@Override
 	public C caseSetBind(TCSetBind node, S arg)
 	{
-		return caseBind(node, arg);
+ 		C all = newCollection();
+		all.addAll(visitorSet.applyExpressionVisitor(node.set, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
+ 		return all;
 	}
 
  	@Override
 	public C caseTypeBind(TCTypeBind node, S arg)
 	{
-		return caseBind(node, arg);
+		C all = newCollection();
+		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
+ 		return all;
 	}
 
  	abstract protected C newCollection();

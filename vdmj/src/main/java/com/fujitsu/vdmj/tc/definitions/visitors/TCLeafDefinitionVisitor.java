@@ -428,9 +428,7 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseTypeDefinition(TCTypeDefinition node, S arg)
 	{
-		C all = newCollection();
-		
-		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
+		C all = visitorSet.applyTypeVisitor(node.type, arg);
 		
 		if (node.invExpression != null)
 		{

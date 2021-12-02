@@ -53,6 +53,8 @@ import com.fujitsu.vdmj.in.definitions.INTypeDefinition;
 import com.fujitsu.vdmj.in.definitions.INUntypedDefinition;
 import com.fujitsu.vdmj.in.definitions.INValueDefinition;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
+import com.fujitsu.vdmj.in.patterns.INPattern;
+import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.traces.INTraceApplyExpression;
 import com.fujitsu.vdmj.in.traces.INTraceBracketedExpression;
 import com.fujitsu.vdmj.in.traces.INTraceConcurrentExpression;
@@ -62,6 +64,7 @@ import com.fujitsu.vdmj.in.traces.INTraceDefinitionTerm;
 import com.fujitsu.vdmj.in.traces.INTraceLetBeStBinding;
 import com.fujitsu.vdmj.in.traces.INTraceLetDefBinding;
 import com.fujitsu.vdmj.in.traces.INTraceRepeatDefinition;
+import com.fujitsu.vdmj.in.types.INPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCField;
 
 /**
@@ -127,6 +130,14 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = newCollection();
 		
+		for (INPatternList plist: node.paramPatternList)
+		{
+			for (INPattern p: plist)
+			{
+				all.addAll(visitorSet.applyPatternVisitor(p, arg));
+			}
+		}
+
 		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
 
@@ -153,6 +164,11 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = newCollection();
 		
+		for (INPattern p: node.parameterPatterns)
+		{
+			all.addAll(visitorSet.applyPatternVisitor(p, arg));
+		}
+
 		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
 		all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
 		
@@ -180,6 +196,16 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = visitorSet.applyTypeVisitor(node.getType(), arg);
 		
+		for (INPatternListTypePair ptp: node.parameterPatterns)
+		{
+			all.addAll(visitorSet.applyTypeVisitor(ptp.type, arg));
+
+			for (INPattern p: ptp.patterns)
+			{
+				all.addAll(visitorSet.applyPatternVisitor(p, arg));
+			}
+		}
+
 		if (node.body != null)
 		{
 			all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
@@ -207,6 +233,16 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	public C caseImplicitOperationDefinition(INImplicitOperationDefinition node, S arg)
 	{
 		C all = newCollection();
+		
+		for (INPatternListTypePair ptp: node.parameterPatterns)
+		{
+			all.addAll(visitorSet.applyTypeVisitor(ptp.type, arg));
+
+			for (INPattern p: ptp.patterns)
+			{
+				all.addAll(visitorSet.applyPatternVisitor(p, arg));
+			}
+		}
 		
 		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
 

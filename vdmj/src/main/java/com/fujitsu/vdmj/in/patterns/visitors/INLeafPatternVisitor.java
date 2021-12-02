@@ -42,7 +42,7 @@ import com.fujitsu.vdmj.in.patterns.INTuplePattern;
 import com.fujitsu.vdmj.in.patterns.INUnionPattern;
 
 /**
- * This TCPattern visitor visits all of the leaves of a pattern tree and calls
+ * This INPattern visitor visits all of the leaves of a pattern tree and calls
  * the basic processing methods for the simple patterns.
  */
 public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extends INPatternVisitor<C, S>

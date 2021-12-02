@@ -464,8 +464,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
  	public C casePreExpression(INPreExpression node, S arg)
  	{
-		C all = newCollection();
-		all.addAll(node.function.apply(this, arg));
+		C all = node.function.apply(this, arg);
 		
 		for (INExpression exp: node.args)
 		{

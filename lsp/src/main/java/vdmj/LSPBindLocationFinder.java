@@ -31,8 +31,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
-import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
-import com.fujitsu.vdmj.tc.patterns.TCSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCLeafBindVisitor;
 
@@ -59,21 +57,5 @@ public class LSPBindLocationFinder extends TCLeafBindVisitor<TCNode, Set<TCNode>
 	public Set<TCNode> caseTypeBind(TCTypeBind node, LexLocation arg)
 	{
 		return node.unresolved.matchUnresolved(arg);
-	}
-	
-	@Override
-	public Set<TCNode> caseSetBind(TCSetBind node, LexLocation arg)
-	{
-		Set<TCNode> all = visitorSet.applyExpressionVisitor(node.set, arg);
-		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
-		return all;
-	}
-	
-	@Override
-	public Set<TCNode> caseSeqBind(TCSeqBind node, LexLocation arg)
-	{
-		Set<TCNode> all = visitorSet.applyExpressionVisitor(node.sequence, arg);
-		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
-		return all;
 	}
 }

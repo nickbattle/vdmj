@@ -33,6 +33,10 @@ import com.fujitsu.vdmj.tc.patterns.TCSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCLeafBindVisitor;
 
+/**
+ * This is a helper-visitor that just applies the expression visitor of the
+ * visitorSet to any components of a TCBind that involve expressions.
+ */
 public class TCBindExpressionsVisitor<E, C extends Collection<E>, S> extends TCLeafBindVisitor<E, C, S>
 {
 	public TCBindExpressionsVisitor(TCVisitorSet<E, C, S> visitorSet)

@@ -52,6 +52,8 @@ import com.fujitsu.vdmj.ast.definitions.ASTTypeDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTUntypedDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleBind;
+import com.fujitsu.vdmj.ast.patterns.ASTPattern;
+import com.fujitsu.vdmj.ast.patterns.ASTPatternList;
 import com.fujitsu.vdmj.ast.traces.ASTTraceApplyExpression;
 import com.fujitsu.vdmj.ast.traces.ASTTraceBracketedExpression;
 import com.fujitsu.vdmj.ast.traces.ASTTraceConcurrentExpression;
@@ -62,11 +64,7 @@ import com.fujitsu.vdmj.ast.traces.ASTTraceLetBeStBinding;
 import com.fujitsu.vdmj.ast.traces.ASTTraceLetDefBinding;
 import com.fujitsu.vdmj.ast.traces.ASTTraceRepeatDefinition;
 import com.fujitsu.vdmj.ast.types.ASTField;
-import com.fujitsu.vdmj.ast.types.ASTFunctionType;
 import com.fujitsu.vdmj.ast.types.ASTPatternListTypePair;
-import com.fujitsu.vdmj.ast.types.ASTType;
-import com.fujitsu.vdmj.ast.types.ASTTypeList;
-import com.fujitsu.vdmj.ast.types.ASTUnknownType;
 
 /**
  * This ASTDefinition visitor visits all of the leaves of a definition tree and calls
@@ -122,17 +120,29 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 	{
 		C all = newCollection();
 		
-		ASTType type = node.typebind != null ? node.typebind.type : new ASTUnknownType(node.location);
-		all.addAll(visitorSet.applyTypeVisitor(type, arg));	
-		all.addAll(visitorSet.applyExpressionVisitor(node.test, arg));
+		if (node.typebind != null)
+		{
+			all.addAll(visitorSet.applyTypeVisitor(node.typebind.type, arg));	
+		}
 		
+		all.addAll(visitorSet.applyExpressionVisitor(node.test, arg));
 		return all;
 	}
 
  	@Override
 	public C caseExplicitFunctionDefinition(ASTExplicitFunctionDefinition node, S arg)
 	{
-		C all = visitorSet.applyTypeVisitor(node.type, arg);
+		C all = newCollection();
+
+		for (ASTPatternList plist: node.paramPatternList)
+		{
+			for (ASTPattern p: plist)
+			{
+				all.addAll(visitorSet.applyPatternVisitor(p, arg));
+			}
+		}
+
+		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
 		
 		if (node.precondition != null)
@@ -156,7 +166,14 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseExplicitOperationDefinition(ASTExplicitOperationDefinition node, S arg)
 	{
-		C all = visitorSet.applyTypeVisitor(node.type, arg);
+		C all = newCollection();
+
+		for (ASTPattern p: node.parameterPatterns)
+		{
+			all.addAll(visitorSet.applyPatternVisitor(p, arg));
+		}
+
+		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
 		all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
 		
 		if (node.precondition != null)
@@ -182,20 +199,17 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 	public C caseImplicitFunctionDefinition(ASTImplicitFunctionDefinition node, S arg)
 	{
 		C all = newCollection();
-		ASTTypeList ptypes = new ASTTypeList();
 
 		for (ASTPatternListTypePair ptp: node.parameterPatterns)
 		{
-			for (int i=0; i<ptp.patterns.size(); i++)
+			all.addAll(visitorSet.applyTypeVisitor(ptp.type, arg));
+
+			for (ASTPattern p: ptp.patterns)
 			{
-				ptypes.add(ptp.type);
+				all.addAll(visitorSet.applyPatternVisitor(p, arg));
 			}
 		}
 
-		// NB: implicit functions are always +> total, apparently
-		ASTFunctionType type = new ASTFunctionType(node.location, false, ptypes, node.result.type);
-		all.addAll(visitorSet.applyTypeVisitor(type, arg));
-		
 		if (node.body != null)
 		{
 			all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
@@ -223,19 +237,16 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 	public C caseImplicitOperationDefinition(ASTImplicitOperationDefinition node, S arg)
 	{
 		C all = newCollection();
-		ASTTypeList ptypes = new ASTTypeList();
 
 		for (ASTPatternListTypePair ptp: node.parameterPatterns)
 		{
-			for (int i=0; i<ptp.patterns.size(); i++)
+			all.addAll(visitorSet.applyTypeVisitor(ptp.type, arg));
+
+			for (ASTPattern p: ptp.patterns)
 			{
-				ptypes.add(ptp.type);
+				all.addAll(visitorSet.applyPatternVisitor(p, arg));
 			}
 		}
-
-		// NB: implicit functions are always +> total, apparently
-		ASTFunctionType type = new ASTFunctionType(node.location, false, ptypes, node.result.type);
-		all.addAll(visitorSet.applyTypeVisitor(type, arg));
 		
 		if (node.body != null)
 		{

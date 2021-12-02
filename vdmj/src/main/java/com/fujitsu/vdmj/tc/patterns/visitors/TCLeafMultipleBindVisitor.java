@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
+import com.fujitsu.vdmj.tc.patterns.TCPattern;
 
 /**
  * This TCMultipleBind visitor visits all of the leaves of a bind tree and calls
@@ -59,19 +60,40 @@ public abstract class TCLeafMultipleBindVisitor<E, C extends Collection<E>, S> e
  	@Override
 	public C caseMultipleSeqBind(TCMultipleSeqBind node, S arg)
 	{
-		return caseMultipleBind(node, arg);
+ 		C all = visitorSet.applyExpressionVisitor(node.sequence, arg);
+ 		
+		for (TCPattern p: node.plist)
+		{
+			all.addAll(visitorSet.applyPatternVisitor(p, arg));
+		}
+ 		
+ 		return all;
 	}
 
  	@Override
 	public C caseMultipleSetBind(TCMultipleSetBind node, S arg)
 	{
-		return caseMultipleBind(node, arg);
+ 		C all = visitorSet.applyExpressionVisitor(node.set, arg);
+ 		
+		for (TCPattern p: node.plist)
+		{
+			all.addAll(visitorSet.applyPatternVisitor(p, arg));
+		}
+ 		
+ 		return all;
 	}
 
  	@Override
 	public C caseMultipleTypeBind(TCMultipleTypeBind node, S arg)
 	{
-		return caseMultipleBind(node, arg);
+ 		C all = visitorSet.applyTypeVisitor(node.type, arg);
+
+		for (TCPattern p: node.plist)
+		{
+			all.addAll(visitorSet.applyPatternVisitor(p, arg));
+		}
+
+ 		return all;
 	}
 
  	abstract protected C newCollection();

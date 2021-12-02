@@ -102,8 +102,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseApplyExpression(POApplyExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.root.apply(this, arg));
+		C all = node.root.apply(this, arg);
 		
 		for (POExpression a: node.args)
 		{
@@ -131,8 +130,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseCasesExpression(POCasesExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.exp.apply(this, arg));
+		C all = node.exp.apply(this, arg);
 		
 		for (POCaseAlternative a: node.cases)
 		{
@@ -183,8 +181,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseExists1Expression(POExists1Expression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(visitorSet.applyBindVisitor(node.bind, arg));
+		C all = visitorSet.applyBindVisitor(node.bind, arg);
 		
 		if (node.predicate != null)
 		{
@@ -267,8 +264,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseIotaExpression(POIotaExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(visitorSet.applyBindVisitor(node.bind, arg));
+		C all = visitorSet.applyBindVisitor(node.bind, arg);
 		
 		if (node.predicate != null)
 		{
@@ -313,8 +309,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseLetBeStExpression(POLetBeStExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(visitorSet.applyMultiBindVisitor(node.bind, arg));
+		C all = visitorSet.applyMultiBindVisitor(node.bind, arg);
 		
 		if (node.suchThat != null)
 		{
@@ -438,8 +433,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C casePreExpression(POPreExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.function.apply(this, arg));
+		C all = node.function.apply(this, arg);
 		
 		for (POExpression exp: node.args)
 		{
@@ -504,8 +498,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseSetCompExpression(POSetCompExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.first.apply(this, arg));
+		C all = node.first.apply(this, arg);
 		
 		for (POMultipleBind mbind: node.bindings)
 		{

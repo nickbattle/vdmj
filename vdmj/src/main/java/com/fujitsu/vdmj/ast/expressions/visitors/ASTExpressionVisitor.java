@@ -28,7 +28,7 @@ import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedExpression;
 import com.fujitsu.vdmj.ast.expressions.*;
 
 /**
- * The base type for all TCExpression visitors. All methods, by default, call
+ * The base type for all ASTExpression visitors. All methods, by default, call
  * the abstract caseExpression method, via the various intermediate default
  * methods for their parent types.
  */

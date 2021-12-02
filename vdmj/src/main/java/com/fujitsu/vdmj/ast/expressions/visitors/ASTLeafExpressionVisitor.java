@@ -78,7 +78,7 @@ import com.fujitsu.vdmj.ast.patterns.ASTMultipleBind;
 import com.fujitsu.vdmj.ast.patterns.ASTTypeBind;
 
 /**
- * This TCExpression visitor visits all of the leaves of an expression tree and calls
+ * This ASTExpression visitor visits all of the leaves of an expression tree and calls
  * the basic processing methods for the simple expressions.
  */
 abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> extends ASTExpressionVisitor<C, S>
@@ -124,8 +124,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
 	public C caseCasesExpression(ASTCasesExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.exp.apply(this, arg));
+		C all = node.exp.apply(this, arg);
 		
 		for (ASTCaseAlternative a: node.cases)
 		{
@@ -428,8 +427,7 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
  	@Override
  	public C casePreExpression(ASTPreExpression node, S arg)
  	{
-		C all = newCollection();
-		all.addAll(node.function.apply(this, arg));
+		C all = node.function.apply(this, arg);
 		
 		for (ASTExpression exp: node.args)
 		{
