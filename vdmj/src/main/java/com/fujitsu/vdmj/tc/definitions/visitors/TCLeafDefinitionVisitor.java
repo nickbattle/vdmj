@@ -56,7 +56,6 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
-import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.traces.TCTraceApplyExpression;
 import com.fujitsu.vdmj.tc.traces.TCTraceBracketedExpression;
 import com.fujitsu.vdmj.tc.traces.TCTraceConcurrentExpression;

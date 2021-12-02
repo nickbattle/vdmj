@@ -52,11 +52,7 @@ import com.fujitsu.vdmj.in.definitions.INThreadDefinition;
 import com.fujitsu.vdmj.in.definitions.INTypeDefinition;
 import com.fujitsu.vdmj.in.definitions.INUntypedDefinition;
 import com.fujitsu.vdmj.in.definitions.INValueDefinition;
-import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
-import com.fujitsu.vdmj.in.patterns.INMultipleSeqBind;
-import com.fujitsu.vdmj.in.patterns.INMultipleSetBind;
-import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.in.traces.INTraceApplyExpression;
 import com.fujitsu.vdmj.in.traces.INTraceBracketedExpression;
 import com.fujitsu.vdmj.in.traces.INTraceConcurrentExpression;
@@ -67,7 +63,6 @@ import com.fujitsu.vdmj.in.traces.INTraceLetBeStBinding;
 import com.fujitsu.vdmj.in.traces.INTraceLetDefBinding;
 import com.fujitsu.vdmj.in.traces.INTraceRepeatDefinition;
 import com.fujitsu.vdmj.tc.types.TCField;
-import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 /**
  * This INDefinition visitor visits all of the leaves of a definition tree and calls
@@ -93,20 +88,9 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseAssignmentDefinition(INAssignmentDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.expression.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.expression, arg));
 		return all;
 	}
 
@@ -126,46 +110,25 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseClassInvariantDefinition(INClassInvariantDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		return (expVisitor != null ? node.expression.apply(expVisitor, arg) : newCollection());
+		return visitorSet.applyExpressionVisitor(node.expression, arg);
 	}
 
  	@Override
 	public C caseEqualsDefinition(INEqualsDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.test.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.test, arg));
 		return all;
 	}
 
  	@Override
 	public C caseExplicitFunctionDefinition(INExplicitFunctionDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.body.apply(expVisitor, arg));
-		}
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
 
 		if (node.predef != null)
 		{
@@ -188,19 +151,10 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseExplicitOperationDefinition(INExplicitOperationDefinition node, S arg)
 	{
-		INStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (stmtVisitor != null)
-		{
-			all.addAll(node.body.apply(stmtVisitor, arg));
-		}
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
 		
 		if (node.predef != null)
 		{
@@ -224,18 +178,11 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseImplicitFunctionDefinition(INImplicitFunctionDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		C all = newCollection();
+		C all = visitorSet.applyTypeVisitor(node.getType(), arg);
 		
-		if (typeVisitor != null)
+		if (node.body != null)
 		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null && node.body != null)
-		{
-			all.addAll(node.body.apply(expVisitor, arg));
+			all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
 		}
 
 		if (node.predef != null)
@@ -259,18 +206,13 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseImplicitOperationDefinition(INImplicitOperationDefinition node, S arg)
 	{
-		INStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
-		if (typeVisitor != null)
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+
+		if (node.body != null)
 		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (stmtVisitor != null && node.body != null)
-		{
-			all.addAll(node.body.apply(stmtVisitor, arg));
+			all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
 		}
 
 		if (node.predef != null)
@@ -314,15 +256,7 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseLocalDefinition(INLocalDefinition node, S arg)
 	{
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		C all = newCollection();
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		return all;
+		return visitorSet.applyTypeVisitor(node.getType(), arg);
 	}
 
  	@Override
@@ -332,7 +266,7 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  		
 		for (INMultipleBind bind: node.bindings)
  		{
- 			all.addAll(caseMultipleBind(bind, arg));
+ 			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
  		}
 		
 		return all;
@@ -378,7 +312,7 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		else if (tdef instanceof INTraceLetBeStBinding)
 		{
 			INTraceLetBeStBinding letbe = (INTraceLetBeStBinding)tdef;
-			all.addAll(caseMultipleBind(letbe.bind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(letbe.bind, arg));
 			all.addAll(caseTraceDefinition(letbe.body, arg));
 		}
 		else if (tdef instanceof INTraceRepeatDefinition)
@@ -396,13 +330,8 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		
 		if (core instanceof INTraceApplyExpression)
 		{
-			INStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
-			
-			if (stmtVisitor != null)
-			{
-				INTraceApplyExpression apply = (INTraceApplyExpression)core;
-				all.addAll(apply.callStatement.apply(stmtVisitor, arg));
-			}
+			INTraceApplyExpression apply = (INTraceApplyExpression)core;
+			all.addAll(visitorSet.applyStatementVisitor(apply.callStatement, arg));
 		}
 		else if (core instanceof INTraceBracketedExpression)
 		{
@@ -432,8 +361,7 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C casePerSyncDefinition(INPerSyncDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		return (expVisitor != null ? node.guard.apply(expVisitor, arg) : newCollection());
+		return visitorSet.applyExpressionVisitor(node.guard, arg);
 	}
 
  	@Override
@@ -451,29 +379,21 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseStateDefinition(INStateDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
-		if (typeVisitor != null)
+		for (TCField field: node.fields)
 		{
-			for (TCField field: node.fields)
-			{
-				all.addAll(field.type.apply(typeVisitor, arg));
-			}
+			all.addAll(visitorSet.applyTypeVisitor(field.type, arg));
 		}
-		
-		if (expVisitor != null)
-		{
-			if (node.invExpression != null)
-			{
-				all.addAll(node.invExpression.apply(expVisitor, arg));
-			}
 
-			if (node.initExpression != null)
-			{
-				all.addAll(node.initExpression.apply(expVisitor, arg));
-			}
+		if (node.invExpression != null)
+		{
+			all.addAll(visitorSet.applyExpressionVisitor(node.invExpression, arg));
+		}
+
+		if (node.initExpression != null)
+		{
+			all.addAll(visitorSet.applyExpressionVisitor(node.initExpression, arg));
 		}
 		
 		return all;
@@ -482,21 +402,13 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseThreadDefinition(INThreadDefinition node, S arg)
 	{
-		INStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
-		return (stmtVisitor != null ? node.statement.apply(stmtVisitor, arg) : newCollection());
+		return visitorSet.applyStatementVisitor(node.statement, arg);
 	}
 
  	@Override
 	public C caseTypeDefinition(INTypeDefinition node, S arg)
 	{
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		
-		C all = newCollection();
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.type.apply(typeVisitor, arg));
-		}
+		C all = visitorSet.applyTypeVisitor(node.type, arg);
 		
 		if (node.invdef != null)
 		{
@@ -535,42 +447,9 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseValueDefinition(INValueDefinition node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.exp.apply(expVisitor, arg));
-		}
-		
-		return all;
-	}
-
- 	private C caseMultipleBind(INMultipleBind bind, S arg)
-	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		C all = newCollection();
-		
-		if (expVisitor != null)
-		{
-			if (bind instanceof INMultipleSetBind)
-			{
-				INMultipleSetBind sbind = (INMultipleSetBind)bind;
-				all.addAll(sbind.set.apply(expVisitor, arg));
-			}
-			else if (bind instanceof INMultipleSeqBind)
-			{
-				INMultipleSeqBind sbind = (INMultipleSeqBind)bind;
-				all.addAll(sbind.sequence.apply(expVisitor, arg));
-			}
-		}
-		
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		return all;
 	}
 	

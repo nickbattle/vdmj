@@ -28,7 +28,9 @@ import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.expressions.visitors.INBindExpressionsVisitor;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionFinder;
+import com.fujitsu.vdmj.in.expressions.visitors.INMultiBindExpressionsVisitor;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementExpressionFinder;
 
 /**
@@ -46,6 +48,8 @@ public class INDefinitionExpressionFinder extends INLeafDefinitionVisitor<INExpr
 				definitionVisitor = INDefinitionExpressionFinder.this;
 				statementVisitor = new INStatementExpressionFinder(this);
 				expressionVisitor = new INExpressionFinder(this);
+				bindVisitor = new INBindExpressionsVisitor<INExpression, INExpressionList, Integer>(this);
+				multiBindVisitor = new INMultiBindExpressionsVisitor<INExpression, INExpressionList, Integer>(this);
 			}
 
 			@Override
