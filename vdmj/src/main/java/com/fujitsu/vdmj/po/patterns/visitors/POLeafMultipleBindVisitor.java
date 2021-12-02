@@ -27,12 +27,10 @@ package com.fujitsu.vdmj.po.patterns.visitors;
 import java.util.Collection;
 
 import com.fujitsu.vdmj.po.POVisitorSet;
-import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.POMultipleSeqBind;
 import com.fujitsu.vdmj.po.patterns.POMultipleSetBind;
 import com.fujitsu.vdmj.po.patterns.POMultipleTypeBind;
 import com.fujitsu.vdmj.po.patterns.POPattern;
-import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 /**
  * This POMultipleBind visitor visits all of the leaves of a bind tree and calls
@@ -58,22 +56,12 @@ public abstract class POLeafMultipleBindVisitor<E, C extends Collection<E>, S> e
  	@Override
 	public C caseMultipleSeqBind(POMultipleSeqBind node, S arg)
 	{
- 		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
- 		POPatternVisitor<C, S> patVisitor = visitorSet.getPatternVisitor();
- 		C all = newCollection();
+ 		C all = visitorSet.applyExpressionVisitor(node.sequence, arg);
  		
- 		if (expVisitor != null)
- 		{
- 			all.addAll(node.sequence.apply(expVisitor, arg));
- 		}
- 		
- 		if (patVisitor != null)
- 		{
- 			for (POPattern p: node.plist)
- 			{
- 				all.addAll(p.apply(patVisitor, arg));
- 			}
- 		}
+		for (POPattern p: node.plist)
+		{
+			all.addAll(visitorSet.applyPatternVisitor(p, arg));
+		}
  		
  		return all;
 	}
@@ -81,22 +69,12 @@ public abstract class POLeafMultipleBindVisitor<E, C extends Collection<E>, S> e
  	@Override
 	public C caseMultipleSetBind(POMultipleSetBind node, S arg)
 	{
- 		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
- 		POPatternVisitor<C, S> patVisitor = visitorSet.getPatternVisitor();
- 		C all = newCollection();
+ 		C all = visitorSet.applyExpressionVisitor(node.set, arg);
  		
- 		if (expVisitor != null)
- 		{
- 			all.addAll(node.set.apply(expVisitor, arg));
- 		}
- 		
- 		if (patVisitor != null)
- 		{
- 			for (POPattern p: node.plist)
- 			{
- 				all.addAll(p.apply(patVisitor, arg));
- 			}
- 		}
+		for (POPattern p: node.plist)
+		{
+			all.addAll(visitorSet.applyPatternVisitor(p, arg));
+		}
  		
  		return all;
 	}
@@ -104,22 +82,12 @@ public abstract class POLeafMultipleBindVisitor<E, C extends Collection<E>, S> e
  	@Override
 	public C caseMultipleTypeBind(POMultipleTypeBind node, S arg)
 	{
- 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
- 		POPatternVisitor<C, S> patVisitor = visitorSet.getPatternVisitor();
- 		C all = newCollection();
- 		
- 		if (typeVisitor != null)
- 		{
- 			all.addAll(node.type.apply(typeVisitor, arg));
- 		}
+ 		C all = visitorSet.applyTypeVisitor(node.type, arg);
 
- 		if (patVisitor != null)
- 		{
- 			for (POPattern p: node.plist)
- 			{
- 				all.addAll(p.apply(patVisitor, arg));
- 			}
- 		}
+		for (POPattern p: node.plist)
+		{
+			all.addAll(visitorSet.applyPatternVisitor(p, arg));
+		}
 
  		return all;
 	}

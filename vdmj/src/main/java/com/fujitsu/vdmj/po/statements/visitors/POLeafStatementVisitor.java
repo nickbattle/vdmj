@@ -29,15 +29,7 @@ import java.util.Collection;
 import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.annotations.POAnnotatedStatement;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
-import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
-import com.fujitsu.vdmj.po.patterns.POBind;
-import com.fujitsu.vdmj.po.patterns.POMultipleBind;
-import com.fujitsu.vdmj.po.patterns.POMultipleSeqBind;
-import com.fujitsu.vdmj.po.patterns.POMultipleSetBind;
-import com.fujitsu.vdmj.po.patterns.POSeqBind;
-import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.statements.POAlwaysStatement;
 import com.fujitsu.vdmj.po.statements.POAssignmentStatement;
 import com.fujitsu.vdmj.po.statements.POAtomicStatement;
@@ -104,14 +96,10 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseAnnotatedStatement(POAnnotatedStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
- 		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
  		
- 		if (expVisitor != null)
+ 		for (POExpression a: node.annotation.args)
  		{
-	 		for (POExpression a: node.annotation.args)
-	 		{
-	 			all.addAll(a.apply(expVisitor, arg));
-	 		}
+ 			all.addAll(visitorSet.applyExpressionVisitor(a, arg));
  		}
  		
  		all.addAll(node.statement.apply(this, arg));
@@ -131,13 +119,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseAssignmentStatement(POAssignmentStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.exp.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		return all;
 	}
 
@@ -158,14 +140,10 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseBlockStatement(POBlockStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		PODefinitionVisitor<C, S> defVisitor = visitorSet.getDefinitionVisitor();
 		
-		if (defVisitor != null)
+		for (PODefinition def: node.assignmentDefs)
 		{
-			for (PODefinition def: node.assignmentDefs)
-			{
-				all.addAll(def.apply(defVisitor, arg));
-			}
+			all.addAll(visitorSet.applyDefinitionVisitor(def, arg));
 		}
 		
 		for (POStatement statement: node.statements)
@@ -180,14 +158,10 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseCallObjectStatement(POCallObjectStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
-		if (expVisitor != null)
+		for (POExpression a: node.args)
 		{
-			for (POExpression a: node.args)
-			{
-				all.addAll(a.apply(expVisitor, arg));
-			}
+			all.addAll(visitorSet.applyExpressionVisitor(a, arg));
 		}
 		
 		return all;
@@ -197,14 +171,10 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseCallStatement(POCallStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
-		if (expVisitor != null)
+		for (POExpression a: node.args)
 		{
-			for (POExpression a: node.args)
-			{
-				all.addAll(a.apply(expVisitor, arg));
-			}
+			all.addAll(visitorSet.applyExpressionVisitor(a, arg));
 		}
 		
 		return all;
@@ -227,13 +197,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseCyclesStatement(POCyclesStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.cycles.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.cycles, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -242,13 +206,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseDurationStatement(PODurationStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.duration.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.duration, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -257,13 +215,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseElseIfStatement(POElseIfStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.elseIfExp.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.elseIfExp, arg));
 		all.addAll(node.thenStmt.apply(this, arg));
 		return all;
 	}
@@ -281,12 +233,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		
  		if (node.expression != null)
  		{
-			POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-			
-			if (expVisitor != null)
-			{
-				all.addAll(node.expression.apply(expVisitor, arg));
-			}
+			all.addAll(visitorSet.applyExpressionVisitor(node.expression, arg));
  		}
 
  		return all;
@@ -296,13 +243,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseForAllStatement(POForAllStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.set.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.set, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -311,17 +252,13 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseForIndexStatement(POForIndexStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
-		if (expVisitor != null)
+		all.addAll(visitorSet.applyExpressionVisitor(node.from, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.to, arg));
+		
+		if (node.by != null)
 		{
-			all.addAll(node.from.apply(expVisitor, arg));
-			all.addAll(node.to.apply(expVisitor, arg));
-			
-			if (node.by != null)
-			{
-				all.addAll(node.by.apply(expVisitor, arg));
-			}
+			all.addAll(visitorSet.applyExpressionVisitor(node.by, arg));
 		}
 		
 		all.addAll(node.statement.apply(this, arg));
@@ -332,14 +269,8 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseForPatternBindStatement(POForPatternBindStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		all.addAll(caseBind(node.patternBind.bind, arg));
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.exp.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyBindVisitor(node.patternBind.bind, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -348,13 +279,8 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseIfStatement(POIfStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
-		if (expVisitor != null)
-		{
-			all.addAll(node.ifExp.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.ifExp, arg));
 		all.addAll(node.thenStmt.apply(this, arg));
 		
 		if (node.elseList != null)
@@ -377,12 +303,11 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseLetBeStStatement(POLetBeStStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		all.addAll(caseMultipleBind(node.bind, arg));
+		all.addAll(visitorSet.applyMultiBindVisitor(node.bind, arg));
 		
-		if (expVisitor != null && node.suchThat != null)
+		if (node.suchThat != null)
 		{
-			all.addAll(node.suchThat.apply(expVisitor, arg));
+			all.addAll(visitorSet.applyExpressionVisitor(node.suchThat, arg));
 		}
 		
 		all.addAll(node.statement.apply(this, arg));
@@ -393,14 +318,10 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseLetDefStatement(POLetDefStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		PODefinitionVisitor<C, S> defVisitor = visitorSet.getDefinitionVisitor();
 		
-		if (defVisitor != null)
+		for (PODefinition def: node.localDefs)
 		{
-			for (PODefinition def: node.localDefs)
-			{
-				all.addAll(def.apply(defVisitor, arg));
-			}
+			all.addAll(visitorSet.applyDefinitionVisitor(def, arg));
 		}
 		
 		all.addAll(node.statement.apply(this, arg));
@@ -411,14 +332,10 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C casePeriodicStatement(POPeriodicStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
-		if (expVisitor != null)
+		for (POExpression a: node.args)
 		{
-			for (POExpression a: node.args)
-			{
-				all.addAll(a.apply(expVisitor, arg));
-			}
+			all.addAll(visitorSet.applyExpressionVisitor(a, arg));
 		}
 		
 		return all;
@@ -431,12 +348,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		
  		if (node.expression != null)
  		{
-			POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-			
-			if (expVisitor != null)
-			{
-				all.addAll(node.expression.apply(expVisitor, arg));
-			}
+			all.addAll(visitorSet.applyExpressionVisitor(node.expression, arg));
  		}
 
  		return all;
@@ -465,19 +377,15 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseSpecificationStatement(POSpecificationStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
-		if (expVisitor != null)
+		if (node.precondition != null)
 		{
-			if (node.precondition != null)
-			{
-				all.addAll(node.precondition.apply(expVisitor, arg));
-			}
-			
-			if (node.postcondition != null)
-			{
-				all.addAll(node.postcondition.apply(expVisitor, arg));
-			}
+			all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
+		}
+		
+		if (node.postcondition != null)
+		{
+			all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
 		}
 		
 		return all;
@@ -487,14 +395,10 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseSporadicStatement(POSporadicStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		
-		if (expVisitor != null)
+		for (POExpression a: node.args)
 		{
-			for (POExpression a: node.args)
-			{
-				all.addAll(a.apply(expVisitor, arg));
-			}
+			all.addAll(visitorSet.applyExpressionVisitor(a, arg));
 		}
 		
 		return all;
@@ -504,13 +408,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseStartStatement(POStartStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.objects.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.objects, arg));
 		return all;
 	}
 
@@ -518,13 +416,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseStopStatement(POStopStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.objects.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.objects, arg));
 		return all;
 	}
 
@@ -552,7 +444,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseTrapStatement(POTrapStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		all.addAll(caseBind(node.patternBind.bind, arg));
+		all.addAll(visitorSet.applyBindVisitor(node.patternBind.bind, arg));
 		all.addAll(node.with.apply(this, arg));
 		all.addAll(node.body.apply(this, arg));
 		return all;
@@ -562,58 +454,8 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseWhileStatement(POWhileStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.exp.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		all.addAll(node.statement.apply(this, arg));
-		return all;
-	}
-
-	private C caseBind(POBind bind, S arg)
-	{
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		C all = newCollection();
-		
-		if (expVisitor != null)
-		{
-			if (bind instanceof POSetBind)
-			{
-				POSetBind sbind = (POSetBind)bind;
-				all.addAll(sbind.set.apply(expVisitor, arg));
-			}
-			else if (bind instanceof POSeqBind)
-			{
-				POSeqBind sbind = (POSeqBind)bind;
-				all.addAll(sbind.sequence.apply(expVisitor, arg));
-			}
-		}
-		
-		return all;
-	}
-
- 	private C caseMultipleBind(POMultipleBind bind, S arg)
-	{
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		C all = newCollection();
-		
-		if (expVisitor != null)
-		{
-			if (bind instanceof POMultipleSetBind)
-			{
-				POMultipleSetBind sbind = (POMultipleSetBind)bind;
-				all.addAll(sbind.set.apply(expVisitor, arg));
-			}
-			else if (bind instanceof POMultipleSeqBind)
-			{
-				POMultipleSeqBind sbind = (POMultipleSeqBind)bind;
-				all.addAll(sbind.sequence.apply(expVisitor, arg));
-			}
-		}
-		
 		return all;
 	}
 	

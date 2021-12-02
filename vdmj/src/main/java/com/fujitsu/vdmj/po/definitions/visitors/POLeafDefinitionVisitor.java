@@ -52,13 +52,8 @@ import com.fujitsu.vdmj.po.definitions.POThreadDefinition;
 import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
 import com.fujitsu.vdmj.po.definitions.POUntypedDefinition;
 import com.fujitsu.vdmj.po.definitions.POValueDefinition;
-import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
-import com.fujitsu.vdmj.po.patterns.POMultipleSeqBind;
-import com.fujitsu.vdmj.po.patterns.POMultipleSetBind;
-import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCField;
-import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 /**
  * This PODefinition visitor visits all of the leaves of a definition tree and calls
@@ -84,20 +79,9 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseAssignmentDefinition(POAssignmentDefinition node, S arg)
 	{
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.expression.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.expression, arg));
 		return all;
 	}
 
@@ -117,46 +101,25 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseClassInvariantDefinition(POClassInvariantDefinition node, S arg)
 	{
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		return (expVisitor != null ? node.expression.apply(expVisitor, arg) : newCollection());
+		return visitorSet.applyExpressionVisitor(node.expression, arg);
 	}
 
  	@Override
 	public C caseEqualsDefinition(POEqualsDefinition node, S arg)
 	{
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.test.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.test, arg));
 		return all;
 	}
 
  	@Override
 	public C caseExplicitFunctionDefinition(POExplicitFunctionDefinition node, S arg)
 	{
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.body.apply(expVisitor, arg));
-		}
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
 		
 		if (node.predef != null)
 		{
@@ -179,19 +142,10 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseExplicitOperationDefinition(POExplicitOperationDefinition node, S arg)
 	{
-		POStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (stmtVisitor != null)
-		{
-			all.addAll(node.body.apply(stmtVisitor, arg));
-		}
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
 		
 		if (node.predef != null)
 		{
@@ -215,18 +169,11 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseImplicitFunctionDefinition(POImplicitFunctionDefinition node, S arg)
 	{
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		C all = newCollection();
+		C all = visitorSet.applyTypeVisitor(node.getType(), arg);
 		
-		if (typeVisitor != null)
+ 		if (node.body != null)
 		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
- 		if (node.body != null && expVisitor != null)
-		{
-			all.addAll(node.body.apply(expVisitor, arg));
+			all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
 		}
 
 		if (node.predef != null)
@@ -250,18 +197,11 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseImplicitOperationDefinition(POImplicitOperationDefinition node, S arg)
 	{
-		POStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		C all = newCollection();
+		C all = visitorSet.applyTypeVisitor(node.getType(), arg);
 		
-		if (typeVisitor != null)
+		if (node.body != null)
 		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (stmtVisitor != null && node.body != null)
-		{
-			all.addAll(node.body.apply(stmtVisitor, arg));
+			all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
 		}
 
 		if (node.predef != null)
@@ -305,15 +245,7 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseLocalDefinition(POLocalDefinition node, S arg)
 	{
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		C all = newCollection();
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		return all;
+		return visitorSet.applyTypeVisitor(node.getType(), arg);
 	}
 
  	@Override
@@ -323,7 +255,7 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  		
 		for (POMultipleBind bind: node.bindings)
  		{
- 			all.addAll(caseMultipleBind(bind, arg));
+ 			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
  		}
 		
 		return all;
@@ -344,8 +276,7 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C casePerSyncDefinition(POPerSyncDefinition node, S arg)
 	{
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		return (expVisitor != null ? node.guard.apply(expVisitor, arg) : newCollection());
+		return visitorSet.applyExpressionVisitor(node.guard, arg);
 	}
 
  	@Override
@@ -363,29 +294,21 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseStateDefinition(POStateDefinition node, S arg)
 	{
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
-		if (typeVisitor != null)
+		for (TCField field: node.fields)
 		{
-			for (TCField field: node.fields)
-			{
-				all.addAll(field.type.apply(typeVisitor, arg));
-			}
+			all.addAll(visitorSet.applyTypeVisitor(field.type, arg));
 		}
 		
-		if (expVisitor != null)
+		if (node.invExpression != null)
 		{
-			if (node.invExpression != null)
-			{
-				all.addAll(node.invExpression.apply(expVisitor, arg));
-			}
+			all.addAll(visitorSet.applyExpressionVisitor(node.invExpression, arg));
+		}
 
-			if (node.initExpression != null)
-			{
-				all.addAll(node.initExpression.apply(expVisitor, arg));
-			}
+		if (node.initExpression != null)
+		{
+			all.addAll(visitorSet.applyExpressionVisitor(node.initExpression, arg));
 		}
 		
 		return all;
@@ -394,23 +317,13 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseThreadDefinition(POThreadDefinition node, S arg)
 	{
-		POStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
-		return (stmtVisitor != null ? node.statement.apply(stmtVisitor, arg) : newCollection());
+		return visitorSet.applyStatementVisitor(node.statement, arg);
 	}
 
  	@Override
 	public C caseTypeDefinition(POTypeDefinition node, S arg)
 	{
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		
-		C all = newCollection();
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.type.apply(typeVisitor, arg));
-		}
-		
-		return all;
+		return visitorSet.applyTypeVisitor(node.type, arg);
 	}
 
  	@Override
@@ -422,44 +335,11 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseValueDefinition(POValueDefinition node, S arg)
 	{
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.exp.apply(expVisitor, arg));
-		}
-		
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		return all;
 	}
 
- 	private C caseMultipleBind(POMultipleBind bind, S arg)
-	{
-		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		C all = newCollection();
-		
-		if (expVisitor != null)
-		{
-			if (bind instanceof POMultipleSetBind)
-			{
-				POMultipleSetBind sbind = (POMultipleSetBind)bind;
-				all.addAll(sbind.set.apply(expVisitor, arg));
-			}
-			else if (bind instanceof POMultipleSeqBind)
-			{
-				POMultipleSeqBind sbind = (POMultipleSeqBind)bind;
-				all.addAll(sbind.sequence.apply(expVisitor, arg));
-			}
-		}
-		
-		return all;
-	}
-	
 	abstract protected C newCollection();
 }

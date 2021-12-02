@@ -27,11 +27,9 @@ package com.fujitsu.vdmj.po.patterns.visitors;
 import java.util.Collection;
 
 import com.fujitsu.vdmj.po.POVisitorSet;
-import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.POSeqBind;
 import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
-import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 /**
  * This POBind visitor visits all of the leaves of a bind tree and calls
@@ -57,60 +55,27 @@ public abstract class POLeafBindVisitor<E, C extends Collection<E>, S> extends P
  	@Override
 	public C caseSeqBind(POSeqBind node, S arg)
 	{
- 		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
- 		POPatternVisitor<C, S> patVisitor = visitorSet.getPatternVisitor();
  		C all = newCollection();
- 		
- 		if (expVisitor != null)
- 		{
- 			all.addAll(node.sequence.apply(expVisitor, arg));
- 		}
- 		
- 		if (patVisitor != null)
- 		{
- 			all.addAll(node.pattern.apply(patVisitor, arg));
- 		}
- 		
+		all.addAll(visitorSet.applyExpressionVisitor(node.sequence, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
  		return all;
 	}
 
  	@Override
 	public C caseSetBind(POSetBind node, S arg)
 	{
- 		POExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
- 		POPatternVisitor<C, S> patVisitor = visitorSet.getPatternVisitor();
  		C all = newCollection();
- 		
- 		if (expVisitor != null)
- 		{
- 			all.addAll(node.set.apply(expVisitor, arg));
- 		}
- 		
- 		if (patVisitor != null)
- 		{
- 			all.addAll(node.pattern.apply(patVisitor, arg));
- 		}
- 		
+		all.addAll(visitorSet.applyExpressionVisitor(node.set, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
  		return all;
 	}
 
  	@Override
 	public C caseTypeBind(POTypeBind node, S arg)
 	{
- 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		POPatternVisitor<C, S> patVisitor = visitorSet.getPatternVisitor();
 		C all = newCollection();
- 		
- 		if (typeVisitor != null)
- 		{
- 			all.addAll(node.type.apply(typeVisitor, arg));
- 		}
- 		
- 		if (patVisitor != null)
- 		{
- 			all.addAll(node.pattern.apply(patVisitor, arg));
- 		}
-
+		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
  		return all;
 	}
 
