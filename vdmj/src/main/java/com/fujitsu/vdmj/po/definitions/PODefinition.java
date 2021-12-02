@@ -120,7 +120,6 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	 * Get a list of proof obligations for the definition.
 	 *
 	 * @param ctxt The call context.
-	 * @param env TODO
 	 * @return A list of POs.
 	 */
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)

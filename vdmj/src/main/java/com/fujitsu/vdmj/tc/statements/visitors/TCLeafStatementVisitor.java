@@ -30,12 +30,6 @@ import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotatedStatement;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.patterns.TCBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
-import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
-import com.fujitsu.vdmj.tc.patterns.TCSetBind;
 import com.fujitsu.vdmj.tc.statements.TCAlwaysStatement;
 import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
 import com.fujitsu.vdmj.tc.statements.TCAtomicStatement;
@@ -260,7 +254,13 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseForPatternBindStatement(TCForPatternBindStatement node, S arg)
 	{
-		C all = caseBind(node.patternBind.bind, arg);
+		C all = newCollection();
+		
+		if (node.patternBind.bind != null)
+		{
+			visitorSet.applyBindVisitor(node.patternBind.bind, arg);
+		}
+		
 		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
@@ -291,7 +291,7 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseLetBeStStatement(TCLetBeStStatement node, S arg)
 	{
-		C all = caseMultipleBind(node.bind, arg);
+		C all = visitorSet.applyMultiBindVisitor(node.bind, arg);
 		
 		if (node.suchThat != null)
 		{
@@ -427,7 +427,13 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
  	@Override
 	public C caseTrapStatement(TCTrapStatement node, S arg)
 	{
-		C all = caseBind(node.patternBind.bind, arg);
+		C all = newCollection();
+		
+		if (node.patternBind.bind != null)
+		{
+			visitorSet.applyBindVisitor(node.patternBind.bind, arg);
+		}
+		
 		all.addAll(node.with.apply(this, arg));
 		all.addAll(node.body.apply(this, arg));
 		return all;
@@ -447,41 +453,5 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		return newCollection();
 	}
 
-	protected C caseBind(TCBind bind, S arg)
-	{
-		C all = newCollection();
-		
-		if (bind instanceof TCSetBind)
-		{
-			TCSetBind sbind = (TCSetBind)bind;
-			all.addAll(visitorSet.applyExpressionVisitor(sbind.set, arg));
-		}
-		else if (bind instanceof TCSeqBind)
-		{
-			TCSeqBind sbind = (TCSeqBind)bind;
-			all.addAll(visitorSet.applyExpressionVisitor(sbind.sequence, arg));
-		}
-		
-		return all;
-	}
-
- 	protected C caseMultipleBind(TCMultipleBind bind, S arg)
-	{
-		C all = newCollection();
-		
-		if (bind instanceof TCMultipleSetBind)
-		{
-			TCMultipleSetBind sbind = (TCMultipleSetBind)bind;
-			all.addAll(visitorSet.applyExpressionVisitor(sbind.set, arg));
-		}
-		else if (bind instanceof TCMultipleSeqBind)
-		{
-			TCMultipleSeqBind sbind = (TCMultipleSeqBind)bind;
-			all.addAll(visitorSet.applyExpressionVisitor(sbind.sequence, arg));
-		}
-		
-		return all;
-	}
-	
 	abstract protected C newCollection();
 }

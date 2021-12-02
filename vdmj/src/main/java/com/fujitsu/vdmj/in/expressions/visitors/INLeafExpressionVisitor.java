@@ -75,12 +75,7 @@ import com.fujitsu.vdmj.in.expressions.INSetRangeExpression;
 import com.fujitsu.vdmj.in.expressions.INSubseqExpression;
 import com.fujitsu.vdmj.in.expressions.INTupleExpression;
 import com.fujitsu.vdmj.in.expressions.INUnaryExpression;
-import com.fujitsu.vdmj.in.patterns.INBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
-import com.fujitsu.vdmj.in.patterns.INMultipleSeqBind;
-import com.fujitsu.vdmj.in.patterns.INMultipleSetBind;
-import com.fujitsu.vdmj.in.patterns.INSeqBind;
-import com.fujitsu.vdmj.in.patterns.INSetBind;
 
 /**
  * This INExpression visitor visits all of the leaves of an expression tree and calls
@@ -205,7 +200,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	public C caseExists1Expression(INExists1Expression node, S arg)
 	{
 		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
-		all.addAll(caseBind(node.bind, arg));
+		all.addAll(visitorSet.applyBindVisitor(node.bind, arg));
 		
 		if (node.predicate != null)
 		{
@@ -222,7 +217,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (INMultipleBind bind: node.bindList)
 		{
-			all.addAll(caseMultipleBind(bind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
 		}
 		
 		if (node.predicate != null)
@@ -256,7 +251,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (INMultipleBind bind: node.bindList)
 		{
-			all.addAll(caseMultipleBind(bind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
 		}
 		
 		if (node.predicate != null)
@@ -295,7 +290,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	public C caseIotaExpression(INIotaExpression node, S arg)
 	{
 		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
-		all.addAll(caseBind(node.bind, arg));
+		all.addAll(visitorSet.applyBindVisitor(node.bind, arg));
 		
 		if (node.predicate != null)
 		{
@@ -341,7 +336,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	public C caseLetBeStExpression(INLetBeStExpression node, S arg)
 	{
 		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
-		all.addAll(caseMultipleBind(node.bind, arg));
+		all.addAll(visitorSet.applyMultiBindVisitor(node.bind, arg));
 		
 		if (node.suchThat != null)
 		{
@@ -379,7 +374,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (INMultipleBind mbind: node.bindings)
 		{
-			all.addAll(caseMultipleBind(mbind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(mbind, arg));
 		}
 		
 		if (node.predicate != null)
@@ -509,7 +504,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = allNodes ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(node.first.apply(this, arg));
-		all.addAll(caseBind(node.bind, arg));
+		all.addAll(visitorSet.applyBindVisitor(node.bind, arg));
 		
 		if (node.predicate != null)
 		{
@@ -540,7 +535,7 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (INMultipleBind mbind: node.bindings)
 		{
-			all.addAll(caseMultipleBind(mbind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(mbind, arg));
 		}
 		
 		if (node.predicate != null)
@@ -603,42 +598,6 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		return all;
 	}
 
-	private C caseBind(INBind bind, S arg)
-	{
-		C all = newCollection();
-		
-		if (bind instanceof INSetBind)
-		{
-			INSetBind sbind = (INSetBind)bind;
-			all.addAll(sbind.set.apply(this, arg));
-		}
-		else if (bind instanceof INSeqBind)
-		{
-			INSeqBind sbind = (INSeqBind)bind;
-			all.addAll(sbind.sequence.apply(this, arg));
-		}
-		
-		return all;
-	}
-
- 	private C caseMultipleBind(INMultipleBind bind, S arg)
-	{
-		C all = newCollection();
-		
-		if (bind instanceof INMultipleSetBind)
-		{
-			INMultipleSetBind sbind = (INMultipleSetBind)bind;
-			all.addAll(sbind.set.apply(this, arg));
-		}
-		else if (bind instanceof INMultipleSeqBind)
-		{
-			INMultipleSeqBind sbind = (INMultipleSeqBind)bind;
-			all.addAll(sbind.sequence.apply(this, arg));
-		}
-		
-		return all;
-	}
-	
 	abstract protected C newCollection();
 	
 	protected C caseNonLeafNode(INExpression node, S arg)

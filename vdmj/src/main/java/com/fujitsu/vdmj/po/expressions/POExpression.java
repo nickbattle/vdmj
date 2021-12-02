@@ -98,7 +98,6 @@ public abstract class POExpression extends PONode implements Serializable
 	 * Get a list of proof obligations from the expression.
 	 *
 	 * @param ctxt The call context.
-	 * @param env TODO
 	 * @return The list of proof obligations.
 	 */
 

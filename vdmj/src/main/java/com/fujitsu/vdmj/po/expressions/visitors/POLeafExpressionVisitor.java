@@ -75,12 +75,7 @@ import com.fujitsu.vdmj.po.expressions.POSetRangeExpression;
 import com.fujitsu.vdmj.po.expressions.POSubseqExpression;
 import com.fujitsu.vdmj.po.expressions.POTupleExpression;
 import com.fujitsu.vdmj.po.expressions.POUnaryExpression;
-import com.fujitsu.vdmj.po.patterns.POBind;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
-import com.fujitsu.vdmj.po.patterns.POMultipleSeqBind;
-import com.fujitsu.vdmj.po.patterns.POMultipleSetBind;
-import com.fujitsu.vdmj.po.patterns.POSeqBind;
-import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 
 /**
@@ -189,7 +184,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	public C caseExists1Expression(POExists1Expression node, S arg)
 	{
 		C all = newCollection();
-		all.addAll(caseBind(node.bind, arg));
+		all.addAll(visitorSet.applyBindVisitor(node.bind, arg));
 		
 		if (node.predicate != null)
 		{
@@ -206,7 +201,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (POMultipleBind bind: node.bindList)
 		{
-			all.addAll(caseMultipleBind(bind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
 		}
 		
 		if (node.predicate != null)
@@ -236,7 +231,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (POMultipleBind bind: node.bindList)
 		{
-			all.addAll(caseMultipleBind(bind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
 		}
 		
 		if (node.predicate != null)
@@ -273,7 +268,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	public C caseIotaExpression(POIotaExpression node, S arg)
 	{
 		C all = newCollection();
-		all.addAll(caseBind(node.bind, arg));
+		all.addAll(visitorSet.applyBindVisitor(node.bind, arg));
 		
 		if (node.predicate != null)
 		{
@@ -308,7 +303,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (POTypeBind bind: node.bindList)
 		{
-			all.addAll(caseBind(bind, arg));
+			all.addAll(visitorSet.applyBindVisitor(bind, arg));
 		}
 		
 		all.addAll(node.expression.apply(this, arg));
@@ -319,7 +314,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	public C caseLetBeStExpression(POLetBeStExpression node, S arg)
 	{
 		C all = newCollection();
-		all.addAll(caseMultipleBind(node.bind, arg));
+		all.addAll(visitorSet.applyMultiBindVisitor(node.bind, arg));
 		
 		if (node.suchThat != null)
 		{
@@ -357,7 +352,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (POMultipleBind mbind: node.bindings)
 		{
-			all.addAll(caseMultipleBind(mbind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(mbind, arg));
 		}
 		
 		if (node.predicate != null)
@@ -483,7 +478,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = newCollection();
 		all.addAll(node.first.apply(this, arg));
-		all.addAll(caseBind(node.bind, arg));
+		all.addAll(visitorSet.applyBindVisitor(node.bind, arg));
 		
 		if (node.predicate != null)
 		{
@@ -514,7 +509,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (POMultipleBind mbind: node.bindings)
 		{
-			all.addAll(caseMultipleBind(mbind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(mbind, arg));
 		}
 		
 		if (node.predicate != null)
@@ -574,42 +569,6 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = newCollection();
 		all.addAll(node.exp.apply(this, arg));
-		return all;
-	}
-
-	private C caseBind(POBind bind, S arg)
-	{
-		C all = newCollection();
-		
-		if (bind instanceof POSetBind)
-		{
-			POSetBind sbind = (POSetBind)bind;
-			all.addAll(sbind.set.apply(this, arg));
-		}
-		else if (bind instanceof POSeqBind)
-		{
-			POSeqBind sbind = (POSeqBind)bind;
-			all.addAll(sbind.sequence.apply(this, arg));
-		}
-		
-		return all;
-	}
-
- 	private Collection<? extends E> caseMultipleBind(POMultipleBind bind, S arg)
-	{
-		C all = newCollection();
-		
-		if (bind instanceof POMultipleSetBind)
-		{
-			POMultipleSetBind sbind = (POMultipleSetBind)bind;
-			all.addAll(sbind.set.apply(this, arg));
-		}
-		else if (bind instanceof POMultipleSeqBind)
-		{
-			POMultipleSeqBind sbind = (POMultipleSeqBind)bind;
-			all.addAll(sbind.sequence.apply(this, arg));
-		}
-		
 		return all;
 	}
 

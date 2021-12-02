@@ -60,7 +60,6 @@ public abstract class POStatement extends PONode implements Serializable
 	 * Get a list of proof obligations from the statement.
 	 *
 	 * @param ctxt The call context.
-	 * @param env TODO
 	 * @return The list of proof obligations.
 	 */
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)

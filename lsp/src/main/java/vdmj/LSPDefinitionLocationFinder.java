@@ -43,7 +43,6 @@ import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCLeafDefinitionVisitor;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.TCErrorCase;
 import com.fujitsu.vdmj.tc.statements.TCExternalClause;
