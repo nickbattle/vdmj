@@ -35,6 +35,8 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCBindExpressionsVisitor;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCMultiBindExpressionsVisitor;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCBindExitChecker;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindExitChecker;
 import com.fujitsu.vdmj.tc.statements.TCBlockStatement;
@@ -69,6 +71,24 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 				bindVisitor = new TCBindExitChecker(this);
 				multiBindVisitor = new TCMultipleBindExitChecker(this);
 				statementVisitor = TCExitChecker.this;
+
+				bindVisitor = new TCBindExpressionsVisitor<TCType, TCTypeSet, Environment>(this)
+				{
+					@Override
+					protected TCTypeSet newCollection()
+					{
+						return TCExitChecker.this.newCollection();
+					}
+				};
+				
+				multiBindVisitor = new TCMultiBindExpressionsVisitor<TCType, TCTypeSet, Environment>(this)
+				{
+					@Override
+					protected TCTypeSet newCollection()
+					{
+						return TCExitChecker.this.newCollection();
+					}
+				};
 			}
 
 			@Override

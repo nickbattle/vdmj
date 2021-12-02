@@ -63,6 +63,8 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 				expressionVisitor = new LSPExpressionLocationFinder(this);
 				statementVisitor = new LSPStatementLocationFinder(this);
 				patternVisitor = new LSPPatternLocationFinder(this);
+				bindVisitor = new LSPBindLocationFinder(this);
+				multiBindVisitor = new LSPMultipleBindLocationFinder(this);
 			}
 
 			@Override

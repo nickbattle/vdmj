@@ -44,16 +44,6 @@ import com.fujitsu.vdmj.tc.expressions.TCNewExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.patterns.TCBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
-import com.fujitsu.vdmj.tc.patterns.TCPattern;
-import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
-import com.fujitsu.vdmj.tc.patterns.TCSetBind;
-import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
-import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 
 public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode, Set<TCNode>, LexLocation>
 {
@@ -202,70 +192,6 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 			}
 		}
 	
-		return all;
-	}
-	
-	@Override
-	protected Set<TCNode> caseBind(TCBind bind, LexLocation arg)
-	{
-		TCPatternVisitor<Set<TCNode>, LexLocation> patternVisitor = visitorSet.getPatternVisitor();
-		Set<TCNode> all = super.caseBind(bind, arg);
-		
-		if (all.isEmpty())
-		{
-			if (bind instanceof TCTypeBind)
-			{
-				TCTypeBind tbind = (TCTypeBind)bind;
-				all.addAll(tbind.unresolved.matchUnresolved(arg));
-			}
-			else if (bind instanceof TCSetBind && patternVisitor != null)
-			{
-				TCSetBind sbind = (TCSetBind)bind;
-				all.addAll(sbind.pattern.apply(patternVisitor, arg));
-			}
-			else if (bind instanceof TCSeqBind && patternVisitor != null)
-			{
-				TCSeqBind sbind = (TCSeqBind)bind;
-				all.addAll(sbind.pattern.apply(patternVisitor, arg));
-			}
-		}
-		
-		return all;
-	}
-
-	@Override
- 	protected Set<TCNode> caseMultipleBind(TCMultipleBind bind, LexLocation arg)
-	{
-		TCPatternVisitor<Set<TCNode>, LexLocation> patternVisitor = visitorSet.getPatternVisitor();
-		Set<TCNode> all = super.caseMultipleBind(bind, arg);
-		
-		if (all.isEmpty())
-		{
-			if (bind instanceof TCMultipleTypeBind)
-			{
-				TCMultipleTypeBind mbind = (TCMultipleTypeBind)bind;
-				all.addAll(mbind.unresolved.matchUnresolved(arg));
-			}
-			else if (bind instanceof TCMultipleSetBind && patternVisitor != null)
-			{
-				TCMultipleSetBind sbind = (TCMultipleSetBind)bind;
-				
-				for (TCPattern p: sbind.plist)
-				{
-					all.addAll(p.apply(patternVisitor, arg));
-				}
-			}
-			else if (bind instanceof TCMultipleSeqBind)
-			{
-				TCMultipleSeqBind sbind = (TCMultipleSeqBind)bind;
-
-				for (TCPattern p: sbind.plist)
-				{
-					all.addAll(p.apply(patternVisitor, arg));
-				}
-			}
-		}
-		
 		return all;
 	}
 }
