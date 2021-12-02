@@ -22,54 +22,54 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.ast.patterns.visitors;
+package com.fujitsu.vdmj.tc.patterns.visitors;
 
 import java.util.Collection;
 
-import com.fujitsu.vdmj.ast.ASTVisitorSet;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleBind;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleSeqBind;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleSetBind;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleTypeBind;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 
 /**
- * This ASTMultipleBind visitor visits all of the leaves of a bind tree and calls
+ * This TCMultipleBind visitor visits all of the leaves of a bind tree and calls
  * the basic processing methods for the simple cases.
  */
-public abstract class ASTLeafMultipleBindVisitor<E, C extends Collection<E>, S> extends ASTMultipleBindVisitor<C, S>
+public abstract class TCLeafMultipleBindVisitor<E, C extends Collection<E>, S> extends TCMultipleBindVisitor<C, S>
 {
-	protected ASTVisitorSet<E, C, S> visitorSet = new ASTVisitorSet<E, C, S>()
+	protected TCVisitorSet<E, C, S> visitorSet = new TCVisitorSet<E, C, S>()
 	{
 		@Override
 		protected void setVisitors()
 		{
-			multiBindVisitor = ASTLeafMultipleBindVisitor.this;
+			multiBindVisitor = TCLeafMultipleBindVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return ASTLeafMultipleBindVisitor.this.newCollection();
+			return TCLeafMultipleBindVisitor.this.newCollection();
 		}
 	};
 
  	@Override
-	abstract public C caseMultipleBind(ASTMultipleBind node, S arg);
+	abstract public C caseMultipleBind(TCMultipleBind node, S arg);
 
  	@Override
-	public C caseMultipleSeqBind(ASTMultipleSeqBind node, S arg)
+	public C caseMultipleSeqBind(TCMultipleSeqBind node, S arg)
 	{
 		return caseMultipleBind(node, arg);
 	}
 
  	@Override
-	public C caseMultipleSetBind(ASTMultipleSetBind node, S arg)
+	public C caseMultipleSetBind(TCMultipleSetBind node, S arg)
 	{
 		return caseMultipleBind(node, arg);
 	}
 
  	@Override
-	public C caseMultipleTypeBind(ASTMultipleTypeBind node, S arg)
+	public C caseMultipleTypeBind(TCMultipleTypeBind node, S arg)
 	{
 		return caseMultipleBind(node, arg);
 	}

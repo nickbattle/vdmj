@@ -79,13 +79,13 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			definitionVisitor = ASTLeafDefinitionVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return ASTLeafDefinitionVisitor.this.newCollection();
 		}
 	};
 

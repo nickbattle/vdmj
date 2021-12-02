@@ -43,13 +43,13 @@ public abstract class ASTLeafBindVisitor<E, C extends Collection<E>, S> extends 
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			bindVisitor = ASTLeafBindVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return ASTLeafBindVisitor.this.newCollection();
 		}
 	};
 
@@ -73,4 +73,6 @@ public abstract class ASTLeafBindVisitor<E, C extends Collection<E>, S> extends 
 	{
 		return caseBind(node, arg);
 	}
+
+ 	abstract protected C newCollection();
 }

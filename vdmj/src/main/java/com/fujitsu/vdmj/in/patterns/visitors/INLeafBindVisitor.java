@@ -44,13 +44,13 @@ public abstract class INLeafBindVisitor<E, C extends Collection<E>, S> extends I
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			bindVisitor = INLeafBindVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return INLeafBindVisitor.this.newCollection();
 		}
 	};
 

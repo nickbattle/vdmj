@@ -56,13 +56,13 @@ public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends T
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			typeVisitor = TCLeafTypeVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return TCLeafTypeVisitor.this.newCollection();
 		}
 	};
 	

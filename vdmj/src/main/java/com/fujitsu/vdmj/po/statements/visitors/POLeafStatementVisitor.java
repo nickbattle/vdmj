@@ -83,13 +83,13 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			statementVisitor = POLeafStatementVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return POLeafStatementVisitor.this.newCollection();
 		}
 	};
 	

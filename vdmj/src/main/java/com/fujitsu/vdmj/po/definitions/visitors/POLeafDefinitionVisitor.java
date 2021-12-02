@@ -71,13 +71,13 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			definitionVisitor = POLeafDefinitionVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return POLeafDefinitionVisitor.this.newCollection();
 		}
 	};
 

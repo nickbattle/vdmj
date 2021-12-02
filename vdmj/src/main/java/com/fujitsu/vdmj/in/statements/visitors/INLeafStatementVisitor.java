@@ -83,13 +83,13 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			statementVisitor = INLeafStatementVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return INLeafStatementVisitor.this.newCollection();
 		}
 	};
 	

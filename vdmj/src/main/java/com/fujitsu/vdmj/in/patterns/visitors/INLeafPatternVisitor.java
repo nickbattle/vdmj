@@ -53,13 +53,13 @@ public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extend
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			patternVisitor = INLeafPatternVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return INLeafPatternVisitor.this.newCollection();
 		}
 	};
 	

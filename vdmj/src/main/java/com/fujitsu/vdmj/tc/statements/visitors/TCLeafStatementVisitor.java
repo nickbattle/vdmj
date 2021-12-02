@@ -83,13 +83,13 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			statementVisitor = TCLeafStatementVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return TCLeafStatementVisitor.this.newCollection();
 		}
 	};
 	

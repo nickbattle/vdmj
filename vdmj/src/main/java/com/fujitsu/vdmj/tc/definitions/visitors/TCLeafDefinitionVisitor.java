@@ -83,13 +83,13 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			definitionVisitor = TCLeafDefinitionVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return TCLeafDefinitionVisitor.this.newCollection();
 		}
 	};
 	

@@ -45,13 +45,13 @@ public abstract class POLeafMultipleBindVisitor<E, C extends Collection<E>, S> e
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			multiBindVisitor = POLeafMultipleBindVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return POLeafMultipleBindVisitor.this.newCollection();
 		}
 	};
 

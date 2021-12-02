@@ -53,13 +53,13 @@ public abstract class TCLeafPatternVisitor<E, C extends Collection<E>, S> extend
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			patternVisitor = TCLeafPatternVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return TCLeafPatternVisitor.this.newCollection();
 		}
 	};
 	

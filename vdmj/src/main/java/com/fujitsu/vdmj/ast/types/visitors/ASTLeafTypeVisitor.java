@@ -55,13 +55,13 @@ public abstract class ASTLeafTypeVisitor<E, C extends Collection<E>, S> extends 
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			typeVisitor = ASTLeafTypeVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return ASTLeafTypeVisitor.this.newCollection();
 		}
 	};
 

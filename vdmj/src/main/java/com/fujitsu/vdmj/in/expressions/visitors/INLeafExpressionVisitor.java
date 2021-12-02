@@ -93,13 +93,13 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			expressionVisitor = INLeafExpressionVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return INLeafExpressionVisitor.this.newCollection();
 		}
 	};
 

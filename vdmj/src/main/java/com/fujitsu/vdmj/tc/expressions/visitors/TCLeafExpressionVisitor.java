@@ -96,13 +96,13 @@ abstract public class TCLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			expressionVisitor = TCLeafExpressionVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return TCLeafExpressionVisitor.this.newCollection();
 		}
 	};
 	

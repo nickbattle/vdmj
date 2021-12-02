@@ -74,13 +74,13 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			statementVisitor = ASTLeafStatementVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return ASTLeafStatementVisitor.this.newCollection();
 		}
 	};
 

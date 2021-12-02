@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2021 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,56 +22,56 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.ast.patterns.visitors;
+package com.fujitsu.vdmj.tc.patterns.visitors;
 
 import java.util.Collection;
 
-import com.fujitsu.vdmj.ast.ASTVisitorSet;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleBind;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleSeqBind;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleSetBind;
-import com.fujitsu.vdmj.ast.patterns.ASTMultipleTypeBind;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.patterns.TCBind;
+import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
+import com.fujitsu.vdmj.tc.patterns.TCSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 
 /**
- * This ASTMultipleBind visitor visits all of the leaves of a bind tree and calls
+ * This TCBind visitor visits all of the leaves of a bind tree and calls
  * the basic processing methods for the simple cases.
  */
-public abstract class ASTLeafMultipleBindVisitor<E, C extends Collection<E>, S> extends ASTMultipleBindVisitor<C, S>
+public abstract class TCLeafBindVisitor<E, C extends Collection<E>, S> extends TCBindVisitor<C, S>
 {
-	protected ASTVisitorSet<E, C, S> visitorSet = new ASTVisitorSet<E, C, S>()
+	protected TCVisitorSet<E, C, S> visitorSet = new TCVisitorSet<E, C, S>()
 	{
 		@Override
 		protected void setVisitors()
 		{
-			multiBindVisitor = ASTLeafMultipleBindVisitor.this;
+			bindVisitor = TCLeafBindVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return ASTLeafMultipleBindVisitor.this.newCollection();
+			return TCLeafBindVisitor.this.newCollection();
 		}
 	};
 
  	@Override
-	abstract public C caseMultipleBind(ASTMultipleBind node, S arg);
+	abstract public C caseBind(TCBind node, S arg);
 
  	@Override
-	public C caseMultipleSeqBind(ASTMultipleSeqBind node, S arg)
+	public C caseSeqBind(TCSeqBind node, S arg)
 	{
-		return caseMultipleBind(node, arg);
+		return caseBind(node, arg);
 	}
 
  	@Override
-	public C caseMultipleSetBind(ASTMultipleSetBind node, S arg)
+	public C caseSetBind(TCSetBind node, S arg)
 	{
-		return caseMultipleBind(node, arg);
+		return caseBind(node, arg);
 	}
 
  	@Override
-	public C caseMultipleTypeBind(ASTMultipleTypeBind node, S arg)
+	public C caseTypeBind(TCTypeBind node, S arg)
 	{
-		return caseMultipleBind(node, arg);
+		return caseBind(node, arg);
 	}
 
  	abstract protected C newCollection();

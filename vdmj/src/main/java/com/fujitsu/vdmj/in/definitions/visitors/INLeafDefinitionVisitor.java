@@ -75,7 +75,20 @@ import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
  */
 abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> extends INDefinitionVisitor<C, S>
 {
-	protected INVisitorSet<E, C, S> visitorSet;
+	protected INVisitorSet<E, C, S> visitorSet = new INVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			definitionVisitor = INLeafDefinitionVisitor.this;
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return INLeafDefinitionVisitor.this.newCollection();
+		}
+	};
 
  	@Override
 	public C caseAssignmentDefinition(INAssignmentDefinition node, S arg)

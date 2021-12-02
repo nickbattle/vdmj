@@ -88,13 +88,13 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			expressionVisitor = ASTLeafExpressionVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return ASTLeafExpressionVisitor.this.newCollection();
 		}
 	};
 

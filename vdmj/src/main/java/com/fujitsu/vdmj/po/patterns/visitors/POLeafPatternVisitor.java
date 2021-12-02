@@ -53,13 +53,13 @@ public abstract class POLeafPatternVisitor<E, C extends Collection<E>, S> extend
 		@Override
 		protected void setVisitors()
 		{
-			// None
+			patternVisitor = POLeafPatternVisitor.this;
 		}
 
 		@Override
 		protected C newCollection()
 		{
-			return null;
+			return POLeafPatternVisitor.this.newCollection();
 		}
 	};
 
