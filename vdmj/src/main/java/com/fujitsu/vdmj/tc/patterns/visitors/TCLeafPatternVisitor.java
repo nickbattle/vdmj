@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.tc.patterns.visitors;
 import java.util.Collection;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCConcatenationPattern;
 import com.fujitsu.vdmj.tc.patterns.TCExpressionPattern;
 import com.fujitsu.vdmj.tc.patterns.TCMapPattern;
@@ -77,8 +76,7 @@ public abstract class TCLeafPatternVisitor<E, C extends Collection<E>, S> extend
  	@Override
 	public C caseExpressionPattern(TCExpressionPattern node, S arg)
 	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		return (expVisitor != null ? node.exp.apply(expVisitor, arg) : newCollection());
+		return visitorSet.applyExpressionVisitor(node.exp, arg);
 	}
 
  	@Override

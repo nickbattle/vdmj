@@ -51,13 +51,13 @@ public class TCMultipleBindExitChecker extends TCMultipleBindVisitor<TCTypeSet, 
 	@Override
 	public TCTypeSet caseMultipleSeqBind(TCMultipleSeqBind node, Environment base)
 	{
-		return node.sequence.apply(visitorSet.getExpressionVisitor(), base);
+		return visitorSet.applyExpressionVisitor(node.sequence, base);
 	}
 
 	@Override
 	public TCTypeSet caseMultipleSetBind(TCMultipleSetBind node, Environment base)
 	{
-		return node.set.apply(visitorSet.getExpressionVisitor(), base);
+		return visitorSet.applyExpressionVisitor(node.set, base);
 	}
 	
 	@Override

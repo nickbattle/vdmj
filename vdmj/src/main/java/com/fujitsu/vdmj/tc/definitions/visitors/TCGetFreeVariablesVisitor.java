@@ -91,7 +91,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 	public TCNameSet caseEqualsDefinition(TCEqualsDefinition node, EnvTriple arg)
 	{
 		Environment local = new FlatEnvironment(node.defs, arg.env);
-		return node.test.apply(visitorSet.getExpressionVisitor(), new EnvTriple(arg.globals, local, arg.returns));
+		return visitorSet.applyExpressionVisitor(node.test, new EnvTriple(arg.globals, local, arg.returns));
 	}
 	
 	@Override
@@ -108,7 +108,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		}
 
 		Environment local = new FlatEnvironment(defs, arg.env);
-		TCNameSet names = node.body.apply(visitorSet.getExpressionVisitor(), new EnvTriple(arg.globals, local, arg.returns));
+		TCNameSet names = visitorSet.applyExpressionVisitor(node.body, new EnvTriple(arg.globals, local, arg.returns));
 		
 		if (node.predef != null)
 		{
@@ -134,7 +134,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		}
 
 		Environment local = new FlatEnvironment(defs, arg.env);
-		TCNameSet names = node.body.apply(visitorSet.getStatementVisitor(), new EnvTriple(arg.globals, local, arg.returns));
+		TCNameSet names = visitorSet.applyStatementVisitor(node.body, new EnvTriple(arg.globals, local, arg.returns));
 		
 		if (node.predef != null)
 		{
@@ -164,7 +164,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		
 		if (node.body != null)
 		{
-			names.addAll(node.body.apply(visitorSet.getExpressionVisitor(), new EnvTriple(arg.globals, local, arg.returns)));
+			names.addAll(visitorSet.applyExpressionVisitor(node.body, new EnvTriple(arg.globals, local, arg.returns)));
 		}
 		
 		if (node.predef != null)
@@ -195,7 +195,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		
 		if (node.body != null)
 		{
-			names.addAll(node.body.apply(visitorSet.getStatementVisitor(), new EnvTriple(arg.globals, local, arg.returns)));
+			names.addAll(visitorSet.applyStatementVisitor(node.body, new EnvTriple(arg.globals, local, arg.returns)));
 		}
 		
 		if (node.predef != null)
@@ -215,15 +215,15 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 	public TCNameSet caseInstanceVariableDefinition(TCInstanceVariableDefinition node, EnvTriple arg)
 	{
 		TCNameSet names = new TCNameSet();
-		names.addAll(node.type.apply(visitorSet.getTypeVisitor(), arg));
-		names.addAll(node.expression.apply(visitorSet.getExpressionVisitor(), arg));
+		names.addAll(visitorSet.applyTypeVisitor(node.type, arg));
+		names.addAll(visitorSet.applyExpressionVisitor(node.expression, arg));
 		return names;
 	}
 	
 	@Override
 	public TCNameSet caseLocalDefinition(TCLocalDefinition node, EnvTriple arg)
 	{
-		TCNameSet names = node.type.apply(visitorSet.getTypeVisitor(), arg);
+		TCNameSet names = visitorSet.applyTypeVisitor(node.type, arg);
 		
 		if (node.valueDefinition != null)
 		{
@@ -260,7 +260,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		if (node.type instanceof TCNamedType)
 		{
 			TCNamedType nt = (TCNamedType)node.type;
-			names.addAll(nt.type.apply(visitorSet.getTypeVisitor(), arg));
+			names.addAll(visitorSet.applyTypeVisitor(nt.type, arg));
 		}
 		else if (node.type instanceof TCRecordType)
 		{
@@ -268,7 +268,7 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 			
 			for (TCField field: rt.fields)
 			{
-				names.addAll(field.type.apply(visitorSet.getTypeVisitor(), arg));
+				names.addAll(visitorSet.applyTypeVisitor(field.type, arg));
 			}
 		}
 		
@@ -287,10 +287,10 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		
 		if (node.type != null)
 		{
-			names.addAll(node.type.apply(visitorSet.getTypeVisitor(), arg));
+			names.addAll(visitorSet.applyTypeVisitor(node.type, arg));
 		}
 		
-		names.addAll(node.exp.apply(visitorSet.getExpressionVisitor(), arg));
+		names.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		return names;
 	}
 }

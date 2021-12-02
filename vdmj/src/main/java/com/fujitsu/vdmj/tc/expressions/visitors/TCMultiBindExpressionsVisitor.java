@@ -30,9 +30,10 @@ import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCLeafMultipleBindVisitor;
 
-abstract public class TCMultiBindExpressionsVisitor<E, C extends Collection<E>, S> extends TCLeafMultipleBindVisitor<E, C, S>
+public class TCMultiBindExpressionsVisitor<E, C extends Collection<E>, S> extends TCLeafMultipleBindVisitor<E, C, S>
 {
 	public TCMultiBindExpressionsVisitor(TCVisitorSet<E, C, S> visitorSet)
 	{
@@ -46,6 +47,12 @@ abstract public class TCMultiBindExpressionsVisitor<E, C extends Collection<E>, 
 	}
 	
 	@Override
+	public C caseMultipleTypeBind(TCMultipleTypeBind node, S arg)
+	{
+		return visitorSet.applyTypeVisitor(node.type, arg);
+	}
+	
+	@Override
 	public C caseMultipleSeqBind(TCMultipleSeqBind node, S arg)
 	{
 		return visitorSet.applyExpressionVisitor(node.sequence, arg);
@@ -55,5 +62,16 @@ abstract public class TCMultiBindExpressionsVisitor<E, C extends Collection<E>, 
 	public C caseMultipleSetBind(TCMultipleSetBind node, S arg)
 	{
 		return visitorSet.applyExpressionVisitor(node.set, arg);
+	}
+
+	@Override
+	protected C newCollection()
+	{
+		/**
+		 * This should never happen, because all of the bind cases are covered above.
+		 * But we can't implement this without a subclass that knows C, so to avoid
+		 * too many visitor classes, we just throw an exception here.
+		 */
+		throw new RuntimeException("Unexpected TCMultiBindExpressionsVisitor newCollection");
 	}
 }

@@ -30,9 +30,10 @@ import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
 import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
 import com.fujitsu.vdmj.tc.patterns.TCSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCLeafBindVisitor;
 
-abstract public class TCBindExpressionsVisitor<E, C extends Collection<E>, S> extends TCLeafBindVisitor<E, C, S>
+public class TCBindExpressionsVisitor<E, C extends Collection<E>, S> extends TCLeafBindVisitor<E, C, S>
 {
 	public TCBindExpressionsVisitor(TCVisitorSet<E, C, S> visitorSet)
 	{
@@ -46,6 +47,12 @@ abstract public class TCBindExpressionsVisitor<E, C extends Collection<E>, S> ex
 	}
 	
 	@Override
+	public C caseTypeBind(TCTypeBind node, S arg)
+	{
+		return visitorSet.applyTypeVisitor(node.type, arg);
+	}
+	
+	@Override
 	public C caseSeqBind(TCSeqBind node, S arg)
 	{
 		return visitorSet.applyExpressionVisitor(node.sequence, arg);
@@ -55,5 +62,16 @@ abstract public class TCBindExpressionsVisitor<E, C extends Collection<E>, S> ex
 	public C caseSetBind(TCSetBind node, S arg)
 	{
 		return visitorSet.applyExpressionVisitor(node.set, arg);
+	}
+
+	@Override
+	protected C newCollection()
+	{
+		/**
+		 * This should never happen, because all of the bind cases are covered above.
+		 * But we can't implement this without a subclass that knows C, so to avoid
+		 * too many visitor classes, we just throw an exception here.
+		 */
+		throw new RuntimeException("Unexpected TCBindExpressionsVisitor newCollection");
 	}
 }

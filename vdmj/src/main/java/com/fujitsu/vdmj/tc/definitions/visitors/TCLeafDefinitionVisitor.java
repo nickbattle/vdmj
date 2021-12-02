@@ -52,10 +52,7 @@ import com.fujitsu.vdmj.tc.definitions.TCThreadDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCUntypedDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
@@ -284,7 +281,7 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  		
 		for (TCMultipleBind bind: node.bindings)
  		{
- 			all.addAll(caseMultipleBind(bind, arg));
+ 			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
  		}
 		
 		return all;
@@ -314,7 +311,6 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	
  	private C caseTraceDefinition(TCTraceDefinition tdef, S arg)
  	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		C all = newCollection();
 		
 		if (tdef instanceof TCTraceLetDefBinding)
@@ -332,12 +328,12 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		{
 			TCTraceLetBeStBinding letbe = (TCTraceLetBeStBinding)tdef;
 
-			if (letbe.stexp != null && expVisitor != null)
+			if (letbe.stexp != null)
 			{
 				all.addAll(visitorSet.applyExpressionVisitor(letbe.stexp, arg));
 			}
 			
-			all.addAll(caseMultipleBind(letbe.bind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(letbe.bind, arg));
 			all.addAll(caseTraceDefinition(letbe.body, arg));
 		}
 		else if (tdef instanceof TCTraceRepeatDefinition)
@@ -355,13 +351,8 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		
 		if (core instanceof TCTraceApplyExpression)
 		{
-			TCStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
-			
-			if (stmtVisitor != null)
-			{
-				TCTraceApplyExpression apply = (TCTraceApplyExpression)core;
-				all.addAll(visitorSet.applyStatementVisitor(apply.callStatement, arg));
-			}
+			TCTraceApplyExpression apply = (TCTraceApplyExpression)core;
+			all.addAll(visitorSet.applyStatementVisitor(apply.callStatement, arg));
 		}
 		else if (core instanceof TCTraceBracketedExpression)
 		{
@@ -474,29 +465,6 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
 		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
-		
-		return all;
-	}
-
- 	/**
- 	 * This multiple bind case covers the common expression visitor
- 	 * cases, but they can be overridden, perhaps to use the (m)bind visitorSet
- 	 * entry if required. 
- 	 */
- 	protected C caseMultipleBind(TCMultipleBind bind, S arg)
-	{
-		C all = newCollection();
-		
-		if (bind instanceof TCMultipleSetBind)
-		{
-			TCMultipleSetBind sbind = (TCMultipleSetBind)bind;
-			all.addAll(visitorSet.applyExpressionVisitor(sbind.set, arg));
-		}
-		else if (bind instanceof TCMultipleSeqBind)
-		{
-			TCMultipleSeqBind sbind = (TCMultipleSeqBind)bind;
-			all.addAll(visitorSet.applyExpressionVisitor(sbind.sequence, arg));
-		}
 		
 		return all;
 	}

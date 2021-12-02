@@ -94,11 +94,10 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 	public Set<TCNode> caseLetDefExpression(TCLetDefExpression node, LexLocation arg)
 	{
 		Set<TCNode> all = super.caseLetDefExpression(node, arg);
-		TCDefinitionVisitor<Set<TCNode>, LexLocation> defVisitor = visitorSet.getDefinitionVisitor();
 
 		for (TCDefinition def: node.localDefs)
  		{
- 			all.addAll(def.apply(defVisitor, arg));
+ 			all.addAll(visitorSet.applyDefinitionVisitor(def, arg));
  		}
  		
 		return all;
