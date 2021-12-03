@@ -66,6 +66,7 @@ import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.TupleValue;
 import com.fujitsu.vdmj.values.Value;
+import com.fujitsu.vdmj.values.ValueMap;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -471,7 +472,7 @@ public class DAPDebugExecutor implements DebugExecutor
 			String className = obj.type.name.getName();
 			NameValuePairMap all = obj.getMemberValues();
 			
-			JSONArray inherited = new JSONArray();
+			ValueMap inherited = new ValueMap();
 			JSONArray members = new JSONArray();
 			
 			for (TCNameToken name: all.keySet())
@@ -494,17 +495,19 @@ public class DAPDebugExecutor implements DebugExecutor
 				}
 				else
 				{
-					inherited.add(new JSONObject(
-							"name", name.toString(),
-							"value", value.toString(),
-							"variablesReference", valueToReference(value),
-							"presentationHint", "baseClass")
-						);				
+					inherited.put(new SeqValue(name.toString()), value);
 				}
 			}
 			
-			// Result has inherited first...
-			variables.addAll(inherited);
+			if (!inherited.isEmpty())
+			{
+				// Result has inherited first...
+				variables.add(new JSONObject(
+						"name", "inherited",
+						"value", "",
+						"variablesReference", valueToReference(new MapValue(inherited))));
+			}
+			
 			variables.addAll(members);
 		}
 		else if (var instanceof MapValue)
