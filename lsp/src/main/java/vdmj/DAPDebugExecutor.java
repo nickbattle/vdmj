@@ -468,7 +468,11 @@ public class DAPDebugExecutor implements DebugExecutor
 		else if (var instanceof ObjectValue)
 		{
 			ObjectValue obj = (ObjectValue)var;
+			String className = obj.type.name.getName();
 			NameValuePairMap all = obj.getMemberValues();
+			
+			JSONArray inherited = new JSONArray();
+			JSONArray members = new JSONArray();
 			
 			for (TCNameToken name: all.keySet())
 			{
@@ -480,12 +484,28 @@ public class DAPDebugExecutor implements DebugExecutor
 					continue;	// skip func/op members
 				}
 				
-				variables.add(new JSONObject(
-						"name", name.toString(),
-						"value", value.toString(),
-						"variablesReference", valueToReference(value))
-					);
+				if (name.getModule().equals(className))
+				{
+					members.add(new JSONObject(
+							"name", name.toString(),
+							"value", value.toString(),
+							"variablesReference", valueToReference(value))
+						);
+				}
+				else
+				{
+					inherited.add(new JSONObject(
+							"name", name.toString(),
+							"value", value.toString(),
+							"variablesReference", valueToReference(value),
+							"presentationHint", "baseClass")
+						);				
+				}
 			}
+			
+			// Result has inherited first...
+			variables.addAll(inherited);
+			variables.addAll(members);
 		}
 		else if (var instanceof MapValue)
 		{
