@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
+import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.Utils;
@@ -71,6 +72,7 @@ public class TranslateHandler extends LSPHandler
 			File file = Utils.uriToFile(params.get("uri"));
 			File saveUri = Utils.uriToFile(params.get("saveUri"));
 			String language = params.get("languageId");
+			JSONArray args = params.get("arguments");
 			
 			if (saveUri.exists())
 			{
@@ -94,7 +96,36 @@ public class TranslateHandler extends LSPHandler
 			switch (language)
 			{
 				case "latex":
-					return LSPXWorkspaceManager.getInstance().translateLaTeX(request, file, saveUri);
+				{
+					boolean modelOnly = false;
+					boolean markCoverage = false;
+					boolean insertCoverageTables = false;
+					
+					// Search the array, looking for the three arguments possible, ignoring others
+					if (args != null)
+					{
+						for (int i=0; i<args.size(); i++)
+						{
+							JSONObject arg = args.index(i);
+							
+							if (arg.containsKey("modelOnly"))
+							{
+								modelOnly = arg.get("modelOnly");
+							}
+							else if (arg.containsKey("markCoverage"))
+							{
+								markCoverage = arg.get("markCoverage");
+							}
+							else if (arg.containsKey("insertCoverageTables"))
+							{
+								insertCoverageTables = arg.get("insertCoverageTables");
+							}
+						}
+					}
+
+					return LSPXWorkspaceManager.getInstance().translateLaTeX(request, file, saveUri,
+							modelOnly, markCoverage, insertCoverageTables);
+				}
 				
 				case "word":
 					return LSPXWorkspaceManager.getInstance().translateWord(request, file, saveUri);

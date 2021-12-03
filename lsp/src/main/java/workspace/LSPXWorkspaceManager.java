@@ -350,7 +350,8 @@ public class LSPXWorkspaceManager
 		}
 	}
 
-	public RPCMessageList translateLaTeX(RPCRequest request, File file, File saveUri)
+	public RPCMessageList translateLaTeX(RPCRequest request, File file, File saveUri,
+			boolean modelOnly, boolean markCoverage, boolean insertCoverageTables)
 	{
 		File responseFile = null;
 		Map<File, StringBuilder> filemap = wsManager.getProjectFiles();
@@ -361,7 +362,7 @@ public class LSPXWorkspaceManager
 			{
 				for (File pfile: filemap.keySet())
 				{
-					fileToLaTeX(saveUri, pfile);
+					fileToLaTeX(saveUri, pfile, modelOnly, markCoverage, insertCoverageTables);
 				}
 
 				responseFile = saveUri;		// ??
@@ -374,7 +375,7 @@ public class LSPXWorkspaceManager
 				{
 					if (pfile.getPath().startsWith(subfolder))
 					{
-						fileToLaTeX(saveUri, pfile);
+						fileToLaTeX(saveUri, pfile, modelOnly, markCoverage, insertCoverageTables);
 					}
 				}
 
@@ -382,7 +383,7 @@ public class LSPXWorkspaceManager
 			}
 			else if (filemap.containsKey(file))
 			{
-				responseFile = fileToLaTeX(saveUri, file);
+				responseFile = fileToLaTeX(saveUri, file, modelOnly, markCoverage, insertCoverageTables);
 			}
 			else
 			{
@@ -397,7 +398,8 @@ public class LSPXWorkspaceManager
 		}
 	}
 	
-	private File fileToLaTeX(File saveUri, File file) throws IOException
+	private File fileToLaTeX(File saveUri, File file,
+			boolean modelOnly, boolean markCoverage, boolean insertCoverageTables) throws IOException
 	{
 		SourceFile source = new SourceFile(file);
 		String texname = file.getName().replaceAll("\\.vdm..$", ".tex");
@@ -406,7 +408,7 @@ public class LSPXWorkspaceManager
 		File outfile = new File(subfolder, texname);
 		
 		PrintWriter out = new PrintWriter(outfile);
-		source.printLatexCoverage(out, true, true, false);
+		source.printLatexCoverage(out, true, modelOnly, markCoverage, insertCoverageTables);
 		out.close();
 
 		return outfile;
