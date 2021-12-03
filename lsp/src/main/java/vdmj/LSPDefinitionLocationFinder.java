@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
@@ -75,6 +76,29 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	public Set<TCNode> caseDefinition(TCDefinition node, LexLocation position)
 	{
 		return newCollection();		// Nothing found
+	}
+	
+	@Override
+	public Set<TCNode> caseClassDefinition(TCClassDefinition node, LexLocation sought)
+	{
+		Set<TCNode> all = super.caseClassDefinition(node, sought);
+		
+		if (sought.within(node.name.getLocation()))
+		{
+			all.add(node.name);
+		}
+		else if (node.supernames != null)
+		{
+			for (TCNameToken sname: node.supernames)
+			{
+				if (sought.within(sname.getLocation()))
+				{
+					all.add(sname);
+				}
+			}
+		}
+		
+		return all;
 	}
 	
 	@Override

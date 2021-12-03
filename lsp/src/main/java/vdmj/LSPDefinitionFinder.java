@@ -157,15 +157,12 @@ public class LSPDefinitionFinder
 			
 			if (span == null || position.within(span))
 			{
-				for (TCDefinition def: cdef.definitions)
+				Set<TCNode> nodes = cdef.apply(finder, position);
+
+				if (nodes != null && !nodes.isEmpty())	// found it!
 				{
-					Set<TCNode> nodes = def.apply(finder, position);
-					
-					if (nodes != null && !nodes.isEmpty())	// found it!
-					{
-						TCNode node = nodes.iterator().next();
-						return new Found(null, cdef, node);
-					}
+					TCNode node = nodes.iterator().next();
+					return new Found(null, cdef, node);
 				}
 			}
 		}
