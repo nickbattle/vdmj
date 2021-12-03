@@ -56,6 +56,7 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
+import com.fujitsu.vdmj.tc.statements.TCErrorCase;
 import com.fujitsu.vdmj.tc.traces.TCTraceApplyExpression;
 import com.fujitsu.vdmj.tc.traces.TCTraceBracketedExpression;
 import com.fujitsu.vdmj.tc.traces.TCTraceConcurrentExpression;
@@ -237,6 +238,15 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		if (node.postdef != null)
 		{
 			all.addAll(node.postdef.apply(this, arg));
+		}
+		
+		if (node.errors != null)
+		{
+			for (TCErrorCase error: node.errors)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(error.left, arg));
+				all.addAll(visitorSet.applyExpressionVisitor(error.right, arg));
+			}
 		}
 
 		return all;

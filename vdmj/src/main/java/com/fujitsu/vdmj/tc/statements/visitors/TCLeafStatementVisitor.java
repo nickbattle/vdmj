@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.tc.statements.TCCasesStatement;
 import com.fujitsu.vdmj.tc.statements.TCCyclesStatement;
 import com.fujitsu.vdmj.tc.statements.TCDurationStatement;
 import com.fujitsu.vdmj.tc.statements.TCElseIfStatement;
+import com.fujitsu.vdmj.tc.statements.TCErrorCase;
 import com.fujitsu.vdmj.tc.statements.TCErrorStatement;
 import com.fujitsu.vdmj.tc.statements.TCExitStatement;
 import com.fujitsu.vdmj.tc.statements.TCForAllStatement;
@@ -376,6 +377,15 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 			all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
 		}
 		
+		if (node.errors != null)
+		{
+			for (TCErrorCase error: node.errors)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(error.left, arg));
+				all.addAll(visitorSet.applyExpressionVisitor(error.right, arg));
+			}
+		}
+
 		return all;
 	}
 

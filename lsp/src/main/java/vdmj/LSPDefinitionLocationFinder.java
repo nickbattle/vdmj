@@ -44,7 +44,6 @@ import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCLeafDefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.statements.TCErrorCase;
 import com.fujitsu.vdmj.tc.statements.TCExternalClause;
 
 public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode, Set<TCNode>, LexLocation>
@@ -153,15 +152,6 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 				}
 				
 				all.addAll(ext.unresolved.matchUnresolved(sought));
-			}
-		}
-		
-		if (node.errors != null)
-		{
-			for (TCErrorCase error: node.errors)
-			{
-				all.addAll(visitorSet.applyExpressionVisitor(error.left, sought));
-				all.addAll(visitorSet.applyExpressionVisitor(error.right, sought));
 			}
 		}
 		

@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
-import com.fujitsu.vdmj.tc.statements.TCErrorCase;
 import com.fujitsu.vdmj.tc.statements.TCExternalClause;
 import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
@@ -153,21 +152,20 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 	@Override
 	public Set<TCNode> caseCallStatement(TCCallStatement node, LexLocation arg)
 	{
-		Set<TCNode> all = newCollection();
+		Set<TCNode> all = super.caseCallStatement(node, arg);
 
 		if (arg.within(node.location))
 		{
 			all.add(node);
 		}
 
-		all.addAll(super.caseCallStatement(node, arg));
 		return all;
 	}
  	
  	@Override
  	public Set<TCNode> caseAssignmentStatement(TCAssignmentStatement node, LexLocation arg)
  	{
-		Set<TCNode> all = newCollection();
+		Set<TCNode> all = super.caseAssignmentStatement(node, arg);
 		TCStateDesignator des = node.target;
 		boolean found = false;
 		
@@ -192,7 +190,6 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 			}
 		}
 
- 		all.addAll(super.caseAssignmentStatement(node, arg));
 		return all;
  	}
 	
@@ -214,15 +211,6 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 				}
 				
 				all.addAll(ext.unresolved.matchUnresolved(sought));
-			}
-		}
-		
-		if (node.errors != null)
-		{
-			for (TCErrorCase error: node.errors)
-			{
-				all.addAll(visitorSet.applyExpressionVisitor(error.left, sought));
-				all.addAll(visitorSet.applyExpressionVisitor(error.right, sought));
 			}
 		}
 		
