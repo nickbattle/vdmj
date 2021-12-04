@@ -44,6 +44,12 @@ abstract public class MappedList<FROM extends Mappable, TO extends Mappable> ext
 		}
 	}
 	
+    public MappedList(List<TO> to)
+    {
+    	this();
+    	addAll(to);
+    }
+	
 	public MappedList()
 	{
 		super();
