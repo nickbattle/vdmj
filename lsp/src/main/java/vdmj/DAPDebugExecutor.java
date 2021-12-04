@@ -426,21 +426,21 @@ public class DAPDebugExecutor implements DebugExecutor
 				);
 			}
 		}
-		else if (var instanceof Map)	// eg, "inherited"
+		else if (var instanceof Map)	// eg, "inherited", arbitrary string pairs
 		{
 			@SuppressWarnings("unchecked")
-			Map<String, String> c = (Map<String, String>)var;
+			Map<String, String> map = (Map<String, String>)var;
 			List<String> sorted = new Vector<String>();
-			sorted.addAll(c.keySet());
+			sorted.addAll(map.keySet());
 			Collections.sort(sorted);
 			
 			for (String name: sorted)
 			{
-				String value = c.get(name);
+				String value = map.get(name);
 				
 				variables.add(new JSONObject(
-					"name", name.toString(),
-					"value", value.toString(),
+					"name", name,
+					"value", value,
 					"variablesReference", 0L));
 			}		
 		}
