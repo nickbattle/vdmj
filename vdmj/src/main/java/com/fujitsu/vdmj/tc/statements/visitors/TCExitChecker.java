@@ -82,6 +82,11 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 			}
 		};
 	}
+	
+	public TCExitChecker(TCVisitorSet<TCType, TCTypeSet, Environment> visitors)
+	{
+		this.visitorSet = visitors;
+	}
 
 	@Override
 	protected TCTypeSet newCollection()

@@ -60,6 +60,11 @@ public class INDefinitionExpressionFinder extends INLeafDefinitionVisitor<INExpr
 		};
 	}
 
+	public INDefinitionExpressionFinder(INVisitorSet<INExpression, INExpressionList, Integer> visitors)
+	{
+		this.visitorSet = visitors;
+	}
+	
 	@Override
 	protected INExpressionList newCollection()
 	{

@@ -53,6 +53,11 @@ public class INDefinitionStatementFinder extends INLeafDefinitionVisitor<INState
 		};
 	}
 
+	public INDefinitionStatementFinder(INVisitorSet<INStatement, INStatementList, Integer> visitors)
+	{
+		this.visitorSet = visitors;
+	}
+
 	@Override
 	protected INStatementList newCollection()
 	{
