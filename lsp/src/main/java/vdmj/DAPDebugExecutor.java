@@ -26,12 +26,14 @@ package vdmj;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugExecutor;
 import com.fujitsu.vdmj.debug.DebugType;
@@ -66,7 +68,6 @@ import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.TupleValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueMap;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -425,6 +426,24 @@ public class DAPDebugExecutor implements DebugExecutor
 				);
 			}
 		}
+		else if (var instanceof Map)	// eg, "inherited"
+		{
+			@SuppressWarnings("unchecked")
+			Map<String, String> c = (Map<String, String>)var;
+			List<String> sorted = new Vector<String>();
+			sorted.addAll(c.keySet());
+			Collections.sort(sorted);
+			
+			for (String name: sorted)
+			{
+				String value = c.get(name);
+				
+				variables.add(new JSONObject(
+					"name", name.toString(),
+					"value", value.toString(),
+					"variablesReference", 0L));
+			}		
+		}
 		else if (var instanceof RecordValue)
 		{
 			RecordValue r = (RecordValue)var;
@@ -472,7 +491,7 @@ public class DAPDebugExecutor implements DebugExecutor
 			String className = obj.type.name.getName();
 			NameValuePairMap all = obj.getMemberValues();
 			
-			ValueMap inherited = new ValueMap();
+			Map<String, String> inherited = new HashMap<String, String>();
 			JSONArray members = new JSONArray();
 			
 			for (TCNameToken name: all.keySet())
@@ -495,7 +514,7 @@ public class DAPDebugExecutor implements DebugExecutor
 				}
 				else
 				{
-					inherited.put(new SeqValue(name.toString()), value);
+					inherited.put(name.getExplicit(true).toString(), value.toString());
 				}
 			}
 			
@@ -505,7 +524,7 @@ public class DAPDebugExecutor implements DebugExecutor
 				variables.add(new JSONObject(
 						"name", "inherited",
 						"value", "",
-						"variablesReference", valueToReference(new MapValue(inherited))));
+						"variablesReference", valueToReference(inherited)));
 			}
 			
 			variables.addAll(members);
@@ -542,7 +561,7 @@ public class DAPDebugExecutor implements DebugExecutor
 		return variables;
 	}
 
-	private Long valueToReference(Value value)
+	private Long valueToReference(Object value)
 	{
 		if (value instanceof ReferenceValue)
 		{
@@ -554,7 +573,8 @@ public class DAPDebugExecutor implements DebugExecutor
 			value instanceof SeqValue ||
 			value instanceof ObjectValue ||
 			value instanceof MapValue ||
-			value instanceof TupleValue)
+			value instanceof TupleValue ||
+			value instanceof Map)
 		{
 			int ref = nextVariablesReference.incrementAndGet();
 			variablesReferences.put(ref, value);
