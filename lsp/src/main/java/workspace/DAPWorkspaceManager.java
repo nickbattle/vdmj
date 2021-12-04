@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.messages.RTLogger;
@@ -138,12 +139,56 @@ public class DAPWorkspaceManager
 			this.defaultName = defaultName;
 			this.remoteControl = remoteControl;
 			
+			processSettings(request);
+			
 			return new DAPMessageList(request);
 		}
 		catch (Exception e)
 		{
 			Log.error(e);
 			return new DAPMessageList(request, e);
+		}
+	}
+
+	/**
+	 * Pick out request arguments that are VDMJ Settings.
+	 */
+	private void processSettings(DAPRequest request)
+	{
+		JSONObject args = request.get("arguments");
+		
+		for (String key: args.keySet())
+		{
+			switch (key)
+			{
+				case "dynamicTypeChecks":
+					Settings.dynamictypechecks = args.get(key);
+					break;
+					
+				case "invariantsChecks":
+					Settings.invchecks = args.get(key);
+					break;
+					
+				case "preConditionChecks":
+					Settings.prechecks = args.get(key);
+					break;
+					
+				case "postConditionChecks":
+					Settings.postchecks = args.get(key);
+					break;
+					
+				case "measureChecks":
+					Settings.measureChecks = args.get(key);
+					break;
+				
+				case "exceptions":
+					Settings.exceptions = args.get(key);
+					break;
+				
+				default:
+					// Ignore other options
+					break;
+			}
 		}
 	}
 
