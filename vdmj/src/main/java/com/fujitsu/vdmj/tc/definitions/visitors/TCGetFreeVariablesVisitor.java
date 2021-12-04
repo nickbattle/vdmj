@@ -75,6 +75,11 @@ public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameTok
 		};
 	}
 
+	public TCGetFreeVariablesVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	{
+		this.visitorSet = visitors;
+	}
+	
 	@Override
 	protected TCNameSet newCollection()
 	{
