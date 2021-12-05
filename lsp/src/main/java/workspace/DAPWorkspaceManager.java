@@ -657,4 +657,55 @@ public class DAPWorkspaceManager
 	{
 		return noDebug;
 	}
+	
+	public void stopDebugReader()
+	{
+		/**
+		 * The debugReader field can be cleared at any time, when the debugger ends.
+		 * So we take the initial value here.
+		 */
+		DAPDebugReader reader = debugReader;
+		
+		if (reader != null)
+		{
+			int retries = 5;
+			
+			while (retries-- > 0 && !reader.isListening())
+			{
+				pause(200);		// Wait for reader to stop & listen
+			}
+			
+			if (retries > 0)
+			{
+				reader.interrupt();	// Cause exchange to trip & kill threads
+				retries = 5;
+				
+				while (retries-- > 0 && getDebugReader() != null)
+				{
+					pause(200);
+				}
+				
+				if (retries == 0)
+				{
+					Log.error("DAPDebugReader interrupt did not work?");
+				}
+			}
+			else
+			{
+				Log.error("DAPDebugReader is not listening?");
+			}
+		}
+	}
+	
+	private void pause(long ms)
+	{
+		try
+		{
+			Thread.sleep(ms);
+		}
+		catch (InterruptedException e)
+		{
+			// ignore
+		}
+	}
 }
