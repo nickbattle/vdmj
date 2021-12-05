@@ -28,6 +28,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
@@ -155,6 +158,17 @@ public class ParameterPatternObligation extends ProofObligation
 							existingBindings.add(def.name.getName());
 						}
 					}
+					
+					for (String any: getAnyBindings(pmatch))
+					{
+						if (!existingBindings.contains(any))
+						{
+							ebindings.append(aprefix);
+							ebindings.append(any);
+							ebindings.append(":?");
+							existingBindings.add(any);
+						}
+					}
 	
 					epredicates.append(eprefix);
 					eprefix = " and ";
@@ -202,5 +216,24 @@ public class ParameterPatternObligation extends ProofObligation
 		}
 
 		return "forall " + foralls.toString() + exists.toString();
+	}
+
+	/**
+	 * Pick out the ignore patterns, which produce "any" variables.
+	 * Currently this is done by looking for the name pattern, but it would
+	 * be better to have a visitor to do this properly, and get the type.
+	 */
+	private List<String> getAnyBindings(POExpression pmatch)
+	{
+		Pattern p = Pattern.compile("\\$any\\d+");
+		Matcher m = p.matcher(pmatch.toString());
+		List<String> anys = new Vector<String>();
+		
+		while (m.find())
+		{
+			anys.add(m.group());
+		}
+		
+		return anys;
 	}
 }

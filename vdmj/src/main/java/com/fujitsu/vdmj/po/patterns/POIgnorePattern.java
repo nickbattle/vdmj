@@ -55,7 +55,7 @@ public class POIgnorePattern extends POPattern
 		
 		if (anyName == null)
 		{
-			anyName = new TCNameToken(location, "", "any" + var++);
+			anyName = new TCNameToken(location, "", "$any" + var++);
 		}
 		
 		return new POVariableExpression(anyName, null);
