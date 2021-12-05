@@ -40,7 +40,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public POTrivialProof proof;
 
 	private int var = 1;
-	private TCExpression checkedExpression;
+	private TCExpression checkedExpression = null;
 
 	public ProofObligation(LexLocation location, POType kind, POContextStack ctxt)
 	{

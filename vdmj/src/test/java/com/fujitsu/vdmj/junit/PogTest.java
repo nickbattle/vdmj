@@ -163,7 +163,7 @@ public class PogTest extends TestCase
 		TypeChecker typeChecker = new ClassTypeChecker(checked);
 		typeChecker.typeCheck();
 		TypeChecker.printErrors(Console.out);
-		assertEquals("Type check errors", 0, TypeChecker.getErrorCount());
+		assertEquals("Spec type check errors", 0, TypeChecker.getErrorCount());
 
 		POClassList poglist = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checked);
 		ClassMapper.getInstance(PONode.MAPPINGS).convert(TCRecursiveLoops.getInstance());
@@ -175,6 +175,7 @@ public class PogTest extends TestCase
 		for (ProofObligation po: polist)
 		{
 			Console.out.println(++i + " \"" + po.value.replaceAll("\n", "\\\\n") + "\",");
+			assertFalse("PO type checked failed", po.getCheckedExpression() == null);
 		}
 
 		assertEquals("POs generated", expected.length, polist.size());
