@@ -84,4 +84,9 @@ public class POIgnorePattern extends POPattern
 	{
 		return visitor.caseIgnorePattern(this, arg);
 	}
+
+	public static void init()
+	{
+		var = 1;	// reset on each getProofObligations run.
+	}
 }
