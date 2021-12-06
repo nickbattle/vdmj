@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 
 abstract public class ProofObligation implements Comparable<ProofObligation>
@@ -39,7 +40,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public POTrivialProof proof;
 
 	private int var = 1;
-	private TCExpression checkedExpression;
+	private TCExpression checkedExpression = null;
 
 	public ProofObligation(LexLocation location, POType kind, POContextStack ctxt)
 	{
@@ -49,6 +50,8 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.status = POStatus.UNPROVED;
 		this.proof = null;
 		this.number = 0;
+		
+		POIgnorePattern.init();		// Reset the "any" count for getMatchingPatterns
 	}
 
 	public String getValue()
