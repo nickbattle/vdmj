@@ -58,6 +58,7 @@ import json.JSONObject;
 public class LaunchDebugLens extends CodeLens
 {
 	private final String CODE_LENS_COMMAND = "vdm-vscode.addRunConfiguration";
+	// private final String CODE_LENS_COMMAND = "workbench.action.debug.configure";
 
 	@Override
 	public JSONArray codeLenses(ASTDefinition def, File file)

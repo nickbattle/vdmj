@@ -70,9 +70,8 @@ abstract public class CodeLens
 	
 	protected JSONObject makeLens(LexLocation location, String title, String command, JSONArray arguments)
 	{
-		JSONObject lens = makeLens(location, title, command);
-		JSONObject cmd = lens.get("command");
-		cmd.put("command", new JSONObject("title", title, "command", command, "arguments", arguments));
-		return lens;
+		return new JSONObject(
+				"range", Utils.lexLocationToRange(location),
+				"command", new JSONObject("title", title, "command", command, "arguments", arguments));
 	}
 }
