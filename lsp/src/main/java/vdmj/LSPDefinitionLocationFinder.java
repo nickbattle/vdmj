@@ -83,7 +83,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	{
 		Set<TCNode> all = super.caseClassDefinition(node, sought);
 		
-		if (sought.within(node.name.getLocation()))
+		if (sought.touches(node.name.getLocation()))
 		{
 			all.add(node.name);
 		}
@@ -91,7 +91,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 		{
 			for (TCNameToken sname: node.supernames)
 			{
-				if (sought.within(sname.getLocation()))
+				if (sought.touches(sname.getLocation()))
 				{
 					all.add(sname);
 				}
@@ -169,7 +169,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 			{
 				for (TCNameToken name: ext.identifiers)
 				{
-					if (sought.within(name.getLocation()))
+					if (sought.touches(name.getLocation()))
 					{
 						all.add(name);
 					}
@@ -197,7 +197,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 		
 		for (TCNameToken opname: node.operations)
 		{
-			if (sought.within(opname.getLocation()))
+			if (sought.touches(opname.getLocation()))
 			{
 				all.add(opname);
 			}
@@ -211,7 +211,7 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	{
 		Set<TCNode> all =  super.casePerSyncDefinition(node, sought);
 		
-		if (sought.within(node.opname.getLocation()))
+		if (sought.touches(node.opname.getLocation()))
 		{
 			all.add(node.opname);
 		}

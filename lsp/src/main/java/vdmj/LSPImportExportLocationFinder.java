@@ -51,7 +51,7 @@ public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode,
 	{
 		for (TCNameToken name: node.nameList)
 		{
-			if (arg.within(name.getLocation()))
+			if (arg.touches(name.getLocation()))
 			{
 				return name;
 			}
@@ -74,7 +74,7 @@ public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode,
 	{
 		for (TCNameToken name: node.nameList)
 		{
-			if (arg.within(name.getLocation()))
+			if (arg.touches(name.getLocation()))
 			{
 				return name;
 			}
@@ -97,7 +97,7 @@ public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode,
 	{
 		for (TCNameToken name: node.nameList)
 		{
-			if (arg.within(name.getLocation()))
+			if (arg.touches(name.getLocation()))
 			{
 				return name;
 			}
@@ -118,7 +118,7 @@ public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode,
 	@Override
 	public TCNode caseExportedType(TCExportedType node, LexLocation arg)
 	{
-		if (arg.within(node.name.getLocation()))
+		if (arg.touches(node.name.getLocation()))
 		{
 			return node.name;
 		}
@@ -129,11 +129,11 @@ public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode,
 	@Override
 	public TCNode caseImport(TCImport node, LexLocation arg)
 	{
-		if (arg.within(node.name.getLocation()))
+		if (arg.touches(node.name.getLocation()))
 		{
 			return node;
 		}
-		else if (node.renamed != null && arg.within(node.renamed.getLocation()))
+		else if (node.renamed != null && arg.touches(node.renamed.getLocation()))
 		{
 			return node;
 		}

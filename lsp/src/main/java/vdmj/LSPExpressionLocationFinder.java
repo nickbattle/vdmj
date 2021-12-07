@@ -68,7 +68,7 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 	{
 		Set<TCNode> all = super.caseMkTypeExpression(node, arg);
 		
-		if (arg.within(node.typename.getLocation()))
+		if (arg.touches(node.typename.getLocation()))
 		{
 			all.add(node);
 		}
@@ -81,7 +81,7 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 	{
 		Set<TCNode> result = newCollection();
 
-		if (arg.within(node.location))
+		if (arg.touches(node.location))
 		{
 			result.add(node);
 		}
@@ -115,7 +115,7 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 	{
 		Set<TCNode> all = super.caseFieldExpression(node, arg);
 		
-		if (arg.within(node.field.getLocation()))
+		if (arg.touches(node.field.getLocation()))
 		{
 			all.add(node);
 		}
@@ -128,7 +128,7 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 	{
 		Set<TCNode> all = super.caseNewExpression(node, arg);
 		
-		if (arg.within(node.classname.getLocation()))
+		if (arg.touches(node.classname.getLocation()))
 		{
 			if (node.ctordef != null)
 			{
@@ -148,7 +148,7 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 	{
 		Set<TCNode> all = super.caseIsExpression(node, arg);
 		
-		if (node.typename != null && arg.within(node.typename.getLocation()))
+		if (node.typename != null && arg.touches(node.typename.getLocation()))
 		{
 			all.add(node.typename);
 		}
@@ -165,7 +165,7 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 	{
 		Set<TCNode> all = super.caseNarrowExpression(node, arg);
 		
-		if (node.typename != null && arg.within(node.typename.getLocation()))
+		if (node.typename != null && arg.touches(node.typename.getLocation()))
 		{
 			all.add(node.typename);
 		}
@@ -184,7 +184,7 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 		
 		for (TCNameToken opname: node.opnames)
 		{
-			if (arg.within(opname.getLocation()))
+			if (arg.touches(opname.getLocation()))
 			{
 				all.add(opname);
 			}

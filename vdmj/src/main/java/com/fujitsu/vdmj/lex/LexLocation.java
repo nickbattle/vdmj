@@ -197,6 +197,22 @@ public class LexLocation implements Serializable
 	}
 	
 	/**
+	 * This is almost identical to the within method, but this returns true when the
+	 * cursor is sitting at the extreme end of the symbol. This is useful for some UIs
+	 * where a symbol is considered "touched" when the cursor sits on the RHS. 
+	 */
+	public boolean touches(LexLocation span)
+	{
+		return
+			(startLine > span.startLine ||
+				(startLine == span.startLine && startPos >= span.startPos)) &&
+			(startLine < span.endLine ||
+				(startLine == span.endLine && startPos <= span.endPos + 1)) &&	// NOTE +1 !
+			file.equals(span.file);
+	}
+
+	
+	/**
 	 * Check whether a location is later in the same file as this location.
 	 */
 	public boolean isLater(LexLocation other)

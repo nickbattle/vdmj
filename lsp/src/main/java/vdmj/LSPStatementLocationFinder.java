@@ -74,12 +74,12 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 	{
 		Set<TCNode> all = caseObjectDesignator(node.designator, arg);
 		
-		if (node.classname != null && arg.within(node.classname.getLocation()))
+		if (node.classname != null && arg.touches(node.classname.getLocation()))
 		{
 			all.add(node.classname);
 		}
 		
-		if (node.field != null && arg.within(node.field.getLocation()))
+		if (node.field != null && arg.touches(node.field.getLocation()))
 		{
 			all.add(node.field);
 		}
@@ -107,7 +107,7 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
  	 	{
  			TCObjectFieldDesignator fdes = (TCObjectFieldDesignator)node;
  			
-			if (fdes.field != null && arg.within(fdes.field.getLocation()))
+			if (fdes.field != null && arg.touches(fdes.field.getLocation()))
 			{
 				all.add(fdes.field);
 			}
@@ -118,7 +118,7 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
  	 	{
  			TCObjectIdentifierDesignator id = (TCObjectIdentifierDesignator)node;
  			
- 			if (arg.within(id.name.getLocation()))
+ 			if (arg.touches(id.name.getLocation()))
  			{
  				all.add(id.expression);		// VariableExpression includes definition
  			}
@@ -129,7 +129,7 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
  			
 			all.addAll(visitorSet.applyExpressionVisitor(des.expression, arg));
 			
-			if (arg.within(des.expression.classname.getLocation()))
+			if (arg.touches(des.expression.classname.getLocation()))
 			{
 				if (des.expression.ctordef != null)
 				{
@@ -154,7 +154,7 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 	{
 		Set<TCNode> all = super.caseCallStatement(node, arg);
 
-		if (arg.within(node.location))
+		if (arg.touches(node.location))
 		{
 			all.add(node);
 		}
@@ -173,7 +173,7 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 		{
 			if (des instanceof TCIdentifierDesignator)
 			{
-				found = found || arg.within(des.location);
+				found = found || arg.touches(des.location);
 				if (found) all.add(des);
 				break;
 			}
@@ -186,7 +186,7 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 			{
 				TCFieldDesignator f = (TCFieldDesignator)des;
 				des = f.object;
-				found = found || arg.within(f.field.getLocation());
+				found = found || arg.touches(f.field.getLocation());
 			}
 		}
 
@@ -204,7 +204,7 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 			{
 				for (TCNameToken name: ext.identifiers)
 				{
-					if (sought.within(name.getLocation()))
+					if (sought.touches(name.getLocation()))
 					{
 						all.add(name);
 					}

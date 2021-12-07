@@ -127,7 +127,7 @@ public class Utils
 		LexLocation rangeLoc = rangeToLexLocation(file, range);
 		return location.within(rangeLoc);
 	}
-
+	
 	public static TCNameToken stringToName(String name) throws LSPException
 	{
 		try
