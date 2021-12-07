@@ -409,11 +409,13 @@ public class LSPXWorkspaceManager
 			{
 				modelOnly = options.get("modelOnly");
 			}
-			else if (options.containsKey("markCoverage"))
+			
+			if (options.containsKey("markCoverage"))
 			{
 				markCoverage = options.get("markCoverage");
 			}
-			else if (options.containsKey("insertCoverageTables"))
+			
+			if (options.containsKey("insertCoverageTables"))
 			{
 				insertCoverageTables = options.get("insertCoverageTables");
 			}
