@@ -571,7 +571,7 @@ public class LSPXWorkspaceManager
 		}
 	}
 	
-	public RPCMessageList translateIsabelle(RPCRequest request, JSONObject options)
+	public RPCMessageList translateIsabelle(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		AnalysisPlugin isa = registry.getPlugin("ISA");
 		
