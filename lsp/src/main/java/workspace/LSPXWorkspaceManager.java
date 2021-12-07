@@ -350,8 +350,7 @@ public class LSPXWorkspaceManager
 		}
 	}
 
-	public RPCMessageList translateLaTeX(RPCRequest request, File file, File saveUri,
-			boolean modelOnly, boolean markCoverage, boolean insertCoverageTables)
+	public RPCMessageList translateLaTeX(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		File responseFile = null;
 		Map<File, StringBuilder> filemap = wsManager.getProjectFiles();
@@ -362,7 +361,7 @@ public class LSPXWorkspaceManager
 			{
 				for (File pfile: filemap.keySet())
 				{
-					fileToLaTeX(saveUri, pfile, modelOnly, markCoverage, insertCoverageTables);
+					fileToLaTeX(saveUri, pfile, options);
 				}
 
 				responseFile = saveUri;		// ??
@@ -375,7 +374,7 @@ public class LSPXWorkspaceManager
 				{
 					if (pfile.getPath().startsWith(subfolder))
 					{
-						fileToLaTeX(saveUri, pfile, modelOnly, markCoverage, insertCoverageTables);
+						fileToLaTeX(saveUri, pfile, options);
 					}
 				}
 
@@ -383,7 +382,7 @@ public class LSPXWorkspaceManager
 			}
 			else if (filemap.containsKey(file))
 			{
-				responseFile = fileToLaTeX(saveUri, file, modelOnly, markCoverage, insertCoverageTables);
+				responseFile = fileToLaTeX(saveUri, file, options);
 			}
 			else
 			{
@@ -398,9 +397,28 @@ public class LSPXWorkspaceManager
 		}
 	}
 	
-	private File fileToLaTeX(File saveUri, File file,
-			boolean modelOnly, boolean markCoverage, boolean insertCoverageTables) throws IOException
+	private File fileToLaTeX(File saveUri, File file, JSONObject options) throws IOException
 	{
+		boolean modelOnly = false;
+		boolean markCoverage = false;
+		boolean insertCoverageTables = false;
+
+		if (options != null)
+		{
+			if (options.containsKey("modelOnly"))
+			{
+				modelOnly = options.get("modelOnly");
+			}
+			else if (options.containsKey("markCoverage"))
+			{
+				markCoverage = options.get("markCoverage");
+			}
+			else if (options.containsKey("insertCoverageTables"))
+			{
+				insertCoverageTables = options.get("insertCoverageTables");
+			}
+		}
+
 		SourceFile source = new SourceFile(file);
 		String texname = file.getName().replaceAll("\\.vdm..$", ".tex");
 		File subfolder = getSubFolder(saveUri, file);
@@ -414,7 +432,7 @@ public class LSPXWorkspaceManager
 		return outfile;
 	}
 
-	public RPCMessageList translateWord(RPCRequest request, File file, File saveUri)
+	public RPCMessageList translateWord(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		File responseFile = null;
 		Map<File, StringBuilder> filemap = wsManager.getProjectFiles();
@@ -476,7 +494,7 @@ public class LSPXWorkspaceManager
 		return  outfile;
 	}
 	
-	public RPCMessageList translateCoverage(RPCRequest request, File file, File saveUri)
+	public RPCMessageList translateCoverage(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		File responseFile = null;
 		Map<File, StringBuilder> filemap = wsManager.getProjectFiles();
@@ -538,7 +556,7 @@ public class LSPXWorkspaceManager
 		return outfile;
 	}
 	
-	public RPCMessageList translateGraphviz(RPCRequest request, File file, File saveUri)
+	public RPCMessageList translateGraphviz(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		try
 		{
@@ -553,7 +571,7 @@ public class LSPXWorkspaceManager
 		}
 	}
 	
-	public RPCMessageList translateIsabelle(RPCRequest request)
+	public RPCMessageList translateIsabelle(RPCRequest request, JSONObject options)
 	{
 		AnalysisPlugin isa = registry.getPlugin("ISA");
 		

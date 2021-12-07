@@ -28,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.Utils;
@@ -72,7 +71,7 @@ public class TranslateHandler extends LSPHandler
 			File file = Utils.uriToFile(params.get("uri"));
 			File saveUri = Utils.uriToFile(params.get("saveUri"));
 			String language = params.get("languageId");
-			JSONArray args = params.get("arguments");
+			JSONObject options = params.get("options");
 			
 			if (saveUri.exists())
 			{
@@ -96,48 +95,19 @@ public class TranslateHandler extends LSPHandler
 			switch (language)
 			{
 				case "latex":
-				{
-					boolean modelOnly = false;
-					boolean markCoverage = false;
-					boolean insertCoverageTables = false;
-					
-					// Search the array, looking for the three arguments possible, ignoring others
-					if (args != null)
-					{
-						for (int i=0; i<args.size(); i++)
-						{
-							JSONObject arg = args.index(i);
-							
-							if (arg.containsKey("modelOnly"))
-							{
-								modelOnly = arg.get("modelOnly");
-							}
-							else if (arg.containsKey("markCoverage"))
-							{
-								markCoverage = arg.get("markCoverage");
-							}
-							else if (arg.containsKey("insertCoverageTables"))
-							{
-								insertCoverageTables = arg.get("insertCoverageTables");
-							}
-						}
-					}
-
-					return LSPXWorkspaceManager.getInstance().translateLaTeX(request, file, saveUri,
-							modelOnly, markCoverage, insertCoverageTables);
-				}
+					return LSPXWorkspaceManager.getInstance().translateLaTeX(request, file, saveUri, options);
 				
 				case "word":
-					return LSPXWorkspaceManager.getInstance().translateWord(request, file, saveUri);
+					return LSPXWorkspaceManager.getInstance().translateWord(request, file, saveUri, options);
 				
 				case "coverage":
-					return LSPXWorkspaceManager.getInstance().translateCoverage(request, file, saveUri);
+					return LSPXWorkspaceManager.getInstance().translateCoverage(request, file, saveUri, options);
 				
 				case "graphviz":
-					return LSPXWorkspaceManager.getInstance().translateGraphviz(request, file, saveUri);
+					return LSPXWorkspaceManager.getInstance().translateGraphviz(request, file, saveUri, options);
 				
 				case "isabelle":
-					return LSPXWorkspaceManager.getInstance().translateIsabelle(request);
+					return LSPXWorkspaceManager.getInstance().translateIsabelle(request, options);
 				
 				default:
 					return new RPCMessageList(request, RPCErrors.InvalidParams, "Unsupported language");
