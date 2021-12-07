@@ -53,7 +53,6 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import vdmj.DAPDebugLink;
-import workspace.LSPXWorkspaceManager;
 import workspace.Log;
 
 public class LSPServer extends JSONServer
@@ -76,8 +75,6 @@ public class LSPServer extends JSONServer
 		System.setProperty("vdmj.debug.link_class", DAPDebugLink.class.getName());
 		Settings.annotations = true;
 		Settings.dialect = dialect;
-
-		LSPXWorkspaceManager.getInstance();		// Just set up
 	}
 	
 	public static LSPServer getInstance()

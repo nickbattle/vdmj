@@ -28,52 +28,43 @@ import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.expressions.visitors.INBindExpressionsVisitor;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionFinder;
-import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
+import com.fujitsu.vdmj.in.expressions.visitors.INMultiBindExpressionsVisitor;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementExpressionFinder;
-import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 
 /**
  * Find an expression by line number within a definition.
  */
 public class INDefinitionExpressionFinder extends INLeafDefinitionVisitor<INExpression, INExpressionList, Integer>
 {
-	private class VisitorSet extends INVisitorSet<INExpression, INExpressionList, Integer>
-	{
-		private final INDefinitionVisitor<INExpressionList, Integer> defVisitor;
-		private final INStatementVisitor<INExpressionList, Integer> stmtVisitor = new INStatementExpressionFinder(this);
-		private final INExpressionVisitor<INExpressionList, Integer> expVisitor = new INExpressionFinder(this);
-
-		public VisitorSet(INDefinitionExpressionFinder parent)
-		{
-			defVisitor = parent;
-		}
-		
-		@Override
-		public INDefinitionVisitor<INExpressionList, Integer> getDefinitionVisitor()
-		{
-			return defVisitor;
-		}
-
-		@Override
-		public INStatementVisitor<INExpressionList, Integer> getStatementVisitor()
-		{
-			return stmtVisitor;
-		}
-		
-		@Override
-		public INExpressionVisitor<INExpressionList, Integer> getExpressionVisitor()
-		{
-			return expVisitor;
-		}
-	}
-	
 	public INDefinitionExpressionFinder()
 	{
-		super();
-		visitorSet = new VisitorSet(this);
+		visitorSet = new INVisitorSet<INExpression, INExpressionList, Integer>()
+		{
+			@Override
+			protected void setVisitors()
+			{
+				definitionVisitor = INDefinitionExpressionFinder.this;
+				statementVisitor = new INStatementExpressionFinder(this);
+				expressionVisitor = new INExpressionFinder(this);
+				bindVisitor = new INBindExpressionsVisitor<INExpression, INExpressionList, Integer>(this);
+				multiBindVisitor = new INMultiBindExpressionsVisitor<INExpression, INExpressionList, Integer>(this);
+			}
+
+			@Override
+			protected INExpressionList newCollection()
+			{
+				return INDefinitionExpressionFinder.this.newCollection();
+			}
+		};
 	}
 
+	public INDefinitionExpressionFinder(INVisitorSet<INExpression, INExpressionList, Integer> visitors)
+	{
+		this.visitorSet = visitors;
+	}
+	
 	@Override
 	protected INExpressionList newCollection()
 	{

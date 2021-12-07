@@ -26,12 +26,14 @@ package vdmj;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import com.fujitsu.vdmj.debug.DebugCommand;
 import com.fujitsu.vdmj.debug.DebugExecutor;
 import com.fujitsu.vdmj.debug.DebugType;
@@ -424,6 +426,24 @@ public class DAPDebugExecutor implements DebugExecutor
 				);
 			}
 		}
+		else if (var instanceof Map)	// eg, "inherited", arbitrary string pairs
+		{
+			@SuppressWarnings("unchecked")
+			Map<String, String> map = (Map<String, String>)var;
+			List<String> sorted = new Vector<String>();
+			sorted.addAll(map.keySet());
+			Collections.sort(sorted);
+			
+			for (String name: sorted)
+			{
+				String value = map.get(name);
+				
+				variables.add(new JSONObject(
+					"name", name,
+					"value", value,
+					"variablesReference", 0L));
+			}		
+		}
 		else if (var instanceof RecordValue)
 		{
 			RecordValue r = (RecordValue)var;
@@ -468,7 +488,11 @@ public class DAPDebugExecutor implements DebugExecutor
 		else if (var instanceof ObjectValue)
 		{
 			ObjectValue obj = (ObjectValue)var;
+			String className = obj.type.name.getName();
 			NameValuePairMap all = obj.getMemberValues();
+			
+			Map<String, String> inherited = new HashMap<String, String>();
+			JSONArray members = new JSONArray();
 			
 			for (TCNameToken name: all.keySet())
 			{
@@ -480,12 +504,30 @@ public class DAPDebugExecutor implements DebugExecutor
 					continue;	// skip func/op members
 				}
 				
-				variables.add(new JSONObject(
-						"name", name.toString(),
-						"value", value.toString(),
-						"variablesReference", valueToReference(value))
-					);
+				if (name.getModule().equals(className))
+				{
+					members.add(new JSONObject(
+							"name", name.toString(),
+							"value", value.toString(),
+							"variablesReference", valueToReference(value))
+						);
+				}
+				else
+				{
+					inherited.put(name.getExplicit(true).toString(), value.toString());
+				}
 			}
+			
+			if (!inherited.isEmpty())
+			{
+				// Result has inherited first...
+				variables.add(new JSONObject(
+						"name", "inherited",
+						"value", "",
+						"variablesReference", valueToReference(inherited)));
+			}
+			
+			variables.addAll(members);
 		}
 		else if (var instanceof MapValue)
 		{
@@ -519,7 +561,7 @@ public class DAPDebugExecutor implements DebugExecutor
 		return variables;
 	}
 
-	private Long valueToReference(Value value)
+	private Long valueToReference(Object value)
 	{
 		if (value instanceof ReferenceValue)
 		{
@@ -531,7 +573,8 @@ public class DAPDebugExecutor implements DebugExecutor
 			value instanceof SeqValue ||
 			value instanceof ObjectValue ||
 			value instanceof MapValue ||
-			value instanceof TupleValue)
+			value instanceof TupleValue ||
+			value instanceof Map)
 		{
 			int ref = nextVariablesReference.incrementAndGet();
 			variablesReferences.put(ref, value);

@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -84,16 +87,51 @@ public class TCMultiBindListDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		TCDefinitionSet defset = new TCDefinitionSet();
+		TCDefinitionList deflist = new TCDefinitionList();
 
 		for (TCMultipleBind mb: bindings)
 		{
 			TCType type = mb.typeCheck(base, scope);
-			defset.addAll(mb.getDefinitions(type, scope));
+			deflist.addAll(mb.getDefinitions(type, scope));
+		}
+
+		/**
+		 * Multiple definitions can bind the same name, so we have to do a pass
+		 * to possibly combine them into unions. Note that TCDefinitions are
+		 * compared for equality using their name only!
+		 */
+
+		Map<TCDefinition, TCTypeSet> map = new HashMap<TCDefinition, TCTypeSet>();
+		
+		for (TCDefinition def: deflist)
+		{
+			if (map.containsKey(def))
+			{
+				TCTypeSet set = map.get(def);
+				set.add(def.getType());
+			}
+			else
+			{
+				map.put(def, new TCTypeSet(def.getType()));
+			}
 		}
 
 		defs = new TCDefinitionList();
-		defs.addAll(defset);
+
+		for (TCDefinition def: map.keySet())
+		{
+			TCTypeSet set = map.get(def);
+			
+			if (set.size() == 1)
+			{
+				defs.add(def);	// Avoid unnecessary def/type copying
+			}
+			else
+			{
+				defs.add(new TCLocalDefinition(location, def.name, set.getType(location)));
+			}
+		}
+		
 		defs.typeCheck(base, scope);
 	}
 

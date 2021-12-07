@@ -37,8 +37,7 @@ public class INExpressionFinder extends INLeafExpressionVisitor<INExpression, IN
 {
 	public INExpressionFinder()
 	{
-		super(true);	// So we visit the nodes as well as the leaves
-		visitorSet = new INVisitorSet<INExpression, INExpressionList, Integer>() {};
+		super(true);	// So we visit the nodes as well as the leaves, default visitorSet
 	}
 
 	public INExpressionFinder(INVisitorSet<INExpression, INExpressionList, Integer> visitors)

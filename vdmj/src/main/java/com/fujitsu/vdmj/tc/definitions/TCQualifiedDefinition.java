@@ -54,7 +54,7 @@ public class TCQualifiedDefinition extends TCDefinition
 	@Override
 	public String toString()
 	{
-		return def.toString();
+		return name + " = " + type;
 	}
 	
 	@Override

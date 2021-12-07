@@ -287,7 +287,7 @@ public class TCApplyExpression extends TCExpression
 
 			if (!TypeComparator.compatible(pt, at))
 			{
-				concern(isSimple, 3061, "Inappropriate type for argument " + i);
+				args.get(i-1).concern(isSimple, 3061, "Inappropriate type for argument " + i);
 				detail2(isSimple, "Expect", pt, "Actual", at);
 			}
 			else if (at instanceof TCFunctionType)

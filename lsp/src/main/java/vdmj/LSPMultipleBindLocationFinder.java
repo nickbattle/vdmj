@@ -22,31 +22,40 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.definitions.visitors;
+package vdmj;
 
-import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.definitions.INDefinition;
-import com.fujitsu.vdmj.in.definitions.visitors.INLeafDefinitionVisitor;
-import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
+import java.util.HashSet;
+import java.util.Set;
 
-public class INDefinitionUpdatableFinder extends INLeafDefinitionVisitor<Value, ValueList, Context>
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCLeafMultipleBindVisitor;
+
+public class LSPMultipleBindLocationFinder extends TCLeafMultipleBindVisitor<TCNode, Set<TCNode>, LexLocation>
 {
-	public INDefinitionUpdatableFinder(INVisitorSet<Value, ValueList, Context> visitors)
+	public LSPMultipleBindLocationFinder(TCVisitorSet<TCNode, Set<TCNode>, LexLocation> visitors)
 	{
 		visitorSet = visitors;
 	}
 
 	@Override
-	protected ValueList newCollection()
+	protected Set<TCNode> newCollection()
 	{
-		return new ValueList();
+		return new HashSet<TCNode>();
 	}
 
 	@Override
-	public ValueList caseDefinition(INDefinition node, Context arg)
+	public Set<TCNode> caseMultipleBind(TCMultipleBind bind, LexLocation arg)
 	{
 		return newCollection();
+	}
+	
+	@Override
+	public Set<TCNode> caseMultipleTypeBind(TCMultipleTypeBind node, LexLocation arg)
+	{
+		return node.unresolved.matchUnresolved(arg);
 	}
 }

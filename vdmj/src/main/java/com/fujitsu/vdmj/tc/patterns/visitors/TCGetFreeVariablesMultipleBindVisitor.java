@@ -51,18 +51,18 @@ public class TCGetFreeVariablesMultipleBindVisitor extends TCMultipleBindVisitor
 	@Override
 	public TCNameSet caseMultipleSeqBind(TCMultipleSeqBind node, EnvTriple arg)
 	{
-		return node.sequence.apply(visitorSet.getExpressionVisitor(), arg);
+		return visitorSet.applyExpressionVisitor(node.sequence, arg);
 	}
 	
 	@Override
 	public TCNameSet caseMultipleSetBind(TCMultipleSetBind node, EnvTriple arg)
 	{
-		return node.set.apply(visitorSet.getExpressionVisitor(), arg);
+		return visitorSet.applyExpressionVisitor(node.set, arg);
 	}
 	
 	@Override
 	public TCNameSet caseMultipleTypeBind(TCMultipleTypeBind node, EnvTriple arg)
 	{
-		return node.type.apply(visitorSet.getTypeVisitor(), arg);
+		return visitorSet.applyTypeVisitor(node.type, arg);
 	}
 }

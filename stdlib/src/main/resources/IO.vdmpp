@@ -39,7 +39,7 @@ fwriteval(filename,val,fdir) ==
 -- Read VDM value in ASCII format from file
 public
 freadval[@p]:seq1 of char -> bool * [@p]
-freadval(f) ==
+freadval(filename) ==
   is not yet specified
   post let mk_(b,t) = RESULT in not b => t = nil;
 

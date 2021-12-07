@@ -22,31 +22,40 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.patterns.visitors;
+package vdmj;
 
-import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.patterns.INBind;
-import com.fujitsu.vdmj.in.patterns.visitors.INLeafBindVisitor;
-import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
+import java.util.HashSet;
+import java.util.Set;
 
-public class INBindUpdatableFinder extends INLeafBindVisitor<Value, ValueList, Context>
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.patterns.TCBind;
+import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCLeafBindVisitor;
+
+public class LSPBindLocationFinder extends TCLeafBindVisitor<TCNode, Set<TCNode>, LexLocation>
 {
-	public INBindUpdatableFinder(INVisitorSet<Value, ValueList, Context> visitors)
+	public LSPBindLocationFinder(TCVisitorSet<TCNode, Set<TCNode>, LexLocation> visitors)
 	{
 		visitorSet = visitors;
 	}
 
 	@Override
-	public ValueList caseBind(INBind node, Context arg)
+	protected Set<TCNode> newCollection()
 	{
-		return newCollection();
+		return new HashSet<TCNode>();
 	}
 
 	@Override
-	protected ValueList newCollection()
+	public Set<TCNode> caseBind(TCBind bind, LexLocation arg)
 	{
-		return new ValueList();
+		return newCollection();
+	}
+	
+	@Override
+	public Set<TCNode> caseTypeBind(TCTypeBind node, LexLocation arg)
+	{
+		return node.unresolved.matchUnresolved(arg);
 	}
 }

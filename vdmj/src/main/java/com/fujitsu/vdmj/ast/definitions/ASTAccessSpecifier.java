@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.ast.definitions;
 
 import java.io.Serializable;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.ASTNode;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
 
 /**
@@ -65,6 +67,6 @@ public class ASTAccessSpecifier extends ASTNode implements Serializable
 
 	public String ifSet(String sep)
 	{
-		return (this == DEFAULT) ? "" : (toString() + sep);
+		return (Settings.dialect == Dialect.VDM_SL || this == DEFAULT) ? "" : (toString() + sep);
 	}
 }

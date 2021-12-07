@@ -34,6 +34,7 @@ import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
 import workspace.Log;
 
@@ -47,6 +48,11 @@ public class TranslateHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
+		if (!LSPWorkspaceManager.getInstance().hasClientCapability("experimental.translateProvider"))
+		{
+			return new RPCMessageList(request, RPCErrors.MethodNotFound, "Translate capability is not enabled by client");
+		}
+
 		switch (request.getMethod())
 		{
 			case "slsp/TR/translate":
@@ -65,6 +71,7 @@ public class TranslateHandler extends LSPHandler
 			File file = Utils.uriToFile(params.get("uri"));
 			File saveUri = Utils.uriToFile(params.get("saveUri"));
 			String language = params.get("languageId");
+			JSONObject options = params.get("options");
 			
 			if (saveUri.exists())
 			{
@@ -88,19 +95,19 @@ public class TranslateHandler extends LSPHandler
 			switch (language)
 			{
 				case "latex":
-					return LSPXWorkspaceManager.getInstance().translateLaTeX(request, file, saveUri);
+					return LSPXWorkspaceManager.getInstance().translateLaTeX(request, file, saveUri, options);
 				
 				case "word":
-					return LSPXWorkspaceManager.getInstance().translateWord(request, file, saveUri);
+					return LSPXWorkspaceManager.getInstance().translateWord(request, file, saveUri, options);
 				
 				case "coverage":
-					return LSPXWorkspaceManager.getInstance().translateCoverage(request, file, saveUri);
+					return LSPXWorkspaceManager.getInstance().translateCoverage(request, file, saveUri, options);
 				
 				case "graphviz":
-					return LSPXWorkspaceManager.getInstance().translateGraphviz(request, file, saveUri);
+					return LSPXWorkspaceManager.getInstance().translateGraphviz(request, file, saveUri, options);
 				
 				case "isabelle":
-					return LSPXWorkspaceManager.getInstance().translateIsabelle(request);
+					return LSPXWorkspaceManager.getInstance().translateIsabelle(request, file, saveUri, options);
 				
 				default:
 					return new RPCMessageList(request, RPCErrors.InvalidParams, "Unsupported language");

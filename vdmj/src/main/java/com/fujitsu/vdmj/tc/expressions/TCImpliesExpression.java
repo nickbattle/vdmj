@@ -25,7 +25,13 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCImpliesExpression extends TCBooleanBinaryExpression
 {
@@ -34,6 +40,20 @@ public class TCImpliesExpression extends TCBooleanBinaryExpression
 	public TCImpliesExpression(TCExpression left, LexToken op, TCExpression right)
 	{
 		super(left, op, right);
+	}
+	
+	@Override
+	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
+	{
+		TCDefinitionList qualified = left.getQualifiedDefs(env);
+		Environment qenv = env;
+		
+		if (!qualified.isEmpty())
+		{
+			qenv = new FlatEnvironment(qualified, env);
+		}
+
+		return super.typeCheck(qenv, qualifiers, scope, constraint);
 	}
 
 	@Override

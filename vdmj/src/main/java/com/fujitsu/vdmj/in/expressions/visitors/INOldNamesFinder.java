@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.in.expressions.visitors;
 
-import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -34,8 +33,7 @@ public class INOldNamesFinder extends INLeafExpressionVisitor<TCNameToken, TCNam
 {
 	public INOldNamesFinder()
 	{
-		super(false);
-		visitorSet = new INVisitorSet<TCNameToken, TCNameList, Object>() {};
+		super(false);	// default visitorSet
 	}
 
 	@Override

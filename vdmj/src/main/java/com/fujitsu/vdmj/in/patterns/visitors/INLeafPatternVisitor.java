@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.in.patterns.visitors;
 import java.util.Collection;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.patterns.INConcatenationPattern;
 import com.fujitsu.vdmj.in.patterns.INExpressionPattern;
 import com.fujitsu.vdmj.in.patterns.INMapPattern;
@@ -43,12 +42,25 @@ import com.fujitsu.vdmj.in.patterns.INTuplePattern;
 import com.fujitsu.vdmj.in.patterns.INUnionPattern;
 
 /**
- * This TCPattern visitor visits all of the leaves of a pattern tree and calls
+ * This INPattern visitor visits all of the leaves of a pattern tree and calls
  * the basic processing methods for the simple patterns.
  */
 public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extends INPatternVisitor<C, S>
 {
-	protected INVisitorSet<E, C, S> visitorSet;
+	protected INVisitorSet<E, C, S> visitorSet = new INVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			patternVisitor = INLeafPatternVisitor.this;
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return INLeafPatternVisitor.this.newCollection();
+		}
+	};
 	
  	@Override
 	public C caseConcatenationPattern(INConcatenationPattern node, S arg)
@@ -64,8 +76,7 @@ public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extend
  	@Override
 	public C caseExpressionPattern(INExpressionPattern node, S arg)
 	{
-		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		return (expVisitor != null ? node.exp.apply(expVisitor, arg) : newCollection());
+		return visitorSet.applyExpressionVisitor(node.exp, arg);
 	}
 
  	@Override

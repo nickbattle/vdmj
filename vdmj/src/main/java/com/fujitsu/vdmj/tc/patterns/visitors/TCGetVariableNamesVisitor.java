@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.tc.patterns.visitors;
 
-import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
@@ -34,7 +33,7 @@ public class TCGetVariableNamesVisitor extends TCLeafPatternVisitor<TCNameToken,
 {
 	public TCGetVariableNamesVisitor()
 	{
-		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, Object>() {};
+		// default visitorSet
 	}
 	
 	@Override

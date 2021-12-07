@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.tc.definitions.visitors;
 
 import java.util.Collection;
+
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -51,15 +52,11 @@ import com.fujitsu.vdmj.tc.definitions.TCThreadDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCUntypedDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
-import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
-import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
+import com.fujitsu.vdmj.tc.statements.TCErrorCase;
 import com.fujitsu.vdmj.tc.traces.TCTraceApplyExpression;
 import com.fujitsu.vdmj.tc.traces.TCTraceBracketedExpression;
 import com.fujitsu.vdmj.tc.traces.TCTraceConcurrentExpression;
@@ -71,7 +68,6 @@ import com.fujitsu.vdmj.tc.traces.TCTraceLetDefBinding;
 import com.fujitsu.vdmj.tc.traces.TCTraceRepeatDefinition;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
-import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 /**
  * This TCDefinition visitor visits all of the leaves of a definition tree and calls
@@ -79,24 +75,28 @@ import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
  */
 abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> extends TCDefinitionVisitor<C, S>
 {
-	protected TCVisitorSet<E, C, S> visitorSet;
+	protected TCVisitorSet<E, C, S> visitorSet = new TCVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			definitionVisitor = TCLeafDefinitionVisitor.this;
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return TCLeafDefinitionVisitor.this.newCollection();
+		}
+	};
 	
  	@Override
 	public C caseAssignmentDefinition(TCAssignmentDefinition node, S arg)
 	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.expression.apply(expVisitor, arg));
-		}
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.expression, arg));
 		
 		return all;
 	}
@@ -117,26 +117,16 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseClassInvariantDefinition(TCClassInvariantDefinition node, S arg)
 	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		return (expVisitor != null ? node.expression.apply(expVisitor, arg) : newCollection());
+		return visitorSet.applyExpressionVisitor(node.expression, arg);
 	}
 
  	@Override
 	public C caseEqualsDefinition(TCEqualsDefinition node, S arg)
 	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.test.apply(expVisitor, arg));
-		}
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.test, arg));
 		
 		return all;
 	}
@@ -144,25 +134,9 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseExplicitFunctionDefinition(TCExplicitFunctionDefinition node, S arg)
 	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		TCPatternVisitor<C, S> patternVisitor = visitorSet.getPatternVisitor();
-		C all = newCollection();
-		
-		if (patternVisitor != null)
-		{
-			all.addAll(patternCheck(patternVisitor, node.paramPatternList, arg));
-		}
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.body.apply(expVisitor, arg));
-		}
+		C all = patternCheck(node.paramPatternList, arg);
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
 		
 		if (node.predef != null)
 		{
@@ -185,25 +159,9 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseExplicitOperationDefinition(TCExplicitOperationDefinition node, S arg)
 	{
-		TCStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		TCPatternVisitor<C, S> patternVisitor = visitorSet.getPatternVisitor();
-		C all = newCollection();
-		
-		if (patternVisitor != null)
-		{
-			patternCheck(patternVisitor, node.parameterPatterns, arg);
-		}
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (stmtVisitor != null)
-		{
-			all.addAll(node.body.apply(stmtVisitor, arg));
-		}
+		C all = patternCheck(node.parameterPatterns, arg);
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
 		
 		if (node.predef != null)
 		{
@@ -227,28 +185,15 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseImplicitFunctionDefinition(TCImplicitFunctionDefinition node, S arg)
 	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		TCPatternVisitor<C, S> patternVisitor = visitorSet.getPatternVisitor();
 		C all = newCollection();
 		
-		if (patternVisitor != null)
+		for (TCPatternListTypePair pair: node.parameterPatterns)
 		{
-			for (TCPatternListTypePair pair: node.parameterPatterns)
-			{
-				all.addAll(patternCheck(patternVisitor, pair.patterns, arg));
-			}
+			all.addAll(patternCheck(pair.patterns, arg));
 		}
 
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null && node.body != null)
-		{
-			all.addAll(node.body.apply(expVisitor, arg));
-		}
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
 		
 		if (node.predef != null)
 		{
@@ -271,27 +216,18 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseImplicitOperationDefinition(TCImplicitOperationDefinition node, S arg)
 	{
-		TCStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		TCPatternVisitor<C, S> patternVisitor = visitorSet.getPatternVisitor();
 		C all = newCollection();
 		
-		if (patternVisitor != null)
+		for (TCPatternListTypePair pair: node.parameterPatterns)
 		{
-			for (TCPatternListTypePair pair: node.parameterPatterns)
-			{
-				all.addAll(patternCheck(patternVisitor, pair.patterns, arg));
-			}
+			all.addAll(patternCheck(pair.patterns, arg));
 		}
 		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
 		
-		if (stmtVisitor != null && node.body != null)
+		if (node.body != null)
 		{
-			all.addAll(node.body.apply(stmtVisitor, arg));
+			all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
 		}
 
  		if (node.predef != null)
@@ -302,6 +238,15 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		if (node.postdef != null)
 		{
 			all.addAll(node.postdef.apply(this, arg));
+		}
+		
+		if (node.errors != null)
+		{
+			for (TCErrorCase error: node.errors)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(error.left, arg));
+				all.addAll(visitorSet.applyExpressionVisitor(error.right, arg));
+			}
 		}
 
 		return all;
@@ -335,15 +280,7 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseLocalDefinition(TCLocalDefinition node, S arg)
 	{
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		C all = newCollection();
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		return all;
+		return visitorSet.applyTypeVisitor(node.getType(), arg);
 	}
 
  	@Override
@@ -353,7 +290,7 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  		
 		for (TCMultipleBind bind: node.bindings)
  		{
- 			all.addAll(caseMultipleBind(bind, arg));
+ 			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
  		}
 		
 		return all;
@@ -383,7 +320,6 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	
  	private C caseTraceDefinition(TCTraceDefinition tdef, S arg)
  	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
 		C all = newCollection();
 		
 		if (tdef instanceof TCTraceLetDefBinding)
@@ -401,12 +337,12 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		{
 			TCTraceLetBeStBinding letbe = (TCTraceLetBeStBinding)tdef;
 
-			if (letbe.stexp != null && expVisitor != null)
+			if (letbe.stexp != null)
 			{
-				all.addAll(letbe.stexp.apply(expVisitor, arg));
+				all.addAll(visitorSet.applyExpressionVisitor(letbe.stexp, arg));
 			}
 			
-			all.addAll(caseMultipleBind(letbe.bind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(letbe.bind, arg));
 			all.addAll(caseTraceDefinition(letbe.body, arg));
 		}
 		else if (tdef instanceof TCTraceRepeatDefinition)
@@ -424,13 +360,8 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		
 		if (core instanceof TCTraceApplyExpression)
 		{
-			TCStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
-			
-			if (stmtVisitor != null)
-			{
-				TCTraceApplyExpression apply = (TCTraceApplyExpression)core;
-				all.addAll(apply.callStatement.apply(stmtVisitor, arg));
-			}
+			TCTraceApplyExpression apply = (TCTraceApplyExpression)core;
+			all.addAll(visitorSet.applyStatementVisitor(apply.callStatement, arg));
 		}
 		else if (core instanceof TCTraceBracketedExpression)
 		{
@@ -460,8 +391,7 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	@Override
 	public C casePerSyncDefinition(TCPerSyncDefinition node, S arg)
 	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		return (expVisitor != null ? node.guard.apply(expVisitor, arg) : newCollection());
+		return visitorSet.applyExpressionVisitor(node.guard, arg);
 	}
 
  	@Override
@@ -479,29 +409,21 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseStateDefinition(TCStateDefinition node, S arg)
 	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
 		C all = newCollection();
 		
-		if (typeVisitor != null)
+		for (TCField field: node.fields)
 		{
-			for (TCField field: node.fields)
-			{
-				all.addAll(field.type.apply(typeVisitor, arg));
-			}
+			all.addAll(visitorSet.applyTypeVisitor(field.type, arg));
 		}
 		
-		if (expVisitor != null)
+		if (node.invExpression != null)
 		{
-			if (node.invExpression != null)
-			{
-				all.addAll(node.invExpression.apply(expVisitor, arg));
-			}
+			all.addAll(visitorSet.applyExpressionVisitor(node.invExpression, arg));
+		}
 
-			if (node.initExpression != null)
-			{
-				all.addAll(node.initExpression.apply(expVisitor, arg));
-			}
+		if (node.initExpression != null)
+		{
+			all.addAll(visitorSet.applyExpressionVisitor(node.initExpression, arg));
 		}
 		
 		return all;
@@ -510,38 +432,27 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseThreadDefinition(TCThreadDefinition node, S arg)
 	{
-		TCStatementVisitor<C, S> stmtVisitor = visitorSet.getStatementVisitor();
-		return (stmtVisitor != null ? node.statement.apply(stmtVisitor, arg) : newCollection());
+		return visitorSet.applyStatementVisitor(node.statement, arg);
 	}
 
  	@Override
 	public C caseTypeDefinition(TCTypeDefinition node, S arg)
 	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		C all = newCollection();
+		C all = visitorSet.applyTypeVisitor(node.type, arg);
 		
-		if (typeVisitor != null)
+		if (node.invExpression != null)
 		{
-			all.addAll(node.type.apply(typeVisitor, arg));
+			all.addAll(visitorSet.applyExpressionVisitor(node.invExpression, arg));
 		}
-		
-		if (expVisitor != null)
+
+		if (node.eqExpression != null)
 		{
-			if (node.invExpression != null)
-			{
-				all.addAll(node.invExpression.apply(expVisitor, arg));
-			}
+			all.addAll(visitorSet.applyExpressionVisitor(node.eqExpression, arg));
+		}
 
-			if (node.eqExpression != null)
-			{
-				all.addAll(node.eqExpression.apply(expVisitor, arg));
-			}
-
-			if (node.ordExpression != null)
-			{
-				all.addAll(node.ordExpression.apply(expVisitor, arg));
-			}
+		if (node.ordExpression != null)
+		{
+			all.addAll(visitorSet.applyExpressionVisitor(node.ordExpression, arg));
 		}
 		
 		return all;
@@ -556,75 +467,34 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseValueDefinition(TCValueDefinition node, S arg)
 	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		TCPatternVisitor<C, S> patternVisitor = visitorSet.getPatternVisitor();
 		C all = newCollection();
 		
-		if (patternVisitor != null)
-		{
-			all.addAll(node.pattern.apply(patternVisitor, arg));
-		}
-		
-		if (typeVisitor != null)
-		{
-			all.addAll(node.getType().apply(typeVisitor, arg));
-		}
-		
-		if (expVisitor != null)
-		{
-			all.addAll(node.exp.apply(expVisitor, arg));
-		}
+		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
+		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		
 		return all;
 	}
 
- 	/**
- 	 * This multiple bind case covers the common expression visitor
- 	 * cases, but they can be overridden, perhaps to use the (m)bind visitorSet
- 	 * entry if required. 
- 	 */
- 	protected C caseMultipleBind(TCMultipleBind bind, S arg)
-	{
-		TCExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		C all = newCollection();
-		
-		if (expVisitor != null)
-		{
-			if (bind instanceof TCMultipleSetBind)
-			{
-				TCMultipleSetBind sbind = (TCMultipleSetBind)bind;
-				all.addAll(sbind.set.apply(expVisitor, arg));
-			}
-			else if (bind instanceof TCMultipleSeqBind)
-			{
-				TCMultipleSeqBind sbind = (TCMultipleSeqBind)bind;
-				all.addAll(sbind.sequence.apply(expVisitor, arg));
-			}
-		}
-		
-		return all;
-	}
-
-	protected C patternCheck(TCPatternVisitor<C, S> patternVisitor, TCPatternListList paramPatternList, S arg)
+	protected C patternCheck(TCPatternListList paramPatternList, S arg)
 	{
 		C all = newCollection();
 
 		for (TCPatternList list: paramPatternList)
 		{
-			all.addAll(patternCheck(patternVisitor, list, arg));
+			all.addAll(patternCheck(list, arg));
 		}
 		
 		return all;
 	}
 
-	protected C patternCheck(TCPatternVisitor<C, S> patternVisitor, TCPatternList list, S arg)
+	protected C patternCheck(TCPatternList list, S arg)
 	{
 		C all = newCollection();
 
 		for (TCPattern p: list)
 		{
-			all.addAll(p.apply(patternVisitor, arg));
+			all.addAll(visitorSet.applyPatternVisitor(p, arg));
 		}
 		
 		return all;

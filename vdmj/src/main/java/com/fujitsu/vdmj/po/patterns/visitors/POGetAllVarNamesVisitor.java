@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.po.patterns.visitors;
 
-import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -34,7 +33,7 @@ public class POGetAllVarNamesVisitor extends POLeafPatternVisitor<TCNameToken, T
 {
 	public POGetAllVarNamesVisitor()
 	{
-		visitorSet = new POVisitorSet<TCNameToken, TCNameList, Object>() {};
+		// default visitorSet
 	}
 	
 	@Override

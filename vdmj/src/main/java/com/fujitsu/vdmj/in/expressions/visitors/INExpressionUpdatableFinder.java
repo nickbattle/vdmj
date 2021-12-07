@@ -24,17 +24,9 @@
 
 package com.fujitsu.vdmj.in.expressions.visitors;
 
-import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionUpdatableFinder;
-import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INFieldExpression;
 import com.fujitsu.vdmj.in.expressions.INVariableExpression;
-import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
-import com.fujitsu.vdmj.in.patterns.visitors.INBindUpdatableFinder;
-import com.fujitsu.vdmj.in.patterns.visitors.INBindVisitor;
-import com.fujitsu.vdmj.in.patterns.visitors.INMultipleBindUpdatableFinder;
-import com.fujitsu.vdmj.in.patterns.visitors.INMultipleBindVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ExceptionHandler;
@@ -48,47 +40,9 @@ import com.fujitsu.vdmj.values.ValueList;
  */
 public class INExpressionUpdatableFinder extends INLeafExpressionVisitor<Value, ValueList, Context>
 {
-	private class VisitorSet extends INVisitorSet<Value, ValueList, Context>
-	{
-		private final INExpressionVisitor<ValueList, Context> expVisitor;
-		private final INDefinitionVisitor<ValueList, Context> defVisitor = new INDefinitionUpdatableFinder(this);
-		private final INBindVisitor<ValueList, Context> bindVisitor = new INBindUpdatableFinder(this);
-		private final INMultipleBindVisitor<ValueList, Context> mbindVisitor = new INMultipleBindUpdatableFinder(this);
-
-		public VisitorSet(INExpressionUpdatableFinder parent)
-		{
-			expVisitor = parent;
-		}
-		
-		@Override
-		public INDefinitionVisitor<ValueList, Context> getDefinitionVisitor()
-		{
-			return defVisitor;
-		}
-
-		@Override
-		public INExpressionVisitor<ValueList, Context> getExpressionVisitor()
-		{
-			return expVisitor;
-		}
-		
-		@Override
-		public INBindVisitor<ValueList, Context> getBindVisitor()
-		{
-			return bindVisitor;
-		}
-		
-		@Override
-		public INMultipleBindVisitor<ValueList, Context> getMultiBindVisitor()
-		{
-			return mbindVisitor;
-		}
-	}
-	
 	public INExpressionUpdatableFinder()
 	{
-		super(false);
-		visitorSet = new VisitorSet(this);
+		super(false);	// default visitorSet
 	}
 
 	@Override

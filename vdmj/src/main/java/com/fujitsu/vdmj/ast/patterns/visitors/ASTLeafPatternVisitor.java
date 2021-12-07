@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.ast.patterns.visitors;
 import java.util.Collection;
 
 import com.fujitsu.vdmj.ast.ASTVisitorSet;
-import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
 import com.fujitsu.vdmj.ast.patterns.ASTConcatenationPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTExpressionPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTMapPattern;
@@ -43,12 +42,25 @@ import com.fujitsu.vdmj.ast.patterns.ASTTuplePattern;
 import com.fujitsu.vdmj.ast.patterns.ASTUnionPattern;
 
 /**
- * This TCPattern visitor visits all of the leaves of a pattern tree and calls
+ * This ASTPattern visitor visits all of the leaves of a pattern tree and calls
  * the basic processing methods for the simple patterns.
  */
 public abstract class ASTLeafPatternVisitor<E, C extends Collection<E>, S> extends ASTPatternVisitor<C, S>
 {
-	protected ASTVisitorSet<E, C, S> visitorSet;
+	protected ASTVisitorSet<E, C, S> visitorSet = new ASTVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			patternVisitor = ASTLeafPatternVisitor.this;
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return ASTLeafPatternVisitor.this.newCollection();
+		}
+	};
 
  	@Override
 	public C caseConcatenationPattern(ASTConcatenationPattern node, S arg)
@@ -64,8 +76,7 @@ public abstract class ASTLeafPatternVisitor<E, C extends Collection<E>, S> exten
  	@Override
 	public C caseExpressionPattern(ASTExpressionPattern node, S arg)
 	{
-		ASTExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
-		return (expVisitor != null ? node.exp.apply(expVisitor, arg) : newCollection());
+		return visitorSet.applyExpressionVisitor(node.exp, arg);
 	}
 
  	@Override

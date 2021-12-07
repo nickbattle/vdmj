@@ -32,15 +32,35 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
+import workspace.LSPWorkspaceManager;
 
 /**
  * The base class for all code lenses.
  */
 abstract public class CodeLens
 {
+	/**
+	 * Lenses can be generated from the AST while entering a specifications. They
+	 * can also be refreshed later from the TC after the spec is checked. Both
+	 * of these are required. 
+	 */
 	abstract public JSONArray codeLenses(ASTDefinition definition, File file);
 	abstract public JSONArray codeLenses(TCDefinition definition, File file);
 	
+	/**
+	 * Lenses are often dependent on particular LSP Clients that implement the
+	 * commands returned. This method extracts the client name from the initialization
+	 * echange with the Client.
+	 */
+	protected String getClientName()
+	{
+		return LSPWorkspaceManager.getInstance().getClientInfo("name");
+	}
+	
+	/**
+	 * These helper methods generate the lens response body. The JSONArray returned
+	 * by codeLenses (above) is an array of these structures, one per lens. 
+	 */
 	protected JSONObject makeLens(LexLocation location, String title, String command)
 	{
 		return new JSONObject(

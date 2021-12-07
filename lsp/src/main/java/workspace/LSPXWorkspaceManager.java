@@ -54,78 +54,107 @@ import workspace.plugins.TCPlugin;
 public class LSPXWorkspaceManager
 {
 	private static LSPXWorkspaceManager INSTANCE = null;
-	protected final PluginRegistry registry;
+	private final PluginRegistry registry;
+	private final LSPWorkspaceManager wsManager;
 	
 	protected LSPXWorkspaceManager()
 	{
 		this.registry = PluginRegistry.getInstance();
+		this.wsManager = LSPWorkspaceManager.getInstance();
 	}
 
 	public static synchronized LSPXWorkspaceManager getInstance()
 	{
 		if (INSTANCE == null)
 		{
-			INSTANCE = new LSPXWorkspaceManager();
-			
-			PluginRegistry registry = PluginRegistry.getInstance();
-			registry.registerPlugin(POPlugin.factory(Settings.dialect));
-			registry.registerPlugin(CTPlugin.factory(Settings.dialect));
-			
-			/**
-			 * Load external plugins, given a list of names.
-			 */
-			if (System.getProperty("lspx.plugins") != null)
-			{
-				String[] plugins = System.getProperty("lspx.plugins").split("\\s*,\\s*");
-				
-				for (String plugin: plugins)
-				{
-					try
-					{
-						Class<?> clazz = Class.forName(plugin);
-
-						try
-						{
-							Method factory = clazz.getMethod("factory", Dialect.class);
-							AnalysisPlugin instance = (AnalysisPlugin)factory.invoke(null, Settings.dialect);
-							registry.registerPlugin(instance);
-							Log.printf("Registered LSPX plugin %s", plugin);
-						}
-						catch (NoSuchMethodException e)		// Try default constructor
-						{
-							try
-							{
-								Constructor<?> ctor = clazz.getConstructor();
-								AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
-								registry.registerPlugin(instance);
-								Log.printf("Registered LSPX plugin %s", plugin);
-							}
-							catch (Throwable th)
-							{
-								Log.error(th);
-								Log.error("Cannot register LSPX plugin %s", plugin);
-							}
-						}
-						catch (Exception e)
-						{
-							Log.error(e);
-							Log.error("Plugin %s factory failed", plugin);
-						}
-					}
-					catch (ClassNotFoundException e)
-					{
-						Log.error("Plugin class %s not found", plugin);
-					}
-				}
-			}
+			INSTANCE = new LSPXWorkspaceManager();		
+			Log.printf("Created LSPXWorkspaceManager");
 		}
 
 		return INSTANCE;
 	}
 
+	/**
+	 * This is called after the client capabilities have been received. If the option
+	 * is enabled in the capabilities, the relevant plugin is registered.
+	 * 
+	 * PO and CT are built-in, but still enabled by the capabilities.
+	 * 
+	 * Further plugins may be loaded via the property "lspx.plugins".
+	 */
+	public void enablePlugins()
+	{
+		if (wsManager.hasClientCapability("experimental.proofObligationGeneration"))
+		{
+			registry.registerPlugin(POPlugin.factory(Settings.dialect));
+		}
+		
+		if (wsManager.hasClientCapability("experimental.combinatorialTesting"))
+		{
+			registry.registerPlugin(CTPlugin.factory(Settings.dialect));
+		}
+		
+		enableExternalPlugins();
+	}
+
+	/**
+	 * Load external plugins, given a list of class names in the "lspx.plugins" property.
+	 */
+	private void enableExternalPlugins()
+	{
+		if (System.getProperty("lspx.plugins") != null)
+		{
+			String[] plugins = System.getProperty("lspx.plugins").split("\\s*,\\s*");
+			
+			for (String plugin: plugins)
+			{
+				try
+				{
+					Class<?> clazz = Class.forName(plugin);
+
+					try
+					{
+						Method factory = clazz.getMethod("factory", Dialect.class);
+						AnalysisPlugin instance = (AnalysisPlugin)factory.invoke(null, Settings.dialect);
+						registry.registerPlugin(instance);
+						Log.printf("Registered LSPX plugin %s", plugin);
+					}
+					catch (NoSuchMethodException e)		// Try default constructor
+					{
+						try
+						{
+							Constructor<?> ctor = clazz.getConstructor();
+							AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
+							registry.registerPlugin(instance);
+							Log.printf("Registered LSPX plugin %s", plugin);
+						}
+						catch (Throwable th)
+						{
+							Log.error(th);
+							Log.error("Cannot register LSPX plugin %s", plugin);
+						}
+					}
+					catch (Exception e)
+					{
+						Log.error(e);
+						Log.error("Plugin %s factory method failed", plugin);
+					}
+				}
+				catch (ClassNotFoundException e)
+				{
+					Log.error("Plugin class %s not found", plugin);
+				}
+			}
+		}
+		else
+		{
+			Log.printf("No external plugins configured in lspx.plugins");
+		}
+	}
+
 	public RPCMessageList unhandledMethod(RPCRequest request)
 	{
-		AnalysisPlugin plugin = PluginRegistry.getInstance().getPluginForMethod(request.getMethod());
+		AnalysisPlugin plugin = registry.getPluginForMethod(request.getMethod());
 		
 		if (plugin == null)
 		{
@@ -308,8 +337,7 @@ public class LSPXWorkspaceManager
 	 */
 	private File getSubFolder(File saveUri, File file)
 	{
-		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
-		File root = manager.getRoot();
+		File root = wsManager.getRoot();
 		
 		if (file.getParent().startsWith(root.getPath()))
 		{
@@ -322,11 +350,10 @@ public class LSPXWorkspaceManager
 		}
 	}
 
-	public RPCMessageList translateLaTeX(RPCRequest request, File file, File saveUri)
+	public RPCMessageList translateLaTeX(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		File responseFile = null;
-		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
-		Map<File, StringBuilder> filemap = manager.getProjectFiles();
+		Map<File, StringBuilder> filemap = wsManager.getProjectFiles();
 
 		try
 		{
@@ -334,7 +361,7 @@ public class LSPXWorkspaceManager
 			{
 				for (File pfile: filemap.keySet())
 				{
-					fileToLaTeX(saveUri, pfile);
+					fileToLaTeX(saveUri, pfile, options);
 				}
 
 				responseFile = saveUri;		// ??
@@ -347,7 +374,7 @@ public class LSPXWorkspaceManager
 				{
 					if (pfile.getPath().startsWith(subfolder))
 					{
-						fileToLaTeX(saveUri, pfile);
+						fileToLaTeX(saveUri, pfile, options);
 					}
 				}
 
@@ -355,7 +382,7 @@ public class LSPXWorkspaceManager
 			}
 			else if (filemap.containsKey(file))
 			{
-				responseFile = fileToLaTeX(saveUri, file);
+				responseFile = fileToLaTeX(saveUri, file, options);
 			}
 			else
 			{
@@ -370,8 +397,30 @@ public class LSPXWorkspaceManager
 		}
 	}
 	
-	private File fileToLaTeX(File saveUri, File file) throws IOException
+	private File fileToLaTeX(File saveUri, File file, JSONObject options) throws IOException
 	{
+		boolean modelOnly = false;
+		boolean markCoverage = false;
+		boolean insertCoverageTables = false;
+
+		if (options != null)
+		{
+			if (options.containsKey("modelOnly"))
+			{
+				modelOnly = options.get("modelOnly");
+			}
+			
+			if (options.containsKey("markCoverage"))
+			{
+				markCoverage = options.get("markCoverage");
+			}
+			
+			if (options.containsKey("insertCoverageTables"))
+			{
+				insertCoverageTables = options.get("insertCoverageTables");
+			}
+		}
+
 		SourceFile source = new SourceFile(file);
 		String texname = file.getName().replaceAll("\\.vdm..$", ".tex");
 		File subfolder = getSubFolder(saveUri, file);
@@ -379,17 +428,16 @@ public class LSPXWorkspaceManager
 		File outfile = new File(subfolder, texname);
 		
 		PrintWriter out = new PrintWriter(outfile);
-		source.printLatexCoverage(out, true, true, false);
+		source.printLatexCoverage(out, true, modelOnly, markCoverage, insertCoverageTables);
 		out.close();
 
 		return outfile;
 	}
 
-	public RPCMessageList translateWord(RPCRequest request, File file, File saveUri)
+	public RPCMessageList translateWord(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		File responseFile = null;
-		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
-		Map<File, StringBuilder> filemap = manager.getProjectFiles();
+		Map<File, StringBuilder> filemap = wsManager.getProjectFiles();
 
 		try
 		{
@@ -448,11 +496,10 @@ public class LSPXWorkspaceManager
 		return  outfile;
 	}
 	
-	public RPCMessageList translateCoverage(RPCRequest request, File file, File saveUri)
+	public RPCMessageList translateCoverage(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		File responseFile = null;
-		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
-		Map<File, StringBuilder> filemap = manager.getProjectFiles();
+		Map<File, StringBuilder> filemap = wsManager.getProjectFiles();
 
 		try
 		{
@@ -511,7 +558,7 @@ public class LSPXWorkspaceManager
 		return outfile;
 	}
 	
-	public RPCMessageList translateGraphviz(RPCRequest request, File file, File saveUri)
+	public RPCMessageList translateGraphviz(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		try
 		{
@@ -526,7 +573,7 @@ public class LSPXWorkspaceManager
 		}
 	}
 	
-	public RPCMessageList translateIsabelle(RPCRequest request)
+	public RPCMessageList translateIsabelle(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		AnalysisPlugin isa = registry.getPlugin("ISA");
 		

@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.in.patterns.visitors;
 
-import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.patterns.INIdentifierPattern;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -34,7 +33,7 @@ public class INGetAllVarNamesVisitor extends INLeafPatternVisitor<TCNameToken, T
 {
 	public INGetAllVarNamesVisitor()
 	{
-		visitorSet = new INVisitorSet<TCNameToken, TCNameList, Object>() {};
+		// default visitorSet
 	}
 	
 	@Override

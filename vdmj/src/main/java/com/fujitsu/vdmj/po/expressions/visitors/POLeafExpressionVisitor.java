@@ -75,12 +75,7 @@ import com.fujitsu.vdmj.po.expressions.POSetRangeExpression;
 import com.fujitsu.vdmj.po.expressions.POSubseqExpression;
 import com.fujitsu.vdmj.po.expressions.POTupleExpression;
 import com.fujitsu.vdmj.po.expressions.POUnaryExpression;
-import com.fujitsu.vdmj.po.patterns.POBind;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
-import com.fujitsu.vdmj.po.patterns.POMultipleSeqBind;
-import com.fujitsu.vdmj.po.patterns.POMultipleSetBind;
-import com.fujitsu.vdmj.po.patterns.POSeqBind;
-import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 
 /**
@@ -89,13 +84,25 @@ import com.fujitsu.vdmj.po.patterns.POTypeBind;
  */
 abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> extends POExpressionVisitor<C, S>
 {
-	protected POVisitorSet<E, C, S> visitorSet;
+	protected POVisitorSet<E, C, S> visitorSet = new POVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			expressionVisitor = POLeafExpressionVisitor.this;
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return POLeafExpressionVisitor.this.newCollection();
+		}
+	};
 
  	@Override
 	public C caseApplyExpression(POApplyExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.root.apply(this, arg));
+		C all = node.root.apply(this, arg);
 		
 		for (POExpression a: node.args)
 		{
@@ -123,8 +130,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseCasesExpression(POCasesExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.exp.apply(this, arg));
+		C all = node.exp.apply(this, arg);
 		
 		for (POCaseAlternative a: node.cases)
 		{
@@ -175,8 +181,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseExists1Expression(POExists1Expression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(caseBind(node.bind, arg));
+		C all = visitorSet.applyBindVisitor(node.bind, arg);
 		
 		if (node.predicate != null)
 		{
@@ -193,7 +198,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (POMultipleBind bind: node.bindList)
 		{
-			all.addAll(caseMultipleBind(bind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
 		}
 		
 		if (node.predicate != null)
@@ -223,7 +228,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (POMultipleBind bind: node.bindList)
 		{
-			all.addAll(caseMultipleBind(bind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
 		}
 		
 		if (node.predicate != null)
@@ -259,8 +264,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseIotaExpression(POIotaExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(caseBind(node.bind, arg));
+		C all = visitorSet.applyBindVisitor(node.bind, arg);
 		
 		if (node.predicate != null)
 		{
@@ -295,7 +299,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (POTypeBind bind: node.bindList)
 		{
-			all.addAll(caseBind(bind, arg));
+			all.addAll(visitorSet.applyBindVisitor(bind, arg));
 		}
 		
 		all.addAll(node.expression.apply(this, arg));
@@ -305,8 +309,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseLetBeStExpression(POLetBeStExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(caseMultipleBind(node.bind, arg));
+		C all = visitorSet.applyMultiBindVisitor(node.bind, arg);
 		
 		if (node.suchThat != null)
 		{
@@ -344,7 +347,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 		
 		for (POMultipleBind mbind: node.bindings)
 		{
-			all.addAll(caseMultipleBind(mbind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(mbind, arg));
 		}
 		
 		if (node.predicate != null)
@@ -430,8 +433,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C casePreExpression(POPreExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.function.apply(this, arg));
+		C all = node.function.apply(this, arg);
 		
 		for (POExpression exp: node.args)
 		{
@@ -470,7 +472,7 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = newCollection();
 		all.addAll(node.first.apply(this, arg));
-		all.addAll(caseBind(node.bind, arg));
+		all.addAll(visitorSet.applyBindVisitor(node.bind, arg));
 		
 		if (node.predicate != null)
 		{
@@ -496,12 +498,11 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseSetCompExpression(POSetCompExpression node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.first.apply(this, arg));
+		C all = node.first.apply(this, arg);
 		
 		for (POMultipleBind mbind: node.bindings)
 		{
-			all.addAll(caseMultipleBind(mbind, arg));
+			all.addAll(visitorSet.applyMultiBindVisitor(mbind, arg));
 		}
 		
 		if (node.predicate != null)
@@ -561,42 +562,6 @@ abstract public class POLeafExpressionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = newCollection();
 		all.addAll(node.exp.apply(this, arg));
-		return all;
-	}
-
-	private C caseBind(POBind bind, S arg)
-	{
-		C all = newCollection();
-		
-		if (bind instanceof POSetBind)
-		{
-			POSetBind sbind = (POSetBind)bind;
-			all.addAll(sbind.set.apply(this, arg));
-		}
-		else if (bind instanceof POSeqBind)
-		{
-			POSeqBind sbind = (POSeqBind)bind;
-			all.addAll(sbind.sequence.apply(this, arg));
-		}
-		
-		return all;
-	}
-
- 	private Collection<? extends E> caseMultipleBind(POMultipleBind bind, S arg)
-	{
-		C all = newCollection();
-		
-		if (bind instanceof POMultipleSetBind)
-		{
-			POMultipleSetBind sbind = (POMultipleSetBind)bind;
-			all.addAll(sbind.set.apply(this, arg));
-		}
-		else if (bind instanceof POMultipleSeqBind)
-		{
-			POMultipleSeqBind sbind = (POMultipleSeqBind)bind;
-			all.addAll(sbind.sequence.apply(this, arg));
-		}
-		
 		return all;
 	}
 

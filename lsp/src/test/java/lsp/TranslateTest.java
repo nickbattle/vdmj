@@ -45,7 +45,7 @@ import rpc.RPCRequest;
 public class TranslateTest extends LSPTest
 {
 	private JSONObject capabilities = new JSONObject(
-			"experimental", new JSONObject("translate", true));
+			"experimental", new JSONObject("translateProvider", true));
 	
 	@Before
 	public void setUp()
@@ -143,7 +143,8 @@ public class TranslateTest extends LSPTest
 				new JSONObject(
 					"uri", null,
 					"languageId", "latex",
-					"saveUri",	empty.toURI().toString()));
+					"saveUri",	empty.toURI().toString(),
+					"options", new JSONObject("modelOnly", true)));
 
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());

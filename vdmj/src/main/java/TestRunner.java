@@ -69,7 +69,6 @@ public class TestRunner
 						+ "()", mainContext));
 			} catch (Exception e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

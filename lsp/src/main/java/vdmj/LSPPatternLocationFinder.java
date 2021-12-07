@@ -61,7 +61,7 @@ public class LSPPatternLocationFinder extends TCLeafPatternVisitor<TCNode, Set<T
 	{
 		Set<TCNode> all = super.caseRecordPattern(node, arg);
 
-		if (arg.within(node.typename.getLocation()))
+		if (arg.touches(node.typename.getLocation()))
 		{
 			all.add(node.typename);
 		}

@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.po.patterns.visitors;
 
 import java.util.Iterator;
 
-import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POLocalDefinition;
@@ -53,7 +52,7 @@ public class POGetAllDefinitionsVisitor extends POLeafPatternVisitor<PODefinitio
 {
 	public POGetAllDefinitionsVisitor()
 	{
-		visitorSet = new POVisitorSet<PODefinition, PODefinitionList, TCType>() {};
+		// default visitorSet
 	}
 	
 	@Override

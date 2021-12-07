@@ -55,7 +55,7 @@ public class POIgnorePattern extends POPattern
 		
 		if (anyName == null)
 		{
-			anyName = new TCNameToken(location, "", "any" + var++);
+			anyName = new TCNameToken(location, "", "$any" + var++);
 		}
 		
 		return new POVariableExpression(anyName, null);
@@ -83,5 +83,10 @@ public class POIgnorePattern extends POPattern
 	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseIgnorePattern(this, arg);
+	}
+
+	public static void init()
+	{
+		var = 1;	// reset on each getProofObligations run.
 	}
 }

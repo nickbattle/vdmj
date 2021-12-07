@@ -36,6 +36,7 @@ import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
 import workspace.Log;
 
@@ -49,6 +50,11 @@ public class CTHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
+		if (!LSPWorkspaceManager.getInstance().hasClientCapability("experimental.combinatorialTesting"))
+		{
+			return new RPCMessageList(request, RPCErrors.MethodNotFound, "CT plugin is not enabled by client");
+		}
+
 		switch (request.getMethod())
 		{
 			case "slsp/CT/traces":

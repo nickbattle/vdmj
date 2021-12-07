@@ -27,11 +27,9 @@ package com.fujitsu.vdmj.in.patterns.visitors;
 import java.util.Collection;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.patterns.INSeqBind;
 import com.fujitsu.vdmj.in.patterns.INSetBind;
 import com.fujitsu.vdmj.in.patterns.INTypeBind;
-import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 /**
  * This TCBind visitor visits all of the leaves of a bind tree and calls
@@ -39,65 +37,45 @@ import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
  */
 public abstract class INLeafBindVisitor<E, C extends Collection<E>, S> extends INBindVisitor<C, S>
 {
-	protected INVisitorSet<E, C, S> visitorSet;
+	protected INVisitorSet<E, C, S> visitorSet = new INVisitorSet<E, C, S>()
+	{
+		@Override
+		protected void setVisitors()
+		{
+			bindVisitor = INLeafBindVisitor.this;
+		}
+
+		@Override
+		protected C newCollection()
+		{
+			return INLeafBindVisitor.this.newCollection();
+		}
+	};
 
  	@Override
 	public C caseSeqBind(INSeqBind node, S arg)
 	{
- 		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
- 		INPatternVisitor<C, S> patVisitor = visitorSet.getPatternVisitor();
  		C all = newCollection();
- 		
- 		if (expVisitor != null)
- 		{
- 			all.addAll(node.sequence.apply(expVisitor, arg));
- 		}
- 		
- 		if (patVisitor != null)
- 		{
- 			all.addAll(node.pattern.apply(patVisitor, arg));
- 		}
- 		
+		all.addAll(visitorSet.applyExpressionVisitor(node.sequence, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
  		return all;
 	}
 
  	@Override
 	public C caseSetBind(INSetBind node, S arg)
 	{
- 		INExpressionVisitor<C, S> expVisitor = visitorSet.getExpressionVisitor();
- 		INPatternVisitor<C, S> patVisitor = visitorSet.getPatternVisitor();
  		C all = newCollection();
- 		
- 		if (expVisitor != null)
- 		{
- 			all.addAll(node.set.apply(expVisitor, arg));
- 		}
- 		
- 		if (patVisitor != null)
- 		{
- 			all.addAll(node.pattern.apply(patVisitor, arg));
- 		}
- 		
+		all.addAll(visitorSet.applyExpressionVisitor(node.set, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
  		return all;
 	}
 
  	@Override
 	public C caseTypeBind(INTypeBind node, S arg)
 	{
- 		TCTypeVisitor<C, S> typeVisitor = visitorSet.getTypeVisitor();
-		INPatternVisitor<C, S> patVisitor = visitorSet.getPatternVisitor();
 		C all = newCollection();
- 		
- 		if (typeVisitor != null)
- 		{
- 			all.addAll(node.type.apply(typeVisitor, arg));
- 		}
- 		
- 		if (patVisitor != null)
- 		{
- 			all.addAll(node.pattern.apply(patVisitor, arg));
- 		}
-
+		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
  		return all;
 	}
 

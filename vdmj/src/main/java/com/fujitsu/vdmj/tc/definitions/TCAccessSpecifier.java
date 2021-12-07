@@ -26,6 +26,8 @@ package com.fujitsu.vdmj.tc.definitions;
 
 import java.io.Serializable;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.TCNode;
 
@@ -85,6 +87,6 @@ public class TCAccessSpecifier extends TCNode implements Serializable
 
 	public String ifSet(String sep)
 	{
-		return (this == DEFAULT) ? "" : (toString() + sep);
+		return (Settings.dialect == Dialect.VDM_SL || this == DEFAULT) ? "" : (toString() + sep);
 	}
 }

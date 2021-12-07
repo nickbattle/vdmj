@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.messages.RTLogger;
@@ -138,12 +139,56 @@ public class DAPWorkspaceManager
 			this.defaultName = defaultName;
 			this.remoteControl = remoteControl;
 			
+			processSettings(request);
+			
 			return new DAPMessageList(request);
 		}
 		catch (Exception e)
 		{
 			Log.error(e);
 			return new DAPMessageList(request, e);
+		}
+	}
+
+	/**
+	 * Pick out request arguments that are VDMJ Settings.
+	 */
+	private void processSettings(DAPRequest request)
+	{
+		JSONObject args = request.get("arguments");
+		
+		for (String key: args.keySet())
+		{
+			switch (key)
+			{
+				case "dynamicTypeChecks":
+					Settings.dynamictypechecks = args.get(key);
+					break;
+					
+				case "invariantsChecks":
+					Settings.invchecks = args.get(key);
+					break;
+					
+				case "preConditionChecks":
+					Settings.prechecks = args.get(key);
+					break;
+					
+				case "postConditionChecks":
+					Settings.postchecks = args.get(key);
+					break;
+					
+				case "measureChecks":
+					Settings.measureChecks = args.get(key);
+					break;
+				
+				case "exceptions":
+					Settings.exceptions = args.get(key);
+					break;
+				
+				default:
+					// Ignore other options
+					break;
+			}
 		}
 	}
 
@@ -611,5 +656,56 @@ public class DAPWorkspaceManager
 	public boolean getNoDebug()
 	{
 		return noDebug;
+	}
+	
+	public void stopDebugReader()
+	{
+		/**
+		 * The debugReader field can be cleared at any time, when the debugger ends.
+		 * So we take the initial value here.
+		 */
+		DAPDebugReader reader = debugReader;
+		
+		if (reader != null)
+		{
+			int retries = 5;
+			
+			while (retries-- > 0 && !reader.isListening())
+			{
+				pause(200);		// Wait for reader to stop & listen
+			}
+			
+			if (retries > 0)
+			{
+				reader.interrupt();	// Cause exchange to trip & kill threads
+				retries = 5;
+				
+				while (retries-- > 0 && getDebugReader() != null)
+				{
+					pause(200);
+				}
+				
+				if (retries == 0)
+				{
+					Log.error("DAPDebugReader interrupt did not work?");
+				}
+			}
+			else
+			{
+				Log.error("DAPDebugReader is not listening?");
+			}
+		}
+	}
+	
+	private void pause(long ms)
+	{
+		try
+		{
+			Thread.sleep(ms);
+		}
+		catch (InterruptedException e)
+		{
+			// ignore
+		}
 	}
 }

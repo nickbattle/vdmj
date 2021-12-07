@@ -177,14 +177,15 @@ public class SourceFile
 
 	public void printLatexCoverage(PrintWriter out, boolean headers)
 	{
-		printLatexCoverage(out, headers, false, true);
+		printLatexCoverage(out, headers, false, true, true);
 	}
 
-	public void printLatexCoverage(PrintWriter out, boolean headers, boolean modelOnly, boolean coverage)
+	public void printLatexCoverage(PrintWriter out, boolean headers,
+			boolean modelOnly, boolean markCoverage, boolean insertCoverageTables)
 	{
 		Map<Integer, List<LexLocation>> hits = null;
 		
-		if (coverage)
+		if (markCoverage || insertCoverageTables)
 		{
 			hits = LexLocation.getMissLocations(filename);
 		}
@@ -231,7 +232,7 @@ public class SourceFile
 
 			String spaced = detab(line, Properties.parser_tabstop);
 			
-			if (coverage)
+			if (markCoverage)
 			{
 				List<LexLocation> list = hits.get(lnum);
 				out.println(markup(spaced, list));
@@ -252,7 +253,7 @@ public class SourceFile
 			out.println("\\end{vdm_al}");
 		}
 
-		if (coverage)
+		if (insertCoverageTables)
 		{
 			out.println("\\bigskip");
 			out.println("\\begin{longtable}{|l|r|r|}");

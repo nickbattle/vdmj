@@ -96,10 +96,16 @@ public class LSPWorkspaceManager
 		{
 			INSTANCE = new LSPWorkspaceManager();
 			
+			/**
+			 * Register the built-in plugins. Others are registered in LSPXWorkspaceManager,
+			 * when the client capabilities have been received.
+			 */
 			PluginRegistry registry = PluginRegistry.getInstance();
 			registry.registerPlugin(ASTPlugin.factory(Settings.dialect));
 			registry.registerPlugin(TCPlugin.factory(Settings.dialect));
 			registry.registerPlugin(INPlugin.factory(Settings.dialect));
+			
+			Log.printf("Created LSPWorkspaceManager");
 		}
 
 		return INSTANCE;
@@ -135,6 +141,8 @@ public class LSPWorkspaceManager
 		this.rootUri = rootUri;
 		this.clientCapabilities = clientCapabilities;
 		this.openFiles.clear();
+		
+		LSPXWorkspaceManager.getInstance().enablePlugins();
 		
 		System.setProperty("vdmj.parser.tabstop", "1");	// Forced, for LSP location offsets
 		Properties.init();
@@ -522,7 +530,7 @@ public class LSPWorkspaceManager
 					Log.printf("Ignoring file on dot path");
 					actionCode = 0;
 				}
-				else if (file.equals(new File(rootUri, ".vscode/ordering")))
+				else if (file.equals(new File(rootUri, ORDERING)))
 				{
 					Log.printf("Created ordering file, rebuilding");
 					actionCode = 2;		// Rebuild and re-check
@@ -566,7 +574,7 @@ public class LSPWorkspaceManager
 					Log.printf("Ignoring file on dot path");
 					actionCode = 0;
 				}
-				else if (file.equals(new File(rootUri, ".vscode/ordering")))
+				else if (file.equals(new File(rootUri, ORDERING)))
 				{
 					Log.printf("Updated ordering file, rebuilding");
 					actionCode = 2;		// Rebuild and re-check

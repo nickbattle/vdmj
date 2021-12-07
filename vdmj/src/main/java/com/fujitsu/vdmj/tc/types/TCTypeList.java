@@ -106,7 +106,7 @@ public class TCTypeList extends TCMappedList<ASTType, TCType> implements Cloneab
 			{
 				TCUnresolvedType unresolved = (TCUnresolvedType)type;
 				
-				if (sought.within(unresolved.typename.getLocation()))
+				if (sought.touches(unresolved.typename.getLocation()))
 				{
 					matched.add(unresolved);
 				}
@@ -115,7 +115,7 @@ public class TCTypeList extends TCMappedList<ASTType, TCType> implements Cloneab
 			{
 				TCParameterType paramtype = (TCParameterType)type;
 				
-				if (sought.within(paramtype.name.getLocation()))
+				if (sought.touches(paramtype.name.getLocation()))
 				{
 					matched.add(paramtype);
 				}

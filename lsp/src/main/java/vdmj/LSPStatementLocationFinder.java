@@ -31,22 +31,10 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.patterns.TCBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
-import com.fujitsu.vdmj.tc.patterns.TCPattern;
-import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
-import com.fujitsu.vdmj.tc.patterns.TCSetBind;
-import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
-import com.fujitsu.vdmj.tc.patterns.visitors.TCPatternVisitor;
 import com.fujitsu.vdmj.tc.statements.TCAssignmentStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
-import com.fujitsu.vdmj.tc.statements.TCErrorCase;
 import com.fujitsu.vdmj.tc.statements.TCExternalClause;
 import com.fujitsu.vdmj.tc.statements.TCFieldDesignator;
 import com.fujitsu.vdmj.tc.statements.TCIdentifierDesignator;
@@ -86,12 +74,12 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 	{
 		Set<TCNode> all = caseObjectDesignator(node.designator, arg);
 		
-		if (node.classname != null && arg.within(node.classname.getLocation()))
+		if (node.classname != null && arg.touches(node.classname.getLocation()))
 		{
 			all.add(node.classname);
 		}
 		
-		if (node.field != null && arg.within(node.field.getLocation()))
+		if (node.field != null && arg.touches(node.field.getLocation()))
 		{
 			all.add(node.field);
 		}
@@ -107,15 +95,11 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
  		if (node instanceof TCObjectApplyDesignator)
  		{
  			TCObjectApplyDesignator apply = (TCObjectApplyDesignator)node;
- 			TCExpressionVisitor<Set<TCNode>, LexLocation> expv = visitorSet.getExpressionVisitor();
  			
- 			if (expv != null)
- 			{
- 				for (TCExpression a: apply.args)
- 				{
- 					all.addAll(a.apply(expv, arg));
- 				}
- 			}
+			for (TCExpression a: apply.args)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(a, arg));
+			}
  			
  			all.addAll(caseObjectDesignator(apply.object, arg));
  		}
@@ -123,7 +107,7 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
  	 	{
  			TCObjectFieldDesignator fdes = (TCObjectFieldDesignator)node;
  			
-			if (fdes.field != null && arg.within(fdes.field.getLocation()))
+			if (fdes.field != null && arg.touches(fdes.field.getLocation()))
 			{
 				all.add(fdes.field);
 			}
@@ -134,7 +118,7 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
  	 	{
  			TCObjectIdentifierDesignator id = (TCObjectIdentifierDesignator)node;
  			
- 			if (arg.within(id.name.getLocation()))
+ 			if (arg.touches(id.name.getLocation()))
  			{
  				all.add(id.expression);		// VariableExpression includes definition
  			}
@@ -142,24 +126,20 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
  		else if (node instanceof TCObjectNewDesignator)
  	 	{
  			TCObjectNewDesignator des = (TCObjectNewDesignator)node;
- 			TCExpressionVisitor<Set<TCNode>, LexLocation> expv = visitorSet.getExpressionVisitor();
  			
- 			if (expv != null)
- 			{
-				all.addAll(des.expression.apply(expv, arg));
-				
-				if (arg.within(des.expression.classname.getLocation()))
+			all.addAll(visitorSet.applyExpressionVisitor(des.expression, arg));
+			
+			if (arg.touches(des.expression.classname.getLocation()))
+			{
+				if (des.expression.ctordef != null)
 				{
-					if (des.expression.ctordef != null)
-					{
-						all.add(des.expression.ctordef.name);
-					}
-					else
-					{
-						all.add(des.expression.classname);	// Anon ctor
-					}
+					all.add(des.expression.ctordef.name);
 				}
- 			}
+				else
+				{
+					all.add(des.expression.classname);	// Anon ctor
+				}
+			}
  	 	}
  		else if (node instanceof TCObjectSelfDesignator)
  	 	{
@@ -172,21 +152,20 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 	@Override
 	public Set<TCNode> caseCallStatement(TCCallStatement node, LexLocation arg)
 	{
-		Set<TCNode> all = newCollection();
+		Set<TCNode> all = super.caseCallStatement(node, arg);
 
-		if (arg.within(node.location))
+		if (arg.touches(node.location))
 		{
 			all.add(node);
 		}
 
-		all.addAll(super.caseCallStatement(node, arg));
 		return all;
 	}
  	
  	@Override
  	public Set<TCNode> caseAssignmentStatement(TCAssignmentStatement node, LexLocation arg)
  	{
-		Set<TCNode> all = newCollection();
+		Set<TCNode> all = super.caseAssignmentStatement(node, arg);
 		TCStateDesignator des = node.target;
 		boolean found = false;
 		
@@ -194,7 +173,7 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 		{
 			if (des instanceof TCIdentifierDesignator)
 			{
-				found = found || arg.within(des.location);
+				found = found || arg.touches(des.location);
 				if (found) all.add(des);
 				break;
 			}
@@ -207,77 +186,12 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 			{
 				TCFieldDesignator f = (TCFieldDesignator)des;
 				des = f.object;
-				found = found || arg.within(f.field.getLocation());
+				found = found || arg.touches(f.field.getLocation());
 			}
 		}
 
- 		all.addAll(super.caseAssignmentStatement(node, arg));
 		return all;
  	}
-	
-	@Override
-	protected Set<TCNode> caseBind(TCBind bind, LexLocation arg)
-	{
-		TCPatternVisitor<Set<TCNode>, LexLocation> patternVisitor = visitorSet.getPatternVisitor();
-		Set<TCNode> all = super.caseBind(bind, arg);
-		
-		if (all.isEmpty())
-		{
-			if (bind instanceof TCTypeBind)
-			{
-				TCTypeBind tbind = (TCTypeBind)bind;
-				all.addAll(tbind.unresolved.matchUnresolved(arg));
-			}
-			else if (bind instanceof TCSetBind && patternVisitor != null)
-			{
-				TCSetBind sbind = (TCSetBind)bind;
-				all.addAll(sbind.pattern.apply(patternVisitor, arg));
-			}
-			else if (bind instanceof TCSeqBind && patternVisitor != null)
-			{
-				TCSeqBind sbind = (TCSeqBind)bind;
-				all.addAll(sbind.pattern.apply(patternVisitor, arg));
-			}
-		}
-		
-		return all;
-	}
-
-	@Override
- 	protected Set<TCNode> caseMultipleBind(TCMultipleBind bind, LexLocation arg)
-	{
-		TCPatternVisitor<Set<TCNode>, LexLocation> patternVisitor = visitorSet.getPatternVisitor();
-		Set<TCNode> all = super.caseMultipleBind(bind, arg);
-		
-		if (all.isEmpty())
-		{
-			if (bind instanceof TCMultipleTypeBind)
-			{
-				TCMultipleTypeBind mbind = (TCMultipleTypeBind)bind;
-				all.addAll(mbind.unresolved.matchUnresolved(arg));
-			}
-			else if (bind instanceof TCMultipleSetBind && patternVisitor != null)
-			{
-				TCMultipleSetBind sbind = (TCMultipleSetBind)bind;
-				
-				for (TCPattern p: sbind.plist)
-				{
-					all.addAll(p.apply(patternVisitor, arg));
-				}
-			}
-			else if (bind instanceof TCMultipleSeqBind)
-			{
-				TCMultipleSeqBind sbind = (TCMultipleSeqBind)bind;
-
-				for (TCPattern p: sbind.plist)
-				{
-					all.addAll(p.apply(patternVisitor, arg));
-				}
-			}
-		}
-		
-		return all;
-	}
 	
 	@Override
 	public Set<TCNode> caseSpecificationStatement(TCSpecificationStatement node, LexLocation sought)
@@ -290,24 +204,13 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 			{
 				for (TCNameToken name: ext.identifiers)
 				{
-					if (sought.within(name.getLocation()))
+					if (sought.touches(name.getLocation()))
 					{
 						all.add(name);
 					}
 				}
 				
 				all.addAll(ext.unresolved.matchUnresolved(sought));
-			}
-		}
-		
-		if (node.errors != null)
-		{
-			TCExpressionVisitor<Set<TCNode>, LexLocation> expVisitor = visitorSet.getExpressionVisitor();
-			
-			for (TCErrorCase error: node.errors)
-			{
-				all.addAll(error.left.apply(expVisitor, sought));
-				all.addAll(error.right.apply(expVisitor, sought));
 			}
 		}
 		

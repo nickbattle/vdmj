@@ -320,6 +320,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 			pre.setLimitStateScope(limitStateScope);
 			pre.setEnclosingDefinition(predef);
 			pre.setFunctional(true, true);
+			predef.paramDefinitionList = predef.getParamDefinitions();
 			TCBooleanType expected = new TCBooleanType(location);
 			TCType b = predef.body.typeCheck(pre, null, NameScope.NAMESANDSTATE, expected);
 
@@ -401,6 +402,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		{
 			TCType b = null;
 			TCBooleanType expected = new TCBooleanType(location);
+			postdef.paramDefinitionList = postdef.getParamDefinitions();
 
 			if (result != null)
 			{

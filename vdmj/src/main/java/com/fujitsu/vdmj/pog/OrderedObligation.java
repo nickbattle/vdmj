@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 public class OrderedObligation extends ProofObligation
 {
@@ -38,17 +39,26 @@ public class OrderedObligation extends ProofObligation
 
 		for (TCType type: types)
 		{
-			sb.append(prefix);
-    		sb.append("(is_(");
-    		sb.append(left);
-    		sb.append(", ");
-    		sb.append(type);
-    		sb.append(") and is_(");
-    		sb.append(right);
-    		sb.append(", ");
-    		sb.append(type);
-    		sb.append("))");
-    		prefix = " or ";
+			if (!TypeComparator.isSubType(left.getExptype(), type))
+			{
+				sb.append(prefix);
+	    		sb.append("is_(");
+	    		sb.append(left);
+	    		sb.append(", ");
+	    		sb.append(type);
+	    		sb.append(")");
+	    		prefix = " and ";
+			}
+			
+			if (!TypeComparator.isSubType(right.getExptype(), type))
+			{
+		    	sb.append("is_(");
+	    		sb.append(right);
+	    		sb.append(", ");
+	    		sb.append(type);
+	    		sb.append(")");
+	    		prefix = " or ";
+			}
 		}
 		
 		value = ctxt.getObligation(sb.toString());

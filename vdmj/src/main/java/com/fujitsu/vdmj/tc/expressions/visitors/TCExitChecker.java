@@ -74,7 +74,7 @@ public class TCExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeSet, En
 					if (explop.possibleExceptions == null)
 					{
 						explop.possibleExceptions = TCDefinition.IN_PROGRESS;
-						explop.possibleExceptions = explop.body.apply(visitorSet.getStatementVisitor(), base);
+						explop.possibleExceptions = visitorSet.applyStatementVisitor(explop.body, base);
 					}
 					
 					result.addAll(explop.possibleExceptions);
@@ -88,7 +88,7 @@ public class TCExitChecker extends TCLeafExpressionVisitor<TCType, TCTypeSet, En
 						if (implop.body != null)
 						{
 							implop.possibleExceptions = TCDefinition.IN_PROGRESS;
-							implop.possibleExceptions = implop.body.apply(visitorSet.getStatementVisitor(), base);
+							implop.possibleExceptions = visitorSet.applyStatementVisitor(implop.body, base);
 						}
 						else
 						{

@@ -51,13 +51,13 @@ public class TCBindExitChecker extends TCBindVisitor<TCTypeSet, Environment>
 	@Override
 	public TCTypeSet caseSeqBind(TCSeqBind node, Environment base)
 	{
-		return node.sequence.apply(visitorSet.getExpressionVisitor(), base);
+		return visitorSet.applyExpressionVisitor(node.sequence, base);
 	}
 
 	@Override
 	public TCTypeSet caseSetBind(TCSetBind node, Environment base)
 	{
-		return node.set.apply(visitorSet.getExpressionVisitor(), base);
+		return visitorSet.applyExpressionVisitor(node.set, base);
 	}
 	
 	@Override

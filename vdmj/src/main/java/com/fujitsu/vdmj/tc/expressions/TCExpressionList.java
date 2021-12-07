@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
+import java.util.List;
+
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.tc.TCMappedList;
@@ -40,6 +42,12 @@ public class TCExpressionList extends TCMappedList<ASTExpression, TCExpression>
 	public TCExpressionList()
 	{
 		super();
+	}
+	
+	public TCExpressionList(List<TCExpression> to)  
+	{
+		super();
+		addAll(to);
 	}
 
 	@Override

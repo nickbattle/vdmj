@@ -84,10 +84,10 @@ public class PogTest extends TestCase
 		"(forall x:seq of (int) &\n  (not exists [a]:seq1 of (int) & [a] = (x ^ [-999]) =>\n    (not exists [a, b]:seq1 of (int) & [a, b] = (x ^ [-999]) =>\n      (exists [a] ^ [b]:seq1 of (int) & ([a] ^ [b]) = (x ^ [-999]) => let [a] ^ [b] = (x ^ [-999]) in\n        (a + b) in set dom m))))\n",
 		"(forall x:seq of (int) &\n  (not exists [a]:seq1 of (int) & [a] = (x ^ [-999]) =>\n    (not exists [a, b]:seq1 of (int) & [a, b] = (x ^ [-999]) =>\n      (not exists [a] ^ [b]:seq1 of (int) & ([a] ^ [b]) = (x ^ [-999]) =>\n        m(999) in set dom m))))\n",
 		"(forall x:seq of (int) &\n  (not exists [a]:seq1 of (int) & [a] = (x ^ [-999]) =>\n    (not exists [a, b]:seq1 of (int) & [a, b] = (x ^ [-999]) =>\n      (not exists [a] ^ [b]:seq1 of (int) & ([a] ^ [b]) = (x ^ [-999]) =>\n        999 in set dom m))))\n",
-		"(forall mk_(i, any1):(int * int) &\n  exists x in set {m(1), 2, 3} & (m(x) < i))\n",
-		"(forall mk_(i, any1):(int * int) &\n  1 in set dom m)\n",
-		"(forall mk_(i, any1):(int * int) &\n  (forall x in set {m(1), 2, 3} &\n    x in set dom m))\n",
-		"(forall mk_(i, any1):(int * int) &\n  (forall x in set {m(1), 2, 3} & (m(x) < i) =>\n    x in set dom m))\n",
+		"(forall mk_(i, $any1):(int * int) &\n  exists x in set {m(1), 2, 3} & (m(x) < i))\n",
+		"(forall mk_(i, $any1):(int * int) &\n  1 in set dom m)\n",
+		"(forall mk_(i, $any1):(int * int) &\n  (forall x in set {m(1), 2, 3} &\n    x in set dom m))\n",
+		"(forall mk_(i, $any1):(int * int) &\n  (forall x in set {m(1), 2, 3} & (m(x) < i) =>\n    x in set dom m))\n",
 		"1 in set dom m\n",
 		"(let x:int = m(1) in\n  x in set dom m)\n",
 		"(forall x:int &\n  x in set dom m)\n",
@@ -163,7 +163,7 @@ public class PogTest extends TestCase
 		TypeChecker typeChecker = new ClassTypeChecker(checked);
 		typeChecker.typeCheck();
 		TypeChecker.printErrors(Console.out);
-		assertEquals("Type check errors", 0, TypeChecker.getErrorCount());
+		assertEquals("Spec type check errors", 0, TypeChecker.getErrorCount());
 
 		POClassList poglist = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checked);
 		ClassMapper.getInstance(PONode.MAPPINGS).convert(TCRecursiveLoops.getInstance());
@@ -175,6 +175,7 @@ public class PogTest extends TestCase
 		for (ProofObligation po: polist)
 		{
 			Console.out.println(++i + " \"" + po.value.replaceAll("\n", "\\\\n") + "\",");
+			assertFalse("PO type checked failed", po.getCheckedExpression() == null);
 		}
 
 		assertEquals("POs generated", expected.length, polist.size());
