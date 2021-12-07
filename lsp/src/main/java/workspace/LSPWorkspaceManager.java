@@ -169,8 +169,21 @@ public class LSPWorkspaceManager
 
 	public boolean hasClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
 	{
-		Boolean cap = getClientCapability(dotName);
-		return cap != null && cap;
+		Object cap = getClientCapability(dotName);
+		
+		if (cap != null)
+		{
+			if (cap instanceof Boolean)
+			{
+				return (Boolean)cap;
+			}
+			
+			return true;	// Object exists
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
