@@ -25,6 +25,10 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
+import com.fujitsu.vdmj.tc.expressions.TCNewExpression;
+import com.fujitsu.vdmj.tc.expressions.TCRealLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCUndefinedExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -59,6 +63,39 @@ public class TCSystemDefinition extends TCClassDefinition
 					if (ut.typename.getName().equals("BUS"))
 					{
 						d.warning(5014, "Uninitialized BUS unmapped");
+					}
+				}
+				else if (iv.type instanceof TCUnresolvedType &&
+						 iv.expression instanceof TCNewExpression)
+				{
+					TCUnresolvedType ut = (TCUnresolvedType)iv.type;
+	
+					if (ut.typename.getName().equals("CPU"))
+					{
+						TCNewExpression newExp = (TCNewExpression) iv.expression;
+						TCExpression exp = newExp.args.get(1);
+						
+						double speed = 0;
+						
+						if (exp instanceof TCIntegerLiteralExpression)
+						{
+							TCIntegerLiteralExpression frequencyExp = (TCIntegerLiteralExpression) newExp.args.get(1);
+							speed = frequencyExp.value.value;
+						}
+						else if (exp instanceof TCRealLiteralExpression)
+						{
+							TCRealLiteralExpression frequencyExp = (TCRealLiteralExpression) newExp.args.get(1);
+							speed = frequencyExp.value.value;
+						}
+	
+						if (speed == 0)
+						{
+							d.report(3305, "CPU frequency to slow: " + speed + " Hz");
+						}
+						else if (speed > TCCPUClassDefinition.CPU_MAX_FREQUENCY)
+						{
+							d.report(3306, "CPU frequency to fast: " + speed + " Hz");
+						}
 					}
 				}
 			}

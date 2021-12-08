@@ -39,6 +39,8 @@ public class TCCPUClassDefinition extends TCClassDefinition
 {
 	private static final long serialVersionUID = 1L;
 
+	public static final long CPU_MAX_FREQUENCY = 1000000000; // 1GHz
+
 	public TCCPUClassDefinition(TCNameToken className, TCNameList supernames, TCDefinitionList definitions)
 	{
 		super(className, supernames, definitions);

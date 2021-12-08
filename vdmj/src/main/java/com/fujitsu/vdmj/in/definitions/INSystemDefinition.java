@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUndefinedType;
 import com.fujitsu.vdmj.values.BUSValue;
 import com.fujitsu.vdmj.values.CPUValue;
+import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.QuoteValue;
 import com.fujitsu.vdmj.values.RealValue;
@@ -54,6 +55,17 @@ import com.fujitsu.vdmj.values.ValueSet;
 public class INSystemDefinition extends INClassDefinition
 {
 	private static final long serialVersionUID = 1L;
+	private static ObjectValue systemObject = null;
+
+	public static NameValuePairList getSystemMembers()
+	{
+		if (systemObject != null)
+		{
+			return systemObject.members.asList();
+		}
+
+		return null;
+	}
 
 	public INSystemDefinition(TCNameToken className, TCClassType type, INDefinitionList members)
 	{
@@ -100,7 +112,7 @@ public class INSystemDefinition extends INClassDefinition
 
 			// Run the constructor to do any deploys etc.
 
-			ObjectValue system = makeNewInstance(null, new ValueList(),
+			systemObject = makeNewInstance(null, new ValueList(),
 					initialContext, new HashMap<TCNameToken, ObjectValue>(), false);
 
 			// Do CPUs first so that default BUSses can connect all CPUs.
@@ -110,7 +122,7 @@ public class INSystemDefinition extends INClassDefinition
 
 			for (INDefinition d: cpudefs)
 			{
-    			UpdatableValue v = (UpdatableValue)system.members.get(d.name);
+    			UpdatableValue v = (UpdatableValue)systemObject.members.get(d.name);
     			CPUValue cpu = null;
 
     			if (v.isUndefined())
@@ -151,7 +163,7 @@ public class INSystemDefinition extends INClassDefinition
 
 					if (ct.classdef instanceof TCBUSClassDefinition)
 					{
-						UpdatableValue v = (UpdatableValue)system.members.get(d.name);
+						UpdatableValue v = (UpdatableValue)systemObject.members.get(d.name);
 	    				BUSValue bus = null;
 
 						if (!v.isUndefined())
