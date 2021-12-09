@@ -25,9 +25,6 @@
 package workspace.lenses;
 
 import java.io.File;
-import java.util.List;
-import java.util.Vector;
-
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
@@ -41,15 +38,18 @@ import com.fujitsu.vdmj.ast.types.ASTPatternListTypePair;
 import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
+import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
+import com.fujitsu.vdmj.tc.types.TCPatternListTypePairList;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 import json.JSONArray;
@@ -70,7 +70,7 @@ public class LaunchDebugLens extends CodeLens
 			String launchName = null;
 			String defaultName = null;
 			String applyName = null;
-			List<Param> applyArgs = new Vector<Param>();
+			JSONArray applyArgs = new JSONArray();
 			
 			if (def instanceof ASTExplicitFunctionDefinition)
 			{
@@ -78,7 +78,6 @@ public class LaunchDebugLens extends CodeLens
 				applyName = exdef.name.getName();
 				launchName = applyName;
 				defaultName = exdef.name.module;
-				applyArgs = new Vector<Param>();
 				
 				ASTFunctionType ftype = (ASTFunctionType) exdef.type;
 				ASTTypeList ptypes = ftype.parameters;
@@ -86,9 +85,8 @@ public class LaunchDebugLens extends CodeLens
 				
 				for (ASTPattern p: exdef.paramPatternList.get(0))	// Curried?
 				{
-					applyArgs.add(new Param(p.toString(), ptypes.get(i++).toString()));
+					applyArgs.add(new JSONObject("name", p.toString(), "type", ptypes.get(i++).toString()));
 				}
-				
 			}
 			else if (def instanceof ASTImplicitFunctionDefinition)
 			{
@@ -96,13 +94,12 @@ public class LaunchDebugLens extends CodeLens
 				applyName = imdef.name.getName();
 				launchName = applyName;
 				defaultName = imdef.name.module;
-				applyArgs = new Vector<Param>();
 				
 				for (ASTPatternListTypePair param: imdef.parameterPatterns)
 				{
 					for (ASTPattern p: param.patterns)
 					{
-						applyArgs.add(new Param(p.toString(), param.type.toString()));
+						applyArgs.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
 					}
 				}
 			}
@@ -110,32 +107,38 @@ public class LaunchDebugLens extends CodeLens
 			{
 				ASTExplicitOperationDefinition exop = (ASTExplicitOperationDefinition) def;
 				applyName = exop.name.getName();
-				launchName = applyName;
 				defaultName = exop.name.module;
-				applyArgs = new Vector<Param>();
 				
-				ASTOperationType ftype = (ASTOperationType) exop.type;
-				ASTTypeList ptypes = ftype.parameters;
-				int i = 0;
-				
-				for (ASTPattern p: exop.parameterPatterns)
+				if (!applyName.equals(defaultName))		// Not a constructor
 				{
-					applyArgs.add(new Param(p.toString(), ptypes.get(i++).toString()));
+					launchName = applyName;
+					
+					ASTOperationType ftype = (ASTOperationType) exop.type;
+					ASTTypeList ptypes = ftype.parameters;
+					int i = 0;
+					
+					for (ASTPattern p: exop.parameterPatterns)
+					{
+						applyArgs.add(new JSONObject("name", p.toString(), "type", ptypes.get(i++).toString()));
+					}
 				}
 			}
 			else if (def instanceof ASTImplicitOperationDefinition)
 			{
 				ASTImplicitOperationDefinition imop = (ASTImplicitOperationDefinition) def;
 				applyName = imop.name.getName();
-				launchName = applyName;
 				defaultName = imop.name.module;
-				applyArgs = new Vector<Param>();
-				
-				for (ASTPatternListTypePair param: imop.parameterPatterns)
+
+				if (!applyName.equals(defaultName))		// Not a constructor
 				{
-					for (ASTPattern p: param.patterns)
+					launchName = applyName;
+					
+					for (ASTPatternListTypePair param: imop.parameterPatterns)
 					{
-						applyArgs.add(new Param(p.toString(), param.type.toString()));
+						for (ASTPattern p: param.patterns)
+						{
+							applyArgs.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
+						}
 					}
 				}
 			}
@@ -143,10 +146,10 @@ public class LaunchDebugLens extends CodeLens
 			if (launchName != null)
 			{
 				results.add(makeLens(def.location, "Launch", CODE_LENS_COMMAND,
-						launchArgs(launchName, defaultName, false, applyName, applyArgs)));
+						launchArgs(launchName, defaultName, false, null, applyName, applyArgs)));
 					
 				results.add(makeLens(def.location, "Debug", CODE_LENS_COMMAND,
-						launchArgs(launchName, defaultName, true, applyName, applyArgs)));
+						launchArgs(launchName, defaultName, true, null, applyName, applyArgs)));
 			}
 		}
 		
@@ -163,7 +166,8 @@ public class LaunchDebugLens extends CodeLens
 			String launchName = null;
 			String defaultName = null;
 			String applyName = null;
-			List<Param> applyArgs = new Vector<Param>();
+			JSONArray applyArgs = null;
+			TCClassDefinition classdef = null;
 			
 			if (def instanceof TCExplicitFunctionDefinition)
 			{
@@ -171,17 +175,9 @@ public class LaunchDebugLens extends CodeLens
 				applyName = exdef.name.getName();
 				launchName = applyName;
 				defaultName = exdef.name.getModule();
-				applyArgs = new Vector<Param>();
-				
 				TCFunctionType ftype = (TCFunctionType) exdef.type;
-				TCTypeList ptypes = ftype.parameters;
-				int i = 0;
-				
-				for (TCPattern p: exdef.paramPatternList.get(0))	// Curried?
-				{
-					applyArgs.add(new Param(p.toString(), ptypes.get(i++).toString()));
-				}
-				
+				applyArgs = getParams(exdef.paramPatternList.get(0), ftype.parameters);
+				classdef = exdef.classDefinition;
 			}
 			else if (def instanceof TCImplicitFunctionDefinition)
 			{
@@ -189,63 +185,109 @@ public class LaunchDebugLens extends CodeLens
 				applyName = imdef.name.getName();
 				launchName = applyName;
 				defaultName = imdef.name.getModule();
-				applyArgs = new Vector<Param>();
-				
-				for (TCPatternListTypePair param: imdef.parameterPatterns)
-				{
-					for (TCPattern p: param.patterns)
-					{
-						applyArgs.add(new Param(p.toString(), param.type.toString()));
-					}
-				}
+				applyArgs = getParams(imdef.parameterPatterns);
+				classdef = imdef.classDefinition;
 			}
 			else if (def instanceof TCExplicitOperationDefinition)
 			{
 				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition) def;
-				applyName = exop.name.getName();
-				launchName = applyName;
-				defaultName = exop.name.getModule();
-				applyArgs = new Vector<Param>();
 				
-				TCOperationType ftype = (TCOperationType) exop.type;
-				TCTypeList ptypes = ftype.parameters;
-				int i = 0;
-				
-				for (TCPattern p: exop.parameterPatterns)
+				if (!exop.isConstructor)
 				{
-					applyArgs.add(new Param(p.toString(), ptypes.get(i++).toString()));
+					applyName = exop.name.getName();
+					launchName = applyName;
+					defaultName = exop.name.getModule();
+					TCOperationType ftype = (TCOperationType) exop.type;
+					applyArgs = getParams(exop.parameterPatterns, ftype.parameters);
+					classdef = exop.classDefinition;
 				}
 			}
 			else if (def instanceof TCImplicitOperationDefinition)
 			{
 				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition) def;
-				applyName = imop.name.getName();
-				launchName = applyName;
-				defaultName = imop.name.getModule();
-				applyArgs = new Vector<Param>();
 				
-				for (TCPatternListTypePair param: imop.parameterPatterns)
+				if (!imop.isConstructor)
 				{
-					for (TCPattern p: param.patterns)
-					{
-						applyArgs.add(new Param(p.toString(), param.type.toString()));
-					}
+					applyName = imop.name.getName();
+					launchName = applyName;
+					defaultName = imop.name.getModule();
+					applyArgs = getParams(imop.parameterPatterns);
+					classdef = imop.classDefinition;
 				}
 			}
 			
 			if (launchName != null)
 			{
+				JSONArray constructors = null;
+				
+				if (classdef != null && !def.isAccess(Token.STATIC))	// Look for class constructors
+				{
+					constructors = new JSONArray();
+					
+					for (TCDefinition cdef: classdef.definitions)
+					{
+						if (cdef instanceof TCExplicitOperationDefinition)
+						{
+							TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)cdef;
+							
+							if (exop.isConstructor)
+							{
+								TCOperationType optype = (TCOperationType) exop.type;
+								constructors.add(getParams(exop.parameterPatterns, optype.parameters));
+							}
+						}
+						else if (cdef instanceof TCImplicitOperationDefinition)
+						{
+							TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)cdef;
+							
+							if (imop.isConstructor)
+							{
+								constructors.add(getParams(imop.parameterPatterns));
+							}
+						}
+					}
+				}
+			
 				results.add(makeLens(def.location, "Launch", CODE_LENS_COMMAND,
-						launchArgs(launchName, defaultName, false, applyName, applyArgs)));
+						launchArgs(launchName, defaultName, false, constructors, applyName, applyArgs)));
 					
 				results.add(makeLens(def.location, "Debug", CODE_LENS_COMMAND,
-						launchArgs(launchName, defaultName, true, applyName, applyArgs)));
+						launchArgs(launchName, defaultName, true, constructors, applyName, applyArgs)));
 			}
 		}
 
 		return results;
 	}
 	
+	private JSONArray getParams(TCPatternList patterns, TCTypeList types)
+	{
+		JSONArray params = new JSONArray();
+		int i = 0;
+		
+		for (TCPattern p: patterns)
+		{
+			params.add(new JSONObject("name", p.toString(), "type", types.get(i++).toString()));
+		}
+		
+		return params;
+	}
+	
+	private JSONArray getParams(TCPatternListTypePairList ptList)
+	{
+		JSONArray params = new JSONArray();
+
+		for (TCPatternListTypePair param: ptList)
+		{
+			for (TCPattern p: param.patterns)
+			{
+				params.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
+			}
+		}
+		
+		return params;
+	}
+
+		
 	private boolean isPublic(ASTDefinition def)
 	{
 		if (Settings.dialect != Dialect.VDM_SL)
@@ -270,25 +312,8 @@ public class LaunchDebugLens extends CodeLens
 		}
 	}
 
-	private static class Param
-	{
-		public final String name;
-		public final String type;
-		
-		public Param(String name, String type)
-		{
-			this.name = name;
-			this.type = type;
-		}
-		
-		public JSONObject toJSON()
-		{
-			return new JSONObject("name", name, "type", type);
-		}
-	}
-
 	private JSONArray launchArgs(String launchName, String defaultName,
-			boolean debug, String applyName, List<Param> applyArgs)
+			boolean debug, JSONArray constructors, String applyName, JSONArray applyArgs)
 	{
 		JSONObject launchArgs = new JSONObject();
 		
@@ -299,15 +324,14 @@ public class LaunchDebugLens extends CodeLens
 		launchArgs.put("noDebug", !debug);		// Note: inverted :)
 		launchArgs.put("remoteControl", null);
 		
-		launchArgs.put("applyName", applyName);
-		JSONArray args = new JSONArray();
-		launchArgs.put("applyArgs", args);
-		
-		for (Param p: applyArgs)
+		if (constructors != null && !constructors.isEmpty())
 		{
-			args.add(p.toJSON());
+			launchArgs.put("constructors", constructors);
 		}
+		
+		launchArgs.put("applyName", applyName);
+		launchArgs.put("applyArgs", applyArgs);
 
-    	return new JSONArray(launchArgs);
+    	return new JSONArray(launchArgs);	// Array with one object
 	}
 }
