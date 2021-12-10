@@ -24,13 +24,11 @@
 
 package workspace;
 
+import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
-
+import json.JSONArray;
 import json.JSONObject;
-import workspace.lenses.CodeLens;
 import workspace.plugins.AnalysisPlugin;
 
 public class PluginRegistry
@@ -111,15 +109,15 @@ public class PluginRegistry
 		return options;
 	}
 	
-	public List<CodeLens> getCodeLenses()
+	public JSONArray applyCodeLenses(File file, boolean dirty)
 	{
-		List<CodeLens> lenses = new Vector<CodeLens>();
+		JSONArray commands = new JSONArray();
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
-			lenses.addAll(plugin.getCodeLenses());
+			commands.addAll(plugin.applyCodeLenses(file, dirty));
 		}
 		
-		return lenses;
+		return commands;
 	}
 }

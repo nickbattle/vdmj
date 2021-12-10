@@ -24,9 +24,11 @@
 
 package workspace.plugins;
 
+import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
+import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPMessageUtils;
 import rpc.RPCErrors;
@@ -82,10 +84,19 @@ abstract public class AnalysisPlugin
 	}
 	
 	/**
-	 * Plugins can add code lenses by overriding this method.
+	 * Plugins can define code lenses here.
+	 * @param dirty 
 	 */
-	public List<CodeLens> getCodeLenses()
+	protected List<CodeLens> getCodeLenses(boolean dirty)
 	{
 		return new Vector<CodeLens>();
+	}
+
+	/**
+	 * Plugins can apply their code lenses by overriding this method.
+	 */
+	public JSONArray applyCodeLenses(File file, boolean dirty)
+	{
+		return new JSONArray();
 	}
 }

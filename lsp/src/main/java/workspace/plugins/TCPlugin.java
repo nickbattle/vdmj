@@ -49,6 +49,8 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import workspace.Log;
+import workspace.lenses.CodeLens;
+import workspace.lenses.TCLaunchDebugLens;
 
 abstract public class TCPlugin extends AnalysisPlugin
 {
@@ -88,6 +90,19 @@ abstract public class TCPlugin extends AnalysisPlugin
 	{
 	}
 
+	@Override
+	protected List<CodeLens> getCodeLenses(boolean dirty)
+	{
+		List<CodeLens> lenses = new Vector<CodeLens>();
+		
+		if (!dirty)
+		{
+			lenses.add(new TCLaunchDebugLens());
+		}
+		
+		return lenses;
+	}
+
 	public void preCheck()
 	{
 		errs.clear();
@@ -115,8 +130,6 @@ abstract public class TCPlugin extends AnalysisPlugin
 	abstract public TCDefinitionList lookupDefinition(String startsWith);
 	
 	abstract public void saveDependencies(File saveUri) throws IOException;
-
-	abstract public JSONArray documentLenses(File file);
 
 	/**
 	 * Common methods for hierarchical outlines.

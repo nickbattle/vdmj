@@ -49,7 +49,6 @@ import json.JSONArray;
 import lsp.textdocument.SymbolKind;
 import workspace.LSPWorkspaceManager;
 import workspace.Log;
-import workspace.PluginRegistry;
 import workspace.lenses.CodeLens;
 
 public class ASTPluginPR extends ASTPlugin
@@ -194,13 +193,13 @@ public class ASTPluginPR extends ASTPlugin
 	}
 
 	@Override
-	public JSONArray documentLenses(File file)
+	public JSONArray applyCodeLenses(File file, boolean dirty)
 	{
 		JSONArray results = new JSONArray();
 		
 		if (dirtyClassList != null && !dirtyClassList.isEmpty())	// May be syntax errors
 		{
-			List<CodeLens> lenses = PluginRegistry.getInstance().getCodeLenses();
+			List<CodeLens> lenses = getCodeLenses(dirty);
 			
 			for (ASTClassDefinition clazz: dirtyClassList)
 			{
@@ -212,7 +211,7 @@ public class ASTPluginPR extends ASTPlugin
 						{
 							for (CodeLens lens: lenses)
 							{
-								results.addAll(lens.codeLenses(def, file));
+								results.addAll(lens.getDefinitionLenses(def));
 							}
 						}
 					}

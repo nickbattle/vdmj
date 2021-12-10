@@ -841,19 +841,8 @@ public class LSPWorkspaceManager
 	
 	public RPCMessageList codeLens(RPCRequest request, File file)
 	{
-		JSONArray lenses = null;
 		ASTPlugin ast = registry.getPlugin("AST");
-		
-		if (ast.isDirty())
-		{
-			lenses = ast.documentLenses(file);
-		}
-		else
-		{
-			TCPlugin tc = registry.getPlugin("TC");
-			lenses = tc.documentLenses(file);
-		}
-		
+		JSONArray lenses = registry.applyCodeLenses(file, ast.isDirty());
 		return new RPCMessageList(request, lenses);
 	}
 
