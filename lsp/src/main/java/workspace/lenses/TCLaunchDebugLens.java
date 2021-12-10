@@ -44,7 +44,7 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 import json.JSONArray;
 import json.JSONObject;
 
-public class TCLaunchDebugLens extends CodeLens
+public class TCLaunchDebugLens extends AbstractLaunchDebugLens
 {
 	private final String CODE_LENS_COMMAND = "vdm-vscode.addLensRunConfiguration";
 	// private final String CODE_LENS_COMMAND = "workbench.action.debug.configure";
@@ -195,28 +195,5 @@ public class TCLaunchDebugLens extends CodeLens
 		{
 			return true;
 		}
-	}
-
-	private JSONArray launchArgs(String launchName, String defaultName,
-			boolean debug, JSONArray constructors, String applyName, JSONArray applyArgs)
-	{
-		JSONObject launchArgs = new JSONObject();
-		
-		launchArgs.put("name", (debug ? "Debug " : "Launch ") + launchName);
-		launchArgs.put("defaultName", defaultName);
-		launchArgs.put("type", "vdm");
-		launchArgs.put("request", "launch");
-		launchArgs.put("noDebug", !debug);		// Note: inverted :)
-		launchArgs.put("remoteControl", null);
-		
-		if (constructors != null && !constructors.isEmpty())
-		{
-			launchArgs.put("constructors", constructors);
-		}
-		
-		launchArgs.put("applyName", applyName);
-		launchArgs.put("applyArgs", applyArgs);
-
-    	return new JSONArray(launchArgs);	// Array with one object
 	}
 }
