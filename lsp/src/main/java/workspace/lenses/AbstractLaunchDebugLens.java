@@ -32,6 +32,10 @@ public abstract class AbstractLaunchDebugLens extends CodeLens
 	@Override
 	abstract public <DEF> JSONArray getDefinitionLenses(DEF definition);
 
+	/**
+	 * Generate the command arguments for a code lens. This is used as the "arguments" passed to
+	 * the makeLens methods to create the response to the Client.
+	 */
 	protected JSONArray launchArgs(String launchName, String defaultName,
 			boolean debug, JSONArray constructors, String applyName, JSONArray applyArgs)
 	{
