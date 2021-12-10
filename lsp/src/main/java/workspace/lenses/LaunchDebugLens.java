@@ -91,15 +91,19 @@ public class LaunchDebugLens extends CodeLens
 			else if (def instanceof ASTImplicitFunctionDefinition)
 			{
 				ASTImplicitFunctionDefinition imdef = (ASTImplicitFunctionDefinition) def;
-				applyName = imdef.name.getName();
-				launchName = applyName;
-				defaultName = imdef.name.module;
 				
-				for (ASTPatternListTypePair param: imdef.parameterPatterns)
+				if (imdef.body != null)
 				{
-					for (ASTPattern p: param.patterns)
+					applyName = imdef.name.getName();
+					launchName = applyName;
+					defaultName = imdef.name.module;
+					
+					for (ASTPatternListTypePair param: imdef.parameterPatterns)
 					{
-						applyArgs.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
+						for (ASTPattern p: param.patterns)
+						{
+							applyArgs.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
+						}
 					}
 				}
 			}
@@ -129,7 +133,7 @@ public class LaunchDebugLens extends CodeLens
 				applyName = imop.name.getName();
 				defaultName = imop.name.module;
 
-				if (!applyName.equals(defaultName))		// Not a constructor
+				if (!applyName.equals(defaultName) && imop.body != null)	// Not a constructor
 				{
 					launchName = applyName;
 					
@@ -182,11 +186,15 @@ public class LaunchDebugLens extends CodeLens
 			else if (def instanceof TCImplicitFunctionDefinition)
 			{
 				TCImplicitFunctionDefinition imdef = (TCImplicitFunctionDefinition) def;
-				applyName = imdef.name.getName();
-				launchName = applyName;
-				defaultName = imdef.name.getModule();
-				applyArgs = getParams(imdef.parameterPatterns);
-				classdef = imdef.classDefinition;
+				
+				if (imdef.body != null)
+				{
+					applyName = imdef.name.getName();
+					launchName = applyName;
+					defaultName = imdef.name.getModule();
+					applyArgs = getParams(imdef.parameterPatterns);
+					classdef = imdef.classDefinition;
+				}
 			}
 			else if (def instanceof TCExplicitOperationDefinition)
 			{
@@ -206,7 +214,7 @@ public class LaunchDebugLens extends CodeLens
 			{
 				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition) def;
 				
-				if (!imop.isConstructor)
+				if (!imop.isConstructor && imop.body != null)
 				{
 					applyName = imop.name.getName();
 					launchName = applyName;
