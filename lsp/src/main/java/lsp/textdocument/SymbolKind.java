@@ -25,7 +25,11 @@
 package lsp.textdocument;
 
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 
 public enum SymbolKind
 {
@@ -70,11 +74,49 @@ public enum SymbolKind
 
 	public static SymbolKind kindOf(TCDefinition def)
 	{
+		if (def instanceof TCExplicitOperationDefinition)
+		{
+			TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition)def;
+			
+			if (exop.isConstructor)
+			{
+				return Class;
+			}
+		}
+		else if (def instanceof TCImplicitOperationDefinition)
+		{
+			TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition)def;
+
+			if (imop.isConstructor)
+			{
+				return Class;
+			}
+		}
+		
 		return kindOf(def.kind());
 	}
 
 	public static SymbolKind kindOf(ASTDefinition def)
 	{
+		if (def instanceof ASTExplicitOperationDefinition)
+		{
+			ASTExplicitOperationDefinition exop = (ASTExplicitOperationDefinition)def;
+			
+			if (exop.name.getName().equals(exop.name.module))
+			{
+				return Class;
+			}
+		}
+		else if (def instanceof ASTImplicitOperationDefinition)
+		{
+			ASTImplicitOperationDefinition imop = (ASTImplicitOperationDefinition)def;
+
+			if (imop.name.getName().equals(imop.name.module))
+			{
+				return Class;
+			}
+		}
+
 		return kindOf(def.kind());
 	}
 	

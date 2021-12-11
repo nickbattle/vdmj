@@ -169,8 +169,21 @@ public class LSPWorkspaceManager
 
 	public boolean hasClientCapability(String dotName)	// eg. "workspace.workspaceFolders"
 	{
-		Boolean cap = getClientCapability(dotName);
-		return cap != null && cap;
+		Object cap = getClientCapability(dotName);
+		
+		if (cap != null)
+		{
+			if (cap instanceof Boolean)
+			{
+				return (Boolean)cap;
+			}
+			
+			return true;	// Object exists
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -828,19 +841,8 @@ public class LSPWorkspaceManager
 	
 	public RPCMessageList codeLens(RPCRequest request, File file)
 	{
-		JSONArray lenses = null;
 		ASTPlugin ast = registry.getPlugin("AST");
-		
-		if (ast.isDirty())
-		{
-			lenses = ast.documentLenses(file);
-		}
-		else
-		{
-			TCPlugin tc = registry.getPlugin("TC");
-			lenses = tc.documentLenses(file);
-		}
-		
+		JSONArray lenses = registry.applyCodeLenses(file, ast.isDirty());
 		return new RPCMessageList(request, lenses);
 	}
 

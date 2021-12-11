@@ -45,7 +45,6 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
-import workspace.PluginRegistry;
 import workspace.lenses.CodeLens;
 
 public class TCPluginPR extends TCPlugin
@@ -208,13 +207,13 @@ public class TCPluginPR extends TCPlugin
 	}
 
 	@Override
-	public JSONArray documentLenses(File file)
+	public JSONArray applyCodeLenses(File file, boolean dirty)
 	{
 		JSONArray results = new JSONArray();
 		
 		if (!tcClassList.isEmpty())	// May be syntax errors
 		{
-			List<CodeLens> lenses = PluginRegistry.getInstance().getCodeLenses();
+			List<CodeLens> lenses = getCodeLenses(dirty);
 			
 			for (TCClassDefinition clazz: tcClassList)
 			{
@@ -226,7 +225,7 @@ public class TCPluginPR extends TCPlugin
 						{
 							for (CodeLens lens: lenses)
 							{
-								results.addAll(lens.codeLenses(def, file));
+								results.addAll(lens.getDefinitionLenses(def));
 							}
 						}
 					}

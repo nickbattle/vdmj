@@ -24,13 +24,11 @@
 
 package workspace;
 
+import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
-
+import json.JSONArray;
 import json.JSONObject;
-import workspace.lenses.CodeLens;
 import workspace.plugins.AnalysisPlugin;
 
 public class PluginRegistry
@@ -85,14 +83,22 @@ public class PluginRegistry
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
-			if (plugin.supportsMethod(method))
+			try
 			{
-				if (result != null)
+				if (plugin.supportsMethod(method))
 				{
-					Log.error("Multiple plugins support %s", method);
+					if (result != null)
+					{
+						Log.error("Multiple plugins support %s", method);
+					}
+					
+					result = (T)plugin;
 				}
-				
-				result = (T)plugin;
+			}
+			catch (Throwable e)
+			{
+				Log.error("Exception in %s supportsMethod", plugin.getName());
+				Log.error(e);
 			}
 		}
 		
@@ -105,21 +111,37 @@ public class PluginRegistry
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
-			options.putAll(plugin.getExperimentalOptions());
+			try
+			{
+				options.putAll(plugin.getExperimentalOptions());
+			}
+			catch (Throwable e)
+			{
+				Log.error("Exception in %s getExperimentalOptions", plugin.getName());
+				Log.error(e);
+			}
 		}
 		
 		return options;
 	}
 	
-	public List<CodeLens> getCodeLenses()
+	public JSONArray applyCodeLenses(File file, boolean dirty)
 	{
-		List<CodeLens> lenses = new Vector<CodeLens>();
+		JSONArray commands = new JSONArray();
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
-			lenses.addAll(plugin.getCodeLenses());
+			try
+			{
+				commands.addAll(plugin.applyCodeLenses(file, dirty));
+			}
+			catch (Throwable e)
+			{
+				Log.error("Exception in %s applyCodeLenses", plugin.getName());
+				Log.error(e);
+			}
 		}
 		
-		return lenses;
+		return commands;
 	}
 }

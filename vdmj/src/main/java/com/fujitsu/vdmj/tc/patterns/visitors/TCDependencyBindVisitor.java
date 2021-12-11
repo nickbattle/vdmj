@@ -28,40 +28,40 @@ import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
+import com.fujitsu.vdmj.tc.patterns.TCBind;
+import com.fujitsu.vdmj.tc.patterns.TCSeqBind;
+import com.fujitsu.vdmj.tc.patterns.TCSetBind;
+import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 
-public class TCGetFreeVariablesMultipleBindVisitor extends TCMultipleBindVisitor<TCNameSet, EnvTriple>
+public class TCDependencyBindVisitor extends TCBindVisitor<TCNameSet, EnvTriple>
 {
 	private final TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitorSet;
 	
-	public TCGetFreeVariablesMultipleBindVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	public TCDependencyBindVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
 	{
 		visitorSet = visitors;
 	}
 
 	@Override
-	public TCNameSet caseMultipleBind(TCMultipleBind node, EnvTriple arg)
+	public TCNameSet caseBind(TCBind node, EnvTriple arg)
 	{
 		return new TCNameSet();
 	}
 	
 	@Override
-	public TCNameSet caseMultipleSeqBind(TCMultipleSeqBind node, EnvTriple arg)
+	public TCNameSet caseSeqBind(TCSeqBind node, EnvTriple arg)
 	{
 		return visitorSet.applyExpressionVisitor(node.sequence, arg);
 	}
 	
 	@Override
-	public TCNameSet caseMultipleSetBind(TCMultipleSetBind node, EnvTriple arg)
+	public TCNameSet caseSetBind(TCSetBind node, EnvTriple arg)
 	{
 		return visitorSet.applyExpressionVisitor(node.set, arg);
 	}
 	
 	@Override
-	public TCNameSet caseMultipleTypeBind(TCMultipleTypeBind node, EnvTriple arg)
+	public TCNameSet caseTypeBind(TCTypeBind node, EnvTriple arg)
 	{
 		return visitorSet.applyTypeVisitor(node.type, arg);
 	}
