@@ -83,14 +83,22 @@ public class PluginRegistry
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
-			if (plugin.supportsMethod(method))
+			try
 			{
-				if (result != null)
+				if (plugin.supportsMethod(method))
 				{
-					Log.error("Multiple plugins support %s", method);
+					if (result != null)
+					{
+						Log.error("Multiple plugins support %s", method);
+					}
+					
+					result = (T)plugin;
 				}
-				
-				result = (T)plugin;
+			}
+			catch (Throwable e)
+			{
+				Log.error("Exception in %s supportsMethod", plugin.getName());
+				Log.error(e);
 			}
 		}
 		
@@ -103,7 +111,15 @@ public class PluginRegistry
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
-			options.putAll(plugin.getExperimentalOptions());
+			try
+			{
+				options.putAll(plugin.getExperimentalOptions());
+			}
+			catch (Throwable e)
+			{
+				Log.error("Exception in %s getExperimentalOptions", plugin.getName());
+				Log.error(e);
+			}
 		}
 		
 		return options;
@@ -115,7 +131,15 @@ public class PluginRegistry
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
-			commands.addAll(plugin.applyCodeLenses(file, dirty));
+			try
+			{
+				commands.addAll(plugin.applyCodeLenses(file, dirty));
+			}
+			catch (Throwable e)
+			{
+				Log.error("Exception in %s applyCodeLenses", plugin.getName());
+				Log.error(e);
+			}
 		}
 		
 		return commands;
