@@ -35,13 +35,12 @@ public class INAnnotatedExpression extends INExpression
 	private static final long serialVersionUID = 1L;
 	
 	public final INAnnotation annotation;
-
 	public final INExpression expression;
 	
 	public INAnnotatedExpression(LexLocation location, INAnnotation annotation, INExpression expression)
 	{
 		super(location);
-		this.annotation = annotation;
+		this.annotation = (annotation != null) ? annotation : new INNoAnnotation();
 		this.expression = expression;
 	}
 

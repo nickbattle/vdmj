@@ -36,13 +36,12 @@ public class POAnnotatedStatement extends POStatement
 	private static final long serialVersionUID = 1L;
 
 	public final POAnnotation annotation;
-
 	public final POStatement statement;
 	
 	public POAnnotatedStatement(LexLocation location, POAnnotation annotation, POStatement statement)
 	{
 		super(location);
-		this.annotation = annotation;
+		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.statement = statement;
 	}
 
