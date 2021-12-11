@@ -53,16 +53,16 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCDependencyVisitor extends TCLeafDefinitionVisitor<TCNameToken, TCNameSet, EnvTriple>
+public class TCDependencyDefinitionVisitor extends TCLeafDefinitionVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
-	public TCDependencyVisitor()
+	public TCDependencyDefinitionVisitor()
 	{
 		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, EnvTriple>()
 		{
 			@Override
 			protected void setVisitors()
 			{
-				definitionVisitor = TCDependencyVisitor.this;
+				definitionVisitor = TCDependencyDefinitionVisitor.this;
 				expressionVisitor = new TCDependencyExpressionVisitor(this);
 				statementVisitor = new TCDependencyStatementVisitor(this);
 				typeVisitor = new TCDependencyTypeVisitor(this);
@@ -73,12 +73,12 @@ public class TCDependencyVisitor extends TCLeafDefinitionVisitor<TCNameToken, TC
 			@Override
 			protected TCNameSet newCollection()
 			{
-				return TCDependencyVisitor.this.newCollection();
+				return TCDependencyDefinitionVisitor.this.newCollection();
 			}
 		};
 	}
 
-	public TCDependencyVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	public TCDependencyDefinitionVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
 	{
 		this.visitorSet = visitors;
 	}

@@ -33,7 +33,8 @@ import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
-import com.fujitsu.vdmj.tc.definitions.visitors.TCDependencyVisitor;
+import com.fujitsu.vdmj.tc.definitions.visitors.TCDependencyDefinitionVisitor;
+import com.fujitsu.vdmj.tc.definitions.visitors.TCFreeVariableDefinitionVisitor;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCGetVariableNamesVisitor;
 import com.fujitsu.vdmj.tc.expressions.EnvTriple;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -42,6 +43,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
@@ -180,11 +182,20 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	}
 
 	/**
-	 * Return a list of free variables needed for the definition to initialise.
+	 * Return a list of variable dependencies needed for the definition to initialise.
 	 */
 	public final TCNameSet getDependencies(Environment globals, Environment env, AtomicBoolean returns)
 	{
-		return apply(new TCDependencyVisitor(), new EnvTriple(globals, env, returns));
+		return apply(new TCDependencyDefinitionVisitor(), new EnvTriple(globals, env, returns));
+	}
+
+	/**
+	 * Return a list of free variables in the definition.
+	 */
+	public final TCNameSet getFreeVariables()
+	{
+		Environment empty = new FlatEnvironment(new TCDefinitionList());
+		return apply(new TCFreeVariableDefinitionVisitor(), empty);
 	}
 	
 	/**
