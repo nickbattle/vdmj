@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCFreeVariableExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
@@ -42,10 +41,8 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCFreeVariableBindVisitor;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCFreeVariableMultipleBindVisitor;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCFreeVariablePatternVisitor;
-import com.fujitsu.vdmj.tc.types.TCField;
-import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.statements.visitors.TCFreeVariableStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
-import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.visitors.TCFreeVariableTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
@@ -62,7 +59,7 @@ public class TCFreeVariableDefinitionVisitor extends TCLeafDefinitionVisitor<TCN
 			{
 				definitionVisitor = TCFreeVariableDefinitionVisitor.this;
 				expressionVisitor = new TCFreeVariableExpressionVisitor(this);
-				statementVisitor = null;
+				statementVisitor = new TCFreeVariableStatementVisitor(this);
 				patternVisitor = new TCFreeVariablePatternVisitor(this);
 				typeVisitor = new TCFreeVariableTypeVisitor(this);
 				bindVisitor = new TCFreeVariableBindVisitor(this);
@@ -255,34 +252,6 @@ public class TCFreeVariableDefinitionVisitor extends TCLeafDefinitionVisitor<TCN
 		if (node.initdef != null)
 		{
 			names.addAll(node.initdef.apply(this, local));
-		}
-		
-		return names;
-	}
-	
-	@Override
-	public TCNameSet caseTypeDefinition(TCTypeDefinition node, Environment arg)
-	{
-		TCNameSet names = new TCNameSet();
-		
-		if (node.type instanceof TCNamedType)
-		{
-			TCNamedType nt = (TCNamedType)node.type;
-			names.addAll(visitorSet.applyTypeVisitor(nt.type, arg));
-		}
-		else if (node.type instanceof TCRecordType)
-		{
-			TCRecordType rt = (TCRecordType)node.type;
-			
-			for (TCField field: rt.fields)
-			{
-				names.addAll(visitorSet.applyTypeVisitor(field.type, arg));
-			}
-		}
-		
-		if (node.invdef != null)
-		{
-			names.addAll(node.invdef.apply(this, arg));
 		}
 		
 		return names;

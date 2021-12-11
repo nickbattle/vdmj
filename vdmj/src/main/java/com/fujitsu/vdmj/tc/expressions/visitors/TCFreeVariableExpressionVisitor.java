@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.tc.expressions.TCSetCompExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -81,36 +82,82 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 	@Override
 	public TCNameSet caseExists1Expression(TCExists1Expression node, Environment arg)
 	{
-		Environment local = new FlatEnvironment(node.def, arg);
-		return super.caseExists1Expression(node, local);
+		TCNameSet all = visitorSet.applyBindVisitor(node.bind, arg);
+		
+		if (node.predicate != null)
+		{
+			Environment local = new FlatEnvironment(node.def, arg);
+			all.addAll(node.predicate.apply(this, local));
+		}
+		
+		return all;
 	}
 	
 	@Override
 	public TCNameSet caseExistsExpression(TCExistsExpression node, Environment arg)
 	{
-		Environment local = new FlatEnvironment(node.def, arg);
-		return super.caseExistsExpression(node, local);
+		TCNameSet all = newCollection();
+		
+		for (TCMultipleBind bind: node.bindList)
+		{
+			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
+		}
+		
+		if (node.predicate != null)
+		{
+			Environment local = new FlatEnvironment(node.def, arg);
+			all.addAll(node.predicate.apply(this, local));
+		}
+		
+		return all;
 	}
 	
 	@Override
 	public TCNameSet caseForAllExpression(TCForAllExpression node, Environment arg)
 	{
-		Environment local = new FlatEnvironment(node.def, arg);
-		return super.caseForAllExpression(node, local);
+		TCNameSet all = newCollection();
+		
+		for (TCMultipleBind bind: node.bindList)
+		{
+			all.addAll(visitorSet.applyMultiBindVisitor(bind, arg));
+		}
+		
+		if (node.predicate != null)
+		{
+			Environment local = new FlatEnvironment(node.def, arg);
+			all.addAll(node.predicate.apply(this, local));
+		}
+		
+		return all;
 	}
 	
 	@Override
 	public TCNameSet caseIotaExpression(TCIotaExpression node, Environment arg)
 	{
-		Environment local = new FlatEnvironment(node.def, arg);
-		return super.caseIotaExpression(node, local);
+		TCNameSet all = visitorSet.applyBindVisitor(node.bind, arg);
+		
+		if (node.predicate != null)
+		{
+			Environment local = new FlatEnvironment(node.def, arg);
+			all.addAll(node.predicate.apply(this, local));
+		}
+		
+		return all;
 	}
 	
 	@Override
 	public TCNameSet caseLetBeStExpression(TCLetBeStExpression node, Environment arg)
 	{
-		Environment local = new FlatEnvironment(node.def, arg);
-		return super.caseLetBeStExpression(node, local);
+		TCNameSet all = visitorSet.applyMultiBindVisitor(node.bind, arg);
+		
+		if (node.suchThat != null)
+		{
+			Environment local = new FlatEnvironment(node.def, arg);
+			all.addAll(node.suchThat.apply(this, local));
+		}
+		
+		all.addAll(node.value.apply(this, arg));
+		return all;
 	}
 	
 	@Override
@@ -139,22 +186,61 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 	@Override
 	public TCNameSet caseMapCompExpression(TCMapCompExpression node, Environment arg)
 	{
+		TCNameSet all = newCollection();
+		
+		for (TCMultipleBind mbind: node.bindings)
+		{
+			all.addAll(visitorSet.applyMultiBindVisitor(mbind, arg));
+		}
+
 		Environment local = new FlatEnvironment(node.def, arg);
-		return super.caseMapCompExpression(node, local);
+		all.addAll(node.first.left.apply(this, local));
+		all.addAll(node.first.right.apply(this, local));
+		
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, local));
+		}
+		
+		return all;
 	}
 	
 	@Override
 	public TCNameSet caseSeqCompExpression(TCSeqCompExpression node, Environment arg)
 	{
+		TCNameSet all = newCollection();
+		all.addAll(visitorSet.applyBindVisitor(node.bind, arg));
+
 		Environment local = new FlatEnvironment(node.def, arg);
-		return super.caseSeqCompExpression(node, local);
+		all.addAll(node.first.apply(this, local));
+		
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, local));
+		}
+
+		return all;
 	}
 	
 	@Override
 	public TCNameSet caseSetCompExpression(TCSetCompExpression node, Environment arg)
 	{
+		TCNameSet all = newCollection();
+		
+		for (TCMultipleBind mbind: node.bindings)
+		{
+			all.addAll(visitorSet.applyMultiBindVisitor(mbind, arg));
+		}
+
 		Environment local = new FlatEnvironment(node.def, arg);
-		return super.caseSetCompExpression(node, local);
+		all.addAll(node.first.apply(this, local));
+
+		if (node.predicate != null)
+		{
+			all.addAll(node.predicate.apply(this, local));
+		}
+		
+		return all;
 	}
 	
 	@Override

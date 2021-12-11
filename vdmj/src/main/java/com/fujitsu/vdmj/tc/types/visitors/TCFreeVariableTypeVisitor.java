@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.tc.types.visitors;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -48,18 +47,5 @@ public class TCFreeVariableTypeVisitor extends TCLeafTypeVisitor<TCNameToken, TC
 	public TCNameSet caseType(TCType node, Environment arg)
 	{
 		return newCollection();		// Default has no names
-	}
-	
-	@Override
-	public TCNameSet caseClassType(TCClassType node, Environment arg)
-	{
-		if (arg.findType(node.name, node.name.getModule()) == null)
-		{
-			return new TCNameSet(node.name);
-		}
-		else
-		{
-			return new TCNameSet();
-		}
 	}
 }
