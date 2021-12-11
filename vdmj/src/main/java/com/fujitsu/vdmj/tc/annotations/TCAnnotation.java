@@ -48,7 +48,6 @@ public abstract class TCAnnotation extends TCNode implements MappingOptional
 	private static final long serialVersionUID = 1L;
 
 	public final TCIdentifierToken name;
-	
 	public final TCExpressionList args;
 	
 	private static final Set<Class<? extends TCAnnotation>> declared = new HashSet<Class<? extends TCAnnotation>>(); 

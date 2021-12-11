@@ -47,7 +47,6 @@ public abstract class POAnnotation extends PONode implements MappingOptional
 	private static final long serialVersionUID = 1L;
 
 	public final TCIdentifierToken name;
-	
 	public final POExpressionList args;
 	
 	private static final Set<Class<? extends POAnnotation>> declared = new HashSet<Class<? extends POAnnotation>>(); 

@@ -44,7 +44,6 @@ public abstract class INAnnotation extends INNode implements MappingOptional
 	private static final long serialVersionUID = 1L;
 
 	public final TCIdentifierToken name;
-	
 	public final INExpressionList args;
 	
 	private static final Set<Class<? extends INAnnotation>> declared = new HashSet<Class<? extends INAnnotation>>(); 
