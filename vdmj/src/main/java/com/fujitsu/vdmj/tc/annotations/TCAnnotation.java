@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.mapper.MappingOptional;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -42,7 +43,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public abstract class TCAnnotation extends TCNode
+public abstract class TCAnnotation extends TCNode implements MappingOptional
 {
 	private static final long serialVersionUID = 1L;
 

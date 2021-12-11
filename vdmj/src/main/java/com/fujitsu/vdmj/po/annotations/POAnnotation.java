@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.mapper.MappingOptional;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -41,7 +42,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public abstract class POAnnotation extends PONode
+public abstract class POAnnotation extends PONode implements MappingOptional
 {
 	private static final long serialVersionUID = 1L;
 

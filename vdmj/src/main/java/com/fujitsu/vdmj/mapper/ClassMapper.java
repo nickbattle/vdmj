@@ -783,6 +783,15 @@ public class ClassMapper
     
     		if (mp == null)
     		{
+    			/**
+    			 * This is used for annotations, so that user supplied annotation classes
+    			 * do not fail if there is no map for a given analysis.
+    			 */
+    			if (source instanceof MappingOptional)
+    			{
+    				return null;
+    			}
+    			
     			throw new Exception("No mapping for " + srcClass + " in " + configFile);
     		}
     		else if (mp.unmapped)

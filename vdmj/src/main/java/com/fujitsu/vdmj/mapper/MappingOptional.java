@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2021 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,37 +22,13 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.annotations;
+package com.fujitsu.vdmj.mapper;
 
-import java.util.function.Predicate;
-
-import com.fujitsu.vdmj.in.INMappedList;
-import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
-import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
-
-public class INAnnotationList extends INMappedList<TCAnnotation, INAnnotation>
+/**
+ * A marker interface that indicates that the class may not exist in a mapping
+ * to another analysis, and should map to null without error.
+ */
+public interface MappingOptional
 {
-	private static final long serialVersionUID = 1L;
-	
-	public INAnnotationList()
-	{
-		super();
-	}
-	
-	public INAnnotationList(TCAnnotationList from) throws Exception
-	{
-		super(from);
-		
-		/**
-		 * Annotations are MappingOptional, so we remove any nulls here.
-		 */
-		this.removeIf(new Predicate<INAnnotation>()
-		{
-			@Override
-			public boolean test(INAnnotation a)
-			{
-				return a == null;
-			}
-		});
-	}
+	// Empty
 }
