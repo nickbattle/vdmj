@@ -53,8 +53,8 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import workspace.Log;
+import workspace.lenses.ASTLaunchDebugLens;
 import workspace.lenses.CodeLens;
-import workspace.lenses.LaunchDebugLens;
 
 public abstract class ASTPlugin extends AnalysisPlugin
 {
@@ -99,14 +99,19 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	}
 	
 	/**
-	 * We register the launch/debug code lens here. It could have been in the TCPlugin.
-	 * Just an arbitrary choice, unless we divide the AST/TC sides of CodeLens.
+	 * We register the launch/debug code lens here, if the tree is dirty. Else it
+	 * is registered by the TCPlugin.
 	 */
 	@Override
-	public List<CodeLens> getCodeLenses()
+	protected List<CodeLens> getCodeLenses(boolean dirty)
 	{
 		List<CodeLens> lenses = new Vector<CodeLens>();
-		lenses.add(new LaunchDebugLens());
+		
+		if (dirty)
+		{
+			lenses.add(new ASTLaunchDebugLens());
+		}
+		
 		return lenses;
 	}
 
@@ -147,9 +152,6 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	abstract public FilenameFilter getFilenameFilter();
 
 	abstract public String[] getFilenameFilters();
-	
-	abstract public JSONArray documentLenses(File file);
-
 	
 	/**
 	 * Common methods for hierarchical outlines.

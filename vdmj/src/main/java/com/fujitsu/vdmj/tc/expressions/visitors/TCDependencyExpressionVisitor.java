@@ -61,9 +61,9 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCGetFreeVariablesVisitor extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple>
+public class TCDependencyExpressionVisitor extends TCLeafExpressionVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
-	public TCGetFreeVariablesVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	public TCDependencyExpressionVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
 	{
 		visitorSet = visitors;
 	}

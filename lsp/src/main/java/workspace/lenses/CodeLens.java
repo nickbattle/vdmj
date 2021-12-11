@@ -24,11 +24,7 @@
 
 package workspace.lenses;
 
-import java.io.File;
-
-import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
@@ -44,8 +40,7 @@ abstract public class CodeLens
 	 * can also be refreshed later from the TC after the spec is checked. Both
 	 * of these are required. 
 	 */
-	abstract public JSONArray codeLenses(ASTDefinition definition, File file);
-	abstract public JSONArray codeLenses(TCDefinition definition, File file);
+	abstract public <DEF> JSONArray getDefinitionLenses(DEF definition);
 	
 	/**
 	 * Lenses are often dependent on particular LSP Clients that implement the
@@ -70,9 +65,8 @@ abstract public class CodeLens
 	
 	protected JSONObject makeLens(LexLocation location, String title, String command, JSONArray arguments)
 	{
-		JSONObject lens = makeLens(location, title, command);
-		JSONObject cmd = lens.get("command");
-		cmd.put("command", new JSONObject("title", title, "command", command, "arguments", arguments));
-		return lens;
+		return new JSONObject(
+				"range", Utils.lexLocationToRange(location),
+				"command", new JSONObject("title", title, "command", command, "arguments", arguments));
 	}
 }

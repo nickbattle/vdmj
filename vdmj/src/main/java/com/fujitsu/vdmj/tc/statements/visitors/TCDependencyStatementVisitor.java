@@ -51,9 +51,9 @@ import com.fujitsu.vdmj.tc.statements.TCWhileStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 
-public class TCGetFreeVariablesVisitor extends TCLeafStatementVisitor<TCNameToken, TCNameSet, EnvTriple>
+public class TCDependencyStatementVisitor extends TCLeafStatementVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
-	public TCGetFreeVariablesVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	public TCDependencyStatementVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
 	{
 		visitorSet = visitors;
 	}
