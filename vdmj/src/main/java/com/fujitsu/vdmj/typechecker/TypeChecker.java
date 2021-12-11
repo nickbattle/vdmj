@@ -88,19 +88,19 @@ abstract public class TypeChecker
     	for (TCDefinition def: defs)
     	{
     		Environment empty = new FlatEnvironment(new TCDefinitionList());
-			TCNameSet freevars = def.getFreeVariables(globals, empty, new AtomicBoolean(false));
+			TCNameSet initdeps = def.getDependencies(globals, empty, new AtomicBoolean(false));
 			
-			if (!freevars.isEmpty())
+			if (!initdeps.isEmpty())
 			{
     			for (TCNameToken name: def.getVariableNames())
     			{
-    				dependencies.put(name.getExplicit(true), freevars);
+    				dependencies.put(name.getExplicit(true), initdeps);
     				
     				if (Settings.verbose)
     				{
-    					Console.out.println(name.getExplicit(true) + " => " + freevars);
+    					Console.out.println(name.getExplicit(true) + " => " + initdeps);
 
-    					for (TCNameToken freevar: freevars)
+    					for (TCNameToken freevar: initdeps)
     					{
     						TCDefinition fdef = globals.findName(freevar, NameScope.ANYTHING);
     						

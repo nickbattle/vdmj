@@ -33,9 +33,9 @@ import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
-public class TCGetFreeVariablesVisitor extends TCLeafTypeVisitor<TCNameToken, TCNameSet, EnvTriple>
+public class TCDependencyTypeVisitor extends TCLeafTypeVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
-	public TCGetFreeVariablesVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	public TCDependencyTypeVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
 	{
 		visitorSet = visitors;
 	}

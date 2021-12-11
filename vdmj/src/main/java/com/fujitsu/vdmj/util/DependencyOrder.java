@@ -69,7 +69,7 @@ public class DependencyOrder
 		    	{
 		        	Environment globals = new FlatEnvironment(new TCDefinitionList());
 		    		Environment empty = new FlatEnvironment(new TCDefinitionList());
-					TCNameSet freevars = def.getFreeVariables(globals, empty, new AtomicBoolean(false));
+					TCNameSet freevars = def.getDependencies(globals, empty, new AtomicBoolean(false));
 			    	
 			    	for (TCNameToken dep: freevars)
 			    	{

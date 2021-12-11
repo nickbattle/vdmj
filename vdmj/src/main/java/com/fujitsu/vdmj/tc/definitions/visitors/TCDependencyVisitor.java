@@ -38,44 +38,47 @@ import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.EnvTriple;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCDependencyExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.patterns.visitors.TCGetFreeVariablesBindVisitor;
-import com.fujitsu.vdmj.tc.patterns.visitors.TCGetFreeVariablesMultipleBindVisitor;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCDependencyBindVisitor;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCDependencyMultipleBindVisitor;
+import com.fujitsu.vdmj.tc.statements.visitors.TCDependencyStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
+import com.fujitsu.vdmj.tc.types.visitors.TCDependencyTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCGetFreeVariablesVisitor extends TCLeafDefinitionVisitor<TCNameToken, TCNameSet, EnvTriple>
+public class TCDependencyVisitor extends TCLeafDefinitionVisitor<TCNameToken, TCNameSet, EnvTriple>
 {
-	public TCGetFreeVariablesVisitor()
+	public TCDependencyVisitor()
 	{
 		visitorSet = new TCVisitorSet<TCNameToken, TCNameSet, EnvTriple>()
 		{
 			@Override
 			protected void setVisitors()
 			{
-				definitionVisitor = TCGetFreeVariablesVisitor.this;
-				expressionVisitor = new com.fujitsu.vdmj.tc.expressions.visitors.TCGetFreeVariablesVisitor(this);
-				statementVisitor = new com.fujitsu.vdmj.tc.statements.visitors.TCGetFreeVariablesVisitor(this);
-				typeVisitor = new com.fujitsu.vdmj.tc.types.visitors.TCGetFreeVariablesVisitor(this);
-				bindVisitor = new TCGetFreeVariablesBindVisitor(this);
-				multiBindVisitor = new TCGetFreeVariablesMultipleBindVisitor(this); 
+				definitionVisitor = TCDependencyVisitor.this;
+				expressionVisitor = new TCDependencyExpressionVisitor(this);
+				statementVisitor = new TCDependencyStatementVisitor(this);
+				typeVisitor = new TCDependencyTypeVisitor(this);
+				bindVisitor = new TCDependencyBindVisitor(this);
+				multiBindVisitor = new TCDependencyMultipleBindVisitor(this); 
 			}
 
 			@Override
 			protected TCNameSet newCollection()
 			{
-				return TCGetFreeVariablesVisitor.this.newCollection();
+				return TCDependencyVisitor.this.newCollection();
 			}
 		};
 	}
 
-	public TCGetFreeVariablesVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
+	public TCDependencyVisitor(TCVisitorSet<TCNameToken, TCNameSet, EnvTriple> visitors)
 	{
 		this.visitorSet = visitors;
 	}
