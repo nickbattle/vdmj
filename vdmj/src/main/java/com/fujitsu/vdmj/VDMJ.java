@@ -302,17 +302,6 @@ abstract public class VDMJ
 				{
 					filenames.add(file);
 				}
-				else if (GetResource.find(file))
-				{
-					try
-					{				
-						filenames.add(GetResource.load(file));
-					}
-					catch (IOException e)
-					{
-						usage("Cannot load resource /" + file.getName() + ": " + e.getMessage());
-					}
-    			}
 				else
 				{
 					boolean found = false;
@@ -334,7 +323,21 @@ abstract public class VDMJ
 					
 					if (!found)
 					{
-						usage("Cannot find file " + file);
+						if (GetResource.find(file))
+						{
+							try
+							{				
+								filenames.add(GetResource.load(file));
+							}
+							catch (IOException e)
+							{
+								usage("Cannot load resource /" + file.getName() + ": " + e.getMessage());
+							}
+		    			}
+						else
+						{
+							usage("Cannot find file " + file);
+						}
 					}
 				}
     		}
