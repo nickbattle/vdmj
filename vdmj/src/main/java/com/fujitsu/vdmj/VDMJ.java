@@ -268,12 +268,12 @@ abstract public class VDMJ
        				}
        				else
        				{
-       					usage(path + " is not a directory or a jar file");
+       					usage(path + " is not a directory");
        				}
     			}
     			else
     			{
-    				usage("-path option requires a directory or a jar file");
+    				usage("-path option requires a directory");
     			}
     		}
     		else if (arg.equals("-strict"))
