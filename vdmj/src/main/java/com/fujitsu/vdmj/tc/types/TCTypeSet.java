@@ -147,6 +147,19 @@ public class TCTypeSet extends TreeSet<TCType> implements Cloneable, Mappable
 				remove(opt.type);	// Because T | [T] = [T]
 			}
 		}
+		else if (t instanceof TCTokenType)
+		{
+			TCTokenType tt = (TCTokenType)t;
+
+			for (TCType x: this)
+			{
+				if (x instanceof TCTokenType)
+				{
+					TCTokenType xt = (TCTokenType)x;
+					xt.argtypes.addAll(tt.argtypes);
+				}
+			}
+		}
 		
 		return super.add(t);
 	}

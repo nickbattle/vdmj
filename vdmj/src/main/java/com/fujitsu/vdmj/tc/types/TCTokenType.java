@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 public class TCTokenType extends TCBasicType
 {
 	private static final long serialVersionUID = 1L;
+	public TCTypeSet argtypes = new TCTypeSet();
 
 	public TCTokenType(LexLocation location)
 	{
@@ -46,5 +47,10 @@ public class TCTokenType extends TCBasicType
 	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseTokenType(this, arg);
+	}
+
+	public void addType(TCType argtype)
+	{
+		argtypes.add(argtype);
 	}
 }
