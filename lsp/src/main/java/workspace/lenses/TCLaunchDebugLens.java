@@ -144,6 +144,12 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens
 							}
 						}
 					}
+					
+					if (constructors.isEmpty())
+					{
+						// create an entry for the default constructor, new C()
+						constructors.add(new JSONArray());
+					}
 				}
 			
 				results.add(makeLens(def.location, "Launch", CODE_LENS_COMMAND,
