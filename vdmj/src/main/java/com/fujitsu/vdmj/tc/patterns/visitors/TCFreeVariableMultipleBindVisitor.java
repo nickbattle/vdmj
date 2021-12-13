@@ -39,6 +39,7 @@ public class TCFreeVariableMultipleBindVisitor extends TCMultipleBindVisitor<TCN
 	
 	public TCFreeVariableMultipleBindVisitor(TCVisitorSet<TCNameToken, TCNameSet, Environment> visitors)
 	{
+		assert visitors != null : "Visitor set cannot be null";
 		visitorSet = visitors;
 	}
 
