@@ -30,21 +30,14 @@ import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
-import com.fujitsu.vdmj.ast.patterns.ASTPattern;
-import com.fujitsu.vdmj.ast.types.ASTFunctionType;
-import com.fujitsu.vdmj.ast.types.ASTOperationType;
-import com.fujitsu.vdmj.ast.types.ASTPatternListTypePair;
-import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
 
 import json.JSONArray;
-import json.JSONObject;
 
 public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 {
-	private final String CODE_LENS_COMMAND = "vdm-vscode.addLensRunConfiguration";
-	// private final String CODE_LENS_COMMAND = "workbench.action.debug.configure";
+	private final String CODE_LENS_COMMAND = "vdm-vscode.addLensRunConfigurationWarning";
 
 	@Override
 	public <DEF> JSONArray getDefinitionLenses(DEF definition)
@@ -54,93 +47,36 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 		
 		if ("vscode".equals(getClientName()) && isPublic(def))
 		{
-			String launchName = null;
-			String defaultName = null;
-			String applyName = null;
-			JSONArray applyArgs = new JSONArray();
+			boolean included = false;
 			
 			if (def instanceof ASTExplicitFunctionDefinition)
 			{
-				ASTExplicitFunctionDefinition exdef = (ASTExplicitFunctionDefinition) def;
-				applyName = exdef.name.getName();
-				launchName = applyName;
-				defaultName = exdef.name.module;
-				
-				ASTFunctionType ftype = (ASTFunctionType) exdef.type;
-				ASTTypeList ptypes = ftype.parameters;
-				int i = 0;
-				
-				for (ASTPattern p: exdef.paramPatternList.get(0))	// Curried?
-				{
-					applyArgs.add(new JSONObject("name", p.toString(), "type", ptypes.get(i++).toString()));
-				}
+				included = true;
 			}
 			else if (def instanceof ASTImplicitFunctionDefinition)
 			{
 				ASTImplicitFunctionDefinition imdef = (ASTImplicitFunctionDefinition) def;
-				
-				if (imdef.body != null)
-				{
-					applyName = imdef.name.getName();
-					launchName = applyName;
-					defaultName = imdef.name.module;
-					
-					for (ASTPatternListTypePair param: imdef.parameterPatterns)
-					{
-						for (ASTPattern p: param.patterns)
-						{
-							applyArgs.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
-						}
-					}
-				}
+				included = (imdef.body != null);
 			}
 			else if (def instanceof ASTExplicitOperationDefinition)
 			{
 				ASTExplicitOperationDefinition exop = (ASTExplicitOperationDefinition) def;
-				applyName = exop.name.getName();
-				defaultName = exop.name.module;
-				
-				if (!applyName.equals(defaultName))		// Not a constructor
-				{
-					launchName = applyName;
-					
-					ASTOperationType ftype = (ASTOperationType) exop.type;
-					ASTTypeList ptypes = ftype.parameters;
-					int i = 0;
-					
-					for (ASTPattern p: exop.parameterPatterns)
-					{
-						applyArgs.add(new JSONObject("name", p.toString(), "type", ptypes.get(i++).toString()));
-					}
-				}
+				String applyName = exop.name.getName();
+				String defaultName = exop.name.module;
+				included = (!applyName.equals(defaultName));		// Not a constructor
 			}
 			else if (def instanceof ASTImplicitOperationDefinition)
 			{
 				ASTImplicitOperationDefinition imop = (ASTImplicitOperationDefinition) def;
-				applyName = imop.name.getName();
-				defaultName = imop.name.module;
-
-				if (!applyName.equals(defaultName) && imop.body != null)	// Not a constructor
-				{
-					launchName = applyName;
-					
-					for (ASTPatternListTypePair param: imop.parameterPatterns)
-					{
-						for (ASTPattern p: param.patterns)
-						{
-							applyArgs.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
-						}
-					}
-				}
+				String applyName = imop.name.getName();
+				String defaultName = imop.name.module;
+				included = (!applyName.equals(defaultName) && imop.body != null);	// Not a constructor
 			}
 			
-			if (launchName != null)
+			if (included)
 			{
-				results.add(makeLens(def.location, "Launch", CODE_LENS_COMMAND,
-						launchArgs(launchName, defaultName, false, null, applyName, applyArgs)));
-					
-				results.add(makeLens(def.location, "Debug", CODE_LENS_COMMAND,
-						launchArgs(launchName, defaultName, true, null, applyName, applyArgs)));
+				results.add(makeLens(def.location, "Launch", CODE_LENS_COMMAND));
+				results.add(makeLens(def.location, "Debug", CODE_LENS_COMMAND));
 			}
 		}
 		
