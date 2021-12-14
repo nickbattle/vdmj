@@ -635,7 +635,9 @@ public class LSPWorkspaceManager
 		
 		if (actionCode > 0)
 		{
-			return checkLoadedFiles("after change watched");
+			RPCMessageList results = checkLoadedFiles("after change watched");
+			// results.add(RPCRequest.create("workspace/codeLens/refresh", null));
+			return results;
 		}
 		else
 		{
