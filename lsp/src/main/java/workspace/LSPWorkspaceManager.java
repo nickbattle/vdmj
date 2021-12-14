@@ -848,6 +848,11 @@ public class LSPWorkspaceManager
 		return new RPCMessageList(request, lenses);
 	}
 
+	public RPCMessageList codeLensResolve(RPCRequest request, JSONObject data)
+	{
+		return new RPCMessageList(request);
+	}
+
 	/**
 	 * Fix the "range" fields of the DocumentSymbol array passed in, such that each
 	 * range starts at the selectionRange and ends at the start of the next symbol,
