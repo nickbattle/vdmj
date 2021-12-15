@@ -89,6 +89,7 @@ public class State implements ValueListener, Serializable
 				INEqualsExpression ee = (INEqualsExpression)definition.initExpression;
 				ee.location.hit();
 				ee.left.location.hit();
+				ee.left.breakpoint.check(ee.left.location, globals);
 				Value v = ee.right.eval(globals);
 
 				if (!(v instanceof RecordValue))
