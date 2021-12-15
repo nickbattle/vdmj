@@ -29,8 +29,8 @@ import java.io.FilenameFilter;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
@@ -211,7 +211,7 @@ public class ASTPluginPR extends ASTPlugin
 						{
 							for (CodeLens lens: lenses)
 							{
-								results.addAll(lens.getDefinitionLenses(def));
+								results.addAll(lens.getDefinitionLenses(def, clazz));
 							}
 						}
 					}

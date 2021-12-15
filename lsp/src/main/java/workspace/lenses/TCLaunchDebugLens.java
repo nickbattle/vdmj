@@ -47,12 +47,12 @@ import json.JSONObject;
 public class TCLaunchDebugLens extends AbstractLaunchDebugLens
 {
 	private final String CODE_LENS_COMMAND = "vdm-vscode.addLensRunConfiguration";
-	// private final String CODE_LENS_COMMAND = "workbench.action.debug.configure";
 
 	@Override
-	public <DEF> JSONArray getDefinitionLenses(DEF definition)
+	public <DEF, CLS> JSONArray getDefinitionLenses(DEF definition, CLS classdef)
 	{
 		TCDefinition def = (TCDefinition)definition;
+		TCClassDefinition cls = (TCClassDefinition) classdef;
 		JSONArray results = new JSONArray();
 		
 		if ("vscode".equals(getClientName()) && isPublic(def))
@@ -61,7 +61,6 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens
 			String defaultName = null;
 			String applyName = null;
 			JSONArray applyArgs = null;
-			TCClassDefinition classdef = null;
 			
 			if (def instanceof TCExplicitFunctionDefinition)
 			{
@@ -71,7 +70,6 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens
 				defaultName = exdef.name.getModule();
 				TCFunctionType ftype = (TCFunctionType) exdef.type;
 				applyArgs = getParams(exdef.paramPatternList.get(0), ftype.parameters);
-				classdef = exdef.classDefinition;
 			}
 			else if (def instanceof TCImplicitFunctionDefinition)
 			{
@@ -83,7 +81,6 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens
 					launchName = applyName;
 					defaultName = imdef.name.getModule();
 					applyArgs = getParams(imdef.parameterPatterns);
-					classdef = imdef.classDefinition;
 				}
 			}
 			else if (def instanceof TCExplicitOperationDefinition)
@@ -97,7 +94,6 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens
 					defaultName = exop.name.getModule();
 					TCOperationType ftype = (TCOperationType) exop.type;
 					applyArgs = getParams(exop.parameterPatterns, ftype.parameters);
-					classdef = exop.classDefinition;
 				}
 			}
 			else if (def instanceof TCImplicitOperationDefinition)
@@ -110,7 +106,6 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens
 					launchName = applyName;
 					defaultName = imop.name.getModule();
 					applyArgs = getParams(imop.parameterPatterns);
-					classdef = imop.classDefinition;
 				}
 			}
 			
@@ -118,11 +113,11 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens
 			{
 				JSONArray constructors = null;
 				
-				if (classdef != null && !def.isAccess(Token.STATIC))	// Look for class constructors
+				if (cls != null && !def.isAccess(Token.STATIC))	// Look for class constructors
 				{
 					constructors = new JSONArray();
 					
-					for (TCDefinition cdef: classdef.definitions)
+					for (TCDefinition cdef: cls.definitions)
 					{
 						if (cdef instanceof TCExplicitOperationDefinition)
 						{
