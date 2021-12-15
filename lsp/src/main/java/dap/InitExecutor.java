@@ -84,7 +84,7 @@ public class InitExecutor extends AsyncExecutor
 			if (command instanceof InitRunnable)
 			{
 				InitRunnable initcmd = (InitRunnable)command;
-				running = launchCommand;
+				running = initcmd.getExpression();
 				String launchResult = initcmd.initRun(request);
 				server.stdout(initcmd.format(launchResult) + "\n");
 			}

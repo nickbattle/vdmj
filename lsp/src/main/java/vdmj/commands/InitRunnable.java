@@ -36,6 +36,6 @@ import dap.DAPRequest;
 public interface InitRunnable
 {
 	public String initRun(DAPRequest request);
-	
+	public String getExpression();
 	public String format(String result);
 }

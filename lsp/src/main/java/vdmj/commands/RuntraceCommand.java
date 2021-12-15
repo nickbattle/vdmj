@@ -76,6 +76,12 @@ public class RuntraceCommand extends Command implements InitRunnable
 	}
 	
 	@Override
+	public String getExpression()
+	{
+		return tracename + " " + testNumber;
+	}
+	
+	@Override
 	public String format(String result)
 	{
 		return result;	// All done by display
