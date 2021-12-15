@@ -37,9 +37,12 @@ import com.fujitsu.vdmj.ast.types.ASTFunctionType;
 import com.fujitsu.vdmj.ast.types.ASTOperationType;
 import com.fujitsu.vdmj.ast.types.ASTPatternListTypePair;
 import com.fujitsu.vdmj.ast.types.ASTPatternListTypePairList;
+import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.ast.types.ASTTypeList;
+import com.fujitsu.vdmj.ast.types.ASTUnresolvedType;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
+
 import json.JSONArray;
 import json.JSONObject;
 
@@ -74,7 +77,7 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 				
 				for (ASTPattern p: exdef.paramPatternList.get(0))	// Curried?
 				{
-					applyArgs.add(new JSONObject("name", p.toString(), "type", ptypes.get(i++).toString()));
+					applyArgs.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
 				}
 			}
 			else if (def instanceof ASTImplicitFunctionDefinition)
@@ -91,7 +94,7 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 					{
 						for (ASTPattern p: param.patterns)
 						{
-							applyArgs.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
+							applyArgs.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
 						}
 					}
 				}
@@ -112,7 +115,7 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 					
 					for (ASTPattern p: exop.parameterPatterns)
 					{
-						applyArgs.add(new JSONObject("name", p.toString(), "type", ptypes.get(i++).toString()));
+						applyArgs.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
 					}
 				}
 			}
@@ -130,7 +133,7 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 					{
 						for (ASTPattern p: param.patterns)
 						{
-							applyArgs.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
+							applyArgs.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
 						}
 					}
 				}
@@ -192,7 +195,7 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 		
 		for (ASTPattern p: patterns)
 		{
-			params.add(new JSONObject("name", p.toString(), "type", types.get(i++).toString()));
+			params.add(new JSONObject("name", p.toString(), "type", fix(types.get(i++))));
 		}
 		
 		return params;
@@ -206,11 +209,24 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 		{
 			for (ASTPattern p: param.patterns)
 			{
-				params.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
+				params.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
 			}
 		}
 		
 		return params;
+	}
+	
+	private String fix(ASTType type)
+	{
+		if (type instanceof ASTUnresolvedType)
+		{
+			ASTUnresolvedType ut = (ASTUnresolvedType)type;
+			return ut.typename.name;
+		}
+		else
+		{
+			return type.toString();
+		}
 	}
 
 	private boolean isPublic(ASTDefinition def)
