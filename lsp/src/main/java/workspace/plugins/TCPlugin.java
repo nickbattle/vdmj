@@ -26,6 +26,7 @@ package workspace.plugins;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -138,6 +139,17 @@ abstract public class TCPlugin extends AnalysisPlugin
 	{
 		JSONObject result = null;
 		TCDefinitionList alldefs = top.getDefinitions();
+		
+		alldefs.sort(new Comparator<TCDefinition>()
+		{
+			@Override
+			public int compare(TCDefinition d1, TCDefinition d2)
+			{
+				// Order definitions by the location of their names. All "getDefinitions"
+				// include non-null names (ie. values do).
+				return d1.name.getLocation().compareTo(d2.name.getLocation());
+			}
+		});
 		
 		if (!alldefs.isEmpty())
 		{

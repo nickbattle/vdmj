@@ -43,7 +43,7 @@ import com.fujitsu.vdmj.ast.lex.LexToken;
 /**
  * A class to hold the location of a token.
  */
-public class LexLocation implements Serializable
+public class LexLocation implements Serializable, Comparable<LexLocation>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -527,5 +527,25 @@ public class LexLocation implements Serializable
 		}
 
 		br.close();
+	}
+
+	@Override
+	public int compareTo(LexLocation lother)
+	{
+		if (file.equals(lother.file))
+		{
+			if (startLine == lother.startLine)
+			{
+				return startPos - lother.startPos;
+			}
+			else
+			{
+				return startLine - lother.startLine;
+			}
+		}
+		else
+		{
+			return file.compareTo(lother.file);
+		}
 	}
 }
