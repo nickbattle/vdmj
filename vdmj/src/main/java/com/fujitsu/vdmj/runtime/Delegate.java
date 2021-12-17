@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,9 @@ public class Delegate implements Serializable
 	private Class<?> delegateClass = null;
 	private Map<String, Method> delegateMethods = null;
 	private Map<String, TCNameList> delegateArgs = null;
+	
+	// Names of old VDMJ classes that moved to stdlib
+	private static String[] stdlibNames = { "CSV", "IO", "MATH", "VDMUtil" };
 
 	public boolean hasDelegate()
 	{
@@ -83,7 +87,10 @@ public class Delegate implements Serializable
 			}
 			catch (ClassNotFoundException e)
 			{
-				// Fine
+				if (Arrays.asList(stdlibNames).contains(name))
+				{
+					System.err.println("NOTE: include stdlib.jar in classpath to access " + name);
+				}
 			}
 		}
 

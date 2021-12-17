@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.patterns;
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
+import com.fujitsu.vdmj.util.Utils;
 
 public class POMultipleBindList extends POMappedList<TCMultipleBind, POMultipleBind>
 {
@@ -40,5 +41,11 @@ public class POMultipleBindList extends POMappedList<TCMultipleBind, POMultipleB
 	public POMultipleBindList(TCMultipleBindList from) throws Exception
 	{
 		super(from);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return Utils.listToString(this);
 	}
 }

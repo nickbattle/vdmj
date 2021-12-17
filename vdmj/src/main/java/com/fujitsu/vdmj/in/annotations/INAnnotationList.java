@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
+import java.util.function.Predicate;
+
 import com.fujitsu.vdmj.in.INMappedList;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
@@ -40,5 +42,17 @@ public class INAnnotationList extends INMappedList<TCAnnotation, INAnnotation>
 	public INAnnotationList(TCAnnotationList from) throws Exception
 	{
 		super(from);
+		
+		/**
+		 * Annotations are MappingOptional, so we remove any nulls here.
+		 */
+		this.removeIf(new Predicate<INAnnotation>()
+		{
+			@Override
+			public boolean test(INAnnotation a)
+			{
+				return a == null;
+			}
+		});
 	}
 }

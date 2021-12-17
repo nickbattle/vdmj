@@ -99,7 +99,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register(new DefinitionHandler(), "textDocument/definition");
 		dispatcher.register(new DocumentSymbolHandler(), "textDocument/documentSymbol");
 		dispatcher.register(new CompletionHandler(), "textDocument/completion");
-		dispatcher.register(new CodeLensHandler(), "textDocument/codeLens");
+		dispatcher.register(new CodeLensHandler(), "textDocument/codeLens", "codeLens/resolve");
 
 		dispatcher.register(new DidChangeWSHandler(), "workspace/didChangeWatchedFiles");
 

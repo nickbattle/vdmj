@@ -40,7 +40,7 @@ abstract public class CodeLens
 	 * can also be refreshed later from the TC after the spec is checked. Both
 	 * of these are required. 
 	 */
-	abstract public <DEF> JSONArray getDefinitionLenses(DEF definition);
+	abstract public <DEF, CLS> JSONArray getDefinitionLenses(DEF definition, CLS module);
 	
 	/**
 	 * Lenses are often dependent on particular LSP Clients that implement the

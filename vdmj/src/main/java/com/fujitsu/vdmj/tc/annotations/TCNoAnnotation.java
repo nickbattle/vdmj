@@ -22,20 +22,18 @@
  *
  ******************************************************************************/
 
-package vdmj.commands;
+package com.fujitsu.vdmj.tc.annotations;
 
-import dap.DAPRequest;
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-/**
- * Commands that implement this interface can be executed from the InitThread,
- * which calls the initRun method rather than the Command's usual run method.
- * The difference is because the InitThread has already done all of the setup
- * to create a Executor and can return the result DAP messages. So this interface
- * just deals with Strings. 
- */
-public interface InitRunnable
+public class TCNoAnnotation extends TCAnnotation
 {
-	public String initRun(DAPRequest request);
-	public String getExpression();
-	public String format(String result);
+	private static final long serialVersionUID = 1L;
+
+	public TCNoAnnotation()
+	{
+		super(new TCIdentifierToken(LexLocation.ANY, "?", false), new TCExpressionList());
+	}
 }

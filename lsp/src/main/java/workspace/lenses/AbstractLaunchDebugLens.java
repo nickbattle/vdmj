@@ -30,7 +30,7 @@ import json.JSONObject;
 public abstract class AbstractLaunchDebugLens extends CodeLens
 {
 	@Override
-	abstract public <DEF> JSONArray getDefinitionLenses(DEF definition);
+	abstract public <DEF, CLS> JSONArray getDefinitionLenses(DEF definition, CLS module);
 
 	/**
 	 * Generate the command arguments for a code lens. This is used as the "arguments" passed to

@@ -34,16 +34,16 @@ import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.mapper.MappingOptional;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.values.Value;
 
-public abstract class INAnnotation extends INNode
+public abstract class INAnnotation extends INNode implements MappingOptional
 {
 	private static final long serialVersionUID = 1L;
 
 	public final TCIdentifierToken name;
-	
 	public final INExpressionList args;
 	
 	private static final Set<Class<? extends INAnnotation>> declared = new HashSet<Class<? extends INAnnotation>>(); 

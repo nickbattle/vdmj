@@ -225,7 +225,7 @@ public class TCPluginPR extends TCPlugin
 						{
 							for (CodeLens lens: lenses)
 							{
-								results.addAll(lens.getDefinitionLenses(def));
+								results.addAll(lens.getDefinitionLenses(def, clazz));
 							}
 						}
 					}

@@ -41,6 +41,7 @@ public class TCFreeVariableStatementVisitor extends TCLeafStatementVisitor<TCNam
 {
 	public TCFreeVariableStatementVisitor(TCVisitorSet<TCNameToken, TCNameSet, Environment> visitors)
 	{
+		assert visitors != null : "Visitor set cannot be null";
 		visitorSet = visitors;
 	}
 

@@ -124,7 +124,8 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 	@Override
 	public int compareTo(TCDefinition o)
 	{
-		return name == null ? 0 : name.compareTo(o.name); 
+		// Note that some definitions DO have null names!
+		return name == null || o.name == null ? 0 : name.compareTo(o.name); 
 	};
 
 	@Override

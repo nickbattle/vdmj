@@ -34,6 +34,7 @@ public class TCFreeVariableTypeVisitor extends TCLeafTypeVisitor<TCNameToken, TC
 {
 	public TCFreeVariableTypeVisitor(TCVisitorSet<TCNameToken, TCNameSet, Environment> visitors)
 	{
+		assert visitors != null : "Visitor set cannot be null";
 		visitorSet = visitors;
 	}
 

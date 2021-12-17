@@ -193,7 +193,11 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 		}
 
 		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
-		all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
+		
+		if (node.body != null)
+		{
+			all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
+		}
 		
 		if (node.predef != null)
 		{

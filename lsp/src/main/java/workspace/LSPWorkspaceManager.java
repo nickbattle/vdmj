@@ -635,7 +635,15 @@ public class LSPWorkspaceManager
 		
 		if (actionCode > 0)
 		{
-			return checkLoadedFiles("after change watched");
+			RPCMessageList results = checkLoadedFiles("after change watched");
+			
+			if (hasClientCapability("workspace.codeLens.refreshSupport") ||
+				hasClientCapability("experimental.codeLens.refreshSupport"))
+			{
+				results.add(RPCRequest.create("workspace/codeLens/refresh", null));
+			}
+			
+			return results;
 		}
 		else
 		{
@@ -844,6 +852,11 @@ public class LSPWorkspaceManager
 		ASTPlugin ast = registry.getPlugin("AST");
 		JSONArray lenses = registry.applyCodeLenses(file, ast.isDirty());
 		return new RPCMessageList(request, lenses);
+	}
+
+	public RPCMessageList codeLensResolve(RPCRequest request, JSONObject data)
+	{
+		return new RPCMessageList(request);
 	}
 
 	/**

@@ -36,13 +36,12 @@ public class POAnnotatedExpression extends POExpression
 	private static final long serialVersionUID = 1L;
 	
 	public final POAnnotation annotation;
-
 	public final POExpression expression;
 	
 	public POAnnotatedExpression(LexLocation location, POAnnotation annotation, POExpression expression)
 	{
 		super(location);
-		this.annotation = annotation;
+		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.expression = expression;
 	}
 

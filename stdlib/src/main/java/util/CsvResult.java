@@ -22,11 +22,39 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.util;
+package util;
+
+import java.util.List;
 
 import com.fujitsu.vdmj.values.Value;
 
-public interface CsvValueBuilder
+public class CsvResult
 {
-	public Value createValue(String value) throws Exception;
+	private List<Value> values;
+	private String errorMsg;
+	
+	public CsvResult(List<Value> values)
+	{
+		this(values, null);
+	}
+	
+	public CsvResult(List<Value> values, String errorMsg)
+	{
+		this.values = values;
+		this.errorMsg = errorMsg;
+	}
+	
+	public List<Value> getValues()
+	{
+		return values;
+	}
+	public boolean dataOk()
+	{
+		return errorMsg == null;
+	}
+	
+	public String getErrorMsg()
+	{
+		return errorMsg;
+	}
 }

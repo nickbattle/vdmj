@@ -36,13 +36,12 @@ public class TCAnnotatedStatement extends TCStatement
 	private static final long serialVersionUID = 1L;
 
 	public final TCAnnotation annotation;
-
 	public final TCStatement statement;
 	
 	public TCAnnotatedStatement(LexLocation location, TCAnnotation annotation, TCStatement statement)
 	{
 		super(location);
-		this.annotation = annotation;
+		this.annotation = (annotation != null) ? annotation : new TCNoAnnotation();
 		this.statement = statement;
 	}
 
