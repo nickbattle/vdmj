@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -552,7 +553,7 @@ public class DAPWorkspaceManager
 
 	public DAPMessageList threads(DAPRequest request)
 	{
-		List<SchedulableThread> threads = SchedulableThread.getAllThreads();
+		List<SchedulableThread> threads = new Vector<SchedulableThread>(SchedulableThread.getAllThreads());
 		Collections.sort(threads);
 		JSONArray list = new JSONArray();
 		
