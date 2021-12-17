@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2018 Nick Battle.
+ *	Copyright (c) 2021 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -24,45 +24,16 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
-import com.fujitsu.vdmj.in.statements.INStatement;
-import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.values.Value;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-public class INAnnotatedStatement extends INStatement
+public class INNoAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
 
-	public final INAnnotation annotation;
-	public final INStatement statement;
-	
-	public INAnnotatedStatement(LexLocation location, INAnnotation annotation, INStatement statement)
+	public INNoAnnotation()
 	{
-		super(location);
-		this.annotation = (annotation != null) ? annotation : new INNoAnnotation();
-		this.statement = statement;
-	}
-
-	@Override
-	public String toString()
-	{
-		return annotation + " " + statement;
-	}
-
-	@Override
-	public Value eval(Context ctxt)
-	{
-		breakpoint.check(location, ctxt);
-		annotation.inBefore(this, ctxt);
-		Value rv = statement.eval(ctxt);
-		annotation.inAfter(this, rv, ctxt);
-		return rv;
-	}
-	
-	@Override
-	public <R, S> R apply(INStatementVisitor<R, S> visitor, S arg)
-	{
-		return visitor.caseAnnotatedStatement(this, arg);
+		super(new TCIdentifierToken(LexLocation.ANY, "?", false), new INExpressionList());
 	}
 }

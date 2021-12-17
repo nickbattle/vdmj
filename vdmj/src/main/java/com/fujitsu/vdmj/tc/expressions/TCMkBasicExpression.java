@@ -55,7 +55,12 @@ public class TCMkBasicExpression extends TCExpression
 	{
 		TCType argtype = arg.typeCheck(env, null, scope, null);
 
-		if (!(type instanceof TCTokenType) && !argtype.equals(type))
+		if (type instanceof TCTokenType)
+		{
+			TCTokenType tt = (TCTokenType)type;
+			tt.addType(argtype);
+		}
+		else if (!argtype.equals(type))
 		{
 			report(3125, "Argument of mk_" + type + " is the wrong type");
 		}

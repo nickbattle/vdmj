@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
+import java.util.function.Predicate;
+
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
@@ -45,6 +47,18 @@ public class POAnnotationList extends POMappedList<TCAnnotation, POAnnotation>
 	public POAnnotationList(TCAnnotationList from) throws Exception
 	{
 		super(from);
+		
+		/**
+		 * Annotations are MappingOptional, so we remove any nulls here.
+		 */
+		this.removeIf(new Predicate<POAnnotation>()
+		{
+			@Override
+			public boolean test(POAnnotation a)
+			{
+				return a == null;
+			}
+		});
 	}
 
 	public ProofObligationList poBefore(PODefinition def, POContextStack ctxt)

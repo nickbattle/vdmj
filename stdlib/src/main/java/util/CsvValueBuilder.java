@@ -1,8 +1,8 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2021 Nick Battle.
+ *	Copyright (c) 2016 Aarhus University.
  *
- *	Author: Nick Battle
+ *	Author: Kenneth Lausdahl
  *
  *	This file is part of VDMJ.
  *
@@ -22,20 +22,11 @@
  *
  ******************************************************************************/
 
-package vdmj.commands;
+package util;
 
-import dap.DAPRequest;
+import com.fujitsu.vdmj.values.Value;
 
-/**
- * Commands that implement this interface can be executed from the InitThread,
- * which calls the initRun method rather than the Command's usual run method.
- * The difference is because the InitThread has already done all of the setup
- * to create a Executor and can return the result DAP messages. So this interface
- * just deals with Strings. 
- */
-public interface InitRunnable
+public interface CsvValueBuilder
 {
-	public String initRun(DAPRequest request);
-	public String getExpression();
-	public String format(String result);
+	public Value createValue(String value) throws Exception;
 }

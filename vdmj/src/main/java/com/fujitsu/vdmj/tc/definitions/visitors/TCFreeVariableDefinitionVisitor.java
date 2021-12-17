@@ -76,6 +76,7 @@ public class TCFreeVariableDefinitionVisitor extends TCLeafDefinitionVisitor<TCN
 
 	public TCFreeVariableDefinitionVisitor(TCVisitorSet<TCNameToken, TCNameSet, Environment> visitors)
 	{
+		assert visitors != null : "Visitor set cannot be null";
 		this.visitorSet = visitors;
 	}
 	

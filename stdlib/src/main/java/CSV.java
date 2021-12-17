@@ -45,9 +45,6 @@ import com.fujitsu.vdmj.runtime.VDMOperation;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.util.CsvParser;
-import com.fujitsu.vdmj.util.CsvResult;
-import com.fujitsu.vdmj.util.CsvValueBuilder;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.NaturalValue;
@@ -56,6 +53,10 @@ import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.TupleValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
+
+import util.CsvParser;
+import util.CsvResult;
+import util.CsvValueBuilder;
 
 /**
  * Basic CSV file support for VDM. This class was imported from Overture.

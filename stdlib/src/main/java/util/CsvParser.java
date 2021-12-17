@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.util;
+package util;
 
 import java.util.LinkedList;
 import java.util.List;

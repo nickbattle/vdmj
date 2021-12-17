@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
+import java.util.function.Predicate;
+
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
 import com.fujitsu.vdmj.tc.TCMappedList;
@@ -46,6 +48,18 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 	public TCAnnotationList(ASTAnnotationList from) throws Exception
 	{
 		super(from);
+		
+		/**
+		 * Annotations are MappingOptional, so we remove any nulls here.
+		 */
+		this.removeIf(new Predicate<TCAnnotation>()
+		{
+			@Override
+			public boolean test(TCAnnotation a)
+			{
+				return a == null;
+			}
+		});
 	}
 	
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)

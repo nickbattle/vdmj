@@ -51,6 +51,7 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 {
 	public TCFreeVariableExpressionVisitor(TCVisitorSet<TCNameToken, TCNameSet, Environment> visitors)
 	{
+		assert visitors != null : "Visitor set cannot be null";
 		visitorSet = visitors;
 	}
 

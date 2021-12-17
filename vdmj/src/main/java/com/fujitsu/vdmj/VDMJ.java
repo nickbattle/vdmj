@@ -25,10 +25,7 @@
 package com.fujitsu.vdmj;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.JarURLConnection;
 import java.net.URL;
@@ -37,18 +34,18 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 import java.util.Map.Entry;
+import java.util.Vector;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-import java.util.zip.ZipEntry;
 
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.util.GetResource;
 
 /**
  * The main class of the VDMJ parser/checker/interpreter.
@@ -265,18 +262,18 @@ abstract public class VDMJ
     			{
        				File path = new File(i.next());
        				
-       				if (path.isDirectory() || (path.isFile() && path.getName().endsWith(".jar")))
+       				if (path.isDirectory())
        				{
        					pathnames.add(path);
        				}
        				else
        				{
-       					usage(path + " is not a directory or a jar file");
+       					usage(path + " is not a directory");
        				}
     			}
     			else
     			{
-    				usage("-path option requires a directory or a jar file");
+    				usage("-path option requires a directory");
     			}
     		}
     		else if (arg.equals("-strict"))
@@ -287,9 +284,8 @@ abstract public class VDMJ
     		{
     			usage("Unknown option " + arg);
     		}
-    		else
+    		else	// It's a file or a directory
     		{
-    			// It's a file or a directory
     			File file = new File(arg);
 
 				if (file.isDirectory())
@@ -302,81 +298,48 @@ abstract public class VDMJ
 						}
 					}
 				}
-    			else
-    			{
-    				if (file.exists())
-    				{
-    					filenames.add(file);
-    				}
-    				else
-    				{
-    					boolean OK = false;
-    					
-    					for (File path: pathnames)
-    					{
-    						if (path.getName().endsWith(".jar"))	// Usually stdlib jar
-    						{
-    							JarFile jar = null;
-    							
-    							try
-								{
-									jar = new JarFile(path);
-									ZipEntry entry = jar.getEntry(file.getName());	// Use base name
-									
-									if (entry != null)
-									{
-										File temp = File.createTempFile(file.getName() + ".", null);
-										temp.deleteOnExit();
-										OutputStream out = new FileOutputStream(temp);
-										InputStream in = jar.getInputStream(entry);
-										byte[] buf = new byte[8192];
-									    int length;
-
-									    while ((length = in.read(buf)) > 0)
-									    {
-									        out.write(buf, 0, length);
-									    }
-									    
-									    in.close();
-									    out.close();
-									    
-		    							filenames.add(temp);
-		    							OK = true;
-		    							break;
-									}
-								}
-								catch (IOException e)
-								{
-									// Ignore
-								}
-    							finally
-    							{
-    								try
-									{
-										jar.close();
-									}
-									catch (IOException e)
-									{
-									}
-    							}
-    						}
-    						
-    						File pfile = new File(path, arg);
-    						
-    						if (pfile.exists())
-    						{
-    							filenames.add(pfile);
-    							OK = true;
-    							break;
-    						}
-    					}
-    					
-    					if (!OK)
-    					{
-    						usage("Cannot find file " + file);
-    					}
-    				}
-    			}
+    			else if (file.exists())
+				{
+					filenames.add(file);
+				}
+				else
+				{
+					boolean found = false;
+					
+					if (!file.isAbsolute())
+					{
+						for (File path: pathnames)
+						{
+							File pfile = new File(path.getPath(), file.getPath());
+							
+							if (pfile.exists())
+							{
+								filenames.add(pfile);
+								found = true;
+								break;
+							}
+						}
+					}
+					
+					if (!found)
+					{
+						if (GetResource.find(file))
+						{
+							try
+							{				
+								filenames.add(GetResource.load(file));
+							}
+							catch (IOException e)
+							{
+								usage("Cannot load resource /" + file.getName() + ": " + e.getMessage());
+							}
+		    			}
+						else
+						{
+							usage("Cannot find file " + file);
+						}
+					}
+				}
     		}
 		}
 

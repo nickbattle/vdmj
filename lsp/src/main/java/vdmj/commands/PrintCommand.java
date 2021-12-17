@@ -73,6 +73,12 @@ public class PrintCommand extends Command implements InitRunnable
 	}
 	
 	@Override
+	public String getExpression()
+	{
+		return expression;
+	}
+	
+	@Override
 	public String format(String result)
 	{
 		return expression + " = " + result;

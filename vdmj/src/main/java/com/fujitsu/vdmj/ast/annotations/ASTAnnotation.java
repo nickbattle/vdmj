@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.mapper.MappingOptional;
 import com.fujitsu.vdmj.syntax.ClassReader;
 import com.fujitsu.vdmj.syntax.DefinitionReader;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
@@ -43,7 +44,7 @@ import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.syntax.StatementReader;
 
-public abstract class ASTAnnotation extends ASTNode
+public abstract class ASTAnnotation extends ASTNode implements MappingOptional
 {
 	private static final long serialVersionUID = 1L;
 	public final LexIdentifierToken name;

@@ -714,7 +714,7 @@ functions
 public
 writeval[@p]: @p -> bool
 writeval(val)==
-  is not yet specified;
+  true; -- is not yet specified;
 
 -- Write VDM value in ASCII format to file.
 -- fdir = <start> will overwrite existing file,
@@ -723,13 +723,13 @@ writeval(val)==
 public
 fwriteval[@p]:seq1 of char * @p * filedirective -> bool
 fwriteval(filename,val,fdir) ==
-  is not yet specified;
+  true; -- is not yet specified;
 
 -- Read VDM value in ASCII format from file
 public
 freadval[@p]:seq1 of char -> bool * [@p]
 freadval(f) ==
-  is not yet specified
+  mk_(true, nil) -- is not yet specified
   post let mk_(b,t) = RESULT in not b => t = nil;
 
 operations
@@ -745,7 +745,7 @@ echo(text) ==
 public
 fecho: seq of char * seq of char * [filedirective] ==> bool
 fecho (filename,text,fdir) ==
-  is not yet specified
+  return true -- is not yet specified
   pre filename = "" <=> fdir = nil;
 
 -- The in/out functions  will return false if an error occur. In this
@@ -754,5 +754,5 @@ fecho (filename,text,fdir) ==
 public
 ferror:()  ==> seq of char
 ferror () ==
-  is not yet specified
+  return ""; -- is not yet specified
 end IO

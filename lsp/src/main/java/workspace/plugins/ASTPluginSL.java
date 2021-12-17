@@ -184,7 +184,7 @@ public class ASTPluginSL extends ASTPlugin
 					{
 						for (CodeLens lens: lenses)
 						{
-							results.addAll(lens.getDefinitionLenses(def));
+							results.addAll(lens.getDefinitionLenses(def, null));
 						}
 					}
 				}

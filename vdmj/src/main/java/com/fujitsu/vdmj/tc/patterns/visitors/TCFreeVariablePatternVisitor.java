@@ -34,6 +34,7 @@ public class TCFreeVariablePatternVisitor extends TCLeafPatternVisitor<TCNameTok
 {
 	public TCFreeVariablePatternVisitor(TCVisitorSet<TCNameToken, TCNameSet, Environment> visitors)
 	{
+		assert visitors != null : "Visitor set cannot be null";
 		visitorSet = visitors;
 	}
 

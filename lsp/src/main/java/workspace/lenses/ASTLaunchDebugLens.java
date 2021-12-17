@@ -25,16 +25,21 @@
 package workspace.lenses;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
+import com.fujitsu.vdmj.ast.patterns.ASTPatternList;
 import com.fujitsu.vdmj.ast.types.ASTFunctionType;
 import com.fujitsu.vdmj.ast.types.ASTOperationType;
 import com.fujitsu.vdmj.ast.types.ASTPatternListTypePair;
+import com.fujitsu.vdmj.ast.types.ASTPatternListTypePairList;
+import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.ast.types.ASTTypeList;
+import com.fujitsu.vdmj.ast.types.ASTUnresolvedType;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.Token;
 
@@ -44,12 +49,12 @@ import json.JSONObject;
 public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 {
 	private final String CODE_LENS_COMMAND = "vdm-vscode.addLensRunConfiguration";
-	// private final String CODE_LENS_COMMAND = "workbench.action.debug.configure";
 
 	@Override
-	public <DEF> JSONArray getDefinitionLenses(DEF definition)
+	public <DEF, CLS> JSONArray getDefinitionLenses(DEF definition, CLS classdef)
 	{
-		ASTDefinition def = (ASTDefinition)definition;	// Better be!
+		ASTDefinition def = (ASTDefinition)definition;
+		ASTClassDefinition cls = (ASTClassDefinition) classdef;
 		JSONArray results = new JSONArray();
 		
 		if ("vscode".equals(getClientName()) && isPublic(def))
@@ -72,7 +77,7 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 				
 				for (ASTPattern p: exdef.paramPatternList.get(0))	// Curried?
 				{
-					applyArgs.add(new JSONObject("name", p.toString(), "type", ptypes.get(i++).toString()));
+					applyArgs.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
 				}
 			}
 			else if (def instanceof ASTImplicitFunctionDefinition)
@@ -89,7 +94,7 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 					{
 						for (ASTPattern p: param.patterns)
 						{
-							applyArgs.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
+							applyArgs.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
 						}
 					}
 				}
@@ -110,7 +115,7 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 					
 					for (ASTPattern p: exop.parameterPatterns)
 					{
-						applyArgs.add(new JSONObject("name", p.toString(), "type", ptypes.get(i++).toString()));
+						applyArgs.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
 					}
 				}
 			}
@@ -128,25 +133,102 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 					{
 						for (ASTPattern p: param.patterns)
 						{
-							applyArgs.add(new JSONObject("name", p.toString(), "type", param.type.toString()));
+							applyArgs.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
 						}
 					}
 				}
 			}
-			
+
 			if (launchName != null)
 			{
+				JSONArray constructors = null;
+				
+				if (cls != null && !def.accessSpecifier.isStatic)	// Look for class constructors
+				{
+					constructors = new JSONArray();
+					
+					for (ASTDefinition cdef: cls.definitions)
+					{
+						if (cdef instanceof ASTExplicitOperationDefinition)
+						{
+							ASTExplicitOperationDefinition exop = (ASTExplicitOperationDefinition)cdef;
+							
+							if (exop.name.getName().equals(defaultName))
+							{
+								ASTOperationType optype = (ASTOperationType) exop.type;
+								constructors.add(getParams(exop.parameterPatterns, optype.parameters));
+							}
+						}
+						else if (cdef instanceof ASTImplicitOperationDefinition)
+						{
+							ASTImplicitOperationDefinition imop = (ASTImplicitOperationDefinition)cdef;
+							
+							if (imop.name.getName().equals(defaultName))
+							{
+								constructors.add(getParams(imop.parameterPatterns));
+							}
+						}
+					}
+					
+					if (constructors.isEmpty())
+					{
+						// create an entry for the default constructor, new C()
+						constructors.add(new JSONArray());
+					}
+				}
+			
 				results.add(makeLens(def.location, "Launch", CODE_LENS_COMMAND,
-						launchArgs(launchName, defaultName, false, null, applyName, applyArgs)));
+						launchArgs(launchName, defaultName, false, constructors, applyName, applyArgs)));
 					
 				results.add(makeLens(def.location, "Debug", CODE_LENS_COMMAND,
-						launchArgs(launchName, defaultName, true, null, applyName, applyArgs)));
+						launchArgs(launchName, defaultName, true, constructors, applyName, applyArgs)));
 			}
 		}
 		
 		return results;
 	}
+
+	private JSONArray getParams(ASTPatternList patterns, ASTTypeList types)
+	{
+		JSONArray params = new JSONArray();
+		int i = 0;
 		
+		for (ASTPattern p: patterns)
+		{
+			params.add(new JSONObject("name", p.toString(), "type", fix(types.get(i++))));
+		}
+		
+		return params;
+	}
+	
+	private JSONArray getParams(ASTPatternListTypePairList ptList)
+	{
+		JSONArray params = new JSONArray();
+
+		for (ASTPatternListTypePair param: ptList)
+		{
+			for (ASTPattern p: param.patterns)
+			{
+				params.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
+			}
+		}
+		
+		return params;
+	}
+	
+	private String fix(ASTType type)
+	{
+		if (type instanceof ASTUnresolvedType)
+		{
+			ASTUnresolvedType ut = (ASTUnresolvedType)type;
+			return ut.typename.name;
+		}
+		else
+		{
+			return type.toString();
+		}
+	}
+
 	private boolean isPublic(ASTDefinition def)
 	{
 		if (Settings.dialect != Dialect.VDM_SL)

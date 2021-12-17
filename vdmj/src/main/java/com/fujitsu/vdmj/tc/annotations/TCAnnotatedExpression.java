@@ -37,20 +37,19 @@ public class TCAnnotatedExpression extends TCExpression
 	private static final long serialVersionUID = 1L;
 	
 	public final TCAnnotation annotation;
-
 	public final TCExpression expression;
 	
 	public TCAnnotatedExpression(LexLocation location, TCAnnotation annotation, TCExpression expression)
 	{
 		super(location);
-		this.annotation = annotation;
+		this.annotation = (annotation != null) ? annotation : new TCNoAnnotation();
 		this.expression = expression;
 	}
 
 	@Override
 	public String toString()
 	{
-		return annotation + " " + expression;
+		return (annotation == null ? annotation + " " : "") + expression;
 	}
 
 	@Override

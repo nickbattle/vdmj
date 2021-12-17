@@ -1,8 +1,8 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Aarhus University.
+ *	Copyright (c) 2021 Nick Battle.
  *
- *	Author: Kenneth Lausdahl
+ *	Author: Nick Battle
  *
  *	This file is part of VDMJ.
  *
@@ -22,39 +22,18 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.util;
+package com.fujitsu.vdmj.po.annotations;
 
-import java.util.List;
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
-import com.fujitsu.vdmj.values.Value;
-
-public class CsvResult
+public class PONoAnnotation extends POAnnotation
 {
-	private List<Value> values;
-	private String errorMsg;
-	
-	public CsvResult(List<Value> values)
+	private static final long serialVersionUID = 1L;
+
+	public PONoAnnotation()
 	{
-		this(values, null);
-	}
-	
-	public CsvResult(List<Value> values, String errorMsg)
-	{
-		this.values = values;
-		this.errorMsg = errorMsg;
-	}
-	
-	public List<Value> getValues()
-	{
-		return values;
-	}
-	public boolean dataOk()
-	{
-		return errorMsg == null;
-	}
-	
-	public String getErrorMsg()
-	{
-		return errorMsg;
+		super(new TCIdentifierToken(LexLocation.ANY, "?", false), new POExpressionList());
 	}
 }

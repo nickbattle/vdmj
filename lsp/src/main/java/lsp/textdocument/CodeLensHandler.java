@@ -46,6 +46,21 @@ public class CodeLensHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
+		switch (request.getMethod())
+		{
+			case "textDocument/codeLens":
+				return codeLens(request);
+			
+			case "codeLens/resolve":
+				return codeLensResolve(request);
+				
+			default:
+				return new RPCMessageList(request, RPCErrors.MethodNotFound, "Unexpected codeLens method");
+		}
+	}
+	
+	private RPCMessageList codeLens(RPCRequest request)
+	{
 		try
 		{
 			JSONObject params = request.get("params");
@@ -58,6 +73,22 @@ public class CodeLensHandler extends LSPHandler
 		{
 			Log.error(e);
 			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
+		}
+		catch (Exception e)
+		{
+			Log.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+	
+	private RPCMessageList codeLensResolve(RPCRequest request)
+	{
+		try
+		{
+			JSONObject params = request.get("params");
+			JSONObject data = params.get("data");
+			
+			return LSPWorkspaceManager.getInstance().codeLensResolve(request, data);
 		}
 		catch (Exception e)
 		{

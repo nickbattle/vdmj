@@ -18,24 +18,46 @@
  *
  *	You should have received a copy of the GNU General Public License
  *	along with VDMJ.  If not, see <http://www.gnu.org/licenses/>.
- *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
 
-package vdmj.commands;
+package com.fujitsu.vdmj.util;
 
-import dap.DAPRequest;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
- * Commands that implement this interface can be executed from the InitThread,
- * which calls the initRun method rather than the Command's usual run method.
- * The difference is because the InitThread has already done all of the setup
- * to create a Executor and can return the result DAP messages. So this interface
- * just deals with Strings. 
+ * A utility class to find and load a file from the classpath into a
+ * temporary location.
  */
-public interface InitRunnable
+public class GetResource
 {
-	public String initRun(DAPRequest request);
-	public String getExpression();
-	public String format(String result);
+	public static boolean find(File file)
+	{
+		return GetResource.class.getResource("/" + file.getName()) != null;
+	}
+	
+	public static File load(File file) throws IOException
+	{
+		File temp = File.createTempFile("tmp", file.getName());
+		temp.deleteOnExit();
+		
+		InputStream in = GetResource.class.getResourceAsStream("/" + file.getName());
+		OutputStream out = new FileOutputStream(temp);
+		byte[] buf = new byte[8192];
+	    int length;
+
+	    while ((length = in.read(buf)) > 0)
+	    {
+	        out.write(buf, 0, length);
+	    }
+	    
+		in.close();
+		out.close();
+		
+		return temp;
+	}
 }

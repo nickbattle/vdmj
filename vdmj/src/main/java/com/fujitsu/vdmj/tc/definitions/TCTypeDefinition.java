@@ -141,7 +141,7 @@ public class TCTypeDefinition extends TCDefinition
 		if (eqPattern1 != null)
 		{
     		eqdef = getEqOrdDefinition(eqPattern1, eqPattern2,
-    			eqExpression, name.getEqName(eqExpression.location));
+    			eqExpression, name.getEqName(eqPattern1.location));
     		type.setEquality(eqdef);
 		}
 		else
@@ -152,11 +152,11 @@ public class TCTypeDefinition extends TCDefinition
 		if (ordPattern1 != null)
 		{
     		orddef = getEqOrdDefinition(ordPattern1, ordPattern2,
-    			ordExpression, name.getOrdName(ordExpression.location));
+    			ordExpression, name.getOrdName(ordPattern1.location));
     		type.setOrder(orddef);
     		
-    		mindef = getMinMaxDefinition(true, name.getMinName(ordExpression.location));
-    		maxdef = getMinMaxDefinition(false, name.getMaxName(ordExpression.location));
+    		mindef = getMinMaxDefinition(true, name.getMinName(ordPattern1.location));
+    		maxdef = getMinMaxDefinition(false, name.getMaxName(ordPattern1.location));
 		}
 		else
 		{
