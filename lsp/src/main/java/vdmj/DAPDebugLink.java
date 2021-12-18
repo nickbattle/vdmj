@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.values.CPUValue;
 import dap.DAPResponse;
 import dap.DAPServer;
 import json.JSONObject;
+import workspace.DAPWorkspaceManager;
 import workspace.Log;
 
 public class DAPDebugLink extends ConsoleDebugLink
@@ -80,9 +81,12 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void newThread(CPUValue cpu)
 	{
-		if (server == null)
+		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPDebugReader debugReader = manager.getDebugReader();
+		
+		if (debugReader == null || !debugReader.isListening())
 		{
-			return;		// Not started via a debugger
+			return;		// Client is not listening
 		}
 		
 		try
@@ -100,7 +104,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void stopped(Context ctxt, LexLocation location, Exception ex)
 	{
-		if (!debugging || suspendBreaks || server == null)	// Not attached to a debugger or local eval
+		if (!debugging || suspendBreaks)	// Not attached to a debugger or local eval
 		{
 			return;
 		}
@@ -196,12 +200,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 	
 	@Override
 	public void breakpoint(Context ctxt, Breakpoint bp)
-	{
-		if (server == null)
-		{
-			return;		// Not started via a debugger
-		}
-		
+	{	
 		// Calls stopped with a null exception, which sends events
 		super.breakpoint(ctxt, bp);
 	}
@@ -209,9 +208,12 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void complete(DebugReason reason, ContextException exception)
 	{
-		if (server == null)
+		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPDebugReader debugReader = manager.getDebugReader();
+		
+		if (debugReader == null || !debugReader.isListening())
 		{
-			return;		// Not started via a debugger
+			return;		// Client is not listening
 		}
 		
 		try

@@ -29,8 +29,11 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
+import json.JSONArray;
+import json.JSONObject;
 import vdmj.DAPDebugReader;
 import workspace.DAPWorkspaceManager;
+import workspace.Log;
 
 public class ThreadsHandler extends DAPHandler
 {
@@ -52,7 +55,17 @@ public class ThreadsHandler extends DAPHandler
 		}
 		else
 		{
-			return manager.threads(request);
+			/**
+			 * Why is the client asking for a threads list, when we're not stopped?
+			 * If we send an empty list, the client cannot "pause" anything. So we
+			 * try to send back an arbitrary dummy thread. We don't care about the
+			 * thread in the pause request, so this is fine.
+			 * 
+			 * Was: return manager.threads(request);
+			 */
+			Log.printf("Received threads request while not stopped");
+			JSONArray list = new JSONArray(new JSONObject("id", 0L, "name", "dummy"));
+			return new DAPMessageList(request, new JSONObject("threads", list));
 		}
 	}
 }
