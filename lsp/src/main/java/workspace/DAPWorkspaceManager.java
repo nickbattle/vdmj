@@ -559,9 +559,12 @@ public class DAPWorkspaceManager
 		
 		for (SchedulableThread thread: threads)
 		{
-			list.add(new JSONObject(
-				"id",	thread.getId(),
-				"name", thread.getName()));
+			if (!thread.getName().startsWith("BusThread-"))		// Don't include busses
+			{
+				list.add(new JSONObject(
+					"id",	thread.getId(),
+					"name", thread.getName()));
+			}
 		}
 		
 		return new DAPMessageList(request, new JSONObject("threads", list));

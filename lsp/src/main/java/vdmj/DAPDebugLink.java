@@ -44,7 +44,6 @@ import com.fujitsu.vdmj.values.CPUValue;
 import dap.DAPResponse;
 import dap.DAPServer;
 import json.JSONObject;
-import workspace.DAPWorkspaceManager;
 import workspace.Log;
 
 public class DAPDebugLink extends ConsoleDebugLink
@@ -81,14 +80,6 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void newThread(CPUValue cpu)
 	{
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
-		DAPDebugReader debugReader = manager.getDebugReader();
-		
-		if (debugReader == null || !debugReader.isListening())
-		{
-			return;		// Client is not listening
-		}
-		
 		try
 		{
 			Log.printf("New thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
@@ -208,14 +199,6 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void complete(DebugReason reason, ContextException exception)
 	{
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
-		DAPDebugReader debugReader = manager.getDebugReader();
-		
-		if (debugReader == null || !debugReader.isListening())
-		{
-			return;		// Client is not listening
-		}
-		
 		try
 		{
 			Log.printf("End thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());

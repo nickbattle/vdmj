@@ -25,6 +25,9 @@
 package dap.handlers;
 
 import java.io.IOException;
+import java.util.List;
+
+import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 import dap.DAPHandler;
 import dap.DAPMessageList;
@@ -56,16 +59,26 @@ public class ThreadsHandler extends DAPHandler
 		else
 		{
 			/**
-			 * Why is the client asking for a threads list, when we're not stopped?
+			 * The client asks for threads, and expects new thread/complete thread
+			 * messages, even when not in a debugger.
+			 * 
+			 * During the initialization phase, we have no scheduleable threads.
 			 * If we send an empty list, the client cannot "pause" anything. So we
 			 * try to send back an arbitrary dummy thread. We don't care about the
 			 * thread in the pause request, so this is fine.
-			 * 
-			 * Was: return manager.threads(request);
 			 */
-			Log.printf("Received threads request while not stopped");
-			JSONArray list = new JSONArray(new JSONObject("id", 0L, "name", "dummy"));
-			return new DAPMessageList(request, new JSONObject("threads", list));
+			List<SchedulableThread> all = SchedulableThread.getAllThreads();
+			
+			if (all.isEmpty())
+			{
+				Log.printf("Received threads request before threads started - init?");
+				JSONArray list = new JSONArray(new JSONObject("id", 0L, "name", "init"));
+				return new DAPMessageList(request, new JSONObject("threads", list));
+			}
+			else
+			{
+				return manager.threads(request);
+			}
 		}
 	}
 }
