@@ -69,7 +69,9 @@ public class DAPDebugLink extends ConsoleDebugLink
 	
 	private DAPDebugLink()
 	{
-		server = DAPServer.getInstance();	// NOTE! changes for each session (see reset)
+		// NOTE! changes for each session (see reset)
+		// NOTE! server can be null, if executed via CT runtrace
+		server = DAPServer.getInstance();
 	}
 	
 	@Override
@@ -81,7 +83,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void newThread(CPUValue cpu)
 	{
-		if (!server.isRunning())
+		if (server == null || !server.isRunning())
 		{
 			return;		// Too late!
 		}
@@ -106,7 +108,8 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void stopped(Context ctxt, LexLocation location, Exception ex)
 	{
-		if (!debugging || suspendBreaks || !server.isRunning())	// Not attached to a debugger or local eval
+		if (!debugging || suspendBreaks ||
+				server == null || !server.isRunning())	// Not attached to a debugger or local eval
 		{
 			return;
 		}
@@ -203,7 +206,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void breakpoint(Context ctxt, Breakpoint bp)
 	{	
-		if (!server.isRunning())
+		if (server == null || !server.isRunning())
 		{
 			return;		// Too late!
 		}
@@ -215,7 +218,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void complete(DebugReason reason, ContextException exception)
 	{
-		if (!server.isRunning())
+		if (server == null || !server.isRunning())
 		{
 			return;		// Too late!
 		}
