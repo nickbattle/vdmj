@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.values.CPUValue;
 import dap.DAPResponse;
 import dap.DAPServer;
 import json.JSONObject;
+import workspace.DAPWorkspaceManager;
 import workspace.Log;
 
 public class DAPDebugLink extends ConsoleDebugLink
@@ -68,7 +69,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 	
 	private DAPDebugLink()
 	{
-		server = DAPServer.getInstance();
+		server = DAPServer.getInstance();	// NOTE! changes for each session (see reset)
 	}
 	
 	@Override
@@ -80,6 +81,16 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void newThread(CPUValue cpu)
 	{
+		if (!server.isRunning())
+		{
+			return;		// Too late!
+		}
+
+		if (DAPWorkspaceManager.getInstance().getNoDebug())
+		{
+			return;		// No one cares
+		}
+			
 		try
 		{
 			Log.printf("New thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
@@ -95,7 +106,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void stopped(Context ctxt, LexLocation location, Exception ex)
 	{
-		if (!debugging || suspendBreaks)	// Not attached to a debugger or local eval
+		if (!debugging || suspendBreaks || !server.isRunning())	// Not attached to a debugger or local eval
 		{
 			return;
 		}
@@ -192,6 +203,11 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void breakpoint(Context ctxt, Breakpoint bp)
 	{	
+		if (!server.isRunning())
+		{
+			return;		// Too late!
+		}
+
 		// Calls stopped with a null exception, which sends events
 		super.breakpoint(ctxt, bp);
 	}
@@ -199,6 +215,16 @@ public class DAPDebugLink extends ConsoleDebugLink
 	@Override
 	public void complete(DebugReason reason, ContextException exception)
 	{
+		if (!server.isRunning())
+		{
+			return;		// Too late!
+		}
+		
+		if (DAPWorkspaceManager.getInstance().getNoDebug())
+		{
+			return;		// No one cares
+		}
+		
 		try
 		{
 			Log.printf("End thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
@@ -213,6 +239,6 @@ public class DAPDebugLink extends ConsoleDebugLink
 
 	public void reset()
 	{
-		instance = null;
+		instance = null;	// NOTE! This causes a new server to be set
 	}
 }

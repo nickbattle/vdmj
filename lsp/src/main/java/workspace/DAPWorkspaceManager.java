@@ -577,6 +577,7 @@ public class DAPWorkspaceManager
 	{
 		RTLogger.dump(true);
 		stdout("\nSession disconnected.\n");
+		SchedulableThread.terminateAll();
 		clearInterpreter();
 		DAPMessageList result = new DAPMessageList(request);
 		return result;
