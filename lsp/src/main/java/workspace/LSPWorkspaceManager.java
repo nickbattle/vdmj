@@ -524,10 +524,15 @@ public class LSPWorkspaceManager
 	 * The action code returned indicates whether the change watched file requires the
 	 * specification to be reloaded and rechecked(2), just re-checked(1), or nothing(0). 
 	 */
+	
+	private static final int DO_NOTHING = 0;
+	private static final int RECHECK = 1;
+	private static final int RELOAD_AND_CHECK = 2;
+	
 	public int changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
 	{
 		FilenameFilter filter = getFilenameFilter();
-		int actionCode = 0;
+		int actionCode = DO_NOTHING;
 		boolean ignoreDotPath = onDotPath(file);
 		
 		switch (type)
@@ -536,22 +541,22 @@ public class LSPWorkspaceManager
 				if (file.isDirectory())
 				{
 					Log.printf("New directory created: %s", file);
-					actionCode = 0;
+					actionCode = DO_NOTHING;
 				}
 				else if (ignoreDotPath)
 				{
 					Log.printf("Ignoring file on dot path");
-					actionCode = 0;
+					actionCode = DO_NOTHING;
 				}
 				else if (file.equals(new File(rootUri, ORDERING)))
 				{
 					Log.printf("Created ordering file, rebuilding");
-					actionCode = 2;		// Rebuild and re-check
+					actionCode = RELOAD_AND_CHECK;
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
 					Log.printf("Ignoring non-project file: %s", file);
-					actionCode = 0;
+					actionCode = DO_NOTHING;
 				}
 				else if (!projectFiles.keySet().contains(file))	
 				{
@@ -559,20 +564,20 @@ public class LSPWorkspaceManager
 					{
 						Log.error("File not in ordering list: %s", file);
 						sendMessage(1L, "Ordering file out of date? " + file);
-						actionCode = 0;
+						actionCode = DO_NOTHING;
 					}
 					else
 					{
 						Log.printf("Created new file: %s", file);
 						loadFile(file);
-						actionCode = 1;	// Just re-check
+						actionCode = RECHECK;
 					}
 				}
 				else
 				{
 					// Usually because a didOpen gets in first, on creation
 					Log.printf("Created file already added: %s", file);
-					actionCode = 0;		// Already re-built by openFile
+					actionCode = DO_NOTHING;	// Already re-built by openFile
 				}
 				break;
 				
@@ -580,38 +585,38 @@ public class LSPWorkspaceManager
 				if (file.isDirectory())
 				{
 					Log.printf("Directory changed: %s", file);
-					actionCode = 0;
+					actionCode = DO_NOTHING;
 				}
 				else if (ignoreDotPath)
 				{
 					Log.printf("Ignoring file on dot path");
-					actionCode = 0;
+					actionCode = DO_NOTHING;
 				}
 				else if (file.equals(new File(rootUri, ORDERING)))
 				{
 					Log.printf("Updated ordering file, rebuilding");
-					actionCode = 2;		// Rebuild and re-check
+					actionCode = RELOAD_AND_CHECK;
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
 					Log.printf("Ignoring non-project file change: %s", file);
-					actionCode = 0;
+					actionCode = DO_NOTHING;
 				}
 				else if (!projectFiles.keySet().contains(file))	
 				{
 					Log.error("Changed file not known: %s", file);
-					actionCode = 2;		// Try rebuilding?
+					actionCode = RELOAD_AND_CHECK;	// Try rebuilding?
 				}
 				else
 				{
-					actionCode = 1;		// Simple file change/save
+					actionCode = RECHECK;	// Simple file change/save
 				}
 				break;
 				
 			case DELETE:
 				// Since the file is deleted, we don't know what it was so we have to rebuild
 				Log.printf("Deleted %s (dir/file?), rebuilding", file);
-				actionCode = 2;		// Rebuild and re-check
+				actionCode = RELOAD_AND_CHECK;
 				break;
 		}
 		
@@ -620,7 +625,7 @@ public class LSPWorkspaceManager
 
 	public RPCMessageList afterChangeWatchedFiles(RPCRequest request, int actionCode) throws Exception
 	{
-		if (actionCode == 2)
+		if (actionCode == RELOAD_AND_CHECK)
 		{
 			LSPServer server = LSPServer.getInstance();
 			
@@ -633,7 +638,7 @@ public class LSPWorkspaceManager
 			loadAllProjectFiles();
 		}
 		
-		if (actionCode > 0)
+		if (actionCode == RELOAD_AND_CHECK || actionCode == RECHECK)
 		{
 			RPCMessageList results = checkLoadedFiles("after change watched");
 			

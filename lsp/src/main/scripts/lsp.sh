@@ -53,9 +53,10 @@ fi
 VDMJ_JAR=$MAVENREPO/vdmj/${VERSION}/vdmj-${VERSION}.jar
 ANNOTATIONS_JAR=$MAVENREPO/annotations/${VERSION}/annotations-${VERSION}.jar
 LSP_JAR=$MAVENREPO/lsp/${VERSION}/lsp-${VERSION}.jar
+STDLIB_JAR=$MAVENREPO/stdlib/${VERSION}/stdlib-${VERSION}.jar
 
 java ${JAVA64_VMOPTS} -Dlsp.log.filename=/dev/stdout \
-    -cp $VDMJ_JAR:$ANNOTATIONS_JAR:$LSP_JAR \
+    -cp $VDMJ_JAR:$ANNOTATIONS_JAR:$LSP_JAR:$STDLIB_JAR \
     lsp.LSPServerSocket $DIALECT -lsp 8000 -dap 8001
 
 exit 0
