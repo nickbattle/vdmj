@@ -7,19 +7,19 @@
 	<parent>
 		<groupId>com.fujitsu</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4.4.4-P-SNAPSHOT</version>
+		<version>4.4.4-P</version>
 	</parent>
 
 	<groupId>com.fujitsu</groupId>
 	<artifactId>examples</artifactId>
 	<name>VDMJ Suite Examples</name>
 	<packaging>pom</packaging>
-	<version>4.4.4-P-SNAPSHOT</version>	<!-- This version is inherited by all modules -->
+	<version>4.4.4-P</version>	<!-- This version is inherited by all modules -->
 	
 	<properties>
 	    <maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	    <revision>4.4.4-P-SNAPSHOT</revision>	<!-- CHANGE VERSION HERE, AND MODULE'S PARENT POMs -->
+	    <revision>4.4.4-P</revision>	<!-- CHANGE VERSION HERE, AND MODULE'S PARENT POMs -->
 	</properties>
 
 	<!-- sub modules -->
