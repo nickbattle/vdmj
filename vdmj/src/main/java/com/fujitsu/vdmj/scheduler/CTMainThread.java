@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.debug.DebugLink;
+import com.fujitsu.vdmj.debug.DebugReason;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.traces.INTraceVariableStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -159,6 +160,13 @@ public class CTMainThread extends MainThread
 				}
 				
 				result.add(Verdict.FAILED);
+			}
+		}
+		finally
+		{
+			if (debug)
+			{
+				DebugLink.getInstance().complete(DebugReason.OK, null);
 			}
 		}
 	}
