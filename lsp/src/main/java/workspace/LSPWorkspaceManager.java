@@ -32,6 +32,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -74,8 +75,9 @@ import workspace.plugins.TCPlugin;
 public class LSPWorkspaceManager
 {
 	private static LSPWorkspaceManager INSTANCE = null;
-	protected final PluginRegistry registry;
-	protected final LSPMessageUtils messages;
+	private final PluginRegistry registry;
+	private final LSPMessageUtils messages;
+	private final Charset encoding;
 
 	private JSONObject clientInfo;
 	private JSONObject clientCapabilities;
@@ -88,6 +90,17 @@ public class LSPWorkspaceManager
 	{
 		registry = PluginRegistry.getInstance();
 		messages = new LSPMessageUtils();
+		
+		if (System.getProperty("lsp.encoding") == null)
+		{
+			encoding = Charset.defaultCharset();
+			Log.printf("Workspace using default encoding");
+		}
+		else
+		{
+			encoding = Charset.forName(System.getProperty("lsp.encoding"));
+			Log.printf("Workspace encoding set to %s", encoding.displayName());
+		}
 	}
 
 	public static synchronized LSPWorkspaceManager getInstance()
@@ -299,6 +312,10 @@ public class LSPWorkspaceManager
 				{
 					loadFile(file);
 				}
+				else
+				{
+					Log.printf("Ignoring file %s", file.getPath());
+				}
 			}
 		}
 	}
@@ -306,7 +323,7 @@ public class LSPWorkspaceManager
 	private void loadFile(File file) throws IOException
 	{
 		StringBuilder sb = new StringBuilder();
-		InputStreamReader isr = new InputStreamReader(new FileInputStream(file));
+		InputStreamReader isr = new InputStreamReader(new FileInputStream(file), encoding);
 		char[] data = new char[(int)file.length() + 1];
 		int size = isr.read(data);
 		
@@ -318,6 +335,7 @@ public class LSPWorkspaceManager
 		isr.close();
 		
 		projectFiles.put(file, sb);
+		Log.printf("Loaded file %s", file.getPath());
 	}
 	
 	private boolean onDotPath(File file)

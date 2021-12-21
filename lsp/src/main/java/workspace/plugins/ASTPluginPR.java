@@ -26,7 +26,6 @@ package workspace.plugins;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -94,8 +93,7 @@ public class ASTPluginPR extends ASTPlugin
 		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
-			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(),
-					Settings.dialect, entry.getKey(), Charset.defaultCharset().displayName());
+			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(), Settings.dialect, entry.getKey(), "UTF-8");
 			ClassReader mr = new ClassReader(ltr);
 			astClassList.addAll(mr.readClasses());
 			
@@ -129,8 +127,7 @@ public class ASTPluginPR extends ASTPlugin
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
-		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
-				Settings.dialect, file, Charset.defaultCharset().displayName());
+		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file, "UTF-8");
 		ClassReader cr = new ClassReader(ltr);
 		dirtyClassList = cr.readClasses();
 		
