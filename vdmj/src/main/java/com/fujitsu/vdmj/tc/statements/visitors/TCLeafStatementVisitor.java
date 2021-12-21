@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.tc.statements.TCCallStatement;
 import com.fujitsu.vdmj.tc.statements.TCCaseStmtAlternative;
 import com.fujitsu.vdmj.tc.statements.TCCasesStatement;
 import com.fujitsu.vdmj.tc.statements.TCCyclesStatement;
+import com.fujitsu.vdmj.tc.statements.TCDefStatement;
 import com.fujitsu.vdmj.tc.statements.TCDurationStatement;
 import com.fujitsu.vdmj.tc.statements.TCElseIfStatement;
 import com.fujitsu.vdmj.tc.statements.TCErrorCase;
@@ -316,6 +317,20 @@ abstract public class TCLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
+ 	
+ 	@Override
+ 	public C caseDefStatement(TCDefStatement node, S arg)
+ 	{
+		C all = newCollection();
+		
+		for (TCDefinition def: node.equalsDefs)
+		{
+			all.addAll(visitorSet.applyDefinitionVisitor(def, arg));
+		}
+		
+		all.addAll(node.statement.apply(this, arg));
+		return all;
+ 	}
 
  	@Override
 	public C casePeriodicStatement(TCPeriodicStatement node, S arg)

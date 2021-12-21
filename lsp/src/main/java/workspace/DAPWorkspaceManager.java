@@ -268,6 +268,8 @@ public class DAPWorkspaceManager
 		{
 			throw new LSPException(RPCErrors.ContentModified, "Specification has errors");
 		}
+		
+		noDebug = false;	// Force debug on for runOneTrace
 
 		return ct.runOneTrace(Utils.stringToName(name), testNumber);
 	}
