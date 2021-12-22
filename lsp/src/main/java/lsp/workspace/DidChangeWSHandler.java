@@ -63,7 +63,6 @@ public class DidChangeWSHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			JSONArray changes = params.get("changes");
-			RPCMessageList responses = new RPCMessageList();
 			int actionCode = 0;
 			
 			for (Object fileEvent: changes)
@@ -79,7 +78,7 @@ public class DidChangeWSHandler extends LSPHandler
 						File file = Utils.uriToFile(uri);
 						int code = LSPWorkspaceManager.getInstance().changeWatchedFile(request, file, type);
 						
-						if (code > actionCode)
+						if (code > actionCode)	// Note: ordered severity
 						{
 							actionCode = code;
 						}
@@ -92,9 +91,9 @@ public class DidChangeWSHandler extends LSPHandler
 			}
 			
 			// Do rebuilding and type checking after ALL the changes are processed
-			responses.addAll(LSPWorkspaceManager.getInstance().afterChangeWatchedFiles(request, actionCode));
+			// This can return null, since didChangeWatchedFiles is a notification.
 			
-			return responses;
+			return LSPWorkspaceManager.getInstance().afterChangeWatchedFiles(request, actionCode);
 		}
 		catch (URISyntaxException e)
 		{

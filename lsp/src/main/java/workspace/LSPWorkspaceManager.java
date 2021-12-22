@@ -540,7 +540,9 @@ public class LSPWorkspaceManager
 
 	/**
 	 * The action code returned indicates whether the change watched file requires the
-	 * specification to be reloaded and rechecked(2), just re-checked(1), or nothing(0). 
+	 * specification to be reloaded and rechecked(2), just re-checked(1), or nothing(0).
+	 * Note that these are ordered by severity, so multiple file changes will select
+	 * one actionCode that is the most comprehensive. See the handler.
 	 */
 	
 	private static final int DO_NOTHING = 0;
@@ -670,7 +672,7 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
-			return new RPCMessageList(request);
+			return null;	// The didChangeWatchedFiles is a notification, so no reply needed.
 		}
 	}
 
