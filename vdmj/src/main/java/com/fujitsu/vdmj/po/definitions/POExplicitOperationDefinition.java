@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.pog.OperationPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
@@ -114,6 +115,8 @@ public class POExplicitOperationDefinition extends PODefinition
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 		TCNameList pids = new TCNameList();
 
+		ctxt.push(new PONoCheckContext());		// Don't typecheck operation POs yet
+		
 		for (POPattern p: parameterPatterns)
 		{
 			pids.addAll(p.getVariableNames());
@@ -149,6 +152,8 @@ public class POExplicitOperationDefinition extends PODefinition
 		{
 			obligations.add(new SubTypeObligation(this, actualResult, ctxt));
 		}
+		
+		ctxt.pop();
 
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;

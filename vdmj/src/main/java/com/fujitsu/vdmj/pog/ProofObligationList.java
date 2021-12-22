@@ -113,7 +113,10 @@ public class ProofObligationList extends Vector<ProofObligation>
 		{
 			try
 			{
-				typeCheck(po, tcmodule.name.getName(), new ModuleEnvironment(tcmodule));
+				if (po.isCheckable)
+				{
+					typeCheck(po, tcmodule.name.getName(), new ModuleEnvironment(tcmodule));
+				}
 			}
 			catch (Exception e)
 			{
@@ -128,7 +131,10 @@ public class ProofObligationList extends Vector<ProofObligation>
 		{
 			try
 			{
-				typeCheck(po, tcdef.name.getName(), new PrivateClassEnvironment(tcdef));
+				if (po.isCheckable)
+				{
+					typeCheck(po, tcdef.name.getName(), new PrivateClassEnvironment(tcdef));
+				}
 			}
 			catch (Exception e)
 			{

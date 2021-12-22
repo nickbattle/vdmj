@@ -52,6 +52,23 @@ public class POContextStack extends Stack<POContext>
 
 		return result.toString();
 	}
+	
+	public boolean isCheckable()
+	{
+		ListIterator<POContext> p = this.listIterator(size());
+
+		while (p.hasPrevious())
+		{
+			POContext c = p.previous();
+
+			if (c instanceof PONoCheckContext)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	public String getObligation(String root)
 	{
