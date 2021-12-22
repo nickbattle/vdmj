@@ -565,7 +565,7 @@ public class LSPWorkspaceManager
 				}
 				else if (ignoreDotPath)
 				{
-					Log.printf("Ignoring file on dot path");
+					Log.printf("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (file.equals(new File(rootUri, ORDERING)))
@@ -609,7 +609,7 @@ public class LSPWorkspaceManager
 				}
 				else if (ignoreDotPath)
 				{
-					Log.printf("Ignoring file on dot path");
+					Log.printf("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (file.equals(new File(rootUri, ORDERING)))
