@@ -53,6 +53,11 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.number = 0;
 		this.isCheckable = ctxt.isCheckable();	// Set false for operation POs
 		
+		if (!isCheckable)
+		{
+			this.status = POStatus.UNCHECKED;	// Implies unproved
+		}
+		
 		POIgnorePattern.init();		// Reset the "any" count for getMatchingPatterns
 	}
 
