@@ -77,6 +77,7 @@ public class LSPServerStdio implements Runnable
 		
 		Thread.currentThread().setName("LSP Listener");
 		new LSPServerStdio(dialect).run();
+		System.exit(0);
 	}
 	
 	private static void usage()
