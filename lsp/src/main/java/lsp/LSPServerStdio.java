@@ -81,7 +81,7 @@ public class LSPServerStdio implements Runnable
 	
 	private static void usage()
 	{
-		System.err.println("Usage: LSPServerStdio [-vdmsl | -vdmpp | -vdmrt] [-dap]");
+		System.err.println("Usage: LSPServerStdio [-vdmsl | -vdmpp | -vdmrt] [-dap <port>]");
 		System.exit(1);
 	}
 	
