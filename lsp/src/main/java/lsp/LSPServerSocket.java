@@ -108,7 +108,7 @@ public class LSPServerSocket implements Runnable
 
 		try
 		{
-			Log.printf("LSP %s Server listening on port %d", dialect, port);
+			Log.printf("LSP %s Server connecting to port %d", dialect, port);
 			socket = new Socket("localhost", port);
 			new LSPServer(dialect, socket.getInputStream(), socket.getOutputStream()).run();
 			Log.error("LSP Server stopped");
