@@ -55,7 +55,7 @@ public class Diag
 				Calendar now = new GregorianCalendar();
 				now.setTimeInMillis(rec.getMillis());
 				
-				return String.format("%02d:%02d:%02d.%03d: [%s][%s] %s",
+				return String.format("%02d:%02d:%02d.%03d: [%s][%s] %s\n",
 					now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE),
 					now.get(Calendar.SECOND), now.get(Calendar.MILLISECOND),
 					rec.getLevel().getName(), rec.getThreadID(),rec.getMessage());
@@ -64,7 +64,6 @@ public class Diag
 				
 		logger = Logger.getLogger("LSPServer");
 		logger.setUseParentHandlers(false);
-		logger.setLevel(Level.ALL);
 
 		String filename = System.getProperty("lsp.log.filename");
 		
@@ -89,6 +88,8 @@ public class Diag
 			handler.setLevel(Level.ALL);
 			logger.addHandler(handler);
 		}
+		
+		setLevel(System.getProperty("lsp.log.level", "all"));
 	}
 
 	/**
@@ -101,7 +102,15 @@ public class Diag
 	{
 		Level old = logger.getLevel();
 		logger.setLevel(level);
-		info("Logging level changed from " + old.getName()+ " to " + level.getName());
+		
+		if (old != null)
+		{
+			log("Logging level changed from " + old.getName()+ " to " + level.getName());
+		}
+		else
+		{
+			log("Logging level set to " + level.getName());
+		}
 	}
 
 	/**
@@ -130,12 +139,12 @@ public class Diag
 	}
 
 	/**
-     * Log a message unconditionally. This raises the message at ALL level - ie.
+     * Log a message unconditionally. This raises the message at OFF level - ie.
      * even if diagnostics are off, still raise the message.
      */
 	public static synchronized void log(String format, Object... args)
 	{
-		logger.log(Level.ALL, String.format(format, args));
+		logger.log(Level.OFF, String.format(format, args));
 	}
 
 	/**
