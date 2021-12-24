@@ -184,4 +184,10 @@ public class Diag
 	{
 		logger.log(Level.SEVERE, String.format(format, args));
 	}
+
+	public static synchronized void error(Throwable throwable)
+	{
+		logger.log(Level.SEVERE, String.format("EXCEPTION: %s %s",
+				throwable.getClass().getSimpleName(), throwable.getMessage()));
+	}
 }
