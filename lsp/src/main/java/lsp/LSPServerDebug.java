@@ -52,7 +52,7 @@ public class LSPServerDebug implements Runnable
 		int lspPort = -1;
 		
 		Log.init();
-		Diag.init();
+		// Diag.init();
 
 		for (int a=0; a<args.length; a++)
 		{
@@ -113,7 +113,7 @@ public class LSPServerDebug implements Runnable
 
 			while (true)
 			{
-				Diag.log("LSP %s Server listening on port %d", dialect, socket.getLocalPort());
+				Log.printf("LSP %s Server listening on port %d", dialect, socket.getLocalPort());
 				Socket conn = socket.accept();
 				
 				try
@@ -125,7 +125,7 @@ public class LSPServerDebug implements Runnable
 					Diag.severe("LSP Server stopped: %s", e.getMessage());
 				}
 				
-				Diag.log("LSP %s Server closing port %d", dialect, socket.getLocalPort());
+				Log.printf("LSP %s Server closing port %d", dialect, socket.getLocalPort());
 				conn.close();
 			}
 		}
@@ -133,7 +133,7 @@ public class LSPServerDebug implements Runnable
 		{
 			try
 			{
-				Diag.severe("LSP Server socket error: %s", e.getMessage());
+				Log.printf("LSP Server socket error: %s", e.getMessage());
 				if (socket != null) socket.close();
 			}
 			catch (IOException e1)

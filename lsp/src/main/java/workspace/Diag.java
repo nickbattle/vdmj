@@ -24,9 +24,14 @@
 
 package workspace;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 /**
@@ -37,14 +42,26 @@ public class Diag
 	/** The Java logger */
 	private static Logger logger;
 
-	/** The handler - set to a FileHandler */
-	private static Handler handler;
-
 	/**
 	 * Set a handler to save diags to a file for the LSP configuration.
 	 */
 	public static synchronized void init()
 	{
+		Formatter formatter = new Formatter()
+		{
+			@Override
+			public String format(LogRecord rec)
+			{
+				Calendar now = new GregorianCalendar();
+				now.setTimeInMillis(rec.getMillis());
+				
+				return String.format("%02d:%02d:%02d.%03d: [%s][%s] %s",
+					now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE),
+					now.get(Calendar.SECOND), now.get(Calendar.MILLISECOND),
+					rec.getLevel().getName(), rec.getThreadID(),rec.getMessage());
+			}
+		};
+				
 		logger = Logger.getLogger("LSPServer");
 		logger.setUseParentHandlers(false);
 		logger.setLevel(Level.ALL);
@@ -55,8 +72,8 @@ public class Diag
 		{
 			try
 			{
-				handler = new FileHandler(filename);
-				handler.setFormatter(new DiagFormatter());
+				Handler handler = new FileHandler(filename);
+				handler.setFormatter(formatter);
 				handler.setLevel(Level.ALL);
 				logger.addHandler(handler);
 			}
@@ -64,6 +81,13 @@ public class Diag
 			{
 				System.err.printf("Cannot create log file: %s\n", filename);
 			}
+		}
+		else
+		{
+			Handler handler = new ConsoleHandler();
+			handler.setFormatter(formatter);
+			handler.setLevel(Level.ALL);
+			logger.addHandler(handler);
 		}
 	}
 
@@ -82,16 +106,17 @@ public class Diag
 
 	/**
      * Set the current diagnostic level using a string level name. The name can
-     * be: all, fine, info, config, warning, severe or off. An unrecognised
-     * level sets the level to SEVERE.
-     * 
-     * @param level
-     *            The new diagnostic level
+     * be: all, finest, finer, fine, info, config, warning, severe or off.
+     * An unrecognised level sets the level to SEVERE.
      */
 	public static synchronized void setLevel(String level)
 	{
 		if (level.equalsIgnoreCase("all"))
 			setLevel(Level.ALL);
+		else if (level.equalsIgnoreCase("finest"))
+			setLevel(Level.FINEST);
+		else if (level.equalsIgnoreCase("finer"))
+			setLevel(Level.FINER);
 		else if (level.equalsIgnoreCase("fine"))
 			setLevel(Level.FINE);
 		else if (level.equalsIgnoreCase("info"))
@@ -105,99 +130,49 @@ public class Diag
 	}
 
 	/**
-     * Log a message unconditionally. This raises the message at OFF level - ie.
+     * Log a message unconditionally. This raises the message at ALL level - ie.
      * even if diagnostics are off, still raise the message.
-     * 
-     * @param line
-     *            The text to log.
      */
-	public static synchronized void log(String line)
-	{
-		logger.log(Level.ALL, line);
-	}
-
 	public static synchronized void log(String format, Object... args)
 	{
-		log(String.format(format, args));
+		logger.log(Level.ALL, String.format(format, args));
 	}
 
 	/**
-     * Log a message at FINE level.
-     * 
-     * @param line
-     *            The text to log.
+     * Log a message at various levels.
      */
-	public static synchronized void fine(String line)
+	public static synchronized void finest(String format, Object... args)
 	{
-		logger.fine(line);
+		logger.log(Level.FINEST, String.format(format, args));
+	}
+
+	public static synchronized void finer(String format, Object... args)
+	{
+		logger.log(Level.FINER, String.format(format, args));
 	}
 
 	public static synchronized void fine(String format, Object... args)
 	{
-		fine(String.format(format, args));
-	}
-
-	/**
-     * Log a message at INFO level.
-     * 
-     * @param line
-     *            The text to log.
-     */
-	public static synchronized void info(String line)
-	{
-		logger.info(line);
+		logger.log(Level.FINE, String.format(format, args));
 	}
 
 	public static synchronized void info(String format, Object... args)
 	{
-		info(String.format(format, args));
-	}
-
-	/**
-     * Log a message at CONFIG level.
-     * 
-     * @param line
-     *            The text to log.
-     */
-	public static synchronized void config(String line)
-	{
-		logger.config(line);
+		logger.log(Level.INFO, String.format(format, args));
 	}
 
 	public static synchronized void config(String format, Object... args)
 	{
-		config(String.format(format, args));
-	}
-
-	/**
-     * Log a message at WARNING level.
-     * 
-     * @param line
-     *            The text to log.
-     */
-	public static synchronized void warning(String line)
-	{
-		logger.warning(line);
+		logger.log(Level.CONFIG, String.format(format, args));
 	}
 
 	public static synchronized void warning(String format, Object... args)
 	{
-		warning(String.format(format, args));
-	}
-
-	/**
-     * Log a message at SEVERE level.
-     * 
-     * @param line
-     *            The text to log.
-     */
-	public static synchronized void severe(String line)
-	{
-		logger.severe(line);
+		logger.log(Level.WARNING, String.format(format, args));
 	}
 
 	public static synchronized void severe(String format, Object... args)
 	{
-		severe(String.format(format, args));
+		logger.log(Level.SEVERE, String.format(format, args));
 	}
 }
