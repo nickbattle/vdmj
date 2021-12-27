@@ -41,7 +41,7 @@ public class IgnoreHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		Diag.error("Ignoring request %s", request.toString());
+		Diag.warning("Ignoring request %s", request.toString());
 		return new DAPMessageList(request, false, null, null);
 	}
 }

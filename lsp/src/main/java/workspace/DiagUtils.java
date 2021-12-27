@@ -35,7 +35,7 @@ public class DiagUtils
 {
 	public static void dump(List<VDMMessage> messages)
 	{
-		if (Diag.isLogging(Level.FINE))
+		if (Diag.isLoggable(Level.FINE))
 		{
 			for (VDMMessage m: messages)
 			{
@@ -46,7 +46,7 @@ public class DiagUtils
 	
 	public static void dumpEdit(JSONObject range, StringBuilder buffer)
 	{
-		if (Diag.isLogging(Level.FINE))
+		if (Diag.isLoggable(Level.FINE))
 		{
 			JSONObject position = range.get("start");
 			long line = position.get("line");

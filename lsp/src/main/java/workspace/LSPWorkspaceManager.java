@@ -94,7 +94,7 @@ public class LSPWorkspaceManager
 		if (System.getProperty("lsp.encoding") == null)
 		{
 			encoding = Charset.defaultCharset();
-			Diag.info("Workspace using default encoding");
+			Diag.info("Workspace using default encoding: %s", encoding.name());
 		}
 		else
 		{

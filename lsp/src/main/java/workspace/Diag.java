@@ -117,7 +117,7 @@ public class Diag
 	 * Check whether a given diag Level is being logged. Note this is
 	 * always true if we are the debug server.
 	 */
-	public static synchronized boolean isLogging(Level level)
+	public static synchronized boolean isLoggable(Level level)
 	{
 		return logger.getLevel().intValue() <= level.intValue() || isDebugServer;
 	}
@@ -171,12 +171,17 @@ public class Diag
 	}
 
 	/**
-     * Log a message unconditionally. This raises the message at OFF level - ie.
-     * even if diagnostics are off, still raise the message.
+     * Log a message unconditionally. This bypasses the Logger and uses
+     * the handler(s) directly.
      */
 	public static synchronized void log(String format, Object... args)
 	{
-		logger.log(Level.OFF, String.format(format, args));
+		LogRecord rec = new LogRecord(Level.ALL, String.format(format, args));
+		
+		for (Handler h: logger.getHandlers())
+		{
+			h.publish(rec);
+		}
 	}
 
 	/**
@@ -219,7 +224,7 @@ public class Diag
 
 	public static synchronized void error(String format, Object... args)
 	{
-		logger.log(Level.SEVERE, String.format(format, args));
+		logger.log(Level.SEVERE, String.format("ERROR: " + format, args));
 	}
 
 	public static synchronized void error(Throwable throwable)
