@@ -315,7 +315,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 							}
 							
 							JSONObject params = new JSONObject("token", workDoneToken, "value", value);
-							Diag.info("Sending work done = %d%%", done);
+							Diag.fine("Sending work done = %d%%", done);
 							send(server, RPCRequest.notification("$/progress", params));
 							percentDone = done;
 						}
@@ -328,7 +328,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 					else
 					{
 						JSONObject params = new JSONObject("token", progressToken, "value", batch);
-						Diag.info("Sending intermediate results");
+						Diag.fine("Sending intermediate results");
 						send(server, RPCRequest.notification("$/progress", params));
 					}
 
@@ -394,7 +394,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 			Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
 			JSONArray array = new JSONArray();
 			
-			Diag.info("Starting batch at test number %d...", testNumber);
+			Diag.fine("Starting batch at test number %d...", testNumber);
 		
 			while (traceIterator.hasMoreTests() && batchSize > 0 && testNumber <= endTest)
 			{
@@ -433,7 +433,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 				testNumber++;
 			}
 			
-			Diag.info("Completed batch at test number %d", testNumber);
+			Diag.fine("Completed batch at test number %d", testNumber);
 			return array;
 		}
 	}
