@@ -30,7 +30,7 @@ import java.net.Socket;
 
 import com.fujitsu.vdmj.lex.Dialect;
 
-import workspace.Log;
+import workspace.Diag;
 
 public class DAPServerSocket implements Runnable
 {
@@ -48,8 +48,6 @@ public class DAPServerSocket implements Runnable
 		Dialect dialect = Dialect.VDM_SL;
 		int dapPort = -1;
 		
-		Log.init();
-
 		for (int a=0; a<args.length; a++)
 		{
 			if (args[a].equals("-vdmsl"))
@@ -70,7 +68,7 @@ public class DAPServerSocket implements Runnable
 			}
 			else
 			{
-				Log.error("Usage: DAPSocketServer [-vdmsl | -vdmpp | -vdmrt] -dap");
+				Diag.error("Usage: DAPSocketServer [-vdmsl | -vdmpp | -vdmrt] -dap");
 			}
 		}
 		
@@ -89,7 +87,7 @@ public class DAPServerSocket implements Runnable
 			
 			while (true)
 			{
-				Log.printf("DAP %s Server listening on port %d", dialect, port);
+				Diag.info("DAP %s Server listening on port %d", dialect, port);
 				Socket conn = socket.accept();
 				
 				try
@@ -98,10 +96,10 @@ public class DAPServerSocket implements Runnable
 				}
 				catch (IOException e)
 				{
-					Log.error("DAP Server stopped: %s", e.getMessage());
+					Diag.error("DAP Server stopped: %s", e.getMessage());
 				}
 
-				Log.printf("DAP %s Server closing port %d", dialect, port);
+				Diag.info("DAP %s Server closing port %d", dialect, port);
 				conn.close();
 			}
 		}
@@ -109,7 +107,7 @@ public class DAPServerSocket implements Runnable
 		{
 			try
 			{
-				Log.error("DAP Server socket error: %s", e.getMessage());
+				Diag.error("DAP Server socket error: %s", e.getMessage());
 				if (socket != null) socket.close();
 			}
 			catch (IOException e1)

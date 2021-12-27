@@ -96,7 +96,7 @@ public class Diag
 		
 		if (isDebugServer)
 		{
-			setLevel(Level.ALL);
+			logger.setLevel(Level.ALL);
 			info("Enabling all logging for debug server");
 		}
 		else
@@ -213,6 +213,11 @@ public class Diag
 	}
 
 	public static synchronized void severe(String format, Object... args)
+	{
+		logger.log(Level.SEVERE, String.format(format, args));
+	}
+
+	public static synchronized void error(String format, Object... args)
 	{
 		logger.log(Level.SEVERE, String.format(format, args));
 	}

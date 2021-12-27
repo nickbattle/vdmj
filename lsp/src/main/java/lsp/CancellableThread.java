@@ -27,7 +27,7 @@ package lsp;
 import java.util.HashMap;
 import java.util.Map;
 
-import workspace.Log;
+import workspace.Diag;
 
 abstract public class CancellableThread extends Thread
 {
@@ -47,13 +47,13 @@ abstract public class CancellableThread extends Thread
 	{
 		try
 		{
-			Log.printf("Starting %s", getName());
+			Diag.info("Starting %s", getName());
 			body();
 		}
 		finally
 		{
 			active.remove(myId);
-			Log.printf("Completed %s", getName());
+			Diag.info("Completed %s", getName());
 		}
 	}
 	
@@ -63,7 +63,7 @@ abstract public class CancellableThread extends Thread
 		
 		if (thread == null)
 		{
-			Log.error("Cannot cancel thread id %s", id.toString());
+			Diag.error("Cannot cancel thread id %s", id.toString());
 		}
 		else
 		{
@@ -75,7 +75,7 @@ abstract public class CancellableThread extends Thread
 	{
 		for (Object id: active.keySet())
 		{
-			Log.printf("Cancelling %s", id.toString());
+			Diag.info("Cancelling %s", id.toString());
 			cancel(id);
 		}
 	}
@@ -83,7 +83,7 @@ abstract public class CancellableThread extends Thread
 	public void setCancelled()
 	{
 		cancelled = true;
-		Log.printf("Thread %s cancel sent", myId.toString());
+		Diag.info("Thread %s cancel sent", myId.toString());
 	}
 
 	public static CancellableThread find(Object id)

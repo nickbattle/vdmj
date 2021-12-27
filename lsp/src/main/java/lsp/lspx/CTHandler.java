@@ -36,9 +36,9 @@ import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.Diag;
 import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
-import workspace.Log;
 
 public class CTHandler extends LSPHandler
 {
@@ -81,12 +81,12 @@ public class CTHandler extends LSPHandler
 		}
 		catch (URISyntaxException e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
@@ -101,7 +101,7 @@ public class CTHandler extends LSPHandler
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
@@ -163,7 +163,7 @@ public class CTHandler extends LSPHandler
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}

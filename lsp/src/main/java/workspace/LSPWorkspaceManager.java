@@ -94,12 +94,12 @@ public class LSPWorkspaceManager
 		if (System.getProperty("lsp.encoding") == null)
 		{
 			encoding = Charset.defaultCharset();
-			Log.printf("Workspace using default encoding");
+			Diag.info("Workspace using default encoding");
 		}
 		else
 		{
 			encoding = Charset.forName(System.getProperty("lsp.encoding"));
-			Log.printf("Workspace encoding set to %s", encoding.displayName());
+			Diag.info("Workspace encoding set to %s", encoding.displayName());
 		}
 	}
 
@@ -118,7 +118,7 @@ public class LSPWorkspaceManager
 			registry.registerPlugin(TCPlugin.factory(Settings.dialect));
 			registry.registerPlugin(INPlugin.factory(Settings.dialect));
 			
-			Log.printf("Created LSPWorkspaceManager");
+			Diag.info("Created LSPWorkspaceManager");
 		}
 
 		return INSTANCE;
@@ -175,7 +175,7 @@ public class LSPWorkspaceManager
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
@@ -206,12 +206,12 @@ public class LSPWorkspaceManager
 		
 		if (capability != null)
 		{
-			Log.printf("Client capability %s = %s", dotName, capability);
+			Diag.fine("Client capability %s = %s", dotName, capability);
 			return capability;
 		}
 		else
 		{
-			Log.printf("Missing client capability: %s", dotName);
+			Diag.fine("Missing client capability: %s", dotName);
 			return null;
 		}
 	}
@@ -252,7 +252,7 @@ public class LSPWorkspaceManager
 		
 		if (orderedFiles)
 		{
-			Log.printf("Loading ordered project files from %s", ordering);
+			Diag.info("Loading ordered project files from %s", ordering);
 			BufferedReader br = null;
 			
 			try
@@ -264,7 +264,7 @@ public class LSPWorkspaceManager
 				{
 					// Use canonical file to allow "./folder/file"
 					File file = new File(rootUri, source).getCanonicalFile();
-					Log.printf("Loading %s", file);
+					Diag.info("Loading %s", file);
 					
 					if (file.exists())
 					{
@@ -272,7 +272,7 @@ public class LSPWorkspaceManager
 					}
 					else
 					{
-						Log.error("Ordering file not found: " + file);
+						Diag.error("Ordering file not found: " + file);
 						sendMessage(1L, "Ordering file not found: " + file);
 					}
 					
@@ -286,7 +286,7 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
-			Log.printf("Loading all project files under %s", rootUri);
+			Diag.info("Loading all project files under %s", rootUri);
 			loadProjectFiles(rootUri);
 		}
 	}
@@ -314,7 +314,7 @@ public class LSPWorkspaceManager
 				}
 				else
 				{
-					Log.printf("Ignoring file %s", file.getPath());
+					Diag.warning("Ignoring file %s", file.getPath());
 				}
 			}
 		}
@@ -335,7 +335,7 @@ public class LSPWorkspaceManager
 		isr.close();
 		
 		projectFiles.put(file, sb);
-		Log.printf("Loaded file %s", file.getPath());
+		Diag.info("Loaded file %s", file.getPath());
 	}
 	
 	private boolean onDotPath(File file)
@@ -362,7 +362,7 @@ public class LSPWorkspaceManager
 		POPlugin po = registry.getPlugin("PO");
 		CTPlugin ct = registry.getPlugin("CT");
 		
-		Log.printf("Checking loaded files (%s)...", reason);
+		Diag.info("Checking loaded files (%s)...", reason);
 		ast.preCheck();
 		tc.preCheck();
 		in.preCheck();
@@ -383,25 +383,25 @@ public class LSPWorkspaceManager
 			{
 				if (in.checkLoadedFiles(tc.getTC()))
 				{
-					Log.printf("Loaded files checked successfully");
+					Diag.info("Loaded files checked successfully");
 				}
 				else
 				{
-					Log.error("Failed to create interpreter");
+					Diag.error("Failed to create interpreter");
 				}
 			}
 			else
 			{
-				Log.error("Type checking errors found");
-				Log.dump(tc.getErrs());
-				Log.dump(tc.getWarns());
+				Diag.error("Type checking errors found");
+				DiagUtils.dump(tc.getErrs());
+				DiagUtils.dump(tc.getWarns());
 			}
 		}
 		else
 		{
-			Log.error("Syntax errors found");
-			Log.dump(ast.getErrs());
-			Log.dump(ast.getWarns());
+			Diag.error("Syntax errors found");
+			DiagUtils.dump(ast.getErrs());
+			DiagUtils.dump(ast.getWarns());
 		}
 		
 		List<VDMMessage> diags = new Vector<VDMMessage>();
@@ -424,7 +424,7 @@ public class LSPWorkspaceManager
 			ct.checkLoadedFiles(in.getIN());
 		}
 
-		Log.printf("Checked loaded files.");
+		Diag.info("Checked loaded files.");
 		return result;
 	}
 
@@ -432,21 +432,21 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Log.printf("Ignoring dot path file", file);
+			Diag.info("Ignoring dot path file", file);
 			return null;
 		}
 		if (!projectFiles.keySet().contains(file))
 		{
-			Log.printf("Opening new file: %s", file);
+			Diag.info("Opening new file: %s", file);
 			openFiles.add(file);
 		}
 		else if (openFiles.contains(file))
 		{
-			Log.error("File already open: %s", file);
+			Diag.warning("File already open: %s", file);
 		}
 		else
 		{
-			Log.printf("Opening known file: %s", file);
+			Diag.info("Opening known file: %s", file);
 			openFiles.add(file);
 		}
 		
@@ -454,14 +454,14 @@ public class LSPWorkspaceManager
 		
 		if (orderedFiles && existing == null)
 		{
-			Log.error("File not in ordering list: %s", file);
+			Diag.error("File not in ordering list: %s", file);
 			sendMessage(1L, "Ordering file out of date? " + file);
 		}
 		else if (existing == null || !existing.toString().equals(text))
 		{
 			if (existing != null)
 			{
-				Log.printf("File different on didOpen?");
+				Diag.info("File different on didOpen?");
 			}
 			
 			projectFiles.put(file, new StringBuilder(text));
@@ -475,19 +475,19 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Log.printf("Ignoring dot path file", file);
+			Diag.info("Ignoring dot path file", file);
 		}
 		else if (!projectFiles.keySet().contains(file))
 		{
-			Log.error("File not known: %s", file);
+			Diag.error("File not known: %s", file);
 		}
 		else if (!openFiles.contains(file))
 		{
-			Log.error("File not open: %s", file);
+			Diag.error("File not open: %s", file);
 		}
 		else
 		{
-			Log.printf("Closing file: %s", file);
+			Diag.info("Closing file: %s", file);
 			openFiles.remove(file);
 		}
 		
@@ -498,17 +498,17 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Log.printf("Ignoring dot path file", file);
+			Diag.info("Ignoring dot path file", file);
 			return null;
 		}
 		else if (!projectFiles.keySet().contains(file))
 		{
-			Log.error("File not known: %s", file);
+			Diag.error("File not known: %s", file);
 			return null;
 		}
 		else if (!openFiles.contains(file))
 		{
-			Log.error("File not open: %s", file);
+			Diag.error("File not open: %s", file);
 			return null;
 		}
 		else
@@ -522,7 +522,7 @@ public class LSPWorkspaceManager
 				buffer.replace(start, end, text);
 			}
 			
-			Log.dumpEdit(range, buffer);
+			DiagUtils.dumpEdit(range, buffer);
 			ASTPlugin ast = registry.getPlugin("AST");
 			List<VDMMessage> errors = ast.fileChanged(file);
 			
@@ -560,35 +560,35 @@ public class LSPWorkspaceManager
 			case CREATE:
 				if (file.isDirectory())
 				{
-					Log.printf("New directory created: %s", file);
+					Diag.info("New directory created: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (ignoreDotPath)
 				{
-					Log.printf("Ignoring file on dot path: %s", file);
+					Diag.info("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (file.equals(new File(rootUri, ORDERING)))
 				{
-					Log.printf("Created ordering file, rebuilding");
+					Diag.info("Created ordering file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
-					Log.printf("Ignoring non-project file: %s", file);
+					Diag.info("Ignoring non-project file: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (!projectFiles.keySet().contains(file))	
 				{
 					if (orderedFiles)
 					{
-						Log.error("File not in ordering list: %s", file);
+						Diag.error("File not in ordering list: %s", file);
 						sendMessage(1L, "Ordering file out of date? " + file);
 						actionCode = DO_NOTHING;
 					}
 					else
 					{
-						Log.printf("Created new file: %s", file);
+						Diag.info("Created new file: %s", file);
 						loadFile(file);
 						actionCode = RECHECK;
 					}
@@ -596,7 +596,7 @@ public class LSPWorkspaceManager
 				else
 				{
 					// Usually because a didOpen gets in first, on creation
-					Log.printf("Created file already added: %s", file);
+					Diag.info("Created file already added: %s", file);
 					actionCode = DO_NOTHING;	// Already re-built by openFile
 				}
 				break;
@@ -604,27 +604,27 @@ public class LSPWorkspaceManager
 			case CHANGE:
 				if (file.isDirectory())
 				{
-					Log.printf("Directory changed: %s", file);
+					Diag.info("Directory changed: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (ignoreDotPath)
 				{
-					Log.printf("Ignoring file on dot path: %s", file);
+					Diag.info("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (file.equals(new File(rootUri, ORDERING)))
 				{
-					Log.printf("Updated ordering file, rebuilding");
+					Diag.info("Updated ordering file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
-					Log.printf("Ignoring non-project file change: %s", file);
+					Diag.info("Ignoring non-project file change: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (!projectFiles.keySet().contains(file))	
 				{
-					Log.error("Changed file not known: %s", file);
+					Diag.error("Changed file not known: %s", file);
 					actionCode = RELOAD_AND_CHECK;	// Try rebuilding?
 				}
 				else
@@ -635,7 +635,7 @@ public class LSPWorkspaceManager
 				
 			case DELETE:
 				// Since the file is deleted, we don't know what it was so we have to rebuild
-				Log.printf("Deleted %s (dir/file?), rebuilding", file);
+				Diag.info("Deleted %s (dir/file?), rebuilding", file);
 				actionCode = RELOAD_AND_CHECK;
 				break;
 		}
@@ -684,15 +684,15 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Log.printf("Ignoring dot path file", file);
+			Diag.info("Ignoring dot path file", file);
 		}
 		else if (!projectFiles.keySet().contains(file))
 		{
-			Log.error("File not known: %s", file);
+			Diag.error("File not known: %s", file);
 		}
 		else if (!openFiles.contains(file))
 		{
-			Log.error("File not open: %s", file);
+			Diag.error("File not open: %s", file);
 		}
 		else
 		{
@@ -827,7 +827,7 @@ public class LSPWorkspaceManager
 				
 				if (!word.isEmpty())
 				{
-					Log.printf("Trying to complete '%s'", word);
+					Diag.info("Trying to complete '%s'", word);
 					
 					for (TCDefinition defn: lookupDefinition(word))
 					{
@@ -939,9 +939,9 @@ public class LSPWorkspaceManager
 		
 		if (!sloc.within(rloc))
 		{
-			Log.error("Selection not within range at symbol %s", name);
-			Log.error("Range %s", range);
-			Log.error("Selection %s", selectionRange);
+			Diag.error("Selection not within range at symbol %s", name);
+			Diag.error("Range %s", range);
+			Diag.error("Selection %s", selectionRange);
 		}
 	}
 
@@ -1001,7 +1001,7 @@ public class LSPWorkspaceManager
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 		}
 	}
 }

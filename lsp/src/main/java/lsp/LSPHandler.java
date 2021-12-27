@@ -28,7 +28,7 @@ import rpc.RPCHandler;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
-import workspace.Log;
+import workspace.Diag;
 
 abstract public class LSPHandler implements RPCHandler
 {
@@ -44,12 +44,12 @@ abstract public class LSPHandler implements RPCHandler
 	{
 		if (message.isError())
 		{
-			Log.error("Error response to id %d received: %s", (Long)message.get("id"), message.getError());
+			Diag.error("Error response to id %d received: %s", (Long)message.get("id"), message.getError());
 			return;
 		}
 		else
 		{
-			Log.printf("Successful response to id %d ignored", (Long)message.get("id"));
+			Diag.info("Successful response to id %d ignored", (Long)message.get("id"));
 		}
 	}
 }

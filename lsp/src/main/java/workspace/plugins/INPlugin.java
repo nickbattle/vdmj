@@ -29,7 +29,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
-import workspace.Log;
+import workspace.Diag;
 
 abstract public class INPlugin extends AnalysisPlugin
 {
@@ -45,7 +45,7 @@ abstract public class INPlugin extends AnalysisPlugin
 				return new INPluginPR();
 				
 			default:
-				Log.error("Unknown dialect " + dialect);
+				Diag.error("Unknown dialect " + dialect);
 				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
 		}
 	}

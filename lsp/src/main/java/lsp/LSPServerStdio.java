@@ -25,11 +25,11 @@
 package lsp;
 
 import java.io.IOException;
+
 import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.DAPServerSocket;
 import workspace.Diag;
-import workspace.Log;
 
 public class LSPServerStdio implements Runnable
 {
@@ -45,7 +45,6 @@ public class LSPServerStdio implements Runnable
 		Dialect dialect = Dialect.VDM_SL;
 		int dapPort = -1;
 		
-		Log.init();
 		Diag.init(false);
 
 		for (int a=0; a<args.length; a++)
@@ -93,12 +92,12 @@ public class LSPServerStdio implements Runnable
 	{
 		try
 		{
-			Log.printf("LSP %s Server listening on stdio", dialect);
+			Diag.info("LSP %s Server listening on stdio", dialect);
 			new LSPServer(dialect, System.in, System.out).run();
 		}
 		catch (IOException e)
 		{
-			Log.error("LSP Server stopped: %s", e.getMessage());
+			Diag.error("LSP Server stopped: %s", e.getMessage());
 		}
 	}
 }

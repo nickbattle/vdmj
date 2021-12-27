@@ -34,8 +34,8 @@ import lsp.textdocument.WatchKind;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.Diag;
 import workspace.LSPWorkspaceManager;
-import workspace.Log;
 
 public class DidChangeWSHandler extends LSPHandler
 {
@@ -85,7 +85,7 @@ public class DidChangeWSHandler extends LSPHandler
 					}
 					else
 					{
-						Log.printf("WARNING: ignoring non-file URI", uri);
+						Diag.info("WARNING: ignoring non-file URI", uri);
 					}
 				}
 			}
@@ -97,12 +97,12 @@ public class DidChangeWSHandler extends LSPHandler
 		}
 		catch (URISyntaxException e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}

@@ -67,7 +67,7 @@ public class PluginRegistry
 	{
 		plugins.put(plugin.getName(), plugin);
 		plugin.init();
-		Log.printf("Registered analysis plugin: %s", plugin.getName());
+		Diag.config("Registered analysis plugin: %s", plugin.getName());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -89,7 +89,7 @@ public class PluginRegistry
 				{
 					if (result != null)
 					{
-						Log.error("Multiple plugins support %s", method);
+						Diag.error("Multiple plugins support %s", method);
 					}
 					
 					result = (T)plugin;
@@ -97,8 +97,8 @@ public class PluginRegistry
 			}
 			catch (Throwable e)
 			{
-				Log.error("Exception in %s supportsMethod", plugin.getName());
-				Log.error(e);
+				Diag.error("Exception in %s supportsMethod", plugin.getName());
+				Diag.error(e);
 			}
 		}
 		
@@ -117,8 +117,8 @@ public class PluginRegistry
 			}
 			catch (Throwable e)
 			{
-				Log.error("Exception in %s getExperimentalOptions", plugin.getName());
-				Log.error(e);
+				Diag.error("Exception in %s getExperimentalOptions", plugin.getName());
+				Diag.error(e);
 			}
 		}
 		
@@ -137,8 +137,8 @@ public class PluginRegistry
 			}
 			catch (Throwable e)
 			{
-				Log.error("Exception in %s applyCodeLenses", plugin.getName());
-				Log.error(e);
+				Diag.error("Exception in %s applyCodeLenses", plugin.getName());
+				Diag.error(e);
 			}
 		}
 		

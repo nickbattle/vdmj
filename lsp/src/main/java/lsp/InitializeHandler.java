@@ -26,9 +26,8 @@ package lsp;
 
 import rpc.RPCRequest;
 import rpc.RPCResponse;
+import workspace.Diag;
 import workspace.LSPWorkspaceManager;
-import workspace.Log;
-
 import java.io.File;
 import java.net.URISyntaxException;
 
@@ -72,12 +71,12 @@ public class InitializeHandler extends LSPHandler
 		}
 		catch (URISyntaxException e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
@@ -92,6 +91,6 @@ public class InitializeHandler extends LSPHandler
 	public void response(RPCResponse message)
 	{
 		// Response to dynamic registrations
-		Log.printf("Response to id %d received", (Long)message.get("id"));
+		Diag.info("Response to id %d received", (Long)message.get("id"));
 	}
 }

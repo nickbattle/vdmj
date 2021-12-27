@@ -71,7 +71,7 @@ import com.fujitsu.vdmj.values.Value;
 
 import json.JSONArray;
 import json.JSONObject;
-import workspace.Log;
+import workspace.Diag;
 
 public class DAPDebugExecutor implements DebugExecutor
 {
@@ -261,7 +261,7 @@ public class DAPDebugExecutor implements DebugExecutor
 			}
 			catch (Exception e)
 			{
-				Log.error(e);
+				Diag.error(e);
 			}
 
 			ctxt.threadState.setAtomic(false);
@@ -338,7 +338,7 @@ public class DAPDebugExecutor implements DebugExecutor
 			}
 			else
 			{
-				Log.error("Invalid frameId in stack request: %d", frameId);
+				Diag.error("Invalid frameId in stack request: %d", frameId);
 				frameId = 0;
 			}
 		}
@@ -383,7 +383,7 @@ public class DAPDebugExecutor implements DebugExecutor
 		}
 		else
 		{
-			Log.error("Invalid frameId in scopes request: %d", frameId);
+			Diag.error("Invalid frameId in scopes request: %d", frameId);
 			// return an empty scopes array
 		}
 		
@@ -673,7 +673,7 @@ public class DAPDebugExecutor implements DebugExecutor
 					}
 					catch (Exception e)
 					{
-						Log.error(e);
+						Diag.error(e);
 					}
 				}
 				else if (d instanceof TCMutexSyncDefinition)

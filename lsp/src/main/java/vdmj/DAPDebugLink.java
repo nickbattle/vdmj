@@ -45,7 +45,7 @@ import dap.DAPResponse;
 import dap.DAPServer;
 import json.JSONObject;
 import workspace.DAPWorkspaceManager;
-import workspace.Log;
+import workspace.Diag;
 
 public class DAPDebugLink extends ConsoleDebugLink
 {
@@ -95,13 +95,13 @@ public class DAPDebugLink extends ConsoleDebugLink
 			
 		try
 		{
-			Log.printf("New thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
+			Diag.info("New thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
 			server.writeMessage(new DAPResponse("thread",
 				new JSONObject("reason", "started", "threadId", Thread.currentThread().getId())));
 		}
 		catch (IOException e)
 		{
-			Log.error(e);
+			Diag.error(e);
 		}
 	}
 	
@@ -175,7 +175,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 		}
 		catch (IOException e)
 		{
-			Log.error(e);
+			Diag.error(e);
 		}
 
 		super.stopped(ctxt, location, ex);
@@ -191,7 +191,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 			}
 			catch (IOException e)
 			{
-				Log.error(e);
+				Diag.error(e);
 			}
 		}
 		
@@ -230,13 +230,13 @@ public class DAPDebugLink extends ConsoleDebugLink
 		
 		try
 		{
-			Log.printf("End thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
+			Diag.info("End thread %s(%d)", Thread.currentThread().getName(), Thread.currentThread().getId());
 			server.writeMessage(new DAPResponse("thread",
 				new JSONObject("reason", "exited", "threadId", Thread.currentThread().getId())));
 		}
 		catch (IOException e)
 		{
-			Log.error(e);
+			Diag.error(e);
 		}
 	}
 

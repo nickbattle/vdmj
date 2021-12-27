@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.DAPServerSocket;
 import workspace.Diag;
-import workspace.Log;
 
 public class LSPServerDebug implements Runnable
 {
@@ -51,7 +50,6 @@ public class LSPServerDebug implements Runnable
 		int dapPort = -1;
 		int lspPort = -1;
 		
-		Log.init();
 		Diag.init(true);
 
 		for (int a=0; a<args.length; a++)
@@ -113,7 +111,7 @@ public class LSPServerDebug implements Runnable
 
 			while (true)
 			{
-				Log.printf("LSP %s Server listening on port %d", dialect, socket.getLocalPort());
+				Diag.info("LSP %s Server listening on port %d", dialect, socket.getLocalPort());
 				Socket conn = socket.accept();
 				
 				try
@@ -125,7 +123,7 @@ public class LSPServerDebug implements Runnable
 					Diag.severe("LSP Server stopped: %s", e.getMessage());
 				}
 				
-				Log.printf("LSP %s Server closing port %d", dialect, socket.getLocalPort());
+				Diag.info("LSP %s Server closing port %d", dialect, socket.getLocalPort());
 				conn.close();
 			}
 		}
@@ -133,7 +131,7 @@ public class LSPServerDebug implements Runnable
 		{
 			try
 			{
-				Log.printf("LSP Server socket error: %s", e.getMessage());
+				Diag.info("LSP Server socket error: %s", e.getMessage());
 				if (socket != null) socket.close();
 			}
 			catch (IOException e1)

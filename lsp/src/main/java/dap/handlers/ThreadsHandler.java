@@ -36,7 +36,7 @@ import json.JSONArray;
 import json.JSONObject;
 import vdmj.DAPDebugReader;
 import workspace.DAPWorkspaceManager;
-import workspace.Log;
+import workspace.Diag;
 
 public class ThreadsHandler extends DAPHandler
 {
@@ -71,7 +71,7 @@ public class ThreadsHandler extends DAPHandler
 			
 			if (all.isEmpty())
 			{
-				Log.printf("Received threads request before threads started - init?");
+				Diag.info("Received threads request before threads started - init?");
 				JSONArray list = new JSONArray(new JSONObject("id", 0L, "name", "init"));
 				return new DAPMessageList(request, new JSONObject("threads", list));
 			}

@@ -45,14 +45,12 @@ import dap.handlers.ThreadsHandler;
 import json.JSONObject;
 import json.JSONServer;
 import workspace.DAPWorkspaceManager;
-import workspace.Log;
+import workspace.Diag;
 
 public class DAPServer extends JSONServer
 {
 	private static DAPServer INSTANCE = null;
-	
 	private final DAPDispatcher dispatcher;
-	
 	private boolean running = false;
 	
 	public DAPServer(Dialect dialect, Socket socket) throws IOException
@@ -113,7 +111,7 @@ public class DAPServer extends JSONServer
 			
 			if (message == null)	// EOF
 			{
-				Log.printf("End of stream detected");
+				Diag.info("End of stream detected");
 				break;
 			}
 			
@@ -140,8 +138,8 @@ public class DAPServer extends JSONServer
 		}
 		catch (IOException e)
 		{
-			Log.error(e);
-			Log.printf("%s", message);
+			Diag.error(e);
+			Diag.info("%s", message);
 		}
 	}
 
@@ -153,8 +151,8 @@ public class DAPServer extends JSONServer
 		}
 		catch (IOException e)
 		{
-			Log.error(e);
-			Log.printf("%s", message);
+			Diag.error(e);
+			Diag.info("%s", message);
 		}
 	}
 

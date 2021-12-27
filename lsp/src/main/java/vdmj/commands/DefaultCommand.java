@@ -29,7 +29,7 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
-import workspace.Log;
+import workspace.Diag;
 
 public class DefaultCommand extends Command
 {
@@ -63,7 +63,7 @@ public class DefaultCommand extends Command
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new DAPMessageList(request, e);
 		}
 	}

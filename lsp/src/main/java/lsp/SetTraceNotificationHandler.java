@@ -42,23 +42,30 @@ public class SetTraceNotificationHandler extends LSPHandler
 		JSONObject params = request.get("params");
 		String value = params.get("value");
 		
-		switch (value)
+		if (Diag.isDebugServer())
 		{
-			case "off":
-				Diag.setLevel("off");
-				break;
-				
-			case "messages":
-				Diag.setLevel("info");
-				break;
-				
-			case "verbose":
-				Diag.setLevel("finest");
-				break;
-				
-			default:
-				Diag.severe("Ignoring trace notification level '%s'", value);
-				break;
+			Diag.warning("Ignoring SetTrace notification: %s", value);
+		}
+		else
+		{
+			switch (value)
+			{
+				case "off":
+					Diag.setLevel("off");
+					break;
+					
+				case "messages":
+					Diag.setLevel("info");
+					break;
+					
+				case "verbose":
+					Diag.setLevel("finest");
+					break;
+					
+				default:
+					Diag.severe("Ignoring trace notification level '%s'", value);
+					break;
+			}
 		}
 		
 		return null;

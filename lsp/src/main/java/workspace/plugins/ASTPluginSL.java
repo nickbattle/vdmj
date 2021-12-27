@@ -44,8 +44,8 @@ import com.fujitsu.vdmj.syntax.ModuleReader;
 
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
+import workspace.DiagUtils;
 import workspace.LSPWorkspaceManager;
-import workspace.Log;
 import workspace.lenses.CodeLens;
 
 public class ASTPluginSL extends ASTPlugin
@@ -123,7 +123,7 @@ public class ASTPluginSL extends ASTPlugin
 			errs.addAll(mr.getWarnings());
 		}
 
-		Log.dump(errs);
+		DiagUtils.dump(errs);
 		return errs;
 	}
 	
