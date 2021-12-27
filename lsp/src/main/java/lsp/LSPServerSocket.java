@@ -30,6 +30,7 @@ import java.net.Socket;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.DAPServerSocket;
+import workspace.Diag;
 import workspace.Log;
 
 public class LSPServerSocket implements Runnable
@@ -50,6 +51,7 @@ public class LSPServerSocket implements Runnable
 		int lspPort = -1;
 		
 		Log.init();
+		Diag.init(false);
 
 		for (int a=0; a<args.length; a++)
 		{

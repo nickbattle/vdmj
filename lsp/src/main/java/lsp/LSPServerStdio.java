@@ -28,6 +28,7 @@ import java.io.IOException;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.DAPServerSocket;
+import workspace.Diag;
 import workspace.Log;
 
 public class LSPServerStdio implements Runnable
@@ -45,6 +46,7 @@ public class LSPServerStdio implements Runnable
 		int dapPort = -1;
 		
 		Log.init();
+		Diag.init(false);
 
 		for (int a=0; a<args.length; a++)
 		{

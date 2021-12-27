@@ -22,45 +22,48 @@
  *
  ******************************************************************************/
 
-package lsp;
+package workspace;
 
-import rpc.RPCRequest;
-import workspace.Diag;
+import java.util.List;
+import java.util.logging.Level;
+
+import com.fujitsu.vdmj.messages.VDMMessage;
+
 import json.JSONObject;
-import rpc.RPCMessageList;
 
-public class SetTraceNotificationHandler extends LSPHandler
+public class DiagUtils
 {
-	public SetTraceNotificationHandler()
+	public static void dump(List<VDMMessage> messages)
 	{
-		super();
-	}
-
-	@Override
-	public RPCMessageList request(RPCRequest request)
-	{
-		JSONObject params = request.get("params");
-		String value = params.get("value");
-		
-		switch (value)
+		if (Diag.isLogging(Level.FINE))
 		{
-			case "off":
-				Diag.setLevel("off");
-				break;
-				
-			case "messages":
-				Diag.setLevel("info");
-				break;
-				
-			case "verbose":
-				Diag.setLevel("finest");
-				break;
-				
-			default:
-				Diag.severe("Ignoring trace notification level '%s'", value);
-				break;
+			for (VDMMessage m: messages)
+			{
+				Diag.fine("MSG: %s", m.toString());
+			}
 		}
-		
-		return null;
+	}
+	
+	public static void dumpEdit(JSONObject range, StringBuilder buffer)
+	{
+		if (Diag.isLogging(Level.FINE))
+		{
+			JSONObject position = range.get("start");
+			long line = position.get("line");
+			long count = 0;
+			int start = 0;
+			
+			while (count < line)
+			{
+				if (buffer.charAt(start++) == '\n')
+				{
+					count++;
+				}
+			}
+			
+			int end = start;
+			while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
+			Diag.fine("EDITED %d: [%s]", line+1, buffer.substring(start, end));
+		}
 	}
 }

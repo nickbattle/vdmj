@@ -52,7 +52,7 @@ public class LSPServerDebug implements Runnable
 		int lspPort = -1;
 		
 		Log.init();
-		// Diag.init();
+		Diag.init(true);
 
 		for (int a=0; a<args.length; a++)
 		{

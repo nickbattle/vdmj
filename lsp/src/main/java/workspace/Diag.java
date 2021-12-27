@@ -41,12 +41,17 @@ public class Diag
 {
 	/** The Java logger */
 	private static Logger logger;
+	
+	/** True if we are the LSPServerDebug */
+	private static boolean isDebugServer;
 
 	/**
 	 * Set a handler to save diags to a file for the LSP configuration.
 	 */
-	public static synchronized void init()
+	public static synchronized void init(boolean debugServer)
 	{
+		isDebugServer = debugServer;
+		
 		Formatter formatter = new Formatter()
 		{
 			@Override
@@ -89,7 +94,32 @@ public class Diag
 			logger.addHandler(handler);
 		}
 		
-		setLevel(System.getProperty("lsp.log.level", "all"));
+		if (isDebugServer)
+		{
+			setLevel(Level.ALL);
+			info("Enabling all logging for debug server");
+		}
+		else
+		{
+			setLevel(System.getProperty("lsp.log.level", "off"));
+		}
+	}
+	
+	/**
+	 * Check whether we are the debug server.
+	 */
+	public static synchronized boolean isDebugServer()
+	{
+		return isDebugServer;
+	}
+	
+	/**
+	 * Check whether a given diag Level is being logged. Note this is
+	 * always true if we are the debug server.
+	 */
+	public static synchronized boolean isLogging(Level level)
+	{
+		return logger.getLevel().intValue() <= level.intValue() || isDebugServer;
 	}
 
 	/**
@@ -122,6 +152,8 @@ public class Diag
 	{
 		if (level.equalsIgnoreCase("all"))
 			setLevel(Level.ALL);
+		else if (level.equalsIgnoreCase("off"))
+			setLevel(Level.OFF);
 		else if (level.equalsIgnoreCase("finest"))
 			setLevel(Level.FINEST);
 		else if (level.equalsIgnoreCase("finer"))
