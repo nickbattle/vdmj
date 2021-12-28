@@ -101,7 +101,7 @@ public class Diag
 		}
 		else
 		{
-			setLevel(System.getProperty("lsp.log.level", "off"));
+			setLevel(System.getProperty("lsp.log.level", (filename != null ? "info" : "off")));
 		}
 	}
 	
