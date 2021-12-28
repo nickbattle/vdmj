@@ -63,7 +63,7 @@ public class Diag
 				return String.format("%02d:%02d:%02d.%03d: [%s][%s] %s\n",
 					now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE),
 					now.get(Calendar.SECOND), now.get(Calendar.MILLISECOND),
-					rec.getLevel().getName(), rec.getThreadID(),rec.getMessage());
+					rec.getLevel().getName(), rec.getThreadID(), rec.getMessage());
 			}
 		};
 				
@@ -101,7 +101,8 @@ public class Diag
 		}
 		else
 		{
-			setLevel(System.getProperty("lsp.log.level", (filename != null ? "info" : "off")));
+			String defLevel = (filename != null ? "info" : "off");
+			setLevel(System.getProperty("lsp.log.level", defLevel));
 		}
 	}
 	
@@ -119,7 +120,7 @@ public class Diag
 	 */
 	public static synchronized boolean isLoggable(Level level)
 	{
-		return logger.getLevel().intValue() <= level.intValue() || isDebugServer;
+		return logger.isLoggable(level) || isDebugServer;
 	}
 
 	/**
