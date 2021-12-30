@@ -35,8 +35,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import json.JSONReader;
-
 public class JSONReaderTest extends TestCase
 {
 	private final Random r = new Random();
