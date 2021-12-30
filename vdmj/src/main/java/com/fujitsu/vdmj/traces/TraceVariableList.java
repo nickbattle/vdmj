@@ -28,7 +28,6 @@ import java.util.TreeSet;
 
 import com.fujitsu.vdmj.in.traces.INTraceVariable;
 import com.fujitsu.vdmj.in.traces.INTraceVariableStatement;
-import com.fujitsu.vdmj.traces.CallSequence;
 
 public class TraceVariableList extends TreeSet<INTraceVariable>
 {

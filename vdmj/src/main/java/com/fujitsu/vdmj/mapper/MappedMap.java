@@ -27,8 +27,6 @@ package com.fujitsu.vdmj.mapper;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fujitsu.vdmj.mapper.ClassMapper;
-
 abstract public class MappedMap<FROM_KEY extends Mappable, FROM extends Mappable,
 	TO_KEY extends Mappable, TO extends Mappable> extends HashMap<TO_KEY, TO>
 {
