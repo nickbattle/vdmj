@@ -136,11 +136,11 @@ public class Diag
 		
 		if (old != null)
 		{
-			log("Logging level changed from " + old.getName()+ " to " + level.getName());
+			info("Logging level changed from " + old.getName()+ " to " + level.getName());
 		}
 		else
 		{
-			log("Logging level set to " + level.getName());
+			info("Logging level set to " + level.getName());
 		}
 	}
 
