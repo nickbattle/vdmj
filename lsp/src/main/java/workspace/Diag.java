@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  */
 public class Diag
 {
-	/** The Java logger */
+	/** The Java logger. */
 	private static Logger logger;
 	
 	/** True if we are the LSPServerDebug */
