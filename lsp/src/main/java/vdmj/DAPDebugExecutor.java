@@ -490,11 +490,14 @@ public class DAPDebugExecutor implements DebugExecutor
 			ObjectValue obj = (ObjectValue)var;
 			String className = obj.type.name.getName();
 			NameValuePairMap all = obj.getMemberValues();
-			
+			TCNameList sorted = new TCNameList();
+			sorted.addAll(all.keySet());
+			Collections.sort(sorted);
+
 			Map<String, String> inherited = new HashMap<String, String>();
 			JSONArray members = new JSONArray();
 			
-			for (TCNameToken name: all.keySet())
+			for (TCNameToken name: sorted)
 			{
 				Value value = all.get(name);
 				
@@ -756,7 +759,15 @@ public class DAPDebugExecutor implements DebugExecutor
 		}
 		
 		Context arguments = new Context(loc, title, null);
-		arguments.putAll(c);
+		
+		for (Entry<TCNameToken, Value> nvp: c.entrySet())
+		{
+			if (!(nvp.getValue() instanceof FunctionValue) &&
+				!(nvp.getValue() instanceof OperationValue))
+			{
+				arguments.put(nvp.getKey(), nvp.getValue());
+			}
+		}
 		
 		if (c instanceof StateContext)
 		{
