@@ -763,13 +763,27 @@ public class DAPDebugExecutor implements DebugExecutor
 		for (Entry<TCNameToken, Value> nvp: c.entrySet())
 		{
 			// We eliminate operations from the context, since those are not valuable in
-			// a stack frame. But functions can be (eg. constant lambdas). It's hard to
-			// distinguish function definitions though...
+			// a stack frame. But functions can be (eg. constant lambdas, comps or iterations).
+			// So we have to distinguish function definitions using the "name" of the value.
 			
-			if (!(nvp.getValue() instanceof OperationValue))
+			if (nvp.getValue() instanceof OperationValue)
 			{
-				arguments.put(nvp.getKey(), nvp.getValue());
+				continue;
 			}
+			
+			if (nvp.getValue() instanceof FunctionValue)
+			{
+				FunctionValue fv = (FunctionValue)nvp.getValue();
+				
+				if (!fv.name.equals("lambda") &&
+					!fv.name.equals("comp") &&
+					!fv.name.equals("**"))
+				{
+					continue;
+				}
+			}
+
+			arguments.put(nvp.getKey(), nvp.getValue());
 		}
 		
 		if (c instanceof StateContext)
