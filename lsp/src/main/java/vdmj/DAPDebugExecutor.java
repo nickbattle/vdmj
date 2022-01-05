@@ -762,8 +762,11 @@ public class DAPDebugExecutor implements DebugExecutor
 		
 		for (Entry<TCNameToken, Value> nvp: c.entrySet())
 		{
-			if (!(nvp.getValue() instanceof FunctionValue) &&
-				!(nvp.getValue() instanceof OperationValue))
+			// We eliminate operations from the context, since those are not valuable in
+			// a stack frame. But functions can be (eg. constant lambdas). It's hard to
+			// distinguish function definitions though...
+			
+			if (!(nvp.getValue() instanceof OperationValue))
 			{
 				arguments.put(nvp.getKey(), nvp.getValue());
 			}
