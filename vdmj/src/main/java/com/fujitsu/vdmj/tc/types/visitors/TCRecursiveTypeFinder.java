@@ -52,7 +52,7 @@ public class TCRecursiveTypeFinder extends TCLeafTypeVisitor<Boolean, Set<Boolea
 	@Override
 	public Set<Boolean> caseNamedType(TCNamedType node, TCType arg)
 	{
-		if (done.equals(node) && node.equals(arg))
+		if (done.contains(node) && node.equals(arg))
 		{
 			Set<Boolean> result = newCollection();
 			result.add(true);
