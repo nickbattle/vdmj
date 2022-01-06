@@ -219,26 +219,27 @@ public class DAPDebugExecutor implements DebugExecutor
 	{
 		JSONObject arguments = (JSONObject) command.getPayload();
 		String expr = arguments.get("expression");
-		String answer = "?";
+		String error = null;
+		Value answer = null;
 		String savedName = interpreter.getDefaultName();
 
 		try
 		{
 			interpreter.setDefaultName(breakloc.module);
 			ctxt.threadState.setAtomic(true);
-			answer = interpreter.evaluate(expr, ctxt).toString();
+			answer = interpreter.evaluate(expr, ctxt);
  		}
 		catch (ParserException e)
 		{
-			answer = simplify(e.getMessage());
+			error = simplify(e.getMessage());
 		}
 		catch (ContextException e)
 		{
-			answer = simplify(e.getMessage());
+			error = simplify(e.getMessage());
 		}
 		catch (RuntimeException e)
 		{
-			answer = "Runtime: " + e.getMessage();
+			error = "Runtime: " + e.getMessage();
 		}
 		catch (Exception e)
 		{
@@ -247,11 +248,11 @@ public class DAPDebugExecutor implements DebugExecutor
 				e = (Exception)e.getCause();
 			}
 			
-			answer = "Error: " + e.getMessage();
+			error = "Error: " + e.getMessage();
 		}
 		catch (Throwable th)
 		{
-			answer = "Error: " + th.getMessage();
+			error = "Error: " + th.getMessage();
 		}
 		finally
 		{
@@ -267,7 +268,15 @@ public class DAPDebugExecutor implements DebugExecutor
 			ctxt.threadState.setAtomic(false);
 		}
 
-		return new DebugCommand(DebugType.PRINT, new JSONObject("result", answer, "variablesReference", 0));
+		if (error != null)
+		{
+			return new DebugCommand(DebugType.PRINT, new JSONObject("result", error, "variablesReference", 0));
+		}
+		else
+		{
+			return new DebugCommand(DebugType.PRINT, new JSONObject(
+					"result", answer.toString(), "variablesReference", valueToReference(answer)));
+		}
 	}
 
 	private String simplify(String message)
