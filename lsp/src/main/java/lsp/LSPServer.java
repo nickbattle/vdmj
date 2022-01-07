@@ -90,7 +90,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register(new ShutdownHandler(), "shutdown");
 		dispatcher.register(new ExitHandler(), "exit");
 		dispatcher.register(new CancelHandler(), "$/cancelRequest");
-		dispatcher.register(new SetTraceNotificationHandler(), "$/setTraceNotification");
+		dispatcher.register(new SetTraceNotificationHandler(), "$/setTraceNotification", "$/setTrace");
 
 		dispatcher.register(new DidOpenHandler(), "textDocument/didOpen");
 		dispatcher.register(new DidCloseHandler(), "textDocument/didClose");
