@@ -199,7 +199,6 @@ public class LSPWorkspaceManager
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <T> T getClientCapability(String dotName)
 	{
 		T capability = clientCapabilities.getPath(dotName);

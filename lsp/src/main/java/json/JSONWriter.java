@@ -102,7 +102,6 @@ public class JSONWriter
 		writer.print('"');
 	}
 
-	@SuppressWarnings("unchecked")
 	private void writeValue(Object value) throws IOException
 	{
 		if (value == null)

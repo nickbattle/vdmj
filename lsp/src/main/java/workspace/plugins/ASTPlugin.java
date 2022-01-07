@@ -102,7 +102,6 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	 * We register the launch/debug code lens here, if the tree is dirty. Else it
 	 * is registered by the TCPlugin.
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	protected List<CodeLens> getCodeLenses(boolean dirty)
 	{

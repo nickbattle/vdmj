@@ -228,7 +228,6 @@ public class DAPWorkspaceManager
 		return cap != null && cap;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <T> T getClientCapability(String dotName)
 	{
 		T capability = clientCapabilities.getPath(dotName);
