@@ -53,6 +53,7 @@ import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -829,23 +830,61 @@ public class LSPWorkspaceManager
 	
 	private JSONObject completionForDef(TCDefinition defn)
 	{
-		TCType ftype = defn.getType();
+		TCType type = defn.getType();
+		String label = null;
+		String insertText = null;
 		
-		if (ftype instanceof TCOperationType || ftype instanceof TCFunctionType)
+		if (type instanceof TCOperationType)
 		{
-			return new JSONObject(
-				"label", defn.name.toString(),
-				"kind", CompletionItemKind.kindOf(defn).getValue(),
-				"insertText", defn.name.toString());	// Include arg types
+			TCOperationType otype = (TCOperationType)type;
+			label = defn.name.toString();
+			insertText = defn.name.getName() + snippetText(otype.parameters);
+		}
+		else if (type instanceof TCFunctionType)
+		{
+			TCFunctionType ftype = (TCFunctionType)type;
+			label = defn.name.toString();
+			insertText = defn.name.getName() + snippetText(ftype.parameters);
 		}
 		else
 		{
 			return new JSONObject(
-				"label", defn.name.getName(),
-				"kind", CompletionItemKind.kindOf(defn).getValue(),
-				"detail", ftype.toString(),
-				"insertText", defn.name.getName());
+					"label", defn.name.getName(),
+					"kind", CompletionItemKind.kindOf(defn).getValue(),
+					"detail", type.toString(),
+					"insertText", defn.name.getName());
 		}
+
+		return new JSONObject(
+			"label", label,
+			"kind", CompletionItemKind.kindOf(defn).getValue(),
+			"insertText", insertText,
+			"insertTextFormat", 2);		// Snippet format
+	}
+
+	/**
+	 * A snippet string like "(${1:nat}, ${2:seq of nat})" 
+	 */
+	private String snippetText(TCTypeList parameters)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("(");
+		int pos = 1;
+		String sep = "";
+		
+		for (TCType p: parameters)
+		{
+			sb.append(sep);
+			sb.append("${");
+			sb.append(pos++);
+			sb.append(":");
+			sb.append(p.toString());
+			sb.append("}");
+			sep = ", ";
+		}
+		
+		sb.append(")");
+		return sb.toString();
 	}
 
 	public RPCMessageList documentSymbols(RPCRequest request, File file)
