@@ -773,22 +773,7 @@ public class LSPWorkspaceManager
 				{
 					if (field.name != null)
 					{
-						TCType ftype = field.getType();
-						
-						if (ftype instanceof TCOperationType || ftype instanceof TCFunctionType)
-						{
-							result.add(new JSONObject(
-								"label", field.name.toString(),		// Include types
-								"kind", CompletionItemKind.kindOf(field).getValue(),
-								"detail", ftype.toString()));
-						}
-						else
-						{
-							result.add(new JSONObject(
-								"label", field.name.getName(),
-								"kind", CompletionItemKind.kindOf(field).getValue(),
-								"detail", ftype.toString()));
-						}
+						result.add(completionForDef(field));
 					}
 				}
 			}
@@ -830,25 +815,37 @@ public class LSPWorkspaceManager
 					
 					for (TCDefinition defn: lookupDefinition(word))
 					{
-						TCType ftype = defn.getType();
-						String insert = defn.name.getName();
-						
-						if (defn.isFunctionOrOperation())
+						if (defn.name != null)
 						{
-							insert = insert + ftype.toString().replaceAll("( ->| \\+>| ==>).*", ")");
+							result.add(completionForDef(defn));
 						}
-						
-						result.add(new JSONObject(
-								"label", defn.name.getName(),
-								"kind", CompletionItemKind.kindOf(defn).getValue(),
-								"detail", ftype.toString(),
-								"insertText", insert));
 					}
 				}
 			}
 		}
 		
 		return new RPCMessageList(request, result);
+	}
+	
+	private JSONObject completionForDef(TCDefinition defn)
+	{
+		TCType ftype = defn.getType();
+		
+		if (ftype instanceof TCOperationType || ftype instanceof TCFunctionType)
+		{
+			return new JSONObject(
+				"label", defn.name.toString(),
+				"kind", CompletionItemKind.kindOf(defn).getValue(),
+				"insertText", defn.name.toString());	// Include arg types
+		}
+		else
+		{
+			return new JSONObject(
+				"label", defn.name.getName(),
+				"kind", CompletionItemKind.kindOf(defn).getValue(),
+				"detail", ftype.toString(),
+				"insertText", defn.name.getName());
+		}
 	}
 
 	public RPCMessageList documentSymbols(RPCRequest request, File file)
