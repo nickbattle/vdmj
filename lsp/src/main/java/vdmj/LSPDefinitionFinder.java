@@ -191,7 +191,7 @@ public class LSPDefinitionFinder
 		}
 		else
 		{
-			Diag.error("Unable to locate symbol %s", position);
+			Diag.info("Unable to locate symbol %s", position);
 			return null;
 		}
 	}
@@ -218,7 +218,7 @@ public class LSPDefinitionFinder
 		}
 		else
 		{
-			Diag.error("Unable to locate symbol %s", position);
+			Diag.info("Unable to locate symbol %s", position);
 			return null;
 		}
 	}

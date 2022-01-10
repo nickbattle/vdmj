@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -749,7 +750,7 @@ public class LSPWorkspaceManager
 	public RPCMessageList completion(RPCRequest request,
 			CompletionTriggerKind triggerKind, File file, int zline, int zcol)
 	{
-		JSONArray result = new JSONArray();
+		HashMap<String, JSONObject> labels = new HashMap<String, JSONObject>();
 		TCDefinition def = findDefinition(file, zline, zcol - 2);
 	
 		if (def != null)
@@ -760,7 +761,7 @@ public class LSPWorkspaceManager
 				
 				for (TCField field: rtype.fields)
 				{
-					result.add(new JSONObject(
+					labels.put(field.tag, new JSONObject(
 						"label", field.tag,
 						"kind", CompletionItemKind.kindOf(def).getValue(),
 						"detail", field.type.toString()));
@@ -774,7 +775,8 @@ public class LSPWorkspaceManager
 				{
 					if (field.name != null)
 					{
-						result.add(completionForDef(field));
+						JSONObject comp = completionForDef(field);
+						labels.put(comp.get("label"), comp);
 					}
 				}
 			}
@@ -818,12 +820,16 @@ public class LSPWorkspaceManager
 					{
 						if (defn.name != null)
 						{
-							result.add(completionForDef(defn));
+							JSONObject comp = completionForDef(defn);
+							labels.put(comp.get("label"), comp);
 						}
 					}
 				}
 			}
 		}
+		
+		JSONArray result = new JSONArray();
+		result.addAll(labels.values());		
 		
 		return new RPCMessageList(request, result);
 	}
