@@ -31,7 +31,7 @@ import com.fujitsu.vdmj.Settings;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
-import workspace.Log;
+import workspace.Diag;
 
 public class PrecisionCommand extends Command
 {
@@ -82,7 +82,7 @@ public class PrecisionCommand extends Command
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new DAPMessageList(request, e);
 		}
 	}
