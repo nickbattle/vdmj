@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.in.statements.visitors;
 
+import com.fujitsu.vdmj.in.annotations.INAnnotatedStatement;
+import com.fujitsu.vdmj.in.statements.INCyclesStatement;
+import com.fujitsu.vdmj.in.statements.INDurationStatement;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.statements.INStatementList;
 
@@ -44,6 +47,24 @@ public class INStatementFinder extends INLeafStatementVisitor<INStatement, INSta
 	protected INStatementList caseNonLeafNode(INStatement node, Integer arg)
 	{
 		return caseStatement(node, arg);
+	}
+	
+	@Override
+	public INStatementList caseDurationStatement(INDurationStatement node, Integer arg)
+	{
+		return node.statement.apply(this, arg);
+	}
+	
+	@Override
+	public INStatementList caseCyclesStatement(INCyclesStatement node, Integer arg)
+	{
+		return node.statement.apply(this, arg);
+	}
+	
+	@Override
+	public INStatementList caseAnnotatedStatement(INAnnotatedStatement node, Integer arg)
+	{
+		return node.statement.apply(this, arg);
 	}
 
 	@Override

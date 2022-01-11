@@ -31,7 +31,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
 import json.JSONObject;
-import workspace.Log;
+import workspace.Diag;
 
 abstract public class Command
 {
@@ -47,19 +47,19 @@ abstract public class Command
 		
 		try
 		{
-			Log.printf("Trying to load command vdmj.commands.%sCommand", name);
+			Diag.info("Trying to load command vdmj.commands.%sCommand", name);
 			Class<?> clazz = Class.forName("vdmj.commands." + name + "Command");
 			Constructor<?> ctor = clazz.getConstructor(String.class); 
 			return (Command)ctor.newInstance(line);
 		}
 		catch (ClassNotFoundException e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new ErrorCommand("Unknown command '" + name.toLowerCase() + "'. Try help");
 		}
 		catch (InvocationTargetException e)
 		{
-			Log.error(e.getTargetException());
+			Diag.error(e.getTargetException());
 			
 			if (e.getTargetException() instanceof IllegalArgumentException)
 			{
@@ -72,7 +72,7 @@ abstract public class Command
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new ErrorCommand("Error: " + e.getMessage());
 		}
 	}

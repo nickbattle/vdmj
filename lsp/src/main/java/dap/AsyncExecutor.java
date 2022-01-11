@@ -31,7 +31,7 @@ import com.fujitsu.vdmj.runtime.Breakpoint;
 import lsp.CancellableThread;
 import vdmj.DAPDebugReader;
 import workspace.DAPWorkspaceManager;
-import workspace.Log;
+import workspace.Diag;
 
 public abstract class AsyncExecutor extends CancellableThread
 {
@@ -70,12 +70,12 @@ public abstract class AsyncExecutor extends CancellableThread
 		{
 			try
 			{
-				Log.error(e);
+				Diag.error(e);
 				error(e);
 			}
 			catch (IOException io)
 			{
-				Log.error(io);
+				Diag.error(io);
 			}
 		}
 		finally
@@ -86,7 +86,7 @@ public abstract class AsyncExecutor extends CancellableThread
 			}
 			catch (IOException e)
 			{
-				Log.error(e);
+				Diag.error(e);
 			}
 			
 			if (dbg != null)

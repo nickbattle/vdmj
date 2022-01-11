@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.definitions;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -68,7 +69,9 @@ public class POClassInvariantDefinition extends PODefinition
 
 		if (!classDefinition.hasConstructors)
 		{
+			ctxt.push(new PONoCheckContext());
 			list.add(new StateInvariantObligation(this, ctxt));
+			ctxt.pop();
 		}
 
 		return list;

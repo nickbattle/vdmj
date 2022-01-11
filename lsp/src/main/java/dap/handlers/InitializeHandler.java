@@ -25,12 +25,13 @@
 package dap.handlers;
 
 import java.io.IOException;
+
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import workspace.DAPWorkspaceManager;
-import workspace.Log;
+import workspace.Diag;
 
 public class InitializeHandler extends DAPHandler
 {
@@ -63,7 +64,7 @@ public class InitializeHandler extends DAPHandler
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new DAPMessageList(request, false, e.getMessage(), null);
 		}
 	}
@@ -76,7 +77,7 @@ public class InitializeHandler extends DAPHandler
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new DAPMessageList(request, false, e.getMessage(), null);
 		}
 	}

@@ -40,7 +40,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONObject;
 import rpc.RPCErrors;
-import workspace.Log;
+import workspace.Diag;
 
 public class Utils
 {
@@ -210,7 +210,7 @@ public class Utils
 			return buffer.length();
 		}
 		
-		Log.error("Cannot locate line %d character %s in buffer length %d", zline, zcol, buffer.length());
+		Diag.error("Cannot locate line %d character %s in buffer length %d", zline, zcol, buffer.length());
 		return -1;
 	}
 	
@@ -288,9 +288,9 @@ public class Utils
 		
 		if (start >= 0)
 		{
-			Log.error(message, start);
-			Log.printf("(1): %s", quote(diff1));
-			Log.printf("(2): %s", quote(diff2));
+			Diag.error(message, start);
+			Diag.info("(1): %s", quote(diff1));
+			Diag.info("(2): %s", quote(diff2));
 		}
 	}
 	

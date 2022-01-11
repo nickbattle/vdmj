@@ -48,7 +48,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
 import workspace.DAPWorkspaceManager;
-import workspace.Log;
+import workspace.Diag;
 
 /**
  * A class to listen for and interact with multiple threads that are being debugged.
@@ -83,7 +83,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 		}
 	}
 	
@@ -98,16 +98,16 @@ public class DAPDebugReader extends Thread implements TraceCallback
 			{
 				exchanger = new Exchanger<JSONObject>();
 				debuggedThread = link.getDebugThread();
-				Log.printf("----------------- DEBUG STOP in %s", debuggedThread.getName());
+				Diag.info("----------------- DEBUG STOP in %s", debuggedThread.getName());
 				
 				while (doCommand());
 				
-				Log.printf("----------------- RESUME");
+				Diag.info("----------------- RESUME");
 				exchanger = null;
 			}
 			catch (Exception e)
 			{
-				Log.error(e);
+				Diag.error(e);
 				link.killThreads();
 				break;
 			}
@@ -126,7 +126,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		}
 		catch (InterruptedException e)	// eg. via QuitCommand
 		{
-			Log.printf("DAPDebugReader exchange interrupted");
+			Diag.info("DAPDebugReader exchange interrupted");
 			link.killThreads();
 			return false;
 		}
@@ -244,7 +244,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				}
 			}
 
-			Log.error("Cannot find threadId %s", th);
+			Diag.error("Cannot find threadId %s", th);
 		}
 
 		return debuggedThread;

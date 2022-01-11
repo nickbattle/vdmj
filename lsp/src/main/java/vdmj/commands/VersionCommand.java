@@ -35,7 +35,7 @@ import com.fujitsu.vdmj.VDMJ;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
-import workspace.Log;
+import workspace.Diag;
 
 public class VersionCommand extends Command
 {
@@ -67,7 +67,7 @@ public class VersionCommand extends Command
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new DAPMessageList(request, false, "Cannot determine VDMJ version", null);
 		}
 	}

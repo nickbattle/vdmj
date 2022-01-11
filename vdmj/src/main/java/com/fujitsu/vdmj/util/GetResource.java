@@ -27,7 +27,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
+import com.fujitsu.vdmj.VDMJ;
 
 /**
  * A utility class to find and load a file from the classpath into a
@@ -45,18 +49,25 @@ public class GetResource
 		File temp = File.createTempFile("tmp", file.getName());
 		temp.deleteOnExit();
 		
+		/**
+		 * Note: we assume libraries are UTF8 encoded, but write them as the
+		 * local file encoding for the session.
+		 */
 		InputStream in = GetResource.class.getResourceAsStream("/" + file.getName());
+		InputStreamReader isr = new InputStreamReader(in, "UTF8");
 		OutputStream out = new FileOutputStream(temp);
-		byte[] buf = new byte[8192];
+		OutputStreamWriter osr = new OutputStreamWriter(out, VDMJ.filecharset);
+		
+		char[] buf = new char[8192];
 	    int length;
 
-	    while ((length = in.read(buf)) > 0)
+	    while ((length = isr.read(buf, 0, 8192)) > 0)
 	    {
-	        out.write(buf, 0, length);
+	        osr.write(buf, 0, length);
 	    }
 	    
-		in.close();
-		out.close();
+		isr.close();
+		osr.close();
 		
 		return temp;
 	}

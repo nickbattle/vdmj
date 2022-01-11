@@ -38,6 +38,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public String value;
 	public POStatus status;
 	public POTrivialProof proof;
+	public boolean isCheckable;
 
 	private int var = 1;
 	private TCExpression checkedExpression = null;
@@ -50,6 +51,12 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.status = POStatus.UNPROVED;
 		this.proof = null;
 		this.number = 0;
+		this.isCheckable = ctxt.isCheckable();	// Set false for operation POs
+		
+		if (!isCheckable)
+		{
+			this.status = POStatus.UNCHECKED;	// Implies unproved
+		}
 		
 		POIgnorePattern.init();		// Reset the "any" count for getMatchingPatterns
 	}

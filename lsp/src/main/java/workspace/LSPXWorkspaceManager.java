@@ -68,7 +68,7 @@ public class LSPXWorkspaceManager
 		if (INSTANCE == null)
 		{
 			INSTANCE = new LSPXWorkspaceManager();		
-			Log.printf("Created LSPXWorkspaceManager");
+			Diag.info("Created LSPXWorkspaceManager");
 		}
 
 		return INSTANCE;
@@ -117,7 +117,7 @@ public class LSPXWorkspaceManager
 						Method factory = clazz.getMethod("factory", Dialect.class);
 						AnalysisPlugin instance = (AnalysisPlugin)factory.invoke(null, Settings.dialect);
 						registry.registerPlugin(instance);
-						Log.printf("Registered LSPX plugin %s", plugin);
+						Diag.info("Registered LSPX plugin %s", plugin);
 					}
 					catch (NoSuchMethodException e)		// Try default constructor
 					{
@@ -126,29 +126,29 @@ public class LSPXWorkspaceManager
 							Constructor<?> ctor = clazz.getConstructor();
 							AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
 							registry.registerPlugin(instance);
-							Log.printf("Registered LSPX plugin %s", plugin);
+							Diag.info("Registered LSPX plugin %s", plugin);
 						}
 						catch (Throwable th)
 						{
-							Log.error(th);
-							Log.error("Cannot register LSPX plugin %s", plugin);
+							Diag.error(th);
+							Diag.error("Cannot register LSPX plugin %s", plugin);
 						}
 					}
 					catch (Exception e)
 					{
-						Log.error(e);
-						Log.error("Plugin %s factory method failed", plugin);
+						Diag.error(e);
+						Diag.error("Plugin %s factory method failed", plugin);
 					}
 				}
 				catch (ClassNotFoundException e)
 				{
-					Log.error("Plugin class %s not found", plugin);
+					Diag.error("Plugin class %s not found", plugin);
 				}
 			}
 		}
 		else
 		{
-			Log.printf("No external plugins configured in lspx.plugins");
+			Diag.info("No external plugins configured in lspx.plugins");
 		}
 	}
 
@@ -158,7 +158,7 @@ public class LSPXWorkspaceManager
 		
 		if (plugin == null)
 		{
-			Log.error("No external plugin registered for " + request.getMethod());
+			Diag.error("No external plugin registered for " + request.getMethod());
 			return new RPCMessageList(request, RPCErrors.MethodNotFound, request.getMethod());
 		}
 		else
@@ -200,7 +200,7 @@ public class LSPXWorkspaceManager
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
@@ -237,7 +237,7 @@ public class LSPXWorkspaceManager
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
@@ -265,12 +265,12 @@ public class LSPXWorkspaceManager
 		}
 		catch (LSPException e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, e.getError(), e.getMessage());
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
@@ -296,7 +296,7 @@ public class LSPXWorkspaceManager
 
 			if (DAPWorkspaceManager.getInstance().refreshInterpreter())
 			{
-				Log.error("The spec has changed since generate, so re-generating");
+				Diag.error("The spec has changed since generate, so re-generating");
 				ct.generate(tracename);
 			}
 			
@@ -314,12 +314,12 @@ public class LSPXWorkspaceManager
 		}
 		catch (LSPException e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, e.getError(), e.getMessage());
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}

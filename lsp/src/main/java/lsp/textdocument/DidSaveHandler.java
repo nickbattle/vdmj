@@ -32,8 +32,8 @@ import lsp.LSPHandler;
 import lsp.Utils;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.Diag;
 import workspace.LSPWorkspaceManager;
-import workspace.Log;
 
 public class DidSaveHandler extends LSPHandler
 {
@@ -56,11 +56,11 @@ public class DidSaveHandler extends LSPHandler
 		}
 		catch (URISyntaxException e)
 		{
-			Log.error(e);
+			Diag.error(e);
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 		}
 
 		return null;

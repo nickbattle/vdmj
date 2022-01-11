@@ -32,7 +32,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.runtime.VDMOperation;
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.ObjectValue;
@@ -95,9 +95,9 @@ public class TestSuite
 					{
 						INExplicitOperationDefinition ctor = getTestConstructor(instance);
 						if (ctor == null
-								|| !ctor.name.getModule().equals(instance.type.name.getLocation().module)
-								&& ctor.parameterPatterns.isEmpty()
-								|| ctor.accessSpecifier.access == Token.PUBLIC)
+								// || !ctor.name.getModule().equals(instance.type.name.getLocation().module)
+								// && ctor.parameterDefinitions.isEmpty()
+								|| ctor.accessSpecifier.access != Token.PUBLIC)
 						{
 							throw new Exception("Class "
 									+ p.name.getModule()
@@ -114,9 +114,9 @@ public class TestSuite
 						{
 							boolean foundSetName = false;
 							// check that we have setName and that it is accesiable
-							for (TCDefinition def : instance.type.definitions)
+							for (TCNameToken name : instance.members.keySet())
 							{
-								if (def.name.getName().equals("setName"))
+								if (name.getName().equals("setName"))
 								{
 									foundSetName = true;
 								}

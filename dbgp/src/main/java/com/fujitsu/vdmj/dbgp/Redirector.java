@@ -28,8 +28,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 
-import com.fujitsu.vdmj.dbgp.DBGPReader;
-import com.fujitsu.vdmj.dbgp.DBGPRedirect;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
 

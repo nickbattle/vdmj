@@ -52,7 +52,7 @@ import rpc.RPCErrors;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import workspace.DAPWorkspaceManager;
-import workspace.Log;
+import workspace.Diag;
 
 abstract public class CTPlugin extends AnalysisPlugin
 {
@@ -81,7 +81,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 				return new CTPluginPR();
 				
 			default:
-				Log.error("Unknown dialect " + dialect);
+				Diag.error("Unknown dialect " + dialect);
 				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
 		}
 	}
@@ -138,7 +138,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 
 		if (tracedef == null)
 		{
-			Log.error("Trace %s not found", tracename);
+			Diag.error("Trace %s not found", tracename);
 			throw new LSPException(RPCErrors.ContentModified, "Trace " + tracename + " not found");
 		}
 
@@ -152,7 +152,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 			traceCount = traceIterator.count();
 			long after = System.currentTimeMillis();
 
-			Log.printf("Generated %d traces in %.3f secs.", traceCount, (double)(after-before)/1000);
+			Diag.info("Generated %d traces in %.3f secs.", traceCount, (double)(after-before)/1000);
 			return traceCount;
 		}
 		catch (Exception e)
@@ -168,7 +168,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 	{
 		if (!tracename.equals(traceName))
 		{
-			Log.printf("Pre-generating new tracename %s", tracename);
+			Diag.info("Pre-generating new tracename %s", tracename);
 			generate(tracename);
 		}
 		
@@ -226,7 +226,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 	{
 		if (!tracename.equals(traceName))
 		{
-			Log.printf("Pre-generating new tracename %s", tracename);
+			Diag.info("Pre-generating new tracename %s", tracename);
 			generate(tracename);
 		}
 		
@@ -315,7 +315,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 							}
 							
 							JSONObject params = new JSONObject("token", workDoneToken, "value", value);
-							Log.printf("Sending work done = %d%%", done);
+							Diag.fine("Sending work done = %d%%", done);
 							send(server, RPCRequest.notification("$/progress", params));
 							percentDone = done;
 						}
@@ -328,13 +328,13 @@ abstract public class CTPlugin extends AnalysisPlugin
 					else
 					{
 						JSONObject params = new JSONObject("token", progressToken, "value", batch);
-						Log.printf("Sending intermediate results");
+						Diag.fine("Sending intermediate results");
 						send(server, RPCRequest.notification("$/progress", params));
 					}
 
 					if (cancelled)
 					{
-						Log.printf("%s cancelled", getName());
+						Diag.info("%s cancelled", getName());
 						break;
 					}
 				}
@@ -343,12 +343,12 @@ abstract public class CTPlugin extends AnalysisPlugin
 				{
 					if (cancelled)
 					{
-						Log.printf("Sending cancelled results");
+						Diag.info("Sending cancelled results");
 						send(server, RPCResponse.error(request, RPCErrors.RequestCancelled, "Trace cancelled", responses));
 					}
 					else
 					{
-						Log.printf("Sending complete results");
+						Diag.info("Sending complete results");
 						send(server, RPCResponse.result(request, responses));
 					}
 				}
@@ -356,19 +356,19 @@ abstract public class CTPlugin extends AnalysisPlugin
 				{
 					if (cancelled)
 					{
-						Log.printf("Sending cancelled null result");
+						Diag.info("Sending cancelled null result");
 						send(server, RPCResponse.error(request, RPCErrors.RequestCancelled, "Trace cancelled", null));
 					}
 					else
 					{
-						Log.printf("Sending final null result");
+						Diag.info("Sending final null result");
 						send(server, RPCResponse.result(request));
 					}
 				}
 			}
 			catch (Throwable e)
 			{
-				Log.error(e);
+				Diag.error(e);
 			}
 			finally
 			{
@@ -381,7 +381,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 		{
 			if (server == null)		// Unit testing
 			{
-				Log.printf("%s", response.toString());
+				Diag.info("%s", response.toString());
 			}
 			else
 			{
@@ -394,7 +394,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 			Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
 			JSONArray array = new JSONArray();
 			
-			Log.printf("Starting batch at test number %d...", testNumber);
+			Diag.fine("Starting batch at test number %d...", testNumber);
 		
 			while (traceIterator.hasMoreTests() && batchSize > 0 && testNumber <= endTest)
 			{
@@ -433,7 +433,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 				testNumber++;
 			}
 			
-			Log.printf("Completed batch at test number %d", testNumber);
+			Diag.fine("Completed batch at test number %d", testNumber);
 			return array;
 		}
 	}

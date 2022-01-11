@@ -46,7 +46,6 @@ import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.InternalException;
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.Utils;
@@ -271,8 +270,19 @@ public class Delegate implements Serializable
 		}
 		catch (InvocationTargetException e)
 		{
-			throw new InternalException(59,
-				"Failed in native method: " + e.getTargetException().getMessage());
+			if (e.getTargetException() instanceof ExitException)
+			{
+				throw (ExitException) e.getTargetException();
+			}
+			else if (e.getTargetException() instanceof ContextException)
+			{
+				throw (ContextException) e.getTargetException();
+			}
+			else
+			{
+				throw new InternalException(59,
+					"Failed in native method: " + e.getTargetException().getMessage());
+			}
 		}
 	}
 

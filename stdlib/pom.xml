@@ -53,10 +53,9 @@
 									<include>*.vdmsl</include>
 									<include>*.vdmpp</include>
 									<include>*.vdmrt</include>
-									<exclude>pom.xml</exclude>
 								</resource>
 								<resource>
-									<directory>..</directory>
+									<directory>.</directory>
 									<filtering>false</filtering>
 									<include>LICENCE</include>
 								</resource>

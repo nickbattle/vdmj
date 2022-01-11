@@ -25,7 +25,7 @@
 package lsp;
 
 import rpc.RPCRequest;
-import workspace.Log;
+import workspace.Diag;
 import json.JSONObject;
 import rpc.RPCMessageList;
 
@@ -41,8 +41,9 @@ public class SetTraceNotificationHandler extends LSPHandler
 	{
 		JSONObject params = request.get("params");
 		String value = params.get("value");
-		// Link this to the Log level one day...
-		Log.printf("Ignoring trace notification of '%s'", value);
+		
+		Diag.warning("Ignoring SetTrace notification: %s", value);
+		
 		return null;
 	}
 }

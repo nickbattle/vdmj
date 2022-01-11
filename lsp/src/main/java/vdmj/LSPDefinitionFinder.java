@@ -61,7 +61,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
 import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
 
-import workspace.Log;
+import workspace.Diag;
 
 public class LSPDefinitionFinder
 {
@@ -183,7 +183,7 @@ public class LSPDefinitionFinder
 
 			if (result == null)
 			{
-				Log.error("TCNode located, but unable to find definition of %s %s",
+				Diag.error("TCNode located, but unable to find definition of %s %s",
 						found.node.getClass().getSimpleName(), position);
 			}
 						
@@ -191,7 +191,7 @@ public class LSPDefinitionFinder
 		}
 		else
 		{
-			Log.error("Unable to locate symbol %s", position);
+			Diag.info("Unable to locate symbol %s", position);
 			return null;
 		}
 	}
@@ -210,7 +210,7 @@ public class LSPDefinitionFinder
 
 			if (result == null)
 			{
-				Log.error("TCNode located, but unable to find definition of %s %s",
+				Diag.error("TCNode located, but unable to find definition of %s %s",
 						found.node.getClass().getSimpleName(), position);
 			}
 			
@@ -218,7 +218,7 @@ public class LSPDefinitionFinder
 		}
 		else
 		{
-			Log.error("Unable to locate symbol %s", position);
+			Diag.info("Unable to locate symbol %s", position);
 			return null;
 		}
 	}
