@@ -158,7 +158,7 @@ public class POImplicitOperationDefinition extends PODefinition
 
 		if (precondition != null)
 		{
-			obligations.addAll(precondition.getProofObligations(ctxt, env));
+			obligations.addAll(predef.getProofObligations(ctxt, env));
 		}
 
 		if (postcondition != null)
@@ -166,12 +166,12 @@ public class POImplicitOperationDefinition extends PODefinition
 			if (precondition != null)
 			{
 				ctxt.push(new POImpliesContext(precondition));
-				obligations.addAll(postcondition.getProofObligations(ctxt, env));
+				obligations.addAll(postdef.getProofObligations(ctxt, env));
 				ctxt.pop();
 			}
 			else
 			{
-				obligations.addAll(postcondition.getProofObligations(ctxt, env));
+				obligations.addAll(postdef.getProofObligations(ctxt, env));
 			}
 			
 			obligations.add(new OperationPostConditionObligation(this, ctxt));

@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.pog.OperationPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -129,12 +130,22 @@ public class POExplicitOperationDefinition extends PODefinition
 
 		if (precondition != null)
 		{
-			obligations.addAll(precondition.getProofObligations(ctxt, env));
+			obligations.addAll(predef.getProofObligations(ctxt, env));
 		}
 
 		if (postcondition != null)
 		{
-			obligations.addAll(postcondition.getProofObligations(ctxt, env));
+			if (precondition != null)
+			{
+				ctxt.push(new POImpliesContext(precondition));
+				obligations.addAll(postdef.getProofObligations(ctxt, env));
+				ctxt.pop();
+			}
+			else
+			{
+				obligations.addAll(postdef.getProofObligations(ctxt, env));
+			}
+
 			obligations.add(new OperationPostConditionObligation(this, ctxt));
 		}
 
