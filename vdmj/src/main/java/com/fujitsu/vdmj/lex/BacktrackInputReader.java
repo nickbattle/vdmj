@@ -53,9 +53,6 @@ public class BacktrackInputReader extends Reader
 	/** The total number of characters in the file. */
 	private int max = 0;
 	
-	/** A Byte Order marker */
-	private final static char BOM = '\uFEFF';
-
 	/**
 	 * Create an object to read the file name passed with the given charset.
 	 *
@@ -67,19 +64,7 @@ public class BacktrackInputReader extends Reader
 		{
 			InputStreamReader isr = readerFactory(file, charset);
 			data = new char[readerLength(file, isr)];
-    		char bom = (char) isr.read();
-    		
-    		if (bom != BOM)	// No BOM marker detected
-    		{
-    			data[0] = bom;
-    	        max = isr.read(data, 1, data.length-1);
-    	        max++;
-    		}
-    		else
-    		{
-    	        max = isr.read(data);
-    		}
-
+   	        max = isr.read(data);
     		pos = 0;
 			isr.close();
 		}
@@ -116,19 +101,7 @@ public class BacktrackInputReader extends Reader
 	        	new LatexStreamReader(is, charset);
 
     		data = new char[expression.length() + 1];
-    		char bom = (char) isr.read();
-    		
-    		if (bom != BOM)	// No BOM marker detected
-    		{
-    			data[0] = bom;
-    	        max = isr.read(data, 1, data.length-1);
-    	        max++;
-    		}
-    		else
-    		{
-    	        max = isr.read(data);
-    		}
-    		
+   	        max = isr.read(data);
 	        pos = 0;
 
 	        isr.close();
