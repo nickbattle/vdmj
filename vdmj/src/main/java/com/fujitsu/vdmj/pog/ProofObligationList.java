@@ -176,10 +176,20 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		while (iter.hasNext())
 		{
-			switch (iter.next().number)
+			VDMError message = iter.next();
+			
+			switch (message.number)
 			{
 				case 3336:	// "Illegal use of RESULT reserved identifier"
 					iter.remove();
+					break;
+					
+				case 3182:	// "Name 'xxx' is not in scope"
+					if (message.message.startsWith("Name 'measure_"))
+					{
+						// Probably an implicit missing measure
+						iter.remove();
+					}
 					break;
 					
 				default:	// fine

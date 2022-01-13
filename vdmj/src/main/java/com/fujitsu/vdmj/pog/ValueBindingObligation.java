@@ -24,9 +24,6 @@
 
 package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.ast.expressions.ASTExpression;
-import com.fujitsu.vdmj.ast.patterns.ASTPattern;
-import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.po.definitions.POEqualsDefinition;
 import com.fujitsu.vdmj.po.definitions.POValueDefinition;
 
@@ -38,11 +35,11 @@ public class ValueBindingObligation extends ProofObligation
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("exists ");
-		sb.append(poValueDefinition.pattern);
+		sb.append(poValueDefinition.pattern.getMatchingExpression());
 		sb.append(":");
 		sb.append(poValueDefinition.type);
 		sb.append(" & ");
-		sb.append(poValueDefinition.pattern);
+		sb.append(poValueDefinition.pattern.getMatchingExpression());
 		sb.append(" = ");
 		sb.append(poValueDefinition.exp);
 
@@ -55,31 +52,13 @@ public class ValueBindingObligation extends ProofObligation
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("exists ");
-		sb.append(def.pattern);
+		sb.append(def.pattern.getMatchingExpression());
 		sb.append(":");
 		sb.append(def.expType);
 		sb.append(" & ");
-		sb.append(def.pattern);
+		sb.append(def.pattern.getMatchingExpression());
 		sb.append(" = ");
 		sb.append(def.test);
-
-		value = ctxt.getObligation(sb.toString());
-	}
-
-	public ValueBindingObligation(
-		ASTPattern p, ASTType t, ASTExpression e, POContextStack ctxt)
-	{
-		super(p.location, POType.VALUE_BINDING, ctxt);
-		StringBuilder sb = new StringBuilder();
-
-		sb.append("exists ");
-		sb.append(p);
-		sb.append(":");
-		sb.append(t);
-		sb.append(" & ");
-		sb.append(p);
-		sb.append(" = ");
-		sb.append(e);
 
 		value = ctxt.getObligation(sb.toString());
 	}
