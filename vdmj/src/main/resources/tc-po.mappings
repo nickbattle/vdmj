@@ -32,7 +32,7 @@ map TCMutexSyncDefinition{annotations, location, operations} to POMutexSyncDefin
 map TCNamedTraceDefinition{annotations, location, name} to PONamedTraceDefinition(annotations, location, name);
 map TCPerSyncDefinition{annotations, location, opname, guard} to POPerSyncDefinition(annotations, location, opname, guard);
 map TCRenamedDefinition{name, def} to PORenamedDefinition(name, def);
-map TCStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression, recordType} to POStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression, recordType);
+map TCStateDefinition{name, fields, invPattern, invExpression, initPattern, initExpression, invdef, initdef, recordType} to POStateDefinition(name, fields, invPattern, invExpression, initPattern, initExpression, invdef, initdef, recordType);
 map TCSystemDefinition{name, classtype, definitions} to POSystemDefinition(name, classtype, definitions, this);
 map TCThreadDefinition{statement} to POThreadDefinition(statement);
 map TCTypeDefinition{annotations, name, type, invPattern, invExpression, invdef, eqPattern1, eqPattern2, eqExpression, eqdef, ordPattern1, ordPattern2, ordExpression, orddef} to POTypeDefinition(annotations, name, type, invPattern, invExpression, invdef, eqPattern1, eqPattern2, eqExpression, eqdef, ordPattern1, ordPattern2, ordExpression, orddef);

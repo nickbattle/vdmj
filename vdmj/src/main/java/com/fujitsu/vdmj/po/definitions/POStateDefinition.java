@@ -48,11 +48,15 @@ public class POStateDefinition extends PODefinition
 	public final POExpression invExpression;
 	public final POPattern initPattern;
 	public final POExpression initExpression;
+	public final POExplicitFunctionDefinition invdef;
+	public final POExplicitFunctionDefinition initdef;
+
 	public final TCRecordType recordType;
 
 	public POStateDefinition(TCNameToken name, TCFieldList fields,
 		POPattern invPattern, POExpression invExpression,
 		POPattern initPattern, POExpression initExpression,
+		POExplicitFunctionDefinition invdef, POExplicitFunctionDefinition initdef,
 		TCRecordType recordType)
 	{
 		super(name.getLocation(), name);
@@ -62,6 +66,8 @@ public class POStateDefinition extends PODefinition
 		this.invExpression = invExpression;
 		this.initPattern = initPattern;
 		this.initExpression = initExpression;
+		this.invdef = invdef;
+		this.initdef = initdef;
 		this.recordType = recordType;
 	}
 
@@ -88,7 +94,7 @@ public class POStateDefinition extends PODefinition
 
 		if (invExpression != null)
 		{
-			list.addAll(invExpression.getProofObligations(ctxt, env));
+			list.addAll(invdef.getProofObligations(ctxt, env));
 			list.add(new SatisfiabilityObligation(this, ctxt));
 		}
 

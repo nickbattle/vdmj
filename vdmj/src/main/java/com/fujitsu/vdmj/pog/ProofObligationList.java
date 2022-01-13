@@ -119,6 +119,8 @@ public class ProofObligationList extends Vector<ProofObligation>
 			}
 			catch (Exception e)
 			{
+				Console.err.println(po.toString());
+				TypeChecker.printErrors(Console.err);
 				Console.err.println(e.getMessage());
 			}
 		}
