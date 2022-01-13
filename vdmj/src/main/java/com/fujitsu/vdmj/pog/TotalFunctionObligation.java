@@ -37,24 +37,40 @@ public class TotalFunctionObligation extends ProofObligation
 	public TotalFunctionObligation(POExplicitFunctionDefinition def, POContextStack ctxt)
 	{
 		super(def.location, POType.TOTAL, ctxt);
-		value = ctxt.getObligation(getContext(def.name.getName(), def.type, def.paramPatternList));
+		value = ctxt.getObligation(getContext(def.name.getName(), def));
 	}
 
-	private String getContext(String name, TCFunctionType deftype, List<POPatternList> paramPatternList)
+	private String getContext(String name, POExplicitFunctionDefinition def)
 	{
-		boolean curried = (paramPatternList.size() > 1);
+		boolean curried = (def.paramPatternList.size() > 1);
 		List<String> defined = new Vector<String>();
-		TCFunctionType ftype = deftype;
+		TCFunctionType ftype = def.type;
 
 		StringBuilder fapply = new StringBuilder();
 		fapply.append(name);
-		fapply.append("(");
+		String sep = "";
 
-		if (!deftype.parameters.isEmpty())
+		if (def.typeParams != null)
 		{
-    		String sep = "";
-
-    		for (POPatternList pl: paramPatternList)
+			fapply.append("[");
+			
+			for (int p=0; p < def.typeParams.size(); p++)
+			{
+				fapply.append(sep);
+				fapply.append("?");
+				sep = ", ";
+			}
+			
+			fapply.append("]");
+		}
+		
+		fapply.append("(");
+		
+		if (!ftype.parameters.isEmpty())
+		{
+			sep = "";
+			
+    		for (POPatternList pl: def.paramPatternList)
     		{
     			for (POPattern p: pl)
     			{
@@ -92,7 +108,7 @@ public class TotalFunctionObligation extends ProofObligation
 		fapply.append(")");
 
 		StringBuilder sb = new StringBuilder();
-		String sep = "";
+		sep = "";
 		
 		for (String tbdef: defined)
 		{
