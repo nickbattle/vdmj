@@ -22,7 +22,7 @@ function help()
     echo "Usage: $0 [--help|-?] [-P] [-A] <VM and VDMJ options>"
     echo "-P use high precision VDMJ"
     echo "-A use annotation libraries and options"
-    echo "Default VM options are $JAVA64 $VM_OPTS"
+    echo "Default VM options are $VM_OPTS"
     exit 0
 }
 
@@ -98,9 +98,12 @@ fi
 # The dialect is based on $0, so hard-link this file as vdmsl, vdmpp and vdmrt.
 DIALECT=$(basename $0)
 
-# Keep rlwrap output in a separate folder
-export RLWRAP_HOME=~/.vdmj
-
-# Execute the JVM...
-exec rlwrap "$JAVA64" $VM_OPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJ_OPTS "$@"
+if which rlwrap >/dev/null 2>&1
+then
+	# Keep rlwrap output in a separate folder
+	export RLWRAP_HOME=~/.vdmj
+	exec rlwrap "$JAVA64" $VM_OPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJ_OPTS "$@"
+else
+	exec "$JAVA64" $VM_OPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJ_OPTS "$@"
+fi
 
