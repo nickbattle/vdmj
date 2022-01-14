@@ -71,7 +71,7 @@ import com.fujitsu.vdmj.values.Value;
 
 import json.JSONArray;
 import json.JSONObject;
-import workspace.Log;
+import workspace.Diag;
 
 public class DAPDebugExecutor implements DebugExecutor
 {
@@ -219,26 +219,27 @@ public class DAPDebugExecutor implements DebugExecutor
 	{
 		JSONObject arguments = (JSONObject) command.getPayload();
 		String expr = arguments.get("expression");
-		String answer = "?";
+		String error = null;
+		Value answer = null;
 		String savedName = interpreter.getDefaultName();
 
 		try
 		{
 			interpreter.setDefaultName(breakloc.module);
 			ctxt.threadState.setAtomic(true);
-			answer = interpreter.evaluate(expr, ctxt).toString();
+			answer = interpreter.evaluate(expr, ctxt);
  		}
 		catch (ParserException e)
 		{
-			answer = simplify(e.getMessage());
+			error = simplify(e.getMessage());
 		}
 		catch (ContextException e)
 		{
-			answer = simplify(e.getMessage());
+			error = simplify(e.getMessage());
 		}
 		catch (RuntimeException e)
 		{
-			answer = "Runtime: " + e.getMessage();
+			error = "Runtime: " + e.getMessage();
 		}
 		catch (Exception e)
 		{
@@ -247,11 +248,11 @@ public class DAPDebugExecutor implements DebugExecutor
 				e = (Exception)e.getCause();
 			}
 			
-			answer = "Error: " + e.getMessage();
+			error = "Error: " + e.getMessage();
 		}
 		catch (Throwable th)
 		{
-			answer = "Error: " + th.getMessage();
+			error = "Error: " + th.getMessage();
 		}
 		finally
 		{
@@ -261,13 +262,21 @@ public class DAPDebugExecutor implements DebugExecutor
 			}
 			catch (Exception e)
 			{
-				Log.error(e);
+				Diag.error(e);
 			}
 
 			ctxt.threadState.setAtomic(false);
 		}
 
-		return new DebugCommand(DebugType.PRINT, new JSONObject("result", answer, "variablesReference", 0));
+		if (error != null)
+		{
+			return new DebugCommand(DebugType.PRINT, new JSONObject("result", error, "variablesReference", 0));
+		}
+		else
+		{
+			return new DebugCommand(DebugType.PRINT, new JSONObject(
+					"result", answer.toString(), "variablesReference", valueToReference(answer)));
+		}
 	}
 
 	private String simplify(String message)
@@ -338,7 +347,7 @@ public class DAPDebugExecutor implements DebugExecutor
 			}
 			else
 			{
-				Log.error("Invalid frameId in stack request: %d", frameId);
+				Diag.error("Invalid frameId in stack request: %d", frameId);
 				frameId = 0;
 			}
 		}
@@ -383,7 +392,7 @@ public class DAPDebugExecutor implements DebugExecutor
 		}
 		else
 		{
-			Log.error("Invalid frameId in scopes request: %d", frameId);
+			Diag.error("Invalid frameId in scopes request: %d", frameId);
 			// return an empty scopes array
 		}
 		
@@ -490,11 +499,14 @@ public class DAPDebugExecutor implements DebugExecutor
 			ObjectValue obj = (ObjectValue)var;
 			String className = obj.type.name.getName();
 			NameValuePairMap all = obj.getMemberValues();
-			
+			TCNameList sorted = new TCNameList();
+			sorted.addAll(all.keySet());
+			Collections.sort(sorted);
+
 			Map<String, String> inherited = new HashMap<String, String>();
 			JSONArray members = new JSONArray();
 			
-			for (TCNameToken name: all.keySet())
+			for (TCNameToken name: sorted)
 			{
 				Value value = all.get(name);
 				
@@ -673,7 +685,7 @@ public class DAPDebugExecutor implements DebugExecutor
 					}
 					catch (Exception e)
 					{
-						Log.error(e);
+						Diag.error(e);
 					}
 				}
 				else if (d instanceof TCMutexSyncDefinition)
@@ -756,7 +768,32 @@ public class DAPDebugExecutor implements DebugExecutor
 		}
 		
 		Context arguments = new Context(loc, title, null);
-		arguments.putAll(c);
+		
+		for (Entry<TCNameToken, Value> nvp: c.entrySet())
+		{
+			// We eliminate operations from the context, since those are not valuable in
+			// a stack frame. But functions can be (eg. constant lambdas, comps or iterations).
+			// So we have to distinguish function definitions using the "name" of the value.
+			
+			if (nvp.getValue() instanceof OperationValue)
+			{
+				continue;
+			}
+			
+			if (nvp.getValue() instanceof FunctionValue)
+			{
+				FunctionValue fv = (FunctionValue)nvp.getValue();
+				
+				if (!fv.name.equals("lambda") &&
+					!fv.name.equals("comp") &&
+					!fv.name.equals("**"))
+				{
+					continue;
+				}
+			}
+
+			arguments.put(nvp.getKey(), nvp.getValue());
+		}
 		
 		if (c instanceof StateContext)
 		{

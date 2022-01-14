@@ -28,7 +28,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
-import workspace.Log;
+import workspace.Diag;
 import workspace.plugins.AnalysisPlugin;
 
 public abstract class ISAPlugin extends AnalysisPlugin
@@ -41,7 +41,7 @@ public abstract class ISAPlugin extends AnalysisPlugin
 				return new ISAPluginSL();
 				
 			default:
-				Log.error("Unknown dialect " + dialect);
+				Diag.error("Unknown dialect " + dialect);
 				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
 		}
 	}

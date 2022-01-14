@@ -27,8 +27,6 @@ package com.fujitsu.vdmj.mapper;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.mapper.ClassMapper;
-
 abstract public class MappedList<FROM extends Mappable, TO extends Mappable> extends Vector<TO> implements Mappable
 {
 	private static final long serialVersionUID = 1L;

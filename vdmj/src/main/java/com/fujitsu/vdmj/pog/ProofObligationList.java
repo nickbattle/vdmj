@@ -40,15 +40,14 @@ import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
-import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
 @SuppressWarnings("serial")
@@ -113,25 +112,35 @@ public class ProofObligationList extends Vector<ProofObligation>
 		{
 			try
 			{
-				typeCheck(po, tcmodule.name.getName(), new ModuleEnvironment(tcmodule));
+				if (po.isCheckable)
+				{
+					typeCheck(po, tcmodule.name.getName(), new ModuleEnvironment(tcmodule));
+				}
 			}
 			catch (Exception e)
 			{
+				Console.err.println(po.toString());
+				TypeChecker.printErrors(Console.err);
 				Console.err.println(e.getMessage());
 			}
 		}
 	}
 
-	public void typeCheck(TCClassDefinition tcdef)
+	public void typeCheck(TCNameToken name, Environment env)
 	{
 		for (ProofObligation po: this)
 		{
 			try
 			{
-				typeCheck(po, tcdef.name.getName(), new PrivateClassEnvironment(tcdef));
+				if (po.isCheckable)
+				{
+					typeCheck(po, name.getName(), env);
+				}
 			}
 			catch (Exception e)
 			{
+				Console.err.println(po.toString());
+				TypeChecker.printErrors(Console.err);
 				Console.err.println(e.getMessage());
 			}
 		}
@@ -167,10 +176,20 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		while (iter.hasNext())
 		{
-			switch (iter.next().number)
+			VDMError message = iter.next();
+			
+			switch (message.number)
 			{
 				case 3336:	// "Illegal use of RESULT reserved identifier"
 					iter.remove();
+					break;
+					
+				case 3182:	// "Name 'xxx' is not in scope"
+					if (message.message.startsWith("Name 'measure_"))
+					{
+						// Probably an implicit missing measure
+						iter.remove();
+					}
 					break;
 					
 				default:	// fine
@@ -180,8 +199,6 @@ public class ProofObligationList extends Vector<ProofObligation>
 		
 		if (TypeChecker.getErrorCount() > 0)
 		{
-			Console.err.println(obligation.toString());
-			TypeChecker.printErrors(Console.err);
 			throw new ParserException(2330, "PO has type errors?", obligation.location, 0);
 		}
 		

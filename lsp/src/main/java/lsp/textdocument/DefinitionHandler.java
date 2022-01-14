@@ -30,11 +30,11 @@ import java.net.URISyntaxException;
 import json.JSONObject;
 import lsp.LSPHandler;
 import lsp.Utils;
-import rpc.RPCRequest;
-import workspace.LSPWorkspaceManager;
-import workspace.Log;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
+import rpc.RPCRequest;
+import workspace.Diag;
+import workspace.LSPWorkspaceManager;
 
 public class DefinitionHandler extends LSPHandler
 {
@@ -60,12 +60,12 @@ public class DefinitionHandler extends LSPHandler
 		}
 		catch (URISyntaxException e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}

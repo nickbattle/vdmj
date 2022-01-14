@@ -29,10 +29,11 @@ import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Interpreter;
+
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
-import workspace.Log;
+import workspace.Diag;
 
 public class ClassesCommand extends Command
 {
@@ -71,7 +72,7 @@ public class ClassesCommand extends Command
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new DAPMessageList(request, e);
 		}
 	}

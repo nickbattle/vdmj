@@ -25,6 +25,7 @@
 package lsp;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 import com.fujitsu.vdmj.lex.Dialect;
@@ -32,12 +33,12 @@ import com.fujitsu.vdmj.lex.Dialect;
 import dap.DAPServerSocket;
 import workspace.Diag;
 
-public class LSPServerSocket implements Runnable
+public class LSPServerDebug implements Runnable
 {
 	private Dialect dialect;
 	private int port;
 
-	public LSPServerSocket(Dialect dialect, int port)
+	public LSPServerDebug(Dialect dialect, int port)
 	{
 		this.dialect = dialect;
 		this.port = port;
@@ -49,7 +50,7 @@ public class LSPServerSocket implements Runnable
 		int dapPort = -1;
 		int lspPort = -1;
 		
-		Diag.init(false);
+		Diag.init(true);
 
 		for (int a=0; a<args.length; a++)
 		{
@@ -90,35 +91,47 @@ public class LSPServerSocket implements Runnable
 		}
 		
 		Thread.currentThread().setName("LSP Listener");
-		new LSPServerSocket(dialect, lspPort).run();
-		
-		System.exit(0);
+		new LSPServerDebug(dialect, lspPort).run();
 	}
 	
 	private static void usage()
 	{
-		System.err.println("Usage: LSPServerSocket [-vdmsl | -vdmpp | -vdmrt] -lsp <port> [-dap <port>]");
+		System.err.println("Usage: LSPServerDebug [-vdmsl | -vdmpp | -vdmrt] -lsp <port> [-dap <port>]");
 		System.exit(1);
 	}
 	
 	@Override
 	public void run()
 	{
-		Socket socket = null;
+		ServerSocket socket = null;
 
 		try
 		{
-			Diag.info("LSP %s Server connecting to port %d", dialect, port);
-			socket = new Socket("localhost", port);
-			new LSPServer(dialect, socket.getInputStream(), socket.getOutputStream()).run();
-			Diag.error("LSP Server stopped");
-			socket.close();
+			socket = new ServerSocket(port, 10);
+
+			while (true)
+			{
+				Diag.info("LSP %s Server listening on port %d", dialect, socket.getLocalPort());
+				Socket conn = socket.accept();
+				
+				try
+				{
+					new LSPServer(dialect, conn.getInputStream(), conn.getOutputStream()).run();
+				}
+				catch (IOException e)
+				{
+					Diag.severe("LSP Server stopped: %s", e.getMessage());
+				}
+				
+				Diag.info("LSP %s Server closing port %d", dialect, socket.getLocalPort());
+				conn.close();
+			}
 		}
 		catch (IOException e)
 		{
 			try
 			{
-				Diag.error("LSP Server socket error: %s", e.getMessage());
+				Diag.info("LSP Server socket error: %s", e.getMessage());
 				if (socket != null) socket.close();
 			}
 			catch (IOException e1)

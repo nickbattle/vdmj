@@ -57,7 +57,7 @@ STDLIB_JAR=$MAVENREPO/stdlib/${VERSION}/stdlib-${VERSION}.jar
 
 java ${JAVA64_VMOPTS} -Dlsp.log.filename=/dev/stdout \
     -cp $VDMJ_JAR:$ANNOTATIONS_JAR:$LSP_JAR:$STDLIB_JAR \
-    lsp.LSPServerSocket $DIALECT -lsp 8000 -dap 8001
+    lsp.LSPServerDebug $DIALECT -lsp 8000 -dap 8001
 
 exit 0
 

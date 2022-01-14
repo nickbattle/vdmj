@@ -52,7 +52,7 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
-import workspace.Log;
+import workspace.Diag;
 import workspace.lenses.ASTLaunchDebugLens;
 import workspace.lenses.CodeLens;
 
@@ -76,7 +76,7 @@ public abstract class ASTPlugin extends AnalysisPlugin
 				return new ASTPluginPR();
 				
 			default:
-				Log.error("Unknown dialect " + dialect);
+				Diag.error("Unknown dialect " + dialect);
 				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
 		}
 	}
@@ -102,7 +102,6 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	 * We register the launch/debug code lens here, if the tree is dirty. Else it
 	 * is registered by the TCPlugin.
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	protected List<CodeLens> getCodeLenses(boolean dirty)
 	{

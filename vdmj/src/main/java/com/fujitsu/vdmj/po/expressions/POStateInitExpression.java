@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 
@@ -34,7 +35,7 @@ public class POStateInitExpression extends POExpression
 
 	public POStateInitExpression(POStateDefinition state)
 	{
-		super(state.location);
+		super(LexLocation.ANY);
 		this.state = state;
 	}
 

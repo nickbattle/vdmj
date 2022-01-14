@@ -46,10 +46,11 @@ import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
+
 import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
-import workspace.Log;
+import workspace.Diag;
 import workspace.lenses.CodeLens;
 import workspace.lenses.TCLaunchDebugLens;
 
@@ -70,7 +71,7 @@ abstract public class TCPlugin extends AnalysisPlugin
 				return new TCPluginPR();
 				
 			default:
-				Log.error("Unknown dialect " + dialect);
+				Diag.error("Unknown dialect " + dialect);
 				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
 		}
 	}

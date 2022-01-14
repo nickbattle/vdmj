@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2021 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,47 +22,48 @@
  *
  ******************************************************************************/
 
-package lsp.textdocument;
+package workspace;
 
-import java.io.File;
-import java.net.URISyntaxException;
+import java.util.List;
+import java.util.logging.Level;
+
+import com.fujitsu.vdmj.messages.VDMMessage;
 
 import json.JSONObject;
-import lsp.LSPHandler;
-import lsp.Utils;
-import rpc.RPCErrors;
-import rpc.RPCMessageList;
-import rpc.RPCRequest;
-import workspace.Diag;
-import workspace.LSPWorkspaceManager;
 
-public class DocumentSymbolHandler extends LSPHandler
+public class DiagUtils
 {
-	public DocumentSymbolHandler()
+	public static void dump(List<VDMMessage> messages)
 	{
-		super();
+		if (Diag.isLoggable(Level.FINE))
+		{
+			for (VDMMessage m: messages)
+			{
+				Diag.fine("MSG: %s", m.toString());
+			}
+		}
 	}
-
-	@Override
-	public RPCMessageList request(RPCRequest request)
+	
+	public static void dumpEdit(JSONObject range, StringBuilder buffer)
 	{
-		try
+		if (Diag.isLoggable(Level.FINE))
 		{
-			JSONObject params = request.get("params");
-			JSONObject textDoc = params.get("textDocument");
-			File file = Utils.uriToFile(textDoc.get("uri"));
+			JSONObject position = range.get("start");
+			long line = position.get("line");
+			long count = 0;
+			int start = 0;
 			
-			return LSPWorkspaceManager.getInstance().documentSymbols(request, file);
-		}
-		catch (URISyntaxException e)
-		{
-			Diag.error(e);
-			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
-		}
-		catch (Exception e)
-		{
-			Diag.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+			while (count < line)
+			{
+				if (buffer.charAt(start++) == '\n')
+				{
+					count++;
+				}
+			}
+			
+			int end = start;
+			while (end < buffer.length() && buffer.charAt(end) != '\n') end++;
+			Diag.fine("EDITED %d: [%s]", line+1, buffer.substring(start, end));
 		}
 	}
 }

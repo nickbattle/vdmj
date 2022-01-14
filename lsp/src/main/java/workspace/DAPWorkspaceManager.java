@@ -146,7 +146,7 @@ public class DAPWorkspaceManager
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new DAPMessageList(request, e);
 		}
 	}
@@ -212,7 +212,7 @@ public class DAPWorkspaceManager
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new DAPMessageList(request, e);
 		}
 		finally
@@ -228,19 +228,18 @@ public class DAPWorkspaceManager
 		return cap != null && cap;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <T> T getClientCapability(String dotName)
 	{
 		T capability = clientCapabilities.getPath(dotName);
 		
 		if (capability != null)
 		{
-			Log.printf("Client capability %s = %s", dotName, capability);
+			Diag.info("Client capability %s = %s", dotName, capability);
 			return capability;
 		}
 		else
 		{
-			Log.printf("Missing client capability: %s", dotName);
+			Diag.info("Missing client capability: %s", dotName);
 			return null;
 		}
 	}
@@ -251,7 +250,7 @@ public class DAPWorkspaceManager
 		
 		if (ct.isRunning())
 		{
-			Log.error("Previous trace is still running...");
+			Diag.error("Previous trace is still running...");
 			throw new LSPException(RPCErrors.InvalidRequest, "Trace still running");
 		}
 
@@ -286,7 +285,7 @@ public class DAPWorkspaceManager
 			}
 			catch (Exception e)
 			{
-				Log.error(e);
+				Diag.error(e);
 				interpreter = null;
 			}
 		}
@@ -333,7 +332,7 @@ public class DAPWorkspaceManager
 		}
 		catch (IOException e)
 		{
-			Log.error("Failed sending message: ", message);
+			Diag.error("Failed sending message: ", message);
 		}
 	}
 	
@@ -392,7 +391,7 @@ public class DAPWorkspaceManager
 						{
 							if (condition != null)
 							{
-								Log.error("Ignoring tracepoint condition " + condition);
+								Diag.error("Ignoring tracepoint condition " + condition);
 							}
 							
 							interpreter.setTracepoint(exp, expressionList(logMessage));
@@ -413,7 +412,7 @@ public class DAPWorkspaceManager
 					{
 						if (condition != null)
 						{
-							Log.error("Ignoring tracepoint condition " + condition);
+							Diag.error("Ignoring tracepoint condition " + condition);
 						}
 						
 						interpreter.setTracepoint(stmt, expressionList(logMessage));
@@ -443,7 +442,7 @@ public class DAPWorkspaceManager
 		if (filterOptions == null)
 		{
 			String error = "No filterOptions";
-			Log.error(error);
+			Diag.error(error);
 			results.add(new JSONObject("verified", false, "message", error));
 		}
 		else
@@ -463,7 +462,7 @@ public class DAPWorkspaceManager
 					catch (Exception e)
 					{
 						String error = "Illegal condition: " + e.getMessage(); 
-						Log.error(error);
+						Diag.error(error);
 						results.add(new JSONObject("verified", false, "message", error));
 						sendMessage(1L, error);
 					}
@@ -471,7 +470,7 @@ public class DAPWorkspaceManager
 				else
 				{
 					String error = "Unknown filterOption Id " + filterOption.get("filterId");
-					Log.error(error);
+					Diag.error(error);
 					results.add(new JSONObject("verified", false, "message", error));
 					sendMessage(1L, error);
 				}
@@ -634,7 +633,7 @@ public class DAPWorkspaceManager
 	{
 		if (hasChanged())
 		{
-			Log.printf("Specification has changed, resetting interpreter");
+			Diag.info("Specification has changed, resetting interpreter");
 			interpreter = null;
 			return true;
 		}
@@ -694,12 +693,12 @@ public class DAPWorkspaceManager
 				
 				if (retries == 0)
 				{
-					Log.error("DAPDebugReader interrupt did not work?");
+					Diag.error("DAPDebugReader interrupt did not work?");
 				}
 			}
 			else
 			{
-				Log.error("DAPDebugReader is not listening?");
+				Diag.error("DAPDebugReader is not listening?");
 			}
 		}
 	}

@@ -39,7 +39,7 @@ import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import workspace.Log;
+import workspace.Diag;
 import workspace.PluginRegistry;
 import workspace.plugins.AnalysisPlugin;
 import workspace.plugins.TCPlugin;
@@ -136,7 +136,7 @@ public class V2CPlugin extends AnalysisPlugin
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}

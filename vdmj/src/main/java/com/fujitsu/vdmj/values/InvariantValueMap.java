@@ -40,7 +40,6 @@ import com.fujitsu.vdmj.traces.PermuteArray;
  * standard Java HashMaps or TreeMaps, as these may break if the user wants
  * eq/ord clauses that do not meet the Java contracts for equals() and compareTo().
  */
-@SuppressWarnings("serial")
 public class InvariantValueMap implements Map<Value, Value>
 {
 	private static class Entry implements Map.Entry<Value, Value>

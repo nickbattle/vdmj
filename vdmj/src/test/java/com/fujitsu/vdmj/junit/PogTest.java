@@ -65,9 +65,10 @@ public class PogTest extends TestCase
 
 	private String[] expected =
 	{
+		"(forall a:seq of (nat1) &\n  is_(inv_T2(a), bool))\n",
 		"exists a : seq of (nat1) & (a <> [])\n",
 		"forall m1, m2 in set {{1 |-> 2}, {2 |-> 3}} & forall d3 in set dom m1, d4 in set dom m2 & d3 = d4 => m1(d3) = m2(d4)\n",
-		"true -- After instance variable initializers (iv < 10)\n",
+		"After instance variable initializers (iv < 10)\n",
 		"forall arg1:(int * int), arg2:seq of (int) & (exists bind1:(int * int), i:int, j:int & (arg1 = bind1) and (mk_(i, j) = bind1)) and (exists bind1:seq of (int), k:int & (arg2 = bind1) and ([k] = bind1))\n",
 		"(forall mk_(i, j):(int * int), [k]:seq of (int) &\n  i in set dom m)\n",
 		"(forall mk_(i, j):(int * int) &\n  i in set dom m)\n",
@@ -78,6 +79,7 @@ public class PogTest extends TestCase
 		"(let x:nat1 = 123 in\n  (not (m(-1) > 0) =>\n    (not (m(-2) > 0) =>\n      (not ((x < 0) or ((x > 10) or (x = 100))) =>\n        999 in set dom m))))\n",
 		"(forall a:int, b:int & (a < b) =>\n  a in set dom m)\n",
 		"(forall a:int, b:int &\n  pre_prepostf(a, b) => post_prepostf(a, b, (a + b)))\n",
+		"(forall mk_(a, b):(int * int), c:(int * int) &\n  is_(pre_prepostfi(mk_(a, b), c), bool))\n",
 		"(forall mk_(a, b):(int * int), c:(int * int) &\n  pre_prepostfi(mk_(a, b), c) => exists r:int & post_prepostfi(mk_(a, b), c, r))\n",
 		"(forall x:seq of (int) &\n  (exists [a]:seq1 of (int) & [a] = (x ^ [-999]) => let [a] = (x ^ [-999]) in\n    a in set dom m))\n",
 		"(forall x:seq of (int) &\n  (not exists [a]:seq1 of (int) & [a] = (x ^ [-999]) =>\n    (exists [a, b]:seq1 of (int) & [a, b] = (x ^ [-999]) => let [a, b] = (x ^ [-999]) in\n      (a + b) in set dom m)))\n",
@@ -146,8 +148,8 @@ public class PogTest extends TestCase
 		"1 in set dom m\n",
 		"2 in set dom m\n",
 		"3 in set dom m\n",
-		"true -- while (x > 0) do ...\n",
-		"true -- After iv := (iv + 1) (iv < 10)\n"
+		"while (x > 0) do ...\n",
+		"After iv := (iv + 1) (iv < 10)\n"
 	};
 
 	public void testPOG() throws Exception
@@ -175,7 +177,7 @@ public class PogTest extends TestCase
 		for (ProofObligation po: polist)
 		{
 			Console.out.println(++i + " \"" + po.value.replaceAll("\n", "\\\\n") + "\",");
-			assertFalse("PO type checked failed", po.getCheckedExpression() == null);
+			assertTrue("PO type checked failed", !po.isCheckable || po.getCheckedExpression() != null);
 		}
 
 		assertEquals("POs generated", expected.length, polist.size());

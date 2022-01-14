@@ -29,7 +29,7 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import workspace.Log;
+import workspace.Diag;
 
 public class IgnoreHandler extends DAPHandler
 {
@@ -41,7 +41,7 @@ public class IgnoreHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		Log.error("Ignoring request %s", request.toString());
+		Diag.warning("Ignoring request %s", request.toString());
 		return new DAPMessageList(request, false, null, null);
 	}
 }

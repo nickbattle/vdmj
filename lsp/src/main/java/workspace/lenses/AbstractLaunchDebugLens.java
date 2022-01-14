@@ -29,6 +29,8 @@ import json.JSONObject;
 
 public abstract class AbstractLaunchDebugLens extends CodeLens
 {
+	protected final String CODE_LENS_COMMAND = "vdm-vscode.addLensRunConfiguration";
+
 	@Override
 	abstract public <DEF, CLS> JSONArray getDefinitionLenses(DEF definition, CLS module);
 

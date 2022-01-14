@@ -22,31 +22,13 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.traces;
+package com.fujitsu.vdmj.pog;
 
-import java.util.TreeSet;
-
-import com.fujitsu.vdmj.in.traces.INTraceVariable;
-import com.fujitsu.vdmj.in.traces.INTraceVariableStatement;
-
-public class TraceVariableList extends TreeSet<INTraceVariable>
+public class PONoCheckContext extends POContext
 {
-	private static final long serialVersionUID = 1L;
-
-	public TraceVariableList()
+	@Override
+	public String getContext()
 	{
-		super();
-	}
-
-	public CallSequence getVariables()
-	{
-		CallSequence seq = new CallSequence();
-
-		for (INTraceVariable var: this)
-		{
-			seq.add(new INTraceVariableStatement(var));
-		}
-
-		return seq;
+		return "";
 	}
 }

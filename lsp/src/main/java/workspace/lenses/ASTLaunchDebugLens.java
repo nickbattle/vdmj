@@ -48,8 +48,6 @@ import json.JSONObject;
 
 public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 {
-	private final String CODE_LENS_COMMAND = "vdm-vscode.addLensRunConfiguration";
-
 	@Override
 	public <DEF, CLS> JSONArray getDefinitionLenses(DEF definition, CLS classdef)
 	{
@@ -57,7 +55,7 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
 		ASTClassDefinition cls = (ASTClassDefinition) classdef;
 		JSONArray results = new JSONArray();
 		
-		if ("vscode".equals(getClientName()) && isPublic(def))
+		if (isClientType("vscode") && isPublic(def))
 		{
 			String launchName = null;
 			String defaultName = null;

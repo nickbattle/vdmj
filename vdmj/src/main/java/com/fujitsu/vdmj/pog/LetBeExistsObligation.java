@@ -26,8 +26,6 @@ package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.expressions.POLetBeStExpression;
 import com.fujitsu.vdmj.po.statements.POLetBeStStatement;
-import com.fujitsu.vdmj.pog.POContextStack;
-import com.fujitsu.vdmj.pog.ProofObligation;
 
 public class LetBeExistsObligation extends ProofObligation
 {
@@ -43,6 +41,10 @@ public class LetBeExistsObligation extends ProofObligation
 		{
 			sb.append(" & ");
 			sb.append(exp.suchThat);
+		}
+		else
+		{
+			sb.append(" & true");
 		}
 
 		value = ctxt.getObligation(sb.toString());
@@ -60,6 +62,10 @@ public class LetBeExistsObligation extends ProofObligation
 		{
 			sb.append(" & ");
 			sb.append(stmt.suchThat);
+		}
+		else
+		{
+			sb.append(" & true");
 		}
 
 		value = ctxt.getObligation(sb.toString());

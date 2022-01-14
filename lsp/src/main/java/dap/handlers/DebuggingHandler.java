@@ -31,7 +31,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import vdmj.DAPDebugReader;
 import workspace.DAPWorkspaceManager;
-import workspace.Log;
+import workspace.Diag;
 
 public class DebuggingHandler extends DAPHandler
 {
@@ -53,7 +53,7 @@ public class DebuggingHandler extends DAPHandler
 		}
 		else
 		{
-			Log.error("Ignoring debugging request %s", request.toString());
+			Diag.error("Ignoring debugging request %s", request.toString());
 			return new DAPMessageList(request, false, null, null);
 		}
 	}

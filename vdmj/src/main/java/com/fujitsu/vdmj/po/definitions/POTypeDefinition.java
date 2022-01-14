@@ -54,10 +54,14 @@ public class POTypeDefinition extends PODefinition
 	public final POPattern ordPattern2;
 	public final POExpression ordExpression;
 
+	public final POExplicitFunctionDefinition invdef;
+	public final POExplicitFunctionDefinition eqdef;
+	public final POExplicitFunctionDefinition orddef;
+
 	public POTypeDefinition(POAnnotationList annotations, TCNameToken name, TCInvariantType type,
-		POPattern invPattern, POExpression invExpression,
-		POPattern eqPattern1, POPattern eqPattern2, POExpression eqExpression,
-		POPattern ordPattern1, POPattern ordPattern2, POExpression ordExpression)
+		POPattern invPattern, POExpression invExpression, POExplicitFunctionDefinition invdef,
+		POPattern eqPattern1, POPattern eqPattern2, POExpression eqExpression, POExplicitFunctionDefinition eqdef,
+		POPattern ordPattern1, POPattern ordPattern2, POExpression ordExpression, POExplicitFunctionDefinition orddef)
 	{
 		super(name.getLocation(), name);
 
@@ -65,12 +69,17 @@ public class POTypeDefinition extends PODefinition
 		this.type = type;
 		this.invPattern = invPattern;
 		this.invExpression = invExpression;
+		this.invdef = invdef;
+		
 		this.eqPattern1 = eqPattern1;
 		this.eqPattern2 = eqPattern2;
 		this.eqExpression = eqExpression;
+		this.eqdef = eqdef;
+		
 		this.ordPattern1 = ordPattern1;
 		this.ordPattern2 = ordPattern2;
 		this.ordExpression = ordExpression;
+		this.orddef = orddef;
 	}
 
 	@Override
@@ -97,21 +106,21 @@ public class POTypeDefinition extends PODefinition
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
-		if (invExpression != null)
+		if (invdef != null)
 		{
-			list.addAll(invExpression.getProofObligations(ctxt, env));
+			list.addAll(invdef.getProofObligations(ctxt, env));
 			list.add(new SatisfiabilityObligation(this, ctxt));
 		}
 
-		if (eqExpression != null)
+		if (eqdef != null)
 		{
-			list.addAll(eqExpression.getProofObligations(ctxt, env));
+			list.addAll(eqdef.getProofObligations(ctxt, env));
 			list.add(new EquivRelationObligation(this, ctxt));
 		}
 
-		if (ordExpression != null)
+		if (orddef != null)
 		{
-			list.addAll(ordExpression.getProofObligations(ctxt, env));
+			list.addAll(orddef.getProofObligations(ctxt, env));
 			list.add(new StrictOrderObligation(this, ctxt));
 		}
 

@@ -32,6 +32,8 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -52,6 +54,7 @@ import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -74,8 +77,9 @@ import workspace.plugins.TCPlugin;
 public class LSPWorkspaceManager
 {
 	private static LSPWorkspaceManager INSTANCE = null;
-	protected final PluginRegistry registry;
-	protected final LSPMessageUtils messages;
+	private final PluginRegistry registry;
+	private final LSPMessageUtils messages;
+	private final Charset encoding;
 
 	private JSONObject clientInfo;
 	private JSONObject clientCapabilities;
@@ -88,6 +92,17 @@ public class LSPWorkspaceManager
 	{
 		registry = PluginRegistry.getInstance();
 		messages = new LSPMessageUtils();
+		
+		if (System.getProperty("lsp.encoding") == null)
+		{
+			encoding = Charset.defaultCharset();
+			Diag.info("Workspace using default encoding: %s", encoding.name());
+		}
+		else
+		{
+			encoding = Charset.forName(System.getProperty("lsp.encoding"));
+			Diag.info("Workspace encoding set to %s", encoding.displayName());
+		}
 	}
 
 	public static synchronized LSPWorkspaceManager getInstance()
@@ -105,7 +120,7 @@ public class LSPWorkspaceManager
 			registry.registerPlugin(TCPlugin.factory(Settings.dialect));
 			registry.registerPlugin(INPlugin.factory(Settings.dialect));
 			
-			Log.printf("Created LSPWorkspaceManager");
+			Diag.info("Created LSPWorkspaceManager");
 		}
 
 		return INSTANCE;
@@ -162,7 +177,7 @@ public class LSPWorkspaceManager
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
@@ -186,19 +201,18 @@ public class LSPWorkspaceManager
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	public <T> T getClientCapability(String dotName)
 	{
 		T capability = clientCapabilities.getPath(dotName);
 		
 		if (capability != null)
 		{
-			Log.printf("Client capability %s = %s", dotName, capability);
+			Diag.fine("Client capability %s = %s", dotName, capability);
 			return capability;
 		}
 		else
 		{
-			Log.printf("Missing client capability: %s", dotName);
+			Diag.fine("Missing client capability: %s", dotName);
 			return null;
 		}
 	}
@@ -239,7 +253,7 @@ public class LSPWorkspaceManager
 		
 		if (orderedFiles)
 		{
-			Log.printf("Loading ordered project files from %s", ordering);
+			Diag.info("Loading ordered project files from %s", ordering);
 			BufferedReader br = null;
 			
 			try
@@ -251,7 +265,7 @@ public class LSPWorkspaceManager
 				{
 					// Use canonical file to allow "./folder/file"
 					File file = new File(rootUri, source).getCanonicalFile();
-					Log.printf("Loading %s", file);
+					Diag.info("Loading %s", file);
 					
 					if (file.exists())
 					{
@@ -259,7 +273,7 @@ public class LSPWorkspaceManager
 					}
 					else
 					{
-						Log.error("Ordering file not found: " + file);
+						Diag.error("Ordering file not found: " + file);
 						sendMessage(1L, "Ordering file not found: " + file);
 					}
 					
@@ -273,7 +287,7 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
-			Log.printf("Loading all project files under %s", rootUri);
+			Diag.info("Loading all project files under %s", rootUri);
 			loadProjectFiles(rootUri);
 		}
 	}
@@ -299,6 +313,10 @@ public class LSPWorkspaceManager
 				{
 					loadFile(file);
 				}
+				else
+				{
+					Diag.warning("Ignoring file %s", file.getPath());
+				}
 			}
 		}
 	}
@@ -306,7 +324,7 @@ public class LSPWorkspaceManager
 	private void loadFile(File file) throws IOException
 	{
 		StringBuilder sb = new StringBuilder();
-		InputStreamReader isr = new InputStreamReader(new FileInputStream(file));
+		InputStreamReader isr = new InputStreamReader(new FileInputStream(file), encoding);
 		char[] data = new char[(int)file.length() + 1];
 		int size = isr.read(data);
 		
@@ -318,6 +336,7 @@ public class LSPWorkspaceManager
 		isr.close();
 		
 		projectFiles.put(file, sb);
+		Diag.info("Loaded file %s encoding %s", file.getPath(), encoding.displayName());
 	}
 	
 	private boolean onDotPath(File file)
@@ -344,7 +363,7 @@ public class LSPWorkspaceManager
 		POPlugin po = registry.getPlugin("PO");
 		CTPlugin ct = registry.getPlugin("CT");
 		
-		Log.printf("Checking loaded files (%s)...", reason);
+		Diag.info("Checking loaded files (%s)...", reason);
 		ast.preCheck();
 		tc.preCheck();
 		in.preCheck();
@@ -365,25 +384,25 @@ public class LSPWorkspaceManager
 			{
 				if (in.checkLoadedFiles(tc.getTC()))
 				{
-					Log.printf("Loaded files checked successfully");
+					Diag.info("Loaded files checked successfully");
 				}
 				else
 				{
-					Log.error("Failed to create interpreter");
+					Diag.error("Failed to create interpreter");
 				}
 			}
 			else
 			{
-				Log.error("Type checking errors found");
-				Log.dump(tc.getErrs());
-				Log.dump(tc.getWarns());
+				Diag.error("Type checking errors found");
+				DiagUtils.dump(tc.getErrs());
+				DiagUtils.dump(tc.getWarns());
 			}
 		}
 		else
 		{
-			Log.error("Syntax errors found");
-			Log.dump(ast.getErrs());
-			Log.dump(ast.getWarns());
+			Diag.error("Syntax errors found");
+			DiagUtils.dump(ast.getErrs());
+			DiagUtils.dump(ast.getWarns());
 		}
 		
 		List<VDMMessage> diags = new Vector<VDMMessage>();
@@ -406,7 +425,7 @@ public class LSPWorkspaceManager
 			ct.checkLoadedFiles(in.getIN());
 		}
 
-		Log.printf("Checked loaded files.");
+		Diag.info("Checked loaded files.");
 		return result;
 	}
 
@@ -414,21 +433,21 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Log.printf("Ignoring dot path file", file);
+			Diag.info("Ignoring dot path file", file);
 			return null;
 		}
 		if (!projectFiles.keySet().contains(file))
 		{
-			Log.printf("Opening new file: %s", file);
+			Diag.info("Opening new file: %s", file);
 			openFiles.add(file);
 		}
 		else if (openFiles.contains(file))
 		{
-			Log.error("File already open: %s", file);
+			Diag.warning("File already open: %s", file);
 		}
 		else
 		{
-			Log.printf("Opening known file: %s", file);
+			Diag.info("Opening known file: %s", file);
 			openFiles.add(file);
 		}
 		
@@ -436,14 +455,14 @@ public class LSPWorkspaceManager
 		
 		if (orderedFiles && existing == null)
 		{
-			Log.error("File not in ordering list: %s", file);
+			Diag.error("File not in ordering list: %s", file);
 			sendMessage(1L, "Ordering file out of date? " + file);
 		}
 		else if (existing == null || !existing.toString().equals(text))
 		{
 			if (existing != null)
 			{
-				Log.printf("File different on didOpen?");
+				Diag.info("File different on didOpen?");
 			}
 			
 			projectFiles.put(file, new StringBuilder(text));
@@ -457,19 +476,19 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Log.printf("Ignoring dot path file", file);
+			Diag.info("Ignoring dot path file", file);
 		}
 		else if (!projectFiles.keySet().contains(file))
 		{
-			Log.error("File not known: %s", file);
+			Diag.error("File not known: %s", file);
 		}
 		else if (!openFiles.contains(file))
 		{
-			Log.error("File not open: %s", file);
+			Diag.error("File not open: %s", file);
 		}
 		else
 		{
-			Log.printf("Closing file: %s", file);
+			Diag.info("Closing file: %s", file);
 			openFiles.remove(file);
 		}
 		
@@ -480,17 +499,17 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Log.printf("Ignoring dot path file", file);
+			Diag.info("Ignoring dot path file", file);
 			return null;
 		}
 		else if (!projectFiles.keySet().contains(file))
 		{
-			Log.error("File not known: %s", file);
+			Diag.error("File not known: %s", file);
 			return null;
 		}
 		else if (!openFiles.contains(file))
 		{
-			Log.error("File not open: %s", file);
+			Diag.error("File not open: %s", file);
 			return null;
 		}
 		else
@@ -504,7 +523,7 @@ public class LSPWorkspaceManager
 				buffer.replace(start, end, text);
 			}
 			
-			Log.dumpEdit(range, buffer);
+			DiagUtils.dumpEdit(range, buffer);
 			ASTPlugin ast = registry.getPlugin("AST");
 			List<VDMMessage> errors = ast.fileChanged(file);
 			
@@ -522,7 +541,9 @@ public class LSPWorkspaceManager
 
 	/**
 	 * The action code returned indicates whether the change watched file requires the
-	 * specification to be reloaded and rechecked(2), just re-checked(1), or nothing(0). 
+	 * specification to be reloaded and rechecked(2), just re-checked(1), or nothing(0).
+	 * Note that these are ordered by severity, so multiple file changes will select
+	 * one actionCode that is the most comprehensive. See the handler.
 	 */
 	
 	private static final int DO_NOTHING = 0;
@@ -540,35 +561,35 @@ public class LSPWorkspaceManager
 			case CREATE:
 				if (file.isDirectory())
 				{
-					Log.printf("New directory created: %s", file);
+					Diag.info("New directory created: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (ignoreDotPath)
 				{
-					Log.printf("Ignoring file on dot path");
+					Diag.info("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (file.equals(new File(rootUri, ORDERING)))
 				{
-					Log.printf("Created ordering file, rebuilding");
+					Diag.info("Created ordering file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
-					Log.printf("Ignoring non-project file: %s", file);
+					Diag.info("Ignoring non-project file: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (!projectFiles.keySet().contains(file))	
 				{
 					if (orderedFiles)
 					{
-						Log.error("File not in ordering list: %s", file);
+						Diag.error("File not in ordering list: %s", file);
 						sendMessage(1L, "Ordering file out of date? " + file);
 						actionCode = DO_NOTHING;
 					}
 					else
 					{
-						Log.printf("Created new file: %s", file);
+						Diag.info("Created new file: %s", file);
 						loadFile(file);
 						actionCode = RECHECK;
 					}
@@ -576,7 +597,7 @@ public class LSPWorkspaceManager
 				else
 				{
 					// Usually because a didOpen gets in first, on creation
-					Log.printf("Created file already added: %s", file);
+					Diag.info("Created file already added: %s", file);
 					actionCode = DO_NOTHING;	// Already re-built by openFile
 				}
 				break;
@@ -584,27 +605,27 @@ public class LSPWorkspaceManager
 			case CHANGE:
 				if (file.isDirectory())
 				{
-					Log.printf("Directory changed: %s", file);
+					Diag.info("Directory changed: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (ignoreDotPath)
 				{
-					Log.printf("Ignoring file on dot path");
+					Diag.info("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (file.equals(new File(rootUri, ORDERING)))
 				{
-					Log.printf("Updated ordering file, rebuilding");
+					Diag.info("Updated ordering file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
-					Log.printf("Ignoring non-project file change: %s", file);
+					Diag.info("Ignoring non-project file change: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (!projectFiles.keySet().contains(file))	
 				{
-					Log.error("Changed file not known: %s", file);
+					Diag.error("Changed file not known: %s", file);
 					actionCode = RELOAD_AND_CHECK;	// Try rebuilding?
 				}
 				else
@@ -615,7 +636,7 @@ public class LSPWorkspaceManager
 				
 			case DELETE:
 				// Since the file is deleted, we don't know what it was so we have to rebuild
-				Log.printf("Deleted %s (dir/file?), rebuilding", file);
+				Diag.info("Deleted %s (dir/file?), rebuilding", file);
 				actionCode = RELOAD_AND_CHECK;
 				break;
 		}
@@ -652,7 +673,7 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
-			return new RPCMessageList(request);
+			return null;	// The didChangeWatchedFiles is a notification, so no reply needed.
 		}
 	}
 
@@ -664,15 +685,15 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Log.printf("Ignoring dot path file", file);
+			Diag.info("Ignoring dot path file", file);
 		}
 		else if (!projectFiles.keySet().contains(file))
 		{
-			Log.error("File not known: %s", file);
+			Diag.error("File not known: %s", file);
 		}
 		else if (!openFiles.contains(file))
 		{
-			Log.error("File not open: %s", file);
+			Diag.error("File not open: %s", file);
 		}
 		else
 		{
@@ -729,7 +750,7 @@ public class LSPWorkspaceManager
 	public RPCMessageList completion(RPCRequest request,
 			CompletionTriggerKind triggerKind, File file, int zline, int zcol)
 	{
-		JSONArray result = new JSONArray();
+		HashMap<String, JSONObject> labels = new HashMap<String, JSONObject>();
 		TCDefinition def = findDefinition(file, zline, zcol - 2);
 	
 		if (def != null)
@@ -740,7 +761,7 @@ public class LSPWorkspaceManager
 				
 				for (TCField field: rtype.fields)
 				{
-					result.add(new JSONObject(
+					labels.put(field.tag, new JSONObject(
 						"label", field.tag,
 						"kind", CompletionItemKind.kindOf(def).getValue(),
 						"detail", field.type.toString()));
@@ -754,22 +775,8 @@ public class LSPWorkspaceManager
 				{
 					if (field.name != null)
 					{
-						TCType ftype = field.getType();
-						
-						if (ftype instanceof TCOperationType || ftype instanceof TCFunctionType)
-						{
-							result.add(new JSONObject(
-								"label", field.name.toString(),		// Include types
-								"kind", CompletionItemKind.kindOf(field).getValue(),
-								"detail", ftype.toString()));
-						}
-						else
-						{
-							result.add(new JSONObject(
-								"label", field.name.getName(),
-								"kind", CompletionItemKind.kindOf(field).getValue(),
-								"detail", ftype.toString()));
-						}
+						JSONObject comp = completionForDef(field);
+						labels.put(comp.get("label"), comp);
 					}
 				}
 			}
@@ -807,29 +814,83 @@ public class LSPWorkspaceManager
 				
 				if (!word.isEmpty())
 				{
-					Log.printf("Trying to complete '%s'", word);
+					Diag.info("Trying to complete '%s'", word);
 					
 					for (TCDefinition defn: lookupDefinition(word))
 					{
-						TCType ftype = defn.getType();
-						String insert = defn.name.getName();
-						
-						if (defn.isFunctionOrOperation())
+						if (defn.name != null)
 						{
-							insert = insert + ftype.toString().replaceAll("( ->| \\+>| ==>).*", ")");
+							JSONObject comp = completionForDef(defn);
+							labels.put(comp.get("label"), comp);
 						}
-						
-						result.add(new JSONObject(
-								"label", defn.name.getName(),
-								"kind", CompletionItemKind.kindOf(defn).getValue(),
-								"detail", ftype.toString(),
-								"insertText", insert));
 					}
 				}
 			}
 		}
 		
+		JSONArray result = new JSONArray();
+		result.addAll(labels.values());		
+		
 		return new RPCMessageList(request, result);
+	}
+	
+	private JSONObject completionForDef(TCDefinition defn)
+	{
+		TCType type = defn.getType();
+		String label = null;
+		String insertText = null;
+		
+		if (type instanceof TCOperationType)
+		{
+			TCOperationType otype = (TCOperationType)type;
+			label = defn.name.toString();
+			insertText = defn.name.getName() + snippetText(otype.parameters);
+		}
+		else if (type instanceof TCFunctionType)
+		{
+			TCFunctionType ftype = (TCFunctionType)type;
+			label = defn.name.toString();
+			insertText = defn.name.getName() + snippetText(ftype.parameters);
+		}
+		else
+		{
+			return new JSONObject(
+					"label", defn.name.getName(),
+					"kind", CompletionItemKind.kindOf(defn).getValue(),
+					"detail", type.toString(),
+					"insertText", defn.name.getName());
+		}
+
+		return new JSONObject(
+			"label", label,
+			"kind", CompletionItemKind.kindOf(defn).getValue(),
+			"insertText", insertText,
+			"insertTextFormat", 2);		// Snippet format
+	}
+
+	/**
+	 * A snippet string like "(${1:nat}, ${2:seq of nat})" 
+	 */
+	private String snippetText(TCTypeList parameters)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("(");
+		int pos = 1;
+		String sep = "";
+		
+		for (TCType p: parameters)
+		{
+			sb.append(sep);
+			sb.append("${");
+			sb.append(pos++);
+			sb.append(":");
+			sb.append(p.toString());
+			sb.append("}");
+			sep = ", ";
+		}
+		
+		sb.append(")");
+		return sb.toString();
 	}
 
 	public RPCMessageList documentSymbols(RPCRequest request, File file)
@@ -919,9 +980,9 @@ public class LSPWorkspaceManager
 		
 		if (!sloc.within(rloc))
 		{
-			Log.error("Selection not within range at symbol %s", name);
-			Log.error("Range %s", range);
-			Log.error("Selection %s", selectionRange);
+			Diag.error("Selection not within range at symbol %s", name);
+			Diag.error("Range %s", range);
+			Diag.error("Selection %s", selectionRange);
 		}
 	}
 
@@ -981,7 +1042,7 @@ public class LSPWorkspaceManager
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 		}
 	}
 }

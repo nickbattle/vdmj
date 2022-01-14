@@ -33,8 +33,8 @@ import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.Diag;
 import workspace.LSPWorkspaceManager;
-import workspace.Log;
 
 public class CompletionHandler extends LSPHandler
 {
@@ -62,12 +62,12 @@ public class CompletionHandler extends LSPHandler
 		}
 		catch (URISyntaxException e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InvalidParams, "URI syntax error");
 		}
 		catch (Exception e)
 		{
-			Log.error(e);
+			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}

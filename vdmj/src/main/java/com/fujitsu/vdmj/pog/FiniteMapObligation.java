@@ -51,8 +51,14 @@ public class FiniteMapObligation extends ProofObligation
 		}
 
 		sb.append(" &\n    ");
-		sb.append(exp.predicate);
-		sb.append(" => exists " + findex + " in set dom " + finmap + " & " +
+		
+		if (exp.predicate != null)
+		{
+			sb.append(exp.predicate);
+			sb.append(" => ");
+		}
+		
+		sb.append("exists " + findex + " in set dom " + finmap + " & " +
 			finmap + "(" + findex + ") = {");
 		sb.append(exp.first);
 		sb.append("}");

@@ -53,7 +53,7 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import vdmj.DAPDebugLink;
-import workspace.Log;
+import workspace.Diag;
 
 public class LSPServer extends JSONServer
 {
@@ -90,7 +90,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register(new ShutdownHandler(), "shutdown");
 		dispatcher.register(new ExitHandler(), "exit");
 		dispatcher.register(new CancelHandler(), "$/cancelRequest");
-		dispatcher.register(new SetTraceNotificationHandler(), "$/setTraceNotification");
+		dispatcher.register(new SetTraceNotificationHandler(), "$/setTraceNotification", "$/setTrace");
 
 		dispatcher.register(new DidOpenHandler(), "textDocument/didOpen");
 		dispatcher.register(new DidCloseHandler(), "textDocument/didClose");
@@ -123,7 +123,7 @@ public class LSPServer extends JSONServer
 			
 			if (message == null)	// EOF
 			{
-				Log.printf("End of stream detected");
+				Diag.info("End of stream detected");
 				break;
 			}
 			
@@ -139,7 +139,7 @@ public class LSPServer extends JSONServer
 				}
 				else
 				{
-					Log.error("Unhandled response, id=%d", id);
+					Diag.error("Unhandled response, id=%d", id);
 				}
 			}
 			else

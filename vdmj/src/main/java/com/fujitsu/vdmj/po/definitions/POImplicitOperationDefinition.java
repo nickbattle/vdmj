@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.po.types.POPatternTypePair;
 import com.fujitsu.vdmj.pog.OperationPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POImpliesContext;
+import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.POOperationDefinitionContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -134,6 +135,8 @@ public class POImplicitOperationDefinition extends PODefinition
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 		TCNameList pids = new TCNameList();
 		boolean matchNeeded = false;
+		
+		ctxt.push(new PONoCheckContext());
 
 		for (POPatternListTypePair pltp: parameterPatterns)
 		{
@@ -155,7 +158,7 @@ public class POImplicitOperationDefinition extends PODefinition
 
 		if (precondition != null)
 		{
-			obligations.addAll(precondition.getProofObligations(ctxt, env));
+			obligations.addAll(predef.getProofObligations(ctxt, env));
 		}
 
 		if (postcondition != null)
@@ -163,12 +166,12 @@ public class POImplicitOperationDefinition extends PODefinition
 			if (precondition != null)
 			{
 				ctxt.push(new POImpliesContext(precondition));
-				obligations.addAll(postcondition.getProofObligations(ctxt, env));
+				obligations.addAll(postdef.getProofObligations(ctxt, env));
 				ctxt.pop();
 			}
 			else
 			{
-				obligations.addAll(postcondition.getProofObligations(ctxt, env));
+				obligations.addAll(postdef.getProofObligations(ctxt, env));
 			}
 			
 			obligations.add(new OperationPostConditionObligation(this, ctxt));
@@ -203,6 +206,8 @@ public class POImplicitOperationDefinition extends PODefinition
 			}
 		}
 
+		ctxt.pop();
+		
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;
 	}

@@ -32,7 +32,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import workspace.Log;
+import workspace.Diag;
 
 abstract public class JSONServer
 {
@@ -89,19 +89,19 @@ abstract public class JSONServer
 			}
 			else
 			{
-				Log.error("Malformed header: %s", separator);
+				Diag.error("Malformed header: %s", separator);
 			}
 			
 			separator = readLine();
 		}
 		else if (!separator.isEmpty())
 		{
-			Log.error("Input stream out of sync. Expected \\r\\n got [%s]", separator);
+			Diag.error("Input stream out of sync. Expected \\r\\n got [%s]", separator);
 		}
 		
 		if (!contentLength.startsWith(CONTENT_LENGTH))
 		{
-			Log.error("Input stream out of sync. Expected Content-Length: got [%s]", contentLength);
+			Diag.error("Input stream out of sync. Expected Content-Length: got [%s]", contentLength);
 			throw new IOException("Input stream out of sync");
 		}
 		else
@@ -116,7 +116,7 @@ abstract public class JSONServer
 			}
 			
 			String message = new String(bytes, encoding);
-			Log.printf(">>> %s %s", prefix, message);
+			Diag.fine(">>> %s %s", prefix, message);
 			JSONReader jreader = new JSONReader(new StringReader(message));
 			return jreader.readObject();
 		}
@@ -142,6 +142,6 @@ abstract public class JSONServer
 		outStream.write(message.toByteArray());		// Avoid multiple packets
 		outStream.flush();
 
-		Log.printf("<<< %s %s", prefix, swout);
+		Diag.fine("<<< %s %s", prefix, swout);
 	}
 }

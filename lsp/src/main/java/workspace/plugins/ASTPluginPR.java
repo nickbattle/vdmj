@@ -26,7 +26,6 @@ package workspace.plugins;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -47,8 +46,9 @@ import com.fujitsu.vdmj.syntax.ClassReader;
 
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
+import workspace.Diag;
+import workspace.DiagUtils;
 import workspace.LSPWorkspaceManager;
-import workspace.Log;
 import workspace.lenses.CodeLens;
 
 public class ASTPluginPR extends ASTPlugin
@@ -87,15 +87,14 @@ public class ASTPluginPR extends ASTPlugin
 			}
 			catch (Exception e)
 			{
-				Log.error(e);
+				Diag.error(e);
 				return false;
 			}
 		}
 		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
-			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(),
-					Settings.dialect, entry.getKey(), Charset.defaultCharset().displayName());
+			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(), Settings.dialect, entry.getKey(), "UTF-8");
 			ClassReader mr = new ClassReader(ltr);
 			astClassList.addAll(mr.readClasses());
 			
@@ -129,8 +128,7 @@ public class ASTPluginPR extends ASTPlugin
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
-		LexTokenReader ltr = new LexTokenReader(buffer.toString(),
-				Settings.dialect, file, Charset.defaultCharset().displayName());
+		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file, "UTF-8");
 		ClassReader cr = new ClassReader(ltr);
 		dirtyClassList = cr.readClasses();
 		
@@ -144,7 +142,7 @@ public class ASTPluginPR extends ASTPlugin
 			errs.addAll(cr.getWarnings());
 		}
 
-		Log.dump(errs);
+		DiagUtils.dump(errs);
 		return errs;
 	}
 

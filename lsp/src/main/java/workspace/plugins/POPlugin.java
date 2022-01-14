@@ -29,14 +29,13 @@ import java.io.File;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
-import workspace.Log;
+import workspace.Diag;
 
 abstract public class POPlugin extends AnalysisPlugin
 {
@@ -52,7 +51,7 @@ abstract public class POPlugin extends AnalysisPlugin
 				return new POPluginPR();
 				
 			default:
-				Log.error("Unknown dialect " + dialect);
+				Diag.error("Unknown dialect " + dialect);
 				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
 		}
 	}
@@ -142,7 +141,7 @@ abstract public class POPlugin extends AnalysisPlugin
 					"name",		name,
 					"location",	Utils.lexLocationToLocation(po.location),
 					"source",	splitPO(po.value),
-					"proved",	po.status != POStatus.UNPROVED));
+					"status",	po.status.toString()));
 		}
 		
 		return results;
