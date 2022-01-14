@@ -52,7 +52,7 @@ public class BacktrackInputReader extends Reader
 
 	/** The total number of characters in the file. */
 	private int max = 0;
-
+	
 	/**
 	 * Create an object to read the file name passed with the given charset.
 	 *
@@ -64,8 +64,8 @@ public class BacktrackInputReader extends Reader
 		{
 			InputStreamReader isr = readerFactory(file, charset);
 			data = new char[readerLength(file, isr)];
-			max = isr.read(data);
-			pos = 0;
+   	        max = isr.read(data);
+    		pos = 0;
 			isr.close();
 		}
 		catch (IOException e)
@@ -101,7 +101,7 @@ public class BacktrackInputReader extends Reader
 	        	new LatexStreamReader(is, charset);
 
     		data = new char[expression.length() + 1];
-	        max = isr.read(data);
+   	        max = isr.read(data);
 	        pos = 0;
 
 	        isr.close();

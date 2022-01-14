@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
+import workspace.Diag;
 import workspace.LSPWorkspaceManager;
 
 /**
@@ -50,6 +51,25 @@ abstract public class CodeLens
 	protected String getClientName()
 	{
 		return LSPWorkspaceManager.getInstance().getClientInfo("name");
+	}
+	
+	/**
+	 * LSP clients sometimes have different names for the same client. This
+	 * method enables a general check, allowing multiple names.
+	 */
+	protected boolean isClientType(String type)
+	{
+		String client = getClientName();
+		
+		switch (type)
+		{
+			case "vscode":
+				return client.equals("vscode") || client.equals("Visual Studio Code");
+				
+			default:
+				Diag.error("Unknown client test: %s", type);
+				return false;
+		}
 	}
 	
 	/**

@@ -336,7 +336,7 @@ public class LSPWorkspaceManager
 		isr.close();
 		
 		projectFiles.put(file, sb);
-		Diag.info("Loaded file %s", file.getPath());
+		Diag.info("Loaded file %s encoding %s", file.getPath(), encoding.displayName());
 	}
 	
 	private boolean onDotPath(File file)

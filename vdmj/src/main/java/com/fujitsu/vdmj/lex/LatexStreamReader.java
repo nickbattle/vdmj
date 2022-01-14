@@ -36,6 +36,8 @@ import java.util.Stack;
  */
 public class LatexStreamReader extends InputStreamReader
 {
+	private final static String BOM = "\uFEFF";
+
 	private Stack<Boolean> ifstack = new Stack<Boolean>();
 
 	public LatexStreamReader(InputStream in, String charsetName)
@@ -49,6 +51,11 @@ public class LatexStreamReader extends InputStreamReader
 	{
 		BufferedReader br = new BufferedReader(this);
 		String line = br.readLine();
+		
+		if (line.startsWith(BOM))
+		{
+			line = line.substring(1);
+		}
 
 		boolean supress = false;
 		int pos = 0;

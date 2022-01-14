@@ -155,7 +155,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 
 		if (precondition != null)
 		{
-			obligations.addAll(precondition.getProofObligations(ctxt, env));
+			obligations.addAll(predef.getProofObligations(ctxt, env));
 		}
 
 		if (postcondition != null)
@@ -167,8 +167,10 @@ public class POImplicitFunctionDefinition extends PODefinition
 				ctxt.pop();
 			}
 
+			ctxt.push(new POFunctionDefinitionContext(this, false));
 			ctxt.push(new POFunctionResultContext(this));
 			obligations.addAll(postcondition.getProofObligations(ctxt, env));
+			ctxt.pop();
 			ctxt.pop();
 		}
 
@@ -210,12 +212,14 @@ public class POImplicitFunctionDefinition extends PODefinition
 	public List<POPatternList> getParamPatternList()
 	{
 		List<POPatternList> list = new Vector<POPatternList>();
+		POPatternList onelist = new POPatternList();
 		
 		for (POPatternListTypePair p: parameterPatterns)
 		{
-			list.add(p.patterns);
+			onelist.addAll(p.patterns);
 		}
 		
+		list.add(onelist);
 		return list;
 	}
 
