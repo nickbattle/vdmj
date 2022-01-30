@@ -527,12 +527,22 @@ public class SourceFile
 
 	public void writeCoverage(PrintWriter out)
 	{
+		writeCoverage(out, false);	// Just write hits
+	}
+	
+	public void writeCoverage(PrintWriter out, boolean all)
+	{
         for (LexLocation l: LexLocation.getSourceLocations(filename))
         {
         	if (l.hits > 0)
         	{
         		out.println("+" + l.startLine +
         			" " + l.startPos + "-" + l.endPos + "=" + l.hits);
+        	}
+        	else if (all)
+        	{
+        		out.println("-" + l.startLine +
+            			" " + l.startPos + "-" + l.endPos + "=" + l.hits);
         	}
         }
 	}
