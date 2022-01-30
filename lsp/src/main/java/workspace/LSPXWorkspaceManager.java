@@ -552,7 +552,7 @@ public class LSPXWorkspaceManager
 		File outfile = new File(subfolder, covname);
 		
 		PrintWriter out = new PrintWriter(outfile);
-		source.writeCoverage(out);
+		source.writeCoverage(out, true);
 		out.close();
 
 		return outfile;

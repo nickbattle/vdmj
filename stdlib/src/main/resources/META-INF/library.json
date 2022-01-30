@@ -1,0 +1,92 @@
+{
+	"vdmsl": [
+		{
+			"name": "IO",
+			"description": "The IO library",
+			"files": ["IO.vdmsl"],
+			"depends": []
+		},
+		{
+			"name": "CSV",
+			"description": "The CSV library",
+			"files": ["CSV.vdmsl"],
+			"depends": []
+		},
+		{
+			"name": "MATH",
+			"description": "The MATH library",
+			"files": ["MATH.vdmsl"],
+			"depends": []
+		},
+		{
+			"name": "VDMUtil",
+			"description": "The VDMUtil library",
+			"files": ["VDMUtil.vdmsl"],
+			"depends": []
+		}
+	],
+	"vdmpp": [
+		{
+			"name": "IO",
+			"description": "The IO library",
+			"files": ["IO.vdmpp"],
+			"depends": []
+		},
+		{
+			"name": "CSV",
+			"description": "The CSV library",
+			"files": ["CSV.vdmpp"],
+			"depends": []
+		},
+		{
+			"name": "MATH",
+			"description": "The MATH library",
+			"files": ["MATH.vdmpp"],
+			"depends": []
+		},
+		{
+			"name": "VDMUtil",
+			"description": "The VDMUtil library",
+			"files": ["VDMUtil.vdmpp"],
+			"depends": []
+		},
+		{
+			"name": "VDMUnit",
+			"description": "The VDMUnit library",
+			"files": ["VDMUnit.vdmpp"],
+			"depends": ["IO"]
+		}
+	],
+	"vdmrt": [
+		{
+			"name": "IO",
+			"description": "The IO library",
+			"files": ["IO.vdmrt"],
+			"depends": []
+		},
+		{
+			"name": "CSV",
+			"description": "The CSV library",
+			"files": ["CSV.vdmrt"],
+			"depends": []
+		},
+		{
+			"name": "MATH",
+			"description": "The MATH library",
+			"files": ["MATH.vdmrt"],
+			"depends": []
+		},
+		{
+			"name": "VDMUtil",
+			"description": "The VDMUtil library",
+			"files": ["VDMUtil.vdmrt"],
+			"depends": []
+		},
+		{
+			"name": "VDMUnit",
+			"description": "The VDMUnit library",
+			"files": ["VDMUnit.vdmrt"],
+			"depends": ["IO"]
+		}
+	]
+}

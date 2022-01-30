@@ -405,6 +405,8 @@ public class LSPWorkspaceManager
 			DiagUtils.dump(ast.getWarns());
 		}
 		
+		boolean hasErrors = !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
+		
 		List<VDMMessage> diags = new Vector<VDMMessage>();
 		diags.addAll(ast.getErrs());
 		diags.addAll(tc.getErrs());
@@ -417,7 +419,7 @@ public class LSPWorkspaceManager
 			po.checkLoadedFiles(tc.getTC());
 
 			result.add(RPCRequest.notification("slsp/POG/updated",
-					new JSONObject("successful", tc.getErrs().isEmpty())));
+					new JSONObject("successful", !hasErrors)));
 		}
 		
 		if (hasClientCapability("experimental.combinatorialTesting"))
