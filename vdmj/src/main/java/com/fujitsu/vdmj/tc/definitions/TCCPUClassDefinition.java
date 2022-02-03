@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import java.math.BigDecimal;
+
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -39,7 +41,7 @@ public class TCCPUClassDefinition extends TCClassDefinition
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final long CPU_MAX_FREQUENCY = 1000000000; // 1GHz
+	public static final BigDecimal CPU_MAX_FREQUENCY = new BigDecimal(1000000000); // 1GHz
 
 	public TCCPUClassDefinition(TCNameToken className, TCNameList supernames, TCDefinitionList definitions)
 	{

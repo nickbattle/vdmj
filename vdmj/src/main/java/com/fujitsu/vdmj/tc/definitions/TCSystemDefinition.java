@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import java.math.BigDecimal;
+
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
@@ -75,12 +77,12 @@ public class TCSystemDefinition extends TCClassDefinition
 						TCNewExpression newExp = (TCNewExpression) iv.expression;
 						TCExpression exp = newExp.args.get(1);
 						
-						double speed = 0;
+						BigDecimal speed = BigDecimal.ZERO;
 						
 						if (exp instanceof TCIntegerLiteralExpression)
 						{
 							TCIntegerLiteralExpression frequencyExp = (TCIntegerLiteralExpression) newExp.args.get(1);
-							speed = frequencyExp.value.value;
+							speed = new BigDecimal(frequencyExp.value.value);
 						}
 						else if (exp instanceof TCRealLiteralExpression)
 						{
@@ -88,11 +90,11 @@ public class TCSystemDefinition extends TCClassDefinition
 							speed = frequencyExp.value.value;
 						}
 	
-						if (speed == 0)
+						if (speed.equals(BigDecimal.ZERO))
 						{
 							d.report(3305, "CPU frequency to slow: " + speed + " Hz");
 						}
-						else if (speed > TCCPUClassDefinition.CPU_MAX_FREQUENCY)
+						else if (speed.compareTo(TCCPUClassDefinition.CPU_MAX_FREQUENCY) > 0)
 						{
 							d.report(3306, "CPU frequency to fast: " + speed + " Hz");
 						}
