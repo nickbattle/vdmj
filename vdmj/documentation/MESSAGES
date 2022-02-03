@@ -701,8 +701,8 @@ as the expected and actual values.
 3302, "Variable <name> cannot be accessed from this context"
 3303, "Measure parameters different to function"
 3304, "Recursive function cannot be its own measure"
-3305, (Overture)
-3306, (Overture)
+3305, "CPU frequency to slow: <n> Hz"
+3306, "CPU frequency to fast: <n> Hz"
 3307, "Errs clause is not bool -> bool"
 3308, "Cannot mix modules and flat specifications"
 3309, "Measure must not be polymorphic"
