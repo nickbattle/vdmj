@@ -46,7 +46,6 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
-import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.LocatedException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMWarning;
@@ -636,13 +635,16 @@ public abstract class SyntaxReader
 
 	protected void report(LocatedException error, Token[] after, Token[] upto)
 	{
-		VDMError vdmerror = new VDMError(error);
-		errors.add(vdmerror);
-
-		if (errors.size() >= MAX-1)
+		if (errors.size() < MAX)
 		{
-			errors.add(new VDMError(9, "Too many syntax errors", error.location));
-			throw new InternalException(9, "Too many syntax errors");
+			VDMError vdmerror = new VDMError(error);
+			errors.add(vdmerror);
+	
+			if (errors.size() == MAX)
+			{
+				errors.add(new VDMError(9, "Too many syntax errors", error.location));
+				// throw new InternalException(9, "Too many syntax errors");
+			}
 		}
 
 		// Either leave one token beyond something in the after list, or
@@ -668,7 +670,7 @@ public abstract class SyntaxReader
 		}
 		catch (LexException le)
 		{
-			errors.add(new VDMError(le));
+			report(le.number, le.getMessage(), le.location);
 		}
 	}
 
@@ -677,13 +679,16 @@ public abstract class SyntaxReader
 	 */
 	public void warning(int no, String msg, LexLocation location)
 	{
-		VDMWarning vdmwarning = new VDMWarning(no, msg, location);
-		warnings.add(vdmwarning);
-
-		if (warnings.size() >= MAX-1)
+		if (warnings.size() < MAX)
 		{
-			errors.add(new VDMError(9, "Too many warnings", location));
-			throw new InternalException(9, "Too many warnings");
+			VDMWarning vdmwarning = new VDMWarning(no, msg, location);
+			warnings.add(vdmwarning);
+	
+			if (warnings.size() == MAX)
+			{
+				errors.add(new VDMError(9, "Too many warnings", location));
+				// throw new InternalException(9, "Too many warnings");
+			}
 		}
 	}
 
@@ -692,13 +697,16 @@ public abstract class SyntaxReader
 	 */
 	public void report(int no, String msg, LexLocation location)
 	{
-		VDMError vdmerror = new VDMError(no, msg, location);
-		errors.add(vdmerror);
-
-		if (errors.size() >= MAX-1)
+		if (errors.size() < MAX)
 		{
-			errors.add(new VDMError(9, "Too many syntax errors", location));
-			throw new InternalException(9, "Too many syntax errors");
+			VDMError vdmerror = new VDMError(no, msg, location);
+			errors.add(vdmerror);
+	
+			if (errors.size() == MAX)
+			{
+				errors.add(new VDMError(9, "Too many syntax errors", location));
+				// throw new InternalException(9, "Too many syntax errors");
+			}
 		}
 	}
 
