@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
+import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.util.DependencyOrder;
 
@@ -83,6 +84,10 @@ public class TCPluginSL extends TCPlugin
 			tcModuleList.combineDefaults();
 			TypeChecker tc = new ModuleTypeChecker(tcModuleList);
 			tc.typeCheck();
+		}
+		catch (TypeCheckException e)
+		{
+			TypeChecker.report(3430, e.getMessage(), e.location);
 		}
 		catch (InternalException e)
 		{

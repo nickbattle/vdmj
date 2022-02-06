@@ -52,7 +52,7 @@ public class LatexStreamReader extends InputStreamReader
 		BufferedReader br = new BufferedReader(this);
 		String line = br.readLine();
 		
-		if (line.startsWith(BOM))
+		if (line != null && line.startsWith(BOM))
 		{
 			line = line.substring(1);
 		}

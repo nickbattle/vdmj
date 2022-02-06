@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
+import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.util.DependencyOrder;
 
@@ -82,6 +83,10 @@ public class TCPluginPR extends TCPlugin
 			tcClassList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(astClassList);
 			TypeChecker tc = new ClassTypeChecker(tcClassList);
 			tc.typeCheck();
+		}
+		catch (TypeCheckException te)
+		{
+			TypeChecker.report(3427, te.getMessage(), te.location);
 		}
 		catch (InternalException e)
 		{
