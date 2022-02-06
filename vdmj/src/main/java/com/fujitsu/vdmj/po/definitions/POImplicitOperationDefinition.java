@@ -74,7 +74,7 @@ public class POImplicitOperationDefinition extends PODefinition
 	public final POExplicitFunctionDefinition predef;
 	public final POExplicitFunctionDefinition postdef;
 	public final TCType actualResult;
-	public final PODefinition stateDefinition;
+	public final PODefinition state;
 	public final boolean isConstructor;
 
 	public POImplicitOperationDefinition(POAnnotationList annotations,
@@ -106,7 +106,7 @@ public class POImplicitOperationDefinition extends PODefinition
 		this.predef = predef;
 		this.postdef = postdef;
 		this.actualResult = actualResult;
-		this.stateDefinition = stateDefinition;
+		this.state = stateDefinition;
 		this.isConstructor = isConstructor;
 	}
 
@@ -199,9 +199,9 @@ public class POImplicitOperationDefinition extends PODefinition
 		{
 			if (postcondition != null)
 			{
-				ctxt.push(new POOperationDefinitionContext(this, false, stateDefinition));
+				ctxt.push(new POOperationDefinitionContext(this, false, state));
 				obligations.add(
-					new SatisfiabilityObligation(this, stateDefinition, ctxt));
+					new SatisfiabilityObligation(this, state, ctxt));
 				ctxt.pop();
 			}
 		}
