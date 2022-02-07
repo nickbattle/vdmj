@@ -66,11 +66,11 @@ public class LSPInitializeResponse extends JSONObject
 		JSONObject experimental = 
 				new JSONObject(
 						"translateProvider", new JSONObject(
-								"languageId", new JSONArray("latex", "word", "coverage", "graphviz", "isabelle"),
+								"languageId", new JSONArray("latex", "word", "coverage", "graphviz"),
 								"workDoneProgress", false),
 						"dapServer", new JSONObject("port", DAPServerSocket.getPort()));
 		
-		experimental.putAll(PluginRegistry.getInstance().getExperimentalOptions());
+		experimental.putAll(PluginRegistry.getInstance().getExperimentalOptions(experimental));
 		
 		cap.put("experimental", experimental);
 

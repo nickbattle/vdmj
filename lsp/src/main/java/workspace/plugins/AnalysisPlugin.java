@@ -76,8 +76,9 @@ abstract public class AnalysisPlugin
 	/**
 	 * All plugins can register experimental options that are sent back to the Client
 	 * in the experimental section of the initialize response.
+	 * @param standard 
 	 */
-	public JSONObject getExperimentalOptions()
+	public JSONObject getExperimentalOptions(JSONObject standard)
 	{
 		return new JSONObject();
 	}
