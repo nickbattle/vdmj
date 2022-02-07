@@ -31,13 +31,13 @@ import java.util.List;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
+import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.util.DependencyOrder;
 
@@ -84,12 +84,9 @@ public class TCPluginSL extends TCPlugin
 			TypeChecker tc = new ModuleTypeChecker(tcModuleList);
 			tc.typeCheck();
 		}
-		catch (InternalException e)
+		catch (TypeCheckException e)
 		{
-			if (e.number != 10)		// Too many errors
-			{
-				throw e;
-			}
+			TypeChecker.report(3430, e.getMessage(), e.location);
 		}
 		
 		if (TypeChecker.getErrorCount() > 0)

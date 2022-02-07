@@ -36,7 +36,6 @@ import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
-import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
@@ -189,14 +188,17 @@ abstract public class TypeChecker
 
 		if (!errors.contains(error))
 		{
-			errors.add(error);
-			lastMessage = error;
-
-    		if (errors.size() >= MAX-1)
-    		{
-    			errors.add(new VDMError(10, "Too many type checking errors", location));
-    			throw new InternalException(10, "Too many type checking errors");
-    		}
+			if (errors.size() < MAX)
+			{
+				errors.add(error);
+				lastMessage = error;
+	
+	    		if (errors.size() == MAX)
+	    		{
+	    			errors.add(new VDMError(10, "Too many type checking errors", location));
+	    			// throw new InternalException(10, "Too many type checking errors");
+	    		}
+			}
 		}
 		else
 		{
@@ -211,8 +213,17 @@ abstract public class TypeChecker
 
 		if (!warnings.contains(warning))
 		{
-			warnings.add(warning);
-			lastMessage = warning;
+			if (warnings.size() < MAX)
+			{
+				warnings.add(warning);
+				lastMessage = warning;
+
+				if (warnings.size() == MAX)
+	    		{
+	    			warnings.add(new VDMWarning(10, "Too many type checking warnings", location));
+	    			// throw new InternalException(10, "Too many type checking errors");
+	    		}
+			}
 		}
 		else
 		{
