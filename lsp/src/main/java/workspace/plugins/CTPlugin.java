@@ -103,7 +103,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 	}
 	
 	@Override
-	public JSONObject getExperimentalOptions()
+	public JSONObject getExperimentalOptions(JSONObject standard)
 	{
 		return new JSONObject("combinatorialTestProvider", new JSONObject("workDoneProgress", true));
 	}

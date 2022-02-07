@@ -105,7 +105,7 @@ public class PluginRegistry
 		return result;
 	}
 
-	public JSONObject getExperimentalOptions()
+	public JSONObject getExperimentalOptions(JSONObject standard)
 	{
 		JSONObject options = new JSONObject();
 		
@@ -113,7 +113,7 @@ public class PluginRegistry
 		{
 			try
 			{
-				options.putAll(plugin.getExperimentalOptions());
+				options.putAll(plugin.getExperimentalOptions(standard));
 			}
 			catch (Throwable e)
 			{

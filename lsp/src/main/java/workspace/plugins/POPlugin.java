@@ -73,7 +73,7 @@ abstract public class POPlugin extends AnalysisPlugin
 	}
 	
 	@Override
-	public JSONObject getExperimentalOptions()
+	public JSONObject getExperimentalOptions(JSONObject standard)
 	{
 		return new JSONObject("proofObligationProvider", true);
 	}
