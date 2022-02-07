@@ -686,7 +686,7 @@ public abstract class SyntaxReader
 	
 			if (warnings.size() == MAX)
 			{
-				errors.add(new VDMError(9, "Too many warnings", location));
+				warnings.add(new VDMWarning(9, "Too many warnings", location));
 				// throw new InternalException(9, "Too many warnings");
 			}
 		}

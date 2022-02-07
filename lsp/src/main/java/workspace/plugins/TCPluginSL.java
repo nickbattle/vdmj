@@ -31,7 +31,6 @@ import java.util.List;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -88,13 +87,6 @@ public class TCPluginSL extends TCPlugin
 		catch (TypeCheckException e)
 		{
 			TypeChecker.report(3430, e.getMessage(), e.location);
-		}
-		catch (InternalException e)
-		{
-			if (e.number != 10)		// Too many errors
-			{
-				throw e;
-			}
 		}
 		
 		if (TypeChecker.getErrorCount() > 0)
