@@ -56,6 +56,7 @@ import com.fujitsu.vdmj.ast.types.ASTSetType;
 import com.fujitsu.vdmj.ast.types.ASTTokenType;
 import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.ast.types.ASTTypeList;
+import com.fujitsu.vdmj.ast.types.ASTTypeSet;
 import com.fujitsu.vdmj.ast.types.ASTUnionType;
 import com.fujitsu.vdmj.ast.types.ASTUnknownType;
 import com.fujitsu.vdmj.ast.types.ASTUnresolvedType;
@@ -128,16 +129,25 @@ public class TypeReader extends SyntaxReader
 	private ASTType readUnionType()
 		throws ParserException, LexException
 	{
+		LexToken token = lastToken();
 		ASTType type = readProductType();
+		ASTTypeSet union = new ASTTypeSet();
+		union.add(type);
 
 		while (lastToken().type == Token.PIPE)
 		{
-			LexToken token = lastToken();
 			nextToken();
-			type = new ASTUnionType(token.location, type, readProductType());
+			union.add(readProductType());
 		}
 
-		return type;
+		if (union.size() == 1)
+		{
+			return type;
+		}
+		else
+		{
+			return new ASTUnionType(token.location, union);
+		}
 	}
 
 	private ASTType readProductType()

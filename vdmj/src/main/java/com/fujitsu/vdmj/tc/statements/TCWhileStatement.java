@@ -72,6 +72,11 @@ public class TCWhileStatement extends TCStatement
 		{
 			qenv = new FlatEnvironment(qualified, env);
 		}
+		
+		if (exp instanceof TCBooleanLiteralExpression)
+		{
+			mandatory = false;	// while true and while false effectively suppress constraints
+		}
 
 		TCType stype = statement.typeCheck(qenv, scope, constraint, mandatory);
 		
