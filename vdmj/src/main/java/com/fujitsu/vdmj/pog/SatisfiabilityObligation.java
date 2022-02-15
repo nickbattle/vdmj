@@ -120,7 +120,7 @@ public class SatisfiabilityObligation extends ProofObligation
 		if (typedef.type instanceof TCNamedType)
 		{
 			TCNamedType nt = (TCNamedType)typedef.type;
-			sb.append(nt.type);
+			sb.append(explicitType(nt.type, typedef.location));
 		}
 		else
 		{

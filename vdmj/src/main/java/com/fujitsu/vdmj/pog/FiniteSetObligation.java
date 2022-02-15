@@ -40,7 +40,7 @@ public class FiniteSetObligation extends ProofObligation
 		String findex = getVar("findex");
 
 		sb.append("exists " + finmap + ":map nat to (");
-		sb.append(settype.setof);
+		sb.append(explicitType(settype.setof, exp.location));
 		sb.append(") &\n");
 		sb.append("  forall ");
 		String prefix = "";
