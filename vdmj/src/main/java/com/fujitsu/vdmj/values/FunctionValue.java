@@ -762,6 +762,29 @@ public class FunctionValue extends Value
 		copy.typeValues = typeValues;
 		return copy;
 	}
+	
+	/**
+	 * Add context variables to this Function and any pre/post values.
+	 */
+	public void addFreeVariables(Context free)
+	{
+		if (freeVariables == null)
+		{
+			freeVariables = new Context(location, name, null);
+		}
+
+		freeVariables.putAll(free);
+		
+		if (precondition != null)
+		{
+			precondition.addFreeVariables(free);
+		}
+		
+		if (postcondition != null)
+		{
+			postcondition.addFreeVariables(free);
+		}
+	}
 
 	public String toTitle()
 	{
