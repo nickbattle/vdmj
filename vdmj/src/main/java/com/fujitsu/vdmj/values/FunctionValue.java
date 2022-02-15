@@ -558,6 +558,11 @@ public class FunctionValue extends Value
 				}
 				
 				argList.addAll(argValues);
+				
+				if (freeVariables != null)
+				{
+					evalContext.putAll(freeVariables);	// Pass free vars along chain
+				}
 
     			FunctionValue rv = new FunctionValue(location, "curried",
     				(TCFunctionType)type.result,
