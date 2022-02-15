@@ -104,7 +104,7 @@ public class Properties
 	public static String debug_link_class = null;
 	
 	/** The size limit for power set expressions */
-	public static int in_powerset_limit = 100;
+	public static int in_powerset_limit = 30;
 	
 	/**
 	 * When the class is initialized, which uses the vdmj.properties file, and any System
