@@ -28,7 +28,9 @@ import java.util.List;
 
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
@@ -70,6 +72,10 @@ public class INPowerSetExpression extends INUnaryExpression
 		catch (ValueException e)
 		{
 			return abort(e);
+		}
+		catch (InternalException e)		// From powerSet
+		{
+			throw new ContextException(e.number, e.getMessage(), location, ctxt);
 		}
 	}
 
