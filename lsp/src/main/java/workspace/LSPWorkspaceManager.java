@@ -413,7 +413,14 @@ public class LSPWorkspaceManager
 			{
 				if (i.isDirectory())
 				{
-					if (path.startsWith(i.getAbsolutePath()))
+					String folder = i.getAbsolutePath();
+					
+					if (!folder.endsWith(File.separator))
+					{
+						folder = folder + File.separator;
+					}
+					
+					if (path.startsWith(folder))		// ie. within the folder
 					{
 						return true;
 					}
@@ -504,12 +511,12 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Diag.info("Ignoring dot path file", file);
+			Diag.info("Ignoring %s dot path file", file);
 			return null;
 		}
 		else if (ignoredFile(file))
 		{
-			Diag.info("Ignoring file in vdmignore", file);
+			Diag.info("Ignoring file %s in vdmignore", file);
 			return null;			
 		}
 		else if (!projectFiles.keySet().contains(file))
@@ -552,11 +559,11 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Diag.info("Ignoring dot path file", file);
+			Diag.info("Ignoring %s dot path file", file);
 		}
 		else if (ignoredFile(file))
 		{
-			Diag.info("Ignoring file in vdmignore", file);			
+			Diag.info("Ignoring %s file in vdmignore", file);			
 		}
 		else if (!projectFiles.keySet().contains(file))
 		{
@@ -579,12 +586,12 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Diag.info("Ignoring dot path file", file);
+			Diag.info("Ignoring %s dot path file", file);
 			return null;
 		}
 		else if (ignoredFile(file))
 		{
-			Diag.info("Ignoring file in vdmignore", file);
+			Diag.info("Ignoring %s file in vdmignore", file);
 			return null;			
 		}
 		else if (!projectFiles.keySet().contains(file))
@@ -661,12 +668,12 @@ public class LSPWorkspaceManager
 				}
 				else if (ignoreDotPath)
 				{
-					Diag.info("Ignoring file on dot path: %s", file);
+					Diag.info("Ignoring file %s on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (ignoredFile(file))
 				{
-					Diag.info("Ignoring file in vdmignore", file);
+					Diag.info("Ignoring %s file in vdmignore", file);
 					actionCode = DO_NOTHING;			
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
@@ -715,12 +722,12 @@ public class LSPWorkspaceManager
 				}
 				else if (ignoreDotPath)
 				{
-					Diag.info("Ignoring file on dot path: %s", file);
+					Diag.info("Ignoring %s file on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (ignoredFile(file))
 				{
-					Diag.info("Ignoring file in vdmignore", file);
+					Diag.info("Ignoring %s file in vdmignore", file);
 					actionCode = DO_NOTHING;			
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
@@ -790,11 +797,11 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Diag.info("Ignoring dot path file", file);
+			Diag.info("Ignoring %s dot path file", file);
 		}
 		else if (ignoredFile(file))
 		{
-			Diag.info("Ignoring file in vdmignore", file);
+			Diag.info("Ignoring file %s in vdmignore", file);
 		}
 		else if (!projectFiles.keySet().contains(file))
 		{
@@ -817,6 +824,11 @@ public class LSPWorkspaceManager
 
 	public RPCMessageList findDefinition(RPCRequest request, File file, int zline, int zcol)
 	{
+		if (ignoredFile(file))
+		{
+			return new RPCMessageList(request, null);
+		}
+		
 		TCDefinition def = findDefinition(file, zline, zcol);
 		
 		if (def == null)
@@ -860,6 +872,12 @@ public class LSPWorkspaceManager
 			CompletionTriggerKind triggerKind, File file, int zline, int zcol)
 	{
 		HashMap<String, JSONObject> labels = new HashMap<String, JSONObject>();
+		
+		if (ignoredFile(file))
+		{
+			return new RPCMessageList(request, new JSONArray());
+		}
+		
 		TCDefinition def = findDefinition(file, zline, zcol - 2);
 	
 		if (def != null)
@@ -1004,6 +1022,11 @@ public class LSPWorkspaceManager
 
 	public RPCMessageList documentSymbols(RPCRequest request, File file)
 	{
+		if (ignoredFile(file))
+		{
+			return new RPCMessageList(request, new JSONArray());
+		}
+
 		TCPlugin tc = registry.getPlugin("TC");
 		JSONArray results = tc.documentSymbols(file);
 
@@ -1024,6 +1047,11 @@ public class LSPWorkspaceManager
 	
 	public RPCMessageList codeLens(RPCRequest request, File file)
 	{
+		if (ignoredFile(file))
+		{
+			return new RPCMessageList(request, new JSONArray());
+		}
+
 		ASTPlugin ast = registry.getPlugin("AST");
 		JSONArray lenses = registry.applyCodeLenses(file, ast.isDirty());
 		return new RPCMessageList(request, lenses);
