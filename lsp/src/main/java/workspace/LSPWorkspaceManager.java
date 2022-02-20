@@ -824,7 +824,7 @@ public class LSPWorkspaceManager
 
 	public RPCMessageList findDefinition(RPCRequest request, File file, int zline, int zcol)
 	{
-		if (ignoredFile(file))
+		if (onDotPath(file) || ignoredFile(file))
 		{
 			return new RPCMessageList(request, null);
 		}
@@ -873,7 +873,7 @@ public class LSPWorkspaceManager
 	{
 		HashMap<String, JSONObject> labels = new HashMap<String, JSONObject>();
 		
-		if (ignoredFile(file))
+		if (onDotPath(file) || ignoredFile(file))
 		{
 			return new RPCMessageList(request, new JSONArray());
 		}
@@ -1022,7 +1022,7 @@ public class LSPWorkspaceManager
 
 	public RPCMessageList documentSymbols(RPCRequest request, File file)
 	{
-		if (ignoredFile(file))
+		if (onDotPath(file) || ignoredFile(file))
 		{
 			return new RPCMessageList(request, new JSONArray());
 		}
@@ -1047,7 +1047,7 @@ public class LSPWorkspaceManager
 	
 	public RPCMessageList codeLens(RPCRequest request, File file)
 	{
-		if (ignoredFile(file))
+		if (onDotPath(file) || ignoredFile(file))
 		{
 			return new RPCMessageList(request, new JSONArray());
 		}
