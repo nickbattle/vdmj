@@ -668,7 +668,7 @@ public class LSPWorkspaceManager
 				}
 				else if (ignoreDotPath)
 				{
-					Diag.info("Ignoring file %s on dot path: %s", file);
+					Diag.info("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (ignoredFile(file))
@@ -722,7 +722,7 @@ public class LSPWorkspaceManager
 				}
 				else if (ignoreDotPath)
 				{
-					Diag.info("Ignoring %s file on dot path: %s", file);
+					Diag.info("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (ignoredFile(file))
