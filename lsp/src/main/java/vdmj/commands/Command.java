@@ -29,8 +29,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPResponse;
-import json.JSONObject;
 import workspace.Diag;
 import workspace.PluginRegistry;
 
@@ -91,11 +89,6 @@ abstract public class Command
 	public abstract DAPMessageList run(DAPRequest request);
 
 	public abstract boolean notWhenRunning();
-	
-	protected DAPResponse stdout(String message)
-	{
-		return new DAPResponse("output", new JSONObject("output", message));
-	}
 	
 	protected void pause(long ms)
 	{

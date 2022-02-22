@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
@@ -111,6 +112,12 @@ public class LSPXWorkspaceManager
 				try
 				{
 					Class<?> clazz = Class.forName(plugin);
+					
+					if (Modifier.isAbstract(clazz.getModifiers()))
+					{
+						Diag.severe("Plugin class is abstract: %s", clazz.getName());
+						continue;
+					}
 
 					try
 					{

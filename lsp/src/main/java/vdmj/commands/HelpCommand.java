@@ -77,11 +77,14 @@ public class HelpCommand extends Command
 			}
 		}
 		
-		for (String[] help: PluginRegistry.getInstance().getCommandHelp())
+		for (String[][] phelp: PluginRegistry.getInstance().getCommandHelp())
 		{
-			if (command == null || command.equals(help[0]))
+			for (String[] help: phelp)
 			{
-				sb.append(help[1] + "\n");
+				if (command == null || command.equals(help[0]))
+				{
+					sb.append(help[1] + "\n");
+				}
 			}
 		}
 

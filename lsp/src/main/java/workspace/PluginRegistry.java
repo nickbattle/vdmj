@@ -179,15 +179,16 @@ public class PluginRegistry
 		return result;
 	}
 	
-	public List<String[]> getCommandHelp()
+	public List<String[][]> getCommandHelp()
 	{
-		List<String[]> result = new Vector<String[]>();
+		List<String[][]> result = new Vector<String[][]>();
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			try
 			{
-				result.addAll(plugin.getCommandHelp());
+				String[][] messages = plugin.getCommandHelp();
+				result.add(messages);
 			}
 			catch (Throwable e)
 			{

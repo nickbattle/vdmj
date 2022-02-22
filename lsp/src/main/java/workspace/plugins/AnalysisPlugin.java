@@ -111,11 +111,11 @@ abstract public class AnalysisPlugin
 	}
 
 	/**
-	 * Returns a list of String arrays for Command help. The first string is the
+	 * Returns an array of String arrays for Command help. The first string is the
 	 * simple name of the command, the 2nd is the detail of the usage. 
 	 */
-	public List<String[]> getCommandHelp()
+	public String[][] getCommandHelp()
 	{
-		return new Vector<String[]>();
+		return new String[0][0];
 	}
 }
