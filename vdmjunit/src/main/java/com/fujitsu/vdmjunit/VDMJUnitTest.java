@@ -113,6 +113,9 @@ public abstract class VDMJUnitTest
 		}
 	}
 
+	/**
+	 * Return a list of warnings raised by readSpecification.
+	 */
 	protected static List<VDMWarning> getWarnings()
 	{
 		if (reader != null)

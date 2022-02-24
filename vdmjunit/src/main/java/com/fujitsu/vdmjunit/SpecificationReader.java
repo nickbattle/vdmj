@@ -134,7 +134,7 @@ abstract public class SpecificationReader
 	protected abstract Interpreter readSpecification(Charset charset, List<File> list) throws Exception;
 
 	/**
-	 * Return the syntax and type checking errors from readSpecification
+	 * Return the syntax and type checking errors from the last readSpecification
 	 * @return a list of errors
 	 */
 	public List<VDMError> getErrors()
@@ -142,6 +142,10 @@ abstract public class SpecificationReader
 		return errors;
 	}
 
+	/**
+	 * Return the warnings from the last readSpecification
+	 * @return a list of warnings
+	 */
 	public List<VDMWarning> getWarnings()
 	{
 		return warnings;
