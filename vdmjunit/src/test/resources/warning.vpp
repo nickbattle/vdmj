@@ -1,0 +1,5 @@
+class A
+instance variables
+	iv:nat -- warning not initialized
+
+end A

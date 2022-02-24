@@ -47,7 +47,7 @@ abstract public class VDMJUnitTestPP extends VDMJUnitTest
 	 */
 	protected static void readSpecification(Charset charset, String... files) throws Exception
 	{
-		SpecificationReader reader = new OOSpecificationReader(Dialect.VDM_PP);
+		reader = new OOSpecificationReader(Dialect.VDM_PP);
 		interpreter = reader.readSpecification(charset, files);
 	}
 

@@ -33,7 +33,9 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
 /**
@@ -41,6 +43,9 @@ import com.fujitsu.vdmj.runtime.Interpreter;
  */
 abstract public class SpecificationReader
 {
+	protected List<VDMError> errors = new Vector<VDMError>();
+	protected List<VDMWarning> warnings = new Vector<VDMWarning>();
+
 	/**
 	 * Construct a SpecificationReader for a particular VDM dialect.
 	 * 
@@ -117,4 +122,18 @@ abstract public class SpecificationReader
 	 * @throws Exception
 	 */
 	protected abstract Interpreter readSpecification(Charset charset, List<File> list) throws Exception;
+
+	/**
+	 * Return the syntax and type checking errors from readSpecification
+	 * @return a list of errors
+	 */
+	public List<VDMError> getErrors()
+	{
+		return errors;
+	}
+
+	public List<VDMWarning> getWarnings()
+	{
+		return warnings;
+	}
 }

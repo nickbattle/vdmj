@@ -45,6 +45,7 @@ import com.fujitsu.vdmj.syntax.ClassReader;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
+import com.fujitsu.vdmj.typechecker.TypeChecker;
 
 /**
  * Read a VDM++ or VDM-RT specifications.
@@ -70,6 +71,9 @@ public class OOSpecificationReader extends SpecificationReader
 			ClassReader reader = new ClassReader(lexer);
 			parsedClasses.addAll(reader.readClasses());
 			
+			errors.addAll(reader.getErrors());
+			warnings.addAll(reader.getWarnings());
+			
 			if (reader.getErrorCount() > 0)
 			{
 				printMessages(reader.getErrors());
@@ -87,6 +91,9 @@ public class OOSpecificationReader extends SpecificationReader
 		ClassTypeChecker checker = new ClassTypeChecker(checkedClasses);
 		checker.typeCheck();
 		
+		errors.addAll(TypeChecker.getErrors());
+		warnings.addAll(TypeChecker.getWarnings());
+
 		if (ClassTypeChecker.getErrorCount() > 0)
 		{
 			printMessages(ClassTypeChecker.getErrors());

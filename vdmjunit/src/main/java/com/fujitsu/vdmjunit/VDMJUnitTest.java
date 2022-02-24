@@ -27,10 +27,14 @@ package com.fujitsu.vdmjunit;
 import static org.junit.Assert.fail;
 
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.VDMError;
+import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -49,6 +53,9 @@ public abstract class VDMJUnitTest
 	
 	/** True if the init() method has been called. */
 	private static boolean initialized = false;
+	
+	/** The reader used to parse the spec */
+	protected static SpecificationReader reader;
 	
 	/**
 	 * Set the release of VDM before parsing. The release is either CLASSIC
@@ -89,6 +96,33 @@ public abstract class VDMJUnitTest
 	protected static void readSpecification(Charset charset, String... files) throws Exception
 	{
 		fail("Implemented in subclasses only");
+	}
+	
+	/**
+	 * Return a list of syntax or type checking errors raised by readSpecification.
+	 */
+	protected static List<VDMError> getErrors()
+	{
+		if (reader != null)
+		{
+			return reader.getErrors();
+		}
+		else
+		{
+			return new Vector<VDMError>();
+		}
+	}
+
+	protected static List<VDMWarning> getWarnings()
+	{
+		if (reader != null)
+		{
+			return reader.getWarnings();
+		}
+		else
+		{
+			return new Vector<VDMWarning>();
+		}
 	}
 
 	/**

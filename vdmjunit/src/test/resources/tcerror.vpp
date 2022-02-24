@@ -1,0 +1,5 @@
+class A
+values
+	Z : nat = "oops!";	-- TC error
+
+end A

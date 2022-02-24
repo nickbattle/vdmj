@@ -69,6 +69,9 @@ public class SLSpecificationReader extends SpecificationReader
 			ModuleReader reader = new ModuleReader(lexer);
 			parsedModules.addAll(reader.readModules());
 			
+			errors.addAll(reader.getErrors());
+			warnings.addAll(reader.getWarnings());
+			
 			if (reader.getErrorCount() > 0)
 			{
 				printMessages(reader.getErrors());
@@ -79,7 +82,10 @@ public class SLSpecificationReader extends SpecificationReader
 		TCModuleList checkedModules = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedModules);
 		TypeChecker checker = new ModuleTypeChecker(checkedModules);
 		checker.typeCheck();
-		
+
+		errors.addAll(TypeChecker.getErrors());
+		warnings.addAll(TypeChecker.getWarnings());
+
 		if (ModuleTypeChecker.getErrorCount() > 0)
 		{
 			printMessages(ModuleTypeChecker.getErrors());

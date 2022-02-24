@@ -24,27 +24,34 @@
 
 package com.fujitsu.vdmjunit;
 
-import java.nio.charset.Charset;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-/**
- * The VDMJUnit class for testing VDM-SL specifications.
- */
-abstract public class VDMJUnitTestSL extends VDMJUnitTest
+import org.junit.Test;
+import com.fujitsu.vdmjunit.VDMJUnitTestPP;
+
+public class ErrorTest extends VDMJUnitTestPP
 {
-	/**
-	 * @see com.fujitsu.vdmjunit.VDMJUnitTest#readSpecification(String...)
-	 */
-	protected static void readSpecification(String... files) throws Exception
+	@Test
+	public void warning() throws Exception
 	{
-		readSpecification(Charset.defaultCharset(), files);
+		readSpecification("warning.vpp");
+		assertTrue(getErrors().isEmpty());
+		assertTrue(getWarnings().size() == 1);
 	}
-
-	/**
-	 * @see com.fujitsu.vdmjunit.VDMJUnitTest#readSpecification(Charset, String...)
-	 */
-	protected static void readSpecification(Charset charset, String... files) throws Exception
+	
+	@Test
+	public void tcerror() throws Exception
 	{
-		reader = new SLSpecificationReader();
-		interpreter = reader.readSpecification(charset, files);
+		try
+		{
+			readSpecification("tcerror.vpp");
+			fail("Expecting read to fail!");
+		}
+		catch (AssertionError e)
+		{
+			assertTrue(getErrors().size() == 2);
+			assertTrue(getWarnings().isEmpty());
+		}
 	}
 }
