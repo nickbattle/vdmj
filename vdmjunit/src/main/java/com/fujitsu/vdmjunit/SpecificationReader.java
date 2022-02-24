@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.util.GetResource;
 
 /**
  * The abstract parent class of all specification readers.
@@ -92,7 +93,16 @@ abstract public class SpecificationReader
 				throw new FileNotFoundException(filename);
 			}
 			
-			File file = new File(url.getFile());
+			File file = null;
+			
+			if (url.getProtocol().equals("jar"))
+			{
+				file = GetResource.load(new File("/" + filename));
+			}
+			else
+			{
+				file = new File(url.toURI());
+			}
 			
 			if (file.isDirectory())
 			{
