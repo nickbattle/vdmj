@@ -87,7 +87,11 @@ public class LSPWorkspaceManager
 	private Map<File, StringBuilder> projectFiles = new LinkedHashMap<File, StringBuilder>();
 	private Set<File> openFiles = new HashSet<File>();
 	private boolean orderedFiles = false;
+	private Set<File> ignores = new HashSet<File>();
 	
+	private static final String ORDERING = ".vscode/ordering";
+	private static final String VDMIGNORE = ".vscode/vdmignore";
+
 	private LSPWorkspaceManager()
 	{
 		registry = PluginRegistry.getInstance();
@@ -243,11 +247,11 @@ public class LSPWorkspaceManager
 			))));
 	}
 	
-	private static final String ORDERING = ".vscode/ordering";
-
 	private void loadAllProjectFiles() throws IOException
 	{
 		projectFiles.clear();
+		loadVDMIgnore();
+		
 		File ordering = new File(rootUri, ORDERING);
 		orderedFiles = ordering.exists();
 		
@@ -292,6 +296,42 @@ public class LSPWorkspaceManager
 		}
 	}
 
+	private void loadVDMIgnore() throws IOException
+	{
+		File ignoreFile = new File(rootUri, VDMIGNORE);
+		ignores.clear();
+		
+		if (ignoreFile.exists())
+		{
+			Diag.info("Reading " + VDMIGNORE);
+			BufferedReader br = null;
+	
+			try
+			{
+				br = new BufferedReader(new FileReader(ignoreFile));
+				String source = br.readLine();
+				
+				while (source != null)
+				{
+					// Use canonical file to allow "./folder/file"
+					File file = new File(rootUri, source).getCanonicalFile();
+					ignores.add(file);
+					Diag.info("Ignoring %s", file);
+					source = br.readLine();
+				}
+			}
+			catch (IOException e)
+			{
+				Diag.error(e);
+				Diag.error("Cannot read " + VDMIGNORE);
+			}
+			finally
+			{
+				if (br != null)	br.close();
+			}
+		}
+	}
+
 	private void loadProjectFiles(File root) throws IOException
 	{
 		FilenameFilter filter = getFilenameFilter();
@@ -302,6 +342,10 @@ public class LSPWorkspaceManager
 			if (onDotPath(file))
 			{
 				continue;	// ignore .generated, .vscode etc
+			}
+			if (ignoredFile(file))
+			{
+				continue;	// ignore files in VDMIGNORE
 			}
 			else if (file.isDirectory())
 			{
@@ -349,6 +393,38 @@ public class LSPWorkspaceManager
 			if (!part.isEmpty() && part.charAt(0) == '.')
 			{
 				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	private boolean ignoredFile(File file)
+	{
+		if (ignores.contains(file))
+		{
+			return true;
+		}
+		else
+		{
+			String path = file.getAbsolutePath();
+			
+			for (File i: ignores)
+			{
+				if (i.isDirectory())
+				{
+					String folder = i.getAbsolutePath();
+					
+					if (!folder.endsWith(File.separator))
+					{
+						folder = folder + File.separator;
+					}
+					
+					if (path.startsWith(folder))		// ie. within the folder
+					{
+						return true;
+					}
+				}
 			}
 		}
 		
@@ -435,10 +511,15 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Diag.info("Ignoring dot path file", file);
+			Diag.info("Ignoring %s dot path file", file);
 			return null;
 		}
-		if (!projectFiles.keySet().contains(file))
+		else if (ignoredFile(file))
+		{
+			Diag.info("Ignoring file %s in vdmignore", file);
+			return null;			
+		}
+		else if (!projectFiles.keySet().contains(file))
 		{
 			Diag.info("Opening new file: %s", file);
 			openFiles.add(file);
@@ -478,7 +559,11 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Diag.info("Ignoring dot path file", file);
+			Diag.info("Ignoring %s dot path file", file);
+		}
+		else if (ignoredFile(file))
+		{
+			Diag.info("Ignoring %s file in vdmignore", file);			
 		}
 		else if (!projectFiles.keySet().contains(file))
 		{
@@ -501,8 +586,13 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Diag.info("Ignoring dot path file", file);
+			Diag.info("Ignoring %s dot path file", file);
 			return null;
+		}
+		else if (ignoredFile(file))
+		{
+			Diag.info("Ignoring %s file in vdmignore", file);
+			return null;			
 		}
 		else if (!projectFiles.keySet().contains(file))
 		{
@@ -566,15 +656,25 @@ public class LSPWorkspaceManager
 					Diag.info("New directory created: %s", file);
 					actionCode = DO_NOTHING;
 				}
+				else if (file.equals(new File(rootUri, ORDERING)))
+				{
+					Diag.info("Created ordering file, rebuilding");
+					actionCode = RELOAD_AND_CHECK;
+				}
+				else if (file.equals(new File(rootUri, VDMIGNORE)))
+				{
+					Diag.info("Created vdmignore file, rebuilding");
+					actionCode = RELOAD_AND_CHECK;
+				}
 				else if (ignoreDotPath)
 				{
 					Diag.info("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
-				else if (file.equals(new File(rootUri, ORDERING)))
+				else if (ignoredFile(file))
 				{
-					Diag.info("Created ordering file, rebuilding");
-					actionCode = RELOAD_AND_CHECK;
+					Diag.info("Ignoring %s file in vdmignore", file);
+					actionCode = DO_NOTHING;			
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
@@ -610,15 +710,25 @@ public class LSPWorkspaceManager
 					Diag.info("Directory changed: %s", file);
 					actionCode = DO_NOTHING;
 				}
+				else if (file.equals(new File(rootUri, ORDERING)))
+				{
+					Diag.info("Changed ordering file, rebuilding");
+					actionCode = RELOAD_AND_CHECK;
+				}
+				else if (file.equals(new File(rootUri, VDMIGNORE)))
+				{
+					Diag.info("Changed vdmignore file, rebuilding");
+					actionCode = RELOAD_AND_CHECK;
+				}
 				else if (ignoreDotPath)
 				{
 					Diag.info("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
-				else if (file.equals(new File(rootUri, ORDERING)))
+				else if (ignoredFile(file))
 				{
-					Diag.info("Updated ordering file, rebuilding");
-					actionCode = RELOAD_AND_CHECK;
+					Diag.info("Ignoring %s file in vdmignore", file);
+					actionCode = DO_NOTHING;			
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
@@ -687,7 +797,11 @@ public class LSPWorkspaceManager
 	{
 		if (onDotPath(file))
 		{
-			Diag.info("Ignoring dot path file", file);
+			Diag.info("Ignoring %s dot path file", file);
+		}
+		else if (ignoredFile(file))
+		{
+			Diag.info("Ignoring file %s in vdmignore", file);
 		}
 		else if (!projectFiles.keySet().contains(file))
 		{
@@ -710,6 +824,11 @@ public class LSPWorkspaceManager
 
 	public RPCMessageList findDefinition(RPCRequest request, File file, int zline, int zcol)
 	{
+		if (onDotPath(file) || ignoredFile(file))
+		{
+			return new RPCMessageList(request, null);
+		}
+		
 		TCDefinition def = findDefinition(file, zline, zcol);
 		
 		if (def == null)
@@ -753,6 +872,12 @@ public class LSPWorkspaceManager
 			CompletionTriggerKind triggerKind, File file, int zline, int zcol)
 	{
 		HashMap<String, JSONObject> labels = new HashMap<String, JSONObject>();
+		
+		if (onDotPath(file) || ignoredFile(file))
+		{
+			return new RPCMessageList(request, new JSONArray());
+		}
+		
 		TCDefinition def = findDefinition(file, zline, zcol - 2);
 	
 		if (def != null)
@@ -897,6 +1022,11 @@ public class LSPWorkspaceManager
 
 	public RPCMessageList documentSymbols(RPCRequest request, File file)
 	{
+		if (onDotPath(file) || ignoredFile(file))
+		{
+			return new RPCMessageList(request, new JSONArray());
+		}
+
 		TCPlugin tc = registry.getPlugin("TC");
 		JSONArray results = tc.documentSymbols(file);
 
@@ -917,6 +1047,11 @@ public class LSPWorkspaceManager
 	
 	public RPCMessageList codeLens(RPCRequest request, File file)
 	{
+		if (onDotPath(file) || ignoredFile(file))
+		{
+			return new RPCMessageList(request, new JSONArray());
+		}
+
 		ASTPlugin ast = registry.getPlugin("AST");
 		JSONArray lenses = registry.applyCodeLenses(file, ast.isDirty());
 		return new RPCMessageList(request, lenses);

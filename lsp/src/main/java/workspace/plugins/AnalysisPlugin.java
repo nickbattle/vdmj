@@ -34,6 +34,7 @@ import lsp.LSPMessageUtils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import vdmj.commands.Command;
 import workspace.lenses.CodeLens;
 
 abstract public class AnalysisPlugin
@@ -98,5 +99,23 @@ abstract public class AnalysisPlugin
 	public JSONArray applyCodeLenses(File file, boolean dirty)
 	{
 		return new JSONArray();
+	}
+
+	/**
+	 * Plugins can return Commands to execute in the console. They are passed
+	 * the whole command line, so that they can process arguments.
+	 */
+	public Command getCommand(String line)
+	{
+		return null;
+	}
+
+	/**
+	 * Returns an array of String arrays for Command help. The first string is the
+	 * simple name of the command, the 2nd is the detail of the usage. 
+	 */
+	public String[][] getCommandHelp()
+	{
+		return new String[0][0];
 	}
 }

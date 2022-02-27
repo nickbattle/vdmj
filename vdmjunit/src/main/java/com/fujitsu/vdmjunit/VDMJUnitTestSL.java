@@ -44,7 +44,7 @@ abstract public class VDMJUnitTestSL extends VDMJUnitTest
 	 */
 	protected static void readSpecification(Charset charset, String... files) throws Exception
 	{
-		SpecificationReader reader = new SLSpecificationReader();
+		reader = new SLSpecificationReader();
 		interpreter = reader.readSpecification(charset, files);
 	}
 }

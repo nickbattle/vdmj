@@ -51,9 +51,9 @@ public class InvariantObligation extends ProofObligation
 		sb.append("is_(");
 		sb.append(exp.exp);
 		sb.append(", inmap ");
-		sb.append(exp.type.from);
+		sb.append(explicitType(exp.type.from, exp.location));
 		sb.append(" to ");
-		sb.append(exp.type.to);
+		sb.append(explicitType(exp.type.to, exp.location));
 		sb.append(")");
 
 		value = ctxt.getObligation(sb.toString());

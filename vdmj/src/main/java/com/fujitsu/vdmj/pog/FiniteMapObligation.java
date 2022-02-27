@@ -39,7 +39,7 @@ public class FiniteMapObligation extends ProofObligation
 		String findex = getVar("findex");
 
 		sb.append("exists " + finmap + ":map nat to (");
-		sb.append(maptype);
+		sb.append(explicitType(maptype, exp.location));
 		sb.append(") &\n  forall ");
 		String prefix = "";
 

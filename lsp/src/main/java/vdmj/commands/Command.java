@@ -29,9 +29,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPResponse;
-import json.JSONObject;
 import workspace.Diag;
+import workspace.PluginRegistry;
 
 abstract public class Command
 {
@@ -54,8 +53,18 @@ abstract public class Command
 		}
 		catch (ClassNotFoundException e)
 		{
-			Diag.error(e);
-			return new ErrorCommand("Unknown command '" + name.toLowerCase() + "'. Try help");
+			Diag.info("Trying to load command %s from plugins", name);
+			Command cmd = PluginRegistry.getInstance().getCommand(line);
+			
+			if (cmd != null)
+			{
+				return cmd;
+			}
+			else
+			{
+				Diag.error(e);
+				return new ErrorCommand("Unknown command '" + name.toLowerCase() + "'. Try help");
+			}
 		}
 		catch (InvocationTargetException e)
 		{
@@ -80,11 +89,6 @@ abstract public class Command
 	public abstract DAPMessageList run(DAPRequest request);
 
 	public abstract boolean notWhenRunning();
-	
-	protected DAPResponse stdout(String message)
-	{
-		return new DAPResponse("output", new JSONObject("output", message));
-	}
 	
 	protected void pause(long ms)
 	{

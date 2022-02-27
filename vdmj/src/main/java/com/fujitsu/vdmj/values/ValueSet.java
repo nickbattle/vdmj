@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.traces.PermuteArray;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -183,6 +185,11 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 
 	public List<ValueSet> powerSet()
 	{
+   		if (size() > Properties.in_powerset_limit)
+		{
+			throw new InternalException(4176, "Cannot evaluate power set of size " + size());
+		}
+		
 		List<ValueSet> sets = new Vector<ValueSet>(2^size());
 
 		if (isEmpty())

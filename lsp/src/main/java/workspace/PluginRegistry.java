@@ -26,9 +26,13 @@ package workspace;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
+
 import json.JSONArray;
 import json.JSONObject;
+import vdmj.commands.Command;
 import workspace.plugins.AnalysisPlugin;
 
 public class PluginRegistry
@@ -143,5 +147,56 @@ public class PluginRegistry
 		}
 		
 		return commands;
+	}
+	
+	public Command getCommand(String line)
+	{
+		Command result = null;
+		
+		for (AnalysisPlugin plugin: plugins.values())
+		{
+			try
+			{
+				Command c = plugin.getCommand(line);
+				
+				if (c != null)
+				{
+					if (result != null)
+					{
+						Diag.error("Multiple plugins support %s", line);
+					}
+					
+					result = c;
+				}
+			}
+			catch (Throwable e)
+			{
+				Diag.error("Exception in %s getCommand", plugin.getName());
+				Diag.error(e);
+			}
+		}
+		
+		return result;
+	}
+	
+	public List<String[][]> getCommandHelp()
+	{
+		List<String[][]> result = new Vector<String[][]>();
+		
+		for (AnalysisPlugin plugin: plugins.values())
+		{
+			try
+			{
+				String[][] messages = plugin.getCommandHelp();
+				result.add(messages);
+			}
+			catch (Throwable e)
+			{
+				Diag.error("Exception in %s getCommandHelp", plugin.getName());
+				Diag.error(e);
+			}
+		}
+		
+		return result;
 	}
 }

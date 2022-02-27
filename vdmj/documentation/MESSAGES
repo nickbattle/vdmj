@@ -934,6 +934,7 @@ as the expected and actual values.
 4173, "Unknown annotation @<name>"
 4174, "Stack overflow"
 4175, "Execution cancelled"
+4176, "Cannot evaluate power set of size <n>"
 
 
 5000, "Definition <name> not used"

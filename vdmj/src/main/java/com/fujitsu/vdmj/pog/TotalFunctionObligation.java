@@ -123,7 +123,7 @@ public class TotalFunctionObligation extends ProofObligation
 		sb.append("is_(");
 		sb.append(fapply);
 		sb.append(", ");
-		sb.append(ftype.result);
+		sb.append(explicitType(ftype.result, def.location));
 		sb.append(")");
 
 		return sb.toString();

@@ -53,7 +53,7 @@ public class CasesExhaustiveObligation extends ProofObligation
 	    		sb.append("(exists ");
 	    		sb.append(alt.pattern);
 	    		sb.append(":");
-	    		sb.append(exp.expType);
+	    		sb.append(explicitType(exp.expType, exp.location));
 	    		sb.append(" & ");
 	    		sb.append(exp.exp);
 	    		sb.append(" = ");

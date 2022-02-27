@@ -641,7 +641,7 @@ public class SubTypeObligation extends ProofObligation
 		sb.append("is_(");
 		sb.append(exp);
 		sb.append(", ");
-		sb.append(type);
+		sb.append(explicitType(type, exp.location));
 		sb.append(")");
 	}
 }

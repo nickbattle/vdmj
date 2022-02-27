@@ -83,7 +83,8 @@ public class INLetDefExpression extends INExpression
 						
 						if (fv.name.equals(d.name.getName()))
 						{
-							fv.freeVariables = ctxt.getVisibleVariables();
+							fv.addFreeVariables(ctxt.getVisibleVariables());
+							fv.addFreeVariables(evalContext);	// add previous defs
 							fv.freeVariables.put(d.name, fv);
 						}
 					}

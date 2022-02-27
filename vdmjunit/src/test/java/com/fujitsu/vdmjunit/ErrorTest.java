@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2013 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -22,23 +22,36 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.pog;
+package com.fujitsu.vdmjunit;
 
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.statements.POStateDesignator;
-import com.fujitsu.vdmj.pog.ProofObligation;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-public class MapApplyObligation extends ProofObligation
+import org.junit.Test;
+import com.fujitsu.vdmjunit.VDMJUnitTestPP;
+
+public class ErrorTest extends VDMJUnitTestPP
 {
-	public MapApplyObligation(POExpression root, POExpression poExpression, POContextStack ctxt)
+	@Test
+	public void warning() throws Exception
 	{
-		super(root.location, POType.MAP_APPLY, ctxt);
-		value = ctxt.getObligation(poExpression + " in set dom " + root);
+		readSpecification("warning.vpp");
+		assertTrue(getErrors().isEmpty());
+		assertTrue(getWarnings().size() == 1);
 	}
-
-	public MapApplyObligation(POStateDesignator root, POExpression arg, POContextStack ctxt)
+	
+	@Test
+	public void tcerror() throws Exception
 	{
-		super(root.location, POType.MAP_APPLY, ctxt);
-		value = ctxt.getObligation(arg + " in set dom " + root);
+		try
+		{
+			readSpecification("tcerror.vpp");
+			fail("Expecting read to fail!");
+		}
+		catch (AssertionError e)
+		{
+			assertTrue(getErrors().size() == 2);
+			assertTrue(getWarnings().isEmpty());
+		}
 	}
 }

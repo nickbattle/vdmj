@@ -27,6 +27,7 @@ package vdmj.commands;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
+import workspace.PluginRegistry;
 
 public class HelpCommand extends Command
 {
@@ -77,6 +78,17 @@ public class HelpCommand extends Command
 			}
 		}
 		
+		for (String[][] phelp: PluginRegistry.getInstance().getCommandHelp())
+		{
+			for (String[] help: phelp)
+			{
+				if (command == null || command.equals(help[0]))
+				{
+					sb.append(help[1] + "\n");
+				}
+			}
+		}
+
 		if (sb.length() == 0)
 		{
 			sb.append("Unknown command '" + command + "'");

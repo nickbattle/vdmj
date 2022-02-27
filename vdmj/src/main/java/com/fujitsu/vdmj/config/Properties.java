@@ -103,6 +103,9 @@ public class Properties
 	/** The class name for the DebugLink */
 	public static String debug_link_class = null;
 	
+	/** The size limit for power set expressions */
+	public static int in_powerset_limit = 30;
+	
 	/**
 	 * When the class is initialized, which uses the vdmj.properties file, and any System
 	 * properties, to set the static fields above.
@@ -144,6 +147,8 @@ public class Properties
 			rt_diags_guards = get(vdmj, "vdmj.rt.diags_guards", rt_diags_guards);
 			rt_diags_timestep = get(vdmj, "vdmj.rt.diags_timestep", rt_diags_timestep);
 			
+			in_powerset_limit = get(vdmj, "vdmj.in.powerset_limit", in_powerset_limit);
+
 			cmd_plugin_packages = get(vdmj, "vdmj.cmd.plugin_packages", cmd_plugin_packages);
 			debug_link_class = get(vdmj, "vdmj.debug.link_class", null);
 		}

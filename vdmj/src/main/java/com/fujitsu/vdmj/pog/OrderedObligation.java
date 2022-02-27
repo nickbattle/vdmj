@@ -45,7 +45,7 @@ public class OrderedObligation extends ProofObligation
 	    		sb.append("is_(");
 	    		sb.append(left);
 	    		sb.append(", ");
-	    		sb.append(type);
+	    		sb.append(explicitType(type, left.location));
 	    		sb.append(")");
 	    		prefix = " and ";
 			}
@@ -55,7 +55,7 @@ public class OrderedObligation extends ProofObligation
 		    	sb.append("is_(");
 	    		sb.append(right);
 	    		sb.append(", ");
-	    		sb.append(type);
+	    		sb.append(explicitType(type, right.location));
 	    		sb.append(")");
 	    		prefix = " or ";
 			}
