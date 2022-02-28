@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
 
 /**
@@ -128,6 +129,21 @@ public class TCMultiBindListDefinition extends TCDefinition
 			}
 			else
 			{
+				// The types that are bound to the same variable must all be compatible,
+				// otherwise no values can be bound.
+				
+				for (TCType t1: set)
+				{
+					for (TCType t2: set)
+					{
+						if (!TypeComparator.compatible(t1, t2))
+						{
+							report(3322, "Duplicate patterns bind to different types");
+							detail2(def.name.toString(), t1, def.name.toString(), t2);
+						}
+					}
+				}
+				
 				defs.add(new TCLocalDefinition(location, def.name, set.getType(location)));
 			}
 		}
