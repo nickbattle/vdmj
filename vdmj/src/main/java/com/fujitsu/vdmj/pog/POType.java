@@ -64,7 +64,8 @@ public enum POType
 	STRICT_ORDER("strict order"),
 	EQUIV_RELATION("equivalence relation"),
 	TOTAL("total function"),
-	INV_SATISFIABILITY("invariant satisfiability");
+	INV_SATISFIABILITY("invariant satisfiability"),
+	THEOREM("theorem");
 
 	private String kind;
 
