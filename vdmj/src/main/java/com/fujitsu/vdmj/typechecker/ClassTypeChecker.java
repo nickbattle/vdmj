@@ -167,6 +167,9 @@ public class ClassTypeChecker extends TypeChecker
 			if (c.annotations != null) c.annotations.tcAfter(c);
 		}
     	
-    	cyclicDependencyCheck(allDefs);
+		// Close any annotations
+		TCAnnotation.close();
+
+		cyclicDependencyCheck(allDefs);
 	}
 }
