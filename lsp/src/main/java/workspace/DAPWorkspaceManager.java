@@ -123,6 +123,24 @@ public class DAPWorkspaceManager
 	public DAPMessageList launch(DAPRequest request,
 			boolean noDebug, String defaultName, String command, String remoteControl) throws Exception
 	{
+		int retry = 50;
+		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+		
+		while (retry-- > 0 && manager.checkInProgress())
+		{
+			Diag.fine("Waiting for check to complete");
+			pause(100);
+		}
+		
+		if (manager.checkInProgress())
+		{
+			DAPMessageList responses = new DAPMessageList();
+			responses.add(new DAPResponse(request, false, "Specification being chceked, cannot launch", null));
+			stderr("Specification being checked, cannot launch");
+			clearInterpreter();
+			return responses;
+		}
+		
 		if (!canExecute())
 		{
 			DAPMessageList responses = new DAPMessageList();
