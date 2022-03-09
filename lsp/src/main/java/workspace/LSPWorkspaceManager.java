@@ -527,6 +527,8 @@ public class LSPWorkspaceManager
 			ct.checkLoadedFiles(in.getIN());
 		}
 
+		result.add(RPCRequest.notification("slsp/checked", new JSONObject("successful", !hasErrors)));
+
 		Diag.info("Checked loaded files.");
 		return result;
 	}
