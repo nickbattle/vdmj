@@ -58,7 +58,7 @@ public class TranslateTest extends LSPTest
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/v2ctest_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(1, notify.size());
+		assertEquals(2, notify.size());
 
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));

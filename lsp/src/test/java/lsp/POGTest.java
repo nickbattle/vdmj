@@ -49,7 +49,7 @@ public class POGTest extends LSPTest
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/pogtest_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(2, notify.size());
+		assertEquals(3, notify.size());
 
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
@@ -81,7 +81,7 @@ public class POGTest extends LSPTest
 		setupWorkspace(Dialect.VDM_PP);
 		File testdir = new File("src/test/resources/pogtest_pp");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(2, notify.size());
+		assertEquals(3, notify.size());
 
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
@@ -112,7 +112,7 @@ public class POGTest extends LSPTest
 		setupWorkspace(Dialect.VDM_RT);
 		File testdir = new File("src/test/resources/pogtest_rt");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(2, notify.size());
+		assertEquals(3, notify.size());
 
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
@@ -143,7 +143,7 @@ public class POGTest extends LSPTest
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/pogerrors_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(2, notify.size());
+		assertEquals(3, notify.size());
 
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
