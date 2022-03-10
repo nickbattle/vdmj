@@ -75,6 +75,8 @@ public class LSPServer extends JSONServer
 		System.setProperty("vdmj.debug.link_class", DAPDebugLink.class.getName());
 		Settings.annotations = true;
 		Settings.dialect = dialect;
+		Settings.strict = Boolean.parseBoolean("vdmj.strict");
+		Settings.verbose = Boolean.parseBoolean("vdmj.verbose");
 	}
 	
 	public static LSPServer getInstance()
