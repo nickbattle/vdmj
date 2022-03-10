@@ -417,6 +417,19 @@ public abstract class SyntaxReader
 		throw new LexException(0, "Comment doesn't start with @Annotation", LexLocation.ANY);
 	}
 
+	protected void trailingAnnotationCheck() throws LexException, ParserException
+	{
+		ASTAnnotationList trailing = readAnnotations(getComments());
+		
+		if (!trailing.isEmpty())
+		{
+			for (ASTAnnotation annotation: trailing)
+			{
+				warning(5038, "Trailing annotation ignored: " + annotation, annotation.name.location);
+			}
+		}
+	}
+	
 	/**
 	 * @return A new DefinitionReader.
 	 */
