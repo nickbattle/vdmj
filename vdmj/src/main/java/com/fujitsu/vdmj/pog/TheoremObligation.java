@@ -30,9 +30,17 @@ import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 
 public class TheoremObligation extends ProofObligation
 {
-	public TheoremObligation(LexLocation location, POVariableExpression name, POExpression theorem, POContextStack ctxt)
+	private final POVariableExpression theoremName;
+	
+	public TheoremObligation(LexLocation location, POVariableExpression theoremName, POExpression theorem, POContextStack ctxt)
 	{
 		super(location, POType.THEOREM, ctxt);
-		value = theorem.toString();
+		this.theoremName = theoremName;
+		this.value = theorem.toString();
+	}
+	
+	public POVariableExpression getTheoremName()
+	{
+		return theoremName;
 	}
 }
