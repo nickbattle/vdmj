@@ -25,12 +25,14 @@
 package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 
 public class TheoremObligation extends ProofObligation
 {
-	public TheoremObligation(LexLocation location, String name, String theorem, POContextStack ctxt)
+	public TheoremObligation(LexLocation location, POVariableExpression name, POExpression theorem, POContextStack ctxt)
 	{
 		super(location, POType.THEOREM, ctxt);
-		value = theorem;
+		value = theorem.toString();
 	}
 }
