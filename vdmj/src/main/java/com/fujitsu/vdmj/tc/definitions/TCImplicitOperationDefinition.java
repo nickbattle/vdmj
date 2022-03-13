@@ -436,14 +436,35 @@ public class TCImplicitOperationDefinition extends TCDefinition
 
 			for (TCErrorCase error: errors)
 			{
-				TCType a = error.left.typeCheck(local, null, NameScope.NAMESANDSTATE, expected);
+				FlatEnvironment errs_lhs = new FlatEnvironment(argdefs, base);
+				errs_lhs.setLimitStateScope(limitStateScope);
+				errs_lhs.setEnclosingDefinition(this);
+				errs_lhs.setFunctional(true, true);
+
+				TCType a = error.left.typeCheck(errs_lhs, null, NameScope.NAMESANDSTATE, expected);
 
 				if (!a.isType(TCBooleanType.class, location))
 				{
 					error.left.report(3307, "Errs clause is not bool -> bool");
 				}
 
-				TCType b = error.right.typeCheck(local, null, NameScope.NAMESANDANYSTATE, expected);
+				FlatEnvironment errs_rhs = null;
+						
+				if (result != null)
+				{
+		    		TCDefinitionList postdefs = result.getDefinitions();
+		    		errs_rhs = new FlatCheckedEnvironment(postdefs, local, NameScope.NAMESANDANYSTATE);
+		    		errs_rhs.setEnclosingDefinition(postdef);
+		    		errs_rhs.setFunctional(true, true);
+				}
+				else
+				{
+		    		errs_rhs = new FlatEnvironment(new TCDefinitionList(), local);
+		    		errs_rhs.setEnclosingDefinition(postdef);
+		    		errs_rhs.setFunctional(true, true);
+				}
+
+				TCType b = error.right.typeCheck(errs_rhs, null, NameScope.NAMESANDANYSTATE, expected);
 
 				if (!b.isType(TCBooleanType.class, location))
 				{

@@ -96,6 +96,8 @@ public class ClassReader extends SyntaxReader
 				clazz.setAnnotations(annotations);
 				clazz.setComments(comments);
     		}
+    		
+    		trailingAnnotationCheck();
 
     		if (lastToken().isNot(Token.EOF))
     		{

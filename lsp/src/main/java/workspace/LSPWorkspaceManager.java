@@ -88,6 +88,7 @@ public class LSPWorkspaceManager
 	private Set<File> openFiles = new HashSet<File>();
 	private boolean orderedFiles = false;
 	private Set<File> ignores = new HashSet<File>();
+	private boolean checkInProgress = false;
 	
 	private static final String ORDERING = ".vscode/ordering";
 	private static final String VDMIGNORE = ".vscode/vdmignore";
@@ -430,8 +431,31 @@ public class LSPWorkspaceManager
 		
 		return false;
 	}
+	
+	public synchronized boolean checkInProgress()
+	{
+		return checkInProgress;
+	}
 
-	private RPCMessageList checkLoadedFiles(String reason) throws Exception
+	private synchronized RPCMessageList checkLoadedFiles(String reason) throws Exception
+	{
+		try
+		{
+			checkInProgress  = true;
+			return checkLoadedFilesSafe(reason);
+		}
+		catch (Throwable th)
+		{
+			Diag.error(th);
+			throw th;
+		}
+		finally
+		{
+			checkInProgress = false;
+		}
+	}
+	
+	private RPCMessageList checkLoadedFilesSafe(String reason) throws Exception
 	{
 		ASTPlugin ast = registry.getPlugin("AST");
 		TCPlugin tc = registry.getPlugin("TC");
@@ -502,6 +526,8 @@ public class LSPWorkspaceManager
 		{
 			ct.checkLoadedFiles(in.getIN());
 		}
+
+		result.add(RPCRequest.notification("slsp/checked", new JSONObject("successful", !hasErrors)));
 
 		Diag.info("Checked loaded files.");
 		return result;

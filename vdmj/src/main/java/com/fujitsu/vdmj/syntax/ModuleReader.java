@@ -124,6 +124,8 @@ public class ModuleReader extends SyntaxReader
     					break;
     			}
     		}
+    		
+    		trailingAnnotationCheck();
     	}
     	catch (LocatedException e)
     	{

@@ -366,26 +366,31 @@ public class TCTypeDefinition extends TCDefinition
 	{
 		if (invdef != null && invdef.findName(sought, incState) != null)
 		{
+			markUsed();		// Using inv_T marks T as used
 			return invdef;
 		}
 
 		if (eqdef != null && eqdef.findName(sought, incState) != null)
 		{
+			markUsed();		// Using eq_T marks T as used
 			return eqdef;
 		}
 
 		if (orddef != null && orddef.findName(sought, incState) != null)
 		{
+			markUsed();		// Using ord_T marks T as used
 			return orddef;
 		}
 
 		if (mindef != null && mindef.findName(sought, incState) != null)
 		{
+			markUsed();		// Using min_T marks T as used
 			return mindef;
 		}
 
 		if (maxdef != null && maxdef.findName(sought, incState) != null)
 		{
+			markUsed();		// Using max_T marks T as used
 			return maxdef;
 		}
 

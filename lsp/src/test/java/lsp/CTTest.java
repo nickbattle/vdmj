@@ -49,7 +49,7 @@ public class CTTest extends LSPTest
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/cttest_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(1, notify.size());
+		assertEquals(2, notify.size());
 
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
@@ -76,7 +76,7 @@ public class CTTest extends LSPTest
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/cttest_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(1, notify.size());
+		assertEquals(2, notify.size());
 
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
@@ -102,7 +102,7 @@ public class CTTest extends LSPTest
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/cttest_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(1, notify.size());
+		assertEquals(2, notify.size());
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
@@ -130,7 +130,7 @@ public class CTTest extends LSPTest
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/ctalarm_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(1, notify.size());
+		assertEquals(2, notify.size());
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
@@ -159,7 +159,7 @@ public class CTTest extends LSPTest
 		setupWorkspace(Dialect.VDM_PP);
 		File testdir = new File("src/test/resources/cttest_pp");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(1, notify.size());
+		assertEquals(2, notify.size());
 
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
@@ -186,7 +186,7 @@ public class CTTest extends LSPTest
 		setupWorkspace(Dialect.VDM_PP);
 		File testdir = new File("src/test/resources/cttest_pp");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(1, notify.size());
+		assertEquals(2, notify.size());
 
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
@@ -212,7 +212,7 @@ public class CTTest extends LSPTest
 		setupWorkspace(Dialect.VDM_PP);
 		File testdir = new File("src/test/resources/cttest_pp");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(1, notify.size());
+		assertEquals(2, notify.size());
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
@@ -242,7 +242,7 @@ public class CTTest extends LSPTest
 		setupWorkspace(Dialect.VDM_RT);
 		File testdir = new File("src/test/resources/cttest_rt");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(1, notify.size());
+		assertEquals(2, notify.size());
 
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
@@ -269,7 +269,7 @@ public class CTTest extends LSPTest
 		setupWorkspace(Dialect.VDM_RT);
 		File testdir = new File("src/test/resources/cttest_rt");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(1, notify.size());
+		assertEquals(2, notify.size());
 
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
@@ -295,7 +295,7 @@ public class CTTest extends LSPTest
 		setupWorkspace(Dialect.VDM_RT);
 		File testdir = new File("src/test/resources/cttest_rt");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(1, notify.size());
+		assertEquals(2, notify.size());
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
