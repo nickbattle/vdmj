@@ -410,6 +410,7 @@ public class FunctionValue extends Value
 				
 				ValueList measureArgs = null;
 				
+				
 				if (curriedArgs == null)
 				{
 					measureArgs = argValues;
