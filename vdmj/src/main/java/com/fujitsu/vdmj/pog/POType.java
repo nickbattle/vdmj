@@ -65,7 +65,8 @@ public enum POType
 	EQUIV_RELATION("equivalence relation"),
 	TOTAL("total function"),
 	INV_SATISFIABILITY("invariant satisfiability"),
-	THEOREM("theorem");
+	THEOREM("theorem"),
+	STATE_INIT("state init");
 
 	private String kind;
 

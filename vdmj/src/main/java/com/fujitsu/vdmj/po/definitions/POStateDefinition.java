@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
+import com.fujitsu.vdmj.pog.StateInitObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFieldList;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
@@ -96,6 +97,12 @@ public class POStateDefinition extends PODefinition
 		{
 			list.addAll(invdef.getProofObligations(ctxt, env));
 			list.add(new SatisfiabilityObligation(this, ctxt));
+		}
+		
+		if (initExpression != null)
+		{
+			list.addAll(initdef.getProofObligations(ctxt, env));
+			list.add(new StateInitObligation(this, ctxt));
 		}
 
 		if (annotations != null) annotations.poAfter(this, list, ctxt);
