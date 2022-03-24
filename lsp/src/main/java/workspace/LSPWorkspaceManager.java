@@ -31,6 +31,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -46,6 +47,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCClassType;
@@ -89,9 +91,13 @@ public class LSPWorkspaceManager
 	private boolean orderedFiles = false;
 	private Set<File> ignores = new HashSet<File>();
 	private boolean checkInProgress = false;
+	private Set<File> documentFiles = new HashSet<File>();
+	private Set<File> documentFilesToWarn = new HashSet<File>();
 	
 	private static final String ORDERING = ".vscode/ordering";
 	private static final String VDMIGNORE = ".vscode/vdmignore";
+	private static final String DOCFILES = ".+\\.doc|.+\\.docx|.+\\.odt";
+
 
 	private LSPWorkspaceManager()
 	{
@@ -251,6 +257,8 @@ public class LSPWorkspaceManager
 	private void loadAllProjectFiles() throws IOException
 	{
 		projectFiles.clear();
+		documentFiles.clear();
+		documentFilesToWarn.clear();
 		loadVDMIgnore();
 		
 		File ordering = new File(rootUri, ORDERING);
@@ -358,6 +366,10 @@ public class LSPWorkspaceManager
 				{
 					loadFile(file);
 				}
+				else if (file.getName().matches(DOCFILES))
+				{
+					loadDocFile(file);
+				}
 				else
 				{
 					Diag.warning("Ignoring file %s", file.getPath());
@@ -384,6 +396,21 @@ public class LSPWorkspaceManager
 		Diag.info("Loaded file %s encoding %s", file.getPath(), encoding.displayName());
 	}
 	
+	private void loadDocFile(File file) throws IOException
+	{
+		Diag.info("Converting document file %s", file);
+		SourceFile source = new SourceFile(file);
+		File vdm = new File(file.getPath() + "." + Settings.dialect.getArgstring().substring(1));
+		PrintWriter spw = new PrintWriter(vdm, "UTF-8");
+		source.printSource(spw);
+		spw.close();
+		Diag.info("Extracted source written to " + vdm);
+		
+		loadFile(vdm);
+		documentFiles.add(vdm);
+		documentFilesToWarn.add(vdm);
+	}
+
 	private boolean onDotPath(File file)
 	{
 		// Ignore files on "dot" paths
@@ -632,6 +659,12 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
+			if (documentFilesToWarn.contains(file))
+			{
+				sendMessage(1L, "WARNING: Changing generated VDM source: " + file);
+				documentFilesToWarn.remove(file);
+			}
+			
 			StringBuilder buffer = projectFiles.get(file);
 			int start = Utils.findPosition(buffer, range.get("start"));
 			int end   = Utils.findPosition(buffer, range.get("end"));
