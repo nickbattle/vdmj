@@ -411,16 +411,18 @@ public class LSPWorkspaceManager
 		if (vdm.exists())
 		{
 			Diag.info("Not overwriting existing doc file: %s", vdm);
-			return;
+		}
+		else
+		{
+			Diag.info("Converting document file %s", file);
+			PrintWriter spw = new PrintWriter(vdm, encoding.name());
+			source.printSource(spw);
+			spw.close();
+			Diag.info("Extracted source written to " + vdm);
+			
+			loadFile(vdm);
 		}
 		
-		Diag.info("Converting document file %s", file);
-		PrintWriter spw = new PrintWriter(vdm, "UTF-8");
-		source.printSource(spw);
-		spw.close();
-		Diag.info("Extracted source written to " + vdm);
-		
-		loadFile(vdm);
 		documentFiles.add(vdm);
 		documentFilesToWarn.add(vdm);
 	}
