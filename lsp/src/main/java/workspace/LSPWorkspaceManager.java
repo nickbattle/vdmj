@@ -282,7 +282,14 @@ public class LSPWorkspaceManager
 					
 					if (file.exists())
 					{
-						loadFile(file);
+						if (file.getName().matches(DOCFILES))
+						{
+							loadDocFile(file);
+						}
+						else
+						{
+							loadFile(file);
+						}
 					}
 					else
 					{
@@ -398,9 +405,16 @@ public class LSPWorkspaceManager
 	
 	private void loadDocFile(File file) throws IOException
 	{
-		Diag.info("Converting document file %s", file);
 		SourceFile source = new SourceFile(file);
 		File vdm = new File(file.getPath() + "." + Settings.dialect.getArgstring().substring(1));
+		
+		if (vdm.exists())
+		{
+			Diag.info("Not overwriting existing doc file: %s", vdm);
+			return;
+		}
+		
+		Diag.info("Converting document file %s", file);
 		PrintWriter spw = new PrintWriter(vdm, "UTF-8");
 		source.printSource(spw);
 		spw.close();
@@ -735,6 +749,11 @@ public class LSPWorkspaceManager
 					Diag.info("Ignoring %s file in vdmignore", file);
 					actionCode = DO_NOTHING;			
 				}
+				else if (file.getName().matches(DOCFILES))
+				{
+					Diag.info("Created new document file, rebuilding");
+					actionCode = RELOAD_AND_CHECK;
+				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
 					Diag.info("Ignoring non-project file: %s", file);
@@ -789,6 +808,11 @@ public class LSPWorkspaceManager
 					Diag.info("Ignoring %s file in vdmignore", file);
 					actionCode = DO_NOTHING;			
 				}
+				else if (file.getName().matches(DOCFILES))
+				{
+					Diag.info("Updated document file, rebuilding");
+					actionCode = RELOAD_AND_CHECK;
+				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
 					Diag.info("Ignoring non-project file change: %s", file);
@@ -801,6 +825,11 @@ public class LSPWorkspaceManager
 				}
 				else
 				{
+					if (documentFiles.contains(file))
+					{
+						sendMessage(1L, "WARNING: Overwriting generated VDM source: " + file);
+					}
+					
 					actionCode = RECHECK;	// Simple file change/save
 				}
 				break;
