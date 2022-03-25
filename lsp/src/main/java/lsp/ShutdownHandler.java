@@ -25,6 +25,7 @@
 package lsp;
 
 import rpc.RPCRequest;
+import workspace.LSPWorkspaceManager;
 import rpc.RPCMessageList;
 
 public class ShutdownHandler extends LSPHandler
@@ -37,7 +38,6 @@ public class ShutdownHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		LSPServer.getInstance().setInitialized(false);
-		return new RPCMessageList(request);
+		return LSPWorkspaceManager.getInstance().shutdown(request);
 	}
 }

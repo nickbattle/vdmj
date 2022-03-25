@@ -34,11 +34,15 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Pattern;
@@ -91,7 +95,7 @@ public class LSPWorkspaceManager
 	private boolean orderedFiles = false;
 	private Set<File> ignores = new HashSet<File>();
 	private boolean checkInProgress = false;
-	private Set<File> documentFiles = new HashSet<File>();
+	private Map<File, FileTime> documentFiles = new HashMap<File, FileTime>();
 	private Set<File> documentFilesToWarn = new HashSet<File>();
 	
 	private static final String ORDERING = ".vscode/ordering";
@@ -257,6 +261,7 @@ public class LSPWorkspaceManager
 	private void loadAllProjectFiles() throws IOException
 	{
 		projectFiles.clear();
+		clearDocumentFiles();
 		documentFiles.clear();
 		documentFilesToWarn.clear();
 		loadVDMIgnore();
@@ -282,7 +287,7 @@ public class LSPWorkspaceManager
 					
 					if (file.exists())
 					{
-						if (file.getName().matches(DOCFILES))
+						if (documentFile(file))
 						{
 							loadDocFile(file);
 						}
@@ -294,7 +299,7 @@ public class LSPWorkspaceManager
 					else
 					{
 						Diag.error("Ordering file not found: " + file);
-						sendMessage(1L, "Ordering file not found: " + file);
+						sendMessage(ERROR_MSG, "Ordering file not found: " + file);
 					}
 					
 					source = br.readLine();
@@ -373,7 +378,7 @@ public class LSPWorkspaceManager
 				{
 					loadFile(file);
 				}
-				else if (file.getName().matches(DOCFILES))
+				else if (documentFile(file))
 				{
 					loadDocFile(file);
 				}
@@ -411,6 +416,7 @@ public class LSPWorkspaceManager
 		if (vdm.exists())
 		{
 			Diag.info("Not overwriting existing doc file: %s", vdm);
+			documentFiles.put(vdm, FileTime.fromMillis(0));
 		}
 		else
 		{
@@ -421,9 +427,11 @@ public class LSPWorkspaceManager
 			Diag.info("Extracted source written to " + vdm);
 			
 			loadFile(vdm);
+
+			BasicFileAttributes attr = Files.readAttributes(vdm.toPath(), BasicFileAttributes.class);
+			documentFiles.put(vdm, attr.creationTime());
 		}
 		
-		documentFiles.add(vdm);
 		documentFilesToWarn.add(vdm);
 	}
 
@@ -473,6 +481,40 @@ public class LSPWorkspaceManager
 		}
 		
 		return false;
+	}
+	
+	private boolean documentFile(File file)
+	{
+		return file.getName().matches(DOCFILES);
+	}
+	
+	private void clearDocumentFiles()
+	{
+		Diag.info("Clearing unchanged document files");
+		
+		for (Entry<File, FileTime> docfile: documentFiles.entrySet())
+		{
+			File file = docfile.getKey();
+			
+			try
+			{
+				BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+				
+				if (attr.lastModifiedTime().equals(docfile.getValue()))
+				{
+					Diag.info("Deleting unchanged extract file %s", file);
+					file.delete();
+				}
+				else
+				{
+					Diag.info("Keeping changed extract file %s", file);
+				}
+			}
+			catch (IOException e)
+			{
+				Diag.error("Problem cleaning up extract %s: %s", file, e);
+			}
+		}
 	}
 	
 	public synchronized boolean checkInProgress()
@@ -608,7 +650,7 @@ public class LSPWorkspaceManager
 		if (orderedFiles && existing == null)
 		{
 			Diag.error("File not in ordering list: %s", file);
-			sendMessage(1L, "Ordering file out of date? " + file);
+			sendMessage(ERROR_MSG, "Ordering file out of date? " + file);
 		}
 		else if (existing == null || !existing.toString().equals(text))
 		{
@@ -677,7 +719,7 @@ public class LSPWorkspaceManager
 		{
 			if (documentFilesToWarn.contains(file))
 			{
-				sendMessage(1L, "WARNING: Changing generated VDM source: " + file);
+				sendMessage(WARNING_MSG, "WARNING: Changing generated VDM source: " + file);
 				documentFilesToWarn.remove(file);
 			}
 			
@@ -751,7 +793,7 @@ public class LSPWorkspaceManager
 					Diag.info("Ignoring %s file in vdmignore", file);
 					actionCode = DO_NOTHING;			
 				}
-				else if (file.getName().matches(DOCFILES))
+				else if (documentFile(file))
 				{
 					Diag.info("Created new document file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
@@ -766,7 +808,7 @@ public class LSPWorkspaceManager
 					if (orderedFiles)
 					{
 						Diag.error("File not in ordering list: %s", file);
-						sendMessage(1L, "Ordering file out of date? " + file);
+						sendMessage(WARNING_MSG, "Ordering file out of date? " + file);
 						actionCode = DO_NOTHING;
 					}
 					else
@@ -810,7 +852,7 @@ public class LSPWorkspaceManager
 					Diag.info("Ignoring %s file in vdmignore", file);
 					actionCode = DO_NOTHING;			
 				}
-				else if (file.getName().matches(DOCFILES))
+				else if (documentFile(file))
 				{
 					Diag.info("Updated document file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
@@ -827,12 +869,14 @@ public class LSPWorkspaceManager
 				}
 				else
 				{
-					if (documentFiles.contains(file))
-					{
-						sendMessage(1L, "WARNING: Overwriting generated VDM source: " + file);
-					}
-					
-					actionCode = RECHECK;	// Simple file change/save
+					Diag.info("Simple file change: %s", file);
+					actionCode = RECHECK;
+
+					// Can't distinguish quick delete/create from change here, so comment out...
+					// if (documentFiles.containsKey(file))
+					// {
+					// 		sendMessage(WARNING_MSG, "WARNING: Overwriting generated VDM source: " + file);
+					// }
 				}
 				break;
 				
@@ -903,6 +947,11 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
+			if (documentFiles.containsKey(file))
+			{
+				sendMessage(WARNING_MSG, "WARNING: Saving generated VDM source: " + file);
+			}
+
 			if (text != null)
 			{
 				projectFiles.put(file, new StringBuilder(text));
@@ -930,7 +979,7 @@ public class LSPWorkspaceManager
 			{
 				try
 				{
-					sendMessage(1L, "Specification contains errors. Cannot locate symbols.");
+					sendMessage(WARNING_MSG, "Specification contains errors. Cannot locate symbols.");
 				}
 				catch (IOException e)
 				{
@@ -1248,11 +1297,22 @@ public class LSPWorkspaceManager
 		ASTPlugin ast = registry.getPlugin("AST");
 		return ast.getFilenameFilter();
 	}
+
+	private static final long ERROR_MSG = 1L;
+	private static final long WARNING_MSG = 2L;
 	
 	private void sendMessage(Long type, String message) throws IOException
 	{
 		LSPServer.getInstance().writeMessage(RPCRequest.notification("window/showMessage",
 				new JSONObject("type", type, "message", message)));
+	}
+	
+	public RPCMessageList shutdown(RPCRequest request)
+	{
+		Diag.info("Shutting down server");
+		LSPServer.getInstance().setInitialized(false);
+		clearDocumentFiles();
+		return new RPCMessageList(request);
 	}
 
 	public void restart()	// Called from DAP manager

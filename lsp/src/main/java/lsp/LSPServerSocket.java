@@ -111,7 +111,7 @@ public class LSPServerSocket implements Runnable
 			Diag.info("LSP %s Server connecting to port %d", dialect, port);
 			socket = new Socket("localhost", port);
 			new LSPServer(dialect, socket.getInputStream(), socket.getOutputStream()).run();
-			Diag.error("LSP Server stopped");
+			Diag.info("LSP Server stopped");
 			socket.close();
 		}
 		catch (IOException e)
