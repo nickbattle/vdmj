@@ -429,7 +429,7 @@ public class LSPWorkspaceManager
 			loadFile(vdm);
 
 			BasicFileAttributes attr = Files.readAttributes(vdm.toPath(), BasicFileAttributes.class);
-			documentFiles.put(vdm, attr.creationTime());
+			documentFiles.put(vdm, attr.lastModifiedTime());
 		}
 		
 		documentFilesToWarn.add(vdm);
