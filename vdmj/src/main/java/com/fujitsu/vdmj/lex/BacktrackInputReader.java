@@ -33,6 +33,7 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.Stack;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.messages.InternalException;
 
 /**
@@ -52,6 +53,9 @@ public class BacktrackInputReader extends Reader
 
 	/** The total number of characters in the file. */
 	private int max = 0;
+	
+	/** External reader factory */
+	private ReaderFactory readerFactory = null;
 	
 	/**
 	 * Create an object to read the file name passed with the given charset.
@@ -116,11 +120,31 @@ public class BacktrackInputReader extends Reader
 	/**
 	 * Create an InputStreamReader from a File, depending on the filename.
 	 */
-	public static InputStreamReader readerFactory(File file, String charset)
+	private InputStreamReader readerFactory(File file, String charset)
 		throws IOException
 	{
 		String name = file.getName();
-
+		
+		if (Properties.parser_streamreader != null)
+		{
+			try
+			{
+				Class<?> clazz = Class.forName(Properties.parser_streamreader);
+				readerFactory = (ReaderFactory) clazz.newInstance();
+				InputStreamReader reader = readerFactory.create(file, charset);
+				
+				if (reader != null)
+				{
+					return reader;
+				}
+			}
+			catch (Exception e)
+			{
+				readerFactory = null;
+				throw new IOException("External parser failed", e);
+			}
+		}
+		
 		if (name.toLowerCase().endsWith(".doc"))
 		{
 			return new DocStreamReader(new FileInputStream(file), charset);
@@ -146,7 +170,11 @@ public class BacktrackInputReader extends Reader
 	{
 		String name = file.getName();
 
-		if (name.endsWith(".docx"))
+		if (readerFactory != null)
+		{
+			return readerFactory.length();
+		}
+		else if (name.endsWith(".docx"))
 		{
 			return ((DocxStreamReader)isr).length();
 		}

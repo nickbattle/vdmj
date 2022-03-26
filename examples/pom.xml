@@ -15,15 +15,16 @@
 	<name>VDMJ Suite Examples</name>
 	<packaging>pom</packaging>
 	<version>4.4.5-SNAPSHOT</version>	<!-- This version is inherited by all modules -->
-	
+
 	<properties>
-	    <maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
-	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	    <revision>4.4.5-SNAPSHOT</revision>	<!-- CHANGE VERSION HERE, AND MODULE'S PARENT POMs -->
+		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<revision>4.4.5-SNAPSHOT</revision>	<!-- CHANGE VERSION HERE, AND MODULE'S PARENT POMs -->
 	</properties>
 
 	<!-- sub modules -->
 	<modules>
 		<module>v2c</module>
+		<module>parser</module>
 	</modules>
 </project>
