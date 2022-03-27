@@ -29,17 +29,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * Implemented by external parser reader factories.
+ * Implemented by external parsers.
  */
-public interface ReaderFactory
+public interface ExternalFormatReader
 {
 	/**
 	 * Return an InputStreamReader for the file, or null if none available.
 	 */
-	public InputStreamReader create(File file, String charset) throws IOException;
+	public InputStreamReader getInputStream(File file, String charset) throws IOException;
 
 	/**
-	 * Return the total length of the file.
+	 * Return the total length of the file, in characters (not bytes).
 	 */
 	public int length();
 }

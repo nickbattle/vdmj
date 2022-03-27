@@ -26,9 +26,7 @@ package com.fujitsu.vdmj.runtime;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
@@ -60,23 +58,7 @@ public class SourceFile
 	{
 		this.filename = filename;
 
-		BufferedReader br = null;
-		String name = filename.getName();
-
-		if (name.toLowerCase().endsWith(".doc") ||
-			name.toLowerCase().endsWith(".docx") ||
-			name.toLowerCase().endsWith(".odt"))
-		{
-			br = new BufferedReader(
-				new BacktrackInputReader(filename, VDMJ.filecharset));
-		}
-		else
-		{
-			br = new BufferedReader(
-				new InputStreamReader(
-					new FileInputStream(filename), VDMJ.filecharset));
-		}
-
+		BufferedReader br = new BufferedReader(new BacktrackInputReader(filename, VDMJ.filecharset));
 		String line = br.readLine();
 		boolean vdm_al = false;
 

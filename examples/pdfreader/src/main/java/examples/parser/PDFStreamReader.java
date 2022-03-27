@@ -30,17 +30,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.fujitsu.vdmj.lex.ReaderFactory;
+import com.fujitsu.vdmj.lex.ExternalFormatReader;
 
 /**
  * Invoke an external pdftotext command to read a PDF file.
  */
-public class ExampleParser implements ReaderFactory
+public class PDFStreamReader implements ExternalFormatReader
 {
 	private String fileText = null;
 	
 	@Override
-	public InputStreamReader create(File file, String charset) throws IOException
+	public InputStreamReader getInputStream(File file, String charset) throws IOException
 	{
 		try
 		{

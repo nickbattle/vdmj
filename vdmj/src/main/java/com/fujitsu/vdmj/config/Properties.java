@@ -39,8 +39,8 @@ public class Properties
 	/** Nesting of block comments: 0-3 = support, warning, error, ignore. */
 	public static int parser_comment_nesting = 3;
 	
-	/** External parser class */
-	public static String parser_streamreader = null;
+	/** External reader patterns and classes */
+	public static String parser_externalreaders = null;
 	
 	/** The package list for annotation classes to load. */
 	public static String annotations_packages = "com.fujitsu.vdmj.ast.annotations;annotations.ast";
@@ -128,7 +128,7 @@ public class Properties
 			
 			parser_tabstop = get(vdmj, "vdmj.parser.tabstop", parser_tabstop);
 			parser_comment_nesting = get(vdmj, "vdmj.parser.comment_nesting", parser_comment_nesting);
-			parser_streamreader = get(vdmj, "vdmj.parser.streamreader", parser_streamreader);
+			parser_externalreaders = get(vdmj, "vdmj.parser.externalreaders", parser_externalreaders);
 			mapping_search_path = get(vdmj, "vdmj.mapping.search_path", mapping_search_path);
 			annotations_packages = get(vdmj, "vdmj.annotations.packages", annotations_packages);
 			annotations_debug = get(vdmj, "vdmj.annotations.debug", annotations_debug);

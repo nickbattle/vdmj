@@ -10,8 +10,9 @@
 		<version>4.4.5-SNAPSHOT</version>
 	</parent>
 
-	<name>External Parser</name>
-	<artifactId>parser</artifactId>
+	<name>PDF Reader</name>
+	<artifactId>pdfreader</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<dependencies>

@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 import com.fujitsu.vdmj.config.Properties;
@@ -54,8 +56,9 @@ public class BacktrackInputReader extends Reader
 	/** The total number of characters in the file. */
 	private int max = 0;
 	
-	/** External reader factory */
-	private ReaderFactory readerFactory = null;
+	/** External readers */
+	private ExternalFormatReader externalReader = null;
+	private Map<String, Class<? extends ExternalFormatReader>> externalReaders = null;
 	
 	/**
 	 * Create an object to read the file name passed with the given charset.
@@ -125,23 +128,34 @@ public class BacktrackInputReader extends Reader
 	{
 		String name = file.getName();
 		
-		if (Properties.parser_streamreader != null)
+		if (Properties.parser_externalreaders != null)
 		{
-			try
+			if (externalReaders == null)
 			{
-				Class<?> clazz = Class.forName(Properties.parser_streamreader);
-				readerFactory = (ReaderFactory) clazz.newInstance();
-				InputStreamReader reader = readerFactory.create(file, charset);
-				
-				if (reader != null)
-				{
-					return reader;
-				}
+				buildExternalReaders();
 			}
-			catch (Exception e)
+			
+			for (String pattern: externalReaders.keySet())
 			{
-				readerFactory = null;
-				throw new IOException("External parser failed", e);
+				if (name.endsWith(pattern))
+				{
+					try
+					{
+						Class<? extends ExternalFormatReader> clazz = externalReaders.get(pattern);
+						externalReader = clazz.newInstance();
+						InputStreamReader reader = externalReader.getInputStream(file, charset);
+						
+						if (reader != null)
+						{
+							return reader;
+						}
+					}
+					catch (Exception e)
+					{
+						externalReader = null;
+						throw new IOException("External parser failed", e);
+					}
+				}
 			}
 		}
 		
@@ -164,15 +178,39 @@ public class BacktrackInputReader extends Reader
 	}
 
 	/**
+	 * Property format is "<pattern>=<class>,<pattern>=<class>,..."
+	 */
+	@SuppressWarnings("unchecked")
+	private void buildExternalReaders() throws IOException
+	{
+		externalReaders = new HashMap<String, Class<? extends ExternalFormatReader>>();
+		String[] readers = Properties.parser_externalreaders.split("\\s*,\\s*");
+		
+		for (String readerPair: readers)
+		{
+			try
+			{
+				String[] parts = readerPair.split("\\s*=\\s*");
+				Class<? extends ExternalFormatReader> clazz = (Class<? extends ExternalFormatReader>) Class.forName(parts[1]);
+				externalReaders.put(parts[0], clazz);
+			}
+			catch (Exception e)
+			{
+				throw new IOException("Build external readers failed", e);
+			}
+		}
+	}
+
+	/**
 	 * Calculate the length to allocate for a given file/stream.
 	 */
 	private int readerLength(File file, InputStreamReader isr)
 	{
 		String name = file.getName();
 
-		if (readerFactory != null)
+		if (externalReader != null)
 		{
-			return readerFactory.length();
+			return externalReader.length();
 		}
 		else if (name.endsWith(".docx"))
 		{
