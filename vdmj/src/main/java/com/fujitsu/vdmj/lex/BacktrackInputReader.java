@@ -58,7 +58,7 @@ public class BacktrackInputReader extends Reader
 	
 	/** External readers */
 	private ExternalFormatReader externalReader = null;
-	private Map<String, Class<? extends ExternalFormatReader>> externalReaders = null;
+	private static Map<String, Class<? extends ExternalFormatReader>> externalReaders = null;
 	
 	/**
 	 * Create an object to read the file name passed with the given charset.
@@ -123,8 +123,7 @@ public class BacktrackInputReader extends Reader
 	/**
 	 * Create an InputStreamReader from a File, depending on the filename.
 	 */
-	private InputStreamReader readerFactory(File file, String charset)
-		throws IOException
+	private InputStreamReader readerFactory(File file, String charset) throws IOException
 	{
 		String name = file.getName();
 		
@@ -224,6 +223,28 @@ public class BacktrackInputReader extends Reader
 		{
 			return (int)(file.length() + 1);
 		}
+	}
+	
+	/**
+	 * Test whether an non-default reader is used for File.
+	 */
+	public static boolean isDocumentFormat(File file)
+	{
+		if (externalReaders != null)
+		{
+			for (String key: externalReaders.keySet())
+			{
+				if (file.getName().endsWith(key))
+				{
+					return true;
+				}
+			}
+		}
+		
+		return
+			file.getName().endsWith(".doc") ||
+			file.getName().endsWith(".docx") ||
+			file.getName().endsWith(".odt");
 	}
 
 
