@@ -49,6 +49,7 @@ import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.SourceFile;
@@ -100,7 +101,6 @@ public class LSPWorkspaceManager
 	
 	private static final String ORDERING = ".vscode/ordering";
 	private static final String VDMIGNORE = ".vscode/vdmignore";
-	private static final String DOCFILES = ".+\\.doc|.+\\.docx|.+\\.odt";
 
 
 	private LSPWorkspaceManager()
@@ -485,7 +485,7 @@ public class LSPWorkspaceManager
 	
 	private boolean documentFile(File file)
 	{
-		return file.getName().matches(DOCFILES);
+		return BacktrackInputReader.isDocumentFormat(file);
 	}
 	
 	private void clearDocumentFiles()
