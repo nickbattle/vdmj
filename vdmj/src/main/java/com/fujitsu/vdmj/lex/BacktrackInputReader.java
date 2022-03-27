@@ -180,7 +180,7 @@ public class BacktrackInputReader extends Reader
 	 * Property format is "<pattern>=<class>,<pattern>=<class>,..."
 	 */
 	@SuppressWarnings("unchecked")
-	private void buildExternalReaders() throws IOException
+	private static synchronized void buildExternalReaders() throws IOException
 	{
 		externalReaders = new HashMap<String, Class<? extends ExternalFormatReader>>();
 		String[] readers = Properties.parser_externalreaders.split("\\s*,\\s*");
@@ -228,8 +228,13 @@ public class BacktrackInputReader extends Reader
 	/**
 	 * Test whether an non-default reader is used for File.
 	 */
-	public static boolean isDocumentFormat(File file)
+	public static boolean isDocumentFormat(File file) throws IOException
 	{
+		if (externalReaders == null && Properties.parser_externalreaders != null)
+		{
+			buildExternalReaders();
+		}
+		
 		if (externalReaders != null)
 		{
 			for (String key: externalReaders.keySet())

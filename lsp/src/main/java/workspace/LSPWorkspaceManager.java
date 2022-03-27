@@ -485,7 +485,15 @@ public class LSPWorkspaceManager
 	
 	private boolean documentFile(File file)
 	{
-		return BacktrackInputReader.isDocumentFormat(file);
+		try
+		{
+			return BacktrackInputReader.isDocumentFormat(file);
+		}
+		catch (IOException e)
+		{
+			Diag.error("isDocumentFormat: " + e);
+			return false;
+		}
 	}
 	
 	private void clearDocumentFiles()
