@@ -139,15 +139,20 @@ public class Properties
 	/**
 	 * Initialize properties from a specific file.
 	 */
-	public static void init(File file)
+	public static void init(String filename)
 	{
 		java.util.Properties vdmj = new java.util.Properties();
 
 		try
 		{
-			InputStream s = new FileInputStream(file);
-			vdmj.load(s);
-			s.close();
+			File file = new File(filename);
+			
+			if (file.canRead())
+			{
+				InputStream s = new FileInputStream(file);
+				vdmj.load(s);
+				s.close();
+			}
 		}
 		catch (Exception e)
 		{
