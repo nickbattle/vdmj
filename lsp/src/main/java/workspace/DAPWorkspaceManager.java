@@ -36,6 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.messages.RTLogger;
@@ -206,10 +207,28 @@ public class DAPWorkspaceManager
 					break;
 				
 				default:
-					// Ignore other options
+					Diag.warning("Ignoring setting %s", key);
 					break;
 			}
 		}
+		
+		// TODO set VDMJ properties...
+	}
+	
+	/**
+	 * This puts the Settings and VDMJ properties back to the default for the project.
+	 * It undoes changes from processSettings above.
+	 */
+	private void restoreSettings()
+	{
+		Settings.dynamictypechecks = true;
+		Settings.invchecks = true;
+		Settings.prechecks = true;
+		Settings.postchecks = true;
+		Settings.measureChecks = true;
+		Settings.exceptions = false;
+		
+		Properties.init(LSPWorkspaceManager.PROPERTIES);
 	}
 
 	public DAPMessageList configurationDone(DAPRequest request) throws IOException
@@ -599,6 +618,7 @@ public class DAPWorkspaceManager
 		stdout("\nSession disconnected.\n");
 		SchedulableThread.terminateAll();
 		clearInterpreter();
+		restoreSettings();
 		DAPMessageList result = new DAPMessageList(request);
 		return result;
 	}
@@ -627,6 +647,7 @@ public class DAPWorkspaceManager
 		}
 		
 		clearInterpreter();
+		restoreSettings();
 		return result;
 	}
 	

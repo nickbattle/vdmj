@@ -101,7 +101,7 @@ public class LSPWorkspaceManager
 	
 	private static final String ORDERING = ".vscode/ordering";
 	private static final String VDMIGNORE = ".vscode/vdmignore";
-
+	public static final String PROPERTIES = ".vscode/vdmj.properties";
 
 	private LSPWorkspaceManager()
 	{
@@ -175,7 +175,7 @@ public class LSPWorkspaceManager
 		LSPXWorkspaceManager.getInstance().enablePlugins();
 		
 		System.setProperty("vdmj.parser.tabstop", "1");	// Forced, for LSP location offsets
-		Properties.init();
+		Properties.init(PROPERTIES);
 		loadAllProjectFiles();
 		
 		return new RPCMessageList(request, new LSPInitializeResponse());
