@@ -177,42 +177,84 @@ public class DAPWorkspaceManager
 	private void processSettings(DAPRequest request)
 	{
 		JSONObject args = request.get("arguments");
+		JSONObject settings = args.get("settings");
 		
-		for (String key: args.keySet())
+		if (settings != null)
 		{
-			switch (key)
+			for (String key: settings.keySet())
 			{
-				case "dynamicTypeChecks":
-					Settings.dynamictypechecks = args.get(key);
-					break;
+				switch (key)
+				{
+					case "dynamicTypeChecks":
+						Settings.dynamictypechecks = settings.get(key);
+						break;
+						
+					case "invariantsChecks":
+						Settings.invchecks = settings.get(key);
+						break;
+						
+					case "preConditionChecks":
+						Settings.prechecks = settings.get(key);
+						break;
+						
+					case "postConditionChecks":
+						Settings.postchecks = settings.get(key);
+						break;
+						
+					case "measureChecks":
+						Settings.measureChecks = settings.get(key);
+						break;
 					
-				case "invariantsChecks":
-					Settings.invchecks = args.get(key);
-					break;
+					case "exceptions":
+						Settings.exceptions = settings.get(key);
+						break;
 					
-				case "preConditionChecks":
-					Settings.prechecks = args.get(key);
-					break;
-					
-				case "postConditionChecks":
-					Settings.postchecks = args.get(key);
-					break;
-					
-				case "measureChecks":
-					Settings.measureChecks = args.get(key);
-					break;
-				
-				case "exceptions":
-					Settings.exceptions = args.get(key);
-					break;
-				
-				default:
-					Diag.warning("Ignoring setting %s", key);
-					break;
+					default:
+						Diag.warning("Ignoring setting %s", key);
+						break;
+				}
 			}
 		}
 		
-		// TODO set VDMJ properties...
+		JSONObject properties = args.get("properties");
+		
+		if (properties != null)
+		{
+			for (String key: properties.keySet())
+			{
+				switch (key)
+				{
+					case "vdmj.parser.comment_nesting":
+					case "vdmj.parser.externalreaders":
+					case "vdmj.annotations.packages":
+					case "vdmj.annotations.debug":
+					case "vdmj.mapping.search_path":
+					case "vdmj.tc.skip_recursive_check":
+					case "vdmj.tc.skip_cyclic_check":
+					case "vdmj.tc.max_errors":
+					case "vdmj.scheduler.fcfs_timeslice":
+					case "vdmj.scheduler.virtual_timeslice":
+					case "vdmj.scheduler.jitter":
+					case "vdmj.rt.duration_default":
+					case "vdmj.rt.duration_transactions":
+					case "vdmj.rt.log_instvarchanges":
+					case "vdmj.rt.max_periodic_overlaps":
+					case "vdmj.rt.diags_guards":
+					case "vdmj.rt.diags_timestep":
+					case "vdmj.in.powerset_limit":
+						String value = properties.get(key).toString();	// Must be string for property
+						System.setProperty(key, value);
+						break;
+
+					default:
+						Diag.warning("Ignoring property %s", key);
+						break;
+				}
+			}
+			
+			// System properties override thise from the properties file
+			Properties.init(LSPWorkspaceManager.PROPERTIES);
+		}
 	}
 	
 	/**
@@ -228,6 +270,38 @@ public class DAPWorkspaceManager
 		Settings.measureChecks = true;
 		Settings.exceptions = false;
 		
+		java.util.Properties sys = System.getProperties();
+		
+		for (Object key: sys.keySet())
+		{
+			String name = (String)key;
+			
+			switch (name)
+			{
+				case "vdmj.parser.comment_nesting":
+				case "vdmj.parser.externalreaders":
+				case "vdmj.annotations.packages":
+				case "vdmj.annotations.debug":
+				case "vdmj.mapping.search_path":
+				case "vdmj.tc.skip_recursive_check":
+				case "vdmj.tc.skip_cyclic_check":
+				case "vdmj.tc.max_errors":
+				case "vdmj.scheduler.fcfs_timeslice":
+				case "vdmj.scheduler.virtual_timeslice":
+				case "vdmj.scheduler.jitter":
+				case "vdmj.rt.duration_default":
+				case "vdmj.rt.duration_transactions":
+				case "vdmj.rt.log_instvarchanges":
+				case "vdmj.rt.max_periodic_overlaps":
+				case "vdmj.rt.diags_guards":
+				case "vdmj.rt.diags_timestep":
+				case "vdmj.in.powerset_limit":
+					System.clearProperty(name);
+					break;
+			}
+		}
+		
+		// Reset properties from the file
 		Properties.init(LSPWorkspaceManager.PROPERTIES);
 	}
 
