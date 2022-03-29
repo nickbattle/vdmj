@@ -127,7 +127,7 @@ public class BacktrackInputReader extends Reader
 	{
 		String name = file.getName();
 		
-		if (Properties.parser_externalreaders != null)
+		if (Properties.parser_external_readers != null)
 		{
 			if (externalReaders == null)
 			{
@@ -183,7 +183,7 @@ public class BacktrackInputReader extends Reader
 	private static synchronized void buildExternalReaders() throws IOException
 	{
 		externalReaders = new HashMap<String, Class<? extends ExternalFormatReader>>();
-		String[] readers = Properties.parser_externalreaders.split("\\s*,\\s*");
+		String[] readers = Properties.parser_external_readers.split("\\s*,\\s*");
 		
 		for (String readerPair: readers)
 		{
@@ -230,7 +230,7 @@ public class BacktrackInputReader extends Reader
 	 */
 	public static boolean isDocumentFormat(File file) throws IOException
 	{
-		if (externalReaders == null && Properties.parser_externalreaders != null)
+		if (externalReaders == null && Properties.parser_external_readers != null)
 		{
 			buildExternalReaders();
 		}
