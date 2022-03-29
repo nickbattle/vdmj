@@ -128,7 +128,7 @@ public class Properties
 				s.close();
 			}
 			
-			setDefaults(vdmj);	// Even if file cannot be found
+			setValues(vdmj);	// Even if file cannot be found
 		}
 		catch (Exception e)
 		{
@@ -160,40 +160,43 @@ public class Properties
 		}
 		finally
 		{
-			setDefaults(vdmj);	// Even if file cannot be read
+			setValues(vdmj);	// Even if file cannot be read
 		}
 	}
 
-	private static void setDefaults(java.util.Properties vdmj)
+	private static void setValues(java.util.Properties vdmj)
 	{
-		parser_tabstop = get(vdmj, "vdmj.parser.tabstop", parser_tabstop);
-		parser_comment_nesting = get(vdmj, "vdmj.parser.comment_nesting", parser_comment_nesting);
-		parser_externalreaders = get(vdmj, "vdmj.parser.externalreaders", parser_externalreaders);
-		mapping_search_path = get(vdmj, "vdmj.mapping.search_path", mapping_search_path);
-		annotations_packages = get(vdmj, "vdmj.annotations.packages", annotations_packages);
-		annotations_debug = get(vdmj, "vdmj.annotations.debug", annotations_debug);
-		tc_skip_recursive_check = get(vdmj, "vdmj.tc.skip_recursive_check", tc_skip_recursive_check);
-		tc_skip_cyclic_check = get(vdmj, "vdmj.tc.skip_cyclic_check", tc_skip_cyclic_check);
-		tc_max_errors = get(vdmj, "vdmj.tc.max_errors", tc_max_errors);
-		
-		scheduler_fcfs_timeslice = get(vdmj, "vdmj.scheduler.fcfs_timeslice", scheduler_fcfs_timeslice);
-		scheduler_virtual_timeslice = get(vdmj, "vdmj.scheduler.virtual_timeslice", scheduler_virtual_timeslice);
-		scheduler_jitter = get(vdmj, "vdmj.scheduler_jitter", scheduler_jitter);
-		
-		traces_max_repeats = get(vdmj, "vdmj.traces.max_repeats", traces_max_repeats);
-		traces_save_state = get(vdmj, "vdmj.traces.save_state", traces_save_state);
-		traces_max_arg_length = get(vdmj, "vdmj.traces.max_arg_length", traces_max_arg_length);
-		
-		rt_duration_default = get(vdmj, "vdmj.rt.duration_default", rt_duration_default);
-		rt_duration_transactions = get(vdmj, "vdmj.rt.duration_transactions", rt_duration_transactions);
-		rt_log_instvarchanges = get(vdmj, "vdmj.rt.log_instvarchanges", rt_log_instvarchanges);
-		rt_max_periodic_overlaps = get(vdmj, "vdmj.rt.max_periodic_overlaps", rt_max_periodic_overlaps);
-		rt_diags_guards = get(vdmj, "vdmj.rt.diags_guards", rt_diags_guards);
-		rt_diags_timestep = get(vdmj, "vdmj.rt.diags_timestep", rt_diags_timestep);
-		
-		in_powerset_limit = get(vdmj, "vdmj.in.powerset_limit", in_powerset_limit);
+		parser_tabstop = get(vdmj, "vdmj.parser.tabstop", 4);
+		parser_comment_nesting = get(vdmj, "vdmj.parser.comment_nesting", 3);
+		parser_externalreaders = get(vdmj, "vdmj.parser.externalreaders", null);
 
-		cmd_plugin_packages = get(vdmj, "vdmj.cmd.plugin_packages", cmd_plugin_packages);
+		annotations_packages = get(vdmj, "vdmj.annotations.packages", "com.fujitsu.vdmj.ast.annotations;annotations.ast");
+		annotations_debug = get(vdmj, "vdmj.annotations.debug", false);
+
+		mapping_search_path = get(vdmj, "vdmj.mapping.search_path", null);
+
+		tc_skip_recursive_check = get(vdmj, "vdmj.tc.skip_recursive_check", false);
+		tc_skip_cyclic_check = get(vdmj, "vdmj.tc.skip_cyclic_check", false);
+		tc_max_errors = get(vdmj, "vdmj.tc.max_errors", 100);
+		
+		scheduler_fcfs_timeslice = get(vdmj, "vdmj.scheduler.fcfs_timeslice", 10);
+		scheduler_virtual_timeslice = get(vdmj, "vdmj.scheduler.virtual_timeslice", 10000);
+		scheduler_jitter = get(vdmj, "vdmj.scheduler_jitter", 0);
+		
+		traces_max_repeats = get(vdmj, "vdmj.traces.max_repeats", 5);
+		traces_save_state = get(vdmj, "vdmj.traces.save_state", false);
+		traces_max_arg_length = get(vdmj, "vdmj.traces.max_arg_length", 50);
+		
+		rt_duration_default = get(vdmj, "vdmj.rt.duration_default", 2);
+		rt_duration_transactions = get(vdmj, "vdmj.rt.duration_transactions", false);
+		rt_log_instvarchanges = get(vdmj, "vdmj.rt.log_instvarchanges", false);
+		rt_max_periodic_overlaps = get(vdmj, "vdmj.rt.max_periodic_overlaps", 20);
+		rt_diags_guards = get(vdmj, "vdmj.rt.diags_guards", false);
+		rt_diags_timestep = get(vdmj, "vdmj.rt.diags_timestep", false);
+		
+		in_powerset_limit = get(vdmj, "vdmj.in.powerset_limit", 30);
+
+		cmd_plugin_packages = get(vdmj, "vdmj.cmd.plugin_packages", "plugins");
 		debug_link_class = get(vdmj, "vdmj.debug.link_class", null);		
 	}
 	
