@@ -175,6 +175,7 @@ public class LSPWorkspaceManager
 		LSPXWorkspaceManager.getInstance().enablePlugins();
 		
 		System.setProperty("vdmj.parser.tabstop", "1");	// Forced, for LSP location offsets
+		Diag.info("Reading properties from %s", PROPERTIES);
 		Properties.init(PROPERTIES);
 		loadAllProjectFiles();
 		

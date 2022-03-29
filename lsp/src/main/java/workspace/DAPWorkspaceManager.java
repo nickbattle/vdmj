@@ -181,6 +181,8 @@ public class DAPWorkspaceManager
 		
 		if (settings != null)
 		{
+			Diag.info("Updating settings: %s", settings);
+			
 			for (String key: settings.keySet())
 			{
 				switch (key)
@@ -220,6 +222,8 @@ public class DAPWorkspaceManager
 		
 		if (properties != null)
 		{
+			Diag.info("Updating properties: %s", properties);
+
 			for (String key: properties.keySet())
 			{
 				switch (key)
@@ -252,7 +256,8 @@ public class DAPWorkspaceManager
 				}
 			}
 			
-			// System properties override thise from the properties file
+			// System properties override those from the properties file
+			Diag.info("Reading properties from %s", LSPWorkspaceManager.PROPERTIES);
 			Properties.init(LSPWorkspaceManager.PROPERTIES);
 		}
 	}
@@ -263,6 +268,7 @@ public class DAPWorkspaceManager
 	 */
 	private void restoreSettings()
 	{
+		Diag.info("Resetting settings");
 		Settings.dynamictypechecks = true;
 		Settings.invchecks = true;
 		Settings.prechecks = true;
@@ -270,38 +276,28 @@ public class DAPWorkspaceManager
 		Settings.measureChecks = true;
 		Settings.exceptions = false;
 		
-		java.util.Properties sys = System.getProperties();
-		
-		for (Object key: sys.keySet())
-		{
-			String name = (String)key;
-			
-			switch (name)
-			{
-				case "vdmj.parser.comment_nesting":
-				case "vdmj.parser.externalreaders":
-				case "vdmj.annotations.packages":
-				case "vdmj.annotations.debug":
-				case "vdmj.mapping.search_path":
-				case "vdmj.tc.skip_recursive_check":
-				case "vdmj.tc.skip_cyclic_check":
-				case "vdmj.tc.max_errors":
-				case "vdmj.scheduler.fcfs_timeslice":
-				case "vdmj.scheduler.virtual_timeslice":
-				case "vdmj.scheduler.jitter":
-				case "vdmj.rt.duration_default":
-				case "vdmj.rt.duration_transactions":
-				case "vdmj.rt.log_instvarchanges":
-				case "vdmj.rt.max_periodic_overlaps":
-				case "vdmj.rt.diags_guards":
-				case "vdmj.rt.diags_timestep":
-				case "vdmj.in.powerset_limit":
-					System.clearProperty(name);
-					break;
-			}
-		}
+		// Clear any System property overrides...
+		System.clearProperty("vdmj.parser.comment_nesting");
+		System.clearProperty("vdmj.parser.externalreaders");
+		System.clearProperty("vdmj.annotations.packages");
+		System.clearProperty("vdmj.annotations.debug");
+		System.clearProperty("vdmj.mapping.search_path");
+		System.clearProperty("vdmj.tc.skip_recursive_check");
+		System.clearProperty("vdmj.tc.skip_cyclic_check");
+		System.clearProperty("vdmj.tc.max_errors");
+		System.clearProperty("vdmj.scheduler.fcfs_timeslice");
+		System.clearProperty("vdmj.scheduler.virtual_timeslice");
+		System.clearProperty("vdmj.scheduler.jitter");
+		System.clearProperty("vdmj.rt.duration_default");
+		System.clearProperty("vdmj.rt.duration_transactions");
+		System.clearProperty("vdmj.rt.log_instvarchanges");
+		System.clearProperty("vdmj.rt.max_periodic_overlaps");
+		System.clearProperty("vdmj.rt.diags_guards");
+		System.clearProperty("vdmj.rt.diags_timestep");
+		System.clearProperty("vdmj.in.powerset_limit");
 		
 		// Reset properties from the file
+		Diag.info("Resetting properties from %s", LSPWorkspaceManager.PROPERTIES);
 		Properties.init(LSPWorkspaceManager.PROPERTIES);
 	}
 
