@@ -65,7 +65,14 @@ public class INStringPattern extends INPattern
 
 		try
 		{
-			if (!expval.stringValue(ctxt).equals(value.value))
+			String sval = expval.stringValue(ctxt);		// "[]" if empty
+			
+			if (sval.equals("[]"))
+			{
+				sval = "";
+			}
+			
+			if (!sval.equals(value.value))
 			{
 				patternFail(4122, "String pattern match failed");
 			}

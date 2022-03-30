@@ -10,11 +10,9 @@
 		<version>4.4.5-P-SNAPSHOT</version>
 	</parent>
 
-	<groupId>com.fujitsu</groupId>
 	<artifactId>examples</artifactId>
 	<name>VDMJ Suite Examples</name>
 	<packaging>pom</packaging>
-	<version>4.4.5-P-SNAPSHOT</version>	<!-- This version is inherited by all modules -->
 	
 	<properties>
 	    <maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
@@ -25,5 +23,6 @@
 	<!-- sub modules -->
 	<modules>
 		<module>v2c</module>
+		<module>pdfreader</module>
 	</modules>
 </project>

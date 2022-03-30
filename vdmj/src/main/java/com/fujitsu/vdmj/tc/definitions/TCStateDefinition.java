@@ -292,7 +292,7 @@ public class TCStateDefinition extends TCDefinition
 
 		TCTypeList ptypes = new TCTypeList();
 		ptypes.add(new TCUnresolvedType(name));
-		TCFunctionType ftype = new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
+		TCFunctionType ftype = new TCFunctionType(loc, ptypes, true, new TCBooleanType(loc));
 
 		TCExpression body = new TCStateInitExpression(this);
 

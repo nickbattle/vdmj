@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2022 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,22 +22,24 @@
  *
  ******************************************************************************/
 
-package lsp;
+package com.fujitsu.vdmj.lex;
 
-import rpc.RPCRequest;
-import workspace.LSPWorkspaceManager;
-import rpc.RPCMessageList;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
-public class ShutdownHandler extends LSPHandler
+/**
+ * Implemented by external parsers.
+ */
+public interface ExternalFormatReader
 {
-	public ShutdownHandler()
-	{
-		super();
-	}
+	/**
+	 * Return an InputStreamReader for the file, or null if none available.
+	 */
+	public InputStreamReader getInputStream(File file, String charset) throws IOException;
 
-	@Override
-	public RPCMessageList request(RPCRequest request)
-	{
-		return LSPWorkspaceManager.getInstance().shutdown(request);
-	}
+	/**
+	 * Return the total length of the file, in characters (not bytes).
+	 */
+	public int length();
 }

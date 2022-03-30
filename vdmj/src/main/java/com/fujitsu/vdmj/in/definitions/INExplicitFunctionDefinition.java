@@ -148,7 +148,9 @@ public class INExplicitFunctionDefinition extends INDefinition
 		
 		if (measureDef != null && measureDef.name.getName().startsWith("measure_"))
 		{
-			nvl.add(new NameValuePair(measureDef.name, new FunctionValue(measureDef, null, null, null)));
+			FunctionValue mfunc = new FunctionValue(measureDef, null, null, null);
+			mfunc.uninstantiated = (typeParams != null);
+			nvl.add(new NameValuePair(measureDef.name, mfunc));
 		}
 
 		return nvl;

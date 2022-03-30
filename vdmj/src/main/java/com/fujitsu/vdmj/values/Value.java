@@ -187,6 +187,7 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 		if (to instanceof TCUnionType)
 		{
 			TCUnionType uto = (TCUnionType)to;
+			Value matched = null;
 
 			for (TCType ut: uto.types)
 			{
@@ -199,7 +200,12 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
     						done.add(ut);
     					}
     					
-    					return convertValueTo(ut, ctxt, done);
+    					matched = convertValueTo(ut, ctxt, done);
+    					
+    					if (matched.equals(this))
+    					{
+    						return matched;		// Immediate return for perfect match
+    					}
     				}
     				catch (ValueException e)
     				{
@@ -210,6 +216,11 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
     					// Pre/post/invariant problems
     				}
 				}
+			}
+			
+			if (matched != null)
+			{
+				return matched;		// Last non-perfect match
 			}
 		}
 		else if (to instanceof TCParameterType)

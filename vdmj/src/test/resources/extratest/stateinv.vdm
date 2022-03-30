@@ -5,7 +5,7 @@ exports
 		
 	functions
 		inv_State: State +> bool;
-		init_State: State +> bool;
+		init_State: State -> bool;
 
 definitions
 

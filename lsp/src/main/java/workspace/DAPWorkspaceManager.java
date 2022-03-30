@@ -36,6 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.messages.RTLogger;
@@ -176,40 +177,128 @@ public class DAPWorkspaceManager
 	private void processSettings(DAPRequest request)
 	{
 		JSONObject args = request.get("arguments");
+		JSONObject settings = args.get("settings");
 		
-		for (String key: args.keySet())
+		if (settings != null)
 		{
-			switch (key)
+			Diag.info("Updating settings: %s", settings);
+			
+			for (String key: settings.keySet())
 			{
-				case "dynamicTypeChecks":
-					Settings.dynamictypechecks = args.get(key);
-					break;
+				switch (key)
+				{
+					case "dynamicTypeChecks":
+						Settings.dynamictypechecks = settings.get(key);
+						break;
+						
+					case "invariantsChecks":
+						Settings.invchecks = settings.get(key);
+						break;
+						
+					case "preConditionChecks":
+						Settings.prechecks = settings.get(key);
+						break;
+						
+					case "postConditionChecks":
+						Settings.postchecks = settings.get(key);
+						break;
+						
+					case "measureChecks":
+						Settings.measureChecks = settings.get(key);
+						break;
 					
-				case "invariantsChecks":
-					Settings.invchecks = args.get(key);
-					break;
+					case "exceptions":
+						Settings.exceptions = settings.get(key);
+						break;
 					
-				case "preConditionChecks":
-					Settings.prechecks = args.get(key);
-					break;
-					
-				case "postConditionChecks":
-					Settings.postchecks = args.get(key);
-					break;
-					
-				case "measureChecks":
-					Settings.measureChecks = args.get(key);
-					break;
-				
-				case "exceptions":
-					Settings.exceptions = args.get(key);
-					break;
-				
-				default:
-					// Ignore other options
-					break;
+					default:
+						Diag.warning("Ignoring setting %s", key);
+						break;
+				}
 			}
 		}
+		
+		JSONObject properties = args.get("properties");
+		
+		if (properties != null)
+		{
+			Diag.info("Updating properties: %s", properties);
+
+			for (String key: properties.keySet())
+			{
+				switch (key)
+				{
+					case "vdmj.parser.comment_nesting":
+					case "vdmj.parser.external_readers":
+					case "vdmj.annotations.packages":
+					case "vdmj.annotations.debug":
+					case "vdmj.mapping.search_path":
+					case "vdmj.tc.skip_recursive_check":
+					case "vdmj.tc.skip_cyclic_check":
+					case "vdmj.tc.max_errors":
+					case "vdmj.scheduler.fcfs_timeslice":
+					case "vdmj.scheduler.virtual_timeslice":
+					case "vdmj.scheduler.jitter":
+					case "vdmj.rt.duration_default":
+					case "vdmj.rt.duration_transactions":
+					case "vdmj.rt.log_instvarchanges":
+					case "vdmj.rt.max_periodic_overlaps":
+					case "vdmj.rt.diags_guards":
+					case "vdmj.rt.diags_timestep":
+					case "vdmj.in.powerset_limit":
+						String value = properties.get(key).toString();	// Must be string for property
+						System.setProperty(key, value);
+						break;
+
+					default:
+						Diag.warning("Ignoring property %s", key);
+						break;
+				}
+			}
+			
+			// System properties override those from the properties file
+			Diag.info("Reading properties from %s", LSPWorkspaceManager.PROPERTIES);
+			Properties.init(LSPWorkspaceManager.PROPERTIES);
+		}
+	}
+	
+	/**
+	 * This puts the Settings and VDMJ properties back to the default for the project.
+	 * It undoes changes from processSettings above.
+	 */
+	private void restoreSettings()
+	{
+		Diag.info("Resetting settings");
+		Settings.dynamictypechecks = true;
+		Settings.invchecks = true;
+		Settings.prechecks = true;
+		Settings.postchecks = true;
+		Settings.measureChecks = true;
+		Settings.exceptions = false;
+		
+		// Clear any System property overrides...
+		System.clearProperty("vdmj.parser.comment_nesting");
+		System.clearProperty("vdmj.parser.external_readers");
+		System.clearProperty("vdmj.annotations.packages");
+		System.clearProperty("vdmj.annotations.debug");
+		System.clearProperty("vdmj.mapping.search_path");
+		System.clearProperty("vdmj.tc.skip_recursive_check");
+		System.clearProperty("vdmj.tc.skip_cyclic_check");
+		System.clearProperty("vdmj.tc.max_errors");
+		System.clearProperty("vdmj.scheduler.fcfs_timeslice");
+		System.clearProperty("vdmj.scheduler.virtual_timeslice");
+		System.clearProperty("vdmj.scheduler.jitter");
+		System.clearProperty("vdmj.rt.duration_default");
+		System.clearProperty("vdmj.rt.duration_transactions");
+		System.clearProperty("vdmj.rt.log_instvarchanges");
+		System.clearProperty("vdmj.rt.max_periodic_overlaps");
+		System.clearProperty("vdmj.rt.diags_guards");
+		System.clearProperty("vdmj.rt.diags_timestep");
+		System.clearProperty("vdmj.in.powerset_limit");
+		
+		// Reset properties from the file
+		Diag.info("Resetting properties from %s", LSPWorkspaceManager.PROPERTIES);
+		Properties.init(LSPWorkspaceManager.PROPERTIES);
 	}
 
 	public DAPMessageList configurationDone(DAPRequest request) throws IOException
@@ -599,6 +688,7 @@ public class DAPWorkspaceManager
 		stdout("\nSession disconnected.\n");
 		SchedulableThread.terminateAll();
 		clearInterpreter();
+		restoreSettings();
 		DAPMessageList result = new DAPMessageList(request);
 		return result;
 	}
@@ -627,6 +717,7 @@ public class DAPWorkspaceManager
 		}
 		
 		clearInterpreter();
+		restoreSettings();
 		return result;
 	}
 	

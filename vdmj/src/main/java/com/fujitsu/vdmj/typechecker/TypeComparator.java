@@ -809,8 +809,16 @@ public class TypeComparator
 			}
 			else if (sub instanceof TCNamedType)
     		{
-				TCNamedType subn = (TCNamedType)sub;
-				return searchSubType(subn.type, sup, invignore);
+				if (sup instanceof TCNamedType)
+				{
+					// both have an invariant and we're not ignoring them, so check for equality
+					return sub.equals(sup) ? Result.Yes : Result.No;
+				}
+				else
+				{
+					// sub has an invariant and we're not ignoring it, so No.
+					return Result.No;
+				}
 			}
 			else if (sup instanceof TCOptionalType)
     		{
