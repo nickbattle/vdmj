@@ -49,7 +49,7 @@ public class ASTCasesExpression extends ASTExpression
 	{
 		return "(cases " + exp + " :\n" +
 			Utils.listToString("", cases, ",\n", "") +
-			(others == null ? "\n" : "\nothers -> " + others + "\n") + "end)";
+			(others == null ? "\n" : ",\nothers -> " + others + "\n") + "end)";
 	}
 
 	@Override
