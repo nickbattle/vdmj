@@ -66,6 +66,16 @@ public class POApplyExpression extends POExpression
 	@Override
 	public String toString()
 	{
+		if (root instanceof POVariableExpression)
+		{
+			POVariableExpression v = (POVariableExpression)root;
+			
+			if (!v.name.getModule().equals(location.module))	// explicit external calls
+			{
+				return v.name.getExplicit(true) +  "("+ Utils.listToString(args) + ")";
+			}
+		}
+
 		return root + "("+ Utils.listToString(args) + ")";
 	}
 

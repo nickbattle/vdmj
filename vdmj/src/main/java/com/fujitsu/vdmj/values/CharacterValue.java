@@ -74,6 +74,10 @@ public class CharacterValue extends Value
 		{
 			return "'\\0" + Integer.toOctalString(unicode) + "'";
 		}
+		else if (unicode == '\'' || unicode == '\"' || unicode == '\\')
+		{
+			return "'\\" + unicode + "'";
+		}
 		else
 		{
 			return "'" + unicode + "'";
