@@ -190,12 +190,20 @@ public class BacktrackInputReader extends Reader
 			try
 			{
 				String[] parts = readerPair.split("\\s*=\\s*");
-				Class<? extends ExternalFormatReader> clazz = (Class<? extends ExternalFormatReader>) Class.forName(parts[1]);
-				externalReaders.put(parts[0], clazz);
+				
+				if (parts.length == 2)
+				{
+					Class<? extends ExternalFormatReader> clazz = (Class<? extends ExternalFormatReader>) Class.forName(parts[1]);
+					externalReaders.put(parts[0], clazz);
+				}
+				else
+				{
+					System.err.printf("Malformed external readers: %s\n", Properties.parser_external_readers);
+				}
 			}
 			catch (Exception e)
 			{
-				throw new IOException("Build external readers failed", e);
+				throw new IOException("Build external readers failed: " + e);
 			}
 		}
 	}
