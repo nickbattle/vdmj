@@ -102,6 +102,14 @@ public class BacktrackInputReader
 	}
 	
 	/**
+	 * Create an object to read the string passed with the default charset.
+	 */
+	public BacktrackInputReader(String expression)
+	{
+		this(expression, Charset.defaultCharset().name());
+	}
+
+	/**
 	 * Return the entire content of the file.
 	 */
 	public char[] getText()
@@ -122,13 +130,13 @@ public class BacktrackInputReader
 			buildExternalReaders();
 		}
 		
-		for (String pattern: externalReaders.keySet())
+		for (String suffix: externalReaders.keySet())
 		{
-			if (name.endsWith(pattern))
+			if (name.endsWith(suffix))
 			{
 				try
 				{
-					Class<? extends ExternalFormatReader> clazz = externalReaders.get(pattern);
+					Class<? extends ExternalFormatReader> clazz = externalReaders.get(suffix);
 					return clazz.newInstance();
 				}
 				catch (Exception e)
@@ -156,6 +164,8 @@ public class BacktrackInputReader
 		externalReaders.put(".DOCX", DocxStreamReader.class);
 		externalReaders.put(".odt", ODFStreamReader.class);
 		externalReaders.put(".ODT", ODFStreamReader.class);
+		externalReaders.put(".adoc", AsciiDocStreamReader.class);
+		externalReaders.put(".ADOC", AsciiDocStreamReader.class);
 		
 		if (Properties.parser_external_readers != null)
 		{
@@ -206,14 +216,6 @@ public class BacktrackInputReader
 		return false;	// use LaTeX reader
 	}
 
-
-	/**
-	 * Create an object to read the string passed with the default charset.
-	 */
-	public BacktrackInputReader(String expression)
-	{
-		this(expression, Charset.defaultCharset().name());
-	}
 
 	/**
 	 * Push the current location to permit backtracking.
