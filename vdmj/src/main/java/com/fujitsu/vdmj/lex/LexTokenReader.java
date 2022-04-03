@@ -232,6 +232,14 @@ public class LexTokenReader extends BacktrackInputReader
 		this.last = null;
 		this.comments.clear();
 	}
+	
+	/**
+	 * This ought to prevent subsequent reads.
+	 */
+	public void close()
+	{
+		// do nothing - file was already closed.
+	}
 
 	/**
 	 * A string representation of the current location.
