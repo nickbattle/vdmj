@@ -125,7 +125,7 @@ public class BacktrackInputReader
 				}
 				catch (Exception e)
 				{
-					throw new IOException("External reader failed", e);
+					throw new IOException("External reader failed: " + e);
 				}
 			}
 		}
@@ -134,13 +134,14 @@ public class BacktrackInputReader
 	}
 
 	/**
-	 * Property format is "<pattern>=<class>,<pattern>=<class>,..."
+	 * Property format is "<suffix>=<class>,<suffix>=<class>,..."
 	 */
 	@SuppressWarnings("unchecked")
 	private static synchronized void buildExternalReaders() throws IOException
 	{
 		externalReaders = new HashMap<String, Class<? extends ExternalFormatReader>>();
 		
+		// Add the standard readers first
 		externalReaders.put(".doc", DocStreamReader.class);
 		externalReaders.put(".DOC", DocStreamReader.class);
 		externalReaders.put(".docx", DocxStreamReader.class);
@@ -194,7 +195,7 @@ public class BacktrackInputReader
 			}
 		}
 		
-		return false;
+		return false;	// use LaTeX reader
 	}
 
 
