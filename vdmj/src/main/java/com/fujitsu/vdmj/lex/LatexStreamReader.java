@@ -29,6 +29,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Stack;
 
 /**
@@ -39,11 +41,21 @@ public class LatexStreamReader implements ExternalFormatReader
 	private final static String BOM = "\uFEFF";
 
 	private Stack<Boolean> ifstack = new Stack<Boolean>();
+	
+	public char[] getText(String expression) throws IOException
+	{
+		return readFile(new StringReader(expression));
+	}
 
 	@Override
 	public char[] getText(File file, String encoding) throws IOException
 	{
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
+		return readFile(new InputStreamReader(new FileInputStream(file), encoding));
+	}
+	
+	private char[] readFile(Reader reader) throws IOException
+	{
+		BufferedReader br = new BufferedReader(reader);
 		String line = br.readLine();
 		StringBuilder array = new StringBuilder();
 		

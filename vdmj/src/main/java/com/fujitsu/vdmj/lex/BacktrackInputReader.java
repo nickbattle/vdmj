@@ -89,8 +89,16 @@ public class BacktrackInputReader
 	 */
 	public BacktrackInputReader(String expression, String charset)
 	{
-		data = expression.toCharArray();
-        pos = 0;
+		try
+		{
+			LatexStreamReader lsr = new LatexStreamReader();
+			data = lsr.getText(expression);
+			pos = 0;
+		}
+		catch (IOException e)
+		{
+			throw new InternalException(0, "Cannot read file: " + e.getMessage());
+		}
 	}
 	
 	/**
