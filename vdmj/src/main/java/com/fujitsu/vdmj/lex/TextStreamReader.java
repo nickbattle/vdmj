@@ -24,17 +24,44 @@
 
 package com.fujitsu.vdmj.lex;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
- * A class to read .adoc encoded VDM files.
+ * A class to read text encoded VDM files, and look for a given marker.
  */
-public class AsciiDocStreamReader extends TextStreamReader
+abstract public class TextStreamReader implements ExternalFormatReader
 {
-	@Override
-	public char[] getText(File file, String encoding) throws IOException
+	protected char[] getText(File file, String encoding, String marker) throws IOException
 	{
-		return getText(file, encoding, "{vdm}");
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
+		StringBuilder text =  new StringBuilder();
+		boolean capturing = false;
+		String line = br.readLine();
+
+		while (line != null)
+		{
+			if (line.trim().contains(marker))
+			{
+				capturing = !capturing;
+			}
+			else
+			{
+				if (capturing)
+				{
+					text.append(line);
+					text.append('\n');
+				}
+			}
+
+			line = br.readLine();
+		}
+
+		br.close();
+		
+		return text.toString().toCharArray();
 	}
 }

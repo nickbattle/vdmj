@@ -166,6 +166,8 @@ public class BacktrackInputReader
 		externalReaders.put(".ODT", ODFStreamReader.class);
 		externalReaders.put(".adoc", AsciiDocStreamReader.class);
 		externalReaders.put(".ADOC", AsciiDocStreamReader.class);
+		externalReaders.put(".md", MarkdownStreamReader.class);
+		externalReaders.put(".markdown", MarkdownStreamReader.class);
 		
 		if (Properties.parser_external_readers != null)
 		{

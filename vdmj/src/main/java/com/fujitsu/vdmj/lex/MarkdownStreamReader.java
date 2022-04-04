@@ -28,13 +28,13 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * A class to read .adoc encoded VDM files.
+ * A class to read .md Markdown encoded VDM files.
  */
-public class AsciiDocStreamReader extends TextStreamReader
+public class MarkdownStreamReader extends TextStreamReader
 {
 	@Override
 	public char[] getText(File file, String encoding) throws IOException
 	{
-		return getText(file, encoding, "{vdm}");
+		return getText(file, encoding, "<!-- vdm -->");
 	}
 }
