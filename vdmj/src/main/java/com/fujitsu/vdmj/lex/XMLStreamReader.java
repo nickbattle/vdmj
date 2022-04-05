@@ -24,32 +24,33 @@
 
 package com.fujitsu.vdmj.lex;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import com.fujitsu.vdmj.VDMJ;
-
 /**
  * A class to read an XML encoded VDM file, such as .docx or ODF
  */
-abstract public class XMLStreamReader extends InputStreamReader
+abstract public class XMLStreamReader implements ExternalFormatReader
 {
-	protected String fileText = null;
 	private final static int ARRAYCHUNK = 10000;
+	private final String partName;
 
-	public XMLStreamReader(InputStream in, String partName)
-		throws IOException
+	public XMLStreamReader(String partName)
 	{
-		super(in);
-		
-		ZipInputStream zis = new ZipInputStream(in);
+		this.partName = partName;
+	}
+
+	public String readZip(File file, String encoding) throws IOException
+	{
+		ZipInputStream zis = new ZipInputStream(new FileInputStream(file));
 		ZipEntry ze = zis.getNextEntry();
+		String fileText = null;
 
 		while (ze != null)
 		{
@@ -78,7 +79,6 @@ abstract public class XMLStreamReader extends InputStreamReader
 				while (r > 0);
 				
 				// Look for the XML encoding
-				String encoding = VDMJ.filecharset;
 				String firstLine = new String(bytes, 0, 100);
 				Pattern epattern = Pattern.compile("encoding=\"([\\w-]+)\"");
 				Matcher ematch = epattern.matcher(firstLine);
@@ -96,15 +96,25 @@ abstract public class XMLStreamReader extends InputStreamReader
 		}
 
 		zis.close();
+		
+		if (fileText != null)
+		{
+			return fileText;
+		}
+		else
+		{
+			throw new IOException("Cannot find partName: " + partName);
+		}
 	}
 
 	protected final static String MARKER = "%%VDM%%";
 
 	@Override
-	public int read(char[] array) throws IOException
+	public char[] getText(File file, String encoding) throws IOException
 	{
+		String fileText = readZip(file, encoding);
+		StringBuilder text = new StringBuilder();
 		int start = fileText.indexOf(MARKER);
-		int ap = 0;
 
 		while (start > 0)
 		{
@@ -139,19 +149,12 @@ abstract public class XMLStreamReader extends InputStreamReader
 			}
 
 			String fixed = dequote(new String(clean, 0, cp));
-			char[] chars = fixed.toCharArray();
-			System.arraycopy(chars, 0, array, ap, chars.length);
-			ap += chars.length;
+			text.append(fixed);
 
 			start = fileText.indexOf(MARKER, end+1);
 		}
 
-		return ap;
-	}
-
-	public int length()
-	{
-		return fileText.length();
+		return text.toString().toCharArray();
 	}
 
 	abstract protected String despace(String in);

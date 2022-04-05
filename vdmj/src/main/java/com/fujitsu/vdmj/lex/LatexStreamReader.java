@@ -25,32 +25,39 @@
 package com.fujitsu.vdmj.lex;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Stack;
 
 /**
  * A class to read LaTeX encoded VDM files.
  */
-public class LatexStreamReader extends InputStreamReader
+public class LatexStreamReader implements ExternalFormatReader
 {
 	private final static String BOM = "\uFEFF";
 
 	private Stack<Boolean> ifstack = new Stack<Boolean>();
-
-	public LatexStreamReader(InputStream in, String charsetName)
-		throws UnsupportedEncodingException
+	
+	public char[] getText(String expression) throws IOException
 	{
-		super(in, charsetName);
+		return readFile(new StringReader(expression));
 	}
 
 	@Override
-	public int read(char[] array) throws IOException
+	public char[] getText(File file, String encoding) throws IOException
 	{
-		BufferedReader br = new BufferedReader(this);
+		return readFile(new InputStreamReader(new FileInputStream(file), encoding));
+	}
+	
+	private char[] readFile(Reader reader) throws IOException
+	{
+		BufferedReader br = new BufferedReader(reader);
 		String line = br.readLine();
+		StringBuilder array = new StringBuilder();
 		
 		if (line != null && line.startsWith(BOM))
 		{
@@ -58,7 +65,6 @@ public class LatexStreamReader extends InputStreamReader
 		}
 
 		boolean supress = false;
-		int pos = 0;
 
 		while (line != null)
 		{
@@ -129,15 +135,14 @@ public class LatexStreamReader extends InputStreamReader
 
 			if (!supress)
 			{
-				line.getChars(0, line.length(), array, pos);
-				pos += line.length();
+				array.append(line);
 			}
 
-			array[pos++] = '\n';
+			array.append('\n');
 			line = br.readLine();
 		}
 
 		br.close();
-		return pos;
+		return array.toString().toCharArray();
 	}
 }

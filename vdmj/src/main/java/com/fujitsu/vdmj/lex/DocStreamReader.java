@@ -24,53 +24,18 @@
 
 package com.fujitsu.vdmj.lex;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 
 /**
- * A class to read .doc encoded VDM files.
+ * A class to read .doc encoded VDM files. These are treated as simple text
+ * encoding files.
  */
-public class DocStreamReader extends InputStreamReader
+public class DocStreamReader extends TextStreamReader
 {
-	public DocStreamReader(InputStream in, String charsetName)
-		throws UnsupportedEncodingException
-	{
-		super(in, charsetName);
-	}
-
-	private final static String MARKER = "%%VDM%%";
-
 	@Override
-	public int read(char[] array) throws IOException
+	public char[] getText(File file, String encoding) throws IOException
 	{
-		BufferedReader br = new BufferedReader(this);
-		boolean capturing = false;
-		int pos = 0;
-		String line = br.readLine();
-
-		while (line != null)
-		{
-			if (line.endsWith(MARKER))
-			{
-				capturing = !capturing;
-			}
-			else
-			{
-				if (capturing)
-				{
-					line.getChars(0, line.length(), array, pos);
-					pos += line.length();
-					array[pos++] = '\n';
-				}
-			}
-
-			line = br.readLine();
-		}
-
-		br.close();
-		return pos;
+		return getText(file, encoding, "%%VDM%%");
 	}
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2022 Nick Battle
  *
  *	Author: Nick Battle
  *
@@ -24,21 +24,44 @@
 
 package com.fujitsu.vdmj.lex;
 
-/**
- * A class to read an ODF encoded VDM file.
- */
-public class DocxStreamReader extends XMLStreamReader
-{
-	public DocxStreamReader()
-	{
-		super("word/document.xml");
-	}
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
-	@Override
-	protected String despace(String in)
+/**
+ * A class to read text encoded VDM files, and look for a given marker.
+ */
+abstract public class TextStreamReader implements ExternalFormatReader
+{
+	protected char[] getText(File file, String encoding, String marker) throws IOException
 	{
-		return in
-    		.replaceAll("<w:tab/>", "\t")
-			.replaceAll("</w:pPr>", "\n");
+		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
+		StringBuilder text =  new StringBuilder();
+		boolean capturing = false;
+		String line = br.readLine();
+
+		while (line != null)
+		{
+			if (line.trim().contains(marker))
+			{
+				capturing = !capturing;
+			}
+			else
+			{
+				if (capturing)
+				{
+					text.append(line);
+					text.append('\n');
+				}
+			}
+
+			line = br.readLine();
+		}
+
+		br.close();
+		
+		return text.toString().toCharArray();
 	}
 }

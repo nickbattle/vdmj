@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +58,9 @@ public class SourceFile
 	public SourceFile(File filename) throws IOException
 	{
 		this.filename = filename;
-
-		BufferedReader br = new BufferedReader(new BacktrackInputReader(filename, VDMJ.filecharset));
+		
+		BacktrackInputReader bir = new BacktrackInputReader(filename, VDMJ.filecharset);
+		BufferedReader br = new BufferedReader(new StringReader(new String(bir.getText())));
 		String line = br.readLine();
 		boolean vdm_al = false;
 

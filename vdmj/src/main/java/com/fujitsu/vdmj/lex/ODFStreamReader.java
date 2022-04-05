@@ -24,17 +24,14 @@
 
 package com.fujitsu.vdmj.lex;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * A class to read an ODF encoded VDM file.
  */
 public class ODFStreamReader extends XMLStreamReader
 {
-	public ODFStreamReader(InputStream in) throws IOException
+	public ODFStreamReader()
 	{
-		super(in, "content.xml");
+		super("content.xml");
 	}
 
 	@Override

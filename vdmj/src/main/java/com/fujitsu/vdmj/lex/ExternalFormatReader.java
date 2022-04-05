@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.lex;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
 /**
  * Implemented by external parsers.
@@ -34,12 +33,7 @@ import java.io.InputStreamReader;
 public interface ExternalFormatReader
 {
 	/**
-	 * Return an InputStreamReader for the file, or null if none available.
+	 * Return a character array with the extracted VDM, or null if none available.
 	 */
-	public InputStreamReader getInputStream(File file, String charset) throws IOException;
-
-	/**
-	 * Return the total length of the file, in characters (not bytes).
-	 */
-	public int length();
+	public char[] getText(File file, String charset) throws IOException;
 }

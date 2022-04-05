@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2022 Nick Battle
  *
  *	Author: Nick Battle
  *
@@ -24,21 +24,17 @@
 
 package com.fujitsu.vdmj.lex;
 
-/**
- * A class to read an ODF encoded VDM file.
- */
-public class DocxStreamReader extends XMLStreamReader
-{
-	public DocxStreamReader()
-	{
-		super("word/document.xml");
-	}
+import java.io.File;
+import java.io.IOException;
 
+/**
+ * A class to read .adoc encoded VDM files.
+ */
+public class AsciiDocStreamReader extends TextStreamReader
+{
 	@Override
-	protected String despace(String in)
+	public char[] getText(File file, String encoding) throws IOException
 	{
-		return in
-    		.replaceAll("<w:tab/>", "\t")
-			.replaceAll("</w:pPr>", "\n");
+		return getText(file, encoding, "{vdm}");
 	}
 }

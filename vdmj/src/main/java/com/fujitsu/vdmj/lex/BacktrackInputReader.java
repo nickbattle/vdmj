@@ -24,12 +24,8 @@
 
 package com.fujitsu.vdmj.lex;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +38,7 @@ import com.fujitsu.vdmj.messages.InternalException;
  * A class to allow arbitrary checkpoints and backtracking while
  * parsing a file.
  */
-public class BacktrackInputReader extends Reader
+public class BacktrackInputReader
 {
 	/** A stack of position markers for popping. */
 	private Stack<Integer> stack = new Stack<Integer>();
@@ -53,11 +49,7 @@ public class BacktrackInputReader extends Reader
 	/** The current read position. */
 	private int pos = 0;
 
-	/** The total number of characters in the file. */
-	private int max = 0;
-	
 	/** External readers */
-	private ExternalFormatReader externalReader = null;
 	private static Map<String, Class<? extends ExternalFormatReader>> externalReaders = null;
 	
 	/**
@@ -69,15 +61,13 @@ public class BacktrackInputReader extends Reader
 	{
 		try
 		{
-			InputStreamReader isr = readerFactory(file, charset);
-			data = new char[readerLength(file, isr)];
-   	        max = isr.read(data);
-    		pos = 0;
-			isr.close();
+			ExternalFormatReader efr = readerFactory(file, charset);
+			data = efr.getText(file, charset);
+			pos = 0;
 		}
 		catch (IOException e)
 		{
-			throw new InternalException(0, e.getMessage());
+			throw new InternalException(0, "Cannot read file: " + e.getMessage());
 		}
 	}
 
@@ -99,160 +89,18 @@ public class BacktrackInputReader extends Reader
 	 */
 	public BacktrackInputReader(String expression, String charset)
 	{
-    	try
-        {
-	        ByteArrayInputStream is =
-	        	new ByteArrayInputStream(expression.getBytes(charset));
-
-	        InputStreamReader isr =
-	        	new LatexStreamReader(is, charset);
-
-    		data = new char[expression.length() + 1];
-   	        max = isr.read(data);
-	        pos = 0;
-
-	        isr.close();
-	        is.close();
-        }
-        catch (IOException e)
-        {
-	        // This can never really happen...
-        }
-	}
-
-	/**
-	 * Create an InputStreamReader from a File, depending on the filename.
-	 */
-	private InputStreamReader readerFactory(File file, String charset) throws IOException
-	{
-		String name = file.getName();
-		
-		if (Properties.parser_external_readers != null)
+		try
 		{
-			if (externalReaders == null)
-			{
-				buildExternalReaders();
-			}
-			
-			for (String pattern: externalReaders.keySet())
-			{
-				if (name.endsWith(pattern))
-				{
-					try
-					{
-						Class<? extends ExternalFormatReader> clazz = externalReaders.get(pattern);
-						externalReader = clazz.newInstance();
-						InputStreamReader reader = externalReader.getInputStream(file, charset);
-						
-						if (reader != null)
-						{
-							return reader;
-						}
-					}
-					catch (Exception e)
-					{
-						externalReader = null;
-						throw new IOException("External parser failed", e);
-					}
-				}
-			}
+			LatexStreamReader lsr = new LatexStreamReader();
+			data = lsr.getText(expression);
+			pos = 0;
 		}
-		
-		if (name.toLowerCase().endsWith(".doc"))
+		catch (IOException e)
 		{
-			return new DocStreamReader(new FileInputStream(file), charset);
-		}
-		else if (name.toLowerCase().endsWith(".docx"))
-		{
-			return new DocxStreamReader(new FileInputStream(file));
-		}
-		else if (name.toLowerCase().endsWith(".odt"))
-		{
-			return new ODFStreamReader(new FileInputStream(file));
-		}
-		else
-		{
-			return new LatexStreamReader(new FileInputStream(file), charset);
-		}
-	}
-
-	/**
-	 * Property format is "<pattern>=<class>,<pattern>=<class>,..."
-	 */
-	@SuppressWarnings("unchecked")
-	private static synchronized void buildExternalReaders() throws IOException
-	{
-		externalReaders = new HashMap<String, Class<? extends ExternalFormatReader>>();
-		String[] readers = Properties.parser_external_readers.split("\\s*,\\s*");
-		
-		for (String readerPair: readers)
-		{
-			try
-			{
-				String[] parts = readerPair.split("\\s*=\\s*");
-				Class<? extends ExternalFormatReader> clazz = (Class<? extends ExternalFormatReader>) Class.forName(parts[1]);
-				externalReaders.put(parts[0], clazz);
-			}
-			catch (Exception e)
-			{
-				throw new IOException("Build external readers failed", e);
-			}
-		}
-	}
-
-	/**
-	 * Calculate the length to allocate for a given file/stream.
-	 */
-	private int readerLength(File file, InputStreamReader isr)
-	{
-		String name = file.getName();
-
-		if (externalReader != null)
-		{
-			return externalReader.length();
-		}
-		else if (name.endsWith(".docx"))
-		{
-			return ((DocxStreamReader)isr).length();
-		}
-		else if (name.endsWith(".odt"))
-		{
-			return ((ODFStreamReader)isr).length();
-		}
-		else
-		{
-			return (int)(file.length() + 1);
+			throw new InternalException(0, "Cannot read file: " + e.getMessage());
 		}
 	}
 	
-	/**
-	 * Test whether an non-default reader is used for File.
-	 */
-	public static boolean isDocumentFormat(File file) throws IOException
-	{
-		if (externalReaders == null && Properties.parser_external_readers != null)
-		{
-			buildExternalReaders();
-		}
-		
-		if (externalReaders != null)
-		{
-			for (String key: externalReaders.keySet())
-			{
-				if (file.getName().endsWith(key))
-				{
-					return true;
-				}
-			}
-		}
-		
-		return
-			file.getName().endsWith(".doc") ||
-			file.getName().endsWith(".docx") ||
-			file.getName().endsWith(".odt");
-	}
-
-
 	/**
 	 * Create an object to read the string passed with the default charset.
 	 */
@@ -260,6 +108,116 @@ public class BacktrackInputReader extends Reader
 	{
 		this(expression, Charset.defaultCharset().name());
 	}
+
+	/**
+	 * Return the entire content of the file.
+	 */
+	public char[] getText()
+	{
+		return data;
+	}
+
+	/**
+	 * Create an ExternalFormatReader from a File, depending on the filename.
+	 * @throws IOException 
+	 */
+	private ExternalFormatReader readerFactory(File file, String charset) throws IOException
+	{
+		String name = file.getName();
+		
+		if (externalReaders == null)
+		{
+			buildExternalReaders();
+		}
+		
+		for (String suffix: externalReaders.keySet())
+		{
+			if (name.endsWith(suffix))
+			{
+				try
+				{
+					Class<? extends ExternalFormatReader> clazz = externalReaders.get(suffix);
+					return clazz.newInstance();
+				}
+				catch (Exception e)
+				{
+					throw new IOException("External reader failed: " + e);
+				}
+			}
+		}
+
+		return new LatexStreamReader();		// Reader of last resort :-)
+	}
+
+	/**
+	 * Property format is "<suffix>=<class>,<suffix>=<class>,..."
+	 */
+	@SuppressWarnings("unchecked")
+	private static synchronized void buildExternalReaders() throws IOException
+	{
+		externalReaders = new HashMap<String, Class<? extends ExternalFormatReader>>();
+		
+		// Add the standard readers first
+		externalReaders.put(".doc", DocStreamReader.class);
+		externalReaders.put(".DOC", DocStreamReader.class);
+		externalReaders.put(".docx", DocxStreamReader.class);
+		externalReaders.put(".DOCX", DocxStreamReader.class);
+		externalReaders.put(".odt", ODFStreamReader.class);
+		externalReaders.put(".ODT", ODFStreamReader.class);
+		externalReaders.put(".adoc", AsciiDocStreamReader.class);
+		externalReaders.put(".ADOC", AsciiDocStreamReader.class);
+		externalReaders.put(".md", MarkdownStreamReader.class);
+		externalReaders.put(".markdown", MarkdownStreamReader.class);
+		
+		if (Properties.parser_external_readers != null)
+		{
+			String[] readers = Properties.parser_external_readers.split("\\s*,\\s*");
+			
+			for (String readerPair: readers)
+			{
+				try
+				{
+					String[] parts = readerPair.split("\\s*=\\s*");
+					
+					if (parts.length == 2)
+					{
+						Class<? extends ExternalFormatReader> clazz = (Class<? extends ExternalFormatReader>) Class.forName(parts[1]);
+						externalReaders.put(parts[0], clazz);
+					}
+					else
+					{
+						System.err.printf("Malformed external readers: %s\n", Properties.parser_external_readers);
+					}
+				}
+				catch (Exception e)
+				{
+					throw new IOException("Build external readers failed: " + e);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Test whether an non-default reader is used for File.
+	 */
+	public static boolean isDocumentFormat(File file) throws IOException
+	{
+		if (externalReaders == null)
+		{
+			buildExternalReaders();
+		}
+		
+		for (String key: externalReaders.keySet())
+		{
+			if (file.getName().endsWith(key))
+			{
+				return true;
+			}
+		}
+		
+		return false;	// use LaTeX reader
+	}
+
 
 	/**
 	 * Push the current location to permit backtracking.
@@ -295,31 +253,6 @@ public class BacktrackInputReader extends Reader
 	 */
 	public char readCh()
 	{
-		return (pos == max) ? (char)-1 : data[pos++];
-	}
-
-	/**
-	 * Read characters into the array passed.
-	 */
-	@Override
-	public int read(char[] cbuf, int off, int len)
-	{
-		int n = 0;
-
-		while (pos != max && n < len)
-		{
-			cbuf[off + n++] = data[pos++];
-		}
-
-		return (n == 0) ? -1 : n;
-	}
-
-	/**
-	 * Close the input stream.
-	 */
-	@Override
-	public void close()
-	{
-		return;		// Stream was closed at the start anyway.
+		return (pos == data.length) ? (char)-1 : data[pos++];
 	}
 }

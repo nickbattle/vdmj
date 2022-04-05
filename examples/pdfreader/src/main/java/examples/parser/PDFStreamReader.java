@@ -25,7 +25,6 @@
 package examples.parser;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -37,10 +36,8 @@ import com.fujitsu.vdmj.lex.ExternalFormatReader;
  */
 public class PDFStreamReader implements ExternalFormatReader
 {
-	private String fileText = null;
-	
 	@Override
-	public InputStreamReader getInputStream(File file, String charset) throws IOException
+	public char[] getText(File file, String charset) throws IOException
 	{
 		try
 		{
@@ -63,19 +60,12 @@ public class PDFStreamReader implements ExternalFormatReader
 			}
 			
 			is.close();
-			fileText = sb.toString();
-		    return new InputStreamReader(new ByteArrayInputStream(fileText.getBytes()), charset);
+			return sb.toString().toCharArray();
 		}
 		catch (Throwable th)
 		{
 			System.err.println(th);
 			return null;
 		}
-	}
-
-	@Override
-	public int length()
-	{
-		return fileText.length();
 	}
 }
