@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Date;
 
 /**
  * A class to read text encoded VDM files, and look for a given marker.
@@ -41,6 +42,14 @@ abstract public class TextStreamReader implements ExternalFormatReader
 		StringBuilder text =  new StringBuilder();
 		boolean capturing = false;
 		String line = br.readLine();
+		
+		text.append("--\n");
+		text.append("-- Document created from ");
+		text.append(file.getName());
+		text.append(" at ");
+		text.append(new Date());
+		text.append("\n");
+		text.append("--\n");
 
 		while (line != null)
 		{

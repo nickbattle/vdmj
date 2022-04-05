@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -116,6 +117,14 @@ abstract public class XMLStreamReader implements ExternalFormatReader
 		StringBuilder text = new StringBuilder();
 		int start = fileText.indexOf(MARKER);
 
+		text.append("--\n");
+		text.append("-- Document created from ");
+		text.append(file.getName());
+		text.append(" at ");
+		text.append(new Date());
+		text.append("\n");
+		text.append("--\n");
+		
 		while (start > 0)
 		{
 			start += MARKER.length();
