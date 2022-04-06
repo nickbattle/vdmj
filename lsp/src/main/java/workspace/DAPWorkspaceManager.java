@@ -229,8 +229,6 @@ public class DAPWorkspaceManager
 			{
 				switch (key)
 				{
-					case "vdmj.parser.comment_nesting":
-					case "vdmj.parser.external_readers":
 					case "vdmj.annotations.packages":
 					case "vdmj.annotations.debug":
 					case "vdmj.mapping.search_path":
@@ -278,8 +276,6 @@ public class DAPWorkspaceManager
 		Settings.exceptions = false;
 		
 		// Clear any System property overrides...
-		System.clearProperty("vdmj.parser.comment_nesting");
-		System.clearProperty("vdmj.parser.external_readers");
 		System.clearProperty("vdmj.annotations.packages");
 		System.clearProperty("vdmj.annotations.debug");
 		System.clearProperty("vdmj.mapping.search_path");
