@@ -44,6 +44,9 @@ public class Properties
 	/** External reader patterns and classes */
 	public static String parser_external_readers = null;
 	
+	/** Merge adjacent single line comments into a block */
+	public static boolean parser_merge_comments = false;
+	
 	/** The package list for annotation classes to load. */
 	public static String annotations_packages = "com.fujitsu.vdmj.ast.annotations;annotations.ast";
 	
@@ -169,6 +172,7 @@ public class Properties
 		parser_tabstop = get(vdmj, "vdmj.parser.tabstop", 4);
 		parser_comment_nesting = get(vdmj, "vdmj.parser.comment_nesting", 3);
 		parser_external_readers = get(vdmj, "vdmj.parser.external_readers", null);
+		parser_merge_comments = get(vdmj, "vdmj.parser.merge_comments", false);
 
 		annotations_packages = get(vdmj, "vdmj.annotations.packages", "com.fujitsu.vdmj.ast.annotations;annotations.ast");
 		annotations_debug = get(vdmj, "vdmj.annotations.debug", false);

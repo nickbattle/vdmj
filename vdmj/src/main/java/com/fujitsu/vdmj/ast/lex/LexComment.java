@@ -37,16 +37,23 @@ public class LexComment extends ASTNode
 	public final LexLocation location;
 	public final String comment;
 	public final boolean block;
+	public final LexLocation endloc;	// Last line of multi-line merged comment
 
-	public LexComment(LexLocation location, String comment, boolean block)
+	public LexComment(LexLocation location, String comment, boolean block, LexLocation endloc)
 	{
 		super();
 		
 		this.location = location;
 		this.comment = comment;
 		this.block = block;
+		this.endloc = endloc;
 	}
-	
+
+	public LexComment(LexLocation location, String comment, boolean block)
+	{
+		this(location, comment, block, location);
+	}
+
 	@Override
 	public String toString()
 	{

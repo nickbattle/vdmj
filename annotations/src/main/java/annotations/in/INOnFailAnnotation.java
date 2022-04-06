@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INIntegerLiteralExpression;
-import com.fujitsu.vdmj.in.expressions.INStringLiteralExpression;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -38,10 +37,12 @@ import com.fujitsu.vdmj.values.Value;
 public class INOnFailAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
+	private final String format;
 
-	public INOnFailAnnotation(TCIdentifierToken name, INExpressionList args)
+	public INOnFailAnnotation(TCIdentifierToken name, INExpressionList args, String format)
 	{
 		super(name, args);
+		this.format = format;
 	}
 	
 	@Override
@@ -68,17 +69,16 @@ public class INOnFailAnnotation extends INAnnotation
 					values[p - offset] = args.get(p).eval(ctxt);
 				}
 				
-				INStringLiteralExpression fmt = (INStringLiteralExpression)args.get(offset - 1);
-				String format = fmt.value.value;
 				String location = "";
+				String useformat = format;
 				
 				if (format.endsWith("$"))	// Add @OnFail location to output
 				{
 					 location = name.getLocation().toString();
-					 format = format.substring(0, format.length() - 1);
+					 useformat = format.substring(0, format.length() - 1);
 				}
 							
-				Console.out.printf(errno + format + location + "\n", values);
+				Console.out.printf(errno + useformat + location + "\n", values);
 			}
 		}
 		catch (ValueException e)

@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 public class TCOnFailAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
+	private String format = null;
 
 	public TCOnFailAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -104,7 +105,17 @@ public class TCOnFailAnnotation extends TCAnnotation
 					str = (TCStringLiteralExpression)args.get(1);
 				}
 				
-				String format = str.value.value;
+				format = str.value.value;
+				
+				if (format.contains("%NAME"))
+				{
+					TCDefinition enc = env.getEnclosingDefinition();
+					
+					if (enc != null && enc.name != null)
+					{
+						format = format.replaceAll("%NAME", enc.name.getName());
+					}
+				}
 				
 				try
 				{
