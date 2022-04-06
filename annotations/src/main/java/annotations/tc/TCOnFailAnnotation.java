@@ -106,6 +106,16 @@ public class TCOnFailAnnotation extends TCAnnotation
 				
 				String format = str.value.value;
 				
+				if (format.contains("%NAME"))
+				{
+					TCDefinition enc = env.getEnclosingDefinition();
+					
+					if (enc != null && enc.name != null)
+					{
+						format = format.replaceAll("%NAME", enc.name.getName());
+					}
+				}
+				
 				try
 				{
 					// Try to format with string arguments to check they are all %s (up to 20)
