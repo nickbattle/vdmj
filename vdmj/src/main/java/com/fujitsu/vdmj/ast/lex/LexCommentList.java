@@ -44,7 +44,24 @@ public class LexCommentList extends Vector<LexComment>
 	
 	public void add(LexLocation location, String comment, boolean block)
 	{
-		this.add(new LexComment(location, comment, block));
+		LexLocation endloc = location;
+		
+		if (size() > 0 && Boolean.getBoolean("vdmj.parser.merge_comments"))
+		{
+			LexComment previous = this.lastElement();
+			
+			if (!previous.block && previous.endloc.startLine == location.startLine - 1)
+			{
+				this.remove(size() - 1);
+				
+				// Simulate a block comment, including the indentation padding
+				comment = previous.comment + "\n" + padding(location.startPos - 1) + comment;
+				endloc = location;				// New end is this comment
+				location = previous.location;	// Start of growing block
+			}
+		}
+
+		this.add(new LexComment(location, comment, block, endloc));
 	}
 
 	public String comment(int i)
@@ -55,5 +72,17 @@ public class LexCommentList extends Vector<LexComment>
 	public LexLocation location(int i)
 	{
 		return get(i).location;
+	}
+	
+	private String padding(int len)
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		for (int i=0; i<len; i++)
+		{
+			sb.append(' ');
+		}
+		
+		return sb.toString();
 	}
 }
