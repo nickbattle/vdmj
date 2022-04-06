@@ -160,6 +160,7 @@ public class DAPWorkspaceManager
 			this.defaultName = defaultName;
 			this.remoteControl = remoteControl;
 			
+			clearInterpreter();
 			processSettings(request);
 			
 			return new DAPMessageList(request);
@@ -305,6 +306,8 @@ public class DAPWorkspaceManager
 	{
 		try
 		{
+			// Interpreter may already have been created by setBreakpoint calls during configuration.
+			
 			if (remoteControl != null)
 			{
 				RemoteControlExecutor exec = new RemoteControlExecutor("remote", request, remoteControl, defaultName);
@@ -387,9 +390,8 @@ public class DAPWorkspaceManager
 		{
 			try
 			{
-				TCPlugin tc = registry.getPlugin("TC");
 				INPlugin in = registry.getPlugin("IN");
-				interpreter = in.getInterpreter(tc.getTC());
+				interpreter = in.getInterpreter();
 			}
 			catch (Exception e)
 			{
@@ -735,6 +737,7 @@ public class DAPWorkspaceManager
 				interpreter.clearBreakpoint(bpno);
 			}
 			
+			Diag.info("Cleared interpreter");
 			interpreter = null;
 		}
 	}

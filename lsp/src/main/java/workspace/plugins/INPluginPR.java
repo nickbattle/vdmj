@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.tc.definitions.TCClassList;
 public class INPluginPR extends INPlugin
 {
 	private INClassList inClassList = null;
+	private TCClassList tcClassList = null;
 	
 	public INPluginPR()
 	{
@@ -56,12 +57,14 @@ public class INPluginPR extends INPlugin
 	public void preCheck()
 	{
 		inClassList = new INClassList();
+		tcClassList = new TCClassList();
 	}
 	
 	@Override
 	public <T extends Mappable> boolean checkLoadedFiles(T tcClassList) throws Exception
 	{
-		inClassList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(tcClassList);
+		this.tcClassList = (TCClassList) tcClassList;
+		this.inClassList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(tcClassList);
 		return true;
 	}
 
@@ -73,8 +76,8 @@ public class INPluginPR extends INPlugin
 	}
 
 	@Override
-	public <T extends Mappable> Interpreter getInterpreter(T tcClassList) throws Exception
+	public <T extends Mappable> Interpreter getInterpreter() throws Exception
 	{
-		return new ClassInterpreter(inClassList, (TCClassList)tcClassList);
+		return new ClassInterpreter(inClassList, tcClassList);
 	}
 }

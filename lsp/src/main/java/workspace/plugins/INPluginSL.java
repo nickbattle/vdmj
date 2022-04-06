@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 public class INPluginSL extends INPlugin
 {
 	private INModuleList inModuleList = null;
+	private TCModuleList tcModuleList = null;
 	
 	public INPluginSL()
 	{
@@ -56,12 +57,14 @@ public class INPluginSL extends INPlugin
 	public void preCheck()
 	{
 		inModuleList = new INModuleList();
+		tcModuleList = new TCModuleList();
 	}
 	
 	@Override
 	public <T extends Mappable> boolean checkLoadedFiles(T tcModuleList) throws Exception
 	{
-		inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(tcModuleList);
+		this.tcModuleList = (TCModuleList) tcModuleList;
+		this.inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(tcModuleList);
 		return true;
 	}
 
@@ -73,8 +76,8 @@ public class INPluginSL extends INPlugin
 	}
 
 	@Override
-	public <T extends Mappable> Interpreter getInterpreter(T tcModuleList) throws Exception
+	public <T extends Mappable> Interpreter getInterpreter() throws Exception
 	{
-		return new ModuleInterpreter(inModuleList, (TCModuleList) tcModuleList);
+		return new ModuleInterpreter(inModuleList, tcModuleList);
 	}
 }

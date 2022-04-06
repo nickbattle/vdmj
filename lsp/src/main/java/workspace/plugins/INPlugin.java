@@ -74,5 +74,5 @@ abstract public class INPlugin extends AnalysisPlugin
 	
 	abstract public <T extends Mappable> boolean checkLoadedFiles(T tcList) throws Exception;
 	
-	abstract public <T extends Mappable> Interpreter getInterpreter(T tcList) throws Exception;
+	abstract public <T extends Mappable> Interpreter getInterpreter() throws Exception;
 }
