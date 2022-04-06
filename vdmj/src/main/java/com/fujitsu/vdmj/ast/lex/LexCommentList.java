@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.ast.lex;
 
 import java.util.Vector;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexLocation;
 
 public class LexCommentList extends Vector<LexComment>
@@ -46,7 +47,7 @@ public class LexCommentList extends Vector<LexComment>
 	{
 		LexLocation endloc = location;
 		
-		if (size() > 0 && Boolean.getBoolean("vdmj.parser.merge_comments"))
+		if (size() > 0 && Properties.parser_merge_comments)
 		{
 			LexComment previous = this.lastElement();
 			
