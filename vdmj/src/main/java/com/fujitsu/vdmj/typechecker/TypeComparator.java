@@ -224,7 +224,7 @@ public class TypeComparator
 		}
 
 		// The pair.result is "Maybe" until this call returns.
-		pair.result = test(to, from, paramOnly);
+		pair.result = comptest(to, from, paramOnly);
 
 		return pair.result;
 	}
@@ -259,7 +259,7 @@ public class TypeComparator
 	 * @return Yes or No.
 	 */
 
-	private static Result test(TCType to, TCType from, boolean paramOnly)
+	private static Result comptest(TCType to, TCType from, boolean paramOnly)
 	{
 		if (to instanceof TCUnresolvedType)
 		{
@@ -476,10 +476,10 @@ public class TypeComparator
 				TCFunctionType fa = (TCFunctionType)to;
 				TCFunctionType fb = (TCFunctionType)from;
 				
-				if (fb.partial && !fa.partial)
-				{
-					return Result.No;
-				}
+//				if (fb.partial && !fa.partial)
+//				{
+//					return Result.No;
+//				}
 
 				return (allCompatible(fa.parameters, fb.parameters, paramOnly) == Result.Yes &&
 						(paramOnly ||
@@ -951,6 +951,11 @@ public class TypeComparator
 
 				TCFunctionType subf = (TCFunctionType)sub;
 				TCFunctionType supf = (TCFunctionType)sup;
+
+				if (subf.partial && !supf.partial)
+				{
+					return Result.No;
+				}
 
 				return (allSubTypes(subf.parameters, supf.parameters, invignore) == Result.Yes &&
 						searchSubType(subf.result, supf.result, invignore) == Result.Yes) ?
