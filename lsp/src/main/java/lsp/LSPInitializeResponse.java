@@ -59,6 +59,8 @@ public class LSPInitializeResponse extends JSONObject
 		cap.put("codeLensProvider",
 			new JSONObject("resolveProvider", false));
 		
+		cap.put("referencesProvider", true);
+		
 		/**
 		 * Experimental responses are partly fixed, from the implicit Server functions, and
 		 * party added by registered plugins.
