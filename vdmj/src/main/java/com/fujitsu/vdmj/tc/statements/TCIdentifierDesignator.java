@@ -39,6 +39,7 @@ public class TCIdentifierDesignator extends TCStateDesignator
 {
 	private static final long serialVersionUID = 1L;
 	public final TCNameToken name;
+	private TCDefinition vardef = null;
 
 	public TCIdentifierDesignator(TCNameToken name)
 	{
@@ -63,9 +64,9 @@ public class TCIdentifierDesignator extends TCStateDesignator
 			// by name in VDM++ does not "inherit" values from a superclass.
 
 			TCNameToken exname = name.getExplicit(true);
-			TCDefinition def = env.findName(exname, NameScope.STATE);
+			vardef = env.findName(exname, NameScope.STATE);
 
-			if (def == null)
+			if (vardef == null)
 			{
 				TCDefinitionSet matches = env.findMatches(exname);
 				
@@ -91,32 +92,32 @@ public class TCIdentifierDesignator extends TCStateDesignator
 				
 				return new TCUnknownType(location);
 			}
-			else if (!def.isUpdatable())
+			else if (!vardef.isUpdatable())
 			{
 				report(3301, "Variable '" + name + "' in scope is not updatable");
-				return def.getType();
+				return vardef.getType();
 			}
-			else if (encl != null && encl.isPure() && def.isInstanceVariable())
+			else if (encl != null && encl.isPure() && vardef.isInstanceVariable())
 			{
 				report(3338, "Cannot update state in a pure operation");
 			}
-			else if (def.classDefinition != null)
+			else if (vardef.classDefinition != null)
 			{
-    			if (!TCClassDefinition.isAccessible(env, def, true))
+    			if (!TCClassDefinition.isAccessible(env, vardef, true))
     			{
     				report(3180, "Inaccessible member '" + name + "' of class " +
-    					def.classDefinition.name.getName());
+    					vardef.classDefinition.name.getName());
     				return new TCUnknownType(location);
     			}
-    			else if (!def.isStatic() && env.isStatic())
+    			else if (!vardef.isStatic() && env.isStatic())
     			{
     				report(3181, "Cannot access " + name + " from a static context");
     				return new TCUnknownType(location);
     			}
 			}
-			else if (def instanceof TCExternalDefinition)
+			else if (vardef instanceof TCExternalDefinition)
 			{
-				TCExternalDefinition d = (TCExternalDefinition)def;
+				TCExternalDefinition d = (TCExternalDefinition)vardef;
 
 				if (d.readOnly)
 				{
@@ -125,7 +126,7 @@ public class TCIdentifierDesignator extends TCStateDesignator
 			}
 			// else just state access in (say) an explicit operation
 
-			return def.getType();
+			return vardef.getType();
 		}
 		else
 		{
@@ -168,6 +169,11 @@ public class TCIdentifierDesignator extends TCStateDesignator
 
 			return def.getType();
 		}
+	}
+	
+	public TCDefinition getDefinition()
+	{
+		return vardef;
 	}
 
 	@Override

@@ -260,7 +260,7 @@ public class LSPDefinitionFinder
 		else if (node instanceof TCIdentifierDesignator)
 		{
 			TCIdentifierDesignator id = (TCIdentifierDesignator)node;
-			return env.findName(id.name, NameScope.NAMESANDSTATE);
+			return id.getDefinition();
 		}
 		else if (node instanceof TCIdentifierToken)
 		{
