@@ -105,6 +105,12 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 	public Set<TCNode> caseAssignmentDefinition(TCAssignmentDefinition node, LexLocation sought)
 	{
 		Set<TCNode> all = super.caseAssignmentDefinition(node, sought);
+		
+		if (sought.touches(node.name.getLocation()))
+		{
+			all.add(node);
+		}
+		
 		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}

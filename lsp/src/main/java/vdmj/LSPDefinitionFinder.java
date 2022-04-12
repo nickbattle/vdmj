@@ -30,6 +30,7 @@ import java.util.Set;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -236,7 +237,8 @@ public class LSPDefinitionFinder
 			node instanceof TCExplicitOperationDefinition ||
 			node instanceof TCImplicitOperationDefinition ||
 			node instanceof TCTypeDefinition ||
-			node instanceof TCStateDefinition)
+			node instanceof TCStateDefinition ||
+			node instanceof TCAssignmentDefinition)
 		{
 			return (TCDefinition) node;
 		}
