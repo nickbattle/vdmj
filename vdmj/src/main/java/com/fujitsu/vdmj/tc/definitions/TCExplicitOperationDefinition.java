@@ -74,8 +74,8 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	public TCExplicitFunctionDefinition predef;
 	public TCExplicitFunctionDefinition postdef;
 	public TCDefinitionList paramDefinitions;
+	
 	public TCStateDefinition state;
-
 	private TCType actualResult = null;
 	public boolean isConstructor = false;
 	public TCTypeSet possibleExceptions = null;

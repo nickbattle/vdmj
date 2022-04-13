@@ -72,6 +72,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	public TCTypeList unresolved;
 	public TCExplicitFunctionDefinition predef;
 	public TCExplicitFunctionDefinition postdef;
+	public TCDefinitionList paramDefinitions;
 
 	public boolean recursive = false;
 	public boolean isUndefined = false;
@@ -235,14 +236,14 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			defs.addAll(getTypeParamDefinitions());
 		}
 
-		TCDefinitionList argdefs = new TCDefinitionList();
+		paramDefinitions = new TCDefinitionList();
 
 		for (TCPatternListTypePair pltp: parameterPatterns)
 		{
-			argdefs.addAll(pltp.getDefinitions(NameScope.LOCAL));
+			paramDefinitions.addAll(pltp.getDefinitions(NameScope.LOCAL));
 		}
 
-		defs.addAll(checkDuplicatePatterns(argdefs));
+		defs.addAll(checkDuplicatePatterns(paramDefinitions));
 		FlatEnvironment local = new FlatCheckedEnvironment(defs, base, scope);
 		FlatCheckedEnvironment checked = (FlatCheckedEnvironment)local;
 		checked.setStatic(accessSpecifier);
@@ -253,7 +254,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 
 		if (predef != null)
 		{
-			FlatEnvironment pre = new FlatEnvironment(argdefs, base);
+			FlatEnvironment pre = new FlatEnvironment(paramDefinitions, base);
 			pre.setEnclosingDefinition(predef);
 			predef.paramDefinitionList = predef.getParamDefinitions();
 

@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
@@ -180,6 +181,17 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 			all.add(node);
 		}
 		
+		for (TCDefinitionList plist: node.paramDefinitionList)
+		{
+			for (TCDefinition pdef: plist)
+			{
+				if (sought.touches(pdef.name.getLocation()))
+				{
+					all.add(pdef);
+				}
+			}
+		}
+		
 		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}
@@ -193,7 +205,15 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 		{
 			all.add(node);
 		}
-		
+
+		for (TCDefinition pdef: node.paramDefinitions)
+		{
+			if (sought.touches(pdef.name.getLocation()))
+			{
+				all.add(pdef);
+			}
+		}
+
 		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}
@@ -208,6 +228,14 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 			all.add(node);
 		}
 		
+		for (TCDefinition pdef: node.paramDefinitions)
+		{
+			if (sought.touches(pdef.name.getLocation()))
+			{
+				all.add(pdef);
+			}
+		}
+
 		all.addAll(node.unresolved.matchUnresolved(sought));
 		return all;
 	}
@@ -221,7 +249,15 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 		{
 			all.add(node);
 		}
-		
+
+		for (TCDefinition pdef: node.paramDefinitions)
+		{
+			if (sought.touches(pdef.name.getLocation()))
+			{
+				all.add(pdef);
+			}
+		}
+
 		all.addAll(node.unresolved.matchUnresolved(sought));
 		
 		if (node.externals != null)

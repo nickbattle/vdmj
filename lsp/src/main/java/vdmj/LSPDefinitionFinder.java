@@ -238,7 +238,8 @@ public class LSPDefinitionFinder
 			node instanceof TCImplicitOperationDefinition ||
 			node instanceof TCTypeDefinition ||
 			node instanceof TCStateDefinition ||
-			node instanceof TCAssignmentDefinition)
+			node instanceof TCAssignmentDefinition ||	// dcl x:type := ...
+			node instanceof TCLocalDefinition)			// Func/op parameter defs
 		{
 			return (TCDefinition) node;
 		}
