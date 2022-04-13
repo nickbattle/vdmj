@@ -30,17 +30,10 @@ import java.util.Set;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCFieldExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
@@ -198,7 +191,6 @@ public class LSPDefinitionFinder
 		}
 		else
 		{
-			Diag.info("Unable to locate symbol %s", position);
 			return null;
 		}
 	}
@@ -225,25 +217,17 @@ public class LSPDefinitionFinder
 		}
 		else
 		{
-			Diag.info("Unable to locate symbol %s", position);
 			return null;
 		}
 	}
 	
 	private TCDefinition lookupNodeDefinition(TCNode node, Environment env, String fromModule)
 	{
-		if (node instanceof TCExplicitFunctionDefinition ||
-			node instanceof TCImplicitFunctionDefinition ||
-			node instanceof TCExplicitOperationDefinition ||
-			node instanceof TCImplicitOperationDefinition ||
-			node instanceof TCTypeDefinition ||
-			node instanceof TCStateDefinition ||
-			node instanceof TCAssignmentDefinition ||	// dcl x:type := ...
-			node instanceof TCLocalDefinition)			// Func/op parameter defs
+		if (node instanceof TCDefinition)	// node is already a definition (eg. a func or param name)
 		{
 			return (TCDefinition) node;
 		}
-		else if (node instanceof TCField)
+		else if (node instanceof TCField)	// Part of a record type definition
 		{
 			TCField field = (TCField)node;
    			return new TCLocalDefinition(field.tagname.getLocation(), field.tagname, field.type);

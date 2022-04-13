@@ -422,14 +422,14 @@ abstract public class INLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 			all.addAll(visitorSet.applyTypeVisitor(field.type, arg));
 		}
 
-		if (node.invExpression != null)
+		if (node.invdef != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.invExpression, arg));
+			all.addAll(node.invdef.apply(this, arg));
 		}
 
-		if (node.initExpression != null)
+		if (node.initdef != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.initExpression, arg));
+			all.addAll(node.initdef.apply(this, arg));
 		}
 		
 		return all;
