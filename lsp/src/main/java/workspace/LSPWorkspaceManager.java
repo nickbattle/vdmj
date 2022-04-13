@@ -1016,6 +1016,68 @@ public class LSPWorkspaceManager
 		}
 	}
 
+	public RPCMessageList findReferences(RPCRequest request, File file, int zline, int zcol, Boolean incdec)
+	{
+		if (onDotPath(file) || ignoredFile(file))
+		{
+			return new RPCMessageList(request, null);
+		}
+		
+		TCDefinition def = findDefinition(file, zline, zcol);
+		
+		if (def == null || def.name == null)
+		{
+			return new RPCMessageList(request, null);
+		}
+		else if (def.location.file.getName().equals("console") ||
+				 def.location.file.getName().equals("?"))
+		{
+			// This happens for pseudo-symbols like CPU and BUS in RT
+			return new RPCMessageList(request, null);
+		}
+		else
+		{
+			String word = def.name.getName();
+			JSONArray results = new JSONArray();
+			
+			for (File pfile: projectFiles.keySet())
+			{
+				StringBuilder buffer = projectFiles.get(pfile);
+				
+				if (buffer.indexOf(word) > 0)
+				{
+					JSONArray list = Utils.findWords(buffer, word);
+					
+					for (int i=0; i<list.size(); i++)
+					{
+						JSONObject range = list.index(i);
+						TCDefinition def2 = findDefinition(pfile, range);
+						
+						// Check by location, so that manufactured definitions for fields
+						// will match.
+						if (def2 != null && def2.location.equals(def.location))
+						{
+							results.add(
+								new JSONObject(
+									"uri", pfile.toURI().toString(),
+									"range", range));
+						}
+					}
+				}
+			}
+			
+			if (incdec)
+			{
+				results.add(
+					new JSONObject(
+						"uri", def.location.file.toURI().toString(),
+						"range", Utils.lexLocationToRange(def.location)));
+			}
+			
+			return new RPCMessageList(request, results);
+		}
+	}
+
 	public RPCMessageList completion(RPCRequest request,
 			CompletionTriggerKind triggerKind, File file, int zline, int zcol)
 	{
@@ -1293,6 +1355,15 @@ public class LSPWorkspaceManager
 	{
 		TCPlugin plugin = registry.getPlugin("TC");
 		return plugin.findDefinition(file, zline, zcol);
+	}
+
+	private TCDefinition findDefinition(File file, JSONObject range)
+	{
+		TCPlugin plugin = registry.getPlugin("TC");
+		JSONObject start = range.get("start");
+		long zline = start.get("line");
+		long zcol  = start.get("character");
+		return plugin.findDefinition(file, (int)zline, (int)zcol);
 	}
 
 	private TCDefinitionList lookupDefinition(String startsWith)

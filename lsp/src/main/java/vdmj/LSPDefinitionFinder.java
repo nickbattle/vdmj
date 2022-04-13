@@ -30,10 +30,17 @@ import java.util.Set;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCAssignmentDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCFieldExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
@@ -225,7 +232,23 @@ public class LSPDefinitionFinder
 	
 	private TCDefinition lookupNodeDefinition(TCNode node, Environment env, String fromModule)
 	{
-		if (node instanceof TCVariableExpression)
+		if (node instanceof TCExplicitFunctionDefinition ||
+			node instanceof TCImplicitFunctionDefinition ||
+			node instanceof TCExplicitOperationDefinition ||
+			node instanceof TCImplicitOperationDefinition ||
+			node instanceof TCTypeDefinition ||
+			node instanceof TCStateDefinition ||
+			node instanceof TCAssignmentDefinition ||	// dcl x:type := ...
+			node instanceof TCLocalDefinition)			// Func/op parameter defs
+		{
+			return (TCDefinition) node;
+		}
+		else if (node instanceof TCField)
+		{
+			TCField field = (TCField)node;
+   			return new TCLocalDefinition(field.tagname.getLocation(), field.tagname, field.type);
+		}
+		else if (node instanceof TCVariableExpression)
 		{
 			TCVariableExpression vexp = (TCVariableExpression)node;
 			return vexp.getDefinition();
@@ -243,7 +266,7 @@ public class LSPDefinitionFinder
 		else if (node instanceof TCIdentifierDesignator)
 		{
 			TCIdentifierDesignator id = (TCIdentifierDesignator)node;
-			return env.findName(id.name, NameScope.NAMESANDSTATE);
+			return id.getDefinition();
 		}
 		else if (node instanceof TCIdentifierToken)
 		{

@@ -81,6 +81,8 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	public TCTypeList unresolved;
 	public TCExplicitFunctionDefinition predef;
 	public TCExplicitFunctionDefinition postdef;
+	public TCDefinitionList paramDefinitions;
+
 	public TCStateDefinition state;
 	public TCType actualResult;
 	public TCTypeSet possibleExceptions = null;
@@ -206,16 +208,17 @@ public class TCImplicitOperationDefinition extends TCDefinition
 
 		scope = NameScope.NAMESANDSTATE;
 		TCDefinitionList defs = new TCDefinitionList();
-		TCDefinitionList argdefs = new TCDefinitionList();
 		TypeComparator.checkImports(base, unresolved, location.module);
 		TypeComparator.checkComposeTypes(type, base, false);
 
+		paramDefinitions = new TCDefinitionList();
+
 		for (TCPatternListTypePair ptp: parameterPatterns)
 		{
-			argdefs.addAll(ptp.getDefinitions(ptp.type.isClass(base) ? NameScope.STATE : NameScope.LOCAL));
+			paramDefinitions.addAll(ptp.getDefinitions(ptp.type.isClass(base) ? NameScope.STATE : NameScope.LOCAL));
 		}
 
-		defs.addAll(checkDuplicatePatterns(argdefs));
+		defs.addAll(checkDuplicatePatterns(paramDefinitions));
 
 		if (result != null)
 		{
@@ -255,7 +258,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
         				else
         				{
             				defs.add(new TCExternalDefinition(sdef, clause.mode.is(Token.READ)));
-            				argdefs.add(new TCExternalDefinition(sdef, clause.mode.is(Token.READ)));
+            				paramDefinitions.add(new TCExternalDefinition(sdef, clause.mode.is(Token.READ)));
 
             				// VDM++ "ext wr" clauses in a constructor effectively
             				// initialize the instance variable concerned.
@@ -316,7 +319,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 
 		if (predef != null)
 		{
-			FlatEnvironment pre = new FlatEnvironment(argdefs, base);
+			FlatEnvironment pre = new FlatEnvironment(paramDefinitions, base);
 			pre.setLimitStateScope(limitStateScope);
 			pre.setEnclosingDefinition(predef);
 			pre.setFunctional(true, true);
@@ -436,7 +439,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 
 			for (TCErrorCase error: errors)
 			{
-				FlatEnvironment errs_lhs = new FlatEnvironment(argdefs, base);
+				FlatEnvironment errs_lhs = new FlatEnvironment(paramDefinitions, base);
 				errs_lhs.setLimitStateScope(limitStateScope);
 				errs_lhs.setEnclosingDefinition(this);
 				errs_lhs.setFunctional(true, true);

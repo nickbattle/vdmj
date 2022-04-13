@@ -46,6 +46,7 @@ import lsp.textdocument.DidCloseHandler;
 import lsp.textdocument.DidOpenHandler;
 import lsp.textdocument.DidSaveHandler;
 import lsp.textdocument.DocumentSymbolHandler;
+import lsp.textdocument.ReferencesHandler;
 import lsp.workspace.DidChangeWSHandler;
 import rpc.RPCDispatcher;
 import rpc.RPCHandler;
@@ -102,6 +103,7 @@ public class LSPServer extends JSONServer
 		dispatcher.register(new DocumentSymbolHandler(), "textDocument/documentSymbol");
 		dispatcher.register(new CompletionHandler(), "textDocument/completion");
 		dispatcher.register(new CodeLensHandler(), "textDocument/codeLens", "codeLens/resolve");
+		dispatcher.register(new ReferencesHandler(), "textDocument/references");
 
 		dispatcher.register(new DidChangeWSHandler(), "workspace/didChangeWatchedFiles");
 

@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
+import json.JSONArray;
 import json.JSONObject;
 import rpc.RPCErrors;
 import workspace.Diag;
@@ -172,6 +173,51 @@ public class Utils
 		{
 			return new File(s).getAbsoluteFile();
 		}
+	}
+	
+	/**
+	 * Return Ranges for the locations of word in the buffer.
+	 */
+	public static JSONArray findWords(StringBuilder buffer, String word)
+	{
+		long currentLine = 0;
+		long currentCharacter = 0;
+		char wstart = word.charAt(0);
+		JSONArray results = new JSONArray();
+		int limit = buffer.length() - word.length() + 1;
+		
+		for (int i=0; i<limit; i++)
+		{
+			if (buffer.charAt(i) == wstart &&
+				buffer.substring(i, i + word.length()).equals(word))
+			{
+				results.add(
+					new JSONObject(
+						"start",
+							new JSONObject(
+								"line", currentLine,
+								"character", currentCharacter),
+						
+						"end",
+							new JSONObject(
+								"line", currentLine,
+								"character", currentCharacter + word.length())));
+				
+				currentCharacter += word.length();
+				i += word.length() - 1;
+			}
+			else if (buffer.charAt(i) == '\n')
+			{
+				currentLine++;
+				currentCharacter = 0;
+			}
+			else
+			{
+				currentCharacter++;
+			}
+		}
+		
+		return results;
 	}
 
 	public static int findPosition(StringBuilder buffer, JSONObject position) throws Exception
