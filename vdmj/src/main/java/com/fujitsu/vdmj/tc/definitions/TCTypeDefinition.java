@@ -474,7 +474,7 @@ public class TCTypeDefinition extends TCDefinition
 			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier,
-			name.getInvName(loc), null, ftype, parameters, invExpression, null, null, true, null);
+			name.getInvName(invExpression.location), null, ftype, parameters, invExpression, null, null, true, null);
 
 		def.classDefinition = classDefinition;
 		ftype.definitions = new TCDefinitionList(def);

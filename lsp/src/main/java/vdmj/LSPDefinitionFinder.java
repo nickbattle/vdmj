@@ -161,7 +161,12 @@ public class LSPDefinitionFinder
 
 				if (nodes != null && !nodes.isEmpty())	// found it!
 				{
-					TCNode node = nodes.iterator().next();
+					if (nodes.size() > 1)
+					{
+						Diag.warning("WARNING: location maps multiple definitions at %s", position);
+					}
+					
+					TCNode node = nodes.iterator().next();	// Pick one
 					return new Found(null, cdef, node);
 				}
 			}
