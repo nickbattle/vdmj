@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMkTypeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNarrowExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNewExpression;
+import com.fujitsu.vdmj.tc.expressions.TCStateInitExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -191,5 +192,11 @@ public class LSPExpressionLocationFinder extends TCLeafExpressionVisitor<TCNode,
 		}
 	
 		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseStateInitExpression(TCStateInitExpression node, LexLocation arg)
+	{
+		return visitorSet.applyExpressionVisitor(node.state.initExpression, arg);
 	}
 }
