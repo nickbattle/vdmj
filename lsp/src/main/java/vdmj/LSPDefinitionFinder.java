@@ -137,6 +137,14 @@ public class LSPDefinitionFinder
 					
 					if (nodes != null && !nodes.isEmpty())	// found it!
 					{
+						if (nodes.size() > 1)
+						{
+							for (TCNode n: nodes)
+							{
+								Diag.warning("Location maps multiple definitions: %s", n);
+							}
+						}
+						
 						TCNode node = nodes.iterator().next();
 						return new Found(module, null, node);
 					}
@@ -161,7 +169,15 @@ public class LSPDefinitionFinder
 
 				if (nodes != null && !nodes.isEmpty())	// found it!
 				{
-					TCNode node = nodes.iterator().next();
+					if (nodes.size() > 1)
+					{
+						for (TCNode n: nodes)
+						{
+							Diag.warning("Location maps multiple definitions: %s", n);
+						}
+					}
+					
+					TCNode node = nodes.iterator().next();	// Pick one
 					return new Found(null, cdef, node);
 				}
 			}
