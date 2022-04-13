@@ -242,6 +242,11 @@ public class LSPDefinitionFinder
 		{
 			return (TCDefinition) node;
 		}
+		else if (node instanceof TCField)
+		{
+			TCField field = (TCField)node;
+   			return new TCLocalDefinition(field.tagname.getLocation(), field.tagname, field.type);
+		}
 		else if (node instanceof TCVariableExpression)
 		{
 			TCVariableExpression vexp = (TCVariableExpression)node;

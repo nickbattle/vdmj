@@ -1053,7 +1053,9 @@ public class LSPWorkspaceManager
 						JSONObject range = list.index(i);
 						TCDefinition def2 = findDefinition(pfile, range);
 						
-						if (def2 == def)	// Same definition
+						// Check by location, so that manufactured definitions for fields
+						// will match.
+						if (def2 != null && def2.location.equals(def.location))
 						{
 							results.add(
 								new JSONObject(

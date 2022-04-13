@@ -184,8 +184,9 @@ public class Utils
 		long currentCharacter = 0;
 		char wstart = word.charAt(0);
 		JSONArray results = new JSONArray();
+		int limit = buffer.length() - word.length() + 1;
 		
-		for (int i=0; i<buffer.length() - word.length(); i++)
+		for (int i=0; i<limit; i++)
 		{
 			if (buffer.charAt(i) == wstart &&
 				buffer.substring(i, i + word.length()).equals(word))
