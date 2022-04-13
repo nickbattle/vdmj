@@ -420,14 +420,14 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 			all.addAll(visitorSet.applyTypeVisitor(field.type, arg));
 		}
 		
-		if (node.invExpression != null)
+		if (node.invdef != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.invExpression, arg));
+			all.addAll(node.invdef.apply(this, arg));
 		}
 
-		if (node.initExpression != null)
+		if (node.initdef != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.initExpression, arg));
+			all.addAll(node.initdef.apply(this, arg));
 		}
 		
 		return all;
@@ -444,19 +444,29 @@ abstract public class TCLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	{
 		C all = visitorSet.applyTypeVisitor(node.type, arg);
 		
-		if (node.invExpression != null)
+		if (node.invdef != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.invExpression, arg));
+			all.addAll(node.invdef.apply(this, arg));
 		}
 
-		if (node.eqExpression != null)
+		if (node.eqdef != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.eqExpression, arg));
+			all.addAll(node.eqdef.apply(this, arg));
 		}
 
-		if (node.ordExpression != null)
+		if (node.orddef != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.ordExpression, arg));
+			all.addAll(node.orddef.apply(this, arg));
+		}
+		
+		if (node.mindef != null)
+		{
+			all.addAll(node.mindef.apply(this, arg));
+		}
+
+		if (node.maxdef != null)
+		{
+			all.addAll(node.maxdef.apply(this, arg));
 		}
 		
 		return all;

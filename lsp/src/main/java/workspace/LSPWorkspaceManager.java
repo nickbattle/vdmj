@@ -996,6 +996,7 @@ public class LSPWorkspaceManager
 				}
 			}
 
+			Diag.info("Unable to locate symbol at %s %d:%d", file, zline, zcol);
 			return new RPCMessageList(request, null);
 		}
 		else if (def.location.file.getName().equals("console") ||
@@ -1027,6 +1028,7 @@ public class LSPWorkspaceManager
 		
 		if (def == null || def.name == null)
 		{
+			Diag.info("Unable to locate symbol at %s %d:%d", file, zline, zcol);
 			return new RPCMessageList(request, null);
 		}
 		else if (def.location.file.getName().equals("console") ||

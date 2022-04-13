@@ -183,13 +183,14 @@ public class Utils
 		long currentLine = 0;
 		long currentCharacter = 0;
 		char wstart = word.charAt(0);
+		int wlen = word.length();
+		int limit = buffer.length() - wlen + 1;
 		JSONArray results = new JSONArray();
-		int limit = buffer.length() - word.length() + 1;
 		
 		for (int i=0; i<limit; i++)
 		{
 			if (buffer.charAt(i) == wstart &&
-				buffer.substring(i, i + word.length()).equals(word))
+				buffer.substring(i, i + wlen).equals(word))
 			{
 				results.add(
 					new JSONObject(
@@ -201,10 +202,10 @@ public class Utils
 						"end",
 							new JSONObject(
 								"line", currentLine,
-								"character", currentCharacter + word.length())));
+								"character", currentCharacter + wlen)));
 				
-				currentCharacter += word.length();
-				i += word.length() - 1;
+				currentCharacter += wlen;
+				i += wlen - 1;
 			}
 			else if (buffer.charAt(i) == '\n')
 			{
