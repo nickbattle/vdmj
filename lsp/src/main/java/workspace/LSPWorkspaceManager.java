@@ -53,6 +53,8 @@ import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.SourceFile;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.types.TCClassType;
@@ -1078,6 +1080,41 @@ public class LSPWorkspaceManager
 			
 			return new RPCMessageList(request, results);
 		}
+	}
+
+	public RPCMessageList prepareHierarchy(RPCRequest request, File file, int zline, int zcol)
+	{
+		// We can assume we're PP or RT
+		TCDefinition def = findDefinition(file, zline, zcol);
+		
+		if (def == null || def.name == null)
+		{
+			Diag.info("Unable to locate symbol at %s %d:%d", file, zline, zcol);
+			return new RPCMessageList(request, null);
+		}
+		else if (def.location.file.getName().equals("console") ||
+				 def.location.file.getName().equals("?"))
+		{
+			// This happens for pseudo-symbols like CPU and BUS in RT
+			return new RPCMessageList(request, null);
+		}
+		else if (def instanceof TCClassDefinition)
+		{
+			TCClassDefinition cdef = (TCClassDefinition)def;
+			return new RPCMessageList(request, messages.typeHierarchyItem(cdef));
+		}
+		else
+		{
+			Diag.info("Type hierarchy request isn't for class object");
+			return new RPCMessageList(request, null);
+		}
+	}
+
+	public RPCMessageList getTypeHierarchy(RPCRequest request, String classname, boolean subtypes)
+	{
+		TCPlugin tc = registry.getPlugin("TC");
+		TCClassList results = tc.getTypeHierarchy(classname, subtypes);
+		return new RPCMessageList(request, messages.typeHierarchyItems(results));
 	}
 
 	public RPCMessageList completion(RPCRequest request,

@@ -36,6 +36,9 @@ import java.util.Vector;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCClassList;
+
 import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
@@ -151,4 +154,25 @@ public class LSPMessageUtils
 		}
 	}
 
+	public JSONObject typeHierarchyItem(TCClassDefinition cdef)
+	{
+		return new JSONObject(
+				"name",				cdef.name.getName(),
+				"kind",				SymbolKind.Class,
+				"uri",				cdef.location.file.toURI().toString(),
+				"range",			Utils.lexLocationToRange(cdef.location),
+				"selectionRange",	Utils.lexLocationToRange(cdef.location));
+	}
+	
+	public JSONArray typeHierarchyItems(TCClassList cdefs)
+	{
+		JSONArray results = new JSONArray();
+		
+		for (TCClassDefinition cdef: cdefs)
+		{
+			results.add(typeHierarchyItem(cdef));
+		}
+		
+		return results;
+	}
 }
