@@ -30,6 +30,7 @@ import java.util.Set;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCRecordPattern;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCLeafPatternVisitor;
@@ -54,6 +55,19 @@ public class LSPPatternLocationFinder extends TCLeafPatternVisitor<TCNode, Set<T
 	public Set<TCNode> casePattern(TCPattern node, LexLocation arg)
 	{
 		return newCollection();
+	}
+	
+	@Override
+	public Set<TCNode> caseIdentifierPattern(TCIdentifierPattern node, LexLocation arg)
+	{
+		Set<TCNode> all = newCollection();
+		
+		if (arg.touches(node.name.getLocation()))
+		{
+			all.add(node);
+		}
+		
+		return all;
 	}
 	
 	@Override
