@@ -272,7 +272,8 @@ public class TCPluginPR extends TCPlugin
 		{
 			if (sdef.superdefs.contains(cdef))
 			{
-				subs.addAll(subtypes(sdef));
+				subs.add(sdef);
+				// subs.addAll(subtypes(sdef));
 			}
 		}
 		
@@ -284,10 +285,10 @@ public class TCPluginPR extends TCPlugin
 		TCClassList supers = new TCClassList();
 		supers.addAll(cdef.superdefs);
 		
-		for (TCClassDefinition sdef: cdef.superdefs)
-		{
-			supers.addAll(supertypes(sdef));
-		}
+//		for (TCClassDefinition sdef: cdef.superdefs)
+//		{
+//			supers.addAll(supertypes(sdef));
+//		}
 		
 		return supers;
 	}
