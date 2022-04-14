@@ -141,7 +141,8 @@ public class LSPDefinitionFinder
 						{
 							for (TCNode n: nodes)
 							{
-								Diag.warning("Location maps multiple definitions: %s", n);
+								Diag.warning("Location maps multiple definitions: %s (%s)",
+										n, n.getClass().getSimpleName());
 							}
 						}
 						
@@ -173,7 +174,8 @@ public class LSPDefinitionFinder
 					{
 						for (TCNode n: nodes)
 						{
-							Diag.warning("Location maps multiple definitions: %s", n);
+							Diag.warning("Location maps multiple definitions: %s (%s)",
+									n, n.getClass().getSimpleName());
 						}
 					}
 					

@@ -187,7 +187,9 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 			{
 				if (sought.touches(pdef.name.getLocation()))
 				{
+					all.clear();	// Remove pattern match
 					all.add(pdef);
+					return all;
 				}
 			}
 		}
@@ -210,7 +212,9 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 		{
 			if (sought.touches(pdef.name.getLocation()))
 			{
+				all.clear();	// Remove pattern match
 				all.add(pdef);
+				return all;
 			}
 		}
 
@@ -232,7 +236,9 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 		{
 			if (sought.touches(pdef.name.getLocation()))
 			{
+				all.clear();	// Remove pattern match
 				all.add(pdef);
+				return all;
 			}
 		}
 
@@ -254,7 +260,9 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 		{
 			if (sought.touches(pdef.name.getLocation()))
 			{
+				all.clear();	// Remove pattern match
 				all.add(pdef);
+				return all;
 			}
 		}
 
