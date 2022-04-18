@@ -224,4 +224,72 @@ public class TCPluginPR extends TCPlugin
 		
 		return results;
 	}
+
+	@Override
+	public TCClassList getTypeHierarchy(String classname, boolean subtypes)
+	{
+		if (tcClassList != null)
+		{
+			TCClassDefinition cdef = find(classname);
+			
+			if (cdef == null)
+			{
+				return null;
+			}
+			else if (subtypes)
+			{
+				return subtypes(cdef);
+			}
+			else
+			{
+				return supertypes(cdef);
+			}
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	private TCClassDefinition find(String classname)
+	{
+		for (TCClassDefinition cdef: tcClassList)
+		{
+			if (cdef.name.getName().equals(classname))
+			{
+				return cdef;
+			}
+		}
+		
+		return null;
+	}
+
+	private TCClassList subtypes(TCClassDefinition cdef)
+	{
+		TCClassList subs = new TCClassList();
+		
+		for (TCClassDefinition sdef: tcClassList)
+		{
+			if (sdef.superdefs.contains(cdef))
+			{
+				subs.add(sdef);
+				// subs.addAll(subtypes(sdef));
+			}
+		}
+		
+		return subs;
+	}
+
+	private TCClassList supertypes(TCClassDefinition cdef)
+	{
+		TCClassList supers = new TCClassList();
+		supers.addAll(cdef.superdefs);
+		
+//		for (TCClassDefinition sdef: cdef.superdefs)
+//		{
+//			supers.addAll(supertypes(sdef));
+//		}
+		
+		return supers;
+	}
 }

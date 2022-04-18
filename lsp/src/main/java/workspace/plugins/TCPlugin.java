@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCMutexSyncDefinition;
@@ -132,6 +133,8 @@ abstract public class TCPlugin extends AnalysisPlugin
 	abstract public TCDefinitionList lookupDefinition(String startsWith);
 	
 	abstract public void saveDependencies(File saveUri) throws IOException;
+
+	abstract public TCClassList getTypeHierarchy(String classname, boolean subtypes);
 
 	/**
 	 * Common methods for hierarchical outlines.

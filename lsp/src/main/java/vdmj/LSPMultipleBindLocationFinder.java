@@ -25,14 +25,21 @@
 package vdmj;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleSeqBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.patterns.visitors.TCLeafMultipleBindVisitor;
+import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class LSPMultipleBindLocationFinder extends TCLeafMultipleBindVisitor<TCNode, Set<TCNode>, LexLocation>
 {
@@ -54,8 +61,47 @@ public class LSPMultipleBindLocationFinder extends TCLeafMultipleBindVisitor<TCN
 	}
 	
 	@Override
+	public Set<TCNode> caseMultipleSetBind(TCMultipleSetBind node, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseMultipleSetBind(node, arg);
+		patternCheck(all, new TCUnknownType(node.location));
+		return all;
+	}
+	
+	@Override
+	public Set<TCNode> caseMultipleSeqBind(TCMultipleSeqBind node, LexLocation arg)
+	{
+		Set<TCNode> all = super.caseMultipleSeqBind(node, arg);
+		patternCheck(all, new TCUnknownType(node.location));
+		return all;
+	}
+	
+	@Override
 	public Set<TCNode> caseMultipleTypeBind(TCMultipleTypeBind node, LexLocation arg)
 	{
-		return node.unresolved.matchUnresolved(arg);
+		Set<TCNode> all = super.caseMultipleTypeBind(node, arg);
+		patternCheck(all, node.type);
+		all.addAll(node.unresolved.matchUnresolved(arg));
+		return all;
+	}
+	
+	private void patternCheck(Set<TCNode> all, TCType type)
+	{
+		Set<TCNode> defs = new HashSet<TCNode>();
+		Iterator<TCNode> iter = all.iterator();
+		
+		while (iter.hasNext())
+		{
+			TCNode node = iter.next();
+			
+			if (node instanceof TCIdentifierPattern)
+			{
+				TCIdentifierPattern p = (TCIdentifierPattern)node;
+				iter.remove();
+				defs.addAll(p.getDefinitions(type, NameScope.LOCAL));
+			}
+		}
+		
+		all.addAll(defs);
 	}
 }

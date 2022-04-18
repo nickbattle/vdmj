@@ -61,6 +61,8 @@ public class LSPInitializeResponse extends JSONObject
 		
 		cap.put("referencesProvider", true);
 		
+		cap.put("typeHierarchyProvider", true);
+		
 		/**
 		 * Experimental responses are partly fixed, from the implicit Server functions, and
 		 * party added by registered plugins.

@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
@@ -239,5 +240,11 @@ public class TCPluginSL extends TCPlugin
 		}
 		
 		return results;
+	}
+
+	@Override
+	public TCClassList getTypeHierarchy(String classname, boolean subtypes)
+	{
+		return null;	// Never called.
 	}
 }
