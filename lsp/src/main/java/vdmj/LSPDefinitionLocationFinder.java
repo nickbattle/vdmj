@@ -234,7 +234,8 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 		
 		for (TCDefinition pdef: node.paramDefinitions)
 		{
-			if (sought.touches(pdef.name.getLocation()))
+			if (!pdef.name.getName().equals("self") &&
+				sought.touches(pdef.name.getLocation()))
 			{
 				all.clear();	// Remove pattern match
 				all.add(pdef);
@@ -258,7 +259,8 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 
 		for (TCDefinition pdef: node.paramDefinitions)
 		{
-			if (sought.touches(pdef.name.getLocation()))
+			if (!pdef.name.getName().equals("self") &&
+				sought.touches(pdef.name.getLocation()))
 			{
 				all.clear();	// Remove pattern match
 				all.add(pdef);
