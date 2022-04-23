@@ -26,13 +26,34 @@ package simulation;
 
 import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
+import com.fujitsu.vdmj.runtime.ValueException;
 
 public class TestSimulation extends RemoteSimulation
 {
 	@Override
 	public void setup(ASTClassList classes)
 	{
-		setParameter(classes, "SETTINGS", "PARAM", 1.23);
-		setParameter(classes, "zz", "ss", 1.23);
+		setParameter(classes, "A", "MIN", 50);
+		setParameter(classes, "A", "MAX", 100);
+	}
+
+	@Override
+	public long step(long time)
+	{
+		try
+		{
+			Long last = getSystemIntegerValue("obj1", "last");
+			System.out.println("Last = " + last);
+			
+			setSystemValue("obj1", "last", last + 1);
+			last = getSystemIntegerValue("obj1", "last");
+			System.out.println("Updated = " + last);
+		}
+		catch (ValueException e)
+		{
+			System.err.println(e);
+		}
+		
+		return time + 1000;
 	}
 }
