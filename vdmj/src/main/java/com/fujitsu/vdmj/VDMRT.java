@@ -54,7 +54,7 @@ public class VDMRT extends VDMPP
 			}
 			catch (Exception ex)
 			{
-				System.err.println(ex.getMessage());
+				println("Simulation: " + ex.getMessage());
 				e = ExitStatus.EXIT_ERRORS;
 			}
 		}

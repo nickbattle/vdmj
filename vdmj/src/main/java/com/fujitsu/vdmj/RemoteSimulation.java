@@ -30,8 +30,14 @@ import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
+import com.fujitsu.vdmj.ast.expressions.ASTBooleanLiteralExpression;
+import com.fujitsu.vdmj.ast.expressions.ASTIntegerLiteralExpression;
 import com.fujitsu.vdmj.ast.expressions.ASTRealLiteralExpression;
+import com.fujitsu.vdmj.ast.expressions.ASTStringLiteralExpression;
+import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
+import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexRealToken;
+import com.fujitsu.vdmj.ast.lex.LexStringToken;
 import com.fujitsu.vdmj.ast.patterns.ASTIdentifierPattern;
 
 abstract public class RemoteSimulation
@@ -81,22 +87,31 @@ abstract public class RemoteSimulation
 			}
 		}
 		
-		return null;	// Not found
+		throw new InvalidParameterException("Cannot find definition: " + classname + "`" + pname);
 	}
 	
 	protected void setParameter(ASTClassList classes, String classname, String pname, Double pvalue)
 	{
 		ASTValueDefinition vdef = findParameterDefinition(classes, classname, pname);
-		String fullName = classname + "`" + pname;
-		
-		if (vdef != null)
-		{
-			vdef.setExpression(new ASTRealLiteralExpression(new LexRealToken(pvalue, vdef.location)));
-		}
-		else
-		{
-			throw new InvalidParameterException("Cannot find definition: " + fullName);
-		}
+		vdef.setExpression(new ASTRealLiteralExpression(new LexRealToken(pvalue, vdef.location)));
+	}
+	
+	protected void setParameter(ASTClassList classes, String classname, String pname, Integer pvalue)
+	{
+		ASTValueDefinition vdef = findParameterDefinition(classes, classname, pname);
+		vdef.setExpression(new ASTIntegerLiteralExpression(new LexIntegerToken(pvalue, vdef.location)));
+	}
+	
+	protected void setParameter(ASTClassList classes, String classname, String pname, Boolean pvalue)
+	{
+		ASTValueDefinition vdef = findParameterDefinition(classes, classname, pname);
+		vdef.setExpression(new ASTBooleanLiteralExpression(new LexBooleanToken(pvalue, vdef.location)));
+	}
+	
+	protected void setParameter(ASTClassList classes, String classname, String pname, String pvalue)
+	{
+		ASTValueDefinition vdef = findParameterDefinition(classes, classname, pname);
+		vdef.setExpression(new ASTStringLiteralExpression(new LexStringToken(pvalue, vdef.location)));
 	}
 	
 	abstract public void setup(ASTClassList classes);

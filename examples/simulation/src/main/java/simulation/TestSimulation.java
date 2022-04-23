@@ -33,5 +33,6 @@ public class TestSimulation extends RemoteSimulation
 	public void setup(ASTClassList classes)
 	{
 		setParameter(classes, "SETTINGS", "PARAM", 1.23);
+		setParameter(classes, "zz", "ss", 1.23);
 	}
 }
