@@ -548,6 +548,7 @@ abstract public class VDMJ
 		System.err.println("-annotations: enable annotation processing");
 		System.err.println("-log <filename>: enable real-time event logging");
 		System.err.println("-remote <class>: enable remote control");
+		System.err.println("-simulation <class>: enable simulation control");
 		System.err.println("-verbose: display detailed startup information");
 
 		System.exit(1);
