@@ -45,6 +45,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.NameValuePair;
+import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.RealValue;
 import com.fujitsu.vdmj.values.SeqValue;
@@ -126,11 +127,18 @@ abstract public class RemoteSimulation
 	}
 	
 	/**
-	 * Support methods for finding and setting object fields, during a step.
+	 * Support methods for finding and setting system object fields, during a step.
 	 */
 	private UpdatableValue getSystemValue(String varname, String fieldname)
 	{
-		for (NameValuePair nvp: INSystemDefinition.getSystemMembers())
+		NameValuePairList systemMembers = INSystemDefinition.getSystemMembers();
+		
+		if (systemMembers == null)
+		{
+			throw new InvalidParameterException("No system class defined");
+		}
+		
+		for (NameValuePair nvp: systemMembers)
 		{
 			if (nvp.name.getName().equals(varname) && nvp.value.deref() instanceof ObjectValue)
 			{
@@ -153,7 +161,7 @@ abstract public class RemoteSimulation
 			}
 		}
 		
-		throw new InvalidParameterException("Cannot find value: " + varname + "`" + fieldname);
+		throw new InvalidParameterException("Cannot find system variable: " + varname);
 	}
 	
 	protected Double getSystemDoubleValue(String varname, String fieldname) throws ValueException
@@ -204,7 +212,17 @@ abstract public class RemoteSimulation
 		v.set(LexLocation.ANY, new SeqValue(value), null);
 	}
 	
+	/**
+	 * Perform any simulation setup actions, including setting parameters. The classes list
+	 * can be passed to setParameter methods.
+	 */
 	abstract public void setup(ASTClassList classes);
 
+	/**
+	 * Intercept the simulation. This method is called at the start of the execution (time=0)
+	 * and subsequently at (or as soon after as possible) the time returned by this call. The
+	 * method can call getSystem<Type>Value and setSystemValue to read or change the value of
+	 * objects defined within the system class.
+	 */
 	abstract public long step(long time);
 }
