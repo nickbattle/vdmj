@@ -85,13 +85,6 @@ public class ASTPluginPR extends ASTPlugin
 				// Add CPU and BUS up front, to be overwritten if they are explicitly defined
 				astClassList.add(new ASTCPUClassDefinition());
 				astClassList.add(new ASTBUSClassDefinition());
-				
-				RemoteSimulation simulation = RemoteSimulation.getInstance();
-				
-				if (simulation != null)
-				{
-					simulation.setup(astClassList);
-				}
 			}
 			catch (Exception e)
 			{
@@ -115,6 +108,31 @@ public class ASTPluginPR extends ASTPlugin
 			{
 				warns.addAll(mr.getWarnings());
 			}
+		}
+		
+		String remoteSimulation = System.getProperty("lsp.remoteSimulation");
+		
+		if (remoteSimulation != null)
+		{
+			RemoteSimulation simulation = RemoteSimulation.getInstance();
+			
+			if (simulation == null)
+			{
+				try
+				{
+					@SuppressWarnings("unchecked")
+					Class<RemoteSimulation> clazz = (Class<RemoteSimulation>) Class.forName(remoteSimulation);
+					simulation = clazz.newInstance();
+				}
+				catch (Exception e)
+				{
+					Diag.error(e);
+					Diag.error("Error while creating %s", remoteSimulation);
+				}
+			}
+			
+			Diag.info("Calling remoteSimulation setup %s", remoteSimulation);
+			simulation.setup(astClassList);
 		}
 		
 		return errs.isEmpty();

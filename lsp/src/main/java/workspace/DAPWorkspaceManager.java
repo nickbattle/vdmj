@@ -35,12 +35,10 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Catchpoint;
@@ -82,7 +80,6 @@ public class DAPWorkspaceManager
 	private String defaultName;
 	private DAPDebugReader debugReader;
 	private String remoteControl;
-	private String remoteSimulation;
 	
 	protected DAPWorkspaceManager()
 	{
@@ -125,7 +122,7 @@ public class DAPWorkspaceManager
 	}
 
 	public DAPMessageList launch(DAPRequest request,
-			boolean noDebug, String defaultName, String command, String remoteControl, String remoteSimulation) throws Exception
+			boolean noDebug, String defaultName, String command, String remoteControl) throws Exception
 	{
 		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
 		int retry = 50;		// 5s worth of 100ms
@@ -162,7 +159,6 @@ public class DAPWorkspaceManager
 			this.launchCommand = command;
 			this.defaultName = defaultName;
 			this.remoteControl = remoteControl;
-			this.remoteSimulation = remoteSimulation;
 			
 			clearInterpreter();
 			processSettings(request);
@@ -306,14 +302,6 @@ public class DAPWorkspaceManager
 	{
 		try
 		{
-			if (remoteSimulation != null && Settings.dialect == Dialect.VDM_RT)
-			{
-				@SuppressWarnings("unchecked")
-				Class<RemoteSimulation> clazz = (Class<RemoteSimulation>) Class.forName(remoteSimulation);
-				clazz.newInstance();
-				Diag.info("Created remoteSimulation singleton for %s", remoteSimulation);
-			}
-			
 			// Interpreter may already have been created by setBreakpoint calls during configuration.
 			
 			if (remoteControl != null)
@@ -338,7 +326,6 @@ public class DAPWorkspaceManager
 		{
 			launchCommand = null;
 			remoteControl = null;
-			remoteSimulation = null;
 		}
 	}
 
