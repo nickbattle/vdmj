@@ -48,8 +48,10 @@ public class LaunchHandler extends DAPHandler
 			String defaultName = arguments.get("defaultName");
 			String command = arguments.get("command");
 			String remoteControl = arguments.get("remoteControl");
+			String remoteSimulation = arguments.get("remoteSimulation");
 			
-			return DAPWorkspaceManager.getInstance().launch(request, noDebug, defaultName, command, remoteControl);
+			return DAPWorkspaceManager.getInstance().launch(
+					request, noDebug, defaultName, command, remoteControl, remoteSimulation);
 		}
 		catch (Exception e)
 		{

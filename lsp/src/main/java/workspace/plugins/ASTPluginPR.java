@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
@@ -84,6 +85,13 @@ public class ASTPluginPR extends ASTPlugin
 				// Add CPU and BUS up front, to be overwritten if they are explicitly defined
 				astClassList.add(new ASTCPUClassDefinition());
 				astClassList.add(new ASTBUSClassDefinition());
+				
+				RemoteSimulation simulation = RemoteSimulation.getInstance();
+				
+				if (simulation != null)
+				{
+					simulation.setup(astClassList);
+				}
 			}
 			catch (Exception e)
 			{
