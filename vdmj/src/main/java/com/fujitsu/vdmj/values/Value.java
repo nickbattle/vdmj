@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.values;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Formattable;
 import java.util.FormattableFlags;
@@ -290,12 +291,38 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 
 	public Value abort(int number, String msg, Context ctxt) throws ValueException
 	{
+		if (ctxt == null) ctxt = javaContext();
 		throw new ValueException(number, msg, ctxt);
 	}
 
 	public Value abort(int number, Exception e, Context ctxt) throws ValueException
 	{
 		throw new ValueException(number, e.getMessage(), ctxt);
+	}
+	
+	/**
+	 * This method tries to create a meaningful Context for value exceptions when there
+	 * is no Context passed. It uses the Java native call stack to try to indicate the
+	 * location of the exception (often from native code).
+	 */
+	private Context javaContext()
+	{
+		Throwable here = new Throwable();
+		StackTraceElement[] stack = here.getStackTrace();
+		
+		if (stack.length > 3)	// nativeContext, abort, xxxValue(null), caller
+		{
+			StackTraceElement caller = stack[3];
+			File file = new File(caller.getFileName());
+			String module = caller.getClassName() + "." + caller.getMethodName();
+			int line = caller.getLineNumber();
+			LexLocation loc = new LexLocation(file, module, line, 0, line, 0);
+			return new Context(loc, caller.toString(), null);
+		}
+		else
+		{
+			return new Context(LexLocation.ANY, "Unknown location", null);
+		}
 	}
 
 	public boolean isUndefined()
