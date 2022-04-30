@@ -24,10 +24,12 @@
 
 package com.fujitsu.vdmj.runtime;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -78,6 +80,37 @@ public class Context extends HashMap<TCNameToken, Value>
 		{
 			this.threadState = outer.threadState;
 		}
+	}
+
+	/**
+	 * This method tries to create a meaningful Context for value exceptions when there
+	 * is no Context passed. It uses the Java native call stack to try to indicate the
+	 * location of the exception (often from native code), assuming the first class that
+	 * is not within VDMJ is the source.
+	 */
+	public static Context javaContext()
+	{
+		Throwable here = new Throwable();
+		StackTraceElement[] stack = here.getStackTrace();
+		Context result = null;
+		String VDMJ = VDMJ.class.getPackage().getName();
+		
+		for (int frame = stack.length - 1; frame >= 0; frame--)
+		{
+			if (!stack[frame].getClassName().startsWith(VDMJ))
+			{
+				StackTraceElement caller = stack[frame];
+				File file = new File(caller.getFileName());
+				String module = caller.getClassName();
+				int line = caller.getLineNumber();
+				LexLocation loc = new LexLocation(file, module, line, 0, line, 0);
+				String floc = (result == null) ? " (" + file + ") at line " + line : "";
+				result = new Context(loc, "Java method " + caller.getMethodName() + floc, result);
+			}
+		}
+
+		return result != null ? result :
+			new Context(LexLocation.ANY, "Unknown location", null);
 	}
 
 	/**
