@@ -290,6 +290,7 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 
 	public Value abort(int number, String msg, Context ctxt) throws ValueException
 	{
+		if (ctxt == null) ctxt = Context.javaContext();	// javaContext(0), abort(1), xxxValue(null)(2), caller(3)
 		throw new ValueException(number, msg, ctxt);
 	}
 
@@ -297,7 +298,7 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 	{
 		throw new ValueException(number, e.getMessage(), ctxt);
 	}
-
+	
 	public boolean isUndefined()
 	{
 		return false;
