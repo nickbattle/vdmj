@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -96,7 +97,7 @@ public class ValueFactory
 		return new SeqValue(new ValueList(args));
 	}
 	
-	public static SetValue mkSet(Value ...args) throws ValueException
+	public static SetValue mkSet(Value ...args)
 	{
 		return new SetValue(new ValueSet(args));
 	}
@@ -130,7 +131,7 @@ public class ValueFactory
 		else
 		{
 			throw new ValueException(69, "Definition " + module + "`" + name +
-				" is " + type.getClass().getSimpleName() + " not TCRecordType", null);
+				" is " + type.getClass().getSimpleName() + " not TCRecordType", Context.javaContext());
 		}
 	}
 
@@ -146,7 +147,7 @@ public class ValueFactory
 		else
 		{
 			throw new ValueException(69, "Definition " + module + "`" + name +
-				" is " + type.getClass().getSimpleName() + " not TCNamedType", null);
+				" is " + type.getClass().getSimpleName() + " not TCNamedType", Context.javaContext());
 		}
 	}
 	
@@ -158,7 +159,7 @@ public class ValueFactory
 		
 		if (def == null)
 		{
-			throw new ValueException(70, "Definition " + tcname.getExplicit(true) + " not found", null);
+			throw new ValueException(70, "Definition " + tcname.getExplicit(true) + " not found", Context.javaContext());
 		}
 		
 		return def.getType();
