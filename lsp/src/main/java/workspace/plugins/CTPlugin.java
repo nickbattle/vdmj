@@ -475,7 +475,7 @@ abstract public class CTPlugin extends AnalysisPlugin
 			
 			if (results != null && i < results.size())
 			{
-				result = results.get(i).toString();
+				result = String.valueOf(results.get(i));
 			}
 			
 			array.add(new JSONObject("case", calls[i], "result", result));

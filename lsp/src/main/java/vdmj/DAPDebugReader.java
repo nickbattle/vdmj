@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.concurrent.Exchanger;
 
 import com.fujitsu.vdmj.debug.DebugCommand;
-import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugType;
 import com.fujitsu.vdmj.debug.TraceCallback;
 import com.fujitsu.vdmj.in.expressions.INExpression;
@@ -66,7 +65,7 @@ public class DAPDebugReader extends Thread implements TraceCallback
 		setName("DAPDebugReader");
 		DAPDebugExecutor.init();
 		server = DAPServer.getInstance();
-		link = (DAPDebugLink)DebugLink.getInstance();
+		link = DAPDebugLink.getNewInstance();
 	}
 	
 	public boolean isListening()
