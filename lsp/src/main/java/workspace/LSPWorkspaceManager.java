@@ -1044,6 +1044,8 @@ public class LSPWorkspaceManager
 			String word = def.name.getName();
 			JSONArray results = new JSONArray();
 			
+			JSONObject defRange = Utils.lexLocationToRange(def.location);
+			
 			for (File pfile: projectFiles.keySet())
 			{
 				StringBuilder buffer = projectFiles.get(pfile);
@@ -1055,16 +1057,20 @@ public class LSPWorkspaceManager
 					for (int i=0; i<list.size(); i++)
 					{
 						JSONObject range = list.index(i);
-						TCDefinition def2 = findDefinition(pfile, range);
 						
-						// Check by location, so that manufactured definitions for fields
-						// will match.
-						if (def2 != null && def2.location.equals(def.location))
+						if (!range.equals(defRange))	// See incdec below
 						{
-							results.add(
-								new JSONObject(
-									"uri", pfile.toURI().toString(),
-									"range", range));
+							TCDefinition def2 = findDefinition(pfile, range);
+							
+							// Check by location, so that manufactured definitions for fields
+							// will match.
+							if (def2 != null && def2.location.equals(def.location))
+							{
+								results.add(
+									new JSONObject(
+										"uri", pfile.toURI().toString(),
+										"range", range));
+							}
 						}
 					}
 				}
@@ -1072,10 +1078,9 @@ public class LSPWorkspaceManager
 			
 			if (incdec)
 			{
-				results.add(
-					new JSONObject(
+				results.add(new JSONObject(
 						"uri", def.location.file.toURI().toString(),
-						"range", Utils.lexLocationToRange(def.location)));
+						"range", defRange));
 			}
 			
 			return new RPCMessageList(request, results);
