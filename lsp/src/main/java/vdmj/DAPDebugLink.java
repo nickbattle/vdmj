@@ -50,28 +50,43 @@ import workspace.Diag;
 public class DAPDebugLink extends ConsoleDebugLink
 {
 	/** Singleton instance */
-	private static DebugLink instance;
+	private static DAPDebugLink instance;
 
 	private final DAPServer server;
 
 	/**
-	 * Get the singleton. 
+	 * Get the singleton.
 	 */
 	public synchronized static DebugLink getInstance()
 	{
 		if (instance == null)
 		{
-			instance = new DAPDebugLink();
+			instance = getNewInstance();
 		}
 		
 		return instance;
 	}
 	
+	/**
+	 * This method forces a new instance to be created, and is used in the DAPDebugReader
+	 * to get a clean link with a new DAPServer setting.
+	 */
+	public synchronized static DAPDebugLink getNewInstance()
+	{
+		instance = new DAPDebugLink();
+		return instance;
+	}
+	
 	private DAPDebugLink()
 	{
-		// NOTE! changes for each session (see reset)
-		// NOTE! server can be null, if executed via CT runtrace
+		// NOTE! server socket changes for each session (see reset)
+		// NOTE! server can be null, if executed via CT "generate" calling init()
 		server = DAPServer.getInstance();
+		
+		if (server == null)
+		{
+			Diag.warning("DAP server not set in DAPDebugLink?");
+		}
 	}
 	
 	@Override
