@@ -27,6 +27,7 @@ package vdmj;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -810,6 +811,17 @@ public class DAPDebugExecutor implements DebugExecutor
 		{
 			ClassContext s = (ClassContext)c;
 			Context statics = s.classdef.getStatics();
+		    Iterator<Map.Entry<TCNameToken, Value>> it = statics.entrySet().iterator();
+		    
+	        while (it.hasNext())
+	        {
+	        	Entry<TCNameToken, Value> e = it.next();
+	        	
+				if (e.getValue() instanceof FunctionValue || e.getValue() instanceof OperationValue)
+				{
+	                it.remove();
+	            }
+	        }
 			
 			if (!statics.isEmpty())
 			{

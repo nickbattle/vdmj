@@ -163,7 +163,9 @@ public class LSPDefinitionLocationFinder extends TCLeafDefinitionVisitor<TCNode,
 		{
 			if (sought.touches(def.name.getLocation()))
 			{
+				all.clear();
 				all.add(def.name);
+				return all;
 			}
 		}
 
