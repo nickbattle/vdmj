@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.definitions;
 
 import com.fujitsu.vdmj.po.POMappedList;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POLetDefContext;
 import com.fujitsu.vdmj.pog.PONameContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -79,6 +80,31 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 		{
 			ctxt.push(new PONameContext(d.getVariableNames()));
 			obligations.addAll(d.getProofObligations(ctxt, env));
+			ctxt.pop();
+		}
+
+		return obligations;
+	}
+
+	/**
+	 * This method gets obligations for each definition, but adds a context for each
+	 * one. This is used in let/def expressions, where definitions can depend on
+	 * earlier definitions in the same expression.
+	 */
+	public ProofObligationList getDefProofObligations(POContextStack ctxt, Environment env)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+
+		for (PODefinition d: this)
+		{
+			ctxt.push(new PONameContext(d.getVariableNames()));
+			obligations.addAll(d.getProofObligations(ctxt, env));
+			ctxt.pop();
+			ctxt.push(new POLetDefContext(d));
+		}
+		
+		for (int i=0; i<this.size(); i++)
+		{
 			ctxt.pop();
 		}
 

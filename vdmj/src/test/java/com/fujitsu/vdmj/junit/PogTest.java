@@ -94,7 +94,7 @@ public class PogTest extends TestCase
 		"(let x:int = m(1) in\n  x in set dom m)\n",
 		"(forall x:int &\n  x in set dom m)\n",
 		"1 in set dom m\n",
-		"2 in set dom m\n",
+		"(let x = m(1) in\n  2 in set dom m)\n",
 		"(def x = m(1); y = m(2) in\n  x in set dom m)\n",
 		"(def x = m(1); y = m(2) in\n  y in set dom m)\n",
 		"exists1 x in set {1, 2, 3} & (x < 10)\n",
