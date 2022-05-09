@@ -8,7 +8,7 @@ The testing has focused on VS Code.
 
 Firstly, install VS Code itself. See [https://code.visualstudio.com/](https://code.visualstudio.com/). 
 
-Secondly, search for and install the "VDM VSCode" extension via the VS Code extensions panel (id "jonaskrask.vdm-vscode").
+Secondly, search for and install the "VDM VSCode" extension via the VS Code extensions panel (id "overturetool.vdm-vscode").
 
 
 ## Editing VDM Specifications
@@ -23,7 +23,7 @@ Most standard VS Code actions should work, but note:
 
 - Syntax errors are displayed for the file being edited as you type; the whole specification is type-checked when you save a file.
 
-- The F12 key will navigate from a symbol name to its definition (eg. from a function call to its definition).
+- The F12 key will navigate from a symbol name to its definition (eg. from a function call to its definition). Shift-F12 on a definition will highlight all references of that symbol.
 
 - Typing a "." or "\`" after a record variable will offer field names to complete the expression. Typing CTRL-SPACE will offer global names with which to complete the name you are typing.
 
@@ -41,7 +41,7 @@ Various settings are available, and these can be set on a user, workspace or fol
 
 ## Execution
 
-To evaluate expressions against the specification for debugging, open the `Run...` panel. Initially, if there is
+To evaluate expressions against the specification for debugging, click the "Launch | Debug" code lens that should appear above all executable definitions. This will prompt for any arguments and create a launch configuration in `.vscode/launch.json`. Alternatively, open the `Run...` panel. Initially, if there is
 no `.vscode/launch.json` file in your folder, you will be prompted to create one. Select the `VDM Debug`
 confguration; the default settings can be accepted. You can then launch the interpreter using the "Run" menu,
 or just by pressing F5. You cannot start the interpreter if there are type checking errors (warnings are ok).
@@ -67,7 +67,7 @@ Executed in 0.003 secs.
 
 ```
 
-The launch.json file has an optional "command" setting. If set, the interpreter will execute that one command and then exit. So for example, "print main(1,2,3)" will automatically execute that one call.
+The launch.json file has an optional "command" setting. If set, the interpreter will execute that one command and then exit. So for example, "print main(1,2,3)" will automatically execute that one call. Similarly, the "remoteControl" option can name a class on the classpath that implements VDMJ's RemoteControl interface.
 
 If breakpoints have been set, the evaluation will stop and can be single stepped (over, in, out) or continued,
 stack frames and values viewed and watched, using standard VS Code controls. Multi-threaded VDM++ debugging should
@@ -98,7 +98,6 @@ Two options are available to translate VDM source into LaTeX or Word formats. Ri
 
 Various things do not work perfectly yet:
 
-- The F12 navigate to definition works in most cases, but if you find any examples that don't, please add them to [this issue](https://github.com/jonaskrask/vdm-vscode/issues/6).
 - The "." or "\`" field completion is awkward to use because it requires the spec to be cleanly type-checked. So if you type `var.field`, the field part will not be offered unless you type `var`, then save the spec to type check it, and then type ".".
 - If you click the `Stop` (Shift-F5 or the red square) debugging button, the session is usually closed and the debug console says so. But if you click `Stop` at a breakpoint or an exception that has been caught, control returns to the debug console and the session is still active. Clicking `Stop` once again will stop for real.
 

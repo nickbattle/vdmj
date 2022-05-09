@@ -24,15 +24,27 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.po.definitions.POExplicitOperationDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 
 public class POImpliesContext extends POContext
 {
-	public final POExpression exp;
+	public final String exp;
 
 	public POImpliesContext(POExpression precondition)
 	{
-		this.exp = precondition;
+		this.exp = precondition.toString();
+	}
+
+	public POImpliesContext(POExplicitOperationDefinition def)
+	{
+		this.exp = preconditionCall(def.name, def.getParamPatternList(), def.precondition);
+	}
+
+	public POImpliesContext(POImplicitOperationDefinition def)
+	{
+		this.exp = preconditionCall(def.name, def.getParamPatternList(), def.precondition);
 	}
 
 	@Override
