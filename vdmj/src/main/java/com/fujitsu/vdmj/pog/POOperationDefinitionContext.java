@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitOperationDefinition;
 import com.fujitsu.vdmj.po.definitions.POStateDefinition;
-import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -43,7 +42,7 @@ public class POOperationDefinitionContext extends POContext
 	public final TCOperationType deftype;
 	public final POPatternList paramPatternList;
 	public final boolean addPrecond;
-	public final POExpression precondition;
+	public final String precondition;
 	public final PODefinition stateDefinition;
 
 	public POOperationDefinitionContext(POImplicitOperationDefinition definition,
@@ -53,7 +52,7 @@ public class POOperationDefinitionContext extends POContext
 		this.deftype = definition.type;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.getParamPatternList();
-		this.precondition = definition.precondition;
+		this.precondition = preconditionCall(name, paramPatternList, definition.precondition);
 		this.stateDefinition = stateDefinition;
 	}
 
