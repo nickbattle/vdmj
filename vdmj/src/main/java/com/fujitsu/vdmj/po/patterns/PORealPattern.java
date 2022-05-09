@@ -25,8 +25,6 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexRealToken;
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.PORealLiteralExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 
 public class PORealPattern extends POPattern
@@ -44,12 +42,6 @@ public class PORealPattern extends POPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public POExpression getMatchingExpression()
-	{
-		return new PORealLiteralExpression(value);
 	}
 
 	@Override

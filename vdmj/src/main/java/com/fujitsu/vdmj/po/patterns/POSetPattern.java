@@ -25,9 +25,6 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.po.expressions.POSetEnumExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 
 
@@ -46,19 +43,6 @@ public class POSetPattern extends POPattern
 	public String toString()
 	{
 		return "{" + plist.toString() + "}";
-	}
-
-	@Override
-	public POExpression getMatchingExpression()
-	{
-		POExpressionList list = new POExpressionList();
-
-		for (POPattern p: plist)
-		{
-			list.add(p.getMatchingExpression());
-		}
-
-		return new POSetEnumExpression(location, list, null);
 	}
 
 	@Override

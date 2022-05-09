@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionSet;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetAllDefinitionsVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetAllVarNamesVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetPossibleTypeVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -145,7 +146,10 @@ public abstract class POPattern extends PONode implements Serializable
 	 *
 	 * @return An expression, being a value that matches the pattern.
 	 */
-	abstract public POExpression getMatchingExpression();
+	public final POExpression getMatchingExpression()
+	{
+		return apply(new POGetMatchingExpressionVisitor(), null);
+	}
 
 	/**
 	 * Implemented by all patterns to allow visitor processing.

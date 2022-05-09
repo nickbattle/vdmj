@@ -25,11 +25,7 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.po.expressions.PONewExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
@@ -54,21 +50,6 @@ public class POObjectPattern extends POPattern
 	public String toString()
 	{
 		return "obj_" + type + "(" + Utils.listToString(fieldlist) + ")";
-	}
-
-	@Override
-	public POExpression getMatchingExpression()
-	{
-		POExpressionList list = new POExpressionList();
-
-		for (PONamePatternPair npp: fieldlist)
-		{
-			list.add(npp.pattern.getMatchingExpression());
-		}
-
-		// Note... this may not actually match obj_C(...)
-		return new PONewExpression(location,
-			new TCIdentifierToken(classname.getLocation(), classname.getName(), false), list);
 	}
 
 	@Override

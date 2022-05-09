@@ -25,8 +25,6 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
-import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
-import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 
 public class POBooleanPattern extends POPattern
@@ -44,12 +42,6 @@ public class POBooleanPattern extends POPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public POExpression getMatchingExpression()
-	{
-		return new POBooleanLiteralExpression(value);
 	}
 
 	@Override

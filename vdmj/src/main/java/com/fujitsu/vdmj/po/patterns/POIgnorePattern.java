@@ -25,16 +25,11 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class POIgnorePattern extends POPattern
 {
 	private static final long serialVersionUID = 1L;
-	private static int var = 1;		// Used in getMatchingExpression()
-	private TCNameToken anyName = null;
 
 	public POIgnorePattern(LexLocation location)
 	{
@@ -45,20 +40,6 @@ public class POIgnorePattern extends POPattern
 	public String toString()
 	{
 		return "-";
-	}
-
-	@Override
-	public POExpression getMatchingExpression()
-	{
-		// Generate a new "any" name for use during PO generation. The name
-		// must be unique for the pattern instance.
-		
-		if (anyName == null)
-		{
-			anyName = new TCNameToken(location, "", "$any" + var++);
-		}
-		
-		return new POVariableExpression(anyName, null);
 	}
 
 	@Override
@@ -83,10 +64,5 @@ public class POIgnorePattern extends POPattern
 	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseIgnorePattern(this, arg);
-	}
-
-	public static void init()
-	{
-		var = 1;	// reset on each getProofObligations run.
 	}
 }

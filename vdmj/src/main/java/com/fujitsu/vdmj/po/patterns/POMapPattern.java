@@ -25,9 +25,6 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POMapEnumExpression;
-import com.fujitsu.vdmj.po.expressions.POMapletExpressionList;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -53,19 +50,6 @@ public class POMapPattern extends POPattern
 		{
 			return Utils.listToString("{", maplets, ", ", "}");
 		}
-	}
-
-	@Override
-	public POExpression getMatchingExpression()
-	{
-		POMapletExpressionList list = new POMapletExpressionList();
-
-		for (POMapletPattern p: maplets)
-		{
-			list.add(p.getMapletExpression());
-		}
-
-		return new POMapEnumExpression(location, list, null, null);
 	}
 
 	@Override
