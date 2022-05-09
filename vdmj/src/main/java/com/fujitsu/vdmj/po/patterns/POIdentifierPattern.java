@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
@@ -50,12 +48,6 @@ public class POIdentifierPattern extends POPattern
 	public String toString()
 	{
 		return name.toString();
-	}
-
-	@Override
-	public POExpression getMatchingExpression()
-	{
-		return new POVariableExpression(name, null);
 	}
 
 	@Override

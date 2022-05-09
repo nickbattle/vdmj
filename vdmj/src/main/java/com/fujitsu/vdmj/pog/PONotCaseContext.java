@@ -55,10 +55,11 @@ public class PONotCaseContext extends POContext
 		}
 		else
 		{
-			POExpression matching = pattern.getMatchingExpression();
+			POPattern noIgnores = pattern.removeIgnorePatterns();
+			POExpression matching = noIgnores.getMatchingExpression();
 			
     		sb.append("not exists ");
-    		sb.append(pattern);
+    		sb.append(noIgnores);
     		sb.append(":");
     		sb.append(type);
     		sb.append(" & ");

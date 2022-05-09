@@ -25,8 +25,6 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POIntegerLiteralExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 
 public class POIntegerPattern extends POPattern
@@ -44,12 +42,6 @@ public class POIntegerPattern extends POPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public POExpression getMatchingExpression()
-	{
-		return new POIntegerLiteralExpression(value);
 	}
 
 	@Override

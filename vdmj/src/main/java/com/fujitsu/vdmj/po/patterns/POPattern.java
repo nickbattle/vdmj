@@ -33,8 +33,10 @@ import com.fujitsu.vdmj.po.definitions.PODefinitionSet;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetAllDefinitionsVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetAllVarNamesVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetPossibleTypeVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -145,7 +147,22 @@ public abstract class POPattern extends PONode implements Serializable
 	 *
 	 * @return An expression, being a value that matches the pattern.
 	 */
-	abstract public POExpression getMatchingExpression();
+	public final POExpression getMatchingExpression()
+	{
+		return apply(new POGetMatchingExpressionVisitor(), null);
+	}
+	
+	/**
+	 * A pattern with "any" variables substituted for ignore patterns. This
+	 * is used in POs where a pattern with an any clause is subsequently
+	 * used to create a value of the same type.
+	 * 
+	 * @return A pattern without ignore patterns.
+	 */
+	public final POPattern removeIgnorePatterns()
+	{
+		return apply(new PORemoveIgnoresVisitor(), null);
+	}
 
 	/**
 	 * Implemented by all patterns to allow visitor processing.

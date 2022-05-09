@@ -104,7 +104,7 @@ public class TCSetType extends TCType
 	@Override
 	public String toDisplay()
 	{
-		return empty ? "{}" : "set of (" + setof + ")";
+		return empty ? "set of ?" : "set of (" + setof + ")";
 	}
 
 	@Override
