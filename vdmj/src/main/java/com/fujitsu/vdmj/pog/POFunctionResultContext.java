@@ -36,7 +36,7 @@ public class POFunctionResultContext extends POContext
 {
 	public final TCNameToken name;
 	public final TCFunctionType deftype;
-	public final POExpression precondition;
+	public final String precondition;
 	public final POExpression body;
 	public final POPatternTypePair result;
 	public final boolean implicit;
@@ -45,7 +45,7 @@ public class POFunctionResultContext extends POContext
 	{
 		this.name = definition.name;
 		this.deftype = definition.type;
-		this.precondition = definition.precondition;
+		this.precondition = preconditionCall(name, definition.paramPatternList, definition.precondition);
 		this.body = definition.body;
 		this.implicit = false;
 
@@ -60,7 +60,7 @@ public class POFunctionResultContext extends POContext
 	{
 		this.name = definition.name;
 		this.deftype = definition.type;
-		this.precondition = definition.precondition;
+		this.precondition = preconditionCall(name, definition.getParamPatternList(), definition.precondition);
 		this.body = definition.body;
 		this.implicit = true;
 		this.result = definition.result;

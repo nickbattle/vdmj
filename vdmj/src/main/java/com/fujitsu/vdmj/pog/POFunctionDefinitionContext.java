@@ -29,7 +29,6 @@ import java.util.List;
 
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
-import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -43,7 +42,7 @@ public class POFunctionDefinitionContext extends POContext
 	public final TCFunctionType deftype;
 	public final List<POPatternList> paramPatternList;
 	public final boolean addPrecond;
-	public final POExpression precondition;
+	public final String precondition;
 
 	public POFunctionDefinitionContext(
 		POExplicitFunctionDefinition definition, boolean precond)
@@ -52,7 +51,7 @@ public class POFunctionDefinitionContext extends POContext
 		this.deftype = definition.type;
 		this.paramPatternList = definition.paramPatternList;
 		this.addPrecond = precond;
-		this.precondition = definition.precondition;
+		this.precondition = preconditionCall(name, paramPatternList, definition.precondition);
 	}
 
 	public POFunctionDefinitionContext(
@@ -62,7 +61,7 @@ public class POFunctionDefinitionContext extends POContext
 		this.deftype = definition.type;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.getParamPatternList();
-		this.precondition = definition.precondition;
+		this.precondition = preconditionCall(name, paramPatternList, definition.precondition);
 	}
 
 	@Override

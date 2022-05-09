@@ -165,7 +165,7 @@ public class POImplicitOperationDefinition extends PODefinition
 		{
 			if (precondition != null)
 			{
-				ctxt.push(new POImpliesContext(precondition));
+				ctxt.push(new POImpliesContext(this));
 				obligations.addAll(postdef.getProofObligations(ctxt, env));
 				ctxt.pop();
 			}
