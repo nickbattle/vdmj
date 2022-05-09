@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.po.types.POPatternListTypePairList;
 import com.fujitsu.vdmj.po.types.POPatternTypePair;
 import com.fujitsu.vdmj.pog.OperationPostConditionObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.POOperationDefinitionContext;
@@ -48,6 +49,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
@@ -165,8 +167,10 @@ public class POImplicitOperationDefinition extends PODefinition
 		{
 			if (precondition != null)
 			{
+				ctxt.push(new POFunctionDefinitionContext(postdef, true));
 				ctxt.push(new POImpliesContext(this));
-				obligations.addAll(postdef.getProofObligations(ctxt, env));
+				obligations.add(new TotalFunctionObligation(postdef, ctxt));
+				ctxt.pop();
 				ctxt.pop();
 			}
 			else
