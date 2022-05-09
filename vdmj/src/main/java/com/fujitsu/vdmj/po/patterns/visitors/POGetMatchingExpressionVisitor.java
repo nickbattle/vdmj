@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.POIntegerLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POMapEnumExpression;
 import com.fujitsu.vdmj.po.expressions.POMapUnionExpression;
+import com.fujitsu.vdmj.po.expressions.POMapletExpression;
 import com.fujitsu.vdmj.po.expressions.POMapletExpressionList;
 import com.fujitsu.vdmj.po.expressions.POMkTypeExpression;
 import com.fujitsu.vdmj.po.expressions.PONewExpression;
@@ -147,7 +148,7 @@ public class POGetMatchingExpressionVisitor extends POPatternVisitor<POExpressio
 
 		for (POMapletPattern p: node.maplets)
 		{
-			list.add(p.getMapletExpression());
+			list.add(new POMapletExpression(p.location, p.from.apply(this, arg), p.to.apply(this, arg)));
 		}
 
 		return new POMapEnumExpression(node.location, list, null, null);
