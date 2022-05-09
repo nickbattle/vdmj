@@ -45,12 +45,6 @@ public class POExpressionPattern extends POPattern
 	}
 
 	@Override
-	public POExpression getMatchingExpression()
-	{
-		return exp;
-	}
-
-	@Override
 	public int getLength()
 	{
 		return ANY;	// Special value meaning "any length"

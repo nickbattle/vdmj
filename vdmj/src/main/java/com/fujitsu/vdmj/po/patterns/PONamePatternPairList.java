@@ -42,6 +42,11 @@ public class PONamePatternPairList extends POMappedList<TCNamePatternPair, PONam
 		super(list);
 	}
 	
+	public PONamePatternPairList()
+	{
+		super();
+	}
+
 	@Override
 	public String toString()
 	{

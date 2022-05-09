@@ -24,12 +24,7 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
-import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POMapUnionExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 
 
@@ -50,14 +45,6 @@ public class POMapUnionPattern extends POPattern
 	public String toString()
 	{
 		return left + " union " + right;
-	}
-
-	@Override
-	public POExpression getMatchingExpression()
-	{
-		LexToken op = new LexKeywordToken(Token.MUNION, location);
-		return new POMapUnionExpression(
-			left.getMatchingExpression(), op, right.getMatchingExpression(), null, null);
 	}
 
 	@Override

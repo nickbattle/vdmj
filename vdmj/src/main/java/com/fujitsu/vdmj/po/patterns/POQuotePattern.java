@@ -25,8 +25,6 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.ast.lex.LexQuoteToken;
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POQuoteLiteralExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 
 public class POQuotePattern extends POPattern
@@ -44,12 +42,6 @@ public class POQuotePattern extends POPattern
 	public String toString()
 	{
 		return value.toString();
-	}
-
-	@Override
-	public POExpression getMatchingExpression()
-	{
-		return new POQuoteLiteralExpression(value);
 	}
 
 	@Override

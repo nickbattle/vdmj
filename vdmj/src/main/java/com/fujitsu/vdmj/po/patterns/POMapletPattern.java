@@ -24,13 +24,7 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
-import com.fujitsu.vdmj.ast.lex.LexToken;
-import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.expressions.POMapletExpression;
-import com.fujitsu.vdmj.tc.types.TCMapType;
-import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POMapletPattern extends PONode
 {
@@ -50,19 +44,8 @@ public class POMapletPattern extends PONode
 		return from + " |-> " + to;
 	}
 
-	public POMapletExpression getMapletExpression()
-	{
-		LexToken op = new LexKeywordToken(Token.MAPLET, from.location);
-		return new POMapletExpression(op.location, from.getMatchingExpression(), to.getMatchingExpression());
-	}
-
 	public boolean isSimple()
 	{
 		return from.isSimple() && to.isSimple();
-	}
-	
-	public TCType getPossibleType()
-	{
-		return new TCMapType(from.location, from.getPossibleType(), to.getPossibleType());
 	}
 }

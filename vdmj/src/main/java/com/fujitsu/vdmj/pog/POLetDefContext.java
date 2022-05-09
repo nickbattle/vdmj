@@ -24,16 +24,23 @@
 
 package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.po.expressions.POLetDefExpression;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.util.Utils;
 
 public class POLetDefContext extends POContext
 {
-	public final POLetDefExpression exp;
+	public final PODefinitionList localDefs;
 
-	public POLetDefContext(POLetDefExpression poLetDefExpression)
+	public POLetDefContext(PODefinitionList localDefs)
 	{
-		this.exp = poLetDefExpression;
+		this.localDefs = localDefs;
+	}
+
+	public POLetDefContext(PODefinition localDef)
+	{
+		this.localDefs = new PODefinitionList();
+		this.localDefs.add(localDef);
 	}
 
 	@Override
@@ -47,10 +54,10 @@ public class POLetDefContext extends POContext
 	{
 		StringBuilder sb = new StringBuilder();
 
-		if (!exp.localDefs.isEmpty())
+		if (!localDefs.isEmpty())
 		{
 			sb.append("let ");
-			sb.append(Utils.listToString(exp.localDefs));
+			sb.append(Utils.listToString(localDefs));
 			sb.append(" in");
 		}
 

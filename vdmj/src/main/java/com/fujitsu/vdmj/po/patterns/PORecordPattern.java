@@ -24,9 +24,6 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.po.expressions.POMkTypeExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -51,19 +48,6 @@ public class PORecordPattern extends POPattern
 	public String toString()
 	{
 		return "mk_" + type + "(" + Utils.listToString(plist) + ")";
-	}
-
-	@Override
-	public POExpression getMatchingExpression()
-	{
-		POExpressionList list = new POExpressionList();
-
-		for (POPattern p: plist)
-		{
-			list.add(p.getMatchingExpression());
-		}
-
-		return new POMkTypeExpression(typename, list, null, null);
 	}
 
 	@Override

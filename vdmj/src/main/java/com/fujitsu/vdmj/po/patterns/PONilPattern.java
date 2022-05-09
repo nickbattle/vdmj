@@ -25,8 +25,6 @@
 package com.fujitsu.vdmj.po.patterns;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.expressions.POExpression;
-import com.fujitsu.vdmj.po.expressions.PONilExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 
 public class PONilPattern extends POPattern
@@ -42,12 +40,6 @@ public class PONilPattern extends POPattern
 	public String toString()
 	{
 		return "nil";
-	}
-
-	@Override
-	public POExpression getMatchingExpression()
-	{
-		return new PONilExpression(location);
 	}
 
 	@Override
