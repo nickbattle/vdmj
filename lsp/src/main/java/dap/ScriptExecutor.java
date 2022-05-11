@@ -111,12 +111,6 @@ public class ScriptExecutor extends AsyncExecutor
 				}
 			}
 		}
-		catch (IOException e)
-		{
-			Diag.info("Script aborted");
-			server.writeMessage(new DAPResponse(request, false, e.getMessage(), null));
-			server.stderr("ABORTED " + filename + "\n");
-		}
 		finally
 		{
 			if (script != null)
@@ -137,16 +131,16 @@ public class ScriptExecutor extends AsyncExecutor
 	protected void tail(double time) throws IOException
 	{
 		Diag.info("Completed script");
-		server.stdout("END " + filename + "\n");
-		server.writeMessage(new DAPResponse(request, true, null, null));
+		server.writeMessage(new DAPResponse(request, true, null,
+				new JSONObject("result", "END " + filename, "variablesReference", 0)));
+
 	}
 
 	@Override
 	protected void error(Throwable e) throws IOException
 	{
-		Diag.error(e);
-		server.stderr("ABORTED " + filename + "\n");
-		server.writeMessage(new DAPResponse(request, false, e.getMessage(), null));
+		Diag.info("Aborted script");
+		server.writeMessage(new DAPResponse(request, false, "ABORTED " + filename + "\n" + e.getMessage(), null));
 	}
 
 	@Override
