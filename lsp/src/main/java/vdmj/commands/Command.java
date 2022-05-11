@@ -29,11 +29,14 @@ import java.lang.reflect.InvocationTargetException;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
+import dap.DAPServer;
 import workspace.Diag;
 import workspace.PluginRegistry;
 
 abstract public class Command
 {
+	protected DAPServer server = DAPServer.getInstance();
+	
 	public static Command parse(String line)
 	{
 		if (line == null || line.isEmpty())

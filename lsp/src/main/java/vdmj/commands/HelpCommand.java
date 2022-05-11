@@ -61,6 +61,7 @@ public class HelpCommand extends Command
 		HelpCommand.HELP,
 		InitCommand.HELP,
 		VersionCommand.HELP,
+		ScriptCommand.HELP,
 		QuitCommand.HELP
 	};
 	

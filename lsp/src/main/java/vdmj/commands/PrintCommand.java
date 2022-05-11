@@ -24,12 +24,14 @@
 
 package vdmj.commands;
 
+import java.io.IOException;
+
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.ExpressionExecutor;
 import workspace.DAPWorkspaceManager;
 
-public class PrintCommand extends Command implements InitRunnable
+public class PrintCommand extends Command implements InitRunnable, ScriptRunnable
 {
 	public static final String USAGE = "Usage: print <expression>";
 	public static final String[] HELP = { "print", "print <exp> - evaluate an expression" };
@@ -88,5 +90,11 @@ public class PrintCommand extends Command implements InitRunnable
 	public boolean notWhenRunning()
 	{
 		return true;
+	}
+
+	@Override
+	public String scriptRun(DAPRequest request) throws IOException
+	{
+		return initRun(request);
 	}
 }
