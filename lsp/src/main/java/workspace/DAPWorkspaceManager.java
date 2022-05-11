@@ -63,6 +63,7 @@ import rpc.RPCRequest;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
+import vdmj.commands.ScriptCommand;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
@@ -634,7 +635,7 @@ public class DAPWorkspaceManager
 			return responses;
 		}
 
-		if (command instanceof PrintCommand)	// ie. evaluate something
+		if (command instanceof PrintCommand || command instanceof ScriptCommand)	// ie. evaluate something
 		{
 			if (!canExecute())
 			{

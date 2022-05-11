@@ -131,8 +131,9 @@ public class ScriptExecutor extends AsyncExecutor
 	protected void tail(double time) throws IOException
 	{
 		Diag.info("Completed script");
+		String answer = "END " + filename + "\nExecuted in " + time + " secs.\n";
 		server.writeMessage(new DAPResponse(request, true, null,
-				new JSONObject("result", "END " + filename, "variablesReference", 0)));
+				new JSONObject("result", answer, "variablesReference", 0)));
 
 	}
 
