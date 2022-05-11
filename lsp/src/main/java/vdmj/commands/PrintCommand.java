@@ -29,7 +29,9 @@ import java.io.IOException;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.ExpressionExecutor;
+import vdmj.DAPDebugReader;
 import workspace.DAPWorkspaceManager;
+import workspace.Diag;
 
 public class PrintCommand extends Command implements InitRunnable, ScriptRunnable
 {
@@ -95,6 +97,30 @@ public class PrintCommand extends Command implements InitRunnable, ScriptRunnabl
 	@Override
 	public String scriptRun(DAPRequest request) throws IOException
 	{
-		return initRun(request);
+		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPDebugReader dbg = null;
+
+		try
+		{
+//			dbg = new DAPDebugReader();
+//			manager.setDebugReader(dbg);
+//			dbg.start();
+			
+			return manager.getInterpreter().execute(expression).toString();
+		}
+		catch (Throwable e)
+		{
+			Diag.error(e);
+			return e.getMessage();
+		}
+		finally
+		{
+			if (dbg != null)
+			{
+				dbg.interrupt();	// Stop the debugger reader.
+			}
+			
+			manager.setDebugReader(null);
+		}
 	}
 }

@@ -93,7 +93,7 @@ public class ScriptCommand extends Command implements ScriptRunnable
 				{
 					ScriptRunnable scmd = (ScriptRunnable)cmd;
 					String result = scmd.scriptRun(request);
-					Diag.info("Result = ", result);
+					Diag.info("Result = %s", result);
 					server.stdout("= " + result + "\n");
 				}
 				else
