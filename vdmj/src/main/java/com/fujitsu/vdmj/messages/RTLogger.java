@@ -47,6 +47,11 @@ public class RTLogger
 
 		enabled = on;
 	}
+	
+	public static synchronized boolean isEnabled()
+	{
+		return enabled;
+	}
 
 	public static synchronized void log(String event)
 	{
