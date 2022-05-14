@@ -26,6 +26,8 @@ package workspace;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -209,7 +211,12 @@ public class DAPWorkspaceManager
 					case "exceptions":
 						Settings.exceptions = settings.get(key);
 						break;
-					
+						
+					case "precision":
+						Long p = settings.get(key);
+						Settings.precision = new MathContext(p.intValue(), RoundingMode.HALF_UP);
+						break;
+						
 					default:
 						Diag.warning("Ignoring setting %s", key);
 						break;
