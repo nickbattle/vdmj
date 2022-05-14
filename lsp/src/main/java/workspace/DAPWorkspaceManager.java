@@ -55,14 +55,12 @@ import dap.InitExecutor;
 import dap.RemoteControlExecutor;
 import json.JSONArray;
 import json.JSONObject;
-import lsp.LSPException;
 import lsp.LSPServer;
-import lsp.Utils;
-import rpc.RPCErrors;
 import rpc.RPCRequest;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
+import vdmj.commands.ScriptCommand;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
@@ -245,8 +243,15 @@ public class DAPWorkspaceManager
 					case "vdmj.rt.diags_guards":
 					case "vdmj.rt.diags_timestep":
 					case "vdmj.in.powerset_limit":
-						String value = properties.get(key).toString();	// Must be string for property
-						System.setProperty(key, value);
+						if (properties.get(key) == null)
+						{
+							System.clearProperty(key);
+						}
+						else
+						{
+							String value = properties.get(key).toString().trim();
+							System.setProperty(key, value);
+						}
 						break;
 
 					default:
@@ -349,35 +354,6 @@ public class DAPWorkspaceManager
 			Diag.info("Missing client capability: %s", dotName);
 			return null;
 		}
-	}
-
-	public JSONObject ctRunOneTrace(DAPRequest request, String name, long testNumber) throws LSPException
-	{
-		CTPlugin ct = registry.getPlugin("CT");
-		
-		if (ct.isRunning())
-		{
-			Diag.error("Previous trace is still running...");
-			throw new LSPException(RPCErrors.InvalidRequest, "Trace still running");
-		}
-
-		/**
-		 * If the specification has been modified since we last ran (or nothing has yet run),
-		 * we have to re-create the interpreter, otherwise the old interpreter (with the old tree)
-		 * is used to "generate" the trace names, so changes are not picked up. Note that a
-		 * new tree will have no breakpoints, so if you had any set via a launch, they will be
-		 * ignored.
-		 */
-		refreshInterpreter();
-		
-		if (specHasErrors())
-		{
-			throw new LSPException(RPCErrors.ContentModified, "Specification has errors");
-		}
-		
-		noDebug = false;	// Force debug on for runOneTrace
-
-		return ct.runOneTrace(Utils.stringToName(name), testNumber);
 	}
 
 	public Interpreter getInterpreter()
@@ -634,7 +610,7 @@ public class DAPWorkspaceManager
 			return responses;
 		}
 
-		if (command instanceof PrintCommand)	// ie. evaluate something
+		if (command instanceof PrintCommand || command instanceof ScriptCommand)	// ie. evaluate something
 		{
 			if (!canExecute())
 			{
@@ -750,7 +726,7 @@ public class DAPWorkspaceManager
 		return false;
 	}
 	
-	private boolean specHasErrors()
+	public boolean specHasErrors()
 	{
 		ASTPlugin ast = registry.getPlugin("AST");
 		TCPlugin tc = registry.getPlugin("TC");
@@ -771,6 +747,11 @@ public class DAPWorkspaceManager
 	public boolean getNoDebug()
 	{
 		return noDebug;
+	}
+	
+	public void setNoDebug(boolean noDebug)
+	{
+		this.noDebug = noDebug;
 	}
 	
 	public void stopDebugReader()

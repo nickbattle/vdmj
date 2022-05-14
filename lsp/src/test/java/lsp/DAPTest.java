@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2022 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -43,7 +43,7 @@ import workspace.Diag;
 import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
 
-abstract public class LSPTest
+abstract public class DAPTest
 {
 	protected LSPWorkspaceManager lspManager = null;
 	protected LSPXWorkspaceManager lspxManager = null;

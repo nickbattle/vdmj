@@ -29,7 +29,7 @@ import dap.DAPRequest;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPException;
-import workspace.DAPWorkspaceManager;
+import workspace.DAPXWorkspaceManager;
 
 public class RuntraceCommand extends Command implements InitRunnable
 {
@@ -65,7 +65,7 @@ public class RuntraceCommand extends Command implements InitRunnable
 	{
 		try
 		{
-			DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+			DAPXWorkspaceManager manager = DAPXWorkspaceManager.getInstance();
 			JSONObject result = manager.ctRunOneTrace(request, tracename, testNumber);
 			return display(result);
 		}
