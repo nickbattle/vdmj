@@ -243,8 +243,15 @@ public class DAPWorkspaceManager
 					case "vdmj.rt.diags_guards":
 					case "vdmj.rt.diags_timestep":
 					case "vdmj.in.powerset_limit":
-						String value = properties.get(key).toString();	// Must be string for property
-						System.setProperty(key, value);
+						if (properties.get(key) == null)
+						{
+							System.clearProperty(key);
+						}
+						else
+						{
+							String value = properties.get(key).toString().trim();
+							System.setProperty(key, value);
+						}
 						break;
 
 					default:
