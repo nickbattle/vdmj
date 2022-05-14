@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2022 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -28,64 +28,37 @@ import java.io.IOException;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.ExpressionExecutor;
-import workspace.DAPWorkspaceManager;
+import dap.ScriptExecutor;
 
-public class PrintCommand extends Command implements InitRunnable, ScriptRunnable
+public class ScriptCommand extends Command implements ScriptRunnable
 {
-	public static final String USAGE = "Usage: print <expression>";
-	public static final String[] HELP = { "print", "print <exp> - evaluate an expression" };
+	public static final String USAGE = "Usage: script <file>";
+	public static final String[] HELP = { "script", "script <file> - run commands from file" };
 	
-	public final String expression;
-
-	public PrintCommand(String line)
+	private final String filename;
+	
+	public ScriptCommand(String line)
 	{
 		String[] parts = line.split("\\s+", 2);
 		
 		if (parts.length == 2)
 		{
-			this.expression = parts[1];
+			filename = parts[1];
 		}
 		else
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
 	}
-	
+
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		ExpressionExecutor executor = new ExpressionExecutor("print", request, expression);
+		ScriptExecutor executor = new ScriptExecutor("script", request, filename);
 		executor.start();
 		return null;
 	}
-
-	@Override
-	public String initRun(DAPRequest request)
-	{
-		try
-		{
-			DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
-			return manager.getInterpreter().execute(expression).toString();
-		}
-		catch (Exception e)
-		{
-			return "Cannot evaluate " + expression + " : " + e.getMessage();
-		}
-	}
 	
-	@Override
-	public String getExpression()
-	{
-		return expression;
-	}
-	
-	@Override
-	public String format(String result)
-	{
-		return expression + " = " + result;
-	}
-
 	@Override
 	public boolean notWhenRunning()
 	{
@@ -95,10 +68,6 @@ public class PrintCommand extends Command implements InitRunnable, ScriptRunnabl
 	@Override
 	public String scriptRun(DAPRequest request) throws IOException
 	{
-		/**
-		 * We are executing this on the main DAP thread from ScriptCommand. So we cannot
-		 * stop at a breakpoint because the DAP thread is not listening for Client messages.
-		 */
-		return initRun(request);	// NB. No debug reader
+		return "Cannot nest scripts";
 	}
 }

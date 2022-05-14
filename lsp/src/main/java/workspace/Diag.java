@@ -228,9 +228,21 @@ public class Diag
 		logger.log(Level.SEVERE, String.format("ERROR: " + format, args));
 	}
 
+	private static final int STACK_DUMP = 10;	// Frames to dump for exceptions
+	
 	public static synchronized void error(Throwable throwable)
 	{
 		logger.log(Level.SEVERE, String.format("EXCEPTION: %s %s",
 				throwable.getClass().getSimpleName(), throwable.getMessage()));
+		
+		StackTraceElement[] stack = throwable.getStackTrace();
+		int count = stack.length < STACK_DUMP ? stack.length : STACK_DUMP;
+		
+		for (int i=0; i<count; i++)
+		{
+			StackTraceElement frame = stack[i];
+			logger.log(Level.SEVERE, String.format("%s %s at %s line %d",
+					frame.getClassName(), frame.getMethodName(), frame.getFileName(), frame.getLineNumber()));
+		}
 	}
 }

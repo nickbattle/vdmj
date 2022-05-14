@@ -26,13 +26,16 @@ package vdmj.commands;
 
 import java.io.IOException;
 
+import com.fujitsu.vdmj.lex.LexLocation;
+
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.InitExecutor;
 import json.JSONObject;
+import workspace.DAPWorkspaceManager;
 
-public class InitCommand extends Command
+public class InitCommand extends Command implements ScriptRunnable
 {
 	public static final String USAGE = "Usage: init";
 	public static final String[] HELP =	{ "init", "init - re-initialize the specification" };
@@ -83,5 +86,13 @@ public class InitCommand extends Command
 	public boolean notWhenRunning()
 	{
 		return true;
+	}
+
+	@Override
+	public String scriptRun(DAPRequest request) throws IOException
+	{
+		LexLocation.clearLocations();
+		DAPWorkspaceManager.getInstance().getInterpreter().init();
+		return "()\nGlobal context initialized\nCleared all coverage information";
 	}
 }

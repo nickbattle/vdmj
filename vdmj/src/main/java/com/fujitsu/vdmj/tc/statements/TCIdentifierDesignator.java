@@ -130,35 +130,35 @@ public class TCIdentifierDesignator extends TCStateDesignator
 		}
 		else
 		{
-			TCDefinition def = env.findName(name, NameScope.STATE);
+			vardef = env.findName(name, NameScope.STATE);
 
-			if (def == null)
+			if (vardef == null)
 			{
 				report(3247, "Unknown state variable '" + name + "' in assignment");
 				return new TCUnknownType(name.getLocation());
 			}
-			else if (def.isFunction())
+			else if (vardef.isFunction())
 			{
 				report(3247, "Function apply not allowed in state designator");
 				return new TCUnknownType(name.getLocation());
 			}
-			else if (def.isOperation())
+			else if (vardef.isOperation())
 			{
 				report(3247, "Operation call not allowed in state designator");
 				return new TCUnknownType(name.getLocation());
 			}
-			else if (!def.isUpdatable())
+			else if (!vardef.isUpdatable())
 			{
 				report(3301, "Variable '" + name + "' in scope is not updatable");
 				return new TCUnknownType(name.getLocation());
 			}
-			else if (encl != null && encl.isPure() && !(def instanceof TCAssignmentDefinition))
+			else if (encl != null && encl.isPure() && !(vardef instanceof TCAssignmentDefinition))
 			{
 				report(3338, "Cannot update state in a pure operation");
 			}
-			else if (def instanceof TCExternalDefinition)
+			else if (vardef instanceof TCExternalDefinition)
 			{
-				TCExternalDefinition d = (TCExternalDefinition)def;
+				TCExternalDefinition d = (TCExternalDefinition)vardef;
 
 				if (d.readOnly)
 				{
@@ -167,7 +167,7 @@ public class TCIdentifierDesignator extends TCStateDesignator
 			}
 			// else just state access in (say) an explicit operation
 
-			return def.getType();
+			return vardef.getType();
 		}
 	}
 	
