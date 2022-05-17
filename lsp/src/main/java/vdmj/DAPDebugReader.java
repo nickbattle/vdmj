@@ -158,6 +158,21 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				break;
 			}
 
+			case "setFunctionBreakpoints":
+			{
+				JSONObject arguments = dapRequest.get("arguments");
+				JSONArray names = arguments.get("breakpoints");
+				DAPMessageList responses = DAPWorkspaceManager.getInstance().setFunctionBreakpoints(dapRequest, names);
+
+				for (JSONObject response: responses)
+				{
+					server.writeMessage(response);
+				}
+
+				result = true;
+				break;
+			}
+
 			case "setExceptionBreakpoints":
 			{
 				JSONObject arguments = dapRequest.get("arguments");

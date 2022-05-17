@@ -46,6 +46,7 @@ public class DAPInitializeResponse extends DAPResponse
 		cap.put("supportsConditionalBreakpoints", true);
 		cap.put("supportsHitConditionalBreakpoints", true);
 		cap.put("supportsLogPoints", true);
+		cap.put("supportsFunctionBreakpoints", true);
 		
 		cap.put("supportsExceptionFilterOptions", true);
 		cap.put("exceptionBreakpointFilters",
