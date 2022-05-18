@@ -32,8 +32,8 @@ import com.fujitsu.vdmj.tc.definitions.TCSystemDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCHistoryExpression;
-import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -103,23 +103,36 @@ public class TCSeparateAnnotation extends TCAnnotation
 		}
 		else
 		{
-			if (!(args.get(0) instanceof TCHistoryExpression))
+			if (args.get(0) instanceof TCHistoryExpression)
+			{
+				TCHistoryExpression h = (TCHistoryExpression)args.get(0);
+				TCNameToken op = h.opnames.get(0);
+				
+				if (env.findMatches(h.opnames.get(0)).isEmpty())
+				{
+					op.report(6008, "Cannot find " + op);
+				}
+			}
+			else
 			{
 				args.get(0).report(6008, "Expecting history expression (eg. #fin(op))");
 			}
 			
-			if (!(args.get(1) instanceof TCHistoryExpression))
+			if (args.get(1) instanceof TCHistoryExpression)
+			{
+				TCHistoryExpression h = (TCHistoryExpression)args.get(1);
+				TCNameToken op = h.opnames.get(0);
+				
+				if (env.findMatches(h.opnames.get(0)).isEmpty())
+				{
+					op.report(6008, "Cannot find " + op);
+				}
+			}
+			else
 			{
 				args.get(1).report(6008, "Expecting history expression (eg. #req(op))");
 			}
 			
-			if (!(args.get(2) instanceof TCIntegerLiteralExpression))
-			{
-				args.get(2).report(6008, "Expecting integer literal expression");
-			}
-
-			args.get(0).typeCheck(env, null, scope, null);
-			args.get(1).typeCheck(env, null, scope, null);
 			TCType time = args.get(2).typeCheck(env, null, scope, null);
 			
 			if (!time.isNumeric(LexLocation.ANY))

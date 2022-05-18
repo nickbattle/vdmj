@@ -25,7 +25,13 @@
 package annotations.ast;
 
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
+import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.lex.LexException;
+import com.fujitsu.vdmj.lex.LexTokenReader;
+import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.syntax.ExpressionReader;
+import com.fujitsu.vdmj.syntax.ParserException;
 
 public class ASTSeparateAnnotation extends ASTAnnotation
 {
@@ -35,4 +41,33 @@ public class ASTSeparateAnnotation extends ASTAnnotation
 	{
 		super(name);
 	}
+	
+	@Override
+	public ASTExpressionList parse(LexTokenReader ltr) throws LexException, ParserException
+	{
+		ASTExpressionList args = new ASTExpressionList();
+		
+		if (ltr.nextToken().is(Token.BRA))
+		{
+			if (ltr.nextToken().isNot(Token.KET))
+			{
+				ExpressionReader er = new ExpressionReader(ltr);
+				args.add(er.readPerExpression());
+		
+				while (ltr.getLast().is(Token.COMMA))
+				{
+					ltr.nextToken();
+					args.add(er.readPerExpression());	// To allow #req, #act, #fin
+				}
+			}
+	
+			if (ltr.getLast().isNot(Token.KET))
+			{
+				parseException("Expecting ')' after annotation", ltr.getLast().location);
+			}
+		}
+		
+		return args;
+	}
+
 }
