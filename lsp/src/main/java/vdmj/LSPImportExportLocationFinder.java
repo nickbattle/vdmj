@@ -131,11 +131,11 @@ public class LSPImportExportLocationFinder extends TCImportExportVisitor<TCNode,
 	{
 		if (arg.touches(node.name.getLocation()))
 		{
-			return node;
+			return node.name;
 		}
 		else if (node.renamed != null && arg.touches(node.renamed.getLocation()))
 		{
-			return node;
+			return node.renamed;
 		}
 		else if (node instanceof TCImportedValue)
 		{

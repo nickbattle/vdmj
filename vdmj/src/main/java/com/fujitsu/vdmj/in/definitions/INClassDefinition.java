@@ -33,6 +33,7 @@ import java.util.Map.Entry;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -114,13 +115,14 @@ public class INClassDefinition extends INDefinition
 	 * @param supernames
 	 * @param definitions
 	 */
-	public INClassDefinition(TCNameToken className, TCClassType type, TCNameList supernames,
+	public INClassDefinition(INAnnotationList annotations, TCNameToken className, TCClassType type, TCNameList supernames,
 		INDefinitionList definitions, INDefinitionList superInheritedDefinitions,
 		INDefinitionList localInheritedDefinitions, INClassList superdefs,
 		INExplicitOperationDefinition invariant, boolean isAbstract)
 	{
 		super(className.getLocation(), null, className);
 
+		this.annotations = annotations;
 		this.supernames = supernames;
 		this.definitions = definitions;
 		this.classtype = type;
@@ -139,7 +141,7 @@ public class INClassDefinition extends INDefinition
 	 */
 	public INClassDefinition()
 	{
-		this(new TCNameToken(LexLocation.ANY, "CLASS", "DEFAULT"), new TCClassType(LexLocation.ANY, new TCClassDefinition()),
+		this(null, new TCNameToken(LexLocation.ANY, "CLASS", "DEFAULT"), new TCClassType(LexLocation.ANY, new TCClassDefinition()),
 			new TCNameList(), new INDefinitionList(), new INDefinitionList(), new INDefinitionList(),
 			new INClassList(), null, false);
 

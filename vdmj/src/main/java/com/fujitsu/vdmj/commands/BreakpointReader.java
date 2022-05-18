@@ -356,6 +356,7 @@ public class BreakpointReader
 			}
 			
 			Breakpoint bp = interpreter.setBreakpoint(exp, condition);
+			bp.setFunction();
 			println("Created " + bp);
 			println(interpreter.getSourceLine(bp.location));
 		}
@@ -371,6 +372,7 @@ public class BreakpointReader
 			}
 			
 			Breakpoint bp = interpreter.setBreakpoint(stmt, condition);
+			bp.setFunction();
 			println("Created " + bp);
 			println(interpreter.getSourceLine(bp.location));
 		}

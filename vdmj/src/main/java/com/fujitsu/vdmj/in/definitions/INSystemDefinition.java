@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.in.definitions;
 import java.util.HashMap;
 
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.RTLogger;
@@ -67,9 +68,9 @@ public class INSystemDefinition extends INClassDefinition
 		return null;
 	}
 
-	public INSystemDefinition(TCNameToken className, TCClassType type, INDefinitionList members)
+	public INSystemDefinition(INAnnotationList annotations, TCNameToken className, TCClassType type, INDefinitionList members)
 	{
-		super(className, type, new TCNameList(), members, new INDefinitionList(),
+		super(annotations, className, type, new TCNameList(), members, new INDefinitionList(),
 			new INDefinitionList(), new INClassList(), null, false);
 	}
 

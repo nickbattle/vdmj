@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import workspace.Diag;
@@ -40,6 +41,7 @@ public class DAPServerSocket implements Runnable
 	public DAPServerSocket(Dialect dialect, int port)
 	{
 		this.dialect = dialect;
+		Settings.dialect = dialect;		// Race with LSP that does this too
 		DAPServerSocket.port = port;
 	}
 

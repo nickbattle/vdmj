@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
@@ -39,9 +40,9 @@ public class TCSystemDefinition extends TCClassDefinition
 {
 	private static final long serialVersionUID = 1L;
 
-	public TCSystemDefinition(TCNameToken className, TCDefinitionList members)
+	public TCSystemDefinition(TCAnnotationList annotations, TCNameToken className, TCDefinitionList members)
 	{
-		super(className, new TCNameList(), members);
+		super(annotations, className, new TCNameList(), members);
 	}
 
 	@Override
