@@ -108,6 +108,15 @@ public class Utils
 			"range", lexLocationToRange(location));
 	}
 	
+	public static JSONObject lexLocationToSource(LexLocation location)
+	{
+		return new JSONObject(
+			"name", location.file.getName(),
+			"sourceReference", 0,
+			"path", location.file.getAbsolutePath().toString()
+			);
+	}
+	
 	public static LexLocation rangeToLexLocation(File file, JSONObject range)
 	{
 		JSONObject start = range.get("start");

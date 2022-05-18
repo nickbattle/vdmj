@@ -71,6 +71,7 @@ import dap.RemoteControlExecutor;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPServer;
+import lsp.Utils;
 import rpc.RPCRequest;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
@@ -621,7 +622,10 @@ public class DAPWorkspaceManager
 					interpreter.clearBreakpoint(exp.breakpoint.number);
 					Breakpoint bp = interpreter.setBreakpoint(exp, condition);
 					bp.setFunction();
-					results.add(new JSONObject("verified", true));
+					results.add(new JSONObject(
+							"verified", true,
+							"source", Utils.lexLocationToSource(exp.location),
+							"line", exp.location.startLine));
 				}
 				else if (node instanceof INStatement)
 				{
@@ -630,7 +634,10 @@ public class DAPWorkspaceManager
 					
 					Breakpoint bp = interpreter.setBreakpoint(stmt, condition);
 					bp.setFunction();
-					results.add(new JSONObject("verified", true));
+					results.add(new JSONObject(
+							"verified", true,
+							"source", Utils.lexLocationToSource(stmt.location),
+							"line", stmt.location.startLine));
 				}
 				else if (list.isEmpty())
 				{
