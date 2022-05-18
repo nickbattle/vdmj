@@ -48,7 +48,7 @@ public class INCPUClassDefinition extends INClassDefinition
 
 	public INCPUClassDefinition(TCNameToken className, TCClassType type, TCNameList supernames, INDefinitionList definitions)
 	{
-		super(className, type, supernames, definitions, new INDefinitionList(),
+		super(null, className, type, supernames, definitions, new INDefinitionList(),
 			new INDefinitionList(), new INClassList(), null, false);
 	}
 
