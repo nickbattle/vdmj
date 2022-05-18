@@ -25,12 +25,16 @@
 package workspace.plugins;
 
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INClassList;
+import com.fujitsu.vdmj.in.definitions.INDefinition;
+import com.fujitsu.vdmj.in.definitions.INDefinitionList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 public class INPluginPR extends INPlugin
 {
@@ -79,5 +83,27 @@ public class INPluginPR extends INPlugin
 	public <T extends Mappable> Interpreter getInterpreter() throws Exception
 	{
 		return new ClassInterpreter(inClassList, tcClassList);
+	}
+
+	@Override
+	public INDefinitionList findDefinition(TCNameToken name)
+	{
+		INDefinitionList results = new INDefinitionList();
+		
+		for (INClassDefinition module: inClassList)
+		{
+			if (module.name.getName().equals(name.getModule()))
+			{
+				for (INDefinition def: module.definitions)
+				{
+					if (def.name != null && def.name.equals(name))
+					{
+						results.add(def);
+					}
+				}
+			}
+		}
+		
+		return results;
 	}
 }

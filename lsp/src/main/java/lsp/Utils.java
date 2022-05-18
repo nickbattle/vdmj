@@ -108,6 +108,15 @@ public class Utils
 			"range", lexLocationToRange(location));
 	}
 	
+	public static JSONObject lexLocationToSource(LexLocation location)
+	{
+		return new JSONObject(
+			"name", location.file.getName(),
+			"sourceReference", 0,
+			"path", location.file.getAbsolutePath().toString()
+			);
+	}
+	
 	public static LexLocation rangeToLexLocation(File file, JSONObject range)
 	{
 		JSONObject start = range.get("start");
@@ -190,7 +199,8 @@ public class Utils
 		for (int i=0; i<limit; i++)
 		{
 			if (buffer.charAt(i) == wstart &&
-				buffer.substring(i, i + wlen).equals(word))
+				buffer.substring(i, i + wlen).equals(word) &&
+				!restOfName(buffer.charAt(i + wlen + 1)))	// end of a word
 			{
 				results.add(
 					new JSONObject(
@@ -410,6 +420,33 @@ public class Utils
 		else
 		{
 			throw new RuntimeException("Field " + field + " unexpected type: " + raw.getClass().getSimpleName());
+		}
+	}
+	
+	/**
+	 * @return True if the character passed can be part of a variable name.
+	 */
+	private static boolean restOfName(char c)
+	{
+		if (c < 0x0100)
+		{
+			return Character.isLetterOrDigit(c) || c == '$' || c == '_' || c == '\'';
+		}
+		else
+		{
+			switch (Character.getType(c))
+			{
+				case Character.CONTROL:
+				case Character.LINE_SEPARATOR:
+				case Character.PARAGRAPH_SEPARATOR:
+				case Character.SPACE_SEPARATOR:
+				case Character.SURROGATE:
+				case Character.UNASSIGNED:
+					return false;
+
+				default:
+					return true;
+			}
 		}
 	}
 }

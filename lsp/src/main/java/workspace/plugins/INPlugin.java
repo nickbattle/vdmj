@@ -25,9 +25,11 @@
 package workspace.plugins;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.definitions.INDefinitionList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import workspace.Diag;
 
@@ -75,4 +77,6 @@ abstract public class INPlugin extends AnalysisPlugin
 	abstract public <T extends Mappable> boolean checkLoadedFiles(T tcList) throws Exception;
 	
 	abstract public <T extends Mappable> Interpreter getInterpreter() throws Exception;
+
+	abstract public INDefinitionList findDefinition(TCNameToken lnt);
 }
