@@ -74,6 +74,10 @@ public class Breakpoint implements Serializable
 	public static final int PAUSE = 1;
 	public static final int TERMINATE = 2;
 
+	public int bpType = SOURCE;
+	public static final int SOURCE = 0;		// A file:line source breakpoint
+	public static final int FUNCTION = 1;	// A function or operation name breakpoint
+	
 	public Breakpoint(LexLocation location)
 	{
 		this.location = location;
@@ -174,6 +178,16 @@ public class Breakpoint implements Serializable
 	private static synchronized int execInterruptLevel()	// Needs sync for Java 11
 	{
 		return execInterrupt;
+	}
+	
+	public void setFunction()
+	{
+		bpType = FUNCTION;
+	}
+	
+	public boolean isFunction()
+	{
+		return bpType == FUNCTION;
 	}
 	
 	/**

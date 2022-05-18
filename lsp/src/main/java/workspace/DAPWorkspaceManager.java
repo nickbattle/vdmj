@@ -38,14 +38,29 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.definitions.INDefinition;
+import com.fujitsu.vdmj.in.definitions.INDefinitionList;
+import com.fujitsu.vdmj.in.definitions.INExplicitFunctionDefinition;
+import com.fujitsu.vdmj.in.definitions.INExplicitOperationDefinition;
+import com.fujitsu.vdmj.in.definitions.INImplicitFunctionDefinition;
+import com.fujitsu.vdmj.in.definitions.INImplicitOperationDefinition;
+import com.fujitsu.vdmj.in.expressions.INBinaryExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexTokenReader;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Catchpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import dap.AsyncExecutor;
 import dap.DAPInitializeResponse;
@@ -58,6 +73,7 @@ import dap.RemoteControlExecutor;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPServer;
+import lsp.Utils;
 import rpc.RPCRequest;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
@@ -436,7 +452,7 @@ public class DAPWorkspaceManager
 		{
 			Breakpoint bp = existing.get(bpno);
 			
-			if (bp.location.file.equals(file))
+			if (bp.location.file.equals(file) && !bp.isFunction())
 			{
 				interpreter.clearBreakpoint(bpno);
 			}
@@ -519,6 +535,137 @@ public class DAPWorkspaceManager
 		return new DAPMessageList(request, new JSONObject("breakpoints", results));
 	}
 	
+	public DAPMessageList setFunctionBreakpoints(DAPRequest request, JSONArray breakpoints) throws Exception
+	{
+		JSONArray results = new JSONArray();
+		
+		Map<Integer, Breakpoint> existing = getInterpreter().getBreakpoints();
+		Set<Integer> bps = new HashSet<Integer>(existing.keySet());
+		
+		for (Integer bpno: bps)
+		{
+			Breakpoint bp = existing.get(bpno);
+			
+			if (bp.isFunction())
+			{
+				interpreter.clearBreakpoint(bpno);
+			}
+		}
+		
+		for (Object object: breakpoints)
+		{
+			JSONObject breakpoint = (JSONObject) object;
+			String name = breakpoint.get("name");
+			String condition = breakpoint.get("condition");
+			
+			if (condition == null || condition.isEmpty())
+			{
+				condition = breakpoint.get("hitCondition");
+			}
+			
+			if (condition != null && condition.isEmpty()) condition = null;
+
+			if (!noDebug)	// debugging allowed!
+			{
+				LexTokenReader ltr = new LexTokenReader(name, Dialect.VDM_SL);
+				LexToken token = ltr.nextToken();
+				ltr.close();
+
+				INPlugin in = registry.getPlugin("IN");
+				INDefinitionList list = null;
+
+				if (token.is(Token.IDENTIFIER))
+				{
+					LexIdentifierToken id = (LexIdentifierToken)token;
+					TCNameToken tok = new TCNameToken(id.location, interpreter.getDefaultName(), id.name);
+					list = in.findDefinition(tok);
+				}
+				else if (token.is(Token.NAME))
+				{
+					list = in.findDefinition(new TCNameToken((LexNameToken)token));
+				}
+				
+				INNode node = null;
+				
+				if (!list.isEmpty())
+				{
+					INDefinition d = list.elementAt(0);
+					
+					if (d instanceof INExplicitFunctionDefinition)
+					{
+						INExplicitFunctionDefinition efd = (INExplicitFunctionDefinition)d;
+						node = efd.body;
+					}
+					else if (d instanceof INImplicitFunctionDefinition)
+					{
+						INImplicitFunctionDefinition ifd = (INImplicitFunctionDefinition)d;
+						node = ifd.body;
+					}
+					else if (d instanceof INExplicitOperationDefinition)
+					{
+						INExplicitOperationDefinition eod = (INExplicitOperationDefinition)d;
+						node = eod.body;
+					}
+					else if (d instanceof INImplicitOperationDefinition)
+					{
+						INImplicitOperationDefinition iod = (INImplicitOperationDefinition)d;
+						node = iod.body;
+					}
+				}
+
+				if (node instanceof INExpression)
+				{
+					INExpression exp = (INExpression) node;
+					
+					while (exp instanceof INBinaryExpression)
+					{
+						// None of the binary expressions check their BP, to avoid excessive stepping
+						// when going through (say) a chain of "and" clauses. So if we've picked a
+						// binary expression here, we move the BP to the left hand.
+						INBinaryExpression bexp = (INBinaryExpression)exp;
+						exp = bexp.left;
+					}
+					
+					interpreter.clearBreakpoint(exp.breakpoint.number);
+					Breakpoint bp = interpreter.setBreakpoint(exp, condition);
+					bp.setFunction();
+					results.add(new JSONObject(
+							"verified", true,
+							"source", Utils.lexLocationToSource(exp.location),
+							"line", exp.location.startLine));
+				}
+				else if (node instanceof INStatement)
+				{
+					INStatement stmt = (INStatement) node;
+					interpreter.clearBreakpoint(stmt.breakpoint.number);
+					
+					Breakpoint bp = interpreter.setBreakpoint(stmt, condition);
+					bp.setFunction();
+					results.add(new JSONObject(
+							"verified", true,
+							"source", Utils.lexLocationToSource(stmt.location),
+							"line", stmt.location.startLine));
+				}
+				else if (list.isEmpty())
+				{
+					Diag.error("Function breakpoint name %s not found", name);
+					results.add(new JSONObject("verified", false, "message", name + " is not visible or not found"));
+				}
+				else
+				{
+					Diag.error("Function breakpoint %s is not function or operation", name);
+					results.add(new JSONObject("verified", false, "message", " is not a function or operation"));
+				}
+			}
+			else
+			{
+				results.add(new JSONObject("verified", false));
+			}
+		}
+		
+		return new DAPMessageList(request, new JSONObject("breakpoints", results));
+	}
+
 	public DAPMessageList setExceptionBreakpoints(DAPRequest request, JSONArray filterOptions)
 	{
 		for (Catchpoint cp: getInterpreter().getCatchpoints())
