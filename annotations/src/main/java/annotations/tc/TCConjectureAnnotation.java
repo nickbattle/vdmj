@@ -124,7 +124,7 @@ abstract public class TCConjectureAnnotation extends TCAnnotation
 			
 			if (env.findMatches(hexp.opnames.get(0)).isEmpty())
 			{
-				hexp.report(6008, "Cannot find " + op);
+				hexp.report(6008, "Name '" + op + "' is not in scope");
 				return false;
 			}
 			
