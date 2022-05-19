@@ -122,7 +122,7 @@ abstract public class TCConjectureAnnotation extends TCAnnotation
 			TCHistoryExpression hexp = (TCHistoryExpression)exp;
 			TCNameToken op = hexp.opnames.get(0);
 			
-			if (env.findMatches(hexp.opnames.get(0)).isEmpty())
+			if (env.findMatches(op).isEmpty())
 			{
 				hexp.report(6008, "Name '" + op + "' is not in scope");
 				return false;
