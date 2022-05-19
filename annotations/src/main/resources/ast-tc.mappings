@@ -11,4 +11,5 @@ map ASTPrintfAnnotation{name, args} to TCPrintfAnnotation(name, args);
 map ASTWarningAnnotation{name, args} to TCWarningAnnotation(name, args);
 map ASTOnFailAnnotation{name, args} to TCOnFailAnnotation(name, args);
 map ASTSeparateAnnotation{name, args} to TCSeparateAnnotation(name, args);
+map ASTDeadlineMetAnnotation{name, args} to TCDeadlineMetAnnotation(name, args);
 

@@ -28,11 +28,11 @@ import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.typechecker.Environment;
 
-public class TCSeparateAnnotation extends TCConjectureAnnotation
+public class TCDeadlineMetAnnotation extends TCConjectureAnnotation
 {
 	private static final long serialVersionUID = 1L;
 
-	public TCSeparateAnnotation(TCIdentifierToken name, TCExpressionList args)
+	public TCDeadlineMetAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
 		super(name, args);
 	}
@@ -42,7 +42,7 @@ public class TCSeparateAnnotation extends TCConjectureAnnotation
 	{
 		if (args.size() != 4)
 		{
-			name.report(6008, "Expecting @Separate(<start>, <end>, <pred>, <time>)");
+			name.report(6008, "Expecting @DeadlineMet(<start>, <end>, <pred>, <time>)");
 		}
 		else
 		{
