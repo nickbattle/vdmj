@@ -135,6 +135,24 @@ public class UpdatableValue extends ReferenceValue
 	@Override
 	public void set(LexLocation location, Value newval, Context ctxt) throws ValueException
 	{
+		// First make the change without invoking the listeners.
+		atomicSet(location, newval, ctxt);
+		
+		// The listeners are outside the sync in atomicSet because they have to lock
+		// the object they notify, which can be holding a lock on this one.
+
+		if (listeners != null)
+		{
+			listeners.changedValue(location, value, ctxt);
+		}
+	}
+	
+	/**
+	 * This is used by the atomic statement, and is used to set values
+	 * without invoking the invariant checks.
+	 */
+	public void atomicSet(LexLocation location, Value newval, Context ctxt) throws ValueException
+	{
 		// Anything with structure added to an UpdateableValue has to be
 		// updatable, otherwise you can "freeze" part of the substructure
 		// such that it can't be changed. And we have to set the listeners
@@ -150,14 +168,8 @@ public class UpdatableValue extends ReferenceValue
 				value = value.convertTo(restrictedTo, ctxt);
     		}
 		}
-
-		// The listeners are outside the sync because they have to lock
-		// the object they notify, which can be holding a lock on this one.
-
-		if (listeners != null)
-		{
-			listeners.changedValue(location, value, ctxt);
-		}
+		
+		// NOTE: we omit the listener check here, called in "set" above.
 	}
 
 	public void addListener(ValueListener listener)

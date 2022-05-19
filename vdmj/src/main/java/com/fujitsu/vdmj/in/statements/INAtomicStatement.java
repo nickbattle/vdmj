@@ -85,9 +85,9 @@ public class INAtomicStatement extends INStatement
 		}
 		
 		// We make the assignments atomically by turning off thread swaps and time
-		// then temporarily removing the listener lists from each Updateable target.
+		// then updating each target without invoking the invariant checks (atomicSet).
 		// Then, when all assignments have been made, we check the invariants by
-		// passing the updated values to each listener list, as the assignment would have.
+		// passing the updated values to each listener list, as an assignment would have.
 		// Finally, we re-enable the thread swapping and time stepping, before returning
 		// a void value.
 		
@@ -100,9 +100,7 @@ public class INAtomicStatement extends INStatement
 			{
 				UpdatableValue target = (UpdatableValue) targets.get(i);
 				listenerLists.add(target.listeners);
-				target.listeners = null;
-				target.set(location, values.get(i), ctxt);	// No invariant listeners
-				target.listeners = listenerLists.get(i);
+				target.atomicSet(location, values.get(i), ctxt);	// No invariant listeners
 			}
 			
 			for (int i = 0; i < size; i++)
