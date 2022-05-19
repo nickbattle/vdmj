@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCSystemDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
@@ -75,34 +76,43 @@ abstract public class TCConjectureAnnotation extends TCAnnotation
 				typeCheck(env);
 			}
 		}
+		else if (def instanceof TCImplicitOperationDefinition)
+		{
+			TCImplicitOperationDefinition op = (TCImplicitOperationDefinition)def;
+			
+			if (op.isConstructor && op.classDefinition instanceof TCSystemDefinition)
+			{
+				typeCheck(env);
+			}
+		}
 		else
 		{
-			name.report(6009, "@" + name + " only applies to system classes");
+			name.report(6009, "@" + name + " only applies to system class constructors");
 		}
 	}
 
 	@Override
 	public void tcBefore(TCModule module)
 	{
-		name.report(6009, "@" + name + " only applies to system classes");
+		name.report(6009, "@" + name + " only applies to system class constructors");
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition clazz)
 	{
-		name.report(6009, "@" + name + " only applies to system classes");
+		name.report(6009, "@" + name + " only applies to system class constructors");
 	}
 
 	@Override
 	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
-		name.report(6009, "@" + name + " only applies to system classes");
+		name.report(6009, "@" + name + " only applies to system class constructors");
 	}
 
 	@Override
 	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
-		name.report(6009, "@" + name + " only applies to system classes");
+		name.report(6009, "@" + name + " only applies to system class constructors");
 	}
 
 	protected boolean checkHistoryExpression(Environment env, TCExpression exp)
