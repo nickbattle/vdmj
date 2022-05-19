@@ -75,6 +75,7 @@ public class INAtomicStatement extends INStatement
 			try
 			{
 				stmt.location.hit();
+				stmt.breakpoint.check(location, ctxt);
 				targets.add(stmt.target.eval(ctxt));
 				values.add(stmt.exp.eval(ctxt).convertTo(stmt.targetType, ctxt));
 			}
