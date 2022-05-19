@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 
@@ -47,24 +48,37 @@ abstract public class ASTConjectureAnnotation extends ASTAnnotation
 	{
 		ASTExpressionList args = new ASTExpressionList();
 		
-		if (ltr.nextToken().is(Token.BRA))
+		try
 		{
-			if (ltr.nextToken().isNot(Token.KET))
+			if (ltr.nextToken().is(Token.BRA))
 			{
-				ExpressionReader er = new ExpressionReader(ltr);
-				args.add(er.readPerExpression());
-		
-				while (ltr.getLast().is(Token.COMMA))
+				if (ltr.nextToken().isNot(Token.KET))
 				{
-					ltr.nextToken();
-					args.add(er.readPerExpression());	// To allow #req, #act, #fin
+					ExpressionReader er = new ExpressionReader(ltr);
+					args.add(er.readPerExpression());
+			
+					while (ltr.getLast().is(Token.COMMA))
+					{
+						ltr.nextToken();
+						args.add(er.readPerExpression());	// To allow #req, #act, #fin
+					}
+				}
+
+				if (ltr.getLast().isNot(Token.KET))
+				{
+					parseException("Expecting ')' after annotation", ltr.getLast().location);
 				}
 			}
-	
-			if (ltr.getLast().isNot(Token.KET))
-			{
-				parseException("Expecting ')' after annotation", ltr.getLast().location);
-			}
+		}
+		catch (Exception e)
+		{
+			// Log errors regardless of vdmj.annotations.debug, because syntax errors in
+			// conjectures are important to see.
+			Console.err.println("Error 6008: " + e.getMessage() + " at " + ltr.getLast().location);
+			
+			// Return blank args, which will probably cause a TC error too, rather than
+			// cause this annotation to be ignored.
+			args.clear();
 		}
 		
 		return args;
