@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.RationalValue;
-import com.fujitsu.vdmj.values.Value;
 
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;

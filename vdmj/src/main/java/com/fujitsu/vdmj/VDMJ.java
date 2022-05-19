@@ -42,8 +42,6 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import com.fujitsu.vdmj.Settings;
-
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
