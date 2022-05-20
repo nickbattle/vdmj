@@ -24,16 +24,6 @@
 
 package workspace;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
-
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.messages.RTLogger;
-
-import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import lsp.LSPException;
@@ -105,42 +95,5 @@ public class DAPXWorkspaceManager
 		dapManager.setNoDebug(false);	// Force debug on for runOneTrace
 
 		return ct.runOneTrace(Utils.stringToName(name), testNumber);
-	}
-
-	public DAPMessageList rtLog(DAPRequest request, String logfile)
-	{
-		String message = null;
-		
-		if (Settings.dialect != Dialect.VDM_RT)
-		{
-			message = "Command only available for VDM-RT";
-			Diag.error(message);
-			return new DAPMessageList(request, false, message, null);			
-		}
-
-		if (logfile == null)
-		{
-			RTLogger.enable(false);
-			message = "RT event logging disabled";
-		}
-		else
-		{
-			try
-			{
-				File file = new File(logfile);
-				PrintWriter p = new PrintWriter(new FileOutputStream(logfile, false));
-				RTLogger.setLogfile(p);
-				message = "RT events now logged to " + file.getAbsolutePath();
-			}
-			catch (FileNotFoundException e)
-			{
-				message = "Cannot create RT event log: " + e.getMessage();
-				Diag.error(message);
-				return new DAPMessageList(request, false, message, null);			
-			}
-		}
-		
-		Diag.info(message);
-		return new DAPMessageList(request, new JSONObject("result", message));
 	}
 }

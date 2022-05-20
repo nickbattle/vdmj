@@ -94,6 +94,7 @@ public class DAPWorkspaceManager
 	private String defaultName;
 	private DAPDebugReader debugReader;
 	private String remoteControl;
+	private String logging;
 	
 	protected DAPWorkspaceManager()
 	{
@@ -136,7 +137,7 @@ public class DAPWorkspaceManager
 	}
 
 	public DAPMessageList launch(DAPRequest request,
-			boolean noDebug, String defaultName, String command, String remoteControl) throws Exception
+			boolean noDebug, String defaultName, String command, String remoteControl, String logging) throws Exception
 	{
 		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
 		int retry = 50;		// 5s worth of 100ms
@@ -173,6 +174,7 @@ public class DAPWorkspaceManager
 			this.launchCommand = command;
 			this.defaultName = defaultName;
 			this.remoteControl = remoteControl;
+			this.logging = logging;
 			
 			clearInterpreter();
 			processSettings(request);
@@ -325,6 +327,13 @@ public class DAPWorkspaceManager
 		{
 			// Interpreter may already have been created by setBreakpoint calls during configuration.
 			
+			if (Settings.dialect == Dialect.VDM_RT && logging != null)
+			{
+				File file = new File(logging);
+				RTLogger.setLogfileName(file);
+				Diag.info("RT events now logged to %s", file.getAbsolutePath());
+			}
+			
 			if (remoteControl != null)
 			{
 				RemoteControlExecutor exec = new RemoteControlExecutor("remote", request, remoteControl, defaultName);
@@ -347,6 +356,7 @@ public class DAPWorkspaceManager
 		{
 			launchCommand = null;
 			remoteControl = null;
+			logging = null;
 		}
 	}
 
