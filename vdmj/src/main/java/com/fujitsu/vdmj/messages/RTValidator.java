@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.messages;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -43,11 +42,11 @@ public class RTValidator
 	private static final Pattern ITEM = Pattern.compile(" (\\w+): ((\"[^\"]+\")|(\\w+))");
 	private static List<INAnnotation> conjectures = null;
 	
-	public static void validate(File logfile)
+	public static int validate(File logfile) throws IOException
 	{
 		if (!loadConjectures())
 		{
-			return;	// No conjectures found
+			throw new IOException("No conjectures found in specification");
 		}
 		
 		BufferedReader br = null;
@@ -56,19 +55,26 @@ public class RTValidator
 		{
 			br = new BufferedReader(new FileReader(logfile));
 			String line = br.readLine();
+			int errors = 0;
 			
 			while (line != null)
 			{
 				Map<String, String> record = parse(line);
-				validate(record);
+				
+				if (!validate(record))
+				{
+					errors++;
+				}
+				
 				line = br.readLine();
 			}
-		}
-		catch (FileNotFoundException e)
-		{
-		}
-		catch (IOException e)
-		{
+			
+			if (errors > 0)
+			{
+				writeViolations(new File(logfile.getAbsolutePath() + ".violations"));
+			}
+			
+			return errors;
 		}
 		finally
 		{
@@ -84,21 +90,6 @@ public class RTValidator
 				}
 			}
 		}
-	}
-
-	private static void validate(Map<String, String> record)
-	{
-		for (INAnnotation annotation: conjectures)
-		{
-			ConjectureProcessor processor = (ConjectureProcessor) annotation;
-			processor.process(record);
-		}
-	}
-
-	private static boolean loadConjectures()
-	{
-		conjectures = INAnnotation.getInstances(ConjectureProcessor.class);
-		return !conjectures.isEmpty();
 	}
 
 	private static Map<String, String> parse(String line)
@@ -118,12 +109,41 @@ public class RTValidator
 			map.put(m.group(1), m.group(2));
 		}
 		
-		System.out.println(map);
 		return map;
 	}
-	
-	public static void main(String[] args) throws FileNotFoundException
+
+	private static boolean loadConjectures()
 	{
-		validate(new File("/home/nick/eclipse.vdmj/VDMJTests/rt.log"));
+		conjectures = INAnnotation.getInstances(ConjectureProcessor.class);
+	
+		for (INAnnotation annotation: conjectures)
+		{
+			ConjectureProcessor processor = (ConjectureProcessor) annotation;
+			processor.processReset();
+		}
+		
+		return !conjectures.isEmpty();
+	}
+
+	private static boolean validate(Map<String, String> record)
+	{
+		boolean result = true;
+		
+		for (INAnnotation annotation: conjectures)
+		{
+			ConjectureProcessor processor = (ConjectureProcessor) annotation;
+			result = result && processor.process(record);
+		}
+		
+		return result;
+	}
+
+	private static void writeViolations(File violations) throws IOException
+	{
+		for (INAnnotation annotation: conjectures)
+		{
+			ConjectureProcessor processor = (ConjectureProcessor) annotation;
+			processor.processComplete(violations);
+		}
 	}
 }

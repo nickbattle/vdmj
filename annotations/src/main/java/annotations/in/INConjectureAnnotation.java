@@ -41,5 +41,5 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 	}
 
 	@Override
-	abstract public void process(Map<String, String> record);
+	abstract public boolean process(Map<String, String> record);
 }

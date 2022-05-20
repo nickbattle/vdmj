@@ -24,9 +24,13 @@
 
 package com.fujitsu.vdmj.messages;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 public interface ConjectureProcessor
 {
-	public void process(Map<String, String> record);
+	public void processReset();
+	public boolean process(Map<String, String> record);
+	public void processComplete(File violations) throws IOException;
 }

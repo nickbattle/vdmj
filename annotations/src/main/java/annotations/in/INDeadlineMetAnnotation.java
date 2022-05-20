@@ -24,6 +24,8 @@
 
 package annotations.in;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
@@ -39,7 +41,18 @@ public class INDeadlineMetAnnotation extends INConjectureAnnotation
 	}
 
 	@Override
-	public void process(Map<String, String> record)
+	public void processReset()
+	{
+	}
+
+	@Override
+	public boolean process(Map<String, String> record)
+	{
+		return true;
+	}
+
+	@Override
+	public void processComplete(File violations) throws IOException
 	{
 	}
 }
