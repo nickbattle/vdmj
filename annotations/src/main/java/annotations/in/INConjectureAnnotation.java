@@ -24,6 +24,8 @@
 
 package annotations.in;
 
+import java.util.Map;
+
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
@@ -36,4 +38,6 @@ public abstract class INConjectureAnnotation extends INAnnotation
 	{
 		super(name, args);
 	}
+
+	abstract public void process(Map<String, String> record);
 }

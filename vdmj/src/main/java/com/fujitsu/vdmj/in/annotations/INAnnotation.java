@@ -94,6 +94,21 @@ public abstract class INAnnotation extends INNode implements MappingOptional
 	{
 		// Nothing by default
 	}
+	
+	public static List<INAnnotation> getInstances(Class<? extends INAnnotation> type)
+	{
+		List<INAnnotation> found = new Vector<INAnnotation>();
+		
+		for (INAnnotation instance: instances)
+		{
+			if (type.isAssignableFrom(instance.getClass()))
+			{
+				found.add(instance);
+			}
+		}
+		
+		return found;
+	}
 
 	@Override
 	public String toString()

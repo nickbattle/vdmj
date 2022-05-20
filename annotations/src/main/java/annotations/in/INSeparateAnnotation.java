@@ -24,6 +24,8 @@
 
 package annotations.in;
 
+import java.util.Map;
+
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
@@ -34,5 +36,10 @@ public class INSeparateAnnotation extends INConjectureAnnotation
 	public INSeparateAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);
+	}
+
+	@Override
+	public void process(Map<String, String> record)
+	{
 	}
 }
