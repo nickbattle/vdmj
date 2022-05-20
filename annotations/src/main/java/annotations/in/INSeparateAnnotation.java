@@ -31,6 +31,30 @@ import java.util.Map;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
+/**
+ * We will write O(e, i , t) to indicate that the i th occurrence of event e takes place at time t.
+ * The variable i ranges over the non-zero natural numbers N1, and t, representing time, ranges
+ * over the indices of the trace.
+ * 
+ * We will write E(p, t) to mean that the state predicate p is true of the variables in the
+ * execution trace at time t.
+ * 
+ * A separation conjecture is a 5-tuple Separate(e1, c, e2, d , m) where e1 and e2 are the names of
+ * events, c is a state predicate, d is the minimum acceptable delay between an occurrence of e1 and
+ * any following occurrence of e2 provided that c evaluates to true at the occurrence time of e1.
+ * If c evaluates to false when e1 occurs, the validation conjecture holds independently of the
+ * occurrence time of e2. The Boolean flag m is called the ‘match flag’, when set to true, indicates
+ * a requirement that the occurrence numbers of e1 and e2 should be equal.
+ * 
+ * A validation conjecture Separate(e1, c, e2, d , m) evaluates true over an execution trace if
+ * and only if:
+ * 
+ * forall i1, t1 & O(e1, i1, t1) and E(c, t1) =>
+ *     not exists i2, t2 & O(e2, i2, t2) and t1 <= t2 < t1 + d and
+ *     (m => i1 = i2) and (e1 = e2 => i2 = i1 + 1)
+ * 
+ * See http://dx.doi.org/10.1109/HASE.2007.26.
+ */
 public class INSeparateAnnotation extends INConjectureAnnotation
 {
 	private static final long serialVersionUID = 1L;

@@ -31,6 +31,27 @@ import java.util.Map;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
+/**
+ * We will write O(e, i , t) to indicate that the i th occurrence of event e takes place at time t.
+ * The variable i ranges over the non-zero natural numbers N1, and t, representing time, ranges
+ * over the indices of the trace.
+ * 
+ * We will write E(p, t) to mean that the state predicate p is true of the variables in the
+ * execution trace at time t.
+ * 
+ * A Deadline conjecture places a maximum delay on the occurrence of the reaction event. Again,
+ * the match option may be used to link the occurrence numbers of the stimulus and reaction events.
+ * 
+ * A validation conjecture DeadlineMet(e1, c, e2, d , m) consists of a stimulus event, condition
+ * and reaction event; if c holds, d is the maximum tolerable delay between stimulus and reaction.
+ * The conjecture evaluates true over an execution trace if and only if:
+ * 
+ * forall i1, t1 & O(e1, i1, t1) and E(c, t1) =>
+ *    exists i2, t2 & O(e2, i2, t2) and t1 <= t2 <= t1 + d and
+ *    (m => i1 = i2) and (e1 = e2 => i2 = i1 + 1)
+ * 
+ * See http://dx.doi.org/10.1109/HASE.2007.26.
+ */
 public class INDeadlineMetAnnotation extends INConjectureAnnotation
 {
 	private static final long serialVersionUID = 1L;
