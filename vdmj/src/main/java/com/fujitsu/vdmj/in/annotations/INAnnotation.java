@@ -95,7 +95,7 @@ public abstract class INAnnotation extends INNode implements MappingOptional
 		// Nothing by default
 	}
 	
-	public static List<INAnnotation> getInstances(Class<? extends INAnnotation> type)
+	public static List<INAnnotation> getInstances(Class<?> type)
 	{
 		List<INAnnotation> found = new Vector<INAnnotation>();
 		

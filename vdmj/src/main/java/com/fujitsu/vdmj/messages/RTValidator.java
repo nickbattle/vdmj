@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package runtime;
+package com.fujitsu.vdmj.messages;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -36,8 +36,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
-
-import annotations.in.INConjectureAnnotation;
 
 public class RTValidator
 {
@@ -92,14 +90,14 @@ public class RTValidator
 	{
 		for (INAnnotation annotation: conjectures)
 		{
-			INConjectureAnnotation conjecture = (INConjectureAnnotation) annotation;
-			conjecture.process(record);
+			ConjectureProcessor processor = (ConjectureProcessor) annotation;
+			processor.process(record);
 		}
 	}
 
 	private static boolean loadConjectures()
 	{
-		conjectures = INAnnotation.getInstances(INConjectureAnnotation.class);
+		conjectures = INAnnotation.getInstances(ConjectureProcessor.class);
 		return !conjectures.isEmpty();
 	}
 
