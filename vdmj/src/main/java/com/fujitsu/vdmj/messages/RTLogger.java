@@ -126,7 +126,7 @@ public class RTLogger
 		}
 	}
 
-	public static void setLogfile(PrintWriter out)
+	private static void setLogfile(PrintWriter out)
 	{
 		enabled = true;
 		dump(true);		// Write out and close previous
@@ -137,8 +137,16 @@ public class RTLogger
 	public static void setLogfileName(File file) throws FileNotFoundException
 	{
 		logfile = file;
-		PrintWriter p = new PrintWriter(new FileOutputStream(file, false));
-		setLogfile(p);
+
+		if (file != null)
+		{
+			PrintWriter p = new PrintWriter(new FileOutputStream(file, false));
+			setLogfile(p);
+		}
+		else
+		{
+			setLogfile(null);	// Use Console.out
+		}
 	}
 
 	public static int getLogSize()
@@ -146,7 +154,7 @@ public class RTLogger
 		return events.size();
 	}
 	
-	public static File getFile()
+	public static File getLogfileName()
 	{
 		return logfile;
 	}

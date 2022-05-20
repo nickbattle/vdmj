@@ -24,9 +24,8 @@
 
 package com.fujitsu.vdmj.commands;
 
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -165,7 +164,15 @@ public class ClassCommandReader extends CommandReader
 				println("Flushing " + RTLogger.getLogSize() + " RT events");
 			}
 
-			RTLogger.setLogfile(null);
+			try
+			{
+				RTLogger.setLogfileName(null);
+			}
+			catch (FileNotFoundException e)
+			{
+				// ignore
+			}
+			
 			println("RT events now logged to the console");
 			return true;
 		}
@@ -185,8 +192,7 @@ public class ClassCommandReader extends CommandReader
 		{
 			try
 			{
-				PrintWriter p = new PrintWriter(new FileOutputStream(parts[1], false));
-				RTLogger.setLogfile(p);
+				RTLogger.setLogfileName(new File(parts[1]));
 				println("RT events now logged to " + parts[1]);
 			}
 			catch (FileNotFoundException e)
