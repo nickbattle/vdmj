@@ -22,17 +22,35 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.messages;
+package annotations.tc;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.typechecker.Environment;
 
-import com.fujitsu.vdmj.runtime.Context;
-
-public interface ConjectureProcessor
+public class TCSepRequireAnnotation extends TCConjectureAnnotation
 {
-	public void processReset();
-	public boolean process(Map<String, String> record, Context ctxt);
-	public int processComplete(File violations) throws IOException;
+	private static final long serialVersionUID = 1L;
+
+	public TCSepRequireAnnotation(TCIdentifierToken name, TCExpressionList args)
+	{
+		super(name, args);
+	}
+	
+	@Override
+	protected void typeCheck(Environment env)
+	{
+		if (args.size() != 5)
+		{
+			name.report(6008, "Expecting @SepRequire(e1, [c], e2, d, m)");
+		}
+		else
+		{
+			checkHistoryExpression(env, args.get(0));
+			checkBooleanExpression(env, args.get(1));
+			checkHistoryExpression(env, args.get(2));
+			checkNumericExpression(env, args.get(3));
+			checkBooleanExpression(env, args.get(4));
+		}
+	}
 }

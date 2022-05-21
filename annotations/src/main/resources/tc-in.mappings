@@ -12,3 +12,4 @@ map TCWarningAnnotation{name, args} to INNullAnnotation(name, args);
 map TCOnFailAnnotation{name, args, format} to INOnFailAnnotation(name, args, format);
 map TCSeparateAnnotation{name, args} to INSeparateAnnotation(name, args);
 map TCDeadlineMetAnnotation{name, args} to INDeadlineMetAnnotation(name, args);
+map TCSepRequireAnnotation{name, args} to INSepRequireAnnotation(name, args);

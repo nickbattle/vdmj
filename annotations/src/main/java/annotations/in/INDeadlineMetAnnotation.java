@@ -26,10 +26,13 @@ package annotations.in;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.messages.RTValidator;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 /**
@@ -48,8 +51,10 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
  * The conjecture evaluates true over an execution trace if and only if:
  * 
  * forall i1, t1 & O(e1, i1, t1) and E(c, t1) =>
- *    exists i2, t2 & O(e2, i2, t2) and t1 <= t2 <= t1 + d and
- *    (m => i1 = i2) and (e1 = e2 => i2 = i1 + 1)
+ *    exists i2, t2 & O(e2, i2, t2)
+ *        and t1 <= t2 <= t1 + d
+ *        and (m => i1 = i2)
+ *        and (e1 = e2 => i2 = i1 + 1)
  * 
  * See http://dx.doi.org/10.1109/HASE.2007.26.
  */
@@ -63,18 +68,77 @@ public class INDeadlineMetAnnotation extends INConjectureAnnotation
 	}
 
 	@Override
-	public void processReset()
-	{
-	}
-
-	@Override
 	public boolean process(Map<String, String> record, Context ctxt)
 	{
-		return true;
+		String event = record.get(RTValidator.HISTORY);	// eg. "#req(A`op)" or "#fin(Z`op)"
+		boolean result = true;
+		
+		if (event != null)
+		{
+			try
+			{
+				long time = Long.parseLong(record.get("time"));
+				long thid = Long.parseLong(record.get("id"));
+
+				if (event.equals(e1))
+				{
+					i1++;
+
+					if (condition == null || condition.eval(ctxt).boolValue(ctxt))
+					{
+						occurrences.add(new Occurrence(i1, time, thid));
+					}
+				}
+				
+				if (event.equals(e2))
+				{
+					i2++;
+					
+					Iterator<Occurrence> iter = occurrences.iterator();
+					
+					while (iter.hasNext())
+					{
+						Occurrence occ = iter.next();
+						
+						boolean T = occ.t1 <= time && time < occ.t1 + delay;	// t1 <= t2 < t1 + d
+						boolean M = match ? occ.i1 == i2 : true;				// m => i1 = i2
+						boolean E = e1.equals(e2) ? i2 == i1 + 1 : true;		// e1 = e2 => i2 = i1 + 1
+						
+						if (T && M && E)	// exists, so if all are true the occurrence is complete
+						{
+							iter.remove();	// Deadline was met!
+						}
+					}
+				}
+			}
+			catch (ValueException e)
+			{
+				System.err.println("Error in condition: " + e);
+			}
+			catch (NumberFormatException e)
+			{
+				System.err.println("Malformed record: " + e);
+			}
+		}
+		
+		return result;
 	}
 
 	@Override
-	public void processComplete(File violations) throws IOException
+	public int processComplete(File violations) throws IOException
 	{
+		// If any occurrences remain, they have never been satisfied, so error.
+		
+		for (Occurrence occ: occurrences)
+		{
+			failures.add(new Failure(occ.t1, occ.thid));
+		}
+		
+		for (Failure failure: failures)
+		{
+			System.err.println("FAIL: " + failure.toString());
+		}
+		
+		return failures.size();
 	}
 }

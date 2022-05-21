@@ -24,23 +24,112 @@
 
 package annotations.in;
 
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
+import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.expressions.INNilExpression;
 import com.fujitsu.vdmj.messages.ConjectureProcessor;
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 public abstract class INConjectureAnnotation extends INAnnotation implements ConjectureProcessor
 {
 	private static final long serialVersionUID = 1L;
 
+	protected final String e1;
+	protected final INExpression condition;
+	protected final String e2;
+	protected final long delay;
+	protected final boolean match;
+
 	public INConjectureAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);
+		
+		this.e1 = args.get(0).toString();
+		this.condition = args.get(1) instanceof INNilExpression ? null : args.get(1);
+		this.e2 = args.get(2).toString();
+		this.delay = Long.parseLong(args.get(3).toString());
+		this.match = Boolean.parseBoolean(args.get(4).toString());
+	}
+
+	protected static class Occurrence
+	{
+		public final long i1;
+		public final long t1;
+		public final long thid;
+		
+		public Occurrence(long i1, long t1, long thid)
+		{
+			this.i1 = i1;
+			this.t1 = t1;
+			this.thid = thid;
+		}
+	}
+	
+	protected static class Failure
+	{
+		public final long t1;
+		public final long thid1;
+		public final long t2;
+		public final long thid2;
+		
+		public Failure(long t1, long thid1, long t2, long thid2)
+		{
+			this.t1 = t1;
+			this.thid1 = thid1;
+			this.t2 = t2;
+			this.thid2 = thid2;
+		}
+		
+		public Failure(long t1, long thid1)
+		{
+			this.t1 = t1;
+			this.thid1 = thid1;
+			this.t2 = -1;
+			this.thid2 = -1;
+		}
+		
+		@Override
+		public String toString()
+		{
+			if (t2 < 0)
+			{
+				return t1 + ", " + thid1;
+			}
+			else
+			{
+				return t1 + ", " + thid1 + ", " + t2 + ", " + thid2;
+			}
+		}
+	}
+
+	protected final List<Occurrence> occurrences = new Vector<Occurrence>();
+	protected final List<Failure> failures = new Vector<Failure>();
+	protected long i1 = 0;
+	protected long i2 = 0;
+	
+	@Override
+	public void processReset()
+	{
+		occurrences.clear();
+		failures.clear();
+		i1 = 0;
+		i2 = 0;
 	}
 
 	@Override
-	abstract public boolean process(Map<String, String> record, Context ctxt);
+	public int processComplete(File violations) throws IOException
+	{
+		for (Failure failure: failures)
+		{
+			System.err.println("FAIL: " + failure.toString());
+		}
+		
+		return failures.size();
+	}
 }

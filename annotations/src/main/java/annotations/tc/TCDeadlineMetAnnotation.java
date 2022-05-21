@@ -40,16 +40,17 @@ public class TCDeadlineMetAnnotation extends TCConjectureAnnotation
 	@Override
 	protected void typeCheck(Environment env)
 	{
-		if (args.size() != 4)
+		if (args.size() != 5)
 		{
-			name.report(6008, "Expecting @DeadlineMet(<start>, <end>, <pred>, <time>)");
+			name.report(6008, "Expecting @DeadlineMet(e1, [c], e2, d, m)");
 		}
 		else
 		{
 			checkHistoryExpression(env, args.get(0));
-			checkHistoryExpression(env, args.get(1));
-			checkBooleanExpression(env, args.get(2));
+			checkNumericExpression(env, args.get(1));
+			checkHistoryExpression(env, args.get(2));
 			checkNumericExpression(env, args.get(3));
+			checkBooleanExpression(env, args.get(4));
 		}
 	}
 }

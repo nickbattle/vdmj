@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.SeqValue;
 
@@ -63,8 +64,8 @@ public class RTValidator
 		{
 			br = new BufferedReader(new FileReader(logfile));
 			String line = br.readLine();
-			int errors = 0;
 			Context ctxt = new Context(LexLocation.ANY, "Conjecture context", null);
+			ctxt.setThreadState(CPUValue.vCPU);
 			
 			while (line != null)
 			{
@@ -90,20 +91,15 @@ public class RTValidator
 						ctxt.put(tcname, new SeqValue(value));
 					}
 				}
-				else if (!validate(record, ctxt))
+				else
 				{
-					errors++;
+					validate(record, ctxt);
 				}
 				
 				line = br.readLine();
 			}
 			
-			if (errors > 0)
-			{
-				writeViolations(new File(logfile.getAbsolutePath() + ".violations"));
-			}
-			
-			return errors;
+			return writeViolations(new File(logfile.getAbsolutePath() + ".violations"));
 		}
 		finally
 		{
@@ -196,12 +192,16 @@ public class RTValidator
 		return result;
 	}
 
-	private static void writeViolations(File violations) throws IOException
+	private static int writeViolations(File violations) throws IOException
 	{
+		int count = 0;
+		
 		for (INAnnotation annotation: conjectures)
 		{
 			ConjectureProcessor processor = (ConjectureProcessor) annotation;
-			processor.processComplete(violations);
+			count += processor.processComplete(violations);
 		}
+		
+		return count;
 	}
 }

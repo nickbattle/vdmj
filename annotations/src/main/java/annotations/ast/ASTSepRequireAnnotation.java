@@ -22,17 +22,16 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.messages;
+package annotations.ast;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
-import com.fujitsu.vdmj.runtime.Context;
-
-public interface ConjectureProcessor
+public class ASTSepRequireAnnotation extends ASTConjectureAnnotation
 {
-	public void processReset();
-	public boolean process(Map<String, String> record, Context ctxt);
-	public int processComplete(File violations) throws IOException;
+	private static final long serialVersionUID = 1L;
+
+	public ASTSepRequireAnnotation(LexIdentifierToken name)
+	{
+		super(name);
+	}
 }
