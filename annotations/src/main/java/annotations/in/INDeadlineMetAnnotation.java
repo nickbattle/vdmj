@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 /**
@@ -67,7 +68,7 @@ public class INDeadlineMetAnnotation extends INConjectureAnnotation
 	}
 
 	@Override
-	public boolean process(Map<String, String> record)
+	public boolean process(Map<String, String> record, Context ctxt)
 	{
 		return true;
 	}

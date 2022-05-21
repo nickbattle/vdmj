@@ -35,9 +35,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.values.IntegerValue;
+import com.fujitsu.vdmj.values.SeqValue;
 
 public class RTValidator
 {
+	public static final String KIND = "_kind_";
+	public static final String HISTORY = "_history_";
+	
 	private static final Pattern TYPE = Pattern.compile("(\\w+) ->");
 	private static final Pattern ITEM = Pattern.compile(" (\\w+): ((\"[^\"]+\")|(\\w+))");
 	private static List<INAnnotation> conjectures = null;
@@ -56,12 +64,33 @@ public class RTValidator
 			br = new BufferedReader(new FileReader(logfile));
 			String line = br.readLine();
 			int errors = 0;
+			Context ctxt = new Context(LexLocation.ANY, "Conjecture context", null);
 			
 			while (line != null)
 			{
 				Map<String, String> record = parse(line);
 				
-				if (!validate(record))
+				if (record.get(KIND).equals("InstVarChange"))
+				{
+					String name = record.get("instnm").replace("\"", "");
+					String value = record.get("val").replace("\"", "");
+					
+					// InstVarChange -> instnm: "counts((A`interval + 1))" val: "1" objref: 1 id: 15 time: 255
+					// InstVarChange -> instnm: "last" val: "227" objref: 1 id: 15 time: 259
+					
+					TCNameToken tcname = new TCNameToken(LexLocation.ANY, "DUMMY", name);
+					
+					try
+					{
+						long v = Long.parseLong(value);
+						ctxt.put(tcname, new IntegerValue(v));
+					}
+					catch (NumberFormatException e)
+					{
+						ctxt.put(tcname, new SeqValue(value));
+					}
+				}
+				else if (!validate(record, ctxt))
 				{
 					errors++;
 				}
@@ -92,14 +121,20 @@ public class RTValidator
 		}
 	}
 
-	private static Map<String, String> parse(String line)
+	private static Map<String, String> parse(String line) throws IOException
 	{
 		Map<String, String> map = new LinkedHashMap<String, String>();
 		Matcher m = TYPE.matcher(line);
+		String rtype = null;
 		
-		while (m.find())
+		if (m.find())
 		{
-			map.put("kind", m.group(1));
+			map.put(KIND, m.group(1));
+			rtype = m.group(1);
+		}
+		else
+		{
+			throw new IOException("Malformed log record: no record type");
 		}
 		
 		m = ITEM.matcher(line);
@@ -107,6 +142,29 @@ public class RTValidator
 		while (m.find())
 		{
 			map.put(m.group(1), m.group(2));
+		}
+
+		String opname = map.get("opname");	// eg. "A`op(nat, nat)"
+		
+		if (opname != null)
+		{
+			opname = opname.substring(1);
+			opname = opname.replaceFirst("\\(.*$", "");		// Remove types and quotes
+		}
+
+		switch (rtype)
+		{
+			case "OpRequest":
+				map.put(HISTORY, "#req(" + opname + ")");
+				break;
+				
+			case "OpActivate":
+				map.put(HISTORY, "#act(" + opname + ")");
+				break;
+				
+			case "OpCompleted":
+				map.put(HISTORY, "#fin(" + opname + ")");
+				break;
 		}
 		
 		return map;
@@ -125,14 +183,14 @@ public class RTValidator
 		return !conjectures.isEmpty();
 	}
 
-	private static boolean validate(Map<String, String> record)
+	private static boolean validate(Map<String, String> record, Context ctxt)
 	{
 		boolean result = true;
 		
 		for (INAnnotation annotation: conjectures)
 		{
 			ConjectureProcessor processor = (ConjectureProcessor) annotation;
-			result = result && processor.process(record);
+			result = result && processor.process(record, ctxt);
 		}
 		
 		return result;

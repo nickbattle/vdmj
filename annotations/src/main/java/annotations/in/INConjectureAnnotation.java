@@ -29,6 +29,7 @@ import java.util.Map;
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.messages.ConjectureProcessor;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 public abstract class INConjectureAnnotation extends INAnnotation implements ConjectureProcessor
@@ -41,5 +42,5 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 	}
 
 	@Override
-	abstract public boolean process(Map<String, String> record);
+	abstract public boolean process(Map<String, String> record, Context ctxt);
 }

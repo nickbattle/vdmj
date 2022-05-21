@@ -141,7 +141,7 @@ abstract public class TCConjectureAnnotation extends TCAnnotation
 	{
 		TCType type = tcExpression.typeCheck(env, null, NameScope.ANYTHING, null);
 		
-		if (type instanceof TCBooleanType)
+		if (type.isType(TCBooleanType.class, LexLocation.ANY))
 		{
 			return true;
 		}

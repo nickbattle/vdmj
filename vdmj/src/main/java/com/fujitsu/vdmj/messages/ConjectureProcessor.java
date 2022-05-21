@@ -28,9 +28,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
+import com.fujitsu.vdmj.runtime.Context;
+
 public interface ConjectureProcessor
 {
 	public void processReset();
-	public boolean process(Map<String, String> record);
+	public boolean process(Map<String, String> record, Context ctxt);
 	public void processComplete(File violations) throws IOException;
 }
