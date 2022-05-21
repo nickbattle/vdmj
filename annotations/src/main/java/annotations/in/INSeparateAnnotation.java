@@ -171,6 +171,7 @@ public class INSeparateAnnotation extends INConjectureAnnotation
 						if (T && M && E)	// Not exists, so if all are true this is a failure
 						{
 							failures.add(new Failure(occ.t1, occ.thid, time, thid));
+							result = false;
 						}
 					}
 				}
