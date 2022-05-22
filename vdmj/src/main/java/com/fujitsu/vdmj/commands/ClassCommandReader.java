@@ -249,7 +249,7 @@ public class ClassCommandReader extends CommandReader
 		}
 		else
 		{
-			println("No log file started - use 'log'");
+			println("No log file started - use 'log <file>' or 'validate <file>'");
 		}
 		
 		return true;
