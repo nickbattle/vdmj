@@ -25,7 +25,9 @@
 package annotations.in;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Vector;
 
@@ -125,9 +127,18 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 	@Override
 	public int processComplete(File violations) throws IOException
 	{
-		for (Failure failure: failures)
+		PrintWriter pw = new PrintWriter(new FileWriter(violations, true));
+		
+		try
 		{
-			System.out.println(failure.toString());
+			for (Failure failure: failures)
+			{
+				pw.println(failure.toString());
+			}
+		}
+		finally
+		{
+			pw.close();
 		}
 		
 		return failures.size();

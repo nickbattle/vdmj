@@ -195,6 +195,7 @@ public class RTValidator
 	private static int writeViolations(File violations) throws IOException
 	{
 		int count = 0;
+		violations.delete();
 		
 		for (INAnnotation annotation: conjectures)
 		{

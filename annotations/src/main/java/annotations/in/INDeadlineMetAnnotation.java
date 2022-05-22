@@ -25,7 +25,9 @@
 package annotations.in;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -140,9 +142,18 @@ public class INDeadlineMetAnnotation extends INConjectureAnnotation
 			failures.add(new Failure(occ.t1, occ.thid));
 		}
 		
-		for (Failure failure: failures)
+		PrintWriter pw = new PrintWriter(new FileWriter(violations, true));
+		
+		try
 		{
-			System.out.println(failure.toString());
+			for (Failure failure: failures)
+			{
+				pw.println(failure.toString());
+			}
+		}
+		finally
+		{
+			pw.close();
 		}
 		
 		return failures.size();
