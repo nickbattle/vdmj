@@ -36,6 +36,8 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INNilExpression;
 import com.fujitsu.vdmj.messages.ConjectureProcessor;
+import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 public abstract class INConjectureAnnotation extends INAnnotation implements ConjectureProcessor
@@ -160,5 +162,22 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 		}
 		
 		return failures.size();
+	}
+	
+	protected boolean checkCondition(Context ctxt)
+	{
+		if (condition == null)
+		{
+			return true;
+		}
+		
+		try
+		{
+			return condition.eval(ctxt).boolValue(ctxt);
+		}
+		catch (ValueException e)
+		{
+			return true;
+		}
 	}
 }

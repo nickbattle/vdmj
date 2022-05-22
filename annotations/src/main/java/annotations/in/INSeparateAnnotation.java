@@ -30,7 +30,6 @@ import java.util.Map;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.messages.RTValidator;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 /**
@@ -90,7 +89,7 @@ public class INSeparateAnnotation extends INConjectureAnnotation
 				{
 					i1++;
 
-					if (condition == null || condition.eval(ctxt).boolValue(ctxt))
+					if (checkCondition(ctxt))
 					{
 						occurrences.add(new Occurrence(i1, time, thid));
 					}
@@ -122,10 +121,6 @@ public class INSeparateAnnotation extends INConjectureAnnotation
 						}
 					}
 				}
-			}
-			catch (ValueException e)
-			{
-				System.err.println("Error in condition: " + e);
 			}
 			catch (NumberFormatException e)
 			{
