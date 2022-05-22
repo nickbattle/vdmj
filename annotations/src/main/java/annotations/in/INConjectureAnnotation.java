@@ -42,6 +42,7 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 {
 	private static final long serialVersionUID = 1L;
 
+	protected final String name;
 	protected final String e1;
 	protected final INExpression condition;
 	protected final String e2;
@@ -52,6 +53,7 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 	{
 		super(name, args);
 		
+		this.name = "C" + (++counter);
 		this.e1 = args.get(0).toString();
 		this.condition = args.get(1) instanceof INNilExpression ? null : args.get(1);
 		this.e2 = args.get(2).toString();
@@ -75,21 +77,24 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 	
 	protected static class Failure
 	{
+		public final INConjectureAnnotation conj;
 		public final long t1;
 		public final long thid1;
 		public final long t2;
 		public final long thid2;
 		
-		public Failure(long t1, long thid1, long t2, long thid2)
+		public Failure(INConjectureAnnotation annotation, long t1, long thid1, long t2, long thid2)
 		{
+			this.conj = annotation;
 			this.t1 = t1;
 			this.thid1 = thid1;
 			this.t2 = t2;
 			this.thid2 = thid2;
 		}
 		
-		public Failure(long t1, long thid1)
+		public Failure(INConjectureAnnotation annotation, long t1, long thid1)
 		{
+			this.conj = annotation;
 			this.t1 = t1;
 			this.thid1 = thid1;
 			this.t2 = -1;
@@ -101,11 +106,13 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 		{
 			if (t2 < 0)
 			{
-				return "FAIL: " + t1 + ", " + thid1;
+				return String.format("\"%s\" \"%s, %s, %s, %d\" %d %d",
+						conj.name, conj.e1, conj.condition, conj.e2, conj.delay, t1, thid1);
 			}
 			else
 			{
-				return "FAIL: " + t1 + ", " + thid1 + ", " + t2 + ", " + thid2;
+				return String.format("\"%s\" \"%s, %s, %s, %d\" %d %d %d %d",
+						conj.name, conj.e1, conj.condition, conj.e2, conj.delay, t1, thid1, t2, thid2);
 			}
 		}
 	}
@@ -114,6 +121,13 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 	protected final List<Failure> failures = new Vector<Failure>();
 	protected long i1 = 0;
 	protected long i2 = 0;
+	
+	private static int counter = 0;		// Names conjectures, C1, C2, etc
+	
+	public static void doInit()
+	{
+		counter = 0;
+	}
 	
 	@Override
 	public void processReset()
@@ -131,6 +145,10 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 		
 		try
 		{
+			if (failures.isEmpty())
+			{
+				pw.printf("\"%s\" \"%s, %s, %s, %d\" PASS\n", name, e1, condition, e2, delay);
+			}
 			for (Failure failure: failures)
 			{
 				pw.println(failure.toString());

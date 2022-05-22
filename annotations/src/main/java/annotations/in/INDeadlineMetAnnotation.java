@@ -25,9 +25,7 @@
 package annotations.in;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -112,7 +110,7 @@ public class INDeadlineMetAnnotation extends INConjectureAnnotation
 						}
 						else if (!T && M && E)	// Too late
 						{
-							failures.add(new Failure(occ.t1, occ.thid, time, thid));
+							failures.add(new Failure(this, occ.t1, occ.thid, time, thid));
 							iter.remove();
 							result = false;
 						}
@@ -139,23 +137,9 @@ public class INDeadlineMetAnnotation extends INConjectureAnnotation
 		
 		for (Occurrence occ: occurrences)
 		{
-			failures.add(new Failure(occ.t1, occ.thid));
+			failures.add(new Failure(this, occ.t1, occ.thid));
 		}
-		
-		PrintWriter pw = new PrintWriter(new FileWriter(violations, true));
-		
-		try
-		{
-			for (Failure failure: failures)
-			{
-				pw.println(failure.toString());
-			}
-		}
-		finally
-		{
-			pw.close();
-		}
-		
-		return failures.size();
+	
+		return super.processComplete(violations);
 	}
 }

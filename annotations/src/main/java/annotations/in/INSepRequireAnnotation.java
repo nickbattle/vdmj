@@ -25,9 +25,7 @@
 package annotations.in;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -108,15 +106,13 @@ public class INSepRequireAnnotation extends INConjectureAnnotation
 						
 						if (T && M && E)	// Not exists, so if all are true this is a failure
 						{
-							failures.add(new Failure(occ.t1, occ.thid, time, thid));
+							failures.add(new Failure(this, occ.t1, occ.thid, time, thid));
 							iter.remove();
 							result = false;
 						}
-						else if (!T && M && E)	// Too late
+						else if (!T && M && E)	// Success, so remove occurrence
 						{
-							failures.add(new Failure(occ.t1, occ.thid, time, thid));
 							iter.remove();
-							result = false;
 						}
 					}
 				}
@@ -141,23 +137,9 @@ public class INSepRequireAnnotation extends INConjectureAnnotation
 		
 		for (Occurrence occ: occurrences)
 		{
-			failures.add(new Failure(occ.t1, occ.thid));
+			failures.add(new Failure(this, occ.t1, occ.thid));
 		}
 		
-		PrintWriter pw = new PrintWriter(new FileWriter(violations, true));
-		
-		try
-		{
-			for (Failure failure: failures)
-			{
-				pw.println(failure.toString());
-			}
-		}
-		finally
-		{
-			pw.close();
-		}
-		
-		return failures.size();
+		return super.processComplete(violations);
 	}
 }
