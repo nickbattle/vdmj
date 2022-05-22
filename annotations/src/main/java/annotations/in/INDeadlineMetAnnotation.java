@@ -106,7 +106,13 @@ public class INDeadlineMetAnnotation extends INConjectureAnnotation
 						
 						if (T && M && E)	// exists, so if all are true the occurrence is complete
 						{
-							iter.remove();	// Deadline was met!
+							iter.remove();		// Deadline was met!
+						}
+						else if (!T && M && E)	// Too late
+						{
+							failures.add(new Failure(occ.t1, occ.thid, time, thid));
+							iter.remove();
+							result = false;
 						}
 					}
 				}
@@ -136,7 +142,7 @@ public class INDeadlineMetAnnotation extends INConjectureAnnotation
 		
 		for (Failure failure: failures)
 		{
-			System.err.println("FAIL: " + failure.toString());
+			System.out.println(failure.toString());
 		}
 		
 		return failures.size();

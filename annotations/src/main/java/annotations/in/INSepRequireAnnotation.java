@@ -26,7 +26,9 @@ package annotations.in;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Map;
+
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.messages.RTValidator;
 import com.fujitsu.vdmj.runtime.Context;
@@ -92,8 +94,12 @@ public class INSepRequireAnnotation extends INConjectureAnnotation
 				{
 					i2++;
 					
-					for (Occurrence occ: occurrences)
+					Iterator<Occurrence> iter = occurrences.iterator();
+					
+					while (iter.hasNext())
 					{
+						Occurrence occ = iter.next();
+
 						boolean T = occ.t1 <= time && time < occ.t1 + delay;	// t1 <= t2 < t1 + d
 						boolean M = match ? occ.i1 == i2 : true;				// m => i1 = i2
 						boolean E = e1.equals(e2) ? i2 == i1 + 1 : true;		// e1 = e2 => i2 = i1 + 1
@@ -101,6 +107,13 @@ public class INSepRequireAnnotation extends INConjectureAnnotation
 						if (T && M && E)	// Not exists, so if all are true this is a failure
 						{
 							failures.add(new Failure(occ.t1, occ.thid, time, thid));
+							iter.remove();
+							result = false;
+						}
+						else if (!T && M && E)	// Too late
+						{
+							failures.add(new Failure(occ.t1, occ.thid, time, thid));
+							iter.remove();
 							result = false;
 						}
 					}
@@ -131,7 +144,7 @@ public class INSepRequireAnnotation extends INConjectureAnnotation
 		
 		for (Failure failure: failures)
 		{
-			System.err.println("FAIL: " + failure.toString());
+			System.out.println(failure.toString());
 		}
 		
 		return failures.size();

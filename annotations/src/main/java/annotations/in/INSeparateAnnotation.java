@@ -26,6 +26,7 @@ package annotations.in;
 
 import java.util.Iterator;
 import java.util.Map;
+
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.messages.RTValidator;
 import com.fujitsu.vdmj.runtime.Context;
@@ -105,6 +106,12 @@ public class INSeparateAnnotation extends INConjectureAnnotation
 						boolean E = e1.equals(e2) ? i2 == i1 + 1 : true;		// e1 = e2 => i2 = i1 + 1
 						
 						if (T && M && E)	// Not exists, so if all are true this is a failure
+						{
+							failures.add(new Failure(occ.t1, occ.thid, time, thid));
+							iter.remove();
+							result = false;
+						}
+						else if (!T && M && E)	// Too late
 						{
 							failures.add(new Failure(occ.t1, occ.thid, time, thid));
 							iter.remove();

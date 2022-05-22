@@ -99,11 +99,11 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 		{
 			if (t2 < 0)
 			{
-				return t1 + ", " + thid1;
+				return "FAIL: " + t1 + ", " + thid1;
 			}
 			else
 			{
-				return t1 + ", " + thid1 + ", " + t2 + ", " + thid2;
+				return "FAIL: " + t1 + ", " + thid1 + ", " + t2 + ", " + thid2;
 			}
 		}
 	}
@@ -127,7 +127,7 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 	{
 		for (Failure failure: failures)
 		{
-			System.err.println("FAIL: " + failure.toString());
+			System.out.println(failure.toString());
 		}
 		
 		return failures.size();
