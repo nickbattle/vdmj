@@ -38,7 +38,6 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
-import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -144,17 +143,19 @@ abstract public class TCConjectureAnnotation extends TCAnnotation
 	
 	protected boolean checkBooleanExpression(Environment env, TCExpression tcExpression)
 	{
-		TCType type = tcExpression.typeCheck(env, null, NameScope.ANYTHING, null);
+		return true;	// Can't check expressions yet...
 		
-		if (type.isType(TCBooleanType.class, LexLocation.ANY))
-		{
-			return true;
-		}
-		else
-		{
-			tcExpression.report(6008, "Expecting boolean expression, got " + type);
-			return false;
-		}
+//		TCType type = tcExpression.typeCheck(env, null, NameScope.ANYTHING, null);
+//		
+//		if (type.isType(TCBooleanType.class, LexLocation.ANY))
+//		{
+//			return true;
+//		}
+//		else
+//		{
+//			tcExpression.report(6008, "Expecting boolean expression, got " + type);
+//			return false;
+//		}
 	}
 	
 	protected boolean checkNumericExpression(Environment env, TCExpression exp)

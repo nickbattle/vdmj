@@ -47,7 +47,7 @@ public class TCDeadlineMetAnnotation extends TCConjectureAnnotation
 		else
 		{
 			checkHistoryExpression(env, args.get(0));
-			checkNumericExpression(env, args.get(1));
+			checkBooleanExpression(env, args.get(1));
 			checkHistoryExpression(env, args.get(2));
 			checkNumericExpression(env, args.get(3));
 			checkBooleanExpression(env, args.get(4));

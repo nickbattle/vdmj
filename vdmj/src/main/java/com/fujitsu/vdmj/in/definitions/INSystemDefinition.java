@@ -67,6 +67,11 @@ public class INSystemDefinition extends INClassDefinition
 
 		return null;
 	}
+	
+	public static ObjectValue getSystemObject()
+	{
+		return systemObject;
+	}
 
 	public INSystemDefinition(INAnnotationList annotations, TCNameToken className, TCClassType type, INDefinitionList members)
 	{

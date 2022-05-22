@@ -35,11 +35,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
+import com.fujitsu.vdmj.in.definitions.INSystemDefinition;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.IntegerValue;
+import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.SeqValue;
 
 public class RTValidator
@@ -66,6 +68,9 @@ public class RTValidator
 			String line = br.readLine();
 			Context ctxt = new Context(LexLocation.ANY, "Conjecture context", null);
 			ctxt.setThreadState(CPUValue.vCPU);
+
+			ObjectValue sysObject = INSystemDefinition.getSystemObject();
+			String systemName = sysObject == null ? "SYS" : sysObject.classdef.name.getName();
 			
 			while (line != null)
 			{
@@ -79,7 +84,7 @@ public class RTValidator
 					// InstVarChange -> instnm: "counts((A`interval + 1))" val: "1" objref: 1 id: 15 time: 255
 					// InstVarChange -> instnm: "last" val: "227" objref: 1 id: 15 time: 259
 					
-					TCNameToken tcname = new TCNameToken(LexLocation.ANY, "DUMMY", name);
+					TCNameToken tcname = new TCNameToken(LexLocation.ANY, systemName, name);
 					
 					try
 					{
