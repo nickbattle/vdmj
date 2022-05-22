@@ -54,6 +54,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.RTLogger;
+import com.fujitsu.vdmj.messages.RTValidator;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Catchpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -128,7 +129,6 @@ public class DAPWorkspaceManager
 
 	public DAPMessageList dapInitialize(DAPRequest request, JSONObject clientCapabilities)
 	{
-		RTLogger.enable(false);
 		this.clientCapabilities = clientCapabilities;
 		DAPMessageList responses = new DAPMessageList();
 		responses.add(new DAPInitializeResponse(request));
@@ -815,7 +815,33 @@ public class DAPWorkspaceManager
 	 */
 	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
-		RTLogger.dump(true);
+		try
+		{
+			RTLogger.dump(true);
+			
+			if (RTLogger.isEnabled())
+			{
+				Diag.info("Validating RT logs");
+				int errs = RTValidator.validate(RTLogger.getLogfileName());
+				
+				if (errs == 0)
+				{
+					stdout("No conjecture validation errors found");
+				}
+				else
+				{
+					stderr("Found " + errs + " conjecture failures");
+				}
+				
+				RTLogger.enable(false);
+			}
+		}
+		catch (IOException e)
+		{
+			Diag.error("Problem saving/validating RT logs");
+			Diag.error(e);
+		}
+		
 		stdout("\nSession disconnected.\n");
 		SchedulableThread.terminateAll();
 		clearInterpreter();

@@ -123,12 +123,7 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 	protected long i2 = 0;
 	
 	private static int counter = 0;		// Names conjectures, C1, C2, etc
-	
-	public static void doInit()
-	{
-		counter = 0;
-	}
-	
+
 	@Override
 	public void processReset()
 	{
@@ -138,6 +133,11 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 		i2 = 0;
 	}
 
+	public static void init()
+	{
+		counter = 0;
+	}
+	
 	@Override
 	public int processComplete(File violations) throws IOException
 	{
