@@ -133,7 +133,7 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 		i2 = 0;
 	}
 
-	public static void init()
+	public static void doInit()
 	{
 		counter = 0;
 	}

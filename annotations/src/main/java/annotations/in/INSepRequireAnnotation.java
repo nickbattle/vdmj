@@ -66,6 +66,11 @@ public class INSepRequireAnnotation extends INConjectureAnnotation
 	{
 		super(name, args);
 	}
+	
+	public static void doInit()
+	{
+		INConjectureAnnotation.doInit();
+	}
 
 	@Override
 	public boolean process(Map<String, String> record, Context ctxt)
