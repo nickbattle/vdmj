@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INNilExpression;
 import com.fujitsu.vdmj.messages.ConjectureProcessor;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
@@ -177,7 +178,16 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 		}
 		catch (ValueException e)
 		{
-			return true;
+			return false;			// Probably value is not boolean
+		}
+		catch (ContextException e)
+		{
+			if (e.number == 4034)	// Name not in scope => no InstVarChange events
+			{
+				return false;
+			}
+			
+			throw e;
 		}
 	}
 }
