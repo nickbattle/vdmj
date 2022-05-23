@@ -109,13 +109,13 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 		{
 			if (t2 < 0)
 			{
-				return String.format("\"%s\" \"%s, %s, %s, %d\" %d %d",
-						conj.name, conj.e1, conj.condition, conj.e2, conj.delay, t1, thid1);
+				return String.format("\"%s\" \"%s, %s, %s, %d, %b\" %d %d",
+						conj.name, conj.e1, conj.condition, conj.e2, conj.delay, conj.match, t1, thid1);
 			}
 			else
 			{
-				return String.format("\"%s\" \"%s, %s, %s, %d\" %d %d %d %d",
-						conj.name, conj.e1, conj.condition, conj.e2, conj.delay, t1, thid1, t2, thid2);
+				return String.format("\"%s\" \"%s, %s, %s, %d, %b\" %d %d %d %d",
+						conj.name, conj.e1, conj.condition, conj.e2, conj.delay, conj.match, t1, thid1, t2, thid2);
 			}
 		}
 	}
