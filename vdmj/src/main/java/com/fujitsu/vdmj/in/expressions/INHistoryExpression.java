@@ -161,7 +161,7 @@ public class INHistoryExpression extends INExpression
 		{
 			sb.append(sep);
 			sep = ", ";
-			sb.append(opname.getName());
+			sb.append(opname.getExplicit(true));
 		}
 
 		sb.append(")");

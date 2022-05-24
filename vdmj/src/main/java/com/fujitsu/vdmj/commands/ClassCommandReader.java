@@ -24,9 +24,9 @@
 
 package com.fujitsu.vdmj.commands;
 
+import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.RTLogger;
+import com.fujitsu.vdmj.messages.RTValidator;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
@@ -165,7 +166,15 @@ public class ClassCommandReader extends CommandReader
 				println("Flushing " + RTLogger.getLogSize() + " RT events");
 			}
 
-			RTLogger.setLogfile(null);
+			try
+			{
+				RTLogger.setLogfileName(null);
+			}
+			catch (FileNotFoundException e)
+			{
+				// ignore
+			}
+			
 			println("RT events now logged to the console");
 			return true;
 		}
@@ -185,8 +194,7 @@ public class ClassCommandReader extends CommandReader
 		{
 			try
 			{
-				PrintWriter p = new PrintWriter(new FileOutputStream(parts[1], false));
-				RTLogger.setLogfile(p);
+				RTLogger.setLogfileName(new File(parts[1]));
 				println("RT events now logged to " + parts[1]);
 			}
 			catch (FileNotFoundException e)
@@ -195,6 +203,55 @@ public class ClassCommandReader extends CommandReader
 			}
 		}
 
+		return true;
+	}
+	
+	@Override
+	protected boolean doValidate(String line)
+	{
+		if (Settings.dialect != Dialect.VDM_RT)
+		{
+			return super.doValidate(line);
+		}
+
+		String[] parts = line.split("\\s+");
+
+		if (parts.length > 2)
+		{
+			println("Usage: validate [<file>]");
+			return true;
+		}
+
+		File logfile = null;
+
+		if (parts.length == 2)
+		{
+			logfile = new File(parts[1]);
+		}
+		else
+		{
+			RTLogger.dump(false);
+			logfile = RTLogger.getLogfileName();
+		}
+		
+		if (logfile != null)
+		{
+			try
+			{
+				println("Validating RT events from " + logfile);
+				int errs = RTValidator.validate(logfile);
+				println(errs == 0 ? "No errors found" : "Found " + errs + " conjecture failures");
+			}
+			catch (IOException e)
+			{
+				println("Error: " + e.getMessage());
+			}
+		}
+		else
+		{
+			println("No log file started - use 'log <file>' or 'validate <file>'");
+		}
+		
 		return true;
 	}
 	
@@ -235,6 +292,7 @@ public class ClassCommandReader extends CommandReader
 		if (Settings.dialect == Dialect.VDM_RT)
 		{
 			println("log [<file> | off] - log RT events to file");
+			println("validate [<file>] - validate RT log events");
 		}
 
 		super.doHelp(line);

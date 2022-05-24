@@ -26,8 +26,6 @@ package com.fujitsu.vdmj;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -231,8 +229,7 @@ public class VDMPP extends VDMJ
 		{
     		try
     		{
-    			PrintWriter p = new PrintWriter(new FileOutputStream(logfile, false));
-    			RTLogger.setLogfile(p);
+    			RTLogger.setLogfileName(new File(logfile));
     			println("RT events now logged to " + logfile);
     		}
     		catch (FileNotFoundException e)

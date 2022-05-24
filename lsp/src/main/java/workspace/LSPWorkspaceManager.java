@@ -420,6 +420,7 @@ public class LSPWorkspaceManager
 		{
 			Diag.info("Not overwriting existing doc file: %s", vdm);
 			documentFiles.put(vdm, FileTime.fromMillis(0));
+			documentFilesToWarn.add(vdm);
 		}
 		else
 		{
@@ -429,13 +430,20 @@ public class LSPWorkspaceManager
 			spw.close();
 			Diag.info("Extracted source written to " + vdm);
 			
-			loadFile(vdm);
-
-			BasicFileAttributes attr = Files.readAttributes(vdm.toPath(), BasicFileAttributes.class);
-			documentFiles.put(vdm, attr.lastModifiedTime());
+			if (vdm.length() > 0)	// eg. not an empty extraction
+			{
+				loadFile(vdm);
+	
+				BasicFileAttributes attr = Files.readAttributes(vdm.toPath(), BasicFileAttributes.class);
+				documentFiles.put(vdm, attr.lastModifiedTime());
+				documentFilesToWarn.add(vdm);
+			}
+			else
+			{
+				Diag.info("Removing empty extracted file: %s", vdm);
+				vdm.delete();
+			}
 		}
-		
-		documentFilesToWarn.add(vdm);
 	}
 
 	private boolean onDotPath(File file)

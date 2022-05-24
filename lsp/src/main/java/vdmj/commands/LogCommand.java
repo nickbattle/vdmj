@@ -26,8 +26,6 @@ package vdmj.commands;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -94,16 +92,22 @@ public class LogCommand extends Command
 				message = "Flushing " + RTLogger.getLogSize() + " RT events\n";
 			}
 
-			RTLogger.setLogfile(null);
-			message = message + "RT events now logged to the console";
+			try
+			{
+				RTLogger.setLogfileName(null);
+				message = message + "RT events now logged to the console";
+			}
+			catch (FileNotFoundException e)
+			{
+				 message = message + "\nCannot create RT event log: " + e.getMessage();
+			}
 		}
 		else
 		{
 			try
 			{
 				File file = new File(logfile);
-				PrintWriter p = new PrintWriter(new FileOutputStream(logfile, false));
-				RTLogger.setLogfile(p);
+				RTLogger.setLogfileName(file);
 				message = "RT events now logged to " + file.getAbsolutePath();
 			}
 			catch (FileNotFoundException e)
