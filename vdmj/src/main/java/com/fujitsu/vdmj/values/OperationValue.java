@@ -565,7 +565,7 @@ public class OperationValue extends Value
 
 		RTLogger.log(
 			"OpRequest -> id: " + Thread.currentThread().getId() +
-			" opname: \"" + name + "\"" +
+			" opname: \"" + name.getExplicit(true) + "\"" +
 			" objref: " + self.objectReference +
 			" clnm: \"" + self.type.name.getName() + "\"" +
 			" cpunm: " + from.getNumber() +
@@ -730,7 +730,7 @@ public class OperationValue extends Value
 
 	    		RTLogger.log(
 	    			kind + " -> id: " + ct.getId() +
-	    			" opname: \"" + name + "\"" +
+	    			" opname: \"" + name.getExplicit(true) + "\"" +
 	    			" objref: nil" +
 	    			" clnm: \"" + classdef.name.getName() + "\"" +
 	    			" cpunm: " + cpu +
@@ -741,7 +741,7 @@ public class OperationValue extends Value
 			{
         		RTLogger.log(
         			kind + " -> id: " + ct.getId() +
-        			" opname: \"" + name + "\"" +
+        			" opname: \"" + name.getExplicit(true) + "\"" +
         			" objref: " + self.objectReference +
         			" clnm: \"" + self.type.name.getName() + "\"" +
         			" cpunm: " + self.getCPU().getNumber() +

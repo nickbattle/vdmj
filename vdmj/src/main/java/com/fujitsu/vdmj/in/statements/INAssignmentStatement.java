@@ -78,7 +78,8 @@ public class INAssignmentStatement extends INStatement
 		}
 
 		if (Settings.dialect == Dialect.VDM_RT &&
-			Properties.rt_log_instvarchanges)
+			Properties.rt_log_instvarchanges &&
+			target instanceof INIdentifierDesignator)	// Only simple variables
 		{
 			ObjectValue self = ctxt.getSelf();	// May be a static
 

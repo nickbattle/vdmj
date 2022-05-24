@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2022 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,40 +22,16 @@
  *
  ******************************************************************************/
 
-package dap.handlers;
+package annotations.ast;
 
-import java.io.IOException;
-import dap.DAPHandler;
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import json.JSONObject;
-import workspace.DAPWorkspaceManager;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
-public class LaunchHandler extends DAPHandler
+public class ASTDeadlineMetAnnotation extends ASTConjectureAnnotation
 {
-	public LaunchHandler()
-	{
-		super();
-	}
+	private static final long serialVersionUID = 1L;
 
-	@Override
-	public DAPMessageList run(DAPRequest request) throws IOException
+	public ASTDeadlineMetAnnotation(LexIdentifierToken name)
 	{
-		try
-		{
-			JSONObject arguments = request.get("arguments");
-			Boolean noDebug = arguments.get("noDebug", false);
-			String defaultName = arguments.get("defaultName");
-			String command = arguments.get("command");
-			String remoteControl = arguments.get("remoteControl");
-			String logging = arguments.get("logging");
-			
-			return DAPWorkspaceManager.getInstance().launch(
-					request, noDebug, defaultName, command, remoteControl, logging);
-		}
-		catch (Exception e)
-		{
-			return new DAPMessageList(request, e);
-		}
+		super(name);
 	}
 }

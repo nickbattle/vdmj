@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2022 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,40 +22,17 @@
  *
  ******************************************************************************/
 
-package dap.handlers;
+package com.fujitsu.vdmj.messages;
 
+import java.io.File;
 import java.io.IOException;
-import dap.DAPHandler;
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import json.JSONObject;
-import workspace.DAPWorkspaceManager;
+import java.util.Map;
 
-public class LaunchHandler extends DAPHandler
+import com.fujitsu.vdmj.runtime.Context;
+
+public interface ConjectureProcessor
 {
-	public LaunchHandler()
-	{
-		super();
-	}
-
-	@Override
-	public DAPMessageList run(DAPRequest request) throws IOException
-	{
-		try
-		{
-			JSONObject arguments = request.get("arguments");
-			Boolean noDebug = arguments.get("noDebug", false);
-			String defaultName = arguments.get("defaultName");
-			String command = arguments.get("command");
-			String remoteControl = arguments.get("remoteControl");
-			String logging = arguments.get("logging");
-			
-			return DAPWorkspaceManager.getInstance().launch(
-					request, noDebug, defaultName, command, remoteControl, logging);
-		}
-		catch (Exception e)
-		{
-			return new DAPMessageList(request, e);
-		}
-	}
+	public void processReset();
+	public boolean process(Map<String, String> record, Context ctxt);
+	public int processComplete(File violations) throws IOException;
 }

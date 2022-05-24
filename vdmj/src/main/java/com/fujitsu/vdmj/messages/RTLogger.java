@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.messages;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,7 +37,8 @@ public class RTLogger
 {
 	private static boolean enabled = false;
 	private static List<String> events = new LinkedList<String>();
-	private static PrintWriter logfile = null;
+	private static File logfile;
+	private static PrintWriter writer = null;
 	private static String cached = null;
 
 	public static synchronized void enable(boolean on)
@@ -107,7 +111,7 @@ public class RTLogger
 
 	private static void doLog(String event)
 	{
-		if (logfile == null)
+		if (writer == null)
 		{
 			Console.out.println(event);
 		}
@@ -122,35 +126,55 @@ public class RTLogger
 		}
 	}
 
-	public static void setLogfile(PrintWriter out)
+	private static void setLogfile(PrintWriter out)
 	{
 		enabled = true;
 		dump(true);		// Write out and close previous
-		logfile = out;
+		writer = out;
 		cached = null;
+	}
+
+	public static void setLogfileName(File file) throws FileNotFoundException
+	{
+		logfile = file;
+
+		if (file != null)
+		{
+			PrintWriter p = new PrintWriter(new FileOutputStream(file, false));
+			setLogfile(p);
+		}
+		else
+		{
+			setLogfile(null);	// Use Console.out
+		}
 	}
 
 	public static int getLogSize()
 	{
 		return events.size();
 	}
+	
+	public static File getLogfileName()
+	{
+		return logfile;
+	}
 
 	public static synchronized void dump(boolean close)
 	{
-		if (logfile != null)
+		if (writer != null)
 		{
     		for (String event: events)
     		{
-    			logfile.println(event);
+    			writer.println(event);
     		}
 
-    		logfile.flush();
+    		writer.flush();
     		events.clear();
 
     		if (close)
     		{
-    			logfile.close();
-    			logfile = null;
+    			writer.close();
+    			writer = null;
     			cached = null;
     		}
 		}

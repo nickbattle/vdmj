@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2021 Nick Battle.
+ *	Copyright (c) 2022 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,27 +22,35 @@
  *
  ******************************************************************************/
 
-package dap.handlers;
+package annotations.tc;
 
-import java.io.IOException;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.typechecker.Environment;
 
-import dap.DAPHandler;
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import workspace.DAPXWorkspaceManager;
-
-public class LogHandler extends DAPHandler
+public class TCSeparateAnnotation extends TCConjectureAnnotation
 {
-	public LogHandler()
+	private static final long serialVersionUID = 1L;
+
+	public TCSeparateAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
-		super();
+		super(name, args);
 	}
 	
 	@Override
-	public DAPMessageList run(DAPRequest request) throws IOException
+	protected void typeCheck(Environment env)
 	{
-		String logfile = request.get("arguments");
-		
-		return DAPXWorkspaceManager.getInstance().rtLog(request, logfile);
+		if (args.size() != 5)
+		{
+			name.report(6008, "Expecting @Separate(e1, [c], e2, d, m)");
+		}
+		else
+		{
+			checkHistoryExpression(env, args.get(0));
+			checkBooleanExpression(env, args.get(1));
+			checkHistoryExpression(env, args.get(2));
+			checkNumericExpression(env, args.get(3));
+			checkBooleanExpression(env, args.get(4));
+		}
 	}
 }

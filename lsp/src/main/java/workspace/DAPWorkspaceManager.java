@@ -54,6 +54,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.RTLogger;
+import com.fujitsu.vdmj.messages.RTValidator;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Catchpoint;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -94,6 +95,7 @@ public class DAPWorkspaceManager
 	private String defaultName;
 	private DAPDebugReader debugReader;
 	private String remoteControl;
+	private String logging;
 	
 	protected DAPWorkspaceManager()
 	{
@@ -127,7 +129,6 @@ public class DAPWorkspaceManager
 
 	public DAPMessageList dapInitialize(DAPRequest request, JSONObject clientCapabilities)
 	{
-		RTLogger.enable(false);
 		this.clientCapabilities = clientCapabilities;
 		DAPMessageList responses = new DAPMessageList();
 		responses.add(new DAPInitializeResponse(request));
@@ -136,7 +137,7 @@ public class DAPWorkspaceManager
 	}
 
 	public DAPMessageList launch(DAPRequest request,
-			boolean noDebug, String defaultName, String command, String remoteControl) throws Exception
+			boolean noDebug, String defaultName, String command, String remoteControl, String logging) throws Exception
 	{
 		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
 		int retry = 50;		// 5s worth of 100ms
@@ -173,6 +174,7 @@ public class DAPWorkspaceManager
 			this.launchCommand = command;
 			this.defaultName = defaultName;
 			this.remoteControl = remoteControl;
+			this.logging = logging;
 			
 			clearInterpreter();
 			processSettings(request);
@@ -325,6 +327,13 @@ public class DAPWorkspaceManager
 		{
 			// Interpreter may already have been created by setBreakpoint calls during configuration.
 			
+			if (Settings.dialect == Dialect.VDM_RT && logging != null)
+			{
+				File file = new File(logging);
+				RTLogger.setLogfileName(file);
+				Diag.info("RT events now logged to %s", file.getAbsolutePath());
+			}
+			
 			if (remoteControl != null)
 			{
 				RemoteControlExecutor exec = new RemoteControlExecutor("remote", request, remoteControl, defaultName);
@@ -347,6 +356,7 @@ public class DAPWorkspaceManager
 		{
 			launchCommand = null;
 			remoteControl = null;
+			logging = null;
 		}
 	}
 
@@ -805,7 +815,33 @@ public class DAPWorkspaceManager
 	 */
 	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
-		RTLogger.dump(true);
+		try
+		{
+			RTLogger.dump(true);
+			
+			if (RTLogger.isEnabled())
+			{
+				Diag.info("Validating RT logs");
+				int errs = RTValidator.validate(RTLogger.getLogfileName());
+				
+				if (errs == 0)
+				{
+					stdout("No conjecture validation errors found");
+				}
+				else
+				{
+					stderr("Found " + errs + " conjecture failures");
+				}
+				
+				RTLogger.enable(false);
+			}
+		}
+		catch (IOException e)
+		{
+			Diag.error("Problem saving/validating RT logs");
+			Diag.error(e);
+		}
+		
 		stdout("\nSession disconnected.\n");
 		SchedulableThread.terminateAll();
 		clearInterpreter();

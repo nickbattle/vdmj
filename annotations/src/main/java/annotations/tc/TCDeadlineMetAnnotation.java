@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2022 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,40 +22,35 @@
  *
  ******************************************************************************/
 
-package dap.handlers;
+package annotations.tc;
 
-import java.io.IOException;
-import dap.DAPHandler;
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import json.JSONObject;
-import workspace.DAPWorkspaceManager;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.typechecker.Environment;
 
-public class LaunchHandler extends DAPHandler
+public class TCDeadlineMetAnnotation extends TCConjectureAnnotation
 {
-	public LaunchHandler()
-	{
-		super();
-	}
+	private static final long serialVersionUID = 1L;
 
-	@Override
-	public DAPMessageList run(DAPRequest request) throws IOException
+	public TCDeadlineMetAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
-		try
+		super(name, args);
+	}
+	
+	@Override
+	protected void typeCheck(Environment env)
+	{
+		if (args.size() != 5)
 		{
-			JSONObject arguments = request.get("arguments");
-			Boolean noDebug = arguments.get("noDebug", false);
-			String defaultName = arguments.get("defaultName");
-			String command = arguments.get("command");
-			String remoteControl = arguments.get("remoteControl");
-			String logging = arguments.get("logging");
-			
-			return DAPWorkspaceManager.getInstance().launch(
-					request, noDebug, defaultName, command, remoteControl, logging);
+			name.report(6008, "Expecting @DeadlineMet(e1, [c], e2, d, m)");
 		}
-		catch (Exception e)
+		else
 		{
-			return new DAPMessageList(request, e);
+			checkHistoryExpression(env, args.get(0));
+			checkBooleanExpression(env, args.get(1));
+			checkHistoryExpression(env, args.get(2));
+			checkNumericExpression(env, args.get(3));
+			checkBooleanExpression(env, args.get(4));
 		}
 	}
 }

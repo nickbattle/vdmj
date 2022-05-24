@@ -41,6 +41,7 @@ abstract public class TextStreamReader implements ExternalFormatReader
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
 		StringBuilder text =  new StringBuilder();
 		boolean capturing = false;
+		boolean found = false;
 		String line = br.readLine();
 		
 		text.append("--\n");
@@ -63,6 +64,7 @@ abstract public class TextStreamReader implements ExternalFormatReader
 				{
 					text.append(line);
 					text.append('\n');
+					found = true;
 				}
 			}
 
@@ -71,6 +73,13 @@ abstract public class TextStreamReader implements ExternalFormatReader
 
 		br.close();
 		
-		return text.toString().toCharArray();
+		if (!found)
+		{
+			return new char[0];
+		}
+		else
+		{
+			return text.toString().toCharArray();
+		}
 	}
 }

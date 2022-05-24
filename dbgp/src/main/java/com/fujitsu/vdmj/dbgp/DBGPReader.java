@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.dbgp;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,10 +43,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Release;
@@ -58,6 +57,9 @@ import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.VDMPP;
 import com.fujitsu.vdmj.VDMRT;
 import com.fujitsu.vdmj.VDMSL;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.debug.DebugExecutor;
 import com.fujitsu.vdmj.debug.DebugLink;
@@ -72,9 +74,6 @@ import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
-import com.fujitsu.vdmj.ast.lex.LexNameToken;
-import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
@@ -520,8 +519,7 @@ public class DBGPReader extends DebugLink
 				{
 					if (logfile != null)
 					{
-		    			PrintWriter p = new PrintWriter(new FileOutputStream(logfile, false));
-		    			RTLogger.setLogfile(p);
+		    			RTLogger.setLogfileName(new File(logfile));
 					}
 
 					Interpreter i = controller.getInterpreter();
@@ -2591,7 +2589,7 @@ public class DBGPReader extends DebugLink
 					out.append("Flushing " + RTLogger.getLogSize() + " RT events\n");
 				}
 
-				RTLogger.setLogfile(null);
+				RTLogger.setLogfileName(null);
 				out.append("RT events now logged to the console");
 			}
 			else if (c.data.equals("off"))
@@ -2601,8 +2599,7 @@ public class DBGPReader extends DebugLink
 			}
 			else
 			{
-				PrintWriter p = new PrintWriter(new FileOutputStream(c.data, true));
-				RTLogger.setLogfile(p);
+				RTLogger.setLogfileName(new File(c.data));
 				out.append("RT events now logged to " + c.data);
 			}
 		}

@@ -292,6 +292,10 @@ abstract public class CommandReader
 				{
 					carryOn = doLog(line);
 				}
+				else if (cmd.equals("validate"))
+				{
+					carryOn = doValidate(line);
+				}
 				else if (cmd.equals("print") || cmd.equals("p"))
 				{
 					carryOn = doEvaluate(line);
@@ -908,6 +912,11 @@ abstract public class CommandReader
 	}
 
 	protected boolean doLog(String line)
+	{
+		return notAvailable(line);
+	}
+
+	protected boolean doValidate(String line)
 	{
 		return notAvailable(line);
 	}

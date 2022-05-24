@@ -370,7 +370,7 @@ public abstract class SyntaxReader
 
 		if (!Settings.annotations || readingAnnotations > 0)
 		{
-			return annotations;
+			return annotations;		// ignore nested annotations
 		}
 		else
 		{
@@ -390,8 +390,7 @@ public abstract class SyntaxReader
 				{
 					if (Properties.annotations_debug)
 					{
-						Console.err.println("Annotations: " + e);
-						e.printStackTrace();
+						Console.err.println("Annotations: " + e.getMessage() + " at " + comments.location(i));
 					}
 				}
 			}
