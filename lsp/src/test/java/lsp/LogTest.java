@@ -83,13 +83,18 @@ public class LogTest extends DAPTest
 		
 		handler = new InitializeHandler();
 		request = new DAPRequest(new JSONObject(
-				"command", "configurationDone",		// Creates log file from 
+				"command", "configurationDone",		// Creates log file from "logging"
 				"type", "request",
 				"arguments", null,
 				"seq", 2));
 		dump(request);
 		
 		response = handler.run(request);
+		
+		// The init thread will NPE because there is no DAPServer etc, so just wait for it.
+		Thread init = CancellableThread.find("init");
+		if (init != null) init.join();
+		
 		assertEquals(1, response.size());
 		assertEquals(true, response.get(0).get("success"));
 		dump(response.get(0));
