@@ -90,11 +90,6 @@ public class LogTest extends DAPTest
 		dump(request);
 		
 		response = handler.run(request);
-		
-		// The init thread will NPE because there is no DAPServer etc, so just wait for it.
-		Thread init = CancellableThread.find("init");
-		if (init != null) init.join();
-		
 		assertEquals(1, response.size());
 		assertEquals(true, response.get(0).get("success"));
 		dump(response.get(0));
