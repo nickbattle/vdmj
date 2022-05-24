@@ -33,9 +33,11 @@ import org.junit.Test;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.RTLogger;
 
+import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.handlers.LogHandler;
+import dap.handlers.InitializeHandler;
+import dap.handlers.LaunchHandler;
 import json.JSONArray;
 import json.JSONObject;
 import rpc.RPCMessageList;
@@ -54,28 +56,46 @@ public class LogTest extends DAPTest
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
 		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
-		LogHandler handler = new LogHandler();
+		DAPHandler handler = new LaunchHandler();
 		RTLogger.enable(false);
 		
 		File log = File.createTempFile("log", ".log");
 		log.deleteOnExit();
-		DAPRequest request = new DAPRequest(new JSONObject("command", "sdap/log", "type", "request", "arguments", log.getAbsolutePath(), "seq", 1));
+		log.delete();
+		assertEquals(false, log.exists());
+		assertEquals(false, RTLogger.isEnabled());
+
+		JSONObject args = new JSONObject(
+				"noDebug", false,
+				"defaultName", "A",
+				"logging", log.getAbsolutePath());
+		DAPRequest request = new DAPRequest(new JSONObject(
+				"command", "launch",
+				"type", "request",
+				"arguments", args,
+				"seq", 1));
 		dump(request);
 		
 		DAPMessageList response = handler.run(request);
 		assertEquals(1, response.size());
+		assertEquals(true, response.get(0).get("success"));
 		dump(response.get(0));
-		assertEquals("RT events now logged to " + log.getAbsolutePath(), response.get(0).getPath("body.result"));
-		assertTrue(RTLogger.isEnabled());
 		
-		request = new DAPRequest(new JSONObject("command", "sdap/log", "type", "request", "seq", 2));
+		handler = new InitializeHandler();
+		request = new DAPRequest(new JSONObject(
+				"command", "configurationDone",		// Creates log file from 
+				"type", "request",
+				"arguments", null,
+				"seq", 2));
 		dump(request);
 		
-		RTLogger.enable(false);
 		response = handler.run(request);
 		assertEquals(1, response.size());
+		assertEquals(true, response.get(0).get("success"));
 		dump(response.get(0));
-		assertEquals("RT event logging disabled", response.get(0).getPath("body.result"));
-		assertTrue(!RTLogger.isEnabled());
+		
+		assertEquals(true, log.exists());
+		assertEquals(true, RTLogger.isEnabled());
+		log.delete();
 	}
 }
