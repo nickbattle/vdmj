@@ -96,7 +96,14 @@ public class INDeadlineMetAnnotation extends INConjectureAnnotation
 				
 				if (event.equals(e2))
 				{
-					i2++;
+					if (e1.equals(e2))
+					{
+						i2 = i1;	// Already counted above
+					}
+					else
+					{
+						i2++;
+					}
 					
 					Iterator<Occurrence> iter = occurrences.iterator();
 					
@@ -106,9 +113,9 @@ public class INDeadlineMetAnnotation extends INConjectureAnnotation
 						
 						boolean T = occ.t1 <= time && time < occ.t1 + delay;	// t1 <= t2 < t1 + d
 						boolean M = match ? occ.i1 == i2 : true;				// m => i1 = i2
-						boolean E = e1.equals(e2) ? i2 == i1 + 1 : true;		// e1 = e2 => i2 = i1 + 1
+						boolean E = e1.equals(e2) ? i2 == occ.i1 + 1 : true;	// e1 = e2 => i2 = i1 + 1
 						
-						if (T && M && E)	// exists, so if all are true the occurrence is complete
+						if (T && M && E)		// exists, so if all are true the occurrence is complete
 						{
 							iter.remove();		// Deadline was met!
 						}
