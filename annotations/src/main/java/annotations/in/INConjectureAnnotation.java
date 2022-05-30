@@ -28,7 +28,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
@@ -40,12 +43,13 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.util.JSONWriter;
 
 public abstract class INConjectureAnnotation extends INAnnotation implements ConjectureProcessor
 {
 	private static final long serialVersionUID = 1L;
 
-	protected final String name;
+	protected final String cname;
 	protected final String e1;
 	protected final INExpression condition;
 	protected final String e2;
@@ -56,7 +60,7 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 	{
 		super(name, args);
 		
-		this.name = "C" + (++counter);
+		this.cname = "C" + (++counter);
 		this.e1 = args.get(0).toString();
 		this.condition = args.get(1) instanceof INNilExpression ? null : args.get(1);
 		this.e2 = args.get(2).toString();
@@ -104,19 +108,33 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 			this.thid2 = -1;
 		}
 		
-		@Override
-		public String toString()
+		public String toJSON()
 		{
-			if (t2 < 0)
+			StringWriter sw = new StringWriter();
+			JSONWriter jw = new JSONWriter(new PrintWriter(sw));
+			Map<String, Object> json = new HashMap<String, Object>();
+			
+			json.put("status", false);
+			json.put("name", conj.cname);
+			json.put("expression", conj.toString());
+			
+			Map<String, Object> event = new HashMap<String, Object>();
+			event.put("kind", conj.e1);
+			event.put("time", t1);
+			event.put("thid", thid1);
+			json.put("source", event);
+			
+			if (t2 >= 0)
 			{
-				return String.format("\"%s\" \"%s, %s, %s, %d, %b\" %d %d",
-						conj.name, conj.e1, conj.condition, conj.e2, conj.delay, conj.match, t1, thid1);
+				event.clear();
+				event.put("kind", conj.e2);
+				event.put("time", t2);
+				event.put("thid", thid2);
+				json.put("destination", event);
 			}
-			else
-			{
-				return String.format("\"%s\" \"%s, %s, %s, %d, %b\" %d %d %d %d",
-						conj.name, conj.e1, conj.condition, conj.e2, conj.delay, conj.match, t1, thid1, t2, thid2);
-			}
+			
+			jw.writeObject(json);
+			return sw.getBuffer().toString();
 		}
 	}
 
@@ -150,11 +168,16 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 		{
 			if (failures.isEmpty())
 			{
-				pw.printf("\"%s\" \"%s, %s, %s, %d\" PASS\n", name, e1, condition, e2, delay);
+				Map<String, Object> json = new HashMap<String, Object>();
+				json.put("status", true);
+				json.put("name", cname);
+				json.put("expression", toString());
+				new JSONWriter(pw).writeObject(json);
 			}
+			
 			for (Failure failure: failures)
 			{
-				pw.println(failure.toString());
+				pw.println(failure.toJSON());
 			}
 		}
 		finally
@@ -189,5 +212,27 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 			
 			throw e;
 		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("#");
+		sb.append(name);
+		sb.append("(");
+		sb.append(e1);
+		sb.append(", ");
+		sb.append(condition);
+		sb.append(", ");
+		sb.append(e2);
+		sb.append(", ");
+		sb.append(delay);
+		sb.append(", ");
+		sb.append(match);
+		sb.append(")");
+		
+		return sb.toString();
 	}
 }
