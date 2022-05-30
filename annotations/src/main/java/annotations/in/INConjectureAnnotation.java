@@ -126,11 +126,11 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 			
 			if (t2 >= 0)
 			{
-				event.clear();
-				event.put("kind", conj.e2);
-				event.put("time", t2);
-				event.put("thid", thid2);
-				json.put("destination", event);
+				Map<String, Object> event2 = new HashMap<String, Object>();
+				event2.put("kind", conj.e2);
+				event2.put("time", t2);
+				event2.put("thid", thid2);
+				json.put("destination", event2);
 			}
 			
 			jw.writeObject(json);
