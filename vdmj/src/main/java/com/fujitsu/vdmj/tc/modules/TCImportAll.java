@@ -59,7 +59,14 @@ public class TCImportAll extends TCImport
 
 		if (from.exportdefs.isEmpty())
 		{
-			report(3190, "Import all from module with no exports?");
+			if (from.exports == null)
+			{
+				report(3190, "Import all from module with no exports clause?");
+			}
+			else
+			{
+				report(3190, "Import all from module with no exported definitions?");
+			}
 		}
 
 		TCDefinitionList imported = new TCDefinitionList();
