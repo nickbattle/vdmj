@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -39,6 +40,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INNilExpression;
 import com.fujitsu.vdmj.messages.ConjectureProcessor;
+import com.fujitsu.vdmj.messages.RTValidator;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -71,65 +73,69 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 	protected static class Occurrence
 	{
 		public final long i1;
-		public final long t1;
-		public final long thid;
+		public final Map<String, String> record;
 		
-		public Occurrence(long i1, long t1, long thid)
+		public Occurrence(long i1, Map<String, String> record)
 		{
 			this.i1 = i1;
-			this.t1 = t1;
-			this.thid = thid;
+			this.record = record;
+		}
+		
+		public long time()
+		{
+			return Long.parseLong(record.get("time"));
+		}
+		
+		public String get(String key)
+		{
+			return record.get(key);
 		}
 	}
 	
 	protected static class Failure
 	{
-		public final INConjectureAnnotation conj;
-		public final long t1;
-		public final long thid1;
-		public final long t2;
-		public final long thid2;
+		public final INConjectureAnnotation annotation;
+		public final Occurrence first;
+		public final Occurrence second;
 		
-		public Failure(INConjectureAnnotation annotation, long t1, long thid1, long t2, long thid2)
+		public Failure(INConjectureAnnotation annotation, Occurrence first, Occurrence second)
 		{
-			this.conj = annotation;
-			this.t1 = t1;
-			this.thid1 = thid1;
-			this.t2 = t2;
-			this.thid2 = thid2;
+			this.annotation = annotation;
+			this.first = first;
+			this.second = second;
 		}
 		
-		public Failure(INConjectureAnnotation annotation, long t1, long thid1)
+		public Failure(INConjectureAnnotation annotation, Occurrence occ)
 		{
-			this.conj = annotation;
-			this.t1 = t1;
-			this.thid1 = thid1;
-			this.t2 = -1;
-			this.thid2 = -1;
+			this.annotation = annotation;
+			this.first = occ;
+			this.second = null;
 		}
 		
 		public String toJSON()
 		{
 			StringWriter sw = new StringWriter();
 			JSONWriter jw = new JSONWriter(new PrintWriter(sw));
-			Map<String, Object> json = new HashMap<String, Object>();
+			Map<String, Object> json = new LinkedHashMap<String, Object>();
 			
+			json.put("name", annotation.cname);
 			json.put("status", false);
-			json.put("name", conj.cname);
-			json.put("expression", conj.toString());
+			json.put("expression", annotation.toString());
 			
-			Map<String, Object> event = new HashMap<String, Object>();
-			event.put("kind", conj.e1);
-			event.put("time", t1);
-			event.put("thid", thid1);
-			json.put("source", event);
+			Map<String, Object> event1 = new LinkedHashMap<String, Object>();
+			event1.put("kind", first.get(RTValidator.KIND));
+			event1.put("opname", first.get(RTValidator.OPNAME));
+			event1.put("time", Long.parseLong(first.get("time")));
+			event1.put("thid", Long.parseLong(first.get("id")));
+			json.put("source", event1);
 			
-			if (t2 >= 0)
+			if (second != null)
 			{
-				Map<String, Object> event2 = new HashMap<String, Object>();
-				event2.put("kind", conj.e2);
-				event2.put("time", t2);
-				event2.put("thid", thid2);
+				Map<String, Object> event2 = new LinkedHashMap<String, Object>();
+				event2.put("kind", second.get(RTValidator.KIND));
+				event2.put("opname", second.get(RTValidator.OPNAME));
+				event2.put("time", Long.parseLong(second.get("time")));
+				event2.put("thid", Long.parseLong(second.get("id")));
 				json.put("destination", event2);
 			}
 			

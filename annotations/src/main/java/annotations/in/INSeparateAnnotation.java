@@ -82,16 +82,13 @@ public class INSeparateAnnotation extends INConjectureAnnotation
 		{
 			try
 			{
-				long time = Long.parseLong(record.get("time"));
-				long thid = Long.parseLong(record.get("id"));
-
 				if (event.equals(e1))
 				{
 					i1++;
 
 					if (checkCondition(ctxt))
 					{
-						occurrences.add(new Occurrence(i1, time, thid));
+						occurrences.add(new Occurrence(i1, record));
 					}
 				}
 				
@@ -106,19 +103,20 @@ public class INSeparateAnnotation extends INConjectureAnnotation
 						i2++;
 					}
 					
+					long time = Long.parseLong(record.get("time"));
 					Iterator<Occurrence> iter = occurrences.iterator();
 					
 					while (iter.hasNext())
 					{
 						Occurrence occ = iter.next();
 						
-						boolean T = occ.t1 <= time && time < occ.t1 + delay;	// t1 <= t2 < t1 + d
-						boolean M = match ? occ.i1 == i2 : true;				// m => i1 = i2
-						boolean E = e1.equals(e2) ? i2 == occ.i1 + 1 : true;	// e1 = e2 => i2 = i1 + 1
+						boolean T = occ.time() <= time && time < occ.time() + delay;	// t1 <= t2 < t1 + d
+						boolean M = match ? occ.i1 == i2 : true;						// m => i1 = i2
+						boolean E = e1.equals(e2) ? i2 == occ.i1 + 1 : true;			// e1 = e2 => i2 = i1 + 1
 						
 						if (T && M && E)	// Not exists, so if all are true this is a failure
 						{
-							failures.add(new Failure(this, occ.t1, occ.thid, time, thid));
+							failures.add(new Failure(this, occ, new Occurrence(i2, record)));
 							iter.remove();
 							result = false;
 						}
