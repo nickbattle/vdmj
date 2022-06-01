@@ -84,7 +84,7 @@ public abstract class POAnnotation extends PONode implements MappingOptional
 		
 		for (POAnnotation annotation: instances)
 		{
-			annotation.doInit1();
+			annotation.doInit(null);
 		}
 	}
 	
@@ -93,9 +93,24 @@ public abstract class POAnnotation extends PONode implements MappingOptional
 		// Nothing by default
 	}
 
-	public void doInit1()
+	public void doInit(Object none)
 	{
-		// Nothing by default
+		// Nothing by default, and nothing to pass
+	}
+
+	public static List<POAnnotation> getInstances(Class<?> type)
+	{
+		List<POAnnotation> found = new Vector<POAnnotation>();
+		
+		for (POAnnotation instance: instances)
+		{
+			if (type.isAssignableFrom(instance.getClass()))
+			{
+				found.add(instance);
+			}
+		}
+		
+		return found;
 	}
 
 	@Override

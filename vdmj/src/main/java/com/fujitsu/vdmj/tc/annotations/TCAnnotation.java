@@ -99,6 +99,21 @@ public abstract class TCAnnotation extends TCNode implements MappingOptional
 		// Nothing by default
 	}
 
+	public static List<TCAnnotation> getInstances(Class<?> type)
+	{
+		List<TCAnnotation> found = new Vector<TCAnnotation>();
+		
+		for (TCAnnotation instance: instances)
+		{
+			if (type.isAssignableFrom(instance.getClass()))
+			{
+				found.add(instance);
+			}
+		}
+		
+		return found;
+	}
+
 	@Override
 	public String toString()
 	{
