@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.NameValuePairList;
@@ -51,7 +52,8 @@ public class INWitnessAnnotation extends INAnnotation
 	public static void doInit()
 	{
 		tagValues  = new NameValuePairList();
-		Context ctxt = new Context(LexLocation.ANY, "Witness context", null);
+		Context root = Interpreter.getInstance().getInitialContext();
+		Context ctxt = new Context(LexLocation.ANY, "Witness context", root);
 		ctxt.setThreadState(CPUValue.vCPU);
 		boolean retry = false;
 		int retries = 3;
