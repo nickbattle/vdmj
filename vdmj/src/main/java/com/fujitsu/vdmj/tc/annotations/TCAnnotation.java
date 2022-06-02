@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
@@ -76,6 +77,10 @@ public abstract class TCAnnotation extends TCNode implements MappingOptional
 			{
 				Method doInit = clazz.getMethod("doInit", (Class<?>[])null);
 				doInit.invoke(null, (Object[])null);
+			}
+			catch (InvocationTargetException e)
+			{
+				throw new RuntimeException(clazz.getSimpleName() + ":" + e.getCause());
 			}
 			catch (Throwable e)
 			{

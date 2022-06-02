@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.NameValuePairList;
@@ -52,14 +53,34 @@ public class INWitnessAnnotation extends INAnnotation
 		tagValues  = new NameValuePairList();
 		Context ctxt = new Context(LexLocation.ANY, "Witness context", null);
 		ctxt.setThreadState(CPUValue.vCPU);
+		boolean retry = false;
+		int retries = 3;
 		
-		for (INAnnotation a: getInstances(INWitnessAnnotation.class))
+		do
 		{
-			INWitnessAnnotation witness = (INWitnessAnnotation)a;
-			NameValuePairList nvpl = witness.myDefinition.getNamedValues(ctxt);
-			ctxt.putList(nvpl);
-			tagValues.addAll(nvpl);
+			for (INAnnotation a: getInstances(INWitnessAnnotation.class))
+			{
+				try
+				{
+					INWitnessAnnotation witness = (INWitnessAnnotation)a;
+					NameValuePairList nvpl = witness.myDefinition.getNamedValues(ctxt);
+					ctxt.putList(nvpl);
+					tagValues.addAll(nvpl);
+				}
+				catch (ContextException e)
+				{
+					if (e.number == 4034)	// Name not in scope
+					{
+						retry = true;
+					}
+					else
+					{
+						throw e;
+					}
+				}
+			}
 		}
+		while (retry && --retries > 0);
 	}
 	
 	@Override

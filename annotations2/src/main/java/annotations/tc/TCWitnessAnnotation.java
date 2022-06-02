@@ -67,7 +67,7 @@ public class TCWitnessAnnotation extends TCAnnotation
 	private TCValueDefinition createDefinition()
 	{
 		TCVariableExpression tag = (TCVariableExpression)args.get(0);
-		myDefinition  = new TCValueDefinition(NameScope.LOCAL, null,
+		myDefinition  = new TCValueDefinition(NameScope.ANYTHING, null,
 				null, new TCIdentifierPattern(tag.name), null, args.get(1));
 		
 		return myDefinition;
@@ -77,7 +77,7 @@ public class TCWitnessAnnotation extends TCAnnotation
 	protected void doInit(Environment globals)
 	{
 		Environment local = new FlatEnvironment(tagDefinitions, globals);
-		tagDefinitions.typeCheck(local, NameScope.LOCAL);
+		tagDefinitions.typeCheck(local, NameScope.ANYTHING);
 	}
 
 	@Override
