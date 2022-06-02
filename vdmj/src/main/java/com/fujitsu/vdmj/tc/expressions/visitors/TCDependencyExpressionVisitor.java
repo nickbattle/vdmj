@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.tc.expressions.visitors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotatedExpression;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCRenamedDefinition;
@@ -78,6 +79,12 @@ public class TCDependencyExpressionVisitor extends TCLeafExpressionVisitor<TCNam
 	public TCNameSet caseExpression(TCExpression node, EnvTriple arg)
 	{
 		return newCollection();
+	}
+	
+	@Override
+	public TCNameSet caseAnnotatedExpression(TCAnnotatedExpression node, EnvTriple arg)
+	{
+		return newCollection();		// Don't search annotations for dependencies
 	}
 
 	@Override
