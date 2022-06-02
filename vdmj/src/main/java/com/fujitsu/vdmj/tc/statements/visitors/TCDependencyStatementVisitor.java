@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.tc.statements.visitors;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
-import com.fujitsu.vdmj.tc.annotations.TCAnnotatedExpression;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotatedStatement;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
