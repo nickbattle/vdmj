@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -76,8 +77,8 @@ public class TCWitnessAnnotation extends TCAnnotation
 	@Override
 	protected void doInit(Environment globals)
 	{
-		Environment local = new FlatEnvironment(tagDefinitions, globals);
-		tagDefinitions.typeCheck(local, NameScope.ANYTHING);
+		Environment local = new FlatCheckedEnvironment(tagDefinitions, globals, NameScope.GLOBAL);
+		myDefinition.typeCheck(local, NameScope.ANYTHING);
 	}
 
 	@Override
