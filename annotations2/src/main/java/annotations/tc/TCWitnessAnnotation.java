@@ -24,8 +24,11 @@
 
 package annotations.tc;
 
+import java.util.List;
+import java.util.Vector;
+
+import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -35,8 +38,8 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.typechecker.TypeChecker;
 
 public class TCWitnessAnnotation extends TCAnnotation
 {
@@ -78,15 +81,20 @@ public class TCWitnessAnnotation extends TCAnnotation
 	protected void doInit(Environment globals)
 	{
 		Environment local = new FlatCheckedEnvironment(tagDefinitions, globals, NameScope.GLOBAL);
+		List<VDMError> errs = TypeChecker.getErrors();
+		int before = errs.size();
 		myDefinition.typeCheck(local, NameScope.ANYTHING);
-	}
-
-	@Override
-	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
-	{
-		Environment local = new FlatEnvironment(tagDefinitions, env);
+		List<String> problems = new Vector<String>();
 		
-		args.get(0).typeCheck(local, null, scope, null);
-		args.get(1).typeCheck(local, null, scope, null);
+		if (errs.size() > before)
+		{
+			for (int i = before; i<errs.size(); i++)
+			{
+				VDMError e = errs.remove(i);
+				problems.add(e.message);
+			}
+			
+			TypeChecker.report(6666, "Bad witness: " + problems, name.getLocation());
+		}
 	}
 }
