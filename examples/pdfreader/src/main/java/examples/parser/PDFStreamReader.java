@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 
 import com.fujitsu.vdmj.lex.ExternalFormatReader;
 
@@ -37,10 +38,11 @@ import com.fujitsu.vdmj.lex.ExternalFormatReader;
 public class PDFStreamReader implements ExternalFormatReader
 {
 	@Override
-	public char[] getText(File file, String charset) throws IOException
+	public char[] getText(URI uri, String charset) throws IOException
 	{
 		try
 		{
+			File file = new File(uri);
 			Process p = Runtime.getRuntime().exec("pdftotext -layout " + file + " -");
 			BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream(), charset));
 			boolean inVDM = false;

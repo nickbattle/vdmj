@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.Stack;
 
 /**
@@ -48,8 +49,9 @@ public class LatexStreamReader implements ExternalFormatReader
 	}
 
 	@Override
-	public char[] getText(File file, String encoding) throws IOException
+	public char[] getText(URI uri, String encoding) throws IOException
 	{
+		File file = new File(uri);
 		return readFile(new InputStreamReader(new FileInputStream(file), encoding));
 	}
 	
