@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.lex;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 
 /**
  * A class to read .md Markdown encoded VDM files.
@@ -34,9 +33,8 @@ import java.net.URI;
 public class MarkdownStreamReader extends TextStreamReader
 {
 	@Override
-	public char[] getText(URI uri, String encoding) throws IOException
+	public char[] getText(File file, String encoding) throws IOException
 	{
-		File file = new File(uri);
 		return getText(file, encoding, "<!-- vdm -->");
 	}
 }
