@@ -84,17 +84,23 @@ public class TCWitnessAnnotation extends TCAnnotation
 		List<VDMError> errs = TypeChecker.getErrors();
 		int before = errs.size();
 		myDefinition.typeCheck(local, NameScope.ANYTHING);
-		List<String> problems = new Vector<String>();
 		
 		if (errs.size() > before)
 		{
-			for (int i = before; i<errs.size(); i++)
-			{
-				VDMError e = errs.remove(i);
-				problems.add(e.message);
-			}
+			List<VDMError> problems = new Vector<VDMError>();
+			int after = errs.size();
 			
-			TypeChecker.report(6666, "Bad witness: " + problems, name.getLocation());
+			for (int i = before; i < after; i++)
+			{
+				problems.add(errs.remove(before));	// Always remove this one
+			}
+
+			TypeChecker.report(6666, "Bad witness", name.getLocation());
+
+			for (VDMError e: problems)
+			{
+				TypeChecker.detail("Witness", e);
+			}
 		}
 	}
 }
