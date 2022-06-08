@@ -93,6 +93,7 @@ public class VDMSL extends VDMJ
 			catch (InternalException e)
 			{
    				println(e.toString());
+   				perrs++;
 			}
 			catch (Throwable e)
 			{
