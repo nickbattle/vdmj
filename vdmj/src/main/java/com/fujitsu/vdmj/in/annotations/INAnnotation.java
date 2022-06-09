@@ -76,7 +76,7 @@ public abstract class INAnnotation extends INNode implements MappingOptional
 			}
 			catch (InvocationTargetException e)
 			{
-				throw new RuntimeException(clazz.getSimpleName() + ":" + e.getCause());
+				throw new RuntimeException(clazz.getSimpleName() + ": " + e.getCause());
 			}
 			catch (Throwable e)
 			{
