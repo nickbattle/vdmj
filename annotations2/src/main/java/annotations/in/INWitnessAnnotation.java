@@ -76,7 +76,7 @@ public class INWitnessAnnotation extends INAnnotation
 					}
 					else
 					{
-						throw e;
+						throw new ContextException(6666, e.rawMessage, e.location, witnessCtxt);
 					}
 				}
 			}
