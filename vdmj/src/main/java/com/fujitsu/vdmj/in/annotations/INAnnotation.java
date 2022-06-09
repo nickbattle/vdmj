@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.mapper.MappingOptional;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.values.Value;
 
@@ -76,7 +77,14 @@ public abstract class INAnnotation extends INNode implements MappingOptional
 			}
 			catch (InvocationTargetException e)
 			{
-				throw new RuntimeException(clazz.getSimpleName() + ": " + e.getCause());
+				if (e.getCause() instanceof ContextException)
+				{
+					throw (ContextException)e.getCause();
+				}
+				else
+				{
+					throw new RuntimeException(clazz.getSimpleName() + ": " + e.getCause());
+				}
 			}
 			catch (Throwable e)
 			{

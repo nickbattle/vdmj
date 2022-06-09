@@ -190,7 +190,7 @@ public class ClassInterpreter extends Interpreter
 		initialContext = executableClasses.creatInitialContext();
 		executableClasses.initialize((StateContext) initialContext);
 		executableClasses.systemInit(scheduler, initialContext);
-		INAnnotation.init(initialContext);
+		// INAnnotation.init(initialContext);	// Moved to InitThread
 		logSwapOut();
 
 		createdValues = new NameValuePairMap();
@@ -232,7 +232,7 @@ public class ClassInterpreter extends Interpreter
 			}
 
 			executableClasses.systemInit(scheduler, initialContext);
-			INAnnotation.init(initialContext);
+			// INAnnotation.init(initialContext);	// Moved to InitThread
 			logSwapOut();
 	
 			createdValues = new NameValuePairMap();

@@ -208,7 +208,7 @@ public class ModuleInterpreter extends Interpreter
 		CPUValue.init(scheduler);
 		initialContext = executableModules.creatInitialContext();
 		executableModules.initialize(initialContext);
-		INAnnotation.init(initialContext);
+		// INAnnotation.init(initialContext);	// Moved to InitThread
 	}
 
 	@Override

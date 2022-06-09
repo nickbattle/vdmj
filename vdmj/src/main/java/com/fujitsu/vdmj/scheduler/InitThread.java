@@ -30,6 +30,7 @@ import java.util.Set;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.debug.DebugLink;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.in.modules.INModule;
@@ -220,6 +221,8 @@ public class InitThread extends SchedulableThread
 			throw toThrow;
 		}
 
+		INAnnotation.init(globalContext);
+
 		Settings.exceptions = exceptions;
 	}
 
@@ -336,6 +339,8 @@ public class InitThread extends SchedulableThread
 
 			throw toThrow;
 		}
+
+		INAnnotation.init(globalContext);
 
 		Settings.exceptions = exceptions;
 	}

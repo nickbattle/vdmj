@@ -57,7 +57,7 @@ public class INWitnessAnnotation extends INAnnotation
 	public static void doInit()
 	{
 		Context root = Interpreter.getInstance().getInitialContext();
-		witnessCtxt = new Context(LexLocation.ANY, "Witness context", root);
+		witnessCtxt = new Context(LexLocation.ANY, "@Witness initialization", root);
 		witnessCtxt.setThreadState(CPUValue.vCPU);
 		boolean retry = false;
 		int retries = 3;
@@ -99,7 +99,8 @@ public class INWitnessAnnotation extends INAnnotation
 			}
 			
 			ContextException first = problems.get(0);
-			throw new ContextException(6666, "Bad witness(es)", first.location, witnessCtxt);
+			// Context ctxt = new Context(first.location, "@Witness initialization", root);
+			throw new ContextException(6666, "Bad witness(es)", first.location, root);
 		}
 	}
 	
