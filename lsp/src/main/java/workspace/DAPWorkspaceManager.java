@@ -331,6 +331,7 @@ public class DAPWorkspaceManager
 			{
 				File file = new File(logging);
 				RTLogger.setLogfileName(file);
+				Properties.rt_log_instvarchanges = true;
 				Diag.info("RT events now logged to %s", file.getAbsolutePath());
 			}
 			
