@@ -286,7 +286,29 @@ public class DAPDebugReader extends Thread implements TraceCallback
 				{
 					return new DebugCommand(DebugType.PRINT, arguments);
 				}
-				else	// User has typed something at a debug stop, context = repl?
+				else if ("repl".equals(context))
+				{
+					String expression = arguments.get("expression");
+					
+					if (expression != null && expression.startsWith("p "))
+					{
+						expression = expression.substring(2);
+					}
+					else if (expression != null && expression.startsWith("print "))
+					{
+						expression = expression.substring(6);
+					}
+					else
+					{
+						return new DebugCommand(null,
+								new DAPResponse(request, false,
+									"Can only use \"[p]rint <expression>\" at breakpoint", null));
+					}
+					
+					arguments.put("expression", expression);
+					return new DebugCommand(DebugType.PRINT, arguments);
+				}
+				else	// Unknown context
 				{
 					Diag.info("Ignoring command %s, context %s", command, context);
 					return new DebugCommand(null,
