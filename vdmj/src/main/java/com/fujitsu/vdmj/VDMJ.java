@@ -327,8 +327,11 @@ abstract public class VDMJ
 						if (GetResource.find(file))
 						{
 							try
-							{				
-								filenames.add(GetResource.load(file));
+							{
+								File lib = new File("lib");
+								lib.mkdir();
+								File dest = new File(lib, file.getName());
+								filenames.add(GetResource.load(file, dest));
 							}
 							catch (IOException e)
 							{
