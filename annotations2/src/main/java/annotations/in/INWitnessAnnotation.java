@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.NameValuePairList;
@@ -57,7 +58,7 @@ public class INWitnessAnnotation extends INAnnotation
 	public static void doInit()
 	{
 		Context root = Interpreter.getInstance().getInitialContext();
-		witnessCtxt = new Context(LexLocation.ANY, "@Witness initialization", root);
+		witnessCtxt = new StateContext(LexLocation.ANY, "@Witness initialization", root, null);
 		witnessCtxt.setThreadState(CPUValue.vCPU);
 		boolean retry = false;
 		int retries = 3;
@@ -99,8 +100,7 @@ public class INWitnessAnnotation extends INAnnotation
 			}
 			
 			ContextException first = problems.get(0);
-			// Context ctxt = new Context(first.location, "@Witness initialization", root);
-			throw new ContextException(6666, "Bad witness(es)", first.location, root);
+			throw new ContextException(6666, "Bad witness(es)", first.location, witnessCtxt);
 		}
 	}
 	
