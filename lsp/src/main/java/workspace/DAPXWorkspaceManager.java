@@ -24,11 +24,13 @@
 
 package workspace;
 
+import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import lsp.LSPException;
 import lsp.Utils;
 import rpc.RPCErrors;
+import workspace.plugins.AnalysisPlugin;
 import workspace.plugins.CTPlugin;
 
 public class DAPXWorkspaceManager
@@ -95,5 +97,20 @@ public class DAPXWorkspaceManager
 		dapManager.setNoDebug(false);	// Force debug on for runOneTrace
 
 		return ct.runOneTrace(Utils.stringToName(name), testNumber);
+	}
+
+	public DAPMessageList unhandledCommand(DAPRequest request)
+	{
+		AnalysisPlugin plugin = registry.getPluginForMethod(request.getCommand());
+		
+		if (plugin == null)
+		{
+			Diag.error("No external plugin registered for " + request.getCommand());
+			return new DAPMessageList(request, false, "Unknown command: " + request.getCommand(), null);
+		}
+		else
+		{
+			return plugin.analyse(request);
+		}
 	}
 }

@@ -33,18 +33,6 @@ public class RPCDispatcher
 	private Map<String, RPCHandler> handlers = new HashMap<String, RPCHandler>();
 	private RPCHandler unknownHandler = null;
 	
-	public void register(RPCHandler handler, String method)
-	{
-		if (method == null)
-		{
-			unknownHandler = handler;
-		}
-		else
-		{
-			handlers.put(method, handler);
-		}
-	}
-	
 	public void register(RPCHandler handler, String... methods)
 	{
 		if (methods.length == 0)

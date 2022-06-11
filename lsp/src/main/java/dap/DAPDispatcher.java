@@ -31,20 +31,34 @@ import java.util.Map;
 public class DAPDispatcher
 {
 	private Map<String, DAPHandler> handlers = new HashMap<String, DAPHandler>();
+	private DAPHandler unknownHandler = null;
 	
 	public void register(DAPHandler handler, String... methods)
 	{
-		for (String method: methods)
+		if (methods.length == 0)
 		{
-			handlers.put(method, handler);
+			unknownHandler = handler;
 		}
+		else
+		{
+			for (String method: methods)
+			{
+				handlers.put(method, handler);
+			}
+		}
+	}
+
+	public DAPHandler getHandler(DAPRequest request)
+	{
+		DAPHandler handler = handlers.get(request.getCommand());
+		return handler == null ? unknownHandler : handler;
 	}
 
 	public DAPMessageList dispatch(DAPRequest request)
 	{
 		try
 		{
-			DAPHandler handler = handlers.get(request.getCommand());
+			DAPHandler handler = getHandler(request);
 			
 			if (handler == null)
 			{
