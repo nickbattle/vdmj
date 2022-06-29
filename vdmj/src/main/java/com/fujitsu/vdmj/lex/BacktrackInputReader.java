@@ -198,13 +198,20 @@ public class BacktrackInputReader
 	}
 
 	/**
-	 * Test whether an non-default reader is used for File.
+	 * Test whether an external format reader is used for File.
 	 */
-	public static boolean isDocumentFormat(File file) throws IOException
+	public static boolean isExternalFormat(File file)
 	{
 		if (externalReaders == null)
 		{
-			buildExternalReaders();
+			try
+			{
+				buildExternalReaders();
+			}
+			catch (IOException e)
+			{
+				return false;
+			}
 		}
 		
 		for (String key: externalReaders.keySet())

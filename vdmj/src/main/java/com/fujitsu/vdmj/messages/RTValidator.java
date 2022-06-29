@@ -48,6 +48,7 @@ public class RTValidator
 {
 	public static final String KIND = "_kind_";
 	public static final String HISTORY = "_history_";
+	public static final String OPNAME = "_opname_";
 	
 	private static final Pattern TYPE = Pattern.compile("(\\w+) ->");
 	private static final Pattern ITEM = Pattern.compile(" (\\w+): ((\"[^\"]+\")|(\\w+))");
@@ -150,7 +151,8 @@ public class RTValidator
 		if (opname != null)
 		{
 			opname = opname.substring(1);
-			opname = opname.replaceFirst("\\(.*$", "");		// Remove types and quotes
+			opname = opname.replaceFirst("\\(.*$", "");		// Remove param types and quotes
+			map.put(OPNAME, opname);
 		}
 
 		switch (rtype)

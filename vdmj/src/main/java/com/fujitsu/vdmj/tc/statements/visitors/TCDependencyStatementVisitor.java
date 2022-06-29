@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.tc.statements.visitors;
 
 import com.fujitsu.vdmj.tc.TCVisitorSet;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotatedStatement;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.expressions.EnvTriple;
@@ -68,6 +69,12 @@ public class TCDependencyStatementVisitor extends TCLeafStatementVisitor<TCNameT
 	public TCNameSet caseStatement(TCStatement node, EnvTriple arg)
 	{
 		return new TCNameSet();
+	}
+
+	@Override
+	public TCNameSet caseAnnotatedStatement(TCAnnotatedStatement node, EnvTriple arg)
+	{
+		return newCollection();		// Don't search annotations for dependencies
 	}
 
 	@Override

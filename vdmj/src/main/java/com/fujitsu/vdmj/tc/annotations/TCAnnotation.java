@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.tc.annotations;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
@@ -77,6 +78,10 @@ public abstract class TCAnnotation extends TCNode implements MappingOptional
 				Method doInit = clazz.getMethod("doInit", (Class<?>[])null);
 				doInit.invoke(null, (Object[])null);
 			}
+			catch (InvocationTargetException e)
+			{
+				throw new RuntimeException(clazz.getSimpleName() + ":" + e.getCause());
+			}
 			catch (Throwable e)
 			{
 				throw new RuntimeException(clazz.getSimpleName() + ":" + e);
@@ -97,6 +102,21 @@ public abstract class TCAnnotation extends TCNode implements MappingOptional
 	protected void doInit(Environment globals)
 	{
 		// Nothing by default
+	}
+
+	public static List<TCAnnotation> getInstances(Class<?> type)
+	{
+		List<TCAnnotation> found = new Vector<TCAnnotation>();
+		
+		for (TCAnnotation instance: instances)
+		{
+			if (type.isAssignableFrom(instance.getClass()))
+			{
+				found.add(instance);
+			}
+		}
+		
+		return found;
 	}
 
 	@Override

@@ -28,6 +28,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
+import dap.DAPMessageList;
+import dap.DAPRequest;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPMessageUtils;
@@ -65,13 +67,16 @@ abstract public class AnalysisPlugin
 	}
 
 	/**
-	 * External plugins override this method to implement their functionality.
-	 * @param request
-	 * @return responses
+	 * External plugins override these methods to implement their functionality.
 	 */
 	public RPCMessageList analyse(RPCRequest request)
 	{
 		return new RPCMessageList(request, RPCErrors.InternalError, "Plugin does not support analysis");
+	}
+
+	public DAPMessageList analyse(DAPRequest request)
+	{
+		return new DAPMessageList(request, false, "Plugin does not support analysis", null);
 	}
 
 	/**

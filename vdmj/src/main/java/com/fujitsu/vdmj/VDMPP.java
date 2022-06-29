@@ -32,6 +32,7 @@ import java.util.List;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.commands.ClassCommandReader;
 import com.fujitsu.vdmj.commands.CommandReader;
+import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -244,7 +245,21 @@ public class VDMPP extends VDMJ
    			long before = System.currentTimeMillis();
    			interpreter = getInterpreter();
    			if (Settings.verbose) before = System.currentTimeMillis();
-   			interpreter.init();
+  			ConsoleDebugReader dbg = null;
+
+   			try
+   			{
+   				dbg = new ConsoleDebugReader();
+   				dbg.start();
+   				interpreter.init();
+   			}
+   			finally
+   			{
+   				if (dbg != null)
+   				{
+   					dbg.interrupt();
+   				}
+   			}
 
    			if (defaultName != null)
    			{
