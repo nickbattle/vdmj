@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 
 import vdmj.commands.Command;
 import vdmj.commands.InitRunnable;
+import workspace.Diag;
 
 public class InitExecutor extends AsyncExecutor
 {
@@ -98,10 +99,17 @@ public class InitExecutor extends AsyncExecutor
 	@Override
 	protected void error(Throwable e) throws IOException
 	{
-		server.stderr(e.getMessage());
-		server.stdout("Init terminated.\n");
-		manager.clearInterpreter();
-		server.writeMessage(new DAPResponse("terminated", null));
+		try
+		{
+			server.stderr(e.getMessage());
+			server.stdout("Init terminated.\n");
+			manager.clearInterpreter();
+			server.writeMessage(new DAPResponse("terminated", null));
+		}
+		catch (Throwable e1)
+		{
+			Diag.error("Error during error handler: " + e1);
+		}
 	}
 
 	@Override

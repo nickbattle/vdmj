@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.annotations;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
@@ -76,6 +77,10 @@ public abstract class POAnnotation extends PONode implements MappingOptional
 				Method doInit = clazz.getMethod("doInit", (Class<?>[])null);
 				doInit.invoke(null, (Object[])null);
 			}
+			catch (InvocationTargetException e)
+			{
+				throw new RuntimeException(clazz.getSimpleName() + ":" + e.getCause());
+			}
 			catch (Throwable e)
 			{
 				throw new RuntimeException(clazz.getSimpleName() + ":" + e);
@@ -84,7 +89,7 @@ public abstract class POAnnotation extends PONode implements MappingOptional
 		
 		for (POAnnotation annotation: instances)
 		{
-			annotation.doInit1();
+			annotation.doInit(null);
 		}
 	}
 	
@@ -93,9 +98,24 @@ public abstract class POAnnotation extends PONode implements MappingOptional
 		// Nothing by default
 	}
 
-	public void doInit1()
+	public void doInit(Object none)
 	{
-		// Nothing by default
+		// Nothing by default, and nothing to pass
+	}
+
+	public static List<POAnnotation> getInstances(Class<?> type)
+	{
+		List<POAnnotation> found = new Vector<POAnnotation>();
+		
+		for (POAnnotation instance: instances)
+		{
+			if (type.isAssignableFrom(instance.getClass()))
+			{
+				found.add(instance);
+			}
+		}
+		
+		return found;
 	}
 
 	@Override

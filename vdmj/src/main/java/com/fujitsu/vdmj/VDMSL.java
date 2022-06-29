@@ -31,6 +31,7 @@ import java.util.List;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.commands.CommandReader;
 import com.fujitsu.vdmj.commands.ModuleCommandReader;
+import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -93,6 +94,7 @@ public class VDMSL extends VDMJ
 			catch (InternalException e)
 			{
    				println(e.toString());
+   				perrs++;
 			}
 			catch (Throwable e)
 			{
@@ -227,7 +229,21 @@ public class VDMSL extends VDMJ
    			long before = System.currentTimeMillis();
    			interpreter = getInterpreter();
    			if (Settings.verbose) before = System.currentTimeMillis();
-   			interpreter.init();
+   			ConsoleDebugReader dbg = null;
+
+   			try
+   			{
+   				dbg = new ConsoleDebugReader();
+   				dbg.start();
+   				interpreter.init();
+   			}
+   			finally
+   			{
+   				if (dbg != null)
+   				{
+   					dbg.interrupt();
+   				}
+   			}
 
    			if (defaultName != null)
    			{

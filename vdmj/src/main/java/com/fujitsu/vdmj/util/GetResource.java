@@ -35,7 +35,7 @@ import com.fujitsu.vdmj.VDMJ;
 
 /**
  * A utility class to find and load a file from the classpath into a
- * temporary location.
+ * temporary or given location.
  */
 public class GetResource
 {
@@ -48,14 +48,18 @@ public class GetResource
 	{
 		File temp = File.createTempFile("tmp", file.getName());
 		temp.deleteOnExit();
-		
+		return load(file, temp);
+	}
+	
+	public static File load(File file, File dest) throws IOException
+	{
 		/**
 		 * Note: we assume libraries are UTF8 encoded, but write them as the
 		 * local file encoding for the session.
 		 */
 		InputStream in = GetResource.class.getResourceAsStream("/" + file.getName());
 		InputStreamReader isr = new InputStreamReader(in, "UTF8");
-		OutputStream out = new FileOutputStream(temp);
+		OutputStream out = new FileOutputStream(dest);
 		OutputStreamWriter osr = new OutputStreamWriter(out, VDMJ.filecharset);
 		
 		char[] buf = new char[8192];
@@ -69,6 +73,6 @@ public class GetResource
 		isr.close();
 		osr.close();
 		
-		return temp;
+		return dest;
 	}
 }

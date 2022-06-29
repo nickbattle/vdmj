@@ -200,7 +200,7 @@ public class Utils
 		{
 			if (buffer.charAt(i) == wstart &&
 				buffer.substring(i, i + wlen).equals(word) &&
-				!restOfName(buffer.charAt(i + wlen + 1)))	// end of a word
+				!restOfName(buffer.charAt(i + wlen)))	// end of a word
 			{
 				results.add(
 					new JSONObject(

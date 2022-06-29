@@ -268,11 +268,12 @@ public class DAPDebugReader extends Thread implements TraceCallback
 	{
 		String command = request.getCommand();
 		JSONObject arguments = request.get("arguments");
+		String context = arguments.get("context");
 		
 		switch (command)
 		{
 			case "evaluate":
-				if ("variables".equals(arguments.get("context")))
+				if ("variables".equals(context))
 				{
 					// In the variables context, the expression sent to evaluate is already
 					// the value of the variable, so just send it back as the result.
@@ -281,17 +282,37 @@ public class DAPDebugReader extends Thread implements TraceCallback
 						new DAPResponse(request, true, null,
 							new JSONObject("result", arguments.get("expression"), "variablesReference", 0)));
 				}
-				else if ("".equals(arguments.get("expression")))
-				{
-					// User has typed Enter at a debug stop and sent a blank evaluation.
-					// Send message back as an error.
-					
-					return new DebugCommand(null,
-						new DAPResponse(request, false, "Enter expression to evaluate", null));
-				}
-				else
+				else if ("watch".equals(context))
 				{
 					return new DebugCommand(DebugType.PRINT, arguments);
+				}
+				else if ("repl".equals(context))
+				{
+					String expression = arguments.get("expression");
+					
+					if (expression != null && expression.startsWith("p "))
+					{
+						expression = expression.substring(2);
+					}
+					else if (expression != null && expression.startsWith("print "))
+					{
+						expression = expression.substring(6);
+					}
+					else
+					{
+						return new DebugCommand(null,
+								new DAPResponse(request, false,
+									"Can only use \"[p]rint <expression>\" at breakpoint", null));
+					}
+					
+					arguments.put("expression", expression);
+					return new DebugCommand(DebugType.PRINT, arguments);
+				}
+				else	// Unknown context
+				{
+					Diag.info("Ignoring command %s, context %s", command, context);
+					return new DebugCommand(null,
+						new DAPResponse(request, false, "(Stop debugger first)", null));
 				}
 				
 			case "continue":

@@ -338,6 +338,7 @@ public class DAPWorkspaceManager
 			{
 				File file = new File(logging);
 				RTLogger.setLogfileName(file);
+				Properties.rt_log_instvarchanges = true;
 				Diag.info("RT events now logged to %s", file.getAbsolutePath());
 			}
 			
@@ -765,8 +766,15 @@ public class DAPWorkspaceManager
 			return responses;
 		}
 		
+		if ("watch".equals(context))	// watch received outside execution
+		{
+			Diag.info("Ignoring watch request for %s", expression);
+			return new DAPMessageList(request,
+					new JSONObject("result", "not available", "variablesReference", 0));
+		}
+
 		Command command = Command.parse(expression);
-		
+	
 		if (command.notWhenRunning() && AsyncExecutor.currentlyRunning() != null)
 		{
 			DAPMessageList responses = new DAPMessageList(request,

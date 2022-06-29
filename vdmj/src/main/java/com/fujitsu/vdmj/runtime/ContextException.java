@@ -32,12 +32,14 @@ public class ContextException extends RuntimeException
 	public final LexLocation location;
 	public final Context ctxt;
 	public final int number;
+	public final String rawMessage;
 
 	public ContextException(int number, String msg, LexLocation location, Context ctxt)
 	{
 		super("Error " + number + ": " + msg + " " + location);
 		this.location = location;
 		this.number = number;
+		this.rawMessage = msg;
 		this.ctxt = ctxt;
 	}
 

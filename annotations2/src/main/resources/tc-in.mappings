@@ -8,3 +8,4 @@ map TCChangesAnnotation{name, args} to INChangesAnnotation(name, args);
 map TCTestAnnotation{name, args} to INTestAnnotation(name, args);
 map TCNullAnnotation{name, args} to INNullAnnotation(name, args);
 map TCLimitAnnotation{name, args} to INLimitAnnotation(name, args);
+map TCWitnessAnnotation{name, args, myDefinition} to INWitnessAnnotation(name, args, myDefinition);

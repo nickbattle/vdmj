@@ -43,6 +43,7 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
@@ -320,7 +321,7 @@ abstract public class VDMJ
 						}
 					}
 				}
-    			else if (file.exists())
+    			else if (file.exists() || BacktrackInputReader.isExternalFormat(file))
 				{
 					filenames.add(file);
 				}
@@ -348,8 +349,11 @@ abstract public class VDMJ
 						if (GetResource.find(file))
 						{
 							try
-							{				
-								filenames.add(GetResource.load(file));
+							{
+								File lib = new File("lib");
+								lib.mkdir();
+								File dest = new File(lib, file.getName());
+								filenames.add(GetResource.load(file, dest));
 							}
 							catch (IOException e)
 							{

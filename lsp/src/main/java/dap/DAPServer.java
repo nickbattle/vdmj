@@ -87,6 +87,8 @@ public class DAPServer extends JSONServer
 		dispatcher.register(new DebuggingHandler(),
 			"continue", "stepIn", "stepOut", "next", "scopes", "variables");
 
+		dispatcher.register(new UnknownHandler());
+		
 		return dispatcher;
 	}
 

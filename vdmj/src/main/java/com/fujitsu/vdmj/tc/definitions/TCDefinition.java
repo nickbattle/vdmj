@@ -260,8 +260,16 @@ public abstract class TCDefinition extends TCNode implements Serializable, Compa
 		{
 			if (!nameScope.matches(scope))
 			{
-				sought.report(3302,
-					"State variable '" + sought.toString() + "' cannot be accessed from this context");
+				if (nameScope.matches(NameScope.VARSANDSTATE))
+				{
+					sought.report(3302,
+						"State variable '" + sought.toString() + "' cannot be accessed from this context");
+				}
+				else
+				{
+					sought.report(3302,
+							"Variable '" + sought.toString() + "' cannot be accessed from this context");
+				}
 			}
 
 			markUsed();

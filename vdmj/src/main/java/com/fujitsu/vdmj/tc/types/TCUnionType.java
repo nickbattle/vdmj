@@ -507,6 +507,12 @@ public class TCUnionType extends TCType
     						continue;
     					}
     					
+    					if (f.name == null)
+    					{
+    						// Omit definitions without names, like mutex defs
+    						continue;
+    					}
+    					
     					// TCTypeSet current = common.get(f.name);
     					TCNameToken synthname = f.name.getModifiedName(classname.getName());
     					TCTypeSet current = null;

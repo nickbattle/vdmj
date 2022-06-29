@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.in.annotations;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +37,7 @@ import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.mapper.MappingOptional;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.values.Value;
 
@@ -73,9 +75,20 @@ public abstract class INAnnotation extends INNode implements MappingOptional
 				Method doInit = clazz.getMethod("doInit", (Class<?>[])null);
 				doInit.invoke(null, (Object[])null);
 			}
+			catch (InvocationTargetException e)
+			{
+				if (e.getCause() instanceof ContextException)
+				{
+					throw (ContextException)e.getCause();
+				}
+				else
+				{
+					throw new RuntimeException(clazz.getSimpleName() + ": " + e.getCause());
+				}
+			}
 			catch (Throwable e)
 			{
-				throw new RuntimeException(clazz.getSimpleName() + ":" + e);
+				throw new RuntimeException(clazz.getSimpleName() + ": " + e);
 			}
 		}
 		

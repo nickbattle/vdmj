@@ -40,7 +40,8 @@ public class TCRenamedDefinition extends TCDefinition
 
 	public TCRenamedDefinition(TCNameToken name, TCDefinition def)
 	{
-		super(def.pass, name.getLocation(), name, def.nameScope);
+		super(def.pass, name.getLocation(), name,
+			def instanceof TCStateDefinition? NameScope.TYPENAME : def.nameScope);
 		this.def = def;
 	}
 
@@ -123,7 +124,7 @@ public class TCRenamedDefinition extends TCDefinition
 
 		TCDefinition renamed = super.findName(sought, NameScope.TYPENAME);
 
-		if (renamed != null && def instanceof TCTypeDefinition)
+		if (renamed != null && (def instanceof TCTypeDefinition || def instanceof TCStateDefinition))
 		{
 			def.markUsed();
 			return renamed;

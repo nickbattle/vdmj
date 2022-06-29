@@ -83,7 +83,7 @@ public class LogTest extends DAPTest
 		
 		handler = new InitializeHandler();
 		request = new DAPRequest(new JSONObject(
-				"command", "configurationDone",		// Creates log file from 
+				"command", "configurationDone",		// Creates log file from "logging"
 				"type", "request",
 				"arguments", null,
 				"seq", 2));

@@ -35,8 +35,10 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.VDMJ;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.INNode;
-import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
@@ -61,9 +63,6 @@ import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.scheduler.SystemClock;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
-import com.fujitsu.vdmj.ast.expressions.ASTExpression;
-import com.fujitsu.vdmj.ast.lex.LexToken;
-import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionSet;
@@ -190,7 +189,7 @@ public class ClassInterpreter extends Interpreter
 		initialContext = executableClasses.creatInitialContext();
 		executableClasses.initialize((StateContext) initialContext);
 		executableClasses.systemInit(scheduler, initialContext);
-		INAnnotation.init(initialContext);
+		// INAnnotation.init(initialContext);	// Moved to InitThread
 		logSwapOut();
 
 		createdValues = new NameValuePairMap();
@@ -232,7 +231,7 @@ public class ClassInterpreter extends Interpreter
 			}
 
 			executableClasses.systemInit(scheduler, initialContext);
-			INAnnotation.init(initialContext);
+			// INAnnotation.init(initialContext);	// Moved to InitThread
 			logSwapOut();
 	
 			createdValues = new NameValuePairMap();

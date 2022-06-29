@@ -584,7 +584,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		}
 		else if (base.isVDMPP() && !accessSpecifier.isStatic)
 		{
-			plist.add(new TCIdentifierPattern(name.getSelfName()));
+			plist.add(new TCIdentifierPattern(classDefinition.name.getSelfName()));
 		}
 
 		parameters.add(plist);
@@ -625,11 +625,11 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		}
 		else if (base.isVDMPP())
 		{
-			plist.add(new TCIdentifierPattern(name.getSelfName().getOldName()));
+			plist.add(new TCIdentifierPattern(classDefinition.name.getSelfName().getOldName()));
 			
 			if (!accessSpecifier.isStatic)
 			{
-				plist.add(new TCIdentifierPattern(name.getSelfName()));
+				plist.add(new TCIdentifierPattern(classDefinition.name.getSelfName()));
 			}
 		}
 
