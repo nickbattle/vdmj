@@ -181,6 +181,8 @@ public class LSPStatementLocationFinder extends TCLeafStatementVisitor<TCNode, S
 			{
 				TCMapSeqDesignator ms = (TCMapSeqDesignator)des;
 				des = ms.mapseq;
+				
+				all.addAll(visitorSet.applyExpressionVisitor(ms.exp, arg));
 			}
 			else if (des instanceof TCFieldDesignator)
 			{
