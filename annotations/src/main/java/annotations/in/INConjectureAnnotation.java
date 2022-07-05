@@ -179,6 +179,7 @@ public abstract class INConjectureAnnotation extends INAnnotation implements Con
 				json.put("name", cname);
 				json.put("expression", toString());
 				new JSONWriter(pw).writeObject(json);
+				pw.println();
 			}
 			
 			for (Failure failure: failures)
