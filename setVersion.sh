@@ -14,7 +14,7 @@ fi
 
 VERSION="$1"
 TEMP=/tmp/setVersion$$
-trap "rm -f $TEMP" INTR EXIT
+trap "rm -f $TEMP" INT EXIT
 
 find . -name "pom.xml" -print | while read POM
 do
