@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>com.fujitsu</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4.4.5-SNAPSHOT</version><!--UPDATE-->
+		<version>4.4.5</version><!--UPDATE-->
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>com.fujitsu</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>4.4.5-SNAPSHOT</version><!--UPDATE-->
+			<version>4.4.5</version><!--UPDATE-->
 		</dependency>
 	</dependencies>
 

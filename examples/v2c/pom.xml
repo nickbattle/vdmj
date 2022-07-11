@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>com.fujitsu</groupId>
 		<artifactId>examples</artifactId>
-		<version>4.4.5-SNAPSHOT</version><!--UPDATE-->
+		<version>4.4.5</version><!--UPDATE-->
 	</parent>
 	
 	<artifactId>v2c</artifactId>
@@ -23,12 +23,12 @@
 		<dependency>
 			<groupId>com.fujitsu</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>4.4.5-SNAPSHOT</version><!--UPDATE-->
+			<version>4.4.5</version><!--UPDATE-->
 		</dependency>
 		<dependency>
 			<groupId>com.fujitsu</groupId>
 			<artifactId>lsp</artifactId>
-			<version>4.4.5-SNAPSHOT</version><!--UPDATE-->
+			<version>4.4.5</version><!--UPDATE-->
 		</dependency>
 	</dependencies>
 
