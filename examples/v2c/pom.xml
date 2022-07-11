@@ -6,11 +6,10 @@
 	<parent>
 		<groupId>com.fujitsu</groupId>
 		<artifactId>examples</artifactId>
-		<version>4.4.5-P-SNAPSHOT</version>
+		<version>4.4.5-P</version><!--UPDATE-->
 	</parent>
 	
 	<artifactId>v2c</artifactId>
-	<version>0.0.1-P-SNAPSHOT</version>
 	<name>V2C</name>
 	<description>Example VDM to C class mapper implementation</description>
 	
@@ -24,12 +23,12 @@
 		<dependency>
 			<groupId>com.fujitsu</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>${revision}</version>
+			<version>4.4.5</version><!--UPDATE-->
 		</dependency>
 		<dependency>
 			<groupId>com.fujitsu</groupId>
 			<artifactId>lsp</artifactId>
-			<version>${revision}</version>
+			<version>4.4.5</version><!--UPDATE-->
 		</dependency>
 	</dependencies>
 
