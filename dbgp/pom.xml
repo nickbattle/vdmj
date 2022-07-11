@@ -8,15 +8,15 @@
 	<parent>
 		<groupId>com.fujitsu</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4.4.5-SNAPSHOT</version>
+		<version>4.4.5</version><!--UPDATE-->
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	
+
 	<description>DBGP protocol handler for VDMJ</description>
-	
+
 	<properties>
 		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
-	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<developers>
@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>com.fujitsu</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>${revision}</version>
+			<version>4.4.5</version><!--UPDATE-->
 		</dependency>
 	</dependencies>
 
@@ -61,18 +61,19 @@
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.2</version>
-                <executions>
-                    <execution>
-                        <id>default-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
 							<archive>
 								<manifestEntries>
 									<Main-Class>com.fujitsu.vdmj.dbgp.DBGPReader</Main-Class>
-									<Implementation-Version>${project.version} build ${maven.build.timestamp}</Implementation-Version>
+									<Implementation-Version>${project.version} build
+										${maven.build.timestamp}</Implementation-Version>
 									<Class-Path>.</Class-Path>
 								</manifestEntries>
 							</archive>
