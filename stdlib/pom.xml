@@ -28,7 +28,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -36,7 +35,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.6</version>
 				<executions>
 					<execution>
 						<id>copy-resources</id>
@@ -66,13 +64,11 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.2</version>
 				<executions>
 					<execution>
 						<id>default-jar</id>
 						<phase>package</phase>
 						<configuration>
-							<useDefaultManifestFile>true</useDefaultManifestFile>
 							<classesDirectory>target/classes</classesDirectory>
 						</configuration>
 					</execution>

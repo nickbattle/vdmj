@@ -41,7 +41,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -49,7 +48,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.5</version>
 				<configuration>
 					<includes>
 						<include>**/*Test.java</include>
@@ -58,7 +56,6 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.2</version>
                 <executions>
                     <execution>
                         <id>default-jar</id>
@@ -104,7 +101,6 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.0</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
