@@ -1,51 +1,52 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.fujitsu</groupId>
-		<artifactId>examples</artifactId>
-		<version>4.4.5-P</version><!--UPDATE-->
-	</parent>
-	
-	<artifactId>v2c</artifactId>
-	<name>V2C</name>
-	<description>Example VDM to C class mapper implementation</description>
-	
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.fujitsu</groupId>
-			<artifactId>vdmj</artifactId>
-			<version>4.4.5-P</version><!--UPDATE-->
-		</dependency>
-		<dependency>
-			<groupId>com.fujitsu</groupId>
-			<artifactId>lsp</artifactId>
-			<version>4.4.5-P</version><!--UPDATE-->
-		</dependency>
-	</dependencies>
+    <parent>
+        <groupId>dk.au.ece.vdmj</groupId>
+        <artifactId>examples</artifactId>
+        <version>${revision}${sha1}${changelist}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.2</version>
+    <artifactId>v2c</artifactId>
+    <name>V2C</name>
+    <description>Example VDM to C class mapper implementation</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>dk.au.ece.vdmj</groupId>
+            <artifactId>vdmj</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dk.au.ece.vdmj</groupId>
+            <artifactId>lsp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
                 <executions>
                     <execution>
                         <id>default-jar</id>
@@ -54,13 +55,13 @@
                             <goal>jar</goal>
                         </goals>
                         <configuration>
-							<finalName>
-								${project.artifactId}-${project.version}-${maven.build.timestamp}
-							</finalName>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
+                            <finalName>
+                                ${project.artifactId}-${project.version}-${maven.build.timestamp}
+                            </finalName>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -6,9 +6,9 @@
 	<name>DBGP</name>
 
 	<parent>
-		<groupId>com.fujitsu</groupId>
+		<groupId>dk.au.ece.vdmj</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4.4.5-P</version><!--UPDATE-->
+		<version>${revision}${sha1}${changelist}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -32,9 +32,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.fujitsu</groupId>
+			<groupId>dk.au.ece.vdmj</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>4.4.5-P</version><!--UPDATE-->
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 

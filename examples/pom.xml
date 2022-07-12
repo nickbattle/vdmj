@@ -5,9 +5,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.fujitsu</groupId>
+		<groupId>dk.au.ece.vdmj</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4.4.5-P</version><!--UPDATE-->
+		<version>${revision}${sha1}${changelist}</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>examples</artifactId>
