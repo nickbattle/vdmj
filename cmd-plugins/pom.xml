@@ -3,9 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.fujitsu</groupId>
+		<groupId>dk.au.ece.vdmj</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4.4.5</version><!--UPDATE-->
+		<version>${revision}${sha1}${changelist}</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 	
 	<artifactId>cmd-plugins</artifactId>
@@ -30,9 +31,9 @@
 			<version>4.8.2</version>
 		</dependency>
 		<dependency>
-			<groupId>com.fujitsu</groupId>
+			<groupId>dk.au.ece.vdmj</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>4.4.5</version><!--UPDATE-->
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 

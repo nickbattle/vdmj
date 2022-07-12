@@ -6,9 +6,9 @@
 	<description>Annotations</description>
 	
 	<parent>
-		<groupId>com.fujitsu</groupId>
+		<groupId>dk.au.ece.vdmj</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4.4.5</version><!--UPDATE-->
+		<version>${revision}${sha1}${changelist}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -30,9 +30,9 @@
 			<version>4.8.2</version>
 		</dependency>
 		<dependency>
-			<groupId>com.fujitsu</groupId>
+			<groupId>dk.au.ece.vdmj</groupId>
 			<artifactId>vdmj</artifactId>
-			<version>4.4.5</version><!--UPDATE-->
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 
