@@ -5,9 +5,9 @@
 	<name>VDMJ</name>
 	
 	<parent>
-		<groupId>com.fujitsu</groupId>
+		<groupId>dk.au.ece.vdmj</groupId>
 		<artifactId>vdmj-suite</artifactId>
-		<version>4.4.5</version><!--UPDATE-->
+		<version>${revision}${sha1}${changelist}</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
