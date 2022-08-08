@@ -2,3 +2,4 @@
 /.project
 target
 .idea
+.ci-friendly-pom.xml
