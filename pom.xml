@@ -83,7 +83,6 @@
                     </configuration>
                 </plugin>
 
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
@@ -151,7 +150,24 @@
 
             </plugins>
         </pluginManagement>
+
+	    <plugins>
+			<plugin>
+				<groupId>com.outbrain.swinfra</groupId>
+				<artifactId>ci-friendly-flatten-maven-plugin</artifactId>
+				<version>1.0.14</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>clean</goal>
+							<goal>flatten</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+	    </plugins>
     </build>
+    
 
     <scm>
         <url>https://github.com/nickbattle/vdmj
