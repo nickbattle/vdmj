@@ -34,16 +34,26 @@
         <module>examples</module>
     </modules>
 
+   	<dependencyManagement>
+   		<dependencies>
+	   		<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.13.1</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+   	</dependencyManagement>
+
     <build>
         <pluginManagement>
             <plugins>
-                <!-- Configure the compiler for all Overture Projects -->
+                <!-- Configure the compiler for all VDMJ Projects -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.10.1</version>
                 </plugin>
-
 
                 <!-- Attatch sources to all installed jars -->
                 <plugin>
@@ -108,7 +118,6 @@
                     <version>3.3.0</version>
                 </plugin>
 
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
@@ -120,7 +129,6 @@
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>3.0.0-M2</version>
                 </plugin>
-
 
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -134,7 +142,6 @@
                     <version>3.2.0</version>
                 </plugin>
 
-
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jarsigner-plugin</artifactId>
@@ -146,7 +153,6 @@
                     <artifactId>maven-gpg-plugin</artifactId>
                     <version>3.0.1</version>
                 </plugin>
-
 
             </plugins>
         </pluginManagement>
