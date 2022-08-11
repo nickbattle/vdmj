@@ -33,6 +33,9 @@
 	</dependencies>
 
 	<build>
+		<finalName>
+			${project.artifactId}-${project.version}-${maven.build.timestamp}
+		</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -51,11 +54,6 @@
                         <goals>
                             <goal>jar</goal>
                         </goals>
-                        <configuration>
-							<finalName>
-								${project.artifactId}-${project.version}-${maven.build.timestamp}
-							</finalName>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

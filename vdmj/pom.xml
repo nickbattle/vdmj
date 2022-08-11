@@ -35,6 +35,9 @@
 	</dependencies>
 
 	<build>
+		<finalName>
+			${project.artifactId}-${project.version}-${maven.build.timestamp}
+		</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -69,9 +72,6 @@
 									<Class-Path>.</Class-Path>
 								</manifestEntries>
 							</archive>
-							<finalName>
-								${project.artifactId}-${project.version}-${maven.build.timestamp}
-							</finalName>
 						</configuration>
 					</execution>
                     <execution>
@@ -89,9 +89,6 @@
                                 <include>src/main/scripts/vdmsl.sh</include>
                             </includes>
                             <classifier>docs</classifier>
-							<finalName>
-								${project.artifactId}-${project.version}-${maven.build.timestamp}
-							</finalName>
                         </configuration>
                     </execution>
 				</executions>
@@ -105,9 +102,6 @@
 						<goals>
 							<goal>jar</goal>
 						</goals>
-						<configuration>
-							<finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}</finalName>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
