@@ -137,7 +137,7 @@ public class BacktrackInputReader
 				try
 				{
 					Class<? extends ExternalFormatReader> clazz = externalReaders.get(suffix);
-					return clazz.newInstance();
+					return clazz.getDeclaredConstructor().newInstance();
 				}
 				catch (Exception e)
 				{

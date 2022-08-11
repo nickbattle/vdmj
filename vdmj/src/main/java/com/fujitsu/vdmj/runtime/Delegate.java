@@ -100,7 +100,7 @@ public class Delegate implements Serializable
 	{
 		try
 		{
-			return delegateClass.newInstance();
+			return delegateClass.getDeclaredConstructor().newInstance();
 		}
 		catch (NullPointerException e)
 		{
@@ -108,6 +108,16 @@ public class Delegate implements Serializable
 				"No delegate class found: " + name);
 		}
 		catch (InstantiationException e)
+		{
+			throw new InternalException(54,
+				"Cannot instantiate native object: " + e.getMessage());
+		}
+		catch (InvocationTargetException e)
+		{
+			throw new InternalException(54,
+				"Cannot instantiate native object: " + e.getMessage());
+		}
+		catch (NoSuchMethodException e)
 		{
 			throw new InternalException(54,
 				"Cannot instantiate native object: " + e.getMessage());

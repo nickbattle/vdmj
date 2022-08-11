@@ -136,7 +136,7 @@ abstract public class POPlugin extends AnalysisPlugin
 
 			results.add(
 				new JSONObject(
-					"id",		new Long(po.number),
+					"id",		Long.valueOf(po.number),
 					"kind", 	po.kind.toString(),
 					"name",		name,
 					"location",	Utils.lexLocationToLocation(po.location),
