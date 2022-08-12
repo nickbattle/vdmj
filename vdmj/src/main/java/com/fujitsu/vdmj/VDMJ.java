@@ -437,7 +437,7 @@ abstract public class VDMJ
         					{
         						try
 								{
-									RemoteControl remote = remoteClass.newInstance();
+									RemoteControl remote = remoteClass.getDeclaredConstructor().newInstance();
 									Interpreter i = controller.getInterpreter();
 
 									if (defaultName != null)

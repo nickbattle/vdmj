@@ -81,7 +81,7 @@ public class RemoteControlExecutor extends AsyncExecutor
 		try
 		{
 			Class<RemoteControl> remoteClass = (Class<RemoteControl>) ClassLoader.getSystemClassLoader().loadClass(remoteControl);
-			RemoteControl remote = remoteClass.newInstance();
+			RemoteControl remote = remoteClass.getDeclaredConstructor().newInstance();
 			Interpreter i = Interpreter.getInstance();
 
 			running = remoteControl;

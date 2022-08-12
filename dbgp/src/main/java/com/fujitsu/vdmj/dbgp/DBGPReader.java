@@ -530,7 +530,7 @@ public class DBGPReader extends DebugLink
 					}
 
 					RemoteControl remote =
-						(remoteClass == null) ? null : remoteClass.newInstance();
+						(remoteClass == null) ? null : remoteClass.getDeclaredConstructor().newInstance();
 
 					mainInstance = new DBGPReader(host, port, ideKey, i, expression, null);
 					mainInstance.startup(remote);

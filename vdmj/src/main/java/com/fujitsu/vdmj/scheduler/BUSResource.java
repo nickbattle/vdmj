@@ -239,7 +239,7 @@ public class BUSResource extends Resource
 		}
 		else
 		{
-			return SystemClock.timeToInternal(TimeUnit.seconds, new Double(bytes) / speed); // bytes/s
+			return SystemClock.timeToInternal(TimeUnit.seconds, Double.valueOf(bytes) / speed); // bytes/s
 		}
 	}
 
