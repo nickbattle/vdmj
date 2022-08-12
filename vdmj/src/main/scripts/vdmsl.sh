@@ -4,11 +4,11 @@
 #####################################################################################
 
 # Change these to flip VDMJ version
-MVERSION="4.4.6"
-PVERSION="4.4.6-P"
+MVERSION="4.5.0-SNAPSHOT"
+PVERSION="4.5.0-P-SNAPSHOT"
 
-# The Maven repository directory containing VDMJ jars
-MAVENREPO=~/.m2/repository/com/fujitsu
+# The Maven repository directory containing VDMJ versions
+MAVENREPO=~/.m2/repository/dk/au/ece/vdmj
 
 # Location of the vdmj.properties file, if any. Override with -D.
 PROPDIR="$HOME/lib"
@@ -34,15 +34,6 @@ function check()
 	exit 1
     fi
 }
-
-# Just warn if a later version is available in Maven
-LATEST=$(ls $MAVENREPO/vdmj | grep "^[0-9].[0-9].[0-9]" | tail -1)
-
-if [ "$MVERSION" != "$LATEST" ]
-then
-    echo "WARNING: Latest VDMJ version is $LATEST, not $MVERSION"
-fi
-
 
 # Chosen version defaults to "master"
 VERSION=$MVERSION
@@ -72,6 +63,14 @@ do
     esac
     shift
 done
+
+# Warn if a later version is available in Maven
+LATEST=$(ls $MAVENREPO/vdmj | grep "^[0-9]*\.[0-9]*\.[0-9]*" | tail -1)
+
+if [ "$VERSION" != "$LATEST" ]
+then
+    echo "WARNING: Latest VDMJ version is $LATEST, not $VERSION"
+fi
 
 # Locate the jars
 VDMJ_JAR=$MAVENREPO/vdmj/${VERSION}/vdmj-${VERSION}.jar

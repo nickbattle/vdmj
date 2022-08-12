@@ -99,7 +99,7 @@ public class INNotYetSpecifiedExpression extends INExpression
 					
 					Class<?> io = Class.forName("IO");
 					Method m = io.getMethod("freadval", new Class[] {Value.class, Context.class});
-					return (Value)m.invoke(io.newInstance(), new Object[] {fval, ctxt});
+					return (Value)m.invoke(io.getDeclaredConstructor().newInstance(), new Object[] {fval, ctxt});
 				}
 				catch (Exception e)
 				{

@@ -87,13 +87,13 @@ public class CTTest extends LSPTest
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
+		assertEquals(Long.valueOf(25), response.get(0).getPath("result.numberOfTests"));
 
 		request = RPCRequest.create(123L, "slsp/CT/generate", new JSONObject("name", "B`TB1"));
 		response = handler.request(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		assertEquals(new Long(5), response.get(0).getPath("result.numberOfTests"));
+		assertEquals(Long.valueOf(5), response.get(0).getPath("result.numberOfTests"));
 	}
 
 	@Test
@@ -110,7 +110,7 @@ public class CTTest extends LSPTest
 		RPCRequest request =RPCRequest.create(123L, "slsp/CT/generate", new JSONObject("name", "A`TA"));
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
-		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
+		assertEquals(Long.valueOf(25), response.get(0).getPath("result.numberOfTests"));
 
 		request = RPCRequest.create(123L, "slsp/CT/execute", new JSONObject(
 				"name",					"A`TA",
@@ -138,7 +138,7 @@ public class CTTest extends LSPTest
 		RPCRequest request = RPCRequest.create(123L, "slsp/CT/generate", new JSONObject("name", "DEFAULT`Test1"));
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
-		assertEquals(new Long(160), response.get(0).getPath("result.numberOfTests"));
+		assertEquals(Long.valueOf(160), response.get(0).getPath("result.numberOfTests"));
 
 		request = RPCRequest.create(123L, "slsp/CT/execute", new JSONObject("name", "DEFAULT`Test1"));
 		response = handler.request(request);
@@ -197,13 +197,13 @@ public class CTTest extends LSPTest
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
+		assertEquals(Long.valueOf(25), response.get(0).getPath("result.numberOfTests"));
 
 		request = RPCRequest.create(123L, "slsp/CT/generate", new JSONObject("name", "B`TB1"));
 		response = handler.request(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		assertEquals(new Long(5), response.get(0).getPath("result.numberOfTests"));
+		assertEquals(Long.valueOf(5), response.get(0).getPath("result.numberOfTests"));
 	}
 
 	@Test
@@ -220,7 +220,7 @@ public class CTTest extends LSPTest
 		RPCRequest request = RPCRequest.create(123L, "slsp/CT/generate", new JSONObject("name", "A`TA"));
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
-		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
+		assertEquals(Long.valueOf(25), response.get(0).getPath("result.numberOfTests"));
 
 		request = RPCRequest.create(123L, "slsp/CT/execute", new JSONObject(
 				"name",					"A`TA",
@@ -280,13 +280,13 @@ public class CTTest extends LSPTest
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
+		assertEquals(Long.valueOf(25), response.get(0).getPath("result.numberOfTests"));
 
 		request = RPCRequest.create(123L, "slsp/CT/generate", new JSONObject("name", "B`TB1"));
 		response = handler.request(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		assertEquals(new Long(5), response.get(0).getPath("result.numberOfTests"));
+		assertEquals(Long.valueOf(5), response.get(0).getPath("result.numberOfTests"));
 	}
 
 	@Test
@@ -303,7 +303,7 @@ public class CTTest extends LSPTest
 		RPCRequest request = RPCRequest.create(123L, "slsp/CT/generate", new JSONObject("name", "A`TA"));
 		RPCMessageList response = handler.request(request);
 		assertEquals(1, response.size());
-		assertEquals(new Long(25), response.get(0).getPath("result.numberOfTests"));
+		assertEquals(Long.valueOf(25), response.get(0).getPath("result.numberOfTests"));
 
 		request = RPCRequest.create(123L, "slsp/CT/execute", new JSONObject("name", "A`TA"));
 		response = handler.request(request);

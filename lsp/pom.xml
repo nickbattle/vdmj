@@ -28,8 +28,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>dk.au.ece.vdmj</groupId>
@@ -39,6 +37,9 @@
 	</dependencies>
 
 	<build>
+		<finalName>
+			${project.artifactId}-${project.version}-${maven.build.timestamp}
+		</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -73,9 +74,6 @@
 									<Class-Path>.</Class-Path>
 								</manifestEntries>
 							</archive>
-							<finalName>
-								${project.artifactId}-${project.version}-${maven.build.timestamp}
-							</finalName>
 						</configuration>
 					</execution>
 				</executions>

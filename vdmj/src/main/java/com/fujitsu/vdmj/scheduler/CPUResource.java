@@ -203,7 +203,7 @@ public class CPUResource extends Resource
 
 	public long getCyclesDuration(long cycles)
 	{
-		return isVirtual() ? 0 : SystemClock.timeToInternal(TimeUnit.seconds, new Double(cycles) / clock);
+		return isVirtual() ? 0 : SystemClock.timeToInternal(TimeUnit.seconds, Double.valueOf(cycles) / clock);
 	}
 
 	public int getNumber()

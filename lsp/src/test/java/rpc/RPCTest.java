@@ -73,7 +73,7 @@ public class RPCTest extends TestCase
 		writer.flush();
 		
 		System.out.println(out.toString());
-		assertEquals(new Long(19), responses.get(0).get("result"));
+		assertEquals(Long.valueOf(19), responses.get(0).get("result"));
 	}
 	
 	@Test
@@ -110,7 +110,7 @@ public class RPCTest extends TestCase
 		writer.flush();
 		
 		System.out.println(out.toString());
-		assertEquals(new Long(-19), responses.get(0).get("result"));
+		assertEquals(Long.valueOf(-19), responses.get(0).get("result"));
 	}
 	
 	@Test
@@ -130,6 +130,6 @@ public class RPCTest extends TestCase
 		
 		System.out.println(out.toString());
 		JSONObject error = responses.get(0).get("error");
-		assertEquals(error.get("code"), new Long(-32601));
+		assertEquals(error.get("code"), Long.valueOf(-32601));
 	}
 }
