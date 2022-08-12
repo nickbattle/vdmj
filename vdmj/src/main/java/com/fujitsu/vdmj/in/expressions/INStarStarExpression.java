@@ -122,7 +122,12 @@ public class INStarStarExpression extends INBinaryExpression
     			Apfloat rd = new Apfloat(rv.realValue(ctxt), Settings.precision.getPrecision());
     			Apfloat result;
     			
-    			if (rd.intValue() >= 0)
+    			if (ld.signum() < 0 && NumericValue.isInteger(rv))
+				{
+					BigInteger exp = rv.intValue(ctxt);
+					result = ApfloatMath.pow(ld, exp.longValue());
+				}
+    			else if (rd.intValue() >= 0)
     			{
     				result = ApfloatMath.pow(ld, rd);
     			}
