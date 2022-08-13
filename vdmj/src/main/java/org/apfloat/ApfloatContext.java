@@ -926,7 +926,7 @@ public class ApfloatContext
         {
             if (propertyName.equals(BUILDER_FACTORY))
             {
-                setBuilderFactory((BuilderFactory) Class.forName(propertyValue).newInstance());
+                setBuilderFactory((BuilderFactory) Class.forName(propertyValue).getDeclaredConstructor().newInstance());
             }
             else if (propertyName.equals(DEFAULT_RADIX))
             {

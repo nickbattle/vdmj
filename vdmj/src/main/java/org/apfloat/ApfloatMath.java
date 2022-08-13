@@ -838,7 +838,7 @@ public class ApfloatMath
         }
 
         // Get synchronization lock - getting the lock is also synchronized
-        Integer radixKey = getRadixPiKey(new Integer(radix));   // Use new Integer since we synchronize on it; Integer.valueOf() could be shared instance
+        Integer radixKey = getRadixPiKey(Integer.valueOf(radix));   // Use new Integer since we synchronize on it; Integer.valueOf() could be shared instance
 
         Apfloat pi;
 
@@ -1253,7 +1253,7 @@ public class ApfloatMath
         throws ApfloatRuntimeException
     {
         // Get synchronization lock - getting the lock is also synchronized
-        Integer radixKey = getRadixLogKey(new Integer(radix));      // Use new Integer since we synchronize on it; Integer.valueOf() could be shared instance
+        Integer radixKey = getRadixLogKey(Integer.valueOf(radix));      // Use new Integer since we synchronize on it; Integer.valueOf() could be shared instance
 
         Apfloat logRadix;
 
