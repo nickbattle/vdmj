@@ -40,9 +40,6 @@
 	</dependencies>
 
 	<build>
-		<finalName>
-			${project.artifactId}-${project.version}-${maven.build.timestamp}
-		</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -53,12 +50,8 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<includes>
-						<include>**/*Test.java</include>
-					</includes>
-				</configuration>
 			</plugin>
 			<!-- Use the dependency plugin to unpack the apfloat dependency into the classes -->
 			<plugin>
@@ -88,6 +81,7 @@
 				</executions>
 			</plugin>		
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
@@ -132,16 +126,8 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
+            </plugin>
+ 		</plugins>
 	</build>
 
 </project>

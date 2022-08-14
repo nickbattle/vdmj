@@ -42,6 +42,16 @@
 				<version>4.13.1</version>
 				<scope>test</scope>
 			</dependency>
+			<dependency>
+				<groupId>dk.au.ece.vdmj</groupId>
+				<artifactId>vdmj</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+	        <dependency>
+	            <groupId>dk.au.ece.vdmj</groupId>
+	            <artifactId>lsp</artifactId>
+				<version>${project.version}</version>
+	        </dependency>
 		</dependencies>
    	</dependencyManagement>
 
@@ -97,6 +107,7 @@
                     <configuration>
                         <failOnError>false</failOnError>
                         <quiet>true</quiet>
+						<source>8</source>
                     </configuration>
                 </plugin>
 
@@ -110,7 +121,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0-M6</version>
-
+					<configuration>
+						<includes>
+							<include>**/*Test.java</include>
+						</includes>
+					</configuration>
                 </plugin>
 
                 <plugin>
@@ -163,6 +178,10 @@
 
             </plugins>
         </pluginManagement>
+
+		<finalName>
+			${project.artifactId}-${project.version}-${maven.build.timestamp}
+		</finalName>
 
 	    <plugins>
 			<plugin>
