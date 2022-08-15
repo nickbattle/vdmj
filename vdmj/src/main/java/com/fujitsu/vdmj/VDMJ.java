@@ -396,9 +396,9 @@ abstract public class VDMJ
 			
 			try
 			{
-				remoteSimulation.newInstance();
+				remoteSimulation.getDeclaredConstructor().newInstance();
 			}
-			catch (InstantiationException | IllegalAccessException e)
+			catch (Exception e)
 			{
 				usage("Cannot instantiate simulation: " + e.getMessage());
 			}

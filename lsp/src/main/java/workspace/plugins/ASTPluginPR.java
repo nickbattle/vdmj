@@ -122,7 +122,7 @@ public class ASTPluginPR extends ASTPlugin
 				{
 					@SuppressWarnings("unchecked")
 					Class<RemoteSimulation> clazz = (Class<RemoteSimulation>) Class.forName(remoteSimulation);
-					simulation = clazz.newInstance();
+					simulation = clazz.getDeclaredConstructor().newInstance();
 				}
 				catch (Exception e)
 				{
