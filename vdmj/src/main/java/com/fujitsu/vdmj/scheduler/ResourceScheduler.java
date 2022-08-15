@@ -28,6 +28,8 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.fujitsu.vdmj.RemoteSimulation;
+
 public class ResourceScheduler implements Serializable
 {
     private static final long serialVersionUID = 1L;
@@ -71,9 +73,16 @@ public class ResourceScheduler implements Serializable
 	public void start(MainThread main)
 	{
 		mainThread = main;
+		stopping = false;
 
 		boolean idle = true;
-		stopping = false;
+		long nextSimulationStop = Long.MAX_VALUE;
+		RemoteSimulation simulation = RemoteSimulation.getInstance();		
+
+		if (simulation != null)
+		{
+			nextSimulationStop = simulation.step(SystemClock.getWallTime());
+		}
 
 		do
 		{
@@ -100,6 +109,11 @@ public class ResourceScheduler implements Serializable
 			if (idle && minstep >= 0 && minstep < Long.MAX_VALUE)
 			{
 				SystemClock.advance(minstep);
+
+				if (simulation != null && SystemClock.getWallTime() >= nextSimulationStop)
+				{
+					nextSimulationStop = simulation.step(SystemClock.getWallTime());
+				}
 
 				for (Resource resource: resources)
 				{

@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
@@ -107,6 +108,31 @@ public class ASTPluginPR extends ASTPlugin
 			{
 				warns.addAll(mr.getWarnings());
 			}
+		}
+		
+		String remoteSimulation = System.getProperty("lsp.remoteSimulation");
+		
+		if (remoteSimulation != null)
+		{
+			RemoteSimulation simulation = RemoteSimulation.getInstance();
+			
+			if (simulation == null)
+			{
+				try
+				{
+					@SuppressWarnings("unchecked")
+					Class<RemoteSimulation> clazz = (Class<RemoteSimulation>) Class.forName(remoteSimulation);
+					simulation = clazz.getDeclaredConstructor().newInstance();
+				}
+				catch (Exception e)
+				{
+					Diag.error(e);
+					Diag.error("Error while creating %s", remoteSimulation);
+				}
+			}
+			
+			Diag.info("Calling remoteSimulation setup %s", remoteSimulation);
+			simulation.setup(astClassList);
 		}
 		
 		return errs.isEmpty();

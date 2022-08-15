@@ -1,3 +1,6 @@
+/*
+ * Test spec to use with TestSimulation
+ */
 system SYS
 instance variables
 	static public obj1 : A := new A();
@@ -18,8 +21,8 @@ instance variables
 	last:nat := 0;
 
 values
-	public MIN = 50;
-	public MAX = 150;
+	public MIN = 0;		-- Set by TestSimulation
+	public MAX = 0;		-- Set by TestSimulation
 	
 operations
 	public op: () ==> ()

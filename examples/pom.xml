@@ -24,5 +24,6 @@
 	<modules>
 		<module>v2c</module>
 		<module>pdfreader</module>
+		<module>simulation</module>
 	</modules>
 </project>

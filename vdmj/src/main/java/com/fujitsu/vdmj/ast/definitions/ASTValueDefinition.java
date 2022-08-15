@@ -40,7 +40,7 @@ public class ASTValueDefinition extends ASTDefinition
 	public final NameScope scope;
 	public final ASTPattern pattern;
 	public final ASTType type;
-	public final ASTExpression exp;
+	public ASTExpression exp;
 
 	public ASTValueDefinition(NameScope scope, ASTPattern p, ASTType type, ASTExpression exp)
 	{
@@ -101,5 +101,10 @@ public class ASTValueDefinition extends ASTDefinition
 	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseValueDefinition(this, arg);
+	}
+
+	public void setExpression(ASTExpression newExpression)
+	{
+		this.exp = newExpression;
 	}
 }

@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj;
 
+import java.io.File;
+import java.util.List;
+
 import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -34,6 +37,29 @@ public class VDMRT extends VDMPP
 	public VDMRT()
 	{
 		Settings.dialect = Dialect.VDM_RT;
+	}
+	
+	@Override
+	public ExitStatus parse(List<File> files)
+	{
+		ExitStatus e = super.parse(files);
+		
+		RemoteSimulation rs = RemoteSimulation.getInstance();
+		
+		if (rs != null)
+		{
+			try
+			{
+				rs.setup(parsedClasses);
+			}
+			catch (Exception ex)
+			{
+				println("Simulation: " + ex.getMessage());
+				e = ExitStatus.EXIT_ERRORS;
+			}
+		}
+		
+		return e;
 	}
 
 	@Override
