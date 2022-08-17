@@ -77,20 +77,34 @@ public class EventHub
 		List<EventListener> list = registrations.get(event.type);
 		RPCMessageList responses = new RPCMessageList();
 
-		for (EventListener listener: list)
+		if (list != null)
 		{
-			try
+			for (EventListener listener: list)
 			{
-				Diag.fine("Invoking %s event handler for %s", listener.getName(), event.type);
-				responses.addAll(listener.handleEvent(event));
+				try
+				{
+					Diag.fine("Invoking %s event handler for %s", listener.getName(), event.type);
+					RPCMessageList response = listener.handleEvent(event);
+					
+					if (response == null)
+					{
+						throw new Exception("Handler returned null rather than empty response");
+					}
+					
+					responses.addAll(response);
+				}
+				catch (Exception e)
+				{
+					Diag.error(e);
+					Diag.error("Error in s event handler for %s", listener.getName(), event.type);
+				}
+	
+				Diag.fine("Completed %s event handler for %s", listener.getName(), event.type);
 			}
-			catch (Exception e)
-			{
-				Diag.error(e);
-				Diag.error("Error in s event handler for %s", listener.getName(), event.type);
-			}
-
-			Diag.fine("Completed %s event handler for %s", listener.getName(), event.type);
+		}
+		else
+		{
+			Diag.fine("No plugins registered for %s", event.type);
 		}
 		
 		return responses;

@@ -130,7 +130,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		else
 		{
 			Diag.error("Unhandled ASTPlugin event %s", event);
-			return null;
+			return new RPCMessageList();
 		}
 	}
 	

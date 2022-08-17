@@ -78,6 +78,8 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.events.ChangeFileEvent;
+import workspace.events.InitializeEvent;
+import workspace.events.InitializedEvent;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
@@ -184,7 +186,10 @@ public class LSPWorkspaceManager
 		Properties.init(PROPERTIES);
 		loadAllProjectFiles();
 		
-		return new RPCMessageList(request, new LSPInitializeResponse());
+		RPCMessageList responses = new RPCMessageList(request, new LSPInitializeResponse());
+		responses.addAll(EventHub.getInstance().publish(new InitializeEvent(request)));
+		
+		return responses;
 	}
 
 	public RPCMessageList lspInitialized(RPCRequest request)
@@ -194,6 +199,7 @@ public class LSPWorkspaceManager
 			RPCMessageList response = new RPCMessageList();
 			response.add(lspDynamicRegistrations());
 			response.addAll(checkLoadedFiles("initialized"));
+			response.addAll(EventHub.getInstance().publish(new InitializedEvent(request)));
 			return response;
 		}
 		catch (Exception e)

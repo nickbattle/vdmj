@@ -27,9 +27,11 @@ package examples;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
+import rpc.RPCMessageList;
 import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;
+import workspace.events.Event;
 import workspace.plugins.AnalysisPlugin;
 
 abstract public class ExamplePlugin extends AnalysisPlugin implements EventListener
@@ -59,13 +61,18 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	@Override
 	public String getName()
 	{
-		return "Example";
+		return "ExamplePlugin";
 	}
 
 	@Override
 	public void init()
 	{
 		EventHub eventhub = EventHub.getInstance();
+		eventhub.register(this, "initialize", this);
+		eventhub.register(this, "initialized", this);
 		eventhub.register(this, "textDocument/didChange", this);
 	}
+	
+	@Override
+	abstract public RPCMessageList handleEvent(Event event) throws Exception;
 }
