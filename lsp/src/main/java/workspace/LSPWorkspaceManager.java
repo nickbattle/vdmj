@@ -77,6 +77,7 @@ import lsp.textdocument.WatchKind;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.events.ChangeFileEvent;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
@@ -87,6 +88,7 @@ public class LSPWorkspaceManager
 {
 	private static LSPWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
+	private final EventHub eventhub;
 	private final LSPMessageUtils messages;
 	private final Charset encoding;
 
@@ -108,6 +110,7 @@ public class LSPWorkspaceManager
 	private LSPWorkspaceManager()
 	{
 		registry = PluginRegistry.getInstance();
+		eventhub = EventHub.getInstance();
 		messages = new LSPMessageUtils();
 		
 		if (System.getProperty("lsp.encoding") == null)
@@ -744,18 +747,8 @@ public class LSPWorkspaceManager
 			}
 			
 			DiagUtils.dumpEdit(range, buffer);
-			ASTPlugin ast = registry.getPlugin("AST");
-			List<VDMMessage> errors = ast.fileChanged(file);
 			
-			// Add TC errors as these need to be seen until the next save
-			TCPlugin tc = registry.getPlugin("TC");
-			errors.addAll(tc.getErrs());
-			errors.addAll(tc.getWarns());
-			
-			// We report on this file, plus the files with tc errors (if any).
-			Set<File> files = messages.filesOfMessages(errors);
-			files.add(file);
-			return messages.diagnosticResponses(errors, files);
+			return eventhub.publish(new ChangeFileEvent(request, file));
 		}
 	}
 

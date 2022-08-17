@@ -37,15 +37,21 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.commands.Command;
+import workspace.EventHub;
+import workspace.PluginRegistry;
 import workspace.lenses.CodeLens;
 
 abstract public class AnalysisPlugin
 {
 	protected final LSPMessageUtils messages;
+	protected final PluginRegistry registry;
+	protected final EventHub eventhub;
 	
 	public AnalysisPlugin()
 	{
 		messages = new LSPMessageUtils();
+		registry = PluginRegistry.getInstance();
+		eventhub = EventHub.getInstance();
 	}
 	
 	protected RPCMessageList errorResult()

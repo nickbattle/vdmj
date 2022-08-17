@@ -26,8 +26,8 @@ package workspace.plugins;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
@@ -52,11 +52,15 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
+import rpc.RPCMessageList;
 import workspace.Diag;
+import workspace.EventListener;
+import workspace.events.ChangeFileEvent;
+import workspace.events.Event;
 import workspace.lenses.ASTLaunchDebugLens;
 import workspace.lenses.CodeLens;
 
-public abstract class ASTPlugin extends AnalysisPlugin
+public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 {
 	protected static final boolean STRUCTURED_OUTLINE = true;
 
@@ -84,7 +88,6 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	protected ASTPlugin()
 	{
 		super();
-		this.dirty = false;
 	}
 	
 	@Override
@@ -96,6 +99,8 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
+		eventhub.register(this, "textDocument/didChange", this);
+		this.dirty = false;
 	}
 	
 	/**
@@ -115,9 +120,33 @@ public abstract class ASTPlugin extends AnalysisPlugin
 		return lenses;
 	}
 
-	public List<VDMMessage> fileChanged(File file) throws IOException
+	@Override
+	public RPCMessageList handleEvent(Event event) throws Exception
 	{
-		return parseFile(file);
+		if (event instanceof ChangeFileEvent)
+		{
+			return didChange((ChangeFileEvent) event);
+		}
+		else
+		{
+			Diag.error("Unhandled ASTPlugin event %s", event);
+			return null;
+		}
+	}
+	
+	private RPCMessageList didChange(ChangeFileEvent event) throws Exception
+	{
+		List<VDMMessage> errors = parseFile(event.file);
+		
+		// Add TC errors as these need to be seen until the next save
+		TCPlugin tc = registry.getPlugin("TC");
+		errors.addAll(tc.getErrs());
+		errors.addAll(tc.getWarns());
+		
+		// We report on this file, plus the files with tc errors (if any).
+		Set<File> files = messages.filesOfMessages(errors);
+		files.add(event.file);
+		return messages.diagnosticResponses(errors, files);
 	}
 	
 	public void preCheck()
