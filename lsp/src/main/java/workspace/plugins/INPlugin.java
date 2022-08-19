@@ -71,6 +71,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	public void init()
 	{
 		eventhub.register(this, "checkFilesEvent/prepare", this);
+		eventhub.register(this, "checkFilesEvent/checked", this);
 	}
 
 
@@ -85,6 +86,11 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			{
 				case "checkFilesEvent/prepare":
 					preCheck(ev);
+					return new RPCMessageList();
+
+				case "checkFilesEvent/checked":
+					TCPlugin tc = registry.getPlugin("TC");
+					checkLoadedFiles(tc.getTC());
 					return new RPCMessageList();
 
 				default:

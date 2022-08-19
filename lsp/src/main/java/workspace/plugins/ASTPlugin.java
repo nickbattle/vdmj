@@ -102,26 +102,10 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	{
 		eventhub.register(this, "textDocument/didChange", this);
 		eventhub.register(this, "checkFilesEvent/prepare", this);
+		eventhub.register(this, "checkFilesEvent/syntax", this);
 		this.dirty = false;
 	}
 	
-	/**
-	 * We register the launch/debug code lens here, if the tree is dirty. Else it
-	 * is registered by the TCPlugin.
-	 */
-	@Override
-	protected List<CodeLens> getCodeLenses(boolean dirty)
-	{
-		List<CodeLens> lenses = new Vector<CodeLens>();
-		
-		if (dirty)
-		{
-			lenses.add(new ASTLaunchDebugLens());
-		}
-		
-		return lenses;
-	}
-
 	@Override
 	public RPCMessageList handleEvent(Event event) throws Exception
 	{
@@ -137,6 +121,12 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 			{
 				case "checkFilesEvent/prepare":
 					preCheck(ev);
+					return new RPCMessageList();
+
+				case "checkFilesEvent/syntax":
+					checkLoadedFiles();
+					ev.addErrs(errs);
+					ev.addWarns(warns);
 					return new RPCMessageList();
 
 				default:
@@ -180,6 +170,23 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract public boolean checkLoadedFiles();
 	
+	/**
+	 * We register the launch/debug code lens here, if the tree is dirty. Else it
+	 * is registered by the TCPlugin.
+	 */
+	@Override
+	protected List<CodeLens> getCodeLenses(boolean dirty)
+	{
+		List<CodeLens> lenses = new Vector<CodeLens>();
+		
+		if (dirty)
+		{
+			lenses.add(new ASTLaunchDebugLens());
+		}
+		
+		return lenses;
+	}
+
 	public List<VDMMessage> getErrs()
 	{
 		return errs;

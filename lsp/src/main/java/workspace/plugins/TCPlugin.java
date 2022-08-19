@@ -96,19 +96,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	public void init()
 	{
 		eventhub.register(this, "checkFilesEvent/prepare", this);
-	}
-
-	@Override
-	protected List<CodeLens> getCodeLenses(boolean dirty)
-	{
-		List<CodeLens> lenses = new Vector<CodeLens>();
-		
-		if (!dirty)
-		{
-			lenses.add(new TCLaunchDebugLens());
-		}
-		
-		return lenses;
+		eventhub.register(this, "checkFilesEvent/typecheck", this);
 	}
 
 	@Override
@@ -122,6 +110,13 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 			{
 				case "checkFilesEvent/prepare":
 					preCheck(ev);
+					return new RPCMessageList();
+
+				case "checkFilesEvent/typecheck":
+					ASTPlugin ast = registry.getPlugin("AST");
+					checkLoadedFiles(ast.getAST());
+					ev.addErrs(errs);
+					ev.addWarns(warns);
 					return new RPCMessageList();
 
 				default:
@@ -146,6 +141,19 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	 * Event handling above. Supporting methods below. 
 	 */
 	
+	@Override
+	protected List<CodeLens> getCodeLenses(boolean dirty)
+	{
+		List<CodeLens> lenses = new Vector<CodeLens>();
+		
+		if (!dirty)
+		{
+			lenses.add(new TCLaunchDebugLens());
+		}
+		
+		return lenses;
+	}
+
 	public List<VDMMessage> getErrs()
 	{
 		return errs;

@@ -126,6 +126,11 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 					preCheck(ev);
 					return new RPCMessageList();
 
+				case "checkFilesEvent/checked":
+					INPlugin in = registry.getPlugin("IN");
+					checkLoadedFiles(in.getIN());
+					return new RPCMessageList();
+
 				default:
 					Diag.error("Unhandled %s CheckFilesEvent %s", getName(), event);
 					return new RPCMessageList();

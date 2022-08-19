@@ -72,6 +72,9 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		eventhub.register(this, "initialized", this);
 		eventhub.register(this, "textDocument/didChange", this);
 		eventhub.register(this, "checkFilesEvent/prepare", this);
+		eventhub.register(this, "checkFilesEvent/syntax", this);
+		eventhub.register(this, "checkFilesEvent/typecheck", this);
+		eventhub.register(this, "checkFilesEvent/checked", this);
 	}
 	
 	@Override

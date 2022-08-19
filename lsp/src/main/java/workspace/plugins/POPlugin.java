@@ -34,8 +34,10 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.LSPServer;
 import lsp.Utils;
 import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.CheckFilesEvent;
@@ -75,6 +77,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	public void init()
 	{
 		eventhub.register(this, "checkFilesEvent/prepare", this);
+		eventhub.register(this, "checkFilesEvent/checked", this);
 	}
 	
 	@Override
@@ -96,6 +99,13 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 					preCheck(ev);
 					return new RPCMessageList();
 
+				case "checkFilesEvent/checked":
+					TCPlugin tc = registry.getPlugin("TC");
+					checkLoadedFiles(tc.getTC());
+					LSPServer.getInstance().writeMessage(RPCRequest.notification("slsp/POG/updated",
+							new JSONObject("successful", tc.getErrs().isEmpty())));
+					return new RPCMessageList();
+
 				default:
 					Diag.error("Unhandled %s CheckFilesEvent %s", getName(), event);
 					return new RPCMessageList();
@@ -110,7 +120,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 	protected void preCheck(CheckFilesEvent ev)
 	{
-		
+		// Nothing
 	}
 
 	/**

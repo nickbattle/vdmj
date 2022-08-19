@@ -82,9 +82,7 @@ import workspace.events.CheckFilesEvent;
 import workspace.events.InitializeEvent;
 import workspace.events.InitializedEvent;
 import workspace.plugins.ASTPlugin;
-import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
-import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
 
 public class LSPWorkspaceManager
@@ -563,64 +561,52 @@ public class LSPWorkspaceManager
 	
 	private RPCMessageList checkLoadedFilesSafe(String reason) throws Exception
 	{
-		ASTPlugin ast = registry.getPlugin("AST");
-		TCPlugin tc = registry.getPlugin("TC");
-		INPlugin in = registry.getPlugin("IN");
-		POPlugin po = registry.getPlugin("PO");
-		CTPlugin ct = registry.getPlugin("CT");
-		
 		Diag.info("Checking loaded files (%s)...", reason);
 		eventhub.publish(new CheckFilesEvent("prepare"));
+
+		List<VDMMessage> diags = new Vector<VDMMessage>();
+		boolean hasErrors = false;
+
+		CheckFilesEvent syntax = new CheckFilesEvent("syntax");
+		eventhub.publish(syntax);
+		diags.addAll(syntax.getMessages());
 		
-		if (ast.checkLoadedFiles())
+		if (!syntax.hasErrs())
 		{
-			if (tc.checkLoadedFiles(ast.getAST()))
+			CheckFilesEvent typecheck = new CheckFilesEvent("typecheck");
+			eventhub.publish(typecheck);
+			diags.addAll(typecheck.getMessages());
+
+			if (!typecheck.hasErrs())
 			{
-				if (in.checkLoadedFiles(tc.getTC()))
+				CheckFilesEvent runtime = new CheckFilesEvent("checked");
+				eventhub.publish(runtime);
+				diags.addAll(runtime.getMessages());
+
+				if (!runtime.hasErrs())
 				{
 					Diag.info("Loaded files checked successfully");
 				}
 				else
 				{
 					Diag.error("Failed to create interpreter");
+					hasErrors = true;
 				}
 			}
 			else
 			{
 				Diag.error("Type checking errors found");
-				DiagUtils.dump(tc.getErrs());
-				DiagUtils.dump(tc.getWarns());
+				hasErrors = true;
 			}
 		}
 		else
 		{
 			Diag.error("Syntax errors found");
-			DiagUtils.dump(ast.getErrs());
-			DiagUtils.dump(ast.getWarns());
+			hasErrors = true;
 		}
-		
-		boolean hasErrors = !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
-		
-		List<VDMMessage> diags = new Vector<VDMMessage>();
-		diags.addAll(ast.getErrs());
-		diags.addAll(tc.getErrs());
-		diags.addAll(ast.getWarns());
-		diags.addAll(tc.getWarns());
+
+		DiagUtils.dump(diags);
 		RPCMessageList result = messages.diagnosticResponses(diags, projectFiles.keySet());
-		
-		if (hasClientCapability("experimental.proofObligationGeneration"))
-		{
-			po.checkLoadedFiles(tc.getTC());
-
-			result.add(RPCRequest.notification("slsp/POG/updated",
-					new JSONObject("successful", !hasErrors)));
-		}
-		
-		if (hasClientCapability("experimental.combinatorialTesting"))
-		{
-			ct.checkLoadedFiles(in.getIN());
-		}
-
 		result.add(RPCRequest.notification("slsp/checked", new JSONObject("successful", !hasErrors)));
 
 		Diag.info("Checked loaded files.");
