@@ -81,6 +81,7 @@ import workspace.events.ChangeFileEvent;
 import workspace.events.CheckFilesEvent;
 import workspace.events.InitializeEvent;
 import workspace.events.InitializedEvent;
+import workspace.events.ShutdownEvent;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.INPlugin;
 import workspace.plugins.TCPlugin;
@@ -858,12 +859,6 @@ public class LSPWorkspaceManager
 				{
 					Diag.info("Simple file change: %s", file);
 					actionCode = RECHECK;
-
-					// Can't distinguish quick delete/create from change here, so comment out...
-					// if (documentFiles.containsKey(file))
-					// {
-					// 		sendMessage(WARNING_MSG, "WARNING: Overwriting generated VDM source: " + file);
-					// }
 				}
 				break;
 				
@@ -1410,6 +1405,7 @@ public class LSPWorkspaceManager
 	public RPCMessageList shutdown(RPCRequest request)
 	{
 		Diag.info("Shutting down server");
+		eventhub.publish(new ShutdownEvent(request));
 		LSPServer.getInstance().setInitialized(false);
 		clearDocumentFiles();
 		return new RPCMessageList(request);
