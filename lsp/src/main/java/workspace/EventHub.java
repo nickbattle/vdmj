@@ -58,6 +58,18 @@ public class EventHub
 		return INSTANCE;
 	}
 	
+	/**
+	 * This is only used by unit testing.
+	 */
+	public static void reset()
+	{
+		if (INSTANCE != null)
+		{
+			INSTANCE.registrations.clear();
+			INSTANCE = null;
+		}
+	}
+	
 	public synchronized void register(AnalysisPlugin plugin, String event, EventListener listener)
 	{
 		List<EventListener> list = registrations.get(event);

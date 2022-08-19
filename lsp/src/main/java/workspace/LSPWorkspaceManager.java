@@ -153,6 +153,7 @@ public class LSPWorkspaceManager
 	public static void reset()
 	{
 		PluginRegistry.reset();
+		EventHub.reset();
 		INSTANCE = null;
 	}
 	
