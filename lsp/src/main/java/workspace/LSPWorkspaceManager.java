@@ -78,6 +78,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.events.ChangeFileEvent;
+import workspace.events.CheckFilesEvent;
 import workspace.events.InitializeEvent;
 import workspace.events.InitializedEvent;
 import workspace.plugins.ASTPlugin;
@@ -569,19 +570,7 @@ public class LSPWorkspaceManager
 		CTPlugin ct = registry.getPlugin("CT");
 		
 		Diag.info("Checking loaded files (%s)...", reason);
-		ast.preCheck();
-		tc.preCheck();
-		in.preCheck();
-		
-		if (hasClientCapability("experimental.proofObligationGeneration"))
-		{
-			po.preCheck();
-		}
-		
-		if (hasClientCapability("experimental.combinatorialTesting"))
-		{
-			ct.preCheck();
-		}
+		eventhub.publish(new CheckFilesEvent("prepare"));
 		
 		if (ast.checkLoadedFiles())
 		{

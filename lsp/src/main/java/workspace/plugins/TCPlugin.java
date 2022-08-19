@@ -51,11 +51,15 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
+import rpc.RPCMessageList;
 import workspace.Diag;
+import workspace.EventListener;
+import workspace.events.CheckFilesEvent;
+import workspace.events.Event;
 import workspace.lenses.CodeLens;
 import workspace.lenses.TCLaunchDebugLens;
 
-abstract public class TCPlugin extends AnalysisPlugin
+abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 {
 	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
 	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
@@ -91,6 +95,7 @@ abstract public class TCPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
+		eventhub.register(this, "checkFilesEvent/prepare", this);
 	}
 
 	@Override
@@ -106,11 +111,40 @@ abstract public class TCPlugin extends AnalysisPlugin
 		return lenses;
 	}
 
-	public void preCheck()
+	@Override
+	public RPCMessageList handleEvent(Event event) throws Exception
+	{
+		if (event instanceof CheckFilesEvent)
+		{
+			CheckFilesEvent ev = (CheckFilesEvent)event;
+			
+			switch (ev.type)
+			{
+				case "checkFilesEvent/prepare":
+					preCheck(ev);
+					return new RPCMessageList();
+
+				default:
+					Diag.error("Unhandled %s CheckFilesEvent %s", getName(), event);
+					return new RPCMessageList();
+			}
+		}
+		else
+		{
+			Diag.error("Unhandled %s event %s", getName(), event);
+			return new RPCMessageList();
+		}
+	}
+
+	protected void preCheck(CheckFilesEvent ev)
 	{
 		errs.clear();
 		warns.clear();
 	}
+	
+	/**
+	 * Event handling above. Supporting methods below. 
+	 */
 	
 	public List<VDMMessage> getErrs()
 	{

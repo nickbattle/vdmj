@@ -31,9 +31,13 @@ import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
+import rpc.RPCMessageList;
 import workspace.Diag;
+import workspace.EventListener;
+import workspace.events.CheckFilesEvent;
+import workspace.events.Event;
 
-abstract public class INPlugin extends AnalysisPlugin
+abstract public class INPlugin extends AnalysisPlugin implements EventListener
 {
 	public static INPlugin factory(Dialect dialect)
 	{
@@ -66,11 +70,42 @@ abstract public class INPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
+		eventhub.register(this, "checkFilesEvent/prepare", this);
 	}
 
-	public void preCheck()
+
+	@Override
+	public RPCMessageList handleEvent(Event event) throws Exception
+	{
+		if (event instanceof CheckFilesEvent)
+		{
+			CheckFilesEvent ev = (CheckFilesEvent)event;
+			
+			switch (ev.type)
+			{
+				case "checkFilesEvent/prepare":
+					preCheck(ev);
+					return new RPCMessageList();
+
+				default:
+					Diag.error("Unhandled %s CheckFilesEvent %s", getName(), event);
+					return new RPCMessageList();
+			}
+		}
+		else
+		{
+			Diag.error("Unhandled %s event %s", getName(), event);
+			return new RPCMessageList();
+		}
+	}
+
+	protected void preCheck(CheckFilesEvent ev)
 	{
 	}
+	
+	/**
+	 * Event handling above. Supporting methods below. 
+	 */
 	
 	abstract public <T extends Mappable> T getIN();
 	

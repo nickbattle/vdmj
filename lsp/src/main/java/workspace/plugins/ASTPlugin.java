@@ -56,6 +56,7 @@ import rpc.RPCMessageList;
 import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.ChangeFileEvent;
+import workspace.events.CheckFilesEvent;
 import workspace.events.Event;
 import workspace.lenses.ASTLaunchDebugLens;
 import workspace.lenses.CodeLens;
@@ -100,6 +101,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	public void init()
 	{
 		eventhub.register(this, "textDocument/didChange", this);
+		eventhub.register(this, "checkFilesEvent/prepare", this);
 		this.dirty = false;
 	}
 	
@@ -127,18 +129,35 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		{
 			return didChange((ChangeFileEvent) event);
 		}
+		else if (event instanceof CheckFilesEvent)
+		{
+			CheckFilesEvent ev = (CheckFilesEvent)event;
+			
+			switch (ev.type)
+			{
+				case "checkFilesEvent/prepare":
+					preCheck(ev);
+					return new RPCMessageList();
+
+				default:
+					Diag.error("Unhandled %s CheckFilesEvent %s", getName(), event);
+					return new RPCMessageList();
+			}
+		}
 		else
 		{
-			Diag.error("Unhandled ASTPlugin event %s", event);
+			Diag.error("Unhandled %s event %s", getName(), event);
 			return new RPCMessageList();
 		}
 	}
 	
+	abstract protected List<VDMMessage> parseFile(File file);
+
 	private RPCMessageList didChange(ChangeFileEvent event) throws Exception
 	{
 		List<VDMMessage> errors = parseFile(event.file);
 		
-		// Add TC errors as these need to be seen until the next save
+		// Add current TC errors as these need to be seen until the next save
 		TCPlugin tc = registry.getPlugin("TC");
 		errors.addAll(tc.getErrs());
 		errors.addAll(tc.getWarns());
@@ -149,11 +168,15 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		return messages.diagnosticResponses(errors, files);
 	}
 	
-	public void preCheck()
+	protected void preCheck(CheckFilesEvent event)
 	{
 		errs.clear();
 		warns.clear();
 	}
+	
+	/**
+	 * Event handling above. Supporting methods below. 
+	 */
 	
 	abstract public boolean checkLoadedFiles();
 	
@@ -169,8 +192,6 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract public <T extends Mappable> T getAST();
 	
-	abstract protected List<VDMMessage> parseFile(File file);
-
 	public boolean isDirty()
 	{
 		return dirty;

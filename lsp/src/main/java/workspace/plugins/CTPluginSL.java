@@ -34,14 +34,16 @@ import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 
+import workspace.events.CheckFilesEvent;
+
 public class CTPluginSL extends CTPlugin
 {
 	private INModuleList inModuleList = null;
 	
 	@Override
-	public void preCheck()
+	protected void preCheck(CheckFilesEvent ev)
 	{
-		super.preCheck();
+		super.preCheck(ev);
 		inModuleList = null;
 	}
 

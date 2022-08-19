@@ -35,9 +35,13 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
+import rpc.RPCMessageList;
 import workspace.Diag;
+import workspace.EventListener;
+import workspace.events.CheckFilesEvent;
+import workspace.events.Event;
 
-abstract public class POPlugin extends AnalysisPlugin
+abstract public class POPlugin extends AnalysisPlugin implements EventListener
 {
 	public static POPlugin factory(Dialect dialect)
 	{
@@ -70,6 +74,7 @@ abstract public class POPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
+		eventhub.register(this, "checkFilesEvent/prepare", this);
 	}
 	
 	@Override
@@ -78,8 +83,40 @@ abstract public class POPlugin extends AnalysisPlugin
 		return new JSONObject("proofObligationProvider", true);
 	}
 
-	abstract public void preCheck();
+	@Override
+	public RPCMessageList handleEvent(Event event) throws Exception
+	{
+		if (event instanceof CheckFilesEvent)
+		{
+			CheckFilesEvent ev = (CheckFilesEvent)event;
+			
+			switch (ev.type)
+			{
+				case "checkFilesEvent/prepare":
+					preCheck(ev);
+					return new RPCMessageList();
 
+				default:
+					Diag.error("Unhandled %s CheckFilesEvent %s", getName(), event);
+					return new RPCMessageList();
+			}
+		}
+		else
+		{
+			Diag.error("Unhandled %s event %s", getName(), event);
+			return new RPCMessageList();
+		}
+	}
+
+	protected void preCheck(CheckFilesEvent ev)
+	{
+		
+	}
+
+	/**
+	 * Event handling above. Supporting methods below. 
+	 */
+	
 	abstract public <T extends Mappable> T getPO();
 	
 	abstract public <T extends Mappable> boolean checkLoadedFiles(T poList) throws Exception;
