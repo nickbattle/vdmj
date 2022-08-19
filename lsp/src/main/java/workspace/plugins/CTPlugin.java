@@ -105,6 +105,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 	public void init()
 	{
 		eventhub.register(this, "checkFilesEvent/prepare", this);
+		eventhub.register(this, "checkFilesEvent/checked", this);
 	}
 	
 	@Override

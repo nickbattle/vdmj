@@ -565,23 +565,24 @@ public class LSPWorkspaceManager
 		Diag.info("Checking loaded files (%s)...", reason);
 		eventhub.publish(new CheckFilesEvent("prepare"));
 
+		RPCMessageList results = new RPCMessageList();
 		List<VDMMessage> diags = new Vector<VDMMessage>();
 		boolean hasErrors = false;
 
 		CheckFilesEvent syntax = new CheckFilesEvent("syntax");
-		eventhub.publish(syntax);
+		results.addAll(eventhub.publish(syntax));
 		diags.addAll(syntax.getMessages());
 		
 		if (!syntax.hasErrs())
 		{
 			CheckFilesEvent typecheck = new CheckFilesEvent("typecheck");
-			eventhub.publish(typecheck);
+			results.addAll(eventhub.publish(typecheck));
 			diags.addAll(typecheck.getMessages());
 
 			if (!typecheck.hasErrs())
 			{
 				CheckFilesEvent runtime = new CheckFilesEvent("checked");
-				eventhub.publish(runtime);
+				results.addAll(eventhub.publish(runtime));
 				diags.addAll(runtime.getMessages());
 
 				if (!runtime.hasErrs())
@@ -607,11 +608,11 @@ public class LSPWorkspaceManager
 		}
 
 		DiagUtils.dump(diags);
-		RPCMessageList result = messages.diagnosticResponses(diags, projectFiles.keySet());
-		result.add(RPCRequest.notification("slsp/checked", new JSONObject("successful", !hasErrors)));
+		results.addAll(messages.diagnosticResponses(diags, projectFiles.keySet()));
+		results.add(RPCRequest.notification("slsp/checked", new JSONObject("successful", !hasErrors)));
 
 		Diag.info("Checked loaded files.");
-		return result;
+		return results;
 	}
 
 	public RPCMessageList openFile(RPCRequest request, File file, String text) throws Exception
