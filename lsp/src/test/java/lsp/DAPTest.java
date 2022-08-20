@@ -54,17 +54,18 @@ abstract public class DAPTest
 	
 	static
 	{
-		Diag.init(false);	// No logging, if lsp.log.level is unset
+		Diag.init(true);	// No logging, if lsp.log.level is unset
 	}
 
 	protected void setupWorkspace(Dialect dialect) throws IOException
 	{
 		Settings.dialect = dialect;
+		EventHub.reset();
+		PluginRegistry.reset();
 		LSPWorkspaceManager.reset();
 		LSPXWorkspaceManager.reset();
 		DAPWorkspaceManager.reset();
-		EventHub.reset();
-		PluginRegistry.reset();
+		DAPXWorkspaceManager.reset();
 		lspManager = LSPWorkspaceManager.getInstance();
 		lspxManager = LSPXWorkspaceManager.getInstance();
 		dapManager = DAPWorkspaceManager.getInstance();

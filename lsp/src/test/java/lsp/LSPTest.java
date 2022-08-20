@@ -60,11 +60,12 @@ abstract public class LSPTest
 	protected void setupWorkspace(Dialect dialect) throws IOException
 	{
 		Settings.dialect = dialect;
+		EventHub.reset();
+		PluginRegistry.reset();
 		LSPWorkspaceManager.reset();
 		LSPXWorkspaceManager.reset();
 		DAPWorkspaceManager.reset();
-		EventHub.reset();
-		PluginRegistry.reset();
+		DAPXWorkspaceManager.reset();
 		lspManager = LSPWorkspaceManager.getInstance();
 		lspxManager = LSPXWorkspaceManager.getInstance();
 		dapManager = DAPWorkspaceManager.getInstance();
