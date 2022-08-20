@@ -40,8 +40,10 @@ import rpc.RPCRequest;
 import workspace.DAPWorkspaceManager;
 import workspace.DAPXWorkspaceManager;
 import workspace.Diag;
+import workspace.EventHub;
 import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
+import workspace.PluginRegistry;
 
 abstract public class LSPTest
 {
@@ -61,6 +63,8 @@ abstract public class LSPTest
 		LSPWorkspaceManager.reset();
 		LSPXWorkspaceManager.reset();
 		DAPWorkspaceManager.reset();
+		EventHub.reset();
+		PluginRegistry.reset();
 		lspManager = LSPWorkspaceManager.getInstance();
 		lspxManager = LSPXWorkspaceManager.getInstance();
 		dapManager = DAPWorkspaceManager.getInstance();
