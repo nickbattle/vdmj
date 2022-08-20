@@ -40,6 +40,7 @@ import vdmj.commands.Command;
 import workspace.EventHub;
 import workspace.PluginRegistry;
 import workspace.events.DAPEvent;
+import workspace.events.LSPEvent;
 import workspace.lenses.CodeLens;
 
 abstract public class AnalysisPlugin
@@ -79,10 +80,15 @@ abstract public class AnalysisPlugin
 	}
 
 	/**
-	 * This method is used to dispatch DAP events. This default method just returns an
+	 * These methods are used to dispatch LSP/DAP events. These default methods just return an
 	 * error, usually indicating that an event has been registered with the EventHub, but
 	 * no handler provided.
 	 */
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
+	{
+		return new RPCMessageList(event.request, RPCErrors.InternalError, "Plugin does not handle LSP events");
+	}
+
 	public DAPMessageList handleEvent(DAPEvent event) throws Exception
 	{
 		return new DAPMessageList(event.request, false, "Plugin does not handle DAP events", null);
