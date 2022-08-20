@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2022 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,45 +22,14 @@
  *
  ******************************************************************************/
 
-package plugins;
+package workspace.events;
 
-import rpc.RPCMessageList;
-import workspace.EventHub;
-import workspace.EventListener;
-import workspace.events.Event;
-import workspace.events.UnknownMethodEvent;
-import workspace.plugins.AnalysisPlugin;
+import rpc.RPCRequest;
 
-public class AnotherPlugin extends AnalysisPlugin implements EventListener
+public class UnknownMethodEvent extends Event
 {
-	public AnotherPlugin()
+	public UnknownMethodEvent(RPCRequest request)
 	{
-		super();
-	}
-	
-	@Override
-	public String getName()
-	{
-		return "Another";
-	}
-
-	@Override
-	public void init()
-	{
-		EventHub.getInstance().register(this, "unknownMethodEvent/slsp/another", this);
-	}
-
-	@Override
-	public RPCMessageList handleEvent(Event event) throws Exception
-	{
-		if (event instanceof UnknownMethodEvent &&
-			event.type.equals("unknownMethodEvent/slsp/another"))
-		{
-			return new RPCMessageList(event.request, "Handled method");
-		}
-		else
-		{
-			return null;
-		}
+		super("unknownMethodEvent/" + request.getMethod(), request);
 	}
 }

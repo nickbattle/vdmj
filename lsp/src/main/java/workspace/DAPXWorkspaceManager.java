@@ -24,6 +24,7 @@
 
 package workspace;
 
+import java.util.List;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
@@ -37,11 +38,13 @@ public class DAPXWorkspaceManager
 {
 	private static DAPXWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
+	private final EventHub eventhub;
 	private final DAPWorkspaceManager dapManager;
 	
 	protected DAPXWorkspaceManager()
 	{
 		this.registry = PluginRegistry.getInstance();
+		this.eventhub = EventHub.getInstance();
 		this.dapManager = DAPWorkspaceManager.getInstance();
 	}
 
@@ -101,16 +104,31 @@ public class DAPXWorkspaceManager
 
 	public DAPMessageList unhandledCommand(DAPRequest request)
 	{
-		AnalysisPlugin plugin = registry.getPluginForMethod(request.getCommand());
+		List<EventListener> plugins = eventhub.query("unknownMethodEvent/" + request.getCommand());
 		
-		if (plugin == null)
+		if (plugins == null)
 		{
 			Diag.error("No external plugin registered for " + request.getCommand());
 			return new DAPMessageList(request, false, "Unknown command: " + request.getCommand(), null);
 		}
 		else
 		{
-			return plugin.analyse(request);
+			/**
+			 * Ideally we would just let the EventHub dispatch the event and get the results, but
+			 * DAP processing uses DAPMessageLists etc, so we do it by hand for now.
+			 */
+			DAPMessageList results = new DAPMessageList();
+			
+			for (EventListener listener: plugins)
+			{
+				if (listener instanceof AnalysisPlugin)
+				{
+					AnalysisPlugin plugin = (AnalysisPlugin)listener;
+					results.addAll(plugin.analyse(request));
+				}
+			}
+			
+			return results;
 		}
 	}
 }

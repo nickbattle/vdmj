@@ -64,16 +64,8 @@ abstract public class AnalysisPlugin
 	abstract public void init();
 	
 	/**
-	 * External plugins claim to support specific LSP messages. This method
-	 * identifies whether the plugin supports the name passed.
-	 */
-	public boolean supportsMethod(String method)
-	{
-		return false;
-	}
-
-	/**
 	 * External plugins override these methods to implement their functionality.
+	 * The methods are invoked via an UnknownMethodEvent, which the plugins register for.
 	 */
 	public RPCMessageList analyse(RPCRequest request)
 	{

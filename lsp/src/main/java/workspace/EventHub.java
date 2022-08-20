@@ -84,6 +84,11 @@ public class EventHub
 		Diag.config("Registered %s event handler for event %s", plugin.getName(), event);
 	}
 	
+	public List<EventListener> query(String type)
+	{
+		return registrations.get(type);
+	}
+	
 	public RPCMessageList publish(Event event)
 	{
 		List<EventListener> list = registrations.get(event.type);

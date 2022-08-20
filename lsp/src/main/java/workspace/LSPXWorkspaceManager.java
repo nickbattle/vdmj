@@ -46,6 +46,7 @@ import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.events.UnknownMethodEvent;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.AnalysisPlugin;
 import workspace.plugins.CTPlugin;
@@ -56,11 +57,13 @@ public class LSPXWorkspaceManager
 {
 	private static LSPXWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
+	private final EventHub eventhub;
 	private final LSPWorkspaceManager wsManager;
 	
 	protected LSPXWorkspaceManager()
 	{
 		this.registry = PluginRegistry.getInstance();
+		this.eventhub = EventHub.getInstance();
 		this.wsManager = LSPWorkspaceManager.getInstance();
 	}
 
@@ -161,16 +164,17 @@ public class LSPXWorkspaceManager
 
 	public RPCMessageList unhandledMethod(RPCRequest request)
 	{
-		AnalysisPlugin plugin = registry.getPluginForMethod(request.getMethod());
+		UnknownMethodEvent event = new UnknownMethodEvent(request);
+		RPCMessageList results = eventhub.publish(event);
 		
-		if (plugin == null)
+		if (results.isEmpty())
 		{
 			Diag.error("No external plugin registered for " + request.getMethod());
 			return new RPCMessageList(request, RPCErrors.MethodNotFound, request.getMethod());
 		}
 		else
 		{
-			return plugin.analyse(request);
+			return results;
 		}
 	}
 
