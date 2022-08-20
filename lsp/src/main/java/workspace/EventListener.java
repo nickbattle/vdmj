@@ -24,8 +24,10 @@
 
 package workspace;
 
+import dap.DAPMessageList;
 import rpc.RPCMessageList;
-import workspace.events.Event;
+import workspace.events.DAPEvent;
+import workspace.events.LSPEvent;
 
 /**
  * An interface implemented by subscribers to the EventHub. 
@@ -33,5 +35,6 @@ import workspace.events.Event;
 public interface EventListener
 {
 	public String getName();
-	public RPCMessageList handleEvent(Event event) throws Exception;
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception;
+	public DAPMessageList handleEvent(DAPEvent event) throws Exception;
 }

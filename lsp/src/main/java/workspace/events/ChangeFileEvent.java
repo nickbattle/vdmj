@@ -28,7 +28,7 @@ import java.io.File;
 
 import rpc.RPCRequest;
 
-public class ChangeFileEvent extends Event
+public class ChangeFileEvent extends LSPEvent
 {
 	public final File file;
 	

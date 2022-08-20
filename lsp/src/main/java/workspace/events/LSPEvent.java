@@ -22,17 +22,24 @@
  *
  ******************************************************************************/
 
-package examples;
+package workspace.events;
 
-import rpc.RPCMessageList;
-import workspace.events.LSPEvent;
+import rpc.RPCRequest;
 
-public class ExamplePluginPR extends ExamplePlugin
+abstract public class LSPEvent
 {
-	@Override
-	public RPCMessageList handleEvent(LSPEvent event) throws Exception
+	public final String type;
+	public final RPCRequest request;
+	
+	protected LSPEvent(String type, RPCRequest request)
 	{
-		System.out.println("ExamplePluginPR got " + event);
-		return new RPCMessageList();
+		this.type = type;
+		this.request = request;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "LSP Event " + type;
 	}
 }

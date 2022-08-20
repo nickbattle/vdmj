@@ -25,12 +25,12 @@
 package examples;
 
 import rpc.RPCMessageList;
-import workspace.events.Event;
+import workspace.events.LSPEvent;
 
 public class ExamplePluginSL extends ExamplePlugin
 {
 	@Override
-	public RPCMessageList handleEvent(Event event) throws Exception
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
 		System.out.println("ExamplePluginSL got " + event);
 		return new RPCMessageList();

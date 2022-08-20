@@ -43,7 +43,7 @@ import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;
 import workspace.PluginRegistry;
-import workspace.events.Event;
+import workspace.events.LSPEvent;
 import workspace.plugins.AnalysisPlugin;
 import workspace.plugins.TCPlugin;
 
@@ -79,16 +79,18 @@ public class V2CPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		EventHub.getInstance().register(this, "unknownMethodEvent/slsp/v2c", this);
+		EventHub.getInstance().register(this, "unknownMethodEvent", this);
+		EventHub.getInstance().register(this, "unknownCommandEvent", this);
 	}
 	
 	/**
 	 * This method is called when unknownMethodEvent/slsp/v2c events are raised.
 	 */
 	@Override
-	public RPCMessageList handleEvent(Event event) throws Exception
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		if (event.type.equals("unknownMethodEvent/slsp/v2c"))
+		if (event.type.equals("unknownMethodEvent") &&
+			event.request.getMethod().equals("slsp/v2c"))
 		{
 			return analyse(event.request);
 		}

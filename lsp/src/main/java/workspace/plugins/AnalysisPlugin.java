@@ -39,6 +39,7 @@ import rpc.RPCRequest;
 import vdmj.commands.Command;
 import workspace.EventHub;
 import workspace.PluginRegistry;
+import workspace.events.DAPEvent;
 import workspace.lenses.CodeLens;
 
 abstract public class AnalysisPlugin
@@ -75,6 +76,16 @@ abstract public class AnalysisPlugin
 	public DAPMessageList analyse(DAPRequest request)
 	{
 		return new DAPMessageList(request, false, "Plugin does not support analysis", null);
+	}
+
+	/**
+	 * This method is used to dispatch DAP events. This default method just returns an
+	 * error, usually indicating that an event has been registered with the EventHub, but
+	 * no handler provided.
+	 */
+	public DAPMessageList handleEvent(DAPEvent event) throws Exception
+	{
+		return new DAPMessageList(event.request, false, "Plugin does not handle DAP events", null);
 	}
 
 	/**

@@ -334,6 +334,6 @@ public class TranslateTest extends LSPTest
 		response = handler.request(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		assertEquals("Handled method", response.get(0).getPath("result"));
+		assertEquals("Handled LSP method", response.get(0).getPath("result"));
 	}
 }

@@ -35,7 +35,7 @@ import rpc.RPCMessageList;
 import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.CheckFilesEvent;
-import workspace.events.Event;
+import workspace.events.LSPEvent;
 
 abstract public class INPlugin extends AnalysisPlugin implements EventListener
 {
@@ -76,7 +76,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 
 
 	@Override
-	public RPCMessageList handleEvent(Event event) throws Exception
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
 		if (event instanceof CheckFilesEvent)
 		{

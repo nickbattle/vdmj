@@ -24,14 +24,14 @@
 
 package workspace.events;
 
-import rpc.RPCRequest;
+import dap.DAPRequest;
 
-abstract public class Event
+abstract public class DAPEvent
 {
 	public final String type;
-	public final RPCRequest request;
+	public final DAPRequest request;
 	
-	protected Event(String type, RPCRequest request)
+	protected DAPEvent(String type, DAPRequest request)
 	{
 		this.type = type;
 		this.request = request;
@@ -40,6 +40,6 @@ abstract public class Event
 	@Override
 	public String toString()
 	{
-		return "Event " + type;
+		return "DAP Event " + type;
 	}
 }

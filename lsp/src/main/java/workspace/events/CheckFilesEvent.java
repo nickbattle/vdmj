@@ -29,7 +29,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.messages.VDMMessage;
 
-public class CheckFilesEvent extends Event
+public class CheckFilesEvent extends LSPEvent
 {
 	private final List<VDMMessage> errs = new Vector<VDMMessage>();
 	private final List<VDMMessage> warns = new Vector<VDMMessage>();

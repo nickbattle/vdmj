@@ -26,10 +26,10 @@ package workspace.events;
 
 import rpc.RPCRequest;
 
-public class UnknownMethodEvent extends Event
+public class UnknownMethodEvent extends LSPEvent
 {
 	public UnknownMethodEvent(RPCRequest request)
 	{
-		super("unknownMethodEvent/" + request.getMethod(), request);
+		super("unknownMethodEvent", request);
 	}
 }

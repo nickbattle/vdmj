@@ -26,7 +26,7 @@ package workspace.events;
 
 import rpc.RPCRequest;
 
-public class ShutdownEvent extends Event
+public class ShutdownEvent extends LSPEvent
 {
 	public ShutdownEvent(RPCRequest request)
 	{

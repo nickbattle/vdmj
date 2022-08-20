@@ -117,22 +117,20 @@ public class ExecuteTest extends DAPTest
 
 		dap.UnknownHandler handler = new dap.UnknownHandler();
 
-		DAPRequest request = new DAPRequest(new JSONObject("type", "request", "command", "unknown"));
+		DAPRequest request = new DAPRequest(new JSONObject("type", "request", "command", "sdap/unknown"));
 
 		DAPMessageList response = handler.run(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		System.out.println("^^^");
-		assertEquals("Unknown command: unknown", response.get(0).getPath("message"));
+		assertEquals("Unknown command: sdap/unknown", response.get(0).getPath("message"));
 		assertEquals(false, response.get(0).getPath("success"));
 
-		request = new DAPRequest(new JSONObject("type", "request", "command", "slsp/another"));
+		request = new DAPRequest(new JSONObject("type", "request", "command", "sdap/another"));
 
 		response = handler.run(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		System.out.println("^^^");
-		assertEquals("Plugin does not support analysis", response.get(0).getPath("message"));
-		assertEquals(false, response.get(0).getPath("success"));
+		assertEquals("Handled DAP command", response.get(0).getPath("message"));
+		assertEquals(true, response.get(0).getPath("success"));
 	}
 }

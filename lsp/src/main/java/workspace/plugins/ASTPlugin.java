@@ -57,7 +57,7 @@ import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.ChangeFileEvent;
 import workspace.events.CheckFilesEvent;
-import workspace.events.Event;
+import workspace.events.LSPEvent;
 import workspace.lenses.ASTLaunchDebugLens;
 import workspace.lenses.CodeLens;
 
@@ -107,7 +107,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	public RPCMessageList handleEvent(Event event) throws Exception
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
 		if (event instanceof ChangeFileEvent)
 		{

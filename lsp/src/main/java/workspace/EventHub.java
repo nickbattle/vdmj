@@ -29,8 +29,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import dap.DAPMessageList;
 import rpc.RPCMessageList;
-import workspace.events.Event;
+import workspace.events.DAPEvent;
+import workspace.events.LSPEvent;
 import workspace.plugins.AnalysisPlugin;
 
 /**
@@ -89,7 +91,7 @@ public class EventHub
 		return registrations.get(type);
 	}
 	
-	public RPCMessageList publish(Event event)
+	public RPCMessageList publish(LSPEvent event)
 	{
 		List<EventListener> list = registrations.get(event.type);
 		RPCMessageList responses = new RPCMessageList();
@@ -102,6 +104,44 @@ public class EventHub
 				{
 					Diag.fine("Invoking %s event handler for %s", listener.getName(), event.type);
 					RPCMessageList response = listener.handleEvent(event);
+					
+					if (response == null)
+					{
+						throw new Exception("Handler returned null rather than empty response");
+					}
+					
+					responses.addAll(response);
+				}
+				catch (Exception e)
+				{
+					Diag.error(e);
+					Diag.error("Error in s event handler for %s", listener.getName(), event.type);
+				}
+	
+				Diag.fine("Completed %s event handler for %s", listener.getName(), event.type);
+			}
+		}
+		else
+		{
+			Diag.fine("No plugins registered for %s", event.type);
+		}
+		
+		return responses;
+	}
+	
+	public DAPMessageList publish(DAPEvent event)
+	{
+		List<EventListener> list = registrations.get(event.type);
+		DAPMessageList responses = new DAPMessageList();
+
+		if (list != null)
+		{
+			for (EventListener listener: list)
+			{
+				try
+				{
+					Diag.fine("Invoking %s event handler for %s", listener.getName(), event.type);
+					DAPMessageList response = listener.handleEvent(event);
 					
 					if (response == null)
 					{

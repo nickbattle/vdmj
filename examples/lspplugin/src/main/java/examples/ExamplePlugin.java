@@ -31,7 +31,7 @@ import rpc.RPCMessageList;
 import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;
-import workspace.events.Event;
+import workspace.events.LSPEvent;
 import workspace.plugins.AnalysisPlugin;
 
 abstract public class ExamplePlugin extends AnalysisPlugin implements EventListener
@@ -79,5 +79,5 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	}
 	
 	@Override
-	abstract public RPCMessageList handleEvent(Event event) throws Exception;
+	abstract public RPCMessageList handleEvent(LSPEvent event) throws Exception;
 }

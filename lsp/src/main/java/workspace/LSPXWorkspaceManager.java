@@ -164,8 +164,7 @@ public class LSPXWorkspaceManager
 
 	public RPCMessageList unhandledMethod(RPCRequest request)
 	{
-		UnknownMethodEvent event = new UnknownMethodEvent(request);
-		RPCMessageList results = eventhub.publish(event);
+		RPCMessageList results = eventhub.publish(new UnknownMethodEvent(request));
 		
 		if (results.isEmpty())
 		{

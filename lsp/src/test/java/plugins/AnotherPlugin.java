@@ -24,10 +24,15 @@
 
 package plugins;
 
+import dap.DAPMessageList;
+import dap.DAPRequest;
 import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import workspace.EventHub;
 import workspace.EventListener;
-import workspace.events.Event;
+import workspace.events.DAPEvent;
+import workspace.events.LSPEvent;
+import workspace.events.UnknownCommandEvent;
 import workspace.events.UnknownMethodEvent;
 import workspace.plugins.AnalysisPlugin;
 
@@ -47,20 +52,47 @@ public class AnotherPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		EventHub.getInstance().register(this, "unknownMethodEvent/slsp/another", this);
+		EventHub.getInstance().register(this, "unknownMethodEvent", this);
+		EventHub.getInstance().register(this, "unknownCommandEvent", this);
 	}
 
 	@Override
-	public RPCMessageList handleEvent(Event event) throws Exception
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
 		if (event instanceof UnknownMethodEvent &&
-			event.type.equals("unknownMethodEvent/slsp/another"))
+			event.request.getMethod().equals("slsp/another"))
 		{
-			return new RPCMessageList(event.request, "Handled method");
+			return analyse(event.request);
 		}
 		else
 		{
-			return null;
+			return new RPCMessageList();
 		}
+	}
+
+	@Override
+	public DAPMessageList handleEvent(DAPEvent event) throws Exception
+	{
+		if (event instanceof UnknownCommandEvent &&
+			event.request.getCommand().equals("sdap/another"))
+		{
+			return analyse(event.request);
+		}
+		else
+		{
+			return new DAPMessageList();
+		}
+	}
+	
+	@Override
+	public RPCMessageList analyse(RPCRequest request)
+	{
+		return new RPCMessageList(request, "Handled LSP method");
+	}
+	
+	@Override
+	public DAPMessageList analyse(DAPRequest request)
+	{
+		return new DAPMessageList(request, true, "Handled DAP command", null);
 	}
 }

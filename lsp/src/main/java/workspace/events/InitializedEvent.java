@@ -26,7 +26,7 @@ package workspace.events;
 
 import rpc.RPCRequest;
 
-public class InitializedEvent extends Event
+public class InitializedEvent extends LSPEvent
 {
 	public InitializedEvent(RPCRequest request)
 	{

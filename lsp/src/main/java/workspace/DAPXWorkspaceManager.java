@@ -24,14 +24,13 @@
 
 package workspace;
 
-import java.util.List;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import lsp.LSPException;
 import lsp.Utils;
 import rpc.RPCErrors;
-import workspace.plugins.AnalysisPlugin;
+import workspace.events.UnknownCommandEvent;
 import workspace.plugins.CTPlugin;
 
 public class DAPXWorkspaceManager
@@ -104,31 +103,16 @@ public class DAPXWorkspaceManager
 
 	public DAPMessageList unhandledCommand(DAPRequest request)
 	{
-		List<EventListener> plugins = eventhub.query("unknownMethodEvent/" + request.getCommand());
+		DAPMessageList responses = eventhub.publish(new UnknownCommandEvent(request));
 		
-		if (plugins == null)
+		if (responses.isEmpty())
 		{
-			Diag.error("No external plugin registered for " + request.getCommand());
+			Diag.error("No external plugin registered for unknownMethodEvent (%s)", request.getCommand());
 			return new DAPMessageList(request, false, "Unknown command: " + request.getCommand(), null);
 		}
 		else
 		{
-			/**
-			 * Ideally we would just let the EventHub dispatch the event and get the results, but
-			 * DAP processing uses DAPMessageLists etc, so we do it by hand for now.
-			 */
-			DAPMessageList results = new DAPMessageList();
-			
-			for (EventListener listener: plugins)
-			{
-				if (listener instanceof AnalysisPlugin)
-				{
-					AnalysisPlugin plugin = (AnalysisPlugin)listener;
-					results.addAll(plugin.analyse(request));
-				}
-			}
-			
-			return results;
+			return responses;
 		}
 	}
 }
