@@ -83,7 +83,8 @@ public class V2CPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	/**
-	 * This method is called when unknownMethodEvent/slsp/v2c events are raised.
+	 * This method is called when unknownMethodEvent, slsp/v2c events are raised.
+	 * They go via the unknownMethod handler, which sends an unknownMethodEvent.
 	 */
 	@Override
 	public RPCMessageList handleEvent(LSPEvent event) throws Exception
@@ -101,7 +102,7 @@ public class V2CPlugin extends AnalysisPlugin implements EventListener
 
 	/**
 	 * The analyse method is called when the LSP client sends a request that has a name
-	 * recognised by the supportsMethod method above. It is passed the JSON request and
+	 * recognised by the handleEvent method above. It is passed the JSON request and
 	 * returns a list of JSON responses.
 	 */
 	@Override
