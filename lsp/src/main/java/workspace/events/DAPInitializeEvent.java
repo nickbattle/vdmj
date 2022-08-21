@@ -22,26 +22,14 @@
  *
  ******************************************************************************/
 
-package examples;
+package workspace.events;
 
-import dap.DAPMessageList;
-import rpc.RPCMessageList;
-import workspace.events.DAPEvent;
-import workspace.events.LSPEvent;
+import dap.DAPRequest;
 
-public class ExamplePluginPR extends ExamplePlugin
+public class DAPInitializeEvent extends DAPEvent
 {
-	@Override
-	public RPCMessageList handleEvent(LSPEvent event) throws Exception
+	public DAPInitializeEvent(DAPRequest request)
 	{
-		System.out.println("ExamplePluginPR got " + event);
-		return new RPCMessageList();
-	}
-
-	@Override
-	public DAPMessageList handleEvent(DAPEvent event) throws Exception
-	{
-		System.out.println("ExamplePluginPR got " + event);
-		return new DAPMessageList();
+		super(request.getCommand(), request);
 	}
 }

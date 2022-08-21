@@ -78,6 +78,7 @@ import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
 import vdmj.commands.ScriptCommand;
+import workspace.events.DAPInitializeEvent;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
@@ -87,6 +88,7 @@ public class DAPWorkspaceManager
 {
 	private static DAPWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
+	private final EventHub eventhub;
 	
 	private JSONObject clientCapabilities;
 	private Boolean noDebug;
@@ -100,6 +102,7 @@ public class DAPWorkspaceManager
 	protected DAPWorkspaceManager()
 	{
 		this.registry = PluginRegistry.getInstance();
+		this.eventhub = EventHub.getInstance();
 	}
 
 	public static synchronized DAPWorkspaceManager getInstance()
@@ -133,6 +136,7 @@ public class DAPWorkspaceManager
 		DAPMessageList responses = new DAPMessageList();
 		responses.add(new DAPInitializeResponse(request));
 		responses.add(new DAPResponse("initialized", null));
+		responses.addAll(eventhub.publish(new DAPInitializeEvent(request)));
 		return responses;
 	}
 

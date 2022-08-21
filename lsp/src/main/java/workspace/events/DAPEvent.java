@@ -33,7 +33,7 @@ abstract public class DAPEvent
 	
 	protected DAPEvent(String type, DAPRequest request)
 	{
-		this.type = type;
+		this.type = "dap:" + type;
 		this.request = request;
 	}
 	

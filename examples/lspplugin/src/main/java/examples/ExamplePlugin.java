@@ -27,10 +27,12 @@ package examples;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
+import dap.DAPMessageList;
 import rpc.RPCMessageList;
 import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;
+import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
 import workspace.plugins.AnalysisPlugin;
 
@@ -79,10 +81,15 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		eventhub.register(this, "checkFilesEvent/typecheck", this);
 		eventhub.register(this, "checkFilesEvent/checked", this);
 		eventhub.register(this, "unknownMethodEvent", this);
-		eventhub.register(this, "unknownCommandEvent", this);
 		eventhub.register(this, "shutdown", this);
+
+		eventhub.register(this, "dap:initialize", this);
+		eventhub.register(this, "dap:unknownCommandEvent", this);
 	}
 	
 	@Override
 	abstract public RPCMessageList handleEvent(LSPEvent event) throws Exception;
+	
+	@Override
+	abstract public DAPMessageList handleEvent(DAPEvent event) throws Exception;
 }

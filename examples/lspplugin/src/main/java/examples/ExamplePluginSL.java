@@ -24,7 +24,9 @@
 
 package examples;
 
+import dap.DAPMessageList;
 import rpc.RPCMessageList;
+import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
 
 public class ExamplePluginSL extends ExamplePlugin
@@ -34,5 +36,12 @@ public class ExamplePluginSL extends ExamplePlugin
 	{
 		System.out.println("ExamplePluginSL got " + event);
 		return new RPCMessageList();
+	}
+
+	@Override
+	public DAPMessageList handleEvent(DAPEvent event) throws Exception
+	{
+		System.out.println("ExamplePluginPR got " + event);
+		return new DAPMessageList();
 	}
 }
