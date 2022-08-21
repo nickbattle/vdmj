@@ -34,26 +34,26 @@
         <module>examples</module>
     </modules>
 
-   	<dependencyManagement>
-   		<dependencies>
-	   		<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.13.1</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>dk.au.ece.vdmj</groupId>
-				<artifactId>vdmj</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-	        <dependency>
-	            <groupId>dk.au.ece.vdmj</groupId>
-	            <artifactId>lsp</artifactId>
-				<version>${project.version}</version>
-	        </dependency>
-		</dependencies>
-   	</dependencyManagement>
+       <dependencyManagement>
+           <dependencies>
+               <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.13.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>dk.au.ece.vdmj</groupId>
+                <artifactId>vdmj</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dk.au.ece.vdmj</groupId>
+                <artifactId>lsp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+       </dependencyManagement>
 
     <build>
         <pluginManagement>
@@ -63,13 +63,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.10.1</version>
-					<configuration>
-						<compilerArgs>
-							<arg>-Xlint:deprecation</arg>
-						</compilerArgs>
-						<source>1.8</source>
-						<target>1.8</target>
-					</configuration>
+                    <configuration>
+                        <compilerArgs>
+                            <arg>-Xlint:deprecation</arg>
+                        </compilerArgs>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
                 </plugin>
 
                 <!-- Attatch sources to all installed jars -->
@@ -107,7 +107,7 @@
                     <configuration>
                         <failOnError>false</failOnError>
                         <quiet>true</quiet>
-						<source>8</source>
+                        <source>8</source>
                     </configuration>
                 </plugin>
 
@@ -121,11 +121,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0-M6</version>
-					<configuration>
-						<includes>
-							<include>**/*Test.java</include>
-						</includes>
-					</configuration>
+                    <configuration>
+                        <includes>
+                            <include>**/*Test.java</include>
+                        </includes>
+                    </configuration>
                 </plugin>
 
                 <plugin>
@@ -179,25 +179,25 @@
             </plugins>
         </pluginManagement>
 
-		<finalName>
-			${project.artifactId}-${project.version}-${maven.build.timestamp}
-		</finalName>
+        <finalName>
+            ${project.artifactId}-${project.version}-${maven.build.timestamp}
+        </finalName>
 
-	    <plugins>
-			<plugin>
-				<groupId>com.outbrain.swinfra</groupId>
-				<artifactId>ci-friendly-flatten-maven-plugin</artifactId>
-				<version>1.0.14</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>clean</goal>
-							<goal>flatten</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-	    </plugins>
+        <plugins>
+            <plugin>
+                <groupId>com.outbrain.swinfra</groupId>
+                <artifactId>ci-friendly-flatten-maven-plugin</artifactId>
+                <version>1.0.14</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>clean</goal>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
     
 
@@ -256,14 +256,6 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                    </plugin>
-                    <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
                         <version>1.6.12</version>
@@ -291,12 +283,16 @@
                 </plugins>
             </build>
         </profile>
-
+    
         <profile>
             <id>au</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <properties>
+                <!-- Speeds up builds in development -->
+                <maven.javadoc.skip>true</maven.javadoc.skip>
+            </properties>
             <distributionManagement>
                 <repository>
                     <id>vdmj.overture.au.dk-central</id>
