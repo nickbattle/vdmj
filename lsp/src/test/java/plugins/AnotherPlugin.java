@@ -53,7 +53,7 @@ public class AnotherPlugin extends AnalysisPlugin implements EventListener
 	public void init()
 	{
 		EventHub.getInstance().register(this, "unknownMethodEvent", this);
-		EventHub.getInstance().register(this, "unknownCommandEvent", this);
+		EventHub.getInstance().register(this, "dap:unknownCommandEvent", this);
 	}
 
 	@Override

@@ -55,9 +55,6 @@ public class PluginRegistry
 		return INSTANCE;
 	}
 	
-	/**
-	 * This is only used by unit testing.
-	 */
 	public static void reset()
 	{
 		if (INSTANCE != null)

@@ -151,11 +151,9 @@ public class LSPWorkspaceManager
 		return INSTANCE;
 	}
 	
-	/**
-	 * This is only used by unit testing.
-	 */
 	public static void reset()
 	{
+		Diag.config("Resetting LSPWorkspaceManager, PluginRegistry and EventHub");
 		PluginRegistry.reset();
 		EventHub.reset();
 		INSTANCE = null;
@@ -1415,6 +1413,8 @@ public class LSPWorkspaceManager
 		eventhub.publish(new ShutdownEvent(request));
 		LSPServer.getInstance().setInitialized(false);
 		clearExternalFiles();
+		reset();	// Clear registry, eventhub and singleton
+		
 		return new RPCMessageList(request);
 	}
 
