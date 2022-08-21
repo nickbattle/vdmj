@@ -78,7 +78,11 @@ import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
 import vdmj.commands.ScriptCommand;
+import workspace.events.DAPDisconnectEvent;
+import workspace.events.DAPEvaluateEvent;
 import workspace.events.DAPInitializeEvent;
+import workspace.events.DAPLaunchEvent;
+import workspace.events.DAPTerminateEvent;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
@@ -182,7 +186,9 @@ public class DAPWorkspaceManager
 			
 			clearInterpreter();
 			processSettings(request);
-			
+
+			eventhub.publish(new DAPLaunchEvent(request));
+
 			return new DAPMessageList(request);
 		}
 		catch (Exception e)
@@ -338,6 +344,8 @@ public class DAPWorkspaceManager
 				Properties.rt_log_instvarchanges = true;
 				Diag.info("RT events now logged to %s", file.getAbsolutePath());
 			}
+			
+			eventhub.publish(new DAPLaunchEvent(request));
 			
 			if (remoteControl != null)
 			{
@@ -800,6 +808,8 @@ public class DAPWorkspaceManager
 			}
 		}
 		
+		eventhub.publish(new DAPEvaluateEvent(request));
+
 		return command.run(request);
 	}
 
@@ -858,6 +868,8 @@ public class DAPWorkspaceManager
 		SchedulableThread.terminateAll();
 		clearInterpreter();
 		restoreSettings();
+		eventhub.publish(new DAPDisconnectEvent(request));
+
 		DAPMessageList result = new DAPMessageList(request);
 		return result;
 	}
@@ -887,6 +899,8 @@ public class DAPWorkspaceManager
 		
 		clearInterpreter();
 		restoreSettings();
+		eventhub.publish(new DAPTerminateEvent(request));
+
 		return result;
 	}
 	

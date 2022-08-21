@@ -84,6 +84,12 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		eventhub.register(this, "shutdown", this);
 
 		eventhub.register(this, "dap:initialize", this);
+		eventhub.register(this, "dap:launch", this);
+		eventhub.register(this, "dap:configurationDone", this);
+		eventhub.register(this, "dap:evaluate", this);
+		eventhub.register(this, "dap:disconnect", this);
+		eventhub.register(this, "dap:terminate", this);
+
 		eventhub.register(this, "dap:unknownCommandEvent", this);
 	}
 	
