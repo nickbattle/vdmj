@@ -70,7 +70,10 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		EventHub eventhub = EventHub.getInstance();
 		eventhub.register(this, "initialize", this);
 		eventhub.register(this, "initialized", this);
+		eventhub.register(this, "textDocument/didOpen", this);
 		eventhub.register(this, "textDocument/didChange", this);
+		eventhub.register(this, "textDocument/didClose", this);
+		eventhub.register(this, "textDocument/didSave", this);
 		eventhub.register(this, "checkFilesEvent/prepare", this);
 		eventhub.register(this, "checkFilesEvent/syntax", this);
 		eventhub.register(this, "checkFilesEvent/typecheck", this);
