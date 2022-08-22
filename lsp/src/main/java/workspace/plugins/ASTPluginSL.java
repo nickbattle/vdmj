@@ -46,7 +46,7 @@ import json.JSONArray;
 import lsp.textdocument.SymbolKind;
 import workspace.DiagUtils;
 import workspace.LSPWorkspaceManager;
-import workspace.events.CheckFilesEvent;
+import workspace.events.CheckPrepareEvent;
 import workspace.lenses.CodeLens;
 
 public class ASTPluginSL extends ASTPlugin
@@ -60,7 +60,7 @@ public class ASTPluginSL extends ASTPlugin
 	}
 	
 	@Override
-	protected void preCheck(CheckFilesEvent ev)
+	protected void preCheck(CheckPrepareEvent ev)
 	{
 		super.preCheck(ev);
 		astModuleList = new ASTModuleList();

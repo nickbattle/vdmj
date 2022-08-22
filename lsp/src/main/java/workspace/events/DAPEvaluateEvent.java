@@ -24,6 +24,8 @@
 
 package workspace.events;
 
+import java.io.IOException;
+
 import dap.DAPRequest;
 import json.JSONObject;
 
@@ -31,9 +33,19 @@ public class DAPEvaluateEvent extends DAPEvent
 {
 	public DAPEvaluateEvent(DAPRequest request)
 	{
-		super(request.getCommand(), request);
+		super(request);
 	}
 	
+	public DAPEvaluateEvent(String launchCommand) throws IOException
+	{
+		// Simulate a request for "print <expression>"
+		super(new DAPRequest(
+			new JSONObject(
+				"type", "request",
+				"command", "evaluate",
+				"arguments", new JSONObject("expression", launchCommand))));
+	}
+
 	@Override
 	public String toString()
 	{

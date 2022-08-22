@@ -55,7 +55,8 @@ import rpc.RPCResponse;
 import workspace.DAPWorkspaceManager;
 import workspace.Diag;
 import workspace.EventListener;
-import workspace.events.CheckFilesEvent;
+import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckPrepareEvent;
 import workspace.events.LSPEvent;
 
 abstract public class CTPlugin extends AnalysisPlugin implements EventListener
@@ -104,8 +105,8 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		eventhub.register("checkFilesEvent/prepare", this);
-		eventhub.register("checkFilesEvent/checked", this);
+		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckCompleteEvent.class, this);
 	}
 	
 	@Override
@@ -117,34 +118,24 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		if (event instanceof CheckFilesEvent)
+		if (event instanceof CheckPrepareEvent)
 		{
-			CheckFilesEvent ev = (CheckFilesEvent)event;
-			
-			switch (ev.type)
-			{
-				case "checkFilesEvent/prepare":
-					preCheck(ev);
-					return new RPCMessageList();
-
-				case "checkFilesEvent/checked":
-					INPlugin in = registry.getPlugin("IN");
-					checkLoadedFiles(in.getIN());
-					return new RPCMessageList();
-
-				default:
-					Diag.error("Unhandled %s CheckFilesEvent %s", getName(), event);
-					return new RPCMessageList();
-			}
+			preCheck((CheckPrepareEvent) event);
+		}
+		else if (event instanceof CheckCompleteEvent)
+		{ 
+			INPlugin in = registry.getPlugin("IN");
+			checkLoadedFiles(in.getIN());
 		}
 		else
 		{
 			Diag.error("Unhandled %s event %s", getName(), event);
-			return null;
 		}
+		
+		return null;
 	}
 
-	protected void preCheck(CheckFilesEvent ev)
+	protected void preCheck(CheckPrepareEvent event)
 	{
 		if (traceExecutor != null && traceRunning)
 		{

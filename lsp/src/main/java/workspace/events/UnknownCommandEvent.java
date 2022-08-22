@@ -30,6 +30,6 @@ public class UnknownCommandEvent extends DAPEvent
 {
 	public UnknownCommandEvent(DAPRequest request)
 	{
-		super("unknownCommandEvent", request);
+		super(request);
 	}
 }

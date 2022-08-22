@@ -26,20 +26,18 @@ package workspace.events;
 
 import dap.DAPRequest;
 
-abstract public class DAPEvent
+abstract public class DAPEvent extends Event
 {
-	public final String type;
 	public final DAPRequest request;
 	
-	protected DAPEvent(String type, DAPRequest request)
+	protected DAPEvent(DAPRequest request)
 	{
-		this.type = "dap:" + type;
 		this.request = request;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "DAP Event " + type;
+		return "DAP Event " + getKey();
 	}
 }

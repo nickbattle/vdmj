@@ -30,6 +30,6 @@ public class UnknownMethodEvent extends LSPEvent
 {
 	public UnknownMethodEvent(RPCRequest request)
 	{
-		super("unknownMethodEvent", request);
+		super(request);
 	}
 }

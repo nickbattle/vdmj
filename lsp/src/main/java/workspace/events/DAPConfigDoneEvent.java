@@ -24,14 +24,12 @@
 
 package workspace.events;
 
-import java.io.File;
+import dap.DAPRequest;
 
-import rpc.RPCRequest;
-
-public class OpenFileEvent extends AbstractFileEvent
+public class DAPConfigDoneEvent extends DAPEvent
 {
-	public OpenFileEvent(RPCRequest request, File file)
+	public DAPConfigDoneEvent(DAPRequest request)
 	{
-		super(request, file);
+		super(request);
 	}
 }

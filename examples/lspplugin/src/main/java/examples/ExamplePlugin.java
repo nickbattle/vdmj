@@ -32,8 +32,27 @@ import rpc.RPCMessageList;
 import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;
+import workspace.events.ChangeFileEvent;
+import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckSyntaxEvent;
+import workspace.events.CheckTypeEvent;
+import workspace.events.CloseFileEvent;
+import workspace.events.DAPConfigDoneEvent;
+import workspace.events.DAPDisconnectEvent;
+import workspace.events.DAPEvaluateEvent;
 import workspace.events.DAPEvent;
+import workspace.events.DAPInitializeEvent;
+import workspace.events.DAPLaunchEvent;
+import workspace.events.DAPTerminateEvent;
+import workspace.events.InitializeEvent;
+import workspace.events.InitializedEvent;
 import workspace.events.LSPEvent;
+import workspace.events.OpenFileEvent;
+import workspace.events.SaveFileEvent;
+import workspace.events.ShutdownEvent;
+import workspace.events.UnknownCommandEvent;
+import workspace.events.UnknownMethodEvent;
 import workspace.plugins.AnalysisPlugin;
 
 abstract public class ExamplePlugin extends AnalysisPlugin implements EventListener
@@ -64,27 +83,27 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	public void init()
 	{
 		EventHub eventhub = EventHub.getInstance();
-		eventhub.register("initialize", this);
-		eventhub.register("initialized", this);
-		eventhub.register("textDocument/didOpen", this);
-		eventhub.register("textDocument/didChange", this);
-		eventhub.register("textDocument/didClose", this);
-		eventhub.register("textDocument/didSave", this);
-		eventhub.register("checkFilesEvent/prepare", this);
-		eventhub.register("checkFilesEvent/syntax", this);
-		eventhub.register("checkFilesEvent/typecheck", this);
-		eventhub.register("checkFilesEvent/checked", this);
-		eventhub.register("unknownMethodEvent", this);
-		eventhub.register("shutdown", this);
+		eventhub.register(InitializeEvent.class, this);
+		eventhub.register(InitializedEvent.class, this);
+		eventhub.register(OpenFileEvent.class, this);
+		eventhub.register(ChangeFileEvent.class, this);
+		eventhub.register(CloseFileEvent.class, this);
+		eventhub.register(SaveFileEvent.class, this);
+		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckSyntaxEvent.class, this);
+		eventhub.register(CheckTypeEvent.class, this);
+		eventhub.register(CheckCompleteEvent.class, this);
+		eventhub.register(UnknownMethodEvent.class, this);
+		eventhub.register(ShutdownEvent.class, this);
 
-		eventhub.register("dap:initialize", this);
-		eventhub.register("dap:launch", this);
-		eventhub.register("dap:configurationDone", this);
-		eventhub.register("dap:evaluate", this);
-		eventhub.register("dap:disconnect", this);
-		eventhub.register("dap:terminate", this);
+		eventhub.register(DAPInitializeEvent.class, this);
+		eventhub.register(DAPLaunchEvent.class, this);
+		eventhub.register(DAPConfigDoneEvent.class, this);
+		eventhub.register(DAPEvaluateEvent.class, this);
+		eventhub.register(DAPDisconnectEvent.class, this);
+		eventhub.register(DAPTerminateEvent.class, this);
 
-		eventhub.register("dap:unknownCommandEvent", this);
+		eventhub.register(UnknownCommandEvent.class, this);
 	}
 
 	@Override

@@ -30,6 +30,6 @@ public class DAPInitializeEvent extends DAPEvent
 {
 	public DAPInitializeEvent(DAPRequest request)
 	{
-		super(request.getCommand(), request);
+		super(request);
 	}
 }

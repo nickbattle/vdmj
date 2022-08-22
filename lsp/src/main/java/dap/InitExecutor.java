@@ -33,6 +33,8 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import vdmj.commands.Command;
 import vdmj.commands.InitRunnable;
 import workspace.Diag;
+import workspace.EventHub;
+import workspace.events.DAPEvaluateEvent;
 
 public class InitExecutor extends AsyncExecutor
 {
@@ -84,6 +86,7 @@ public class InitExecutor extends AsyncExecutor
 			
 			if (command instanceof InitRunnable)
 			{
+				EventHub.getInstance().publish(new DAPEvaluateEvent(launchCommand));
 				InitRunnable initcmd = (InitRunnable)command;
 				running = initcmd.getExpression();
 				String launchResult = initcmd.initRun(request);

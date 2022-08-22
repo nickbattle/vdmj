@@ -30,6 +30,6 @@ public class ShutdownEvent extends LSPEvent
 {
 	public ShutdownEvent(RPCRequest request)
 	{
-		super(request.getMethod(), request);
+		super(request);
 	}
 }

@@ -54,7 +54,8 @@ import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
 import workspace.Diag;
 import workspace.EventListener;
-import workspace.events.CheckFilesEvent;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckTypeEvent;
 import workspace.events.LSPEvent;
 import workspace.lenses.CodeLens;
 import workspace.lenses.TCLaunchDebugLens;
@@ -95,34 +96,26 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		eventhub.register("checkFilesEvent/prepare", this);
-		eventhub.register("checkFilesEvent/typecheck", this);
+		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckTypeEvent.class, this);
 	}
 
 	@Override
 	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		if (event instanceof CheckFilesEvent)
+		if (event instanceof CheckPrepareEvent)
 		{
-			CheckFilesEvent ev = (CheckFilesEvent)event;
-			
-			switch (ev.type)
-			{
-				case "checkFilesEvent/prepare":
-					preCheck(ev);
-					return new RPCMessageList();
-
-				case "checkFilesEvent/typecheck":
-					ASTPlugin ast = registry.getPlugin("AST");
-					checkLoadedFiles(ast.getAST());
-					ev.addErrs(errs);
-					ev.addWarns(warns);
-					return new RPCMessageList();
-
-				default:
-					Diag.error("Unhandled %s CheckFilesEvent %s", getName(), event);
-					return new RPCMessageList();
-			}
+			preCheck((CheckPrepareEvent)event);
+			return new RPCMessageList();
+		}
+		else if (event instanceof CheckTypeEvent)
+		{
+			CheckTypeEvent ev = (CheckTypeEvent)event;
+			ASTPlugin ast = registry.getPlugin("AST");
+			checkLoadedFiles(ast.getAST());
+			ev.addErrs(errs);
+			ev.addWarns(warns);
+			return new RPCMessageList();
 		}
 		else
 		{
@@ -131,7 +124,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
-	protected void preCheck(CheckFilesEvent ev)
+	protected void preCheck(CheckPrepareEvent ev)
 	{
 		errs.clear();
 		warns.clear();

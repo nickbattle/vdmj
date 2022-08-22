@@ -78,6 +78,7 @@ import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
 import vdmj.commands.ScriptCommand;
+import workspace.events.DAPConfigDoneEvent;
 import workspace.events.DAPDisconnectEvent;
 import workspace.events.DAPEvaluateEvent;
 import workspace.events.DAPInitializeEvent;
@@ -345,7 +346,7 @@ public class DAPWorkspaceManager
 				Diag.info("RT events now logged to %s", file.getAbsolutePath());
 			}
 			
-			eventhub.publish(new DAPLaunchEvent(request));
+			eventhub.publish(new DAPConfigDoneEvent(request));
 			
 			if (remoteControl != null)
 			{

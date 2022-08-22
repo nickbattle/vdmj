@@ -24,14 +24,13 @@
 
 package workspace.events;
 
-import java.io.File;
-
-import rpc.RPCRequest;
-
-public class OpenFileEvent extends AbstractFileEvent
+/**
+ * The root of LSP and DAP events.
+ */
+abstract public class Event
 {
-	public OpenFileEvent(RPCRequest request, File file)
+	public String getKey()
 	{
-		super(request, file);
+		return this.getClass().getName();
 	}
 }

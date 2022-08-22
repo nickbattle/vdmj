@@ -45,7 +45,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
-import workspace.events.CheckFilesEvent;
+import workspace.events.CheckPrepareEvent;
 import workspace.lenses.CodeLens;
 
 public class TCPluginPR extends TCPlugin
@@ -64,7 +64,7 @@ public class TCPluginPR extends TCPlugin
 	}
 
 	@Override
-	protected void preCheck(CheckFilesEvent ev)
+	protected void preCheck(CheckPrepareEvent ev)
 	{
 		super.preCheck(ev);
 		tcClassList = new TCClassList();

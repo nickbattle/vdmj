@@ -32,6 +32,7 @@ import java.util.Vector;
 import dap.DAPMessageList;
 import rpc.RPCMessageList;
 import workspace.events.DAPEvent;
+import workspace.events.Event;
 import workspace.events.LSPEvent;
 
 /**
@@ -68,28 +69,29 @@ public class EventHub
 		}
 	}
 	
-	public synchronized void register(String event, EventListener listener)
+	public synchronized void register(Class<? extends Event> eventClass, EventListener listener)
 	{
-		List<EventListener> list = registrations.get(event);
+		String key = eventClass.getName();
+		List<EventListener> list = registrations.get(key);
 		
 		if (list == null)
 		{
 			list = new Vector<EventListener>();
-			registrations.put(event, list);
+			registrations.put(key, list);
 		}
 		
 		list.add(listener);	// registration order
-		Diag.config("Registered %s event handler for event %s", listener.getName(), event);
+		Diag.config("Registered %s event handler for event %s", listener.getName(), key);
 	}
 	
-	public List<EventListener> query(String type)
+	public List<EventListener> query(Event type)
 	{
-		return registrations.get(type);
+		return registrations.get(type.getKey());
 	}
 	
 	public RPCMessageList publish(LSPEvent event)
 	{
-		List<EventListener> list = registrations.get(event.type);
+		List<EventListener> list = registrations.get(event.getKey());
 		RPCMessageList responses = new RPCMessageList();
 
 		if (list != null)
@@ -98,7 +100,7 @@ public class EventHub
 			{
 				try
 				{
-					Diag.fine("Invoking %s event handler for %s", listener.getName(), event.type);
+					Diag.fine("Invoking %s event handler for %s", listener.getName(), event.getKey());
 					RPCMessageList response = listener.handleEvent(event);
 					
 					if (response != null)
@@ -109,15 +111,13 @@ public class EventHub
 				catch (Exception e)
 				{
 					Diag.error(e);
-					Diag.error("Error in s event handler for %s", listener.getName(), event.type);
+					Diag.error("Error in s event handler for %s", listener.getName(), event.getKey());
 				}
-	
-				Diag.fine("Completed %s event handler for %s", listener.getName(), event.type);
 			}
 		}
 		else
 		{
-			Diag.fine("No plugins registered for %s", event.type);
+			Diag.fine("No plugins registered for %s", event.getKey());
 		}
 		
 		return responses;
@@ -125,7 +125,7 @@ public class EventHub
 	
 	public DAPMessageList publish(DAPEvent event)
 	{
-		List<EventListener> list = registrations.get(event.type);
+		List<EventListener> list = registrations.get(event.getKey());
 		DAPMessageList responses = new DAPMessageList();
 
 		if (list != null)
@@ -134,7 +134,7 @@ public class EventHub
 			{
 				try
 				{
-					Diag.fine("Invoking %s event handler for %s", listener.getName(), event.type);
+					Diag.fine("Invoking %s event handler for %s", listener.getName(), event.getKey());
 					DAPMessageList response = listener.handleEvent(event);
 					
 					if (response != null)
@@ -145,15 +145,13 @@ public class EventHub
 				catch (Exception e)
 				{
 					Diag.error(e);
-					Diag.error("Error in s event handler for %s", listener.getName(), event.type);
+					Diag.error("Error in s event handler for %s", listener.getName(), event.getKey());
 				}
-	
-				Diag.fine("Completed %s event handler for %s", listener.getName(), event.type);
 			}
 		}
 		else
 		{
-			Diag.fine("No plugins registered for %s", event.type);
+			Diag.fine("No plugins registered for %s", event.getKey());
 		}
 		
 		return responses;

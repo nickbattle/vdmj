@@ -50,7 +50,7 @@ import lsp.textdocument.SymbolKind;
 import workspace.Diag;
 import workspace.DiagUtils;
 import workspace.LSPWorkspaceManager;
-import workspace.events.CheckFilesEvent;
+import workspace.events.CheckPrepareEvent;
 import workspace.lenses.CodeLens;
 
 public class ASTPluginPR extends ASTPlugin
@@ -64,7 +64,7 @@ public class ASTPluginPR extends ASTPlugin
 	}
 	
 	@Override
-	protected void preCheck(CheckFilesEvent ev)
+	protected void preCheck(CheckPrepareEvent ev)
 	{
 		super.preCheck(ev);
 		astClassList = new ASTClassList();

@@ -78,7 +78,10 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.events.ChangeFileEvent;
-import workspace.events.CheckFilesEvent;
+import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckSyntaxEvent;
+import workspace.events.CheckTypeEvent;
 import workspace.events.CloseFileEvent;
 import workspace.events.InitializeEvent;
 import workspace.events.InitializedEvent;
@@ -565,25 +568,25 @@ public class LSPWorkspaceManager
 	private RPCMessageList checkLoadedFilesSafe(String reason) throws Exception
 	{
 		Diag.info("Checking loaded files (%s)...", reason);
-		eventhub.publish(new CheckFilesEvent("prepare"));
+		eventhub.publish(new CheckPrepareEvent());
 
 		RPCMessageList results = new RPCMessageList();
 		List<VDMMessage> diags = new Vector<VDMMessage>();
 		boolean hasErrors = false;
 
-		CheckFilesEvent syntax = new CheckFilesEvent("syntax");
+		CheckSyntaxEvent syntax = new CheckSyntaxEvent();
 		results.addAll(eventhub.publish(syntax));
 		diags.addAll(syntax.getMessages());
 		
 		if (!syntax.hasErrs())
 		{
-			CheckFilesEvent typecheck = new CheckFilesEvent("typecheck");
+			CheckTypeEvent typecheck = new CheckTypeEvent();
 			results.addAll(eventhub.publish(typecheck));
 			diags.addAll(typecheck.getMessages());
 
 			if (!typecheck.hasErrs())
 			{
-				CheckFilesEvent runtime = new CheckFilesEvent("checked");
+				CheckCompleteEvent runtime = new CheckCompleteEvent();
 				results.addAll(eventhub.publish(runtime));
 				diags.addAll(runtime.getMessages());
 

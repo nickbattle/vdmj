@@ -36,7 +36,7 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-import workspace.events.CheckFilesEvent;
+import workspace.events.CheckPrepareEvent;
 
 public class INPluginPR extends INPlugin
 {
@@ -55,7 +55,7 @@ public class INPluginPR extends INPlugin
 	}
 
 	@Override
-	public void preCheck(CheckFilesEvent ev)
+	public void preCheck(CheckPrepareEvent ev)
 	{
 		super.preCheck(ev);
 		inClassList = new INClassList();

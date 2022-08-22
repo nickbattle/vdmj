@@ -26,20 +26,18 @@ package workspace.events;
 
 import rpc.RPCRequest;
 
-abstract public class LSPEvent
+abstract public class LSPEvent extends Event
 {
-	public final String type;
 	public final RPCRequest request;
 	
-	protected LSPEvent(String type, RPCRequest request)
+	protected LSPEvent(RPCRequest request)
 	{
-		this.type = type;
 		this.request = request;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "LSP Event " + type;
+		return "LSP Event " + getKey();
 	}
 }

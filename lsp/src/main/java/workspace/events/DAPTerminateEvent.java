@@ -30,6 +30,6 @@ public class DAPTerminateEvent extends DAPEvent
 {
 	public DAPTerminateEvent(DAPRequest request)
 	{
-		super("terminate", request);	// getCommand is "quit"
+		super(request);	// getCommand is "quit"
 	}
 }

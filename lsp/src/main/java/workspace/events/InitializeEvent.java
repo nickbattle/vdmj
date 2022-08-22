@@ -30,6 +30,6 @@ public class InitializeEvent extends LSPEvent
 {
 	public InitializeEvent(RPCRequest request)
 	{
-		super(request.getMethod(), request);
+		super(request);
 	}
 }

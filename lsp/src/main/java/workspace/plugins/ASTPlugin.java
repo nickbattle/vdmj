@@ -56,7 +56,8 @@ import rpc.RPCMessageList;
 import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.ChangeFileEvent;
-import workspace.events.CheckFilesEvent;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckSyntaxEvent;
 import workspace.events.LSPEvent;
 import workspace.lenses.ASTLaunchDebugLens;
 import workspace.lenses.CodeLens;
@@ -100,9 +101,9 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		eventhub.register("textDocument/didChange", this);
-		eventhub.register("checkFilesEvent/prepare", this);
-		eventhub.register("checkFilesEvent/syntax", this);
+		eventhub.register(ChangeFileEvent.class, this);
+		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckSyntaxEvent.class, this);
 		this.dirty = false;
 	}
 	
@@ -113,26 +114,18 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		{
 			return didChange((ChangeFileEvent) event);
 		}
-		else if (event instanceof CheckFilesEvent)
+		else if (event instanceof CheckPrepareEvent)
 		{
-			CheckFilesEvent ev = (CheckFilesEvent)event;
-			
-			switch (ev.type)
-			{
-				case "checkFilesEvent/prepare":
-					preCheck(ev);
-					return new RPCMessageList();
-
-				case "checkFilesEvent/syntax":
-					checkLoadedFiles();
-					ev.addErrs(errs);
-					ev.addWarns(warns);
-					return new RPCMessageList();
-
-				default:
-					Diag.error("Unhandled %s CheckFilesEvent %s", getName(), event);
-					return new RPCMessageList();
-			}
+			preCheck((CheckPrepareEvent)event);
+			return null;
+		}
+		else if (event instanceof CheckSyntaxEvent)
+		{
+			CheckSyntaxEvent ev = (CheckSyntaxEvent)event;
+			checkLoadedFiles();
+			ev.addErrs(errs);
+			ev.addWarns(warns);
+			return null;
 		}
 		else
 		{
@@ -158,7 +151,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		return messages.diagnosticResponses(errors, files);
 	}
 	
-	protected void preCheck(CheckFilesEvent event)
+	protected void preCheck(CheckPrepareEvent ev)
 	{
 		errs.clear();
 		warns.clear();

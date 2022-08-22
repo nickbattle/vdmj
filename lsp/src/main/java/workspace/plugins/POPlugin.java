@@ -39,7 +39,8 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.EventListener;
-import workspace.events.CheckFilesEvent;
+import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckPrepareEvent;
 import workspace.events.LSPEvent;
 
 abstract public class POPlugin extends AnalysisPlugin implements EventListener
@@ -75,8 +76,8 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		eventhub.register("checkFilesEvent/prepare", this);
-		eventhub.register("checkFilesEvent/checked", this);
+		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckCompleteEvent.class, this);
 	}
 	
 	@Override
@@ -88,28 +89,19 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		if (event instanceof CheckFilesEvent)
+		if (event instanceof CheckPrepareEvent)
 		{
-			CheckFilesEvent ev = (CheckFilesEvent)event;
-			
-			switch (ev.type)
-			{
-				case "checkFilesEvent/prepare":
-					preCheck(ev);
-					return new RPCMessageList();
-
-				case "checkFilesEvent/checked":
-					TCPlugin tc = registry.getPlugin("TC");
-					checkLoadedFiles(tc.getTC());
-					RPCMessageList results = new RPCMessageList();
-					results.add(RPCRequest.notification("slsp/POG/updated",
-							new JSONObject("successful", tc.getErrs().isEmpty())));
-					return results;
-
-				default:
-					Diag.error("Unhandled %s CheckFilesEvent %s", getName(), event);
-					return new RPCMessageList();
-			}
+			preCheck((CheckPrepareEvent)event);
+			return new RPCMessageList();
+		}
+		if (event instanceof CheckCompleteEvent)
+		{
+			TCPlugin tc = registry.getPlugin("TC");
+			checkLoadedFiles(tc.getTC());
+			RPCMessageList results = new RPCMessageList();
+			results.add(RPCRequest.notification("slsp/POG/updated",
+					new JSONObject("successful", tc.getErrs().isEmpty())));
+			return results;
 		}
 		else
 		{
@@ -118,7 +110,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
-	protected void preCheck(CheckFilesEvent ev)
+	protected void preCheck(CheckPrepareEvent event)
 	{
 		// Nothing
 	}

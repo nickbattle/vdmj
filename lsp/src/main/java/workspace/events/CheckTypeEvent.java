@@ -24,14 +24,10 @@
 
 package workspace.events;
 
-import java.io.File;
-
-import rpc.RPCRequest;
-
-public class OpenFileEvent extends AbstractFileEvent
+public class CheckTypeEvent extends AbstractCheckFilesEvent
 {
-	public OpenFileEvent(RPCRequest request, File file)
+	public CheckTypeEvent()
 	{
-		super(request, file);
+		super();
 	}
 }

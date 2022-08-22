@@ -30,6 +30,6 @@ public class DAPDisconnectEvent extends DAPEvent
 {
 	public DAPDisconnectEvent(DAPRequest request)
 	{
-		super(request.getCommand(), request);
+		super(request);
 	}
 }

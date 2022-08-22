@@ -28,19 +28,10 @@ import java.io.File;
 
 import rpc.RPCRequest;
 
-public class ChangeFileEvent extends LSPEvent
+public class ChangeFileEvent extends AbstractFileEvent
 {
-	public final File file;
-	
 	public ChangeFileEvent(RPCRequest request, File file)
 	{
-		super(request.getMethod(), request);
-		this.file = file;
-	}
-	
-	@Override
-	public String toString()
-	{
-		return super.toString() + ", file " + file;
+		super(request, file);
 	}
 }
