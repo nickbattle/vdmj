@@ -33,7 +33,6 @@ import dap.DAPMessageList;
 import rpc.RPCMessageList;
 import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
-import workspace.plugins.AnalysisPlugin;
 
 /**
  * A singleton to control the publication of events from the WorkspaceManagers to
@@ -69,18 +68,18 @@ public class EventHub
 		}
 	}
 	
-	public synchronized void register(AnalysisPlugin plugin, String event, EventListener listener)
+	public synchronized void register(String event, EventListener listener)
 	{
 		List<EventListener> list = registrations.get(event);
 		
 		if (list == null)
 		{
 			list = new Vector<EventListener>();
+			registrations.put(event, list);
 		}
 		
 		list.add(listener);	// registration order
-		registrations.put(event, list);
-		Diag.config("Registered %s event handler for event %s", plugin.getName(), event);
+		Diag.config("Registered %s event handler for event %s", listener.getName(), event);
 	}
 	
 	public List<EventListener> query(String type)
@@ -102,12 +101,10 @@ public class EventHub
 					Diag.fine("Invoking %s event handler for %s", listener.getName(), event.type);
 					RPCMessageList response = listener.handleEvent(event);
 					
-					if (response == null)
+					if (response != null)
 					{
-						throw new Exception("Handler returned null rather than empty response");
+						responses.addAll(response);
 					}
-					
-					responses.addAll(response);
 				}
 				catch (Exception e)
 				{
@@ -140,12 +137,10 @@ public class EventHub
 					Diag.fine("Invoking %s event handler for %s", listener.getName(), event.type);
 					DAPMessageList response = listener.handleEvent(event);
 					
-					if (response == null)
+					if (response != null)
 					{
-						throw new Exception("Handler returned null rather than empty response");
+						responses.addAll(response);
 					}
-					
-					responses.addAll(response);
 				}
 				catch (Exception e)
 				{

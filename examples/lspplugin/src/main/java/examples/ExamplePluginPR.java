@@ -35,13 +35,19 @@ public class ExamplePluginPR extends ExamplePlugin
 	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
 		System.out.println("ExamplePluginPR got " + event);
-		return new RPCMessageList();
+		return null;
 	}
 
 	@Override
 	public DAPMessageList handleEvent(DAPEvent event) throws Exception
 	{
 		System.out.println("ExamplePluginPR got " + event);
-		return new DAPMessageList();
+		return null;
+	}
+
+	@Override
+	public String getName()
+	{
+		return "ExamplePluginPR";
 	}
 }

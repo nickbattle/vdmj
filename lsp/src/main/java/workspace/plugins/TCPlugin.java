@@ -95,8 +95,8 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		eventhub.register(this, "checkFilesEvent/prepare", this);
-		eventhub.register(this, "checkFilesEvent/typecheck", this);
+		eventhub.register("checkFilesEvent/prepare", this);
+		eventhub.register("checkFilesEvent/typecheck", this);
 	}
 
 	@Override
@@ -127,7 +127,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		else
 		{
 			Diag.error("Unhandled %s event %s", getName(), event);
-			return new RPCMessageList();
+			return null;
 		}
 	}
 

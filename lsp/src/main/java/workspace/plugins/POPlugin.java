@@ -75,8 +75,8 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		eventhub.register(this, "checkFilesEvent/prepare", this);
-		eventhub.register(this, "checkFilesEvent/checked", this);
+		eventhub.register("checkFilesEvent/prepare", this);
+		eventhub.register("checkFilesEvent/checked", this);
 	}
 	
 	@Override
@@ -114,7 +114,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		else
 		{
 			Diag.error("Unhandled %s event %s", getName(), event);
-			return new RPCMessageList();
+			return null;
 		}
 	}
 

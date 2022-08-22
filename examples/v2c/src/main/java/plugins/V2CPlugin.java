@@ -79,7 +79,7 @@ public class V2CPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		EventHub.getInstance().register(this, "unknownMethodEvent", this);
+		EventHub.getInstance().register("unknownMethodEvent", this);
 	}
 	
 	/**

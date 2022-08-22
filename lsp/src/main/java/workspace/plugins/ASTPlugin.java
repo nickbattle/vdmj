@@ -100,9 +100,9 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		eventhub.register(this, "textDocument/didChange", this);
-		eventhub.register(this, "checkFilesEvent/prepare", this);
-		eventhub.register(this, "checkFilesEvent/syntax", this);
+		eventhub.register("textDocument/didChange", this);
+		eventhub.register("checkFilesEvent/prepare", this);
+		eventhub.register("checkFilesEvent/syntax", this);
 		this.dirty = false;
 	}
 	
@@ -137,7 +137,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		else
 		{
 			Diag.error("Unhandled %s event %s", getName(), event);
-			return new RPCMessageList();
+			return null;
 		}
 	}
 	

@@ -116,12 +116,6 @@ public class LSPXWorkspaceManager
 				{
 					Class<?> clazz = Class.forName(plugin);
 					
-					if (Modifier.isAbstract(clazz.getModifiers()))
-					{
-						Diag.severe("Plugin class is abstract: %s", clazz.getName());
-						continue;
-					}
-
 					try
 					{
 						Method factory = clazz.getMethod("factory", Dialect.class);
@@ -133,6 +127,12 @@ public class LSPXWorkspaceManager
 					{
 						try
 						{
+							if (Modifier.isAbstract(clazz.getModifiers()))
+							{
+								Diag.severe("Plugin class is abstract: %s", clazz.getName());
+								continue;
+							}
+
 							Constructor<?> ctor = clazz.getConstructor();
 							AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
 							registry.registerPlugin(instance);

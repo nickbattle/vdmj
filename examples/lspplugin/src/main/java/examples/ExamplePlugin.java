@@ -61,38 +61,35 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	}
 	
 	@Override
-	public String getName()
-	{
-		return "ExamplePlugin";
-	}
-
-	@Override
 	public void init()
 	{
 		EventHub eventhub = EventHub.getInstance();
-		eventhub.register(this, "initialize", this);
-		eventhub.register(this, "initialized", this);
-		eventhub.register(this, "textDocument/didOpen", this);
-		eventhub.register(this, "textDocument/didChange", this);
-		eventhub.register(this, "textDocument/didClose", this);
-		eventhub.register(this, "textDocument/didSave", this);
-		eventhub.register(this, "checkFilesEvent/prepare", this);
-		eventhub.register(this, "checkFilesEvent/syntax", this);
-		eventhub.register(this, "checkFilesEvent/typecheck", this);
-		eventhub.register(this, "checkFilesEvent/checked", this);
-		eventhub.register(this, "unknownMethodEvent", this);
-		eventhub.register(this, "shutdown", this);
+		eventhub.register("initialize", this);
+		eventhub.register("initialized", this);
+		eventhub.register("textDocument/didOpen", this);
+		eventhub.register("textDocument/didChange", this);
+		eventhub.register("textDocument/didClose", this);
+		eventhub.register("textDocument/didSave", this);
+		eventhub.register("checkFilesEvent/prepare", this);
+		eventhub.register("checkFilesEvent/syntax", this);
+		eventhub.register("checkFilesEvent/typecheck", this);
+		eventhub.register("checkFilesEvent/checked", this);
+		eventhub.register("unknownMethodEvent", this);
+		eventhub.register("shutdown", this);
 
-		eventhub.register(this, "dap:initialize", this);
-		eventhub.register(this, "dap:launch", this);
-		eventhub.register(this, "dap:configurationDone", this);
-		eventhub.register(this, "dap:evaluate", this);
-		eventhub.register(this, "dap:disconnect", this);
-		eventhub.register(this, "dap:terminate", this);
+		eventhub.register("dap:initialize", this);
+		eventhub.register("dap:launch", this);
+		eventhub.register("dap:configurationDone", this);
+		eventhub.register("dap:evaluate", this);
+		eventhub.register("dap:disconnect", this);
+		eventhub.register("dap:terminate", this);
 
-		eventhub.register(this, "dap:unknownCommandEvent", this);
+		eventhub.register("dap:unknownCommandEvent", this);
 	}
-	
+
+	@Override
+	abstract public String getName();
+
 	@Override
 	abstract public RPCMessageList handleEvent(LSPEvent event) throws Exception;
 	

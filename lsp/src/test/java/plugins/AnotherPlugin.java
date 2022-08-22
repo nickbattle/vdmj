@@ -52,8 +52,8 @@ public class AnotherPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		EventHub.getInstance().register(this, "unknownMethodEvent", this);
-		EventHub.getInstance().register(this, "dap:unknownCommandEvent", this);
+		EventHub.getInstance().register("unknownMethodEvent", this);
+		EventHub.getInstance().register("dap:unknownCommandEvent", this);
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class AnotherPlugin extends AnalysisPlugin implements EventListener
 		}
 		else
 		{
-			return new RPCMessageList();
+			return null;
 		}
 	}
 
@@ -80,7 +80,7 @@ public class AnotherPlugin extends AnalysisPlugin implements EventListener
 		}
 		else
 		{
-			return new DAPMessageList();
+			return null;
 		}
 	}
 	
