@@ -278,7 +278,7 @@ public class LSPWorkspaceManager
 	private void loadAllProjectFiles() throws IOException
 	{
 		projectFiles.clear();
-		clearExternalFiles();
+		removeExternalFiles();
 		externalFiles.clear();
 		externalFilesToWarn.clear();
 		loadVDMIgnore();
@@ -513,7 +513,7 @@ public class LSPWorkspaceManager
 		return BacktrackInputReader.isExternalFormat(file);
 	}
 	
-	private void clearExternalFiles()
+	private void removeExternalFiles()
 	{
 		Diag.info("Clearing unchanged external files");
 		
@@ -664,7 +664,7 @@ public class LSPWorkspaceManager
 			}
 			
 			projectFiles.put(file, new StringBuilder(text));
-			checkLoadedFiles("file out of sync");
+			return checkLoadedFiles("file out of sync");
 		}
 		
 		return null;
@@ -809,8 +809,7 @@ public class LSPWorkspaceManager
 					else
 					{
 						Diag.info("Created new file: %s", file);
-						loadFile(file);
-						actionCode = RECHECK;
+						actionCode = RELOAD_AND_CHECK;
 					}
 				}
 				else
@@ -1415,7 +1414,7 @@ public class LSPWorkspaceManager
 		Diag.info("Shutting down server");
 		eventhub.publish(new ShutdownEvent(request));
 		LSPServer.getInstance().setInitialized(false);
-		clearExternalFiles();
+		removeExternalFiles();
 		reset();	// Clear registry, eventhub and singleton
 		
 		return new RPCMessageList(request);
