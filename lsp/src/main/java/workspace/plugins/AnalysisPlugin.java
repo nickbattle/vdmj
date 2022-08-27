@@ -29,13 +29,11 @@ import java.util.List;
 import java.util.Vector;
 
 import dap.DAPMessageList;
-import dap.DAPRequest;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPMessageUtils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
-import rpc.RPCRequest;
 import vdmj.commands.Command;
 import workspace.EventHub;
 import workspace.PluginRegistry;
@@ -65,20 +63,6 @@ abstract public class AnalysisPlugin
 	
 	abstract public void init();
 	
-	/**
-	 * External plugins override these methods to implement their functionality.
-	 * The methods are invoked via an UnknownMethodEvent, which the plugins register for.
-	 */
-	public RPCMessageList analyse(RPCRequest request)
-	{
-		return new RPCMessageList(request, RPCErrors.InternalError, "Plugin does not support analysis");
-	}
-
-	public DAPMessageList analyse(DAPRequest request)
-	{
-		return new DAPMessageList(request, false, "Plugin does not support analysis", null);
-	}
-
 	/**
 	 * These methods are used to dispatch LSP/DAP events. These default methods just return an
 	 * error, usually indicating that an event has been registered with the EventHub, but

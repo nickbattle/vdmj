@@ -108,9 +108,6 @@ public class TranslateHandler extends LSPHandler
 				case "graphviz":
 					return LSPXWorkspaceManager.getInstance().translateGraphviz(request, file, saveUri, options);
 				
-				case "isabelle":
-					return LSPXWorkspaceManager.getInstance().translateIsabelle(request, file, saveUri, options);
-				
 				default:
 					RPCMessageList external = EventHub.getInstance().publish(new UnknownMethodEvent(request));
 					

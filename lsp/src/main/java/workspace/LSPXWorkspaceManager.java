@@ -582,18 +582,4 @@ public class LSPXWorkspaceManager
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
 		}
 	}
-	
-	public RPCMessageList translateIsabelle(RPCRequest request, File file, File saveUri, JSONObject options)
-	{
-		AnalysisPlugin isa = registry.getPlugin("ISA");
-		
-		if (isa != null)
-		{
-			return isa.analyse(request);
-		}
-		else
-		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "ISA plugin not available");
-		}
-	}
 }

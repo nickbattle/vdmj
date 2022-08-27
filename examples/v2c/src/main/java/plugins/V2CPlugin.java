@@ -106,8 +106,7 @@ public class V2CPlugin extends AnalysisPlugin implements EventListener
 	 * recognised by the handleEvent method above. It is passed the JSON request and
 	 * returns a list of JSON responses.
 	 */
-	@Override
-	public RPCMessageList analyse(RPCRequest request)
+	private RPCMessageList analyse(RPCRequest request)
 	{
 		try
 		{
