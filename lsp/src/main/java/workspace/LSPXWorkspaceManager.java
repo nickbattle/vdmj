@@ -46,6 +46,7 @@ import lsp.Utils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.events.UnknownMethodEvent;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.AnalysisPlugin;
 import workspace.plugins.CTPlugin;
@@ -56,11 +57,13 @@ public class LSPXWorkspaceManager
 {
 	private static LSPXWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
+	private final EventHub eventhub;
 	private final LSPWorkspaceManager wsManager;
 	
 	protected LSPXWorkspaceManager()
 	{
 		this.registry = PluginRegistry.getInstance();
+		this.eventhub = EventHub.getInstance();
 		this.wsManager = LSPWorkspaceManager.getInstance();
 	}
 
@@ -113,12 +116,6 @@ public class LSPXWorkspaceManager
 				{
 					Class<?> clazz = Class.forName(plugin);
 					
-					if (Modifier.isAbstract(clazz.getModifiers()))
-					{
-						Diag.severe("Plugin class is abstract: %s", clazz.getName());
-						continue;
-					}
-
 					try
 					{
 						Method factory = clazz.getMethod("factory", Dialect.class);
@@ -130,6 +127,12 @@ public class LSPXWorkspaceManager
 					{
 						try
 						{
+							if (Modifier.isAbstract(clazz.getModifiers()))
+							{
+								Diag.severe("Plugin class is abstract: %s", clazz.getName());
+								continue;
+							}
+
 							Constructor<?> ctor = clazz.getConstructor();
 							AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
 							registry.registerPlugin(instance);
@@ -161,16 +164,16 @@ public class LSPXWorkspaceManager
 
 	public RPCMessageList unhandledMethod(RPCRequest request)
 	{
-		AnalysisPlugin plugin = registry.getPluginForMethod(request.getMethod());
+		RPCMessageList results = eventhub.publish(new UnknownMethodEvent(request));
 		
-		if (plugin == null)
+		if (results.isEmpty())
 		{
 			Diag.error("No external plugin registered for " + request.getMethod());
 			return new RPCMessageList(request, RPCErrors.MethodNotFound, request.getMethod());
 		}
 		else
 		{
-			return plugin.analyse(request);
+			return results;
 		}
 	}
 
@@ -577,20 +580,6 @@ public class LSPXWorkspaceManager
 		catch (IOException e)
 		{
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
-	}
-	
-	public RPCMessageList translateIsabelle(RPCRequest request, File file, File saveUri, JSONObject options)
-	{
-		AnalysisPlugin isa = registry.getPlugin("ISA");
-		
-		if (isa != null)
-		{
-			return isa.analyse(request);
-		}
-		else
-		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "ISA plugin not available");
 		}
 	}
 }

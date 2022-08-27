@@ -40,7 +40,11 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
+import workspace.EventHub;
+import workspace.EventListener;
 import workspace.PluginRegistry;
+import workspace.events.LSPEvent;
+import workspace.events.UnknownMethodEvent;
 import workspace.plugins.AnalysisPlugin;
 import workspace.plugins.TCPlugin;
 
@@ -48,7 +52,7 @@ import workspace.plugins.TCPlugin;
  * All LSP plugins must extend AnalysisPlugin. The fully qualified class name of the plugin must be set
  * in the "lspx.plugins" property, to make the LSP Server load it.
  */
-public class V2CPlugin extends AnalysisPlugin
+public class V2CPlugin extends AnalysisPlugin implements EventListener
 {
 	/**
 	 * A plugin must provide a default constructor, as here or a static "factory" method that takes
@@ -76,25 +80,33 @@ public class V2CPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
-		// Ignore
+		EventHub.getInstance().register(UnknownMethodEvent.class, this);
 	}
 	
 	/**
-	 * A plugin can support a number of LSP methods, but here we match just one.
+	 * This method is called when unknownMethodEvent, slsp/v2c events are raised.
+	 * They go via the unknownMethod handler, which sends an unknownMethodEvent.
 	 */
 	@Override
-	public boolean supportsMethod(String method)
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		return method.equals("slsp/v2c");
+		if (event instanceof UnknownMethodEvent &&
+			event.request.getMethod().equals("slsp/v2c"))
+		{
+			return analyse(event.request);
+		}
+		else
+		{
+			return new RPCMessageList();
+		}
 	}
-	
+
 	/**
 	 * The analyse method is called when the LSP client sends a request that has a name
-	 * recognised by the supportsMethod method above. It is passed the JSON request and
+	 * recognised by the handleEvent method above. It is passed the JSON request and
 	 * returns a list of JSON responses.
 	 */
-	@Override
-	public RPCMessageList analyse(RPCRequest request)
+	private RPCMessageList analyse(RPCRequest request)
 	{
 		try
 		{

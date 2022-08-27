@@ -50,14 +50,14 @@ public class POGTest extends LSPTest
 		File testdir = new File("src/test/resources/pogtest_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
 		assertEquals(3, notify.size());
-
-		dump(notify.get(0));
-		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
-		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
+		dump(notify.get(0));
+		assertEquals("slsp/POG/updated", notify.get(0).getPath("method"));
+		assertEquals(true, notify.get(0).getPath("params.successful"));
+
 		dump(notify.get(1));
-		assertEquals("slsp/POG/updated", notify.get(1).getPath("method"));
-		assertEquals(true, notify.get(1).getPath("params.successful"));
+		assertEquals("textDocument/publishDiagnostics", notify.get(1).getPath("method"));
+		assertTrue(notify.get(1).getPath("params.diagnostics") instanceof JSONArray);
 
 		POGHandler handler = new POGHandler();
 		File file = new File(testdir, "pogtest.vdmsl");
@@ -82,14 +82,14 @@ public class POGTest extends LSPTest
 		File testdir = new File("src/test/resources/pogtest_pp");
 		RPCMessageList notify = initialize(testdir, capabilities);
 		assertEquals(3, notify.size());
-
-		dump(notify.get(0));
-		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
-		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
+		dump(notify.get(0));
+		assertEquals("slsp/POG/updated", notify.get(0).getPath("method"));
+		assertEquals(true, notify.get(0).getPath("params.successful"));
+
 		dump(notify.get(1));
-		assertEquals("slsp/POG/updated", notify.get(1).getPath("method"));
-		assertEquals(true, notify.get(1).getPath("params.successful"));
+		assertEquals("textDocument/publishDiagnostics", notify.get(1).getPath("method"));
+		assertTrue(notify.get(1).getPath("params.diagnostics") instanceof JSONArray);
 		
 		POGHandler handler = new POGHandler();
 		RPCRequest request = RPCRequest.create(789L, "slsp/POG/generate",
@@ -113,14 +113,14 @@ public class POGTest extends LSPTest
 		File testdir = new File("src/test/resources/pogtest_rt");
 		RPCMessageList notify = initialize(testdir, capabilities);
 		assertEquals(3, notify.size());
-
-		dump(notify.get(0));
-		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
-		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
 		
+		dump(notify.get(0));
+		assertEquals("slsp/POG/updated", notify.get(0).getPath("method"));
+		assertEquals(true, notify.get(0).getPath("params.successful"));
+
 		dump(notify.get(1));
-		assertEquals("slsp/POG/updated", notify.get(1).getPath("method"));
-		assertEquals(true, notify.get(1).getPath("params.successful"));
+		assertEquals("textDocument/publishDiagnostics", notify.get(1).getPath("method"));
+		assertTrue(notify.get(1).getPath("params.diagnostics") instanceof JSONArray);
 		
 		POGHandler handler = new POGHandler();
 		RPCRequest request = RPCRequest.create(789L, "slsp/POG/generate",
@@ -143,7 +143,7 @@ public class POGTest extends LSPTest
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/pogerrors_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
-		assertEquals(3, notify.size());
+		assertEquals(2, notify.size());
 
 		dump(notify.get(0));
 		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
@@ -154,7 +154,7 @@ public class POGTest extends LSPTest
 		assertEquals("Unable to resolve type name 'nt'", notify.get(0).getPath("params.diagnostics.[0].message"));
 		
 		dump(notify.get(1));
-		assertEquals("slsp/POG/updated", notify.get(1).getPath("method"));
+		assertEquals("slsp/checked", notify.get(1).getPath("method"));
 		assertEquals(false, notify.get(1).getPath("params.successful"));
 
 		POGHandler handler = new POGHandler();

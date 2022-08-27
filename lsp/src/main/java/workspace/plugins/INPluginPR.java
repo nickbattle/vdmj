@@ -36,6 +36,8 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
+import workspace.events.CheckPrepareEvent;
+
 public class INPluginPR extends INPlugin
 {
 	private INClassList inClassList = null;
@@ -53,13 +55,9 @@ public class INPluginPR extends INPlugin
 	}
 
 	@Override
-	public void init()
+	public void preCheck(CheckPrepareEvent ev)
 	{
-	}
-
-	@Override
-	public void preCheck()
-	{
+		super.preCheck(ev);
 		inClassList = new INClassList();
 		tcClassList = new TCClassList();
 	}

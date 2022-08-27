@@ -233,7 +233,7 @@ public class CTTest extends LSPTest
 		assertEquals(null, response);	// backgrounded
 		
 		Thread background = CancellableThread.find(123L);
-		background.join();
+		if (background != null) background.join();
 	}
 
 	@Test

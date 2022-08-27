@@ -30,18 +30,20 @@ import json.JSONObject;
 import lsp.LSPException;
 import lsp.Utils;
 import rpc.RPCErrors;
-import workspace.plugins.AnalysisPlugin;
+import workspace.events.UnknownCommandEvent;
 import workspace.plugins.CTPlugin;
 
 public class DAPXWorkspaceManager
 {
 	private static DAPXWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
+	private final EventHub eventhub;
 	private final DAPWorkspaceManager dapManager;
 	
 	protected DAPXWorkspaceManager()
 	{
 		this.registry = PluginRegistry.getInstance();
+		this.eventhub = EventHub.getInstance();
 		this.dapManager = DAPWorkspaceManager.getInstance();
 	}
 
@@ -101,16 +103,16 @@ public class DAPXWorkspaceManager
 
 	public DAPMessageList unhandledCommand(DAPRequest request)
 	{
-		AnalysisPlugin plugin = registry.getPluginForMethod(request.getCommand());
+		DAPMessageList responses = eventhub.publish(new UnknownCommandEvent(request));
 		
-		if (plugin == null)
+		if (responses.isEmpty())
 		{
-			Diag.error("No external plugin registered for " + request.getCommand());
+			Diag.error("No external plugin registered for unknownMethodEvent (%s)", request.getCommand());
 			return new DAPMessageList(request, false, "Unknown command: " + request.getCommand(), null);
 		}
 		else
 		{
-			return plugin.analyse(request);
+			return responses;
 		}
 	}
 }

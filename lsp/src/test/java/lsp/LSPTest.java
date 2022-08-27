@@ -40,8 +40,10 @@ import rpc.RPCRequest;
 import workspace.DAPWorkspaceManager;
 import workspace.DAPXWorkspaceManager;
 import workspace.Diag;
+import workspace.EventHub;
 import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
+import workspace.PluginRegistry;
 
 abstract public class LSPTest
 {
@@ -58,9 +60,12 @@ abstract public class LSPTest
 	protected void setupWorkspace(Dialect dialect) throws IOException
 	{
 		Settings.dialect = dialect;
+		EventHub.reset();
+		PluginRegistry.reset();
 		LSPWorkspaceManager.reset();
 		LSPXWorkspaceManager.reset();
 		DAPWorkspaceManager.reset();
+		DAPXWorkspaceManager.reset();
 		lspManager = LSPWorkspaceManager.getInstance();
 		lspxManager = LSPXWorkspaceManager.getInstance();
 		dapManager = DAPWorkspaceManager.getInstance();

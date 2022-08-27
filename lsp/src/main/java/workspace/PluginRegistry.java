@@ -55,9 +55,6 @@ public class PluginRegistry
 		return INSTANCE;
 	}
 	
-	/**
-	 * This is only used by unit testing.
-	 */
 	public static void reset()
 	{
 		if (INSTANCE != null)
@@ -80,35 +77,6 @@ public class PluginRegistry
 		return (T)plugins.get(name);
 	}
 	
-	@SuppressWarnings("unchecked")
-	public <T> T getPluginForMethod(String method)
-	{
-		T result = null;
-		
-		for (AnalysisPlugin plugin: plugins.values())
-		{
-			try
-			{
-				if (plugin.supportsMethod(method))
-				{
-					if (result != null)
-					{
-						Diag.error("Multiple plugins support %s", method);
-					}
-					
-					result = (T)plugin;
-				}
-			}
-			catch (Throwable e)
-			{
-				Diag.error("Exception in %s supportsMethod", plugin.getName());
-				Diag.error(e);
-			}
-		}
-		
-		return result;
-	}
-
 	public JSONObject getExperimentalOptions(JSONObject standard)
 	{
 		JSONObject options = new JSONObject();

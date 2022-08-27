@@ -334,7 +334,6 @@ public class TranslateTest extends LSPTest
 		response = handler.request(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		assertEquals("Plugin does not support analysis", response.get(0).getPath("error.message"));
-		assertEquals(Long.valueOf(-32603), response.get(0).getPath("error.code"));
+		assertEquals("Handled LSP method", response.get(0).getPath("result"));
 	}
 }

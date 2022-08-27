@@ -29,23 +29,29 @@ import java.util.List;
 import java.util.Vector;
 
 import dap.DAPMessageList;
-import dap.DAPRequest;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPMessageUtils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
-import rpc.RPCRequest;
 import vdmj.commands.Command;
+import workspace.EventHub;
+import workspace.PluginRegistry;
+import workspace.events.DAPEvent;
+import workspace.events.LSPEvent;
 import workspace.lenses.CodeLens;
 
 abstract public class AnalysisPlugin
 {
 	protected final LSPMessageUtils messages;
+	protected final PluginRegistry registry;
+	protected final EventHub eventhub;
 	
 	public AnalysisPlugin()
 	{
 		messages = new LSPMessageUtils();
+		registry = PluginRegistry.getInstance();
+		eventhub = EventHub.getInstance();
 	}
 	
 	protected RPCMessageList errorResult()
@@ -58,25 +64,18 @@ abstract public class AnalysisPlugin
 	abstract public void init();
 	
 	/**
-	 * External plugins claim to support specific LSP messages. This method
-	 * identifies whether the plugin supports the name passed.
+	 * These methods are used to dispatch LSP/DAP events. These default methods just return an
+	 * error, usually indicating that an event has been registered with the EventHub, but
+	 * no handler provided.
 	 */
-	public boolean supportsMethod(String method)
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		return false;
+		return new RPCMessageList(event.request, RPCErrors.InternalError, "Plugin does not handle LSP events");
 	}
 
-	/**
-	 * External plugins override these methods to implement their functionality.
-	 */
-	public RPCMessageList analyse(RPCRequest request)
+	public DAPMessageList handleEvent(DAPEvent event) throws Exception
 	{
-		return new RPCMessageList(request, RPCErrors.InternalError, "Plugin does not support analysis");
-	}
-
-	public DAPMessageList analyse(DAPRequest request)
-	{
-		return new DAPMessageList(request, false, "Plugin does not support analysis", null);
+		return new DAPMessageList(event.request, false, "Plugin does not handle DAP events", null);
 	}
 
 	/**

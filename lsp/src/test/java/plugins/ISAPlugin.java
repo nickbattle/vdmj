@@ -29,10 +29,16 @@ import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONArray;
 import json.JSONObject;
+import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import workspace.Diag;
+import workspace.EventHub;
+import workspace.EventListener;
+import workspace.events.LSPEvent;
+import workspace.events.UnknownMethodEvent;
 import workspace.plugins.AnalysisPlugin;
 
-public abstract class ISAPlugin extends AnalysisPlugin
+public abstract class ISAPlugin extends AnalysisPlugin implements EventListener
 {
 	public static ISAPlugin factory(Dialect dialect)
 	{
@@ -61,9 +67,31 @@ public abstract class ISAPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
-		// Ignore
+		EventHub.getInstance().register(UnknownMethodEvent.class, this);
 	}
 	
+	@Override
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
+	{
+		if (event instanceof UnknownMethodEvent)
+		{
+			if (event.request.getMethod().equals("slsp/TR/translate"))
+			{
+				JSONObject params = event.request.get("params");
+				String language = params.get("languageId");
+				
+				if (language.equals("isabelle"))
+				{
+					return analyse(event.request);
+				}
+			}
+		}
+		
+		return null;	// Not handled
+	}
+	
+	abstract public RPCMessageList analyse(RPCRequest request);
+
 	@Override
 	public JSONObject getExperimentalOptions(JSONObject standard)
 	{

@@ -22,27 +22,27 @@
  *
  ******************************************************************************/
 
-package lsp;
+package dap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+
 import org.junit.Test;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.RTLogger;
 
-import dap.DAPHandler;
-import dap.DAPMessageList;
-import dap.DAPRequest;
 import dap.handlers.InitializeHandler;
 import dap.handlers.LaunchHandler;
 import json.JSONArray;
 import json.JSONObject;
+import lsp.CancellableThread;
+import lsp.DAPTest;
 import rpc.RPCMessageList;
 
-public class LogTest extends DAPTest
+public class ExecuteTest extends DAPTest
 {
 	@Test
 	public void testLog() throws Exception
@@ -97,5 +97,40 @@ public class LogTest extends DAPTest
 		assertEquals(true, log.exists());
 		assertEquals(true, RTLogger.isEnabled());
 		log.delete();
+		
+		Thread background = CancellableThread.find("init");
+		if (background != null) background.join();
+	}
+	
+	@Test
+	public void testUnknownCommand() throws Exception
+	{
+		System.setProperty("lspx.plugins", "plugins.AnotherPlugin");
+		setupWorkspace(Dialect.VDM_SL);
+		File testdir = new File("src/test/resources/pogtest_sl");
+		RPCMessageList notify = initialize(testdir, new JSONObject());
+		assertEquals(2, notify.size());
+
+		dump(notify.get(0));
+		assertEquals("textDocument/publishDiagnostics", notify.get(0).getPath("method"));
+		assertTrue(notify.get(0).getPath("params.diagnostics") instanceof JSONArray);
+
+		dap.UnknownHandler handler = new dap.UnknownHandler();
+
+		DAPRequest request = new DAPRequest(new JSONObject("type", "request", "command", "sdap/unknown"));
+
+		DAPMessageList response = handler.run(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals("Unknown command: sdap/unknown", response.get(0).getPath("message"));
+		assertEquals(false, response.get(0).getPath("success"));
+
+		request = new DAPRequest(new JSONObject("type", "request", "command", "sdap/another"));
+
+		response = handler.run(request);
+		assertEquals(1, response.size());
+		dump(response.get(0));
+		assertEquals("Handled DAP command", response.get(0).getPath("message"));
+		assertEquals(true, response.get(0).getPath("success"));
 	}
 }

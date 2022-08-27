@@ -30,6 +30,8 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
+import workspace.events.CheckPrepareEvent;
+
 public class POPluginSL extends POPlugin
 {
 	private POModuleList poModuleList;
@@ -40,8 +42,9 @@ public class POPluginSL extends POPlugin
 	}
 
 	@Override
-	public void preCheck()
+	public void preCheck(CheckPrepareEvent ev)
 	{
+		super.preCheck(ev);
 		poModuleList = null;
 	}
 

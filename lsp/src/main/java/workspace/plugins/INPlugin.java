@@ -31,9 +31,14 @@ import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
+import rpc.RPCMessageList;
 import workspace.Diag;
+import workspace.EventListener;
+import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.LSPEvent;
 
-abstract public class INPlugin extends AnalysisPlugin
+abstract public class INPlugin extends AnalysisPlugin implements EventListener
 {
 	public static INPlugin factory(Dialect dialect)
 	{
@@ -66,11 +71,38 @@ abstract public class INPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
+		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckCompleteEvent.class, this);
 	}
 
-	public void preCheck()
+
+	@Override
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
+	{
+		if (event instanceof CheckPrepareEvent)
+		{
+			preCheck((CheckPrepareEvent) event);
+		}
+		else if (event instanceof CheckCompleteEvent)
+		{
+			TCPlugin tc = registry.getPlugin("TC");
+			checkLoadedFiles(tc.getTC());
+		}
+		else
+		{
+			Diag.error("Unhandled %s event %s", getName(), event);
+		}
+
+		return null;
+	}
+
+	protected void preCheck(CheckPrepareEvent event)
 	{
 	}
+	
+	/**
+	 * Event handling above. Supporting methods below. 
+	 */
 	
 	abstract public <T extends Mappable> T getIN();
 	

@@ -49,12 +49,17 @@ import lsp.CancellableThread;
 import lsp.LSPException;
 import lsp.LSPServer;
 import rpc.RPCErrors;
+import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import workspace.DAPWorkspaceManager;
 import workspace.Diag;
+import workspace.EventListener;
+import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.LSPEvent;
 
-abstract public class CTPlugin extends AnalysisPlugin
+abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 {
 	protected TraceIterator traceIterator = null;
 	protected INClassDefinition traceClassDef = null;
@@ -100,6 +105,8 @@ abstract public class CTPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
+		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckCompleteEvent.class, this);
 	}
 	
 	@Override
@@ -108,7 +115,27 @@ abstract public class CTPlugin extends AnalysisPlugin
 		return new JSONObject("combinatorialTestProvider", new JSONObject("workDoneProgress", true));
 	}
 
-	public void preCheck()
+	@Override
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
+	{
+		if (event instanceof CheckPrepareEvent)
+		{
+			preCheck((CheckPrepareEvent) event);
+		}
+		else if (event instanceof CheckCompleteEvent)
+		{ 
+			INPlugin in = registry.getPlugin("IN");
+			checkLoadedFiles(in.getIN());
+		}
+		else
+		{
+			Diag.error("Unhandled %s event %s", getName(), event);
+		}
+		
+		return null;
+	}
+
+	protected void preCheck(CheckPrepareEvent event)
 	{
 		if (traceExecutor != null && traceRunning)
 		{
@@ -124,6 +151,10 @@ abstract public class CTPlugin extends AnalysisPlugin
 		}
 	}
 
+	/**
+	 * Event handling above. Supporting methods below. 
+	 */
+	
 	abstract public <T extends Mappable> boolean checkLoadedFiles(T inList) throws Exception;
 
 	abstract public Map<String, TCNameList> getTraceNames();

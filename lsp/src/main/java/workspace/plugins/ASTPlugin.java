@@ -26,8 +26,8 @@ package workspace.plugins;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
@@ -52,11 +52,17 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
+import rpc.RPCMessageList;
 import workspace.Diag;
+import workspace.EventListener;
+import workspace.events.ChangeFileEvent;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckSyntaxEvent;
+import workspace.events.LSPEvent;
 import workspace.lenses.ASTLaunchDebugLens;
 import workspace.lenses.CodeLens;
 
-public abstract class ASTPlugin extends AnalysisPlugin
+public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 {
 	protected static final boolean STRUCTURED_OUTLINE = true;
 
@@ -84,7 +90,6 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	protected ASTPlugin()
 	{
 		super();
-		this.dirty = false;
 	}
 	
 	@Override
@@ -96,7 +101,67 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
+		eventhub.register(ChangeFileEvent.class, this);
+		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckSyntaxEvent.class, this);
+		this.dirty = false;
 	}
+	
+	@Override
+	public RPCMessageList handleEvent(LSPEvent event) throws Exception
+	{
+		if (event instanceof ChangeFileEvent)
+		{
+			return didChange((ChangeFileEvent) event);
+		}
+		else if (event instanceof CheckPrepareEvent)
+		{
+			preCheck((CheckPrepareEvent)event);
+			return null;
+		}
+		else if (event instanceof CheckSyntaxEvent)
+		{
+			CheckSyntaxEvent ev = (CheckSyntaxEvent)event;
+			checkLoadedFiles();
+			ev.addErrs(errs);
+			ev.addWarns(warns);
+			return null;
+		}
+		else
+		{
+			Diag.error("Unhandled %s event %s", getName(), event);
+			return null;
+		}
+	}
+	
+	abstract protected List<VDMMessage> parseFile(File file);
+
+	private RPCMessageList didChange(ChangeFileEvent event) throws Exception
+	{
+		List<VDMMessage> errors = parseFile(event.file);
+		
+		// Add current TC errors as these need to be seen until the next save
+		TCPlugin tc = registry.getPlugin("TC");
+		errors.addAll(tc.getErrs());
+		errors.addAll(tc.getWarns());
+		
+		// We report on this file, plus the files with tc errors (if any).
+		Set<File> files = messages.filesOfMessages(errors);
+		files.add(event.file);
+		return messages.diagnosticResponses(errors, files);
+	}
+	
+	protected void preCheck(CheckPrepareEvent ev)
+	{
+		errs.clear();
+		warns.clear();
+	}
+	
+	/**
+	 * Event handling above. Supporting methods below. 
+	 */
+	
+	abstract public boolean checkLoadedFiles();
 	
 	/**
 	 * We register the launch/debug code lens here, if the tree is dirty. Else it
@@ -115,19 +180,6 @@ public abstract class ASTPlugin extends AnalysisPlugin
 		return lenses;
 	}
 
-	public List<VDMMessage> fileChanged(File file) throws IOException
-	{
-		return parseFile(file);
-	}
-	
-	public void preCheck()
-	{
-		errs.clear();
-		warns.clear();
-	}
-	
-	abstract public boolean checkLoadedFiles();
-	
 	public List<VDMMessage> getErrs()
 	{
 		return errs;
@@ -140,8 +192,6 @@ public abstract class ASTPlugin extends AnalysisPlugin
 	
 	abstract public <T extends Mappable> T getAST();
 	
-	abstract protected List<VDMMessage> parseFile(File file);
-
 	public boolean isDirty()
 	{
 		return dirty;

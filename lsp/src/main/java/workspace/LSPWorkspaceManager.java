@@ -77,16 +77,26 @@ import lsp.textdocument.WatchKind;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.events.ChangeFileEvent;
+import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckSyntaxEvent;
+import workspace.events.CheckTypeEvent;
+import workspace.events.CloseFileEvent;
+import workspace.events.InitializeEvent;
+import workspace.events.InitializedEvent;
+import workspace.events.OpenFileEvent;
+import workspace.events.SaveFileEvent;
+import workspace.events.ShutdownEvent;
 import workspace.plugins.ASTPlugin;
-import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
-import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
 
 public class LSPWorkspaceManager
 {
 	private static LSPWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
+	private final EventHub eventhub;
 	private final LSPMessageUtils messages;
 	private final Charset encoding;
 
@@ -98,8 +108,8 @@ public class LSPWorkspaceManager
 	private boolean orderedFiles = false;
 	private Set<File> ignores = new HashSet<File>();
 	private boolean checkInProgress = false;
-	private Map<File, FileTime> documentFiles = new HashMap<File, FileTime>();
-	private Set<File> documentFilesToWarn = new HashSet<File>();
+	private Map<File, FileTime> externalFiles = new HashMap<File, FileTime>();
+	private Set<File> externalFilesToWarn = new HashSet<File>();
 	
 	private static final String ORDERING = ".vscode/ordering";
 	private static final String VDMIGNORE = ".vscode/vdmignore";
@@ -108,6 +118,7 @@ public class LSPWorkspaceManager
 	private LSPWorkspaceManager()
 	{
 		registry = PluginRegistry.getInstance();
+		eventhub = EventHub.getInstance();
 		messages = new LSPMessageUtils();
 		
 		if (System.getProperty("lsp.encoding") == null)
@@ -143,12 +154,11 @@ public class LSPWorkspaceManager
 		return INSTANCE;
 	}
 	
-	/**
-	 * This is only used by unit testing.
-	 */
 	public static void reset()
 	{
+		Diag.config("Resetting LSPWorkspaceManager, PluginRegistry and EventHub");
 		PluginRegistry.reset();
+		EventHub.reset();
 		INSTANCE = null;
 	}
 	
@@ -181,7 +191,10 @@ public class LSPWorkspaceManager
 		Properties.init(PROPERTIES);
 		loadAllProjectFiles();
 		
-		return new RPCMessageList(request, new LSPInitializeResponse());
+		RPCMessageList responses = new RPCMessageList(request, new LSPInitializeResponse());
+		responses.addAll(eventhub.publish(new InitializeEvent(request)));
+		
+		return responses;
 	}
 
 	public RPCMessageList lspInitialized(RPCRequest request)
@@ -191,6 +204,7 @@ public class LSPWorkspaceManager
 			RPCMessageList response = new RPCMessageList();
 			response.add(lspDynamicRegistrations());
 			response.addAll(checkLoadedFiles("initialized"));
+			response.addAll(eventhub.publish(new InitializedEvent(request)));
 			return response;
 		}
 		catch (Exception e)
@@ -264,9 +278,9 @@ public class LSPWorkspaceManager
 	private void loadAllProjectFiles() throws IOException
 	{
 		projectFiles.clear();
-		clearDocumentFiles();
-		documentFiles.clear();
-		documentFilesToWarn.clear();
+		removeExternalFiles();
+		externalFiles.clear();
+		externalFilesToWarn.clear();
 		loadVDMIgnore();
 		
 		File ordering = new File(rootUri, ORDERING);
@@ -290,9 +304,9 @@ public class LSPWorkspaceManager
 					
 					if (file.exists())
 					{
-						if (documentFile(file))
+						if (isExternalFile(file))
 						{
-							loadDocFile(file);
+							loadExternalFile(file);
 						}
 						else
 						{
@@ -381,9 +395,9 @@ public class LSPWorkspaceManager
 				{
 					loadFile(file);
 				}
-				else if (documentFile(file))
+				else if (isExternalFile(file))
 				{
-					loadDocFile(file);
+					loadExternalFile(file);
 				}
 				else
 				{
@@ -411,20 +425,20 @@ public class LSPWorkspaceManager
 		Diag.info("Loaded file %s encoding %s", file.getPath(), encoding.displayName());
 	}
 	
-	private void loadDocFile(File file) throws IOException
+	private void loadExternalFile(File file) throws IOException
 	{
 		SourceFile source = new SourceFile(file);
 		File vdm = new File(file.getPath() + "." + Settings.dialect.getArgstring().substring(1));
 		
 		if (vdm.exists())
 		{
-			Diag.info("Not overwriting existing doc file: %s", vdm);
-			documentFiles.put(vdm, FileTime.fromMillis(0));
-			documentFilesToWarn.add(vdm);
+			Diag.info("Not overwriting existing external file: %s", vdm);
+			externalFiles.put(vdm, FileTime.fromMillis(0));
+			externalFilesToWarn.add(vdm);
 		}
 		else
 		{
-			Diag.info("Converting document file %s", file);
+			Diag.info("Converting external file %s", file);
 			PrintWriter spw = new PrintWriter(vdm, encoding.name());
 			source.printSource(spw);
 			spw.close();
@@ -435,8 +449,8 @@ public class LSPWorkspaceManager
 				loadFile(vdm);
 	
 				BasicFileAttributes attr = Files.readAttributes(vdm.toPath(), BasicFileAttributes.class);
-				documentFiles.put(vdm, attr.lastModifiedTime());
-				documentFilesToWarn.add(vdm);
+				externalFiles.put(vdm, attr.lastModifiedTime());
+				externalFilesToWarn.add(vdm);
 			}
 			else
 			{
@@ -494,36 +508,36 @@ public class LSPWorkspaceManager
 		return false;
 	}
 	
-	private boolean documentFile(File file)
+	private boolean isExternalFile(File file)
 	{
 		return BacktrackInputReader.isExternalFormat(file);
 	}
 	
-	private void clearDocumentFiles()
+	private void removeExternalFiles()
 	{
-		Diag.info("Clearing unchanged document files");
+		Diag.info("Clearing unchanged external files");
 		
-		for (Entry<File, FileTime> docfile: documentFiles.entrySet())
+		for (Entry<File, FileTime> extfile: externalFiles.entrySet())
 		{
-			File file = docfile.getKey();
+			File file = extfile.getKey();
 			
 			try
 			{
 				BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
 				
-				if (attr.lastModifiedTime().equals(docfile.getValue()))
+				if (attr.lastModifiedTime().equals(extfile.getValue()))
 				{
-					Diag.info("Deleting unchanged extract file %s", file);
+					Diag.info("Deleting unchanged external file %s", file);
 					file.delete();
 				}
 				else
 				{
-					Diag.info("Keeping changed extract file %s", file);
+					Diag.info("Keeping changed external file %s", file);
 				}
 			}
 			catch (IOException e)
 			{
-				Diag.error("Problem cleaning up extract %s: %s", file, e);
+				Diag.error("Problem cleaning up external %s: %s", file, e);
 			}
 		}
 	}
@@ -553,80 +567,57 @@ public class LSPWorkspaceManager
 	
 	private RPCMessageList checkLoadedFilesSafe(String reason) throws Exception
 	{
-		ASTPlugin ast = registry.getPlugin("AST");
-		TCPlugin tc = registry.getPlugin("TC");
-		INPlugin in = registry.getPlugin("IN");
-		POPlugin po = registry.getPlugin("PO");
-		CTPlugin ct = registry.getPlugin("CT");
-		
 		Diag.info("Checking loaded files (%s)...", reason);
-		ast.preCheck();
-		tc.preCheck();
-		in.preCheck();
+		eventhub.publish(new CheckPrepareEvent());
+
+		RPCMessageList results = new RPCMessageList();
+		List<VDMMessage> diags = new Vector<VDMMessage>();
+		boolean hasErrors = false;
+
+		CheckSyntaxEvent syntax = new CheckSyntaxEvent();
+		results.addAll(eventhub.publish(syntax));
+		diags.addAll(syntax.getMessages());
 		
-		if (hasClientCapability("experimental.proofObligationGeneration"))
+		if (!syntax.hasErrs())
 		{
-			po.preCheck();
-		}
-		
-		if (hasClientCapability("experimental.combinatorialTesting"))
-		{
-			ct.preCheck();
-		}
-		
-		if (ast.checkLoadedFiles())
-		{
-			if (tc.checkLoadedFiles(ast.getAST()))
+			CheckTypeEvent typecheck = new CheckTypeEvent();
+			results.addAll(eventhub.publish(typecheck));
+			diags.addAll(typecheck.getMessages());
+
+			if (!typecheck.hasErrs())
 			{
-				if (in.checkLoadedFiles(tc.getTC()))
+				CheckCompleteEvent runtime = new CheckCompleteEvent();
+				results.addAll(eventhub.publish(runtime));
+				diags.addAll(runtime.getMessages());
+
+				if (!runtime.hasErrs())
 				{
 					Diag.info("Loaded files checked successfully");
 				}
 				else
 				{
 					Diag.error("Failed to create interpreter");
+					hasErrors = true;
 				}
 			}
 			else
 			{
 				Diag.error("Type checking errors found");
-				DiagUtils.dump(tc.getErrs());
-				DiagUtils.dump(tc.getWarns());
+				hasErrors = true;
 			}
 		}
 		else
 		{
 			Diag.error("Syntax errors found");
-			DiagUtils.dump(ast.getErrs());
-			DiagUtils.dump(ast.getWarns());
-		}
-		
-		boolean hasErrors = !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
-		
-		List<VDMMessage> diags = new Vector<VDMMessage>();
-		diags.addAll(ast.getErrs());
-		diags.addAll(tc.getErrs());
-		diags.addAll(ast.getWarns());
-		diags.addAll(tc.getWarns());
-		RPCMessageList result = messages.diagnosticResponses(diags, projectFiles.keySet());
-		
-		if (hasClientCapability("experimental.proofObligationGeneration"))
-		{
-			po.checkLoadedFiles(tc.getTC());
-
-			result.add(RPCRequest.notification("slsp/POG/updated",
-					new JSONObject("successful", !hasErrors)));
-		}
-		
-		if (hasClientCapability("experimental.combinatorialTesting"))
-		{
-			ct.checkLoadedFiles(in.getIN());
+			hasErrors = true;
 		}
 
-		result.add(RPCRequest.notification("slsp/checked", new JSONObject("successful", !hasErrors)));
+		DiagUtils.dump(diags);
+		results.addAll(messages.diagnosticResponses(diags, projectFiles.keySet()));
+		results.add(RPCRequest.notification("slsp/checked", new JSONObject("successful", !hasErrors)));
 
 		Diag.info("Checked loaded files.");
-		return result;
+		return results;
 	}
 
 	public RPCMessageList openFile(RPCRequest request, File file, String text) throws Exception
@@ -656,6 +647,8 @@ public class LSPWorkspaceManager
 			openFiles.add(file);
 		}
 		
+		eventhub.publish(new OpenFileEvent(request, file));
+		
 		StringBuilder existing = projectFiles.get(file);
 		
 		if (orderedFiles && existing == null)
@@ -671,7 +664,7 @@ public class LSPWorkspaceManager
 			}
 			
 			projectFiles.put(file, new StringBuilder(text));
-			checkLoadedFiles("file out of sync");
+			return checkLoadedFiles("file out of sync");
 		}
 		
 		return null;
@@ -699,6 +692,7 @@ public class LSPWorkspaceManager
 		{
 			Diag.info("Closing file: %s", file);
 			openFiles.remove(file);
+			eventhub.publish(new CloseFileEvent(request, file));
 		}
 		
 		return null;
@@ -728,10 +722,10 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
-			if (documentFilesToWarn.contains(file))
+			if (externalFilesToWarn.contains(file))
 			{
 				sendMessage(WARNING_MSG, "WARNING: Changing generated VDM source: " + file);
-				documentFilesToWarn.remove(file);
+				externalFilesToWarn.remove(file);
 			}
 			
 			StringBuilder buffer = projectFiles.get(file);
@@ -744,18 +738,8 @@ public class LSPWorkspaceManager
 			}
 			
 			DiagUtils.dumpEdit(range, buffer);
-			ASTPlugin ast = registry.getPlugin("AST");
-			List<VDMMessage> errors = ast.fileChanged(file);
 			
-			// Add TC errors as these need to be seen until the next save
-			TCPlugin tc = registry.getPlugin("TC");
-			errors.addAll(tc.getErrs());
-			errors.addAll(tc.getWarns());
-			
-			// We report on this file, plus the files with tc errors (if any).
-			Set<File> files = messages.filesOfMessages(errors);
-			files.add(file);
-			return messages.diagnosticResponses(errors, files);
+			return eventhub.publish(new ChangeFileEvent(request, file));
 		}
 	}
 
@@ -804,7 +788,7 @@ public class LSPWorkspaceManager
 					Diag.info("Ignoring %s file in vdmignore", file);
 					actionCode = DO_NOTHING;			
 				}
-				else if (documentFile(file))
+				else if (isExternalFile(file))
 				{
 					Diag.info("Created new document file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
@@ -825,8 +809,7 @@ public class LSPWorkspaceManager
 					else
 					{
 						Diag.info("Created new file: %s", file);
-						loadFile(file);
-						actionCode = RECHECK;
+						actionCode = RELOAD_AND_CHECK;
 					}
 				}
 				else
@@ -863,7 +846,7 @@ public class LSPWorkspaceManager
 					Diag.info("Ignoring %s file in vdmignore", file);
 					actionCode = DO_NOTHING;			
 				}
-				else if (documentFile(file))
+				else if (isExternalFile(file))
 				{
 					Diag.info("Updated document file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
@@ -882,12 +865,6 @@ public class LSPWorkspaceManager
 				{
 					Diag.info("Simple file change: %s", file);
 					actionCode = RECHECK;
-
-					// Can't distinguish quick delete/create from change here, so comment out...
-					// if (documentFiles.containsKey(file))
-					// {
-					// 		sendMessage(WARNING_MSG, "WARNING: Overwriting generated VDM source: " + file);
-					// }
 				}
 				break;
 				
@@ -958,7 +935,7 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
-			if (documentFiles.containsKey(file))
+			if (externalFiles.containsKey(file))
 			{
 				sendMessage(WARNING_MSG, "WARNING: Saving generated VDM source: " + file);
 			}
@@ -968,6 +945,7 @@ public class LSPWorkspaceManager
 				projectFiles.put(file, new StringBuilder(text));
 			}
 			
+			eventhub.publish(new SaveFileEvent(request, file));
 			checkLoadedFiles("saved");
 		}
 	}
@@ -1434,8 +1412,11 @@ public class LSPWorkspaceManager
 	public RPCMessageList shutdown(RPCRequest request)
 	{
 		Diag.info("Shutting down server");
+		eventhub.publish(new ShutdownEvent(request));
 		LSPServer.getInstance().setInitialized(false);
-		clearDocumentFiles();
+		removeExternalFiles();
+		reset();	// Clear registry, eventhub and singleton
+		
 		return new RPCMessageList(request);
 	}
 

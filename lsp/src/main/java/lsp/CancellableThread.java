@@ -47,8 +47,15 @@ abstract public class CancellableThread extends Thread
 	{
 		try
 		{
-			Diag.info("Starting %s", getName());
-			body();
+			if (!cancelled)
+			{
+				Diag.info("Starting %s", getName());
+				body();
+			}
+			else
+			{
+				Diag.info("%s cancelled before it started", getName());
+			}
 		}
 		finally
 		{
