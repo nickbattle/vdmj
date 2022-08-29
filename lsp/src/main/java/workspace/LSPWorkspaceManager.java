@@ -202,7 +202,7 @@ public class LSPWorkspaceManager
 		try
 		{
 			RPCMessageList response = new RPCMessageList();
-			response.add(lspDynamicRegistrations());
+			response.addAll(lspDynamicRegistrations());
 			response.addAll(checkLoadedFiles("initialized"));
 			response.addAll(eventhub.publish(new InitializedEvent(request)));
 			return response;
@@ -254,25 +254,38 @@ public class LSPWorkspaceManager
 		return clientInfo.get(key);
 	}
 
-	private RPCRequest lspDynamicRegistrations()
+	private RPCMessageList lspDynamicRegistrations()
 	{
-		JSONArray watchers = new JSONArray();
+		RPCMessageList registrations = new RPCMessageList();
 		
-		// Add the rootUri so that we only notice changes in our own project.
-		// We watch for all files/dirs and deal with filtering in changedWatchedFiles,
-		// otherwise directory deletions are not notified.
-		watchers.add(new JSONObject("globPattern", rootUri.getAbsolutePath() + "/**"));
+		if (hasClientCapability("workspace.didChangeWatchedFiles.dynamicRegistration"))
+		{
+			JSONArray watchers = new JSONArray();
+			
+			// Add the rootUri so that we only notice changes in our own project.
+			// We watch for all files/dirs and deal with filtering in changedWatchedFiles,
+			// otherwise directory deletions are not notified.
+			watchers.add(new JSONObject("globPattern", rootUri.getAbsolutePath() + "/**"));
+			
+			registrations.add( RPCRequest.create("client/registerCapability",
+				new JSONObject(
+					"registrations",
+						new JSONArray(
+							new JSONObject(
+								"id", "12345",
+								"method", "workspace/didChangeWatchedFiles",
+								"registerOptions",
+									new JSONObject("watchers", watchers)
+				)))));
+			
+			Diag.info("Added dynamic registration for workspace/didChangeWatchedFiles");
+		}
+		else
+		{
+			Diag.info("Client does not support dynamic registration for workspace/didChangeWatchedFiles");
+		}
 		
-		return RPCRequest.create("client/registerCapability",
-			new JSONObject(
-				"registrations",
-					new JSONArray(
-						new JSONObject(
-							"id", "12345",
-							"method", "workspace/didChangeWatchedFiles",
-							"registerOptions",
-								new JSONObject("watchers", watchers)
-			))));
+		return registrations;
 	}
 	
 	private void loadAllProjectFiles() throws IOException
