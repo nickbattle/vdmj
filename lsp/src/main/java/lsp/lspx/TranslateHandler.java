@@ -35,10 +35,8 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.EventHub;
 import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
-import workspace.events.UnknownMethodEvent;
 
 public class TranslateHandler extends LSPHandler
 {
@@ -109,14 +107,7 @@ public class TranslateHandler extends LSPHandler
 					return LSPXWorkspaceManager.getInstance().translateGraphviz(request, file, saveUri, options);
 				
 				default:
-					RPCMessageList external = EventHub.getInstance().publish(new UnknownMethodEvent(request));
-					
-					if (external != null && !external.isEmpty())
-					{
-						return external;
-					}
-					
-					return new RPCMessageList(request, RPCErrors.InvalidParams, "Unsupported language");
+					return LSPXWorkspaceManager.getInstance().unhandledMethod(request);
 			}
 			
 		}
