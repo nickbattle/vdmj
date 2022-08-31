@@ -41,7 +41,7 @@ public class ExamplePluginSL extends ExamplePlugin
 	@Override
 	public DAPMessageList handleEvent(DAPEvent event) throws Exception
 	{
-		System.out.println("ExamplePluginPR got " + event);
+		System.out.println("ExamplePluginSL got " + event);
 		return null;
 	}
 
