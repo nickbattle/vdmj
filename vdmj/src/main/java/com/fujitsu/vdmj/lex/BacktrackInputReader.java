@@ -62,7 +62,8 @@ public class BacktrackInputReader
 		try
 		{
 			ExternalFormatReader efr = readerFactory(file, charset);
-			data = efr.getText(file, charset);
+			char[] source = efr.getText(file, charset);
+			data = new IfdefProcessor().getText(source);
 			pos = 0;
 		}
 		catch (IOException e)

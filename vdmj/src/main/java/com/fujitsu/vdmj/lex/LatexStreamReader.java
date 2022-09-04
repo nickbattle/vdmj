@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.Stack;
 
 /**
  * A class to read LaTeX encoded VDM files.
@@ -40,8 +39,6 @@ public class LatexStreamReader implements ExternalFormatReader
 {
 	private final static String BOM = "\uFEFF";
 
-	private Stack<Boolean> ifstack = new Stack<Boolean>();
-	
 	public char[] getText(String expression) throws IOException
 	{
 		return readFile(new StringReader(expression));
@@ -89,46 +86,6 @@ public class LatexStreamReader implements ExternalFormatReader
     					 trimmed.startsWith("\\document"))
     			{
     				supress = true;
-    				line = "";
-    			}
-			}
-			else if (trimmed.startsWith("#"))
-			{
-    			if (trimmed.startsWith("#ifdef"))
-    			{
-    				String label = trimmed.substring(6).trim();
-    				ifstack.push(supress);
-
-    				if (!supress && System.getProperty(label) == null)
-    				{
-    					supress = true;
-    				}
-
-    				line = "";
-    			}
-    			else if (trimmed.startsWith("#ifndef"))
-    			{
-    				String label = trimmed.substring(7).trim();
-    				ifstack.push(supress);
-
-    				if (!supress && System.getProperty(label) != null)
-    				{
-    					supress = true;
-    				}
-
-    				line = "";
-    			}
-    			else if (trimmed.startsWith("#else") && !ifstack.isEmpty())
-    			{
-    				if (!ifstack.peek())
-    				{
-    					supress = !supress;
-    					line = "";
-    				}
-    			}
-    			else if (trimmed.startsWith("#endif") && !ifstack.isEmpty())
-    			{
-    				supress = ifstack.pop();
     				line = "";
     			}
 			}
