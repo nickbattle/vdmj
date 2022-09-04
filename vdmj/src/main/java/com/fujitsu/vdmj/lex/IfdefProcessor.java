@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Stack;
 
+import com.fujitsu.vdmj.config.Properties;
+
 /**
  * A class to process #ifdef #else #endif directives.
  */
@@ -87,6 +89,33 @@ public class IfdefProcessor
     			{
     				supress = ifstack.pop();
     				line = "";
+    			}
+    			else if (trimmed.startsWith("#define"))
+    			{
+    				String[] parts = trimmed.split("\\s+");
+    				
+    				if (parts[0].equals("#define") && parts.length == 3 && !supress)
+    				{
+    					String name = parts[1];
+    					String value = parts[2];
+    					System.setProperty(name, value);
+    					Properties.init();
+    				}
+    				
+    				line = "";
+    			}
+    			else if (trimmed.startsWith("#undef"))
+    			{
+    				String[] parts = trimmed.split("\\s+");
+    				
+       				if (parts[0].equals("#undef") && parts.length == 2 && !supress)
+    				{
+    					String name = parts[1];
+    					System.clearProperty(name);
+    					Properties.init();
+    				}
+       				
+       				line = "";
     			}
 			}
 
