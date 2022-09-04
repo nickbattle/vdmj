@@ -53,9 +53,11 @@ public class IfdefProcessor
 
 			if (trimmed.startsWith("#"))
 			{
-    			if (trimmed.startsWith("#ifdef"))
+   				String[] parts = trimmed.split("\\s+");
+
+    			if (parts[0].equals("#ifdef") && parts.length == 2)
     			{
-    				String label = trimmed.substring(6).trim();
+    				String label = parts[1];
     				ifstack.push(supress);
 
     				if (!supress && System.getProperty(label) == null)
@@ -65,9 +67,9 @@ public class IfdefProcessor
 
     				line = "";
     			}
-    			else if (trimmed.startsWith("#ifndef"))
+    			else if (parts[0].equals("#ifndef") && parts.length == 2)
     			{
-    				String label = trimmed.substring(7).trim();
+    				String label = parts[1];
     				ifstack.push(supress);
 
     				if (!supress && System.getProperty(label) != null)
@@ -77,7 +79,7 @@ public class IfdefProcessor
 
     				line = "";
     			}
-    			else if (trimmed.startsWith("#else") && !ifstack.isEmpty())
+    			else if (parts[0].equals("#else") && parts.length == 1 && !ifstack.isEmpty())
     			{
     				if (!ifstack.peek())
     				{
@@ -85,34 +87,31 @@ public class IfdefProcessor
     					line = "";
     				}
     			}
-    			else if (trimmed.startsWith("#endif") && !ifstack.isEmpty())
+    			else if (parts[0].equals("#endif") && parts.length == 1 && !ifstack.isEmpty())
     			{
     				supress = ifstack.pop();
     				line = "";
     			}
-    			else if (trimmed.startsWith("#define"))
+    			else if (parts[0].equals("#define") && parts.length >= 3)
     			{
-    				String[] parts = trimmed.split("\\s+");
-    				
-    				if (parts[0].equals("#define") && parts.length == 3 && !supress)
+    				if (!supress)
     				{
     					String name = parts[1];
-    					String value = parts[2];
+    					int pos = trimmed.indexOf(name) + name.length();	// eg. #define X "abc def"
+    					String value = trimmed.substring(pos).trim();
     					System.setProperty(name, value);
-    					Properties.init();
+    					if (name.startsWith("vdmj.")) Properties.init();
     				}
     				
     				line = "";
     			}
-    			else if (trimmed.startsWith("#undef"))
+    			else if (parts[0].equals("#undef") && parts.length == 2)
     			{
-    				String[] parts = trimmed.split("\\s+");
-    				
-       				if (parts[0].equals("#undef") && parts.length == 2 && !supress)
+       				if (!supress)
     				{
     					String name = parts[1];
     					System.clearProperty(name);
-    					Properties.init();
+    					if (name.startsWith("vdmj.")) Properties.init();
     				}
        				
        				line = "";

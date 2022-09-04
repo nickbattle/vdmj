@@ -93,7 +93,8 @@ public class BacktrackInputReader
 		try
 		{
 			LatexStreamReader lsr = new LatexStreamReader();
-			data = lsr.getText(expression);
+			char[] source = lsr.getText(expression);
+			data = new IfdefProcessor().getText(source);
 			pos = 0;
 		}
 		catch (IOException e)
