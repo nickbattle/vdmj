@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.lspx.TranslateHandler;
+import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 
@@ -120,8 +121,8 @@ public class TranslateTest extends LSPTest
 		empty.toFile().delete();
 
 		dump(response.get(0));
-		assertEquals("Unsupported language", response.get(0).getPath("error.message"));
-		assertEquals(Long.valueOf(-32602), response.get(0).getPath("error.code"));
+		assertEquals("slsp/TR/translate", response.get(0).getPath("error.message"));
+		assertEquals((Long)RPCErrors.MethodNotFound.getValue(), response.get(0).getPath("error.code"));
 	}
 
 	@Test

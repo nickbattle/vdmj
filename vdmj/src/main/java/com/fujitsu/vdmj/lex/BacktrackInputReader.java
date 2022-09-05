@@ -62,7 +62,8 @@ public class BacktrackInputReader
 		try
 		{
 			ExternalFormatReader efr = readerFactory(file, charset);
-			data = efr.getText(file, charset);
+			char[] source = efr.getText(file, charset);
+			data = new IfdefProcessor().getText(source);
 			pos = 0;
 		}
 		catch (IOException e)
@@ -92,7 +93,8 @@ public class BacktrackInputReader
 		try
 		{
 			LatexStreamReader lsr = new LatexStreamReader();
-			data = lsr.getText(expression);
+			char[] source = lsr.getText(expression);
+			data = new IfdefProcessor().getText(source);
 			pos = 0;
 		}
 		catch (IOException e)

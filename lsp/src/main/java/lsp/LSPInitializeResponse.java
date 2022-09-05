@@ -27,6 +27,7 @@ package lsp;
 import dap.DAPServerSocket;
 import json.JSONArray;
 import json.JSONObject;
+import workspace.LSPWorkspaceManager;
 import workspace.PluginRegistry;
 
 public class LSPInitializeResponse extends JSONObject
@@ -42,6 +43,9 @@ public class LSPInitializeResponse extends JSONObject
 	private JSONObject getServerCapabilities()
 	{
 		JSONObject cap = new JSONObject();
+		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+		
+		
 		cap.put("definitionProvider", true);			// Go to definition for F12
 		cap.put("documentSymbolProvider", true);		// Symbol information for Outline view
 
@@ -50,10 +54,11 @@ public class LSPInitializeResponse extends JSONObject
 				"triggerCharacters", new JSONArray(".", "`"),
 				"resolveProvider", false));
 		
-		cap.put("textDocumentSync",						// Note: save covered by watched files
+		cap.put("textDocumentSync",
 			new JSONObject(
 				"openClose", true,
-				"change", 2		// incremental
+				"save", !manager.hasClientCapability("workspace.didChangeWatchedFiles.dynamicRegistration"),
+				"change", 2				// incremental
 			));
 		
 		cap.put("codeLensProvider",
