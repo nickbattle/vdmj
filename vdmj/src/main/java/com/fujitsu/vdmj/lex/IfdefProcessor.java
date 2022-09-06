@@ -79,13 +79,31 @@ public class IfdefProcessor
 
     				line = "";
     			}
+       			else if (parts[0].equals("#elseif") && parts.length == 2)
+    			{
+    				if (!ifstack.peek())
+    				{
+    					ifstack.pop();
+    					supress = !supress;
+        				ifstack.push(supress);
+        				String label = parts[1];
+
+	    				if (!supress && System.getProperty(label) == null)
+	    				{
+	    					supress = true;
+	    				}
+    				}
+
+    				line = "";
+    			}
     			else if (parts[0].equals("#else") && parts.length == 1 && !ifstack.isEmpty())
     			{
     				if (!ifstack.peek())
     				{
     					supress = !supress;
-    					line = "";
     				}
+
+    				line = "";
     			}
     			else if (parts[0].equals("#endif") && parts.length == 1 && !ifstack.isEmpty())
     			{
