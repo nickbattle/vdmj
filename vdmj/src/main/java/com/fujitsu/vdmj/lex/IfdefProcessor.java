@@ -45,7 +45,10 @@ public class IfdefProcessor
 		String line = br.readLine();
 		StringBuilder output = new StringBuilder();
 		
-		boolean supress = false;
+		boolean include = true;
+		boolean done = false;
+		
+		ifstack.push(true);		// Always included to start
 
 		while (line != null)
 		{
@@ -57,62 +60,65 @@ public class IfdefProcessor
 
     			if (parts[0].equals("#ifdef") && parts.length == 2)
     			{
-    				String label = parts[1];
-    				ifstack.push(supress);
-
-    				if (!supress && System.getProperty(label) == null)
+    				if (ifstack.peek())
     				{
-    					supress = true;
+	    				ifstack.push(include);
+	    				include = (System.getProperty(parts[1]) != null);
+	    				done = include;
     				}
-
+    				
     				line = "";
     			}
     			else if (parts[0].equals("#ifndef") && parts.length == 2)
     			{
-    				String label = parts[1];
-    				ifstack.push(supress);
-
-    				if (!supress && System.getProperty(label) != null)
+    				if (ifstack.peek())
     				{
-    					supress = true;
+	    				ifstack.push(include);
+	    				include = (System.getProperty(parts[1]) == null);
+	    				done = include;
     				}
-
+    				
     				line = "";
     			}
        			else if (parts[0].equals("#elseif") && parts.length == 2)
     			{
-    				if (!ifstack.peek())
-    				{
-    					ifstack.pop();
-    					supress = !supress;
-        				ifstack.push(supress);
-        				String label = parts[1];
-
-	    				if (!supress && System.getProperty(label) == null)
+       				if (ifstack.peek())
+       				{
+	    				if (!done)
 	    				{
-	    					supress = true;
+	    					include = (System.getProperty(parts[1]) != null);
+	    					done = include;
 	    				}
-    				}
+	    				else
+	    				{
+	    					include = false;
+	    				}
+       				}
 
     				line = "";
     			}
     			else if (parts[0].equals("#else") && parts.length == 1 && !ifstack.isEmpty())
     			{
-    				if (!ifstack.peek())
+    				if (ifstack.peek())
     				{
-    					supress = !supress;
+    					include = !done;
     				}
-
+    				
     				line = "";
     			}
     			else if (parts[0].equals("#endif") && parts.length == 1 && !ifstack.isEmpty())
     			{
-    				supress = ifstack.pop();
+    				if (ifstack.peek())
+    				{
+	    				include = ifstack.pop();
+	    				done = false;
+    				}
+    				
     				line = "";
     			}
     			else if (parts[0].equals("#define") && parts.length >= 3)
     			{
-    				if (!supress)
+    				if (ifstack.peek() && include)
     				{
     					String name = parts[1];
     					int pos = trimmed.indexOf(name) + name.length();	// eg. #define X "abc def"
@@ -125,7 +131,7 @@ public class IfdefProcessor
     			}
     			else if (parts[0].equals("#undef") && parts.length == 2)
     			{
-       				if (!supress)
+       				if (ifstack.peek() && include)
     				{
     					String name = parts[1];
     					System.clearProperty(name);
@@ -136,7 +142,7 @@ public class IfdefProcessor
     			}
 			}
 
-			if (!supress)
+			if (include)
 			{
 				output.append(line);
 			}
