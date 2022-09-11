@@ -66,6 +66,13 @@ as the expected and actual values.
 1013, "Illegal nested block comment"
 1014, "Cannot convert <string> in base <n>"
 
+1500, "Unexpected #directive"
+1501, "Unexpected end of preprocessor stream"
+1502, "Expecting #ifdef <property>"
+1503, "Expecting #ifndef <property>"
+1504, "Expecting #define <property> [value]"
+1505, "Expecting #undef <property>"
+
 
 2000, "Expecting 'in set' or 'in seq' after pattern in set binding"
 2001, "Expecting 'in set' or 'in seq' in set bind"
