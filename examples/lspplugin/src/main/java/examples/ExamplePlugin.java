@@ -24,11 +24,18 @@
 
 package examples;
 
+import java.io.File;
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.DAPMessageList;
+import json.JSONArray;
+import json.JSONObject;
 import rpc.RPCMessageList;
+import vdmj.commands.Command;
 import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;
@@ -53,6 +60,7 @@ import workspace.events.SaveFileEvent;
 import workspace.events.ShutdownEvent;
 import workspace.events.UnknownCommandEvent;
 import workspace.events.UnknownMethodEvent;
+import workspace.lenses.CodeLens;
 import workspace.plugins.AnalysisPlugin;
 
 abstract public class ExamplePlugin extends AnalysisPlugin implements EventListener
@@ -104,6 +112,51 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		eventhub.register(DAPTerminateEvent.class, this);
 
 		eventhub.register(UnknownCommandEvent.class, this);
+	}
+	
+	@Override
+	public JSONObject getExperimentalOptions(JSONObject standard)
+	{
+		// Just an example. See initialize response.
+		return new JSONObject("exampleProvider", true);	
+	}
+	
+	@Override
+	protected List<CodeLens> getCodeLenses(boolean dirty)
+	{
+		List<CodeLens> lenses = new Vector<CodeLens>();
+		lenses.add(new ExampleLens());
+		return lenses;
+	}
+	
+	@Override
+	abstract public JSONArray applyCodeLenses(File file, boolean dirty);
+	
+	@Override
+	public Command getCommand(String line)
+	{
+		String[] parts = line.split("\\s+");
+		
+		switch (parts[0])
+		{
+			case "example":
+				return new ExampleCommand(line);
+				
+			// Other commands here...
+				
+			default:
+				return null;
+		}
+	}
+	
+	@Override
+	public String[][] getCommandHelp()
+	{
+		return new String[][]
+		{
+			ExampleCommand.HELP
+			// Other commands' help lines here...
+		};
 	}
 
 	@Override
