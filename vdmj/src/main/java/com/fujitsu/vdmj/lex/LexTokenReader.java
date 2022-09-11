@@ -849,11 +849,11 @@ public class LexTokenReader extends BacktrackInputReader
     				}
     				while (Character.isLetter(ch));
 
-    				type = Token.lookup(tag.toString(), dialect);
+    				type = Token.lookup(tag.toString(), dialect);	// #req, #act, #fin
 
     				if (type == null)
     				{
-    					throwMessage(1007, "Unexpected tag after '#'");
+    					throwMessage(1007, tokline, tokpos, "Unexpected tag after '#'");
     				}
 
     				rdch = false;
