@@ -75,7 +75,7 @@ public class ASTPluginSL extends ASTPlugin
 		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
-			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(), Dialect.VDM_SL, entry.getKey(), "UTF-8");
+			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(), Dialect.VDM_SL, entry.getKey());
 			ModuleReader mr = new ModuleReader(ltr);
 			astModuleList.addAll(mr.readModules());
 			
@@ -110,7 +110,7 @@ public class ASTPluginSL extends ASTPlugin
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
-		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file, "UTF-8");
+		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file);
 		ModuleReader mr = new ModuleReader(ltr);
 		dirtyModuleList = mr.readModules();
 		

@@ -65,7 +65,7 @@ public class SLSpecificationReader extends SpecificationReader
 		
 		for (File file: files)
 		{
-			LexTokenReader lexer = new LexTokenReader(file, Settings.dialect, charset.toString());
+			LexTokenReader lexer = new LexTokenReader(file, Settings.dialect, charset);
 			ModuleReader reader = new ModuleReader(lexer);
 			parsedModules.addAll(reader.readModules());
 			

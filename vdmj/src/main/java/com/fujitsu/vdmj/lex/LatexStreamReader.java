@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 
 /**
  * A class to read LaTeX encoded VDM files.
@@ -45,7 +46,7 @@ public class LatexStreamReader implements ExternalFormatReader
 	}
 
 	@Override
-	public char[] getText(File file, String encoding) throws IOException
+	public char[] getText(File file, Charset encoding) throws IOException
 	{
 		return readFile(new InputStreamReader(new FileInputStream(file), encoding));
 	}

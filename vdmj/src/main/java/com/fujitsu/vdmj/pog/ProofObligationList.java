@@ -148,7 +148,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 
 	private void typeCheck(ProofObligation obligation, String mname, Environment env) throws Exception
 	{
-		LexTokenReader ltr = new LexTokenReader(obligation.getValue(), Dialect.VDM_SL, Console.charset);
+		LexTokenReader ltr = new LexTokenReader(obligation.getValue(), Dialect.VDM_SL);
 		ExpressionReader reader = new ExpressionReader(ltr);
 		reader.setCurrentModule(mname);
 		ASTExpression ast = reader.readExpression();

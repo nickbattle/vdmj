@@ -609,7 +609,7 @@ public class DBGPReader extends DebugLink
 		System.exit(1);
 	}
 
-	private static String validateCharset(String cs)
+	private static Charset validateCharset(String cs)
 	{
 		if (!Charset.isSupported(cs))
 		{
@@ -627,7 +627,7 @@ public class DBGPReader extends DebugLink
 			usage("Charset " + cs + " is not supported");
 		}
 
-		return cs;
+		return Charset.forName(cs);
 	}
 
 	public DBGPReader(

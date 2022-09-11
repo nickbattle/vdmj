@@ -124,7 +124,7 @@ public class LexLocation implements Serializable, Comparable<LexLocation>
 		{
 			return "";		// Default LexLocation has no location string
 		}
-		else if (module == null || module.equals(""))
+		else if (module.equals(""))
 		{
 			return "in '" + file + "' at line " + startLine + ":" + startPos;
 		}
@@ -165,7 +165,7 @@ public class LexLocation implements Serializable, Comparable<LexLocation>
 	@Override
 	public int hashCode()
 	{
-		return file.hashCode() + (module != null ? module.hashCode() : 0) + startLine + startPos;
+		return file.hashCode() + module.hashCode() + startLine + startPos;
 	}
 
 	/**

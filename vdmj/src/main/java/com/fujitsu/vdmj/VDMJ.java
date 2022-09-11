@@ -62,7 +62,7 @@ abstract public class VDMJ
 	protected static String script = null;
 	protected static String logfile = null;
 
-	public static String filecharset = Charset.defaultCharset().name();
+	public static Charset filecharset = Charset.defaultCharset();
 
 	/**
 	 * The main method. This validates the arguments, then parses and type
@@ -649,7 +649,7 @@ abstract public class VDMJ
 		return n + " " + (n != 1 ? s + pl : s);
 	}
 
-	private static String validateCharset(String cs)
+	private static Charset validateCharset(String cs)
 	{
 		if (!Charset.isSupported(cs))
 		{
@@ -667,10 +667,10 @@ abstract public class VDMJ
 			usage("Charset " + cs + " is not supported");
 		}
 
-		return cs;
+		return Charset.forName(cs);
 	}
 
-	public void setCharset(String charset)
+	public void setCharset(Charset charset)
 	{
 		VDMJ.filecharset = charset;
 	}

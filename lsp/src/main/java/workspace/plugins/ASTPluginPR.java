@@ -96,7 +96,7 @@ public class ASTPluginPR extends ASTPlugin
 		
 		for (Entry<File, StringBuilder> entry: projectFiles.entrySet())
 		{
-			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(), Settings.dialect, entry.getKey(), "UTF-8");
+			LexTokenReader ltr = new LexTokenReader(entry.getValue().toString(), Settings.dialect, entry.getKey());
 			ClassReader mr = new ClassReader(ltr);
 			astClassList.addAll(mr.readClasses());
 			
@@ -155,7 +155,7 @@ public class ASTPluginPR extends ASTPlugin
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
-		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file, "UTF-8");
+		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file);
 		ClassReader cr = new ClassReader(ltr);
 		dirtyClassList = cr.readClasses();
 		

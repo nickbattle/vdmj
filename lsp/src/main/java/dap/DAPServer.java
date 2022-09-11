@@ -26,6 +26,7 @@ package dap;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.Charset;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.Console;
@@ -105,7 +106,7 @@ public class DAPServer extends JSONServer
 	public void run() throws IOException
 	{
 		running = true;
-		Console.init("UTF-8", getOutConsoleWriter(), getErrConsoleWriter());
+		Console.init(Charset.forName("UTF-8"), getOutConsoleWriter(), getErrConsoleWriter());
 
 		while (running)
 		{
@@ -129,7 +130,7 @@ public class DAPServer extends JSONServer
 			}
 		}
 
-		Console.init("UTF-8");
+		Console.init(Charset.forName("UTF-8"));
 	}
 	
 	public void stdout(String message)

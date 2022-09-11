@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.lex;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -111,9 +112,9 @@ abstract public class XMLStreamReader implements ExternalFormatReader
 	protected final static String MARKER = "%%VDM%%";
 
 	@Override
-	public char[] getText(File file, String encoding) throws IOException
+	public char[] getText(File file, Charset encoding) throws IOException
 	{
-		String fileText = readZip(file, encoding);
+		String fileText = readZip(file, encoding.name());
 		StringBuilder text = new StringBuilder();
 		int start = fileText.indexOf(MARKER);
 

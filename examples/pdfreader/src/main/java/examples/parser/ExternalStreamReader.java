@@ -26,6 +26,7 @@ package examples.parser;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 import com.fujitsu.vdmj.lex.ExternalFormatReader;
 
@@ -36,7 +37,7 @@ import com.fujitsu.vdmj.lex.ExternalFormatReader;
 public class ExternalStreamReader implements ExternalFormatReader
 {
 	@Override
-	public char[] getText(File file, String charset) throws IOException
+	public char[] getText(File file, Charset charset) throws IOException
 	{
 		try
 		{

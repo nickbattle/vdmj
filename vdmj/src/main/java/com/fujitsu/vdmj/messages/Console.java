@@ -28,13 +28,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 public class Console
 {
 	/** The charset for the console. */
-	public static String charset;
+	public static Charset charset;
 
 	/** A print writer for stdout that uses a given encoding. */
 	public static ConsoleWriter out;
@@ -47,35 +46,21 @@ public class Console
 
 	static
 	{
-		init(Charset.defaultCharset().name());
+		init(Charset.defaultCharset());
 	}
 
-	public static void init(String cs)
+	public static void init(Charset cs)
 	{
-		try
-		{
-			init(cs,
-				new ConsolePrintWriter(new PrintWriter(new OutputStreamWriter(System.out, cs))),
-				new ConsolePrintWriter(new PrintWriter(new OutputStreamWriter(System.err, cs))));
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			System.err.println("Console encoding exception: " + e);
-		}
+		init(cs,
+			new ConsolePrintWriter(new PrintWriter(new OutputStreamWriter(System.out, cs))),
+			new ConsolePrintWriter(new PrintWriter(new OutputStreamWriter(System.err, cs))));
 	}
 	
-	public static void init(String cs, ConsoleWriter stdout, ConsoleWriter stderr)
+	public static void init(Charset cs, ConsoleWriter stdout, ConsoleWriter stderr)
 	{
-		try
-		{
-			charset = cs;
-			out = stdout;
-			err = stderr;
-			in = new BufferedReader(new InputStreamReader(System.in, charset));
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			System.err.println("Console encoding exception: " + e);
-		}
+		charset = cs;
+		out = stdout;
+		err = stderr;
+		in = new BufferedReader(new InputStreamReader(System.in, charset));
 	}
 }

@@ -84,7 +84,7 @@ public class IfdefProcessor
 	
 	private void error(int errno, String message, String token)
 	{
-		LexLocation loc = new LexLocation(sourceFile, null, lineNo, 1, lineNo, token.length()+1);
+		LexLocation loc = new LexLocation(sourceFile, "", lineNo, 1, lineNo, token.length()+1);
 		errs.add(new VDMError(errno, message, loc));
 	}
 	
@@ -178,6 +178,7 @@ public class IfdefProcessor
 		writeLine(false);	// #if?def line
 		
 		boolean done = readBody(include && condition);
+		boolean _else = false;
 		
 		while (line != null)
 		{
@@ -190,17 +191,37 @@ public class IfdefProcessor
 				switch (parts[0])
 				{
 					case "#else":
-						writeLine(false);		// #else line
-						readBody(include && !done);
+						if (_else)
+						{
+							error(1507, "Expecting #endif after #else", "#else");
+						}
+
+						writeLine(false);
+						done |= readBody(include && !done);
+						_else = true;
 						break;
 						
 					case "#endif":
-						writeLine(false);		// #endif line
+						writeLine(false);
 						return;
 						
 					case "#elseif":
-						writeLine(false);		// #elseif line
-						done |= readBody(include && !done && System.getProperty(parts[1]) != null);
+						if (_else)
+						{
+							error(1507, "Expecting #endif after #else", "#elseif");
+						}
+
+						if (parts.length < 2)
+						{
+							error(1506, "Expecting #elseif <property>", "#elseif");
+							writeLine(false);
+							done |= readBody(include && !done);
+						}
+						else
+						{
+							writeLine(false);
+							done |= readBody(include && !done && System.getProperty(parts[1]) != null);
+						}
 						break;
 						
 					default:

@@ -43,10 +43,10 @@ import com.fujitsu.vdmj.messages.VDMError;
 public class BacktrackInputReader
 {
 	/** A stack of position markers for popping. */
-	private Stack<Integer> stack = new Stack<Integer>();
+	private final Stack<Integer> stack = new Stack<Integer>();
 
 	/** The characters from the file. */
-	private char[] data;
+	private final char[] data;
 
 	/** The current read position. */
 	private int pos = 0;
@@ -55,20 +55,21 @@ public class BacktrackInputReader
 	private static Map<String, Class<? extends ExternalFormatReader>> externalReaders = null;
 	
 	/** Ifdef processing */
-	private IfdefProcessor ifdefProcessor = null;
+	private final IfdefProcessor ifdefProcessor;
 	
 	/**
 	 * Create an object to read the file name passed with the given charset.
 	 *
 	 * @param file	The filename to open
+	 * @param charset The encoding of the file.
 	 */
-	public BacktrackInputReader(File file, String charset)
+	public BacktrackInputReader(File file, Charset charset)
 	{
 		try
 		{
-			ExternalFormatReader efr = readerFactory(file, charset);
-			char[] source = efr.getText(file, charset);
 			ifdefProcessor = new IfdefProcessor(file);
+			ExternalFormatReader efr = readerFactory(file);
+			char[] source = efr.getText(file, charset);
 			data = ifdefProcessor.getText(source);
 			pos = 0;
 		}
@@ -82,15 +83,16 @@ public class BacktrackInputReader
 	 * Create an object to read the string passed. This is used in the
 	 * interpreter to parse expressions typed in.
 	 *
-	 * @param content
+	 * @param file The filename of the content, for errors
+	 * @param content The actual content.
 	 */
-	public BacktrackInputReader(File file, String content, String charset)
+	public BacktrackInputReader(File file, String content)
 	{
 		try
 		{
+			ifdefProcessor = new IfdefProcessor(file);
 			LatexStreamReader lsr = new LatexStreamReader();
 			char[] source = lsr.getText(content);
-			ifdefProcessor = new IfdefProcessor(file);
 			data = ifdefProcessor.getText(source);
 			pos = 0;
 		}
@@ -98,14 +100,6 @@ public class BacktrackInputReader
 		{
 			throw new InternalException(0, "Cannot read file: " + e.getMessage());
 		}
-	}
-	
-	/**
-	 * Create an object to read the string passed with the default charset.
-	 */
-	public BacktrackInputReader(String expression)
-	{
-		this(null, expression, Charset.defaultCharset().name());
 	}
 
 	/**
@@ -120,9 +114,9 @@ public class BacktrackInputReader
 	 * Create an ExternalFormatReader from a File, depending on the filename.
 	 * @throws IOException 
 	 */
-	private ExternalFormatReader readerFactory(File file, String charset) throws IOException
+	private ExternalFormatReader readerFactory(File file) throws IOException
 	{
-		String name = file.getName();
+		String lowerName = file.getName().toLowerCase();		// NB! lower case matched
 		
 		if (externalReaders == null)
 		{
@@ -131,7 +125,7 @@ public class BacktrackInputReader
 		
 		for (String suffix: externalReaders.keySet())
 		{
-			if (name.endsWith(suffix))
+			if (lowerName.endsWith(suffix))
 			{
 				try
 				{
@@ -158,13 +152,9 @@ public class BacktrackInputReader
 		
 		// Add the standard readers first
 		externalReaders.put(".doc", DocStreamReader.class);
-		externalReaders.put(".DOC", DocStreamReader.class);
 		externalReaders.put(".docx", DocxStreamReader.class);
-		externalReaders.put(".DOCX", DocxStreamReader.class);
 		externalReaders.put(".odt", ODFStreamReader.class);
-		externalReaders.put(".ODT", ODFStreamReader.class);
 		externalReaders.put(".adoc", AsciiDocStreamReader.class);
-		externalReaders.put(".ADOC", AsciiDocStreamReader.class);
 		externalReaders.put(".md", MarkdownStreamReader.class);
 		externalReaders.put(".markdown", MarkdownStreamReader.class);
 		
@@ -181,7 +171,7 @@ public class BacktrackInputReader
 					if (parts.length == 2)
 					{
 						Class<? extends ExternalFormatReader> clazz = (Class<? extends ExternalFormatReader>) Class.forName(parts[1]);
-						externalReaders.put(parts[0], clazz);
+						externalReaders.put(parts[0].toLowerCase(), clazz);
 					}
 					else
 					{
@@ -215,7 +205,7 @@ public class BacktrackInputReader
 		
 		for (String key: externalReaders.keySet())
 		{
-			if (file.getName().endsWith(key))
+			if (file.getName().toLowerCase().endsWith(key))
 			{
 				return true;
 			}
@@ -263,7 +253,7 @@ public class BacktrackInputReader
 	}
 	
 	/**
-	 * Get any {@link #ifdefProcessor} processor errors.
+	 * Get any IfdefProcessor errors.
 	 */
 	public List<VDMError> getErrors()
 	{

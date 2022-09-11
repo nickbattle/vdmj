@@ -49,7 +49,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
 import com.fujitsu.vdmj.po.PONode;
@@ -249,7 +248,7 @@ public class ClassInterpreter extends Interpreter
 	@Override
 	protected TCExpression parseExpression(String line, String module) throws Exception
 	{
-		LexTokenReader ltr = new LexTokenReader(line, Settings.dialect, Console.charset);
+		LexTokenReader ltr = new LexTokenReader(line, Settings.dialect);
 		ExpressionReader reader = new ExpressionReader(ltr);
 		reader.setCurrentModule(module);
 		ASTExpression ast = reader.readExpression();
