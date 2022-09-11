@@ -24,10 +24,20 @@
 
 package examples;
 
+import java.io.File;
+import java.util.List;
+
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCClassList;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+
 import dap.DAPMessageList;
+import json.JSONArray;
 import rpc.RPCMessageList;
 import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
+import workspace.lenses.CodeLens;
+import workspace.plugins.TCPlugin;
 
 public class ExamplePluginPR extends ExamplePlugin
 {
@@ -49,5 +59,37 @@ public class ExamplePluginPR extends ExamplePlugin
 	public String getName()
 	{
 		return "ExamplePluginPR";
+	}
+	
+	@Override
+	public JSONArray applyCodeLenses(File file, boolean dirty)
+	{
+		TCPlugin tc = registry.getPlugin("TC");
+		TCClassList tcClassList = tc.getTC();
+		JSONArray results = new JSONArray();
+		
+		if (!tcClassList.isEmpty())	// May be syntax errors
+		{
+			List<CodeLens> lenses = getCodeLenses(dirty);
+			
+			for (TCClassDefinition clazz: tcClassList)
+			{
+				if (clazz.name.getLocation().file.equals(file))
+				{
+					for (TCDefinition def: clazz.definitions)
+					{
+						if (def.location.file.equals(file))
+						{
+							for (CodeLens lens: lenses)
+							{
+								results.addAll(lens.getDefinitionLenses(def, clazz));
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
 	}
 }

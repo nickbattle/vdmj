@@ -26,8 +26,6 @@ package dap;
 
 import java.util.Vector;
 
-import dap.DAPRequest;
-import dap.DAPResponse;
 import json.JSONObject;
 
 public class DAPMessageList extends Vector<JSONObject>
