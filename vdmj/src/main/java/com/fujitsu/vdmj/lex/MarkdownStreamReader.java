@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.lex;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * A class to read .md Markdown encoded VDM files.
@@ -33,7 +34,7 @@ import java.io.IOException;
 public class MarkdownStreamReader extends TextStreamReader
 {
 	@Override
-	public char[] getText(File file, String encoding) throws IOException
+	public char[] getText(File file, Charset encoding) throws IOException
 	{
 		return getText(file, encoding, "<!-- vdm -->");
 	}

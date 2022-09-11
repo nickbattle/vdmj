@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Date;
 
 /**
@@ -36,7 +37,7 @@ import java.util.Date;
  */
 abstract public class TextStreamReader implements ExternalFormatReader
 {
-	protected char[] getText(File file, String encoding, String marker) throws IOException
+	protected char[] getText(File file, Charset encoding, String marker) throws IOException
 	{
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), encoding));
 		StringBuilder text =  new StringBuilder();

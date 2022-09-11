@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.lex;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * A class to read .doc encoded VDM files. These are treated as simple text
@@ -34,7 +35,7 @@ import java.io.IOException;
 public class DocStreamReader extends TextStreamReader
 {
 	@Override
-	public char[] getText(File file, String encoding) throws IOException
+	public char[] getText(File file, Charset encoding) throws IOException
 	{
 		return getText(file, encoding, "%%VDM%%");
 	}

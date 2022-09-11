@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.lex;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * Implemented by external parsers.
@@ -35,5 +36,5 @@ public interface ExternalFormatReader
 	/**
 	 * Return a character array with the extracted VDM, or null if none available.
 	 */
-	public char[] getText(File file, String charset) throws IOException;
+	public char[] getText(File file, Charset charset) throws IOException;
 }

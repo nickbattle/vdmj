@@ -31,7 +31,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -45,9 +44,9 @@ import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsolePrintWriter;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
@@ -1438,11 +1437,6 @@ abstract public class CommandReader
 		catch (FileNotFoundException e)
 		{
 			println("File '" + filename + "' not found");
-			return false;
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			println("File encoding exception: " + e);
 			return false;
 		}
 

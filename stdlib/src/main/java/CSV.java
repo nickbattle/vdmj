@@ -29,7 +29,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 
-import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpression;
@@ -277,7 +276,7 @@ public class CSV implements Serializable
 	private static Value createValue(String module, String method, String value)
 			throws Exception
 	{
-		LexTokenReader ltr = new LexTokenReader(value, Dialect.VDM_PP, VDMJ.filecharset);
+		LexTokenReader ltr = new LexTokenReader(value, Dialect.VDM_PP);
 		ExpressionReader reader = new ExpressionReader(ltr);
 		reader.setCurrentModule(module);
 		ASTExpression exp = reader.readExpression();

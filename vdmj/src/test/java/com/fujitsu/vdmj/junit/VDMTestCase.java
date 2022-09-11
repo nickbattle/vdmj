@@ -46,10 +46,10 @@ public class VDMTestCase extends TestCase
 {
 	protected ASTClassList parseClasses(String vpppath)
 	{
-		return parseClasses(vpppath, Charset.defaultCharset().name());
+		return parseClasses(vpppath, Charset.defaultCharset());
 	}
 
-	protected ASTClassList parseClasses(String vpppath, String charset)
+	protected ASTClassList parseClasses(String vpppath, Charset charset)
 	{
 		Settings.release = Release.CLASSIC;
 		Settings.dialect = Dialect.VDM_PP;
