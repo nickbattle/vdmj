@@ -28,11 +28,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.messages.VDMError;
 
 /**
  * A class to allow arbitrary checkpoints and backtracking while
@@ -52,6 +54,9 @@ public class BacktrackInputReader
 	/** External readers */
 	private static Map<String, Class<? extends ExternalFormatReader>> externalReaders = null;
 	
+	/** Ifdef processing */
+	private IfdefProcessor ifdefProcessor = null;
+	
 	/**
 	 * Create an object to read the file name passed with the given charset.
 	 *
@@ -63,7 +68,8 @@ public class BacktrackInputReader
 		{
 			ExternalFormatReader efr = readerFactory(file, charset);
 			char[] source = efr.getText(file, charset);
-			data = new IfdefProcessor().getText(source);
+			ifdefProcessor = new IfdefProcessor(file);
+			data = ifdefProcessor.getText(source);
 			pos = 0;
 		}
 		catch (IOException e)
@@ -73,28 +79,19 @@ public class BacktrackInputReader
 	}
 
 	/**
-	 * Create an object to read the file name passed with the default charset.
-	 *
-	 * @param file	The filename to open
-	 */
-	public BacktrackInputReader(File file)
-	{
-		this(file, Charset.defaultCharset().name());
-	}
-
-	/**
 	 * Create an object to read the string passed. This is used in the
 	 * interpreter to parse expressions typed in.
 	 *
-	 * @param expression
+	 * @param content
 	 */
-	public BacktrackInputReader(String expression, String charset)
+	public BacktrackInputReader(File file, String content, String charset)
 	{
 		try
 		{
 			LatexStreamReader lsr = new LatexStreamReader();
-			char[] source = lsr.getText(expression);
-			data = new IfdefProcessor().getText(source);
+			char[] source = lsr.getText(content);
+			ifdefProcessor = new IfdefProcessor(file);
+			data = ifdefProcessor.getText(source);
 			pos = 0;
 		}
 		catch (IOException e)
@@ -108,7 +105,7 @@ public class BacktrackInputReader
 	 */
 	public BacktrackInputReader(String expression)
 	{
-		this(expression, Charset.defaultCharset().name());
+		this(null, expression, Charset.defaultCharset().name());
 	}
 
 	/**
@@ -263,5 +260,18 @@ public class BacktrackInputReader
 	public char readCh()
 	{
 		return (pos == data.length) ? (char)-1 : data[pos++];
+	}
+	
+	/**
+	 * Get any {@link #ifdefProcessor} processor errors.
+	 */
+	public List<VDMError> getErrors()
+	{
+		return ifdefProcessor.getErrors();
+	}
+	
+	public int getErrorCount()
+	{
+		return ifdefProcessor.getErrorCount();
 	}
 }

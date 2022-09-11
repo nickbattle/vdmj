@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.syntax;
 
 import java.io.File;
+import java.util.List;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
@@ -59,6 +60,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.LocatedException;
+import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCImportAll;
@@ -726,5 +728,19 @@ public class ModuleReader extends SyntaxReader
 		{
 			return null;
 		}
+	}
+	
+	@Override
+	public List<VDMError> getErrors()
+	{
+		List<VDMError> errs = reader.getErrors();
+		errs.addAll(super.getErrors());
+		return errs;
+	}
+	
+	@Override
+	public int getErrorCount()
+	{
+		return reader.getErrorCount() + super.getErrorCount();
 	}
 }

@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.lex;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
@@ -147,10 +148,7 @@ public class LexTokenReader extends BacktrackInputReader
 	 */
 	public LexTokenReader(File file, Dialect dialect)
 	{
-		super(file);
-		this.file = file;
-		this.dialect = dialect;
-		init();
+		this(file, dialect, Charset.defaultCharset().name());
 	}
 
 	/**
@@ -177,10 +175,7 @@ public class LexTokenReader extends BacktrackInputReader
 	 */
 	public LexTokenReader(String expression, Dialect dialect)
 	{
-		super(expression);
-		this.file = new File("console");
-		this.dialect = dialect;
-		init();
+		this(expression, dialect, Charset.defaultCharset().name());
 	}
 
 	/**
@@ -193,7 +188,7 @@ public class LexTokenReader extends BacktrackInputReader
 	 */
 	public LexTokenReader(String expression, Dialect dialect, String charset)
 	{
-		super(expression, charset);
+		super(new File("console"), expression, charset);
 		this.file = new File("console");
 		this.dialect = dialect;
 		init();
@@ -207,7 +202,7 @@ public class LexTokenReader extends BacktrackInputReader
 	 */
 	public LexTokenReader(String content, Dialect dialect, File file, String charset)
 	{
-		super(content, charset);
+		super(file, content, charset);
 		this.file = file;
 		this.dialect = dialect;
 		init();
