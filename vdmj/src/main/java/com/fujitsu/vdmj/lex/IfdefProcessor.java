@@ -84,7 +84,7 @@ public class IfdefProcessor
 	
 	private void error(int errno, String message, String token)
 	{
-		LexLocation loc = new LexLocation(sourceFile, "?", lineNo, 1, lineNo, token.length()+1);
+		LexLocation loc = new LexLocation(sourceFile, null, lineNo, 1, lineNo, token.length()+1);
 		errs.add(new VDMError(errno, message, loc));
 	}
 	
@@ -149,12 +149,28 @@ public class IfdefProcessor
 
 	private void readIfdef(String[] ifdef, boolean include) throws IOException
 	{
-		readIf(System.getProperty(ifdef[1]) != null, include);
+		if (ifdef.length >= 2)
+		{
+			readIf(System.getProperty(ifdef[1]) != null, include);
+		}
+		else
+		{
+			error(1502, "Expecting #ifdef <property>", "#ifdef");
+			readIf(true, include);
+		}
 	}
 
 	private void readIfndef(String[] ifndef, boolean include) throws IOException
 	{
-		readIf(System.getProperty(ifndef[1]) == null, include);
+		if (ifndef.length >= 2)
+		{
+			readIf(System.getProperty(ifndef[1]) == null, include);
+		}
+		else
+		{
+			error(1503, "Expecting #ifndef <property>", "#ifndef");
+			readIf(true, include);
+		}
 	}
 
 	private void readIf(boolean condition, boolean include) throws IOException
@@ -200,7 +216,11 @@ public class IfdefProcessor
 
 	private void readDefine(String[] parts, boolean include) throws IOException
 	{
-		if (include)
+		if (parts.length < 2)
+		{
+			error(1504, "Expecting #define <property> [value]", "#define");
+		}
+		else if (include)
 		{
 			String name = parts[1];
 			
@@ -226,16 +246,22 @@ public class IfdefProcessor
 
 	private void readUndef(String[] parts, boolean include) throws IOException
 	{
-		writeLine(include);		// #undef line
-		
-		if (include)
+		if (parts.length < 2)
 		{
-			System.clearProperty(parts[1]);
-			if (parts[1].startsWith("vdmj."))
+			error(1505, "Expecting #undef <property>", "#undef");
+		}
+		else if (include)
+		{
+			String name = parts[1];
+			System.clearProperty(name);
+			
+			if (name.startsWith("vdmj."))
 			{
 				Properties.init();
 			}
 		}
+
+		writeLine(false);	// #undef line
 	}
 
 	public List<VDMError> getErrors()

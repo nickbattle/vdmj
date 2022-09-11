@@ -165,7 +165,7 @@ public class LexLocation implements Serializable, Comparable<LexLocation>
 	@Override
 	public int hashCode()
 	{
-		return file.hashCode() + module.hashCode() + startLine + startPos;
+		return file.hashCode() + (module != null ? module.hashCode() : 0) + startLine + startPos;
 	}
 
 	/**
