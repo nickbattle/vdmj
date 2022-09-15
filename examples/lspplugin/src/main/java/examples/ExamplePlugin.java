@@ -128,6 +128,10 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		return lenses;
 	}
 	
+	/**
+	 * Since we provide a code lens (above), we should implement applyCodeLenses in
+	 * both dialect subclasses.
+	 */
 	@Override
 	abstract public JSONArray applyCodeLenses(File file);
 	

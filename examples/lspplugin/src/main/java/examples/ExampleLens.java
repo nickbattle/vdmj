@@ -24,7 +24,6 @@
 
 package examples;
 
-import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
@@ -47,8 +46,7 @@ public class ExampleLens extends CodeLens implements TCCodeLens
 	{
 		JSONArray results = new JSONArray();
 		
-		if (definition instanceof TCExplicitFunctionDefinition &&	// Only explicit functions (say)
-			definition.isAccess(Token.PUBLIC))						// To match VDM++ launches
+		if (definition instanceof TCExplicitFunctionDefinition)	// Only explicit functions (say)
 		{
 			TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)definition;
 			// This displays the launch.json file via a "Config" lens
