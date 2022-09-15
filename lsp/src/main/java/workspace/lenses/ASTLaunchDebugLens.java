@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTPatternList;
 import com.fujitsu.vdmj.ast.types.ASTFunctionType;
@@ -48,6 +49,12 @@ import json.JSONObject;
 
 public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCodeLens
 {
+	@Override
+	public JSONArray getDefinitionLenses(ASTDefinition def, ASTModule module)
+	{
+		return getDefinitionLenses(def, (ASTClassDefinition)null);
+	}
+
 	@Override
 	public JSONArray getDefinitionLenses(ASTDefinition def, ASTClassDefinition cls)
 	{

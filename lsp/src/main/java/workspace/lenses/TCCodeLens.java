@@ -26,10 +26,12 @@ package workspace.lenses;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.modules.TCModule;
 
 import json.JSONArray;
 
 public interface TCCodeLens
 {
+	JSONArray getDefinitionLenses(TCDefinition def, TCModule module);
 	JSONArray getDefinitionLenses(TCDefinition def, TCClassDefinition cls);
 }

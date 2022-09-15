@@ -183,7 +183,7 @@ public class ASTPluginSL extends ASTPlugin
 					{
 						for (ASTCodeLens lens: lenses)
 						{
-							results.addAll(lens.getDefinitionLenses(def, null));
+							results.addAll(lens.getDefinitionLenses(def, module));
 						}
 					}
 				}

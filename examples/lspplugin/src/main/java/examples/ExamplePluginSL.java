@@ -80,7 +80,7 @@ public class ExamplePluginSL extends ExamplePlugin
 					{
 						for (TCCodeLens lens: lenses)
 						{
-							results.addAll(lens.getDefinitionLenses(def, null));
+							results.addAll(lens.getDefinitionLenses(def, module));
 						}
 					}
 				}

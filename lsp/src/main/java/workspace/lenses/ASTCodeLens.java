@@ -26,10 +26,12 @@ package workspace.lenses;
 
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
+import com.fujitsu.vdmj.ast.modules.ASTModule;
 
 import json.JSONArray;
 
 public interface ASTCodeLens
 {
+	JSONArray getDefinitionLenses(ASTDefinition def, ASTModule module);
 	JSONArray getDefinitionLenses(ASTDefinition def, ASTClassDefinition cls);
 }

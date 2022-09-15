@@ -144,6 +144,9 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		
 		return lenses;
 	}
+	
+	@Override
+	abstract public JSONArray applyCodeLenses(File file);
 
 	public List<VDMMessage> getErrs()
 	{
