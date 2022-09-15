@@ -47,7 +47,7 @@ import lsp.textdocument.SymbolKind;
 import workspace.DiagUtils;
 import workspace.LSPWorkspaceManager;
 import workspace.events.CheckPrepareEvent;
-import workspace.lenses.CodeLens;
+import workspace.lenses.ASTCodeLens;
 
 public class ASTPluginSL extends ASTPlugin
 {
@@ -166,13 +166,14 @@ public class ASTPluginSL extends ASTPlugin
 	}
 
 	@Override
-	public JSONArray applyCodeLenses(File file, boolean dirty)
+	public JSONArray applyCodeLenses(File file)
 	{
 		JSONArray results = new JSONArray();
+		ASTPlugin ast = registry.getPlugin("AST");
 		
 		if (dirtyModuleList != null && !dirtyModuleList.isEmpty())
 		{
-			List<CodeLens> lenses = getCodeLenses(dirty);
+			List<ASTCodeLens> lenses = getCodeLenses(ast.isDirty());
 			
 			for (ASTModule module: dirtyModuleList)
 			{
@@ -180,7 +181,7 @@ public class ASTPluginSL extends ASTPlugin
 				{
 					if (def.location.file.equals(file))
 					{
-						for (CodeLens lens: lenses)
+						for (ASTCodeLens lens: lenses)
 						{
 							results.addAll(lens.getDefinitionLenses(def, null));
 						}

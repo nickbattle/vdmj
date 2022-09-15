@@ -37,13 +37,6 @@ import workspace.LSPWorkspaceManager;
 abstract public class CodeLens
 {
 	/**
-	 * Lenses can be generated from the AST while entering a specifications. They
-	 * can also be refreshed later from the TC after the spec is checked. Both
-	 * of these are required. 
-	 */
-	abstract public <DEF, CLS> JSONArray getDefinitionLenses(DEF definition, CLS module);
-	
-	/**
 	 * Lenses are often dependent on particular LSP Clients that implement the
 	 * commands returned. This method extracts the client name from the initialization
 	 * echange with the Client.

@@ -60,7 +60,7 @@ import workspace.events.SaveFileEvent;
 import workspace.events.ShutdownEvent;
 import workspace.events.UnknownCommandEvent;
 import workspace.events.UnknownMethodEvent;
-import workspace.lenses.CodeLens;
+import workspace.lenses.TCCodeLens;
 import workspace.plugins.AnalysisPlugin;
 
 abstract public class ExamplePlugin extends AnalysisPlugin implements EventListener
@@ -121,16 +121,15 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		return new JSONObject("exampleProvider", true);	
 	}
 	
-	@Override
-	protected List<CodeLens> getCodeLenses(boolean dirty)
+	protected List<TCCodeLens> getCodeLenses()
 	{
-		List<CodeLens> lenses = new Vector<CodeLens>();
+		List<TCCodeLens> lenses = new Vector<TCCodeLens>();
 		lenses.add(new ExampleLens());
 		return lenses;
 	}
 	
 	@Override
-	abstract public JSONArray applyCodeLenses(File file, boolean dirty);
+	abstract public JSONArray applyCodeLenses(File file);
 	
 	@Override
 	public Command getCommand(String line)

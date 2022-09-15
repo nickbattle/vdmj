@@ -46,13 +46,11 @@ import com.fujitsu.vdmj.lex.Token;
 import json.JSONArray;
 import json.JSONObject;
 
-public class ASTLaunchDebugLens extends AbstractLaunchDebugLens
+public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCodeLens
 {
 	@Override
-	public <DEF, CLS> JSONArray getDefinitionLenses(DEF definition, CLS classdef)
+	public JSONArray getDefinitionLenses(ASTDefinition def, ASTClassDefinition cls)
 	{
-		ASTDefinition def = (ASTDefinition)definition;
-		ASTClassDefinition cls = (ASTClassDefinition) classdef;
 		JSONArray results = new JSONArray();
 		
 		if (isClientType("vscode") && isPublic(def))

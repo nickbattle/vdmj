@@ -44,13 +44,11 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 import json.JSONArray;
 import json.JSONObject;
 
-public class TCLaunchDebugLens extends AbstractLaunchDebugLens
+public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCodeLens
 {
 	@Override
-	public <DEF, CLS> JSONArray getDefinitionLenses(DEF definition, CLS classdef)
+	public JSONArray getDefinitionLenses(TCDefinition def, TCClassDefinition cls)
 	{
-		TCDefinition def = (TCDefinition)definition;
-		TCClassDefinition cls = (TCClassDefinition) classdef;
 		JSONArray results = new JSONArray();
 		
 		if (isClientType("vscode") && isPublic(def))

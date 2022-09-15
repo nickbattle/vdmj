@@ -97,7 +97,7 @@ public class PluginRegistry
 		return options;
 	}
 	
-	public JSONArray applyCodeLenses(File file, boolean dirty)
+	public JSONArray applyCodeLenses(File file)
 	{
 		JSONArray commands = new JSONArray();
 		
@@ -105,7 +105,7 @@ public class PluginRegistry
 		{
 			try
 			{
-				commands.addAll(plugin.applyCodeLenses(file, dirty));
+				commands.addAll(plugin.applyCodeLenses(file));
 			}
 			catch (Throwable e)
 			{

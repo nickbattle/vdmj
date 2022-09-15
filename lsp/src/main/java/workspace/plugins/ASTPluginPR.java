@@ -51,7 +51,7 @@ import workspace.Diag;
 import workspace.DiagUtils;
 import workspace.LSPWorkspaceManager;
 import workspace.events.CheckPrepareEvent;
-import workspace.lenses.CodeLens;
+import workspace.lenses.ASTCodeLens;
 
 public class ASTPluginPR extends ASTPlugin
 {
@@ -218,13 +218,14 @@ public class ASTPluginPR extends ASTPlugin
 	}
 
 	@Override
-	public JSONArray applyCodeLenses(File file, boolean dirty)
+	public JSONArray applyCodeLenses(File file)
 	{
 		JSONArray results = new JSONArray();
+		ASTPlugin ast = registry.getPlugin("AST");
 		
 		if (dirtyClassList != null && !dirtyClassList.isEmpty())	// May be syntax errors
 		{
-			List<CodeLens> lenses = getCodeLenses(dirty);
+			List<ASTCodeLens> lenses = getCodeLenses(ast.isDirty());
 			
 			for (ASTClassDefinition clazz: dirtyClassList)
 			{
@@ -234,7 +235,7 @@ public class ASTPluginPR extends ASTPlugin
 					{
 						if (def.location.file.equals(file))
 						{
-							for (CodeLens lens: lenses)
+							for (ASTCodeLens lens: lenses)
 							{
 								results.addAll(lens.getDefinitionLenses(def, clazz));
 							}
