@@ -1297,8 +1297,7 @@ public class LSPWorkspaceManager
 			return new RPCMessageList(request, new JSONArray());
 		}
 
-		ASTPlugin ast = registry.getPlugin("AST");
-		JSONArray lenses = registry.applyCodeLenses(file, ast.isDirty());
+		JSONArray lenses = registry.applyCodeLenses(file);
 		return new RPCMessageList(request, lenses);
 	}
 

@@ -57,7 +57,7 @@ import workspace.EventListener;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckTypeEvent;
 import workspace.events.LSPEvent;
-import workspace.lenses.CodeLens;
+import workspace.lenses.TCCodeLens;
 import workspace.lenses.TCLaunchDebugLens;
 
 abstract public class TCPlugin extends AnalysisPlugin implements EventListener
@@ -133,11 +133,9 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	/**
 	 * Event handling above. Supporting methods below. 
 	 */
-	
-	@Override
-	protected List<CodeLens> getCodeLenses(boolean dirty)
+	protected List<TCCodeLens> getCodeLenses(boolean dirty)
 	{
-		List<CodeLens> lenses = new Vector<CodeLens>();
+		List<TCCodeLens> lenses = new Vector<TCCodeLens>();
 		
 		if (!dirty)
 		{
@@ -146,6 +144,9 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		
 		return lenses;
 	}
+	
+	@Override
+	abstract public JSONArray applyCodeLenses(File file);
 
 	public List<VDMMessage> getErrs()
 	{

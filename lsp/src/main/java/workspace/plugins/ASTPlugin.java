@@ -59,8 +59,8 @@ import workspace.events.ChangeFileEvent;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
 import workspace.events.LSPEvent;
+import workspace.lenses.ASTCodeLens;
 import workspace.lenses.ASTLaunchDebugLens;
-import workspace.lenses.CodeLens;
 
 public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 {
@@ -167,10 +167,9 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	 * We register the launch/debug code lens here, if the tree is dirty. Else it
 	 * is registered by the TCPlugin.
 	 */
-	@Override
-	protected List<CodeLens> getCodeLenses(boolean dirty)
+	protected List<ASTCodeLens> getCodeLenses(boolean dirty)
 	{
-		List<CodeLens> lenses = new Vector<CodeLens>();
+		List<ASTCodeLens> lenses = new Vector<ASTCodeLens>();
 		
 		if (dirty)
 		{
@@ -179,6 +178,9 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		
 		return lenses;
 	}
+	
+	@Override
+	abstract public JSONArray applyCodeLenses(File file);
 
 	public List<VDMMessage> getErrs()
 	{

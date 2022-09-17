@@ -36,7 +36,7 @@ import json.JSONArray;
 import rpc.RPCMessageList;
 import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
-import workspace.lenses.CodeLens;
+import workspace.lenses.TCCodeLens;
 import workspace.plugins.TCPlugin;
 
 public class ExamplePluginSL extends ExamplePlugin
@@ -62,7 +62,7 @@ public class ExamplePluginSL extends ExamplePlugin
 	}
 	
 	@Override
-	public JSONArray applyCodeLenses(File file, boolean dirty)
+	public JSONArray applyCodeLenses(File file)
 	{
 		TCPlugin tc = registry.getPlugin("TC");
 		TCModuleList tcModuleList = tc.getTC();
@@ -70,7 +70,7 @@ public class ExamplePluginSL extends ExamplePlugin
 		
 		if (!tcModuleList.isEmpty())
 		{
-			List<CodeLens> lenses = getCodeLenses(dirty);
+			List<TCCodeLens> lenses = getCodeLenses();
 			
 			for (TCModule module: tcModuleList)
 			{
@@ -78,9 +78,9 @@ public class ExamplePluginSL extends ExamplePlugin
 				{
 					if (def.location.file.equals(file))
 					{
-						for (CodeLens lens: lenses)
+						for (TCCodeLens lens: lenses)
 						{
-							results.addAll(lens.getDefinitionLenses(def, null));
+							results.addAll(lens.getDefinitionLenses(def, module));
 						}
 					}
 				}

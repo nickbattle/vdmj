@@ -22,37 +22,16 @@
  *
  ******************************************************************************/
 
-package examples;
+package workspace.lenses;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 
 import json.JSONArray;
-import workspace.lenses.CodeLens;
-import workspace.lenses.TCCodeLens;
 
-public class ExampleLens extends CodeLens implements TCCodeLens
+public interface TCCodeLens
 {
-	@Override
-	public JSONArray getDefinitionLenses(TCDefinition def, TCModule module)
-	{
-		return getDefinitionLenses(def, (TCClassDefinition)null);
-	}
-
-	@Override
-	public JSONArray getDefinitionLenses(TCDefinition definition, TCClassDefinition classdef)
-	{
-		JSONArray results = new JSONArray();
-		
-		if (definition instanceof TCExplicitFunctionDefinition)	// Only explicit functions (say)
-		{
-			TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)definition;
-			// This displays the launch.json file via a "Config" lens
-			results.add(makeLens(def.location, "Config", "workbench.action.debug.configure"));
-		}
-		
-		return results;
-	}
+	JSONArray getDefinitionLenses(TCDefinition def, TCModule module);
+	JSONArray getDefinitionLenses(TCDefinition def, TCClassDefinition cls);
 }

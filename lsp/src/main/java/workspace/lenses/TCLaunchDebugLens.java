@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -44,13 +45,17 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 import json.JSONArray;
 import json.JSONObject;
 
-public class TCLaunchDebugLens extends AbstractLaunchDebugLens
+public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCodeLens
 {
 	@Override
-	public <DEF, CLS> JSONArray getDefinitionLenses(DEF definition, CLS classdef)
+	public JSONArray getDefinitionLenses(TCDefinition def, TCModule module)
 	{
-		TCDefinition def = (TCDefinition)definition;
-		TCClassDefinition cls = (TCClassDefinition) classdef;
+		return getDefinitionLenses(def, (TCClassDefinition)null);
+	}
+
+	@Override
+	public JSONArray getDefinitionLenses(TCDefinition def, TCClassDefinition cls)
+	{
 		JSONArray results = new JSONArray();
 		
 		if (isClientType("vscode") && isPublic(def))

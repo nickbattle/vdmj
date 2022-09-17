@@ -25,8 +25,6 @@
 package workspace.plugins;
 
 import java.io.File;
-import java.util.List;
-import java.util.Vector;
 
 import dap.DAPMessageList;
 import json.JSONArray;
@@ -39,7 +37,6 @@ import workspace.EventHub;
 import workspace.PluginRegistry;
 import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
-import workspace.lenses.CodeLens;
 
 abstract public class AnalysisPlugin
 {
@@ -87,20 +84,11 @@ abstract public class AnalysisPlugin
 	{
 		return new JSONObject();
 	}
-	
-	/**
-	 * Plugins can define code lenses here.
-	 * @param dirty 
-	 */
-	protected List<CodeLens> getCodeLenses(boolean dirty)
-	{
-		return new Vector<CodeLens>();
-	}
 
 	/**
 	 * Plugins can apply their code lenses by overriding this method.
 	 */
-	public JSONArray applyCodeLenses(File file, boolean dirty)
+	public JSONArray applyCodeLenses(File file)
 	{
 		return new JSONArray();
 	}
