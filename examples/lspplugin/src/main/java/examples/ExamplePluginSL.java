@@ -41,6 +41,9 @@ import workspace.plugins.TCPlugin;
 
 public class ExamplePluginSL extends ExamplePlugin
 {
+	/**
+	 * In this example, we just print out the names of the events received.
+	 */
 	@Override
 	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
@@ -54,13 +57,17 @@ public class ExamplePluginSL extends ExamplePlugin
 		System.out.println("ExamplePluginSL got " + event);
 		return null;
 	}
-
-	@Override
-	public String getName()
-	{
-		return "ExamplePluginSL";
-	}
 	
+	/**
+	 * To apply code lenses for SL, we get the TC plugin to obtain a ModuleList of
+	 * type-checked modules, and then search through them for TCDefinitions that are
+	 * within the File that is passed from the Client (ie. the file on screen).
+	 * Note that the DEFAULT module can span multiple files!
+	 * 
+	 * This way of splitting lenses into getCodeLenses and applyCodeLenses is just
+	 * a convention. The only requirement is that this method returns the lenses
+	 * required.
+	 */
 	@Override
 	public JSONArray applyCodeLenses(File file)
 	{

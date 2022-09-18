@@ -33,6 +33,11 @@ import json.JSONArray;
 import workspace.lenses.CodeLens;
 import workspace.lenses.TCCodeLens;
 
+/**
+ * Most code lenses extend CodeLens, which provides makeLens methods to create the
+ * JSON response(s). But this is only a convenience. The way a plugin implements
+ * its code lenses is just a matter for the applyCodeLenses method in the plugin.
+ */
 public class ExampleLens extends CodeLens implements TCCodeLens
 {
 	@Override
