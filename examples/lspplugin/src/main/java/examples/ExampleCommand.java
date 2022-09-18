@@ -31,14 +31,25 @@ import vdmj.commands.Command;
 
 /**
  * Example of how to implement a Command for the example plugin.
+ * 
+ * Commands can implement InitRunnable and ScriptRunnable to enable them to be used as
+ * the "command" of a launch request, and to be included in "scripts", respectively.
  */
-public class ExampleCommand extends Command
+public class ExampleCommand extends Command // implements InitRunnable, ScriptRunnable
 {
 	public static final String USAGE = "Usage: example <text>";
 	public static final String[] HELP = { "example", "example <text> - echo text to the console" };
 
 	private final String line;
 
+	/**
+	 * The constructor is passed the entire line that the user typed. The first word on the
+	 * line will usually match the name of the class - eg. typing "example one two three" will look
+	 * for a class called "ExampleCommand". The rest of the line may contain any command
+	 * arguments that are needed. The constructor should parse the line and save any arguments
+	 * that it needs. If there is a usage error, the constructor should throw an
+	 * IllegalArgumentException with a usage message.
+	 */
 	public ExampleCommand(String line)
 	{
 		String[] parts = line.split("\\s+", 2);
@@ -53,13 +64,26 @@ public class ExampleCommand extends Command
 		}
 	}
 
+	/**
+	 * The run method is invoked after construction, and is passed the DAP "evaluate" request,
+	 * which may contain other useful fields. Typically, a command will use the arguments that
+	 * it parsed in the constructor here.
+	 * 
+	 * Text returned in the "result" field will be displayed on stdout on the console.
+	 * A DAP response with a false "success" field will display the "message" on stderr.
+	 */
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		// Do whatever you like with request...
+		// return new DAPMessageList(request, false, "Error message...", null);
 		return new DAPMessageList(request, new JSONObject("result", "You typed '" + line + "'"));
 	}
 
+	/**
+	 * If this returns true, this command will not be allowed while the interpreter is evaluating
+	 * something else. So for example the PrintCommand returns true, since we cannot have overlapping
+	 * evaluations.
+	 */
 	@Override
 	public boolean notWhenRunning()
 	{

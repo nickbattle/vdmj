@@ -65,6 +65,12 @@ import workspace.plugins.AnalysisPlugin;
 
 abstract public class ExamplePlugin extends AnalysisPlugin implements EventListener
 {
+	/**
+	 * Most plugins will have at least two subclasses that deal with modules and classes,
+	 * respectively. This factory method is called, if it exists, when the lspx.plugins
+	 * list is being processed. Otherwise a dialect-specific plugin class can be given
+	 * in lspx.plugins.
+	 */
 	public static ExamplePlugin factory(Dialect dialect)
 	{
 		switch (dialect)
@@ -82,11 +88,22 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		}
 	}
 
-	public ExamplePlugin()
+	/**
+	 * Most plugins will have SL, PP and RT subclasses, since they have to deal with
+	 * modules and classes differently. In that case, it is easiest to implement a
+	 * factory(dialect) method, as above. But if there was a single-dialect plugin,
+	 * it could create a public constructor here instead.
+	 */
+	protected ExamplePlugin()
 	{
 		// Not used, because of the factory method above.
 	}
 	
+	/**
+	 * The init method is called when the plugin is registered with the PluginRegistry.
+	 * Typically, it registers itself with the EventHub to receive various events, for
+	 * which the class has to implement EventListener.
+	 */
 	@Override
 	public void init()
 	{
@@ -114,6 +131,10 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		eventhub.register(UnknownCommandEvent.class, this);
 	}
 	
+	/**
+	 * At LSP initialization, a plugin can set or change any LSPServer capability
+	 * responses that it wants to, by implementing this method.
+	 */
 	@Override
 	public JSONObject getExperimentalOptions(JSONObject standard)
 	{
@@ -121,6 +142,12 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		return new JSONObject("exampleProvider", true);	
 	}
 	
+	/**
+	 * This is just one way of implementing code lenses. This method is used by the
+	 * applyCodeLenses methods in the dialect subclasses, and is intended to return
+	 * a list of the code lenses that this plugin provides. These could be cached,
+	 * unless the code lenses themselves contain state.
+	 */
 	protected List<TCCodeLens> getCodeLenses()
 	{
 		List<TCCodeLens> lenses = new Vector<TCCodeLens>();
@@ -135,6 +162,13 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	@Override
 	abstract public JSONArray applyCodeLenses(File file);
 	
+	/**
+	 * This method is called when the user types a line that is not recognised by the
+	 * built-in commands. It is responsible for returning an instance of the Command
+	 * provided by the plugin, if the line matches. A plugin can offer many commands.
+	 * Typically, the first word on the line indicates the Command to use, but this is
+	 * only a convention.
+	 */
 	@Override
 	public Command getCommand(String line)
 	{
@@ -152,6 +186,13 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		}
 	}
 	
+	/**
+	 * This method returns the (2D) String array of help lines for all the Commands
+	 * recognised above. By convention, each Command has a field called HELP that
+	 * contains the keyword for the Command, plus a helpful message. For example:
+	 * 
+	 * String[] HELP = { "example", "example <text> - echo text to the console" };
+	 */
 	@Override
 	public String[][] getCommandHelp()
 	{
@@ -162,9 +203,22 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		};
 	}
 
+	/**
+	 * The name of the plugin allows other plugins to obtain the instance via the registry.
+	 * For example, registry.getPlugin("Example"). This is a generic method, so it expects
+	 * the type to match the variable being assigned.
+	 */
 	@Override
-	abstract public String getName();
+	public String getName()
+	{
+		return "Example";
+	}
 
+	/**
+	 * These two events are implemented in the subclasses, and react to events received.
+	 * In the example, they just print out what they received, but in general the plugin
+	 * would react in some way, and return messages to send to the Client.
+	 */
 	@Override
 	abstract public RPCMessageList handleEvent(LSPEvent event) throws Exception;
 	
