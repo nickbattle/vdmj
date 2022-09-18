@@ -72,16 +72,14 @@ public class LSPInitializeResponse extends JSONObject
 		 * Experimental responses are partly fixed, from the implicit Server functions, and
 		 * party added by registered plugins.
 		 */
-		JSONObject experimental = 
+		cap.put("experimental",
 				new JSONObject(
 						"translateProvider", new JSONObject(
 								"languageId", new JSONArray("latex", "word", "coverage", "graphviz"),
 								"workDoneProgress", false),
-						"dapServer", new JSONObject("port", DAPServerSocket.getPort()));
+						"dapServer", new JSONObject("port", DAPServerSocket.getPort())));
 		
-		experimental.putAll(PluginRegistry.getInstance().getExperimentalOptions(experimental));
-		
-		cap.put("experimental", experimental);
+		PluginRegistry.getInstance().setPluginCapabilities(cap);
 
 		return cap;
 	}

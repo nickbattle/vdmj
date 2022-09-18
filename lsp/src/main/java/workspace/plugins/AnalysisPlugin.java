@@ -77,12 +77,12 @@ abstract public class AnalysisPlugin
 
 	/**
 	 * All plugins can register experimental options that are sent back to the Client
-	 * in the experimental section of the initialize response.
-	 * @param standard 
+	 * in the experimental section of the initialize response. They can also set regular
+	 * server capabilities, though this should be done with care!
 	 */
-	public JSONObject getExperimentalOptions(JSONObject standard)
+	public void setServerCapabilities(JSONObject capabilities)
 	{
-		return new JSONObject();
+		return;
 	}
 
 	/**

@@ -35,7 +35,7 @@ import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;
 import workspace.events.LSPEvent;
-import workspace.events.UnknownMethodEvent;
+import workspace.events.UnknownTranslationEvent;
 import workspace.plugins.AnalysisPlugin;
 
 public abstract class ISAPlugin extends AnalysisPlugin implements EventListener
@@ -67,23 +67,19 @@ public abstract class ISAPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		EventHub.getInstance().register(UnknownMethodEvent.class, this);
+		EventHub.getInstance().register(UnknownTranslationEvent.class, this);
 	}
 	
 	@Override
 	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		if (event instanceof UnknownMethodEvent)
+		if (event instanceof UnknownTranslationEvent)
 		{
-			if (event.request.getMethod().equals("slsp/TR/translate"))
+			UnknownTranslationEvent ute = (UnknownTranslationEvent)event;
+			
+			if (ute.languageId.equals("isabelle"))
 			{
-				JSONObject params = event.request.get("params");
-				String language = params.get("languageId");
-				
-				if (language.equals("isabelle"))
-				{
-					return analyse(event.request);
-				}
+				return analyse(event.request);
 			}
 		}
 		
@@ -93,20 +89,23 @@ public abstract class ISAPlugin extends AnalysisPlugin implements EventListener
 	abstract public RPCMessageList analyse(RPCRequest request);
 
 	@Override
-	public JSONObject getExperimentalOptions(JSONObject standard)
+	public void setServerCapabilities(JSONObject capabilities)
 	{
-		JSONObject provider = standard.get("translateProvider");
+		JSONObject experimental = capabilities.get("experimental");
 		
-		if (provider != null)
+		if (experimental != null)
 		{
-			JSONArray ids = provider.get("languageId");
+			JSONObject provider = capabilities.get("translateProvider");
 			
-			if (ids != null)
+			if (provider != null)
 			{
-				ids.add("isabelle");	// Edit the standard response to include isabelle
+				JSONArray ids = provider.get("languageId");
+				
+				if (ids != null)
+				{
+					ids.add("isabelle");	// Edit the standard response to include isabelle
+				}
 			}
 		}
-		
-		return new JSONObject();
 	}
 }

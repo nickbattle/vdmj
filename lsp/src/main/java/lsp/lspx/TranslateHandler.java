@@ -35,8 +35,10 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
+import workspace.EventHub;
 import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
+import workspace.events.UnknownTranslationEvent;
 
 public class TranslateHandler extends LSPHandler
 {
@@ -107,7 +109,15 @@ public class TranslateHandler extends LSPHandler
 					return LSPXWorkspaceManager.getInstance().translateGraphviz(request, file, saveUri, options);
 				
 				default:
-					return LSPXWorkspaceManager.getInstance().unhandledMethod(request);
+					RPCMessageList result = EventHub.getInstance().publish(new UnknownTranslationEvent(request, language));
+					
+					if (result.isEmpty())	// Not handled
+					{
+						Diag.error("No external plugin registered for " + language);
+						return new RPCMessageList(request, RPCErrors.MethodNotFound, language);
+					}
+					
+					return result;
 			}
 			
 		}

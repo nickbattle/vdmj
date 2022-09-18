@@ -110,9 +110,14 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	public JSONObject getExperimentalOptions(JSONObject standard)
+	public void setServerCapabilities(JSONObject capabilities)
 	{
-		return new JSONObject("combinatorialTestProvider", new JSONObject("workDoneProgress", true));
+		JSONObject experimental = capabilities.get("experimental");
+		
+		if (experimental != null)
+		{
+			experimental.put("combinatorialTestProvider", new JSONObject("workDoneProgress", true));
+		}
 	}
 
 	@Override

@@ -39,9 +39,11 @@ import com.fujitsu.vdmj.lex.Dialect;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.lspx.TranslateHandler;
+import plugins.ISAPluginSL;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.PluginRegistry;
 
 public class TranslateTest extends LSPTest
 {
@@ -116,12 +118,13 @@ public class TranslateTest extends LSPTest
 					"languageId", "Chinese",
 					"saveUri",	empty.toUri().toString()));
 		
+		PluginRegistry.getInstance().registerPlugin(new ISAPluginSL());
 		response = handler.request(request);
 		assertEquals(1, response.size());
 		empty.toFile().delete();
 
 		dump(response.get(0));
-		assertEquals("slsp/TR/translate", response.get(0).getPath("error.message"));
+		assertEquals("Chinese", response.get(0).getPath("error.message"));
 		assertEquals((Long)RPCErrors.MethodNotFound.getValue(), response.get(0).getPath("error.code"));
 	}
 

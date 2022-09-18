@@ -81,9 +81,14 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	public JSONObject getExperimentalOptions(JSONObject standard)
+	public void setServerCapabilities(JSONObject capabilities)
 	{
-		return new JSONObject("proofObligationProvider", true);
+		JSONObject experimental = capabilities.get("experimental");
+		
+		if (experimental != null)
+		{
+			experimental.put("proofObligationProvider", true);
+		}
 	}
 
 	@Override

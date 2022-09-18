@@ -54,13 +54,16 @@ public class ExamplePluginPR extends ExamplePlugin
 		System.out.println("ExamplePluginPR got " + event);
 		return null;
 	}
-
-	@Override
-	public String getName()
-	{
-		return "ExamplePluginPR";
-	}
 	
+	/**
+	 * To apply code lenses for PP/RT, we get the TC plugin to obtain a ClassList of
+	 * type-checked classes, and then search through them for TCDefinitions that are
+	 * within the File that is passed from the Client (ie. the file on screen).
+	 * 
+	 * This way of splitting lenses into getCodeLenses and applyCodeLenses is just
+	 * a convention. The only requirement is that this method returns the lenses
+	 * required.
+	 */
 	@Override
 	public JSONArray applyCodeLenses(File file)
 	{
@@ -76,14 +79,11 @@ public class ExamplePluginPR extends ExamplePlugin
 			{
 				if (clazz.name.getLocation().file.equals(file))
 				{
-					for (TCDefinition def: clazz.definitions)
+					for (TCDefinition def: clazz.definitions)	// ie. within this class/file
 					{
-						if (def.location.file.equals(file))
+						for (TCCodeLens lens: lenses)
 						{
-							for (TCCodeLens lens: lenses)
-							{
-								results.addAll(lens.getDefinitionLenses(def, clazz));
-							}
+							results.addAll(lens.getDefinitionLenses(def, clazz));
 						}
 					}
 				}
