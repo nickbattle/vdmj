@@ -115,10 +115,11 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	}
 	
 	@Override
-	public JSONObject getExperimentalOptions(JSONObject standard)
+	public void setServerCapabilities(JSONObject capabilities)
 	{
 		// Just an example. See initialize response.
-		return new JSONObject("exampleProvider", true);	
+		JSONObject experimental = capabilities.get("experimental");
+		experimental.put("exampleProvider", true);	
 	}
 	
 	protected List<TCCodeLens> getCodeLenses()

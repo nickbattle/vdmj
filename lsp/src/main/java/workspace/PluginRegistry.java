@@ -77,24 +77,20 @@ public class PluginRegistry
 		return (T)plugins.get(name);
 	}
 	
-	public JSONObject getExperimentalOptions(JSONObject standard)
+	public void setPluginCapabilities(JSONObject capabilities)
 	{
-		JSONObject options = new JSONObject();
-		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			try
 			{
-				options.putAll(plugin.getExperimentalOptions(standard));
+				plugin.setServerCapabilities(capabilities);
 			}
 			catch (Throwable e)
 			{
-				Diag.error("Exception in %s getExperimentalOptions", plugin.getName());
+				Diag.error("Exception in %s setServerCapabilities", plugin.getName());
 				Diag.error(e);
 			}
 		}
-		
-		return options;
 	}
 	
 	public JSONArray applyCodeLenses(File file)
