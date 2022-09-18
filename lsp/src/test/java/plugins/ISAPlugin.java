@@ -35,7 +35,7 @@ import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;
 import workspace.events.LSPEvent;
-import workspace.events.UnknownMethodEvent;
+import workspace.events.UnknownTranslationEvent;
 import workspace.plugins.AnalysisPlugin;
 
 public abstract class ISAPlugin extends AnalysisPlugin implements EventListener
@@ -67,23 +67,19 @@ public abstract class ISAPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		EventHub.getInstance().register(UnknownMethodEvent.class, this);
+		EventHub.getInstance().register(UnknownTranslationEvent.class, this);
 	}
 	
 	@Override
 	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		if (event instanceof UnknownMethodEvent)
+		if (event instanceof UnknownTranslationEvent)
 		{
-			if (event.request.getMethod().equals("slsp/TR/translate"))
+			UnknownTranslationEvent ute = (UnknownTranslationEvent)event;
+			
+			if (ute.languageId.equals("isabelle"))
 			{
-				JSONObject params = event.request.get("params");
-				String language = params.get("languageId");
-				
-				if (language.equals("isabelle"))
-				{
-					return analyse(event.request);
-				}
+				return analyse(event.request);
 			}
 		}
 		
