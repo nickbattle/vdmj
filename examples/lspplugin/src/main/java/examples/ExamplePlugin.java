@@ -60,6 +60,7 @@ import workspace.events.SaveFileEvent;
 import workspace.events.ShutdownEvent;
 import workspace.events.UnknownCommandEvent;
 import workspace.events.UnknownMethodEvent;
+import workspace.events.UnknownTranslationEvent;
 import workspace.lenses.TCCodeLens;
 import workspace.plugins.AnalysisPlugin;
 
@@ -118,7 +119,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		eventhub.register(CheckSyntaxEvent.class, this);
 		eventhub.register(CheckTypeEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
-		eventhub.register(UnknownMethodEvent.class, this);
+		eventhub.register(UnknownTranslationEvent.class, this);
 		eventhub.register(ShutdownEvent.class, this);
 
 		eventhub.register(DAPInitializeEvent.class, this);
@@ -128,6 +129,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		eventhub.register(DAPDisconnectEvent.class, this);
 		eventhub.register(DAPTerminateEvent.class, this);
 
+		eventhub.register(UnknownMethodEvent.class, this);
 		eventhub.register(UnknownCommandEvent.class, this);
 	}
 	
