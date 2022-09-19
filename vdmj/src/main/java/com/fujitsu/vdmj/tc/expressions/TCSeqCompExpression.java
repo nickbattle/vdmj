@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCBind;
@@ -37,6 +38,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCSeqCompExpression extends TCSeqExpression
@@ -87,6 +89,16 @@ public class TCSeqCompExpression extends TCSeqExpression
 		if (constraint != null && constraint.isSeq(location))
 		{
 			elemConstraint = constraint.getSeq().seqof;
+		}
+
+		if (predicate != null)
+		{
+			TCDefinitionList qualified = predicate.getQualifiedDefs(local);
+			
+			if (!qualified.isEmpty())
+			{
+				local = new FlatEnvironment(qualified, local);
+			}
 		}
 
 		TCType etype = first.typeCheck(local, null, scope, elemConstraint);
