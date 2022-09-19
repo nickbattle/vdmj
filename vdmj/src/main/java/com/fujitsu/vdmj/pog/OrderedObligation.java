@@ -52,6 +52,7 @@ public class OrderedObligation extends ProofObligation
 			
 			if (!TypeComparator.isSubType(right.getExptype(), type))
 			{
+				sb.append(prefix);
 		    	sb.append("is_(");
 	    		sb.append(right);
 	    		sb.append(", ");
