@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.tc.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCMultiBindListDefinition;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
@@ -33,6 +34,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCLetBeStExpression extends TCExpression
@@ -70,6 +72,16 @@ public class TCLetBeStExpression extends TCExpression
 			!suchThat.typeCheck(local, null, scope, null).isType(TCBooleanType.class, location))
 		{
 			report(3117, "Such that clause is not boolean");
+		}
+
+		if (suchThat != null)
+		{
+			TCDefinitionList qualified = suchThat.getQualifiedDefs(local);
+			
+			if (!qualified.isEmpty())
+			{
+				local = new FlatEnvironment(qualified, local);
+			}
 		}
 
 		TCType r = value.typeCheck(local, null, scope, constraint);
