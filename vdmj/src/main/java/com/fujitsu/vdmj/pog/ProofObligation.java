@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -59,8 +58,6 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		{
 			this.status = POStatus.UNCHECKED;	// Implies unproved
 		}
-		
-		POGetMatchingExpressionVisitor.init();	// Reset the "any" count
 	}
 
 	public String getValue()

@@ -28,6 +28,7 @@ import java.util.ListIterator;
 import java.util.Stack;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 @SuppressWarnings("serial")
@@ -72,6 +73,8 @@ public class POContextStack extends Stack<POContext>
 
 	public String getObligation(String root)
 	{
+		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before stack
+
 		StringBuilder result = new StringBuilder();
 		String spacing = "  ";
 		String indent = "";
