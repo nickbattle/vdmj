@@ -390,7 +390,7 @@ abstract public class OvertureTest extends TestCase
 
 			for (Value ex: assertions.seqValue(null))
 			{
-				long n = ex.intValue(null);
+				long n = ex.intValue(null).longValue();
 				expected.add(n);
 			}
 

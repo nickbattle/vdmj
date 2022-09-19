@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.values;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -49,32 +52,32 @@ public class ValueFactory
 		return new CharacterValue(c);
 	}
 	
-	public static IntegerValue mkInt(long i)
+	public static IntegerValue mkInt(BigInteger i)
 	{
 		return new IntegerValue(i);
 	}
 	
-	public static NaturalValue mkNat(long n) throws Exception
+	public static NaturalValue mkNat(BigInteger n) throws Exception
 	{
 		return new NaturalValue(n);
 	}
 	
-	public static NaturalOneValue mkNat1(long n) throws Exception
+	public static NaturalOneValue mkNat1(BigInteger n) throws Exception
 	{
 		return new NaturalOneValue(n);
 	}
 	
-	public static RationalValue mkRat(long p, long q) throws Exception
+	public static RationalValue mkRat(BigInteger p, BigInteger q) throws Exception
 	{
-		return new RationalValue((double)p/q);
+		return new RationalValue(new BigDecimal(p).divide(new BigDecimal(q)));
 	}
 
-	public static RationalValue mkRat(double d) throws Exception
+	public static RationalValue mkRat(BigDecimal d) throws Exception
 	{
 		return new RationalValue(d);
 	}
 
-	public static RealValue mkReal(double d) throws Exception
+	public static RealValue mkReal(BigDecimal d) throws Exception
 	{
 		return new RealValue(d);
 	}

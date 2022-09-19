@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.security.InvalidParameterException;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
@@ -105,13 +107,13 @@ abstract public class RemoteSimulation
 	protected void setParameter(ASTClassList classes, String classname, String pname, Double pvalue)
 	{
 		ASTValueDefinition vdef = findParameterDefinition(classes, classname, pname);
-		vdef.setExpression(new ASTRealLiteralExpression(new LexRealToken(pvalue, vdef.location)));
+		vdef.setExpression(new ASTRealLiteralExpression(new LexRealToken(new BigDecimal(pvalue.toString()), vdef.location)));
 	}
 	
 	protected void setParameter(ASTClassList classes, String classname, String pname, Integer pvalue)
 	{
 		ASTValueDefinition vdef = findParameterDefinition(classes, classname, pname);
-		vdef.setExpression(new ASTIntegerLiteralExpression(new LexIntegerToken(pvalue, vdef.location)));
+		vdef.setExpression(new ASTIntegerLiteralExpression(new LexIntegerToken(new BigInteger(pvalue.toString()), vdef.location)));
 	}
 	
 	protected void setParameter(ASTClassList classes, String classname, String pname, Boolean pvalue)
@@ -167,13 +169,13 @@ abstract public class RemoteSimulation
 	protected Double getSystemDoubleValue(String varname, String fieldname) throws ValueException
 	{
 		UpdatableValue v = getSystemValue(varname, fieldname);
-		return v.realValue(null);
+		return v.realValue(null).doubleValue();
 	}
 	
 	protected Long getSystemIntegerValue(String varname, String fieldname) throws ValueException
 	{
 		UpdatableValue v = getSystemValue(varname, fieldname);
-		return v.intValue(null);
+		return v.intValue(null).longValue();
 	}
 	
 	protected Boolean getSystemBooleanValue(String varname, String fieldname) throws ValueException

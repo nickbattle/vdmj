@@ -26,6 +26,8 @@ package com.fujitsu.vdmjunit;
 
 import static org.junit.Assert.fail;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Vector;
@@ -251,7 +253,7 @@ public abstract class VDMJUnitTest
 	 * 			or the specification has not been initialized, or if the result is not
 	 * 			a VDM integer value.
 	 */
-	protected long runInt(String expression) throws Exception
+	protected BigInteger runInt(String expression) throws Exception
 	{
 		return run(expression).intValue(null);
 	}
@@ -266,7 +268,7 @@ public abstract class VDMJUnitTest
 	 * 			or the specification has not been initialized, or if the result is not
 	 * 			a VDM real value.
 	 */
-	protected double runReal(String expression) throws Exception
+	protected BigDecimal runReal(String expression) throws Exception
 	{
 		return run(expression).realValue(null);
 	}

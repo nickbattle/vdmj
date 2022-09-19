@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.values;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -89,25 +92,25 @@ abstract public class ReferenceValue extends Value
 	}
 
 	@Override
-	public double realValue(Context ctxt) throws ValueException
+	public BigDecimal realValue(Context ctxt) throws ValueException
 	{
 		return value.realValue(ctxt);
 	}
 
 	@Override
-	public long intValue(Context ctxt) throws ValueException
+	public BigInteger intValue(Context ctxt) throws ValueException
 	{
 		return value.intValue(ctxt);
 	}
 
 	@Override
-	public long natValue(Context ctxt) throws ValueException
+	public BigInteger natValue(Context ctxt) throws ValueException
 	{
 		return value.natValue(ctxt);
 	}
 
 	@Override
-	public long nat1Value(Context ctxt) throws ValueException
+	public BigInteger nat1Value(Context ctxt) throws ValueException
 	{
 		return value.nat1Value(ctxt);
 	}

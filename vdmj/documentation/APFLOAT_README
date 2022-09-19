@@ -1,0 +1,8 @@
+Copyright © 2021 Mikko Tommila
+
+This work is licensed under the terms of the MIT license. See the MIT License for more details.
+
+The apfloat library is embedded in the high precision VDMJ jar, in the org.apfloat package.
+Note that apfloat's MIT licence is compatible with GPL3.
+
+See https://github.com/mtommila/apfloat

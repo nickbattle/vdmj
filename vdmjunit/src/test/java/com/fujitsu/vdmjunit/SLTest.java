@@ -27,6 +27,8 @@ package com.fujitsu.vdmjunit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.math.BigInteger;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -53,7 +55,7 @@ public class SLTest extends VDMJUnitTestSL
 	{
 		setDefault("A");
 		run("setValue(123)");
-		assertEquals(123, runInt("getValue()"));
+		assertEquals(new BigInteger("123"), runInt("getValue()"));
 		assertVDM("getValue()", "RESULT = 123");
 		
 		try
@@ -70,10 +72,10 @@ public class SLTest extends VDMJUnitTestSL
 	@Test
 	public void two() throws Exception
 	{
-		assertEquals(100, runInt("B`g(99)"));
+		assertEquals(new BigInteger("100"), runInt("B`g(99)"));
 		setDefault("B");
 		Value r = run("g(1)");
-		assertEquals(2, r.intValue(null));
+		assertEquals(new BigInteger("2"), r.intValue(null));
 		assertVDM(r, "RESULT = 2");
 		
 		try

@@ -15,15 +15,20 @@ from the pom.xml file.
 
 Maven installs VDMJ in the com.fujitsu group.
 
+VDMJ includes the Apfloat library for arbitrary precision arithmetic.
+
+For information on licensing, see the LGPL and APFLOAT_README files in the
+documentation folder.
+
 For information on a particular release, see https://github.com/nickbattle/vdmj/releases.
 
 Running VDMJ
 ============
 
-The whole of the core language is in a single jar called vdmj-<version>.jar, which is
+The whole of the core language is in a single jar called vdmj-<version>-P.jar, which is
 created in the target folder by the Maven build. That can be executed directly as follows:
 
-$ java -jar vdmj-4.4.3-SNAPSHOT-210413.jar -vdmsl -i
+$ java -jar vdmj-4.4.3-P-SNAPSHOT-210413.jar -vdmsl -i
 Initialized 1 module in 0.489 secs. 
 Interpreter started
 >
@@ -32,7 +37,7 @@ Additional jars are available to add standard libraries, and annotations. These 
 in the target folders of the corresponding vdmj-suite. So if the jars were all in one
 locations, you could run:
 
-$ java -cp vdmj-4.4.3-SNAPSHOT-210413.jar:annotations-4.4.3-SNAPSHOT-210413.jar \
+$ java -cp vdmj-4.4.3-P-SNAPSHOT-210413.jar:annotations-4.4.3-SNAPSHOT-210413.jar \
      com.fujitsu.vdmj.VDMJ -vdmsl -annotations -i
 Initialized 1 module in 0.454 secs. 
 Interpreter started
@@ -72,4 +77,3 @@ Initialized 1 module in 0.165 secs.
 Interpreter started
 > q
 Bye
-

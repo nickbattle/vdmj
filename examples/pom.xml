@@ -12,10 +12,10 @@
 	<artifactId>examples</artifactId>
 	<name>VDMJ Suite Examples</name>
 	<packaging>pom</packaging>
-
+	
 	<properties>
-		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	    <maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
+	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<!-- sub modules -->

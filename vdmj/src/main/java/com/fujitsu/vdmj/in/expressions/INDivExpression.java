@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
@@ -48,15 +50,15 @@ public class INDivExpression extends INNumericBinaryExpression
 
 		try
 		{
-    		double lv = left.eval(ctxt).intValue(ctxt);
-    		double rv = right.eval(ctxt).intValue(ctxt);
+    		BigInteger lv = left.eval(ctxt).intValue(ctxt);
+    		BigInteger rv = right.eval(ctxt).intValue(ctxt);
 
-    		if (rv == 0)
+    		if (rv.signum() == 0)
     		{
     			throw new ValueException(4134, "Infinite or NaN trouble", ctxt);
     		}
 
-    		return NumericValue.valueOf(div(lv, rv), ctxt);
+    		return NumericValue.valueOf(lv.divide(rv), ctxt);
         }
         catch (ValueException e)
         {

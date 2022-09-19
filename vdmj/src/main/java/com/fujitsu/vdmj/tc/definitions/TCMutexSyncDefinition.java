@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.tc.definitions;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -192,7 +194,7 @@ public class TCMutexSyncDefinition extends TCDefinition
 		return new TCEqualsExpression(
 			new TCHistoryExpression(location, Token.ACTIVE, list),
     		new LexKeywordToken(Token.EQUALS, location),
-    		new TCIntegerLiteralExpression(new LexIntegerToken(0, location)));
+    		new TCIntegerLiteralExpression(new LexIntegerToken(BigInteger.ZERO, location)));
 	}
 
 	@Override

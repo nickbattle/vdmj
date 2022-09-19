@@ -139,7 +139,7 @@ public class CSV implements Serializable
 		try
 		{
 			File file = getFile(fval);
-			long index = indexVal.intValue(null);
+			long index = indexVal.intValue(null).longValue();
 			SeqValue lineCells = new SeqValue();
 
 			boolean success = false;

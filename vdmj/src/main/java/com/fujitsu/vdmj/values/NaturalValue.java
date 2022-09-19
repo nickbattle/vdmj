@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.values;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -36,14 +38,19 @@ public class NaturalValue extends IntegerValue
 {
 	private static final long serialVersionUID = 1L;
 
-	public NaturalValue(long value) throws Exception
+	public NaturalValue(BigInteger value) throws Exception
 	{
 		super(value);
 
-		if (value < 0)
+		if (value.signum() < 0)
 		{
 			throw new Exception("Value " + value + " is not a nat");
 		}
+	}
+
+	public NaturalValue(long size) throws Exception
+	{
+		this(new BigInteger(Long.toString(size)));
 	}
 
 	@Override

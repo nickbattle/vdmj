@@ -65,7 +65,7 @@ public class TCFieldNumberExpression extends TCExpression
 		}
 
 		TCProductType product = type.getProduct();
-		long fn = field.value;
+		long fn = field.value.longValue();
 
 		if (fn > product.types.size() || fn < 1)
 		{

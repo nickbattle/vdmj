@@ -104,7 +104,7 @@ public class TCWarningAnnotation extends TCAnnotation
 			else
 			{
 				TCIntegerLiteralExpression w = (TCIntegerLiteralExpression)arg;
-				suppressed.add(w.value.value);
+				suppressed.add(w.value.value.longValue());
 			}
 		}
 	}

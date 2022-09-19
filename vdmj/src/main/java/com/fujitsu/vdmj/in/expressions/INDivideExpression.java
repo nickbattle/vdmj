@@ -24,6 +24,10 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
@@ -48,15 +52,34 @@ public class INDivideExpression extends INNumericBinaryExpression
 
 		try
 		{
-    		double lv = left.eval(ctxt).realValue(ctxt);
-    		double rv = right.eval(ctxt).realValue(ctxt);
+    		Value l = left.eval(ctxt);
+    		Value r = right.eval(ctxt);
 
-    		return NumericValue.valueOf(lv / rv, ctxt);
+			if (NumericValue.areIntegers(l, r))
+			{
+				BigInteger lv = l.intValue(ctxt);
+				BigInteger rv = r.intValue(ctxt);
+				BigInteger[] result = lv.divideAndRemainder(rv);
+				
+				if (result[1].equals(BigInteger.ZERO))	// Else do BigDecimal
+				{
+					return NumericValue.valueOf(result[0], ctxt);
+				}
+			}
+
+			BigDecimal lv = l.realValue(ctxt);
+    		BigDecimal rv = r.realValue(ctxt);
+
+    		return NumericValue.valueOf(lv.divide(rv, Settings.precision), ctxt);
         }
         catch (ValueException e)
         {
         	return abort(e);
         }
+		catch (Exception e)
+		{
+			return abort(new ValueException(4134, e.getMessage(), ctxt));
+		}
 	}
 
 	@Override

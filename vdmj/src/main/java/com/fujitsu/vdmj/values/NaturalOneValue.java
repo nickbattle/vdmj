@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.values;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -36,14 +38,19 @@ public class NaturalOneValue extends NaturalValue
 {
 	private static final long serialVersionUID = 1L;
 
-	public NaturalOneValue(long value) throws Exception
+	public NaturalOneValue(BigInteger value) throws Exception
 	{
 		super(value);
 
-		if (value < 1)
+		if (value.signum() < 1)
 		{
 			throw new Exception("Value " + value + " is not a nat1");
 		}
+	}
+
+	public NaturalOneValue(long i) throws Exception
+	{
+		this(new BigInteger("" + i));
 	}
 
 	@Override

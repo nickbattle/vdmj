@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.lex;
 
 import java.io.File;
+import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Stack;
@@ -532,7 +533,7 @@ public class LexTokenReader extends BacktrackInputReader
 				try
 				{
 					String s = v.toString();
-					if (check) Long.parseLong(s, base);	// Just check
+					// Long.parseLong(s, base);	// Not checked for High Precision
 					return s;
 				}
 				catch (NumberFormatException e)
@@ -985,7 +986,7 @@ public class LexTokenReader extends BacktrackInputReader
 				{
 					unpush();
 					rdCh();
-					String decimal = String.valueOf(Long.parseLong(rdNumber(16), 16));
+					BigInteger decimal = new BigInteger(rdNumber(16), 16);
 					last = new LexIntegerToken(decimal, location(tokline, tokpos));
 				}
 				else

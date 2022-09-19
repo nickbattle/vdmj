@@ -59,7 +59,7 @@ public class BUSValue extends ObjectValue
 		SchedulingPolicy policy = SchedulingPolicy.factory(parg.value.toUpperCase());
 
 		RealValue sarg = (RealValue)argvals.get(1);
-		double speed = sarg.value;
+		double speed = sarg.value.doubleValue();
 
 		SetValue set = (SetValue)argvals.get(2);
 		List<CPUResource> cpulist = new Vector<CPUResource>();
