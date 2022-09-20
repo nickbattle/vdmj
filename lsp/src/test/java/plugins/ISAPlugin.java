@@ -95,7 +95,7 @@ public abstract class ISAPlugin extends AnalysisPlugin implements EventListener
 		
 		if (experimental != null)
 		{
-			JSONObject provider = capabilities.get("translateProvider");
+			JSONObject provider = experimental.get("translateProvider");
 			
 			if (provider != null)
 			{

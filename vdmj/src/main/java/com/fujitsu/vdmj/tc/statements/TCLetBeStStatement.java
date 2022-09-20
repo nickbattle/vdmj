@@ -86,6 +86,16 @@ public class TCLetBeStStatement extends TCStatement
 			report(3225, "Such that clause is not boolean");
 		}
 
+		if (suchThat != null)
+		{
+			TCDefinitionList qual = suchThat.getQualifiedDefs(local);
+			
+			if (!qual.isEmpty())
+			{
+				local = new FlatEnvironment(qual, local);
+			}
+		}
+
 		TCType r = statement.typeCheck(local, scope, constraint, mandatory);
 		local.unusedCheck();
 		return setType(r);
