@@ -26,6 +26,7 @@ package workspace;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -103,6 +104,25 @@ public class DAPWorkspaceManager
 	private DAPDebugReader debugReader;
 	private String remoteControl;
 	private String logging;
+	
+	/**
+	 * These are the only property names that can sensibly set via the DAP launch.
+	 */
+	private static List<String> propertyNames = Arrays.asList(
+		"vdmj.annotations.packages",
+		"vdmj.annotations.debug",
+		"vdmj.mapping.search_path",
+		"vdmj.scheduler.fcfs_timeslice",
+		"vdmj.scheduler.virtual_timeslice",
+		"vdmj.scheduler.jitter",
+		"vdmj.rt.duration_default",
+		"vdmj.rt.duration_transactions",
+		"vdmj.rt.log_instvarchanges",
+		"vdmj.rt.max_periodic_overlaps",
+		"vdmj.rt.diags_guards",
+		"vdmj.rt.diags_timestep",
+		"vdmj.in.powerset_limit"
+	);
 	
 	protected DAPWorkspaceManager()
 	{
@@ -254,42 +274,25 @@ public class DAPWorkspaceManager
 
 			for (String key: properties.keySet())
 			{
-				switch (key)
+				if (propertyNames.contains(key))
 				{
-					case "vdmj.annotations.packages":
-					case "vdmj.annotations.debug":
-					case "vdmj.mapping.search_path":
-					case "vdmj.tc.skip_recursive_check":
-					case "vdmj.tc.skip_cyclic_check":
-					case "vdmj.tc.max_errors":
-					case "vdmj.scheduler.fcfs_timeslice":
-					case "vdmj.scheduler.virtual_timeslice":
-					case "vdmj.scheduler.jitter":
-					case "vdmj.rt.duration_default":
-					case "vdmj.rt.duration_transactions":
-					case "vdmj.rt.log_instvarchanges":
-					case "vdmj.rt.max_periodic_overlaps":
-					case "vdmj.rt.diags_guards":
-					case "vdmj.rt.diags_timestep":
-					case "vdmj.in.powerset_limit":
-						if (properties.get(key) == null)
-						{
-							System.clearProperty(key);
-						}
-						else
-						{
-							String value = properties.get(key).toString().trim();
-							System.setProperty(key, value);
-						}
-						break;
-
-					default:
-						Diag.warning("Ignoring property %s", key);
-						break;
+					if (properties.get(key) == null)
+					{
+						System.clearProperty(key);
+					}
+					else
+					{
+						String value = properties.get(key).toString().trim();
+						System.setProperty(key, value);
+					}
+				}
+				else
+				{
+					Diag.warning("Ignoring property %s", key);
 				}
 			}
 			
-			// System properties override those from the properties file
+			// System properties above override those from the properties file
 			Diag.info("Reading properties from %s", LSPWorkspaceManager.PROPERTIES);
 			Properties.init(LSPWorkspaceManager.PROPERTIES);
 		}
@@ -310,22 +313,10 @@ public class DAPWorkspaceManager
 		Settings.exceptions = false;
 		
 		// Clear any System property overrides...
-		System.clearProperty("vdmj.annotations.packages");
-		System.clearProperty("vdmj.annotations.debug");
-		System.clearProperty("vdmj.mapping.search_path");
-		System.clearProperty("vdmj.tc.skip_recursive_check");
-		System.clearProperty("vdmj.tc.skip_cyclic_check");
-		System.clearProperty("vdmj.tc.max_errors");
-		System.clearProperty("vdmj.scheduler.fcfs_timeslice");
-		System.clearProperty("vdmj.scheduler.virtual_timeslice");
-		System.clearProperty("vdmj.scheduler.jitter");
-		System.clearProperty("vdmj.rt.duration_default");
-		System.clearProperty("vdmj.rt.duration_transactions");
-		System.clearProperty("vdmj.rt.log_instvarchanges");
-		System.clearProperty("vdmj.rt.max_periodic_overlaps");
-		System.clearProperty("vdmj.rt.diags_guards");
-		System.clearProperty("vdmj.rt.diags_timestep");
-		System.clearProperty("vdmj.in.powerset_limit");
+		for (String key: propertyNames)
+		{
+			System.clearProperty(key);
+		}
 		
 		// Reset properties from the file
 		Diag.info("Resetting properties from %s", LSPWorkspaceManager.PROPERTIES);
