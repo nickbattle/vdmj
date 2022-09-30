@@ -24,9 +24,6 @@
 
 package vdmj.commands;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServer;
@@ -45,16 +42,9 @@ abstract public class Command
 		}
 
 		String[] parts = line.split("\\s+");
-		String name = parts[0].substring(0, 1).toUpperCase() + parts[0].substring(1).toLowerCase();
+		String name = parts[0];
 		
 		try
-		{
-			Diag.info("Trying to load command vdmj.commands.%sCommand", name);
-			Class<?> clazz = Class.forName("vdmj.commands." + name + "Command");
-			Constructor<?> ctor = clazz.getConstructor(String.class); 
-			return (Command)ctor.newInstance(line);
-		}
-		catch (ClassNotFoundException e)
 		{
 			Diag.info("Trying to load command %s from plugins", name);
 			Command cmd = PluginRegistry.getInstance().getCommand(line);
@@ -65,21 +55,7 @@ abstract public class Command
 			}
 			else
 			{
-				Diag.error(e);
 				return new ErrorCommand("Unknown command '" + name.toLowerCase() + "'. Try help");
-			}
-		}
-		catch (InvocationTargetException e)
-		{
-			Diag.error(e.getTargetException());
-			
-			if (e.getTargetException() instanceof IllegalArgumentException)
-			{
-				return new ErrorCommand(e.getTargetException().getMessage());
-			}
-			else
-			{
-				return new ErrorCommand("Error: " + e.getTargetException().getMessage());
 			}
 		}
 		catch (Exception e)

@@ -38,7 +38,7 @@ import workspace.DAPWorkspaceManager;
 public class InitCommand extends Command implements ScriptRunnable
 {
 	public static final String USAGE = "Usage: init";
-	public static final String[] HELP =	{ "init", "init - re-initialize the specification" };
+	public static final String HELP = "init - re-initialize the specification";
 	
 	public InitCommand(String line)
 	{

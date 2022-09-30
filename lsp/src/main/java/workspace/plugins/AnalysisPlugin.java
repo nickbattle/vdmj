@@ -33,6 +33,7 @@ import lsp.LSPMessageUtils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import vdmj.commands.Command;
+import vdmj.commands.HelpList;
 import workspace.EventHub;
 import workspace.PluginRegistry;
 import workspace.events.DAPEvent;
@@ -106,8 +107,8 @@ abstract public class AnalysisPlugin
 	 * Returns an array of String arrays for Command help. The first string is the
 	 * simple name of the command, the 2nd is the detail of the usage. 
 	 */
-	public String[][] getCommandHelp()
+	public HelpList getCommandHelp()
 	{
-		return new String[0][0];
+		return new HelpList();
 	}
 }

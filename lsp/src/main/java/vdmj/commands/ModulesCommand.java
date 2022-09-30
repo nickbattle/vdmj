@@ -38,7 +38,7 @@ import workspace.Diag;
 public class ModulesCommand extends Command
 {
 	public static final String USAGE = "Usage: modules";
-	public static final String[] HELP =	{ "modules", "modules - list the modules in the specification" };
+	public static final String HELP = "modules - list the modules in the specification";
 	
 	public ModulesCommand(String line)
 	{

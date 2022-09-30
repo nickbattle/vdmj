@@ -34,7 +34,7 @@ import workspace.DAPWorkspaceManager;
 public class PrintCommand extends Command implements InitRunnable, ScriptRunnable
 {
 	public static final String USAGE = "Usage: print <expression>";
-	public static final String[] HELP = { "print", "print <exp> - evaluate an expression" };
+	public static final String HELP = "print <exp> - evaluate an expression";
 	
 	public final String expression;
 

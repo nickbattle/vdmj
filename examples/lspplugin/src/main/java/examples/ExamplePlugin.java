@@ -36,6 +36,7 @@ import json.JSONArray;
 import json.JSONObject;
 import rpc.RPCMessageList;
 import vdmj.commands.Command;
+import vdmj.commands.HelpList;
 import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;
@@ -190,20 +191,20 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	}
 	
 	/**
-	 * This method returns the (2D) String array of help lines for all the Commands
+	 * This method returns the HelpList of help lines for all the Commands
 	 * recognised above. By convention, each Command has a field called HELP that
-	 * contains the keyword for the Command, plus a helpful message. For example:
+	 * contains a helpful message. For example:
 	 * 
-	 * String[] HELP = { "example", "example <text> - echo text to the console" };
+	 * String[] HELP = "example <text> - echo text to the console";
 	 */
 	@Override
-	public String[][] getCommandHelp()
+	public HelpList getCommandHelp()
 	{
-		return new String[][]
-		{
+		return new HelpList
+		(
 			ExampleCommand.HELP
 			// Other commands' help lines here...
-		};
+		);
 	}
 
 	/**

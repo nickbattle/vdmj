@@ -36,6 +36,9 @@ import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
+import vdmj.commands.Command;
+import vdmj.commands.HelpList;
+import vdmj.commands.ModulesCommand;
 import workspace.events.CheckPrepareEvent;
 
 public class INPluginSL extends INPlugin
@@ -57,11 +60,30 @@ public class INPluginSL extends INPlugin
 	@Override
 	protected void preCheck(CheckPrepareEvent ev)
 	{
-		super.preCheck(ev);
 		inModuleList = new INModuleList();
 		tcModuleList = new TCModuleList();
 	}
+
+	@Override
+	public Command getCommand(String line)
+	{
+		String[] parts = line.split("\\s+");
+		
+		switch (parts[0])
+		{
+			case "modules":	return new ModulesCommand(line);
+			
+			default:
+				return super.getCommand(line);
+		}
+	}
 	
+	@Override
+	public HelpList getCommandHelp()
+	{
+		return new HelpList(super.getCommandHelp(), ModulesCommand.HELP);
+	}
+
 	@Override
 	public <T extends Mappable> boolean checkLoadedFiles(T tcModuleList) throws Exception
 	{

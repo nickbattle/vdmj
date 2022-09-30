@@ -38,7 +38,7 @@ import workspace.Diag;
 public class ClassesCommand extends Command
 {
 	public static final String USAGE = "Usage: classes";
-	public static final String[] HELP =	{ "classes", "classes - list the classes in the specification" };
+	public static final String HELP = "classes - list the classes in the specification";
 	
 	public ClassesCommand(String line)
 	{

@@ -34,7 +34,7 @@ import workspace.DAPXWorkspaceManager;
 public class RuntraceCommand extends Command implements InitRunnable
 {
 	public static final String USAGE = "Usage: runtrace <trace> <number>";
-	public static final String[] HELP = { "runtrace", "runtrace <trace> <number> - run one test from a trace" };
+	public static final String HELP = "runtrace <trace> <number> - run one test from a trace";
 	
 	public final String tracename;
 	public final long testNumber;

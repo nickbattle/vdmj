@@ -38,7 +38,7 @@ import vdmj.commands.Command;
 public class ExampleCommand extends Command // implements InitRunnable, ScriptRunnable
 {
 	public static final String USAGE = "Usage: example <text>";
-	public static final String[] HELP = { "example", "example <text> - echo text to the console" };
+	public static final String HELP = "example <text> - echo text to the console";
 
 	private final String line;
 

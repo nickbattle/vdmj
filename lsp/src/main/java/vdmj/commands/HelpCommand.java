@@ -32,7 +32,7 @@ import workspace.PluginRegistry;
 public class HelpCommand extends Command
 {
 	public static final String USAGE = "Usage: help [command]";
-	public static final String[] HELP = { "help", "help [<command>] - information about commands" };
+	public static final String HELP = "help [<command>] - information about commands";
 	
 	private String command = null;
 
@@ -50,42 +50,16 @@ public class HelpCommand extends Command
 		}
 	}
 	
-	private static String[][] entries =
-	{
-		DefaultCommand.HELP,
-		ModulesCommand.HELP,
-		ClassesCommand.HELP,
-		PrintCommand.HELP,
-		SetCommand.HELP,
-		LogCommand.HELP,
-		HelpCommand.HELP,
-		InitCommand.HELP,
-		VersionCommand.HELP,
-		ScriptCommand.HELP,
-		QuitCommand.HELP
-	};
-	
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
 		StringBuilder sb = new StringBuilder();
 		
-		for (String[] help: entries)
+		for (String phelp: PluginRegistry.getInstance().getCommandHelp())
 		{
-			if (command == null || command.equals(help[0]))
+			if (command == null || phelp.startsWith(command))
 			{
-				sb.append(help[1] + "\n");
-			}
-		}
-		
-		for (String[][] phelp: PluginRegistry.getInstance().getCommandHelp())
-		{
-			for (String[] help: phelp)
-			{
-				if (command == null || command.equals(help[0]))
-				{
-					sb.append(help[1] + "\n");
-				}
+				sb.append(phelp + "\n");
 			}
 		}
 

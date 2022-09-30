@@ -26,13 +26,12 @@ package workspace;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import json.JSONArray;
 import json.JSONObject;
 import vdmj.commands.Command;
+import vdmj.commands.HelpList;
 import workspace.plugins.AnalysisPlugin;
 
 public class PluginRegistry
@@ -143,15 +142,15 @@ public class PluginRegistry
 		return result;
 	}
 	
-	public List<String[][]> getCommandHelp()
+	public HelpList getCommandHelp()
 	{
-		List<String[][]> result = new Vector<String[][]>();
+		HelpList result = new HelpList();
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			try
 			{
-				String[][] messages = plugin.getCommandHelp();
+				HelpList messages = plugin.getCommandHelp();
 				result.add(messages);
 			}
 			catch (Throwable e)
