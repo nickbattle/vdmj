@@ -31,6 +31,7 @@ import java.util.Map;
 import json.JSONArray;
 import json.JSONObject;
 import vdmj.commands.Command;
+import vdmj.commands.ErrorCommand;
 import vdmj.commands.HelpList;
 import workspace.plugins.AnalysisPlugin;
 
@@ -131,6 +132,11 @@ public class PluginRegistry
 					
 					result = c;
 				}
+			}
+			catch (IllegalArgumentException e)	// Usage failed
+			{
+				Diag.error(e.getMessage());
+				return new ErrorCommand(e.getMessage()); 
 			}
 			catch (Throwable e)
 			{

@@ -51,14 +51,14 @@ abstract public class Command
 			
 			if (cmd != null)
 			{
-				return cmd;
+				return cmd;		// Usage is ok
 			}
 			else
 			{
 				return new ErrorCommand("Unknown command '" + name.toLowerCase() + "'. Try help");
 			}
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
 			Diag.error(e);
 			return new ErrorCommand("Error: " + e.getMessage());

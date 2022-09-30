@@ -44,6 +44,7 @@ import vdmj.commands.InitCommand;
 import vdmj.commands.PrintCommand;
 import vdmj.commands.QuitCommand;
 import vdmj.commands.RestartCommand;
+import vdmj.commands.RuntraceCommand;
 import vdmj.commands.ScriptCommand;
 import vdmj.commands.SetCommand;
 import vdmj.commands.VersionCommand;
@@ -119,17 +120,18 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		
 		switch (parts[0])
 		{
-			case "default":	return new DefaultCommand(line);
+			case "default":		return new DefaultCommand(line);
 			case "print":
-			case "p":		return new PrintCommand(line);
-			case "set":		return new SetCommand(line);
-			case "init":	return new InitCommand(line);
-			case "script":	return new ScriptCommand(line);
-			case "help":	return new HelpCommand(line);
-			case "version":	return new VersionCommand(line);
-			case "restart":	return new RestartCommand(line);
+			case "p":			return new PrintCommand(line);
+			case "set":			return new SetCommand(line);
+			case "init":		return new InitCommand(line);
+			case "script":		return new ScriptCommand(line);
+			case "help":		return new HelpCommand(line);
+			case "version":		return new VersionCommand(line);
+			case "restart":		return new RestartCommand(line);
+			case "runtrace":	return new RuntraceCommand(line);
 			case "quit":
-			case "q":		return new QuitCommand(line);
+			case "q":			return new QuitCommand(line);
 
 			default:
 				try
