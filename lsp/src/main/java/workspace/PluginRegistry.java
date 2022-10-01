@@ -93,7 +93,7 @@ public class PluginRegistry
 		}
 	}
 	
-	public JSONArray applyCodeLenses(File file)
+	public JSONArray getCodeLenses(File file)
 	{
 		JSONArray commands = new JSONArray();
 		
@@ -101,7 +101,7 @@ public class PluginRegistry
 		{
 			try
 			{
-				commands.addAll(plugin.applyCodeLenses(file));
+				commands.addAll(plugin.getCodeLenses(file));
 			}
 			catch (Throwable e)
 			{

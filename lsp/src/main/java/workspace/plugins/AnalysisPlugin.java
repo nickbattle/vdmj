@@ -87,9 +87,9 @@ abstract public class AnalysisPlugin
 	}
 
 	/**
-	 * Plugins can apply their code lenses by overriding this method.
+	 * Plugins can return code lenses by overriding this method.
 	 */
-	public JSONArray applyCodeLenses(File file)
+	public JSONArray getCodeLenses(File file)
 	{
 		return new JSONArray();
 	}

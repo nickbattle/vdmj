@@ -210,7 +210,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	 * We register the launch/debug code lens here, if the tree is dirty. Else it
 	 * is registered by the TCPlugin.
 	 */
-	protected List<ASTCodeLens> getCodeLenses(boolean dirty)
+	protected List<ASTCodeLens> getASTCodeLenses(boolean dirty)
 	{
 		List<ASTCodeLens> lenses = new Vector<ASTCodeLens>();
 		
@@ -223,7 +223,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	abstract public JSONArray applyCodeLenses(File file);
+	abstract public JSONArray getCodeLenses(File file);
 
 	public List<VDMMessage> getErrs()
 	{

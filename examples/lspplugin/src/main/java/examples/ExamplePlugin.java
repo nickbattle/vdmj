@@ -148,11 +148,11 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	
 	/**
 	 * This is just one way of implementing code lenses. This method is used by the
-	 * applyCodeLenses methods in the dialect subclasses, and is intended to return
+	 * getCodeLenses methods in the dialect subclasses, and is intended to return
 	 * a list of the code lenses that this plugin provides. These could be cached,
 	 * unless the code lenses themselves contain state.
 	 */
-	protected List<TCCodeLens> getCodeLenses()
+	protected List<TCCodeLens> getTCCodeLenses()
 	{
 		List<TCCodeLens> lenses = new Vector<TCCodeLens>();
 		lenses.add(new ExampleLens());
@@ -164,7 +164,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	 * both dialect subclasses.
 	 */
 	@Override
-	abstract public JSONArray applyCodeLenses(File file);
+	abstract public JSONArray getCodeLenses(File file);
 	
 	/**
 	 * This method is called when the user types a line that is not recognised by the

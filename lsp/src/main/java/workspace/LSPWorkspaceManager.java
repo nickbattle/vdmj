@@ -1262,7 +1262,7 @@ public class LSPWorkspaceManager
 			return new RPCMessageList(request, new JSONArray());
 		}
 
-		JSONArray lenses = registry.applyCodeLenses(file);
+		JSONArray lenses = registry.getCodeLenses(file);
 		return new RPCMessageList(request, lenses);
 	}
 

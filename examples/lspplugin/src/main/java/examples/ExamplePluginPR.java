@@ -65,7 +65,7 @@ public class ExamplePluginPR extends ExamplePlugin
 	 * required.
 	 */
 	@Override
-	public JSONArray applyCodeLenses(File file)
+	public JSONArray getCodeLenses(File file)
 	{
 		TCPlugin tc = registry.getPlugin("TC");
 		TCClassList tcClassList = tc.getTC();
@@ -73,7 +73,7 @@ public class ExamplePluginPR extends ExamplePlugin
 		
 		if (!tcClassList.isEmpty())	// May be syntax errors
 		{
-			List<TCCodeLens> lenses = getCodeLenses();
+			List<TCCodeLens> lenses = getTCCodeLenses();
 			
 			for (TCClassDefinition clazz: tcClassList)
 			{
