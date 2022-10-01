@@ -53,11 +53,14 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.EventListener;
+import workspace.LSPWorkspaceManager;
 import workspace.events.ChangeFileEvent;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
+import workspace.events.InitializedEvent;
 import workspace.events.LSPEvent;
 import workspace.lenses.ASTCodeLens;
 import workspace.lenses.ASTLaunchDebugLens;
@@ -101,6 +104,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
+		eventhub.register(InitializedEvent.class, this);
 		eventhub.register(ChangeFileEvent.class, this);
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckSyntaxEvent.class, this);
@@ -110,7 +114,11 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
-		if (event instanceof ChangeFileEvent)
+		if (event instanceof InitializedEvent)
+		{
+			return lspDynamicRegistrations();
+		}
+		else if (event instanceof ChangeFileEvent)
 		{
 			return didChange((ChangeFileEvent) event);
 		}
@@ -132,6 +140,41 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 			Diag.error("Unhandled %s event %s", getName(), event);
 			return null;
 		}
+	}
+	
+	private RPCMessageList lspDynamicRegistrations()
+	{
+		RPCMessageList registrations = new RPCMessageList();
+		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+		
+		if (manager.hasClientCapability("workspace.didChangeWatchedFiles.dynamicRegistration"))
+		{
+			JSONArray watchers = new JSONArray();
+			
+			// Add the rootUri so that we only notice changes in our own project.
+			// We watch for all files/dirs and deal with filtering in changedWatchedFiles,
+			// otherwise directory deletions are not notified.
+			watchers.add(new JSONObject("globPattern", manager.getRoot().getAbsolutePath() + "/**"));
+			
+			registrations.add( RPCRequest.create("client/registerCapability",
+				new JSONObject(
+					"registrations",
+						new JSONArray(
+							new JSONObject(
+								"id", "12345",
+								"method", "workspace/didChangeWatchedFiles",
+								"registerOptions",
+									new JSONObject("watchers", watchers)
+				)))));
+			
+			Diag.info("Added dynamic registration for workspace/didChangeWatchedFiles");
+		}
+		else
+		{
+			Diag.info("Client does not support dynamic registration for workspace/didChangeWatchedFiles");
+		}
+		
+		return registrations;
 	}
 	
 	abstract protected List<VDMMessage> parseFile(File file);
@@ -167,7 +210,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	 * We register the launch/debug code lens here, if the tree is dirty. Else it
 	 * is registered by the TCPlugin.
 	 */
-	protected List<ASTCodeLens> getCodeLenses(boolean dirty)
+	protected List<ASTCodeLens> getASTCodeLenses(boolean dirty)
 	{
 		List<ASTCodeLens> lenses = new Vector<ASTCodeLens>();
 		
@@ -180,7 +223,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	abstract public JSONArray applyCodeLenses(File file);
+	abstract public JSONArray getCodeLenses(File file);
 
 	public List<VDMMessage> getErrs()
 	{

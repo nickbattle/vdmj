@@ -133,7 +133,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	/**
 	 * Event handling above. Supporting methods below. 
 	 */
-	protected List<TCCodeLens> getCodeLenses(boolean dirty)
+	protected List<TCCodeLens> getTCCodeLenses(boolean dirty)
 	{
 		List<TCCodeLens> lenses = new Vector<TCCodeLens>();
 		
@@ -146,7 +146,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	abstract public JSONArray applyCodeLenses(File file);
+	abstract public JSONArray getCodeLenses(File file);
 
 	public List<VDMMessage> getErrs()
 	{

@@ -202,7 +202,6 @@ public class LSPWorkspaceManager
 		try
 		{
 			RPCMessageList response = new RPCMessageList();
-			response.addAll(lspDynamicRegistrations());
 			response.addAll(checkLoadedFiles("initialized"));
 			response.addAll(eventhub.publish(new InitializedEvent(request)));
 			return response;
@@ -254,40 +253,6 @@ public class LSPWorkspaceManager
 		return clientInfo.get(key);
 	}
 
-	private RPCMessageList lspDynamicRegistrations()
-	{
-		RPCMessageList registrations = new RPCMessageList();
-		
-		if (hasClientCapability("workspace.didChangeWatchedFiles.dynamicRegistration"))
-		{
-			JSONArray watchers = new JSONArray();
-			
-			// Add the rootUri so that we only notice changes in our own project.
-			// We watch for all files/dirs and deal with filtering in changedWatchedFiles,
-			// otherwise directory deletions are not notified.
-			watchers.add(new JSONObject("globPattern", rootUri.getAbsolutePath() + "/**"));
-			
-			registrations.add( RPCRequest.create("client/registerCapability",
-				new JSONObject(
-					"registrations",
-						new JSONArray(
-							new JSONObject(
-								"id", "12345",
-								"method", "workspace/didChangeWatchedFiles",
-								"registerOptions",
-									new JSONObject("watchers", watchers)
-				)))));
-			
-			Diag.info("Added dynamic registration for workspace/didChangeWatchedFiles");
-		}
-		else
-		{
-			Diag.info("Client does not support dynamic registration for workspace/didChangeWatchedFiles");
-		}
-		
-		return registrations;
-	}
-	
 	private void loadAllProjectFiles() throws IOException
 	{
 		projectFiles.clear();
@@ -1297,7 +1262,7 @@ public class LSPWorkspaceManager
 			return new RPCMessageList(request, new JSONArray());
 		}
 
-		JSONArray lenses = registry.applyCodeLenses(file);
+		JSONArray lenses = registry.getCodeLenses(file);
 		return new RPCMessageList(request, lenses);
 	}
 

@@ -26,13 +26,13 @@ package workspace;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import json.JSONArray;
 import json.JSONObject;
 import vdmj.commands.Command;
+import vdmj.commands.ErrorCommand;
+import vdmj.commands.HelpList;
 import workspace.plugins.AnalysisPlugin;
 
 public class PluginRegistry
@@ -93,7 +93,7 @@ public class PluginRegistry
 		}
 	}
 	
-	public JSONArray applyCodeLenses(File file)
+	public JSONArray getCodeLenses(File file)
 	{
 		JSONArray commands = new JSONArray();
 		
@@ -101,7 +101,7 @@ public class PluginRegistry
 		{
 			try
 			{
-				commands.addAll(plugin.applyCodeLenses(file));
+				commands.addAll(plugin.getCodeLenses(file));
 			}
 			catch (Throwable e)
 			{
@@ -133,6 +133,11 @@ public class PluginRegistry
 					result = c;
 				}
 			}
+			catch (IllegalArgumentException e)	// Usage failed
+			{
+				Diag.error(e.getMessage());
+				return new ErrorCommand(e.getMessage()); 
+			}
 			catch (Throwable e)
 			{
 				Diag.error("Exception in %s getCommand", plugin.getName());
@@ -143,15 +148,15 @@ public class PluginRegistry
 		return result;
 	}
 	
-	public List<String[][]> getCommandHelp()
+	public HelpList getCommandHelp()
 	{
-		List<String[][]> result = new Vector<String[][]>();
+		HelpList result = new HelpList();
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			try
 			{
-				String[][] messages = plugin.getCommandHelp();
+				HelpList messages = plugin.getCommandHelp();
 				result.add(messages);
 			}
 			catch (Throwable e)

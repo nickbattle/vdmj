@@ -33,7 +33,7 @@ import dap.ScriptExecutor;
 public class ScriptCommand extends Command implements ScriptRunnable
 {
 	public static final String USAGE = "Usage: script <file>";
-	public static final String[] HELP = { "script", "script <file> - run commands from file" };
+	public static final String HELP = "script <file> - run commands from file";
 	
 	private final String filename;
 	

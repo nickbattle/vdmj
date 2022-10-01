@@ -192,14 +192,14 @@ public class TCPluginPR extends TCPlugin
 	}
 
 	@Override
-	public JSONArray applyCodeLenses(File file)
+	public JSONArray getCodeLenses(File file)
 	{
 		JSONArray results = new JSONArray();
 		ASTPlugin ast = registry.getPlugin("AST");
 		
 		if (!tcClassList.isEmpty())	// May be syntax errors
 		{
-			List<TCCodeLens> lenses = getCodeLenses(ast.isDirty());
+			List<TCCodeLens> lenses = getTCCodeLenses(ast.isDirty());
 			
 			for (TCClassDefinition clazz: tcClassList)
 			{

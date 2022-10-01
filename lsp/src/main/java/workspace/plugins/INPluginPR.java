@@ -36,6 +36,10 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
+import vdmj.commands.ClassesCommand;
+import vdmj.commands.Command;
+import vdmj.commands.HelpList;
+import vdmj.commands.LogCommand;
 import workspace.events.CheckPrepareEvent;
 
 public class INPluginPR extends INPlugin
@@ -57,9 +61,29 @@ public class INPluginPR extends INPlugin
 	@Override
 	public void preCheck(CheckPrepareEvent ev)
 	{
-		super.preCheck(ev);
 		inClassList = new INClassList();
 		tcClassList = new TCClassList();
+	}
+	
+	@Override
+	public Command getCommand(String line)
+	{
+		String[] parts = line.split("\\s+");
+		
+		switch (parts[0])
+		{
+			case "classes":	return new ClassesCommand(line);
+			case "log":		return new LogCommand(line);
+			
+			default:
+				return super.getCommand(line);
+		}
+	}
+	
+	@Override
+	public HelpList getCommandHelp()
+	{
+		return new HelpList(super.getCommandHelp(), ClassesCommand.HELP, LogCommand.HELP);
 	}
 	
 	@Override

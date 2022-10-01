@@ -36,6 +36,7 @@ import json.JSONArray;
 import json.JSONObject;
 import rpc.RPCMessageList;
 import vdmj.commands.Command;
+import vdmj.commands.HelpList;
 import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;
@@ -147,11 +148,11 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	
 	/**
 	 * This is just one way of implementing code lenses. This method is used by the
-	 * applyCodeLenses methods in the dialect subclasses, and is intended to return
+	 * getCodeLenses methods in the dialect subclasses, and is intended to return
 	 * a list of the code lenses that this plugin provides. These could be cached,
 	 * unless the code lenses themselves contain state.
 	 */
-	protected List<TCCodeLens> getCodeLenses()
+	protected List<TCCodeLens> getTCCodeLenses()
 	{
 		List<TCCodeLens> lenses = new Vector<TCCodeLens>();
 		lenses.add(new ExampleLens());
@@ -163,7 +164,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	 * both dialect subclasses.
 	 */
 	@Override
-	abstract public JSONArray applyCodeLenses(File file);
+	abstract public JSONArray getCodeLenses(File file);
 	
 	/**
 	 * This method is called when the user types a line that is not recognised by the
@@ -190,20 +191,20 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	}
 	
 	/**
-	 * This method returns the (2D) String array of help lines for all the Commands
+	 * This method returns the HelpList of help lines for all the Commands
 	 * recognised above. By convention, each Command has a field called HELP that
-	 * contains the keyword for the Command, plus a helpful message. For example:
+	 * contains a helpful message. For example:
 	 * 
-	 * String[] HELP = { "example", "example <text> - echo text to the console" };
+	 * String[] HELP = "example <text> - echo text to the console";
 	 */
 	@Override
-	public String[][] getCommandHelp()
+	public HelpList getCommandHelp()
 	{
-		return new String[][]
-		{
+		return new HelpList
+		(
 			ExampleCommand.HELP
 			// Other commands' help lines here...
-		};
+		);
 	}
 
 	/**

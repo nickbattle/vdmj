@@ -38,7 +38,7 @@ import json.JSONObject;
 public class LogCommand extends Command
 {
 	public static final String USAGE = "Usage: log [<file> | off]";
-	public static final String[] HELP =	{ "log", "log [<file> | off] - control RT logging" };
+	public static final String HELP = "log [<file> | off] - control RT logging";
 	
 	private String logfile = null;
 	

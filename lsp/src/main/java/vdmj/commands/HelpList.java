@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2022 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -24,44 +24,39 @@
 
 package vdmj.commands;
 
-import dap.AsyncExecutor;
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import dap.DAPServer;
-import lsp.CancellableThread;
-import workspace.DAPWorkspaceManager;
+import java.util.Collections;
+import java.util.Vector;
 
-public class QuitCommand extends Command
+public class HelpList extends Vector<String>
 {
-	public static final String HELP = "quit - end the debugging session";
-	public static final String USAGE = "Usage: quit";
-	
-	public QuitCommand(String line)
-	{
-		if (!line.equals("quit") && !line.equals("q"))
-		{
-			throw new IllegalArgumentException(USAGE);
-		}
-	}
+	private static final long serialVersionUID = 1L;
 
-	@Override
-	public DAPMessageList run(DAPRequest request)
+	public HelpList(String... lines)
 	{
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
-
-		if (AsyncExecutor.currentlyRunning() != null)
-		{
-			CancellableThread.cancelAll();
-			manager.stopDebugReader();
-		}
-		
-		DAPServer.getInstance().setRunning(false);
-		return manager.terminate(request, false);
+		add(lines);
+		Collections.sort(this);
 	}
 	
-	@Override
-	public boolean notWhenRunning()
+	public HelpList(HelpList list, String... lines)
 	{
-		return false;
+		addAll(list);
+		add(lines);
+		Collections.sort(this);
+	}
+	
+	private void add(String... lines)
+	{
+		for (String line: lines)
+		{
+			add(line);
+		}
+
+		Collections.sort(this);
+	}
+
+	public void add(HelpList list)
+	{
+		addAll(list);
+		Collections.sort(this);
 	}
 }

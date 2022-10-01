@@ -40,7 +40,7 @@ import workspace.Diag;
 public class VersionCommand extends Command
 {
 	public static final String USAGE = "Usage: version";
-	public static final String[] HELP =	{ "version", "version - show the VDMJ version and build" };
+	public static final String HELP = "version - show the VDMJ version and build";
 	
 	public VersionCommand(String line)
 	{
