@@ -52,11 +52,6 @@ abstract public class AnalysisPlugin
 		eventhub = EventHub.getInstance();
 	}
 	
-	protected RPCMessageList errorResult()
-	{
-		return new RPCMessageList(null, RPCErrors.InternalError, "?");
-	}
-
 	abstract public String getName();
 	
 	abstract public void init();
