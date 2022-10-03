@@ -105,7 +105,7 @@ public class PluginRegistry
 			}
 			catch (Throwable e)
 			{
-				Diag.error("Exception in %s applyCodeLenses", plugin.getName());
+				Diag.error("Exception in %s getCodeLenses", plugin.getName());
 				Diag.error(e);
 			}
 		}
