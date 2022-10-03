@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -86,8 +85,8 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 				return new CTPluginPR();
 				
 			default:
-				Diag.error("Unknown dialect " + dialect);
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+				Diag.error("Unsupported dialect " + dialect);
+				throw new IllegalArgumentException("Unsupported dialect: " + dialect);
 		}
 	}
 

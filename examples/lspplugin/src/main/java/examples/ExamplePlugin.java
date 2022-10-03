@@ -28,7 +28,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.DAPMessageList;
@@ -85,8 +84,8 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 				return new ExamplePluginPR();
 				
 			default:
-				Diag.error("Unknown dialect " + dialect);
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+				Diag.error("Unsupported dialect " + dialect);
+				throw new IllegalArgumentException("Unsupported dialect: " + dialect);
 		}
 	}
 

@@ -27,7 +27,6 @@ package workspace.plugins;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.INDefinitionList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
@@ -68,8 +67,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 				return new INPluginPR();
 				
 			default:
-				Diag.error("Unknown dialect " + dialect);
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+				Diag.error("Unsupported dialect " + dialect);
+				throw new IllegalArgumentException("Unsupported dialect: " + dialect);
 		}
 	}
 

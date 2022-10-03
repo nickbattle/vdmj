@@ -24,7 +24,6 @@
 
 package plugins;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONArray;
@@ -48,8 +47,8 @@ public abstract class ISAPlugin extends AnalysisPlugin implements EventListener
 				return new ISAPluginSL();
 				
 			default:
-				Diag.error("Unknown dialect " + dialect);
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+				Diag.error("Unsupported dialect " + dialect);
+				throw new IllegalArgumentException("Unsupported dialect: " + dialect);
 		}
 	}
 

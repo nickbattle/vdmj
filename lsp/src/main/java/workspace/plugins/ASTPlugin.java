@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinitionList;
 import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
@@ -85,8 +84,8 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 				return new ASTPluginPR();
 				
 			default:
-				Diag.error("Unknown dialect " + dialect);
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+				Diag.error("Unsupported dialect " + dialect);
+				throw new IllegalArgumentException("Unsupported dialect: " + dialect);
 		}
 	}
 
