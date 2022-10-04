@@ -54,12 +54,13 @@ public class HelpCommand extends Command
 	public DAPMessageList run(DAPRequest request)
 	{
 		StringBuilder sb = new StringBuilder();
+		HelpList help = PluginRegistry.getInstance().getCommandHelp();
 		
-		for (String phelp: PluginRegistry.getInstance().getCommandHelp())
+		for (String cmd: help.keySet())
 		{
-			if (command == null || phelp.startsWith(command))
+			if (command == null || cmd.equals(command))
 			{
-				sb.append(phelp + "\n");
+				sb.append(help.get(cmd) + "\n");
 			}
 		}
 
