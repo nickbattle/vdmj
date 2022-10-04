@@ -24,39 +24,37 @@
 
 package vdmj.commands;
 
-import java.util.Collections;
-import java.util.Vector;
+import java.util.TreeMap;
 
-public class HelpList extends Vector<String>
+/**
+ * An ordered list of "command", "usage" help pairs.
+ */
+public class HelpList extends TreeMap<String, String>
 {
 	private static final long serialVersionUID = 1L;
 
 	public HelpList(String... lines)
 	{
 		add(lines);
-		Collections.sort(this);
 	}
 	
 	public HelpList(HelpList list, String... lines)
 	{
-		addAll(list);
+		add(list);
 		add(lines);
-		Collections.sort(this);
 	}
 	
 	private void add(String... lines)
 	{
 		for (String line: lines)
 		{
-			add(line);
+			String[] parts = line.split("\\s+");
+			put(parts[0], line);
 		}
-
-		Collections.sort(this);
 	}
 
 	public void add(HelpList list)
 	{
-		addAll(list);
-		Collections.sort(this);
+		putAll(list);
 	}
 }

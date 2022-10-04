@@ -31,7 +31,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
@@ -77,8 +76,8 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 				return new TCPluginPR();
 				
 			default:
-				Diag.error("Unknown dialect " + dialect);
-				throw new RuntimeException("Unsupported dialect: " + Settings.dialect);
+				Diag.error("Unsupported dialect " + dialect);
+				throw new IllegalArgumentException("Unsupported dialect: " + dialect);
 		}
 	}
 

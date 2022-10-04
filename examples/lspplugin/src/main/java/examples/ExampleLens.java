@@ -51,11 +51,14 @@ public class ExampleLens extends CodeLens implements TCCodeLens
 	{
 		JSONArray results = new JSONArray();
 		
-		if (definition instanceof TCExplicitFunctionDefinition)	// Only explicit functions (say)
+		if (isClientType("vscode"))		// Lens is VSCode-specific, because of the command used
 		{
-			TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)definition;
-			// This displays the launch.json file via a "Config" lens
-			results.add(makeLens(def.location, "Config", "workbench.action.debug.configure"));
+			if (definition instanceof TCExplicitFunctionDefinition)	// Only explicit functions (say)
+			{
+				TCExplicitFunctionDefinition def = (TCExplicitFunctionDefinition)definition;
+				// This displays the launch.json file via a "Config" lens
+				results.add(makeLens(def.location, "Config", "workbench.action.debug.configure"));
+			}
 		}
 		
 		return results;
