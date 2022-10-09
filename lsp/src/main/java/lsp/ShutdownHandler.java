@@ -38,6 +38,6 @@ public class ShutdownHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		return LSPWorkspaceManager.getInstance().shutdown(request);
+		return LSPWorkspaceManager.getInstance().lspShutdown(request);
 	}
 }

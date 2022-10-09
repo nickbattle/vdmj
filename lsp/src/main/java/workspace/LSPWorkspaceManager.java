@@ -50,7 +50,6 @@ import java.util.regex.Pattern;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
-import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -598,7 +597,7 @@ public class LSPWorkspaceManager
 		return results;
 	}
 
-	public RPCMessageList openFile(RPCRequest request, File file, String text) throws Exception
+	public RPCMessageList lspDidOpen(RPCRequest request, File file, String text) throws Exception
 	{
 		if (onDotPath(file))
 		{
@@ -648,7 +647,7 @@ public class LSPWorkspaceManager
 		return null;
 	}
 
-	public RPCMessageList closeFile(RPCRequest request, File file) throws Exception
+	public RPCMessageList lspDidClose(RPCRequest request, File file) throws Exception
 	{
 		if (onDotPath(file))
 		{
@@ -676,7 +675,7 @@ public class LSPWorkspaceManager
 		return null;
 	}
 
-	public RPCMessageList changeFile(RPCRequest request, File file, JSONObject range, String text) throws Exception
+	public RPCMessageList lspDidChange(RPCRequest request, File file, JSONObject range, String text) throws Exception
 	{
 		if (onDotPath(file))
 		{
@@ -722,6 +721,45 @@ public class LSPWorkspaceManager
 	}
 
 	/**
+	 * This is currently done via watched file events above. Note that this method
+	 * is a notification, so cannot return errors.
+	 */
+	public void lspDidSave(RPCRequest request, File file, String text) throws Exception
+	{
+		if (onDotPath(file))
+		{
+			Diag.info("Ignoring %s dot path file", file);
+		}
+		else if (ignoredFile(file))
+		{
+			Diag.info("Ignoring file %s in vdmignore", file);
+		}
+		else if (!projectFiles.keySet().contains(file))
+		{
+			Diag.error("File not known: %s", file);
+		}
+		else if (!openFiles.contains(file))
+		{
+			Diag.error("File not open: %s", file);
+		}
+		else
+		{
+			if (externalFiles.containsKey(file))
+			{
+				sendMessage(WARNING_MSG, "WARNING: Saving generated VDM source: " + file);
+			}
+	
+			if (text != null)
+			{
+				projectFiles.put(file, new StringBuilder(text));
+			}
+			
+			eventhub.publish(new SaveFileEvent(request, file));
+			checkLoadedFiles("saved");
+		}
+	}
+
+	/**
 	 * The action code returned indicates whether the change watched file requires the
 	 * specification to be reloaded and rechecked(2), just re-checked(1), or nothing(0).
 	 * Note that these are ordered by severity, so multiple file changes will select
@@ -732,7 +770,7 @@ public class LSPWorkspaceManager
 	private static final int RECHECK = 1;
 	private static final int RELOAD_AND_CHECK = 2;
 	
-	public int changeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
+	public int lspDidChangeWatchedFile(RPCRequest request, File file, WatchKind type) throws Exception
 	{
 		FilenameFilter filter = getFilenameFilter();
 		int actionCode = DO_NOTHING;
@@ -889,46 +927,7 @@ public class LSPWorkspaceManager
 		}
 	}
 
-	/**
-	 * This is currently done via watched file events above. Note that this method
-	 * is a notification, so cannot return errors.
-	 */
-	public void saveFile(RPCRequest request, File file, String text) throws Exception
-	{
-		if (onDotPath(file))
-		{
-			Diag.info("Ignoring %s dot path file", file);
-		}
-		else if (ignoredFile(file))
-		{
-			Diag.info("Ignoring file %s in vdmignore", file);
-		}
-		else if (!projectFiles.keySet().contains(file))
-		{
-			Diag.error("File not known: %s", file);
-		}
-		else if (!openFiles.contains(file))
-		{
-			Diag.error("File not open: %s", file);
-		}
-		else
-		{
-			if (externalFiles.containsKey(file))
-			{
-				sendMessage(WARNING_MSG, "WARNING: Saving generated VDM source: " + file);
-			}
-
-			if (text != null)
-			{
-				projectFiles.put(file, new StringBuilder(text));
-			}
-			
-			eventhub.publish(new SaveFileEvent(request, file));
-			checkLoadedFiles("saved");
-		}
-	}
-
-	public RPCMessageList findDefinition(RPCRequest request, File file, int zline, int zcol)
+	public RPCMessageList lspDefinition(RPCRequest request, File file, long zline, long zcol)
 	{
 		if (onDotPath(file) || ignoredFile(file))
 		{
@@ -975,7 +974,7 @@ public class LSPWorkspaceManager
 		}
 	}
 
-	public RPCMessageList findReferences(RPCRequest request, File file, int zline, int zcol, Boolean incdec)
+	public RPCMessageList lspReferences(RPCRequest request, File file, long zline, long zcol, Boolean incdec)
 	{
 		if (onDotPath(file) || ignoredFile(file))
 		{
@@ -1016,7 +1015,11 @@ public class LSPWorkspaceManager
 						
 						if (!range.equals(defRange))	// See incdec below
 						{
-							TCDefinition def2 = findDefinition(pfile, range);
+							JSONObject start = range.get("start");
+							long zline2 = start.get("line");
+							long zcol2  = start.get("character");
+
+							TCDefinition def2 = findDefinition(pfile, zline2, zcol2);
 							
 							// Check by location, so that manufactured definitions for fields
 							// will match.
@@ -1043,7 +1046,7 @@ public class LSPWorkspaceManager
 		}
 	}
 
-	public RPCMessageList prepareHierarchy(RPCRequest request, File file, int zline, int zcol)
+	public RPCMessageList lspPrepareTypeHierarchy(RPCRequest request, File file, long zline, long zcol)
 	{
 		// We can assume we're PP or RT
 		TCDefinition def = findDefinition(file, zline, zcol);
@@ -1071,15 +1074,22 @@ public class LSPWorkspaceManager
 		}
 	}
 
-	public RPCMessageList getTypeHierarchy(RPCRequest request, String classname, boolean subtypes)
+	public RPCMessageList lspSupertypes(RPCRequest request, String classname)
 	{
 		TCPlugin tc = registry.getPlugin("TC");
-		TCClassList results = tc.getTypeHierarchy(classname, subtypes);
+		TCClassList results = tc.getTypeHierarchy(classname, false);
 		return new RPCMessageList(request, messages.typeHierarchyItems(results));
 	}
 
-	public RPCMessageList completion(RPCRequest request,
-			CompletionTriggerKind triggerKind, File file, int zline, int zcol)
+	public RPCMessageList lspSubtypes(RPCRequest request, String classname)
+	{
+		TCPlugin tc = registry.getPlugin("TC");
+		TCClassList results = tc.getTypeHierarchy(classname, true);
+		return new RPCMessageList(request, messages.typeHierarchyItems(results));
+	}
+
+	public RPCMessageList lspCompletion(RPCRequest request,
+			CompletionTriggerKind triggerKind, File file, long zline, long zcol)
 	{
 		HashMap<String, JSONObject> labels = new HashMap<String, JSONObject>();
 		
@@ -1152,8 +1162,10 @@ public class LSPWorkspaceManager
 				if (!word.isEmpty())
 				{
 					Diag.info("Trying to complete '%s'", word);
+					TCPlugin plugin = registry.getPlugin("TC");
+					TCDefinitionList startingWith = plugin.lookupDefinition(word);
 					
-					for (TCDefinition defn: lookupDefinition(word))
+					for (TCDefinition defn: startingWith)
 					{
 						if (defn.name != null)
 						{
@@ -1230,7 +1242,7 @@ public class LSPWorkspaceManager
 		return sb.toString();
 	}
 
-	public RPCMessageList documentSymbols(RPCRequest request, File file)
+	public RPCMessageList lspDocumentSymbols(RPCRequest request, File file)
 	{
 		if (onDotPath(file) || ignoredFile(file))
 		{
@@ -1249,13 +1261,13 @@ public class LSPWorkspaceManager
 		if (!results.isEmpty())
 		{
 			 StringBuilder buffer = projectFiles.get(file);
-			 fixRanges(results, afterLine(Utils.getEndPosition(buffer)));
+			 Utils.fixRanges(results, Utils.afterLine(Utils.getEndPosition(buffer)));
 		}
 		
 		return new RPCMessageList(request, results);
 	}
 	
-	public RPCMessageList codeLens(RPCRequest request, File file)
+	public RPCMessageList lspCodeLens(RPCRequest request, File file)
 	{
 		if (onDotPath(file) || ignoredFile(file))
 		{
@@ -1266,109 +1278,15 @@ public class LSPWorkspaceManager
 		return new RPCMessageList(request, lenses);
 	}
 
-	public RPCMessageList codeLensResolve(RPCRequest request, JSONObject data)
+	public RPCMessageList lspCodeLensResolve(RPCRequest request, JSONObject data)
 	{
 		return new RPCMessageList(request);
 	}
-
-	/**
-	 * Fix the "range" fields of the DocumentSymbol array passed in, such that each
-	 * range starts at the selectionRange and ends at the start of the next symbol,
-	 * or the end passed (for the last one). Recurse into any children.
-	 */
-	private void fixRanges(JSONArray symbols, JSONObject endPosition)
-	{
-		for (int s = 0; s < symbols.size(); s++)
-		{
-			JSONObject symbol = symbols.index(s);
-			JSONObject start = symbol.getPath("selectionRange.start");
-
-			JSONObject nextstart = null;
-			
-			for (int n = s + 1; n <= symbols.size(); n++)
-			{
-				if (n == symbols.size())
-				{
-					nextstart = endPosition;
-				}
-				else
-				{
-					JSONObject next = symbols.index(n);
-					nextstart = next.getPath("selectionRange.start");
-				}
-				
-				if (!nextstart.get("line").equals(start.get("line")))
-				{
-					break;	// Guaranteed exit for endPosition
-				}
-			}
-			
-			JSONObject range = symbol.get("range");
-			range.put("start", startLine(start));
-			range.put("end", beforeNext(nextstart));
-			
-			verifyRange(symbol.get("name"), range, symbol.getPath("selectionRange"));
-			
-			JSONArray children = symbol.get("children");
-			
-			if (children != null)
-			{
-				fixRanges(children, nextstart);
-			}
-		}
-	}
 	
-	private void verifyRange(String name, JSONObject range, JSONObject selectionRange)
-	{
-		File file = new File("?");
-		LexLocation rloc = Utils.rangeToLexLocation(file, range);
-		LexLocation sloc = Utils.rangeToLexLocation(file, selectionRange);
-		
-		if (!sloc.within(rloc))
-		{
-			Diag.error("Selection not within range at symbol %s", name);
-			Diag.error("Range %s", range);
-			Diag.error("Selection %s", selectionRange);
-		}
-	}
-
-	private JSONObject afterLine(JSONObject position)
-	{
-		long line = position.get("line");
-		return new JSONObject("line", line+1, "character", 0);
-	}
-	
-	private JSONObject startLine(JSONObject position)
-	{
-		long line = position.get("line");
-		return new JSONObject("line", line, "character", 0);
-	}
-	
-	private JSONObject beforeNext(JSONObject next)
-	{
-		long line = next.get("line");
-		return new JSONObject("line", line - 1, "character", 999999999);
-	}
-	
-	private TCDefinition findDefinition(File file, int zline, int zcol)
+	private TCDefinition findDefinition(File file, long zline, long zcol)
 	{
 		TCPlugin plugin = registry.getPlugin("TC");
-		return plugin.findDefinition(file, zline, zcol);
-	}
-
-	private TCDefinition findDefinition(File file, JSONObject range)
-	{
-		TCPlugin plugin = registry.getPlugin("TC");
-		JSONObject start = range.get("start");
-		long zline = start.get("line");
-		long zcol  = start.get("character");
 		return plugin.findDefinition(file, (int)zline, (int)zcol);
-	}
-
-	private TCDefinitionList lookupDefinition(String startsWith)
-	{
-		TCPlugin plugin = registry.getPlugin("TC");
-		return plugin.lookupDefinition(startsWith);
 	}
 
 	private FilenameFilter getFilenameFilter()
@@ -1386,7 +1304,7 @@ public class LSPWorkspaceManager
 				new JSONObject("type", type, "message", message)));
 	}
 	
-	public RPCMessageList shutdown(RPCRequest request)
+	public RPCMessageList lspShutdown(RPCRequest request)
 	{
 		Diag.info("Shutting down server");
 		eventhub.publish(new ShutdownEvent(request));

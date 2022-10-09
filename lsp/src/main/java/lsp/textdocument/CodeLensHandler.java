@@ -67,7 +67,7 @@ public class CodeLensHandler extends LSPHandler
 			JSONObject textDocument = params.get("textDocument");
 			File file = Utils.uriToFile(textDocument.get("uri"));
 			
-			return LSPWorkspaceManager.getInstance().codeLens(request, file);
+			return LSPWorkspaceManager.getInstance().lspCodeLens(request, file);
 		}
 		catch (URISyntaxException e)
 		{
@@ -88,7 +88,7 @@ public class CodeLensHandler extends LSPHandler
 			JSONObject params = request.get("params");
 			JSONObject data = params.get("data");
 			
-			return LSPWorkspaceManager.getInstance().codeLensResolve(request, data);
+			return LSPWorkspaceManager.getInstance().lspCodeLensResolve(request, data);
 		}
 		catch (Exception e)
 		{

@@ -52,7 +52,7 @@ public class DidCloseHandler extends LSPHandler
 			JSONObject text = params.get("textDocument");
 			File file = Utils.uriToFile(text.get("uri"));
 			
-			return LSPWorkspaceManager.getInstance().closeFile(request, file);
+			return LSPWorkspaceManager.getInstance().lspDidClose(request, file);
 		}
 		catch (URISyntaxException e)
 		{

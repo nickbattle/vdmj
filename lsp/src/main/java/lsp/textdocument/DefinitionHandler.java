@@ -56,7 +56,7 @@ public class DefinitionHandler extends LSPHandler
 			Long line = position.get("line");
 			Long col = position.get("character");
 			
-			return LSPWorkspaceManager.getInstance().findDefinition(request, file, line.intValue(), col.intValue());
+			return LSPWorkspaceManager.getInstance().lspDefinition(request, file, line, col);
 		}
 		catch (URISyntaxException e)
 		{

@@ -53,7 +53,7 @@ public class DidOpenHandler extends LSPHandler
 			File file = Utils.uriToFile(textDoc.get("uri"));
 			String text = textDoc.get("text");
 			
-			return LSPWorkspaceManager.getInstance().openFile(request, file, text);
+			return LSPWorkspaceManager.getInstance().lspDidOpen(request, file, text);
 		}
 		catch (URISyntaxException e)
 		{

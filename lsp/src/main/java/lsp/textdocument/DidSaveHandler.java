@@ -52,7 +52,7 @@ public class DidSaveHandler extends LSPHandler
 			File file = Utils.uriToFile(textDoc.get("uri"));
 			String text = params.get("text");
 			
-			LSPWorkspaceManager.getInstance().saveFile(request, file, text);
+			LSPWorkspaceManager.getInstance().lspDidSave(request, file, text);
 		}
 		catch (URISyntaxException e)
 		{

@@ -163,7 +163,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 
 	abstract public JSONArray documentSymbols(File file);
 
-	abstract public TCDefinition findDefinition(File file, int zline, int zcol);
+	abstract public TCDefinition findDefinition(File file, long zline, long zcol);
 
 	abstract public TCDefinitionList lookupDefinition(String startsWith);
 	

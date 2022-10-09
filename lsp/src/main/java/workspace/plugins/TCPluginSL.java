@@ -155,7 +155,7 @@ public class TCPluginSL extends TCPlugin
 	}
 
 	@Override
-	public TCDefinition findDefinition(File file, int zline, int zcol)
+	public TCDefinition findDefinition(File file, long zline, long zcol)
 	{
 		if (tcModuleList != null && !tcModuleList.isEmpty())
 		{
