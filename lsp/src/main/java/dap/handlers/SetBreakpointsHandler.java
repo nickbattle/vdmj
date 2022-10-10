@@ -82,7 +82,7 @@ public class SetBreakpointsHandler extends DAPHandler
 				File file = Utils.pathToFile(source.get("path"));
 				JSONArray breakpoints = arguments.get("breakpoints");
 				
-				return DAPWorkspaceManager.getInstance().setBreakpoints(request, file, breakpoints);
+				return DAPWorkspaceManager.getInstance().dapSetBreakpoints(request, file, breakpoints);
 			}
 		}
 		catch (Exception e)
@@ -108,7 +108,7 @@ public class SetBreakpointsHandler extends DAPHandler
 				JSONObject arguments = request.get("arguments");
 				JSONArray breakpoints = arguments.get("breakpoints");
 				
-				return DAPWorkspaceManager.getInstance().setFunctionBreakpoints(request, breakpoints);
+				return DAPWorkspaceManager.getInstance().dapSetFunctionBreakpoints(request, breakpoints);
 			}
 		}
 		catch (Exception e)
@@ -133,7 +133,7 @@ public class SetBreakpointsHandler extends DAPHandler
 			{
 				JSONObject arguments = request.get("arguments");
 				JSONArray filterOptions = arguments.get("filterOptions");
-				return manager.setExceptionBreakpoints(request, filterOptions);
+				return manager.dapSetExceptionBreakpoints(request, filterOptions);
 			}
 		}
 		catch (Exception e)

@@ -73,7 +73,7 @@ public class InitializeHandler extends DAPHandler
 	{
 		try
 		{
-			return DAPWorkspaceManager.getInstance().configurationDone(request);
+			return DAPWorkspaceManager.getInstance().dapConfigurationDone(request);
 		}
 		catch (Exception e)
 		{

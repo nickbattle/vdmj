@@ -77,7 +77,7 @@ public class ThreadsHandler extends DAPHandler
 			}
 			else
 			{
-				return manager.threads(request);
+				return manager.dapThreads(request);
 			}
 		}
 	}

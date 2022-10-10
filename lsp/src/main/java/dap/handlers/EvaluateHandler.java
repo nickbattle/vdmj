@@ -56,7 +56,7 @@ public class EvaluateHandler extends DAPHandler
 			JSONObject arguments = request.get("arguments");
 			String expression = arguments.get("expression");
 			String context = arguments.get("context");
-			return manager.evaluate(request, expression, context);
+			return manager.dapEvaluate(request, expression, context);
 		}
 	}
 }

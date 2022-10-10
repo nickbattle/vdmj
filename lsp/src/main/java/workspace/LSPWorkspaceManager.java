@@ -943,14 +943,7 @@ public class LSPWorkspaceManager
 			
 			if (!ast.getErrs().isEmpty() || !tc.getErrs().isEmpty())
 			{
-				try
-				{
-					sendMessage(WARNING_MSG, "Specification contains errors. Cannot locate symbols.");
-				}
-				catch (IOException e)
-				{
-					// ignore
-				}
+				sendMessage(WARNING_MSG, "Specification contains errors. Cannot locate symbols.");
 			}
 
 			Diag.info("Unable to locate symbol at %s %d:%d", file, zline, zcol);
@@ -1298,10 +1291,17 @@ public class LSPWorkspaceManager
 	private static final long ERROR_MSG = 1L;
 	private static final long WARNING_MSG = 2L;
 	
-	private void sendMessage(Long type, String message) throws IOException
+	private void sendMessage(Long type, String message)
 	{
-		LSPServer.getInstance().writeMessage(RPCRequest.notification("window/showMessage",
-				new JSONObject("type", type, "message", message)));
+		try
+		{
+			LSPServer.getInstance().writeMessage(RPCRequest.notification("window/showMessage",
+					new JSONObject("type", type, "message", message)));
+		}
+		catch (IOException e)
+		{
+			Diag.error("Failed sending message: ", message);
+		}
 	}
 	
 	public RPCMessageList lspShutdown(RPCRequest request)

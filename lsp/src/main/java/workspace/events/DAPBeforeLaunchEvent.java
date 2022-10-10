@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2022 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,46 +22,14 @@
  *
  ******************************************************************************/
 
-package vdmj.commands;
+package workspace.events;
 
-import dap.AsyncExecutor;
-import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPServer;
-import lsp.CancellableThread;
-import workspace.DAPWorkspaceManager;
 
-public class QuitCommand extends Command
+public class DAPBeforeLaunchEvent extends DAPEvent
 {
-	public static final String HELP = "quit - end the debugging session";
-	public static final String USAGE = "Usage: quit";
-	
-	public QuitCommand(String line)
+	public DAPBeforeLaunchEvent(DAPRequest request)
 	{
-		if (!line.equals("quit") && !line.equals("q"))
-		{
-			throw new IllegalArgumentException(USAGE);
-		}
-	}
-
-	@Override
-	public DAPMessageList run(DAPRequest request)
-	{
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
-
-		if (AsyncExecutor.currentlyRunning() != null)
-		{
-			CancellableThread.cancelAll();
-			manager.stopDebugReader();
-		}
-		
-		DAPServer.getInstance().setRunning(false);
-		return manager.dapTerminate(request, false);
-	}
-	
-	@Override
-	public boolean notWhenRunning()
-	{
-		return false;
+		super(request);
 	}
 }
