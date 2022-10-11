@@ -26,6 +26,7 @@ package dap;
 
 import json.JSONArray;
 import json.JSONObject;
+import workspace.PluginRegistry;
 
 public class DAPInitializeResponse extends DAPResponse
 {
@@ -39,6 +40,7 @@ public class DAPInitializeResponse extends DAPResponse
 	private static JSONObject getServerCapabilities()
 	{
 		JSONObject cap = new JSONObject();
+
 		cap.put("supportsConfigurationDoneRequest", true);
 		cap.put("supportsTerminateRequest", true);
 		cap.put("supportsCancelRequest", false);
@@ -58,6 +60,8 @@ public class DAPInitializeResponse extends DAPResponse
 						"supportsCondition",	true,
 						"conditionDescription",	"Space separated exit value(s) to catch")));
 		
+		PluginRegistry.getInstance().setDAPCapabilities(cap);
+
 		return cap;
 	}
 }

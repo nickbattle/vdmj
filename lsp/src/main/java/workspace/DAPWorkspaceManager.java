@@ -169,31 +169,23 @@ public class DAPWorkspaceManager
 			boolean noDebug, String defaultName, String command, String remoteControl, String logging) throws Exception
 	{
 		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
-		int retry = 50;		// 5s worth of 100ms
-		
-		while (retry > 0 && manager.checkInProgress())
+
+		for (int retry = 50; retry > 0 && manager.checkInProgress(); retry--)	// 5s worth of 100ms
 		{
 			Diag.fine("Waiting for check to complete, %d", retry);
 			pause(100);
-			retry--;
 		}
 		
 		if (manager.checkInProgress())
 		{
-			DAPMessageList responses = new DAPMessageList();
-			responses.add(new DAPResponse(request, false, "Specification being checked, cannot launch", null));
 			stderr("Specification being checked, cannot launch");
-			clearInterpreter();
-			return responses;
+			return new DAPMessageList(request, false, "Specification being checked, cannot launch", null);
 		}
 		
 		if (specHasErrors())
 		{
-			DAPMessageList responses = new DAPMessageList();
-			responses.add(new DAPResponse(request, false, "Specification has errors, cannot launch", null));
 			stderr("Specification has errors, cannot launch");
-			clearInterpreter();
-			return responses;
+			return new DAPMessageList(request, false, "Specification has errors, cannot launch", null);
 		}
 		
 		try
@@ -386,29 +378,6 @@ public class DAPWorkspaceManager
 	}
 
 	/**
-	 * Create a new (dialect) Interpreter from the IN tree, or return the
-	 * current interpreter.
-	 */
-	public Interpreter getInterpreter()
-	{
-		if (interpreter == null)
-		{
-			try
-			{
-				INPlugin in = registry.getPlugin("IN");
-				interpreter = in.getInterpreter();
-			}
-			catch (Exception e)
-			{
-				Diag.error(e);
-				interpreter = null;
-			}
-		}
-		
-		return interpreter;
-	}
-
-	/**
 	 * The interpreter has changed if there is an interpreter, and the IN tree
 	 * within that interpreter is not the same as the IN plugin's tree.
 	 */
@@ -418,6 +387,10 @@ public class DAPWorkspaceManager
 		return interpreter != null && interpreter.getIN() != in.getIN();
 	}
 	
+	/**
+	 * The AST is dirty if an edit has been made that has not been saved and
+	 * type checked.
+	 */
 	private boolean isDirty()
 	{
 		ASTPlugin ast = registry.getPlugin("AST");
@@ -934,7 +907,31 @@ public class DAPWorkspaceManager
 	}
 	
 	/**
+	 * Create a new (dialect) Interpreter from the IN tree, or return the
+	 * current interpreter.
+	 */
+	public Interpreter getInterpreter()
+	{
+		if (interpreter == null)
+		{
+			try
+			{
+				INPlugin in = registry.getPlugin("IN");
+				interpreter = in.getInterpreter();
+			}
+			catch (Exception e)
+			{
+				Diag.error(e);
+				interpreter = null;
+			}
+		}
+		
+		return interpreter;
+	}
+
+	/**
 	 * Clear the interpreter value and remove all breakpoints from the IN tree.
+	 * A new Interpreter will be made on the next call to getInterpreter().
 	 */
 	public void clearInterpreter()
 	{

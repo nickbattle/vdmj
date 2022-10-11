@@ -1084,13 +1084,12 @@ public class LSPWorkspaceManager
 	public RPCMessageList lspCompletion(RPCRequest request,
 			CompletionTriggerKind triggerKind, File file, long zline, long zcol)
 	{
-		HashMap<String, JSONObject> labels = new HashMap<String, JSONObject>();
-		
 		if (onDotPath(file) || ignoredFile(file))
 		{
 			return new RPCMessageList(request, new JSONArray());
 		}
 		
+		Map<String, JSONObject> labels = new HashMap<String, JSONObject>();
 		TCDefinition def = findDefinition(file, zline, zcol - 2);
 	
 		if (def != null)

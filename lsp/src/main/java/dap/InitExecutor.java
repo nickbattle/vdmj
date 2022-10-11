@@ -106,7 +106,6 @@ public class InitExecutor extends AsyncExecutor
 		{
 			server.stderr(e.getMessage());
 			server.stdout("Init terminated.\n");
-			manager.clearInterpreter();
 			server.writeMessage(new DAPResponse("terminated", null));
 		}
 		catch (Throwable e1)
