@@ -57,7 +57,7 @@ import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.CheckCompleteEvent;
 import workspace.events.CheckPrepareEvent;
-import workspace.events.DAPBeforeLaunchEvent;
+import workspace.events.DAPBeforeEvaluateEvent;
 import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
 
@@ -109,7 +109,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 	{
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
-		eventhub.register(DAPBeforeLaunchEvent.class, this);
+		eventhub.register(DAPBeforeEvaluateEvent.class, this);
 	}
 	
 	@Override
@@ -146,7 +146,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public DAPMessageList handleEvent(DAPEvent event) throws Exception
 	{
-		if (event instanceof DAPBeforeLaunchEvent)
+		if (event instanceof DAPBeforeEvaluateEvent)
 		{
 			if (isRunning())
 			{

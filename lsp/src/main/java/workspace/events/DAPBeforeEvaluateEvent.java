@@ -26,9 +26,9 @@ package workspace.events;
 
 import dap.DAPRequest;
 
-public class DAPBeforeLaunchEvent extends DAPEvent
+public class DAPBeforeEvaluateEvent extends DAPEvent
 {
-	public DAPBeforeLaunchEvent(DAPRequest request)
+	public DAPBeforeEvaluateEvent(DAPRequest request)
 	{
 		super(request);
 	}

@@ -79,7 +79,7 @@ import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
 import vdmj.commands.ScriptCommand;
-import workspace.events.DAPBeforeLaunchEvent;
+import workspace.events.DAPBeforeEvaluateEvent;
 import workspace.events.DAPConfigDoneEvent;
 import workspace.events.DAPDisconnectEvent;
 import workspace.events.DAPEvaluateEvent;
@@ -763,25 +763,6 @@ public class DAPWorkspaceManager
 	
 	public DAPMessageList dapEvaluate(DAPRequest request, String expression, String context)
 	{
-		// An event here allows plugins to return failure DAPResponse(s) with a "message"
-		// reason not to launch. For example, CTPlugin sends this if the trace is still
-		// running.
-		
-		DAPMessageList prechecks = eventhub.publish(new DAPBeforeLaunchEvent(request));
-		
-		if (!prechecks.isEmpty())
-		{
-			String reason = prechecks.get(0).get("message");
-			DAPMessageList responses = new DAPMessageList(request,
-					new JSONObject(
-						"result", "Cannot evaluate expression: " + reason,
-						"variablesReference", 0));
-			
-			DAPServer.getInstance().setRunning(false);
-			clearInterpreter();
-			return responses;
-		}
-		
 		// This happens when watches are set, but there is no execution session open.
 		
 		if ("watch".equals(context))	// watch received outside execution
@@ -791,6 +772,34 @@ public class DAPWorkspaceManager
 					new JSONObject("result", "not available", "variablesReference", 0));
 		}
 
+		// An event here allows plugins to return failure DAPResponse(s) with a "message"
+		// reason not to evaluate. For example, CTPlugin sends this if the trace is still
+		// running.
+		
+		DAPMessageList prechecks = eventhub.publish(new DAPBeforeEvaluateEvent(request));
+		
+		for (JSONObject response: prechecks)
+		{
+			if (response instanceof DAPResponse)
+			{
+				DAPResponse dap = (DAPResponse)response;
+				boolean success = dap.get("success");
+				
+				if (!success)	// First failure stops the execution
+				{
+					String reason = dap.get("message");
+					DAPMessageList responses = new DAPMessageList(request,
+							new JSONObject(
+								"result", "Cannot evaluate expression: " + reason,
+								"variablesReference", 0));
+					
+					DAPServer.getInstance().setRunning(false);
+					clearInterpreter();
+					return responses;
+				}
+			}
+		}
+		
 		Command command = Command.parse(expression);
 	
 		if (command.notWhenRunning() && AsyncExecutor.currentlyRunning() != null)

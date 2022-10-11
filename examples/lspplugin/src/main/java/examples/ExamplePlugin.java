@@ -45,7 +45,7 @@ import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
 import workspace.events.CheckTypeEvent;
 import workspace.events.CloseFileEvent;
-import workspace.events.DAPBeforeLaunchEvent;
+import workspace.events.DAPBeforeEvaluateEvent;
 import workspace.events.DAPConfigDoneEvent;
 import workspace.events.DAPDisconnectEvent;
 import workspace.events.DAPEvaluateEvent;
@@ -124,7 +124,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		eventhub.register(ShutdownEvent.class, this);
 
 		eventhub.register(DAPInitializeEvent.class, this);
-		eventhub.register(DAPBeforeLaunchEvent.class, this);
+		eventhub.register(DAPBeforeEvaluateEvent.class, this);
 		eventhub.register(DAPLaunchEvent.class, this);
 		eventhub.register(DAPConfigDoneEvent.class, this);
 		eventhub.register(DAPEvaluateEvent.class, this);
