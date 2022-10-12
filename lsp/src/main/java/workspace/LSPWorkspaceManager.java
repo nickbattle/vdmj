@@ -519,8 +519,18 @@ public class LSPWorkspaceManager
 		}
 	}
 	
+	/**
+	 * This will wait for up to 5 seconds before returning the checkInProgress
+	 * flag, to give a chance for a type check to complete.
+	 */
 	public synchronized boolean checkInProgress()
 	{
+		for (int retry = 50; retry > 0 && checkInProgress; retry--)
+		{
+			Diag.fine("Waiting for check to complete, %d", retry);
+			pause(100);
+		}
+		
 		return checkInProgress;
 	}
 
@@ -1329,6 +1339,18 @@ public class LSPWorkspaceManager
 		catch (Exception e)
 		{
 			Diag.error(e);
+		}
+	}
+	
+	private void pause(long ms)
+	{
+		try
+		{
+			Thread.sleep(ms);
+		}
+		catch (InterruptedException e)
+		{
+			// ignore
 		}
 	}
 }

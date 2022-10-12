@@ -72,9 +72,7 @@ import dap.InitExecutor;
 import dap.RemoteControlExecutor;
 import json.JSONArray;
 import json.JSONObject;
-import lsp.LSPServer;
 import lsp.Utils;
-import rpc.RPCRequest;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
@@ -170,12 +168,6 @@ public class DAPWorkspaceManager
 	{
 		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
 
-		for (int retry = 50; retry > 0 && manager.checkInProgress(); retry--)	// 5s worth of 100ms
-		{
-			Diag.fine("Waiting for check to complete, %d", retry);
-			pause(100);
-		}
-		
 		if (manager.checkInProgress())
 		{
 			stderr("Specification being checked, cannot launch");
@@ -408,25 +400,6 @@ public class DAPWorkspaceManager
 	private void stderr(String message)
 	{
 		DAPServer.getInstance().stderr(message);
-	}
-	
-	/**
-	 * Raise a popup message using the showMessage notification. 
-	 */
-	private static final long ERROR_MSG = 1L;
-	// private static final long WARNING_MSG = 2L;
-	
-	private void sendMessage(Long type, String message)
-	{
-		try
-		{
-			LSPServer.getInstance().writeMessage(RPCRequest.notification("window/showMessage",
-					new JSONObject("type", type, "message", message)));
-		}
-		catch (IOException e)
-		{
-			Diag.error("Failed sending message: ", message);
-		}
 	}
 	
 	public DAPMessageList dapSetBreakpoints(DAPRequest request, File file, JSONArray breakpoints) throws Exception
@@ -681,18 +654,20 @@ public class DAPWorkspaceManager
 				
 				if (filterOption.get("filterId").equals("VDM_Exceptions"))
 				{
+					String condition = "";
+					
 					try
 					{
-						String condition = filterOption.get("condition");
+						condition = filterOption.get("condition");
 						interpreter.setCatchpoint(condition);
 						results.add(new JSONObject("verified", true));
 					}
 					catch (Exception e)
 					{
-						String error = "Illegal condition: " + e.getMessage(); 
+						String error = "Illegal exception condition '" + condition + "': "+ e.getMessage(); 
 						Diag.error(error);
 						results.add(new JSONObject("verified", false, "message", error));
-						sendMessage(ERROR_MSG, error);
+						stderr(error);
 					}
 				}
 				else
@@ -700,7 +675,7 @@ public class DAPWorkspaceManager
 					String error = "Unknown filterOption Id " + filterOption.get("filterId");
 					Diag.error(error);
 					results.add(new JSONObject("verified", false, "message", error));
-					sendMessage(ERROR_MSG, error);
+					stderr(error);
 				}
 			}
 		}
@@ -968,6 +943,9 @@ public class DAPWorkspaceManager
 		return false;
 	}
 	
+	/**
+	 * Check whether there are syntax or type checking errors in the spec.
+	 */
 	public boolean specHasErrors()
 	{
 		ASTPlugin ast = registry.getPlugin("AST");
