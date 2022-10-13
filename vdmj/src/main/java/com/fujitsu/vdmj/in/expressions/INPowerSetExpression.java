@@ -59,7 +59,7 @@ public class INPowerSetExpression extends INUnaryExpression
 		try
 		{
     		ValueSet values = exp.eval(ctxt).setValue(ctxt);
-    		List<ValueSet> psets = values.powerSet();
+    		List<ValueSet> psets = values.powerSet(breakpoint, location, ctxt);
     		ValueSet rs = new ValueSet(psets.size());
 
     		for (ValueSet v: psets)

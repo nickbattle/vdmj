@@ -139,7 +139,7 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 		ValueList tuples = ofTypeList(tuple, ctxt);
 		ValueSet set = new ValueSet();
 		set.addAll(tuples);
-		List<ValueSet> psets = set.powerSet();
+		List<ValueSet> psets = set.powerSet(null, null, null);
 
 		for (ValueSet map: psets)
 		{
@@ -262,7 +262,7 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 		ValueList list = type.setof.apply(this, ctxt);
 		ValueSet set = new ValueSet(list.size());
 		set.addAll(list);
-		List<ValueSet> psets = set.powerSet();
+		List<ValueSet> psets = set.powerSet(null, null, null);
 		list.clear();
 
 		for (ValueSet v: psets)

@@ -214,7 +214,7 @@ public class Breakpoint implements Serializable
 			case PAUSE:
     			try
     			{
-    				execInterrupt = 0;
+    				setExecInterrupt(Breakpoint.NONE);
     				enterDebugger(ctxt);
     			}
     			catch (DebuggerException e)
@@ -224,7 +224,7 @@ public class Breakpoint implements Serializable
 				break;
 
 			case TERMINATE:
-				execInterrupt = 0;
+				setExecInterrupt(Breakpoint.NONE);
 				throw new ContextException(4175, "Execution cancelled", location, ctxt);
 		}
 		
