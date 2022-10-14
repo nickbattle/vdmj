@@ -175,13 +175,17 @@ public class ConsoleDebugLink extends DebugLink
 	{
 		Breakpoint bp = getBreakpoint();
 		
-		if (bp == null)
+		if (bp == null && !stopped.isEmpty())
 		{
 			return stopped.get(0);	// First stopped thread
 		}
-		else
+		else if (!breakpoints.isEmpty())
 		{
 			return breakpoints.keySet().iterator().next();
+		}
+		else
+		{
+			throw new IllegalStateException("No threads to debug");
 		}
 	}
 	

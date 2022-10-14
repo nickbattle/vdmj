@@ -29,6 +29,7 @@ import java.util.List;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -60,14 +61,26 @@ public class INPowerSetExpression extends INUnaryExpression
 		{
     		ValueSet values = exp.eval(ctxt).setValue(ctxt);
     		List<ValueSet> psets = values.powerSet(breakpoint, location, ctxt);
-    		ValueSet rs = new ValueSet(psets.size());
+			ValueSet rs = new ValueSet(psets.size());
 
     		for (ValueSet v: psets)
     		{
     			rs.addNoCheck(new SetValue(v));
     		}
 
-    		return new SetValue(rs);
+			if (Breakpoint.execInterruptLevel() > 0)
+			{
+				breakpoint.check(location, ctxt);
+			}
+
+			Value r = new SetValue(rs);	// Sorts sets... expensive!
+			
+			if (Breakpoint.execInterruptLevel() > 0)
+			{
+				breakpoint.check(location, ctxt);
+			}
+
+			return r;
 		}
 		catch (ValueException e)
 		{

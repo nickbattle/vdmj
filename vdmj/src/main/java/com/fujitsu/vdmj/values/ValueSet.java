@@ -240,9 +240,25 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 
 				result.add(newset);
 
-				if (breakpoint != null)
+				// We check the interrupt level here, rather than letting the check
+				// method do it, to avoid incrementing the hit count for the breakpoint
+				// too many times.
+
+				switch (Breakpoint.execInterruptLevel())
 				{
-					breakpoint.check(location, ctxt);
+					case Breakpoint.TERMINATE:
+						throw new InternalException(4176, "Interrupted power set of size " + size());
+				
+					case Breakpoint.PAUSE:
+						if (breakpoint != null)
+						{
+							breakpoint.check(location, ctxt);
+						}
+						break;
+					
+					case Breakpoint.NONE:
+					default:
+						break;	// carry on
 				}
 			}
 		}
