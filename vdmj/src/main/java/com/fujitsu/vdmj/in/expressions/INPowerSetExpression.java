@@ -68,19 +68,25 @@ public class INPowerSetExpression extends INUnaryExpression
     			rs.addNoCheck(new SetValue(v));
     		}
 
+    		// The additions above can take a while, because all of the SetValues are
+    		// sorted. So we check the interrupt flag afterwards to try to respond.
+    		
 			if (Breakpoint.execInterruptLevel() > 0)
 			{
 				breakpoint.check(location, ctxt);
 			}
 
-			Value r = new SetValue(rs);	// Sorts sets... expensive!
+			Value ps = new SetValue(rs);
+			
+			// And again here, the sort above can take a while, so we re-check the
+			// interrupt flag to try to respond while within the power expression.
 			
 			if (Breakpoint.execInterruptLevel() > 0)
 			{
 				breakpoint.check(location, ctxt);
 			}
 
-			return r;
+			return ps;
 		}
 		catch (ValueException e)
 		{
