@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTPatternList;
@@ -65,6 +66,7 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 			String launchName = null;
 			String defaultName = null;
 			String applyName = null;
+			JSONArray applyTypes = null;
 			JSONArray applyArgs = new JSONArray();
 			
 			if (def instanceof ASTExplicitFunctionDefinition)
@@ -73,6 +75,16 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 				applyName = exdef.name.getName();
 				launchName = applyName;
 				defaultName = exdef.name.module;
+				
+				if (exdef.typeParams != null)
+				{
+					applyTypes = new JSONArray();
+					
+					for (LexNameToken ptype: exdef.typeParams)
+					{
+						applyTypes.add("@" + ptype.toString());
+					}
+				}
 				
 				ASTFunctionType ftype = (ASTFunctionType) exdef.type;
 				ASTTypeList ptypes = ftype.parameters;
@@ -181,10 +193,10 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 				}
 			
 				results.add(makeLens(def.location, "Launch", CODE_LENS_COMMAND,
-						launchArgs(launchName, defaultName, false, constructors, applyName, applyArgs)));
+						launchArgs(launchName, defaultName, false, constructors, applyName, applyTypes, applyArgs)));
 					
 				results.add(makeLens(def.location, "Debug", CODE_LENS_COMMAND,
-						launchArgs(launchName, defaultName, true, constructors, applyName, applyArgs)));
+						launchArgs(launchName, defaultName, true, constructors, applyName, applyTypes, applyArgs)));
 			}
 		}
 		

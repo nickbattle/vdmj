@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -63,6 +64,7 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 			String launchName = null;
 			String defaultName = null;
 			String applyName = null;
+			JSONArray applyTypes = null;
 			JSONArray applyArgs = null;
 			
 			if (def instanceof TCExplicitFunctionDefinition)
@@ -71,6 +73,17 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 				applyName = exdef.name.getName();
 				launchName = applyName;
 				defaultName = exdef.name.getModule();
+				
+				if (exdef.typeParams != null)
+				{
+					applyTypes = new JSONArray();
+					
+					for (TCNameToken ptype: exdef.typeParams)
+					{
+						applyTypes.add("@" + ptype.toString());
+					}
+				}
+				
 				TCFunctionType ftype = (TCFunctionType) exdef.type;
 				applyArgs = getParams(exdef.paramPatternList.get(0), ftype.parameters);
 			}
@@ -151,10 +164,10 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 				}
 			
 				results.add(makeLens(def.location, "Launch", CODE_LENS_COMMAND,
-						launchArgs(launchName, defaultName, false, constructors, applyName, applyArgs)));
+						launchArgs(launchName, defaultName, false, constructors, applyName, applyTypes, applyArgs)));
 					
 				results.add(makeLens(def.location, "Debug", CODE_LENS_COMMAND,
-						launchArgs(launchName, defaultName, true, constructors, applyName, applyArgs)));
+						launchArgs(launchName, defaultName, true, constructors, applyName, applyTypes, applyArgs)));
 			}
 		}
 

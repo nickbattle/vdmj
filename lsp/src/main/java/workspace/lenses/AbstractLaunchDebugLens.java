@@ -36,7 +36,7 @@ public abstract class AbstractLaunchDebugLens extends CodeLens
 	 * the makeLens methods to create the response to the Client.
 	 */
 	protected JSONArray launchArgs(String launchName, String defaultName,
-			boolean debug, JSONArray constructors, String applyName, JSONArray applyArgs)
+			boolean debug, JSONArray constructors, String applyName, JSONArray applyTypes, JSONArray applyArgs)
 	{
 		JSONObject launchArgs = new JSONObject();
 		
@@ -53,6 +53,12 @@ public abstract class AbstractLaunchDebugLens extends CodeLens
 		}
 		
 		launchArgs.put("applyName", applyName);
+		
+		if (applyTypes != null)
+		{
+			launchArgs.put("applyTypes", applyTypes);
+		}
+		
 		launchArgs.put("applyArgs", applyArgs);
 
     	return new JSONArray(launchArgs);	// Array with one object
