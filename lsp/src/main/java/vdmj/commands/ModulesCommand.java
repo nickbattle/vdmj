@@ -60,11 +60,13 @@ public class ModulesCommand extends Command
 			}
 			
 			ModuleInterpreter  m = (ModuleInterpreter) Interpreter.getInstance();
+			String defname = m.getDefaultName();
 			StringBuilder sb = new StringBuilder();
 			
 			for (INModule module: m.getModules())
 			{
 				sb.append(module.name.toString());
+				if (module.name.toString().equals(defname)) sb.append(" (default)");
 				sb.append("\n");
 			}
 

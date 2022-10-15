@@ -767,17 +767,11 @@ public class DAPWorkspaceManager
 			{
 				clearInterpreter();
 				
-				return new DAPMessageList(request,
-						new JSONObject(
-							"result", "Cannot start interpreter: errors exist?",
-							"variablesReference", 0));
+				return new DAPMessageList(request, false, "Cannot start interpreter: specification has errors?", null);
 			}
 			else if (hasChanged())
 			{
-				return new DAPMessageList(request,
-						new JSONObject(
-							"result", "Specification has changed: try restart",
-							"variablesReference", 0));
+				return new DAPMessageList(request, false, "Specification has changed: try restart", null);
 			}
 			else if (isDirty())
 			{
