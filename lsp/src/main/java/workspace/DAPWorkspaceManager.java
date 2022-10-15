@@ -736,11 +736,7 @@ public class DAPWorkspaceManager
 				if (!success)	// First failure stops the execution
 				{
 					String reason = dap.get("message");
-					DAPMessageList responses = new DAPMessageList(request,
-							new JSONObject(
-								"result", "Cannot evaluate expression: " + reason,
-								"variablesReference", 0));
-					
+					DAPMessageList responses = new DAPMessageList(request, false, "Cannot evaluate expression: " + reason, null);
 					DAPServer.getInstance().setRunning(false);
 					clearInterpreter();
 					return responses;
@@ -752,10 +748,7 @@ public class DAPWorkspaceManager
 	
 		if (command.notWhenRunning() && AsyncExecutor.currentlyRunning() != null)
 		{
-			return new DAPMessageList(request,
-					new JSONObject(
-						"result", "Still running " + AsyncExecutor.currentlyRunning(),
-						"variablesReference", 0));
+			return new DAPMessageList(request, false, "Still running " + AsyncExecutor.currentlyRunning(), null);
 		}
 
 		// If we are about to evaluate something, check that we can execute.
