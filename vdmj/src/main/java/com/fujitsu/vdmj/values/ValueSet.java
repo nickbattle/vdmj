@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.config.Properties;
-import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
@@ -52,7 +51,6 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 
 	// These are used in power sets to allow interruption of long operations
 	private Breakpoint breakpoint;
-	private LexLocation location;
 	private Context ctxt;
 
 	public ValueSet()
@@ -191,7 +189,7 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 		return results;
 	}
 
-	public List<ValueSet> powerSet(Breakpoint breakpoint, LexLocation location, Context ctxt)
+	public List<ValueSet> powerSet(Breakpoint breakpoint, Context ctxt)
 	{
    		if (size() > Properties.in_powerset_limit)
 		{
@@ -199,7 +197,6 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 		}
    		
    		this.breakpoint = breakpoint;
-   		this.location = location;
    		this.ctxt = ctxt;
 		
 		List<ValueSet> sets = new Vector<ValueSet>(2^size());
@@ -252,7 +249,7 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 					case Breakpoint.PAUSE:
 						if (breakpoint != null)
 						{
-							breakpoint.check(location, ctxt);
+							breakpoint.enterDebugger(ctxt);
 						}
 						break;
 					

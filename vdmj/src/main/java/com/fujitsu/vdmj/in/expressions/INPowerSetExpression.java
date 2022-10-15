@@ -60,7 +60,7 @@ public class INPowerSetExpression extends INUnaryExpression
 		try
 		{
     		ValueSet values = exp.eval(ctxt).setValue(ctxt);
-    		List<ValueSet> psets = values.powerSet(breakpoint, location, ctxt);
+    		List<ValueSet> psets = values.powerSet(breakpoint, ctxt);
 			ValueSet rs = new ValueSet(psets.size());
 
     		for (ValueSet v: psets)
@@ -73,7 +73,7 @@ public class INPowerSetExpression extends INUnaryExpression
     		
 			if (Breakpoint.execInterruptLevel() > 0)
 			{
-				breakpoint.check(location, ctxt);
+				breakpoint.enterDebugger(ctxt);
 			}
 
 			Value ps = new SetValue(rs);
@@ -83,7 +83,7 @@ public class INPowerSetExpression extends INUnaryExpression
 			
 			if (Breakpoint.execInterruptLevel() > 0)
 			{
-				breakpoint.check(location, ctxt);
+				breakpoint.enterDebugger(ctxt);
 			}
 
 			return ps;
