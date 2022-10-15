@@ -139,5 +139,6 @@ public class ConcurrentIterator extends TraceIterator
 	public void reset()
 	{
 		nodes.reset();
+		permutations = null;
 	}
 }
