@@ -68,8 +68,12 @@ public class Breakpoint implements Serializable
 	/** The number of times this breakpoint has been reached. */
 	public long hits = 0;
 	
-	/** Set true by an external cancel or pause action */
-	private static int execInterrupt = 0;
+	/**
+	 * Set true by an external cancel or pause action. Note that this is
+	 * volatile, to enable the variable to be set by one thread and tested
+	 * by another (though the methods use synchronized too).
+	 */
+	private static volatile int execInterrupt = 0;
 	public static final int NONE = 0;
 	public static final int PAUSE = 1;
 	public static final int TERMINATE = 2;
@@ -175,7 +179,7 @@ public class Breakpoint implements Serializable
 		execInterrupt = level;
 	}
 	
-	private static synchronized int execInterruptLevel()	// Needs sync for Java 11
+	public static synchronized int execInterruptLevel()	// Needs sync for Java 11
 	{
 		return execInterrupt;
 	}
@@ -214,7 +218,7 @@ public class Breakpoint implements Serializable
 			case PAUSE:
     			try
     			{
-    				execInterrupt = 0;
+    				setExecInterrupt(Breakpoint.NONE);
     				enterDebugger(ctxt);
     			}
     			catch (DebuggerException e)
@@ -224,7 +228,7 @@ public class Breakpoint implements Serializable
 				break;
 
 			case TERMINATE:
-				execInterrupt = 0;
+				setExecInterrupt(Breakpoint.NONE);
 				throw new ContextException(4175, "Execution cancelled", location, ctxt);
 		}
 		

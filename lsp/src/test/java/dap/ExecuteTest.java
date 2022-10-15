@@ -122,7 +122,7 @@ public class ExecuteTest extends DAPTest
 		DAPMessageList response = handler.run(request);
 		assertEquals(1, response.size());
 		dump(response.get(0));
-		assertEquals("Unknown command: sdap/unknown", response.get(0).getPath("message"));
+		assertEquals("Unknown DAP command: sdap/unknown", response.get(0).getPath("message"));
 		assertEquals(false, response.get(0).getPath("success"));
 
 		request = new DAPRequest(new JSONObject("type", "request", "command", "sdap/another"));

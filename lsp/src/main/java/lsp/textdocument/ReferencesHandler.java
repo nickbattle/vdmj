@@ -58,7 +58,7 @@ public class ReferencesHandler extends LSPHandler
 			JSONObject context = params.get("context");
 			Boolean incdec = context.get("includeDeclaration");
 			
-			return LSPWorkspaceManager.getInstance().findReferences(request,
+			return LSPWorkspaceManager.getInstance().lspReferences(request,
 					file, line.intValue(), col.intValue(), incdec);
 		}
 		catch (URISyntaxException e)

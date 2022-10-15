@@ -78,7 +78,12 @@ abstract public class AnalysisPlugin
 	 */
 	public void setServerCapabilities(JSONObject capabilities)
 	{
-		return;
+		return;		// LSP capabilities
+	}
+
+	public void setDAPCapabilities(JSONObject capabilities)
+	{
+		return;		// DAP capabilities
 	}
 
 	/**

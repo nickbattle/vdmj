@@ -93,6 +93,22 @@ public class PluginRegistry
 		}
 	}
 	
+	public void setDAPCapabilities(JSONObject capabilities)
+	{
+		for (AnalysisPlugin plugin: plugins.values())
+		{
+			try
+			{
+				plugin.setDAPCapabilities(capabilities);
+			}
+			catch (Throwable e)
+			{
+				Diag.error("Exception in %s setServerCapabilities", plugin.getName());
+				Diag.error(e);
+			}
+		}
+	}
+	
 	public JSONArray getCodeLenses(File file)
 	{
 		JSONArray commands = new JSONArray();

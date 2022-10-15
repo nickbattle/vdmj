@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.traces.TraceIterator;
 import com.fujitsu.vdmj.traces.TraceReductionType;
 import com.fujitsu.vdmj.traces.Verdict;
 
+import dap.DAPMessageList;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.CancellableThread;
@@ -56,6 +57,8 @@ import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.CheckCompleteEvent;
 import workspace.events.CheckPrepareEvent;
+import workspace.events.DAPBeforeEvaluateEvent;
+import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
 
 abstract public class CTPlugin extends AnalysisPlugin implements EventListener
@@ -106,6 +109,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 	{
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
+		eventhub.register(DAPBeforeEvaluateEvent.class, this);
 	}
 	
 	@Override
@@ -134,6 +138,20 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 		else
 		{
 			Diag.error("Unhandled %s event %s", getName(), event);
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public DAPMessageList handleEvent(DAPEvent event) throws Exception
+	{
+		if (event instanceof DAPBeforeEvaluateEvent)
+		{
+			if (isRunning())
+			{
+				return new DAPMessageList(event.request, false, "CT is still running", null);
+			}
 		}
 		
 		return null;

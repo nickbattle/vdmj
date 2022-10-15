@@ -26,25 +26,16 @@ package workspace;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import json.JSONObject;
-import lsp.LSPException;
-import lsp.Utils;
-import rpc.RPCErrors;
 import workspace.events.UnknownCommandEvent;
-import workspace.plugins.CTPlugin;
 
 public class DAPXWorkspaceManager
 {
 	private static DAPXWorkspaceManager INSTANCE = null;
-	private final PluginRegistry registry;
 	private final EventHub eventhub;
-	private final DAPWorkspaceManager dapManager;
 	
 	protected DAPXWorkspaceManager()
 	{
-		this.registry = PluginRegistry.getInstance();
 		this.eventhub = EventHub.getInstance();
-		this.dapManager = DAPWorkspaceManager.getInstance();
 	}
 
 	public static synchronized DAPXWorkspaceManager getInstance()
@@ -69,38 +60,6 @@ public class DAPXWorkspaceManager
 		}
 	}
 	
-	/**
-	 * DAPX extensions...
-	 */
-	public JSONObject ctRunOneTrace(DAPRequest request, String name, long testNumber) throws LSPException
-	{
-		CTPlugin ct = registry.getPlugin("CT");
-		
-		if (ct.isRunning())
-		{
-			Diag.error("Previous trace is still running...");
-			throw new LSPException(RPCErrors.InvalidRequest, "Trace still running");
-		}
-
-		/**
-		 * If the specification has been modified since we last ran (or nothing has yet run),
-		 * we have to re-create the interpreter, otherwise the old interpreter (with the old tree)
-		 * is used to "generate" the trace names, so changes are not picked up. Note that a
-		 * new tree will have no breakpoints, so if you had any set via a launch, they will be
-		 * ignored.
-		 */
-		dapManager.refreshInterpreter();
-		
-		if (dapManager.specHasErrors())
-		{
-			throw new LSPException(RPCErrors.ContentModified, "Specification has errors");
-		}
-		
-		dapManager.setNoDebug(false);	// Force debug on for runOneTrace
-
-		return ct.runOneTrace(Utils.stringToName(name), testNumber);
-	}
-
 	public DAPMessageList unhandledCommand(DAPRequest request)
 	{
 		DAPMessageList responses = eventhub.publish(new UnknownCommandEvent(request));
@@ -108,7 +67,7 @@ public class DAPXWorkspaceManager
 		if (responses.isEmpty())
 		{
 			Diag.error("No external plugin registered for unknownMethodEvent (%s)", request.getCommand());
-			return new DAPMessageList(request, false, "Unknown command: " + request.getCommand(), null);
+			return new DAPMessageList(request, false, "Unknown DAP command: " + request.getCommand(), null);
 		}
 		else
 		{

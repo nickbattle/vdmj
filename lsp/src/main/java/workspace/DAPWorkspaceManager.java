@@ -74,13 +74,12 @@ import dap.InitExecutor;
 import dap.RemoteControlExecutor;
 import json.JSONArray;
 import json.JSONObject;
-import lsp.LSPServer;
 import lsp.Utils;
-import rpc.RPCRequest;
 import vdmj.DAPDebugReader;
 import vdmj.commands.Command;
 import vdmj.commands.PrintCommand;
 import vdmj.commands.ScriptCommand;
+import workspace.events.DAPBeforeEvaluateEvent;
 import workspace.events.DAPConfigDoneEvent;
 import workspace.events.DAPDisconnectEvent;
 import workspace.events.DAPEvaluateEvent;
@@ -88,7 +87,6 @@ import workspace.events.DAPInitializeEvent;
 import workspace.events.DAPLaunchEvent;
 import workspace.events.DAPTerminateEvent;
 import workspace.plugins.ASTPlugin;
-import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
 import workspace.plugins.TCPlugin;
 
@@ -167,35 +165,21 @@ public class DAPWorkspaceManager
 		return responses;
 	}
 
-	public DAPMessageList launch(DAPRequest request,
+	public DAPMessageList dapLaunch(DAPRequest request,
 			boolean noDebug, String defaultName, String command, String remoteControl, String logging) throws Exception
 	{
 		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
-		int retry = 50;		// 5s worth of 100ms
-		
-		while (retry > 0 && manager.checkInProgress())
-		{
-			Diag.fine("Waiting for check to complete, %d", retry);
-			pause(100);
-			retry--;
-		}
-		
+
 		if (manager.checkInProgress())
 		{
-			DAPMessageList responses = new DAPMessageList();
-			responses.add(new DAPResponse(request, false, "Specification being checked, cannot launch", null));
 			stderr("Specification being checked, cannot launch");
-			clearInterpreter();
-			return responses;
+			return new DAPMessageList(request, false, "Specification being checked, cannot launch", null);
 		}
 		
-		if (!canExecute())
+		if (specHasErrors())
 		{
-			DAPMessageList responses = new DAPMessageList();
-			responses.add(new DAPResponse(request, false, "Specification has errors, cannot launch", null));
 			stderr("Specification has errors, cannot launch");
-			clearInterpreter();
-			return responses;
+			return new DAPMessageList(request, false, "Specification has errors, cannot launch", null);
 		}
 		
 		try
@@ -222,7 +206,7 @@ public class DAPWorkspaceManager
 	}
 
 	/**
-	 * Pick out request arguments that are VDMJ Settings.
+	 * Pick out request arguments that are VDMJ Settings and properties.
 	 */
 	private void processSettings(DAPRequest request)
 	{
@@ -311,7 +295,7 @@ public class DAPWorkspaceManager
 	 */
 	private void restoreSettings()
 	{
-		Diag.info("Resetting settings");
+		Diag.info("Resetting to default settings");
 		Settings.dynamictypechecks = true;
 		Settings.invchecks = true;
 		Settings.prechecks = true;
@@ -330,12 +314,10 @@ public class DAPWorkspaceManager
 		Properties.init(LSPWorkspaceManager.PROPERTIES);
 	}
 
-	public DAPMessageList configurationDone(DAPRequest request) throws IOException
+	public DAPMessageList dapConfigurationDone(DAPRequest request)
 	{
 		try
 		{
-			// Interpreter may already have been created by setBreakpoint calls during configuration.
-			
 			if (Settings.dialect == Dialect.VDM_RT && logging != null)
 			{
 				File file = new File(logging);
@@ -394,45 +376,29 @@ public class DAPWorkspaceManager
 		}
 	}
 
-	public Interpreter getInterpreter()
-	{
-		if (interpreter == null)
-		{
-			try
-			{
-				INPlugin in = registry.getPlugin("IN");
-				interpreter = in.getInterpreter();
-			}
-			catch (Exception e)
-			{
-				Diag.error(e);
-				interpreter = null;
-			}
-		}
-		
-		return interpreter;
-	}
-
-	private boolean canExecute()
-	{
-		ASTPlugin ast = registry.getPlugin("AST");
-		TCPlugin tc = registry.getPlugin("TC");
-		
-		return ast.getErrs().isEmpty() && tc.getErrs().isEmpty();
-	}
-	
+	/**
+	 * The interpreter has changed if there is an interpreter, and the IN tree
+	 * within that interpreter is not the same as the IN plugin's tree.
+	 */
 	private boolean hasChanged()
 	{
 		INPlugin in = registry.getPlugin("IN");
-		return getInterpreter() != null && getInterpreter().getIN() != in.getIN();
+		return interpreter != null && interpreter.getIN() != in.getIN();
 	}
 	
+	/**
+	 * The AST is dirty if an edit has been made that has not been saved and
+	 * type checked.
+	 */
 	private boolean isDirty()
 	{
 		ASTPlugin ast = registry.getPlugin("AST");
 		return ast.isDirty();
 	}
 
+	/**
+	 * Write messages directly to the console, on stdout or stderr.
+	 */
 	private void stdout(String message)
 	{
 		DAPServer.getInstance().stdout(message);
@@ -443,24 +409,12 @@ public class DAPWorkspaceManager
 		DAPServer.getInstance().stderr(message);
 	}
 	
-	private void sendMessage(Long type, String message)
-	{
-		try
-		{
-			LSPServer.getInstance().writeMessage(RPCRequest.notification("window/showMessage",
-					new JSONObject("type", type, "message", message)));
-		}
-		catch (IOException e)
-		{
-			Diag.error("Failed sending message: ", message);
-		}
-	}
-	
-	public DAPMessageList setBreakpoints(DAPRequest request, File file, JSONArray breakpoints) throws Exception
+	public DAPMessageList dapSetBreakpoints(DAPRequest request, File file, JSONArray breakpoints) throws Exception
 	{
 		JSONArray results = new JSONArray();
+		getInterpreter();
 		
-		Map<Integer, Breakpoint> existing = getInterpreter().getBreakpoints();
+		Map<Integer, Breakpoint> existing = interpreter.getBreakpoints();
 		Set<Integer> bps = new HashSet<Integer>(existing.keySet());
 		
 		for (Integer bpno: bps)
@@ -550,11 +504,12 @@ public class DAPWorkspaceManager
 		return new DAPMessageList(request, new JSONObject("breakpoints", results));
 	}
 	
-	public DAPMessageList setFunctionBreakpoints(DAPRequest request, JSONArray breakpoints) throws Exception
+	public DAPMessageList dapSetFunctionBreakpoints(DAPRequest request, JSONArray breakpoints) throws Exception
 	{
 		JSONArray results = new JSONArray();
+		getInterpreter();
 		
-		Map<Integer, Breakpoint> existing = getInterpreter().getBreakpoints();
+		Map<Integer, Breakpoint> existing = interpreter.getBreakpoints();
 		Set<Integer> bps = new HashSet<Integer>(existing.keySet());
 		
 		for (Integer bpno: bps)
@@ -681,9 +636,11 @@ public class DAPWorkspaceManager
 		return new DAPMessageList(request, new JSONObject("breakpoints", results));
 	}
 
-	public DAPMessageList setExceptionBreakpoints(DAPRequest request, JSONArray filterOptions)
+	public DAPMessageList dapSetExceptionBreakpoints(DAPRequest request, JSONArray filterOptions)
 	{
-		for (Catchpoint cp: getInterpreter().getCatchpoints())
+		getInterpreter();
+		
+		for (Catchpoint cp: interpreter.getCatchpoints())
 		{
 			interpreter.clearBreakpoint(cp.number);
 		}
@@ -704,18 +661,20 @@ public class DAPWorkspaceManager
 				
 				if (filterOption.get("filterId").equals("VDM_Exceptions"))
 				{
+					String condition = "";
+					
 					try
 					{
-						String condition = filterOption.get("condition");
+						condition = filterOption.get("condition");
 						interpreter.setCatchpoint(condition);
 						results.add(new JSONObject("verified", true));
 					}
 					catch (Exception e)
 					{
-						String error = "Illegal condition: " + e.getMessage(); 
+						String error = "Illegal exception condition '" + condition + "': "+ e.getMessage(); 
 						Diag.error(error);
 						results.add(new JSONObject("verified", false, "message", error));
-						sendMessage(1L, error);
+						stderr(error);
 					}
 				}
 				else
@@ -723,7 +682,7 @@ public class DAPWorkspaceManager
 					String error = "Unknown filterOption Id " + filterOption.get("filterId");
 					Diag.error(error);
 					results.add(new JSONObject("verified", false, "message", error));
-					sendMessage(1L, error);
+					stderr(error);
 				}
 			}
 		}
@@ -757,18 +716,9 @@ public class DAPWorkspaceManager
 		return sb.toString();
 	}
 	
-	public DAPMessageList evaluate(DAPRequest request, String expression, String context)
+	public DAPMessageList dapEvaluate(DAPRequest request, String expression, String context)
 	{
-		CTPlugin ct = registry.getPlugin("CT");
-		
-		if (ct.isRunning())
-		{
-			DAPMessageList responses = new DAPMessageList(request,
-					new JSONObject("result", "Cannot start interpreter: trace still running?", "variablesReference", 0));
-			DAPServer.getInstance().setRunning(false);
-			clearInterpreter();
-			return responses;
-		}
+		// This happens when watches are set, but there is no execution session open.
 		
 		if ("watch".equals(context))	// watch received outside execution
 		{
@@ -777,29 +727,51 @@ public class DAPWorkspaceManager
 					new JSONObject("result", "not available", "variablesReference", 0));
 		}
 
+		// An event here allows plugins to return failure DAPResponse(s) with a "message"
+		// reason not to evaluate. For example, CTPlugin sends this if the trace is still
+		// running.
+		
+		DAPMessageList prechecks = eventhub.publish(new DAPBeforeEvaluateEvent(request));
+		
+		for (JSONObject response: prechecks)
+		{
+			if (response instanceof DAPResponse)
+			{
+				DAPResponse dap = (DAPResponse)response;
+				boolean success = dap.get("success");
+				
+				if (!success)	// First failure stops the execution
+				{
+					String reason = dap.get("message");
+					DAPMessageList responses = new DAPMessageList(request, false, "Cannot evaluate expression: " + reason, null);
+					DAPServer.getInstance().setRunning(false);
+					clearInterpreter();
+					return responses;
+				}
+			}
+		}
+		
 		Command command = Command.parse(expression);
 	
 		if (command.notWhenRunning() && AsyncExecutor.currentlyRunning() != null)
 		{
-			DAPMessageList responses = new DAPMessageList(request,
-					new JSONObject("result", "Still running " + AsyncExecutor.currentlyRunning(), "variablesReference", 0));
-			return responses;
+			return new DAPMessageList(request, false, "Still running " + AsyncExecutor.currentlyRunning(), null);
 		}
 
-		if (command instanceof PrintCommand || command instanceof ScriptCommand)	// ie. evaluate something
+		// If we are about to evaluate something, check that we can execute.
+		
+		if (command instanceof PrintCommand ||
+			command instanceof ScriptCommand)
 		{
-			if (!canExecute())
+			if (specHasErrors())
 			{
-				DAPMessageList responses = new DAPMessageList(request,
-						new JSONObject("result", "Cannot start interpreter: errors exist?", "variablesReference", 0));
 				clearInterpreter();
-				return responses;
+				
+				return new DAPMessageList(request, false, "Cannot start interpreter: specification has errors?", null);
 			}
 			else if (hasChanged())
 			{
-				DAPMessageList responses = new DAPMessageList(request,
-						new JSONObject("result", "Specification has changed: try restart", "variablesReference", 0));
-				return responses;
+				return new DAPMessageList(request, false, "Specification has changed: try restart", null);
 			}
 			else if (isDirty())
 			{
@@ -812,7 +784,7 @@ public class DAPWorkspaceManager
 		return command.run(request);
 	}
 
-	public DAPMessageList threads(DAPRequest request)
+	public DAPMessageList dapThreads(DAPRequest request)
 	{
 		List<SchedulableThread> threads = new Vector<SchedulableThread>(SchedulableThread.getAllThreads());
 		Collections.sort(threads);
@@ -834,7 +806,7 @@ public class DAPWorkspaceManager
 	/**
 	 * Termination and cleanup methods.
 	 */
-	public DAPMessageList disconnect(DAPRequest request, Boolean terminateDebuggee)
+	public DAPMessageList dapDisconnect(DAPRequest request, Boolean terminateDebuggee)
 	{
 		try
 		{
@@ -873,12 +845,12 @@ public class DAPWorkspaceManager
 		return result;
 	}
 
-	public DAPMessageList terminate(DAPRequest request, Boolean restart)
+	public DAPMessageList dapTerminate(DAPRequest request, Boolean restart)
 	{
 		DAPMessageList result = new DAPMessageList(request);
 		RTLogger.dump(true);
 
-		if (restart && canExecute())
+		if (restart && !specHasErrors())
 		{
 			stdout("\nSession restarting...\n");
 			LSPWorkspaceManager lsp = LSPWorkspaceManager.getInstance();
@@ -903,6 +875,33 @@ public class DAPWorkspaceManager
 		return result;
 	}
 	
+	/**
+	 * Create a new (dialect) Interpreter from the IN tree, or return the
+	 * current interpreter.
+	 */
+	public Interpreter getInterpreter()
+	{
+		if (interpreter == null)
+		{
+			try
+			{
+				INPlugin in = registry.getPlugin("IN");
+				interpreter = in.getInterpreter();
+			}
+			catch (Exception e)
+			{
+				Diag.error(e);
+				interpreter = null;
+			}
+		}
+		
+		return interpreter;
+	}
+
+	/**
+	 * Clear the interpreter value and remove all breakpoints from the IN tree.
+	 * A new Interpreter will be made on the next call to getInterpreter().
+	 */
 	public void clearInterpreter()
 	{
 		if (interpreter != null)
@@ -922,18 +921,25 @@ public class DAPWorkspaceManager
 		}
 	}
 	
+	/**
+	 * If the IN plugin has a new tree, clear the interpreter so that a new one
+	 * can be created (above).
+	 */
 	public boolean refreshInterpreter()
 	{
 		if (hasChanged())
 		{
-			Diag.info("Specification has changed, resetting interpreter");
-			interpreter = null;
+			Diag.info("Specification has changed, clearing interpreter");
+			clearInterpreter();
 			return true;
 		}
 		
 		return false;
 	}
 	
+	/**
+	 * Check whether there are syntax or type checking errors in the spec.
+	 */
 	public boolean specHasErrors()
 	{
 		ASTPlugin ast = registry.getPlugin("AST");

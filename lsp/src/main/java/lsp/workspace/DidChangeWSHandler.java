@@ -76,7 +76,7 @@ public class DidChangeWSHandler extends LSPHandler
 					{
 						WatchKind type = WatchKind.kindOf(change.get("type"));
 						File file = Utils.uriToFile(uri);
-						int code = LSPWorkspaceManager.getInstance().changeWatchedFile(request, file, type);
+						int code = LSPWorkspaceManager.getInstance().lspDidChangeWatchedFile(request, file, type);
 						
 						if (code > actionCode)	// Note: ordered severity
 						{

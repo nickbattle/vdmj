@@ -30,6 +30,7 @@ import java.util.List;
 import com.fujitsu.vdmj.in.patterns.INIdentifierPattern;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ExceptionHandler;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -139,7 +140,7 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 		ValueList tuples = ofTypeList(tuple, ctxt);
 		ValueSet set = new ValueSet();
 		set.addAll(tuples);
-		List<ValueSet> psets = set.powerSet();
+		List<ValueSet> psets = set.powerSet(new Breakpoint(ctxt.location), ctxt);
 
 		for (ValueSet map: psets)
 		{
@@ -262,7 +263,7 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 		ValueList list = type.setof.apply(this, ctxt);
 		ValueSet set = new ValueSet(list.size());
 		set.addAll(list);
-		List<ValueSet> psets = set.powerSet();
+		List<ValueSet> psets = set.powerSet(new Breakpoint(ctxt.location), ctxt);
 		list.clear();
 
 		for (ValueSet v: psets)

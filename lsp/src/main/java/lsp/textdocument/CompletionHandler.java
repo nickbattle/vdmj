@@ -58,7 +58,7 @@ public class CompletionHandler extends LSPHandler
 			Long line = position.get("line");
 			Long character = position.get("character");
 			
-			return LSPWorkspaceManager.getInstance().completion(request, triggerKind, file, line.intValue(), character.intValue());
+			return LSPWorkspaceManager.getInstance().lspCompletion(request, triggerKind, file, line, character);
 		}
 		catch (URISyntaxException e)
 		{

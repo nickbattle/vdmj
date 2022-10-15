@@ -50,7 +50,7 @@ public class LaunchHandler extends DAPHandler
 			String remoteControl = arguments.get("remoteControl");
 			String logging = arguments.get("logging");
 			
-			return DAPWorkspaceManager.getInstance().launch(
+			return DAPWorkspaceManager.getInstance().dapLaunch(
 					request, noDebug, defaultName, command, remoteControl, logging);
 		}
 		catch (Exception e)

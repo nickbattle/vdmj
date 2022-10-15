@@ -98,14 +98,6 @@ public class LSPXWorkspaceManager
 			registry.registerPlugin(CTPlugin.factory(Settings.dialect));
 		}
 		
-		enableExternalPlugins();
-	}
-
-	/**
-	 * Load external plugins, given a list of class names in the "lspx.plugins" property.
-	 */
-	private void enableExternalPlugins()
-	{
 		if (System.getProperty("lspx.plugins") != null)
 		{
 			String[] plugins = System.getProperty("lspx.plugins").split("\\s*,\\s*");

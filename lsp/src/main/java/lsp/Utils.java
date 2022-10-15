@@ -271,6 +271,85 @@ public class Utils
 		return -1;
 	}
 	
+	/**
+	 * Fix the "range" fields of the DocumentSymbol array passed in, such that each
+	 * range starts at the selectionRange and ends at the start of the next symbol,
+	 * or the end passed (for the last one). Recurse into any children.
+	 */
+	public static void fixRanges(JSONArray symbols, JSONObject endPosition)
+	{
+		for (int s = 0; s < symbols.size(); s++)
+		{
+			JSONObject symbol = symbols.index(s);
+			JSONObject start = symbol.getPath("selectionRange.start");
+
+			JSONObject nextstart = null;
+			
+			for (int n = s + 1; n <= symbols.size(); n++)
+			{
+				if (n == symbols.size())
+				{
+					nextstart = endPosition;
+				}
+				else
+				{
+					JSONObject next = symbols.index(n);
+					nextstart = next.getPath("selectionRange.start");
+				}
+				
+				if (!nextstart.get("line").equals(start.get("line")))
+				{
+					break;	// Guaranteed exit for endPosition
+				}
+			}
+			
+			JSONObject range = symbol.get("range");
+			range.put("start", startLine(start));
+			range.put("end", beforeNext(nextstart));
+			
+			verifyRange(symbol.get("name"), range, symbol.getPath("selectionRange"));
+			
+			JSONArray children = symbol.get("children");
+			
+			if (children != null)
+			{
+				fixRanges(children, nextstart);
+			}
+		}
+	}
+	
+	private static void verifyRange(String name, JSONObject range, JSONObject selectionRange)
+	{
+		File file = new File("?");
+		LexLocation rloc = Utils.rangeToLexLocation(file, range);
+		LexLocation sloc = Utils.rangeToLexLocation(file, selectionRange);
+		
+		if (!sloc.within(rloc))
+		{
+			Diag.error("Selection not within range at symbol %s", name);
+			Diag.error("Range %s", range);
+			Diag.error("Selection %s", selectionRange);
+		}
+	}
+
+	public static JSONObject afterLine(JSONObject position)
+	{
+		long line = position.get("line");
+		return new JSONObject("line", line+1, "character", 0);
+	}
+	
+	private static JSONObject startLine(JSONObject position)
+	{
+		long line = position.get("line");
+		return new JSONObject("line", line, "character", 0);
+	}
+	
+	private static JSONObject beforeNext(JSONObject next)
+	{
+		long line = next.get("line");
+		return new JSONObject("line", line - 1, "character", 999999999);
+	}
+	
 	public static JSONObject getEndPosition(StringBuilder buffer)
 	{
 		long currentLine = 0;

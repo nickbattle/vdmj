@@ -32,6 +32,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import vdmj.DAPDebugReader;
 import workspace.DAPWorkspaceManager;
+import workspace.Diag;
 
 public class PauseHandler extends DAPHandler
 {
@@ -55,6 +56,7 @@ public class PauseHandler extends DAPHandler
 			else	// Async pause from user
 			{
 				Breakpoint.setExecInterrupt(Breakpoint.PAUSE);
+				Diag.info("Set the exec interrupt value to PAUSE");
 				return new DAPMessageList(request);
 			}
 

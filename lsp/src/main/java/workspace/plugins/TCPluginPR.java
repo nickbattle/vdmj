@@ -143,7 +143,7 @@ public class TCPluginPR extends TCPlugin
 	}
 
 	@Override
-	public TCDefinition findDefinition(File file, int zline, int zcol)
+	public TCDefinition findDefinition(File file, long zline, long zcol)
 	{
 		if (tcClassList != null && !tcClassList.isEmpty())
 		{

@@ -31,6 +31,8 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.runtime.Breakpoint;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.traces.PermuteArray;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -46,6 +48,10 @@ import com.fujitsu.vdmj.util.Utils;
 public class ValueSet extends Vector<Value>		// NB based on Vector
 {
 	private boolean isSorted;
+
+	// These are used in power sets to allow interruption of long operations
+	private Breakpoint breakpoint;
+	private Context ctxt;
 
 	public ValueSet()
 	{
@@ -183,12 +189,15 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 		return results;
 	}
 
-	public List<ValueSet> powerSet()
+	public List<ValueSet> powerSet(Breakpoint breakpoint, Context ctxt)
 	{
    		if (size() > Properties.in_powerset_limit)
 		{
 			throw new InternalException(4176, "Cannot evaluate power set of size " + size());
 		}
+   		
+   		this.breakpoint = breakpoint;
+   		this.ctxt = ctxt;
 		
 		List<ValueSet> sets = new Vector<ValueSet>(2^size());
 
@@ -227,6 +236,27 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 				}
 
 				result.add(newset);
+
+				// We check the interrupt level here, rather than letting the check
+				// method do it, to avoid incrementing the hit count for the breakpoint
+				// too many times.
+
+				switch (Breakpoint.execInterruptLevel())
+				{
+					case Breakpoint.TERMINATE:
+						throw new InternalException(4176, "Interrupted power set of size " + size());
+				
+					case Breakpoint.PAUSE:
+						if (breakpoint != null)
+						{
+							breakpoint.enterDebugger(ctxt);
+						}
+						break;
+					
+					case Breakpoint.NONE:
+					default:
+						break;	// carry on
+				}
 			}
 		}
 	}

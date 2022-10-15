@@ -52,7 +52,7 @@ public class DocumentSymbolHandler extends LSPHandler
 			JSONObject textDoc = params.get("textDocument");
 			File file = Utils.uriToFile(textDoc.get("uri"));
 			
-			return LSPWorkspaceManager.getInstance().documentSymbols(request, file);
+			return LSPWorkspaceManager.getInstance().lspDocumentSymbols(request, file);
 		}
 		catch (URISyntaxException e)
 		{
