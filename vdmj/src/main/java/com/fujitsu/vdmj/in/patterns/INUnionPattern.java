@@ -103,11 +103,6 @@ public class INUnionPattern extends INPattern
 		{
 			if (rlen == ANY)
 			{
-//				if (size == 0)
-//				{
-//					// Can't match a union b with {}
-//				}
-//				else
 				if (size % 2 == 1)
 				{
 					// Odd => add the middle, then those either side
@@ -196,11 +191,13 @@ public class INUnionPattern extends INPattern
 
 				try
 				{
-					List<NameValuePairList> lnvps = left.getAllNamedValues(new SetValue(first), ctxt);
+					// Note the SetValues are unsorted, to preserve the ordering
+					
+					List<NameValuePairList> lnvps = left.getAllNamedValues(new SetValue(first, false), ctxt);
 					nvplists.add(lnvps);
 					counts[0] = lnvps.size();
 
-					List<NameValuePairList> rnvps = right.getAllNamedValues(new SetValue(second), ctxt);
+					List<NameValuePairList> rnvps = right.getAllNamedValues(new SetValue(second, false), ctxt);
 					nvplists.add(rnvps);
 					counts[1] = rnvps.size();
 				}
