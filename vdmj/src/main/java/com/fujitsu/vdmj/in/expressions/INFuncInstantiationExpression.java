@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import java.util.List;
+
 import com.fujitsu.vdmj.in.definitions.INExplicitFunctionDefinition;
 import com.fujitsu.vdmj.in.definitions.INImplicitFunctionDefinition;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
@@ -31,9 +33,9 @@ import com.fujitsu.vdmj.in.types.INInstantiate;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.ParameterValue;
@@ -90,20 +92,21 @@ public class INFuncInstantiationExpression extends INExpression
 
     		Context params = new Context(location, "Instantiation params", null);
     		TCTypeList argtypes = new TCTypeList();
+    		TCParameterCollector collector = new TCParameterCollector();
 
     		for (int i=0; i< actualTypes.size(); i++)
     		{
     			TCType ptype = actualTypes.get(i);
-    			TCNameToken pname = paramNames.get(i);
+    			List<String> names = ptype.apply(collector, null);
     			
-    			if (ptype.toString().indexOf('@') >= 0)		// Really need type.isPolymorphic
+    			if (!names.isEmpty())
     			{
     				// Resolve any @T types referred to in the type parameters
     				ptype = INInstantiate.instantiate(ptype, ctxt, ctxt);
     			}
     			
     			argtypes.add(ptype);
-    			params.put(pname, new ParameterValue(ptype));
+    			params.put(paramNames.get(i), new ParameterValue(ptype));
     		}
     		
     		FunctionValue rv = null;
