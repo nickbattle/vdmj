@@ -432,7 +432,7 @@ public class LSPWorkspaceManager
 			}
 			else
 			{
-				Diag.info("External file contains no VDM source: %s", vdm);
+				Diag.info("External file contains no VDM source: %s", file);
 			}
 		}
 	}
