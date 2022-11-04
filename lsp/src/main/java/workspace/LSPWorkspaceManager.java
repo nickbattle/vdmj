@@ -351,6 +351,7 @@ public class LSPWorkspaceManager
 	{
 		FilenameFilter filter = getFilenameFilter();
 		File[] files = root.listFiles();
+		List<String> ignored = new Vector<String>();
 		
 		for (File file: files)
 		{
@@ -379,8 +380,14 @@ public class LSPWorkspaceManager
 				else
 				{
 					Diag.warning("Ignoring file %s", file.getPath());
+					ignored.add(file.getName());
 				}
 			}
+		}
+		
+		if (!ignored.isEmpty())
+		{
+			sendMessage(WARNING_MSG, "These files can be added to vdmignore: " + ignored.toString());
 		}
 	}
 
