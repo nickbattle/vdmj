@@ -404,7 +404,6 @@ public class LSPWorkspaceManager
 	
 	private void loadExternalFile(File file) throws IOException
 	{
-		SourceFile source = new SourceFile(file);
 		File vdm = new File(file.getPath() + "." + Settings.dialect.getArgstring().substring(1));
 		
 		if (vdm.exists())
@@ -415,14 +414,16 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
-			Diag.info("Converting external file %s", file);
-			PrintWriter spw = new PrintWriter(vdm, encoding.name());
-			source.printSource(spw);
-			spw.close();
-			Diag.info("Extracted source written to " + vdm);
-			
-			if (vdm.length() > 0)	// eg. not an empty extraction
+			SourceFile source = new SourceFile(file);
+
+			if (source.getCount() > 0)	// ie. not an empty extraction
 			{
+				Diag.info("Processing external file %s", file);
+				PrintWriter spw = new PrintWriter(vdm, encoding.name());
+				source.printSource(spw);
+				spw.close();
+				Diag.info("Extracted source written to " + vdm);
+				
 				loadFile(vdm);
 	
 				BasicFileAttributes attr = Files.readAttributes(vdm.toPath(), BasicFileAttributes.class);
@@ -431,8 +432,7 @@ public class LSPWorkspaceManager
 			}
 			else
 			{
-				Diag.info("Removing empty extracted file: %s", vdm);
-				vdm.delete();
+				Diag.info("External file contains no VDM source: %s", vdm);
 			}
 		}
 	}
