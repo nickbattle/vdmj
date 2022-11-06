@@ -37,6 +37,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -351,7 +352,7 @@ public class LSPWorkspaceManager
 	{
 		FilenameFilter filter = getFilenameFilter();
 		File[] files = root.listFiles();
-		List<String> ignored = new Vector<String>();
+		List<File> ignored = new Vector<File>();
 		
 		for (File file: files)
 		{
@@ -380,14 +381,33 @@ public class LSPWorkspaceManager
 				else
 				{
 					Diag.warning("Ignoring file %s", file.getPath());
-					ignored.add(file.getName());
+					ignored.add(file);
 				}
 			}
 		}
 		
 		if (!ignored.isEmpty())
 		{
-			sendMessage(WARNING_MSG, "These files can be added to vdmignore: " + ignored.toString());
+			Collections.sort(ignored);
+			StringBuilder sb = new StringBuilder();
+			sb.append("These files can be added to vdmignore:\n");
+			String project = rootUri.getPath();
+			
+			for (File ignore: ignored)
+			{
+				if (ignore.getPath().startsWith(project))	// It should!
+				{
+					sb.append(ignore.getPath().substring(project.length() + 1));
+				}
+				else
+				{
+					sb.append(ignore);
+				}
+				
+				sb.append("\n");
+			}
+			
+			sendMessage(WARNING_MSG, sb.toString());
 		}
 	}
 
