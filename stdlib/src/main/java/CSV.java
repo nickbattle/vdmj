@@ -123,7 +123,7 @@ public class CSV implements Serializable
 	}
 
 	/**
-	 * Read a CSV live as a seq of ? in VDM
+	 * Read a CSV line as a seq of ? in VDM
 	 * 
 	 * @param fval
 	 *            name of the file to read from

@@ -59,6 +59,13 @@ fecho (filename,text,fdir) ==
   is not yet specified
   pre filename = "" <=> fdir = nil;
 
+-- Get input text from a file, similar to the reverse of fecho
+public
+finput: seq1 of char ==> bool * [seq of char]
+finput (filename) ==
+  is not yet specified
+  post let mk_(b,t) = RESULT in not b => t = nil;
+
 -- The in/out functions  will return false if an error occur. In this
 -- case an internal error string will be set. 'ferror' returns this
 -- string and set it to "".

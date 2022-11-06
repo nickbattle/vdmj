@@ -24,8 +24,10 @@
 
 // This must be in the default package to work with VDMJ's native delegation.
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -167,6 +169,51 @@ public class IO implements Serializable
 		}
 
 		return new BooleanValue(true);
+	}
+
+	@VDMOperation
+	public static Value finput(Value fval)
+	{
+		ValueList result = new ValueList();
+
+		try
+		{
+			File file = new File(stringOf(fval).replace('/', File.separatorChar));
+			if (!file.isAbsolute())
+			{
+				file = new File(new File(".").getParentFile(), file.getAbsolutePath());
+			}
+
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+			ValueList valList = new ValueList();
+			boolean isReadingFile = true;
+
+			while(isReadingFile) {
+				int nextCharacterInt = bufferedReader.read();
+
+				if(nextCharacterInt == -1) {
+					isReadingFile = false;
+					break;
+				}
+
+				CharacterValue cv = new CharacterValue((char) nextCharacterInt);
+				valList.add(cv);
+			}
+
+			bufferedReader.close();
+			SeqValue seqVal = new SeqValue(valList);
+			result.add(new BooleanValue(true));
+			result.add(seqVal);
+		}
+		catch (Exception e)
+		{
+			lastError = e.toString();
+			result = new ValueList();
+			result.add(new BooleanValue(false));
+			result.add(new NilValue());
+		}
+
+		return new TupleValue(result);
 	}
 
 	@VDMOperation
