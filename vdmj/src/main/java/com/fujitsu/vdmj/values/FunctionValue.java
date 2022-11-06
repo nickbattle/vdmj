@@ -431,6 +431,10 @@ public class FunctionValue extends Value
 					evalContext.threadState.setAtomic(true);
 					mv = measure.eval(measure.location, measureArgs, evalContext).deref();
 				}
+				catch (ValueException e)
+				{
+					throw new ValueException(e.number, "Measure: " + e.getMessage(), e.ctxt);
+				}
 				finally
 				{
 					evalContext.threadState.setAtomic(false);

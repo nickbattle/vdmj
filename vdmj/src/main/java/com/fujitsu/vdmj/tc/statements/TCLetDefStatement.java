@@ -62,6 +62,7 @@ public class TCLetDefStatement extends TCStatement
 		// Each local definition is in scope for later local definitions...
 
 		Environment local = new FlatEnvironment(env, Settings.strict, false);	// Functional only, if -strict
+		local.setFunctional(false, false);	// Fix for RM#49
 
 		for (TCDefinition d: localDefs)
 		{

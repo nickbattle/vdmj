@@ -37,6 +37,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -351,6 +352,7 @@ public class LSPWorkspaceManager
 	{
 		FilenameFilter filter = getFilenameFilter();
 		File[] files = root.listFiles();
+		List<File> ignored = new Vector<File>();
 		
 		for (File file: files)
 		{
@@ -379,8 +381,33 @@ public class LSPWorkspaceManager
 				else
 				{
 					Diag.warning("Ignoring file %s", file.getPath());
+					ignored.add(file);
 				}
 			}
+		}
+		
+		if (!ignored.isEmpty())
+		{
+			Collections.sort(ignored);
+			StringBuilder sb = new StringBuilder();
+			sb.append("These files can be added to vdmignore:\n");
+			String project = rootUri.getPath();
+			
+			for (File ignore: ignored)
+			{
+				if (ignore.getPath().startsWith(project))	// It should!
+				{
+					sb.append(ignore.getPath().substring(project.length() + 1));
+				}
+				else
+				{
+					sb.append(ignore);
+				}
+				
+				sb.append("\n");
+			}
+			
+			sendMessage(WARNING_MSG, sb.toString());
 		}
 	}
 
@@ -404,7 +431,6 @@ public class LSPWorkspaceManager
 	
 	private void loadExternalFile(File file) throws IOException
 	{
-		SourceFile source = new SourceFile(file);
 		File vdm = new File(file.getPath() + "." + Settings.dialect.getArgstring().substring(1));
 		
 		if (vdm.exists())
@@ -415,14 +441,16 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
-			Diag.info("Converting external file %s", file);
-			PrintWriter spw = new PrintWriter(vdm, encoding.name());
-			source.printSource(spw);
-			spw.close();
-			Diag.info("Extracted source written to " + vdm);
-			
-			if (vdm.length() > 0)	// eg. not an empty extraction
+			SourceFile source = new SourceFile(file);
+
+			if (source.getCount() > 0)	// ie. not an empty extraction
 			{
+				Diag.info("Processing external file %s", file);
+				PrintWriter spw = new PrintWriter(vdm, encoding.name());
+				source.printSource(spw);
+				spw.close();
+				Diag.info("Extracted source written to " + vdm);
+				
 				loadFile(vdm);
 	
 				BasicFileAttributes attr = Files.readAttributes(vdm.toPath(), BasicFileAttributes.class);
@@ -431,8 +459,7 @@ public class LSPWorkspaceManager
 			}
 			else
 			{
-				Diag.info("Removing empty extracted file: %s", vdm);
-				vdm.delete();
+				Diag.info("External file contains no VDM source: %s", file);
 			}
 		}
 	}
