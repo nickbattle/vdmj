@@ -151,6 +151,8 @@ public class BacktrackInputReader
 		externalReaders = new HashMap<String, Class<? extends ExternalFormatReader>>();
 		
 		// Add the standard readers first
+		externalReaders.put(".tex", LatexStreamReader.class);	// To allow *.tex files
+		externalReaders.put(".latex", LatexStreamReader.class);	// To allow *.latex files
 		externalReaders.put(".doc", DocStreamReader.class);
 		externalReaders.put(".docx", DocxStreamReader.class);
 		externalReaders.put(".odt", ODFStreamReader.class);
