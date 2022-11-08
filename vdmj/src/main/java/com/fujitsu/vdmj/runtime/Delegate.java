@@ -207,13 +207,32 @@ public class Delegate implements Serializable
 
 			try
 			{
-				Class<?>[] array = new Class<?>[0];
-				m = delegateClass.getMethod(mname, ptypes.toArray(array));
-
-				if (!m.getReturnType().equals(Value.class))
+				try
 				{
-					throw new InternalException(58,
-						"Native method does not return Value: " + m);
+					// First try to find a method with a final Context parameter
+					
+					List<Class<?>> ptypes2 = new Vector<Class<?>>(ptypes);
+					ptypes2.add(Context.class);
+					Class<?>[] array2 = new Class<?>[0];
+					
+					m = delegateClass.getMethod(mname, ptypes2.toArray(array2));
+	
+					if (!m.getReturnType().equals(Value.class))
+					{
+						throw new InternalException(58,
+							"Native method does not return Value: " + m);
+					}
+				}
+				catch (Throwable t)
+				{
+					Class<?>[] array = new Class<?>[0];
+					m = delegateClass.getMethod(mname, ptypes.toArray(array));
+	
+					if (!m.getReturnType().equals(Value.class))
+					{
+						throw new InternalException(58,
+							"Native method does not return Value: " + m);
+					}					
 				}
 			}
 			catch (SecurityException e)
@@ -256,12 +275,18 @@ public class Delegate implements Serializable
 		}
 
 		TCNameList anames = delegateArgs.get(ctxt.title);
-		Object[] avals = new Object[anames.size()];
+		boolean hasCtxt = m.getParameterCount() > anames.size();
+		Object[] avals = new Object[anames.size() + (hasCtxt ? 1 : 0)];
 		int a = 0;
 
 		for (TCNameToken arg: anames)
 		{
 			avals[a++] = ctxt.get(arg);
+		}
+		
+		if (hasCtxt)
+		{
+			avals[a] = ctxt;
 		}
 
 		try
