@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
-import java.lang.reflect.Method;
-
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
@@ -33,14 +31,12 @@ import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.NaturalOneValue;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.SeqValue;
@@ -81,32 +77,32 @@ public class INNotYetSpecifiedExpression extends INExpression
     		}
 		}
 
-		if (location.module.equals("IO") ||
-			location.module.equals("DEFAULT"))
-		{
-			if (ctxt.title.equals("freadval(filename)"))
-			{
-				// This needs type invariant information from the context, so we
-				// can't just call down to a native method for this one.
-
-				try
-				{
-					TCNameToken arg = new TCNameToken(location, "IO", "filename");
-					Value fval = ctxt.get(arg);
-					
-					// We can't link with the IO class directly because it's in the default
-					// package, so we reflect our way over to it.
-					
-					Class<?> io = Class.forName("IO");
-					Method m = io.getMethod("freadval", new Class[] {Value.class, Context.class});
-					return (Value)m.invoke(io.getDeclaredConstructor().newInstance(), new Object[] {fval, ctxt});
-				}
-				catch (Exception e)
-				{
-					throw new InternalException(62, "Cannot invoke native method: " + e.getMessage());
-				}
-			}
-		}
+//		if (location.module.equals("IO") ||
+//			location.module.equals("DEFAULT"))
+//		{
+//			if (ctxt.title.equals("freadval(filename)"))
+//			{
+//				// This needs type invariant information from the context, so we
+//				// can't just call down to a native method for this one.
+//
+//				try
+//				{
+//					TCNameToken arg = new TCNameToken(location, "IO", "filename");
+//					Value fval = ctxt.get(arg);
+//					
+//					// We can't link with the IO class directly because it's in the default
+//					// package, so we reflect our way over to it.
+//					
+//					Class<?> io = Class.forName("IO");
+//					Method m = io.getMethod("freadval", new Class[] {Value.class, Context.class});
+//					return (Value)m.invoke(io.getDeclaredConstructor().newInstance(), new Object[] {fval, ctxt});
+//				}
+//				catch (Exception e)
+//				{
+//					throw new InternalException(62, "Cannot invoke native method: " + e.getMessage());
+//				}
+//			}
+//		}
 
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
