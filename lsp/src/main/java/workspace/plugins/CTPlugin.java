@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -208,8 +209,9 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 			Diag.info("Generated %d traces in %.3f secs.", traceCount, (double)(after-before)/1000);
 			return traceCount;
 		}
-		catch (Exception e)
+		catch (Exception e)		// Probably during expansion
 		{
+			Console.err.println("Trace generate: " + e.getMessage());
 			throw new LSPException(RPCErrors.InternalError, e.getMessage());
 		}
 	}
