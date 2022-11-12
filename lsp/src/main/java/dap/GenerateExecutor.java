@@ -26,12 +26,8 @@ package dap;
 
 import java.io.IOException;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.modules.INModuleList;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.scheduler.MainThread;
@@ -62,23 +58,11 @@ public class GenerateExecutor extends AsyncExecutor
 	protected void exec() throws Exception
 	{
 		Interpreter i = Interpreter.getInstance();
-		Context mainContext = null;
-		
-		if (Settings.dialect == Dialect.VDM_SL)
-		{
-			INModuleList modules = Interpreter.getInstance().getIN();
-			mainContext = modules.creatInitialContext();
-		}
-		else
-		{
-			INClassList classes = Interpreter.getInstance().getIN();
-			mainContext = classes.creatInitialContext();
-		}
-
+		Context mainContext = i.getTraceContext(tracedef.classDefinition);
 		mainContext.putAll(i.getInitialContext());
 		mainContext.setThreadState(CPUValue.vCPU);
 		i.clearBreakpointHits();
-
+		
 		INExpression gexp = new INGenerateExpression(tracedef);
 		MainThread main = new MainThread(gexp, mainContext);
 		main.start();
