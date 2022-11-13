@@ -53,7 +53,7 @@ public class FPPolicy extends FCFSPolicy
 
 		priorities.put(thread,
 			priority == 0 ?	Properties.scheduler_fcfs_timeslice :
-			thread.isVirtual() ? Properties.scheduler_virtual_timeslice :
+			thread.isVirtualResource() ? Properties.scheduler_virtual_timeslice :
 			priority);
 	}
 
