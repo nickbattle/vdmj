@@ -41,7 +41,7 @@ import workspace.plugins.INPlugin;
 public class GenerateCommand extends Command
 {
 	public static final String USAGE = "Usage: generate <trace name>";
-	public static final String HELP = "generate <trace name> - expand trace name";
+	public static final String HELP = "generate <trace name> - debug expansion of trace name";
 	
 	public final String tracename;
 

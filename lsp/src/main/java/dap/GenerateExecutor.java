@@ -68,7 +68,7 @@ public class GenerateExecutor extends AsyncExecutor
 		main.start();
 		i.getScheduler().start(main);
 
-		answer = main.getResult().toString();	// Can throw ContextException
+		answer = "Generated " + main.getResult() + " tests";	// Can throw ContextException
 	}
 
 	@Override

@@ -53,6 +53,8 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
+import vdmj.commands.GenerateCommand;
+import vdmj.commands.HelpList;
 import workspace.DAPWorkspaceManager;
 import workspace.Diag;
 import workspace.EventListener;
@@ -172,6 +174,15 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 				// Ignore
 			}
 		}
+	}
+	
+	@Override
+	public HelpList getCommandHelp()
+	{
+		return new HelpList
+		(
+			GenerateCommand.HELP
+		);
 	}
 
 	/**
