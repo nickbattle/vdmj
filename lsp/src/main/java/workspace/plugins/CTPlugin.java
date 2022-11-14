@@ -222,7 +222,9 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 		}
 		catch (Exception e)		// Probably during expansion
 		{
-			Console.err.println("Trace generate: " + e.getMessage());
+			Console.err.println("Exception during trace expansion:");
+			Console.err.println(e.getMessage());
+			Console.err.println("You can debug this using the 'generate' console command");
 			throw new LSPException(RPCErrors.InternalError, e.getMessage());
 		}
 	}
