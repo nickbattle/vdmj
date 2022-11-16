@@ -38,7 +38,7 @@ public class DAPErrConsoleWriter implements ConsoleWriter
 	@Override
 	public void println(String message)
 	{
-		server.stderr(message + "\n");
+		server.stderr(message + "\\n");
 	}
 	
 	@Override
@@ -56,7 +56,7 @@ public class DAPErrConsoleWriter implements ConsoleWriter
 	@Override
 	public void println()
 	{
-		server.stderr("\n");
+		server.stderr("\\n");
 	}
 
 	@Override
