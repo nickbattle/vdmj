@@ -54,6 +54,11 @@ public class CSVReader implements ExternalFormatReader
 		
 		for (String line = reader.readLine(); line != null; line = reader.readLine())
 		{
+			if (line.trim().isEmpty())
+			{
+				continue;	// Ignore blank lines
+			}
+			
 			vdm.append(sep);
 			vdm.append("\n");
 			vdm.append(INDENT);
@@ -112,11 +117,6 @@ public class CSVReader implements ExternalFormatReader
 	{
 		try
 		{
-			if (line.trim().isEmpty())
-			{
-				return "[ ]";	// Blank line - an error
-			}
-			
 			LexTokenReader ltr = new LexTokenReader(line, Dialect.VDM_SL);
 			ltr.nextToken();
 			ExpressionReader reader = new ExpressionReader(ltr);
