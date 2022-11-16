@@ -32,7 +32,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Date;
 
-import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.ExternalFormatReader;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -83,11 +82,17 @@ public class CSVReader implements ExternalFormatReader
 		vdm.append("\n--\n");
 		vdm.append("types\n");
 		vdm.append(INDENT);
-		vdm.append("CSVCell = nat | seq of char | set of nat;\n");
+		vdm.append("CSVCell = CellType\n");
 		vdm.append(INDENT);
-		vdm.append("CSVRow  = seq1 of CSVCell;\n");
+		vdm.append("inv cell == cellInvariant(cell);   -- implement this!\n\n");
 		vdm.append(INDENT);
-		vdm.append("CSVFile = seq of CSVRow;\n\n");
+		vdm.append("CSVRow  = seq1 of CSVCell\n");
+		vdm.append(INDENT);
+		vdm.append("inv row == rowInvariant(row);      -- implement this!\n\n");
+		vdm.append(INDENT);
+		vdm.append("CSVFile = seq of CSVRow\n");
+		vdm.append(INDENT);
+		vdm.append("inv file == fileInvariant(file);   -- implement this!\n\n");
 
 		vdm.append("values\n");
 		vdm.append(INDENT);
@@ -107,11 +112,15 @@ public class CSVReader implements ExternalFormatReader
 	{
 		try
 		{
+			if (line.trim().isEmpty())
+			{
+				return "[ ]";	// Blank line - an error
+			}
+			
 			LexTokenReader ltr = new LexTokenReader(line, Dialect.VDM_SL);
 			ltr.nextToken();
 			ExpressionReader reader = new ExpressionReader(ltr);
-			ASTExpressionList list = reader.readExpressionList();
-			return "[ " + list.toString() + " ]";
+			return "[ " + reader.readExpressionList() + " ]";
 		}
 		catch (LocatedException e)
 		{

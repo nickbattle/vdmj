@@ -5,7 +5,9 @@ are used to extract VDM content for document formats that are not supported by V
 for example from PDF files or ZIP files, or perhaps HTML.
 
 The example in this project parses CSV lines as a list of VDM expressions, returning a simple
-type schema for the data, plus a value of that type representing the file content.
+type schema for the data, plus a value of that type representing the file content. The schema
+types include a CellType and invariants via three functions, xxxInvriant(xxx), which have to be
+implemented by the caller to define any rules required for the data.
 
 A reader class must implement the ExternalFormatReader interface. Its getText method must
 return the *entire* encapsulated VDM content from the document in one read operation - this
