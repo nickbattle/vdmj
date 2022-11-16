@@ -38,7 +38,7 @@ public class DAPOutConsoleWriter implements ConsoleWriter
 	@Override
 	public void println(String message)
 	{
-		server.stdout(message + "\\n");
+		server.stdout(message + "\n");
 	}
 	
 	@Override
@@ -56,7 +56,7 @@ public class DAPOutConsoleWriter implements ConsoleWriter
 	@Override
 	public void println()
 	{
-		server.stdout("\\n");
+		server.stdout("\n");
 	}
 
 	@Override
