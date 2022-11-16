@@ -115,7 +115,7 @@ public class Delegate implements Serializable
 		catch (InvocationTargetException e)
 		{
 			throw new InternalException(54,
-				"Cannot instantiate native object: " + e.getMessage());
+				"Cannot instantiate native object: " + e.getTargetException().toString());
 		}
 		catch (NoSuchMethodException e)
 		{
@@ -316,7 +316,7 @@ public class Delegate implements Serializable
 			else
 			{
 				throw new InternalException(59,
-					"Failed in native method: " + e.getTargetException().getMessage());
+					"Failed in native method: " + e.getTargetException().toString());
 			}
 		}
 	}
