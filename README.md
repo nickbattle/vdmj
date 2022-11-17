@@ -26,6 +26,7 @@ VDMJ is a command line tool, but it is used by the ![Overture](https://github.co
 * ![High Precision Guide](/vdmj/documentation/HighPrecisionGuide.pdf "High Precision Guide")
 * ![VDMJUnit Guide](/vdmj/documentation/VDMJUnit.pdf "VDMJUnit Guide")
 * ![Annotation Guide](/vdmj/documentation/AnnotationGuide.pdf "Annotation Guide")
+* ![Library Guide](/vdmj/documentation/LibraryGuide.pdf "Library Guide")
 
 ### Screen Shots
 ![Eclipse Integration](/screenshots/eclipse.jpg?raw=true "Eclipse Integration")
