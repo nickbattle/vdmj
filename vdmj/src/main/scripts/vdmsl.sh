@@ -80,7 +80,7 @@ check "$VDMJ_JAR"
 check "$STDLIB_JAR"
 check "$PLUGINS_JAR"
 CLASSPATH="$VDMJ_JAR:$PLUGINS_JAR:$STDLIB_JAR:$PROPDIR"
-MAIN="com.fujitsu.vdmj.VDMJ"
+MAIN="VDMJ"
 
 if [ $ANNOTATIONS_VERSION ]
 then
