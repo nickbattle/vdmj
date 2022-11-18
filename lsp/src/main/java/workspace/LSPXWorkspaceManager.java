@@ -100,7 +100,7 @@ public class LSPXWorkspaceManager
 		
 		if (System.getProperty("lspx.plugins") != null)
 		{
-			String[] plugins = System.getProperty("lspx.plugins").split("\\s*,\\s*");
+			String[] plugins = System.getProperty("lspx.plugins").split("\\s*[,;]\\s*");
 			
 			for (String plugin: plugins)
 			{

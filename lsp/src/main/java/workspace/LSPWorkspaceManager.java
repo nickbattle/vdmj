@@ -83,6 +83,7 @@ import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
 import workspace.events.CheckTypeEvent;
 import workspace.events.CloseFileEvent;
+import workspace.events.CodeLensEvent;
 import workspace.events.InitializeEvent;
 import workspace.events.InitializedEvent;
 import workspace.events.OpenFileEvent;
@@ -1302,8 +1303,17 @@ public class LSPWorkspaceManager
 		{
 			return new RPCMessageList(request, new JSONArray());
 		}
-
-		JSONArray lenses = registry.getCodeLenses(file);
+		
+		RPCMessageList responses = eventhub.publish(new CodeLensEvent(request, file));
+		
+		// We have to combine all the plugin lens responses into one.
+		JSONArray lenses = new JSONArray();
+		
+		for (JSONObject lens: responses)
+		{
+			lenses.addAll(lens.get("result"));
+		}
+		
 		return new RPCMessageList(request, lenses);
 	}
 

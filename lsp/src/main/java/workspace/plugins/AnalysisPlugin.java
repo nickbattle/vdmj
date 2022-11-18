@@ -24,10 +24,7 @@
 
 package workspace.plugins;
 
-import java.io.File;
-
 import dap.DAPMessageList;
-import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPMessageUtils;
 import rpc.RPCErrors;
@@ -84,14 +81,6 @@ abstract public class AnalysisPlugin
 	public void setDAPCapabilities(JSONObject capabilities)
 	{
 		return;		// DAP capabilities
-	}
-
-	/**
-	 * Plugins can return code lenses by overriding this method.
-	 */
-	public JSONArray getCodeLenses(File file)
-	{
-		return new JSONArray();
 	}
 
 	/**

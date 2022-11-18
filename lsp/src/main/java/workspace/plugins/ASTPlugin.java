@@ -59,6 +59,7 @@ import workspace.LSPWorkspaceManager;
 import workspace.events.ChangeFileEvent;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
+import workspace.events.CodeLensEvent;
 import workspace.events.InitializedEvent;
 import workspace.events.LSPEvent;
 import workspace.lenses.ASTCodeLens;
@@ -107,6 +108,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		eventhub.register(ChangeFileEvent.class, this);
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckSyntaxEvent.class, this);
+		eventhub.register(CodeLensEvent.class, this);
 		this.dirty = false;
 	}
 	
@@ -120,6 +122,11 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		else if (event instanceof ChangeFileEvent)
 		{
 			return didChange((ChangeFileEvent) event);
+		}
+		else if (event instanceof CodeLensEvent)
+		{
+			CodeLensEvent le = (CodeLensEvent)event;
+			return new RPCMessageList(le.request, getCodeLenses(le.file));
 		}
 		else if (event instanceof CheckPrepareEvent)
 		{
@@ -221,8 +228,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		return lenses;
 	}
 	
-	@Override
-	abstract public JSONArray getCodeLenses(File file);
+	abstract protected JSONArray getCodeLenses(File file);
 
 	public List<VDMMessage> getErrs()
 	{
