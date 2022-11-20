@@ -812,7 +812,6 @@ public class LSPWorkspaceManager
 	{
 		FilenameFilter filter = getFilenameFilter();
 		int actionCode = DO_NOTHING;
-		boolean ignoreDotPath = onDotPath(file);
 		
 		switch (type)
 		{
@@ -832,7 +831,7 @@ public class LSPWorkspaceManager
 					Diag.info("Created vdmignore file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
 				}
-				else if (ignoreDotPath)
+				else if (onDotPath(file))
 				{
 					Diag.info("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
@@ -890,7 +889,7 @@ public class LSPWorkspaceManager
 					Diag.info("Changed vdmignore file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
 				}
-				else if (ignoreDotPath)
+				else if (onDotPath(file))
 				{
 					Diag.info("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
@@ -923,9 +922,23 @@ public class LSPWorkspaceManager
 				break;
 				
 			case DELETE:
-				// Since the file is deleted, we don't know what it was so we have to rebuild
-				Diag.info("Deleted %s (dir/file?), rebuilding", file);
-				actionCode = RELOAD_AND_CHECK;
+				// Since the file is deleted, we can't access any file attributes, so we
+				// just check for whether it is ignored/dotpath.
+				if (onDotPath(file))
+				{
+					Diag.info("Ignoring deleted file on dot path: %s", file);
+					actionCode = DO_NOTHING;
+				}
+				else if (ignoredFile(file))
+				{
+					Diag.info("Ignoring deleted file in vdmignore: %s", file);
+					actionCode = DO_NOTHING;			
+				}
+				else
+				{
+					Diag.info("Deleted %s (dir/file?), rebuilding", file);
+					actionCode = RELOAD_AND_CHECK;
+				}
 				break;
 		}
 		
