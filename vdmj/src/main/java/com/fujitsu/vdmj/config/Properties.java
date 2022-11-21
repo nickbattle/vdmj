@@ -114,6 +114,9 @@ public class Properties
 	/** The size limit for power set expressions */
 	public static int in_powerset_limit = 30;
 	
+	/** The size limit for type bind expansions */
+	public static long in_typebind_limit = 1000000;
+	
 	/**
 	 * When the class is initialized, which uses the vdmj.properties file, and any System
 	 * properties, to set the static fields above.
@@ -199,6 +202,7 @@ public class Properties
 		rt_diags_timestep = get(vdmj, "vdmj.rt.diags_timestep", false);
 		
 		in_powerset_limit = get(vdmj, "vdmj.in.powerset_limit", 30);
+		in_typebind_limit = get(vdmj, "vdmj.in.typebind_limit", 10000000);
 
 		cmd_plugin_packages = get(vdmj, "vdmj.cmd.plugin_packages", "plugins");
 		debug_link_class = get(vdmj, "vdmj.debug.link_class", null);		
