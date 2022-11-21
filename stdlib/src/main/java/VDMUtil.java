@@ -31,7 +31,9 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.runtime.VDMFunction;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
@@ -39,6 +41,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.CharacterValue;
+import com.fujitsu.vdmj.values.NaturalOneValue;
 import com.fujitsu.vdmj.values.NilValue;
 import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.SeqValue;
@@ -117,6 +120,38 @@ public class VDMUtil
 		else
 		{
 			return new NilValue();
+		}
+	}
+
+	public Value get_file_pos(Context ctxt)
+	{
+		try
+		{
+			ValueList tuple = new ValueList();
+			Context outer = ctxt.getRoot().outer;
+			RootContext root = outer.getRoot();
+
+			tuple.add(new SeqValue(ctxt.location.file.getPath()));
+			tuple.add(new NaturalOneValue(ctxt.location.startLine));
+			tuple.add(new NaturalOneValue(ctxt.location.startPos));
+			tuple.add(new SeqValue(ctxt.location.module));
+
+			int bra = root.title.indexOf('(');
+
+			if (bra > 0)
+			{
+    			tuple.add(new SeqValue(root.title.substring(0, bra)));
+			}
+			else
+			{
+				tuple.add(new SeqValue(""));
+			}
+
+			return new TupleValue(tuple);
+		}
+		catch (Exception e)
+		{
+			throw new ContextException(4076, e.getMessage(), ctxt.location, ctxt);
 		}
 	}
 }

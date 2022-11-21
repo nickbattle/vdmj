@@ -24,11 +24,9 @@
 
 package workspace;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import json.JSONArray;
 import json.JSONObject;
 import vdmj.commands.Command;
 import vdmj.commands.ErrorCommand;
@@ -107,26 +105,6 @@ public class PluginRegistry
 				Diag.error(e);
 			}
 		}
-	}
-	
-	public JSONArray getCodeLenses(File file)
-	{
-		JSONArray commands = new JSONArray();
-		
-		for (AnalysisPlugin plugin: plugins.values())
-		{
-			try
-			{
-				commands.addAll(plugin.getCodeLenses(file));
-			}
-			catch (Throwable e)
-			{
-				Diag.error("Exception in %s getCodeLenses", plugin.getName());
-				Diag.error(e);
-			}
-		}
-		
-		return commands;
 	}
 	
 	public Command getCommand(String line)

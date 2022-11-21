@@ -55,6 +55,7 @@ import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckTypeEvent;
+import workspace.events.CodeLensEvent;
 import workspace.events.LSPEvent;
 import workspace.lenses.TCCodeLens;
 import workspace.lenses.TCLaunchDebugLens;
@@ -97,6 +98,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	{
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckTypeEvent.class, this);
+		eventhub.register(CodeLensEvent.class, this);
 	}
 
 	@Override
@@ -115,6 +117,11 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 			ev.addErrs(errs);
 			ev.addWarns(warns);
 			return new RPCMessageList();
+		}
+		else if (event instanceof CodeLensEvent)
+		{
+			CodeLensEvent le = (CodeLensEvent)event;
+			return new RPCMessageList(le.request, getCodeLenses(le.file));
 		}
 		else
 		{
@@ -144,8 +151,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		return lenses;
 	}
 	
-	@Override
-	abstract public JSONArray getCodeLenses(File file);
+	abstract protected JSONArray getCodeLenses(File file);
 
 	public List<VDMMessage> getErrs()
 	{

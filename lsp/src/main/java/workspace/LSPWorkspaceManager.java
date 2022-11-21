@@ -83,6 +83,7 @@ import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
 import workspace.events.CheckTypeEvent;
 import workspace.events.CloseFileEvent;
+import workspace.events.CodeLensEvent;
 import workspace.events.InitializeEvent;
 import workspace.events.InitializedEvent;
 import workspace.events.OpenFileEvent;
@@ -811,7 +812,6 @@ public class LSPWorkspaceManager
 	{
 		FilenameFilter filter = getFilenameFilter();
 		int actionCode = DO_NOTHING;
-		boolean ignoreDotPath = onDotPath(file);
 		
 		switch (type)
 		{
@@ -831,7 +831,7 @@ public class LSPWorkspaceManager
 					Diag.info("Created vdmignore file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
 				}
-				else if (ignoreDotPath)
+				else if (onDotPath(file))
 				{
 					Diag.info("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
@@ -889,7 +889,7 @@ public class LSPWorkspaceManager
 					Diag.info("Changed vdmignore file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
 				}
-				else if (ignoreDotPath)
+				else if (onDotPath(file))
 				{
 					Diag.info("Ignoring file on dot path: %s", file);
 					actionCode = DO_NOTHING;
@@ -922,9 +922,23 @@ public class LSPWorkspaceManager
 				break;
 				
 			case DELETE:
-				// Since the file is deleted, we don't know what it was so we have to rebuild
-				Diag.info("Deleted %s (dir/file?), rebuilding", file);
-				actionCode = RELOAD_AND_CHECK;
+				// Since the file is deleted, we can't access any file attributes, so we
+				// just check for whether it is ignored/dotpath.
+				if (onDotPath(file))
+				{
+					Diag.info("Ignoring deleted file on dot path: %s", file);
+					actionCode = DO_NOTHING;
+				}
+				else if (ignoredFile(file))
+				{
+					Diag.info("Ignoring deleted file in vdmignore: %s", file);
+					actionCode = DO_NOTHING;			
+				}
+				else
+				{
+					Diag.info("Deleted %s (dir/file?), rebuilding", file);
+					actionCode = RELOAD_AND_CHECK;
+				}
 				break;
 		}
 		
@@ -1302,8 +1316,17 @@ public class LSPWorkspaceManager
 		{
 			return new RPCMessageList(request, new JSONArray());
 		}
-
-		JSONArray lenses = registry.getCodeLenses(file);
+		
+		RPCMessageList responses = eventhub.publish(new CodeLensEvent(request, file));
+		
+		// We have to combine all the plugin lens responses into one.
+		JSONArray lenses = new JSONArray();
+		
+		for (JSONObject lens: responses)
+		{
+			lenses.addAll(lens.get("result"));
+		}
+		
 		return new RPCMessageList(request, lenses);
 	}
 

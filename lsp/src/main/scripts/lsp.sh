@@ -16,7 +16,7 @@ PVERSION="4.5.0-P-SNAPSHOT"
 VERSION=$MVERSION
 
 # The Maven repository directory containing jars
-MAVENREPO=~/.m2/repository/com/fujitsu
+MAVENREPO=~/.m2/repository/dk/au/ece/vdmj
 
 JAVA64_VMOPTS="-Xmx3000m -Xss1m"
 #JAVA64_VMOPTS="-Xmx3000m -Xss1m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote"

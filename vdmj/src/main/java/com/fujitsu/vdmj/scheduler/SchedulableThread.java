@@ -479,7 +479,7 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 		return state == RunState.TIMESTEP || state == RunState.WAITING;
 	}
 
-	public boolean isVirtual()
+	public boolean isVirtualResource()
 	{
 		return virtual;
 	}

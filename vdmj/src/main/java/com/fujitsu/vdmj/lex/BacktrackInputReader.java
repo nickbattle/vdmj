@@ -114,7 +114,7 @@ public class BacktrackInputReader
 	 * Create an ExternalFormatReader from a File, depending on the filename.
 	 * @throws IOException 
 	 */
-	private ExternalFormatReader readerFactory(File file) throws IOException
+	public static ExternalFormatReader readerFactory(File file) throws IOException
 	{
 		String lowerName = file.getName().toLowerCase();		// NB! lower case matched
 		

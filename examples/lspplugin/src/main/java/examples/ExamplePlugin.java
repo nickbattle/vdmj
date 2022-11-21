@@ -24,14 +24,12 @@
 
 package examples;
 
-import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.DAPMessageList;
-import json.JSONArray;
 import json.JSONObject;
 import rpc.RPCMessageList;
 import vdmj.commands.Command;
@@ -45,6 +43,7 @@ import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
 import workspace.events.CheckTypeEvent;
 import workspace.events.CloseFileEvent;
+import workspace.events.CodeLensEvent;
 import workspace.events.DAPBeforeEvaluateEvent;
 import workspace.events.DAPConfigDoneEvent;
 import workspace.events.DAPDisconnectEvent;
@@ -116,6 +115,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		eventhub.register(ChangeFileEvent.class, this);
 		eventhub.register(CloseFileEvent.class, this);
 		eventhub.register(SaveFileEvent.class, this);
+		eventhub.register(CodeLensEvent.class, this);
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckSyntaxEvent.class, this);
 		eventhub.register(CheckTypeEvent.class, this);
@@ -159,13 +159,6 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		lenses.add(new ExampleLens());
 		return lenses;
 	}
-	
-	/**
-	 * Since we provide a code lens (above), we should implement applyCodeLenses in
-	 * both dialect subclasses.
-	 */
-	@Override
-	abstract public JSONArray getCodeLenses(File file);
 	
 	/**
 	 * This method is called when the user types a line that is not recognised by the

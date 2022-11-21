@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import dap.DAPMessageList;
 import json.JSONArray;
 import rpc.RPCMessageList;
+import workspace.events.CodeLensEvent;
 import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
 import workspace.lenses.TCCodeLens;
@@ -45,7 +46,16 @@ public class ExamplePluginPR extends ExamplePlugin
 	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
 		System.out.println("ExamplePluginPR got " + event);
-		return null;
+
+		if (event instanceof CodeLensEvent)
+		{
+			CodeLensEvent le = (CodeLensEvent)event;
+			return new RPCMessageList(event.request, getCodeLenses(le.file));
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	@Override
@@ -60,12 +70,11 @@ public class ExamplePluginPR extends ExamplePlugin
 	 * type-checked classes, and then search through them for TCDefinitions that are
 	 * within the File that is passed from the Client (ie. the file on screen).
 	 * 
-	 * This way of splitting lenses into getCodeLenses and applyCodeLenses is just
+	 * This way of splitting lenses into getCodeLenses and getTCCodeLenses is just
 	 * a convention. The only requirement is that this method returns the lenses
 	 * required.
 	 */
-	@Override
-	public JSONArray getCodeLenses(File file)
+	private JSONArray getCodeLenses(File file)
 	{
 		TCPlugin tc = registry.getPlugin("TC");
 		TCClassList tcClassList = tc.getTC();

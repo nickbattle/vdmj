@@ -94,11 +94,8 @@ public class IO implements Serializable
 		return new BooleanValue(true);
 	}
 
-	// Note that this method is not callable via the native interface, since it
-	// need access to the Context to call any type invariants involved while
-	// reading the data.
-	//
-	// See the INNotYetSpecifiedExpression class.
+	// Note that this method needs access to the Context to call any type invariants involved while
+	// reading the data. This is handled by the Delegate class.
 	
 	@VDMFunction
 	public static Value freadval(Value fval, Context ctxt)

@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -52,6 +53,8 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
+import vdmj.commands.GenerateCommand;
+import vdmj.commands.HelpList;
 import workspace.DAPWorkspaceManager;
 import workspace.Diag;
 import workspace.EventListener;
@@ -172,6 +175,15 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 			}
 		}
 	}
+	
+	@Override
+	public HelpList getCommandHelp()
+	{
+		return new HelpList
+		(
+			GenerateCommand.HELP
+		);
+	}
 
 	/**
 	 * Event handling above. Supporting methods below. 
@@ -208,8 +220,11 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 			Diag.info("Generated %d traces in %.3f secs.", traceCount, (double)(after-before)/1000);
 			return traceCount;
 		}
-		catch (Exception e)
+		catch (Exception e)		// Probably during expansion
 		{
+			Console.err.println("Exception during trace expansion:");
+			Console.err.println(e.getMessage());
+			Console.err.println("You can debug this using the 'generate' console command");
 			throw new LSPException(RPCErrors.InternalError, e.getMessage());
 		}
 	}

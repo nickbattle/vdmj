@@ -24,5 +24,6 @@
 		<module>pdfreader</module>
 		<module>simulation</module>
 		<module>lspplugin</module>
+		<module>csvreader</module>
 	</modules>
 </project>

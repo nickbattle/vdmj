@@ -746,7 +746,7 @@ public class DAPDebugExecutor implements DebugExecutor
 	private Context buildArguments(RootContext c, Frame frame)
 	{
 		String title = (c.outer == null ? "Globals" : "Arguments");
-		LexLocation loc = (c.outer == null ? c.location : frame.location);
+		LexLocation loc = frame.location;	// (c.outer == null ? c.location : frame.location);
 		
 		if (c == ctxt)	// Stopped in base context (init)
 		{

@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import dap.DAPMessageList;
 import json.JSONArray;
 import rpc.RPCMessageList;
+import workspace.events.CodeLensEvent;
 import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
 import workspace.lenses.TCCodeLens;
@@ -43,12 +44,22 @@ public class ExamplePluginSL extends ExamplePlugin
 {
 	/**
 	 * In this example, we just print out the names of the events received.
+	 * CodeLensEvents are passed to the getCodeLenses method.
 	 */
 	@Override
 	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
 		System.out.println("ExamplePluginSL got " + event);
-		return null;
+		
+		if (event instanceof CodeLensEvent)
+		{
+			CodeLensEvent le = (CodeLensEvent)event;
+			return new RPCMessageList(event.request, getCodeLenses(le.file));
+		}
+		else
+		{
+			return null;
+		}
 	}
 
 	@Override
@@ -64,12 +75,11 @@ public class ExamplePluginSL extends ExamplePlugin
 	 * within the File that is passed from the Client (ie. the file on screen).
 	 * Note that the DEFAULT module can span multiple files!
 	 * 
-	 * This way of splitting lenses into getCodeLenses and applyCodeLenses is just
+	 * This way of splitting lenses into getCodeLenses and getTCCodeLenses is just
 	 * a convention. The only requirement is that this method returns the lenses
 	 * required.
 	 */
-	@Override
-	public JSONArray getCodeLenses(File file)
+	private JSONArray getCodeLenses(File file)
 	{
 		TCPlugin tc = registry.getPlugin("TC");
 		TCModuleList tcModuleList = tc.getTC();
