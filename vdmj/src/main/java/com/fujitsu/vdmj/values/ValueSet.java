@@ -193,7 +193,7 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 	{
    		if (size() > Properties.in_powerset_limit)
 		{
-			throw new InternalException(4176, "Cannot evaluate power set of size " + size());
+			throw new InternalException(0073, "Cannot evaluate power set of size " + size());
 		}
    		
    		this.breakpoint = breakpoint;

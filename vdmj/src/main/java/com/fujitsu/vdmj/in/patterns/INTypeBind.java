@@ -24,8 +24,10 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.patterns.visitors.INBindVisitor;
 import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
+import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -64,6 +66,13 @@ public class INTypeBind extends INBind
 	{
 		try
 		{
+			long size = type.apply(new INTypeSizeVisitor(), ctxt);
+			
+	   		if (size > Properties.in_typebind_limit)
+			{
+				throw new InternalException(0074, "Cannot evaluate type bind of size " + size);
+			}
+
 			return type.apply(new INGetAllValuesVisitor(), ctxt);
 		}
 		catch (InternalException e)		// Used while visitors don't have exceptions

@@ -48,6 +48,8 @@ as the expected and actual values.
 0070, "Definition <name> not found"
 0071, "Native method marked as @VDMOperation: <name>"
 0072, "Native method marked as @VDMFunction: <name>"
+0073, "Cannot evaluate power set of size <size>"
+0074, "Cannot evaluate type bind of size <size>"
 
 
 1000, "Malformed quoted character"
