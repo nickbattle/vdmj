@@ -120,7 +120,7 @@ public class DAPWorkspaceManager
 		"vdmj.rt.diags_guards",
 		"vdmj.rt.diags_timestep",
 		"vdmj.in.powerset_limit",
-		"vdmj.in_typebind_limit"
+		"vdmj.in.typebind_limit"
 	);
 	
 	protected DAPWorkspaceManager()
