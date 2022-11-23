@@ -121,7 +121,8 @@ public class DAPWorkspaceManager
 		"vdmj.rt.max_periodic_overlaps",
 		"vdmj.rt.diags_guards",
 		"vdmj.rt.diags_timestep",
-		"vdmj.in.powerset_limit"
+		"vdmj.in.powerset_limit",
+		"vdmj.in.typebind_limit"
 	);
 	
 	protected DAPWorkspaceManager()
