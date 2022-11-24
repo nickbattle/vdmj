@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2022 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.types.TCCharacterType;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCInMapType;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
@@ -88,14 +89,29 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	{
 		long f = type.from.apply(this, ctxt);
 		long t = type.to.apply(this, ctxt);
-		long r = 0;
+		long r = 1;	// +1 for the empty map
 		
-		for (int z=1; z <= f; z++)
+		for (int z=1; z<=f; z++)
 		{
-			r = r + binCoefficient(f, z) * pow(t, z);
+			r = r + combs(f, z) * pow(t, z);
 		}
 		
-		return r + 1;	// +1 for the empty map
+		return r;
+	}
+
+	@Override
+	public Long caseInMapType(TCInMapType type, Context ctxt)
+	{
+		long f = type.from.apply(this, ctxt);
+		long t = type.to.apply(this, ctxt);
+		long r = 1;	// +1 for the empty map
+		
+		for (int z=1; z<=f; z++)
+		{
+			r = r + combs(f, z) * (z > t ? 0 : perms(t, z));
+		}
+		
+		return r;
 	}
 	
 	@Override
@@ -170,11 +186,11 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	@Override
 	public Long caseUnionType(TCUnionType type, Context ctxt)
 	{
-		long n = 1;
+		long n = 0;
 
 		for (TCType member: type.types)
 		{
-			n = n * member.apply(this, ctxt);
+			n = n + member.apply(this, ctxt);
 		}
 
 		return n;
@@ -287,23 +303,28 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	}
 
 	/**
-	 * Factorial, binary-coefficient and power methods for caseMapType
+	 * Factorial, binary-coefficient, permutations and power methods for caseMapType
 	 */
 	private long fac(long n)
 	{
 		return (n == 0) ? 1 : n * fac(n-1);
 	}
 
-	private long binCoefficient(long n, long k)
+	private long combs(long n, long k)	// k <= n
 	{
 		return fac(n) / (fac(k) * fac(n - k));
 	}
 
-	private long pow(long n, long m)
+	private long perms(long n, long k)	// k <= n
+	{
+		return fac(n) / fac(n - k);
+	}
+
+	private long pow(long n, long k)
 	{
 		long r = 1;
 		
-		for (int i=0; i<m; i++)
+		for (int i=0; i<k; i++)
 		{
 			r = r * n;
 		}
