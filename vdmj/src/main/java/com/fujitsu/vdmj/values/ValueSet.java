@@ -67,6 +67,7 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 
 	public ValueSet(ValueSet from)
 	{
+		super(from.size());
 		addAll(from);
 		isSorted = from.isSorted;
 	}
@@ -79,6 +80,8 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 
 	public ValueSet(Value ...values)
 	{
+		super(values.length);
+		
 		for (Value v: values)
 		{
 			add(v);
@@ -174,7 +177,7 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 
     		while (p.hasNext())
     		{
-    			ValueSet m = new ValueSet();
+    			ValueSet m = new ValueSet(size);
     			int[] perm = p.next();
 
     			for (int i=0; i<size; i++)
@@ -264,7 +267,7 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 	@Override
 	public Object clone()
 	{
-		ValueSet copy = new ValueSet();
+		ValueSet copy = new ValueSet(size());
 
 		for (Value v: this)
 		{
