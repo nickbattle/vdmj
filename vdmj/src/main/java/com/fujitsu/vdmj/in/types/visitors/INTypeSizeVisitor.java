@@ -106,9 +106,9 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 		long t = type.to.apply(this, ctxt);
 		long r = 1;	// +1 for the empty map
 		
-		for (int z=1; z<=f; z++)
+		for (int z=1; z<=f && z<=t; z++)
 		{
-			r = r + combs(f, z) * (z > t ? 0 : perms(t, z));
+			r = r + combs(f, z) * perms(t, z);
 		}
 		
 		return r;
@@ -123,7 +123,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	@Override
 	public Long caseOptionalType(TCOptionalType type, Context ctxt)
 	{
-		return type.type.apply(this, ctxt);
+		return type.type.apply(this, ctxt) + 1;		// + 'nil'
 	}
 
 	@Override
