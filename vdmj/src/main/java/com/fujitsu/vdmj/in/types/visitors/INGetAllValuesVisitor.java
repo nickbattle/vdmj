@@ -138,6 +138,8 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 					
 					results.add(new MapValue(m));
 				}
+				
+				checkBreakpoint(type, new Breakpoint(ctxt.location), ctxt);
 			}
 		}
 		
@@ -170,6 +172,8 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 					
 					results.add(new MapValue(m));
 				}
+				
+				checkBreakpoint(type, new Breakpoint(ctxt.location), ctxt);
 			}
 		}
 		
@@ -456,5 +460,33 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 		}
 		
 		return results;
+	}
+	
+	/**
+	 * Check whether we should drop into the debugger for long expansions.
+	 */
+	private void checkBreakpoint(TCType type, Breakpoint breakpoint, Context ctxt)
+	{
+		// We check the interrupt level here, rather than letting the check
+		// method do it, to avoid incrementing the hit count for the breakpoint
+		// too many times.
+
+		switch (Breakpoint.execInterruptLevel())
+		{
+			case Breakpoint.TERMINATE:
+				long size = type.apply(new INTypeSizeVisitor(), ctxt);
+				throw new InternalException(4176, "Interrupted type expansion size " + size);
+		
+			case Breakpoint.PAUSE:
+				if (breakpoint != null)
+				{
+					breakpoint.enterDebugger(ctxt);
+				}
+				break;
+			
+			case Breakpoint.NONE:
+			default:
+				break;	// carry on
+		}
 	}
 }
