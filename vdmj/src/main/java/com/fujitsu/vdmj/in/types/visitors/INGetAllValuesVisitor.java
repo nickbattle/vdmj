@@ -69,6 +69,9 @@ import com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 import com.fujitsu.vdmj.tc.types.TCVoidReturnType;
 import com.fujitsu.vdmj.tc.types.TCVoidType;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
+import com.fujitsu.vdmj.util.DuplicateKPermutor;
+import com.fujitsu.vdmj.util.KCombinator;
+import com.fujitsu.vdmj.util.KPermutor;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.InvariantValue;
 import com.fujitsu.vdmj.values.MapValue;
@@ -113,49 +116,65 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 	@Override
 	public ValueList caseInMapType(TCInMapType type, Context ctxt)
 	{
-		ValueList maps = caseMapType(type, ctxt);
-		ValueList result = new ValueList();
+		ValueList fromValues = type.from.apply(this, ctxt);
+		ValueList toValues = type.to.apply(this, ctxt);
+		ValueList results = new ValueList();
 		
-		for (Value map: maps)
+		int fromSize = fromValues.size();
+		int toSize = toValues.size();
+		
+		for (int ds=1; ds<=fromSize && ds<=toSize; ds++)		// map domain sizes
 		{
-			MapValue vm = (MapValue)map;
-			
-			if (vm.values.isInjective())
+			for (int[] domain: new KCombinator(fromSize, ds))
 			{
-				result.add(vm);
+				for (int[] range: new KPermutor(toSize, ds))
+				{
+					ValueMap m = new ValueMap();
+
+					for (int i=0; i<ds; i++)
+					{
+						m.put(fromValues.get(domain[i]), toValues.get(range[i]));
+					}
+					
+					results.add(new MapValue(m));
+				}
 			}
 		}
 		
-		return result;
+		results.add(new MapValue());	// empty map
+		return results;
 	}
 
 	@Override
 	public ValueList caseMapType(TCMapType type, Context ctxt)
 	{
-		TCTypeList tuple = new TCTypeList();
-		tuple.add(type.from);
-		tuple.add(type.to);
-		
+		ValueList fromValues = type.from.apply(this, ctxt);
+		ValueList toValues = type.to.apply(this, ctxt);
 		ValueList results = new ValueList();
-		ValueList tuples = ofTypeList(tuple, ctxt);
-		ValueSet set = new ValueSet();
-		set.addAll(tuples);
-		List<ValueSet> psets = set.powerSet(new Breakpoint(ctxt.location), ctxt);
-
-		for (ValueSet map: psets)
+		
+		int fromSize = fromValues.size();
+		int toSize = toValues.size();
+		
+		for (int ds=1; ds<=fromSize; ds++)		// map domain sizes
 		{
-			ValueMap result = new ValueMap();
-			
-			for (Value v: map)
+			for (int[] domain: new KCombinator(fromSize, ds))
 			{
-				TupleValue tv = (TupleValue)v;
-				result.put(tv.values.get(0), tv.values.get(1));
+				for (int[] range: new DuplicateKPermutor(toSize, ds))
+				{
+					ValueMap m = new ValueMap();
+
+					for (int i=0; i<ds; i++)
+					{
+						m.put(fromValues.get(domain[i]), toValues.get(range[i]));
+					}
+					
+					results.add(new MapValue(m));
+				}
 			}
-			
-			results.add(new MapValue(result));
 		}
 		
-		return results; 
+		results.add(new MapValue());	// empty map
+		return results;
 	}
 
 	@Override
