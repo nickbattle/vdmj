@@ -33,7 +33,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.util.Permutor;
+import com.fujitsu.vdmj.util.Selector;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.NameValuePairMap;
@@ -131,7 +131,7 @@ public class INSetPattern extends INPattern
 				continue;
 			}
 
-			Permutor permutor = new Permutor(counts);
+			Selector permutor = new Selector(counts);
 
 			while (permutor.hasNext())
 			{
