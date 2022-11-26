@@ -444,7 +444,7 @@ public class LSPWorkspaceManager
 		{
 			SourceFile source = new SourceFile(file);
 
-			if (source.getCount() > 0)	// ie. not an empty extraction
+			if (source.hasContent())	// ie. not an empty extraction
 			{
 				Diag.info("Processing external file %s", file);
 				PrintWriter spw = new PrintWriter(vdm, encoding.name());

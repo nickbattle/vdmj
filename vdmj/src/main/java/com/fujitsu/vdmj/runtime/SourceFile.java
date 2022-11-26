@@ -93,6 +93,19 @@ public class SourceFile
 	{
 		return lines.size();
 	}
+	
+	public boolean hasContent()
+	{
+		for (String line: lines)
+		{
+			if (!line.trim().isEmpty())		// File has SOME text!
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 	public void printSource(PrintWriter out)
 	{
