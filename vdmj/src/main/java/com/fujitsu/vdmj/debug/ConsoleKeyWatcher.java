@@ -54,6 +54,7 @@ public class ConsoleKeyWatcher extends Thread
 				if (link.isDebugging())		// ie. we're not stopped
 				{
 					int bytes = System.in.available();
+					boolean messages = true;
 					
 					while (bytes-- > 0)
 					{
@@ -62,21 +63,30 @@ public class ConsoleKeyWatcher extends Thread
 						switch (key)
 						{
 							case 'p':
-								System.out.println("Pausing...");
-								Breakpoint.setExecInterrupt(Breakpoint.PAUSE);
+								if (messages)
+								{
+									System.out.println("Pausing...");
+									Breakpoint.setExecInterrupt(Breakpoint.PAUSE);
+									messages = false;
+								}
 								break;
 								
 							case 'q':
-								System.out.println("Terminating...");
-								Breakpoint.setExecInterrupt(Breakpoint.TERMINATE);
-								break;
-								
-							case '\n':
+								if (messages)
+								{
+									System.out.println("Terminating...");
+									Breakpoint.setExecInterrupt(Breakpoint.TERMINATE);
+									messages = false;
+								}
 								break;
 								
 							default:
-								System.out.println("p <enter> to pause");
-								System.out.println("q <enter> to interrupt");
+								if (messages)
+								{
+									System.out.println("p <enter> to pause");
+									System.out.println("q <enter> to interrupt");
+									messages = false;
+								}
 								break;
 						}
 					}
