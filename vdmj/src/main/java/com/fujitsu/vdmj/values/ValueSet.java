@@ -34,8 +34,8 @@ import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.traces.PermuteArray;
+import com.fujitsu.vdmj.util.KCombinator;
 import com.fujitsu.vdmj.util.Utils;
-
 
 /**
  * A set of values. Note that although this class implements a set (no duplicates)
@@ -210,12 +210,49 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 		}
 		else
 		{
-			powerGenerate(sets, new boolean[size()], 0);
+			/**
+			 * There are two algorithms for calculating power sets. One is recursive, the other
+			 * uses the KCombinator iterator. The recursive algorithm uses more stack but does
+			 * not generate as much garbage. The performance is about the same. Change the flag
+			 * below to switch.
+			 */
+			final boolean USE_RECURSIVE = false;
+			
+			if (USE_RECURSIVE)
+			{
+				powerGenerate(sets, new boolean[size()], 0);
+			}
+			else
+			{
+				int size = size();
+				
+				for (int ss=1; ss<=size; ss++)
+				{
+					for (int[] kc: new KCombinator(size, ss))
+					{
+						ValueSet ns = new ValueSet(ss);
+	
+						for (int i=0; i<ss; i++)
+						{
+							ns.addNoCheck(get(kc[i]));
+						}
+						
+						sets.add(ns);
+					}
+	
+					checkBreakpoint(breakpoint, ctxt);
+				}
+	
+				sets.add(new ValueSet());	// Add {}
+			}
 		}
 
 		return sets;
 	}
 
+	/**
+	 * This is the recursive power set algorithm.
+	 */
 	private void powerGenerate(List<ValueSet> result, boolean[] flags, int n)
 	{
 		for (int i=0; i <= 1; ++i)
@@ -240,27 +277,35 @@ public class ValueSet extends Vector<Value>		// NB based on Vector
 
 				result.add(newset);
 
-				// We check the interrupt level here, rather than letting the check
-				// method do it, to avoid incrementing the hit count for the breakpoint
-				// too many times.
-
-				switch (Breakpoint.execInterruptLevel())
-				{
-					case Breakpoint.TERMINATE:
-						throw new InternalException(4176, "Interrupted power set of size " + size());
-				
-					case Breakpoint.PAUSE:
-						if (breakpoint != null)
-						{
-							breakpoint.enterDebugger(ctxt);
-						}
-						break;
-					
-					case Breakpoint.NONE:
-					default:
-						break;	// carry on
-				}
+				checkBreakpoint(breakpoint, ctxt);
 			}
+		}
+	}
+
+	/**
+	 * Check whether we should drop into the debugger for long expansions.
+	 */
+	private void checkBreakpoint(Breakpoint breakpoint, Context ctxt)
+	{
+		// We check the interrupt level here, rather than letting the check
+		// method do it, to avoid incrementing the hit count for the breakpoint
+		// too many times.
+
+		switch (Breakpoint.execInterruptLevel())
+		{
+			case Breakpoint.TERMINATE:
+				throw new InternalException(4176, "Interrupted power set size " + size());
+		
+			case Breakpoint.PAUSE:
+				if (breakpoint != null)
+				{
+					breakpoint.enterDebugger(ctxt);
+				}
+				break;
+			
+			case Breakpoint.NONE:
+			default:
+				break;	// carry on
 		}
 	}
 
