@@ -45,6 +45,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
+import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
@@ -453,11 +454,14 @@ abstract public class CommandReader
 	{
 		line = line.substring(line.indexOf(' ') + 1);
 		ConsoleDebugReader dbg = null;
+		ConsoleKeyWatcher watch = null;
 		
 		try
 		{
 			dbg = new ConsoleDebugReader();
 			dbg.start();
+			watch = new ConsoleKeyWatcher();
+			watch.start();
 			
    			long before = System.currentTimeMillis();
    			println("= " + interpreter.execute(line));
@@ -500,6 +504,11 @@ abstract public class CommandReader
 			if (dbg != null)
 			{
 				dbg.interrupt();	// Stop the debugger reader.
+			}
+			
+			if (watch != null)
+			{
+				watch.interrupt();	// Stop ESC key watcher.
 			}
 		}
 

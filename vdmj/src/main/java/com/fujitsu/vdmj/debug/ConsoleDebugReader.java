@@ -112,7 +112,11 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 			{
 				if (!debuggedThread.equals(lastThread) || !loc.equals(lastLoc))
 				{
-					Console.out.println(Interpreter.getInstance().getSourceLine(loc));
+					if (!loc.file.getName().equals("console"))
+					{
+						Console.out.println(Interpreter.getInstance().getSourceLine(loc));
+					}
+					
 					lastLoc = loc;
 				}
 			}
