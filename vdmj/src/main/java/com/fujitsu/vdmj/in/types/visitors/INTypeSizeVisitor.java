@@ -307,7 +307,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	 */
 	private long fac(long n)
 	{
-		return (n == 0) ? 1 : n * fac(n-1);
+		return (n == 0) ? 1 : Math.multiplyExact(n, fac(n-1));
 	}
 
 	private long combs(long n, long k)	// k <= n
@@ -326,7 +326,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 		
 		for (int i=0; i<k; i++)
 		{
-			r = r * n;
+			r = Math.multiplyExact(r, n);	// catch overflow
 		}
 		
 		return r;
