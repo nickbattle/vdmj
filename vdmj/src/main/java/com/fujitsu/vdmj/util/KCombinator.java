@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * Iteratively produce all k-combinations from n items.
+ * Iteratively produce and ordered list of all k-combinations from n items.
  * Can be used as "for (int[] row: kcombinator)".
  */
 public class KCombinator implements Iterator<int[]>, Iterable<int[]>
@@ -73,6 +73,10 @@ public class KCombinator implements Iterator<int[]>, Iterable<int[]>
         return !finished;
     }
 
+	/**
+	 * NOTE that these combinations are ordered. That is, [1,2] comes before [1,3] or [2,4] etc.
+	 * This is used in the power set calculation to avoid sorting the sets.
+	 */
     @Override
 	public int[] next()
     {

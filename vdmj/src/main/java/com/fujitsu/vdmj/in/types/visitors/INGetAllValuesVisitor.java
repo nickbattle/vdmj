@@ -122,6 +122,7 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 		
 		int fromSize = fromValues.size();
 		int toSize = toValues.size();
+		long check = 0;
 		
 		for (int ds=1; ds<=fromSize && ds<=toSize; ds++)		// map domain sizes
 		{
@@ -137,9 +138,13 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 					}
 					
 					results.add(new MapValue(m));
-				}
-				
-				checkBreakpoint(type, new Breakpoint(ctxt.location), ctxt);
+					
+					if (++check >= 100)
+					{
+						checkBreakpoint(type, new Breakpoint(ctxt.location), ctxt);
+						check = 0;
+					}
+				}				
 			}
 		}
 		
@@ -156,6 +161,7 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 		
 		int fromSize = fromValues.size();
 		int toSize = toValues.size();
+		long check = 0;
 		
 		for (int ds=1; ds<=fromSize; ds++)		// map domain sizes
 		{
@@ -171,9 +177,13 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 					}
 					
 					results.add(new MapValue(m));
+
+					if (++check >= 100)
+					{
+						checkBreakpoint(type, new Breakpoint(ctxt.location), ctxt);
+						check = 0;
+					}
 				}
-				
-				checkBreakpoint(type, new Breakpoint(ctxt.location), ctxt);
 			}
 		}
 		
