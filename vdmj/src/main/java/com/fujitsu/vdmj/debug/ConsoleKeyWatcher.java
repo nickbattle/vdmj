@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.debug;
 
 import java.io.IOException;
 
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 
 /**
@@ -34,9 +35,11 @@ import com.fujitsu.vdmj.runtime.Breakpoint;
 public class ConsoleKeyWatcher extends Thread
 {
 	private static final long PAUSE = 200;
+	private final String expression;
 
-	public ConsoleKeyWatcher()
+	public ConsoleKeyWatcher(String expression)
 	{
+		this.expression = expression;
 		setName("KeyWatcher");
 	}
 	
@@ -51,44 +54,29 @@ public class ConsoleKeyWatcher extends Thread
 			{
 				Thread.sleep(PAUSE);
 				
-				if (link.isDebugging())		// ie. we're not stopped
+				if (link.isDebugging() && Console.in.ready())	// ie. we're not stopped, and there's key data
 				{
-					int bytes = System.in.available();
-					boolean messages = true;
-					
-					while (bytes-- > 0)
+					switch (Console.in.readLine())
 					{
-						int key = System.in.read();
-						
-						switch (key)
-						{
-							case 'p':
-								if (messages)
-								{
-									System.out.println("Pausing...");
-									Breakpoint.setExecInterrupt(Breakpoint.PAUSE);
-									messages = false;
-								}
-								break;
-								
-							case 'q':
-								if (messages)
-								{
-									System.out.println("Terminating...");
-									Breakpoint.setExecInterrupt(Breakpoint.TERMINATE);
-									messages = false;
-								}
-								break;
-								
-							default:
-								if (messages)
-								{
-									System.out.println("p <enter> to pause");
-									System.out.println("q <enter> to interrupt");
-									messages = false;
-								}
-								break;
-						}
+						case "p":
+						case "pause":
+							Console.out.println("Pausing...");
+							Breakpoint.setExecInterrupt(Breakpoint.PAUSE);
+							break;
+							
+						case "q":
+						case "quit":
+						case "k":
+						case "kill":
+							Console.out.println("Terminating...");
+							Breakpoint.setExecInterrupt(Breakpoint.TERMINATE);
+							break;
+							
+						default:
+							Console.out.println("Still executing: " + expression);
+							Console.out.println("[p]ause to pause execution");
+							Console.out.println("[q]uit or [k]ill to cancel");
+							break;
 					}
 				}
 			}

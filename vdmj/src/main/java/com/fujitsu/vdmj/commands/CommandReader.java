@@ -460,7 +460,7 @@ abstract public class CommandReader
 		{
 			dbg = new ConsoleDebugReader();
 			dbg.start();
-			watch = new ConsoleKeyWatcher();
+			watch = new ConsoleKeyWatcher(line);
 			watch.start();
 			
    			long before = System.currentTimeMillis();
