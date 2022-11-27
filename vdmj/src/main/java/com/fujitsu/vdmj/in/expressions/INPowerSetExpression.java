@@ -76,7 +76,7 @@ public class INPowerSetExpression extends INUnaryExpression
 				breakpoint.enterDebugger(ctxt);
 			}
 
-			Value ps = new SetValue(rs);
+			Value ps = new SetValue(rs, false);		// Already sorted
 			
 			// And again here, the sort above can take a while, so we re-check the
 			// interrupt flag to try to respond while within the power expression.

@@ -122,7 +122,7 @@ public class KCombinator implements Iterator<int[]>, Iterable<int[]>
     
     public static void main(String[] args)
     {
-    	KCombinator c = new KCombinator(4, 2);
+    	KCombinator c = new KCombinator(6, 3);
     	
     	for (int[] comb: c)
     	{
