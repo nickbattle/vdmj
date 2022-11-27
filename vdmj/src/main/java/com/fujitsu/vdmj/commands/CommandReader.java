@@ -623,14 +623,14 @@ abstract public class CommandReader
 			}
 			
 			ConsoleDebugReader dbg = null;
+			ConsoleKeyWatcher watcher = null;
 			
 			try
 			{
-				if (debug)
-				{
-					dbg = new ConsoleDebugReader();
-					dbg.start();
-				}
+				dbg = new ConsoleDebugReader();
+				dbg.start();
+				watcher = new ConsoleKeyWatcher("runtrace");
+				watcher.start();
 
 				boolean passed = interpreter.runtrace(line, startTest, endTest, debug, reduction, reductionType, traceseed);
     			
@@ -651,9 +651,14 @@ abstract public class CommandReader
 			}
 			finally
 			{
-				if (debug)
+				if (dbg != null)
 				{
 					dbg.interrupt();
+				}
+				
+				if (watcher != null)
+				{
+					watcher.interrupt();
 				}
 			}
 
@@ -950,11 +955,15 @@ abstract public class CommandReader
 		LexLocation.clearLocations();
 		println("Cleared all coverage information");
 		ConsoleDebugReader dbg = null;
+		ConsoleKeyWatcher watcher = null;
 
 		try
 		{
 			dbg = new ConsoleDebugReader();
 			dbg.start();
+			watcher = new ConsoleKeyWatcher("init");
+			watcher.start();
+			
 			interpreter.init();
 		}
 		catch (Exception e)
@@ -966,6 +975,11 @@ abstract public class CommandReader
 			if (dbg != null)
 			{
 				dbg.interrupt();
+			}
+			
+			if (watcher != null)
+			{
+				watcher.interrupt();
 			}
 		}
 		
