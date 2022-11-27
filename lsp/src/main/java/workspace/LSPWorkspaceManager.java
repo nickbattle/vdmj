@@ -190,7 +190,7 @@ public class LSPWorkspaceManager
 		System.setProperty("vdmj.parser.tabstop", "1");	// Forced, for LSP location offsets
 		Diag.info("Reading properties from %s", PROPERTIES);
 		Properties.init(PROPERTIES);
-		loadAllProjectFiles();
+		loadAllProjectFiles(true);
 		
 		RPCMessageList responses = new RPCMessageList(request, new LSPInitializeResponse());
 		responses.addAll(eventhub.publish(new InitializeEvent(request)));
@@ -254,12 +254,17 @@ public class LSPWorkspaceManager
 		return clientInfo.get(key);
 	}
 
-	private void loadAllProjectFiles() throws IOException
+	private void loadAllProjectFiles(boolean deleteExternals) throws IOException
 	{
 		projectFiles.clear();
-		removeExternalFiles();
-		externalFiles.clear();
-		externalFilesToWarn.clear();
+		
+		if (deleteExternals)
+		{
+			removeExternalFiles();
+			externalFiles.clear();
+			externalFilesToWarn.clear();
+		}
+		
 		loadVDMIgnore();
 		
 		File ordering = new File(rootUri, ORDERING);
@@ -957,7 +962,7 @@ public class LSPWorkspaceManager
 				server.writeMessage(RPCRequest.notification("textDocument/publishDiagnostics", noerrs));
 			}
 
-			loadAllProjectFiles();
+			loadAllProjectFiles(false);		// don't delete externals, to avoid another changeWatchedFiles
 		}
 		
 		if (actionCode == RELOAD_AND_CHECK || actionCode == RECHECK)
