@@ -106,12 +106,14 @@ public class LSPWorkspaceManager
 	private File rootUri = null;
 	private Map<File, StringBuilder> projectFiles = new LinkedHashMap<File, StringBuilder>();
 	private Set<File> openFiles = new HashSet<File>();
-	private boolean orderedFiles = false;
-	private Set<File> ignores = new HashSet<File>();
 	private boolean checkInProgress = false;
+
+	private List<File> vdmignore = new Vector<File>();
+	private List<File> ordering = new Vector<File>();
+	private boolean hasOrderedFiles = false;
 	private Map<File, FileTime> externalFiles = new HashMap<File, FileTime>();
 	private Set<File> externalFilesToWarn = new HashSet<File>();
-	private Set<File> externals = new HashSet<File>();
+	private List<File> externals = new Vector<File>();
 	
 	private static final String ORDERING = ".vscode/ordering";
 	private static final String VDMIGNORE = ".vscode/vdmignore";
@@ -256,63 +258,26 @@ public class LSPWorkspaceManager
 		return clientInfo.get(key);
 	}
 
-	private void loadAllProjectFiles(boolean deleteExternals) throws IOException
+	private void loadAllProjectFiles(boolean reloadExternals) throws IOException
 	{
 		projectFiles.clear();
 		
-		if (deleteExternals)
+		if (reloadExternals)
 		{
 			removeExternalFiles();
 			externalFiles.clear();
 			externalFilesToWarn.clear();
 		}
 		
-		ignores = loadFileSet(VDMIGNORE);
-		externals = loadFileSet(EXTERNALS);
+		vdmignore = readFileList(VDMIGNORE);
+		externals = readFileList(EXTERNALS);
+		ordering  = readFileList(ORDERING);
 		
-		File ordering = new File(rootUri, ORDERING);
-		orderedFiles = ordering.exists();
+		hasOrderedFiles = !ordering.isEmpty();
 		
-		if (orderedFiles)
+		if (hasOrderedFiles)
 		{
-			Diag.info("Loading ordered project files from %s", ordering);
-			BufferedReader br = null;
-			
-			try
-			{
-				br = new BufferedReader(new FileReader(ordering));
-				String source = br.readLine();
-				
-				while (source != null)
-				{
-					// Use canonical file to allow "./folder/file"
-					File file = new File(rootUri, source).getCanonicalFile();
-					Diag.info("Loading %s", file);
-					
-					if (file.exists())
-					{
-						if (isExternalFile(file))
-						{
-							loadExternalFile(file);
-						}
-						else
-						{
-							loadFile(file);
-						}
-					}
-					else
-					{
-						Diag.error("Ordering file not found: " + file);
-						sendMessage(ERROR_MSG, "Ordering file not found: " + file);
-					}
-					
-					source = br.readLine();
-				}
-			}
-			finally
-			{
-				if (br != null)	br.close();
-			}
+			loadOrderedFiles();
 		}
 		else
 		{
@@ -320,20 +285,47 @@ public class LSPWorkspaceManager
 			loadProjectFiles(rootUri);
 		}
 	}
-
-	private Set<File> loadFileSet(String file) throws IOException
+	
+	private void loadOrderedFiles() throws IOException
 	{
-		Set<File> contents = new HashSet<File>();
-		File fileSet = new File(rootUri, file);
+		Diag.info("Using ordered project files from %s", ORDERING);
 		
-		if (fileSet.exists())
+		for (File file: ordering)
 		{
-			Diag.info("Reading " + file);
+			Diag.info("Loading %s", file);
+			
+			if (file.exists())
+			{
+				if (isExternalFile(file))
+				{
+					loadExternalFile(file);
+				}
+				else
+				{
+					loadFile(file);
+				}
+			}
+			else
+			{
+				Diag.error("Ordering item not found: " + file);
+				sendMessage(ERROR_MSG, "Ordering item not found: " + file);
+			}
+		}
+	}
+
+	private List<File> readFileList(String filename) throws IOException
+	{
+		List<File> contents = new Vector<File>();
+		File fileList = new File(rootUri, filename);
+		
+		if (fileList.exists())
+		{
+			Diag.info("Reading " + filename);
 			BufferedReader br = null;
 	
 			try
 			{
-				br = new BufferedReader(new FileReader(fileSet));
+				br = new BufferedReader(new FileReader(fileList));
 				String source = br.readLine();
 				
 				while (source != null)
@@ -341,14 +333,14 @@ public class LSPWorkspaceManager
 					// Use canonical file to allow "./folder/file"
 					File item = new File(rootUri, source).getCanonicalFile();
 					contents.add(item);
-					Diag.info("Loaded %s from %s", item, file);
+					Diag.info("Read %s from %s", item, filename);
 					source = br.readLine();
 				}
 			}
 			catch (IOException e)
 			{
 				Diag.error(e);
-				Diag.error("Cannot read " + file);
+				Diag.error("Cannot read " + filename);
 			}
 			finally
 			{
@@ -371,7 +363,7 @@ public class LSPWorkspaceManager
 			{
 				continue;	// ignore .generated, .vscode etc
 			}
-			if (ignoredFile(file))
+			else if (ignoredFile(file))
 			{
 				continue;	// ignore files in VDMIGNORE
 			}
@@ -379,28 +371,36 @@ public class LSPWorkspaceManager
 			{
 				loadProjectFiles(file);
 			}
-			else
+			else if (filter.accept(root, file.getName()))
 			{
-				if (filter.accept(root, file.getName()))
+				loadFile(file);
+			}
+			else if (isExternalFile(file))
+			{
+				if (externals.isEmpty() || externals.contains(file))
 				{
-					loadFile(file);
+					loadExternalFile(file);
 				}
-				else if (isExternalFile(file))
+				else
 				{
-					if (externals.isEmpty() || externals.contains(file))
+					File extract = getExtractedName(file);
+					
+					if (extract.exists())
 					{
-						loadExternalFile(file);
+						Diag.info("Removing ignored VDM extract: %s", extract);
+						extract.delete();
+						externalFiles.remove(extract);
 					}
 					else
 					{
 						Diag.fine("Ignoring external file %s", file);
 					}
 				}
-				else
-				{
-					Diag.warning("Ignoring file %s", file.getPath());
-					ignored.add(file);
-				}
+			}
+			else
+			{
+				Diag.warning("Ignoring file %s", file.getPath());
+				ignored.add(file);
 			}
 		}
 		
@@ -447,15 +447,30 @@ public class LSPWorkspaceManager
 		Diag.info("Loaded file %s encoding %s", file.getPath(), encoding.displayName());
 	}
 	
+	private File getExtractedName(File file)
+	{
+		return new File(file.getPath() + "." + Settings.dialect.getArgstring().substring(1));
+	}
+	
 	private void loadExternalFile(File file) throws IOException
 	{
-		File vdm = new File(file.getPath() + "." + Settings.dialect.getArgstring().substring(1));
+		File vdm = getExtractedName(file);
 		
 		if (vdm.exists())
 		{
-			Diag.info("Not overwriting existing external file: %s", vdm);
-			externalFiles.put(vdm, FileTime.fromMillis(0));
-			externalFilesToWarn.add(vdm);
+			BasicFileAttributes attr = Files.readAttributes(vdm.toPath(), BasicFileAttributes.class);
+			FileTime time = attr.lastModifiedTime();
+			
+			if (time.equals(externalFiles.get(vdm)))
+			{
+				// Not changed by the user, so still delete at the end (FileTime unchanged)
+				Diag.info("External file has not changed: %s", vdm);
+			}
+			else
+			{
+				Diag.info("Not overwriting changed external file: %s", vdm);
+				externalFiles.put(vdm, FileTime.fromMillis(0));
+			}
 		}
 		else
 		{
@@ -500,7 +515,7 @@ public class LSPWorkspaceManager
 	
 	private boolean ignoredFile(File file)
 	{
-		if (ignores.contains(file))
+		if (vdmignore.contains(file))
 		{
 			return true;
 		}
@@ -508,7 +523,7 @@ public class LSPWorkspaceManager
 		{
 			String path = file.getAbsolutePath();
 			
-			for (File i: ignores)
+			for (File i: vdmignore)
 			{
 				if (i.isDirectory())
 				{
@@ -542,6 +557,11 @@ public class LSPWorkspaceManager
 		for (Entry<File, FileTime> extfile: externalFiles.entrySet())
 		{
 			File file = extfile.getKey();
+			
+			if (!file.exists())
+			{
+				continue;
+			}
 			
 			try
 			{
@@ -683,7 +703,7 @@ public class LSPWorkspaceManager
 		
 		StringBuilder existing = projectFiles.get(file);
 		
-		if (orderedFiles && existing == null)
+		if (hasOrderedFiles && existing == null)
 		{
 			Diag.error("File not in ordering list: %s", file);
 			sendMessage(ERROR_MSG, "Ordering file out of date? " + file);
@@ -875,7 +895,7 @@ public class LSPWorkspaceManager
 				}
 				else if (!projectFiles.keySet().contains(file))	
 				{
-					if (orderedFiles)
+					if (hasOrderedFiles)
 					{
 						Diag.error("File not in ordering list: %s", file);
 						sendMessage(WARNING_MSG, "Ordering file out of date? " + file);
