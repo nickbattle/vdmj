@@ -111,9 +111,11 @@ public class LSPWorkspaceManager
 	private boolean checkInProgress = false;
 	private Map<File, FileTime> externalFiles = new HashMap<File, FileTime>();
 	private Set<File> externalFilesToWarn = new HashSet<File>();
+	private Set<File> externals = new HashSet<File>();
 	
 	private static final String ORDERING = ".vscode/ordering";
 	private static final String VDMIGNORE = ".vscode/vdmignore";
+	private static final String EXTERNALS = ".vscode/externals";
 	public static final String PROPERTIES = ".vscode/vdmj.properties";
 
 	private LSPWorkspaceManager()
@@ -265,7 +267,8 @@ public class LSPWorkspaceManager
 			externalFilesToWarn.clear();
 		}
 		
-		loadVDMIgnore();
+		ignores = loadFileSet(VDMIGNORE);
+		externals = loadFileSet(EXTERNALS);
 		
 		File ordering = new File(rootUri, ORDERING);
 		orderedFiles = ordering.exists();
@@ -318,40 +321,42 @@ public class LSPWorkspaceManager
 		}
 	}
 
-	private void loadVDMIgnore() throws IOException
+	private Set<File> loadFileSet(String file) throws IOException
 	{
-		File ignoreFile = new File(rootUri, VDMIGNORE);
-		ignores.clear();
+		Set<File> contents = new HashSet<File>();
+		File fileSet = new File(rootUri, file);
 		
-		if (ignoreFile.exists())
+		if (fileSet.exists())
 		{
-			Diag.info("Reading " + VDMIGNORE);
+			Diag.info("Reading " + file);
 			BufferedReader br = null;
 	
 			try
 			{
-				br = new BufferedReader(new FileReader(ignoreFile));
+				br = new BufferedReader(new FileReader(fileSet));
 				String source = br.readLine();
 				
 				while (source != null)
 				{
 					// Use canonical file to allow "./folder/file"
-					File file = new File(rootUri, source).getCanonicalFile();
-					ignores.add(file);
-					Diag.info("Ignoring %s", file);
+					File item = new File(rootUri, source).getCanonicalFile();
+					contents.add(item);
+					Diag.info("Loaded %s from %s", item, file);
 					source = br.readLine();
 				}
 			}
 			catch (IOException e)
 			{
 				Diag.error(e);
-				Diag.error("Cannot read " + VDMIGNORE);
+				Diag.error("Cannot read " + file);
 			}
 			finally
 			{
 				if (br != null)	br.close();
 			}
 		}
+		
+		return contents;
 	}
 
 	private void loadProjectFiles(File root) throws IOException
@@ -382,7 +387,14 @@ public class LSPWorkspaceManager
 				}
 				else if (isExternalFile(file))
 				{
-					loadExternalFile(file);
+					if (externals.isEmpty() || externals.contains(file))
+					{
+						loadExternalFile(file);
+					}
+					else
+					{
+						Diag.fine("Ignoring external file %s", file);
+					}
 				}
 				else
 				{
@@ -831,6 +843,11 @@ public class LSPWorkspaceManager
 					Diag.info("Created ordering file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
 				}
+				else if (file.equals(new File(rootUri, EXTERNALS)))
+				{
+					Diag.info("Created externals file, rebuilding");
+					actionCode = RELOAD_AND_CHECK;
+				}
 				else if (file.equals(new File(rootUri, VDMIGNORE)))
 				{
 					Diag.info("Created vdmignore file, rebuilding");
@@ -848,7 +865,7 @@ public class LSPWorkspaceManager
 				}
 				else if (isExternalFile(file))
 				{
-					Diag.info("Created new document file, rebuilding");
+					Diag.info("Created new external file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
@@ -889,6 +906,11 @@ public class LSPWorkspaceManager
 					Diag.info("Changed ordering file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
 				}
+				else if (file.equals(new File(rootUri, EXTERNALS)))
+				{
+					Diag.info("Changed externals file, rebuilding");
+					actionCode = RELOAD_AND_CHECK;
+				}
 				else if (file.equals(new File(rootUri, VDMIGNORE)))
 				{
 					Diag.info("Changed vdmignore file, rebuilding");
@@ -906,7 +928,7 @@ public class LSPWorkspaceManager
 				}
 				else if (isExternalFile(file))
 				{
-					Diag.info("Updated document file, rebuilding");
+					Diag.info("Updated external file, rebuilding");
 					actionCode = RELOAD_AND_CHECK;
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
