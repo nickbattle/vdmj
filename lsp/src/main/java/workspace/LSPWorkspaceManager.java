@@ -334,15 +334,15 @@ public class LSPWorkspaceManager
 			try
 			{
 				br = new BufferedReader(new FileReader(fileList));
-				String source = br.readLine();
+				String source = br.readLine().trim();
 				
-				while (source != null)
+				while (source != null && !source.isEmpty())
 				{
 					// Use canonical file to allow "./folder/file"
 					File item = new File(rootUri, source).getCanonicalFile();
 					contents.add(item);
 					Diag.info("Read %s from %s", item, filename);
-					source = br.readLine();
+					source = br.readLine().trim();
 				}
 			}
 			catch (IOException e)
@@ -547,7 +547,19 @@ public class LSPWorkspaceManager
 	
 	private boolean isExtractedFile(File file)
 	{
-		return externalFiles.containsKey(file);		// eg. *.adoc.vdmsl
+		// Check whether the file, less the dialect extension, is external.
+		String suffix = "." + Settings.dialect.getArgstring().substring(1);	// eg. ".vdmsl"
+		String path = file.getPath();
+		
+		if (path.endsWith(suffix))
+		{
+			File prefix = new File(path.substring(0, path.lastIndexOf(suffix)));
+			return isExternalFile(prefix);
+		}
+		else
+		{
+			return false;
+		}
 	}
 	
 	private void removeExtractedFiles()
