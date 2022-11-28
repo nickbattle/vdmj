@@ -112,8 +112,9 @@ public class LSPWorkspaceManager
 	private List<File> ordering = new Vector<File>();
 	private boolean hasOrderedFiles = false;
 	private Map<File, FileTime> externalFiles = new HashMap<File, FileTime>();
-	private Set<File> externalFilesToWarn = new HashSet<File>();
+	private Set<File> externalFilesWarned = new HashSet<File>();
 	private List<File> externals = new Vector<File>();
+	private List<File> ignoreChangesList = new Vector<File>();
 	
 	private static final String ORDERING = ".vscode/ordering";
 	private static final String VDMIGNORE = ".vscode/vdmignore";
@@ -194,7 +195,7 @@ public class LSPWorkspaceManager
 		System.setProperty("vdmj.parser.tabstop", "1");	// Forced, for LSP location offsets
 		Diag.info("Reading properties from %s", PROPERTIES);
 		Properties.init(PROPERTIES);
-		loadAllProjectFiles(true);
+		loadAllProjectFiles();
 		
 		RPCMessageList responses = new RPCMessageList(request, new LSPInitializeResponse());
 		responses.addAll(eventhub.publish(new InitializeEvent(request)));
@@ -258,16 +259,13 @@ public class LSPWorkspaceManager
 		return clientInfo.get(key);
 	}
 
-	private void loadAllProjectFiles(boolean reloadExternals) throws IOException
+	private void loadAllProjectFiles() throws IOException
 	{
 		projectFiles.clear();
+		externalFilesWarned.clear();	// Re-warn after changes
 		
-		if (reloadExternals)
-		{
-			removeExternalFiles();
-			externalFiles.clear();
-			externalFilesToWarn.clear();
-		}
+		removeExtractedFiles();
+		externalFiles.clear();
 		
 		vdmignore = readFileList(VDMIGNORE);
 		externals = readFileList(EXTERNALS);
@@ -292,11 +290,21 @@ public class LSPWorkspaceManager
 		
 		for (File file: ordering)
 		{
-			Diag.info("Loading %s", file);
+			Diag.info("Loading ordered item %s", file);
 			
 			if (file.exists())
 			{
-				if (isExternalFile(file))
+				if (onDotPath(file))
+				{
+					Diag.info("Ignoring ordering item on dot path: %s", file);
+					sendMessage(WARNING_MSG, "Ignoring ordering item on dot path: " + file);
+				}
+				else if (ignoredFile(file))
+				{
+					Diag.info("Ignoring ordering item in vdmignore: %s", file);
+					sendMessage(WARNING_MSG, "Ignoring ordering item in vdmignore: " + file);
+				}
+				else if (isExternalFile(file))
 				{
 					loadExternalFile(file);
 				}
@@ -458,24 +466,13 @@ public class LSPWorkspaceManager
 		
 		if (vdm.exists())
 		{
-			BasicFileAttributes attr = Files.readAttributes(vdm.toPath(), BasicFileAttributes.class);
-			FileTime time = attr.lastModifiedTime();
-			
-			if (time.equals(externalFiles.get(vdm)))
-			{
-				// Not changed by the user, so still delete at the end (FileTime unchanged)
-				Diag.info("External file has not changed: %s", vdm);
-			}
-			else
-			{
-				Diag.info("Not overwriting changed external file: %s", vdm);
-				externalFiles.put(vdm, FileTime.fromMillis(0));
-			}
+			Diag.info("Not overwriting existing external file: %s", vdm);
+			externalFiles.put(vdm, FileTime.fromMillis(0));
 		}
 		else
 		{
 			SourceFile source = new SourceFile(file);
-
+	
 			if (source.hasContent())	// ie. not an empty extraction
 			{
 				Diag.info("Processing external file %s", file);
@@ -488,7 +485,6 @@ public class LSPWorkspaceManager
 	
 				BasicFileAttributes attr = Files.readAttributes(vdm.toPath(), BasicFileAttributes.class);
 				externalFiles.put(vdm, attr.lastModifiedTime());
-				externalFilesToWarn.add(vdm);
 			}
 			else
 			{
@@ -499,7 +495,6 @@ public class LSPWorkspaceManager
 
 	private boolean onDotPath(File file)
 	{
-		// Ignore files on "dot" paths
 		String[] parts = file.getAbsolutePath().split(Pattern.quote(File.separator));
 		
 		for (String part: parts)
@@ -550,9 +545,14 @@ public class LSPWorkspaceManager
 		return BacktrackInputReader.isExternalFormat(file);
 	}
 	
-	private void removeExternalFiles()
+	private boolean isExtractedFile(File file)
 	{
-		Diag.info("Clearing unchanged external files");
+		return externalFiles.containsKey(file);		// eg. *.adoc.vdmsl
+	}
+	
+	private void removeExtractedFiles()
+	{
+		Diag.info("Clearing unchanged extracted files");
 		
 		for (Entry<File, FileTime> extfile: externalFiles.entrySet())
 		{
@@ -569,17 +569,18 @@ public class LSPWorkspaceManager
 				
 				if (attr.lastModifiedTime().equals(extfile.getValue()))
 				{
-					Diag.info("Deleting unchanged external file %s", file);
+					Diag.info("Deleting unchanged extracted file %s", file);
 					file.delete();
+					ignoreChangesList.add(file);
 				}
 				else
 				{
-					Diag.info("Keeping changed external file %s", file);
+					Diag.info("Keeping changed extracted file %s", file);
 				}
 			}
 			catch (IOException e)
 			{
-				Diag.error("Problem cleaning up external %s: %s", file, e);
+				Diag.error("Problem cleaning up %s: %s", file, e);
 			}
 		}
 	}
@@ -774,10 +775,10 @@ public class LSPWorkspaceManager
 		}
 		else
 		{
-			if (externalFilesToWarn.contains(file))
+			if (externalFiles.containsKey(file) && !externalFilesWarned.contains(file))
 			{
 				sendMessage(WARNING_MSG, "WARNING: Changing generated VDM source: " + file);
-				externalFilesToWarn.remove(file);
+				externalFilesWarned.add(file);
 			}
 			
 			StringBuilder buffer = projectFiles.get(file);
@@ -850,6 +851,18 @@ public class LSPWorkspaceManager
 		FilenameFilter filter = getFilenameFilter();
 		int actionCode = DO_NOTHING;
 		
+		/**
+		 * This is a cludge to avoid loops caused by the build clearing the extracted files
+		 * generating changes that cause more builds. The list is set in removeExtractedFiles,
+		 * and cleared here once an event has been received.
+		 */
+		if (ignoreChangesList.contains(file))
+		{
+			Diag.info("Ignoring %s event for %s", type, file);
+			ignoreChangesList.remove(file);
+			return DO_NOTHING;
+		}
+		
 		switch (type)
 		{
 			case CREATE:
@@ -885,8 +898,13 @@ public class LSPWorkspaceManager
 				}
 				else if (isExternalFile(file))
 				{
-					Diag.info("Created new external file, rebuilding");
+					Diag.info("Created new external file: %s", file);
 					actionCode = RELOAD_AND_CHECK;
+				}
+				else if (isExtractedFile(file))
+				{
+					Diag.info("Created new extracted file: %s", file);
+					actionCode = DO_NOTHING;	// Created by a build anyway
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
@@ -938,18 +956,23 @@ public class LSPWorkspaceManager
 				}
 				else if (onDotPath(file))
 				{
-					Diag.info("Ignoring file on dot path: %s", file);
+					Diag.info("Ignoring changed file on dot path: %s", file);
 					actionCode = DO_NOTHING;
 				}
 				else if (ignoredFile(file))
 				{
-					Diag.info("Ignoring %s file in vdmignore", file);
+					Diag.info("Ignoring changed %s file in vdmignore", file);
 					actionCode = DO_NOTHING;			
 				}
 				else if (isExternalFile(file))
 				{
-					Diag.info("Updated external file, rebuilding");
+					Diag.info("Updated external file: %s", file);
 					actionCode = RELOAD_AND_CHECK;
+				}
+				else if (isExtractedFile(file))
+				{
+					Diag.info("Updated extracted file: %s", file);
+					actionCode = RECHECK;
 				}
 				else if (!filter.accept(file.getParentFile(), file.getName()))
 				{
@@ -981,6 +1004,11 @@ public class LSPWorkspaceManager
 					Diag.info("Ignoring deleted file in vdmignore: %s", file);
 					actionCode = DO_NOTHING;			
 				}
+				else if (isExtractedFile(file))
+				{
+					Diag.info("Deleted extracted file: %s", file);
+					actionCode = RELOAD_AND_CHECK;	// Could be a user delete!
+				}
 				else
 				{
 					Diag.info("Deleted %s (dir/file?), rebuilding", file);
@@ -1004,7 +1032,7 @@ public class LSPWorkspaceManager
 				server.writeMessage(RPCRequest.notification("textDocument/publishDiagnostics", noerrs));
 			}
 
-			loadAllProjectFiles(false);		// don't delete externals, to avoid another changeWatchedFiles
+			loadAllProjectFiles();
 		}
 		
 		if (actionCode == RELOAD_AND_CHECK || actionCode == RECHECK)
@@ -1415,7 +1443,7 @@ public class LSPWorkspaceManager
 		Diag.info("Shutting down server");
 		eventhub.publish(new ShutdownEvent(request));
 		LSPServer.getInstance().setInitialized(false);
-		removeExternalFiles();
+		removeExtractedFiles();
 		reset();	// Clear registry, eventhub and singleton
 		
 		return new RPCMessageList(request);
