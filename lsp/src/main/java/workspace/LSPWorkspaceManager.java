@@ -333,15 +333,18 @@ public class LSPWorkspaceManager
 			try
 			{
 				br = new BufferedReader(new FileReader(fileList));
-				String source = br.readLine().trim();
 				
-				while (source != null && !source.isEmpty())
+				for (String source = br.readLine(); source != null; source = br.readLine())
 				{
-					// Use canonical file to allow "./folder/file"
-					File item = new File(rootUri, source).getCanonicalFile();
-					contents.add(item);
-					Diag.info("Read %s from %s", item, filename);
-					source = br.readLine().trim();
+					source = source.trim();
+					
+					if (!source.isEmpty())
+					{
+						// Use canonical file to allow "./folder/file"
+						File item = new File(rootUri, source).getCanonicalFile();
+						contents.add(item);
+						Diag.info("Read %s from %s", item, filename);
+					}
 				}
 			}
 			catch (IOException e)
@@ -467,6 +470,7 @@ public class LSPWorkspaceManager
 		{
 			Diag.info("Not overwriting existing extract file: %s", extract);
 			externalFiles.put(extract, FileTime.fromMillis(0));
+			loadFile(extract);
 		}
 		else
 		{
@@ -716,7 +720,7 @@ public class LSPWorkspaceManager
 		
 		StringBuilder existing = projectFiles.get(file);
 		
-		if (hasOrderedFiles && existing == null)
+		if (hasOrderedFiles && !isExtractedFile(file) && existing == null)
 		{
 			Diag.error("File not in ordering list: %s", file);
 			sendMessage(ERROR_MSG, "Ordering file out of date? " + file);
