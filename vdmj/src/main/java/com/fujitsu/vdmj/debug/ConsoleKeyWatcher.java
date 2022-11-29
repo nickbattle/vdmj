@@ -36,10 +36,12 @@ public class ConsoleKeyWatcher extends Thread
 {
 	private static final long PAUSE = 200;
 	private final String expression;
+	private final long startTime;
 
 	public ConsoleKeyWatcher(String expression)
 	{
 		this.expression = expression;
+		this.startTime = System.currentTimeMillis();
 		setName("KeyWatcher");
 	}
 	
@@ -73,7 +75,10 @@ public class ConsoleKeyWatcher extends Thread
 							break;
 							
 						default:
-							Console.out.println("Still executing: " + expression);
+							long now = System.currentTimeMillis();
+					  		double runtime = (double)(now - startTime)/1000;
+					  	 
+							Console.out.println("Running " + expression + " for " + runtime + "s");
 							Console.out.println("[p]ause to pause execution");
 							Console.out.println("[q]uit or [k]ill to cancel");
 							break;
