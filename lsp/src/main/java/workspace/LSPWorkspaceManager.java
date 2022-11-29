@@ -262,7 +262,7 @@ public class LSPWorkspaceManager
 	private void loadAllProjectFiles() throws IOException
 	{
 		projectFiles.clear();
-		externalFilesWarned.clear();	// Re-warn after changes
+		externalFilesWarned.clear();	// Re-warn after reloads
 		
 		removeExtractedFiles();
 		externalFiles.clear();
@@ -275,6 +275,7 @@ public class LSPWorkspaceManager
 		
 		if (hasOrderedFiles)
 		{
+			Diag.info("Loading ordered project files from %s", ORDERING);
 			loadOrderedFiles();
 		}
 		else
@@ -286,8 +287,6 @@ public class LSPWorkspaceManager
 	
 	private void loadOrderedFiles() throws IOException
 	{
-		Diag.info("Using ordered project files from %s", ORDERING);
-		
 		for (File file: ordering)
 		{
 			Diag.info("Loading ordered item %s", file);
@@ -377,7 +376,7 @@ public class LSPWorkspaceManager
 			}
 			else if (file.isDirectory())
 			{
-				loadProjectFiles(file);
+				loadProjectFiles(file);		// Recurse into subdir
 			}
 			else if (filter.accept(root, file.getName()))
 			{
@@ -462,12 +461,12 @@ public class LSPWorkspaceManager
 	
 	private void loadExternalFile(File file) throws IOException
 	{
-		File vdm = getExtractedName(file);
+		File extract = getExtractedName(file);
 		
-		if (vdm.exists())
+		if (extract.exists())
 		{
-			Diag.info("Not overwriting existing external file: %s", vdm);
-			externalFiles.put(vdm, FileTime.fromMillis(0));
+			Diag.info("Not overwriting existing extract file: %s", extract);
+			externalFiles.put(extract, FileTime.fromMillis(0));
 		}
 		else
 		{
@@ -476,15 +475,15 @@ public class LSPWorkspaceManager
 			if (source.hasContent())	// ie. not an empty extraction
 			{
 				Diag.info("Processing external file %s", file);
-				PrintWriter spw = new PrintWriter(vdm, encoding.name());
+				PrintWriter spw = new PrintWriter(extract, encoding.name());
 				source.printSource(spw);
 				spw.close();
-				Diag.info("Extracted source written to " + vdm);
+				Diag.info("Extracted source written to " + extract);
 				
-				loadFile(vdm);
+				loadFile(extract);
 	
-				BasicFileAttributes attr = Files.readAttributes(vdm.toPath(), BasicFileAttributes.class);
-				externalFiles.put(vdm, attr.lastModifiedTime());
+				BasicFileAttributes attr = Files.readAttributes(extract.toPath(), BasicFileAttributes.class);
+				externalFiles.put(extract, attr.lastModifiedTime());
 			}
 			else
 			{
@@ -554,7 +553,7 @@ public class LSPWorkspaceManager
 		if (path.endsWith(suffix))
 		{
 			File prefix = new File(path.substring(0, path.lastIndexOf(suffix)));
-			return isExternalFile(prefix);
+			return isExternalFile(prefix);	// prefix of file is external => file extracted
 		}
 		else
 		{
@@ -565,34 +564,35 @@ public class LSPWorkspaceManager
 	private void removeExtractedFiles()
 	{
 		Diag.info("Clearing unchanged extracted files");
+		ignoreChangesList.clear();
 		
 		for (Entry<File, FileTime> extfile: externalFiles.entrySet())
 		{
-			File file = extfile.getKey();
+			File extract = extfile.getKey();
 			
-			if (!file.exists())
+			if (!extract.exists())
 			{
 				continue;
 			}
 			
 			try
 			{
-				BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+				BasicFileAttributes attr = Files.readAttributes(extract.toPath(), BasicFileAttributes.class);
 				
 				if (attr.lastModifiedTime().equals(extfile.getValue()))
 				{
-					Diag.info("Deleting unchanged extracted file %s", file);
-					file.delete();
-					ignoreChangesList.add(file);
+					Diag.info("Deleting unchanged extracted file %s", extract);
+					extract.delete();
+					ignoreChangesList.add(extract);
 				}
 				else
 				{
-					Diag.info("Keeping changed extracted file %s", file);
+					Diag.info("Keeping changed extracted file %s", extract);
 				}
 			}
 			catch (IOException e)
 			{
-				Diag.error("Problem cleaning up %s: %s", file, e);
+				Diag.error("Problem cleaning up %s: %s", extract, e);
 			}
 		}
 	}
@@ -789,7 +789,7 @@ public class LSPWorkspaceManager
 		{
 			if (externalFiles.containsKey(file) && !externalFilesWarned.contains(file))
 			{
-				sendMessage(WARNING_MSG, "WARNING: Changing generated VDM source: " + file);
+				sendMessage(WARNING_MSG, "WARNING: Changing extracted VDM source: " + file);
 				externalFilesWarned.add(file);
 			}
 			
@@ -834,7 +834,7 @@ public class LSPWorkspaceManager
 		{
 			if (externalFiles.containsKey(file))
 			{
-				sendMessage(WARNING_MSG, "WARNING: Saving generated VDM source: " + file);
+				sendMessage(WARNING_MSG, "WARNING: Saving extracted VDM source: " + file);
 			}
 	
 			if (text != null)
@@ -864,13 +864,13 @@ public class LSPWorkspaceManager
 		int actionCode = DO_NOTHING;
 		
 		/**
-		 * This is a cludge to avoid loops caused by the build clearing the extracted files
+		 * This is a kludge to avoid loops caused by the build clearing the extracted files
 		 * generating changes that cause more builds. The list is set in removeExtractedFiles,
 		 * and cleared here once an event has been received.
 		 */
 		if (ignoreChangesList.contains(file))
 		{
-			Diag.info("Ignoring %s event for %s", type, file);
+			Diag.info("Suppressing %s event for %s", type, file);
 			ignoreChangesList.remove(file);
 			return DO_NOTHING;
 		}
