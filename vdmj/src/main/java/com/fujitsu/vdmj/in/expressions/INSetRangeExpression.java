@@ -68,7 +68,7 @@ public class INSetRangeExpression extends INSetExpression
     			set.addNoCheck(new IntegerValue(i));
     		}
 
-    		return new SetValue(set);
+    		return new SetValue(set, false);
 		}
 		catch (ValueException e)
 		{
