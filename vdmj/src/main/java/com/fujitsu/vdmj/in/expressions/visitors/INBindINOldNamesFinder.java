@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2022 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -25,57 +25,27 @@
 package com.fujitsu.vdmj.in.expressions.visitors;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INVariableExpression;
+import com.fujitsu.vdmj.in.patterns.INBind;
+import com.fujitsu.vdmj.in.patterns.visitors.INLeafBindVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class INOldNamesFinder extends INLeafExpressionVisitor<TCNameToken, TCNameList, Object>
+public class INBindINOldNamesFinder extends INLeafBindVisitor<TCNameToken, TCNameList, Object>
 {
-	public INOldNamesFinder()
+	public INBindINOldNamesFinder(INVisitorSet<TCNameToken, TCNameList, Object> inVisitorSet)
 	{
-		super(false);
-		
-		visitorSet = new INVisitorSet<TCNameToken, TCNameList, Object>()
-		{
-			@Override
-			protected void setVisitors()
-			{
-				expressionVisitor = INOldNamesFinder.this;
-				bindVisitor = new INBindINOldNamesFinder(this);
-				multiBindVisitor = new INMultiBindINOldNamesFinder(this);
-			}
+		super(inVisitorSet);
+	}
 
-			@Override
-			protected TCNameList newCollection()
-			{
-				return INOldNamesFinder.this.newCollection();
-			}
-		};
+	@Override
+	public TCNameList caseBind(INBind node, Object arg)
+	{
+		return newCollection();
 	}
 
 	@Override
 	protected TCNameList newCollection()
 	{
 		return new TCNameList();
-	}
-
-	@Override
-	public TCNameList caseExpression(INExpression node, Object arg)
-	{
-		return newCollection();
-	}
-
-	@Override
-	public TCNameList caseVariableExpression(INVariableExpression node, Object arg)
-	{
-		if (node.name.isOld())
-		{
-			return new TCNameList(node.name);
-		}
-		else
-		{
-			return new TCNameList();
-		}
 	}
 }
