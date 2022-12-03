@@ -234,9 +234,10 @@ public class INClassDefinition extends INDefinition
 
     		// We initialize inherited definitions first, so that they can be
     		// overridden by local definitions, cf. TCClassDefinition.getDefinitions()
+    		// *** Causes problems with https://github.com/overturetool/vdm-vscode/issues/198
 
-    		setStaticDefinitions(localInheritedDefinitions, initCtxt);
     		setStaticDefinitions(definitions, initCtxt);
+    		setStaticDefinitions(localInheritedDefinitions, initCtxt);
     		
     		try
     		{
