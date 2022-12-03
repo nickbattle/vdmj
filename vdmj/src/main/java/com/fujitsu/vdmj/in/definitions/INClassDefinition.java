@@ -232,11 +232,11 @@ public class INClassDefinition extends INDefinition
     		privateStaticValues = new NameValuePairMap();
     		publicStaticValues = new NameValuePairMap();
 
-    		// We initialize function and operation definitions first as these
-    		// can be called by variable initializations.
+    		// We initialize inherited definitions first, so that they can be
+    		// overridden by local definitions, cf. TCClassDefinition.getDefinitions()
 
-    		setStaticDefinitions(definitions, initCtxt);
     		setStaticDefinitions(localInheritedDefinitions, initCtxt);
+    		setStaticDefinitions(definitions, initCtxt);
     		
     		try
     		{
