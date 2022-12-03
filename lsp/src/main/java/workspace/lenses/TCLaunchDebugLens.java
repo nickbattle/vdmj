@@ -66,32 +66,37 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 			String applyName = null;
 			JSONArray applyTypes = null;
 			JSONArray applyArgs = null;
+			boolean needsCtor = (Settings.dialect != Dialect.VDM_SL);
 			
 			if (def instanceof TCExplicitFunctionDefinition)
 			{
 				TCExplicitFunctionDefinition exdef = (TCExplicitFunctionDefinition) def;
-				applyName = exdef.name.getName();
-				launchName = applyName;
-				defaultName = exdef.name.getModule();
 				
-				if (exdef.typeParams != null)
+				if (!def.isSubclassResponsibility())
 				{
-					applyTypes = new JSONArray();
+					applyName = exdef.name.getName();
+					launchName = applyName;
+					defaultName = exdef.name.getModule();
 					
-					for (TCNameToken ptype: exdef.typeParams)
+					if (exdef.typeParams != null)
 					{
-						applyTypes.add("@" + ptype.toString());
+						applyTypes = new JSONArray();
+						
+						for (TCNameToken ptype: exdef.typeParams)
+						{
+							applyTypes.add("@" + ptype.toString());
+						}
 					}
+					
+					TCFunctionType ftype = (TCFunctionType) exdef.type;
+					applyArgs = getParams(exdef.paramPatternList.get(0), ftype.parameters);
 				}
-				
-				TCFunctionType ftype = (TCFunctionType) exdef.type;
-				applyArgs = getParams(exdef.paramPatternList.get(0), ftype.parameters);
 			}
 			else if (def instanceof TCImplicitFunctionDefinition)
 			{
 				TCImplicitFunctionDefinition imdef = (TCImplicitFunctionDefinition) def;
 				
-				if (imdef.body != null)
+				if (imdef.body != null && !imdef.isSubclassResponsibility())
 				{
 					applyName = imdef.name.getName();
 					launchName = applyName;
@@ -103,25 +108,27 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 			{
 				TCExplicitOperationDefinition exop = (TCExplicitOperationDefinition) def;
 				
-				if (!exop.isConstructor)
+				if (!exop.isConstructor && !exop.isSubclassResponsibility())
 				{
 					applyName = exop.name.getName();
 					launchName = applyName;
 					defaultName = exop.name.getModule();
 					TCOperationType ftype = (TCOperationType) exop.type;
 					applyArgs = getParams(exop.parameterPatterns, ftype.parameters);
+					needsCtor = !exop.accessSpecifier.isStatic;
 				}
 			}
 			else if (def instanceof TCImplicitOperationDefinition)
 			{
 				TCImplicitOperationDefinition imop = (TCImplicitOperationDefinition) def;
 				
-				if (!imop.isConstructor && imop.body != null)
+				if (!imop.isConstructor && imop.body != null && !imop.isSubclassResponsibility())
 				{
 					applyName = imop.name.getName();
 					launchName = applyName;
 					defaultName = imop.name.getModule();
 					applyArgs = getParams(imop.parameterPatterns);
+					needsCtor = !imop.accessSpecifier.isStatic;
 				}
 			}
 			
@@ -129,7 +136,7 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 			{
 				JSONArray constructors = null;
 				
-				if (cls != null && !def.isAccess(Token.STATIC))	// Look for class constructors
+				if (cls != null && needsCtor)
 				{
 					constructors = new JSONArray();
 					
