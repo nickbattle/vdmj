@@ -25,27 +25,27 @@
 package com.fujitsu.vdmj.in.expressions.visitors;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.patterns.INMultipleBind;
-import com.fujitsu.vdmj.in.patterns.visitors.INLeafMultipleBindVisitor;
+import com.fujitsu.vdmj.in.patterns.INPattern;
+import com.fujitsu.vdmj.in.patterns.visitors.INLeafPatternVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-public class INMultiBindINOldNamesFinder extends INLeafMultipleBindVisitor<TCNameToken, TCNameList, Object>
+public class INPatternOldNamesFinder extends INLeafPatternVisitor<TCNameToken, TCNameList, Object>
 {
-	public INMultiBindINOldNamesFinder(INVisitorSet<TCNameToken, TCNameList, Object> inVisitorSet)
+	public INPatternOldNamesFinder(INVisitorSet<TCNameToken, TCNameList, Object> inVisitorSet)
 	{
 		super(inVisitorSet);
-	}
-
-	@Override
-	public TCNameList caseMultipleBind(INMultipleBind node, Object arg)
-	{
-		return newCollection();
 	}
 
 	@Override
 	protected TCNameList newCollection()
 	{
 		return new TCNameList();
+	}
+
+	@Override
+	public TCNameList casePattern(INPattern node, Object arg)
+	{
+		return newCollection();
 	}
 }
