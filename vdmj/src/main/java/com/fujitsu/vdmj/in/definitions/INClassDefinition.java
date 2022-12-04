@@ -340,6 +340,12 @@ public class INClassDefinition extends INDefinition
 					nvl = d.getNamedValues(initCtxt);
 				}
 			}
+			
+			// The putAllNews (ie. only if the name doesn't already exist) is required
+			// here because we can get multiple calls to setStaticValues, one from the
+			// outer forceStaticValuesInit and one from a makeInstance. In that
+			// case, for statics, we have to use the existing named value rather than
+			// creating a new one - ie. the one static value.
 
 			if (d.isValueDefinition())
 			{
@@ -349,13 +355,13 @@ public class INClassDefinition extends INDefinition
 				{
 					case PRIVATE:
 					case PROTECTED:
-						privateStaticValues.putAll(nvl);
-						initCtxt.putList(nvl);
+						privateStaticValues.putAllNew(nvl);
+						initCtxt.putAllNew(nvl);
 						break;
 
 					case PUBLIC:
-						publicStaticValues.putAll(nvl);
-						initCtxt.putList(nvl);
+						publicStaticValues.putAllNew(nvl);
+						initCtxt.putAllNew(nvl);
 						break;
 						
 					default:
@@ -370,13 +376,13 @@ public class INClassDefinition extends INDefinition
 				{
 					case PRIVATE:
 					case PROTECTED:
-						privateStaticValues.putAll(nvl);
-						initCtxt.putList(nvl);
+						privateStaticValues.putAllNew(nvl);
+						initCtxt.putAllNew(nvl);
 						break;
 
 					case PUBLIC:
-						publicStaticValues.putAll(nvl);
-						initCtxt.putList(nvl);
+						publicStaticValues.putAllNew(nvl);
+						initCtxt.putAllNew(nvl);
 						break;
 						
 					default:

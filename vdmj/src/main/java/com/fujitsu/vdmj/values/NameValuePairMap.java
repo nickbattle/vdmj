@@ -44,6 +44,22 @@ public class NameValuePairMap extends HashMap<TCNameToken, Value>
 		}
 	}
 
+	public void putNew(NameValuePair nvp)
+	{
+		if (get(nvp.name) == null)
+		{
+			put(nvp.name, nvp.value);
+		}
+	}
+
+	public void putAllNew(NameValuePairList list)
+	{
+		for (NameValuePair nvp: list)
+		{
+			putNew(nvp);
+		}
+	}
+
 	public ValueList getOverloads(TCNameToken sought)
 	{
 		ValueList list = new ValueList();
