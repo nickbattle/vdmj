@@ -70,7 +70,7 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 			String applyName = null;
 			JSONArray applyTypes = null;
 			JSONArray applyArgs = new JSONArray();
-			boolean needsCtor = (Settings.dialect != Dialect.VDM_SL);
+			boolean needsCtor = (Settings.dialect != Dialect.VDM_SL && !def.accessSpecifier.isStatic);
 			
 			if (def instanceof ASTExplicitFunctionDefinition)
 			{
@@ -129,7 +129,6 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 				{
 					applyName = exop.name.getName();
 					defaultName = exop.name.module;
-					needsCtor = !exop.accessSpecifier.isStatic;
 					
 					if (!applyName.equals(defaultName))		// Not a constructor
 					{
@@ -154,7 +153,6 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 				{
 					applyName = imop.name.getName();
 					defaultName = imop.name.module;
-					needsCtor = !imop.accessSpecifier.isStatic;
 	
 					if (!applyName.equals(defaultName))	// Not a constructor
 					{

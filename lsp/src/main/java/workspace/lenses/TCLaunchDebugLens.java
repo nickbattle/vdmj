@@ -66,7 +66,7 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 			String applyName = null;
 			JSONArray applyTypes = null;
 			JSONArray applyArgs = null;
-			boolean needsCtor = (Settings.dialect != Dialect.VDM_SL);
+			boolean needsCtor = (Settings.dialect != Dialect.VDM_SL && !def.accessSpecifier.isStatic);
 			
 			if (def instanceof TCExplicitFunctionDefinition)
 			{
@@ -115,7 +115,6 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 					defaultName = exop.name.getModule();
 					TCOperationType ftype = (TCOperationType) exop.type;
 					applyArgs = getParams(exop.parameterPatterns, ftype.parameters);
-					needsCtor = !exop.accessSpecifier.isStatic;
 				}
 			}
 			else if (def instanceof TCImplicitOperationDefinition)
@@ -128,7 +127,6 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 					launchName = applyName;
 					defaultName = imop.name.getModule();
 					applyArgs = getParams(imop.parameterPatterns);
-					needsCtor = !imop.accessSpecifier.isStatic;
 				}
 			}
 			
