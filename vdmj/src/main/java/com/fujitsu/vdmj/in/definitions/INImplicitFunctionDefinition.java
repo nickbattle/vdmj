@@ -232,6 +232,12 @@ public class INImplicitFunctionDefinition extends INDefinition
 	{
 		return (body != null);
 	}
+	
+	@Override
+	public boolean isRuntime()
+	{
+		return !isSubclassResponsibility();
+	}
 
 	@Override
 	public boolean isSubclassResponsibility()

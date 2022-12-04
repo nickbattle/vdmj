@@ -208,6 +208,12 @@ public class INExplicitFunctionDefinition extends INDefinition
 	{
 		return true;
 	}
+	
+	@Override
+	public boolean isRuntime()
+	{
+		return !isSubclassResponsibility();
+	}
 
 	@Override
 	public boolean isSubclassResponsibility()

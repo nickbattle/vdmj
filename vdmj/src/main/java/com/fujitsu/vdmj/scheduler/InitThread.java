@@ -241,7 +241,7 @@ public class InitThread extends SchedulableThread
 
 		for (INClassDefinition cdef: classes)
 		{
-			cdef.staticInit(globalContext);
+			cdef.forceStaticInit(globalContext);
 		}
 
 		// Values can forward reference each other, which means that we don't
@@ -274,7 +274,7 @@ public class InitThread extends SchedulableThread
 
     			try
     			{
-            		cdef.staticValuesInit(globalContext);
+            		cdef.forceStaticValuesInit(globalContext);
     				passed.add(cdef.name);
     			}
     			catch (ContextException e)

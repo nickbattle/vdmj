@@ -126,6 +126,12 @@ public class INExplicitOperationDefinition extends INDefinition
 
 		return nvl;
 	}
+	
+	@Override
+	public boolean isRuntime()
+	{
+		return !isSubclassResponsibility();
+	}
 
 	@Override
 	public boolean isOperation()
