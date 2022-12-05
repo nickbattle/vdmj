@@ -771,7 +771,8 @@ as the expected and actual values.
 3361, "@<name> has no arguments"
 3362, "@<name> only applies to functions or operations"
 3363, "Definition does not @Override superclass"
-3364, "Recursive cycle measures return different types" 
+3364, "Recursive cycle measures return different types"
+3365, "Void operation cannot use 'return <exp>'"
 
 
 4000, "Cannot instantiate abstract class <class>"
