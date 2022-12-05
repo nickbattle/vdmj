@@ -93,7 +93,9 @@ public class INApplyExpression extends INExpression
            		
            		if (endstop && !breakpoint.isContinue(ctxt))
            		{
+           			ctxt.addResult(location, this.toString(), rv);
            			breakpoint.enterDebugger(ctxt);
+           			ctxt.removeResult(location);
            		}
            		
            		return rv;
@@ -112,7 +114,9 @@ public class INApplyExpression extends INExpression
            		
            		if (endstop && !breakpoint.isContinue(ctxt))
            		{
+           			ctxt.addResult(location, this.toString(), rv);
            			breakpoint.enterDebugger(ctxt);
+           			ctxt.removeResult(location);
            		}
            		
            		return rv;
