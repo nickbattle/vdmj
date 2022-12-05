@@ -428,6 +428,11 @@ public class Context extends HashMap<TCNameToken, Value>
 		RESULT = new TCNameToken(location, location.module, "RESULT " + name);
 		put(RESULT, rv);
 	}
+	
+	public TCNameToken getResult()
+	{
+		return RESULT;
+	}
 
 	public void removeResult(LexLocation location)
 	{

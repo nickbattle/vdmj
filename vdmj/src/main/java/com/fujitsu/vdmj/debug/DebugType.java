@@ -52,5 +52,6 @@ public enum DebugType
 	TERMINATE,
 	ERROR,
 	
-	BREAKPOINT
+	BREAKPOINT,
+	RESULT
 }
