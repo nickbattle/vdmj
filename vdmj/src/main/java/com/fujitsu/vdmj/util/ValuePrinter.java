@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.TupleValue;
 import com.fujitsu.vdmj.values.UpdatableValue;
 import com.fujitsu.vdmj.values.Value;
+import com.fujitsu.vdmj.values.ValueListener;
 import com.fujitsu.vdmj.values.visitors.LeafValueVisitor;
 
 /**
@@ -48,9 +49,10 @@ import com.fujitsu.vdmj.values.visitors.LeafValueVisitor;
  */
 public class ValuePrinter extends LeafValueVisitor<String, List<String>, Integer>
 {
-	public static void print(Value v)
+	public static void print(String title, Value v)
 	{
 		ValuePrinter visitor = new ValuePrinter();
+		System.out.println("----------- " + title);
 		
 		for (String line: v.apply(visitor, 0))
 		{
@@ -170,6 +172,15 @@ public class ValuePrinter extends LeafValueVisitor<String, List<String>, Integer
 	{
 		List<String> all = indent(newCollection(), "updatable", arg);
 		all.addAll(super.caseUpdatableValue(node, arg + INDENT));
+		
+		if (node.listeners != null)
+		{
+			for (ValueListener vl: node.listeners)
+			{
+				indent(all, "listener " + vl, arg + INDENT);
+			}
+		}
+		
 		return all;
 	}
 	

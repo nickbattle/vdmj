@@ -50,6 +50,11 @@ public class InvariantValueListener implements ValueListener, Serializable
 	{
 		this.root = value;		// Always an updatable InvariantValue
 	}
+	
+	public Value getValue()
+	{
+		return root;
+	}
 
 	@Override
 	public void changedValue(LexLocation location, Value value, Context ctxt) throws ValueException
