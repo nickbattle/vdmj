@@ -464,7 +464,11 @@ abstract public class CommandReader
 			watch.start();
 			
    			long before = System.currentTimeMillis();
-   			println("= " + interpreter.execute(line));
+   			
+   			Value v = interpreter.execute(line);
+   			// ValuePrinter.print(v);
+   			
+   			println("= " + v);
    			long after = System.currentTimeMillis();
 			println("Executed in " + (double)(after-before)/1000 + " secs. ");
 
