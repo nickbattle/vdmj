@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.runtime.ExceptionHandler;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.InvariantListenerEditor;
 import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 /**
@@ -101,7 +102,15 @@ public class TransactionValue extends UpdatableValue
 
 		synchronized (this)
 		{
-   			newvalue = newval.getUpdatable(listeners);
+			if (newvalue instanceof InvariantValue)
+			{
+				// Before overwriting this invariant value, we check whether any listeners
+				// refer to it, and remove them - these would otherwise become dangling links.
+				// See VSCode bug #197.
+				newvalue.apply(new InvariantListenerEditor(), newvalue);
+			}
+
+			newvalue = newval.getConstant().getUpdatable(listeners);
     		newvalue = ((UpdatableValue)newvalue).value;	// To avoid nested updatables
 
     		if (restrictedTo != null)

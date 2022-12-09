@@ -197,7 +197,8 @@ public class RecordValue extends Value
 			nm.add(fv.name, uv, fv.comparable);
 		}
 
-		UpdatableValue uval = UpdatableValue.factory(new RecordValue(type, nm, invariant, equality, ordering), listeners);
+		RecordValue rval = new RecordValue(type, nm, invariant, equality, ordering);
+		UpdatableValue uval = UpdatableValue.factory(rval, listeners);
 		
 		if (invl != null)
 		{
