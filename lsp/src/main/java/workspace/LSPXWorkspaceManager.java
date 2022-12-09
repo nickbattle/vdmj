@@ -25,12 +25,14 @@
 package workspace;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
+import java.util.Set;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -365,6 +367,8 @@ public class LSPXWorkspaceManager
 				{
 					fileToLaTeX(saveUri, pfile, options);
 				}
+				
+				createLaTeXDocument(saveUri, filemap.keySet());
 
 				responseFile = saveUri;		// ??
 			}
@@ -378,6 +382,11 @@ public class LSPXWorkspaceManager
 					{
 						fileToLaTeX(saveUri, pfile, options);
 					}
+				}
+				
+				if (file.equals(wsManager.getRoot()))
+				{
+					createLaTeXDocument(saveUri, filemap.keySet());
 				}
 
 				responseFile = file;		// ??
@@ -399,6 +408,39 @@ public class LSPXWorkspaceManager
 		}
 	}
 	
+	private void createLaTeXDocument(File saveUri, Set<File> sources) throws IOException
+	{
+		String project = wsManager.getRoot().getName();
+		File document = new File(saveUri, project + ".tex");
+		PrintWriter out = new PrintWriter(new FileOutputStream(document));
+		
+		out.println("\\documentclass{article}");
+		out.println("\\usepackage{fullpage}"); 
+		out.println("\\usepackage[color]{vdmlisting}"); 
+		out.println("\\usepackage[hidelinks]{hyperref} "); 
+		out.println("\\usepackage{longtable}"); 
+		out.println("\\begin{document}"); 
+		out.println("\\title{" + project + "}"); 
+		out.println("\\author{}"); 
+		out.println("\\maketitle"); 
+		out.println("\\tableofcontents");
+		out.println();
+		
+		for (File pfile: sources)
+		{
+			String secname = pfile.getName().replaceAll("\\.vdm..$", "");
+			String texname = secname + ".tex";
+			File subfolder = getSubFolder(saveUri, pfile);
+			File outfile = new File(subfolder, texname);
+			out.println("\\section{" + secname + "}"); 
+			out.println("\\input{" + outfile + "}");
+			out.println();
+		}
+		
+		out.println("\\end{document}");
+		out.close();
+	}
+
 	private File fileToLaTeX(File saveUri, File file, JSONObject options) throws IOException
 	{
 		boolean modelOnly = false;
