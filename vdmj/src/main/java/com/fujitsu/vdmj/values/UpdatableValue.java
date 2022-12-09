@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.InvariantListenerEditor;
 import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 /**
@@ -146,6 +147,14 @@ public class UpdatableValue extends ReferenceValue
 
 		synchronized (this)
 		{
+			if (value instanceof InvariantValue)
+			{
+				// Before overwriting this invariant value, we check whether any listeners
+				// refer to it, and remove them - these would otherwise become dangling links.
+				// See VSCode bug #197.
+				value.apply(new InvariantListenerEditor(), value);
+			}
+			
    			value = newval.getConstant().getUpdatable(listeners);
     		value = ((UpdatableValue)value).value;	// To avoid nested updatables
     		

@@ -43,7 +43,7 @@ public class InvariantListenerEditor extends LeafValueVisitor<ValueListener, Val
 	@Override
 	public ValueListenerList caseUpdatableValue(UpdatableValue node, Value root)
 	{
-		ValueListenerList all = newCollection();
+		ValueListenerList all = super.caseUpdatableValue(node, root);
 		
 		if (node.listeners != null)
 		{
@@ -57,7 +57,7 @@ public class InvariantListenerEditor extends LeafValueVisitor<ValueListener, Val
 				{
 					InvariantValueListener ivl = (InvariantValueListener)vl;
 					
-					if (ivl.getValue() == root)	// NB object equality
+					if (ivl.getValue().getValue() == root)	// NB object equality
 					{
 						iter.remove();
 						all.add(ivl);
@@ -74,5 +74,4 @@ public class InvariantListenerEditor extends LeafValueVisitor<ValueListener, Val
 	{
 		return new ValueListenerList();
 	}
-
 }
