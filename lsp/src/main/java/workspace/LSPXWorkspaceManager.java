@@ -31,6 +31,8 @@ import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
 
@@ -426,13 +428,18 @@ public class LSPXWorkspaceManager
 		out.println("\\tableofcontents");
 		out.println();
 		
+        Path sourceBase = Paths.get(wsManager.getRoot().getAbsolutePath());
+		
 		for (File pfile: sources)
 		{
-			String secname = pfile.getName().replaceAll("\\.vdm..$", "");
-			String texname = secname + ".tex";
-			File subfolder = getSubFolder(saveUri, pfile);
-			File outfile = new File(subfolder, texname);
-			out.println("\\section{" + secname + "}"); 
+	        Path pathSource = Paths.get(pfile.getAbsolutePath());
+	        File relativeParent = sourceBase.relativize(pathSource).toFile().getParentFile();
+
+	        String section = pfile.getName().replaceAll("\\.vdm..$", "");
+			String texname = section + ".tex";
+			File outfile = relativeParent == null ? new File(texname) : new File(relativeParent, texname);
+			
+			out.println("\\section{" + section + "}"); 
 			out.println("\\input{" + outfile + "}");
 			out.println();
 		}
