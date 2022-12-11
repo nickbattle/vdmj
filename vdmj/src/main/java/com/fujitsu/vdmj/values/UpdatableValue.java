@@ -99,7 +99,7 @@ public class UpdatableValue extends ReferenceValue
 	}
 	
 	@Override
-	public synchronized Value getUpdatable(ValueListenerList watch)
+	public synchronized UpdatableValue getUpdatable(ValueListenerList watch)
 	{
 		// Create new object every time, because we end up with two references
 		// to the same value otherwise (Overture bug #544)
@@ -147,21 +147,23 @@ public class UpdatableValue extends ReferenceValue
 
 		synchronized (this)
 		{
-			if (value instanceof InvariantValue)
+			if (value instanceof InvariantValue && Settings.dialect != Dialect.VDM_SL)
 			{
 				// Before overwriting this invariant value, we check whether any listeners
 				// refer to it, and remove them - these would otherwise become dangling links.
-				// See VSCode bug #197.
+				// See VSCode bug #197. Only affects VDM++/RT because of objrefs.
+				
 				value.apply(new InvariantListenerEditor(), value);
 			}
 			
-   			value = newval.getConstant().getUpdatable(listeners);
-    		value = ((UpdatableValue)value).value;	// To avoid nested updatables
+   			UpdatableValue updated = newval.getConstant().getUpdatable(listeners);
     		
     		if (restrictedTo != null)
     		{
-				value = value.convertTo(restrictedTo, ctxt);
+				updated = (UpdatableValue) updated.convertTo(restrictedTo, ctxt);
     		}
+
+    		value = updated.value;	// To avoid nested updatables
 		}
 		
 		// NOTE: we omit the listener check here, called in "set" above.

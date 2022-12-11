@@ -139,7 +139,7 @@ public class ObjectValue extends Value
 	}
 
 	@Override
-	public Value getUpdatable(ValueListenerList listeners)
+	public UpdatableValue getUpdatable(ValueListenerList listeners)
 	{
 		for (Entry<TCNameToken, Value> m: members.entrySet())
 		{

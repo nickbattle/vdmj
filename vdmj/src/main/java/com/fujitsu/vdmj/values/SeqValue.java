@@ -100,7 +100,7 @@ public class SeqValue extends Value
 	}
 
 	@Override
-	public Value getUpdatable(ValueListenerList listeners)
+	public UpdatableValue getUpdatable(ValueListenerList listeners)
 	{
 		ValueList nseq = new ValueList();
 

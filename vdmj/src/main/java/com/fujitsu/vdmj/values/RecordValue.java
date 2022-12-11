@@ -169,7 +169,7 @@ public class RecordValue extends Value
 	}
 
 	@Override
-	public Value getUpdatable(ValueListenerList listeners)
+	public UpdatableValue getUpdatable(ValueListenerList listeners)
 	{
 		InvariantValueListener invl = null;
 

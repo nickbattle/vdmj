@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -77,7 +79,7 @@ public class TransactionValue extends UpdatableValue
 	}
 
 	@Override
-	public synchronized Value getUpdatable(ValueListenerList watch)
+	public synchronized UpdatableValue getUpdatable(ValueListenerList watch)
 	{
 		return new TransactionValue(select(), watch, restrictedTo);
 	}
@@ -102,21 +104,23 @@ public class TransactionValue extends UpdatableValue
 
 		synchronized (this)
 		{
-			if (newvalue instanceof InvariantValue)
+			if (newvalue instanceof InvariantValue && Settings.dialect != Dialect.VDM_SL)
 			{
 				// Before overwriting this invariant value, we check whether any listeners
 				// refer to it, and remove them - these would otherwise become dangling links.
-				// See VSCode bug #197.
+				// See VSCode bug #197. Only affects VDM++/RT because of objrefs.
+				
 				newvalue.apply(new InvariantListenerEditor(), newvalue);
 			}
 
-			newvalue = newval.getConstant().getUpdatable(listeners);
-    		newvalue = ((UpdatableValue)newvalue).value;	// To avoid nested updatables
+			UpdatableValue updated = newval.getConstant().getUpdatable(listeners);
 
     		if (restrictedTo != null)
     		{
-				newvalue = newvalue.convertTo(restrictedTo, ctxt);
+				updated = (UpdatableValue) updated.convertTo(restrictedTo, ctxt);
     		}
+
+    		newvalue = updated.value;	// To avoid nested updatables
 		}
 
 		if (newthreadid < 0)

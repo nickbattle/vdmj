@@ -54,7 +54,7 @@ public class MapValue extends Value
 	}
 
 	@Override
-	public Value getUpdatable(ValueListenerList listeners)
+	public UpdatableValue getUpdatable(ValueListenerList listeners)
 	{
 		ValueMap nm = new ValueMap();
 
