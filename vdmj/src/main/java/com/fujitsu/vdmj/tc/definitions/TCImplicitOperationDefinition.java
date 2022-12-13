@@ -124,7 +124,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	@Override
 	public String toString()
 	{
-		return	(type.isPure() ? "pure " : "") + name +
+		return	accessSpecifier.ifSet(" ") + (type.isPure() ? "pure " : "") + name +
 				Utils.listToString("(", parameterPatterns, ", ", ")") +
 				(result == null ? "" : " " + result) +
 				(externals == null ? "" : "\n\text " + externals) +
