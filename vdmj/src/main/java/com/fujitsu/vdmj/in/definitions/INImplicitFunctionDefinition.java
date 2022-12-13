@@ -112,7 +112,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 	@Override
 	public String toString()
 	{
-		return	name.getName() +
+		return	accessSpecifier.ifSet(" ") + name.getName() +
 				(typeParams == null ? "" : "[" + typeParams + "]") +
 				Utils.listToString("(", parameterPatterns, ", ", ")") + result +
 				(body == null ? "" : " ==\n\t" + body) +

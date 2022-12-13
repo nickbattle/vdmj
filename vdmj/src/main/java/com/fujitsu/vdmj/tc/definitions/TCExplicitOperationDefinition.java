@@ -103,7 +103,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	@Override
 	public String toString()
 	{
-		return  accessSpecifier.ifSet(" ") + (type.isPure() ? "pure " : "") + name + ": " + type +
+		return  accessSpecifier.ifSet(" ") + name + ": " + type +
 				"\n\t" + name + "(" + Utils.listToString(parameterPatterns) + ")" +
 				(body == null ? "" : " ==\n" + body) +
 				(precondition == null ? "" : "\n\tpre " + precondition) +

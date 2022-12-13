@@ -83,7 +83,7 @@ public class INExplicitOperationDefinition extends INDefinition
 	@Override
 	public String toString()
 	{
-		return  (type.isPure() ? "pure " : "") + name + ": " + type +
+		return  accessSpecifier.ifSet(" ") + name + ": " + type +
 				"\n\t" + name + "(" + Utils.listToString(parameterPatterns) + ")" +
 				(body == null ? "" : " ==\n" + body) +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
