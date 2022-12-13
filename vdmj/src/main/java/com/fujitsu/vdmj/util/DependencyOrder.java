@@ -110,6 +110,24 @@ public class DependencyOrder
 	    }
     }
 	
+	public void definitionOrder(TCDefinitionList definitions)
+	{
+		for (TCDefinition def: definitions.singleDefinitions())
+		{
+	    	String myname = def.name.getName();
+	    	nameToFile.put(myname, def.location.file);
+
+	    	Environment globals = new FlatEnvironment(new TCDefinitionList());
+    		Environment empty = new FlatEnvironment(new TCDefinitionList());
+			TCNameSet freevars = def.getDependencies(globals, empty, new AtomicBoolean(false));
+	    	
+	    	for (TCNameToken dep: freevars)
+	    	{
+				add(myname, dep.getName());
+	    	}
+	    }		
+	}
+	
     /**
      * Create a "dot" language version of the graph for the graphviz tool.
      * @throws IOException 
