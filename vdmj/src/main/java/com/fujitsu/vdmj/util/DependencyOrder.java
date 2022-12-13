@@ -27,10 +27,13 @@ package com.fujitsu.vdmj.util;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -158,8 +161,78 @@ public class DependencyOrder
 		fw.write(sb.toString());
 		fw.close();
 	}
+    
+    public List<String> getStartpoints()
+    {
+		/*
+		 * The startpoints are where there are no incoming links to a node. So
+		 * the usedBy entry is blank (removed cycles) or null.
+		 */
+		List<String> startpoints = new Vector<String>();
 
-	private void add(String from, String to)
+		for (String module: nameToFile.keySet())
+		{
+			if (usedBy.get(module) == null || usedBy.get(module).isEmpty())
+			{
+				startpoints.add(module);
+				usedBy.put(module, new HashSet<String>());
+			}
+		}
+
+		return startpoints;
+    }
+    
+    /**
+     * Note that the graph must be acyclic!
+     * @return the initialization order of the names
+     */
+    public List<String> topologicalSort(List<String> startpoints)
+    {
+		//	See https://en.wikipedia.org/wiki/Topological_sorting#Kahn's_algorithm
+		//
+		//	L ← Empty list that will contain the sorted elements
+		//	S ← Set of all nodes with no incoming edge
+		//
+		//	while S is not empty do
+		//	    remove a node n from S
+		//	    add n to L
+		//	    for each node m with an edge e from n to m do
+		//	        remove edge e from the graph
+		//	        if m has no other incoming edges then
+		//	            insert m into S
+		//
+		//	if graph has edges then
+		//	    return error   (graph has at least one cycle)
+		//	else 
+		//	    return L   (a topologically sorted order)
+
+		List<String> ordering = new Vector<String>();
+
+		while (!startpoints.isEmpty())
+		{
+		    String n = startpoints.remove(0);
+		    ordering.add(n);
+		    Set<String> usesSet = uses.get(n);
+	    	
+		    if (usesSet != null)
+		    {
+		    	Set<String> copy = new HashSet<String>(usesSet);
+		    	
+		    	for (String m: copy)
+		    	{	
+	    			if (delete(n, m) == 0)
+			    	{
+						startpoints.add(m);
+				    }
+		    	}
+		    }
+		}
+
+		Collections.reverse(ordering);	// the init order
+		return ordering;
+    }
+
+	protected void add(String from, String to)
     {
     	if (!from.equals(to))
     	{
@@ -183,4 +256,11 @@ public class DependencyOrder
     		set.add(from);
     	}
     }
+	
+	protected int delete(String from, String to)
+	{
+    	uses.get(from).remove(to);
+    	usedBy.get(to).remove(from);
+    	return usedBy.get(to).size();	// remaining size
+	}
 }
