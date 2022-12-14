@@ -123,9 +123,7 @@ public class DependencyOrder
 	    	String myname = def.name.getName();
 	    	nameToFile.put(myname, def.location.file);
 
-	    	Environment globals = new FlatEnvironment(new TCDefinitionList());
-    		Environment empty = new FlatEnvironment(new TCDefinitionList());
-			TCNameSet freevars = def.getDependencies(globals, empty, new AtomicBoolean(false));
+			TCNameSet freevars = def.getFreeVariables();
 	    	
 	    	for (TCNameToken dep: freevars)
 	    	{
