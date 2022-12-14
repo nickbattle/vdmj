@@ -54,8 +54,11 @@ public class DependencyOrder
 	protected Map<String, Set<String>> uses = new HashMap<String, Set<String>>();
 	protected Map<String, Set<String>> usedBy  = new HashMap<String, Set<String>>();
 	
+	private boolean sortCalled;
+	
 	public DependencyOrder()
 	{
+		sortCalled = false;
 	}
     			
     public void classOrder(TCClassList classList)
@@ -186,8 +189,18 @@ public class DependencyOrder
      * Note that the graph must be acyclic!
      * @return the initialization order of the names
      */
+    public List<String> topologicalSort()
+    {
+    	return topologicalSort(getStartpoints());
+    }
+    
     public List<String> topologicalSort(List<String> startpoints)
     {
+    	if (sortCalled)
+    	{
+    		throw new IllegalStateException("topologicalSort already called");
+    	}
+    	
 		//	See https://en.wikipedia.org/wiki/Topological_sorting#Kahn's_algorithm
 		//
 		//	L ← Empty list that will contain the sorted elements
@@ -229,6 +242,7 @@ public class DependencyOrder
 		}
 
 		Collections.reverse(ordering);	// the init order
+		sortCalled = true;
 		return ordering;
     }
 
@@ -262,5 +276,26 @@ public class DependencyOrder
     	uses.get(from).remove(to);
     	usedBy.get(to).remove(from);
     	return usedBy.get(to).size();	// remaining size
+	}
+
+	public static void main(String[] args)
+	{
+		class Test extends DependencyOrder
+		{
+			public void test()
+			{
+				nameToFile.put("A", new File("test.vdm"));
+				add("A", "B");	// A depends on B etc.
+				add("A", "C");
+				add("B", "C");
+				System.out.println(nameToFile);
+				System.out.println(uses);
+				System.out.println(usedBy);
+				System.out.println("Sort = " + topologicalSort());
+			}
+		};
+		
+		Test test = new Test();
+		test.test();
 	}
 }
