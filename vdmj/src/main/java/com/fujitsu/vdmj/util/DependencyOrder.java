@@ -240,11 +240,35 @@ public class DependencyOrder
 		    	}
 		    }
 		}
-
-		Collections.reverse(ordering);	// the init order
-		sortCalled = true;
-		return ordering;
+		
+		if (edgeCount() > 0)
+		{
+			throw new IllegalStateException("Dependency graph has cycles");
+		}
+		else
+		{
+			Collections.reverse(ordering);	// the init order
+			sortCalled = true;
+			return ordering;
+		}
     }
+
+	private int edgeCount()
+	{
+		int count = 0;
+		
+		for (Set<String> set: uses.values())
+		{
+			count += set.size();
+		}
+		
+		for (Set<String> set: usedBy.values())
+		{
+			count += set.size();	// include reverse links too?
+		}
+		
+		return count;
+	}
 
 	protected void add(String from, String to)
     {
