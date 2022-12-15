@@ -62,7 +62,17 @@ public abstract class INLeafPatternVisitor<E, C extends Collection<E>, S> extend
 		}
 	};
 	
- 	@Override
+ 	public INLeafPatternVisitor()
+	{
+		// use default visitorSet
+	}
+	
+ 	public INLeafPatternVisitor(INVisitorSet<E, C, S> inVisitorSet)
+	{
+		this.visitorSet = inVisitorSet;
+	}
+
+	@Override
 	public C caseConcatenationPattern(INConcatenationPattern node, S arg)
 	{
  		C all = newCollection();

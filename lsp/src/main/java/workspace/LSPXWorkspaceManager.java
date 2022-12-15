@@ -25,12 +25,16 @@
 package workspace;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Set;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -365,6 +369,8 @@ public class LSPXWorkspaceManager
 				{
 					fileToLaTeX(saveUri, pfile, options);
 				}
+				
+				createLaTeXDocument(saveUri, filemap.keySet());
 
 				responseFile = saveUri;		// ??
 			}
@@ -378,6 +384,11 @@ public class LSPXWorkspaceManager
 					{
 						fileToLaTeX(saveUri, pfile, options);
 					}
+				}
+				
+				if (file.equals(wsManager.getRoot()))
+				{
+					createLaTeXDocument(saveUri, filemap.keySet());
 				}
 
 				responseFile = file;		// ??
@@ -399,6 +410,44 @@ public class LSPXWorkspaceManager
 		}
 	}
 	
+	private void createLaTeXDocument(File saveUri, Set<File> sources) throws IOException
+	{
+		String project = wsManager.getRoot().getName();
+		File document = new File(saveUri, project + ".tex");
+		PrintWriter out = new PrintWriter(new FileOutputStream(document));
+		
+		out.println("\\documentclass{article}");
+		out.println("\\usepackage{fullpage}"); 
+		out.println("\\usepackage[color]{vdmlisting}"); 
+		out.println("\\usepackage[hidelinks]{hyperref} "); 
+		out.println("\\usepackage{longtable}"); 
+		out.println("\\begin{document}"); 
+		out.println("\\title{" + project + "}"); 
+		out.println("\\author{}"); 
+		out.println("\\maketitle"); 
+		out.println("\\tableofcontents");
+		out.println();
+		
+        Path sourceBase = Paths.get(wsManager.getRoot().getAbsolutePath());
+		
+		for (File pfile: sources)
+		{
+	        Path pathSource = Paths.get(pfile.getAbsolutePath());
+	        File relativeParent = sourceBase.relativize(pathSource).toFile().getParentFile();
+
+	        String section = pfile.getName().replaceAll("\\.vdm..$", "");
+			String texname = section + ".tex";
+			File outfile = relativeParent == null ? new File(texname) : new File(relativeParent, texname);
+			
+			out.println("\\section{" + section + "}"); 
+			out.println("\\input{" + outfile + "}");
+			out.println();
+		}
+		
+		out.println("\\end{document}");
+		out.close();
+	}
+
 	private File fileToLaTeX(File saveUri, File file, JSONObject options) throws IOException
 	{
 		boolean modelOnly = false;

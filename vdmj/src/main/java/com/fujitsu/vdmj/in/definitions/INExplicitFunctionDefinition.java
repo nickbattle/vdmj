@@ -105,7 +105,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 			params.append("(" + Utils.listToString(plist) + ")");
 		}
 
-		return name.getName() +
+		return accessSpecifier.ifSet(" ") + name.getName() +
 				(typeParams == null ? ": " : "[" + typeParams + "]: ") + type +
 				"\n\t" + name.getName() + params + " ==\n" + body +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
@@ -207,6 +207,12 @@ public class INExplicitFunctionDefinition extends INDefinition
 	public boolean isCallableFunction()
 	{
 		return true;
+	}
+	
+	@Override
+	public boolean isRuntime()
+	{
+		return !isSubclassResponsibility();
 	}
 
 	@Override

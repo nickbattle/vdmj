@@ -347,8 +347,7 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 	 * @param listeners The listener to inform of updates to the value.
 	 * @return An UpdatableValue for this one.
 	 */
-
-	public Value getUpdatable(ValueListenerList listeners)
+	public UpdatableValue getUpdatable(ValueListenerList listeners)
 	{
 		return UpdatableValue.factory(this, listeners);
 	}

@@ -68,7 +68,7 @@ public class ASTImplicitFunctionDefinition extends ASTDefinition
 	@Override
 	public String toString()
 	{
-		return	accessSpecifier + " " +	name.name +
+		return	accessSpecifier.ifSet(" ") + name.name +
 				(typeParams == null ? "" : "[" + typeParams + "]") +
 				Utils.listToString("(", parameterPatterns, ", ", ")") + result +
 				(body == null ? "" : " ==\n\t" + body) +

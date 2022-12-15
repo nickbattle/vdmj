@@ -62,7 +62,10 @@ public class Context extends HashMap<TCNameToken, Value>
 	public String prepostMsg = null;
 	/** Set to the operation being guarded, if any. */
 	public OperationValue guardOp = null;
-
+	
+	/** The name of a temporary RESULT symbol, when debugging */
+	private TCNameToken RESULT = null;
+	
 	/**
 	 * Create a context at the given location.
 	 *
@@ -415,5 +418,25 @@ public class Context extends HashMap<TCNameToken, Value>
 	{
 		this.prepost = prepost;
 		this.prepostMsg = prepostMsg;
+	}
+
+	/**
+	 * Add/remove a temporary result value to the current stack frame.
+	 */
+	public void addResult(LexLocation location, String name, Value rv)
+	{
+		RESULT = new TCNameToken(location, location.module, "RESULT " + name);
+		put(RESULT, rv);
+	}
+	
+	public TCNameToken getResult()
+	{
+		return RESULT;
+	}
+
+	public void removeResult(LexLocation location)
+	{
+		remove(RESULT);
+		RESULT = null;
 	}
 }

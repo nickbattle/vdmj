@@ -67,7 +67,22 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 		{
 			lastThread = debuggedThread;
 			debuggedThread = link.getDebugThread();		// Initially bp thread
+			
+			displayResult();
 			while (doCommand());
+		}
+	}
+
+	/**
+	 * Displays the Context "RESULT", which may be the return value of a call.
+	 */
+	private void displayResult()
+	{
+		DebugCommand response = link.sendCommand(debuggedThread, DebugCommand.RESULT);
+		
+		if (response.getPayload() != null)
+		{
+			Console.out.println(response.toString());		// eg. RESULT f(x) = 123;
 		}
 	}
 
@@ -112,7 +127,11 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 			{
 				if (!debuggedThread.equals(lastThread) || !loc.equals(lastLoc))
 				{
-					Console.out.println(Interpreter.getInstance().getSourceLine(loc));
+					if (!loc.file.getName().equals("console"))
+					{
+						Console.out.println(Interpreter.getInstance().getSourceLine(loc));
+					}
+					
 					lastLoc = loc;
 				}
 			}

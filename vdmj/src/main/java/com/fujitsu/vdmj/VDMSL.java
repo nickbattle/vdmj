@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.commands.CommandReader;
 import com.fujitsu.vdmj.commands.ModuleCommandReader;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
+import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -230,11 +231,15 @@ public class VDMSL extends VDMJ
    			interpreter = getInterpreter();
    			if (Settings.verbose) before = System.currentTimeMillis();
    			ConsoleDebugReader dbg = null;
+   			ConsoleKeyWatcher watcher = null;
 
    			try
    			{
    				dbg = new ConsoleDebugReader();
    				dbg.start();
+   				watcher = new ConsoleKeyWatcher("init");
+   				watcher.start();
+   				
    				interpreter.init();
    			}
    			finally
@@ -242,6 +247,11 @@ public class VDMSL extends VDMJ
    				if (dbg != null)
    				{
    					dbg.interrupt();
+   				}
+   				
+   				if (watcher != null)
+   				{
+   					watcher.interrupt();
    				}
    			}
 

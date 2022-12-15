@@ -77,7 +77,7 @@ public class SetValue extends Value
 	}
 
 	@Override
-	public Value getUpdatable(ValueListenerList listeners)
+	public UpdatableValue getUpdatable(ValueListenerList listeners)
 	{
 		ValueSet nset = new ValueSet();
 

@@ -113,7 +113,7 @@ public class InvariantValue extends ReferenceValue
 	}
 
 	@Override
-	public Value getUpdatable(ValueListenerList listeners)
+	public UpdatableValue getUpdatable(ValueListenerList listeners)
 	{
 		InvariantValueListener invl = null;
 

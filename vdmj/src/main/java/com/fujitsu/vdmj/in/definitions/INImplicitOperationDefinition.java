@@ -103,7 +103,7 @@ public class INImplicitOperationDefinition extends INDefinition
 	@Override
 	public String toString()
 	{
-		return	(type.isPure() ? "pure " : "") + name +
+		return	accessSpecifier.ifSet(" ") + name +
 				Utils.listToString("(", parameterPatterns, ", ", ")") +
 				(result == null ? "" : " " + result) +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
@@ -174,6 +174,12 @@ public class INImplicitOperationDefinition extends INDefinition
 	public boolean isCallableOperation()
 	{
 		return (body != null);
+	}
+	
+	@Override
+	public boolean isRuntime()
+	{
+		return !isSubclassResponsibility();
 	}
 
 	@Override

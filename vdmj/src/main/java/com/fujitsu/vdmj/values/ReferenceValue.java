@@ -48,6 +48,11 @@ abstract public class ReferenceValue extends Value
 	{
 		this.value = new UndefinedValue();
 	}
+	
+	public Value getValue()
+	{
+		return value;
+	}
 
 	@Override
 	protected Value convertValueTo(TCType to, Context ctxt, TCTypeSet done) throws ValueException

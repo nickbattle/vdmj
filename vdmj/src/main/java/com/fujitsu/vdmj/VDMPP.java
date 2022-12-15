@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.commands.ClassCommandReader;
 import com.fujitsu.vdmj.commands.CommandReader;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
+import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -246,11 +247,15 @@ public class VDMPP extends VDMJ
    			interpreter = getInterpreter();
    			if (Settings.verbose) before = System.currentTimeMillis();
   			ConsoleDebugReader dbg = null;
+  			ConsoleKeyWatcher watcher = null;
 
    			try
    			{
    				dbg = new ConsoleDebugReader();
    				dbg.start();
+   				watcher = new ConsoleKeyWatcher("init");
+   				watcher.start();
+   				
    				interpreter.init();
    			}
    			finally
@@ -258,6 +263,11 @@ public class VDMPP extends VDMJ
    				if (dbg != null)
    				{
    					dbg.interrupt();
+   				}
+   				
+   				if (watcher != null)
+   				{
+   					watcher.interrupt();
    				}
    			}
 

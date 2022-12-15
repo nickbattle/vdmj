@@ -71,7 +71,7 @@ public class INSetRangeExpression extends INSetExpression
     			from = from.add(BigInteger.ONE);
     		}
 
-    		return new SetValue(set);
+    		return new SetValue(set, false);
 		}
 		catch (ValueException e)
 		{

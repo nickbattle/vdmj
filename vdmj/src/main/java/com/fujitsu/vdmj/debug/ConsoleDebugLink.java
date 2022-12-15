@@ -117,6 +117,14 @@ public class ConsoleDebugLink extends DebugLink
 		
 		return true;
 	}
+	
+	/**
+	 * Return the debugging flag
+	 */
+	public synchronized boolean isDebugging()
+	{
+		return debugging;
+	}
 
 	/**
 	 * Return the current set of stopped threads.

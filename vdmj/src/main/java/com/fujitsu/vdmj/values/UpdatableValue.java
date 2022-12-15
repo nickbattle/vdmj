@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.values.visitors.InvariantListenerEditor;
 import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 /**
@@ -44,7 +45,6 @@ import com.fujitsu.vdmj.values.visitors.ValueVisitor;
  * here are synchronized, to guarantee that the sets and gets see all
  * changes (to the same UpdateableValue) produced by other threads.
  */
-
 public class UpdatableValue extends ReferenceValue
 {
 	private static final long serialVersionUID = 1L;
@@ -102,21 +102,8 @@ public class UpdatableValue extends ReferenceValue
 	}
 	
 	@Override
-	public synchronized Value getUpdatable(ValueListenerList watch)
+	public synchronized UpdatableValue getUpdatable(ValueListenerList watch)
 	{
-//		if (watch != null)
-//		{
-//			addListeners(watch);
-//		}
-//
-//		// We have to calculate the getUpdates to propagate the combined
-//		// listeners to the rest of the structure, but we do not want to
-//		// create a new UpdatableValue, having updated this one.
-//		
-//		UpdatableValue uv = (UpdatableValue)value.getUpdatable(listeners);
-//		value = uv.value;
-//		return this;
-
 		// Create new object every time, because we end up with two references
 		// to the same value otherwise (Overture bug #544)
 		return UpdatableValue.factory(value, watch);
@@ -163,13 +150,23 @@ public class UpdatableValue extends ReferenceValue
 
 		synchronized (this)
 		{
-   			value = newval.getConstant().getUpdatable(listeners);
-    		value = ((UpdatableValue)value).value;	// To avoid nested updatables
+			if (value instanceof InvariantValue && Settings.dialect != Dialect.VDM_SL)
+			{
+				// Before overwriting this invariant value, we check whether any listeners
+				// refer to it, and remove them - these would otherwise become dangling links.
+				// See VSCode bug #197. Only affects VDM++/RT because of objrefs.
+				
+				value.apply(new InvariantListenerEditor(), value);
+			}
+			
+   			UpdatableValue updated = newval.getConstant().getUpdatable(listeners);
     		
     		if (restrictedTo != null)
     		{
-				value = value.convertTo(restrictedTo, ctxt);
+				updated = (UpdatableValue) updated.convertTo(restrictedTo, ctxt);
     		}
+
+    		value = updated.value;	// To avoid nested updatables
 		}
 		
 		// NOTE: we omit the listener check here, called in "set" above.

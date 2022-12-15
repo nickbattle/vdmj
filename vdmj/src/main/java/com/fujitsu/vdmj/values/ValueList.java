@@ -42,6 +42,7 @@ public class ValueList extends Vector<Value>
 
 	public ValueList(ValueList from)
 	{
+		super(from.size());
 		addAll(from);
 	}
 
@@ -52,6 +53,8 @@ public class ValueList extends Vector<Value>
 
 	public ValueList(Value ...values)
 	{
+		super(values.length);
+		
 		for (Value v: values)
 		{
 			add(v);

@@ -68,7 +68,7 @@ public class ASTImplicitOperationDefinition extends ASTDefinition
 	@Override
 	public String toString()
 	{
-		return	(accessSpecifier.isPure ? "pure " : "") + name +
+		return	accessSpecifier.ifSet(" ") + name +
 				Utils.listToString("(", parameterPatterns, ", ", ")") +
 				(result == null ? "" : " " + result) +
 				(externals == null ? "" : "\n\text " + externals) +

@@ -24,7 +24,15 @@
 
 package com.fujitsu.vdmj.util;
 
-public class Permutor
+import java.util.Arrays;
+import java.util.Iterator;
+
+/**
+ * Produce every selection of one value from an array of limits.
+ * 
+ * Callable as an iterator, "for (int[] row: selector)"
+ */
+public class Selector implements Iterator<int[]>, Iterable<int[]>
 {
 	private final int[] limit;
 	private final int count;
@@ -32,7 +40,7 @@ public class Permutor
 
 	private boolean done = false;
 
-	public Permutor(int[] limits)
+	public Selector(int[] limits)
 	{
 		this.limit = limits;
 		this.count = limits.length;
@@ -49,10 +57,22 @@ public class Permutor
 		}
 	}
 
-	private int[] permute()
+	@Override
+	public Iterator<int[]> iterator()
 	{
-		int[] old = new int[count];
-		System.arraycopy(current, 0, old, 0, count);
+		return this;
+	}
+
+	@Override
+	public boolean hasNext()
+	{
+		return !done;
+	}
+
+	@Override
+	public int[] next()
+	{
+		int[] result = copy();
 
 		for (int i=0; i<count; i++)
 		{
@@ -70,16 +90,24 @@ public class Permutor
 			}
 		}
 
-		return old;
+		return result;
 	}
 
-	public int[] next()
-	{
-		return permute();
-	}
-
-	public boolean hasNext()
-	{
-		return !done;
-	}
+    private int[] copy()
+    {
+		int[] result = new int[count];
+		System.arraycopy(current, 0, result, 0, count);
+		return result;
+    }
+    
+    public static void main(String[] args)
+    {
+    	int[] limits = { 3, 4 };
+    	Selector selector = new Selector(limits);
+    	
+    	for (int[] row: selector)
+    	{
+    		System.out.println(Arrays.toString(row));
+    	}
+    }
 }

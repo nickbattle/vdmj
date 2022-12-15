@@ -55,6 +55,7 @@ public class ValueMap extends HashMap<Value, Value>
 
 	public ValueMap(ValueMap from)
 	{
+		super(from.size());
 		putAll(from);
 	}
 

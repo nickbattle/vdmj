@@ -28,13 +28,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
+
 import com.fujitsu.vdmj.commands.CommandPlugin;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -142,16 +142,7 @@ public class OrderPlugin extends CommandPlugin
 			 * The startpoints are where there are no incoming links to a node. So
 			 * the usedBy entry is blank (removed cycles) or null.
 			 */
-			List<String> startpoints = new Vector<String>();
-	
-			for (String module: nameToFile.keySet())
-			{
-				if (usedBy.get(module) == null || usedBy.get(module).isEmpty())
-				{
-					startpoints.add(module);
-					usedBy.put(module, new HashSet<String>());
-				}
-			}
+			List<String> startpoints = getStartpoints();
 	
 			if (startpoints.isEmpty())
 			{
@@ -163,47 +154,7 @@ public class OrderPlugin extends CommandPlugin
 				Console.out.println("Ordering from startpoints: " + startpoints);
 			}
 			
-			//	See https://en.wikipedia.org/wiki/Topological_sorting#Kahn's_algorithm
-			//
-			//	L ← Empty list that will contain the sorted elements
-			//	S ← Set of all nodes with no incoming edge
-			//
-			//	while S is not empty do
-			//	    remove a node n from S
-			//	    add n to L
-			//	    for each node m with an edge e from n to m do
-			//	        remove edge e from the graph
-			//	        if m has no other incoming edges then
-			//	            insert m into S
-			//
-			//	if graph has edges then
-			//	    return error   (graph has at least one cycle)
-			//	else 
-			//	    return L   (a topologically sorted order)
-	
-			List<String> ordering = new Vector<String>();
-	
-			while (!startpoints.isEmpty())
-			{
-			    String n = startpoints.remove(0);
-			    ordering.add(n);
-			    Set<String> usesSet = uses.get(n);
-		    	
-			    if (usesSet != null)
-			    {
-			    	Set<String> copy = new HashSet<String>(usesSet);
-			    	
-			    	for (String m: copy)
-			    	{	
-		    			if (delete(n, m) == 0)
-				    	{
-							startpoints.add(m);
-					    }
-			    	}
-			    }
-			}
-			
-			Collections.reverse(ordering);
+			List<String> ordering = topologicalSort(startpoints);
 			List<String> filenames = new Vector<String>();
 			
 			for (String name: ordering)
@@ -294,13 +245,6 @@ public class OrderPlugin extends CommandPlugin
 	    	}
 	    	
 	    	return count;
-		}
-	
-		private int delete(String from, String to)
-		{
-	    	uses.get(from).remove(to);
-	    	usedBy.get(to).remove(from);
-	    	return usedBy.get(to).size();	// remaining size
 		}
 	}
 }

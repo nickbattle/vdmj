@@ -31,10 +31,12 @@ import com.fujitsu.vdmj.ast.definitions.ASTExplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
+import com.fujitsu.vdmj.ast.expressions.ASTSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTPatternList;
+import com.fujitsu.vdmj.ast.statements.ASTSubclassResponsibilityStatement;
 import com.fujitsu.vdmj.ast.types.ASTFunctionType;
 import com.fujitsu.vdmj.ast.types.ASTOperationType;
 import com.fujitsu.vdmj.ast.types.ASTPatternListTypePair;
@@ -68,38 +70,43 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 			String applyName = null;
 			JSONArray applyTypes = null;
 			JSONArray applyArgs = new JSONArray();
+			boolean needsCtor = (Settings.dialect != Dialect.VDM_SL && !def.accessSpecifier.isStatic);
 			
 			if (def instanceof ASTExplicitFunctionDefinition)
 			{
 				ASTExplicitFunctionDefinition exdef = (ASTExplicitFunctionDefinition) def;
-				applyName = exdef.name.getName();
-				launchName = applyName;
-				defaultName = exdef.name.module;
 				
-				if (exdef.typeParams != null)
+				if (!(exdef.body instanceof ASTSubclassResponsibilityExpression))
 				{
-					applyTypes = new JSONArray();
+					applyName = exdef.name.getName();
+					launchName = applyName;
+					defaultName = exdef.name.module;
 					
-					for (LexNameToken ptype: exdef.typeParams)
+					if (exdef.typeParams != null)
 					{
-						applyTypes.add("@" + ptype.toString());
+						applyTypes = new JSONArray();
+						
+						for (LexNameToken ptype: exdef.typeParams)
+						{
+							applyTypes.add("@" + ptype.toString());
+						}
 					}
-				}
-				
-				ASTFunctionType ftype = (ASTFunctionType) exdef.type;
-				ASTTypeList ptypes = ftype.parameters;
-				int i = 0;
-				
-				for (ASTPattern p: exdef.paramPatternList.get(0))	// Curried?
-				{
-					applyArgs.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
+					
+					ASTFunctionType ftype = (ASTFunctionType) exdef.type;
+					ASTTypeList ptypes = ftype.parameters;
+					int i = 0;
+					
+					for (ASTPattern p: exdef.paramPatternList.get(0))	// Curried?
+					{
+						applyArgs.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
+					}
 				}
 			}
 			else if (def instanceof ASTImplicitFunctionDefinition)
 			{
 				ASTImplicitFunctionDefinition imdef = (ASTImplicitFunctionDefinition) def;
 				
-				if (imdef.body != null)
+				if (imdef.body != null && !(imdef.body instanceof ASTSubclassResponsibilityExpression))
 				{
 					applyName = imdef.name.getName();
 					launchName = applyName;
@@ -117,38 +124,46 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 			else if (def instanceof ASTExplicitOperationDefinition)
 			{
 				ASTExplicitOperationDefinition exop = (ASTExplicitOperationDefinition) def;
-				applyName = exop.name.getName();
-				defaultName = exop.name.module;
 				
-				if (!applyName.equals(defaultName))		// Not a constructor
+				if (!(exop.body instanceof ASTSubclassResponsibilityStatement))
 				{
-					launchName = applyName;
+					applyName = exop.name.getName();
+					defaultName = exop.name.module;
 					
-					ASTOperationType ftype = (ASTOperationType) exop.type;
-					ASTTypeList ptypes = ftype.parameters;
-					int i = 0;
-					
-					for (ASTPattern p: exop.parameterPatterns)
+					if (!applyName.equals(defaultName))		// Not a constructor
 					{
-						applyArgs.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
+						launchName = applyName;
+						
+						ASTOperationType ftype = (ASTOperationType) exop.type;
+						ASTTypeList ptypes = ftype.parameters;
+						int i = 0;
+						
+						for (ASTPattern p: exop.parameterPatterns)
+						{
+							applyArgs.add(new JSONObject("name", p.toString(), "type", fix(ptypes.get(i++))));
+						}
 					}
 				}
 			}
 			else if (def instanceof ASTImplicitOperationDefinition)
 			{
 				ASTImplicitOperationDefinition imop = (ASTImplicitOperationDefinition) def;
-				applyName = imop.name.getName();
-				defaultName = imop.name.module;
-
-				if (!applyName.equals(defaultName) && imop.body != null)	// Not a constructor
+				
+				if (imop.body != null && !(imop.body instanceof ASTSubclassResponsibilityStatement))
 				{
-					launchName = applyName;
-					
-					for (ASTPatternListTypePair param: imop.parameterPatterns)
+					applyName = imop.name.getName();
+					defaultName = imop.name.module;
+	
+					if (!applyName.equals(defaultName))	// Not a constructor
 					{
-						for (ASTPattern p: param.patterns)
+						launchName = applyName;
+						
+						for (ASTPatternListTypePair param: imop.parameterPatterns)
 						{
-							applyArgs.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
+							for (ASTPattern p: param.patterns)
+							{
+								applyArgs.add(new JSONObject("name", p.toString(), "type", fix(param.type)));
+							}
 						}
 					}
 				}
@@ -158,7 +173,7 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 			{
 				JSONArray constructors = null;
 				
-				if (cls != null && !def.accessSpecifier.isStatic)	// Look for class constructors
+				if (cls != null && needsCtor)
 				{
 					constructors = new JSONArray();
 					

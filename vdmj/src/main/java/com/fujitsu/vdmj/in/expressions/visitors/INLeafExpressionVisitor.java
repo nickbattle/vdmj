@@ -357,6 +357,8 @@ abstract public class INLeafExpressionVisitor<E, C extends Collection<E>, S> ext
  			if (def instanceof INValueDefinition)
  			{
  				INValueDefinition vdef = (INValueDefinition)def;
+ 				all.addAll(visitorSet.applyPatternVisitor(vdef.pattern, arg));
+ 				if (vdef.type != null) all.addAll(visitorSet.applyTypeVisitor(vdef.type, arg));
  				all.addAll(vdef.exp.apply(this, arg));
  			}
  		}

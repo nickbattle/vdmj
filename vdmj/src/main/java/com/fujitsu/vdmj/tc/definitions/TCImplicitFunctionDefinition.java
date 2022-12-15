@@ -120,7 +120,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	@Override
 	public String toString()
 	{
-		return	accessSpecifier + " " +	name.getName() +
+		return	accessSpecifier.ifSet(" ") + name.getName() +
 				(typeParams == null ? "" : "[" + typeParams + "]") +
 				Utils.listToString("(", parameterPatterns, ", ", ")") + result +
 				(body == null ? "" : " ==\n\t" + body) +
