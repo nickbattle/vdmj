@@ -25,8 +25,12 @@
 package examples;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Vector;
 
+import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -34,6 +38,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import dap.DAPMessageList;
 import json.JSONArray;
 import rpc.RPCMessageList;
+import workspace.events.CheckCompleteEvent;
 import workspace.events.CodeLensEvent;
 import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
@@ -52,6 +57,12 @@ public class ExamplePluginPR extends ExamplePlugin
 			CodeLensEvent le = (CodeLensEvent)event;
 			return new RPCMessageList(event.request, getCodeLenses(le.file));
 		}
+		else if (event instanceof CheckCompleteEvent)
+		{
+			CheckCompleteEvent ce = (CheckCompleteEvent)event;
+			addFirstWarning(ce);
+			return null;
+		}
 		else
 		{
 			return null;
@@ -65,6 +76,22 @@ public class ExamplePluginPR extends ExamplePlugin
 		return null;
 	}
 	
+	/**
+	 * Go through the ClassList from the TC plugin and issue a warning for
+	 * the first definition of the first module, as an example.
+	 */
+	private void addFirstWarning(CheckCompleteEvent event) throws IOException
+	{
+		TCPlugin tc = registry.getPlugin("TC");
+		TCClassList tcClassList = tc.getTC();
+		
+		TCDefinition first = tcClassList.get(0).definitions.get(0);
+		VDMWarning warning = new VDMWarning(9999, "Example warning from plugin", first.name.getLocation());
+		List<VDMMessage> list = new Vector<VDMMessage>();
+		list.add(warning);
+		event.addWarns(list);	// Add the warning to the event
+	}
+
 	/**
 	 * To apply code lenses for PP/RT, we get the TC plugin to obtain a ClassList of
 	 * type-checked classes, and then search through them for TCDefinitions that are
