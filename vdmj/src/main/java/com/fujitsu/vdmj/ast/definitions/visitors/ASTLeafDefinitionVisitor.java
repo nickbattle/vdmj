@@ -322,6 +322,7 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 		else if (tdef instanceof ASTTraceLetBeStBinding)
 		{
 			ASTTraceLetBeStBinding letbe = (ASTTraceLetBeStBinding)tdef;
+			all.addAll(visitorSet.applyExpressionVisitor(letbe.stexp, arg));
 			all.addAll(visitorSet.applyMultiBindVisitor(letbe.bind, arg));
 			all.addAll(caseTraceDefinition(letbe.body, arg));
 		}
@@ -406,8 +407,13 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 	public C caseTypeDefinition(ASTTypeDefinition node, S arg)
 	{
 		C all = visitorSet.applyTypeVisitor(node.type, arg);
+		all.addAll(visitorSet.applyPatternVisitor(node.invPattern, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.invExpression, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.eqPattern1, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.eqPattern2, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.eqExpression, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.ordPattern1, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.ordPattern2, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.ordExpression, arg));
 		return all;
 	}

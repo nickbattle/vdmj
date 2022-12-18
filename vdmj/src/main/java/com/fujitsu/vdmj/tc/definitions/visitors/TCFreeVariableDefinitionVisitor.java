@@ -115,20 +115,9 @@ public class TCFreeVariableDefinitionVisitor extends TCLeafDefinitionVisitor<TCN
 		Environment local = new FlatEnvironment(defs, arg);
 		TCNameSet names = visitorSet.applyExpressionVisitor(node.body, local);
 		
-		if (node.predef != null)
-		{
-			names.addAll(node.predef.apply(this, local));
-		}
-		
-		if (node.postdef != null)
-		{
-			names.addAll(node.postdef.apply(this, local));
-		}
-		
-		if (node.measureDef != null)
-		{
-			names.addAll(node.measureDef.apply(this, arg));
-		}
+		names.addAll(visitorSet.applyDefinitionVisitor(node.predef, local));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.postdef, local));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.measureDef, arg));
 
 		return names;
 	}
@@ -145,16 +134,8 @@ public class TCFreeVariableDefinitionVisitor extends TCLeafDefinitionVisitor<TCN
 
 		Environment local = new FlatEnvironment(defs, arg);
 		TCNameSet names = visitorSet.applyStatementVisitor(node.body, local);
-		
-		if (node.predef != null)
-		{
-			names.addAll(node.predef.apply(this, local));
-		}
-		
-		if (node.postdef != null)
-		{
-			names.addAll(node.postdef.apply(this, local));
-		}
+		names.addAll(visitorSet.applyDefinitionVisitor(node.predef, local));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.postdef, local));
 		
 		return names;
 	}
@@ -171,26 +152,10 @@ public class TCFreeVariableDefinitionVisitor extends TCLeafDefinitionVisitor<TCN
 
 		Environment local = new FlatEnvironment(defs, arg);
 		TCNameSet names = new TCNameSet();
-		
-		if (node.body != null)
-		{
-			names.addAll(visitorSet.applyExpressionVisitor(node.body, local));
-		}
-		
-		if (node.predef != null)
-		{
-			names.addAll(node.predef.apply(this, local));
-		}
-		
-		if (node.postdef != null)
-		{
-			names.addAll(node.postdef.apply(this, local));
-		}
-		
-		if (node.measureDef != null)
-		{
-			names.addAll(node.measureDef.apply(this, arg));
-		}
+		names.addAll(visitorSet.applyExpressionVisitor(node.body, local));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.predef, local));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.postdef, local));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.measureDef, arg));
 
 		return names;
 	}
@@ -207,21 +172,9 @@ public class TCFreeVariableDefinitionVisitor extends TCLeafDefinitionVisitor<TCN
 
 		Environment local = new FlatEnvironment(defs, arg);
 		TCNameSet names = new TCNameSet();
-		
-		if (node.body != null)
-		{
-			names.addAll(visitorSet.applyStatementVisitor(node.body, local));
-		}
-		
-		if (node.predef != null)
-		{
-			names.addAll(node.predef.apply(this, local));
-		}
-		
-		if (node.postdef != null)
-		{
-			names.addAll(node.postdef.apply(this, local));
-		}
+		names.addAll(visitorSet.applyStatementVisitor(node.body, local));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.predef, local));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.postdef, local));
 		
 		return names;
 	}
@@ -230,12 +183,7 @@ public class TCFreeVariableDefinitionVisitor extends TCLeafDefinitionVisitor<TCN
 	public TCNameSet caseLocalDefinition(TCLocalDefinition node, Environment arg)
 	{
 		TCNameSet names = visitorSet.applyTypeVisitor(node.type, arg);
-		
-		if (node.valueDefinition != null)
-		{
-			names.addAll(node.valueDefinition.apply(this, arg));
-		}
-		
+		names.addAll(node.valueDefinition.apply(this, arg));
 		return names;
 	}
 	
@@ -244,30 +192,15 @@ public class TCFreeVariableDefinitionVisitor extends TCLeafDefinitionVisitor<TCN
 	{
 		Environment local = new FlatEnvironment(node, arg);
 		TCNameSet names = new TCNameSet();
-		
-		if (node.invdef != null)
-		{
-			names.addAll(node.invdef.apply(this, local));
-		}
-		
-		if (node.initdef != null)
-		{
-			names.addAll(node.initdef.apply(this, local));
-		}
-		
+		names.addAll(visitorSet.applyDefinitionVisitor(node.invdef, local));
+		names.addAll(visitorSet.applyDefinitionVisitor(node.initdef, local));
 		return names;
 	}
 	
 	@Override
 	public TCNameSet caseValueDefinition(TCValueDefinition node, Environment arg)
 	{
-		TCNameSet names = new TCNameSet();
-		
-		if (node.type != null)
-		{
-			names.addAll(visitorSet.applyTypeVisitor(node.type, arg));
-		}
-		
+		TCNameSet names = visitorSet.applyTypeVisitor(node.type, arg);
 		names.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		return names;
 	}
