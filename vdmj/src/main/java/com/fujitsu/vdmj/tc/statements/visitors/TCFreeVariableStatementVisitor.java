@@ -75,12 +75,7 @@ public class TCFreeVariableStatementVisitor extends TCLeafStatementVisitor<TCNam
 	{
 		TCNameSet names = visitorSet.applyMultiBindVisitor(node.bind, arg);
 		Environment local = new FlatEnvironment(node.def, arg);
-		
-		if (node.suchThat != null)
-		{
-			names.addAll(visitorSet.applyExpressionVisitor(node.suchThat, local));
-		}
-		
+		names.addAll(visitorSet.applyExpressionVisitor(node.suchThat, local));
 		names.addAll(node.statement.apply(this, local));
 		return names;
 	}
@@ -100,8 +95,7 @@ public class TCFreeVariableStatementVisitor extends TCLeafStatementVisitor<TCNam
 			else
 			{
 				local = new FlatEnvironment(d, local);
-				names.addAll(visitorSet.applyDefinitionVisitor(d,
-						local));
+				names.addAll(visitorSet.applyDefinitionVisitor(d, local));
 			}
 		}
 

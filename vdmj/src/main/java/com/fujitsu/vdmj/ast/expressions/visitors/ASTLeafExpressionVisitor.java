@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.ast.expressions.visitors;
 import java.util.Collection;
 
 import com.fujitsu.vdmj.ast.ASTVisitorSet;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedExpression;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTEqualsDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
@@ -110,6 +111,20 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 		
 		return all;
 	}
+ 	
+ 	@Override
+ 	public C caseAnnotatedExpression(ASTAnnotatedExpression node, S arg)
+ 	{
+ 		C all = newCollection();
+ 		
+ 		for (ASTExpression exp: node.annotation.args)
+ 		{
+ 			all.addAll(exp.apply(this, arg));
+ 		}
+ 		
+ 		all.addAll(node.expression.apply(this, arg));
+ 		return all;
+ 	}
 
  	@Override
 	public C caseBinaryExpression(ASTBinaryExpression node, S arg)
@@ -126,11 +141,11 @@ abstract public class ASTLeafExpressionVisitor<E, C extends Collection<E>, S> ex
 		
 		for (ASTCaseAlternative a: node.cases)
 		{
+			all.addAll(visitorSet.applyPatternVisitor(a.pattern, arg));
 			all.addAll(a.result.apply(this, arg));
 		}
 		
 		all.addAll(visitorSet.applyExpressionVisitor(node.others, arg));
-		
 		return all;
 	}
 

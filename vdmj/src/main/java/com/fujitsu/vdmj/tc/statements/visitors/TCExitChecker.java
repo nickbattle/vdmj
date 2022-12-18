@@ -42,15 +42,12 @@ import com.fujitsu.vdmj.tc.patterns.visitors.TCMultipleBindExitChecker;
 import com.fujitsu.vdmj.tc.statements.TCBlockStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallObjectStatement;
 import com.fujitsu.vdmj.tc.statements.TCCallStatement;
-import com.fujitsu.vdmj.tc.statements.TCCaseStmtAlternative;
-import com.fujitsu.vdmj.tc.statements.TCCasesStatement;
 import com.fujitsu.vdmj.tc.statements.TCExitStatement;
 import com.fujitsu.vdmj.tc.statements.TCLetBeStStatement;
 import com.fujitsu.vdmj.tc.statements.TCLetDefStatement;
 import com.fujitsu.vdmj.tc.statements.TCNotYetSpecifiedStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.statements.TCSubclassResponsibilityStatement;
-import com.fujitsu.vdmj.tc.statements.visitors.TCLeafStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -225,19 +222,6 @@ public class TCExitChecker extends TCLeafStatementVisitor<TCType, TCTypeSet, Env
 
 		result.add(new TCUnknownType(node.location));
 		return result;
-	}
-	
-	@Override
-	public TCTypeSet caseCasesStatement(TCCasesStatement node, Environment base)
-	{
-		TCTypeSet types = visitorSet.applyExpressionVisitor(node.exp, base);
-
-		for (TCCaseStmtAlternative c: node.cases)
-		{
-			types.addAll(c.statement.apply(this, base));
-		}
-
-		return types;
 	}
 	
 	@Override

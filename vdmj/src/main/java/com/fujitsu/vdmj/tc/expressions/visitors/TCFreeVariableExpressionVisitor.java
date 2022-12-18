@@ -197,11 +197,7 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 		Environment local = new FlatEnvironment(node.def, arg);
 		all.addAll(node.first.left.apply(this, local));
 		all.addAll(node.first.right.apply(this, local));
-		
-		if (node.predicate != null)
-		{
-			all.addAll(node.predicate.apply(this, local));
-		}
+		all.addAll(visitorSet.applyExpressionVisitor(node.predicate, local));
 		
 		return all;
 	}
@@ -214,11 +210,7 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 
 		Environment local = new FlatEnvironment(node.def, arg);
 		all.addAll(node.first.apply(this, local));
-		
-		if (node.predicate != null)
-		{
-			all.addAll(node.predicate.apply(this, local));
-		}
+		all.addAll(visitorSet.applyExpressionVisitor(node.predicate, local));
 
 		return all;
 	}
@@ -235,11 +227,7 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 
 		Environment local = new FlatEnvironment(node.def, arg);
 		all.addAll(node.first.apply(this, local));
-
-		if (node.predicate != null)
-		{
-			all.addAll(node.predicate.apply(this, local));
-		}
+		all.addAll(visitorSet.applyExpressionVisitor(node.predicate, local));
 		
 		return all;
 	}

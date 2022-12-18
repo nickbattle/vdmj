@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.ast.statements.visitors;
 import java.util.Collection;
 
 import com.fujitsu.vdmj.ast.ASTVisitorSet;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedStatement;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.statements.ASTAlwaysStatement;
@@ -103,6 +104,21 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
 		all.addAll(node.body.apply(this, arg));
 		return all;
 	}
+	
+	@Override
+	public C caseAnnotatedStatement(ASTAnnotatedStatement node, S arg)
+	{
+ 		C all = newCollection();
+ 		
+ 		for (ASTExpression a: node.annotation.args)
+ 		{
+ 			all.addAll(visitorSet.applyExpressionVisitor(a, arg));
+ 		}
+ 		
+ 		all.addAll(node.statement.apply(this, arg));
+ 		return all;
+	}
+
 
  	@Override
 	public C caseAssignmentStatement(ASTAssignmentStatement node, S arg)

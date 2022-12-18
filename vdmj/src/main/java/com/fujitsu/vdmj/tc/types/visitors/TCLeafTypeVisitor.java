@@ -103,8 +103,7 @@ public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends T
 	@Override
 	public C caseMapType(TCMapType node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.from.apply(this, arg));
+		C all = node.from.apply(this, arg);
 		all.addAll(node.to.apply(this, arg));
 		return all;
 	}
@@ -186,9 +185,7 @@ public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends T
 	@Override
 	public C caseSeqType(TCSeqType node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.seqof.apply(this, arg));
-		return all;
+		return node.seqof.apply(this, arg);
 	}
 
 	@Override
@@ -200,9 +197,7 @@ public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends T
 	@Override
 	public C caseSetType(TCSetType node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.setof.apply(this, arg));
-		return all;
+		return node.setof.apply(this, arg);
 	}
 
 	@Override
