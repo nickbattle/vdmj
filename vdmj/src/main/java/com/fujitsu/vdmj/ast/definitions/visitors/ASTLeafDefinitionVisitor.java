@@ -54,6 +54,8 @@ import com.fujitsu.vdmj.ast.definitions.ASTValueDefinition;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleBind;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTPatternList;
+import com.fujitsu.vdmj.ast.statements.ASTErrorCase;
+import com.fujitsu.vdmj.ast.statements.ASTExternalClause;
 import com.fujitsu.vdmj.ast.traces.ASTTraceApplyExpression;
 import com.fujitsu.vdmj.ast.traces.ASTTraceBracketedExpression;
 import com.fujitsu.vdmj.ast.traces.ASTTraceConcurrentExpression;
@@ -185,6 +187,9 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 			}
 		}
 
+		all.addAll(visitorSet.applyPatternVisitor(node.result.pattern, arg));
+		all.addAll(visitorSet.applyTypeVisitor(node.result.type, arg));
+		
 		all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
@@ -207,7 +212,30 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 				all.addAll(visitorSet.applyPatternVisitor(p, arg));
 			}
 		}
+
+		if (node.result != null)
+		{
+			all.addAll(visitorSet.applyPatternVisitor(node.result.pattern, arg));
+			all.addAll(visitorSet.applyTypeVisitor(node.result.type, arg));
+		}
 		
+		if (node.externals != null)
+		{
+			for (ASTExternalClause ex: node.externals)
+			{
+				all.addAll(visitorSet.applyTypeVisitor(ex.type, arg));
+			}
+		}
+		
+		if (node.errors != null)
+		{
+			for (ASTErrorCase err: node.errors)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(err.left, arg));
+				all.addAll(visitorSet.applyExpressionVisitor(err.right, arg));
+			}
+		}
+
 		all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
