@@ -41,14 +41,25 @@ import com.fujitsu.vdmj.po.statements.POCasesStatement;
 import com.fujitsu.vdmj.po.statements.POCyclesStatement;
 import com.fujitsu.vdmj.po.statements.PODurationStatement;
 import com.fujitsu.vdmj.po.statements.POElseIfStatement;
+import com.fujitsu.vdmj.po.statements.POErrorCase;
 import com.fujitsu.vdmj.po.statements.POErrorStatement;
 import com.fujitsu.vdmj.po.statements.POExitStatement;
+import com.fujitsu.vdmj.po.statements.POExternalClause;
+import com.fujitsu.vdmj.po.statements.POFieldDesignator;
 import com.fujitsu.vdmj.po.statements.POForAllStatement;
 import com.fujitsu.vdmj.po.statements.POForIndexStatement;
 import com.fujitsu.vdmj.po.statements.POForPatternBindStatement;
+import com.fujitsu.vdmj.po.statements.POIdentifierDesignator;
 import com.fujitsu.vdmj.po.statements.POIfStatement;
 import com.fujitsu.vdmj.po.statements.POLetBeStStatement;
 import com.fujitsu.vdmj.po.statements.POLetDefStatement;
+import com.fujitsu.vdmj.po.statements.POMapSeqDesignator;
+import com.fujitsu.vdmj.po.statements.POObjectApplyDesignator;
+import com.fujitsu.vdmj.po.statements.POObjectDesignator;
+import com.fujitsu.vdmj.po.statements.POObjectFieldDesignator;
+import com.fujitsu.vdmj.po.statements.POObjectIdentifierDesignator;
+import com.fujitsu.vdmj.po.statements.POObjectNewDesignator;
+import com.fujitsu.vdmj.po.statements.POObjectSelfDesignator;
 import com.fujitsu.vdmj.po.statements.POPeriodicStatement;
 import com.fujitsu.vdmj.po.statements.POReturnStatement;
 import com.fujitsu.vdmj.po.statements.POSimpleBlockStatement;
@@ -56,6 +67,7 @@ import com.fujitsu.vdmj.po.statements.POSkipStatement;
 import com.fujitsu.vdmj.po.statements.POSpecificationStatement;
 import com.fujitsu.vdmj.po.statements.POSporadicStatement;
 import com.fujitsu.vdmj.po.statements.POStartStatement;
+import com.fujitsu.vdmj.po.statements.POStateDesignator;
 import com.fujitsu.vdmj.po.statements.POStatement;
 import com.fujitsu.vdmj.po.statements.POStopStatement;
 import com.fujitsu.vdmj.po.statements.POSubclassResponsibilityStatement;
@@ -119,6 +131,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseAssignmentStatement(POAssignmentStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(caseStateDesignator(node.target, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		return all;
 	}
@@ -158,6 +171,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseCallObjectStatement(POCallObjectStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(caseObjectDesignator(node.designator, arg));
 		
 		for (POExpression a: node.args)
 		{
@@ -243,6 +257,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseForAllStatement(POForAllStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.set, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
@@ -252,15 +267,9 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseForIndexStatement(POForIndexStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
-		
 		all.addAll(visitorSet.applyExpressionVisitor(node.from, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.to, arg));
-		
-		if (node.by != null)
-		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.by, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.by, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -269,6 +278,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseForPatternBindStatement(POForPatternBindStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(visitorSet.applyPatternVisitor(node.patternBind.pattern, arg));
 		all.addAll(visitorSet.applyBindVisitor(node.patternBind.bind, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		all.addAll(node.statement.apply(this, arg));
@@ -291,11 +301,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 			}
 		}
 		
-		if (node.elseStmt != null)
-		{
-			all.addAll(node.elseStmt.apply(this, arg));
-		}
-		
+		all.addAll(node.elseStmt.apply(this, arg));
 		return all;
 	}
 
@@ -304,12 +310,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(visitorSet.applyMultiBindVisitor(node.bind, arg));
-		
-		if (node.suchThat != null)
-		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.suchThat, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.suchThat, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -378,14 +379,24 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
 		
-		if (node.precondition != null)
+		all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
+
+		if (node.externals != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
+			for (POExternalClause ex: node.externals)
+			{
+				all.addAll(visitorSet.applyTypeVisitor(ex.type, arg));
+			}
 		}
 		
-		if (node.postcondition != null)
+		if (node.errors != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
+			for (POErrorCase err: node.errors)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(err.left, arg));
+				all.addAll(visitorSet.applyExpressionVisitor(err.right, arg));
+			}
 		}
 		
 		return all;
@@ -433,6 +444,8 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		
 		for (POTixeStmtAlternative alternative: node.traps)
 		{
+			all.addAll(visitorSet.applyPatternVisitor(alternative.patternBind.pattern, arg));
+			all.addAll(visitorSet.applyBindVisitor(alternative.patternBind.bind, arg));
 			all.addAll(alternative.statement.apply(this, arg));
 		}
 		
@@ -444,6 +457,7 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseTrapStatement(POTrapStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(visitorSet.applyPatternVisitor(node.patternBind.pattern, arg));
 		all.addAll(visitorSet.applyBindVisitor(node.patternBind.bind, arg));
 		all.addAll(node.with.apply(this, arg));
 		all.addAll(node.body.apply(this, arg));
@@ -459,6 +473,68 @@ abstract public class POLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		return all;
 	}
 	
+	private C caseStateDesignator(POStateDesignator designator, S arg)
+	{
+		if (designator instanceof POFieldDesignator)
+		{
+			POFieldDesignator fd = (POFieldDesignator)designator;
+			return caseStateDesignator(fd.object, arg);
+		}
+		else if (designator instanceof POIdentifierDesignator)
+		{
+			return newCollection();
+		}
+		else if (designator instanceof POMapSeqDesignator)
+		{
+			POMapSeqDesignator msd = (POMapSeqDesignator)designator;
+			C all = caseStateDesignator(msd.mapseq, arg);
+			all.addAll(visitorSet.applyExpressionVisitor(msd.exp, arg));
+			return all;
+		}
+		else
+		{
+			throw new IllegalArgumentException("caseStateDesignator");
+		}
+	}
+
+	private C caseObjectDesignator(POObjectDesignator designator, S arg)
+	{
+		if (designator instanceof POObjectApplyDesignator)
+		{
+			POObjectApplyDesignator ad = (POObjectApplyDesignator)designator;
+			C all = caseObjectDesignator(ad.object, arg);
+			
+			for (POExpression exp: ad.args)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(exp, arg));
+			}
+			
+			return all;
+		}
+		else if (designator instanceof POObjectFieldDesignator)
+		{
+			POObjectFieldDesignator fd = (POObjectFieldDesignator)designator;
+			return caseObjectDesignator(fd.object, arg);
+		}
+		else if (designator instanceof POObjectNewDesignator)
+		{
+			POObjectNewDesignator nd = (POObjectNewDesignator)designator;
+			return visitorSet.applyExpressionVisitor(nd.expression, arg);
+		}
+		else if (designator instanceof POObjectIdentifierDesignator)
+		{
+			return newCollection();
+		}
+		else if (designator instanceof POObjectSelfDesignator)
+		{
+			return newCollection();
+		}
+		else
+		{
+			throw new IllegalArgumentException("caseObjectDesignator");
+		}
+	}
+
 	abstract protected C newCollection();
 	
 	protected C caseNonLeafNode(POStatement stmt, S arg)
