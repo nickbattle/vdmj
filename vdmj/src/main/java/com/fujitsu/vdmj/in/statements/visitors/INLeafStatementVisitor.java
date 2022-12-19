@@ -41,14 +41,24 @@ import com.fujitsu.vdmj.in.statements.INCasesStatement;
 import com.fujitsu.vdmj.in.statements.INCyclesStatement;
 import com.fujitsu.vdmj.in.statements.INDurationStatement;
 import com.fujitsu.vdmj.in.statements.INElseIfStatement;
+import com.fujitsu.vdmj.in.statements.INErrorCase;
 import com.fujitsu.vdmj.in.statements.INErrorStatement;
 import com.fujitsu.vdmj.in.statements.INExitStatement;
+import com.fujitsu.vdmj.in.statements.INFieldDesignator;
 import com.fujitsu.vdmj.in.statements.INForAllStatement;
 import com.fujitsu.vdmj.in.statements.INForIndexStatement;
 import com.fujitsu.vdmj.in.statements.INForPatternBindStatement;
+import com.fujitsu.vdmj.in.statements.INIdentifierDesignator;
 import com.fujitsu.vdmj.in.statements.INIfStatement;
 import com.fujitsu.vdmj.in.statements.INLetBeStStatement;
 import com.fujitsu.vdmj.in.statements.INLetDefStatement;
+import com.fujitsu.vdmj.in.statements.INMapSeqDesignator;
+import com.fujitsu.vdmj.in.statements.INObjectApplyDesignator;
+import com.fujitsu.vdmj.in.statements.INObjectDesignator;
+import com.fujitsu.vdmj.in.statements.INObjectFieldDesignator;
+import com.fujitsu.vdmj.in.statements.INObjectIdentifierDesignator;
+import com.fujitsu.vdmj.in.statements.INObjectNewDesignator;
+import com.fujitsu.vdmj.in.statements.INObjectSelfDesignator;
 import com.fujitsu.vdmj.in.statements.INPeriodicStatement;
 import com.fujitsu.vdmj.in.statements.INReturnStatement;
 import com.fujitsu.vdmj.in.statements.INSimpleBlockStatement;
@@ -56,6 +66,7 @@ import com.fujitsu.vdmj.in.statements.INSkipStatement;
 import com.fujitsu.vdmj.in.statements.INSpecificationStatement;
 import com.fujitsu.vdmj.in.statements.INSporadicStatement;
 import com.fujitsu.vdmj.in.statements.INStartStatement;
+import com.fujitsu.vdmj.in.statements.INStateDesignator;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.statements.INStopStatement;
 import com.fujitsu.vdmj.in.statements.INSubclassResponsibilityStatement;
@@ -119,6 +130,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseAssignmentStatement(INAssignmentStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(caseStateDesignator(node.target, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		return all;
 	}
@@ -158,6 +170,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseCallObjectStatement(INCallObjectStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(caseObjectDesignator(node.designator, arg));
 		
 		for (INExpression a: node.args)
 		{
@@ -243,6 +256,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseForAllStatement(INForAllStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.set, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
@@ -254,12 +268,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(visitorSet.applyExpressionVisitor(node.from, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.to, arg));
-		
-		if (node.by != null)
-		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.by, arg));
-		}
-
+		all.addAll(visitorSet.applyExpressionVisitor(node.by, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -268,6 +277,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseForPatternBindStatement(INForPatternBindStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(visitorSet.applyPatternVisitor(node.patternBind.pattern, arg));
 		all.addAll(visitorSet.applyBindVisitor(node.patternBind.bind, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		all.addAll(node.statement.apply(this, arg));
@@ -302,12 +312,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
 		all.addAll(visitorSet.applyMultiBindVisitor(node.bind, arg));
-		
-		if (node.suchThat != null)
-		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.suchThat, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.suchThat, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -376,14 +381,16 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
 		
-		if (node.precondition != null)
+		all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
+
+		if (node.errors != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
-		}
-		
-		if (node.postcondition != null)
-		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
+			for (INErrorCase err: node.errors)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(err.left, arg));
+				all.addAll(visitorSet.applyExpressionVisitor(err.right, arg));
+			}
 		}
 		
 		return all;
@@ -431,6 +438,8 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		
 		for (INTixeStmtAlternative alternative: node.traps)
 		{
+			all.addAll(visitorSet.applyPatternVisitor(alternative.patternBind.pattern, arg));
+			all.addAll(visitorSet.applyBindVisitor(alternative.patternBind.bind, arg));
 			all.addAll(alternative.statement.apply(this, arg));
 		}
 		
@@ -442,6 +451,7 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 	public C caseTrapStatement(INTrapStatement node, S arg)
 	{
 		C all = (allNodes) ? caseNonLeafNode(node, arg) : newCollection();
+		all.addAll(visitorSet.applyPatternVisitor(node.patternBind.pattern, arg));
 		all.addAll(visitorSet.applyBindVisitor(node.patternBind.bind, arg));
 		all.addAll(node.with.apply(this, arg));
 		all.addAll(node.body.apply(this, arg));
@@ -455,6 +465,68 @@ abstract public class INLeafStatementVisitor<E, C extends Collection<E>, S> exte
 		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
+	}
+
+	private C caseStateDesignator(INStateDesignator designator, S arg)
+	{
+		if (designator instanceof INFieldDesignator)
+		{
+			INFieldDesignator fd = (INFieldDesignator)designator;
+			return caseStateDesignator(fd.object, arg);
+		}
+		else if (designator instanceof INIdentifierDesignator)
+		{
+			return newCollection();
+		}
+		else if (designator instanceof INMapSeqDesignator)
+		{
+			INMapSeqDesignator msd = (INMapSeqDesignator)designator;
+			C all = caseStateDesignator(msd.mapseq, arg);
+			all.addAll(visitorSet.applyExpressionVisitor(msd.exp, arg));
+			return all;
+		}
+		else
+		{
+			throw new IllegalArgumentException("caseStateDesignator");
+		}
+	}
+
+	private C caseObjectDesignator(INObjectDesignator designator, S arg)
+	{
+		if (designator instanceof INObjectApplyDesignator)
+		{
+			INObjectApplyDesignator ad = (INObjectApplyDesignator)designator;
+			C all = caseObjectDesignator(ad.object, arg);
+			
+			for (INExpression exp: ad.args)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(exp, arg));
+			}
+			
+			return all;
+		}
+		else if (designator instanceof INObjectFieldDesignator)
+		{
+			INObjectFieldDesignator fd = (INObjectFieldDesignator)designator;
+			return caseObjectDesignator(fd.object, arg);
+		}
+		else if (designator instanceof INObjectNewDesignator)
+		{
+			INObjectNewDesignator nd = (INObjectNewDesignator)designator;
+			return visitorSet.applyExpressionVisitor(nd.expression, arg);
+		}
+		else if (designator instanceof INObjectIdentifierDesignator)
+		{
+			return newCollection();
+		}
+		else if (designator instanceof INObjectSelfDesignator)
+		{
+			return newCollection();
+		}
+		else
+		{
+			throw new IllegalArgumentException("caseObjectDesignator");
+		}
 	}
 
 	abstract protected C newCollection();
