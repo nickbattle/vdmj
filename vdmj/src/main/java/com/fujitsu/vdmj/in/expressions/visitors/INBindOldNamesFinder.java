@@ -34,7 +34,7 @@ public class INBindOldNamesFinder extends INLeafBindVisitor<TCNameToken, TCNameL
 {
 	public INBindOldNamesFinder(INVisitorSet<TCNameToken, TCNameList, Object> inVisitorSet)
 	{
-		super(inVisitorSet);
+		this.visitorSet = inVisitorSet;
 	}
 
 	@Override

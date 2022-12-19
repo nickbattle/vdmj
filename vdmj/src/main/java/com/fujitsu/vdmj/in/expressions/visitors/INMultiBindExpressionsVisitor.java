@@ -41,7 +41,7 @@ public class INMultiBindExpressionsVisitor<E, C extends Collection<E>, S> extend
 {
 	public INMultiBindExpressionsVisitor(INVisitorSet<E, C, S> visitorSet)
 	{
-		super(visitorSet);
+		this.visitorSet = visitorSet;
 	}
 	
 	@Override

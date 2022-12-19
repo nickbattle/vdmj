@@ -52,11 +52,6 @@ public abstract class INLeafBindVisitor<E, C extends Collection<E>, S> extends I
 		}
 	};
 
- 	public INLeafBindVisitor(INVisitorSet<E, C, S> inVisitorSet)
-	{
- 		this.visitorSet = inVisitorSet;
-	}
-
 	@Override
 	public C caseSeqBind(INSeqBind node, S arg)
 	{
