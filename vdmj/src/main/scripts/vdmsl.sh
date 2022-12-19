@@ -35,6 +35,27 @@ function check()
     fi
 }
 
+function latest()
+{
+	# Warn if a later version is available in Maven
+	BASEVER=$(echo $1 | sed -e "s/\(^[0-9]*\.[0-9]*\.[0-9]*\(-P\)\{0,1\}\).*$/\1/")
+	
+	if [ -e $MAVENREPO/vdmj/$BASEVER ]
+	then
+		LATEST=$BASEVER
+	elif [[ $1 == *-P* ]]
+	then
+		LATEST=$(ls $MAVENREPO/vdmj | grep "^[0-9]*\.[0-9]*\.[0-9]*" | grep -- "-P" | tail -1)
+	else
+		LATEST=$(ls $MAVENREPO/vdmj | grep "^[0-9]*\.[0-9]*\.[0-9]*" | grep -v -- "-P" | tail -1)
+	fi
+	
+	if [ "$1" != "$LATEST" ]
+	then
+	    echo "WARNING: Latest VDMJ version is $LATEST, not $1"
+	fi
+}
+
 # Chosen version defaults to "master"
 VERSION=$MVERSION
 
@@ -65,12 +86,7 @@ do
 done
 
 # Warn if a later version is available in Maven
-LATEST=$(ls $MAVENREPO/vdmj | grep "^[0-9]*\.[0-9]*\.[0-9]*" | tail -1)
-
-if [ "$VERSION" != "$LATEST" ]
-then
-    echo "WARNING: Latest VDMJ version is $LATEST, not $VERSION"
-fi
+latest $VERSION
 
 # Locate the jars
 VDMJ_JAR=$MAVENREPO/vdmj/${VERSION}/vdmj-${VERSION}.jar
