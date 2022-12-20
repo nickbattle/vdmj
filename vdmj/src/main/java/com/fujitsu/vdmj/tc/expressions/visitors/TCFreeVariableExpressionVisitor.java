@@ -150,14 +150,14 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 	public TCNameSet caseLetBeStExpression(TCLetBeStExpression node, Environment arg)
 	{
 		TCNameSet all = visitorSet.applyMultiBindVisitor(node.bind, arg);
+		Environment local = new FlatEnvironment(node.def, arg);
 		
 		if (node.suchThat != null)
 		{
-			Environment local = new FlatEnvironment(node.def, arg);
 			all.addAll(node.suchThat.apply(this, local));
 		}
 		
-		all.addAll(node.value.apply(this, arg));
+		all.addAll(node.value.apply(this, local));
 		return all;
 	}
 	
