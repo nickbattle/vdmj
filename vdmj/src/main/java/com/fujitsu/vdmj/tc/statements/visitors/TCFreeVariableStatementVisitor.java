@@ -30,12 +30,15 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.TCBlockStatement;
+import com.fujitsu.vdmj.tc.statements.TCCaseStmtAlternative;
+import com.fujitsu.vdmj.tc.statements.TCCasesStatement;
 import com.fujitsu.vdmj.tc.statements.TCLetBeStStatement;
 import com.fujitsu.vdmj.tc.statements.TCLetDefStatement;
 import com.fujitsu.vdmj.tc.statements.TCSpecificationStatement;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCFreeVariableStatementVisitor extends TCLeafStatementVisitor<TCNameToken, TCNameSet, Environment>
 {
@@ -68,6 +71,22 @@ public class TCFreeVariableStatementVisitor extends TCLeafStatementVisitor<TCNam
 		}
 
 		return caseSimpleBlockStatement(node, local);
+	}
+	
+ 	@Override
+	public TCNameSet caseCasesStatement(TCCasesStatement node, Environment arg)
+	{
+ 		TCNameSet all = visitorSet.applyExpressionVisitor(node.exp, arg);
+		
+		for (TCCaseStmtAlternative a: node.cases)
+		{
+			Environment local = new FlatEnvironment(a.pattern.getDefinitions(node.expType, NameScope.LOCAL), arg);
+			all.addAll(visitorSet.applyPatternVisitor(a.pattern, local));
+			all.addAll(a.statement.apply(this, local));
+		}
+		
+		all.addAll(visitorSet.applyStatementVisitor(node.others, arg));
+		return all;
 	}
 	
 	@Override

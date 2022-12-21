@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCRenamedDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
+import com.fujitsu.vdmj.tc.expressions.TCCaseAlternative;
+import com.fujitsu.vdmj.tc.expressions.TCCasesExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExists1Expression;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -78,6 +80,22 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 		}
 		
 		return names;
+	}
+	
+ 	@Override
+	public TCNameSet caseCasesExpression(TCCasesExpression node, Environment arg)
+	{
+ 		TCNameSet all = node.exp.apply(this, arg);
+		
+		for (TCCaseAlternative a: node.cases)
+		{
+			Environment local = new FlatEnvironment(a.pattern.getDefinitions(node.expType, NameScope.LOCAL), arg);
+			all.addAll(visitorSet.applyPatternVisitor(a.pattern, local));
+			all.addAll(a.result.apply(this, local));
+		}
+		
+		all.addAll(visitorSet.applyExpressionVisitor(node.others, arg));
+		return all;
 	}
 	
 	@Override
