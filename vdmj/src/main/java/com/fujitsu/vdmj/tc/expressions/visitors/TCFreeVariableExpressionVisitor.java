@@ -31,11 +31,13 @@ import com.fujitsu.vdmj.tc.definitions.TCRenamedDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCApplyExpression;
 import com.fujitsu.vdmj.tc.expressions.TCCaseAlternative;
 import com.fujitsu.vdmj.tc.expressions.TCCasesExpression;
+import com.fujitsu.vdmj.tc.expressions.TCDefExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExists1Expression;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIotaExpression;
+import com.fujitsu.vdmj.tc.expressions.TCLambdaExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLetBeStExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMapCompExpression;
@@ -45,6 +47,7 @@ import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
+import com.fujitsu.vdmj.tc.patterns.TCTypeBind;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -98,6 +101,29 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 		return all;
 	}
 	
+ 	@Override
+ 	public TCNameSet caseDefExpression(TCDefExpression node, Environment arg)
+ 	{
+		Environment local = arg;
+		TCNameSet names = new TCNameSet();
+
+		for (TCDefinition d: node.localDefs)
+		{
+			if (d instanceof TCExplicitFunctionDefinition)
+			{
+				// ignore
+			}
+			else
+			{
+				local = new FlatEnvironment(d, local);
+				names.addAll(visitorSet.applyDefinitionVisitor(d, local));
+			}
+		}
+
+		names.addAll(node.expression.apply(this, local));
+		return names;
+ 	}
+ 	
 	@Override
 	public TCNameSet caseExists1Expression(TCExists1Expression node, Environment arg)
 	{
@@ -161,6 +187,21 @@ public class TCFreeVariableExpressionVisitor extends TCLeafExpressionVisitor<TCN
 			all.addAll(node.predicate.apply(this, local));
 		}
 		
+		return all;
+	}
+	
+	@Override
+	public TCNameSet caseLambdaExpression(TCLambdaExpression node, Environment arg)
+	{
+		TCNameSet all = newCollection();
+		
+		for (TCTypeBind bind: node.bindList)
+		{
+			all.addAll(visitorSet.applyBindVisitor(bind, arg));
+		}
+		
+		Environment local = new FlatEnvironment(node.def, arg);
+		all.addAll(node.expression.apply(this, local));
 		return all;
 	}
 	

@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.statements.TCBlockStatement;
 import com.fujitsu.vdmj.tc.statements.TCCaseStmtAlternative;
 import com.fujitsu.vdmj.tc.statements.TCCasesStatement;
+import com.fujitsu.vdmj.tc.statements.TCDefStatement;
 import com.fujitsu.vdmj.tc.statements.TCLetBeStStatement;
 import com.fujitsu.vdmj.tc.statements.TCLetDefStatement;
 import com.fujitsu.vdmj.tc.statements.TCSpecificationStatement;
@@ -88,6 +89,29 @@ public class TCFreeVariableStatementVisitor extends TCLeafStatementVisitor<TCNam
 		all.addAll(visitorSet.applyStatementVisitor(node.others, arg));
 		return all;
 	}
+ 	
+ 	@Override
+ 	public TCNameSet caseDefStatement(TCDefStatement node, Environment arg)
+ 	{
+		Environment local = arg;
+		TCNameSet names = new TCNameSet();
+
+		for (TCDefinition d: node.equalsDefs)
+		{
+			if (d instanceof TCExplicitFunctionDefinition)
+			{
+				// ignore
+			}
+			else
+			{
+				local = new FlatEnvironment(d, local);
+				names.addAll(visitorSet.applyDefinitionVisitor(d, local));
+			}
+		}
+
+		names.addAll(node.statement.apply(this, local));
+		return names;
+ 	}
 	
 	@Override
 	public TCNameSet caseLetBeStStatement(TCLetBeStStatement node, Environment arg)
