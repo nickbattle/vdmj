@@ -89,8 +89,11 @@ public class InitExecutor extends AsyncExecutor
 				EventHub.getInstance().publish(new DAPEvaluateEvent(launchCommand));
 				InitRunnable initcmd = (InitRunnable)command;
 				running = initcmd.getExpression();
+				long before = System.currentTimeMillis();
 				String launchResult = initcmd.initRun(request);
-				server.stdout(initcmd.format(launchResult) + "\n");
+				long after = System.currentTimeMillis();
+				time = (double)(after-before)/1000;
+				server.stdout(initcmd.format(launchResult) + "\nExecuted in " + time + " secs.\n");
 			}
 			else
 			{
