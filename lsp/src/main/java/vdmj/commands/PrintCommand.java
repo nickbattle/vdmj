@@ -83,7 +83,7 @@ public class PrintCommand extends Command implements InitRunnable, ScriptRunnabl
 	@Override
 	public String format(String result)
 	{
-		return expression + " = " + result;
+		return "= " + result;
 	}
 
 	@Override

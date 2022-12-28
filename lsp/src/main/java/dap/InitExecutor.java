@@ -87,6 +87,7 @@ public class InitExecutor extends AsyncExecutor
 			if (command instanceof InitRunnable)
 			{
 				EventHub.getInstance().publish(new DAPEvaluateEvent(launchCommand));
+				server.stdout(launchCommand + "\n");	// So we see what it's doing
 				InitRunnable initcmd = (InitRunnable)command;
 				running = initcmd.getExpression();
 				long before = System.currentTimeMillis();
