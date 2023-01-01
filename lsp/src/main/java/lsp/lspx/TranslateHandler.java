@@ -38,6 +38,7 @@ import workspace.Diag;
 import workspace.EventHub;
 import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
+import workspace.MessageHub;
 import workspace.events.UnknownTranslationEvent;
 
 public class TranslateHandler extends LSPHandler
@@ -115,6 +116,11 @@ public class TranslateHandler extends LSPHandler
 					{
 						Diag.error("No external plugin registered for " + language);
 						return new RPCMessageList(request, RPCErrors.MethodNotFound, language);
+					}
+					else
+					{
+						// Allow translations to raise errors
+						result.addAll(MessageHub.getInstance().getDiagnosticResponses());
 					}
 					
 					return result;

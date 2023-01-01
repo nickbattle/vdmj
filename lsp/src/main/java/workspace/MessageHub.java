@@ -162,6 +162,12 @@ public class MessageHub
 	/**
 	 * Get a complete list of LSP diagnostic responses for the files passed.
 	 */
+	public RPCMessageList getDiagnosticResponses()
+	{
+		Set<File> files = LSPWorkspaceManager.getInstance().getProjectFiles().keySet();
+		return getDiagnosticResponses(files);
+	}
+	
 	public RPCMessageList getDiagnosticResponses(File file)
 	{
 		Set<File> files = new HashSet<File>();
