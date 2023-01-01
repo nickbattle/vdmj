@@ -293,7 +293,7 @@ public class TranslateTest extends LSPTest
 					"saveUri",	empty.toURI().toString()));
 
 		RPCMessageList response = handler.request(request);
-		assertEquals(1, response.size());
+		assertEquals(2, response.size());
 		dump(response.get(0));
 		assertEquals(empty.toURI().toString(), response.get(0).getPath("result.uri"));
 
