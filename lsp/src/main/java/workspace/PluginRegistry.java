@@ -75,6 +75,11 @@ public class PluginRegistry
 		return (T)plugins.get(name);
 	}
 	
+	public Map<String, AnalysisPlugin> getPlugins()
+	{
+		return plugins;
+	}
+	
 	public void setPluginCapabilities(JSONObject capabilities)
 	{
 		for (AnalysisPlugin plugin: plugins.values())

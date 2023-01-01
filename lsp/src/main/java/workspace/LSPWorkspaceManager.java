@@ -98,6 +98,7 @@ public class LSPWorkspaceManager
 	private static LSPWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
 	private final EventHub eventhub;
+	private final MessageHub messagehub;
 	private final LSPMessageUtils messages;
 	private final Charset encoding;
 
@@ -125,6 +126,7 @@ public class LSPWorkspaceManager
 	{
 		registry = PluginRegistry.getInstance();
 		eventhub = EventHub.getInstance();
+		messagehub = MessageHub.getInstance();
 		messages = new LSPMessageUtils();
 		
 		if (System.getProperty("lsp.encoding") == null)
@@ -263,6 +265,7 @@ public class LSPWorkspaceManager
 	{
 		projectFiles.clear();
 		externalFilesWarned.clear();	// Re-warn after reloads
+		messagehub.clear();
 		
 		removeExtractedFiles();
 		externalFiles.clear();
@@ -454,6 +457,7 @@ public class LSPWorkspaceManager
 		isr.close();
 		
 		projectFiles.put(file, sb);
+		messagehub.addFile(file);
 		Diag.info("Loaded file %s encoding %s", file.getPath(), encoding.displayName());
 	}
 	
@@ -701,7 +705,7 @@ public class LSPWorkspaceManager
 			Diag.info("Ignoring file %s in vdmignore", file);
 			return null;			
 		}
-		else if (!projectFiles.keySet().contains(file))
+		else if (!projectFiles.containsKey(file))
 		{
 			Diag.info("Opening new file: %s", file);
 			openFiles.add(file);
@@ -733,6 +737,7 @@ public class LSPWorkspaceManager
 			}
 			
 			projectFiles.put(file, new StringBuilder(text));
+			messagehub.addFile(file);
 			return checkLoadedFiles("file out of sync");
 		}
 		
@@ -826,7 +831,7 @@ public class LSPWorkspaceManager
 		{
 			Diag.info("Ignoring file %s in vdmignore", file);
 		}
-		else if (!projectFiles.keySet().contains(file))
+		else if (!projectFiles.containsKey(file))
 		{
 			Diag.error("File not known: %s", file);
 		}

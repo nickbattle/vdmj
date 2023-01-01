@@ -48,6 +48,7 @@ public class EventHub
 	private EventHub()
 	{
 		this.registrations = new HashMap<String, List<EventListener>>();
+		Diag.info("Created EventHub");
 	}
 	
 	public synchronized static EventHub getInstance()
