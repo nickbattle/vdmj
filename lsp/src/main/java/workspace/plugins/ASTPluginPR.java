@@ -48,9 +48,9 @@ import com.fujitsu.vdmj.syntax.ClassReader;
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
 import workspace.Diag;
-import workspace.DiagUtils;
 import workspace.LSPWorkspaceManager;
 import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckSyntaxEvent;
 import workspace.lenses.ASTCodeLens;
 
 public class ASTPluginPR extends ASTPlugin
@@ -71,10 +71,11 @@ public class ASTPluginPR extends ASTPlugin
 	}
 	
 	@Override
-	public boolean checkLoadedFiles()
+	public void checkLoadedFiles(CheckSyntaxEvent event)
 	{
 		dirty = false;
 		dirtyClassList = null;
+		hasErrs = false;
 		
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		LexLocation.resetLocations();
@@ -90,7 +91,7 @@ public class ASTPluginPR extends ASTPlugin
 			catch (Exception e)
 			{
 				Diag.error(e);
-				return false;
+				return;
 			}
 		}
 		
@@ -102,12 +103,13 @@ public class ASTPluginPR extends ASTPlugin
 			
 			if (mr.getErrorCount() > 0)
 			{
-				errs.addAll(mr.getErrors());
+				messagehub.addPluginMessages(this, mr.getErrors());
+				hasErrs = true;
 			}
 			
 			if (mr.getWarningCount() > 0)
 			{
-				warns.addAll(mr.getWarnings());
+				messagehub.addPluginMessages(this, mr.getWarnings());
 			}
 		}
 		
@@ -136,7 +138,7 @@ public class ASTPluginPR extends ASTPlugin
 			simulation.setup(astClassList);
 		}
 		
-		return errs.isEmpty();
+		if (hasErrs) event.setErrors();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -151,7 +153,7 @@ public class ASTPluginPR extends ASTPlugin
 	{
 		dirty = true;	// Until saved.
 
-		List<VDMMessage> errs = new Vector<VDMMessage>();
+		List<VDMMessage> messages = new Vector<VDMMessage>();
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
@@ -161,16 +163,15 @@ public class ASTPluginPR extends ASTPlugin
 		
 		if (cr.getErrorCount() > 0)
 		{
-			errs.addAll(cr.getErrors());
+			messages.addAll(cr.getErrors());
 		}
 		
 		if (cr.getWarningCount() > 0)
 		{
-			errs.addAll(cr.getWarnings());
+			messages.addAll(cr.getWarnings());
 		}
 
-		DiagUtils.dump(errs);
-		return errs;
+		return messages;
 	}
 
 	@Override

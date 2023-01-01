@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import dap.DAPMessageList;
 import json.JSONArray;
 import rpc.RPCMessageList;
+import workspace.MessageHub;
 import workspace.events.CheckCompleteEvent;
 import workspace.events.CodeLensEvent;
 import workspace.events.DAPEvent;
@@ -89,7 +90,7 @@ public class ExamplePluginPR extends ExamplePlugin
 		VDMWarning warning = new VDMWarning(9999, "Example warning from plugin", first.name.getLocation());
 		List<VDMMessage> list = new Vector<VDMMessage>();
 		list.add(warning);
-		event.addWarns(list);	// Add the warning to the event
+		MessageHub.getInstance().addPluginMessages(this, list);	// Add the warning to the hub
 	}
 
 	/**

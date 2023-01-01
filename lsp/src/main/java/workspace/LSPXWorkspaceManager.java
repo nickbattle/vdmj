@@ -195,7 +195,7 @@ public class LSPXWorkspaceManager
 			ASTPlugin ast = registry.getPlugin("AST");
 			TCPlugin tc = registry.getPlugin("TC");
 			
-			if (!ast.getErrs().isEmpty() || !tc.getErrs().isEmpty())	// No clean tree
+			if (ast.hasErrs() || tc.hasErrs())	// No clean tree
 			{
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
 			}
@@ -335,7 +335,7 @@ public class LSPXWorkspaceManager
 		ASTPlugin ast = registry.getPlugin("AST");
 		TCPlugin tc = registry.getPlugin("TC");
 		
-		return !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
+		return ast.hasErrs() || tc.hasErrs();
 	}
 
 	/**

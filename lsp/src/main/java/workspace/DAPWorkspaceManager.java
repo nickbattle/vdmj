@@ -939,7 +939,7 @@ public class DAPWorkspaceManager
 		ASTPlugin ast = registry.getPlugin("AST");
 		TCPlugin tc = registry.getPlugin("TC");
 		
-		return !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
+		return ast.hasErrs() || tc.hasErrs();
 	}
 
 	public void setDebugReader(DAPDebugReader debugReader)

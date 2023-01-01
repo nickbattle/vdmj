@@ -43,7 +43,7 @@ import workspace.plugins.AnalysisPlugin;
 
 /**
  * A singleton object to manage the current set of error and warning messages for all
- * of the source files in the workspace. 
+ * of the source files in the workspace.
  */
 public class MessageHub
 {
@@ -82,7 +82,7 @@ public class MessageHub
 	 * This is used by the workspace manager to populate a blank plugin map for a
 	 * new file.
 	 */
-	public void addFile(File file)
+	public synchronized void addFile(File file)
 	{
 		if (!messageMap.containsKey(file))
 		{
@@ -105,7 +105,7 @@ public class MessageHub
 	/**
 	 * Add a list of messages for files (assumed to be already added).
 	 */
-	public void addPluginMessages(AnalysisPlugin plugin, List<VDMMessage> messages)
+	public synchronized void addPluginMessages(AnalysisPlugin plugin, List<? extends VDMMessage> messages)
 	{
 		String pname = plugin.getName();
 		
@@ -120,6 +120,7 @@ public class MessageHub
 				if (pmessages != null)
 				{
 					pmessages.add(message);
+					Diag.fine("Added %s MSG %s", pname, message);
 				}
 				else
 				{
@@ -136,7 +137,7 @@ public class MessageHub
 	/**
 	 * Clear all messages that relate to a given plugin.
 	 */
-	public void clearPluginMessages(AnalysisPlugin plugin)
+	public synchronized void clearPluginMessages(AnalysisPlugin plugin)
 	{
 		String pname = plugin.getName();
 		
@@ -145,12 +146,14 @@ public class MessageHub
 			Map<String, Set<VDMMessage>> pmap = messageMap.get(file);
 			pmap.get(pname).clear();
 		}
+		
+		Diag.fine("Cleared messages for %s", pname);
 	}
 	
 	/**
 	 * Clear all file messages. This is used when the project is reloaded
 	 */
-	public void clear()
+	public synchronized void clear()
 	{
 		messageMap.clear();
 		Diag.info("MessageHub cleared");
@@ -159,7 +162,14 @@ public class MessageHub
 	/**
 	 * Get a complete list of LSP diagnostic responses for the files passed.
 	 */
-	public RPCMessageList getDiagnosticResponses(List<File> filesToReport)
+	public RPCMessageList getDiagnosticResponses(File file)
+	{
+		Set<File> files = new HashSet<File>();
+		files.add(file);
+		return getDiagnosticResponses(files);
+	}
+	
+	public synchronized RPCMessageList getDiagnosticResponses(Set<File> filesToReport)
 	{
 		RPCMessageList responses = new RPCMessageList();
 

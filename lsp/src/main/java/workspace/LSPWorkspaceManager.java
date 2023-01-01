@@ -51,7 +51,6 @@ import java.util.regex.Pattern;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
-import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
@@ -644,24 +643,20 @@ public class LSPWorkspaceManager
 		eventhub.publish(new CheckPrepareEvent());
 
 		RPCMessageList results = new RPCMessageList();
-		List<VDMMessage> diags = new Vector<VDMMessage>();
 		boolean hasErrors = false;
 
 		CheckSyntaxEvent syntax = new CheckSyntaxEvent();
 		results.addAll(eventhub.publish(syntax));
-		diags.addAll(syntax.getMessages());
 		
 		if (!syntax.hasErrs())
 		{
 			CheckTypeEvent typecheck = new CheckTypeEvent();
 			results.addAll(eventhub.publish(typecheck));
-			diags.addAll(typecheck.getMessages());
 
 			if (!typecheck.hasErrs())
 			{
 				CheckCompleteEvent runtime = new CheckCompleteEvent();
 				results.addAll(eventhub.publish(runtime));
-				diags.addAll(runtime.getMessages());
 
 				if (!runtime.hasErrs())
 				{
@@ -685,8 +680,7 @@ public class LSPWorkspaceManager
 			hasErrors = true;
 		}
 
-		DiagUtils.dump(diags);
-		results.addAll(messages.diagnosticResponses(diags, projectFiles.keySet()));
+		results.addAll(messagehub.getDiagnosticResponses(projectFiles.keySet()));
 		results.add(RPCRequest.notification("slsp/checked", new JSONObject("successful", !hasErrors)));
 
 		Diag.info("Checked loaded files.");
@@ -1088,7 +1082,7 @@ public class LSPWorkspaceManager
 			ASTPlugin ast = registry.getPlugin("AST");
 			TCPlugin tc = registry.getPlugin("TC");
 			
-			if (!ast.getErrs().isEmpty() || !tc.getErrs().isEmpty())
+			if (ast.hasErrs() || tc.hasErrs())
 			{
 				sendMessage(WARNING_MSG, "Specification contains errors. Cannot locate symbols.");
 			}

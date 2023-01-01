@@ -44,9 +44,9 @@ import com.fujitsu.vdmj.syntax.ModuleReader;
 
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
-import workspace.DiagUtils;
 import workspace.LSPWorkspaceManager;
 import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckSyntaxEvent;
 import workspace.lenses.ASTCodeLens;
 
 public class ASTPluginSL extends ASTPlugin
@@ -67,9 +67,10 @@ public class ASTPluginSL extends ASTPlugin
 	}
 	
 	@Override
-	public boolean checkLoadedFiles()
+	public void checkLoadedFiles(CheckSyntaxEvent event)
 	{
 		dirty = false;
+		hasErrs = false;
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		LexLocation.resetLocations();
 		
@@ -81,16 +82,17 @@ public class ASTPluginSL extends ASTPlugin
 			
 			if (mr.getErrorCount() > 0)
 			{
-				errs.addAll(mr.getErrors());
+				messagehub.addPluginMessages(this, mr.getErrors());
+				hasErrs = true;
 			}
 			
 			if (mr.getWarningCount() > 0)
 			{
-				warns.addAll(mr.getWarnings());
+				messagehub.addPluginMessages(this, mr.getWarnings());
 			}
 		}
 		
-		return errs.isEmpty();
+		if(hasErrs) event.setErrors();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -106,7 +108,7 @@ public class ASTPluginSL extends ASTPlugin
 		dirty = true;	// Until saved.
 		dirtyModuleList = null;
 
-		List<VDMMessage> errs = new Vector<VDMMessage>();
+		List<VDMMessage> messages = new Vector<VDMMessage>();
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
@@ -116,16 +118,15 @@ public class ASTPluginSL extends ASTPlugin
 		
 		if (mr.getErrorCount() > 0)
 		{
-			errs.addAll(mr.getErrors());
+			messages.addAll(mr.getErrors());
 		}
 		
 		if (mr.getWarningCount() > 0)
 		{
-			errs.addAll(mr.getWarnings());
+			messages.addAll(mr.getWarnings());
 		}
 
-		DiagUtils.dump(errs);
-		return errs;
+		return messages;
 	}
 	
 	@Override
