@@ -151,6 +151,30 @@ public class MessageHub
 	}
 	
 	/**
+	 * Check whether the hub contains any VDMErrors.
+	 */
+	public boolean hasErrors()
+	{
+		for (Map<String, Set<VDMMessage>> pmap: messageMap.values())
+		{
+			for (Set<VDMMessage> msgs: pmap.values())
+			{
+				for (VDMMessage m: msgs)
+				{
+					if (m instanceof VDMError)
+					{
+						Diag.fine("MessageHub contains at least one VDMError");
+						return true;
+					}
+				}
+			}
+		}
+		
+		Diag.fine("MessageHub has no VDMErrors");
+		return false;
+	}
+	
+	/**
 	 * Clear all file messages. This is used when the project is reloaded
 	 */
 	public synchronized void clear()

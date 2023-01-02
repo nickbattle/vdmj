@@ -29,7 +29,6 @@ import java.io.FilenameFilter;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.Settings;
@@ -42,7 +41,6 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ClassReader;
 
 import json.JSONArray;
@@ -75,7 +73,6 @@ public class ASTPluginPR extends ASTPlugin
 	{
 		dirty = false;
 		dirtyClassList = null;
-		hasErrs = false;
 		
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		LexLocation.resetLocations();
@@ -104,7 +101,6 @@ public class ASTPluginPR extends ASTPlugin
 			if (mr.getErrorCount() > 0)
 			{
 				messagehub.addPluginMessages(this, mr.getErrors());
-				hasErrs = true;
 			}
 			
 			if (mr.getWarningCount() > 0)
@@ -137,8 +133,6 @@ public class ASTPluginPR extends ASTPlugin
 			Diag.info("Calling remoteSimulation setup %s", remoteSimulation);
 			simulation.setup(astClassList);
 		}
-		
-		if (hasErrs) event.setErrors();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -149,11 +143,10 @@ public class ASTPluginPR extends ASTPlugin
 	}
 	
 	@Override
-	protected List<VDMMessage> parseFile(File file)
+	protected void parseFile(File file)
 	{
 		dirty = true;	// Until saved.
 
-		List<VDMMessage> messages = new Vector<VDMMessage>();
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
@@ -163,15 +156,13 @@ public class ASTPluginPR extends ASTPlugin
 		
 		if (cr.getErrorCount() > 0)
 		{
-			messages.addAll(cr.getErrors());
+			messagehub.addPluginMessages(this, cr.getErrors());
 		}
 		
 		if (cr.getWarningCount() > 0)
 		{
-			messages.addAll(cr.getWarnings());
+			messagehub.addPluginMessages(this, cr.getWarnings());
 		}
-
-		return messages;
 	}
 
 	@Override

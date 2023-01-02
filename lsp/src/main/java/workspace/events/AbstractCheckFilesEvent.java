@@ -26,20 +26,8 @@ package workspace.events;
 
 abstract public class AbstractCheckFilesEvent extends LSPEvent
 {
-	private boolean hasErrs = false;
-	
 	public AbstractCheckFilesEvent()
 	{
 		super(null);
 	}
-	
-	public void setErrors()
-	{
-		this.hasErrs = true;
-	}
-
-	public boolean hasErrs()
-	{
-		return hasErrs;
-	}	
 }

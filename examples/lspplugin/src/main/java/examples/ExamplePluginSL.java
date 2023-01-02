@@ -89,6 +89,7 @@ public class ExamplePluginSL extends ExamplePlugin
 	{
 		TCPlugin tc = registry.getPlugin("TC");
 		TCModuleList tcModuleList = tc.getTC();
+		MessageHub.getInstance().clearPluginMessages(this);
 		
 		TCDefinition first = tcModuleList.get(0).defs.get(0);
 		VDMWarning warning = new VDMWarning(9999, "Example warning from plugin", first.name.getLocation());

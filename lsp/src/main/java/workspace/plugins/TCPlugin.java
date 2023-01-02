@@ -61,8 +61,6 @@ import workspace.lenses.TCLaunchDebugLens;
 
 abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 {
-	protected boolean hasErrs = false;
-	
 	public static TCPlugin factory(Dialect dialect)
 	{
 		switch (dialect)
@@ -99,11 +97,6 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		eventhub.register(CodeLensEvent.class, this);
 	}
 
-	public boolean hasErrs()
-	{
-		return hasErrs;
-	}
-
 	@Override
 	public RPCMessageList handleEvent(LSPEvent event) throws Exception
 	{
@@ -133,7 +126,6 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	protected void preCheck(CheckPrepareEvent ev)
 	{
 		messagehub.clearPluginMessages(this);
-		hasErrs = false;
 	}
 	
 	/**

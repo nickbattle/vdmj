@@ -29,7 +29,6 @@ import java.io.FilenameFilter;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
@@ -39,7 +38,6 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 
 import json.JSONArray;
@@ -70,7 +68,6 @@ public class ASTPluginSL extends ASTPlugin
 	public void checkLoadedFiles(CheckSyntaxEvent event)
 	{
 		dirty = false;
-		hasErrs = false;
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		LexLocation.resetLocations();
 		
@@ -83,7 +80,6 @@ public class ASTPluginSL extends ASTPlugin
 			if (mr.getErrorCount() > 0)
 			{
 				messagehub.addPluginMessages(this, mr.getErrors());
-				hasErrs = true;
 			}
 			
 			if (mr.getWarningCount() > 0)
@@ -91,8 +87,6 @@ public class ASTPluginSL extends ASTPlugin
 				messagehub.addPluginMessages(this, mr.getWarnings());
 			}
 		}
-		
-		if(hasErrs) event.setErrors();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -103,12 +97,11 @@ public class ASTPluginSL extends ASTPlugin
 	}
 	
 	@Override
-	protected List<VDMMessage> parseFile(File file)
+	protected void parseFile(File file)
 	{
 		dirty = true;	// Until saved.
 		dirtyModuleList = null;
 
-		List<VDMMessage> messages = new Vector<VDMMessage>();
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
@@ -118,15 +111,13 @@ public class ASTPluginSL extends ASTPlugin
 		
 		if (mr.getErrorCount() > 0)
 		{
-			messages.addAll(mr.getErrors());
+			messagehub.addPluginMessages(this, mr.getErrors());
 		}
 		
 		if (mr.getWarningCount() > 0)
 		{
-			messages.addAll(mr.getWarnings());
+			messagehub.addPluginMessages(this, mr.getWarnings());
 		}
-
-		return messages;
 	}
 	
 	@Override

@@ -90,8 +90,6 @@ public class TCPluginSL extends TCPlugin
 		if (TypeChecker.getErrorCount() > 0)
 		{
 			messagehub.addPluginMessages(this, TypeChecker.getErrors());
-			hasErrs = true;
-			if (hasErrs) event.setErrors();
 		}
 		
 		if (TypeChecker.getWarningCount() > 0)

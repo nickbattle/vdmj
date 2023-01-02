@@ -51,7 +51,6 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.events.UnknownMethodEvent;
-import workspace.plugins.ASTPlugin;
 import workspace.plugins.AnalysisPlugin;
 import workspace.plugins.CTPlugin;
 import workspace.plugins.POPlugin;
@@ -62,12 +61,14 @@ public class LSPXWorkspaceManager
 	private static LSPXWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
 	private final EventHub eventhub;
+	private final MessageHub messagehub;
 	private final LSPWorkspaceManager wsManager;
 	
 	protected LSPXWorkspaceManager()
 	{
 		this.registry = PluginRegistry.getInstance();
 		this.eventhub = EventHub.getInstance();
+		this.messagehub = MessageHub.getInstance();
 		this.wsManager = LSPWorkspaceManager.getInstance();
 	}
 
@@ -192,10 +193,7 @@ public class LSPXWorkspaceManager
 	{
 		try
 		{
-			ASTPlugin ast = registry.getPlugin("AST");
-			TCPlugin tc = registry.getPlugin("TC");
-			
-			if (ast.hasErrs() || tc.hasErrs())	// No clean tree
+			if (messagehub.hasErrors())	// No clean tree
 			{
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
 			}
@@ -332,10 +330,7 @@ public class LSPXWorkspaceManager
 	
 	private boolean specHasErrors()
 	{
-		ASTPlugin ast = registry.getPlugin("AST");
-		TCPlugin tc = registry.getPlugin("TC");
-		
-		return ast.hasErrs() || tc.hasErrs();
+		return messagehub.hasErrors();
 	}
 
 	/**

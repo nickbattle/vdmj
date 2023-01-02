@@ -45,7 +45,6 @@ import com.fujitsu.vdmj.ast.types.ASTNamedType;
 import com.fujitsu.vdmj.ast.types.ASTRecordType;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMMessage;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -68,7 +67,6 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 {
 	protected static final boolean STRUCTURED_OUTLINE = true;
 	protected boolean dirty;
-	protected boolean hasErrs = false;
 	
 	public static ASTPlugin factory(Dialect dialect)
 	{
@@ -177,19 +175,18 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		return registrations;
 	}
 	
-	abstract protected List<VDMMessage> parseFile(File file);
+	abstract protected void parseFile(File file);
 
 	private RPCMessageList didChange(ChangeFileEvent event) throws Exception
 	{
 		messagehub.clearPluginMessages(this);
-		messagehub.addPluginMessages(this, parseFile(event.file));
+		parseFile(event.file);
 		return messagehub.getDiagnosticResponses(event.file);	// Includes TC errs etc
 	}
 	
 	protected void preCheck(CheckPrepareEvent ev)
 	{
 		messagehub.clearPluginMessages(this);
-		hasErrs = false;
 	}
 	
 	/**
@@ -222,11 +219,6 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		return dirty;
 	}
 	
-	public boolean hasErrs()
-	{
-		return hasErrs;
-	}
-
 	abstract public JSONArray documentSymbols(File file);
 
 	abstract public FilenameFilter getFilenameFilter();
