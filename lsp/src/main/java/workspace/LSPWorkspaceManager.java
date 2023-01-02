@@ -1039,14 +1039,6 @@ public class LSPWorkspaceManager
 	{
 		if (actionCode == RELOAD_AND_CHECK)
 		{
-			LSPServer server = LSPServer.getInstance();
-			
-			for (File source: projectFiles.keySet())
-			{
-				JSONObject noerrs = new JSONObject("uri", source.toURI().toString(), "diagnostics", new JSONArray());
-				server.writeMessage(RPCRequest.notification("textDocument/publishDiagnostics", noerrs));
-			}
-
 			loadAllProjectFiles();
 		}
 		
