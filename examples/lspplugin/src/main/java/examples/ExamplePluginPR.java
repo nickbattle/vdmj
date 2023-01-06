@@ -87,10 +87,14 @@ public class ExamplePluginPR extends ExamplePlugin
 		TCClassList tcClassList = tc.getTC();
 		
 		TCDefinition first = tcClassList.get(0).definitions.get(0);
-		VDMWarning warning = new VDMWarning(9999, "Example warning from plugin", first.name.getLocation());
-		List<VDMMessage> list = new Vector<VDMMessage>();
-		list.add(warning);
-		MessageHub.getInstance().addPluginMessages(this, list);	// Add the warning to the hub
+
+		if (first != null && first.name != null)
+		{
+			VDMWarning warning = new VDMWarning(9999, "Example warning from plugin", first.name.getLocation());
+			List<VDMMessage> list = new Vector<VDMMessage>();
+			list.add(warning);
+			MessageHub.getInstance().addPluginMessages(this, list);	// Add the warning to the hub
+		}
 	}
 
 	/**
