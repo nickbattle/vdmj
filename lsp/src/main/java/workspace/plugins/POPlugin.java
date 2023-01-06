@@ -104,7 +104,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			checkLoadedFiles(tc.getTC());
 			RPCMessageList results = new RPCMessageList();
 			results.add(RPCRequest.notification("slsp/POG/updated",
-					new JSONObject("successful", tc.getErrs().isEmpty())));
+					new JSONObject("successful", !messagehub.hasErrors())));
 			return results;
 		}
 		else

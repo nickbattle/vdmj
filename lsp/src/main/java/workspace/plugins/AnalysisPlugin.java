@@ -32,6 +32,7 @@ import rpc.RPCMessageList;
 import vdmj.commands.Command;
 import vdmj.commands.HelpList;
 import workspace.EventHub;
+import workspace.MessageHub;
 import workspace.PluginRegistry;
 import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
@@ -41,12 +42,14 @@ abstract public class AnalysisPlugin
 	protected final LSPMessageUtils messages;
 	protected final PluginRegistry registry;
 	protected final EventHub eventhub;
+	protected final MessageHub messagehub;
 	
 	public AnalysisPlugin()
 	{
 		messages = new LSPMessageUtils();
 		registry = PluginRegistry.getInstance();
 		eventhub = EventHub.getInstance();
+		messagehub = MessageHub.getInstance();
 	}
 	
 	abstract public String getName();

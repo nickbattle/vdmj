@@ -112,18 +112,6 @@ public class LSPMessageUtils
 		return responses;
 	}
 	
-	public Set<File> filesOfMessages(List<VDMMessage> list)
-	{
-		Set<File> set = new HashSet<File>();
-		
-		for (VDMMessage message: list)
-		{
-			set.add(message.location.file.getAbsoluteFile());
-		}
-
-		return set;
-	}
-	
 	public JSONObject documentSymbol(String name, String detail,
 			SymbolKind kind, LexLocation range, LexLocation selection)
 	{

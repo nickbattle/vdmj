@@ -55,6 +55,8 @@ import com.fujitsu.vdmj.po.definitions.POValueDefinition;
 import com.fujitsu.vdmj.po.patterns.POMultipleBind;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.statements.POErrorCase;
+import com.fujitsu.vdmj.po.statements.POExternalClause;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCField;
 
@@ -82,8 +84,7 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseAssignmentDefinition(POAssignmentDefinition node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		C all = visitorSet.applyTypeVisitor(node.getType(), arg);
 		all.addAll(visitorSet.applyExpressionVisitor(node.expression, arg));
 		return all;
 	}
@@ -110,8 +111,7 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseEqualsDefinition(POEqualsDefinition node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		C all = visitorSet.applyTypeVisitor(node.getType(), arg);
 		all.addAll(visitorSet.applyExpressionVisitor(node.test, arg));
 		return all;
 	}
@@ -129,23 +129,11 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 			}
 		}
 
-		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
-		
-		if (node.predef != null)
-		{
-			all.addAll(node.predef.apply(this, arg));
-		}
-		
-		if (node.postdef != null)
-		{
-			all.addAll(node.postdef.apply(this, arg));
-		}
-		
-		if (node.measureDef != null)
-		{
-			all.addAll(node.measureDef.apply(this, arg));
-		}
+		all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
+		all.addAll(visitorSet.applyDefinitionVisitor(node.measureDef, arg));
 
 		return all;
 	}
@@ -160,18 +148,10 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 			all.addAll(visitorSet.applyPatternVisitor(p, arg));
 		}
 
-		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
 		all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
-		
-		if (node.predef != null)
-		{
-			all.addAll(node.predef.apply(this, arg));
-		}
-		
-		if (node.postdef != null)
-		{
-			all.addAll(node.postdef.apply(this, arg));
-		}
+		all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
 		
 		return all;
 	}
@@ -197,25 +177,13 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 			}
 		}
 
- 		if (node.body != null)
-		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
-		}
-
-		if (node.predef != null)
-		{
-			all.addAll(node.predef.apply(this, arg));
-		}
+		all.addAll(visitorSet.applyPatternVisitor(node.result.pattern, arg));
+		all.addAll(visitorSet.applyTypeVisitor(node.result.type, arg));
 		
-		if (node.postdef != null)
-		{
-			all.addAll(node.postdef.apply(this, arg));
-		}
-		
-		if (node.measureDef != null)
-		{
-			all.addAll(node.measureDef.apply(this, arg));
-		}
+		all.addAll(visitorSet.applyExpressionVisitor(node.body, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
+		all.addAll(visitorSet.applyDefinitionVisitor(node.measureDef, arg));
 		
 		return all;
 	}
@@ -235,20 +203,32 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 			}
 		}
 
-		if (node.body != null)
+		if (node.result != null)
 		{
-			all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
-		}
-
-		if (node.predef != null)
-		{
-			all.addAll(node.predef.apply(this, arg));
+			all.addAll(visitorSet.applyPatternVisitor(node.result.pattern, arg));
+			all.addAll(visitorSet.applyTypeVisitor(node.result.type, arg));
 		}
 		
-		if (node.postdef != null)
+		if (node.externals != null)
 		{
-			all.addAll(node.postdef.apply(this, arg));
+			for (POExternalClause ex: node.externals)
+			{
+				all.addAll(visitorSet.applyTypeVisitor(ex.type, arg));
+			}
 		}
+		
+		if (node.errors != null)
+		{
+			for (POErrorCase err: node.errors)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(err.left, arg));
+				all.addAll(visitorSet.applyExpressionVisitor(err.right, arg));
+			}
+		}
+
+		all.addAll(visitorSet.applyStatementVisitor(node.body, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
 		
 		return all;
 	}
@@ -256,26 +236,21 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseImportedDefinition(POImportedDefinition node, S arg)
 	{
-		return newCollection();
+		return node.def.apply(this, arg);
 	}
 
  	@Override
 	public C caseInheritedDefinition(POInheritedDefinition node, S arg)
 	{
-		return newCollection();
+		return node.superdef.apply(this, arg);
 	}
 
  	@Override
 	public C caseInstanceVariableDefinition(POInstanceVariableDefinition node, S arg)
 	{
- 		if (node.expression != null)
- 		{
- 			return caseAssignmentDefinition(node, arg);
- 		}
- 		else
- 		{
- 			return newCollection();
- 		}
+		C all = visitorSet.applyTypeVisitor(node.type, arg);	
+		all.addAll(visitorSet.applyExpressionVisitor(node.expression, arg));
+		return all;
 	}
 
  	@Override
@@ -324,7 +299,7 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseRenamedDefinition(PORenamedDefinition node, S arg)
 	{
-		return newCollection();
+		return node.def.apply(this, arg);
 	}
 
  	@Override
@@ -337,15 +312,8 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 			all.addAll(visitorSet.applyTypeVisitor(field.type, arg));
 		}
 		
-		if (node.invdef != null)
-		{
-			all.addAll(node.invdef.apply(this, arg));
-		}
-
-		if (node.initdef != null)
-		{
-			all.addAll(node.initdef.apply(this, arg));
-		}
+		all.addAll(visitorSet.applyExpressionVisitor(node.invExpression, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.initExpression, arg));
 		
 		return all;
 	}
@@ -360,22 +328,14 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
 	public C caseTypeDefinition(POTypeDefinition node, S arg)
 	{
 		C all = visitorSet.applyTypeVisitor(node.type, arg);
-		
-		if (node.invdef != null)
-		{
-			all.addAll(node.invdef.apply(this, arg));
-		}
-
-		if (node.eqdef != null)
-		{
-			all.addAll(node.eqdef.apply(this, arg));
-		}
-
-		if (node.orddef != null)
-		{
-			all.addAll(node.orddef.apply(this, arg));
-		}
-		
+		all.addAll(visitorSet.applyPatternVisitor(node.invPattern, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.invExpression, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.eqPattern1, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.eqPattern2, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.eqExpression, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.ordPattern1, arg));
+		all.addAll(visitorSet.applyPatternVisitor(node.ordPattern2, arg));
+		all.addAll(visitorSet.applyExpressionVisitor(node.ordExpression, arg));
 		return all;
 	}
 
@@ -388,8 +348,8 @@ abstract public class POLeafDefinitionVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseValueDefinition(POValueDefinition node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(visitorSet.applyTypeVisitor(node.getType(), arg));
+		C all = visitorSet.applyPatternVisitor(node.pattern, arg);
+		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		return all;
 	}

@@ -47,6 +47,7 @@ import json.JSONObject;
 import lsp.textdocument.SymbolKind;
 import vdmj.LSPDefinitionFinder;
 import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckTypeEvent;
 import workspace.lenses.TCCodeLens;
 
 public class TCPluginSL extends TCPlugin
@@ -72,7 +73,7 @@ public class TCPluginSL extends TCPlugin
 	}
 	
 	@Override
-	public <T extends Mappable> boolean checkLoadedFiles(T astModuleList) throws Exception
+	public <T extends Mappable> void checkLoadedFiles(T astModuleList, CheckTypeEvent event) throws Exception
 	{
 		try
 		{
@@ -88,15 +89,13 @@ public class TCPluginSL extends TCPlugin
 		
 		if (TypeChecker.getErrorCount() > 0)
 		{
-			errs.addAll(TypeChecker.getErrors());
+			messagehub.addPluginMessages(this, TypeChecker.getErrors());
 		}
 		
 		if (TypeChecker.getWarningCount() > 0)
 		{
-			warns.addAll(TypeChecker.getWarnings());
+			messagehub.addPluginMessages(this, TypeChecker.getWarnings());
 		}
-		
-		return errs.isEmpty();
 	}
 
 	@SuppressWarnings("unchecked")

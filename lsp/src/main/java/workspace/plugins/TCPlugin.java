@@ -33,7 +33,6 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -62,9 +61,6 @@ import workspace.lenses.TCLaunchDebugLens;
 
 abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 {
-	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
-	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
-	
 	public static TCPlugin factory(Dialect dialect)
 	{
 		switch (dialect)
@@ -111,11 +107,8 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		}
 		else if (event instanceof CheckTypeEvent)
 		{
-			CheckTypeEvent ev = (CheckTypeEvent)event;
 			ASTPlugin ast = registry.getPlugin("AST");
-			checkLoadedFiles(ast.getAST());
-			ev.addErrs(errs);
-			ev.addWarns(warns);
+			checkLoadedFiles(ast.getAST(), (CheckTypeEvent)event);
 			return new RPCMessageList();
 		}
 		else if (event instanceof CodeLensEvent)
@@ -132,8 +125,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 
 	protected void preCheck(CheckPrepareEvent ev)
 	{
-		errs.clear();
-		warns.clear();
+		messagehub.clearPluginMessages(this);
 	}
 	
 	/**
@@ -153,19 +145,9 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract protected JSONArray getCodeLenses(File file);
 
-	public List<VDMMessage> getErrs()
-	{
-		return errs;
-	}
-	
-	public List<VDMMessage> getWarns()
-	{
-		return warns;
-	}
-	
 	abstract public <T extends Mappable> T getTC();
 	
-	abstract public <T extends Mappable> boolean checkLoadedFiles(T ast) throws Exception;
+	abstract public <T extends Mappable> void checkLoadedFiles(T ast, CheckTypeEvent event) throws Exception;
 
 	abstract public JSONArray documentSymbols(File file);
 

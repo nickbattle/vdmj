@@ -52,16 +52,10 @@ public abstract class INLeafBindVisitor<E, C extends Collection<E>, S> extends I
 		}
 	};
 
- 	public INLeafBindVisitor(INVisitorSet<E, C, S> inVisitorSet)
-	{
- 		this.visitorSet = inVisitorSet;
-	}
-
 	@Override
 	public C caseSeqBind(INSeqBind node, S arg)
 	{
- 		C all = newCollection();
-		all.addAll(visitorSet.applyExpressionVisitor(node.sequence, arg));
+ 		C all = visitorSet.applyExpressionVisitor(node.sequence, arg);
 		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
  		return all;
 	}
@@ -69,8 +63,7 @@ public abstract class INLeafBindVisitor<E, C extends Collection<E>, S> extends I
  	@Override
 	public C caseSetBind(INSetBind node, S arg)
 	{
- 		C all = newCollection();
-		all.addAll(visitorSet.applyExpressionVisitor(node.set, arg));
+ 		C all = visitorSet.applyExpressionVisitor(node.set, arg);
 		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
  		return all;
 	}
@@ -78,8 +71,7 @@ public abstract class INLeafBindVisitor<E, C extends Collection<E>, S> extends I
  	@Override
 	public C caseTypeBind(INTypeBind node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
+		C all = visitorSet.applyTypeVisitor(node.type, arg);
 		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
  		return all;
 	}

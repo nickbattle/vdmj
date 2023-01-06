@@ -94,8 +94,7 @@ public abstract class ASTLeafTypeVisitor<E, C extends Collection<E>, S> extends 
 	@Override
 	public C caseMapType(ASTMapType node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.from.apply(this, arg));
+		C all = node.from.apply(this, arg);
 		all.addAll(node.to.apply(this, arg));
 		return all;
 	}
@@ -163,9 +162,7 @@ public abstract class ASTLeafTypeVisitor<E, C extends Collection<E>, S> extends 
 	@Override
 	public C caseSeqType(ASTSeqType node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.seqof.apply(this, arg));
-		return all;
+		return node.seqof.apply(this, arg);
 	}
 
 	@Override
@@ -177,9 +174,7 @@ public abstract class ASTLeafTypeVisitor<E, C extends Collection<E>, S> extends 
 	@Override
 	public C caseSetType(ASTSetType node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.setof.apply(this, arg));
-		return all;
+		return node.setof.apply(this, arg);
 	}
 
 	@Override

@@ -55,8 +55,7 @@ public abstract class POLeafBindVisitor<E, C extends Collection<E>, S> extends P
  	@Override
 	public C caseSeqBind(POSeqBind node, S arg)
 	{
- 		C all = newCollection();
-		all.addAll(visitorSet.applyExpressionVisitor(node.sequence, arg));
+ 		C all = visitorSet.applyExpressionVisitor(node.sequence, arg);
 		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
  		return all;
 	}
@@ -64,8 +63,7 @@ public abstract class POLeafBindVisitor<E, C extends Collection<E>, S> extends P
  	@Override
 	public C caseSetBind(POSetBind node, S arg)
 	{
- 		C all = newCollection();
-		all.addAll(visitorSet.applyExpressionVisitor(node.set, arg));
+ 		C all = visitorSet.applyExpressionVisitor(node.set, arg);
 		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
  		return all;
 	}
@@ -73,8 +71,7 @@ public abstract class POLeafBindVisitor<E, C extends Collection<E>, S> extends P
  	@Override
 	public C caseTypeBind(POTypeBind node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
+		C all = visitorSet.applyTypeVisitor(node.type, arg);
 		all.addAll(visitorSet.applyPatternVisitor(node.pattern, arg));
  		return all;
 	}

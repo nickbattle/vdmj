@@ -51,7 +51,6 @@ import java.util.regex.Pattern;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
-import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
@@ -98,7 +97,8 @@ public class LSPWorkspaceManager
 	private static LSPWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
 	private final EventHub eventhub;
-	private final LSPMessageUtils messages;
+	private final MessageHub messagehub;
+	private final LSPMessageUtils msgutils;
 	private final Charset encoding;
 
 	private JSONObject clientInfo;
@@ -125,7 +125,8 @@ public class LSPWorkspaceManager
 	{
 		registry = PluginRegistry.getInstance();
 		eventhub = EventHub.getInstance();
-		messages = new LSPMessageUtils();
+		messagehub = MessageHub.getInstance();
+		msgutils = new LSPMessageUtils();
 		
 		if (System.getProperty("lsp.encoding") == null)
 		{
@@ -162,9 +163,10 @@ public class LSPWorkspaceManager
 	
 	public static void reset()
 	{
-		Diag.config("Resetting LSPWorkspaceManager, PluginRegistry and EventHub");
+		Diag.config("Resetting LSPWorkspaceManager, PluginRegistry, EventHub and MessageHub");
 		PluginRegistry.reset();
 		EventHub.reset();
+		MessageHub.reset();
 		INSTANCE = null;
 	}
 	
@@ -263,6 +265,7 @@ public class LSPWorkspaceManager
 	{
 		projectFiles.clear();
 		externalFilesWarned.clear();	// Re-warn after reloads
+		messagehub.clear();
 		
 		removeExtractedFiles();
 		externalFiles.clear();
@@ -454,6 +457,7 @@ public class LSPWorkspaceManager
 		isr.close();
 		
 		projectFiles.put(file, sb);
+		messagehub.addFile(file);
 		Diag.info("Loaded file %s encoding %s", file.getPath(), encoding.displayName());
 	}
 	
@@ -574,29 +578,27 @@ public class LSPWorkspaceManager
 		{
 			File extract = extfile.getKey();
 			
-			if (!extract.exists())
+			if (extract.exists())
 			{
-				continue;
-			}
-			
-			try
-			{
-				BasicFileAttributes attr = Files.readAttributes(extract.toPath(), BasicFileAttributes.class);
-				
-				if (attr.lastModifiedTime().equals(extfile.getValue()))
+				try
 				{
-					Diag.info("Deleting unchanged extracted file %s", extract);
-					extract.delete();
-					ignoreChangesList.add(extract);
+					BasicFileAttributes attr = Files.readAttributes(extract.toPath(), BasicFileAttributes.class);
+					
+					if (attr.lastModifiedTime().equals(extfile.getValue()))
+					{
+						Diag.info("Deleting unchanged extracted file %s", extract);
+						extract.delete();
+						ignoreChangesList.add(extract);
+					}
+					else
+					{
+						Diag.info("Keeping changed extracted file %s", extract);
+					}
 				}
-				else
+				catch (IOException e)
 				{
-					Diag.info("Keeping changed extracted file %s", extract);
+					Diag.error("Problem cleaning up %s: %s", extract, e);
 				}
-			}
-			catch (IOException e)
-			{
-				Diag.error("Problem cleaning up %s: %s", extract, e);
 			}
 		}
 	}
@@ -637,53 +639,48 @@ public class LSPWorkspaceManager
 	private RPCMessageList checkLoadedFilesSafe(String reason) throws Exception
 	{
 		Diag.info("Checking loaded files (%s)...", reason);
-		eventhub.publish(new CheckPrepareEvent());
-
 		RPCMessageList results = new RPCMessageList();
-		List<VDMMessage> diags = new Vector<VDMMessage>();
-		boolean hasErrors = false;
 
-		CheckSyntaxEvent syntax = new CheckSyntaxEvent();
-		results.addAll(eventhub.publish(syntax));
-		diags.addAll(syntax.getMessages());
-		
-		if (!syntax.hasErrs())
+		results.addAll(eventhub.publish(new CheckPrepareEvent()));
+
+		if (!messagehub.hasErrors())
 		{
-			CheckTypeEvent typecheck = new CheckTypeEvent();
-			results.addAll(eventhub.publish(typecheck));
-			diags.addAll(typecheck.getMessages());
-
-			if (!typecheck.hasErrs())
+			results.addAll(eventhub.publish(new CheckSyntaxEvent()));
+			
+			if (!messagehub.hasErrors())
 			{
-				CheckCompleteEvent runtime = new CheckCompleteEvent();
-				results.addAll(eventhub.publish(runtime));
-				diags.addAll(runtime.getMessages());
-
-				if (!runtime.hasErrs())
+				results.addAll(eventhub.publish(new CheckTypeEvent()));
+	
+				if (!messagehub.hasErrors())
 				{
-					Diag.info("Loaded files checked successfully");
+					results.addAll(eventhub.publish(new CheckCompleteEvent()));
+	
+					if (!messagehub.hasErrors())
+					{
+						Diag.info("Loaded files checked successfully");
+					}
+					else
+					{
+						Diag.error("Failed to initialize interpreter");
+					}
 				}
 				else
 				{
-					Diag.error("Failed to create interpreter");
-					hasErrors = true;
+					Diag.error("Type checking errors found");
 				}
 			}
 			else
 			{
-				Diag.error("Type checking errors found");
-				hasErrors = true;
+				Diag.error("Syntax errors found");
 			}
 		}
 		else
 		{
-			Diag.error("Syntax errors found");
-			hasErrors = true;
+			Diag.error("Preparation errors found");
 		}
 
-		DiagUtils.dump(diags);
-		results.addAll(messages.diagnosticResponses(diags, projectFiles.keySet()));
-		results.add(RPCRequest.notification("slsp/checked", new JSONObject("successful", !hasErrors)));
+		results.addAll(messagehub.getDiagnosticResponses(projectFiles.keySet()));
+		results.add(RPCRequest.notification("slsp/checked", new JSONObject("successful", !messagehub.hasErrors())));
 
 		Diag.info("Checked loaded files.");
 		return results;
@@ -701,7 +698,7 @@ public class LSPWorkspaceManager
 			Diag.info("Ignoring file %s in vdmignore", file);
 			return null;			
 		}
-		else if (!projectFiles.keySet().contains(file))
+		else if (!projectFiles.containsKey(file))
 		{
 			Diag.info("Opening new file: %s", file);
 			openFiles.add(file);
@@ -733,6 +730,7 @@ public class LSPWorkspaceManager
 			}
 			
 			projectFiles.put(file, new StringBuilder(text));
+			messagehub.addFile(file);
 			return checkLoadedFiles("file out of sync");
 		}
 		
@@ -749,7 +747,7 @@ public class LSPWorkspaceManager
 		{
 			Diag.info("Ignoring %s file in vdmignore", file);			
 		}
-		else if (!projectFiles.keySet().contains(file))
+		else if (!projectFiles.containsKey(file))
 		{
 			Diag.error("File not known: %s", file);
 		}
@@ -779,7 +777,7 @@ public class LSPWorkspaceManager
 			Diag.info("Ignoring %s file in vdmignore", file);
 			return null;			
 		}
-		else if (!projectFiles.keySet().contains(file))
+		else if (!projectFiles.containsKey(file))
 		{
 			Diag.error("File not known: %s", file);
 			return null;
@@ -826,7 +824,7 @@ public class LSPWorkspaceManager
 		{
 			Diag.info("Ignoring file %s in vdmignore", file);
 		}
-		else if (!projectFiles.keySet().contains(file))
+		else if (!projectFiles.containsKey(file))
 		{
 			Diag.error("File not known: %s", file);
 		}
@@ -927,7 +925,7 @@ public class LSPWorkspaceManager
 					Diag.info("Ignoring non-project file: %s", file);
 					actionCode = DO_NOTHING;
 				}
-				else if (!projectFiles.keySet().contains(file))	
+				else if (!projectFiles.containsKey(file))	
 				{
 					if (hasOrderedFiles)
 					{
@@ -995,7 +993,7 @@ public class LSPWorkspaceManager
 					Diag.info("Ignoring non-project file change: %s", file);
 					actionCode = DO_NOTHING;
 				}
-				else if (!projectFiles.keySet().contains(file))	
+				else if (!projectFiles.containsKey(file))	
 				{
 					Diag.error("Changed file not known: %s", file);
 					actionCode = RELOAD_AND_CHECK;	// Try rebuilding?
@@ -1040,14 +1038,6 @@ public class LSPWorkspaceManager
 	{
 		if (actionCode == RELOAD_AND_CHECK)
 		{
-			LSPServer server = LSPServer.getInstance();
-			
-			for (File source: projectFiles.keySet())
-			{
-				JSONObject noerrs = new JSONObject("uri", source.toURI().toString(), "diagnostics", new JSONArray());
-				server.writeMessage(RPCRequest.notification("textDocument/publishDiagnostics", noerrs));
-			}
-
 			loadAllProjectFiles();
 		}
 		
@@ -1080,10 +1070,7 @@ public class LSPWorkspaceManager
 		
 		if (def == null)
 		{
-			ASTPlugin ast = registry.getPlugin("AST");
-			TCPlugin tc = registry.getPlugin("TC");
-			
-			if (!ast.getErrs().isEmpty() || !tc.getErrs().isEmpty())
+			if (messagehub.hasErrors())
 			{
 				sendMessage(WARNING_MSG, "Specification contains errors. Cannot locate symbols.");
 			}
@@ -1200,7 +1187,7 @@ public class LSPWorkspaceManager
 		else if (def instanceof TCClassDefinition)
 		{
 			TCClassDefinition cdef = (TCClassDefinition)def;
-			return new RPCMessageList(request, messages.typeHierarchyItem(cdef));
+			return new RPCMessageList(request, msgutils.typeHierarchyItem(cdef));
 		}
 		else
 		{
@@ -1213,14 +1200,14 @@ public class LSPWorkspaceManager
 	{
 		TCPlugin tc = registry.getPlugin("TC");
 		TCClassList results = tc.getTypeHierarchy(classname, false);
-		return new RPCMessageList(request, messages.typeHierarchyItems(results));
+		return new RPCMessageList(request, msgutils.typeHierarchyItems(results));
 	}
 
 	public RPCMessageList lspSubtypes(RPCRequest request, String classname)
 	{
 		TCPlugin tc = registry.getPlugin("TC");
 		TCClassList results = tc.getTypeHierarchy(classname, true);
-		return new RPCMessageList(request, messages.typeHierarchyItems(results));
+		return new RPCMessageList(request, msgutils.typeHierarchyItems(results));
 	}
 
 	public RPCMessageList lspCompletion(RPCRequest request,
@@ -1460,7 +1447,7 @@ public class LSPWorkspaceManager
 		eventhub.publish(new ShutdownEvent(request));
 		LSPServer.getInstance().setInitialized(false);
 		removeExtractedFiles();
-		reset();	// Clear registry, eventhub and singleton
+		reset();	// Clear registry, eventhub and messagehub
 		
 		return new RPCMessageList(request);
 	}

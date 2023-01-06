@@ -27,7 +27,6 @@ package workspace.plugins;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
@@ -46,7 +45,6 @@ import com.fujitsu.vdmj.ast.types.ASTNamedType;
 import com.fujitsu.vdmj.ast.types.ASTRecordType;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMMessage;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -68,9 +66,6 @@ import workspace.lenses.ASTLaunchDebugLens;
 public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 {
 	protected static final boolean STRUCTURED_OUTLINE = true;
-
-	protected final List<VDMMessage> errs = new Vector<VDMMessage>();
-	protected final List<VDMMessage> warns = new Vector<VDMMessage>();
 	protected boolean dirty;
 	
 	public static ASTPlugin factory(Dialect dialect)
@@ -135,10 +130,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		}
 		else if (event instanceof CheckSyntaxEvent)
 		{
-			CheckSyntaxEvent ev = (CheckSyntaxEvent)event;
-			checkLoadedFiles();
-			ev.addErrs(errs);
-			ev.addWarns(warns);
+			checkLoadedFiles((CheckSyntaxEvent)event);
 			return null;
 		}
 		else
@@ -183,34 +175,24 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 		return registrations;
 	}
 	
-	abstract protected List<VDMMessage> parseFile(File file);
+	abstract protected void parseFile(File file);
 
 	private RPCMessageList didChange(ChangeFileEvent event) throws Exception
 	{
-		List<VDMMessage> errors = parseFile(event.file);
-		
-		// Add current TC errors as these need to be seen until the next save
-		TCPlugin tc = registry.getPlugin("TC");
-		errors.addAll(tc.getErrs());
-		errors.addAll(tc.getWarns());
-		
-		// We report on this file, plus the files with tc errors (if any).
-		Set<File> files = messages.filesOfMessages(errors);
-		files.add(event.file);
-		return messages.diagnosticResponses(errors, files);
+		messagehub.clearPluginMessages(this);
+		parseFile(event.file);
+		return messagehub.getDiagnosticResponses(event.file);	// Includes TC errs etc
 	}
 	
 	protected void preCheck(CheckPrepareEvent ev)
 	{
-		errs.clear();
-		warns.clear();
+		messagehub.clearPluginMessages(this);
 	}
 	
 	/**
 	 * Event handling above. Supporting methods below. 
 	 */
-	
-	abstract public boolean checkLoadedFiles();
+	abstract public void checkLoadedFiles(CheckSyntaxEvent ev);
 	
 	/**
 	 * We register the launch/debug code lens here, if the tree is dirty. Else it
@@ -230,23 +212,13 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract protected JSONArray getCodeLenses(File file);
 
-	public List<VDMMessage> getErrs()
-	{
-		return errs;
-	}
-	
-	public List<VDMMessage> getWarns()
-	{
-		return warns;
-	}
-	
 	abstract public <T extends Mappable> T getAST();
 	
 	public boolean isDirty()
 	{
 		return dirty;
 	}
-
+	
 	abstract public JSONArray documentSymbols(File file);
 
 	abstract public FilenameFilter getFilenameFilter();

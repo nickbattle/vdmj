@@ -43,6 +43,7 @@ import workspace.Diag;
 import workspace.EventHub;
 import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
+import workspace.MessageHub;
 import workspace.PluginRegistry;
 
 abstract public class LSPTest
@@ -61,6 +62,7 @@ abstract public class LSPTest
 	{
 		Settings.dialect = dialect;
 		EventHub.reset();
+		MessageHub.reset();
 		PluginRegistry.reset();
 		LSPWorkspaceManager.reset();
 		LSPXWorkspaceManager.reset();

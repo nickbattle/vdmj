@@ -65,11 +65,8 @@ public abstract class POLeafPatternVisitor<E, C extends Collection<E>, S> extend
  	@Override
 	public C caseConcatenationPattern(POConcatenationPattern node, S arg)
 	{
- 		C all = newCollection();
- 		
- 		all.addAll(node.left.apply(this, arg));
+ 		C all = node.left.apply(this, arg);
  		all.addAll(node.right.apply(this, arg));
- 		
  		return all;
 	}
 
@@ -96,11 +93,8 @@ public abstract class POLeafPatternVisitor<E, C extends Collection<E>, S> extend
  	@Override
 	public C caseMapUnionPattern(POMapUnionPattern node, S arg)
 	{
- 		C all = newCollection();
- 		
- 		all.addAll(node.left.apply(this, arg));
+ 		C all = node.left.apply(this, arg);
  		all.addAll(node.right.apply(this, arg));
- 		
  		return all;
 	}
 
@@ -172,11 +166,8 @@ public abstract class POLeafPatternVisitor<E, C extends Collection<E>, S> extend
  	@Override
 	public C caseUnionPattern(POUnionPattern node, S arg)
 	{
- 		C all = newCollection();
- 		
- 		all.addAll(node.left.apply(this, arg));
+ 		C all = node.left.apply(this, arg);
  		all.addAll(node.right.apply(this, arg));
- 		
  		return all;
 	}
 

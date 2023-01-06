@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.ast.statements.visitors;
 import java.util.Collection;
 
 import com.fujitsu.vdmj.ast.ASTVisitorSet;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotatedStatement;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.statements.ASTAlwaysStatement;
@@ -40,14 +41,25 @@ import com.fujitsu.vdmj.ast.statements.ASTCasesStatement;
 import com.fujitsu.vdmj.ast.statements.ASTCyclesStatement;
 import com.fujitsu.vdmj.ast.statements.ASTDurationStatement;
 import com.fujitsu.vdmj.ast.statements.ASTElseIfStatement;
+import com.fujitsu.vdmj.ast.statements.ASTErrorCase;
 import com.fujitsu.vdmj.ast.statements.ASTErrorStatement;
 import com.fujitsu.vdmj.ast.statements.ASTExitStatement;
+import com.fujitsu.vdmj.ast.statements.ASTExternalClause;
+import com.fujitsu.vdmj.ast.statements.ASTFieldDesignator;
 import com.fujitsu.vdmj.ast.statements.ASTForAllStatement;
 import com.fujitsu.vdmj.ast.statements.ASTForIndexStatement;
 import com.fujitsu.vdmj.ast.statements.ASTForPatternBindStatement;
+import com.fujitsu.vdmj.ast.statements.ASTIdentifierDesignator;
 import com.fujitsu.vdmj.ast.statements.ASTIfStatement;
 import com.fujitsu.vdmj.ast.statements.ASTLetBeStStatement;
 import com.fujitsu.vdmj.ast.statements.ASTLetDefStatement;
+import com.fujitsu.vdmj.ast.statements.ASTMapSeqDesignator;
+import com.fujitsu.vdmj.ast.statements.ASTObjectApplyDesignator;
+import com.fujitsu.vdmj.ast.statements.ASTObjectDesignator;
+import com.fujitsu.vdmj.ast.statements.ASTObjectFieldDesignator;
+import com.fujitsu.vdmj.ast.statements.ASTObjectIdentifierDesignator;
+import com.fujitsu.vdmj.ast.statements.ASTObjectNewDesignator;
+import com.fujitsu.vdmj.ast.statements.ASTObjectSelfDesignator;
 import com.fujitsu.vdmj.ast.statements.ASTPeriodicStatement;
 import com.fujitsu.vdmj.ast.statements.ASTReturnStatement;
 import com.fujitsu.vdmj.ast.statements.ASTSimpleBlockStatement;
@@ -55,6 +67,7 @@ import com.fujitsu.vdmj.ast.statements.ASTSkipStatement;
 import com.fujitsu.vdmj.ast.statements.ASTSpecificationStatement;
 import com.fujitsu.vdmj.ast.statements.ASTSporadicStatement;
 import com.fujitsu.vdmj.ast.statements.ASTStartStatement;
+import com.fujitsu.vdmj.ast.statements.ASTStateDesignator;
 import com.fujitsu.vdmj.ast.statements.ASTStatement;
 import com.fujitsu.vdmj.ast.statements.ASTStopStatement;
 import com.fujitsu.vdmj.ast.statements.ASTSubclassResponsibilityStatement;
@@ -87,16 +100,32 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
 	@Override
 	public C caseAlwaysStatement(ASTAlwaysStatement node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(node.always.apply(this, arg));
+		C all = node.always.apply(this, arg);
 		all.addAll(node.body.apply(this, arg));
 		return all;
 	}
+	
+	@Override
+	public C caseAnnotatedStatement(ASTAnnotatedStatement node, S arg)
+	{
+ 		C all = newCollection();
+ 		
+ 		for (ASTExpression a: node.annotation.args)
+ 		{
+ 			all.addAll(visitorSet.applyExpressionVisitor(a, arg));
+ 		}
+ 		
+ 		all.addAll(node.statement.apply(this, arg));
+ 		return all;
+	}
+
 
  	@Override
 	public C caseAssignmentStatement(ASTAssignmentStatement node, S arg)
 	{
-		return visitorSet.applyExpressionVisitor(node.exp, arg);
+ 		C all = caseStateDesignator(node.target, arg);
+		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
+		return all;
 	}
 
 	@Override
@@ -133,7 +162,7 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
 	@Override
 	public C caseCallObjectStatement(ASTCallObjectStatement node, S arg)
 	{
-		C all = newCollection();
+		C all = caseObjectDesignator(node.designator, arg);
 		
 		for (ASTExpression a: node.args)
 		{
@@ -159,7 +188,7 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseCasesStatement(ASTCasesStatement node, S arg)
 	{
-		C all = newCollection();
+		C all = visitorSet.applyExpressionVisitor(node.exp, arg);
 		
 		for (ASTCaseStmtAlternative alternative: node.cases)
 		{
@@ -172,8 +201,7 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseCyclesStatement(ASTCyclesStatement node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(visitorSet.applyExpressionVisitor(node.cycles, arg));
+		C all = visitorSet.applyExpressionVisitor(node.cycles, arg);
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -181,8 +209,7 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseDurationStatement(ASTDurationStatement node, S arg)
 	{
-		C all = newCollection();
-		all.addAll(visitorSet.applyExpressionVisitor(node.duration, arg));
+		C all = visitorSet.applyExpressionVisitor(node.duration, arg);
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -204,20 +231,14 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseExitStatement(ASTExitStatement node, S arg)
 	{
- 		if (node.expression != null)
- 		{
-			return visitorSet.applyExpressionVisitor(node.expression, arg);
- 		}
- 		else
- 		{
- 			return newCollection();
- 		}
+		return visitorSet.applyExpressionVisitor(node.expression, arg);
 	}
 
  	@Override
 	public C caseForAllStatement(ASTForAllStatement node, S arg)
 	{
-		C all = visitorSet.applyExpressionVisitor(node.set, arg);
+		C all = visitorSet.applyPatternVisitor(node.pattern, arg);
+		all.addAll(visitorSet.applyExpressionVisitor(node.set, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -225,16 +246,9 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseForIndexStatement(ASTForIndexStatement node, S arg)
 	{
-		C all = newCollection();
-		
-		all.addAll(visitorSet.applyExpressionVisitor(node.from, arg));
+		C all = visitorSet.applyExpressionVisitor(node.from, arg);
 		all.addAll(visitorSet.applyExpressionVisitor(node.to, arg));
-		
-		if (node.by != null)
-		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.by, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.by, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -243,6 +257,7 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
 	public C caseForPatternBindStatement(ASTForPatternBindStatement node, S arg)
 	{
  		C all = visitorSet.applyBindVisitor(node.patternBind.bind, arg);
+ 		all.addAll(visitorSet.applyPatternVisitor(node.patternBind.pattern, arg));
 		all.addAll(visitorSet.applyExpressionVisitor(node.exp, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
@@ -262,11 +277,7 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
 			}
 		}
 		
-		if (node.elseStmt != null)
-		{
-			all.addAll(node.elseStmt.apply(this, arg));
-		}
-		
+		all.addAll(visitorSet.applyStatementVisitor(node.elseStmt, arg));
 		return all;
 	}
 
@@ -274,12 +285,7 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
 	public C caseLetBeStStatement(ASTLetBeStStatement node, S arg)
 	{
 		C all = visitorSet.applyMultiBindVisitor(node.bind, arg);
-		
-		if (node.suchThat != null)
-		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.suchThat, arg));
-		}
-		
+		all.addAll(visitorSet.applyExpressionVisitor(node.suchThat, arg));
 		all.addAll(node.statement.apply(this, arg));
 		return all;
 	}
@@ -314,14 +320,7 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseReturnStatement(ASTReturnStatement node, S arg)
 	{
- 		if (node.expression != null)
- 		{
-			return visitorSet.applyExpressionVisitor(node.expression, arg);
- 		}
- 		else
- 		{
- 			return newCollection();
- 		}
+		return visitorSet.applyExpressionVisitor(node.expression, arg);
 	}
 
  	@Override
@@ -346,16 +345,24 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseSpecificationStatement(ASTSpecificationStatement node, S arg)
 	{
-		C all = newCollection();
-		
-		if (node.precondition != null)
+		C all = visitorSet.applyExpressionVisitor(node.precondition, arg);
+		all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
+
+		if (node.externals != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.precondition, arg));
+			for (ASTExternalClause ex: node.externals)
+			{
+				all.addAll(visitorSet.applyTypeVisitor(ex.type, arg));
+			}
 		}
 		
-		if (node.postcondition != null)
+		if (node.errors != null)
 		{
-			all.addAll(visitorSet.applyExpressionVisitor(node.postcondition, arg));
+			for (ASTErrorCase err: node.errors)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(err.left, arg));
+				all.addAll(visitorSet.applyExpressionVisitor(err.right, arg));
+			}
 		}
 		
 		return all;
@@ -399,6 +406,8 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
 		
 		for (ASTTixeStmtAlternative alternative: node.traps)
 		{
+			all.addAll(visitorSet.applyPatternVisitor(alternative.patternBind.pattern, arg));
+			all.addAll(visitorSet.applyBindVisitor(alternative.patternBind.bind, arg));
 			all.addAll(alternative.statement.apply(this, arg));
 		}
 		
@@ -409,7 +418,8 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
  	@Override
 	public C caseTrapStatement(ASTTrapStatement node, S arg)
 	{
-		C all = visitorSet.applyBindVisitor(node.patternBind.bind, arg);
+		C all = visitorSet.applyPatternVisitor(node.patternBind.pattern, arg);
+		all.addAll(visitorSet.applyBindVisitor(node.patternBind.bind, arg));
 		all.addAll(node.with.apply(this, arg));
 		all.addAll(node.body.apply(this, arg));
 		return all;
@@ -421,6 +431,68 @@ abstract public class ASTLeafStatementVisitor<E, C extends Collection<E>, S> ext
 		C all = visitorSet.applyExpressionVisitor(node.exp, arg);
 		all.addAll(node.statement.apply(this, arg));
 		return all;
+	}
+
+	private C caseStateDesignator(ASTStateDesignator designator, S arg)
+	{
+		if (designator instanceof ASTFieldDesignator)
+		{
+			ASTFieldDesignator fd = (ASTFieldDesignator)designator;
+			return caseStateDesignator(fd.object, arg);
+		}
+		else if (designator instanceof ASTIdentifierDesignator)
+		{
+			return newCollection();
+		}
+		else if (designator instanceof ASTMapSeqDesignator)
+		{
+			ASTMapSeqDesignator msd = (ASTMapSeqDesignator)designator;
+			C all = caseStateDesignator(msd.mapseq, arg);
+			all.addAll(visitorSet.applyExpressionVisitor(msd.exp, arg));
+			return all;
+		}
+		else
+		{
+			throw new IllegalArgumentException("caseStateDesignator");
+		}
+	}
+
+	private C caseObjectDesignator(ASTObjectDesignator designator, S arg)
+	{
+		if (designator instanceof ASTObjectApplyDesignator)
+		{
+			ASTObjectApplyDesignator ad = (ASTObjectApplyDesignator)designator;
+			C all = caseObjectDesignator(ad.object, arg);
+			
+			for (ASTExpression exp: ad.args)
+			{
+				all.addAll(visitorSet.applyExpressionVisitor(exp, arg));
+			}
+			
+			return all;
+		}
+		else if (designator instanceof ASTObjectFieldDesignator)
+		{
+			ASTObjectFieldDesignator fd = (ASTObjectFieldDesignator)designator;
+			return caseObjectDesignator(fd.object, arg);
+		}
+		else if (designator instanceof ASTObjectNewDesignator)
+		{
+			ASTObjectNewDesignator nd = (ASTObjectNewDesignator)designator;
+			return visitorSet.applyExpressionVisitor(nd.expression, arg);
+		}
+		else if (designator instanceof ASTObjectIdentifierDesignator)
+		{
+			return newCollection();
+		}
+		else if (designator instanceof ASTObjectSelfDesignator)
+		{
+			return newCollection();
+		}
+		else
+		{
+			throw new IllegalArgumentException("caseObjectDesignator");
+		}
 	}
 
 	abstract protected C newCollection();

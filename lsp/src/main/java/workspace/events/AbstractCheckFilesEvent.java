@@ -24,51 +24,10 @@
 
 package workspace.events;
 
-import java.util.List;
-import java.util.Vector;
-
-import com.fujitsu.vdmj.messages.VDMMessage;
-
 abstract public class AbstractCheckFilesEvent extends LSPEvent
 {
-	private final List<VDMMessage> errs = new Vector<VDMMessage>();
-	private final List<VDMMessage> warns = new Vector<VDMMessage>();
-	
 	public AbstractCheckFilesEvent()
 	{
 		super(null);
 	}
-	
-	public List<VDMMessage> getErrs()
-	{
-		return errs;
-	}
-	
-	public void addErrs(List<VDMMessage> errs)
-	{
-		this.errs.addAll(errs);
-	}
-	
-	public List<VDMMessage> getWarns()
-	{
-		return warns;
-	}
-	
-	public void addWarns(List<VDMMessage> warns)
-	{
-		this.warns.addAll(warns);
-	}
-	
-	public List<VDMMessage> getMessages()
-	{
-		Vector<VDMMessage> all = new Vector<VDMMessage>();
-		all.addAll(errs);
-		all.addAll(warns);
-		return all;
-	}
-
-	public boolean hasErrs()
-	{
-		return !errs.isEmpty();
-	}	
 }

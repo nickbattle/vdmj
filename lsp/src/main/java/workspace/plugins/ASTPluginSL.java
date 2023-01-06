@@ -29,7 +29,6 @@ import java.io.FilenameFilter;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
@@ -39,14 +38,13 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
-import workspace.DiagUtils;
 import workspace.LSPWorkspaceManager;
 import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckSyntaxEvent;
 import workspace.lenses.ASTCodeLens;
 
 public class ASTPluginSL extends ASTPlugin
@@ -67,7 +65,7 @@ public class ASTPluginSL extends ASTPlugin
 	}
 	
 	@Override
-	public boolean checkLoadedFiles()
+	public void checkLoadedFiles(CheckSyntaxEvent event)
 	{
 		dirty = false;
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
@@ -81,16 +79,14 @@ public class ASTPluginSL extends ASTPlugin
 			
 			if (mr.getErrorCount() > 0)
 			{
-				errs.addAll(mr.getErrors());
+				messagehub.addPluginMessages(this, mr.getErrors());
 			}
 			
 			if (mr.getWarningCount() > 0)
 			{
-				warns.addAll(mr.getWarnings());
+				messagehub.addPluginMessages(this, mr.getWarnings());
 			}
 		}
-		
-		return errs.isEmpty();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -101,12 +97,11 @@ public class ASTPluginSL extends ASTPlugin
 	}
 	
 	@Override
-	protected List<VDMMessage> parseFile(File file)
+	protected void parseFile(File file)
 	{
 		dirty = true;	// Until saved.
 		dirtyModuleList = null;
 
-		List<VDMMessage> errs = new Vector<VDMMessage>();
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
@@ -116,16 +111,13 @@ public class ASTPluginSL extends ASTPlugin
 		
 		if (mr.getErrorCount() > 0)
 		{
-			errs.addAll(mr.getErrors());
+			messagehub.addPluginMessages(this, mr.getErrors());
 		}
 		
 		if (mr.getWarningCount() > 0)
 		{
-			errs.addAll(mr.getWarnings());
+			messagehub.addPluginMessages(this, mr.getWarnings());
 		}
-
-		DiagUtils.dump(errs);
-		return errs;
 	}
 	
 	@Override

@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.ast.patterns.ASTMultipleBind;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleSeqBind;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleSetBind;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleTypeBind;
+import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 
 /**
  * This ASTMultipleBind visitor visits all of the leaves of a bind tree and calls
@@ -59,19 +60,43 @@ public abstract class ASTLeafMultipleBindVisitor<E, C extends Collection<E>, S> 
  	@Override
 	public C caseMultipleSeqBind(ASTMultipleSeqBind node, S arg)
 	{
-		return caseMultipleBind(node, arg);
+ 		C all = newCollection();
+ 		
+ 		for (ASTPattern p: node.plist)
+ 		{
+ 			all.addAll(visitorSet.applyPatternVisitor(p, arg));
+ 		}
+ 		
+ 		all.addAll(visitorSet.applyExpressionVisitor(node.sequence, arg));
+		return all;
 	}
 
  	@Override
 	public C caseMultipleSetBind(ASTMultipleSetBind node, S arg)
 	{
-		return caseMultipleBind(node, arg);
+ 		C all = newCollection();
+ 		
+ 		for (ASTPattern p: node.plist)
+ 		{
+ 			all.addAll(visitorSet.applyPatternVisitor(p, arg));
+ 		}
+ 		
+ 		all.addAll(visitorSet.applyExpressionVisitor(node.set, arg));
+		return all;
 	}
 
  	@Override
 	public C caseMultipleTypeBind(ASTMultipleTypeBind node, S arg)
 	{
-		return caseMultipleBind(node, arg);
+ 		C all = newCollection();
+ 		
+ 		for (ASTPattern p: node.plist)
+ 		{
+ 			all.addAll(visitorSet.applyPatternVisitor(p, arg));
+ 		}
+ 		
+ 		all.addAll(visitorSet.applyTypeVisitor(node.type, arg));
+		return all;
 	}
 
  	abstract protected C newCollection();

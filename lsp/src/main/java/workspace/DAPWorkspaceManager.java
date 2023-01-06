@@ -88,13 +88,13 @@ import workspace.events.DAPLaunchEvent;
 import workspace.events.DAPTerminateEvent;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.INPlugin;
-import workspace.plugins.TCPlugin;
 
 public class DAPWorkspaceManager
 {
 	private static DAPWorkspaceManager INSTANCE = null;
 	private final PluginRegistry registry;
 	private final EventHub eventhub;
+	private final MessageHub messagehub;
 	
 	private JSONObject clientCapabilities;
 	private Boolean noDebug;
@@ -129,6 +129,7 @@ public class DAPWorkspaceManager
 	{
 		this.registry = PluginRegistry.getInstance();
 		this.eventhub = EventHub.getInstance();
+		this.messagehub = MessageHub.getInstance();
 	}
 
 	public static synchronized DAPWorkspaceManager getInstance()
@@ -943,10 +944,7 @@ public class DAPWorkspaceManager
 	 */
 	public boolean specHasErrors()
 	{
-		ASTPlugin ast = registry.getPlugin("AST");
-		TCPlugin tc = registry.getPlugin("TC");
-		
-		return !ast.getErrs().isEmpty() || !tc.getErrs().isEmpty();
+		return messagehub.hasErrors();
 	}
 
 	public void setDebugReader(DAPDebugReader debugReader)

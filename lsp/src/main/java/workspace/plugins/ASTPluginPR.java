@@ -29,7 +29,6 @@ import java.io.FilenameFilter;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.Settings;
@@ -42,15 +41,14 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ClassReader;
 
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
 import workspace.Diag;
-import workspace.DiagUtils;
 import workspace.LSPWorkspaceManager;
 import workspace.events.CheckPrepareEvent;
+import workspace.events.CheckSyntaxEvent;
 import workspace.lenses.ASTCodeLens;
 
 public class ASTPluginPR extends ASTPlugin
@@ -71,7 +69,7 @@ public class ASTPluginPR extends ASTPlugin
 	}
 	
 	@Override
-	public boolean checkLoadedFiles()
+	public void checkLoadedFiles(CheckSyntaxEvent event)
 	{
 		dirty = false;
 		dirtyClassList = null;
@@ -90,7 +88,7 @@ public class ASTPluginPR extends ASTPlugin
 			catch (Exception e)
 			{
 				Diag.error(e);
-				return false;
+				return;
 			}
 		}
 		
@@ -102,12 +100,12 @@ public class ASTPluginPR extends ASTPlugin
 			
 			if (mr.getErrorCount() > 0)
 			{
-				errs.addAll(mr.getErrors());
+				messagehub.addPluginMessages(this, mr.getErrors());
 			}
 			
 			if (mr.getWarningCount() > 0)
 			{
-				warns.addAll(mr.getWarnings());
+				messagehub.addPluginMessages(this, mr.getWarnings());
 			}
 		}
 		
@@ -135,8 +133,6 @@ public class ASTPluginPR extends ASTPlugin
 			Diag.info("Calling remoteSimulation setup %s", remoteSimulation);
 			simulation.setup(astClassList);
 		}
-		
-		return errs.isEmpty();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -147,11 +143,10 @@ public class ASTPluginPR extends ASTPlugin
 	}
 	
 	@Override
-	protected List<VDMMessage> parseFile(File file)
+	protected void parseFile(File file)
 	{
 		dirty = true;	// Until saved.
 
-		List<VDMMessage> errs = new Vector<VDMMessage>();
 		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
@@ -161,16 +156,13 @@ public class ASTPluginPR extends ASTPlugin
 		
 		if (cr.getErrorCount() > 0)
 		{
-			errs.addAll(cr.getErrors());
+			messagehub.addPluginMessages(this, cr.getErrors());
 		}
 		
 		if (cr.getWarningCount() > 0)
 		{
-			errs.addAll(cr.getWarnings());
+			messagehub.addPluginMessages(this, cr.getWarnings());
 		}
-
-		DiagUtils.dump(errs);
-		return errs;
 	}
 
 	@Override

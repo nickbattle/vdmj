@@ -90,7 +90,7 @@ abstract public class INVisitorSet<E, C extends Collection<E>, S>
 	
 	public C applyDefinitionVisitor(INDefinition def, S arg)
 	{
- 		if (definitionVisitor != null)
+ 		if (definitionVisitor != null && def != null)
  		{
  			return def.apply(definitionVisitor, arg);
  		}
@@ -107,7 +107,7 @@ abstract public class INVisitorSet<E, C extends Collection<E>, S>
  	
 	public C applyExpressionVisitor(INExpression def, S arg)
 	{
- 		if (expressionVisitor != null)
+ 		if (expressionVisitor != null && def != null)
  		{
  			return def.apply(expressionVisitor, arg);
  		}
@@ -124,7 +124,7 @@ abstract public class INVisitorSet<E, C extends Collection<E>, S>
 
 	public C applyStatementVisitor(INStatement def, S arg)
 	{
- 		if (statementVisitor != null)
+ 		if (statementVisitor != null && def != null)
  		{
  			return def.apply(statementVisitor, arg);
  		}
@@ -141,7 +141,7 @@ abstract public class INVisitorSet<E, C extends Collection<E>, S>
  	
 	public C applyPatternVisitor(INPattern def, S arg)
 	{
- 		if (patternVisitor != null)
+ 		if (patternVisitor != null && def != null)
  		{
  			return def.apply(patternVisitor, arg);
  		}
@@ -158,7 +158,7 @@ abstract public class INVisitorSet<E, C extends Collection<E>, S>
 
 	public C applyTypeVisitor(TCType def, S arg)
 	{
- 		if (typeVisitor != null)
+ 		if (typeVisitor != null && def != null)
  		{
  			return def.apply(typeVisitor, arg);
  		}
@@ -175,7 +175,7 @@ abstract public class INVisitorSet<E, C extends Collection<E>, S>
 
 	public C applyBindVisitor(INBind def, S arg)
 	{
- 		if (bindVisitor != null)
+ 		if (bindVisitor != null && def != null)
  		{
  			return def.apply(bindVisitor, arg);
  		}
@@ -192,7 +192,7 @@ abstract public class INVisitorSet<E, C extends Collection<E>, S>
 	
 	public C applyMultiBindVisitor(INMultipleBind def, S arg)
 	{
- 		if (multiBindVisitor != null)
+ 		if (multiBindVisitor != null && def != null)
  		{
  			return def.apply(multiBindVisitor, arg);
  		}
