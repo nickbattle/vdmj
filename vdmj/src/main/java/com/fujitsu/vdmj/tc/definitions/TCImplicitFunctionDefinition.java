@@ -366,7 +366,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		if (!(body instanceof TCNotYetSpecifiedExpression) &&
 			!(body instanceof TCSubclassResponsibilityExpression))
 		{
-			local.unusedCheck();
+			checked.unusedCheck();	// Look underneath qualified definitions, if any
 		}
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);

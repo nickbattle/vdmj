@@ -479,7 +479,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 		if (!(body instanceof TCNotYetSpecifiedStatement) &&
 			!(body instanceof TCSubclassResponsibilityStatement))
 		{
-			local.unusedCheck();
+			checked.unusedCheck();
 		}
 
 		if (possibleExceptions == null && body != null)

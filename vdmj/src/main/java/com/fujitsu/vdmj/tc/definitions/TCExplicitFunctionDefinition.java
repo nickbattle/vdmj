@@ -372,7 +372,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			!(body instanceof TCSubclassResponsibilityExpression) &&
 			!(name.getName().startsWith("measure_")))
 		{
-			local.unusedCheck();
+			checked.unusedCheck();	// Look underneath qualified definitions, if any
 		}
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);

@@ -46,6 +46,7 @@ public class TCAndExpression extends TCBooleanBinaryExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
+		ltype = left.typeCheck(env, null, scope, null);
 		TCDefinitionList qualified = left.getQualifiedDefs(env);
 		Environment qenv = env;
 		
@@ -54,8 +55,7 @@ public class TCAndExpression extends TCBooleanBinaryExpression
 			qenv = new FlatEnvironment(qualified, env);
 		}
 
-		ltype = left.typeCheck(env, null, scope, null);
-		rtype = right.typeCheck(qenv, null, scope, null);	// RHS qualified
+		rtype = right.typeCheck(qenv, null, scope, null);	// RHS qualified, using LHS
 		TCType expected = new TCBooleanType(location);
 
 		if (!ltype.isType(expected.getClass(), location))
@@ -68,7 +68,7 @@ public class TCAndExpression extends TCBooleanBinaryExpression
 			report(3066, "Right hand of " + op + " is not " + expected);
 		}
 
-		return checkConstraint(constraint, setType(expected));
+		return checkConstraint(constraint, expected);
 	}
 
 	@Override
