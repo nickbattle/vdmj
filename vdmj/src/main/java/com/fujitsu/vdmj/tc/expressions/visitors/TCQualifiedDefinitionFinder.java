@@ -94,6 +94,7 @@ public class TCQualifiedDefinitionFinder extends TCExpressionVisitor<TCDefinitio
 		if (node.test instanceof TCVariableExpression)
 		{
 			TCVariableExpression exp = (TCVariableExpression)node.test;
+			// Lookup with any name type to avoid scope errors, but test NAMES below.
 			TCDefinition existing = env.findName(exp.name, NameScope.NAMESANDSTATE);
 			
 			if (existing != null && existing.nameScope.matches(NameScope.NAMES))
@@ -129,11 +130,13 @@ public class TCQualifiedDefinitionFinder extends TCExpressionVisitor<TCDefinitio
 			node.right instanceof TCNilExpression)
 		{
 			TCVariableExpression var = (TCVariableExpression)node.left;
+			// Lookup with any name type to avoid scope errors, but test NAMES below.
 			TCDefinition existing = env.findName(var.name, NameScope.NAMESANDSTATE);
 			
 			if (existing != null && existing.nameScope.matches(NameScope.NAMES) &&
 				existing.getType() instanceof TCOptionalType)
 			{
+				// if var <> nil, var is the underlying type
 				TCOptionalType optional = (TCOptionalType)existing.getType();
   				result.add(new TCQualifiedDefinition(existing, optional.type));
   			}
@@ -150,6 +153,7 @@ public class TCQualifiedDefinitionFinder extends TCExpressionVisitor<TCDefinitio
 		if (node.left instanceof TCVariableExpression)
 		{
 			TCVariableExpression var = (TCVariableExpression)node.left;
+			// Lookup with any name type to avoid scope errors, but test NAMES below.
 			TCDefinition existing = env.findName(var.name, NameScope.NAMESANDSTATE);
 			
 			if (existing != null && existing.nameScope.matches(NameScope.NAMES))
@@ -170,6 +174,7 @@ public class TCQualifiedDefinitionFinder extends TCExpressionVisitor<TCDefinitio
 		if (node.left instanceof TCVariableExpression)
 		{
 			TCVariableExpression var = (TCVariableExpression)node.left;
+			// Lookup with any name type to avoid scope errors, but test NAMES below.
 			TCDefinition existing = env.findName(var.name, NameScope.NAMESANDSTATE);
 			
 			if (existing != null && existing.nameScope.matches(NameScope.NAMES))
@@ -194,6 +199,7 @@ public class TCQualifiedDefinitionFinder extends TCExpressionVisitor<TCDefinitio
 		if (node.left instanceof TCVariableExpression)
 		{
 			TCVariableExpression var = (TCVariableExpression)node.left;
+			// Lookup with any name type to avoid scope errors, but test NAMES below.
 			TCDefinition existing = env.findName(var.name, NameScope.NAMESANDSTATE);
 			
 			if (existing != null && existing.nameScope.matches(NameScope.NAMES))
