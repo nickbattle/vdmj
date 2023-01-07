@@ -31,8 +31,11 @@ import com.fujitsu.vdmj.tc.definitions.TCQualifiedDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCAndExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
+import com.fujitsu.vdmj.tc.expressions.TCNilExpression;
+import com.fujitsu.vdmj.tc.expressions.TCNotEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPreOpExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
+import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -96,5 +99,27 @@ public class TCQualifiedDefinitionFinder extends TCExpressionVisitor<TCDefinitio
 		}
 		
 		return result;
+	}
+	
+	@Override
+	public TCDefinitionList caseNotEqualExpression(TCNotEqualExpression node, Environment env)
+	{
+		TCDefinitionList result = new TCDefinitionList();
+		
+		if (node.left instanceof TCVariableExpression &&
+			node.right instanceof TCNilExpression)
+		{
+			TCVariableExpression var = (TCVariableExpression)node.left;
+			TCDefinition existing = env.findName(var.name, NameScope.NAMESANDSTATE);
+			
+			if (existing != null && existing.nameScope.matches(NameScope.NAMES) &&
+				existing.getType() instanceof TCOptionalType)
+			{
+				TCOptionalType optional = (TCOptionalType)existing.getType();
+  				result.add(new TCQualifiedDefinition(existing, optional.type));
+  			}
+		}
+		
+		return result;		
 	}
 }
