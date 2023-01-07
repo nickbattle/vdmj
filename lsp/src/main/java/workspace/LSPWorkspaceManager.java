@@ -345,10 +345,11 @@ public class LSPWorkspaceManager
 				for (String source = br.readLine(); source != null; source = br.readLine())
 				{
 					source = source.trim();
-					Diag.info("Read %s from %s", source, filename);
 					
 					if (!source.isEmpty())
 					{
+						Diag.info("Read %s from %s", source, filename);
+
 						if (globbing)
 						{
 							try
@@ -376,6 +377,18 @@ public class LSPWorkspaceManager
 							File item = new File(rootUri, source).getCanonicalFile();
 							contents.add(item);
 						}
+					}
+				}
+				
+				if (contents.isEmpty())
+				{
+					if (globbing)
+					{
+						Diag.warning("Config file returned no matches: %s", filename);
+					}
+					else
+					{
+						Diag.warning("Config file has no entries: %s", filename);
 					}
 				}
 			}
