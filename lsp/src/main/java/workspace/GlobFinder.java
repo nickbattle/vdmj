@@ -44,6 +44,8 @@ public class GlobFinder extends SimpleFileVisitor<Path>
 
 	GlobFinder(String pattern)
 	{
+		// Normalize first, to eliminate "./" and similar, which won't match
+		pattern = Paths.get(pattern).normalize().toString();
 		matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
 		matches = new Vector<File>();
 	}
@@ -93,24 +95,17 @@ public class GlobFinder extends SimpleFileVisitor<Path>
 	{
 		Diag.init(true);
 		
-		StringBuilder pattern = new StringBuilder();
-		pattern.append("{");
-		String sep = "";
-		
 		for (int i=0; i<args.length; i++)
 		{
-			pattern.append(sep);
-			pattern.append(args[i]);
-			sep = ",";
-		}
-		
-		pattern.append("}");
-		GlobFinder finder = new GlobFinder(pattern.toString());
-		Files.walkFileTree(Paths.get(""), finder);
-		
-		for (File file: finder.getMatches())
-		{
-			System.out.println(file);
+			GlobFinder finder = new GlobFinder(args[i]);
+			Files.walkFileTree(Paths.get(""), finder);
+			
+			System.out.println("Pattern " + args[i] + "...");
+			
+			for (File file: finder.getMatches())
+			{
+				System.out.println(file);
+			}
 		}
 	}
 }
