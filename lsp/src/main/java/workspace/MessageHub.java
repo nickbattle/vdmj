@@ -174,6 +174,28 @@ public class MessageHub
 	}
 	
 	/**
+	 * Get all of the messages raised by a particular plugin. The returned
+	 * map references the MessageHub data and so can be edited (WITH CARE!)
+	 */
+	public synchronized Map<File, Set<VDMMessage>> getPluginMessages(AnalysisPlugin plugin)
+	{
+		HashMap<File, Set<VDMMessage>> result = new HashMap<File, Set<VDMMessage>>();
+		String pname = plugin.getName();
+
+		for (File file: messageMap.keySet())
+		{
+			Map<String, Set<VDMMessage>> pmap = messageMap.get(file);
+			
+			if (pmap.containsKey(pname))
+			{
+				result.put(file, pmap.get(pname));	// Ref to messageMap
+			}
+		}
+		
+		return result;
+	}
+	
+	/**
 	 * Check whether the hub contains any VDMErrors.
 	 */
 	public boolean hasErrors()
