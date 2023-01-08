@@ -74,19 +74,53 @@ public class INApplyExpression extends INExpression
 		
 		for (INExpression arg: args)
 		{
-			String a = arg.toString();
-			
-			if (a.startsWith("(") && a.endsWith(")"))
-			{
-				a = a.substring(1, a.length() - 1);		// eg. "(x + y)" is "x + y"
-			}
-			
 			sb.append(sep);
-			sb.append(a);
+			sb.append(deBracketed(arg.toString()));
 			sep = ", ";
 		}
 		
 		return sb.toString();
+	}
+
+	/**
+	 * Clean an expression has outer brackets. We have to check
+	 * for cases like "(a + 1) * (b + 1)", which look outer-bracketed.
+	 */
+	private String deBracketed(String arg)
+	{
+		if (arg.startsWith("(") && arg.endsWith(")"))
+		{
+			int count = 0;
+			int i=0;
+			
+			while (i < arg.length())
+			{
+				char c = arg.charAt(i);
+				
+				if (c == '(')
+				{
+					count++;
+				}
+				else if (c == ')')
+				{
+					count--;
+					if (count == 0) break;
+				}
+				
+				i++;
+			}
+			
+			if (i == arg.length() - 1)	// ie. match of first "(" is last char.
+			{
+				return arg.substring(1, arg.length() - 1);	// eg. "(x + y)" is "x + y"
+			}
+			else
+			{
+				return arg;
+			}
+		}
+		
+		return arg;
 	}
 
 	@Override
