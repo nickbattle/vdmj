@@ -30,7 +30,6 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.OperationValue;
@@ -60,12 +59,34 @@ public class INApplyExpression extends INExpression
 		if (root instanceof INVariableExpression)
 		{
 			INVariableExpression ve = (INVariableExpression)root;
-			return ve.name.getName() + "("+ Utils.listToString(args) + ")";
+			return ve.name.getName() + "(" + argsString() + ")";
 		}
 		else
 		{
-			return root + "("+ Utils.listToString(args) + ")";
+			return root + "(" + argsString() + ")";
 		}
+	}
+	
+	private String argsString()
+	{
+		StringBuilder sb = new StringBuilder();
+		String sep = "";
+		
+		for (INExpression arg: args)
+		{
+			String a = arg.toString();
+			
+			if (a.startsWith("(") && a.endsWith(")"))
+			{
+				a = a.substring(1, a.length() - 1);		// eg. "(x + y)" is "x + y"
+			}
+			
+			sb.append(sep);
+			sb.append(a);
+			sep = ", ";
+		}
+		
+		return sb.toString();
 	}
 
 	@Override
