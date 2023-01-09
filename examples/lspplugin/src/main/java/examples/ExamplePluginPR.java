@@ -40,6 +40,7 @@ import json.JSONArray;
 import rpc.RPCMessageList;
 import workspace.MessageHub;
 import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckFailedEvent;
 import workspace.events.CodeLensEvent;
 import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
@@ -62,6 +63,11 @@ public class ExamplePluginPR extends ExamplePlugin
 		{
 			CheckCompleteEvent ce = (CheckCompleteEvent)event;
 			addFirstWarning(ce);
+			return null;
+		}
+		else if (event instanceof CheckFailedEvent)
+		{
+			fixTCMessages();
 			return null;
 		}
 		else

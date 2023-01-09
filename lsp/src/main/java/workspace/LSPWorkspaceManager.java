@@ -80,6 +80,7 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.events.ChangeFileEvent;
 import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckFailedEvent;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
 import workspace.events.CheckTypeEvent;
@@ -704,21 +705,25 @@ public class LSPWorkspaceManager
 					else
 					{
 						Diag.error("Failed to initialize interpreter");
+						results.addAll(eventhub.publish(new CheckFailedEvent()));
 					}
 				}
 				else
 				{
 					Diag.error("Type checking errors found");
+					results.addAll(eventhub.publish(new CheckFailedEvent()));
 				}
 			}
 			else
 			{
 				Diag.error("Syntax errors found");
+				results.addAll(eventhub.publish(new CheckFailedEvent()));
 			}
 		}
 		else
 		{
 			Diag.error("Preparation errors found");
+			results.addAll(eventhub.publish(new CheckFailedEvent()));
 		}
 
 		results.addAll(messagehub.getDiagnosticResponses(projectFiles.keySet()));
