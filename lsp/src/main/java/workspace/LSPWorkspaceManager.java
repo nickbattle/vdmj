@@ -343,6 +343,7 @@ public class LSPWorkspaceManager
 			try
 			{
 				br = new BufferedReader(new FileReader(fileList));
+				boolean hasText = false;
 				
 				for (String source = br.readLine(); source != null; source = br.readLine())
 				{
@@ -350,6 +351,7 @@ public class LSPWorkspaceManager
 					
 					if (!source.isEmpty())
 					{
+						hasText = true;	// has some text!
 						Diag.info("Read %s from %s", source, filename);
 
 						if (globbing)
@@ -382,7 +384,7 @@ public class LSPWorkspaceManager
 					}
 				}
 				
-				if (contents.isEmpty())
+				if (contents.isEmpty() && hasText)
 				{
 					if (globbing)
 					{
