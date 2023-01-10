@@ -67,12 +67,12 @@ public class ExamplePluginSL extends ExamplePlugin
 		{
 			CheckCompleteEvent ce = (CheckCompleteEvent)event;
 			addFirstWarning(ce);
-			fixTCMessages();
 			return null;
 		}
 		else if (event instanceof CheckFailedEvent)
 		{
-			fixTCMessages();
+			CheckFailedEvent cfe = (CheckFailedEvent)event;
+			fixTCMessages(cfe);
 			return null;
 		}
 		else
@@ -98,14 +98,16 @@ public class ExamplePluginSL extends ExamplePlugin
 		TCModuleList tcModuleList = tc.getTC();
 		MessageHub.getInstance().clearPluginMessages(this);
 		
-		TCDefinition first = tcModuleList.get(0).defs.get(0);
-		
-		if (first != null && first.name != null)
+		for (TCDefinition def: tcModuleList.get(0).defs)
 		{
-			VDMWarning warning = new VDMWarning(9999, "Example warning from plugin", first.name.getLocation());
-			List<VDMMessage> list = new Vector<VDMMessage>();
-			list.add(warning);
-			MessageHub.getInstance().addPluginMessages(this, list);	// Add the warning to the hub
+			if (def.name != null)
+			{
+				VDMWarning warning = new VDMWarning(9999, "Example warning from plugin", def.name.getLocation());
+				List<VDMMessage> list = new Vector<VDMMessage>();
+				list.add(warning);
+				MessageHub.getInstance().addPluginMessages(this, list);	// Add the warning to the hub
+				break;
+			}
 		}
 	}
 

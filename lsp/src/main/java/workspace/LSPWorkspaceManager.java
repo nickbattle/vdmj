@@ -88,6 +88,7 @@ import workspace.events.CloseFileEvent;
 import workspace.events.CodeLensEvent;
 import workspace.events.InitializeEvent;
 import workspace.events.InitializedEvent;
+import workspace.events.LSPEvent;
 import workspace.events.OpenFileEvent;
 import workspace.events.SaveFileEvent;
 import workspace.events.ShutdownEvent;
@@ -684,19 +685,23 @@ public class LSPWorkspaceManager
 		Diag.info("Checking loaded files (%s)...", reason);
 		RPCMessageList results = new RPCMessageList();
 
-		results.addAll(eventhub.publish(new CheckPrepareEvent()));
+		LSPEvent event = new CheckPrepareEvent();
+		results.addAll(eventhub.publish(event));
 
 		if (!messagehub.hasErrors())
 		{
-			results.addAll(eventhub.publish(new CheckSyntaxEvent()));
+			event = new CheckSyntaxEvent();
+			results.addAll(eventhub.publish(event));
 			
 			if (!messagehub.hasErrors())
 			{
-				results.addAll(eventhub.publish(new CheckTypeEvent()));
+				event = new CheckTypeEvent();
+				results.addAll(eventhub.publish(event));
 	
 				if (!messagehub.hasErrors())
 				{
-					results.addAll(eventhub.publish(new CheckCompleteEvent()));
+					event = new CheckCompleteEvent();
+					results.addAll(eventhub.publish(event));
 	
 					if (!messagehub.hasErrors())
 					{
@@ -705,25 +710,25 @@ public class LSPWorkspaceManager
 					else
 					{
 						Diag.error("Failed to initialize interpreter");
-						results.addAll(eventhub.publish(new CheckFailedEvent()));
+						results.addAll(eventhub.publish(new CheckFailedEvent(event)));
 					}
 				}
 				else
 				{
 					Diag.error("Type checking errors found");
-					results.addAll(eventhub.publish(new CheckFailedEvent()));
+					results.addAll(eventhub.publish(new CheckFailedEvent(event)));
 				}
 			}
 			else
 			{
 				Diag.error("Syntax errors found");
-				results.addAll(eventhub.publish(new CheckFailedEvent()));
+				results.addAll(eventhub.publish(new CheckFailedEvent(event)));
 			}
 		}
 		else
 		{
 			Diag.error("Preparation errors found");
-			results.addAll(eventhub.publish(new CheckFailedEvent()));
+			results.addAll(eventhub.publish(new CheckFailedEvent(event)));
 		}
 
 		results.addAll(messagehub.getDiagnosticResponses(projectFiles.keySet()));

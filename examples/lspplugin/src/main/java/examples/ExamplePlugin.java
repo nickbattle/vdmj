@@ -238,9 +238,9 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	/**
 	 * Example of how to obtain and change messages from another plugin.
 	 */
-	protected void fixTCMessages()
+	protected void fixTCMessages(CheckFailedEvent event)
 	{
-		Diag.info("Adjusting TC errors...");
+		Diag.info("Adjusting TC errors... caused by %s", event.getCause());
 		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
 		Map<File, Set<VDMMessage>> tcMsgs = MessageHub.getInstance().getPluginMessages(tc);
 		

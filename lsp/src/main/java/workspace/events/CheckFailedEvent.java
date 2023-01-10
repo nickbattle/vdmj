@@ -26,8 +26,16 @@ package workspace.events;
 
 public class CheckFailedEvent extends AbstractCheckFilesEvent
 {
-	public CheckFailedEvent()
+	private final LSPEvent event;
+	
+	public CheckFailedEvent(LSPEvent event)
 	{
 		super();
+		this.event = event;
+	}
+	
+	public LSPEvent getCause()
+	{
+		return event;
 	}
 }
