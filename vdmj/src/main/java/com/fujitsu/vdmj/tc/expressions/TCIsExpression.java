@@ -71,7 +71,7 @@ public class TCIsExpression extends TCExpression
 
 		if (basictype != null)
 		{
-			basictype = basictype.typeResolve(env, null);
+			basictype = basictype.typeResolve(env);
 			TypeComparator.checkComposeTypes(basictype, env, false);
 			TypeComparator.checkImports(env, unresolved, location.module);
 		}

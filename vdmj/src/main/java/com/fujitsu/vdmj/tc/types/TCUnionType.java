@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
@@ -878,32 +877,18 @@ public class TCUnionType extends TCType
 		}
 	}
 
-	private boolean infinite = false;
-
 	@Override
-	public TCType typeResolve(Environment env, TCTypeDefinition root)
+	public TCType typeResolve(Environment env)
 	{
-		if (resolved)
-		{
-			return this;
-		}
-		else
-		{
-			resolved = true;
-			infinite = true;
-		}
-
+		if (resolved) return this; else resolved = true;
 		TCTypeSet fixed = new TCTypeSet();
 		TypeCheckException problem = null;
 
 		for (TCType t: types)
 		{
-			if (root != null)
-				root.infinite = false;
-
 			try
 			{
-				fixed.add(t.typeResolve(env, root));
+				fixed.add(t.typeResolve(env));
 			}
 			catch (TypeCheckException e)
 			{
@@ -919,9 +904,6 @@ public class TCUnionType extends TCType
 
 				resolved = true;	// See bug #26
 			}
-
-			if (root != null)
-				infinite = infinite && root.infinite;
 		}
 		
 		if (problem != null)
@@ -931,7 +913,6 @@ public class TCUnionType extends TCType
 		}
 
 		types = fixed;
-		if (root != null) root.infinite = infinite;
 
 		// Resolved types may be unions, so force a re-expand
 		expanded = false;

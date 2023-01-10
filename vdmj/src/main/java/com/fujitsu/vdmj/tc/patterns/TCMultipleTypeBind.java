@@ -54,7 +54,7 @@ public class TCMultipleTypeBind extends TCMultipleBind
 	public TCType typeCheck(Environment base, NameScope scope)
 	{
 		plist.typeResolve(base);
-		type = type.typeResolve(base, null);
+		type = type.typeResolve(base);
 		TCType ptype = getPossibleType();
 		
 		TypeComparator.checkImports(base, unresolved, location.module);

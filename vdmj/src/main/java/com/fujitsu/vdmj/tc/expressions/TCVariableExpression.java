@@ -174,7 +174,7 @@ public class TCVariableExpression extends TCExpression
 			// we don't need to retry at the top level (assuming all names
 			// are in the environment).
 
-			result = result.typeResolve(env, null);
+			result = result.typeResolve(env);
 			
 			// If a constraint is passed in, we can raise an error if it is
 			// not possible for the type to match the constraint (rather than

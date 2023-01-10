@@ -117,7 +117,7 @@ public class TCExportedFunction extends TCExport
 						FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
 							efd.getTypeParamDefinitions(), env, NameScope.NAMES);
 
-						type = type.typeResolve(params, null);
+						type = type.typeResolve(params);
 						
 						if (efd.typeParams == null)
 						{
@@ -141,7 +141,7 @@ public class TCExportedFunction extends TCExport
 						FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
 							ifd.getTypeParamDefinitions(), env, NameScope.NAMES);
 
-						type = type.typeResolve(params, null);
+						type = type.typeResolve(params);
 						
 						if (ifd.typeParams == null)
 						{
@@ -162,7 +162,7 @@ public class TCExportedFunction extends TCExport
 				}
 				else
 				{
-					type = type.typeResolve(env, null);
+					type = type.typeResolve(env);
 					
 					// if (actualType != null && !TypeComparator.compatible(resolved, actualType))
 					if (actualType != null && !actualType.equals(type))

@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.types;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -45,7 +44,7 @@ public class TCParameterType extends TCType
 	}
 
 	@Override
-	public TCType typeResolve(Environment env, TCTypeDefinition root)
+	public TCType typeResolve(Environment env)
 	{
 		if (resolved) return this; else resolved = true;
 

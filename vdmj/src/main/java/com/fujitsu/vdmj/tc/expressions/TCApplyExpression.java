@@ -137,7 +137,7 @@ public class TCApplyExpression extends TCExpression
 				root.report(3350, "Polymorphic function has not been instantiated");
 			}
 			
-			ft.typeResolve(env, null);
+			ft.typeResolve(env);
 			results.add(functionApply(isSimple, ft));
 		}
 
@@ -156,7 +156,7 @@ public class TCApplyExpression extends TCExpression
 			}
 			
 			TCOperationType ot = type.getOperation();
-			ot.typeResolve(env, null);
+			ot.typeResolve(env);
 
 			if (inFunction && Settings.release == Release.VDM_10 && !ot.pure)
 			{

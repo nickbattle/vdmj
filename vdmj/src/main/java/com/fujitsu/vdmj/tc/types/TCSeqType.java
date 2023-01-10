@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.types;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -77,14 +76,13 @@ public class TCSeqType extends TCType
 	}
 
 	@Override
-	public TCType typeResolve(Environment env, TCTypeDefinition root)
+	public TCType typeResolve(Environment env)
 	{
 		if (resolved) return this; else { resolved = true; }
 
 		try
 		{
-			seqof = seqof.typeResolve(env, root);
-			if (root != null) root.infinite = false;	// Could be empty
+			seqof = seqof.typeResolve(env);
 			return this;
 		}
 		catch (TypeCheckException e)

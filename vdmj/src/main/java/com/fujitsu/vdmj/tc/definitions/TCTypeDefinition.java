@@ -79,7 +79,6 @@ public class TCTypeDefinition extends TCDefinition
 	public TCExplicitFunctionDefinition mindef;
 	public TCExplicitFunctionDefinition maxdef;
 	
-	public boolean infinite = false;
 	private TCDefinitionList composeDefinitions;
 
 	public TCTypeDefinition(TCAnnotationList annotations, TCAccessSpecifier accessSpecifier, TCNameToken name,
@@ -188,10 +187,9 @@ public class TCTypeDefinition extends TCDefinition
 	{
 		try
 		{
-			infinite = false;
-			type = (TCInvariantType)type.typeResolve(base, this);
+			type = (TCInvariantType)type.typeResolve(base);
 
-			if (type.isRecursive()) //(infinite)
+			if (type.isRecursive())
 			{
 				report(3050, "Type '" + name + "' is infinite");
 			}

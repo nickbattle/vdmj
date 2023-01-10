@@ -189,11 +189,11 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
 				getTypeParamDefinitions(), base, NameScope.NAMES);
 
-			type = type.typeResolve(params, null);
+			type = type.typeResolve(params);
 		}
 		else
 		{
-			type = type.typeResolve(base, null);
+			type = type.typeResolve(base);
 		}
 
 		if (result != null)

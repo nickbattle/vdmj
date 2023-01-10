@@ -150,7 +150,7 @@ public class TCValueDefinition extends TCDefinition
 	{
 		if (type != null)
 		{
-			type = type.typeResolve(env, null);
+			type = type.typeResolve(env);
 			pattern.typeResolve(env);
 			updateDefs();
 		}

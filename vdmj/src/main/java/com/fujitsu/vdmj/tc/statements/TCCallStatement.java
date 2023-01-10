@@ -112,7 +112,7 @@ public class TCCallStatement extends TCStatement
 		if (type.isOperation(location))
 		{
     		TCOperationType optype = type.getOperation();
-    		optype.typeResolve(env, null);
+    		optype.typeResolve(env);
     		TCDefinition encl = env.getEnclosingDefinition();
     		
     		if (encl != null && encl.isPure() && !optype.isPure())
@@ -137,7 +137,7 @@ public class TCCallStatement extends TCStatement
 			// a "return" statement.
 
     		TCFunctionType ftype = type.getFunction();
-    		ftype.typeResolve(env, null);
+    		ftype.typeResolve(env);
 
     		// Reset the name's qualifier with the actual function type so
     		// that runtime search has a simple TypeComparator call.

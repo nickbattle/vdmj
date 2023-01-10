@@ -144,7 +144,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 	@Override
 	public void typeResolve(Environment base)
 	{
-		type = type.typeResolve(base, null);
+		type = type.typeResolve(base);
 
 		if (base.isVDMPP())
 		{

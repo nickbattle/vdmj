@@ -83,7 +83,7 @@ public class TCImportedFunction extends TCImportedValue
 	    		}
 
 	    		FlatCheckedEnvironment params =	new FlatCheckedEnvironment(defs, env, NameScope.NAMES);
-				type = type.typeResolve(params, null);
+				type = type.typeResolve(params);
 				TypeComparator.checkComposeTypes(type, params, false);
 				
 				if (expdef != null)

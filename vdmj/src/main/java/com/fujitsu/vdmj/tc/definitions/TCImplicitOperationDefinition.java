@@ -167,7 +167,7 @@ public class TCImplicitOperationDefinition extends TCDefinition
 	@Override
 	public void typeResolve(Environment base)
 	{
-		type = type.typeResolve(base, null);
+		type = type.typeResolve(base);
 
 		if (result != null)
 		{

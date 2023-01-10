@@ -98,7 +98,7 @@ public class TCImportedValue extends TCImport
 		
 		if (type != null)
 		{
-			type = type.typeResolve(env, null);
+			type = type.typeResolve(env);
 			TypeComparator.checkComposeTypes(type, env, false);
 			
 			if (from != null && expdef != null)
@@ -107,7 +107,7 @@ public class TCImportedValue extends TCImport
     
     			if (expdef != null)
     			{
-        			TCType exptype = expdef.getType().typeResolve(env, null);
+        			TCType exptype = expdef.getType().typeResolve(env);
     
         			if (!TypeComparator.compatible(type, exptype))
         			{

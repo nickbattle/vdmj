@@ -70,7 +70,7 @@ public class TCPatternListTypePair extends TCNode
 	public void typeResolve(Environment base)
 	{
 		patterns.typeResolve(base);
-		type = type.typeResolve(base, null);
+		type = type.typeResolve(base);
 	}
 
 	@Override

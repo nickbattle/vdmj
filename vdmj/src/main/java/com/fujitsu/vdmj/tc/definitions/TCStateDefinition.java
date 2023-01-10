@@ -142,7 +142,7 @@ public class TCStateDefinition extends TCDefinition
 		{
 			try
 			{
-				f.typeResolve(env, null);
+				f.typeResolve(env);
 			}
 			catch (TypeCheckException e)
 			{
@@ -151,7 +151,7 @@ public class TCStateDefinition extends TCDefinition
 			}
 		}
 
-		recordType = (TCRecordType) recordType.typeResolve(env, null);
+		recordType = (TCRecordType) recordType.typeResolve(env);
 
 		if (invPattern != null)
 		{

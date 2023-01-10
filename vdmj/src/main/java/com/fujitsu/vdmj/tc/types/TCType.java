@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.types.visitors.TCRecursiveTypeFinder;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.tc.types.visitors.TCUnresolvedTypeFinder;
@@ -110,9 +109,8 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	 * type (eg. in the element types in a TCSetType).
 	 *
 	 * @param env The other type names defined in this scope.
-	 * @param root The outermost type definition being resolved.
 	 */
-	public TCType typeResolve(Environment env, TCTypeDefinition root)
+	public TCType typeResolve(Environment env)
 	{
 		resolved = true;
 		return this;
