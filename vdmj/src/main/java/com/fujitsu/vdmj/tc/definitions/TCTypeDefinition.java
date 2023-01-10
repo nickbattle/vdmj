@@ -191,7 +191,7 @@ public class TCTypeDefinition extends TCDefinition
 			infinite = false;
 			type = (TCInvariantType)type.typeResolve(base, this);
 
-			if (infinite)
+			if (type.isRecursive()) //(infinite)
 			{
 				report(3050, "Type '" + name + "' is infinite");
 			}
