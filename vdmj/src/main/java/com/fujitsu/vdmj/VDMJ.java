@@ -627,13 +627,20 @@ abstract public class VDMJ
 		
 		StackTraceElement[] stack = throwable.getStackTrace();
 		int max = Properties.diag_max_stack;
-		int count = stack.length < max ? stack.length : max;
+		int count = (max == 0 )? stack.length : (stack.length < max) ? stack.length : max;
 		
 		for (int i=0; i<count; i++)
 		{
 			StackTraceElement frame = stack[i];
-			Console.out.println(String.format("%s %s at %s line %d",
+			Console.out.println(String.format("  %s %s at %s line %d",
 					frame.getClassName(), frame.getMethodName(), frame.getFileName(), frame.getLineNumber()));
+		}
+		
+		if (count < stack.length)
+		{
+			Console.out.println((stack.length - count) +
+				" more frames available (vdmj.diag.max_stack currently = " +
+				Properties.diag_max_stack +")");
 		}
 	}
 
