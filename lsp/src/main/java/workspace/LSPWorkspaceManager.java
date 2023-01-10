@@ -386,7 +386,8 @@ public class LSPWorkspaceManager
 				{
 					if (globbing)
 					{
-						Diag.warning("Config file returned no matches: %s", filename);
+						Diag.warning("Config file has no matches: %s", filename);
+						sendMessage(WARNING_MSG, filename + " matches no files?");
 					}
 					else
 					{
