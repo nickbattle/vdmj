@@ -42,7 +42,7 @@ public class GlobFinder extends SimpleFileVisitor<Path>
 	private final PathMatcher matcher;
 	private final List<File> matches;
 
-	GlobFinder(String pattern)
+	public GlobFinder(String pattern)
 	{
 		// Normalize first, to eliminate "./" and similar, which won't match
 		pattern = Paths.get(pattern).normalize().toString();

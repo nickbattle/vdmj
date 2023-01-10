@@ -38,6 +38,6 @@ abstract public class DAPEvent extends Event
 	@Override
 	public String toString()
 	{
-		return "DAP Event " + getKey();
+		return "DAP Event " + getKey() + (properties != null ? properties : "");
 	}
 }

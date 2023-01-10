@@ -24,13 +24,42 @@
 
 package workspace.events;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * The root of LSP and DAP events.
  */
 abstract public class Event
 {
+	/**
+	 * Properties can be attached to events to aid communication between plugins
+	 * without anticipating any particular keys/values.
+	 */
+	protected Map<String, Object> properties = null;
+	
 	public String getKey()
 	{
 		return this.getClass().getName();
+	}
+	
+	public Map<String, Object> getProperties()
+	{
+		if (properties == null)
+		{
+			properties = new HashMap<String, Object>();
+		}
+		
+		return properties;
+	}
+	
+	public Object getProperty(String key)
+	{
+		return getProperties().get(key);
+	}
+	
+	public Object setProperty(String key, Object value)
+	{
+		return getProperties().put(key, value);
 	}
 }

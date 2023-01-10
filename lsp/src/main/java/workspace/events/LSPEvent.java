@@ -38,6 +38,6 @@ abstract public class LSPEvent extends Event
 	@Override
 	public String toString()
 	{
-		return "LSP Event " + getKey();
+		return "LSP Event " + getKey() + (properties != null ? properties : "");
 	}
 }
