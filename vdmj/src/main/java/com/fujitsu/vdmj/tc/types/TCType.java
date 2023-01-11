@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.types.visitors.TCInfiniteTypeFinder;
 import com.fujitsu.vdmj.tc.types.visitors.TCRecursiveTypeFinder;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.tc.types.visitors.TCUnresolvedTypeFinder;
@@ -442,8 +443,13 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
-	 * Identify recursive types.
+	 * Identify recursive and infinite types.
 	 */
+	public boolean isInfinite()
+	{
+		return !this.apply(new TCInfiniteTypeFinder(), this).isEmpty();
+	}
+
 	public boolean isRecursive()
 	{
 		return !this.apply(new TCRecursiveTypeFinder(), this).isEmpty();

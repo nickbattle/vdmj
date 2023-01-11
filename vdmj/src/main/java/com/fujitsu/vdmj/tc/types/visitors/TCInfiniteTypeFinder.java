@@ -27,17 +27,24 @@ package com.fujitsu.vdmj.tc.types.visitors;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
+import com.fujitsu.vdmj.tc.types.TCSeqType;
+import com.fujitsu.vdmj.tc.types.TCSet1Type;
+import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
 
 /**
- * Explore the tree of a type and indicate whether it is recursive, by returning a
- * non-empty set of bools. This is used by TCType.isRecursive(). Types are recursive
+ * Explore the tree of a type and indicate whether it is infinite, by returning a
+ * non-empty set of bools. This is used by TCType.isInfinite(). Types are infinite
  * when a named or record type T contains T, without hiding it behind an optional
  * type or something that can be empty, like a set/seq/map.
  */
-public class TCRecursiveTypeFinder extends TCLeafTypeVisitor<Boolean, Set<Boolean>, TCType>
+public class TCInfiniteTypeFinder extends TCLeafTypeVisitor<Boolean, Set<Boolean>, TCType>
 {
 	@Override
 	protected Set<Boolean> newCollection()
@@ -50,7 +57,57 @@ public class TCRecursiveTypeFinder extends TCLeafTypeVisitor<Boolean, Set<Boolea
 	{
 		return newCollection();
 	}
+	
+	@Override
+	public Set<Boolean> caseOptionalType(TCOptionalType node, TCType arg)
+	{
+		return newCollection();		// Not infinite, regardless of what is inside
+	}
+	
+	@Override
+	public Set<Boolean> caseSeqType(TCSeqType node, TCType arg)
+	{
+		return newCollection();		// Not infinite, regardless of what is inside
+	}
+	
+	@Override
+	public Set<Boolean> caseSeq1Type(TCSeq1Type node, TCType arg)
+	{
+		return node.seqof.apply(this, arg);		// Note: seq1 could be infinite!
+	}
 
+	@Override
+	public Set<Boolean> caseSetType(TCSetType node, TCType arg)
+	{
+		return newCollection();		// Not infinite, regardless of what is inside
+	}
+	
+	@Override
+	public Set<Boolean> caseSet1Type(TCSet1Type node, TCType arg)
+	{
+		return node.setof.apply(this, arg);		// Note: set1 could be infinite!
+	}
+	
+	@Override
+	public Set<Boolean> caseMapType(TCMapType node, TCType arg)
+	{
+		return newCollection();		// Not infinite, regardless of what is inside
+	}
+	
+	@Override
+	public Set<Boolean> caseUnionType(TCUnionType node, TCType arg)
+	{
+		for (TCType u: node.types)
+		{
+			if (u.apply(this, arg).isEmpty())
+			{
+				return newCollection();		// This case is OK
+			}
+		}
+		
+		return trueSet();	// All of the union are infinite
+	}
+	
 	@Override
 	public Set<Boolean> caseNamedType(TCNamedType node, TCType arg)
 	{
