@@ -35,6 +35,7 @@ import java.io.PrintWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
@@ -47,6 +48,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
@@ -78,6 +80,7 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.events.ChangeFileEvent;
 import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckFailedEvent;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
 import workspace.events.CheckTypeEvent;
@@ -85,6 +88,7 @@ import workspace.events.CloseFileEvent;
 import workspace.events.CodeLensEvent;
 import workspace.events.InitializeEvent;
 import workspace.events.InitializedEvent;
+import workspace.events.LSPEvent;
 import workspace.events.OpenFileEvent;
 import workspace.events.SaveFileEvent;
 import workspace.events.ShutdownEvent;
@@ -95,9 +99,9 @@ import workspace.plugins.TCPlugin;
 public class LSPWorkspaceManager
 {
 	private static LSPWorkspaceManager INSTANCE = null;
-	private final PluginRegistry registry;
-	private final EventHub eventhub;
-	private final MessageHub messagehub;
+	private PluginRegistry registry;
+	private EventHub eventhub;
+	private MessageHub messagehub;
 	private final LSPMessageUtils msgutils;
 	private final Charset encoding;
 
@@ -131,12 +135,12 @@ public class LSPWorkspaceManager
 		if (System.getProperty("lsp.encoding") == null)
 		{
 			encoding = Charset.defaultCharset();
-			Diag.info("Workspace using default encoding: %s", encoding.name());
+			Diag.info("Workspace created, using default encoding: %s", encoding.name());
 		}
 		else
 		{
 			encoding = Charset.forName(System.getProperty("lsp.encoding"));
-			Diag.info("Workspace encoding set to %s", encoding.displayName());
+			Diag.info("Workspace created, encoding set to %s", encoding.displayName());
 		}
 	}
 
@@ -163,10 +167,13 @@ public class LSPWorkspaceManager
 	
 	public static void reset()
 	{
-		Diag.config("Resetting LSPWorkspaceManager, PluginRegistry, EventHub and MessageHub");
+		Diag.config("Resetting WorkspaceManagers, PluginRegistry, EventHub and MessageHub");
+		
+		LSPXWorkspaceManager.reset();
 		PluginRegistry.reset();
 		EventHub.reset();
 		MessageHub.reset();
+		
 		INSTANCE = null;
 	}
 	
@@ -270,9 +277,9 @@ public class LSPWorkspaceManager
 		removeExtractedFiles();
 		externalFiles.clear();
 		
-		vdmignore = readFileList(VDMIGNORE);
-		externals = readFileList(EXTERNALS);
-		ordering  = readFileList(ORDERING);
+		vdmignore = readFileList(VDMIGNORE, true);
+		externals = readFileList(EXTERNALS, true);
+		ordering  = readFileList(ORDERING, false);	// Don't glob this one!
 		
 		hasOrderedFiles = !ordering.isEmpty();
 		
@@ -323,7 +330,7 @@ public class LSPWorkspaceManager
 		}
 	}
 
-	private List<File> readFileList(String filename) throws IOException
+	private List<File> readFileList(String filename, boolean globbing) throws IOException
 	{
 		List<File> contents = new Vector<File>();
 		File fileList = new File(rootUri, filename);
@@ -336,6 +343,7 @@ public class LSPWorkspaceManager
 			try
 			{
 				br = new BufferedReader(new FileReader(fileList));
+				boolean hasText = false;
 				
 				for (String source = br.readLine(); source != null; source = br.readLine())
 				{
@@ -343,10 +351,49 @@ public class LSPWorkspaceManager
 					
 					if (!source.isEmpty())
 					{
-						// Use canonical file to allow "./folder/file"
-						File item = new File(rootUri, source).getCanonicalFile();
-						contents.add(item);
-						Diag.info("Read %s from %s", item, filename);
+						hasText = true;	// has some text!
+						Diag.info("Read %s from %s", source, filename);
+
+						if (globbing)
+						{
+							try
+							{
+								GlobFinder finder = new GlobFinder(source);
+								Files.walkFileTree(Paths.get(""), finder);
+								List<File> found = finder.getMatches();
+								
+								for (File file: found)
+								{
+									Diag.fine("Glob: %s", file);
+								}
+								
+								contents.addAll(found);
+							}
+							catch (PatternSyntaxException e)
+							{
+								Diag.error(e);
+								sendMessage(WARNING_MSG, filename + ": " + source + ": " + e.getDescription());
+							}
+						}
+						else
+						{
+							// Use canonical file to allow "./folder/file"
+							File item = new File(rootUri, source).getCanonicalFile();
+							contents.add(item);
+						}
+					}
+				}
+				
+				if (contents.isEmpty() && hasText)
+				{
+					if (globbing)
+					{
+						Diag.warning("Config file has no matches: %s", filename);
+						sendMessage(WARNING_MSG, filename + " matches no files?");
+					}
+					else
+					{
+						Diag.warning("Config file has no entries: %s", filename);
 					}
 				}
 			}
@@ -641,19 +688,23 @@ public class LSPWorkspaceManager
 		Diag.info("Checking loaded files (%s)...", reason);
 		RPCMessageList results = new RPCMessageList();
 
-		results.addAll(eventhub.publish(new CheckPrepareEvent()));
+		LSPEvent event = new CheckPrepareEvent();
+		results.addAll(eventhub.publish(event));
 
 		if (!messagehub.hasErrors())
 		{
-			results.addAll(eventhub.publish(new CheckSyntaxEvent()));
+			event = new CheckSyntaxEvent();
+			results.addAll(eventhub.publish(event));
 			
 			if (!messagehub.hasErrors())
 			{
-				results.addAll(eventhub.publish(new CheckTypeEvent()));
+				event = new CheckTypeEvent();
+				results.addAll(eventhub.publish(event));
 	
 				if (!messagehub.hasErrors())
 				{
-					results.addAll(eventhub.publish(new CheckCompleteEvent()));
+					event = new CheckCompleteEvent();
+					results.addAll(eventhub.publish(event));
 	
 					if (!messagehub.hasErrors())
 					{
@@ -662,21 +713,25 @@ public class LSPWorkspaceManager
 					else
 					{
 						Diag.error("Failed to initialize interpreter");
+						results.addAll(eventhub.publish(new CheckFailedEvent(event)));
 					}
 				}
 				else
 				{
 					Diag.error("Type checking errors found");
+					results.addAll(eventhub.publish(new CheckFailedEvent(event)));
 				}
 			}
 			else
 			{
 				Diag.error("Syntax errors found");
+				results.addAll(eventhub.publish(new CheckFailedEvent(event)));
 			}
 		}
 		else
 		{
 			Diag.error("Preparation errors found");
+			results.addAll(eventhub.publish(new CheckFailedEvent(event)));
 		}
 
 		results.addAll(messagehub.getDiagnosticResponses(projectFiles.keySet()));

@@ -117,6 +117,9 @@ public class Properties
 	/** The size limit for type bind expansions */
 	public static long in_typebind_limit = 100000;
 	
+	/** The maximum stack to dump via println(Throwable) */
+	public static int diag_max_stack = 1;
+	
 	/**
 	 * When the class is initialized, which uses the vdmj.properties file, and any System
 	 * properties, to set the static fields above.
@@ -206,6 +209,7 @@ public class Properties
 
 		cmd_plugin_packages = get(vdmj, "vdmj.cmd.plugin_packages", "plugins");
 		debug_link_class = get(vdmj, "vdmj.debug.link_class", null);		
+		diag_max_stack = get(vdmj, "vdmj.diag.max_stack", 1);
 	}
 	
 	private static int get(java.util.Properties local, String key, int def)

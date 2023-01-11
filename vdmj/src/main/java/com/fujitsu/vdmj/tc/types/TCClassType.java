@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
@@ -72,7 +71,7 @@ public class TCClassType extends TCType
 	}
 
 	@Override
-	public TCType typeResolve(Environment env, TCTypeDefinition root)
+	public TCType typeResolve(Environment env)
 	{
 		if (resolved) return this; else resolved = true;
 
@@ -102,7 +101,7 @@ public class TCClassType extends TCType
 					}
 				}
 
-				d.getType().typeResolve(self, root);
+				d.getType().typeResolve(self);
 				resolved = true;	// recursively cleared?
 			}
 

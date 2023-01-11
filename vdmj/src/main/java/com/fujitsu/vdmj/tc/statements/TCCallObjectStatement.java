@@ -182,7 +182,7 @@ public class TCCallObjectStatement extends TCStatement
 		if (type.isOperation(location))
 		{
 			TCOperationType optype = type.getOperation();
-			optype.typeResolve(env, null);
+			optype.typeResolve(env);
     		TCDefinition encl = env.getEnclosingDefinition();
     		
     		if (encl != null && encl.isPure() && !optype.isPure())
@@ -200,7 +200,7 @@ public class TCCallObjectStatement extends TCStatement
 			// a "return" statement.
 
 			TCFunctionType ftype = type.getFunction();
-			ftype.typeResolve(env, null);
+			ftype.typeResolve(env);
 			field.setTypeQualifier(ftype.parameters);
 			checkArgTypes(ftype.parameters, atypes);	// Not necessary?
 			return checkReturnType(constraint, ftype.result, mandatory);

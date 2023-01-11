@@ -151,7 +151,7 @@ public class TCFuncInstantiationExpression extends TCExpression
     					TCType ptype = actualTypes.get(i);
     					TCNameToken name = typeParams.get(i);
     					
-    					ptype = ptype.typeResolve(env, null);
+    					ptype = ptype.typeResolve(env);
     					fixed.add(ptype);
     					map.put(name, ptype);
     					TypeComparator.checkComposeTypes(ptype, env, false);

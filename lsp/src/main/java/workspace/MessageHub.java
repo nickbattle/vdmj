@@ -50,7 +50,7 @@ public class MessageHub
 	private static MessageHub INSTANCE = null;
 	
 	private final Map<File, Map<String, Set<VDMMessage>>> messageMap;
-	private final Map<String, AnalysisPlugin> pluginMap;
+	private final Map<String, AnalysisPlugin> pluginMap;	// Ref to PluginRegistry map
 	
 	private MessageHub()
 	{
@@ -79,6 +79,20 @@ public class MessageHub
 	}
 	
 	/**
+	 * This is used by the LSPX workspace manager to add new lspx.plugins.
+	 */
+	public synchronized void addPlugin(AnalysisPlugin plugin)
+	{
+		for (File file: messageMap.keySet())
+		{
+			Map<String, Set<VDMMessage>> pmap = messageMap.get(file);
+			pmap.put(plugin.getName(), new HashSet<VDMMessage>());
+		}
+		
+		Diag.info("Added plugin %s to MessageHub", plugin.getName());
+	}
+	
+	/**
 	 * This is used by the workspace manager to populate a blank plugin map for a
 	 * new file.
 	 */
@@ -98,7 +112,7 @@ public class MessageHub
 		}
 		else
 		{
-			Diag.error("Cannot add MessageHub file %s", file);
+			Diag.info("MessageHub already contains file %s", file);
 		}
 	}
 	
@@ -124,12 +138,12 @@ public class MessageHub
 				}
 				else
 				{
-					Diag.error("Cannot add message for plugin name %s", pname);
+					Diag.error("Cannot add message for plugin %s", pname);
 				}
 			}
 			else
 			{
-				Diag.error("Cannot add message for file %s", message.location.file);
+				Diag.error("File %s not in MessageHub", message.location.file);
 			}
 		}
 	}
@@ -144,10 +158,41 @@ public class MessageHub
 		for (File file: messageMap.keySet())
 		{
 			Map<String, Set<VDMMessage>> pmap = messageMap.get(file);
-			pmap.get(pname).clear();
+			Set<VDMMessage> pmessages = pmap.get(pname);
+			
+			if (pmessages != null)
+			{
+				pmessages.clear();
+			}
+			else
+			{
+				Diag.error("Cannot clear messages for plugin %s", pname);
+			}
 		}
 		
-		Diag.fine("Cleared messages for %s", pname);
+		Diag.fine("Cleared messages for plugin %s", pname);
+	}
+	
+	/**
+	 * Get all of the messages raised by a particular plugin. The returned
+	 * map references the MessageHub data and so can be edited (WITH CARE!)
+	 */
+	public synchronized Map<File, Set<VDMMessage>> getPluginMessages(AnalysisPlugin plugin)
+	{
+		HashMap<File, Set<VDMMessage>> result = new HashMap<File, Set<VDMMessage>>();
+		String pname = plugin.getName();
+
+		for (File file: messageMap.keySet())
+		{
+			Map<String, Set<VDMMessage>> pmap = messageMap.get(file);
+			
+			if (pmap.containsKey(pname))
+			{
+				result.put(file, pmap.get(pname));	// Ref to messageMap
+			}
+		}
+		
+		return result;
 	}
 	
 	/**

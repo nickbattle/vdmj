@@ -200,11 +200,11 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
 				getTypeParamDefinitions(), base, NameScope.NAMES);
 
-			type = type.typeResolve(params, null);
+			type = type.typeResolve(params);
 		}
 		else
 		{
-			type = type.typeResolve(base, null);
+			type = type.typeResolve(base);
 		}
 
 		if (base.isVDMPP())
@@ -372,7 +372,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			!(body instanceof TCSubclassResponsibilityExpression) &&
 			!(name.getName().startsWith("measure_")))
 		{
-			local.unusedCheck();
+			checked.unusedCheck();	// Look underneath qualified definitions, if any
 		}
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);

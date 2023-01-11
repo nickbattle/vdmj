@@ -103,7 +103,7 @@ public class TCExportedValue extends TCExport
 	@Override
 	public void typeCheck(Environment env, TCDefinitionList actualDefs)
 	{
-		type = type.typeResolve(env, null);
+		type = type.typeResolve(env);
 		
 		for (TCNameToken name: nameList)
 		{

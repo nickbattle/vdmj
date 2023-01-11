@@ -46,7 +46,7 @@ public class TCPatternTypePair extends TCNode
 	public void typeResolve(Environment base)
 	{
 		if (resolved ) return; else { resolved = true; }
-		type = type.typeResolve(base, null);
+		type = type.typeResolve(base);
 	}
 
 	public TCDefinitionList getDefinitions()

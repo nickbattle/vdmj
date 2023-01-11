@@ -96,12 +96,12 @@ public class TCImportedType extends TCImport
 		
 		if (def != null)
 		{
-			def.type = (TCInvariantType)def.type.typeResolve(env, null);
+			def.type = (TCInvariantType)def.type.typeResolve(env);
 			TypeComparator.checkComposeTypes(def.type, env, false);
 
 			if (expdef != null)
 			{
-				TCType exptype = expdef.getType().typeResolve(env, null);
+				TCType exptype = expdef.getType().typeResolve(env);
 
 				// TypeComparator.compatible(def.type, exptype))
 				if (!def.type.toDetailedString().equals(exptype.toDetailedString()))

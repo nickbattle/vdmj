@@ -90,7 +90,7 @@ public class TCAssignmentDefinition extends TCDefinition
 	@Override
 	public void typeCheck(Environment base, NameScope scope)
 	{
-		type = type.typeResolve(base, null);
+		type = type.typeResolve(base);
 		getDefinitions().setExcluded(true);
 		expType = expression.typeCheck(base, null, scope, type);
 		getDefinitions().setExcluded(false);

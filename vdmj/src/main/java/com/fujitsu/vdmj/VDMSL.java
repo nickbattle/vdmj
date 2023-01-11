@@ -99,7 +99,7 @@ public class VDMSL extends VDMJ
 			}
 			catch (Throwable e)
 			{
-   				println(e.toString());
+   				println(e);
    				perrs++;
 			}
 
@@ -154,7 +154,7 @@ public class VDMSL extends VDMJ
 		}
 		catch (Throwable e)
 		{
-			println(e.toString());
+			println(e);
 			terrs++;
 		}
 
@@ -197,7 +197,7 @@ public class VDMSL extends VDMJ
     		}
 			catch (Throwable e)
 			{
-    			println(e.toString());
+    			println(e);
     			terrs++;
 			}
 

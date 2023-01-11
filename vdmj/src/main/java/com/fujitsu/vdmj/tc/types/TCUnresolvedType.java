@@ -58,19 +58,19 @@ public class TCUnresolvedType extends TCType
 	}
 
 	@Override
-	public TCType typeResolve(Environment env, TCTypeDefinition root)
+	public TCType typeResolve(Environment env)
 	{
-		TCType deref = dereference(env, root);
+		TCType deref = dereference(env);
 
 		if (!(deref instanceof TCClassType))
 		{
-			deref = deref.typeResolve(env, root);
+			deref = deref.typeResolve(env);
 		}
 
 		return deref;
 	}
 
-	private TCType dereference(Environment env, TCTypeDefinition root)
+	private TCType dereference(Environment env)
 	{
 		TCDefinition def = env.findType(typename, location.module);
 
@@ -98,14 +98,6 @@ public class TCUnresolvedType extends TCType
 			!(def instanceof TCInheritedDefinition))
 		{
 			report(3434, "'" + typename + "' is not the name of a type definition");
-		}
-
-		if (def instanceof TCTypeDefinition)
-		{
-			if (def == root)
-			{
-				root.infinite = true;
-			}
 		}
 
 		if ((def instanceof TCCPUClassDefinition ||

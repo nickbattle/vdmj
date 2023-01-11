@@ -93,6 +93,11 @@ public class TCSeqCompExpression extends TCSeqExpression
 
 		if (predicate != null)
 		{
+			if (!predicate.typeCheck(local, null, scope, new TCBooleanType(location)).isType(TCBooleanType.class, location))
+			{
+				predicate.report(3156, "Predicate is not boolean");
+			}
+
 			TCDefinitionList qualified = predicate.getQualifiedDefs(local);
 			
 			if (!qualified.isEmpty())
@@ -102,14 +107,6 @@ public class TCSeqCompExpression extends TCSeqExpression
 		}
 
 		TCType etype = first.typeCheck(local, null, scope, elemConstraint);
-
-		if (predicate != null)
-		{
-			if (!predicate.typeCheck(local, null, scope, new TCBooleanType(location)).isType(TCBooleanType.class, location))
-			{
-				predicate.report(3156, "Predicate is not boolean");
-			}
-		}
 
 		local.unusedCheck();
 		return setType(new TCSeqType(location, etype));

@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.types;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -86,7 +85,7 @@ public class TCMapType extends TCType
 	}
 
 	@Override
-	public TCMapType typeResolve(Environment env, TCTypeDefinition root)
+	public TCMapType typeResolve(Environment env)
 	{
 		if (resolved) return this; else { resolved = true; }
 
@@ -94,8 +93,8 @@ public class TCMapType extends TCType
 		{
 			if (!empty)
 			{
-				from = from.typeResolve(env, root);
-				to = to.typeResolve(env, root);
+				from = from.typeResolve(env);
+				to = to.typeResolve(env);
 			}
 
 			return this;

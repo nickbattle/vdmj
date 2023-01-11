@@ -40,6 +40,7 @@ import json.JSONArray;
 import rpc.RPCMessageList;
 import workspace.MessageHub;
 import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckFailedEvent;
 import workspace.events.CodeLensEvent;
 import workspace.events.DAPEvent;
 import workspace.events.LSPEvent;
@@ -68,6 +69,12 @@ public class ExamplePluginSL extends ExamplePlugin
 			addFirstWarning(ce);
 			return null;
 		}
+		else if (event instanceof CheckFailedEvent)
+		{
+			CheckFailedEvent cfe = (CheckFailedEvent)event;
+			fixTCMessages(cfe);
+			return null;
+		}
 		else
 		{
 			return null;
@@ -91,11 +98,17 @@ public class ExamplePluginSL extends ExamplePlugin
 		TCModuleList tcModuleList = tc.getTC();
 		MessageHub.getInstance().clearPluginMessages(this);
 		
-		TCDefinition first = tcModuleList.get(0).defs.get(0);
-		VDMWarning warning = new VDMWarning(9999, "Example warning from plugin", first.name.getLocation());
-		List<VDMMessage> list = new Vector<VDMMessage>();
-		list.add(warning);
-		MessageHub.getInstance().addPluginMessages(this, list);	// Add the warning to the hub
+		for (TCDefinition def: tcModuleList.get(0).defs)
+		{
+			if (def.name != null)
+			{
+				VDMWarning warning = new VDMWarning(9999, "Example warning from plugin", def.name.getLocation());
+				List<VDMMessage> list = new Vector<VDMMessage>();
+				list.add(warning);
+				MessageHub.getInstance().addPluginMessages(this, list);	// Add the warning to the hub
+				break;
+			}
+		}
 	}
 
 	/**

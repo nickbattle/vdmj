@@ -101,7 +101,7 @@ public class VDMPP extends VDMJ
 			}
 			catch (Throwable e)
 			{
-   				println(e.toString());
+   				println(e);
    				perrs++;
 			}
 
@@ -151,13 +151,7 @@ public class VDMPP extends VDMJ
 		}
 		catch (Throwable e)
 		{
-			println(e.toString());
-
-			if (e instanceof StackOverflowError)
-			{
-				e.printStackTrace();
-			}
-
+			println(e);
 			terrs++;
 		}
 
@@ -200,7 +194,7 @@ public class VDMPP extends VDMJ
     		}
 			catch (Throwable e)
 			{
-    			println(e.toString());
+    			println(e);
     			terrs++;
 			}
 

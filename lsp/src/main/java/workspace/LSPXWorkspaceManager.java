@@ -118,6 +118,7 @@ public class LSPXWorkspaceManager
 						Method factory = clazz.getMethod("factory", Dialect.class);
 						AnalysisPlugin instance = (AnalysisPlugin)factory.invoke(null, Settings.dialect);
 						registry.registerPlugin(instance);
+						messagehub.addPlugin(instance);
 						Diag.info("Registered LSPX plugin %s", plugin);
 					}
 					catch (NoSuchMethodException e)		// Try default constructor
@@ -133,6 +134,7 @@ public class LSPXWorkspaceManager
 							Constructor<?> ctor = clazz.getConstructor();
 							AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
 							registry.registerPlugin(instance);
+							messagehub.addPlugin(instance);
 							Diag.info("Registered LSPX plugin %s", plugin);
 						}
 						catch (Throwable th)
@@ -175,7 +177,7 @@ public class LSPXWorkspaceManager
 	}
 
 	/**
-	 * This is only used by unit testing.
+	 * Reset the singleton.
 	 */
 	public static void reset()
 	{

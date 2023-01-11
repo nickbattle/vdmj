@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.tc.expressions;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -45,6 +46,7 @@ public class TCAndExpression extends TCBooleanBinaryExpression
 	@Override
 	public TCType typeCheck(Environment env, TCTypeList qualifiers, NameScope scope, TCType constraint)
 	{
+		ltype = left.typeCheck(env, null, scope, null);
 		TCDefinitionList qualified = left.getQualifiedDefs(env);
 		Environment qenv = env;
 		
@@ -53,7 +55,20 @@ public class TCAndExpression extends TCBooleanBinaryExpression
 			qenv = new FlatEnvironment(qualified, env);
 		}
 
-		return super.typeCheck(qenv, qualifiers, scope, constraint);
+		rtype = right.typeCheck(qenv, null, scope, null);	// RHS qualified, using LHS
+		TCType expected = new TCBooleanType(location);
+
+		if (!ltype.isType(expected.getClass(), location))
+		{
+			report(3065, "Left hand of " + op + " is not " + expected);
+		}
+
+		if (!rtype.isType(expected.getClass(), location))
+		{
+			report(3066, "Right hand of " + op + " is not " + expected);
+		}
+
+		return checkConstraint(constraint, expected);
 	}
 
 	@Override

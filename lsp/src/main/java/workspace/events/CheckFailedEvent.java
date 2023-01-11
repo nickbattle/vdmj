@@ -24,20 +24,18 @@
 
 package workspace.events;
 
-import rpc.RPCRequest;
-
-abstract public class LSPEvent extends Event
+public class CheckFailedEvent extends AbstractCheckFilesEvent
 {
-	public final RPCRequest request;
+	private final LSPEvent event;
 	
-	protected LSPEvent(RPCRequest request)
+	public CheckFailedEvent(LSPEvent event)
 	{
-		this.request = request;
+		super();
+		this.event = event;
 	}
 	
-	@Override
-	public String toString()
+	public LSPEvent getCause()
 	{
-		return "LSP Event " + getKey() + (properties != null ? properties : "");
+		return event;
 	}
 }

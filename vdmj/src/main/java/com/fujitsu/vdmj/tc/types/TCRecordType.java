@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.tc.types;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCTypeDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -116,31 +115,17 @@ public class TCRecordType extends TCInvariantType
 		}
 	}
 
-	private boolean infinite = false;
-
 	@Override
-	public TCType typeResolve(Environment env, TCTypeDefinition root)
+	public TCType typeResolve(Environment env)
 	{
-		if (resolved)
-		{
-			return this;
-		}
-		else
-		{
-			resolved = true;
-			infinite = false;
-		}
-		
+		if (resolved) return this; else resolved = true;
 		TypeCheckException problem = null;
 
 		for (TCField f: fields)
 		{
-			if (root != null)
-				root.infinite = false;
-
 			try
 			{
-				f.typeResolve(env, root);
+				f.typeResolve(env);
 			}
 			catch (TypeCheckException e)
 			{
@@ -156,9 +141,6 @@ public class TCRecordType extends TCInvariantType
 
 				resolved = true;	// See bug #26
 			}
-
-			if (root != null)
-				infinite = infinite || root.infinite;
 		}
 		
 		if (problem != null)
@@ -167,7 +149,6 @@ public class TCRecordType extends TCInvariantType
 			throw problem;
 		}
 
-		if (root != null) root.infinite = infinite;
 		return this;
 	}
 

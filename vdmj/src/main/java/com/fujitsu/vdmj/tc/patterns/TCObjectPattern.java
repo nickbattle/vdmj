@@ -73,7 +73,7 @@ public class TCObjectPattern extends TCPattern
 		try
 		{
 			fieldlist.typeResolve(env);
-			type = type.typeResolve(env, null);
+			type = type.typeResolve(env);
 
 			if (!type.isClass(env))
 			{

@@ -644,6 +644,30 @@ abstract public class VDMJ
 		Console.out.println(m);
 	}
 
+	protected static void println(Throwable throwable)
+	{
+		Console.out.println(String.format("EXCEPTION: %s %s",
+				throwable.getClass().getSimpleName(), throwable.getMessage()));
+		
+		StackTraceElement[] stack = throwable.getStackTrace();
+		int max = Properties.diag_max_stack;
+		int count = (max == 0 )? stack.length : (stack.length < max) ? stack.length : max;
+		
+		for (int i=0; i<count; i++)
+		{
+			StackTraceElement frame = stack[i];
+			Console.out.println(String.format("  %s %s at %s line %d",
+					frame.getClassName(), frame.getMethodName(), frame.getFileName(), frame.getLineNumber()));
+		}
+		
+		if (count < stack.length)
+		{
+			Console.out.println((stack.length - count) +
+				" more frames available (vdmj.diag.max_stack currently = " +
+				Properties.diag_max_stack +")");
+		}
+	}
+
 	protected String plural(int n, String s, String pl)
 	{
 		return n + " " + (n != 1 ? s + pl : s);

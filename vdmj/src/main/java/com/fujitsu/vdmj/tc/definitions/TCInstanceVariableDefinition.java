@@ -66,7 +66,7 @@ public class TCInstanceVariableDefinition extends TCAssignmentDefinition
 	{
 		try
 		{
-			type = type.typeResolve(env, null);
+			type = type.typeResolve(env);
 		}
 		catch (TypeCheckException e)
 		{

@@ -24,10 +24,17 @@
 
 package examples;
 
+import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.messages.VDMError;
+import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.messages.VDMWarning;
 
 import dap.DAPMessageList;
 import json.JSONObject;
@@ -37,8 +44,11 @@ import vdmj.commands.HelpList;
 import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;
+import workspace.MessageHub;
+import workspace.PluginRegistry;
 import workspace.events.ChangeFileEvent;
 import workspace.events.CheckCompleteEvent;
+import workspace.events.CheckFailedEvent;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
 import workspace.events.CheckTypeEvent;
@@ -63,6 +73,7 @@ import workspace.events.UnknownMethodEvent;
 import workspace.events.UnknownTranslationEvent;
 import workspace.lenses.TCCodeLens;
 import workspace.plugins.AnalysisPlugin;
+import workspace.plugins.TCPlugin;
 
 abstract public class ExamplePlugin extends AnalysisPlugin implements EventListener
 {
@@ -120,6 +131,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		eventhub.register(CheckSyntaxEvent.class, this);
 		eventhub.register(CheckTypeEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
+		eventhub.register(CheckFailedEvent.class, this);
 		eventhub.register(UnknownTranslationEvent.class, this);
 		eventhub.register(ShutdownEvent.class, this);
 
@@ -222,4 +234,37 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	
 	@Override
 	abstract public DAPMessageList handleEvent(DAPEvent event) throws Exception;
+	
+	/**
+	 * Example of how to obtain and change messages from another plugin.
+	 */
+	protected void fixTCMessages(CheckFailedEvent event)
+	{
+		Diag.info("Adjusting TC errors... caused by %s", event.getCause());
+		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
+		Map<File, Set<VDMMessage>> tcMsgs = MessageHub.getInstance().getPluginMessages(tc);
+		
+		for (File file: tcMsgs.keySet())
+		{
+			Set<VDMMessage> oldMsgs = tcMsgs.get(file);
+			Set<VDMMessage> newMsgs = new HashSet<VDMMessage>();
+			
+			for (VDMMessage msg: oldMsgs)
+			{
+				if (msg instanceof VDMError)
+				{
+					VDMError err = (VDMError)msg;
+					newMsgs.add(new VDMError(err.number, "Something serious wrong here!", err.location));
+				}
+				else if (msg instanceof VDMWarning)
+				{
+					VDMWarning warn = (VDMWarning)msg;
+					newMsgs.add(new VDMWarning(warn.number, "Something strange here!", warn.location));
+				}
+			}
+			
+			oldMsgs.clear();
+			oldMsgs.addAll(newMsgs);	// Use same container
+		}
+	}
 }

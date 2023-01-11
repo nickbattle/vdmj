@@ -81,6 +81,11 @@ public class TCSetCompExpression extends TCSetExpression
 		
 		if (predicate != null)
 		{
+			if (!predicate.typeCheck(local, null, scope, new TCBooleanType(location)).isType(TCBooleanType.class, location))
+			{
+				predicate.report(3159, "Predicate is not boolean");
+			}
+
 			TCDefinitionList qualified = predicate.getQualifiedDefs(local);
 			
 			if (!qualified.isEmpty())
@@ -94,14 +99,6 @@ public class TCSetCompExpression extends TCSetExpression
 		if (TCType.isFunctionType(etype, location))
 		{
 			first.warning(5037, "Function equality cannot be reliably computed");
-		}
-
-		if (predicate != null)
-		{
-			if (!predicate.typeCheck(local, null, scope, new TCBooleanType(location)).isType(TCBooleanType.class, location))
-			{
-				predicate.report(3159, "Predicate is not boolean");
-			}
 		}
 
 		local.unusedCheck();

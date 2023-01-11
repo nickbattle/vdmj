@@ -189,11 +189,11 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			FlatCheckedEnvironment params =	new FlatCheckedEnvironment(
 				getTypeParamDefinitions(), base, NameScope.NAMES);
 
-			type = type.typeResolve(params, null);
+			type = type.typeResolve(params);
 		}
 		else
 		{
-			type = type.typeResolve(base, null);
+			type = type.typeResolve(base);
 		}
 
 		if (result != null)
@@ -366,7 +366,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		if (!(body instanceof TCNotYetSpecifiedExpression) &&
 			!(body instanceof TCSubclassResponsibilityExpression))
 		{
-			local.unusedCheck();
+			checked.unusedCheck();	// Look underneath qualified definitions, if any
 		}
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);

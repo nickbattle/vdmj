@@ -75,7 +75,7 @@ public class TCLocalDefinition extends TCDefinition
 	{
    		if (type != null)
    		{
-   			type = type.typeResolve(base, null);
+   			type = type.typeResolve(base);
    		}
 	}
 
@@ -84,7 +84,7 @@ public class TCLocalDefinition extends TCDefinition
 	{
    		if (type != null)
    		{
-   			type = type.typeResolve(base, null);
+   			type = type.typeResolve(base);
    		}
 	}
 

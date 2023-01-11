@@ -68,7 +68,7 @@ public class TCRecordPattern extends TCPattern
 		try
 		{
 			plist.typeResolve(env);
-			type = type.typeResolve(env, null);
+			type = type.typeResolve(env);
 		}
 		catch (TypeCheckException e)
 		{
