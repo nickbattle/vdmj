@@ -31,7 +31,9 @@ import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
+import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
@@ -67,11 +69,23 @@ public class TCRecursiveTypeFinder extends TCLeafTypeVisitor<Boolean, Set<Boolea
 	{
 		return newCollection();		// Not recursive, regardless of what is inside
 	}
+	
+	@Override
+	public Set<Boolean> caseSeq1Type(TCSeq1Type node, Object arg)
+	{
+		return node.seqof.apply(this, arg);		// Note: seq1 could be infinite!
+	}
 
 	@Override
 	public Set<Boolean> caseSetType(TCSetType node, Object arg)
 	{
 		return newCollection();		// Not recursive, regardless of what is inside
+	}
+	
+	@Override
+	public Set<Boolean> caseSet1Type(TCSet1Type node, Object arg)
+	{
+		return node.setof.apply(this, arg);		// Note: set1 could be infinite!
 	}
 	
 	@Override
