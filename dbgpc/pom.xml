@@ -1,9 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>dbgpc</artifactId>
 	<name>DBGP Client</name>
-	
+
 	<parent>
 		<groupId>dk.au.ece.vdmj</groupId>
 		<artifactId>vdmj-suite</artifactId>
@@ -39,15 +40,33 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Main-Class>com.fujitsu.vdmjc.DBGPC</Main-Class>
-							<Implementation-Version>${maven.build.timestamp}</Implementation-Version>
-							<Class-Path>.</Class-Path>
-						</manifestEntries>
-					</archive>
-				</configuration>
+				<executions>
+					<execution>
+						<configuration>
+							<archive>
+								<manifestEntries>
+									<Main-Class>com.fujitsu.vdmjc.DBGPC</Main-Class>
+									<Implementation-Version>${maven.build.timestamp}</Implementation-Version>
+									<Class-Path>.</Class-Path>
+								</manifestEntries>
+							</archive>
+						</configuration>
+					</execution>
+					<execution>
+						<id>documentation</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<classesDirectory>${basedir}</classesDirectory>
+							<includes>
+								<include>documentation/**.pdf</include>
+							</includes>
+							<classifier>docs</classifier>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
