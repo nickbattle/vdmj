@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.in.types.visitors;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ExceptionHandler;
@@ -64,70 +66,70 @@ import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
 
-public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
+public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 {
 	@Override
-	public Long caseType(TCType type, Context ctxt)
+	public BigInteger caseType(TCType type, Context ctxt)
 	{
 		throw new RuntimeException("Missing INTypeSizeVisitor case for " + type);
 	}
 
 	@Override
-	public Long caseBooleanType(TCBooleanType type, Context ctxt)
+	public BigInteger caseBooleanType(TCBooleanType type, Context ctxt)
 	{
-		return 2L;
+		return new BigInteger("2");
 	}
 
 	@Override
-	public Long caseBracketType(TCBracketType type, Context ctxt)
+	public BigInteger caseBracketType(TCBracketType type, Context ctxt)
 	{
 		return type.type.apply(this, ctxt);
 	}
 
 	@Override
-	public Long caseMapType(TCMapType type, Context ctxt)
+	public BigInteger caseMapType(TCMapType type, Context ctxt)
 	{
-		long f = type.from.apply(this, ctxt);
-		long t = type.to.apply(this, ctxt);
-		long r = 1;	// +1 for the empty map
+		BigInteger f = type.from.apply(this, ctxt);
+		BigInteger t = type.to.apply(this, ctxt);
+		BigInteger r = BigInteger.ONE;	// +1 for the empty map
 		
-		for (int z=1; z<=f; z++)
+		for (BigInteger z = BigInteger.ONE; z.compareTo(f) <= 0; z = z.add(BigInteger.ONE))
 		{
-			r = r + combs(f, z) * pow(t, z);
+			r = r.add(combs(f, z.multiply(pow(t, z))));
 		}
 		
 		return r;
 	}
 
 	@Override
-	public Long caseInMapType(TCInMapType type, Context ctxt)
+	public BigInteger caseInMapType(TCInMapType type, Context ctxt)
 	{
-		long f = type.from.apply(this, ctxt);
-		long t = type.to.apply(this, ctxt);
-		long r = 1;	// +1 for the empty map
+		BigInteger f = type.from.apply(this, ctxt);
+		BigInteger t = type.to.apply(this, ctxt);
+		BigInteger r = BigInteger.ONE;	// +1 for the empty map
 		
-		for (int z=1; z<=f && z<=t; z++)
+		for (BigInteger z = BigInteger.ONE; z.compareTo(f) <= 0 && z.compareTo(t) <= 0; z = z.add(BigInteger.ONE))
 		{
-			r = r + combs(f, z) * perms(t, z);
+			r = r.add(combs(f, z).multiply(perms(t, z)));
 		}
 		
 		return r;
 	}
 	
 	@Override
-	public Long caseNamedType(TCNamedType type, Context ctxt)
+	public BigInteger caseNamedType(TCNamedType type, Context ctxt)
 	{
 		return type.type.apply(this, ctxt);
 	}
 
 	@Override
-	public Long caseOptionalType(TCOptionalType type, Context ctxt)
+	public BigInteger caseOptionalType(TCOptionalType type, Context ctxt)
 	{
-		return type.type.apply(this, ctxt) + 1;		// + 'nil'
+		return type.type.apply(this, ctxt).add(BigInteger.ONE);		// + 'nil'
 	}
 
 	@Override
-	public Long caseParameterType(TCParameterType type, Context ctxt)
+	public BigInteger caseParameterType(TCParameterType type, Context ctxt)
 	{
 		Value t = ctxt.lookup(type.name);
 
@@ -146,19 +148,19 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	}
 
 	@Override
-	public Long caseProductType(TCProductType type, Context ctxt)
+	public BigInteger caseProductType(TCProductType type, Context ctxt)
 	{
 		return ofTypeList(type.types, ctxt);
 	}
 
 	@Override
-	public Long caseQuoteType(TCQuoteType type, Context ctxt)
+	public BigInteger caseQuoteType(TCQuoteType type, Context ctxt)
 	{
-		return 1L;
+		return BigInteger.ONE;
 	}
 
 	@Override
-	public Long caseRecordType(TCRecordType type, Context ctxt)
+	public BigInteger caseRecordType(TCRecordType type, Context ctxt)
 	{
 		TCTypeList fieldtypes = new TCTypeList();
 
@@ -171,26 +173,26 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	}
 
 	@Override
-	public Long caseSetType(TCSetType type, Context ctxt)
+	public BigInteger caseSetType(TCSetType type, Context ctxt)
 	{
-		long n = type.setof.apply(this, ctxt);
+		BigInteger n = type.setof.apply(this, ctxt);
 
 		if (type instanceof TCSet1Type)
 		{
-			n = n - 1;
+			n = n.subtract(BigInteger.ONE);
 		}
 
-		return pow(2, n);
+		return pow(new BigInteger("2"), n);
 	}
 
 	@Override
-	public Long caseUnionType(TCUnionType type, Context ctxt)
+	public BigInteger caseUnionType(TCUnionType type, Context ctxt)
 	{
-		long n = 0;
+		BigInteger n = BigInteger.ZERO;
 
 		for (TCType member: type.types)
 		{
-			n = n + member.apply(this, ctxt);
+			n = n.add(member.apply(this, ctxt));
 		}
 
 		return n;
@@ -201,103 +203,103 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	 */
 	
 	@Override
-	public Long caseCharacterType(TCCharacterType type, Context ctxt)
+	public BigInteger caseCharacterType(TCCharacterType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 	
 	@Override
-	public Long caseClassType(TCClassType type, Context ctxt)
+	public BigInteger caseClassType(TCClassType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseFunctionType(TCFunctionType type, Context ctxt)
+	public BigInteger caseFunctionType(TCFunctionType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseIntegerType(TCIntegerType type, Context ctxt)
+	public BigInteger caseIntegerType(TCIntegerType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseNaturalOneType(TCNaturalOneType type, Context ctxt)
+	public BigInteger caseNaturalOneType(TCNaturalOneType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseNaturalType(TCNaturalType type, Context ctxt)
+	public BigInteger caseNaturalType(TCNaturalType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseNumericType(TCNumericType type, Context ctxt)
+	public BigInteger caseNumericType(TCNumericType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseOperationType(TCOperationType type, Context ctxt)
+	public BigInteger caseOperationType(TCOperationType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseRationalType(TCRationalType type, Context ctxt)
+	public BigInteger caseRationalType(TCRationalType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseRealType(TCRealType type, Context ctxt)
+	public BigInteger caseRealType(TCRealType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseSeqType(TCSeqType type, Context ctxt)
+	public BigInteger caseSeqType(TCSeqType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseTokenType(TCTokenType type, Context ctxt)
+	public BigInteger caseTokenType(TCTokenType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseUndefinedType(TCUndefinedType type, Context ctxt)
+	public BigInteger caseUndefinedType(TCUndefinedType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseUnknownType(TCUnknownType type, Context ctxt)
+	public BigInteger caseUnknownType(TCUnknownType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseUnresolvedType(TCUnresolvedType type, Context ctxt)
+	public BigInteger caseUnresolvedType(TCUnresolvedType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseVoidReturnType(TCVoidReturnType type, Context ctxt)
+	public BigInteger caseVoidReturnType(TCVoidReturnType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
 
 	@Override
-	public Long caseVoidType(TCVoidType type, Context ctxt)
+	public BigInteger caseVoidType(TCVoidType type, Context ctxt)
 	{
 		return infiniteType(type, ctxt);
 	}
@@ -305,49 +307,57 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	/**
 	 * Factorial, binary-coefficient, permutations and power methods for caseMapType
 	 */
-	private long fac(long n)
+	private BigInteger fac(BigInteger n)
 	{
-		return (n == 0) ? 1 : Math.multiplyExact(n, fac(n-1));
-	}
-
-	private long combs(long n, long k)	// k <= n
-	{
-		return fac(n) / (fac(k) * fac(n - k));
-	}
-
-	private long perms(long n, long k)	// k <= n
-	{
-		return fac(n) / fac(n - k);
-	}
-
-	private long pow(long n, long k)
-	{
-		long r = 1;
-		
-		for (int i=0; i<k; i++)
+		if (n.equals(BigInteger.ZERO))
 		{
-			r = Math.multiplyExact(r, n);	// catch overflow
+			return BigInteger.ONE;
 		}
-		
-		return r;
+		else
+		{
+			long nl = n.longValue();
+			BigInteger r = BigInteger.ONE;
+			
+			for (long i = 2; i < nl; i++)
+			{
+				r = r.multiply(new BigInteger(Long.toString(i)));
+			}
+			
+			return r;
+		}
+	}
+
+	private BigInteger combs(BigInteger n, BigInteger k)	// k <= n
+	{
+		return fac(n).divide(fac(k).multiply(fac(n.subtract(k))));
+	}
+
+	private BigInteger perms(BigInteger n, BigInteger k)	// k <= n
+	{
+		return fac(n).divide(fac(n.subtract(k)));
+	}
+
+	private BigInteger pow(BigInteger n, BigInteger k)
+	{
+		return n.pow(k.intValueExact());
 	}
 
 	/**
 	 * Throw a runtime exception wrapping a ValueException cause. We need to add some sort
 	 * of exception mechanism to visitors? 
 	 */
-	private Long infiniteType(TCType type, Context ctxt)
+	private BigInteger infiniteType(TCType type, Context ctxt)
 	{
 		throw new InternalException(4, "Cannot get bind values for type " + type);
 	}
 	
-	private Long ofTypeList(TCTypeList types, Context ctxt)
+	private BigInteger ofTypeList(TCTypeList types, Context ctxt)
 	{
-		long n = 1;
+		BigInteger n = BigInteger.ONE;
 		
 		for (TCType t: types)
 		{
-			n = n * t.apply(this, ctxt);
+			n = n.multiply(t.apply(this, ctxt));
 		}
 
 		return n;

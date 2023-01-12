@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.in.types.visitors;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
@@ -486,12 +487,12 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 			case Breakpoint.TERMINATE:
 				try
 				{
-					long size = type.apply(new INTypeSizeVisitor(), ctxt);
+					BigInteger size = type.apply(new INTypeSizeVisitor(), ctxt);
 					throw new InternalException(4176, "Interrupted type expansion size " + size);
 				}
 				catch (ArithmeticException e)
 				{
-					throw new InternalException(4176, "Interrupted type expansion, exceeds long");
+					throw new InternalException(4176, "Interrupted type expansion, exceeds BigInteger");
 				}
 		
 			case Breakpoint.PAUSE:

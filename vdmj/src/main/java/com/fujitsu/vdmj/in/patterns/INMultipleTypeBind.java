@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.patterns.visitors.INMultipleBindVisitor;
 import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
@@ -57,9 +59,9 @@ public class INMultipleTypeBind extends INMultipleBind
 	{
 		try
 		{
-			long size = type.apply(new INTypeSizeVisitor(), ctxt);
+			BigInteger size = type.apply(new INTypeSizeVisitor(), ctxt);
 			
-	   		if (size > Properties.in_typebind_limit)
+	   		if (size.compareTo(new BigInteger(Long.toString(Properties.in_typebind_limit))) > 0)
 			{
 				throw new ContextException(5039, "Cannot evaluate type bind of size " + size, location, ctxt);
 			}
