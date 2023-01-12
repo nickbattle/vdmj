@@ -39,6 +39,22 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+                   <execution>
+                        <id>documentation</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classesDirectory>${basedir}</classesDirectory>
+                            <includes>
+                                <include>documentation/**.pdf</include>
+                            </includes>
+                            <classifier>docs</classifier>
+                        </configuration>
+                    </execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

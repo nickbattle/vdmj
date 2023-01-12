@@ -64,6 +64,20 @@
 							</archive>
 						</configuration>
 					</execution>
+					<execution>
+						<id>documentation</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<classesDirectory>${basedir}</classesDirectory>
+							<includes>
+								<include>documentation/**.pdf</include>
+							</includes>
+							<classifier>docs</classifier>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
