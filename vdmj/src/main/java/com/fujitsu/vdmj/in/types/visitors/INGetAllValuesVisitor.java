@@ -484,8 +484,15 @@ public class INGetAllValuesVisitor extends TCTypeVisitor<ValueList, Context>
 		switch (Breakpoint.execInterruptLevel())
 		{
 			case Breakpoint.TERMINATE:
-				long size = type.apply(new INTypeSizeVisitor(), ctxt);
-				throw new InternalException(4176, "Interrupted type expansion size " + size);
+				try
+				{
+					long size = type.apply(new INTypeSizeVisitor(), ctxt);
+					throw new InternalException(4176, "Interrupted type expansion size " + size);
+				}
+				catch (ArithmeticException e)
+				{
+					throw new InternalException(4176, "Interrupted type expansion, exceeds long");
+				}
 		
 			case Breakpoint.PAUSE:
 				if (breakpoint != null)

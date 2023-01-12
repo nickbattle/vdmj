@@ -287,7 +287,8 @@ public class VDMSL extends VDMJ
 				e = (Exception)e.getCause();
 			}
 			
-			println("Initialization: " + e.getMessage());
+			println("Initialization:");
+			println(e);
 			return ExitStatus.EXIT_ERRORS;
 		}
 
@@ -325,7 +326,8 @@ public class VDMSL extends VDMJ
 				e = (Exception)e.getCause();
 			}
 			
-			println("Execution: " + e);
+			println("Execution:");
+			println(e);
 		}
 
 		return ExitStatus.EXIT_ERRORS;

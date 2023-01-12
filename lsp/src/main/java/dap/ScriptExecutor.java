@@ -65,7 +65,15 @@ public class ScriptExecutor extends AsyncExecutor
 				
 				if (line == null)
 				{
-					return;
+					return;		// End of file
+				}
+				
+				line = line.trim();
+				
+				if (line.isEmpty() || line.startsWith("--"))
+				{
+					server.stdout(line + "\n");
+					continue;
 				}
 				
 				Command cmd = Command.parse(line);

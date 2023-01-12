@@ -277,7 +277,7 @@ public class TCTypeDefinition extends TCDefinition
 		{
 			pass = Pass.DEFS;		// Come back later for the invariant functions
 			
-			if (type.isUnion(location))
+			if (!type.isInfinite() && type.isUnion(location))
 			{
 				TCUnionType ut = type.getUnion();
 				

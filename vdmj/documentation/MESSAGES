@@ -988,3 +988,5 @@ as the expected and actual values.
 5036, "Cannot use 'time' in a functional context"
 5037, "Function equality cannot be reliably computed"
 5038, "Trailing annotation ignored"
+5039, "Cannot evaluate type bind of size <n>"
+5040, "Cannot evaluate type bind, size exceeds long"
