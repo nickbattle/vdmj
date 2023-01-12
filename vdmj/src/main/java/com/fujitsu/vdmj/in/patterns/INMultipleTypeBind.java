@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
 import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.ValueList;
@@ -60,10 +61,14 @@ public class INMultipleTypeBind extends INMultipleBind
 			
 	   		if (size > Properties.in_typebind_limit)
 			{
-				throw new InternalException(0074, "Cannot evaluate type bind of size " + size);
+				throw new ContextException(5039, "Cannot evaluate type bind of size " + size, location, ctxt);
 			}
 
 	   		return type.apply(new INGetAllValuesVisitor(), ctxt);
+		}
+		catch (ArithmeticException e)
+		{
+			throw new ContextException(5040, "Cannot evaluate type bind, size exceeds long", location, ctxt);
 		}
 		catch (InternalException e)		// Used while visitors don't have exceptions
 		{
