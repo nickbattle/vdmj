@@ -66,6 +66,13 @@ import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
 
+import static java.math.BigInteger.ONE;
+import static java.math.BigInteger.ZERO;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 {
 	@Override
@@ -77,7 +84,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 	@Override
 	public BigInteger caseBooleanType(TCBooleanType type, Context ctxt)
 	{
-		return new BigInteger("2");
+		return BigInteger.valueOf(2);
 	}
 
 	@Override
@@ -91,9 +98,9 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 	{
 		BigInteger f = type.from.apply(this, ctxt);
 		BigInteger t = type.to.apply(this, ctxt);
-		BigInteger r = BigInteger.ONE;	// +1 for the empty map
+		BigInteger r = ONE;	// +1 for the empty map
 		
-		for (BigInteger z = BigInteger.ONE; z.compareTo(f) <= 0; z = z.add(BigInteger.ONE))
+		for (BigInteger z = ONE; z.compareTo(f) <= 0; z = z.add(ONE))
 		{
 			r = r.add(combs(f, z.multiply(pow(t, z))));
 		}
@@ -106,9 +113,9 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 	{
 		BigInteger f = type.from.apply(this, ctxt);
 		BigInteger t = type.to.apply(this, ctxt);
-		BigInteger r = BigInteger.ONE;	// +1 for the empty map
+		BigInteger r = ONE;	// +1 for the empty map
 		
-		for (BigInteger z = BigInteger.ONE; z.compareTo(f) <= 0 && z.compareTo(t) <= 0; z = z.add(BigInteger.ONE))
+		for (BigInteger z = ONE; z.compareTo(f) <= 0 && z.compareTo(t) <= 0; z = z.add(ONE))
 		{
 			r = r.add(combs(f, z).multiply(perms(t, z)));
 		}
@@ -125,7 +132,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 	@Override
 	public BigInteger caseOptionalType(TCOptionalType type, Context ctxt)
 	{
-		return type.type.apply(this, ctxt).add(BigInteger.ONE);		// + 'nil'
+		return type.type.apply(this, ctxt).add(ONE);		// + 'nil'
 	}
 
 	@Override
@@ -156,7 +163,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 	@Override
 	public BigInteger caseQuoteType(TCQuoteType type, Context ctxt)
 	{
-		return BigInteger.ONE;
+		return ONE;
 	}
 
 	@Override
@@ -179,16 +186,16 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 
 		if (type instanceof TCSet1Type)
 		{
-			n = n.subtract(BigInteger.ONE);
+			n = n.subtract(ONE);
 		}
 
-		return pow(new BigInteger("2"), n);
+		return pow(BigInteger.valueOf(2), n);
 	}
 
 	@Override
 	public BigInteger caseUnionType(TCUnionType type, Context ctxt)
 	{
-		BigInteger n = BigInteger.ZERO;
+		BigInteger n = ZERO;
 
 		for (TCType member: type.types)
 		{
@@ -309,18 +316,18 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 	 */
 	private BigInteger fac(BigInteger n)
 	{
-		if (n.equals(BigInteger.ZERO))
+		if (n.equals(ZERO))
 		{
-			return BigInteger.ONE;
+			return ONE;
 		}
 		else
 		{
 			long nl = n.longValue();
-			BigInteger r = BigInteger.ONE;
+			BigInteger r = ONE;
 			
-			for (long i = 2; i < nl; i++)
+			for (long i = 2; i <= nl; i++)
 			{
-				r = r.multiply(new BigInteger(Long.toString(i)));
+				r = r.multiply(BigInteger.valueOf(i));
 			}
 			
 			return r;
@@ -339,7 +346,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 
 	private BigInteger pow(BigInteger n, BigInteger k)
 	{
-		return n.pow(k.intValueExact());
+		return n.pow(k.intValueExact());	// ArithmeticException if k not <= MAX_INT
 	}
 
 	/**
@@ -353,7 +360,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 	
 	private BigInteger ofTypeList(TCTypeList types, Context ctxt)
 	{
-		BigInteger n = BigInteger.ONE;
+		BigInteger n = ONE;
 		
 		for (TCType t: types)
 		{
@@ -362,4 +369,50 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 
 		return n;
 	}
+	
+	// For testing
+	public static void main(String[] args) throws IOException
+	{
+		INTypeSizeVisitor visitor = new INTypeSizeVisitor();
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		System.out.print("> ");
+		String line = br.readLine();
+		
+		while (line != null)
+		{
+			args = line.trim().split("\\s+");
+			
+			switch (args[0])
+			{
+				case "fac":
+					System.out.println(visitor.fac(new BigInteger(args[1])));
+					break;
+					
+				case "pow":
+					System.out.println(visitor.pow(new BigInteger(args[1]), new BigInteger(args[2])));
+					break;
+					
+				case "combs":
+					System.out.println(visitor.combs(new BigInteger(args[1]), new BigInteger(args[2])));
+					break;
+					
+				case "perms":
+					System.out.println(visitor.perms(new BigInteger(args[1]), new BigInteger(args[2])));
+					break;
+					
+				case "quit":
+				case "q":
+					System.exit(0);
+					
+				default:
+					System.out.println("<fac|pow|combs|perms> <int args>...");
+					System.out.println("or quit");
+			}
+			
+			System.out.print("> ");
+			line = br.readLine();
+		}
+	}
+	
 }
