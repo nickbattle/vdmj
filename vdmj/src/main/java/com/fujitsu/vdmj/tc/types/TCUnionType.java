@@ -392,6 +392,7 @@ public class TCUnionType extends TCType
 
     		Map<String, TCTypeList> common = new HashMap<String, TCTypeList>();
     		int recordCount = 0;
+    		boolean nonrecs = false;
 
     		for (TCType t: types)
     		{
@@ -413,6 +414,10 @@ public class TCUnionType extends TCType
     					}
     				}
     			}
+    			else
+    			{
+    				nonrecs = true;		// Union has some non-record types
+    			}
     		}
     		
     		// If all fields were present in all records, the TypeLists will be the
@@ -425,7 +430,7 @@ public class TCUnionType extends TCType
     		{
     			TCTypeList list = common.get(field);
     			
-    			if (list.size() != recordCount)
+    			if (list.size() != recordCount || nonrecs)
     			{
     				// Both unknown and undefined types do not trigger isSubType, so we use
     				// an illegal quote type, <?>.
