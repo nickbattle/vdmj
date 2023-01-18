@@ -68,6 +68,8 @@ public class TCUnionType extends TCType
 
 	private int prodCard = -1;
 	private boolean expanded = false;
+	
+	public static TCType MISSING_FIELD = new TCQuoteType(LexLocation.ANY, "?");
 
 	public TCUnionType(LexLocation location, TCType a, TCType b)
 	{
@@ -427,7 +429,7 @@ public class TCUnionType extends TCType
     			{
     				// Both unknown and undefined types do not trigger isSubType, so we use
     				// an illegal quote type, <?>.
-    				list.add(new TCQuoteType(location, "?"));
+    				list.add(MISSING_FIELD);
     			}
     			
     			TCTypeSet set = new TCTypeSet();

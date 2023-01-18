@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.expressions.POBooleanLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POCharLiteralExpression;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.expressions.POExpressionList;
+import com.fujitsu.vdmj.po.expressions.POFieldExpression;
 import com.fujitsu.vdmj.po.expressions.POFuncInstantiationExpression;
 import com.fujitsu.vdmj.po.expressions.POMapEnumExpression;
 import com.fujitsu.vdmj.po.expressions.POMapletExpression;
@@ -217,8 +218,65 @@ public class SubTypeObligation extends ProofObligation
 
 		StringBuilder sb = new StringBuilder();
 		String prefix = "";
-
 		etype = etype.deBracket();
+		
+		if (atype instanceof TCUnionType && exp instanceof POFieldExpression)
+		{
+			POFieldExpression fexp = (POFieldExpression)exp;
+			TCUnionType ut = (TCUnionType)atype;
+			boolean found = false;
+			
+			for (TCType type: ut.types)
+			{
+				// This impossible quote type is added by TCUnionType.getRecord when
+				// not all records in the union have the field concerned.
+
+				if (type == TCUnionType.MISSING_FIELD)
+				{
+					found = true;
+					break;
+				}
+			}
+			
+			if (found && fexp.object.getExptype() instanceof TCUnionType)
+			{
+				TCUnionType union = (TCUnionType)fexp.object.getExptype();
+				TCTypeSet valid = new TCTypeSet();
+				TCTypeSet vtype = new TCTypeSet();
+				
+				for (TCType type: union.types)
+				{
+					if (type instanceof TCRecordType)
+					{
+						TCRecordType rt = (TCRecordType)type;
+						TCField field = rt.findField(fexp.field.getName());
+						
+						if (field != null)
+						{
+							valid.add(rt);
+							vtype.add(field.type);
+						}
+					}
+				}
+			
+				if (!valid.isEmpty())
+				{
+					addIs(sb, fexp.object, valid.getType(location));
+					String s = oneType(true, exp, etype, vtype.getType(location));
+
+					if (s.length() > 0)
+					{
+						sb.append(" and ");
+						sb.append("(");
+						sb.append(s);
+						sb.append(")");
+					}
+					
+					return sb.toString();
+				}
+			}
+		}
+		
 
 		if (etype instanceof TCUnionType)
 		{
