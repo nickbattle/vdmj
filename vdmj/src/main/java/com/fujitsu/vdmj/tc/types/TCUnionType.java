@@ -391,15 +391,11 @@ public class TCUnionType extends TCType
     		// fields' types...
 
     		Map<String, TCTypeList> common = new HashMap<String, TCTypeList>();
-    		int recordCount = 0;
-    		boolean nonrecs = false;
 
     		for (TCType t: types)
     		{
     			if (t.isRecord(location))
     			{
-    				recordCount++;
-    				
     				for (TCField f: t.getRecord().fields)
     				{
     					TCTypeList current = common.get(f.tag);
@@ -414,15 +410,13 @@ public class TCUnionType extends TCType
     					}
     				}
     			}
-    			else
-    			{
-    				nonrecs = true;		// Union has some non-record types
-    			}
     		}
     		
     		// If all fields were present in all records, the TypeLists will be the
     		// same size. But if not, the shorter ones have to have UnknownTypes added,
     		// because some of the records do not have that field.
+    		
+    		// We no longer do this - see POFieldExpression logic.
     		
     		Map<String, TCTypeSet> typesets = new HashMap<String, TCTypeSet>();
     		
@@ -430,12 +424,12 @@ public class TCUnionType extends TCType
     		{
     			TCTypeList list = common.get(field);
     			
-    			if (list.size() != recordCount || nonrecs)
-    			{
-    				// Both unknown and undefined types do not trigger isSubType, so we use
-    				// an illegal quote type, <?>.
-    				list.add(MISSING_FIELD);
-    			}
+//    			if (list.size() != recordCount || nonrecs)
+//    			{
+//    				// Both unknown and undefined types do not trigger isSubType, so we use
+//    				// an illegal quote type, <?>.
+//    				list.add(MISSING_FIELD);
+//    			}
     			
     			TCTypeSet set = new TCTypeSet();
     			set.addAll(list);
