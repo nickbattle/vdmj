@@ -27,14 +27,11 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
-import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POFieldExpression extends POExpression
@@ -62,39 +59,31 @@ public class POFieldExpression extends POExpression
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList list = object.getProofObligations(ctxt, env);
+		ProofObligationList obligations = object.getProofObligations(ctxt, env);
 
 		// If the object base is a union of records, we create a subtype PO to say that
 		// the object is one of the records that defines this field.
 		
-		if (object.getExptype().isUnion(location))
+		TCTypeQualifier qualifier = new TCTypeQualifier()
 		{
-			TCUnionType ut = object.getExptype().getUnion();
-			TCTypeSet matches = ut.getMatches(new TCTypeQualifier()
+			@Override
+			public boolean matches(TCType member)
 			{
-				@Override
-				public boolean matches(TCType member)
+				if (member instanceof TCRecordType)
 				{
-					if (member instanceof TCRecordType)
-					{
-						TCRecordType rt = (TCRecordType)member;
-						return (rt.findField(field.getName()) != null);
-					}
-					else
-					{
-						return false;
-					}
+					TCRecordType rt = (TCRecordType)member;
+					return (rt.findField(field.getName()) != null);
 				}
-			});
-			
-			if (matches.size() < ut.types.size())
-			{
-				TCType matching = matches.getType(location);
-				list.add(new SubTypeObligation(object, matching, object.getExptype(), ctxt));
+				else
+				{
+					return false;
+				}
 			}
-		}
+		};
+		
+		obligations.addAll(checkUnionQualifiers(object, qualifier, ctxt));
 
-		return list;
+		return obligations;
 	}
 
 	@Override

@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
-import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -53,35 +52,6 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt, env);
 		obligations.addAll(getNonNilObligations(ctxt));
-
-		if (ltype.isUnion(location))
-		{
-			for (TCType type: ltype.getUnion().types)
-			{
-				if (!type.isNumeric(type.location))
-				{
-					obligations.add(
-						new SubTypeObligation(left, new TCRealType(left.location), ltype, ctxt));
-
-					break;
-				}
-			}
-		}
-
-		if (rtype.isUnion(location))
-		{
-			for (TCType type: rtype.getUnion().types)
-			{
-				if (!type.isNumeric(type.location))
-				{
-        			obligations.add(
-        				new SubTypeObligation(right, new TCRealType(right.location), rtype, ctxt));
-        			
-        			break;
-				}
-			}
-		}
-
 		return obligations;
 	}
 	

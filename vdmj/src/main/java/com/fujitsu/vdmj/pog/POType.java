@@ -47,7 +47,6 @@ public enum POType
 	MAP_SEQ_OF_COMPATIBLE("map sequence compatible"),
 	MAP_SET_OF_COMPATIBLE("map set compatible"),
 	SEQ_MODIFICATION("sequence modification"),
-	TUPLE_SELECT("tuple selection"),
 	VALUE_BINDING("value binding"),
 	SUB_TYPE("subtype"),
 	CASES_EXHAUSTIVE("cases exhaustive"),

@@ -31,7 +31,11 @@ import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 /**
@@ -132,6 +136,27 @@ public abstract class POExpression extends PONode implements Serializable
 	public TCType getExptype()
 	{
 		return exptype;
+	}
+	
+	/**
+	 * Get any obligations for unions that are qualified.
+	 */
+	public ProofObligationList checkUnionQualifiers(POExpression exp, TCTypeQualifier qualifier, POContextStack ctxt)
+	{
+		ProofObligationList obligations = new ProofObligationList();
+		
+		if (exp.getExptype().isUnion(location))
+		{
+			TCUnionType ut = exp.getExptype().getUnion();
+			TCTypeSet sets = ut.getMatches(qualifier);
+			
+			if (sets.size() < ut.types.size())
+			{
+				obligations.add(new SubTypeObligation(exp, sets.getType(location), exp.getExptype(), ctxt));
+			}
+		}
+
+		return obligations;
 	}
 
 	/**
