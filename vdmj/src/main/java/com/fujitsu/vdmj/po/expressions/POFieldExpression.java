@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.typechecker.Environment;
@@ -66,23 +67,25 @@ public class POFieldExpression extends POExpression
 		// If the object base is a union of records, we create a subtype PO to say that
 		// the object is one of the records that defines this field.
 		
-		if (object.getExptype() instanceof TCUnionType)
+		if (object.getExptype().isUnion(location))
 		{
-			TCUnionType ut = (TCUnionType)object.getExptype();
-			TCTypeSet matches = new TCTypeSet();
-			
-			for (TCType type: ut.types)
+			TCUnionType ut = object.getExptype().getUnion();
+			TCTypeSet matches = ut.getMatches(new TCTypeQualifier()
 			{
-				if (type instanceof TCRecordType)
+				@Override
+				public boolean matches(TCType member)
 				{
-					TCRecordType rt = (TCRecordType)type;
-					
-					if (rt.findField(field.getName()) != null)
+					if (member instanceof TCRecordType)
 					{
-						matches.add(rt);
+						TCRecordType rt = (TCRecordType)member;
+						return (rt.findField(field.getName()) != null);
+					}
+					else
+					{
+						return false;
 					}
 				}
-			}
+			});
 			
 			if (matches.size() < ut.types.size())
 			{

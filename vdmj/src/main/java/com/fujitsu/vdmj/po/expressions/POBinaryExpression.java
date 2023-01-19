@@ -28,7 +28,11 @@ import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 abstract public class POBinaryExpression extends POExpression
@@ -58,8 +62,34 @@ abstract public class POBinaryExpression extends POExpression
 		ProofObligationList obligations = new ProofObligationList();
 		obligations.addAll(left.getProofObligations(ctxt, env));
 		obligations.addAll(right.getProofObligations(ctxt, env));
+
+		if (left.getExptype().isUnion(location))
+		{
+			TCUnionType ut = left.getExptype().getUnion();
+			TCTypeSet sets = ut.getMatches(getLeftQualifier());
+			
+			if (sets.size() < ut.types.size())
+			{
+				obligations.add(new SubTypeObligation(left, sets.getType(location), left.getExptype(), ctxt));
+			}
+		}
+		
+		if (right.getExptype().isUnion(location))
+		{
+			TCUnionType ut = right.getExptype().getUnion();
+			TCTypeSet sets = ut.getMatches(getRightQualifier());
+			
+			if (sets.size() < ut.types.size())
+			{
+				obligations.add(new SubTypeObligation(right, sets.getType(location), right.getExptype(), ctxt));
+			}
+		}
+		
 		return obligations;
 	}
+
+	abstract protected TCTypeQualifier getLeftQualifier();
+	abstract protected TCTypeQualifier getRightQualifier();
 
 	@Override
 	public String toString()

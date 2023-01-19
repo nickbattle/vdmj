@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -50,7 +51,8 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = getNonNilObligations(ctxt);
+		ProofObligationList obligations = super.getProofObligations(ctxt, env);
+		obligations.addAll(getNonNilObligations(ctxt));
 
 		if (ltype.isUnion(location))
 		{
@@ -80,8 +82,6 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 			}
 		}
 
-		obligations.addAll(left.getProofObligations(ctxt, env));
-		obligations.addAll(right.getProofObligations(ctxt, env));
 		return obligations;
 	}
 	
@@ -183,5 +183,17 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseNumericBinaryExpression(this, arg);
+	}
+	
+	@Override
+	protected TCTypeQualifier getLeftQualifier()
+	{
+		return TCTypeQualifier.getNumericQualifier();
+	}
+	
+	@Override
+	protected TCTypeQualifier getRightQualifier()
+	{
+		return TCTypeQualifier.getNumericQualifier();
 	}
 }

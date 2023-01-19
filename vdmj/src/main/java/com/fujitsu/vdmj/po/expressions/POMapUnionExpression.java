@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.pog.MapCompatibleObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POMapUnionExpression extends POBinaryExpression
@@ -54,5 +55,17 @@ public class POMapUnionExpression extends POBinaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseMapUnionExpression(this, arg);
+	}
+
+	@Override
+	protected TCTypeQualifier getLeftQualifier()
+	{
+		return TCTypeQualifier.getMapQualifier();
+	}
+
+	@Override
+	protected TCTypeQualifier getRightQualifier()
+	{
+		return TCTypeQualifier.getMapQualifier();
 	}
 }

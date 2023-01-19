@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.po.expressions;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 
 public class POFloorExpression extends POUnaryExpression
 {
@@ -46,5 +47,11 @@ public class POFloorExpression extends POUnaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseFloorExpression(this, arg);
+	}
+
+	@Override
+	protected TCTypeQualifier getQualifier()
+	{
+		return TCTypeQualifier.getNumericQualifier();
 	}
 }

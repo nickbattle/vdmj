@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 abstract public class POBooleanBinaryExpression extends POBinaryExpression
@@ -46,7 +47,7 @@ abstract public class POBooleanBinaryExpression extends POBinaryExpression
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = new ProofObligationList();
+		ProofObligationList obligations = super.getProofObligations(ctxt, env);
 
 		if (ltype.isUnion(location))
 		{
@@ -60,8 +61,6 @@ abstract public class POBooleanBinaryExpression extends POBinaryExpression
 				new SubTypeObligation(right, new TCBooleanType(right.location), rtype, ctxt));
 		}
 
-		obligations.addAll(left.getProofObligations(ctxt, env));
-		obligations.addAll(right.getProofObligations(ctxt, env));
 		return obligations;
 	}
 
@@ -69,5 +68,17 @@ abstract public class POBooleanBinaryExpression extends POBinaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseBooleanBinaryExpression(this, arg);
+	}
+	
+	@Override
+	protected TCTypeQualifier getLeftQualifier()
+	{
+		return TCTypeQualifier.getBoolQualifier();
+	}
+	
+	@Override
+	protected TCTypeQualifier getRightQualifier()
+	{
+		return TCTypeQualifier.getBoolQualifier();
 	}
 }

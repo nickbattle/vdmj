@@ -805,6 +805,21 @@ public class TCUnionType extends TCType
 
 		return opType;
 	}
+	
+	public TCTypeSet getMatches(TCTypeQualifier qualifier)
+	{
+		TCTypeSet set = new TCTypeSet();
+		
+		for (TCType member: types)
+		{
+			if (qualifier.matches(member))
+			{
+				set.add(member);
+			}
+		}
+		
+		return set;
+	}
 
 	@Override
 	public boolean equals(Object other)
