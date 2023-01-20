@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.tc.types;
 
-import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCBUSClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCCPUClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -49,12 +48,6 @@ public class TCUnresolvedType extends TCType
 	{
 		super(typename.getLocation());
 		this.typename = typename;
-	}
-
-	@Override
-	public TCType isType(String other, LexLocation from)
-	{
-		return typename.getName().equals(other) ? this : null;
 	}
 
 	@Override

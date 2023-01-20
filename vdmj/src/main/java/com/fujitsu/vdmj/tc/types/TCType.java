@@ -146,6 +146,9 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 		return other;
 	}
 
+	/**
+	 * Check whether this type's accessSpecifier is more limited than the one given.
+	 */
 	public boolean narrowerThan(TCAccessSpecifier accessSpecifier)
 	{
 		if (definitions != null)
@@ -166,15 +169,9 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
-	 * @param typename
-	 * @param from
-	 */
-	public TCType isType(String typename, LexLocation from)
-	{
-		return (toDisplay().equals(typename)) ? this : null;
-	}
-
-	/**
+	 * Test whether this type is of the given type, accounting for optional types, named
+	 * types, bracketed types and unions.
+	 * 
 	 * @param typeclass
 	 * @param from
 	 */
@@ -199,11 +196,17 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 		return false;	// Parameter types and type check errors are unknown.
 	}
 
+	/**
+	 * Test whether a type, including ALL of a union, are TCVoidType or TCVoidReturnType.
+	 */
 	public boolean isVoid()
 	{
 		return false;	// TCVoidType and TCVoidReturnType are void.
 	}
 
+	/**
+	 * Test whether a type, including ANY of a union, are TCVoidType or TCVoidReturnType.
+	 */
 	public boolean hasVoid()
 	{
 		return false;	// TCVoidType and TCVoidReturnType are void.
@@ -234,14 +237,19 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
-	 * @param from Where the test is being made from.
+	 * Test whether the type is ultimately a record type, including union members and
+	 * searching through names types.
 	 */
-	public boolean isRecord(LexLocation from)	// ie. does it contain fields (see isTag)
+	public boolean isRecord(LexLocation from)
 	{
 		return false;
 	}
 
-	public boolean isTag()		// ie. can we call mk_T (see isRecord)
+	/**
+	 * Test whether this type can be instantiated via a mk_T(...), so stop searching at
+	 * a named type or a union.
+	 */
+	public boolean isTag()
 	{
 		return false;
 	}
@@ -289,8 +297,7 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
-	 * @param n
-	 * @param from
+	 * Test for a product of a specific cardinality.
 	 */
 	public boolean isProduct(int n, LexLocation from)
 	{

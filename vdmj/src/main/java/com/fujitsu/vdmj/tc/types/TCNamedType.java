@@ -49,13 +49,6 @@ public class TCNamedType extends TCInvariantType
 	}
 
 	@Override
-	public TCType isType(String other, LexLocation from)
-	{
-		if (opaque && !from.module.equals(location.module)) return null;
-		return type.isType(other, location);
-	}
-
-	@Override
 	public boolean isType(Class<? extends TCType> typeclass, LexLocation from)
 	{
 		if (opaque && !from.module.equals(location.module)) return false;

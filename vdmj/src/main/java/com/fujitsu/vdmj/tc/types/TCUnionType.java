@@ -102,22 +102,6 @@ public class TCUnionType extends TCType
 	}
 
 	@Override
-	public TCType isType(String typename, LexLocation from)
-	{
-		for (TCType t: types)
-		{
-			TCType rt = t.isType(typename, location);
-
-			if (rt != null)
-			{
-				return rt;
-			}
-		}
-
-		return null;
-	}
-
-	@Override
 	public boolean isType(Class<? extends TCType> typeclass, LexLocation from)
 	{
 		for (TCType t: types)
