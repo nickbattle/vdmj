@@ -10,9 +10,6 @@ PVERSION="4.5.0-P-SNAPSHOT"
 # The Maven repository directory containing VDMJ versions
 MAVENREPO=~/.m2/repository/dk/au/ece/vdmj
 
-# Location of the vdmj.properties file, if any. Override with -D.
-PROPDIR="$HOME/lib"
-
 # Details for 64-bit Java
 JAVA64="/usr/bin/java"
 VM_OPTS="-Xmx3000m -Xss1m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote"
@@ -23,6 +20,7 @@ function help()
     echo "-P use high precision VDMJ"
     echo "-A use annotation libraries and options"
     echo "Default VM options are $VM_OPTS"
+    echo "Set \$USER_ANNOTATIONS and/or \$USER_CLASSPATH for extensions" 
     exit 0
 }
 
@@ -95,7 +93,7 @@ PLUGINS_JAR=$MAVENREPO/cmd-plugins/${VERSION}/cmd-plugins-${VERSION}.jar
 check "$VDMJ_JAR"
 check "$STDLIB_JAR"
 check "$PLUGINS_JAR"
-CLASSPATH="$VDMJ_JAR:$PLUGINS_JAR:$STDLIB_JAR:$PROPDIR"
+CLASSPATH="$VDMJ_JAR:$PLUGINS_JAR:$STDLIB_JAR:$USER_CLASSPATH"
 MAIN="VDMJ"
 
 if [ $ANNOTATIONS_VERSION ]
@@ -106,7 +104,7 @@ then
     check "$ANNOTATIONS2_JAR"
     VDMJ_OPTS="$VDMJ_OPTS -annotations"
     VM_OPTS="$VM_OPTS -Dannotations.debug"
-    CLASSPATH="$CLASSPATH:$ANNOTATIONS_JAR:$ANNOTATIONS2_JAR"
+    CLASSPATH="$CLASSPATH:$ANNOTATIONS_JAR:$ANNOTATIONS2_JAR:$USER_ANNOTATIONS"
 fi
 
 
