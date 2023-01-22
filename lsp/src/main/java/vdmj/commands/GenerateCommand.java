@@ -71,7 +71,17 @@ public class GenerateCommand extends Command
 
 			Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
 			interpreter.init();
-			TCNameToken qname = Utils.stringToName(tracename);
+			TCNameToken qname = null;
+			
+			if (!tracename.contains("`"))
+			{
+				qname = Utils.stringToName(interpreter.getDefaultName() + "`" + tracename);
+			}
+			else
+			{
+				qname = Utils.stringToName(tracename);
+			}
+			
 			INNamedTraceDefinition tracedef = interpreter.findTraceDefinition(qname);
 
 			if (tracedef == null)
