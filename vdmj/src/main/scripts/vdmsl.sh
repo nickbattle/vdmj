@@ -4,8 +4,8 @@
 #####################################################################################
 
 # Change these to flip VDMJ version
-MVERSION="4.5.0-SNAPSHOT"
-PVERSION="4.5.0-P-SNAPSHOT"
+MVERSION=${VDMJ_VERSION:-4.5.0-SNAPSHOT}
+PVERSION=${VDMJ_PVERSION:-4.5.0-P-SNAPSHOT}
 
 # The Maven repository directory containing VDMJ versions
 MAVENREPO=~/.m2/repository/dk/au/ece/vdmj
@@ -14,13 +14,15 @@ MAVENREPO=~/.m2/repository/dk/au/ece/vdmj
 JAVA64="/usr/bin/java"
 VM_OPTS="-Xmx3000m -Xss1m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote"
 
+
 function help()
 {
     echo "Usage: $0 [--help|-?] [-P] [-A] <VM and VDMJ options>"
-    echo "-P use high precision VDMJ"
+    echo "-P use high precision VDMJ ($PVERSION)"
     echo "-A use annotation libraries and options"
     echo "Default VM options are $VM_OPTS"
-    echo "Set \$USER_ANNOTATIONS and/or \$USER_CLASSPATH for extensions" 
+    echo "Set \$VDMJ_VERSION and \$VDMJ_PVERSION to change versions"
+    echo "Set \$VDMJ_ANNOTATIONS and/or \$VDMJ_CLASSPATH for extensions" 
     exit 0
 }
 
@@ -69,7 +71,7 @@ do
 	    help
 	    ;;
 	-A)
-	    ANNOTATIONS_VERSION=$VERSION
+	    USE_ANNOTATIONS=1
 	    ;;
 	-P)
 	    VERSION=$PVERSION
@@ -93,10 +95,10 @@ PLUGINS_JAR=$MAVENREPO/cmd-plugins/${VERSION}/cmd-plugins-${VERSION}.jar
 check "$VDMJ_JAR"
 check "$STDLIB_JAR"
 check "$PLUGINS_JAR"
-CLASSPATH="$VDMJ_JAR:$PLUGINS_JAR:$STDLIB_JAR:$USER_CLASSPATH"
+CLASSPATH="$VDMJ_JAR:$PLUGINS_JAR:$STDLIB_JAR:$VDMJ_CLASSPATH"
 MAIN="VDMJ"
 
-if [ $ANNOTATIONS_VERSION ]
+if [ $USE_ANNOTATIONS ]
 then
     ANNOTATIONS_JAR=$MAVENREPO/annotations/${VERSION}/annotations-${VERSION}.jar
     check "$ANNOTATIONS_JAR"
@@ -104,7 +106,7 @@ then
     check "$ANNOTATIONS2_JAR"
     VDMJ_OPTS="$VDMJ_OPTS -annotations"
     VM_OPTS="$VM_OPTS -Dannotations.debug"
-    CLASSPATH="$CLASSPATH:$ANNOTATIONS_JAR:$ANNOTATIONS2_JAR:$USER_ANNOTATIONS"
+    CLASSPATH="$CLASSPATH:$ANNOTATIONS_JAR:$ANNOTATIONS2_JAR:$VDMJ_ANNOTATIONS"
 fi
 
 
