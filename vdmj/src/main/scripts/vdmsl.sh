@@ -12,15 +12,15 @@ MAVENREPO=~/.m2/repository/dk/au/ece/vdmj
 
 # Details for 64-bit Java
 JAVA64="/usr/bin/java"
-VM_OPTS="-Xmx3000m -Xss1m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote"
-
+VMOPTS=${VDMJ_VMOPTS:--Xmx3000m -Xss1m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote}
+VDMJOPTS=${VDMJ_OPTS:--strict}
 
 function help()
 {
     echo "Usage: $0 [--help|-?] [-P] [-A] <VM and VDMJ options>"
     echo "-P use high precision VDMJ ($PVERSION)"
-    echo "-A use annotation libraries and options"
-    echo "Default VM options are $VM_OPTS"
+    echo "-A use annotation libraries"
+    echo "Set \$VDMJ_VMOPTS and/or \$VDMJ_OPTS to set Java/tool options"
     echo "Set \$VDMJ_VERSION and \$VDMJ_PVERSION to change versions"
     echo "Set \$VDMJ_ANNOTATIONS and/or \$VDMJ_CLASSPATH for extensions" 
     exit 0
@@ -77,10 +77,10 @@ do
 	    VERSION=$PVERSION
 	    ;;
 	-D*|-X*)
-	    VM_OPTS="$VM_OPTS $1"
+	    VMOPTS="$VMOPTS $1"
 	    ;;
 	*)
-	    VDMJ_OPTS="$VDMJ_OPTS $1"
+	    VDMJOPTS="$VDMJOPTS $1"
     esac
     shift
 done
@@ -104,8 +104,8 @@ then
     check "$ANNOTATIONS_JAR"
     ANNOTATIONS2_JAR=$MAVENREPO/annotations2/${VERSION}/annotations2-${VERSION}.jar
     check "$ANNOTATIONS2_JAR"
-    VDMJ_OPTS="$VDMJ_OPTS -annotations"
-    VM_OPTS="$VM_OPTS -Dannotations.debug"
+    VDMJOPTS="$VDMJOPTS -annotations"
+    VMOPTS="$VMOPTS -Dannotations.debug"
     CLASSPATH="$CLASSPATH:$ANNOTATIONS_JAR:$ANNOTATIONS2_JAR:$VDMJ_ANNOTATIONS"
 fi
 
@@ -117,8 +117,8 @@ if which rlwrap >/dev/null 2>&1
 then
 	# Keep rlwrap output in a separate folder
 	export RLWRAP_HOME=~/.vdmj
-	exec rlwrap "$JAVA64" $VM_OPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJ_OPTS "$@"
+	exec rlwrap "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS "$@"
 else
-	exec "$JAVA64" $VM_OPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJ_OPTS "$@"
+	exec "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS "$@"
 fi
 
