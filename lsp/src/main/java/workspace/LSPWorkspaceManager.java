@@ -851,26 +851,38 @@ public class LSPWorkspaceManager
 			}
 			
 			StringBuilder buffer = projectFiles.get(file);
-			int start = Utils.findPosition(buffer, range.get("start"));
-			int end   = Utils.findPosition(buffer, range.get("end"));
 			
-			if (start >= 0 && end >= 0)
+			if (range != null)
 			{
-				buffer.replace(start, end, text);
+				int start = Utils.findPosition(buffer, range.get("start"));
+				int end   = Utils.findPosition(buffer, range.get("end"));
+				
+				if (start >= 0 && end >= 0)
+				{
+					buffer.replace(start, end, text);
+				}
+				
+				DiagUtils.dumpEdit(range, buffer);
 			}
-			
-			DiagUtils.dumpEdit(range, buffer);
+			else
+			{
+				Diag.fine("Replacing entire content of %s", file);
+				buffer.setLength(0);
+				buffer.append(text);
+			}
 			
 			return eventhub.publish(new ChangeFileEvent(request, file));
 		}
 	}
 
 	/**
-	 * This is currently done via watched file events above. Note that this method
-	 * is a notification, so cannot return errors.
+	 * This is currently done via watched file events above in VSCode. Note that this method
+	 * is a notification, but we do return error notifications.
 	 */
-	public void lspDidSave(RPCRequest request, File file, String text) throws Exception
+	public RPCMessageList lspDidSave(RPCRequest request, File file, String text) throws Exception
 	{
+		RPCMessageList messages = null;
+		
 		if (onDotPath(file))
 		{
 			Diag.info("Ignoring %s dot path file", file);
@@ -900,8 +912,10 @@ public class LSPWorkspaceManager
 			}
 			
 			eventhub.publish(new SaveFileEvent(request, file));
-			checkLoadedFiles("saved");
+			messages = checkLoadedFiles("saved");
 		}
+		
+		return messages;
 	}
 
 	/**
