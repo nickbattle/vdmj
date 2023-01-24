@@ -113,6 +113,11 @@ fi
 # The dialect is based on $0, so hard-link this file as vdmsl, vdmpp and vdmrt.
 DIALECT=$(basename $0)
 
+if [ "$VDMJ_DEBUG" ]
+then
+	echo "$JAVA64 $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS $@"
+fi
+
 if which rlwrap >/dev/null 2>&1
 then
 	# Keep rlwrap output in a separate folder
