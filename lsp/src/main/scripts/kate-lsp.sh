@@ -55,9 +55,7 @@ ANNOTATIONS_JAR=$MAVENREPO/annotations/${VERSION}/annotations-${VERSION}.jar
 LSP_JAR=$MAVENREPO/lsp/${VERSION}/lsp-${VERSION}.jar
 STDLIB_JAR=$MAVENREPO/stdlib/${VERSION}/stdlib-${VERSION}.jar
 
-java ${JAVA64_VMOPTS} \
+exec java ${JAVA64_VMOPTS} \
     -cp $VDMJ_JAR:$ANNOTATIONS_JAR:$LSP_JAR:$STDLIB_JAR \
     lsp.LSPServerStdio $DIALECT
-
-exit 0
 
