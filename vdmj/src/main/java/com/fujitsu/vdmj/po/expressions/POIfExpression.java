@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.PONotImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POIfExpression extends POExpression
@@ -81,6 +82,7 @@ public class POIfExpression extends POExpression
 
 		ctxt.push(new POImpliesContext(ifExp));
 		obligations.addAll(thenExp.getProofObligations(ctxt, env));
+		obligations.addAll(checkUnionQualifiers(thenExp, TCTypeQualifier.getBoolQualifier(), ctxt));
 		ctxt.pop();
 
 		ctxt.push(new PONotImpliesContext(ifExp));	// not (ifExp) =>

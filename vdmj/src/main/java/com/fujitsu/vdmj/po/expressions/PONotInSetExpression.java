@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 
 public class PONotInSetExpression extends POBinaryExpression
 {
@@ -42,5 +43,17 @@ public class PONotInSetExpression extends POBinaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseNotInSetExpression(this, arg);
+	}
+
+	@Override
+	protected TCTypeQualifier getLeftQualifier()
+	{
+		return TCTypeQualifier.getAnyQualifier();
+	}
+
+	@Override
+	protected TCTypeQualifier getRightQualifier()
+	{
+		return TCTypeQualifier.getSetQualifier();
 	}
 }

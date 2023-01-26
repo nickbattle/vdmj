@@ -70,22 +70,6 @@ public class TCRecordType extends TCInvariantType
 	}
 
 	@Override
-	public TCType isType(String typename, LexLocation from)
-	{
-		if (opaque && !from.module.equals(location.module)) return null;
-
-		if (typename.indexOf('`') > 0)
-		{
-			return (name.getName().equals(typename)) ? this : null;
-		}
-		else
-		{
-			// Local typenames aren't qualified with the local module name
-			return (name.getName().equals(typename)) ? this : null;
-		}
-	}
-
-	@Override
 	public boolean isRecord(LexLocation from)
 	{
 		if (opaque && !from.module.equals(location.module)) return false;

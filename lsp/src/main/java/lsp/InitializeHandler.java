@@ -66,6 +66,12 @@ public class InitializeHandler extends LSPHandler
 			JSONObject clientInfo = params.get("clientInfo");
 			File rootUri = Utils.uriToFile(params.get("rootUri"));
 			JSONObject clientCapabilities = params.get("capabilities");
+			
+			if (rootUri == null)
+			{
+				rootUri = new File(".").getCanonicalFile();	// Some editors don't set the root?
+				Diag.config("Assuming rootUri = %s", rootUri);
+			}
 	
 			return LSPWorkspaceManager.getInstance().lspInitialize(request, clientInfo, rootUri, clientCapabilities);
 		}

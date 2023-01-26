@@ -74,6 +74,7 @@ public class PogTest extends TestCase
 		"(forall mk_(i, j):(int * int) &\n  i in set dom m)\n",
 		"(let x:nat1 = 123 in\n  -1 in set dom m)\n",
 		"(let x:nat1 = 123 in\n  ((m(-1) > 0) =>\n    1 in set dom m))\n",
+		"(let x:nat1 = 123 in\n  (not (m(-1) > 0) =>\n    -2 in set dom m))\n",
 		"(let x:nat1 = 123 in\n  (not (m(-1) > 0) =>\n    ((m(-2) > 0) =>\n      2 in set dom m)))\n",
 		"(let x:nat1 = 123 in\n  (not (m(-1) > 0) =>\n    (not (m(-2) > 0) =>\n      (((x < 0) or ((x > 10) or (x = 100))) =>\n        3 in set dom m))))\n",
 		"(let x:nat1 = 123 in\n  (not (m(-1) > 0) =>\n    (not (m(-2) > 0) =>\n      (not ((x < 0) or ((x > 10) or (x = 100))) =>\n        999 in set dom m))))\n",
@@ -128,7 +129,7 @@ public class PogTest extends TestCase
 		"(forall n:nat &\n  (not (n = 1) =>\n    measure_recursive(n) > measure_recursive((n - 1))))\n",
 		"dom {1 |-> false} subset inds [2, true, 7.8]\n",
 		"is_(([2, true, 7.8] ++ {1 |-> false}), seq of ((bool | nat)))\n",
-		"(forall t:((nat * nat * nat) | (nat * nat)) &\n  not is_(t, (nat * nat)))\n",
+		"(forall t:((nat * nat * nat) | (nat * nat)) &\n  is_(t, (nat * nat * nat)))\n",
 		"(forall u:U &\n  exists mk_(a, b):U & mk_(a, b) = u)\n",
 		"(forall u:U &\n  is_(u, (nat * nat)))\n",
 		"(is_([1, 2, true], T1) and ((is_(1, bool)) and (is_(2, bool)))) or (is_([1, 2, true], T2) and inv_T2([1, 2, true]) and ((is_nat1(true))))\n",
@@ -180,7 +181,6 @@ public class PogTest extends TestCase
 			assertTrue("PO type checked failed", !po.isCheckable || po.getCheckedExpression() != null);
 		}
 
-		assertEquals("POs generated", expected.length, polist.size());
 		i = 0;
 
 		for (ProofObligation po: polist)
@@ -195,5 +195,7 @@ public class PogTest extends TestCase
 			assertEquals("PO #" + (i+1), expected[i], po.value);
 			i++;
 		}
+
+		assertEquals("POs generated", expected.length, polist.size());
 	}
 }

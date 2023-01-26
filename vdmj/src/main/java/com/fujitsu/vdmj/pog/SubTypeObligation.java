@@ -217,9 +217,8 @@ public class SubTypeObligation extends ProofObligation
 
 		StringBuilder sb = new StringBuilder();
 		String prefix = "";
-
 		etype = etype.deBracket();
-
+		
 		if (etype instanceof TCUnionType)
 		{
 			TCUnionType ut = (TCUnionType)etype;

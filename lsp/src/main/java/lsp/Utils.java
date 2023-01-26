@@ -167,6 +167,9 @@ public class Utils
 		}
 		else
 		{
+			// Some URIs have illegal spaces - like the Kate editor - so fix here
+			s = s.replaceAll(" ", "%20");
+			
 			URI uri = new URI(s);
 			return new File(uri).getAbsoluteFile();
 		}

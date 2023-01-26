@@ -1,10 +1,10 @@
 #
-# Start an LSP server
+# Start an LSP server for the Kate editor
 #
 
 function usage()
 {
-    echo "Usage: lsp.sh [-P] [-X<arg>] [-D<name>=<value>] <-vdmsl | -vdmpp | -vdmrt>"
+    echo "Usage: kate-lsp.sh [-P] [-X<arg>] [-D<name>=<value>] <-vdmsl | -vdmpp | -vdmrt>"
     echo "-P = high precision build"
     echo "-X = set JVM -X options"
     echo "-D = set Java properties"
@@ -57,5 +57,5 @@ STDLIB_JAR=$MAVENREPO/stdlib/${VERSION}/stdlib-${VERSION}.jar
 
 exec java ${JAVA64_VMOPTS} \
     -cp $VDMJ_JAR:$ANNOTATIONS_JAR:$LSP_JAR:$STDLIB_JAR \
-    lsp.LSPServerDebug $DIALECT -lsp 8000 -dap 8001
+    lsp.LSPServerStdio $DIALECT
 

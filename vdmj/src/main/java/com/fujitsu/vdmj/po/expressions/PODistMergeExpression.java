@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.MapSetOfCompatibleObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class PODistMergeExpression extends POUnaryExpression
@@ -58,5 +59,11 @@ public class PODistMergeExpression extends POUnaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseDistMergeExpression(this, arg);
+	}
+
+	@Override
+	protected TCTypeQualifier getQualifier()
+	{
+		return TCTypeQualifier.getSetQualifier();
 	}
 }

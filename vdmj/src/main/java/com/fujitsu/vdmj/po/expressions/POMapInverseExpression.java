@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.pog.InvariantObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCMapType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POMapInverseExpression extends POUnaryExpression
@@ -66,5 +67,11 @@ public class POMapInverseExpression extends POUnaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseMapInverseExpression(this, arg);
+	}
+
+	@Override
+	protected TCTypeQualifier getQualifier()
+	{
+		return TCTypeQualifier.getMapQualifier();
 	}
 }

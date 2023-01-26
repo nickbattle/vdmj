@@ -52,7 +52,9 @@ public class CompletionHandler extends LSPHandler
 			JSONObject text = params.get("textDocument");
 			JSONObject position = params.get("position");
 			JSONObject context = params.get("context");
-			CompletionTriggerKind triggerKind = CompletionTriggerKind.kindOf(context.get("triggerKind"));
+			CompletionTriggerKind triggerKind =
+					context == null ? CompletionTriggerKind.INVOKED :
+					CompletionTriggerKind.kindOf(context.get("triggerKind"));
 			
 			File file = Utils.uriToFile(text.get("uri"));
 			Long line = position.get("line");
