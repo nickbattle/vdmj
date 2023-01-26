@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqModificationObligation;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POPlusPlusExpression extends POBinaryExpression
@@ -59,5 +60,24 @@ public class POPlusPlusExpression extends POBinaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.casePlusPlusExpression(this, arg);
+	}
+
+	@Override
+	protected TCTypeQualifier getLeftQualifier()
+	{
+		return new TCTypeQualifier()
+		{
+			@Override
+			public boolean matches(TCType member)
+			{
+				return member.isSeq(location) || member.isMap(location);
+			}
+		};
+	}
+
+	@Override
+	protected TCTypeQualifier getRightQualifier()
+	{
+		return TCTypeQualifier.getAnyQualifier();
 	}
 }

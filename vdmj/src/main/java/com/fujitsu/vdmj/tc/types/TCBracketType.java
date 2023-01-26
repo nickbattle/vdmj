@@ -43,12 +43,6 @@ public class TCBracketType extends TCType
 	}
 
 	@Override
-	public TCType isType(String typename, LexLocation from)
-	{
-		return type.isType(typename, location);
-	}
-
-	@Override
 	public boolean isType(Class<? extends TCType> typeclass, LexLocation from)
 	{
 		return type.isType(typeclass, location);

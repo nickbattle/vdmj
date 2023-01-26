@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.pog.MapComposeObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
 public class POCompExpression extends POBinaryExpression
@@ -71,5 +72,24 @@ public class POCompExpression extends POBinaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseCompExpression(this, arg);
+	}
+
+	@Override
+	protected TCTypeQualifier getLeftQualifier()
+	{
+		return new TCTypeQualifier()
+		{
+			@Override
+			public boolean matches(TCType member)
+			{
+				return member.isFunction(location) || member.isMap(location);
+			}
+		};
+	}
+
+	@Override
+	protected TCTypeQualifier getRightQualifier()
+	{
+		return TCTypeQualifier.getAnyQualifier();
 	}
 }

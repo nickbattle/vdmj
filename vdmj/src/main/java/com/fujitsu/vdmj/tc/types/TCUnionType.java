@@ -68,6 +68,8 @@ public class TCUnionType extends TCType
 
 	private int prodCard = -1;
 	private boolean expanded = false;
+	
+	public static TCType MISSING_FIELD = new TCQuoteType(LexLocation.ANY, "?");
 
 	public TCUnionType(LexLocation location, TCType a, TCType b)
 	{
@@ -97,22 +99,6 @@ public class TCUnionType extends TCType
 		}
 
 		return false;
-	}
-
-	@Override
-	public TCType isType(String typename, LexLocation from)
-	{
-		for (TCType t: types)
-		{
-			TCType rt = t.isType(typename, location);
-
-			if (rt != null)
-			{
-				return rt;
-			}
-		}
-
-		return null;
 	}
 
 	@Override
@@ -389,14 +375,11 @@ public class TCUnionType extends TCType
     		// fields' types...
 
     		Map<String, TCTypeList> common = new HashMap<String, TCTypeList>();
-    		int recordCount = 0;
 
     		for (TCType t: types)
     		{
     			if (t.isRecord(location))
     			{
-    				recordCount++;
-    				
     				for (TCField f: t.getRecord().fields)
     				{
     					TCTypeList current = common.get(f.tag);
@@ -417,18 +400,20 @@ public class TCUnionType extends TCType
     		// same size. But if not, the shorter ones have to have UnknownTypes added,
     		// because some of the records do not have that field.
     		
+    		// We no longer do this - see POFieldExpression logic.
+    		
     		Map<String, TCTypeSet> typesets = new HashMap<String, TCTypeSet>();
     		
     		for (String field: common.keySet())
     		{
     			TCTypeList list = common.get(field);
     			
-    			if (list.size() != recordCount)
-    			{
-    				// Both unknown and undefined types do not trigger isSubType, so we use
-    				// an illegal quote type, <?>.
-    				list.add(new TCQuoteType(location, "?"));
-    			}
+//    			if (list.size() != recordCount || nonrecs)
+//    			{
+//    				// Both unknown and undefined types do not trigger isSubType, so we use
+//    				// an illegal quote type, <?>.
+//    				list.add(MISSING_FIELD);
+//    			}
     			
     			TCTypeSet set = new TCTypeSet();
     			set.addAll(list);
@@ -803,6 +788,21 @@ public class TCUnionType extends TCType
     	}
 
 		return opType;
+	}
+	
+	public TCTypeSet getMatches(TCTypeQualifier qualifier)
+	{
+		TCTypeSet set = new TCTypeSet();
+		
+		for (TCType member: types)
+		{
+			if (qualifier.matches(member))
+			{
+				set.add(member);
+			}
+		}
+		
+		return set;
 	}
 
 	@Override

@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.pog.POForAllContext;
 import com.fujitsu.vdmj.pog.POForAllPredicateContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCSetType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -93,6 +94,7 @@ public class POSetCompExpression extends POSetExpression
 		{
     		ctxt.push(new POForAllContext(this));
     		obligations.addAll(predicate.getProofObligations(ctxt, env));
+    		obligations.addAll(checkUnionQualifiers(predicate, TCTypeQualifier.getBoolQualifier(), ctxt));
     		ctxt.pop();
 		}
 

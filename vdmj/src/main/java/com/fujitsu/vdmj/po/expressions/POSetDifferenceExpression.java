@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 
 public class POSetDifferenceExpression extends POBinaryExpression
 {
@@ -42,5 +43,17 @@ public class POSetDifferenceExpression extends POBinaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseSetDifferenceExpression(this, arg);
+	}
+
+	@Override
+	protected TCTypeQualifier getLeftQualifier()
+	{
+		return TCTypeQualifier.getSetQualifier();
+	}
+
+	@Override
+	protected TCTypeQualifier getRightQualifier()
+	{
+		return TCTypeQualifier.getSetQualifier();
 	}
 }

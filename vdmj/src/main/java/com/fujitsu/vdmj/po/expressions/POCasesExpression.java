@@ -63,7 +63,7 @@ public class POCasesExpression extends POExpression
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = new ProofObligationList();
+		ProofObligationList obligations = exp.getProofObligations(ctxt, env);
 
 		int count = 0;
 		boolean hasIgnore = false;

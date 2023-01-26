@@ -139,7 +139,7 @@ public class TCOnFailAnnotation extends TCAnnotation
 	@Override
 	public void tcAfter(TCExpression exp, TCType type, Environment env, NameScope scope)
 	{
-		if (!(type instanceof TCBooleanType))
+		if (!type.isType(TCBooleanType.class, exp.location))
 		{
 			name.report(3361, "@OnFail not applied to boolean expression");
 		}

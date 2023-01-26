@@ -31,8 +31,8 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
-import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
@@ -50,38 +50,8 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ProofObligationList obligations = getNonNilObligations(ctxt);
-
-		if (ltype.isUnion(location))
-		{
-			for (TCType type: ltype.getUnion().types)
-			{
-				if (!type.isNumeric(type.location))
-				{
-					obligations.add(
-						new SubTypeObligation(left, new TCRealType(left.location), ltype, ctxt));
-
-					break;
-				}
-			}
-		}
-
-		if (rtype.isUnion(location))
-		{
-			for (TCType type: rtype.getUnion().types)
-			{
-				if (!type.isNumeric(type.location))
-				{
-        			obligations.add(
-        				new SubTypeObligation(right, new TCRealType(right.location), rtype, ctxt));
-        			
-        			break;
-				}
-			}
-		}
-
-		obligations.addAll(left.getProofObligations(ctxt, env));
-		obligations.addAll(right.getProofObligations(ctxt, env));
+		ProofObligationList obligations = super.getProofObligations(ctxt, env);
+		obligations.addAll(getNonNilObligations(ctxt));
 		return obligations;
 	}
 	
@@ -183,5 +153,17 @@ abstract public class PONumericBinaryExpression extends POBinaryExpression
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseNumericBinaryExpression(this, arg);
+	}
+	
+	@Override
+	protected TCTypeQualifier getLeftQualifier()
+	{
+		return TCTypeQualifier.getNumericQualifier();
+	}
+	
+	@Override
+	protected TCTypeQualifier getRightQualifier()
+	{
+		return TCTypeQualifier.getNumericQualifier();
 	}
 }
