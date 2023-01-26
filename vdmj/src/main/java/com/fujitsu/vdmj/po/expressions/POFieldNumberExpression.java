@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.po.expressions;
 
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
@@ -67,7 +69,7 @@ public class POFieldNumberExpression extends POExpression
 				if (member.isProduct(location))
 				{
 					TCProductType pt = member.getProduct();
-					return (pt.types.size() >= field.value);
+					return (field.value.compareTo(BigInteger.valueOf(pt.types.size())) <= 0);
 				}
 				else
 				{
