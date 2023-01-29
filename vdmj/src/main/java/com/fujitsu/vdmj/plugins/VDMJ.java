@@ -24,9 +24,9 @@
 
 package com.fujitsu.vdmj.plugins;
 
-import static com.fujitsu.vdmj.plugins.AnalysisPlugin.fail;
-import static com.fujitsu.vdmj.plugins.AnalysisPlugin.println;
-import static com.fujitsu.vdmj.plugins.AnalysisPlugin.verbose;
+import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,10 +53,13 @@ import com.fujitsu.vdmj.util.GetResource;
  */
 public class VDMJ
 {
+	private static List<String> argv = null;
+	private static List<File> paths = null;
+
 	public static void main(String[] args)
 	{
-		List<String> argv = new Vector<String>();
-		argv.addAll(Arrays.asList(args));
+		argv = new Vector<String>(Arrays.asList(args));
+		paths = new Vector<File>();
 
 		if (argv.contains("-vdmsl"))
 		{
@@ -95,23 +98,27 @@ public class VDMJ
 		
 		verbose("Dialect set to " + Settings.dialect);
 		
-		List<File> paths = new Vector<File>();
-		
-		processArgs(argv, paths);
-		loadPlugins(argv);
-		findFiles(argv, paths);
+		processArgs();
+		loadPlugins();
+		findFiles();
 		checkFiles();
 	}
 	
-	private static void processArgs(List<String> args, List<File> paths)
+	private static void processArgs()
 	{
-		if (args.contains("-verbose"))
+		if (argv.contains("-verbose"))
 		{
 			Settings.verbose = true;
-			args.remove("-verbose");
+			argv.remove("-verbose");
 		}
 		
-		Iterator<String> iter = args.iterator();
+		if (argv.contains("-q"))
+		{
+			PluginConsole.quiet = true;
+			argv.remove("-q");
+		}
+		
+		Iterator<String> iter = argv.iterator();
 		
 		while (iter.hasNext())
 		{
@@ -130,7 +137,7 @@ public class VDMJ
 		}
 	}
 	
-	private static void loadPlugins(List<String> argv)
+	private static void loadPlugins()
 	{
 		try
 		{
@@ -147,11 +154,11 @@ public class VDMJ
 		}
 	}
 	
-	private static void findFiles(List<String> args, List<File> paths)
+	private static void findFiles()
 	{
 		List<File> filenames = new Vector<File>();
 		
-		for (String arg: args)
+		for (String arg: argv)
 		{
 			File file = new File(arg);
 	
@@ -214,7 +221,7 @@ public class VDMJ
 		
 		if (filenames.isEmpty())
 		{
-			fail("You have no specified any source files");
+			fail("You have not specified any source files");
 		}
 		else
 		{
@@ -228,52 +235,52 @@ public class VDMJ
 		try
 		{
 			EventHub eventhub = EventHub.getInstance();
-			Event event = new CheckPrepareEvent();
-			Vector<VDMError> results = new Vector<VDMError>();
+			List<VDMError> errList = new Vector<VDMError>();
 			
-			results.addAll(eventhub.publish(event));
+			Event event = new CheckPrepareEvent();
+			errList = eventhub.publish(event);
 
-			if (results.isEmpty())
+			if (errList.isEmpty())
 			{
 				event = new CheckSyntaxEvent();
-				results.addAll(eventhub.publish(event));
+				errList.addAll(eventhub.publish(event));
 				
-				if (results.isEmpty())
+				if (errList.isEmpty())
 				{
 					event = new CheckTypeEvent();
-					results.addAll(eventhub.publish(event));
+					errList.addAll(eventhub.publish(event));
 
-					if (results.isEmpty())
+					if (errList.isEmpty())
 					{
 						event = new CheckCompleteEvent();
-						results.addAll(eventhub.publish(event));
+						errList.addAll(eventhub.publish(event));
 
-						if (results.isEmpty())
+						if (errList.isEmpty())
 						{
 							verbose("Loaded files checked successfully");
 						}
 						else
 						{
 							verbose("Failed to initialize interpreter");
-							results.addAll(eventhub.publish(new CheckFailedEvent(event)));
+							errList.addAll(eventhub.publish(new CheckFailedEvent(event)));
 						}
 					}
 					else
 					{
 						verbose("Type checking errors found");
-						results.addAll(eventhub.publish(new CheckFailedEvent(event)));
+						errList.addAll(eventhub.publish(new CheckFailedEvent(event)));
 					}
 				}
 				else
 				{
 					verbose("Syntax errors found");
-					results.addAll(eventhub.publish(new CheckFailedEvent(event)));
+					errList.addAll(eventhub.publish(new CheckFailedEvent(event)));
 				}
 			}
 			else
 			{
 				verbose("Preparation errors found");
-				results.addAll(eventhub.publish(new CheckFailedEvent(event)));
+				errList.addAll(eventhub.publish(new CheckFailedEvent(event)));
 			}
 		}
 		catch (Exception e)

@@ -93,11 +93,11 @@ public class EventHub
 		{
 			for (EventListener listener: list)
 			{
-				T response = listener.handleEvent(event);
+				List<T> response = listener.handleEvent(event);
 				
 				if (response != null)
 				{
-					responses.add(response);
+					responses.addAll(response);
 				}
 			}
 		}

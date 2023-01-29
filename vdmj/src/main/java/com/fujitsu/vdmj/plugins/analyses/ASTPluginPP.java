@@ -24,13 +24,16 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.info;
+import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
+
 import java.io.File;
 
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.syntax.ClassReader;
 
 /**
@@ -49,26 +52,44 @@ public class ASTPluginPP extends ASTPlugin
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	protected <T> T syntaxCheck(CheckSyntaxEvent event)
+	protected <T> T syntaxCheck()
 	{
+		int errs = 0;
+		int warns = 0;
+		double duration = 0;
+		
 		for (File file: files)
 		{
 			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_PP);
+	   		long before = System.currentTimeMillis();
 			ClassReader mr = new ClassReader(ltr);
 			astClassList.addAll(mr.readClasses());
-			
+	   		long after = System.currentTimeMillis();
+	   		duration += (after - before);
+
 			if (mr.getErrorCount() > 0)
 			{
 				errors.addAll(mr.getErrors());
+				errs += mr.getErrorCount();
 			}
 			
 			if (mr.getWarningCount() > 0)
 			{
 				warnings.addAll(mr.getWarnings());
+				warns += mr.getWarningCount();
 			}
 		}
-	
-		return (T) Boolean.valueOf(!errors.isEmpty());
+
+   		int count = astClassList.size();
+
+   		info("Parsed " + plural(count, "class", "s") + " in " +
+   			(double)(duration)/1000 + " secs. ");
+   		info(errs == 0 ? "No syntax errors" :
+   			"Found " + plural(errs, "syntax error", "s"));
+  		infoln(warns == 0 ? "" : " and " +
+  			(nowarn ? "suppressed " : "") + plural(warns, "warning", "s"));
+
+		return (T) errors;
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -24,6 +24,10 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
+import static com.fujitsu.vdmj.plugins.PluginConsole.info;
+import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
+
 import java.io.File;
 
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
@@ -31,7 +35,6 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.Console;
-import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 
 /**
@@ -50,7 +53,7 @@ public class ASTPluginSL extends ASTPlugin
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected <T> T syntaxCheck(CheckSyntaxEvent event)
+	protected <T> T syntaxCheck()
 	{
 		int errs = 0;
 		int warns = 0;
@@ -80,14 +83,14 @@ public class ASTPluginSL extends ASTPlugin
 	
    		int count = astModuleList.getModuleNames().size();
 
-   		println("Parsed " + plural(count, "module", "s") + " in " +
+   		info("Parsed " + plural(count, "module", "s") + " in " +
    			(double)(duration)/1000 + " secs. ");
-   		println(errs == 0 ? "No syntax errors" :
+   		info(errs == 0 ? "No syntax errors" :
    			"Found " + plural(errs, "syntax error", "s"));
-  		println(warns == 0 ? "" : " and " +
+  		infoln(warns == 0 ? "" : " and " +
   			(nowarn ? "suppressed " : "") + plural(warns, "warning", "s"));
 
-		return (T) Boolean.valueOf(!errors.isEmpty());
+		return (T) errors;
 	}
 	
 	@SuppressWarnings("unchecked")

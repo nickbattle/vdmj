@@ -96,15 +96,9 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		{
 			String arg = iter.next();
 			
-			if (arg.equals("-q"))
+			if (arg.equals("-w"))
 			{
-				quiet = true;
-				iter.remove();
-			}
-			else if (arg.equals("-w"))
-			{
-				nowarn = true;
-				iter.remove();
+				nowarn = true;	// Removed in TC
 			}
 		}
 	}
@@ -125,7 +119,7 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		}
 		else if (event instanceof CheckSyntaxEvent)
 		{
-			return syntaxCheck((CheckSyntaxEvent)event);
+			return syntaxCheck();
 		}
 		else
 		{
@@ -135,7 +129,7 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 
 	abstract protected <T> T syntaxPrepare();
 
-	abstract protected <T> T syntaxCheck(CheckSyntaxEvent event);
+	abstract protected <T> T syntaxCheck();
 
 	abstract public <T extends Mappable> T getAST();
 }
