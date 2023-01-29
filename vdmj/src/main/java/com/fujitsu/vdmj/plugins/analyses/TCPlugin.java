@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -40,11 +39,10 @@ import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
 
 /**
- * AST analysis plugin
+ * TC analysis plugin
  */
-abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
+abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 {
-	protected List<File> files;
 	protected List<VDMError> errors;
 	protected List<VDMWarning> warnings;
 	protected boolean nowarn;
@@ -52,13 +50,12 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public String getName()
 	{
-		return "AST";
+		return "TC";
 	}
 
 	@Override
 	public void init()
 	{
-		files = new Vector<File>();
 		errors = new Vector<VDMError>();
 		warnings = new Vector<VDMWarning>();
 		nowarn = false;
@@ -67,18 +64,18 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		eventhub.register(CheckSyntaxEvent.class, this);
 	}
 
-	public static ASTPlugin factory(Dialect dialect) throws Exception
+	public static TCPlugin factory(Dialect dialect) throws Exception
 	{
 		switch (dialect)
 		{
 			case VDM_SL:
-				return new ASTPluginSL();
+				return new TCPluginSL();
 				
 			case VDM_PP:
-				return new ASTPluginPP();
+				return new TCPluginPP();
 				
 			case VDM_RT:
-				return new ASTPluginRT();
+				return new TCPluginRT();
 				
 			default:
 				throw new Exception("Unknown dialect: " + dialect);
@@ -96,14 +93,10 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 			
 			if (arg.equals("-w"))
 			{
-				nowarn = true;	// Removed in TC
+				nowarn = true;
+				iter.remove();
 			}
 		}
-	}
-	
-	public void setFiles(List<File> files)
-	{
-		this.files = files;
 	}
 
 	@Override
@@ -113,11 +106,11 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		{
 			errors.clear();
 			warnings.clear();
-			return syntaxPrepare();
+			return typeCheckPrepare();
 		}
 		else if (event instanceof CheckSyntaxEvent)
 		{
-			return syntaxCheck();
+			return typeCheck();
 		}
 		else
 		{
@@ -125,9 +118,9 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
-	abstract protected <T> T syntaxPrepare();
+	abstract protected <T> T typeCheckPrepare();
 
-	abstract protected <T> T syntaxCheck();
+	abstract protected <T> T typeCheck();
 
-	abstract public <T extends Mappable> T getAST();
+	abstract public <T extends Mappable> T getTC();
 }

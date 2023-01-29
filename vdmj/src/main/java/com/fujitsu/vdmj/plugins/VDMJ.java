@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
+import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckFailedEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
@@ -106,18 +107,6 @@ public class VDMJ
 	
 	private static void processArgs()
 	{
-		if (argv.contains("-verbose"))
-		{
-			Settings.verbose = true;
-			argv.remove("-verbose");
-		}
-		
-		if (argv.contains("-q"))
-		{
-			PluginConsole.quiet = true;
-			argv.remove("-q");
-		}
-		
 		Iterator<String> iter = argv.iterator();
 		
 		while (iter.hasNext())
@@ -134,6 +123,16 @@ public class VDMJ
 					iter.remove();
 				}
 			}
+			else if (arg.equals("-verbose"))
+			{
+				Settings.verbose = true;
+				iter.remove();
+			}
+			else if (arg.equals("-q"))
+			{
+				PluginConsole.quiet = true;
+				iter.remove();
+			}
 		}
 	}
 	
@@ -143,9 +142,14 @@ public class VDMJ
 		{
 			PluginRegistry registry = PluginRegistry.getInstance();
 			verbose("Registering standard plugins");
+
 			ASTPlugin ast = ASTPlugin.factory(Settings.dialect);
 			registry.registerPlugin(ast);
 			ast.processArgs(argv);
+
+			TCPlugin tc = TCPlugin.factory(Settings.dialect);
+			registry.registerPlugin(tc);
+			tc.processArgs(argv);
 		}
 		catch (Exception e)
 		{
