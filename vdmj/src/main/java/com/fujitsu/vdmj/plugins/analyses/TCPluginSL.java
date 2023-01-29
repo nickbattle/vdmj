@@ -60,16 +60,15 @@ public class TCPluginSL extends TCPlugin
 	{
 		long before = System.currentTimeMillis();
 		int terrs = 0;
-		TCModuleList checkedModules = null;
 		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
 		ASTModuleList parsedModules = ast.getAST();
 
 		try
    		{
-   			checkedModules = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedModules);
-   			terrs += checkedModules.combineDefaults();
+   			tcModuleList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedModules);
+   			terrs += tcModuleList.combineDefaults();
 
-   			TypeChecker typeChecker = new ModuleTypeChecker(checkedModules);
+   			TypeChecker typeChecker = new ModuleTypeChecker(tcModuleList);
    			typeChecker.typeCheck();
    		}
 		catch (InternalException e)
@@ -97,7 +96,7 @@ public class TCPluginSL extends TCPlugin
 			TypeChecker.printWarnings(Console.out);
 		}
 
-		info("Type checked " + plural(checkedModules.size(), "class", "es") +
+		info("Type checked " + plural(tcModuleList.size(), "class", "es") +
 			" in " + (double)(after-before)/1000 + " secs. ");
   		info(terrs == 0 ? "No type errors" :
   			"Found " + plural(terrs, "type error", "s"));

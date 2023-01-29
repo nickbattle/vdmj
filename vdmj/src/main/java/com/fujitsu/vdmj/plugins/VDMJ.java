@@ -30,6 +30,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +41,7 @@ import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
+import com.fujitsu.vdmj.plugins.analyses.INPlugin;
 import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckFailedEvent;
@@ -47,6 +49,7 @@ import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.CheckTypeEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
+import com.fujitsu.vdmj.plugins.events.ShutdownEvent;
 import com.fujitsu.vdmj.util.GetResource;
 
 /**
@@ -62,47 +65,10 @@ public class VDMJ
 		argv = new Vector<String>(Arrays.asList(args));
 		paths = new Vector<File>();
 
-		if (argv.contains("-vdmsl"))
-		{
-			Settings.dialect = Dialect.VDM_SL;
-			argv.remove("-vdmsl");
-			
-			if (argv.contains("-vdmpp") || argv.contains("-vdmrt"))
-			{
-				fail("Must include one of -vdmsl, -vdmpp or -vdmrt");
-			}
-		}
-		else if (argv.contains("-vdmpp"))
-		{
-			Settings.dialect = Dialect.VDM_PP;
-			argv.remove("-vdmpp");
-			
-			if (argv.contains("-vdmsl") || argv.contains("-vdmrt"))
-			{
-				fail("Must include one of -vdmsl, -vdmpp or -vdmrt");
-			}
-		}
-		else if (argv.contains("-vdmrt"))
-		{
-			Settings.dialect = Dialect.VDM_RT;
-			argv.remove("-vdmrt");
-			
-			if (argv.contains("-vdmpp") || argv.contains("-vdmsl"))
-			{
-				fail("Must include one of -vdmsl, -vdmpp or -vdmrt");
-			}
-		}
-		else
-		{
-			fail("Must include one of -vdmsl, -vdmpp or -vdmrt");
-		}
-		
-		verbose("Dialect set to " + Settings.dialect);
-		
 		processArgs();
 		loadPlugins();
 		findFiles();
-		checkFiles();
+		complete(checkAndInitFiles());
 	}
 	
 	private static void processArgs()
@@ -113,7 +79,22 @@ public class VDMJ
 		{
 			String arg = iter.next();
 			
-			if (arg.equals("-path"))
+			if (arg.equals("-vdmsl"))
+			{
+				Settings.dialect = Dialect.VDM_SL;
+				iter.remove();
+			}
+			else if (arg.equals("-vdmpp"))
+			{
+				Settings.dialect = Dialect.VDM_PP;
+				iter.remove();
+			}
+			else if (arg.equals("-vdmrt"))
+			{
+				Settings.dialect = Dialect.VDM_RT;
+				iter.remove();
+			}
+			else if (arg.equals("-path"))
 			{
 				iter.remove();
 				
@@ -128,11 +109,26 @@ public class VDMJ
 				Settings.verbose = true;
 				iter.remove();
 			}
+			else if (arg.equals("-annotations"))
+			{
+				Settings.annotations = true;
+				iter.remove();
+			}
+			else if (arg.equals("-strict"))
+			{
+				Settings.strict = true;
+				iter.remove();
+			}
 			else if (arg.equals("-q"))
 			{
 				PluginConsole.quiet = true;
 				iter.remove();
 			}
+		}
+		
+		if (Settings.dialect == null)
+		{
+			fail("You must set -vdmsl, -vdmpp or -vdmrt");
 		}
 	}
 	
@@ -150,6 +146,32 @@ public class VDMJ
 			TCPlugin tc = TCPlugin.factory(Settings.dialect);
 			registry.registerPlugin(tc);
 			tc.processArgs(argv);
+
+			INPlugin in = INPlugin.factory(Settings.dialect);
+			registry.registerPlugin(in);
+			in.processArgs(argv);
+			
+			if (System.getProperty("vdmj.plugins") != null)
+			{
+				String[] plugins = System.getProperty("vdmj.plugins").split("\\s*[,;]\\s*");
+				
+				for (String plugin: plugins)
+				{
+					try
+					{
+						Class<?> clazz = Class.forName(plugin);
+						Method factory = clazz.getMethod("factory", Dialect.class);
+						AnalysisPlugin instance = (AnalysisPlugin)factory.invoke(null, Settings.dialect);
+						registry.registerPlugin(instance);
+						verbose("Registered " + plugin);
+					}
+					catch (Exception e)
+					{
+						println("Cannot load plugin: " + plugin);
+						throw e;
+					}
+				}
+			}
 		}
 		catch (Exception e)
 		{
@@ -164,6 +186,11 @@ public class VDMJ
 		
 		for (String arg: argv)
 		{
+			if (arg.startsWith("-"))
+			{
+				fail("Unexpected option: " + arg);
+			}
+			
 			File file = new File(arg);
 	
 			if (file.isDirectory())
@@ -234,7 +261,7 @@ public class VDMJ
 		}
 	}
 	
-	private static void checkFiles()
+	private static boolean checkAndInitFiles()
 	{
 		try
 		{
@@ -261,7 +288,8 @@ public class VDMJ
 
 						if (errList.isEmpty())
 						{
-							verbose("Loaded files checked successfully");
+							verbose("Loaded files initialized successfully");
+							return true;
 						}
 						else
 						{
@@ -286,6 +314,23 @@ public class VDMJ
 				verbose("Preparation errors found");
 				errList.addAll(eventhub.publish(new CheckFailedEvent(event)));
 			}
+		}
+		catch (Exception e)
+		{
+			println(e);
+			System.exit(1);
+		}
+		
+		return false;
+	}
+
+	private static void complete(boolean success)
+	{
+		try
+		{
+			EventHub eventhub = EventHub.getInstance();
+			eventhub.publish(new ShutdownEvent());
+			System.exit(success ? 0 : 1);
 		}
 		catch (Exception e)
 		{
