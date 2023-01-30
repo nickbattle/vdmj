@@ -30,6 +30,11 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.fujitsu.vdmj.ExitStatus;
+import com.fujitsu.vdmj.RemoteControl;
+import com.fujitsu.vdmj.RemoteInterpreter;
+import com.fujitsu.vdmj.commands.CommandReader;
+import com.fujitsu.vdmj.commands.ModuleCommandReader;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.in.INNode;
@@ -48,11 +53,13 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 public class INPluginSL extends INPlugin
 {
 	private INModuleList inModuleList = null;
+	private ModuleInterpreter interpreter = null;
 	
 	@Override
 	protected <T> T interpreterPrepare()
 	{
 		inModuleList = new INModuleList();
+		interpreter = null;
 		return null;
 	}
 
@@ -60,7 +67,11 @@ public class INPluginSL extends INPlugin
 	@Override
 	protected <T> T interpreterInit()
 	{
-		ModuleInterpreter interpreter = null;
+		if (!startInterpreter)
+		{
+			return (T) errsOf();
+		}
+		
 		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
 		TCModuleList checkedModules = tc.getTC();
 
@@ -131,18 +142,32 @@ public class INPluginSL extends INPlugin
 
 			return (T) errsOf(e);
 		}
-
+		
+		return (T) errsOf();
+	}
+	
+	@Override
+	public ExitStatus interpreterRun()
+	{
 		try
 		{
-			if (expression != null)
-			{
-				println(interpreter.execute(expression).toString());
-				return (T) errsOf();
-			}
-			else
+			if (interactive)
 			{
 				infoln("Interpreter started");
-				return (T) errsOf();
+				CommandReader reader = new ModuleCommandReader(interpreter, "> ");
+				ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
+				return reader.run(ast.getFiles());
+			}
+			else if (expression != null)
+			{
+				println(interpreter.execute(expression).toString());
+				return ExitStatus.EXIT_OK;
+			}
+			else if (remoteClass != null)
+			{
+				RemoteControl remote = remoteClass.getDeclaredConstructor().newInstance();
+				remote.run(new RemoteInterpreter(interpreter));
+				return ExitStatus.EXIT_OK;
 			}
 		}
 		catch (ContextException e)
@@ -158,7 +183,7 @@ public class INPluginSL extends INPlugin
 				e.ctxt.printStackTrace(Console.out, true);
 			}
 
-			return (T) errsOf(e);
+			return ExitStatus.EXIT_ERRORS;
 		}
 		catch (Exception e)
 		{
@@ -170,10 +195,12 @@ public class INPluginSL extends INPlugin
 			println("Execution:");
 			println(e);
 
-			return (T) errsOf(e);
+			return ExitStatus.EXIT_ERRORS;
 		}
+
+		return ExitStatus.EXIT_OK;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Mappable> T getIN()

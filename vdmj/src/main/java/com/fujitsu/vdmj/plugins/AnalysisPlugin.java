@@ -40,6 +40,6 @@ abstract public class AnalysisPlugin
 	
 	public abstract String getName();
 	public abstract void init();
-	public abstract void processArgs(List<String> argv); 
-	
+	public abstract void processArgs(List<String> argv);
+	public abstract void getUsage(); 
 }

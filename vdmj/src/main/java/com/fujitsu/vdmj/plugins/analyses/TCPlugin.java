@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -80,6 +82,12 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 			default:
 				throw new Exception("Unknown dialect: " + dialect);
 		}
+	}
+	
+	@Override
+	public void getUsage()
+	{
+		println("-w: suppress warning messages");
 	}
 	
 	@Override

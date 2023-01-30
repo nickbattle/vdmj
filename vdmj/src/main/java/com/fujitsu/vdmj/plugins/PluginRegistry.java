@@ -24,7 +24,7 @@
 
 package com.fujitsu.vdmj.plugins;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class PluginRegistry
@@ -34,7 +34,7 @@ public class PluginRegistry
 
 	private PluginRegistry()
 	{
-		plugins = new HashMap<String, AnalysisPlugin>();
+		plugins = new LinkedHashMap<String, AnalysisPlugin>();
 	}
 
 	public static synchronized PluginRegistry getInstance()

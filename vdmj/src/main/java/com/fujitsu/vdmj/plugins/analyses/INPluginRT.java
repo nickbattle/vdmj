@@ -32,8 +32,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.lang.reflect.InvocationTargetException;
 
+import com.fujitsu.vdmj.ExitStatus;
+import com.fujitsu.vdmj.RemoteControl;
+import com.fujitsu.vdmj.RemoteInterpreter;
 import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
+import com.fujitsu.vdmj.commands.ClassCommandReader;
+import com.fujitsu.vdmj.commands.CommandReader;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.in.INNode;
@@ -55,6 +60,7 @@ import com.fujitsu.vdmj.tc.definitions.TCClassList;
 public class INPluginRT extends INPlugin
 {
 	private INClassList inClassList = null;
+	private ClassInterpreter interpreter = null;
 	
 	@Override
 	public void init()
@@ -88,6 +94,7 @@ public class INPluginRT extends INPlugin
 	protected <T> T interpreterPrepare()
 	{
 		inClassList = new INClassList();
+		interpreter = null;
 		
 		RemoteSimulation rs = RemoteSimulation.getInstance();
 		
@@ -113,7 +120,11 @@ public class INPluginRT extends INPlugin
 	@Override
 	protected <T> T interpreterInit()
 	{
-		ClassInterpreter interpreter = null;
+		if (!startInterpreter)
+		{
+			return (T) errsOf();
+		}
+		
 		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
 		TCClassList checkedClasses = tc.getTC();
 
@@ -198,26 +209,41 @@ public class INPluginRT extends INPlugin
 
 			return (T) errsOf(e);
 		}
-
-		try
+		finally
 		{
-			if (expression != null)
-			{
-				println(interpreter.execute(expression).toString());
-				return (T) errsOf();
-			}
-			else
-			{
-				infoln("Interpreter started");
-			}
-			
 			if (logfile != null)
 			{
 				RTLogger.dump(true);
 				infoln("RT events dumped to " + logfile);
 			}
-			
-			return (T) errsOf();
+		}
+
+		return (T) errsOf();
+	}
+	
+	@Override
+	public ExitStatus interpreterRun()
+	{
+		try
+		{
+			if (interactive)
+			{
+				infoln("Interpreter started");
+				CommandReader reader = new ClassCommandReader(interpreter, "> ");
+				ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
+				return reader.run(ast.getFiles());
+			}
+			else if (expression != null)
+			{
+				println(interpreter.execute(expression).toString());
+				return ExitStatus.EXIT_OK;
+			}
+			else if (remoteClass != null)
+			{
+				RemoteControl remote = remoteClass.getDeclaredConstructor().newInstance();
+				remote.run(new RemoteInterpreter(interpreter));
+				return ExitStatus.EXIT_OK;
+			}
 		}
 		catch (ContextException e)
 		{
@@ -232,7 +258,7 @@ public class INPluginRT extends INPlugin
 				e.ctxt.printStackTrace(Console.out, true);
 			}
 
-			return (T) errsOf(e);
+			return ExitStatus.EXIT_ERRORS;
 		}
 		catch (Exception e)
 		{
@@ -244,8 +270,10 @@ public class INPluginRT extends INPlugin
 			println("Execution:");
 			println(e);
 
-			return (T) errsOf(e);
+			return ExitStatus.EXIT_ERRORS;
 		}
+
+		return ExitStatus.EXIT_OK;
 	}
 	
 	@SuppressWarnings("unchecked")

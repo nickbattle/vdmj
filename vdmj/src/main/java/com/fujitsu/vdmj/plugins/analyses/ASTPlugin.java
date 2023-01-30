@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.plugins.analyses;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
 
 import java.io.File;
@@ -89,6 +90,17 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 			default:
 				throw new Exception("Unknown dialect: " + dialect);
 		}
+	}
+	
+	@Override
+	public void getUsage()
+	{
+		println("-c <charset>: select a file charset");
+	}
+	
+	public List<File> getFiles()
+	{
+		return files;
 	}
 	
 	@Override

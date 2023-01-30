@@ -25,11 +25,13 @@
 package com.fujitsu.vdmj.plugins.analyses;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.Settings;
@@ -49,6 +51,7 @@ import com.fujitsu.vdmj.runtime.ContextException;
  */
 abstract public class INPlugin extends AnalysisPlugin implements EventListener
 {
+	protected boolean startInterpreter;
 	protected boolean interactive;
 	protected String defaultName;
 	protected String expression;
@@ -67,6 +70,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
+		startInterpreter = false;
 		interactive = false;
 		defaultName = null;
 		expression = null;
@@ -99,6 +103,26 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
+	public void getUsage()
+	{
+		println("-i: run the interpreter if successfully type checked");
+		println("-e <exp>: evaluate <exp> and stop");
+		println("-p: generate proof obligations and stop");
+		println("-c <charset>: select a file charset");
+		println("-default <name>: set the default module/class");
+		println("-pre: disable precondition checks");
+		println("-post: disable postcondition checks");
+		println("-inv: disable type/state invariant checks");
+		println("-dtc: disable all dynamic type checking");
+		println("-exceptions: raise pre/post/inv violations as <RuntimeError>");
+		println("-measures: disable recursive measure checking");
+		println("-annotations: enable annotation processing");
+		println("-log <filename>: enable real-time event logging");
+		println("-remote <class>: enable remote control");
+		println("-simulation <class>: enable simulation control");
+	}
+	
+	@Override
 	public void processArgs(List<String> argv)
 	{
 		Iterator<String> iter = argv.iterator();
@@ -110,11 +134,13 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			if (arg.equals("-i"))
 			{
 				iter.remove();
+				startInterpreter = true;
 				interactive = true;
 			}
 			else if (arg.equals("-e"))
 			{
 				iter.remove();
+				startInterpreter = true;
 				interactive = false;
 				
 				if (iter.hasNext())
@@ -190,6 +216,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
     		else if (arg.equals("-remote"))
     		{
     			iter.remove();
+    			startInterpreter = true;
     			interactive = false;
     			
     			if (iter.hasNext())
@@ -205,7 +232,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
     		else if (arg.equals("-simulation"))
     		{
     			iter.remove();
-    			interactive = false;
+    			startInterpreter = true;
+    			interactive = true;
     			
     			if (iter.hasNext())
     			{
@@ -290,10 +318,12 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			throw new Exception("Unhandled event: " + event);
 		}
 	}
-
+	
 	abstract protected <T> T interpreterPrepare();
 
 	abstract protected <T> T interpreterInit();
+
+	abstract public ExitStatus interpreterRun();
 
 	abstract public <T extends Mappable> T getIN();
 
@@ -314,5 +344,10 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		}
 		
 		return null;
+	}
+
+	public boolean runNeeded()
+	{
+		return startInterpreter;	// Because we need it for something!
 	}
 }

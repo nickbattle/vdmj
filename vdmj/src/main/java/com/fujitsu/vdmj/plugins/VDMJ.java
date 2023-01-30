@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.plugins;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
@@ -37,11 +38,13 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
@@ -68,6 +71,7 @@ public class VDMJ
 {
 	private static List<String> argv = null;
 	private static List<File> paths = null;
+	private static boolean showUsage = false;
 
 	public static void main(String[] args)
 	{
@@ -75,13 +79,55 @@ public class VDMJ
 		paths = new Vector<File>();
 		
 		Properties.init();
-
 		processArgs();
 		loadPlugins();
-		findFiles();
-		complete(checkAndInitFiles());
+		
+		ExitStatus result = ExitStatus.EXIT_OK;
+		
+		do
+		{
+			findFiles();
+			
+			if (checkAndInitFiles())
+			{
+				if (runNeeded())
+				{
+					result = run();
+					if (result != ExitStatus.RELOAD) infoln("Bye");
+				}
+			}
+
+			complete();
+		}
+		while (result == ExitStatus.RELOAD);
+		
+		System.exit(result == ExitStatus.EXIT_OK ? 0 : 1);
 	}
 	
+	private static void usage()
+	{
+		Map<String, AnalysisPlugin> map = PluginRegistry.getInstance().getPlugins();
+		
+		println("Usage: VDMJ <-vdmsl | -vdmpp | -vdmrt> [<options>] [<files or dirs>]");
+		println("-vdmsl: parse files as VDM-SL");
+		println("-vdmpp: parse files as VDM++");
+		println("-vdmrt: parse files as VDM-RT");
+		println("-v: show VDMJ jar version");
+		println("-path: search path for files");
+		println("-strict: use strict grammar rules");
+		println("-r <release>: VDM language release");
+		println("-t <charset>: select a console charset");
+		println("-q: suppress information messages");
+		println("-verbose: display detailed startup information");
+		
+		for (AnalysisPlugin plugin: map.values())
+		{
+			plugin.getUsage();
+		}
+		
+		System.exit(0);
+	}
+
 	private static void processArgs()
 	{
 		Iterator<String> iter = argv.iterator();
@@ -188,6 +234,11 @@ public class VDMJ
 				PluginConsole.quiet = true;
 				iter.remove();
 			}
+			else if (arg.equals("-help") || arg.equals("-?"))
+			{
+				iter.remove();
+				showUsage = true;	// Done in loadPlugins
+			}
 		}
 		
 		if (Settings.dialect == null)
@@ -235,6 +286,11 @@ public class VDMJ
 						throw e;
 					}
 				}
+			}
+			
+			if (showUsage)	// Can do this now we've loaded plugins!
+			{
+				usage();
 			}
 		}
 		catch (Exception e)
@@ -383,18 +439,28 @@ public class VDMJ
 		
 		return false;
 	}
+	
+	private static boolean runNeeded()
+	{
+		INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
+		return in.runNeeded();
+	}
 
-	private static void complete(boolean success)
+	private static ExitStatus run()
+	{
+		INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
+		return in.interpreterRun();
+	}
+
+	private static void complete()
 	{
 		try
 		{
 			EventHub.getInstance().publish(new ShutdownEvent());
-			System.exit(success ? 0 : 1);
 		}
 		catch (Exception e)
 		{
 			println(e);
-			System.exit(1);
 		}
 	}
 	
