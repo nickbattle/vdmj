@@ -24,7 +24,7 @@
 
 package workspace;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import json.JSONObject;
@@ -40,7 +40,7 @@ public class PluginRegistry
 
 	private PluginRegistry()
 	{
-		plugins = new HashMap<String, AnalysisPlugin>();
+		plugins = new LinkedHashMap<String, AnalysisPlugin>();
 	}
 
 	public static synchronized PluginRegistry getInstance()
