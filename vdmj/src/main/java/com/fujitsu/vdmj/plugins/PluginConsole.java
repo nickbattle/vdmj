@@ -24,6 +24,10 @@
 
 package com.fujitsu.vdmj.plugins;
 
+import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.messages.Console;
@@ -94,5 +98,26 @@ public class PluginConsole
 				" more frames available (vdmj.diag.max_stack currently = " +
 				Properties.diag_max_stack +")");
 		}
+	}
+	
+	public static Charset validateCharset(String cs)
+	{
+		if (!Charset.isSupported(cs))
+		{
+			println("Charset " + cs + " is not supported\n");
+			println("Available charsets:");
+			println("Default = " + Charset.defaultCharset());
+			Map<String,Charset> available = Charset.availableCharsets();
+
+			for (Entry<String, Charset> entry: available.entrySet())
+			{
+				println(entry.getKey() + " " + available.get(entry.getKey()).aliases());
+			}
+
+			println("");
+			fail("Charset " + cs + " is not supported");
+		}
+
+		return Charset.forName(cs);
 	}
 }

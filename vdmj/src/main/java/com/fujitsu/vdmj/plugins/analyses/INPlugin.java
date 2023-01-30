@@ -24,10 +24,15 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.RemoteControl;
+import com.fujitsu.vdmj.RemoteSimulation;
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.Mappable;
@@ -44,10 +49,14 @@ import com.fujitsu.vdmj.runtime.ContextException;
  */
 abstract public class INPlugin extends AnalysisPlugin implements EventListener
 {
-	protected boolean start;
+	protected boolean interactive;
 	protected String defaultName;
 	protected String expression;
 	protected String logfile;
+	protected String remoteControlName;
+	protected String remoteSimulationName;
+	protected Class<RemoteControl> remoteClass;
+	protected Class<RemoteSimulation> remoteSimulation;
 	
 	@Override
 	public String getName()
@@ -58,8 +67,15 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		start = false;
+		interactive = false;
 		defaultName = null;
+		expression = null;
+		logfile = null;
+		remoteControlName = null;
+		remoteSimulationName = null;
+		remoteClass = null;
+		remoteSimulation = null;
+		
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
 	}
@@ -93,17 +109,22 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			
 			if (arg.equals("-i"))
 			{
-				start = true;
 				iter.remove();
+				interactive = true;
 			}
 			else if (arg.equals("-e"))
 			{
 				iter.remove();
+				interactive = false;
 				
 				if (iter.hasNext())
 				{
 					expression = iter.next();
 					iter.remove();
+				}
+				else
+				{
+					fail("-e option requires an expression");
 				}
 			}
 			else if (arg.equals("-default"))
@@ -115,6 +136,10 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 					defaultName = iter.next();
 					iter.remove();
 				}
+				else
+				{
+					fail("-default requires a name");
+				}
 			}
 			else if (arg.equals("-log"))
 			{
@@ -125,6 +150,106 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 					logfile = iter.next();
 					iter.remove();
 				}
+				else
+				{
+					fail("-fail requires a log file name");
+				}
+			}
+    		else if (arg.equals("-pre"))
+    		{
+    			iter.remove();
+    			Settings.prechecks = false;
+    		}
+    		else if (arg.equals("-post"))
+    		{
+    			iter.remove();
+    			Settings.postchecks = false;
+    		}
+    		else if (arg.equals("-inv"))
+    		{
+    			iter.remove();
+    			Settings.invchecks = false;
+    		}
+    		else if (arg.equals("-dtc"))
+    		{
+    			iter.remove();
+    			// NB. Turn off both when no DTC
+    			Settings.invchecks = false;
+    			Settings.dynamictypechecks = false;
+    		}
+    		else if (arg.equals("-exceptions"))
+    		{
+    			iter.remove();
+    			Settings.exceptions = true;
+    		}
+    		else if (arg.equals("-measures"))
+    		{
+    			iter.remove();
+    			Settings.measureChecks = false;
+    		}
+    		else if (arg.equals("-remote"))
+    		{
+    			iter.remove();
+    			interactive = false;
+    			
+    			if (iter.hasNext())
+    			{
+    				remoteControlName = iter.next();
+    				iter.remove();
+    			}
+    			else
+    			{
+    				fail("-remote option requires a Java classname");
+    			}
+    		}
+    		else if (arg.equals("-simulation"))
+    		{
+    			iter.remove();
+    			interactive = false;
+    			
+    			if (iter.hasNext())
+    			{
+    				remoteSimulationName = iter.next();
+    				iter.remove();
+    			}
+    			else
+    			{
+    				fail("-simulation option requires a Java classname");
+    			}
+    		}
+		}
+		
+		if (logfile != null && Settings.dialect != Dialect.VDM_RT)
+		{
+			fail("The -log option can only be used with -vdmrt");
+		}
+		
+		if (remoteControlName != null && remoteSimulationName != null)
+		{
+			fail("The -remote and -simulation options cannot be used together");
+		}
+		
+		if (remoteSimulationName != null && Settings.dialect != Dialect.VDM_RT)
+		{
+			fail("The -simulation option can only be used with -vdmrt");
+		}
+
+		if (remoteControlName != null)
+		{
+			remoteClass = getRemoteClass(remoteControlName);
+		}
+
+		if (remoteSimulationName != null)
+		{
+			remoteSimulation = getRemoteClass(remoteSimulationName);
+			
+			try
+			{
+				remoteSimulation.getDeclaredConstructor().newInstance();
+			}
+			catch (Exception e)
+			{
+				fail("Cannot instantiate simulation: " + e.getMessage());
 			}
 		}
 	}
@@ -171,4 +296,23 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	abstract protected <T> T interpreterInit();
 
 	abstract public <T extends Mappable> T getIN();
+
+	@SuppressWarnings("unchecked")
+	private static <T> T getRemoteClass(String remoteName)
+	{
+		try
+		{
+			return (T) ClassLoader.getSystemClassLoader().loadClass(remoteName);
+		}
+		catch (ClassNotFoundException e)
+		{
+			fail("Cannot locate " + remoteName + " on the CLASSPATH");
+		}
+		catch (ClassCastException e)
+		{
+			fail(remoteName + " does not implement interface");
+		}
+		
+		return null;
+	}
 }

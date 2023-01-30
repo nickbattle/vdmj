@@ -61,7 +61,7 @@ public class ASTPluginSL extends ASTPlugin
 		
 		for (File file: files)
 		{
-			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL);
+			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL, filecharset);
 			ModuleReader mr = new ModuleReader(ltr);
 	   		long before = System.currentTimeMillis();
 			astModuleList.addAll(mr.readModules());

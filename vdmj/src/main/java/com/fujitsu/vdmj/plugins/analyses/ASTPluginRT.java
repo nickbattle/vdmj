@@ -60,7 +60,7 @@ public class ASTPluginRT extends ASTPlugin
 		
 		for (File file: files)
 		{
-			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_RT);
+			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_RT, filecharset);
 	   		long before = System.currentTimeMillis();
 			ClassReader mr = new ClassReader(ltr);
 			astClassList.addAll(mr.readClasses());

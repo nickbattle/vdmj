@@ -26,19 +26,28 @@ package com.fujitsu.vdmj.plugins;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.JarURLConnection;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
+import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 import com.fujitsu.vdmj.plugins.analyses.INPlugin;
@@ -64,6 +73,8 @@ public class VDMJ
 	{
 		argv = new Vector<String>(Arrays.asList(args));
 		paths = new Vector<File>();
+		
+		Properties.init();
 
 		processArgs();
 		loadPlugins();
@@ -81,19 +92,68 @@ public class VDMJ
 			
 			if (arg.equals("-vdmsl"))
 			{
-				Settings.dialect = Dialect.VDM_SL;
 				iter.remove();
+				Settings.dialect = Dialect.VDM_SL;
 			}
 			else if (arg.equals("-vdmpp"))
 			{
-				Settings.dialect = Dialect.VDM_PP;
 				iter.remove();
+				Settings.dialect = Dialect.VDM_PP;
 			}
 			else if (arg.equals("-vdmrt"))
 			{
-				Settings.dialect = Dialect.VDM_RT;
 				iter.remove();
+				Settings.dialect = Dialect.VDM_RT;
 			}
+    		else if (arg.equals("-r"))
+    		{
+    			iter.remove();
+    			
+    			if (iter.hasNext())
+    			{
+    				Settings.release = Release.lookup(iter.next());
+       				iter.remove();
+       			 
+    				if (Settings.release == null)
+    				{
+    					fail("-r option must be " + Release.list());
+    				}
+    			}
+    			else
+    			{
+    				fail("-r option requires a VDM release");
+    			}
+    		}
+    		else if (arg.equals("-v"))		// Exit if this option is used.
+    		{
+    			iter.remove();
+    			String version = getVersion();
+
+    			if (version == null)
+    			{
+    				println("Cannot determine VDMJ version");
+        			System.exit(1);
+    			}
+    			else
+    			{
+    				println("VDMJ version = " + version);
+        			System.exit(0);
+    			}
+    		}
+    		else if (arg.equals("-t"))
+    		{
+    			iter.remove();
+    			
+    			if (iter.hasNext())
+    			{
+    				Console.init(validateCharset(iter.next()));
+    				iter.remove();
+    			}
+    			else
+    			{
+    				fail("-t option requires a charset name");
+    			}
+    		}
 			else if (arg.equals("-path"))
 			{
 				iter.remove();
@@ -102,6 +162,10 @@ public class VDMJ
 				{
 					paths.add(new File(iter.next()));
 					iter.remove();
+				}
+				else
+				{
+					fail("-path requires a directory");
 				}
 			}
 			else if (arg.equals("-verbose"))
@@ -188,6 +252,9 @@ public class VDMJ
 		{
 			if (arg.startsWith("-"))
 			{
+				// All legal options and their arguments should have been removed by
+				// this point, so we assume filenames cannot start with "-"!
+				
 				fail("Unexpected option: " + arg);
 			}
 			
@@ -250,15 +317,8 @@ public class VDMJ
 			}
 		}
 		
-		if (filenames.isEmpty())
-		{
-			fail("You have not specified any source files");
-		}
-		else
-		{
-			ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
-			ast.setFiles(filenames);
-		}
+		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
+		ast.setFiles(filenames);
 	}
 	
 	private static boolean checkAndInitFiles()
@@ -328,14 +388,31 @@ public class VDMJ
 	{
 		try
 		{
-			EventHub eventhub = EventHub.getInstance();
-			eventhub.publish(new ShutdownEvent());
+			EventHub.getInstance().publish(new ShutdownEvent());
 			System.exit(success ? 0 : 1);
 		}
 		catch (Exception e)
 		{
 			println(e);
 			System.exit(1);
+		}
+	}
+	
+	private static String getVersion()
+	{
+		try
+		{
+			String path = VDMJ.class.getName().replaceAll("\\.", "/");
+			URL url = VDMJ.class.getResource("/" + path + ".class");
+			JarURLConnection conn = (JarURLConnection)url.openConnection();
+		    JarFile jar = conn.getJarFile();
+			Manifest mf = jar.getManifest();
+			String version = (String)mf.getMainAttributes().get(Attributes.Name.IMPLEMENTATION_VERSION);
+			return version;
+		}
+		catch (Exception e)
+		{
+			return null;
 		}
 	}
 }

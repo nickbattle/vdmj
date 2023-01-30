@@ -24,7 +24,11 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
+import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
+
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -45,6 +49,7 @@ import com.fujitsu.vdmj.plugins.events.Event;
 abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 {
 	protected List<File> files;
+	protected Charset filecharset;
 	protected List<VDMError> errors;
 	protected List<VDMWarning> warnings;
 	protected boolean nowarn;
@@ -59,6 +64,7 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	public void init()
 	{
 		files = new Vector<File>();
+		filecharset = Charset.defaultCharset();
 		errors = new Vector<VDMError>();
 		warnings = new Vector<VDMWarning>();
 		nowarn = false;
@@ -98,6 +104,19 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 			{
 				nowarn = true;	// Removed in TC
 			}
+    		else if (arg.equals("-c"))
+    		{
+    			iter.remove();
+    			
+    			if (iter.hasNext())
+    			{
+    				filecharset = validateCharset(iter.next());
+    			}
+    			else
+    			{
+    				fail("-c option requires a charset name");
+    			}
+    		}
 		}
 	}
 	
