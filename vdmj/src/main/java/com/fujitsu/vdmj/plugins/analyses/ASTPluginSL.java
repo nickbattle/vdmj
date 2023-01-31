@@ -27,14 +27,18 @@ package com.fujitsu.vdmj.plugins.analyses;
 import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
 import static com.fujitsu.vdmj.plugins.PluginConsole.info;
 import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.File;
 
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 
 /**
@@ -59,20 +63,35 @@ public class ASTPluginSL extends ASTPlugin
 		
 		for (File file: files)
 		{
-			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL, filecharset);
-			ModuleReader mr = new ModuleReader(ltr);
-	   		long before = System.currentTimeMillis();
-			astModuleList.addAll(mr.readModules());
-	   		long after = System.currentTimeMillis();
-	   		duration += (after - before);
+			ModuleReader mr = null;
 			
-			if (mr.getErrorCount() > 0)
+			try
+			{
+				LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL, filecharset);
+				mr = new ModuleReader(ltr);
+				long before = System.currentTimeMillis();
+				astModuleList.addAll(mr.readModules());
+				long after = System.currentTimeMillis();
+				duration += (after - before);
+			}
+			catch (InternalException e)
+			{
+				println(e.toString());
+				errors.add(new VDMError(0, e.toString(), LexLocation.ANY));
+			}
+			catch (Throwable e)
+			{
+				println(e);
+				errors.add(new VDMError(0, e.toString(), LexLocation.ANY));
+			}
+
+			if (mr != null && mr.getErrorCount() > 0)
 			{
 				errors.addAll(mr.getErrors());
     			mr.printErrors(Console.out);
 			}
 
-			if (mr.getWarningCount() > 0)
+			if (mr != null && mr.getWarningCount() > 0)
 			{
 				warnings.addAll(mr.getWarnings());
     			mr.printWarnings(Console.out);

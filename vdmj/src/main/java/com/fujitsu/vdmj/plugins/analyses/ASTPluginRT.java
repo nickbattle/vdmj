@@ -27,13 +27,17 @@ package com.fujitsu.vdmj.plugins.analyses;
 import static com.fujitsu.vdmj.plugins.PluginConsole.info;
 import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.File;
 
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.syntax.ClassReader;
 
 /**
@@ -60,23 +64,38 @@ public class ASTPluginRT extends ASTPlugin
 		
 		for (File file: files)
 		{
-			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_RT, filecharset);
-	   		long before = System.currentTimeMillis();
-			ClassReader mr = new ClassReader(ltr);
-			astClassList.addAll(mr.readClasses());
-	   		long after = System.currentTimeMillis();
-	   		duration += (after - before);
-
-			if (mr.getErrorCount() > 0)
+			ClassReader cr = null;
+			
+			try
 			{
-				errors.addAll(mr.getErrors());
-				errs += mr.getErrorCount();
+				LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_RT, filecharset);
+		   		long before = System.currentTimeMillis();
+				cr = new ClassReader(ltr);
+				astClassList.addAll(cr.readClasses());
+		   		long after = System.currentTimeMillis();
+		   		duration += (after - before);
+			}
+			catch (InternalException e)
+			{
+				println(e.toString());
+				errors.add(new VDMError(0, e.toString(), LexLocation.ANY));
+			}
+			catch (Throwable e)
+			{
+				println(e);
+				errors.add(new VDMError(0, e.toString(), LexLocation.ANY));
+			}
+
+			if (cr != null && cr.getErrorCount() > 0)
+			{
+				errors.addAll(cr.getErrors());
+				errs += cr.getErrorCount();
 			}
 			
-			if (mr.getWarningCount() > 0)
+			if (cr != null && cr.getWarningCount() > 0)
 			{
-				warnings.addAll(mr.getWarnings());
-				warns += mr.getWarningCount();
+				warnings.addAll(cr.getWarnings());
+				warns += cr.getWarningCount();
 			}
 		}
 
