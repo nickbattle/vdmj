@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
+import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
 import com.fujitsu.vdmj.plugins.events.ShutdownEvent;
 
@@ -45,6 +46,7 @@ public class INPluginRT extends INPluginPP
 	public void init()
 	{
 		super.init();
+		eventhub.register(CheckSyntaxEvent.class, this);
 		eventhub.register(ShutdownEvent.class, this);
 	}
 	
@@ -52,7 +54,28 @@ public class INPluginRT extends INPluginPP
 	@Override
 	public <T> T handleEvent(Event event) throws Exception
 	{
-		if (event instanceof ShutdownEvent)
+		if (event instanceof CheckSyntaxEvent)
+		{
+			RemoteSimulation rs = RemoteSimulation.getInstance();
+			
+			if (rs != null)
+			{
+				try
+				{
+					ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
+					ASTClassList parsedClasses = ast.getAST();
+					rs.setup(parsedClasses);
+				}
+				catch (Exception ex)
+				{
+					println("Simulation: " + ex.getMessage());
+					return (T) errsOf(ex);
+				}
+			}
+
+			return null;
+		}
+		else if (event instanceof ShutdownEvent)
 		{
 			if (RTLogger.getLogSize() > 0)
 			{
@@ -66,32 +89,6 @@ public class INPluginRT extends INPluginPP
 		{
 			return super.handleEvent(event);
 		}
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	protected <T> T interpreterPrepare()
-	{
-		super.interpreterPrepare();
-		
-		RemoteSimulation rs = RemoteSimulation.getInstance();
-		
-		if (rs != null)
-		{
-			try
-			{
-				ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
-				ASTClassList parsedClasses = ast.getAST();
-				rs.setup(parsedClasses);
-			}
-			catch (Exception ex)
-			{
-				println("Simulation: " + ex.getMessage());
-				return (T) errsOf(ex);
-			}
-		}
-
-		return null;
 	}
 
 	@SuppressWarnings("unchecked")
