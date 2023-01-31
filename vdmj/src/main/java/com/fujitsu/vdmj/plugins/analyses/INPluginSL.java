@@ -160,7 +160,31 @@ public class INPluginSL extends INPlugin
 			}
 			else if (expression != null)
 			{
-				println(interpreter.execute(expression).toString());
+	   			ConsoleDebugReader dbg = null;
+	   			ConsoleKeyWatcher watcher = null;
+
+	   			try
+	   			{
+	   				dbg = new ConsoleDebugReader();
+	   				dbg.start();
+	   				watcher = new ConsoleKeyWatcher(expression);
+	   				watcher.start();
+	   				
+					println(interpreter.execute(expression).toString());
+	   			}
+	   			finally
+	   			{
+	   				if (dbg != null)
+	   				{
+	   					dbg.interrupt();
+	   				}
+	   				
+	   				if (watcher != null)
+	   				{
+	   					watcher.interrupt();
+	   				}
+	   			}
+	   			
 				return ExitStatus.EXIT_OK;
 			}
 			else if (remoteClass != null)

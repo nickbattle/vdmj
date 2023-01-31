@@ -383,7 +383,13 @@ public class VDMJ
 		}
 		
 		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
+		INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
 		ast.setFiles(filenames);
+		
+		if (filenames.isEmpty() && !in.isInteractive())
+		{
+			fail("You did not identify any source files");
+		}
 	}
 	
 	private static boolean checkAndInitFiles()

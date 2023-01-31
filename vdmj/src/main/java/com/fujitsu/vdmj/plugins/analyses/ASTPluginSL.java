@@ -55,8 +55,6 @@ public class ASTPluginSL extends ASTPlugin
 	@Override
 	protected <T> T syntaxCheck()
 	{
-		int errs = 0;
-		int warns = 0;
 		double duration = 0;
 		
 		for (File file: files)
@@ -70,14 +68,14 @@ public class ASTPluginSL extends ASTPlugin
 			
 			if (mr.getErrorCount() > 0)
 			{
+				errors.addAll(mr.getErrors());
     			mr.printErrors(Console.out);
-    			errs += mr.getErrorCount();
 			}
 
 			if (mr.getWarningCount() > 0)
 			{
+				warnings.addAll(mr.getWarnings());
     			mr.printWarnings(Console.out);
-    			warns += mr.getWarningCount();
 			}
 		}
 	
@@ -85,10 +83,10 @@ public class ASTPluginSL extends ASTPlugin
 
    		info("Parsed " + plural(count, "module", "s") + " in " +
    			(double)(duration)/1000 + " secs. ");
-   		info(errs == 0 ? "No syntax errors" :
-   			"Found " + plural(errs, "syntax error", "s"));
-  		infoln(warns == 0 ? "" : " and " +
-  			(nowarn ? "suppressed " : "") + plural(warns, "warning", "s"));
+   		info(errors.isEmpty() ? "No syntax errors" :
+   			"Found " + plural(errors.size(), "syntax error", "s"));
+  		infoln(warnings.isEmpty() ? "" : " and " +
+  			(nowarn ? "suppressed " : "") + plural(warnings.size(), "warning", "s"));
 
 		return (T) errors;
 	}

@@ -96,7 +96,7 @@ public class TCPluginSL extends TCPlugin
 			TypeChecker.printWarnings(Console.out);
 		}
 
-		info("Type checked " + plural(tcModuleList.size(), "class", "es") +
+		info("Type checked " + plural(tcModuleList.size(), "module", "s") +
 			" in " + (double)(after-before)/1000 + " secs. ");
   		info(terrs == 0 ? "No type errors" :
   			"Found " + plural(terrs, "type error", "s"));

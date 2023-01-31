@@ -37,7 +37,7 @@ import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
-import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
+import com.fujitsu.vdmj.plugins.events.CheckTypeEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
 
 /**
@@ -63,7 +63,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		nowarn = false;
 		
 		eventhub.register(CheckPrepareEvent.class, this);
-		eventhub.register(CheckSyntaxEvent.class, this);
+		eventhub.register(CheckTypeEvent.class, this);
 	}
 
 	public static TCPlugin factory(Dialect dialect) throws Exception
@@ -116,7 +116,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 			warnings.clear();
 			return typeCheckPrepare();
 		}
-		else if (event instanceof CheckSyntaxEvent)
+		else if (event instanceof CheckTypeEvent)
 		{
 			return typeCheck();
 		}

@@ -350,4 +350,9 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	{
 		return startInterpreter;	// Because we need it for something!
 	}
+	
+	public boolean isInteractive()
+	{
+		return interactive;
+	}
 }
