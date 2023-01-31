@@ -71,7 +71,6 @@ public class VDMJ
 {
 	private static List<String> argv = null;
 	private static List<File> paths = null;
-	private static boolean showUsage = false;
 
 	public static void main(String[] args)
 	{
@@ -79,8 +78,9 @@ public class VDMJ
 		paths = new Vector<File>();
 		
 		Properties.init();
-		processArgs();
+		setDialect(argv);
 		loadPlugins();
+		processArgs();
 		
 		ExitStatus result = ExitStatus.EXIT_OK;
 		
@@ -104,9 +104,32 @@ public class VDMJ
 		System.exit(result == ExitStatus.EXIT_OK ? 0 : 1);
 	}
 	
+	private static void setDialect(List<String> argv2)
+	{
+		if (argv.contains("-vdmsl"))
+		{
+			argv.remove("-vdmsl");
+			Settings.dialect = Dialect.VDM_SL;
+		}
+		else if (argv.contains("-vdmpp"))
+		{
+			argv.remove("-vdmpp");
+			Settings.dialect = Dialect.VDM_PP;
+		}
+		else if (argv.contains("-vdmrt"))
+		{
+			argv.remove("-vdmrt");
+			Settings.dialect = Dialect.VDM_RT;
+		}
+		else
+		{
+			fail("You must set either -vdmsl, -vdmpp or -vdmrt");
+		}
+	}
+
 	private static void usage()
 	{
-		Map<String, AnalysisPlugin> map = PluginRegistry.getInstance().getPlugins();
+		Map<String, AnalysisPlugin> plugins = PluginRegistry.getInstance().getPlugins();
 		
 		println("Usage: VDMJ <-vdmsl | -vdmpp | -vdmrt> [<options>] [<files or dirs>]");
 		println("-vdmsl: parse files as VDM-SL");
@@ -120,7 +143,7 @@ public class VDMJ
 		println("-q: suppress information messages");
 		println("-verbose: display detailed startup information");
 		
-		for (AnalysisPlugin plugin: map.values())
+		for (AnalysisPlugin plugin: plugins.values())
 		{
 			plugin.getUsage();
 		}
@@ -130,28 +153,14 @@ public class VDMJ
 
 	private static void processArgs()
 	{
+		boolean showUsage = false;
 		Iterator<String> iter = argv.iterator();
 		
 		while (iter.hasNext())
 		{
 			String arg = iter.next();
 			
-			if (arg.equals("-vdmsl"))
-			{
-				iter.remove();
-				Settings.dialect = Dialect.VDM_SL;
-			}
-			else if (arg.equals("-vdmpp"))
-			{
-				iter.remove();
-				Settings.dialect = Dialect.VDM_PP;
-			}
-			else if (arg.equals("-vdmrt"))
-			{
-				iter.remove();
-				Settings.dialect = Dialect.VDM_RT;
-			}
-    		else if (arg.equals("-r"))
+    		if (arg.equals("-r"))
     		{
     			iter.remove();
     			
@@ -237,13 +246,21 @@ public class VDMJ
 			else if (arg.equals("-help") || arg.equals("-?"))
 			{
 				iter.remove();
-				showUsage = true;	// Done in loadPlugins
+				showUsage = true;
 			}
 		}
 		
-		if (Settings.dialect == null)
+		
+		Map<String, AnalysisPlugin> plugins = PluginRegistry.getInstance().getPlugins();
+		
+		for (AnalysisPlugin plugin: plugins.values())
 		{
-			fail("You must set -vdmsl, -vdmpp or -vdmrt");
+			plugin.processArgs(argv);
+		}
+		
+		if (showUsage)
+		{
+			usage();	// Exits - shows all plugins' options
 		}
 	}
 	
@@ -256,15 +273,12 @@ public class VDMJ
 
 			ASTPlugin ast = ASTPlugin.factory(Settings.dialect);
 			registry.registerPlugin(ast);
-			ast.processArgs(argv);
 
 			TCPlugin tc = TCPlugin.factory(Settings.dialect);
 			registry.registerPlugin(tc);
-			tc.processArgs(argv);
 
 			INPlugin in = INPlugin.factory(Settings.dialect);
 			registry.registerPlugin(in);
-			in.processArgs(argv);
 			
 			if (System.getProperty("vdmj.plugins") != null)
 			{
@@ -286,11 +300,6 @@ public class VDMJ
 						throw e;
 					}
 				}
-			}
-			
-			if (showUsage)	// Can do this now we've loaded plugins!
-			{
-				usage();
 			}
 		}
 		catch (Exception e)
