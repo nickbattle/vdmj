@@ -93,7 +93,7 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	public void getUsage()
+	public void usage()
 	{
 		println("-c <charset>: select a file charset");
 	}

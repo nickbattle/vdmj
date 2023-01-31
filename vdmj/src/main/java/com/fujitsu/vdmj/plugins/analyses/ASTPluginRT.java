@@ -24,97 +24,10 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.info;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-
-import java.io.File;
-
-import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.lex.LexTokenReader;
-import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.InternalException;
-import com.fujitsu.vdmj.messages.VDMError;
-import com.fujitsu.vdmj.syntax.ClassReader;
-
 /**
  * VDM-RT AST plugin
  */
-public class ASTPluginRT extends ASTPlugin
+public class ASTPluginRT extends ASTPluginPP
 {
-	private ASTClassList astClassList = null;
-	
-	@Override
-	protected <T> T syntaxPrepare()
-	{
-		astClassList = new ASTClassList();
-		return null;
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	protected <T> T syntaxCheck()
-	{
-		int errs = 0;
-		int warns = 0;
-		double duration = 0;
-		
-		for (File file: files)
-		{
-			ClassReader cr = null;
-			
-			try
-			{
-				LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_RT, filecharset);
-		   		long before = System.currentTimeMillis();
-				cr = new ClassReader(ltr);
-				astClassList.addAll(cr.readClasses());
-		   		long after = System.currentTimeMillis();
-		   		duration += (after - before);
-			}
-			catch (InternalException e)
-			{
-				println(e.toString());
-				errors.add(new VDMError(0, e.toString(), LexLocation.ANY));
-			}
-			catch (Throwable e)
-			{
-				println(e);
-				errors.add(new VDMError(0, e.toString(), LexLocation.ANY));
-			}
-
-			if (cr != null && cr.getErrorCount() > 0)
-			{
-				errors.addAll(cr.getErrors());
-				errs += cr.getErrorCount();
-			}
-			
-			if (cr != null && cr.getWarningCount() > 0)
-			{
-				warnings.addAll(cr.getWarnings());
-				warns += cr.getWarningCount();
-			}
-		}
-
-   		int count = astClassList.size();
-
-   		info("Parsed " + plural(count, "class", "s") + " in " +
-   			(double)(duration)/1000 + " secs. ");
-   		info(errs == 0 ? "No syntax errors" :
-   			"Found " + plural(errs, "syntax error", "s"));
-  		infoln(warns == 0 ? "" : " and " +
-  			(nowarn ? "suppressed " : "") + plural(warns, "warning", "s"));
-
-		return (T) errors;
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Mappable> T getAST()
-	{
-		return (T)astClassList;
-	}
+	// Currently identical to PP - LexTokenStream uses Settings.dialect
 }

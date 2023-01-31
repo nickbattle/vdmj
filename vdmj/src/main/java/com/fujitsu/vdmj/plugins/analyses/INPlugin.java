@@ -29,22 +29,18 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
-import com.fujitsu.vdmj.runtime.ContextException;
 
 /**
  * IN analysis plugin
@@ -103,7 +99,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	public void getUsage()
+	public void usage()
 	{
 		println("-i: run the interpreter if successfully type checked");
 		println("-e <exp>: evaluate <exp> and stop");
@@ -282,26 +278,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 	
-	protected List<VDMError> errsOf(Exception... list)
-	{
-		List<VDMError> errs = new Vector<VDMError>();
-		
-		for (Exception e: list)
-		{
-			if (e instanceof ContextException)
-			{
-				ContextException ce = (ContextException)e;
-				errs.add(new VDMError(ce));
-			}
-			else
-			{
-				errs.add(new VDMError(0, e.getMessage(), LexLocation.ANY));
-			}
-		}
-		
-		return errs;
-	}
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T handleEvent(Event event) throws Exception
 	{
@@ -311,7 +288,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		}
 		else if (event instanceof CheckCompleteEvent)
 		{
-			return interpreterInit();
+			return startInterpreter ? interpreterInit() : null;
 		}
 		else
 		{

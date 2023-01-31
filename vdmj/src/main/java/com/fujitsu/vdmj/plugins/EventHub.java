@@ -95,7 +95,7 @@ public class EventHub
 			{
 				List<T> response = listener.handleEvent(event);
 				
-				if (response != null)
+				if (response != null)	// Null => no response
 				{
 					responses.addAll(response);
 				}

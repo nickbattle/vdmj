@@ -85,7 +85,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	public void getUsage()
+	public void usage()
 	{
 		println("-w: suppress warning messages");
 	}

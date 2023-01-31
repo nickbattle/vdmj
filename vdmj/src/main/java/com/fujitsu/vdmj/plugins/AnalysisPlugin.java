@@ -25,13 +25,18 @@
 package com.fujitsu.vdmj.plugins;
 
 import java.util.List;
+import java.util.Vector;
+
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.VDMError;
+import com.fujitsu.vdmj.runtime.ContextException;
 
 /**
  * The abstract root of all VDMJ analysis plugins.
  */
 abstract public class AnalysisPlugin
 {
-	protected  EventHub eventhub;
+	protected final EventHub eventhub;
 	
 	protected AnalysisPlugin()
 	{
@@ -41,5 +46,22 @@ abstract public class AnalysisPlugin
 	public abstract String getName();
 	public abstract void init();
 	public abstract void processArgs(List<String> argv);
-	public abstract void getUsage(); 
+	public abstract void usage(); 
+
+	protected List<VDMError> errsOf(Throwable e)
+	{
+		List<VDMError> errs = new Vector<VDMError>();
+		
+		if (e instanceof ContextException)
+		{
+			ContextException ce = (ContextException)e;
+			errs.add(new VDMError(ce));
+		}
+		else
+		{
+			errs.add(new VDMError(0, e.getMessage(), LexLocation.ANY));
+		}
+		
+		return errs;
+	}
 }

@@ -67,11 +67,6 @@ public class INPluginPP extends INPlugin
 	@Override
 	protected <T> T interpreterInit()
 	{
-		if (!startInterpreter)
-		{
-			return (T) errsOf();
-		}
-		
 		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
 		TCClassList checkedClasses = tc.getTC();
 
@@ -143,7 +138,7 @@ public class INPluginPP extends INPlugin
 			return (T) errsOf(e);
 		}
 		
-		return (T) errsOf();
+		return null;
 	}
 	
 	@Override

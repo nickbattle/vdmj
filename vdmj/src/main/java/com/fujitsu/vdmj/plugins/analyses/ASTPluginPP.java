@@ -31,13 +31,11 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.File;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.InternalException;
-import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.syntax.ClassReader;
 
 /**
@@ -68,7 +66,7 @@ public class ASTPluginPP extends ASTPlugin
 			
 			try
 			{
-				LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_PP, filecharset);
+				LexTokenReader ltr = new LexTokenReader(file, Settings.dialect, filecharset);
 		   		long before = System.currentTimeMillis();
 				cr = new ClassReader(ltr);
 				astClassList.addAll(cr.readClasses());
@@ -78,12 +76,12 @@ public class ASTPluginPP extends ASTPlugin
 			catch (InternalException e)
 			{
 				println(e.toString());
-				errors.add(new VDMError(0, e.toString(), LexLocation.ANY));
+				errors.addAll(errsOf(e));
 			}
 			catch (Throwable e)
 			{
 				println(e);
-				errors.add(new VDMError(0, e.toString(), LexLocation.ANY));
+				errors.addAll(errsOf(e));
 			}
 
 			if (cr != null && cr.getErrorCount() > 0)
@@ -101,7 +99,7 @@ public class ASTPluginPP extends ASTPlugin
 
    		int count = astClassList.size();
 
-   		info("Parsed " + plural(count, "class", "s") + " in " +
+   		info("Parsed " + plural(count, "class", "es") + " in " +
    			(double)(duration)/1000 + " secs. ");
    		info(errs == 0 ? "No syntax errors" :
    			"Found " + plural(errs, "syntax error", "s"));

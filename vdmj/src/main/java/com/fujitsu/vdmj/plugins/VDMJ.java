@@ -25,8 +25,8 @@
 package com.fujitsu.vdmj.plugins;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
@@ -145,7 +145,7 @@ public class VDMJ
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
-			plugin.getUsage();
+			plugin.usage();
 		}
 		
 		System.exit(0);
@@ -153,7 +153,6 @@ public class VDMJ
 
 	private static void processArgs()
 	{
-		boolean showUsage = false;
 		Iterator<String> iter = argv.iterator();
 		
 		while (iter.hasNext())
@@ -246,21 +245,15 @@ public class VDMJ
 			else if (arg.equals("-help") || arg.equals("-?"))
 			{
 				iter.remove();
-				showUsage = true;
+				usage();
 			}
 		}
-		
 		
 		Map<String, AnalysisPlugin> plugins = PluginRegistry.getInstance().getPlugins();
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			plugin.processArgs(argv);
-		}
-		
-		if (showUsage)
-		{
-			usage();	// Exits - shows all plugins' options
 		}
 	}
 	
