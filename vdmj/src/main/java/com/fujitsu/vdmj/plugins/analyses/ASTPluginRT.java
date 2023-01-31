@@ -24,10 +24,29 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
+import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
+import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
+
 /**
  * VDM-RT AST plugin
  */
 public class ASTPluginRT extends ASTPluginPP
 {
-	// Currently identical to PP - LexTokenStream uses Settings.dialect
+	@Override
+	protected <T> T syntaxCheck()
+	{
+		T result = super.syntaxCheck();
+		
+		try
+		{
+			astClassList.add(new ASTCPUClassDefinition());
+			astClassList.add(new ASTBUSClassDefinition());
+		}
+		catch (Exception e)
+		{
+			// ignore - can't happen
+		}
+		
+		return result;
+	}
 }

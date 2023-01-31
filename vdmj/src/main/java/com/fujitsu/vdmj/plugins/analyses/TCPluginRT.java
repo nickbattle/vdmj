@@ -24,31 +24,10 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.plugins.PluginRegistry;
-
 /**
  * VDM-RT TC plugin
  */
 public class TCPluginRT extends TCPluginPP
 {
-	@Override
-	protected <T> T typeCheck()
-	{
-		try
-		{
-			ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
-			ASTClassList parsedClasses = ast.getAST();
-			parsedClasses.add(new ASTCPUClassDefinition());
-			parsedClasses.add(new ASTBUSClassDefinition());
-		}
-		catch (Exception e)
-		{
-			// Can't happen
-		}
-		
-		return super.typeCheck();
-	}
+	// Currently identical to PP
 }

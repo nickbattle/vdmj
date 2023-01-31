@@ -43,7 +43,7 @@ import com.fujitsu.vdmj.syntax.ClassReader;
  */
 public class ASTPluginPP extends ASTPlugin
 {
-	private ASTClassList astClassList = null;
+	protected ASTClassList astClassList = null;
 	
 	@Override
 	protected <T> T syntaxPrepare()
