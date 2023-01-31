@@ -125,122 +125,122 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		
 		while (iter.hasNext())
 		{
-			String arg = iter.next();
-			
-			if (arg.equals("-i"))
-			{
-				iter.remove();
-				startInterpreter = true;
-				interactive = true;
-			}
-			else if (arg.equals("-e"))
-			{
-				iter.remove();
-				startInterpreter = true;
-				interactive = false;
-				
-				if (iter.hasNext())
-				{
-					expression = iter.next();
+			switch(iter.next())
+			{			
+				case "-i":
 					iter.remove();
-				}
-				else
-				{
-					fail("-e option requires an expression");
-				}
-			}
-			else if (arg.equals("-default"))
-			{
-				iter.remove();
-				
-				if (iter.hasNext())
-				{
-					defaultName = iter.next();
+					startInterpreter = true;
+					interactive = true;
+					break;
+					
+				case "-e":
 					iter.remove();
-				}
-				else
-				{
-					fail("-default requires a name");
-				}
-			}
-			else if (arg.equals("-log"))
-			{
-				iter.remove();
-				
-				if (iter.hasNext())
-				{
-					logfile = iter.next();
+					startInterpreter = true;
+					interactive = false;
+					
+					if (iter.hasNext())
+					{
+						expression = iter.next();
+						iter.remove();
+					}
+					else
+					{
+						fail("-e option requires an expression");
+					}
+					break;
+
+				case "-default":
 					iter.remove();
-				}
-				else
-				{
-					fail("-fail requires a log file name");
-				}
+					
+					if (iter.hasNext())
+					{
+						defaultName = iter.next();
+						iter.remove();
+					}
+					else
+					{
+						fail("-default requires a name");
+					}
+					break;
+					
+				case "-log":
+					iter.remove();
+					
+					if (iter.hasNext())
+					{
+						logfile = iter.next();
+						iter.remove();
+					}
+					else
+					{
+						fail("-fail requires a log file name");
+					}
+					break;
+					
+	    		case "-pre":
+	    			iter.remove();
+	    			Settings.prechecks = false;
+	    			break;
+
+	    		case "-post":
+	    			iter.remove();
+	    			Settings.postchecks = false;
+	    			break;
+	    			
+	    		case "-inv":
+	    			iter.remove();
+	    			Settings.invchecks = false;
+	    			break;
+	    			
+	    		case "-dtc":
+	    			iter.remove();
+	    			// NB. Turn off both when no DTC
+	    			Settings.invchecks = false;
+	    			Settings.dynamictypechecks = false;
+	    			break;
+	    			
+	    		case "-exceptions":
+	    			iter.remove();
+	    			Settings.exceptions = true;
+	    			break;
+	    			
+	    		case "-measures":
+	    			iter.remove();
+	    			Settings.measureChecks = false;
+	    			break;
+	    			
+	    		case "-remote":
+	    			iter.remove();
+	    			startInterpreter = true;
+	    			interactive = false;
+	    			
+	    			if (iter.hasNext())
+	    			{
+	    				remoteControlName = iter.next();
+	    				iter.remove();
+	    			}
+	    			else
+	    			{
+	    				fail("-remote option requires a Java classname");
+	    			}
+	    			break;
+	    			
+	    		case "-simulation":
+	    			iter.remove();
+	    			startInterpreter = true;
+	    			interactive = true;
+	    			
+	    			if (iter.hasNext())
+	    			{
+	    				remoteSimulationName = iter.next();
+	    				iter.remove();
+	    			}
+	    			else
+	    			{
+	    				fail("-simulation option requires a Java classname");
+	    			}
+	    			break;
 			}
-    		else if (arg.equals("-pre"))
-    		{
-    			iter.remove();
-    			Settings.prechecks = false;
-    		}
-    		else if (arg.equals("-post"))
-    		{
-    			iter.remove();
-    			Settings.postchecks = false;
-    		}
-    		else if (arg.equals("-inv"))
-    		{
-    			iter.remove();
-    			Settings.invchecks = false;
-    		}
-    		else if (arg.equals("-dtc"))
-    		{
-    			iter.remove();
-    			// NB. Turn off both when no DTC
-    			Settings.invchecks = false;
-    			Settings.dynamictypechecks = false;
-    		}
-    		else if (arg.equals("-exceptions"))
-    		{
-    			iter.remove();
-    			Settings.exceptions = true;
-    		}
-    		else if (arg.equals("-measures"))
-    		{
-    			iter.remove();
-    			Settings.measureChecks = false;
-    		}
-    		else if (arg.equals("-remote"))
-    		{
-    			iter.remove();
-    			startInterpreter = true;
-    			interactive = false;
-    			
-    			if (iter.hasNext())
-    			{
-    				remoteControlName = iter.next();
-    				iter.remove();
-    			}
-    			else
-    			{
-    				fail("-remote option requires a Java classname");
-    			}
-    		}
-    		else if (arg.equals("-simulation"))
-    		{
-    			iter.remove();
-    			startInterpreter = true;
-    			interactive = true;
-    			
-    			if (iter.hasNext())
-    			{
-    				remoteSimulationName = iter.next();
-    				iter.remove();
-    			}
-    			else
-    			{
-    				fail("-simulation option requires a Java classname");
-    			}
-    		}
 		}
 		
 		if (logfile != null && Settings.dialect != Dialect.VDM_RT)
@@ -278,7 +278,6 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T handleEvent(Event event) throws Exception
 	{

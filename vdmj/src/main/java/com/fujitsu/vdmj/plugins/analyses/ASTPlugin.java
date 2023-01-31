@@ -110,24 +110,25 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		
 		while (iter.hasNext())
 		{
-			String arg = iter.next();
-			
-			if (arg.equals("-w"))
+			switch (iter.next())
 			{
-				nowarn = true;	// Removed in TC
-			}
-    		else if (arg.equals("-c"))
-    		{
-    			iter.remove();
-    			
-    			if (iter.hasNext())
-    			{
-    				filecharset = validateCharset(iter.next());
-    			}
-    			else
-    			{
-    				fail("-c option requires a charset name");
-    			}
+				case "-w":
+					nowarn = true;	// Removed in TC
+					break;
+					
+				case "-c":
+	    			iter.remove();
+	    			
+	    			if (iter.hasNext())
+	    			{
+	    				filecharset = validateCharset(iter.next());
+	    				iter.remove();
+	    			}
+	    			else
+	    			{
+	    				fail("-c option requires a charset name");
+	    			}
+	    			break;
     		}
 		}
 	}
