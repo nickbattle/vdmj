@@ -25,10 +25,10 @@
 package com.fujitsu.vdmj.plugins.analyses;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.RemoteControl;
@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
@@ -56,7 +57,7 @@ public class INPluginSL extends INPlugin
 	private ModuleInterpreter interpreter = null;
 	
 	@Override
-	protected <T> T interpreterPrepare()
+	protected List<VDMMessage> interpreterPrepare()
 	{
 		inModuleList = new INModuleList();
 		interpreter = null;
@@ -65,7 +66,7 @@ public class INPluginSL extends INPlugin
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected <T> T interpreterInit()
+	protected List<VDMMessage> interpreterInit()
 	{
 		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
 		TCModuleList checkedModules = tc.getTC();
@@ -74,7 +75,6 @@ public class INPluginSL extends INPlugin
 		{
    			inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedModules);
    			interpreter = new ModuleInterpreter(inModuleList, checkedModules);
-   			long before = System.currentTimeMillis();
    			ConsoleDebugReader dbg = null;
    			ConsoleKeyWatcher watcher = null;
 
@@ -104,11 +104,6 @@ public class INPluginSL extends INPlugin
    			{
    				interpreter.setDefaultName(defaultName);
    			}
-
-   			long after = System.currentTimeMillis();
-
-   	   		infoln("Initialized " + plural(inModuleList.size(), "module", "s") + " in " +
-   	   			(double)(after-before)/1000 + " secs. ");
 		}
 		catch (ContextException e)
 		{
@@ -123,7 +118,7 @@ public class INPluginSL extends INPlugin
 				e.ctxt.printStackTrace(Console.out, true);
 			}
 			
-			return (T) errsOf(e);
+			return errsOf(e);
 		}
 		catch (Exception e)
 		{
@@ -135,7 +130,7 @@ public class INPluginSL extends INPlugin
 			println("Initialization:");
 			println(e);
 
-			return (T) errsOf(e);
+			return errsOf(e);
 		}
 		
 		return null;

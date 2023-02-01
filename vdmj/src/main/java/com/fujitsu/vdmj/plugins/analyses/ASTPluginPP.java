@@ -24,18 +24,16 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.info;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-
 import java.io.File;
+import java.util.List;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ClassReader;
 
 /**
@@ -46,19 +44,16 @@ public class ASTPluginPP extends ASTPlugin
 	protected ASTClassList astClassList = null;
 	
 	@Override
-	protected <T> T syntaxPrepare()
+	protected List<VDMMessage> syntaxPrepare()
 	{
 		astClassList = new ASTClassList();
 		return null;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	protected <T> T syntaxCheck()
+	protected List<VDMMessage> syntaxCheck()
 	{
-		int errs = 0;
-		int warns = 0;
-		double duration = 0;
+		List<VDMMessage> messages = new Vector<VDMMessage>();
 		
 		for (File file: files)
 		{
@@ -67,46 +62,26 @@ public class ASTPluginPP extends ASTPlugin
 			try
 			{
 				LexTokenReader ltr = new LexTokenReader(file, Settings.dialect, filecharset);
-		   		long before = System.currentTimeMillis();
 				cr = new ClassReader(ltr);
 				astClassList.addAll(cr.readClasses());
-		   		long after = System.currentTimeMillis();
-		   		duration += (after - before);
 			}
 			catch (InternalException e)
 			{
-				println(e.toString());
-				errors.addAll(errsOf(e));
+				messages.addAll(errsOf(e));
 			}
 			catch (Throwable e)
 			{
-				println(e);
-				errors.addAll(errsOf(e));
+				messages.addAll(errsOf(e));
 			}
 
-			if (cr != null && cr.getErrorCount() > 0)
+			if (cr != null)
 			{
-				errors.addAll(cr.getErrors());
-				errs += cr.getErrorCount();
-			}
-			
-			if (cr != null && cr.getWarningCount() > 0)
-			{
-				warnings.addAll(cr.getWarnings());
-				warns += cr.getWarningCount();
+				messages.addAll(cr.getErrors());
+				messages.addAll(cr.getWarnings());
 			}
 		}
 
-   		int count = astClassList.size();
-
-   		info("Parsed " + plural(count, "class", "es") + " in " +
-   			(double)(duration)/1000 + " secs. ");
-   		info(errs == 0 ? "No syntax errors" :
-   			"Found " + plural(errs, "syntax error", "s"));
-  		infoln(warns == 0 ? "" : " and " +
-  			(nowarn ? "suppressed " : "") + plural(warns, "warning", "s"));
-
-		return (T) errors;
+		return messages;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -114,5 +89,11 @@ public class ASTPluginPP extends ASTPlugin
 	public <T extends Mappable> T getAST()
 	{
 		return (T)astClassList;
+	}
+
+	@Override
+	public int getCount()
+	{
+		return astClassList.size();
 	}
 }

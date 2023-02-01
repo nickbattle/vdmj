@@ -24,16 +24,14 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.info;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import java.util.List;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
@@ -48,7 +46,7 @@ public class TCPluginSL extends TCPlugin
 	private TCModuleList tcModuleList = null;
 	
 	@Override
-	protected <T> T typeCheckPrepare()
+	protected List<VDMMessage> typeCheckPrepare()
 	{
 		tcModuleList = new TCModuleList();
 		return null;
@@ -56,54 +54,31 @@ public class TCPluginSL extends TCPlugin
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected <T> T typeCheck()
+	protected List<VDMMessage> typeCheck()
 	{
-		long before = System.currentTimeMillis();
-		int terrs = 0;
 		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
 		ASTModuleList parsedModules = ast.getAST();
+		List<VDMMessage> messages = new Vector<VDMMessage>();
 
 		try
    		{
    			tcModuleList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedModules);
-   			terrs += tcModuleList.combineDefaults();
-
    			TypeChecker typeChecker = new ModuleTypeChecker(tcModuleList);
    			typeChecker.typeCheck();
    		}
 		catch (InternalException e)
 		{
-			println(e.toString());
+			messages.addAll(errsOf(e));
 		}
 		catch (Throwable e)
 		{
-			println(e);
-			terrs++;
+			messages.addAll(errsOf(e));
 		}
 
-   		long after = System.currentTimeMillis();
-		terrs += TypeChecker.getErrorCount();
+		messages.addAll(TypeChecker.getErrors());
+		messages.addAll(TypeChecker.getWarnings());
 
-		if (terrs > 0)
-		{
-			TypeChecker.printErrors(Console.out);
-		}
-
-  		int twarn = TypeChecker.getWarningCount();
-
-		if (twarn > 0 && !nowarn)
-		{
-			TypeChecker.printWarnings(Console.out);
-		}
-
-		info("Type checked " + plural(tcModuleList.size(), "module", "s") +
-			" in " + (double)(after-before)/1000 + " secs. ");
-  		info(terrs == 0 ? "No type errors" :
-  			"Found " + plural(terrs, "type error", "s"));
-  		infoln(twarn == 0 ? "" : " and " +
-  			(nowarn ? "suppressed " : "") + plural(twarn, "warning", "s"));
-
-		return (T) errors;
+		return messages;
 	}
 	
 	@SuppressWarnings("unchecked")

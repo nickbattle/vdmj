@@ -32,6 +32,7 @@ import java.util.List;
 
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
@@ -111,7 +112,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	}
 
 	@Override
-	public <T> T handleEvent(Event event) throws Exception
+	public List<VDMMessage> handleEvent(Event event) throws Exception
 	{
 		if (event instanceof CheckSyntaxEvent)
 		{

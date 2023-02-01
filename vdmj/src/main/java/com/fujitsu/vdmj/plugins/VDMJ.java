@@ -25,7 +25,9 @@
 package com.fujitsu.vdmj.plugins;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
+import static com.fujitsu.vdmj.plugins.PluginConsole.info;
 import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
@@ -52,6 +54,8 @@ import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMError;
+import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 import com.fujitsu.vdmj.plugins.analyses.INPlugin;
 import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
@@ -71,11 +75,13 @@ public class VDMJ
 {
 	private static List<String> argv = null;
 	private static List<File> paths = null;
+	private static boolean nowarn = false;
 
 	public static void main(String[] args)
 	{
 		argv = new Vector<String>(Arrays.asList(args));
 		paths = new Vector<File>();
+		nowarn = false;
 		
 		Properties.init();
 		setDialect(argv);
@@ -93,14 +99,18 @@ public class VDMJ
 				if (runNeeded())
 				{
 					result = run();
-					if (result != ExitStatus.RELOAD) infoln("Bye");
 				}
+			}
+			else
+			{
+				result = ExitStatus.EXIT_ERRORS;
 			}
 
 			complete();
 		}
 		while (result == ExitStatus.RELOAD);
 		
+		infoln("Bye");
 		System.exit(result == ExitStatus.EXIT_OK ? 0 : 1);
 	}
 	
@@ -157,95 +167,101 @@ public class VDMJ
 		
 		while (iter.hasNext())
 		{
-			String arg = iter.next();
-			
-    		if (arg.equals("-r"))
-    		{
-    			iter.remove();
-    			
-    			if (iter.hasNext())
-    			{
-    				Settings.release = Release.lookup(iter.next());
-       				iter.remove();
-       			 
-    				if (Settings.release == null)
-    				{
-    					fail("-r option must be " + Release.list());
-    				}
-    			}
-    			else
-    			{
-    				fail("-r option requires a VDM release");
-    			}
-    		}
-    		else if (arg.equals("-v"))		// Exit if this option is used.
-    		{
-    			iter.remove();
-    			String version = getVersion();
-
-    			if (version == null)
-    			{
-    				println("Cannot determine VDMJ version");
-        			System.exit(1);
-    			}
-    			else
-    			{
-    				println("VDMJ version = " + version);
-        			System.exit(0);
-    			}
-    		}
-    		else if (arg.equals("-t"))
-    		{
-    			iter.remove();
-    			
-    			if (iter.hasNext())
-    			{
-    				Console.init(validateCharset(iter.next()));
-    				iter.remove();
-    			}
-    			else
-    			{
-    				fail("-t option requires a charset name");
-    			}
-    		}
-			else if (arg.equals("-path"))
+			switch (iter.next())
 			{
-				iter.remove();
-				
-				if (iter.hasNext())
-				{
-					paths.add(new File(iter.next()));
+				case "-w":
 					iter.remove();
-				}
-				else
-				{
-					fail("-path requires a directory");
-				}
-			}
-			else if (arg.equals("-verbose"))
-			{
-				Settings.verbose = true;
-				iter.remove();
-			}
-			else if (arg.equals("-annotations"))
-			{
-				Settings.annotations = true;
-				iter.remove();
-			}
-			else if (arg.equals("-strict"))
-			{
-				Settings.strict = true;
-				iter.remove();
-			}
-			else if (arg.equals("-q"))
-			{
-				PluginConsole.quiet = true;
-				iter.remove();
-			}
-			else if (arg.equals("-help") || arg.equals("-?"))
-			{
-				iter.remove();
-				usage();
+					nowarn = true;
+					break;
+					
+				case "-r":
+	    			iter.remove();
+	    			
+	    			if (iter.hasNext())
+	    			{
+	    				Settings.release = Release.lookup(iter.next());
+	       				iter.remove();
+	       			 
+	    				if (Settings.release == null)
+	    				{
+	    					fail("-r option must be " + Release.list());
+	    				}
+	    			}
+	    			else
+	    			{
+	    				fail("-r option requires a VDM release");
+	    			}
+	    			break;
+
+				case "-v":		// Exit if this option is used.
+	    			iter.remove();
+	    			String version = getVersion();
+	
+	    			if (version == null)
+	    			{
+	    				println("Cannot determine VDMJ version");
+	        			System.exit(1);
+	    			}
+	    			else
+	    			{
+	    				println("VDMJ version = " + version);
+	        			System.exit(0);
+	    			}
+	    			break;
+
+	    		case "-t":
+	    			iter.remove();
+	    			
+	    			if (iter.hasNext())
+	    			{
+	    				Console.init(validateCharset(iter.next()));
+	    				iter.remove();
+	    			}
+	    			else
+	    			{
+	    				fail("-t option requires a charset name");
+	    			}
+	    			break;
+
+				case "-path":
+					iter.remove();
+					
+					if (iter.hasNext())
+					{
+						paths.add(new File(iter.next()));
+						iter.remove();
+					}
+					else
+					{
+						fail("-path requires a directory");
+					}
+	    			break;
+
+				case "-verbose":
+					Settings.verbose = true;
+					iter.remove();
+	    			break;
+
+				case "-annotations":
+					Settings.annotations = true;
+					iter.remove();
+	    			break;
+
+				case "-strict":
+					Settings.strict = true;
+					iter.remove();
+	    			break;
+
+				case "-q":
+					PluginConsole.quiet = true;
+					iter.remove();
+	    			break;
+
+				case "-help":
+				case "-?":
+					iter.remove();
+					usage();
+	    			break;
 			}
 		}
 		
@@ -390,27 +406,25 @@ public class VDMJ
 		try
 		{
 			EventHub eventhub = EventHub.getInstance();
-			List<VDMError> errList = new Vector<VDMError>();
-			
 			Event event = new CheckPrepareEvent();
-			errList = eventhub.publish(event);
+			List<VDMMessage> messages = eventhub.publish(event);
 
-			if (errList.isEmpty())
+			if (report(messages, "Prepared", "preparation"))
 			{
 				event = new CheckSyntaxEvent();
-				errList.addAll(eventhub.publish(event));
+				messages = eventhub.publish(event);
 				
-				if (errList.isEmpty())
+				if (report(messages, "Parsed", "syntax"))
 				{
 					event = new CheckTypeEvent();
-					errList.addAll(eventhub.publish(event));
+					messages = eventhub.publish(event);
 
-					if (errList.isEmpty())
+					if (report(messages, "Type checked", "type"))
 					{
 						event = new CheckCompleteEvent();
-						errList.addAll(eventhub.publish(event));
+						messages = eventhub.publish(event);
 
-						if (errList.isEmpty())
+						if (report(messages, "Initialized", "init"))
 						{
 							verbose("Loaded files initialized successfully");
 							return true;
@@ -418,25 +432,25 @@ public class VDMJ
 						else
 						{
 							verbose("Failed to initialize interpreter");
-							errList.addAll(eventhub.publish(new CheckFailedEvent(event)));
+							messages.addAll(eventhub.publish(new CheckFailedEvent(event)));
 						}
 					}
 					else
 					{
 						verbose("Type checking errors found");
-						errList.addAll(eventhub.publish(new CheckFailedEvent(event)));
+						messages.addAll(eventhub.publish(new CheckFailedEvent(event)));
 					}
 				}
 				else
 				{
 					verbose("Syntax errors found");
-					errList.addAll(eventhub.publish(new CheckFailedEvent(event)));
+					messages.addAll(eventhub.publish(new CheckFailedEvent(event)));
 				}
 			}
 			else
 			{
 				verbose("Preparation errors found");
-				errList.addAll(eventhub.publish(new CheckFailedEvent(event)));
+				messages.addAll(eventhub.publish(new CheckFailedEvent(event)));
 			}
 		}
 		catch (Exception e)
@@ -446,6 +460,43 @@ public class VDMJ
 		}
 		
 		return false;
+	}
+	
+	private static boolean report(List<VDMMessage> messages, String verb, String kind)
+	{
+		int errors = 0;
+		int warnings = 0;
+		
+		for (VDMMessage m: messages)
+		{
+			if (m instanceof VDMError)
+			{
+				println(m.toString());
+				errors++;
+			}
+			else if (m instanceof VDMWarning)
+			{
+				if (!nowarn) println(m.toString());
+				warnings++;
+			}
+		}
+		
+		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
+
+		String objects = Settings.dialect == Dialect.VDM_SL ?
+			plural(ast.getCount(), "module", "s") :
+			plural(ast.getCount(), "class", "es");
+			
+		double duration = (double)(EventHub.getInstance().getLastDuration())/1000;
+		
+		if (errors > 0 || warnings > 0 || !verb.equals("Prepared"))
+		{
+	   		info(verb + " " + objects + " in " + duration + " secs. ");
+	   		info(errors == 0 ? "No " + kind + " errors" : "Found " + plural(errors, kind + " error", "s"));
+	  		infoln(warnings == 0 ? "" : " and " + (nowarn ? "suppressed " : "") + plural(warnings, "warning", "s"));
+		}
+		
+		return (errors == 0);
 	}
 	
 	private static boolean runNeeded()

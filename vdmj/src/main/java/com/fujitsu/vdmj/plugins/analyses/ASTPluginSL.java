@@ -24,19 +24,16 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.info;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-
 import java.io.File;
+import java.util.List;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ModuleReader;
 
 /**
@@ -47,7 +44,7 @@ public class ASTPluginSL extends ASTPlugin
 	private ASTModuleList astModuleList = null;
 	
 	@Override
-	protected <T> T syntaxPrepare()
+	protected List<VDMMessage> syntaxPrepare()
 	{
 		astModuleList = new ASTModuleList();
 		return null;
@@ -55,9 +52,9 @@ public class ASTPluginSL extends ASTPlugin
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected <T> T syntaxCheck()
+	protected List<VDMMessage> syntaxCheck()
 	{
-		double duration = 0;
+		List<VDMMessage> messages = new Vector<VDMMessage>();
 		
 		for (File file: files)
 		{
@@ -67,45 +64,25 @@ public class ASTPluginSL extends ASTPlugin
 			{
 				LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL, filecharset);
 				mr = new ModuleReader(ltr);
-				long before = System.currentTimeMillis();
 				astModuleList.addAll(mr.readModules());
-				long after = System.currentTimeMillis();
-				duration += (after - before);
 			}
 			catch (InternalException e)
 			{
-				println(e.toString());
-				errors.addAll(errsOf(e));
+				messages.addAll(errsOf(e));
 			}
 			catch (Throwable e)
 			{
-				println(e);
-				errors.addAll(errsOf(e));
+				messages.addAll(errsOf(e));
 			}
 
-			if (mr != null && mr.getErrorCount() > 0)
+			if (mr != null)
 			{
-				errors.addAll(mr.getErrors());
-    			mr.printErrors(Console.out);
-			}
-
-			if (mr != null && mr.getWarningCount() > 0)
-			{
-				warnings.addAll(mr.getWarnings());
-    			mr.printWarnings(Console.out);
+				messages.addAll(mr.getErrors());
+				messages.addAll(mr.getWarnings());
 			}
 		}
-	
-   		int count = astModuleList.getModuleNames().size();
 
-   		info("Parsed " + plural(count, "module", "s") + " in " +
-   			(double)(duration)/1000 + " secs. ");
-   		info(errors.isEmpty() ? "No syntax errors" :
-   			"Found " + plural(errors.size(), "syntax error", "s"));
-  		infoln(warnings.isEmpty() ? "" : " and " +
-  			(nowarn ? "suppressed " : "") + plural(warnings.size(), "warning", "s"));
-
-		return (T) errors;
+		return messages;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -113,5 +90,11 @@ public class ASTPluginSL extends ASTPlugin
 	public <T extends Mappable> T getAST()
 	{
 		return (T)astModuleList;
+	}
+
+	@Override
+	public int getCount()
+	{
+		return astModuleList.getModuleNames().size();
 	}
 }

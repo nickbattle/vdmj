@@ -29,6 +29,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMError;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.runtime.ContextException;
 
 /**
@@ -48,9 +49,9 @@ abstract public class AnalysisPlugin
 	public abstract void processArgs(List<String> argv);
 	public abstract void usage(); 
 
-	protected List<VDMError> errsOf(Throwable e)
+	protected List<VDMMessage> errsOf(Throwable e)
 	{
-		List<VDMError> errs = new Vector<VDMError>();
+		List<VDMMessage> errs = new Vector<VDMMessage>();
 		
 		if (e instanceof ContextException)
 		{

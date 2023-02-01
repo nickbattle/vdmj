@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.events.Event;
 
 /**
@@ -38,6 +39,7 @@ import com.fujitsu.vdmj.plugins.events.Event;
 public class EventHub
 {
 	private static EventHub INSTANCE = null;
+	private long lastDuration = 0;
 	
 	private final Map<String, List<EventListener>> registrations;
 	
@@ -84,16 +86,17 @@ public class EventHub
 		return registrations.get(type.getKey());
 	}
 	
-	public <T> List<T> publish(Event event) throws Exception
+	public List<VDMMessage> publish(Event event) throws Exception
 	{
 		List<EventListener> list = registrations.get(event.getKey());
-		List<T> responses = new Vector<T>();
+		List<VDMMessage> responses = new Vector<VDMMessage>();
+		long before = System.currentTimeMillis();
 
 		if (list != null)
 		{
 			for (EventListener listener: list)
 			{
-				List<T> response = listener.handleEvent(event);
+				List<VDMMessage> response = listener.handleEvent(event);
 				
 				if (response != null)	// Null => no response
 				{
@@ -102,6 +105,12 @@ public class EventHub
 			}
 		}
 		
+		lastDuration = System.currentTimeMillis() - before;
 		return responses;
+	}
+	
+	public long getLastDuration()
+	{
+		return lastDuration;
 	}
 }

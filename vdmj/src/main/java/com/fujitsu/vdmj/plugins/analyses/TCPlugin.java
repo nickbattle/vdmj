@@ -26,14 +26,11 @@ package com.fujitsu.vdmj.plugins.analyses;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMError;
-import com.fujitsu.vdmj.messages.VDMWarning;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
@@ -45,10 +42,6 @@ import com.fujitsu.vdmj.plugins.events.Event;
  */
 abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 {
-	protected List<VDMError> errors;
-	protected List<VDMWarning> warnings;
-	protected boolean nowarn;
-	
 	@Override
 	public String getName()
 	{
@@ -58,10 +51,6 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		errors = new Vector<VDMError>();
-		warnings = new Vector<VDMWarning>();
-		nowarn = false;
-		
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckTypeEvent.class, this);
 	}
@@ -93,27 +82,14 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void processArgs(List<String> argv)
 	{
-		Iterator<String> iter = argv.iterator();
-		
-		while (iter.hasNext())
-		{
-			switch (iter.next())
-			{
-				case "-w":
-					nowarn = true;
-					iter.remove();
-					break;
-			}
-		}
+		return;		// None as yet
 	}
 
 	@Override
-	public <T> T handleEvent(Event event) throws Exception
+	public List<VDMMessage> handleEvent(Event event) throws Exception
 	{
 		if (event instanceof CheckPrepareEvent)
 		{
-			errors.clear();
-			warnings.clear();
 			return typeCheckPrepare();
 		}
 		else if (event instanceof CheckTypeEvent)
@@ -126,9 +102,9 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
-	abstract protected <T> T typeCheckPrepare();
+	abstract protected List<VDMMessage> typeCheckPrepare();
 
-	abstract protected <T> T typeCheck();
+	abstract protected List<VDMMessage> typeCheck();
 
 	abstract public <T extends Mappable> T getTC();
 }

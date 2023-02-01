@@ -24,8 +24,11 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
+import java.util.List;
+
 import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
+import com.fujitsu.vdmj.messages.VDMMessage;
 
 /**
  * VDM-RT AST plugin
@@ -33,9 +36,9 @@ import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
 public class ASTPluginRT extends ASTPluginPP
 {
 	@Override
-	protected <T> T syntaxCheck()
+	protected List<VDMMessage> syntaxCheck()
 	{
-		T result = super.syntaxCheck();
+		List<VDMMessage> result = super.syntaxCheck();
 		
 		try
 		{

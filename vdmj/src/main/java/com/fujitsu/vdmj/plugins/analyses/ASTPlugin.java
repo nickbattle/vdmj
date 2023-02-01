@@ -36,8 +36,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMError;
-import com.fujitsu.vdmj.messages.VDMWarning;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
@@ -51,9 +50,6 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 {
 	protected List<File> files;
 	protected Charset filecharset;
-	protected List<VDMError> errors;
-	protected List<VDMWarning> warnings;
-	protected boolean nowarn;
 	
 	@Override
 	public String getName()
@@ -66,9 +62,6 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	{
 		files = new Vector<File>();
 		filecharset = Charset.defaultCharset();
-		errors = new Vector<VDMError>();
-		warnings = new Vector<VDMWarning>();
-		nowarn = false;
 		
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckSyntaxEvent.class, this);
@@ -98,6 +91,11 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		println("-c <charset>: select a file charset");
 	}
 	
+	public void setFiles(List<File> files)
+	{
+		this.files = files;
+	}
+
 	public List<File> getFiles()
 	{
 		return files;
@@ -112,10 +110,6 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		{
 			switch (iter.next())
 			{
-				case "-w":
-					nowarn = true;	// Removed in TC
-					break;
-					
 				case "-c":
 	    			iter.remove();
 	    			
@@ -133,18 +127,11 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 	
-	public void setFiles(List<File> files)
-	{
-		this.files = files;
-	}
-
 	@Override
-	public <T> T handleEvent(Event event) throws Exception
+	public List<VDMMessage> handleEvent(Event event) throws Exception
 	{
 		if (event instanceof CheckPrepareEvent)
 		{
-			errors.clear();
-			warnings.clear();
 			return syntaxPrepare();
 		}
 		else if (event instanceof CheckSyntaxEvent)
@@ -157,9 +144,11 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 
-	abstract protected <T> T syntaxPrepare();
+	abstract protected List<VDMMessage> syntaxPrepare();
 
-	abstract protected <T> T syntaxCheck();
+	abstract protected List<VDMMessage> syntaxCheck();
 
 	abstract public <T extends Mappable> T getAST();
+	
+	abstract public int getCount();
 }

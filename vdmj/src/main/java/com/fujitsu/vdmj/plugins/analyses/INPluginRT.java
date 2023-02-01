@@ -28,10 +28,12 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.List;
 
 import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.messages.RTLogger;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
@@ -50,9 +52,8 @@ public class INPluginRT extends INPluginPP
 		eventhub.register(ShutdownEvent.class, this);
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T handleEvent(Event event) throws Exception
+	public List<VDMMessage> handleEvent(Event event) throws Exception
 	{
 		if (event instanceof CheckSyntaxEvent)
 		{
@@ -69,7 +70,7 @@ public class INPluginRT extends INPluginPP
 				catch (Exception ex)
 				{
 					println("Simulation: " + ex.getMessage());
-					return (T) errsOf(ex);
+					return errsOf(ex);
 				}
 			}
 
@@ -91,9 +92,8 @@ public class INPluginRT extends INPluginPP
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	protected <T> T interpreterInit()
+	protected List<VDMMessage> interpreterInit()
 	{
 		if (logfile != null)
 		{
@@ -105,7 +105,7 @@ public class INPluginRT extends INPluginPP
     		catch (FileNotFoundException e)
     		{
     			println("Cannot create RT event log: " + e.getMessage());
-    			return (T) errsOf(e);
+    			return errsOf(e);
     		}
 		}
 		

@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
@@ -279,7 +280,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	public <T> T handleEvent(Event event) throws Exception
+	public List<VDMMessage> handleEvent(Event event) throws Exception
 	{
 		if (event instanceof CheckPrepareEvent)
 		{
@@ -295,9 +296,9 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 	
-	abstract protected <T> T interpreterPrepare();
+	abstract protected List<VDMMessage> interpreterPrepare();
 
-	abstract protected <T> T interpreterInit();
+	abstract protected List<VDMMessage> interpreterInit();
 
 	abstract public ExitStatus interpreterRun();
 
