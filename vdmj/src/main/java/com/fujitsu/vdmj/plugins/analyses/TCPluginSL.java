@@ -63,6 +63,7 @@ public class TCPluginSL extends TCPlugin
 		try
    		{
    			tcModuleList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedModules);
+   			tcModuleList.combineDefaults();
    			TypeChecker typeChecker = new ModuleTypeChecker(tcModuleList);
    			typeChecker.typeCheck();
    		}
