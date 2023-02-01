@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>v2c</artifactId>
-    <name>V2C</name>
+    <name>Example V2C Class Mapper</name>
     <description>Example VDM to C class mapper implementation</description>
 
     <dependencies>

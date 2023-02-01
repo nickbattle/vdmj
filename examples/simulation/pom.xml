@@ -11,7 +11,7 @@
 	</parent>
 
 	<artifactId>simulation</artifactId>
-	<name>Simulation</name>
+	<name>Example Simulation</name>
 	<description>An example RemoteSimulation</description>
 	
 	<dependencies>
