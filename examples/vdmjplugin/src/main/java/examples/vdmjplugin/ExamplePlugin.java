@@ -125,7 +125,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		return null;
 	}
 
-	abstract protected <T> T checkDefinitions();
+	abstract protected List<VDMMessage> checkDefinitions();
 	
 	protected String InitialUpper(LexNameToken name)
 	{

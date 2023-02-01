@@ -25,8 +25,7 @@
 package examples.vdmjplugin;
 
 /**
- * @author nick
- *
+ * Example VDMJ plugin
  */
 public class ExamplePluginRT extends ExamplePluginPP
 {
