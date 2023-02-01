@@ -71,9 +71,9 @@ public class PluginConsole
 		}
 	}
 
-	public static void println(String m)
+	public static void println(Object m)
 	{
-		Console.out.println(m);
+		Console.out.println(m.toString());
 	}
 
 	public static void println(Throwable throwable)

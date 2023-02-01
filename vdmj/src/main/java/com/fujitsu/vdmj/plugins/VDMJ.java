@@ -483,18 +483,22 @@ public class VDMJ
 		}
 		
 		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
+		int count = ast.getCount();
 
-		String objects = Settings.dialect == Dialect.VDM_SL ?
-			plural(ast.getCount(), "module", "s") :
-			plural(ast.getCount(), "class", "es");
-			
-		double duration = (double)(EventHub.getInstance().getLastDuration())/1000;
-		
-		if (errors > 0 || warnings > 0 || !verb.equals("Prepared"))
+		if (count > 0)	// Just using -i gives count = 0
 		{
-	   		info(verb + " " + objects + " in " + duration + " secs. ");
-	   		info(errors == 0 ? "No " + kind + " errors" : "Found " + plural(errors, kind + " error", "s"));
-	  		infoln(warnings == 0 ? "" : " and " + (nowarn ? "suppressed " : "") + plural(warnings, "warning", "s"));
+			String objects = Settings.dialect == Dialect.VDM_SL ?
+				plural(count, "module", "s") :
+				plural(count, "class", "es");
+				
+			double duration = (double)(EventHub.getInstance().getLastDuration())/1000;
+			
+			if (errors > 0 || warnings > 0 || !verb.equals("Prepared"))
+			{
+		   		info(verb + " " + objects + " in " + duration + " secs. ");
+		   		info(errors == 0 ? "No " + kind + " errors" : "Found " + plural(errors, kind + " error", "s"));
+		  		infoln(warnings == 0 ? "" : " and " + (nowarn ? "suppressed " : "") + plural(warnings, "warning", "s"));
+			}
 		}
 		
 		return (errors == 0);	// Return "OK" if we can continue (ie. no errors)

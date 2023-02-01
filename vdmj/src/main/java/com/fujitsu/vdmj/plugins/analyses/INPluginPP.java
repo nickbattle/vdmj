@@ -150,7 +150,7 @@ public class INPluginPP extends INPlugin
 			}
 			else if (expression != null)
 			{
-				println(interpreter.execute(expression).toString());
+				println(interpreter.execute(expression));
 				return ExitStatus.EXIT_OK;
 			}
 			else if (remoteClass != null)
