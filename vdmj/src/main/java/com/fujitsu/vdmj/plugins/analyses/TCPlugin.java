@@ -97,12 +97,12 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 		
 		while (iter.hasNext())
 		{
-			String arg = iter.next();
-			
-			if (arg.equals("-w"))
+			switch (iter.next())
 			{
-				nowarn = true;
-				iter.remove();
+				case "-w":
+					nowarn = true;
+					iter.remove();
+					break;
 			}
 		}
 	}

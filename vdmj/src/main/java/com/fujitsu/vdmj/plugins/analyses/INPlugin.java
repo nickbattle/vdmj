@@ -47,8 +47,8 @@ import com.fujitsu.vdmj.plugins.events.Event;
  */
 abstract public class INPlugin extends AnalysisPlugin implements EventListener
 {
-	protected boolean startInterpreter;
-	protected boolean interactive;
+	protected boolean startInterpreter;		// eg. -e or -remote as well as -i
+	protected boolean interactive;			// eg. -i or -simulation
 	protected String defaultName;
 	protected String expression;
 	protected String logfile;
