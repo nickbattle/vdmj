@@ -329,7 +329,8 @@ public class VDMJ
 				// All legal options and their arguments should have been removed by
 				// this point, so we assume filenames cannot start with "-"!
 				
-				fail("Unexpected option: " + arg);
+				println("Unexpected option: " + arg);
+				usage();
 			}
 			
 			File file = new File(arg);
@@ -496,7 +497,7 @@ public class VDMJ
 	  		infoln(warnings == 0 ? "" : " and " + (nowarn ? "suppressed " : "") + plural(warnings, "warning", "s"));
 		}
 		
-		return (errors == 0);
+		return (errors == 0);	// Return "OK" if we can continue (ie. no errors)
 	}
 	
 	private static boolean runNeeded()
