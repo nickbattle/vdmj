@@ -296,9 +296,9 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 	
-	abstract protected List<VDMMessage> interpreterPrepare();
+	abstract public List<VDMMessage> interpreterPrepare();
 
-	abstract protected List<VDMMessage> interpreterInit();
+	abstract public List<VDMMessage> interpreterInit();
 
 	abstract public ExitStatus interpreterRun();
 

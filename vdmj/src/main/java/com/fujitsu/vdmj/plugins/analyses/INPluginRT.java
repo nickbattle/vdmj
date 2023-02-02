@@ -93,7 +93,7 @@ public class INPluginRT extends INPluginPP
 	}
 
 	@Override
-	protected List<VDMMessage> interpreterInit()
+	public List<VDMMessage> interpreterInit()
 	{
 		if (logfile != null)
 		{

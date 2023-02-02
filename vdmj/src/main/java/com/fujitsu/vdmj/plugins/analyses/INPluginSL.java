@@ -57,16 +57,15 @@ public class INPluginSL extends INPlugin
 	private ModuleInterpreter interpreter = null;
 	
 	@Override
-	protected List<VDMMessage> interpreterPrepare()
+	public List<VDMMessage> interpreterPrepare()
 	{
 		inModuleList = new INModuleList();
 		interpreter = null;
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	protected List<VDMMessage> interpreterInit()
+	public List<VDMMessage> interpreterInit()
 	{
 		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
 		TCModuleList checkedModules = tc.getTC();
@@ -144,9 +143,12 @@ public class INPluginSL extends INPlugin
 			if (interactive)
 			{
 				infoln("Interpreter started");
+				
 				CommandReader reader = new ModuleCommandReader(interpreter, "> ");
 				ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
 				return reader.run(ast.getFiles());
+				
+//				return new com.fujitsu.vdmj.plugins.CommandReader().run();
 			}
 			else if (expression != null)
 			{

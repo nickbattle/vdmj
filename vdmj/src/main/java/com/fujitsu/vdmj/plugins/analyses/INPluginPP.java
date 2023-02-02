@@ -57,7 +57,7 @@ public class INPluginPP extends INPlugin
 	private ClassInterpreter interpreter = null;
 	
 	@Override
-	protected List<VDMMessage> interpreterPrepare()
+	public List<VDMMessage> interpreterPrepare()
 	{
 		inClassList = new INClassList();
 		interpreter = null;
@@ -66,7 +66,7 @@ public class INPluginPP extends INPlugin
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected List<VDMMessage> interpreterInit()
+	public List<VDMMessage> interpreterInit()
 	{
 		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
 		TCClassList checkedClasses = tc.getTC();

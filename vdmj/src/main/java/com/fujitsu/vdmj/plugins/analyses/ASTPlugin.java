@@ -37,8 +37,10 @@ import java.util.Vector;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
+import com.fujitsu.vdmj.plugins.commands.ASTCommand;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
@@ -101,6 +103,17 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		return files;
 	}
 	
+	public void checkForUpdates(long timestamp)
+	{
+		for (File file: files)
+		{
+			if (file.lastModified() > timestamp)
+			{
+				println("File " + file + " has changed");
+			}
+		}
+	}
+	
 	@Override
 	public void processArgs(List<String> argv)
 	{
@@ -151,4 +164,17 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	abstract public <T extends Mappable> T getAST();
 	
 	abstract public int getCount();
+	
+	@Override
+	public AnalysisCommand getCommand(String[] argv)
+	{
+		switch (argv[0])
+		{
+			case "files":
+				return new ASTCommand(argv);
+				
+			default:
+				return null;
+		}
+	}
 }

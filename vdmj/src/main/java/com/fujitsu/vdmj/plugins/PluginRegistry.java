@@ -24,8 +24,12 @@
 
 package com.fujitsu.vdmj.plugins;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.*;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import com.fujitsu.vdmj.plugins.commands.ErrorCommand;
 
 public class PluginRegistry
 {
@@ -71,5 +75,42 @@ public class PluginRegistry
 	public Map<String, AnalysisPlugin> getPlugins()
 	{
 		return plugins;
+	}
+	
+	public AnalysisCommand getCommand(String[] argv)
+	{
+		AnalysisCommand result = null;
+		
+		for (AnalysisPlugin plugin: plugins.values())
+		{
+			try
+			{
+				AnalysisCommand c = plugin.getCommand(argv);
+				
+				if (c != null)
+				{
+					if (result != null)
+					{
+						verbose("Multiple plugins support " + argv[0]);
+					}
+					
+					result = c;		// Note, override earlier results
+				}
+			}
+			catch (IllegalArgumentException e)	// Usage failed
+			{
+				return new ErrorCommand(e); 
+			}
+		}
+		
+		return result;
+	}
+
+	public void getHelp()
+	{
+		for (AnalysisPlugin plugin: plugins.values())
+		{
+			plugin.help();
+		}
 	}
 }

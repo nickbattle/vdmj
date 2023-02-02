@@ -47,7 +47,17 @@ abstract public class AnalysisPlugin
 	public abstract String getName();
 	public abstract void init();
 	public abstract void processArgs(List<String> argv);
-	public abstract void usage(); 
+	public abstract void usage();
+	
+	public AnalysisCommand getCommand(String[] argv)
+	{
+		return null;
+	}
+	
+	public void help()
+	{
+		return;		// CommandReader help
+	}
 
 	protected List<VDMMessage> errsOf(Throwable e)
 	{
