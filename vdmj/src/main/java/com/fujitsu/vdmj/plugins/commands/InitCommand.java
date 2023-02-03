@@ -67,11 +67,10 @@ public class InitCommand extends AnalysisCommand
 			watch.start();
 			
    			long before = System.currentTimeMillis();
-   			
    			Interpreter.getInstance().init();
+   			long after = System.currentTimeMillis();
    			
    			println("Global context initialized");
-   			long after = System.currentTimeMillis();
 			println("Executed in " + (double)(after-before)/1000 + " secs. ");
 		}
 		catch (Throwable e)
