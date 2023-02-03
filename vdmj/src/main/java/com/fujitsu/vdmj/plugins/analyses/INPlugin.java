@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
+import com.fujitsu.vdmj.plugins.CommandList;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
@@ -334,24 +335,21 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	{
 		return interactive;
 	}
+
+	protected CommandList commonCommands = new CommandList
+	(
+		PrintCommand.class
+	);
 	
 	@Override
 	public AnalysisCommand getCommand(String[] argv)
 	{
-		switch (argv[0])
-		{
-			case "print":
-			case "p":
-				return new PrintCommand(argv);
-				
-			default:
-				return null;
-		}
+		return lookup(argv, commonCommands);
 	}
 	
 	@Override
 	public void help()
 	{
-		println("[p]rint <exp>: evaluate expression");
+		showHelp(commonCommands);
 	}
 }

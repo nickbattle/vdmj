@@ -128,4 +128,9 @@ public class PrintCommand extends AnalysisCommand
 			}
 		}
 	}
+	
+	public void help()
+	{
+		println("print <exp>: evaluate an expression");
+	}
 }

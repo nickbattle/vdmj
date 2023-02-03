@@ -63,7 +63,6 @@ public class INPluginPP extends INPlugin
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<VDMMessage> interpreterInit()
 	{

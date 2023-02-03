@@ -24,7 +24,10 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
+import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
+import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -37,6 +40,7 @@ import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
+import com.fujitsu.vdmj.plugins.CommandList;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.commands.FilesCommand;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
@@ -163,22 +167,20 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract public int getCount();
 	
+	protected CommandList commonCommands = new CommandList
+	(
+		FilesCommand.class
+	);
+	
 	@Override
 	public AnalysisCommand getCommand(String[] argv)
 	{
-		switch (argv[0])
-		{
-			case "files":
-				return new FilesCommand(argv);
-				
-			default:
-				return null;
-		}
+		return lookup(argv, commonCommands);
 	}
 	
 	@Override
 	public void help()
 	{
-		println("files: list the loaded files");
+		showHelp(commonCommands);
 	}
 }

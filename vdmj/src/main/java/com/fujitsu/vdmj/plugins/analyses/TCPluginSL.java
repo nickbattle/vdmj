@@ -52,7 +52,6 @@ public class TCPluginSL extends TCPlugin
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected List<VDMMessage> typeCheck()
 	{

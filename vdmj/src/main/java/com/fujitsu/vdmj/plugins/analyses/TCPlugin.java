@@ -31,7 +31,9 @@ import java.util.List;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
+import com.fujitsu.vdmj.plugins.CommandList;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.CheckTypeEvent;
@@ -107,4 +109,21 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	abstract protected List<VDMMessage> typeCheck();
 
 	abstract public <T extends Mappable> T getTC();
+
+	protected CommandList commonCommands = new CommandList
+	(
+		// 
+	);
+	
+	@Override
+	public AnalysisCommand getCommand(String[] argv)
+	{
+		return lookup(argv, commonCommands);
+	}
+	
+	@Override
+	public void help()
+	{
+		showHelp(commonCommands);
+	}
 }

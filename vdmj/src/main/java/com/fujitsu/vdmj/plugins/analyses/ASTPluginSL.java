@@ -50,7 +50,6 @@ public class ASTPluginSL extends ASTPlugin
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected List<VDMMessage> syntaxCheck()
 	{

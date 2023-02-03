@@ -22,38 +22,23 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.plugins.commands;
+package com.fujitsu.vdmj.plugins;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
-import java.io.File;
+import java.util.Vector;
 
-import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
-
-public class FilesCommand extends AnalysisCommand
+/**
+ * Hold a list of AnalysisCommands.
+ */
+public class CommandList extends Vector<Class<? extends AnalysisCommand>>
 {
-	private final static String USAGE = "Usage: files";
-	private ASTPlugin ast = registry.getPlugin("AST");
+	private static final long serialVersionUID = 1L;
 
-	public FilesCommand(String[] argv)
+	@SafeVarargs
+	public CommandList(Class<? extends AnalysisCommand>... commands)
 	{
-		if (!argv[0].equals("files") || argv.length != 1)
+		for (Class<? extends AnalysisCommand> cmd: commands)
 		{
-			throw new IllegalArgumentException(USAGE);
+			this.add(cmd);
 		}
-	}
-
-	@Override
-	public void run()
-	{
-		for (File file: ast.getFiles())
-		{
-			println(file);
-		}
-	}
-	
-	public static void help()
-	{
-		println("files: list the specification files");
 	}
 }
