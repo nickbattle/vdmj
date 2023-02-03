@@ -39,7 +39,9 @@ public class InitCommand extends AnalysisCommand
 
 	public InitCommand(String[] argv)
 	{
-		if (argv.length != 1 || !argv[0].equals("init"))
+		super(argv);
+		
+		if (!argv[0].equals("init"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
@@ -48,6 +50,12 @@ public class InitCommand extends AnalysisCommand
 	@Override
 	public void run()
 	{
+		if (argv.length != 1)
+		{
+			println(USAGE);
+			return;
+		}
+
 		ConsoleDebugReader dbg = null;
 		ConsoleKeyWatcher watch = null;
 		

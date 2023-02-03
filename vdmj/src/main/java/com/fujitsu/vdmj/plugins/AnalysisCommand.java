@@ -27,10 +27,12 @@ package com.fujitsu.vdmj.plugins;
 abstract public class AnalysisCommand
 {
 	protected final PluginRegistry registry;
+	protected final String[] argv;
 	
-	protected AnalysisCommand()
+	protected AnalysisCommand(String[] argv)
 	{
-		registry = PluginRegistry.getInstance();
+		this.registry = PluginRegistry.getInstance();
+		this.argv = argv;
 	}
 	
 	abstract public void run();

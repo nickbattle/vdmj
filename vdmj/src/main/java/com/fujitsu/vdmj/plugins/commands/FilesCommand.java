@@ -37,7 +37,9 @@ public class FilesCommand extends AnalysisCommand
 
 	public FilesCommand(String[] argv)
 	{
-		if ( argv.length != 1 || !argv[0].equals("files"))
+		super(argv);
+		
+		if (!argv[0].equals("files"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
@@ -46,6 +48,12 @@ public class FilesCommand extends AnalysisCommand
 	@Override
 	public void run()
 	{
+		if (argv.length != 1)
+		{
+			println(USAGE);
+			return;
+		}
+		
 		for (File file: ast.getFiles())
 		{
 			println(file);

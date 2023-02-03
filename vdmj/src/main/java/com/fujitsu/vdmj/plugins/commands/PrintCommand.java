@@ -40,14 +40,25 @@ import com.fujitsu.vdmj.values.Value;
 
 public class PrintCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: print <expression>";
-	private final String expression;
+	private final static String USAGE = "Usage: [p]rint <expression>";
 
 	public PrintCommand(String[] argv)
 	{
-		if (argv.length <= 1 || (!argv[0].equals("print") && !argv[0].equals("p")))
+		super(argv);
+		
+		if (!argv[0].equals("print") && !argv[0].equals("p"))
 		{
 			throw new IllegalArgumentException(USAGE);
+		}
+	}
+
+	@Override
+	public void run()
+	{
+		if (argv.length == 1)
+		{
+			println(USAGE);
+			return;
 		}
 		
 		StringBuilder sb = new StringBuilder();
@@ -60,12 +71,7 @@ public class PrintCommand extends AnalysisCommand
 			sep = " ";
 		}
 		
-		expression = sb.toString();
-	}
-
-	@Override
-	public void run()
-	{
+		String expression = sb.toString();
 		ConsoleDebugReader dbg = null;
 		ConsoleKeyWatcher watch = null;
 		
@@ -77,11 +83,10 @@ public class PrintCommand extends AnalysisCommand
 			watch.start();
 			
    			long before = System.currentTimeMillis();
-   			
    			Value v = Interpreter.getInstance().execute(expression);
+   			long after = System.currentTimeMillis();
    			
    			println("= " + v);
-   			long after = System.currentTimeMillis();
 			println("Executed in " + (double)(after-before)/1000 + " secs. ");
 
 			if (RTLogger.getLogSize() > 0)
@@ -131,6 +136,6 @@ public class PrintCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("print <exp>: evaluate an expression");
+		println("[p]rint <exp>: evaluate an expression");
 	}
 }

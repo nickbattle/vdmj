@@ -103,7 +103,7 @@ abstract public class AnalysisPlugin
 			{
 				if (e.getCause() instanceof IllegalArgumentException)
 				{
-					// try next one
+					// doesn't match argv, try next one
 				}
 				else if (e.getCause() instanceof NoSuchMethodException)
 				{

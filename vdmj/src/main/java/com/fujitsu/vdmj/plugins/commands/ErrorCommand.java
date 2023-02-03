@@ -34,11 +34,13 @@ public class ErrorCommand extends AnalysisCommand
 	
 	public ErrorCommand(String message)
 	{
+		super(null);
 		this.message = message;
 	}
 
 	public ErrorCommand(Exception e)
 	{
+		super(null);
 		this.message = e.getMessage();
 	}
 
