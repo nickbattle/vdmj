@@ -30,12 +30,12 @@ import java.io.File;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 
-public class ASTCommand extends AnalysisCommand
+public class FilesCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: files";
 	private ASTPlugin ast = registry.getPlugin("AST");
 
-	public ASTCommand(String[] argv)
+	public FilesCommand(String[] argv)
 	{
 		if (argv.length != 1)
 		{

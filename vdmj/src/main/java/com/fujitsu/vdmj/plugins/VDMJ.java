@@ -24,13 +24,7 @@
 
 package com.fujitsu.vdmj.plugins;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
-import static com.fujitsu.vdmj.plugins.PluginConsole.info;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -253,7 +247,7 @@ public class VDMJ
 	    			break;
 
 				case "-q":
-					PluginConsole.quiet = true;
+					PluginConsole.setQuiet(true);
 					iter.remove();
 	    			break;
 

@@ -24,7 +24,7 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
 import java.util.List;
 

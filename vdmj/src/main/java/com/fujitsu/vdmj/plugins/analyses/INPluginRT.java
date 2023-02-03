@@ -24,7 +24,7 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -67,7 +67,7 @@ public class INPluginRT extends INPluginPP
 					ASTClassList parsedClasses = ast.getAST();
 					rs.setup(parsedClasses);
 				}
-				catch (Exception ex)
+				catch (Throwable ex)
 				{
 					println("Simulation: " + ex.getMessage());
 					return errsOf(ex);
@@ -100,11 +100,11 @@ public class INPluginRT extends INPluginPP
     		try
     		{
     			RTLogger.setLogfileName(new File(logfile));
-    			println("Writing RT events to " + logfile);
+    			printf("Writing RT events to %s\n", logfile);
     		}
     		catch (FileNotFoundException e)
     		{
-    			println("Cannot create RT event log: " + e.getMessage());
+    			printf("Cannot create RT event log: %s\n", e.getMessage());
     			return errsOf(e);
     		}
 		}

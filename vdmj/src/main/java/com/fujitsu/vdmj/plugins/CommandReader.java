@@ -64,33 +64,39 @@ public class CommandReader
 					continue;
 				}
 				
-				String[] argv = line.split("\\s+");
+				String[] argv = line.split("\\s+");		// Note: no 'quote' processing yet
 				
-				if (argv[0].equals("help"))
+				switch (argv[0])
 				{
-					registry.getHelp();
-				}
-				else if (argv[0].equals("quit") || argv[0].equals("q"))
-				{
-					carryOn = false;
-				}
-				else if (argv[0].equals("reload"))
-				{
-					exitStatus = ExitStatus.RELOAD;
-					carryOn = false;
-				}
-				else
-				{
-					AnalysisCommand command = registry.getCommand(argv);
+					case "help":
+						registry.getHelp();
+						println("reload: reload specification files");
+						println("help: list all commands available");
+						println("[q]uit: close the session");
+						break;
 					
-					if (command == null)
-					{
-						println("Unknown command, try 'help'");
-					}
-					else
-					{
-						command.run();
-					}
+					case "quit":
+					case "q":
+						carryOn = false;
+						break;
+
+					case "reload":
+						exitStatus = ExitStatus.RELOAD;
+						carryOn = false;
+						break;
+
+					default:
+						AnalysisCommand command = registry.getCommand(argv);
+						
+						if (command == null)
+						{
+							println("Unknown command, try 'help'");
+						}
+						else
+						{
+							command.run();
+						}
+						break;
 				}
 			}
 			catch (Throwable e)

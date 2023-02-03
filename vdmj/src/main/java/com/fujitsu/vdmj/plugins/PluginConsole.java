@@ -34,7 +34,12 @@ import com.fujitsu.vdmj.messages.Console;
 
 public class PluginConsole
 {
-	public static boolean quiet = false;
+	private static boolean quiet = false;
+	
+	public static void setQuiet(boolean quiet)
+	{
+		PluginConsole.quiet = quiet;
+	}
 	
 	public static void fail(String reason)
 	{
@@ -63,6 +68,14 @@ public class PluginConsole
 		}
 	}
 
+	public static void infof(String format, Object... args)
+	{
+		if (!quiet)
+		{
+			Console.out.printf(format, args);
+		}
+	}
+
 	public static void infoln(String m)
 	{
 		if (!quiet)
@@ -74,6 +87,11 @@ public class PluginConsole
 	public static void println(Object m)
 	{
 		Console.out.println(m.toString());
+	}
+
+	public static void printf(String format, Object... args)
+	{
+		Console.out.printf(format, args);
 	}
 
 	public static void println(Throwable throwable)

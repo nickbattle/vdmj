@@ -24,9 +24,7 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
+import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -40,7 +38,7 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
-import com.fujitsu.vdmj.plugins.commands.ASTCommand;
+import com.fujitsu.vdmj.plugins.commands.FilesCommand;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
@@ -87,12 +85,6 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 	
-	@Override
-	public void usage()
-	{
-		println("-c <charset>: select a file charset");
-	}
-	
 	public void setFiles(List<File> files)
 	{
 		this.files = files;
@@ -109,11 +101,17 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		{
 			if (file.lastModified() > timestamp)
 			{
-				println("File " + file + " has changed");
+				printf("File %s has changed\n", file);
 			}
 		}
 	}
 	
+	@Override
+	public void usage()
+	{
+		println("-c <charset>: select a file charset");
+	}
+
 	@Override
 	public void processArgs(List<String> argv)
 	{
@@ -171,10 +169,16 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		switch (argv[0])
 		{
 			case "files":
-				return new ASTCommand(argv);
+				return new FilesCommand(argv);
 				
 			default:
 				return null;
 		}
+	}
+	
+	@Override
+	public void help()
+	{
+		println("files: list the loaded files");
 	}
 }

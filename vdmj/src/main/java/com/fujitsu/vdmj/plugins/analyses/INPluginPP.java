@@ -24,8 +24,7 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -120,7 +119,7 @@ public class INPluginPP extends INPlugin
 			
 			return errsOf(e);
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
 			while (e instanceof InvocationTargetException)
 			{
@@ -175,7 +174,7 @@ public class INPluginPP extends INPlugin
 
 			return ExitStatus.EXIT_ERRORS;
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
 			while (e instanceof InvocationTargetException)
 			{

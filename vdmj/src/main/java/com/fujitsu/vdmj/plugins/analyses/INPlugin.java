@@ -37,8 +37,10 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
+import com.fujitsu.vdmj.plugins.commands.PrintCommand;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
@@ -331,5 +333,25 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	public boolean isInteractive()
 	{
 		return interactive;
+	}
+	
+	@Override
+	public AnalysisCommand getCommand(String[] argv)
+	{
+		switch (argv[0])
+		{
+			case "print":
+			case "p":
+				return new PrintCommand(argv);
+				
+			default:
+				return null;
+		}
+	}
+	
+	@Override
+	public void help()
+	{
+		println("[p]rint <exp>: evaluate expression");
 	}
 }

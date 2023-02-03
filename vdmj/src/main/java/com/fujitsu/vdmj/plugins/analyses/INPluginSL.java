@@ -24,8 +24,7 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -119,7 +118,7 @@ public class INPluginSL extends INPlugin
 			
 			return errsOf(e);
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
 			while (e instanceof InvocationTargetException)
 			{
@@ -144,11 +143,11 @@ public class INPluginSL extends INPlugin
 			{
 				infoln("Interpreter started");
 				
-				CommandReader reader = new ModuleCommandReader(interpreter, "> ");
-				ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
-				return reader.run(ast.getFiles());
+//				CommandReader reader = new ModuleCommandReader(interpreter, "> ");
+//				ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
+//				return reader.run(ast.getFiles());
 				
-//				return new com.fujitsu.vdmj.plugins.CommandReader().run();
+				return new com.fujitsu.vdmj.plugins.CommandReader().run();
 			}
 			else if (expression != null)
 			{
@@ -178,7 +177,7 @@ public class INPluginSL extends INPlugin
 
 			return ExitStatus.EXIT_ERRORS;
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
 			while (e instanceof InvocationTargetException)
 			{

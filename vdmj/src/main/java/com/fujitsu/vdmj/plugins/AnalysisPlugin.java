@@ -46,17 +46,25 @@ abstract public class AnalysisPlugin
 	
 	public abstract String getName();
 	public abstract void init();
-	public abstract void processArgs(List<String> argv);
-	public abstract void usage();
+	
+	public void processArgs(List<String> argv)
+	{
+		return;			// Process any command line -options used
+	}
+	
+	public void usage()
+	{
+		return;			// List usage of any command line -options used
+	}
 	
 	public AnalysisCommand getCommand(String[] argv)
 	{
-		return null;
+		return null;	// Get an object to handle argv, if supported
 	}
 	
 	public void help()
 	{
-		return;		// CommandReader help
+		return;			// List usage of commands supported
 	}
 
 	protected List<VDMMessage> errsOf(Throwable e)
