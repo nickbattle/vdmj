@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.CommandList;
 import com.fujitsu.vdmj.plugins.EventListener;
+import com.fujitsu.vdmj.plugins.commands.InitCommand;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
@@ -338,6 +339,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 
 	protected CommandList commonCommands = new CommandList
 	(
+		InitCommand.class,
 		PrintCommand.class
 	);
 	

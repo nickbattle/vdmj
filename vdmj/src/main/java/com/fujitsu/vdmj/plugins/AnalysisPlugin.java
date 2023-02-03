@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.plugins;
 import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -98,17 +99,20 @@ abstract public class AnalysisPlugin
 				Constructor<? extends AnalysisCommand> ctor = cmd.getConstructor(String[].class);
 				return ctor.newInstance(new Object[]{argv});
 			}
-			catch (NoSuchMethodException e)
+			catch (InvocationTargetException e)
 			{
-				printf("%s does not implement consrtuctor(String[] argv)?", cmd.getSimpleName());
-			}
-			catch (IllegalArgumentException e)
-			{
-				// try the next one
+				if (e.getCause() instanceof IllegalArgumentException)
+				{
+					// try next one
+				}
+				else if (e.getCause() instanceof NoSuchMethodException)
+				{
+					printf("%s does not implement constructor(String[] argv)?\n", cmd.getSimpleName());
+				}
 			}
 			catch (Throwable e)
 			{
-				verbose("Command " + cmd.getSimpleName() + ": " + e.getMessage());
+				println("Command " + cmd.getSimpleName() + ": " + e.getMessage());
 			}
 		}
 		
@@ -129,7 +133,7 @@ abstract public class AnalysisPlugin
 				}
 				else
 				{
-					printf("%s does not implement static void help()?", cmd.getSimpleName());
+					printf("%s does not implement static void help()?\n", cmd.getSimpleName());
 				}
 			}
 			catch (Throwable e)

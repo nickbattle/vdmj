@@ -30,37 +30,19 @@ import java.lang.reflect.InvocationTargetException;
 
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
-import com.fujitsu.vdmj.messages.RTLogger;
-import com.fujitsu.vdmj.messages.VDMErrorsException;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.runtime.DebuggerException;
 import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.syntax.ParserException;
-import com.fujitsu.vdmj.values.Value;
 
-public class PrintCommand extends AnalysisCommand
+public class InitCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: print <expression>";
-	private final String expression;
+	private final static String USAGE = "Usage: init";
 
-	public PrintCommand(String[] argv)
+	public InitCommand(String[] argv)
 	{
-		if (argv.length <= 1 || (!argv[0].equals("print") && !argv[0].equals("p")))
+		if (argv.length != 1 || !argv[0].equals("init"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
-		
-		StringBuilder sb = new StringBuilder();
-		String sep = "";
-		
-		for (int i=1; i<argv.length; i++)
-		{
-			sb.append(sep);
-			sb.append(argv[i]);
-			sep = " ";
-		}
-		
-		expression = sb.toString();
 	}
 
 	@Override
@@ -73,38 +55,16 @@ public class PrintCommand extends AnalysisCommand
 		{
 			dbg = new ConsoleDebugReader();
 			dbg.start();
-			watch = new ConsoleKeyWatcher(expression);
+			watch = new ConsoleKeyWatcher("init");
 			watch.start();
 			
    			long before = System.currentTimeMillis();
    			
-   			Value v = Interpreter.getInstance().execute(expression);
+   			Interpreter.getInstance().init();
    			
-   			println("= " + v);
+   			println("Global context initialized");
    			long after = System.currentTimeMillis();
 			println("Executed in " + (double)(after-before)/1000 + " secs. ");
-
-			if (RTLogger.getLogSize() > 0)
-			{
-				println("Dumped RT events");
-				RTLogger.dump(false);
-			}
-		}
-		catch (ParserException e)
-		{
-			println("Syntax: " + e.getMessage());
-		}
-		catch (DebuggerException e)
-		{
-			println("Debug: " + e.getMessage());
-		}
-		catch (RuntimeException e)
-		{
-			println("Runtime: " + e);
-		}
-		catch (VDMErrorsException e)
-		{
-			println(e.toString());
 		}
 		catch (Throwable e)
 		{
@@ -131,6 +91,6 @@ public class PrintCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("print <exp>: evaluate an expression");
+		println("init: re-initialize the specification");
 	}
 }

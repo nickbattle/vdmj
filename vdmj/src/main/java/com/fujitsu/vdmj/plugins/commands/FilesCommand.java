@@ -37,7 +37,7 @@ public class FilesCommand extends AnalysisCommand
 
 	public FilesCommand(String[] argv)
 	{
-		if (!argv[0].equals("files") || argv.length != 1)
+		if ( argv.length != 1 || !argv[0].equals("files"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
