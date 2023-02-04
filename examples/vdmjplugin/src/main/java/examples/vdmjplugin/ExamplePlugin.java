@@ -33,8 +33,10 @@ import java.util.List;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
+import com.fujitsu.vdmj.plugins.commands.ErrorCommand;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
 
@@ -111,6 +113,11 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		println("-check <maxlen>: Check definition names against naming comvention");
 	}
 
+	public void setMaxlen(int len)
+	{
+		this.maxLength = len;
+	}
+
 	@Override
 	public List<VDMMessage> handleEvent(Event event) throws Exception
 	{
@@ -125,10 +132,34 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 		return null;
 	}
 
-	abstract protected List<VDMMessage> checkDefinitions();
+	public abstract List<VDMMessage> checkDefinitions();
 	
 	protected String InitialUpper(LexNameToken name)
 	{
 		return String.valueOf(name.name.charAt(0)).toUpperCase() + name.name.substring(1).toLowerCase();
+	}
+	
+	@Override
+	public AnalysisCommand getCommand(String[] argv)
+	{
+		if (argv[0].equals("maxlen"))
+		{
+			if (enabled)
+			{
+				return new ExampleCommand(argv, this);
+			}
+			else
+			{
+				return new ErrorCommand("The ExamplePlugin is not enabled. Restart VDMJ with -check <max>");
+			}
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public void help()
+	{
+		println("maxlen <len>: repeat checks with new maxlen");
 	}
 }

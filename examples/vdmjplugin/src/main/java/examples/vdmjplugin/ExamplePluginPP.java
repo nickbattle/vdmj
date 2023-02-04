@@ -46,7 +46,7 @@ import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 public class ExamplePluginPP extends ExamplePlugin
 {
 	@Override
-	protected List<VDMMessage> checkDefinitions()
+	public List<VDMMessage> checkDefinitions()
 	{
 		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
 		ASTClassList classes = ast.getAST();
@@ -65,12 +65,12 @@ public class ExamplePluginPP extends ExamplePlugin
 					
 					if (!correct.equals(def.name.name))
 					{
-						messages.add(new VDMError(9999, "Name should be '" + correct + "'", def.name.location));
+						messages.add(new VDMError(9999, "Name '" + def.name.name + "' should be '" + correct + "'", def.name.location));
 					}
 					
 					if (def.name.name.length() > maxLength)
 					{
-						messages.add(new VDMWarning(9999, "Name should be " + maxLength + " chars or less", def.name.location));
+						messages.add(new VDMWarning(9999, "Name '" + def.name.name + "' should be " + maxLength + " chars or less", def.name.location));
 					}
 				}
 			}
