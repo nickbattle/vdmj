@@ -100,8 +100,6 @@ public class ScriptCommand extends AnalysisCommand
 					println("Unknown command in script: " + line);
 				}
 			}
-			
-			script.close();
 		}
 		catch (IOException e)
 		{

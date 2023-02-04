@@ -81,16 +81,23 @@ public class PluginRegistry
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
-			AnalysisCommand c = plugin.getCommand(argv);
-			
-			if (c != null)
+			try
 			{
-				if (result != null)
-				{
-					verbose("Multiple plugins support " + argv[0]);
-				}
+				AnalysisCommand c = plugin.getCommand(argv);
 				
-				result = c;		// Note, override earlier results
+				if (c != null)
+				{
+					if (result != null)
+					{
+						verbose("Multiple plugins support " + argv[0]);
+					}
+					
+					result = c;		// Note, override earlier results
+				}
+			}
+			catch (Throwable e)
+			{
+				// Ignore misbehaving plugins
 			}
 		}
 		
@@ -101,7 +108,14 @@ public class PluginRegistry
 	{
 		for (AnalysisPlugin plugin: plugins.values())
 		{
-			plugin.help();
+			try
+			{
+				plugin.help();
+			}
+			catch (Throwable e)
+			{
+				// Ignore misbehaving plugins
+			}
 		}
 	}
 }
