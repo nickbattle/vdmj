@@ -47,10 +47,13 @@ import com.fujitsu.vdmj.plugins.commands.DebugCommand;
 import com.fujitsu.vdmj.plugins.commands.DefaultCommand;
 import com.fujitsu.vdmj.plugins.commands.EnvCommand;
 import com.fujitsu.vdmj.plugins.commands.InitCommand;
+import com.fujitsu.vdmj.plugins.commands.LatexCommand;
 import com.fujitsu.vdmj.plugins.commands.ModulesCommand;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
+import com.fujitsu.vdmj.plugins.commands.SaveCommand;
 import com.fujitsu.vdmj.plugins.commands.ScriptCommand;
 import com.fujitsu.vdmj.plugins.commands.SetCommand;
+import com.fujitsu.vdmj.plugins.commands.WordCommand;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
@@ -348,15 +351,18 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	protected CommandList commonCommands = new CommandList
 	(
 		InitCommand.class,
-		PrintCommand.class,
-		ScriptCommand.class,
 		SetCommand.class,
-		AssertCommand.class,
-		DebugCommand.class,
-		EnvCommand.class,
 		DefaultCommand.class,
 		ModulesCommand.class,
-		CoverageCommand.class
+		EnvCommand.class,
+		PrintCommand.class,
+		ScriptCommand.class,
+		AssertCommand.class,
+		DebugCommand.class,
+		CoverageCommand.class,
+		LatexCommand.class,
+		WordCommand.class,
+		SaveCommand.class
 	);
 	
 	@Override
