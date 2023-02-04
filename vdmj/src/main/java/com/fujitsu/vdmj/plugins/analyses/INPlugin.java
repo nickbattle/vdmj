@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.CommandList;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.commands.AssertCommand;
+import com.fujitsu.vdmj.plugins.commands.CoverageCommand;
 import com.fujitsu.vdmj.plugins.commands.DebugCommand;
 import com.fujitsu.vdmj.plugins.commands.DefaultCommand;
 import com.fujitsu.vdmj.plugins.commands.EnvCommand;
@@ -354,7 +355,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		DebugCommand.class,
 		EnvCommand.class,
 		DefaultCommand.class,
-		ModulesCommand.class
+		ModulesCommand.class,
+		CoverageCommand.class
 	);
 	
 	@Override
