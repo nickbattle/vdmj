@@ -142,9 +142,11 @@ public class INPluginPP extends INPlugin
 			if (interactive)
 			{
 				infoln("Interpreter started");
-				CommandReader reader = new ClassCommandReader(interpreter, "> ");
-				ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
-				return reader.run(ast.getFiles());
+//				CommandReader reader = new ClassCommandReader(interpreter, "> ");
+//				ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
+//				return reader.run(ast.getFiles());
+
+				return new com.fujitsu.vdmj.plugins.CommandReader().run();
 			}
 			else if (expression != null)
 			{
