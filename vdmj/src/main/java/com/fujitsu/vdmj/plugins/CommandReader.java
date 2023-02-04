@@ -31,6 +31,7 @@ import java.lang.reflect.InvocationTargetException;
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
+import com.fujitsu.vdmj.plugins.commands.ReaderControl;
 
 public class CommandReader
 {
@@ -69,20 +70,43 @@ public class CommandReader
 				switch (argv[0])
 				{
 					case "help":
-						registry.getHelp();
-						println("reload: reload specification files");
-						println("help: list all commands available");
-						println("[q]uit: close the session");
+					case "?":
+						if (argv.length == 1)
+						{
+							registry.getHelp();
+							println("reload: reload specification files");
+							println("help: list all commands available");
+							println("[q]uit: close the session");
+						}
+						else
+						{
+							println("Usage: help");
+						}
 						break;
 					
 					case "quit":
 					case "q":
-						carryOn = false;
+						if (argv.length == 1)
+						{
+							exitStatus = ExitStatus.EXIT_OK;
+							carryOn = false;
+						}
+						else
+						{
+							println("Usage: [q]uit");
+						}
 						break;
 
 					case "reload":
-						exitStatus = ExitStatus.RELOAD;
-						carryOn = false;
+						if (argv.length == 1)
+						{
+							exitStatus = ExitStatus.RELOAD;
+							carryOn = false;
+						}
+						else
+						{
+							println("Usage: reload");
+						}
 						break;
 
 					default:
@@ -95,6 +119,13 @@ public class CommandReader
 						else
 						{
 							command.run();
+							
+							if (command instanceof ReaderControl)
+							{
+								ReaderControl ctrl = (ReaderControl)command;
+								exitStatus = ctrl.exitStatus();
+								carryOn = ctrl.carryOn();
+							}
 						}
 						break;
 				}

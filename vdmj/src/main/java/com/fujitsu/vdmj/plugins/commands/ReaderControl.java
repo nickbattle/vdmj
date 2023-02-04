@@ -24,48 +24,14 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
-
 import com.fujitsu.vdmj.ExitStatus;
-import com.fujitsu.vdmj.plugins.AnalysisCommand;
 
-public class MessageCommand extends AnalysisCommand implements ReaderControl
+/**
+ * Implemented by commands that want to influence the main CommandReader.
+ */
+public interface ReaderControl
 {
-	private final String message;
-	private final ExitStatus exitStatus;
-	private final boolean carryOn;
-	
-	public MessageCommand(String message)
-	{
-		super(null);
-		this.message = message;
-		this.exitStatus = ExitStatus.EXIT_OK;
-		this.carryOn = true;
-	}
-	
-	public MessageCommand(String message, ExitStatus exitStatus, boolean carryOn)
-	{
-		super(null);
-		this.message = message;
-		this.exitStatus = exitStatus;
-		this.carryOn = carryOn;
-	}
-	
-	@Override
-	public void run()
-	{
-		println(message);
-	}
+	public ExitStatus exitStatus() throws Throwable;
 
-	@Override
-	public ExitStatus exitStatus() throws Throwable
-	{
-		return exitStatus;
-	}
-
-	@Override
-	public boolean carryOn()
-	{
-		return carryOn;
-	}
+	public boolean carryOn() throws Throwable;
 }
