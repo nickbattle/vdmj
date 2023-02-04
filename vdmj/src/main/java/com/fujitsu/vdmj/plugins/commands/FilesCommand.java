@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 public class FilesCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: files";
-	private ASTPlugin ast = registry.getPlugin("AST");
 
 	public FilesCommand(String[] argv)
 	{
@@ -53,7 +52,9 @@ public class FilesCommand extends AnalysisCommand
 			println(USAGE);
 			return;
 		}
-		
+
+		ASTPlugin ast = registry.getPlugin("AST");
+
 		for (File file: ast.getFiles())
 		{
 			println(file);

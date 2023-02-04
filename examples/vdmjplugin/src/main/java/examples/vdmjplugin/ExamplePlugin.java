@@ -36,7 +36,7 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
-import com.fujitsu.vdmj.plugins.commands.ErrorCommand;
+import com.fujitsu.vdmj.plugins.commands.MessageCommand;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
 
@@ -150,7 +150,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 			}
 			else
 			{
-				return new ErrorCommand("The ExamplePlugin is not enabled. Restart VDMJ with -check <max>");
+				return new MessageCommand("The ExamplePlugin is not enabled. Restart VDMJ with -check <max>");
 			}
 		}
 		

@@ -27,11 +27,11 @@ package com.fujitsu.vdmj.plugins.commands;
 import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 
-public class ErrorCommand extends AnalysisCommand
+public class MessageCommand extends AnalysisCommand
 {
 	private final String message;
 	
-	public ErrorCommand(String message)
+	public MessageCommand(String message)
 	{
 		super(null);
 		this.message = message;

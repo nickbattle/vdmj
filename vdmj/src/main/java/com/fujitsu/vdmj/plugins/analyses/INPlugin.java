@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.commands.InitCommand;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
 import com.fujitsu.vdmj.plugins.commands.ScriptCommand;
+import com.fujitsu.vdmj.plugins.commands.SetCommand;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
@@ -342,7 +343,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	(
 		InitCommand.class,
 		PrintCommand.class,
-		ScriptCommand.class
+		ScriptCommand.class,
+		SetCommand.class
 	);
 	
 	@Override
