@@ -36,4 +36,19 @@ abstract public class AnalysisCommand
 	}
 	
 	abstract public void run();
+	
+	protected String argv2line(int from)
+	{
+		StringBuilder sb = new StringBuilder();
+		String sep = "";
+		
+		for (int i=from; i<argv.length; i++)
+		{
+			sb.append(sep);
+			sb.append(argv[i]);
+			sep = " ";
+		}
+
+		return sb.toString();
+	}
 }

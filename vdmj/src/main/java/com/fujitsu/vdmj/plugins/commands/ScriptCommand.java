@@ -144,6 +144,6 @@ public class ScriptCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("script <file>: run commands from file");
+		println("script <file> - run commands from file");
 	}
 }

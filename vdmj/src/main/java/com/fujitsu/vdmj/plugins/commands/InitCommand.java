@@ -98,6 +98,6 @@ public class InitCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("init: re-initialize the specification");
+		println("init - re-initialize the specification");
 	}
 }

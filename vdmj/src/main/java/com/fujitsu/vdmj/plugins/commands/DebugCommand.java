@@ -24,21 +24,25 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
-import java.io.File;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import com.fujitsu.vdmj.commands.BreakpointReader;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
+import com.fujitsu.vdmj.runtime.Interpreter;
 
-public class FilesCommand extends AnalysisCommand
+public class DebugCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: files";
+	private final static String USAGE = "Usage: break | trace | catch | list | remove";
 
-	public FilesCommand(String[] argv)
+	public DebugCommand(String[] argv)
 	{
 		super(argv);
 		
-		if (!argv[0].equals("files"))
+		if (!argv[0].equals("break") &&
+			!argv[0].equals("trace") &&
+			!argv[0].equals("catch") &&
+			!argv[0].equals("list") &&
+			!argv[0].equals("remove"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
@@ -47,22 +51,18 @@ public class FilesCommand extends AnalysisCommand
 	@Override
 	public void run()
 	{
-		if (argv.length != 1)
-		{
-			println(USAGE);
-			return;
-		}
-
-		ASTPlugin ast = registry.getPlugin("AST");
-
-		for (File file: ast.getFiles())
-		{
-			println(file);
-		}
+		BreakpointReader reader = new BreakpointReader(Interpreter.getInstance());
+		reader.doCommand(argv2line(0));
 	}
 	
 	public static void help()
 	{
-		println("files - list the specification files");
+		println("break [<file>:]<line#> [<condition>] - create a breakpoint");
+		println("break <function/operation> [<condition>] - create a breakpoint");
+		println("trace [<file>:]<line#> [<exp>] - create a tracepoint");
+		println("trace <function/operation> [<exp>] - create a tracepoint");
+		println("catch [<exp list>] - create an exception catchpoint");
+		println("remove <breakpoint#> - remove a trace/breakpoint");
+		println("list - list breakpoints");
 	}
 }

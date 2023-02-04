@@ -183,6 +183,6 @@ public class AssertCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("assert <file>: check assertions from a file");
+		println("assert <file> - check assertions from a file");
 	}
 }

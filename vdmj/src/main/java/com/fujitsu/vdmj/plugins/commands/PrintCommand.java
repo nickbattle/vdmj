@@ -61,17 +61,7 @@ public class PrintCommand extends AnalysisCommand
 			return;
 		}
 		
-		StringBuilder sb = new StringBuilder();
-		String sep = "";
-		
-		for (int i=1; i<argv.length; i++)
-		{
-			sb.append(sep);
-			sb.append(argv[i]);
-			sep = " ";
-		}
-		
-		String expression = sb.toString();
+		String expression = argv2line(1);
 		ConsoleDebugReader dbg = null;
 		ConsoleKeyWatcher watch = null;
 		
@@ -136,6 +126,6 @@ public class PrintCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("[p]rint <exp>: evaluate an expression");
+		println("[p]rint <exp> - evaluate an expression");
 	}
 }

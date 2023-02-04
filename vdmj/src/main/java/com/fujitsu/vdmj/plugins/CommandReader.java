@@ -74,9 +74,9 @@ public class CommandReader
 						if (argv.length == 1)
 						{
 							registry.getHelp();
-							println("reload: reload specification files");
-							println("help: list all commands available");
-							println("[q]uit: close the session");
+							println("reload - reload specification files");
+							println("help - list all commands available");
+							println("[q]uit - close the session");
 						}
 						else
 						{
