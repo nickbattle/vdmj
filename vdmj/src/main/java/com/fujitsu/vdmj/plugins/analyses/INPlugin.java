@@ -54,6 +54,8 @@ import com.fujitsu.vdmj.plugins.commands.RuntraceCommand;
 import com.fujitsu.vdmj.plugins.commands.SaveCommand;
 import com.fujitsu.vdmj.plugins.commands.ScriptCommand;
 import com.fujitsu.vdmj.plugins.commands.SetCommand;
+import com.fujitsu.vdmj.plugins.commands.StateCommand;
+import com.fujitsu.vdmj.plugins.commands.ThreadsCommand;
 import com.fujitsu.vdmj.plugins.commands.WordCommand;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
@@ -349,7 +351,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		return interactive;
 	}
 
-	protected CommandList commonCommands = new CommandList
+	protected CommandList commandsList = new CommandList
 	(
 		InitCommand.class,
 		SetCommand.class,
@@ -364,18 +366,20 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		LatexCommand.class,
 		WordCommand.class,
 		SaveCommand.class,
-		RuntraceCommand.class
+		RuntraceCommand.class,
+		StateCommand.class,
+		ThreadsCommand.class
 	);
 	
 	@Override
 	public AnalysisCommand getCommand(String[] argv)
 	{
-		return lookup(argv, commonCommands);
+		return lookup(argv, commandsList);
 	}
 	
 	@Override
 	public void help()
 	{
-		showHelp(commonCommands);
+		showHelp(commandsList);
 	}
 }

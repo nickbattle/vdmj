@@ -28,26 +28,23 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.ast.modules.ASTModule;
-import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
-import com.fujitsu.vdmj.plugins.analyses.ASTPluginSL;
+import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 
-public class ModulesCommand extends AnalysisCommand
+public class StateCommand extends AnalysisCommand
 {
-	private final static String KIND = Settings.dialect == Dialect.VDM_SL ? "modules" : "classes";
+	private final static String USAGE = "Usage: state";
 
-	public ModulesCommand(String[] argv)
+	public StateCommand(String[] argv)
 	{
 		super(argv);
 		
-		if (!argv[0].equals(KIND))
+		if (!argv[0].equals("state"))
 		{
-			throw new IllegalArgumentException(KIND);
+			throw new IllegalArgumentException(USAGE);
 		}
 	}
 
@@ -56,34 +53,25 @@ public class ModulesCommand extends AnalysisCommand
 	{
 		if (argv.length != 1)
 		{
-			println(KIND);
+			println(USAGE);
+			return;
+		}
+		else if (Settings.dialect != Dialect.VDM_SL)
+		{
+			println("Command is only availble for VDM-SL");
 			return;
 		}
 
-		ASTPlugin ast = registry.getPlugin("AST");
-		
-		if (ast instanceof ASTPluginSL)
-		{
-			ASTModuleList list = ast.getAST();
-	
-			for (ASTModule module: list)
-			{
-				println(module.name.name);
-			}
-		}
-		else
-		{
-			ASTClassList list = ast.getAST();
-			
-			for (ASTClassDefinition clazz: list)
-			{
-				println(clazz.name.name);
-			}
-		}
+		ModuleInterpreter interpreter = (ModuleInterpreter) Interpreter.getInstance();
+		Context c = interpreter.getStateContext();
+		printf("%s", c == null ? "(no state)\n" : c.toString());
 	}
 	
 	public static void help()
 	{
-		printf("%s - list the specification %s\n", KIND, KIND);
+		if (Settings.dialect == Dialect.VDM_SL)
+		{
+			println("state - show the default module state");
+		}
 	}
 }

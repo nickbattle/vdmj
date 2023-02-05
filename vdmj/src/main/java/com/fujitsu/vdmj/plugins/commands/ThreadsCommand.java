@@ -24,66 +24,80 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import java.util.List;
+
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.ast.modules.ASTModule;
-import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
-import com.fujitsu.vdmj.plugins.analyses.ASTPluginSL;
+import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
-public class ModulesCommand extends AnalysisCommand
+public class ThreadsCommand extends AnalysisCommand
 {
-	private final static String KIND = Settings.dialect == Dialect.VDM_SL ? "modules" : "classes";
+	private final static String USAGE = "Usage: threads";
 
-	public ModulesCommand(String[] argv)
+	public ThreadsCommand(String[] argv)
 	{
 		super(argv);
 		
-		if (!argv[0].equals(KIND))
+		if (!argv[0].equals("threads"))
 		{
-			throw new IllegalArgumentException(KIND);
+			throw new IllegalArgumentException(USAGE);
 		}
 	}
 
 	@Override
 	public void run()
 	{
-		if (argv.length != 1)
+		List<SchedulableThread> list = SchedulableThread.getAllThreads();
+		
+		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			println(KIND);
+			println("Command is not available in VDM-SL");
 			return;
 		}
-
-		ASTPlugin ast = registry.getPlugin("AST");
-		
-		if (ast instanceof ASTPluginSL)
+		else if (argv.length != 1)
 		{
-			ASTModuleList list = ast.getAST();
-	
-			for (ASTModule module: list)
+			println(USAGE);
+			return;
+		}
+		else if (list.isEmpty())
+		{
+			println("No threads running");
+			return;
+		}
+		
+   		int maxName = 0;
+		long maxNum = 0;
+		
+		for (SchedulableThread th: list)
+		{
+			if (th.getName().length() > maxName)
 			{
-				println(module.name.name);
+				maxName = th.getName().length();
+			}
+			
+			if (th.getId() > maxNum)
+			{
+				maxNum = th.getId();
 			}
 		}
-		else
+		
+		int width = (int)Math.floor(Math.log10(maxNum)) + 1;
+		
+		for (SchedulableThread th: list)
 		{
-			ASTClassList list = ast.getAST();
-			
-			for (ASTClassDefinition clazz: list)
-			{
-				println(clazz.name.name);
-			}
+			String format = String.format("%%%dd: %%-%ds  %%s", width, maxName);
+			println(String.format(format, th.getId(), th.getName(), th.getRunState()));
 		}
 	}
 	
 	public static void help()
 	{
-		printf("%s - list the specification %s\n", KIND, KIND);
+		if (Settings.dialect != Dialect.VDM_SL)
+		{
+			println("threads - list the running threads");
+		}
 	}
 }
