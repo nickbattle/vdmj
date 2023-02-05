@@ -50,6 +50,7 @@ import com.fujitsu.vdmj.plugins.commands.InitCommand;
 import com.fujitsu.vdmj.plugins.commands.LatexCommand;
 import com.fujitsu.vdmj.plugins.commands.ModulesCommand;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
+import com.fujitsu.vdmj.plugins.commands.RuntraceCommand;
 import com.fujitsu.vdmj.plugins.commands.SaveCommand;
 import com.fujitsu.vdmj.plugins.commands.ScriptCommand;
 import com.fujitsu.vdmj.plugins.commands.SetCommand;
@@ -362,7 +363,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		CoverageCommand.class,
 		LatexCommand.class,
 		WordCommand.class,
-		SaveCommand.class
+		SaveCommand.class,
+		RuntraceCommand.class
 	);
 	
 	@Override
