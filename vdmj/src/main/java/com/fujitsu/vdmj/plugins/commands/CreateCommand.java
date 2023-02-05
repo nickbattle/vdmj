@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
-import com.fujitsu.vdmj.runtime.Interpreter;
 
 public class CreateCommand extends AnalysisCommand
 {
