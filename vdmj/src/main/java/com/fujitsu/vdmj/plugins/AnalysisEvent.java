@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.plugins.events;
+package com.fujitsu.vdmj.plugins;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * The root of all plugin events.
  */
-abstract public class Event
+abstract public class AnalysisEvent
 {
 	/**
 	 * Properties can be attached to events to aid communication between plugins

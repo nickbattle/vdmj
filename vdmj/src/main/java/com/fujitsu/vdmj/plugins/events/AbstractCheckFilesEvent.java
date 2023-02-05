@@ -24,7 +24,9 @@
 
 package com.fujitsu.vdmj.plugins.events;
 
-abstract public class AbstractCheckFilesEvent extends Event
+import com.fujitsu.vdmj.plugins.AnalysisEvent;
+
+abstract public class AbstractCheckFilesEvent extends AnalysisEvent
 {
 	public AbstractCheckFilesEvent()
 	{

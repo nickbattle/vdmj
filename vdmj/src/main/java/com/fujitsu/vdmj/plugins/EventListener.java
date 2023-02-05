@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.plugins;
 import java.util.List;
 
 import com.fujitsu.vdmj.messages.VDMMessage;
-import com.fujitsu.vdmj.plugins.events.Event;
 
 /**
  * An interface implemented by subscribers to the EventHub. 
@@ -35,5 +34,5 @@ import com.fujitsu.vdmj.plugins.events.Event;
 public interface EventListener
 {
 	public String getName();
-	public List<VDMMessage> handleEvent(Event event) throws Exception;
+	public List<VDMMessage> handleEvent(AnalysisEvent event) throws Exception;
 }

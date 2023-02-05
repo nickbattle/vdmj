@@ -37,11 +37,11 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.CommandList;
+import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.commands.PogCommand;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
-import com.fujitsu.vdmj.plugins.events.Event;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
 /**
@@ -108,7 +108,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	}
 
 	@Override
-	public List<VDMMessage> handleEvent(Event event) throws Exception
+	public List<VDMMessage> handleEvent(AnalysisEvent event) throws Exception
 	{
 		if (event instanceof CheckPrepareEvent)
 		{

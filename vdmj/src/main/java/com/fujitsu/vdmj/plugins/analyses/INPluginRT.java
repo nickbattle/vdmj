@@ -34,9 +34,9 @@ import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
-import com.fujitsu.vdmj.plugins.events.Event;
 import com.fujitsu.vdmj.plugins.events.ShutdownEvent;
 
 /**
@@ -53,7 +53,7 @@ public class INPluginRT extends INPluginPP
 	}
 	
 	@Override
-	public List<VDMMessage> handleEvent(Event event) throws Exception
+	public List<VDMMessage> handleEvent(AnalysisEvent event) throws Exception
 	{
 		if (event instanceof CheckSyntaxEvent)
 		{

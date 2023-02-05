@@ -59,7 +59,6 @@ import com.fujitsu.vdmj.plugins.events.CheckFailedEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.CheckTypeEvent;
-import com.fujitsu.vdmj.plugins.events.Event;
 import com.fujitsu.vdmj.plugins.events.ShutdownEvent;
 import com.fujitsu.vdmj.util.GetResource;
 
@@ -405,7 +404,7 @@ public class VDMJ
 		try
 		{
 			EventHub eventhub = EventHub.getInstance();
-			Event event = new CheckPrepareEvent();
+			AnalysisEvent event = new CheckPrepareEvent();
 			List<VDMMessage> messages = eventhub.publish(event);
 
 			if (report(messages, "Prepared", "preparation"))

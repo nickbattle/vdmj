@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.messages.VDMMessage;
-import com.fujitsu.vdmj.plugins.events.Event;
 
 /**
  * A singleton to control the publication of events from the command reader to
@@ -67,7 +66,7 @@ public class EventHub
 		}
 	}
 	
-	public synchronized void register(Class<? extends Event> eventClass, EventListener listener)
+	public synchronized void register(Class<? extends AnalysisEvent> eventClass, EventListener listener)
 	{
 		String key = eventClass.getName();
 		List<EventListener> list = registrations.get(key);
@@ -81,12 +80,12 @@ public class EventHub
 		list.add(listener);	// registration order
 	}
 	
-	public List<EventListener> query(Event type)
+	public List<EventListener> query(AnalysisEvent type)
 	{
 		return registrations.get(type.getKey());
 	}
 	
-	public List<VDMMessage> publish(Event event) throws Exception
+	public List<VDMMessage> publish(AnalysisEvent event) throws Exception
 	{
 		List<EventListener> list = registrations.get(event.getKey());
 		List<VDMMessage> responses = new Vector<VDMMessage>();

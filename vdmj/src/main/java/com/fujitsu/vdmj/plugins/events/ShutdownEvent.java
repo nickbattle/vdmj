@@ -24,7 +24,9 @@
 
 package com.fujitsu.vdmj.plugins.events;
 
-public class ShutdownEvent extends Event
+import com.fujitsu.vdmj.plugins.AnalysisEvent;
+
+public class ShutdownEvent extends AnalysisEvent
 {
 	// 
 }

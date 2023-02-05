@@ -24,17 +24,19 @@
 
 package com.fujitsu.vdmj.plugins.events;
 
+import com.fujitsu.vdmj.plugins.AnalysisEvent;
+
 public class CheckFailedEvent extends AbstractCheckFilesEvent
 {
-	private final Event event;
+	private final AnalysisEvent event;
 	
-	public CheckFailedEvent(Event event)
+	public CheckFailedEvent(AnalysisEvent event)
 	{
 		super();
 		this.event = event;
 	}
 	
-	public Event getCause()
+	public AnalysisEvent getCause()
 	{
 		return event;
 	}
