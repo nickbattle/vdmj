@@ -68,7 +68,7 @@ public class CreateCommand extends AnalysisCommand
 
 			try
 			{
-				ClassInterpreter cinterpreter = (ClassInterpreter) Interpreter.getInstance();
+				ClassInterpreter cinterpreter = ClassInterpreter.getInstance();
 				cinterpreter.create(var, exp);
 			}
 			catch (Exception e)

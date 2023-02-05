@@ -62,7 +62,7 @@ public class StateCommand extends AnalysisCommand
 			return;
 		}
 
-		ModuleInterpreter interpreter = (ModuleInterpreter) Interpreter.getInstance();
+		ModuleInterpreter interpreter = ModuleInterpreter.getInstance();
 		Context c = interpreter.getStateContext();
 		printf("%s", c == null ? "(no state)\n" : c.toString());
 	}
