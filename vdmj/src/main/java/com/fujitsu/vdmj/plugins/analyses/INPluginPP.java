@@ -24,7 +24,8 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
+import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -32,8 +33,6 @@ import java.util.List;
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteInterpreter;
-import com.fujitsu.vdmj.commands.ClassCommandReader;
-import com.fujitsu.vdmj.commands.CommandReader;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.in.INNode;

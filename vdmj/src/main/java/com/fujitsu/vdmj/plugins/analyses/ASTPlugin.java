@@ -42,7 +42,6 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.CommandList;
 import com.fujitsu.vdmj.plugins.EventListener;
-import com.fujitsu.vdmj.plugins.commands.FilesCommand;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.Event;
@@ -167,20 +166,20 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract public int getCount();
 	
-	protected CommandList commonCommands = new CommandList
+	protected CommandList commandList = new CommandList
 	(
-		FilesCommand.class
+		// None yet
 	);
 	
 	@Override
 	public AnalysisCommand getCommand(String[] argv)
 	{
-		return lookup(argv, commonCommands);
+		return lookup(argv, commandList);
 	}
 	
 	@Override
 	public void help()
 	{
-		showHelp(commonCommands);
+		showHelp(commandList);
 	}
 }

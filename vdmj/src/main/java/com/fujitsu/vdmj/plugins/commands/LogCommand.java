@@ -119,9 +119,15 @@ public class LogCommand extends AnalysisCommand
 	
 	private void doValidate()
 	{
-		if (argv.length > 2)
+		if (argv.length != 2)
 		{
-			println("Usage: validate [<file>]");
+			println("Usage: validate <file>");
+			return;
+		}
+		
+		if (!Settings.annotations)
+		{
+			println("Enable annotations first, using 'set annotations on'");
 			return;
 		}
 
@@ -152,7 +158,7 @@ public class LogCommand extends AnalysisCommand
 		}
 		else
 		{
-			println("No log file given - use 'log <file>' or 'validate <file>'");
+			println("No log file given - use 'validate <file>'");
 		}
 	}
 	
@@ -161,7 +167,7 @@ public class LogCommand extends AnalysisCommand
 		if (Settings.dialect == Dialect.VDM_RT)
 		{
 			println("log [<file> | off] - log RT events to file");
-			println("validate [<file>] - validate RT log events");
+			println("validate <file> - validate RT log events");
 		}
 	}
 }

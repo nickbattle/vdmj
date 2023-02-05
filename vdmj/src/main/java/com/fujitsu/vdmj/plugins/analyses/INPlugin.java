@@ -47,6 +47,7 @@ import com.fujitsu.vdmj.plugins.commands.CreateCommand;
 import com.fujitsu.vdmj.plugins.commands.DebugCommand;
 import com.fujitsu.vdmj.plugins.commands.DefaultCommand;
 import com.fujitsu.vdmj.plugins.commands.EnvCommand;
+import com.fujitsu.vdmj.plugins.commands.FilesCommand;
 import com.fujitsu.vdmj.plugins.commands.InitCommand;
 import com.fujitsu.vdmj.plugins.commands.LatexCommand;
 import com.fujitsu.vdmj.plugins.commands.LogCommand;
@@ -359,20 +360,21 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		SetCommand.class,
 		DefaultCommand.class,
 		ModulesCommand.class,
+		FilesCommand.class,
 		EnvCommand.class,
+		StateCommand.class,
+		LogCommand.class,
 		PrintCommand.class,
 		ScriptCommand.class,
 		AssertCommand.class,
+		ThreadsCommand.class,
+		CreateCommand.class,
 		DebugCommand.class,
 		CoverageCommand.class,
 		LatexCommand.class,
 		WordCommand.class,
 		SaveCommand.class,
-		RuntraceCommand.class,
-		StateCommand.class,
-		ThreadsCommand.class,
-		CreateCommand.class,
-		LogCommand.class
+		RuntraceCommand.class
 	);
 	
 	@Override

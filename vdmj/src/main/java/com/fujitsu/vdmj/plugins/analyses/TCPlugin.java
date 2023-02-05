@@ -110,20 +110,20 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 
 	abstract public <T extends Mappable> T getTC();
 
-	protected CommandList commonCommands = new CommandList
+	protected CommandList commandList = new CommandList
 	(
-		// 
+		// None yet
 	);
 	
 	@Override
 	public AnalysisCommand getCommand(String[] argv)
 	{
-		return lookup(argv, commonCommands);
+		return lookup(argv, commandList);
 	}
 	
 	@Override
 	public void help()
 	{
-		showHelp(commonCommands);
+		showHelp(commandList);
 	}
 }
