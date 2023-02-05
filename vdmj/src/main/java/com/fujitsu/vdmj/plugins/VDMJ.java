@@ -52,6 +52,7 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 import com.fujitsu.vdmj.plugins.analyses.INPlugin;
+import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckFailedEvent;
@@ -282,6 +283,9 @@ public class VDMJ
 
 			INPlugin in = INPlugin.factory(Settings.dialect);
 			registry.registerPlugin(in);
+			
+			POPlugin po = POPlugin.factory(Settings.dialect);
+			registry.registerPlugin(po);
 			
 			if (System.getProperty("vdmj.plugins") != null)
 			{

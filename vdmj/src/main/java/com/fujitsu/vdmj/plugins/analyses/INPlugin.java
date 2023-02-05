@@ -125,7 +125,6 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	{
 		println("-i: run the interpreter if successfully type checked");
 		println("-e <exp>: evaluate <exp> and stop");
-		println("-p: generate proof obligations and stop");
 		println("-c <charset>: select a file charset");
 		println("-default <name>: set the default module/class");
 		println("-pre: disable precondition checks");
