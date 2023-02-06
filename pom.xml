@@ -22,15 +22,15 @@
 
     <!-- sub modules -->
     <modules>
+        <module>vdmj</module>
+        <module>lsp</module>
         <module>annotations</module>
         <module>annotations2</module>
-        <module>vdmj</module>
-        <module>vdmjunit</module>
-        <module>lsp</module>
+        <module>stdlib</module>
         <module>dbgp</module>
         <module>dbgpc</module>
-        <module>stdlib</module>
         <module>cmd-plugins</module>
+        <module>vdmjunit</module>
         <module>examples</module>
     </modules>
 

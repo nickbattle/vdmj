@@ -24,12 +24,12 @@
 
 /**
  * This is just a helper class to avoid having to remember the package name of the
- * main VDMJ class when launching.
+ * main VDMJ class when launching. It currently uses the plugin version of VDMJ.
  */
 public class VDMJ
 {
 	public static void main(String[] args)
 	{
-		com.fujitsu.vdmj.VDMJ.main(args);
+		com.fujitsu.vdmj.plugins.VDMJ.main(args);
 	}
 }

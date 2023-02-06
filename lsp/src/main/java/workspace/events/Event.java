@@ -53,9 +53,10 @@ abstract public class Event
 		return properties;
 	}
 	
-	public Object getProperty(String key)
+	@SuppressWarnings("unchecked")
+	public <T> T getProperty(String key)
 	{
-		return getProperties().get(key);
+		return (T) getProperties().get(key);
 	}
 	
 	public Object setProperty(String key, Object value)

@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.syntax;
 
 import java.io.File;
 import java.util.List;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
@@ -733,7 +734,7 @@ public class ModuleReader extends SyntaxReader
 	@Override
 	public List<VDMError> getErrors()
 	{
-		List<VDMError> errs = reader.getErrors();
+		List<VDMError> errs = new Vector<VDMError>(reader.getErrors());
 		errs.addAll(super.getErrors());
 		return errs;
 	}

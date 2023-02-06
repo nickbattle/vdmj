@@ -11,7 +11,8 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
-	<name>PDF Reader</name>
+	<name>Example PDF Reader</name>
+	<description>An example external file reader for PDF files</description>
 	<artifactId>pdfreader</artifactId>
 	<packaging>jar</packaging>
 

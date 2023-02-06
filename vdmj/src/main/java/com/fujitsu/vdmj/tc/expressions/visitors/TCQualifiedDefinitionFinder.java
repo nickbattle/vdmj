@@ -37,6 +37,8 @@ import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNilExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCPreOpExpression;
+import com.fujitsu.vdmj.tc.expressions.TCProperSubsetExpression;
+import com.fujitsu.vdmj.tc.expressions.TCSubsetExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
@@ -206,6 +208,56 @@ public class TCQualifiedDefinitionFinder extends TCExpressionVisitor<TCDefinitio
 			{
 				// if var <=> exp, var is boolean
 				result.add(new TCQualifiedDefinition(existing, new TCBooleanType(node.location)));
+  			}
+		}
+		
+		return result;		
+	}
+	
+	@Override
+	public TCDefinitionList caseSubsetExpression(TCSubsetExpression node, Environment env)
+	{
+		TCDefinitionList result = new TCDefinitionList();
+		
+		if (node.left instanceof TCVariableExpression)
+		{
+			TCVariableExpression var = (TCVariableExpression)node.left;
+			// Lookup with any name type to avoid scope errors, but test NAMES below.
+			TCDefinition existing = env.findName(var.name, NameScope.NAMESANDSTATE);
+			
+			if (existing != null && existing.nameScope.matches(NameScope.NAMES))
+			{
+				// if var subset exp, var is the same type as the set (at most)
+				if (node.rtype.isSet(node.location))
+				{
+					TCSetType set = node.rtype.getSet();
+					result.add(new TCQualifiedDefinition(existing, set));
+				}
+  			}
+		}
+		
+		return result;		
+	}
+	
+	@Override
+	public TCDefinitionList caseProperSubsetExpression(TCProperSubsetExpression node, Environment env)
+	{
+		TCDefinitionList result = new TCDefinitionList();
+		
+		if (node.left instanceof TCVariableExpression)
+		{
+			TCVariableExpression var = (TCVariableExpression)node.left;
+			// Lookup with any name type to avoid scope errors, but test NAMES below.
+			TCDefinition existing = env.findName(var.name, NameScope.NAMESANDSTATE);
+			
+			if (existing != null && existing.nameScope.matches(NameScope.NAMES))
+			{
+				// if var psubset exp, var is the same type as the set (at most)
+				if (node.rtype.isSet(node.location))
+				{
+					TCSetType set = node.rtype.getSet();
+					result.add(new TCQualifiedDefinition(existing, set));
+				}
   			}
 		}
 		

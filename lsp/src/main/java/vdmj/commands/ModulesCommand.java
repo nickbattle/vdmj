@@ -27,7 +27,6 @@ package vdmj.commands;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 
 import dap.DAPMessageList;
@@ -59,7 +58,7 @@ public class ModulesCommand extends Command
 						false, "Command only available for VDM-SL", null);			
 			}
 			
-			ModuleInterpreter  m = (ModuleInterpreter) Interpreter.getInstance();
+			ModuleInterpreter  m = ModuleInterpreter.getInstance();
 			String defname = m.getDefaultName();
 			StringBuilder sb = new StringBuilder();
 			

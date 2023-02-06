@@ -114,6 +114,11 @@ public class ClassInterpreter extends Interpreter
 		}
 	}
 
+	public static ClassInterpreter getInstance()
+	{
+		return (ClassInterpreter) instance;
+	}
+
 	@Override
 	public void setDefaultName(String cname) throws Exception
 	{
