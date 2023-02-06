@@ -137,8 +137,8 @@ public class VDMJ
 	{
 		Map<String, AnalysisPlugin> plugins = PluginRegistry.getInstance().getPlugins();
 		
-		println("Usage: VDMJ <-vdmsl | -vdmpp | -vdmrt> [<options>] [<files or dirs>]");
-		println("-vdmsl: parse files as VDM-SL");
+		println("Usage: VDMJ [-vdmsl | -vdmpp | -vdmrt] [<options>] [<files or dirs>]");
+		println("-vdmsl: parse files as VDM-SL (default)");
 		println("-vdmpp: parse files as VDM++");
 		println("-vdmrt: parse files as VDM-RT");
 		println("-v: show VDMJ jar version");

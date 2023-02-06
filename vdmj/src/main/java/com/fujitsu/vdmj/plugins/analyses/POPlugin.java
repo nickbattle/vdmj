@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.plugins.CommandList;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.commands.PogCommand;
+import com.fujitsu.vdmj.plugins.events.AbstractCheckFilesEvent;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -120,6 +121,8 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 			if (poAtStart)
 			{
+				event.setProperty(AbstractCheckFilesEvent.TITLE, "Analysed");
+				event.setProperty(AbstractCheckFilesEvent.KIND, "POG");
 				ProofObligationList list = getProofObligations();
 				
 				if (list.isEmpty())
