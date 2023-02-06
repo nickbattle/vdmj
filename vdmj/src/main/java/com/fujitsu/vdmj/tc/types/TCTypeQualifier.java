@@ -88,7 +88,8 @@ abstract public class TCTypeQualifier
 				{
 					return member.isMap(LexLocation.ANY);
 				}
-			};}
+			};
+		}
 
 		return mapQualifier;
 	}
@@ -104,7 +105,8 @@ abstract public class TCTypeQualifier
 				{
 					return member.isNumeric(LexLocation.ANY);
 				}
-			};}
+			};
+		}
 
 		return numericQualifier;
 	}
@@ -120,7 +122,8 @@ abstract public class TCTypeQualifier
 				{
 					return member.isType(TCBooleanType.class, LexLocation.ANY);
 				}
-			};}
+			};
+		}
 
 		return boolQualifier;
 	}
@@ -136,7 +139,8 @@ abstract public class TCTypeQualifier
 				{
 					return true;	// Anything goes!
 				}
-			};}
+			};
+		}
 
 		return anyQualifier;
 	}
