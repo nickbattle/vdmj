@@ -59,7 +59,7 @@ public class ClassesCommand extends Command
 						false, "Command not available for VDM-SL", null);			
 			}
 			
-			ClassInterpreter  m = (ClassInterpreter) Interpreter.getInstance();
+			ClassInterpreter  m = ClassInterpreter.getInstance();
 			String defname = m.getDefaultName();
 			StringBuilder sb = new StringBuilder();
 			

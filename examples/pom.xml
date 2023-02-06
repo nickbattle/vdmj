@@ -22,8 +22,9 @@
 	<modules>
 		<module>v2c</module>
 		<module>pdfreader</module>
+		<module>csvreader</module>
 		<module>simulation</module>
 		<module>lspplugin</module>
-		<module>csvreader</module>
+		<module>vdmjplugin</module>
 	</modules>
 </project>

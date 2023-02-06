@@ -8,7 +8,7 @@
 		<version>${revision}${sha1}${changelist}</version>
 	</parent>
 	<artifactId>csvreader</artifactId>
-	<name>CSV Reader</name>
+	<name>Example CSV Reader</name>
 	<description>An example external file reader for CSV files</description>
 
 	<dependencies>

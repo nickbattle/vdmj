@@ -112,6 +112,11 @@ public class ModuleInterpreter extends Interpreter
 		}
 	}
 
+	public static ModuleInterpreter getInstance()
+	{
+		return (ModuleInterpreter) instance;
+	}
+
 	/**
 	 * Set the default module to the name given.
 	 *

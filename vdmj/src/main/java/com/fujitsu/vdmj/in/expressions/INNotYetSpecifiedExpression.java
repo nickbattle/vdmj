@@ -61,7 +61,7 @@ public class INNotYetSpecifiedExpression extends INExpression
 
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			ModuleInterpreter i = (ModuleInterpreter)Interpreter.getInstance();
+			ModuleInterpreter i = ModuleInterpreter.getInstance();
 			INModule module = i.findModule(location.module);
 
 			if (module != null)

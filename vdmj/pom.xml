@@ -61,7 +61,7 @@
                         <configuration>
 							<archive>
 								<manifestEntries>
-									<Main-Class>com.fujitsu.vdmj.VDMJ</Main-Class>
+									<Main-Class>com.fujitsu.vdmj.plugins.VDMJ</Main-Class>
 									<Implementation-Version>${project.version} build ${maven.build.timestamp}</Implementation-Version>
 									<Class-Path>.</Class-Path>
 								</manifestEntries>
