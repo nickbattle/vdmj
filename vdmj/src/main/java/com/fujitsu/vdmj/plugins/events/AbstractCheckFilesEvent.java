@@ -28,6 +28,9 @@ import com.fujitsu.vdmj.plugins.AnalysisEvent;
 
 abstract public class AbstractCheckFilesEvent extends AnalysisEvent
 {
+	public static final String TITLE = "PHASE_TITLE";
+	public static final String KIND = "PHASE_KIND";
+	
 	public AbstractCheckFilesEvent()
 	{
 	}

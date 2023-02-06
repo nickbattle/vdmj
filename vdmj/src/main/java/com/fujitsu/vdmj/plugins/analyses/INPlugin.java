@@ -61,6 +61,7 @@ import com.fujitsu.vdmj.plugins.commands.SetCommand;
 import com.fujitsu.vdmj.plugins.commands.StateCommand;
 import com.fujitsu.vdmj.plugins.commands.ThreadsCommand;
 import com.fujitsu.vdmj.plugins.commands.WordCommand;
+import com.fujitsu.vdmj.plugins.events.AbstractCheckFilesEvent;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 
@@ -308,7 +309,16 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		}
 		else if (event instanceof CheckCompleteEvent)
 		{
-			return startInterpreter ? interpreterInit() : null;
+			if (startInterpreter)
+			{
+				event.setProperty(AbstractCheckFilesEvent.TITLE, "Initialized");
+				event.setProperty(AbstractCheckFilesEvent.KIND, "init");
+				return interpreterInit();
+			}
+			else
+			{
+				return null;
+			}
 		}
 		else
 		{

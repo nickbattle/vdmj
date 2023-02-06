@@ -29,5 +29,7 @@ public class CheckSyntaxEvent extends AbstractCheckFilesEvent
 	public CheckSyntaxEvent()
 	{
 		super();
+		setProperty(TITLE, "Parsed");
+		setProperty(KIND, "syntax");
 	}
 }

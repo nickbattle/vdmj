@@ -29,5 +29,7 @@ public class CheckCompleteEvent extends AbstractCheckFilesEvent
 	public CheckCompleteEvent()
 	{
 		super();
+		setProperty(TITLE, "Completed");
+		setProperty(KIND, "completion");
 	}
 }

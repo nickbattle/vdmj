@@ -54,6 +54,7 @@ import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 import com.fujitsu.vdmj.plugins.analyses.INPlugin;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
+import com.fujitsu.vdmj.plugins.events.AbstractCheckFilesEvent;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckFailedEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
@@ -404,25 +405,25 @@ public class VDMJ
 		try
 		{
 			EventHub eventhub = EventHub.getInstance();
-			AnalysisEvent event = new CheckPrepareEvent();
+			AbstractCheckFilesEvent event = new CheckPrepareEvent();
 			List<VDMMessage> messages = eventhub.publish(event);
 
-			if (report(messages, "Prepared", "preparation"))
+			if (report(messages, event))
 			{
 				event = new CheckSyntaxEvent();
 				messages = eventhub.publish(event);
 				
-				if (report(messages, "Parsed", "syntax"))
+				if (report(messages, event))
 				{
 					event = new CheckTypeEvent();
 					messages = eventhub.publish(event);
 
-					if (report(messages, "Type checked", "type"))
+					if (report(messages, event))
 					{
 						event = new CheckCompleteEvent();
 						messages = eventhub.publish(event);
 
-						if (report(messages, "Initialized", "init"))
+						if (report(messages, event))
 						{
 							verbose("Loaded files initialized successfully");
 							return true;
@@ -460,7 +461,7 @@ public class VDMJ
 		return false;
 	}
 	
-	private static boolean report(List<VDMMessage> messages, String verb, String kind)
+	private static boolean report(List<VDMMessage> messages, AbstractCheckFilesEvent event)
 	{
 		int errors = 0;
 		int warnings = 0;
@@ -489,10 +490,12 @@ public class VDMJ
 				plural(count, "class", "es");
 				
 			double duration = (double)(EventHub.getInstance().getLastDuration())/1000;
+			String title = event.getProperty(AbstractCheckFilesEvent.TITLE);
+			String kind = event.getProperty(AbstractCheckFilesEvent.KIND);
 			
-			if (errors > 0 || warnings > 0 || !verb.equals("Prepared"))
+			if (errors > 0 || warnings > 0 || !title.equals("Prepared"))
 			{
-		   		info(verb + " " + objects + " in " + duration + " secs. ");
+		   		info(title + " " + objects + " in " + duration + " secs. ");
 		   		info(errors == 0 ? "No " + kind + " errors" : "Found " + plural(errors, kind + " error", "s"));
 		  		infoln(warnings == 0 ? "" : " and " + (nowarn ? "suppressed " : "") + plural(warnings, "warning", "s"));
 			}

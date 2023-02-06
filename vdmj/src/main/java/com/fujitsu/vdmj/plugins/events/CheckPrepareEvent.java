@@ -29,5 +29,7 @@ public class CheckPrepareEvent extends AbstractCheckFilesEvent
 	public CheckPrepareEvent()
 	{
 		super();
+		setProperty(TITLE, "Prepared");
+		setProperty(KIND, "preparation");
 	}
 }

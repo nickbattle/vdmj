@@ -29,5 +29,7 @@ public class CheckTypeEvent extends AbstractCheckFilesEvent
 	public CheckTypeEvent()
 	{
 		super();
+		setProperty(TITLE, "Type checked");
+		setProperty(KIND, "type");
 	}
 }
