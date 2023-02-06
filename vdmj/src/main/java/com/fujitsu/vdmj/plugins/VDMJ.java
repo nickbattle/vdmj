@@ -128,7 +128,8 @@ public class VDMJ
 		}
 		else
 		{
-			fail("You must set either -vdmsl, -vdmpp or -vdmrt");
+			verbose("Setting dialect to VDM-SL by default");
+			Settings.dialect = Dialect.VDM_SL;
 		}
 	}
 
