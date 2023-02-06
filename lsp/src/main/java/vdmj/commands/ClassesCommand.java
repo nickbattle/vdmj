@@ -28,7 +28,6 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
-import com.fujitsu.vdmj.runtime.Interpreter;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
