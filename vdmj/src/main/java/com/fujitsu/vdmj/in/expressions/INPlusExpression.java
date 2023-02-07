@@ -53,17 +53,22 @@ public class INPlusExpression extends INNumericBinaryExpression
 
 			if (NumericValue.areIntegers(l, r))
 			{
-				long lv = l.intValue(ctxt);
-				long rv = r.intValue(ctxt);
-				long sum = addExact(lv, rv, ctxt);
-				return NumericValue.valueOf(sum, ctxt);
+				try
+				{
+					long lv = l.intValue(ctxt);
+					long rv = r.intValue(ctxt);
+					long sum = addExact(lv, rv, ctxt);
+					return NumericValue.valueOf(sum, ctxt);
+				}
+				catch (ValueException e)
+				{
+					// Too big... try reals
+				}
 			}
-			else
-			{
-				double lv = l.realValue(ctxt);
-				double rv = r.realValue(ctxt);
-	    		return NumericValue.valueOf(lv + rv, ctxt);
-			}
+
+			double lv = l.realValue(ctxt);
+			double rv = r.realValue(ctxt);
+    		return NumericValue.valueOf(lv + rv, ctxt);
     	}
     	catch (ValueException e)
     	{
