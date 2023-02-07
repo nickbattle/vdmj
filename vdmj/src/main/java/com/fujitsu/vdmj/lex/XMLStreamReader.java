@@ -105,7 +105,7 @@ abstract public class XMLStreamReader implements ExternalFormatReader
 		}
 		else
 		{
-			throw new IOException("Cannot find partName: " + partName);
+			throw new IOException("Cannot find ZIP part: " + file + "!/" + partName);
 		}
 	}
 
