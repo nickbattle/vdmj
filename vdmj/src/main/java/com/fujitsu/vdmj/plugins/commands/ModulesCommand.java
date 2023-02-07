@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 import com.fujitsu.vdmj.plugins.analyses.ASTPluginSL;
+import com.fujitsu.vdmj.runtime.Interpreter;
 
 public class ModulesCommand extends AnalysisCommand
 {
@@ -61,6 +62,7 @@ public class ModulesCommand extends AnalysisCommand
 		}
 
 		ASTPlugin ast = registry.getPlugin("AST");
+		String def = Interpreter.getInstance().getDefaultName();
 		
 		if (ast instanceof ASTPluginSL)
 		{
@@ -68,7 +70,7 @@ public class ModulesCommand extends AnalysisCommand
 	
 			for (ASTModule module: list)
 			{
-				println(module.name.name);
+				println(module.name.name + (module.name.name.equals(def) ? " (default)" : ""));
 			}
 		}
 		else
@@ -77,7 +79,7 @@ public class ModulesCommand extends AnalysisCommand
 			
 			for (ASTClassDefinition clazz: list)
 			{
-				println(clazz.name.name);
+				println(clazz.name.name + (clazz.name.name.equals(def) ? " (default)" : ""));
 			}
 		}
 	}

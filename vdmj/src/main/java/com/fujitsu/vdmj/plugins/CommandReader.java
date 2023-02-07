@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.plugins;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 import com.fujitsu.vdmj.ExitStatus;
@@ -50,7 +51,7 @@ public class CommandReader
 			try
 			{
 				Console.out.print("> ");
-				String line = Console.in.readLine();
+				String line = readLine();
 
 				if (line == null)	// EOF
 				{
@@ -143,4 +144,20 @@ public class CommandReader
 		
 		return exitStatus;
 	}
+	
+	private String readLine() throws IOException
+	{
+		StringBuilder line = new StringBuilder();
+		line.append("\\");
+		
+		do
+		{
+			line.deleteCharAt(line.length() - 1);	// Remove trailing backslash
+			line.append(Console.in.readLine());
+		}
+		while (line.length() > 0 && line.charAt(line.length() - 1) == '\\');
+		
+		return line.toString();
+	}
+
 }
