@@ -98,6 +98,11 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		return files;
 	}
 	
+	public Charset getFileCharset()
+	{
+		return filecharset;
+	}
+	
 	public void checkForUpdates(long timestamp)
 	{
 		for (File file: files)
