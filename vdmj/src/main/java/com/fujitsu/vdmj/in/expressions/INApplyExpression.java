@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.OperationValue;
@@ -75,52 +76,11 @@ public class INApplyExpression extends INExpression
 		for (INExpression arg: args)
 		{
 			sb.append(sep);
-			sb.append(deBracketed(arg.toString()));
+			sb.append(Utils.deBracketed(arg.toString()));
 			sep = ", ";
 		}
 		
 		return sb.toString();
-	}
-
-	/**
-	 * Clean an expression has outer brackets. We have to check
-	 * for cases like "(a + 1) * (b + 1)", which look outer-bracketed.
-	 */
-	private String deBracketed(String arg)
-	{
-		if (arg.startsWith("(") && arg.endsWith(")"))
-		{
-			int count = 0;
-			int i=0;
-			
-			while (i < arg.length())
-			{
-				char c = arg.charAt(i);
-				
-				if (c == '(')
-				{
-					count++;
-				}
-				else if (c == ')')
-				{
-					count--;
-					if (count == 0) break;
-				}
-				
-				i++;
-			}
-			
-			if (i == arg.length() - 1)	// ie. match of first "(" is last char.
-			{
-				return arg.substring(1, arg.length() - 1);	// eg. "(x + y)" is "x + y"
-			}
-			else
-			{
-				return arg;
-			}
-		}
-		
-		return arg;
 	}
 
 	@Override

@@ -77,7 +77,7 @@ public class ASTExplicitFunctionDefinition extends ASTDefinition
 		}
 
 		return accessSpecifier.ifSet(" ") + name.name +
-				(typeParams == null ? ": " : "[" + typeParams + "]: ") + type +
+				(typeParams == null ? ": " : "[" + typeParams + "]: ") + Utils.deBracketed(type) +
 				"\n\t" + name.name + params + " ==\n" + body +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
 				(postcondition == null ? "" : "\n\tpost " + postcondition);
