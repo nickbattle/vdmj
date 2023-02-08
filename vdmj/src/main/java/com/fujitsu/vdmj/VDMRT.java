@@ -35,7 +35,7 @@ import com.fujitsu.vdmj.messages.InternalException;
 /**
  * The main class of the VDM-RT parser/checker/interpreter.
  * 
- * @deprecated use com.fujitsu.vdmj.plugins.VDMJ instead.
+ * @deprecated use {@link com.fujitsu.vdmj.plugins.VDMJ} instead.
  */
 @Deprecated
 public class VDMRT extends VDMPP

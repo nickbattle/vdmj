@@ -50,7 +50,7 @@ import com.fujitsu.vdmj.util.GetResource;
 /**
  * The main class of the VDMJ parser/checker/interpreter.
  * 
- * @deprecated use com.fujitsu.vdmj.plugins.VDMJ instead.
+ * @deprecated use {@link com.fujitsu.vdmj.plugins.VDMJ} instead.
  */
 @Deprecated
 abstract public class VDMJ

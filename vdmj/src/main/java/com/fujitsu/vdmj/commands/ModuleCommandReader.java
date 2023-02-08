@@ -35,7 +35,7 @@ import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 /**
  * A class to read and perform module related commands from standard input.
  * 
- * @deprecated use com.fujitsu.vdmj.plugins.CommandReader instead.
+ * @deprecated use {@link com.fujitsu.vdmj.plugins.CommandReader} instead.
  */
 @Deprecated
 public class ModuleCommandReader extends CommandReader

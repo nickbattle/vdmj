@@ -58,7 +58,7 @@ import com.fujitsu.vdmj.util.Utils;
 /**
  * The main class of the VDM++ and VICE parser/checker/interpreter.
  * 
- * @deprecated use com.fujitsu.vdmj.plugins.VDMJ instead.
+ * @deprecated use {@link com.fujitsu.vdmj.plugins.VDMJ} instead.
  */
 @Deprecated
 public class VDMPP extends VDMJ
