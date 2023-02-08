@@ -47,6 +47,7 @@ import com.fujitsu.vdmj.values.Value;
 public class AssertCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: assert <file>";
+	private boolean errors;
 
 	public AssertCommand(String[] argv)
 	{
@@ -56,6 +57,8 @@ public class AssertCommand extends AnalysisCommand
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
+		
+		errors = false;
 	}
 
 	@Override
@@ -161,6 +164,7 @@ public class AssertCommand extends AnalysisCommand
 			if (assertErrors == 0)
 			{
 				printf("PASSED all %d assertions from %s\n", assertPasses, file);
+				errors = true;
 			}
 			else
 			{
@@ -182,6 +186,11 @@ public class AssertCommand extends AnalysisCommand
 				// ignore
 			}
 		}
+	}
+	
+	public boolean errors()
+	{
+		return errors;
 	}
 	
 	public static void help()

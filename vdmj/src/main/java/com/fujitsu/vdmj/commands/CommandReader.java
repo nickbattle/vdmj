@@ -65,7 +65,10 @@ import com.fujitsu.vdmj.values.Value;
 
 /**
  * A class to read and perform commands from standard input.
+ * 
+ * @deprecated use com.fujitsu.vdmj.plugins.CommandReader instead.
  */
+@Deprecated
 abstract public class CommandReader
 {
 	/** The interpreter to use for the execution of commands. */

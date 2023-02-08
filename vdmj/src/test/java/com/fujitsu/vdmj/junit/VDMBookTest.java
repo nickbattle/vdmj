@@ -24,16 +24,14 @@
 
 package com.fujitsu.vdmj.junit;
 
-import java.io.File;
 import java.net.URL;
 
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.commands.ClassCommandReader;
-import com.fujitsu.vdmj.commands.CommandReader;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.plugins.commands.AssertCommand;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
@@ -72,9 +70,8 @@ public class VDMBookTest extends VDMTestCase
 		INClassList runnable = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checked);
 		ClassInterpreter interpreter = new ClassInterpreter(runnable, checked);
 		interpreter.init();
-		CommandReader reader = new ClassCommandReader(interpreter, "");
-		boolean OK = reader.assertFile(new File(assertions));
-		assertEquals("Execution errors", true, OK);
+		AssertCommand cmd = new AssertCommand(new String[] {"assert", assertions});
+		assertEquals("Execution errors", true, !cmd.errors());
 	}
 
 	public void test_Enigma() throws Exception
