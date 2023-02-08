@@ -29,9 +29,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
+import com.fujitsu.vdmj.plugins.VDMJ;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.values.CPUValue;

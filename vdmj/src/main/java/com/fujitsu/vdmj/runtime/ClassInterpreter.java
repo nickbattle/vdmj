@@ -34,7 +34,6 @@ import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.config.Properties;
@@ -74,6 +73,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
+import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.BUSValue;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.NameValuePair;
@@ -444,7 +444,7 @@ public class ClassInterpreter extends Interpreter
 		{
 			long now = System.currentTimeMillis();
 			pogClasses = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedClasses);
-			VDMJ.mapperStats(now, PONode.MAPPINGS);
+			Utils.mapperStats(now, PONode.MAPPINGS);
 		}
 		
 		POAnnotation.init();

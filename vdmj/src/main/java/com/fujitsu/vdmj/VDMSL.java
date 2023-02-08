@@ -51,10 +51,14 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * The main class of the VDM-SL parser/checker/interpreter.
+ * 
+ * @deprecated use com.fujitsu.vdmj.plugins.VDMJ instead.
  */
+@Deprecated
 public class VDMSL extends VDMJ
 {
 	private ASTModuleList parsedModules = new ASTModuleList();
@@ -142,7 +146,7 @@ public class VDMSL extends VDMJ
    		{
    			checkedModules = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedModules);
    			parsedModules = new ASTModuleList();	// AST not needed after this
-   			before = mapperStats(before, TCNode.MAPPINGS);
+   			before = Utils.mapperStats(before, TCNode.MAPPINGS);
    			terrs += checkedModules.combineDefaults();
 
    			TypeChecker typeChecker = new ModuleTypeChecker(checkedModules);
@@ -188,7 +192,7 @@ public class VDMSL extends VDMJ
       		{
       			long now = System.currentTimeMillis();
       			POModuleList pogModules = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedModules);
-      			mapperStats(now, PONode.MAPPINGS);
+      			Utils.mapperStats(now, PONode.MAPPINGS);
       			list = pogModules.getProofObligations();
        		}
     		catch (InternalException e)
@@ -340,7 +344,7 @@ public class VDMSL extends VDMJ
 		{
 			long before = System.currentTimeMillis();
    			executableModules = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedModules);
-   			mapperStats(before, INNode.MAPPINGS);
+   			Utils.mapperStats(before, INNode.MAPPINGS);
 		}
 		
 		return new ModuleInterpreter(executableModules, checkedModules);

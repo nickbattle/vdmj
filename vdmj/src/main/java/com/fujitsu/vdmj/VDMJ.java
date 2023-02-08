@@ -43,14 +43,16 @@ import java.util.jar.Manifest;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.util.GetResource;
 
 /**
  * The main class of the VDMJ parser/checker/interpreter.
+ * 
+ * @deprecated use com.fujitsu.vdmj.plugins.VDMJ instead.
  */
+@Deprecated
 abstract public class VDMJ
 {
 	protected static boolean warnings = true;
@@ -675,39 +677,5 @@ abstract public class VDMJ
 	public void setQuiet(boolean quiet)
 	{
 		VDMJ.quiet = quiet;
-	}
-	
-	public static long mapperStats(long start, String mappings)
-	{
-		if (Settings.verbose)
-		{
-    		long now = System.currentTimeMillis();
-    		ClassMapper mapper = ClassMapper.getInstance(mappings);
-    		long count = mapper.getNodeCount();
-    		long load = mapper.getLoadTime();
-    		
-    		if (load != 0)
-    		{
-    			infoln("Loaded " + mappings + " in " + (double)load/1000 + " secs");
-    		}
-    		
-    		double time = (double)(now-start-load)/1000;
-    		
-    		if (time < 0.01)
-    		{
-    			infoln("Mapped " + count + " nodes with " + mappings + " in " + time + " secs");
-    		}
-    		else
-    		{
-    			int rate = (int) (count/time);
-    			infoln("Mapped " + count + " nodes with " + mappings + " in " + time + " secs (" + rate + "/sec)");
-    		}
-    		
-    		return System.currentTimeMillis();		// ie. remove load times
-		}
-		else
-		{
-			return start;
-		}
 	}
 }

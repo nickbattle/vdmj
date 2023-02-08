@@ -28,6 +28,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.messages.Console;
+
 public class Utils
 {
 	public static <T> String listToString(List<T> list)
@@ -122,5 +126,39 @@ public class Utils
 		}
 		
 		return arg;
+	}
+	
+	public static long mapperStats(long start, String mappings)
+	{
+		if (Settings.verbose)
+		{
+    		long now = System.currentTimeMillis();
+    		ClassMapper mapper = ClassMapper.getInstance(mappings);
+    		long count = mapper.getNodeCount();
+    		long load = mapper.getLoadTime();
+    		
+    		if (load != 0)
+    		{
+    			Console.out.println("Loaded " + mappings + " in " + (double)load/1000 + " secs");
+    		}
+    		
+    		double time = (double)(now-start-load)/1000;
+    		
+    		if (time < 0.01)
+    		{
+    			Console.out.println("Mapped " + count + " nodes with " + mappings + " in " + time + " secs");
+    		}
+    		else
+    		{
+    			int rate = (int) (count/time);
+    			Console.out.println("Mapped " + count + " nodes with " + mappings + " in " + time + " secs (" + rate + "/sec)");
+    		}
+    		
+    		return System.currentTimeMillis();		// ie. remove load times
+		}
+		else
+		{
+			return start;
+		}
 	}
 }

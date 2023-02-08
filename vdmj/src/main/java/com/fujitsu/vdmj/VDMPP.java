@@ -53,10 +53,14 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * The main class of the VDM++ and VICE parser/checker/interpreter.
+ * 
+ * @deprecated use com.fujitsu.vdmj.plugins.VDMJ instead.
  */
+@Deprecated
 public class VDMPP extends VDMJ
 {
 	protected ASTClassList parsedClasses = new ASTClassList();
@@ -141,7 +145,7 @@ public class VDMPP extends VDMJ
    		{
    			checkedClasses = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedClasses);
    			parsedClasses = new ASTClassList();		// AST not needed now
-   			before = mapperStats(before, TCNode.MAPPINGS);
+   			before = Utils.mapperStats(before, TCNode.MAPPINGS);
    			TypeChecker typeChecker = new ClassTypeChecker(checkedClasses);
    			typeChecker.typeCheck();
    		}
@@ -185,7 +189,7 @@ public class VDMPP extends VDMJ
       		{
       			long now = System.currentTimeMillis();
       			POClassList pogClasses = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedClasses);
-      			mapperStats(now, PONode.MAPPINGS);
+      			Utils.mapperStats(now, PONode.MAPPINGS);
       			list = pogClasses.getProofObligations();
        		}
     		catch (InternalException e)
@@ -360,7 +364,7 @@ public class VDMPP extends VDMJ
 		{
 			long before = System.currentTimeMillis();
    			executableClasses = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedClasses);
-   			mapperStats(before, INNode.MAPPINGS);
+   			Utils.mapperStats(before, INNode.MAPPINGS);
 		}
 		
 		return new ClassInterpreter(executableClasses, checkedClasses);
