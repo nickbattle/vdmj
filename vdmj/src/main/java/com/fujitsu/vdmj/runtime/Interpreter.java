@@ -606,9 +606,6 @@ abstract public class Interpreter
 		TraceIterator tests = tracedef.getIterator(getTraceContext(tracedef.classDefinition));
 		long after = System.currentTimeMillis();
 
-		boolean wasCMD = Settings.usingCmdLine;
-		Settings.usingCmdLine = debug;
-
 		if (writer == null)
 		{
 			writer = Console.out;
@@ -699,7 +696,6 @@ abstract public class Interpreter
 
 		init();
 		savedInitialContext = null;
-		Settings.usingCmdLine = wasCMD;
 		
 		if (excluded > 0)
 		{

@@ -83,7 +83,6 @@ abstract public class VDMJ
 		String defaultName = null;
 
 		Properties.init();		// Read properties file, if any
-		Settings.usingCmdLine = true;
 
 		for (Iterator<String> i = largs.iterator(); i.hasNext();)
 		{
