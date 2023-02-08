@@ -29,7 +29,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
-import com.fujitsu.vdmj.VDMJ;
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpression;
@@ -111,7 +111,7 @@ public class IO implements Serializable
 				file = new File(new File(".").getParentFile(), file.getAbsolutePath());
 			}
 
-			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_PP, VDMJ.filecharset);
+			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_PP, Settings.filecharset);
 			ExpressionReader reader = new ExpressionReader(ltr);
 			reader.setCurrentModule("IO");
 			ASTExpression exp = reader.readExpression();

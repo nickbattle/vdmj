@@ -86,7 +86,7 @@ public class VDMSL extends VDMJ
    			try
    			{
 				long before = System.currentTimeMillis();
-				LexTokenReader ltr = new LexTokenReader(file, Settings.dialect, filecharset);
+				LexTokenReader ltr = new LexTokenReader(file, Settings.dialect, Settings.filecharset);
     			reader = new ModuleReader(ltr);
     			parsedModules.addAll(reader.readModules());
     	   		long after = System.currentTimeMillis();

@@ -30,18 +30,18 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
+import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.CommandList;
-import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
@@ -52,7 +52,6 @@ import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 {
 	protected List<File> files;
-	protected Charset filecharset;
 	
 	@Override
 	public String getName()
@@ -64,7 +63,6 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	public void init()
 	{
 		files = new Vector<File>();
-		filecharset = Charset.defaultCharset();
 		
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckSyntaxEvent.class, this);
@@ -98,11 +96,6 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		return files;
 	}
 	
-	public Charset getFileCharset()
-	{
-		return filecharset;
-	}
-	
 	public void checkForUpdates(long timestamp)
 	{
 		for (File file: files)
@@ -134,7 +127,7 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	    			
 	    			if (iter.hasNext())
 	    			{
-	    				filecharset = validateCharset(iter.next());
+	    				Settings.filecharset = validateCharset(iter.next());
 	    				iter.remove();
 	    			}
 	    			else

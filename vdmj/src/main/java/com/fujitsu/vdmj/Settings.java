@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj;
 
+import java.nio.charset.Charset;
+
 import com.fujitsu.vdmj.lex.Dialect;
 
 /**
@@ -33,6 +35,7 @@ public class Settings
 {
 	public static Release release = Release.DEFAULT;
 	public static Dialect dialect = null;
+	public static Charset filecharset = Charset.defaultCharset();
 
 	public static boolean prechecks = true;
 	public static boolean postchecks = true;

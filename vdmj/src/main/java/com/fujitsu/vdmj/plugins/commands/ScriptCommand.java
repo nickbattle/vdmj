@@ -32,8 +32,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 
 public class ScriptCommand extends AnalysisCommand
 {
@@ -70,8 +70,7 @@ public class ScriptCommand extends AnalysisCommand
 		
 		try
 		{
-			ASTPlugin ast = registry.getPlugin("AST");
-			script = new BufferedReader(new InputStreamReader(new FileInputStream(file), ast.getFileCharset()));
+			script = new BufferedReader(new InputStreamReader(new FileInputStream(file), Settings.filecharset));
 
 			while (true)
 			{

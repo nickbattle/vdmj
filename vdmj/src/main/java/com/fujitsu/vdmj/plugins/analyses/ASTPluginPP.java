@@ -61,7 +61,7 @@ public class ASTPluginPP extends ASTPlugin
 			
 			try
 			{
-				LexTokenReader ltr = new LexTokenReader(file, Settings.dialect, filecharset);
+				LexTokenReader ltr = new LexTokenReader(file, Settings.dialect, Settings.filecharset);
 				cr = new ClassReader(ltr);
 				astClassList.addAll(cr.readClasses());
 			}

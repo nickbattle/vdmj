@@ -256,7 +256,7 @@ public class DBGPReader extends DebugLink
     					usage("-c must come after <-vdmpp|-vdmsl|-vdmrt>");
     				}
 
-    				controller.setCharset(validateCharset(i.next()));
+    				Settings.filecharset = validateCharset(i.next());
     			}
     			else
     			{
@@ -474,7 +474,7 @@ public class DBGPReader extends DebugLink
 			try
 			{
 				byte[] bytes = Base64.decode(expression);
-				expression = new String(bytes, VDMJ.filecharset);
+				expression = new String(bytes, Settings.filecharset);
 			}
 			catch (Exception e)
 			{
@@ -487,7 +487,7 @@ public class DBGPReader extends DebugLink
 			try
 			{
 				byte[] bytes = Base64.decode(defaultName);
-				defaultName = new String(bytes, VDMJ.filecharset);
+				defaultName = new String(bytes, Settings.filecharset);
 			}
 			catch (Exception e)
 			{

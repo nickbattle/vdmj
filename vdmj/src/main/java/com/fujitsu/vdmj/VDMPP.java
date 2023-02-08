@@ -88,7 +88,7 @@ public class VDMPP extends VDMJ
    			try
    			{
 				long before = System.currentTimeMillis();
-				LexTokenReader ltr = new LexTokenReader(file, Settings.dialect, filecharset);
+				LexTokenReader ltr = new LexTokenReader(file, Settings.dialect, Settings.filecharset);
     			reader = new ClassReader(ltr);
     			parsedClasses.addAll(reader.readClasses());
     	   		long after = System.currentTimeMillis();

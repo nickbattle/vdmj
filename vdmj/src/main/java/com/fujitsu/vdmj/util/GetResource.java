@@ -31,7 +31,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
-import com.fujitsu.vdmj.VDMJ;
+import com.fujitsu.vdmj.Settings;
 
 /**
  * A utility class to find and load a file from the classpath into a
@@ -60,7 +60,7 @@ public class GetResource
 		InputStream in = GetResource.class.getResourceAsStream("/" + file.getName());
 		InputStreamReader isr = new InputStreamReader(in, "UTF8");
 		OutputStream out = new FileOutputStream(dest);
-		OutputStreamWriter osr = new OutputStreamWriter(out, VDMJ.filecharset);
+		OutputStreamWriter osr = new OutputStreamWriter(out, Settings.filecharset);
 		
 		char[] buf = new char[8192];
 	    int length;

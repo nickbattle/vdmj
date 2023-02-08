@@ -60,8 +60,6 @@ abstract public class VDMJ
 	protected static String script = null;
 	protected static String logfile = null;
 
-	public static Charset filecharset = Charset.defaultCharset();
-
 	/**
 	 * The main method. This validates the arguments, then parses and type
 	 * checks the files provided (if any), and finally enters the interpreter
@@ -160,7 +158,7 @@ abstract public class VDMJ
     		{
     			if (i.hasNext())
     			{
-    				filecharset = validateCharset(i.next());
+    				Settings.filecharset = validateCharset(i.next());
     			}
     			else
     			{
@@ -667,11 +665,6 @@ abstract public class VDMJ
 		}
 
 		return Charset.forName(cs);
-	}
-
-	public void setCharset(Charset charset)
-	{
-		VDMJ.filecharset = charset;
 	}
 
 	public void setWarnings(boolean warnings)

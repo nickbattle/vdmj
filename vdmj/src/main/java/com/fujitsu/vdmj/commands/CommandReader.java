@@ -42,7 +42,6 @@ import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
@@ -1395,7 +1394,7 @@ abstract public class CommandReader
 			{
 				scriptFile = new File(parts[1]);
 				scriptReader = new BufferedReader(
-					new InputStreamReader(new FileInputStream(scriptFile), VDMJ.filecharset));
+					new InputStreamReader(new FileInputStream(scriptFile), Settings.filecharset));
 			}
 		}
 		catch (Exception e)
@@ -1459,7 +1458,7 @@ abstract public class CommandReader
 
 		try
 		{
-			input = new BufferedReader(new InputStreamReader(new FileInputStream(filename), VDMJ.filecharset));
+			input = new BufferedReader(new InputStreamReader(new FileInputStream(filename), Settings.filecharset));
 		}
 		catch (FileNotFoundException e)
 		{

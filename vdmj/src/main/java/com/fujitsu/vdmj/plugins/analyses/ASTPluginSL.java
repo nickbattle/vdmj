@@ -28,6 +28,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -61,7 +62,7 @@ public class ASTPluginSL extends ASTPlugin
 			
 			try
 			{
-				LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL, filecharset);
+				LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL, Settings.filecharset);
 				mr = new ModuleReader(ltr);
 				astModuleList.addAll(mr.readModules());
 			}
