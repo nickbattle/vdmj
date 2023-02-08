@@ -45,6 +45,7 @@ import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * VDM-PP IN plugin
@@ -70,7 +71,9 @@ public class INPluginPP extends INPlugin
 
 		try
 		{
+			long before = System.currentTimeMillis();
    			inClassList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedClasses);
+   			Utils.mapperStats(before, INNode.MAPPINGS);
    			interpreter = new ClassInterpreter(inClassList, checkedClasses);
    			ConsoleDebugReader dbg = null;
    			ConsoleKeyWatcher watcher = null;

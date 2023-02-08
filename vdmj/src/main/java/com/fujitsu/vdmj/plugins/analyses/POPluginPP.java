@@ -31,9 +31,11 @@ import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
+import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.definitions.POClassList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * VDM-SL PO plugin
@@ -58,7 +60,9 @@ public class POPluginPP extends POPlugin
 
 		try
    		{
+			long before = System.currentTimeMillis();
    			poClassList = new POClassList(checkedClasses);
+   			Utils.mapperStats(before, PONode.MAPPINGS);
    		}
 		catch (InternalException e)
 		{
