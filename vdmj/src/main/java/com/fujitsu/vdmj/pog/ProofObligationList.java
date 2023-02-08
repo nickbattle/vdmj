@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMError;
+import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
@@ -46,7 +47,6 @@ import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
@@ -106,7 +106,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		}
 	}
 	
-	public void typeCheck(TCModule tcmodule)
+	public void typeCheck(TCModule tcmodule, MultiModuleEnvironment menv)
 	{
 		for (ProofObligation po: this)
 		{
@@ -114,7 +114,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 			{
 				if (po.isCheckable)
 				{
-					typeCheck(po, tcmodule.name.getName(), new ModuleEnvironment(tcmodule));
+					typeCheck(po, tcmodule.name.getName(), menv);
 				}
 			}
 			catch (Exception e)
