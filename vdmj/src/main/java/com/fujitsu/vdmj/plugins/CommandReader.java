@@ -27,12 +27,16 @@ package com.fujitsu.vdmj.plugins;
 import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import com.fujitsu.vdmj.ExitStatus;
+import com.fujitsu.vdmj.commands.CommandPlugin;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 import com.fujitsu.vdmj.plugins.commands.ReaderControl;
+import com.fujitsu.vdmj.runtime.Interpreter;
 
 public class CommandReader
 {
@@ -115,7 +119,12 @@ public class CommandReader
 						
 						if (command == null)
 						{
-							println("Unknown command, try 'help'");
+							command = usePlugin(argv);	// Attempt to load plugin
+						}
+						
+						if (command == null)
+						{
+							println("Bad command. Try 'help'");
 						}
 						else
 						{
@@ -158,6 +167,66 @@ public class CommandReader
 		while (line.length() > 0 && line.charAt(line.length() - 1) == '\\');
 		
 		return line.toString();
+	}
+
+	private AnalysisCommand usePlugin(String[] argv) throws Exception
+	{
+		String plugin = Character.toUpperCase(argv[0].charAt(0)) + argv[0].substring(1).toLowerCase();
+		String[] packages = Properties.cmd_plugin_packages.split(";|:");
+		
+		for (String pack: packages)
+		{
+			try
+			{
+				Class<?> clazz = Class.forName(pack + "." + plugin + "Plugin");
+
+				if (CommandPlugin.class.isAssignableFrom(clazz))
+				{
+					Constructor<?> ctor = clazz.getConstructor(Interpreter.class);
+					CommandPlugin cmd = (CommandPlugin)ctor.newInstance(Interpreter.getInstance());
+					
+					// Convert an old CommandPlugin to an AnalysisCommand
+					return new AnalysisCommand(argv)
+					{
+						@Override
+						public void run()
+						{
+							try
+							{
+								cmd.run(argv);
+							}
+							catch (Exception e)
+							{
+								println(e);
+							}
+						}
+					};
+				}
+				else if (AnalysisCommand.class.isAssignableFrom(clazz))
+				{
+					Constructor<?> ctor = clazz.getConstructor(String[].class);
+					return (AnalysisCommand)ctor.newInstance(new Object[]{argv});
+				}
+			}
+			catch (IllegalArgumentException e)	// From AnalysisCommands
+			{
+				println(e.getMessage());
+			}
+			catch (ClassNotFoundException e)
+			{
+				// Try next package
+			}
+			catch (InstantiationException e)
+			{
+				// Try next package
+			}
+			catch (IllegalAccessException e)
+			{
+				// Try next package
+			}
+		}
+
+		return null;
 	}
 
 }

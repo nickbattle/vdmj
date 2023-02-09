@@ -34,7 +34,9 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -301,6 +303,20 @@ public class VDMJ
 						Class<?> clazz = Class.forName(plugin);
 						Method factory = clazz.getMethod("factory", Dialect.class);
 						AnalysisPlugin instance = (AnalysisPlugin)factory.invoke(null, Settings.dialect);
+						registry.registerPlugin(instance);
+						verbose("Registered " + plugin);
+					}
+					catch (NoSuchMethodException e)
+					{
+						Class<?> clazz = Class.forName(plugin);
+
+						if (Modifier.isAbstract(clazz.getModifiers()))
+						{
+							fail("Plugin class is abstract: " + clazz.getName());
+						}
+
+						Constructor<?> ctor = clazz.getConstructor();
+						AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
 						registry.registerPlugin(instance);
 						verbose("Registered " + plugin);
 					}
