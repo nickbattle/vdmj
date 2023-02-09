@@ -24,21 +24,22 @@
 
 package com.fujitsu.vdmj.plugins;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
+import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
+import static com.fujitsu.vdmj.plugins.PluginConsole.info;
+import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.JarURLConnection;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Release;
@@ -62,6 +63,7 @@ import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.CheckTypeEvent;
 import com.fujitsu.vdmj.plugins.events.ShutdownEvent;
 import com.fujitsu.vdmj.util.GetResource;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * The main class for the plugin based VDMJ.
@@ -191,7 +193,7 @@ public class VDMJ
 
 				case "-v":		// Exit if this option is used.
 	    			iter.remove();
-	    			String version = getVersion();
+	    			String version = Utils.getVersion();
 	
 	    			if (version == null)
 	    			{
@@ -526,24 +528,6 @@ public class VDMJ
 		catch (Exception e)
 		{
 			println(e);
-		}
-	}
-	
-	private static String getVersion()
-	{
-		try
-		{
-			String path = VDMJ.class.getName().replaceAll("\\.", "/");
-			URL url = VDMJ.class.getResource("/" + path + ".class");
-			JarURLConnection conn = (JarURLConnection)url.openConnection();
-		    JarFile jar = conn.getJarFile();
-			Manifest mf = jar.getManifest();
-			String version = (String)mf.getMainAttributes().get(Attributes.Name.IMPLEMENTATION_VERSION);
-			return version;
-		}
-		catch (Exception e)
-		{
-			return null;
 		}
 	}
 }

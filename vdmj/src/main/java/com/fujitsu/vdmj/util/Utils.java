@@ -24,13 +24,19 @@
 
 package com.fujitsu.vdmj.util;
 
+import java.net.JarURLConnection;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.plugins.VDMJ;
 
 public class Utils
 {
@@ -159,6 +165,24 @@ public class Utils
 		else
 		{
 			return start;
+		}
+	}
+
+	public static String getVersion()
+	{
+		try
+		{
+			String path = VDMJ.class.getName().replaceAll("\\.", "/");
+			URL url = VDMJ.class.getResource("/" + path + ".class");
+			JarURLConnection conn = (JarURLConnection)url.openConnection();
+		    JarFile jar = conn.getJarFile();
+			Manifest mf = jar.getManifest();
+			String version = (String)mf.getMainAttributes().get(Attributes.Name.IMPLEMENTATION_VERSION);
+			return version;
+		}
+		catch (Exception e)
+		{
+			return null;
 		}
 	}
 }

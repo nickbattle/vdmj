@@ -27,8 +27,6 @@ package com.fujitsu.vdmj;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.JarURLConnection;
-import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -36,9 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
@@ -46,6 +41,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.util.GetResource;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * The main class of the VDMJ parser/checker/interpreter.
@@ -105,7 +101,7 @@ abstract public class VDMJ
     		}
     		else if (arg.equals("-v"))		// Exit if this option is used.
     		{
-    			String version = getVersion();
+    			String version = Utils.getVersion();
 
     			if (version == null)
     			{
@@ -503,24 +499,6 @@ abstract public class VDMJ
 		}
 		
 		return null;
-	}
-
-	private static String getVersion()
-	{
-		try
-		{
-			String path = VDMJ.class.getName().replaceAll("\\.", "/");
-			URL url = VDMJ.class.getResource("/" + path + ".class");
-			JarURLConnection conn = (JarURLConnection)url.openConnection();
-		    JarFile jar = conn.getJarFile();
-			Manifest mf = jar.getManifest();
-			String version = (String)mf.getMainAttributes().get(Attributes.Name.IMPLEMENTATION_VERSION);
-			return version;
-		}
-		catch (Exception e)
-		{
-			return null;
-		}
 	}
 
 	private static void usage(String msg)
