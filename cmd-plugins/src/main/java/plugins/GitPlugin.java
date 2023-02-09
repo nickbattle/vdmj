@@ -36,7 +36,7 @@ public class GitPlugin extends AnalysisCommand
 		
 		if (!argv[0].equals("git"))
 		{
-			throw new IllegalArgumentException("Usage: git <command>");
+			throw new IllegalArgumentException("Usage: git <command> [args]");
 		}
 	}
 

@@ -24,7 +24,7 @@
 
 package com.fujitsu.vdmj.plugins;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 import com.fujitsu.vdmj.plugins.commands.ReaderControl;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
+@SuppressWarnings("deprecation")	// Because we're using CommandPlugin still
 public class CommandReader
 {
 	public ExitStatus run()
