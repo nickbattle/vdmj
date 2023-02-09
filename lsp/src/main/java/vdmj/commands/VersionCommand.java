@@ -30,7 +30,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
-import com.fujitsu.vdmj.VDMJ;
+import com.fujitsu.vdmj.plugins.VDMJ;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;

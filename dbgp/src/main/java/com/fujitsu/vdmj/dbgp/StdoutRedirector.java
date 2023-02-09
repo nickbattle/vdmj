@@ -29,6 +29,7 @@ import java.io.PrintWriter;
 
 import com.fujitsu.vdmj.messages.Console;
 
+@Deprecated
 public class StdoutRedirector extends Redirector
 {
 	public StdoutRedirector(PrintWriter out)

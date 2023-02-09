@@ -114,6 +114,12 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueMap;
 
+/**
+ * The DebugLink class for the DBGp protocol.
+ * 
+ * @deprecated This protocol is deprecated because it depends on the old VDMJ main class.
+ */
+@Deprecated
 public class DBGPReader extends DebugLink
 {
 	private static Map<String, DBGPReader> threadInstances = new HashMap<String, DBGPReader>();
