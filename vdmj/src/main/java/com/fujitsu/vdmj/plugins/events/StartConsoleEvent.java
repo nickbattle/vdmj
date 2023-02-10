@@ -26,7 +26,7 @@ package com.fujitsu.vdmj.plugins.events;
 
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
 
-public class ShutdownEvent extends AnalysisEvent
+public class StartConsoleEvent extends AnalysisEvent
 {
-	// Indicates that the system is shutting down
+	// Indicates that a console session should be started
 }

@@ -64,6 +64,7 @@ import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.CheckTypeEvent;
 import com.fujitsu.vdmj.plugins.events.ShutdownEvent;
+import com.fujitsu.vdmj.plugins.events.StartConsoleEvent;
 import com.fujitsu.vdmj.util.GetResource;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -95,10 +96,7 @@ public class VDMJ
 			
 			if (checkAndInitFiles())
 			{
-				if (runNeeded())
-				{
-					result = run();
-				}
+				result = run();
 			}
 			else
 			{
@@ -115,6 +113,12 @@ public class VDMJ
 	
 	private static void setDialect()
 	{
+		if (argv.contains("-verbose"))
+		{
+			argv.remove("-verbose");
+			Settings.verbose = true;
+		}
+
 		if (argv.contains("-vdmsl"))
 		{
 			argv.remove("-vdmsl");
@@ -134,12 +138,6 @@ public class VDMJ
 		{
 			verbose("Setting dialect to VDM-SL by default");
 			Settings.dialect = Dialect.VDM_SL;
-		}
-		
-		if (argv.contains("-verbose"))
-		{
-			argv.remove("-verbose");
-			Settings.verbose = true;
 		}
 	}
 
@@ -493,24 +491,26 @@ public class VDMJ
 		return false;
 	}
 	
-	private static boolean report(List<VDMMessage> messages, AbstractCheckFilesEvent event)
+	private static int count(List<VDMMessage> messages, Class<? extends VDMMessage>type)
 	{
-		int nerrs = 0;
-		int nwarns = 0;
-		
+		int count = 0;
+
 		for (VDMMessage m: messages)
 		{
-			if (m instanceof VDMError)
+			if (type.isAssignableFrom(m.getClass()))
 			{
 				println(m.toString());
-				nerrs++;
-			}
-			else if (m instanceof VDMWarning)
-			{
-				if (warnings) println(m.toString());
-				nwarns++;
+				count++;
 			}
 		}
+		
+		return count;
+	}
+	
+	private static boolean report(List<VDMMessage> messages, AbstractCheckFilesEvent event)
+	{
+		int nerrs  = count(messages, VDMError.class);
+		int nwarns = count(messages, VDMWarning.class);
 		
 		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
 		int count = ast.getCount();
@@ -536,16 +536,19 @@ public class VDMJ
 		return (nerrs == 0);	// Return "OK" if we can continue (ie. no errors)
 	}
 	
-	private static boolean runNeeded()
-	{
-		INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
-		return in.runNeeded();
-	}
-
 	private static ExitStatus run()
 	{
-		INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
-		return in.interpreterRun();
+		try
+		{
+			List<VDMMessage> messages = EventHub.getInstance().publish(new StartConsoleEvent());
+			int errs = count(messages, VDMError.class);
+			return (errs > 0) ? ExitStatus.EXIT_ERRORS : ExitStatus.EXIT_OK;
+		}
+		catch (Exception e)
+		{
+			println(e);
+			return ExitStatus.EXIT_ERRORS;
+		}
 	}
 
 	private static void complete()
