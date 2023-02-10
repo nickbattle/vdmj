@@ -41,17 +41,17 @@ public class PluginConsole
 		PluginConsole.quiet = quiet;
 	}
 	
-	public static void fail(String reason)
+	public static void fail(String format, Object... args)
 	{
-		println(reason);
+		Console.out.printf(format + "\n", args);
 		System.exit(1);
 	}
 
-	public static void verbose(String message)
+	public static void verbose(String format, Object... args)
 	{
 		if (Settings.verbose)
 		{
-			println(message);
+			Console.out.printf(format + "\n", args);
 		}
 	}
 
