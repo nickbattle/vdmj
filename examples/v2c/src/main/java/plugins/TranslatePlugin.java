@@ -40,7 +40,10 @@ import examples.v2c.tr.modules.TRModuleList;
  * All command line plugins must extend CommandPlugin and be in the class "plugins" by
  * default. The packages searched for plugins can be changed using the "vdmj.plugins"
  * JVM property.
+ * 
+ * @deprecated This will be ported to the new AnalysisCommand at some point.
  */
+@Deprecated
 public class TranslatePlugin extends CommandPlugin
 {
 	/**
