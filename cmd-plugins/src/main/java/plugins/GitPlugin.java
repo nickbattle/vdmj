@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2023 Nick Battle.
+ *	Copyright (c) 2020 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,47 +22,53 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.plugins.commands;
+package plugins;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
-import com.fujitsu.vdmj.debug.BreakpointReader;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.runtime.Interpreter;
 
-public class DebugCommand extends AnalysisCommand
+public class GitPlugin extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: break | trace | catch | list | remove";
-
-	public DebugCommand(String[] argv)
+	public GitPlugin(String[] argv)
 	{
 		super(argv);
 		
-		if (!argv[0].equals("break") &&
-			!argv[0].equals("trace") &&
-			!argv[0].equals("catch") &&
-			!argv[0].equals("list") &&
-			!argv[0].equals("remove"))
+		if (!argv[0].equals("git"))
 		{
-			throw new IllegalArgumentException(USAGE);
+			throw new IllegalArgumentException("Usage: git <command> [args]");
 		}
 	}
 
 	@Override
 	public void run()
 	{
-		BreakpointReader reader = new BreakpointReader(Interpreter.getInstance());
-		reader.doCommand(argv2line(0));
+		if (argv.length == 1)
+		{
+			help();
+			return;
+		}
+		
+		try
+		{
+			ProcessBuilder pb = new ProcessBuilder(argv);
+			pb.inheritIO();
+			Process p = pb.start();
+			p.waitFor();
+			
+			if (p.exitValue() != 0)
+			{
+				println("Process exit code = " + p.exitValue());
+			}
+		}
+		catch (Exception e)
+		{
+			println(e);
+		}
 	}
-	
+
 	public static void help()
 	{
-		println("break [<file>:]<line#> [<condition>] - create a breakpoint");
-		println("break <function/operation> [<condition>] - create a breakpoint");
-		println("trace [<file>:]<line#> [<exp>] - create a tracepoint");
-		println("trace <function/operation> [<exp>] - create a tracepoint");
-		println("catch [<exp list>] - create an exception catchpoint");
-		println("remove <breakpoint#> - remove a trace/breakpoint");
-		println("list - list breakpoints");
+		println("git <command> [<args>] - run a git command");
 	}
 }

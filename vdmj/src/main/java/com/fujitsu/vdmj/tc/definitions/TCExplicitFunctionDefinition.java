@@ -123,7 +123,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		}
 
 		return accessSpecifier.ifSet(" ") + name +
-				(typeParams == null ? ": " : "[" + typeParams + "]: ") + type +
+				(typeParams == null ? ": " : "[" + typeParams + "]: ") + Utils.deBracketed(type) +
 				"\n\t" + name + params + " ==\n" + body +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
 				(postcondition == null ? "" : "\n\tpost " + postcondition) +

@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.typechecker.ModuleTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * VDM-SL TC plugin
@@ -61,7 +62,9 @@ public class TCPluginSL extends TCPlugin
 
 		try
    		{
+			long before = System.currentTimeMillis();
    			tcModuleList = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedModules);
+   			Utils.mapperStats(before, TCNode.MAPPINGS);
    			tcModuleList.combineDefaults();
    			TypeChecker typeChecker = new ModuleTypeChecker(tcModuleList);
    			typeChecker.typeCheck();

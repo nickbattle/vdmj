@@ -44,7 +44,11 @@ import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 /**
  * A class to read and perform class related commands from standard input.
- */
+ * 
+ * @deprecated use {@link com.fujitsu.vdmj.plugins.CommandReader} instead.
+ * This class will be removed in VDMJ version 5.
+*/
+@Deprecated
 public class ClassCommandReader extends CommandReader
 {
 	/** A ClassInterpreter version of the interpreter field. */

@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.config.Properties;
@@ -69,6 +68,7 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.traces.CallSequence;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
+import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -374,7 +374,7 @@ public class ModuleInterpreter extends Interpreter
 			long now = System.currentTimeMillis();
 			pogModules = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedModules);
 			ClassMapper.getInstance(PONode.MAPPINGS).convert(TCRecursiveLoops.getInstance());
-			VDMJ.mapperStats(now, PONode.MAPPINGS);
+			Utils.mapperStats(now, PONode.MAPPINGS);
 		}
 		
 		POAnnotation.init();

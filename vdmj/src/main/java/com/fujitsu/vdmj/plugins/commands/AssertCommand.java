@@ -24,14 +24,17 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
+import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
@@ -44,6 +47,7 @@ import com.fujitsu.vdmj.values.Value;
 public class AssertCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: assert <file>";
+	private boolean errors;
 
 	public AssertCommand(String[] argv)
 	{
@@ -53,6 +57,8 @@ public class AssertCommand extends AnalysisCommand
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
+		
+		errors = false;
 	}
 
 	@Override
@@ -76,7 +82,7 @@ public class AssertCommand extends AnalysisCommand
 		
 		try
 		{
-			script = new BufferedReader(new FileReader(file));
+			script = new BufferedReader(new InputStreamReader(new FileInputStream(file), Settings.filecharset));
 			int assertErrors = 0;
 			int assertPasses = 0;
 
@@ -158,6 +164,7 @@ public class AssertCommand extends AnalysisCommand
 			if (assertErrors == 0)
 			{
 				printf("PASSED all %d assertions from %s\n", assertPasses, file);
+				errors = true;
 			}
 			else
 			{
@@ -179,6 +186,11 @@ public class AssertCommand extends AnalysisCommand
 				// ignore
 			}
 		}
+	}
+	
+	public boolean errors()
+	{
+		return errors;
 	}
 	
 	public static void help()

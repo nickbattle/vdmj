@@ -260,7 +260,17 @@ public class SubTypeObligation extends ProofObligation
 
 			if (et.invdef != null)
 			{
-    			sb.append(et.invdef.name.getName());
+				TCNameToken invname = et.invdef.name;
+				
+				if (invname.getModule().equals(location.module))
+				{
+	    			sb.append(invname.getName());	// inv_T
+				}
+				else
+				{
+					sb.append(invname.getExplicit(true));	// Module`inv_T
+				}
+				
     			sb.append("(");
 
 //				This needs to be put back if/when we change the inv_R signature to take

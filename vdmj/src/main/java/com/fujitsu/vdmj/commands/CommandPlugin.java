@@ -25,6 +25,13 @@ package com.fujitsu.vdmj.commands;
 
 import com.fujitsu.vdmj.runtime.Interpreter;
 
+/**
+ * User command plugin base class.
+ * 
+ * @deprecated in favour of AnalysisCommands.
+ * This class will be removed in VDMJ version 5.
+ */
+@Deprecated
 abstract public class CommandPlugin
 {
 	protected final Interpreter interpreter;

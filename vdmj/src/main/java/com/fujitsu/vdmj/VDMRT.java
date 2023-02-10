@@ -32,6 +32,13 @@ import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.InternalException;
 
+/**
+ * The main class of the VDM-RT parser/checker/interpreter.
+ * 
+ * @deprecated use {@link com.fujitsu.vdmj.plugins.VDMJ} instead.
+ * This class will be removed in VDMJ version 5.
+ */
+@Deprecated
 public class VDMRT extends VDMPP
 {
 	public VDMRT()

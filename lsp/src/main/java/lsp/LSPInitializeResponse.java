@@ -36,7 +36,9 @@ public class LSPInitializeResponse extends JSONObject
 	
 	public LSPInitializeResponse()
 	{
-		put("serverInfo", new JSONObject("name", "VDMJ LSP Server", "version", "0.1"));
+		String version = com.fujitsu.vdmj.util.Utils.getVersion();
+		if (version == null) version = "unknown";
+		put("serverInfo", new JSONObject("name", "VDMJ LSP Server", "version", version));
 		put("capabilities", getServerCapabilities());
 	}
 

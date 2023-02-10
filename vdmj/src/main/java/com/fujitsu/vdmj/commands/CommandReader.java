@@ -44,8 +44,8 @@ import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.VDMJ;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.debug.BreakpointReader;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -68,7 +68,11 @@ import com.fujitsu.vdmj.values.Value;
 
 /**
  * A class to read and perform commands from standard input.
+ * 
+ * @deprecated use {@link com.fujitsu.vdmj.plugins.CommandReader} instead.
+ * This class will be removed in VDMJ version 5.
  */
+@Deprecated
 abstract public class CommandReader
 {
 	/** The interpreter to use for the execution of commands. */
@@ -1430,7 +1434,7 @@ abstract public class CommandReader
 			{
 				scriptFile = new File(parts[1]);
 				scriptReader = new BufferedReader(
-					new InputStreamReader(new FileInputStream(scriptFile), VDMJ.filecharset));
+					new InputStreamReader(new FileInputStream(scriptFile), Settings.filecharset));
 			}
 		}
 		catch (Exception e)
@@ -1494,7 +1498,7 @@ abstract public class CommandReader
 
 		try
 		{
-			input = new BufferedReader(new InputStreamReader(new FileInputStream(filename), VDMJ.filecharset));
+			input = new BufferedReader(new InputStreamReader(new FileInputStream(filename), Settings.filecharset));
 		}
 		catch (FileNotFoundException e)
 		{

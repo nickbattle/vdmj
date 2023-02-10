@@ -106,7 +106,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 		}
 
 		return accessSpecifier.ifSet(" ") + name.getName() +
-				(typeParams == null ? ": " : "[" + typeParams + "]: ") + type +
+				(typeParams == null ? ": " : "[" + typeParams + "]: ") + Utils.deBracketed(type) +
 				"\n\t" + name.getName() + params + " ==\n" + body +
 				(precondition == null ? "" : "\n\tpre " + precondition) +
 				(postcondition == null ? "" : "\n\tpost " + postcondition);

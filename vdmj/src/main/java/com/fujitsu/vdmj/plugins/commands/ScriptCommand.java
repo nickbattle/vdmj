@@ -28,9 +28,11 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 
 public class ScriptCommand extends AnalysisCommand
@@ -68,7 +70,7 @@ public class ScriptCommand extends AnalysisCommand
 		
 		try
 		{
-			script = new BufferedReader(new FileReader(file));
+			script = new BufferedReader(new InputStreamReader(new FileInputStream(file), Settings.filecharset));
 
 			while (true)
 			{
