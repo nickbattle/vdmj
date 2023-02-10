@@ -137,6 +137,11 @@ public class VDMJ
 		}
 	}
 
+	public static void setWarnings(boolean warnings)
+	{
+		nowarn = !warnings;
+	}
+
 	private static void usage()
 	{
 		Map<String, AnalysisPlugin> plugins = PluginRegistry.getInstance().getPlugins();
@@ -273,7 +278,7 @@ public class VDMJ
 		}
 	}
 	
-	private static void loadPlugins()
+	public static void loadPlugins()
 	{
 		try
 		{
@@ -419,7 +424,7 @@ public class VDMJ
 		}
 	}
 	
-	private static boolean checkAndInitFiles()
+	public static boolean checkAndInitFiles()
 	{
 		try
 		{

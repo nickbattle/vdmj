@@ -48,15 +48,10 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteInterpreter;
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.VDMJ;
-import com.fujitsu.vdmj.VDMPP;
-import com.fujitsu.vdmj.VDMRT;
-import com.fujitsu.vdmj.VDMSL;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
@@ -81,6 +76,10 @@ import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsolePrintWriter;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.RTLogger;
+import com.fujitsu.vdmj.plugins.PluginConsole;
+import com.fujitsu.vdmj.plugins.PluginRegistry;
+import com.fujitsu.vdmj.plugins.VDMJ;
+import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Breakpoint;
@@ -116,10 +115,7 @@ import com.fujitsu.vdmj.values.ValueMap;
 
 /**
  * The DebugLink class for the DBGp protocol.
- * 
- * @deprecated This protocol is deprecated because it depends on the old VDMJ main class.
  */
-@Deprecated
 public class DBGPReader extends DebugLink
 {
 	private static Map<String, DBGPReader> threadInstances = new HashMap<String, DBGPReader>();
@@ -168,7 +164,6 @@ public class DBGPReader extends DebugLink
 		String expression = null;
 		List<File> files = new Vector<File>();
 		List<String> largs = Arrays.asList(args);
-		VDMJ controller = null;
 		boolean warnings = true;
 		boolean quiet = false;
 		String logfile = null;
@@ -187,16 +182,16 @@ public class DBGPReader extends DebugLink
 
     		if (arg.equals("-vdmsl"))
     		{
-    			controller = new VDMSL();
+    			Settings.dialect = Dialect.VDM_SL;
     		}
     		else if (arg.equals("-vdmpp"))
     		{
-    			controller = new VDMPP();
-    		}
+    			Settings.dialect = Dialect.VDM_PP;
+       		}
     		else if (arg.equals("-vdmrt"))
     		{
-    			controller = new VDMRT();
-    		}
+    			Settings.dialect = Dialect.VDM_RT;
+       		}
     		else if (arg.equals("-h"))
     		{
     			if (i.hasNext())
@@ -257,11 +252,6 @@ public class DBGPReader extends DebugLink
     		{
     			if (i.hasNext())
     			{
-    				if (controller == null)
-    				{
-    					usage("-c must come after <-vdmpp|-vdmsl|-vdmrt>");
-    				}
-
     				Settings.filecharset = validateCharset(i.next());
     			}
     			else
@@ -459,7 +449,7 @@ public class DBGPReader extends DebugLink
     		}
 		}
 
-		if (host == null || port == -1 || controller == null ||
+		if (host == null || port == -1 ||
 			ideKey == null || (expression == null && remoteName == null) || Settings.dialect == null ||
 			files.isEmpty())
 		{
@@ -514,72 +504,71 @@ public class DBGPReader extends DebugLink
 			}
 		}
 
-		controller.setWarnings(warnings);
-		controller.setQuiet(quiet);
+		
+		PluginConsole.setQuiet(quiet);
+		
+		VDMJ.loadPlugins();
+		VDMJ.setWarnings(warnings);
+		
+		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
+		ast.setFiles(files);
 
-		if (controller.parse(files) == ExitStatus.EXIT_OK)
+		if (VDMJ.checkAndInitFiles())
 		{
-    		if (controller.typeCheck() == ExitStatus.EXIT_OK)
-    		{
-				try
+			try
+			{
+				if (logfile != null)
 				{
-					if (logfile != null)
-					{
-		    			RTLogger.setLogfileName(new File(logfile));
-					}
-
-					Interpreter i = controller.getInterpreter();
-
-					if (defaultName != null)
-					{
-						i.setDefaultName(defaultName);
-					}
-
-					RemoteControl remote =
-						(remoteClass == null) ? null : remoteClass.getDeclaredConstructor().newInstance();
-
-					mainInstance = new DBGPReader(host, port, ideKey, i, expression, null);
-					mainInstance.startup(remote);
-
-					if (coverage != null)
-					{
-						writeCoverage(i, coverage);
-					}
-
-					RTLogger.dump(true);
-	    			System.exit(0);
+	    			RTLogger.setLogfileName(new File(logfile));
 				}
-				catch (ContextException e)
+
+				Interpreter i = Interpreter.getInstance();
+
+				if (defaultName != null)
 				{
-					System.out.println("Initialization: " + e);
-					
-					if (e.isStackOverflow())
-					{
-						e.ctxt.printStackFrames(Console.out);
-					}
-					else
-					{
-						e.ctxt.printStackTrace(Console.out, true);
-					}
+					i.setDefaultName(defaultName);
+				}
 
-					RTLogger.dump(true);
-					System.exit(3);
-				}
-				catch (Exception e)
+				RemoteControl remote =
+					(remoteClass == null) ? null : remoteClass.getDeclaredConstructor().newInstance();
+
+				mainInstance = new DBGPReader(host, port, ideKey, i, expression, null);
+				mainInstance.startup(remote);
+
+				if (coverage != null)
 				{
-					System.out.println("Initialization: " + e);
-					RTLogger.dump(true);
-					System.exit(3);
+					writeCoverage(i, coverage);
 				}
-    		}
-    		else
-    		{
-    			System.exit(2);
-    		}
+
+				RTLogger.dump(true);
+    			System.exit(0);
+			}
+			catch (ContextException e)
+			{
+				System.out.println("Initialization: " + e);
+				
+				if (e.isStackOverflow())
+				{
+					e.ctxt.printStackFrames(Console.out);
+				}
+				else
+				{
+					e.ctxt.printStackTrace(Console.out, true);
+				}
+
+				RTLogger.dump(true);
+				System.exit(3);
+			}
+			catch (Exception e)
+			{
+				System.out.println("Initialization: " + e);
+				RTLogger.dump(true);
+				System.exit(3);
+			}
 		}
 		else
 		{
-			System.exit(1);
+			System.exit(2);
 		}
 	}
 	

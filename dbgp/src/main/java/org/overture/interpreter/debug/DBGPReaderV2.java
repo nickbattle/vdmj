@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.values.CPUValue;
 /**
  * Class to simulate the Overture entry point.
  */
-@Deprecated
 public class DBGPReaderV2 extends DBGPReader
 {
 	private DBGPReaderV2(String host, int port, String ideKey,

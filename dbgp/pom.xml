@@ -61,8 +61,7 @@
 							<archive>
 								<manifestEntries>
 									<Main-Class>com.fujitsu.vdmj.dbgp.DBGPReader</Main-Class>
-									<Implementation-Version>${project.version} build
-										${maven.build.timestamp}</Implementation-Version>
+									<Implementation-Version>${project.version} build ${maven.build.timestamp}</Implementation-Version>
 									<Class-Path>.</Class-Path>
 								</manifestEntries>
 							</archive>
