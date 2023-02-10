@@ -83,7 +83,7 @@ public class VDMJ
 		warnings = true;
 		
 		Properties.init();
-		setDialect(argv);
+		setDialect();
 		loadPlugins();
 		processArgs();
 		
@@ -113,7 +113,7 @@ public class VDMJ
 		System.exit(result == ExitStatus.EXIT_OK ? 0 : 1);
 	}
 	
-	private static void setDialect(List<String> argv2)
+	private static void setDialect()
 	{
 		if (argv.contains("-vdmsl"))
 		{
@@ -134,6 +134,12 @@ public class VDMJ
 		{
 			verbose("Setting dialect to VDM-SL by default");
 			Settings.dialect = Dialect.VDM_SL;
+		}
+		
+		if (argv.contains("-verbose"))
+		{
+			argv.remove("-verbose");
+			Settings.verbose = true;
 		}
 	}
 
@@ -243,11 +249,6 @@ public class VDMJ
 					}
 	    			break;
 
-				case "-verbose":
-					Settings.verbose = true;
-					iter.remove();
-	    			break;
-
 				case "-annotations":
 					Settings.annotations = true;
 					iter.remove();
@@ -288,15 +289,19 @@ public class VDMJ
 
 			ASTPlugin ast = ASTPlugin.factory(Settings.dialect);
 			registry.registerPlugin(ast);
+			verbose("Registered AST plugin");
 
 			TCPlugin tc = TCPlugin.factory(Settings.dialect);
 			registry.registerPlugin(tc);
+			verbose("Registered TC plugin");
 
 			INPlugin in = INPlugin.factory(Settings.dialect);
 			registry.registerPlugin(in);
+			verbose("Registered IN plugin");
 			
 			POPlugin po = POPlugin.factory(Settings.dialect);
 			registry.registerPlugin(po);
+			verbose("Registered PO plugin");
 			
 			if (System.getProperty("vdmj.plugins") != null)
 			{
@@ -310,7 +315,7 @@ public class VDMJ
 						Method factory = clazz.getMethod("factory", Dialect.class);
 						AnalysisPlugin instance = (AnalysisPlugin)factory.invoke(null, Settings.dialect);
 						registry.registerPlugin(instance);
-						verbose("Registered " + plugin);
+						verbose("Registered " + plugin + " plugin");
 					}
 					catch (NoSuchMethodException e)
 					{
@@ -324,7 +329,7 @@ public class VDMJ
 						Constructor<?> ctor = clazz.getConstructor();
 						AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
 						registry.registerPlugin(instance);
-						verbose("Registered " + plugin);
+						verbose("Registered " + plugin + " plugin");
 					}
 					catch (Exception e)
 					{
@@ -423,6 +428,8 @@ public class VDMJ
 		{
 			fail("You did not identify any source files");
 		}
+		
+		verbose("Found %d files", filenames.size());
 	}
 	
 	public static boolean checkAndInitFiles()
