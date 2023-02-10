@@ -74,13 +74,13 @@ public class VDMJ
 {
 	private static List<String> argv = null;
 	private static List<File> paths = null;
-	private static boolean nowarn = false;
+	private static boolean warnings = true;
 
 	public static void main(String[] args)
 	{
 		argv = new Vector<String>(Arrays.asList(args));
 		paths = new Vector<File>();
-		nowarn = false;
+		warnings = true;
 		
 		Properties.init();
 		setDialect(argv);
@@ -139,7 +139,7 @@ public class VDMJ
 
 	public static void setWarnings(boolean warnings)
 	{
-		nowarn = !warnings;
+		VDMJ.warnings = warnings;
 	}
 
 	private static void usage()
@@ -176,7 +176,7 @@ public class VDMJ
 			{
 				case "-w":
 					iter.remove();
-					nowarn = true;
+					warnings = false;
 					break;
 					
 				case "-r":
@@ -487,20 +487,20 @@ public class VDMJ
 	
 	private static boolean report(List<VDMMessage> messages, AbstractCheckFilesEvent event)
 	{
-		int errors = 0;
-		int warnings = 0;
+		int nerrs = 0;
+		int nwarns = 0;
 		
 		for (VDMMessage m: messages)
 		{
 			if (m instanceof VDMError)
 			{
 				println(m.toString());
-				errors++;
+				nerrs++;
 			}
 			else if (m instanceof VDMWarning)
 			{
-				if (!nowarn) println(m.toString());
-				warnings++;
+				if (warnings) println(m.toString());
+				nwarns++;
 			}
 		}
 		
@@ -517,15 +517,15 @@ public class VDMJ
 			String title = event.getProperty(AbstractCheckFilesEvent.TITLE);
 			String kind = event.getProperty(AbstractCheckFilesEvent.KIND);
 			
-			if (errors > 0 || warnings > 0 || !title.equals("Prepared"))
+			if (nerrs > 0 || nwarns > 0 || !title.equals("Prepared"))
 			{
 		   		info(title + " " + objects + " in " + duration + " secs. ");
-		   		info(errors == 0 ? "No " + kind + " errors" : "Found " + plural(errors, kind + " error", "s"));
-		  		infoln(warnings == 0 ? "" : " and " + (nowarn ? "suppressed " : "") + plural(warnings, "warning", "s"));
+		   		info(nerrs == 0 ? "No " + kind + " errors" : "Found " + plural(nerrs, kind + " error", "s"));
+		  		infoln(nwarns == 0 ? "" : " and " + (warnings ? "" : "suppressed ") + plural(nwarns, "warning", "s"));
 			}
 		}
 		
-		return (errors == 0);	// Return "OK" if we can continue (ie. no errors)
+		return (nerrs == 0);	// Return "OK" if we can continue (ie. no errors)
 	}
 	
 	private static boolean runNeeded()
