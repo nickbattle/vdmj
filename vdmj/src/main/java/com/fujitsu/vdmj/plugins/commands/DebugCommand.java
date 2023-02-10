@@ -26,7 +26,7 @@ package com.fujitsu.vdmj.plugins.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
-import com.fujitsu.vdmj.commands.BreakpointReader;
+import com.fujitsu.vdmj.debug.BreakpointReader;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.runtime.Interpreter;
 

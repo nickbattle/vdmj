@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.commands;
+package com.fujitsu.vdmj.debug;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;

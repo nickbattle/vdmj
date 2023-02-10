@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.debug.BreakpointReader;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -67,6 +68,7 @@ import com.fujitsu.vdmj.values.Value;
  * A class to read and perform commands from standard input.
  * 
  * @deprecated use {@link com.fujitsu.vdmj.plugins.CommandReader} instead.
+ * This class will be removed in VDMJ version 5.
  */
 @Deprecated
 abstract public class CommandReader

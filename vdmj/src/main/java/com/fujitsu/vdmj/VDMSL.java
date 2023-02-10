@@ -57,6 +57,7 @@ import com.fujitsu.vdmj.util.Utils;
  * The main class of the VDM-SL parser/checker/interpreter.
  * 
  * @deprecated use {@link com.fujitsu.vdmj.plugins.VDMJ} instead.
+ * This class will be removed in VDMJ version 5.
  */
 @Deprecated
 public class VDMSL extends VDMJ
