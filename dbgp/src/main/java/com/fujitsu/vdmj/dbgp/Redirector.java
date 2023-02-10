@@ -31,7 +31,6 @@ import java.nio.charset.Charset;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
 
-@Deprecated
 abstract public class Redirector implements ConsoleWriter
 {
 	protected final PrintWriter out;
