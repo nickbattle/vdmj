@@ -43,6 +43,10 @@ import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.util.DependencyOrder;
 
+/**
+ * @deprecated This will be ported to the new AnalysisCommand at some point.
+ */
+@Deprecated
 public class OrderPlugin extends CommandPlugin
 {
 	public OrderPlugin(Interpreter interpreter)
