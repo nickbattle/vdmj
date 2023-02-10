@@ -24,17 +24,15 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
-
 import java.util.List;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
+import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.CommandList;
-import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.CheckTypeEvent;
@@ -73,18 +71,6 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 			default:
 				throw new Exception("Unknown dialect: " + dialect);
 		}
-	}
-	
-	@Override
-	public void usage()
-	{
-		println("-w: suppress warning messages");
-	}
-	
-	@Override
-	public void processArgs(List<String> argv)
-	{
-		return;		// None as yet
 	}
 
 	@Override

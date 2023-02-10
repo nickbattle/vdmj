@@ -150,6 +150,7 @@ public class VDMJ
 		println("-vdmsl: parse files as VDM-SL (default)");
 		println("-vdmpp: parse files as VDM++");
 		println("-vdmrt: parse files as VDM-RT");
+		println("-w: suppress warning messages");
 		println("-v: show VDMJ jar version");
 		println("-path: search path for files");
 		println("-strict: use strict grammar rules");
