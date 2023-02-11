@@ -28,16 +28,16 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
 import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
+import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.CommandList;
-import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.commands.PogCommand;
 import com.fujitsu.vdmj.plugins.events.AbstractCheckFilesEvent;
@@ -150,7 +150,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract public ProofObligationList getProofObligations();
 
-	abstract public <T extends Mappable> T getPO();
+	abstract public <T extends Collection<?>> T getPO();
 
 	protected CommandList commandList = new CommandList
 	(

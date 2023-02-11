@@ -24,11 +24,15 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
+import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
+import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.List;
 
+import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteInterpreter;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
@@ -36,7 +40,6 @@ import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.CommandReader;
@@ -130,14 +133,14 @@ public class INPluginSL extends INPlugin
 	}
 	
 	@Override
-	protected void interpreterRun()
+	protected ExitStatus interpreterRun()
 	{
 		try
 		{
 			if (interactive)
 			{
 				infoln("Interpreter started");
-				new CommandReader().run();
+				return new CommandReader().run();
 			}
 			else if (expression != null)
 			{
@@ -162,6 +165,8 @@ public class INPluginSL extends INPlugin
 			{
 				e.ctxt.printStackTrace(Console.out, true);
 			}
+			
+			return ExitStatus.EXIT_ERRORS;
 		}
 		catch (Throwable e)
 		{
@@ -172,12 +177,15 @@ public class INPluginSL extends INPlugin
 			
 			println("Execution:");
 			println(e);
+			return ExitStatus.EXIT_ERRORS;
 		}
+		
+		return ExitStatus.EXIT_OK;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Mappable> T getIN()
+	public <T extends Collection<?>> T getIN()
 	{
 		return (T)inModuleList;
 	}

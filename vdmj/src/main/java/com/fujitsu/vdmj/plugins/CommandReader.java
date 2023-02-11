@@ -172,13 +172,14 @@ public class CommandReader
 
 	private AnalysisCommand usePlugin(String[] argv) throws Exception
 	{
-		String plugin = Character.toUpperCase(argv[0].charAt(0)) + argv[0].substring(1).toLowerCase();
 		String[] packages = Properties.cmd_plugin_packages.split(";|:");
 		
 		for (String pack: packages)
 		{
 			try
 			{
+				// Remove this CommandPlugin test when we remove the @Deprecated classes.
+				String plugin = Character.toUpperCase(argv[0].charAt(0)) + argv[0].substring(1).toLowerCase();
 				Class<?> clazz = Class.forName(pack + "." + plugin + "Plugin");
 
 				if (CommandPlugin.class.isAssignableFrom(clazz))

@@ -24,9 +24,20 @@
 
 package com.fujitsu.vdmj.plugins.events;
 
+import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
 
 public class StartConsoleEvent extends AnalysisEvent
 {
-	// Indicates that a console session should be started
+	private ExitStatus status = ExitStatus.EXIT_OK;
+	
+	public void setStatus(ExitStatus status)
+	{
+		this.status = status;
+	}
+	
+	public ExitStatus getStatus()
+	{
+		return status;
+	}
 }
