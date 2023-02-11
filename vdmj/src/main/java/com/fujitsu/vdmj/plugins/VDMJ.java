@@ -440,12 +440,12 @@ public class VDMJ
 		try
 		{
 			EventHub eventhub = EventHub.getInstance();
-			AbstractCheckFilesEvent event = new CheckPrepareEvent();
+			AbstractCheckFilesEvent event = new CheckPrepareEvent(files);
 			List<VDMMessage> messages = eventhub.publish(event);
 
 			if (report(messages, event))
 			{
-				event = new CheckSyntaxEvent(files);
+				event = new CheckSyntaxEvent();
 				messages = eventhub.publish(event);
 				
 				if (report(messages, event))

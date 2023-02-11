@@ -24,12 +24,23 @@
 
 package com.fujitsu.vdmj.plugins.events;
 
+import java.io.File;
+import java.util.List;
+
 public class CheckPrepareEvent extends AbstractCheckFilesEvent
 {
-	public CheckPrepareEvent()
+	private final List<File> files;
+
+	public CheckPrepareEvent(List<File> files)
 	{
 		super();
+		this.files = files;
 		setProperty(TITLE, "Prepared");
 		setProperty(KIND, "preparation");
+	}
+	
+	public List<File> getFiles()
+	{
+		return files;
 	}
 }
