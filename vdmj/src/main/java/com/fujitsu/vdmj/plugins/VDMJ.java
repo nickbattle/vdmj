@@ -64,6 +64,7 @@ import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.CheckTypeEvent;
 import com.fujitsu.vdmj.plugins.events.ShutdownEvent;
+import com.fujitsu.vdmj.plugins.events.StartConsoleEvent;
 import com.fujitsu.vdmj.util.GetResource;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -74,16 +75,18 @@ public class VDMJ
 {
 	private static List<String> argv = null;
 	private static List<File> paths = null;
+	private static List<File> files = null;
 	private static boolean warnings = true;
 
 	public static void main(String[] args)
 	{
 		argv = new Vector<String>(Arrays.asList(args));
 		paths = new Vector<File>();
+		files = new Vector<File>();
 		warnings = true;
 		
 		Properties.init();
-		setDialect(argv);
+		setDialect();
 		loadPlugins();
 		processArgs();
 		
@@ -95,10 +98,7 @@ public class VDMJ
 			
 			if (checkAndInitFiles())
 			{
-				if (runNeeded())
-				{
-					result = run();
-				}
+				result = run();
 			}
 			else
 			{
@@ -113,8 +113,14 @@ public class VDMJ
 		System.exit(result == ExitStatus.EXIT_OK ? 0 : 1);
 	}
 	
-	private static void setDialect(List<String> argv2)
+	private static void setDialect()
 	{
+		if (argv.contains("-verbose"))
+		{
+			argv.remove("-verbose");
+			Settings.verbose = true;
+		}
+
 		if (argv.contains("-vdmsl"))
 		{
 			argv.remove("-vdmsl");
@@ -137,9 +143,14 @@ public class VDMJ
 		}
 	}
 
-	public static void setWarnings(boolean warnings)
+	public static void setFiles(List<File> files)
 	{
-		VDMJ.warnings = warnings;
+		VDMJ.files = files;
+	}
+
+	public static List<File> getFiles()
+	{
+		return files;
 	}
 
 	private static void usage()
@@ -150,6 +161,7 @@ public class VDMJ
 		println("-vdmsl: parse files as VDM-SL (default)");
 		println("-vdmpp: parse files as VDM++");
 		println("-vdmrt: parse files as VDM-RT");
+		println("-w: suppress warning messages");
 		println("-v: show VDMJ jar version");
 		println("-path: search path for files");
 		println("-strict: use strict grammar rules");
@@ -164,6 +176,13 @@ public class VDMJ
 		}
 		
 		System.exit(0);
+	}
+	
+	public static void setArgs(String... args)
+	{
+		// See DBGPReader's use of this
+		argv = new Vector<String>(Arrays.asList(args));
+		processArgs();
 	}
 
 	private static void processArgs()
@@ -242,11 +261,6 @@ public class VDMJ
 					}
 	    			break;
 
-				case "-verbose":
-					Settings.verbose = true;
-					iter.remove();
-	    			break;
-
 				case "-annotations":
 					Settings.annotations = true;
 					iter.remove();
@@ -287,15 +301,19 @@ public class VDMJ
 
 			ASTPlugin ast = ASTPlugin.factory(Settings.dialect);
 			registry.registerPlugin(ast);
+			verbose("Registered AST plugin");
 
 			TCPlugin tc = TCPlugin.factory(Settings.dialect);
 			registry.registerPlugin(tc);
+			verbose("Registered TC plugin");
 
 			INPlugin in = INPlugin.factory(Settings.dialect);
 			registry.registerPlugin(in);
+			verbose("Registered IN plugin");
 			
 			POPlugin po = POPlugin.factory(Settings.dialect);
 			registry.registerPlugin(po);
+			verbose("Registered PO plugin");
 			
 			if (System.getProperty("vdmj.plugins") != null)
 			{
@@ -309,7 +327,7 @@ public class VDMJ
 						Method factory = clazz.getMethod("factory", Dialect.class);
 						AnalysisPlugin instance = (AnalysisPlugin)factory.invoke(null, Settings.dialect);
 						registry.registerPlugin(instance);
-						verbose("Registered " + plugin);
+						verbose("Registered " + plugin + " plugin");
 					}
 					catch (NoSuchMethodException e)
 					{
@@ -323,7 +341,7 @@ public class VDMJ
 						Constructor<?> ctor = clazz.getConstructor();
 						AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
 						registry.registerPlugin(instance);
-						verbose("Registered " + plugin);
+						verbose("Registered " + plugin + " plugin");
 					}
 					catch (Exception e)
 					{
@@ -342,7 +360,7 @@ public class VDMJ
 	
 	private static void findFiles()
 	{
-		List<File> filenames = new Vector<File>();
+		files = new Vector<File>();
 		
 		for (String arg: argv)
 		{
@@ -363,13 +381,13 @@ public class VDMJ
 				{
 					if (subfile.isFile())
 					{
-						filenames.add(subfile);
+						files.add(subfile);
 					}
 				}
 			}
 			else if (file.exists() || BacktrackInputReader.isExternalFormat(file))
 			{
-				filenames.add(file);
+				files.add(file);
 			}
 			else
 			{
@@ -383,7 +401,7 @@ public class VDMJ
 						
 						if (pfile.exists())
 						{
-							filenames.add(pfile);
+							files.add(pfile);
 							found = true;
 							break;
 						}
@@ -399,7 +417,7 @@ public class VDMJ
 							File lib = new File("lib");
 							lib.mkdir();
 							File dest = new File(lib, file.getName());
-							filenames.add(GetResource.load(file, dest));
+							files.add(GetResource.load(file, dest));
 						}
 						catch (IOException e)
 						{
@@ -414,14 +432,7 @@ public class VDMJ
 			}
 		}
 		
-		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
-		INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
-		ast.setFiles(filenames);
-		
-		if (filenames.isEmpty() && !in.isInteractive())
-		{
-			fail("You did not identify any source files");
-		}
+		verbose("Found %d files", files.size());
 	}
 	
 	public static boolean checkAndInitFiles()
@@ -434,7 +445,7 @@ public class VDMJ
 
 			if (report(messages, event))
 			{
-				event = new CheckSyntaxEvent();
+				event = new CheckSyntaxEvent(files);
 				messages = eventhub.publish(event);
 				
 				if (report(messages, event))
@@ -485,24 +496,26 @@ public class VDMJ
 		return false;
 	}
 	
-	private static boolean report(List<VDMMessage> messages, AbstractCheckFilesEvent event)
+	private static int count(List<VDMMessage> messages, Class<? extends VDMMessage>type)
 	{
-		int nerrs = 0;
-		int nwarns = 0;
-		
+		int count = 0;
+
 		for (VDMMessage m: messages)
 		{
-			if (m instanceof VDMError)
+			if (type.isAssignableFrom(m.getClass()))
 			{
 				println(m.toString());
-				nerrs++;
-			}
-			else if (m instanceof VDMWarning)
-			{
-				if (warnings) println(m.toString());
-				nwarns++;
+				count++;
 			}
 		}
+		
+		return count;
+	}
+	
+	private static boolean report(List<VDMMessage> messages, AbstractCheckFilesEvent event)
+	{
+		int nerrs  = count(messages, VDMError.class);
+		int nwarns = count(messages, VDMWarning.class);
 		
 		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
 		int count = ast.getCount();
@@ -528,16 +541,19 @@ public class VDMJ
 		return (nerrs == 0);	// Return "OK" if we can continue (ie. no errors)
 	}
 	
-	private static boolean runNeeded()
-	{
-		INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
-		return in.runNeeded();
-	}
-
 	private static ExitStatus run()
 	{
-		INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
-		return in.interpreterRun();
+		try
+		{
+			List<VDMMessage> messages = EventHub.getInstance().publish(new StartConsoleEvent());
+			int errs = count(messages, VDMError.class);
+			return (errs > 0) ? ExitStatus.EXIT_ERRORS : ExitStatus.EXIT_OK;
+		}
+		catch (Exception e)
+		{
+			println(e);
+			return ExitStatus.EXIT_ERRORS;
+		}
 	}
 
 	private static void complete()

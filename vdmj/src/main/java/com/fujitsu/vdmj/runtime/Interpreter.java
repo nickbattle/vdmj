@@ -710,7 +710,15 @@ abstract public class Interpreter
 
 	public abstract List<Object> runOneTrace(INClassDefinition classDefinition, CallSequence test, boolean debug);
 	
+	/** @deprecated in favour of TCPlugin.getTC() */
+	@Deprecated
 	abstract public <T extends List<?>> T getTC();
+	
+	/** @deprecated in favour of INPlugin.getIN() */
+	@Deprecated
 	abstract public <T extends List<?>> T getIN();
+	
+	/** @deprecated in favour of POPlugin.getPO() */
+	@Deprecated
 	abstract public <T extends List<?>> T getPO();
 }

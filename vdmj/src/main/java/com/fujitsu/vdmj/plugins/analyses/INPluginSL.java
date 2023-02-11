@@ -24,13 +24,11 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteInterpreter;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
@@ -41,6 +39,7 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.plugins.CommandReader;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
@@ -64,17 +63,11 @@ public class INPluginSL extends INPlugin
 	}
 
 	@Override
-	public List<VDMMessage> interpreterInit()
+	protected List<VDMMessage> interpreterInit()
 	{
-		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
-		TCModuleList checkedModules = tc.getTC();
-
 		try
 		{
-			long before = System.currentTimeMillis();
-   			inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedModules);
-   			Utils.mapperStats(before, INNode.MAPPINGS);
-   			interpreter = new ModuleInterpreter(inModuleList, checkedModules);
+   			getInterpreter();
    			ConsoleDebugReader dbg = null;
    			ConsoleKeyWatcher watcher = null;
 
@@ -137,31 +130,24 @@ public class INPluginSL extends INPlugin
 	}
 	
 	@Override
-	public ExitStatus interpreterRun()
+	protected void interpreterRun()
 	{
 		try
 		{
 			if (interactive)
 			{
 				infoln("Interpreter started");
-				
-//				CommandReader reader = new ModuleCommandReader(interpreter, "> ");
-//				ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
-//				return reader.run(ast.getFiles());
-				
-				return new com.fujitsu.vdmj.plugins.CommandReader().run();
+				new CommandReader().run();
 			}
 			else if (expression != null)
 			{
 				// No debug thread or watcher for -e <exp>
 				println(interpreter.execute(expression));
-				return ExitStatus.EXIT_OK;
 			}
 			else if (remoteClass != null)
 			{
 				RemoteControl remote = remoteClass.getDeclaredConstructor().newInstance();
 				remote.run(new RemoteInterpreter(interpreter));
-				return ExitStatus.EXIT_OK;
 			}
 		}
 		catch (ContextException e)
@@ -176,8 +162,6 @@ public class INPluginSL extends INPlugin
 			{
 				e.ctxt.printStackTrace(Console.out, true);
 			}
-
-			return ExitStatus.EXIT_ERRORS;
 		}
 		catch (Throwable e)
 		{
@@ -188,11 +172,7 @@ public class INPluginSL extends INPlugin
 			
 			println("Execution:");
 			println(e);
-
-			return ExitStatus.EXIT_ERRORS;
 		}
-
-		return ExitStatus.EXIT_OK;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -200,5 +180,29 @@ public class INPluginSL extends INPlugin
 	public <T extends Mappable> T getIN()
 	{
 		return (T)inModuleList;
+	}
+
+	@Override
+	public ModuleInterpreter getInterpreter()
+	{
+		if (interpreter == null)
+		{
+			try
+			{
+				TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
+				TCModuleList checkedModules = tc.getTC();
+				long before = System.currentTimeMillis();
+				inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedModules);
+				Utils.mapperStats(before, INNode.MAPPINGS);
+				interpreter = new ModuleInterpreter(inModuleList, checkedModules);
+			}
+			catch (Exception e)
+			{
+				println(e);
+				fail("Cannot create interpreter");
+			}
+		}
+		
+		return interpreter;
 	}
 }

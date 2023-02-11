@@ -540,6 +540,7 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	@Override
 	public <T extends List<?>> T getTC()
 	{
@@ -547,6 +548,7 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	@Override
 	public <T extends List<?>> T getIN()
 	{
@@ -554,6 +556,7 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	@Override
 	public <T extends List<?>> T getPO()
 	{

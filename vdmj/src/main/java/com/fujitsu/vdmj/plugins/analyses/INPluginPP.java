@@ -24,13 +24,13 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
 import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteInterpreter;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.plugins.CommandReader;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -56,7 +57,7 @@ public class INPluginPP extends INPlugin
 	private ClassInterpreter interpreter = null;
 	
 	@Override
-	public List<VDMMessage> interpreterPrepare()
+	protected List<VDMMessage> interpreterPrepare()
 	{
 		inClassList = new INClassList();
 		interpreter = null;
@@ -64,17 +65,11 @@ public class INPluginPP extends INPlugin
 	}
 
 	@Override
-	public List<VDMMessage> interpreterInit()
+	protected List<VDMMessage> interpreterInit()
 	{
-		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
-		TCClassList checkedClasses = tc.getTC();
-
 		try
 		{
-			long before = System.currentTimeMillis();
-   			inClassList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedClasses);
-   			Utils.mapperStats(before, INNode.MAPPINGS);
-   			interpreter = new ClassInterpreter(inClassList, checkedClasses);
+   			getInterpreter();
    			ConsoleDebugReader dbg = null;
    			ConsoleKeyWatcher watcher = null;
 
@@ -137,29 +132,23 @@ public class INPluginPP extends INPlugin
 	}
 	
 	@Override
-	public ExitStatus interpreterRun()
+	protected void interpreterRun()
 	{
 		try
 		{
 			if (interactive)
 			{
 				infoln("Interpreter started");
-//				CommandReader reader = new ClassCommandReader(interpreter, "> ");
-//				ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
-//				return reader.run(ast.getFiles());
-
-				return new com.fujitsu.vdmj.plugins.CommandReader().run();
+				new CommandReader().run();
 			}
 			else if (expression != null)
 			{
 				println(interpreter.execute(expression));
-				return ExitStatus.EXIT_OK;
 			}
 			else if (remoteClass != null)
 			{
 				RemoteControl remote = remoteClass.getDeclaredConstructor().newInstance();
 				remote.run(new RemoteInterpreter(interpreter));
-				return ExitStatus.EXIT_OK;
 			}
 		}
 		catch (ContextException e)
@@ -174,8 +163,6 @@ public class INPluginPP extends INPlugin
 			{
 				e.ctxt.printStackTrace(Console.out, true);
 			}
-
-			return ExitStatus.EXIT_ERRORS;
 		}
 		catch (Throwable e)
 		{
@@ -186,11 +173,7 @@ public class INPluginPP extends INPlugin
 			
 			println("Execution:");
 			println(e);
-
-			return ExitStatus.EXIT_ERRORS;
 		}
-
-		return ExitStatus.EXIT_OK;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -198,5 +181,29 @@ public class INPluginPP extends INPlugin
 	public <T extends Mappable> T getIN()
 	{
 		return (T)inClassList;
+	}
+
+	@Override
+	public ClassInterpreter getInterpreter()
+	{
+		if (interpreter == null)
+		{
+			try
+			{
+				TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
+				TCClassList checkedClasses = tc.getTC();
+				long before = System.currentTimeMillis();
+				inClassList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedClasses);
+				Utils.mapperStats(before, INNode.MAPPINGS);
+				interpreter = new ClassInterpreter(inClassList, checkedClasses);
+			}
+			catch (Exception e)
+			{
+				println(e);
+				fail("Cannot create interpreter");
+			}
+		}
+		
+		return interpreter;
 	}
 }

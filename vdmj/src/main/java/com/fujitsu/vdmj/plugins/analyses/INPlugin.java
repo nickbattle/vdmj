@@ -30,7 +30,6 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import java.util.Iterator;
 import java.util.List;
 
-import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.Settings;
@@ -38,9 +37,9 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
+import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.CommandList;
-import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.commands.AssertCommand;
 import com.fujitsu.vdmj.plugins.commands.CoverageCommand;
@@ -64,6 +63,9 @@ import com.fujitsu.vdmj.plugins.commands.WordCommand;
 import com.fujitsu.vdmj.plugins.events.AbstractCheckFilesEvent;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
+import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
+import com.fujitsu.vdmj.plugins.events.StartConsoleEvent;
+import com.fujitsu.vdmj.runtime.Interpreter;
 
 /**
  * IN analysis plugin
@@ -100,7 +102,9 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		remoteSimulation = null;
 		
 		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckSyntaxEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
+		eventhub.register(StartConsoleEvent.class, this);
 	}
 
 	public static INPlugin factory(Dialect dialect) throws Exception
@@ -306,6 +310,17 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		{
 			return interpreterPrepare();
 		}
+		else if (event instanceof CheckSyntaxEvent)
+		{
+			CheckSyntaxEvent sevent = (CheckSyntaxEvent)event;
+			
+			if (sevent.getFiles().isEmpty() && !interactive)
+			{
+				fail("You did not identify any source files");
+			}
+
+			return null;
+		}
 		else if (event instanceof CheckCompleteEvent)
 		{
 			if (startInterpreter)
@@ -319,17 +334,28 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 				return null;
 			}
 		}
+		else if (event instanceof StartConsoleEvent)
+		{
+			if (startInterpreter)
+			{
+				interpreterRun();
+			}
+
+			return null;	// No errors needed?
+		}
 		else
 		{
 			throw new Exception("Unhandled event: " + event);
 		}
 	}
 	
-	abstract public List<VDMMessage> interpreterPrepare();
+	abstract protected List<VDMMessage> interpreterPrepare();
 
-	abstract public List<VDMMessage> interpreterInit();
+	abstract protected List<VDMMessage> interpreterInit();
 
-	abstract public ExitStatus interpreterRun();
+	abstract protected void interpreterRun();
+	
+	abstract public Interpreter getInterpreter();
 
 	abstract public <T extends Mappable> T getIN();
 
@@ -352,11 +378,6 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		return null;
 	}
 
-	public boolean runNeeded()
-	{
-		return startInterpreter;	// Because we need it for something!
-	}
-	
 	public boolean isInteractive()
 	{
 		return interactive;

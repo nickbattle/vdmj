@@ -423,6 +423,7 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	@Override
 	public <T extends List<?>> T getTC()
 	{
@@ -430,6 +431,7 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	@Override
 	public <T extends List<?>> T getIN()
 	{
@@ -437,6 +439,7 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	@Override
 	public <T extends List<?>> T getPO()
 	{
