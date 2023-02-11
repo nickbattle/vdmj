@@ -134,12 +134,12 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	{
 		if (event instanceof CheckPrepareEvent)
 		{
+			CheckPrepareEvent pevent = (CheckPrepareEvent)event;
+			files = pevent.getFiles();
 			return syntaxPrepare();
 		}
 		else if (event instanceof CheckSyntaxEvent)
 		{
-			CheckSyntaxEvent sevent = (CheckSyntaxEvent)event;
-			files = sevent.getFiles();
 			return syntaxCheck();
 		}
 		else

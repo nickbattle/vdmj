@@ -63,7 +63,6 @@ import com.fujitsu.vdmj.plugins.commands.WordCommand;
 import com.fujitsu.vdmj.plugins.events.AbstractCheckFilesEvent;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
-import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.StartConsoleEvent;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
@@ -102,7 +101,6 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		remoteSimulation = null;
 		
 		eventhub.register(CheckPrepareEvent.class, this);
-		eventhub.register(CheckSyntaxEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
 		eventhub.register(StartConsoleEvent.class, this);
 	}
@@ -308,18 +306,14 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	{
 		if (event instanceof CheckPrepareEvent)
 		{
-			return interpreterPrepare();
-		}
-		else if (event instanceof CheckSyntaxEvent)
-		{
-			CheckSyntaxEvent sevent = (CheckSyntaxEvent)event;
+			CheckPrepareEvent pevent = (CheckPrepareEvent)event;
 			
-			if (sevent.getFiles().isEmpty() && !interactive)
+			if (pevent.getFiles().isEmpty() && !interactive)
 			{
 				fail("You did not identify any source files");
 			}
 
-			return null;
+			return interpreterPrepare();
 		}
 		else if (event instanceof CheckCompleteEvent)
 		{
