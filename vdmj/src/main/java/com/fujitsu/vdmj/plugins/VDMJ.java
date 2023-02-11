@@ -75,12 +75,14 @@ public class VDMJ
 {
 	private static List<String> argv = null;
 	private static List<File> paths = null;
+	private static List<File> files = null;
 	private static boolean warnings = true;
 
 	public static void main(String[] args)
 	{
 		argv = new Vector<String>(Arrays.asList(args));
 		paths = new Vector<File>();
+		files = new Vector<File>();
 		warnings = true;
 		
 		Properties.init();
@@ -141,9 +143,14 @@ public class VDMJ
 		}
 	}
 
-	public static void setWarnings(boolean warnings)
+	public static void setFiles(List<File> files)
 	{
-		VDMJ.warnings = warnings;
+		VDMJ.files = files;
+	}
+
+	public static List<File> getFiles()
+	{
+		return files;
 	}
 
 	private static void usage()
@@ -169,6 +176,13 @@ public class VDMJ
 		}
 		
 		System.exit(0);
+	}
+	
+	public static void setArgs(String... args)
+	{
+		// See DBGPReader's use of this
+		argv = new Vector<String>(Arrays.asList(args));
+		processArgs();
 	}
 
 	private static void processArgs()
@@ -346,7 +360,7 @@ public class VDMJ
 	
 	private static void findFiles()
 	{
-		List<File> filenames = new Vector<File>();
+		files = new Vector<File>();
 		
 		for (String arg: argv)
 		{
@@ -367,13 +381,13 @@ public class VDMJ
 				{
 					if (subfile.isFile())
 					{
-						filenames.add(subfile);
+						files.add(subfile);
 					}
 				}
 			}
 			else if (file.exists() || BacktrackInputReader.isExternalFormat(file))
 			{
-				filenames.add(file);
+				files.add(file);
 			}
 			else
 			{
@@ -387,7 +401,7 @@ public class VDMJ
 						
 						if (pfile.exists())
 						{
-							filenames.add(pfile);
+							files.add(pfile);
 							found = true;
 							break;
 						}
@@ -403,7 +417,7 @@ public class VDMJ
 							File lib = new File("lib");
 							lib.mkdir();
 							File dest = new File(lib, file.getName());
-							filenames.add(GetResource.load(file, dest));
+							files.add(GetResource.load(file, dest));
 						}
 						catch (IOException e)
 						{
@@ -418,16 +432,7 @@ public class VDMJ
 			}
 		}
 		
-		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
-		INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
-		ast.setFiles(filenames);
-		
-		if (filenames.isEmpty() && !in.isInteractive())
-		{
-			fail("You did not identify any source files");
-		}
-		
-		verbose("Found %d files", filenames.size());
+		verbose("Found %d files", files.size());
 	}
 	
 	public static boolean checkAndInitFiles()
@@ -440,7 +445,7 @@ public class VDMJ
 
 			if (report(messages, event))
 			{
-				event = new CheckSyntaxEvent();
+				event = new CheckSyntaxEvent(files);
 				messages = eventhub.publish(event);
 				
 				if (report(messages, event))

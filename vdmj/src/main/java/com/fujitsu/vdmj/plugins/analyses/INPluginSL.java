@@ -24,8 +24,7 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -66,15 +65,9 @@ public class INPluginSL extends INPlugin
 	@Override
 	protected List<VDMMessage> interpreterInit()
 	{
-		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
-		TCModuleList checkedModules = tc.getTC();
-
 		try
 		{
-			long before = System.currentTimeMillis();
-   			inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedModules);
-   			Utils.mapperStats(before, INNode.MAPPINGS);
-   			interpreter = new ModuleInterpreter(inModuleList, checkedModules);
+   			getInterpreter();
    			ConsoleDebugReader dbg = null;
    			ConsoleKeyWatcher watcher = null;
 
@@ -187,5 +180,29 @@ public class INPluginSL extends INPlugin
 	public <T extends Mappable> T getIN()
 	{
 		return (T)inModuleList;
+	}
+
+	@Override
+	public ModuleInterpreter getInterpreter()
+	{
+		if (interpreter == null)
+		{
+			try
+			{
+				TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
+				TCModuleList checkedModules = tc.getTC();
+				long before = System.currentTimeMillis();
+				inModuleList = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedModules);
+				Utils.mapperStats(before, INNode.MAPPINGS);
+				interpreter = new ModuleInterpreter(inModuleList, checkedModules);
+			}
+			catch (Exception e)
+			{
+				println(e);
+				fail("Cannot create interpreter");
+			}
+		}
+		
+		return interpreter;
 	}
 }

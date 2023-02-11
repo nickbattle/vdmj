@@ -63,7 +63,9 @@ import com.fujitsu.vdmj.plugins.commands.WordCommand;
 import com.fujitsu.vdmj.plugins.events.AbstractCheckFilesEvent;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
+import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 import com.fujitsu.vdmj.plugins.events.StartConsoleEvent;
+import com.fujitsu.vdmj.runtime.Interpreter;
 
 /**
  * IN analysis plugin
@@ -100,6 +102,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		remoteSimulation = null;
 		
 		eventhub.register(CheckPrepareEvent.class, this);
+		eventhub.register(CheckSyntaxEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
 		eventhub.register(StartConsoleEvent.class, this);
 	}
@@ -307,6 +310,17 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		{
 			return interpreterPrepare();
 		}
+		else if (event instanceof CheckSyntaxEvent)
+		{
+			CheckSyntaxEvent sevent = (CheckSyntaxEvent)event;
+			
+			if (sevent.getFiles().isEmpty() && !interactive)
+			{
+				fail("You did not identify any source files");
+			}
+
+			return null;
+		}
 		else if (event instanceof CheckCompleteEvent)
 		{
 			if (startInterpreter)
@@ -340,6 +354,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	abstract protected List<VDMMessage> interpreterInit();
 
 	abstract protected void interpreterRun();
+	
+	abstract public Interpreter getInterpreter();
 
 	abstract public <T extends Mappable> T getIN();
 

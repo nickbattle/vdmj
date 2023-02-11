@@ -24,11 +24,12 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+
 import java.io.File;
 
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
+import com.fujitsu.vdmj.plugins.VDMJ;
 
 public class FilesCommand extends AnalysisCommand
 {
@@ -53,9 +54,7 @@ public class FilesCommand extends AnalysisCommand
 			return;
 		}
 
-		ASTPlugin ast = registry.getPlugin("AST");
-
-		for (File file: ast.getFiles())
+		for (File file: VDMJ.getFiles())
 		{
 			println(file);
 		}

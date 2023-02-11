@@ -86,16 +86,6 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		}
 	}
 	
-	public void setFiles(List<File> files)
-	{
-		this.files = files;
-	}
-
-	public List<File> getFiles()
-	{
-		return files;
-	}
-	
 	public void checkForUpdates(long timestamp)
 	{
 		for (File file: files)
@@ -148,6 +138,8 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 		}
 		else if (event instanceof CheckSyntaxEvent)
 		{
+			CheckSyntaxEvent sevent = (CheckSyntaxEvent)event;
+			files = sevent.getFiles();
 			return syntaxCheck();
 		}
 		else

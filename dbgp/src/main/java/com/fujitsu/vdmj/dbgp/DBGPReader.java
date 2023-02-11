@@ -76,10 +76,9 @@ import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsolePrintWriter;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.RTLogger;
-import com.fujitsu.vdmj.plugins.PluginConsole;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.VDMJ;
-import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
+import com.fujitsu.vdmj.plugins.analyses.INPlugin;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Breakpoint;
@@ -504,14 +503,10 @@ public class DBGPReader extends DebugLink
 			}
 		}
 
-		
-		PluginConsole.setQuiet(quiet);
-		
 		VDMJ.loadPlugins();
-		VDMJ.setWarnings(warnings);
-		
-		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
-		ast.setFiles(files);
+		if (quiet) VDMJ.setArgs("-q");
+		if (!warnings) VDMJ.setArgs("-w");
+		VDMJ.setFiles(files);
 
 		if (VDMJ.checkAndInitFiles())
 		{
@@ -522,7 +517,8 @@ public class DBGPReader extends DebugLink
 	    			RTLogger.setLogfileName(new File(logfile));
 				}
 
-				Interpreter i = Interpreter.getInstance();
+				INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
+				Interpreter i = in.getInterpreter();
 
 				if (defaultName != null)
 				{

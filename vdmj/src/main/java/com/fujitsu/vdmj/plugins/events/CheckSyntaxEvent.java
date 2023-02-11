@@ -24,12 +24,23 @@
 
 package com.fujitsu.vdmj.plugins.events;
 
+import java.io.File;
+import java.util.List;
+
 public class CheckSyntaxEvent extends AbstractCheckFilesEvent
 {
-	public CheckSyntaxEvent()
+	private final List<File> files;
+	
+	public CheckSyntaxEvent(List<File> files)
 	{
 		super();
+		this.files = files;
 		setProperty(TITLE, "Parsed");
 		setProperty(KIND, "syntax");
+	}
+	
+	public List<File> getFiles()
+	{
+		return files;
 	}
 }
