@@ -1,0 +1,49 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+	<id>distribution</id>
+
+	<formats>
+		<format>zip</format>
+	</formats>
+
+	<baseDirectory>vdmj-suite-${project.version}</baseDirectory>
+
+	<files>
+		<file>
+			<source>../LICENCE</source>
+			<destName>LICENCE</destName>
+		</file>
+	</files>
+	
+	<fileSets>
+		<fileSet>
+			<directory>..</directory>
+			<outputDirectory>docs</outputDirectory>
+			<includes>
+				<include>vdmj/documentation/*.pdf</include>
+				<include>annotations/documentation/*.pdf</include>
+				<include>lsp/documentation/*.pdf</include>
+			</includes>
+		</fileSet>
+	</fileSets>
+
+	<moduleSets>
+		<moduleSet>
+			<useAllReactorProjects>true</useAllReactorProjects>
+			<includes>
+				<include>dk.au.ece.vdmj:vdmj</include>
+				<include>dk.au.ece.vdmj:stdlib</include>
+				<include>dk.au.ece.vdmj:annotations</include>
+				<include>dk.au.ece.vdmj:annotations2</include>
+				<include>dk.au.ece.vdmj:cmd-plugins</include>
+				<include>dk.au.ece.vdmj:lsp</include>
+				<include>dk.au.ece.vdmj:vdmjunit</include>
+			</includes>
+			<binaries>
+				<unpack>false</unpack>
+				<includeDependencies>false</includeDependencies>
+			</binaries>
+		</moduleSet>
+	</moduleSets>
+</assembly>
