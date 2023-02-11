@@ -508,7 +508,7 @@ public class DBGPReader extends DebugLink
 		if (!warnings) VDMJ.setArgs("-w");
 		VDMJ.setFiles(files);
 
-		if (VDMJ.checkAndInitFiles())
+		if (VDMJ.checkAndInitFiles())	// Only parse/checks, no init.
 		{
 			try
 			{
@@ -518,22 +518,22 @@ public class DBGPReader extends DebugLink
 				}
 
 				INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
-				Interpreter i = in.getInterpreter();
+				Interpreter interpreter = in.getInterpreter();
 
 				if (defaultName != null)
 				{
-					i.setDefaultName(defaultName);
+					interpreter.setDefaultName(defaultName);
 				}
 
 				RemoteControl remote =
 					(remoteClass == null) ? null : remoteClass.getDeclaredConstructor().newInstance();
 
-				mainInstance = new DBGPReader(host, port, ideKey, i, expression, null);
+				mainInstance = new DBGPReader(host, port, ideKey, interpreter, expression, null);
 				mainInstance.startup(remote);
 
 				if (coverage != null)
 				{
-					writeCoverage(i, coverage);
+					writeCoverage(interpreter, coverage);
 				}
 
 				RTLogger.dump(true);

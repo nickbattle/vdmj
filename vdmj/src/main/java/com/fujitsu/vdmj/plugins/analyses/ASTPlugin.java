@@ -30,13 +30,13 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
@@ -152,10 +152,19 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 
 	abstract protected List<VDMMessage> syntaxCheck();
 
-	abstract public <T extends Mappable> T getAST();
+	abstract public <T extends Collection<?>> T getAST();
 	
-	abstract public int getCount();
-	
+	public int getCount()
+	{
+		Collection<?> objects = getAST();
+		return objects != null ? objects.size() : 0;
+	}
+
+	public List<File> getFiles()
+	{
+		return files;
+	}
+
 	protected CommandList commandList = new CommandList
 	(
 		// None yet

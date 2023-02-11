@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.plugins.analyses;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
@@ -32,7 +33,6 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
-import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.syntax.ModuleReader;
@@ -87,14 +87,8 @@ public class ASTPluginSL extends ASTPlugin
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Mappable> T getAST()
+	public <T extends Collection<?>> T getAST()
 	{
 		return (T)astModuleList;
-	}
-
-	@Override
-	public int getCount()
-	{
-		return astModuleList.getModuleNames().size();
 	}
 }

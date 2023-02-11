@@ -24,10 +24,10 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
@@ -78,7 +78,7 @@ public class POPluginPP extends POPlugin
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T extends Mappable> T getPO()
+	public <T extends Collection<?>> T getPO()
 	{
 		return (T)poClassList;
 	}

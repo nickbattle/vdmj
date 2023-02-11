@@ -24,10 +24,10 @@
 
 package com.fujitsu.vdmj.plugins.analyses;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
@@ -94,7 +94,7 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 
 	abstract protected List<VDMMessage> typeCheck();
 
-	abstract public <T extends Mappable> T getTC();
+	abstract public <T extends Collection<?>> T getTC();
 
 	protected CommandList commandList = new CommandList
 	(

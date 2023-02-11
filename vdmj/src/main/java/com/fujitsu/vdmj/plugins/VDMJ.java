@@ -143,14 +143,19 @@ public class VDMJ
 		}
 	}
 
+	/**
+	 * These setters are used by DBGPReader, so that it can use the other
+	 * VDMJ methods to parse/check the spec.
+	 */
 	public static void setFiles(List<File> files)
 	{
 		VDMJ.files = files;
 	}
 
-	public static List<File> getFiles()
+	public static void setArgs(String... args)
 	{
-		return files;
+		argv = new Vector<String>(Arrays.asList(args));
+		processArgs();
 	}
 
 	private static void usage()
@@ -178,13 +183,6 @@ public class VDMJ
 		System.exit(0);
 	}
 	
-	public static void setArgs(String... args)
-	{
-		// See DBGPReader's use of this
-		argv = new Vector<String>(Arrays.asList(args));
-		processArgs();
-	}
-
 	private static void processArgs()
 	{
 		Iterator<String> iter = argv.iterator();
@@ -545,9 +543,9 @@ public class VDMJ
 	{
 		try
 		{
-			List<VDMMessage> messages = EventHub.getInstance().publish(new StartConsoleEvent());
-			int errs = count(messages, VDMError.class);
-			return (errs > 0) ? ExitStatus.EXIT_ERRORS : ExitStatus.EXIT_OK;
+			StartConsoleEvent event = new StartConsoleEvent();
+			EventHub.getInstance().publish(event);
+			return event.getStatus();
 		}
 		catch (Exception e)
 		{

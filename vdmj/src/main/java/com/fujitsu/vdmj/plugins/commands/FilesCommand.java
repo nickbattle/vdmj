@@ -29,7 +29,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import java.io.File;
 
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.VDMJ;
+import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 
 public class FilesCommand extends AnalysisCommand
 {
@@ -53,8 +53,10 @@ public class FilesCommand extends AnalysisCommand
 			println(USAGE);
 			return;
 		}
+		
+		ASTPlugin ast = registry.getPlugin("AST");
 
-		for (File file: VDMJ.getFiles())
+		for (File file: ast.getFiles())
 		{
 			println(file);
 		}

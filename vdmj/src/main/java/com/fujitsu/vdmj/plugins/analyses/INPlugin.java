@@ -27,14 +27,15 @@ package com.fujitsu.vdmj.plugins.analyses;
 import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
@@ -332,7 +333,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		{
 			if (startInterpreter)
 			{
-				interpreterRun();
+				StartConsoleEvent sevent = (StartConsoleEvent)event;
+				sevent.setStatus(interpreterRun());
 			}
 
 			return null;	// No errors needed?
@@ -347,11 +349,11 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 
 	abstract protected List<VDMMessage> interpreterInit();
 
-	abstract protected void interpreterRun();
+	abstract protected ExitStatus interpreterRun();
 	
 	abstract public Interpreter getInterpreter();
 
-	abstract public <T extends Mappable> T getIN();
+	abstract public <T extends Collection<?>> T getIN();
 
 	@SuppressWarnings("unchecked")
 	private static <T> T getRemoteClass(String remoteName)
