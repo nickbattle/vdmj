@@ -8,7 +8,7 @@ VERSION=${VDMJ_VERSION:-4.5.0-P-SNAPSHOT}
 
 function help()
 {
-    echo "Usage: $0 [-help] <VM and VDMJ options>"
+    echo "Usage: $(basename $0) [-help] <VM and VDMJ options>"
     exit 0
 }
 
