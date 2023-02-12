@@ -154,11 +154,7 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 
 	abstract public <T extends Collection<?>> T getAST();
 	
-	public int getCount()
-	{
-		Collection<?> objects = getAST();
-		return objects != null ? objects.size() : 0;
-	}
+	abstract public int getCount();
 
 	public List<File> getFiles()
 	{
