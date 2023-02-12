@@ -42,7 +42,7 @@ import com.fujitsu.vdmj.util.Utils;
  */
 public class POPluginSL extends POPlugin
 {
-	private POModuleList poModuleList = null;
+	protected POModuleList poModuleList = null;
 	
 	@Override
 	protected List<VDMMessage> pogPrepare()

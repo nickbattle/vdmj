@@ -26,10 +26,13 @@ package com.fujitsu.vdmj.plugins.analyses;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -42,7 +45,7 @@ import com.fujitsu.vdmj.syntax.ModuleReader;
  */
 public class ASTPluginSL extends ASTPlugin
 {
-	private ASTModuleList astModuleList = null;
+	protected ASTModuleList astModuleList = null;
 	
 	@Override
 	protected List<VDMMessage> syntaxPrepare()
@@ -90,5 +93,18 @@ public class ASTPluginSL extends ASTPlugin
 	public <T extends Collection<?>> T getAST()
 	{
 		return (T)astModuleList;
+	}
+
+	@Override
+	public int getCount()
+	{
+		Set<String> names = new HashSet<String>();
+		
+		for (ASTModule m: astModuleList)
+		{
+			names.add(m.name.name);		// Combines DEFAULTs
+		}
+		
+		return names.size();
 	}
 }

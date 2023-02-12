@@ -90,4 +90,10 @@ public class ASTPluginPP extends ASTPlugin
 	{
 		return (T)astClassList;
 	}
+
+	@Override
+	public int getCount()
+	{
+		return astClassList.size();
+	}
 }

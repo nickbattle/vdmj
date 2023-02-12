@@ -44,7 +44,7 @@ import com.fujitsu.vdmj.util.Utils;
  */
 public class TCPluginPP extends TCPlugin
 {
-	private TCClassList tcClassList = null;
+	protected TCClassList tcClassList = null;
 	
 	@Override
 	protected List<VDMMessage> typeCheckPrepare()

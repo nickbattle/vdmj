@@ -28,15 +28,15 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.ast.modules.ASTModule;
-import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
-import com.fujitsu.vdmj.plugins.analyses.ASTPluginSL;
+import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
+import com.fujitsu.vdmj.plugins.analyses.TCPluginSL;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCClassList;
+import com.fujitsu.vdmj.tc.modules.TCModule;
+import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
 public class ModulesCommand extends AnalysisCommand
 {
@@ -61,25 +61,25 @@ public class ModulesCommand extends AnalysisCommand
 			return;
 		}
 
-		ASTPlugin ast = registry.getPlugin("AST");
+		TCPlugin tc = registry.getPlugin("TC");	// NB. TC has DEFAULTs combined
 		String def = Interpreter.getInstance().getDefaultName();
 		
-		if (ast instanceof ASTPluginSL)
+		if (tc instanceof TCPluginSL)
 		{
-			ASTModuleList list = ast.getAST();
+			TCModuleList list = tc.getTC();
 	
-			for (ASTModule module: list)
+			for (TCModule module: list)
 			{
-				println(module.name.name + (module.name.name.equals(def) ? " (default)" : ""));
+				println(module.name.getName() + (module.name.getName().equals(def) ? " (default)" : ""));
 			}
 		}
 		else
 		{
-			ASTClassList list = ast.getAST();
+			TCClassList list = tc.getTC();
 			
-			for (ASTClassDefinition clazz: list)
+			for (TCClassDefinition clazz: list)
 			{
-				println(clazz.name.name + (clazz.name.name.equals(def) ? " (default)" : ""));
+				println(clazz.name.getName() + (clazz.name.getName().equals(def) ? " (default)" : ""));
 			}
 		}
 	}
