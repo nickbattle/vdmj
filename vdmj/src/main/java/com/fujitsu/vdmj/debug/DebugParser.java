@@ -40,66 +40,70 @@ public class DebugParser
    			{
    				return null;
    			}
-   			else if (request.equals("quit") || request.equals("q"))
+   			
+   			String[] argv = request.split("\\s+");
+   			
+   			if (argv[0].equals("quit") || argv[0].equals("q"))
 			{
 				return DebugCommand.QUIT;
 			}
-			else if (request.equals("stop"))
+			else if (argv[0].equals("stop"))
 			{
 				return DebugCommand.STOP;
 			}
-			else if (request.equals("help") || request.equals("?"))
+			else if (argv[0].equals("help") || argv[0].equals("?"))
 			{
 				return DebugCommand.HELP;
 			}
-			else if (request.equals("stack"))
+			else if (argv[0].equals("stack"))
 			{
 				return DebugCommand.STACK;
 			}
-			else if (request.equals("up"))
+			else if (argv[0].equals("up"))
 			{
 				return DebugCommand.UP;
 			}
-			else if (request.equals("down"))
+			else if (argv[0].equals("down"))
 			{
 				return DebugCommand.DOWN;
 			}
-			else if (request.equals("step") || request.equals("s"))
+			else if (argv[0].equals("step") || argv[0].equals("s"))
 			{
 				return DebugCommand.STEP;
 			}
-			else if (request.equals("next") || request.equals("n"))
+			else if (argv[0].equals("next") || argv[0].equals("n"))
 			{
 				return DebugCommand.NEXT;
 			}
-			else if (request.equals("out") || request.equals("o"))
+			else if (argv[0].equals("out") || argv[0].equals("o"))
 			{
 				return DebugCommand.OUT;
 			}
-			else if (request.equals("continue") || request.equals("c"))
+			else if (argv[0].equals("continue") || argv[0].equals("c"))
 			{
 				return DebugCommand.CONTINUE;
 			}
-			else if (request.equals("source"))
+			else if (argv[0].equals("source"))
 			{
 				return DebugCommand.SOURCE;
 			}
-			else if (request.equals("threads"))
+			else if (argv[0].equals("threads"))
 			{
 				return DebugCommand.THREADS;
 			}
-			else if (request.startsWith("thread ") || request.startsWith("th "))
+			else if (argv[0].equals("thread") || argv[0].equals("th"))
 			{
-				Integer th = Integer.parseInt(request.substring(request.indexOf(' ') + 1));
+				if (argv.length != 2) return new DebugCommand(DebugType.ERROR, "Usage: thread <n>");
+				Integer th = Integer.parseInt(argv[1]);
 				return new DebugCommand(DebugType.THREAD, th);
 			}
-			else if (request.startsWith("print ") || request.startsWith("p "))
+			else if (argv[0].equals("print") || argv[0].equals("p"))
 			{
-				String args = request.substring(request.indexOf(' ') + 1);
-				return new DebugCommand(DebugType.PRINT, args);
+				String exp = request.substring(request.indexOf(' ') + 1);
+				return new DebugCommand(DebugType.PRINT, exp);
 			}
-			else if (request.startsWith("break") || request.startsWith("trace") || request.startsWith("catch") ||
-					 request.startsWith("list")  || request.startsWith("remove"))
+			else if (argv[0].equals("break") || argv[0].equals("trace") || argv[0].equals("catch") ||
+					argv[0].equals("list")  || argv[0].equals("remove"))
 			{
 				return new DebugCommand(DebugType.BREAKPOINT, request);
 			}

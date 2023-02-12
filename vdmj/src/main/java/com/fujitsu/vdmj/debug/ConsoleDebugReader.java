@@ -163,6 +163,11 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 				case BREAKPOINT:
 					doBreakpoint(command);
 					return true;
+					
+				case ERROR:
+					Console.out.println(command.toString());
+					Console.out.println("--");
+					return true;
 
 				default:
 				{
@@ -175,7 +180,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 							return false;
 
 						default:
-							Console.out.print(response.toString());	// toString of commands are sensible
+							Console.out.print(response.toString());	// toStrings have newlines
 							Console.out.println("--");
 							return true;
 					}
@@ -266,6 +271,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 		}
 
 		Console.out.println("No such thread Id - try 'threads'");
+		Console.out.println("--");
 	}
 	
 	@Override

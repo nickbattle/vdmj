@@ -138,7 +138,7 @@ public class ConsoleDebugExecutor implements DebugExecutor
 					break;
 					
 				default:
-					result = new DebugCommand(DebugType.ERROR, "Bad command. Try 'help'");
+					result = new DebugCommand(DebugType.ERROR, "Bad command. Try 'help'\n");
 					break;
 			}
 		}
