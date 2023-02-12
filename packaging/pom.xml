@@ -13,6 +13,11 @@
 	<packaging>pom</packaging>
 	<name>Packaging</name>
 	<description>Distribution packaging for key jars</description>
+	
+	<properties>
+		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
+	</properties>
+	
 
 	<build>
 		<plugins>
@@ -41,7 +46,7 @@
 							<descriptors>
 								<descriptor>assembly.xml</descriptor>
 							</descriptors>
-							<finalName>vdmj-suite-${project.version}</finalName>
+							<finalName>vdmj-suite-${project.version}-${maven.build.timestamp}</finalName>
 						</configuration>
 					</execution>
 				</executions>
