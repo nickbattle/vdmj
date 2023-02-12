@@ -107,6 +107,8 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 				{
 					Console.out.println(mainEx.getMessage());
 				}
+
+				Console.out.println(Interpreter.getInstance().getSourceLine(cex.location));
 			}
 			else if (mainEx != null)
 			{
