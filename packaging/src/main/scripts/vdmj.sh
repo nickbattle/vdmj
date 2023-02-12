@@ -17,7 +17,7 @@ then help
 fi
 
 VMOPTS=-Xmx2g
-VDMJOPTS=
+VDMJOPTS="-annotations"
 
 # Process non-VDMJ options
 while [ $# -gt 0 ]
