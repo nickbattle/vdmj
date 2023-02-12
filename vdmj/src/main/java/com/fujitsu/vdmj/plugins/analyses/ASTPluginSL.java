@@ -42,7 +42,7 @@ import com.fujitsu.vdmj.syntax.ModuleReader;
  */
 public class ASTPluginSL extends ASTPlugin
 {
-	private ASTModuleList astModuleList = null;
+	protected ASTModuleList astModuleList = null;
 	
 	@Override
 	protected List<VDMMessage> syntaxPrepare()

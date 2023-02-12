@@ -44,7 +44,7 @@ import com.fujitsu.vdmj.util.Utils;
  */
 public class TCPluginSL extends TCPlugin
 {
-	private TCModuleList tcModuleList = null;
+	protected TCModuleList tcModuleList = null;
 	
 	@Override
 	protected List<VDMMessage> typeCheckPrepare()

@@ -54,8 +54,8 @@ import com.fujitsu.vdmj.util.Utils;
  */
 public class INPluginPP extends INPlugin
 {
-	private INClassList inClassList = null;
-	private ClassInterpreter interpreter = null;
+	protected INClassList inClassList = null;
+	protected ClassInterpreter interpreter = null;
 	
 	@Override
 	protected List<VDMMessage> interpreterPrepare()

@@ -25,7 +25,6 @@
 package examples.vdmjplugin;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
@@ -36,7 +35,6 @@ import com.fujitsu.vdmj.ast.expressions.ASTStringLiteralExpression;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexStringToken;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
-import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.ast.patterns.ASTIdentifierPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -49,8 +47,6 @@ import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class ASTReplacement extends ASTPluginSL
 {
-	private ASTModuleList astModuleList = null;
-	
 	public static ASTPlugin factory(Dialect dialect) throws Exception
 	{
 		if (dialect == Dialect.VDM_SL)
@@ -61,13 +57,6 @@ public class ASTReplacement extends ASTPluginSL
 		{
 			throw new IllegalArgumentException("Only supported for VDM-SL");
 		}
-	}
-	
-	@Override
-	protected List<VDMMessage> syntaxPrepare()
-	{
-		astModuleList = new ASTModuleList();
-		return new Vector<VDMMessage>();
 	}
 	
 	@Override
@@ -95,12 +84,5 @@ public class ASTReplacement extends ASTPluginSL
 		result.add(warning);
 		
 		return result;
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T extends Collection<?>> T getAST()
-	{
-		return (T) astModuleList;
 	}
 }
