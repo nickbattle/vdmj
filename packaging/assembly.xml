@@ -14,6 +14,11 @@
 			<source>../LICENCE</source>
 			<destName>LICENCE</destName>
 		</file>
+		<file>
+			<source>src/main/resources/vdmj.sh</source>
+			<destName>vdmj.sh</destName>
+			<fileMode>0777</fileMode>
+		</file>
 	</files>
 	
 	<fileSets>
