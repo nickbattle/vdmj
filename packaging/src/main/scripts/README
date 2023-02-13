@@ -1,0 +1,61 @@
+VDM Scripts
+===========
+
+The VDMJ distribution contains a bash shell script, "vdmj.sh", to help you to start the command line,
+including all of the relevant jar files in the distribution ZIP. To run the script, unzip the distribution
+and add the extract folder to your $PATH.
+
+PATH=$PATH:~/vdmj-suite-4.5.0-SNAPSHOT/
+
+nick@cube:~> vdmj.sh 
+Usage: vdmj.sh [-help] <VM and VDMJ options>
+
+nick@cube:~> vdmj.sh -help
+Usage: VDMJ [-vdmsl | -vdmpp | -vdmrt] [<options>] [<files or dirs>]
+-vdmsl: parse files as VDM-SL (default)
+-vdmpp: parse files as VDM++
+-vdmrt: parse files as VDM-RT
+-w: suppress warning messages
+-v: show VDMJ jar version
+...
+
+nick@cube:~> vdmj.sh -vdmpp -i test.vpp 
+Parsed 2 classes in 0.057 secs. No syntax errors
+Warning 5000: Definition 'a' not used in 'A' (test.vpp) at line 4:8
+Type checked 2 classes in 0.135 secs. No type errors and 1 warning
+Initialized 2 classes in 0.156 secs. No init errors
+Interpreter started
+> print f(10)
+Got a=10
+= 11
+Executed in 0.009 secs.
+>
+
+If you are not running a bash shell, you can run VDMJ directly from Java as follows, though it would
+be sensible to add this to some sort of script in your environment. For simple invocations, you can
+use "-jar", which uses the MainClass defined in its manifest; for more complex invocations, that include
+the other jars, you have to specify the "-cp" classpath and the main class "VDMJ":
+
+nick@cube> java -jar vdmj-4.5.0-SNAPSHOT.jar 
+You did not identify any source files
+
+nick@cube> java -jar vdmj-4.5.0-SNAPSHOT.jar -vdmsl -i
+Interpreter started
+> p 1+1
+= 2
+Executed in 0.009 secs. 
+> q
+Bye
+
+nick@cube> java -Xmx2g -cp \
+	vdmj-4.5.0-SNAPSHOT.jar:\
+	annotations-4.5.0-SNAPSHOT.jar:\
+	annotations2-4.5.0-SNAPSHOT.jar:\
+	cmd-plugins-4.5.0-SNAPSHOT.jar:\
+	stdlib-4.5.0-SNAPSHOT.jar VDMJ -annotations -i test.vdm
+Parsed 1 module in 0.103 secs. No syntax errors
+Type checked 1 module in 0.313 secs. No type errors
+Initialized 1 module in 0.292 secs. No init errors
+Interpreter started
+> q
+Bye

@@ -13,7 +13,7 @@ level folder will build an Eclipse project file and allow the project to be impo
 Alternatively, the Eclipse Maven plugin should be able to import the project directly
 from the pom.xml file.
 
-Maven installs VDMJ in the com.fujitsu group.
+Maven installs VDMJ in the dk.au.ece.vdmj group.
 
 VDMJ includes the Apfloat library for arbitrary precision arithmetic.
 
@@ -28,7 +28,7 @@ Running VDMJ
 The whole of the core language is in a single jar called vdmj-<version>-P.jar, which is
 created in the target folder by the Maven build. That can be executed directly as follows:
 
-$ java -jar vdmj-4.4.3-P-SNAPSHOT-210413.jar -vdmsl -i
+$ java -jar vdmj-4.n.n-P.jar -vdmsl -i
 Initialized 1 module in 0.489 secs. 
 Interpreter started
 >
@@ -37,8 +37,7 @@ Additional jars are available to add standard libraries, and annotations. These 
 in the target folders of the corresponding vdmj-suite. So if the jars were all in one
 locations, you could run:
 
-$ java -cp vdmj-4.4.3-P-SNAPSHOT-210413.jar:annotations-4.4.3-SNAPSHOT-210413.jar \
-     com.fujitsu.vdmj.VDMJ -vdmsl -annotations -i
+$ java -cp vdmj-4.n.n-P.jar:annotations-4.n.n-P.jar VDMJ -vdmsl -annotations -i
 Initialized 1 module in 0.454 secs. 
 Interpreter started
 > set
@@ -53,7 +52,7 @@ Annotations are enabled
 
 But this is quite awkward, so a bash script is provided in vdmj/src/main/scripts called
 "vdmsl.sh". This is intended to be used as the target of a symlink, and locates the jars
-in the standard Maven build location (ie. $HOME/.m2/repository/com/fujitsu/vdmj). The
+in the standard Maven build location (ie. $HOME/.m2/repository/dk/au/ece/vdmj). The
 script has arguments to add annotations or the high-precision jars to the execution:
 
 lrwxrwxrwx 1 nick users  65 Nov 30 11:41 vdmpp -> vdmj-suite/vdmj/src/main/scripts/vdmsl.sh
