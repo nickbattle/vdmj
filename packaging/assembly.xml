@@ -19,6 +19,10 @@
 			<destName>vdmj.sh</destName>
 			<fileMode>0777</fileMode>
 		</file>
+		<file>
+			<source>src/main/scripts/README</source>
+			<destName>README</destName>
+		</file>
 	</files>
 	
 	<fileSets>
