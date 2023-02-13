@@ -34,9 +34,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -329,20 +327,7 @@ public class VDMJ
 					}
 					catch (NoSuchMethodException e)
 					{
-						Class<?> clazz = Class.forName(plugin);
-
-						if (Modifier.isAbstract(clazz.getModifiers()))
-						{
-							fail("Plugin class is abstract: " + clazz.getName());
-						}
-
-						Constructor<?> ctor = clazz.getConstructor();
-						AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
-						registry.registerPlugin(instance);
-						verbose("Registered " + plugin + " plugin");
-					}
-					catch (Exception e)
-					{
+						println("vdmj.plugins = " + System.getProperty("vdmj.plugins"));
 						println("Cannot load plugin: " + plugin);
 						throw e;
 					}

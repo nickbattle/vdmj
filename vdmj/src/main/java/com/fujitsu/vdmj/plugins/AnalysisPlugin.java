@@ -33,6 +33,7 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
@@ -44,10 +45,17 @@ import com.fujitsu.vdmj.runtime.ContextException;
 abstract public class AnalysisPlugin
 {
 	protected final EventHub eventhub;
+	protected final PluginRegistry registry;
+	
+	public static AnalysisPlugin factory(Dialect dialect) throws Exception
+	{
+		throw new Exception("Plugin must provide a static factory(Dialect) method");
+	}
 	
 	protected AnalysisPlugin()
 	{
 		eventhub = EventHub.getInstance();
+		registry = PluginRegistry.getInstance();
 	}
 	
 	public abstract String getName();
