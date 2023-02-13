@@ -120,7 +120,7 @@ public class CommandReader
 						
 						if (command == null)
 						{
-							command = usePlugin(argv);	// Attempt to load plugin
+							command = loadDirectly(argv);
 						}
 						
 						if (command == null)
@@ -170,7 +170,16 @@ public class CommandReader
 		return line.toString();
 	}
 
-	private AnalysisCommand usePlugin(String[] argv) throws Exception
+	/**
+	 * You can load an AnalysisCommand directly from the classpath, rather than getting one
+	 * from an AnalysisPlugin with getCommand. This is mainly for backward compatibility, but
+	 * it might be useful to offer "global" commands as an extension that are not linked to
+	 * a particular plugin. The cmd-plugins jar includes a GitPlugin example that can be loaded
+	 * this way.
+	 * 
+	 * Note that for this to work, the name of the command (as in the past) must be *Plugin.
+	 */
+	private AnalysisCommand loadDirectly(String[] argv) throws Exception
 	{
 		String[] packages = Properties.cmd_plugin_packages.split(";|:");
 		
