@@ -34,6 +34,7 @@ import java.io.InputStreamReader;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
+import com.fujitsu.vdmj.util.Utils;
 
 public class ScriptCommand extends AnalysisCommand
 {
@@ -90,7 +91,7 @@ public class ScriptCommand extends AnalysisCommand
 					continue;
 				}
 				
-				String[] argv = line.split("\\s+");
+				String[] argv = Utils.toArgv(line);
 				AnalysisCommand cmd = registry.getCommand(argv);
 				
 				if (cmd != null)

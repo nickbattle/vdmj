@@ -48,6 +48,7 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.traces.TraceReductionType;
+import com.fujitsu.vdmj.util.Utils;
 
 public class RuntraceCommand extends AnalysisCommand
 {
@@ -116,7 +117,7 @@ public class RuntraceCommand extends AnalysisCommand
 
 	private void doRuntrace(String line, boolean debug)
 	{
-		doRuntrace(line.split("\\s+"), debug);
+		doRuntrace(Utils.toArgv(line), debug);
 	}
 
 	private void doRuntrace(String[] argv, boolean debug)

@@ -29,6 +29,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -132,6 +133,68 @@ public class Utils
 		}
 		
 		return arg;
+	}
+	
+	public static String[] toArgv(String s)
+	{
+		List<String> list = new Vector<String>();
+		int p = 0;
+		boolean quoting = false;
+		boolean backslash = false;
+		StringBuilder sb = new StringBuilder();
+		
+		while (p < s.length())
+		{
+			char c = s.charAt(p++);
+			
+			if (backslash)
+			{
+				sb.append(c);
+				backslash = false;
+				continue;
+			}
+			
+			switch (c)
+			{
+				case '\"':
+				case '\'':
+					quoting = !quoting;
+					
+					if (!quoting)
+					{
+						list.add(sb.toString());
+						sb.setLength(0);
+					}
+					break;
+
+				case '\\':
+					backslash = true;
+					break;
+					
+				case ' ':
+				case '\t':
+					if (quoting)
+					{
+						sb.append(c);
+					}
+					else if (sb.length() > 0)
+					{
+						list.add(sb.toString());
+						sb.setLength(0);
+					}
+					break;
+					
+				default:
+					sb.append(c);
+			}
+		}
+		
+		if (sb.length() > 0)
+		{
+			list.add(sb.toString());
+		}
+		
+		return list.toArray(new String[0]);
 	}
 	
 	public static long mapperStats(long start, String mappings)
