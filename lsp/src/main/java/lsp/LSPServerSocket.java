@@ -27,12 +27,14 @@ package lsp;
 import java.io.IOException;
 import java.net.Socket;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.VDMJMain;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import dap.DAPServerSocket;
 import workspace.Diag;
 
-public class LSPServerSocket implements Runnable
+public class LSPServerSocket implements Runnable, VDMJMain
 {
 	private Dialect dialect;
 	private int port;
@@ -42,9 +44,15 @@ public class LSPServerSocket implements Runnable
 		this.dialect = dialect;
 		this.port = port;
 	}
+	
+	public static String getMainName()
+	{
+		return LSP_NAME;
+	}
 
 	public static void main(String[] args)
 	{
+		Settings.mainClass = LSPServerSocket.class;
 		Dialect dialect = Dialect.VDM_SL;
 		int dapPort = -1;
 		int lspPort = -1;

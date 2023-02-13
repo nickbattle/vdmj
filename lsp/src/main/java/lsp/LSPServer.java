@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.VDMJMain;
 import com.fujitsu.vdmj.lex.Dialect;
 
 import json.JSONObject;
@@ -57,13 +58,18 @@ import rpc.RPCResponse;
 import vdmj.DAPDebugLink;
 import workspace.Diag;
 
-public class LSPServer extends JSONServer
+public class LSPServer extends JSONServer implements VDMJMain
 {
 	private static LSPServer INSTANCE = null;
 
 	private final RPCDispatcher dispatcher;
 	private final Map<Long, RPCHandler> responseHandlers;
 	private boolean initialized = false;
+	
+	public static String getMainName()
+	{
+		return LSP_NAME;
+	}
 	
 	public LSPServer(Dialect dialect, InputStream inStream, OutputStream outStream) throws IOException
 	{
