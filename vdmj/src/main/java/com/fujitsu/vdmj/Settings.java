@@ -60,12 +60,12 @@ public class Settings
 			}
 			catch (Throwable e)
 			{
-				return "undefined";
+				return VDMJMain.UNDEFINED;
 			}
 		}
 		else
 		{
-			return "undefined";
+			return VDMJMain.UNDEFINED;
 		}
 	}
 }

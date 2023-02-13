@@ -30,9 +30,10 @@ package com.fujitsu.vdmj;
  */
 public interface VDMJMain
 {
-	public static final String VDMJ_NAME = "VDMJ";
-	public static final String LSP_NAME = "LSP";
-	public static final String DBGP_NAME = "DBGP";
+	public static final String VDMJ_MAIN = "VDMJ";
+	public static final String LSP_MAIN = "LSP";
+	public static final String DBGP_MAIN = "DBGP";
+	public static final String UNDEFINED = "undefined";
 	
 	/**
 	 * This method should be implemented in every VDMJMain, returning a useful
@@ -40,6 +41,6 @@ public interface VDMJMain
 	 */
 	public static String getMainName()
 	{
-		return "undefined";
+		return UNDEFINED;
 	}
 }

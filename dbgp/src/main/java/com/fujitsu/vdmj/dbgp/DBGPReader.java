@@ -153,7 +153,7 @@ public class DBGPReader extends DebugLink implements VDMJMain
 	
 	public static String getMainName()
 	{
-		return DBGP_NAME;
+		return DBGP_MAIN;
 	}
 
 	@SuppressWarnings("unchecked")

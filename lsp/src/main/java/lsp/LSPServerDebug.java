@@ -48,7 +48,7 @@ public class LSPServerDebug implements Runnable, VDMJMain
 	
 	public static String getMainName()
 	{
-		return LSP_NAME;
+		return LSP_MAIN;
 	}
 
 	public static void main(String[] args)

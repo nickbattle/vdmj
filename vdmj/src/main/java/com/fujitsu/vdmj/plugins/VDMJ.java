@@ -79,7 +79,7 @@ public class VDMJ implements VDMJMain
 	
 	public static String getMainName()
 	{
-		return VDMJ_NAME;
+		return VDMJ_MAIN;
 	}
 
 	public static void main(String[] args)

@@ -68,7 +68,7 @@ public class LSPServer extends JSONServer implements VDMJMain
 	
 	public static String getMainName()
 	{
-		return LSP_NAME;
+		return LSP_MAIN;
 	}
 	
 	public LSPServer(Dialect dialect, InputStream inStream, OutputStream outStream) throws IOException
