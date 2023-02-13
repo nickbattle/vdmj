@@ -52,6 +52,7 @@ import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteInterpreter;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.VDMJMain;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
@@ -115,7 +116,7 @@ import com.fujitsu.vdmj.values.ValueMap;
 /**
  * The DebugLink class for the DBGp protocol.
  */
-public class DBGPReader extends DebugLink
+public class DBGPReader extends DebugLink implements VDMJMain
 {
 	private static Map<String, DBGPReader> threadInstances = new HashMap<String, DBGPReader>();
 	private static DBGPReader mainInstance;
@@ -149,10 +150,17 @@ public class DBGPReader extends DebugLink
 	private boolean stopped = false;
 
 	private static final int SOURCE_LINES = 5;
+	
+	public static String getMainName()
+	{
+		return DBGP_NAME;
+	}
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args)
 	{
+		Settings.mainClass = DBGPReader.class;
+		
 		// Identify this class as the debug link - See DebugLink
 		System.setProperty("vdmj.debug.link_class", DBGPReader.class.getName());
 		
