@@ -37,9 +37,9 @@ public class StateCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: state";
 
-	public StateCommand(String[] argv)
+	public StateCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("state"))
 		{

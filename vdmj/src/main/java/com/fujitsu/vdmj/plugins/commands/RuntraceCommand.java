@@ -59,9 +59,9 @@ public class RuntraceCommand extends AnalysisCommand
 	private static File traceoutput = null;
 	private static long traceseed = 0;
 
-	public RuntraceCommand(String[] argv)
+	public RuntraceCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("runtrace") && !argv[0].equals("rt") &&
 			!argv[0].equals("debugtrace") && !argv[0].equals("dt") &&

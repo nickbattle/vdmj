@@ -37,7 +37,7 @@ public class MessageCommand extends AnalysisCommand implements ReaderControl
 	
 	public MessageCommand(String message)
 	{
-		super(null);
+		super("");
 		this.message = message;
 		this.exitStatus = ExitStatus.EXIT_OK;
 		this.carryOn = true;

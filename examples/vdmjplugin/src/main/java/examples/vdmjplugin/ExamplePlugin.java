@@ -140,13 +140,15 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	}
 	
 	@Override
-	public AnalysisCommand getCommand(String[] argv)
+	public AnalysisCommand getCommand(String line)
 	{
+		String[] argv = line.split("\\s+");
+		
 		if (argv[0].equals("maxlen"))
 		{
 			if (enabled)
 			{
-				return new ExampleCommand(argv, this);
+				return new ExampleCommand(line, this);
 			}
 			else
 			{

@@ -41,9 +41,9 @@ public class CoverageCommand extends AnalysisCommand
 	private final static String USAGE = "Usage: coverage clear|write <dir>|merge <dir>|<filenames>";
 	private Interpreter interpreter = null;
 
-	public CoverageCommand(String[] argv)
+	public CoverageCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("coverage"))
 		{

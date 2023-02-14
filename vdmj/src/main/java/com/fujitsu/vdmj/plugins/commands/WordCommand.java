@@ -38,9 +38,9 @@ public class WordCommand extends AnalysisCommand
 	private final static String USAGE = "Usage: word [<files>]";
 	private final Interpreter interpreter;
 
-	public WordCommand(String[] argv)
+	public WordCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("word"))
 		{

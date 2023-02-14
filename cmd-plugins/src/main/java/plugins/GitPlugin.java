@@ -30,9 +30,9 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 
 public class GitPlugin extends AnalysisCommand
 {
-	public GitPlugin(String[] argv)
+	public GitPlugin(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("git"))
 		{

@@ -33,9 +33,9 @@ public class EnvCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: env";
 
-	public EnvCommand(String[] argv)
+	public EnvCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("env"))
 		{

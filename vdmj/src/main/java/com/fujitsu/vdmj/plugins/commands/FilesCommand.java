@@ -35,9 +35,9 @@ public class FilesCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: files";
 
-	public FilesCommand(String[] argv)
+	public FilesCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("files"))
 		{

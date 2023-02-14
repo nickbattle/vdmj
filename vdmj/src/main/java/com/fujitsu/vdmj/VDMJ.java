@@ -52,7 +52,7 @@ import com.fujitsu.vdmj.util.Utils;
  * This class will be removed in VDMJ version 5.
  */
 @Deprecated
-abstract public class VDMJ
+abstract public class VDMJ implements VDMJMain
 {
 	protected static boolean warnings = true;
 	protected static boolean interpret = false;
@@ -60,6 +60,11 @@ abstract public class VDMJ
 	protected static boolean quiet = false;
 	protected static String script = null;
 	protected static String logfile = null;
+	
+	public static String getMainName()
+	{
+		return VDMJ_MAIN;
+	}
 
 	/**
 	 * The main method. This validates the arguments, then parses and type
@@ -70,6 +75,7 @@ abstract public class VDMJ
 	 */
 	public static void main(String[] args)
 	{
+		Settings.mainClass = VDMJ.class;		
 		List<File> filenames = new Vector<File>();
 		List<File> pathnames = new Vector<File>();
 		List<String> largs = Arrays.asList(args);
@@ -81,7 +87,7 @@ abstract public class VDMJ
 		Class<RemoteSimulation> remoteSimulation = null;
 		String defaultName = null;
 
-		Properties.init();		// Read properties file, if any
+		Properties.init();
 
 		for (Iterator<String> i = largs.iterator(); i.hasNext();)
 		{

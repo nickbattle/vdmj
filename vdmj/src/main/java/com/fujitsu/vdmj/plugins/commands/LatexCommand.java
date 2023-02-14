@@ -38,9 +38,9 @@ public class LatexCommand extends AnalysisCommand
 	private final static String USAGE = "Usage: latex|latexdoc [<files>]";
 	private final Interpreter interpreter;
 
-	public LatexCommand(String[] argv)
+	public LatexCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("latex") && !argv[0].equals("latexdoc"))
 		{

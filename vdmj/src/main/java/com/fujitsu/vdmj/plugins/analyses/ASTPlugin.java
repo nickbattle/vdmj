@@ -167,9 +167,9 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	);
 	
 	@Override
-	public AnalysisCommand getCommand(String[] argv)
+	public AnalysisCommand getCommand(String line)
 	{
-		return lookup(argv, commandList);
+		return lookup(line, commandList);
 	}
 	
 	@Override

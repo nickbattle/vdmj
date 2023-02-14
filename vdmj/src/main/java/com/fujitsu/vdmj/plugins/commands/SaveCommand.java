@@ -40,9 +40,9 @@ public class SaveCommand extends AnalysisCommand
 	private final static String USAGE = "Usage: save [<filenames>]";
 	private final Interpreter interpreter;
 
-	public SaveCommand(String[] argv)
+	public SaveCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("save"))
 		{

@@ -37,9 +37,9 @@ public class ThreadsCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: threads";
 
-	public ThreadsCommand(String[] argv)
+	public ThreadsCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("threads"))
 		{

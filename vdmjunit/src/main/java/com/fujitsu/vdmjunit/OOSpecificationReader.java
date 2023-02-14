@@ -24,28 +24,7 @@
 
 package com.fujitsu.vdmjunit;
 
-import static org.junit.Assert.fail;
-
-import java.io.File;
-import java.nio.charset.Charset;
-import java.util.List;
-
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.ast.definitions.ASTBUSClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTCPUClassDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTClassList;
-import com.fujitsu.vdmj.in.INNode;
-import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.lex.LexTokenReader;
-import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.runtime.ClassInterpreter;
-import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.syntax.ClassReader;
-import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.definitions.TCClassList;
-import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
-import com.fujitsu.vdmj.typechecker.TypeChecker;
 
 /**
  * Read a VDM++ or VDM-RT specifications.
@@ -55,52 +34,5 @@ public class OOSpecificationReader extends SpecificationReader
 	public OOSpecificationReader(Dialect dialect)
 	{
 		super(dialect);
-	}
-
-	/**
-	 * @see com.fujitsu.vdmjunit.SpecificationReader#readSpecification(Charset, java.util.List)
-	 */
-	@Override
-	protected Interpreter readSpecification(Charset charset, List<File> files) throws Exception
-	{
-		ASTClassList parsedClasses = new ASTClassList();
-		
-		for (File file: files)
-		{
-			LexTokenReader lexer = new LexTokenReader(file, Settings.dialect, charset);
-			ClassReader reader = new ClassReader(lexer);
-			parsedClasses.addAll(reader.readClasses());
-			
-			errors.addAll(reader.getErrors());
-			warnings.addAll(reader.getWarnings());
-			
-			if (reader.getErrorCount() > 0)
-			{
-				printMessages(reader.getErrors());
-				fail("Syntax errors (see stdout)");
-			}
-		}
-		
-		if (Settings.dialect == Dialect.VDM_RT)
-		{
-			parsedClasses.add(new ASTCPUClassDefinition());
-			parsedClasses.add(new ASTBUSClassDefinition());
-		}
-		
-		TCClassList checkedClasses = ClassMapper.getInstance(TCNode.MAPPINGS).init().convert(parsedClasses);
-		ClassTypeChecker checker = new ClassTypeChecker(checkedClasses);
-		checker.typeCheck();
-		
-		errors.addAll(TypeChecker.getErrors());
-		warnings.addAll(TypeChecker.getWarnings());
-
-		if (ClassTypeChecker.getErrorCount() > 0)
-		{
-			printMessages(ClassTypeChecker.getErrors());
-			fail("Type errors (see stdout)");
-		}
-		
-		INClassList executableClasses = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checkedClasses);
-		return new ClassInterpreter(executableClasses, checkedClasses);
 	}
 }

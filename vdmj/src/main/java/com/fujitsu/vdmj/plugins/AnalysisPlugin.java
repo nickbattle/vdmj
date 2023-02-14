@@ -33,6 +33,7 @@ import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
@@ -44,10 +45,17 @@ import com.fujitsu.vdmj.runtime.ContextException;
 abstract public class AnalysisPlugin
 {
 	protected final EventHub eventhub;
+	protected final PluginRegistry registry;
+	
+	public static AnalysisPlugin factory(Dialect dialect) throws Exception
+	{
+		throw new Exception("Plugin must provide a static factory(Dialect) method");
+	}
 	
 	protected AnalysisPlugin()
 	{
 		eventhub = EventHub.getInstance();
+		registry = PluginRegistry.getInstance();
 	}
 	
 	public abstract String getName();
@@ -63,9 +71,9 @@ abstract public class AnalysisPlugin
 		return;			// List usage of any command line -options used
 	}
 	
-	public AnalysisCommand getCommand(String[] argv)
+	public AnalysisCommand getCommand(String line)
 	{
-		return null;	// Get an object to handle argv, if supported
+		return null;	// Get an object to handle line, if supported
 	}
 	
 	public void help()
@@ -90,25 +98,29 @@ abstract public class AnalysisPlugin
 		return errs;
 	}
 	
-	protected AnalysisCommand lookup(String[] argv, CommandList commands)
+	protected AnalysisCommand lookup(String line, CommandList commands)
 	{
 		for (Class<? extends AnalysisCommand> cmd: commands)
 		{
 			try
 			{
-				Constructor<? extends AnalysisCommand> ctor = cmd.getConstructor(String[].class);
-				return ctor.newInstance(new Object[]{argv});
+				Constructor<? extends AnalysisCommand> ctor = cmd.getConstructor(String.class);
+				return ctor.newInstance(new Object[]{line});
 			}
 			catch (InvocationTargetException e)
 			{
 				if (e.getCause() instanceof IllegalArgumentException)
 				{
-					// doesn't match argv, try next one
+					// doesn't match line, try next one
 				}
-				else if (e.getCause() instanceof NoSuchMethodException)
+				else
 				{
-					printf("%s does not implement constructor(String[] argv)?\n", cmd.getSimpleName());
+					println("Command " + cmd.getSimpleName() + ": " + e.getCause().getMessage());
 				}
+			}
+			catch (NoSuchMethodException e)
+			{
+				printf("%s does not implement constructor(String line)?\n", cmd.getSimpleName());
 			}
 			catch (Throwable e)
 			{

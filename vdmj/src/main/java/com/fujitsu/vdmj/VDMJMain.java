@@ -22,22 +22,25 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.plugins;
+package com.fujitsu.vdmj;
 
-import com.fujitsu.vdmj.util.Utils;
-
-abstract public class AnalysisCommand
+/**
+ * An interface, implemented by all Java "main" providers, to help identify the
+ * environment currently running. See Settings.mainClass.
+ */
+public interface VDMJMain
 {
-	protected final PluginRegistry registry;
-	protected final String line;
-	protected final String[] argv;
+	public static final String VDMJ_MAIN = "VDMJ";
+	public static final String LSP_MAIN = "LSP";
+	public static final String DBGP_MAIN = "DBGP";
+	public static final String UNDEFINED = "undefined";
 	
-	protected AnalysisCommand(String line)
+	/**
+	 * This method should be implemented in every VDMJMain, returning a useful
+	 * identifier. The constants above are the ones we know about.
+	 */
+	public static String getMainName()
 	{
-		this.registry = PluginRegistry.getInstance();
-		this.argv = Utils.toArgv(line);
-		this.line = line;
+		return UNDEFINED;
 	}
-	
-	abstract public void run();
 }
