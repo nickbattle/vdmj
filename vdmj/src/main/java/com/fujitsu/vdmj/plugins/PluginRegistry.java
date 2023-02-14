@@ -75,15 +75,16 @@ public class PluginRegistry
 		return plugins;
 	}
 	
-	public AnalysisCommand getCommand(String[] argv)
+	public AnalysisCommand getCommand(String line)
 	{
+		String[] argv = line.split("\\s+");
 		AnalysisCommand result = null;
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			try
 			{
-				AnalysisCommand c = plugin.getCommand(argv);
+				AnalysisCommand c = plugin.getCommand(line);
 				
 				if (c != null)
 				{

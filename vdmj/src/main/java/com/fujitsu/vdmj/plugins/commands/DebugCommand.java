@@ -34,9 +34,9 @@ public class DebugCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: break | trace | catch | list | remove";
 
-	public DebugCommand(String[] argv)
+	public DebugCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("break") &&
 			!argv[0].equals("trace") &&
@@ -52,7 +52,7 @@ public class DebugCommand extends AnalysisCommand
 	public void run()
 	{
 		BreakpointReader reader = new BreakpointReader(Interpreter.getInstance());
-		reader.doCommand(argv2line(0));
+		reader.doCommand(line);
 	}
 	
 	public static void help()

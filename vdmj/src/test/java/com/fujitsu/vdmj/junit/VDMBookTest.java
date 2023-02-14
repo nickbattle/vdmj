@@ -70,7 +70,7 @@ public class VDMBookTest extends VDMTestCase
 		INClassList runnable = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checked);
 		ClassInterpreter interpreter = new ClassInterpreter(runnable, checked);
 		interpreter.init();
-		AssertCommand cmd = new AssertCommand(new String[] {"assert", assertions});
+		AssertCommand cmd = new AssertCommand("assert " + assertions);
 		assertEquals("Execution errors", true, !cmd.errors());
 	}
 

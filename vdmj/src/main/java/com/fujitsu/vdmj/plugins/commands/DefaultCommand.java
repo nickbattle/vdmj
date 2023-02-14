@@ -36,9 +36,9 @@ public class DefaultCommand extends AnalysisCommand
 	private final static String USAGE = "Usage: default <name>";
 	private final static String KIND = Settings.dialect == Dialect.VDM_SL ? "module" : "class";
 	
-	public DefaultCommand(String[] argv)
+	public DefaultCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("default"))
 		{

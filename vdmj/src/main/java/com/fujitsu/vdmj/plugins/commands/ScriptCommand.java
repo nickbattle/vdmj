@@ -39,9 +39,9 @@ public class ScriptCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: script <file>";
 
-	public ScriptCommand(String[] argv)
+	public ScriptCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("script"))
 		{
@@ -90,8 +90,7 @@ public class ScriptCommand extends AnalysisCommand
 					continue;
 				}
 				
-				String[] argv = line.split("\\s+");
-				AnalysisCommand cmd = registry.getCommand(argv);
+				AnalysisCommand cmd = registry.getCommand(line);
 				
 				if (cmd != null)
 				{

@@ -38,9 +38,9 @@ public class CreateCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: create <name> := <expression>";
 
-	public CreateCommand(String[] argv)
+	public CreateCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("create"))
 		{
@@ -58,7 +58,7 @@ public class CreateCommand extends AnalysisCommand
 		}
 		
 		Pattern p = Pattern.compile("^create (\\w+)\\s*?:=\\s*(.+)$");
-		Matcher m = p.matcher(argv2line(0));
+		Matcher m = p.matcher(line);
 
 		if (m.matches())
 		{

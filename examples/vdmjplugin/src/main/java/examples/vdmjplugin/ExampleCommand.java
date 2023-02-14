@@ -33,9 +33,9 @@ public class ExampleCommand extends AnalysisCommand
 {
 	private final ExamplePlugin plugin;
 	
-	protected ExampleCommand(String[] argv, ExamplePlugin plugin)
+	protected ExampleCommand(String line, ExamplePlugin plugin)
 	{
-		super(argv);
+		super(line);
 		this.plugin = plugin;
 	}
 

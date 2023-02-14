@@ -42,9 +42,9 @@ public class ModulesCommand extends AnalysisCommand
 {
 	private final static String KIND = Settings.dialect == Dialect.VDM_SL ? "modules" : "classes";
 
-	public ModulesCommand(String[] argv)
+	public ModulesCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals(KIND))
 		{

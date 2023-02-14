@@ -24,31 +24,20 @@
 
 package com.fujitsu.vdmj.plugins;
 
+import com.fujitsu.vdmj.util.Utils;
+
 abstract public class AnalysisCommand
 {
 	protected final PluginRegistry registry;
+	protected final String line;
 	protected final String[] argv;
 	
-	protected AnalysisCommand(String[] argv)
+	protected AnalysisCommand(String line)
 	{
 		this.registry = PluginRegistry.getInstance();
-		this.argv = argv;
+		this.argv = Utils.toArgv(line);
+		this.line = line;
 	}
 	
 	abstract public void run();
-	
-	protected String argv2line(int from)
-	{
-		StringBuilder sb = new StringBuilder();
-		String sep = "";
-		
-		for (int i=from; i<argv.length; i++)
-		{
-			sb.append(sep);
-			sb.append(argv[i]);
-			sep = " ";
-		}
-
-		return sb.toString();
-	}
 }

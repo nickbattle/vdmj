@@ -34,9 +34,9 @@ public class SetCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: set [<pre|post|inv|dtc|exceptions|measures|annotations> <on|off>]";
 
-	public SetCommand(String[] argv)
+	public SetCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("set"))
 		{

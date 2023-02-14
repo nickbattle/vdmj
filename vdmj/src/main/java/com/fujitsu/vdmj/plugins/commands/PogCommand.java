@@ -37,9 +37,9 @@ public class PogCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: pog [<function/operation>]";
 
-	public PogCommand(String[] argv)
+	public PogCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("pog"))
 		{
@@ -60,7 +60,7 @@ public class PogCommand extends AnalysisCommand
 		}
 		else
 		{
-    		String match = argv2line(1);
+    		String match = line.substring(line.indexOf(' ') + 1);
 			list = new ProofObligationList();
 
 			for (ProofObligation obligation: all)

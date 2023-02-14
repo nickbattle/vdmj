@@ -49,9 +49,9 @@ public class AssertCommand extends AnalysisCommand
 	private final static String USAGE = "Usage: assert <file>";
 	private boolean errors;
 
-	public AssertCommand(String[] argv)
+	public AssertCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("assert"))
 		{

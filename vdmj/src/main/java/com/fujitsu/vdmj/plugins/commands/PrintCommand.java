@@ -42,9 +42,9 @@ public class PrintCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: [p]rint <expression>";
 
-	public PrintCommand(String[] argv)
+	public PrintCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("print") && !argv[0].equals("p"))
 		{
@@ -61,7 +61,7 @@ public class PrintCommand extends AnalysisCommand
 			return;
 		}
 		
-		String expression = argv2line(1);
+		String expression = line.substring(line.indexOf(' ') + 1);
 		ConsoleDebugReader dbg = null;
 		ConsoleKeyWatcher watch = null;
 		

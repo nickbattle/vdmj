@@ -40,9 +40,9 @@ public class LogCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: log | validate";
 
-	public LogCommand(String[] argv)
+	public LogCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("log") &&
 			!argv[0].equals("validate"))

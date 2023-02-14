@@ -98,7 +98,7 @@ public class ExecutionTest extends TestCase
 		INModuleList runnable = ClassMapper.getInstance(INNode.MAPPINGS).init().convert(checked);
 		ModuleInterpreter interpreter = new ModuleInterpreter(runnable, checked);
 		interpreter.init();
-		AssertCommand cmd = new AssertCommand(new String[] {"assert", assertions});
+		AssertCommand cmd = new AssertCommand("assert " + assertions);
 		assertEquals("Execution errors", true, !cmd.errors());
 	}
 
@@ -109,7 +109,7 @@ public class ExecutionTest extends TestCase
 
 		ModuleInterpreter interpreter = new ModuleInterpreter(new INModuleList(), new TCModuleList());
 		interpreter.init();
-		AssertCommand cmd = new AssertCommand(new String[] {"assert", file});
+		AssertCommand cmd = new AssertCommand("assert " + file);
 		assertEquals("Execution errors", true, !cmd.errors());
 	}
 

@@ -403,9 +403,9 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	);
 	
 	@Override
-	public AnalysisCommand getCommand(String[] argv)
+	public AnalysisCommand getCommand(String line)
 	{
-		return lookup(argv, commandsList);
+		return lookup(line, commandsList);
 	}
 	
 	@Override

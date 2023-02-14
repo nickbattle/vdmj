@@ -37,9 +37,9 @@ public class InitCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: init";
 
-	public InitCommand(String[] argv)
+	public InitCommand(String line)
 	{
-		super(argv);
+		super(line);
 		
 		if (!argv[0].equals("init"))
 		{
