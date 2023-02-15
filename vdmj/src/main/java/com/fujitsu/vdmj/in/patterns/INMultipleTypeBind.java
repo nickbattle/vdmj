@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -39,6 +40,9 @@ public class INMultipleTypeBind extends INMultipleBind
 {
 	private static final long serialVersionUID = 1L;
 	public final TCType type;
+	
+	private ValueList bindValues = null;
+	private boolean bindPermuted = false;
 
 	public INMultipleTypeBind(INPatternList plist, TCType type)
 	{
@@ -51,10 +55,20 @@ public class INMultipleTypeBind extends INMultipleBind
 	{
 		return plist + ":" + type;
 	}
+	
+	public void setBindValues(ValueList values)
+	{
+		bindValues = values;
+	}
 
 	@Override
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
+		if (bindValues != null && bindPermuted == permuted && !(type instanceof TCParameterType))
+		{
+			return bindValues;		// Should be exactly the same
+		}
+		
 		try
 		{
 			long size = type.apply(new INTypeSizeVisitor(), ctxt);
@@ -64,7 +78,9 @@ public class INMultipleTypeBind extends INMultipleBind
 				throw new ContextException(5039, "Cannot evaluate type bind of size " + size, location, ctxt);
 			}
 
-	   		return type.apply(new INGetAllValuesVisitor(), ctxt);
+	   		bindValues = type.apply(new INGetAllValuesVisitor(), ctxt);
+	   		bindPermuted = permuted;
+	   		return bindValues;
 		}
 		catch (ArithmeticException e)
 		{
