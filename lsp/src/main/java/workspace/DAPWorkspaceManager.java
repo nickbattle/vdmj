@@ -864,6 +864,7 @@ public class DAPWorkspaceManager
 			result.add(new DAPResponse("exit", new JSONObject("exitCode", 0L)));
 		}
 		
+		SchedulableThread.terminateAll();
 		clearInterpreter();
 		restoreSettings();
 		eventhub.publish(new DAPTerminateEvent(request));
