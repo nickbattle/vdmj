@@ -1,2 +1,2 @@
-t:nat = {0, ..., 100}
-a:T = {0, ..., 9}
+t:nat = {0, ..., 100}    -- A modest set of nats
+a:T = {0, ..., MAX_T-1}  -- The whole type of T

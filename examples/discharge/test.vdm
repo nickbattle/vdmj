@@ -1,6 +1,9 @@
+values
+	MAX_T = 10;
+	
 types
 	T = nat
-	inv t == t < 10;
+	inv t == t < MAX_T;
 	
 functions
 	f: T -> T

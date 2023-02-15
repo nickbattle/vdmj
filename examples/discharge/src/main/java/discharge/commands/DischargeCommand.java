@@ -146,7 +146,7 @@ public class DischargeCommand extends AnalysisCommand
 					}
 					else
 					{
-						println("No range defined for " + mbind);
+						println("PO# " + n + ": No range defined for " + mbind);
 					}
 				}
 				
