@@ -1,0 +1,2 @@
+value:int = {-100, ..., 100}
+group:set of (nat) = power {1, ..., 10}

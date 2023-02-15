@@ -1,0 +1,6 @@
+functions
+	f: int * set of nat -> real
+	f(value, group) ==
+		if value >= 0
+		then value/card group
+		else 0; 
