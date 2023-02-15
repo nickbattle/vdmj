@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
@@ -71,6 +72,7 @@ abstract public class SpecificationReader
 	 */
 	public SpecificationReader(Dialect dialect)
 	{
+		Properties.init();
 		Settings.dialect = dialect;
 		PluginRegistry.reset();
 		EventHub.reset();

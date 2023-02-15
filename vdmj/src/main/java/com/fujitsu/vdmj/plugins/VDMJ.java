@@ -34,6 +34,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -332,6 +333,12 @@ public class VDMJ implements VDMJMain
 						registry.registerPlugin(instance);
 						verbose("Registered " + plugin + " plugin");
 					}
+					catch (InvocationTargetException e)
+					{
+						println("vdmj.plugins = " + System.getProperty("vdmj.plugins"));
+						println("Cannot load plugin: " + plugin);
+						throw e.getCause();
+					}
 					catch (NoSuchMethodException e)
 					{
 						println("vdmj.plugins = " + System.getProperty("vdmj.plugins"));
@@ -341,10 +348,10 @@ public class VDMJ implements VDMJMain
 				}
 			}
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
 			println(e);
-			System.exit(1);
+			throw new RuntimeException("Cannot load plugins");
 		}
 	}
 	

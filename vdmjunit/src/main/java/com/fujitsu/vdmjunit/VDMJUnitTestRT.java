@@ -26,8 +26,11 @@ package com.fujitsu.vdmjunit;
 
 import java.nio.charset.Charset;
 
+import org.junit.AfterClass;
+
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
+import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 /**
  * The VDMJUnit class for testing VDM-RT specifications.
@@ -59,5 +62,14 @@ abstract public class VDMJUnitTestRT extends VDMJUnitTest
 	{
 		ClassInterpreter ci = (ClassInterpreter) interpreter;
 		ci.create(name, value);
+	}
+
+	/**
+	 * Clean up all threads for PP and RT because each JUnit is one "session".
+	 */
+	@AfterClass
+	public static void afterClass()
+	{
+		SchedulableThread.terminateAll();
 	}
 }
