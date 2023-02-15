@@ -1,6 +1,11 @@
+types
+	T = nat
+	inv t == t < 10;
+	
 functions
-	f: int * set of nat -> real
-	f(value, group) ==
-		if value >= 0
-		then value/card group
-		else 0; 
+	f: T -> T
+	f(a) ==
+		if a = 0
+		then 1
+		else a * f(a-1)
+	measure a; 

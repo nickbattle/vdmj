@@ -24,13 +24,15 @@
 
 package discharge.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,9 +47,6 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.values.IntegerValue;
-import com.fujitsu.vdmj.values.NaturalOneValue;
-import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
@@ -56,12 +55,7 @@ import discharge.visitors.TypeBindFinder;
 
 public class DischargeCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: discharge <PO#> <ranges file>";
-	
-	private static final int RANGE = 1000;
-	private ValueList natValues;
-	private ValueList nat1Values;
-	private ValueList intValues;
+	private final static String USAGE = "Usage: discharge <ranges file> [<PO numbers>]";
 	
 	public DischargeCommand(String line)
 	{
@@ -71,24 +65,25 @@ public class DischargeCommand extends AnalysisCommand
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
-		
-		setTypeRanges();
 	}
 
 	@Override
 	public void run()
 	{
-		if (argv.length != 3)
+		if (argv.length < 2)
 		{
 			println(USAGE);
 			return;
 		}
 		
-		int number = 0;
+		List<Integer> numbers = new Vector<Integer>();
 		
 		try
 		{
-			number = Integer.parseInt(argv[1]);
+			for (int i=2; i<argv.length; i++)
+			{
+				numbers.add(Integer.parseInt(argv[i]));
+			}
 		}
 		catch (NumberFormatException e)
 		{
@@ -98,25 +93,31 @@ public class DischargeCommand extends AnalysisCommand
 		
 		POPlugin plugin = registry.getPlugin("PO");
 		ProofObligationList all = plugin.getProofObligations();
-
-		if (number < 1 || number > all.size())
+		
+		if (numbers.isEmpty())
 		{
-			if (all.size() == 1)
+			for (int n=1; n<=all.size(); n++)
 			{
-				println("PO# can only be 1");
+				numbers.add(n);		// Every PO
 			}
-			else
+		}
+		else
+		{
+			for (Integer n: numbers)
 			{
-				println("PO# must be between 1 and " + all.size());
+				if (n < 1 || n > all.size())
+				{
+					println("PO# must be between 1 and " + all.size());
+					return;
+				}
 			}
-			return;
 		}
 
 		Map<String, ValueList> ranges = null;
 
 		try
 		{
-			ranges = readRanges(argv[2]);
+			ranges = readRanges(argv[1]);
 		}
 		catch (IOException e)
 		{
@@ -126,28 +127,38 @@ public class DischargeCommand extends AnalysisCommand
 		
 		try
 		{
-			ProofObligation po = all.get(number - 1);
-			TCExpression tcexp = po.getCheckedExpression();
-			INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
-			
-			for (INMultipleTypeBind mbind: inexp.apply(new TypeBindFinder(), null))
-			{
-				ValueList values = ranges.get(mbind.toString());
-				
-				if (values != null)
-				{
-					mbind.setBindValues(values);
-				}
-				else
-				{
-					println("No ranges defined for " + mbind);
-					return;
-				}
-			}
-			
 			Interpreter i = Interpreter.getInstance();
 			RootContext ctxt = i.getInitialContext();
-			println("Result = " + inexp.eval(ctxt));
+
+			for (Integer n: numbers)
+			{
+				ProofObligation po = all.get(n - 1);
+				TCExpression tcexp = po.getCheckedExpression();
+				INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+				
+				for (INMultipleTypeBind mbind: inexp.apply(new TypeBindFinder(), null))
+				{
+					ValueList values = ranges.get(mbind.toString());
+					
+					if (values != null)
+					{
+						mbind.setBindValues(values);
+					}
+					else
+					{
+						println("No range defined for " + mbind);
+					}
+				}
+				
+				try
+				{
+					printf("PO# %d, Result = %s\n", n, inexp.eval(ctxt));
+				}
+				catch (Exception e)
+				{
+					printf("PO# %d, failed: %s\n", n, e.getMessage());
+				}
+			}
 		}
 		catch (Exception e)
 		{
@@ -180,7 +191,8 @@ public class DischargeCommand extends AnalysisCommand
 				}
 				catch (Exception e)
 				{
-					println("Ignoring range: " + e.getMessage());
+					println("Ignoring range: " + m.group(2));
+					println("Range error: " + e.getMessage());
 				}
 			}
 		}
@@ -188,40 +200,9 @@ public class DischargeCommand extends AnalysisCommand
 		reader.close();
 		return ranges;
 	}
-
-	private void setTypeRanges()
-	{
-		try
-		{
-			natValues = new ValueList(RANGE);
-			
-			for (int nat = 0; nat < RANGE; nat++)
-			{
-				natValues.add(new NaturalValue(nat));
-			}
-			
-			nat1Values = new ValueList(RANGE);
-			
-			for (int nat = 1; nat < RANGE; nat++)
-			{
-				nat1Values.add(new NaturalOneValue(nat));
-			}
-			
-			intValues = new ValueList(RANGE);
-			
-			for (int nat = -RANGE; nat < RANGE; nat++)
-			{
-				intValues.add(new IntegerValue(nat));
-			}
-		}
-		catch (Exception e)
-		{
-			// Can't happen
-		}
-	}
 	
 	public static void help()
 	{
-		println("discharge <PO#> <ranges file> - attempt to brute force discharge PO");
+		println("discharge <ranges file> [<PO#s>] - attempt to brute force discharge POs");
 	}
 }

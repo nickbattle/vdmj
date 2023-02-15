@@ -1,2 +1,2 @@
-value:int = {-100, ..., 100}
-group:set of (nat) = power {1, ..., 10}
+t:nat = {0, ..., 100}
+a:T = {0, ..., 9}

@@ -7,35 +7,55 @@ It then evaluates the PO, which would normally not be executable because of the 
 values for each bind. For example, the test.vdm spec in the project folder is:
 
 ```
+types
+	T = nat
+	inv t == t < 10;
+	
 functions
-	f: int * set of nat -> real
-	f(value, group) ==
-		if value >= 0
-		then value/card group
-		else 0;
+	f: T -> T
+	f(a) ==
+		if a = 0
+		then 1
+		else a * f(a-1)
+	measure a; 
 ```
 
-That creates one PO:
+That creates seven POs:
 
 ```
 Proof Obligation 1: (Unproved)
-f: non-zero obligation in 'DEFAULT' (test.vdm) at line 5:19
-(forall value:int, group:set of (nat) &
-  ((value >= 0) =>
-    (card group) <> 0))
+T: total function obligation in 'DEFAULT' (test.vdm) at line 3:16
+(forall t:nat &
+  is_(inv_T(t), bool))
+
+...
+
+Proof Obligation 7: (Unproved)
+f: subtype obligation in 'DEFAULT' (test.vdm) at line 6:5
+(forall a:T &
+  inv_T((if (a = 0) then 1 else (a * f((a - 1))))) and (is_nat((if (a = 0) then 1 else (a * f((a - 1)))))))
 ```
 
-So with a rules file like this:
+So with a ranges file like this:
 
 ```
-value:int = {-100, ..., 100}
-group:set of (nat) = power {1, ..., 10}
+t:nat = {0, ..., 100}
+a:T = {0, ..., 9}
 ```
 
-The discharge command will exercise the PO with the set of ints and sets of nats given.
+The discharge command will exercise all the POs with the set of nats and Ts given.
 
 ```
-> discharge 1 ranges      -- ie. discharge PO#1 using the ranges file
-Result = false            -- Something failed (but we don't know what)
+> discharge
+Usage: discharge <ranges file> [<PO numbers>]
+
+> discharge ranges
+PO# 1, Result = true
+PO# 2, Result = true
+PO# 3, Result = true
+PO# 4, Result = true
+PO# 5, Result = true
+PO# 6, Result = true
+PO# 7, Result = false       -- NOTE this fails, because T is too small for a factorial of T
 >
 ```
