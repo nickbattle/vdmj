@@ -351,7 +351,7 @@ public class VDMJ implements VDMJMain
 		catch (Throwable e)
 		{
 			println(e);
-			System.exit(1);
+			throw new RuntimeException("Cannot load plugins");
 		}
 	}
 	
