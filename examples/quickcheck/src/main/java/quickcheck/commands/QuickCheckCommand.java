@@ -102,6 +102,11 @@ public class QuickCheckCommand extends AnalysisCommand
 		ProofObligationList obligations = plugin.getProofObligations();
 		obligations.renumber();
 		ProofObligationList chosen = getPOs(argv, obligations);
+
+		if (chosen == null)
+		{
+			return;
+		}
 		
 		if (argv[1].startsWith(">"))
 		{
@@ -111,7 +116,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		{
 			Map<String, ValueList> ranges = parseRanges(argv[1]);
 			
-			if (chosen == null || ranges == null)
+			if (ranges == null)
 			{
 				return;
 			}
