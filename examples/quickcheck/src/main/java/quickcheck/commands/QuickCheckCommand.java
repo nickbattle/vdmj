@@ -32,6 +32,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,6 +70,8 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
+import com.fujitsu.vdmj.util.Selector;
+import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
@@ -103,25 +106,21 @@ public class QuickCheckCommand extends AnalysisCommand
 		obligations.renumber();
 		ProofObligationList chosen = getPOs(argv, obligations);
 
-		if (chosen == null)
+		if (chosen != null)
 		{
-			return;
-		}
-		
-		if (argv[1].startsWith(">"))
-		{
-			createRanges(argv[1].substring(1), chosen);
-		}
-		else
-		{
-			Map<String, ValueList> ranges = parseRanges(argv[1]);
-			
-			if (ranges == null)
+			if (argv[1].startsWith(">"))
 			{
-				return;
+				createRanges(argv[1].substring(1), chosen);
 			}
-			
-			runRanges(chosen, ranges);
+			else
+			{
+				Map<String, ValueList> ranges = generateRanges(argv[1]);
+				
+				if (ranges != null)
+				{
+					runRanges(chosen, ranges);
+				}
+			}
 		}
 	}
 	
@@ -129,7 +128,7 @@ public class QuickCheckCommand extends AnalysisCommand
 	{
 		if (argv.length == 2)
 		{
-			return all;
+			return all;		// No PO#s specified
 		}
 		else
 		{
@@ -147,7 +146,7 @@ public class QuickCheckCommand extends AnalysisCommand
 					}
 					else
 					{
-						println("PO# " + argv[i] + " must be between 1 and " + all.size());
+						println("PO# " + argv[i] + " unknown. Must be between 1 and " + all.size());
 					}
 				}
 				
@@ -162,7 +161,19 @@ public class QuickCheckCommand extends AnalysisCommand
 		}
 	}
 	
-	private Map<String, ValueList> parseRanges(String filename)
+	private void checkFor(LexTokenReader reader, Token expected, String message) throws LexException, ParserException
+	{
+		LexToken last = reader.getLast();
+		
+		if (last.isNot(expected))
+		{
+			throw new ParserException(9000, message, last.location, 0);
+		}
+		
+		reader.nextToken();
+	}
+	
+	private Map<String, ValueList> generateRanges(String filename)
 	{
 		try
 		{
@@ -179,27 +190,12 @@ public class QuickCheckCommand extends AnalysisCommand
 				BindReader br = new BindReader(ltr);
 				br.setCurrentModule(module);
 				astbinds.add(br.readMultipleBind());
-				LexToken token = ltr.getLast();
-				
-				if (token.isNot(Token.EQUALS))
-				{
-					throw new ParserException(9000,
-						"Expecting <multiple bind> '=' <set expression>;", token.location, 0);
-				}
-				
-				ltr.nextToken();
+				checkFor(ltr, Token.EQUALS, "Expecting <multiple bind> '=' <set expression>;");
+
 				ExpressionReader er = new ExpressionReader(ltr);
 				er.setCurrentModule(module);
 				astexps.add(er.readExpression());
-				token = ltr.getLast();
-				
-				if (token.isNot(Token.SEMICOLON))
-				{
-					throw new ParserException(9000,
-							"Expecting semi-colon after range", token.location, 0);
-				}
-				
-				ltr.nextToken();
+				checkFor(ltr, Token.SEMICOLON, "Expecting semi-colon after previous <set expression>");
 			}
 			
 			TCMultipleBindList tcbinds = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astbinds);
@@ -287,6 +283,17 @@ public class QuickCheckCommand extends AnalysisCommand
 		return null;
 	}
 	
+	private INExpression getPOExpression(ProofObligation po) throws Exception
+	{
+		TCExpression tcexp = po.getCheckedExpression();
+		return ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+	}
+	
+	private List<INMultipleTypeBind> getBindList(INExpression inexp) throws Exception
+	{
+		return inexp.apply(new TypeBindFinder(), null);
+	}
+	
 	private void createRanges(String filename, ProofObligationList all)
 	{
 		try
@@ -297,10 +304,7 @@ public class QuickCheckCommand extends AnalysisCommand
 
 			for (ProofObligation po: all)
 			{
-				TCExpression tcexp = po.getCheckedExpression();
-				INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
-				
-				for (INMultipleTypeBind mbind: inexp.apply(new TypeBindFinder(), null))
+				for (INMultipleTypeBind mbind: getBindList(getPOExpression(po)))
 				{
 					if (!done.contains(mbind.toString()))
 					{
@@ -323,15 +327,15 @@ public class QuickCheckCommand extends AnalysisCommand
 	{
 		try
 		{
-			Interpreter i = Interpreter.getInstance();
-			RootContext ctxt = i.getInitialContext();
+			Interpreter interpreter = Interpreter.getInstance();
+			RootContext ctxt = interpreter.getInitialContext();
 
 			for (ProofObligation po: chosen)
 			{
-				TCExpression tcexp = po.getCheckedExpression();
-				INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+				INExpression inexp = getPOExpression(po);
+				List<INMultipleTypeBind> bindings = getBindList(inexp);
 				
-				for (INMultipleTypeBind mbind: inexp.apply(new TypeBindFinder(), null))
+				for (INMultipleTypeBind mbind: bindings)
 				{
 					ValueList values = ranges.get(mbind.toString());
 					
@@ -347,7 +351,59 @@ public class QuickCheckCommand extends AnalysisCommand
 				
 				try
 				{
-					printf("PO# %d, Result = %s\n", po.number, inexp.eval(ctxt));
+					Value result = inexp.eval(ctxt);
+					
+					if (result instanceof BooleanValue)
+					{
+						if (result.boolValue(ctxt))
+						{
+							printf("PO# %d, Result = true\n", po.number);
+						}
+						else
+						{
+							printf("PO# %d, Result = false\n", po.number);
+							
+							// Find counterexample bindings...
+							
+							int[] limits = new int[bindings.size()];
+							ValueList[] possibles = new ValueList[bindings.size()];
+							
+							for (int i=0; i<bindings.size(); i++)
+							{
+								INMultipleTypeBind bind = bindings.get(i);
+								possibles[i] = new ValueList(bind.getBindValues());	// Copy!
+								limits[i++] = bind.getBindValues().size();
+							}
+							
+							for (int[] attempt: new Selector(limits))
+							{
+								for (int i=0; i<bindings.size(); i++)
+								{
+									INMultipleTypeBind bind = bindings.get(i);
+									bind.getBindValues().clear();
+									bind.getBindValues().add(possibles[i].get(attempt[i]));
+								}
+								
+								if (!inexp.eval(ctxt).boolValue(ctxt))
+								{
+									printf("Counter example: ");
+									
+									for (int i=0; i<bindings.size(); i++)
+									{
+										INMultipleTypeBind bind = bindings.get(i);
+										println(bind + " = " + bind.getBindValues().get(0));
+									}
+									
+									break;	// One is good enough?
+								}
+							}
+						}
+					}
+					else
+					{
+						printf("PO# %d, Failed: PO evaluation returns %s?\n", po.number, result.kind());
+					}
+					
 				}
 				catch (Exception e)
 				{
@@ -364,6 +420,6 @@ public class QuickCheckCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("quickcheck [>]<ranges file> [<PO#s>] - attempt to brute force discharge POs");
+		println("quickcheck [>]<ranges file> [<PO#s>] - lightweight PO verification");
 	}
 }
