@@ -8,11 +8,11 @@ values for each bind. For example, the "test.vdm" spec in the project folder is:
 
 ```
 	values
-		MAX_T = 10;
-		
+		MAX_T = 9;
+	
 	types
 		T = nat
-		inv t == t < MAX_T;
+		inv t == t <= MAX_T;
 		
 	functions
 		f: T -> T
@@ -20,7 +20,10 @@ values for each bind. For example, the "test.vdm" spec in the project folder is:
 			if a = 0
 			then 1
 			else a * f(a-1)
-		measure a; 
+		measure a;
+		
+		getSet: T * T -> set of T
+		getSet(a, b) == {a, ..., b};
 ```
 
 That creates seven POs:
@@ -39,24 +42,28 @@ That creates seven POs:
 	  inv_T((if (a = 0) then 1 else (a * f((a - 1))))) and (is_nat((if (a = 0) then 1 else (a * f((a - 1)))))))
 ```
 
-A "ranges" file consists of lines of the form `<bind:T> = <VDM set-of-T expression>`. These set values are used
-to substitute the type binds in the PO, using the name of the bind to match (so one PO could involve multiple
-ranges lines). The set expressions are evaluated in the global environment of the spec, so they can use types
-and constants, functions etc, which may help. They can be set enumerations, comprehensions, functions returning
-sets and so on. Trailing comments are allowed too.
+A "ranges" file consists of pairs of the form `<multiple bind> = <VDM set-of-T expression>;`. These set values
+are used to substitute the type binds in the PO, using the name of the bind to match (so one PO could involve
+multiple ranges lines). The set expressions are evaluated in the global environment of the spec, so they can use
+types and constants, functions etc, which may help. They can be set enumerations, comprehensions, functions
+returning sets and so on. Comments and whitespace are ignored. Each pair is terminated by a semicolon.
 
 ```
-	t:nat = {0, ..., 100}    -- A modest set of nats
-	a:T = {0, ..., MAX_T-1}  -- The whole type of T
+	-- Simple range of nats
+	t : nat = {0, ..., 100};
+	
+	-- More complex generation, via a function
+	a : T = getSet(0, MAX_T);
 ```
 
-The "quickcheck" command will then exercise POs with the set of nats and Ts given as the type binds in "ranges".
+The "quickcheck" or "qc" command will then exercise POs with the set of nats and Ts given as the type binds
+in "ranges".
 
 ```
 	> quickcheck
 	Usage: quickcheck <ranges file> [<PO numbers>]
 	
-	> quickcheck ranges
+	> qc ranges
 	PO# 1, Result = true
 	PO# 2, Result = true
 	PO# 3, Result = true
