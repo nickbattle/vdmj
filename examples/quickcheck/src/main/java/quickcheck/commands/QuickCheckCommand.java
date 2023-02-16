@@ -24,29 +24,49 @@
 
 package quickcheck.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
+import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
+import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.ast.patterns.ASTMultipleBindList;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
+import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexException;
+import com.fujitsu.vdmj.lex.LexTokenReader;
+import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
+import com.fujitsu.vdmj.syntax.BindReader;
+import com.fujitsu.vdmj.syntax.ExpressionReader;
+import com.fujitsu.vdmj.syntax.ParserException;
+import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
+import com.fujitsu.vdmj.tc.types.TCSetType;
+import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.typechecker.TypeCheckException;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
@@ -113,15 +133,10 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 		}
 
-		Map<String, ValueList> ranges = null;
-
-		try
+		Map<String, ValueList> ranges = parseRanges(argv[1]);
+		
+		if (ranges == null)
 		{
-			ranges = readRanges(argv[1]);
-		}
-		catch (IOException e)
-		{
-			println("Cannot read ranges file: " + e.getMessage());
 			return;
 		}
 		
@@ -167,38 +182,122 @@ public class QuickCheckCommand extends AnalysisCommand
 		}
 	}
 	
-	private Map<String, ValueList> readRanges(String file) throws IOException
+	private Map<String, ValueList> parseRanges(String filename)
 	{
-		Map<String, ValueList> ranges = new HashMap<String, ValueList>();
-		BufferedReader reader = new BufferedReader(new FileReader(file));
-		Pattern rangeLine = Pattern.compile("^\\s*([^=]+?)\\s*=\\s*(.*)$");
-		Interpreter i = Interpreter.getInstance();
-		RootContext ctxt = i.getInitialContext();
-		
-		for (String line = reader.readLine(); line != null; line = reader.readLine())
+		try
 		{
-			Matcher m = rangeLine.matcher(line);
+			File file = new File(filename);
+			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL);
+			Interpreter interpreter = Interpreter.getInstance();
+			String module = interpreter.getDefaultName();
 			
-			if (m.matches())
+			ASTMultipleBindList astbinds = new ASTMultipleBindList();
+			ASTExpressionList astexps = new ASTExpressionList();
+			
+			while (ltr.getLast().isNot(Token.EOF))
 			{
-				try
+				BindReader br = new BindReader(ltr);
+				br.setCurrentModule(module);
+				astbinds.add(br.readMultipleBind());
+				LexToken token = ltr.getLast();
+				
+				if (token.isNot(Token.EQUALS))
 				{
-					Value v = i.evaluate(m.group(2), ctxt);
-					SetValue sv = (SetValue)v;
-					ValueList vl = new ValueList();
-					vl.addAll(sv.values);
-					ranges.put(m.group(1), vl);
+					throw new ParserException(9000,
+						"Expecting <multiple bind> '=' <set expression>;", token.location, 0);
 				}
-				catch (Exception e)
+				
+				ltr.nextToken();
+				ExpressionReader er = new ExpressionReader(ltr);
+				er.setCurrentModule(module);
+				astexps.add(er.readExpression());
+				token = ltr.getLast();
+				
+				if (token.isNot(Token.SEMICOLON))
 				{
-					println("Ignoring range: " + m.group(2));
-					println("Range error: " + e.getMessage());
+					throw new ParserException(9000,
+							"Expecting semi-colon after range", token.location, 0);
+				}
+				
+				ltr.nextToken();
+			}
+			
+			TCMultipleBindList tcbinds = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astbinds);
+			TCExpressionList tcexps = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astexps);
+			Environment env = interpreter.getGlobalEnvironment();
+			int errors = 0;
+			
+			for (int i=0; i<tcbinds.size(); i++)
+			{
+				TCMultipleBind mb = tcbinds.get(i);
+				TCType mbtype = mb.typeCheck(env, NameScope.NAMESANDSTATE);
+				TCSetType mbset = new TCSetType(mb.location, mbtype);
+				
+				TCExpression exp = tcexps.get(i);
+				TCType exptype = exp.typeCheck(env, null, NameScope.NAMESANDSTATE, null);
+				
+				if (!TypeComparator.compatible(mbset, exptype))
+				{
+					println("Range bind and expression do not match at " + exp.location);
+					println("Bind type: " + mbtype);
+					println("Expression type: " + exptype + ", expecting " + mbset);
+					errors++;
 				}
 			}
+			
+			if (errors > 0)
+			{
+				return null;
+			}
+			
+			INMultipleBindList inbinds = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcbinds);
+			INExpressionList inexps = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexps);
+			RootContext ctxt = interpreter.getInitialContext();
+			Map<String, ValueList> ranges = new HashMap<String, ValueList>();
+			
+			for (int i=0; i<inbinds.size(); i++)
+			{
+				ctxt.threadState.init();
+				String key = inbinds.get(i).toString();
+				Value value = inexps.get(i).eval(ctxt);
+				
+				if (value instanceof SetValue)
+				{
+					SetValue svalue = (SetValue)value;
+					ValueList list = new ValueList();
+					list.addAll(svalue.values);
+					ranges.put(key, list);
+				}
+				else
+				{
+					println("Range does not evaluate to a set");
+				}
+			}
+
+			return ranges;
+		}
+		catch (LexException e)
+		{
+			println(e.toString());
+		}
+		catch (ParserException e)
+		{
+			println(e.toString());
+		}
+		catch (TypeCheckException e)
+		{
+			println("Error: " + e.getMessage() + " " + e.location);
+		}
+		catch (InternalException e)
+		{
+			println(e.getMessage());
+		}
+		catch (Exception e)
+		{
+			println(e);
 		}
 		
-		reader.close();
-		return ranges;
+		return null;
 	}
 	
 	public static void help()

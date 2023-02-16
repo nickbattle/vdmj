@@ -1,2 +1,5 @@
-t:nat = {0, ..., 100}    -- A modest set of nats
-a:T = {0, ..., MAX_T-1}  -- The whole type of T
+-- Simple range of nats
+t:nat = {0, ..., 100};
+
+-- More complex generation, via a function
+a:T = getSet(0, MAX_T);
