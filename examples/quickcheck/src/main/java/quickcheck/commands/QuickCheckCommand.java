@@ -29,9 +29,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexToken;
@@ -96,89 +94,54 @@ public class QuickCheckCommand extends AnalysisCommand
 			return;
 		}
 		
-		List<Integer> numbers = new Vector<Integer>();
+		POPlugin plugin = registry.getPlugin("PO");
+		ProofObligationList obligations = plugin.getProofObligations();
+		obligations.renumber();
+		ProofObligationList chosen = getPOs(argv, obligations);
+		Map<String, ValueList> ranges = parseRanges(argv[1]);
 		
-		try
+		if (chosen == null || ranges == null)
 		{
-			for (int i=2; i<argv.length; i++)
-			{
-				numbers.add(Integer.parseInt(argv[i]));
-			}
-		}
-		catch (NumberFormatException e)
-		{
-			println(USAGE);
 			return;
 		}
 		
-		POPlugin plugin = registry.getPlugin("PO");
-		ProofObligationList all = plugin.getProofObligations();
-		
-		if (numbers.isEmpty())
+		runRanges(chosen, ranges);
+	}
+	
+	private ProofObligationList getPOs(String[] argv, ProofObligationList all)
+	{
+		if (argv.length == 2)
 		{
-			for (int n=1; n<=all.size(); n++)
-			{
-				numbers.add(n);		// Every PO
-			}
+			return all;
 		}
 		else
 		{
-			for (Integer n: numbers)
+			try
 			{
-				if (n < 1 || n > all.size())
-				{
-					println("PO# must be between 1 and " + all.size());
-					return;
-				}
-			}
-		}
-
-		Map<String, ValueList> ranges = parseRanges(argv[1]);
-		
-		if (ranges == null)
-		{
-			return;
-		}
-		
-		try
-		{
-			Interpreter i = Interpreter.getInstance();
-			RootContext ctxt = i.getInitialContext();
-
-			for (Integer n: numbers)
-			{
-				ProofObligation po = all.get(n - 1);
-				TCExpression tcexp = po.getCheckedExpression();
-				INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+				ProofObligationList list = new ProofObligationList();
 				
-				for (INMultipleTypeBind mbind: inexp.apply(new TypeBindFinder(), null))
+				for (int i=2; i<argv.length; i++)
 				{
-					ValueList values = ranges.get(mbind.toString());
+					int n = Integer.parseInt(argv[i]);
 					
-					if (values != null)
+					if (n > 0 && n <= all.size())
 					{
-						mbind.setBindValues(values);
+						list.add(all.get(n-1));
 					}
 					else
 					{
-						println("PO# " + n + ": No range defined for " + mbind);
+						println("PO# " + argv[i] + " must be between 1 and " + all.size());
 					}
 				}
 				
-				try
-				{
-					printf("PO# %d, Result = %s\n", n, inexp.eval(ctxt));
-				}
-				catch (Exception e)
-				{
-					printf("PO# %d, failed: %s\n", n, e.getMessage());
-				}
+				return list;
 			}
-		}
-		catch (Exception e)
-		{
-			println(e);
-			return;
+			catch (NumberFormatException e)
+			{
+				println(e.getMessage());
+				println(USAGE);
+				return null;
+			}
 		}
 	}
 	
@@ -259,7 +222,8 @@ public class QuickCheckCommand extends AnalysisCommand
 			{
 				ctxt.threadState.init();
 				String key = inbinds.get(i).toString();
-				Value value = inexps.get(i).eval(ctxt);
+				INExpression exp = inexps.get(i);
+				Value value = exp.eval(ctxt);
 				
 				if (value instanceof SetValue)
 				{
@@ -270,8 +234,14 @@ public class QuickCheckCommand extends AnalysisCommand
 				}
 				else
 				{
-					println("Range does not evaluate to a set");
+					println("Range did not evaluate to a set " + exp.location);
+					errors++;
 				}
+			}
+			
+			if (errors > 0)
+			{
+				return null;
 			}
 
 			return ranges;
@@ -298,6 +268,49 @@ public class QuickCheckCommand extends AnalysisCommand
 		}
 		
 		return null;
+	}
+	
+	private void runRanges(ProofObligationList chosen, Map<String, ValueList> ranges)
+	{
+		try
+		{
+			Interpreter i = Interpreter.getInstance();
+			RootContext ctxt = i.getInitialContext();
+
+			for (ProofObligation po: chosen)
+			{
+				TCExpression tcexp = po.getCheckedExpression();
+				INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+				
+				for (INMultipleTypeBind mbind: inexp.apply(new TypeBindFinder(), null))
+				{
+					ValueList values = ranges.get(mbind.toString());
+					
+					if (values != null)
+					{
+						mbind.setBindValues(values);
+					}
+					else
+					{
+						println("PO# " + po.number + ": No range defined for " + mbind);
+					}
+				}
+				
+				try
+				{
+					printf("PO# %d, Result = %s\n", po.number, inexp.eval(ctxt));
+				}
+				catch (Exception e)
+				{
+					printf("PO# %d, Failed: %s\n", po.number, e.getMessage());
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			println(e);
+			return;
+		}
 	}
 	
 	public static void help()
