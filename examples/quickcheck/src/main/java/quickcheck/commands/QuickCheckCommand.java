@@ -28,8 +28,12 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexToken;
@@ -73,7 +77,7 @@ import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: quickcheck <ranges file> [<PO numbers>]";
+	private final static String USAGE = "Usage: quickcheck [>]<ranges file> [<PO numbers>]";
 	
 	public QuickCheckCommand(String line)
 	{
@@ -98,14 +102,22 @@ public class QuickCheckCommand extends AnalysisCommand
 		ProofObligationList obligations = plugin.getProofObligations();
 		obligations.renumber();
 		ProofObligationList chosen = getPOs(argv, obligations);
-		Map<String, ValueList> ranges = parseRanges(argv[1]);
 		
-		if (chosen == null || ranges == null)
+		if (argv[1].startsWith(">"))
 		{
-			return;
+			createRanges(argv[1].substring(1), chosen);
 		}
-		
-		runRanges(chosen, ranges);
+		else
+		{
+			Map<String, ValueList> ranges = parseRanges(argv[1]);
+			
+			if (chosen == null || ranges == null)
+			{
+				return;
+			}
+			
+			runRanges(chosen, ranges);
+		}
 	}
 	
 	private ProofObligationList getPOs(String[] argv, ProofObligationList all)
@@ -270,6 +282,38 @@ public class QuickCheckCommand extends AnalysisCommand
 		return null;
 	}
 	
+	private void createRanges(String filename, ProofObligationList all)
+	{
+		try
+		{
+			File file = new File(filename);
+			PrintWriter writer = new PrintWriter(new FileWriter(file));
+			Set<String> done = new HashSet<String>();
+
+			for (ProofObligation po: all)
+			{
+				TCExpression tcexp = po.getCheckedExpression();
+				INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+				
+				for (INMultipleTypeBind mbind: inexp.apply(new TypeBindFinder(), null))
+				{
+					if (!done.contains(mbind.toString()))
+					{
+						writer.println(mbind + " = { /* To be supplied */ };");
+						done.add(mbind.toString());
+					}
+				}
+			}
+
+			writer.close();
+			println("Wrote " + done.size() + " ranges to " + filename);
+		}
+		catch (Exception e)
+		{
+			println("Error: " + e.getMessage());
+		}
+	}
+	
 	private void runRanges(ProofObligationList chosen, Map<String, ValueList> ranges)
 	{
 		try
@@ -315,6 +359,6 @@ public class QuickCheckCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("quickcheck <ranges file> [<PO#s>] - attempt to brute force discharge POs");
+		println("quickcheck [>]<ranges file> [<PO#s>] - attempt to brute force discharge POs");
 	}
 }

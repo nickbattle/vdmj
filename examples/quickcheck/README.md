@@ -39,7 +39,8 @@ That creates seven POs:
 	Proof Obligation 7: (Unproved)
 	f: subtype obligation in 'DEFAULT' (test.vdm) at line 6:5
 	(forall a:T &
-	  inv_T((if (a = 0) then 1 else (a * f((a - 1))))) and (is_nat((if (a = 0) then 1 else (a * f((a - 1)))))))
+	  inv_T((if (a = 0) then 1 else (a * f((a - 1))))) and
+	  (is_nat((if (a = 0) then 1 else (a * f((a - 1)))))))
 ```
 
 A "ranges" file consists of pairs of the form `<multiple bind> = <VDM set-of-T expression>;`. These set values
@@ -56,14 +57,22 @@ returning sets and so on. Comments and whitespace are ignored. Each pair is term
 	a : T = getSet(0, MAX_T);
 ```
 
-The "quickcheck" or "qc" command will then exercise POs with the set of nats and Ts given as the type binds
-in "ranges".
+An initial ranges file can be created with the "quickcheck" or "qc" command, using `>filename` as the name.
+This will create one line for every bind in the PO list, but the sets will be blank.
+After the sets are provided, the "quickcheck" or "qc" command can use the updated range file to exercise POs
+with the sets given as the type binds.
 
 ```
 	> quickcheck
-	Usage: quickcheck <ranges file> [<PO numbers>]
+	Usage: quickcheck [>]<ranges file> [<PO numbers>]
 	
-	> qc ranges
+	> quickcheck >qcfile
+	Wrote 2 ranges to qcfile
+	>
+	
+	... edit the sets in qcfile here, then...
+	
+	> qc qcfile                 -- Try every PO, or provide a list of numbers
 	PO# 1, Result = true
 	PO# 2, Result = true
 	PO# 3, Result = true
