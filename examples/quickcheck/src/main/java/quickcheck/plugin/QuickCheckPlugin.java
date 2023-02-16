@@ -22,32 +22,57 @@
  *
  ******************************************************************************/
 
-package discharge.visitors;
+package quickcheck.plugin;
 
-import java.util.List;
-import java.util.Vector;
+import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.plugins.AnalysisCommand;
+import com.fujitsu.vdmj.plugins.AnalysisPlugin;
+import com.fujitsu.vdmj.util.Utils;
 
-import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.definitions.INDefinition;
-import com.fujitsu.vdmj.in.definitions.visitors.INLeafDefinitionVisitor;
-import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
+import quickcheck.commands.QuickCheckCommand;
 
-public class DefinitionTypeBindFinder extends INLeafDefinitionVisitor<INMultipleTypeBind, List<INMultipleTypeBind>, Object>
+public class QuickCheckPlugin extends AnalysisPlugin
 {
-	public DefinitionTypeBindFinder(INVisitorSet<INMultipleTypeBind, List<INMultipleTypeBind>, Object> inVisitorSet)
+	public static AnalysisPlugin factory(Dialect dialect)
 	{
-		this.visitorSet = inVisitorSet;
+		if (dialect == Dialect.VDM_SL)
+		{
+			return new QuickCheckPlugin();
+		}
+		else
+		{
+			throw new IllegalArgumentException("QuickCheck: Unsupported dialect");
+		}
+	}
+	
+	@Override
+	public String getName()
+	{
+		return "QC";
 	}
 
 	@Override
-	protected List<INMultipleTypeBind> newCollection()
+	public void init()
 	{
-		return new Vector<INMultipleTypeBind>();
+		// Get everything from PO?
 	}
-
+	
 	@Override
-	public List<INMultipleTypeBind> caseDefinition(INDefinition node, Object arg)
+	public AnalysisCommand getCommand(String line)
 	{
-		return newCollection();
+		String[] argv = Utils.toArgv(line);
+		
+		if (argv[0].equals("quickcheck") || argv[0].equals("qc"))
+		{
+			return new QuickCheckCommand(line);
+		}
+		
+		return null;
+	}
+	
+	@Override
+	public void help()
+	{
+		QuickCheckCommand.help();
 	}
 }

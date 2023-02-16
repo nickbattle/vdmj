@@ -8,9 +8,9 @@
 		<version>${revision}${sha1}${changelist}</version>
 	</parent>
 	
-	<artifactId>discharge</artifactId>
-	<name>Example PO Discharge plugin</name>
-	<description>Experimental brute force PO discharge plugin for VDMJ.</description>
+	<artifactId>quickcheck</artifactId>
+	<name>Example PO QuickCheck plugin</name>
+	<description>Experimental brute force PO quickcheck plugin for VDMJ.</description>
 
 	<dependencies>
 		<dependency>

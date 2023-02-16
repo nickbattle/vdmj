@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package discharge.commands;
+package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.*;
 
@@ -51,17 +51,17 @@ import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
-import discharge.visitors.TypeBindFinder;
+import quickcheck.visitors.TypeBindFinder;
 
-public class DischargeCommand extends AnalysisCommand
+public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: discharge <ranges file> [<PO numbers>]";
+	private final static String USAGE = "Usage: quickcheck <ranges file> [<PO numbers>]";
 	
-	public DischargeCommand(String line)
+	public QuickCheckCommand(String line)
 	{
 		super(line);
 		
-		if (!argv[0].equals("discharge"))
+		if (!argv[0].equals("quickcheck") && !argv[0].equals("qc"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
@@ -203,6 +203,6 @@ public class DischargeCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("discharge <ranges file> [<PO#s>] - attempt to brute force discharge POs");
+		println("quickcheck <ranges file> [<PO#s>] - attempt to brute force discharge POs");
 	}
 }

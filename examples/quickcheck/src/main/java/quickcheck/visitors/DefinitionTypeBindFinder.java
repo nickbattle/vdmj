@@ -22,38 +22,21 @@
  *
  ******************************************************************************/
 
-package discharge.visitors;
+package quickcheck.visitors;
 
 import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.visitors.INLeafExpressionVisitor;
+import com.fujitsu.vdmj.in.definitions.INDefinition;
+import com.fujitsu.vdmj.in.definitions.visitors.INLeafDefinitionVisitor;
 import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
 
-public class TypeBindFinder extends INLeafExpressionVisitor<INMultipleTypeBind, List<INMultipleTypeBind>, Object>
+public class DefinitionTypeBindFinder extends INLeafDefinitionVisitor<INMultipleTypeBind, List<INMultipleTypeBind>, Object>
 {
-	public TypeBindFinder()
+	public DefinitionTypeBindFinder(INVisitorSet<INMultipleTypeBind, List<INMultipleTypeBind>, Object> inVisitorSet)
 	{
-		super(false);
-		
-		visitorSet = new INVisitorSet<INMultipleTypeBind, List<INMultipleTypeBind>, Object>()
-		{
-			@Override
-			protected void setVisitors()
-			{
-				expressionVisitor = TypeBindFinder.this;
-				multiBindVisitor = new MultiTypeBindFinder(this);
-				definitionVisitor = new DefinitionTypeBindFinder(this);
-			}
-			
-			@Override
-			protected List<INMultipleTypeBind> newCollection()
-			{
-				return TypeBindFinder.this.newCollection();
-			}
-		};
+		this.visitorSet = inVisitorSet;
 	}
 
 	@Override
@@ -63,7 +46,7 @@ public class TypeBindFinder extends INLeafExpressionVisitor<INMultipleTypeBind, 
 	}
 
 	@Override
-	public List<INMultipleTypeBind> caseExpression(INExpression node, Object arg)
+	public List<INMultipleTypeBind> caseDefinition(INDefinition node, Object arg)
 	{
 		return newCollection();
 	}

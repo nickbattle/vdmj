@@ -26,6 +26,6 @@
 		<module>simulation</module>
 		<module>lspplugin</module>
 		<module>vdmjplugin</module>
-		<module>discharge</module>
+		<module>quickcheck</module>
 	</modules>
 </project>

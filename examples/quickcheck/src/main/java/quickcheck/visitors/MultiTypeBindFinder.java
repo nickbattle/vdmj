@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package discharge.visitors;
+package quickcheck.visitors;
 
 import java.util.List;
 import java.util.Vector;

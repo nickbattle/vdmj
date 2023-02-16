@@ -1,6 +1,6 @@
-# discharge
+# QuickCheck
 
-This project contains a simple example of VDMJ plugin.
+This project contains a simple example of VDMJ plugin to quickly check proof obligations.
 
 The plugin registers uses a file of "ranges" to specify the values to give to type binds in a proof obligation.
 It then evaluates the PO, which would normally not be executable because of the type binds, using the range
@@ -50,13 +50,13 @@ sets and so on. Trailing comments are allowed too.
 	a:T = {0, ..., MAX_T-1}  -- The whole type of T
 ```
 
-The "discharge" command will then exercise POs with the set of nats and Ts given as the type binds in "ranges".
+The "quickcheck" command will then exercise POs with the set of nats and Ts given as the type binds in "ranges".
 
 ```
-	> discharge
-	Usage: discharge <ranges file> [<PO numbers>]
+	> quickcheck
+	Usage: quickcheck <ranges file> [<PO numbers>]
 	
-	> discharge ranges
+	> quickcheck ranges
 	PO# 1, Result = true
 	PO# 2, Result = true
 	PO# 3, Result = true
