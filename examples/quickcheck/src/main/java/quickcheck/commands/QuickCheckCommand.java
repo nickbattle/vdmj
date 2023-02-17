@@ -35,7 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
+import java.util.Stack;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
@@ -47,9 +47,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
-import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
-import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -60,6 +58,7 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.syntax.BindReader;
@@ -68,6 +67,7 @@ import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.types.TCSetType;
@@ -76,13 +76,11 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
-import com.fujitsu.vdmj.util.Selector;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
-import quickcheck.visitors.ForallExpressionFinder;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheckCommand extends AnalysisCommand
@@ -310,7 +308,7 @@ public class QuickCheckCommand extends AnalysisCommand
 	
 	private List<INBindingSetter> getBindList(INExpression inexp, boolean foralls) throws Exception
 	{
-		return inexp.apply(new TypeBindFinder(), foralls);
+		return inexp.apply(new TypeBindFinder(), null);
 	}
 	
 	private void createRanges(String filename, ProofObligationList all)
@@ -347,6 +345,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		try
 		{
 			RootContext ctxt = Interpreter.getInstance().getInitialContext();
+			List<INBindingSetter> bindings = null;
 
 			for (ProofObligation po: chosen)
 			{
@@ -356,8 +355,10 @@ public class QuickCheckCommand extends AnalysisCommand
 					continue;
 				}
 
+				Stack<Context> failPath = new Stack<Context>();
+				INForAllExpression.setFailPath(failPath);
 				INExpression poexp = getPOExpression(po);
-				List<INBindingSetter> bindings = getBindList(poexp, false);
+				bindings = getBindList(poexp, false);
 				
 				for (INBindingSetter mbind: bindings)
 				{
@@ -388,8 +389,7 @@ public class QuickCheckCommand extends AnalysisCommand
 						else
 						{
 							printf("PO# %d, FAILED %s: ", po.number, duration(before, after));
-							// findCounterexample(bindings, poexp, ctxt);
-							findCounterexample(poexp, ctxt);
+							printFailPath(failPath);
 							println("\n" + po);
 						}
 					}
@@ -404,6 +404,15 @@ public class QuickCheckCommand extends AnalysisCommand
 					printf("PO# %d, %s\n\n", po.number, e.getMessage());
 					println(po);
 				}
+				finally
+				{
+					INForAllExpression.setFailPath(null);
+
+					for (INBindingSetter mbind: bindings)
+					{
+						mbind.setBindValues(null);
+					}
+				}
 			}
 		}
 		catch (Exception e)
@@ -413,153 +422,25 @@ public class QuickCheckCommand extends AnalysisCommand
 		}
 	}
 	
+	private void printFailPath(Stack<Context> failPath)
+	{
+		printf("Counterexample: ");
+		String sep = "";
+		
+		for (Context path: failPath)
+		{
+			for (TCNameToken name: path.keySet())
+			{
+				printf("%s%s = %s", sep, name, path.get(name));
+				sep = ", ";
+			}
+		}
+	}
+
 	private Object duration(long before, long after)
 	{
 		double duration = (double)(after - before)/1000;
 		return "in " + duration + "s";
-	}
-
-	/**
-	 * This version tried to set every PO binding to one value, but that causes false
-	 * negatives, eg. (forall a:nat & exists x:nat & (x > a)) implies a=0 x=0 fails.
-	 *
-	private void findCounterexample(List<INBindingSetter> bindings, INExpression inexp, RootContext ctxt)
-	{
-		int[] limits = new int[bindings.size()];
-		ValueList[] originals = new ValueList[bindings.size()];
-		
-		for (int i=0; i<bindings.size(); i++)
-		{
-			INBindingSetter bind = bindings.get(i);
-			originals[i] = new ValueList(bind.getBindValues());	// Note: Copy!
-			limits[i] = bind.getBindValues().size();
-		}
-		
-		for (int[] attempt: new Selector(limits))
-		{
-			for (int i=0; i<bindings.size(); i++)
-			{
-				INBindingSetter bind = bindings.get(i);
-				bind.getBindValues().clear();
-				bind.getBindValues().add(originals[i].get(attempt[i]));
-			}
-			
-			Exception exception = null;
-			boolean passed = false;
-			
-			try
-			{
-				passed = inexp.eval(ctxt).boolValue(ctxt);
-			}
-			catch (Exception e)
-			{
-				exception = e;
-				passed = false;
-			}
-			
-			if (!passed)
-			{
-				printf("Counterexample: ");
-				String sep = "";
-				
-				for (int i=0; i<bindings.size(); i++)
-				{
-					INBindingSetter bind = bindings.get(i);
-					printf("%s%s = %s", sep, bind, bind.getBindValues().get(0));
-					sep = ", ";
-				}
-				
-				println(exception != null ? ", raises " + exception : "");
-
-				break;	// One is good enough?
-			}
-		}
-		
-		// Restore bindings
-		for (int i=0; i<bindings.size(); i++)
-		{
-			INBindingSetter bind = bindings.get(i);
-			bind.getBindValues().clear();
-			bind.getBindValues().addAll(originals[i]);
-		}
-	}
-	***/
-
-	private void findCounterexample(INExpression inexp, RootContext ctxt)
-	{
-		List<INBindingSetter> bindings = new Vector<INBindingSetter>();
-		List<INForAllExpression> foralls = new Vector<INForAllExpression>();
-		
-		for (INForAllExpression forall: inexp.apply(new ForallExpressionFinder(), null))
-		{
-			foralls.add(forall);
-			
-			for (INMultipleBind bind: forall.bindList)
-			{
-				if (bind instanceof INMultipleTypeBind)
-				{
-					bindings.add((INBindingSetter) bind);
-				}
-			}
-		}
-		
-		int[] limits = new int[bindings.size()];
-		ValueList[] originals = new ValueList[bindings.size()];
-		
-		for (int i=0; i<bindings.size(); i++)
-		{
-			INBindingSetter bind = bindings.get(i);
-			originals[i] = new ValueList(bind.getBindValues());	// Note: Copy!
-			limits[i] = bind.getBindValues().size();
-		}
-		
-		for (int[] attempt: new Selector(limits))
-		{
-			for (int i=0; i<bindings.size(); i++)
-			{
-				INBindingSetter bind = bindings.get(i);
-				bind.getBindValues().clear();
-				bind.getBindValues().add(originals[i].get(attempt[i]));
-			}
-			
-			Exception exception = null;
-			boolean passed = false;
-			
-			try
-			{
-				passed = inexp.eval(ctxt).boolValue(ctxt);
-			}
-			catch (Exception e)
-			{
-				exception = e;
-				passed = false;
-			}
-			
-			if (!passed)
-			{
-				printf("Counterexample: ");
-				String sep = "";
-				
-				for (int i=0; i<bindings.size(); i++)
-				{
-					INBindingSetter bind = bindings.get(i);
-					printf("%s%s = %s", sep, bind, bind.getBindValues().get(0));
-					sep = ", ";
-				}
-				
-				println(exception != null ? ", raises " + exception : "");
-
-				break;	// One is good enough?
-			}
-		}
-		
-		// Restore bindings
-		for (int i=0; i<bindings.size(); i++)
-		{
-			INBindingSetter bind = bindings.get(i);
-			bind.getBindValues().clear();
-			bind.getBindValues().addAll(originals[i]);
-		}
 	}
 	
 	public static void help()
