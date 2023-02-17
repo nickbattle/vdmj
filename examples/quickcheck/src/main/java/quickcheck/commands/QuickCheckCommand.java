@@ -37,9 +37,11 @@ import java.util.Map;
 import java.util.Set;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
+import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleBindList;
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
@@ -289,8 +291,16 @@ public class QuickCheckCommand extends AnalysisCommand
 	
 	private INExpression getPOExpression(ProofObligation po) throws Exception
 	{
-		TCExpression tcexp = po.getCheckedExpression();
-		return ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+		if (po.isCheckable)
+		{
+			TCExpression tcexp = po.getCheckedExpression();
+			return ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+		}
+		else
+		{
+			// Not checkable, so just use "true"
+			return new INBooleanLiteralExpression(new LexBooleanToken(true, po.location));
+		}
 	}
 	
 	private List<INBindingSetter> getBindList(INExpression inexp) throws Exception
@@ -312,7 +322,7 @@ public class QuickCheckCommand extends AnalysisCommand
 				{
 					if (!done.contains(mbind.toString()))
 					{
-						writer.println(mbind + " = { /* To be supplied for PO#" + po.number + " */ };");
+						writer.println(mbind + " = { /* To be supplied, see PO#" + po.number + " */ };");
 						done.add(mbind.toString());
 					}
 				}
