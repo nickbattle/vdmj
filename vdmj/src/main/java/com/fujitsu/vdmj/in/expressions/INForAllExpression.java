@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.in.expressions;
 
+import java.util.Stack;
+
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
@@ -45,12 +47,20 @@ public class INForAllExpression extends INExpression
 	private static final long serialVersionUID = 1L;
 	public final INMultipleBindList bindList;
 	public final INExpression predicate;
+	
+	// This is used by QuickCheckCommand
+	public static Stack<Context> failPath = null;
 
 	public INForAllExpression(LexLocation location,	INMultipleBindList bindList, INExpression predicate)
 	{
 		super(location);
 		this.bindList = bindList;
 		this.predicate = predicate;
+	}
+	
+	public static void setFailPath(Stack<Context> stack)
+	{
+		failPath = stack;
 	}
 
 	@Override
@@ -66,6 +76,11 @@ public class INForAllExpression extends INExpression
 
 		try
 		{
+			if (failPath != null)
+			{
+				failPath.clear();
+			}
+			
 			QuantifierList quantifiers = new QuantifierList();
 
 			for (INMultipleBind mb: bindList)
@@ -109,6 +124,11 @@ public class INForAllExpression extends INExpression
 				{
 					if (matches && !predicate.eval(evalContext).boolValue(ctxt))
 					{
+						if (failPath != null)
+						{
+							failPath.push(evalContext);
+						}
+						
 						return new BooleanValue(false);
 					}
 				}
