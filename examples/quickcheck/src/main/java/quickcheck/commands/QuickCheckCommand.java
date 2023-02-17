@@ -345,6 +345,12 @@ public class QuickCheckCommand extends AnalysisCommand
 
 			for (ProofObligation po: chosen)
 			{
+				if (!po.isCheckable)
+				{
+					printf("PO# %d, UNCHECKED\n", po.number);
+					continue;
+				}
+
 				INExpression poexp = getPOExpression(po);
 				List<INBindingSetter> bindings = getBindList(poexp);
 				
