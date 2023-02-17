@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
@@ -44,7 +45,9 @@ import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
@@ -383,7 +386,8 @@ public class QuickCheckCommand extends AnalysisCommand
 						else
 						{
 							printf("PO# %d, FAILED %s: ", po.number, duration(before, after));
-							findCounterexample(bindings, poexp, ctxt);
+							// findCounterexample(bindings, poexp, ctxt);
+							findCounterexample(poexp, ctxt);
 							println("\n" + po);
 						}
 					}
@@ -413,15 +417,19 @@ public class QuickCheckCommand extends AnalysisCommand
 		return "in " + duration + "s";
 	}
 
+	/**
+	 * This version tried to set every PO binding to one value, but that causes false
+	 * negatives, eg. (forall a:nat & exists x:nat & (x > a)) implies a=0 x=0 fails.
+	 *
 	private void findCounterexample(List<INBindingSetter> bindings, INExpression inexp, RootContext ctxt)
 	{
 		int[] limits = new int[bindings.size()];
-		ValueList[] possibles = new ValueList[bindings.size()];
+		ValueList[] originals = new ValueList[bindings.size()];
 		
 		for (int i=0; i<bindings.size(); i++)
 		{
 			INBindingSetter bind = bindings.get(i);
-			possibles[i] = new ValueList(bind.getBindValues());	// Note: Copy!
+			originals[i] = new ValueList(bind.getBindValues());	// Note: Copy!
 			limits[i] = bind.getBindValues().size();
 		}
 		
@@ -431,7 +439,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			{
 				INBindingSetter bind = bindings.get(i);
 				bind.getBindValues().clear();
-				bind.getBindValues().add(possibles[i].get(attempt[i]));
+				bind.getBindValues().add(originals[i].get(attempt[i]));
 			}
 			
 			Exception exception = null;
@@ -463,6 +471,97 @@ public class QuickCheckCommand extends AnalysisCommand
 
 				break;	// One is good enough?
 			}
+		}
+		
+		// Restore bindings
+		for (int i=0; i<bindings.size(); i++)
+		{
+			INBindingSetter bind = bindings.get(i);
+			bind.getBindValues().clear();
+			bind.getBindValues().addAll(originals[i]);
+		}
+	}
+	***/
+
+	private void findCounterexample(INExpression inexp, RootContext ctxt)
+	{
+		List<INBindingSetter> bindings = new Vector<INBindingSetter>();
+
+		// Only search over the top level forall's type bindings, assuming there is one.
+
+		if (inexp instanceof INForAllExpression)
+		{
+			INForAllExpression forall = (INForAllExpression)inexp;
+			
+			for (INMultipleBind binding: forall.bindList)
+			{
+				if (binding instanceof INBindingSetter)
+				{
+					bindings.add((INBindingSetter) binding);
+				}
+			}
+		}
+		else
+		{
+			println("Cannot find counterexample?");
+		}
+		
+		int[] limits = new int[bindings.size()];
+		ValueList[] originals = new ValueList[bindings.size()];
+		
+		for (int i=0; i<bindings.size(); i++)
+		{
+			INBindingSetter bind = bindings.get(i);
+			originals[i] = new ValueList(bind.getBindValues());	// Note: Copy!
+			limits[i] = bind.getBindValues().size();
+		}
+		
+		for (int[] attempt: new Selector(limits))
+		{
+			for (int i=0; i<bindings.size(); i++)
+			{
+				INBindingSetter bind = bindings.get(i);
+				bind.getBindValues().clear();
+				bind.getBindValues().add(originals[i].get(attempt[i]));
+			}
+			
+			Exception exception = null;
+			boolean passed = false;
+			
+			try
+			{
+				passed = inexp.eval(ctxt).boolValue(ctxt);
+			}
+			catch (Exception e)
+			{
+				exception = e;
+				passed = false;
+			}
+			
+			if (!passed)
+			{
+				printf("Counterexample: ");
+				String sep = "";
+				
+				for (int i=0; i<bindings.size(); i++)
+				{
+					INBindingSetter bind = bindings.get(i);
+					printf("%s%s = %s", sep, bind, bind.getBindValues().get(0));
+					sep = ", ";
+				}
+				
+				println(exception != null ? ", raises " + exception : "");
+
+				break;	// One is good enough?
+			}
+		}
+		
+		// Restore bindings
+		for (int i=0; i<bindings.size(); i++)
+		{
+			INBindingSetter bind = bindings.get(i);
+			bind.getBindValues().clear();
+			bind.getBindValues().addAll(originals[i]);
 		}
 	}
 	
