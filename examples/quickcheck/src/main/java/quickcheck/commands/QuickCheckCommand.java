@@ -450,12 +450,6 @@ public class QuickCheckCommand extends AnalysisCommand
 			if (!passed)
 			{
 				printf("Counterexample: ");
-				
-				if (exception != null)
-				{
-					println(exception.getMessage());
-				}
-				
 				String sep = "";
 				
 				for (int i=0; i<bindings.size(); i++)
@@ -465,7 +459,8 @@ public class QuickCheckCommand extends AnalysisCommand
 					sep = ", ";
 				}
 				
-				println("");
+				println(exception != null ? ", raises " + exception : "");
+
 				break;	// One is good enough?
 			}
 		}
