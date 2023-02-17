@@ -28,14 +28,14 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
+import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.patterns.visitors.INLeafMultipleBindVisitor;
 
-public class MultiTypeBindFinder extends INLeafMultipleBindVisitor<INBindingSetter, List<INBindingSetter>, Object>
+public class MultiTypeBindFinder extends INLeafMultipleBindVisitor<INBindingSetter, List<INBindingSetter>, Boolean>
 {
-	public MultiTypeBindFinder(INVisitorSet<INBindingSetter, List<INBindingSetter>, Object> inVisitorSet)
+	public MultiTypeBindFinder(INVisitorSet<INBindingSetter, List<INBindingSetter>, Boolean> inVisitorSet)
 	{
 		this.visitorSet = inVisitorSet;
 	}
@@ -47,15 +47,20 @@ public class MultiTypeBindFinder extends INLeafMultipleBindVisitor<INBindingSett
 	}
 
 	@Override
-	public List<INBindingSetter> caseMultipleTypeBind(INMultipleTypeBind node, Object arg)
+	public List<INBindingSetter> caseMultipleTypeBind(INMultipleTypeBind node, Boolean foralls)
 	{
 		List<INBindingSetter> binds = newCollection();
-		binds.add(node);
+		
+		if (!foralls)	// Not only foralls
+		{
+			binds.add(node);
+		}
+		
 		return binds;
 	}
 
 	@Override
-	public List<INBindingSetter> caseMultipleBind(INMultipleBind node, Object arg)
+	public List<INBindingSetter> caseMultipleBind(INMultipleBind node, Boolean foralls)
 	{
 		return newCollection();
 	}

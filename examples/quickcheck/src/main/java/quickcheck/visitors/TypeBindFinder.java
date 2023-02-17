@@ -29,16 +29,19 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.expressions.visitors.INLeafExpressionVisitor;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INMultipleBind;
+import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
 
-public class TypeBindFinder extends INLeafExpressionVisitor<INBindingSetter, List<INBindingSetter>, Object>
+public class TypeBindFinder extends INLeafExpressionVisitor<INBindingSetter, List<INBindingSetter>, Boolean>
 {
 	public TypeBindFinder()
 	{
 		super(false);
 		
-		visitorSet = new INVisitorSet<INBindingSetter, List<INBindingSetter>, Object>()
+		visitorSet = new INVisitorSet<INBindingSetter, List<INBindingSetter>, Boolean>()
 		{
 			@Override
 			protected void setVisitors()
@@ -62,9 +65,33 @@ public class TypeBindFinder extends INLeafExpressionVisitor<INBindingSetter, Lis
 	{
 		return new Vector<INBindingSetter>();
 	}
+	
+	@Override
+	public List<INBindingSetter> caseForAllExpression(INForAllExpression node, Boolean foralls)
+	{
+		if (!foralls)	// Not foralls only
+		{
+			return super.caseForAllExpression(node, foralls);
+		}
+		else
+		{
+			List<INBindingSetter> all = newCollection();
+			
+			for (INMultipleBind bind: node.bindList)
+			{
+				if (bind instanceof INMultipleTypeBind)
+				{
+					all.add((INBindingSetter) bind);	// NB not using bind visitor
+				}
+			}
+		
+			all.addAll(visitorSet.applyExpressionVisitor(node.predicate, foralls));
+			return all;
+		}
+	}
 
 	@Override
-	public List<INBindingSetter> caseExpression(INExpression node, Object arg)
+	public List<INBindingSetter> caseExpression(INExpression node, Boolean foralls)
 	{
 		return newCollection();
 	}

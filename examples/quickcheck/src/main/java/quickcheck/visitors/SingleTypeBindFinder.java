@@ -33,9 +33,9 @@ import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.patterns.INTypeBind;
 import com.fujitsu.vdmj.in.patterns.visitors.INLeafBindVisitor;
 
-public class SingleTypeBindFinder extends INLeafBindVisitor<INBindingSetter, List<INBindingSetter>, Object>
+public class SingleTypeBindFinder extends INLeafBindVisitor<INBindingSetter, List<INBindingSetter>, Boolean>
 {
-	public SingleTypeBindFinder(INVisitorSet<INBindingSetter, List<INBindingSetter>, Object> inVisitorSet)
+	public SingleTypeBindFinder(INVisitorSet<INBindingSetter, List<INBindingSetter>, Boolean> inVisitorSet)
 	{
 		this.visitorSet = inVisitorSet;
 	}
@@ -47,15 +47,20 @@ public class SingleTypeBindFinder extends INLeafBindVisitor<INBindingSetter, Lis
 	}
 	
 	@Override
-	public List<INBindingSetter> caseTypeBind(INTypeBind node, Object arg)
+	public List<INBindingSetter> caseTypeBind(INTypeBind node, Boolean foralls)
 	{
 		List<INBindingSetter> binds = newCollection();
-		binds.add(node);
+		
+		if (!foralls)	// Not only foralls
+		{
+			binds.add(node);
+		}
+		
 		return binds;
 	}
 
 	@Override
-	public List<INBindingSetter> caseBind(INBind node, Object arg)
+	public List<INBindingSetter> caseBind(INBind node, Boolean foralls)
 	{
 		return newCollection();
 	}

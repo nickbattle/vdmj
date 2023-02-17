@@ -32,9 +32,9 @@ import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.visitors.INLeafDefinitionVisitor;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 
-public class DefinitionTypeBindFinder extends INLeafDefinitionVisitor<INBindingSetter, List<INBindingSetter>, Object>
+public class DefinitionTypeBindFinder extends INLeafDefinitionVisitor<INBindingSetter, List<INBindingSetter>, Boolean>
 {
-	public DefinitionTypeBindFinder(INVisitorSet<INBindingSetter, List<INBindingSetter>, Object> inVisitorSet)
+	public DefinitionTypeBindFinder(INVisitorSet<INBindingSetter, List<INBindingSetter>, Boolean> inVisitorSet)
 	{
 		this.visitorSet = inVisitorSet;
 	}
@@ -46,7 +46,7 @@ public class DefinitionTypeBindFinder extends INLeafDefinitionVisitor<INBindingS
 	}
 
 	@Override
-	public List<INBindingSetter> caseDefinition(INDefinition node, Object arg)
+	public List<INBindingSetter> caseDefinition(INDefinition node, Boolean foralls)
 	{
 		return newCollection();
 	}

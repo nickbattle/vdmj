@@ -35,7 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
@@ -45,9 +44,7 @@ import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
-import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
@@ -306,9 +303,9 @@ public class QuickCheckCommand extends AnalysisCommand
 		}
 	}
 	
-	private List<INBindingSetter> getBindList(INExpression inexp) throws Exception
+	private List<INBindingSetter> getBindList(INExpression inexp, boolean foralls) throws Exception
 	{
-		return inexp.apply(new TypeBindFinder(), null);
+		return inexp.apply(new TypeBindFinder(), foralls);
 	}
 	
 	private void createRanges(String filename, ProofObligationList all)
@@ -321,7 +318,7 @@ public class QuickCheckCommand extends AnalysisCommand
 
 			for (ProofObligation po: all)
 			{
-				for (INBindingSetter mbind: getBindList(getPOExpression(po)))
+				for (INBindingSetter mbind: getBindList(getPOExpression(po), false))
 				{
 					if (!done.contains(mbind.toString()))
 					{
@@ -355,7 +352,7 @@ public class QuickCheckCommand extends AnalysisCommand
 				}
 
 				INExpression poexp = getPOExpression(po);
-				List<INBindingSetter> bindings = getBindList(poexp);
+				List<INBindingSetter> bindings = getBindList(poexp, false);
 				
 				for (INBindingSetter mbind: bindings)
 				{
@@ -485,25 +482,16 @@ public class QuickCheckCommand extends AnalysisCommand
 
 	private void findCounterexample(INExpression inexp, RootContext ctxt)
 	{
-		List<INBindingSetter> bindings = new Vector<INBindingSetter>();
-
-		// Only search over the top level forall's type bindings, assuming there is one.
-
-		if (inexp instanceof INForAllExpression)
+		List<INBindingSetter> bindings = null;
+		
+		try
 		{
-			INForAllExpression forall = (INForAllExpression)inexp;
-			
-			for (INMultipleBind binding: forall.bindList)
-			{
-				if (binding instanceof INBindingSetter)
-				{
-					bindings.add((INBindingSetter) binding);
-				}
-			}
+			bindings = getBindList(inexp, true);	// Only search for foralls...
 		}
-		else
+		catch (Exception e)
 		{
 			println("Cannot find counterexample?");
+			return;
 		}
 		
 		int[] limits = new int[bindings.size()];
