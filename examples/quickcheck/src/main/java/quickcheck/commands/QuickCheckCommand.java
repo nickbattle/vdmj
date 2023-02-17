@@ -319,7 +319,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		}
 		catch (Exception e)
 		{
-			println("Error: " + e.getMessage());
+			println("Can't create range file: " + e.getMessage());
 		}
 	}
 	
@@ -356,23 +356,22 @@ public class QuickCheckCommand extends AnalysisCommand
 					{
 						if (result.boolValue(ctxt))
 						{
-							printf("PO# %d, Result = PASSED\n", po.number);
+							printf("PO# %d, PASSED\n", po.number);
 						}
 						else
 						{
-							printf("PO# %d, Result = FAILED: ", po.number);
+							printf("PO# %d, FAILED: ", po.number);
 							findCounterexample(bindings, poexp, ctxt);
 						}
 					}
 					else
 					{
-						printf("PO# %d, Failed: PO evaluation returns %s?\n", po.number, result.kind());
+						printf("PO# %d, Error: PO evaluation returns %s?\n", po.number, result.kind());
 					}
-					
 				}
 				catch (Exception e)
 				{
-					printf("PO# %d, Failed: %s\n", po.number, e.getMessage());
+					printf("PO# %d, Error: %s\n", po.number, e.getMessage());
 				}
 			}
 		}
