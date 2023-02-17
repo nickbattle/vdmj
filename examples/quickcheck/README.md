@@ -73,12 +73,17 @@ with the sets given as the type binds.
 	... edit the sets in qcfile here, then...
 	
 	> qc qcfile                 -- Try every PO, or provide a list of numbers
-	PO# 1, Result = true
-	PO# 2, Result = true
-	PO# 3, Result = true
-	PO# 4, Result = true
-	PO# 5, Result = true
-	PO# 6, Result = true
-	PO# 7, Result = false       -- NOTE this fails, because T is too small for a factorial of T
+		Ranges expanded in 0.049s
+		PO# 1, PASSED in 0.018s
+		PO# 2, PASSED in 0.001s
+		PO# 3, PASSED in 0.001s
+		PO# 4, PASSED in 0.0s
+		PO# 5, PASSED in 0.002s
+		PO# 6, PASSED in 0.003s
+		PO# 7, FAILED in 0.008s: Counterexample: a = 4
+		f: subtype obligation in 'DEFAULT' (test.vdm) at line 9:5
+		(forall a:T &
+		  inv_T((if (a = 0) then 1 else (a * f((a - 1))))) and
+		  (is_nat((if (a = 0) then 1 else (a * f((a - 1)))))))
 	>
 ```
