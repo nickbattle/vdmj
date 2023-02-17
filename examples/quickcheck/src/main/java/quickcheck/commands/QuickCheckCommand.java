@@ -230,6 +230,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			INExpressionList inexps = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexps);
 			RootContext ctxt = interpreter.getInitialContext();
 			Map<String, ValueList> ranges = new HashMap<String, ValueList>();
+			long before = System.currentTimeMillis();
 			
 			for (int i=0; i<inbinds.size(); i++)
 			{
@@ -256,6 +257,9 @@ public class QuickCheckCommand extends AnalysisCommand
 			{
 				return null;
 			}
+			
+			long after = System.currentTimeMillis();
+			println("Ranges expanded " + duration(before, after));
 
 			return ranges;
 		}
@@ -308,7 +312,7 @@ public class QuickCheckCommand extends AnalysisCommand
 				{
 					if (!done.contains(mbind.toString()))
 					{
-						writer.println(mbind + " = { /* To be supplied */ };");
+						writer.println(mbind + " = { /* To be supplied for PO#" + po.number + " */ };");
 						done.add(mbind.toString());
 					}
 				}
@@ -350,28 +354,33 @@ public class QuickCheckCommand extends AnalysisCommand
 				
 				try
 				{
+					long before = System.currentTimeMillis();
 					Value result = poexp.eval(ctxt);
+					long after = System.currentTimeMillis();
 					
 					if (result instanceof BooleanValue)
 					{
 						if (result.boolValue(ctxt))
 						{
-							printf("PO# %d, PASSED\n", po.number);
+							printf("PO# %d, PASSED %s\n", po.number, duration(before, after));
 						}
 						else
 						{
-							printf("PO# %d, FAILED: ", po.number);
+							printf("PO# %d, FAILED %s: ", po.number, duration(before, after));
 							findCounterexample(bindings, poexp, ctxt);
+							println("\n" + po);
 						}
 					}
 					else
 					{
-						printf("PO# %d, Error: PO evaluation returns %s?\n", po.number, result.kind());
+						printf("PO# %d, Error: PO evaluation returns %s?\n\n", po.number, result.kind());
+						println(po);
 					}
 				}
 				catch (Exception e)
 				{
-					printf("PO# %d, Error: %s\n", po.number, e.getMessage());
+					printf("PO# %d, %s\n\n", po.number, e.getMessage());
+					println(po);
 				}
 			}
 		}
@@ -382,6 +391,12 @@ public class QuickCheckCommand extends AnalysisCommand
 		}
 	}
 	
+	private Object duration(long before, long after)
+	{
+		double duration = (double)(after - before)/1000;
+		return "in " + duration + "s";
+	}
+
 	private void findCounterexample(List<INBindingSetter> bindings, INExpression inexp, RootContext ctxt)
 	{
 		int[] limits = new int[bindings.size()];
@@ -390,8 +405,8 @@ public class QuickCheckCommand extends AnalysisCommand
 		for (int i=0; i<bindings.size(); i++)
 		{
 			INBindingSetter bind = bindings.get(i);
-			possibles[i] = new ValueList(bind.getBindValues());	// Copy!
-			limits[i++] = bind.getBindValues().size();
+			possibles[i] = new ValueList(bind.getBindValues());	// Note: Copy!
+			limits[i] = bind.getBindValues().size();
 		}
 		
 		for (int[] attempt: new Selector(limits))
@@ -425,12 +440,16 @@ public class QuickCheckCommand extends AnalysisCommand
 					println(exception.getMessage());
 				}
 				
+				String sep = "";
+				
 				for (int i=0; i<bindings.size(); i++)
 				{
 					INBindingSetter bind = bindings.get(i);
-					println(bind + " = " + bind.getBindValues().get(0));
+					printf("%s%s = %s", sep, bind, bind.getBindValues().get(0));
+					sep = ", ";
 				}
 				
+				println("");
 				break;	// One is good enough?
 			}
 		}
