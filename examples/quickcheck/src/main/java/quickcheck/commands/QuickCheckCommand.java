@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
@@ -44,8 +45,11 @@ import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
+import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -78,6 +82,7 @@ import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
+import quickcheck.visitors.ForallExpressionFinder;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheckCommand extends AnalysisCommand
@@ -482,16 +487,20 @@ public class QuickCheckCommand extends AnalysisCommand
 
 	private void findCounterexample(INExpression inexp, RootContext ctxt)
 	{
-		List<INBindingSetter> bindings = null;
+		List<INBindingSetter> bindings = new Vector<INBindingSetter>();
+		List<INForAllExpression> foralls = new Vector<INForAllExpression>();
 		
-		try
+		for (INForAllExpression forall: inexp.apply(new ForallExpressionFinder(), null))
 		{
-			bindings = getBindList(inexp, true);	// Only search for foralls...
-		}
-		catch (Exception e)
-		{
-			println("Cannot find counterexample?");
-			return;
+			foralls.add(forall);
+			
+			for (INMultipleBind bind: forall.bindList)
+			{
+				if (bind instanceof INMultipleTypeBind)
+				{
+					bindings.add((INBindingSetter) bind);
+				}
+			}
 		}
 		
 		int[] limits = new int[bindings.size()];
