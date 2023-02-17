@@ -30,31 +30,32 @@ import java.util.Vector;
 import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
+import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.patterns.visitors.INLeafMultipleBindVisitor;
 
-public class MultiTypeBindFinder extends INLeafMultipleBindVisitor<INMultipleTypeBind, List<INMultipleTypeBind>, Object>
+public class MultiTypeBindFinder extends INLeafMultipleBindVisitor<INBindingSetter, List<INBindingSetter>, Object>
 {
-	public MultiTypeBindFinder(INVisitorSet<INMultipleTypeBind, List<INMultipleTypeBind>, Object> inVisitorSet)
+	public MultiTypeBindFinder(INVisitorSet<INBindingSetter, List<INBindingSetter>, Object> inVisitorSet)
 	{
 		this.visitorSet = inVisitorSet;
 	}
 
 	@Override
-	protected List<INMultipleTypeBind> newCollection()
+	protected List<INBindingSetter> newCollection()
 	{
-		return new Vector<INMultipleTypeBind>();
+		return new Vector<INBindingSetter>();
 	}
 
 	@Override
-	public List<INMultipleTypeBind> caseMultipleTypeBind(INMultipleTypeBind node, Object arg)
+	public List<INBindingSetter> caseMultipleTypeBind(INMultipleTypeBind node, Object arg)
 	{
-		List<INMultipleTypeBind> binds = newCollection();
+		List<INBindingSetter> binds = newCollection();
 		binds.add(node);
 		return binds;
 	}
 
 	@Override
-	public List<INMultipleTypeBind> caseMultipleBind(INMultipleBind node, Object arg)
+	public List<INBindingSetter> caseMultipleBind(INMultipleBind node, Object arg)
 	{
 		return newCollection();
 	}

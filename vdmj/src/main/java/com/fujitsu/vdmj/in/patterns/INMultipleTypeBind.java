@@ -36,7 +36,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.values.ValueList;
 
-public class INMultipleTypeBind extends INMultipleBind
+public class INMultipleTypeBind extends INMultipleBind implements INBindingSetter
 {
 	private static final long serialVersionUID = 1L;
 	public final TCType type;
@@ -58,11 +58,13 @@ public class INMultipleTypeBind extends INMultipleBind
 		return plist + ":" + type;
 	}
 	
+	@Override
 	public void setBindValues(ValueList values)
 	{
 		bindValues = values;
 	}
 	
+	@Override
 	public ValueList getBindValues()
 	{
 		return bindValues;	// Without calculation!

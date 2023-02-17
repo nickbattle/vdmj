@@ -42,8 +42,8 @@ import com.fujitsu.vdmj.ast.patterns.ASTMultipleBindList;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
-import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -289,7 +289,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		return ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
 	}
 	
-	private List<INMultipleTypeBind> getBindList(INExpression inexp) throws Exception
+	private List<INBindingSetter> getBindList(INExpression inexp) throws Exception
 	{
 		return inexp.apply(new TypeBindFinder(), null);
 	}
@@ -304,7 +304,7 @@ public class QuickCheckCommand extends AnalysisCommand
 
 			for (ProofObligation po: all)
 			{
-				for (INMultipleTypeBind mbind: getBindList(getPOExpression(po)))
+				for (INBindingSetter mbind: getBindList(getPOExpression(po)))
 				{
 					if (!done.contains(mbind.toString()))
 					{
@@ -327,15 +327,14 @@ public class QuickCheckCommand extends AnalysisCommand
 	{
 		try
 		{
-			Interpreter interpreter = Interpreter.getInstance();
-			RootContext ctxt = interpreter.getInitialContext();
+			RootContext ctxt = Interpreter.getInstance().getInitialContext();
 
 			for (ProofObligation po: chosen)
 			{
-				INExpression inexp = getPOExpression(po);
-				List<INMultipleTypeBind> bindings = getBindList(inexp);
+				INExpression poexp = getPOExpression(po);
+				List<INBindingSetter> bindings = getBindList(poexp);
 				
-				for (INMultipleTypeBind mbind: bindings)
+				for (INBindingSetter mbind: bindings)
 				{
 					ValueList values = ranges.get(mbind.toString());
 					
@@ -351,52 +350,18 @@ public class QuickCheckCommand extends AnalysisCommand
 				
 				try
 				{
-					Value result = inexp.eval(ctxt);
+					Value result = poexp.eval(ctxt);
 					
 					if (result instanceof BooleanValue)
 					{
 						if (result.boolValue(ctxt))
 						{
-							printf("PO# %d, Result = true\n", po.number);
+							printf("PO# %d, Result = PASSED\n", po.number);
 						}
 						else
 						{
-							printf("PO# %d, Result = false\n", po.number);
-							
-							// Find counterexample bindings...
-							
-							int[] limits = new int[bindings.size()];
-							ValueList[] possibles = new ValueList[bindings.size()];
-							
-							for (int i=0; i<bindings.size(); i++)
-							{
-								INMultipleTypeBind bind = bindings.get(i);
-								possibles[i] = new ValueList(bind.getBindValues());	// Copy!
-								limits[i++] = bind.getBindValues().size();
-							}
-							
-							for (int[] attempt: new Selector(limits))
-							{
-								for (int i=0; i<bindings.size(); i++)
-								{
-									INMultipleTypeBind bind = bindings.get(i);
-									bind.getBindValues().clear();
-									bind.getBindValues().add(possibles[i].get(attempt[i]));
-								}
-								
-								if (!inexp.eval(ctxt).boolValue(ctxt))
-								{
-									printf("Counter example: ");
-									
-									for (int i=0; i<bindings.size(); i++)
-									{
-										INMultipleTypeBind bind = bindings.get(i);
-										println(bind + " = " + bind.getBindValues().get(0));
-									}
-									
-									break;	// One is good enough?
-								}
-							}
+							printf("PO# %d, Result = FAILED: ", po.number);
+							findCounterexample(bindings, poexp, ctxt);
 						}
 					}
 					else
@@ -415,6 +380,60 @@ public class QuickCheckCommand extends AnalysisCommand
 		{
 			println(e);
 			return;
+		}
+	}
+	
+	private void findCounterexample(List<INBindingSetter> bindings, INExpression inexp, RootContext ctxt)
+	{
+		int[] limits = new int[bindings.size()];
+		ValueList[] possibles = new ValueList[bindings.size()];
+		
+		for (int i=0; i<bindings.size(); i++)
+		{
+			INBindingSetter bind = bindings.get(i);
+			possibles[i] = new ValueList(bind.getBindValues());	// Copy!
+			limits[i++] = bind.getBindValues().size();
+		}
+		
+		for (int[] attempt: new Selector(limits))
+		{
+			for (int i=0; i<bindings.size(); i++)
+			{
+				INBindingSetter bind = bindings.get(i);
+				bind.getBindValues().clear();
+				bind.getBindValues().add(possibles[i].get(attempt[i]));
+			}
+			
+			Exception exception = null;
+			boolean passed = false;
+			
+			try
+			{
+				passed = inexp.eval(ctxt).boolValue(ctxt);
+			}
+			catch (Exception e)
+			{
+				exception = e;
+				passed = false;
+			}
+			
+			if (!passed)
+			{
+				printf("Counterexample: ");
+				
+				if (exception != null)
+				{
+					println(exception.getMessage());
+				}
+				
+				for (int i=0; i<bindings.size(); i++)
+				{
+					INBindingSetter bind = bindings.get(i);
+					println(bind + " = " + bind.getBindValues().get(0));
+				}
+				
+				break;	// One is good enough?
+			}
 		}
 	}
 	

@@ -22,32 +22,12 @@
  *
  ******************************************************************************/
 
-package quickcheck.visitors;
+package com.fujitsu.vdmj.in.patterns;
 
-import java.util.List;
-import java.util.Vector;
+import com.fujitsu.vdmj.values.ValueList;
 
-import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.definitions.INDefinition;
-import com.fujitsu.vdmj.in.definitions.visitors.INLeafDefinitionVisitor;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
-
-public class DefinitionTypeBindFinder extends INLeafDefinitionVisitor<INBindingSetter, List<INBindingSetter>, Object>
+public interface INBindingSetter
 {
-	public DefinitionTypeBindFinder(INVisitorSet<INBindingSetter, List<INBindingSetter>, Object> inVisitorSet)
-	{
-		this.visitorSet = inVisitorSet;
-	}
-
-	@Override
-	protected List<INBindingSetter> newCollection()
-	{
-		return new Vector<INBindingSetter>();
-	}
-
-	@Override
-	public List<INBindingSetter> caseDefinition(INDefinition node, Object arg)
-	{
-		return newCollection();
-	}
+	public void setBindValues(ValueList values);
+	public ValueList getBindValues();
 }

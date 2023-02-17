@@ -28,13 +28,14 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
-import com.fujitsu.vdmj.in.definitions.INDefinition;
-import com.fujitsu.vdmj.in.definitions.visitors.INLeafDefinitionVisitor;
+import com.fujitsu.vdmj.in.patterns.INBind;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INTypeBind;
+import com.fujitsu.vdmj.in.patterns.visitors.INLeafBindVisitor;
 
-public class DefinitionTypeBindFinder extends INLeafDefinitionVisitor<INBindingSetter, List<INBindingSetter>, Object>
+public class SingleTypeBindFinder extends INLeafBindVisitor<INBindingSetter, List<INBindingSetter>, Object>
 {
-	public DefinitionTypeBindFinder(INVisitorSet<INBindingSetter, List<INBindingSetter>, Object> inVisitorSet)
+	public SingleTypeBindFinder(INVisitorSet<INBindingSetter, List<INBindingSetter>, Object> inVisitorSet)
 	{
 		this.visitorSet = inVisitorSet;
 	}
@@ -44,9 +45,17 @@ public class DefinitionTypeBindFinder extends INLeafDefinitionVisitor<INBindingS
 	{
 		return new Vector<INBindingSetter>();
 	}
+	
+	@Override
+	public List<INBindingSetter> caseTypeBind(INTypeBind node, Object arg)
+	{
+		List<INBindingSetter> binds = newCollection();
+		binds.add(node);
+		return binds;
+	}
 
 	@Override
-	public List<INBindingSetter> caseDefinition(INDefinition node, Object arg)
+	public List<INBindingSetter> caseBind(INBind node, Object arg)
 	{
 		return newCollection();
 	}

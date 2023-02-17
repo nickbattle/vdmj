@@ -36,7 +36,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.values.ValueList;
 
-public class INTypeBind extends INBind
+public class INTypeBind extends INBind implements INBindingSetter
 {
 	private static final long serialVersionUID = 1L;
 	public final TCType type;
@@ -50,6 +50,18 @@ public class INTypeBind extends INBind
 		super(pattern.location, pattern);
 		this.type = type;
 		this.hasTypeParams = !type.apply(new TCParameterCollector(), null).isEmpty();
+	}
+
+	@Override
+	public void setBindValues(ValueList values)
+	{
+		bindValues = values;
+	}
+
+	@Override
+	public ValueList getBindValues()
+	{
+		return bindValues;	// Without calculation!
 	}
 
 	@Override

@@ -30,26 +30,27 @@ import java.util.Vector;
 import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.visitors.INLeafExpressionVisitor;
-import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
+import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 
-public class TypeBindFinder extends INLeafExpressionVisitor<INMultipleTypeBind, List<INMultipleTypeBind>, Object>
+public class TypeBindFinder extends INLeafExpressionVisitor<INBindingSetter, List<INBindingSetter>, Object>
 {
 	public TypeBindFinder()
 	{
 		super(false);
 		
-		visitorSet = new INVisitorSet<INMultipleTypeBind, List<INMultipleTypeBind>, Object>()
+		visitorSet = new INVisitorSet<INBindingSetter, List<INBindingSetter>, Object>()
 		{
 			@Override
 			protected void setVisitors()
 			{
 				expressionVisitor = TypeBindFinder.this;
 				multiBindVisitor = new MultiTypeBindFinder(this);
+				bindVisitor = new SingleTypeBindFinder(this);
 				definitionVisitor = new DefinitionTypeBindFinder(this);
 			}
 			
 			@Override
-			protected List<INMultipleTypeBind> newCollection()
+			protected List<INBindingSetter> newCollection()
 			{
 				return TypeBindFinder.this.newCollection();
 			}
@@ -57,13 +58,13 @@ public class TypeBindFinder extends INLeafExpressionVisitor<INMultipleTypeBind, 
 	}
 
 	@Override
-	protected List<INMultipleTypeBind> newCollection()
+	protected List<INBindingSetter> newCollection()
 	{
-		return new Vector<INMultipleTypeBind>();
+		return new Vector<INBindingSetter>();
 	}
 
 	@Override
-	public List<INMultipleTypeBind> caseExpression(INExpression node, Object arg)
+	public List<INBindingSetter> caseExpression(INExpression node, Object arg)
 	{
 		return newCollection();
 	}
