@@ -63,6 +63,12 @@ public class INTypeBind extends INBind implements INBindingSetter
 	{
 		return bindValues;	// Without calculation!
 	}
+	
+	@Override
+	public TCType getType()
+	{
+		return type;
+	}
 
 	@Override
 	public INMultipleBindList getMultipleBindList()

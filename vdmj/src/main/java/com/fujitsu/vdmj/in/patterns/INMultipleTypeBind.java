@@ -69,6 +69,12 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	{
 		return bindValues;	// Without calculation!
 	}
+	
+	@Override
+	public TCType getType()
+	{
+		return type;
+	}
 
 	@Override
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
