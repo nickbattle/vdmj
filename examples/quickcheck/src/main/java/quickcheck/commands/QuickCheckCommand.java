@@ -82,6 +82,7 @@ import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
+import quickcheck.visitors.DefaultRangeCreator;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheckCommand extends AnalysisCommand
@@ -341,6 +342,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			File file = new File(filename);
 			PrintWriter writer = new PrintWriter(new FileWriter(file));
 			Set<String> done = new HashSet<String>();
+			DefaultRangeCreator rangeCreator = new DefaultRangeCreator();
 
 			for (ProofObligation po: all)
 			{
@@ -348,7 +350,8 @@ public class QuickCheckCommand extends AnalysisCommand
 				{
 					if (!done.contains(mbind.toString()))
 					{
-						writer.println(mbind + " = { /* To be supplied, see PO#" + po.number + " */ };");
+						String range = mbind.getType().apply(rangeCreator, null);
+						writer.println(mbind + " = " + range + ";");
 						done.add(mbind.toString());
 					}
 				}
