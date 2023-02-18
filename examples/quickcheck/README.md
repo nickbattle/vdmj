@@ -47,7 +47,7 @@ A "ranges" file consists of pairs of the form `<multiple bind> = <VDM set-of-T e
 are used to substitute the type binds in the PO, using the name of the bind to match (so one PO could involve
 multiple ranges lines). The set expressions are evaluated in the global environment of the spec, so they can use
 types and constants, functions etc, which may help. They can be set enumerations, comprehensions, functions
-returning sets and so on. Comments and whitespace are ignored. Each pair is terminated by a semicolon.
+returning sets and so on. Comments and whitespace are ignored. Every pair is terminated by a semicolon.
 
 ```
 	-- Simple range of nats
@@ -57,22 +57,23 @@ returning sets and so on. Comments and whitespace are ignored. Each pair is term
 	a : T = getSet(0, MAX_T);
 ```
 
-An initial ranges file can be created with the "quickcheck" or "qc" command, using `>filename` as the name.
-This will create one line for every bind in the PO list, but the sets will be blank.
-After the sets are provided, the "quickcheck" or "qc" command can use the updated range file to exercise POs
-with the sets given as the type binds.
+An initial ranges file can be created with the "quickcheck" or "qc" command, using `-c filename`.
+This will create one line for every bind in the PO list give (all by default). The values will be defaults for
+the type, but should be examined carefully to see whether they are suitable.
+After the ranges are provided, the "quickcheck" or "qc" command can use the updated range file to exercise POs
+with the sets given as the type binds. The default range filename is "ranges.qc".
 
 ```
-	> quickcheck
-	Usage: quickcheck [>]<ranges file> [<PO numbers>]
+	> quickcheck -help
+	Usage: Usage: quickcheck [-c <file>]|[-f <file>] [<PO numbers>]]
 	
-	> quickcheck >qcfile
-	Wrote 2 ranges to qcfile
+	> quickcheck -c qcfile
+	Created 2 ranges in qcfile
 	>
 	
 	... edit the sets in qcfile here, then...
 	
-	> qc qcfile                 -- Try every PO, or provide a list of numbers
+	> qc -f qcfile                 -- Try every PO, or provide a list of numbers
 		Ranges expanded in 0.049s
 		PO# 1, PASSED in 0.018s
 		PO# 2, PASSED in 0.001s

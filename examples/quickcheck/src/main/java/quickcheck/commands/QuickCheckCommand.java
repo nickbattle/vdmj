@@ -87,7 +87,7 @@ import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: quickcheck [-c <file>][[-f <file>] [<PO numbers>]]";
+	private final static String USAGE = "Usage: quickcheck [-c <file>]|[-f <file>] [<PO numbers>]]";
 	
 	public QuickCheckCommand(String line)
 	{
@@ -112,13 +112,18 @@ public class QuickCheckCommand extends AnalysisCommand
 			{
 				switch (argv[i])
 				{
+					case "-?":
+					case "-help":
+						println(USAGE);
+						return;
+						
 					case "-f":
 						rangesFile = argv[++i];
 						createFile = false;
 						break;
 						
 					case "-c":
-						rangesFile = argv[++i];
+						if (++i < argv.length) rangesFile = argv[i];
 						createFile = true;
 						break;
 						
@@ -141,10 +146,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 		}
 		
-		POPlugin plugin = registry.getPlugin("PO");
-		ProofObligationList obligations = plugin.getProofObligations();
-		obligations.renumber();
-		ProofObligationList chosen = getPOs(poList, obligations);
+		ProofObligationList chosen = getPOs(poList);
 
 		if (chosen != null)
 		{
@@ -164,8 +166,12 @@ public class QuickCheckCommand extends AnalysisCommand
 		}
 	}
 	
-	private ProofObligationList getPOs(List<Integer> poList, ProofObligationList all)
+	private ProofObligationList getPOs(List<Integer> poList)
 	{
+		POPlugin plugin = registry.getPlugin("PO");
+		ProofObligationList all = plugin.getProofObligations();
+		all.renumber();
+
 		if (poList.isEmpty())
 		{
 			return all;		// No PO#s specified
@@ -335,7 +341,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		return inexp.apply(new TypeBindFinder(), null);
 	}
 	
-	private void createRanges(String filename, ProofObligationList all)
+	private void createRanges(String filename, ProofObligationList chosen)
 	{
 		try
 		{
@@ -344,7 +350,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			Set<String> done = new HashSet<String>();
 			DefaultRangeCreator rangeCreator = new DefaultRangeCreator();
 
-			for (ProofObligation po: all)
+			for (ProofObligation po: chosen)
 			{
 				for (INBindingSetter mbind: getBindList(getPOExpression(po), false))
 				{
@@ -358,7 +364,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 
 			writer.close();
-			println("Wrote " + done.size() + " ranges to " + filename);
+			println("Created " + done.size() + " ranges in " + filename);
 		}
 		catch (Exception e)
 		{
@@ -471,6 +477,6 @@ public class QuickCheckCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("quickcheck [-c <file>][[-f <file>] [<PO numbers>]] - lightweight PO verification");
+		println("Usage: quickcheck [-c <file>]|[-f <file>] [<PO numbers>]] - lightweight PO verification");
 	}
 }
