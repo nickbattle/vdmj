@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
@@ -85,7 +86,7 @@ import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: quickcheck [>]<ranges file> [<PO numbers>]";
+	private final static String USAGE = "Usage: quickcheck [-c <file>][[-f <file>] [<PO numbers>]]";
 	
 	public QuickCheckCommand(String line)
 	{
@@ -100,26 +101,59 @@ public class QuickCheckCommand extends AnalysisCommand
 	@Override
 	public void run()
 	{
-		if (argv.length < 2)
+		String rangesFile = "ranges.qc";
+		boolean createFile = false;
+		List<Integer> poList = new Vector<Integer>();
+
+		for (int i=1; i < argv.length; i++)
 		{
-			println(USAGE);
-			return;
+			try
+			{
+				switch (argv[i])
+				{
+					case "-f":
+						rangesFile = argv[++i];
+						createFile = false;
+						break;
+						
+					case "-c":
+						rangesFile = argv[++i];
+						createFile = true;
+						break;
+						
+					default:
+						poList.add(Integer.parseInt(argv[i]));
+						break;
+				}
+			}
+			catch (NumberFormatException e)
+			{
+				println("Malformed PO#: " + e.getMessage());
+				println(USAGE);
+				return;
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				println("Missing argument");
+				println(USAGE);
+				return;
+			}
 		}
 		
 		POPlugin plugin = registry.getPlugin("PO");
 		ProofObligationList obligations = plugin.getProofObligations();
 		obligations.renumber();
-		ProofObligationList chosen = getPOs(argv, obligations);
+		ProofObligationList chosen = getPOs(poList, obligations);
 
 		if (chosen != null)
 		{
-			if (argv[1].startsWith(">"))
+			if (createFile)
 			{
-				createRanges(argv[1].substring(1), chosen);
+				createRanges(rangesFile, chosen);
 			}
 			else
 			{
-				Map<String, ValueList> ranges = generateRanges(argv[1]);
+				Map<String, ValueList> ranges = generateRanges(rangesFile);
 				
 				if (ranges != null)
 				{
@@ -129,40 +163,29 @@ public class QuickCheckCommand extends AnalysisCommand
 		}
 	}
 	
-	private ProofObligationList getPOs(String[] argv, ProofObligationList all)
+	private ProofObligationList getPOs(List<Integer> poList, ProofObligationList all)
 	{
-		if (argv.length == 2)
+		if (poList.isEmpty())
 		{
 			return all;		// No PO#s specified
 		}
 		else
 		{
-			try
+			ProofObligationList list = new ProofObligationList();
+			
+			for (Integer n: poList)
 			{
-				ProofObligationList list = new ProofObligationList();
-				
-				for (int i=2; i<argv.length; i++)
+				if (n > 0 && n <= all.size())
 				{
-					int n = Integer.parseInt(argv[i]);
-					
-					if (n > 0 && n <= all.size())
-					{
-						list.add(all.get(n-1));
-					}
-					else
-					{
-						println("PO# " + argv[i] + " unknown. Must be between 1 and " + all.size());
-					}
+					list.add(all.get(n-1));
 				}
-				
-				return list;
+				else
+				{
+					println("PO# " + n + " unknown. Must be between 1 and " + all.size());
+				}
 			}
-			catch (NumberFormatException e)
-			{
-				println(e.getMessage());
-				println(USAGE);
-				return null;
-			}
+			
+			return list;
 		}
 	}
 	
@@ -445,6 +468,6 @@ public class QuickCheckCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("quickcheck [>]<ranges file> [<PO#s>] - lightweight PO verification");
+		println("quickcheck [-c <file>][[-f <file>] [<PO numbers>]] - lightweight PO verification");
 	}
 }
