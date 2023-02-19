@@ -93,10 +93,10 @@ public class SeqValue extends Value
 
 		if ((flags & FormattableFlags.ALTERNATE) == 0 && s.charAt(0) == '"')
 		{
-			s = s.substring(1, s.length()-1);
+			s = s.substring(1, s.length()-1);	// Without "quotes"
 		}
 
-		formatTo(s, formatter, flags, width, precision);
+		formatTo(s, formatter, 0, width, precision);
 	}
 
 	@Override
