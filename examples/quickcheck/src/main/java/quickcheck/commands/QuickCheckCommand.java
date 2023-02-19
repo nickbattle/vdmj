@@ -60,6 +60,7 @@ import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.syntax.BindReader;
@@ -156,11 +157,11 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 			else
 			{
-				Map<String, ValueList> ranges = generateRanges(rangesFile);
+				Map<String, ValueList> ranges = readRanges(rangesFile);
 				
 				if (ranges != null)
 				{
-					runRanges(chosen, ranges);
+					checkObligations(chosen, ranges);
 				}
 			}
 		}
@@ -208,7 +209,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		reader.nextToken();
 	}
 	
-	private Map<String, ValueList> generateRanges(String filename)
+	private Map<String, ValueList> readRanges(String filename)
 	{
 		try
 		{
@@ -314,6 +315,10 @@ public class QuickCheckCommand extends AnalysisCommand
 		{
 			println(e.getMessage());
 		}
+		catch (ContextException e)
+		{
+			println(e.getMessage());
+		}
 		catch (Exception e)
 		{
 			println(e);
@@ -364,7 +369,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 
 			writer.close();
-			println("Created " + done.size() + " default ranges in " + filename + ". Check them!");
+			println("Created " + done.size() + " default ranges in " + filename + ". Check them! Then run 'qc'");
 		}
 		catch (Exception e)
 		{
@@ -372,7 +377,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		}
 	}
 	
-	private void runRanges(ProofObligationList chosen, Map<String, ValueList> ranges)
+	private void checkObligations(ProofObligationList chosen, Map<String, ValueList> ranges)
 	{
 		try
 		{
