@@ -30,11 +30,15 @@ import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNumericType;
+import com.fujitsu.vdmj.tc.types.TCProductType;
+import com.fujitsu.vdmj.tc.types.TCQuoteType;
 import com.fujitsu.vdmj.tc.types.TCRationalType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
+import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
@@ -94,6 +98,12 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 	}
 	
 	@Override
+	public String caseSet1Type(TCSet1Type node, Object arg)
+	{
+		return "power " + node.setof.apply(this, arg) + " \\ {}";
+	}
+	
+	@Override
 	public String caseSeqType(TCSeqType node, Object arg)
 	{
 		String type = node.seqof.apply(this, arg);
@@ -110,5 +120,62 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 		
 		return "{ { a |-> b | a in set d, b in set r }\n" +
 				"| d in set power " + dom + ", r in set power " + rng + " }";
+	}
+	
+	@Override
+	public String caseProductType(TCProductType node, Object arg)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("{ mk_(");
+		String sep = "";
+		
+		for (int v=1; v <= node.types.size(); v++)
+		{
+			sb.append(sep);
+			sb.append("v" + v);
+			sep = ", ";
+		}
+		
+		sb.append(") | ");
+		
+		int v = 1;
+		sep = "";
+		
+		for (TCType type: node.types)
+		{
+			sb.append(sep);
+			sb.append("v" + v++);
+			sb.append(" in set ");
+			sb.append(type.apply(this, arg));
+			sep = ", ";
+		}
+		
+		sb.append(" }");
+		
+		return sb.toString(); 
+	}
+	
+	@Override
+	public String caseUnionType(TCUnionType node, Object arg)
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("dunion { ");
+		String sep = "";
+		
+		for (TCType type: node.types)
+		{
+			sb.append(sep);
+			sb.append(type.apply(this, arg));
+			sep = ", ";
+		}
+		
+		sb.append(" }");
+		return sb.toString();
+	}
+	
+	@Override
+	public String caseQuoteType(TCQuoteType node, Object arg)
+	{
+		return "{ <" + node.value + "> }"; 
 	}
 }

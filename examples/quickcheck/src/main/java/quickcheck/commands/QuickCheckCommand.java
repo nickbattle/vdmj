@@ -364,7 +364,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 
 			writer.close();
-			println("Created " + done.size() + " ranges in " + filename);
+			println("Created " + done.size() + " default ranges in " + filename + ". Check them!");
 		}
 		catch (Exception e)
 		{

@@ -74,17 +74,17 @@ with the sets given as the type binds. The default range filename is "ranges.qc"
 	... edit the sets in qcfile here, then...
 	
 	> qc -f qcfile                 -- Try every PO, or provide a list of numbers
-		Ranges expanded in 0.049s
-		PO# 1, PASSED in 0.018s
-		PO# 2, PASSED in 0.001s
-		PO# 3, PASSED in 0.001s
-		PO# 4, PASSED in 0.0s
-		PO# 5, PASSED in 0.002s
-		PO# 6, PASSED in 0.003s
-		PO# 7, FAILED in 0.008s: Counterexample: a = 4
-		f: subtype obligation in 'DEFAULT' (test.vdm) at line 9:5
-		(forall a:T &
-		  inv_T((if (a = 0) then 1 else (a * f((a - 1))))) and
-		  (is_nat((if (a = 0) then 1 else (a * f((a - 1)))))))
+	Ranges expanded in 0.049s
+	PO# 1, PASSED in 0.018s
+	PO# 2, PASSED in 0.001s
+	PO# 3, PASSED in 0.001s
+	PO# 4, PASSED in 0.0s
+	PO# 5, PASSED in 0.002s
+	PO# 6, PASSED in 0.003s
+	PO# 7, FAILED in 0.008s: Counterexample: a = 4
+	f: subtype obligation in 'DEFAULT' (test.vdm) at line 9:5
+	(forall a:T &
+	  inv_T((if (a = 0) then 1 else (a * f((a - 1))))) and
+	  (is_nat((if (a = 0) then 1 else (a * f((a - 1)))))))
 	>
 ```
