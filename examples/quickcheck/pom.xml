@@ -9,8 +9,8 @@
 	</parent>
 	
 	<artifactId>quickcheck</artifactId>
-	<name>Example PO QuickCheck plugin</name>
-	<description>Experimental brute force PO quickcheck plugin for VDMJ.</description>
+	<name>Example QuickCheck plugin</name>
+	<description>Experimental brute force plugin for PO verification.</description>
 
 	<dependencies>
 		<dependency>
