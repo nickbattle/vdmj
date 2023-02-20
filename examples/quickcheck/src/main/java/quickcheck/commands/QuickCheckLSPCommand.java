@@ -24,27 +24,31 @@
 
 package quickcheck.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.plugins.AnalysisCommand;
-import com.fujitsu.vdmj.plugins.PluginRegistry;
-import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.values.ValueList;
 
-public class QuickCheckCommand extends AnalysisCommand
+import dap.DAPMessageList;
+import dap.DAPRequest;
+import vdmj.commands.Command;
+import workspace.PluginRegistry;
+import workspace.plugins.POPlugin;
+
+public class QuickCheckLSPCommand extends Command
 {
 	private final static String USAGE = "Usage: quickcheck [-c <file>]|[-f <file>] [<PO numbers>]";
-	public final static String HELP = "quickcheck - lightweight PO verification";
+	public static final String HELP = "quickcheck - lightweight PO verification";
+	
+	private final String[] argv;
 			
-	public QuickCheckCommand(String line)
+	public QuickCheckLSPCommand(String line)
 	{
-		super(line);
+		argv = line.split("\\s+");
 		
 		if (!argv[0].equals("quickcheck") && !argv[0].equals("qc"))
 		{
@@ -53,8 +57,9 @@ public class QuickCheckCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public DAPMessageList run(DAPRequest request)
 	{
+		DAPMessageList empty = new DAPMessageList(request);
 		String rangesFile = "ranges.qc";
 		boolean createFile = false;
 		List<Integer> poList = new Vector<Integer>();
@@ -68,7 +73,7 @@ public class QuickCheckCommand extends AnalysisCommand
 					case "-?":
 					case "-help":
 						errorln(USAGE);
-						return;
+						return empty;
 						
 					case "-f":
 						rangesFile = argv[++i];
@@ -89,13 +94,13 @@ public class QuickCheckCommand extends AnalysisCommand
 			{
 				errorln("Malformed PO#: " + e.getMessage());
 				errorln(USAGE);
-				return;
+				return empty;
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
 				errorln("Missing argument");
 				errorln(USAGE);
-				return;
+				return empty;
 			}
 		}
 		
@@ -122,10 +127,13 @@ public class QuickCheckCommand extends AnalysisCommand
 				}
 			}
 		}
+		
+		return empty;
 	}
-	
-	public static void help()
+
+	@Override
+	public boolean notWhenRunning()
 	{
-		println("quickcheck [-c <file>]|[-f <file>] [<PO numbers>]] - lightweight PO verification");
+		return true;
 	}
 }
