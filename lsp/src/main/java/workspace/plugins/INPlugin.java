@@ -142,6 +142,10 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 					Constructor<?> ctor = clazz.getConstructor(String.class); 
 					return (Command)ctor.newInstance(line);
 				}
+				catch (ClassNotFoundException e)
+				{
+					return null;
+				}
 				catch (InvocationTargetException e)
 				{
 					Diag.error(e.getTargetException());
