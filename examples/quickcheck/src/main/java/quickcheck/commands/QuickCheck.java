@@ -118,7 +118,7 @@ public class QuickCheck
 				}
 			}
 			
-			return list;
+			return errorCount > 0 ? null : list;
 		}
 	}
 	
