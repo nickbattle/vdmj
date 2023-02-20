@@ -35,7 +35,7 @@ import workspace.Diag;
 import workspace.PluginRegistry;
 import workspace.plugins.CTPlugin;
 
-public class RuntraceCommand extends Command implements InitRunnable
+public class RuntraceCommand extends AnalysisCommand implements InitRunnable
 {
 	public static final String USAGE = "Usage: runtrace <trace> <number>";
 	public static final String HELP = "runtrace <trace> <number> - run one test from a trace";

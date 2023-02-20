@@ -38,7 +38,7 @@ import workspace.Diag;
 import workspace.PluginRegistry;
 import workspace.plugins.INPlugin;
 
-public class GenerateCommand extends Command
+public class GenerateCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: generate <trace name>";
 	public static final String HELP = "generate <trace name> - debug expansion of trace name";

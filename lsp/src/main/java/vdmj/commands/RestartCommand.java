@@ -27,7 +27,7 @@ package vdmj.commands;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 
-public class RestartCommand extends Command
+public class RestartCommand extends AnalysisCommand
 {
 	public RestartCommand(String message)
 	{

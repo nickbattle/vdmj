@@ -34,7 +34,7 @@ import dap.DAPRequest;
 import json.JSONObject;
 import workspace.Diag;
 
-public class ClassesCommand extends Command
+public class ClassesCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: classes";
 	public static final String HELP = "classes - list the classes in the specification";

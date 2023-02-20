@@ -27,7 +27,7 @@ package vdmj.commands;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 
-public class ErrorCommand extends Command
+public class ErrorCommand extends AnalysisCommand
 {
 	private final String message;
 	

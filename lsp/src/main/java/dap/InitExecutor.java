@@ -30,7 +30,7 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
 import vdmj.commands.InitRunnable;
 import workspace.Diag;
 import workspace.EventHub;
@@ -82,7 +82,7 @@ public class InitExecutor extends AsyncExecutor
 
 		if (launchCommand != null)
 		{
-			Command command = Command.parse(launchCommand);
+			AnalysisCommand command = AnalysisCommand.parse(launchCommand);
 			
 			if (command instanceof InitRunnable)
 			{

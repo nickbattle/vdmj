@@ -27,7 +27,7 @@ package examples;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
 
 /**
  * Example of how to implement a Command for the example plugin.
@@ -35,7 +35,7 @@ import vdmj.commands.Command;
  * Commands can implement InitRunnable and ScriptRunnable to enable them to be used as
  * the "command" of a launch request, and to be included in "scripts", respectively.
  */
-public class ExampleCommand extends Command // implements InitRunnable, ScriptRunnable
+public class ExampleCommand extends AnalysisCommand // implements InitRunnable, ScriptRunnable
 {
 	public static final String USAGE = "Usage: example <text>";
 	public static final String HELP = "example <text> - echo text to the console";

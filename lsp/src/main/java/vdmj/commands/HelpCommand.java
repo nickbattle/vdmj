@@ -29,7 +29,7 @@ import dap.DAPRequest;
 import json.JSONObject;
 import workspace.PluginRegistry;
 
-public class HelpCommand extends Command
+public class HelpCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: help [command]";
 	public static final String HELP = "help [<command>] - information about commands";

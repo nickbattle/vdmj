@@ -74,7 +74,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
 import vdmj.DAPDebugReader;
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
 import vdmj.commands.PrintCommand;
 import vdmj.commands.ScriptCommand;
 import workspace.events.DAPBeforeEvaluateEvent;
@@ -747,7 +747,7 @@ public class DAPWorkspaceManager
 			}
 		}
 		
-		Command command = Command.parse(expression);
+		AnalysisCommand command = AnalysisCommand.parse(expression);
 	
 		if (command.notWhenRunning() && AsyncExecutor.currentlyRunning() != null)
 		{

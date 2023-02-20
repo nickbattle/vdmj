@@ -31,7 +31,7 @@ import dap.DAPRequest;
 import json.JSONObject;
 import workspace.Diag;
 
-public class VersionCommand extends Command
+public class VersionCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: version";
 	public static final String HELP = "version - show the VDMJ version and build";

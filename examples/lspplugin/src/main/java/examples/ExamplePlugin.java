@@ -39,7 +39,7 @@ import com.fujitsu.vdmj.messages.VDMWarning;
 import dap.DAPMessageList;
 import json.JSONObject;
 import rpc.RPCMessageList;
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
 import vdmj.commands.HelpList;
 import workspace.Diag;
 import workspace.EventHub;
@@ -180,7 +180,7 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	 * only a convention.
 	 */
 	@Override
-	public Command getCommand(String line)
+	public AnalysisCommand getCommand(String line)
 	{
 		String[] parts = line.split("\\s+");
 		

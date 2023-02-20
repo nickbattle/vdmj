@@ -35,11 +35,11 @@ import com.fujitsu.vdmj.values.ValueList;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
 
-public class QuickCheckLSPCommand extends Command
+public class QuickCheckLSPCommand extends AnalysisCommand
 {
 	private final static String USAGE = "Usage: quickcheck [-c <file>]|[-f <file>] [<PO numbers>]";
 	public static final String HELP = "quickcheck - lightweight PO verification";

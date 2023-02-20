@@ -29,7 +29,7 @@ import com.fujitsu.vdmj.util.Utils;
 
 import quickcheck.commands.QuickCheckCommand;
 import quickcheck.commands.QuickCheckLSPCommand;
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
 import vdmj.commands.HelpList;
 import workspace.plugins.AnalysisPlugin;
 
@@ -60,7 +60,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 	}
 	
 	@Override
-	public Command getCommand(String line)
+	public AnalysisCommand getCommand(String line)
 	{
 		String[] argv = Utils.toArgv(line);
 		

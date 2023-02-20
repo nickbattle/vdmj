@@ -35,7 +35,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 
-public class LogCommand extends Command
+public class LogCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: log [<file> | off]";
 	public static final String HELP = "log [<file> | off] - control RT logging";

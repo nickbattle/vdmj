@@ -31,7 +31,7 @@ import dap.DAPServer;
 import lsp.CancellableThread;
 import workspace.DAPWorkspaceManager;
 
-public class QuitCommand extends Command
+public class QuitCommand extends AnalysisCommand
 {
 	public static final String HELP = "quit - end the debugging session";
 	public static final String USAGE = "Usage: quit";

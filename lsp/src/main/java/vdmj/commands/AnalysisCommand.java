@@ -30,11 +30,11 @@ import dap.DAPServer;
 import workspace.Diag;
 import workspace.PluginRegistry;
 
-abstract public class Command
+abstract public class AnalysisCommand
 {
 	protected DAPServer server = DAPServer.getInstance();
 	
-	public static Command parse(String line)
+	public static AnalysisCommand parse(String line)
 	{
 		if (line == null || line.isEmpty())
 		{
@@ -47,7 +47,7 @@ abstract public class Command
 		try
 		{
 			Diag.info("Trying to load command %s from plugins", name);
-			Command cmd = PluginRegistry.getInstance().getCommand(line);
+			AnalysisCommand cmd = PluginRegistry.getInstance().getCommand(line);
 			
 			if (cmd != null)
 			{

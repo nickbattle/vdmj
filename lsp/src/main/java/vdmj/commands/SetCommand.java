@@ -29,7 +29,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 
-public class SetCommand extends Command
+public class SetCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: set [<pre|post|inv|dtc|measures|annotations> <on|off>]";
 	public static final String HELP = "set [<pre|post|inv|dtc|measures|annotations> <on|off>] - set runtime checks";

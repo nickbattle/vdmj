@@ -37,7 +37,7 @@ import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import vdmj.commands.ClassesCommand;
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
 import vdmj.commands.HelpList;
 import vdmj.commands.LogCommand;
 import workspace.events.CheckPrepareEvent;
@@ -66,7 +66,7 @@ public class INPluginPR extends INPlugin
 	}
 	
 	@Override
-	public Command getCommand(String line)
+	public AnalysisCommand getCommand(String line)
 	{
 		String[] parts = line.split("\\s+");
 		
