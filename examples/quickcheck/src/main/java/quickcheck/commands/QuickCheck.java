@@ -86,8 +86,17 @@ import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
+	private int errorCount = 0;
+	
+	public boolean hasErrors()
+	{
+		return errorCount > 0;
+	}
+	
 	public ProofObligationList getPOs(ProofObligationList all, List<Integer> poList)
 	{
+		errorCount = 0;
+		
 		if (poList.isEmpty())
 		{
 			return all;		// No PO#s specified
@@ -105,6 +114,7 @@ public class QuickCheck
 				else
 				{
 					errorln("PO# " + n + " unknown. Must be between 1 and " + all.size());
+					errorCount++;
 				}
 			}
 			
@@ -128,6 +138,7 @@ public class QuickCheck
 	{
 		try
 		{
+			errorCount = 0;
 			File file = new File(filename);
 			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL);
 			Interpreter interpreter = Interpreter.getInstance();
@@ -152,7 +163,6 @@ public class QuickCheck
 			TCMultipleBindList tcbinds = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astbinds);
 			TCExpressionList tcexps = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astexps);
 			Environment env = interpreter.getGlobalEnvironment();
-			int errors = 0;
 			
 			for (int i=0; i<tcbinds.size(); i++)
 			{
@@ -168,11 +178,11 @@ public class QuickCheck
 					errorln("Range bind and expression do not match at " + exp.location);
 					errorln("Bind type: " + mbtype);
 					errorln("Expression type: " + exptype + ", expecting " + mbset);
-					errors++;
+					errorCount++;
 				}
 			}
 			
-			if (errors > 0)
+			if (errorCount > 0)
 			{
 				return null;
 			}
@@ -200,11 +210,11 @@ public class QuickCheck
 				else
 				{
 					errorln("Range does not evaluate to a set " + exp.location);
-					errors++;
+					errorCount++;
 				}
 			}
 			
-			if (errors > 0)
+			if (errorCount > 0)
 			{
 				return null;
 			}
@@ -239,6 +249,7 @@ public class QuickCheck
 			errorln(e);
 		}
 		
+		errorCount++;
 		return null;
 	}
 	
@@ -265,6 +276,7 @@ public class QuickCheck
 	{
 		try
 		{
+			errorCount = 0;
 			File file = new File(filename);
 			PrintWriter writer = new PrintWriter(new FileWriter(file));
 			Set<String> done = new HashSet<String>();
@@ -288,6 +300,7 @@ public class QuickCheck
 		}
 		catch (Exception e)
 		{
+			errorCount++;
 			errorln("Can't create range file: " + e.getMessage());
 		}
 	}
@@ -296,6 +309,7 @@ public class QuickCheck
 	{
 		try
 		{
+			errorCount = 0;
 			RootContext ctxt = Interpreter.getInstance().getInitialContext();
 			List<INBindingSetter> bindings = null;
 
@@ -323,6 +337,7 @@ public class QuickCheck
 					else
 					{
 						errorln("PO# " + po.number + ": No range defined for " + mbind);
+						errorCount++;
 					}
 				}
 				
@@ -343,18 +358,21 @@ public class QuickCheck
 							printf("PO# %d, FAILED %s: ", po.number, duration(before, after));
 							printFailPath(failPath);
 							println("\n" + po);
+							errorCount++;
 						}
 					}
 					else
 					{
 						printf("PO# %d, Error: PO evaluation returns %s?\n\n", po.number, result.kind());
 						println(po);
+						errorCount++;
 					}
 				}
 				catch (Exception e)
 				{
 					printf("PO# %d, %s\n\n", po.number, e.getMessage());
 					println(po);
+					errorCount++;
 				}
 				finally
 				{
@@ -369,6 +387,7 @@ public class QuickCheck
 		}
 		catch (Exception e)
 		{
+			errorCount++;
 			println(e);
 			return;
 		}

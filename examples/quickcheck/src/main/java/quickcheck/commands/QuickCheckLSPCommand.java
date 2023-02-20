@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.values.ValueList;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
+import json.JSONObject;
 import vdmj.commands.AnalysisCommand;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
@@ -55,11 +56,22 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 			throw new IllegalArgumentException(USAGE);
 		}
 	}
+	
+	private DAPMessageList result(DAPRequest request, String error)
+	{
+		if (error != null)
+		{
+			return new DAPMessageList(request, false, error, null);
+		}
+		else
+		{
+			return new DAPMessageList(request, new JSONObject("result", "OK"));
+		}
+	}
 
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		DAPMessageList empty = new DAPMessageList(request);
 		String rangesFile = "ranges.qc";
 		boolean createFile = false;
 		List<Integer> poList = new Vector<Integer>();
@@ -72,8 +84,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 				{
 					case "-?":
 					case "-help":
-						errorln(USAGE);
-						return empty;
+						return result(request, USAGE);
 						
 					case "-f":
 						rangesFile = argv[++i];
@@ -93,14 +104,12 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 			catch (NumberFormatException e)
 			{
 				errorln("Malformed PO#: " + e.getMessage());
-				errorln(USAGE);
-				return empty;
+				return result(request, USAGE);
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
 				errorln("Missing argument");
-				errorln(USAGE);
-				return empty;
+				return result(request, USAGE);
 			}
 		}
 		
@@ -128,7 +137,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 			}
 		}
 		
-		return empty;
+		return result(request, qc.hasErrors() ? "Failed" : null);
 	}
 
 	@Override
