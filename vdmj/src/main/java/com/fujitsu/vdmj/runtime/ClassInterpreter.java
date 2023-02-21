@@ -438,6 +438,7 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@Override
+	@Deprecated
 	public ProofObligationList getProofObligations() throws Exception
 	{
 		if (pogClasses == null)

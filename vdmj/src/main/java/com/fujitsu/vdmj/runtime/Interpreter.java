@@ -314,10 +314,13 @@ abstract public class Interpreter
 
 	/**
 	 * Get a list of proof obligations for the loaded specification.
+	 * 
+	 * This is @deprecated in favour of the POPlugin getProofObligations() method.
 	 *
 	 * @return A list of POs.
 	 * @throws Exception 
 	 */
+	@Deprecated
 	abstract public ProofObligationList getProofObligations() throws Exception;
 
 	/**
