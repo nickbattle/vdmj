@@ -34,7 +34,7 @@ public class EquivRelationObligation extends ProofObligation
 		super(def.eqPattern1.location, POType.EQUIV_RELATION, ctxt);
 		TCNameToken eqT = def.name.getEqName(location);
 		String po = "(forall x:%T & %N(x, x)) and\n"
-			+ "(forall x%T, y:%T & %N(x, y) => %N(y, x)) and\n"
+			+ "(forall x:%T, y:%T & %N(x, y) => %N(y, x)) and\n"
 			+ "(forall x:%T, y:%T, z:%T & %N(x, y) and %N(y, z) => %N(x, z))";
 		po = po.replaceAll("%N", eqT.getName());
 		po = po.replaceAll("%T", def.name.getName());
