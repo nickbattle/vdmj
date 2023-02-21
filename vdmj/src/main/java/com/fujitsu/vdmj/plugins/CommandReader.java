@@ -216,7 +216,7 @@ public class CommandReader
 				}
 				else if (AnalysisCommand.class.isAssignableFrom(clazz))
 				{
-					Constructor<?> ctor = clazz.getConstructor(String[].class);
+					Constructor<?> ctor = clazz.getConstructor(String.class);
 					return (AnalysisCommand)ctor.newInstance(new Object[]{line});
 				}
 			}
