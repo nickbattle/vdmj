@@ -395,6 +395,12 @@ public class QuickCheck
 	
 	private void printFailPath(Stack<Context> failPath)
 	{
+		if (failPath.isEmpty())
+		{
+			printf("No counterexample");
+			return;
+		}
+		
 		printf("Counterexample: ");
 		String sep = "";
 		
