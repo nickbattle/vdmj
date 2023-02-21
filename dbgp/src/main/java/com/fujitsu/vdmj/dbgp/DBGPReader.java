@@ -2992,6 +2992,7 @@ public class DBGPReader extends DebugLink implements VDMJMain
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private void processPOG(DBGPCommand c) throws Exception
 	{
 		ProofObligationList all = interpreter.getProofObligations();
