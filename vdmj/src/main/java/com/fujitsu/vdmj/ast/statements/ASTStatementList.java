@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.ast.statements;
 
 import java.util.Vector;
 
-public class ASTStatementList extends Vector<ASTStatement>
+import com.fujitsu.vdmj.mapper.Mappable;
+
+public class ASTStatementList extends Vector<ASTStatement> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 }

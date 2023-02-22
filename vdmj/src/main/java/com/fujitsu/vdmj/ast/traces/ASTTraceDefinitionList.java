@@ -26,10 +26,12 @@ package com.fujitsu.vdmj.ast.traces;
 
 import java.util.Vector;
 
+import com.fujitsu.vdmj.mapper.Mappable;
+
 /**
  * A class representing a list of trace definitions.
  */
-public class ASTTraceDefinitionList extends Vector<ASTTraceDefinition>
+public class ASTTraceDefinitionList extends Vector<ASTTraceDefinition> implements Mappable
 {
     private static final long serialVersionUID = 1L;
 }

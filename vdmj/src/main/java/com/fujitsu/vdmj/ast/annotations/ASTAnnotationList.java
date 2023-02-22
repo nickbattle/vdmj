@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.statements.ASTStatement;
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.syntax.ClassReader;
 import com.fujitsu.vdmj.syntax.DefinitionReader;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
@@ -38,7 +39,7 @@ import com.fujitsu.vdmj.syntax.ModuleReader;
 import com.fujitsu.vdmj.syntax.StatementReader;
 import com.fujitsu.vdmj.syntax.SyntaxReader;
 
-public class ASTAnnotationList extends Vector<ASTAnnotation>
+public class ASTAnnotationList extends Vector<ASTAnnotation> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 

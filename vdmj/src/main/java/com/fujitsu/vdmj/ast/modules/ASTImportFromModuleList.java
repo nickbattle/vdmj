@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.ast.modules;
 
 import java.util.Vector;
 
-public class ASTImportFromModuleList extends Vector<ASTImportFromModule>
+import com.fujitsu.vdmj.mapper.Mappable;
+
+public class ASTImportFromModuleList extends Vector<ASTImportFromModule> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 }

@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.ast.expressions;
 
 import java.util.Vector;
 
-public class ASTElseIfExpressionList extends Vector<ASTElseIfExpression>
+import com.fujitsu.vdmj.mapper.Mappable;
+
+public class ASTElseIfExpressionList extends Vector<ASTElseIfExpression> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 }
