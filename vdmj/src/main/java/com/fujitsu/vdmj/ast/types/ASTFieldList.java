@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.ast.types;
 
 import java.util.Vector;
 
-public class ASTFieldList extends Vector<ASTField>
+import com.fujitsu.vdmj.mapper.Mappable;
+
+public class ASTFieldList extends Vector<ASTField> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 }
