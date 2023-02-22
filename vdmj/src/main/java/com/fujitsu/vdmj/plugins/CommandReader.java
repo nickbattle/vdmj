@@ -93,7 +93,12 @@ public class CommandReader
 						break;
 				}
 
-				command.run();	// Can be an ErrorCommand
+				String result = command.run(line);		// Can be an ErrorCommand
+				
+				if (result != null)
+				{
+					println(result);
+				}
 				
 				if (command instanceof ReaderControl)
 				{

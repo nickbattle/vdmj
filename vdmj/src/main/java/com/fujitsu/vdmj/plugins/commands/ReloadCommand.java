@@ -43,16 +43,17 @@ public class ReloadCommand extends ControlAnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length == 1)
 		{
 			exitStatus = ExitStatus.RELOAD;
 			carryOn = false;
+			return null;
 		}
 		else
 		{
-			println(USAGE);
+			return USAGE;
 		}
 	}
 	

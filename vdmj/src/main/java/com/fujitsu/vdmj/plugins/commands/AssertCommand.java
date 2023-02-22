@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
@@ -36,7 +37,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.LexException;
-import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.messages.VDMErrorsException;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -62,20 +63,18 @@ public class AssertCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length != 2)
 		{
-			println(USAGE);
-			return;
+			return USAGE;
 		}
 		
 		File file = new File(argv[1]);
 		
 		if (!file.exists())
 		{
-			println("File not found: " + file);
-			return;
+			 return "File not found: " + file;
 		}
 
 		BufferedReader script = null;
@@ -137,14 +136,14 @@ public class AssertCommand extends AnalysisCommand
 				{
 					println("FAILED: " + assertion);
 					println("Runtime: " + e.getMessage());
-					e.ctxt.printStackTrace(Console.out, true);
+					// e.ctxt.printStackTrace(Console.out, true);
 					assertErrors++;
 				}
-				catch (RuntimeException e)
+				catch (VDMErrorsException e)
 				{
 					println("FAILED: " + assertion);
 					println("Runtime: " + e.getMessage());
-					println(e);
+					// println(e);
 					assertErrors++;
 				}
 				catch (Throwable e)
@@ -173,7 +172,7 @@ public class AssertCommand extends AnalysisCommand
 		}
 		catch (IOException e)
 		{
-			println("Assert: " + e.getMessage());
+			errorln("Assert: " + e.getMessage());
 		}
 		finally
 		{
@@ -186,6 +185,8 @@ public class AssertCommand extends AnalysisCommand
 				// ignore
 			}
 		}
+		
+		return null;
 	}
 	
 	public boolean errors()

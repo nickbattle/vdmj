@@ -30,7 +30,7 @@ import com.fujitsu.vdmj.ExitStatus;
 
 public class QuitCommand extends ControlAnalysisCommand
 {
-	private final static String USAGE = "Usage: quit";
+	private final static String USAGE = "Usage: [q]uit";
 
 	public QuitCommand(String line)
 	{
@@ -43,16 +43,17 @@ public class QuitCommand extends ControlAnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length == 1)
 		{
 			exitStatus = ExitStatus.EXIT_OK;
 			carryOn = false;
+			return null;
 		}
 		else
 		{
-			println("Usage: [q]uit");
+			return USAGE;
 		}
 	}
 	

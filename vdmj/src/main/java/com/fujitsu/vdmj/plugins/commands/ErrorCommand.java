@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 
 public class ErrorCommand extends AnalysisCommand
@@ -39,8 +37,8 @@ public class ErrorCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
-		errorln(message);
+		return message;
 	}
 }

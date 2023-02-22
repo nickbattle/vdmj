@@ -48,24 +48,21 @@ public class ThreadsCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		List<SchedulableThread> list = SchedulableThread.getAllThreads();
 		
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			println("Command is not available in VDM-SL");
-			return;
+			return "Command is not available in VDM-SL";
 		}
 		else if (argv.length != 1)
 		{
-			println(USAGE);
-			return;
+			return USAGE;
 		}
 		else if (list.isEmpty())
 		{
-			println("No threads running");
-			return;
+			return "No threads running";
 		}
 		
    		int maxName = 0;
@@ -91,6 +88,8 @@ public class ThreadsCommand extends AnalysisCommand
 			String format = String.format("%%%dd: %%-%ds  %%s", width, maxName);
 			println(String.format(format, th.getId(), th.getName(), th.getRunState()));
 		}
+		
+		return null;
 	}
 	
 	public static void help()

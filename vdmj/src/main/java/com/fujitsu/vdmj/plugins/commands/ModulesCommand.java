@@ -53,12 +53,11 @@ public class ModulesCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length != 1)
 		{
-			println(KIND);
-			return;
+			return "Usage: " + KIND;
 		}
 
 		TCPlugin tc = registry.getPlugin("TC");	// NB. TC has DEFAULTs combined
@@ -82,6 +81,8 @@ public class ModulesCommand extends AnalysisCommand
 				println(clazz.name.getName() + (clazz.name.getName().equals(def) ? " (default)" : ""));
 			}
 		}
+		
+		return null;
 	}
 	
 	public static void help()

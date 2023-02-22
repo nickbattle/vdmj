@@ -43,19 +43,21 @@ public class HelpCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length == 1)
 		{
 			registry.getHelp();
 			
+			// These three don't come from any plugin.
 			ReloadCommand.help();
 			HelpCommand.help();
-			println("[q]uit - close the session");
+			QuitCommand.help();
+			return null;
 		}
 		else
 		{
-			println("Usage: help");
+			return "Usage: help";
 		}
 	}
 	

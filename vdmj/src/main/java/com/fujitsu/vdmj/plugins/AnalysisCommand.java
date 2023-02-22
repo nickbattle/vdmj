@@ -52,8 +52,10 @@ abstract public class AnalysisCommand
 
 	/**
 	 * Run the command.
+	 * @param line TODO
+	 * @return TODO
 	 */
-	abstract public void run();
+	abstract public String run(String line);
 
 	
 	/**
@@ -127,7 +129,7 @@ abstract public class AnalysisCommand
 					return new AnalysisCommand(line)
 					{
 						@Override
-						public void run()
+						public String run(String line)
 						{
 							try
 							{
@@ -137,6 +139,8 @@ abstract public class AnalysisCommand
 							{
 								errorln(e);
 							}
+
+							return null;
 						}
 					};
 				}

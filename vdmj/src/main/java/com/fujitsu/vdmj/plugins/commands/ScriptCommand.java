@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.BufferedReader;
@@ -50,20 +51,18 @@ public class ScriptCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length != 2)
 		{
-			println(USAGE);
-			return;
+			return USAGE;
 		}
 		
 		File file = new File(argv[1]);
 		
 		if (!file.exists())
 		{
-			println("File not found: " + file);
-			return;
+			return "File not found: " + file;
 		}
 
 		BufferedReader script = null;
@@ -74,7 +73,7 @@ public class ScriptCommand extends AnalysisCommand
 
 			while (true)
 			{
-				String line = readLine(script);
+				line = readLine(script);
 				
 				if (line == null)
 				{
@@ -94,7 +93,7 @@ public class ScriptCommand extends AnalysisCommand
 				
 				if (cmd != null)
 				{
-					cmd.run();
+					cmd.run(line);
 				}
 				else
 				{
@@ -104,7 +103,7 @@ public class ScriptCommand extends AnalysisCommand
 		}
 		catch (IOException e)
 		{
-			println("Script: " + e.getMessage());
+			errorln("Script: " + e.getMessage());
 		}
 		finally
 		{
@@ -117,6 +116,8 @@ public class ScriptCommand extends AnalysisCommand
 				// ignore
 			}
 		}
+		
+		return null;
 	}
 
 	private String readLine(BufferedReader script) throws IOException

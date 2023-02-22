@@ -24,16 +24,11 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
-
 import com.fujitsu.vdmj.ExitStatus;
-import com.fujitsu.vdmj.plugins.AnalysisCommand;
 
-public class MessageCommand extends AnalysisCommand implements ReaderControl
+public class MessageCommand extends ControlAnalysisCommand
 {
 	private final String message;
-	private final ExitStatus exitStatus;
-	private final boolean carryOn;
 	
 	public MessageCommand(String message)
 	{
@@ -52,20 +47,8 @@ public class MessageCommand extends AnalysisCommand implements ReaderControl
 	}
 	
 	@Override
-	public void run()
+	public String run(String line)
 	{
-		println(message);
-	}
-
-	@Override
-	public ExitStatus exitStatus() throws Throwable
-	{
-		return exitStatus;
-	}
-
-	@Override
-	public boolean carryOn()
-	{
-		return carryOn;
+		return message;
 	}
 }

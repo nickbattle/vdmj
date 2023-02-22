@@ -25,7 +25,6 @@
 package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 
 import java.util.List;
 import java.util.Map;
@@ -53,7 +52,7 @@ public class QuickCheckCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		String rangesFile = "ranges.qc";
 		boolean createFile = false;
@@ -67,8 +66,7 @@ public class QuickCheckCommand extends AnalysisCommand
 				{
 					case "-?":
 					case "-help":
-						errorln(USAGE);
-						return;
+						return USAGE;
 						
 					case "-f":
 						rangesFile = argv[++i];
@@ -87,15 +85,13 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 			catch (NumberFormatException e)
 			{
-				errorln("Malformed PO#: " + e.getMessage());
-				errorln(USAGE);
-				return;
+				println("Malformed PO#: " + e.getMessage());
+				return USAGE;
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
-				errorln("Missing argument");
-				errorln(USAGE);
-				return;
+				println("Missing argument");
+				return USAGE;
 			}
 		}
 		
@@ -122,6 +118,8 @@ public class QuickCheckCommand extends AnalysisCommand
 				}
 			}
 		}
+		
+		return null;
 	}
 	
 	public static void help()
