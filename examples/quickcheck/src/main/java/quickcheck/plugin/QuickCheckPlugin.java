@@ -35,14 +35,7 @@ public class QuickCheckPlugin extends AnalysisPlugin
 {
 	public static AnalysisPlugin factory(Dialect dialect)
 	{
-		if (dialect == Dialect.VDM_SL)
-		{
-			return new QuickCheckPlugin();
-		}
-		else
-		{
-			throw new IllegalArgumentException("QuickCheck: Unsupported dialect");
-		}
+		return new QuickCheckPlugin();
 	}
 	
 	@Override
