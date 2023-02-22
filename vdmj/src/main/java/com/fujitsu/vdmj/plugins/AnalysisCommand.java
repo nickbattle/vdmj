@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.plugins;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.lang.reflect.Constructor;
 
@@ -35,7 +36,7 @@ import com.fujitsu.vdmj.plugins.commands.ErrorCommand;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings("deprecation")		// While we use Command in loadDirectly
 abstract public class AnalysisCommand
 {
 	protected final PluginRegistry registry;
@@ -90,7 +91,8 @@ abstract public class AnalysisCommand
 		}
 		catch (Throwable e)
 		{
-			return new ErrorCommand("Error: " + e.getMessage());
+			verbose("Parse caught " + e);
+			return new ErrorCommand(e.getMessage());
 		}
 	}
 	

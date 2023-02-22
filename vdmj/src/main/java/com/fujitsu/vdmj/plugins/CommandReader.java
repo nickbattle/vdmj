@@ -32,7 +32,10 @@ import java.lang.reflect.InvocationTargetException;
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
+import com.fujitsu.vdmj.plugins.commands.HelpCommand;
+import com.fujitsu.vdmj.plugins.commands.QuitCommand;
 import com.fujitsu.vdmj.plugins.commands.ReaderControl;
+import com.fujitsu.vdmj.plugins.commands.ReloadCommand;
 
 public class CommandReader
 {
@@ -67,60 +70,36 @@ public class CommandReader
 				}
 				
 				String[] argv = line.split("\\s+");
+				AnalysisCommand command = null;
 				
 				switch (argv[0])
 				{
 					case "help":
 					case "?":
-						if (argv.length == 1)
-						{
-							registry.getHelp();
-							println("reload - reload specification files");
-							println("help - list all commands available");
-							println("[q]uit - close the session");
-						}
-						else
-						{
-							println("Usage: help");
-						}
+						command = new HelpCommand(line);
 						break;
 					
 					case "quit":
 					case "q":
-						if (argv.length == 1)
-						{
-							exitStatus = ExitStatus.EXIT_OK;
-							carryOn = false;
-						}
-						else
-						{
-							println("Usage: [q]uit");
-						}
+						command = new QuitCommand(line);
 						break;
 
 					case "reload":
-						if (argv.length == 1)
-						{
-							exitStatus = ExitStatus.RELOAD;
-							carryOn = false;
-						}
-						else
-						{
-							println("Usage: reload");
-						}
+						command = new ReloadCommand(line);
 						break;
 
 					default:
-						AnalysisCommand command = AnalysisCommand.parse(line);
-						command.run();
-						
-						if (command instanceof ReaderControl)
-						{
-							ReaderControl ctrl = (ReaderControl)command;
-							exitStatus = ctrl.exitStatus();
-							carryOn = ctrl.carryOn();
-						}
+						command = AnalysisCommand.parse(line);
 						break;
+				}
+
+				command.run();	// Can be an ErrorCommand
+				
+				if (command instanceof ReaderControl)
+				{
+					ReaderControl ctrl = (ReaderControl)command;
+					exitStatus = ctrl.exitStatus();
+					carryOn = ctrl.carryOn();
 				}
 			}
 			catch (Throwable e)
