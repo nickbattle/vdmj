@@ -48,8 +48,7 @@ public class INForAllExpression extends INExpression
 	public final INMultipleBindList bindList;
 	public final INExpression predicate;
 	
-	// This is used by QuickCheckCommand
-	public static Stack<Context> failPath = null;
+	public static Stack<Context> failPath = null;	// See setFailPath
 
 	public INForAllExpression(LexLocation location,	INMultipleBindList bindList, INExpression predicate)
 	{
@@ -58,6 +57,10 @@ public class INForAllExpression extends INExpression
 		this.predicate = predicate;
 	}
 	
+	/**
+	 * This should only be used by tools like QuickCheck, and only ever from a single
+	 * threaded evaluation (eg. while evaluating a PO).
+	 */
 	public static void setFailPath(Stack<Context> stack)
 	{
 		failPath = stack;
