@@ -96,6 +96,8 @@ public class ScriptExecutor extends AsyncExecutor
 					if (cmd instanceof ErrorCommand)
 					{
 						Diag.info("Script aborted");
+						ErrorCommand ecmd = (ErrorCommand)cmd;
+						server.stderr(ecmd.getMessage() + "\n");
 						server.stderr("ABORTED " + filename + "\n");
 						server.writeMessage(new DAPResponse(request, false, null, null));
 						return;

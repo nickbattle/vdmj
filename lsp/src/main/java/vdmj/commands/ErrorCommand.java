@@ -36,6 +36,11 @@ public class ErrorCommand extends AnalysisCommand
 		super(message);
 		this.message = message;
 	}
+	
+	public String getMessage()
+	{
+		return message;
+	}
 
 	@Override
 	public DAPMessageList run(DAPRequest request)
