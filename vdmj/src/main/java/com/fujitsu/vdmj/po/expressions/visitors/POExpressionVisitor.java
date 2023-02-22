@@ -138,7 +138,7 @@ public abstract class POExpressionVisitor<R, S>
 
  	public R caseElementsExpression(POElementsExpression node, S arg)
 	{
-		return caseSetExpression(node, arg);
+		return caseUnaryExpression(node, arg);
 	}
 
  	public R caseElseIfExpression(POElseIfExpression node, S arg)
