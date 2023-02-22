@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.in.patterns.INIgnorePattern;
 import com.fujitsu.vdmj.in.patterns.INIntegerPattern;
 import com.fujitsu.vdmj.in.patterns.INMapPattern;
 import com.fujitsu.vdmj.in.patterns.INMapUnionPattern;
+import com.fujitsu.vdmj.in.patterns.INMapletPattern;
 import com.fujitsu.vdmj.in.patterns.INNilPattern;
 import com.fujitsu.vdmj.in.patterns.INObjectPattern;
 import com.fujitsu.vdmj.in.patterns.INPattern;
@@ -90,6 +91,11 @@ public abstract class INPatternVisitor<R, S>
 	}
 
  	public R caseMapPattern(INMapPattern node, S arg)
+	{
+		return casePattern(node, arg);
+	}
+
+ 	public R caseMapletPattern(INMapletPattern node, S arg)
 	{
 		return casePattern(node, arg);
 	}

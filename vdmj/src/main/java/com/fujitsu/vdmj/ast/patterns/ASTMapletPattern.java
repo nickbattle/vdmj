@@ -24,9 +24,9 @@
 
 package com.fujitsu.vdmj.ast.patterns;
 
-import com.fujitsu.vdmj.ast.ASTNode;
+import com.fujitsu.vdmj.ast.patterns.visitors.ASTPatternVisitor;
 
-public class ASTMapletPattern extends ASTNode
+public class ASTMapletPattern extends ASTPattern
 {
 	private static final long serialVersionUID = 1L;
 	public final ASTPattern from;
@@ -34,6 +34,7 @@ public class ASTMapletPattern extends ASTNode
 
 	public ASTMapletPattern(ASTPattern from, ASTPattern to)
 	{
+		super(from.location);
 		this.from = from;
 		this.to = to;
 	}
@@ -42,5 +43,11 @@ public class ASTMapletPattern extends ASTNode
 	public String toString()
 	{
 		return from + " |-> " + to;
+	}
+
+	@Override
+	public <R, S> R apply(ASTPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapletPattern(this, arg);
 	}
 }
