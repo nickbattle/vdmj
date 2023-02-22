@@ -47,11 +47,11 @@ public class GenerateCommand extends AnalysisCommand
 
 	public GenerateCommand(String line)
 	{
-		String[] parts = line.split("\\s+", 2);
+		super(line);
 		
-		if (parts.length == 2)
+		if (argv.length == 2)
 		{
-			this.tracename = parts[1];
+			this.tracename = argv[1];
 		}
 		else
 		{

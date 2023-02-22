@@ -42,9 +42,9 @@ public class InitCommand extends AnalysisCommand implements ScriptRunnable
 	
 	public InitCommand(String line)
 	{
-		String[] parts = line.split("\\s+");
+		super(line);
 		
-		if (parts.length != 1)
+		if (argv.length != 1)
 		{
 			throw new IllegalArgumentException(USAGE);
 		}

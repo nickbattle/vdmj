@@ -52,11 +52,11 @@ public class ExampleCommand extends AnalysisCommand // implements InitRunnable, 
 	 */
 	public ExampleCommand(String line)
 	{
-		String[] parts = line.split("\\s+", 2);
+		super(line);
 		
-		if (parts.length == 2)
+		if (argv.length > 1)
 		{
-			this.line = parts[1];
+			this.line = line;
 		}
 		else
 		{

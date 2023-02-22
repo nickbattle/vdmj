@@ -33,6 +33,7 @@ public class ErrorCommand extends AnalysisCommand
 	
 	public ErrorCommand(String message)
 	{
+		super(message);
 		this.message = message;
 	}
 

@@ -40,6 +40,7 @@ public class PrintCommand extends AnalysisCommand implements InitRunnable, Scrip
 
 	public PrintCommand(String line)
 	{
+		super(line);
 		String[] parts = line.split("\\s+", 2);
 		
 		if (parts.length == 2)

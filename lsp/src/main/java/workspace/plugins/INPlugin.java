@@ -125,7 +125,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			case "set":			return new SetCommand(line);
 			case "init":		return new InitCommand(line);
 			case "script":		return new ScriptCommand(line);
-			case "help":		return new HelpCommand(line);
+			case "help":
+			case "?":			return new HelpCommand(line);
 			case "version":		return new VersionCommand(line);
 			case "restart":		return new RestartCommand(line);
 			case "runtrace":	return new RuntraceCommand(line);

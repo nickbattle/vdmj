@@ -38,7 +38,9 @@ public class VersionCommand extends AnalysisCommand
 	
 	public VersionCommand(String line)
 	{
-		if (!line.trim().equals("version"))
+		super(line);
+		
+		if (!argv[0].equals("version"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}

@@ -28,4 +28,9 @@ package vdmj.commands;
 abstract public class Command extends AnalysisCommand
 {
 	// Placeholder until we replace these with AnalysisCommands.
+
+	protected Command(String line)
+	{
+		super(line);
+	}
 }

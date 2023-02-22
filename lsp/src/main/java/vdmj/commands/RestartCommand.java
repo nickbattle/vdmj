@@ -29,9 +29,9 @@ import dap.DAPRequest;
 
 public class RestartCommand extends AnalysisCommand
 {
-	public RestartCommand(String message)
+	public RestartCommand(String line)
 	{
-		super();
+		super(line);
 	}
 
 	@Override

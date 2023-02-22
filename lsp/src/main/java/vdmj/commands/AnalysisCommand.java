@@ -33,6 +33,12 @@ import workspace.PluginRegistry;
 abstract public class AnalysisCommand
 {
 	protected DAPServer server = DAPServer.getInstance();
+	protected final String[] argv;
+	
+	protected AnalysisCommand(String line)
+	{
+		argv = line.split("\\s+");
+	}
 
 	/**
 	 * Run the command. The JSON returned will be sent back to the Client, if not null.

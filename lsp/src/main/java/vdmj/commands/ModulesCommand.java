@@ -41,7 +41,9 @@ public class ModulesCommand extends AnalysisCommand
 	
 	public ModulesCommand(String line)
 	{
-		if (!line.trim().equals("modules"))
+		super(line);
+		
+		if (!argv[0].equals("modules"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}

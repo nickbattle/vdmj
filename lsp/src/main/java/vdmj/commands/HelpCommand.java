@@ -38,13 +38,13 @@ public class HelpCommand extends AnalysisCommand
 
 	public HelpCommand(String line)
 	{
-		String[] parts = line.split("\\s+");
+		super(line);
 		
-		if (parts.length == 2)
+		if (argv.length == 2)
 		{
-			this.command = parts[1];
+			this.command = argv[1];
 		}
-		else if (parts.length != 1)
+		else if (argv.length != 1)
 		{
 			throw new IllegalArgumentException(USAGE);
 		}

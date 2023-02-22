@@ -95,6 +95,13 @@ public class SetCommand extends ControlAnalysisCommand
 	    		}
 	    		else if (argv[1].equals("measures"))
 	    		{
+	    			if (setting != Settings.annotations)
+	    			{
+		    			println("Specification will now be re-parsed (reloaded)");
+		    			exitStatus = ExitStatus.RELOAD;
+		    			carryOn = false;
+	    			}
+
 	    			Settings.measureChecks = setting;
 	    		}
 	    		else if (argv[1].equals("annotations"))

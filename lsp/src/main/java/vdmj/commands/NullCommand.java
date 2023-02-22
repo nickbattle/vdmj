@@ -29,6 +29,11 @@ import dap.DAPRequest;
 
 public class NullCommand extends AnalysisCommand
 {
+	protected NullCommand()
+	{
+		super("");	// Can't be null! :-)
+	}
+
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{

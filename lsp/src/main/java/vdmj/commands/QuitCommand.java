@@ -38,7 +38,9 @@ public class QuitCommand extends AnalysisCommand
 	
 	public QuitCommand(String line)
 	{
-		if (!line.equals("quit") && !line.equals("q"))
+		super(line);
+		
+		if (!argv[0].equals("quit") && !argv[0].equals("q"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}

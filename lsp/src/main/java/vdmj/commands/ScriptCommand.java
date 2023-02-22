@@ -39,11 +39,11 @@ public class ScriptCommand extends AnalysisCommand implements ScriptRunnable
 	
 	public ScriptCommand(String line)
 	{
-		String[] parts = line.split("\\s+", 2);
+		super(line);
 		
-		if (parts.length == 2)
+		if (argv.length == 2)
 		{
-			filename = parts[1];
+			filename = argv[1];
 		}
 		else
 		{

@@ -45,12 +45,12 @@ public class RuntraceCommand extends AnalysisCommand implements InitRunnable
 
 	public RuntraceCommand(String line)
 	{
-		String[] parts = line.split("\\s+", 3);
+		super(line);
 		
-		if (parts.length == 3)
+		if (argv.length == 3)
 		{
-			this.tracename = parts[1];
-			this.testNumber = Long.parseLong(parts[2]);
+			this.tracename = argv[1];
+			this.testNumber = Long.parseLong(argv[2]);
 		}
 		else
 		{

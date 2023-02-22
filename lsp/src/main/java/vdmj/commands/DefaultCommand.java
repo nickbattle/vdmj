@@ -40,11 +40,11 @@ public class DefaultCommand extends AnalysisCommand
 
 	public DefaultCommand(String line)
 	{
-		String[] parts = line.split("\\s+");
+		super(line);
 		
-		if (parts.length == 2)
+		if (argv.length == 2)
 		{
-			this.defaultName = parts[1];
+			this.defaultName = argv[1];
 		}
 		else
 		{

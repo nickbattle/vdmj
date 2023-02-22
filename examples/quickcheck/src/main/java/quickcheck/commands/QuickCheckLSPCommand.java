@@ -45,11 +45,9 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 	private final static String USAGE = "Usage: quickcheck [-c <file>]|[-f <file>] [<PO numbers>]";
 	public static final String HELP = "quickcheck - lightweight PO verification";
 	
-	private final String[] argv;
-			
 	public QuickCheckLSPCommand(String line)
 	{
-		argv = line.split("\\s+");
+		super(line);
 		
 		if (!argv[0].equals("quickcheck") && !argv[0].equals("qc"))
 		{

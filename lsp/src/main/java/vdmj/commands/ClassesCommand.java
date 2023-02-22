@@ -41,7 +41,9 @@ public class ClassesCommand extends AnalysisCommand
 	
 	public ClassesCommand(String line)
 	{
-		if (!line.trim().equals("classes"))
+		super (line);
+		
+		if (!argv[0].equals("classes"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
