@@ -33,7 +33,22 @@ import workspace.PluginRegistry;
 abstract public class AnalysisCommand
 {
 	protected DAPServer server = DAPServer.getInstance();
-	
+
+	/**
+	 * Run the command. The JSON returned will be sent back to the Client, if not null.
+	 */
+	public abstract DAPMessageList run(DAPRequest request);
+
+	/**
+	 * Returns true if this command should not be executed while another is running.
+	 */
+	public abstract boolean notWhenRunning();
+
+	/**
+	 * Create an AnalysisCommand instance from the line passed, using the PluginRegistry.
+	 * Errors should be caught and turned into ErrorCommands, which print a message when
+	 * executed.
+	 */
 	public static AnalysisCommand parse(String line)
 	{
 		if (line == null || line.isEmpty())
@@ -62,22 +77,6 @@ abstract public class AnalysisCommand
 		{
 			Diag.error(e);
 			return new ErrorCommand("Error: " + e.getMessage());
-		}
-	}
-
-	public abstract DAPMessageList run(DAPRequest request);
-
-	public abstract boolean notWhenRunning();
-	
-	protected void pause(long ms)
-	{
-		try
-		{
-			Thread.sleep(ms);
-		}
-		catch (InterruptedException e)
-		{
-			// ignore
 		}
 	}
 }

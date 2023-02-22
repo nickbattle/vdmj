@@ -51,16 +51,13 @@ abstract public class AnalysisCommand
 	}
 
 	/**
-	 * Run the command.
-	 * @param line TODO
-	 * @return TODO
+	 * Run the command. The string returned will be printed on the console, if not null.
 	 */
 	abstract public String run(String line);
-
 	
 	/**
 	 * Parse a command line and return a command. If no plugins can be found, an
-	 * ErrorCommand is returned which prints the error on run().
+	 * ErrorCommand is returned which prints the error on run.
 	 */
 	public static AnalysisCommand parse(String line)
 	{

@@ -160,12 +160,20 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public AnalysisCommand getCommand(String line)
 	{
-		return lookup(line, commandList);
+		String[] parts = line.split("\\s+");
+		
+		switch (parts[0])
+		{
+			case "pog":		return new PogCommand(line);
+
+			default:
+				return null;
+		}
 	}
 	
 	@Override
 	public void help()
 	{
-		showHelp(commandList);
+		PogCommand.help();
 	}
 }

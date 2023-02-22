@@ -30,18 +30,18 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
 import com.fujitsu.vdmj.plugins.analyses.TCPluginSL;
 import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.tc.modules.TCModule;
-import com.fujitsu.vdmj.tc.modules.TCModuleList;
+import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCClassList;
 
-public class ModulesCommand extends AnalysisCommand
+public class ClassesCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: modules";
+	private final static String USAGE = "Usage: classes";
 
-	public ModulesCommand(String line)
+	public ClassesCommand(String line)
 	{
 		super(line);
 		
-		if (!argv[0].equals("modules"))
+		if (!argv[0].equals("classes"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
@@ -60,23 +60,23 @@ public class ModulesCommand extends AnalysisCommand
 		
 		if (tc instanceof TCPluginSL)
 		{
-			TCModuleList list = tc.getTC();
-	
-			for (TCModule module: list)
-			{
-				println(module.name.getName() + (module.name.getName().equals(def) ? " (default)" : ""));
-			}
-			
-			return null;
+			return "Command is not available for VDM-SL";
 		}
 		else
 		{
-			return "Command is only available for VDM-SL";
+			TCClassList list = tc.getTC();
+			
+			for (TCClassDefinition clazz: list)
+			{
+				println(clazz.name.getName() + (clazz.name.getName().equals(def) ? " (default)" : ""));
+			}
+			
+			return null;
 		}
 	}
 	
 	public static void help()
 	{
-		println("modules - list the specification modules");
+		println("classes - list the specification classes");
 	}
 }
