@@ -54,7 +54,7 @@ public class TranslateTest extends LSPTest
 	@Test
 	public void testV2C() throws Exception
 	{
-		System.setProperty("lspx.plugins", "plugins.V2CPlugin");
+		System.setProperty("lspx.plugins", "plugins.V2CPluginLSP");
 		setupWorkspace(Dialect.VDM_SL);
 		File testdir = new File("src/test/resources/v2ctest_sl");
 		RPCMessageList notify = initialize(testdir, capabilities);
@@ -77,6 +77,7 @@ public class TranslateTest extends LSPTest
 		assertEquals(1, response.size());
 		dump(response.get(0));
 		assertEquals(empty.toURI().toString(), response.get(0).getPath("result.uri"));
+		assertTrue(empty.list().length == 1);
 
 		for (File f: empty.listFiles())
 		{
