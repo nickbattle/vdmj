@@ -25,10 +25,10 @@
 package com.fujitsu.vdmj.plugins;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import com.fujitsu.vdmj.commands.CommandPlugin;
 import com.fujitsu.vdmj.config.Properties;
@@ -90,6 +90,11 @@ abstract public class AnalysisCommand
 		}
 		catch (Throwable e)
 		{
+			if (e instanceof InvocationTargetException)
+			{
+				e = e.getCause();
+			}
+			
 			verbose("Parse caught " + e);
 			return new ErrorCommand(e.getMessage());
 		}
@@ -146,11 +151,6 @@ abstract public class AnalysisCommand
 					Constructor<?> ctor = clazz.getConstructor(String.class);
 					return (AnalysisCommand)ctor.newInstance(new Object[]{line});
 				}
-			}
-			catch (IllegalArgumentException e)	// From AnalysisCommands
-			{
-				println(e.getMessage());
-				break;	// Because we found one, but args were wrong somehow
 			}
 			catch (ClassNotFoundException e)
 			{
