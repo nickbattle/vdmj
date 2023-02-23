@@ -36,7 +36,7 @@ import com.fujitsu.vdmj.plugins.commands.ErrorCommand;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("deprecation")		// While we use Command in loadDirectly
+@SuppressWarnings("deprecation")		// While we use CommandPlugin in loadDirectly
 abstract public class AnalysisCommand
 {
 	protected final PluginRegistry registry;
@@ -150,6 +150,7 @@ abstract public class AnalysisCommand
 			catch (IllegalArgumentException e)	// From AnalysisCommands
 			{
 				println(e.getMessage());
+				break;	// Because we found one, but args were wrong somehow
 			}
 			catch (ClassNotFoundException e)
 			{
