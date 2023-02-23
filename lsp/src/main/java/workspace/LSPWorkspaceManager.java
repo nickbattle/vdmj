@@ -192,7 +192,7 @@ public class LSPWorkspaceManager
 	 */
 	
 	public RPCMessageList lspInitialize(RPCRequest request, JSONObject clientInfo, File rootUri, JSONObject clientCapabilities)
-		throws IOException
+		throws Exception
 	{
 		this.clientInfo = clientInfo;
 		this.rootUri = rootUri;

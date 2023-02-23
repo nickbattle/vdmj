@@ -23,6 +23,7 @@
 
 package com.fujitsu.vdmj.util;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,12 +31,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.Settings;
 
 /**
  * A utility class to find and load a file from the classpath into a
- * temporary or given location.
+ * temporary or given location, or read from resource files.
  */
 public class GetResource
 {
@@ -74,5 +80,36 @@ public class GetResource
 		osr.close();
 		
 		return dest;
+	}
+	
+	public static List<String> readResource(String resourceName) throws Exception
+	{
+		String property = System.getProperty(resourceName);
+		
+		if (property != null)	// Overrides the resources
+		{
+			String[] parts = property.split("\\s*[,;]\\s*");
+			return Arrays.asList(parts);
+		}
+		else
+		{
+			List<String> results = new Vector<String>();
+			Enumeration<URL> urls = GetResource.class.getClassLoader().getResources(resourceName);
+	
+			while (urls.hasMoreElements())
+			{
+				URL url = urls.nextElement();
+				BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+				
+				for (String line = br.readLine(); line != null; line = br.readLine())
+				{
+					results.add(line);
+				}
+				
+				br.close();
+			}
+			
+			return results;
+		}
 	}
 }

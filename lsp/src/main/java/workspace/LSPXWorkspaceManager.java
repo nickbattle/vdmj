@@ -33,6 +33,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,6 +43,7 @@ import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.traces.TraceReductionType;
+import com.fujitsu.vdmj.util.GetResource;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -90,8 +92,9 @@ public class LSPXWorkspaceManager
 	 * PO and CT are built-in, but still enabled by the capabilities.
 	 * 
 	 * Further plugins may be loaded via the property "lspx.plugins".
+	 * @throws Exception 
 	 */
-	public void enablePlugins()
+	public void enablePlugins() throws Exception
 	{
 		if (wsManager.hasClientCapability("experimental.proofObligationGeneration"))
 		{
@@ -103,10 +106,10 @@ public class LSPXWorkspaceManager
 			registry.registerPlugin(CTPlugin.factory(Settings.dialect));
 		}
 		
-		if (System.getProperty("lspx.plugins") != null)
+		List<String> plugins = GetResource.readResource("lspx.plugins");
+		
+		if (!plugins.isEmpty())
 		{
-			String[] plugins = System.getProperty("lspx.plugins").split("\\s*[,;]\\s*");
-			
 			for (String plugin: plugins)
 			{
 				try
