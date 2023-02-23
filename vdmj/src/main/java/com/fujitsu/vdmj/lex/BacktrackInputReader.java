@@ -35,6 +35,7 @@ import java.util.Stack;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMError;
+import com.fujitsu.vdmj.util.GetResource;
 
 /**
  * A class to allow arbitrary checkpoints and backtracking while
@@ -73,7 +74,7 @@ public class BacktrackInputReader
 			data = ifdefProcessor.getText(source);
 			pos = 0;
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			throw new InternalException(0, "Cannot read file: " + e.getMessage());
 		}
@@ -114,7 +115,7 @@ public class BacktrackInputReader
 	 * Create an ExternalFormatReader from a File, depending on the filename.
 	 * @throws IOException 
 	 */
-	public static ExternalFormatReader readerFactory(File file) throws IOException
+	public static ExternalFormatReader readerFactory(File file) throws Exception
 	{
 		String lowerName = file.getName().toLowerCase();		// NB! lower case matched
 		
@@ -146,7 +147,7 @@ public class BacktrackInputReader
 	 * Property format is "<suffix>=<class>,<suffix>=<class>,..."
 	 */
 	@SuppressWarnings("unchecked")
-	private static synchronized void buildExternalReaders() throws IOException
+	private static synchronized void buildExternalReaders() throws Exception
 	{
 		externalReaders = new HashMap<String, Class<? extends ExternalFormatReader>>();
 		
@@ -160,11 +161,11 @@ public class BacktrackInputReader
 		externalReaders.put(".md", MarkdownStreamReader.class);
 		externalReaders.put(".markdown", MarkdownStreamReader.class);
 		
-		if (Properties.parser_external_readers != null)
+		List<String> userExtReaders = GetResource.readResource("vdmj.parser.external_readers");
+		
+		if (!userExtReaders.isEmpty())
 		{
-			String[] readers = Properties.parser_external_readers.split("\\s*,\\s*");
-			
-			for (String readerPair: readers)
+			for (String readerPair: userExtReaders)
 			{
 				try
 				{
@@ -199,7 +200,7 @@ public class BacktrackInputReader
 			{
 				buildExternalReaders();
 			}
-			catch (IOException e)
+			catch (Exception e)
 			{
 				return false;
 			}
