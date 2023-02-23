@@ -70,6 +70,9 @@ public class GitPlugin extends AnalysisCommand
 		return null;
 	}
 
+	/**
+	 * This would be used if the GitCommand was also part of an AnalysisPlugin
+	 */
 	public static void help()
 	{
 		println("git <command> [<args>] - run a git command");

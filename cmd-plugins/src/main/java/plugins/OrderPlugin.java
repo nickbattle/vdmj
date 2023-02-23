@@ -35,27 +35,35 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.commands.CommandPlugin;
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.Console;
-import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.runtime.ModuleInterpreter;
+import com.fujitsu.vdmj.plugins.AnalysisCommand;
+import com.fujitsu.vdmj.plugins.PluginRegistry;
+import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.util.DependencyOrder;
 
 /**
- * @deprecated This will be ported to the new AnalysisCommand at some point.
+ * Attempt to produce an optimal ordering for modules and classes.
  */
-@Deprecated
-public class OrderPlugin extends CommandPlugin
+public class OrderPlugin extends AnalysisCommand
 {
-	public OrderPlugin(Interpreter interpreter)
+	private final static String USAGE = "Usage: order [filename]";
+
+	public OrderPlugin(String line)
 	{
-		super(interpreter);
+		super(line);
+		
+		if (!argv[0].equals("order"))
+		{
+			throw new IllegalArgumentException(USAGE);
+		}
 	}
 
 	@Override
-	public boolean run(String[] argv) throws Exception
+	public String run(String line)
 	{
 		String outputfile = null;
 		
@@ -66,25 +74,28 @@ public class OrderPlugin extends CommandPlugin
 		else if (argv.length != 1)
 		{
 			help();
-			return true;
+			return null;
 		}
 		
 		Order order = new Order(outputfile);
+		TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
 		
-		if (interpreter instanceof ModuleInterpreter)
+		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			order.moduleOrder(interpreter.getTC());
+			order.moduleOrder(tc.getTC());
 		}
 		else
 		{
-			order.classOrder(interpreter.getTC());
+			order.classOrder(tc.getTC());
 		}
 
-		return true;	// Even if command failed
+		return null;
 	}
 
-	@Override
-	public String help()
+	/**
+	 * This would be used if the OrderCommand was also part of an AnalysisPlugin
+	 */
+	public static String help()
 	{
 		return "order [filename] - print/save optimal module/class order";
 	}
