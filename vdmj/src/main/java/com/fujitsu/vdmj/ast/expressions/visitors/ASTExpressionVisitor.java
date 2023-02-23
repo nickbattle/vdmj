@@ -138,7 +138,7 @@ public abstract class ASTExpressionVisitor<R, S>
 
  	public R caseElementsExpression(ASTElementsExpression node, S arg)
 	{
-		return caseSetExpression(node, arg);
+		return caseUnaryExpression(node, arg);
 	}
 
  	public R caseElseIfExpression(ASTElseIfExpression node, S arg)

@@ -33,15 +33,13 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
-public class INElementsExpression extends INSetExpression
+public class INElementsExpression extends INUnaryExpression
 {
 	private static final long serialVersionUID = 1L;
-	public final INExpression exp;
 
 	public INElementsExpression(LexLocation location, INExpression exp)
 	{
-		super(location);
-		this.exp = exp;
+		super(location, exp);
 	}
 
 	@Override

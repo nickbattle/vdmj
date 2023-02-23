@@ -34,15 +34,13 @@ import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
-public class TCElementsExpression extends TCSetExpression
+public class TCElementsExpression extends TCUnaryExpression
 {
 	private static final long serialVersionUID = 1L;
-	public final TCExpression exp;
 
 	public TCElementsExpression(LexLocation location, TCExpression exp)
 	{
-		super(location);
-		this.exp = exp;
+		super(location, exp);
 	}
 
 	@Override

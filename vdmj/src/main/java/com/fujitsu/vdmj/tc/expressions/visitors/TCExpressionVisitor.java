@@ -138,7 +138,7 @@ public abstract class TCExpressionVisitor<R, S>
 
  	public R caseElementsExpression(TCElementsExpression node, S arg)
 	{
-		return caseSetExpression(node, arg);
+		return caseUnaryExpression(node, arg);
 	}
 
  	public R caseElseIfExpression(TCElseIfExpression node, S arg)

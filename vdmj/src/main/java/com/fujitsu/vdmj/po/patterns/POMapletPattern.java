@@ -24,9 +24,9 @@
 
 package com.fujitsu.vdmj.po.patterns;
 
-import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 
-public class POMapletPattern extends PONode
+public class POMapletPattern extends POPattern
 {
 	private static final long serialVersionUID = 1L;
 	public final POPattern from;
@@ -34,6 +34,7 @@ public class POMapletPattern extends PONode
 
 	public POMapletPattern(POPattern from, POPattern to)
 	{
+		super(from.location);
 		this.from = from;
 		this.to = to;
 	}
@@ -47,5 +48,11 @@ public class POMapletPattern extends PONode
 	public boolean isSimple()
 	{
 		return from.isSimple() && to.isSimple();
+	}
+
+	@Override
+	public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapletPattern(this, arg);
 	}
 }

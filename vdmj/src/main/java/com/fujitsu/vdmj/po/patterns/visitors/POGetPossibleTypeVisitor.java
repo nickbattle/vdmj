@@ -147,11 +147,18 @@ public class POGetPossibleTypeVisitor extends POPatternVisitor<TCType, Object>
 		
 		for (POMapletPattern p: node.maplets)
 		{
-			TCType m = new TCMapType(p.location, p.from.apply(this, arg), p.to.apply(this, arg));
-			types.add(m);
+			types.add(p.apply(this, arg));
 		}
 		
 		return types.isEmpty() ? new TCMapType(node.location) : types.getType(node.location);
+	}
+	
+	@Override
+	public TCType caseMapletPattern(POMapletPattern node, Object arg)
+	{
+		TCTypeSet types = new TCTypeSet();
+		types.add(new TCMapType(node.from.location, node.from.apply(this, arg), node.to.apply(this, arg)));
+		return types.getType(node.location);
 	}
 	
 	@Override

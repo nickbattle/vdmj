@@ -138,7 +138,7 @@ public abstract class INExpressionVisitor<R, S>
 
  	public R caseElementsExpression(INElementsExpression node, S arg)
 	{
-		return caseSetExpression(node, arg);
+		return caseUnaryExpression(node, arg);
 	}
 
  	public R caseElseIfExpression(INElseIfExpression node, S arg)
