@@ -27,6 +27,8 @@ package plugins;
 import java.io.File;
 import java.io.PrintWriter;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
@@ -50,19 +52,16 @@ import workspace.plugins.TCPlugin;
 
 /**
  * All LSP plugins must extend AnalysisPlugin. The fully qualified class name of the plugin must be set
- * in the "lspx.plugins" property, to make the LSP Server load it.
+ * in the "lspx.plugins" property or resource file, to make the LSP Server load it.
  */
-public class V2CPlugin extends AnalysisPlugin implements EventListener
+public class V2CPluginLSP extends AnalysisPlugin implements EventListener
 {
 	/**
-	 * A plugin must provide a default constructor, as here or a static "factory" method that takes
-	 * a single Dialect parameter.
-	 * 
-	 * public static V2CPlugin factory(Dialect dialect)
+	 * A plugin must provide a static "factory" method that takes a single Dialect parameter.
 	 */
-	public V2CPlugin()
+	public static AnalysisPlugin factory(Dialect dialect)
 	{
-		super();
+		return new V2CPluginLSP();		// For all dialects. This could be specialized.
 	}
 	
 	/**
@@ -97,7 +96,7 @@ public class V2CPlugin extends AnalysisPlugin implements EventListener
 		}
 		else
 		{
-			return new RPCMessageList();
+			return null;	// Not handled
 		}
 	}
 
@@ -114,34 +113,29 @@ public class V2CPlugin extends AnalysisPlugin implements EventListener
 			File saveUri = Utils.uriToFile(params.get("saveUri"));
 
 			TCPlugin tc = PluginRegistry.getInstance().getPlugin("TC");
-			Object tclist = tc.getTC();
-			
-			if (tclist == null)
-			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification is not checked");
-			}
-			
 			File output = new File(saveUri, "output.c");
 			PrintWriter outstream = new PrintWriter(output);
 			
-			if (tclist instanceof TCModuleList)
+			switch (Settings.dialect)
 			{
-				TCModuleList mlist = (TCModuleList) tclist;
-				TRModuleList trModules = ClassMapper.getInstance(TRNode.MAPPINGS).init().convert(mlist);
-				outstream.println(trModules.translate());
-				outstream.close();
-			}
-			else if (tclist instanceof TCClassList)
-			{
-				TCClassList clist = (TCClassList) tclist;
-				TRClassList trClasses = ClassMapper.getInstance(TRNode.MAPPINGS).init().convert(clist);
-				outstream.println(trClasses.translate());
-				outstream.close();
-			}
-			else
-			{
-				outstream.close();
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Unknown dialect?");
+				case VDM_SL:
+					TCModuleList mlist = tc.getTC();
+					TRModuleList trModules = ClassMapper.getInstance(TRNode.MAPPINGS).init().convert(mlist);
+					outstream.println(trModules.translate());
+					outstream.close();
+					break;
+					
+				case VDM_PP:
+				case VDM_RT:
+					TCClassList clist = tc.getTC();
+					TRClassList trClasses = ClassMapper.getInstance(TRNode.MAPPINGS).init().convert(clist);
+					outstream.println(trClasses.translate());
+					outstream.close();
+					break;
+					
+				default:
+					outstream.close();
+					return new RPCMessageList(request, RPCErrors.InvalidRequest, "Unknown dialect?");
 			}
 
 			return new RPCMessageList(request, new JSONObject("uri", saveUri.toURI().toString()));
