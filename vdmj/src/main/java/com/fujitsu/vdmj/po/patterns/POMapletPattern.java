@@ -45,6 +45,7 @@ public class POMapletPattern extends POPattern
 		return from + " |-> " + to;
 	}
 
+	@Override
 	public boolean isSimple()
 	{
 		return from.isSimple() && to.isSimple();

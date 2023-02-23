@@ -76,6 +76,7 @@ public class INMapletPattern extends INPattern
 		return results;
 	}
 
+	@Override
 	public boolean isConstrained()
 	{
 		if (from.isConstrained() || to.isConstrained())

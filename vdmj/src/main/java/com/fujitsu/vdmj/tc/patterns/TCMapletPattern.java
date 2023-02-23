@@ -42,6 +42,7 @@ public class TCMapletPattern extends TCPattern
 		this.to = to;
 	}
 
+	@Override
 	public void unResolve()
 	{
 		from.unResolve();
@@ -49,6 +50,7 @@ public class TCMapletPattern extends TCPattern
 		resolved = false;
 	}
 
+	@Override
 	public void typeResolve(Environment env)
 	{
 		if (resolved) return; else { resolved = true; }
