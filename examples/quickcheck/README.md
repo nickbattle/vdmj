@@ -68,7 +68,7 @@ with the sets given as the type binds. The default range filename is "ranges.qc"
 	Usage: Usage: quickcheck [-c <file>]|[-f <file>] [<PO numbers>]]
 	
 	> quickcheck -c qcfile
-	Created 2 ranges in qcfile
+	Created 2 default ranges in qcfile. Check them! Then run 'qc'
 	>
 	
 	... edit the sets in qcfile here, then...

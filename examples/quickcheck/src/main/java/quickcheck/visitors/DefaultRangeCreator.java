@@ -107,13 +107,13 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 	@Override
 	public String caseRealType(TCRealType node, Object arg)
 	{
-		return "{ a / b | a, b in set {1, ..., 10} }";
+		return "{ a / b | a, b in set {-10, ..., 10} & b <> 0 }";
 	}
 	
 	@Override
 	public String caseRationalType(TCRationalType node, Object arg)
 	{
-		return "{ a / b | a, b in set {1, ..., 10} }";
+		return "{ a / b | a, b in set {-10, ..., 10} & b <> 0 }";
 	}
 	
 	@Override

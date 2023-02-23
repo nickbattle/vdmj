@@ -319,11 +319,11 @@ public class VDMJ implements VDMJMain
 			registry.registerPlugin(po);
 			verbose("Registered PO plugin");
 			
-			if (System.getProperty("vdmj.plugins") != null)
+			List<String> userPlugins = GetResource.readResource("vdmj.plugins");
+			
+			if (!userPlugins.isEmpty())
 			{
-				String[] plugins = System.getProperty("vdmj.plugins").split("\\s*[,;]\\s*");
-				
-				for (String plugin: plugins)
+				for (String plugin: userPlugins)
 				{
 					try
 					{

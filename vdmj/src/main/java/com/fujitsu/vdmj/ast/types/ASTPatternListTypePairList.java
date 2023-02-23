@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.ast.types;
 
 import java.util.Vector;
 
-public class ASTPatternListTypePairList extends Vector<ASTPatternListTypePair>
+import com.fujitsu.vdmj.mapper.Mappable;
+
+public class ASTPatternListTypePairList extends Vector<ASTPatternListTypePair> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 }

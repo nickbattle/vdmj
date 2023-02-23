@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.ast.expressions;
 
 import java.util.Vector;
 
-public class ASTMapletExpressionList extends Vector<ASTMapletExpression>
+import com.fujitsu.vdmj.mapper.Mappable;
+
+public class ASTMapletExpressionList extends Vector<ASTMapletExpression> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 }
