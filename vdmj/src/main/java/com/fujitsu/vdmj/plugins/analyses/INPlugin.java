@@ -53,6 +53,7 @@ import com.fujitsu.vdmj.plugins.commands.InitCommand;
 import com.fujitsu.vdmj.plugins.commands.LatexCommand;
 import com.fujitsu.vdmj.plugins.commands.LogCommand;
 import com.fujitsu.vdmj.plugins.commands.ModulesCommand;
+import com.fujitsu.vdmj.plugins.commands.PluginsCommand;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
 import com.fujitsu.vdmj.plugins.commands.RuntraceCommand;
 import com.fujitsu.vdmj.plugins.commands.SaveCommand;
@@ -392,6 +393,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			case "modules":		return new ModulesCommand(line);
 			case "classes":		return new ClassesCommand(line);
 			case "files":		return new FilesCommand(line);
+			case "plugins":		return new PluginsCommand(line);
 			case "env":			return new EnvCommand(line);
 			case "state":		return new StateCommand(line);
 			case "log":			return new LogCommand(line);
@@ -427,6 +429,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		ModulesCommand.help();
 		ClassesCommand.help();
 		FilesCommand.help();
+		PluginsCommand.help();
 		EnvCommand.help();
 		StateCommand.help();
 		LogCommand.help();
