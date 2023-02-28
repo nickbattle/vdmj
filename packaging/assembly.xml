@@ -48,6 +48,7 @@
 				<include>dk.au.ece.vdmj:cmd-plugins</include>
 				<include>dk.au.ece.vdmj:lsp</include>
 				<include>dk.au.ece.vdmj:vdmjunit</include>
+				<include>dk.au.ece.vdmj:quickcheck</include>
 			</includes>
 			<binaries>
 				<unpack>false</unpack>
