@@ -26,6 +26,7 @@ package workspace;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -44,9 +45,16 @@ public class GlobFinder extends SimpleFileVisitor<Path>
 
 	public GlobFinder(String pattern)
 	{
-		// Normalize first, to eliminate "./" and similar, which won't match
-		pattern = Paths.get(pattern).normalize().toString();
-		matcher = FileSystems.getDefault().getPathMatcher("glob:" + pattern);
+		FileSystem fs = FileSystems.getDefault();
+		
+		if (fs.getSeparator().equals("/"))
+		{
+			// Normalize first, to eliminate "./" and similar, which won't match
+			// This doesn't work with Windows and "**", hence the fs test above.
+			pattern = Paths.get(pattern).normalize().toString();
+		}
+		
+		matcher = fs.getPathMatcher("glob:" + pattern);
 		matches = new Vector<File>();
 	}
 	
