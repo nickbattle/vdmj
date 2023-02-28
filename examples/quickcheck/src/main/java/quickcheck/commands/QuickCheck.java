@@ -31,6 +31,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -87,7 +88,7 @@ import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
-	private static final long FINITE_LIMIT = 100;
+	private static final BigInteger FINITE_LIMIT = BigInteger.valueOf(100);
 	private int errorCount = 0;
 	
 	public boolean hasErrors()
@@ -302,9 +303,9 @@ public class QuickCheck
 						{
 							try
 							{
-								long size = type.apply(new INTypeSizeVisitor(), ctxt);
+								BigInteger size = type.apply(new INTypeSizeVisitor(), ctxt);
 								
-								if (size > FINITE_LIMIT)	// Avoid huge finite types
+								if (size.compareTo(FINITE_LIMIT) > 0)	// Avoid huge finite types
 								{
 									range = type.apply(rangeCreator, null);
 								}
