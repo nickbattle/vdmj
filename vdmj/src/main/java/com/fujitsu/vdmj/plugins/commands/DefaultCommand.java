@@ -47,12 +47,11 @@ public class DefaultCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length != 2)
 		{
-			println(USAGE);
-			return;
+			return USAGE;
 		}
 
 		try
@@ -64,6 +63,8 @@ public class DefaultCommand extends AnalysisCommand
 		{
 			println(e.getMessage());	// Class/module not loaded
 		}
+		
+		return null;
 	}
 	
 	public static void help()

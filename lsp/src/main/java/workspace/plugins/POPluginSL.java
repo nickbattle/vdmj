@@ -63,7 +63,7 @@ public class POPluginSL extends POPlugin
 	}
 
 	@Override
-	protected ProofObligationList getProofObligations()
+	public ProofObligationList getProofObligations()
 	{
 		return poModuleList.getProofObligations();
 	}

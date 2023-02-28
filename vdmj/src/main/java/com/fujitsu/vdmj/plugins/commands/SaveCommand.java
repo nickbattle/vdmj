@@ -53,7 +53,7 @@ public class SaveCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		try
 		{
@@ -64,7 +64,7 @@ public class SaveCommand extends AnalysisCommand
 					doSave(file);
 				}
 
-				return;
+				return null;
 			}
 
 			for (int p = 1; p < argv.length; p++)
@@ -87,10 +87,12 @@ public class SaveCommand extends AnalysisCommand
     				println(farg + " is not loaded - try 'files'");
     			}
 			}
+			
+			return null;
 		}
 		catch (Exception e)
 		{
-			println("Usage: save [<filenames>]");
+			return USAGE;
 		}
 	}
 

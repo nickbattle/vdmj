@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
@@ -86,6 +87,9 @@ public class POPluginSL extends POPlugin
 	@Override
 	public ProofObligationList getProofObligations()
 	{
-		return poModuleList.getProofObligations();
+		POAnnotation.init();
+		ProofObligationList list = poModuleList.getProofObligations();
+		POAnnotation.close();
+		return list;
 	}
 }

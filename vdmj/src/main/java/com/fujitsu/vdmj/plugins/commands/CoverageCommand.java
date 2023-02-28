@@ -54,7 +54,7 @@ public class CoverageCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		try
 		{
@@ -65,26 +65,25 @@ public class CoverageCommand extends AnalysisCommand
 					doCoverage(file);
 				}
 
-				return;
+				return null;
 			}
 
 			if (argv.length == 2 && argv[1].equals("clear"))
 			{
 				LexLocation.clearLocations();
-				println("Cleared all coverage information");
-				return;
+				return "Cleared all coverage information";
 			}
 
 			if (argv.length == 3 && argv[1].equals("write"))
 			{
 				writeCoverage(new File(argv[2]));
-				return;
+				return null;
 			}
 
 			if (argv.length == 3 && argv[1].equals("merge"))
 			{
 				mergeCoverage(new File(argv[2]));
-				return;
+				return null;
 			}
 
 			for (int p = 1; p < argv.length; p++)
@@ -107,10 +106,13 @@ public class CoverageCommand extends AnalysisCommand
     				println(farg + " is not loaded - try 'files'");
     			}
 			}
+			
+			return null;
 		}
 		catch (Exception e)
 		{
-			println(USAGE);
+			println(e.getMessage());
+			return USAGE;
 		}
 	}
 
@@ -140,6 +142,20 @@ public class CoverageCommand extends AnalysisCommand
 
 	private void writeCoverage(File dir) throws IOException
     {
+		if (dir.exists())
+		{
+			if (!dir.isDirectory())
+			{
+				println(dir + " is not a directory");
+				return;
+			}
+		}
+		else
+		{
+			println("Creating new directory: " + dir);
+			dir.mkdirs();
+		}
+		
     	for (File f: interpreter.getSourceFiles())
     	{
     		SourceFile source = interpreter.getSourceFile(f);
@@ -154,6 +170,12 @@ public class CoverageCommand extends AnalysisCommand
 
 	private void mergeCoverage(File dir) throws IOException
     {
+		if (!dir.exists() || !dir.isDirectory())
+		{
+			println(dir + " is not an existing directory");
+			return;
+		}
+		
     	for (File f: interpreter.getSourceFiles())
     	{
     		File cov = new File(dir.getPath() + File.separator + f.getName() + ".cov");

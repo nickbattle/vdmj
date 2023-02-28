@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.ast.expressions;
 
 import java.util.Vector;
 
-public class ASTRecordModifierList extends Vector<ASTRecordModifier>
+import com.fujitsu.vdmj.mapper.Mappable;
+
+public class ASTRecordModifierList extends Vector<ASTRecordModifier> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 }

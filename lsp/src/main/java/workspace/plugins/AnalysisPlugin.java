@@ -29,7 +29,7 @@ import json.JSONObject;
 import lsp.LSPMessageUtils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
 import vdmj.commands.HelpList;
 import workspace.EventHub;
 import workspace.MessageHub;
@@ -90,7 +90,7 @@ abstract public class AnalysisPlugin
 	 * Plugins can return Commands to execute in the console. They are passed
 	 * the whole command line, so that they can process arguments.
 	 */
-	public Command getCommand(String line)
+	public AnalysisCommand getCommand(String line)
 	{
 		return null;
 	}

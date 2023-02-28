@@ -48,22 +48,22 @@ public class StateCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length != 1)
 		{
-			println(USAGE);
-			return;
+			return USAGE;
 		}
 		else if (Settings.dialect != Dialect.VDM_SL)
 		{
-			println("Command is only availble for VDM-SL");
-			return;
+			return "Command is only availble for VDM-SL";
 		}
 
 		ModuleInterpreter interpreter = ModuleInterpreter.getInstance();
 		Context c = interpreter.getStateContext();
 		printf("%s", c == null ? "(no state)\n" : c.toString());
+		
+		return null;
 	}
 	
 	public static void help()

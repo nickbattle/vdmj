@@ -27,15 +27,13 @@ package com.fujitsu.vdmj.ast.expressions;
 import com.fujitsu.vdmj.ast.expressions.visitors.ASTExpressionVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 
-public class ASTElementsExpression extends ASTSetExpression
+public class ASTElementsExpression extends ASTUnaryExpression
 {
 	private static final long serialVersionUID = 1L;
-	public final ASTExpression exp;
 
 	public ASTElementsExpression(LexLocation location, ASTExpression exp)
 	{
-		super(location);
-		this.exp = exp;
+		super(location, exp);
 	}
 
 	@Override

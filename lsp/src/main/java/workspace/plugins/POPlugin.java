@@ -127,7 +127,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract public <T extends Mappable> boolean checkLoadedFiles(T poList) throws Exception;
 	
-	abstract protected ProofObligationList getProofObligations();
+	abstract public ProofObligationList getProofObligations();
 	
 	protected JSONArray splitPO(String value)
 	{

@@ -28,7 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import json.JSONObject;
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
 import vdmj.commands.ErrorCommand;
 import vdmj.commands.HelpList;
 import workspace.plugins.AnalysisPlugin;
@@ -112,15 +112,15 @@ public class PluginRegistry
 		}
 	}
 	
-	public Command getCommand(String line)
+	public AnalysisCommand getCommand(String line)
 	{
-		Command result = null;
+		AnalysisCommand result = null;
 		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			try
 			{
-				Command c = plugin.getCommand(line);
+				AnalysisCommand c = plugin.getCommand(line);
 				
 				if (c != null)
 				{

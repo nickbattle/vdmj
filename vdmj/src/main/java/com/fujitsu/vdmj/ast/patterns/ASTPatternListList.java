@@ -25,10 +25,12 @@
 package com.fujitsu.vdmj.ast.patterns;
 
 import java.util.Vector;
+
+import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.util.Utils;
 
 @SuppressWarnings("serial")
-public class ASTPatternListList extends Vector<ASTPatternList>
+public class ASTPatternListList extends Vector<ASTPatternList> implements Mappable
 {
 	@Override
 	public String toString()

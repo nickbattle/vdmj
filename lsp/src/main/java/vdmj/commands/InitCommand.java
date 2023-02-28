@@ -35,16 +35,16 @@ import dap.InitExecutor;
 import json.JSONObject;
 import workspace.DAPWorkspaceManager;
 
-public class InitCommand extends Command implements ScriptRunnable
+public class InitCommand extends AnalysisCommand implements ScriptRunnable
 {
 	public static final String USAGE = "Usage: init";
 	public static final String HELP = "init - re-initialize the specification";
 	
 	public InitCommand(String line)
 	{
-		String[] parts = line.split("\\s+");
+		super(line);
 		
-		if (parts.length != 1)
+		if (argv.length != 1)
 		{
 			throw new IllegalArgumentException(USAGE);
 		}

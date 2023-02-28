@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.ast.patterns.ASTIgnorePattern;
 import com.fujitsu.vdmj.ast.patterns.ASTIntegerPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTMapPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTMapUnionPattern;
+import com.fujitsu.vdmj.ast.patterns.ASTMapletPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTNilPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTObjectPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
@@ -90,6 +91,11 @@ public abstract class ASTPatternVisitor<R, S>
 	}
 
  	public R caseMapPattern(ASTMapPattern node, S arg)
+	{
+		return casePattern(node, arg);
+	}
+
+ 	public R caseMapletPattern(ASTMapletPattern node, S arg)
 	{
 		return casePattern(node, arg);
 	}

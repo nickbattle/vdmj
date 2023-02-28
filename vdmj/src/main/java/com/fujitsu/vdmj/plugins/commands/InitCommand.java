@@ -48,12 +48,11 @@ public class InitCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length != 1)
 		{
-			println(USAGE);
-			return;
+			return USAGE;
 		}
 
 		ConsoleDebugReader dbg = null;
@@ -94,6 +93,8 @@ public class InitCommand extends AnalysisCommand
 				watch.interrupt();	// Stop ESC key watcher.
 			}
 		}
+		
+		return null;
 	}
 	
 	public static void help()

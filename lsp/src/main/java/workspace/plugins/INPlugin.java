@@ -34,7 +34,7 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import rpc.RPCMessageList;
-import vdmj.commands.Command;
+import vdmj.commands.AnalysisCommand;
 import vdmj.commands.DefaultCommand;
 import vdmj.commands.ErrorCommand;
 import vdmj.commands.HelpCommand;
@@ -113,7 +113,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	abstract protected void preCheck(CheckPrepareEvent event);
 	
 	@Override
-	public Command getCommand(String line)
+	public AnalysisCommand getCommand(String line)
 	{
 		String[] parts = line.split("\\s+");
 		
@@ -125,7 +125,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			case "set":			return new SetCommand(line);
 			case "init":		return new InitCommand(line);
 			case "script":		return new ScriptCommand(line);
-			case "help":		return new HelpCommand(line);
+			case "help":
+			case "?":			return new HelpCommand(line);
 			case "version":		return new VersionCommand(line);
 			case "restart":		return new RestartCommand(line);
 			case "runtrace":	return new RuntraceCommand(line);
@@ -140,7 +141,11 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 					Diag.info("Trying to load command vdmj.commands.%sCommand", name);
 					Class<?> clazz = Class.forName("vdmj.commands." + name + "Command");
 					Constructor<?> ctor = clazz.getConstructor(String.class); 
-					return (Command)ctor.newInstance(line);
+					return (AnalysisCommand)ctor.newInstance(line);
+				}
+				catch (ClassNotFoundException e)
+				{
+					return null;
 				}
 				catch (InvocationTargetException e)
 				{

@@ -30,23 +30,24 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 
 public class GitPlugin extends AnalysisCommand
 {
+	private final static String USAGE = "Usage: git <command> [args]";
+	
 	public GitPlugin(String line)
 	{
 		super(line);
 		
 		if (!argv[0].equals("git"))
 		{
-			throw new IllegalArgumentException("Usage: git <command> [args]");
+			throw new IllegalArgumentException(USAGE);
 		}
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length == 1)
 		{
-			help();
-			return;
+			return USAGE;
 		}
 		
 		try
@@ -65,8 +66,13 @@ public class GitPlugin extends AnalysisCommand
 		{
 			println(e);
 		}
+		
+		return null;
 	}
 
+	/**
+	 * This would be used if the GitCommand was also part of an AnalysisPlugin
+	 */
 	public static void help()
 	{
 		println("git <command> [<args>] - run a git command");

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2023 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -24,60 +24,13 @@
 
 package vdmj.commands;
 
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import dap.DAPServer;
-import workspace.Diag;
-import workspace.PluginRegistry;
-
-abstract public class Command
+@Deprecated
+abstract public class Command extends AnalysisCommand
 {
-	protected DAPServer server = DAPServer.getInstance();
-	
-	public static Command parse(String line)
+	// Placeholder until we replace these with AnalysisCommands.
+
+	protected Command(String line)
 	{
-		if (line == null || line.isEmpty())
-		{
-			return new NullCommand();
-		}
-
-		String[] parts = line.split("\\s+");
-		String name = parts[0];
-		
-		try
-		{
-			Diag.info("Trying to load command %s from plugins", name);
-			Command cmd = PluginRegistry.getInstance().getCommand(line);
-			
-			if (cmd != null)
-			{
-				return cmd;		// Usage is ok
-			}
-			else
-			{
-				return new ErrorCommand("Unknown command '" + name.toLowerCase() + "'. Try help");
-			}
-		}
-		catch (Throwable e)
-		{
-			Diag.error(e);
-			return new ErrorCommand("Error: " + e.getMessage());
-		}
-	}
-
-	public abstract DAPMessageList run(DAPRequest request);
-
-	public abstract boolean notWhenRunning();
-	
-	protected void pause(long ms)
-	{
-		try
-		{
-			Thread.sleep(ms);
-		}
-		catch (InterruptedException e)
-		{
-			// ignore
-		}
+		super(line);
 	}
 }

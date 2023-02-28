@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>dk.au.ece.vdmj</groupId>
+		<artifactId>examples</artifactId>
+		<version>${revision}${sha1}${changelist}</version>
+	</parent>
+	
+	<artifactId>quickcheck</artifactId>
+	<name>Example QuickCheck plugin</name>
+	<description>Experimental brute force plugin for PO verification.</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>dk.au.ece.vdmj</groupId>
+			<artifactId>vdmj</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>dk.au.ece.vdmj</groupId>
+			<artifactId>lsp</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

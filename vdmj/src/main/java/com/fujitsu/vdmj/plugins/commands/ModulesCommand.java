@@ -24,41 +24,35 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
 import com.fujitsu.vdmj.plugins.analyses.TCPluginSL;
 import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
 public class ModulesCommand extends AnalysisCommand
 {
-	private final static String KIND = Settings.dialect == Dialect.VDM_SL ? "modules" : "classes";
+	private final static String USAGE = "Usage: modules";
 
 	public ModulesCommand(String line)
 	{
 		super(line);
 		
-		if (!argv[0].equals(KIND))
+		if (!argv[0].equals("modules"))
 		{
-			throw new IllegalArgumentException(KIND);
+			throw new IllegalArgumentException(USAGE);
 		}
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length != 1)
 		{
-			println(KIND);
-			return;
+			return USAGE;
 		}
 
 		TCPlugin tc = registry.getPlugin("TC");	// NB. TC has DEFAULTs combined
@@ -72,20 +66,17 @@ public class ModulesCommand extends AnalysisCommand
 			{
 				println(module.name.getName() + (module.name.getName().equals(def) ? " (default)" : ""));
 			}
+			
+			return null;
 		}
 		else
 		{
-			TCClassList list = tc.getTC();
-			
-			for (TCClassDefinition clazz: list)
-			{
-				println(clazz.name.getName() + (clazz.name.getName().equals(def) ? " (default)" : ""));
-			}
+			return "Command is only available for VDM-SL";
 		}
 	}
 	
 	public static void help()
 	{
-		printf("%s - list the specification %s\n", KIND, KIND);
+		println("modules - list the specification modules");
 	}
 }

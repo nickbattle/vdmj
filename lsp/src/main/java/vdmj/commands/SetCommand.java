@@ -29,7 +29,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 
-public class SetCommand extends Command
+public class SetCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: set [<pre|post|inv|dtc|measures|annotations> <on|off>]";
 	public static final String HELP = "set [<pre|post|inv|dtc|measures|annotations> <on|off>] - set runtime checks";
@@ -39,17 +39,17 @@ public class SetCommand extends Command
 
 	public SetCommand(String line)
 	{
-		String[] parts = line.split("\\s+");
+		super(line);
 		
-		if (parts.length == 1)
+		if (argv.length == 1)
 		{
 			this.option = "set";
 		}
-		else if (parts.length == 3 &&
-			(parts[2].equalsIgnoreCase("on") || parts[2].equalsIgnoreCase("off")))
+		else if (argv.length == 3 &&
+			(argv[2].equalsIgnoreCase("on") || argv[2].equalsIgnoreCase("off")))
 		{
-			this.option = parts[1];
-			this.setting = parts[2].equalsIgnoreCase("on");
+			this.option = argv[1];
+			this.setting = argv[2].equalsIgnoreCase("on");
 		}
 		else
 		{
@@ -112,7 +112,7 @@ public class SetCommand extends Command
 
 				if (changed)
     			{
-	    			sb.append("Specification must now be reloaded to take effect");
+	    			sb.append("Specification must now be restarted to take effect");
     			}
     			break;
     			
@@ -123,7 +123,7 @@ public class SetCommand extends Command
 
 				if (changed)
     			{
-	    			sb.append("Specification must now be reloaded to take effect");
+	    			sb.append("Specification must now be restarted to take effect");
     			}
     			break;
     			

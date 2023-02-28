@@ -31,15 +31,13 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
-public class POElementsExpression extends POSetExpression
+public class POElementsExpression extends POUnaryExpression
 {
 	private static final long serialVersionUID = 1L;
-	public final POExpression exp;
 
 	public POElementsExpression(LexLocation location, POExpression exp)
 	{
-		super(location);
-		this.exp = exp;
+		super(location, exp);
 	}
 
 	@Override
@@ -54,6 +52,12 @@ public class POElementsExpression extends POSetExpression
 		ProofObligationList obligations = exp.getProofObligations(ctxt, env);
 		obligations.addAll(checkUnionQualifiers(exp, TCTypeQualifier.getSetQualifier(), ctxt));
 		return obligations;
+	}
+	
+	@Override
+	protected TCTypeQualifier getQualifier()
+	{
+		return TCTypeQualifier.getSetQualifier();
 	}
 
 	@Override

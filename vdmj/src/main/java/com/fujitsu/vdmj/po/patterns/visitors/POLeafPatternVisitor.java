@@ -83,12 +83,19 @@ public abstract class POLeafPatternVisitor<E, C extends Collection<E>, S> extend
  		
  		for (POMapletPattern maplet: node.maplets)
  		{
- 			all.addAll(maplet.from.apply(this, arg));
- 			all.addAll(maplet.to.apply(this, arg));
+ 			all.addAll(maplet.apply(this, arg));
  		}
  		
  		return all;
 	}
+ 	
+ 	@Override
+ 	public C caseMapletPattern(POMapletPattern node, S arg)
+ 	{
+		C all = node.from.apply(this, arg);
+		all.addAll(node.to.apply(this, arg));
+		return all;
+ 	}
 
  	@Override
 	public C caseMapUnionPattern(POMapUnionPattern node, S arg)

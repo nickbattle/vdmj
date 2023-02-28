@@ -38,7 +38,7 @@ import workspace.Diag;
 import workspace.PluginRegistry;
 import workspace.plugins.INPlugin;
 
-public class GenerateCommand extends Command
+public class GenerateCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: generate <trace name>";
 	public static final String HELP = "generate <trace name> - debug expansion of trace name";
@@ -47,11 +47,11 @@ public class GenerateCommand extends Command
 
 	public GenerateCommand(String line)
 	{
-		String[] parts = line.split("\\s+", 2);
+		super(line);
 		
-		if (parts.length == 2)
+		if (argv.length == 2)
 		{
-			this.tracename = parts[1];
+			this.tracename = argv[1];
 		}
 		else
 		{

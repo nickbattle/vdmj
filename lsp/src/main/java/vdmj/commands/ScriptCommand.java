@@ -30,7 +30,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.ScriptExecutor;
 
-public class ScriptCommand extends Command implements ScriptRunnable
+public class ScriptCommand extends AnalysisCommand implements ScriptRunnable
 {
 	public static final String USAGE = "Usage: script <file>";
 	public static final String HELP = "script <file> - run commands from file";
@@ -39,11 +39,11 @@ public class ScriptCommand extends Command implements ScriptRunnable
 	
 	public ScriptCommand(String line)
 	{
-		String[] parts = line.split("\\s+", 2);
+		super(line);
 		
-		if (parts.length == 2)
+		if (argv.length == 2)
 		{
-			filename = parts[1];
+			filename = argv[1];
 		}
 		else
 		{

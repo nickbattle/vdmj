@@ -31,14 +31,16 @@ import dap.DAPServer;
 import lsp.CancellableThread;
 import workspace.DAPWorkspaceManager;
 
-public class QuitCommand extends Command
+public class QuitCommand extends AnalysisCommand
 {
 	public static final String HELP = "quit - end the debugging session";
 	public static final String USAGE = "Usage: quit";
 	
 	public QuitCommand(String line)
 	{
-		if (!line.equals("quit") && !line.equals("q"))
+		super(line);
+		
+		if (!argv[0].equals("quit") && !argv[0].equals("q"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}

@@ -113,11 +113,6 @@ public abstract class TCTypeVisitor<R, S>
 		return caseType(node, arg);
 	}
 
-	public R caseNumericType(TCInvariantType node, S arg)
-	{
-		return caseType(node, arg);
-	}
-
 	public R caseMapType(TCMapType node, S arg)
 	{
 		return caseType(node, arg);

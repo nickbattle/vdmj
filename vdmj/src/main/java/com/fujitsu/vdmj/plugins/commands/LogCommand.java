@@ -52,12 +52,11 @@ public class LogCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (Settings.dialect != Dialect.VDM_RT)
 		{
-			println("Command is only available in VDM-RT");
-			return;
+			return "Command is only available in VDM-RT";
 		}
 		
 		switch (argv[0])
@@ -70,6 +69,8 @@ public class LogCommand extends AnalysisCommand
 				doValidate();
 				break;
 		}
+		
+		return null;
 	}
 	
 	private void doLog()

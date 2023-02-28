@@ -77,7 +77,7 @@ public class RuntraceCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		switch (argv[0])
 		{
@@ -106,7 +106,12 @@ public class RuntraceCommand extends AnalysisCommand
 			case "filter":
 				doFilter();
 				break;
+				
+			default:
+				return USAGE;
 		}
+		
+		return null;
 	}
 
 	private void doRuntrace(boolean debug)

@@ -28,14 +28,15 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.patterns.visitors.INPatternVisitor;
+import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
 
-public class INMapletPattern extends INNode
+public class INMapletPattern extends INPattern
 {
 	private static final long serialVersionUID = 1L;
 	public final INPattern from;
@@ -43,6 +44,7 @@ public class INMapletPattern extends INNode
 
 	public INMapletPattern(INPattern from, INPattern to)
 	{
+		super(from.location);
 		this.from = from;
 		this.to = to;
 	}
@@ -51,16 +53,6 @@ public class INMapletPattern extends INNode
 	public String toString()
 	{
 		return from + " |-> " + to;
-	}
-
-	public List<INIdentifierPattern> findIdentifiers()
-	{
-		List<INIdentifierPattern> list = new Vector<INIdentifierPattern>();
-
-		list.addAll(from.findIdentifiers());
-		list.addAll(to.findIdentifiers());
-
-		return list;
 	}
 
 	public List<NameValuePairList> getAllNamedValues(Entry<Value, Value> maplet, Context ctxt)
@@ -84,6 +76,7 @@ public class INMapletPattern extends INNode
 		return results;
 	}
 
+	@Override
 	public boolean isConstrained()
 	{
 		if (from.isConstrained() || to.isConstrained())
@@ -93,5 +86,17 @@ public class INMapletPattern extends INNode
 
 		return (from.getPossibleType() instanceof TCUnionType ||
 				to.getPossibleType() instanceof TCUnionType);
+	}
+
+	@Override
+	public List<NameValuePairList> getAllNamedValues(Value expval, Context ctxt) throws PatternMatchException
+	{
+		throw new InternalException(0075, "Maplet getAllNamedValues called");	// See method above
+	}
+
+	@Override
+	public <R, S> R apply(INPatternVisitor<R, S> visitor, S arg)
+	{
+		return visitor.caseMapletPattern(this, arg);
 	}
 }

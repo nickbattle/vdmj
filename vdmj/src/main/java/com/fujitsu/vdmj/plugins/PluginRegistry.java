@@ -29,6 +29,8 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.fujitsu.vdmj.plugins.commands.ErrorCommand;
+
 public class PluginRegistry
 {
 	private static PluginRegistry INSTANCE = null;
@@ -95,6 +97,10 @@ public class PluginRegistry
 					
 					result = c;		// Note, override earlier results
 				}
+			}
+			catch (IllegalArgumentException e)
+			{
+				return new ErrorCommand(e.getMessage());
 			}
 			catch (Throwable e)
 			{

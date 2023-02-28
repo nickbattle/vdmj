@@ -367,6 +367,7 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@Override
+	@Deprecated
 	public ProofObligationList getProofObligations() throws Exception
 	{
 		if (pogModules == null)

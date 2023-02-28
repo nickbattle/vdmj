@@ -27,18 +27,16 @@ package com.fujitsu.vdmj.plugins;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import com.fujitsu.vdmj.ExitStatus;
-import com.fujitsu.vdmj.commands.CommandPlugin;
-import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
+import com.fujitsu.vdmj.plugins.commands.HelpCommand;
+import com.fujitsu.vdmj.plugins.commands.QuitCommand;
 import com.fujitsu.vdmj.plugins.commands.ReaderControl;
-import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.plugins.commands.ReloadCommand;
 
-@SuppressWarnings("deprecation")	// Because we're using CommandPlugin still
 public class CommandReader
 {
 	public ExitStatus run()
@@ -72,73 +70,41 @@ public class CommandReader
 				}
 				
 				String[] argv = line.split("\\s+");
+				AnalysisCommand command = null;
 				
 				switch (argv[0])
 				{
 					case "help":
 					case "?":
-						if (argv.length == 1)
-						{
-							registry.getHelp();
-							println("reload - reload specification files");
-							println("help - list all commands available");
-							println("[q]uit - close the session");
-						}
-						else
-						{
-							println("Usage: help");
-						}
+						command = new HelpCommand(line);
 						break;
 					
 					case "quit":
 					case "q":
-						if (argv.length == 1)
-						{
-							exitStatus = ExitStatus.EXIT_OK;
-							carryOn = false;
-						}
-						else
-						{
-							println("Usage: [q]uit");
-						}
+						command = new QuitCommand(line);
 						break;
 
 					case "reload":
-						if (argv.length == 1)
-						{
-							exitStatus = ExitStatus.RELOAD;
-							carryOn = false;
-						}
-						else
-						{
-							println("Usage: reload");
-						}
+						command = new ReloadCommand(line);
 						break;
 
 					default:
-						AnalysisCommand command = registry.getCommand(line);
-						
-						if (command == null)
-						{
-							command = loadDirectly(line);
-						}
-						
-						if (command == null)
-						{
-							println("Bad command. Try 'help'");
-						}
-						else
-						{
-							command.run();
-							
-							if (command instanceof ReaderControl)
-							{
-								ReaderControl ctrl = (ReaderControl)command;
-								exitStatus = ctrl.exitStatus();
-								carryOn = ctrl.carryOn();
-							}
-						}
+						command = AnalysisCommand.parse(line);
 						break;
+				}
+
+				String result = command.run(line);		// Can be an ErrorCommand
+				
+				if (result != null)
+				{
+					println(result);
+				}
+				
+				if (command instanceof ReaderControl)
+				{
+					ReaderControl ctrl = (ReaderControl)command;
+					exitStatus = ctrl.exitStatus();
+					carryOn = ctrl.carryOn();
 				}
 			}
 			catch (Throwable e)
@@ -168,76 +134,5 @@ public class CommandReader
 		while (line.length() > 0 && line.charAt(line.length() - 1) == '\\');
 		
 		return line.toString();
-	}
-
-	/**
-	 * You can load an AnalysisCommand directly from the classpath, rather than getting one
-	 * from an AnalysisPlugin with getCommand. This is mainly for backward compatibility, but
-	 * it might be useful to offer "global" commands as an extension that are not linked to
-	 * a particular plugin. The cmd-plugins jar includes a GitPlugin example that can be loaded
-	 * this way.
-	 * 
-	 * Note that for this to work, the name of the command (as in the past) must be *Plugin.
-	 */
-	private AnalysisCommand loadDirectly(String line) throws Exception
-	{
-		String[] packages = Properties.cmd_plugin_packages.split(";|:");
-		
-		for (String pack: packages)
-		{
-			try
-			{
-				// Remove this CommandPlugin test when we remove the @Deprecated classes.
-				String[] argv = line.split("\\s+");
-				String plugin = Character.toUpperCase(argv[0].charAt(0)) + argv[0].substring(1).toLowerCase();
-				Class<?> clazz = Class.forName(pack + "." + plugin + "Plugin");
-
-				if (CommandPlugin.class.isAssignableFrom(clazz))
-				{
-					Constructor<?> ctor = clazz.getConstructor(Interpreter.class);
-					CommandPlugin cmd = (CommandPlugin)ctor.newInstance(Interpreter.getInstance());
-					
-					// Convert an old CommandPlugin to an AnalysisCommand
-					return new AnalysisCommand(line)
-					{
-						@Override
-						public void run()
-						{
-							try
-							{
-								cmd.run(argv);
-							}
-							catch (Exception e)
-							{
-								println(e);
-							}
-						}
-					};
-				}
-				else if (AnalysisCommand.class.isAssignableFrom(clazz))
-				{
-					Constructor<?> ctor = clazz.getConstructor(String[].class);
-					return (AnalysisCommand)ctor.newInstance(new Object[]{line});
-				}
-			}
-			catch (IllegalArgumentException e)	// From AnalysisCommands
-			{
-				println(e.getMessage());
-			}
-			catch (ClassNotFoundException e)
-			{
-				// Try next package
-			}
-			catch (InstantiationException e)
-			{
-				// Try next package
-			}
-			catch (IllegalAccessException e)
-			{
-				// Try next package
-			}
-		}
-
-		return null;
 	}
 }

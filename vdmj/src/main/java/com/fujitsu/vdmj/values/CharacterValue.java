@@ -91,14 +91,14 @@ public class CharacterValue extends Value
 
 		if ((flags & FormattableFlags.ALTERNATE) > 0)
 		{
-			s = toString();
+			s = String.valueOf(unicode);	// Just x
 		}
 		else
 		{
-			s = "" + unicode;
+			s = toString();		// With 'x' quotes
 		}
 
-		formatTo(s, formatter, flags, width, precision);
+		formatTo(s, formatter, 0, width, precision);
 	}
 
 	@Override

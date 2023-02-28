@@ -125,10 +125,16 @@ public class PORemoveIgnoresVisitor extends POPatternVisitor<POPattern, Object>
 
 		for (POMapletPattern p: node.maplets)
 		{
-			list.add(new POMapletPattern(p.from.apply(this, arg), p.to.apply(this, arg)));
+			list.add((POMapletPattern) p.apply(this, arg));
 		}
 
 		return new POMapPattern(node.location, list);
+	}
+	
+	@Override
+	public POPattern caseMapletPattern(POMapletPattern node, Object arg)
+	{
+		return new POMapletPattern(node.from.apply(this, arg), node.to.apply(this, arg));
 	}
 	
 	@Override

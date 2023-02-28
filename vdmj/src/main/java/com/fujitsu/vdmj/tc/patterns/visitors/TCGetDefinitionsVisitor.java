@@ -73,6 +73,7 @@ public class TCGetDefinitionsVisitor extends TCLeafPatternVisitor<TCDefinition, 
 		defs.add(new TCLocalDefinition(node.location, node.name, arg.ptype, arg.scope));
 		return defs;
 	}
+	
 	@Override
 	public TCDefinitionList caseMapPattern(TCMapPattern node, Pair arg)
 	{

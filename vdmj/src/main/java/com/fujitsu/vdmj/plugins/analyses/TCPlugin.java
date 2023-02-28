@@ -29,10 +29,8 @@ import java.util.List;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.VDMMessage;
-import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
-import com.fujitsu.vdmj.plugins.CommandList;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.events.CheckPrepareEvent;
 import com.fujitsu.vdmj.plugins.events.CheckTypeEvent;
@@ -95,21 +93,4 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	abstract protected List<VDMMessage> typeCheck();
 
 	abstract public <T extends Collection<?>> T getTC();
-
-	protected CommandList commandList = new CommandList
-	(
-		// None yet
-	);
-	
-	@Override
-	public AnalysisCommand getCommand(String line)
-	{
-		return lookup(line, commandList);
-	}
-	
-	@Override
-	public void help()
-	{
-		showHelp(commandList);
-	}
 }

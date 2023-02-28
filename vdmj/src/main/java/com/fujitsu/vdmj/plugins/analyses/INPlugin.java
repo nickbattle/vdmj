@@ -40,9 +40,9 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
-import com.fujitsu.vdmj.plugins.CommandList;
 import com.fujitsu.vdmj.plugins.EventListener;
 import com.fujitsu.vdmj.plugins.commands.AssertCommand;
+import com.fujitsu.vdmj.plugins.commands.ClassesCommand;
 import com.fujitsu.vdmj.plugins.commands.CoverageCommand;
 import com.fujitsu.vdmj.plugins.commands.CreateCommand;
 import com.fujitsu.vdmj.plugins.commands.DebugCommand;
@@ -53,6 +53,7 @@ import com.fujitsu.vdmj.plugins.commands.InitCommand;
 import com.fujitsu.vdmj.plugins.commands.LatexCommand;
 import com.fujitsu.vdmj.plugins.commands.LogCommand;
 import com.fujitsu.vdmj.plugins.commands.ModulesCommand;
+import com.fujitsu.vdmj.plugins.commands.PluginsCommand;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
 import com.fujitsu.vdmj.plugins.commands.RuntraceCommand;
 import com.fujitsu.vdmj.plugins.commands.SaveCommand;
@@ -378,39 +379,70 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	{
 		return interactive;
 	}
-
-	protected CommandList commandsList = new CommandList
-	(
-		InitCommand.class,
-		SetCommand.class,
-		DefaultCommand.class,
-		ModulesCommand.class,
-		FilesCommand.class,
-		EnvCommand.class,
-		StateCommand.class,
-		LogCommand.class,
-		PrintCommand.class,
-		ScriptCommand.class,
-		AssertCommand.class,
-		ThreadsCommand.class,
-		CreateCommand.class,
-		DebugCommand.class,
-		CoverageCommand.class,
-		LatexCommand.class,
-		WordCommand.class,
-		SaveCommand.class,
-		RuntraceCommand.class
-	);
 	
 	@Override
 	public AnalysisCommand getCommand(String line)
 	{
-		return lookup(line, commandsList);
+		String[] parts = line.split("\\s+");
+		
+		switch (parts[0])
+		{
+			case "init":		return new InitCommand(line);
+			case "set":			return new SetCommand(line);
+			case "default":		return new DefaultCommand(line);
+			case "modules":		return new ModulesCommand(line);
+			case "classes":		return new ClassesCommand(line);
+			case "files":		return new FilesCommand(line);
+			case "plugins":		return new PluginsCommand(line);
+			case "env":			return new EnvCommand(line);
+			case "state":		return new StateCommand(line);
+			case "log":			return new LogCommand(line);
+			case "print":
+			case "p":			return new PrintCommand(line);
+			case "script":		return new ScriptCommand(line);
+			case "assert":		return new AssertCommand(line);
+			case "threads":		return new ThreadsCommand(line);
+			case "create":		return new CreateCommand(line);
+			case "break":
+			case "trace":
+			case "catch":
+			case "list":
+			case "remove":		return new DebugCommand(line);
+			case "coverage":	return new CoverageCommand(line);
+			case "latex":		return new LatexCommand(line);
+			case "word":		return new WordCommand(line);
+			case "save":		return new SaveCommand(line);
+			case "runtrace":
+			case "rt":			return new RuntraceCommand(line);
+
+			default:
+				return null;
+		}
 	}
 	
 	@Override
 	public void help()
 	{
-		showHelp(commandsList);
+		InitCommand.help();
+		SetCommand.help();
+		DefaultCommand.help();
+		ModulesCommand.help();
+		ClassesCommand.help();
+		FilesCommand.help();
+		PluginsCommand.help();
+		EnvCommand.help();
+		StateCommand.help();
+		LogCommand.help();
+		PrintCommand.help();
+		ScriptCommand.help();
+		AssertCommand.help();
+		ThreadsCommand.help();
+		CreateCommand.help();
+		DebugCommand.help();
+		CoverageCommand.help();
+		LatexCommand.help();
+		WordCommand.help();
+		SaveCommand.help();
+		RuntraceCommand.help();
 	}
 }

@@ -31,7 +31,7 @@ import dap.DAPRequest;
 import json.JSONObject;
 import workspace.Diag;
 
-public class DefaultCommand extends Command
+public class DefaultCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: default <default module or class>";
 	public static final String HELP = "default <name> - set the default class or module name";
@@ -40,11 +40,11 @@ public class DefaultCommand extends Command
 
 	public DefaultCommand(String line)
 	{
-		String[] parts = line.split("\\s+");
+		super(line);
 		
-		if (parts.length == 2)
+		if (argv.length == 2)
 		{
-			this.defaultName = parts[1];
+			this.defaultName = argv[1];
 		}
 		else
 		{

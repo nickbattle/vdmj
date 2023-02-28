@@ -48,7 +48,7 @@ public class PogCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		POPlugin po = registry.getPlugin("PO");
 		ProofObligationList all = po.getProofObligations();
@@ -81,6 +81,8 @@ public class PogCommand extends AnalysisCommand
 			println("Generated " + plural(list.size(), "proof obligation", "s") + ":\n");
 			printf("%s", list.toString());
 		}
+		
+		return null;
 	}
 	
 	public static void help()

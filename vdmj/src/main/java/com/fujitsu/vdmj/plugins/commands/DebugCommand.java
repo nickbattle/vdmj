@@ -49,10 +49,11 @@ public class DebugCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		BreakpointReader reader = new BreakpointReader(Interpreter.getInstance());
 		reader.doCommand(line);
+		return null;
 	}
 	
 	public static void help()

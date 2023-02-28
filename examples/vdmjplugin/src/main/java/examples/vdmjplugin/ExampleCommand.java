@@ -40,12 +40,11 @@ public class ExampleCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length != 2)
 		{
-			println("Usage: maxlen <length>");
-			return;
+			return "Usage: maxlen <length>";
 		}
 		
 		try
@@ -57,10 +56,12 @@ public class ExampleCommand extends AnalysisCommand
 			{
 				println(m);
 			}
+			
+			return null;
 		}
 		catch (NumberFormatException e)
 		{
-			println("Usage: maxlen <length>");
+			return "Usage: maxlen <length>";
 		}
 	}
 }

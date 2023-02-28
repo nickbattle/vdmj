@@ -94,6 +94,16 @@ public class PluginConsole
 		Console.out.printf(format, args);
 	}
 
+	public static void errorln(Object m)
+	{
+		Console.err.println(m.toString());
+	}
+
+	public static void errorf(String format, Object... args)
+	{
+		Console.err.printf(format, args);
+	}
+
 	public static void println(Throwable throwable)
 	{
 		Console.out.println(String.format("EXCEPTION: %s %s",

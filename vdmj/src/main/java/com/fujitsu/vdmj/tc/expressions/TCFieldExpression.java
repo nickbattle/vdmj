@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.typechecker.TypeChecker;
 
 public class TCFieldExpression extends TCExpression
 {
@@ -176,6 +177,30 @@ public class TCFieldExpression extends TCExpression
 				if (fdef.isStatic())// && !env.isStatic())
 				{
 					// warning(5005, "Should access member " + field + " from a static context");
+				}
+				
+				// If we're trying to access a state field - probably an instance variable - and
+				// the enclosing definition is not pure, we can only do this from non-functional
+				// environments, like regular statements and so on. Functional contexts are not
+				// allowed.
+				
+				if (fdef.nameScope.matches(NameScope.STATE))
+				{
+					TCDefinition encl = env.getEnclosingDefinition();
+					
+					if (!encl.isPure())
+					{
+						if (env.isFunctionalError())
+						{
+							TypeChecker.report(3366,
+								"Cannot access state field '" + field + "' from this context", field.getLocation());
+						}
+						else if (env.isFunctional())
+						{
+							TypeChecker.warning(3366,
+								"Should not access state field '" + field + "' from this context", field.getLocation());
+						}
+					}
 				}
 
    				results.add(fdef.getType());

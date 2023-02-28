@@ -24,12 +24,6 @@
 
 package com.fujitsu.vdmj.plugins;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.*;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Vector;
 
@@ -96,62 +90,5 @@ abstract public class AnalysisPlugin
 		}
 		
 		return errs;
-	}
-	
-	protected AnalysisCommand lookup(String line, CommandList commands)
-	{
-		for (Class<? extends AnalysisCommand> cmd: commands)
-		{
-			try
-			{
-				Constructor<? extends AnalysisCommand> ctor = cmd.getConstructor(String.class);
-				return ctor.newInstance(new Object[]{line});
-			}
-			catch (InvocationTargetException e)
-			{
-				if (e.getCause() instanceof IllegalArgumentException)
-				{
-					// doesn't match line, try next one
-				}
-				else
-				{
-					println("Command " + cmd.getSimpleName() + ": " + e.getCause().getMessage());
-				}
-			}
-			catch (NoSuchMethodException e)
-			{
-				printf("%s does not implement constructor(String line)?\n", cmd.getSimpleName());
-			}
-			catch (Throwable e)
-			{
-				println("Command " + cmd.getSimpleName() + ": " + e.getMessage());
-			}
-		}
-		
-		return null;
-	}
-	
-	protected void showHelp(CommandList commands)
-	{
-		for (Class<? extends AnalysisCommand> cmd: commands)
-		{
-			try
-			{
-				Method help = cmd.getMethod("help", (Class<?>[])null);
-				
-				if ((help.getModifiers() & Modifier.STATIC) != 0)
-				{
-					help.invoke(null, (Object[])null);
-				}
-				else
-				{
-					printf("%s does not implement static void help()?\n", cmd.getSimpleName());
-				}
-			}
-			catch (Throwable e)
-			{
-				// Should never happen
-			}
-		}
 	}
 }

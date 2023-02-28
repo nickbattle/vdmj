@@ -31,7 +31,7 @@ import dap.DAPRequest;
 import dap.ExpressionExecutor;
 import workspace.DAPWorkspaceManager;
 
-public class PrintCommand extends Command implements InitRunnable, ScriptRunnable
+public class PrintCommand extends AnalysisCommand implements InitRunnable, ScriptRunnable
 {
 	public static final String USAGE = "Usage: print <expression>";
 	public static final String HELP = "print <exp> - evaluate an expression";
@@ -40,6 +40,7 @@ public class PrintCommand extends Command implements InitRunnable, ScriptRunnabl
 
 	public PrintCommand(String line)
 	{
+		super(line);
 		String[] parts = line.split("\\s+", 2);
 		
 		if (parts.length == 2)

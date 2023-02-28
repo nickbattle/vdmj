@@ -53,12 +53,11 @@ public class PrintCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length == 1)
 		{
-			println(USAGE);
-			return;
+			return USAGE;
 		}
 		
 		String expression = line.substring(line.indexOf(' ') + 1);
@@ -122,6 +121,8 @@ public class PrintCommand extends AnalysisCommand
 				watch.interrupt();	// Stop ESC key watcher.
 			}
 		}
+		
+		return null;
 	}
 	
 	public static void help()

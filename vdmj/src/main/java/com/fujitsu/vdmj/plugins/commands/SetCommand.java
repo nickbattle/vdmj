@@ -27,10 +27,10 @@ package com.fujitsu.vdmj.plugins.commands;
 import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.plugins.AnalysisCommand;
 
-public class SetCommand extends AnalysisCommand
+public class SetCommand extends ControlAnalysisCommand
 {
 	private final static String USAGE = "Usage: set [<pre|post|inv|dtc|exceptions|measures|annotations> <on|off>]";
 
@@ -50,7 +50,7 @@ public class SetCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (argv.length == 1)
 		{
@@ -61,6 +61,8 @@ public class SetCommand extends AnalysisCommand
 			isEnabled("Pre/post/inv exceptions", Settings.exceptions);
 			isEnabled("Measure checks", Settings.measureChecks);
 			isEnabled("Annotations", Settings.annotations);
+			
+			return null;
 		}
 		else
 		{
@@ -93,25 +95,36 @@ public class SetCommand extends AnalysisCommand
 	    		}
 	    		else if (argv[1].equals("measures"))
 	    		{
+	    			if (setting != Settings.annotations)
+	    			{
+		    			println("Specification will now be re-parsed (reloaded)");
+		    			exitStatus = ExitStatus.RELOAD;
+		    			carryOn = false;
+	    			}
+
 	    			Settings.measureChecks = setting;
 	    		}
 	    		else if (argv[1].equals("annotations"))
 	    		{
 	    			if (setting != Settings.annotations)
 	    			{
-		    			println("Specification must now be re-parsed (reload)");
+		    			println("Specification will now be re-parsed (reloaded)");
+		    			exitStatus = ExitStatus.RELOAD;
+		    			carryOn = false;
 	    			}
 
 	    			Settings.annotations = setting;
 	    		}
 				else
 				{
-					println("Usage: set [<pre|post|inv|dtc|exceptions|measures|annotations> <on|off>]");
+					return USAGE;
 				}
+	    		
+	    		return null;
 			}
 			else
 			{
-				println("Usage: set [<pre|post|inv|dtc|exceptions|measures|annotations> <on|off>]");
+				return USAGE;
 			}
 		}
 	}

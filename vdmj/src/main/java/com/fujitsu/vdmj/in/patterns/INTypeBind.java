@@ -35,17 +35,41 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.values.ValueList;
 
-public class INTypeBind extends INBind
+public class INTypeBind extends INBind implements INBindingSetter
 {
 	private static final long serialVersionUID = 1L;
 	public final TCType type;
+	public final boolean hasTypeParams;
+	
+	private ValueList bindValues = null;
+	private boolean bindPermuted = false;
 
 	public INTypeBind(INPattern pattern, TCType type)
 	{
 		super(pattern.location, pattern);
 		this.type = type;
+		this.hasTypeParams = !type.apply(new TCParameterCollector(), null).isEmpty();
+	}
+
+	@Override
+	public void setBindValues(ValueList values)
+	{
+		bindValues = values;
+	}
+
+	@Override
+	public ValueList getBindValues()
+	{
+		return bindValues;	// Without calculation!
+	}
+	
+	@Override
+	public TCType getType()
+	{
+		return type;
 	}
 
 	@Override
@@ -67,6 +91,11 @@ public class INTypeBind extends INBind
 	@Override
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
+		if (bindValues != null && bindPermuted == permuted && !hasTypeParams)
+		{
+			return bindValues;		// Should be exactly the same
+		}
+		
 		try
 		{
 			BigInteger size = type.apply(new INTypeSizeVisitor(), ctxt);
@@ -76,7 +105,9 @@ public class INTypeBind extends INBind
 				throw new ContextException(5039, "Cannot evaluate type bind of size " + size, location, ctxt);
 			}
 
-			return type.apply(new INGetAllValuesVisitor(), ctxt);
+	   		bindValues = type.apply(new INGetAllValuesVisitor(), ctxt);
+	   		bindPermuted = permuted;
+	   		return bindValues;
 		}
 		catch (ArithmeticException e)
 		{

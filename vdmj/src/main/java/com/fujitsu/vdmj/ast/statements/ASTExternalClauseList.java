@@ -26,7 +26,9 @@ package com.fujitsu.vdmj.ast.statements;
 
 import java.util.Vector;
 
-public class ASTExternalClauseList extends Vector<ASTExternalClause>
+import com.fujitsu.vdmj.mapper.Mappable;
+
+public class ASTExternalClauseList extends Vector<ASTExternalClause> implements Mappable
 {
 	private static final long serialVersionUID = 1L;
 }

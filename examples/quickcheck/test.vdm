@@ -1,0 +1,17 @@
+values
+	MAX_T = 9;
+
+types
+	T = nat
+	inv t == t <= MAX_T;
+	
+functions
+	f: T -> T
+	f(a) ==
+		if a = 0
+		then 1
+		else a * f(a-1)
+	measure a;
+	
+	getSet: T * T -> set of T
+	getSet(a, b) == {a, ..., b};

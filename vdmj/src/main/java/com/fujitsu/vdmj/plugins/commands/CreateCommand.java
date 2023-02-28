@@ -49,12 +49,11 @@ public class CreateCommand extends AnalysisCommand
 	}
 
 	@Override
-	public void run()
+	public String run(String line)
 	{
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			println("Command is not available in VDM-SL");
-			return;
+			return "Command is not available in VDM-SL";
 		}
 		
 		Pattern p = Pattern.compile("^create (\\w+)\\s*?:=\\s*(.+)$");
@@ -79,6 +78,8 @@ public class CreateCommand extends AnalysisCommand
 		{
 			println(USAGE);
 		}
+		
+		return null;
 	}
 	
 	public static void help()

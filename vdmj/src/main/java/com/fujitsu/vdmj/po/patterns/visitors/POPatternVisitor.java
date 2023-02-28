@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.po.patterns.POIntegerPattern;
 import com.fujitsu.vdmj.po.patterns.POMapPattern;
 import com.fujitsu.vdmj.po.patterns.POMapUnionPattern;
+import com.fujitsu.vdmj.po.patterns.POMapletPattern;
 import com.fujitsu.vdmj.po.patterns.PONilPattern;
 import com.fujitsu.vdmj.po.patterns.POObjectPattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
@@ -90,6 +91,11 @@ public abstract class POPatternVisitor<R, S>
 	}
 
  	public R caseMapPattern(POMapPattern node, S arg)
+	{
+		return casePattern(node, arg);
+	}
+
+ 	public R caseMapletPattern(POMapletPattern node, S arg)
 	{
 		return casePattern(node, arg);
 	}
