@@ -124,6 +124,6 @@ public class QuickCheckCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("quickcheck [-c <file>]|[-f <file>] [<PO numbers>]] - lightweight PO verification");
+		println("quickcheck [-c <file>]|[-f <file>] [<PO numbers>] - lightweight PO verification");
 	}
 }
