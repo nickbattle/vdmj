@@ -50,6 +50,8 @@ import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 {
+	private static final int NUMERIC_LIMIT = 10;	
+	
 	@Override
 	public String caseType(TCType node, Object arg)
 	{
@@ -89,31 +91,31 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 	@Override
 	public String caseNumericType(TCNumericType node, Object arg)
 	{
-		return "{ 0, ..., 10 }";
+		return String.format("{ 0, ..., %d }", NUMERIC_LIMIT);
 	}
 	
 	@Override
 	public String caseNaturalOneType(TCNaturalOneType node, Object arg)
 	{
-		return "{ 1, ..., 10 }";
+		return String.format("{ 1, ..., %d }", NUMERIC_LIMIT);
 	}
 	
 	@Override
 	public String caseIntegerType(TCIntegerType node, Object arg)
 	{
-		return "{ -10, ..., 10 }";
+		return String.format("{ -%d, ..., %d }", NUMERIC_LIMIT, NUMERIC_LIMIT);
 	}
 	
 	@Override
 	public String caseRealType(TCRealType node, Object arg)
 	{
-		return "{ a / b | a, b in set {-10, ..., 10} & b <> 0 }";
+		return String.format("{ a / b | a, b in set {-%d, ..., %d} & b <> 0 }", NUMERIC_LIMIT, NUMERIC_LIMIT);
 	}
 	
 	@Override
 	public String caseRationalType(TCRationalType node, Object arg)
 	{
-		return "{ a / b | a, b in set {-10, ..., 10} & b <> 0 }";
+		return String.format("{ a / b | a, b in set {-%d, ..., %d} & b <> 0 }", NUMERIC_LIMIT, NUMERIC_LIMIT);
 	}
 	
 	@Override

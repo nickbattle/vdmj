@@ -49,6 +49,7 @@ import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
+import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -86,6 +87,7 @@ import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
+	private static final long FINITE_LIMIT = 100;
 	private int errorCount = 0;
 	
 	public boolean hasErrors()
@@ -281,6 +283,7 @@ public class QuickCheck
 			PrintWriter writer = new PrintWriter(new FileWriter(file));
 			Set<String> done = new HashSet<String>();
 			DefaultRangeCreator rangeCreator = new DefaultRangeCreator();
+			RootContext ctxt = Interpreter.getInstance().getInitialContext();
 
 			for (ProofObligation po: chosen)
 			{
@@ -288,7 +291,34 @@ public class QuickCheck
 				{
 					if (!done.contains(mbind.toString()))
 					{
-						String range = mbind.getType().apply(rangeCreator, null);
+						TCType type = mbind.getType();
+						String range = null;
+						
+						if (type.isInfinite())
+						{
+							range = type.apply(rangeCreator, null);
+						}
+						else
+						{
+							try
+							{
+								long size = type.apply(new INTypeSizeVisitor(), ctxt);
+								
+								if (size > FINITE_LIMIT)	// Avoid huge finite types
+								{
+									range = type.apply(rangeCreator, null);
+								}
+								else
+								{
+									range = "{ x | x : " + type + " }";
+								}
+							}
+							catch (Exception e)		// Probably ArithmeticException
+							{
+								range = type.apply(rangeCreator, null);
+							}
+						}
+						
 						writer.println(mbind + " = " + range + ";");
 						done.add(mbind.toString());
 					}
