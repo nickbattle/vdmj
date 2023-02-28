@@ -33,7 +33,7 @@ import dap.DAPRequest;
 import json.JSONObject;
 import workspace.Diag;
 
-public class PrecisionCommand extends Command
+public class PrecisionCommand extends AnalysisCommand
 {
 	public static final String USAGE = "Usage: precision [decimal digits]";
 	public static final String[] HELP =	{ "precision", "precision [decimal digits] - set real variable precision" };
@@ -42,13 +42,13 @@ public class PrecisionCommand extends Command
 
 	public PrecisionCommand(String line)
 	{
-		String[] parts = line.split("\\s+");
+		super(line);
 		
-		if (parts.length == 2)
+		if (argv.length == 2)
 		{
 			try
 			{
-				this.precision = Integer.parseInt(parts[1]);
+				this.precision = Integer.parseInt(argv[1]);
 			}
 			catch (NumberFormatException e)
 			{
