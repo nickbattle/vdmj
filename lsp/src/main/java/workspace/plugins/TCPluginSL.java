@@ -86,6 +86,10 @@ public class TCPluginSL extends TCPlugin
 		{
 			TypeChecker.report(3430, e.getMessage(), e.location);
 		}
+		catch (Throwable e)
+		{
+			TypeChecker.report(3430, e.toString(), LexLocation.ANY);
+		}
 		
 		if (TypeChecker.getErrorCount() > 0)
 		{

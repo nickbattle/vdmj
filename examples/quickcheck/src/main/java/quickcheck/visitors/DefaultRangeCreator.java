@@ -160,7 +160,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 	public String caseRecordType(TCRecordType node, Object arg)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("{ mk_R(");
+		sb.append("{ mk_" + node.name + "(");
 		String sep = "";
 		
 		for (int f=1; f <= node.fields.size(); f++)
@@ -182,6 +182,11 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 			sb.append(" in set ");
 			sb.append(field.type.apply(this, arg));
 			sep = ", ";
+		}
+		
+		if (node.invdef != null)
+		{
+			sb.append(" /* & " + node.invdef.body + " */");
 		}
 		
 		sb.append(" }");
