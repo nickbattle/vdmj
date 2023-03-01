@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
+import com.fujitsu.vdmj.Release;
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
@@ -184,7 +186,7 @@ public class TCFieldExpression extends TCExpression
 				// environments, like regular statements and so on. Functional contexts are not
 				// allowed.
 				
-				if (fdef.nameScope.matches(NameScope.STATE))
+				if (fdef.nameScope.matches(NameScope.STATE) && Settings.release == Release.VDM_10)
 				{
 					TCDefinition encl = env.getEnclosingDefinition();
 					
