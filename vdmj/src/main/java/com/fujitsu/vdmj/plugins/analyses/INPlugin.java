@@ -198,7 +198,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 					}
 					else
 					{
-						fail("-fail requires a log file name");
+						fail("-log requires a log file name");
 					}
 					break;
 					

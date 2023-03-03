@@ -164,4 +164,10 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	{
 		println("maxlen <len>: repeat checks with new maxlen");
 	}
+	
+	@Override
+	public String getDescription()
+	{
+		return "The example VDMJ plugin";
+	}
 }

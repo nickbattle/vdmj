@@ -56,7 +56,7 @@ public class PluginsCommand extends AnalysisCommand
 		
 		for (Entry<String, AnalysisPlugin> name: registry.getPlugins().entrySet())
 		{
-			printf("%s = %s\n", name.getKey(), name.getValue().getClass().getName());
+			printf("%s = %s\n", name.getKey(), name.getValue().getDescription());
 		}
 		
 		return null;

@@ -55,6 +55,11 @@ abstract public class AnalysisPlugin
 	public abstract String getName();
 	public abstract void init();
 	
+	public String getDescription()
+	{
+		return getClass().getName();	// Fully qualified classname, by default
+	}
+	
 	public void processArgs(List<String> argv)
 	{
 		return;			// Process any command line -options used
