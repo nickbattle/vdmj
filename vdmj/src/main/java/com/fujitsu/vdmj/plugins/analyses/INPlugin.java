@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.plugins.analyses;
 import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +56,7 @@ import com.fujitsu.vdmj.plugins.commands.LatexCommand;
 import com.fujitsu.vdmj.plugins.commands.LogCommand;
 import com.fujitsu.vdmj.plugins.commands.ModulesCommand;
 import com.fujitsu.vdmj.plugins.commands.PluginsCommand;
+import com.fujitsu.vdmj.plugins.commands.PrecisionCommand;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
 import com.fujitsu.vdmj.plugins.commands.RuntraceCommand;
 import com.fujitsu.vdmj.plugins.commands.SaveCommand;
@@ -141,6 +144,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		println("-log <filename>: enable real-time event logging");
 		println("-remote <class>: enable remote control");
 		println("-simulation <class>: enable simulation control");
+		println("-precision <n>: set real number precision to n places");
 	}
 	
 	@Override
@@ -265,6 +269,39 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	    				fail("-simulation option requires a Java classname");
 	    			}
 	    			break;
+	    			
+	    		case "-precision":
+	    			iter.remove();
+	    			
+        			if (iter.hasNext())
+        			{
+       					String arg = iter.next();
+       					iter.remove();
+
+       					try
+						{
+							int precision = Integer.parseInt(arg);
+							
+							if (precision < 10)
+							{
+								fail("Precision argument must be >= 10");
+							}
+							else
+							{
+								Settings.precision = new MathContext(precision, RoundingMode.HALF_UP);
+							}
+						}
+						catch (NumberFormatException e)
+						{
+							fail("Precision argument must be numeric");
+						}
+        			}
+        			else
+        			{
+        				fail("-precision option requires a value");
+        			}
+        			break;
+
 			}
 		}
 		
@@ -397,6 +434,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			case "env":			return new EnvCommand(line);
 			case "state":		return new StateCommand(line);
 			case "log":			return new LogCommand(line);
+			case "precision":	return new PrecisionCommand(line);
 			case "print":
 			case "p":			return new PrintCommand(line);
 			case "script":		return new ScriptCommand(line);
@@ -433,6 +471,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		EnvCommand.help();
 		StateCommand.help();
 		LogCommand.help();
+		PrecisionCommand.help();
 		PrintCommand.help();
 		ScriptCommand.help();
 		AssertCommand.help();
