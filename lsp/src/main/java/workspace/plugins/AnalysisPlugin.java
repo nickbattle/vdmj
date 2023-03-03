@@ -56,6 +56,11 @@ abstract public class AnalysisPlugin
 	
 	abstract public void init();
 	
+	public Object getDescription()
+	{
+		return getClass().getName();
+	}
+
 	/**
 	 * These methods are used to dispatch LSP/DAP events. These default methods just return an
 	 * error, usually indicating that an event has been registered with the EventHub, but
