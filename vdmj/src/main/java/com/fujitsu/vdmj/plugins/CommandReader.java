@@ -56,7 +56,7 @@ public class CommandReader
 				Console.out.print("> ");
 				String line = readLine();
 
-				if (line == null)	// EOF
+				if (line == null || line.equals("null"))	// EOF
 				{
 					carryOn = false;
 					continue;
