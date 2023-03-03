@@ -216,7 +216,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 		}
 		else
 		{
-			return "{ /* Set of " + node + " */ }";
+			return "{ [a, b, c] | a, b, c in set " + node.seqof.apply(this, arg) + " }";
 		}
 	}
 	
