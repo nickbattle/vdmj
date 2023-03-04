@@ -45,11 +45,20 @@ import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCTokenType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 {
+	/**
+	 * We have to collect the nodes that have already been visited since types can be recursive,
+	 * and the visitor will otherwise blow the stack. Note that this means you need a new visitor
+	 * instance for every use (or only re-use with care!). This is tested and modified in the
+	 * NamedType and RecordType entries.
+	 */
+	protected TCTypeSet done = new TCTypeSet();
+
 	private static final int NUMERIC_LIMIT = 10;	
 	
 	@Override
@@ -146,6 +155,13 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 	@Override
 	public String caseNamedType(TCNamedType node, Object arg)
 	{
+		if (done.contains(node))
+		{
+			return "{ /* recursing " + node.toString() + " */ }";
+		}
+		
+		done.add(node);
+		
 		if (node.invdef != null)
 		{
 			return "{ x | x in set " + node.type.apply(this, arg) + " & inv_" + node.typename + "(x) }";
@@ -159,6 +175,13 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 	@Override
 	public String caseRecordType(TCRecordType node, Object arg)
 	{
+		if (done.contains(node))
+		{
+			return "{ /* recursing " + node.toString() + " */ }";
+		}
+		
+		done.add(node);
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append("{ mk_" + node.name + "(");
 		String sep = "";
