@@ -194,11 +194,13 @@ public class QuickCheck
 			RootContext ctxt = interpreter.getInitialContext();
 			Map<String, ValueList> ranges = new HashMap<String, ValueList>();
 			long before = System.currentTimeMillis();
+			println("Expanding " + inbinds.size() + " ranges:");
 			
 			for (int i=0; i<inbinds.size(); i++)
 			{
 				ctxt.threadState.init();
 				String key = inbinds.get(i).toString();
+				printf(".");
 				INExpression exp = inexps.get(i);
 				Value value = exp.eval(ctxt);
 				
@@ -211,7 +213,7 @@ public class QuickCheck
 				}
 				else
 				{
-					errorln("Range does not evaluate to a set " + exp.location);
+					errorln("\nRange does not evaluate to a set " + exp.location);
 					errorCount++;
 				}
 			}
@@ -222,7 +224,7 @@ public class QuickCheck
 			}
 			
 			long after = System.currentTimeMillis();
-			println("Ranges expanded " + duration(before, after));
+			println("\nRanges expanded " + duration(before, after));
 
 			return ranges;
 		}
