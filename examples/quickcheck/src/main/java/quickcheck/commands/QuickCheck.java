@@ -57,6 +57,7 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Context;
@@ -78,6 +79,7 @@ import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
+import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.SetValue;
@@ -168,6 +170,7 @@ public class QuickCheck
 			TCMultipleBindList tcbinds = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astbinds);
 			TCExpressionList tcexps = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astexps);
 			Environment env = interpreter.getGlobalEnvironment();
+			TypeChecker.clearErrors();
 			
 			for (int i=0; i<tcbinds.size(); i++)
 			{
@@ -178,11 +181,19 @@ public class QuickCheck
 				TCExpression exp = tcexps.get(i);
 				TCType exptype = exp.typeCheck(env, null, NameScope.NAMESANDSTATE, null);
 				
-				if (!TypeComparator.compatible(mbset, exptype))
+				if (TypeChecker.getErrorCount() > 0)
 				{
-					errorln("Range bind and expression do not match at " + exp.location);
-					errorln("Bind type: " + mbtype);
-					errorln("Expression type: " + exptype + ", expecting " + mbset);
+					for (VDMError error: TypeChecker.getErrors())
+					{
+						println(error.toString());
+						errorCount++;
+					}
+				}
+				else if (!TypeComparator.compatible(mbset, exptype))
+				{
+					println("Range bind and expression do not match at " + exp.location);
+					println("Bind type: " + mbtype);
+					println("Expression type: " + exptype + ", expecting " + mbset);
 					errorCount++;
 				}
 			}
@@ -216,7 +227,7 @@ public class QuickCheck
 				}
 				else
 				{
-					errorln("\nRange does not evaluate to a set " + exp.location);
+					println("\nRange does not evaluate to a set " + exp.location);
 					errorCount++;
 				}
 			}
