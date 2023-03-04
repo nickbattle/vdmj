@@ -444,7 +444,7 @@ public class QuickCheck
 		}
 	}
 
-	private Object duration(long before, long after)
+	private String duration(long before, long after)
 	{
 		double duration = (double)(after - before)/1000;
 		return "in " + duration + "s";
