@@ -228,7 +228,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, TCTypeSet>
 	@Override
 	public String caseSeqType(TCSeqType node, TCTypeSet done)
 	{
-		if (node.seqof.isOrdered(node.location))
+		if (node.seqof.isOrdered(node.location) && !node.seqof.isUnion(node.location))
 		{
 			String type = node.seqof.apply(this, done);
 			return "{ [ e | e in set s ] | s in set power " + type + " }";	// includes []
@@ -242,7 +242,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, TCTypeSet>
 	@Override
 	public String caseSeq1Type(TCSeq1Type node, TCTypeSet done)
 	{
-		if (node.seqof.isOrdered(node.location))
+		if (node.seqof.isOrdered(node.location) && !node.seqof.isUnion(node.location))
 		{
 			String type = node.seqof.apply(this, done);
 			return "{ [ e | e in set s ] | s in set power " + type + " } \\ {[]}";

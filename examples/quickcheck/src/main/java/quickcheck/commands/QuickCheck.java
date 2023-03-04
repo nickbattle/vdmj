@@ -137,7 +137,7 @@ public class QuickCheck
 		reader.nextToken();
 	}
 	
-	public Map<String, ValueList> readRanges(String filename)
+	public Map<String, ValueList> readRangeFile(String filename)
 	{
 		try
 		{
@@ -163,6 +163,7 @@ public class QuickCheck
 				checkFor(ltr, Token.SEMICOLON, "Expecting semi-colon after previous <set expression>");
 			}
 			
+			ltr.close();
 			TCMultipleBindList tcbinds = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astbinds);
 			TCExpressionList tcexps = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astexps);
 			Environment env = interpreter.getGlobalEnvironment();
@@ -231,15 +232,15 @@ public class QuickCheck
 		}
 		catch (LexException e)
 		{
-			errorln(e.toString());
+			println(e.toString());
 		}
 		catch (ParserException e)
 		{
-			errorln(e.toString());
+			println(e.toString());
 		}
 		catch (TypeCheckException e)
 		{
-			errorln("Error: " + e.getMessage() + " " + e.location);
+			println("Error: " + e.getMessage() + " " + e.location);
 		}
 		catch (InternalException e)
 		{
@@ -277,7 +278,7 @@ public class QuickCheck
 		return inexp.apply(new TypeBindFinder(), null);
 	}
 	
-	public void createRanges(String filename, ProofObligationList chosen)
+	public void createRangeFile(String filename, ProofObligationList chosen)
 	{
 		try
 		{
