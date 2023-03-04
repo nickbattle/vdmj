@@ -73,6 +73,7 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -298,7 +299,7 @@ public class QuickCheck
 						
 						if (type.isInfinite())
 						{
-							range = type.apply(rangeCreator, null);
+							range = type.apply(rangeCreator, new TCTypeSet());
 						}
 						else
 						{
@@ -308,7 +309,7 @@ public class QuickCheck
 								
 								if (size > FINITE_LIMIT)	// Avoid huge finite types
 								{
-									range = type.apply(rangeCreator, null);
+									range = type.apply(rangeCreator, new TCTypeSet());
 								}
 								else
 								{
@@ -317,7 +318,7 @@ public class QuickCheck
 							}
 							catch (Exception e)		// Probably ArithmeticException
 							{
-								range = type.apply(rangeCreator, null);
+								range = type.apply(rangeCreator, new TCTypeSet());
 							}
 						}
 						

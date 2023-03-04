@@ -50,86 +50,78 @@ import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
-public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
+public class DefaultRangeCreator extends TCTypeVisitor<String, TCTypeSet>
 {
-	/**
-	 * We have to collect the nodes that have already been visited since types can be recursive,
-	 * and the visitor will otherwise blow the stack. Note that this means you need a new visitor
-	 * instance for every use (or only re-use with care!). This is tested and modified in the
-	 * NamedType and RecordType entries.
-	 */
-	protected TCTypeSet done = new TCTypeSet();
-
 	private static final int NUMERIC_LIMIT = 10;	
 	
 	@Override
-	public String caseType(TCType node, Object arg)
+	public String caseType(TCType node, TCTypeSet done)
 	{
 		return "{ /* list of " + node.toString() + " */ }";
 	}
 	
 	@Override
-	public String caseBooleanType(TCBooleanType node, Object arg)
+	public String caseBooleanType(TCBooleanType node, TCTypeSet done)
 	{
 		return "{ true, false }";
 	}
 	
 	@Override
-	public String caseCharacterType(TCCharacterType node, Object arg)
+	public String caseCharacterType(TCCharacterType node, TCTypeSet done)
 	{
 		return "{ 'a', 'b', 'c' }";
 	}
 	
 	@Override
-	public String caseTokenType(TCTokenType node, Object arg)
+	public String caseTokenType(TCTokenType node, TCTypeSet done)
 	{
 		return "{ mk_token(1), mk_token(2), mk_token(3) }";
 	}
 	
 	@Override
-	public String caseOptionalType(TCOptionalType node, Object arg)
+	public String caseOptionalType(TCOptionalType node, TCTypeSet done)
 	{
-		return node.type.apply(this, arg) + " union { nil }";
+		return node.type.apply(this, done) + " union { nil }";
 	}
 	
 	@Override
-	public String caseBracketType(TCBracketType node, Object arg)
+	public String caseBracketType(TCBracketType node, TCTypeSet done)
 	{
-		return node.type.apply(this, arg);
+		return node.type.apply(this, done);
 	}
 
 	@Override
-	public String caseNumericType(TCNumericType node, Object arg)
+	public String caseNumericType(TCNumericType node, TCTypeSet done)
 	{
 		return String.format("{ 0, ..., %d }", NUMERIC_LIMIT);
 	}
 	
 	@Override
-	public String caseNaturalOneType(TCNaturalOneType node, Object arg)
+	public String caseNaturalOneType(TCNaturalOneType node, TCTypeSet done)
 	{
 		return String.format("{ 1, ..., %d }", NUMERIC_LIMIT);
 	}
 	
 	@Override
-	public String caseIntegerType(TCIntegerType node, Object arg)
+	public String caseIntegerType(TCIntegerType node, TCTypeSet done)
 	{
 		return String.format("{ -%d, ..., %d }", NUMERIC_LIMIT, NUMERIC_LIMIT);
 	}
 	
 	@Override
-	public String caseRealType(TCRealType node, Object arg)
+	public String caseRealType(TCRealType node, TCTypeSet done)
 	{
 		return String.format("{ a / b | a, b in set {-%d, ..., %d} & b <> 0 }", NUMERIC_LIMIT, NUMERIC_LIMIT);
 	}
 	
 	@Override
-	public String caseRationalType(TCRationalType node, Object arg)
+	public String caseRationalType(TCRationalType node, TCTypeSet done)
 	{
 		return String.format("{ a / b | a, b in set {-%d, ..., %d} & b <> 0 }", NUMERIC_LIMIT, NUMERIC_LIMIT);
 	}
 	
 	@Override
-	public String caseFunctionType(TCFunctionType node, Object arg)
+	public String caseFunctionType(TCFunctionType node, TCTypeSet done)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("\n");
@@ -139,14 +131,14 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 			sb.append("-- Param ");
 			sb.append(ptype);
 			sb.append(": ");
-			sb.append(ptype.apply(this, arg));
+			sb.append(ptype.apply(this, done));
 			sb.append("\n");			
 		}
 		
 		sb.append("-- Result ");
 		sb.append(node.result);
 		sb.append(": ");
-		sb.append(node.result.apply(this, arg));
+		sb.append(node.result.apply(this, done));
 		sb.append("\n");
 		sb.append("{ /* Set of functions of the above, lambdas or symbols */ }");
 		
@@ -154,7 +146,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 	}
 	
 	@Override
-	public String caseNamedType(TCNamedType node, Object arg)
+	public String caseNamedType(TCNamedType node, TCTypeSet done)
 	{
 		if (done.contains(node))
 		{
@@ -162,19 +154,21 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 		}
 		
 		done.add(node);
+		String rhs = node.type.apply(this, done);
+		done.remove(node);
 		
 		if (node.invdef != null)
 		{
-			return "{ x | x in set " + node.type.apply(this, arg) + " & inv_" + node.typename + "(x) }";
+			return "{ x | x in set " + rhs + " & inv_" + node.typename + "(x) }";
 		}
 		else
 		{
-			return node.type.apply(this, arg);
+			return rhs;
 		}
 	}
 	
 	@Override
-	public String caseRecordType(TCRecordType node, Object arg)
+	public String caseRecordType(TCRecordType node, TCTypeSet done)
 	{
 		if (done.contains(node))
 		{
@@ -204,7 +198,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 			sb.append(sep);
 			sb.append("f" + v++);
 			sb.append(" in set ");
-			sb.append(field.type.apply(this, arg));
+			sb.append(field.type.apply(this, done));
 			sep = ", ";
 		}
 		
@@ -214,55 +208,56 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 		}
 		
 		sb.append(" }");
+		done.remove(node);
 		
 		return sb.toString(); 
 	}
 	
 	@Override
-	public String caseSetType(TCSetType node, Object arg)
+	public String caseSetType(TCSetType node, TCTypeSet done)
 	{
-		return "power " + node.setof.apply(this, arg);
+		return "power " + node.setof.apply(this, done);
 	}
 	
 	@Override
-	public String caseSet1Type(TCSet1Type node, Object arg)
+	public String caseSet1Type(TCSet1Type node, TCTypeSet done)
 	{
-		return "power " + node.setof.apply(this, arg) + " \\ {}";
+		return "power " + node.setof.apply(this, done) + " \\ {}";
 	}
 	
 	@Override
-	public String caseSeqType(TCSeqType node, Object arg)
+	public String caseSeqType(TCSeqType node, TCTypeSet done)
 	{
 		if (node.seqof.isOrdered(node.location))
 		{
-			String type = node.seqof.apply(this, arg);
+			String type = node.seqof.apply(this, done);
 			return "{ [ e | e in set s ] | s in set power " + type + " }";	// includes []
 		}
 		else
 		{
-			return "{ [a, b, c] | a, b, c in set " + node.seqof.apply(this, arg) + " } union {[]}";
+			return "{ [a, b, c] | a, b, c in set " + node.seqof.apply(this, done) + " } union {[]}";
 		}
 	}
 	
 	@Override
-	public String caseSeq1Type(TCSeq1Type node, Object arg)
+	public String caseSeq1Type(TCSeq1Type node, TCTypeSet done)
 	{
 		if (node.seqof.isOrdered(node.location))
 		{
-			String type = node.seqof.apply(this, arg);
+			String type = node.seqof.apply(this, done);
 			return "{ [ e | e in set s ] | s in set power " + type + " } \\ {[]}";
 		}
 		else
 		{
-			return "{ [a, b, c] | a, b, c in set " + node.seqof.apply(this, arg) + " }";
+			return "{ [a, b, c] | a, b, c in set " + node.seqof.apply(this, done) + " }";
 		}
 	}
 	
 	@Override
-	public String caseMapType(TCMapType node, Object arg)
+	public String caseMapType(TCMapType node, TCTypeSet done)
 	{
-		String dom = node.from.apply(this, arg);
-		String rng = node.to.apply(this, arg);
+		String dom = node.from.apply(this, done);
+		String rng = node.to.apply(this, done);
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append("\n");
@@ -278,7 +273,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 	}
 	
 	@Override
-	public String caseProductType(TCProductType node, Object arg)
+	public String caseProductType(TCProductType node, TCTypeSet done)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("{ mk_(");
@@ -301,7 +296,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 			sb.append(sep);
 			sb.append("v" + v++);
 			sb.append(" in set ");
-			sb.append(type.apply(this, arg));
+			sb.append(type.apply(this, done));
 			sep = ", ";
 		}
 		
@@ -311,7 +306,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 	}
 	
 	@Override
-	public String caseUnionType(TCUnionType node, Object arg)
+	public String caseUnionType(TCUnionType node, TCTypeSet done)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("dunion { ");
@@ -320,7 +315,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 		for (TCType type: node.types)
 		{
 			sb.append(sep);
-			sb.append(type.apply(this, arg));
+			sb.append(type.apply(this, done));
 			sep = ", ";
 		}
 		
@@ -329,7 +324,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 	}
 	
 	@Override
-	public String caseQuoteType(TCQuoteType node, Object arg)
+	public String caseQuoteType(TCQuoteType node, TCTypeSet done)
 	{
 		return "{ <" + node.value + "> }"; 
 	}
