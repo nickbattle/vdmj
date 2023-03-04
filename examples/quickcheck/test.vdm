@@ -12,6 +12,3 @@ functions
 		then 1
 		else a * f(a-1)
 	measure a;
-	
-	getSet: T * T -> set of T
-	getSet(a, b) == {a, ..., b};

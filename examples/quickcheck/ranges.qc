@@ -2,4 +2,4 @@
 t : nat = {0, ..., 100};
 
 -- More complex generation, via a function
-a : T = getSet(0, MAX_T);
+a : T = qcGetTRange();
