@@ -122,11 +122,11 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 		{
 			if (createFile)
 			{
-				qc.createRanges(rangesFile, chosen);
+				qc.createRangeFile(rangesFile, chosen);
 			}
 			else
 			{
-				Map<String, ValueList> ranges = qc.readRanges(rangesFile);
+				Map<String, ValueList> ranges = qc.readRangeFile(rangesFile);
 				
 				if (ranges != null)
 				{
