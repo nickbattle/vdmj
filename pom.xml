@@ -304,6 +304,17 @@
                 </snapshotRepository>
             </distributionManagement>
         </profile>
+    
+        <profile>
+            <id>github</id>
+			<distributionManagement>
+				<repository>
+					<id>github</id>
+					<name>GitHub Packages</name>
+					<url>https://maven.pkg.github.com/nickbattle/vdmj</url>
+				</repository>
+			</distributionManagement>
+		</profile>
 
     </profiles>
 
