@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.tc.types.TCQuoteType;
 import com.fujitsu.vdmj.tc.types.TCRationalType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCSeqType;
 import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
@@ -235,7 +236,21 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Object>
 		if (node.seqof.isOrdered(node.location))
 		{
 			String type = node.seqof.apply(this, arg);
-			return "{ [ e | e in set s ] | s in set power " + type + " }";
+			return "{ [ e | e in set s ] | s in set power " + type + " }";	// includes []
+		}
+		else
+		{
+			return "{ [a, b, c] | a, b, c in set " + node.seqof.apply(this, arg) + " } union {[]}";
+		}
+	}
+	
+	@Override
+	public String caseSeq1Type(TCSeq1Type node, Object arg)
+	{
+		if (node.seqof.isOrdered(node.location))
+		{
+			String type = node.seqof.apply(this, arg);
+			return "{ [ e | e in set s ] | s in set power " + type + " } \\ {[]}";
 		}
 		else
 		{

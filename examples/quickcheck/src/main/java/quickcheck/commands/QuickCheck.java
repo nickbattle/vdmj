@@ -284,7 +284,6 @@ public class QuickCheck
 			File file = new File(filename);
 			PrintWriter writer = new PrintWriter(new FileWriter(file));
 			Set<String> done = new HashSet<String>();
-			DefaultRangeCreator rangeCreator = new DefaultRangeCreator();
 			RootContext ctxt = Interpreter.getInstance().getInitialContext();
 
 			for (ProofObligation po: chosen)
@@ -293,6 +292,7 @@ public class QuickCheck
 				{
 					if (!done.contains(mbind.toString()))
 					{
+						DefaultRangeCreator rangeCreator = new DefaultRangeCreator();	// stateful
 						TCType type = mbind.getType();
 						String range = null;
 						
