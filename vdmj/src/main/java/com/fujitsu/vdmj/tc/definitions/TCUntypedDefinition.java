@@ -40,6 +40,8 @@ import com.fujitsu.vdmj.typechecker.Pass;
 public class TCUntypedDefinition extends TCDefinition
 {
 	private static final long serialVersionUID = 1L;
+	
+	public boolean untypedReferenced = false;
 
 	public TCUntypedDefinition(LexLocation location, TCNameToken name)
 	{
@@ -50,6 +52,19 @@ public class TCUntypedDefinition extends TCDefinition
 	public TCType getType()
 	{
 		return new TCUnknownType(location);
+	}
+	
+	@Override
+	public TCDefinition findName(TCNameToken sought, NameScope scope)
+	{
+		TCDefinition found = super.findName(sought, scope);
+		
+		if (found != null)
+		{
+			untypedReferenced = true;
+		}
+		
+		return found;
 	}
 
 	@Override
