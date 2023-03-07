@@ -91,6 +91,7 @@ import quickcheck.visitors.TypeBindFinder;
 public class QuickCheck
 {
 	private static final long FINITE_LIMIT = 100;
+	private static final int NUMERIC_LIMIT = 10;
 	private int errorCount = 0;
 	
 	public boolean hasErrors()
@@ -305,7 +306,7 @@ public class QuickCheck
 				{
 					if (!done.contains(mbind.toString()))
 					{
-						DefaultRangeCreator rangeCreator = new DefaultRangeCreator();	// stateful
+						DefaultRangeCreator rangeCreator = new DefaultRangeCreator(NUMERIC_LIMIT);	// stateful
 						TCType type = mbind.getType();
 						String range = null;
 						
