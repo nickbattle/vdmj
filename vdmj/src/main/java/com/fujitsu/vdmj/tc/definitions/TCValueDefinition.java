@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.Pass;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * A class to hold a value definition.
@@ -52,6 +53,7 @@ public class TCValueDefinition extends TCDefinition
 	public TCType type;
 	public final TCTypeList unresolved;
 	public final TCExpression exp;
+	private final TCType originalType;
 
 	private TCDefinitionList defs = null;
 	protected TCType expType = null;
@@ -64,6 +66,7 @@ public class TCValueDefinition extends TCDefinition
 		this.annotations = annotations;
 		this.pattern = p;
 		this.type = type;
+		this.originalType = type;
 		this.unresolved = type != null ? type.unresolvedTypes() : new TCTypeList();
 		this.exp = exp;
 
@@ -222,14 +225,23 @@ public class TCValueDefinition extends TCDefinition
 		{
 			for (TCDefinition u: defs)
 			{
-				if (u.name.equals(d.name))
+				if (u.name.equals(d.name) && u.isUsed())
 				{
-					if (u.isUsed())
+					d.markUsed();
+				}
+				
+				if (u instanceof TCUntypedDefinition)
+				{
+					TCUntypedDefinition ud = (TCUntypedDefinition)u;
+					
+					// If this untyped definition has already been referenced (TCUntypedDefinition.findName),
+					// we suggest the explicit typing to allow a forward reference to get the right type.
+					// This can give better error reporting in some cases.
+					
+					if (ud.untypedReferenced && originalType == null && !type.isUnknown(location))
 					{
-						d.markUsed();
+						warning(5041, "Add explicit type '" + pattern + " : "+ Utils.deBracketed(type) + "' here");
 					}
-
-					break;
 				}
 			}
 
