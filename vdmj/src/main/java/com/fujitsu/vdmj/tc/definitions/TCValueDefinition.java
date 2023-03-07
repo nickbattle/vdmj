@@ -240,7 +240,7 @@ public class TCValueDefinition extends TCDefinition
 					
 					if (ud.untypedReferenced && originalType == null && !type.isUnknown(location))
 					{
-						warning(5041, "Add explicit type '" + Utils.deBracketed(type) + "' here");
+						warning(5041, "Add explicit type '" + pattern + " : "+ Utils.deBracketed(type) + "' here");
 					}
 				}
 			}
