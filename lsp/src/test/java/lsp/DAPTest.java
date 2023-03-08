@@ -60,12 +60,7 @@ abstract public class DAPTest
 	protected void setupWorkspace(Dialect dialect) throws IOException
 	{
 		Settings.dialect = dialect;
-		EventHub.reset();
-		PluginRegistry.reset();
-		LSPWorkspaceManager.reset();
-		LSPXWorkspaceManager.reset();
-		DAPWorkspaceManager.reset();
-		DAPXWorkspaceManager.reset();
+		LSPWorkspaceManager.reset();	// Clears other managers, registry and hubs too
 		lspManager = LSPWorkspaceManager.getInstance();
 		lspxManager = LSPXWorkspaceManager.getInstance();
 		dapManager = DAPWorkspaceManager.getInstance();
