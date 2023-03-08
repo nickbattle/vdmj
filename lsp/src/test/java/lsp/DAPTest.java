@@ -40,10 +40,8 @@ import rpc.RPCRequest;
 import workspace.DAPWorkspaceManager;
 import workspace.DAPXWorkspaceManager;
 import workspace.Diag;
-import workspace.EventHub;
 import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
-import workspace.PluginRegistry;
 
 abstract public class DAPTest
 {

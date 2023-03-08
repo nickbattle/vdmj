@@ -41,6 +41,7 @@ public class PluginRegistry
 	private PluginRegistry()
 	{
 		plugins = new LinkedHashMap<String, AnalysisPlugin>();
+		Diag.info("Created PluginRegistry");
 	}
 
 	public static synchronized PluginRegistry getInstance()

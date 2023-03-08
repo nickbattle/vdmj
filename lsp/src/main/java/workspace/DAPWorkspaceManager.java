@@ -128,6 +128,7 @@ public class DAPWorkspaceManager
 		this.registry = PluginRegistry.getInstance();
 		this.eventhub = EventHub.getInstance();
 		this.messagehub = MessageHub.getInstance();
+		Diag.info("Created DAPWorkspaceManager");
 	}
 
 	public static synchronized DAPWorkspaceManager getInstance()
