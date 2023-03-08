@@ -52,7 +52,12 @@ import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 
 public class DefaultRangeCreator extends TCTypeVisitor<String, TCTypeSet>
 {
-	private static final int NUMERIC_LIMIT = 10;	
+	private final int NUMERIC_LIMIT;
+	
+	public DefaultRangeCreator(int numeric_limit)
+	{
+		NUMERIC_LIMIT = numeric_limit;
+	}
 	
 	@Override
 	public String caseType(TCType node, TCTypeSet done)
