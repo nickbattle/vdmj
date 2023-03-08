@@ -170,6 +170,8 @@ public class LSPWorkspaceManager
 		Diag.config("Resetting WorkspaceManagers, PluginRegistry, EventHub and MessageHub");
 		
 		LSPXWorkspaceManager.reset();
+		DAPWorkspaceManager.reset();
+		DAPXWorkspaceManager.reset();
 		PluginRegistry.reset();
 		EventHub.reset();
 		MessageHub.reset();

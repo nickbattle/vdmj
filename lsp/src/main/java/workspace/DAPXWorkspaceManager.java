@@ -36,6 +36,7 @@ public class DAPXWorkspaceManager
 	protected DAPXWorkspaceManager()
 	{
 		this.eventhub = EventHub.getInstance();
+		Diag.info("Created DAPXWorkspaceManager");
 	}
 
 	public static synchronized DAPXWorkspaceManager getInstance()
@@ -43,7 +44,6 @@ public class DAPXWorkspaceManager
 		if (INSTANCE == null)
 		{
 			INSTANCE = new DAPXWorkspaceManager();		
-			Diag.info("Created DAPXWorkspaceManager");
 		}
 
 		return INSTANCE;

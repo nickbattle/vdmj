@@ -40,10 +40,8 @@ import rpc.RPCRequest;
 import workspace.DAPWorkspaceManager;
 import workspace.DAPXWorkspaceManager;
 import workspace.Diag;
-import workspace.EventHub;
 import workspace.LSPWorkspaceManager;
 import workspace.LSPXWorkspaceManager;
-import workspace.PluginRegistry;
 
 abstract public class DAPTest
 {
@@ -60,12 +58,7 @@ abstract public class DAPTest
 	protected void setupWorkspace(Dialect dialect) throws IOException
 	{
 		Settings.dialect = dialect;
-		EventHub.reset();
-		PluginRegistry.reset();
-		LSPWorkspaceManager.reset();
-		LSPXWorkspaceManager.reset();
-		DAPWorkspaceManager.reset();
-		DAPXWorkspaceManager.reset();
+		LSPWorkspaceManager.reset();	// Clears other managers, registry and hubs too
 		lspManager = LSPWorkspaceManager.getInstance();
 		lspxManager = LSPXWorkspaceManager.getInstance();
 		dapManager = DAPWorkspaceManager.getInstance();
