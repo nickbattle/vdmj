@@ -993,3 +993,4 @@ as the expected and actual values.
 5039, "Cannot evaluate type bind of size <n>"
 5040, "Cannot evaluate type bind, size exceeds long"
 5041, "Add explicit type <pattern : type> here");
+5042, "Missing type import for <name>";
