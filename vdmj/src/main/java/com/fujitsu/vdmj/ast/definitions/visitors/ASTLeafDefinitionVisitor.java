@@ -40,7 +40,6 @@ import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImportedDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTInheritedDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTInstanceVariableDefinition;
-import com.fujitsu.vdmj.ast.definitions.ASTLocalDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTMultiBindListDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTMutexSyncDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTNamedTraceDefinition;
@@ -261,12 +260,6 @@ abstract public class ASTLeafDefinitionVisitor<E, C extends Collection<E>, S> ex
 		C all = visitorSet.applyTypeVisitor(node.type, arg);	
 		all.addAll(visitorSet.applyExpressionVisitor(node.expression, arg));
 		return all;
-	}
-
- 	@Override
-	public C caseLocalDefinition(ASTLocalDefinition node, S arg)
-	{
-		return visitorSet.applyTypeVisitor(node.type, arg);
 	}
 
  	@Override

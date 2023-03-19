@@ -1246,7 +1246,7 @@ public class ExpressionReader extends SyntaxReader
 		if (token.is(Token.MAPLET))
 		{
 			nextToken();
-			ASTMapletExpression maplet = new ASTMapletExpression(first, token, readExpression());
+			ASTMapletExpression maplet = new ASTMapletExpression(first, token.location, readExpression());
 			return readMapExpression(start, maplet);
 		}
 		else
@@ -1344,7 +1344,7 @@ public class ExpressionReader extends SyntaxReader
 				if (token.is(Token.MAPLET))
 				{
 					nextToken();
-					ASTMapletExpression maplet = new ASTMapletExpression(member, token, readExpression());
+					ASTMapletExpression maplet = new ASTMapletExpression(member, token.location, readExpression());
 					members.add(maplet);
 				}
 				else

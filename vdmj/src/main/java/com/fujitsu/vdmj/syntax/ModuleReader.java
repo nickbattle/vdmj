@@ -168,6 +168,11 @@ public class ModuleReader extends SyntaxReader
 			checkFor(Token.MODULE, 2170, "Expecting 'module' at module start");
 			name = readIdToken("Expecting identifier after 'module'");
 			setCurrentModule(name.name);
+			
+			if (Settings.strict && name.name.equals("DEFAULT"))
+			{
+				warning(5043, "Strict: Should not use 'DEFAULT' as a module name", name.location);
+			}
 
 			if (lastToken().is(Token.IMPORTS))
 			{
