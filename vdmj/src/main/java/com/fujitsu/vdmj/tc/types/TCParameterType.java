@@ -80,6 +80,18 @@ public class TCParameterType extends TCType
 	{
 		return "@" + name;
 	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if (other instanceof TCParameterType)
+		{
+			TCParameterType oparam = (TCParameterType)other;
+			return oparam.name.equals(name);
+		}
+		
+		return false;
+	}
 
 	@Override
 	public <R, S> R apply(TCTypeVisitor<R, S> visitor, S arg)
