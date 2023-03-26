@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
 import com.fujitsu.vdmj.pog.StrictOrderObligation;
+import com.fujitsu.vdmj.pog.TotalOrderObligation;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -122,6 +123,11 @@ public class POTypeDefinition extends PODefinition
 		{
 			list.addAll(orddef.getProofObligations(ctxt, env));
 			list.add(new StrictOrderObligation(this, ctxt));
+		}
+		
+		if (eqdef != null || orddef != null)
+		{
+			list.add(new TotalOrderObligation(this, ctxt));
 		}
 
 		if (annotations != null) annotations.poAfter(this, list, ctxt);

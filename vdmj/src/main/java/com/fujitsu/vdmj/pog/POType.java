@@ -61,6 +61,7 @@ public enum POType
 	SEQ_MEMBER("sequence membership"),
 	ORDERED("ordered"),
 	STRICT_ORDER("strict order"),
+	TOTAL_ORDER("total order"),
 	EQUIV_RELATION("equivalence relation"),
 	TOTAL("total function"),
 	INV_SATISFIABILITY("invariant satisfiability"),
