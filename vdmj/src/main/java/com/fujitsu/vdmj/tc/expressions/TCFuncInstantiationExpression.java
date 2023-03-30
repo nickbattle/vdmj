@@ -31,10 +31,10 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCInstantiate;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
@@ -110,7 +110,7 @@ public class TCFuncInstantiationExpression extends TCExpression
 
     			for (TCDefinition def: t.definitions)		// Possibly a union of several
     			{
-    				TCNameList typeParams = null;
+    				TCTypeList typeParams = null;
     				def = def.deref();
 
     				if (def instanceof TCExplicitFunctionDefinition)
@@ -149,11 +149,11 @@ public class TCFuncInstantiationExpression extends TCExpression
     				for (int i=0; i < actualTypes.size(); i++)
     				{
     					TCType ptype = actualTypes.get(i);
-    					TCNameToken name = typeParams.get(i);
-    					
     					ptype = ptype.typeResolve(env);
     					fixed.add(ptype);
-    					map.put(name, ptype);
+
+    					TCParameterType param = (TCParameterType) typeParams.get(i);
+    					map.put(param.name, ptype);
     					TypeComparator.checkComposeTypes(ptype, env, false);
     				}
 

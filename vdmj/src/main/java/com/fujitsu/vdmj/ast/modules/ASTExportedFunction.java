@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.ast.modules;
 
 import com.fujitsu.vdmj.ast.lex.LexNameList;
 import com.fujitsu.vdmj.ast.types.ASTType;
+import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -34,9 +35,9 @@ public class ASTExportedFunction extends ASTExport
 	private static final long serialVersionUID = 1L;
 	public final LexNameList nameList;
 	public final ASTType type;
-	public final LexNameList typeParams;
+	public final ASTTypeList typeParams;
 
-	public ASTExportedFunction(LexLocation location, LexNameList nameList, ASTType type, LexNameList typeParams)
+	public ASTExportedFunction(LexLocation location, LexNameList nameList, ASTType type, ASTTypeList typeParams)
 	{
 		super(location);
 		this.nameList = nameList;

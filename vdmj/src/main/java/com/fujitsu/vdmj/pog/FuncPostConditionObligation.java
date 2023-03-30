@@ -31,7 +31,7 @@ import com.fujitsu.vdmj.po.expressions.PONotYetSpecifiedExpression;
 import com.fujitsu.vdmj.po.expressions.POSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 public class FuncPostConditionObligation extends ProofObligation
 {
@@ -120,7 +120,7 @@ public class FuncPostConditionObligation extends ProofObligation
 			sb.append("[");
 			String sep = "";
 			
-			for (@SuppressWarnings("unused") TCNameToken p: def.typeParams)
+			for (@SuppressWarnings("unused") TCType p: def.typeParams)
 			{
 				sb.append(sep);
 				sb.append("?");

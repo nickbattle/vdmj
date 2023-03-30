@@ -104,9 +104,9 @@ public class SubTypeObligation extends ProofObligation
 			{
 				TCTypeList actuals = new TCTypeList();
 				
-				for (TCNameToken p: func.typeParams)
+				for (TCType p: func.typeParams)
 				{
-					actuals.add(new TCUnknownType(p.getLocation()));	// "?"
+					actuals.add(new TCUnknownType(p.location));	// "?"
 				}
 				
 				root = new POFuncInstantiationExpression(root, actuals, func.type, func, null);

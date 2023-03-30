@@ -34,12 +34,11 @@ import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
+import com.fujitsu.vdmj.in.types.INInstantiate;
 import com.fujitsu.vdmj.in.types.INPatternListTypePair;
 import com.fujitsu.vdmj.in.types.INPatternListTypePairList;
 import com.fujitsu.vdmj.in.types.INPatternTypePair;
-import com.fujitsu.vdmj.in.types.INInstantiate;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -55,7 +54,7 @@ import com.fujitsu.vdmj.values.NameValuePairList;
 public class INImplicitFunctionDefinition extends INDefinition
 {
 	private static final long serialVersionUID = 1L;
-	public final TCNameList typeParams;
+	public final TCTypeList typeParams;
 	public final INPatternListTypePairList parameterPatterns;
 	public final INPatternTypePair result;
 	public final INExpression body;
@@ -72,7 +71,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 
 	public INImplicitFunctionDefinition(INAnnotationList annotations,
 		INAccessSpecifier accessSpecifier, TCNameToken name,
-		TCNameList typeParams,
+		TCTypeList typeParams,
 		INPatternListTypePairList parameterPatterns,
 		INPatternTypePair result,
 		INExpression body,

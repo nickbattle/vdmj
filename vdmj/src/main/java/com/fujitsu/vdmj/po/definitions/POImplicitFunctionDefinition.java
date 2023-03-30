@@ -48,6 +48,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
@@ -59,7 +60,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 {
 	private static final long serialVersionUID = 1L;
 	
-	public final TCNameList typeParams;
+	public final TCTypeList typeParams;
 	public final POPatternListTypePairList parameterPatterns;
 	public final POPatternTypePair result;
 	public final POExpression body;
@@ -76,7 +77,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 
 	public POImplicitFunctionDefinition(POAnnotationList annotations,
 		TCNameToken name,
-		TCNameList typeParams,
+		TCTypeList typeParams,
 		POPatternListTypePairList parameterPatterns,
 		POPatternTypePair result,
 		POExpression body,

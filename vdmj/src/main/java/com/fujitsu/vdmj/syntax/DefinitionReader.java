@@ -98,6 +98,7 @@ import com.fujitsu.vdmj.ast.types.ASTFunctionType;
 import com.fujitsu.vdmj.ast.types.ASTInvariantType;
 import com.fujitsu.vdmj.ast.types.ASTNamedType;
 import com.fujitsu.vdmj.ast.types.ASTOperationType;
+import com.fujitsu.vdmj.ast.types.ASTParameterType;
 import com.fujitsu.vdmj.ast.types.ASTPatternListTypePair;
 import com.fujitsu.vdmj.ast.types.ASTPatternListTypePairList;
 import com.fujitsu.vdmj.ast.types.ASTPatternTypePair;
@@ -781,23 +782,23 @@ public class DefinitionReader extends SyntaxReader
 		return list;
 	}
 
-	public LexNameList readTypeParams() throws LexException, ParserException
+	public ASTTypeList readTypeParams() throws LexException, ParserException
 	{
-		LexNameList typeParams = null;
+		ASTTypeList typeParams = null;
 
 		if (lastToken().is(Token.SEQ_OPEN))
 		{
-			typeParams = new LexNameList();
+			typeParams = new ASTTypeList();
 			nextToken();
 			checkFor(Token.AT, 2088, "Expecting '@' before type parameter");
 			LexIdentifierToken tid = readIdToken("Expecting '@identifier' in type parameter list");
-			typeParams.add(idToName(tid));
+			typeParams.add(new ASTParameterType(idToName(tid)));
 
 			while (ignore(Token.COMMA))
 			{
 				checkFor(Token.AT, 2089, "Expecting '@' before type parameter");
 				tid = readIdToken("Expecting '@identifier' in type parameter list");
-				typeParams.add(idToName(tid));
+				typeParams.add(new ASTParameterType(idToName(tid)));
 			}
 
 			checkFor(Token.SEQ_CLOSE, 2090, "Expecting ']' after type parameters");
@@ -828,7 +829,7 @@ public class DefinitionReader extends SyntaxReader
 		LexIdentifierToken funcName = readIdToken("Expecting new function identifier");
 		verifyName(funcName.name);
 
-		LexNameList typeParams = readTypeParams();
+		ASTTypeList typeParams = readTypeParams();
 
 		if (lastToken().is(Token.COLON))
 		{
@@ -847,7 +848,7 @@ public class DefinitionReader extends SyntaxReader
 		return def;
 	}
 
-	private ASTDefinition readExplicitFunctionDefinition(LexIdentifierToken funcName, LexNameList typeParams)
+	private ASTDefinition readExplicitFunctionDefinition(LexIdentifierToken funcName, ASTTypeList typeParams)
 		throws ParserException, LexException
 	{
 		// Explicit function definition, like "f: int->bool f(x) == true"
@@ -934,7 +935,7 @@ public class DefinitionReader extends SyntaxReader
 			measure);
 	}
 
-	private ASTDefinition readImplicitFunctionDefinition(LexIdentifierToken funcName, LexNameList typeParams)
+	private ASTDefinition readImplicitFunctionDefinition(LexIdentifierToken funcName, ASTTypeList typeParams)
 		throws ParserException, LexException
 	{
 		// Implicit, like g(x: int) y: bool pre exp post exp
