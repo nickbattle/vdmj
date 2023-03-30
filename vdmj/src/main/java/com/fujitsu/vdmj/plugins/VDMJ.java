@@ -104,7 +104,7 @@ public class VDMJ implements VDMJMain
 			
 			if (checkAndInitFiles())
 			{
-				result = run();
+				result = startConsole();
 			}
 			else
 			{
@@ -493,7 +493,7 @@ public class VDMJ implements VDMJMain
 		return false;
 	}
 	
-	private static int count(List<VDMMessage> messages, Class<? extends VDMMessage>type)
+	private static int display(List<VDMMessage> messages, Class<? extends VDMMessage>type)
 	{
 		int count = 0;
 
@@ -511,8 +511,8 @@ public class VDMJ implements VDMJMain
 	
 	private static boolean report(List<VDMMessage> messages, AbstractCheckFilesEvent event)
 	{
-		int nerrs  = count(messages, VDMError.class);
-		int nwarns = count(messages, VDMWarning.class);
+		int nerrs  = display(messages, VDMError.class);
+		int nwarns = display(messages, VDMWarning.class);
 		
 		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
 		int count = ast.getCount();
@@ -538,7 +538,7 @@ public class VDMJ implements VDMJMain
 		return (nerrs == 0);	// Return "OK" if we can continue (ie. no errors)
 	}
 	
-	private static ExitStatus run()
+	private static ExitStatus startConsole()
 	{
 		try
 		{
