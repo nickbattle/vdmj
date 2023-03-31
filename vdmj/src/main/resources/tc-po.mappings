@@ -322,6 +322,7 @@ unmapped com.fujitsu.vdmj.tc.types.TCFunctionType;
 unmapped com.fujitsu.vdmj.tc.types.TCInMapType;
 unmapped com.fujitsu.vdmj.tc.types.TCInvariantType;
 unmapped com.fujitsu.vdmj.tc.types.TCMapType;
+unmapped com.fujitsu.vdmj.tc.types.TCMaximalType;
 unmapped com.fujitsu.vdmj.tc.types.TCNamedType;
 unmapped com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 unmapped com.fujitsu.vdmj.tc.types.TCNaturalType;

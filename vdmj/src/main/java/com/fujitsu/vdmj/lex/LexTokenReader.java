@@ -940,6 +940,9 @@ public class LexTokenReader extends BacktrackInputReader
 			case ',':
 				type = Token.COMMA;
 				break;
+			case '!':
+				type = Token.PLING;
+				break;
 			case ';':
 				type = Token.SEMICOLON;
 				break;

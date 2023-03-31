@@ -419,14 +419,13 @@ public class TypeReader extends SyntaxReader
 				break;
 
 			case IDENTIFIER:
-				LexIdentifierToken id = (LexIdentifierToken)token;
-				type = new ASTUnresolvedType(idToName(id));
 				nextToken();
+				type = new ASTUnresolvedType(idToName((LexIdentifierToken)token), ignore(Token.PLING));
 				break;
 
 			case NAME:
-				type = new ASTUnresolvedType((LexNameToken)token);
 				nextToken();
+				type = new ASTUnresolvedType((LexNameToken)token, ignore(Token.PLING));
 				break;
 
 			case AT:

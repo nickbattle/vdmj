@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCBracketType;
+import com.fujitsu.vdmj.tc.types.TCMaximalType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
@@ -262,6 +263,11 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 			TCNamedType ntype = (TCNamedType)to;
 			Value converted = convertValueTo(ntype.type, ctxt, done);
 			return new InvariantValue(ntype, converted, ctxt);
+		}
+		else if (to instanceof TCMaximalType)
+		{
+			TCMaximalType mtype = (TCMaximalType)to;
+			return convertValueTo(mtype.type, ctxt, done);
 		}
 		else if (to instanceof TCUnknownType)
 		{

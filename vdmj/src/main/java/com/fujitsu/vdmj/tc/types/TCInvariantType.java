@@ -40,6 +40,7 @@ public abstract class TCInvariantType extends TCType
 
 	public boolean opaque = false;
 	protected boolean inNarrower = false;
+	public boolean maximal = false;
 
 	public TCInvariantType(LexLocation location)
 	{
@@ -48,6 +49,11 @@ public abstract class TCInvariantType extends TCType
 
 	@Override
 	abstract protected String toDisplay();
+	
+	public void setMaximal(boolean maximal)
+	{
+		this.maximal = maximal;
+	}
 
 	public void setOpaque(boolean opaque)
 	{

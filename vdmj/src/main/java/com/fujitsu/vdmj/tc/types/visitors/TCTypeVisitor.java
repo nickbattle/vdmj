@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.tc.types.TCInMapType;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCMapType;
+import com.fujitsu.vdmj.tc.types.TCMaximalType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
@@ -229,6 +230,11 @@ public abstract class TCTypeVisitor<R, S>
 	}
 
 	public R caseVoidType(TCVoidType node, S arg)
+	{
+		return caseType(node, arg);
+	}
+
+	public R caseMaximalType(TCMaximalType node, S arg)
 	{
 		return caseType(node, arg);
 	}
