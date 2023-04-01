@@ -65,7 +65,7 @@ public class PogTest extends TestCase
 
 	private String[] expected =
 	{
-		"(forall a:seq of (nat1) &\n  is_(inv_T2(a), bool))\n",
+		"(forall a:T2! &\n  is_(inv_T2(a), bool))\n",
 		"exists a : seq of (nat1) & (a <> [])\n",
 		"forall m1, m2 in set {{1 |-> 2}, {2 |-> 3}} & forall d3 in set dom m1, d4 in set dom m2 & d3 = d4 => m1(d3) = m2(d4)\n",
 		"After instance variable initializers (iv < 10)\n",

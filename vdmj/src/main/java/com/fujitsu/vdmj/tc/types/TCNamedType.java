@@ -298,7 +298,13 @@ public class TCNamedType extends TCInvariantType
 		if (other instanceof TCNamedType)
 		{
 			TCNamedType nother = (TCNamedType)other;
-			return typename.equals(nother.typename);
+			return typename.equals(nother.typename) &&
+				(
+					maximal || nother.maximal ||
+					(invdef != null) == (nother.invdef != null) &&
+					(eqdef != null) == (nother.eqdef != null) &&
+					(orddef != null) == (nother.orddef != null)
+				);
 		}
 
 		return false;

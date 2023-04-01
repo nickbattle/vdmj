@@ -308,13 +308,13 @@ public class TypeComparator
     		
     		if (to instanceof TCMaximalType)
     		{
-    			to = ((TCMaximalType)to).type;
+    			to = ((TCMaximalType)to).maxtype;
     			continue;
     		}
 
     		if (from instanceof TCMaximalType)
     		{
-    			from = ((TCMaximalType)from).type;
+    			from = ((TCMaximalType)from).maxtype;
     			continue;
     		}
     		
@@ -746,13 +746,13 @@ public class TypeComparator
 
     		if (sub instanceof TCMaximalType)
     		{
-    			sub = ((TCMaximalType)sub).type;
+    			sub = ((TCMaximalType)sub).maxtype;
     			continue;
     		}
 
     		if (sup instanceof TCMaximalType)
     		{
-    			sup = ((TCMaximalType)sup).type;
+    			sup = ((TCMaximalType)sup).maxtype;
     			continue;
     		}
 

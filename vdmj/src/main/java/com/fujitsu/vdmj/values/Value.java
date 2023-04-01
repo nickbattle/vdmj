@@ -267,7 +267,7 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 		else if (to instanceof TCMaximalType)
 		{
 			TCMaximalType mtype = (TCMaximalType)to;
-			return convertValueTo(mtype.type, ctxt, done);
+			return convertValueTo(mtype.maxtype, ctxt, done);
 		}
 		else if (to instanceof TCUnknownType)
 		{

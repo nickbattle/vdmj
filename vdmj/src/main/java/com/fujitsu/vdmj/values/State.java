@@ -58,6 +58,7 @@ public class State implements ValueListener, Serializable
 		}
 
 		TCRecordType rt = (TCRecordType)definition.getType();
+		rt.setMaximal(true);	// Makes record equality equals() work
 		this.recordValue = UpdatableValue.factory(new RecordValue(rt, fieldvalues),
 			new ValueListenerList(this));
 

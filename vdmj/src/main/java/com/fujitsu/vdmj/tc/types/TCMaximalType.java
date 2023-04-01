@@ -33,51 +33,53 @@ import com.fujitsu.vdmj.typechecker.TypeCheckException;
 public class TCMaximalType extends TCType
 {
 	private static final long serialVersionUID = 1L;
-	public TCType type;
+	public TCInvariantType maxtype;
 	
-	public TCMaximalType(TCInvariantType r)
+	public TCMaximalType(TCInvariantType base)
 	{
-		super(r.location);
+		super(base.location);
 		
-		if (r instanceof TCNamedType)
+		if (base instanceof TCNamedType)
 		{
-			TCNamedType nt = (TCNamedType)r;
-			type = new TCNamedType(nt.typename, nt.type);
+			TCNamedType nt = (TCNamedType)base;
+			maxtype = new TCNamedType(nt.typename, nt.type);
 		}
-		else if (r instanceof TCRecordType)
+		else if (base instanceof TCRecordType)
 		{
-			TCRecordType rt = (TCRecordType)r;
-			type = new TCRecordType(rt.name, rt.fields, rt.composed);
+			TCRecordType rt = (TCRecordType)base;
+			maxtype = new TCRecordType(rt.name, rt.fields, rt.composed);
 		}
+
+		maxtype.setMaximal(true);
 	}
 	
 	@Override
 	protected String toDisplay()
 	{
-		return type.toDisplay() + "!";
+		return maxtype.toDisplay() + "!";
 	}
 
 	@Override
 	public boolean isType(Class<? extends TCType> typeclass, LexLocation from)
 	{
-		return type.isType(typeclass, location);
+		return maxtype.isType(typeclass, location);
 	}
 
 	@Override
 	public void unResolve()
 	{
 		if (!resolved) return; else { resolved = false; }
-		type.unResolve();
+		maxtype.unResolve();
 	}
 
 	@Override
 	public TCType typeResolve(Environment env)
 	{
-		if (resolved) return type; else { resolved = true; }
+		if (resolved) return maxtype; else { resolved = true; }
 
 		try
 		{
-			type = type.typeResolve(env);
+			maxtype = (TCInvariantType) maxtype.typeResolve(env);
 			return this;
 		}
 		catch (TypeCheckException e)
@@ -90,151 +92,182 @@ public class TCMaximalType extends TCType
 	@Override
 	public boolean narrowerThan(TCAccessSpecifier accessSpecifier)
 	{
-		return type.narrowerThan(accessSpecifier);
+		return maxtype.narrowerThan(accessSpecifier);
 	}
 
 	@Override
 	public boolean isUnion(LexLocation from)
 	{
-		return type.isUnion(location);
+		return maxtype.isUnion(location);
 	}
 
 	@Override
 	public boolean isSeq(LexLocation from)
 	{
-		return type.isSeq(location);
+		return maxtype.isSeq(location);
 	}
 
 	@Override
 	public boolean isSet(LexLocation from)
 	{
-		return type.isSet(location);
+		return maxtype.isSet(location);
 	}
 
 	@Override
 	public boolean isMap(LexLocation from)
 	{
-		return type.isMap(location);
+		return maxtype.isMap(location);
 	}
 
 	@Override
 	public boolean isRecord(LexLocation from)
 	{
-		return type.isRecord(from);
+		return maxtype.isRecord(from);
 	}
 
 	@Override
 	public boolean isTag()
 	{
-		return type.isTag();
+		return maxtype.isTag();
 	}
 
 	@Override
 	public boolean isNumeric(LexLocation from)
 	{
-		return type.isNumeric(location);
+		return maxtype.isNumeric(location);
 	}
 
 	@Override
 	public boolean isProduct(LexLocation from)
 	{
-		return type.isProduct(location);
+		return maxtype.isProduct(location);
 	}
 
 	@Override
 	public boolean isProduct(int n, LexLocation from)
 	{
-		return type.isProduct(n, location);
+		return maxtype.isProduct(n, location);
 	}
 
 	@Override
 	public boolean isFunction(LexLocation from)
 	{
-		return type.isFunction(location);
+		return maxtype.isFunction(location);
 	}
 
 	@Override
 	public boolean isOperation(LexLocation from)
 	{
-		return type.isOperation(location);
+		return maxtype.isOperation(location);
 	}
 
 	@Override
 	public TCUnionType getUnion()
 	{
-		return type.getUnion();
+		return maxtype.getUnion();
 	}
 
 	@Override
 	public TCSeqType getSeq()
 	{
-		return type.getSeq();
+		return maxtype.getSeq();
 	}
 
 	@Override
 	public TCSetType getSet()
 	{
-		return type.getSet();
+		return maxtype.getSet();
 	}
 
 	@Override
 	public TCMapType getMap()
 	{
-		return type.getMap();
+		return maxtype.getMap();
 	}
 
 	@Override
 	public TCRecordType getRecord()
 	{
-		return type.getRecord();
+		return maxtype.getRecord();
 	}
 
 	@Override
 	public TCNumericType getNumeric()
 	{
-		return type.getNumeric();
+		return maxtype.getNumeric();
 	}
 
 	@Override
 	public TCProductType getProduct()
 	{
-		return type.getProduct();
+		return maxtype.getProduct();
 	}
 
 	@Override
 	public TCProductType getProduct(int n)
 	{
-		return type.getProduct(n);
+		return maxtype.getProduct(n);
 	}
 
 	@Override
 	public TCFunctionType getFunction()
 	{
-		return type.getFunction();
+		return maxtype.getFunction();
 	}
 
 	@Override
 	public TCOperationType getOperation()
 	{
-		return type.getOperation();
+		return maxtype.getOperation();
 	}
 
 	@Override
 	public boolean equals(Object other)
 	{
-		return type.equals(other);
+		if (maxtype instanceof TCNamedType && other instanceof TCNamedType)
+		{
+			TCNamedType nt = (TCNamedType)maxtype;
+			TCNamedType ot = (TCNamedType)other;
+			
+			return nt.type.equals(ot.type) &&
+				(
+					ot.maximal ||
+
+					(nt.invdef != null) == (ot.invdef != null) &&
+					(nt.eqdef != null) == (ot.eqdef != null) &&
+					(nt.orddef != null) == (ot.orddef != null)
+				);
+		}
+		else if (maxtype instanceof TCRecordType && other instanceof TCNamedType)
+		{
+			TCRecordType rt = (TCRecordType)maxtype;
+			TCRecordType ot = (TCRecordType)other;
+			
+			return rt.name.equals(ot.name) &&
+				(
+					ot.maximal ||
+
+					(rt.invdef != null) == (ot.invdef != null) &&
+					(rt.eqdef != null) == (ot.eqdef != null) &&
+					(rt.orddef != null) == (ot.orddef != null)
+				);
+		}
+		else
+		{
+			return maxtype.equals(other);
+		}
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return type.hashCode();
+		return maxtype.hashCode();
 	}
 	
 	@Override
 	public TCTypeList getComposeTypes()
 	{
-		return type.getComposeTypes();
+		return maxtype.getComposeTypes();
 	}
 
 	@Override
