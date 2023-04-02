@@ -478,20 +478,11 @@ public class TCTypeDefinition extends TCDefinition
 		TCPatternListList parameters = new TCPatternListList();
 		parameters.add(params);
 
+		// Functions are xxx_T: T! * T! +> bool, for T = ... or T :: ...
 		TCTypeList ptypes = new TCTypeList();
-		if (type instanceof TCRecordType)
-		{
-			// Records are xxx_R: R * R +> bool
-			ptypes.add(new TCUnresolvedType(name));
-			ptypes.add(new TCUnresolvedType(name));
-		}
-		else
-		{
-			// Named types are xxx_T: X * X +> bool, for T = X
-			TCNamedType nt = (TCNamedType)type;
-			ptypes.add(nt.type);
-			ptypes.add(nt.type);
-		}
+		TCInvariantType max = type.copy(true);
+		ptypes.add(max);
+		ptypes.add(max);
 
 		TCFunctionType ftype =
 			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));

@@ -104,7 +104,7 @@ public class InvariantValue extends ReferenceValue
 	{
 		if (to.equals(type))
 		{
-			if (type.isMaximal())
+			if (type.isMaximal() != to.isMaximal())
 			{
 				return value.convertValueTo(to, ctxt, done);
 			}
@@ -167,7 +167,7 @@ public class InvariantValue extends ReferenceValue
 	@Override
 	public int compareTo(Value other)
 	{
-		if (ordering != null &&
+		if (ordering != null && !type.isMaximal() &&
 			other instanceof InvariantValue &&
 			((InvariantValue)other).type.equals(type))
 		{
@@ -221,7 +221,7 @@ public class InvariantValue extends ReferenceValue
 	{
 		if (other instanceof Value)
 		{
-    		if (equality != null)
+    		if (equality != null && !type.isMaximal())
     		{
     			if (other instanceof NilValue && !(type.type instanceof TCOptionalType))
     			{
