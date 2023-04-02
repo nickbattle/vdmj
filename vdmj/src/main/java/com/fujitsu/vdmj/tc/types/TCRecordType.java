@@ -156,13 +156,7 @@ public class TCRecordType extends TCInvariantType
 		if (other instanceof TCRecordType)
 		{
 			TCRecordType rother = (TCRecordType)other;
-			return name.equals(rother.name) &&
-				(
-					maximal || rother.maximal ||
-					(invdef != null) == (rother.invdef != null) &&
-					(eqdef != null) == (rother.eqdef != null) &&
-					(orddef != null) == (rother.orddef != null)
-				);
+			return name.equals(rother.name);
 		}
 
 		return false;

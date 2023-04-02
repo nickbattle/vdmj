@@ -104,7 +104,14 @@ public class InvariantValue extends ReferenceValue
 	{
 		if (to.equals(type))
 		{
-			return this;
+			if (type.maximal)
+			{
+				return value.convertValueTo(to, ctxt, done);
+			}
+			else
+			{
+				return this;
+			}
 		}
 		else
 		{

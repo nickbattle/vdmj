@@ -409,7 +409,14 @@ public class RecordValue extends Value
 	{
 		if (to.equals(type))
 		{
-			return this;
+			if (type.maximal)
+			{
+				return super.convertValueTo(to, ctxt, done);
+			}
+			else
+			{
+				return this;
+			}
 		}
 		else
 		{
