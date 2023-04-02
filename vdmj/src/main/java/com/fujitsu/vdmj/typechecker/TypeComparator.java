@@ -812,7 +812,7 @@ public class TypeComparator
 				if (sup instanceof TCNamedType)
 				{
 					// both have an invariant and we're not ignoring them, so check for equality
-					return sub.equals(sup) && sub.isMaximal() == sup.isMaximal() ? Result.Yes : Result.No;
+					return sub.equals(sup) && !sub.isMaximal() ? Result.Yes : Result.No;
 				}
 				else
 				{
