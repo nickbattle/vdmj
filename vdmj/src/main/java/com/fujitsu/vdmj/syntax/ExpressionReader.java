@@ -620,7 +620,7 @@ public class ExpressionReader extends SyntaxReader
 		}
 		
 		boolean more = true;
-		boolean maximal = false;
+		LexToken maximal = null;
 
 		while (more)
 		{
@@ -629,12 +629,12 @@ public class ExpressionReader extends SyntaxReader
 			switch (token.type)
     		{
 				case PLING:
-					if (maximal)
+					if (maximal != null)
 					{
 						throwMessage(2335, "Maximal '!' not allowed here", token);	
 					}
 					
-					maximal = true;
+					maximal = token;
 					nextToken();
 					break;
 					
@@ -654,7 +654,7 @@ public class ExpressionReader extends SyntaxReader
     						{
         						// a mk_TYPE() with no field values
     							exp = readMkExpression(ve, maximal);
-    							maximal = false;
+    							maximal = null;
     							break;
     						}
         				}
@@ -677,7 +677,7 @@ public class ExpressionReader extends SyntaxReader
     						else if (name.startsWith("mk_"))
     						{
     							exp = readMkExpression(ve, maximal);
-    							maximal = false;
+    							maximal = null;
     							break;
     						}
     						else if (name.startsWith("is_"))
@@ -799,6 +799,11 @@ public class ExpressionReader extends SyntaxReader
     				more = false;
     				break;
     		}
+		}
+		
+		if (maximal != null)
+		{
+			throwMessage(2335, "Maximal '!' not allowed here", maximal);	
 		}
 
 		// If we've collected as many applicators as we can, but we're still
@@ -1038,7 +1043,7 @@ public class ExpressionReader extends SyntaxReader
 		return new ASTMuExpression(ve.location, record, args);
 	}
 
-	private ASTExpression readMkExpression(ASTVariableExpression ve, boolean maximal)
+	private ASTExpression readMkExpression(ASTVariableExpression ve, LexToken maximal)
 		throws ParserException, LexException
 	{
 		ASTExpressionList args = new ASTExpressionList();
@@ -1058,9 +1063,9 @@ public class ExpressionReader extends SyntaxReader
 
 		if (ve.name.name.equals("mk_"))
 		{
-			if (maximal)
+			if (maximal != null)
 			{
-				throwMessage(2335, "Maximal '!' not allowed here");
+				throwMessage(2335, "Maximal '!' not allowed here", maximal);
 			}
 			
 			if (args.size() < 2)
@@ -1077,9 +1082,9 @@ public class ExpressionReader extends SyntaxReader
 
 			if (type != null)
 			{
-				if (maximal)
+				if (maximal != null)
 				{
-					throwMessage(2335, "Maximal '!' not allowed here");
+					throwMessage(2335, "Maximal '!' not allowed here", maximal);
 				}
 
 				if (args.size() != 1)
@@ -1100,7 +1105,7 @@ public class ExpressionReader extends SyntaxReader
 			}
 			else
 			{
-				exp = new ASTMkTypeExpression(typename, args, maximal);
+				exp = new ASTMkTypeExpression(typename, args, maximal != null);
 			}
 		}
 
