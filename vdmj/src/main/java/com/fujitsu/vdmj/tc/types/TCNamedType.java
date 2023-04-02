@@ -47,6 +47,16 @@ public class TCNamedType extends TCInvariantType
 		this.typename = typename;
 		this.type = type;
 	}
+	
+	@Override
+	public TCNamedType copy()
+	{
+		TCNamedType namedType = new TCNamedType(typename, type);
+		namedType.setInvariant(invdef);
+		namedType.setEquality(eqdef);
+		namedType.setOrder(orddef);
+		return namedType;
+	}
 
 	@Override
 	public boolean isType(Class<? extends TCType> typeclass, LexLocation from)
@@ -335,7 +345,7 @@ public class TCNamedType extends TCInvariantType
 	@Override
 	public String toDisplay()
 	{
-		return typename.toString() + (opaque ? " /* opaque */" : "");
+		return typename.toString() + (maximal ? "!" : "") + (opaque ? " /* opaque */" : "");
 	}
 
 	@Override

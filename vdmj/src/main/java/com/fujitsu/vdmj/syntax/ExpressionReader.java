@@ -620,6 +620,7 @@ public class ExpressionReader extends SyntaxReader
 		}
 		
 		boolean more = true;
+		boolean maximal = false;
 
 		while (more)
 		{
@@ -627,6 +628,16 @@ public class ExpressionReader extends SyntaxReader
 
 			switch (token.type)
     		{
+				case PLING:
+					if (maximal)
+					{
+						throwMessage(2335, "Maximal '!' not allowed here", token);	
+					}
+					
+					maximal = true;
+					nextToken();
+					break;
+					
     			case BRA:
     				// Either sequence(from, ..., to) or func(args) or map(key)
     				// or mk_*(), is_*(), mu(), pre_*(), post_*(),
@@ -642,7 +653,8 @@ public class ExpressionReader extends SyntaxReader
         					if (name.startsWith("mk_"))
     						{
         						// a mk_TYPE() with no field values
-    							exp = readMkExpression(ve);
+    							exp = readMkExpression(ve, maximal);
+    							maximal = false;
     							break;
     						}
         				}
@@ -664,7 +676,8 @@ public class ExpressionReader extends SyntaxReader
     						}
     						else if (name.startsWith("mk_"))
     						{
-    							exp = readMkExpression(ve);
+    							exp = readMkExpression(ve, maximal);
+    							maximal = false;
     							break;
     						}
     						else if (name.startsWith("is_"))
@@ -1025,7 +1038,7 @@ public class ExpressionReader extends SyntaxReader
 		return new ASTMuExpression(ve.location, record, args);
 	}
 
-	private ASTExpression readMkExpression(ASTVariableExpression ve)
+	private ASTExpression readMkExpression(ASTVariableExpression ve, boolean maximal)
 		throws ParserException, LexException
 	{
 		ASTExpressionList args = new ASTExpressionList();
@@ -1045,6 +1058,11 @@ public class ExpressionReader extends SyntaxReader
 
 		if (ve.name.name.equals("mk_"))
 		{
+			if (maximal)
+			{
+				throwMessage(2335, "Maximal '!' not allowed here");
+			}
+			
 			if (args.size() < 2)
 			{
 				throwMessage(2035, "Tuple must have >1 argument");
@@ -1059,6 +1077,11 @@ public class ExpressionReader extends SyntaxReader
 
 			if (type != null)
 			{
+				if (maximal)
+				{
+					throwMessage(2335, "Maximal '!' not allowed here");
+				}
+
 				if (args.size() != 1)
 				{
 					throwMessage(2300, "mk_<type> must have a single argument");
@@ -1077,7 +1100,7 @@ public class ExpressionReader extends SyntaxReader
 			}
 			else
 			{
-				exp = new ASTMkTypeExpression(typename, args);
+				exp = new ASTMkTypeExpression(typename, args, maximal);
 			}
 		}
 

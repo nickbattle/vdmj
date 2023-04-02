@@ -40,12 +40,14 @@ public abstract class TCInvariantType extends TCType
 
 	public boolean opaque = false;
 	protected boolean inNarrower = false;
-	public boolean maximal = false;
+	protected boolean maximal = false;
 
 	public TCInvariantType(LexLocation location)
 	{
 		super(location);
 	}
+
+	abstract public TCInvariantType copy();
 
 	@Override
 	abstract protected String toDisplay();
@@ -118,5 +120,11 @@ public abstract class TCInvariantType extends TCType
 	public boolean isEq(LexLocation from)
 	{
 		return eqdef != null;
+	}
+	
+	@Override
+	public boolean isMaximal()
+	{
+		return maximal;
 	}
 }

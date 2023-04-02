@@ -38,25 +38,14 @@ public class TCMaximalType extends TCType
 	public TCMaximalType(TCInvariantType base)
 	{
 		super(base.location);
-		
-		if (base instanceof TCNamedType)
-		{
-			TCNamedType nt = (TCNamedType)base;
-			maxtype = new TCNamedType(nt.typename, nt.type);
-		}
-		else if (base instanceof TCRecordType)
-		{
-			TCRecordType rt = (TCRecordType)base;
-			maxtype = new TCRecordType(rt.name, rt.fields, rt.composed);
-		}
-
+		maxtype = base.copy();
 		maxtype.setMaximal(true);
 	}
 	
 	@Override
 	protected String toDisplay()
 	{
-		return maxtype.toDisplay() + "!";
+		return maxtype.toDisplay();
 	}
 
 	@Override
@@ -93,6 +82,12 @@ public class TCMaximalType extends TCType
 	public boolean narrowerThan(TCAccessSpecifier accessSpecifier)
 	{
 		return maxtype.narrowerThan(accessSpecifier);
+	}
+	
+	@Override
+	public boolean isMaximal()
+	{
+		return true;
 	}
 
 	@Override

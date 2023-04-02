@@ -103,7 +103,7 @@ map ASTMapletExpressionList{} to TCMapletExpressionList(this);
 map ASTMapRangeExpression{location, exp, comments} to TCMapRangeExpression(location, exp) set comments;
 map ASTMapUnionExpression{left, op, right, comments} to TCMapUnionExpression(left, op, right) set comments;
 map ASTMkBasicExpression{type, arg, comments} to TCMkBasicExpression(type, arg) set comments;
-map ASTMkTypeExpression{typename, args, comments} to TCMkTypeExpression(typename, args) set comments;
+map ASTMkTypeExpression{typename, args, maximal, comments} to TCMkTypeExpression(typename, args, maximal) set comments;
 map ASTModExpression{left, op, right, comments} to TCModExpression(left, op, right) set comments;
 map ASTMuExpression{location, record, modifiers, comments} to TCMuExpression(location, record, modifiers) set comments;
 map ASTNarrowExpression{location, typename, basictype, test, comments} to TCNarrowExpression(location, typename, basictype, test) set comments;

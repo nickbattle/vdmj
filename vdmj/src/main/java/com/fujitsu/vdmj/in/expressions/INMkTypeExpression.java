@@ -50,7 +50,7 @@ public class INMkTypeExpression extends INExpression
 	@Override
 	public String toString()
 	{
-		return "mk_" + recordType.name + "(" + Utils.listToString(args) + ")";
+		return "mk_" + recordType + "(" + Utils.listToString(args) + ")";
 	}
 
 	@Override

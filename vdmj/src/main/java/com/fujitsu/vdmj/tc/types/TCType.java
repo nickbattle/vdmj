@@ -195,6 +195,11 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	{
 		return false;	// Parameter types and type check errors are unknown.
 	}
+	
+	public boolean isMaximal()
+	{
+		return false;	// Only applies to record and named types (invariants)
+	}
 
 	/**
 	 * Test whether a type, including ALL of a union, are TCVoidType or TCVoidReturnType.

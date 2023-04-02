@@ -405,6 +405,7 @@ as the expected and actual values.
 2332, "Duplicate inv clause"
 2333, "Type eq/ord clauses not available in classic"
 2334, "Failed to instantiate AST<name>Annotation"
+2335, "Maximal '!' not allowed here"
 
 
 3000, "Expression does not match declared type"

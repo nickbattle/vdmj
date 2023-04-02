@@ -55,6 +55,15 @@ public class TCRecordType extends TCInvariantType
 		this.fields = fields;
 		this.composed = false;
 	}
+	
+	public TCRecordType copy()
+	{
+		TCRecordType recordType = new TCRecordType(name, fields, composed);
+		recordType.setInvariant(invdef);
+		recordType.setEquality(eqdef);
+		recordType.setOrder(orddef);
+		return recordType;
+	}
 
 	public TCField findField(String tag)
 	{
@@ -139,7 +148,7 @@ public class TCRecordType extends TCInvariantType
 	@Override
 	public String toDisplay()
 	{
-		return name.toString() + (opaque ? " /* opaque */" : "");
+		return name.toString() + (maximal ? "!" : "") + (opaque ? " /* opaque */" : "");
 	}
 
 	@Override
