@@ -150,7 +150,7 @@ public class TCNamedType extends TCInvariantType
 	{
 		if (opaque && !from.module.equals(location.module)) return false;
 		
-		if (orddef != null)
+		if (orddef != null && !maximal)
 		{
 			return true;
 		}
@@ -165,7 +165,7 @@ public class TCNamedType extends TCInvariantType
 	{
 		if (opaque && !from.module.equals(location.module)) return false;
 		
-		if (eqdef != null)
+		if (eqdef != null && !maximal)
 		{
 			return true;
 		}

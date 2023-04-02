@@ -113,13 +113,13 @@ public abstract class TCInvariantType extends TCType
 	@Override
 	public boolean isOrdered(LexLocation from)
 	{
-		return orddef != null;
+		return orddef != null && !maximal;
 	}
 	
 	@Override
 	public boolean isEq(LexLocation from)
 	{
-		return eqdef != null;
+		return eqdef != null && !maximal;
 	}
 	
 	@Override
