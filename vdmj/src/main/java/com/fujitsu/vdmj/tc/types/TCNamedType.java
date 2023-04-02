@@ -49,12 +49,13 @@ public class TCNamedType extends TCInvariantType
 	}
 	
 	@Override
-	public TCNamedType copy()
+	public TCNamedType copy(boolean maximal)
 	{
 		TCNamedType namedType = new TCNamedType(typename, type);
 		namedType.setInvariant(invdef);
 		namedType.setEquality(eqdef);
 		namedType.setOrder(orddef);
+		namedType.setMaximal(maximal);
 		return namedType;
 	}
 

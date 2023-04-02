@@ -56,12 +56,14 @@ public class TCRecordType extends TCInvariantType
 		this.composed = false;
 	}
 	
-	public TCRecordType copy()
+	@Override
+	public TCRecordType copy(boolean maximal)
 	{
 		TCRecordType recordType = new TCRecordType(name, fields, composed);
 		recordType.setInvariant(invdef);
 		recordType.setEquality(eqdef);
 		recordType.setOrder(orddef);
+		recordType.setMaximal(maximal);
 		return recordType;
 	}
 

@@ -92,8 +92,7 @@ public class TCMkTypeExpression extends TCExpression
 		
 		if (maximal)
 		{
-			recordType = recordType.copy();
-			recordType.setMaximal(true);
+			recordType = recordType.copy(true);
 		}
 
 		if (typename.isExplicit())
@@ -101,7 +100,7 @@ public class TCMkTypeExpression extends TCExpression
 			// If the type name is explicit, the TCType ought to have an explicit
 			// name. This only really affects trace expansion.
 
-			recordType = recordType.copy();
+			recordType = recordType.copy(recordType.isMaximal());
 		}
 
 		if (recordType.fields.size() != args.size())

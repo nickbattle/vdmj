@@ -47,7 +47,7 @@ public abstract class TCInvariantType extends TCType
 		super(location);
 	}
 
-	abstract public TCInvariantType copy();
+	abstract public TCInvariantType copy(boolean maximal);
 
 	@Override
 	abstract protected String toDisplay();

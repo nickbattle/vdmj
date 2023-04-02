@@ -38,7 +38,6 @@ import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCInMapType;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCMapType;
-import com.fujitsu.vdmj.tc.types.TCMaximalType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCNumericType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
@@ -303,18 +302,6 @@ public class TypeComparator
     		if (from instanceof TCBracketType)
     		{
     			from = ((TCBracketType)from).type;
-    			continue;
-    		}
-    		
-    		if (to instanceof TCMaximalType)
-    		{
-    			to = ((TCMaximalType)to).maxtype;
-    			continue;
-    		}
-
-    		if (from instanceof TCMaximalType)
-    		{
-    			from = ((TCMaximalType)from).maxtype;
     			continue;
     		}
     		
@@ -741,18 +728,6 @@ public class TypeComparator
     		if (sup instanceof TCBracketType)
     		{
     			sup = ((TCBracketType)sup).type;
-    			continue;
-    		}
-
-    		if (sub instanceof TCMaximalType)
-    		{
-    			sub = ((TCMaximalType)sub).maxtype;
-    			continue;
-    		}
-
-    		if (sup instanceof TCMaximalType)
-    		{
-    			sup = ((TCMaximalType)sup).maxtype;
     			continue;
     		}
 

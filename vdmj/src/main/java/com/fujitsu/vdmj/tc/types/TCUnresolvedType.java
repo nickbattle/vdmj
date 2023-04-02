@@ -111,7 +111,9 @@ public class TCUnresolvedType extends TCType
 		
 		if (r instanceof TCInvariantType && maximal)
 		{
-			r = new TCMaximalType((TCInvariantType) r);
+			// r = new TCMaximalType((TCInvariantType) r);
+			TCInvariantType inv = (TCInvariantType)r;
+			r = inv.copy(true);
 		}
 		
 		return r;

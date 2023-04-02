@@ -43,7 +43,6 @@ import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCInvariantType;
-import com.fujitsu.vdmj.tc.types.TCMaximalType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -456,19 +455,7 @@ public class TCTypeDefinition extends TCDefinition
 		parameters.add(params);
 
 		TCTypeList ptypes = new TCTypeList();
-		ptypes.add(new TCMaximalType(type));
-
-//		if (type instanceof TCRecordType)
-//		{
-//			// Records are inv_R: R +> bool
-//			ptypes.add(new TCUnresolvedType(name));
-//		}
-//		else
-//		{
-//			// Named types are inv_T: x +> bool, for T = x
-//			TCNamedType nt = (TCNamedType)type;
-//			ptypes.add(nt.type);
-//		}
+		ptypes.add(type.copy(true));
 
 		TCFunctionType ftype =
 			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));

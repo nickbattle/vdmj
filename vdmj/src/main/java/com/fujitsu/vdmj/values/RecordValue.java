@@ -372,7 +372,7 @@ public class RecordValue extends Value
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("mk_" + type.name + "(");
+		sb.append("mk_" + type + "(");
 
 		Iterator<TCField> fi = type.fields.iterator();
 
@@ -411,7 +411,8 @@ public class RecordValue extends Value
 		{
 			if (type.isMaximal() && !to.isMaximal())
 			{
-				return super.convertValueTo(to, ctxt, done);
+				TCRecordType rto = (TCRecordType)to;
+				return new RecordValue(rto, fieldmap, ctxt);
 			}
 			else
 			{
