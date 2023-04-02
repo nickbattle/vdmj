@@ -107,15 +107,14 @@ public class TCUnresolvedType extends TCType
 		}
 
 		TCType r = def.getType();
-		r.definitions = new TCDefinitionList(def);
 		
 		if (r instanceof TCInvariantType && maximal)
 		{
-			// r = new TCMaximalType((TCInvariantType) r);
 			TCInvariantType inv = (TCInvariantType)r;
 			r = inv.copy(true);
 		}
 		
+		r.definitions = new TCDefinitionList(def);
 		return r;
 	}
 
