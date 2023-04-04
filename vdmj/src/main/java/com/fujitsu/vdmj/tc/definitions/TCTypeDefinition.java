@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
+import com.fujitsu.vdmj.tc.patterns.visitors.TCGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -142,6 +143,8 @@ public class TCTypeDefinition extends TCDefinition
     		eqdef = getEqOrdDefinition(eqPattern1, eqPattern2,
     			eqExpression, name.getEqName(eqPattern1.location));
     		type.setEquality(eqdef);
+    		
+    		eqdef.implicitDefinitions(base);	// For precondition
 		}
 		else
 		{
@@ -153,6 +156,8 @@ public class TCTypeDefinition extends TCDefinition
     		orddef = getEqOrdDefinition(ordPattern1, ordPattern2,
     			ordExpression, name.getOrdName(ordPattern1.location));
     		type.setOrder(orddef);
+    		
+    		orddef.implicitDefinitions(base);	// For precondition
     		
     		mindef = getMinMaxDefinition(true, name.getMinName(ordPattern1.location));
     		maxdef = getMinMaxDefinition(false, name.getMaxName(ordPattern1.location));
@@ -488,11 +493,31 @@ public class TCTypeDefinition extends TCDefinition
 			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier,
-			fname, null, ftype, parameters, exp, null, null, false, null);
+			fname, null, ftype, parameters, exp, getEqOrdPrecondition(p1, p2), null, false, null);
 
 		def.classDefinition = classDefinition;
 		ftype.definitions = new TCDefinitionList(def);
 		return def;
+	}
+
+	private TCExpression getEqOrdPrecondition(TCPattern p1, TCPattern p2)
+	{
+		if (invExpression == null)
+		{
+			return null;	// No precondition needed if no invariant
+		}
+		
+		try
+		{
+			String invname = name.getInvName(invExpression.location).toString();
+			TCExpression pp1 = p1.apply(new TCGetMatchingExpressionVisitor(), null);
+			TCExpression pp2 = p2.apply(new TCGetMatchingExpressionVisitor(), null);
+			return parse(String.format("%s(%s) and %s(%s)", invname, pp1, invname, pp2));
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException("Cannot process eq/ord ignore patterns " + p1.location);
+		}
 	}
 
 	private TCExplicitFunctionDefinition getMinMaxDefinition(boolean isMin, TCNameToken fname)
@@ -517,11 +542,11 @@ public class TCTypeDefinition extends TCDefinition
 		{
 			if (isMin)
 			{
-				body = parse(String.format("if a < b or a = b then a else b"));
+				body = parse("if a < b or a = b then a else b");
 			}
 			else
 			{
-				body = parse(String.format("if a < b or a = b then b else a"));
+				body = parse("if a < b or a = b then b else a");
 			}
 		}
 		catch (Exception e)
