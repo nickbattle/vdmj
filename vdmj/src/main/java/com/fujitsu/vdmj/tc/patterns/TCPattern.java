@@ -66,6 +66,15 @@ public abstract class TCPattern extends TCNode implements Serializable
 
 	@Override
 	abstract public String toString();
+	
+	/**
+	 * Return VDM-SL source of the pattern. This is usually the same as toString,
+	 * but for unresolved types in RecordPatterns, the handling is different. 
+	 */
+	public String toSource()
+	{
+		return toString();
+	}
 
 	/**
 	 * Resolve any types that the pattern may use by looking up the type

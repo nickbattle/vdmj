@@ -39,7 +39,6 @@ import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
 import com.fujitsu.vdmj.tc.patterns.TCPatternListList;
-import com.fujitsu.vdmj.tc.patterns.visitors.TCGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -477,47 +476,39 @@ public class TCTypeDefinition extends TCDefinition
 	{
 		LexLocation loc = p1.location;
 		TCPatternList params = new TCPatternList();
-		params.add(p1);
-		params.add(p2);
+		params.add(new TCIdentifierPattern(new TCNameToken(loc, loc.module, "p1")));
+		params.add(new TCIdentifierPattern(new TCNameToken(loc, loc.module, "p2")));
 
 		TCPatternListList parameters = new TCPatternListList();
 		parameters.add(params);
 
-		// Functions are xxx_T: T! * T! +> bool, for T = ... or T :: ...
+		// Functions are xxx_T: T * T +> bool
 		TCTypeList ptypes = new TCTypeList();
-		TCInvariantType max = type.copy(true);
-		ptypes.add(max);
-		ptypes.add(max);
+		ptypes.add(type);
+		ptypes.add(type);
 
 		TCFunctionType ftype =
 			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
-
+		
+		TCExpression body = null;
+		
+		try
+		{
+			TCType max = type.copy(true);
+			body = parse(String.format("let %s : %s = p1, %s : %s = p2 in %s",
+					p1.toSource(), max, p2.toSource(), max, exp));
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException("Cannot process eq/ord clause " + p1.location);
+		}
+		
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier,
-			fname, null, ftype, parameters, exp, getEqOrdPrecondition(p1, p2), null, false, null);
+			fname, null, ftype, parameters, body, null, null, false, null);
 
 		def.classDefinition = classDefinition;
 		ftype.definitions = new TCDefinitionList(def);
 		return def;
-	}
-
-	private TCExpression getEqOrdPrecondition(TCPattern p1, TCPattern p2)
-	{
-		if (invExpression == null)
-		{
-			return null;	// No precondition needed if no invariant
-		}
-		
-		try
-		{
-			String invname = name.getInvName(invExpression.location).toString();
-			TCExpression pp1 = p1.apply(new TCGetMatchingExpressionVisitor(), null);
-			TCExpression pp2 = p2.apply(new TCGetMatchingExpressionVisitor(), null);
-			return parse(String.format("%s(%s) and %s(%s)", invname, pp1, invname, pp2));
-		}
-		catch (Exception e)
-		{
-			throw new RuntimeException("Cannot process eq/ord ignore patterns " + p1.location);
-		}
 	}
 
 	private TCExplicitFunctionDefinition getMinMaxDefinition(boolean isMin, TCNameToken fname)
@@ -530,11 +521,11 @@ public class TCTypeDefinition extends TCDefinition
 		TCPatternListList parameters = new TCPatternListList();
 		parameters.add(params);
 
+		// Functions are xxx_T: T * T +> bool
 		TCTypeList ptypes = new TCTypeList();
-		ptypes.add(new TCUnresolvedType(name));
-		ptypes.add(new TCUnresolvedType(name));
+		ptypes.add(type);
+		ptypes.add(type);
 
-		// min_T: T * T +> T, max_T: T * T +> T
 		TCFunctionType ftype = new TCFunctionType(loc, ptypes, false, new TCUnresolvedType(name));
 		TCExpression body = null;
 		
