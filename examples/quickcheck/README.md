@@ -28,7 +28,7 @@ That creates seven POs:
 ```
 	Proof Obligation 1: (Unproved)
 	T: total function obligation in 'DEFAULT' (test.vdm) at line 3:16
-	(forall t:nat &
+	(forall t:T! &
 	  is_(inv_T(t), bool))
 	
 	...
@@ -48,7 +48,8 @@ returning sets and so on. Comments and whitespace are ignored. Every pair is ter
 functions are in the qc.vdm file, which has to be included in the project.
 
 ```
-	-- Simple range of nats
+	-- Simple ranges of nats
+	t : T! = {0, ..., 100};
 	t : nat = {0, ..., 100};
 	
 	-- More complex generation, via a function
