@@ -96,15 +96,13 @@ public class INTypeDefinition extends INDefinition
 
 		if (eqdef != null)
 		{
-			FunctionValue prefunc = (eqdef.predef == null) ? null : new FunctionValue(eqdef.predef, null, null, null);
-			FunctionValue eqfunc =	new FunctionValue(eqdef, prefunc, null, null);
+			FunctionValue eqfunc =	new FunctionValue(eqdef, null, null, null);
 			nvl.add(new NameValuePair(eqdef.name, eqfunc));
 		}
 
 		if (orddef != null)
 		{
-			FunctionValue prefunc = (orddef.predef == null) ? null : new FunctionValue(orddef.predef, null, null, null);
-			FunctionValue ordfunc =	new FunctionValue(orddef, prefunc, null, null);
+			FunctionValue ordfunc =	new FunctionValue(orddef, null, null, null);
 			nvl.add(new NameValuePair(orddef.name, ordfunc));
 		}
 
