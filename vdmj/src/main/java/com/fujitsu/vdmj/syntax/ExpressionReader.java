@@ -629,6 +629,11 @@ public class ExpressionReader extends SyntaxReader
 			switch (token.type)
     		{
 				case PLING:
+					if (Settings.release == Release.CLASSIC)
+					{
+						throwMessage(2335, "Maximal '!' not allowed in VDM classic", token);
+					}
+					
 					if (maximal != null)
 					{
 						throwMessage(2335, "Maximal '!' not allowed here", token);	

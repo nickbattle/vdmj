@@ -420,12 +420,28 @@ public class TypeReader extends SyntaxReader
 
 			case IDENTIFIER:
 				nextToken();
-				type = new ASTUnresolvedType(idToName((LexIdentifierToken)token), ignore(Token.PLING));
+				
+				if (Settings.release == Release.VDM_10)
+				{
+					type = new ASTUnresolvedType(idToName((LexIdentifierToken)token), ignore(Token.PLING));
+				}
+				else
+				{
+					type = new ASTUnresolvedType(idToName((LexIdentifierToken)token), false);
+				}
 				break;
 
 			case NAME:
 				nextToken();
-				type = new ASTUnresolvedType((LexNameToken)token, ignore(Token.PLING));
+				
+				if (Settings.release == Release.VDM_10)
+				{
+					type = new ASTUnresolvedType((LexNameToken)token, ignore(Token.PLING));
+				}
+				else
+				{
+					type = new ASTUnresolvedType((LexNameToken)token, false);
+				}
 				break;
 
 			case AT:
