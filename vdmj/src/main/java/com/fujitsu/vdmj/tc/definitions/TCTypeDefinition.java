@@ -478,13 +478,15 @@ public class TCTypeDefinition extends TCDefinition
 		TCPatternListList parameters = new TCPatternListList();
 		parameters.add(params);
 
-		// Functions are xxx_T: T * T +> bool
+		// Functions are eq_T: T * T +> bool, and ord_T: T * T -> bool (partial)
 		TCTypeList ptypes = new TCTypeList();
 		ptypes.add(type);
 		ptypes.add(type);
+		
+		boolean order = fname.getName().startsWith("ord_");
 
 		TCFunctionType ftype =
-			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
+			new TCFunctionType(loc, ptypes, order, new TCBooleanType(loc));
 		
 		TCExpression body = null;
 		
@@ -517,12 +519,12 @@ public class TCTypeDefinition extends TCDefinition
 		TCPatternListList parameters = new TCPatternListList();
 		parameters.add(params);
 
-		// Functions are xxx_T: T * T +> bool
+		// Functions are xxx_T: T * T -> bool
 		TCTypeList ptypes = new TCTypeList();
 		ptypes.add(type);
 		ptypes.add(type);
 
-		TCFunctionType ftype = new TCFunctionType(loc, ptypes, false, new TCUnresolvedType(name));
+		TCFunctionType ftype = new TCFunctionType(loc, ptypes, true, new TCUnresolvedType(name));
 		TCExpression body = null;
 		
 		try
