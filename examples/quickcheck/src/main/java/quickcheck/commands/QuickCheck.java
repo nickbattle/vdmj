@@ -74,7 +74,6 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
@@ -90,8 +89,10 @@ import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
-	private static final long FINITE_LIMIT = 100;
-	private static final int NUMERIC_LIMIT = 10;
+	private static final long FINITE_LIMIT = 100;		// If sizeof T < 100, use {x | x:T } 
+	private static final int NUMERIC_LIMIT = 10;		// So nat/int/etc are {-10, ..., 10}
+	private static final int EXPANSION_LIMIT = 1000;	// Top level binding value expansion limit
+	
 	private int errorCount = 0;
 	
 	public boolean hasErrors()
@@ -185,6 +186,7 @@ public class QuickCheck
 				{
 					for (VDMError error: TypeChecker.getErrors())
 					{
+						println(exp);
 						println(error.toString());
 						errorCount++;
 					}
@@ -312,7 +314,7 @@ public class QuickCheck
 						
 						if (type.isInfinite())
 						{
-							range = type.apply(rangeCreator, new TCTypeSet());
+							range = type.apply(rangeCreator, EXPANSION_LIMIT);
 						}
 						else
 						{
@@ -322,7 +324,7 @@ public class QuickCheck
 								
 								if (size > FINITE_LIMIT)	// Avoid huge finite types
 								{
-									range = type.apply(rangeCreator, new TCTypeSet());
+									range = type.apply(rangeCreator, EXPANSION_LIMIT);
 								}
 								else
 								{
@@ -331,7 +333,7 @@ public class QuickCheck
 							}
 							catch (Exception e)		// Probably ArithmeticException
 							{
-								range = type.apply(rangeCreator, new TCTypeSet());
+								range = type.apply(rangeCreator, EXPANSION_LIMIT);
 							}
 						}
 						
@@ -454,7 +456,7 @@ public class QuickCheck
 		{
 			for (TCNameToken name: path.keySet())
 			{
-				printf("%s%s = %s", sep, name, path.get(name));
+				printf("%s%s = %#s", sep, name, path.get(name));
 				sep = ", ";
 			}
 		}
