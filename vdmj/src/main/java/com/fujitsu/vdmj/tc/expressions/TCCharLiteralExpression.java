@@ -46,7 +46,7 @@ public class TCCharLiteralExpression extends TCExpression
 	@Override
 	public String toString()
 	{
-		return String.format("%c", value.unicode);
+		return String.format("'%c'", value.unicode);
 	}
 
 	@Override

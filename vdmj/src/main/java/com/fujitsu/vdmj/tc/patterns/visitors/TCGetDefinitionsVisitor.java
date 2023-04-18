@@ -229,7 +229,7 @@ public class TCGetDefinitionsVisitor extends TCLeafPatternVisitor<TCDefinition, 
 		{
 			TCSetType set = arg.ptype.getSet();
 
-			if (!set.empty)
+			// if (!set.empty)
 			{
         		for (TCPattern p: node.plist)
         		{
