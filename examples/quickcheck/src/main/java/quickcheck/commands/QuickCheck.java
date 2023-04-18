@@ -27,6 +27,7 @@ package quickcheck.commands;
 import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -90,7 +91,7 @@ import quickcheck.visitors.TypeBindFinder;
 public class QuickCheck
 {
 	private static final long FINITE_LIMIT = 100;		// If sizeof T < 100, use {x | x:T } 
-	private static final int NUMERIC_LIMIT = 10;		// So nat/int/etc are {-10, ..., 10}
+	private static final int NUMERIC_LIMIT = 5;		// So nat/int/etc are {-5, ..., 5}
 	private static final int EXPANSION_LIMIT = 1000;	// Top level binding value expansion limit
 	
 	private int errorCount = 0;
@@ -366,7 +367,7 @@ public class QuickCheck
 			{
 				if (!po.isCheckable)
 				{
-					printf("PO# %d, UNCHECKED\n", po.number);
+					printf("PO #%d, UNCHECKED\n", po.number);
 					continue;
 				}
 
@@ -381,11 +382,12 @@ public class QuickCheck
 					
 					if (values != null)
 					{
+						verbose("PO #%d, setting %s, %d values", po.number, mbind.toString(), values.size());
 						mbind.setBindValues(values);
 					}
 					else
 					{
-						errorln("PO# " + po.number + ": No range defined for " + mbind);
+						errorln("PO #" + po.number + ": No range defined for " + mbind);
 						errorCount++;
 					}
 				}
@@ -393,6 +395,7 @@ public class QuickCheck
 				try
 				{
 					long before = System.currentTimeMillis();
+					verbose("PO #%d, starting...", po.number);
 					Value result = poexp.eval(ctxt);
 					long after = System.currentTimeMillis();
 					
@@ -400,11 +403,11 @@ public class QuickCheck
 					{
 						if (result.boolValue(ctxt))
 						{
-							printf("PO# %d, PASSED %s\n", po.number, duration(before, after));
+							printf("PO #%d, PASSED %s\n", po.number, duration(before, after));
 						}
 						else
 						{
-							printf("PO# %d, FAILED %s: ", po.number, duration(before, after));
+							printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
 							printFailPath(failPath);
 							println("\n" + po);
 							errorCount++;
@@ -412,14 +415,14 @@ public class QuickCheck
 					}
 					else
 					{
-						printf("PO# %d, Error: PO evaluation returns %s?\n\n", po.number, result.kind());
+						printf("PO #%d, Error: PO evaluation returns %s?\n\n", po.number, result.kind());
 						println(po);
 						errorCount++;
 					}
 				}
 				catch (Exception e)
 				{
-					printf("PO# %d, %s\n\n", po.number, e.getMessage());
+					printf("PO #%d, %s\n\n", po.number, e.getMessage());
 					println(po);
 					errorCount++;
 				}
