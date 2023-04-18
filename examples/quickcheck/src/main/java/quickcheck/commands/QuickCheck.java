@@ -256,11 +256,11 @@ public class QuickCheck
 		{
 			println("Error: " + e.getMessage() + " " + e.location);
 		}
-		catch (InternalException e)
-		{
-			errorln(e.getMessage());
-		}
 		catch (ContextException e)
+		{
+			println(e.getMessage());
+		}
+		catch (InternalException e)
 		{
 			errorln(e.getMessage());
 		}
@@ -337,6 +337,7 @@ public class QuickCheck
 							}
 						}
 						
+						writer.println("-- " + po.location);
 						writer.println(mbind + " = " + range + ";");
 						done.add(mbind.toString());
 					}

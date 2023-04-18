@@ -61,27 +61,29 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Integer>
 		this.done = new TCTypeSet();
 	}
 	
-	private String npower(String set, int maxsize)
+	private String npower(String set, int maxsize, boolean withEmpty)
 	{
 		// A power set of card N is 2^N, so generate a subset such that 2^N <= maxsize
 		int size = (int)(Math.log(maxsize) / Math.log(2));	// < maxsize
 		if (size == 0) size = 1;
 		
-		StringBuilder sb = new StringBuilder();
-		sb.append("{");
+		StringBuilder vars = new StringBuilder();
+		vars.append("{");
 		String sep = "";
 		
 		for (int i=0; i<size; i++)
 		{
-			sb.append(sep);
-			sb.append("s" + i);
+			vars.append(sep);
+			vars.append("s" + i);
 			sep = ", ";
 		}
 		
-		sb.append("}");
+		vars.append("}");
+		
+		String tail = withEmpty ? "" : " \\ {{}}";
 		
 		return "power (if card " + set + " < " + size + " then " + set +
-				" else let " + sb + " union - = " + set + " in " + sb + ")";
+				" else let " + vars + " union - = " + set + " in " + vars + ")" + tail;
 	}
 	
 	@Override
@@ -321,13 +323,13 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Integer>
 	@Override
 	public String caseSetType(TCSetType node, Integer maxsize)
 	{
-		return npower(node.setof.apply(this, maxsize), maxsize);
+		return npower(node.setof.apply(this, maxsize), maxsize, true);
 	}
 	
 	@Override
 	public String caseSet1Type(TCSet1Type node, Integer maxsize)
 	{
-		return npower(node.setof.apply(this, maxsize) + " \\ {}", maxsize);
+		return npower(node.setof.apply(this, maxsize), maxsize, false);
 	}
 	
 	@Override
@@ -336,11 +338,11 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Integer>
 		if (node.seqof.isOrdered(node.location) && !node.seqof.isUnion(node.location))
 		{
 			String type = node.seqof.apply(this, maxsize);
-			return "{ [ e | e in set s ] | s in set " + npower(type, maxsize) + " }";	// includes []
+			return "{ [ e | e in set s ] | s in set " + npower(type, maxsize, true) + " }";
 		}
 		else
 		{
-			return "{ if s = {} then [] else [ let e in set s in e ] | s in set " + npower(node.seqof.apply(this, maxsize), maxsize) + " }";
+			return "{ if s = {} then [] else [ let e in set s in e ] | s in set " + npower(node.seqof.apply(this, maxsize), maxsize, true) + " }";
 		}
 	}
 	
@@ -350,11 +352,11 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Integer>
 		if (node.seqof.isOrdered(node.location) && !node.seqof.isUnion(node.location))
 		{
 			String type = node.seqof.apply(this, maxsize);
-			return "{ [ e | e in set s ] | s in set " + npower(type, maxsize) + " \\ {} }";
+			return "{ [ e | e in set s ] | s in set " + npower(type, maxsize, false) + " }";
 		}
 		else
 		{
-			return "{ if s = {} then [] else [ let e in set s in e ] | s in set " + npower(node.seqof.apply(this, maxsize), maxsize) + " \\ {} }";
+			return "{ if s = {} then [] else [ let e in set s in e ] | s in set " + npower(node.seqof.apply(this, maxsize), maxsize, false) + " }";
 		}
 	}
 	
