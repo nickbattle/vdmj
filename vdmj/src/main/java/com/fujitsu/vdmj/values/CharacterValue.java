@@ -95,7 +95,7 @@ public class CharacterValue extends Value
 		}
 		else
 		{
-			s = toString();		// With 'x' quotes
+			s = toString();		// With 'x' quotes, by default
 		}
 
 		formatTo(s, formatter, 0, width, precision);
