@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.values.SeqValue;
 
 public class TCOnFailAnnotation extends TCAnnotation
 {
@@ -120,13 +121,13 @@ public class TCOnFailAnnotation extends TCAnnotation
 				try
 				{
 					// Try to format with string arguments to check they are all %s (up to 20)
-					Object[] args = new String[20];
-					Arrays.fill(args, "A string");
+					Object[] args = new SeqValue[20];
+					Arrays.fill(args, new SeqValue("abc"));
 					String.format(format, args);
 				}
 				catch (IllegalArgumentException e)
 				{
-					name.report(6008, "@OnFail must only use %[arg$][width]s conversions");
+					name.report(6008, "@OnFail must only use %[arg$][#][width]s conversions");
 				}
 			}
 			else
