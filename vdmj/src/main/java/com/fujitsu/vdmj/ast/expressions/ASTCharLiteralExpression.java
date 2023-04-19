@@ -41,7 +41,7 @@ public class ASTCharLiteralExpression extends ASTExpression
 	@Override
 	public String toString()
 	{
-		return String.format("%c", value.unicode);
+		return String.format("'%c'", value.unicode);	// With quotes
 	}
 
 	@Override

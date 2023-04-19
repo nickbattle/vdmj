@@ -44,7 +44,7 @@ public class INCharLiteralExpression extends INExpression
 	@Override
 	public String toString()
 	{
-		return new CharacterValue(value.unicode).toString();
+		return new CharacterValue(value.unicode).toString();	// eg. \0123 or 'a'
 	}
 
 	@Override
