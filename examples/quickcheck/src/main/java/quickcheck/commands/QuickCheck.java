@@ -460,7 +460,7 @@ public class QuickCheck
 		{
 			for (TCNameToken name: path.keySet())
 			{
-				printf("%s%s = %#s", sep, name, path.get(name));
+				printf("%s%s = %s", sep, name, path.get(name));
 				sep = ", ";
 			}
 		}
