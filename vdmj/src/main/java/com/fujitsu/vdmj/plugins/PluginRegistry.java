@@ -102,7 +102,7 @@ public class PluginRegistry
 		String[] argv = line.split("\\s+");
 		AnalysisCommand result = null;
 		
-		for (AnalysisPlugin plugin: plugins.values())
+		for (AnalysisPlugin plugin: getPlugins())	// Priority ordered
 		{
 			try
 			{

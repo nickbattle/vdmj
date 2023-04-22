@@ -64,7 +64,7 @@ abstract public class AnalysisPlugin
 	 */
 	public int getPriority()
 	{
-		return 1000;	// Default user plugin priority
+		return EventListener.USER_PRIORITY;
 	}
 	
 	public String getDescription()
