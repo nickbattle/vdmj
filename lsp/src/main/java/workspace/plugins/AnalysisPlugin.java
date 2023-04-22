@@ -32,6 +32,7 @@ import rpc.RPCMessageList;
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.HelpList;
 import workspace.EventHub;
+import workspace.EventListener;
 import workspace.MessageHub;
 import workspace.PluginRegistry;
 import workspace.events.DAPEvent;
@@ -56,9 +57,33 @@ abstract public class AnalysisPlugin
 	
 	abstract public void init();
 	
+	/**
+	 * The priority affects the order that plugins are sent events via the EventHub.
+	 * Lower priorities are sent first. The system plugin priorities are fixed multiples
+	 * of 100. User plugins are typically later, but can be earlier. If a plugin does
+	 * not define a priority, they get the default, which effectively means classpath
+	 * order.
+	 */
+	public int getPriority()
+	{
+		return 1000;	// Default user plugin priority
+	}
+	
+	/**
+	 * This calls the getPriority defined above, and is used by the EventHub to order
+	 * EventListeners for event publication.
+	 */
+	public int compareTo(EventListener other)
+	{
+		return getPriority() - other.getPriority();
+	}
+	
+	/**
+	 * This is printed by the "plugins" command.
+	 */
 	public Object getDescription()
 	{
-		return getClass().getName();
+		return getClass().getName() + ", priority " + getPriority();
 	}
 
 	/**

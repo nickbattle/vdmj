@@ -24,6 +24,7 @@
 
 package workspace;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,8 @@ public class EventHub
 			registrations.put(key, list);
 		}
 		
-		list.add(listener);	// registration order
+		list.add(listener);
+		Collections.sort(list);
 		Diag.config("Registered %s event handler for event %s", listener.getName(), key);
 	}
 	

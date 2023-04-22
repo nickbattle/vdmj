@@ -223,6 +223,16 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	{
 		return "Example";
 	}
+	
+	/**
+	 * The priority of the plugin affects when it receives events via the EventHub. Lower
+	 * numbers come first. This is defined via EventListener constants.
+	 */
+	@Override
+	public int getPriority()
+	{
+		return TC_PRIORITY + 1;		// Come just after TC
+	}
 
 	/**
 	 * These two events are implemented in the subclasses, and react to events received.

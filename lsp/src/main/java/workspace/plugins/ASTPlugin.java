@@ -95,6 +95,12 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	{
 		return "AST";
 	}
+	
+	@Override
+	public int getPriority()
+	{
+		return AST_PRIORITY;
+	}
 
 	@Override
 	public void init()

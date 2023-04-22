@@ -106,6 +106,12 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 	{
 		return "CT";
 	}
+	
+	@Override
+	public int getPriority()
+	{
+		return CT_PRIORITY;
+	}
 
 	@Override
 	public void init()

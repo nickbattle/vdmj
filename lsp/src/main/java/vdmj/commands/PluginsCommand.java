@@ -62,6 +62,8 @@ public class PluginsCommand extends AnalysisCommand
 			sb.append(plugin.getKey());
 			sb.append(": ");
 			sb.append(plugin.getValue().getDescription());
+			sb.append(", priority ");
+			sb.append(plugin.getValue().getPriority());
 			sb.append("\n");
 		}
 		
