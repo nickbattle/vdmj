@@ -31,8 +31,14 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 /**
  * An interface implemented by subscribers to the EventHub. 
  */
-public interface EventListener
+public interface EventListener extends Comparable<EventListener>
 {
+	public final static int AST_PRIORITY = 100;
+	public final static int TC_PRIORITY  = 200;
+	public final static int IN_PRIORITY  = 300;
+	public final static int PO_PRIORITY  = 400;
+	
 	public String getName();
+	public int getPriority();
 	public List<VDMMessage> handleEvent(AnalysisEvent event) throws Exception;
 }

@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.plugins;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,8 @@ public class EventHub
 			registrations.put(key, list);
 		}
 		
-		list.add(listener);	// registration order
+		list.add(listener);
+		Collections.sort(list);		// Order by getPriority()
 	}
 	
 	public List<EventListener> query(AnalysisEvent type)
