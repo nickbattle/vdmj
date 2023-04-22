@@ -32,13 +32,15 @@ import workspace.events.LSPEvent;
 /**
  * An interface implemented by subscribers to the EventHub. 
  */
-public interface EventListener extends Comparable<EventListener>
+public interface EventListener
 {
 	public final static int AST_PRIORITY = 100;
 	public final static int TC_PRIORITY  = 200;
 	public final static int IN_PRIORITY  = 300;
 	public final static int PO_PRIORITY  = 400;
 	public final static int CT_PRIORITY  = 500;
+	
+	public final static int USER_PRIORITY  = 1000;
 	
 	public String getName();
 	public int getPriority();

@@ -66,16 +66,7 @@ abstract public class AnalysisPlugin
 	 */
 	public int getPriority()
 	{
-		return 1000;	// Default user plugin priority
-	}
-	
-	/**
-	 * This calls the getPriority defined above, and is used by the EventHub to order
-	 * EventListeners for event publication.
-	 */
-	public int compareTo(EventListener other)
-	{
-		return getPriority() - other.getPriority();
+		return EventListener.USER_PRIORITY;
 	}
 	
 	/**
