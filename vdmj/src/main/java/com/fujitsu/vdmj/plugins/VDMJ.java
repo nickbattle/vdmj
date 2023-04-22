@@ -39,7 +39,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.ExitStatus;
@@ -166,7 +165,7 @@ public class VDMJ implements VDMJMain
 
 	private static void usage()
 	{
-		Map<String, AnalysisPlugin> plugins = PluginRegistry.getInstance().getPlugins();
+		List<AnalysisPlugin> plugins = PluginRegistry.getInstance().getPlugins();
 		
 		println("Usage: VDMJ [-vdmsl | -vdmpp | -vdmrt] [<options>] [<files or dirs>]");
 		println("-vdmsl: parse files as VDM-SL (default)");
@@ -181,7 +180,7 @@ public class VDMJ implements VDMJMain
 		println("-q: suppress information messages");
 		println("-verbose: display detailed startup information");
 		
-		for (AnalysisPlugin plugin: plugins.values())
+		for (AnalysisPlugin plugin: plugins)
 		{
 			plugin.usage();
 		}
@@ -288,11 +287,9 @@ public class VDMJ implements VDMJMain
 			}
 		}
 		
-		Map<String, AnalysisPlugin> plugins = PluginRegistry.getInstance().getPlugins();
-		
-		for (AnalysisPlugin plugin: plugins.values())
+		for (AnalysisPlugin plugin: PluginRegistry.getInstance().getPlugins())
 		{
-			plugin.processArgs(argv);
+			plugin.processArgs(argv);	// In priority order
 		}
 	}
 	
