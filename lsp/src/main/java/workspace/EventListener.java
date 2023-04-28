@@ -34,13 +34,13 @@ import workspace.events.LSPEvent;
  */
 public interface EventListener
 {
-	public final static int AST_PRIORITY = 100;
-	public final static int TC_PRIORITY  = 200;
-	public final static int IN_PRIORITY  = 300;
-	public final static int PO_PRIORITY  = 400;
-	public final static int CT_PRIORITY  = 500;
-	
-	public final static int USER_PRIORITY  = 1000;
+	public final static int AST_PRIORITY = Integer.getInteger("vdmj.plugin.priority.ast", 100);
+	public final static int TC_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.tc", 200);
+	public final static int IN_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.in", 300);
+	public final static int PO_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.po", 400);
+	public final static int CT_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.co", 500);
+
+	public final static int USER_PRIORITY = Integer.getInteger("vdmj.plugin.priority.user", 1000);
 	
 	public String getName();
 	public int getPriority();
