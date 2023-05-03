@@ -153,7 +153,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 		
 		if (type.hasTotal())
 		{
-			ctxt.push(new POFunctionDefinitionContext(this, false));
+			ctxt.push(new POFunctionDefinitionContext(this, true));
 			obligations.add(new TotalFunctionObligation(this, ctxt));
 			ctxt.pop();
 		}
