@@ -37,7 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
@@ -371,8 +370,6 @@ public class QuickCheck
 					continue;
 				}
 
-				Stack<Context> failPath = new Stack<Context>();
-				INForAllExpression.setFailPath(failPath);
 				INExpression poexp = getPOExpression(po);
 				bindings = getBindList(poexp, false);
 				
@@ -408,7 +405,7 @@ public class QuickCheck
 						else
 						{
 							printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
-							printFailPath(failPath);
+							printFailPath(INForAllExpression.failPath, bindings);
 							println("\n" + po);
 							errorCount++;
 						}
@@ -422,14 +419,12 @@ public class QuickCheck
 				}
 				catch (Exception e)
 				{
-					printf("PO #%d, %s\n\n", po.number, e.getMessage());
+					printf("PO #%d, Exception: %s\n\n", po.number, e.getMessage());
 					println(po);
 					errorCount++;
 				}
 				finally
 				{
-					INForAllExpression.setFailPath(null);
-
 					for (INBindingSetter mbind: bindings)
 					{
 						mbind.setBindValues(null);
@@ -445,23 +440,44 @@ public class QuickCheck
 		}
 	}
 	
-	private void printFailPath(Stack<Context> failPath)
+	private void printFailPath(Context path, List<INBindingSetter> bindings)
 	{
-		if (failPath.isEmpty())
+		if (path == null || path.isEmpty())
 		{
 			printf("No counterexample");
+			
+			for (INBindingSetter bind: bindings)
+			{
+				printf("\n%s = %s", bind, bind.getBindValues());
+			}
+			
 			return;
 		}
 		
 		printf("Counterexample: ");
 		String sep = "";
+		Context ctxt = path;
 		
-		for (Context path: failPath)
+		while (true)
 		{
-			for (TCNameToken name: path.keySet())
+			if (ctxt.outer != null)
 			{
-				printf("%s%s = %s", sep, name, path.get(name));
-				sep = ", ";
+				if (ctxt instanceof RootContext)
+				{
+					sep = "; from " + ctxt.title + " where ";
+				}
+				
+				for (TCNameToken name: ctxt.keySet())
+				{
+					printf("%s%s = %s", sep, name, ctxt.get(name));
+					sep = ", ";
+				}
+				
+				ctxt = ctxt.outer;
+			}
+			else
+			{
+				break;
 			}
 		}
 	}
