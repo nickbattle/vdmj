@@ -55,6 +55,7 @@ import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -416,6 +417,14 @@ public class QuickCheck
 						println(po);
 						errorCount++;
 					}
+				}
+				catch (ContextException e)
+				{
+					printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
+					e.ctxt.printStackFrames(Console.out);
+					println("----");
+					println(po);
+					errorCount++;
 				}
 				catch (Exception e)
 				{
