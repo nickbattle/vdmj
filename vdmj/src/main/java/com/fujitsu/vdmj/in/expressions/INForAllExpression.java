@@ -111,7 +111,11 @@ public class INForAllExpression extends INExpression
 				{
 					if (matches && !predicate.eval(evalContext).boolValue(ctxt))
 					{
-						failPath = evalContext;
+						if (failPath == null)	// One shot, record first only
+						{
+							failPath = evalContext;
+						}
+						
 						return new BooleanValue(false);
 					}
 				}
