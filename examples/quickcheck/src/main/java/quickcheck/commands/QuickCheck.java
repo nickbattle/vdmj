@@ -121,7 +121,7 @@ public class QuickCheck
 				}
 				else
 				{
-					errorln("PO# " + n + " unknown. Must be between 1 and " + all.size());
+					println("PO# " + n + " unknown. Must be between 1 and " + all.size());
 					errorCount++;
 				}
 			}
@@ -385,7 +385,7 @@ public class QuickCheck
 					}
 					else
 					{
-						errorln("PO #" + po.number + ": No range defined for " + mbind);
+						println("PO #" + po.number + ": No range defined for " + mbind);
 						errorCount++;
 					}
 				}
@@ -407,7 +407,8 @@ public class QuickCheck
 						{
 							printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
 							printFailPath(INForAllExpression.failPath, bindings);
-							println("\n" + po);
+							println("\n----");
+							println(po);
 							errorCount++;
 						}
 					}
@@ -421,7 +422,16 @@ public class QuickCheck
 				catch (ContextException e)
 				{
 					printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
-					e.ctxt.printStackFrames(Console.out);
+					
+					if (e.ctxt.outer != null)
+					{
+						e.ctxt.printStackFrames(Console.out);
+					}
+					else
+					{
+						println("In context of " + e.ctxt.title + " " + e.ctxt.location);
+					}
+					
 					println("----");
 					println(po);
 					errorCount++;
