@@ -146,6 +146,7 @@ public class QuickCheck
 	{
 		try
 		{
+			printf("Reading %s\n", filename);
 			errorCount = 0;
 			File file = new File(filename);
 			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL);
@@ -407,14 +408,17 @@ public class QuickCheck
 						{
 							printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
 							printFailPath(INForAllExpression.failPath, bindings);
-							println("\n----");
+							println("----");
 							println(po);
 							errorCount++;
 						}
 					}
 					else
 					{
-						printf("PO #%d, Error: PO evaluation returns %s?\n\n", po.number, result.kind());
+						printf("PO #%d, Error: PO evaluation returns %s?\n", po.number, result.kind());
+						println("----");
+						printBindings(bindings);
+						println("----");
 						println(po);
 						errorCount++;
 					}
@@ -433,12 +437,17 @@ public class QuickCheck
 					}
 					
 					println("----");
+					printBindings(bindings);
+					println("----");
 					println(po);
 					errorCount++;
 				}
 				catch (Exception e)
 				{
-					printf("PO #%d, Exception: %s\n\n", po.number, e.getMessage());
+					printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
+					println("----");
+					printBindings(bindings);
+					println("----");
 					println(po);
 					errorCount++;
 				}
@@ -459,17 +468,20 @@ public class QuickCheck
 		}
 	}
 	
+	private void printBindings(List<INBindingSetter> bindings)
+	{
+		for (INBindingSetter bind: bindings)
+		{
+			printf("%s = %s\n", bind, bind.getBindValues());
+		}
+	}
+	
 	private void printFailPath(Context path, List<INBindingSetter> bindings)
 	{
 		if (path == null || path.isEmpty())
 		{
-			printf("No counterexample");
-			
-			for (INBindingSetter bind: bindings)
-			{
-				printf("\n%s = %s", bind, bind.getBindValues());
-			}
-			
+			printf("No counterexample\n");
+			printBindings(bindings);
 			return;
 		}
 		
@@ -499,6 +511,8 @@ public class QuickCheck
 				break;
 			}
 		}
+		
+		println("");
 	}
 
 	private String duration(long before, long after)
