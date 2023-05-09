@@ -24,9 +24,9 @@
 
 package quickcheck.commands;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.io.File;
@@ -52,6 +52,7 @@ import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
@@ -75,23 +76,26 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.BooleanValue;
+import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.visitors.DefaultRangeCreator;
+import quickcheck.visitors.InternalRangeCreator;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
 	private static final long FINITE_LIMIT = 100;		// If sizeof T < 100, use {x | x:T } 
-	private static final int NUMERIC_LIMIT = 5;		// So nat/int/etc are {-5, ..., 5}
+	private static final int NUMERIC_LIMIT = 5;			// So nat/int/etc are {-5, ..., 5}
 	private static final int EXPANSION_LIMIT = 1000;	// Top level binding value expansion limit
 	
 	private int errorCount = 0;
@@ -172,6 +176,7 @@ public class QuickCheck
 			ltr.close();
 			TCMultipleBindList tcbinds = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astbinds);
 			TCExpressionList tcexps = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astexps);
+			TCTypeList tctypes = new TCTypeList();
 			Environment env = interpreter.getGlobalEnvironment();
 			TypeChecker.clearErrors();
 			
@@ -180,6 +185,7 @@ public class QuickCheck
 				TCMultipleBind mb = tcbinds.get(i);
 				TCType mbtype = mb.typeCheck(env, NameScope.NAMESANDSTATE);
 				TCSetType mbset = new TCSetType(mb.location, mbtype);
+				tctypes.add(mbtype);
 				
 				TCExpression exp = tcexps.get(i);
 				TCType exptype = exp.typeCheck(env, null, NameScope.NAMESANDSTATE, null);
@@ -192,6 +198,10 @@ public class QuickCheck
 						println(error.toString());
 						errorCount++;
 					}
+				}
+				else if (exptype.isNumeric(LexLocation.ANY))
+				{
+					continue;	// fixed later
 				}
 				else if (!TypeComparator.compatible(mbset, exptype))
 				{
@@ -229,9 +239,15 @@ public class QuickCheck
 					list.addAll(svalue.values);
 					ranges.put(key, list);
 				}
+				else if (value instanceof IntegerValue)
+				{
+					IntegerValue ivalue = (IntegerValue)value;
+					int limit = (int) ivalue.value;
+					ranges.put(key, tctypes.get(i).apply(new InternalRangeCreator(ctxt, EXPANSION_LIMIT), limit));
+				}
 				else
 				{
-					println("\nRange does not evaluate to a set " + exp.location);
+					println("\nRange does not evaluate to a set or integer " + exp.location);
 					errorCount++;
 				}
 			}
