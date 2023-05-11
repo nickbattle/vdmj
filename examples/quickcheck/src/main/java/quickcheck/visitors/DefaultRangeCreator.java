@@ -297,7 +297,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Integer>
 		// Size will be the product of all fields, ie. maxsize ^ N. So we set root to the
 		// Nth root of maxsize for each field (or 1, minimally).
 		
-		int root = (int) Math.floor(Math.pow(maxsize, 1/node.fields.size()));
+		int root = (int) Math.floor(Math.pow(maxsize, 1.0D/node.fields.size()));
 		if (root == 0) root = 1;
 		
 		for (TCField field: node.fields)
@@ -398,7 +398,7 @@ public class DefaultRangeCreator extends TCTypeVisitor<String, Integer>
 		// Size will be the product of all fields, ie. maxsize ^ N. So we set root to the
 		// Nth root of maxsize for each field (or 1, minimally).
 		
-		int root = (int) Math.floor(Math.pow(maxsize, 1/node.types.size()));
+		int root = (int) Math.floor(Math.pow(maxsize, 1.0D/node.types.size()));
 		if (root == 0) root = 1;
 
 		int v = 1;

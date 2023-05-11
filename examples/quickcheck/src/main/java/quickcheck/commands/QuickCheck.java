@@ -74,6 +74,7 @@ import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -96,7 +97,8 @@ public class QuickCheck
 {
 	private static final long FINITE_LIMIT = 100;		// If sizeof T < 100, use {x | x:T } 
 	private static final int NUMERIC_LIMIT = 5;			// So nat/int/etc are {-5, ..., 5}
-	private static final int EXPANSION_LIMIT = 1000;	// Top level binding value expansion limit
+	private static final int EXPANSION_LIMIT = 20;		// Top level binding value expansion limit
+	private static final boolean GENERATE_VDM = false;	// False => use internal generator
 	
 	private int errorCount = 0;
 	
@@ -326,32 +328,49 @@ public class QuickCheck
 				{
 					if (!done.contains(mbind.toString()))
 					{
-						DefaultRangeCreator rangeCreator = new DefaultRangeCreator(NUMERIC_LIMIT);	// stateful
-						TCType type = mbind.getType();
 						String range = null;
 						
-						if (type.isInfinite())
+						if (GENERATE_VDM)
 						{
-							range = type.apply(rangeCreator, EXPANSION_LIMIT);
-						}
-						else
-						{
-							try
+							DefaultRangeCreator rangeCreator = new DefaultRangeCreator(NUMERIC_LIMIT);
+							TCType type = mbind.getType();
+							
+							if (type.isInfinite())
 							{
-								long size = type.apply(new INTypeSizeVisitor(), ctxt);
-								
-								if (size > FINITE_LIMIT)	// Avoid huge finite types
+								range = type.apply(rangeCreator, EXPANSION_LIMIT);
+							}
+							else
+							{
+								try
+								{
+									long size = type.apply(new INTypeSizeVisitor(), ctxt);
+									
+									if (size > FINITE_LIMIT)	// Avoid huge finite types
+									{
+										range = type.apply(rangeCreator, EXPANSION_LIMIT);
+									}
+									else
+									{
+										range = "{ x | x : " + type + " }";
+									}
+								}
+								catch (Exception e)		// Probably ArithmeticException
 								{
 									range = type.apply(rangeCreator, EXPANSION_LIMIT);
 								}
-								else
-								{
-									range = "{ x | x : " + type + " }";
-								}
 							}
-							catch (Exception e)		// Probably ArithmeticException
+						}
+						else
+						{
+							TCType type = mbind.getType();
+							
+							if (type instanceof TCFunctionType)
 							{
-								range = type.apply(rangeCreator, EXPANSION_LIMIT);
+								range = "{ /* define lambdas! */ }";
+							}
+							else
+							{
+								range = Integer.toString(EXPANSION_LIMIT);
 							}
 						}
 						
