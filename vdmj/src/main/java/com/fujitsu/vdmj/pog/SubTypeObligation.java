@@ -355,7 +355,7 @@ public class SubTypeObligation extends ProofObligation
 		{
 			prefix = "";
 
-			if (etype instanceof TCSeq1Type)
+			if (etype instanceof TCSeq1Type && !(atype.getSeq() instanceof TCSeq1Type))
 			{
     			sb.append(exp);
     			sb.append(" <> []");
@@ -463,7 +463,7 @@ public class SubTypeObligation extends ProofObligation
 		{
 			prefix = "";
 
-			if (etype instanceof TCSet1Type)
+			if (etype instanceof TCSet1Type && !(atype.getSet() instanceof TCSet1Type))
 			{
     			sb.append(exp);
     			sb.append(" <> {}");
