@@ -113,7 +113,18 @@ public class QuickCheck
 		
 		if (poList.isEmpty())
 		{
-			return all;		// No PO#s specified
+			ProofObligationList list = new ProofObligationList();
+			String def = Interpreter.getInstance().getDefaultName();
+			
+			for (ProofObligation po: all)
+			{
+				if (po.location.module.equals(def))
+				{
+					list.add(po);
+				}
+			}
+			
+			return list;	// No PO#s specified, so use default class/module's POs
 		}
 		else
 		{
@@ -224,7 +235,7 @@ public class QuickCheck
 			RootContext ctxt = interpreter.getInitialContext();
 			Map<String, ValueList> ranges = new HashMap<String, ValueList>();
 			long before = System.currentTimeMillis();
-			println("Expanding " + inbinds.size() + " ranges:");
+			printf("Expanding " + inbinds.size() + " ranges: ");
 			
 			for (int i=0; i<inbinds.size(); i++)
 			{
