@@ -355,7 +355,7 @@ public class SubTypeObligation extends ProofObligation
 		{
 			prefix = "";
 
-			if (etype instanceof TCSeq1Type && !(atype.getSeq() instanceof TCSeq1Type))
+			if (etype instanceof TCSeq1Type && atype != null && !(atype.getSeq() instanceof TCSeq1Type))
 			{
     			sb.append(exp);
     			sb.append(" <> []");
@@ -463,7 +463,7 @@ public class SubTypeObligation extends ProofObligation
 		{
 			prefix = "";
 
-			if (etype instanceof TCSet1Type && !(atype.getSet() instanceof TCSet1Type))
+			if (etype instanceof TCSet1Type && atype != null && !(atype.getSet() instanceof TCSet1Type))
 			{
     			sb.append(exp);
     			sb.append(" <> {}");
@@ -490,7 +490,10 @@ public class SubTypeObligation extends ProofObligation
 					}
 				}
 
-				sb.append("\nand ");
+				if (!set.members.isEmpty())
+				{
+					sb.append("\nand ");
+				}
 			}
 			else if (exp instanceof POSetRangeExpression)
 			{
