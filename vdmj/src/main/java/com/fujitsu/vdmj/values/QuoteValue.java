@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.values;
 
+import java.util.FormattableFlags;
+import java.util.Formatter;
+
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCQuoteType;
@@ -62,6 +65,20 @@ public class QuoteValue extends Value
 		}
 
 		return false;
+	}
+
+	@Override
+	public void formatTo(Formatter formatter, int flags, int width, int precision)
+	{
+		String s = toString();		// With '<...>' quotes, by default
+
+		if ((flags & FormattableFlags.ALTERNATE) > 0)
+		{
+			s = value;
+			flags = flags & ~FormattableFlags.ALTERNATE;
+		}
+
+		formatTo(s, formatter, flags, width, precision);
 	}
 
 	@Override

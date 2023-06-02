@@ -190,7 +190,12 @@ public class TCDependencyDefinitionVisitor extends TCLeafDefinitionVisitor<TCNam
 	public TCNameSet caseLocalDefinition(TCLocalDefinition node, EnvTriple arg)
 	{
 		TCNameSet names = visitorSet.applyTypeVisitor(node.type, arg);
-		names.addAll(visitorSet.applyDefinitionVisitor(node.valueDefinition, arg));
+		
+		if (node.isValueDefinition())
+		{
+			names.addAll(visitorSet.applyDefinitionVisitor(node.valueDefinition, arg));
+		}
+		
 		return names;
 	}
 	

@@ -24,9 +24,10 @@
 
 package quickcheck.commands;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -37,7 +38,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
@@ -53,9 +53,11 @@ import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -73,26 +75,32 @@ import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.BooleanValue;
+import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.visitors.DefaultRangeCreator;
+import quickcheck.visitors.InternalRangeCreator;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
-	private static final BigInteger FINITE_LIMIT = BigInteger.valueOf(100);
-	private static final int NUMERIC_LIMIT = 10;
+	private static final BigInteger FINITE_LIMIT = BigInteger.valueOf(100);		// If sizeof T < 100, use {x | x:T }
+	private static final int NUMERIC_LIMIT = 5;			// So nat/int/etc are {-5, ..., 5}
+	private static final int EXPANSION_LIMIT = 20;		// Top level binding value expansion limit
+	private static final boolean GENERATE_VDM = false;	// False => use internal generator
+	
 	private int errorCount = 0;
 	
 	public boolean hasErrors()
@@ -106,7 +114,18 @@ public class QuickCheck
 		
 		if (poList.isEmpty())
 		{
-			return all;		// No PO#s specified
+			ProofObligationList list = new ProofObligationList();
+			String def = Interpreter.getInstance().getDefaultName();
+			
+			for (ProofObligation po: all)
+			{
+				if (po.location.module.equals(def))
+				{
+					list.add(po);
+				}
+			}
+			
+			return list;	// No PO#s specified, so use default class/module's POs
 		}
 		else
 		{
@@ -120,7 +139,7 @@ public class QuickCheck
 				}
 				else
 				{
-					errorln("PO# " + n + " unknown. Must be between 1 and " + all.size());
+					println("PO# " + n + " unknown. Must be between 1 and " + all.size());
 					errorCount++;
 				}
 			}
@@ -145,6 +164,7 @@ public class QuickCheck
 	{
 		try
 		{
+			printf("Reading %s\n", filename);
 			errorCount = 0;
 			File file = new File(filename);
 			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL);
@@ -170,6 +190,7 @@ public class QuickCheck
 			ltr.close();
 			TCMultipleBindList tcbinds = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astbinds);
 			TCExpressionList tcexps = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astexps);
+			TCTypeList tctypes = new TCTypeList();
 			Environment env = interpreter.getGlobalEnvironment();
 			TypeChecker.clearErrors();
 			
@@ -178,6 +199,7 @@ public class QuickCheck
 				TCMultipleBind mb = tcbinds.get(i);
 				TCType mbtype = mb.typeCheck(env, NameScope.NAMESANDSTATE);
 				TCSetType mbset = new TCSetType(mb.location, mbtype);
+				tctypes.add(mbtype);
 				
 				TCExpression exp = tcexps.get(i);
 				TCType exptype = exp.typeCheck(env, null, NameScope.NAMESANDSTATE, null);
@@ -186,9 +208,14 @@ public class QuickCheck
 				{
 					for (VDMError error: TypeChecker.getErrors())
 					{
+						println(exp);
 						println(error.toString());
 						errorCount++;
 					}
+				}
+				else if (exptype.isNumeric(LexLocation.ANY))
+				{
+					continue;	// fixed later
 				}
 				else if (!TypeComparator.compatible(mbset, exptype))
 				{
@@ -209,7 +236,7 @@ public class QuickCheck
 			RootContext ctxt = interpreter.getInitialContext();
 			Map<String, ValueList> ranges = new HashMap<String, ValueList>();
 			long before = System.currentTimeMillis();
-			println("Expanding " + inbinds.size() + " ranges:");
+			printf("Expanding " + inbinds.size() + " ranges: ");
 			
 			for (int i=0; i<inbinds.size(); i++)
 			{
@@ -226,9 +253,15 @@ public class QuickCheck
 					list.addAll(svalue.values);
 					ranges.put(key, list);
 				}
+				else if (value instanceof IntegerValue)
+				{
+					IntegerValue ivalue = (IntegerValue)value;
+					int limit = ivalue.intValue(null).intValue();
+					ranges.put(key, tctypes.get(i).apply(new InternalRangeCreator(ctxt, EXPANSION_LIMIT), limit));
+				}
 				else
 				{
-					println("\nRange does not evaluate to a set " + exp.location);
+					println("\nRange does not evaluate to a set or integer " + exp.location);
 					errorCount++;
 				}
 			}
@@ -255,11 +288,11 @@ public class QuickCheck
 		{
 			println("Error: " + e.getMessage() + " " + e.location);
 		}
-		catch (InternalException e)
-		{
-			errorln(e.getMessage());
-		}
 		catch (ContextException e)
+		{
+			println(e.getMessage());
+		}
+		catch (InternalException e)
 		{
 			errorln(e.getMessage());
 		}
@@ -307,35 +340,53 @@ public class QuickCheck
 				{
 					if (!done.contains(mbind.toString()))
 					{
-						DefaultRangeCreator rangeCreator = new DefaultRangeCreator(NUMERIC_LIMIT);	// stateful
-						TCType type = mbind.getType();
 						String range = null;
 						
-						if (type.isInfinite())
+						if (GENERATE_VDM)
 						{
-							range = type.apply(rangeCreator, new TCTypeSet());
+							DefaultRangeCreator rangeCreator = new DefaultRangeCreator(NUMERIC_LIMIT);
+							TCType type = mbind.getType();
+							
+							if (type.isInfinite())
+							{
+								range = type.apply(rangeCreator, EXPANSION_LIMIT);
+							}
+							else
+							{
+								try
+								{
+									BigInteger size = type.apply(new INTypeSizeVisitor(), ctxt);
+									
+									if (size.compareTo(FINITE_LIMIT) > 0)	// Avoid huge finite types
+									{
+										range = type.apply(rangeCreator, EXPANSION_LIMIT);
+									}
+									else
+									{
+										range = "{ x | x : " + type + " }";
+									}
+								}
+								catch (Exception e)		// Probably ArithmeticException
+								{
+									range = type.apply(rangeCreator, EXPANSION_LIMIT);
+								}
+							}
 						}
 						else
 						{
-							try
+							TCType type = mbind.getType();
+							
+							if (type instanceof TCFunctionType)
 							{
-								BigInteger size = type.apply(new INTypeSizeVisitor(), ctxt);
-								
-								if (size.compareTo(FINITE_LIMIT) > 0)	// Avoid huge finite types
-								{
-									range = type.apply(rangeCreator, new TCTypeSet());
-								}
-								else
-								{
-									range = "{ x | x : " + type + " }";
-								}
+								range = "{ /* define lambdas! */ }";
 							}
-							catch (Exception e)		// Probably ArithmeticException
+							else
 							{
-								range = type.apply(rangeCreator, new TCTypeSet());
+								range = Integer.toString(EXPANSION_LIMIT);
 							}
 						}
 						
+						writer.println("-- " + po.location);
 						writer.println(mbind + " = " + range + ";");
 						done.add(mbind.toString());
 					}
@@ -364,12 +415,10 @@ public class QuickCheck
 			{
 				if (!po.isCheckable)
 				{
-					printf("PO# %d, UNCHECKED\n", po.number);
+					printf("PO #%d, UNCHECKED\n", po.number);
 					continue;
 				}
 
-				Stack<Context> failPath = new Stack<Context>();
-				INForAllExpression.setFailPath(failPath);
 				INExpression poexp = getPOExpression(po);
 				bindings = getBindList(poexp, false);
 				
@@ -379,11 +428,12 @@ public class QuickCheck
 					
 					if (values != null)
 					{
+						verbose("PO #%d, setting %s, %d values", po.number, mbind.toString(), values.size());
 						mbind.setBindValues(values);
 					}
 					else
 					{
-						errorln("PO# " + po.number + ": No range defined for " + mbind);
+						println("PO #" + po.number + ": No range defined for " + mbind);
 						errorCount++;
 					}
 				}
@@ -391,6 +441,7 @@ public class QuickCheck
 				try
 				{
 					long before = System.currentTimeMillis();
+					verbose("PO #%d, starting...", po.number);
 					Value result = poexp.eval(ctxt);
 					long after = System.currentTimeMillis();
 					
@@ -398,33 +449,57 @@ public class QuickCheck
 					{
 						if (result.boolValue(ctxt))
 						{
-							printf("PO# %d, PASSED %s\n", po.number, duration(before, after));
+							printf("PO #%d, PASSED %s\n", po.number, duration(before, after));
 						}
 						else
 						{
-							printf("PO# %d, FAILED %s: ", po.number, duration(before, after));
-							printFailPath(failPath);
-							println("\n" + po);
+							printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
+							printFailPath(INForAllExpression.failPath, bindings);
+							println("----");
+							println(po);
 							errorCount++;
 						}
 					}
 					else
 					{
-						printf("PO# %d, Error: PO evaluation returns %s?\n\n", po.number, result.kind());
+						printf("PO #%d, Error: PO evaluation returns %s?\n", po.number, result.kind());
+						println("----");
+						printBindings(bindings);
+						println("----");
 						println(po);
 						errorCount++;
 					}
 				}
+				catch (ContextException e)
+				{
+					printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
+					
+					if (e.ctxt.outer != null)
+					{
+						e.ctxt.printStackFrames(Console.out);
+					}
+					else
+					{
+						println("In context of " + e.ctxt.title + " " + e.ctxt.location);
+					}
+					
+					println("----");
+					printBindings(bindings);
+					println("----");
+					println(po);
+					errorCount++;
+				}
 				catch (Exception e)
 				{
-					printf("PO# %d, %s\n\n", po.number, e.getMessage());
+					printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
+					println("----");
+					printBindings(bindings);
+					println("----");
 					println(po);
 					errorCount++;
 				}
 				finally
 				{
-					INForAllExpression.setFailPath(null);
-
 					for (INBindingSetter mbind: bindings)
 					{
 						mbind.setBindValues(null);
@@ -440,25 +515,51 @@ public class QuickCheck
 		}
 	}
 	
-	private void printFailPath(Stack<Context> failPath)
+	private void printBindings(List<INBindingSetter> bindings)
 	{
-		if (failPath.isEmpty())
+		for (INBindingSetter bind: bindings)
 		{
-			printf("No counterexample");
+			printf("%s = %s\n", bind, bind.getBindValues());
+		}
+	}
+	
+	private void printFailPath(Context path, List<INBindingSetter> bindings)
+	{
+		if (path == null || path.isEmpty())
+		{
+			printf("No counterexample\n");
+			printBindings(bindings);
 			return;
 		}
 		
 		printf("Counterexample: ");
 		String sep = "";
+		Context ctxt = path;
 		
-		for (Context path: failPath)
+		while (true)
 		{
-			for (TCNameToken name: path.keySet())
+			if (ctxt.outer != null)
 			{
-				printf("%s%s = %s", sep, name, path.get(name));
-				sep = ", ";
+				if (ctxt instanceof RootContext)
+				{
+					sep = "; from " + ctxt.title + " where ";
+				}
+				
+				for (TCNameToken name: ctxt.keySet())
+				{
+					printf("%s%s = %s", sep, name, ctxt.get(name));
+					sep = ", ";
+				}
+				
+				ctxt = ctxt.outer;
+			}
+			else
+			{
+				break;
 			}
 		}
+		
+		println("");
 	}
 
 	private String duration(long before, long after)

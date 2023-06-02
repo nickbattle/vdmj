@@ -56,6 +56,7 @@ import com.fujitsu.vdmj.ast.modules.ASTModuleExports;
 import com.fujitsu.vdmj.ast.modules.ASTModuleImports;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.ast.types.ASTType;
+import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -168,6 +169,11 @@ public class ModuleReader extends SyntaxReader
 			checkFor(Token.MODULE, 2170, "Expecting 'module' at module start");
 			name = readIdToken("Expecting identifier after 'module'");
 			setCurrentModule(name.name);
+			
+			if (Settings.strict && name.name.equals("DEFAULT"))
+			{
+				warning(5043, "Strict: Should not use 'DEFAULT' as a module name", name.location);
+			}
 
 			if (lastToken().is(Token.IMPORTS))
 			{
@@ -374,7 +380,7 @@ public class ModuleReader extends SyntaxReader
 	{
 		LexToken token = lastToken();
 		LexNameList nameList = readIdList(true);
-		LexNameList typeParams = ignoreTypeParams();
+		ASTTypeList typeParams = ignoreTypeParams();
 		checkFor(Token.COLON, 2176, "Expecting ':' after export name");
 		ASTType type = getTypeReader().readType();
 		return new ASTExportedFunction(token.location, nameList, type, typeParams);
@@ -629,7 +635,7 @@ public class ModuleReader extends SyntaxReader
 	{
 		LexNameToken name =	readNameToken("Expecting imported function name", true);
 		LexNameToken defname = getDefName(from, name);
-		LexNameList typeParams = ignoreTypeParams();
+		ASTTypeList typeParams = ignoreTypeParams();
 
 		ASTType type = null;
 
@@ -719,7 +725,7 @@ public class ModuleReader extends SyntaxReader
     	return name;
 	}
 
-	private LexNameList ignoreTypeParams() throws LexException, ParserException
+	private ASTTypeList ignoreTypeParams() throws LexException, ParserException
 	{
 		if (lastToken().is(Token.SEQ_OPEN))
 		{

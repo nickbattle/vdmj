@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.in.patterns.INPatternListList;
 import com.fujitsu.vdmj.in.types.INInstantiate;
 import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -51,7 +50,7 @@ import com.fujitsu.vdmj.values.NameValuePairList;
 public class INExplicitFunctionDefinition extends INDefinition
 {
 	private static final long serialVersionUID = 1L;
-	public final TCNameList typeParams;
+	public final TCTypeList typeParams;
 	public final TCFunctionType type;
 	public final INPatternListList paramPatternList;
 	public final INExpression precondition;
@@ -68,7 +67,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 
 	public INExplicitFunctionDefinition(INAnnotationList annotations,
 		INAccessSpecifier accessSpecifier, TCNameToken name,
-		TCNameList typeParams, TCFunctionType type,
+		TCTypeList typeParams, TCFunctionType type,
 		INPatternListList parameters,
 		INExpression body, INExpression precondition, INExpression postcondition,
 		boolean typeInvariant, TCNameToken measureName, INExplicitFunctionDefinition measureDef,

@@ -87,18 +87,15 @@ public class CharacterValue extends Value
 	@Override
 	public void formatTo(Formatter formatter, int flags, int width, int precision)
 	{
-		String s = null;
+		String s = toString();		// With 'x' quotes, by default
 
 		if ((flags & FormattableFlags.ALTERNATE) > 0)
 		{
 			s = String.valueOf(unicode);	// Just x
-		}
-		else
-		{
-			s = toString();		// With 'x' quotes
+			flags = flags & ~FormattableFlags.ALTERNATE;
 		}
 
-		formatTo(s, formatter, 0, width, precision);
+		formatTo(s, formatter, flags, width, precision);
 	}
 
 	@Override

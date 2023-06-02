@@ -93,6 +93,8 @@ public class TCLetDefExpression extends TCExpression
 		}
 
 		TCType r = expression.typeCheck(local, null, scope, constraint);
+		
+		env.importsCheck(r, location);
 		local.unusedCheck(env);
 		return setType(r);
 	}

@@ -32,7 +32,6 @@ import com.fujitsu.vdmj.ast.definitions.ASTExplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitFunctionDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTImplicitOperationDefinition;
 import com.fujitsu.vdmj.ast.expressions.ASTSubclassResponsibilityExpression;
-import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.modules.ASTModule;
 import com.fujitsu.vdmj.ast.patterns.ASTPattern;
 import com.fujitsu.vdmj.ast.patterns.ASTPatternList;
@@ -86,9 +85,9 @@ public class ASTLaunchDebugLens extends AbstractLaunchDebugLens implements ASTCo
 					{
 						applyTypes = new JSONArray();
 						
-						for (LexNameToken ptype: exdef.typeParams)
+						for (ASTType ptype: exdef.typeParams)
 						{
-							applyTypes.add("@" + ptype.toString());
+							applyTypes.add(ptype.toString());
 						}
 					}
 					

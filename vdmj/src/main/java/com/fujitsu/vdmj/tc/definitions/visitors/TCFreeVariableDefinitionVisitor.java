@@ -183,7 +183,12 @@ public class TCFreeVariableDefinitionVisitor extends TCLeafDefinitionVisitor<TCN
 	public TCNameSet caseLocalDefinition(TCLocalDefinition node, Environment arg)
 	{
 		TCNameSet names = visitorSet.applyTypeVisitor(node.type, arg);
-		names.addAll(node.valueDefinition.apply(this, arg));
+		
+		if (node.isValueDefinition())
+		{
+			names.addAll(node.valueDefinition.apply(this, arg));
+		}
+		
 		return names;
 	}
 	

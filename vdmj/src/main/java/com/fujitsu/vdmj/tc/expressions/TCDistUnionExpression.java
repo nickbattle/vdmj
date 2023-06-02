@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
@@ -60,11 +62,27 @@ public class TCDistUnionExpression extends TCUnaryExpression
 
 		TCType type = exp.typeCheck(env, null, scope, setType);
 
-		if (type.isSet(location))
+		if (type.isSet(location))	// Should be set of union of member set types
 		{
 			TCSetType set = type.getSet();
-
-			if (set.setof.isSet(location))
+			
+			if (set.setof instanceof TCUnionType)
+			{
+				TCUnionType union = (TCUnionType)set.setof;
+				TCTypeSet ts = new TCTypeSet();
+				
+				for (TCType member: union.types)
+				{
+					if (member instanceof TCSetType)
+					{
+						TCSetType sm = (TCSetType)member;
+						ts.add(sm.setof);
+					}
+				}
+				
+				return setType(new TCSetType(location, ts.getType(location)));
+			}
+			else if (set.setof.isSet(location))
 			{
 				return setType(set.setof);
 			}

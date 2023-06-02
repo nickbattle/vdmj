@@ -24,18 +24,18 @@
 
 package com.fujitsu.vdmj.ast.modules;
 
-import com.fujitsu.vdmj.ast.lex.LexNameList;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.ast.types.ASTType;
+import com.fujitsu.vdmj.ast.types.ASTTypeList;
 
 public class ASTImportedFunction extends ASTImportedValue
 {
 	private static final long serialVersionUID = 1L;
 
-	public final LexNameList typeParams;
+	public final ASTTypeList typeParams;
 
 	public ASTImportedFunction(
-		LexNameToken name, ASTType type, LexNameList typeParams, LexNameToken renamed)
+		LexNameToken name, ASTType type, ASTTypeList typeParams, LexNameToken renamed)
 	{
 		super(name, type, renamed);
 		this.typeParams = typeParams;

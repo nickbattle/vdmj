@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2016 Fujitsu Services Ltd.
+ *	Copyright (c) 2023 Fujitsu Services Ltd.
  *
  *	Author: Nick Battle
  *
@@ -22,42 +22,17 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.ast.definitions;
+package com.fujitsu.vdmj.pog;
 
-import com.fujitsu.vdmj.ast.definitions.visitors.ASTDefinitionVisitor;
-import com.fujitsu.vdmj.ast.lex.LexNameToken;
-import com.fujitsu.vdmj.ast.types.ASTType;
-import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
 
-/**
- * A class to hold a local variable definition.
- */
-public class ASTLocalDefinition extends ASTDefinition
+public class TotalOrderObligation extends ProofObligation
 {
-	private static final long serialVersionUID = 1L;
-	public final ASTType type;
-
-	public ASTLocalDefinition(LexLocation location, LexNameToken name, ASTType type)
+	public TotalOrderObligation(POTypeDefinition def, POContextStack ctxt)
 	{
-		super(location, name);
-		this.type = type;
-	}
-
-	@Override
-	public String toString()
-	{
-		return name.name + " = " + type;
-	}
-
-	@Override
-	public String kind()
-	{
-		return "local";
-	}
-
-	@Override
-	public <R, S> R apply(ASTDefinitionVisitor<R, S> visitor, S arg)
-	{
-		return visitor.caseLocalDefinition(this, arg);
+		super(def.location, POType.TOTAL_ORDER, ctxt);
+		String po = "(forall x:%T, y:%T & x <= y or y <= x)";
+		po = po.replaceAll("%T", def.name.getName());
+		value = ctxt.getObligation(po);
 	}
 }

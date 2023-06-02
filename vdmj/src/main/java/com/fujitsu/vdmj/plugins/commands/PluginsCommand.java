@@ -27,8 +27,6 @@ package com.fujitsu.vdmj.plugins.commands;
 import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
-import java.util.Map.Entry;
-
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 
@@ -54,9 +52,9 @@ public class PluginsCommand extends AnalysisCommand
 			return USAGE;
 		}
 		
-		for (Entry<String, AnalysisPlugin> name: registry.getPlugins().entrySet())
+		for (AnalysisPlugin plugin: registry.getPlugins())
 		{
-			printf("%s = %s\n", name.getKey(), name.getValue().getDescription());
+			printf("%s = %s\n", plugin.getName(), plugin.getDescription());
 		}
 		
 		return null;

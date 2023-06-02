@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitOperationDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitOperationDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPatternList;
@@ -41,6 +40,7 @@ import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCPatternListTypePairList;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 import json.JSONArray;
@@ -82,9 +82,9 @@ public class TCLaunchDebugLens extends AbstractLaunchDebugLens implements TCCode
 					{
 						applyTypes = new JSONArray();
 						
-						for (TCNameToken ptype: exdef.typeParams)
+						for (TCType ptype: exdef.typeParams)
 						{
-							applyTypes.add("@" + ptype.toString());
+							applyTypes.add(ptype.toString());
 						}
 					}
 					

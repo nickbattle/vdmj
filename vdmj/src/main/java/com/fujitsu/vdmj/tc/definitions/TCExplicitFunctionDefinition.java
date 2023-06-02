@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.tc.expressions.TCNotYetSpecifiedExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCFunctionCallFinder;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
@@ -63,7 +62,7 @@ import com.fujitsu.vdmj.util.Utils;
 public class TCExplicitFunctionDefinition extends TCDefinition
 {
 	private static final long serialVersionUID = 1L;
-	public final TCNameList typeParams;
+	public final TCTypeList typeParams;
 	public TCFunctionType type;
 	public final TCTypeList unresolved;
 	public final TCPatternListList paramPatternList;
@@ -88,7 +87,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 	public TCExplicitFunctionDefinition(TCAnnotationList annotations,
 		TCAccessSpecifier accessSpecifier, TCNameToken name,
-		TCNameList typeParams, TCFunctionType type,
+		TCTypeList typeParams, TCFunctionType type,
 		TCPatternListList parameters, TCExpression body,
 		TCExpression precondition,
 		TCExpression postcondition, boolean typeInvariant, TCExpression measure)
@@ -180,11 +179,10 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	{
 		TCDefinitionList defs = new TCDefinitionList();
 
-		for (TCNameToken pname: typeParams)
+		for (TCType ptype: typeParams)
 		{
-			TCDefinition p = new TCLocalDefinition(
-					pname.getLocation(), pname, new TCParameterType(pname));
-
+			TCParameterType param = (TCParameterType)ptype;
+			TCDefinition p = new TCLocalDefinition(param.location, param.name, param);
 			p.markUsed();
 			defs.add(p);
 		}

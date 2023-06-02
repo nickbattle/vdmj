@@ -57,6 +57,12 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	{
 		return "PO";
 	}
+	
+	@Override
+	public int getPriority()
+	{
+		return PO_PRIORITY;
+	}
 
 	@Override
 	public void init()

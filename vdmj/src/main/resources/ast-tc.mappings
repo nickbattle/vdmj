@@ -25,7 +25,6 @@ map ASTImplicitOperationDefinition{annotations, accessSpecifier, name, parameter
 map ASTImportedDefinition{location, def, comments} to TCImportedDefinition(location, def) set comments;
 map ASTInheritedDefinition{accessSpecifier, name, superdef, comments} to TCInheritedDefinition(accessSpecifier, name, superdef) set comments;
 map ASTInstanceVariableDefinition{annotations, accessSpecifier, name, type, expression, comments} to TCInstanceVariableDefinition(annotations, accessSpecifier, name, type, expression) set comments;
-map ASTLocalDefinition{location, name, type, comments} to TCLocalDefinition(location, name, type) set comments;
 map ASTMultiBindListDefinition{location, bindings, comments} to TCMultiBindListDefinition(location, bindings) set comments;
 map ASTMutexSyncDefinition{annotations, location, operations, comments} to TCMutexSyncDefinition(annotations, location, operations) set comments;
 map ASTNamedTraceDefinition{annotations, location, name, terms, comments} to TCNamedTraceDefinition(annotations, location, name, terms) set comments;

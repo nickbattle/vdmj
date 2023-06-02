@@ -55,9 +55,21 @@ abstract public class AnalysisPlugin
 	public abstract String getName();
 	public abstract void init();
 	
+	/**
+	 * The priority affects the order that plugins are sent events via the EventHub.
+	 * Lower priorities are sent first. The system plugin priorities are fixed multiples
+	 * of 100. User plugins are typically later, but can be earlier. If a plugin does
+	 * not define a priority, they get the default, which effectively means classpath
+	 * order.
+	 */
+	public int getPriority()
+	{
+		return EventListener.USER_PRIORITY;
+	}
+	
 	public String getDescription()
 	{
-		return getClass().getName();	// Fully qualified classname, by default
+		return getClass().getName() + ", priority " + getPriority();
 	}
 	
 	public void processArgs(List<String> argv)

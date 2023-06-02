@@ -31,9 +31,9 @@ import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POApplyExpression;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.util.Utils;
 
 public class RecursiveObligation extends ProofObligation
@@ -86,9 +86,8 @@ public class RecursiveObligation extends ProofObligation
 			{
 				sb.append("[");
 				
-				for (TCNameToken type: edef.typeParams)
+				for (TCType type: edef.typeParams)
 				{
-					sb.append("@");
 					sb.append(type);
 				}
 				

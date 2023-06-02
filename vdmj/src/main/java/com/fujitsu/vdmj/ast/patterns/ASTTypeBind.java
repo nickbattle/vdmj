@@ -37,6 +37,12 @@ public class ASTTypeBind extends ASTBind
 		super(pattern.location, pattern);
 		this.type = type;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return pattern + ":" + type;
+	}
 
 	@Override
 	public <R, S> R apply(ASTBindVisitor<R, S> visitor, S arg)

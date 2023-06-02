@@ -26,8 +26,12 @@ package com.fujitsu.vdmj.plugins;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.plugins.commands.ErrorCommand;
 
@@ -35,6 +39,15 @@ public class PluginRegistry
 {
 	private static PluginRegistry INSTANCE = null;
 	private final Map<String, AnalysisPlugin> plugins;
+	
+	private static class PluginComparator implements Comparator<AnalysisPlugin>
+	{
+		@Override
+		public int compare(AnalysisPlugin left, AnalysisPlugin right)
+		{
+			return left.getPriority() - right.getPriority();
+		}
+	}
 
 	private PluginRegistry()
 	{
@@ -72,9 +85,16 @@ public class PluginRegistry
 		return (T)plugins.get(name);
 	}
 	
-	public Map<String, AnalysisPlugin> getPlugins()
+	public Map<String, AnalysisPlugin> getPluginMap()
 	{
 		return plugins;
+	}
+	
+	public List<AnalysisPlugin> getPlugins()
+	{
+		List<AnalysisPlugin> sorted = new Vector<AnalysisPlugin>(plugins.values());
+		Collections.sort(sorted, new PluginComparator());
+		return sorted;
 	}
 	
 	public AnalysisCommand getCommand(String line)
@@ -82,7 +102,7 @@ public class PluginRegistry
 		String[] argv = line.split("\\s+");
 		AnalysisCommand result = null;
 		
-		for (AnalysisPlugin plugin: plugins.values())
+		for (AnalysisPlugin plugin: getPlugins())	// Priority ordered
 		{
 			try
 			{

@@ -45,6 +45,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.util.Utils;
@@ -56,7 +57,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 {
 	private static final long serialVersionUID = 1L;
 	
-	public final TCNameList typeParams;
+	public final TCTypeList typeParams;
 	public final TCFunctionType type;
 	public final POPatternListList paramPatternList;
 	public final POExpression precondition;
@@ -75,7 +76,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 	public final TCNameToken measureName;
 
 	public POExplicitFunctionDefinition(POAnnotationList annotations, TCNameToken name,
-		TCNameList typeParams, TCFunctionType type,
+		TCTypeList typeParams, TCFunctionType type,
 		POPatternListList parameters,
 		POExpression body, POExpression precondition, POExpression postcondition,
 		boolean isUndefined, TCType expectedResult, TCType actualResult,
@@ -152,7 +153,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 		
 		if (type.hasTotal())
 		{
-			ctxt.push(new POFunctionDefinitionContext(this, false));
+			ctxt.push(new POFunctionDefinitionContext(this, true));
 			obligations.add(new TotalFunctionObligation(this, ctxt));
 			ctxt.pop();
 		}

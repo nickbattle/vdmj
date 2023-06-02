@@ -49,9 +49,11 @@ functions are in the qc.vdm file, which has to be included in the project.
 
 ```
 	-- Simple range of nats
+	-- in 'DEFAULT' (test.vdm) at line 6:16
 	t : nat = {0, ..., 100};
 	
 	-- More complex generation, via a function
+	-- in 'DEFAULT' (test.vdm) at line 14:13
 	a : T = qcGetTRange();
 ```
 
@@ -72,6 +74,8 @@ type binds. The default range filename is "ranges.qc".
 	... edit the sets in ranges.qc here, then...
 	
 	> qc                  -- Try every PO, or provide a list of numbers
+	Expanding 2 ranges:
+	..
 	Ranges expanded in 0.049s
 	PO# 1, PASSED in 0.018s
 	PO# 2, PASSED in 0.001s

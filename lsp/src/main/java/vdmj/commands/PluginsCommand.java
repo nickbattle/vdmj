@@ -24,8 +24,6 @@
 
 package vdmj.commands;
 
-import java.util.Map.Entry;
-
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
@@ -57,11 +55,11 @@ public class PluginsCommand extends AnalysisCommand
 		
 		StringBuilder sb = new StringBuilder();
 		
-		for (Entry<String, AnalysisPlugin> plugin: PluginRegistry.getInstance().getPlugins().entrySet())
+		for (AnalysisPlugin plugin: PluginRegistry.getInstance().getPlugins())
 		{
-			sb.append(plugin.getKey());
+			sb.append(plugin.getName());
 			sb.append(": ");
-			sb.append(plugin.getValue().getDescription());
+			sb.append(plugin.getDescription());
 			sb.append("\n");
 		}
 		

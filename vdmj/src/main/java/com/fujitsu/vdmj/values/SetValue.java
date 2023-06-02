@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.values;
 
+import java.util.FormattableFlags;
+import java.util.Formatter;
 import java.util.List;
 
 import com.fujitsu.vdmj.runtime.Context;
@@ -119,6 +121,28 @@ public class SetValue extends Value
 		}
 
 		return false;
+	}
+
+	@Override
+	public void formatTo(Formatter formatter, int flags, int width, int precision)
+	{
+		String s = values.toString();
+
+		if ((flags & FormattableFlags.ALTERNATE) > 0)
+		{
+			if (values.isEmpty())
+			{
+				s = "";
+			}
+			else
+			{
+				s = s.substring(1, s.length()-1);	// Without "quotes" or "{ ... }"
+			}
+
+			flags = flags & ~FormattableFlags.ALTERNATE;
+		}
+
+		formatTo(s, formatter, flags, width, precision);
 	}
 
 	@Override

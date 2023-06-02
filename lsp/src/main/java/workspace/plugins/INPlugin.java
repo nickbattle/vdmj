@@ -83,6 +83,12 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	{
 		return "IN";
 	}
+	
+	@Override
+	public int getPriority()
+	{
+		return IN_PRIORITY;
+	}
 
 	@Override
 	public void init()

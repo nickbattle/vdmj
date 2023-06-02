@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.typechecker;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
@@ -31,6 +34,8 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionSet;
 import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 /**
  * The parent class of all type checking environments.
@@ -218,6 +223,28 @@ abstract public class Environment
 		{
 			p.unusedCheck();
 			p = p.outer;
+		}
+	}
+	
+	/**
+	 * Check that a given type is in module scope, or whether there is a
+	 * missing type import.
+	 */
+	public void importsCheck(TCType type, LexLocation location)
+	{
+		if (Settings.dialect == Dialect.VDM_SL && type instanceof TCNamedType)
+		{
+			TCNamedType nt = (TCNamedType)type;
+			TCDefinition def = this.findType(nt.typename, location.module);
+			
+			if (def == null)
+			{
+				TypeChecker.warning(5042, "Missing type import for " + nt.typename.getExplicit(true), location);
+			}
+			else
+			{
+				def.markUsed();		// Note: this isn't the renamed definition, if any
+			}
 		}
 	}
 }

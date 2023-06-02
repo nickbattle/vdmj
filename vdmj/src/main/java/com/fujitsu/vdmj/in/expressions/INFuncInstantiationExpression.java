@@ -32,7 +32,7 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.in.types.INInstantiate;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
@@ -79,15 +79,15 @@ public class INFuncInstantiationExpression extends INExpression
     			abort(3034, "Function is already instantiated: " + fv.name, ctxt);
     		}
 
-    		TCNameList paramNames = null;
+    		TCTypeList paramTypes = null;
     		
     		if (expdef != null)
     		{
-    			paramNames = expdef.typeParams;
+    			paramTypes = expdef.typeParams;
     		}
     		else
     		{
-    			paramNames = impdef.typeParams;
+    			paramTypes = impdef.typeParams;
     		}
 
     		Context params = new Context(location, "Instantiation params", null);
@@ -106,7 +106,8 @@ public class INFuncInstantiationExpression extends INExpression
     			}
     			
     			argtypes.add(ptype);
-    			params.put(paramNames.get(i), new ParameterValue(ptype));
+    			TCParameterType param = (TCParameterType) paramTypes.get(i);
+    			params.put(param.name, new ParameterValue(ptype));
     		}
     		
     		FunctionValue rv = null;

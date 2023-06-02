@@ -993,3 +993,5 @@ as the expected and actual values.
 5039, "Cannot evaluate type bind of size <n>"
 5040, "Cannot evaluate type bind, size exceeds long"
 5041, "Add explicit type <pattern : type> here");
+5042, "Missing type import for <name>";
+5043, "Strict: Should not use 'DEFAULT' as a module name"
