@@ -84,7 +84,7 @@ import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueMap;
 import com.fujitsu.vdmj.values.ValueSet;
 
-public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
+public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 {
 	private final int NUMERIC_LIMIT;
 	private final Context ctxt;
@@ -98,79 +98,79 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 
 	@Override
-	public ValueList caseType(TCType type, Integer limit)
+	public ValueSet caseType(TCType type, Integer limit)
 	{
 		throw new RuntimeException("Missing InternalRangeCreator case for " + type);
 	}
 	
 	@Override
-	public ValueList caseUnknownType(TCUnknownType node, Integer limit)
+	public ValueSet caseUnknownType(TCUnknownType node, Integer limit)
 	{
 		// Anything... ?
 		return caseBooleanType(new TCBooleanType(LexLocation.ANY), limit);
 	}
 
 	@Override
-	public ValueList caseBooleanType(TCBooleanType type, Integer limit)
+	public ValueSet caseBooleanType(TCBooleanType type, Integer limit)
 	{
 		switch (limit)
 		{
-			case 0:		return new ValueList();
-			case 1:		return new ValueList(new BooleanValue(false));
-			default:	return new ValueList(new BooleanValue(true), new BooleanValue(false));
+			case 0:		return new ValueSet();
+			case 1:		return new ValueSet(new BooleanValue(false));
+			default:	return new ValueSet(new BooleanValue(true), new BooleanValue(false));
 		}
 	}
 	
 	@Override
-	public ValueList caseCharacterType(TCCharacterType node, Integer limit)
+	public ValueSet caseCharacterType(TCCharacterType node, Integer limit)
 	{
 		switch (limit)
 		{
-			case 0:		return new ValueList();
-			case 1:		return new ValueList(new CharacterValue('a'));
-			default:	return new ValueList(new CharacterValue('a'), new CharacterValue('b'));
+			case 0:		return new ValueSet();
+			case 1:		return new ValueSet(new CharacterValue('a'));
+			default:	return new ValueSet(new CharacterValue('a'), new CharacterValue('b'));
 		}
 	}
 	
 	@Override
-	public ValueList caseTokenType(TCTokenType node, Integer limit)
+	public ValueSet caseTokenType(TCTokenType node, Integer limit)
 	{
 		switch (limit)
 		{
-			case 0:		return new ValueList();
-			case 1:		return new ValueList(new TokenValue(new IntegerValue(1)));
-			default:	return new ValueList(new TokenValue(new IntegerValue(1)), new TokenValue(new IntegerValue(2)));
+			case 0:		return new ValueSet();
+			case 1:		return new ValueSet(new TokenValue(new IntegerValue(1)));
+			default:	return new ValueSet(new TokenValue(new IntegerValue(1)), new TokenValue(new IntegerValue(2)));
 		}
 	}
 	
 	@Override
-	public ValueList caseOptionalType(TCOptionalType node, Integer limit)
+	public ValueSet caseOptionalType(TCOptionalType node, Integer limit)
 	{
 		switch (limit)
 		{
-			case 0:		return new ValueList();
-			case 1:		return new ValueList(new NilValue());
+			case 0:		return new ValueSet();
+			case 1:		return new ValueSet(new NilValue());
 			default:
-				ValueList list = node.type.apply(this, limit - 1);
+				ValueSet list = node.type.apply(this, limit - 1);
 				list.add(new NilValue());
 				return list;
 		}
 	}
 	
 	@Override
-	public ValueList caseBracketType(TCBracketType node, Integer limit)
+	public ValueSet caseBracketType(TCBracketType node, Integer limit)
 	{
 		return node.type.apply(this, limit);
 	}
 
 	@Override
-	public ValueList caseQuoteType(TCQuoteType node, Integer limit)
+	public ValueSet caseQuoteType(TCQuoteType node, Integer limit)
 	{
-		return new ValueList(new QuoteValue(node.value));
+		return new ValueSet(new QuoteValue(node.value));
 	}
 	
 	@Override
-	public ValueList caseNaturalOneType(TCNaturalOneType node, Integer limit)
+	public ValueSet caseNaturalOneType(TCNaturalOneType node, Integer limit)
 	{
 		int to = NUMERIC_LIMIT;
 
@@ -179,7 +179,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 			to = limit;
 		}
 
-		ValueList result = new ValueList();
+		ValueSet result = new ValueSet();
 		
 		for (long a = 1; a <= to; a++)
 		{
@@ -197,7 +197,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 	
 	@Override
-	public ValueList caseNaturalType(TCNaturalType node, Integer limit)
+	public ValueSet caseNaturalType(TCNaturalType node, Integer limit)
 	{
 		int to = NUMERIC_LIMIT - 1;
 		
@@ -206,7 +206,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 			to = limit - 1;
 		}
 
-		ValueList result = new ValueList();
+		ValueSet result = new ValueSet();
 		
 		for (long a = 0; a <= to; a++)
 		{
@@ -224,7 +224,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 	
 	@Override
-	public ValueList caseIntegerType(TCIntegerType node, Integer limit)
+	public ValueSet caseIntegerType(TCIntegerType node, Integer limit)
 	{
 		int from = 0;
 		int to = 0;
@@ -242,7 +242,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 			to = NUMERIC_LIMIT;
 		}
 
-		ValueList result = new ValueList();
+		ValueSet result = new ValueSet();
 		
 		for (long a = from; a <= to; a++)
 		{
@@ -260,32 +260,32 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 
 	@Override
-	public ValueList caseRationalType(TCRationalType type, Integer limit)
+	public ValueSet caseRationalType(TCRationalType type, Integer limit)
 	{
 		return realLimit(limit);
 	}
 
 	@Override
-	public ValueList caseRealType(TCRealType type, Integer limit)
+	public ValueSet caseRealType(TCRealType type, Integer limit)
 	{
 		return realLimit(limit);
 	}
 	
 	@Override
-	public ValueList caseFunctionType(TCFunctionType node, Integer arg)
+	public ValueSet caseFunctionType(TCFunctionType node, Integer arg)
 	{
 		throw new RuntimeException("Must define function bind range in VDM");
 	}
 
 	@Override
-	public ValueList caseNamedType(TCNamedType type, Integer limit)
+	public ValueSet caseNamedType(TCNamedType type, Integer limit)
 	{
 		if (done.contains(type))
 		{
-			return new ValueList();		// recursing
+			return new ValueSet();		// recursing
 		}
 		
-		ValueList invs = new ValueList();
+		ValueSet invs = new ValueSet();
 		done.add(type);
 		
 		for (Value v: type.type.apply(this, limit))
@@ -311,11 +311,11 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 	
 	@Override
-	public ValueList caseRecordType(TCRecordType node, Integer limit)
+	public ValueSet caseRecordType(TCRecordType node, Integer limit)
 	{
 		if (done.contains(node))
 		{
-			return new ValueList();		// recursing
+			return new ValueSet();		// recursing
 		}
 		
 		done.add(node);
@@ -326,14 +326,14 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 		int root = (int) Math.floor(Math.pow(limit, 1.0D/node.fields.size()));
 		if (root == 0) root = 1;
 		
-		ValueList records = new ValueList();
-		List<ValueList> fvalues = new Vector<ValueList>(node.fields.size());
+		ValueSet records = new ValueSet();
+		List<ValueSet> fvalues = new Vector<ValueSet>(node.fields.size());
 		int[] fsizes = new int[node.fields.size()];
 		int f = 0;
 		
 		for (TCField field: node.fields)
 		{
-			ValueList values = field.type.apply(this, root);
+			ValueSet values = field.type.apply(this, root);
 			fvalues.add(values);
 			fsizes[f++] = values.size();
 		}
@@ -373,9 +373,9 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 	
 	@Override
-	public ValueList caseSet1Type(TCSet1Type node, Integer limit)
+	public ValueSet caseSet1Type(TCSet1Type node, Integer limit)
 	{
-		ValueList rs = new ValueList();
+		ValueSet rs = new ValueSet();
 		
 		for (ValueSet vs: powerLimit(node.setof.apply(this, limit), limit, false))
 		{
@@ -386,9 +386,9 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 	
 	@Override
-	public ValueList caseSetType(TCSetType node, Integer limit)
+	public ValueSet caseSetType(TCSetType node, Integer limit)
 	{
-		ValueList rs = new ValueList();
+		ValueSet rs = new ValueSet();
 		
 		for (ValueSet vs: powerLimit(node.setof.apply(this, limit), limit, true))
 		{
@@ -399,9 +399,9 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 	
 	@Override
-	public ValueList caseSeq1Type(TCSeq1Type node, Integer limit)
+	public ValueSet caseSeq1Type(TCSeq1Type node, Integer limit)
 	{
-		ValueList rs = new ValueList();
+		ValueSet rs = new ValueSet();
 		
 		for (ValueSet vs: powerLimit(node.seqof.apply(this, limit), limit, false))
 		{
@@ -414,9 +414,9 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 	
 	@Override
-	public ValueList caseSeqType(TCSeqType node, Integer limit)
+	public ValueSet caseSeqType(TCSeqType node, Integer limit)
 	{
-		ValueList rs = new ValueList();
+		ValueSet rs = new ValueSet();
 		
 		for (ValueSet vs: powerLimit(node.seqof.apply(this, limit), limit, true))
 		{
@@ -429,11 +429,11 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 
 	@Override
-	public ValueList caseMapType(TCMapType type, Integer limit)
+	public ValueSet caseMapType(TCMapType type, Integer limit)
 	{
-		ValueList fromValues = type.from.apply(this, limit);
-		ValueList toValues = type.to.apply(this, limit);
-		ValueList results = new ValueList();
+		ValueSet fromValues = type.from.apply(this, limit);
+		ValueSet toValues = type.to.apply(this, limit);
+		ValueSet results = new ValueSet();
 		
 		int fromSize = fromValues.size();
 		int toSize = toValues.size();
@@ -467,11 +467,11 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 	
 	@Override
-	public ValueList caseInMapType(TCInMapType type, Integer limit)
+	public ValueSet caseInMapType(TCInMapType type, Integer limit)
 	{
-		ValueList fromValues = type.from.apply(this, limit);
-		ValueList toValues = type.to.apply(this, limit);
-		ValueList results = new ValueList();
+		ValueSet fromValues = type.from.apply(this, limit);
+		ValueSet toValues = type.to.apply(this, limit);
+		ValueSet results = new ValueSet();
 		
 		int fromSize = fromValues.size();
 		int toSize = toValues.size();
@@ -505,7 +505,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 	
 	@Override
-	public ValueList caseProductType(TCProductType node, Integer limit)
+	public ValueSet caseProductType(TCProductType node, Integer limit)
 	{
 		// Size will be the product of all fields, ie. limit ^ N. So we set root to the
 		// Nth root of limit for each field (or 1, minimally).
@@ -513,14 +513,14 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 		int root = (int) Math.floor(Math.pow(limit, 1.0D/node.types.size()));
 		if (root == 0) root = 1;
 		
-		ValueList records = new ValueList();
-		List<ValueList> fvalues = new Vector<ValueList>(node.types.size());
+		ValueSet records = new ValueSet();
+		List<ValueSet> fvalues = new Vector<ValueSet>(node.types.size());
 		int[] fsizes = new int[node.types.size()];
 		int f = 0;
 		
 		for (TCType field: node.types)
 		{
-			ValueList values = field.apply(this, root);
+			ValueSet values = field.apply(this, root);
 			fvalues.add(values);
 			fsizes[f++] = values.size();
 		}
@@ -549,9 +549,9 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 	}
 	
 	@Override
-	public ValueList caseUnionType(TCUnionType node, Integer limit)
+	public ValueSet caseUnionType(TCUnionType node, Integer limit)
 	{
-		ValueList union = new ValueList();
+		ValueSet union = new ValueSet();
 		
 		for (TCType type: node.types)
 		{
@@ -561,9 +561,9 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 		return union;
 	}
 
-	private ValueList realLimit(Integer limit)
+	private ValueSet realLimit(Integer limit)
 	{
-		ValueList result = new ValueList();
+		ValueSet result = new ValueSet();
 		int from = 0;
 		int to = 0;
 		
@@ -601,7 +601,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueList, Integer>
 		return result;
 	}
 
-	private List<ValueSet> powerLimit(ValueList set, int limit, boolean empty)
+	private List<ValueSet> powerLimit(ValueSet set, int limit, boolean empty)
 	{
 		// Generate a power set, up to limit values from the full power set.
 		List<ValueSet> results = new Vector<ValueSet>();

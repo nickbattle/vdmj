@@ -24,18 +24,19 @@
 
 package quickcheck.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.values.ValueList;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
+import quickcheck.qcplugins.QCPlugin;
 import vdmj.commands.AnalysisCommand;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
@@ -70,68 +71,67 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		String rangesFile = "ranges.qc";
-		boolean createFile = false;
 		List<Integer> poList = new Vector<Integer>();
+		QuickCheck qc = new QuickCheck();
 
-		for (int i=1; i < argv.length; i++)
+		List<String> arglist = new Vector<String>(Arrays.asList(argv));
+		arglist.remove(0);	// "qc"
+		List<QCPlugin> qcplugins = qc.getPlugins(arglist);
+		
+		if (qc.hasErrors())
+		{
+			return result(request, "Failed to load QC plugins");
+		}
+
+		for (String arg: arglist)	// Should just be POs
 		{
 			try
 			{
-				switch (argv[i])
+				switch (arg)
 				{
 					case "-?":
 					case "-help":
-						return result(request, USAGE);
-						
-					case "-f":
-						rangesFile = argv[++i];
-						createFile = false;
-						break;
-						
-					case "-c":
-						if (++i < argv.length) rangesFile = argv[i];
-						createFile = true;
-						break;
+						result(request, USAGE);
 						
 					default:
-						poList.add(Integer.parseInt(argv[i]));
+						poList.add(Integer.parseInt(arg));
 						break;
 				}
 			}
 			catch (NumberFormatException e)
 			{
-				errorln("Malformed PO#: " + e.getMessage());
-				return result(request, USAGE);
-			}
-			catch (ArrayIndexOutOfBoundsException e)
-			{
-				errorln("Missing argument");
+				println("Malformed PO#: " + e.getMessage());
 				return result(request, USAGE);
 			}
 		}
 		
-		POPlugin po = PluginRegistry.getInstance().getPlugin("PO");
-		ProofObligationList all = po.getProofObligations();
+		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
+		ProofObligationList all = pog.getProofObligations();
 		all.renumber();
-		
-		QuickCheck qc = new QuickCheck();
 		ProofObligationList chosen = qc.getPOs(all, poList);
-
-		if (chosen != null)
+		
+		if (qc.hasErrors())
 		{
-			if (createFile)
+			return result(request, "Failed to find POs");
+		}
+		
+		boolean doChecks = true;
+		
+		for (QCPlugin plugin: qcplugins)
+		{
+			doChecks = doChecks && plugin.init(chosen);
+			
+			if (plugin.hasErrors())
 			{
-				qc.createRangeFile(rangesFile, chosen);
+				return result(request, "Plugin failed: " + plugin.getName());
 			}
-			else
+		}
+
+		if (doChecks)
+		{
+			for (ProofObligation po: chosen)
 			{
-				Map<String, ValueList> ranges = qc.readRangeFile(rangesFile);
-				
-				if (ranges != null)
-				{
-					qc.checkObligations(chosen, ranges);
-				}
+				qc.checkObligation(po, qc.getValues(qcplugins, po));
 			}
 		}
 		
