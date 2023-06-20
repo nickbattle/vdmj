@@ -26,10 +26,11 @@ package com.fujitsu.vdmj.in.patterns;
 
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.ValueList;
+import com.fujitsu.vdmj.values.ValueSet;
 
 public interface INBindingSetter
 {
-	public void setBindValues(ValueList values);
+	public void setBindValues(ValueSet values);
 	public ValueList getBindValues();
 	public TCType getType();
 }

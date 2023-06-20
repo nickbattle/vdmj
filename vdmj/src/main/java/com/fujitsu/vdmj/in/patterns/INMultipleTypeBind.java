@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.values.ValueList;
+import com.fujitsu.vdmj.values.ValueSet;
 
 public class INMultipleTypeBind extends INMultipleBind implements INBindingSetter
 {
@@ -59,9 +60,17 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	}
 	
 	@Override
-	public void setBindValues(ValueList values)
+	public void setBindValues(ValueSet values)
 	{
-		bindValues = values;
+		if (values == null)
+		{
+			bindValues = null;
+		}
+		else
+		{
+			bindValues = new ValueList();
+			bindValues.addAll(values);
+		}
 	}
 	
 	@Override
