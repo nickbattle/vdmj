@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package quickcheck.commands;
+package quickcheck;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
@@ -63,6 +63,11 @@ public class QuickCheck
 {
 	private int errorCount = 0;
 	
+	public QuickCheck()
+	{
+		// nothing special
+	}
+	
 	public boolean hasErrors()
 	{
 		return errorCount > 0;
@@ -82,7 +87,6 @@ public class QuickCheck
 				try
 				{
 					Class<?> clazz = Class.forName(plugin);
-					//ctor = clazz.getConstructor(String[].class);
 					Constructor<?> ctor = clazz.getDeclaredConstructor(List.class);
 					QCPlugin instance = (QCPlugin) ctor.newInstance((Object)argv);
 					list.add(instance);
@@ -153,47 +157,57 @@ public class QuickCheck
 		}
 	}
 	
-	private INExpression getPOExpression(ProofObligation po) throws Exception
+	public INExpression getINExpression(ProofObligation po)
 	{
-		if (po.isCheckable)
+		try
 		{
-			TCExpression tcexp = po.getCheckedExpression();
-			return ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+			if (po.isCheckable)
+			{
+				TCExpression tcexp = po.getCheckedExpression();
+				return ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+			}
+			else
+			{
+				// Not checkable, so just use "true"
+				return new INBooleanLiteralExpression(new LexBooleanToken(true, po.location));
+			}
 		}
-		else
+		catch (Exception e)
 		{
-			// Not checkable, so just use "true"
-			return new INBooleanLiteralExpression(new LexBooleanToken(true, po.location));
+			errorln("getINExpression: " + e);
+			return new INBooleanLiteralExpression(new LexBooleanToken(false, po.location));
 		}
 	}
 	
-	private List<INBindingSetter> getBindList(INExpression inexp)
+	public List<INBindingSetter> getINBindList(INExpression inexp)
 	{
 		return inexp.apply(new TypeBindFinder(), null);
 	}
 	
 	public Map<String, ValueSet> getValues(List<QCPlugin> plugins, ProofObligation po)
 	{
-		Map<String, ValueSet> ranges = new HashMap<String, ValueSet>();
+		Map<String, ValueSet> union = new HashMap<String, ValueSet>();
+		INExpression exp = getINExpression(po);
+		List<INBindingSetter> binds = getINBindList(exp);
 		
 		for (QCPlugin plugin: plugins)
 		{
-			Map<String, ValueSet> values = plugin.getValues(po);
+			Map<String, ValueSet> pvalues = plugin.getValues(po, exp, binds);
 			
-			for (String bind: values.keySet())
+			for (String bind: pvalues.keySet())
 			{
-				if (ranges.containsKey(bind))
+				if (union.containsKey(bind))
 				{
-					ranges.get(bind).addAll(values.get(bind));
+					union.get(bind).addAll(pvalues.get(bind));
 				}
 				else
 				{
-					ranges.put(bind, values.get(bind));
+					union.put(bind, pvalues.get(bind));
 				}
 			}
 		}
 		
-		return ranges;
+		return union;
 	}
 	
 	public void checkObligation(ProofObligation po, Map<String, ValueSet> ranges)
@@ -210,8 +224,8 @@ public class QuickCheck
 				return;
 			}
 
-			INExpression poexp = getPOExpression(po);
-			bindings = getBindList(poexp);
+			INExpression poexp = getINExpression(po);
+			bindings = getINBindList(poexp);
 			
 			for (INBindingSetter mbind: bindings)
 			{
@@ -224,7 +238,7 @@ public class QuickCheck
 				}
 				else
 				{
-					println("PO #" + po.number + ": No range defined for " + mbind);
+					errorln("PO #" + po.number + ": No range defined for " + mbind);
 					errorCount++;
 				}
 			}

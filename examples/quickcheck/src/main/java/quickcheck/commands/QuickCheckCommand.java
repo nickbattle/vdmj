@@ -25,6 +25,7 @@
 package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +37,7 @@ import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
+import quickcheck.QuickCheck;
 import quickcheck.qcplugins.QCPlugin;
 
 public class QuickCheckCommand extends AnalysisCommand
@@ -104,12 +106,14 @@ public class QuickCheckCommand extends AnalysisCommand
 		
 		for (QCPlugin plugin: qcplugins)
 		{
-			doChecks = doChecks && plugin.init(chosen);
+			doChecks = doChecks && plugin.init(qc, chosen);
 			
 			if (plugin.hasErrors())
 			{
 				return "Plugin init failed: " + plugin.getName();
 			}
+			
+			verbose("Plugin %s initialized\n", plugin.getName());
 		}
 
 		if (doChecks)

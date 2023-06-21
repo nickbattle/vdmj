@@ -81,12 +81,13 @@ import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueSet;
 
+import quickcheck.QuickCheck;
 import quickcheck.visitors.DefaultRangeCreator;
 import quickcheck.visitors.InternalRangeCreator;
 
 public class DefaultQCPlugin extends QCPlugin
 {
-	private final static String USAGE = "Usage: quickcheck [-c <file> | -c <file>] [<PO numbers>]";
+	private final static String USAGE = "Usage: quickcheck [-f <file> | -c <file>] [<PO numbers>]";
 
 	private static final long FINITE_LIMIT = 100;		// If sizeof T < 100, use {x | x:T } 
 	private static final int NUMERIC_LIMIT = 5;			// So nat/int/etc are {-5, ..., 5}
@@ -298,7 +299,7 @@ public class DefaultQCPlugin extends QCPlugin
 		return null;
 	}
 	
-	private void createRangeFile(String filename, ProofObligationList chosen)
+	private void createRangeFile(QuickCheck qc, String filename, ProofObligationList chosen)
 	{
 		try
 		{
@@ -310,7 +311,7 @@ public class DefaultQCPlugin extends QCPlugin
 
 			for (ProofObligation po: chosen)
 			{
-				for (INBindingSetter mbind: getBindList(getPOExpression(po)))
+				for (INBindingSetter mbind: qc.getINBindList(qc.getINExpression(po)))
 				{
 					if (!done.contains(mbind.toString()))
 					{
@@ -390,11 +391,11 @@ public class DefaultQCPlugin extends QCPlugin
 	}
 
 	@Override
-	public boolean init(ProofObligationList chosen)
+	public boolean init(QuickCheck qc, ProofObligationList chosen)
 	{
 		if (createFile)
 		{
-			createRangeFile(rangesFile, chosen);
+			createRangeFile(qc, rangesFile, chosen);
 			return false;	// Don't do checks!
 		}
 		else
@@ -405,20 +406,21 @@ public class DefaultQCPlugin extends QCPlugin
 	}
 
 	@Override
-	public Map<String, ValueSet> getValues(ProofObligation po)
+	public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		Map<String, ValueSet> values = new HashMap<String, ValueSet>();
 		
 		try
 		{
-			for (INBindingSetter mbind: getBindList(getPOExpression(po)))
+			for (INBindingSetter bind: binds)
 			{
-				values.put(mbind.toString(), allRanges.get(mbind.toString()));
+				values.put(bind.toString(), allRanges.get(bind.toString()));
 			}
 		}
 		catch (Exception e)
 		{
 			// Can't happen?
+			println(e);
 		}
 		
 		return values;

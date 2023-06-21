@@ -25,6 +25,7 @@
 package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +37,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
+import quickcheck.QuickCheck;
 import quickcheck.qcplugins.QCPlugin;
 import vdmj.commands.AnalysisCommand;
 import workspace.PluginRegistry;
@@ -119,12 +121,14 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 		
 		for (QCPlugin plugin: qcplugins)
 		{
-			doChecks = doChecks && plugin.init(chosen);
+			doChecks = doChecks && plugin.init(qc, chosen);
 			
 			if (plugin.hasErrors())
 			{
 				return result(request, "Plugin failed: " + plugin.getName());
 			}
+			
+			verbose("Plugin %s initialized\n", plugin.getName());
 		}
 
 		if (doChecks)

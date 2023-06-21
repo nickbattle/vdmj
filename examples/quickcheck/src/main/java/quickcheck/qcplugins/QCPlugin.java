@@ -27,42 +27,18 @@ package quickcheck.qcplugins;
 import java.util.List;
 import java.util.Map;
 
-import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
-import com.fujitsu.vdmj.in.INNode;
-import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
-import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.values.ValueSet;
 
-import quickcheck.visitors.TypeBindFinder;
+import quickcheck.QuickCheck;
 
 abstract public class QCPlugin
 {
 	abstract public String getName();
 	abstract public boolean hasErrors();
-	abstract public boolean init(ProofObligationList chosen);
-	abstract public Map<String, ValueSet> getValues(ProofObligation po);
-	
-	protected INExpression getPOExpression(ProofObligation po) throws Exception
-	{
-		if (po.isCheckable)
-		{
-			TCExpression tcexp = po.getCheckedExpression();
-			return ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
-		}
-		else
-		{
-			// Not checkable, so just use "true"
-			return new INBooleanLiteralExpression(new LexBooleanToken(true, po.location));
-		}
-	}
-	
-	protected List<INBindingSetter> getBindList(INExpression inexp)
-	{
-		return inexp.apply(new TypeBindFinder(), null);
-	}
+	abstract public boolean init(QuickCheck qc, ProofObligationList chosen);
+	abstract public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds);
 }
