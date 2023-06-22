@@ -25,7 +25,6 @@
 package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +37,6 @@ import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
 import quickcheck.QuickCheck;
-import quickcheck.qcplugins.QCPlugin;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
@@ -63,7 +61,7 @@ public class QuickCheckCommand extends AnalysisCommand
 
 		List<String> arglist = new Vector<String>(Arrays.asList(argv));
 		arglist.remove(0);	// "qc"
-		List<QCPlugin> qcplugins = qc.getPlugins(arglist);
+		qc.loadPlugins(arglist);
 		
 		if (qc.hasErrors())
 		{
@@ -102,25 +100,11 @@ public class QuickCheckCommand extends AnalysisCommand
 			return "Failed to find POs";
 		}
 		
-		boolean doChecks = true;
-		
-		for (QCPlugin plugin: qcplugins)
-		{
-			doChecks = doChecks && plugin.init(qc, chosen);
-			
-			if (plugin.hasErrors())
-			{
-				return "Plugin init failed: " + plugin.getName();
-			}
-			
-			verbose("Plugin %s initialized\n", plugin.getName());
-		}
-
-		if (doChecks)
+		if (qc.initPlugins())
 		{
 			for (ProofObligation po: chosen)
 			{
-				qc.checkObligation(po, qc.getValues(qcplugins, po));
+				qc.checkObligation(po, qc.getValues(po));
 			}
 		}
 		

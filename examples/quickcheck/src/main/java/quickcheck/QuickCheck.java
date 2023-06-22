@@ -62,6 +62,8 @@ import quickcheck.visitors.TypeBindFinder;
 public class QuickCheck
 {
 	private int errorCount = 0;
+	private List<QCPlugin> plugins = null;
+	private ProofObligationList chosen = null;
 	
 	public QuickCheck()
 	{
@@ -73,48 +75,76 @@ public class QuickCheck
 		return errorCount > 0;
 	}
 	
-	public List<QCPlugin> getPlugins(List<String> argv)
+	public void loadPlugins(List<String> argv)
 	{
-		List<QCPlugin> list = new Vector<QCPlugin>();
+		plugins = new Vector<QCPlugin>();
 		errorCount = 0;
 		
 		try
 		{
-			List<String> plugins = GetResource.readResource("qc.plugins");
+			List<String> classnames = GetResource.readResource("qc.plugins");
 			
-			for (String plugin: plugins)
+			for (String classname: classnames)
 			{
 				try
 				{
-					Class<?> clazz = Class.forName(plugin);
+					Class<?> clazz = Class.forName(classname);
 					Constructor<?> ctor = clazz.getDeclaredConstructor(List.class);
 					QCPlugin instance = (QCPlugin) ctor.newInstance((Object)argv);
-					list.add(instance);
+					plugins.add(instance);
 				}
 				catch (ClassNotFoundException e)
 				{
-					errorln("Cannot load plugin: " + plugin);
+					errorln("Cannot find plugin class: " + classname);
 					errorCount++;
 				}
 				catch (NoSuchMethodException e)
 				{
-					errorln("Plugin " + plugin + " must implement ctor(List<String> argv)");
+					errorln("Plugin " + classname + " must implement ctor(List<String> argv)");
 					errorCount++;
 				}
 				catch (Throwable th)
 				{
-					errorln("Plugin " + plugin + ": " + th.toString());
+					errorln("Plugin " + classname + ": " + th.toString());
 					errorCount++;
 				}
 			}
-
-			return errorCount == 0 ? list : null;
 		}
 		catch (Throwable e)
 		{
 			errorln("Cannot load plugins: " + e);
-			return null;
 		}
+	}
+	
+	public boolean initPlugins()
+	{
+		boolean doChecks = true;
+		
+		for (QCPlugin plugin: plugins)
+		{
+			doChecks = doChecks && plugin.init(this);
+			
+			if (plugin.hasErrors())
+			{
+				errorln("Plugin init failed: " + plugin.getName());
+			}
+			else
+			{
+				verbose("Plugin %s initialized\n", plugin.getName());
+			}
+		}
+
+		return doChecks;
+	}
+	
+	public List<QCPlugin> getPlugins()
+	{
+		return plugins;
+	}
+	
+	public ProofObligationList getChosen()
+	{
+		return chosen;
 	}
 	
 	public ProofObligationList getPOs(ProofObligationList all, List<Integer> poList)
@@ -123,28 +153,28 @@ public class QuickCheck
 		
 		if (poList.isEmpty())
 		{
-			ProofObligationList list = new ProofObligationList();
+			chosen = new ProofObligationList();
 			String def = Interpreter.getInstance().getDefaultName();
 			
 			for (ProofObligation po: all)
 			{
 				if (po.location.module.equals(def))
 				{
-					list.add(po);
+					chosen.add(po);
 				}
 			}
 			
-			return list;	// No PO#s specified, so use default class/module's POs
+			return chosen;	// No PO#s specified, so use default class/module's POs
 		}
 		else
 		{
-			ProofObligationList list = new ProofObligationList();
+			chosen = new ProofObligationList();
 			
 			for (Integer n: poList)
 			{
 				if (n > 0 && n <= all.size())
 				{
-					list.add(all.get(n-1));
+					chosen.add(all.get(n-1));
 				}
 				else
 				{
@@ -153,7 +183,7 @@ public class QuickCheck
 				}
 			}
 			
-			return errorCount > 0 ? null : list;
+			return errorCount > 0 ? null : chosen;
 		}
 	}
 	
@@ -184,7 +214,7 @@ public class QuickCheck
 		return inexp.apply(new TypeBindFinder(), null);
 	}
 	
-	public Map<String, ValueSet> getValues(List<QCPlugin> plugins, ProofObligation po)
+	public Map<String, ValueSet> getValues(ProofObligation po)
 	{
 		Map<String, ValueSet> union = new HashMap<String, ValueSet>();
 		INExpression exp = getINExpression(po);

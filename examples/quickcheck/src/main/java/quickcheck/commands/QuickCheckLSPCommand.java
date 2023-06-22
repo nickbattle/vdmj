@@ -25,7 +25,6 @@
 package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,7 +37,6 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import quickcheck.QuickCheck;
-import quickcheck.qcplugins.QCPlugin;
 import vdmj.commands.AnalysisCommand;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
@@ -78,7 +76,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 
 		List<String> arglist = new Vector<String>(Arrays.asList(argv));
 		arglist.remove(0);	// "qc"
-		List<QCPlugin> qcplugins = qc.getPlugins(arglist);
+		qc.loadPlugins(arglist);
 		
 		if (qc.hasErrors())
 		{
@@ -117,25 +115,11 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 			return result(request, "Failed to find POs");
 		}
 		
-		boolean doChecks = true;
-		
-		for (QCPlugin plugin: qcplugins)
-		{
-			doChecks = doChecks && plugin.init(qc, chosen);
-			
-			if (plugin.hasErrors())
-			{
-				return result(request, "Plugin failed: " + plugin.getName());
-			}
-			
-			verbose("Plugin %s initialized\n", plugin.getName());
-		}
-
-		if (doChecks)
+		if (qc.initPlugins())
 		{
 			for (ProofObligation po: chosen)
 			{
-				qc.checkObligation(po, qc.getValues(qcplugins, po));
+				qc.checkObligation(po, qc.getValues(po));
 			}
 		}
 		

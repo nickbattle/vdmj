@@ -55,7 +55,6 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
@@ -299,7 +298,7 @@ public class DefaultQCPlugin extends QCPlugin
 		return null;
 	}
 	
-	private void createRangeFile(QuickCheck qc, String filename, ProofObligationList chosen)
+	private void createRangeFile(QuickCheck qc, String filename)
 	{
 		try
 		{
@@ -309,7 +308,7 @@ public class DefaultQCPlugin extends QCPlugin
 			Set<String> done = new HashSet<String>();
 			RootContext ctxt = Interpreter.getInstance().getInitialContext();
 
-			for (ProofObligation po: chosen)
+			for (ProofObligation po: qc.getChosen())
 			{
 				for (INBindingSetter mbind: qc.getINBindList(qc.getINExpression(po)))
 				{
@@ -391,11 +390,11 @@ public class DefaultQCPlugin extends QCPlugin
 	}
 
 	@Override
-	public boolean init(QuickCheck qc, ProofObligationList chosen)
+	public boolean init(QuickCheck qc)
 	{
 		if (createFile)
 		{
-			createRangeFile(qc, rangesFile, chosen);
+			createRangeFile(qc, rangesFile);
 			return false;	// Don't do checks!
 		}
 		else

@@ -30,7 +30,6 @@ import java.util.Map;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
@@ -39,6 +38,6 @@ abstract public class QCPlugin
 {
 	abstract public String getName();
 	abstract public boolean hasErrors();
-	abstract public boolean init(QuickCheck qc, ProofObligationList chosen);
+	abstract public boolean init(QuickCheck qc);
 	abstract public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds);
 }
