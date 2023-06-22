@@ -96,6 +96,7 @@ public class DefaultQCPlugin extends QCPlugin
 	private int errorCount = 0;
 	private String rangesFile = "ranges.qc";
 	private boolean createFile = false;
+	private boolean suppress = false;
 
 	private Map<String, ValueSet> allRanges = null;
 	
@@ -107,6 +108,11 @@ public class DefaultQCPlugin extends QCPlugin
 			{
 				switch (argv.get(i))
 				{
+					case "-n":
+						argv.remove(i);
+						suppress = true;
+						break;
+						
 					case "-f":
 						argv.remove(i);
 						rangesFile = argv.get(i);
@@ -392,7 +398,11 @@ public class DefaultQCPlugin extends QCPlugin
 	@Override
 	public boolean init(QuickCheck qc)
 	{
-		if (createFile)
+		if (suppress)
+		{
+			return true;
+		}
+		else if (createFile)
 		{
 			createRangeFile(qc, rangesFile);
 			return false;	// Don't do checks!
@@ -400,7 +410,7 @@ public class DefaultQCPlugin extends QCPlugin
 		else
 		{
 			allRanges = readRangeFile(rangesFile);
-			return true;
+			return !hasErrors();
 		}
 	}
 
@@ -409,17 +419,20 @@ public class DefaultQCPlugin extends QCPlugin
 	{
 		Map<String, ValueSet> values = new HashMap<String, ValueSet>();
 		
-		try
+		if (!suppress)
 		{
-			for (INBindingSetter bind: binds)
+			try
 			{
-				values.put(bind.toString(), allRanges.get(bind.toString()));
+				for (INBindingSetter bind: binds)
+				{
+					values.put(bind.toString(), allRanges.get(bind.toString()));
+				}
 			}
-		}
-		catch (Exception e)
-		{
-			// Can't happen?
-			println(e);
+			catch (Exception e)
+			{
+				// Can't happen?
+				println(e);
+			}
 		}
 		
 		return values;
