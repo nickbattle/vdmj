@@ -126,11 +126,11 @@ public class QuickCheck
 			
 			if (plugin.hasErrors())
 			{
-				errorln("Plugin init failed: " + plugin.getName());
+				errorln("QCPlugin init failed: " + plugin.getName());
 			}
 			else
 			{
-				verbose("Plugin %s initialized\n", plugin.getName());
+				verbose("QCPlugin %s initialized", plugin.getName());
 			}
 		}
 
