@@ -65,7 +65,7 @@ public class SearchQCPlugin extends QCPlugin
 	@Override
 	public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		NameValuePairList nvps = exp.apply(new SearchQCVisitor(), null);
+		NameValuePairList nvps = po.getCheckedExpression().apply(new SearchQCVisitor(), null);
 		HashMap<String, ValueSet> result = new HashMap<String, ValueSet>();
 		
 		for (NameValuePair pair: nvps)

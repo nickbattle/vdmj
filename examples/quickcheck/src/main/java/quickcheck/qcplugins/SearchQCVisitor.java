@@ -24,62 +24,64 @@
 
 package quickcheck.qcplugins;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INGreaterEqualExpression;
-import com.fujitsu.vdmj.in.expressions.INGreaterExpression;
-import com.fujitsu.vdmj.in.expressions.INIntegerLiteralExpression;
-import com.fujitsu.vdmj.in.expressions.INLessEqualExpression;
-import com.fujitsu.vdmj.in.expressions.INLessExpression;
-import com.fujitsu.vdmj.in.expressions.INNotEqualExpression;
-import com.fujitsu.vdmj.in.expressions.INSeqEnumExpression;
-import com.fujitsu.vdmj.in.expressions.INSetEnumExpression;
-import com.fujitsu.vdmj.in.expressions.INVariableExpression;
-import com.fujitsu.vdmj.in.expressions.visitors.INLeafExpressionVisitor;
+import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.expressions.TCGreaterEqualExpression;
+import com.fujitsu.vdmj.tc.expressions.TCGreaterExpression;
+import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
+import com.fujitsu.vdmj.tc.expressions.TCLessEqualExpression;
+import com.fujitsu.vdmj.tc.expressions.TCLessExpression;
+import com.fujitsu.vdmj.tc.expressions.TCNotEqualExpression;
+import com.fujitsu.vdmj.tc.expressions.TCSeqEnumExpression;
+import com.fujitsu.vdmj.tc.expressions.TCSetEnumExpression;
+import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
+import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.SetValue;
 
-public class SearchQCVisitor extends INLeafExpressionVisitor<NameValuePair, NameValuePairList, Object>
+public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, NameValuePairList, Object>
 {
 	public SearchQCVisitor()
 	{
-		super(false);
+		super();
 	}
 
 	@Override
-	public NameValuePairList caseExpression(INExpression node, Object arg)
+	public NameValuePairList caseExpression(TCExpression node, Object arg)
 	{
 		return newCollection();
 	}
 	
 	@Override
-	public NameValuePairList caseNotEqualExpression(INNotEqualExpression node, Object arg)
+	public NameValuePairList caseNotEqualExpression(TCNotEqualExpression node, Object arg)
 	{
 		NameValuePairList nvpl = newCollection();
 		
-		if (node.left instanceof INVariableExpression)
+		if (node.left instanceof TCVariableExpression)
 		{
-			INVariableExpression var = (INVariableExpression)node.left;
+			TCVariableExpression var = (TCVariableExpression)node.left;
 
-			if (node.right instanceof INIntegerLiteralExpression)
+			if (node.right instanceof TCIntegerLiteralExpression)
 			{
-				INIntegerLiteralExpression rhs = (INIntegerLiteralExpression)node.right;
+				TCIntegerLiteralExpression rhs = (TCIntegerLiteralExpression)node.right;
 				nvpl.add(var.name, new IntegerValue(rhs.value.value));	// ie. rhs is NOT <> rhs
 			}
-			else if (node.right instanceof INSeqEnumExpression)
+			else if (node.right instanceof TCSeqEnumExpression)
 			{
-				INSeqEnumExpression rhs = (INSeqEnumExpression)node.right;
+				TCSeqEnumExpression rhs = (TCSeqEnumExpression)node.right;
 				
 				if (rhs.members.isEmpty())	// empty sequence
 				{
 					nvpl.add(var.name, new SeqValue());	// ie. rhs is NOT <> rhs
 				}
 			}
-			else if (node.right instanceof INSetEnumExpression)
+			else if (node.right instanceof TCSetEnumExpression)
 			{
-				INSetEnumExpression rhs = (INSetEnumExpression)node.right;
+				TCSetEnumExpression rhs = (TCSetEnumExpression)node.right;
 				
 				if (rhs.members.isEmpty())	// empty set
 				{
@@ -92,15 +94,15 @@ public class SearchQCVisitor extends INLeafExpressionVisitor<NameValuePair, Name
 	}
 
 	@Override
-	public NameValuePairList caseGreaterExpression(INGreaterExpression node, Object arg)
+	public NameValuePairList caseGreaterExpression(TCGreaterExpression node, Object arg)
 	{
 		NameValuePairList nvpl = newCollection();
 		
-		if (node.left instanceof INVariableExpression &&
-			node.right instanceof INIntegerLiteralExpression)
+		if (node.left instanceof TCVariableExpression &&
+			node.right instanceof TCIntegerLiteralExpression)
 		{
-			INVariableExpression var = (INVariableExpression)node.left;
-			INIntegerLiteralExpression rhs = (INIntegerLiteralExpression)node.right;
+			TCVariableExpression var = (TCVariableExpression)node.left;
+			TCIntegerLiteralExpression rhs = (TCIntegerLiteralExpression)node.right;
 			
 			nvpl.add(var.name, new IntegerValue(rhs.value.value));	// ie. rhs is NOT > rhs
 		}
@@ -109,15 +111,15 @@ public class SearchQCVisitor extends INLeafExpressionVisitor<NameValuePair, Name
 	}
 	
 	@Override
-	public NameValuePairList caseGreaterEqualExpression(INGreaterEqualExpression node, Object arg)
+	public NameValuePairList caseGreaterEqualExpression(TCGreaterEqualExpression node, Object arg)
 	{
 		NameValuePairList nvpl = newCollection();
 		
-		if (node.left instanceof INVariableExpression &&
-			node.right instanceof INIntegerLiteralExpression)
+		if (node.left instanceof TCVariableExpression &&
+			node.right instanceof TCIntegerLiteralExpression)
 		{
-			INVariableExpression var = (INVariableExpression)node.left;
-			INIntegerLiteralExpression rhs = (INIntegerLiteralExpression)node.right;
+			TCVariableExpression var = (TCVariableExpression)node.left;
+			TCIntegerLiteralExpression rhs = (TCIntegerLiteralExpression)node.right;
 			
 			nvpl.add(var.name, new IntegerValue(rhs.value.value - 1));	// ie. rhs-1 is NOT >= rhs
 		}
@@ -126,15 +128,15 @@ public class SearchQCVisitor extends INLeafExpressionVisitor<NameValuePair, Name
 	}
 	
 	@Override
-	public NameValuePairList caseLessExpression(INLessExpression node, Object arg)
+	public NameValuePairList caseLessExpression(TCLessExpression node, Object arg)
 	{
 		NameValuePairList nvpl = newCollection();
 		
-		if (node.left instanceof INVariableExpression &&
-			node.right instanceof INIntegerLiteralExpression)
+		if (node.left instanceof TCVariableExpression &&
+			node.right instanceof TCIntegerLiteralExpression)
 		{
-			INVariableExpression var = (INVariableExpression)node.left;
-			INIntegerLiteralExpression rhs = (INIntegerLiteralExpression)node.right;
+			TCVariableExpression var = (TCVariableExpression)node.left;
+			TCIntegerLiteralExpression rhs = (TCIntegerLiteralExpression)node.right;
 			
 			nvpl.add(var.name, new IntegerValue(rhs.value.value));	// ie. rhs is NOT < rhs
 		}
@@ -143,15 +145,15 @@ public class SearchQCVisitor extends INLeafExpressionVisitor<NameValuePair, Name
 	}
 	
 	@Override
-	public NameValuePairList caseLessEqualExpression(INLessEqualExpression node, Object arg)
+	public NameValuePairList caseLessEqualExpression(TCLessEqualExpression node, Object arg)
 	{
 		NameValuePairList nvpl = newCollection();
 		
-		if (node.left instanceof INVariableExpression &&
-			node.right instanceof INIntegerLiteralExpression)
+		if (node.left instanceof TCVariableExpression &&
+			node.right instanceof TCIntegerLiteralExpression)
 		{
-			INVariableExpression var = (INVariableExpression)node.left;
-			INIntegerLiteralExpression rhs = (INIntegerLiteralExpression)node.right;
+			TCVariableExpression var = (TCVariableExpression)node.left;
+			TCIntegerLiteralExpression rhs = (TCIntegerLiteralExpression)node.right;
 			
 			nvpl.add(var.name, new IntegerValue(rhs.value.value + 1));	// ie. rhs + 1 is NOT >= rhs
 		}
@@ -160,10 +162,15 @@ public class SearchQCVisitor extends INLeafExpressionVisitor<NameValuePair, Name
 	}
 	
 	@Override
-	public NameValuePairList caseVariableExpression(INVariableExpression node, Object arg)
+	public NameValuePairList caseVariableExpression(TCVariableExpression node, Object arg)
 	{
 		NameValuePairList nvpl = newCollection();
-		// if boolean, then var.name = false
+		
+		if (node.getType() instanceof TCBooleanType)
+		{
+			nvpl.add(node.name, new BooleanValue(false));
+		}
+		
 		return nvpl;
 	}
 
