@@ -72,10 +72,20 @@ public class SearchQCPlugin extends QCPlugin
 		{
 			for (INBindingSetter bind: binds)
 			{
-				// HACK!
-				if (bind.toString().equals(pair.name.getName() + ":" + bind.getType()))	// eg. "a:T" = "a"
+				String key = bind.toString();
+				
+				// HACK! Only works for single name binds
+				if (key.equals(pair.name.getName() + ":" + bind.getType()))	// eg. "a:T" = "a" +":" + "T"
 				{
-					result.put(bind.toString(), new ValueSet(pair.value));
+					if (result.containsKey(key))
+					{
+						ValueSet current = result.get(key);
+						current.add(pair.value);
+					}
+					else
+					{
+						result.put(key, new ValueSet(pair.value));
+					}
 					break;
 				}
 			}
