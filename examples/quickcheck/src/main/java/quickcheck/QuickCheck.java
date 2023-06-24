@@ -57,6 +57,7 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.qcplugins.QCPlugin;
+import quickcheck.visitors.InternalRangeCreator;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
@@ -237,22 +238,14 @@ public class QuickCheck
 			}
 		}
 		
-		errorCount = 0;
-		
 		for (INBindingSetter bind: binds)
 		{
 			if (!union.containsKey(bind.toString()))
 			{
-				println("QC plugins did not generate any values for " + bind);
-				errorCount++;
-			}
-		}
-		
-		if (hasErrors())
-		{
-			for (INBindingSetter bind: binds)
-			{
-				println(bind.toString() + " = " + union.get(bind.toString()));
+				// Generate some values for missing bindings, using the default method
+				RootContext ctxt = Interpreter.getInstance().getInitialContext();
+				ValueSet values = bind.getType().apply(new InternalRangeCreator(ctxt, 10), 5);
+				union.put(bind.toString(), values);
 			}
 		}
 		
