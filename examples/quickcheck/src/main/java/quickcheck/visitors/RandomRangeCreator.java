@@ -98,6 +98,34 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		this.done = new TCTypeSet();
 		this.prng = new Random(seed);
 	}
+	
+	private int nextNat(int bound)
+	{
+		int n = -1;
+		while (n < 0) n = prng.nextInt(bound);
+		return n;
+	}
+	
+//	private int nextNat1(int bound)
+//	{
+//		int n = -1;
+//		while (n <= 0) n = prng.nextInt(bound);
+//		return n;
+//	}
+
+	private int nextNat()
+	{
+		int n = -1;
+		while (n < 0) n = prng.nextInt();
+		return n;
+	}
+	
+	private int nextNat1()
+	{
+		int n = -1;
+		while (n <= 0) n = prng.nextInt();
+		return n;
+	}
 
 	@Override
 	public ValueSet caseType(TCType type, Integer limit)
@@ -135,7 +163,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			default:
 				ValueSet result = new ValueSet();
 				
-				for (int i=0; i < prng.nextInt(limit); i++)
+				for (int i=0; i < limit; i++)
 				{
 					char c = alphabet.charAt(prng.nextInt(alphabet.length()));
 					result.add(new CharacterValue(c));
@@ -155,7 +183,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			default:
 				ValueSet result = new ValueSet();
 				
-				for (int i=0; i < prng.nextInt(limit); i++)
+				for (int i=0; i < limit; i++)
 				{
 					result.add(new TokenValue(new IntegerValue(prng.nextInt())));
 				}
@@ -199,9 +227,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		{
 			try
 			{
-				int n = prng.nextInt();
-				while (n <= 0) n = prng.nextInt();
-				result.add(new NaturalOneValue(n));
+				result.add(new NaturalOneValue(nextNat1()));
 			}
 			catch (Exception e)
 			{
@@ -221,9 +247,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		{
 			try
 			{
-				int n = prng.nextInt();
-				while (n < 0) n = prng.nextInt();
-				result.add(new NaturalOneValue(n));
+				result.add(new NaturalOneValue(nextNat()));
 			}
 			catch (Exception e)
 			{
@@ -600,7 +624,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			int size = set.size();
 			long count = 0;
 			
-			out: for (int ss=1; ss<=size; ss++)
+			out: for (int ss: randomOrder(size))
 			{
 				for (int[] kc: new KCombinator(size, ss))
 				{
@@ -627,5 +651,27 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		}
 	
 		return results;
+	}
+	
+	private int[] randomOrder(int size)
+	{
+		int[] result = new int[size];
+		
+		for (int i=0; i<size; i++)
+		{
+			result[i] = i;
+		}
+		
+		for (int j=0; j<size; j++)	// jumble size times
+		{
+			int a = nextNat(size);
+			int b = nextNat(size);
+			
+			int temp = result[a];
+			result[a] = result[b];
+			result[b] = temp;
+		}
+		
+		return result;
 	}
 }
