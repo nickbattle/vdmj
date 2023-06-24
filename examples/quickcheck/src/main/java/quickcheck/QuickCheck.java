@@ -230,10 +230,29 @@ public class QuickCheck
 				{
 					union.get(bind).addAll(pvalues.get(bind));
 				}
-				else
+				else if (pvalues.containsKey(bind))		// plugin may not contribute all binds
 				{
 					union.put(bind, pvalues.get(bind));
 				}
+			}
+		}
+		
+		errorCount = 0;
+		
+		for (INBindingSetter bind: binds)
+		{
+			if (!union.containsKey(bind.toString()))
+			{
+				println("QC plugins did not generate any values for " + bind);
+				errorCount++;
+			}
+		}
+		
+		if (hasErrors())
+		{
+			for (INBindingSetter bind: binds)
+			{
+				println(bind.toString() + " = " + union.get(bind.toString()));
 			}
 		}
 		

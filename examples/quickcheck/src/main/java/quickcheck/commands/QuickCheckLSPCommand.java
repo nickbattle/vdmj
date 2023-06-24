@@ -28,10 +28,12 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.values.ValueSet;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -119,7 +121,12 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 		{
 			for (ProofObligation po: chosen)
 			{
-				qc.checkObligation(po, qc.getValues(po));
+				Map<String, ValueSet> values = qc.getValues(po);
+				
+				if (!qc.hasErrors())
+				{
+					qc.checkObligation(po, values);
+				}
 			}
 		}
 		
