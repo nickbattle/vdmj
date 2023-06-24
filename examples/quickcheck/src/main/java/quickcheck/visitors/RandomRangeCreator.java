@@ -26,6 +26,7 @@ package quickcheck.visitors;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -70,7 +71,6 @@ import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.InvariantValue;
 import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.NaturalOneValue;
-import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.NilValue;
 import com.fujitsu.vdmj.values.QuoteValue;
 import com.fujitsu.vdmj.values.RealValue;
@@ -84,23 +84,25 @@ import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueMap;
 import com.fujitsu.vdmj.values.ValueSet;
 
-public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
+public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 {
 	private final int NUMERIC_SET_SIZE;	// {1, ..., N} for numerics
 	private final Context ctxt;
 	private final TCTypeSet done;
+	private final Random prng;
 	
-	public InternalRangeCreator(Context ctxt, int numSetSize)
+	public RandomRangeCreator(Context ctxt, int numSetSize, long seed)
 	{
 		this.ctxt = ctxt;
 		this.NUMERIC_SET_SIZE = numSetSize;
 		this.done = new TCTypeSet();
+		this.prng = new Random(seed);
 	}
 
 	@Override
 	public ValueSet caseType(TCType type, Integer limit)
 	{
-		throw new RuntimeException("Missing InternalRangeCreator case for " + type);
+		throw new RuntimeException("Missing RandomRangeCreator case for " + type);
 	}
 	
 	@Override
@@ -116,7 +118,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		switch (limit)
 		{
 			case 0:		return new ValueSet();
-			case 1:		return new ValueSet(new BooleanValue(false));
+			case 1:		return new ValueSet(new BooleanValue(prng.nextBoolean()));
 			default:	return new ValueSet(new BooleanValue(true), new BooleanValue(false));
 		}
 	}
@@ -124,11 +126,22 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseCharacterType(TCCharacterType node, Integer limit)
 	{
+		String alphabet = "abcdefghijklmnopqrstuvwxyz";
+		
 		switch (limit)
 		{
 			case 0:		return new ValueSet();
-			case 1:		return new ValueSet(new CharacterValue('a'));
-			default:	return new ValueSet(new CharacterValue('a'), new CharacterValue('b'));
+			case 1:		return new ValueSet(new CharacterValue(alphabet.charAt(prng.nextInt(alphabet.length()))));
+			default:
+				ValueSet result = new ValueSet();
+				
+				for (int i=0; i < prng.nextInt(limit); i++)
+				{
+					char c = alphabet.charAt(prng.nextInt(alphabet.length()));
+					result.add(new CharacterValue(c));
+				}
+				
+				return result;
 		}
 	}
 	
@@ -139,7 +152,15 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		{
 			case 0:		return new ValueSet();
 			case 1:		return new ValueSet(new TokenValue(new IntegerValue(1)));
-			default:	return new ValueSet(new TokenValue(new IntegerValue(1)), new TokenValue(new IntegerValue(2)));
+			default:
+				ValueSet result = new ValueSet();
+				
+				for (int i=0; i < prng.nextInt(limit); i++)
+				{
+					result.add(new TokenValue(new IntegerValue(prng.nextInt())));
+				}
+				
+				return result;
 		}
 	}
 	
@@ -172,20 +193,15 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseNaturalOneType(TCNaturalOneType node, Integer limit)
 	{
-		int to = NUMERIC_SET_SIZE;
-
-		if (limit < NUMERIC_SET_SIZE)
-		{
-			to = limit;
-		}
-
 		ValueSet result = new ValueSet();
 		
-		for (long a = 1; a <= to; a++)
+		for (long a = 0; a < NUMERIC_SET_SIZE; a++)
 		{
 			try
 			{
-				result.add(new NaturalOneValue(a));
+				int n = prng.nextInt();
+				while (n <= 0) n = prng.nextInt();
+				result.add(new NaturalOneValue(n));
 			}
 			catch (Exception e)
 			{
@@ -199,20 +215,15 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseNaturalType(TCNaturalType node, Integer limit)
 	{
-		int to = NUMERIC_SET_SIZE - 1;
-		
-		if (limit < NUMERIC_SET_SIZE - 1)
-		{
-			to = limit - 1;
-		}
-
 		ValueSet result = new ValueSet();
 		
-		for (long a = 0; a <= to; a++)
+		for (long a = 0; a < NUMERIC_SET_SIZE; a++)
 		{
 			try
 			{
-				result.add(new NaturalValue(a));
+				int n = prng.nextInt();
+				while (n < 0) n = prng.nextInt();
+				result.add(new NaturalOneValue(n));
 			}
 			catch (Exception e)
 			{
@@ -226,29 +237,14 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseIntegerType(TCIntegerType node, Integer limit)
 	{
-		int from = 0;
-		int to = 0;
-		
-		if (limit < NUMERIC_SET_SIZE * 2 + 1)
-		{
-			int half = limit / 2;		// eg. 5/2=2 => {-2, -1, 0, 1, 2}
-			if (half == 0) half = 1;
-			from = -half;
-			to = half;
-		}
-		else
-		{
-			from = -NUMERIC_SET_SIZE;
-			to = NUMERIC_SET_SIZE;
-		}
-
 		ValueSet result = new ValueSet();
 		
-		for (long a = from; a <= to; a++)
+		for (long a = 0; a < NUMERIC_SET_SIZE; a++)
 		{
 			try
 			{
-				result.add(new IntegerValue(a));
+				int n = prng.nextInt();
+				result.add(new NaturalOneValue(n));
 			}
 			catch (Exception e)
 			{
@@ -564,37 +560,17 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	private ValueSet realLimit(Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		int from = 0;
-		int to = 0;
 		
-		if (limit < NUMERIC_SET_SIZE * NUMERIC_SET_SIZE)
+		for (long a = 0; a < limit; a++)
 		{
-			int half = (int) Math.round(Math.sqrt(limit)) / 2;
-			if (half == 0) half = 1;
-			from = -half;
-			to = half;
-		}
-		else
-		{
-			from = -NUMERIC_SET_SIZE;
-			to = NUMERIC_SET_SIZE;
-		}
-		
-		for (double a = from; a <= to; a++)
-		{
-			for (double b = from; b <= to; b++)
+			try
 			{
-				if (b != 0)
-				{
-					try
-					{
-						result.add(new RealValue(a / b));
-					}
-					catch (Exception e)
-					{
-						// Can't be infinite or NaN
-					}
-				}
+				double n = prng.nextDouble();
+				result.add(new RealValue(n));
+			}
+			catch (Exception e)
+			{
+				// Can't happen
 			}
 		}
 		
