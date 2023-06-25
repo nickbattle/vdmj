@@ -86,7 +86,7 @@ import com.fujitsu.vdmj.values.ValueSet;
 
 public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 {
-	private final int NUMERIC_SET_SIZE;	// {1, ..., N} for numerics
+	private final int numSetSize;	// {1, ..., N} for numerics
 	private final Context ctxt;
 	private final TCTypeSet done;
 	private final Random prng;
@@ -94,7 +94,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	public RandomRangeCreator(Context ctxt, int numSetSize, long seed)
 	{
 		this.ctxt = ctxt;
-		this.NUMERIC_SET_SIZE = numSetSize;
+		this.numSetSize = numSetSize;
 		this.done = new TCTypeSet();
 		this.prng = new Random(seed);
 	}
@@ -222,8 +222,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	public ValueSet caseNaturalOneType(TCNaturalOneType node, Integer limit)
 	{
 		ValueSet result = new ValueSet();
+		long num = limit < numSetSize ? limit : numSetSize;
 		
-		for (long a = 0; a < NUMERIC_SET_SIZE; a++)
+		for (long a = 0; a < num; a++)
 		{
 			try
 			{
@@ -242,8 +243,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	public ValueSet caseNaturalType(TCNaturalType node, Integer limit)
 	{
 		ValueSet result = new ValueSet();
+		long num = limit < numSetSize ? limit : numSetSize;
 		
-		for (long a = 0; a < NUMERIC_SET_SIZE; a++)
+		for (long a = 0; a < num; a++)
 		{
 			try
 			{
@@ -262,8 +264,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	public ValueSet caseIntegerType(TCIntegerType node, Integer limit)
 	{
 		ValueSet result = new ValueSet();
+		long num = limit < numSetSize ? limit : numSetSize;
 		
-		for (long a = 0; a < NUMERIC_SET_SIZE; a++)
+		for (long a = 0; a < num; a++)
 		{
 			try
 			{
@@ -584,8 +587,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	private ValueSet realLimit(Integer limit)
 	{
 		ValueSet result = new ValueSet();
+		long num = limit < numSetSize ? limit : numSetSize;
 		
-		for (long a = 0; a < limit; a++)
+		for (long a = 0; a < num; a++)
 		{
 			try
 			{
@@ -601,30 +605,30 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		return result;
 	}
 
-	private List<ValueSet> powerLimit(ValueSet set, int limit, boolean empty)
+	private List<ValueSet> powerLimit(ValueSet source, int limit, boolean incEmpty)
 	{
 		// Generate a power set, up to limit values from the full power set.
 		List<ValueSet> results = new Vector<ValueSet>();
 		
-		if (set.isEmpty())
+		if (source.isEmpty())
 		{
-			if (empty)
+			if (incEmpty)
 			{
 				results.add(new ValueSet());	// Just {}
 			}
 		}
 		else
 		{
-			/**
-			 * The KCombinator below produces combinations in order (eg. [1,2] before [1,3]).
-			 * And we loop the combination sizes from large to small, which is also the
-			 * natural ordering for sets. This means we can use addNoSort and (in power itself)
-			 * which is much more efficient.
-			 */
-			int size = set.size();
+			int size = source.size();
 			long count = 0;
 			
-			out: for (int ss: randomOrder(size))
+			if (incEmpty)
+			{
+				results.add(new ValueSet());	// Add {}
+				count++;
+			}
+			
+			for (int ss: randomOrder(size))
 			{
 				for (int[] kc: new KCombinator(size, ss))
 				{
@@ -632,21 +636,16 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	
 					for (int i=0; i<ss; i++)
 					{
-						ns.addNoSort(set.get(kc[i]));
+						ns.addNoSort(source.get(kc[i]));	// KComb is sorted already
 					}
 					
 					results.add(ns);
 					
 					if (++count >= limit)
 					{
-						break out;
+						return results;
 					}
 				}
-			}
-	
-			if (empty)
-			{
-				results.add(new ValueSet());	// Add {}
 			}
 		}
 	

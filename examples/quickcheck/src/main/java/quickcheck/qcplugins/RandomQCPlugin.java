@@ -40,6 +40,9 @@ import quickcheck.visitors.RandomRangeCreator;
 
 public class RandomQCPlugin extends QCPlugin
 {
+	private static final int NUMERIC_SET_SIZE = 100;	// ie. size of sets for numeric types
+	private static final Integer GEN_LIMIT = 1000;		// Overall returned value limit
+
 	public RandomQCPlugin(List<String> argv)
 	{
 		// Remove your "qc" plugin arguments from the list here
@@ -72,7 +75,8 @@ public class RandomQCPlugin extends QCPlugin
 		
 		for (INBindingSetter bind: binds)
 		{
-			ValueSet values = bind.getType().apply(new RandomRangeCreator(ctxt, 10, seed++), 10);
+			RandomRangeCreator visitor = new RandomRangeCreator(ctxt, NUMERIC_SET_SIZE, seed++);
+			ValueSet values = bind.getType().apply(visitor, GEN_LIMIT);
 			result.put(bind.toString(), values);
 		}
 		

@@ -24,6 +24,8 @@
 
 package quickcheck.qcplugins;
 
+import com.fujitsu.vdmj.tc.expressions.TCAndExpression;
+import com.fujitsu.vdmj.tc.expressions.TCEqualsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCGreaterEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCGreaterExpression;
@@ -56,6 +58,55 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	public NameValuePairList caseExpression(TCExpression node, Object arg)
 	{
 		return newCollection();
+	}
+	
+	@Override
+	public NameValuePairList caseEqualsExpression(TCEqualsExpression node, Object arg)
+	{
+		NameValuePairList nvpl = newCollection();
+		
+		if (node.left instanceof TCVariableExpression)
+		{
+			TCVariableExpression var = (TCVariableExpression)node.left;
+
+			if (node.right instanceof TCIntegerLiteralExpression)
+			{
+				TCIntegerLiteralExpression rhs = (TCIntegerLiteralExpression)node.right;
+				nvpl.add(var.name, new IntegerValue(rhs.value.value + 1));	// ie. rhs + 1 is NOT = rhs
+			}
+			else if (node.right instanceof TCRealLiteralExpression)
+			{
+				try
+				{
+					TCRealLiteralExpression rhs = (TCRealLiteralExpression)node.right;
+					nvpl.add(var.name, new RealValue(rhs.value.value + 1));	// ie. rhs + 1 is NOT = rhs
+				}
+				catch (Exception e)
+				{
+					// ignore
+				}
+			}
+			else if (node.right instanceof TCSeqEnumExpression)
+			{
+				TCSeqEnumExpression rhs = (TCSeqEnumExpression)node.right;
+				
+				if (!rhs.members.isEmpty())	// not empty sequence
+				{
+					nvpl.add(var.name, new SeqValue());	// ie. [] is NOT = rhs
+				}
+			}
+			else if (node.right instanceof TCSetEnumExpression)
+			{
+				TCSetEnumExpression rhs = (TCSetEnumExpression)node.right;
+				
+				if (!rhs.members.isEmpty())	// not empty set
+				{
+					nvpl.add(var.name, new SetValue());	// ie. {} is NOT = rhs
+				}
+			}
+		}
+		
+		return nvpl;
 	}
 	
 	@Override
@@ -241,6 +292,14 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 			nvpl.add(node.name, new BooleanValue(false));
 		}
 		
+		return nvpl;
+	}
+	
+	@Override
+	public NameValuePairList caseAndExpression(TCAndExpression node, Object arg)
+	{
+		NameValuePairList nvpl = node.left.apply(this, arg);
+		nvpl.addAll(node.right.apply(this, arg));
 		return nvpl;
 	}
 

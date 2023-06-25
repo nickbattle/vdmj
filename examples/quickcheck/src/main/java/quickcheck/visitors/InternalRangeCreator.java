@@ -618,13 +618,19 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			/**
 			 * The KCombinator below produces combinations in order (eg. [1,2] before [1,3]).
 			 * And we loop the combination sizes from large to small, which is also the
-			 * natural ordering for sets. This means we can use addNoSort and (in power itself)
-			 * which is much more efficient.
+			 * natural ordering for sets. This means we can use addNoSort which is much more
+			 * efficient.
 			 */
 			int size = set.size();
 			long count = 0;
 			
-			out: for (int ss=1; ss<=size; ss++)
+			if (empty)
+			{
+				results.add(new ValueSet());	// Add {}
+				count++;
+			}
+			
+			for (int ss=size; ss>0; ss--)
 			{
 				for (int[] kc: new KCombinator(size, ss))
 				{
@@ -639,14 +645,9 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 					
 					if (++count >= limit)
 					{
-						break out;
+						return results;
 					}
 				}
-			}
-	
-			if (empty)
-			{
-				results.add(new ValueSet());	// Add {}
 			}
 		}
 	
