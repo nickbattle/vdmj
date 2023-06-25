@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package quickcheck.qcplugins;
+package quickcheck.visitors;
 
 import com.fujitsu.vdmj.tc.expressions.TCAndExpression;
 import com.fujitsu.vdmj.tc.expressions.TCEqualsExpression;

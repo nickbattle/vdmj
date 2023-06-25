@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
+import quickcheck.visitors.SearchQCVisitor;
 
 public class SearchQCPlugin extends QCPlugin
 {
