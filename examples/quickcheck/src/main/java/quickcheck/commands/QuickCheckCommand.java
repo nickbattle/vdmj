@@ -27,7 +27,6 @@ package quickcheck.commands;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -63,8 +62,7 @@ public class QuickCheckCommand extends AnalysisCommand
 
 		List<String> arglist = new Vector<String>(Arrays.asList(argv));
 		arglist.remove(0);	// "qc"
-		List<String> plugins = pluginNames(arglist);
-		qc.loadPlugins(plugins, arglist);
+		qc.loadPlugins(arglist);
 		
 		if (qc.hasErrors())
 		{
@@ -119,44 +117,6 @@ public class QuickCheckCommand extends AnalysisCommand
 		return null;
 	}
 	
-	private List<String> pluginNames(List<String> arglist)
-	{
-		List<String> names = new Vector<String>();
-		Iterator<String> iter = arglist.iterator();
-		
-		while (iter.hasNext())
-		{
-			String arg = iter.next();
-			
-			if (arg.equals("-p"))
-			{
-				iter.remove();
-				
-				while (iter.hasNext())	// eg. -p n1 n2 n2
-				{
-					arg = iter.next();
-					
-					if (arg.equals("-p"))
-					{
-						iter.remove();
-						continue;
-					}
-					else if (!arg.startsWith("-"))
-					{
-						names.add(arg);
-						iter.remove();
-					}
-					else
-					{
-						break;
-					}
-				}
-			}
-		}
-		
-		return names;
-	}
-
 	public static void help()
 	{
 		println("quickcheck [-p <names>][<plugin options>] [<PO numbers>] - lightweight PO verification");

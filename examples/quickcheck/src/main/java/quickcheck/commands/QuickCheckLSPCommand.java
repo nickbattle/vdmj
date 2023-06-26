@@ -27,7 +27,6 @@ package quickcheck.commands;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -78,8 +77,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 
 		List<String> arglist = new Vector<String>(Arrays.asList(argv));
 		arglist.remove(0);	// "qc"
-		List<String> plugins = pluginNames(arglist);
-		qc.loadPlugins(plugins, arglist);
+		qc.loadPlugins(arglist);
 		
 		if (qc.hasErrors())
 		{
@@ -132,38 +130,6 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 		}
 		
 		return result(request, qc.hasErrors() ? "Failed" : null);
-	}
-
-	private List<String> pluginNames(List<String> arglist)
-	{
-		if (arglist.contains("-p"))
-		{
-			List<String> names = new Vector<String>();
-			Iterator<String> iter = arglist.iterator();
-			
-			while (iter.hasNext())
-			{
-				if (iter.next().equals("-p"))
-				{
-					while (iter.hasNext())
-					{
-						String pname = iter.next();
-						
-						if (!pname.startsWith("-"))
-						{
-							names.add(pname);
-						}
-					}
-				}
-			}
-			
-			return names;
-			
-		}
-		else
-		{
-			return null;
-		}
 	}
 
 	@Override

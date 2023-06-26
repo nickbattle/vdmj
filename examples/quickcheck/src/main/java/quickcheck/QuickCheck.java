@@ -31,6 +31,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -76,13 +77,14 @@ public class QuickCheck
 		return errorCount > 0;
 	}
 	
-	public void loadPlugins(List<String> names, List<String> argv)
+	public void loadPlugins(List<String> argv)
 	{
 		plugins = new Vector<QCPlugin>();
 		errorCount = 0;
 		
 		try
 		{
+			List<String> names = pluginNames(argv);
 			List<String> classnames = GetResource.readResource("qc.plugins");
 			
 			for (String classname: classnames)
@@ -160,6 +162,36 @@ public class QuickCheck
 	public ProofObligationList getChosen()
 	{
 		return chosen;
+	}
+	
+	public List<String> pluginNames(List<String> arglist)
+	{
+		List<String> names = new Vector<String>();
+		Iterator<String> iter = arglist.iterator();
+		
+		while (iter.hasNext())
+		{
+			String arg = iter.next();
+			
+			if (arg.equals("-p"))
+			{
+				iter.remove();
+				
+				if (iter.hasNext())
+				{
+					arg = iter.next();
+					iter.remove();
+					names.add(arg);
+				}
+				else
+				{
+					errorln("-p must be followed by a plugin name");
+					names.add("unknown");
+				}
+			}
+		}
+		
+		return names;
 	}
 	
 	public ProofObligationList getPOs(ProofObligationList all, List<Integer> poList)
