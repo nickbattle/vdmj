@@ -51,7 +51,7 @@ public class RandomQCPlugin extends QCPlugin
 	@Override
 	public String getName()
 	{
-		return "RandomQCPlugin";
+		return "random";
 	}
 
 	@Override

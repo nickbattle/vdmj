@@ -45,7 +45,7 @@ public class ExampleQCPlugin extends QCPlugin
 	@Override
 	public String getName()
 	{
-		return "ExampleQCPlugin";	// Just for diagnostics
+		return "exmample";	// Can be used with -p <name>
 	}
 
 	@Override

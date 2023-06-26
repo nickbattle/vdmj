@@ -48,7 +48,7 @@ public class SearchQCPlugin extends QCPlugin
 	@Override
 	public String getName()
 	{
-		return "SearchQCPlugin";
+		return "search";
 	}
 
 	@Override

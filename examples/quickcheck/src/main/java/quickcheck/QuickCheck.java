@@ -76,7 +76,7 @@ public class QuickCheck
 		return errorCount > 0;
 	}
 	
-	public void loadPlugins(List<String> argv)
+	public void loadPlugins(List<String> names, List<String> argv)
 	{
 		plugins = new Vector<QCPlugin>();
 		errorCount = 0;
@@ -92,7 +92,12 @@ public class QuickCheck
 					Class<?> clazz = Class.forName(classname);
 					Constructor<?> ctor = clazz.getDeclaredConstructor(List.class);
 					QCPlugin instance = (QCPlugin) ctor.newInstance((Object)argv);
-					plugins.add(instance);
+					
+					if (names.isEmpty() || names.contains(instance.getName()))
+					{
+						plugins.add(instance);
+						names.remove(instance.getName());
+					}
 				}
 				catch (ClassNotFoundException e)
 				{
@@ -107,6 +112,15 @@ public class QuickCheck
 				catch (Throwable th)
 				{
 					errorln("Plugin " + classname + ": " + th.toString());
+					errorCount++;
+				}
+			}
+			
+			if (!names.isEmpty())
+			{
+				for (String name: names)
+				{
+					println("Could not find plugin " + name);
 					errorCount++;
 				}
 			}
