@@ -45,7 +45,7 @@ public class ExampleQCPlugin extends QCPlugin
 	@Override
 	public String getName()
 	{
-		return "exmample";	// Can be used with -p <name>
+		return "example";	// Can be used with -p <name>
 	}
 
 	@Override
@@ -64,5 +64,11 @@ public class ExampleQCPlugin extends QCPlugin
 	public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		return new HashMap<String, ValueSet>();
+	}
+
+	@Override
+	public String help()
+	{
+		return getName() + " : [options/flags]";
 	}
 }

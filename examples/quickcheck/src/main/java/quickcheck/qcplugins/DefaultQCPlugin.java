@@ -86,7 +86,7 @@ import quickcheck.visitors.InternalRangeCreator;
 
 public class DefaultQCPlugin extends QCPlugin
 {
-	private final static String USAGE = "Usage: quickcheck [-f <file> | -c <file>] [<PO numbers>]";
+	private final static String USAGE = "Usage: quickcheck [-n][-f <file> | -c <file>] [<PO numbers>]";
 
 	private static final long FINITE_LIMIT = 100;		// If sizeof T < 100, use {x | x:T } 
 	private static final int NUMERIC_LIMIT = 5;			// So nat/int/etc are {-5, ..., 5}
@@ -436,5 +436,11 @@ public class DefaultQCPlugin extends QCPlugin
 		}
 		
 		return values;
+	}
+
+	@Override
+	public String help()
+	{
+		return getName() + " : [-n][-f <file> | -c <file>]";
 	}
 }

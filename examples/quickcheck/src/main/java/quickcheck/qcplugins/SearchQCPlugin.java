@@ -94,4 +94,10 @@ public class SearchQCPlugin extends QCPlugin
 		
 		return result;
 	}
+
+	@Override
+	public String help()
+	{
+		return getName() + ": (no options)";
+	}
 }

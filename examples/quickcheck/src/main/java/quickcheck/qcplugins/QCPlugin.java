@@ -40,4 +40,5 @@ abstract public class QCPlugin
 	abstract public boolean hasErrors();
 	abstract public boolean init(QuickCheck qc);
 	abstract public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds);
+	abstract public String help();
 }

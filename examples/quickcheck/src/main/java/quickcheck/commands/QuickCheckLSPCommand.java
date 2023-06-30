@@ -39,13 +39,14 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import quickcheck.QuickCheck;
+import quickcheck.qcplugins.QCPlugin;
 import vdmj.commands.AnalysisCommand;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
 
 public class QuickCheckLSPCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: quickcheck [-c <file>]|[-f <file>] [<PO numbers>]";
+	private final static String USAGE = "Usage: quickcheck [-p <name>]* [<plugin options>] [<PO numbers>]";
 	
 	public QuickCheckLSPCommand(String line)
 	{
@@ -92,7 +93,13 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 				{
 					case "-?":
 					case "-help":
-						result(request, USAGE);
+						println(USAGE);
+						
+						for (QCPlugin plugin: qc.getPlugins())
+						{
+							println(plugin.help());
+						}
+						result(request, null);
 						
 					default:
 						poList.add(Integer.parseInt(arg));

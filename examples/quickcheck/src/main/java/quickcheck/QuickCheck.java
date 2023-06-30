@@ -85,6 +85,7 @@ public class QuickCheck
 		try
 		{
 			List<String> names = pluginNames(argv);
+			List<String> failed = new Vector<String>(names);
 			List<String> classnames = GetResource.readResource("qc.plugins");
 			
 			for (String classname: classnames)
@@ -98,7 +99,7 @@ public class QuickCheck
 					if (names.isEmpty() || names.contains(instance.getName()))
 					{
 						plugins.add(instance);
-						names.remove(instance.getName());
+						failed.remove(instance.getName());
 					}
 				}
 				catch (ClassNotFoundException e)
@@ -118,9 +119,9 @@ public class QuickCheck
 				}
 			}
 			
-			if (!names.isEmpty())
+			if (!failed.isEmpty())
 			{
-				for (String name: names)
+				for (String name: failed)
 				{
 					println("Could not find plugin " + name);
 					errorCount++;

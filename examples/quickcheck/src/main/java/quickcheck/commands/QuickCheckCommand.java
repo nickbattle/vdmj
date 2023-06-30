@@ -39,10 +39,11 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
+import quickcheck.qcplugins.QCPlugin;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: quickcheck [-p <names>][<plugin options>] [<PO numbers>]";
+	private final static String USAGE = "Usage: quickcheck [-p <name>]* [<plugin options>] [<PO numbers>]";
 			
 	public QuickCheckCommand(String line)
 	{
@@ -77,7 +78,13 @@ public class QuickCheckCommand extends AnalysisCommand
 				{
 					case "-?":
 					case "-help":
-						return USAGE;
+						println(USAGE);
+						
+						for (QCPlugin plugin: qc.getPlugins())
+						{
+							println(plugin.help());
+						}
+						return null;
 						
 					default:
 						poList.add(Integer.parseInt(arg));
