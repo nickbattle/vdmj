@@ -71,6 +71,7 @@ import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.InvariantValue;
 import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.NaturalOneValue;
+import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.NilValue;
 import com.fujitsu.vdmj.values.QuoteValue;
 import com.fujitsu.vdmj.values.RealValue;
@@ -249,7 +250,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		{
 			try
 			{
-				result.add(new NaturalOneValue(nextNat()));
+				result.add(new NaturalValue(nextNat()));
 			}
 			catch (Exception e)
 			{
@@ -271,7 +272,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			try
 			{
 				int n = prng.nextInt();
-				result.add(new NaturalOneValue(n));
+				result.add(new IntegerValue(n));
 			}
 			catch (Exception e)
 			{
@@ -295,9 +296,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	}
 	
 	@Override
-	public ValueSet caseFunctionType(TCFunctionType node, Integer arg)
+	public ValueSet caseFunctionType(TCFunctionType node, Integer limit)
 	{
-		throw new RuntimeException("Must define function bind range in VDM");
+		return new ValueSet();	// Can't generate functions!
 	}
 
 	@Override

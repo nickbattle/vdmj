@@ -256,7 +256,7 @@ public class DefaultQCPlugin extends QCPlugin
 				{
 					IntegerValue ivalue = (IntegerValue)value;
 					int limit = (int) ivalue.value;
-					ranges.put(key, tctypes.get(i).apply(new InternalRangeCreator(ctxt, EXPANSION_LIMIT), limit));
+					ranges.put(key, tctypes.get(i).apply(new InternalRangeCreator(ctxt, NUMERIC_LIMIT), limit));
 				}
 				else
 				{

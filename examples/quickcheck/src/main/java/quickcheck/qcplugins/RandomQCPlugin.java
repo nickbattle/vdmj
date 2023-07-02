@@ -40,8 +40,8 @@ import quickcheck.visitors.RandomRangeCreator;
 
 public class RandomQCPlugin extends QCPlugin
 {
-	private static final int NUMERIC_SET_SIZE = 100;	// ie. size of sets for numeric types
-	private static final Integer GEN_LIMIT = 1000;		// Overall returned value limit
+	private static final int NUMERIC_SET_SIZE = 5;		// ie. size of sets for numeric types
+	private static final Integer GEN_LIMIT = 20;		// Overall returned value limit
 
 	public RandomQCPlugin(List<String> argv)
 	{
