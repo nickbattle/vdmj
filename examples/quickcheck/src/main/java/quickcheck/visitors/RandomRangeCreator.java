@@ -271,8 +271,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		{
 			try
 			{
-				int n = prng.nextInt();
-				result.add(new IntegerValue(n));
+				result.add(new IntegerValue(prng.nextInt()));
 			}
 			catch (Exception e)
 			{
