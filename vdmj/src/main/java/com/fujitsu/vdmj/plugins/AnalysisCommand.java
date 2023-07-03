@@ -25,7 +25,7 @@
 package com.fujitsu.vdmj.plugins;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -95,7 +95,7 @@ abstract public class AnalysisCommand
 				e = e.getCause();
 			}
 			
-			verbose("Parse caught " + e);
+			verboseln("Parse caught " + e);
 			return new ErrorCommand(e.getMessage());
 		}
 	}
