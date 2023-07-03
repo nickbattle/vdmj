@@ -593,8 +593,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		{
 			try
 			{
-				double n = prng.nextDouble();
-				result.add(new RealValue(n));
+				result.add(new RealValue(prng.nextDouble()));
 			}
 			catch (Exception e)
 			{

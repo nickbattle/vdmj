@@ -148,7 +148,7 @@ public class QuickCheck
 			}
 			else
 			{
-				verbose("QCPlugin %s initialized", plugin.getName());
+				verbose("QCPlugin %s initialized\n", plugin.getName());
 			}
 		}
 
@@ -322,7 +322,7 @@ public class QuickCheck
 				
 				if (values != null)
 				{
-					verbose("PO #%d, setting %s, %d values", po.number, mbind.toString(), values.size());
+					verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
 					mbind.setBindValues(values);	// Unset in finally clause
 				}
 				else
@@ -335,7 +335,7 @@ public class QuickCheck
 			try
 			{
 				long before = System.currentTimeMillis();
-				verbose("PO #%d, starting...", po.number);
+				verbose("PO #%d, starting...\n", po.number);
 				Value result = poexp.eval(ctxt);
 				long after = System.currentTimeMillis();
 				

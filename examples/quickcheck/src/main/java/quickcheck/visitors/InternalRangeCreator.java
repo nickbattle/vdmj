@@ -86,14 +86,14 @@ import com.fujitsu.vdmj.values.ValueSet;
 
 public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 {
-	private final int NUMERIC_SET_SIZE;	// {1, ..., N} for numerics
+	private final int numSetSize;	// {1, ..., N} for numerics
 	private final Context ctxt;
 	private final TCTypeSet done;
 	
 	public InternalRangeCreator(Context ctxt, int numSetSize)
 	{
 		this.ctxt = ctxt;
-		this.NUMERIC_SET_SIZE = numSetSize;
+		this.numSetSize = numSetSize;
 		this.done = new TCTypeSet();
 	}
 
@@ -172,9 +172,9 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseNaturalOneType(TCNaturalOneType node, Integer limit)
 	{
-		int to = NUMERIC_SET_SIZE;
+		int to = numSetSize;
 
-		if (limit < NUMERIC_SET_SIZE)
+		if (limit < numSetSize)
 		{
 			to = limit;
 		}
@@ -199,9 +199,9 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseNaturalType(TCNaturalType node, Integer limit)
 	{
-		int to = NUMERIC_SET_SIZE - 1;
+		int to = numSetSize - 1;
 		
-		if (limit < NUMERIC_SET_SIZE - 1)
+		if (limit < numSetSize - 1)
 		{
 			to = limit - 1;
 		}
@@ -229,7 +229,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		int from = 0;
 		int to = 0;
 		
-		if (limit < NUMERIC_SET_SIZE * 2 + 1)
+		if (limit < numSetSize * 2 + 1)
 		{
 			int half = limit / 2;		// eg. 5/2=2 => {-2, -1, 0, 1, 2}
 			if (half == 0) half = 1;
@@ -238,8 +238,8 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		}
 		else
 		{
-			from = -NUMERIC_SET_SIZE;
-			to = NUMERIC_SET_SIZE;
+			from = -numSetSize;
+			to = numSetSize;
 		}
 
 		ValueSet result = new ValueSet();
@@ -567,7 +567,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		int from = 0;
 		int to = 0;
 		
-		if (limit < NUMERIC_SET_SIZE * NUMERIC_SET_SIZE)
+		if (limit < numSetSize * numSetSize)
 		{
 			int half = (int) Math.round(Math.sqrt(limit)) / 2;
 			if (half == 0) half = 1;
@@ -576,8 +576,8 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		}
 		else
 		{
-			from = -NUMERIC_SET_SIZE;
-			to = NUMERIC_SET_SIZE;
+			from = -numSetSize;
+			to = numSetSize;
 		}
 		
 		for (double a = from; a <= to; a++)

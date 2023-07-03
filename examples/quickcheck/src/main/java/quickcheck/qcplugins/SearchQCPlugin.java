@@ -42,7 +42,7 @@ public class SearchQCPlugin extends QCPlugin
 {
 	public SearchQCPlugin(List<String> argv)
 	{
-		// Remove your "qc" plugin arguments from the list here
+		// No plugin arguments yet?
 	}
 	
 	@Override

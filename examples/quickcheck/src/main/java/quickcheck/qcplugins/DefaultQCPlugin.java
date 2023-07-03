@@ -25,8 +25,9 @@
 package quickcheck.qcplugins;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -45,7 +46,6 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
-import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -81,22 +81,16 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
-import quickcheck.visitors.DefaultRangeCreator;
 import quickcheck.visitors.InternalRangeCreator;
 
 public class DefaultQCPlugin extends QCPlugin
 {
-	private final static String USAGE = "Usage: quickcheck [-n][-f <file> | -c <file>] [<PO numbers>]";
-
-	private static final long FINITE_LIMIT = 100;		// If sizeof T < 100, use {x | x:T } 
-	private static final int NUMERIC_LIMIT = 5;			// So nat/int/etc are {-5, ..., 5}
-	private static final int EXPANSION_LIMIT = 20;		// Top level binding value expansion limit
-	private static final boolean GENERATE_VDM = false;	// False => use internal generator
+	private int numSetSize = 5;				// So nat/int/etc are {-5, ..., 5}
+	private int expansionLimit = 20;		// Top level binding value expansion limit
 	
 	private int errorCount = 0;
 	private String rangesFile = "ranges.qc";
 	private boolean createFile = false;
-	private boolean suppress = false;
 
 	private Map<String, ValueSet> allRanges = null;
 	
@@ -108,19 +102,19 @@ public class DefaultQCPlugin extends QCPlugin
 			{
 				switch (argv.get(i))
 				{
-					case "-n":
+					case "-default:f":
 						argv.remove(i);
-						suppress = true;
-						break;
+
+						if (i < argv.size())
+						{
+							rangesFile = argv.get(i);
+							argv.remove(i);
+						}
 						
-					case "-f":
-						argv.remove(i);
-						rangesFile = argv.get(i);
-						argv.remove(i);
 						createFile = false;
 						break;
 						
-					case "-c":
+					case "-default:c":
 						argv.remove(i);
 						
 						if (i < argv.size())
@@ -131,14 +125,43 @@ public class DefaultQCPlugin extends QCPlugin
 
 						createFile = true;
 						break;
+						
+					case "-default:n":		// {-n, ..., +n}
+						argv.remove(i);
+
+						if (i < argv.size())
+						{
+							numSetSize = Integer.parseInt(argv.get(i));
+							argv.remove(i);
+						}
+						break;
+						
+					case "-default:s":		// Total top level size
+						argv.remove(i);
+
+						if (i < argv.size())
+						{
+							expansionLimit = Integer.parseInt(argv.get(i));
+							argv.remove(i);
+						}
+						break;
 				}
+			}
+			catch (NumberFormatException e)
+			{
+				errorln("Argument must be numeric");
+				errorln(help());
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
-				println("Missing argument");
-				println(USAGE);
+				errorln("Missing argument");
+				errorln(help());
 			}
 		}
+		
+		verbose("default:n = %d\n", numSetSize);
+		verbose("default:s = %d\n", expansionLimit);
+		verbose("default:f = %s\n", rangesFile);
 	}
 	
 	@Override
@@ -163,7 +186,7 @@ public class DefaultQCPlugin extends QCPlugin
 	{
 		try
 		{
-			printf("Reading %s\n", filename);
+			verbose("Reading %s\n", filename);
 			errorCount = 0;
 			File file = new File(filename);
 			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL);
@@ -235,13 +258,13 @@ public class DefaultQCPlugin extends QCPlugin
 			RootContext ctxt = interpreter.getInitialContext();
 			Map<String, ValueSet> ranges = new HashMap<String, ValueSet>();
 			long before = System.currentTimeMillis();
-			printf("Expanding " + inbinds.size() + " ranges: ");
+			verbose("Expanding " + inbinds.size() + " ranges: ");
 			
 			for (int i=0; i<inbinds.size(); i++)
 			{
 				ctxt.threadState.init();
 				String key = inbinds.get(i).toString();
-				printf(".");
+				verbose(".");
 				INExpression exp = inexps.get(i);
 				Value value = exp.eval(ctxt);
 				
@@ -256,7 +279,7 @@ public class DefaultQCPlugin extends QCPlugin
 				{
 					IntegerValue ivalue = (IntegerValue)value;
 					int limit = (int) ivalue.value;
-					ranges.put(key, tctypes.get(i).apply(new InternalRangeCreator(ctxt, NUMERIC_LIMIT), limit));
+					ranges.put(key, tctypes.get(i).apply(new InternalRangeCreator(ctxt, numSetSize), limit));
 				}
 				else
 				{
@@ -271,7 +294,7 @@ public class DefaultQCPlugin extends QCPlugin
 			}
 			
 			long after = System.currentTimeMillis();
-			println("\nRanges expanded " + duration(before, after));
+			verboseln("\nRanges expanded " + duration(before, after));
 
 			return ranges;
 		}
@@ -312,7 +335,6 @@ public class DefaultQCPlugin extends QCPlugin
 			File file = new File(filename);
 			PrintWriter writer = new PrintWriter(new FileWriter(file));
 			Set<String> done = new HashSet<String>();
-			RootContext ctxt = Interpreter.getInstance().getInitialContext();
 
 			for (ProofObligation po: qc.getChosen())
 			{
@@ -321,49 +343,15 @@ public class DefaultQCPlugin extends QCPlugin
 					if (!done.contains(mbind.toString()))
 					{
 						String range = null;
+						TCType type = mbind.getType();
 						
-						if (GENERATE_VDM)
+						if (type instanceof TCFunctionType)
 						{
-							DefaultRangeCreator rangeCreator = new DefaultRangeCreator(NUMERIC_LIMIT);
-							TCType type = mbind.getType();
-							
-							if (type.isInfinite())
-							{
-								range = type.apply(rangeCreator, EXPANSION_LIMIT);
-							}
-							else
-							{
-								try
-								{
-									long size = type.apply(new INTypeSizeVisitor(), ctxt);
-									
-									if (size > FINITE_LIMIT)	// Avoid huge finite types
-									{
-										range = type.apply(rangeCreator, EXPANSION_LIMIT);
-									}
-									else
-									{
-										range = "{ x | x : " + type + " }";
-									}
-								}
-								catch (Exception e)		// Probably ArithmeticException
-								{
-									range = type.apply(rangeCreator, EXPANSION_LIMIT);
-								}
-							}
+							range = "{ /* define lambdas! */ }";
 						}
 						else
 						{
-							TCType type = mbind.getType();
-							
-							if (type instanceof TCFunctionType)
-							{
-								range = "{ /* define lambdas! */ }";
-							}
-							else
-							{
-								range = Integer.toString(EXPANSION_LIMIT);
-							}
+							range = Integer.toString(expansionLimit);
 						}
 						
 						writer.println("-- " + po.location);
@@ -398,11 +386,7 @@ public class DefaultQCPlugin extends QCPlugin
 	@Override
 	public boolean init(QuickCheck qc)
 	{
-		if (suppress)
-		{
-			return true;
-		}
-		else if (createFile)
+		if (createFile)
 		{
 			createRangeFile(qc, rangesFile);
 			return false;	// Don't do checks!
@@ -419,20 +403,27 @@ public class DefaultQCPlugin extends QCPlugin
 	{
 		Map<String, ValueSet> values = new HashMap<String, ValueSet>();
 		
-		if (!suppress)
+		try
 		{
-			try
+			for (INBindingSetter bind: binds)
 			{
-				for (INBindingSetter bind: binds)
+				String key = bind.toString();
+				
+				if (allRanges.containsKey(key))
 				{
-					values.put(bind.toString(), allRanges.get(bind.toString()));
+					values.put(key, allRanges.get(key));
+				}
+				else
+				{
+					errorln("Range file has no values for " + key);
+					values.put(key, new ValueSet());
 				}
 			}
-			catch (Exception e)
-			{
-				// Can't happen?
-				println(e);
-			}
+		}
+		catch (Exception e)
+		{
+			// Can't happen?
+			println(e);
 		}
 		
 		return values;
@@ -441,6 +432,6 @@ public class DefaultQCPlugin extends QCPlugin
 	@Override
 	public String help()
 	{
-		return getName() + " : [-n][-f <file> | -c <file>]";
+		return getName() + " : [-default:f <file> | -default:c <file>][-default:n <size>][-default:s <size>]";
 	}
 }

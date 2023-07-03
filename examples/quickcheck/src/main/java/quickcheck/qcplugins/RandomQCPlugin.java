@@ -24,6 +24,9 @@
 
 package quickcheck.qcplugins;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +43,50 @@ import quickcheck.visitors.RandomRangeCreator;
 
 public class RandomQCPlugin extends QCPlugin
 {
-	private static final int NUMERIC_SET_SIZE = 5;		// ie. size of sets for numeric types
-	private static final Integer GEN_LIMIT = 20;		// Overall returned value limit
+	private int numSetSize = 5;			// ie. size of sets for numeric types
+	private int expansionLimit = 20;	// Overall returned value limit
 
 	public RandomQCPlugin(List<String> argv)
 	{
-		// Remove your "qc" plugin arguments from the list here
+		for (int i=0; i < argv.size(); i++)
+		{
+			try
+			{
+				switch (argv.get(i))
+				{
+					case "-random:n":
+						argv.remove(i);
+
+						if (i < argv.size())
+						{
+							numSetSize = Integer.parseInt(argv.get(i));
+							argv.remove(i);
+						}
+						break;
+						
+					case "-random:s":		// Total top level size
+						argv.remove(i);
+
+						if (i < argv.size())
+						{
+							expansionLimit = Integer.parseInt(argv.get(i));
+							argv.remove(i);
+						}
+						break;
+				}
+			}
+			catch (NumberFormatException e)
+			{
+				println("Argument must be numeric");
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				println("Missing argument");
+			}
+		}
+		
+		verbose("random:n = %d\n", numSetSize);
+		verbose("random:s = %d\n", expansionLimit);
 	}
 	
 	@Override
@@ -75,8 +116,8 @@ public class RandomQCPlugin extends QCPlugin
 		
 		for (INBindingSetter bind: binds)
 		{
-			RandomRangeCreator visitor = new RandomRangeCreator(ctxt, NUMERIC_SET_SIZE, seed++);
-			ValueSet values = bind.getType().apply(visitor, GEN_LIMIT);
+			RandomRangeCreator visitor = new RandomRangeCreator(ctxt, numSetSize, seed++);
+			ValueSet values = bind.getType().apply(visitor, expansionLimit);
 			result.put(bind.toString(), values);
 		}
 		
@@ -86,6 +127,6 @@ public class RandomQCPlugin extends QCPlugin
 	@Override
 	public String help()
 	{
-		return getName() + ": (no options)";
+		return getName() + ": [-random:n <size>][-random:s <size>]";
 	}
 }

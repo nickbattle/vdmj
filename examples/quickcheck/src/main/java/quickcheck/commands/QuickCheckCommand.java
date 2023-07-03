@@ -43,7 +43,7 @@ import quickcheck.qcplugins.QCPlugin;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: quickcheck [-p <name>]* [<plugin options>] [<PO numbers>]";
+	private final static String USAGE = "Usage: quickcheck [-?|-help][-p <name>]* [<plugin options>] [<PO numbers>]";
 			
 	public QuickCheckCommand(String line)
 	{
@@ -126,6 +126,6 @@ public class QuickCheckCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("quickcheck [-p <names>][<plugin options>] [<PO numbers>] - lightweight PO verification");
+		println("quickcheck [-?|-help][-p <names>]* [<plugin options>] [<PO numbers>] - lightweight PO verification");
 	}
 }

@@ -40,6 +40,7 @@ public class ExampleQCPlugin extends QCPlugin
 	public ExampleQCPlugin(List<String> argv)
 	{
 		// Remove your "qc" plugin arguments from the list here
+		// It's useful to include the plugin name, like "-example:n"
 	}
 	
 	@Override
