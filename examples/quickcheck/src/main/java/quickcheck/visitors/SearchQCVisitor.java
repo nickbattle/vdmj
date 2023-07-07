@@ -24,12 +24,13 @@
 
 package quickcheck.visitors;
 
-import com.fujitsu.vdmj.tc.expressions.TCAndExpression;
+import com.fujitsu.vdmj.tc.expressions.TCBooleanBinaryExpression;
 import com.fujitsu.vdmj.tc.expressions.TCEqualsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCGreaterEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCGreaterExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
+import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLessEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLessExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotEqualExpression;
@@ -39,13 +40,20 @@ import com.fujitsu.vdmj.tc.expressions.TCSetEnumExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCIntegerType;
+import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
+import com.fujitsu.vdmj.tc.types.TCNaturalType;
+import com.fujitsu.vdmj.tc.types.TCRealType;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
+import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.RealValue;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.SetValue;
+import com.fujitsu.vdmj.values.Value;
 
 public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, NameValuePairList, Object>
 {
@@ -283,6 +291,60 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	}
 	
 	@Override
+	public NameValuePairList caseIsExpression(TCIsExpression node, Object arg)
+	{
+		NameValuePairList nvpl = newCollection();
+		
+		if (node.test instanceof TCVariableExpression &&
+			node.basictype != null)
+		{
+			try
+			{
+				TCVariableExpression var = (TCVariableExpression)node.test;
+				TCType vType = var.getType();
+				TCType isType = node.basictype;
+				Value toTry = null;
+				
+				if (isType instanceof TCNaturalOneType)
+				{
+					if (vType instanceof TCNaturalType ||
+						vType instanceof TCIntegerType ||
+						vType instanceof TCRealType)
+					{
+						toTry = new NaturalValue(0);
+					}
+				}
+				else if (isType instanceof TCNaturalType)
+				{
+					if (vType instanceof TCIntegerType ||
+						vType instanceof TCRealType)
+					{
+						toTry = new IntegerValue(-1);
+					}
+				}
+				else if (isType instanceof TCIntegerType)
+				{
+					if (vType instanceof TCRealType)
+					{
+						toTry = new RealValue(1.23);
+					}
+				}
+				
+				if (toTry != null)
+				{
+					nvpl.add(var.name, toTry);
+				}
+			}
+			catch (Exception e)
+			{
+				// can't happen
+			}
+		}
+	
+		return nvpl;
+	}
+	
+	@Override
 	public NameValuePairList caseVariableExpression(TCVariableExpression node, Object arg)
 	{
 		NameValuePairList nvpl = newCollection();
@@ -295,8 +357,11 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 		return nvpl;
 	}
 	
+	/**
+	 * Just try everything over LHS/RHS
+	 */
 	@Override
-	public NameValuePairList caseAndExpression(TCAndExpression node, Object arg)
+	public NameValuePairList caseBooleanBinaryExpression(TCBooleanBinaryExpression node, Object arg)
 	{
 		NameValuePairList nvpl = node.left.apply(this, arg);
 		nvpl.addAll(node.right.apply(this, arg));

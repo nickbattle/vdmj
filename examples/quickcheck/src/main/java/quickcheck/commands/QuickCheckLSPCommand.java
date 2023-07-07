@@ -46,7 +46,8 @@ import workspace.plugins.POPlugin;
 
 public class QuickCheckLSPCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: quickcheck [-?|-help][-p <name>]* [<plugin options>] [<PO numbers>]";
+	public final static String CMD = "quickcheck [-?|-help][-p <name>]* [-<plugin:option>]* [<PO numbers>]";
+	private final static String USAGE = "Usage: " + CMD;
 	
 	public QuickCheckLSPCommand(String line)
 	{
