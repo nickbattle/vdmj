@@ -28,7 +28,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.info;
 import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
 import static org.junit.Assert.fail;
 
 import java.io.File;
@@ -198,30 +198,30 @@ abstract public class SpecificationReader
 
 						if (report(messages, event))
 						{
-							verbose("Loaded files initialized successfully");
+							verboseln("Loaded files initialized successfully");
 							return true;
 						}
 						else
 						{
-							verbose("Failed to initialize interpreter");
+							verboseln("Failed to initialize interpreter");
 							messages.addAll(eventhub.publish(new CheckFailedEvent(event)));
 						}
 					}
 					else
 					{
-						verbose("Type checking errors found");
+						verboseln("Type checking errors found");
 						messages.addAll(eventhub.publish(new CheckFailedEvent(event)));
 					}
 				}
 				else
 				{
-					verbose("Syntax errors found");
+					verboseln("Syntax errors found");
 					messages.addAll(eventhub.publish(new CheckFailedEvent(event)));
 				}
 			}
 			else
 			{
-				verbose("Preparation errors found");
+				verboseln("Preparation errors found");
 				messages.addAll(eventhub.publish(new CheckFailedEvent(event)));
 			}
 		}
