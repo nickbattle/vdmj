@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.plugins;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,15 @@ public class EventHub
 {
 	private static EventHub INSTANCE = null;
 	private long lastDuration = 0;
+	
+	private static class ListenerComparator implements Comparator<EventListener>
+	{
+		@Override
+		public int compare(EventListener left, EventListener right)
+		{
+			return left.getPriority() - right.getPriority();
+		}
+	}
 	
 	private final Map<String, List<EventListener>> registrations;
 	
@@ -77,7 +88,8 @@ public class EventHub
 			registrations.put(key, list);
 		}
 		
-		list.add(listener);	// registration order
+		list.add(listener);
+		Collections.sort(list, new ListenerComparator());		// Order by getPriority()
 	}
 	
 	public List<EventListener> query(AnalysisEvent type)

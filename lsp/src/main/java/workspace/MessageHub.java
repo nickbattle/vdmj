@@ -55,7 +55,7 @@ public class MessageHub
 	private MessageHub()
 	{
 		this.messageMap = new HashMap<File, Map<String, Set<VDMMessage>>>();
-		this.pluginMap = PluginRegistry.getInstance().getPlugins();
+		this.pluginMap = PluginRegistry.getInstance().getPluginMap();
 		Diag.info("Created MessageHub");
 	}
 	

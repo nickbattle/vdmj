@@ -51,7 +51,15 @@ public class PluginConsole
 	{
 		if (Settings.verbose)
 		{
-			Console.out.printf(format + "\n", args);
+			Console.out.printf(format, args);
+		}
+	}
+
+	public static void verboseln(String m)
+	{
+		if (Settings.verbose)
+		{
+			Console.out.println(m);
 		}
 	}
 

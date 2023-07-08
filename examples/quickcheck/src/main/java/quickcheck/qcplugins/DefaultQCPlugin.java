@@ -22,11 +22,12 @@
  *
  ******************************************************************************/
 
-package quickcheck.commands;
+package quickcheck.qcplugins;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -36,30 +37,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
-import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleBindList;
 import com.fujitsu.vdmj.in.INNode;
-import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
-import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
@@ -69,63 +64,110 @@ import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
-import com.fujitsu.vdmj.values.BooleanValue;
+import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueList;
+import com.fujitsu.vdmj.values.ValueSet;
 
-import quickcheck.visitors.DefaultRangeCreator;
-import quickcheck.visitors.TypeBindFinder;
+import quickcheck.QuickCheck;
+import quickcheck.visitors.InternalRangeCreator;
 
-public class QuickCheck
+public class DefaultQCPlugin extends QCPlugin
 {
-	private static final long FINITE_LIMIT = 100;
-	private static final int NUMERIC_LIMIT = 10;
-	private int errorCount = 0;
+	private int numSetSize = 5;				// So nat/int/etc are {-5, ..., 5}
+	private int expansionLimit = 20;		// Top level binding value expansion limit
 	
+	private int errorCount = 0;
+	private String rangesFile = "ranges.qc";
+	private boolean createFile = false;
+
+	private Map<String, ValueSet> allRanges = null;
+	
+	public DefaultQCPlugin(List<String> argv)
+	{
+		for (int i=0; i < argv.size(); i++)
+		{
+			try
+			{
+				switch (argv.get(i))
+				{
+					case "-default:f":
+						argv.remove(i);
+
+						if (i < argv.size())
+						{
+							rangesFile = argv.get(i);
+							argv.remove(i);
+						}
+						
+						createFile = false;
+						break;
+						
+					case "-default:c":
+						argv.remove(i);
+						
+						if (i < argv.size())
+						{
+							rangesFile = argv.get(i);
+							argv.remove(i);
+						}
+
+						createFile = true;
+						break;
+						
+					case "-default:n":		// {-n, ..., +n}
+						argv.remove(i);
+
+						if (i < argv.size())
+						{
+							numSetSize = Integer.parseInt(argv.get(i));
+							argv.remove(i);
+						}
+						break;
+						
+					case "-default:s":		// Total top level size
+						argv.remove(i);
+
+						if (i < argv.size())
+						{
+							expansionLimit = Integer.parseInt(argv.get(i));
+							argv.remove(i);
+						}
+						break;
+				}
+			}
+			catch (NumberFormatException e)
+			{
+				errorln("Argument must be numeric");
+				errorln(help());
+			}
+			catch (ArrayIndexOutOfBoundsException e)
+			{
+				errorln("Missing argument");
+				errorln(help());
+			}
+		}
+		
+		verbose("default:n = %d\n", numSetSize);
+		verbose("default:s = %d\n", expansionLimit);
+		verbose("default:f = %s\n", rangesFile);
+	}
+	
+	@Override
 	public boolean hasErrors()
 	{
 		return errorCount > 0;
-	}
-	
-	public ProofObligationList getPOs(ProofObligationList all, List<Integer> poList)
-	{
-		errorCount = 0;
-		
-		if (poList.isEmpty())
-		{
-			return all;		// No PO#s specified
-		}
-		else
-		{
-			ProofObligationList list = new ProofObligationList();
-			
-			for (Integer n: poList)
-			{
-				if (n > 0 && n <= all.size())
-				{
-					list.add(all.get(n-1));
-				}
-				else
-				{
-					errorln("PO# " + n + " unknown. Must be between 1 and " + all.size());
-					errorCount++;
-				}
-			}
-			
-			return errorCount > 0 ? null : list;
-		}
 	}
 	
 	private void checkFor(LexTokenReader reader, Token expected, String message) throws LexException, ParserException
@@ -140,10 +182,11 @@ public class QuickCheck
 		reader.nextToken();
 	}
 	
-	public Map<String, ValueList> readRangeFile(String filename)
+	private Map<String, ValueSet> readRangeFile(String filename)
 	{
 		try
 		{
+			verbose("Reading %s\n", filename);
 			errorCount = 0;
 			File file = new File(filename);
 			LexTokenReader ltr = new LexTokenReader(file, Dialect.VDM_SL);
@@ -169,6 +212,7 @@ public class QuickCheck
 			ltr.close();
 			TCMultipleBindList tcbinds = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astbinds);
 			TCExpressionList tcexps = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astexps);
+			TCTypeList tctypes = new TCTypeList();
 			Environment env = interpreter.getGlobalEnvironment();
 			TypeChecker.clearErrors();
 			
@@ -177,6 +221,7 @@ public class QuickCheck
 				TCMultipleBind mb = tcbinds.get(i);
 				TCType mbtype = mb.typeCheck(env, NameScope.NAMESANDSTATE);
 				TCSetType mbset = new TCSetType(mb.location, mbtype);
+				tctypes.add(mbtype);
 				
 				TCExpression exp = tcexps.get(i);
 				TCType exptype = exp.typeCheck(env, null, NameScope.NAMESANDSTATE, null);
@@ -185,9 +230,14 @@ public class QuickCheck
 				{
 					for (VDMError error: TypeChecker.getErrors())
 					{
+						println(exp);
 						println(error.toString());
 						errorCount++;
 					}
+				}
+				else if (exptype.isNumeric(LexLocation.ANY))
+				{
+					continue;	// fixed later
 				}
 				else if (!TypeComparator.compatible(mbset, exptype))
 				{
@@ -206,28 +256,34 @@ public class QuickCheck
 			INMultipleBindList inbinds = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcbinds);
 			INExpressionList inexps = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexps);
 			RootContext ctxt = interpreter.getInitialContext();
-			Map<String, ValueList> ranges = new HashMap<String, ValueList>();
+			Map<String, ValueSet> ranges = new HashMap<String, ValueSet>();
 			long before = System.currentTimeMillis();
-			println("Expanding " + inbinds.size() + " ranges:");
+			verbose("Expanding " + inbinds.size() + " ranges: ");
 			
 			for (int i=0; i<inbinds.size(); i++)
 			{
 				ctxt.threadState.init();
 				String key = inbinds.get(i).toString();
-				printf(".");
+				verbose(".");
 				INExpression exp = inexps.get(i);
 				Value value = exp.eval(ctxt);
 				
 				if (value instanceof SetValue)
 				{
 					SetValue svalue = (SetValue)value;
-					ValueList list = new ValueList();
+					ValueSet list = new ValueSet();
 					list.addAll(svalue.values);
 					ranges.put(key, list);
 				}
+				else if (value instanceof IntegerValue)
+				{
+					IntegerValue ivalue = (IntegerValue)value;
+					int limit = (int) ivalue.value;
+					ranges.put(key, tctypes.get(i).apply(new InternalRangeCreator(ctxt, numSetSize), limit));
+				}
 				else
 				{
-					println("\nRange does not evaluate to a set " + exp.location);
+					println("\nRange does not evaluate to a set or integer " + exp.location);
 					errorCount++;
 				}
 			}
@@ -238,7 +294,7 @@ public class QuickCheck
 			}
 			
 			long after = System.currentTimeMillis();
-			println("\nRanges expanded " + duration(before, after));
+			verboseln("\nRanges expanded " + duration(before, after));
 
 			return ranges;
 		}
@@ -254,11 +310,11 @@ public class QuickCheck
 		{
 			println("Error: " + e.getMessage() + " " + e.location);
 		}
-		catch (InternalException e)
-		{
-			errorln(e.getMessage());
-		}
 		catch (ContextException e)
+		{
+			println(e.getMessage());
+		}
+		catch (InternalException e)
 		{
 			errorln(e.getMessage());
 		}
@@ -271,26 +327,7 @@ public class QuickCheck
 		return null;
 	}
 	
-	private INExpression getPOExpression(ProofObligation po) throws Exception
-	{
-		if (po.isCheckable)
-		{
-			TCExpression tcexp = po.getCheckedExpression();
-			return ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
-		}
-		else
-		{
-			// Not checkable, so just use "true"
-			return new INBooleanLiteralExpression(new LexBooleanToken(true, po.location));
-		}
-	}
-	
-	private List<INBindingSetter> getBindList(INExpression inexp, boolean foralls) throws Exception
-	{
-		return inexp.apply(new TypeBindFinder(), null);
-	}
-	
-	public void createRangeFile(String filename, ProofObligationList chosen)
+	private void createRangeFile(QuickCheck qc, String filename)
 	{
 		try
 		{
@@ -298,43 +335,26 @@ public class QuickCheck
 			File file = new File(filename);
 			PrintWriter writer = new PrintWriter(new FileWriter(file));
 			Set<String> done = new HashSet<String>();
-			RootContext ctxt = Interpreter.getInstance().getInitialContext();
 
-			for (ProofObligation po: chosen)
+			for (ProofObligation po: qc.getChosen())
 			{
-				for (INBindingSetter mbind: getBindList(getPOExpression(po), false))
+				for (INBindingSetter mbind: qc.getINBindList(qc.getINExpression(po)))
 				{
 					if (!done.contains(mbind.toString()))
 					{
-						DefaultRangeCreator rangeCreator = new DefaultRangeCreator(NUMERIC_LIMIT);	// stateful
-						TCType type = mbind.getType();
 						String range = null;
+						TCType type = mbind.getType();
 						
-						if (type.isInfinite())
+						if (type instanceof TCFunctionType)
 						{
-							range = type.apply(rangeCreator, new TCTypeSet());
+							range = "{ /* define lambdas! */ }";
 						}
 						else
 						{
-							try
-							{
-								long size = type.apply(new INTypeSizeVisitor(), ctxt);
-								
-								if (size > FINITE_LIMIT)	// Avoid huge finite types
-								{
-									range = type.apply(rangeCreator, new TCTypeSet());
-								}
-								else
-								{
-									range = "{ x | x : " + type + " }";
-								}
-							}
-							catch (Exception e)		// Probably ArithmeticException
-							{
-								range = type.apply(rangeCreator, new TCTypeSet());
-							}
+							range = Integer.toString(expansionLimit);
 						}
 						
+						writer.println("-- " + po.location);
 						writer.println(mbind + " = " + range + ";");
 						done.add(mbind.toString());
 					}
@@ -350,119 +370,68 @@ public class QuickCheck
 			errorln("Can't create range file: " + e.getMessage());
 		}
 	}
-	
-	public void checkObligations(ProofObligationList chosen, Map<String, ValueList> ranges)
-	{
-		try
-		{
-			errorCount = 0;
-			RootContext ctxt = Interpreter.getInstance().getInitialContext();
-			List<INBindingSetter> bindings = null;
-
-			for (ProofObligation po: chosen)
-			{
-				if (!po.isCheckable)
-				{
-					printf("PO# %d, UNCHECKED\n", po.number);
-					continue;
-				}
-
-				Stack<Context> failPath = new Stack<Context>();
-				INForAllExpression.setFailPath(failPath);
-				INExpression poexp = getPOExpression(po);
-				bindings = getBindList(poexp, false);
-				
-				for (INBindingSetter mbind: bindings)
-				{
-					ValueList values = ranges.get(mbind.toString());
-					
-					if (values != null)
-					{
-						mbind.setBindValues(values);
-					}
-					else
-					{
-						errorln("PO# " + po.number + ": No range defined for " + mbind);
-						errorCount++;
-					}
-				}
-				
-				try
-				{
-					long before = System.currentTimeMillis();
-					Value result = poexp.eval(ctxt);
-					long after = System.currentTimeMillis();
-					
-					if (result instanceof BooleanValue)
-					{
-						if (result.boolValue(ctxt))
-						{
-							printf("PO# %d, PASSED %s\n", po.number, duration(before, after));
-						}
-						else
-						{
-							printf("PO# %d, FAILED %s: ", po.number, duration(before, after));
-							printFailPath(failPath);
-							println("\n" + po);
-							errorCount++;
-						}
-					}
-					else
-					{
-						printf("PO# %d, Error: PO evaluation returns %s?\n\n", po.number, result.kind());
-						println(po);
-						errorCount++;
-					}
-				}
-				catch (Exception e)
-				{
-					printf("PO# %d, %s\n\n", po.number, e.getMessage());
-					println(po);
-					errorCount++;
-				}
-				finally
-				{
-					INForAllExpression.setFailPath(null);
-
-					for (INBindingSetter mbind: bindings)
-					{
-						mbind.setBindValues(null);
-					}
-				}
-			}
-		}
-		catch (Exception e)
-		{
-			errorCount++;
-			println(e);
-			return;
-		}
-	}
-	
-	private void printFailPath(Stack<Context> failPath)
-	{
-		if (failPath.isEmpty())
-		{
-			printf("No counterexample");
-			return;
-		}
-		
-		printf("Counterexample: ");
-		String sep = "";
-		
-		for (Context path: failPath)
-		{
-			for (TCNameToken name: path.keySet())
-			{
-				printf("%s%s = %s", sep, name, path.get(name));
-				sep = ", ";
-			}
-		}
-	}
 
 	private String duration(long before, long after)
 	{
 		double duration = (double)(after - before)/1000;
 		return "in " + duration + "s";
+	}
+
+	@Override
+	public String getName()
+	{
+		return "default";
+	}
+
+	@Override
+	public boolean init(QuickCheck qc)
+	{
+		if (createFile)
+		{
+			createRangeFile(qc, rangesFile);
+			return false;	// Don't do checks!
+		}
+		else
+		{
+			allRanges = readRangeFile(rangesFile);
+			return !hasErrors();
+		}
+	}
+
+	@Override
+	public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
+	{
+		Map<String, ValueSet> values = new HashMap<String, ValueSet>();
+		
+		try
+		{
+			for (INBindingSetter bind: binds)
+			{
+				String key = bind.toString();
+				
+				if (allRanges.containsKey(key))
+				{
+					values.put(key, allRanges.get(key));
+				}
+				else
+				{
+					errorln("Range file has no values for " + key);
+					values.put(key, new ValueSet());
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			// Can't happen?
+			println(e);
+		}
+		
+		return values;
+	}
+
+	@Override
+	public String help()
+	{
+		return getName() + " : [-default:f <file> | -default:c <file>][-default:n <size>][-default:s <size>]";
 	}
 }

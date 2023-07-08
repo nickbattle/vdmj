@@ -30,6 +30,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.plural;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.validateCharset;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.io.File;
@@ -39,7 +40,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.ExitStatus;
@@ -144,7 +144,7 @@ public class VDMJ implements VDMJMain
 		}
 		else
 		{
-			verbose("Setting dialect to VDM-SL by default");
+			verboseln("Setting dialect to VDM-SL by default");
 			Settings.dialect = Dialect.VDM_SL;
 		}
 	}
@@ -166,7 +166,7 @@ public class VDMJ implements VDMJMain
 
 	private static void usage()
 	{
-		Map<String, AnalysisPlugin> plugins = PluginRegistry.getInstance().getPlugins();
+		List<AnalysisPlugin> plugins = PluginRegistry.getInstance().getPlugins();
 		
 		println("Usage: VDMJ [-vdmsl | -vdmpp | -vdmrt] [<options>] [<files or dirs>]");
 		println("-vdmsl: parse files as VDM-SL (default)");
@@ -181,7 +181,7 @@ public class VDMJ implements VDMJMain
 		println("-q: suppress information messages");
 		println("-verbose: display detailed startup information");
 		
-		for (AnalysisPlugin plugin: plugins.values())
+		for (AnalysisPlugin plugin: plugins)
 		{
 			plugin.usage();
 		}
@@ -288,11 +288,9 @@ public class VDMJ implements VDMJMain
 			}
 		}
 		
-		Map<String, AnalysisPlugin> plugins = PluginRegistry.getInstance().getPlugins();
-		
-		for (AnalysisPlugin plugin: plugins.values())
+		for (AnalysisPlugin plugin: PluginRegistry.getInstance().getPlugins())
 		{
-			plugin.processArgs(argv);
+			plugin.processArgs(argv);	// In priority order
 		}
 	}
 	
@@ -301,23 +299,23 @@ public class VDMJ implements VDMJMain
 		try
 		{
 			PluginRegistry registry = PluginRegistry.getInstance();
-			verbose("Registering standard plugins");
+			verboseln("Registering standard plugins");
 
 			ASTPlugin ast = ASTPlugin.factory(Settings.dialect);
 			registry.registerPlugin(ast);
-			verbose("Registered AST plugin");
+			verboseln("Registered AST plugin");
 
 			TCPlugin tc = TCPlugin.factory(Settings.dialect);
 			registry.registerPlugin(tc);
-			verbose("Registered TC plugin");
+			verboseln("Registered TC plugin");
 
 			INPlugin in = INPlugin.factory(Settings.dialect);
 			registry.registerPlugin(in);
-			verbose("Registered IN plugin");
+			verboseln("Registered IN plugin");
 			
 			POPlugin po = POPlugin.factory(Settings.dialect);
 			registry.registerPlugin(po);
-			verbose("Registered PO plugin");
+			verboseln("Registered PO plugin");
 			
 			List<String> userPlugins = GetResource.readResource("vdmj.plugins");
 			
@@ -331,7 +329,7 @@ public class VDMJ implements VDMJMain
 						Method factory = clazz.getMethod("factory", Dialect.class);
 						AnalysisPlugin instance = (AnalysisPlugin)factory.invoke(null, Settings.dialect);
 						registry.registerPlugin(instance);
-						verbose("Registered " + plugin + " plugin");
+						verboseln("Registered " + plugin + " plugin");
 					}
 					catch (InvocationTargetException e)
 					{
@@ -429,7 +427,7 @@ public class VDMJ implements VDMJMain
 			}
 		}
 		
-		verbose("Found %d files", files.size());
+		verbose("Found %d files\n", files.size());
 	}
 	
 	public static boolean checkAndInitFiles()
@@ -457,30 +455,30 @@ public class VDMJ implements VDMJMain
 
 						if (report(messages, event))
 						{
-							verbose("Loaded files initialized successfully");
+							verboseln("Loaded files initialized successfully");
 							return true;
 						}
 						else
 						{
-							verbose("Failed to initialize interpreter");
+							verboseln("Failed to initialize interpreter");
 							messages.addAll(eventhub.publish(new CheckFailedEvent(event)));
 						}
 					}
 					else
 					{
-						verbose("Type checking errors found");
+						verboseln("Type checking errors found");
 						messages.addAll(eventhub.publish(new CheckFailedEvent(event)));
 					}
 				}
 				else
 				{
-					verbose("Syntax errors found");
+					verboseln("Syntax errors found");
 					messages.addAll(eventhub.publish(new CheckFailedEvent(event)));
 				}
 			}
 			else
 			{
-				verbose("Preparation errors found");
+				verboseln("Preparation errors found");
 				messages.addAll(eventhub.publish(new CheckFailedEvent(event)));
 			}
 		}

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2022 Nick Battle.
+ *	Copyright (c) 2023 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,25 +22,23 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.plugins;
+package quickcheck.qcplugins;
 
 import java.util.List;
+import java.util.Map;
 
-import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.pog.ProofObligation;
+import com.fujitsu.vdmj.values.ValueSet;
 
-/**
- * An interface implemented by subscribers to the EventHub. 
- */
-public interface EventListener
+import quickcheck.QuickCheck;
+
+abstract public class QCPlugin
 {
-	public final static int AST_PRIORITY = Integer.getInteger("vdmj.plugin.priority.ast", 100);
-	public final static int TC_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.tc", 200);
-	public final static int IN_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.in", 300);
-	public final static int PO_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.po", 400);
-
-	public final static int USER_PRIORITY = Integer.getInteger("vdmj.plugin.priority.user", 1000);
-
-	public String getName();
-	public int getPriority();
-	public List<VDMMessage> handleEvent(AnalysisEvent event) throws Exception;
+	abstract public String getName();
+	abstract public boolean hasErrors();
+	abstract public boolean init(QuickCheck qc);
+	abstract public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds);
+	abstract public String help();
 }

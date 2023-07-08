@@ -27,6 +27,7 @@ package examples.vdmjplugin;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.definitions.ASTClassDefinition;
 import com.fujitsu.vdmj.ast.definitions.ASTClassList;
 import com.fujitsu.vdmj.ast.definitions.ASTDefinition;
@@ -39,6 +40,8 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
+
+import annotations.ast.ASTNoCheckAnnotation;
 
 /**
  * Example VDMJ plugin
@@ -61,16 +64,35 @@ public class ExamplePluginPP extends ExamplePlugin
 					def instanceof ASTExplicitOperationDefinition ||
 					def instanceof ASTImplicitOperationDefinition)
 				{
-					String correct = InitialUpper(def.name);
+					boolean checks = true;
 					
-					if (!correct.equals(def.name.name))
+					if (def.annotations != null)
 					{
-						messages.add(new VDMError(9999, "Name '" + def.name.name + "' should be '" + correct + "'", def.name.location));
+						for (ASTAnnotation a: def.annotations)
+						{
+							if (a instanceof ASTNoCheckAnnotation)
+							{
+								// This could make arbitrary calls on the annotation, to decide
+								// whether to perform the checks or not. But here, the existence
+								// of the annotation is enough.
+								checks = false;
+							}
+						}
 					}
 					
-					if (def.name.name.length() > maxLength)
+					if (checks)
 					{
-						messages.add(new VDMWarning(9999, "Name '" + def.name.name + "' should be " + maxLength + " chars or less", def.name.location));
+						String correct = InitialUpper(def.name);
+						
+						if (!correct.equals(def.name.name))
+						{
+							messages.add(new VDMError(9999, "Name '" + def.name.name + "' should be '" + correct + "'", def.name.location));
+						}
+						
+						if (def.name.name.length() > maxLength)
+						{
+							messages.add(new VDMWarning(9999, "Name '" + def.name.name + "' should be " + maxLength + " chars or less", def.name.location));
+						}
 					}
 				}
 			}

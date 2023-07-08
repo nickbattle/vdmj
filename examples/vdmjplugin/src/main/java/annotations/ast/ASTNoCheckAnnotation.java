@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2022 Nick Battle.
+ *	Copyright (c) 2023 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,25 +22,24 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.plugins;
+package annotations.ast;
 
-import java.util.List;
-
-import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 
 /**
- * An interface implemented by subscribers to the EventHub. 
+ * This annotation is created and associated with the AST node concerned, without
+ * the need for a mapping file, since the AST is always processed first. The
+ * ExamplePlugin only processes the AST tree, so that is sufficient, but more
+ * complex annotations could map this annotation into TC or IN or PO versions,
+ * which then can be mapped to the plugin's ClassMapper tree (if any).
  */
-public interface EventListener
+public class ASTNoCheckAnnotation extends ASTAnnotation
 {
-	public final static int AST_PRIORITY = Integer.getInteger("vdmj.plugin.priority.ast", 100);
-	public final static int TC_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.tc", 200);
-	public final static int IN_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.in", 300);
-	public final static int PO_PRIORITY  = Integer.getInteger("vdmj.plugin.priority.po", 400);
+	private static final long serialVersionUID = 1L;
 
-	public final static int USER_PRIORITY = Integer.getInteger("vdmj.plugin.priority.user", 1000);
-
-	public String getName();
-	public int getPriority();
-	public List<VDMMessage> handleEvent(AnalysisEvent event) throws Exception;
+	public ASTNoCheckAnnotation(LexIdentifierToken name)
+	{
+		super(name);
+	}
 }

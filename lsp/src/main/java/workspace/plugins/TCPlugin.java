@@ -88,6 +88,12 @@ abstract public class TCPlugin extends AnalysisPlugin implements EventListener
 	{
 		return "TC";
 	}
+	
+	@Override
+	public int getPriority()
+	{
+		return TC_PRIORITY;
+	}
 
 	@Override
 	public void init()

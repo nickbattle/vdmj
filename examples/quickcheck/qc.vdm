@@ -1,7 +1,0 @@
-/**
- * Support functions for ranges.qc, which generate more specific values for
- * particular types.
- */
-functions
-	qcGetTRange: () -> set of T
-	qcGetTRange() == {0, ..., MAX_T};

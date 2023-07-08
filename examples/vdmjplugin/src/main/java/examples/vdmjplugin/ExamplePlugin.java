@@ -53,6 +53,12 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	{
 		return "Example";
 	}
+	
+	@Override
+	public int getPriority()
+	{
+		return TC_PRIORITY + 1;		// Can set a priority for EventHub here
+	}
 
 	public static ExamplePlugin factory(Dialect dialect) throws Exception
 	{
@@ -168,6 +174,6 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	@Override
 	public String getDescription()
 	{
-		return "The example VDMJ plugin";
+		return "The example VDMJ plugin, priority " + getPriority();
 	}
 }

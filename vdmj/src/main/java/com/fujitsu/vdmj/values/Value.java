@@ -65,15 +65,15 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 	{
 		StringBuilder sb = new StringBuilder("%");
 
-		switch (flags)
+		if ((flags & FormattableFlags.LEFT_JUSTIFY) > 0)
 		{
-			case FormattableFlags.LEFT_JUSTIFY:
-				sb.append('-');
-				break;
-
-			case FormattableFlags.ALTERNATE:
-				sb.append('#');
-				break;
+			sb.append('-');
+		}
+		
+		if ((flags & FormattableFlags.ALTERNATE) > 0)
+		{
+			// Alternates should be dealt with in subclasses. Ignored otherwise.
+			// sb.append('#');
 		}
 
 		if (width > 0)
