@@ -26,6 +26,7 @@ package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -33,13 +34,16 @@ import java.util.Vector;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.values.ValueList;
+import com.fujitsu.vdmj.values.ValueSet;
+
+import quickcheck.QuickCheck;
+import quickcheck.qcplugins.QCPlugin;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: quickcheck [-c <file>]|[-f <file>] [<PO numbers>]";
-	public final static String HELP = "quickcheck - lightweight PO verification";
+	private final static String USAGE = "Usage: quickcheck [-?|-help][-p <name>]* [<plugin options>] [<PO numbers>]";
 			
 	public QuickCheckCommand(String line)
 	{
@@ -54,32 +58,36 @@ public class QuickCheckCommand extends AnalysisCommand
 	@Override
 	public String run(String line)
 	{
-		String rangesFile = "ranges.qc";
-		boolean createFile = false;
 		List<Integer> poList = new Vector<Integer>();
+		QuickCheck qc = new QuickCheck();
 
-		for (int i=1; i < argv.length; i++)
+		List<String> arglist = new Vector<String>(Arrays.asList(argv));
+		arglist.remove(0);	// "qc"
+		qc.loadPlugins(arglist);
+		
+		if (qc.hasErrors())
+		{
+			return "Failed to load QC plugins";
+		}
+
+		for (String arg: arglist)	// Should just be POs
 		{
 			try
 			{
-				switch (argv[i])
+				switch (arg)
 				{
 					case "-?":
 					case "-help":
-						return USAGE;
+						println(USAGE);
 						
-					case "-f":
-						rangesFile = argv[++i];
-						createFile = false;
-						break;
-						
-					case "-c":
-						if (++i < argv.length) rangesFile = argv[i];
-						createFile = true;
-						break;
+						for (QCPlugin plugin: qc.getPlugins())
+						{
+							println(plugin.help());
+						}
+						return null;
 						
 					default:
-						poList.add(Integer.parseInt(argv[i]));
+						poList.add(Integer.parseInt(arg));
 						break;
 				}
 			}
@@ -88,33 +96,27 @@ public class QuickCheckCommand extends AnalysisCommand
 				println("Malformed PO#: " + e.getMessage());
 				return USAGE;
 			}
-			catch (ArrayIndexOutOfBoundsException e)
-			{
-				println("Missing argument");
-				return USAGE;
-			}
 		}
 		
-		POPlugin po = PluginRegistry.getInstance().getPlugin("PO");
-		ProofObligationList all = po.getProofObligations();
+		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
+		ProofObligationList all = pog.getProofObligations();
 		all.renumber();
-		
-		QuickCheck qc = new QuickCheck();
 		ProofObligationList chosen = qc.getPOs(all, poList);
-
-		if (chosen != null)
+		
+		if (qc.hasErrors())
 		{
-			if (createFile)
+			return "Failed to find POs";
+		}
+		
+		if (qc.initPlugins())
+		{
+			for (ProofObligation po: chosen)
 			{
-				qc.createRangeFile(rangesFile, chosen);
-			}
-			else
-			{
-				Map<String, ValueList> ranges = qc.readRangeFile(rangesFile);
+				Map<String, ValueSet> values = qc.getValues(po);
 				
-				if (ranges != null)
+				if (!qc.hasErrors())
 				{
-					qc.checkObligations(chosen, ranges);
+					qc.checkObligation(po, values);
 				}
 			}
 		}
@@ -124,6 +126,6 @@ public class QuickCheckCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("quickcheck [-c <file>]|[-f <file>] [<PO numbers>] - lightweight PO verification");
+		println("quickcheck [-?|-help][-p <names>]* [<plugin options>] [<PO numbers>] - lightweight PO verification");
 	}
 }

@@ -26,6 +26,7 @@ package quickcheck.visitors;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -84,23 +85,53 @@ import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueMap;
 import com.fujitsu.vdmj.values.ValueSet;
 
-public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
+public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 {
 	private final int numSetSize;	// {1, ..., N} for numerics
 	private final Context ctxt;
 	private final TCTypeSet done;
+	private final Random prng;
 	
-	public InternalRangeCreator(Context ctxt, int numSetSize)
+	public RandomRangeCreator(Context ctxt, int numSetSize, long seed)
 	{
 		this.ctxt = ctxt;
 		this.numSetSize = numSetSize;
 		this.done = new TCTypeSet();
+		this.prng = new Random(seed);
+	}
+	
+	private int nextNat(int bound)
+	{
+		int n = -1;
+		while (n < 0) n = prng.nextInt(bound);
+		return n;
+	}
+	
+//	private int nextNat1(int bound)
+//	{
+//		int n = -1;
+//		while (n <= 0) n = prng.nextInt(bound);
+//		return n;
+//	}
+
+	private int nextNat()
+	{
+		int n = -1;
+		while (n < 0) n = prng.nextInt();
+		return n;
+	}
+	
+	private int nextNat1()
+	{
+		int n = -1;
+		while (n <= 0) n = prng.nextInt();
+		return n;
 	}
 
 	@Override
 	public ValueSet caseType(TCType type, Integer limit)
 	{
-		throw new RuntimeException("Missing InternalRangeCreator case for " + type);
+		throw new RuntimeException("Missing RandomRangeCreator case for " + type);
 	}
 	
 	@Override
@@ -116,7 +147,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		switch (limit)
 		{
 			case 0:		return new ValueSet();
-			case 1:		return new ValueSet(new BooleanValue(false));
+			case 1:		return new ValueSet(new BooleanValue(prng.nextBoolean()));
 			default:	return new ValueSet(new BooleanValue(true), new BooleanValue(false));
 		}
 	}
@@ -124,11 +155,22 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseCharacterType(TCCharacterType node, Integer limit)
 	{
+		String alphabet = "abcdefghijklmnopqrstuvwxyz";
+		
 		switch (limit)
 		{
 			case 0:		return new ValueSet();
-			case 1:		return new ValueSet(new CharacterValue('a'));
-			default:	return new ValueSet(new CharacterValue('a'), new CharacterValue('b'));
+			case 1:		return new ValueSet(new CharacterValue(alphabet.charAt(prng.nextInt(alphabet.length()))));
+			default:
+				ValueSet result = new ValueSet();
+				
+				for (int i=0; i < limit; i++)
+				{
+					char c = alphabet.charAt(prng.nextInt(alphabet.length()));
+					result.add(new CharacterValue(c));
+				}
+				
+				return result;
 		}
 	}
 	
@@ -139,7 +181,15 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		{
 			case 0:		return new ValueSet();
 			case 1:		return new ValueSet(new TokenValue(new IntegerValue(1)));
-			default:	return new ValueSet(new TokenValue(new IntegerValue(1)), new TokenValue(new IntegerValue(2)));
+			default:
+				ValueSet result = new ValueSet();
+				
+				for (int i=0; i < limit; i++)
+				{
+					result.add(new TokenValue(new IntegerValue(prng.nextInt())));
+				}
+				
+				return result;
 		}
 	}
 	
@@ -172,20 +222,14 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseNaturalOneType(TCNaturalOneType node, Integer limit)
 	{
-		int to = numSetSize;
-
-		if (limit < numSetSize)
-		{
-			to = limit;
-		}
-
 		ValueSet result = new ValueSet();
+		long num = limit < numSetSize ? limit : numSetSize;
 		
-		for (long a = 1; a <= to; a++)
+		for (long a = 0; a < num; a++)
 		{
 			try
 			{
-				result.add(new NaturalOneValue(a));
+				result.add(new NaturalOneValue(nextNat1()));
 			}
 			catch (Exception e)
 			{
@@ -199,20 +243,14 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseNaturalType(TCNaturalType node, Integer limit)
 	{
-		int to = numSetSize - 1;
-		
-		if (limit < numSetSize - 1)
-		{
-			to = limit - 1;
-		}
-
 		ValueSet result = new ValueSet();
+		long num = limit < numSetSize ? limit : numSetSize;
 		
-		for (long a = 0; a <= to; a++)
+		for (long a = 0; a < num; a++)
 		{
 			try
 			{
-				result.add(new NaturalValue(a));
+				result.add(new NaturalValue(nextNat()));
 			}
 			catch (Exception e)
 			{
@@ -226,29 +264,14 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseIntegerType(TCIntegerType node, Integer limit)
 	{
-		int from = 0;
-		int to = 0;
-		
-		if (limit < numSetSize * 2 + 1)
-		{
-			int half = limit / 2;		// eg. 5/2=2 => {-2, -1, 0, 1, 2}
-			if (half == 0) half = 1;
-			from = -half;
-			to = half;
-		}
-		else
-		{
-			from = -numSetSize;
-			to = numSetSize;
-		}
-
 		ValueSet result = new ValueSet();
+		long num = limit < numSetSize ? limit : numSetSize;
 		
-		for (long a = from; a <= to; a++)
+		for (long a = 0; a < num; a++)
 		{
 			try
 			{
-				result.add(new IntegerValue(a));
+				result.add(new IntegerValue(prng.nextInt()));
 			}
 			catch (Exception e)
 			{
@@ -272,9 +295,9 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	}
 	
 	@Override
-	public ValueSet caseFunctionType(TCFunctionType node, Integer arg)
+	public ValueSet caseFunctionType(TCFunctionType node, Integer limit)
 	{
-		throw new RuntimeException("Must define function bind range in VDM");
+		return new ValueSet();	// Can't generate functions!
 	}
 
 	@Override
@@ -564,73 +587,47 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	private ValueSet realLimit(Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		int from = 0;
-		int to = 0;
+		long num = limit < numSetSize ? limit : numSetSize;
 		
-		if (limit < numSetSize * numSetSize)
+		for (long a = 0; a < num; a++)
 		{
-			int half = (int) Math.round(Math.sqrt(limit)) / 2;
-			if (half == 0) half = 1;
-			from = -half;
-			to = half;
-		}
-		else
-		{
-			from = -numSetSize;
-			to = numSetSize;
-		}
-		
-		for (double a = from; a <= to; a++)
-		{
-			for (double b = from; b <= to; b++)
+			try
 			{
-				if (b != 0)
-				{
-					try
-					{
-						result.add(new RealValue(a / b));
-					}
-					catch (Exception e)
-					{
-						// Can't be infinite or NaN
-					}
-				}
+				result.add(new RealValue(prng.nextDouble()));
+			}
+			catch (Exception e)
+			{
+				// Can't happen
 			}
 		}
 		
 		return result;
 	}
 
-	private List<ValueSet> powerLimit(ValueSet set, int limit, boolean empty)
+	private List<ValueSet> powerLimit(ValueSet source, int limit, boolean incEmpty)
 	{
 		// Generate a power set, up to limit values from the full power set.
 		List<ValueSet> results = new Vector<ValueSet>();
 		
-		if (set.isEmpty())
+		if (source.isEmpty())
 		{
-			if (empty)
+			if (incEmpty)
 			{
 				results.add(new ValueSet());	// Just {}
 			}
 		}
 		else
 		{
-			/**
-			 * The KCombinator below produces combinations in order (eg. [1,2] before [1,3]).
-			 * And we loop the combination sizes from large to small, which is also the
-			 * natural ordering for sets. This means we can use addNoSort which is much more
-			 * efficient.
-			 */
-			int size = set.size();
+			int size = source.size();
 			long count = 0;
 			
-			if (empty)
+			if (incEmpty)
 			{
 				results.add(new ValueSet());	// Add {}
 				count++;
 			}
 			
-			for (int ss=size; ss>0; ss--)
+			for (int ss: randomOrder(size))
 			{
 				for (int[] kc: new KCombinator(size, ss))
 				{
@@ -638,7 +635,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	
 					for (int i=0; i<ss; i++)
 					{
-						ns.addNoSort(set.get(kc[i]));
+						ns.addNoSort(source.get(kc[i]));	// KComb is sorted already
 					}
 					
 					results.add(ns);
@@ -652,5 +649,27 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		}
 	
 		return results;
+	}
+	
+	private int[] randomOrder(int size)
+	{
+		int[] result = new int[size];
+		
+		for (int i=0; i<size; i++)
+		{
+			result[i] = i+1;
+		}
+		
+		for (int j=0; j<size; j++)	// jumble size times
+		{
+			int a = nextNat(size);
+			int b = nextNat(size);
+			
+			int temp = result[a];
+			result[a] = result[b];
+			result[b] = temp;
+		}
+		
+		return result;
 	}
 }

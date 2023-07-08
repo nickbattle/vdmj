@@ -24,7 +24,7 @@
 
 package com.fujitsu.vdmj.plugins;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -112,7 +112,7 @@ public class PluginRegistry
 				{
 					if (result != null)
 					{
-						verbose("Multiple plugins support " + argv[0]);
+						verboseln("Multiple plugins support " + argv[0]);
 					}
 					
 					result = c;		// Note, override earlier results

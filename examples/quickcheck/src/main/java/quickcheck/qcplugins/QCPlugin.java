@@ -22,15 +22,23 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.patterns;
+package quickcheck.qcplugins;
 
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.values.ValueList;
+import java.util.List;
+import java.util.Map;
+
+import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.values.ValueSet;
 
-public interface INBindingSetter
+import quickcheck.QuickCheck;
+
+abstract public class QCPlugin
 {
-	public void setBindValues(ValueSet values);
-	public ValueList getBindValues();
-	public TCType getType();
+	abstract public String getName();
+	abstract public boolean hasErrors();
+	abstract public boolean init(QuickCheck qc);
+	abstract public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds);
+	abstract public String help();
 }

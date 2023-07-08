@@ -22,51 +22,54 @@
  *
  ******************************************************************************/
 
-package quickcheck.plugin;
+package quickcheck.qcplugins;
 
-import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.util.Utils;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import quickcheck.commands.QuickCheckLSPCommand;
-import vdmj.commands.AnalysisCommand;
-import vdmj.commands.HelpList;
-import workspace.plugins.AnalysisPlugin;
+import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.pog.ProofObligation;
+import com.fujitsu.vdmj.values.ValueSet;
 
-public class QuickCheckLSPPlugin extends AnalysisPlugin
+import quickcheck.QuickCheck;
+
+public class ExampleQCPlugin extends QCPlugin
 {
-	public static AnalysisPlugin factory(Dialect dialect)
+	public ExampleQCPlugin(List<String> argv)
 	{
-		return new QuickCheckLSPPlugin();
+		// Remove your "qc" plugin arguments from the list here
+		// It's useful to include the plugin name, like "-example:n"
 	}
 	
 	@Override
 	public String getName()
 	{
-		return "QC";
+		return "example";	// Can be used with -p <name>
 	}
 
 	@Override
-	public void init()
+	public boolean hasErrors()
 	{
-		// Get everything from PO?
+		return false;	// Called after init and getValues
 	}
-	
+
 	@Override
-	public AnalysisCommand getCommand(String line)
+	public boolean init(QuickCheck qc)
 	{
-		String[] argv = Utils.toArgv(line);
-		
-		if (argv[0].equals("quickcheck") || argv[0].equals("qc"))
-		{
-			return new QuickCheckLSPCommand(line);
-		}
-		
-		return null;
+		return true;	// Return value => whether to do checks or stop 
 	}
-	
+
 	@Override
-	public HelpList getCommandHelp()
+	public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		return new HelpList("quickcheck [-p <names>]* [<plugin options>] [<PO numbers>] - lightweight PO verification");
+		return new HashMap<String, ValueSet>();
+	}
+
+	@Override
+	public String help()
+	{
+		return getName() + " : [options/flags]";
 	}
 }
