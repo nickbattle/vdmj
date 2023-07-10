@@ -291,7 +291,7 @@ public class QuickCheck
 			{
 				// Generate some values for missing bindings, using the default method
 				RootContext ctxt = Interpreter.getInstance().getInitialContext();
-				ValueSet values = bind.getType().apply(new InternalRangeCreator(ctxt, 10), 5);
+				ValueSet values = bind.getType().apply(new InternalRangeCreator(ctxt, 10), 10);
 				union.put(bind.toString(), values);
 			}
 		}

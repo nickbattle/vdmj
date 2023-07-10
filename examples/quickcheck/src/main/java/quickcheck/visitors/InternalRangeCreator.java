@@ -564,21 +564,8 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	private ValueSet realLimit(Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		int from = 0;
-		int to = 0;
-		
-		if (limit < numSetSize * numSetSize)
-		{
-			int half = (int) Math.round(Math.sqrt(limit)) / 2;
-			if (half == 0) half = 1;
-			from = -half;
-			to = half;
-		}
-		else
-		{
-			from = -numSetSize;
-			to = numSetSize;
-		}
+		int from = -numSetSize;
+		int to = numSetSize;
 		
 		for (double a = from; a <= to; a++)
 		{
@@ -589,6 +576,11 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 					try
 					{
 						result.add(new RealValue(a / b));
+						
+						if (result.size() >= limit)
+						{
+							return result;
+						}
 					}
 					catch (Exception e)
 					{
