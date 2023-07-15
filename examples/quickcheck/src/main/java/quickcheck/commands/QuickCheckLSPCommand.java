@@ -96,7 +96,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 					case "-help":
 						println(USAGE);
 						
-						for (QCPlugin plugin: qc.getPlugins())
+						for (QCPlugin plugin: qc.getAllPlugins())
 						{
 							println(plugin.help());
 						}

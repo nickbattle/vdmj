@@ -436,6 +436,12 @@ public class DefaultQCPlugin extends QCPlugin
 	@Override
 	public String help()
 	{
-		return getName() + " : [-default:f <file> | -default:c <file>][-default:n <size>][-default:s <size>]";
+		return getName() + " : [-f <file> | -c <file>][-n <size>][-s <size>]";
+	}
+
+	@Override
+	public boolean useByDefault()
+	{
+		return true;	// Use if no -p given
 	}
 }
