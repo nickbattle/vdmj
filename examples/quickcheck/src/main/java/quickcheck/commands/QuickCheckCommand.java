@@ -71,7 +71,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			return "Failed to load QC plugins";
 		}
 
-		for (String arg: arglist)	// Should just be POs
+		for (String arg: arglist)	// Should just be POs, or -? -help
 		{
 			try
 			{
@@ -81,7 +81,7 @@ public class QuickCheckCommand extends AnalysisCommand
 					case "-help":
 						println(USAGE);
 						
-						for (QCPlugin plugin: qc.getPlugins())
+						for (QCPlugin plugin: qc.getAllPlugins())
 						{
 							println(plugin.help());
 						}

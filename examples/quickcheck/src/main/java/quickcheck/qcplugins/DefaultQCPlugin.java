@@ -102,6 +102,7 @@ public class DefaultQCPlugin extends QCPlugin
 			{
 				switch (argv.get(i))
 				{
+					case "-f":
 					case "-default:f":
 						argv.remove(i);
 
@@ -114,6 +115,7 @@ public class DefaultQCPlugin extends QCPlugin
 						createFile = false;
 						break;
 						
+					case "-c":
 					case "-default:c":
 						argv.remove(i);
 						
@@ -126,7 +128,8 @@ public class DefaultQCPlugin extends QCPlugin
 						createFile = true;
 						break;
 						
-					case "-default:n":		// {-n, ..., +n}
+					case "-n":			// {-n, ..., +n}
+					case "-default:n":
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -136,7 +139,8 @@ public class DefaultQCPlugin extends QCPlugin
 						}
 						break;
 						
-					case "-default:s":		// Total top level size
+					case "-s":			// Total top level size
+					case "-default:s":
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -415,8 +419,8 @@ public class DefaultQCPlugin extends QCPlugin
 				}
 				else
 				{
-					errorln("Range file has no values for " + key);
-					values.put(key, new ValueSet());
+					// Value(s) created in QuickCheck using default method
+					errorln("WARNING: Ranges file has no values for " + key);
 				}
 			}
 		}
@@ -432,6 +436,12 @@ public class DefaultQCPlugin extends QCPlugin
 	@Override
 	public String help()
 	{
-		return getName() + " : [-default:f <file> | -default:c <file>][-default:n <size>][-default:s <size>]";
+		return getName() + " : [-f <file> | -c <file>][-n <size>][-s <size>]";
+	}
+
+	@Override
+	public boolean useByDefault()
+	{
+		return true;	// Use if no -p given
 	}
 }

@@ -564,21 +564,8 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	private ValueSet realLimit(Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		int from = 0;
-		int to = 0;
-		
-		if (limit < numSetSize * numSetSize)
-		{
-			int half = (int) Math.round(Math.sqrt(limit)) / 2;
-			if (half == 0) half = 1;
-			from = -half;
-			to = half;
-		}
-		else
-		{
-			from = -numSetSize;
-			to = numSetSize;
-		}
+		int from = -numSetSize;
+		int to = numSetSize;
 		
 		for (double a = from; a <= to; a++)
 		{
@@ -589,6 +576,11 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 					try
 					{
 						result.add(new RealValue(a / b));
+						
+						if (result.size() >= limit)
+						{
+							return result;
+						}
 					}
 					catch (Exception e)
 					{
@@ -618,8 +610,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			/**
 			 * The KCombinator below produces combinations in order (eg. [1,2] before [1,3]).
 			 * And we loop the combination sizes from large to small, which is also the
-			 * natural ordering for sets. This means we can use addNoSort which is much more
-			 * efficient.
+			 * natural ordering for sets.
 			 */
 			int size = set.size();
 			long count = 0;
@@ -638,7 +629,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	
 					for (int i=0; i<ss; i++)
 					{
-						ns.addNoSort(set.get(kc[i]));
+						ns.add(set.get(kc[i]));
 					}
 					
 					results.add(ns);

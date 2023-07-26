@@ -129,4 +129,10 @@ public class RandomQCPlugin extends QCPlugin
 	{
 		return getName() + ": [-random:n <size>][-random:s <size>]";
 	}
+
+	@Override
+	public boolean useByDefault()
+	{
+		return false;	// Don't use if no -p given
+	}
 }

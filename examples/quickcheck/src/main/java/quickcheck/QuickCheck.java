@@ -64,7 +64,8 @@ import quickcheck.visitors.TypeBindFinder;
 public class QuickCheck
 {
 	private int errorCount = 0;
-	private List<QCPlugin> plugins = null;
+	private List<QCPlugin> plugins = null;		// Configured to be used
+	private List<QCPlugin> unused = null;		// Known, but not to be used
 	private ProofObligationList chosen = null;
 	
 	public QuickCheck()
@@ -80,6 +81,7 @@ public class QuickCheck
 	public void loadPlugins(List<String> argv)
 	{
 		plugins = new Vector<QCPlugin>();
+		unused = new Vector<QCPlugin>();
 		errorCount = 0;
 		
 		try
@@ -96,10 +98,14 @@ public class QuickCheck
 					Constructor<?> ctor = clazz.getDeclaredConstructor(List.class);
 					QCPlugin instance = (QCPlugin) ctor.newInstance((Object)argv);
 					
-					if (names.isEmpty() || names.contains(instance.getName()))
+					if ((names.isEmpty() && instance.useByDefault()) || names.contains(instance.getName()))
 					{
 						plugins.add(instance);
 						failed.remove(instance.getName());
+					}
+					else
+					{
+						unused.add(instance);
 					}
 				}
 				catch (ClassNotFoundException e)
@@ -158,6 +164,13 @@ public class QuickCheck
 	public List<QCPlugin> getPlugins()
 	{
 		return plugins;
+	}
+	
+	public List<QCPlugin> getAllPlugins()	// Used and unused
+	{
+		List<QCPlugin> all = new Vector<QCPlugin>(plugins);
+		all.addAll(unused);
+		return all;
 	}
 	
 	public ProofObligationList getChosen()
@@ -291,7 +304,7 @@ public class QuickCheck
 			{
 				// Generate some values for missing bindings, using the default method
 				RootContext ctxt = Interpreter.getInstance().getInitialContext();
-				ValueSet values = bind.getType().apply(new InternalRangeCreator(ctxt, 10), 5);
+				ValueSet values = bind.getType().apply(new InternalRangeCreator(ctxt, 10), 10);
 				union.put(bind.toString(), values);
 			}
 		}

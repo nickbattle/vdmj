@@ -100,4 +100,10 @@ public class SearchQCPlugin extends QCPlugin
 	{
 		return getName() + ": (no options)";
 	}
+
+	@Override
+	public boolean useByDefault()
+	{
+		return true;	// Use if no -p given
+	}
 }
