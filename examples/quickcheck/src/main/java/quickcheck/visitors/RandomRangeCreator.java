@@ -107,24 +107,10 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		return n;
 	}
 	
-//	private int nextNat1(int bound)
-//	{
-//		int n = -1;
-//		while (n <= 0) n = prng.nextInt(bound);
-//		return n;
-//	}
-
-	private int nextNat()
+	private int nextNat1(int bound)
 	{
 		int n = -1;
-		while (n < 0) n = prng.nextInt();
-		return n;
-	}
-	
-	private int nextNat1()
-	{
-		int n = -1;
-		while (n <= 0) n = prng.nextInt();
+		while (n <= 0) n = prng.nextInt(bound);
 		return n;
 	}
 
@@ -224,12 +210,14 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	{
 		ValueSet result = new ValueSet();
 		long num = limit < numSetSize ? limit : numSetSize;
+		int bound = 10;		// Bias numbers to close to zero
 		
 		for (long a = 0; a < num; a++)
 		{
 			try
 			{
-				result.add(new NaturalOneValue(nextNat1()));
+				result.add(new NaturalOneValue(nextNat1(bound)));
+				bound = bound + 10;
 			}
 			catch (Exception e)
 			{
@@ -245,12 +233,14 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	{
 		ValueSet result = new ValueSet();
 		long num = limit < numSetSize ? limit : numSetSize;
+		int bound = 10;		// Bias numbers to close to zero
 		
 		for (long a = 0; a < num; a++)
 		{
 			try
 			{
-				result.add(new NaturalValue(nextNat()));
+				result.add(new NaturalValue(nextNat(bound)));
+				bound = bound + 10;
 			}
 			catch (Exception e)
 			{
@@ -266,12 +256,14 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	{
 		ValueSet result = new ValueSet();
 		long num = limit < numSetSize ? limit : numSetSize;
+		int bound = 10;		// Bias numbers to close to zero
 		
 		for (long a = 0; a < num; a++)
 		{
 			try
 			{
-				result.add(new IntegerValue(prng.nextInt()));
+				result.add(new IntegerValue(prng.nextInt() % bound));
+				bound = bound + 10;
 			}
 			catch (Exception e)
 			{
@@ -588,12 +580,14 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	{
 		ValueSet result = new ValueSet();
 		long num = limit < numSetSize ? limit : numSetSize;
+		int bound = 10;		// Bias values to be close to zero
 		
 		for (long a = 0; a < num; a++)
 		{
 			try
 			{
-				result.add(new RealValue(prng.nextDouble()));
+				result.add(new RealValue(prng.nextGaussian() * bound));
+				bound = bound + 10;
 			}
 			catch (Exception e)
 			{
@@ -635,7 +629,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	
 					for (int i=0; i<ss; i++)
 					{
-						ns.addNoSort(source.get(kc[i]));	// KComb is sorted already
+						ns.add(source.get(kc[i]));
 					}
 					
 					results.add(ns);
