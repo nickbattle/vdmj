@@ -72,4 +72,10 @@ public class ExampleQCPlugin extends QCPlugin
 	{
 		return getName() + " : [options/flags]";
 	}
+
+	@Override
+	public boolean useByDefault()
+	{
+		return false;	// Not used if no -p options given
+	}
 }
