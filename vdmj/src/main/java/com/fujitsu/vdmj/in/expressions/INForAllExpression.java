@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.BooleanValue;
@@ -118,6 +119,15 @@ public class INForAllExpression extends INExpression
 						
 						return new BooleanValue(false);
 					}
+				}
+				catch (ContextException e)
+				{
+					if (failPath == null)	// One shot, record first only
+					{
+						failPath = evalContext;
+					}
+					
+					throw e;
 				}
 				catch (ValueException e)
 				{
