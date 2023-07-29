@@ -50,6 +50,7 @@ import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCNumericType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.IntegerValue;
@@ -370,13 +371,13 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	{
 		NameValuePairList nvpl = newCollection();
 		
-		if (node.left instanceof TCVariableExpression)
+		if (node.right instanceof TCIndicesExpression)
 		{
-			TCVariableExpression var = (TCVariableExpression)node.left;
-			TCType vartype = var.getType();
-			
-			if (node.right instanceof TCIndicesExpression)
+			if (node.left instanceof TCVariableExpression)
 			{
+				TCVariableExpression var = (TCVariableExpression)node.left;
+				TCType vartype = var.getType();
+
 				if (vartype instanceof TCNumericType)
 				{
 					TCNumericType numtype = (TCNumericType)vartype;
@@ -412,6 +413,17 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 					{
 						// Can't happen
 					}
+				}
+			}
+			
+			if (node.right instanceof TCVariableExpression)
+			{
+				TCVariableExpression var = (TCVariableExpression)node.right;
+				TCType vartype = var.getType();
+				
+				if (!(vartype instanceof TCSeq1Type))
+				{
+					nvpl.add(var.name, new SeqValue());
 				}
 			}
 		}
