@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
@@ -76,6 +77,11 @@ public class QuickCheck
 	public boolean hasErrors()
 	{
 		return errorCount > 0;
+	}
+	
+	public void resetErrors()
+	{
+		errorCount = 0;
 	}
 	
 	public void loadPlugins(List<String> argv)
@@ -316,7 +322,7 @@ public class QuickCheck
 	{
 		try
 		{
-			errorCount = 0;
+			resetErrors();	// Only flag fatal errors
 			RootContext ctxt = Interpreter.getInstance().getInitialContext();
 			List<INBindingSetter> bindings = null;
 
@@ -348,8 +354,39 @@ public class QuickCheck
 			try
 			{
 				long before = System.currentTimeMillis();
-				verbose("PO #%d, starting...\n", po.number);
-				Value result = poexp.eval(ctxt);
+				Value result = new BooleanValue(false);
+				
+				try
+				{
+					verbose("PO #%d, starting...\n", po.number);
+					result = poexp.eval(ctxt);
+				}
+				catch (ContextException e)
+				{
+					printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
+					result = new BooleanValue(false);
+
+					if (Settings.verbose)
+					{
+						if (e.ctxt.outer != null)
+						{
+							e.ctxt.printStackFrames(Console.out);
+						}
+						else
+						{
+							println("In context of " + e.ctxt.title + " " + e.ctxt.location);
+						}
+						
+						println("----");
+						printBindings(bindings);
+						println("----");
+					}
+					else
+					{
+						println("Use -verbose to see exception stack");
+					}
+				}
+				
 				long after = System.currentTimeMillis();
 				
 				if (result instanceof BooleanValue)
@@ -364,7 +401,6 @@ public class QuickCheck
 						printFailPath(INForAllExpression.failPath, bindings);
 						println("----");
 						println(po);
-						errorCount++;
 					}
 				}
 				else
@@ -374,27 +410,7 @@ public class QuickCheck
 					printBindings(bindings);
 					println("----");
 					println(po);
-					errorCount++;
 				}
-			}
-			catch (ContextException e)
-			{
-				printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
-				
-				if (e.ctxt.outer != null)
-				{
-					e.ctxt.printStackFrames(Console.out);
-				}
-				else
-				{
-					println("In context of " + e.ctxt.title + " " + e.ctxt.location);
-				}
-				
-				println("----");
-				printBindings(bindings);
-				println("----");
-				println(po);
-				errorCount++;
 			}
 			catch (Exception e)
 			{

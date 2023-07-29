@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.tc.expressions.TCNotEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCRealLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSeqEnumExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSetEnumExpression;
+import com.fujitsu.vdmj.tc.expressions.TCSubsetExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
@@ -413,25 +414,54 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 					}
 				}
 			}
-			else if (node.right instanceof TCMapDomainExpression)
+		}
+		else if (node.right instanceof TCMapDomainExpression)
+		{
+			TCMapDomainExpression dom = (TCMapDomainExpression)node.right;
+			
+			if (dom.exp instanceof TCVariableExpression)
 			{
-				TCMapDomainExpression dom = (TCMapDomainExpression)node.right;
-				
-				if (dom.exp instanceof TCVariableExpression)
-				{
-					TCVariableExpression mapvar = (TCVariableExpression)dom.exp;
-					nvpl.add(mapvar.name, new MapValue());
-				}
+				TCVariableExpression mapvar = (TCVariableExpression)dom.exp;
+				nvpl.add(mapvar.name, new MapValue());
 			}
-			else if (node.right instanceof TCMapRangeExpression)
+		}
+		else if (node.right instanceof TCMapRangeExpression)
+		{
+			TCMapRangeExpression rng = (TCMapRangeExpression)node.right;
+			
+			if (rng.exp instanceof TCVariableExpression)
 			{
-				TCMapRangeExpression rng = (TCMapRangeExpression)node.right;
-				
-				if (rng.exp instanceof TCVariableExpression)
-				{
-					TCVariableExpression mapvar = (TCVariableExpression)rng.exp;
-					nvpl.add(mapvar.name, new MapValue());
-				}
+				TCVariableExpression mapvar = (TCVariableExpression)rng.exp;
+				nvpl.add(mapvar.name, new MapValue());
+			}
+		}
+		
+		return nvpl;
+	}
+	
+	@Override
+	public NameValuePairList caseSubsetExpression(TCSubsetExpression node, Object arg)
+	{
+		NameValuePairList nvpl = newCollection();
+		
+		if (node.right instanceof TCMapDomainExpression)
+		{
+			TCMapDomainExpression dom = (TCMapDomainExpression)node.right;
+			
+			if (dom.exp instanceof TCVariableExpression)
+			{
+				TCVariableExpression mapvar = (TCVariableExpression)dom.exp;
+				nvpl.add(mapvar.name, new MapValue());
+			}
+		}
+		else if (node.right instanceof TCMapRangeExpression)
+		{
+			TCMapRangeExpression rng = (TCMapRangeExpression)node.right;
+			
+			if (rng.exp instanceof TCVariableExpression)
+			{
+				TCVariableExpression mapvar = (TCVariableExpression)rng.exp;
+				nvpl.add(mapvar.name, new MapValue());
 			}
 		}
 		
