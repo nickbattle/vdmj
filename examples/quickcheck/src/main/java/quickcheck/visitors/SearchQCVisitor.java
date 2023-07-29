@@ -29,6 +29,8 @@ import com.fujitsu.vdmj.tc.expressions.TCEqualsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCGreaterEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCGreaterExpression;
+import com.fujitsu.vdmj.tc.expressions.TCInSetExpression;
+import com.fujitsu.vdmj.tc.expressions.TCIndicesExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLessEqualExpression;
@@ -43,6 +45,7 @@ import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCIntegerType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
+import com.fujitsu.vdmj.tc.types.TCNumericType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.BooleanValue;
@@ -50,6 +53,7 @@ import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.NaturalValue;
+import com.fujitsu.vdmj.values.RationalValue;
 import com.fujitsu.vdmj.values.RealValue;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.SetValue;
@@ -352,6 +356,58 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 		if (node.getType() instanceof TCBooleanType)
 		{
 			nvpl.add(node.name, new BooleanValue(false));
+		}
+		
+		return nvpl;
+	}
+	
+	@Override
+	public NameValuePairList caseInSetExpression(TCInSetExpression node, Object arg)
+	{
+		NameValuePairList nvpl = newCollection();
+		
+		if (node.left instanceof TCVariableExpression)
+		{
+			TCVariableExpression var = (TCVariableExpression)node.left;
+			TCType vartype = var.getType();
+			
+			if (vartype instanceof TCNumericType)
+			{
+				TCNumericType numtype = (TCNumericType)vartype;
+
+				if (node.right instanceof TCIndicesExpression)
+				{
+					try
+					{
+						switch (numtype.getWeight())
+						{
+							case 1:	// nat
+								nvpl.add(var.name, new NaturalValue(0));
+								break;
+								
+							case 2:	// int
+								nvpl.add(var.name, new IntegerValue(0));
+								break;
+								
+							case 3:	// rat
+								nvpl.add(var.name, new RationalValue(0));
+								break;
+								
+							case 4:	// real
+								nvpl.add(var.name, new RealValue(0));
+								break;
+								
+							case 0:	// nat1, so can't set to zero
+							default:
+								break;
+						}
+					}
+					catch (Exception e)
+					{
+						// Can't happen
+					}
+				}
+			}
 		}
 		
 		return nvpl;
