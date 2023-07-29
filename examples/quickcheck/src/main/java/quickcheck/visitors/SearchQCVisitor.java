@@ -35,6 +35,8 @@ import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLessEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLessExpression;
+import com.fujitsu.vdmj.tc.expressions.TCMapDomainExpression;
+import com.fujitsu.vdmj.tc.expressions.TCMapRangeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCRealLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSeqEnumExpression;
@@ -50,6 +52,7 @@ import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.IntegerValue;
+import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.NaturalValue;
@@ -371,16 +374,19 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 			TCVariableExpression var = (TCVariableExpression)node.left;
 			TCType vartype = var.getType();
 			
-			if (vartype instanceof TCNumericType)
+			if (node.right instanceof TCIndicesExpression)
 			{
-				TCNumericType numtype = (TCNumericType)vartype;
-
-				if (node.right instanceof TCIndicesExpression)
+				if (vartype instanceof TCNumericType)
 				{
+					TCNumericType numtype = (TCNumericType)vartype;
+
 					try
 					{
 						switch (numtype.getWeight())
 						{
+							case 0:	// nat1, so can't set to zero
+								break;
+								
 							case 1:	// nat
 								nvpl.add(var.name, new NaturalValue(0));
 								break;
@@ -397,8 +403,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 								nvpl.add(var.name, new RealValue(0));
 								break;
 								
-							case 0:	// nat1, so can't set to zero
-							default:
+							default:	// No idea!
 								break;
 						}
 					}
@@ -406,6 +411,26 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 					{
 						// Can't happen
 					}
+				}
+			}
+			else if (node.right instanceof TCMapDomainExpression)
+			{
+				TCMapDomainExpression dom = (TCMapDomainExpression)node.right;
+				
+				if (dom.exp instanceof TCVariableExpression)
+				{
+					TCVariableExpression mapvar = (TCVariableExpression)dom.exp;
+					nvpl.add(mapvar.name, new MapValue());
+				}
+			}
+			else if (node.right instanceof TCMapRangeExpression)
+			{
+				TCMapRangeExpression rng = (TCMapRangeExpression)node.right;
+				
+				if (rng.exp instanceof TCVariableExpression)
+				{
+					TCVariableExpression mapvar = (TCVariableExpression)rng.exp;
+					nvpl.add(mapvar.name, new MapValue());
 				}
 			}
 		}
