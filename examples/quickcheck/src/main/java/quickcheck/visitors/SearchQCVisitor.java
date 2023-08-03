@@ -80,7 +80,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseEqualsExpression(TCEqualsExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseEqualsExpression(node, arg);
 		
 		if (node.left instanceof TCVariableExpression)
 		{
@@ -129,7 +129,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseNotEqualExpression(TCNotEqualExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseNotEqualExpression(node, arg);
 		
 		if (node.left instanceof TCVariableExpression)
 		{
@@ -178,7 +178,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseGreaterExpression(TCGreaterExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseGreaterExpression(node, arg);
 		
 		if (node.left instanceof TCVariableExpression)
 		{
@@ -209,7 +209,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseGreaterEqualExpression(TCGreaterEqualExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseGreaterEqualExpression(node, arg);
 		
 		if (node.left instanceof TCVariableExpression)
 		{
@@ -240,7 +240,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseLessExpression(TCLessExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseLessExpression(node, arg);
 		
 		if (node.left instanceof TCVariableExpression)
 		{
@@ -271,7 +271,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseLessEqualExpression(TCLessEqualExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseLessEqualExpression(node, arg);
 		
 		if (node.left instanceof TCVariableExpression)
 		{
@@ -302,7 +302,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseIsExpression(TCIsExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseIsExpression(node, arg);
 		
 		if (node.test instanceof TCVariableExpression &&
 			node.basictype != null)
@@ -369,7 +369,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseInSetExpression(TCInSetExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseInSetExpression(node, arg);
 		
 		if (node.right instanceof TCIndicesExpression)
 		{
@@ -454,7 +454,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseSubsetExpression(TCSubsetExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseSubsetExpression(node, arg);
 		
 		if (node.right instanceof TCMapDomainExpression)
 		{

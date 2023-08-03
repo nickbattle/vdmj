@@ -291,13 +291,13 @@ public class QuickCheck
 		{
 			Map<String, ValueSet> pvalues = plugin.getValues(po, exp, binds);
 			
-			for (String bind: pvalues.keySet())
+			for (String bind: pvalues.keySet())		// plugin may not contribute all binds
 			{
 				if (union.containsKey(bind))
 				{
 					union.get(bind).addAll(pvalues.get(bind));
 				}
-				else if (pvalues.containsKey(bind))		// plugin may not contribute all binds
+				else
 				{
 					union.put(bind, pvalues.get(bind));
 				}
