@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
+import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.patterns.INPattern;
@@ -47,8 +48,6 @@ public class INForAllExpression extends INExpression
 	public final INMultipleBindList bindList;
 	public final INExpression predicate;
 	
-	public static Context failPath = null;	// For Quickcheck
-
 	public INForAllExpression(LexLocation location,	INMultipleBindList bindList, INExpression predicate)
 	{
 		super(location);
@@ -112,21 +111,13 @@ public class INForAllExpression extends INExpression
 				{
 					if (matches && !predicate.eval(evalContext).boolValue(ctxt))
 					{
-						if (failPath == null)	// One shot, record first only
-						{
-							failPath = evalContext;
-						}
-						
+						setCounterexample(evalContext);
 						return new BooleanValue(false);
 					}
 				}
 				catch (ContextException e)
 				{
-					if (failPath == null)	// One shot, record first only
-					{
-						failPath = evalContext;
-					}
-					
+					setCounterexample(evalContext);
 					throw e;
 				}
 				catch (ValueException e)
@@ -141,6 +132,26 @@ public class INForAllExpression extends INExpression
 	    }
 
 		return new BooleanValue(true);
+	}
+	
+	/**
+	 * This is used by the QuickCheck plugin to report which values failed.
+	 */
+	private void setCounterexample(Context ctxt)
+	{
+		for (INMultipleBind bind: bindList)
+		{
+			if (bind instanceof INBindingSetter)	// type and multitype binds
+			{
+				INBindingSetter setter = (INBindingSetter)bind;
+				
+				if (setter.getBindValues() != null)
+				{
+					setter.setCounterexample(ctxt);
+					break;	// Just one will do - see QuickCheck printFailPath
+				}
+			}
+		}
 	}
 
 	@Override
