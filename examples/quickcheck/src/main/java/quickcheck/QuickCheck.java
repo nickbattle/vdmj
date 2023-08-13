@@ -41,7 +41,6 @@ import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
@@ -318,7 +317,7 @@ public class QuickCheck
 		return union;
 	}
 	
-	public void checkObligation(ProofObligation po, Map<String, ValueSet> ranges)
+	public void checkObligation(ProofObligation po, Map<String, ValueSet> bindValues)
 	{
 		try
 		{
@@ -332,27 +331,27 @@ public class QuickCheck
 				return;
 			}
 
-			INExpression poexp = getINExpression(po);
-			bindings = getINBindList(poexp);
-			
-			for (INBindingSetter mbind: bindings)
-			{
-				ValueSet values = ranges.get(mbind.toString());
-				
-				if (values != null)
-				{
-					verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
-					mbind.setBindValues(values);	// Unset in finally clause
-				}
-				else
-				{
-					errorln("PO #" + po.number + ": No range defined for " + mbind);
-					errorCount++;
-				}
-			}
-			
 			try
 			{
+				INExpression poexp = getINExpression(po);
+				bindings = getINBindList(poexp);
+				
+				for (INBindingSetter mbind: bindings)
+				{
+					ValueSet values = bindValues.get(mbind.toString());
+					
+					if (values != null)
+					{
+						verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
+						mbind.setBindValues(values);	// Unset in finally clause
+					}
+					else
+					{
+						errorln("PO #" + po.number + ": No range defined for " + mbind);
+						errorCount++;
+					}
+				}
+				
 				long before = System.currentTimeMillis();
 				Value result = new BooleanValue(false);
 				
@@ -398,7 +397,7 @@ public class QuickCheck
 					else
 					{
 						printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
-						printFailPath(INForAllExpression.failPath, bindings);
+						printFailPath(bindings);
 						println("----");
 						println(po);
 					}
@@ -426,9 +425,8 @@ public class QuickCheck
 				for (INBindingSetter mbind: bindings)
 				{
 					mbind.setBindValues(null);
+					mbind.setCounterexample(null);
 				}
-
-				INForAllExpression.failPath = null;
 			}
 		}
 		catch (Exception e)
@@ -447,8 +445,20 @@ public class QuickCheck
 		}
 	}
 	
-	private void printFailPath(Context path, List<INBindingSetter> bindings)
+	private void printFailPath(List<INBindingSetter> bindings)
 	{
+		Context path = null;
+		
+		for (INBindingSetter setter: bindings)
+		{
+			path = setter.getCounterexample();
+			
+			if (path != null)
+			{
+				break;	// Any one will do - see INForAllExpression
+			}
+		}
+		
 		if (path == null || path.isEmpty())
 		{
 			printf("No counterexample\n");

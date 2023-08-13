@@ -113,11 +113,11 @@ public class QuickCheckCommand extends AnalysisCommand
 		{
 			for (ProofObligation po: chosen)
 			{
-				Map<String, ValueSet> values = qc.getValues(po);
+				Map<String, ValueSet> bindValues = qc.getValues(po);
 				
 				if (!qc.hasErrors())
 				{
-					qc.checkObligation(po, values);
+					qc.checkObligation(po, bindValues);
 				}
 			}
 		}
