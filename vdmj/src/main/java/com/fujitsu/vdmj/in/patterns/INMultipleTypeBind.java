@@ -83,7 +83,14 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	@Override
 	public void setCounterexample(Context ctxt)
 	{
-		bindCounterexample = ctxt;
+		if (ctxt == null)
+		{
+			bindCounterexample = null;
+		}
+		else if (bindCounterexample == null)	// Catch first fail, don't overwrite
+		{
+			bindCounterexample = ctxt;
+		}
 	}
 	
 	@Override

@@ -83,7 +83,14 @@ public class INTypeBind extends INBind implements INBindingSetter
 	@Override
 	public void setCounterexample(Context ctxt)
 	{
-		bindCounterexample = ctxt;
+		if (ctxt == null)
+		{
+			bindCounterexample = null;
+		}
+		else if (bindCounterexample == null)	// Catch first fail, don't overwrite
+		{
+			bindCounterexample = ctxt;
+		}
 	}
 	
 	@Override

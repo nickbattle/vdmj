@@ -141,14 +141,14 @@ public class INForAllExpression extends INExpression
 	{
 		for (INMultipleBind bind: bindList)
 		{
-			if (bind instanceof INBindingSetter)	// type and multitype binds
+			if (bind instanceof INBindingSetter)			// Type and multitype binds
 			{
 				INBindingSetter setter = (INBindingSetter)bind;
 				
-				if (setter.getBindValues() != null)
+				if (setter.getBindValues() != null)			// One we care about (set QC values for)
 				{
-					setter.setCounterexample(ctxt);
-					break;	// Just one will do - see QuickCheck printFailPath
+					setter.setCounterexample(ctxt);			// Won't overwrite existing one
+					break;									// Just one will do - see QC printFailPath
 				}
 			}
 		}
