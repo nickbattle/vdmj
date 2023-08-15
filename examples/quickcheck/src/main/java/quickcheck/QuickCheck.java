@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Context;
@@ -335,8 +336,14 @@ public class QuickCheck
 				printf("PO #%d, UNCHECKED\n", po.number);
 				return;
 			}
+			else if (po.status == POStatus.TRIVIAL)
+			{
+				printf("PO #%d, TRIVIAL by %s\n", po.number, po.proof);
+				return;
+			}
 			else if (results.proved)
 			{
+				po.status = POStatus.PROVED;
 				printf("PO #%d, PROVED\n", po.number);
 				return;
 			}

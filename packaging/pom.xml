@@ -16,11 +16,18 @@
 	
 	<properties>
 		<maven.build.timestamp.format>yyMMdd</maven.build.timestamp.format>
+		<packaging.skip.clean>true</packaging.skip.clean>
 	</properties>
 	
-
 	<build>
 		<plugins>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<configuration>
+					<!-- Keep ZIPs from all builds -->
+					<skip>${packaging.skip.clean}</skip>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
