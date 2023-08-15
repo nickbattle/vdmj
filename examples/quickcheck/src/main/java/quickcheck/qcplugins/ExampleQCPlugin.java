@@ -26,7 +26,6 @@ package quickcheck.qcplugins;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
@@ -62,15 +61,15 @@ public class ExampleQCPlugin extends QCPlugin
 	}
 
 	@Override
-	public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
+	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		return new HashMap<String, ValueSet>();
+		return new Results(true, new HashMap<String, ValueSet>());	// Says PROVED, for testing!
 	}
 
 	@Override
 	public String help()
 	{
-		return getName() + " : [options/flags]";
+		return getName() + " [options/flags]";
 	}
 
 	@Override

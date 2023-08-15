@@ -26,7 +26,6 @@ package quickcheck.qcplugins;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
@@ -64,7 +63,7 @@ public class SearchQCPlugin extends QCPlugin
 	}
 
 	@Override
-	public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
+	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		NameValuePairList nvps = po.getCheckedExpression().apply(new SearchQCVisitor(), null);
 		HashMap<String, ValueSet> result = new HashMap<String, ValueSet>();
@@ -92,13 +91,13 @@ public class SearchQCPlugin extends QCPlugin
 			}
 		}
 		
-		return result;
+		return new Results(false, result);
 	}
 
 	@Override
 	public String help()
 	{
-		return getName() + ": (no options)";
+		return getName() + " (no options)";
 	}
 
 	@Override

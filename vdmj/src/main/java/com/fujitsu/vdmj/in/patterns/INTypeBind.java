@@ -44,6 +44,7 @@ public class INTypeBind extends INBind implements INBindingSetter
 	public final boolean hasTypeParams;
 	
 	private ValueList bindValues = null;
+	private Context bindCounterexample = null;
 	private boolean bindPermuted = false;
 
 	public INTypeBind(INPattern pattern, TCType type)
@@ -77,6 +78,25 @@ public class INTypeBind extends INBind implements INBindingSetter
 	public TCType getType()
 	{
 		return type;
+	}
+
+	@Override
+	public void setCounterexample(Context ctxt)
+	{
+		if (ctxt == null)
+		{
+			bindCounterexample = null;
+		}
+		else if (bindCounterexample == null)	// Catch first fail, don't overwrite
+		{
+			bindCounterexample = ctxt;
+		}
+	}
+	
+	@Override
+	public Context getCounterexample()
+	{
+		return bindCounterexample;
 	}
 
 	@Override

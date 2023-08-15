@@ -36,11 +36,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
@@ -58,6 +58,7 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.qcplugins.QCPlugin;
+import quickcheck.qcplugins.Results;
 import quickcheck.visitors.InternalRangeCreator;
 import quickcheck.visitors.TypeBindFinder;
 
@@ -76,6 +77,11 @@ public class QuickCheck
 	public boolean hasErrors()
 	{
 		return errorCount > 0;
+	}
+	
+	public void resetErrors()
+	{
+		errorCount = 0;
 	}
 	
 	public void loadPlugins(List<String> argv)
@@ -275,27 +281,31 @@ public class QuickCheck
 		return inexp.apply(new TypeBindFinder(), null);
 	}
 	
-	public Map<String, ValueSet> getValues(ProofObligation po)
+	public Results getValues(ProofObligation po)
 	{
 		Map<String, ValueSet> union = new HashMap<String, ValueSet>();
+		boolean proved = false;
 		INExpression exp = getINExpression(po);
 		List<INBindingSetter> binds = getINBindList(exp);
 		
 		for (QCPlugin plugin: plugins)
 		{
-			Map<String, ValueSet> pvalues = plugin.getValues(po, exp, binds);
+			Results presults = plugin.getValues(po, exp, binds);
+			Map<String, ValueSet> cexamples = presults.counterexamples;
 			
-			for (String bind: pvalues.keySet())
+			for (String bind: cexamples.keySet())
 			{
 				if (union.containsKey(bind))
 				{
-					union.get(bind).addAll(pvalues.get(bind));
+					union.get(bind).addAll(cexamples.get(bind));
 				}
-				else if (pvalues.containsKey(bind))		// plugin may not contribute all binds
+				else
 				{
-					union.put(bind, pvalues.get(bind));
+					union.put(bind, cexamples.get(bind));
 				}
 			}
+			
+			proved |= presults.proved;
 		}
 		
 		for (INBindingSetter bind: binds)
@@ -309,14 +319,14 @@ public class QuickCheck
 			}
 		}
 		
-		return union;
+		return new Results(proved, union);
 	}
 	
-	public void checkObligation(ProofObligation po, Map<String, ValueSet> ranges)
+	public void checkObligation(ProofObligation po, Results results)
 	{
 		try
 		{
-			errorCount = 0;
+			resetErrors();	// Only flag fatal errors
 			RootContext ctxt = Interpreter.getInstance().getInitialContext();
 			List<INBindingSetter> bindings = null;
 
@@ -325,31 +335,68 @@ public class QuickCheck
 				printf("PO #%d, UNCHECKED\n", po.number);
 				return;
 			}
-
-			INExpression poexp = getINExpression(po);
-			bindings = getINBindList(poexp);
-			
-			for (INBindingSetter mbind: bindings)
+			else if (results.proved)
 			{
-				ValueSet values = ranges.get(mbind.toString());
-				
-				if (values != null)
-				{
-					verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
-					mbind.setBindValues(values);	// Unset in finally clause
-				}
-				else
-				{
-					errorln("PO #" + po.number + ": No range defined for " + mbind);
-					errorCount++;
-				}
+				printf("PO #%d, PROVED\n", po.number);
+				return;
 			}
-			
+
 			try
 			{
+				Map<String, ValueSet> cexamples = results.counterexamples;
+				INExpression poexp = getINExpression(po);
+				bindings = getINBindList(poexp);
+				
+				for (INBindingSetter mbind: bindings)
+				{
+					ValueSet values = cexamples.get(mbind.toString());
+					
+					if (values != null)
+					{
+						verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
+						mbind.setBindValues(values);	// Unset in finally clause
+					}
+					else
+					{
+						errorln("PO #" + po.number + ": No range defined for " + mbind);
+						errorCount++;
+					}
+				}
+				
 				long before = System.currentTimeMillis();
-				verbose("PO #%d, starting...\n", po.number);
-				Value result = poexp.eval(ctxt);
+				Value result = new BooleanValue(false);
+				
+				try
+				{
+					verbose("PO #%d, starting...\n", po.number);
+					result = poexp.eval(ctxt);
+				}
+				catch (ContextException e)
+				{
+					printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
+					result = new BooleanValue(false);
+
+					if (Settings.verbose)
+					{
+						if (e.ctxt.outer != null)
+						{
+							e.ctxt.printStackFrames(Console.out);
+						}
+						else
+						{
+							println("In context of " + e.ctxt.title + " " + e.ctxt.location);
+						}
+						
+						println("----");
+						printBindings(bindings);
+						println("----");
+					}
+					else
+					{
+						println("Use -verbose to see exception stack");
+					}
+				}
+				
 				long after = System.currentTimeMillis();
 				
 				if (result instanceof BooleanValue)
@@ -361,10 +408,9 @@ public class QuickCheck
 					else
 					{
 						printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
-						printFailPath(INForAllExpression.failPath, bindings);
+						printFailPath(bindings);
 						println("----");
 						println(po);
-						errorCount++;
 					}
 				}
 				else
@@ -374,27 +420,7 @@ public class QuickCheck
 					printBindings(bindings);
 					println("----");
 					println(po);
-					errorCount++;
 				}
-			}
-			catch (ContextException e)
-			{
-				printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
-				
-				if (e.ctxt.outer != null)
-				{
-					e.ctxt.printStackFrames(Console.out);
-				}
-				else
-				{
-					println("In context of " + e.ctxt.title + " " + e.ctxt.location);
-				}
-				
-				println("----");
-				printBindings(bindings);
-				println("----");
-				println(po);
-				errorCount++;
 			}
 			catch (Exception e)
 			{
@@ -410,9 +436,8 @@ public class QuickCheck
 				for (INBindingSetter mbind: bindings)
 				{
 					mbind.setBindValues(null);
+					mbind.setCounterexample(null);
 				}
-
-				INForAllExpression.failPath = null;
 			}
 		}
 		catch (Exception e)
@@ -431,8 +456,20 @@ public class QuickCheck
 		}
 	}
 	
-	private void printFailPath(Context path, List<INBindingSetter> bindings)
+	private void printFailPath(List<INBindingSetter> bindings)
 	{
+		Context path = null;
+		
+		for (INBindingSetter setter: bindings)
+		{
+			path = setter.getCounterexample();
+			
+			if (path != null)
+			{
+				break;	// Any one will do - see INForAllExpression
+			}
+		}
+		
 		if (path == null || path.isEmpty())
 		{
 			printf("No counterexample\n");

@@ -44,6 +44,7 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	public final boolean hasTypeParams;
 	
 	private ValueList bindValues = null;
+	private Context bindCounterexample = null;
 	private boolean bindPermuted = false;
 
 	public INMultipleTypeBind(INPatternList plist, TCType type)
@@ -77,6 +78,25 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	public ValueList getBindValues()
 	{
 		return bindValues;	// Without calculation!
+	}
+	
+	@Override
+	public void setCounterexample(Context ctxt)
+	{
+		if (ctxt == null)
+		{
+			bindCounterexample = null;
+		}
+		else if (bindCounterexample == null)	// Catch first fail, don't overwrite
+		{
+			bindCounterexample = ctxt;
+		}
+	}
+	
+	@Override
+	public Context getCounterexample()
+	{
+		return bindCounterexample;
 	}
 	
 	@Override

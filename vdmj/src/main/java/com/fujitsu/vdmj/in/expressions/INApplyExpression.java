@@ -105,7 +105,6 @@ public class INApplyExpression extends INExpression
 
            		FunctionValue fv = object.functionValue(ctxt);
            		Value rv = fv.eval(location, argvals, ctxt);
-				INForAllExpression.failPath = null;		// Ignore fails within PO function calls
            		
            		if (endstop && !breakpoint.isContinue(ctxt))
            		{
