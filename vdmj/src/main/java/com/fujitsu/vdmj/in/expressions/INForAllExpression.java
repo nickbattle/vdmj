@@ -25,11 +25,13 @@
 package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
+import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.patterns.INPattern;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.BooleanValue;
@@ -46,8 +48,6 @@ public class INForAllExpression extends INExpression
 	public final INMultipleBindList bindList;
 	public final INExpression predicate;
 	
-	public static Context failPath = null;	// For Quickcheck
-
 	public INForAllExpression(LexLocation location,	INMultipleBindList bindList, INExpression predicate)
 	{
 		super(location);
@@ -111,13 +111,14 @@ public class INForAllExpression extends INExpression
 				{
 					if (matches && !predicate.eval(evalContext).boolValue(ctxt))
 					{
-						if (failPath == null)	// One shot, record first only
-						{
-							failPath = evalContext;
-						}
-						
+						setCounterexample(evalContext);
 						return new BooleanValue(false);
 					}
+				}
+				catch (ContextException e)
+				{
+					setCounterexample(evalContext);
+					throw e;
 				}
 				catch (ValueException e)
 				{
@@ -131,6 +132,26 @@ public class INForAllExpression extends INExpression
 	    }
 
 		return new BooleanValue(true);
+	}
+	
+	/**
+	 * This is used by the QuickCheck plugin to report which values failed.
+	 */
+	private void setCounterexample(Context ctxt)
+	{
+		for (INMultipleBind bind: bindList)
+		{
+			if (bind instanceof INBindingSetter)			// Type and multitype binds
+			{
+				INBindingSetter setter = (INBindingSetter)bind;
+				
+				if (setter.getBindValues() != null)			// One we care about (set QC values for)
+				{
+					setter.setCounterexample(ctxt);			// Won't overwrite existing one
+					break;									// Just one will do - see QC printFailPath
+				}
+			}
+		}
 	}
 
 	@Override

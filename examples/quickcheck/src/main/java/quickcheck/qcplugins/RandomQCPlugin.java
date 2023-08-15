@@ -29,7 +29,6 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
@@ -108,7 +107,7 @@ public class RandomQCPlugin extends QCPlugin
 	}
 
 	@Override
-	public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
+	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		HashMap<String, ValueSet> result = new HashMap<String, ValueSet>();
 		RootContext ctxt = Interpreter.getInstance().getInitialContext();
@@ -121,13 +120,13 @@ public class RandomQCPlugin extends QCPlugin
 			result.put(bind.toString(), values);
 		}
 		
-		return result;
+		return new Results(false, result);
 	}
 
 	@Override
 	public String help()
 	{
-		return getName() + ": [-random:n <size>][-random:s <size>]";
+		return getName() + " [-random:n <size>][-random:s <size>]";
 	}
 
 	@Override

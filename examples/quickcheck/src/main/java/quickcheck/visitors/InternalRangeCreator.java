@@ -274,7 +274,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseFunctionType(TCFunctionType node, Integer arg)
 	{
-		throw new RuntimeException("Must define function bind range in VDM");
+		return new ValueSet();	// Can't generate functions!
 	}
 
 	@Override

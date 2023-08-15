@@ -25,12 +25,10 @@
 package quickcheck.qcplugins;
 
 import java.util.List;
-import java.util.Map;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
 
@@ -40,6 +38,6 @@ abstract public class QCPlugin
 	abstract public boolean hasErrors();
 	abstract public boolean useByDefault();
 	abstract public boolean init(QuickCheck qc);
-	abstract public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds);
+	abstract public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds);
 	abstract public String help();
 }

@@ -22,18 +22,25 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.in.patterns;
+package quickcheck.qcplugins;
 
-import com.fujitsu.vdmj.runtime.Context;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.values.ValueList;
+import java.util.Map;
+
 import com.fujitsu.vdmj.values.ValueSet;
 
-public interface INBindingSetter
+/**
+ * A class to hold the return values of a getValues() call on a QC plugin.
+ * The proved flag indicates that the PO has been proved to have no counterexamples.
+ * Otherwise, counterexamples contains known or possible values to check.
+ */
+public class Results
 {
-	public void setBindValues(ValueSet values);
-	public ValueList getBindValues();
-	public TCType getType();
-	public void setCounterexample(Context ctxt);
-	public Context getCounterexample();
+	public final boolean proved;
+	public final Map<String, ValueSet> counterexamples;
+	
+	public Results(boolean proved, Map<String, ValueSet> counterexamples)
+	{
+		this.proved = proved;
+		this.counterexamples = counterexamples;
+	}
 }

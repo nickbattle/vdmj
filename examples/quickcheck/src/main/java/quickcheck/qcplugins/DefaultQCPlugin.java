@@ -403,7 +403,7 @@ public class DefaultQCPlugin extends QCPlugin
 	}
 
 	@Override
-	public Map<String, ValueSet> getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
+	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		Map<String, ValueSet> values = new HashMap<String, ValueSet>();
 		
@@ -430,13 +430,13 @@ public class DefaultQCPlugin extends QCPlugin
 			println(e);
 		}
 		
-		return values;
+		return new Results(false, values);
 	}
 
 	@Override
 	public String help()
 	{
-		return getName() + " : [-f <file> | -c <file>][-n <size>][-s <size>]";
+		return getName() + " [-f <file> | -c <file>][-n <size>][-s <size>]";
 	}
 
 	@Override

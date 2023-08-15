@@ -32,23 +32,40 @@ import com.fujitsu.vdmj.tc.expressions.TCEqualsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCGreaterEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCGreaterExpression;
+import com.fujitsu.vdmj.tc.expressions.TCInSetExpression;
+import com.fujitsu.vdmj.tc.expressions.TCIndicesExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
+import com.fujitsu.vdmj.tc.expressions.TCIsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLessEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCLessExpression;
+import com.fujitsu.vdmj.tc.expressions.TCMapDomainExpression;
+import com.fujitsu.vdmj.tc.expressions.TCMapRangeExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCRealLiteralExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSeqEnumExpression;
 import com.fujitsu.vdmj.tc.expressions.TCSetEnumExpression;
+import com.fujitsu.vdmj.tc.expressions.TCSubsetExpression;
 import com.fujitsu.vdmj.tc.expressions.TCVariableExpression;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCLeafExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCIntegerType;
+import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
+import com.fujitsu.vdmj.tc.types.TCNaturalType;
+import com.fujitsu.vdmj.tc.types.TCNumericType;
+import com.fujitsu.vdmj.tc.types.TCRealType;
+import com.fujitsu.vdmj.tc.types.TCSeq1Type;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.IntegerValue;
+import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
+import com.fujitsu.vdmj.values.NaturalValue;
+import com.fujitsu.vdmj.values.RationalValue;
 import com.fujitsu.vdmj.values.RealValue;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.SetValue;
+import com.fujitsu.vdmj.values.Value;
 
 public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, NameValuePairList, Object>
 {
@@ -66,7 +83,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseEqualsExpression(TCEqualsExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseEqualsExpression(node, arg);
 		
 		if (node.left instanceof TCVariableExpression)
 		{
@@ -115,7 +132,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseNotEqualExpression(TCNotEqualExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseNotEqualExpression(node, arg);
 		
 		if (node.left instanceof TCVariableExpression)
 		{
@@ -164,7 +181,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseGreaterExpression(TCGreaterExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseGreaterExpression(node, arg);
 		
 		if (node.left instanceof TCVariableExpression)
 		{
@@ -195,7 +212,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseGreaterEqualExpression(TCGreaterEqualExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseGreaterEqualExpression(node, arg);
 		
 		if (node.left instanceof TCVariableExpression)
 		{
@@ -226,7 +243,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseLessExpression(TCLessExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseLessExpression(node, arg);
 		
 		if (node.left instanceof TCVariableExpression)
 		{
@@ -257,7 +274,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	@Override
 	public NameValuePairList caseLessEqualExpression(TCLessEqualExpression node, Object arg)
 	{
-		NameValuePairList nvpl = newCollection();
+		NameValuePairList nvpl = super.caseLessEqualExpression(node, arg);
 		
 		if (node.left instanceof TCVariableExpression)
 		{
@@ -286,6 +303,60 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 	}
 	
 	@Override
+	public NameValuePairList caseIsExpression(TCIsExpression node, Object arg)
+	{
+		NameValuePairList nvpl = super.caseIsExpression(node, arg);
+		
+		if (node.test instanceof TCVariableExpression &&
+			node.basictype != null)
+		{
+			try
+			{
+				TCVariableExpression var = (TCVariableExpression)node.test;
+				TCType vType = var.getType();
+				TCType isType = node.basictype;
+				Value toTry = null;
+				
+				if (isType instanceof TCNaturalOneType)
+				{
+					if (vType instanceof TCNaturalType ||
+						vType instanceof TCIntegerType ||
+						vType instanceof TCRealType)
+					{
+						toTry = new NaturalValue(0);
+					}
+				}
+				else if (isType instanceof TCNaturalType)
+				{
+					if (vType instanceof TCIntegerType ||
+						vType instanceof TCRealType)
+					{
+						toTry = new IntegerValue(-1);
+					}
+				}
+				else if (isType instanceof TCIntegerType)
+				{
+					if (vType instanceof TCRealType)
+					{
+						toTry = new RealValue(1.23);
+					}
+				}
+				
+				if (toTry != null)
+				{
+					nvpl.add(var.name, toTry);
+				}
+			}
+			catch (Exception e)
+			{
+				// can't happen
+			}
+		}
+	
+		return nvpl;
+	}
+	
+	@Override
 	public NameValuePairList caseVariableExpression(TCVariableExpression node, Object arg)
 	{
 		NameValuePairList nvpl = newCollection();
@@ -298,6 +369,123 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 		return nvpl;
 	}
 	
+	@Override
+	public NameValuePairList caseInSetExpression(TCInSetExpression node, Object arg)
+	{
+		NameValuePairList nvpl = super.caseInSetExpression(node, arg);
+		
+		if (node.right instanceof TCIndicesExpression)
+		{
+			if (node.left instanceof TCVariableExpression)
+			{
+				TCVariableExpression var = (TCVariableExpression)node.left;
+				TCType vartype = var.getType();
+
+				if (vartype instanceof TCNumericType)
+				{
+					TCNumericType numtype = (TCNumericType)vartype;
+
+					try
+					{
+						switch (numtype.getWeight())
+						{
+							case 0:	// nat1, so can't set to zero
+								break;
+								
+							case 1:	// nat
+								nvpl.add(var.name, new NaturalValue(0));
+								break;
+								
+							case 2:	// int
+								nvpl.add(var.name, new IntegerValue(0));
+								break;
+								
+							case 3:	// rat
+								nvpl.add(var.name, new RationalValue(BigDecimal.ZERO));
+								break;
+								
+							case 4:	// real
+								nvpl.add(var.name, new RealValue(0));
+								break;
+								
+							default:	// No idea!
+								break;
+						}
+					}
+					catch (Exception e)
+					{
+						// Can't happen
+					}
+				}
+			}
+			
+			if (node.right instanceof TCVariableExpression)
+			{
+				TCVariableExpression var = (TCVariableExpression)node.right;
+				TCType vartype = var.getType();
+				
+				if (!(vartype instanceof TCSeq1Type))
+				{
+					nvpl.add(var.name, new SeqValue());
+				}
+			}
+		}
+		else if (node.right instanceof TCMapDomainExpression)
+		{
+			TCMapDomainExpression dom = (TCMapDomainExpression)node.right;
+			
+			if (dom.exp instanceof TCVariableExpression)
+			{
+				TCVariableExpression mapvar = (TCVariableExpression)dom.exp;
+				nvpl.add(mapvar.name, new MapValue());
+			}
+		}
+		else if (node.right instanceof TCMapRangeExpression)
+		{
+			TCMapRangeExpression rng = (TCMapRangeExpression)node.right;
+			
+			if (rng.exp instanceof TCVariableExpression)
+			{
+				TCVariableExpression mapvar = (TCVariableExpression)rng.exp;
+				nvpl.add(mapvar.name, new MapValue());
+			}
+		}
+		
+		return nvpl;
+	}
+	
+	@Override
+	public NameValuePairList caseSubsetExpression(TCSubsetExpression node, Object arg)
+	{
+		NameValuePairList nvpl = super.caseSubsetExpression(node, arg);
+		
+		if (node.right instanceof TCMapDomainExpression)
+		{
+			TCMapDomainExpression dom = (TCMapDomainExpression)node.right;
+			
+			if (dom.exp instanceof TCVariableExpression)
+			{
+				TCVariableExpression mapvar = (TCVariableExpression)dom.exp;
+				nvpl.add(mapvar.name, new MapValue());
+			}
+		}
+		else if (node.right instanceof TCMapRangeExpression)
+		{
+			TCMapRangeExpression rng = (TCMapRangeExpression)node.right;
+			
+			if (rng.exp instanceof TCVariableExpression)
+			{
+				TCVariableExpression mapvar = (TCVariableExpression)rng.exp;
+				nvpl.add(mapvar.name, new MapValue());
+			}
+		}
+		
+		return nvpl;
+	}
+	
+	/**
+	 * Just try everything over LHS/RHS
+	 */
 	@Override
 	public NameValuePairList caseAndExpression(TCAndExpression node, Object arg)
 	{
