@@ -282,7 +282,7 @@
         </profile>
     
         <profile>
-            <id>au</id>
+            <id>default</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -290,18 +290,13 @@
                 <!-- Speeds up builds in development -->
                 <maven.javadoc.skip>true</maven.javadoc.skip>
             </properties>
-            <distributionManagement>
-                <repository>
-                    <id>vdmj.overture.au.dk-central</id>
-                    <name>overture.au.dk-releases</name>
-                    <url>https://overture.au.dk/artifactory/vdmj</url>
-                </repository>
-                <snapshotRepository>
-                    <id>vdmj.overture.au.dk-snapshots</id>
-                    <name>overture.au.dk-snapshots</name>
-                    <url>https://overture.au.dk/artifactory/vdmj</url>
-                </snapshotRepository>
-            </distributionManagement>
+			<distributionManagement>
+				<repository>
+					<id>github</id>
+					<name>GitHub Packages</name>
+					<url>https://maven.pkg.github.com/nickbattle/vdmj</url>
+				</repository>
+			</distributionManagement>
         </profile>
     
         <profile>
