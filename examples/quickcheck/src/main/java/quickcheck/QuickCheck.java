@@ -67,7 +67,7 @@ public class QuickCheck
 {
 	private int errorCount = 0;
 	private List<QCPlugin> plugins = null;		// Configured to be used
-	private List<QCPlugin> unused = null;		// Known, but not to be used
+	private List<QCPlugin> disabled = null;		// Known, but not to be used
 	private ProofObligationList chosen = null;
 	
 	public QuickCheck()
@@ -88,7 +88,7 @@ public class QuickCheck
 	public void loadPlugins(List<String> argv)
 	{
 		plugins = new Vector<QCPlugin>();
-		unused = new Vector<QCPlugin>();
+		disabled = new Vector<QCPlugin>();
 		errorCount = 0;
 		
 		try
@@ -112,7 +112,7 @@ public class QuickCheck
 					}
 					else
 					{
-						unused.add(instance);
+						disabled.add(instance);
 					}
 				}
 				catch (ClassNotFoundException e)
@@ -168,15 +168,20 @@ public class QuickCheck
 		return doChecks;
 	}
 	
-	public List<QCPlugin> getPlugins()
+	public List<QCPlugin> getEnabledPlugins()
 	{
 		return plugins;
 	}
 	
-	public List<QCPlugin> getAllPlugins()	// Used and unused
+	public List<QCPlugin> getDisabledPlugins()
+	{
+		return disabled;
+	}
+	
+	public List<QCPlugin> getAllPlugins()	// Enabled and disabled
 	{
 		List<QCPlugin> all = new Vector<QCPlugin>(plugins);
-		all.addAll(unused);
+		all.addAll(disabled);
 		return all;
 	}
 	
