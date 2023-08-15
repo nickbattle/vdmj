@@ -24,20 +24,23 @@
 
 package quickcheck.qcplugins;
 
-import java.util.List;
+import java.util.Map;
 
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
-import com.fujitsu.vdmj.pog.ProofObligation;
+import com.fujitsu.vdmj.values.ValueSet;
 
-import quickcheck.QuickCheck;
-
-abstract public class QCPlugin
+/**
+ * A class to hold the return values of a getValues() call on a QC plugin.
+ * The proved flag indicates that the PO has been proved to have no counterexamples.
+ * Otherwise, counterexamples contains known or possible values to check.
+ */
+public class Results
 {
-	abstract public String getName();
-	abstract public boolean hasErrors();
-	abstract public boolean useByDefault();
-	abstract public boolean init(QuickCheck qc);
-	abstract public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds);
-	abstract public String help();
+	public final boolean proved;
+	public final Map<String, ValueSet> counterexamples;
+	
+	public Results(boolean proved, Map<String, ValueSet> counterexamples)
+	{
+		this.proved = proved;
+		this.counterexamples = counterexamples;
+	}
 }

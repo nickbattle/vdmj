@@ -58,6 +58,7 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.qcplugins.QCPlugin;
+import quickcheck.qcplugins.Results;
 import quickcheck.visitors.InternalRangeCreator;
 import quickcheck.visitors.TypeBindFinder;
 
@@ -280,27 +281,31 @@ public class QuickCheck
 		return inexp.apply(new TypeBindFinder(), null);
 	}
 	
-	public Map<String, ValueSet> getValues(ProofObligation po)
+	public Results getValues(ProofObligation po)
 	{
 		Map<String, ValueSet> union = new HashMap<String, ValueSet>();
+		boolean proved = false;
 		INExpression exp = getINExpression(po);
 		List<INBindingSetter> binds = getINBindList(exp);
 		
 		for (QCPlugin plugin: plugins)
 		{
-			Map<String, ValueSet> pvalues = plugin.getValues(po, exp, binds);
+			Results presults = plugin.getValues(po, exp, binds);
+			Map<String, ValueSet> cexamples = presults.counterexamples;
 			
-			for (String bind: pvalues.keySet())		// plugin may not contribute all binds
+			for (String bind: cexamples.keySet())
 			{
 				if (union.containsKey(bind))
 				{
-					union.get(bind).addAll(pvalues.get(bind));
+					union.get(bind).addAll(cexamples.get(bind));
 				}
 				else
 				{
-					union.put(bind, pvalues.get(bind));
+					union.put(bind, cexamples.get(bind));
 				}
 			}
+			
+			proved |= presults.proved;
 		}
 		
 		for (INBindingSetter bind: binds)
@@ -314,10 +319,10 @@ public class QuickCheck
 			}
 		}
 		
-		return union;
+		return new Results(proved, union);
 	}
 	
-	public void checkObligation(ProofObligation po, Map<String, ValueSet> bindValues)
+	public void checkObligation(ProofObligation po, Results results)
 	{
 		try
 		{
@@ -330,15 +335,21 @@ public class QuickCheck
 				printf("PO #%d, UNCHECKED\n", po.number);
 				return;
 			}
+			else if (results.proved)
+			{
+				printf("PO #%d, PROVED\n", po.number);
+				return;
+			}
 
 			try
 			{
+				Map<String, ValueSet> cexamples = results.counterexamples;
 				INExpression poexp = getINExpression(po);
 				bindings = getINBindList(poexp);
 				
 				for (INBindingSetter mbind: bindings)
 				{
-					ValueSet values = bindValues.get(mbind.toString());
+					ValueSet values = cexamples.get(mbind.toString());
 					
 					if (values != null)
 					{

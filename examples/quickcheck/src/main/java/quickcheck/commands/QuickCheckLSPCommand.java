@@ -28,18 +28,17 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.values.ValueSet;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import quickcheck.QuickCheck;
 import quickcheck.qcplugins.QCPlugin;
+import quickcheck.qcplugins.Results;
 import vdmj.commands.AnalysisCommand;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
@@ -98,7 +97,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 						
 						for (QCPlugin plugin: qc.getAllPlugins())
 						{
-							println(plugin.help());
+							println((plugin.useByDefault() ? "  " : "* ") + plugin.help());
 						}
 						
 						return result(request, null);
@@ -129,11 +128,11 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 		{
 			for (ProofObligation po: chosen)
 			{
-				Map<String, ValueSet> bindValues = qc.getValues(po);
+				Results results = qc.getValues(po);
 				
 				if (!qc.hasErrors())
 				{
-					qc.checkObligation(po, bindValues);
+					qc.checkObligation(po, results);
 				}
 			}
 		}
