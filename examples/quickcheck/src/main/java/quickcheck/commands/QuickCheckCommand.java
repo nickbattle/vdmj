@@ -79,11 +79,23 @@ public class QuickCheckCommand extends AnalysisCommand
 					case "-?":
 					case "-help":
 						println(USAGE);
+						println("Enabled plugins:");
 						
-						for (QCPlugin plugin: qc.getAllPlugins())
+						for (QCPlugin plugin: qc.getEnabledPlugins())
 						{
-							println((plugin.useByDefault() ? "  " : "* ") + plugin.help());
+							println("  " + plugin.help());
 						}
+						
+						if (!qc.getDisabledPlugins().isEmpty())
+						{
+							println("Disabled plugins (add with -p<name>):");
+							
+							for (QCPlugin plugin: qc.getDisabledPlugins())
+							{
+								println("  " + plugin.help());
+							}
+						}
+						
 						return null;
 						
 					default:
