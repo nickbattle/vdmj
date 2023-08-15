@@ -70,9 +70,8 @@ public class ProofObligationList extends Vector<ProofObligation>
 
 			if (po.status == POStatus.TRIVIAL)
 			{
-				sb.append(" by <");
+				sb.append(" by ");
 				sb.append(po.proof);
-				sb.append(">");
 			}
 
 			sb.append(")\n");
