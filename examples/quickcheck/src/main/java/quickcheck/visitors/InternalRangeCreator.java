@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCBracketType;
 import com.fujitsu.vdmj.tc.types.TCCharacterType;
+import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCInMapType;
@@ -100,9 +101,15 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseType(TCType type, Integer limit)
 	{
-		throw new RuntimeException("Missing InternalRangeCreator case for " + type);
+		throw new RuntimeException("QuickCheck: Missing InternalRangeCreator case for " + type);
 	}
 	
+	@Override
+	public ValueSet caseClassType(TCClassType node, Integer limit)
+	{
+		return new ValueSet();	// Can't generate objects!
+	}
+
 	@Override
 	public ValueSet caseUnknownType(TCUnknownType node, Integer limit)
 	{
@@ -560,7 +567,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		return union;
 	}
-
+	
 	private ValueSet realLimit(Integer limit)
 	{
 		ValueSet result = new ValueSet();
