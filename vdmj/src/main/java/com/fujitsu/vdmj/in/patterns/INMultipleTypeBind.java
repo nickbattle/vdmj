@@ -57,7 +57,7 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	@Override
 	public String toString()
 	{
-		return plist + ":" + type;
+		return plist + ":" + type.toExplicitString(location);
 	}
 	
 	@Override

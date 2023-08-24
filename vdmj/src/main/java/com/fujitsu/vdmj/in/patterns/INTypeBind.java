@@ -112,7 +112,7 @@ public class INTypeBind extends INBind implements INBindingSetter
 	@Override
 	public String toString()
 	{
-		return pattern + ":" + type;
+		return pattern + ":" + type.toExplicitString(location);
 	}
 
 	@Override
