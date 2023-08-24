@@ -59,7 +59,6 @@ public class ProofObligationList extends Vector<ProofObligation>
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		renumber();
 
 		for (ProofObligation po: this)
 		{
