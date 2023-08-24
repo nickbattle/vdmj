@@ -110,14 +110,18 @@ public class RandomQCPlugin extends QCPlugin
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		HashMap<String, ValueSet> result = new HashMap<String, ValueSet>();
-		RootContext ctxt = Interpreter.getInstance().getInitialContext();
-		long seed = 1234;
 		
-		for (INBindingSetter bind: binds)
+		if (po.isCheckable)
 		{
-			RandomRangeCreator visitor = new RandomRangeCreator(ctxt, numSetSize, seed++);
-			ValueSet values = bind.getType().apply(visitor, expansionLimit);
-			result.put(bind.toString(), values);
+			RootContext ctxt = Interpreter.getInstance().getInitialContext();
+			long seed = 1234;
+			
+			for (INBindingSetter bind: binds)
+			{
+				RandomRangeCreator visitor = new RandomRangeCreator(ctxt, numSetSize, seed++);
+				ValueSet values = bind.getType().apply(visitor, expansionLimit);
+				result.put(bind.toString(), values);
+			}
 		}
 		
 		return new Results(false, result);

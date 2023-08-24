@@ -65,28 +65,32 @@ public class SearchQCPlugin extends QCPlugin
 	@Override
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		NameValuePairList nvps = po.getCheckedExpression().apply(new SearchQCVisitor(), null);
 		HashMap<String, ValueSet> result = new HashMap<String, ValueSet>();
-		
-		for (NameValuePair pair: nvps)
+
+		if (po.isCheckable)
 		{
-			for (INBindingSetter bind: binds)
+			NameValuePairList nvps = po.getCheckedExpression().apply(new SearchQCVisitor(), null);
+			
+			for (NameValuePair pair: nvps)
 			{
-				String key = bind.toString();
-				
-				// HACK! Only works for single name binds
-				if (key.equals(pair.name.getName() + ":" + bind.getType()))	// eg. "a:T" = "a" +":" + "T"
+				for (INBindingSetter bind: binds)
 				{
-					if (result.containsKey(key))
+					String key = bind.toString();
+					
+					// HACK! Only works for single name binds
+					if (key.equals(pair.name.getName() + ":" + bind.getType()))	// eg. "a:T" = "a" +":" + "T"
 					{
-						ValueSet current = result.get(key);
-						current.add(pair.value);
+						if (result.containsKey(key))
+						{
+							ValueSet current = result.get(key);
+							current.add(pair.value);
+						}
+						else
+						{
+							result.put(key, new ValueSet(pair.value));
+						}
+						break;
 					}
-					else
-					{
-						result.put(key, new ValueSet(pair.value));
-					}
-					break;
 				}
 			}
 		}
