@@ -348,6 +348,19 @@ public class TCNamedType extends TCInvariantType
 	{
 		return typename.toString() + (maximal ? "!" : "") + (opaque ? " /* opaque */" : "");
 	}
+	
+	@Override
+	public String toExplicitString(LexLocation from)
+	{
+		if (typename.getLocation().module.equals(from.module))
+		{
+			return toString();
+		}
+		else
+		{
+			return typename.getExplicit(true).toString();
+		}
+	}
 
 	@Override
 	public boolean narrowerThan(TCAccessSpecifier accessSpecifier)

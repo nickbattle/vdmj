@@ -59,7 +59,6 @@ public class ProofObligationList extends Vector<ProofObligation>
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		renumber();
 
 		for (ProofObligation po: this)
 		{
@@ -147,7 +146,8 @@ public class ProofObligationList extends Vector<ProofObligation>
 
 	private void typeCheck(ProofObligation obligation, String mname, Environment env) throws Exception
 	{
-		LexTokenReader ltr = new LexTokenReader(obligation.getValue(), Dialect.VDM_SL);
+		// Some POs from VDM++ specs can include "new" etc, so parse as VDM++
+		LexTokenReader ltr = new LexTokenReader(obligation.getValue(), Dialect.VDM_PP);
 		ExpressionReader reader = new ExpressionReader(ltr);
 		reader.setCurrentModule(mname);
 		ASTExpression ast = reader.readExpression();
