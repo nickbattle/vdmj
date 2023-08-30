@@ -275,9 +275,9 @@ public class DefaultQCPlugin extends QCPlugin
 				if (value instanceof SetValue)
 				{
 					SetValue svalue = (SetValue)value;
-					ValueSet list = new ValueSet();
-					list.addAll(svalue.values);
-					ranges.put(key, list);
+					// ValueSet list = new ValueSet();
+					// list.addAll(svalue.values);
+					ranges.put(key, svalue.values);
 				}
 				else if (value instanceof IntegerValue)
 				{

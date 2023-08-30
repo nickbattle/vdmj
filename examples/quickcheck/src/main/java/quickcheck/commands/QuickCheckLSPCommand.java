@@ -30,18 +30,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.pog.ProofObligationList;
-
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import quickcheck.QuickCheck;
 import quickcheck.qcplugins.QCPlugin;
-import quickcheck.qcplugins.Results;
 import vdmj.commands.AnalysisCommand;
-import workspace.PluginRegistry;
-import workspace.plugins.POPlugin;
 
 public class QuickCheckLSPCommand extends AnalysisCommand
 {
@@ -125,30 +119,9 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 			}
 		}
 		
-		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
-		ProofObligationList all = pog.getProofObligations();
-		all.renumber();
-		ProofObligationList chosen = qc.getPOs(all, poList);
-		
-		if (qc.hasErrors())
-		{
-			return result(request, "Failed to find POs");
-		}
-		
-		if (qc.initPlugins())
-		{
-			for (ProofObligation po: chosen)
-			{
-				Results results = qc.getValues(po);
-				
-				if (!qc.hasErrors())
-				{
-					qc.checkObligation(po, results);
-				}
-			}
-		}
-		
-		return result(request, qc.hasErrors() ? "Failed" : null);
+		QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, poList);
+		executor.start();
+		return null;
 	}
 
 	@Override

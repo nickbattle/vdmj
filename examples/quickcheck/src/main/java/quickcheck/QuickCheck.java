@@ -56,6 +56,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.GetResource;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.Value;
+import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.qcplugins.QCPlugin;
@@ -386,32 +387,47 @@ public class QuickCheck
 				catch (ContextException e)
 				{
 					printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
-					result = new BooleanValue(false);
-
-					if (Settings.verbose)
+					
+					if (e.rawMessage.equals("Execution cancelled"))
 					{
-						if (e.ctxt.outer != null)
-						{
-							e.ctxt.printStackFrames(Console.out);
-						}
-						else
-						{
-							println("In context of " + e.ctxt.title + " " + e.ctxt.location);
-						}
-						
-						println("----");
-						printBindings(bindings);
-						println("----");
+						result = null;
 					}
 					else
 					{
-						println("Use -verbose to see exception stack");
+						result = new BooleanValue(false);
+	
+						if (Settings.verbose)
+						{
+							if (e.ctxt.outer != null)
+							{
+								e.ctxt.printStackFrames(Console.out);
+							}
+							else
+							{
+								println("In context of " + e.ctxt.title + " " + e.ctxt.location);
+							}
+							
+							println("----");
+							printBindings(bindings);
+							println("----");
+						}
+						else
+						{
+							println("Use -verbose to see exception stack");
+						}
 					}
 				}
 				
 				long after = System.currentTimeMillis();
 				
-				if (result instanceof BooleanValue)
+				if (result == null)		// cancelled
+				{
+					println("----");
+					printBindings(bindings);
+					println("----");
+					println(po);
+				}
+				else if (result instanceof BooleanValue)
 				{
 					if (result.boolValue(ctxt))
 					{
@@ -462,9 +478,30 @@ public class QuickCheck
 	
 	private void printBindings(List<INBindingSetter> bindings)
 	{
+		int MAXVALUES = 10;
+		
 		for (INBindingSetter bind: bindings)
 		{
-			printf("%s = %s\n", bind, bind.getBindValues());
+			printf("%s = [", bind);
+			
+			ValueList list = bind.getBindValues();
+			int max = (list.size() > MAXVALUES) ? MAXVALUES : list.size();
+			String sep = "";
+			
+			for (int i=0; i<max; i++)
+			{
+				printf("%s%s", sep, list.get(i).toShortString(20));
+				sep = ", ";
+			}
+			
+			if (max < list.size())
+			{
+				printf("... (%d values)]\n", list.size());
+			}
+			else
+			{
+				printf("]\n");
+			}
 		}
 	}
 	
