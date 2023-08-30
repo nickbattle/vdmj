@@ -192,7 +192,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		{
 			try
 			{
-				result.add(new NaturalOneValue(a));
+				result.addNoSort(new NaturalOneValue(a));
 			}
 			catch (Exception e)
 			{
@@ -219,7 +219,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		{
 			try
 			{
-				result.add(new NaturalValue(a));
+				result.addNoSort(new NaturalValue(a));
 			}
 			catch (Exception e)
 			{
@@ -255,7 +255,7 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		{
 			try
 			{
-				result.add(new IntegerValue(a));
+				result.addNoSort(new IntegerValue(a));
 			}
 			catch (Exception e)
 			{

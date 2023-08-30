@@ -30,6 +30,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.debug.ConsoleDebugReader;
+import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
@@ -128,7 +130,34 @@ public class QuickCheckCommand extends AnalysisCommand
 				
 				if (!qc.hasErrors())
 				{
-					qc.checkObligation(po, results);
+					ConsoleKeyWatcher watcher = null;
+					ConsoleDebugReader dbg = null;
+					
+					try
+					{
+						dbg = new ConsoleDebugReader();
+						dbg.start();
+						watcher = new ConsoleKeyWatcher(line);
+						watcher.start();
+						
+						qc.checkObligation(po, results);
+					}
+					catch (Exception e)
+					{
+						println(e);
+					}
+					finally
+					{
+						if (watcher != null)
+						{
+							watcher.interrupt();
+						}
+						
+						if (dbg != null)
+						{
+							dbg.interrupt();
+						}
+					}
 				}
 			}
 		}
