@@ -47,6 +47,9 @@ public class Properties
 	/** Merge adjacent single line comments into a block */
 	public static boolean parser_merge_comments = false;
 	
+	/** Allow T! and mk_R! types */
+	public static boolean parser_maximal_types = false;
+	
 	/** The package list for annotation classes to load. */
 	public static String annotations_packages = "com.fujitsu.vdmj.ast.annotations;annotations.ast";
 	
@@ -179,6 +182,7 @@ public class Properties
 		parser_comment_nesting = get(vdmj, "vdmj.parser.comment_nesting", 3);
 		parser_external_readers = get(vdmj, "vdmj.parser.external_readers", null);
 		parser_merge_comments = get(vdmj, "vdmj.parser.merge_comments", false);
+		parser_maximal_types = get(vdmj, "vdmj.parser.maximal_types", false);
 
 		annotations_packages = get(vdmj, "vdmj.annotations.packages", "com.fujitsu.vdmj.ast.annotations;annotations.ast");
 		annotations_debug = get(vdmj, "vdmj.annotations.debug", false);

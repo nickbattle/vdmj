@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.tc.definitions;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -556,8 +557,18 @@ public class TCTypeDefinition extends TCDefinition
 		LexTokenReader ltr = new LexTokenReader(body, Dialect.VDM_SL);
 		ExpressionReader er = new ExpressionReader(ltr);
 		er.setCurrentModule(name.getModule());
-		ASTExpression ast = er.readExpression();
-		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+		boolean old = Properties.parser_maximal_types;
+		
+		try
+		{
+			Properties.parser_maximal_types = true;		// Allow T! types here
+			ASTExpression ast = er.readExpression();
+			return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+		}
+		finally
+		{
+			Properties.parser_maximal_types = old;
+		}
 	}
 
 	@Override

@@ -46,7 +46,7 @@ public class ASTMkTypeExpression extends ASTExpression
 	@Override
 	public String toString()
 	{
-		return "mk_" + typename + "(" + Utils.listToString(args) + ")";
+		return "mk_" + typename + (maximal ? "!" : "") + "(" + Utils.listToString(args) + ")";
 	}
 
 	@Override

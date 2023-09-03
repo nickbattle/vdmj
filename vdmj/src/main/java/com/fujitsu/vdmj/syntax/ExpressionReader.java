@@ -62,6 +62,7 @@ import com.fujitsu.vdmj.ast.types.ASTTokenType;
 import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.ast.types.ASTUnresolvedType;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -629,18 +630,20 @@ public class ExpressionReader extends SyntaxReader
 			switch (token.type)
     		{
 				case PLING:
-					if (Settings.release == Release.CLASSIC)
+					if (Properties.parser_maximal_types)
 					{
-						throwMessage(2335, "Maximal '!' not allowed in VDM classic", token);
+						if (maximal != null)
+						{
+							throwMessage(2335, "Maximal '!' not allowed here", token);	
+						}
+						
+						maximal = token;
+						nextToken();
 					}
-					
-					if (maximal != null)
+					else
 					{
-						throwMessage(2335, "Maximal '!' not allowed here", token);	
+						more = false;
 					}
-					
-					maximal = token;
-					nextToken();
 					break;
 					
     			case BRA:
