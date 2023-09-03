@@ -30,6 +30,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexToken;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -150,7 +151,10 @@ public class ProofObligationList extends Vector<ProofObligation>
 		LexTokenReader ltr = new LexTokenReader(obligation.getValue(), Dialect.VDM_PP);
 		ExpressionReader reader = new ExpressionReader(ltr);
 		reader.setCurrentModule(mname);
+		boolean old = Properties.parser_maximal_types;
+		Properties.parser_maximal_types = true;		// For parse of PO on inv_T2
 		ASTExpression ast = reader.readExpression();
+		Properties.parser_maximal_types = old;
 		LexToken end = ltr.getLast();
 		
 		if (!end.is(Token.EOF))
