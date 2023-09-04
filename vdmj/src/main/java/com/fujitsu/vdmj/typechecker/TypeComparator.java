@@ -985,7 +985,7 @@ public class TypeComparator
 				TCRecordType subr = (TCRecordType)sub;
 				TCRecordType supr = (TCRecordType)sup;
 
-				return subr.equals(supr) && sub.isMaximal() == sup.isMaximal() ? Result.Yes : Result.No;
+				return subr.equals(supr) && !(sub.isMaximal() && !sup.isMaximal()) ? Result.Yes : Result.No;
 			}
 			else if (sub instanceof TCClassType)
 			{
