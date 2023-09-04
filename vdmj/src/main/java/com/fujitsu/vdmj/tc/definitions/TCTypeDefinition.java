@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.visitors.TCDefinitionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
@@ -473,8 +474,8 @@ public class TCTypeDefinition extends TCDefinition
 	{
 		LexLocation loc = p1.location;
 		TCPatternList params = new TCPatternList();
-		params.add(new TCIdentifierPattern(new TCNameToken(loc, loc.module, "p1")));
-		params.add(new TCIdentifierPattern(new TCNameToken(loc, loc.module, "p2")));
+		params.add(new TCIdentifierPattern(new TCNameToken(loc, loc.module, "p1$")));
+		params.add(new TCIdentifierPattern(new TCNameToken(loc, loc.module, "p2$")));
 
 		TCPatternListList parameters = new TCPatternListList();
 		parameters.add(params);
@@ -494,8 +495,14 @@ public class TCTypeDefinition extends TCDefinition
 		try
 		{
 			TCType max = type.copy(true);
-			body = parse(String.format("let %s : %s = p1, %s : %s = p2 in %s",
-					p1.toSource(), max, p2.toSource(), max, exp));
+			
+			// We have to build the "let" expression, with the body of the eq/ord
+			// in the right LexLocation (for error reporting), so we build a "let"
+			// and then edit-in the original expression.
+			
+			String let = String.format("let %s : %s = p1$, %s : %s = p2$ in 0", p1.toSource(), max, p2.toSource(), max);
+			TCLetDefExpression ldef = (TCLetDefExpression) parse(let);
+			body = new TCLetDefExpression(ldef.location, ldef.localDefs, exp);
 		}
 		catch (Exception e)
 		{
@@ -528,6 +535,9 @@ public class TCTypeDefinition extends TCDefinition
 		TCFunctionType ftype = new TCFunctionType(loc, ptypes, true, new TCUnresolvedType(name));
 		TCExpression body = null;
 		
+		// We're not worried about the LexLocations here, because the expression is always
+		// valid (no errors to report). Compare getEqOrdDefinition above.
+		
 		try
 		{
 			if (isMin)
@@ -541,7 +551,7 @@ public class TCTypeDefinition extends TCDefinition
 		}
 		catch (Exception e)
 		{
-			// Never reached
+			throw new RuntimeException("Cannot process min/max clause " + location);
 		}
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier,
@@ -555,19 +565,20 @@ public class TCTypeDefinition extends TCDefinition
 	private TCExpression parse(String body) throws Exception
 	{
 		LexTokenReader ltr = new LexTokenReader(body, Dialect.VDM_SL);
-		ExpressionReader er = new ExpressionReader(ltr);
-		er.setCurrentModule(name.getModule());
 		boolean old = Properties.parser_maximal_types;
 		
 		try
 		{
 			Properties.parser_maximal_types = true;		// Allow T! types here
+			ExpressionReader er = new ExpressionReader(ltr);
+			er.setCurrentModule(location.module);
 			ASTExpression ast = er.readExpression();
 			return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
 		}
 		finally
 		{
 			Properties.parser_maximal_types = old;
+			ltr.close();
 		}
 	}
 
