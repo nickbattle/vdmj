@@ -39,7 +39,7 @@ import vdmj.commands.AnalysisCommand;
 
 public class QuickCheckLSPCommand extends AnalysisCommand
 {
-	public final static String CMD = "quickcheck [-?|-help][-p <name>]* [-<strategy:option>]* [<PO numbers>]";
+	public final static String CMD = "quickcheck [-?|-help][-p <strategy>]* [-<strategy:option>]* [<PO numbers>]";
 	private final static String USAGE = "Usage: " + CMD;
 	
 	public QuickCheckLSPCommand(String line)
