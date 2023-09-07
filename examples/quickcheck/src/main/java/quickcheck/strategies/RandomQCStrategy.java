@@ -24,7 +24,7 @@
 
 package quickcheck.strategies;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.util.HashMap;
@@ -45,6 +45,7 @@ public class RandomQCStrategy extends QCStrategy
 	private int numSetSize = 5;			// ie. size of sets for numeric types
 	private int expansionLimit = 20;	// Overall returned value limit
 	private long seed;
+	private int errorCount = 0;
 
 	public RandomQCStrategy(List<String> argv)
 	{
@@ -56,7 +57,7 @@ public class RandomQCStrategy extends QCStrategy
 			{
 				switch (argv.get(i))
 				{
-					case "-random:n":
+					case "-random:n":		// (0, ..., n}
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -85,15 +86,28 @@ public class RandomQCStrategy extends QCStrategy
 							argv.remove(i);
 						}
 						break;
+
+					default:
+						if (argv.get(i).startsWith("-random:"))
+						{
+							errorln("Unknown random option: " + argv.get(i));
+							errorln(help());
+							errorCount++;
+							argv.remove(i);
+						}
 				}
 			}
 			catch (NumberFormatException e)
 			{
-				println("Argument must be numeric");
+				errorln("Argument must be numeric");
+				errorln(help());
+				errorCount++;
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
-				println("Missing argument");
+				errorln("Missing argument");
+				errorln(help());
+				errorCount++;
 			}
 		}
 		
@@ -111,7 +125,7 @@ public class RandomQCStrategy extends QCStrategy
 	@Override
 	public boolean hasErrors()
 	{
-		return false;
+		return errorCount  > 0;
 	}
 
 	@Override

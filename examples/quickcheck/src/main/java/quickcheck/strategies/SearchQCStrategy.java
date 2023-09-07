@@ -24,6 +24,8 @@
 
 package quickcheck.strategies;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,9 +41,22 @@ import quickcheck.visitors.SearchQCVisitor;
 
 public class SearchQCStrategy extends QCStrategy
 {
+	private int errorCount = 0;
+
 	public SearchQCStrategy(List<String> argv)
 	{
-		// No plugin arguments yet?
+		for (int i=0; i < argv.size(); i++)
+		{
+			// No plugin arguments yet?
+
+			if (argv.get(i).startsWith("-search:"))
+			{
+				errorln("Unknown search option: " + argv.get(i));
+				errorln(help());
+				errorCount ++;
+				argv.remove(i);
+			}
+		}
 	}
 	
 	@Override
@@ -53,7 +68,7 @@ public class SearchQCStrategy extends QCStrategy
 	@Override
 	public boolean hasErrors()
 	{
-		return false;
+		return errorCount > 0;
 	}
 
 	@Override

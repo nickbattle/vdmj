@@ -106,7 +106,11 @@ public class QuickCheck
 					Constructor<?> ctor = clazz.getDeclaredConstructor(List.class);
 					QCStrategy instance = (QCStrategy) ctor.newInstance((Object)argv);
 					
-					if ((names.isEmpty() && instance.useByDefault()) || names.contains(instance.getName()))
+					if (instance.hasErrors())
+					{
+						errorCount++;
+					}
+					else if ((names.isEmpty() && instance.useByDefault()) || names.contains(instance.getName()))
 					{
 						strategies.add(instance);
 						failed.remove(instance.getName());
@@ -137,7 +141,7 @@ public class QuickCheck
 			{
 				for (String name: failed)
 				{
-					println("Could not find strategy " + name);
+					errorln("Could not find strategy " + name);
 					errorCount++;
 				}
 			}
@@ -145,6 +149,7 @@ public class QuickCheck
 		catch (Throwable e)
 		{
 			errorln("Cannot load strategies: " + e);
+			errorCount++;
 		}
 	}
 	
@@ -252,7 +257,7 @@ public class QuickCheck
 				}
 				else
 				{
-					println("PO# " + n + " unknown. Must be between 1 and " + all.size());
+					errorln("PO# " + n + " unknown. Must be between 1 and " + all.size());
 					errorCount++;
 				}
 			}

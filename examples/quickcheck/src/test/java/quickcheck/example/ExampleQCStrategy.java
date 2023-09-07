@@ -24,8 +24,11 @@
 
 package quickcheck.example;
 
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
@@ -39,6 +42,7 @@ import quickcheck.strategies.Results;
 public class ExampleQCStrategy extends QCStrategy
 {
 	private boolean provedResult = false;
+	private int errorCount = 0;
 
 	public ExampleQCStrategy(List<String> argv)
 	{
@@ -57,6 +61,15 @@ public class ExampleQCStrategy extends QCStrategy
 						argv.remove(i);
 					}
 					break;
+					
+				default:
+					if (argv.get(i).startsWith("-example:"))
+					{
+						errorln("Unknown exmaple option: " + argv.get(i));
+						errorln(help());
+						errorCount++;
+						argv.remove(i);
+					}
 			}
 		}
 	}
@@ -70,7 +83,7 @@ public class ExampleQCStrategy extends QCStrategy
 	@Override
 	public boolean hasErrors()
 	{
-		return false;	// Called after init and getValues
+		return errorCount > 0;	// Called after init and getValues
 	}
 
 	@Override
@@ -82,7 +95,14 @@ public class ExampleQCStrategy extends QCStrategy
 	@Override
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		return new Results(provedResult, new HashMap<String, ValueSet>());
+		Map<String, ValueSet> values = new HashMap<String, ValueSet>();
+		
+		for (INBindingSetter bind: binds)
+		{
+			values.put(bind.toString(), new ValueSet());	// ie. nothing, for every bind
+		}
+		
+		return new Results(provedResult, values);
 	}
 
 	@Override

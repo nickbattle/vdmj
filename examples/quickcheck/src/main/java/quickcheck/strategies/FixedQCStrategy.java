@@ -102,7 +102,7 @@ public class FixedQCStrategy extends QCStrategy
 			{
 				switch (argv.get(i))
 				{
-					case "-fixed:f":
+					case "-fixed:f":		// Use this as ranges.qc
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -114,7 +114,7 @@ public class FixedQCStrategy extends QCStrategy
 						createFile = false;
 						break;
 						
-					case "-fixed:c":
+					case "-fixed:c":		// Create ranges.qc
 						argv.remove(i);
 						
 						if (i < argv.size())
@@ -136,7 +136,7 @@ public class FixedQCStrategy extends QCStrategy
 						}
 						break;
 						
-					case "-default:s":	// Total top level size
+					case "-fixed:s":		// Total top level size
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -145,17 +145,28 @@ public class FixedQCStrategy extends QCStrategy
 							argv.remove(i);
 						}
 						break;
+						
+					default:
+						if (argv.get(i).startsWith("-fixed:"))
+						{
+							errorln("Unknown fixed option: " + argv.get(i));
+							errorln(help());
+							errorCount++;
+							argv.remove(i);
+						}
 				}
 			}
 			catch (NumberFormatException e)
 			{
 				errorln("Argument must be numeric");
 				errorln(help());
+				errorCount++;
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
 				errorln("Missing argument");
 				errorln(help());
+				errorCount++;
 			}
 		}
 		
