@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package quickcheck.qcplugins;
+package quickcheck.strategies;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
@@ -83,7 +83,7 @@ import com.fujitsu.vdmj.values.ValueSet;
 import quickcheck.QuickCheck;
 import quickcheck.visitors.InternalRangeCreator;
 
-public class DefaultQCPlugin extends QCPlugin
+public class FixedQCStrategy extends QCStrategy
 {
 	private int numSetSize = 5;				// So nat/int/etc are {-5, ..., 5}
 	private int expansionLimit = 20;		// Top level binding value expansion limit
@@ -94,7 +94,7 @@ public class DefaultQCPlugin extends QCPlugin
 
 	private Map<String, ValueSet> allRanges = null;
 	
-	public DefaultQCPlugin(List<String> argv)
+	public FixedQCStrategy(List<String> argv)
 	{
 		for (int i=0; i < argv.size(); i++)
 		{
@@ -102,8 +102,7 @@ public class DefaultQCPlugin extends QCPlugin
 			{
 				switch (argv.get(i))
 				{
-					case "-f":
-					case "-default:f":
+					case "-fixed:f":
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -115,8 +114,7 @@ public class DefaultQCPlugin extends QCPlugin
 						createFile = false;
 						break;
 						
-					case "-c":
-					case "-default:c":
+					case "-fixed:c":
 						argv.remove(i);
 						
 						if (i < argv.size())
@@ -128,8 +126,7 @@ public class DefaultQCPlugin extends QCPlugin
 						createFile = true;
 						break;
 						
-					case "-n":			// {-n, ..., +n}
-					case "-default:n":
+					case "-fixed:n":		// {-n, ..., +n}
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -139,8 +136,7 @@ public class DefaultQCPlugin extends QCPlugin
 						}
 						break;
 						
-					case "-s":			// Total top level size
-					case "-default:s":
+					case "-default:s":	// Total top level size
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -163,9 +159,9 @@ public class DefaultQCPlugin extends QCPlugin
 			}
 		}
 		
-		verbose("default:n = %d\n", numSetSize);
-		verbose("default:s = %d\n", expansionLimit);
-		verbose("default:f = %s\n", rangesFile);
+		verbose("fixed:n = %d\n", numSetSize);
+		verbose("fixed:s = %d\n", expansionLimit);
+		verbose("fixed:f = %s\n", rangesFile);
 	}
 	
 	@Override
@@ -384,7 +380,7 @@ public class DefaultQCPlugin extends QCPlugin
 	@Override
 	public String getName()
 	{
-		return "default";
+		return "fixed";
 	}
 
 	@Override
@@ -436,12 +432,12 @@ public class DefaultQCPlugin extends QCPlugin
 	@Override
 	public String help()
 	{
-		return getName() + " [-f <file> | -c <file>][-n <size>][-s <size>]";
+		return getName() + " [-fixed:f <file> | -fixed:c <file>][-fixed:n <size>][-fixed:s <size>]";
 	}
 
 	@Override
 	public boolean useByDefault()
 	{
-		return true;	// Use if no -p given
+		return false;	// Use if no -p given
 	}
 }

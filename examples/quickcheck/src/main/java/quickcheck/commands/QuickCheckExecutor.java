@@ -35,7 +35,7 @@ import dap.DAPRequest;
 import dap.DAPResponse;
 import json.JSONObject;
 import quickcheck.QuickCheck;
-import quickcheck.qcplugins.Results;
+import quickcheck.strategies.Results;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
 
@@ -72,7 +72,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 			return;
 		}
 		
-		if (qc.initPlugins())
+		if (qc.initStrategies())
 		{
 			for (ProofObligation po: chosen)
 			{

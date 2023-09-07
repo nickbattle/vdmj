@@ -33,17 +33,17 @@ import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
-import quickcheck.qcplugins.QCPlugin;
-import quickcheck.qcplugins.Results;
+import quickcheck.strategies.QCStrategy;
+import quickcheck.strategies.Results;
 
-public class ExampleQCPlugin extends QCPlugin
+public class ExampleQCStrategy extends QCStrategy
 {
 	private boolean provedResult = false;
 
-	public ExampleQCPlugin(List<String> argv)
+	public ExampleQCStrategy(List<String> argv)
 	{
 		// Remove your "qc" plugin arguments from the list here
-		// It's useful to include the plugin name, like "-example:n"
+		// It's useful to include the strategy name, like "-example:n"
 		for (int i=0; i < argv.size(); i++)
 		{
 			switch (argv.get(i))

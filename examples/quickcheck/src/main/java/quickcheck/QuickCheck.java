@@ -59,16 +59,16 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
-import quickcheck.qcplugins.QCPlugin;
-import quickcheck.qcplugins.Results;
+import quickcheck.strategies.QCStrategy;
+import quickcheck.strategies.Results;
 import quickcheck.visitors.InternalRangeCreator;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
 	private int errorCount = 0;
-	private List<QCPlugin> plugins = null;		// Configured to be used
-	private List<QCPlugin> disabled = null;		// Known, but not to be used
+	private List<QCStrategy> strategies = null;		// Configured to be used
+	private List<QCStrategy> disabled = null;		// Known, but not to be used
 	private ProofObligationList chosen = null;
 	
 	public QuickCheck()
@@ -86,17 +86,17 @@ public class QuickCheck
 		errorCount = 0;
 	}
 	
-	public void loadPlugins(List<String> argv)
+	public void loadStrategies(List<String> argv)
 	{
-		plugins = new Vector<QCPlugin>();
-		disabled = new Vector<QCPlugin>();
+		strategies = new Vector<QCStrategy>();
+		disabled = new Vector<QCStrategy>();
 		errorCount = 0;
 		
 		try
 		{
-			List<String> names = pluginNames(argv);
+			List<String> names = strategyNames(argv);
 			List<String> failed = new Vector<String>(names);
-			List<String> classnames = GetResource.readResource("qc.plugins");
+			List<String> classnames = GetResource.readResource("qc.strategies");
 			
 			for (String classname: classnames)
 			{
@@ -104,11 +104,11 @@ public class QuickCheck
 				{
 					Class<?> clazz = Class.forName(classname);
 					Constructor<?> ctor = clazz.getDeclaredConstructor(List.class);
-					QCPlugin instance = (QCPlugin) ctor.newInstance((Object)argv);
+					QCStrategy instance = (QCStrategy) ctor.newInstance((Object)argv);
 					
 					if ((names.isEmpty() && instance.useByDefault()) || names.contains(instance.getName()))
 					{
-						plugins.add(instance);
+						strategies.add(instance);
 						failed.remove(instance.getName());
 					}
 					else
@@ -118,17 +118,17 @@ public class QuickCheck
 				}
 				catch (ClassNotFoundException e)
 				{
-					errorln("Cannot find plugin class: " + classname);
+					errorln("Cannot find strategy class: " + classname);
 					errorCount++;
 				}
 				catch (NoSuchMethodException e)
 				{
-					errorln("Plugin " + classname + " must implement ctor(List<String> argv)");
+					errorln("Strategy " + classname + " must implement ctor(List<String> argv)");
 					errorCount++;
 				}
 				catch (Throwable th)
 				{
-					errorln("Plugin " + classname + ": " + th.toString());
+					errorln("Strategy " + classname + ": " + th.toString());
 					errorCount++;
 				}
 			}
@@ -137,51 +137,51 @@ public class QuickCheck
 			{
 				for (String name: failed)
 				{
-					println("Could not find plugin " + name);
+					println("Could not find strategy " + name);
 					errorCount++;
 				}
 			}
 		}
 		catch (Throwable e)
 		{
-			errorln("Cannot load plugins: " + e);
+			errorln("Cannot load strategies: " + e);
 		}
 	}
 	
-	public boolean initPlugins()
+	public boolean initStrategies()
 	{
 		boolean doChecks = true;
 		
-		for (QCPlugin plugin: plugins)
+		for (QCStrategy strategy: strategies)
 		{
-			doChecks = doChecks && plugin.init(this);
+			doChecks = doChecks && strategy.init(this);
 			
-			if (plugin.hasErrors())
+			if (strategy.hasErrors())
 			{
-				errorln("QCPlugin init failed: " + plugin.getName());
+				errorln("QCStrategy init failed: " + strategy.getName());
 			}
 			else
 			{
-				verbose("QCPlugin %s initialized\n", plugin.getName());
+				verbose("QCStrategy %s initialized\n", strategy.getName());
 			}
 		}
 
 		return doChecks;
 	}
 	
-	public List<QCPlugin> getEnabledPlugins()
+	public List<QCStrategy> getEnabledStrategies()
 	{
-		return plugins;
+		return strategies;
 	}
 	
-	public List<QCPlugin> getDisabledPlugins()
+	public List<QCStrategy> getDisabledStrategies()
 	{
 		return disabled;
 	}
 	
-	public List<QCPlugin> getAllPlugins()	// Enabled and disabled
+	public List<QCStrategy> getAllStrategies()	// Enabled and disabled
 	{
-		List<QCPlugin> all = new Vector<QCPlugin>(plugins);
+		List<QCStrategy> all = new Vector<QCStrategy>(strategies);
 		all.addAll(disabled);
 		return all;
 	}
@@ -191,7 +191,7 @@ public class QuickCheck
 		return chosen;
 	}
 	
-	public List<String> pluginNames(List<String> arglist)
+	public List<String> strategyNames(List<String> arglist)
 	{
 		List<String> names = new Vector<String>();
 		Iterator<String> iter = arglist.iterator();
@@ -212,7 +212,7 @@ public class QuickCheck
 				}
 				else
 				{
-					errorln("-p must be followed by a plugin name");
+					errorln("-p must be followed by a strategy name");
 					names.add("unknown");
 				}
 			}
@@ -295,9 +295,9 @@ public class QuickCheck
 		INExpression exp = getINExpression(po);
 		List<INBindingSetter> binds = getINBindList(exp);
 		
-		for (QCPlugin plugin: plugins)
+		for (QCStrategy strategy: strategies)
 		{
-			Results presults = plugin.getValues(po, exp, binds);
+			Results presults = strategy.getValues(po, exp, binds);
 			Map<String, ValueSet> cexamples = presults.counterexamples;
 			
 			for (String bind: cexamples.keySet())

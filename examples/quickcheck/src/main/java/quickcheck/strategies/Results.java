@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package quickcheck.qcplugins;
+package quickcheck.strategies;
 
 import java.util.Map;
 

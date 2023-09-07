@@ -39,12 +39,12 @@ import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
 import quickcheck.QuickCheck;
-import quickcheck.qcplugins.QCPlugin;
-import quickcheck.qcplugins.Results;
+import quickcheck.strategies.QCStrategy;
+import quickcheck.strategies.Results;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-p <name>]* [-<plugin:option>]* [<PO numbers>]";
+	private final static String CMD = "quickcheck [-?|-help][-p <name>]* [-<strategy:option>]* [<PO numbers>]";
 	private final static String USAGE = "Usage: " + CMD;
 			
 	public QuickCheckCommand(String line)
@@ -65,11 +65,11 @@ public class QuickCheckCommand extends AnalysisCommand
 
 		List<String> arglist = new Vector<String>(Arrays.asList(argv));
 		arglist.remove(0);	// "qc"
-		qc.loadPlugins(arglist);
+		qc.loadStrategies(arglist);
 		
 		if (qc.hasErrors())
 		{
-			return "Failed to load QC plugins";
+			return "Failed to load QC strategies";
 		}
 
 		for (String arg: arglist)	// Should just be POs, or -? -help
@@ -81,20 +81,20 @@ public class QuickCheckCommand extends AnalysisCommand
 					case "-?":
 					case "-help":
 						println(USAGE);
-						println("Enabled plugins:");
+						println("Enabled strategies:");
 						
-						for (QCPlugin plugin: qc.getEnabledPlugins())
+						for (QCStrategy strategy: qc.getEnabledStrategies())
 						{
-							println("  " + plugin.help());
+							println("  " + strategy.help());
 						}
 						
-						if (!qc.getDisabledPlugins().isEmpty())
+						if (!qc.getDisabledStrategies().isEmpty())
 						{
-							println("Disabled plugins (add with -p<name>):");
+							println("Disabled strategies (add with -p <name>):");
 							
-							for (QCPlugin plugin: qc.getDisabledPlugins())
+							for (QCStrategy strategy: qc.getDisabledStrategies())
 							{
-								println("  " + plugin.help());
+								println("  " + strategy.help());
 							}
 						}
 						
@@ -122,7 +122,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			return "Failed to find POs";
 		}
 		
-		if (qc.initPlugins())
+		if (qc.initStrategies())
 		{
 			for (ProofObligation po: chosen)
 			{

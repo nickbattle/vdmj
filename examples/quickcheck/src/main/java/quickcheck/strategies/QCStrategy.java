@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package quickcheck.qcplugins;
+package quickcheck.strategies;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ import com.fujitsu.vdmj.pog.ProofObligation;
 
 import quickcheck.QuickCheck;
 
-abstract public class QCPlugin
+abstract public class QCStrategy
 {
 	abstract public String getName();
 	abstract public boolean hasErrors();

@@ -22,10 +22,7 @@
  *
  ******************************************************************************/
 
-package quickcheck.qcplugins;
-
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+package quickcheck.strategies;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,65 +30,24 @@ import java.util.List;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.runtime.RootContext;
+import com.fujitsu.vdmj.values.NameValuePair;
+import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
-import quickcheck.visitors.RandomRangeCreator;
+import quickcheck.visitors.SearchQCVisitor;
 
-public class RandomQCPlugin extends QCPlugin
+public class SearchQCStrategy extends QCStrategy
 {
-	private int numSetSize = 5;			// ie. size of sets for numeric types
-	private int expansionLimit = 20;	// Overall returned value limit
-
-	public RandomQCPlugin(List<String> argv)
+	public SearchQCStrategy(List<String> argv)
 	{
-		for (int i=0; i < argv.size(); i++)
-		{
-			try
-			{
-				switch (argv.get(i))
-				{
-					case "-random:n":
-						argv.remove(i);
-
-						if (i < argv.size())
-						{
-							numSetSize = Integer.parseInt(argv.get(i));
-							argv.remove(i);
-						}
-						break;
-						
-					case "-random:s":		// Total top level size
-						argv.remove(i);
-
-						if (i < argv.size())
-						{
-							expansionLimit = Integer.parseInt(argv.get(i));
-							argv.remove(i);
-						}
-						break;
-				}
-			}
-			catch (NumberFormatException e)
-			{
-				println("Argument must be numeric");
-			}
-			catch (ArrayIndexOutOfBoundsException e)
-			{
-				println("Missing argument");
-			}
-		}
-		
-		verbose("random:n = %d\n", numSetSize);
-		verbose("random:s = %d\n", expansionLimit);
+		// No plugin arguments yet?
 	}
 	
 	@Override
 	public String getName()
 	{
-		return "random";
+		return "search";
 	}
 
 	@Override
@@ -110,17 +66,32 @@ public class RandomQCPlugin extends QCPlugin
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		HashMap<String, ValueSet> result = new HashMap<String, ValueSet>();
-		
+
 		if (po.isCheckable)
 		{
-			RootContext ctxt = Interpreter.getInstance().getInitialContext();
-			long seed = 1234;
+			NameValuePairList nvps = po.getCheckedExpression().apply(new SearchQCVisitor(), null);
 			
-			for (INBindingSetter bind: binds)
+			for (NameValuePair pair: nvps)
 			{
-				RandomRangeCreator visitor = new RandomRangeCreator(ctxt, numSetSize, seed++);
-				ValueSet values = bind.getType().apply(visitor, expansionLimit);
-				result.put(bind.toString(), values);
+				for (INBindingSetter bind: binds)
+				{
+					String key = bind.toString();
+					
+					// HACK! Only works for single name binds
+					if (key.equals(pair.name.getName() + ":" + bind.getType()))	// eg. "a:T" = "a" +":" + "T"
+					{
+						if (result.containsKey(key))
+						{
+							ValueSet current = result.get(key);
+							current.add(pair.value);
+						}
+						else
+						{
+							result.put(key, new ValueSet(pair.value));
+						}
+						break;
+					}
+				}
 			}
 		}
 		
@@ -130,12 +101,12 @@ public class RandomQCPlugin extends QCPlugin
 	@Override
 	public String help()
 	{
-		return getName() + " [-random:n <size>][-random:s <size>]";
+		return getName() + " (no options)";
 	}
 
 	@Override
 	public boolean useByDefault()
 	{
-		return false;	// Don't use if no -p given
+		return true;	// Use if no -p given
 	}
 }
