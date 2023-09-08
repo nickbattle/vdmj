@@ -61,7 +61,7 @@ import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.Results;
-import quickcheck.visitors.InternalRangeCreator;
+import quickcheck.visitors.FixedRangeCreator;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
@@ -324,9 +324,9 @@ public class QuickCheck
 		{
 			if (!union.containsKey(bind.toString()))
 			{
-				// Generate some values for missing bindings, using the default method
+				// Generate some values for missing bindings, using the fixed method
 				RootContext ctxt = Interpreter.getInstance().getInitialContext();
-				ValueSet values = bind.getType().apply(new InternalRangeCreator(ctxt, 10), 10);
+				ValueSet values = bind.getType().apply(new FixedRangeCreator(ctxt), 10);
 				union.put(bind.toString(), values);
 			}
 		}

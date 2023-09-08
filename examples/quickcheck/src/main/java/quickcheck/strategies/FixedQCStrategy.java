@@ -81,11 +81,10 @@ import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
-import quickcheck.visitors.InternalRangeCreator;
+import quickcheck.visitors.FixedRangeCreator;
 
 public class FixedQCStrategy extends QCStrategy
 {
-	private int numSetSize = 5;				// So nat/int/etc are {-5, ..., 5}
 	private int expansionLimit = 20;		// Top level binding value expansion limit
 	
 	private int errorCount = 0;
@@ -126,16 +125,6 @@ public class FixedQCStrategy extends QCStrategy
 						createFile = true;
 						break;
 						
-					case "-fixed:n":		// {-n, ..., +n}
-						argv.remove(i);
-
-						if (i < argv.size())
-						{
-							numSetSize = Integer.parseInt(argv.get(i));
-							argv.remove(i);
-						}
-						break;
-						
 					case "-fixed:s":		// Total top level size
 						argv.remove(i);
 
@@ -170,7 +159,6 @@ public class FixedQCStrategy extends QCStrategy
 			}
 		}
 		
-		verbose("fixed:n = %d\n", numSetSize);
 		verbose("fixed:s = %d\n", expansionLimit);
 		verbose("fixed:f = %s\n", rangesFile);
 	}
@@ -290,7 +278,7 @@ public class FixedQCStrategy extends QCStrategy
 				{
 					IntegerValue ivalue = (IntegerValue)value;
 					int limit = (int) ivalue.value;
-					ranges.put(key, tctypes.get(i).apply(new InternalRangeCreator(ctxt, numSetSize), limit));
+					ranges.put(key, tctypes.get(i).apply(new FixedRangeCreator(ctxt), limit));
 				}
 				else
 				{
@@ -443,7 +431,7 @@ public class FixedQCStrategy extends QCStrategy
 	@Override
 	public String help()
 	{
-		return getName() + " [-fixed:f <file> | -fixed:c <file>][-fixed:n <size>][-fixed:s <size>]";
+		return getName() + " [-fixed:f <file> | -fixed:c <file>][-fixed:s <size>]";
 	}
 
 	@Override

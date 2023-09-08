@@ -85,23 +85,21 @@ import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueMap;
 import com.fujitsu.vdmj.values.ValueSet;
 
-public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
+public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 {
-	private final int numSetSize;	// {1, ..., N} for numerics
 	private final Context ctxt;
 	private final TCTypeSet done;
 	
-	public InternalRangeCreator(Context ctxt, int numSetSize)
+	public FixedRangeCreator(Context ctxt)
 	{
 		this.ctxt = ctxt;
-		this.numSetSize = numSetSize;
 		this.done = new TCTypeSet();
 	}
 
 	@Override
 	public ValueSet caseType(TCType type, Integer limit)
 	{
-		throw new RuntimeException("QuickCheck: Missing InternalRangeCreator case for " + type);
+		throw new RuntimeException("QuickCheck: Missing FixedRangeCreator case for " + type);
 	}
 	
 	@Override
@@ -131,23 +129,28 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseCharacterType(TCCharacterType node, Integer limit)
 	{
-		switch (limit)
+		String alphabet = "abcdefghijklmnopqrstuvwxyz";
+		ValueSet result = new ValueSet();
+		
+		for (int i=0; i<alphabet.length() && i < limit; i++)
 		{
-			case 0:		return new ValueSet();
-			case 1:		return new ValueSet(new CharacterValue('a'));
-			default:	return new ValueSet(new CharacterValue('a'), new CharacterValue('b'));
+			result.add(new CharacterValue(alphabet.charAt(i)));
 		}
+		
+		return result;
 	}
 	
 	@Override
 	public ValueSet caseTokenType(TCTokenType node, Integer limit)
 	{
-		switch (limit)
+		ValueSet result = new ValueSet();
+		
+		for (int i=0; i < limit; i++)
 		{
-			case 0:		return new ValueSet();
-			case 1:		return new ValueSet(new TokenValue(new IntegerValue(1)));
-			default:	return new ValueSet(new TokenValue(new IntegerValue(1)), new TokenValue(new IntegerValue(2)));
+			result.add(new TokenValue(new IntegerValue(i)));
 		}
+		
+		return result;
 	}
 	
 	@Override
@@ -179,16 +182,9 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseNaturalOneType(TCNaturalOneType node, Integer limit)
 	{
-		int to = numSetSize;
-
-		if (limit < numSetSize)
-		{
-			to = limit;
-		}
-
 		ValueSet result = new ValueSet();
 		
-		for (long a = 1; a <= to; a++)
+		for (long a = 1; a <= limit; a++)
 		{
 			try
 			{
@@ -206,16 +202,9 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseNaturalType(TCNaturalType node, Integer limit)
 	{
-		int to = numSetSize - 1;
-		
-		if (limit < numSetSize - 1)
-		{
-			to = limit - 1;
-		}
-
 		ValueSet result = new ValueSet();
 		
-		for (long a = 0; a <= to; a++)
+		for (long a = 0; a < limit; a++)
 		{
 			try
 			{
@@ -233,37 +222,24 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseIntegerType(TCIntegerType node, Integer limit)
 	{
-		int from = 0;
-		int to = 0;
-		
-		if (limit < numSetSize * 2 + 1)
-		{
-			int half = limit / 2;		// eg. 5/2=2 => {-2, -1, 0, 1, 2}
-			if (half == 0) half = 1;
-			from = -half;
-			to = half;
-		}
-		else
-		{
-			from = -numSetSize;
-			to = numSetSize;
-		}
-
 		ValueSet result = new ValueSet();
 		
-		for (long a = from; a <= to; a++)
+		switch (limit)
 		{
-			try
-			{
-				result.addNoSort(new IntegerValue(a));
-			}
-			catch (Exception e)
-			{
-				// Can't happen
-			}
-		}
+			case 0:		return new ValueSet();
+			case 1:		return new ValueSet(new IntegerValue(0));
+			default:
+				int a = -limit/2;
+				result.addNoSort(new IntegerValue(a++));
+				
+				while (result.size() < limit)
+				{
+					result.addNoSort(new IntegerValue(a));
+					a++;
+				}
 		
-		return result;
+				return result;
+		}
 	}
 
 	@Override
@@ -558,11 +534,45 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseUnionType(TCUnionType node, Integer limit)
 	{
-		ValueSet union = new ValueSet();
+		int size = node.types.size();
+		ValueSet[] values = new ValueSet[size];
+		int count = 0;
+		int sum = 0;
 		
 		for (TCType type: node.types)
 		{
-			union.addAll(type.apply(this, limit));
+			ValueSet vs = type.apply(this, limit);
+			sum = sum + vs.size();
+			values[count] = vs;
+			count++;
+		}
+		
+		ValueSet union = new ValueSet();
+
+		if (sum < limit)	// use them all
+		{
+			for (ValueSet vs: values)
+			{
+				union.addAll(vs);
+			}
+		}
+		else
+		{
+			count = 0;
+			int i = 0;	// array index
+			int j = 0;	// value index
+			
+			while (count < limit)
+			{
+				if (j < values[i].size())
+				{
+					union.add(values[i].get(j));
+					count++;
+				}
+				
+				i = (i + 1) % size;
+				if (i == 0) j++;
+			}
 		}
 		
 		return union;
@@ -571,12 +581,11 @@ public class InternalRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	private ValueSet realLimit(Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		int from = -numSetSize;
-		int to = numSetSize;
+		int size = (int) Math.floor(Math.sqrt(limit)) + 1;
 		
-		for (double a = from; a <= to; a++)
+		for (double a = -size; a <= size; a++)
 		{
-			for (double b = from; b <= to; b++)
+			for (double b = -size; b <= size; b++)
 			{
 				if (b != 0)
 				{
