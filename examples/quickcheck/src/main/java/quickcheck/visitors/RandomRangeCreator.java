@@ -447,7 +447,8 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		int fromSize = fromValues.size();
 		int toSize = toValues.size();
-		long count = 0;
+		results.add(new MapValue());	// empty map
+		long count = 1;
 		
 		out: for (int ds=1; ds<=fromSize; ds++)		// map domain sizes
 		{
@@ -472,7 +473,6 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			}
 		}
 		
-		results.add(new MapValue());	// empty map
 		return results;
 	}
 	
@@ -615,7 +615,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 				count++;
 			}
 			
-			for (int ss: randomOrder(size))
+			for (int ss = 3; ss <= size; ss++)	// Avoid very small sets?
 			{
 				for (int[] kc: new KCombinator(size, ss))
 				{
@@ -638,8 +638,11 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	
 		return results;
 	}
-	
-	private int[] randomOrder(int size)
+
+	/**
+	 * Not used... 
+	 */
+	protected int[] randomOrder(int size)
 	{
 		int[] result = new int[size];
 		
