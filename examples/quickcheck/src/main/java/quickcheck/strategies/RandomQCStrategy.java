@@ -42,7 +42,6 @@ import quickcheck.visitors.RandomRangeCreator;
 
 public class RandomQCStrategy extends QCStrategy
 {
-	private int numSetSize = 5;			// ie. size of sets for numeric types
 	private int expansionLimit = 20;	// Overall returned value limit
 	private long seed;
 	private int errorCount = 0;
@@ -57,16 +56,6 @@ public class RandomQCStrategy extends QCStrategy
 			{
 				switch (argv.get(i))
 				{
-					case "-random:n":		// (0, ..., n}
-						argv.remove(i);
-
-						if (i < argv.size())
-						{
-							numSetSize = Integer.parseInt(argv.get(i));
-							argv.remove(i);
-						}
-						break;
-						
 					case "-random:s":		// Total top level size
 						argv.remove(i);
 
@@ -111,7 +100,6 @@ public class RandomQCStrategy extends QCStrategy
 			}
 		}
 		
-		verbose("random:n = %d\n", numSetSize);
 		verbose("random:s = %d\n", expansionLimit);
 		verbose("random:r = %d\n", seed);
 	}
@@ -145,7 +133,7 @@ public class RandomQCStrategy extends QCStrategy
 			
 			for (INBindingSetter bind: binds)
 			{
-				RandomRangeCreator visitor = new RandomRangeCreator(ctxt, numSetSize, seed++);
+				RandomRangeCreator visitor = new RandomRangeCreator(ctxt, seed++);
 				ValueSet values = bind.getType().apply(visitor, expansionLimit);
 				result.put(bind.toString(), values);
 			}
@@ -157,7 +145,7 @@ public class RandomQCStrategy extends QCStrategy
 	@Override
 	public String help()
 	{
-		return getName() + " [-random:n <size>][-random:s <size>][-random:r <seed>]";
+		return getName() + " [-random:s <size>][-random:r <seed>]";
 	}
 
 	@Override

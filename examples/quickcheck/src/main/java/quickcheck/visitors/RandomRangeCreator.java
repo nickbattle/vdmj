@@ -87,15 +87,13 @@ import com.fujitsu.vdmj.values.ValueSet;
 
 public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 {
-	private final int numSetSize;	// {1, ..., N} for numerics
 	private final Context ctxt;
 	private final TCTypeSet done;
 	private final Random prng;
 	
-	public RandomRangeCreator(Context ctxt, int numSetSize, long seed)
+	public RandomRangeCreator(Context ctxt, long seed)
 	{
 		this.ctxt = ctxt;
-		this.numSetSize = numSetSize;
 		this.done = new TCTypeSet();
 		this.prng = new Random(seed);
 	}
@@ -209,10 +207,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	public ValueSet caseNaturalOneType(TCNaturalOneType node, Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		long num = limit < numSetSize ? limit : numSetSize;
 		int bound = 10;		// Bias numbers to close to zero
 		
-		for (long a = 0; a < num; a++)
+		for (long a = 0; a < limit; a++)
 		{
 			try
 			{
@@ -232,10 +229,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	public ValueSet caseNaturalType(TCNaturalType node, Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		long num = limit < numSetSize ? limit : numSetSize;
 		int bound = 10;		// Bias numbers to close to zero
 		
-		for (long a = 0; a < num; a++)
+		for (long a = 0; a < limit; a++)
 		{
 			try
 			{
@@ -255,10 +251,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	public ValueSet caseIntegerType(TCIntegerType node, Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		long num = limit < numSetSize ? limit : numSetSize;
 		int bound = 10;		// Bias numbers to close to zero
 		
-		for (long a = 0; a < num; a++)
+		for (long a = 0; a < limit; a++)
 		{
 			try
 			{
@@ -579,10 +574,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	private ValueSet realLimit(Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		long num = limit < numSetSize ? limit : numSetSize;
 		int bound = 10;		// Bias values to be close to zero
 		
-		for (long a = 0; a < num; a++)
+		for (long a = 0; a < limit; a++)
 		{
 			try
 			{

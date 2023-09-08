@@ -392,7 +392,17 @@ public class FixedQCStrategy extends QCStrategy
 		}
 		else
 		{
-			allRanges = readRangeFile(rangesFile);
+			if (new File(rangesFile).exists())
+			{
+				println("Using ranges file " + rangesFile);
+				allRanges = readRangeFile(rangesFile);
+			}
+			else
+			{
+				println("Did not find " + rangesFile + " (see -fixed:c option)");
+				allRanges = new HashMap<String, ValueSet>();
+			}
+			
 			return !hasErrors();
 		}
 	}
@@ -408,14 +418,9 @@ public class FixedQCStrategy extends QCStrategy
 			{
 				String key = bind.toString();
 				
-				if (allRanges.containsKey(key))
+				if (allRanges.containsKey(key))		// else a default created later
 				{
 					values.put(key, allRanges.get(key));
-				}
-				else
-				{
-					// Value(s) created in QuickCheck using default method
-					errorln("WARNING: Ranges file has no values for " + key);
 				}
 			}
 		}
