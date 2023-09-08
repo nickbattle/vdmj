@@ -28,9 +28,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexToken;
-import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
@@ -146,8 +146,8 @@ public class ProofObligationList extends Vector<ProofObligation>
 
 	private void typeCheck(ProofObligation obligation, String mname, Environment env) throws Exception
 	{
-		// Some POs from VDM++ specs can include "new" etc, so parse as VDM++
-		LexTokenReader ltr = new LexTokenReader(obligation.getValue(), Dialect.VDM_PP);
+		// Some POs from VDM++ specs can include "new" etc, so parse as the given dialect
+		LexTokenReader ltr = new LexTokenReader(obligation.getValue(), Settings.dialect);
 		ExpressionReader reader = new ExpressionReader(ltr);
 		reader.setCurrentModule(mname);
 		ASTExpression ast = reader.readExpression();
