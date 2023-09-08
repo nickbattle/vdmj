@@ -28,6 +28,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
+import com.fujitsu.vdmj.in.expressions.INIntegerLiteralExpression;
+import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
@@ -64,15 +67,19 @@ import com.fujitsu.vdmj.util.KCombinator;
 import com.fujitsu.vdmj.util.KPermutor;
 import com.fujitsu.vdmj.util.Selector;
 import com.fujitsu.vdmj.values.BooleanValue;
+import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.CharacterValue;
 import com.fujitsu.vdmj.values.FieldMap;
 import com.fujitsu.vdmj.values.FieldValue;
+import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.InvariantValue;
 import com.fujitsu.vdmj.values.MapValue;
+import com.fujitsu.vdmj.values.NameValuePairMap;
 import com.fujitsu.vdmj.values.NaturalOneValue;
 import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.NilValue;
+import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.QuoteValue;
 import com.fujitsu.vdmj.values.RealValue;
 import com.fujitsu.vdmj.values.RecordValue;
@@ -105,7 +112,8 @@ public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseClassType(TCClassType node, Integer limit)
 	{
-		return new ValueSet();	// Can't generate objects!
+		ObjectValue obj = new ObjectValue(node, new NameValuePairMap(), new Vector<ObjectValue>(), CPUValue.vCPU, null);
+		return new ValueSet(obj);
 	}
 
 	@Override
@@ -257,7 +265,9 @@ public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseFunctionType(TCFunctionType node, Integer arg)
 	{
-		return new ValueSet();	// Can't generate functions!
+		FunctionValue dummy = new FunctionValue(LexLocation.ANY, "dummy", node,
+				new INPatternList(), new INIntegerLiteralExpression(new LexIntegerToken(0, LexLocation.ANY)), null);
+		return new ValueSet(dummy);
 	}
 
 	@Override
@@ -270,12 +280,18 @@ public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		ValueSet invs = new ValueSet();
 		done.add(type);
+		int count = 0;
 		
 		for (Value v: type.type.apply(this, limit))
 		{
 			try
 			{
 				invs.add(new InvariantValue(type, v, ctxt));
+				
+				if (++count > limit)
+				{
+					break;
+				}
 			}
 			catch (ValueException e)
 			{
@@ -646,7 +662,9 @@ public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 				count++;
 			}
 			
-			for (int ss=3; ss <= size; ss++)	// Avoid small sets?
+			int from = (size > 3) ? 3 : size;	// Avoid very small sets?
+			
+			for (int ss = from; ss <= size; ss++)
 			{
 				for (int[] kc: new KCombinator(size, ss))
 				{
