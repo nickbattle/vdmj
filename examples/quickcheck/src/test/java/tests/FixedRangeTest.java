@@ -42,7 +42,7 @@ import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.visitors.FixedRangeCreator;
 
-public class FixRangeTest
+public class FixedRangeTest
 {
 	@Test
 	public void testCharacter()
