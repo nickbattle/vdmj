@@ -52,7 +52,7 @@ public class ExampleQCStrategy extends QCStrategy
 		{
 			switch (argv.get(i))
 			{
-				case "-example:r":
+				case "-example:proved":
 					argv.remove(i);
 
 					if (i < argv.size())
@@ -102,13 +102,13 @@ public class ExampleQCStrategy extends QCStrategy
 			values.put(bind.toString(), new ValueSet());	// ie. nothing, for every bind
 		}
 		
-		return new Results(provedResult, values);
+		return new Results(provedResult, values);	// NOTE proved flag!
 	}
 
 	@Override
 	public String help()
 	{
-		return getName() + " [-example:r <bool>]";
+		return getName() + " [-example:proved <bool>]";
 	}
 
 	@Override

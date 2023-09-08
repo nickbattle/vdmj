@@ -303,11 +303,15 @@ public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		done.add(node);
 		
-		// Size will be the product of all fields, ie. limit ^ N. So we set root to the
-		// Nth root of limit for each field (or 1, minimally).
+		// Size will be the product of all fields, ie. limit ^ N. So we set limit2 to the
+		// so that it will just exceed this.
 		
-		int root = (int) Math.floor(Math.pow(limit, 1.0D/node.fields.size()));
-		if (root == 0) root = 1;
+		int limit2 = 1;
+		
+		while (Math.pow(node.fields.size(), limit2) < limit)
+		{
+			limit2++;
+		}
 		
 		ValueSet records = new ValueSet();
 		List<ValueSet> fvalues = new Vector<ValueSet>(node.fields.size());
@@ -316,7 +320,7 @@ public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		for (TCField field: node.fields)
 		{
-			ValueSet values = field.type.apply(this, root);
+			ValueSet values = field.type.apply(this, limit2);
 			fvalues.add(values);
 			fsizes[f++] = values.size();
 		}
@@ -420,7 +424,9 @@ public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		int fromSize = fromValues.size();
 		int toSize = toValues.size();
-		long count = 0;
+
+		results.add(new MapValue());	// empty map
+		long count = 1;
 		
 		out: for (int ds=1; ds<=fromSize; ds++)		// map domain sizes
 		{
@@ -445,7 +451,6 @@ public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			}
 		}
 		
-		results.add(new MapValue());	// empty map
 		return results;
 	}
 	
@@ -490,11 +495,15 @@ public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseProductType(TCProductType node, Integer limit)
 	{
-		// Size will be the product of all fields, ie. limit ^ N. So we set root to the
-		// Nth root of limit for each field (or 1, minimally).
+		// Size will be the product of all fields, ie. limit ^ N. So we set limit2 to the
+		// so that it will just exceed this.
 		
-		int root = (int) Math.floor(Math.pow(limit, 1.0D/node.types.size()));
-		if (root == 0) root = 1;
+		int limit2 = 1;
+		
+		while (Math.pow(node.types.size(), limit2) < limit)
+		{
+			limit2++;
+		}
 		
 		ValueSet records = new ValueSet();
 		List<ValueSet> fvalues = new Vector<ValueSet>(node.types.size());
@@ -503,7 +512,7 @@ public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		for (TCType field: node.types)
 		{
-			ValueSet values = field.apply(this, root);
+			ValueSet values = field.apply(this, limit2);
 			fvalues.add(values);
 			fsizes[f++] = values.size();
 		}
@@ -637,7 +646,7 @@ public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 				count++;
 			}
 			
-			for (int ss=size; ss>0; ss--)
+			for (int ss=3; ss <= size; ss++)	// Avoid small sets?
 			{
 				for (int[] kc: new KCombinator(size, ss))
 				{

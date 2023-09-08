@@ -56,7 +56,7 @@ public class RandomQCStrategy extends QCStrategy
 			{
 				switch (argv.get(i))
 				{
-					case "-random:s":		// Total top level size
+					case "-random:size":		// Total top level size
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -66,7 +66,7 @@ public class RandomQCStrategy extends QCStrategy
 						}
 						break;
 						
-					case "-random:r":		// Seed
+					case "-random:seed":		// Seed
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -100,8 +100,8 @@ public class RandomQCStrategy extends QCStrategy
 			}
 		}
 		
-		verbose("random:s = %d\n", expansionLimit);
-		verbose("random:r = %d\n", seed);
+		verbose("random:size = %d\n", expansionLimit);
+		verbose("random:seed = %d\n", seed);
 	}
 	
 	@Override
@@ -145,7 +145,7 @@ public class RandomQCStrategy extends QCStrategy
 	@Override
 	public String help()
 	{
-		return getName() + " [-random:s <size>][-random:r <seed>]";
+		return getName() + " [-random:size <size>][-random:seed <seed>]";
 	}
 
 	@Override

@@ -101,7 +101,7 @@ public class FixedQCStrategy extends QCStrategy
 			{
 				switch (argv.get(i))
 				{
-					case "-fixed:f":		// Use this as ranges.qc
+					case "-fixed:file":			// Use this as ranges.qc
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -113,7 +113,7 @@ public class FixedQCStrategy extends QCStrategy
 						createFile = false;
 						break;
 						
-					case "-fixed:c":		// Create ranges.qc
+					case "-fixed:create":		// Create ranges.qc
 						argv.remove(i);
 						
 						if (i < argv.size())
@@ -125,7 +125,7 @@ public class FixedQCStrategy extends QCStrategy
 						createFile = true;
 						break;
 						
-					case "-fixed:s":		// Total top level size
+					case "-fixed:size":		// Total top level size
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -159,8 +159,8 @@ public class FixedQCStrategy extends QCStrategy
 			}
 		}
 		
-		verbose("fixed:s = %d\n", expansionLimit);
-		verbose("fixed:f = %s\n", rangesFile);
+		verbose("fixed:size = %d\n", expansionLimit);
+		verbose("fixed:file = %s\n", rangesFile);
 	}
 	
 	@Override
@@ -436,7 +436,7 @@ public class FixedQCStrategy extends QCStrategy
 	@Override
 	public String help()
 	{
-		return getName() + " [-fixed:f <file> | -fixed:c <file>][-fixed:s <size>]";
+		return getName() + " [-fixed:file <file> | -fixed:create <file>][-fixed:size <size>]";
 	}
 
 	@Override
