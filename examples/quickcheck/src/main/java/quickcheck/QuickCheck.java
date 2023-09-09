@@ -104,6 +104,7 @@ public class QuickCheck
 				{
 					Class<?> clazz = Class.forName(classname);
 					Constructor<?> ctor = clazz.getDeclaredConstructor(List.class);
+					int argvSize = argv.size();
 					QCStrategy instance = (QCStrategy) ctor.newInstance((Object)argv);
 					
 					if (instance.hasErrors())
@@ -118,6 +119,13 @@ public class QuickCheck
 					else
 					{
 						disabled.add(instance);
+						
+						if (argvSize != argv.size())
+						{
+							// Constructor took some arguments
+							errorln("The " + instance.getName() + " strategy is not enabled. Add -p " + instance.getName());
+							errorCount++;
+						}
 					}
 				}
 				catch (ClassNotFoundException e)
@@ -137,13 +145,10 @@ public class QuickCheck
 				}
 			}
 			
-			if (!failed.isEmpty())
+			for (String name: failed)
 			{
-				for (String name: failed)
-				{
-					errorln("Could not find strategy " + name);
-					errorCount++;
-				}
+				errorln("Could not find strategy " + name);
+				errorCount++;
 			}
 		}
 		catch (Throwable e)
