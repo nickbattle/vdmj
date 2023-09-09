@@ -58,10 +58,8 @@ import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCTokenType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
-import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.util.DuplicateKPermutor;
 import com.fujitsu.vdmj.util.KCombinator;
 import com.fujitsu.vdmj.util.KPermutor;
@@ -92,15 +90,11 @@ import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueMap;
 import com.fujitsu.vdmj.values.ValueSet;
 
-public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
+public class FixedRangeCreator extends RangeCreator
 {
-	private final Context ctxt;
-	private final TCTypeSet done;
-	
 	public FixedRangeCreator(Context ctxt)
 	{
-		this.ctxt = ctxt;
-		this.done = new TCTypeSet();
+		super(ctxt);
 	}
 
 	@Override
@@ -632,59 +626,5 @@ public class FixedRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		}
 		
 		return result;
-	}
-
-	private List<ValueSet> powerLimit(ValueSet set, int limit, boolean empty)
-	{
-		// Generate a power set, up to limit values from the full power set.
-		List<ValueSet> results = new Vector<ValueSet>();
-		
-		if (set.isEmpty())
-		{
-			if (empty)
-			{
-				results.add(new ValueSet());	// Just {}
-			}
-		}
-		else
-		{
-			/**
-			 * The KCombinator below produces combinations in order (eg. [1,2] before [1,3]).
-			 * And we loop the combination sizes from large to small, which is also the
-			 * natural ordering for sets.
-			 */
-			int size = set.size();
-			long count = 0;
-			
-			if (empty)
-			{
-				results.add(new ValueSet());	// Add {}
-				count++;
-			}
-			
-			int from = (size > 3) ? 3 : size;	// Avoid very small sets?
-			
-			for (int ss = from; ss <= size; ss++)
-			{
-				for (int[] kc: new KCombinator(size, ss))
-				{
-					ValueSet ns = new ValueSet(ss);
-	
-					for (int i=0; i<ss; i++)
-					{
-						ns.add(set.get(kc[i]));
-					}
-					
-					results.add(ns);
-					
-					if (++count >= limit)
-					{
-						return results;
-					}
-				}
-			}
-		}
-	
-		return results;
 	}
 }

@@ -399,7 +399,7 @@ public class FixedQCStrategy extends QCStrategy
 			}
 			else
 			{
-				println("Did not find " + rangesFile + " (see -fixed:c option)");
+				println("Did not find " + rangesFile + " (see -fixed:create option)");
 				allRanges = new HashMap<String, ValueSet>();
 			}
 			

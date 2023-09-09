@@ -55,10 +55,8 @@ import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCTokenType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
-import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.util.DuplicateKPermutor;
 import com.fujitsu.vdmj.util.KCombinator;
 import com.fujitsu.vdmj.util.KPermutor;
@@ -85,16 +83,13 @@ import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueMap;
 import com.fujitsu.vdmj.values.ValueSet;
 
-public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
+public class RandomRangeCreator extends RangeCreator
 {
-	private final Context ctxt;
-	private final TCTypeSet done;
 	private final Random prng;
 	
 	public RandomRangeCreator(Context ctxt, long seed)
 	{
-		this.ctxt = ctxt;
-		this.done = new TCTypeSet();
+		super(ctxt);
 		this.prng = new Random(seed);
 	}
 	
@@ -638,55 +633,6 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		}
 		
 		return result;
-	}
-
-	private List<ValueSet> powerLimit(ValueSet source, int limit, boolean incEmpty)
-	{
-		// Generate a power set, up to limit values from the full power set.
-		List<ValueSet> results = new Vector<ValueSet>();
-		
-		if (source.isEmpty())
-		{
-			if (incEmpty)
-			{
-				results.add(new ValueSet());	// Just {}
-			}
-		}
-		else
-		{
-			int size = source.size();
-			long count = 0;
-			
-			if (incEmpty)
-			{
-				results.add(new ValueSet());	// Add {}
-				count++;
-			}
-			
-			int from = (size > 3) ? 3 : size;	// Avoid very small sets?
-			
-			for (int ss = from; ss <= size; ss++)
-			{
-				for (int[] kc: new KCombinator(size, ss))
-				{
-					ValueSet ns = new ValueSet(ss);
-	
-					for (int i=0; i<ss; i++)
-					{
-						ns.add(source.get(kc[i]));
-					}
-					
-					results.add(ns);
-					
-					if (++count >= limit)
-					{
-						return results;
-					}
-				}
-			}
-		}
-	
-		return results;
 	}
 
 	/**
