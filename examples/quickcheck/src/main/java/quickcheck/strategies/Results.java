@@ -37,10 +37,12 @@ public class Results
 {
 	public final boolean proved;
 	public final Map<String, ValueSet> counterexamples;
+	public final long duration;		// time to generate counterexamples, in millisecs
 	
-	public Results(boolean proved, Map<String, ValueSet> counterexamples)
+	public Results(boolean proved, Map<String, ValueSet> counterexamples, long duration)
 	{
 		this.proved = proved;
 		this.counterexamples = counterexamples;
+		this.duration = duration;
 	}
 }

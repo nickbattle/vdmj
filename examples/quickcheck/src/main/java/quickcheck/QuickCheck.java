@@ -299,6 +299,7 @@ public class QuickCheck
 		boolean proved = false;
 		INExpression exp = getINExpression(po);
 		List<INBindingSetter> binds = getINBindList(exp);
+		long before = System.currentTimeMillis();
 		
 		for (QCStrategy strategy: strategies)
 		{
@@ -331,7 +332,7 @@ public class QuickCheck
 			}
 		}
 		
-		return new Results(proved, union);
+		return new Results(proved, union, System.currentTimeMillis() - before);
 	}
 	
 	public void checkObligation(ProofObligation po, Results results)
@@ -423,7 +424,7 @@ public class QuickCheck
 					}
 				}
 				
-				long after = System.currentTimeMillis();
+				long after = System.currentTimeMillis() + results.duration;
 				
 				if (result == null)		// cancelled
 				{

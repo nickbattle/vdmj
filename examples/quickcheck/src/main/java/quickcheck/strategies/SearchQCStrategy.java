@@ -81,6 +81,7 @@ public class SearchQCStrategy extends QCStrategy
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		HashMap<String, ValueSet> result = new HashMap<String, ValueSet>();
+		long before = System.currentTimeMillis();
 
 		if (po.isCheckable)
 		{
@@ -110,7 +111,7 @@ public class SearchQCStrategy extends QCStrategy
 			}
 		}
 		
-		return new Results(false, result);
+		return new Results(false, result, System.currentTimeMillis() - before);
 	}
 
 	@Override

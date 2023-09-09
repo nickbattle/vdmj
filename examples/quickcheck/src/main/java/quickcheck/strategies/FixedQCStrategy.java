@@ -25,9 +25,9 @@
 package quickcheck.strategies;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -257,13 +257,13 @@ public class FixedQCStrategy extends QCStrategy
 			RootContext ctxt = interpreter.getInitialContext();
 			Map<String, ValueSet> ranges = new HashMap<String, ValueSet>();
 			long before = System.currentTimeMillis();
-			verbose("Expanding " + inbinds.size() + " ranges: ");
+			printf("Expanding " + inbinds.size() + " ranges: ");
 			
 			for (int i=0; i<inbinds.size(); i++)
 			{
 				ctxt.threadState.init();
 				String key = inbinds.get(i).toString();
-				verbose(".");
+				printf(".");
 				INExpression exp = inexps.get(i);
 				Value value = exp.eval(ctxt);
 				
@@ -293,7 +293,7 @@ public class FixedQCStrategy extends QCStrategy
 			}
 			
 			long after = System.currentTimeMillis();
-			verboseln("\nRanges expanded " + duration(before, after));
+			println("\nRanges expanded " + duration(before, after));
 
 			return ranges;
 		}
@@ -411,6 +411,7 @@ public class FixedQCStrategy extends QCStrategy
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		Map<String, ValueSet> values = new HashMap<String, ValueSet>();
+		long before = System.currentTimeMillis();
 		
 		try
 		{
@@ -430,7 +431,7 @@ public class FixedQCStrategy extends QCStrategy
 			println(e);
 		}
 		
-		return new Results(false, values);
+		return new Results(false, values, System.currentTimeMillis() - before);
 	}
 
 	@Override

@@ -96,13 +96,14 @@ public class ExampleQCStrategy extends QCStrategy
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		Map<String, ValueSet> values = new HashMap<String, ValueSet>();
+		long before = System.currentTimeMillis();
 		
 		for (INBindingSetter bind: binds)
 		{
 			values.put(bind.toString(), new ValueSet());	// ie. nothing, for every bind
 		}
 		
-		return new Results(provedResult, values);	// NOTE proved flag!
+		return new Results(provedResult, values, System.currentTimeMillis() - before);	// NOTE proved flag!
 	}
 
 	@Override
