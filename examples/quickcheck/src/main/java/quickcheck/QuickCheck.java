@@ -51,6 +51,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
+import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.GetResource;
@@ -442,7 +443,17 @@ public class QuickCheck
 				{
 					if (result.boolValue(ctxt))
 					{
-						String outcome = (results.proved) ? "PROVED" : "PASSED";
+						String outcome = null;
+						
+						if (po.getCheckedExpression() instanceof TCExistsExpression)
+						{
+							outcome = "PROVED";		// Any "true" of an exists is PROVED.
+						}
+						else
+						{
+							outcome = (results.proved) ? "PROVED" : "PASSED";
+						}
+						
 						printf("PO #%d, %s %s\n", po.number, outcome, duration(before, after));
 					}
 					else
