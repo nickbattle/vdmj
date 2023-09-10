@@ -122,7 +122,7 @@ public class FixedRangeTest
 	{
 		TCRealType type = new TCRealType(LexLocation.ANY);
 		ValueSet result = type.apply(new FixedRangeCreator(null), 2);
-		assertEquals("{1.0, 2.0}", result.toString());
+		assertEquals("{1, 2}", result.toString());
 		result = type.apply(new FixedRangeCreator(null), 5);
 		assertEquals(5, result.size());
 		result = type.apply(new FixedRangeCreator(null), 1001);
