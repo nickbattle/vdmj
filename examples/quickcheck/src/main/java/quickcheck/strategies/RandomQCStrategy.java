@@ -22,9 +22,9 @@
  *
  ******************************************************************************/
 
-package quickcheck.qcplugins;
+package quickcheck.strategies;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.util.HashMap;
@@ -35,35 +35,29 @@ import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
+import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
 import quickcheck.visitors.RandomRangeCreator;
 
-public class RandomQCPlugin extends QCPlugin
+public class RandomQCStrategy extends QCStrategy
 {
-	private int numSetSize = 5;			// ie. size of sets for numeric types
 	private int expansionLimit = 20;	// Overall returned value limit
+	private long seed;
+	private int errorCount = 0;
 
-	public RandomQCPlugin(List<String> argv)
+	public RandomQCStrategy(List<String> argv)
 	{
+		seed = System.currentTimeMillis();
+		
 		for (int i=0; i < argv.size(); i++)
 		{
 			try
 			{
 				switch (argv.get(i))
 				{
-					case "-random:n":
-						argv.remove(i);
-
-						if (i < argv.size())
-						{
-							numSetSize = Integer.parseInt(argv.get(i));
-							argv.remove(i);
-						}
-						break;
-						
-					case "-random:s":		// Total top level size
+					case "-random:size":		// Total top level size
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -72,20 +66,43 @@ public class RandomQCPlugin extends QCPlugin
 							argv.remove(i);
 						}
 						break;
+						
+					case "-random:seed":		// Seed
+						argv.remove(i);
+
+						if (i < argv.size())
+						{
+							seed = Long.parseLong(argv.get(i));
+							argv.remove(i);
+						}
+						break;
+
+					default:
+						if (argv.get(i).startsWith("-random:"))
+						{
+							errorln("Unknown random option: " + argv.get(i));
+							errorln(help());
+							errorCount++;
+							argv.remove(i);
+						}
 				}
 			}
 			catch (NumberFormatException e)
 			{
-				println("Argument must be numeric");
+				errorln("Argument must be numeric");
+				errorln(help());
+				errorCount++;
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
-				println("Missing argument");
+				errorln("Missing argument");
+				errorln(help());
+				errorCount++;
 			}
 		}
 		
-		verbose("random:n = %d\n", numSetSize);
-		verbose("random:s = %d\n", expansionLimit);
+		verbose("random:size = %d\n", expansionLimit);
+		verbose("random:seed = %d\n", seed);
 	}
 	
 	@Override
@@ -97,7 +114,7 @@ public class RandomQCPlugin extends QCPlugin
 	@Override
 	public boolean hasErrors()
 	{
-		return false;
+		return errorCount  > 0;
 	}
 
 	@Override
@@ -109,29 +126,35 @@ public class RandomQCPlugin extends QCPlugin
 	@Override
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		HashMap<String, ValueSet> result = new HashMap<String, ValueSet>();
-		RootContext ctxt = Interpreter.getInstance().getInitialContext();
-		long seed = 1234;
+		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
+		long before = System.currentTimeMillis();
 		
-		for (INBindingSetter bind: binds)
+		if (po.isCheckable)
 		{
-			RandomRangeCreator visitor = new RandomRangeCreator(ctxt, numSetSize, seed++);
-			ValueSet values = bind.getType().apply(visitor, expansionLimit);
-			result.put(bind.toString(), values);
+			RootContext ctxt = Interpreter.getInstance().getInitialContext();
+			
+			for (INBindingSetter bind: binds)
+			{
+				RandomRangeCreator visitor = new RandomRangeCreator(ctxt, seed++);
+				ValueSet values = bind.getType().apply(visitor, expansionLimit);
+				ValueList list = new ValueList();
+				list.addAll(values);
+				result.put(bind.toString(), list);
+			}
 		}
 		
-		return new Results(false, result);
+		return new Results(false, result, System.currentTimeMillis() - before);
 	}
 
 	@Override
 	public String help()
 	{
-		return getName() + " [-random:n <size>][-random:s <size>]";
+		return getName() + " [-random:size <size>][-random:seed <seed>]";
 	}
 
 	@Override
 	public boolean useByDefault()
 	{
-		return false;	// Don't use if no -p given
+		return true;	// Don't use if no -p given
 	}
 }

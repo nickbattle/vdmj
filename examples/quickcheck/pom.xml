@@ -7,12 +7,16 @@
 		<artifactId>examples</artifactId>
 		<version>${revision}${sha1}${changelist}</version>
 	</parent>
-	
+
 	<artifactId>quickcheck</artifactId>
 	<name>Example QuickCheck plugin</name>
 	<description>Experimental brute force plugin for PO verification.</description>
 
 	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>dk.au.ece.vdmj</groupId>
 			<artifactId>vdmj</artifactId>
@@ -31,7 +35,18 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal><!-- To include example plugin -->
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

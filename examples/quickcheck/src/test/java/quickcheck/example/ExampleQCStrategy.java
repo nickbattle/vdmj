@@ -22,24 +22,56 @@
  *
  ******************************************************************************/
 
-package quickcheck.qcplugins;
+package quickcheck.example;
+
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.values.ValueSet;
+import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
+import quickcheck.strategies.QCStrategy;
+import quickcheck.strategies.Results;
 
-public class ExampleQCPlugin extends QCPlugin
+public class ExampleQCStrategy extends QCStrategy
 {
-	public ExampleQCPlugin(List<String> argv)
+	private boolean provedResult = false;
+	private int errorCount = 0;
+
+	public ExampleQCStrategy(List<String> argv)
 	{
 		// Remove your "qc" plugin arguments from the list here
-		// It's useful to include the plugin name, like "-example:n"
+		// It's useful to include the strategy name, like "-example:n"
+		for (int i=0; i < argv.size(); i++)
+		{
+			switch (argv.get(i))
+			{
+				case "-example:proved":
+					argv.remove(i);
+
+					if (i < argv.size())
+					{
+						provedResult = Boolean.parseBoolean(argv.get(i));
+						argv.remove(i);
+					}
+					break;
+					
+				default:
+					if (argv.get(i).startsWith("-example:"))
+					{
+						errorln("Unknown exmaple option: " + argv.get(i));
+						errorln(help());
+						errorCount++;
+						argv.remove(i);
+					}
+			}
+		}
 	}
 	
 	@Override
@@ -51,7 +83,7 @@ public class ExampleQCPlugin extends QCPlugin
 	@Override
 	public boolean hasErrors()
 	{
-		return false;	// Called after init and getValues
+		return errorCount > 0;	// Called after init and getValues
 	}
 
 	@Override
@@ -63,13 +95,21 @@ public class ExampleQCPlugin extends QCPlugin
 	@Override
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		return new Results(true, new HashMap<String, ValueSet>());	// Says PROVED, for testing!
+		Map<String, ValueList> values = new HashMap<String, ValueList>();
+		long before = System.currentTimeMillis();
+		
+		for (INBindingSetter bind: binds)
+		{
+			values.put(bind.toString(), new ValueList());	// ie. nothing, for every bind
+		}
+		
+		return new Results(provedResult, values, System.currentTimeMillis() - before);	// NOTE proved flag!
 	}
 
 	@Override
 	public String help()
 	{
-		return getName() + " [options/flags]";
+		return getName() + " [-example:proved <bool>]";
 	}
 
 	@Override

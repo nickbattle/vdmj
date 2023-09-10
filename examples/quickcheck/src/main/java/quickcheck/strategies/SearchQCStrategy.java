@@ -22,7 +22,9 @@
  *
  ******************************************************************************/
 
-package quickcheck.qcplugins;
+package quickcheck.strategies;
+
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,16 +34,29 @@ import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
-import com.fujitsu.vdmj.values.ValueSet;
+import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
 import quickcheck.visitors.SearchQCVisitor;
 
-public class SearchQCPlugin extends QCPlugin
+public class SearchQCStrategy extends QCStrategy
 {
-	public SearchQCPlugin(List<String> argv)
+	private int errorCount = 0;
+
+	public SearchQCStrategy(List<String> argv)
 	{
-		// No plugin arguments yet?
+		for (int i=0; i < argv.size(); i++)
+		{
+			// No plugin arguments yet?
+
+			if (argv.get(i).startsWith("-search:"))
+			{
+				errorln("Unknown search option: " + argv.get(i));
+				errorln(help());
+				errorCount ++;
+				argv.remove(i);
+			}
+		}
 	}
 	
 	@Override
@@ -53,7 +68,7 @@ public class SearchQCPlugin extends QCPlugin
 	@Override
 	public boolean hasErrors()
 	{
-		return false;
+		return errorCount > 0;
 	}
 
 	@Override
@@ -65,33 +80,38 @@ public class SearchQCPlugin extends QCPlugin
 	@Override
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		NameValuePairList nvps = po.getCheckedExpression().apply(new SearchQCVisitor(), null);
-		HashMap<String, ValueSet> result = new HashMap<String, ValueSet>();
-		
-		for (NameValuePair pair: nvps)
+		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
+		long before = System.currentTimeMillis();
+
+		if (po.isCheckable)
 		{
-			for (INBindingSetter bind: binds)
+			NameValuePairList nvps = po.getCheckedExpression().apply(new SearchQCVisitor(), null);
+			
+			for (NameValuePair pair: nvps)
 			{
-				String key = bind.toString();
-				
-				// HACK! Only works for single name binds
-				if (key.equals(pair.name.getName() + ":" + bind.getType()))	// eg. "a:T" = "a" +":" + "T"
+				for (INBindingSetter bind: binds)
 				{
-					if (result.containsKey(key))
+					String key = bind.toString();
+					
+					// HACK! Only works for single name binds
+					if (key.equals(pair.name.getName() + ":" + bind.getType()))	// eg. "a:T" = "a" +":" + "T"
 					{
-						ValueSet current = result.get(key);
-						current.add(pair.value);
+						if (result.containsKey(key))
+						{
+							ValueList current = result.get(key);
+							current.add(pair.value);
+						}
+						else
+						{
+							result.put(key, new ValueList(pair.value));
+						}
+						break;
 					}
-					else
-					{
-						result.put(key, new ValueSet(pair.value));
-					}
-					break;
 				}
 			}
 		}
 		
-		return new Results(false, result);
+		return new Results(false, result, System.currentTimeMillis() - before);
 	}
 
 	@Override

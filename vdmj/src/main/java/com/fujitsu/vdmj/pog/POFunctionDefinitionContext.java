@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
-import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POFunctionDefinitionContext extends POContext
@@ -84,27 +83,8 @@ public class POFunctionDefinitionContext extends POContext
 					sb.append(sep);
 					sb.append(p.getMatchingExpression());	// Expands anys
 					sb.append(":");
-					
 					TCType ptype = types.next();
-					
-					if (ptype instanceof TCNamedType)
-					{
-						TCNamedType ntype = (TCNamedType)ptype;
-						
-						if (ntype.typename.getLocation().module.equals(name.getLocation().module))
-						{
-							sb.append(ntype);
-						}
-						else
-						{
-							sb.append(ntype.typename.getExplicit(true));
-						}
-					}
-					else
-					{
-						sb.append(ptype);
-					}
-					
+					sb.append(ptype.toExplicitString(name.getLocation()));
 					sep = ", ";
     			}
 

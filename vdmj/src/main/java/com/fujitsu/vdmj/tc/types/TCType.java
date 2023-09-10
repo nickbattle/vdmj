@@ -100,6 +100,15 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	{
 		return toString();
 	}
+	
+	/**
+	 * The type with its module/class explicit, if it is not the same as the
+	 * location of this type value. Overridden in TCNamedType.
+	 */
+	public String toExplicitString(LexLocation from)
+	{
+		return toString();
+	}
 
 	/**
 	 * Resolve the type. After syntax checking, all named type references are

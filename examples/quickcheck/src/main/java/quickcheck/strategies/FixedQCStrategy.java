@@ -22,12 +22,12 @@
  *
  ******************************************************************************/
 
-package quickcheck.qcplugins;
+package quickcheck.strategies;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -78,23 +78,22 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueSet;
+import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
-import quickcheck.visitors.InternalRangeCreator;
+import quickcheck.visitors.FixedRangeCreator;
 
-public class DefaultQCPlugin extends QCPlugin
+public class FixedQCStrategy extends QCStrategy
 {
-	private int numSetSize = 5;				// So nat/int/etc are {-5, ..., 5}
 	private int expansionLimit = 20;		// Top level binding value expansion limit
 	
 	private int errorCount = 0;
 	private String rangesFile = "ranges.qc";
 	private boolean createFile = false;
 
-	private Map<String, ValueSet> allRanges = null;
+	private Map<String, ValueList> allRanges = null;
 	
-	public DefaultQCPlugin(List<String> argv)
+	public FixedQCStrategy(List<String> argv)
 	{
 		for (int i=0; i < argv.size(); i++)
 		{
@@ -102,8 +101,7 @@ public class DefaultQCPlugin extends QCPlugin
 			{
 				switch (argv.get(i))
 				{
-					case "-f":
-					case "-default:f":
+					case "-fixed:file":			// Use this as ranges.qc
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -115,8 +113,7 @@ public class DefaultQCPlugin extends QCPlugin
 						createFile = false;
 						break;
 						
-					case "-c":
-					case "-default:c":
+					case "-fixed:create":		// Create ranges.qc
 						argv.remove(i);
 						
 						if (i < argv.size())
@@ -128,19 +125,7 @@ public class DefaultQCPlugin extends QCPlugin
 						createFile = true;
 						break;
 						
-					case "-n":			// {-n, ..., +n}
-					case "-default:n":
-						argv.remove(i);
-
-						if (i < argv.size())
-						{
-							numSetSize = Integer.parseInt(argv.get(i));
-							argv.remove(i);
-						}
-						break;
-						
-					case "-s":			// Total top level size
-					case "-default:s":
+					case "-fixed:size":		// Total top level size
 						argv.remove(i);
 
 						if (i < argv.size())
@@ -149,23 +134,33 @@ public class DefaultQCPlugin extends QCPlugin
 							argv.remove(i);
 						}
 						break;
+						
+					default:
+						if (argv.get(i).startsWith("-fixed:"))
+						{
+							errorln("Unknown fixed option: " + argv.get(i));
+							errorln(help());
+							errorCount++;
+							argv.remove(i);
+						}
 				}
 			}
 			catch (NumberFormatException e)
 			{
 				errorln("Argument must be numeric");
 				errorln(help());
+				errorCount++;
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
 				errorln("Missing argument");
 				errorln(help());
+				errorCount++;
 			}
 		}
 		
-		verbose("default:n = %d\n", numSetSize);
-		verbose("default:s = %d\n", expansionLimit);
-		verbose("default:f = %s\n", rangesFile);
+		verbose("fixed:size = %d\n", expansionLimit);
+		verbose("fixed:file = %s\n", rangesFile);
 	}
 	
 	@Override
@@ -186,7 +181,7 @@ public class DefaultQCPlugin extends QCPlugin
 		reader.nextToken();
 	}
 	
-	private Map<String, ValueSet> readRangeFile(String filename)
+	private Map<String, ValueList> readRangeFile(String filename)
 	{
 		try
 		{
@@ -260,22 +255,22 @@ public class DefaultQCPlugin extends QCPlugin
 			INMultipleBindList inbinds = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcbinds);
 			INExpressionList inexps = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexps);
 			RootContext ctxt = interpreter.getInitialContext();
-			Map<String, ValueSet> ranges = new HashMap<String, ValueSet>();
+			Map<String, ValueList> ranges = new HashMap<String, ValueList>();
 			long before = System.currentTimeMillis();
-			verbose("Expanding " + inbinds.size() + " ranges: ");
+			printf("Expanding " + inbinds.size() + " ranges: ");
 			
 			for (int i=0; i<inbinds.size(); i++)
 			{
 				ctxt.threadState.init();
 				String key = inbinds.get(i).toString();
-				verbose(".");
+				printf(".");
 				INExpression exp = inexps.get(i);
 				Value value = exp.eval(ctxt);
 				
 				if (value instanceof SetValue)
 				{
 					SetValue svalue = (SetValue)value;
-					ValueSet list = new ValueSet();
+					ValueList list = new ValueList();
 					list.addAll(svalue.values);
 					ranges.put(key, list);
 				}
@@ -283,7 +278,9 @@ public class DefaultQCPlugin extends QCPlugin
 				{
 					IntegerValue ivalue = (IntegerValue)value;
 					int limit = ivalue.value.intValue();
-					ranges.put(key, tctypes.get(i).apply(new InternalRangeCreator(ctxt, numSetSize), limit));
+					ValueList list = new ValueList();
+					list.addAll(tctypes.get(i).apply(new FixedRangeCreator(ctxt), limit));
+					ranges.put(key, list);
 				}
 				else
 				{
@@ -298,7 +295,7 @@ public class DefaultQCPlugin extends QCPlugin
 			}
 			
 			long after = System.currentTimeMillis();
-			verboseln("\nRanges expanded " + duration(before, after));
+			println("\nRanges expanded " + duration(before, after));
 
 			return ranges;
 		}
@@ -384,7 +381,7 @@ public class DefaultQCPlugin extends QCPlugin
 	@Override
 	public String getName()
 	{
-		return "default";
+		return "fixed";
 	}
 
 	@Override
@@ -397,7 +394,17 @@ public class DefaultQCPlugin extends QCPlugin
 		}
 		else
 		{
-			allRanges = readRangeFile(rangesFile);
+			if (new File(rangesFile).exists())
+			{
+				println("Using ranges file " + rangesFile);
+				allRanges = readRangeFile(rangesFile);
+			}
+			else
+			{
+				println("Did not find " + rangesFile + " (see -fixed:create option)");
+				allRanges = new HashMap<String, ValueList>();
+			}
+			
 			return !hasErrors();
 		}
 	}
@@ -405,7 +412,8 @@ public class DefaultQCPlugin extends QCPlugin
 	@Override
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		Map<String, ValueSet> values = new HashMap<String, ValueSet>();
+		Map<String, ValueList> values = new HashMap<String, ValueList>();
+		long before = System.currentTimeMillis();
 		
 		try
 		{
@@ -413,14 +421,9 @@ public class DefaultQCPlugin extends QCPlugin
 			{
 				String key = bind.toString();
 				
-				if (allRanges.containsKey(key))
+				if (allRanges.containsKey(key))		// else a default created later
 				{
 					values.put(key, allRanges.get(key));
-				}
-				else
-				{
-					// Value(s) created in QuickCheck using default method
-					errorln("WARNING: Ranges file has no values for " + key);
 				}
 			}
 		}
@@ -430,18 +433,18 @@ public class DefaultQCPlugin extends QCPlugin
 			println(e);
 		}
 		
-		return new Results(false, values);
+		return new Results(false, values, System.currentTimeMillis() - before);
 	}
 
 	@Override
 	public String help()
 	{
-		return getName() + " [-f <file> | -c <file>][-n <size>][-s <size>]";
+		return getName() + " [-fixed:file <file> | -fixed:create <file>][-fixed:size <size>]";
 	}
 
 	@Override
 	public boolean useByDefault()
 	{
-		return true;	// Use if no -p given
+		return false;	// Use if no -p given
 	}
 }

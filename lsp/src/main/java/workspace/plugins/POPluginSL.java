@@ -27,6 +27,7 @@ package workspace.plugins;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -65,6 +66,10 @@ public class POPluginSL extends POPlugin
 	@Override
 	public ProofObligationList getProofObligations()
 	{
-		return poModuleList.getProofObligations();
+		POAnnotation.init();
+		ProofObligationList list = poModuleList.getProofObligations();
+		POAnnotation.close();
+		list.renumber();
+		return list;
 	}
 }

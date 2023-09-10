@@ -90,6 +90,7 @@ public class POPluginSL extends POPlugin
 		POAnnotation.init();
 		ProofObligationList list = poModuleList.getProofObligations();
 		POAnnotation.close();
+		list.renumber();
 		return list;
 	}
 }

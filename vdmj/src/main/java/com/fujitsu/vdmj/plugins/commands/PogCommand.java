@@ -65,7 +65,8 @@ public class PogCommand extends AnalysisCommand
 
 			for (ProofObligation obligation: all)
 			{
-				if (obligation.name.startsWith(match))
+				if (obligation.name.startsWith(match) ||
+					Integer.toString(obligation.number).equals(match))
 				{
 					list.add(obligation);
 				}
@@ -87,6 +88,6 @@ public class PogCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("pog [<function/operation>] - generate proof obligations");
+		println("pog [<function/operation/PO#>] - generate proof obligations");
 	}
 }

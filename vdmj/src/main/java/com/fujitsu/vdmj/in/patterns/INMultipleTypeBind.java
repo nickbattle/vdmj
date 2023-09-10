@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
-import java.math.BigInteger;
-
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.patterns.visitors.INMultipleBindVisitor;
 import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
@@ -37,7 +35,6 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.values.ValueList;
-import com.fujitsu.vdmj.values.ValueSet;
 
 public class INMultipleTypeBind extends INMultipleBind implements INBindingSetter
 {
@@ -59,11 +56,11 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	@Override
 	public String toString()
 	{
-		return plist + ":" + type;
+		return plist + ":" + type.toExplicitString(location);
 	}
 	
 	@Override
-	public void setBindValues(ValueSet values)
+	public void setBindValues(ValueList values)
 	{
 		if (values == null)
 		{
@@ -81,7 +78,7 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	{
 		return bindValues;	// Without calculation!
 	}
-
+	
 	@Override
 	public void setCounterexample(Context ctxt)
 	{
@@ -100,7 +97,7 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	{
 		return bindCounterexample;
 	}
-
+	
 	@Override
 	public TCType getType()
 	{
@@ -117,9 +114,9 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 		
 		try
 		{
-			BigInteger size = type.apply(new INTypeSizeVisitor(), ctxt);
+			long size = type.apply(new INTypeSizeVisitor(), ctxt).longValue();
 			
-	   		if (size.compareTo(new BigInteger(Long.toString(Properties.in_typebind_limit))) > 0)
+	   		if (size > Properties.in_typebind_limit)
 			{
 				throw new ContextException(5039, "Cannot evaluate type bind of size " + size, location, ctxt);
 			}

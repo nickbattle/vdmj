@@ -56,18 +56,18 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.util.GetResource;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueSet;
+import com.fujitsu.vdmj.values.ValueList;
 
-import quickcheck.qcplugins.QCPlugin;
-import quickcheck.qcplugins.Results;
-import quickcheck.visitors.InternalRangeCreator;
+import quickcheck.strategies.QCStrategy;
+import quickcheck.strategies.Results;
+import quickcheck.visitors.FixedRangeCreator;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
 	private int errorCount = 0;
-	private List<QCPlugin> plugins = null;		// Configured to be used
-	private List<QCPlugin> disabled = null;		// Known, but not to be used
+	private List<QCStrategy> strategies = null;		// Configured to be used
+	private List<QCStrategy> disabled = null;		// Known, but not to be used
 	private ProofObligationList chosen = null;
 	
 	public QuickCheck()
@@ -85,17 +85,17 @@ public class QuickCheck
 		errorCount = 0;
 	}
 	
-	public void loadPlugins(List<String> argv)
+	public void loadStrategies(List<String> argv)
 	{
-		plugins = new Vector<QCPlugin>();
-		disabled = new Vector<QCPlugin>();
+		strategies = new Vector<QCStrategy>();
+		disabled = new Vector<QCStrategy>();
 		errorCount = 0;
 		
 		try
 		{
-			List<String> names = pluginNames(argv);
+			List<String> names = strategyNames(argv);
 			List<String> failed = new Vector<String>(names);
-			List<String> classnames = GetResource.readResource("qc.plugins");
+			List<String> classnames = GetResource.readResource("qc.strategies");
 			
 			for (String classname: classnames)
 			{
@@ -103,84 +103,94 @@ public class QuickCheck
 				{
 					Class<?> clazz = Class.forName(classname);
 					Constructor<?> ctor = clazz.getDeclaredConstructor(List.class);
-					QCPlugin instance = (QCPlugin) ctor.newInstance((Object)argv);
+					int argvSize = argv.size();
+					QCStrategy instance = (QCStrategy) ctor.newInstance((Object)argv);
 					
-					if ((names.isEmpty() && instance.useByDefault()) || names.contains(instance.getName()))
+					if (instance.hasErrors())
 					{
-						plugins.add(instance);
+						errorCount++;
+					}
+					else if ((names.isEmpty() && instance.useByDefault()) || names.contains(instance.getName()))
+					{
+						strategies.add(instance);
 						failed.remove(instance.getName());
 					}
 					else
 					{
 						disabled.add(instance);
+						
+						if (argvSize != argv.size())
+						{
+							// Constructor took some arguments
+							errorln("The " + instance.getName() + " strategy is not enabled. Add -p " + instance.getName());
+							errorCount++;
+						}
 					}
 				}
 				catch (ClassNotFoundException e)
 				{
-					errorln("Cannot find plugin class: " + classname);
+					errorln("Cannot find strategy class: " + classname);
 					errorCount++;
 				}
 				catch (NoSuchMethodException e)
 				{
-					errorln("Plugin " + classname + " must implement ctor(List<String> argv)");
+					errorln("Strategy " + classname + " must implement ctor(List<String> argv)");
 					errorCount++;
 				}
 				catch (Throwable th)
 				{
-					errorln("Plugin " + classname + ": " + th.toString());
+					errorln("Strategy " + classname + ": " + th.toString());
 					errorCount++;
 				}
 			}
 			
-			if (!failed.isEmpty())
+			for (String name: failed)
 			{
-				for (String name: failed)
-				{
-					println("Could not find plugin " + name);
-					errorCount++;
-				}
+				errorln("Could not find strategy " + name);
+				errorCount++;
 			}
 		}
 		catch (Throwable e)
 		{
-			errorln("Cannot load plugins: " + e);
+			errorln("Cannot load strategies: " + e);
+			errorCount++;
 		}
 	}
 	
-	public boolean initPlugins()
+	public boolean initStrategies()
 	{
 		boolean doChecks = true;
 		
-		for (QCPlugin plugin: plugins)
+		for (QCStrategy strategy: strategies)
 		{
-			doChecks = doChecks && plugin.init(this);
+			doChecks = doChecks && strategy.init(this);
 			
-			if (plugin.hasErrors())
+			if (strategy.hasErrors())
 			{
-				errorln("QCPlugin init failed: " + plugin.getName());
+				errorln("QCStrategy init failed: " + strategy.getName());
 			}
 			else
 			{
-				verbose("QCPlugin %s initialized\n", plugin.getName());
+				verbose("QCStrategy %s initialized\n", strategy.getName());
 			}
 		}
 
 		return doChecks;
 	}
 	
-	public List<QCPlugin> getEnabledPlugins()
+	public List<QCStrategy> getEnabledStrategies()
 	{
-		return plugins;
+		return strategies;
 	}
 	
-	public List<QCPlugin> getDisabledPlugins()
+	public List<QCStrategy> getDisabledStrategies()
 	{
 		return disabled;
 	}
 	
-	public List<QCPlugin> getAllPlugins()	// Enabled and disabled
+	public List<QCStrategy> getAllStrategies()	// Enabled and disabled
 	{
-		List<QCPlugin> all = new Vector<QCPlugin>(plugins);
+		List<QCStrategy> all = new Vector<QCStrategy>(strategies);
 		all.addAll(disabled);
 		return all;
 	}
@@ -190,7 +200,7 @@ public class QuickCheck
 		return chosen;
 	}
 	
-	public List<String> pluginNames(List<String> arglist)
+	public List<String> strategyNames(List<String> arglist)
 	{
 		List<String> names = new Vector<String>();
 		Iterator<String> iter = arglist.iterator();
@@ -211,7 +221,7 @@ public class QuickCheck
 				}
 				else
 				{
-					errorln("-p must be followed by a plugin name");
+					errorln("-p must be followed by a strategy name");
 					names.add("unknown");
 				}
 			}
@@ -251,7 +261,7 @@ public class QuickCheck
 				}
 				else
 				{
-					println("PO# " + n + " unknown. Must be between 1 and " + all.size());
+					errorln("PO# " + n + " unknown. Must be between 1 and " + all.size());
 					errorCount++;
 				}
 			}
@@ -289,15 +299,16 @@ public class QuickCheck
 	
 	public Results getValues(ProofObligation po)
 	{
-		Map<String, ValueSet> union = new HashMap<String, ValueSet>();
+		Map<String, ValueList> union = new HashMap<String, ValueList>();
 		boolean proved = false;
 		INExpression exp = getINExpression(po);
 		List<INBindingSetter> binds = getINBindList(exp);
+		long before = System.currentTimeMillis();
 		
-		for (QCPlugin plugin: plugins)
+		for (QCStrategy strategy: strategies)
 		{
-			Results presults = plugin.getValues(po, exp, binds);
-			Map<String, ValueSet> cexamples = presults.counterexamples;
+			Results presults = strategy.getValues(po, exp, binds);
+			Map<String, ValueList> cexamples = presults.counterexamples;
 			
 			for (String bind: cexamples.keySet())
 			{
@@ -318,14 +329,15 @@ public class QuickCheck
 		{
 			if (!union.containsKey(bind.toString()))
 			{
-				// Generate some values for missing bindings, using the default method
+				// Generate some values for missing bindings, using the fixed method
 				RootContext ctxt = Interpreter.getInstance().getInitialContext();
-				ValueSet values = bind.getType().apply(new InternalRangeCreator(ctxt, 10), 10);
-				union.put(bind.toString(), values);
+				ValueList list = new ValueList();
+				list.addAll(bind.getType().apply(new FixedRangeCreator(ctxt), 10));
+				union.put(bind.toString(), list);
 			}
 		}
 		
-		return new Results(proved, union);
+		return new Results(proved, union, System.currentTimeMillis() - before);
 	}
 	
 	public void checkObligation(ProofObligation po, Results results)
@@ -346,7 +358,7 @@ public class QuickCheck
 				printf("PO #%d, TRIVIAL by %s\n", po.number, po.proof);
 				return;
 			}
-			else if (results.proved)
+			else if (results.proved && results.counterexamples.isEmpty())
 			{
 				po.status = POStatus.PROVED;
 				printf("PO #%d, PROVED\n", po.number);
@@ -355,13 +367,13 @@ public class QuickCheck
 
 			try
 			{
-				Map<String, ValueSet> cexamples = results.counterexamples;
+				Map<String, ValueList> cexamples = results.counterexamples;
 				INExpression poexp = getINExpression(po);
 				bindings = getINBindList(poexp);
 				
 				for (INBindingSetter mbind: bindings)
 				{
-					ValueSet values = cexamples.get(mbind.toString());
+					ValueList values = cexamples.get(mbind.toString());
 					
 					if (values != null)
 					{
@@ -386,36 +398,52 @@ public class QuickCheck
 				catch (ContextException e)
 				{
 					printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
-					result = new BooleanValue(false);
-
-					if (Settings.verbose)
+					
+					if (e.rawMessage.equals("Execution cancelled"))
 					{
-						if (e.ctxt.outer != null)
-						{
-							e.ctxt.printStackFrames(Console.out);
-						}
-						else
-						{
-							println("In context of " + e.ctxt.title + " " + e.ctxt.location);
-						}
-						
-						println("----");
-						printBindings(bindings);
-						println("----");
+						result = null;
 					}
 					else
 					{
-						println("Use -verbose to see exception stack");
+						result = new BooleanValue(false);
+	
+						if (Settings.verbose)
+						{
+							if (e.ctxt.outer != null)
+							{
+								e.ctxt.printStackFrames(Console.out);
+							}
+							else
+							{
+								println("In context of " + e.ctxt.title + " " + e.ctxt.location);
+							}
+							
+							println("----");
+							printBindings(bindings);
+							println("----");
+						}
+						else
+						{
+							println("Use -verbose to see exception stack");
+						}
 					}
 				}
 				
-				long after = System.currentTimeMillis();
+				long after = System.currentTimeMillis() + results.duration;
 				
-				if (result instanceof BooleanValue)
+				if (result == null)		// cancelled
+				{
+					println("----");
+					printBindings(bindings);
+					println("----");
+					println(po);
+				}
+				else if (result instanceof BooleanValue)
 				{
 					if (result.boolValue(ctxt))
 					{
-						printf("PO #%d, PASSED %s\n", po.number, duration(before, after));
+						String outcome = (results.proved) ? "PROVED" : "PASSED";
+						printf("PO #%d, %s %s\n", po.number, outcome, duration(before, after));
 					}
 					else
 					{
@@ -462,9 +490,30 @@ public class QuickCheck
 	
 	private void printBindings(List<INBindingSetter> bindings)
 	{
+		int MAXVALUES = 10;
+		
 		for (INBindingSetter bind: bindings)
 		{
-			printf("%s = %s\n", bind, bind.getBindValues());
+			printf("%s = [", bind);
+			
+			ValueList list = bind.getBindValues();
+			int max = (list.size() > MAXVALUES) ? MAXVALUES : list.size();
+			String sep = "";
+			
+			for (int i=0; i<max; i++)
+			{
+				printf("%s%s", sep, list.get(i).toShortString(20));
+				sep = ", ";
+			}
+			
+			if (max < list.size())
+			{
+				printf("... (%d values)]\n", list.size());
+			}
+			else
+			{
+				printf("]\n");
+			}
 		}
 	}
 	

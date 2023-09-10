@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
-import java.math.BigInteger;
-
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.patterns.visitors.INBindVisitor;
 import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
@@ -37,7 +35,6 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.values.ValueList;
-import com.fujitsu.vdmj.values.ValueSet;
 
 public class INTypeBind extends INBind implements INBindingSetter
 {
@@ -57,7 +54,7 @@ public class INTypeBind extends INBind implements INBindingSetter
 	}
 
 	@Override
-	public void setBindValues(ValueSet values)
+	public void setBindValues(ValueList values)
 	{
 		if (values == null)
 		{
@@ -74,6 +71,12 @@ public class INTypeBind extends INBind implements INBindingSetter
 	public ValueList getBindValues()
 	{
 		return bindValues;	// Without calculation!
+	}
+	
+	@Override
+	public TCType getType()
+	{
+		return type;
 	}
 
 	@Override
@@ -94,12 +97,6 @@ public class INTypeBind extends INBind implements INBindingSetter
 	{
 		return bindCounterexample;
 	}
-	
-	@Override
-	public TCType getType()
-	{
-		return type;
-	}
 
 	@Override
 	public INMultipleBindList getMultipleBindList()
@@ -114,7 +111,7 @@ public class INTypeBind extends INBind implements INBindingSetter
 	@Override
 	public String toString()
 	{
-		return pattern + ":" + type;
+		return pattern + ":" + type.toExplicitString(location);
 	}
 
 	@Override
@@ -127,9 +124,9 @@ public class INTypeBind extends INBind implements INBindingSetter
 		
 		try
 		{
-			BigInteger size = type.apply(new INTypeSizeVisitor(), ctxt);
+			long size = type.apply(new INTypeSizeVisitor(), ctxt).longValue();
 			
-	   		if (size.compareTo(new BigInteger(Long.toString(Properties.in_typebind_limit))) > 0)
+	   		if (size > Properties.in_typebind_limit)
 			{
 				throw new ContextException(5039, "Cannot evaluate type bind of size " + size, location, ctxt);
 			}
