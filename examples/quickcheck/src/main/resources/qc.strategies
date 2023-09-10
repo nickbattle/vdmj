@@ -1,3 +1,4 @@
 quickcheck.strategies.FixedQCStrategy
 quickcheck.strategies.SearchQCStrategy
 quickcheck.strategies.RandomQCStrategy
+quickcheck.strategies.FiniteQCStrategy

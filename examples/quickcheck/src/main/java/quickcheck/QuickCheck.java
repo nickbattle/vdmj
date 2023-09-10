@@ -353,7 +353,7 @@ public class QuickCheck
 				printf("PO #%d, TRIVIAL by %s\n", po.number, po.proof);
 				return;
 			}
-			else if (results.proved)
+			else if (results.proved && results.counterexamples.isEmpty())
 			{
 				po.status = POStatus.PROVED;
 				printf("PO #%d, PROVED\n", po.number);
@@ -437,7 +437,8 @@ public class QuickCheck
 				{
 					if (result.boolValue(ctxt))
 					{
-						printf("PO #%d, PASSED %s\n", po.number, duration(before, after));
+						String outcome = (results.proved) ? "PROVED" : "PASSED";
+						printf("PO #%d, %s %s\n", po.number, outcome, duration(before, after));
 					}
 					else
 					{
