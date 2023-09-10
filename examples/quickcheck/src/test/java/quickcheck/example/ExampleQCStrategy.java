@@ -33,7 +33,7 @@ import java.util.Map;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.values.ValueSet;
+import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
 import quickcheck.strategies.QCStrategy;
@@ -95,12 +95,12 @@ public class ExampleQCStrategy extends QCStrategy
 	@Override
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		Map<String, ValueSet> values = new HashMap<String, ValueSet>();
+		Map<String, ValueList> values = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
 		
 		for (INBindingSetter bind: binds)
 		{
-			values.put(bind.toString(), new ValueSet());	// ie. nothing, for every bind
+			values.put(bind.toString(), new ValueList());	// ie. nothing, for every bind
 		}
 		
 		return new Results(provedResult, values, System.currentTimeMillis() - before);	// NOTE proved flag!

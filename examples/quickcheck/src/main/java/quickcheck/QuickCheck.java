@@ -57,7 +57,6 @@ import com.fujitsu.vdmj.util.GetResource;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
-import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.Results;
@@ -300,7 +299,7 @@ public class QuickCheck
 	
 	public Results getValues(ProofObligation po)
 	{
-		Map<String, ValueSet> union = new HashMap<String, ValueSet>();
+		Map<String, ValueList> union = new HashMap<String, ValueList>();
 		boolean proved = false;
 		INExpression exp = getINExpression(po);
 		List<INBindingSetter> binds = getINBindList(exp);
@@ -309,7 +308,7 @@ public class QuickCheck
 		for (QCStrategy strategy: strategies)
 		{
 			Results presults = strategy.getValues(po, exp, binds);
-			Map<String, ValueSet> cexamples = presults.counterexamples;
+			Map<String, ValueList> cexamples = presults.counterexamples;
 			
 			for (String bind: cexamples.keySet())
 			{
@@ -332,8 +331,9 @@ public class QuickCheck
 			{
 				// Generate some values for missing bindings, using the fixed method
 				RootContext ctxt = Interpreter.getInstance().getInitialContext();
-				ValueSet values = bind.getType().apply(new FixedRangeCreator(ctxt), 10);
-				union.put(bind.toString(), values);
+				ValueList list = new ValueList();
+				list.addAll(bind.getType().apply(new FixedRangeCreator(ctxt), 10));
+				union.put(bind.toString(), list);
 			}
 		}
 		
@@ -367,13 +367,13 @@ public class QuickCheck
 
 			try
 			{
-				Map<String, ValueSet> cexamples = results.counterexamples;
+				Map<String, ValueList> cexamples = results.counterexamples;
 				INExpression poexp = getINExpression(po);
 				bindings = getINBindList(poexp);
 				
 				for (INBindingSetter mbind: bindings)
 				{
-					ValueSet values = cexamples.get(mbind.toString());
+					ValueList values = cexamples.get(mbind.toString());
 					
 					if (values != null)
 					{

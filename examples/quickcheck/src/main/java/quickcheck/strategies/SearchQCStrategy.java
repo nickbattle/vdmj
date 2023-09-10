@@ -34,7 +34,7 @@ import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
-import com.fujitsu.vdmj.values.ValueSet;
+import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
 import quickcheck.visitors.SearchQCVisitor;
@@ -80,7 +80,7 @@ public class SearchQCStrategy extends QCStrategy
 	@Override
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		HashMap<String, ValueSet> result = new HashMap<String, ValueSet>();
+		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
 
 		if (po.isCheckable)
@@ -98,12 +98,12 @@ public class SearchQCStrategy extends QCStrategy
 					{
 						if (result.containsKey(key))
 						{
-							ValueSet current = result.get(key);
+							ValueList current = result.get(key);
 							current.add(pair.value);
 						}
 						else
 						{
-							result.put(key, new ValueSet(pair.value));
+							result.put(key, new ValueList(pair.value));
 						}
 						break;
 					}

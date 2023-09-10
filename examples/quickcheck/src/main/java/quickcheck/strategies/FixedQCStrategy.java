@@ -78,7 +78,7 @@ import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueSet;
+import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
 import quickcheck.visitors.FixedRangeCreator;
@@ -91,7 +91,7 @@ public class FixedQCStrategy extends QCStrategy
 	private String rangesFile = "ranges.qc";
 	private boolean createFile = false;
 
-	private Map<String, ValueSet> allRanges = null;
+	private Map<String, ValueList> allRanges = null;
 	
 	public FixedQCStrategy(List<String> argv)
 	{
@@ -181,7 +181,7 @@ public class FixedQCStrategy extends QCStrategy
 		reader.nextToken();
 	}
 	
-	private Map<String, ValueSet> readRangeFile(String filename)
+	private Map<String, ValueList> readRangeFile(String filename)
 	{
 		try
 		{
@@ -255,7 +255,7 @@ public class FixedQCStrategy extends QCStrategy
 			INMultipleBindList inbinds = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcbinds);
 			INExpressionList inexps = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexps);
 			RootContext ctxt = interpreter.getInitialContext();
-			Map<String, ValueSet> ranges = new HashMap<String, ValueSet>();
+			Map<String, ValueList> ranges = new HashMap<String, ValueList>();
 			long before = System.currentTimeMillis();
 			printf("Expanding " + inbinds.size() + " ranges: ");
 			
@@ -270,15 +270,17 @@ public class FixedQCStrategy extends QCStrategy
 				if (value instanceof SetValue)
 				{
 					SetValue svalue = (SetValue)value;
-					// ValueSet list = new ValueSet();
-					// list.addAll(svalue.values);
-					ranges.put(key, svalue.values);
+					ValueList list = new ValueList();
+					list.addAll(svalue.values);
+					ranges.put(key, list);
 				}
 				else if (value instanceof IntegerValue)
 				{
 					IntegerValue ivalue = (IntegerValue)value;
 					int limit = (int) ivalue.value;
-					ranges.put(key, tctypes.get(i).apply(new FixedRangeCreator(ctxt), limit));
+					ValueList list = new ValueList();
+					list.addAll(tctypes.get(i).apply(new FixedRangeCreator(ctxt), limit));
+					ranges.put(key, list);
 				}
 				else
 				{
@@ -400,7 +402,7 @@ public class FixedQCStrategy extends QCStrategy
 			else
 			{
 				println("Did not find " + rangesFile + " (see -fixed:create option)");
-				allRanges = new HashMap<String, ValueSet>();
+				allRanges = new HashMap<String, ValueList>();
 			}
 			
 			return !hasErrors();
@@ -410,7 +412,7 @@ public class FixedQCStrategy extends QCStrategy
 	@Override
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		Map<String, ValueSet> values = new HashMap<String, ValueSet>();
+		Map<String, ValueList> values = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
 		
 		try

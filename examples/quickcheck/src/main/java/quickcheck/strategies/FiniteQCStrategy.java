@@ -34,11 +34,11 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
 import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
+import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.values.Value;
-import com.fujitsu.vdmj.values.ValueSet;
+import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
 
@@ -119,7 +119,7 @@ public class FiniteQCStrategy extends QCStrategy
 	@Override
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		HashMap<String, ValueSet> result = new HashMap<String, ValueSet>();
+		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
 		boolean proved = false;
 		
@@ -130,11 +130,6 @@ public class FiniteQCStrategy extends QCStrategy
 			
 			for (INBindingSetter bind: binds)
 			{
-				if (bind.getType().isInfinite())
-				{
-					return new Results(false, result, 0);	// Can't do it
-				}
-				
 				try
 				{
 					long size = bind.getType().apply(new INTypeSizeVisitor(), ctxt);
@@ -145,6 +140,10 @@ public class FiniteQCStrategy extends QCStrategy
 			   			return new Results(false, result, 0);	// Too big
 					}
 				}
+				catch (InternalException e)		// Infinite
+				{
+					return new Results(false, result, 0);
+				}
 				catch (ArithmeticException e)	// Overflow probably
 				{
 					return new Results(false, result, 0);
@@ -154,15 +153,7 @@ public class FiniteQCStrategy extends QCStrategy
 			// Game on...
 			for (INBindingSetter bind: binds)
 			{
-				ValueSet set = new ValueSet();
-
-				for (Value v: bind.getType().apply(new INGetAllValuesVisitor(), ctxt))
-				{
-					set.addNoCheck(v);	// For efficiency (values aren't in order)
-				}
-				
-				set.sort();
-				result.put(bind.toString(), set);
+				result.put(bind.toString(), bind.getType().apply(new INGetAllValuesVisitor(), ctxt));
 			}
 			
 			proved = true;	// ie. if the counterexamples above pass, then PROVED

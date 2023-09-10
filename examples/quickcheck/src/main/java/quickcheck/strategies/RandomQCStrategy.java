@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
+import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
@@ -125,7 +126,7 @@ public class RandomQCStrategy extends QCStrategy
 	@Override
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		HashMap<String, ValueSet> result = new HashMap<String, ValueSet>();
+		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
 		
 		if (po.isCheckable)
@@ -136,7 +137,9 @@ public class RandomQCStrategy extends QCStrategy
 			{
 				RandomRangeCreator visitor = new RandomRangeCreator(ctxt, seed++);
 				ValueSet values = bind.getType().apply(visitor, expansionLimit);
-				result.put(bind.toString(), values);
+				ValueList list = new ValueList();
+				list.addAll(values);
+				result.put(bind.toString(), list);
 			}
 		}
 		
