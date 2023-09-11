@@ -459,10 +459,18 @@ public class QuickCheck
 					}
 					else
 					{
-						printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
-						printFailPath(bindings);
-						println("----");
-						println(po);
+						if (po.getCheckedExpression() instanceof TCExistsExpression)
+						{
+							printf("PO #%d, MAYBE %s\n", po.number, duration(before, after));
+						}
+						else
+						{
+							printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
+							printFailPath(bindings);
+							println("----");
+							println(po);
+						}
+
 					}
 				}
 				else
