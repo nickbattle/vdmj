@@ -347,7 +347,8 @@ public class QuickCheck
 		{
 			resetErrors();	// Only flag fatal errors
 			RootContext ctxt = Interpreter.getInstance().getInitialContext();
-			List<INBindingSetter> bindings = null;
+			INExpression poexp = getINExpression(po);
+			List<INBindingSetter> bindings = getINBindList(poexp);;
 
 			if (!po.isCheckable)
 			{
@@ -359,7 +360,9 @@ public class QuickCheck
 				printf("PO #%d, TRIVIAL by %s\n", po.number, po.proof);
 				return;
 			}
-			else if (results.proved && results.counterexamples.isEmpty())
+			else if (results.proved &&
+					 results.counterexamples.isEmpty() &&
+					 !bindings.isEmpty())	// empty binds => simple forall over sets, so must execute
 			{
 				po.status = POStatus.PROVED;
 				printf("PO #%d, PROVED %s\n", po.number, duration(results.duration));
@@ -369,8 +372,6 @@ public class QuickCheck
 			try
 			{
 				Map<String, ValueList> cexamples = results.counterexamples;
-				INExpression poexp = getINExpression(po);
-				bindings = getINBindList(poexp);
 				
 				for (INBindingSetter mbind: bindings)
 				{
