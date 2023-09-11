@@ -44,7 +44,7 @@ import quickcheck.strategies.Results;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-p <strategy>]* [-<strategy:option>]* [<PO numbers>]";
+	private final static String CMD = "quickcheck [-?|-help][-p <strategy>]* [-<strategy:option>]* [<PO numbers/ranges>]";
 	private final static String USAGE = "Usage: " + CMD;
 			
 	public QuickCheckCommand(String line)
@@ -72,11 +72,11 @@ public class QuickCheckCommand extends AnalysisCommand
 			return "Failed to load QC strategies";
 		}
 
-		for (String arg: arglist)	// Should just be POs, or -? -help
+		for (int i=0; i < arglist.size(); i++)	// Should just be POs, or -? -help
 		{
 			try
 			{
-				switch (arg)
+				switch (arglist.get(i))
 				{
 					case "-?":
 					case "-help":
@@ -99,9 +99,20 @@ public class QuickCheckCommand extends AnalysisCommand
 						}
 						
 						return null;
+
+					case "-":
+						i++;
+						int from = poList.get(poList.size() - 1);
+						int to = Integer.parseInt(arglist.get(i));
+						
+						for (int po=from + 1; po <= to; po++)
+						{
+							poList.add(po);
+						}
+						break;
 						
 					default:
-						poList.add(Integer.parseInt(arg));
+						poList.add(Integer.parseInt(arglist.get(i)));
 						break;
 				}
 			}
@@ -114,7 +125,6 @@ public class QuickCheckCommand extends AnalysisCommand
 		
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
-		all.renumber();
 		ProofObligationList chosen = qc.getPOs(all, poList);
 		
 		if (qc.hasErrors())
