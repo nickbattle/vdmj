@@ -55,8 +55,8 @@ public class POLetDefExpression extends POExpression
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
-		ctxt.push(new POLetDefContext(this.localDefs));	// See bug #6
 		ProofObligationList obligations = localDefs.getDefProofObligations(ctxt, env);
+		ctxt.push(new POLetDefContext(this.localDefs));	// See bug #6
 		obligations.addAll(expression.getProofObligations(ctxt, env));
 		ctxt.pop();
 
