@@ -116,6 +116,11 @@ public class QuickCheckCommand extends AnalysisCommand
 						break;
 				}
 			}
+			catch (IndexOutOfBoundsException e)
+			{
+				println("Malformed arguments");
+				return USAGE;
+			}
 			catch (NumberFormatException e)
 			{
 				println("Malformed PO#: " + e.getMessage());

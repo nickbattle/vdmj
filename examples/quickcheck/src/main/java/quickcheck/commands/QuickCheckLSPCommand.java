@@ -123,6 +123,11 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 						break;
 				}
 			}
+			catch (IndexOutOfBoundsException e)
+			{
+				println("Malformed arguments");
+				return result(request, USAGE);
+			}
 			catch (NumberFormatException e)
 			{
 				println("Malformed PO#: " + e.getMessage());
