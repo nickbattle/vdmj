@@ -362,7 +362,7 @@ public class QuickCheck
 			else if (results.proved && results.counterexamples.isEmpty())
 			{
 				po.status = POStatus.PROVED;
-				printf("PO #%d, PROVED\n", po.number);
+				printf("PO #%d, PROVED %s\n", po.number, duration(results.duration));
 				return;
 			}
 
@@ -577,6 +577,12 @@ public class QuickCheck
 		}
 		
 		println("");
+	}
+
+	private String duration(long time)
+	{
+		double duration = (double)(time)/1000;
+		return "in " + duration + "s";
 	}
 
 	private String duration(long before, long after)
