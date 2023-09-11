@@ -448,11 +448,11 @@ public class QuickCheck
 						
 						if (po.getCheckedExpression() instanceof TCExistsExpression)
 						{
-							outcome = "PROVED";		// Any "true" of an exists is PROVED.
+							outcome = "PROVED";		// An "exists" PO is PROVED, if true.
 						}
 						else
 						{
-							outcome = (results.proved) ? "PROVED" : "PASSED";
+							outcome = (results.proved) ? "PROVED" : "MAYBE";
 						}
 						
 						printf("PO #%d, %s %s\n", po.number, outcome, duration(before, after));
