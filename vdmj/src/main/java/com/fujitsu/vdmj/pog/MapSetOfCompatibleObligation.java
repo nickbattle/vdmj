@@ -41,7 +41,9 @@ public class MapSetOfCompatibleObligation extends ProofObligation
 		String m1 = getVar("m");
 		String m2 = getVar("m");
 
-		sb.append("forall " + m1 + ", " + m2 + " in set ");
+		sb.append("forall " + m1 + " in set ");
+		sb.append(exp);
+		sb.append(", " + m2 + " in set ");
 		sb.append(exp);
 
 		String d1 = getVar("d");

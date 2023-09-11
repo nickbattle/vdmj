@@ -123,7 +123,7 @@ public class PogTest extends TestCase
 		"exists finmap1:map nat to (int) & forall a:int, b in set {1, 2, 3} & (a < 10) => exists findex2 in set dom finmap1 & finmap1(findex2) = (a + b)\n",
 		"(forall a:map (int) to (int), b:map (int) to (int) &\n  forall ldom1 in set dom a, rdom2 in set dom b & ldom1 = rdom2 => a(ldom1) = b(rdom2))\n",
 		"(forall x:int &\n  forall m1, m2 in set {{1 |-> 2}, {2 |-> 3}, {x |-> 4}} & forall d3 in set dom m1, d4 in set dom m2 & d3 = d4 => m1(d3) = m2(d4))\n",
-		"forall m1, m2 in set {{1 |-> 2}, {2 |-> 3}} & forall d3 in set dom m1, d4 in set dom m2 & d3 = d4 => m1(d3) = m2(d4)\n",
+		"forall m1 in set {{1 |-> 2}, {2 |-> 3}}, m2 in set {{1 |-> 2}, {2 |-> 3}} & forall d3 in set dom m1, d4 in set dom m2 & d3 = d4 => m1(d3) = m2(d4)\n",
 		"(forall n:nat &\n  is_(measure_recursive(n), nat))\n",
 		"(forall n:nat &\n  (not (n = 1) =>\n    (n - 1) >= 0))\n",
 		"(forall n:nat &\n  (not (n = 1) =>\n    measure_recursive(n) > measure_recursive((n - 1))))\n",
