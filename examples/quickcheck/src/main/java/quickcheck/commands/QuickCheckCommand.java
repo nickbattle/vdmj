@@ -39,12 +39,12 @@ import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
 import quickcheck.QuickCheck;
-import quickcheck.qcplugins.QCPlugin;
-import quickcheck.qcplugins.Results;
+import quickcheck.strategies.QCStrategy;
+import quickcheck.strategies.Results;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-p <name>]* [-<plugin:option>]* [<PO numbers>]";
+	private final static String CMD = "quickcheck [-?|-help][-p <strategy>]* [-<strategy:option>]* [<PO numbers/ranges>]";
 	private final static String USAGE = "Usage: " + CMD;
 			
 	public QuickCheckCommand(String line)
@@ -65,45 +65,61 @@ public class QuickCheckCommand extends AnalysisCommand
 
 		List<String> arglist = new Vector<String>(Arrays.asList(argv));
 		arglist.remove(0);	// "qc"
-		qc.loadPlugins(arglist);
+		qc.loadStrategies(arglist);
 		
 		if (qc.hasErrors())
 		{
-			return "Failed to load QC plugins";
+			return "Failed to load QC strategies";
 		}
 
-		for (String arg: arglist)	// Should just be POs, or -? -help
+		for (int i=0; i < arglist.size(); i++)	// Should just be POs, or -? -help
 		{
 			try
 			{
-				switch (arg)
+				switch (arglist.get(i))
 				{
 					case "-?":
 					case "-help":
 						println(USAGE);
-						println("Enabled plugins:");
+						println("Enabled strategies:");
 						
-						for (QCPlugin plugin: qc.getEnabledPlugins())
+						for (QCStrategy strategy: qc.getEnabledStrategies())
 						{
-							println("  " + plugin.help());
+							println("  " + strategy.help());
 						}
 						
-						if (!qc.getDisabledPlugins().isEmpty())
+						if (!qc.getDisabledStrategies().isEmpty())
 						{
-							println("Disabled plugins (add with -p<name>):");
+							println("Disabled strategies (add with -p <name>):");
 							
-							for (QCPlugin plugin: qc.getDisabledPlugins())
+							for (QCStrategy strategy: qc.getDisabledStrategies())
 							{
-								println("  " + plugin.help());
+								println("  " + strategy.help());
 							}
 						}
 						
 						return null;
+
+					case "-":
+						i++;
+						int from = poList.get(poList.size() - 1);
+						int to = Integer.parseInt(arglist.get(i));
+						
+						for (int po=from + 1; po <= to; po++)
+						{
+							poList.add(po);
+						}
+						break;
 						
 					default:
-						poList.add(Integer.parseInt(arg));
+						poList.add(Integer.parseInt(arglist.get(i)));
 						break;
 				}
+			}
+			catch (IndexOutOfBoundsException e)
+			{
+				println("Malformed arguments");
+				return USAGE;
 			}
 			catch (NumberFormatException e)
 			{
@@ -114,7 +130,6 @@ public class QuickCheckCommand extends AnalysisCommand
 		
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
-		all.renumber();
 		ProofObligationList chosen = qc.getPOs(all, poList);
 		
 		if (qc.hasErrors())
@@ -122,7 +137,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			return "Failed to find POs";
 		}
 		
-		if (qc.initPlugins())
+		if (qc.initStrategies())
 		{
 			for (ProofObligation po: chosen)
 			{

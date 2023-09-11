@@ -34,12 +34,12 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import quickcheck.QuickCheck;
-import quickcheck.qcplugins.QCPlugin;
+import quickcheck.strategies.QCStrategy;
 import vdmj.commands.AnalysisCommand;
 
 public class QuickCheckLSPCommand extends AnalysisCommand
 {
-	public final static String CMD = "quickcheck [-?|-help][-p <name>]* [-<plugin:option>]* [<PO numbers>]";
+	public final static String CMD = "quickcheck [-?|-help][-p <strategy>]* [-<strategy:option>]* [<PO numbers/ranges>]";
 	private final static String USAGE = "Usage: " + CMD;
 	
 	public QuickCheckLSPCommand(String line)
@@ -72,45 +72,61 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 
 		List<String> arglist = new Vector<String>(Arrays.asList(argv));
 		arglist.remove(0);	// "qc"
-		qc.loadPlugins(arglist);
+		qc.loadStrategies(arglist);
 		
 		if (qc.hasErrors())
 		{
-			return result(request, "Failed to load QC plugins");
+			return result(request, "Failed to load QC strategies");
 		}
 
-		for (String arg: arglist)	// Should just be POs
+		for (int i=0; i < arglist.size(); i++)	// Should just be POs, or -? -help
 		{
 			try
 			{
-				switch (arg)
+				switch (arglist.get(i))
 				{
 					case "-?":
 					case "-help":
 						println(USAGE);
-						println("Enabled plugins:");
+						println("Enabled strategies:");
 						
-						for (QCPlugin plugin: qc.getEnabledPlugins())
+						for (QCStrategy strategy: qc.getEnabledStrategies())
 						{
-							println("  " + plugin.help());
+							println("  " + strategy.help());
 						}
 						
-						if (!qc.getDisabledPlugins().isEmpty())
+						if (!qc.getDisabledStrategies().isEmpty())
 						{
-							println("Disabled plugins (add with -p<name>):");
+							println("Disabled strategies (add with -p <name>):");
 							
-							for (QCPlugin plugin: qc.getDisabledPlugins())
+							for (QCStrategy strategy: qc.getDisabledStrategies())
 							{
-								println("  " + plugin.help());
+								println("  " + strategy.help());
 							}
 						}
 						
 						return result(request, null);
 						
+					case "-":
+						i++;
+						int from = poList.get(poList.size() - 1);
+						int to = Integer.parseInt(arglist.get(i));
+						
+						for (int po=from + 1; po <= to; po++)
+						{
+							poList.add(po);
+						}
+						break;
+						
 					default:
-						poList.add(Integer.parseInt(arg));
+						poList.add(Integer.parseInt(arglist.get(i)));
 						break;
 				}
+			}
+			catch (IndexOutOfBoundsException e)
+			{
+				println("Malformed arguments");
+				return result(request, USAGE);
 			}
 			catch (NumberFormatException e)
 			{

@@ -22,11 +22,11 @@
  *
  ******************************************************************************/
 
-package quickcheck.qcplugins;
+package quickcheck.strategies;
 
 import java.util.Map;
 
-import com.fujitsu.vdmj.values.ValueSet;
+import com.fujitsu.vdmj.values.ValueList;
 
 /**
  * A class to hold the return values of a getValues() call on a QC plugin.
@@ -36,11 +36,13 @@ import com.fujitsu.vdmj.values.ValueSet;
 public class Results
 {
 	public final boolean proved;
-	public final Map<String, ValueSet> counterexamples;
+	public final Map<String, ValueList> counterexamples;
+	public final long duration;		// time to generate counterexamples, in millisecs
 	
-	public Results(boolean proved, Map<String, ValueSet> counterexamples)
+	public Results(boolean proved, Map<String, ValueList> counterexamples, long duration)
 	{
 		this.proved = proved;
 		this.counterexamples = counterexamples;
+		this.duration = duration;
 	}
 }

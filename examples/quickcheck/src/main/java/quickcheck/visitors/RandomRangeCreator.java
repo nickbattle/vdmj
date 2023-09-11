@@ -55,10 +55,8 @@ import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCTokenType;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
-import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.util.DuplicateKPermutor;
 import com.fujitsu.vdmj.util.KCombinator;
 import com.fujitsu.vdmj.util.KPermutor;
@@ -85,18 +83,13 @@ import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueMap;
 import com.fujitsu.vdmj.values.ValueSet;
 
-public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
+public class RandomRangeCreator extends RangeCreator
 {
-	private final int numSetSize;	// {1, ..., N} for numerics
-	private final Context ctxt;
-	private final TCTypeSet done;
 	private final Random prng;
 	
-	public RandomRangeCreator(Context ctxt, int numSetSize, long seed)
+	public RandomRangeCreator(Context ctxt, long seed)
 	{
-		this.ctxt = ctxt;
-		this.numSetSize = numSetSize;
-		this.done = new TCTypeSet();
+		super(ctxt);
 		this.prng = new Random(seed);
 	}
 	
@@ -209,10 +202,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	public ValueSet caseNaturalOneType(TCNaturalOneType node, Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		long num = limit < numSetSize ? limit : numSetSize;
 		int bound = 10;		// Bias numbers to close to zero
 		
-		for (long a = 0; a < num; a++)
+		for (long a = 0; a < limit; a++)
 		{
 			try
 			{
@@ -232,10 +224,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	public ValueSet caseNaturalType(TCNaturalType node, Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		long num = limit < numSetSize ? limit : numSetSize;
 		int bound = 10;		// Bias numbers to close to zero
 		
-		for (long a = 0; a < num; a++)
+		for (long a = 0; a < limit; a++)
 		{
 			try
 			{
@@ -255,10 +246,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	public ValueSet caseIntegerType(TCIntegerType node, Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		long num = limit < numSetSize ? limit : numSetSize;
 		int bound = 10;		// Bias numbers to close to zero
 		
-		for (long a = 0; a < num; a++)
+		for (long a = 0; a < limit; a++)
 		{
 			try
 			{
@@ -302,12 +292,18 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		ValueSet invs = new ValueSet();
 		done.add(type);
+		int count = 0;
 		
 		for (Value v: type.type.apply(this, limit))
 		{
 			try
 			{
 				invs.add(new InvariantValue(type, v, ctxt));
+				
+				if (++count > limit)
+				{
+					break;
+				}
 			}
 			catch (ValueException e)
 			{
@@ -330,16 +326,20 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	{
 		if (done.contains(node))
 		{
-			return new ValueSet();		// recursing
+		//	return new ValueSet();		// recursing
 		}
 		
 		done.add(node);
 		
-		// Size will be the product of all fields, ie. limit ^ N. So we set root to the
-		// Nth root of limit for each field (or 1, minimally).
+		// Size will be the product of all fields, ie. limit ^ N. So we set limit2 to the
+		// so that it will just exceed this.
 		
-		int root = (int) Math.floor(Math.pow(limit, 1.0D/node.fields.size()));
-		if (root == 0) root = 1;
+		int limit2 = 1;
+		
+		while (Math.pow(node.fields.size(), limit2) < limit)
+		{
+			limit2++;
+		}
 		
 		ValueSet records = new ValueSet();
 		List<ValueSet> fvalues = new Vector<ValueSet>(node.fields.size());
@@ -348,7 +348,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		for (TCField field: node.fields)
 		{
-			ValueSet values = field.type.apply(this, root);
+			ValueSet values = field.type.apply(this, limit2);
 			fvalues.add(values);
 			fsizes[f++] = values.size();
 		}
@@ -452,7 +452,8 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		int fromSize = fromValues.size();
 		int toSize = toValues.size();
-		long count = 0;
+		results.add(new MapValue());	// empty map
+		long count = 1;
 		
 		out: for (int ds=1; ds<=fromSize; ds++)		// map domain sizes
 		{
@@ -477,7 +478,6 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 			}
 		}
 		
-		results.add(new MapValue());	// empty map
 		return results;
 	}
 	
@@ -522,11 +522,15 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseProductType(TCProductType node, Integer limit)
 	{
-		// Size will be the product of all fields, ie. limit ^ N. So we set root to the
-		// Nth root of limit for each field (or 1, minimally).
+		// Size will be the product of all fields, ie. limit ^ N. So we set limit2 to the
+		// so that it will just exceed this.
 		
-		int root = (int) Math.floor(Math.pow(limit, 1.0D/node.types.size()));
-		if (root == 0) root = 1;
+		int limit2 = 1;
+		
+		while (Math.pow(node.types.size(), limit2) < limit)
+		{
+			limit2++;
+		}
 		
 		ValueSet records = new ValueSet();
 		List<ValueSet> fvalues = new Vector<ValueSet>(node.types.size());
@@ -535,7 +539,7 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		
 		for (TCType field: node.types)
 		{
-			ValueSet values = field.apply(this, root);
+			ValueSet values = field.apply(this, limit2);
 			fvalues.add(values);
 			fsizes[f++] = values.size();
 		}
@@ -566,11 +570,45 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	@Override
 	public ValueSet caseUnionType(TCUnionType node, Integer limit)
 	{
-		ValueSet union = new ValueSet();
+		int size = node.types.size();
+		ValueSet[] values = new ValueSet[size];
+		int count = 0;
+		int sum = 0;
 		
 		for (TCType type: node.types)
 		{
-			union.addAll(type.apply(this, limit));
+			ValueSet vs = type.apply(this, limit);
+			sum = sum + vs.size();
+			values[count] = vs;
+			count++;
+		}
+		
+		ValueSet union = new ValueSet();
+
+		if (sum < limit)	// use them all
+		{
+			for (ValueSet vs: values)
+			{
+				union.addAll(vs);
+			}
+		}
+		else
+		{
+			count = 0;
+			int i = 0;	// array index
+			int j = 0;	// value index
+			
+			while (count < limit)
+			{
+				if (j < values[i].size())
+				{
+					union.add(values[i].get(j));
+					count++;
+				}
+				
+				i = (i + 1) % size;
+				if (i == 0) j++;
+			}
 		}
 		
 		return union;
@@ -579,10 +617,9 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	private ValueSet realLimit(Integer limit)
 	{
 		ValueSet result = new ValueSet();
-		long num = limit < numSetSize ? limit : numSetSize;
 		int bound = 10;		// Bias values to be close to zero
 		
-		for (long a = 0; a < num; a++)
+		for (long a = 0; a < limit; a++)
 		{
 			try
 			{
@@ -598,54 +635,10 @@ public class RandomRangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		return result;
 	}
 
-	private List<ValueSet> powerLimit(ValueSet source, int limit, boolean incEmpty)
-	{
-		// Generate a power set, up to limit values from the full power set.
-		List<ValueSet> results = new Vector<ValueSet>();
-		
-		if (source.isEmpty())
-		{
-			if (incEmpty)
-			{
-				results.add(new ValueSet());	// Just {}
-			}
-		}
-		else
-		{
-			int size = source.size();
-			long count = 0;
-			
-			if (incEmpty)
-			{
-				results.add(new ValueSet());	// Add {}
-				count++;
-			}
-			
-			for (int ss: randomOrder(size))
-			{
-				for (int[] kc: new KCombinator(size, ss))
-				{
-					ValueSet ns = new ValueSet(ss);
-	
-					for (int i=0; i<ss; i++)
-					{
-						ns.add(source.get(kc[i]));
-					}
-					
-					results.add(ns);
-					
-					if (++count >= limit)
-					{
-						return results;
-					}
-				}
-			}
-		}
-	
-		return results;
-	}
-	
-	private int[] randomOrder(int size)
+	/**
+	 * Not used... 
+	 */
+	protected int[] randomOrder(int size)
 	{
 		int[] result = new int[size];
 		

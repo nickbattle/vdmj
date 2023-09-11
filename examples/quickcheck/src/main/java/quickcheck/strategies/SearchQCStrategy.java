@@ -22,7 +22,9 @@
  *
  ******************************************************************************/
 
-package quickcheck.example;
+package quickcheck.strategies;
+
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,33 +32,29 @@ import java.util.List;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.values.ValueSet;
+import com.fujitsu.vdmj.values.NameValuePair;
+import com.fujitsu.vdmj.values.NameValuePairList;
+import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
-import quickcheck.qcplugins.QCPlugin;
-import quickcheck.qcplugins.Results;
+import quickcheck.visitors.SearchQCVisitor;
 
-public class ExampleQCPlugin extends QCPlugin
+public class SearchQCStrategy extends QCStrategy
 {
-	private boolean provedResult = false;
+	private int errorCount = 0;
 
-	public ExampleQCPlugin(List<String> argv)
+	public SearchQCStrategy(List<String> argv)
 	{
-		// Remove your "qc" plugin arguments from the list here
-		// It's useful to include the plugin name, like "-example:n"
 		for (int i=0; i < argv.size(); i++)
 		{
-			switch (argv.get(i))
-			{
-				case "-example:r":
-					argv.remove(i);
+			// No plugin arguments yet?
 
-					if (i < argv.size())
-					{
-						provedResult = Boolean.parseBoolean(argv.get(i));
-						argv.remove(i);
-					}
-					break;
+			if (argv.get(i).startsWith("-search:"))
+			{
+				errorln("Unknown search option: " + argv.get(i));
+				errorln(help());
+				errorCount ++;
+				argv.remove(i);
 			}
 		}
 	}
@@ -64,36 +62,67 @@ public class ExampleQCPlugin extends QCPlugin
 	@Override
 	public String getName()
 	{
-		return "example";	// Can be used with -p <name>
+		return "search";
 	}
 
 	@Override
 	public boolean hasErrors()
 	{
-		return false;	// Called after init and getValues
+		return errorCount > 0;
 	}
 
 	@Override
 	public boolean init(QuickCheck qc)
 	{
-		return true;	// Return value => whether to do checks or stop 
+		return true;
 	}
 
 	@Override
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
-		return new Results(provedResult, new HashMap<String, ValueSet>());
+		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
+		long before = System.currentTimeMillis();
+
+		if (po.isCheckable)
+		{
+			NameValuePairList nvps = po.getCheckedExpression().apply(new SearchQCVisitor(), null);
+			
+			for (NameValuePair pair: nvps)
+			{
+				for (INBindingSetter bind: binds)
+				{
+					String key = bind.toString();
+					
+					// HACK! Only works for single name binds
+					if (key.equals(pair.name.getName() + ":" + bind.getType()))	// eg. "a:T" = "a" +":" + "T"
+					{
+						if (result.containsKey(key))
+						{
+							ValueList current = result.get(key);
+							current.add(pair.value);
+						}
+						else
+						{
+							result.put(key, new ValueList(pair.value));
+						}
+						break;
+					}
+				}
+			}
+		}
+		
+		return new Results(false, result, System.currentTimeMillis() - before);
 	}
 
 	@Override
 	public String help()
 	{
-		return getName() + " [-example:r <bool>]";
+		return getName() + " (no options)";
 	}
 
 	@Override
 	public boolean useByDefault()
 	{
-		return false;	// Not used if no -p options given
+		return true;	// Use if no -p given
 	}
 }

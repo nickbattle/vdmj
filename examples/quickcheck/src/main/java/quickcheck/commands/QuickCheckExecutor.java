@@ -35,7 +35,7 @@ import dap.DAPRequest;
 import dap.DAPResponse;
 import json.JSONObject;
 import quickcheck.QuickCheck;
-import quickcheck.qcplugins.Results;
+import quickcheck.strategies.Results;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
 
@@ -63,7 +63,6 @@ public class QuickCheckExecutor extends AsyncExecutor
 	{
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
-		all.renumber();
 		ProofObligationList chosen = qc.getPOs(all, poList);
 		
 		if (qc.hasErrors())
@@ -72,7 +71,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 			return;
 		}
 		
-		if (qc.initPlugins())
+		if (qc.initStrategies())
 		{
 			for (ProofObligation po: chosen)
 			{
