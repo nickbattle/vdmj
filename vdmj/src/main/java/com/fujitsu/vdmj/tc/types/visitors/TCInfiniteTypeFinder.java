@@ -43,6 +43,9 @@ import com.fujitsu.vdmj.tc.types.TCUnionType;
  * non-empty set of bools. This is used by TCType.isInfinite(). Types are infinite
  * when a named or record type T contains T, without hiding it behind an optional
  * type or something that can be empty, like a set/seq/map.
+ * 
+ * Infinite types are therefore "broken". Compare with TCRecursiveTypeFinder and
+ * INTypeSizeVisitor.
  */
 public class TCInfiniteTypeFinder extends TCLeafTypeVisitor<Boolean, Set<Boolean>, TCType>
 {

@@ -34,8 +34,11 @@ import com.fujitsu.vdmj.tc.types.TCType;
 /**
  * Explore the tree of a type and indicate whether it is recursive, by returning a
  * non-empty set of bools. This is used by TCType.isRecursive(). Types are recursive
- * when a named or record type T contains T, without hiding it behind an optional
+ * when a named or record type T contains T, even if this is hidden behind an optional
  * type or something that can be empty, like a set/seq/map.
+ * 
+ * Recursive types are therefore "okay". Compare with TCInfiniteTypeFinder,
+ * and INTypeSizeVisitor.
  */
 public class TCRecursiveTypeFinder extends TCLeafTypeVisitor<Boolean, Set<Boolean>, TCType>
 {
