@@ -326,7 +326,7 @@ public class RandomRangeCreator extends RangeCreator
 	{
 		if (done.contains(node))
 		{
-		//	return new ValueSet();		// recursing
+			return new ValueSet();		// recursing
 		}
 		
 		done.add(node);
@@ -335,15 +335,19 @@ public class RandomRangeCreator extends RangeCreator
 		// so that it will just exceed this.
 		
 		int limit2 = 1;
+		int fcount = node.fields.size();
 		
-		while (Math.pow(node.fields.size(), limit2) < limit)
+		if (fcount > 1)
 		{
-			limit2++;
+			while (Math.pow(fcount, limit2) < limit)
+			{
+				limit2++;
+			}
 		}
 		
 		ValueSet records = new ValueSet();
-		List<ValueSet> fvalues = new Vector<ValueSet>(node.fields.size());
-		int[] fsizes = new int[node.fields.size()];
+		List<ValueSet> fvalues = new Vector<ValueSet>(fcount);
+		int[] fsizes = new int[fcount];
 		int f = 0;
 		
 		for (TCField field: node.fields)
@@ -526,15 +530,19 @@ public class RandomRangeCreator extends RangeCreator
 		// so that it will just exceed this.
 		
 		int limit2 = 1;
+		int tcount = node.types.size();
 		
-		while (Math.pow(node.types.size(), limit2) < limit)
+		if (tcount > 1)
 		{
-			limit2++;
+			while (Math.pow(tcount, limit2) < limit)
+			{
+				limit2++;
+			}
 		}
 		
 		ValueSet records = new ValueSet();
-		List<ValueSet> fvalues = new Vector<ValueSet>(node.types.size());
-		int[] fsizes = new int[node.types.size()];
+		List<ValueSet> fvalues = new Vector<ValueSet>(tcount);
+		int[] fsizes = new int[tcount];
 		int f = 0;
 		
 		for (TCType field: node.types)
