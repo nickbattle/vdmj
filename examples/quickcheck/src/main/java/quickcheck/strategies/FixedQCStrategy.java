@@ -363,7 +363,8 @@ public class FixedQCStrategy extends QCStrategy
 			}
 
 			writer.close();
-			println("Created " + done.size() + " default ranges in " + filename + ". Check them! Then run 'qc'");
+			println("Created " + done.size() + " default ranges in '" + filename + "'");
+			println("Check them! Then run 'qc -p fixed -fixed:file " + filename + "'");
 		}
 		catch (Exception e)
 		{
