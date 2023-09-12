@@ -39,7 +39,7 @@ import vdmj.commands.AnalysisCommand;
 
 public class QuickCheckLSPCommand extends AnalysisCommand
 {
-	public final static String CMD = "quickcheck [-?|-help][-p <strategy>]* [-<strategy:option>]* [<PO numbers>]";
+	public final static String CMD = "quickcheck [-?|-help][-p <strategy>]* [-<strategy:option>]* [<PO numbers/ranges>]";
 	private final static String USAGE = "Usage: " + CMD;
 	
 	public QuickCheckLSPCommand(String line)
@@ -79,11 +79,11 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 			return result(request, "Failed to load QC strategies");
 		}
 
-		for (String arg: arglist)	// Should just be POs
+		for (int i=0; i < arglist.size(); i++)	// Should just be POs, or -? -help
 		{
 			try
 			{
-				switch (arg)
+				switch (arglist.get(i))
 				{
 					case "-?":
 					case "-help":
@@ -107,10 +107,26 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 						
 						return result(request, null);
 						
+					case "-":
+						i++;
+						int from = poList.get(poList.size() - 1);
+						int to = Integer.parseInt(arglist.get(i));
+						
+						for (int po=from + 1; po <= to; po++)
+						{
+							poList.add(po);
+						}
+						break;
+						
 					default:
-						poList.add(Integer.parseInt(arg));
+						poList.add(Integer.parseInt(arglist.get(i)));
 						break;
 				}
+			}
+			catch (IndexOutOfBoundsException e)
+			{
+				println("Malformed arguments");
+				return result(request, USAGE);
 			}
 			catch (NumberFormatException e)
 			{

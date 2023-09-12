@@ -459,7 +459,10 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
-	 * Identify recursive and infinite types.
+	 * Identify recursive and infinite types. These are specifically to do with
+	 * named and record types that may contain themselves (ie. NOT about types
+	 * with infinite populations as such, like nat or real). Compare these
+	 * visitors with INTypeSizeVisitor.
 	 */
 	public boolean isInfinite()
 	{

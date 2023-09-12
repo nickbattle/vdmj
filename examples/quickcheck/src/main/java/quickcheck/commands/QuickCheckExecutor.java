@@ -63,7 +63,6 @@ public class QuickCheckExecutor extends AsyncExecutor
 	{
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
-		all.renumber();
 		ProofObligationList chosen = qc.getPOs(all, poList);
 		
 		if (qc.hasErrors())
