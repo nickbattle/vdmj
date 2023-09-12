@@ -19,8 +19,8 @@ SELF=$(which "$0")
 DISTRIBUTION=$(dirname "$SELF")
 cd "$DISTRIBUTION"
 
-VERSION="4.5.0-SNAPSHOT"
-RESDIR="vdmj"
+VERSION="4.5.0-P-SNAPSHOT"
+RESDIR="vdmj_hp"
 EXTENSION=${1:-~/.vscode/extensions/overturetool.vdm-vscode-1.3.7}
 
 if [ ! -e "vdmj-$VERSION.jar" ]

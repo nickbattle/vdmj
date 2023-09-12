@@ -9,7 +9,7 @@ the latest changes quickly, and cannot wait for the next VDM VSCode marketplace 
 To run the "vscode.sh" script, you must first include the installation folder (where you
 unzipped the distribution) on your $PATH. For example:
 
-PATH=$PATH:~/vdmj-suite-4.5.0-SNAPSHOT/
+PATH=$PATH:~/vdmj-suite-4.5.0-P-SNAPSHOT/
 
 You can then try running vscode.sh without any arguments, which will detect the VDM VSCode
 installation in the default location ($HOME/.vscode/extensions/overturetool.vdm-vscode-<ver>).
@@ -30,22 +30,22 @@ This CANNOT be undone!
 If anything goes wrong, you will have to REINSTALL the extension.
 
 VDM-VSCode installation = /home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7
-VDMJ distribution       = /home/nick/vdmj-suite-4.5.0-SNAPSHOT
-Version                 = 4.5.0-SNAPSHOT
+VDMJ distribution       = /home/nick/vdmj-suite-4.5.0-P-SNAPSHOT
+Version                 = 4.5.0-P-SNAPSHOT
 
 Do you want to continue [yes/no]? yes
 **************************** COPYING! ****************************
 
-removed '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj/vdmj-4.5.0-SNAPSHOT.jar'
-removed '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj/lsp-4.5.0-SNAPSHOT.jar'
-removed '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj/annotations-4.5.0-SNAPSHOT.jar'
-removed '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj/libs/stdlib-4.5.0-SNAPSHOT.jar'
+removed '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj_hp/vdmj-4.5.0-P-SNAPSHOT.jar'
+removed '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj_hp/lsp-4.5.0-P-SNAPSHOT.jar'
+removed '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj_hp/annotations-4.5.0-P-SNAPSHOT.jar'
+removed '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj_hp/libs/stdlib-4.5.0-P-SNAPSHOT.jar'
 
-'vdmj-4.5.0-SNAPSHOT.jar' -> '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj/vdmj-4.5.0-SNAPSHOT.jar'
-'lsp-4.5.0-SNAPSHOT.jar' -> '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj/lsp-4.5.0-SNAPSHOT.jar'
-'annotations-4.5.0-SNAPSHOT.jar' -> '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj/annotations-4.5.0-SNAPSHOT.jar'
-'stdlib-4.5.0-SNAPSHOT.jar' -> '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj/libs/stdlib-4.5.0-SNAPSHOT.jar'
-'quickcheck-4.5.0-SNAPSHOT.jar' -> '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj/libs/quickcheck-4.5.0-SNAPSHOT.jar'
+'vdmj-4.5.0-P-SNAPSHOT.jar' -> '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj_hp/vdmj-4.5.0-P-SNAPSHOT.jar'
+'lsp-4.5.0-P-SNAPSHOT.jar' -> '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj_hp/lsp-4.5.0-P-SNAPSHOT.jar'
+'annotations-4.5.0-P-SNAPSHOT.jar' -> '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj_hp/annotations-4.5.0-P-SNAPSHOT.jar'
+'stdlib-4.5.0-P-SNAPSHOT.jar' -> '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj_hp/libs/stdlib-4.5.0-P-SNAPSHOT.jar'
+'quickcheck-4.5.0-P-SNAPSHOT.jar' -> '/home/nick/.vscode/extensions/overturetool.vdm-vscode-1.3.7/resources/jars/vdmj_hp/libs/quickcheck-4.5.0-P-SNAPSHOT.jar'
 
 **************************** FINISHED ****************************
 
