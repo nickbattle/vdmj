@@ -358,6 +358,12 @@ public class RandomRangeCreator extends RangeCreator
 		for (TCField field: node.fields)
 		{
 			ValueSet values = field.type.apply(this, limit2);
+			
+			if (values.isEmpty())
+			{
+				return new ValueSet();	// Can't produce anything
+			}
+			
 			fvalues.add(values);
 			fsizes[f++] = values.size();
 		}
