@@ -116,6 +116,7 @@ public class TCExportedValue extends TCExport
 			else
 			{
     			TCType actualType = actual.getType();
+    			TypeComparator.setCurrentModule(name.getModule());
     			
 				if (actualType != null && !TypeComparator.compatible(type, actualType))
 				{
