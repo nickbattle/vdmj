@@ -490,7 +490,7 @@ public class SubTypeObligation extends ProofObligation
 					}
 				}
 
-				if (!set.members.isEmpty())
+				if (sb.length() > 0) // !set.members.isEmpty())
 				{
 					sb.append("\nand ");
 				}

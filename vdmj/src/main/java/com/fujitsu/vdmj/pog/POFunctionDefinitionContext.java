@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -50,6 +51,7 @@ public class POFunctionDefinitionContext extends POContext
 		this.deftype = definition.type;
 		this.paramPatternList = definition.paramPatternList;
 		this.addPrecond = precond;
+		POGetMatchingExpressionVisitor.init();
 		this.precondition = preconditionCall(name, paramPatternList, definition.precondition);
 	}
 
@@ -60,6 +62,7 @@ public class POFunctionDefinitionContext extends POContext
 		this.deftype = definition.type;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.getParamPatternList();
+		POGetMatchingExpressionVisitor.init();
 		this.precondition = preconditionCall(name, paramPatternList, definition.precondition);
 	}
 
@@ -67,6 +70,7 @@ public class POFunctionDefinitionContext extends POContext
 	public String getContext()
 	{
 		StringBuilder sb = new StringBuilder();
+		POGetMatchingExpressionVisitor.init();
 
 		if (!deftype.parameters.isEmpty())
 		{
