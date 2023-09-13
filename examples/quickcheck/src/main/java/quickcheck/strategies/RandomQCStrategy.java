@@ -133,7 +133,7 @@ public class RandomQCStrategy extends QCStrategy
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
 		
-		if (po.isCheckable)
+		if (po.isCheckable && po.getCheckedExpression() != null)
 		{
 			RootContext ctxt = Interpreter.getInstance().getInitialContext();
 			

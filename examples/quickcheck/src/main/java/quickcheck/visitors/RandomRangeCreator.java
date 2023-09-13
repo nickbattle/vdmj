@@ -462,6 +462,12 @@ public class RandomRangeCreator extends RangeCreator
 		int fromSize = fromValues.size();
 		int toSize = toValues.size();
 		results.add(new MapValue());	// empty map
+		
+		if (fromSize == 0 || toSize == 0)
+		{
+			return results;		// Probably invs very strict, so nothing found
+		}
+		
 		long count = 1;
 		
 		out: for (int ds=1; ds<=fromSize; ds++)		// map domain sizes
