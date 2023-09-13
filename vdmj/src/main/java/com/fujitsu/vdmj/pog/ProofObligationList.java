@@ -112,7 +112,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 			{
 				if (po.isCheckable)
 				{
-					typeCheck(po, tcmodule.name.getName(), menv);
+					typeCheck(po, po.location.module, menv);
 				}
 			}
 			catch (Exception e)

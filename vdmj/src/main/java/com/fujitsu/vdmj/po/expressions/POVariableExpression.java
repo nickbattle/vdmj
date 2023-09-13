@@ -69,7 +69,8 @@ public class POVariableExpression extends POExpression
 				return "";		// A function without a precondition
 			}
 
-			return ex.name.getPreName(location).getName();
+			TCNameToken pname = ex.name.getPreName(location);
+			return pname.getExplicit(!location.module.equals(ex.name.getModule())).toString();
 		}
 		else if (vardef instanceof POImplicitFunctionDefinition)
 		{
