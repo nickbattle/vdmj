@@ -273,10 +273,8 @@ public class SubTypeObligation extends ProofObligation
     			sb.append("(");
 				sb.append(exp);
     			sb.append(")");
-    			prefix = " and ";
 			}
-
-			if (etype instanceof TCNamedType)
+			else if (etype instanceof TCNamedType)
 			{
 				TCNamedType nt = (TCNamedType)etype;
 
