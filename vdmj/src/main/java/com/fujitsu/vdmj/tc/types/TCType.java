@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.tc.TCNode;
 import com.fujitsu.vdmj.tc.definitions.TCAccessSpecifier;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.types.visitors.TCExplicitTypeVisitor;
 import com.fujitsu.vdmj.tc.types.visitors.TCInfiniteTypeFinder;
 import com.fujitsu.vdmj.tc.types.visitors.TCRecursiveTypeFinder;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
@@ -102,12 +103,12 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 	
 	/**
-	 * The type with its module/class explicit, if it is not the same as the
-	 * location of this type value. Overridden in TCNamedType.
+	 * The type with its module/class(es) explicit, if it is not the same as the
+	 * location of this type value.
 	 */
-	public String toExplicitString(LexLocation from)
+	public final String toExplicitString(LexLocation from)
 	{
-		return toString();
+		return this.apply(new TCExplicitTypeVisitor(), from.module);
 	}
 
 	/**
