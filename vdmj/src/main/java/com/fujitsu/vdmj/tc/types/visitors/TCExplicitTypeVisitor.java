@@ -24,9 +24,11 @@
 
 package com.fujitsu.vdmj.tc.types.visitors;
 
+import com.fujitsu.vdmj.tc.types.TCBasicType;
 import com.fujitsu.vdmj.tc.types.TCBracketType;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCInMapType;
+import com.fujitsu.vdmj.tc.types.TCInvariantType;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
@@ -76,12 +78,12 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 		for (TCType param: node.parameters)
 		{
 			all.append(prefix);
-			all.append(param.apply(this, from));
+			all.append(wrap(param, from));
 			prefix = " * ";
 		}
 		
 		all.append(node.partial ? " -> " : " +> ");
-		all.append(node.result.apply(this, from));
+		all.append(wrap(node.result, from));
 		return all.toString();
 	}
 
@@ -90,11 +92,10 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 	{
 		StringBuilder all = newBuilder();
 		
-		all.append("inmap (");
-		all.append(node.from.apply(this, from));
-		all.append(") to (");
-		all.append(node.to.apply(this, from));
-		all.append(")");
+		all.append("inmap ");
+		all.append(wrap(node.from, from));
+		all.append(" to ");
+		all.append(wrap(node.to, from));
 		
 		return all.toString();
 	}
@@ -104,11 +105,10 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 	{
 		StringBuilder all = newBuilder();
 		
-		all.append("map (");
-		all.append(node.from.apply(this, from));
-		all.append(") to (");
-		all.append(node.to.apply(this, from));
-		all.append(")");
+		all.append("map ");
+		all.append(wrap(node.from, from));
+		all.append(" to ");
+		all.append(wrap(node.to, from));
 		
 		return all.toString();
 	}
@@ -148,12 +148,12 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 		for (TCType param: node.parameters)
 		{
 			all.append(prefix);
-			all.append(param.apply(this, from));
+			all.append(wrap(param, from));
 			prefix = " * ";
 		}
 		
 		all.append(" ==> ");
-		all.append(node.result.apply(this, from));
+		all.append(wrap(node.result, from));
 		return all.toString();
 	}
 
@@ -173,7 +173,7 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 		{
 			all.append(prefix);
 			all.append("(");
-			all.append(param.apply(this, from));
+			all.append(wrap(param, from));
 			all.append(")");
 			prefix = " * ";
 		}
@@ -210,25 +210,25 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 	@Override
 	public String caseSeq1Type(TCSeq1Type node, String from)
 	{
-		return "seq1 of (" + node.seqof.apply(this, from) + ")";
+		return "seq1 of " + wrap(node.seqof, from);
 	}
 
 	@Override
 	public String caseSeqType(TCSeqType node, String from)
 	{
-		return "seq of (" + node.seqof.apply(this, from) + ")";
+		return "seq of " + wrap(node.seqof, from);
 	}
 
 	@Override
 	public String caseSet1Type(TCSet1Type node, String from)
 	{
-		return "set1 of (" + node.setof.apply(this, from) + ")";
+		return "set1 of " + wrap(node.setof, from);
 	}
 
 	@Override
 	public String caseSetType(TCSetType node, String from)
 	{
-		return "set of (" + node.setof.apply(this, from) + ")";
+		return "set of " + wrap(node.setof, from);
 	}
 
 	@Override
@@ -240,7 +240,7 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 		for (TCType param: node.types)
 		{
 			all.append(prefix);
-			all.append(param.apply(this, from));
+			all.append(wrap(param, from));
 			prefix = " | ";
 		}
 		
@@ -250,5 +250,21 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 	private StringBuilder newBuilder()
 	{
 		return new StringBuilder();
+	}
+	
+	/**
+	 * Don't bother wrapping simple types in brackets. 
+	 */
+	private String wrap(TCType type, String from)
+	{
+		if (type instanceof TCBasicType ||
+			type instanceof TCInvariantType)
+		{
+			return type.apply(this, from);
+		}
+		else
+		{
+			return "(" + type.apply(this, from) + ")";
+		}
 	}
 }
