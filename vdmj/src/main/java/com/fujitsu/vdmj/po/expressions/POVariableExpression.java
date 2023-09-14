@@ -81,7 +81,8 @@ public class POVariableExpression extends POExpression
 				return "";		// A function without a precondition
 			}
 
-			return im.name.getPreName(location).getName();
+			TCNameToken pname = im.name.getPreName(location);
+			return pname.getExplicit(!location.module.equals(im.name.getModule())).toString();
 		}
 		else if (vardef instanceof POExplicitOperationDefinition)
 		{
@@ -92,7 +93,8 @@ public class POVariableExpression extends POExpression
 				return "";		// An operation without a precondition
 			}
 
-			return ex.name.getPreName(location).getName();
+			TCNameToken pname = ex.name.getPreName(location);
+			return pname.getExplicit(!location.module.equals(ex.name.getModule())).toString();
 		}
 		else if (vardef instanceof POImplicitOperationDefinition)
 		{
@@ -103,7 +105,8 @@ public class POVariableExpression extends POExpression
 				return "";		// An operation without a precondition
 			}
 
-			return im.name.getPreName(location).getName();
+			TCNameToken pname = im.name.getPreName(location);
+			return pname.getExplicit(!location.module.equals(im.name.getModule())).toString();
 		}
 
 		return null;	// Not a function/operation.
