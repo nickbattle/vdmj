@@ -90,10 +90,11 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 	{
 		StringBuilder all = newBuilder();
 		
-		all.append("inmap ");
+		all.append("inmap (");
 		all.append(node.from.apply(this, from));
-		all.append(" to ");
+		all.append(") to (");
 		all.append(node.to.apply(this, from));
+		all.append(")");
 		
 		return all.toString();
 	}
@@ -103,10 +104,11 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 	{
 		StringBuilder all = newBuilder();
 		
-		all.append("map ");
+		all.append("map (");
 		all.append(node.from.apply(this, from));
-		all.append(" to ");
+		all.append(") to (");
 		all.append(node.to.apply(this, from));
+		all.append(")");
 		
 		return all.toString();
 	}
@@ -121,15 +123,19 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 		else
 		{
 			done.add(node);
+			String s = null;
 			
 			if (node.location.module.equals(from))
 			{
-				return node.typename.toString();
+				s = node.typename.toString();
 			}
 			else
 			{
-				return node.typename.getExplicit(true).toString();
+				s = node.typename.getExplicit(true).toString();
 			}
+			
+			done.remove(node);
+			return s;
 		}
 	}
 
@@ -166,7 +172,9 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 		for (TCType param: node.types)
 		{
 			all.append(prefix);
+			all.append("(");
 			all.append(param.apply(this, from));
+			all.append(")");
 			prefix = " * ";
 		}
 		
@@ -183,40 +191,44 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 		else
 		{
 			done.add(node);
+			String s = null;
 			
 			if (node.location.module.equals(from))
 			{
-				return node.name.toString();
+				s = node.name.toString();
 			}
 			else
 			{
-				return node.name.getExplicit(true).toString();
+				s = node.name.getExplicit(true).toString();
 			}
+			
+			done.remove(node);
+			return s;
 		}
 	}
 
 	@Override
 	public String caseSeq1Type(TCSeq1Type node, String from)
 	{
-		return "seq1 of " + node.seqof.apply(this, from);
+		return "seq1 of (" + node.seqof.apply(this, from) + ")";
 	}
 
 	@Override
 	public String caseSeqType(TCSeqType node, String from)
 	{
-		return "seq of " + node.seqof.apply(this, from);
+		return "seq of (" + node.seqof.apply(this, from) + ")";
 	}
 
 	@Override
 	public String caseSet1Type(TCSet1Type node, String from)
 	{
-		return "set1 of " + node.setof.apply(this, from);
+		return "set1 of (" + node.setof.apply(this, from) + ")";
 	}
 
 	@Override
 	public String caseSetType(TCSetType node, String from)
 	{
-		return "set of " + node.setof.apply(this, from);
+		return "set of (" + node.setof.apply(this, from) + ")";
 	}
 
 	@Override
