@@ -302,6 +302,12 @@ public class QuickCheck
 	{
 		Map<String, ValueList> union = new HashMap<String, ValueList>();
 		boolean proved = false;
+		
+		if (!po.isCheckable)
+		{
+			return new Results(proved, union, 0);
+		}
+		
 		INExpression exp = getINExpression(po);
 		List<INBindingSetter> binds = getINBindList(exp);
 		long before = System.currentTimeMillis();
