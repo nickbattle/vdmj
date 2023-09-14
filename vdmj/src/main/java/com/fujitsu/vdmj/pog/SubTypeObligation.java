@@ -242,8 +242,7 @@ public class SubTypeObligation extends ProofObligation
 				sb.append("(");
 				addIs(sb, exp, poss);
 
-				if (s.length() > 0 &&
-					!s.startsWith("is_(") && !s.startsWith("(is_("))
+				if (s.length() > 0 && !s.startsWith("is_("))
 				{
 					sb.append(" and ");
 					sb.append(s);
@@ -272,19 +271,7 @@ public class SubTypeObligation extends ProofObligation
 				}
 				
     			sb.append("(");
-
-//				This needs to be put back if/when we change the inv_R signature to take
-//    			the record fields as arguments, rather than one R value.
-//				if (exp instanceof POMkTypeExpression)
-//				{
-//					POMkTypeExpression mk = (POMkTypeExpression)exp;
-//					sb.append(Utils.listToString(mk.args));
-//				}
-//				else
-				{
-					sb.append(exp);
-				}
-
+				sb.append(exp);
     			sb.append(")");
     			prefix = " and ";
 			}
@@ -488,11 +475,6 @@ public class SubTypeObligation extends ProofObligation
 						sb.append(")");
 						prefix = "\nand ";
 					}
-				}
-
-				if (sb.length() > 0) // !set.members.isEmpty())
-				{
-					sb.append("\nand ");
 				}
 			}
 			else if (exp instanceof POSetRangeExpression)
