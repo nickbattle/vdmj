@@ -181,6 +181,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 			{
 				case 3336:	// "Illegal use of RESULT reserved identifier"
 					iter.remove();
+					obligation.isCheckable = false;			// No point
 					break;
 					
 				case 3182:	// "Name 'xxx' is not in scope"
@@ -188,6 +189,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 					{
 						// Probably an implicit missing measure
 						iter.remove();
+						obligation.isCheckable = false;		// No point
 					}
 					break;
 					
