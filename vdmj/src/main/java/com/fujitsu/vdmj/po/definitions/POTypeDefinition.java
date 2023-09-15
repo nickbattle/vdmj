@@ -125,7 +125,7 @@ public class POTypeDefinition extends PODefinition
 			list.add(new StrictOrderObligation(this, ctxt));
 		}
 		
-		if (eqdef != null || orddef != null)
+		if (orddef != null)
 		{
 			list.add(new TotalOrderObligation(this, ctxt));
 		}

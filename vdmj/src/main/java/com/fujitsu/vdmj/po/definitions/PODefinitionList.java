@@ -94,16 +94,19 @@ public class PODefinitionList extends POMappedList<TCDefinition, PODefinition>
 	public ProofObligationList getDefProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		int count = 0;
 
 		for (PODefinition d: this)
 		{
+			ctxt.push(new POLetDefContext(d));		// In scope for recursive or total obligations
+			count++;
+
 			ctxt.push(new PONameContext(d.getVariableNames()));
 			obligations.addAll(d.getProofObligations(ctxt, env));
 			ctxt.pop();
-			ctxt.push(new POLetDefContext(d));
 		}
 		
-		for (int i=0; i<this.size(); i++)
+		for (int i=0; i<count; i++)
 		{
 			ctxt.pop();
 		}
