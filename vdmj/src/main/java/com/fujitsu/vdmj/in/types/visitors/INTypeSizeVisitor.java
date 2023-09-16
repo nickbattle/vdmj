@@ -54,6 +54,7 @@ import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCTokenType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUndefinedType;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -66,6 +67,14 @@ import com.fujitsu.vdmj.values.Value;
 
 public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 {
+	/**
+	 * We have to collect the nodes that have already been visited since types can be recursive,
+	 * and the visitor will otherwise blow the stack. Note that this means you need a new visitor
+	 * instance for every use (or only re-use with care!). This is tested and modified in the
+	 * NamedType and RecordType entries.
+	 */
+	protected TCTypeSet done = new TCTypeSet();
+
 	@Override
 	public Long caseType(TCType type, Context ctxt)
 	{
@@ -117,6 +126,12 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	@Override
 	public Long caseNamedType(TCNamedType type, Context ctxt)
 	{
+		if (done.contains(type))
+		{
+			return 1L;	// Not zero
+		}
+
+		done.add(type);
 		return type.type.apply(this, ctxt);
 	}
 
@@ -160,6 +175,12 @@ public class INTypeSizeVisitor extends TCTypeVisitor<Long, Context>
 	@Override
 	public Long caseRecordType(TCRecordType type, Context ctxt)
 	{
+		if (done.contains(type))
+		{
+			return 1L;	// Not zero
+		}
+
+		done.add(type);
 		TCTypeList fieldtypes = new TCTypeList();
 
 		for (TCField f: type.fields)
