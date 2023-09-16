@@ -60,7 +60,7 @@ public class POCaseContext extends POContext
     		sb.append("exists ");
     		sb.append(pattern.getMatchingExpression());
     		sb.append(":");
-    		sb.append(type);
+    		sb.append(type.toExplicitString(pattern.location));
     		sb.append(" & ");
 			POGetMatchingExpressionVisitor.init();
 			sb.append(pattern.getMatchingExpression());
