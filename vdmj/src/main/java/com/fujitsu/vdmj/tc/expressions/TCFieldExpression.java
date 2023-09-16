@@ -71,7 +71,7 @@ public class TCFieldExpression extends TCExpression
 	{
 		root = object.typeCheck(env, null, scope, null);
 
-		if (root.isUnknown(location))
+		if (root instanceof TCUnknownType)
 		{
 			memberName = new TCNameToken(field.getLocation(), "?", "?", true);
 			return setType(root);
