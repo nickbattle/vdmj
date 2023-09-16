@@ -137,7 +137,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 	{
 		if (done.contains(type))
 		{
-			return 1L;	// Not zero
+			return BigInteger.ONE;	// Not zero
 		}
 
 		done.add(type);
@@ -186,7 +186,7 @@ public class INTypeSizeVisitor extends TCTypeVisitor<BigInteger, Context>
 	{
 		if (done.contains(type))
 		{
-			return 1L;	// Not zero
+			return BigInteger.ONE;	// Not zero
 		}
 
 		done.add(type);
