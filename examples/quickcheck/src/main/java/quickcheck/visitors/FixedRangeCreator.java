@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.in.expressions.INIntegerLiteralExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCBracketType;
@@ -288,6 +289,10 @@ public class FixedRangeCreator extends RangeCreator
 				}
 			}
 			catch (ValueException e)
+			{
+				// Value does not match invariant, so ignore it
+			}
+			catch (ContextException e)
 			{
 				// Value does not match invariant, so ignore it
 			}
