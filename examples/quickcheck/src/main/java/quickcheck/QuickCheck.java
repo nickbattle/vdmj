@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
@@ -415,25 +414,18 @@ public class QuickCheck
 					{
 						result = new BooleanValue(false);
 	
-						if (Settings.verbose)
+						if (e.ctxt.outer != null)
 						{
-							if (e.ctxt.outer != null)
-							{
-								e.ctxt.printStackFrames(Console.out);
-							}
-							else
-							{
-								println("In context of " + e.ctxt.title + " " + e.ctxt.location);
-							}
-							
-							println("----");
-							printBindings(bindings);
-							println("----");
+							e.ctxt.printStackFrames(Console.out);
 						}
 						else
 						{
-							println("Use -verbose to see exception stack");
+							println("In context of " + e.ctxt.title + " " + e.ctxt.location);
 						}
+						
+						println("----");
+						printBindings(bindings);
+						println("----");
 					}
 				}
 				
