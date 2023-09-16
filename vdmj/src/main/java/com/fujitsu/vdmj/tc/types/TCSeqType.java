@@ -95,7 +95,7 @@ public class TCSeqType extends TCType
 	@Override
 	public String toDisplay()
 	{
-		return empty ? "[]" : "seq of (" + seqof + ")";
+		return empty ? "seq of ?" : "seq of (" + seqof + ")";
 	}
 
 	@Override

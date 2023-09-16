@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 abstract public class ProofObligation implements Comparable<ProofObligation>
@@ -113,22 +112,6 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	 */
 	protected String explicitType(TCType type, LexLocation poLoc)
 	{
-		if (type instanceof TCNamedType)
-		{
-			TCNamedType ntype = (TCNamedType)type;
-			
-			if (ntype.typename.getLocation().module.equals(poLoc.module))
-			{
-				return ntype.toString();
-			}
-			else
-			{
-				return ntype.typename.getExplicit(true).toString();
-			}
-		}
-		else
-		{
-			return type.toString();
-		}
+		return type.toExplicitString(poLoc);
 	}
 }

@@ -95,8 +95,11 @@ public class POApplyExpression extends POExpression
 				obligations.add(new SubTypeObligation(args.get(0), m.from, atype, ctxt));
 			}
 		}
+		
+		boolean polymorphic = type.isFunction(location) && type.getFunction().instantiated != null;
 
-		if (!type.isUnknown(location) && (type.isFunction(location) || type.isOperation(location)))
+		if (!type.isUnknown(location) && !polymorphic &&
+			(type.isFunction(location) || type.isOperation(location)))
 		{
 			TCTypeList paramTypes = type.isFunction(location) ?
 				type.getFunction().parameters : type.getOperation().parameters;
@@ -124,7 +127,7 @@ public class POApplyExpression extends POExpression
 			}
 		}
 
-		if (!type.isUnknown(location) && type.isFunction(location))
+		if (!type.isUnknown(location) && type.isFunction(location) && !polymorphic)
 		{
 			if (recursive != null)	// name is a function in a recursive loop
 			{

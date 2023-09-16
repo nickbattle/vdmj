@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.util.Utils;
 
 abstract public class POContext
 {
@@ -79,7 +78,7 @@ abstract public class POContext
 
 		for (POPatternList plist: paramPatternList)
 		{
-			call.append("(" + Utils.listToString(plist) + ")");
+			call.append("(" + plist.getMatchingExpressionList() + ")");
 		}
 
 		return call.toString();

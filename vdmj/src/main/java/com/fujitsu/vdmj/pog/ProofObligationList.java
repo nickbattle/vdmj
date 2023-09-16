@@ -112,7 +112,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 			{
 				if (po.isCheckable)
 				{
-					typeCheck(po, tcmodule.name.getName(), menv);
+					typeCheck(po, po.location.module, menv);
 				}
 			}
 			catch (Exception e)
@@ -180,7 +180,9 @@ public class ProofObligationList extends Vector<ProofObligation>
 			switch (message.number)
 			{
 				case 3336:	// "Illegal use of RESULT reserved identifier"
+				case 3350:	// "Polymorphic function has not been instantiated"
 					iter.remove();
+					obligation.isCheckable = false;			// No point
 					break;
 					
 				case 3182:	// "Name 'xxx' is not in scope"
@@ -188,6 +190,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 					{
 						// Probably an implicit missing measure
 						iter.remove();
+						obligation.isCheckable = false;		// No point
 					}
 					break;
 					

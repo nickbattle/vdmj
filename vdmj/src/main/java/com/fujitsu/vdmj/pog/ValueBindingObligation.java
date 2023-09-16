@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.definitions.POEqualsDefinition;
 import com.fujitsu.vdmj.po.definitions.POValueDefinition;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 
 public class ValueBindingObligation extends ProofObligation
 {
@@ -39,6 +40,7 @@ public class ValueBindingObligation extends ProofObligation
 		sb.append(":");
 		sb.append(poValueDefinition.type);
 		sb.append(" & ");
+		POGetMatchingExpressionVisitor.init();
 		sb.append(poValueDefinition.pattern.getMatchingExpression());
 		sb.append(" = ");
 		sb.append(poValueDefinition.exp);
@@ -56,6 +58,7 @@ public class ValueBindingObligation extends ProofObligation
 		sb.append(":");
 		sb.append(def.expType);
 		sb.append(" & ");
+		POGetMatchingExpressionVisitor.init();
 		sb.append(def.pattern.getMatchingExpression());
 		sb.append(" = ");
 		sb.append(def.test);

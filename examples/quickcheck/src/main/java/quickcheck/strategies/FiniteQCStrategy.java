@@ -28,6 +28,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
@@ -49,29 +50,33 @@ public class FiniteQCStrategy extends QCStrategy
 
 	public FiniteQCStrategy(List<String> argv)
 	{
-		for (int i=0; i < argv.size(); i++)
+		Iterator<String> iter = argv.iterator();
+		
+		while (iter.hasNext())
 		{
 			try
 			{
-				switch (argv.get(i))
+				String arg = iter.next();
+				
+				switch (arg)
 				{
 					case "-finite:size":		// Total top level size = type size
-						argv.remove(i);
+						iter.remove();
 
-						if (i < argv.size())
+						if (iter.hasNext())
 						{
-							expansionLimit = Integer.parseInt(argv.get(i));
-							argv.remove(i);
+							expansionLimit = Integer.parseInt(iter.next());
+							iter.remove();
 						}
 						break;
 
 					default:
-						if (argv.get(i).startsWith("-finite:"))
+						if (arg.startsWith("-finite:"))
 						{
-							errorln("Unknown finite option: " + argv.get(i));
+							errorln("Unknown finite option: " + arg);
 							errorln(help());
 							errorCount++;
-							argv.remove(i);
+							iter.remove();
 						}
 				}
 			}

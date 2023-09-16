@@ -34,6 +34,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +46,9 @@ import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
+import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -67,6 +70,7 @@ import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -95,53 +99,57 @@ public class FixedQCStrategy extends QCStrategy
 	
 	public FixedQCStrategy(List<String> argv)
 	{
-		for (int i=0; i < argv.size(); i++)
+		Iterator<String> iter = argv.iterator();
+		
+		while (iter.hasNext())
 		{
 			try
 			{
-				switch (argv.get(i))
+				String arg = iter.next();
+				
+				switch (arg)
 				{
 					case "-fixed:file":			// Use this as ranges.qc
-						argv.remove(i);
+						iter.remove();
 
-						if (i < argv.size())
+						if (iter.hasNext())
 						{
-							rangesFile = argv.get(i);
-							argv.remove(i);
+							rangesFile = iter.next();
+							iter.remove();
 						}
 						
 						createFile = false;
 						break;
 						
 					case "-fixed:create":		// Create ranges.qc
-						argv.remove(i);
+						iter.remove();
 						
-						if (i < argv.size())
+						if (iter.hasNext())
 						{
-							rangesFile = argv.get(i);
-							argv.remove(i);
+							rangesFile = iter.next();
+							iter.remove();
 						}
 
 						createFile = true;
 						break;
 						
 					case "-fixed:size":		// Total top level size
-						argv.remove(i);
+						iter.remove();
 
-						if (i < argv.size())
+						if (iter.hasNext())
 						{
-							expansionLimit = Integer.parseInt(argv.get(i));
-							argv.remove(i);
+							expansionLimit = Integer.parseInt(iter.next());
+							iter.remove();
 						}
 						break;
 						
 					default:
-						if (argv.get(i).startsWith("-fixed:"))
+						if (arg.startsWith("-fixed:"))
 						{
-							errorln("Unknown fixed option: " + argv.get(i));
+							errorln("Unknown fixed option: " + arg);
 							errorln(help());
 							errorCount++;
-							argv.remove(i);
+							iter.remove();
 						}
 				}
 			}
@@ -262,7 +270,7 @@ public class FixedQCStrategy extends QCStrategy
 			for (int i=0; i<inbinds.size(); i++)
 			{
 				ctxt.threadState.init();
-				String key = inbinds.get(i).toString();
+				String key = keyFor(inbinds.get(i));
 				printf(".");
 				INExpression exp = inexps.get(i);
 				Value value = exp.eval(ctxt);
@@ -327,7 +335,26 @@ public class FixedQCStrategy extends QCStrategy
 		errorCount++;
 		return null;
 	}
-	
+
+	/**
+	 * We can't create a key with the toString of the bind, because the type may not
+	 * be explicit. 
+	 */
+	private String keyFor(INMultipleBind bind)
+	{
+		INMultipleTypeBind tb = (INMultipleTypeBind)bind;
+		
+		if (tb.type instanceof TCNamedType)
+		{
+			TCNamedType nt = (TCNamedType)tb.type;
+			return tb.plist.toString() + ":" + nt.typename.getExplicit(false);
+		}
+		else
+		{
+			return tb.plist.toString() + ":" + tb.type.toString();
+		}
+	}
+
 	private void createRangeFile(QuickCheck qc, String filename)
 	{
 		try

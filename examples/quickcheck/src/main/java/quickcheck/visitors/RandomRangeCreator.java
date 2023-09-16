@@ -324,6 +324,20 @@ public class RandomRangeCreator extends RangeCreator
 	@Override
 	public ValueSet caseRecordType(TCRecordType node, Integer limit)
 	{
+		if (node.fields.isEmpty())		// eg. R :: ;, which has one value, mk_R()
+		{
+			try
+			{
+				ValueSet records = new ValueSet();
+				records.add(new RecordValue(node, new ValueList(), ctxt));
+				return records;
+			}
+			catch (ValueException e)
+			{
+				// Can't happen
+			}
+		}
+		
 		if (done.contains(node))
 		{
 			return new ValueSet();		// recursing
@@ -334,17 +348,8 @@ public class RandomRangeCreator extends RangeCreator
 		// Size will be the product of all fields, ie. limit ^ N. So we set limit2 to the
 		// so that it will just exceed this.
 		
-		int limit2 = 1;
 		int fcount = node.fields.size();
-		
-		if (fcount > 1)
-		{
-			while (Math.pow(fcount, limit2) < limit)
-			{
-				limit2++;
-			}
-		}
-		
+		int limit2 = leastPower(fcount, limit);
 		ValueSet records = new ValueSet();
 		List<ValueSet> fvalues = new Vector<ValueSet>(fcount);
 		int[] fsizes = new int[fcount];
@@ -353,6 +358,12 @@ public class RandomRangeCreator extends RangeCreator
 		for (TCField field: node.fields)
 		{
 			ValueSet values = field.type.apply(this, limit2);
+			
+			if (values.isEmpty())
+			{
+				return new ValueSet();	// Can't produce anything
+			}
+			
 			fvalues.add(values);
 			fsizes[f++] = values.size();
 		}
@@ -457,6 +468,12 @@ public class RandomRangeCreator extends RangeCreator
 		int fromSize = fromValues.size();
 		int toSize = toValues.size();
 		results.add(new MapValue());	// empty map
+		
+		if (fromSize == 0 || toSize == 0)
+		{
+			return results;		// Probably invs very strict, so nothing found
+		}
+		
 		long count = 1;
 		
 		out: for (int ds=1; ds<=fromSize; ds++)		// map domain sizes
@@ -529,17 +546,8 @@ public class RandomRangeCreator extends RangeCreator
 		// Size will be the product of all fields, ie. limit ^ N. So we set limit2 to the
 		// so that it will just exceed this.
 		
-		int limit2 = 1;
 		int tcount = node.types.size();
-		
-		if (tcount > 1)
-		{
-			while (Math.pow(tcount, limit2) < limit)
-			{
-				limit2++;
-			}
-		}
-		
+		int limit2 = leastPower(tcount, limit);
 		ValueSet records = new ValueSet();
 		List<ValueSet> fvalues = new Vector<ValueSet>(tcount);
 		int[] fsizes = new int[tcount];
