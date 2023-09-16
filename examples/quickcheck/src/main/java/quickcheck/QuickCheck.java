@@ -42,7 +42,6 @@ import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -404,7 +403,7 @@ public class QuickCheck
 				}
 				catch (ContextException e)
 				{
-					printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
+					printf("PO #%d, %s\n", po.number, e.getMessage());
 					
 					if (e.rawMessage.equals("Execution cancelled"))
 					{
@@ -413,19 +412,6 @@ public class QuickCheck
 					else
 					{
 						result = new BooleanValue(false);
-	
-						if (e.ctxt.outer != null)
-						{
-							e.ctxt.printStackFrames(Console.out);
-						}
-						else
-						{
-							println("In context of " + e.ctxt.title + " " + e.ctxt.location);
-						}
-						
-						println("----");
-						printBindings(bindings);
-						println("----");
 					}
 				}
 				
