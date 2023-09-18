@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POFunctionResultContext;
 import com.fujitsu.vdmj.pog.PONameContext;
+import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
@@ -136,11 +137,6 @@ public class POExplicitFunctionDefinition extends PODefinition
 		ProofObligationList obligations =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 				
-		if (typeParams != null && !typeParams.isEmpty())
-		{
-			return obligations;		// Cannot generate POs for polymorphic fns (yet)
-		}
-				
 		TCNameList pids = new TCNameList();
 		boolean matchNeeded = false;
 
@@ -157,6 +153,12 @@ public class POExplicitFunctionDefinition extends PODefinition
 			}
 		}
 		
+		if (typeParams != null && !typeParams.isEmpty())
+		{
+			// Cannot generate POs for polymorphic fns (yet), so unchecked
+			ctxt.push(new PONoCheckContext());
+		}
+
 		if (type.hasTotal())
 		{
 			ctxt.push(new POFunctionDefinitionContext(this, true));
@@ -205,6 +207,12 @@ public class POExplicitFunctionDefinition extends PODefinition
 
 		ctxt.pop();
 
+		if (typeParams != null && !typeParams.isEmpty())
+		{
+			// Cannot generate POs for polymorphic fns (yet), so unchecked
+			ctxt.pop();
+		}
+				
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;
 	}
