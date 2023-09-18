@@ -36,11 +36,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.pog.POStatus;
@@ -245,6 +247,12 @@ public class QuickCheck
 				{
 					chosen.add(po);
 				}
+			}
+			
+			if (!all.isEmpty() && chosen.isEmpty())
+			{
+				String m = (Settings.dialect == Dialect.VDM_SL) ? "module" : "class";
+				println("No POs in current " + m + " (" + def + ")");
 			}
 			
 			return chosen;	// No PO#s specified, so use default class/module's POs
