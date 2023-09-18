@@ -44,7 +44,6 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -404,6 +403,7 @@ public class QuickCheck
 				
 				long before = System.currentTimeMillis();
 				Value result = new BooleanValue(false);
+				ContextException exception = null;
 				
 				try
 				{
@@ -412,8 +412,6 @@ public class QuickCheck
 				}
 				catch (ContextException e)
 				{
-					printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
-					
 					if (e.rawMessage.equals("Execution cancelled"))
 					{
 						result = null;
@@ -421,19 +419,7 @@ public class QuickCheck
 					else
 					{
 						result = new BooleanValue(false);
-	
-						if (e.ctxt.outer != null)
-						{
-							e.ctxt.printStackFrames(Console.out);
-						}
-						else
-						{
-							println("In context of " + e.ctxt.title + " " + e.ctxt.location);
-						}
-						
-						println("----");
-						printBindings(bindings);
-						println("----");
+						exception = e;
 					}
 				}
 				
@@ -473,10 +459,15 @@ public class QuickCheck
 						{
 							printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
 							printFailPath(bindings);
+							
+							if (exception != null)
+							{
+								printf("Causes %s\n", exception.getMessage());
+							}
+							
 							println("----");
 							println(po);
 						}
-
 					}
 				}
 				else
