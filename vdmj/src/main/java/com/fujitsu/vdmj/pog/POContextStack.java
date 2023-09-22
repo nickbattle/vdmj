@@ -30,6 +30,7 @@ import java.util.Stack;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 @SuppressWarnings("serial")
 public class POContextStack extends Stack<POContext>
@@ -101,6 +102,21 @@ public class POContextStack extends Stack<POContext>
 		result.append("\n");
 
 		return result.toString();
+	}
+	
+	public TCTypeList getTypeParams()
+	{
+		for (POContext ctxt: this)
+		{
+			TCTypeList params = ctxt.getTypeParams();
+			
+			if (params != null && !params.isEmpty())
+			{
+				return params;
+			}
+		}
+		
+		return null;
 	}
 
 	private String indentNewLines(String line, String indent)
