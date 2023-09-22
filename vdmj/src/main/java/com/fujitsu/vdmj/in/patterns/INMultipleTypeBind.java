@@ -33,14 +33,12 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.values.ValueList;
 
 public class INMultipleTypeBind extends INMultipleBind implements INBindingSetter
 {
 	private static final long serialVersionUID = 1L;
 	public final TCType type;
-	public final boolean hasTypeParams;
 	
 	private ValueList bindValues = null;
 	private Context bindCounterexample = null;
@@ -50,7 +48,6 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	{
 		super(plist);
 		this.type = type;
-		this.hasTypeParams = !type.apply(new TCParameterCollector(), null).isEmpty();
 	}
 
 	@Override
@@ -107,7 +104,7 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	@Override
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
-		if (bindValues != null && bindPermuted == permuted && !hasTypeParams)
+		if (bindValues != null && bindPermuted == permuted)
 		{
 			return bindValues;		// Should be exactly the same
 		}
