@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POFunctionResultContext;
 import com.fujitsu.vdmj.pog.PONameContext;
+import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SatisfiabilityObligation;
@@ -135,6 +136,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 		TCNameList pids = new TCNameList();
 		boolean matchNeeded = false;
+		boolean polymorphic = (typeParams != null && !typeParams.isEmpty());
 
 		for (POPatternListTypePair pltp: parameterPatterns)
 		{
@@ -147,6 +149,12 @@ public class POImplicitFunctionDefinition extends PODefinition
 			{
 				matchNeeded = true;
 			}
+		}
+		
+		if (polymorphic)
+		{
+			// Cannot generate POs for polymorphic fns (yet), so unchecked
+			ctxt.push(new PONoCheckContext());
 		}
 
 		if (pids.hasDuplicates() || matchNeeded)
@@ -203,6 +211,12 @@ public class POImplicitFunctionDefinition extends PODefinition
 					this, type.result, actualResult, ctxt));
 			}
 
+			ctxt.pop();
+		}
+
+		if (polymorphic)
+		{
+			// Cannot generate POs for polymorphic fns (yet), so unchecked
 			ctxt.pop();
 		}
 
