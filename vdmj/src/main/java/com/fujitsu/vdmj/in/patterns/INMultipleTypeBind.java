@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.values.ValueList;
 
 public class INMultipleTypeBind extends INMultipleBind implements INBindingSetter
@@ -43,11 +44,14 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	private ValueList bindValues = null;
 	private Context bindCounterexample = null;
 	private boolean bindPermuted = false;
+	private boolean bindOverride = false;	// True if forcing QC values
+	private boolean hasPolymorphic = false;
 
 	public INMultipleTypeBind(INPatternList plist, TCType type)
 	{
 		super(plist);
 		this.type = type;
+		this.hasPolymorphic = !type.apply(new TCParameterCollector(), null).isEmpty();
 	}
 
 	@Override
@@ -62,11 +66,13 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 		if (values == null)
 		{
 			bindValues = null;
+			bindOverride = false;
 		}
 		else
 		{
 			bindValues = new ValueList();
 			bindValues.addAll(values);
+			bindOverride = true;
 		}
 	}
 	
@@ -104,7 +110,7 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	@Override
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
-		if (bindValues != null && bindPermuted == permuted)
+		if (bindOverride || (bindValues != null && bindPermuted == permuted && !hasPolymorphic))
 		{
 			return bindValues;		// Should be exactly the same
 		}
