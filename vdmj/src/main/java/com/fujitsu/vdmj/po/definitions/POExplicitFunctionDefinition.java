@@ -139,6 +139,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 				
 		TCNameList pids = new TCNameList();
 		boolean matchNeeded = false;
+		boolean polymorphic = (typeParams != null && !typeParams.isEmpty());
 
 		for (POPatternList pl: paramPatternList)
 		{
@@ -153,7 +154,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 			}
 		}
 		
-		if (typeParams != null && !typeParams.isEmpty())
+		if (polymorphic)
 		{
 			// Cannot generate POs for polymorphic fns (yet), so unchecked
 			ctxt.push(new PONoCheckContext());
@@ -207,7 +208,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 
 		ctxt.pop();
 
-		if (typeParams != null && !typeParams.isEmpty())
+		if (polymorphic)
 		{
 			// Cannot generate POs for polymorphic fns (yet), so unchecked
 			ctxt.pop();
