@@ -60,7 +60,7 @@ public class PONotCaseContext extends POContext
     		sb.append("not exists ");
     		sb.append(pattern.getMatchingExpression());
     		sb.append(":");
-    		sb.append(type);
+    		sb.append(type.toExplicitString(pattern.location));
     		sb.append(" & ");
     		POGetMatchingExpressionVisitor.init();
     		sb.append(pattern.getMatchingExpression());

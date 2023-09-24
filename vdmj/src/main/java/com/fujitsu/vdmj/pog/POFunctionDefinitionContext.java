@@ -35,11 +35,13 @@ import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 public class POFunctionDefinitionContext extends POContext
 {
 	public final TCNameToken name;
 	public final TCFunctionType deftype;
+	public final TCTypeList typeParams;
 	public final List<POPatternList> paramPatternList;
 	public final boolean addPrecond;
 	public final String precondition;
@@ -49,6 +51,7 @@ public class POFunctionDefinitionContext extends POContext
 	{
 		this.name = definition.name;
 		this.deftype = definition.type;
+		this.typeParams = definition.typeParams;
 		this.paramPatternList = definition.paramPatternList;
 		this.addPrecond = precond;
 		POGetMatchingExpressionVisitor.init();
@@ -60,6 +63,7 @@ public class POFunctionDefinitionContext extends POContext
 	{
 		this.name = definition.name;
 		this.deftype = definition.type;
+		this.typeParams = definition.typeParams;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.getParamPatternList();
 		POGetMatchingExpressionVisitor.init();
@@ -113,5 +117,11 @@ public class POFunctionDefinitionContext extends POContext
 		}
 
 		return sb.toString();
+	}
+	
+	@Override
+	public TCTypeList getTypeParams()
+	{
+		return typeParams;
 	}
 }

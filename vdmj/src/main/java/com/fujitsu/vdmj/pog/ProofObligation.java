@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 abstract public class ProofObligation implements Comparable<ProofObligation>
 {
@@ -40,6 +41,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public POStatus status;
 	public POTrivialProof proof;
 	public boolean isCheckable;
+	public TCTypeList typeParams;
 
 	private int var = 1;
 	private TCExpression checkedExpression = null;
@@ -53,6 +55,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.proof = null;
 		this.number = 0;
 		this.isCheckable = ctxt.isCheckable();	// Set false for operation POs
+		this.typeParams = ctxt.getTypeParams();
 		
 		if (!isCheckable)
 		{

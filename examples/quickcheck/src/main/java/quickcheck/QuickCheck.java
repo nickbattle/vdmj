@@ -36,13 +36,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
-import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -53,8 +54,12 @@ import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
+import com.fujitsu.vdmj.tc.types.TCRealType;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.util.GetResource;
 import com.fujitsu.vdmj.values.BooleanValue;
+import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -247,6 +252,12 @@ public class QuickCheck
 				}
 			}
 			
+			if (!all.isEmpty() && chosen.isEmpty())
+			{
+				String m = (Settings.dialect == Dialect.VDM_SL) ? "module" : "class";
+				println("No POs in current " + m + " (" + def + ")");
+			}
+			
 			return chosen;	// No PO#s specified, so use default class/module's POs
 		}
 		else
@@ -310,10 +321,11 @@ public class QuickCheck
 		INExpression exp = getINExpression(po);
 		List<INBindingSetter> binds = getINBindList(exp);
 		long before = System.currentTimeMillis();
+		Context ctxt = addTypeParams(po, Interpreter.getInstance().getInitialContext());
 		
 		for (QCStrategy strategy: strategies)
 		{
-			Results presults = strategy.getValues(po, exp, binds);
+			Results presults = strategy.getValues(po, exp, binds, ctxt);
 			Map<String, ValueList> cexamples = presults.counterexamples;
 			
 			for (String bind: cexamples.keySet())
@@ -336,7 +348,6 @@ public class QuickCheck
 			if (!union.containsKey(bind.toString()))
 			{
 				// Generate some values for missing bindings, using the fixed method
-				RootContext ctxt = Interpreter.getInstance().getInitialContext();
 				ValueList list = new ValueList();
 				list.addAll(bind.getType().apply(new FixedRangeCreator(ctxt), 10));
 				union.put(bind.toString(), list);
@@ -351,9 +362,9 @@ public class QuickCheck
 		try
 		{
 			resetErrors();	// Only flag fatal errors
-			RootContext ctxt = Interpreter.getInstance().getInitialContext();
+			Context ctxt = Interpreter.getInstance().getInitialContext();
 			INExpression poexp = getINExpression(po);
-			List<INBindingSetter> bindings = getINBindList(poexp);;
+			List<INBindingSetter> bindings = getINBindList(poexp);
 
 			if (!po.isCheckable)
 			{
@@ -396,6 +407,9 @@ public class QuickCheck
 				
 				long before = System.currentTimeMillis();
 				Value result = new BooleanValue(false);
+				ContextException exception = null;
+				
+				ctxt = addTypeParams(po, ctxt);
 				
 				try
 				{
@@ -404,8 +418,6 @@ public class QuickCheck
 				}
 				catch (ContextException e)
 				{
-					printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
-					
 					if (e.rawMessage.equals("Execution cancelled"))
 					{
 						result = null;
@@ -413,19 +425,7 @@ public class QuickCheck
 					else
 					{
 						result = new BooleanValue(false);
-	
-						if (e.ctxt.outer != null)
-						{
-							e.ctxt.printStackFrames(Console.out);
-						}
-						else
-						{
-							println("In context of " + e.ctxt.title + " " + e.ctxt.location);
-						}
-						
-						println("----");
-						printBindings(bindings);
-						println("----");
+						exception = e;
 					}
 				}
 				
@@ -465,10 +465,15 @@ public class QuickCheck
 						{
 							printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
 							printFailPath(bindings);
+							
+							if (exception != null)
+							{
+								printf("Causes %s\n", exception.getMessage());
+							}
+							
 							println("----");
 							println(po);
 						}
-
 					}
 				}
 				else
@@ -506,6 +511,26 @@ public class QuickCheck
 		}
 	}
 	
+	private Context addTypeParams(ProofObligation po, Context ctxt)
+	{
+		if (po.typeParams != null)
+		{
+			Context params = new Context(po.location, "Type params", ctxt);
+			
+			for (TCType type: po.typeParams)
+			{
+				TCParameterType ptype = (TCParameterType)type;
+				params.put(ptype.name, new ParameterValue(new TCRealType(po.location)));
+			}
+			
+			return params;
+		}
+		else
+		{
+			return ctxt;
+		}
+	}
+
 	private void printBindings(List<INBindingSetter> bindings)
 	{
 		int MAXVALUES = 10;

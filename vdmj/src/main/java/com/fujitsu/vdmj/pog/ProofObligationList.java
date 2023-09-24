@@ -41,12 +41,17 @@ import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 
@@ -159,9 +164,10 @@ public class ProofObligationList extends Vector<ProofObligation>
 		}
 		
 		TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+		Environment tcenv = addTypeParams(obligation, env);
 		
 		TypeChecker.clearErrors();
-		TCType potype = tcexp.typeCheck(env, null, NameScope.NAMESANDANYSTATE, null);
+		TCType potype = tcexp.typeCheck(tcenv, null, NameScope.NAMESANDANYSTATE, null);
 		
 		if (!potype.isType(TCBooleanType.class, obligation.location))
 		{
@@ -205,5 +211,27 @@ public class ProofObligationList extends Vector<ProofObligation>
 		}
 		
 		obligation.setCheckedExpression(tcexp);
+	}
+
+	private Environment addTypeParams(ProofObligation obligation, Environment env)
+	{
+		if (obligation.typeParams != null && !obligation.typeParams.isEmpty())
+		{
+			TCDefinitionList pdefs = new TCDefinitionList();
+			
+			for (TCType ptype: obligation.typeParams)
+			{
+				TCParameterType param = (TCParameterType)ptype;
+				TCDefinition p = new TCLocalDefinition(param.location, param.name, param);
+				p.markUsed();
+				pdefs.add(p);
+			}
+			
+			return new FlatEnvironment(pdefs, env);
+		}
+		else
+		{
+			return env;
+		}
 	}
 }
