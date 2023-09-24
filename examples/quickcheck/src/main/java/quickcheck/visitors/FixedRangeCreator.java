@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.in.expressions.INIntegerLiteralExpression;
 import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCBracketType;
@@ -47,6 +48,7 @@ import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCQuoteType;
 import com.fujitsu.vdmj.tc.types.TCRationalType;
@@ -115,6 +117,12 @@ public class FixedRangeCreator extends RangeCreator
 	{
 		// Anything... ?
 		return caseBooleanType(new TCBooleanType(LexLocation.ANY), limit);
+	}
+	
+	@Override
+	public ValueSet caseParameterType(TCParameterType node, Integer limit)
+	{
+		return realLimit(limit);	// For now...!
 	}
 
 	@Override
@@ -291,6 +299,10 @@ public class FixedRangeCreator extends RangeCreator
 			{
 				// Value does not match invariant, so ignore it
 			}
+			catch (ContextException e)
+			{
+				// Value does not match invariant, so ignore it
+			}
 		}
 		
 		done.remove(type);
@@ -306,6 +318,20 @@ public class FixedRangeCreator extends RangeCreator
 	@Override
 	public ValueSet caseRecordType(TCRecordType node, Integer limit)
 	{
+		if (node.fields.isEmpty())		// eg. R :: ;, which has one value, mk_R()
+		{
+			try
+			{
+				ValueSet records = new ValueSet();
+				records.add(new RecordValue(node, new ValueList(), ctxt));
+				return records;
+			}
+			catch (ValueException e)
+			{
+				// Can't happen
+			}
+		}
+		
 		if (done.contains(node))
 		{
 			return new ValueSet();		// recursing
@@ -316,21 +342,22 @@ public class FixedRangeCreator extends RangeCreator
 		// Size will be the product of all fields, ie. limit ^ N. So we set limit2 to the
 		// so that it will just exceed this.
 		
-		int limit2 = 1;
-		
-		while (Math.pow(node.fields.size(), limit2) < limit)
-		{
-			limit2++;
-		}
-		
+		int fcount = node.fields.size();
+		int limit2 = leastPower(fcount, limit);
 		ValueSet records = new ValueSet();
-		List<ValueSet> fvalues = new Vector<ValueSet>(node.fields.size());
-		int[] fsizes = new int[node.fields.size()];
+		List<ValueSet> fvalues = new Vector<ValueSet>(fcount);
+		int[] fsizes = new int[fcount];
 		int f = 0;
 		
 		for (TCField field: node.fields)
 		{
 			ValueSet values = field.type.apply(this, limit2);
+			
+			if (values.isEmpty())
+			{
+				return new ValueSet();	// Can't produce anything
+			}
+			
 			fvalues.add(values);
 			fsizes[f++] = values.size();
 		}
@@ -434,8 +461,13 @@ public class FixedRangeCreator extends RangeCreator
 		
 		int fromSize = fromValues.size();
 		int toSize = toValues.size();
-
 		results.add(new MapValue());	// empty map
+
+		if (fromSize == 0 || toSize == 0)
+		{
+			return results;		// Probably invs very strict, so nothing found
+		}
+		
 		long count = 1;
 		
 		out: for (int ds=1; ds<=fromSize; ds++)		// map domain sizes
@@ -508,21 +540,22 @@ public class FixedRangeCreator extends RangeCreator
 		// Size will be the product of all fields, ie. limit ^ N. So we set limit2 to the
 		// so that it will just exceed this.
 		
-		int limit2 = 1;
-		
-		while (Math.pow(node.types.size(), limit2) < limit)
-		{
-			limit2++;
-		}
-		
+		int tcount = node.types.size();
+		int limit2 = leastPower(tcount, limit);
 		ValueSet records = new ValueSet();
-		List<ValueSet> fvalues = new Vector<ValueSet>(node.types.size());
-		int[] fsizes = new int[node.types.size()];
+		List<ValueSet> fvalues = new Vector<ValueSet>(tcount);
+		int[] fsizes = new int[tcount];
 		int f = 0;
 		
 		for (TCType field: node.types)
 		{
 			ValueSet values = field.apply(this, limit2);
+			
+			if (values.isEmpty())
+			{
+				return new ValueSet();	// Can't produce anything
+			}
+			
 			fvalues.add(values);
 			fsizes[f++] = values.size();
 		}

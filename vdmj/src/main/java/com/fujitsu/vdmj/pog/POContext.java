@@ -33,16 +33,22 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.util.Utils;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 abstract public class POContext
 {
-	abstract public String getContext();
 	private Map<POExpression, TCType> knownTypes = new HashMap<POExpression, TCType>();
+
+	abstract public String getContext();
 
 	public String getName()
 	{
 		return "";		// Overridden in PONameContext
+	}
+	
+	public TCTypeList getTypeParams()
+	{
+		return null;
 	}
 
 	public boolean isScopeBoundary()
@@ -79,7 +85,7 @@ abstract public class POContext
 
 		for (POPatternList plist: paramPatternList)
 		{
-			call.append("(" + Utils.listToString(plist) + ")");
+			call.append("(" + plist.getMatchingExpressionList() + ")");
 		}
 
 		return call.toString();

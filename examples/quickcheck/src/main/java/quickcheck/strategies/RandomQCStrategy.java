@@ -28,13 +28,13 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.runtime.RootContext;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
@@ -50,40 +50,43 @@ public class RandomQCStrategy extends QCStrategy
 	public RandomQCStrategy(List<String> argv)
 	{
 		seed = System.currentTimeMillis();
+		Iterator<String> iter = argv.iterator();
 		
-		for (int i=0; i < argv.size(); i++)
+		while (iter.hasNext())
 		{
 			try
 			{
-				switch (argv.get(i))
+				String arg = iter.next();
+				
+				switch (arg)
 				{
 					case "-random:size":		// Total top level size
-						argv.remove(i);
+						iter.remove();
 
-						if (i < argv.size())
+						if (iter.hasNext())
 						{
-							expansionLimit = Integer.parseInt(argv.get(i));
-							argv.remove(i);
+							expansionLimit = Integer.parseInt(iter.next());
+							iter.remove();
 						}
 						break;
 						
 					case "-random:seed":		// Seed
-						argv.remove(i);
+						iter.remove();
 
-						if (i < argv.size())
+						if (iter.hasNext())
 						{
-							seed = Long.parseLong(argv.get(i));
-							argv.remove(i);
+							seed = Long.parseLong(iter.next());
+							iter.remove();
 						}
 						break;
 
 					default:
-						if (argv.get(i).startsWith("-random:"))
+						if (arg.startsWith("-random:"))
 						{
-							errorln("Unknown random option: " + argv.get(i));
+							errorln("Unknown random option: " + arg);
 							errorln(help());
 							errorCount++;
-							argv.remove(i);
+							iter.remove();
 						}
 				}
 			}
@@ -124,15 +127,13 @@ public class RandomQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
+	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
 		
-		if (po.isCheckable)
+		if (po.isCheckable && po.getCheckedExpression() != null)
 		{
-			RootContext ctxt = Interpreter.getInstance().getInitialContext();
-			
 			for (INBindingSetter bind: binds)
 			{
 				RandomRangeCreator visitor = new RandomRangeCreator(ctxt, seed++);

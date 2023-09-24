@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
@@ -165,7 +166,7 @@ public class TCValueDefinition extends TCDefinition
 		if (annotations != null) annotations.tcBefore(this, base, scope);
 
 		getDefinitions().setExcluded(true);
-		expType = exp.typeCheck(base, null, scope, type);
+		expType = explicitFix(exp.typeCheck(base, null, scope, type));
 		getDefinitions().setExcluded(false);
 		
 		if (expType instanceof TCUnknownType)
@@ -211,7 +212,40 @@ public class TCValueDefinition extends TCDefinition
 
 		if (annotations != null) annotations.tcAfter(this, type, base, scope);
 	}
-	
+
+	/**
+	 * For named types, if the type is not defined within the module, we have
+	 * to make it explicit, like x:M`T rather than just x:T. This is so that
+	 * toStrings (with POG) can be correctly typechecked.
+	 */
+	private TCType explicitFix(TCType tofix)
+	{
+		if (tofix instanceof TCNamedType)
+		{
+			TCNamedType nt = (TCNamedType)tofix;
+			
+			if (!nt.typename.getLex().module.equals(location.module))
+			{
+				TCNamedType fixed = new TCNamedType(nt.typename.getExplicit(true), nt.type);
+				fixed.setOpaque(nt.opaque);
+				return fixed;
+			}
+		}
+		else if (tofix instanceof TCRecordType)
+		{
+			TCRecordType rt = (TCRecordType)tofix;
+			
+			if (!rt.name.getLex().module.equals(location.module))
+			{
+				TCRecordType fixed = new TCRecordType(rt.name.getExplicit(true), rt.fields, rt.composed);
+				fixed.setOpaque(rt.opaque);
+				return fixed;
+			}
+		}
+		
+		return tofix;
+	}
+
 	private void updateDefs()
 	{
 		TCDefinitionList newdefs = pattern.getDefinitions(type, nameScope);

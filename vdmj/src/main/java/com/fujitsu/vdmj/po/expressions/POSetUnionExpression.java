@@ -40,6 +40,12 @@ public class POSetUnionExpression extends POBinaryExpression
 	}
 
 	@Override
+	public String toString()
+	{
+		return left + " union " + right;
+	}
+
+	@Override
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseSetUnionExpression(this, arg);

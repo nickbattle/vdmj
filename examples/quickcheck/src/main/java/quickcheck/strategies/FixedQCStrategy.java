@@ -34,6 +34,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +46,9 @@ import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
+import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -55,6 +58,7 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.pog.ProofObligation;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
@@ -62,15 +66,24 @@ import com.fujitsu.vdmj.syntax.BindReader;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
@@ -95,53 +108,57 @@ public class FixedQCStrategy extends QCStrategy
 	
 	public FixedQCStrategy(List<String> argv)
 	{
-		for (int i=0; i < argv.size(); i++)
+		Iterator<String> iter = argv.iterator();
+		
+		while (iter.hasNext())
 		{
 			try
 			{
-				switch (argv.get(i))
+				String arg = iter.next();
+				
+				switch (arg)
 				{
 					case "-fixed:file":			// Use this as ranges.qc
-						argv.remove(i);
+						iter.remove();
 
-						if (i < argv.size())
+						if (iter.hasNext())
 						{
-							rangesFile = argv.get(i);
-							argv.remove(i);
+							rangesFile = iter.next();
+							iter.remove();
 						}
 						
 						createFile = false;
 						break;
 						
 					case "-fixed:create":		// Create ranges.qc
-						argv.remove(i);
+						iter.remove();
 						
-						if (i < argv.size())
+						if (iter.hasNext())
 						{
-							rangesFile = argv.get(i);
-							argv.remove(i);
+							rangesFile = iter.next();
+							iter.remove();
 						}
 
 						createFile = true;
 						break;
 						
 					case "-fixed:size":		// Total top level size
-						argv.remove(i);
+						iter.remove();
 
-						if (i < argv.size())
+						if (iter.hasNext())
 						{
-							expansionLimit = Integer.parseInt(argv.get(i));
-							argv.remove(i);
+							expansionLimit = Integer.parseInt(iter.next());
+							iter.remove();
 						}
 						break;
 						
 					default:
-						if (argv.get(i).startsWith("-fixed:"))
+						if (arg.startsWith("-fixed:"))
 						{
-							errorln("Unknown fixed option: " + argv.get(i));
+							errorln("Unknown fixed option: " + arg);
 							errorln(help());
 							errorCount++;
-							argv.remove(i);
+							iter.remove();
 						}
 				}
 			}
@@ -218,18 +235,43 @@ public class FixedQCStrategy extends QCStrategy
 			for (int i=0; i<tcbinds.size(); i++)
 			{
 				TCMultipleBind mb = tcbinds.get(i);
-				TCType mbtype = mb.typeCheck(env, NameScope.NAMESANDSTATE);
+				Environment penv = env;
+				
+				if (mb instanceof TCMultipleTypeBind)
+				{
+					TCMultipleTypeBind mtb = (TCMultipleTypeBind)mb;
+		    		List<String> names = mtb.type.apply(new TCParameterCollector(), null);
+		    		
+		    		if (!names.isEmpty())
+		    		{
+	    				TCDefinitionList defs = new TCDefinitionList();
+	    				LexLocation location = mtb.type.location;
+			    		
+		    			for (String name: names)
+		    			{
+		    				TCNameToken tcname = new TCNameToken(location, module, name.substring(1));
+		    				TCParameterType ptype = new TCParameterType(tcname);
+	    					TCDefinition p = new TCLocalDefinition(location, tcname, ptype);
+	    					p.markUsed();
+	    					defs.add(p);
+		    			}
+		    			
+		    			penv = new FlatEnvironment(defs, env);
+		    		}
+				}
+				
+				TCType mbtype = mb.typeCheck(penv, NameScope.NAMESANDSTATE);
 				TCSetType mbset = new TCSetType(mb.location, mbtype);
 				tctypes.add(mbtype);
 				
 				TCExpression exp = tcexps.get(i);
-				TCType exptype = exp.typeCheck(env, null, NameScope.NAMESANDSTATE, null);
+				TCType exptype = exp.typeCheck(penv, null, NameScope.NAMESANDSTATE, null);
 				
 				if (TypeChecker.getErrorCount() > 0)
 				{
 					for (VDMError error: TypeChecker.getErrors())
 					{
-						println(exp);
+						println(mb + " = " + exp);
 						println(error.toString());
 						errorCount++;
 					}
@@ -262,7 +304,7 @@ public class FixedQCStrategy extends QCStrategy
 			for (int i=0; i<inbinds.size(); i++)
 			{
 				ctxt.threadState.init();
-				String key = inbinds.get(i).toString();
+				String key = keyFor(inbinds.get(i));
 				printf(".");
 				INExpression exp = inexps.get(i);
 				Value value = exp.eval(ctxt);
@@ -327,7 +369,26 @@ public class FixedQCStrategy extends QCStrategy
 		errorCount++;
 		return null;
 	}
-	
+
+	/**
+	 * We can't create a key with the toString of the bind, because the type may not
+	 * be explicit. 
+	 */
+	private String keyFor(INMultipleBind bind)
+	{
+		INMultipleTypeBind tb = (INMultipleTypeBind)bind;
+		
+		if (tb.type instanceof TCNamedType)
+		{
+			TCNamedType nt = (TCNamedType)tb.type;
+			return tb.plist.toString() + ":" + nt.typename.getExplicit(false);
+		}
+		else
+		{
+			return tb.plist.toString() + ":" + tb.type.toString();
+		}
+	}
+
 	private void createRangeFile(QuickCheck qc, String filename)
 	{
 		try
@@ -363,7 +424,8 @@ public class FixedQCStrategy extends QCStrategy
 			}
 
 			writer.close();
-			println("Created " + done.size() + " default ranges in " + filename + ". Check them! Then run 'qc'");
+			println("Created " + done.size() + " default ranges in '" + filename + "'");
+			println("Check them! Then run 'qc -p fixed -fixed:file " + filename + "'");
 		}
 		catch (Exception e)
 		{
@@ -410,7 +472,7 @@ public class FixedQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
+	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
 	{
 		Map<String, ValueList> values = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();

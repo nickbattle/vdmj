@@ -150,7 +150,7 @@ public abstract class POExpression extends PONode implements Serializable
 			TCUnionType ut = exp.getExptype().getUnion();
 			TCTypeSet sets = ut.getMatches(qualifier);
 			
-			if (sets.size() < ut.types.size())
+			if (sets.size() < ut.types.size() && sets.size() > 0)
 			{
 				obligations.add(new SubTypeObligation(exp, sets.getType(location), exp.getExptype(), ctxt));
 			}

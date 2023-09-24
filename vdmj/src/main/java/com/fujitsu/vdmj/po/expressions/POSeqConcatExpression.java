@@ -40,6 +40,12 @@ public class POSeqConcatExpression extends POBinaryExpression
 	}
 
 	@Override
+	public String toString()
+	{
+		return left + " ^ " + right;
+	}
+
+	@Override
 	public <R, S> R apply(POExpressionVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseSeqConcatExpression(this, arg);

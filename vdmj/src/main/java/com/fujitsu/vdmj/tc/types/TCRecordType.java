@@ -160,19 +160,6 @@ public class TCRecordType extends TCInvariantType
 	}
 	
 	@Override
-	public String toExplicitString(LexLocation from)
-	{
-		if (name.getLocation().module.equals(from.module))
-		{
-			return toString();
-		}
-		else
-		{
-			return name.getExplicit(true).toString();
-		}
-	}
-
-	@Override
 	public boolean equals(Object other)
 	{
 		other = deBracket(other);

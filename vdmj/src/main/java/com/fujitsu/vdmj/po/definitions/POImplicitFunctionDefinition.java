@@ -135,6 +135,7 @@ public class POImplicitFunctionDefinition extends PODefinition
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 		TCNameList pids = new TCNameList();
 		boolean matchNeeded = false;
+		boolean polymorphic = (typeParams != null && !typeParams.isEmpty());
 
 		for (POPatternListTypePair pltp: parameterPatterns)
 		{
@@ -147,6 +148,12 @@ public class POImplicitFunctionDefinition extends PODefinition
 			{
 				matchNeeded = true;
 			}
+		}
+		
+		if (polymorphic)
+		{
+			// Cannot generate POs for polymorphic fns (yet), so unchecked
+			// ctxt.push(new PONoCheckContext());
 		}
 
 		if (pids.hasDuplicates() || matchNeeded)
@@ -204,6 +211,12 @@ public class POImplicitFunctionDefinition extends PODefinition
 			}
 
 			ctxt.pop();
+		}
+
+		if (polymorphic)
+		{
+			// Cannot generate POs for polymorphic fns (yet), so unchecked
+			// ctxt.pop();
 		}
 
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);

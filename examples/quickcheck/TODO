@@ -4,4 +4,4 @@ Things still to do with QuickCheck
 2. Move QC to be part of POPlugin(s)
 3. Separate IO from calculations (and allow LSP control)
 4. Make SearchQCPlugin use the "sense" of forall/exists to choose values.
-
+6. Add -file and -func PO selection options?

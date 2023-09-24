@@ -40,17 +40,18 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 {
 	private static final long serialVersionUID = 1L;
 	public final TCType type;
-	public final boolean hasTypeParams;
 	
 	private ValueList bindValues = null;
 	private Context bindCounterexample = null;
 	private boolean bindPermuted = false;
+	private boolean bindOverride = false;	// True if forcing QC values
+	private boolean hasPolymorphic = false;
 
 	public INMultipleTypeBind(INPatternList plist, TCType type)
 	{
 		super(plist);
 		this.type = type;
-		this.hasTypeParams = !type.apply(new TCParameterCollector(), null).isEmpty();
+		this.hasPolymorphic = !type.apply(new TCParameterCollector(), null).isEmpty();
 	}
 
 	@Override
@@ -65,11 +66,13 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 		if (values == null)
 		{
 			bindValues = null;
+			bindOverride = false;
 		}
 		else
 		{
 			bindValues = new ValueList();
 			bindValues.addAll(values);
+			bindOverride = true;
 		}
 	}
 	
@@ -107,7 +110,7 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	@Override
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
-		if (bindValues != null && bindPermuted == permuted && !hasTypeParams)
+		if (bindOverride || (bindValues != null && bindPermuted == permuted && !hasPolymorphic))
 		{
 			return bindValues;		// Should be exactly the same
 		}
