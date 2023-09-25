@@ -34,7 +34,8 @@ import java.util.List;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
@@ -127,13 +128,15 @@ public class RandomQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
 		
 		if (po.isCheckable && po.getCheckedExpression() != null)
 		{
+			RootContext ctxt = Interpreter.getInstance().getInitialContext();
+			
 			for (INBindingSetter bind: binds)
 			{
 				RandomRangeCreator visitor = new RandomRangeCreator(ctxt, seed++);

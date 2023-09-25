@@ -58,7 +58,6 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.pog.ProofObligation;
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
@@ -66,24 +65,16 @@ import com.fujitsu.vdmj.syntax.BindReader;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
-import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
-import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
-import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.typechecker.Environment;
-import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
@@ -235,43 +226,18 @@ public class FixedQCStrategy extends QCStrategy
 			for (int i=0; i<tcbinds.size(); i++)
 			{
 				TCMultipleBind mb = tcbinds.get(i);
-				Environment penv = env;
-				
-				if (mb instanceof TCMultipleTypeBind)
-				{
-					TCMultipleTypeBind mtb = (TCMultipleTypeBind)mb;
-		    		List<String> names = mtb.type.apply(new TCParameterCollector(), null);
-		    		
-		    		if (!names.isEmpty())
-		    		{
-	    				TCDefinitionList defs = new TCDefinitionList();
-	    				LexLocation location = mtb.type.location;
-			    		
-		    			for (String name: names)
-		    			{
-		    				TCNameToken tcname = new TCNameToken(location, module, name.substring(1));
-		    				TCParameterType ptype = new TCParameterType(tcname);
-	    					TCDefinition p = new TCLocalDefinition(location, tcname, ptype);
-	    					p.markUsed();
-	    					defs.add(p);
-		    			}
-		    			
-		    			penv = new FlatEnvironment(defs, env);
-		    		}
-				}
-				
-				TCType mbtype = mb.typeCheck(penv, NameScope.NAMESANDSTATE);
+				TCType mbtype = mb.typeCheck(env, NameScope.NAMESANDSTATE);
 				TCSetType mbset = new TCSetType(mb.location, mbtype);
 				tctypes.add(mbtype);
 				
 				TCExpression exp = tcexps.get(i);
-				TCType exptype = exp.typeCheck(penv, null, NameScope.NAMESANDSTATE, null);
+				TCType exptype = exp.typeCheck(env, null, NameScope.NAMESANDSTATE, null);
 				
 				if (TypeChecker.getErrorCount() > 0)
 				{
 					for (VDMError error: TypeChecker.getErrors())
 					{
-						println(mb + " = " + exp);
+						println(exp);
 						println(error.toString());
 						errorCount++;
 					}
@@ -472,7 +438,7 @@ public class FixedQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		Map<String, ValueList> values = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();

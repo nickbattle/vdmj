@@ -136,9 +136,13 @@ public class POExplicitFunctionDefinition extends PODefinition
 		ProofObligationList obligations =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 				
+		if (typeParams != null && !typeParams.isEmpty())
+		{
+			return obligations;		// Cannot generate POs for polymorphic fns (yet)
+		}
+				
 		TCNameList pids = new TCNameList();
 		boolean matchNeeded = false;
-		boolean polymorphic = (typeParams != null && !typeParams.isEmpty());
 
 		for (POPatternList pl: paramPatternList)
 		{
@@ -153,12 +157,6 @@ public class POExplicitFunctionDefinition extends PODefinition
 			}
 		}
 		
-		if (polymorphic)
-		{
-			// Cannot generate POs for polymorphic fns (yet), so unchecked
-			// ctxt.push(new PONoCheckContext());
-		}
-
 		if (type.hasTotal())
 		{
 			ctxt.push(new POFunctionDefinitionContext(this, true));
@@ -207,12 +205,6 @@ public class POExplicitFunctionDefinition extends PODefinition
 
 		ctxt.pop();
 
-		if (polymorphic)
-		{
-			// Cannot generate POs for polymorphic fns (yet), so unchecked
-			// ctxt.pop();
-		}
-				
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;
 	}
