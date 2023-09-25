@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
@@ -121,7 +122,7 @@ public class FiniteQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
@@ -129,6 +130,7 @@ public class FiniteQCStrategy extends QCStrategy
 		
 		if (po.isCheckable)
 		{
+			Context ctxt = Interpreter.getInstance().getInitialContext();
 			long product = 1;
 			
 			for (INBindingSetter bind: binds)
