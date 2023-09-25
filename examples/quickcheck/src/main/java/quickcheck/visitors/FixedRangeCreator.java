@@ -122,7 +122,9 @@ public class FixedRangeCreator extends RangeCreator
 	@Override
 	public ValueSet caseParameterType(TCParameterType node, Integer limit)
 	{
-		return realLimit(limit);	// For now...!
+		// ParameterValue pv = (ParameterValue) ctxt.get(node.name);
+		// return pv.type.apply(this, limit);
+		return realLimit(limit);
 	}
 
 	@Override

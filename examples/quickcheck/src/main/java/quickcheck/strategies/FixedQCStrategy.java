@@ -198,7 +198,7 @@ public class FixedQCStrategy extends QCStrategy
 		reader.nextToken();
 	}
 	
-	private Map<String, ValueList> readRangeFile(String filename)
+	private Map<String, ValueList> readRangeFile(QuickCheck qc, String filename)
 	{
 		try
 		{
@@ -459,7 +459,7 @@ public class FixedQCStrategy extends QCStrategy
 			if (new File(rangesFile).exists())
 			{
 				println("Using ranges file " + rangesFile);
-				allRanges = readRangeFile(rangesFile);
+				allRanges = readRangeFile(qc, rangesFile);
 			}
 			else
 			{

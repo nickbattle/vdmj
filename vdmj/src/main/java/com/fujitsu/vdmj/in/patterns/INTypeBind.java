@@ -40,17 +40,18 @@ public class INTypeBind extends INBind implements INBindingSetter
 {
 	private static final long serialVersionUID = 1L;
 	public final TCType type;
-	public final boolean hasTypeParams;
+	public final boolean hasPolymorphic;
 	
 	private ValueList bindValues = null;
 	private Context bindCounterexample = null;
 	private boolean bindPermuted = false;
+	private boolean bindOverride = false;
 
 	public INTypeBind(INPattern pattern, TCType type)
 	{
 		super(pattern.location, pattern);
 		this.type = type;
-		this.hasTypeParams = !type.apply(new TCParameterCollector(), null).isEmpty();
+		this.hasPolymorphic = !type.apply(new TCParameterCollector(), null).isEmpty();
 	}
 
 	@Override
@@ -59,11 +60,13 @@ public class INTypeBind extends INBind implements INBindingSetter
 		if (values == null)
 		{
 			bindValues = null;
+			bindOverride = false;
 		}
 		else
 		{
 			bindValues = new ValueList();
 			bindValues.addAll(values);
+			bindOverride = true;
 		}
 	}
 
@@ -117,7 +120,7 @@ public class INTypeBind extends INBind implements INBindingSetter
 	@Override
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
-		if (bindValues != null && bindPermuted == permuted && !hasTypeParams)
+		if (bindOverride || (bindValues != null && bindPermuted == permuted && !hasPolymorphic))
 		{
 			return bindValues;		// Should be exactly the same
 		}
