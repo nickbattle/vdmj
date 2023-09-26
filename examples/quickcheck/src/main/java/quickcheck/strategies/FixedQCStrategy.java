@@ -71,7 +71,6 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
 import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
@@ -240,18 +239,16 @@ public class FixedQCStrategy extends QCStrategy
 				if (mb instanceof TCMultipleTypeBind)
 				{
 					TCMultipleTypeBind mtb = (TCMultipleTypeBind)mb;
-		    		List<String> names = mtb.type.apply(new TCParameterCollector(), null);
+		    		List<TCParameterType> tparams = mtb.type.apply(new TCParameterCollector(), null);
 		    		
-		    		if (!names.isEmpty())
+		    		if (!tparams.isEmpty())
 		    		{
 	    				TCDefinitionList defs = new TCDefinitionList();
 	    				LexLocation location = mtb.type.location;
 			    		
-		    			for (String name: names)
+		    			for (TCParameterType tparam: tparams)
 		    			{
-		    				TCNameToken tcname = new TCNameToken(location, module, name.substring(1));
-		    				TCParameterType ptype = new TCParameterType(tcname);
-	    					TCDefinition p = new TCLocalDefinition(location, tcname, ptype);
+	    					TCDefinition p = new TCLocalDefinition(location, tparam.name, tparam);
 	    					p.markUsed();
 	    					defs.add(p);
 		    			}
