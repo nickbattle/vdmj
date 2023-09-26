@@ -77,6 +77,7 @@ import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
+import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -88,6 +89,7 @@ import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.IntegerValue;
+import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
@@ -234,29 +236,7 @@ public class FixedQCStrategy extends QCStrategy
 			for (int i=0; i<tcbinds.size(); i++)
 			{
 				TCMultipleBind mb = tcbinds.get(i);
-				Environment penv = env;
-				
-				if (mb instanceof TCMultipleTypeBind)
-				{
-					TCMultipleTypeBind mtb = (TCMultipleTypeBind)mb;
-		    		List<TCParameterType> tparams = mtb.type.apply(new TCParameterCollector(), null);
-		    		
-		    		if (!tparams.isEmpty())
-		    		{
-	    				TCDefinitionList defs = new TCDefinitionList();
-	    				LexLocation location = mtb.type.location;
-			    		
-		    			for (TCParameterType tparam: tparams)
-		    			{
-	    					TCDefinition p = new TCLocalDefinition(location, tparam.name, tparam);
-	    					p.markUsed();
-	    					defs.add(p);
-		    			}
-		    			
-		    			penv = new FlatEnvironment(defs, env);
-		    		}
-				}
-				
+				Environment penv = addTypeParams(mb, env);
 				TCType mbtype = mb.typeCheck(penv, NameScope.NAMESANDSTATE);
 				TCSetType mbset = new TCSetType(mb.location, mbtype);
 				tctypes.add(mbtype);
@@ -293,13 +273,16 @@ public class FixedQCStrategy extends QCStrategy
 			
 			INMultipleBindList inbinds = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcbinds);
 			INExpressionList inexps = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexps);
-			RootContext ctxt = interpreter.getInitialContext();
+			RootContext ictxt = interpreter.getInitialContext();
 			Map<String, ValueList> ranges = new HashMap<String, ValueList>();
 			long before = System.currentTimeMillis();
 			printf("Expanding " + inbinds.size() + " ranges: ");
 			
 			for (int i=0; i<inbinds.size(); i++)
 			{
+				TCMultipleBind tcbind = tcbinds.get(i);
+				Context ctxt = addTypeParams(tcbind, ictxt);
+
 				ctxt.threadState.init();
 				String key = keyFor(inbinds.get(i));
 				printf(".");
@@ -435,6 +418,52 @@ public class FixedQCStrategy extends QCStrategy
 	{
 		double duration = (double)(after - before)/1000;
 		return "in " + duration + "s";
+	}
+	
+	private Environment addTypeParams(TCMultipleBind mb, Environment env)
+	{
+		if (mb instanceof TCMultipleTypeBind)
+		{
+			TCMultipleTypeBind mtb = (TCMultipleTypeBind)mb;
+			List<TCParameterType> tparams = mtb.type.apply(new TCParameterCollector(), null);
+			
+			if (!tparams.isEmpty())
+			{
+				TCDefinitionList defs = new TCDefinitionList();
+	    		
+				for (TCParameterType tparam: tparams)
+				{
+					TCDefinition p = new TCLocalDefinition(mtb.type.location, tparam.name, tparam);
+					p.markUsed();
+					defs.add(p);
+				}
+				
+				return new FlatEnvironment(defs, env);
+			}
+		}
+
+		return env;
+	}
+
+	private Context addTypeParams(TCMultipleBind bind, RootContext ctxt)
+	{
+		if (bind instanceof TCMultipleTypeBind)
+		{
+			TCMultipleTypeBind mbind = (TCMultipleTypeBind)bind;
+			List <TCParameterType> ptypes = mbind.type.apply(new TCParameterCollector(), null);
+			Context params = new Context(bind.location, "Type params", ctxt);
+			
+			for (TCParameterType ptype: ptypes)
+			{
+				params.put(ptype.name, new ParameterValue(new TCRealType(ptype.location)));
+			}
+			
+			return params;
+		}
+		else
+		{
+			return ctxt;
+		}
 	}
 
 	@Override
