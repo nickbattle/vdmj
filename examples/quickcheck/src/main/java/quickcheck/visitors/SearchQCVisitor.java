@@ -50,7 +50,7 @@ import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCNumericType;
 import com.fujitsu.vdmj.tc.types.TCRealType;
-import com.fujitsu.vdmj.tc.types.TCSeq1Type;
+import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.IntegerValue;
@@ -66,9 +66,12 @@ import com.fujitsu.vdmj.values.Value;
 
 public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, NameValuePairList, Object>
 {
-	public SearchQCVisitor()
+	private final boolean exists;
+	
+	public SearchQCVisitor(boolean exists)
 	{
 		super();
+		this.exists = exists;
 	}
 
 	@Override
@@ -89,14 +92,30 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 			if (node.right instanceof TCIntegerLiteralExpression)
 			{
 				TCIntegerLiteralExpression rhs = (TCIntegerLiteralExpression)node.right;
-				nvpl.add(var.name, new IntegerValue(rhs.value.value + 1));	// ie. rhs + 1 is NOT = rhs
+				
+				if (exists)
+				{
+					nvpl.add(var.name, new IntegerValue(rhs.value.value));
+				}
+				else
+				{
+					nvpl.add(var.name, new IntegerValue(rhs.value.value + 1));	// ie. rhs + 1 is NOT = rhs
+				}
 			}
 			else if (node.right instanceof TCRealLiteralExpression)
 			{
 				try
 				{
 					TCRealLiteralExpression rhs = (TCRealLiteralExpression)node.right;
-					nvpl.add(var.name, new RealValue(rhs.value.value + 1));	// ie. rhs + 1 is NOT = rhs
+					
+					if (exists)
+					{
+						nvpl.add(var.name, new RealValue(rhs.value.value));
+					}
+					else
+					{
+						nvpl.add(var.name, new RealValue(rhs.value.value + 1));	// ie. rhs + 1 is NOT = rhs
+					}
 				}
 				catch (Exception e)
 				{
@@ -107,7 +126,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 			{
 				TCSeqEnumExpression rhs = (TCSeqEnumExpression)node.right;
 				
-				if (!rhs.members.isEmpty())	// not empty sequence
+				if (!rhs.members.isEmpty() || exists)	// not empty sequence, or empty and exists
 				{
 					nvpl.add(var.name, new SeqValue());	// ie. [] is NOT = rhs
 				}
@@ -116,7 +135,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 			{
 				TCSetEnumExpression rhs = (TCSetEnumExpression)node.right;
 				
-				if (!rhs.members.isEmpty())	// not empty set
+				if (!rhs.members.isEmpty() || exists)	// not empty set, or empty and exists
 				{
 					nvpl.add(var.name, new SetValue());	// ie. {} is NOT = rhs
 				}
@@ -138,14 +157,30 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 			if (node.right instanceof TCIntegerLiteralExpression)
 			{
 				TCIntegerLiteralExpression rhs = (TCIntegerLiteralExpression)node.right;
-				nvpl.add(var.name, new IntegerValue(rhs.value.value));	// ie. rhs is NOT <> rhs
+				
+				if (exists)
+				{
+					nvpl.add(var.name, new IntegerValue(rhs.value.value + 1));
+				}
+				else
+				{
+					nvpl.add(var.name, new IntegerValue(rhs.value.value));	// ie. rhs is NOT <> rhs
+				}
 			}
 			else if (node.right instanceof TCRealLiteralExpression)
 			{
 				try
 				{
 					TCRealLiteralExpression rhs = (TCRealLiteralExpression)node.right;
-					nvpl.add(var.name, new RealValue(rhs.value.value));	// ie. rhs is NOT <> rhs
+					
+					if (exists)
+					{
+						nvpl.add(var.name, new RealValue(rhs.value.value + 1));
+					}
+					else
+					{
+						nvpl.add(var.name, new RealValue(rhs.value.value));	// ie. rhs is NOT <> rhs
+					}
 				}
 				catch (Exception e)
 				{
@@ -187,14 +222,30 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 			if (node.right instanceof TCIntegerLiteralExpression)
 			{
 				TCIntegerLiteralExpression rhs = (TCIntegerLiteralExpression)node.right;
-				nvpl.add(var.name, new IntegerValue(rhs.value.value));	// ie. rhs is NOT > rhs
+				
+				if (exists)
+				{
+					nvpl.add(var.name, new IntegerValue(rhs.value.value + 1));
+				}
+				else
+				{
+					nvpl.add(var.name, new IntegerValue(rhs.value.value));	// ie. rhs is NOT > rhs
+				}
 			}
 			else if (node.right instanceof TCRealLiteralExpression)
 			{
 				try
 				{
 					TCRealLiteralExpression rhs = (TCRealLiteralExpression)node.right;
-					nvpl.add(var.name, new RealValue(rhs.value.value));	// ie. rhs is NOT > rhs
+					
+					if (exists)
+					{
+						nvpl.add(var.name, new RealValue(rhs.value.value + 1));
+					}
+					else
+					{
+						nvpl.add(var.name, new RealValue(rhs.value.value));	// ie. rhs is NOT > rhs
+					}
 				}
 				catch (Exception e)
 				{
@@ -218,14 +269,30 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 			if (node.right instanceof TCIntegerLiteralExpression)
 			{
 				TCIntegerLiteralExpression rhs = (TCIntegerLiteralExpression)node.right;
-				nvpl.add(var.name, new IntegerValue(rhs.value.value - 1));	// ie. rhs-1 is NOT >= rhs
+				
+				if (exists)
+				{
+					nvpl.add(var.name, new IntegerValue(rhs.value.value));
+				}
+				else
+				{
+					nvpl.add(var.name, new IntegerValue(rhs.value.value - 1));	// ie. rhs-1 is NOT >= rhs
+				}
 			}
 			else if (node.right instanceof TCRealLiteralExpression)
 			{
 				try
 				{
 					TCRealLiteralExpression rhs = (TCRealLiteralExpression)node.right;
-					nvpl.add(var.name, new RealValue(rhs.value.value - 1));	// ie. rhs-1 is NOT >= rhs
+					
+					if (exists)
+					{
+						nvpl.add(var.name, new RealValue(rhs.value.value));
+					}
+					else
+					{
+						nvpl.add(var.name, new RealValue(rhs.value.value - 1));	// ie. rhs-1 is NOT >= rhs
+					}
 				}
 				catch (Exception e)
 				{
@@ -249,14 +316,30 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 			if (node.right instanceof TCIntegerLiteralExpression)
 			{
 				TCIntegerLiteralExpression rhs = (TCIntegerLiteralExpression)node.right;
-				nvpl.add(var.name, new IntegerValue(rhs.value.value));	// ie. rhs is NOT < rhs
+				
+				if (exists)
+				{
+					nvpl.add(var.name, new IntegerValue(rhs.value.value - 1));
+				}
+				else
+				{
+					nvpl.add(var.name, new IntegerValue(rhs.value.value));	// ie. rhs is NOT < rhs
+				}
 			}
 			else if (node.right instanceof TCRealLiteralExpression)
 			{
 				try
 				{
 					TCRealLiteralExpression rhs = (TCRealLiteralExpression)node.right;
-					nvpl.add(var.name, new RealValue(rhs.value.value));	// ie. rhs is NOT < rhs
+					
+					if (exists)
+					{
+						nvpl.add(var.name, new RealValue(rhs.value.value - 1));
+					}
+					else
+					{
+						nvpl.add(var.name, new RealValue(rhs.value.value));	// ie. rhs is NOT < rhs
+					}
 				}
 				catch (Exception e)
 				{
@@ -280,14 +363,30 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 			if (node.right instanceof TCIntegerLiteralExpression)
 			{
 				TCIntegerLiteralExpression rhs = (TCIntegerLiteralExpression)node.right;
-				nvpl.add(var.name, new IntegerValue(rhs.value.value + 1));	// ie. rhs+1 is NOT <= rhs
+				
+				if (exists)
+				{
+					nvpl.add(var.name, new IntegerValue(rhs.value.value));
+				}
+				else
+				{
+					nvpl.add(var.name, new IntegerValue(rhs.value.value + 1));	// ie. rhs+1 is NOT <= rhs
+				}
 			}
 			else if (node.right instanceof TCRealLiteralExpression)
 			{
 				try
 				{
 					TCRealLiteralExpression rhs = (TCRealLiteralExpression)node.right;
-					nvpl.add(var.name, new RealValue(rhs.value.value + 1));	// ie. rhs+1 is NOT <= rhs
+					
+					if (exists)
+					{
+						nvpl.add(var.name, new RealValue(rhs.value.value));
+					}
+					else
+					{
+						nvpl.add(var.name, new RealValue(rhs.value.value + 1));	// ie. rhs+1 is NOT <= rhs
+					}
 				}
 				catch (Exception e)
 				{
@@ -381,6 +480,7 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 				if (vartype instanceof TCNumericType)
 				{
 					TCNumericType numtype = (TCNumericType)vartype;
+					int index = (exists ? 1 : 0);
 
 					try
 					{
@@ -390,19 +490,19 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 								break;
 								
 							case 1:	// nat
-								nvpl.add(var.name, new NaturalValue(0));
+								nvpl.add(var.name, new NaturalValue(index));
 								break;
 								
 							case 2:	// int
-								nvpl.add(var.name, new IntegerValue(0));
+								nvpl.add(var.name, new IntegerValue(index));
 								break;
 								
 							case 3:	// rat
-								nvpl.add(var.name, new RationalValue(0));
+								nvpl.add(var.name, new RationalValue(index));
 								break;
 								
 							case 4:	// real
-								nvpl.add(var.name, new RealValue(0));
+								nvpl.add(var.name, new RealValue(index));
 								break;
 								
 							default:	// No idea!
@@ -415,16 +515,15 @@ public class SearchQCVisitor extends TCLeafExpressionVisitor<NameValuePair, Name
 					}
 				}
 			}
+		}
+		else if (node.right instanceof TCVariableExpression)
+		{
+			TCVariableExpression var = (TCVariableExpression)node.right;
+			TCType vartype = var.getType();
 			
-			if (node.right instanceof TCVariableExpression)
+			if (!(vartype instanceof TCSet1Type))
 			{
-				TCVariableExpression var = (TCVariableExpression)node.right;
-				TCType vartype = var.getType();
-				
-				if (!(vartype instanceof TCSeq1Type))
-				{
-					nvpl.add(var.name, new SeqValue());
-				}
+				nvpl.add(var.name, new SeqValue());
 			}
 		}
 		else if (node.right instanceof TCMapDomainExpression)
