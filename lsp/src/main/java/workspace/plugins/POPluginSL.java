@@ -36,6 +36,7 @@ import workspace.events.CheckPrepareEvent;
 public class POPluginSL extends POPlugin
 {
 	private POModuleList poModuleList;
+	private ProofObligationList obligationList;
 
 	public POPluginSL()
 	{
@@ -47,6 +48,7 @@ public class POPluginSL extends POPlugin
 	{
 		super.preCheck(ev);
 		poModuleList = null;
+		obligationList = null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -66,10 +68,14 @@ public class POPluginSL extends POPlugin
 	@Override
 	public ProofObligationList getProofObligations()
 	{
-		POAnnotation.init();
-		ProofObligationList list = poModuleList.getProofObligations();
-		POAnnotation.close();
-		list.renumber();
-		return list;
+		if (obligationList == null)
+		{
+			POAnnotation.init();
+			obligationList = poModuleList.getProofObligations();
+			POAnnotation.close();
+			obligationList.renumber();
+		}
+		
+		return obligationList;
 	}
 }
