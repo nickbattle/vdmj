@@ -34,8 +34,10 @@ import dap.AsyncExecutor;
 import dap.DAPRequest;
 import dap.DAPResponse;
 import json.JSONObject;
+import lsp.LSPServer;
 import quickcheck.QuickCheck;
 import quickcheck.strategies.Results;
+import rpc.RPCRequest;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
 
@@ -90,6 +92,11 @@ public class QuickCheckExecutor extends AsyncExecutor
 	@Override
 	protected void tail(double time) throws IOException
 	{
+		// Kick the (LSP) client, since the PO statuses may have been updated...
+		LSPServer lsp = LSPServer.getInstance();
+		lsp.writeMessage(RPCRequest.notification("slsp/POG/updated",
+				new JSONObject("successful", true)));
+		
 		server.writeMessage(new DAPResponse(request, true, null,
 				new JSONObject("result", answer, "variablesReference", 0)));
 	}
