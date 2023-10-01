@@ -75,8 +75,6 @@ import json.JSONObject;
 import lsp.Utils;
 import vdmj.DAPDebugReader;
 import vdmj.commands.AnalysisCommand;
-import vdmj.commands.PrintCommand;
-import vdmj.commands.ScriptCommand;
 import workspace.events.DAPBeforeEvaluateEvent;
 import workspace.events.DAPConfigDoneEvent;
 import workspace.events.DAPDisconnectEvent;
@@ -757,8 +755,7 @@ public class DAPWorkspaceManager
 
 		// If we are about to evaluate something, check that we can execute.
 		
-		if (command instanceof PrintCommand ||
-			command instanceof ScriptCommand)
+		if (command.notWhenDirty())
 		{
 			if (specHasErrors())
 			{

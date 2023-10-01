@@ -145,4 +145,10 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 	{
 		return true;
 	}
+	
+	@Override
+	public boolean notWhenDirty()
+	{
+		return true;
+	}
 }

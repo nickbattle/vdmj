@@ -66,6 +66,12 @@ public class ScriptCommand extends AnalysisCommand implements ScriptRunnable
 	}
 
 	@Override
+	public boolean notWhenDirty()
+	{
+		return true;
+	}
+	
+	@Override
 	public String scriptRun(DAPRequest request) throws IOException
 	{
 		return "Cannot nest scripts";
