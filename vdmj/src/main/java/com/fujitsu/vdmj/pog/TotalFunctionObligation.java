@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCType;
 
 public class TotalFunctionObligation extends ProofObligation
 {
@@ -54,10 +55,10 @@ public class TotalFunctionObligation extends ProofObligation
 		{
 			fapply.append("[");
 			
-			for (int p=0; p < def.typeParams.size(); p++)
+			for (TCType ptype: def.typeParams)
 			{
 				fapply.append(sep);
-				fapply.append("?");
+				fapply.append(ptype.toString());
 				sep = ", ";
 			}
 			
