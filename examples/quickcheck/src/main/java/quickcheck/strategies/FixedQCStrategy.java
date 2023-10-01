@@ -405,7 +405,15 @@ public class FixedQCStrategy extends QCStrategy
 
 			writer.close();
 			println("Created " + done.size() + " default ranges in '" + filename + "'");
-			println("Check them! Then run 'qc -s fixed -fixed:file " + filename + "'");
+			
+			if (filename.equals("ranges.qc"))
+			{
+				println("Check them! Then run 'qc -s fixed'");
+			}
+			else
+			{
+				println("Check them! Then run 'qc -s fixed -fixed:file " + filename + "'");
+			}
 		}
 		catch (Exception e)
 		{
