@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -63,6 +64,7 @@ import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
+import annotations.po.POQuickCheckAnnotation;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.Results;
 import quickcheck.visitors.FixedRangeCreator;
@@ -520,15 +522,31 @@ public class QuickCheck
 	{
 		if (po.typeParams != null)
 		{
-			Context params = new Context(po.location, "Type params", ctxt);
+			Context pctxt = new Context(po.location, "Type params", ctxt);
+			
+			if (po.annotations != null)
+			{
+				for (POAnnotation a: po.annotations)
+				{
+					if (a instanceof POQuickCheckAnnotation)
+					{
+						POQuickCheckAnnotation qca = (POQuickCheckAnnotation)a;
+						pctxt.put(qca.param.name, new ParameterValue(qca.ptype));
+					}
+				}
+			}
 			
 			for (TCType type: po.typeParams)
 			{
 				TCParameterType ptype = (TCParameterType)type;
-				params.put(ptype.name, new ParameterValue(new TCRealType(po.location)));
+				
+				if (!pctxt.containsKey(ptype.name))
+				{
+					pctxt.put(ptype.name, new ParameterValue(new TCRealType(po.location)));
+				}
 			}
 			
-			return params;
+			return pctxt;
 		}
 		else
 		{

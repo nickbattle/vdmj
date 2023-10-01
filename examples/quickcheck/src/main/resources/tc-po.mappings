@@ -1,0 +1,8 @@
+##########################################################################################
+# The class mapping definition for the VDMJ Proof Obligation Generator. See ClassMapper.
+##########################################################################################
+
+# annotations
+package annotations.tc to annotations.po;
+map TCQuickCheckAnnotation{name, args} to POQuickCheckAnnotation(name, args);
+
