@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.pog;
 import java.util.ListIterator;
 import java.util.Stack;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -113,6 +114,21 @@ public class POContextStack extends Stack<POContext>
 			if (params != null && !params.isEmpty())
 			{
 				return params;
+			}
+		}
+		
+		return null;
+	}
+	
+	public POAnnotationList getAnnotations()
+	{
+		for (POContext ctxt: this)
+		{
+			POAnnotationList annotations = ctxt.getAnnotations();
+			
+			if (annotations != null && !annotations.isEmpty())
+			{
+				return annotations;
 			}
 		}
 		

@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.pog;
 import java.util.Iterator;
 import java.util.List;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
@@ -39,6 +40,7 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 public class POFunctionDefinitionContext extends POContext
 {
+	public final POAnnotationList annotations;
 	public final TCNameToken name;
 	public final TCFunctionType deftype;
 	public final TCTypeList typeParams;
@@ -49,6 +51,7 @@ public class POFunctionDefinitionContext extends POContext
 	public POFunctionDefinitionContext(
 		POExplicitFunctionDefinition definition, boolean precond)
 	{
+		this.annotations = definition.annotations;
 		this.name = definition.name;
 		this.deftype = definition.type;
 		this.typeParams = definition.typeParams;
@@ -61,6 +64,7 @@ public class POFunctionDefinitionContext extends POContext
 	public POFunctionDefinitionContext(
 		POImplicitFunctionDefinition definition, boolean precond)
 	{
+		this.annotations = definition.annotations;
 		this.name = definition.name;
 		this.deftype = definition.type;
 		this.typeParams = definition.typeParams;
@@ -123,5 +127,11 @@ public class POFunctionDefinitionContext extends POContext
 	public TCTypeList getTypeParams()
 	{
 		return typeParams;
+	}
+	
+	@Override
+	public POAnnotationList getAnnotations()
+	{
+		return annotations;
 	}
 }

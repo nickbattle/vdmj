@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -47,6 +48,11 @@ abstract public class POContext
 	}
 	
 	public TCTypeList getTypeParams()
+	{
+		return null;
+	}
+
+	public POAnnotationList getAnnotations()
 	{
 		return null;
 	}

@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -42,6 +43,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public POTrivialProof proof;
 	public boolean isCheckable;
 	public TCTypeList typeParams;
+	public POAnnotationList annotations;
 
 	private int var = 1;
 	private TCExpression checkedExpression = null;
@@ -56,6 +58,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.number = 0;
 		this.isCheckable = ctxt.isCheckable();	// Set false for operation POs
 		this.typeParams = ctxt.getTypeParams();
+		this.annotations = ctxt.getAnnotations();
 		
 		if (!isCheckable)
 		{
