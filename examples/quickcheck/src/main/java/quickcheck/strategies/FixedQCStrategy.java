@@ -405,7 +405,7 @@ public class FixedQCStrategy extends QCStrategy
 
 			writer.close();
 			println("Created " + done.size() + " default ranges in '" + filename + "'");
-			println("Check them! Then run 'qc -p fixed -fixed:file " + filename + "'");
+			println("Check them! Then run 'qc -s fixed -fixed:file " + filename + "'");
 		}
 		catch (Exception e)
 		{
@@ -533,6 +533,6 @@ public class FixedQCStrategy extends QCStrategy
 	@Override
 	public boolean useByDefault()
 	{
-		return false;	// Use if no -p given
+		return false;	// Use if no -s given
 	}
 }

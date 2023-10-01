@@ -44,7 +44,7 @@ import quickcheck.strategies.Results;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-p <strategy>]* [-<strategy:option>]* [<PO numbers/ranges>]";
+	private final static String CMD = "quickcheck [-?|-help][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges>]";
 	private final static String USAGE = "Usage: " + CMD;
 			
 	public QuickCheckCommand(String line)
@@ -90,7 +90,7 @@ public class QuickCheckCommand extends AnalysisCommand
 						
 						if (!qc.getDisabledStrategies().isEmpty())
 						{
-							println("Disabled strategies (add with -p <name>):");
+							println("Disabled strategies (add with -s <name>):");
 							
 							for (QCStrategy strategy: qc.getDisabledStrategies())
 							{

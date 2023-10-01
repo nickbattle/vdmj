@@ -127,7 +127,7 @@ public class QuickCheck
 						if (argvSize != argv.size())
 						{
 							// Constructor took some arguments
-							errorln("The " + instance.getName() + " strategy is not enabled. Add -p " + instance.getName());
+							errorln("The " + instance.getName() + " strategy is not enabled. Add -s " + instance.getName());
 							errorCount++;
 						}
 					}
@@ -214,7 +214,7 @@ public class QuickCheck
 		{
 			String arg = iter.next();
 			
-			if (arg.equals("-p"))
+			if (arg.equals("-s"))
 			{
 				iter.remove();
 				
@@ -226,7 +226,7 @@ public class QuickCheck
 				}
 				else
 				{
-					errorln("-p must be followed by a strategy name");
+					errorln("-s must be followed by a strategy name");
 					names.add("unknown");
 				}
 			}

@@ -78,7 +78,7 @@ public class ExampleQCStrategy extends QCStrategy
 	@Override
 	public String getName()
 	{
-		return "example";	// Can be used with -p <name>
+		return "example";	// Can be used with -s <name>
 	}
 
 	@Override
@@ -116,6 +116,6 @@ public class ExampleQCStrategy extends QCStrategy
 	@Override
 	public boolean useByDefault()
 	{
-		return false;	// Not used if no -p options given
+		return false;	// Not used if no -s options given
 	}
 }

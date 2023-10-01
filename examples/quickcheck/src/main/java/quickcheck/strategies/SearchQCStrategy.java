@@ -126,6 +126,6 @@ public class SearchQCStrategy extends QCStrategy
 	@Override
 	public boolean useByDefault()
 	{
-		return true;	// Use if no -p given
+		return true;	// Use if no -s given
 	}
 }
