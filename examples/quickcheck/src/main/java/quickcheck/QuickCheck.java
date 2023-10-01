@@ -380,7 +380,7 @@ public class QuickCheck
 					 results.counterexamples.isEmpty() &&
 					 !bindings.isEmpty())	// empty binds => simple forall over sets, so must execute
 			{
-				po.status = POStatus.PROVED;
+				po.setStatus(POStatus.PROVED);
 				printf("PO #%d, PROVED %s\n", po.number, duration(results.duration));
 				return;
 			}
@@ -442,28 +442,30 @@ public class QuickCheck
 				{
 					if (result.boolValue(ctxt))
 					{
-						String outcome = null;
+						POStatus outcome = null;
 						
 						if (po.getCheckedExpression() instanceof TCExistsExpression)
 						{
-							outcome = "PROVED";		// An "exists" PO is PROVED, if true.
+							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
 						}
 						else
 						{
-							outcome = (results.proved) ? "PROVED" : "MAYBE";
+							outcome = (results.proved) ? POStatus.PROVED : POStatus.MAYBE;
 						}
 						
-						printf("PO #%d, %s %s\n", po.number, outcome, duration(before, after));
+						printf("PO #%d, %s %s\n", po.number, outcome.toString().toUpperCase(), duration(before, after));
 					}
 					else
 					{
 						if (po.getCheckedExpression() instanceof TCExistsExpression)
 						{
 							printf("PO #%d, MAYBE %s\n", po.number, duration(before, after));
+							po.setStatus(POStatus.MAYBE);
 						}
 						else
 						{
 							printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
+							po.setStatus(POStatus.FAILED);
 							printFailPath(bindings);
 							
 							if (exception != null)
@@ -479,6 +481,7 @@ public class QuickCheck
 				else
 				{
 					printf("PO #%d, Error: PO evaluation returns %s?\n", po.number, result.kind());
+					po.setStatus(POStatus.FAILED);
 					println("----");
 					printBindings(bindings);
 					println("----");
@@ -488,6 +491,7 @@ public class QuickCheck
 			catch (Exception e)
 			{
 				printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
+				po.setStatus(POStatus.FAILED);
 				println("----");
 				printBindings(bindings);
 				println("----");
