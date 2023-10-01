@@ -454,6 +454,7 @@ public class QuickCheck
 						}
 						
 						printf("PO #%d, %s %s\n", po.number, outcome.toString().toUpperCase(), duration(before, after));
+						po.setStatus(outcome);
 					}
 					else
 					{
