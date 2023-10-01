@@ -69,6 +69,11 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	{
 		return value;
 	}
+	
+	public void setStatus(POStatus status)
+	{
+		this.status = status;
+	}
 
 	@Override
 	public String toString()

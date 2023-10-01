@@ -44,11 +44,13 @@ import com.fujitsu.vdmj.util.Utils;
 public class POPluginSL extends POPlugin
 {
 	protected POModuleList poModuleList = null;
+	protected ProofObligationList obligationList = null;
 	
 	@Override
 	protected List<VDMMessage> pogPrepare()
 	{
 		poModuleList = null;
+		obligationList = null;
 		return null;
 	}
 
@@ -87,10 +89,14 @@ public class POPluginSL extends POPlugin
 	@Override
 	public ProofObligationList getProofObligations()
 	{
-		POAnnotation.init();
-		ProofObligationList list = poModuleList.getProofObligations();
-		POAnnotation.close();
-		list.renumber();
-		return list;
+		if (obligationList == null)
+		{
+			POAnnotation.init();
+			obligationList = poModuleList.getProofObligations();
+			POAnnotation.close();
+			obligationList.renumber();
+		}
+		
+		return obligationList;
 	}
 }
