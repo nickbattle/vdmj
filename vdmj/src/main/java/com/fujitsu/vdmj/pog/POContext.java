@@ -72,14 +72,14 @@ abstract public class POContext
 		return knownTypes.get(exp);
 	}
 	
-	protected String preconditionCall(TCNameToken name, POPatternList paramPatternList, POExpression body)
+	protected String preconditionCall(TCNameToken name, TCTypeList typeParams, POPatternList paramPatternList, POExpression body)
 	{
 		List<POPatternList> pplist = new Vector<POPatternList>();
 		pplist.add(paramPatternList);
-		return preconditionCall(name, pplist, body);
+		return preconditionCall(name, typeParams, pplist, body);
 	}
 	
-	protected String preconditionCall(TCNameToken name, List<POPatternList> paramPatternList, POExpression body)
+	protected String preconditionCall(TCNameToken name, TCTypeList typeParams, List<POPatternList> paramPatternList, POExpression body)
 	{
 		if (body == null)
 		{
@@ -88,6 +88,21 @@ abstract public class POContext
 		
 		StringBuilder call = new StringBuilder();
 		call.append(name.getPreName(name.getLocation()));
+		
+		if (typeParams != null && !typeParams.isEmpty())
+		{
+			call.append("[");
+			String sep = "";
+			
+			for (TCType param: typeParams)
+			{
+				call.append(sep);
+				call.append(param);
+				sep = ", ";
+			}
+			
+			call.append("]");
+		}
 
 		for (POPatternList plist: paramPatternList)
 		{

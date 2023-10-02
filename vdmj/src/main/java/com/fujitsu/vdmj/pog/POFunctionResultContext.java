@@ -45,7 +45,7 @@ public class POFunctionResultContext extends POContext
 	{
 		this.name = definition.name;
 		this.deftype = definition.type;
-		this.precondition = preconditionCall(name, definition.paramPatternList, definition.precondition);
+		this.precondition = preconditionCall(name, definition.typeParams, definition.paramPatternList, definition.precondition);
 		this.body = definition.body;
 		this.implicit = false;
 
@@ -60,7 +60,7 @@ public class POFunctionResultContext extends POContext
 	{
 		this.name = definition.name;
 		this.deftype = definition.type;
-		this.precondition = preconditionCall(name, definition.getParamPatternList(), definition.precondition);
+		this.precondition = preconditionCall(name, definition.typeParams, definition.getParamPatternList(), definition.precondition);
 		this.body = definition.body;
 		this.implicit = true;
 		this.result = definition.result;
