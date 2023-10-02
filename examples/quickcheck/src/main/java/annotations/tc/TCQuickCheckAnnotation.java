@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.expressions.TCFuncInstantiationExpression;
@@ -35,6 +36,7 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -50,39 +52,45 @@ public class TCQuickCheckAnnotation extends TCAnnotation
 	@Override
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
+		TCTypeList typeParams = null;
+		boolean found = false;
+		
 		if (def instanceof TCExplicitFunctionDefinition)
 		{
 			TCExplicitFunctionDefinition exdef = (TCExplicitFunctionDefinition)def;
-			
-			if (exdef.typeParams == null)
-			{
-				name.report(6001, "@QuickCheck only applies to polymorphic definitions");
-			}
-			else
-			{
-				TCFuncInstantiationExpression exp = (TCFuncInstantiationExpression) args.get(0);
-				String T = exp.actualTypes.get(0).toString();
-				
-				for (TCType ptype: exdef.typeParams)
-				{
-					if (ptype.toString().equals(T))
-					{
-						return;
-					}
-				}
-				
-				name.report(6001, "@QuickCheck " +  T + " is not a parameter");
-			}
+			typeParams = exdef.typeParams;
+			found = true;
 		}
-		else if (def instanceof TCExplicitFunctionDefinition)
+		else if (def instanceof TCImplicitFunctionDefinition)
 		{
-			// TODO
+			TCImplicitFunctionDefinition imdef = (TCImplicitFunctionDefinition)def;
+			typeParams = imdef.typeParams;
+			found = true;
 		}
-		else
+		
+		if (!found)
 		{
 			name.report(6001, "@QuickCheck only applies to function definitions");
 		}
-		
+		else if (typeParams == null)
+		{
+			name.report(6001, "@QuickCheck only applies to polymorphic definitions");
+		}
+		else
+		{
+			TCFuncInstantiationExpression exp = (TCFuncInstantiationExpression) args.get(0);
+			String T = exp.actualTypes.get(0).toString();
+			
+			for (TCType ptype: typeParams)
+			{
+				if (ptype.toString().equals(T))
+				{
+					return;
+				}
+			}
+			
+			name.report(6001, "@QuickCheck " +  T + " is not a parameter");
+		}
 	}
 	
 	@Override
