@@ -48,7 +48,7 @@ public class ASTQuickCheckAnnotation extends ASTAnnotation
 	}
 	
 	/**
-	 * Override the default parse, and look for @QuickCheck @T = <type>;
+	 * Override the default parse, and look for @QuickCheck @T = <type> [,<type>*];
 	 */
 	@Override
 	public ASTExpressionList parse(LexTokenReader ltr) throws LexException, ParserException
@@ -69,15 +69,19 @@ public class ASTQuickCheckAnnotation extends ASTAnnotation
 				parseException("expecting @T = <type>;", param.location);
 			}
 			
-			ltr.nextToken();
-			ASTType type = er.readType();
-			types.add(type);
+			do
+			{
+				ltr.nextToken();
+				ASTType type = er.readType();
+				types.add(type);
+			}
+			while (ltr.getLast().is(Token.COMMA));
 			
 			args.add(new ASTFuncInstantiationExpression(new ASTVariableExpression(param.name), types));
 		}
 		else
 		{
-			parseException("expecting @T = <type>;", start.location);
+			parseException("expecting @T = <type> [,<type>*];", start.location);
 		}
 		
 		if (ltr.getLast().isNot(Token.SEMICOLON))

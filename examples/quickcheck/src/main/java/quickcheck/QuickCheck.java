@@ -531,7 +531,7 @@ public class QuickCheck
 					if (a instanceof POQuickCheckAnnotation)
 					{
 						POQuickCheckAnnotation qca = (POQuickCheckAnnotation)a;
-						pctxt.put(qca.param.name, new ParameterValue(qca.ptype));
+						pctxt.put(qca.param.name, new ParameterValue(qca.ptypes.firstElement()));
 					}
 				}
 			}

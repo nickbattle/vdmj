@@ -292,17 +292,29 @@ public class FixedQCStrategy extends QCStrategy
 				if (value instanceof SetValue)
 				{
 					SetValue svalue = (SetValue)value;
-					ValueList list = new ValueList();
+					ValueList list = ranges.get(key);	// Existing?
+					
+					if (list == null)
+					{
+						list = new ValueList();
+						ranges.put(key, list);
+					}
+					
 					list.addAll(svalue.values);
-					ranges.put(key, list);
 				}
 				else if (value instanceof IntegerValue)
 				{
 					IntegerValue ivalue = (IntegerValue)value;
 					int limit = (int) ivalue.value;
-					ValueList list = new ValueList();
+					ValueList list = ranges.get(key);	// Existing?
+					
+					if (list == null)
+					{
+						list = new ValueList();
+						ranges.put(key, list);
+					}
+					
 					list.addAll(tctypes.get(i).apply(new FixedRangeCreator(ctxt), limit));
-					ranges.put(key, list);
 				}
 				else
 				{
@@ -463,6 +475,7 @@ public class FixedQCStrategy extends QCStrategy
 			
 			for (TCParameterType ptype: ptypes)
 			{
+				// Just map all @T params to "real" as the ranges.qc value will decide
 				params.put(ptype.name, new ParameterValue(new TCRealType(ptype.location)));
 			}
 			
