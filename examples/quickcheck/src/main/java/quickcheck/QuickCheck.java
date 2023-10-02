@@ -317,7 +317,7 @@ public class QuickCheck
 		
 		if (!po.isCheckable)
 		{
-			return new Results(proved, union, 0);
+			return new Results(false, union, 0);
 		}
 		
 		INExpression exp = getINExpression(po);

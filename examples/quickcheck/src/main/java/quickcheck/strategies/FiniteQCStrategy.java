@@ -159,7 +159,7 @@ public class FiniteQCStrategy extends QCStrategy
 				result.put(bind.toString(), bind.getType().apply(new INGetAllValuesVisitor(), ctxt));
 			}
 			
-			proved = true;	// ie. if the counterexamples above pass, then PROVED
+			proved = (po.typeParams == null);	// ie. counterexamples pass and not polymorphic, then PROVED
 		}
 		
 		return new Results(proved, result, System.currentTimeMillis() - before);
