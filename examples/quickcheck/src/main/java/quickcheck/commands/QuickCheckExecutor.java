@@ -92,11 +92,6 @@ public class QuickCheckExecutor extends AsyncExecutor
 	@Override
 	protected void tail(double time) throws IOException
 	{
-		// Kick the (LSP) client, since the PO statuses may have been updated...
-		LSPServer lsp = LSPServer.getInstance();
-		lsp.writeMessage(RPCRequest.notification("slsp/POG/updated",
-				new JSONObject("successful", true)));
-		
 		server.writeMessage(new DAPResponse(request, true, null,
 				new JSONObject("result", answer, "variablesReference", 0)));
 	}
@@ -109,8 +104,13 @@ public class QuickCheckExecutor extends AsyncExecutor
 	}
 
 	@Override
-	protected void clean()
+	protected void clean() throws IOException
 	{
+		// Always kick the (LSP) client, since the PO statuses may have been updated...
+		LSPServer lsp = LSPServer.getInstance();
+		lsp.writeMessage(RPCRequest.notification("slsp/POG/updated",
+				new JSONObject("successful", true)));
+		
 		running = null;
 	}
 }

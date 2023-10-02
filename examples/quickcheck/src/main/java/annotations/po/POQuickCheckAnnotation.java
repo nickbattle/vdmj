@@ -44,6 +44,6 @@ public class POQuickCheckAnnotation extends POAnnotation
 		POFuncInstantiationExpression exp = (POFuncInstantiationExpression) args.get(0);
 		this.param = (TCParameterType) exp.actualTypes.get(0);
 		this.ptypes = new TCTypeList();
-		this.ptypes.addAll(exp.actualTypes.subList(1, exp.actualTypes.size()-1));
+		this.ptypes.addAll(exp.actualTypes.subList(1, exp.actualTypes.size()));
 	}
 }
