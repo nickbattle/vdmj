@@ -39,7 +39,7 @@ public class TCParameterCollector extends TCLeafTypeVisitor<TCParameterType, Lis
 {
 	public TCParameterCollector()
 	{
-		// default visitorSet
+		// No visitorSet
 	}
 
 	@Override

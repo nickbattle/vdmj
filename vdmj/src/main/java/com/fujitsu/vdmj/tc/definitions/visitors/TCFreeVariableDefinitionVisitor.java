@@ -61,7 +61,7 @@ public class TCFreeVariableDefinitionVisitor extends TCLeafDefinitionVisitor<TCN
 				expressionVisitor = new TCFreeVariableExpressionVisitor(this);
 				statementVisitor = new TCFreeVariableStatementVisitor(this);
 				patternVisitor = new TCFreeVariablePatternVisitor(this);
-				typeVisitor = new TCFreeVariableTypeVisitor(this);
+				typeVisitor = new TCFreeVariableTypeVisitor();
 				bindVisitor = new TCFreeVariableBindVisitor(this);
 				multiBindVisitor = new TCFreeVariableMultipleBindVisitor(this); 
 			}

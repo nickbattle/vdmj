@@ -24,7 +24,6 @@
 
 package com.fujitsu.vdmj.tc.types.visitors;
 
-import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -32,10 +31,9 @@ import com.fujitsu.vdmj.typechecker.Environment;
 
 public class TCFreeVariableTypeVisitor extends TCLeafTypeVisitor<TCNameToken, TCNameSet, Environment>
 {
-	public TCFreeVariableTypeVisitor(TCVisitorSet<TCNameToken, TCNameSet, Environment> visitors)
+	public TCFreeVariableTypeVisitor()
 	{
-		assert visitors != null : "Visitor set cannot be null";
-		visitorSet = visitors;
+		// No visitor set
 	}
 
 	@Override
