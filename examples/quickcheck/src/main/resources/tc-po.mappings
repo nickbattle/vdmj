@@ -4,5 +4,5 @@
 
 # annotations
 package annotations.tc to annotations.po;
-map TCQuickCheckAnnotation{name, args} to POQuickCheckAnnotation(name, args);
+map TCQuickCheckAnnotation{name, qcParam, qcTypes} to POQuickCheckAnnotation(name, qcParam, qcTypes);
 

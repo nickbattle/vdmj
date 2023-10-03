@@ -25,8 +25,6 @@
 package annotations.po;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
-import com.fujitsu.vdmj.po.expressions.POExpressionList;
-import com.fujitsu.vdmj.po.expressions.POFuncInstantiationExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -34,16 +32,14 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 public class POQuickCheckAnnotation extends POAnnotation
 {
 	private static final long serialVersionUID = 1L;
-	public final TCParameterType param;
-	public final TCTypeList ptypes;
+	
+	public final TCParameterType qcParam;
+	public final TCTypeList qcTypes;
 
-	public POQuickCheckAnnotation(TCIdentifierToken name, POExpressionList args)
+	public POQuickCheckAnnotation(TCIdentifierToken name, TCParameterType qcParam, TCTypeList qcTypes)
 	{
-		super(name, args);
-		
-		POFuncInstantiationExpression exp = (POFuncInstantiationExpression) args.get(0);
-		this.param = (TCParameterType) exp.actualTypes.get(0);
-		this.ptypes = new TCTypeList();
-		this.ptypes.addAll(exp.actualTypes.subList(1, exp.actualTypes.size()));
+		super(name, null);
+		this.qcParam = qcParam;
+		this.qcTypes = qcTypes;
 	}
 }

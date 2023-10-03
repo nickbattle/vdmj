@@ -25,9 +25,6 @@
 package annotations.ast;
 
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
-import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
-import com.fujitsu.vdmj.ast.expressions.ASTFuncInstantiationExpression;
-import com.fujitsu.vdmj.ast.expressions.ASTVariableExpression;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.types.ASTParameterType;
 import com.fujitsu.vdmj.ast.types.ASTType;
@@ -41,6 +38,9 @@ import com.fujitsu.vdmj.syntax.TypeReader;
 public class ASTQuickCheckAnnotation extends ASTAnnotation
 {
 	private static final long serialVersionUID = 1L;
+	
+	public ASTParameterType qcParam = null;
+	public ASTTypeList qcTypes = null;
 
 	public ASTQuickCheckAnnotation(LexIdentifierToken name)
 	{
@@ -51,33 +51,29 @@ public class ASTQuickCheckAnnotation extends ASTAnnotation
 	 * Override the default parse, and look for @QuickCheck @T = <type> [,<type>*];
 	 */
 	@Override
-	public ASTExpressionList parse(LexTokenReader ltr) throws LexException, ParserException
+	public void parse(LexTokenReader ltr) throws LexException, ParserException
 	{
 		ltr.nextToken();
-		ASTExpressionList args = new ASTExpressionList();
 		TypeReader er = new TypeReader(ltr);
 		ASTType start = er.readType();
+		qcTypes = new ASTTypeList();
 		
 		if (start instanceof ASTParameterType)
 		{
-			ASTTypeList types = new ASTTypeList();
-			ASTParameterType param = (ASTParameterType)start;
-			types.add(param);
+			qcParam = (ASTParameterType)start;
 
 			if (!ltr.getLast().is(Token.EQUALS))
 			{
-				parseException("expecting @T = <type>;", param.location);
+				parseException("expecting @T = <type>;", qcParam.location);
 			}
 			
 			do
 			{
 				ltr.nextToken();
 				ASTType type = er.readType();
-				types.add(type);
+				qcTypes.add(type);
 			}
 			while (ltr.getLast().is(Token.COMMA));
-			
-			args.add(new ASTFuncInstantiationExpression(new ASTVariableExpression(param.name), types));
 		}
 		else
 		{
@@ -88,7 +84,5 @@ public class ASTQuickCheckAnnotation extends ASTAnnotation
 		{
 			parseException("missing ;", ltr.getLast().location);
 		}
-		
-		return args;
 	}
 }
