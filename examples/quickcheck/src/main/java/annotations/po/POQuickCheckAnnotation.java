@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.util.Utils;
 
 public class POQuickCheckAnnotation extends POAnnotation
 {
@@ -41,5 +42,11 @@ public class POQuickCheckAnnotation extends POAnnotation
 		super(name, null);
 		this.qcParam = qcParam;
 		this.qcTypes = qcTypes;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "@" + name + " " + qcParam + " = " + Utils.listToString("", qcTypes, ", ", ";");
 	}
 }

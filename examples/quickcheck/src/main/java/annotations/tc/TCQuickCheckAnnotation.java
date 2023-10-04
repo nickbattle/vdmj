@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.util.Utils;
 
 public class TCQuickCheckAnnotation extends TCAnnotation
 {
@@ -52,31 +53,35 @@ public class TCQuickCheckAnnotation extends TCAnnotation
 		this.qcParam = qcParam;
 		this.qcTypes = qcTypes;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "@" + name + " " + qcParam + " = " + Utils.listToString("", qcTypes, ", ", ";");
+	}
 
 	@Override
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
 	{
-		boolean found = false;
 		TCTypeList funcParams = null;
 		
 		if (def instanceof TCExplicitFunctionDefinition)
 		{
 			TCExplicitFunctionDefinition exdef = (TCExplicitFunctionDefinition)def;
 			funcParams = exdef.typeParams;
-			found = true;
 		}
 		else if (def instanceof TCImplicitFunctionDefinition)
 		{
 			TCImplicitFunctionDefinition imdef = (TCImplicitFunctionDefinition)def;
 			funcParams = imdef.typeParams;
-			found = true;
 		}
-		
-		if (!found)
+		else
 		{
 			name.report(6001, "@QuickCheck only applies to function definitions");
+			return;
 		}
-		else if (funcParams == null)
+		
+		if (funcParams == null)
 		{
 			name.report(6001, "@QuickCheck only applies to polymorphic definitions");
 		}
@@ -86,11 +91,11 @@ public class TCQuickCheckAnnotation extends TCAnnotation
 			{
 				if (ptype.equals(qcParam))
 				{
-					return;
+					return;		// Valid parameter name
 				}
 			}
 			
-			name.report(6001, "@QuickCheck " +  qcParam + " is not a parameter");
+			name.report(6001, "@QuickCheck " +  qcParam + " is not a parameter of " + def.name);
 		}
 	}
 	
