@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.syntax.TypeReader;
+import com.fujitsu.vdmj.util.Utils;
 
 public class ASTQuickCheckAnnotation extends ASTAnnotation
 {
@@ -47,6 +48,12 @@ public class ASTQuickCheckAnnotation extends ASTAnnotation
 		super(name);
 	}
 	
+	@Override
+	public String toString()
+	{
+		return "@" + name + " " + qcParam + " = " + Utils.listToString("", qcTypes, ", ", ";");
+	}
+
 	/**
 	 * Override the default parse, and look for @QuickCheck @T = <type> [,<type>*];
 	 */
