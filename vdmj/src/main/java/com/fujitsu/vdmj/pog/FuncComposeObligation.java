@@ -35,7 +35,7 @@ public class FuncComposeObligation extends ProofObligation
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("forall arg:");
-		sb.append(explicitType(exp.ltype.getFunction().parameters.get(0), exp.location));
+		sb.append(explicitType(exp.rtype.getFunction().parameters.get(0), exp.location));
 		sb.append(" & ");
 
 		if (pref2 == null || !pref2.equals(""))
