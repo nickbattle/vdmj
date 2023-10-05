@@ -73,12 +73,11 @@ public abstract class ASTAnnotation extends ASTNode implements MappingOptional
 	 */
 	public void parse(LexTokenReader ltr) throws LexException, ParserException
 	{
-		this.args = new ASTExpressionList();
-		
 		if (ltr.nextToken().is(Token.BRA))
 		{
 			if (ltr.nextToken().isNot(Token.KET))
 			{
+				this.args = new ASTExpressionList();
 				ExpressionReader er = new ExpressionReader(ltr);
 				args.add(er.readExpression());
 		

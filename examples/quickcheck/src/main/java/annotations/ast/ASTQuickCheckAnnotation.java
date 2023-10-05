@@ -63,11 +63,11 @@ public class ASTQuickCheckAnnotation extends ASTAnnotation
 		ltr.nextToken();
 		TypeReader er = new TypeReader(ltr);
 		ASTType start = er.readType();
-		qcTypes = new ASTTypeList();
 		
 		if (start instanceof ASTParameterType)
 		{
 			qcParam = (ASTParameterType)start;
+			qcTypes = new ASTTypeList();
 
 			if (!ltr.getLast().is(Token.EQUALS))
 			{
