@@ -491,7 +491,7 @@ public class VDMJ implements VDMJMain
 		return false;
 	}
 	
-	private static int display(List<VDMMessage> messages, Class<? extends VDMMessage>type)
+	private static int display(List<VDMMessage> messages, Class<? extends VDMMessage>type, boolean show)
 	{
 		int count = 0;
 
@@ -499,7 +499,7 @@ public class VDMJ implements VDMJMain
 		{
 			if (type.isAssignableFrom(m.getClass()))
 			{
-				println(m.toString());
+				if (show) println(m.toString());
 				count++;
 			}
 		}
@@ -509,8 +509,8 @@ public class VDMJ implements VDMJMain
 	
 	private static boolean report(List<VDMMessage> messages, AbstractCheckFilesEvent event)
 	{
-		int nerrs  = display(messages, VDMError.class);
-		int nwarns = display(messages, VDMWarning.class);
+		int nerrs  = display(messages, VDMError.class, true);
+		int nwarns = display(messages, VDMWarning.class, warnings);
 		
 		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
 		int count = ast.getCount();
