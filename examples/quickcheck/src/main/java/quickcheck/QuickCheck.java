@@ -554,6 +554,11 @@ public class QuickCheck
 				}
 			}
 			
+			if (!ictxt.hasNext())	// Still empty after any annotations
+			{
+				ictxt.newMap(0);	// So something to hold defaults
+			}
+			
 			for (TCType type: po.typeParams)
 			{
 				TCParameterType ptype = (TCParameterType)type;
