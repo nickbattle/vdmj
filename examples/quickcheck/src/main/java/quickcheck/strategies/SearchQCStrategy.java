@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.values.NameValuePair;
@@ -119,6 +120,10 @@ public class SearchQCStrategy extends QCStrategy
 							}
 						}
 						catch (ValueException e)
+						{
+							// ignore illegal values
+						}
+						catch (ContextException e)
 						{
 							// ignore illegal values
 						}
