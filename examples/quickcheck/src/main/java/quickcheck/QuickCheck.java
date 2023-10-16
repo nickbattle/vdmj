@@ -64,6 +64,7 @@ import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
+import annotations.IterableContext;
 import annotations.po.POQuickCheckAnnotation;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.Results;
@@ -323,36 +324,41 @@ public class QuickCheck
 		INExpression exp = getINExpression(po);
 		List<INBindingSetter> binds = getINBindList(exp);
 		long before = System.currentTimeMillis();
-		Context ctxt = addTypeParams(po, Interpreter.getInstance().getInitialContext());
+		IterableContext ictxt = addTypeParams(po, Interpreter.getInstance().getInitialContext());
 		
-		for (QCStrategy strategy: strategies)
+		while (ictxt.hasNext())
 		{
-			Results presults = strategy.getValues(po, exp, binds, ctxt);
-			Map<String, ValueList> cexamples = presults.counterexamples;
+			ictxt.next();
 			
-			for (String bind: cexamples.keySet())
+			for (QCStrategy strategy: strategies)
 			{
-				if (union.containsKey(bind))
+				Results presults = strategy.getValues(po, exp, binds, ictxt);
+				Map<String, ValueList> cexamples = presults.counterexamples;
+				
+				for (String bind: cexamples.keySet())
 				{
-					union.get(bind).addAll(cexamples.get(bind));
+					if (union.containsKey(bind))
+					{
+						union.get(bind).addAll(cexamples.get(bind));
+					}
+					else
+					{
+						union.put(bind, cexamples.get(bind));
+					}
 				}
-				else
-				{
-					union.put(bind, cexamples.get(bind));
-				}
+				
+				proved |= presults.proved;
 			}
-			
-			proved |= presults.proved;
-		}
 		
-		for (INBindingSetter bind: binds)
-		{
-			if (!union.containsKey(bind.toString()))
+			for (INBindingSetter bind: binds)
 			{
-				// Generate some values for missing bindings, using the fixed method
-				ValueList list = new ValueList();
-				list.addAll(bind.getType().apply(new FixedRangeCreator(ctxt), 10));
-				union.put(bind.toString(), list);
+				if (!union.containsKey(bind.toString()))
+				{
+					// Generate some values for missing bindings, using the fixed method
+					ValueList list = new ValueList();
+					list.addAll(bind.getType().apply(new FixedRangeCreator(ictxt), 10));
+					union.put(bind.toString(), list);
+				}
 			}
 		}
 		
@@ -411,12 +417,18 @@ public class QuickCheck
 				Value result = new BooleanValue(false);
 				ContextException exception = null;
 				
-				ctxt = addTypeParams(po, ctxt);
+				IterableContext ictxt = addTypeParams(po, ctxt);
 				
 				try
 				{
 					verbose("PO #%d, starting...\n", po.number);
-					result = poexp.eval(ctxt);
+					
+					do
+					{
+						ictxt.next();
+						result = poexp.eval(ictxt);
+					}
+					while (ictxt.hasNext() && result.boolValue(ctxt));
 				}
 				catch (ContextException e)
 				{
@@ -518,12 +530,12 @@ public class QuickCheck
 		}
 	}
 	
-	private Context addTypeParams(ProofObligation po, Context ctxt)
+	private IterableContext addTypeParams(ProofObligation po, Context ctxt)
 	{
+		IterableContext ictxt = new IterableContext(po.location, "Type params", ctxt);
+
 		if (po.typeParams != null)
 		{
-			Context pctxt = new Context(po.location, "Type params", ctxt);
-			
 			if (po.annotations != null)
 			{
 				for (POAnnotation a: po.annotations)
@@ -531,7 +543,13 @@ public class QuickCheck
 					if (a instanceof POQuickCheckAnnotation)
 					{
 						POQuickCheckAnnotation qca = (POQuickCheckAnnotation)a;
-						pctxt.put(qca.qcParam.name, new ParameterValue(qca.qcTypes.firstElement()));
+						int index = 0;
+						
+						for (TCType ptype: qca.qcTypes)
+						{
+							Map<TCNameToken, Value> map = ictxt.newMap(index++);
+							map.put(qca.qcParam.name, new ParameterValue(ptype));
+						}
 					}
 				}
 			}
@@ -539,19 +557,15 @@ public class QuickCheck
 			for (TCType type: po.typeParams)
 			{
 				TCParameterType ptype = (TCParameterType)type;
-				
-				if (!pctxt.containsKey(ptype.name))
-				{
-					pctxt.put(ptype.name, new ParameterValue(new TCRealType(po.location)));
-				}
+				ictxt.setDefaults(ptype.name, new ParameterValue(new TCRealType(po.location)));
 			}
-			
-			return pctxt;
 		}
 		else
 		{
-			return ctxt;
+			ictxt.newMap(0);	// So hasNext() and next() work
 		}
+
+		return ictxt;
 	}
 
 	private void printBindings(List<INBindingSetter> bindings)
