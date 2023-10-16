@@ -33,9 +33,11 @@ import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
+import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
@@ -99,15 +101,28 @@ public class SearchQCStrategy extends QCStrategy
 					// HACK! Only works for single name binds
 					if (key.equals(pair.name.getName() + ":" + bind.getType()))	// eg. "a:T" = "a" +":" + "T"
 					{
-						if (result.containsKey(key))
+						// The naivety of the search may result in value assignments that
+						// do not match the type (eg. inside is_(exp, T) => ...). So check.
+						
+						try
 						{
-							ValueList current = result.get(key);
-							current.add(pair.value);
+							Value fixed = pair.value.convertTo(bind.getType(), ctxt);
+							
+							if (result.containsKey(key))
+							{
+								ValueList current = result.get(key);
+								current.add(fixed);
+							}
+							else
+							{
+								result.put(key, new ValueList(fixed));
+							}
 						}
-						else
+						catch (ValueException e)
 						{
-							result.put(key, new ValueList(pair.value));
+							// ignore illegal values
 						}
+
 						break;
 					}
 				}
