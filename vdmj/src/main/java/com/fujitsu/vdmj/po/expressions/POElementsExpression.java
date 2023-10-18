@@ -43,7 +43,7 @@ public class POElementsExpression extends POUnaryExpression
 	@Override
 	public String toString()
 	{
-		return "(elems " + exp + ")";
+		return "(elems (" + exp + "))";
 	}
 
 	@Override

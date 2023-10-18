@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2018 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,29 +22,31 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.tc.types.visitors;
+package annotations.po;
 
-import com.fujitsu.vdmj.tc.lex.TCNameSet;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCType;
-import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.util.Utils;
 
-public class TCFreeVariableTypeVisitor extends TCLeafTypeVisitor<TCNameToken, TCNameSet, Environment>
+public class POQuickCheckAnnotation extends POAnnotation
 {
-	public TCFreeVariableTypeVisitor()
-	{
-		// No visitor set
-	}
+	private static final long serialVersionUID = 1L;
+	
+	public final TCParameterType qcParam;
+	public final TCTypeList qcTypes;
 
-	@Override
-	protected TCNameSet newCollection()
+	public POQuickCheckAnnotation(TCIdentifierToken name, TCParameterType qcParam, TCTypeList qcTypes)
 	{
-		return new TCNameSet();
+		super(name, null);
+		this.qcParam = qcParam;
+		this.qcTypes = qcTypes;
 	}
-
+	
 	@Override
-	public TCNameSet caseType(TCType node, Environment arg)
+	public String toString()
 	{
-		return newCollection();		// Default has no names
+		return "@" + name + " " + qcParam + " = " + Utils.listToString("", qcTypes, ", ", ";");
 	}
 }

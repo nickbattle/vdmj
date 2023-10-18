@@ -48,6 +48,7 @@ import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNaturalType;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCQuoteType;
 import com.fujitsu.vdmj.tc.types.TCRationalType;
@@ -79,6 +80,7 @@ import com.fujitsu.vdmj.values.NaturalOneValue;
 import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.NilValue;
 import com.fujitsu.vdmj.values.ObjectValue;
+import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.QuoteValue;
 import com.fujitsu.vdmj.values.RealValue;
 import com.fujitsu.vdmj.values.RecordValue;
@@ -116,6 +118,13 @@ public class FixedRangeCreator extends RangeCreator
 	{
 		// Anything... ?
 		return caseBooleanType(new TCBooleanType(LexLocation.ANY), limit);
+	}
+	
+	@Override
+	public ValueSet caseParameterType(TCParameterType node, Integer limit)
+	{
+		ParameterValue pv = (ParameterValue) ctxt.get(node.name);
+		return pv.type.apply(this, limit);
 	}
 
 	@Override

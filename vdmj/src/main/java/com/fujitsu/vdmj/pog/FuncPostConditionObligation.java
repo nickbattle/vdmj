@@ -120,10 +120,10 @@ public class FuncPostConditionObligation extends ProofObligation
 			sb.append("[");
 			String sep = "";
 			
-			for (@SuppressWarnings("unused") TCType p: def.typeParams)
+			for (TCType p: def.typeParams)
 			{
 				sb.append(sep);
-				sb.append("?");
+				sb.append(p);
 				sep = ", ";
 			}
 			

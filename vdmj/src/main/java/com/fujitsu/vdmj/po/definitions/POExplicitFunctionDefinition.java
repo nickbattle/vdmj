@@ -136,11 +136,6 @@ public class POExplicitFunctionDefinition extends PODefinition
 		ProofObligationList obligations =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 				
-		if (typeParams != null && !typeParams.isEmpty())
-		{
-			return obligations;		// Cannot generate POs for polymorphic fns (yet)
-		}
-				
 		TCNameList pids = new TCNameList();
 		boolean matchNeeded = false;
 

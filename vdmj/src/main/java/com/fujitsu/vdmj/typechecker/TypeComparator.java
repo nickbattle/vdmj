@@ -359,8 +359,8 @@ public class TypeComparator
 
 		if (from instanceof TCParameterType)
 		{
-			String fstr = from.apply(new TCParameterCollector(), null).get(0);
-			List<String> tstr = to.apply(new TCParameterCollector(), null);
+			TCParameterType fstr = from.apply(new TCParameterCollector(), null).get(0);
+			List<TCParameterType> tstr = to.apply(new TCParameterCollector(), null);
 			
 			if (tstr.contains(fstr) && !(to instanceof TCParameterType))
 			{
@@ -555,8 +555,8 @@ public class TypeComparator
 			}
 			else if (to instanceof TCParameterType)
 			{
-				String tstr = to.apply(new TCParameterCollector(), null).get(0);
-				List<String> fstr = from.apply(new TCParameterCollector(), null);
+				TCParameterType tstr = to.apply(new TCParameterCollector(), null).get(0);
+				List<TCParameterType> fstr = from.apply(new TCParameterCollector(), null);
 				
 				if (fstr.contains(tstr) && !(from instanceof TCParameterType))
 				{

@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.tc.types.visitors;
 
 import java.util.Collection;
 
-import com.fujitsu.vdmj.tc.TCVisitorSet;
 import com.fujitsu.vdmj.tc.types.TCBracketType;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -51,20 +50,13 @@ import com.fujitsu.vdmj.tc.types.TCUnionType;
  */
 public abstract class TCLeafTypeVisitor<E, C extends Collection<E>, S> extends TCTypeVisitor<C, S>
 {
-	protected TCVisitorSet<E, C, S> visitorSet = new TCVisitorSet<E, C, S>()
-	{
-		@Override
-		protected void setVisitors()
-		{
-			typeVisitor = TCLeafTypeVisitor.this;
-		}
-
-		@Override
-		protected C newCollection()
-		{
-			return TCLeafTypeVisitor.this.newCollection();
-		}
-	};
+	/**
+	 * There is no visitor set here, because the TCType leaf visitor does not call out to any
+	 * other grammatical group (like expVisitor etc). Also, since TCTypes are not mapped
+	 * beyond the TC tree, you cannot use (say) an INVisitorSet here anyway. 
+	 */
+	
+	// No visitorSet...
 	
 	/**
 	 * We have to collect the nodes that have already been visited since types can be recursive,

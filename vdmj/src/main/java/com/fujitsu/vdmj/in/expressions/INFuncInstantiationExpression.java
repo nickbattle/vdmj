@@ -97,7 +97,7 @@ public class INFuncInstantiationExpression extends INExpression
     		for (int i=0; i< actualTypes.size(); i++)
     		{
     			TCType ptype = actualTypes.get(i);
-    			List<String> names = ptype.apply(collector, null);
+    			List<TCParameterType> names = ptype.apply(collector, null);
     			
     			if (!names.isEmpty())
     			{
