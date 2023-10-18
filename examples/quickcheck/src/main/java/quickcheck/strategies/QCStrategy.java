@@ -29,6 +29,7 @@ import java.util.List;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
+import com.fujitsu.vdmj.runtime.Context;
 
 import quickcheck.QuickCheck;
 
@@ -38,6 +39,6 @@ abstract public class QCStrategy
 	abstract public boolean hasErrors();
 	abstract public boolean useByDefault();
 	abstract public boolean init(QuickCheck qc);
-	abstract public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds);
+	abstract public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt);
 	abstract public String help();
 }

@@ -51,6 +51,14 @@ abstract public class AnalysisCommand
 	public abstract boolean notWhenRunning();
 
 	/**
+	 * Returns true if this command should not be executed when spec has errors or unsaved changes.
+	 */
+	public boolean notWhenDirty()
+	{
+		return false;
+	}
+
+	/**
 	 * Create an AnalysisCommand instance from the line passed, using the PluginRegistry.
 	 * Errors should be caught and turned into ErrorCommands, which print a message when
 	 * executed.

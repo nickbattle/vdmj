@@ -33,7 +33,6 @@ import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotationList;
-import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexCommentList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
@@ -408,8 +407,7 @@ public abstract class SyntaxReader
 		{
 			LexIdentifierToken name = (LexIdentifierToken)ltr.getLast(); 
 			ASTAnnotation annotation = loadAnnotation(name);
-			ASTExpressionList args = annotation.parse(ltr);
-			annotation.setArgs(args);
+			annotation.parse(ltr);
 			return annotation;
 		}
 		

@@ -52,7 +52,7 @@ public class POOperationDefinitionContext extends POContext
 		this.deftype = definition.type;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.getParamPatternList();
-		this.precondition = preconditionCall(name, paramPatternList, definition.precondition);
+		this.precondition = preconditionCall(name, null, paramPatternList, definition.precondition);
 		this.stateDefinition = stateDefinition;
 	}
 

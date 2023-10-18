@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.CommandReader;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -146,6 +147,16 @@ public class INPluginSL extends INPlugin
 			{
 				// No debug thread or watcher for -e <exp>
 				println(interpreter.execute(expression));
+			}
+			else if (commandline != null)
+			{
+				AnalysisCommand command = AnalysisCommand.parse(commandline);
+				String result = command.run(commandline);
+				
+				if (result != null)
+				{
+					println(result);
+				}
 			}
 			else if (remoteClass != null)
 			{

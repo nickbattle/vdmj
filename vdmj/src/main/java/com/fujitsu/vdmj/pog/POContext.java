@@ -29,10 +29,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 abstract public class POContext
 {
@@ -42,6 +44,16 @@ abstract public class POContext
 	public String getName()
 	{
 		return "";		// Overridden in PONameContext
+	}
+
+	public POAnnotationList getAnnotations()
+	{
+		return null;
+	}
+	
+	public TCTypeList getTypeParams()
+	{
+		return null;
 	}
 
 	public boolean isScopeBoundary()
@@ -59,14 +71,14 @@ abstract public class POContext
 		return knownTypes.get(exp);
 	}
 	
-	protected String preconditionCall(TCNameToken name, POPatternList paramPatternList, POExpression body)
+	protected String preconditionCall(TCNameToken name, TCTypeList typeParams, POPatternList paramPatternList, POExpression body)
 	{
 		List<POPatternList> pplist = new Vector<POPatternList>();
 		pplist.add(paramPatternList);
-		return preconditionCall(name, pplist, body);
+		return preconditionCall(name, typeParams, pplist, body);
 	}
 	
-	protected String preconditionCall(TCNameToken name, List<POPatternList> paramPatternList, POExpression body)
+	protected String preconditionCall(TCNameToken name, TCTypeList typeParams, List<POPatternList> paramPatternList, POExpression body)
 	{
 		if (body == null)
 		{
@@ -75,6 +87,21 @@ abstract public class POContext
 		
 		StringBuilder call = new StringBuilder();
 		call.append(name.getPreName(name.getLocation()));
+		
+		if (typeParams != null && !typeParams.isEmpty())
+		{
+			call.append("[");
+			String sep = "";
+			
+			for (TCType param: typeParams)
+			{
+				call.append(sep);
+				call.append(param);
+				sep = ", ";
+			}
+			
+			call.append("]");
+		}
 
 		for (POPatternList plist: paramPatternList)
 		{

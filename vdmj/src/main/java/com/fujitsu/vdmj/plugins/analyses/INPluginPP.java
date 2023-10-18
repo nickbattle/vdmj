@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.CommandReader;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
@@ -145,6 +146,16 @@ public class INPluginPP extends INPlugin
 			else if (expression != null)
 			{
 				println(interpreter.execute(expression));
+			}
+			else if (commandline != null)
+			{
+				AnalysisCommand command = AnalysisCommand.parse(commandline);
+				String result = command.run(commandline);
+				
+				if (result != null)
+				{
+					println(result);
+				}
 			}
 			else if (remoteClass != null)
 			{

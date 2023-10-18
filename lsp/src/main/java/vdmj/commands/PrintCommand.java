@@ -92,6 +92,12 @@ public class PrintCommand extends AnalysisCommand implements InitRunnable, Scrip
 	{
 		return true;
 	}
+	
+	@Override
+	public boolean notWhenDirty()
+	{
+		return true;
+	}
 
 	@Override
 	public String scriptRun(DAPRequest request) throws IOException

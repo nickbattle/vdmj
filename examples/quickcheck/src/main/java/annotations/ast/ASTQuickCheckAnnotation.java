@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2022 Nick Battle.
+ *	Copyright (c) 2023 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -25,55 +25,71 @@
 package annotations.ast;
 
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
-import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.ast.types.ASTParameterType;
+import com.fujitsu.vdmj.ast.types.ASTType;
+import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
-import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
+import com.fujitsu.vdmj.syntax.TypeReader;
+import com.fujitsu.vdmj.util.Utils;
 
-abstract public class ASTConjectureAnnotation extends ASTAnnotation
+public class ASTQuickCheckAnnotation extends ASTAnnotation
 {
 	private static final long serialVersionUID = 1L;
+	
+	public ASTParameterType qcParam = null;
+	public ASTTypeList qcTypes = null;
 
-	public ASTConjectureAnnotation(LexIdentifierToken name)
+	public ASTQuickCheckAnnotation(LexIdentifierToken name)
 	{
 		super(name);
 	}
 	
 	@Override
+	public String toString()
+	{
+		return "@" + name + " " + qcParam + " = " + Utils.listToString("", qcTypes, ", ", ";");
+	}
+
+	/**
+	 * Override the default parse, and look for @QuickCheck @T = <type> [,<type>*];
+	 */
+	@Override
 	public void parse(LexTokenReader ltr) throws LexException, ParserException
 	{
-		this.args = new ASTExpressionList();
+		ltr.nextToken();
+		TypeReader er = new TypeReader(ltr);
+		ASTType start = er.readType();
 		
-		try
+		if (start instanceof ASTParameterType)
 		{
-			if (ltr.nextToken().is(Token.BRA))
-			{
-				if (ltr.nextToken().isNot(Token.KET))
-				{
-					ExpressionReader er = new ExpressionReader(ltr);
-					args.add(er.readPerExpression());
-			
-					while (ltr.getLast().is(Token.COMMA))
-					{
-						ltr.nextToken();
-						args.add(er.readPerExpression());	// To allow #req, #act, #fin
-					}
-				}
+			qcParam = (ASTParameterType)start;
+			qcTypes = new ASTTypeList();
 
-				if (ltr.getLast().isNot(Token.KET))
-				{
-					parseException("Expecting ')' after annotation", ltr.getLast().location);
-				}
+			if (!ltr.getLast().is(Token.EQUALS))
+			{
+				parseException("expecting @T = <type>;", qcParam.location);
 			}
+			
+			do
+			{
+				ltr.nextToken();
+				ASTType type = er.readType();
+				qcTypes.add(type);
+			}
+			while (ltr.getLast().is(Token.COMMA));
 		}
-		catch (Exception e)
+		else
 		{
-			// Return blank args, which will probably cause a TC error too, rather than
-			// cause this annotation to be ignored.
-			args.clear();
+			parseException("expecting @T = <type> [,<type>*];", start.location);
+		}
+		
+		if (ltr.getLast().isNot(Token.SEMICOLON))
+		{
+			parseException("missing ;", ltr.getLast().location);
 		}
 	}
 }

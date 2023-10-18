@@ -58,6 +58,7 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.pog.ProofObligation;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.RootContext;
@@ -65,21 +66,30 @@ import com.fujitsu.vdmj.syntax.BindReader;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
+import com.fujitsu.vdmj.tc.definitions.TCLocalDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
+import com.fujitsu.vdmj.tc.patterns.TCMultipleTypeBind;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
+import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCSetType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeCheckException;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.IntegerValue;
+import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
@@ -189,7 +199,7 @@ public class FixedQCStrategy extends QCStrategy
 		reader.nextToken();
 	}
 	
-	private Map<String, ValueList> readRangeFile(String filename)
+	private Map<String, ValueList> readRangeFile(QuickCheck qc, String filename)
 	{
 		try
 		{
@@ -226,7 +236,8 @@ public class FixedQCStrategy extends QCStrategy
 			for (int i=0; i<tcbinds.size(); i++)
 			{
 				TCMultipleBind mb = tcbinds.get(i);
-				TCType mbtype = mb.typeCheck(env, NameScope.NAMESANDSTATE);
+				Environment penv = addTypeParams(mb, env);
+				TCType mbtype = mb.typeCheck(penv, NameScope.NAMESANDSTATE);
 				TCSetType mbset = new TCSetType(mb.location, mbtype);
 				tctypes.add(mbtype);
 				
@@ -262,13 +273,16 @@ public class FixedQCStrategy extends QCStrategy
 			
 			INMultipleBindList inbinds = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcbinds);
 			INExpressionList inexps = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexps);
-			RootContext ctxt = interpreter.getInitialContext();
+			RootContext ictxt = interpreter.getInitialContext();
 			Map<String, ValueList> ranges = new HashMap<String, ValueList>();
 			long before = System.currentTimeMillis();
 			printf("Expanding " + inbinds.size() + " ranges: ");
 			
 			for (int i=0; i<inbinds.size(); i++)
 			{
+				TCMultipleBind tcbind = tcbinds.get(i);
+				Context ctxt = addTypeParams(tcbind, ictxt);
+
 				ctxt.threadState.init();
 				String key = keyFor(inbinds.get(i));
 				printf(".");
@@ -278,17 +292,29 @@ public class FixedQCStrategy extends QCStrategy
 				if (value instanceof SetValue)
 				{
 					SetValue svalue = (SetValue)value;
-					ValueList list = new ValueList();
+					ValueList list = ranges.get(key);	// Existing?
+					
+					if (list == null)
+					{
+						list = new ValueList();
+						ranges.put(key, list);
+					}
+					
 					list.addAll(svalue.values);
-					ranges.put(key, list);
 				}
 				else if (value instanceof IntegerValue)
 				{
 					IntegerValue ivalue = (IntegerValue)value;
 					int limit = ivalue.value.intValue();
-					ValueList list = new ValueList();
+					ValueList list = ranges.get(key);	// Existing?
+					
+					if (list == null)
+					{
+						list = new ValueList();
+						ranges.put(key, list);
+					}
+					
 					list.addAll(tctypes.get(i).apply(new FixedRangeCreator(ctxt), limit));
-					ranges.put(key, list);
 				}
 				else
 				{
@@ -391,7 +417,15 @@ public class FixedQCStrategy extends QCStrategy
 
 			writer.close();
 			println("Created " + done.size() + " default ranges in '" + filename + "'");
-			println("Check them! Then run 'qc -p fixed -fixed:file " + filename + "'");
+			
+			if (filename.equals("ranges.qc"))
+			{
+				println("Check them! Then run 'qc -s fixed'");
+			}
+			else
+			{
+				println("Check them! Then run 'qc -s fixed -fixed:file " + filename + "'");
+			}
 		}
 		catch (Exception e)
 		{
@@ -404,6 +438,53 @@ public class FixedQCStrategy extends QCStrategy
 	{
 		double duration = (double)(after - before)/1000;
 		return "in " + duration + "s";
+	}
+	
+	private Environment addTypeParams(TCMultipleBind mb, Environment env)
+	{
+		if (mb instanceof TCMultipleTypeBind)
+		{
+			TCMultipleTypeBind mtb = (TCMultipleTypeBind)mb;
+			List<TCParameterType> tparams = mtb.type.apply(new TCParameterCollector(), null);
+			
+			if (!tparams.isEmpty())
+			{
+				TCDefinitionList defs = new TCDefinitionList();
+	    		
+				for (TCParameterType tparam: tparams)
+				{
+					TCDefinition p = new TCLocalDefinition(mtb.type.location, tparam.name, tparam);
+					p.markUsed();
+					defs.add(p);
+				}
+				
+				return new FlatEnvironment(defs, env);
+			}
+		}
+
+		return env;
+	}
+
+	private Context addTypeParams(TCMultipleBind bind, RootContext ctxt)
+	{
+		if (bind instanceof TCMultipleTypeBind)
+		{
+			TCMultipleTypeBind mbind = (TCMultipleTypeBind)bind;
+			List <TCParameterType> ptypes = mbind.type.apply(new TCParameterCollector(), null);
+			Context params = new Context(bind.location, "Type params", ctxt);
+			
+			for (TCParameterType ptype: ptypes)
+			{
+				// Just map all @T params to "real" as the ranges.qc value will decide
+				params.put(ptype.name, new ParameterValue(new TCRealType(ptype.location)));
+			}
+			
+			return params;
+		}
+		else
+		{
+			return ctxt;
+		}
 	}
 
 	@Override
@@ -425,7 +506,7 @@ public class FixedQCStrategy extends QCStrategy
 			if (new File(rangesFile).exists())
 			{
 				println("Using ranges file " + rangesFile);
-				allRanges = readRangeFile(rangesFile);
+				allRanges = readRangeFile(qc, rangesFile);
 			}
 			else
 			{
@@ -438,7 +519,7 @@ public class FixedQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds)
+	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
 	{
 		Map<String, ValueList> values = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
@@ -473,6 +554,6 @@ public class FixedQCStrategy extends QCStrategy
 	@Override
 	public boolean useByDefault()
 	{
-		return false;	// Use if no -p given
+		return false;	// Use if no -s given
 	}
 }

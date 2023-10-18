@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.pog;
 import java.util.Iterator;
 import java.util.List;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
@@ -35,35 +36,42 @@ import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 public class POFunctionDefinitionContext extends POContext
 {
+	public final POAnnotationList annotations;
 	public final TCNameToken name;
 	public final TCFunctionType deftype;
 	public final List<POPatternList> paramPatternList;
 	public final boolean addPrecond;
 	public final String precondition;
+	public final TCTypeList typeParams;
 
 	public POFunctionDefinitionContext(
 		POExplicitFunctionDefinition definition, boolean precond)
 	{
+		this.annotations = definition.annotations;
 		this.name = definition.name;
 		this.deftype = definition.type;
 		this.paramPatternList = definition.paramPatternList;
 		this.addPrecond = precond;
 		POGetMatchingExpressionVisitor.init();
-		this.precondition = preconditionCall(name, paramPatternList, definition.precondition);
+		this.precondition = preconditionCall(name, definition.typeParams, paramPatternList, definition.precondition);
+		this.typeParams = definition.typeParams;
 	}
 
 	public POFunctionDefinitionContext(
 		POImplicitFunctionDefinition definition, boolean precond)
 	{
+		this.annotations = definition.annotations;
 		this.name = definition.name;
 		this.deftype = definition.type;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.getParamPatternList();
 		POGetMatchingExpressionVisitor.init();
-		this.precondition = preconditionCall(name, paramPatternList, definition.precondition);
+		this.precondition = preconditionCall(name, definition.typeParams, paramPatternList, definition.precondition);
+		this.typeParams = definition.typeParams;
 	}
 
 	@Override
@@ -113,5 +121,17 @@ public class POFunctionDefinitionContext extends POContext
 		}
 
 		return sb.toString();
+	}
+	
+	@Override
+	public TCTypeList getTypeParams()
+	{
+		return typeParams;
+	}
+	
+	@Override
+	public POAnnotationList getAnnotations()
+	{
+		return annotations;
 	}
 }

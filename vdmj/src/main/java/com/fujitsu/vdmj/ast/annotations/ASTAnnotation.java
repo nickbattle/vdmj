@@ -55,11 +55,6 @@ public abstract class ASTAnnotation extends ASTNode implements MappingOptional
 		this.name = name;
 	}
 	
-	public void setArgs(ASTExpressionList args)
-	{
-		this.args = args;
-	}
-
 	@Override
 	public String toString()
 	{
@@ -76,14 +71,13 @@ public abstract class ASTAnnotation extends ASTNode implements MappingOptional
 	 * round brackets. This method can be overridden in particular annotations if the
 	 * default syntax is not appropriate. 
 	 */
-	public ASTExpressionList parse(LexTokenReader ltr) throws LexException, ParserException
+	public void parse(LexTokenReader ltr) throws LexException, ParserException
 	{
-		ASTExpressionList args = new ASTExpressionList();
-		
 		if (ltr.nextToken().is(Token.BRA))
 		{
 			if (ltr.nextToken().isNot(Token.KET))
 			{
+				this.args = new ASTExpressionList();
 				ExpressionReader er = new ExpressionReader(ltr);
 				args.add(er.readExpression());
 		
@@ -99,8 +93,6 @@ public abstract class ASTAnnotation extends ASTNode implements MappingOptional
 				parseException("Expecting ')' after annotation", ltr.getLast().location);
 			}
 		}
-		
-		return args;
 	}
 
 	public void astBefore(DefinitionReader reader)

@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.mapper.ClassMapper;
+import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -52,11 +53,17 @@ import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
+import com.fujitsu.vdmj.tc.types.TCRealType;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.util.GetResource;
 import com.fujitsu.vdmj.values.BooleanValue;
+import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
+import annotations.IterableContext;
+import annotations.po.POQuickCheckAnnotation;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.Results;
 import quickcheck.visitors.FixedRangeCreator;
@@ -121,7 +128,7 @@ public class QuickCheck
 						if (argvSize != argv.size())
 						{
 							// Constructor took some arguments
-							errorln("The " + instance.getName() + " strategy is not enabled. Add -p " + instance.getName());
+							errorln("The " + instance.getName() + " strategy is not enabled. Add -s " + instance.getName());
 							errorCount++;
 						}
 					}
@@ -208,7 +215,7 @@ public class QuickCheck
 		{
 			String arg = iter.next();
 			
-			if (arg.equals("-p"))
+			if (arg.equals("-s"))
 			{
 				iter.remove();
 				
@@ -220,7 +227,7 @@ public class QuickCheck
 				}
 				else
 				{
-					errorln("-p must be followed by a strategy name");
+					errorln("-s must be followed by a strategy name");
 					names.add("unknown");
 				}
 			}
@@ -303,42 +310,47 @@ public class QuickCheck
 		
 		if (!po.isCheckable)
 		{
-			return new Results(proved, union, 0);
+			return new Results(false, union, 0);
 		}
 		
 		INExpression exp = getINExpression(po);
 		List<INBindingSetter> binds = getINBindList(exp);
 		long before = System.currentTimeMillis();
+		IterableContext ictxt = addTypeParams(po, Interpreter.getInstance().getInitialContext());
 		
-		for (QCStrategy strategy: strategies)
+		while (ictxt.hasNext())
 		{
-			Results presults = strategy.getValues(po, exp, binds);
-			Map<String, ValueList> cexamples = presults.counterexamples;
+			ictxt.next();
 			
-			for (String bind: cexamples.keySet())
+			for (QCStrategy strategy: strategies)
 			{
-				if (union.containsKey(bind))
+				Results presults = strategy.getValues(po, exp, binds, ictxt);
+				Map<String, ValueList> cexamples = presults.counterexamples;
+				
+				for (String bind: cexamples.keySet())
 				{
-					union.get(bind).addAll(cexamples.get(bind));
+					if (union.containsKey(bind))
+					{
+						union.get(bind).addAll(cexamples.get(bind));
+					}
+					else
+					{
+						union.put(bind, cexamples.get(bind));
+					}
 				}
-				else
-				{
-					union.put(bind, cexamples.get(bind));
-				}
+				
+				proved |= presults.proved;
 			}
-			
-			proved |= presults.proved;
-		}
 		
-		for (INBindingSetter bind: binds)
-		{
-			if (!union.containsKey(bind.toString()))
+			for (INBindingSetter bind: binds)
 			{
-				// Generate some values for missing bindings, using the fixed method
-				RootContext ctxt = Interpreter.getInstance().getInitialContext();
-				ValueList list = new ValueList();
-				list.addAll(bind.getType().apply(new FixedRangeCreator(ctxt), 10));
-				union.put(bind.toString(), list);
+				if (!union.containsKey(bind.toString()))
+				{
+					// Generate some values for missing bindings, using the fixed method
+					ValueList list = new ValueList();
+					list.addAll(bind.getType().apply(new FixedRangeCreator(ictxt), 10));
+					union.put(bind.toString(), list);
+				}
 			}
 		}
 		
@@ -368,7 +380,7 @@ public class QuickCheck
 					 results.counterexamples.isEmpty() &&
 					 !bindings.isEmpty())	// empty binds => simple forall over sets, so must execute
 			{
-				po.status = POStatus.PROVED;
+				po.setStatus(POStatus.PROVED);
 				printf("PO #%d, PROVED %s\n", po.number, duration(results.duration));
 				return;
 			}
@@ -397,10 +409,18 @@ public class QuickCheck
 				Value result = new BooleanValue(false);
 				ContextException exception = null;
 				
+				IterableContext ictxt = addTypeParams(po, ctxt);
+
 				try
 				{
 					verbose("PO #%d, starting...\n", po.number);
-					result = poexp.eval(ctxt);
+					
+					do
+					{
+						ictxt.next();
+						result = poexp.eval(ictxt);
+					}
+					while (ictxt.hasNext() && result.boolValue(ctxt));
 				}
 				catch (ContextException e)
 				{
@@ -428,28 +448,31 @@ public class QuickCheck
 				{
 					if (result.boolValue(ctxt))
 					{
-						String outcome = null;
+						POStatus outcome = null;
 						
 						if (po.getCheckedExpression() instanceof TCExistsExpression)
 						{
-							outcome = "PROVED";		// An "exists" PO is PROVED, if true.
+							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
 						}
 						else
 						{
-							outcome = (results.proved) ? "PROVED" : "MAYBE";
+							outcome = (results.proved) ? POStatus.PROVED : POStatus.MAYBE;
 						}
 						
-						printf("PO #%d, %s %s\n", po.number, outcome, duration(before, after));
+						printf("PO #%d, %s %s\n", po.number, outcome.toString().toUpperCase(), duration(before, after));
+						po.setStatus(outcome);
 					}
 					else
 					{
 						if (po.getCheckedExpression() instanceof TCExistsExpression)
 						{
 							printf("PO #%d, MAYBE %s\n", po.number, duration(before, after));
+							po.setStatus(POStatus.MAYBE);
 						}
 						else
 						{
 							printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
+							po.setStatus(POStatus.FAILED);
 							printFailPath(bindings);
 							
 							if (exception != null)
@@ -465,6 +488,7 @@ public class QuickCheck
 				else
 				{
 					printf("PO #%d, Error: PO evaluation returns %s?\n", po.number, result.kind());
+					po.setStatus(POStatus.FAILED);
 					println("----");
 					printBindings(bindings);
 					println("----");
@@ -474,6 +498,7 @@ public class QuickCheck
 			catch (Exception e)
 			{
 				printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
+				po.setStatus(POStatus.FAILED);
 				println("----");
 				printBindings(bindings);
 				println("----");
@@ -497,6 +522,49 @@ public class QuickCheck
 		}
 	}
 	
+	private IterableContext addTypeParams(ProofObligation po, Context ctxt)
+	{
+		IterableContext ictxt = new IterableContext(po.location, "Type params", ctxt);
+
+		if (po.typeParams != null)
+		{
+			if (po.annotations != null)
+			{
+				for (POAnnotation a: po.annotations)
+				{
+					if (a instanceof POQuickCheckAnnotation)
+					{
+						POQuickCheckAnnotation qca = (POQuickCheckAnnotation)a;
+						int index = 0;
+						
+						for (TCType ptype: qca.qcTypes)
+						{
+							Map<TCNameToken, Value> map = ictxt.newMap(index++);
+							map.put(qca.qcParam.name, new ParameterValue(ptype));
+						}
+					}
+				}
+			}
+			
+			if (!ictxt.hasNext())	// Still empty after any annotations
+			{
+				ictxt.newMap(0);	// So something to hold defaults
+			}
+			
+			for (TCType type: po.typeParams)
+			{
+				TCParameterType ptype = (TCParameterType)type;
+				ictxt.setDefaults(ptype.name, new ParameterValue(new TCRealType(po.location)));
+			}
+		}
+		else
+		{
+			ictxt.newMap(0);	// So hasNext() and next() work
+		}
+
+		return ictxt;
+	}
+
 	private void printBindings(List<INBindingSetter> bindings)
 	{
 		int MAXVALUES = 10;

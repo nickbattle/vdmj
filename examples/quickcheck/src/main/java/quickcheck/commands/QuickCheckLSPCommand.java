@@ -39,7 +39,7 @@ import vdmj.commands.AnalysisCommand;
 
 public class QuickCheckLSPCommand extends AnalysisCommand
 {
-	public final static String CMD = "quickcheck [-?|-help][-p <strategy>]* [-<strategy:option>]* [<PO numbers/ranges>]";
+	public final static String CMD = "quickcheck [-?|-help][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges>]";
 	private final static String USAGE = "Usage: " + CMD;
 	
 	public QuickCheckLSPCommand(String line)
@@ -97,7 +97,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 						
 						if (!qc.getDisabledStrategies().isEmpty())
 						{
-							println("Disabled strategies (add with -p <name>):");
+							println("Disabled strategies (add with -s <name>):");
 							
 							for (QCStrategy strategy: qc.getDisabledStrategies())
 							{
@@ -142,6 +142,12 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 
 	@Override
 	public boolean notWhenRunning()
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean notWhenDirty()
 	{
 		return true;
 	}

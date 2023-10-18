@@ -79,7 +79,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	protected boolean startInterpreter;		// eg. -e or -remote as well as -i
 	protected boolean interactive;			// eg. -i or -simulation
 	protected String defaultName;
-	protected String expression;
+	protected String expression;			// eg. -e "f(1, 2)"
+	protected String commandline;			// eg. -cmd "qc -s fixed"
 	protected String logfile;
 	protected String remoteControlName;
 	protected String remoteSimulationName;
@@ -139,6 +140,7 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	{
 		println("-i: run the interpreter if successfully type checked");
 		println("-e <exp>: evaluate <exp> and stop");
+		println("-cmd <command>: perform <command> and stop");
 		println("-default <name>: set the default module/class");
 		println("-pre: disable precondition checks");
 		println("-post: disable postcondition checks");
@@ -181,6 +183,22 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 					else
 					{
 						fail("-e option requires an expression");
+					}
+					break;
+
+				case "-cmd":
+					iter.remove();
+					startInterpreter = true;
+					interactive = false;
+					
+					if (iter.hasNext())
+					{
+						commandline = iter.next();
+						iter.remove();
+					}
+					else
+					{
+						fail("-cmd option requires a command");
 					}
 					break;
 

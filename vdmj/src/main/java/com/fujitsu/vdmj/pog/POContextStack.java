@@ -27,9 +27,11 @@ package com.fujitsu.vdmj.pog;
 import java.util.ListIterator;
 import java.util.Stack;
 
+import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
+import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 @SuppressWarnings("serial")
 public class POContextStack extends Stack<POContext>
@@ -102,6 +104,36 @@ public class POContextStack extends Stack<POContext>
 
 		// Finally, we change any polymorphic types to "?" for now
 		return result.toString().replaceAll("@\\w+", "?");
+	}
+	
+	public POAnnotationList getAnnotations()
+	{
+		for (POContext ctxt: this)
+		{
+			POAnnotationList annotations = ctxt.getAnnotations();
+			
+			if (annotations != null && !annotations.isEmpty())
+			{
+				return annotations;
+			}
+		}
+		
+		return null;
+	}
+
+	public TCTypeList getTypeParams()
+	{
+		for (POContext ctxt: this)
+		{
+			TCTypeList params = ctxt.getTypeParams();
+			
+			if (params != null && !params.isEmpty())
+			{
+				return params;
+			}
+		}
+		
+		return null;
 	}
 
 	private String indentNewLines(String line, String indent)

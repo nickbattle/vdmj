@@ -65,7 +65,7 @@ public class TCDependencyDefinitionVisitor extends TCLeafDefinitionVisitor<TCNam
 				definitionVisitor = TCDependencyDefinitionVisitor.this;
 				expressionVisitor = new TCDependencyExpressionVisitor(this);
 				statementVisitor = new TCDependencyStatementVisitor(this);
-				typeVisitor = new TCDependencyTypeVisitor(this);
+				typeVisitor = new TCDependencyTypeVisitor();
 				bindVisitor = new TCDependencyBindVisitor(this);
 				multiBindVisitor = new TCDependencyMultipleBindVisitor(this); 
 			}
