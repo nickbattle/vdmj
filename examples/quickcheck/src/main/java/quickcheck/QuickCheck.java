@@ -39,6 +39,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.in.INNode;
+import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
@@ -48,9 +49,11 @@ import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.ObjectContext;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -59,6 +62,7 @@ import com.fujitsu.vdmj.tc.types.TCRealType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.util.GetResource;
 import com.fujitsu.vdmj.values.BooleanValue;
+import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
@@ -369,7 +373,6 @@ public class QuickCheck
 		try
 		{
 			resetErrors();	// Only flag fatal errors
-			Context ctxt = Interpreter.getInstance().getInitialContext();
 			INExpression poexp = getINExpression(po);
 			List<INBindingSetter> bindings = getINBindList(poexp);
 
@@ -415,6 +418,20 @@ public class QuickCheck
 				long before = System.currentTimeMillis();
 				Value result = new BooleanValue(false);
 				ContextException exception = null;
+				Context ctxt = Interpreter.getInstance().getInitialContext();
+				
+				if (Settings.dialect != Dialect.VDM_SL)
+				{
+					ClassInterpreter in = ClassInterpreter.getInstance();
+					INClassDefinition classdef = in.getDefaultClass();
+					ObjectValue object = classdef.newInstance(null, null, ctxt);
+
+					ctxt = new ObjectContext(
+							classdef.name.getLocation(), classdef.name.getName() + "()",
+							ctxt, object);
+
+					ctxt.put(classdef.name.getSelfName(), object);
+				}
 				
 				IterableContext ictxt = addTypeParams(po, ctxt);
 				

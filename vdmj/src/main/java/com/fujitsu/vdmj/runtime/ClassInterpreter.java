@@ -160,6 +160,11 @@ public class ClassInterpreter extends Interpreter
 	{
 		return defaultClass.name.getName();
 	}
+	
+	public INClassDefinition getDefaultClass()
+	{
+		return defaultClass;
+	}
 
 	@Override
 	public File getDefaultFile()
