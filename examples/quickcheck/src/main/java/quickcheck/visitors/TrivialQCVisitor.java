@@ -190,7 +190,7 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 			return (vleft.value.value != vright.value.value);		// eg. 123 <> 456
 		}
 		
-		return false;
+		return caseExpression(node, truths);
 	}
 
 	@Override
