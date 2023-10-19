@@ -174,6 +174,11 @@ public class ModuleInterpreter extends Interpreter
 	{
 		return defaultModule.name.getName();
 	}
+	
+	public INModule getDefaultModule()
+	{
+		return defaultModule;
+	}
 
 	/**
 	 * @return The current default module's file name.
