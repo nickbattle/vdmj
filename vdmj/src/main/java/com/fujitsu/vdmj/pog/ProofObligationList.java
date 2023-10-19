@@ -94,6 +94,13 @@ public class ProofObligationList extends Vector<ProofObligation>
 			}
 
 			sb.append(")\n");
+			
+			if (po.countermessage != null)
+			{
+				sb.append(po.countermessage);
+				sb.append("\n");
+			}
+			
 			sb.append(po);
 			sb.append("\n");
 		}

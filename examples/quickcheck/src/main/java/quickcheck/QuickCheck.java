@@ -484,7 +484,9 @@ public class QuickCheck
 							
 							if (exception != null)
 							{
-								printf("Causes %s\n", exception.getMessage());
+								String msg = "Causes " + exception.getMessage(); 
+								println(msg);
+								po.setCounterMessage(msg);
 							}
 							
 							println("----");
@@ -494,8 +496,10 @@ public class QuickCheck
 				}
 				else
 				{
-					printf("PO #%d, Error: PO evaluation returns %s?\n", po.number, result.kind());
+					String msg = String.format("Error: PO evaluation returns %s?\n", result.kind());
+					printf("PO #%d, %s\n", po.number, msg);
 					po.setStatus(POStatus.FAILED);
+					po.setCounterMessage(msg);
 					println("----");
 					printBindings(bindings);
 					println("----");
@@ -504,8 +508,10 @@ public class QuickCheck
 			}
 			catch (Exception e)
 			{
-				printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
+				String msg = String.format("Exception: %s", e.getMessage());
+				printf("PO #%d, %s\n", po.number, msg);
 				po.setStatus(POStatus.FAILED);
+				po.setCounterMessage(msg);
 				println("----");
 				printBindings(bindings);
 				println("----");

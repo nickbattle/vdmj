@@ -46,6 +46,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public TCTypeList typeParams;
 	public POAnnotationList annotations;
 	public Context counterexample;
+	public String countermessage;
 
 	private int var = 1;
 	private TCExpression checkedExpression = null;
@@ -62,6 +63,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.typeParams = ctxt.getTypeParams();
 		this.annotations = ctxt.getAnnotations();
 		this.counterexample = new Context(location, "Counterexample", null);
+		this.countermessage = null;
 		
 		if (!isCheckable)
 		{
@@ -91,6 +93,11 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 			counterexample.putAll(ctxt);
 			ctxt = ctxt.outer;
 		}
+	}
+	
+	public void setCounterMessage(String message)
+	{
+		this.countermessage = message;
 	}
 
 	@Override
