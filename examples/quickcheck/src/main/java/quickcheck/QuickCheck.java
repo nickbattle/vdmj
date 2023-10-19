@@ -49,7 +49,6 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
-import com.fujitsu.vdmj.runtime.RootContext;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -473,11 +472,13 @@ public class QuickCheck
 						{
 							printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
-							printFailPath(bindings);
+							po.setCounterexample(printFailPath(bindings));
 							
 							if (exception != null)
 							{
-								printf("Causes %s\n", exception.getMessage());
+								String msg = "Causes " + exception.getMessage(); 
+								println(msg);
+								po.setCounterMessage(msg);
 							}
 							
 							println("----");
@@ -487,8 +488,10 @@ public class QuickCheck
 				}
 				else
 				{
-					printf("PO #%d, Error: PO evaluation returns %s?\n", po.number, result.kind());
+					String msg = String.format("Error: PO evaluation returns %s?\n", result.kind());
+					printf("PO #%d, %s\n", po.number, msg);
 					po.setStatus(POStatus.FAILED);
+					po.setCounterMessage(msg);
 					println("----");
 					printBindings(bindings);
 					println("----");
@@ -497,8 +500,10 @@ public class QuickCheck
 			}
 			catch (Exception e)
 			{
-				printf("PO #%d, Exception: %s\n", po.number, e.getMessage());
+				String msg = String.format("Exception: %s", e.getMessage());
+				printf("PO #%d, %s\n", po.number, msg);
 				po.setStatus(POStatus.FAILED);
+				po.setCounterMessage(msg);
 				println("----");
 				printBindings(bindings);
 				println("----");
@@ -594,7 +599,7 @@ public class QuickCheck
 		}
 	}
 	
-	private void printFailPath(List<INBindingSetter> bindings)
+	private Context printFailPath(List<INBindingSetter> bindings)
 	{
 		Context path = null;
 		
@@ -612,37 +617,26 @@ public class QuickCheck
 		{
 			printf("No counterexample\n");
 			printBindings(bindings);
-			return;
+			return null;
 		}
 		
 		printf("Counterexample: ");
 		String sep = "";
 		Context ctxt = path;
 		
-		while (true)
+		while (ctxt.outer != null)
 		{
-			if (ctxt.outer != null)
+			for (TCNameToken name: ctxt.keySet())
 			{
-				if (ctxt instanceof RootContext)
-				{
-					sep = "; from " + ctxt.title + " where ";
-				}
-				
-				for (TCNameToken name: ctxt.keySet())
-				{
-					printf("%s%s = %s", sep, name, ctxt.get(name));
-					sep = ", ";
-				}
-				
-				ctxt = ctxt.outer;
+				printf("%s%s = %s", sep, name, ctxt.get(name));
+				sep = ", ";
 			}
-			else
-			{
-				break;
-			}
+			
+			ctxt = ctxt.outer;
 		}
 		
 		println("");
+		return path;
 	}
 
 	private String duration(long time)
