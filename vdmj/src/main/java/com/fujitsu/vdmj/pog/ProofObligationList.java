@@ -78,6 +78,21 @@ public class ProofObligationList extends Vector<ProofObligation>
 				sb.append(po.proof);
 			}
 
+			if (po.counterexample != null && !po.counterexample.isEmpty())
+			{
+				sb.append(", Counterexample: ");
+				String sep = "";
+				
+				for (TCNameToken name: po.counterexample.keySet())
+				{
+					sb.append(sep);
+					sb.append(name);
+					sb.append(" = ");
+					sb.append(po.counterexample.get(name));
+					sep = ", ";
+				}
+			}
+
 			sb.append(")\n");
 			sb.append(po);
 			sb.append("\n");

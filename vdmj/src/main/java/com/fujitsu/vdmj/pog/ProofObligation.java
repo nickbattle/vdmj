@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -44,6 +45,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public boolean isCheckable;
 	public TCTypeList typeParams;
 	public POAnnotationList annotations;
+	public Context counterexample;
 
 	private int var = 1;
 	private TCExpression checkedExpression = null;
@@ -59,6 +61,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.isCheckable = ctxt.isCheckable();	// Set false for operation POs
 		this.typeParams = ctxt.getTypeParams();
 		this.annotations = ctxt.getAnnotations();
+		this.counterexample = new Context(location, "Counterexample", null);
 		
 		if (!isCheckable)
 		{
@@ -77,11 +80,33 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	{
 		this.status = status;
 	}
+	
+	public void setCounterexample(Context path)
+	{
+		counterexample.clear();
+		Context ctxt = path;
+		
+		while (ctxt.outer != null)
+		{
+			counterexample.putAll(ctxt);
+			ctxt = ctxt.outer;
+		}
+	}
 
 	@Override
 	public String toString()
 	{
-		return  name + ": " + kind + " obligation " + location + "\n" + value;
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append(name);
+		sb.append(": ");
+		sb.append(kind);
+		sb.append(" obligation ");
+		sb.append(location);
+		sb.append("\n");
+		sb.append(value);
+		
+		return sb.toString();
 	}
 
 	protected String getVar(String root)
