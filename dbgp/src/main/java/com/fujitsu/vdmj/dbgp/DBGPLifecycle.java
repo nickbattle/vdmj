@@ -22,28 +22,45 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.plugins;
+package com.fujitsu.vdmj.dbgp;
 
-import com.fujitsu.vdmj.ExitStatus;
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.VDMJMain;
+import java.io.File;
+import java.util.List;
 
-/**
- * The main class for the plugin based VDMJ.
- */
-public class VDMJ implements VDMJMain
+import com.fujitsu.vdmj.plugins.Lifecycle;
+
+public class DBGPLifecycle extends Lifecycle
 {
-	public static String getMainName()
+	private final boolean quiet;
+	private final boolean warnings;
+	
+	public DBGPLifecycle(List<File> files, boolean quiet, boolean warnings)
 	{
-		return VDMJ_MAIN;
+		super(new String[]{});
+		
+		this.files = files;
+		this.quiet = quiet;
+		this.warnings = warnings;
 	}
-
-	public static void main(String[] args)
+	
+	@Override
+	protected void processArgs()
 	{
-		Settings.mainClass = VDMJ.class;
+		if (quiet) argv.add("-q");
+		if (!warnings) argv.add("-w");
 		
-		Lifecycle lifecycle = new Lifecycle(args);
-		
-		System.exit(lifecycle.run() == ExitStatus.EXIT_OK ? 0 : 1);
+		super.processArgs();
+	}
+	
+	@Override
+	public void loadPlugins()
+	{
+		super.loadPlugins();
+	}
+	
+	@Override
+	public boolean checkAndInitFiles()
+	{
+		return super.checkAndInitFiles();
 	}
 }
