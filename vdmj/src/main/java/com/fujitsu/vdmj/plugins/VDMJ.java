@@ -24,9 +24,12 @@
 
 package com.fujitsu.vdmj.plugins;
 
+import java.lang.reflect.Constructor;
+
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.VDMJMain;
+import com.fujitsu.vdmj.config.Properties;
 
 /**
  * The main class for the plugin based VDMJ.
@@ -41,9 +44,32 @@ public class VDMJ implements VDMJMain
 	public static void main(String[] args)
 	{
 		Settings.mainClass = VDMJ.class;
+		Properties.init();
 		
-		Lifecycle lifecycle = new Lifecycle(args);
+		Lifecycle lifecycle = loadLifecycle(args);
 		
 		System.exit(lifecycle.run() == ExitStatus.EXIT_OK ? 0 : 1);
+	}
+	
+	private static Lifecycle loadLifecycle(String[] args)
+	{
+		if (Properties.lifecycle == null)
+		{
+			return new Lifecycle(args);
+		}
+		
+		try
+		{
+			Class<?> clazz = Class.forName(Properties.lifecycle);
+			Constructor<?> ctor = clazz.getConstructor(String[].class);
+			return (Lifecycle) ctor.newInstance((Object)args);
+		}
+		catch (Exception e)
+		{
+			System.err.println("Cannot instatiate lifecycle " + Properties.lifecycle + "(String[] args)");
+			System.err.println(e.toString());
+			System.exit(1);
+			return null;
+		}
 	}
 }
