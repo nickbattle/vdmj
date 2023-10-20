@@ -28,6 +28,7 @@ import java.util.Stack;
 
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.expressions.TCElseIfExpression;
 import com.fujitsu.vdmj.tc.expressions.TCEqualsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCForAllExpression;
@@ -102,15 +103,33 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 	@Override
 	public Boolean caseIfExpression(TCIfExpression node, Stack<TCExpression> truths)
 	{
+		int pushes = 0;
+		
 		truths.push(node.ifExp);
-		boolean result1 = node.thenExp.apply(this, truths);
+		boolean result = node.thenExp.apply(this, truths);
 		truths.pop();
-
+		
 		truths.push(new TCNotExpression(node.location, node.ifExp));
-		boolean result2 = node.elseExp.apply(this, truths);
-		truths.pop();
+		pushes++;
+		
+		for (TCElseIfExpression elif: node.elseList)
+		{
+			truths.push(elif.elseIfExp);
+			result = result && elif.thenExp.apply(this, truths);
+			truths.pop();
+			
+			truths.push(new TCNotExpression(node.location, elif.thenExp));
+			pushes++;
+		}
 
-		return result1 && result2;		// All paths always true
+		result = result && node.elseExp.apply(this, truths);
+		
+		for (int i=0; i<pushes; i++)
+		{
+			truths.pop();
+		}
+
+		return result;		// All paths always true
 	}
 	
 	@Override
@@ -171,7 +190,7 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 			return (vleft.value.value != vright.value.value);		// eg. 123 <> 456
 		}
 		
-		return false;
+		return caseExpression(node, truths);
 	}
 
 	@Override
