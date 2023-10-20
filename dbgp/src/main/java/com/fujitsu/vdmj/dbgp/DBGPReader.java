@@ -78,7 +78,6 @@ import com.fujitsu.vdmj.messages.ConsolePrintWriter;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
-import com.fujitsu.vdmj.plugins.VDMJ;
 import com.fujitsu.vdmj.plugins.analyses.INPlugin;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -511,12 +510,10 @@ public class DBGPReader extends DebugLink implements VDMJMain
 			}
 		}
 
-		VDMJ.loadPlugins();
-		if (quiet) VDMJ.setArgs("-q");
-		if (!warnings) VDMJ.setArgs("-w");
-		VDMJ.setFiles(files);
-
-		if (VDMJ.checkAndInitFiles())	// Only parse/checks, no init.
+		DBGPLifecycle lifecycle = new DBGPLifecycle(files, quiet, warnings);
+		lifecycle.loadPlugins();
+		
+		if (lifecycle.checkAndInitFiles())	// Only parse/checks, no init.
 		{
 			try
 			{
