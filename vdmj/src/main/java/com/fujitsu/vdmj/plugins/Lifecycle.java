@@ -471,22 +471,6 @@ public class Lifecycle
 		return false;
 	}
 	
-	/**
-	 * These setters are used by DBGPReader, so that it can use the other
-	 * lifecycle methods to parse/check the spec.
-	 */
-	public void setFiles(List<File> files)
-	{
-		this.files = files;
-	}
-
-	public void setArgs(String... args)
-	{
-		this.argv = new Vector<String>(Arrays.asList(args));
-		processArgs();
-	}
-
-	
 	private int display(List<VDMMessage> messages, Class<? extends VDMMessage>type, boolean show)
 	{
 		int count = 0;
@@ -503,7 +487,7 @@ public class Lifecycle
 		return count;
 	}
 	
-	private boolean report(List<VDMMessage> messages, AbstractCheckFilesEvent event)
+	protected boolean report(List<VDMMessage> messages, AbstractCheckFilesEvent event)
 	{
 		int nerrs  = display(messages, VDMError.class, true);
 		int nwarns = display(messages, VDMWarning.class, warnings);
