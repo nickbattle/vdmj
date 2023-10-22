@@ -134,7 +134,7 @@ public class SearchQCStrategy extends QCStrategy
 			}
 		}
 		
-		return new Results(false, result, System.currentTimeMillis() - before);
+		return new Results(null, result, System.currentTimeMillis() - before);
 	}
 
 	@Override

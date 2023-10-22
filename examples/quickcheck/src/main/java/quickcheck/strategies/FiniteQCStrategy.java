@@ -140,16 +140,16 @@ public class FiniteQCStrategy extends QCStrategy
 					
 			   		if (product > expansionLimit)
 					{
-			   			return new Results(false, result, 0);	// Too big
+			   			return new Results(null, result, 0);	// Too big
 					}
 				}
 				catch (InternalException e)		// Infinite
 				{
-					return new Results(false, result, 0);
+					return new Results(null, result, 0);
 				}
 				catch (ArithmeticException e)	// Overflow probably
 				{
-					return new Results(false, result, 0);
+					return new Results(null, result, 0);
 				}
 			}
 			
@@ -162,7 +162,7 @@ public class FiniteQCStrategy extends QCStrategy
 			proved = (po.typeParams == null);	// ie. counterexamples pass and not polymorphic, then PROVED
 		}
 		
-		return new Results(proved, result, System.currentTimeMillis() - before);
+		return new Results(proved ? getName() : null, result, System.currentTimeMillis() - before);
 	}
 
 	@Override
