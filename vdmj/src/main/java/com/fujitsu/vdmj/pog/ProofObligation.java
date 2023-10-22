@@ -47,6 +47,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public POAnnotationList annotations;
 	public Context counterexample;
 	public String countermessage;
+	public String provedBy;
 
 	private int var = 1;
 	private TCExpression checkedExpression = null;
@@ -64,6 +65,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.annotations = ctxt.getAnnotations();
 		this.counterexample = new Context(location, "Counterexample", null);
 		this.countermessage = null;
+		this.provedBy = null;
 		
 		if (!isCheckable)
 		{
@@ -83,6 +85,11 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.status = status;
 	}
 	
+	public void setProvedBy(String provedBy)
+	{
+		this.provedBy = provedBy;
+	}
+
 	public void setCounterexample(Context path)
 	{
 		counterexample.clear();

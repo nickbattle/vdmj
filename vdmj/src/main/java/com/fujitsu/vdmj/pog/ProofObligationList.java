@@ -92,6 +92,12 @@ public class ProofObligationList extends Vector<ProofObligation>
 					sep = ", ";
 				}
 			}
+			
+			if (po.provedBy != null)
+			{
+				sb.append("proved by ");
+				sb.append(po.provedBy);
+			}
 
 			sb.append(")\n");
 			

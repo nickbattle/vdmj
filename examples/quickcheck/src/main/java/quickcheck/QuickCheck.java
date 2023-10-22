@@ -388,12 +388,11 @@ public class QuickCheck
 				printf("PO #%d, TRIVIAL by %s\n", po.number, po.proof);
 				return;
 			}
-			else if (results.provedBy != null &&
-					 results.counterexamples.isEmpty() &&
-					 !bindings.isEmpty())	// empty binds => simple forall over sets, so must execute
+			else if (results.provedBy != null)
 			{
 				po.setStatus(POStatus.PROVED);
-				printf("PO #%d, PROVED %s\n", po.number, duration(results.duration));
+				po.setProvedBy(results.provedBy);
+				printf("PO #%d, PROVED by %s strategy %s\n", po.number, results.provedBy, duration(results.duration));
 				return;
 			}
 
@@ -482,7 +481,7 @@ public class QuickCheck
 						}
 						else
 						{
-							outcome = (results.provedBy != null) ? POStatus.PROVED : POStatus.MAYBE;
+							outcome = POStatus.MAYBE;
 						}
 						
 						printf("PO #%d, %s %s\n", po.number, outcome.toString().toUpperCase(), duration(before, after));
