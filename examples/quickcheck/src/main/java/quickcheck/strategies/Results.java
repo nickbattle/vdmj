@@ -30,18 +30,18 @@ import com.fujitsu.vdmj.values.ValueList;
 
 /**
  * A class to hold the return values of a getValues() call on a QC plugin.
- * The proved flag indicates that the PO has been proved to have no counterexamples.
+ * The provedBy field indicates that the PO has been proved to have no counterexamples.
  * Otherwise, counterexamples contains known or possible values to check.
  */
 public class Results
 {
-	public final boolean proved;
+	public final String provedBy;
 	public final Map<String, ValueList> counterexamples;
 	public final long duration;		// time to generate counterexamples, in millisecs
 	
-	public Results(boolean proved, Map<String, ValueList> counterexamples, long duration)
+	public Results(String proved, Map<String, ValueList> counterexamples, long duration)
 	{
-		this.proved = proved;
+		this.provedBy = proved;
 		this.counterexamples = counterexamples;
 		this.duration = duration;
 	}

@@ -88,7 +88,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 					sep = ", ";
 				}
 			}
-
+			
 			sb.append(")\n");
 			
 			if (po.countermessage != null)

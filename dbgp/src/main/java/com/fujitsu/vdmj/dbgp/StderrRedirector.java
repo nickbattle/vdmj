@@ -45,10 +45,12 @@ public class StderrRedirector extends Redirector
     		{
     			case DISABLE:
     				out.print(line);
+    				out.flush();
     				break;
 
     			case COPY:
     				out.print(line);
+    				out.flush();
     				dbgp.stderr(line);
     				break;
 
