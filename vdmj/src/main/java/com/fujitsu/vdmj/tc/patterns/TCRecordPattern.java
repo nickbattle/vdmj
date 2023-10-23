@@ -52,6 +52,12 @@ public class TCRecordPattern extends TCPattern
 	{
 		return "mk_" + type + "(" + Utils.listToString(plist) + ")";
 	}
+	
+	@Override
+	public String toSource()
+	{
+		return "mk_" + typename + "(" + Utils.listToString(plist) + ")";
+	}
 
 	@Override
 	public void unResolve()

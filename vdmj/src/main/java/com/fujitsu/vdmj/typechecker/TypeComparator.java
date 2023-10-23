@@ -812,7 +812,7 @@ public class TypeComparator
 				if (sup instanceof TCNamedType)
 				{
 					// both have an invariant and we're not ignoring them, so check for equality
-					return sub.equals(sup) ? Result.Yes : Result.No;
+					return sub.equals(sup) && !sub.isMaximal() ? Result.Yes : Result.No;
 				}
 				else
 				{
@@ -985,7 +985,7 @@ public class TypeComparator
 				TCRecordType subr = (TCRecordType)sub;
 				TCRecordType supr = (TCRecordType)sup;
 
-				return subr.equals(supr) ? Result.Yes : Result.No;
+				return subr.equals(supr) && !(sub.isMaximal() && !sup.isMaximal()) ? Result.Yes : Result.No;
 			}
 			else if (sub instanceof TCClassType)
 			{

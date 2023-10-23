@@ -62,6 +62,7 @@ import com.fujitsu.vdmj.ast.types.ASTTokenType;
 import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.ast.types.ASTTypeList;
 import com.fujitsu.vdmj.ast.types.ASTUnresolvedType;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -620,6 +621,7 @@ public class ExpressionReader extends SyntaxReader
 		}
 		
 		boolean more = true;
+		LexToken maximal = null;
 
 		while (more)
 		{
@@ -627,6 +629,23 @@ public class ExpressionReader extends SyntaxReader
 
 			switch (token.type)
     		{
+				case PLING:
+					if (Properties.parser_maximal_types)
+					{
+						if (maximal != null)
+						{
+							throwMessage(2335, "Maximal '!' not allowed here", token);	
+						}
+						
+						maximal = token;
+						nextToken();
+					}
+					else
+					{
+						more = false;
+					}
+					break;
+					
     			case BRA:
     				// Either sequence(from, ..., to) or func(args) or map(key)
     				// or mk_*(), is_*(), mu(), pre_*(), post_*(),
@@ -642,7 +661,8 @@ public class ExpressionReader extends SyntaxReader
         					if (name.startsWith("mk_"))
     						{
         						// a mk_TYPE() with no field values
-    							exp = readMkExpression(ve);
+    							exp = readMkExpression(ve, maximal);
+    							maximal = null;
     							break;
     						}
         				}
@@ -664,7 +684,8 @@ public class ExpressionReader extends SyntaxReader
     						}
     						else if (name.startsWith("mk_"))
     						{
-    							exp = readMkExpression(ve);
+    							exp = readMkExpression(ve, maximal);
+    							maximal = null;
     							break;
     						}
     						else if (name.startsWith("is_"))
@@ -786,6 +807,11 @@ public class ExpressionReader extends SyntaxReader
     				more = false;
     				break;
     		}
+		}
+		
+		if (maximal != null)
+		{
+			throwMessage(2335, "Maximal '!' not allowed here", maximal);	
 		}
 
 		// If we've collected as many applicators as we can, but we're still
@@ -1025,7 +1051,7 @@ public class ExpressionReader extends SyntaxReader
 		return new ASTMuExpression(ve.location, record, args);
 	}
 
-	private ASTExpression readMkExpression(ASTVariableExpression ve)
+	private ASTExpression readMkExpression(ASTVariableExpression ve, LexToken maximal)
 		throws ParserException, LexException
 	{
 		ASTExpressionList args = new ASTExpressionList();
@@ -1045,6 +1071,11 @@ public class ExpressionReader extends SyntaxReader
 
 		if (ve.name.name.equals("mk_"))
 		{
+			if (maximal != null)
+			{
+				throwMessage(2335, "Maximal '!' not allowed here", maximal);
+			}
+			
 			if (args.size() < 2)
 			{
 				throwMessage(2035, "Tuple must have >1 argument");
@@ -1059,6 +1090,11 @@ public class ExpressionReader extends SyntaxReader
 
 			if (type != null)
 			{
+				if (maximal != null)
+				{
+					throwMessage(2335, "Maximal '!' not allowed here", maximal);
+				}
+
 				if (args.size() != 1)
 				{
 					throwMessage(2300, "mk_<type> must have a single argument");
@@ -1077,7 +1113,7 @@ public class ExpressionReader extends SyntaxReader
 			}
 			else
 			{
-				exp = new ASTMkTypeExpression(typename, args);
+				exp = new ASTMkTypeExpression(typename, args, maximal != null);
 			}
 		}
 

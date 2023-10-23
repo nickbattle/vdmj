@@ -50,7 +50,7 @@ abstract public class POContext
 	{
 		return null;
 	}
-	
+
 	public TCTypeList getTypeParams()
 	{
 		return null;

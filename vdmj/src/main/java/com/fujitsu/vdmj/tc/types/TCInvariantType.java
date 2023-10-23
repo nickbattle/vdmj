@@ -40,14 +40,22 @@ public abstract class TCInvariantType extends TCType
 
 	public boolean opaque = false;
 	protected boolean inNarrower = false;
+	protected boolean maximal = false;
 
 	public TCInvariantType(LexLocation location)
 	{
 		super(location);
 	}
 
+	abstract public TCInvariantType copy(boolean maximal);
+
 	@Override
 	abstract protected String toDisplay();
+	
+	public void setMaximal(boolean maximal)
+	{
+		this.maximal = maximal;
+	}
 
 	public void setOpaque(boolean opaque)
 	{
@@ -105,12 +113,18 @@ public abstract class TCInvariantType extends TCType
 	@Override
 	public boolean isOrdered(LexLocation from)
 	{
-		return orddef != null;
+		return orddef != null && !maximal;
 	}
 	
 	@Override
 	public boolean isEq(LexLocation from)
 	{
-		return eqdef != null;
+		return eqdef != null && !maximal;
+	}
+	
+	@Override
+	public boolean isMaximal()
+	{
+		return maximal;
 	}
 }

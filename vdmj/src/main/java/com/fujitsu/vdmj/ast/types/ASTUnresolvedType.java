@@ -31,11 +31,18 @@ public class ASTUnresolvedType extends ASTType
 {
 	private static final long serialVersionUID = 1L;
 	public final LexNameToken typename;
+	public final boolean maximal;
 
-	public ASTUnresolvedType(LexNameToken typename)
+	public ASTUnresolvedType(LexNameToken typename, boolean maximal)
 	{
 		super(typename.location);
 		this.typename = typename;
+		this.maximal = maximal;
+	}
+
+	public ASTUnresolvedType(LexNameToken typename)
+	{
+		this(typename, false);
 	}
 
 	@Override
@@ -44,13 +51,13 @@ public class ASTUnresolvedType extends ASTType
 		if (other instanceof ASTUnresolvedType)
 		{
 			ASTUnresolvedType nother = (ASTUnresolvedType)other;
-			return typename.equals(nother.typename);
+			return typename.equals(nother.typename) && maximal == nother.maximal;
 		}
 
 		if (other instanceof ASTNamedType)
 		{
 			ASTNamedType nother = (ASTNamedType)other;
-			return typename.equals(nother.typename);
+			return typename.equals(nother.typename) && !maximal;
 		}
 
 		return false;
@@ -65,7 +72,7 @@ public class ASTUnresolvedType extends ASTType
 	@Override
 	public String toDisplay()
 	{
-		return "(unresolved " + typename + ")";
+		return "(unresolved " + typename + (maximal ? "!)" : ")");
 	}
 
 	@Override

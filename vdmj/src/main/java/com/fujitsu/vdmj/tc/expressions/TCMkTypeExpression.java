@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.tc.expressions;
 import java.util.Iterator;
 
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCField;
@@ -45,21 +44,23 @@ public class TCMkTypeExpression extends TCExpression
 	private static final long serialVersionUID = 1L;
 	public final TCNameToken typename;
 	public final TCExpressionList args;
+	public final boolean maximal;
 
 	private TCRecordType recordType = null;
 	public TCTypeList argTypes = null;
 
-	public TCMkTypeExpression(TCNameToken typename, TCExpressionList args)
+	public TCMkTypeExpression(TCNameToken typename, TCExpressionList args, boolean maximal)
 	{
 		super(typename.getLocation());
 		this.typename = typename;
 		this.args = args;
+		this.maximal = maximal;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "mk_" + typename + "(" + Utils.listToString(args) + ")";
+		return "mk_" + typename + (maximal ? "!" : "") + "(" + Utils.listToString(args) + ")";
 	}
 
 	@Override
@@ -88,20 +89,18 @@ public class TCMkTypeExpression extends TCExpression
 			report(3127, "Type '" + typename + "' has no struct export");
 			return setType(rec);
 		}
+		
+		if (maximal)
+		{
+			recordType = recordType.copy(true);
+		}
 
 		if (typename.isExplicit())
 		{
 			// If the type name is explicit, the TCType ought to have an explicit
 			// name. This only really affects trace expansion.
 
-			TCExplicitFunctionDefinition inv = recordType.invdef;
-			TCExplicitFunctionDefinition eq = recordType.eqdef;
-			TCExplicitFunctionDefinition ord = recordType.orddef;
-
-			recordType = new TCRecordType(recordType.name, recordType.fields, recordType.composed);
-			recordType.setInvariant(inv);
-			recordType.setEquality(eq);
-			recordType.setOrder(ord);
+			recordType = recordType.copy(recordType.isMaximal());
 		}
 
 		if (recordType.fields.size() != args.size())
@@ -131,7 +130,7 @@ public class TCMkTypeExpression extends TCExpression
 
 		return checkConstraint(constraint, recordType);
 	}
-
+	
 	@Override
 	public <R, S> R apply(TCExpressionVisitor<R, S> visitor, S arg)
 	{

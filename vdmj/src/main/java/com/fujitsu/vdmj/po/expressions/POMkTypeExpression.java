@@ -83,7 +83,7 @@ public class POMkTypeExpression extends POExpression
 			i++;
 		}
 
-		if (recordType.invdef != null)
+		if (recordType.invdef != null && !recordType.isMaximal())
 		{
 			list.add(new SubTypeObligation(this, recordType, recordType, ctxt));
 		}

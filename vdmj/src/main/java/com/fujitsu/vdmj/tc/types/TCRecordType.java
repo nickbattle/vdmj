@@ -55,6 +55,17 @@ public class TCRecordType extends TCInvariantType
 		this.fields = fields;
 		this.composed = false;
 	}
+	
+	@Override
+	public TCRecordType copy(boolean maximal)
+	{
+		TCRecordType recordType = new TCRecordType(name, fields, composed);
+		recordType.setInvariant(invdef);
+		recordType.setEquality(eqdef);
+		recordType.setOrder(orddef);
+		recordType.setMaximal(maximal);
+		return recordType;
+	}
 
 	public TCField findField(String tag)
 	{
@@ -139,7 +150,7 @@ public class TCRecordType extends TCInvariantType
 	@Override
 	public String toDisplay()
 	{
-		return name.toString() + (opaque ? " /* opaque */" : "");
+		return name.toString() + (maximal ? "!" : "") + (opaque ? " /* opaque */" : "");
 	}
 
 	@Override
@@ -156,7 +167,7 @@ public class TCRecordType extends TCInvariantType
 		if (other instanceof TCRecordType)
 		{
 			TCRecordType rother = (TCRecordType)other;
-			return name.equals(rother.name);	// NB. identical
+			return name.equals(rother.name);
 		}
 
 		return false;

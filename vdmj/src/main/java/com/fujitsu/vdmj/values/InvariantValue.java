@@ -58,7 +58,7 @@ public class InvariantValue extends ReferenceValue
 
 	public void checkInvariant(Context ctxt) throws ValueException
 	{
-		if (invariant != null && Settings.invchecks)
+		if (invariant != null && Settings.invchecks && !type.isMaximal())
 		{
 			// In VDM++ and VDM-RT, we do not want to do thread swaps half way
 			// through a DTC check (which can include calculating an invariant),
@@ -104,7 +104,14 @@ public class InvariantValue extends ReferenceValue
 	{
 		if (to.equals(type))
 		{
-			return this;
+			if (type.isMaximal() != to.isMaximal())
+			{
+				return value.convertValueTo(to, ctxt, done);
+			}
+			else
+			{
+				return this;
+			}
 		}
 		else
 		{
@@ -160,7 +167,7 @@ public class InvariantValue extends ReferenceValue
 	@Override
 	public int compareTo(Value other)
 	{
-		if (ordering != null &&
+		if (ordering != null && !type.isMaximal() &&
 			other instanceof InvariantValue &&
 			((InvariantValue)other).type.equals(type))
 		{
@@ -214,7 +221,7 @@ public class InvariantValue extends ReferenceValue
 	{
 		if (other instanceof Value)
 		{
-    		if (equality != null)
+    		if (equality != null && !type.isMaximal())
     		{
     			if (other instanceof NilValue && !(type.type instanceof TCOptionalType))
     			{

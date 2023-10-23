@@ -33,18 +33,20 @@ public class ASTMkTypeExpression extends ASTExpression
 	private static final long serialVersionUID = 1L;
 	public final LexNameToken typename;
 	public final ASTExpressionList args;
+	public final boolean maximal;
 
-	public ASTMkTypeExpression(LexNameToken typename, ASTExpressionList args)
+	public ASTMkTypeExpression(LexNameToken typename, ASTExpressionList args, boolean maximal)
 	{
 		super(typename.location);
 		this.typename = typename;
 		this.args = args;
+		this.maximal = maximal;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "mk_" + typename + "(" + Utils.listToString(args) + ")";
+		return "mk_" + typename + (maximal ? "!" : "") + "(" + Utils.listToString(args) + ")";
 	}
 
 	@Override

@@ -181,6 +181,24 @@ public class LexTokenReader extends BacktrackInputReader
 	}
 
 	/**
+	 * Create a LexTokenReader for the string and dialect passed, starting
+	 * at a particular LexLocation.
+	 *
+	 * @param expression The string (expression) to parse.
+	 * @param dialect Parse VDM++ or VDM-SL tokens.
+	 * @param location The start location for the tokens returned.
+	 */
+	public LexTokenReader(String expression, Dialect dialect, LexLocation location)
+	{
+		super(location.file, expression);
+		this.file = location.file;
+		this.dialect = dialect;
+		init();
+		this.linecount = location.startLine;
+		this.charpos = location.startPos;
+	}
+
+	/**
 	 * Create a LexTokenReader to read content which originates from a file
 	 * which is not yet saved and enable the source of the file to be set.
 	 * This is used in the IDE to provide outline and parse error info while
@@ -940,6 +958,9 @@ public class LexTokenReader extends BacktrackInputReader
 
 			case ',':
 				type = Token.COMMA;
+				break;
+			case '!':
+				type = Token.PLING;
 				break;
 			case ';':
 				type = Token.SEMICOLON;

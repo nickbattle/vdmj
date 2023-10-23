@@ -257,7 +257,7 @@ public class SubTypeObligation extends ProofObligation
 			TCInvariantType et = (TCInvariantType)etype;
 			prefix = "";
 
-			if (et.invdef != null)
+			if (et.invdef != null && !et.isMaximal())
 			{
 				TCNameToken invname = et.invdef.name;
 				

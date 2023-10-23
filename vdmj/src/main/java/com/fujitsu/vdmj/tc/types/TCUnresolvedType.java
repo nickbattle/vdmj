@@ -43,11 +43,18 @@ public class TCUnresolvedType extends TCType
 {
 	private static final long serialVersionUID = 1L;
 	public final TCNameToken typename;
+	public final boolean maximal;
 
-	public TCUnresolvedType(TCNameToken typename)
+	public TCUnresolvedType(TCNameToken typename, boolean maximal)
 	{
 		super(typename.getLocation());
 		this.typename = typename;
+		this.maximal = maximal;
+	}
+
+	public TCUnresolvedType(TCNameToken typename)
+	{
+		this(typename, false);
 	}
 
 	@Override
@@ -100,6 +107,13 @@ public class TCUnresolvedType extends TCType
 		}
 
 		TCType r = def.getType();
+		
+		if (r instanceof TCInvariantType && maximal)
+		{
+			TCInvariantType inv = (TCInvariantType)r;
+			r = inv.copy(true);
+		}
+		
 		r.definitions = new TCDefinitionList(def);
 		return r;
 	}
@@ -133,7 +147,7 @@ public class TCUnresolvedType extends TCType
 	@Override
 	public String toDisplay()
 	{
-		return "(unresolved " + typename.getExplicit(true) + ")";
+		return "(unresolved " + typename.getExplicit(true) + (maximal ? "!)" : ")");
 	}
 
 	@Override
