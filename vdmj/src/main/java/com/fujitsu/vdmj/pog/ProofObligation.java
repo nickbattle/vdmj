@@ -95,7 +95,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		counterexample.clear();
 		Context ctxt = path;
 		
-		while (ctxt.outer != null)
+		while (ctxt != null && ctxt.outer != null)
 		{
 			counterexample.putAll(ctxt);
 			ctxt = ctxt.outer;
