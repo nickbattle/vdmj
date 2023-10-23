@@ -40,7 +40,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 
 import quickcheck.QuickCheck;
 import quickcheck.strategies.QCStrategy;
-import quickcheck.strategies.Results;
+import quickcheck.strategies.StrategyResults;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
@@ -141,7 +141,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		{
 			for (ProofObligation po: chosen)
 			{
-				Results results = qc.getValues(po);
+				StrategyResults results = qc.getValues(po);
 				
 				if (!qc.hasErrors())
 				{

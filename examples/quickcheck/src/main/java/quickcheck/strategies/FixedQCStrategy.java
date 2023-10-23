@@ -519,7 +519,7 @@ public class FixedQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
 	{
 		Map<String, ValueList> values = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
@@ -542,7 +542,7 @@ public class FixedQCStrategy extends QCStrategy
 			println(e);
 		}
 		
-		return new Results(null, values, System.currentTimeMillis() - before);
+		return new StrategyResults(null, false, values, System.currentTimeMillis() - before);
 	}
 
 	@Override

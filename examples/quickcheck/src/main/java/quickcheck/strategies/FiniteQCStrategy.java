@@ -121,11 +121,10 @@ public class FiniteQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
-		boolean proved = false;
 		
 		if (po.isCheckable)
 		{
@@ -140,29 +139,27 @@ public class FiniteQCStrategy extends QCStrategy
 					
 			   		if (product > expansionLimit)
 					{
-			   			return new Results(null, result, 0);	// Too big
+			   			return new StrategyResults();	// Too big
 					}
 				}
 				catch (InternalException e)		// Infinite
 				{
-					return new Results(null, result, 0);
+					return new StrategyResults();
 				}
 				catch (ArithmeticException e)	// Overflow probably
 				{
-					return new Results(null, result, 0);
+					return new StrategyResults();
 				}
 			}
 			
-			// Game on...
+			// Game on... all binds can be expanded
 			for (INBindingSetter bind: binds)
 			{
 				result.put(bind.toString(), bind.getType().apply(new INGetAllValuesVisitor(), ctxt));
 			}
-			
-			proved = (po.typeParams == null);	// ie. counterexamples pass and not polymorphic, then PROVED
 		}
 		
-		return new Results(proved ? getName() : null, result, System.currentTimeMillis() - before);
+		return new StrategyResults(null, true, result, System.currentTimeMillis() - before);
 	}
 
 	@Override

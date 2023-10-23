@@ -83,7 +83,7 @@ public class SearchQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
@@ -134,7 +134,7 @@ public class SearchQCStrategy extends QCStrategy
 			}
 		}
 		
-		return new Results(null, result, System.currentTimeMillis() - before);
+		return new StrategyResults(null, false, result, System.currentTimeMillis() - before);
 	}
 
 	@Override

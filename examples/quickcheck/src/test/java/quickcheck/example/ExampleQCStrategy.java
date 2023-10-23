@@ -38,7 +38,7 @@ import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
 import quickcheck.strategies.QCStrategy;
-import quickcheck.strategies.Results;
+import quickcheck.strategies.StrategyResults;
 
 public class ExampleQCStrategy extends QCStrategy
 {
@@ -94,7 +94,7 @@ public class ExampleQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
 	{
 		Map<String, ValueList> values = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
@@ -104,7 +104,14 @@ public class ExampleQCStrategy extends QCStrategy
 			values.put(bind.toString(), new ValueList());	// ie. nothing, for every bind
 		}
 		
-		return new Results(provedResult ? getName() : null, values, System.currentTimeMillis() - before);	// NOTE proved flag!
+		if (provedResult)
+		{
+			return new StrategyResults(getName(), false, values, System.currentTimeMillis() - before);
+		}
+		else
+		{
+			return new StrategyResults(null, false, values, System.currentTimeMillis() - before);
+		}
 	}
 
 	@Override

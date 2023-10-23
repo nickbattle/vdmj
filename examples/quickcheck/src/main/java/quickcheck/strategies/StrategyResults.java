@@ -24,6 +24,7 @@
 
 package quickcheck.strategies;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fujitsu.vdmj.values.ValueList;
@@ -31,17 +32,30 @@ import com.fujitsu.vdmj.values.ValueList;
 /**
  * A class to hold the return values of a getValues() call on a QC plugin.
  * The provedBy field indicates that the PO has been proved to have no counterexamples.
- * Otherwise, counterexamples contains known or possible values to check.
+ * Otherwise, counterexamples contains known or possible values to check. The
+ * hasAllValues field indicates that all possible values of all bindings are included
+ * (probably from the "finite" strategy) and hence if no counterexamples are found,
+ * the PO is proved.
  */
-public class Results
+public class StrategyResults
 {
-	public final String provedBy;
+	public final String provedBy;			// If set, proved already
+	public final boolean hasAllValues;		// Contains all possible values from all binds
 	public final Map<String, ValueList> counterexamples;
-	public final long duration;		// time to generate counterexamples, in millisecs
-	
-	public Results(String proved, Map<String, ValueList> counterexamples, long duration)
+	public final long duration;				// time to generate counterexamples, in millisecs
+
+	public StrategyResults()
+	{
+		this.provedBy = null;
+		this.hasAllValues = false;
+		this.counterexamples = new HashMap<String, ValueList>();
+		this.duration = 0;
+	}
+
+	public StrategyResults(String proved, boolean hasAllValues, Map<String, ValueList> counterexamples, long duration)
 	{
 		this.provedBy = proved;
+		this.hasAllValues = hasAllValues;
 		this.counterexamples = counterexamples;
 		this.duration = duration;
 	}

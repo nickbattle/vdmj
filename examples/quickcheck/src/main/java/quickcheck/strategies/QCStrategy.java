@@ -39,6 +39,6 @@ abstract public class QCStrategy
 	abstract public boolean hasErrors();
 	abstract public boolean useByDefault();
 	abstract public boolean init(QuickCheck qc);
-	abstract public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt);
+	abstract public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt);
 	abstract public String help();
 }
