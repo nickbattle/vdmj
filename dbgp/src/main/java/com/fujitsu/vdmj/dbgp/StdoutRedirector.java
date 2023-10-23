@@ -45,10 +45,12 @@ public class StdoutRedirector extends Redirector
     		{
     			case DISABLE:
     				out.print(line);
+    				out.flush();
     				break;
 
     			case COPY:
     				out.print(line);
+    				out.flush();
     				dbgp.stdout(line);
     				break;
 

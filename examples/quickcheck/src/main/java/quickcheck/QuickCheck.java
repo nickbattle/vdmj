@@ -311,11 +311,10 @@ public class QuickCheck
 	public Results getValues(ProofObligation po)
 	{
 		Map<String, ValueList> union = new HashMap<String, ValueList>();
-		boolean proved = false;
 		
 		if (!po.isCheckable)
 		{
-			return new Results(false, union, 0);
+			return new Results(null, union, 0);
 		}
 		
 		INExpression exp = getINExpression(po);
@@ -329,8 +328,8 @@ public class QuickCheck
 			
 			for (QCStrategy strategy: strategies)
 			{
-				Results presults = strategy.getValues(po, exp, binds, ictxt);
-				Map<String, ValueList> cexamples = presults.counterexamples;
+				Results sresults = strategy.getValues(po, exp, binds, ictxt);
+				Map<String, ValueList> cexamples = sresults.counterexamples;
 				
 				for (String bind: cexamples.keySet())
 				{
@@ -344,7 +343,10 @@ public class QuickCheck
 					}
 				}
 				
-				proved |= presults.proved;
+				if (sresults.provedBy != null)	// No need to go further
+				{
+					return new Results(sresults.provedBy, cexamples, System.currentTimeMillis() - before);
+				}
 			}
 		
 			for (INBindingSetter bind: binds)
@@ -359,7 +361,7 @@ public class QuickCheck
 			}
 		}
 		
-		return new Results(proved, union, System.currentTimeMillis() - before);
+		return new Results(null, union, System.currentTimeMillis() - before);
 	}
 	
 	public void checkObligation(ProofObligation po, Results results)
@@ -380,12 +382,11 @@ public class QuickCheck
 				printf("PO #%d, TRIVIAL by %s\n", po.number, po.proof);
 				return;
 			}
-			else if (results.proved &&
-					 results.counterexamples.isEmpty() &&
-					 !bindings.isEmpty())	// empty binds => simple forall over sets, so must execute
+			else if (results.provedBy != null)
 			{
 				po.setStatus(POStatus.PROVED);
-				printf("PO #%d, PROVED %s\n", po.number, duration(results.duration));
+				po.setProvedBy(results.provedBy);
+				printf("PO #%d, PROVED by %s strategy %s\n", po.number, results.provedBy, duration(results.duration));
 				return;
 			}
 
@@ -474,7 +475,7 @@ public class QuickCheck
 						}
 						else
 						{
-							outcome = (results.proved) ? POStatus.PROVED : POStatus.MAYBE;
+							outcome = POStatus.MAYBE;
 						}
 						
 						printf("PO #%d, %s %s\n", po.number, outcome.toString().toUpperCase(), duration(before, after));

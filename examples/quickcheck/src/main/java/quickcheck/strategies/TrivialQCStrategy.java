@@ -90,7 +90,7 @@ public class TrivialQCStrategy extends QCStrategy
 			proved = po.getCheckedExpression().apply(visitor, new Stack<TCExpression>());
 		}
 		
-		return new Results(proved, new HashMap<String, ValueList>(), System.currentTimeMillis() - before);
+		return new Results(proved ? getName() : null, new HashMap<String, ValueList>(), System.currentTimeMillis() - before);
 	}
 
 	@Override
