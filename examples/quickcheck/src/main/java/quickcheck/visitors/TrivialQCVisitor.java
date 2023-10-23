@@ -136,21 +136,33 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 	public Boolean caseImpliesExpression(TCImpliesExpression node, Stack<TCExpression> truths)
 	{
 		truths.push(node.left);
+		int pops = 1;
 
 		if (node.left instanceof TCEqualsExpression)
 		{
 			TCEqualsExpression eq = (TCEqualsExpression)node.left;
 			truths.push(new TCNotEqualExpression(eq.left, new LexKeywordToken(Token.NE, eq.location), eq.right));
+			pops++;
+		}
+		else if (node.left instanceof TCNotExpression)
+		{
+			TCNotExpression nexp = (TCNotExpression)node.left;
+			
+			if (nexp.exp instanceof TCEqualsExpression)
+			{
+				TCEqualsExpression eq = (TCEqualsExpression)nexp.exp;
+				truths.push(new TCNotEqualExpression(eq.left, new LexKeywordToken(Token.NE, eq.location), eq.right));
+				pops++;
+			}
 		}
 		
 		boolean result = node.right.apply(this, truths);
 		
-		if (node.left instanceof TCEqualsExpression)
+		for (int i=0; i<pops; i++)
 		{
 			truths.pop();
 		}
 		
-		truths.pop();
 		return result;
 	}
 	

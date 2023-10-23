@@ -125,7 +125,6 @@ public class FiniteQCStrategy extends QCStrategy
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
-		boolean proved = false;
 		
 		if (po.isCheckable)
 		{
@@ -158,11 +157,9 @@ public class FiniteQCStrategy extends QCStrategy
 			{
 				result.put(bind.toString(), bind.getType().apply(new INGetAllValuesVisitor(), ctxt));
 			}
-			
-			proved = (po.typeParams == null);	// ie. counterexamples pass and not polymorphic, then PROVED
 		}
 		
-		return new Results(proved ? getName() : null, result, System.currentTimeMillis() - before);
+		return new Results(null, result, System.currentTimeMillis() - before);
 	}
 
 	@Override
