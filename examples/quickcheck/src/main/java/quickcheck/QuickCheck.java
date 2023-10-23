@@ -314,13 +314,14 @@ public class QuickCheck
 		
 		if (!po.isCheckable)
 		{
-			return new Results(null, union, 0);
+			return new Results();
 		}
 		
 		INExpression exp = getINExpression(po);
 		List<INBindingSetter> binds = getINBindList(exp);
 		long before = System.currentTimeMillis();
 		IterableContext ictxt = addTypeParams(po, Interpreter.getInstance().getInitialContext());
+		boolean hasAllValues = false;
 		
 		while (ictxt.hasNext())
 		{
@@ -330,6 +331,11 @@ public class QuickCheck
 			{
 				Results sresults = strategy.getValues(po, exp, binds, ictxt);
 				Map<String, ValueList> cexamples = sresults.counterexamples;
+				
+				if (sresults.provedBy != null)	// No need to go further
+				{
+					return new Results(sresults.provedBy, sresults.hasAllValues, cexamples, System.currentTimeMillis() - before);
+				}
 				
 				for (String bind: cexamples.keySet())
 				{
@@ -343,10 +349,7 @@ public class QuickCheck
 					}
 				}
 				
-				if (sresults.provedBy != null)	// No need to go further
-				{
-					return new Results(sresults.provedBy, cexamples, System.currentTimeMillis() - before);
-				}
+				hasAllValues = hasAllValues || sresults.hasAllValues;	// At least one has all values
 			}
 		
 			for (INBindingSetter bind: binds)
@@ -361,7 +364,7 @@ public class QuickCheck
 			}
 		}
 		
-		return new Results(null, union, System.currentTimeMillis() - before);
+		return new Results(null, hasAllValues, union, System.currentTimeMillis() - before);
 	}
 	
 	public void checkObligation(ProofObligation po, Results results)
@@ -472,6 +475,10 @@ public class QuickCheck
 						if (po.getCheckedExpression() instanceof TCExistsExpression)
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
+						}
+						else if (results.hasAllValues)
+						{
+							outcome = POStatus.PROVED;		// All values were tested and passed, so PROVED
 						}
 						else
 						{

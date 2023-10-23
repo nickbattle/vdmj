@@ -82,15 +82,18 @@ public class TrivialQCStrategy extends QCStrategy
 	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
 	{
 		long before = System.currentTimeMillis();
-		boolean proved = false;
+		String provedBy = null;
 
 		if (po.isCheckable && po.getCheckedExpression() != null)
 		{
 			TrivialQCVisitor visitor = new TrivialQCVisitor();
-			proved = po.getCheckedExpression().apply(visitor, new Stack<TCExpression>());
+			if (po.getCheckedExpression().apply(visitor, new Stack<TCExpression>()))
+			{
+				provedBy = getName();
+			}
 		}
 		
-		return new Results(proved ? getName() : null, new HashMap<String, ValueList>(), System.currentTimeMillis() - before);
+		return new Results(provedBy, false, new HashMap<String, ValueList>(), System.currentTimeMillis() - before);
 	}
 
 	@Override

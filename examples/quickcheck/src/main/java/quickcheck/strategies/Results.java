@@ -24,6 +24,7 @@
 
 package quickcheck.strategies;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fujitsu.vdmj.values.ValueList;
@@ -35,13 +36,23 @@ import com.fujitsu.vdmj.values.ValueList;
  */
 public class Results
 {
-	public final String provedBy;
+	public final String provedBy;			// If set, proved already
+	public final boolean hasAllValues;		// Proved if all counterexamples fail to stop it
 	public final Map<String, ValueList> counterexamples;
-	public final long duration;		// time to generate counterexamples, in millisecs
-	
-	public Results(String proved, Map<String, ValueList> counterexamples, long duration)
+	public final long duration;				// time to generate counterexamples, in millisecs
+
+	public Results()
+	{
+		this.provedBy = null;
+		this.hasAllValues = false;
+		this.counterexamples = new HashMap<String, ValueList>();
+		this.duration = 0;
+	}
+
+	public Results(String proved, boolean hasAllValues, Map<String, ValueList> counterexamples, long duration)
 	{
 		this.provedBy = proved;
+		this.hasAllValues = hasAllValues;
 		this.counterexamples = counterexamples;
 		this.duration = duration;
 	}

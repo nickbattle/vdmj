@@ -139,27 +139,27 @@ public class FiniteQCStrategy extends QCStrategy
 					
 			   		if (product > expansionLimit)
 					{
-			   			return new Results(null, result, 0);	// Too big
+			   			return new Results();	// Too big
 					}
 				}
 				catch (InternalException e)		// Infinite
 				{
-					return new Results(null, result, 0);
+					return new Results();
 				}
 				catch (ArithmeticException e)	// Overflow probably
 				{
-					return new Results(null, result, 0);
+					return new Results();
 				}
 			}
 			
-			// Game on...
+			// Game on... all binds can be expanded
 			for (INBindingSetter bind: binds)
 			{
 				result.put(bind.toString(), bind.getType().apply(new INGetAllValuesVisitor(), ctxt));
 			}
 		}
 		
-		return new Results(null, result, System.currentTimeMillis() - before);
+		return new Results(null, true, result, System.currentTimeMillis() - before);
 	}
 
 	@Override

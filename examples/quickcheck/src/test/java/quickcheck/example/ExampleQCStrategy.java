@@ -104,7 +104,14 @@ public class ExampleQCStrategy extends QCStrategy
 			values.put(bind.toString(), new ValueList());	// ie. nothing, for every bind
 		}
 		
-		return new Results(provedResult ? getName() : null, values, System.currentTimeMillis() - before);	// NOTE proved flag!
+		if (provedResult)
+		{
+			return new Results(getName(), false, values, System.currentTimeMillis() - before);
+		}
+		else
+		{
+			return new Results(null, false, values, System.currentTimeMillis() - before);
+		}
 	}
 
 	@Override

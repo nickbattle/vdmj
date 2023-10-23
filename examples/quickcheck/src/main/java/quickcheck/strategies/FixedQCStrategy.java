@@ -542,7 +542,7 @@ public class FixedQCStrategy extends QCStrategy
 			println(e);
 		}
 		
-		return new Results(null, values, System.currentTimeMillis() - before);
+		return new Results(null, false, values, System.currentTimeMillis() - before);
 	}
 
 	@Override

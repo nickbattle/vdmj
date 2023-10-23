@@ -144,7 +144,7 @@ public class RandomQCStrategy extends QCStrategy
 			}
 		}
 		
-		return new Results(null, result, System.currentTimeMillis() - before);
+		return new Results(null, false, result, System.currentTimeMillis() - before);
 	}
 
 	@Override
