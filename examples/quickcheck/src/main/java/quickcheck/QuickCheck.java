@@ -70,7 +70,7 @@ import com.fujitsu.vdmj.values.ValueList;
 import annotations.IterableContext;
 import annotations.po.POQuickCheckAnnotation;
 import quickcheck.strategies.QCStrategy;
-import quickcheck.strategies.Results;
+import quickcheck.strategies.StrategyResults;
 import quickcheck.visitors.FixedRangeCreator;
 import quickcheck.visitors.TypeBindFinder;
 
@@ -308,13 +308,13 @@ public class QuickCheck
 		return inexp.apply(new TypeBindFinder(), null);
 	}
 	
-	public Results getValues(ProofObligation po)
+	public StrategyResults getValues(ProofObligation po)
 	{
 		Map<String, ValueList> union = new HashMap<String, ValueList>();
 		
 		if (!po.isCheckable)
 		{
-			return new Results();
+			return new StrategyResults();
 		}
 		
 		INExpression exp = getINExpression(po);
@@ -329,12 +329,12 @@ public class QuickCheck
 			
 			for (QCStrategy strategy: strategies)
 			{
-				Results sresults = strategy.getValues(po, exp, binds, ictxt);
+				StrategyResults sresults = strategy.getValues(po, exp, binds, ictxt);
 				Map<String, ValueList> cexamples = sresults.counterexamples;
 				
 				if (sresults.provedBy != null)	// No need to go further
 				{
-					return new Results(sresults.provedBy, sresults.hasAllValues, cexamples, System.currentTimeMillis() - before);
+					return new StrategyResults(sresults.provedBy, sresults.hasAllValues, cexamples, System.currentTimeMillis() - before);
 				}
 				
 				for (String bind: cexamples.keySet())
@@ -364,10 +364,10 @@ public class QuickCheck
 			}
 		}
 		
-		return new Results(null, hasAllValues, union, System.currentTimeMillis() - before);
+		return new StrategyResults(null, hasAllValues, union, System.currentTimeMillis() - before);
 	}
 	
-	public void checkObligation(ProofObligation po, Results results)
+	public void checkObligation(ProofObligation po, StrategyResults results)
 	{
 		try
 		{
@@ -413,9 +413,6 @@ public class QuickCheck
 					}
 				}
 				
-				long before = System.currentTimeMillis();
-				Value result = new BooleanValue(false);
-				ContextException exception = null;
 				Context ctxt = Interpreter.getInstance().getInitialContext();
 				
 				if (Settings.dialect != Dialect.VDM_SL)
@@ -432,6 +429,9 @@ public class QuickCheck
 				}
 				
 				IterableContext ictxt = addTypeParams(po, ctxt);
+				Value execResult = new BooleanValue(false);
+				ContextException exception = null;
+				long before = System.currentTimeMillis();
 
 				try
 				{
@@ -440,35 +440,35 @@ public class QuickCheck
 					do
 					{
 						ictxt.next();
-						result = poexp.eval(ictxt);
+						execResult = poexp.eval(ictxt);
 					}
-					while (ictxt.hasNext() && result.boolValue(ctxt));
+					while (ictxt.hasNext() && execResult.boolValue(ctxt));
 				}
 				catch (ContextException e)
 				{
 					if (e.rawMessage.equals("Execution cancelled"))
 					{
-						result = null;
+						execResult = null;
 					}
 					else
 					{
-						result = new BooleanValue(false);
+						execResult = new BooleanValue(false);
 						exception = e;
 					}
 				}
 				
 				long after = System.currentTimeMillis() + results.duration;
 				
-				if (result == null)		// cancelled
+				if (execResult == null)		// cancelled
 				{
 					println("----");
 					printBindings(bindings);
 					println("----");
 					println(po);
 				}
-				else if (result instanceof BooleanValue)
+				else if (execResult instanceof BooleanValue)
 				{
-					if (result.boolValue(ctxt))
+					if (execResult.boolValue(ctxt))
 					{
 						POStatus outcome = null;
 						
@@ -515,7 +515,7 @@ public class QuickCheck
 				}
 				else
 				{
-					String msg = String.format("Error: PO evaluation returns %s?\n", result.kind());
+					String msg = String.format("Error: PO evaluation returns %s?\n", execResult.kind());
 					printf("PO #%d, %s\n", po.number, msg);
 					po.setStatus(POStatus.FAILED);
 					po.setCounterMessage(msg);
@@ -550,7 +550,6 @@ public class QuickCheck
 		{
 			errorCount++;
 			println(e);
-			return;
 		}
 	}
 	

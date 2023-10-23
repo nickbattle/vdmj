@@ -36,7 +36,7 @@ import dap.DAPResponse;
 import json.JSONObject;
 import lsp.LSPServer;
 import quickcheck.QuickCheck;
-import quickcheck.strategies.Results;
+import quickcheck.strategies.StrategyResults;
 import rpc.RPCRequest;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
@@ -77,7 +77,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 		{
 			for (ProofObligation po: chosen)
 			{
-				Results results = qc.getValues(po);
+				StrategyResults results = qc.getValues(po);
 				
 				if (!qc.hasErrors())
 				{

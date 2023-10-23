@@ -79,7 +79,7 @@ public class TrivialQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
 	{
 		long before = System.currentTimeMillis();
 		String provedBy = null;
@@ -93,7 +93,7 @@ public class TrivialQCStrategy extends QCStrategy
 			}
 		}
 		
-		return new Results(provedBy, false, new HashMap<String, ValueList>(), System.currentTimeMillis() - before);
+		return new StrategyResults(provedBy, false, new HashMap<String, ValueList>(), System.currentTimeMillis() - before);
 	}
 
 	@Override

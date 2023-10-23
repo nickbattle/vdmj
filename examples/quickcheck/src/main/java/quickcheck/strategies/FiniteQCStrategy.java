@@ -121,7 +121,7 @@ public class FiniteQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public Results getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
@@ -139,16 +139,16 @@ public class FiniteQCStrategy extends QCStrategy
 					
 			   		if (product > expansionLimit)
 					{
-			   			return new Results();	// Too big
+			   			return new StrategyResults();	// Too big
 					}
 				}
 				catch (InternalException e)		// Infinite
 				{
-					return new Results();
+					return new StrategyResults();
 				}
 				catch (ArithmeticException e)	// Overflow probably
 				{
-					return new Results();
+					return new StrategyResults();
 				}
 			}
 			
@@ -159,7 +159,7 @@ public class FiniteQCStrategy extends QCStrategy
 			}
 		}
 		
-		return new Results(null, true, result, System.currentTimeMillis() - before);
+		return new StrategyResults(null, true, result, System.currentTimeMillis() - before);
 	}
 
 	@Override
