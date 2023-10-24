@@ -45,6 +45,7 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	private ValueList bindValues = null;
 	private Context bindCounterexample = null;
 	private boolean bindPermuted = false;
+	private boolean bindOverride = false;
 
 	public INMultipleTypeBind(INPatternList plist, TCType type)
 	{
@@ -65,11 +66,13 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 		if (values == null)
 		{
 			bindValues = null;
+			bindOverride = false;
 		}
 		else
 		{
 			bindValues = new ValueList();
 			bindValues.addAll(values);
+			bindOverride = true;
 		}
 	}
 	
@@ -107,7 +110,7 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	@Override
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
-		if (bindValues != null && bindPermuted == permuted && !hasTypeParams)
+		if (bindOverride || (bindValues != null && bindPermuted == permuted && !hasTypeParams))
 		{
 			return bindValues;		// Should be exactly the same
 		}

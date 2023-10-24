@@ -159,7 +159,11 @@ public class FiniteQCStrategy extends QCStrategy
 			}
 		}
 		
-		return new StrategyResults(null, true, result, System.currentTimeMillis() - before);
+		// We can only claim to have all values if there are no parameter types.
+		// The current bind may be finite, but others may not be.
+		boolean hasAll = (po.typeParams == null);
+		
+		return new StrategyResults(null, hasAll, result, System.currentTimeMillis() - before);
 	}
 
 	@Override

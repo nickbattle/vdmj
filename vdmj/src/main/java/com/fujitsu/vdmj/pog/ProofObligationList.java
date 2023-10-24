@@ -220,6 +220,10 @@ public class ProofObligationList extends Vector<ProofObligation>
 					}
 					break;
 					
+				case 3433:	// Parameter type @T not defined, just ignore
+					iter.remove();
+					break;
+					
 				default:	// fine
 					break;
 			}

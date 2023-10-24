@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCNamedType;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCOptionalType;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCProductType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCSeq1Type;
@@ -127,11 +128,11 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 			
 			if (node.location.module.equals(from))
 			{
-				s = node.typename.toString();
+				s = node.typename.toString() + (node.isMaximal() ? "!" : "");
 			}
 			else
 			{
-				s = node.typename.getExplicit(true).toString();
+				s = node.typename.getExplicit(true).toString() + (node.isMaximal() ? "!" : "");;
 			}
 			
 			done.remove(node);
@@ -180,6 +181,12 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 		
 		return all.toString();
 	}
+	
+	@Override
+	public String caseParameterType(TCParameterType node, String arg)
+	{
+		return node.toString();		// Always @T
+	}
 
 	@Override
 	public String caseRecordType(TCRecordType node, String from)
@@ -195,11 +202,11 @@ public class TCExplicitTypeVisitor extends TCTypeVisitor<String, String>
 			
 			if (node.location.module.equals(from))
 			{
-				s = node.name.toString();
+				s = node.name.toString() + (node.isMaximal() ? "!" : "");;
 			}
 			else
 			{
-				s = node.name.getExplicit(true).toString();
+				s = node.name.getExplicit(true).toString() + (node.isMaximal() ? "!" : "");;
 			}
 			
 			done.remove(node);
