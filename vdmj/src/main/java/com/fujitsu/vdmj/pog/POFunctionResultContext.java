@@ -48,12 +48,22 @@ public class POFunctionResultContext extends POContext
 		this.precondition = preconditionCall(name, definition.typeParams, definition.paramPatternList, definition.precondition);
 		this.body = definition.body;
 		this.implicit = false;
+		
+		TCFunctionType lastFunc = definition.type;
+		
+		for (int i=0; i<definition.paramDefinitionList.size(); i++)		// find last curried func
+		{
+			if (lastFunc.result instanceof TCFunctionType)
+			{
+				lastFunc = (TCFunctionType) lastFunc.result;
+			}
+		}
 
 		this.result = new POPatternTypePair(
 			new POIdentifierPattern(
 				new TCNameToken(
 					definition.location, definition.name.getModule(), "RESULT")),
-					definition.type.result);
+					lastFunc.result);
 	}
 
 	public POFunctionResultContext(POImplicitFunctionDefinition definition)
