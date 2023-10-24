@@ -102,8 +102,7 @@ public class POContextStack extends Stack<POContext>
 		result.append(tail);
 		result.append("\n");
 
-		// Finally, we change any polymorphic types to "?" for now
-		return result.toString().replaceAll("@\\w+", "?");
+		return result.toString();
 	}
 	
 	public POAnnotationList getAnnotations()
