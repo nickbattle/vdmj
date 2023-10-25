@@ -30,6 +30,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -70,13 +71,14 @@ public class TotalFunctionObligation extends ProofObligation
 		if (!ftype.parameters.isEmpty())
 		{
 			sep = "";
+			PORemoveIgnoresVisitor.init();
 			
     		for (POPatternList pl: def.paramPatternList)
     		{
     			for (POPattern p: pl)
     			{
     				fapply.append(sep);
-    				fapply.append(p.getMatchingExpression());	// Expands anys
+    				fapply.append(p.removeIgnorePatterns());
 					sep = ", ";
     			}
 

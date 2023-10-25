@@ -26,7 +26,7 @@ package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.expressions.POCaseAlternative;
 import com.fujitsu.vdmj.po.expressions.POCasesExpression;
-import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 
 public class CasesExhaustiveObligation extends ProofObligation
 {
@@ -48,16 +48,16 @@ public class CasesExhaustiveObligation extends ProofObligation
 			}
 			else
 			{
-	    		POGetMatchingExpressionVisitor.init();
+	    		PORemoveIgnoresVisitor.init();
 	    		sb.append("(exists ");
-	    		sb.append(alt.pattern.getMatchingExpression());
+	    		sb.append(alt.pattern.removeIgnorePatterns());
 	    		sb.append(":");
 	    		sb.append(explicitType(exp.expType, exp.location));
 	    		sb.append(" & ");
-	    		POGetMatchingExpressionVisitor.init();
+	    		PORemoveIgnoresVisitor.init();
 	    		sb.append(exp.exp);
 	    		sb.append(" = ");
-	    		sb.append(alt.pattern.getMatchingExpression());
+	    		sb.append(alt.pattern.removeIgnorePatterns());
 	    		sb.append(")");
 			}
 

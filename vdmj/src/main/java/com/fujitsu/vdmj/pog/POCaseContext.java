@@ -26,7 +26,7 @@ package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
-import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 
 public class POCaseContext extends POContext
@@ -56,14 +56,14 @@ public class POCaseContext extends POContext
 		}
 		else
 		{
-			POGetMatchingExpressionVisitor.init();
+			PORemoveIgnoresVisitor.init();
     		sb.append("exists ");
-    		sb.append(pattern.getMatchingExpression());
+    		sb.append(pattern.removeIgnorePatterns());
     		sb.append(":");
     		sb.append(type.toExplicitString(pattern.location));
     		sb.append(" & ");
-			POGetMatchingExpressionVisitor.init();
-			sb.append(pattern.getMatchingExpression());
+    		PORemoveIgnoresVisitor.init();
+			sb.append(pattern.removeIgnorePatterns());
     		sb.append(" = ");
     		sb.append(exp);
 

@@ -33,6 +33,7 @@ import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -85,6 +86,7 @@ public class POFunctionDefinitionContext extends POContext
     		sb.append("forall ");
     		String sep = "";
     		TCFunctionType ftype = deftype;
+    		PORemoveIgnoresVisitor.init();
 
     		for (POPatternList pl: paramPatternList)
     		{
@@ -93,7 +95,7 @@ public class POFunctionDefinitionContext extends POContext
     			for (POPattern p: pl)
     			{
 					sb.append(sep);
-					sb.append(p.getMatchingExpression());	// Expands anys
+					sb.append(p.removeIgnorePatterns());
 					sb.append(":");
 					TCType ptype = types.next();
 					sb.append(ptype.toExplicitString(name.getLocation()));

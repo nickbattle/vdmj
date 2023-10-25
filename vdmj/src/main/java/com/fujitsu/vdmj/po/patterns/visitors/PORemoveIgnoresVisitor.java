@@ -54,7 +54,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 public class PORemoveIgnoresVisitor extends POPatternVisitor<POPattern, Object>
 {
 	private static int var = 1;		// Used in caseIgnorePattern()
-	private TCNameToken anyName = null;
 
 	public static void init()
 	{
@@ -104,11 +103,7 @@ public class PORemoveIgnoresVisitor extends POPatternVisitor<POPattern, Object>
 		// Generate a new "any" name for use during PO generation. The name
 		// must be unique for the pattern instance.
 		
-		if (anyName == null)
-		{
-			anyName = new TCNameToken(node.location, "", "$any" + var++);
-		}
-		
+		TCNameToken anyName = new TCNameToken(node.location, "", "$any" + var++);
 		return new POIdentifierPattern(anyName);
 	}
 	
