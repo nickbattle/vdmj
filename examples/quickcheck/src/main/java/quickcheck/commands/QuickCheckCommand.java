@@ -30,8 +30,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
@@ -135,6 +137,11 @@ public class QuickCheckCommand extends AnalysisCommand
 		if (qc.hasErrors())
 		{
 			return "Failed to find POs";
+		}
+		
+		if (chosen.isEmpty())
+		{
+			return "No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class");
 		}
 		
 		if (qc.initStrategies())

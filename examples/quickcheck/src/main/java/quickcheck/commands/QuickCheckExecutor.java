@@ -27,6 +27,8 @@ package quickcheck.commands;
 import java.io.IOException;
 import java.util.List;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -70,6 +72,12 @@ public class QuickCheckExecutor extends AsyncExecutor
 		if (qc.hasErrors())
 		{
 			answer = "Failed to find POs";
+			return;
+		}
+		
+		if (chosen.isEmpty())
+		{
+			answer = "No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class");
 			return;
 		}
 		
