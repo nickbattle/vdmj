@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.po.definitions;
 
 import java.io.Serializable;
+
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
@@ -68,6 +69,15 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	@Override
 	abstract public String toString();
 	
+	/**
+	 * The definition with its types' module/class(es) explicit, if we are not the same as the
+	 * location of this definition.
+	 */
+	public String toExplicitString(LexLocation from)
+	{
+		return toString();		// Overridden in defs with types
+	}
+
 	@Override
 	public int compareTo(PODefinition o)
 	{

@@ -133,7 +133,7 @@ public class PogTest extends TestCase
 			/* 66 */ "(forall u:U &\n  (let mk_(a, b):U = u in\n    exists mk_(a, b):U & mk_(a, b) = u))\n",
 			/* 67 */ "(forall u:U &\n  (let mk_(a, b):U = u in\n    is_(u, (nat) * (nat))))\n",
 			/* 68 */ "(is_([1, 2, true], T1) and ((is_(1, bool)) and (is_(2, bool)))) or (is_([1, 2, true], T2) and inv_T2([1, 2, true]))\n",
-			/* 69 */ "(forall t:T1 | T2 &\n  (let x:(T1 | T2) = [1, 2, 3, true] in\n    (is_([1, 2, 3, true], T1) and ((is_(1, bool)) and (is_(2, bool)) and (is_(3, bool)))) or (is_([1, 2, 3, true], T2) and inv_T2([1, 2, 3, true]))))\n",
+			/* 69 */ "(forall t:T1 | T2 &\n  (let x:T1 | T2 = [1, 2, 3, true] in\n    (is_([1, 2, 3, true], T1) and ((is_(1, bool)) and (is_(2, bool)) and (is_(3, bool)))) or (is_([1, 2, 3, true], T2) and inv_T2([1, 2, 3, true]))))\n",
 			/* 70 */ "(forall a:T1 | T2 | int &\n  (is_(a, T1) and (is_(a, seq of bool))) or (is_(a, T2) and inv_T2(a)))\n",
 			/* 71 */ "is_({1 |-> \"2\"}, inmap nat1 to seq1 of char)\n",
 			/* 72 */ "(forall n:nat1, x:nat1 &\n  (not (n < 2) =>\n    (n - 1) > 0))\n",

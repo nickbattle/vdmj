@@ -26,7 +26,6 @@ package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
-import com.fujitsu.vdmj.util.Utils;
 
 public class POLetDefContext extends POContext
 {
@@ -57,7 +56,15 @@ public class POLetDefContext extends POContext
 		if (!localDefs.isEmpty())
 		{
 			sb.append("let ");
-			sb.append(Utils.listToString(localDefs));
+			String sep = "";
+			
+			for (PODefinition def: localDefs)
+			{
+				sb.append(sep);
+				sb.append(def.toExplicitString(def.location));
+				sep = ", ";
+			}
+			
 			sb.append(" in");
 		}
 
