@@ -51,10 +51,12 @@ public class POVariableExpression extends POExpression
 	{
 		if (!name.getModule().equals(location.module))
 		{
-			return name.getExplicit(true) + (name.isOld() ? "~" : "");
+			return name.getModule() + "`" + name.getName() + (name.isOld() ? "~" : "");
 		}
-		
-		return name.getName() + (name.isOld() ? "~" : "");
+		else
+		{
+			return name.getName() + (name.isOld() ? "~" : "");
+		}
 	}
 
 	@Override

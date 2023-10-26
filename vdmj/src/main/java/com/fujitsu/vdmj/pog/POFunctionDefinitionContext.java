@@ -113,6 +113,7 @@ public class POFunctionDefinitionContext extends POContext
     		}
 
     		sb.append(" &");
+    		PORemoveIgnoresVisitor.init();
 
     		if (addPrecond && precondition != null)
     		{
