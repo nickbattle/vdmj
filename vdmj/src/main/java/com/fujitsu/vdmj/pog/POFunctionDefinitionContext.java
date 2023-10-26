@@ -57,7 +57,7 @@ public class POFunctionDefinitionContext extends POContext
 		this.deftype = definition.type;
 		this.paramPatternList = definition.paramPatternList;
 		this.addPrecond = precond;
-		POGetMatchingExpressionVisitor.init();
+		PORemoveIgnoresVisitor.init();
 		this.precondition = preconditionCall(name, definition.typeParams, paramPatternList, definition.precondition);
 		this.typeParams = definition.typeParams;
 	}
@@ -70,7 +70,7 @@ public class POFunctionDefinitionContext extends POContext
 		this.deftype = definition.type;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.getParamPatternList();
-		POGetMatchingExpressionVisitor.init();
+		PORemoveIgnoresVisitor.init();
 		this.precondition = preconditionCall(name, definition.typeParams, paramPatternList, definition.precondition);
 		this.typeParams = definition.typeParams;
 	}

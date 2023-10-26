@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCBracketType;
 import com.fujitsu.vdmj.tc.types.TCCharacterType;
+import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
 import com.fujitsu.vdmj.tc.types.TCInMapType;
@@ -64,15 +65,18 @@ import com.fujitsu.vdmj.util.KCombinator;
 import com.fujitsu.vdmj.util.KPermutor;
 import com.fujitsu.vdmj.util.Selector;
 import com.fujitsu.vdmj.values.BooleanValue;
+import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.CharacterValue;
 import com.fujitsu.vdmj.values.FieldMap;
 import com.fujitsu.vdmj.values.FieldValue;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.InvariantValue;
 import com.fujitsu.vdmj.values.MapValue;
+import com.fujitsu.vdmj.values.NameValuePairMap;
 import com.fujitsu.vdmj.values.NaturalOneValue;
 import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.NilValue;
+import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.QuoteValue;
 import com.fujitsu.vdmj.values.RealValue;
@@ -121,6 +125,13 @@ public class RandomRangeCreator extends RangeCreator
 	{
 		// Anything... ?
 		return caseBooleanType(new TCBooleanType(LexLocation.ANY), limit);
+	}
+	
+	@Override
+	public ValueSet caseClassType(TCClassType node, Integer limit)
+	{
+		ObjectValue obj = new ObjectValue(node, new NameValuePairMap(), new Vector<ObjectValue>(), CPUValue.vCPU, null);
+		return new ValueSet(obj);
 	}
 
 	@Override
