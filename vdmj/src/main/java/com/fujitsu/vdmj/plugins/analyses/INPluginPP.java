@@ -77,10 +77,13 @@ public class INPluginPP extends INPlugin
 
    			try
    			{
-   				dbg = new ConsoleDebugReader();
-   				dbg.start();
-   				watcher = new ConsoleKeyWatcher("init");
-   				watcher.start();
+   				if (interactive)
+   				{
+	   				dbg = new ConsoleDebugReader();
+	   				dbg.start();
+	   				watcher = new ConsoleKeyWatcher("init");
+	   				watcher.start();
+   				}
    				
    				interpreter.init();
    			}
