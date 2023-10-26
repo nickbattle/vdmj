@@ -44,7 +44,7 @@ import quickcheck.QuickCheck;
 
 public class FiniteQCStrategy extends QCStrategy
 {
-	private int expansionLimit = 100000;
+	private int expansionLimit = 1024;	// Small and fast?
 	private int errorCount = 0;
 
 	public FiniteQCStrategy(List<String> argv)

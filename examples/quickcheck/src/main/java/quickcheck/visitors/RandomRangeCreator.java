@@ -398,7 +398,7 @@ public class RandomRangeCreator extends RangeCreator
 					break;
 				}
 			}
-			catch (ValueException e)
+			catch (Exception e)		// Can be RuntimeException too
 			{
 				// Invariant omission
 			}

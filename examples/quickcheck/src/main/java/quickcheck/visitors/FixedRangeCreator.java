@@ -387,7 +387,7 @@ public class FixedRangeCreator extends RangeCreator
 					break;
 				}
 			}
-			catch (ValueException e)
+			catch (Exception e)
 			{
 				// Invariant omission
 			}
