@@ -39,7 +39,7 @@ import vdmj.commands.AnalysisCommand;
 
 public class QuickCheckLSPCommand extends AnalysisCommand
 {
-	public final static String CMD = "quickcheck [-?|-help][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges>]";
+	public final static String CMD = "quickcheck [-?|-help][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String USAGE = "Usage: " + CMD;
 	
 	public QuickCheckLSPCommand(String line)
@@ -68,6 +68,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 	public DAPMessageList run(DAPRequest request)
 	{
 		List<Integer> poList = new Vector<Integer>();
+		List<String> poNames = new Vector<String>();
 		QuickCheck qc = new QuickCheck();
 
 		List<String> arglist = new Vector<String>(Arrays.asList(argv));
@@ -119,7 +120,14 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 						break;
 						
 					default:
-						poList.add(Integer.parseInt(arglist.get(i)));
+						try
+						{
+							poList.add(Integer.parseInt(arglist.get(i)));
+						}
+						catch (NumberFormatException e)
+						{
+							poNames.add(arglist.get(i));
+						}
 						break;
 				}
 			}
@@ -135,7 +143,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 			}
 		}
 		
-		QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, poList);
+		QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, poList, poNames);
 		executor.start();
 		return null;
 	}

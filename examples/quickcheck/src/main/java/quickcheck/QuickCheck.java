@@ -241,11 +241,11 @@ public class QuickCheck
 		return names;
 	}
 	
-	public ProofObligationList getPOs(ProofObligationList all, List<Integer> poList)
+	public ProofObligationList getPOs(ProofObligationList all, List<Integer> poList, List<String> poNames)
 	{
 		errorCount = 0;
 		
-		if (poList.isEmpty())
+		if (poList.isEmpty() && poNames.isEmpty())
 		{
 			chosen = new ProofObligationList();
 			String def = Interpreter.getInstance().getDefaultName();
@@ -274,6 +274,17 @@ public class QuickCheck
 				{
 					errorln("PO# " + n + " unknown. Must be between 1 and " + all.size());
 					errorCount++;
+				}
+			}
+			
+			for (String name: poNames)
+			{
+				for (ProofObligation po: all)
+				{
+					if (po.location.module.matches(name) || po.name.matches(name))
+					{
+						chosen.add(po);
+					}
 				}
 			}
 			

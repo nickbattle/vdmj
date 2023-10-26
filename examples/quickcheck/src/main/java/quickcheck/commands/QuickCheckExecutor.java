@@ -47,13 +47,15 @@ public class QuickCheckExecutor extends AsyncExecutor
 {
 	private final QuickCheck qc;
 	private final List<Integer> poList;
+	private final List<String> poNames;
 	private String answer;
 
-	public QuickCheckExecutor(DAPRequest request, QuickCheck qc, List<Integer> poList)
+	public QuickCheckExecutor(DAPRequest request, QuickCheck qc, List<Integer> poList, List<String> poNames)
 	{
 		super("qc", request);
 		this.qc = qc;
 		this.poList = poList;
+		this.poNames = poNames;
 	}
 
 	@Override
@@ -67,7 +69,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 	{
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
-		ProofObligationList chosen = qc.getPOs(all, poList);
+		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
 		
 		if (qc.hasErrors())
 		{

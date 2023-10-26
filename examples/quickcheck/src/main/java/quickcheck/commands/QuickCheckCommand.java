@@ -46,7 +46,7 @@ import quickcheck.strategies.StrategyResults;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges>]";
+	private final static String CMD = "quickcheck [-?|-help][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String USAGE = "Usage: " + CMD;
 			
 	public QuickCheckCommand(String line)
@@ -63,6 +63,7 @@ public class QuickCheckCommand extends AnalysisCommand
 	public String run(String line)
 	{
 		List<Integer> poList = new Vector<Integer>();
+		List<String> poNames = new Vector<String>();
 		QuickCheck qc = new QuickCheck();
 
 		List<String> arglist = new Vector<String>(Arrays.asList(argv));
@@ -114,7 +115,14 @@ public class QuickCheckCommand extends AnalysisCommand
 						break;
 						
 					default:
-						poList.add(Integer.parseInt(arglist.get(i)));
+						try
+						{
+							poList.add(Integer.parseInt(arglist.get(i)));
+						}
+						catch (NumberFormatException e)
+						{
+							poNames.add(arglist.get(i));	// Name patterns
+						}
 						break;
 				}
 			}
@@ -132,7 +140,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
-		ProofObligationList chosen = qc.getPOs(all, poList);
+		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
 		
 		if (qc.hasErrors())
 		{
