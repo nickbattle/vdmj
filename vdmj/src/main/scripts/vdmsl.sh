@@ -76,7 +76,7 @@ do
 	    VMOPTS="$VMOPTS $1"
 	    ;;
 	*)
-	    VDMJOPTS="$VDMJOPTS $1"
+	    VDMJOPTS="$VDMJOPTS \"$1\""
     esac
     shift
 done
@@ -107,15 +107,15 @@ DIALECT=$(basename $0)
 
 if [ "$VDMJ_DEBUG" ]
 then
-	echo "$JAVA64 $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS $@"
+	echo "$JAVA64 $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS"
 fi
 
 if which rlwrap >/dev/null 2>&1
 then
 	# Keep rlwrap output in a separate folder
 	export RLWRAP_HOME=~/.vdmj
-	exec rlwrap "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS "$@"
+	eval exec rlwrap "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS
 else
-	exec "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS "$@"
+	eval exec "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS
 fi
 

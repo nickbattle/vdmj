@@ -30,7 +30,7 @@ do
 	    VMOPTS="$VMOPTS $1"
 	    ;;
 	*)
-		VDMJOPTS="$VDMJOPTS $1"
+		VDMJOPTS="$VDMJOPTS \"$1\""
 		;;
     esac
     shift
@@ -54,7 +54,7 @@ if which rlwrap >/dev/null 2>&1
 then
 	# Keep rlwrap output in a separate folder
 	export RLWRAP_HOME=~/.vdmj
-	exec rlwrap java $VMOPTS -cp $CLASSPATH $MAIN $VDMJOPTS
+	eval exec rlwrap java $VMOPTS -cp $CLASSPATH $MAIN $VDMJOPTS
 else
-	exec java $VMOPTS -cp $CLASSPATH $MAIN $VDMJOPTS
+	eval exec java $VMOPTS -cp $CLASSPATH $MAIN $VDMJOPTS
 fi
