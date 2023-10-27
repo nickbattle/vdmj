@@ -76,10 +76,12 @@ import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
+	private static final long DEFAULT_TIMEOUT = 5 * 1000;	// 5s timeout
 	private int errorCount = 0;
 	private List<QCStrategy> strategies = null;		// Configured to be used
 	private List<QCStrategy> disabled = null;		// Known, but not to be used
 	private ProofObligationList chosen = null;
+	private long timeout = 0;
 	
 	public QuickCheck()
 	{
@@ -168,8 +170,9 @@ public class QuickCheck
 		}
 	}
 	
-	public boolean initStrategies()
+	public boolean initStrategies(long timeoutSecs)
 	{
+		this.timeout = (timeoutSecs == 0) ? DEFAULT_TIMEOUT : timeoutSecs * 1000;
 		boolean doChecks = true;
 		
 		for (QCStrategy strategy: strategies)
@@ -241,11 +244,11 @@ public class QuickCheck
 		return names;
 	}
 	
-	public ProofObligationList getPOs(ProofObligationList all, List<Integer> poList)
+	public ProofObligationList getPOs(ProofObligationList all, List<Integer> poList, List<String> poNames)
 	{
 		errorCount = 0;
 		
-		if (poList.isEmpty())
+		if (poList.isEmpty() && poNames.isEmpty())
 		{
 			chosen = new ProofObligationList();
 			String def = Interpreter.getInstance().getDefaultName();
@@ -274,6 +277,17 @@ public class QuickCheck
 				{
 					errorln("PO# " + n + " unknown. Must be between 1 and " + all.size());
 					errorCount++;
+				}
+			}
+			
+			for (String name: poNames)
+			{
+				for (ProofObligation po: all)
+				{
+					if (po.location.module.matches(name) || po.name.matches(name))
+					{
+						chosen.add(po);
+					}
 				}
 			}
 			
@@ -404,7 +418,7 @@ public class QuickCheck
 					if (values != null)
 					{
 						verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
-						mbind.setBindValues(values);	// Unset in finally clause
+						mbind.setBindValues(values, timeout);
 					}
 					else
 					{
@@ -468,11 +482,26 @@ public class QuickCheck
 				}
 				else if (execResult instanceof BooleanValue)
 				{
+					boolean didTimeout = false;
+					
+					for (INBindingSetter mbind: bindings)
+					{
+						if (mbind.didTimeout())
+						{
+							didTimeout = true;
+							break;
+						}
+					}
+
 					if (execResult.boolValue(ctxt))
 					{
 						POStatus outcome = null;
 						
-						if (po.getCheckedExpression() instanceof TCExistsExpression)
+						if (didTimeout)
+						{
+							outcome = POStatus.TIMEOUT;
+						}
+						else if (po.getCheckedExpression() instanceof TCExistsExpression)
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
 						}
@@ -490,7 +519,12 @@ public class QuickCheck
 					}
 					else
 					{
-						if (po.getCheckedExpression() instanceof TCExistsExpression)
+						if (didTimeout)		// Result would have been true (above), but...
+						{
+							printf("PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
+							po.setStatus(POStatus.TIMEOUT);
+						}
+						else if (po.getCheckedExpression() instanceof TCExistsExpression)
 						{
 							printf("PO #%d, MAYBE %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.MAYBE);
@@ -541,8 +575,8 @@ public class QuickCheck
 			{
 				for (INBindingSetter mbind: bindings)
 				{
-					mbind.setBindValues(null);
-					mbind.setCounterexample(null);
+					mbind.setBindValues(null, 0);
+					mbind.setCounterexample(null, false);
 				}
 			}
 		}
@@ -552,7 +586,7 @@ public class QuickCheck
 			println(e);
 		}
 	}
-	
+
 	private IterableContext addTypeParams(ProofObligation po, Context ctxt)
 	{
 		IterableContext ictxt = new IterableContext(po.location, "Type params", ctxt);

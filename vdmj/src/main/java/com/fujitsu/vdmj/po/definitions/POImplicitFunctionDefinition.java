@@ -30,6 +30,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.PONotYetSpecifiedExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
@@ -168,11 +169,14 @@ public class POImplicitFunctionDefinition extends PODefinition
 				ctxt.pop();
 			}
 
-			ctxt.push(new POFunctionDefinitionContext(this, false));
-			ctxt.push(new POFunctionResultContext(this));
-			obligations.addAll(postcondition.getProofObligations(ctxt, env));
-			ctxt.pop();
-			ctxt.pop();
+			if (!(body instanceof PONotYetSpecifiedExpression))
+			{
+				ctxt.push(new POFunctionDefinitionContext(this, false));
+				ctxt.push(new POFunctionResultContext(this));
+				obligations.addAll(postcondition.getProofObligations(ctxt, env));
+				ctxt.pop();
+				ctxt.pop();
+			}
 		}
 
 		if (measureDef != null && measureName != null && measureName.getName().startsWith("measure_"))

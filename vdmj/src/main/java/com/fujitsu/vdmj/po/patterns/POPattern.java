@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.po.patterns.visitors.POGetAllVarNamesVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetPossibleTypeVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameSet;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -149,6 +150,15 @@ public abstract class POPattern extends PONode implements Serializable
 	public final POExpression getMatchingExpression()
 	{
 		return apply(new POGetMatchingExpressionVisitor(), null);
+	}
+	
+	/**
+	 * Convert a pattern's ignore patterns into "any" identifier patterns.
+	 * This is used in PO generation.
+	 */
+	public final POPattern removeIgnorePatterns()
+	{
+		return apply(new PORemoveIgnoresVisitor(), null);
 	}
 
 	/**

@@ -60,6 +60,18 @@ public class POPatternList extends POMappedList<TCPattern, POPattern>
 		return list;
 	}
 
+	public POPatternList removeIgnorePatterns()
+	{
+		POPatternList list = new POPatternList();
+
+		for (POPattern p: this)
+		{
+			list.add(p.removeIgnorePatterns());
+		}
+
+		return list;
+	}
+
 	public boolean isSimple()
 	{
 		for (POPattern p: this)

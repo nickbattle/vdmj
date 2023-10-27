@@ -39,8 +39,13 @@ public class FunctionApplyObligation extends ProofObligation
 		{
 			sb.append("pre_(");
 			sb.append(root);
-			sb.append(", ");
-			sb.append(Utils.listToString(args));
+			
+			if (!args.isEmpty())
+			{
+				sb.append(", ");
+				sb.append(Utils.listToString(args));
+			}
+			
 			sb.append(")");
 		}
 		else

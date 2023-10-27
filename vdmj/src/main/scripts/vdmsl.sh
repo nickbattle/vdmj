@@ -12,15 +12,14 @@ MAVENREPO=~/.m2/repository/dk/au/ece/vdmj
 
 # Details for 64-bit Java
 JAVA64="/usr/bin/java"
-VMOPTS=${VDMJ_VMOPTS:--Xmx3000m -Xss1m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote}
-VDMJOPTS=${VDMJ_OPTS:--strict}
+VMOPTS=${VDMJ_VMOPTS:--Xmx3000m -Xss1m -Dannotations.debug -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote}
+VDMJOPTS=${VDMJ_OPTS:--strict -annotations}
 
 function help()
 {
-    echo "Usage: $0 [--help|-?] [-P] [-A] <VM and VDMJ options>"
+    echo "Usage: $0 [--help|-?] [-P] <VM and VDMJ options>"
     echo "-P use high precision VDMJ ($PVERSION)"
-    echo "-A use annotation libraries"
-    echo "Set \$VDMJ_VMOPTS and/or \$VDMJ_OPTS to set Java/tool options"
+    echo "Set \$VDMJ_VMOPTS and/or \$VDMJ_OPTS to override Java/tool options"
     echo "Set \$VDMJ_VERSION and \$VDMJ_PVERSION to change versions"
     echo "Set \$VDMJ_ANNOTATIONS and/or \$VDMJ_CLASSPATH for extensions" 
     exit 0
@@ -70,9 +69,6 @@ do
 	--help|-\?)
 	    help
 	    ;;
-	-A)
-	    USE_ANNOTATIONS=1
-	    ;;
 	-P)
 	    VERSION=$PVERSION
 	    ;;
@@ -80,7 +76,7 @@ do
 	    VMOPTS="$VMOPTS $1"
 	    ;;
 	*)
-	    VDMJOPTS="$VDMJOPTS $1"
+	    VDMJOPTS="$VDMJOPTS \"$1\""
     esac
     shift
 done
@@ -93,43 +89,33 @@ VDMJ_JAR=$MAVENREPO/vdmj/${VERSION}/vdmj-${VERSION}.jar
 STDLIB_JAR=$MAVENREPO/stdlib/${VERSION}/stdlib-${VERSION}.jar
 COMMANDS_JAR=$MAVENREPO/cmd-plugins/${VERSION}/cmd-plugins-${VERSION}.jar
 QUICKCHECK_JAR=$MAVENREPO/quickcheck/${VERSION}/quickcheck-${VERSION}.jar
+ANNOTATIONS_JAR=$MAVENREPO/annotations/${VERSION}/annotations-${VERSION}.jar
+ANNOTATIONS2_JAR=$MAVENREPO/annotations2/${VERSION}/annotations2-${VERSION}.jar
 
 check "$VDMJ_JAR"
 check "$STDLIB_JAR"
 check "$COMMANDS_JAR"
 check "$QUICKCHECK_JAR"
+check "$ANNOTATIONS_JAR"
+check "$ANNOTATIONS2_JAR"
 
-CLASSPATH="$VDMJ_JAR:$COMMANDS_JAR:$STDLIB_JAR:$QUICKCHECK_JAR:$VDMJ_CLASSPATH"
+CLASSPATH="$VDMJ_JAR:$COMMANDS_JAR:$STDLIB_JAR:$QUICKCHECK_JAR:$ANNOTATIONS_JAR:$ANNOTATIONS2_JAR:$VDMJ_ANNOTATIONS:$VDMJ_CLASSPATH"
 MAIN="VDMJ"
-
-if [ $USE_ANNOTATIONS ]
-then
-    ANNOTATIONS_JAR=$MAVENREPO/annotations/${VERSION}/annotations-${VERSION}.jar
-    ANNOTATIONS2_JAR=$MAVENREPO/annotations2/${VERSION}/annotations2-${VERSION}.jar
-
-    check "$ANNOTATIONS_JAR"
-    check "$ANNOTATIONS2_JAR"
-
-    VDMJOPTS="$VDMJOPTS -annotations"
-    VMOPTS="$VMOPTS -Dannotations.debug"
-    CLASSPATH="$CLASSPATH:$ANNOTATIONS_JAR:$ANNOTATIONS2_JAR:$VDMJ_ANNOTATIONS"
-fi
-
 
 # The dialect is based on $0, so hard-link this file as vdmsl, vdmpp and vdmrt.
 DIALECT=$(basename $0)
 
 if [ "$VDMJ_DEBUG" ]
 then
-	echo "$JAVA64 $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS $@"
+	echo "$JAVA64 $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS"
 fi
 
 if which rlwrap >/dev/null 2>&1
 then
 	# Keep rlwrap output in a separate folder
 	export RLWRAP_HOME=~/.vdmj
-	exec rlwrap "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS "$@"
+	eval exec rlwrap "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS
 else
-	exec "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS "$@"
+	eval exec "$JAVA64" $VMOPTS -cp $CLASSPATH $MAIN -$DIALECT $VDMJOPTS
 fi
 

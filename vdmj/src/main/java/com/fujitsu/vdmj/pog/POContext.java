@@ -105,7 +105,7 @@ abstract public class POContext
 
 		for (POPatternList plist: paramPatternList)
 		{
-			call.append("(" + plist.getMatchingExpressionList() + ")");
+			call.append("(" + plist.removeIgnorePatterns() + ")");
 		}
 
 		return call.toString();

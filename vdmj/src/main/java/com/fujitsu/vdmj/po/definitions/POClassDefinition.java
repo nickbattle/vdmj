@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCClassType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.FlatEnvironment;
 import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
 
 /**
@@ -93,8 +94,9 @@ public class POClassDefinition extends PODefinition
 				(annotations != null) ? annotations.poBefore(this) : new ProofObligationList();
 		
 		Environment env = new PrivateClassEnvironment(tcdef, publicEnv);
-		list.addAll(definitions.getProofObligations(ctxt, env));
-		list.typeCheck(tcdef.name, env);
+		Environment local = new FlatEnvironment(tcdef.getSelfDefinition(), env);
+		list.addAll(definitions.getProofObligations(ctxt, local));
+		list.typeCheck(tcdef.name, local);
 		
 		if (annotations != null) annotations.poAfter(this, list);
 		return list;

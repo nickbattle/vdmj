@@ -70,7 +70,7 @@ public class POOperationDefinitionContext extends POContext
 			for (POPattern p: paramPatternList)
 			{
 				sb.append(sep);
-				sb.append(p.getMatchingExpression());	// Expands anys
+				sb.append(p.removeIgnorePatterns());
 				sb.append(":");
 				sb.append(types.next());
 				sep = ", ";

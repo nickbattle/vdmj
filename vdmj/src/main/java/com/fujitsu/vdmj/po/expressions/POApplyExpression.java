@@ -34,6 +34,8 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.pog.SeqApplyObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -69,10 +71,15 @@ public class POApplyExpression extends POExpression
 		if (root instanceof POVariableExpression)
 		{
 			POVariableExpression v = (POVariableExpression)root;
+			// Exclude the param types from the TCNameToken...
 			
-			if (!v.name.getModule().equals(location.module))	// explicit external calls
+			if (!v.name.getModule().equals(location.module))
 			{
-				return v.name.getExplicit(true) +  "("+ Utils.listToString(args) + ")";
+				return v.name.getModule() + "`" + v.name.getName() + "("+ Utils.listToString(args) + ")";
+			}
+			else
+			{
+				return v.name.getName() + "("+ Utils.listToString(args) + ")";
 			}
 		}
 
@@ -108,7 +115,27 @@ public class POApplyExpression extends POExpression
 
 			if (type.isFunction(location) && (prename == null || !prename.equals("")))
 			{
-				obligations.add(new FunctionApplyObligation(root, args, prename, ctxt));
+				boolean needed = true;
+				
+				if (type.definitions != null)
+				{
+					TCDefinition def = type.definitions.firstElement();
+					
+					// If the apply is of an explicit curried function, we don't want to
+					// generate a precondition obligation, because we haven't collected
+					// all the curried parameters yet.
+					
+					if (def instanceof TCExplicitFunctionDefinition)
+					{
+						TCExplicitFunctionDefinition edef = (TCExplicitFunctionDefinition)def;
+						needed =!edef.isCurried;
+					}
+				}
+				
+				if (needed)
+				{
+					obligations.add(new FunctionApplyObligation(root, args, prename, ctxt));
+				}
 			}
 
 			int i=0;

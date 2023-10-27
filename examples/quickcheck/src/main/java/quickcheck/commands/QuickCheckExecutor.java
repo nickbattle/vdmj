@@ -27,6 +27,8 @@ package quickcheck.commands;
 import java.io.IOException;
 import java.util.List;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -44,14 +46,18 @@ import workspace.plugins.POPlugin;
 public class QuickCheckExecutor extends AsyncExecutor
 {
 	private final QuickCheck qc;
+	private final long timeout;
 	private final List<Integer> poList;
+	private final List<String> poNames;
 	private String answer;
 
-	public QuickCheckExecutor(DAPRequest request, QuickCheck qc, List<Integer> poList)
+	public QuickCheckExecutor(DAPRequest request, QuickCheck qc, long timeout, List<Integer> poList, List<String> poNames)
 	{
 		super("qc", request);
 		this.qc = qc;
+		this.timeout = timeout;
 		this.poList = poList;
+		this.poNames = poNames;
 	}
 
 	@Override
@@ -65,7 +71,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 	{
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
-		ProofObligationList chosen = qc.getPOs(all, poList);
+		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
 		
 		if (qc.hasErrors())
 		{
@@ -73,7 +79,13 @@ public class QuickCheckExecutor extends AsyncExecutor
 			return;
 		}
 		
-		if (qc.initStrategies())
+		if (chosen.isEmpty())
+		{
+			answer = "No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class");
+			return;
+		}
+		
+		if (qc.initStrategies(timeout))
 		{
 			for (ProofObligation po: chosen)
 			{

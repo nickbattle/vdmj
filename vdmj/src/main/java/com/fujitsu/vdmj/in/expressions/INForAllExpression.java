@@ -65,6 +65,8 @@ public class INForAllExpression extends INExpression
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
+		long start = System.currentTimeMillis();
+		long timeout = getTimeout();
 
 		try
 		{
@@ -85,6 +87,15 @@ public class INForAllExpression extends INExpression
 
 			while (quantifiers.hasNext())
 			{
+				if (timeout > 0)
+				{
+					if (System.currentTimeMillis() - start > timeout)
+					{
+						setCounterexample(null, true);
+						return new BooleanValue(true);
+					}
+				}
+				
 				Context evalContext = new Context(location, "forall", ctxt);
 				NameValuePairList nvpl = quantifiers.next();
 				boolean matches = true;
@@ -111,13 +122,13 @@ public class INForAllExpression extends INExpression
 				{
 					if (matches && !predicate.eval(evalContext).boolValue(ctxt))
 					{
-						setCounterexample(evalContext);
+						setCounterexample(evalContext, false);
 						return new BooleanValue(false);
 					}
 				}
 				catch (ContextException e)
 				{
-					setCounterexample(evalContext);
+					setCounterexample(evalContext, false);
 					throw e;
 				}
 				catch (ValueException e)
@@ -135,9 +146,31 @@ public class INForAllExpression extends INExpression
 	}
 	
 	/**
+	 * This is used by the QuickCheck plugin to limit PO execution times.
+	 */
+	private long getTimeout()
+	{
+		for (INMultipleBind bind: bindList)
+		{
+			if (bind instanceof INBindingSetter)			// Type and multitype binds
+			{
+				INBindingSetter setter = (INBindingSetter)bind;
+				long timeout = setter.getTimeout();
+				
+				if (timeout > 0)
+				{
+					return timeout;
+				}
+			}
+		}
+		
+		return 0;
+	}
+	
+	/**
 	 * This is used by the QuickCheck plugin to report which values failed.
 	 */
-	private void setCounterexample(Context ctxt)
+	private void setCounterexample(Context ctxt, boolean didTimeout)
 	{
 		for (INMultipleBind bind: bindList)
 		{
@@ -147,7 +180,7 @@ public class INForAllExpression extends INExpression
 				
 				if (setter.getBindValues() != null)			// One we care about (set QC values for)
 				{
-					setter.setCounterexample(ctxt);			// Won't overwrite existing one
+					setter.setCounterexample(ctxt, didTimeout);
 					break;									// Just one will do - see QC printFailPath
 				}
 			}

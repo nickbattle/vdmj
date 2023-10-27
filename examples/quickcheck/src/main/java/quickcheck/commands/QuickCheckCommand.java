@@ -30,8 +30,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
@@ -44,7 +46,7 @@ import quickcheck.strategies.StrategyResults;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges>]";
+	private final static String CMD = "quickcheck [-?|-help][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String USAGE = "Usage: " + CMD;
 			
 	public QuickCheckCommand(String line)
@@ -61,6 +63,9 @@ public class QuickCheckCommand extends AnalysisCommand
 	public String run(String line)
 	{
 		List<Integer> poList = new Vector<Integer>();
+		List<String> poNames = new Vector<String>();
+		long timeout = 0;
+		
 		QuickCheck qc = new QuickCheck();
 
 		List<String> arglist = new Vector<String>(Arrays.asList(argv));
@@ -99,6 +104,11 @@ public class QuickCheckCommand extends AnalysisCommand
 						}
 						
 						return null;
+						
+					case "-t":
+						i++;
+						timeout = Integer.parseInt(arglist.get(i));
+						break;
 
 					case "-":
 						i++;
@@ -112,7 +122,14 @@ public class QuickCheckCommand extends AnalysisCommand
 						break;
 						
 					default:
-						poList.add(Integer.parseInt(arglist.get(i)));
+						try
+						{
+							poList.add(Integer.parseInt(arglist.get(i)));
+						}
+						catch (NumberFormatException e)
+						{
+							poNames.add(arglist.get(i));	// Name patterns
+						}
 						break;
 				}
 			}
@@ -123,21 +140,26 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 			catch (NumberFormatException e)
 			{
-				println("Malformed PO#: " + e.getMessage());
+				println("Malformed argument: " + e.getMessage());
 				return USAGE;
 			}
 		}
 		
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
-		ProofObligationList chosen = qc.getPOs(all, poList);
+		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
 		
 		if (qc.hasErrors())
 		{
 			return "Failed to find POs";
 		}
 		
-		if (qc.initStrategies())
+		if (chosen.isEmpty())
+		{
+			return "No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class");
+		}
+		
+		if (qc.initStrategies(timeout))
 		{
 			for (ProofObligation po: chosen)
 			{

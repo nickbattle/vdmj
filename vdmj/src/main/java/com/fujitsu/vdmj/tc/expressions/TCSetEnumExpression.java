@@ -24,6 +24,8 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
+import com.fujitsu.vdmj.Release;
+import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCSet1Type;
@@ -79,7 +81,9 @@ public class TCSetEnumExpression extends TCSetExpression
 		}
 
 		TCType rt = members.isEmpty() ? new TCSetType(location) :
-					new TCSet1Type(location, ts.getType(location));
+						Settings.release == Release.CLASSIC ?
+							new TCSetType(location, ts.getType(location)) :
+							new TCSet1Type(location, ts.getType(location));
 		
 		return possibleConstraint(constraint, rt);
 	}

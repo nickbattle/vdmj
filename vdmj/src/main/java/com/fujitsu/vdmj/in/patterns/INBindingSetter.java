@@ -30,9 +30,11 @@ import com.fujitsu.vdmj.values.ValueList;
 
 public interface INBindingSetter
 {
-	public void setBindValues(ValueList values);
+	public void setBindValues(ValueList values, long timeout);
 	public ValueList getBindValues();
+	public long getTimeout();
+	public boolean didTimeout();
 	public TCType getType();
-	public void setCounterexample(Context ctxt);
+	public void setCounterexample(Context ctxt, boolean didTimeout);
 	public Context getCounterexample();
 }

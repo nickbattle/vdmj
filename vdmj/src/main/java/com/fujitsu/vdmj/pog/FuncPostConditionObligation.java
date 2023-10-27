@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.expressions.POExpressionList;
 import com.fujitsu.vdmj.po.expressions.PONotYetSpecifiedExpression;
 import com.fujitsu.vdmj.po.expressions.POSubclassResponsibilityExpression;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -130,6 +131,8 @@ public class FuncPostConditionObligation extends ProofObligation
 			sb.append("]");
 		}
 
+		POGetMatchingExpressionVisitor.init();
+		
 		for (int i=0; i<size; i++)
 		{
 			POPatternList pl = def.paramPatternList.get(i);

@@ -47,7 +47,7 @@ public class PORecordPattern extends POPattern
 	@Override
 	public String toString()
 	{
-		return "mk_" + type + "(" + Utils.listToString(plist) + ")";
+		return "mk_" + type.toExplicitString(location) + "(" + Utils.listToString(plist) + ")";
 	}
 
 	@Override

@@ -267,7 +267,9 @@ public class SubTypeObligation extends ProofObligation
 				}
 				else
 				{
-					sb.append(invname.getExplicit(true));	// Module`inv_T
+					sb.append(invname.getModule());
+					sb.append("`");
+					sb.append(invname.getName());	// Module`inv_T
 				}
 				
     			sb.append("(");

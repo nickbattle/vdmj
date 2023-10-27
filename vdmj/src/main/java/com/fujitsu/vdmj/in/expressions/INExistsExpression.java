@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
+import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.patterns.INPattern;
@@ -62,6 +63,8 @@ public class INExistsExpression extends INExpression
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
+		long start = System.currentTimeMillis();
+		long timeout = getTimeout();
 
 		try
 		{
@@ -82,6 +85,15 @@ public class INExistsExpression extends INExpression
 
 			while (quantifiers.hasNext())
 			{
+				if (timeout > 0)
+				{
+					if (System.currentTimeMillis() - start > timeout)
+					{
+						setCounterexample(null, true);
+						return new BooleanValue(true);
+					}
+				}
+				
 				Context evalContext = new Context(location, "exists", ctxt);
 				NameValuePairList nvpl = quantifiers.next();
 				boolean matches = true;
@@ -123,6 +135,48 @@ public class INExistsExpression extends INExpression
 	    }
 
 		return new BooleanValue(false);
+	}
+	
+	/**
+	 * This is used by the QuickCheck plugin to limit PO execution times.
+	 */
+	private long getTimeout()
+	{
+		for (INMultipleBind bind: bindList)
+		{
+			if (bind instanceof INBindingSetter)			// Type and multitype binds
+			{
+				INBindingSetter setter = (INBindingSetter)bind;
+				long timeout = setter.getTimeout();
+				
+				if (timeout > 0)
+				{
+					return timeout;
+				}
+			}
+		}
+		
+		return 0;
+	}
+	
+	/**
+	 * This is used by the QuickCheck plugin to report which values failed.
+	 */
+	private void setCounterexample(Context ctxt, boolean didTimeout)
+	{
+		for (INMultipleBind bind: bindList)
+		{
+			if (bind instanceof INBindingSetter)			// Type and multitype binds
+			{
+				INBindingSetter setter = (INBindingSetter)bind;
+				
+				if (setter.getBindValues() != null)			// One we care about (set QC values for)
+				{
+					setter.setCounterexample(ctxt, didTimeout);
+					break;									// Just one will do - see QC printFailPath
+				}
+			}
+		}
 	}
 
 	@Override

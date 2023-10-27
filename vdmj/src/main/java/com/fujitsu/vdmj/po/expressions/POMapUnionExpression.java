@@ -44,12 +44,6 @@ public class POMapUnionExpression extends POBinaryExpression
 	}
 
 	@Override
-	public String toString()
-	{
-		return left + " munion " + right;
-	}
-
-	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt, env);
