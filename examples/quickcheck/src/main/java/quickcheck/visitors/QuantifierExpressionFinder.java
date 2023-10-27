@@ -27,36 +27,45 @@ package quickcheck.visitors;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.in.expressions.INExistsExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.expressions.visitors.INLeafExpressionVisitor;
 
 /**
- * Find all the forall expressions in a PO.
+ * Find all the forall and exists expressions in a PO.
  */
-public class ForallExpressionFinder extends INLeafExpressionVisitor<INForAllExpression, List<INForAllExpression>, Object>
+public class QuantifierExpressionFinder extends INLeafExpressionVisitor<INExpression, List<INExpression>, Object>
 {
-	public ForallExpressionFinder()
+	public QuantifierExpressionFinder()
 	{
 		super(false);
 	}
 
 	@Override
-	protected List<INForAllExpression> newCollection()
+	protected List<INExpression> newCollection()
 	{
-		return new Vector<INForAllExpression>();
+		return new Vector<INExpression>();
 	}
 	
 	@Override
-	public List<INForAllExpression> caseForAllExpression(INForAllExpression node, Object arg)
+	public List<INExpression> caseForAllExpression(INForAllExpression node, Object arg)
 	{
-		List<INForAllExpression> all = super.caseForAllExpression(node, arg);
+		List<INExpression> all = super.caseForAllExpression(node, arg);
 		all.add(node);
 		return all;
 	}
 
 	@Override
-	public List<INForAllExpression> caseExpression(INExpression node, Object arg)
+	public List<INExpression> caseExistsExpression(INExistsExpression node, Object arg)
+	{
+		List<INExpression> all = super.caseExistsExpression(node, arg);
+		all.add(node);
+		return all;
+	}
+	
+	@Override
+	public List<INExpression> caseExpression(INExpression node, Object arg)
 	{
 		return newCollection();
 	}

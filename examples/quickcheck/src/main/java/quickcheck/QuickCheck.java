@@ -41,8 +41,12 @@ import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
+import com.fujitsu.vdmj.in.expressions.INExistsExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INMultipleBind;
+import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
@@ -72,10 +76,12 @@ import annotations.po.POQuickCheckAnnotation;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
 import quickcheck.visitors.FixedRangeCreator;
+import quickcheck.visitors.QuantifierExpressionFinder;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
+	private static final long MULTIBIND_LIMIT = 1000000;
 	private int errorCount = 0;
 	private List<QCStrategy> strategies = null;		// Configured to be used
 	private List<QCStrategy> disabled = null;		// Known, but not to be used
@@ -424,6 +430,33 @@ public class QuickCheck
 					}
 				}
 				
+				// Although individual binds are limited in size, it's possible to have forall
+				// or exists clauses that combine many bindings and hence generate the product
+				// of the sizes, which can easily take too long! So we find these cases and
+				// trim the binding sizes back to a more reasonable product size.
+				
+				for (INExpression quantifier: poexp.apply(new QuantifierExpressionFinder(), null))
+				{
+					if (quantifier instanceof INForAllExpression)
+					{
+						INForAllExpression forall = (INForAllExpression)quantifier;
+						
+						if (limitBindList(forall.bindList))
+						{
+							results.hasAllValues = false;	// because we removed some
+						}
+					}
+					else if (quantifier instanceof INExistsExpression)
+					{
+						INExistsExpression exists = (INExistsExpression) quantifier;
+						
+						if (limitBindList(exists.bindList))
+						{
+							results.hasAllValues = false;	// because we removed some
+						}
+					}
+				}
+				
 				Context ctxt = Interpreter.getInstance().getInitialContext();
 				
 				if (Settings.dialect != Dialect.VDM_SL)
@@ -564,6 +597,50 @@ public class QuickCheck
 		}
 	}
 	
+	private boolean limitBindList(INMultipleBindList bindList)
+	{
+		long size = 1;
+		
+		for (INMultipleBind bind: bindList)
+		{
+			if (bind instanceof INBindingSetter)
+			{
+				INBindingSetter setter = (INBindingSetter) bind;
+				ValueList list = setter.getBindValues();
+				
+				if (list != null)	// should never be, but...
+				{
+					size = size * list.size();
+				}
+			}
+		}
+		
+		if (size > MULTIBIND_LIMIT)
+		{
+			int reduced = (int) Math.pow(MULTIBIND_LIMIT, 1.0 / bindList.size());
+			
+			if (reduced == 0) reduced = 1;
+			
+			for (INMultipleBind bind: bindList)
+			{
+				if (bind instanceof INBindingSetter)
+				{
+					INBindingSetter setter = (INBindingSetter) bind;
+					ValueList list = setter.getBindValues();
+					
+					if (list != null)	// should never be, but...
+					{
+						list.setSize(reduced);
+					}
+				}
+			}
+			
+			return true;
+		}
+		
+		return false;
+	}
+
 	private IterableContext addTypeParams(ProofObligation po, Context ctxt)
 	{
 		IterableContext ictxt = new IterableContext(po.location, "Type params", ctxt);
