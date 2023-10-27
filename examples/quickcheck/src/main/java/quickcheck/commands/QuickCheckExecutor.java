@@ -46,14 +46,16 @@ import workspace.plugins.POPlugin;
 public class QuickCheckExecutor extends AsyncExecutor
 {
 	private final QuickCheck qc;
+	private final long timeout;
 	private final List<Integer> poList;
 	private final List<String> poNames;
 	private String answer;
 
-	public QuickCheckExecutor(DAPRequest request, QuickCheck qc, List<Integer> poList, List<String> poNames)
+	public QuickCheckExecutor(DAPRequest request, QuickCheck qc, long timeout, List<Integer> poList, List<String> poNames)
 	{
 		super("qc", request);
 		this.qc = qc;
+		this.timeout = timeout;
 		this.poList = poList;
 		this.poNames = poNames;
 	}
@@ -83,7 +85,7 @@ public class QuickCheckExecutor extends AsyncExecutor
 			return;
 		}
 		
-		if (qc.initStrategies())
+		if (qc.initStrategies(timeout))
 		{
 			for (ProofObligation po: chosen)
 			{

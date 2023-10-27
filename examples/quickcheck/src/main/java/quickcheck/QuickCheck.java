@@ -41,12 +41,8 @@ import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
-import com.fujitsu.vdmj.in.expressions.INExistsExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingSetter;
-import com.fujitsu.vdmj.in.patterns.INMultipleBind;
-import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
@@ -76,16 +72,16 @@ import annotations.po.POQuickCheckAnnotation;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
 import quickcheck.visitors.FixedRangeCreator;
-import quickcheck.visitors.QuantifierExpressionFinder;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
-	private static final int MULTIBIND_LIMIT = 100000;
+	private static final long DEFAULT_TIMEOUT = 5 * 1000;	// 5s timeout
 	private int errorCount = 0;
 	private List<QCStrategy> strategies = null;		// Configured to be used
 	private List<QCStrategy> disabled = null;		// Known, but not to be used
 	private ProofObligationList chosen = null;
+	private long timeout = 0;
 	
 	public QuickCheck()
 	{
@@ -174,8 +170,9 @@ public class QuickCheck
 		}
 	}
 	
-	public boolean initStrategies()
+	public boolean initStrategies(long timeoutSecs)
 	{
+		this.timeout = (timeoutSecs == 0) ? DEFAULT_TIMEOUT : timeoutSecs * 1000;
 		boolean doChecks = true;
 		
 		for (QCStrategy strategy: strategies)
@@ -421,39 +418,12 @@ public class QuickCheck
 					if (values != null)
 					{
 						verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
-						mbind.setBindValues(values);	// Unset in finally clause
+						mbind.setBindValues(values, timeout);
 					}
 					else
 					{
 						errorln("PO #" + po.number + ": No range defined for " + mbind);
 						errorCount++;
-					}
-				}
-				
-				// Although individual binds are limited in size, it's possible to have forall
-				// or exists clauses that combine many bindings and hence generate the product
-				// of the sizes, which can easily take too long! So we find these cases and
-				// trim the binding sizes back to a more reasonable product size.
-				
-				for (INExpression quantifier: poexp.apply(new QuantifierExpressionFinder(), null))
-				{
-					if (quantifier instanceof INForAllExpression)
-					{
-						INForAllExpression forall = (INForAllExpression)quantifier;
-						
-						if (limitBindList(forall.bindList))
-						{
-							results.hasAllValues = false;	// because we removed some
-						}
-					}
-					else if (quantifier instanceof INExistsExpression)
-					{
-						INExistsExpression exists = (INExistsExpression) quantifier;
-						
-						if (limitBindList(exists.bindList))
-						{
-							results.hasAllValues = false;	// because we removed some
-						}
 					}
 				}
 				
@@ -512,11 +482,26 @@ public class QuickCheck
 				}
 				else if (execResult instanceof BooleanValue)
 				{
+					boolean didTimeout = false;
+					
+					for (INBindingSetter mbind: bindings)
+					{
+						if (mbind.didTimeout())
+						{
+							didTimeout = true;
+							break;
+						}
+					}
+
 					if (execResult.boolValue(ctxt))
 					{
 						POStatus outcome = null;
 						
-						if (po.getCheckedExpression() instanceof TCExistsExpression)
+						if (didTimeout)
+						{
+							outcome = POStatus.TIMEOUT;
+						}
+						else if (po.getCheckedExpression() instanceof TCExistsExpression)
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
 						}
@@ -534,7 +519,12 @@ public class QuickCheck
 					}
 					else
 					{
-						if (po.getCheckedExpression() instanceof TCExistsExpression)
+						if (didTimeout)		// Result would have been true (above), but...
+						{
+							printf("PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
+							po.setStatus(POStatus.TIMEOUT);
+						}
+						else if (po.getCheckedExpression() instanceof TCExistsExpression)
 						{
 							printf("PO #%d, MAYBE %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.MAYBE);
@@ -585,8 +575,8 @@ public class QuickCheck
 			{
 				for (INBindingSetter mbind: bindings)
 				{
-					mbind.setBindValues(null);
-					mbind.setCounterexample(null);
+					mbind.setBindValues(null, 0);
+					mbind.setCounterexample(null, false);
 				}
 			}
 		}
@@ -595,48 +585,6 @@ public class QuickCheck
 			errorCount++;
 			println(e);
 		}
-	}
-	
-	private boolean limitBindList(INMultipleBindList bindList)
-	{
-		long size = 1;
-		
-		for (INMultipleBind bind: bindList)
-		{
-			if (bind instanceof INBindingSetter)
-			{
-				INBindingSetter setter = (INBindingSetter) bind;
-				ValueList list = setter.getBindValues();
-				
-				if (list != null)	// should never be, but...
-				{
-					size = size * list.size();
-				}
-			}
-		}
-		
-		if (size > MULTIBIND_LIMIT)
-		{
-			int reduced = leastPower(bindList.size(), MULTIBIND_LIMIT);
-			
-			for (INMultipleBind bind: bindList)
-			{
-				if (bind instanceof INBindingSetter)
-				{
-					INBindingSetter setter = (INBindingSetter) bind;
-					ValueList list = setter.getBindValues();
-					
-					if (list != null && list.size() > reduced)
-					{
-						list.setSize(reduced);
-					}
-				}
-			}
-			
-			return true;
-		}
-		
-		return false;
 	}
 
 	private IterableContext addTypeParams(ProofObligation po, Context ctxt)
@@ -761,22 +709,5 @@ public class QuickCheck
 	{
 		double duration = (double)(after - before)/1000;
 		return "in " + duration + "s";
-	}
-	
-	/**
-	 * Return the largest x such that x ** n is <= limit.
-	 */
-	private int leastPower(int n, int limit)
-	{
-		if (n < 2)
-		{
-			return limit;
-		}
-		else
-		{
-			int x = 1;
-			while (Math.pow(x, n) < limit) x++;
-			return x - 1;
-		}
 	}
 }

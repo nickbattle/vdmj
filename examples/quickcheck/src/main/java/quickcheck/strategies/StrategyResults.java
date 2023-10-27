@@ -40,7 +40,7 @@ import com.fujitsu.vdmj.values.ValueList;
 public class StrategyResults
 {
 	public final String provedBy;			// If set, proved already
-	public boolean hasAllValues;			// Contains all possible values from all binds
+	public final boolean hasAllValues;		// Contains all possible values from all binds
 	public final Map<String, ValueList> counterexamples;
 	public final long duration;				// time to generate counterexamples, in millisecs
 

@@ -46,7 +46,7 @@ import quickcheck.strategies.StrategyResults;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	private final static String CMD = "quickcheck [-?|-help][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String USAGE = "Usage: " + CMD;
 			
 	public QuickCheckCommand(String line)
@@ -64,6 +64,8 @@ public class QuickCheckCommand extends AnalysisCommand
 	{
 		List<Integer> poList = new Vector<Integer>();
 		List<String> poNames = new Vector<String>();
+		long timeout = 0;
+		
 		QuickCheck qc = new QuickCheck();
 
 		List<String> arglist = new Vector<String>(Arrays.asList(argv));
@@ -102,6 +104,11 @@ public class QuickCheckCommand extends AnalysisCommand
 						}
 						
 						return null;
+						
+					case "-t":
+						i++;
+						timeout = Integer.parseInt(arglist.get(i));
+						break;
 
 					case "-":
 						i++;
@@ -133,7 +140,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 			catch (NumberFormatException e)
 			{
-				println("Malformed PO#: " + e.getMessage());
+				println("Malformed argument: " + e.getMessage());
 				return USAGE;
 			}
 		}
@@ -152,7 +159,7 @@ public class QuickCheckCommand extends AnalysisCommand
 			return "No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class");
 		}
 		
-		if (qc.initStrategies())
+		if (qc.initStrategies(timeout))
 		{
 			for (ProofObligation po: chosen)
 			{

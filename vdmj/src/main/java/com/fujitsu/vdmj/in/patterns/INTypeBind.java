@@ -46,6 +46,8 @@ public class INTypeBind extends INBind implements INBindingSetter
 	private Context bindCounterexample = null;
 	private boolean bindPermuted = false;
 	private boolean bindOverride = false;
+	private long bindTimeout = 0;
+	private boolean didTimeout = false;
 
 	public INTypeBind(INPattern pattern, TCType type)
 	{
@@ -55,19 +57,23 @@ public class INTypeBind extends INBind implements INBindingSetter
 	}
 
 	@Override
-	public void setBindValues(ValueList values)
+	public void setBindValues(ValueList values, long timeout)
 	{
 		if (values == null)
 		{
 			bindValues = null;
 			bindOverride = false;
+			bindTimeout = 0;
 		}
 		else
 		{
 			bindValues = new ValueList();
 			bindValues.addAll(values);
 			bindOverride = true;
+			bindTimeout = timeout;
 		}
+
+		didTimeout = false;
 	}
 
 	@Override
@@ -77,14 +83,28 @@ public class INTypeBind extends INBind implements INBindingSetter
 	}
 	
 	@Override
+	public long getTimeout()
+	{
+		return bindTimeout;
+	}
+
+	@Override
+	public boolean didTimeout()
+	{
+		return didTimeout;
+	}
+
+	@Override
 	public TCType getType()
 	{
 		return type;
 	}
 
 	@Override
-	public void setCounterexample(Context ctxt)
+	public void setCounterexample(Context ctxt, boolean didTimeout)
 	{
+		this.didTimeout = didTimeout;
+		
 		if (ctxt == null)
 		{
 			bindCounterexample = null;
