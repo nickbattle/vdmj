@@ -81,7 +81,7 @@ import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
 {
-	private static final long MULTIBIND_LIMIT = 1000000;
+	private static final int MULTIBIND_LIMIT = 100000;
 	private int errorCount = 0;
 	private List<QCStrategy> strategies = null;		// Configured to be used
 	private List<QCStrategy> disabled = null;		// Known, but not to be used
@@ -617,9 +617,7 @@ public class QuickCheck
 		
 		if (size > MULTIBIND_LIMIT)
 		{
-			int reduced = (int) Math.pow(MULTIBIND_LIMIT, 1.0 / bindList.size());
-			
-			if (reduced == 0) reduced = 1;
+			int reduced = leastPower(bindList.size(), MULTIBIND_LIMIT);
 			
 			for (INMultipleBind bind: bindList)
 			{
@@ -628,7 +626,7 @@ public class QuickCheck
 					INBindingSetter setter = (INBindingSetter) bind;
 					ValueList list = setter.getBindValues();
 					
-					if (list != null)	// should never be, but...
+					if (list != null && list.size() > reduced)
 					{
 						list.setSize(reduced);
 					}
@@ -763,5 +761,22 @@ public class QuickCheck
 	{
 		double duration = (double)(after - before)/1000;
 		return "in " + duration + "s";
+	}
+	
+	/**
+	 * Return the largest x such that x ** n is <= limit.
+	 */
+	private int leastPower(int n, int limit)
+	{
+		if (n < 2)
+		{
+			return limit;
+		}
+		else
+		{
+			int x = 1;
+			while (Math.pow(x, n) < limit) x++;
+			return x - 1;
+		}
 	}
 }
