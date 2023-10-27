@@ -457,7 +457,8 @@ public class TCTypeDefinition extends TCDefinition
 		parameters.add(params);
 
 		TCTypeList ptypes = new TCTypeList();
-		ptypes.add(type.copy(true));
+		TCInvariantType param = type.copy(true);
+		ptypes.add(param);
 
 		TCFunctionType ftype =
 			new TCFunctionType(loc, ptypes, false, new TCBooleanType(loc));
@@ -467,6 +468,10 @@ public class TCTypeDefinition extends TCDefinition
 
 		def.classDefinition = classDefinition;
 		ftype.definitions = new TCDefinitionList(def);
+		
+		param.definitions = new TCDefinitionList(def);
+		param.setInvariant(def);
+		
 		return def;
 	}
 
