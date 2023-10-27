@@ -110,6 +110,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 						return result(request, null);
 						
 					case "-t":
+						i++;
 						timeout = Integer.parseInt(arglist.get(i));
 						break;
 
