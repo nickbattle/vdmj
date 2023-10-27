@@ -1,8 +1,5 @@
 Things still to do with QuickCheck
 
 . Make getValues interruptible as well as checkObligations?
-. Move QC to be part of POPlugin(s)
+. Move QC to be part of POPlugin(s)?
 . Separate IO from calculations (and allow LSP control)
-. Add -file and -func PO selection options?
-. Make Trivial check a QC strategy?
-. Add counterxamples Context chain and other check status settings to POs (for SLSP)
