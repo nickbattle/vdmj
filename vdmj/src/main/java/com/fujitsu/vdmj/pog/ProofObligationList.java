@@ -129,6 +129,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 	
 	public void typeCheck(TCModule tcmodule, MultiModuleEnvironment menv)
 	{
+		renumber();
 		for (ProofObligation po: this)
 		{
 			try
@@ -142,7 +143,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 			{
 				Console.err.println(po.toString());
 				TypeChecker.printErrors(Console.err);
-				Console.err.println(e.getMessage());
+				Console.err.println(e.toString());
 			}
 		}
 	}
@@ -205,22 +206,19 @@ public class ProofObligationList extends Vector<ProofObligation>
 			
 			switch (message.number)
 			{
-				case 3336:	// "Illegal use of RESULT reserved identifier"
-				case 3350:	// "Polymorphic function has not been instantiated"
-					iter.remove();
-					obligation.isCheckable = false;			// No point
-					break;
-					
 				case 3182:	// "Name 'xxx' is not in scope"
 					if (message.message.startsWith("Name 'measure_"))
 					{
 						// Probably an implicit missing measure
 						iter.remove();
-						obligation.isCheckable = false;		// No point
+						obligation.status = POStatus.FAILED;
+						obligation.isCheckable = false;
+						obligation.countermessage = "Error: Missing measure function";
 					}
 					break;
 					
-				case 3433:	// Parameter type @T not defined, just ignore
+				case 3433:	// Parameter type @T not defined
+				case 3336:	// Illegal use of RESULT reserved identifier
 					iter.remove();
 					break;
 					

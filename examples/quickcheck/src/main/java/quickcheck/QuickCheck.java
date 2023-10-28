@@ -403,6 +403,8 @@ public class QuickCheck
 			{
 				po.setStatus(POStatus.PROVED);
 				po.setProvedBy(results.provedBy);
+				po.setCounterexample(null);
+				po.setCounterMessage(null);
 				printf("PO #%d, PROVED by %s strategy %s\n", po.number, results.provedBy, duration(results.duration));
 				return;
 			}
@@ -516,6 +518,8 @@ public class QuickCheck
 						
 						printf("PO #%d, %s %s\n", po.number, outcome.toString().toUpperCase(), duration(before, after));
 						po.setStatus(outcome);
+						po.setCounterexample(null);
+						po.setCounterMessage(null);
 					}
 					else
 					{
@@ -523,11 +527,15 @@ public class QuickCheck
 						{
 							printf("PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.TIMEOUT);
+							po.setCounterexample(null);
+							po.setCounterMessage(null);
 						}
 						else if (po.getCheckedExpression() instanceof TCExistsExpression)
 						{
 							printf("PO #%d, MAYBE %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.MAYBE);
+							po.setCounterexample(null);
+							po.setCounterMessage(null);
 						}
 						else
 						{
@@ -541,6 +549,10 @@ public class QuickCheck
 								println(msg);
 								po.setCounterMessage(msg);
 							}
+							else
+							{
+								po.setCounterMessage(null);
+							}
 							
 							println("----");
 							println(po);
@@ -552,6 +564,7 @@ public class QuickCheck
 					String msg = String.format("Error: PO evaluation returns %s?\n", execResult.kind());
 					printf("PO #%d, %s\n", po.number, msg);
 					po.setStatus(POStatus.FAILED);
+					po.setCounterexample(null);
 					po.setCounterMessage(msg);
 					println("----");
 					printBindings(bindings);
@@ -564,6 +577,7 @@ public class QuickCheck
 				String msg = String.format("Exception: %s", e.getMessage());
 				printf("PO #%d, %s\n", po.number, msg);
 				po.setStatus(POStatus.FAILED);
+				po.setCounterexample(null);
 				po.setCounterMessage(msg);
 				println("----");
 				printBindings(bindings);
