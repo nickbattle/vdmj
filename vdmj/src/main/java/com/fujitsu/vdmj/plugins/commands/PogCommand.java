@@ -35,7 +35,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 
 public class PogCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: pog [<function/operation>]";
+	private final static String USAGE = "Usage: pog [<function/operation> | <number> | <status>]";
 
 	public PogCommand(String line)
 	{
@@ -66,7 +66,8 @@ public class PogCommand extends AnalysisCommand
 			for (ProofObligation obligation: all)
 			{
 				if (obligation.name.startsWith(match) ||
-					Integer.toString(obligation.number).equals(match))
+					Integer.toString(obligation.number).equals(match) ||
+					obligation.status.toString().equalsIgnoreCase(match))
 				{
 					list.add(obligation);
 				}
@@ -75,11 +76,26 @@ public class PogCommand extends AnalysisCommand
 
 		if (list.isEmpty())
 		{
-			println("No proof obligations generated");
+			if (argv.length == 1)
+			{
+				println("No proof obligations generated");
+			}
+			else
+			{
+				println("Found no matching obligations");
+			}
 		}
 		else
 		{
-			println("Generated " + plural(list.size(), "proof obligation", "s") + ":\n");
+			if (argv.length == 1)
+			{
+				println("Generated " + plural(list.size(), "proof obligation", "s") + ":\n");
+			}
+			else
+			{
+				println("Matched " + plural(list.size(), "proof obligation", "s") + ":\n");
+			}
+
 			printf("%s", list.toString());
 		}
 		
