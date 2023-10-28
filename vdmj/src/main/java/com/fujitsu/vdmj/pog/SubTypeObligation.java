@@ -298,6 +298,11 @@ public class SubTypeObligation extends ProofObligation
 					sb.append(s);
 					sb.append(")");
 				}
+				else
+				{
+					sb.append(prefix);
+					addIs(sb, exp, etype);
+				}
 			}
 			else if (etype instanceof TCRecordType)
 			{
