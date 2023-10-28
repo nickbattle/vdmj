@@ -205,7 +205,6 @@ public class ProofObligationList extends Vector<ProofObligation>
 			
 			switch (message.number)
 			{
-				case 3336:	// "Illegal use of RESULT reserved identifier"
 				case 3350:	// "Polymorphic function has not been instantiated"
 					iter.remove();
 					obligation.isCheckable = false;			// No point
@@ -221,6 +220,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 					break;
 					
 				case 3433:	// Parameter type @T not defined, just ignore
+				case 3336:	// "Illegal use of RESULT reserved identifier"
 					iter.remove();
 					break;
 					
