@@ -37,6 +37,8 @@ public class INAnnotatedStatement extends INStatement
 	public final INAnnotation annotation;
 	public final INStatement statement;
 	
+	private static boolean suspended = false;
+	
 	public INAnnotatedStatement(LexLocation location, INAnnotation annotation, INStatement statement)
 	{
 		super(location);
@@ -50,13 +52,18 @@ public class INAnnotatedStatement extends INStatement
 		return annotation + " " + statement;
 	}
 
+	public static void suspend(boolean flag)
+	{
+		suspended = flag;
+	}
+
 	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-		annotation.inBefore(this, ctxt);
+		if (!suspended) annotation.inBefore(this, ctxt);
 		Value rv = statement.eval(ctxt);
-		annotation.inAfter(this, rv, ctxt);
+		if (!suspended) annotation.inAfter(this, rv, ctxt);
 		return rv;
 	}
 	

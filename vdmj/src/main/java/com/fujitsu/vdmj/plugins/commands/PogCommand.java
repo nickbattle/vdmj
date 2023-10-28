@@ -35,7 +35,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 
 public class PogCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: pog [<function/operation> | <number> | <status>]";
+	private final static String USAGE = "Usage: pog [<fn/op name> | <number> | <status>]";
 
 	public PogCommand(String line)
 	{
@@ -58,9 +58,9 @@ public class PogCommand extends AnalysisCommand
 		{
 			list = all;
 		}
-		else
+		else if (argv.length == 2)
 		{
-    		String match = line.substring(line.indexOf(' ') + 1);
+    		String match = argv[1];
 			list = new ProofObligationList();
 
 			for (ProofObligation obligation: all)
@@ -72,6 +72,10 @@ public class PogCommand extends AnalysisCommand
 					list.add(obligation);
 				}
 			}
+		}
+		else
+		{
+			return USAGE;
 		}
 
 		if (list.isEmpty())
