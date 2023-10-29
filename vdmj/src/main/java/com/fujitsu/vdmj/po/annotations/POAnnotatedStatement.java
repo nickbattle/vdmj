@@ -49,7 +49,7 @@ public class POAnnotatedStatement extends POStatement
 	@Override
 	public String toString()
 	{
-		return "/* " + annotation + " */ " + statement;
+		return statement.toString();	// Don't include annotation in PO source
 	}
 	
 	@Override

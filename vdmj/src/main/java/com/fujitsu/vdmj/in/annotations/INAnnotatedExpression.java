@@ -37,8 +37,6 @@ public class INAnnotatedExpression extends INExpression
 	public final INAnnotation annotation;
 	public final INExpression expression;
 	
-	private static boolean suspended = false;
-	
 	public INAnnotatedExpression(LexLocation location, INAnnotation annotation, INExpression expression)
 	{
 		super(location);
@@ -52,18 +50,13 @@ public class INAnnotatedExpression extends INExpression
 		return annotation + " " + expression;
 	}
 
-	public static void suspend(boolean flag)
-	{
-		suspended = flag;
-	}
-
 	@Override
 	public Value eval(Context ctxt)
 	{
 		breakpoint.check(location, ctxt);
-		if (!suspended) annotation.inBefore(this, ctxt);
+		if (!INAnnotation.suspended) annotation.inBefore(this, ctxt);
 		Value rv = expression.eval(ctxt);
-		if (!suspended) annotation.inAfter(this, rv, ctxt);
+		if (!INAnnotation.suspended) annotation.inAfter(this, rv, ctxt);
 		return rv;
 	}
 

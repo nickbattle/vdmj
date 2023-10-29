@@ -174,10 +174,12 @@ public class ProofObligationList extends Vector<ProofObligation>
 		LexTokenReader ltr = new LexTokenReader(obligation.getValue(), Settings.dialect);
 		ExpressionReader reader = new ExpressionReader(ltr);
 		reader.setCurrentModule(mname);
-		boolean old = Properties.parser_maximal_types;
-		Properties.parser_maximal_types = true;		// For parse of PO on inv_T2
+		
+		boolean oldmax = Properties.parser_maximal_types;
+		Properties.parser_maximal_types = true;		// For parse of PO on inv_T(T!)
 		ASTExpression ast = reader.readExpression();
-		Properties.parser_maximal_types = old;
+		Properties.parser_maximal_types = oldmax;
+		
 		LexToken end = ltr.getLast();
 		
 		if (!end.is(Token.EOF))

@@ -49,7 +49,7 @@ public class POAnnotatedExpression extends POExpression
 	@Override
 	public String toString()
 	{
-		return "/* " + annotation + " */ " + expression;
+		return expression.toString();	// Don't include annotation in PO sources
 	}
 	
 	@Override

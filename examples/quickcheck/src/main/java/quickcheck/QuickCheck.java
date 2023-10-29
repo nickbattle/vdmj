@@ -39,8 +39,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
 import com.fujitsu.vdmj.in.INNode;
-import com.fujitsu.vdmj.in.annotations.INAnnotatedExpression;
-import com.fujitsu.vdmj.in.annotations.INAnnotatedStatement;
+import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
@@ -461,8 +460,7 @@ public class QuickCheck
 						
 						// Suspend annotation execution by the interpreter, because the
 						// expressions and statements in the PO can invoke them.
-						INAnnotatedExpression.suspend(true);
-						INAnnotatedStatement.suspend(true);
+						INAnnotation.suspend(true);
 						
 						execResult = poexp.eval(ictxt);
 					}
@@ -482,8 +480,7 @@ public class QuickCheck
 				}
 				finally
 				{
-					INAnnotatedExpression.suspend(false);
-					INAnnotatedStatement.suspend(false);
+					INAnnotation.suspend(false);
 				}
 				
 				long after = System.currentTimeMillis() + results.duration;
