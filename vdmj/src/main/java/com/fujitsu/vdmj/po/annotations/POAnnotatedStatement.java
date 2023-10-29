@@ -43,6 +43,7 @@ public class POAnnotatedStatement extends POStatement
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.statement = statement;
+		setStmttype(statement.getStmttype());
 	}
 
 	@Override

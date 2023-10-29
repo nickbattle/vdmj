@@ -43,6 +43,7 @@ public class POAnnotatedExpression extends POExpression
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.expression = expression;
+		setExptype(expression.getExptype());
 	}
 
 	@Override
