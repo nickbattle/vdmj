@@ -25,6 +25,7 @@
 package workspace.plugins;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +41,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.LSPServer;
 import lsp.Utils;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
@@ -212,7 +214,10 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				
 				json.put("counterexample", values);
 				
-				StringBuilder sb = new StringBuilder("Counterexample: ");
+				StringBuilder sb = new StringBuilder();
+				sb.append("PO #");
+				sb.append(po.number);
+				sb.append(" counterexample: ");
 				String sep = "";
 				
 				for (TCNameToken vname: po.counterexample.keySet())
@@ -230,7 +235,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			
 			if (po.countermessage != null)
 			{
-				json.put("message", po.countermessage);
+				json.put("message", "PO #" + po.number + ": " + po.countermessage);
 				messages.add(new VDMWarning(9001, po.countermessage, po.location));
 				errFiles.add(po.location.file);
 			}
@@ -239,8 +244,20 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		}
 		
 		messagehub.addPluginMessages(this, messages);
-		results.addAll(messagehub.getDiagnosticResponses(errFiles));
+		RPCMessageList errs = messagehub.getDiagnosticResponses(errFiles);
 		
-		return results;
+		for (JSONObject err: errs)
+		{
+			try
+			{
+				LSPServer.getInstance().writeMessage(err);
+			}
+			catch (IOException e)
+			{
+				Diag.error(e);
+			}
+		}
+		
+		return results;		// Just POG display results
 	}
 }
