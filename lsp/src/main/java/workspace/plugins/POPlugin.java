@@ -25,14 +25,23 @@
 package workspace.plugins;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.LSPServer;
 import lsp.Utils;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
@@ -151,8 +160,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	public JSONArray getObligations(File file)
 	{
 		ProofObligationList poGeneratedList = getProofObligations();
-		poGeneratedList.renumber();
 		JSONArray results = new JSONArray();
+		
+		messagehub.clearPluginMessages(this);
+		List<VDMMessage> messages = new Vector<VDMMessage>();
+		Set<File> errFiles = new HashSet<File>();
 		
 		for (ProofObligation po: poGeneratedList)
 		{
@@ -183,16 +195,69 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				name.add(part);
 			}
 
-			results.add(
-				new JSONObject(
+			JSONObject json = new JSONObject(
 					"id",		Long.valueOf(po.number),
 					"kind", 	po.kind.toString(),
 					"name",		name,
 					"location",	Utils.lexLocationToLocation(po.location),
 					"source",	splitPO(po.value),
-					"status",	po.status.toString()));
+					"status",	po.status.toString());
+			
+			if (!po.counterexample.isEmpty())
+			{
+				JSONObject values = new JSONObject();
+				
+				for (TCNameToken vname: po.counterexample.keySet())
+				{
+					values.put(vname.getName(), po.counterexample.get(vname).toString());
+				}
+				
+				json.put("counterexample", values);
+				
+				StringBuilder sb = new StringBuilder();
+				sb.append("PO #");
+				sb.append(po.number);
+				sb.append(" counterexample: ");
+				String sep = "";
+				
+				for (TCNameToken vname: po.counterexample.keySet())
+				{
+					sb.append(sep);
+					sb.append(vname.getName());
+					sb.append(" = ");
+					sb.append(po.counterexample.get(vname));
+					sep = ", ";
+				}
+				
+				messages.add(new VDMWarning(9000, sb.toString(), po.location));
+				errFiles.add(po.location.file);
+			}
+			
+			if (po.countermessage != null)
+			{
+				json.put("message", "PO #" + po.number + ": " + po.countermessage);
+				messages.add(new VDMWarning(9001, po.countermessage, po.location));
+				errFiles.add(po.location.file);
+			}
+			
+			results.add(json);
 		}
 		
-		return results;
+		messagehub.addPluginMessages(this, messages);
+		RPCMessageList errs = messagehub.getDiagnosticResponses(errFiles);
+		
+		for (JSONObject err: errs)
+		{
+			try
+			{
+				LSPServer.getInstance().writeMessage(err);
+			}
+			catch (IOException e)
+			{
+				Diag.error(e);
+			}
+		}
+		
+		return results;		// Just POG display results
 	}
 }

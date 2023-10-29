@@ -43,12 +43,13 @@ public class POAnnotatedExpression extends POExpression
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.expression = expression;
+		setExptype(expression.getExptype());
 	}
 
 	@Override
 	public String toString()
 	{
-		return "/* " + annotation + " */ " + expression;
+		return expression.toString();	// Don't include annotation in PO sources
 	}
 	
 	@Override

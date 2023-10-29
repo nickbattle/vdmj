@@ -79,20 +79,6 @@ public class MessageHub
 	}
 	
 	/**
-	 * This is used by the LSPX workspace manager to add new lspx.plugins.
-	 */
-	public synchronized void addPlugin(AnalysisPlugin plugin)
-	{
-		for (File file: messageMap.keySet())
-		{
-			Map<String, Set<VDMMessage>> pmap = messageMap.get(file);
-			pmap.put(plugin.getName(), new HashSet<VDMMessage>());
-		}
-		
-		Diag.info("Added plugin %s to MessageHub", plugin.getName());
-	}
-	
-	/**
 	 * This is used by the workspace manager to populate a blank plugin map for a
 	 * new file.
 	 */

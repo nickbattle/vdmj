@@ -43,12 +43,13 @@ public class POAnnotatedStatement extends POStatement
 		super(location);
 		this.annotation = (annotation != null) ? annotation : new PONoAnnotation();
 		this.statement = statement;
+		setStmttype(statement.getStmttype());
 	}
 
 	@Override
 	public String toString()
 	{
-		return "/* " + annotation + " */ " + statement;
+		return statement.toString();	// Don't include annotation in PO source
 	}
 	
 	@Override
