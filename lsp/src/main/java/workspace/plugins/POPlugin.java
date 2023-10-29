@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -183,14 +184,32 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				name.add(part);
 			}
 
-			results.add(
-				new JSONObject(
+			JSONObject json = new JSONObject(
 					"id",		Long.valueOf(po.number),
 					"kind", 	po.kind.toString(),
 					"name",		name,
 					"location",	Utils.lexLocationToLocation(po.location),
 					"source",	splitPO(po.value),
-					"status",	po.status.toString()));
+					"status",	po.status.toString());
+			
+			if (!po.counterexample.isEmpty())
+			{
+				JSONObject values = new JSONObject();
+				
+				for (TCNameToken vname: po.counterexample.keySet())
+				{
+					values.put(vname.getName(), po.counterexample.get(vname).toString());
+				}
+				
+				json.put("counterexample", values);
+			}
+			
+			if (po.countermessage != null)
+			{
+				json.put("message", po.countermessage);
+			}
+			
+			results.add(json);
 		}
 		
 		return results;
