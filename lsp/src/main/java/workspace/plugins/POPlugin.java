@@ -25,9 +25,15 @@
 package workspace.plugins;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -152,8 +158,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	public JSONArray getObligations(File file)
 	{
 		ProofObligationList poGeneratedList = getProofObligations();
-		poGeneratedList.renumber();
 		JSONArray results = new JSONArray();
+		
+		messagehub.clearPluginMessages(this);
+		List<VDMMessage> messages = new Vector<VDMMessage>();
+		Set<File> errFiles = new HashSet<File>();
 		
 		for (ProofObligation po: poGeneratedList)
 		{
@@ -202,15 +211,35 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				}
 				
 				json.put("counterexample", values);
+				
+				StringBuilder sb = new StringBuilder("Counterexample: ");
+				String sep = "";
+				
+				for (TCNameToken vname: po.counterexample.keySet())
+				{
+					sb.append(sep);
+					sb.append(vname.getName());
+					sb.append(" = ");
+					sb.append(po.counterexample.get(vname));
+					sep = ", ";
+				}
+				
+				messages.add(new VDMWarning(9000, sb.toString(), po.location));
+				errFiles.add(po.location.file);
 			}
 			
 			if (po.countermessage != null)
 			{
 				json.put("message", po.countermessage);
+				messages.add(new VDMWarning(9001, po.countermessage, po.location));
+				errFiles.add(po.location.file);
 			}
 			
 			results.add(json);
 		}
+		
+		messagehub.addPluginMessages(this, messages);
+		results.addAll(messagehub.getDiagnosticResponses(errFiles));
 		
 		return results;
 	}
