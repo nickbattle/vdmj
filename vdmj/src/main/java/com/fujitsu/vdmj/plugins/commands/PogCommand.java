@@ -108,6 +108,6 @@ public class PogCommand extends AnalysisCommand
 	
 	public static void help()
 	{
-		println("pog [<function/operation/PO#>] - generate proof obligations");
+		println("pog [<fn/op name> | <number> | <status>] - generate proof obligations");
 	}
 }
