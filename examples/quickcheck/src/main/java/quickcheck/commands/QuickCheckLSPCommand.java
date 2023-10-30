@@ -126,15 +126,25 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 						break;
 						
 					default:
+					{
+						String arg = arglist.get(i);
+						
 						try
 						{
-							poList.add(Integer.parseInt(arglist.get(i)));
+							poList.add(Integer.parseInt(arg));
 						}
 						catch (NumberFormatException e)
 						{
-							poNames.add(arglist.get(i));
+							if (arg.startsWith("-"))
+							{
+								println("Unexpected argument: " + arg);
+								return result(request, USAGE);
+							}
+							
+							poNames.add(arg);	// Name patterns
 						}
 						break;
+					}
 				}
 			}
 			catch (IndexOutOfBoundsException e)
