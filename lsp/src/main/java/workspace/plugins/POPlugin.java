@@ -25,7 +25,6 @@
 package workspace.plugins;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,7 +40,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
 import json.JSONObject;
-import lsp.LSPServer;
 import lsp.Utils;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
@@ -157,10 +155,10 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		return array;
 	}
 
-	public JSONArray getObligations(File file)
+	public RPCMessageList getJSONObligations(RPCRequest request, File file)
 	{
 		ProofObligationList poGeneratedList = getProofObligations();
-		JSONArray results = new JSONArray();
+		JSONArray poList = new JSONArray();
 		
 		messagehub.clearPluginMessages(this);
 		List<VDMMessage> messages = new Vector<VDMMessage>();
@@ -240,24 +238,13 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				errFiles.add(po.location.file);
 			}
 			
-			results.add(json);
+			poList.add(json);
 		}
 		
 		messagehub.addPluginMessages(this, messages);
-		RPCMessageList errs = messagehub.getDiagnosticResponses(errFiles);
+		RPCMessageList result = new RPCMessageList(request, poList);
+		result.addAll(messagehub.getDiagnosticResponses(errFiles));
 		
-		for (JSONObject err: errs)
-		{
-			try
-			{
-				LSPServer.getInstance().writeMessage(err);
-			}
-			catch (IOException e)
-			{
-				Diag.error(e);
-			}
-		}
-		
-		return results;		// Just POG display results
+		return result;
 	}
 }

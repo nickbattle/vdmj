@@ -202,8 +202,7 @@ public class LSPXWorkspaceManager
 			}
 			
 			POPlugin po = registry.getPlugin("PO");
-			JSONArray results = po.getObligations(file);
-			return new RPCMessageList(request, results);
+			return po.getJSONObligations(request, file);
 		}
 		catch (Exception e)
 		{
