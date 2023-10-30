@@ -394,11 +394,6 @@ public class QuickCheck
 				printf("PO #%d, UNCHECKED\n", po.number);
 				return;
 			}
-			else if (po.status == POStatus.TRIVIAL)
-			{
-				printf("PO #%d, TRIVIAL by %s\n", po.number, po.proof);
-				return;
-			}
 			else if (results.provedBy != null)
 			{
 				po.setStatus(POStatus.PROVED);

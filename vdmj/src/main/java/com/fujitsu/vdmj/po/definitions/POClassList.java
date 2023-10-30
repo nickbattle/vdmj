@@ -75,7 +75,6 @@ public class POClassList extends POMappedList<TCClassDefinition, POClassDefiniti
 			obligations.addAll(c.getProofObligations(new POContextStack(), new PublicClassEnvironment(tcclasses)));
 		}
 
-		obligations.trivialCheck();
 		return obligations;
 	}
 }

@@ -41,7 +41,6 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public int number;
 	public String value;
 	public POStatus status;
-	public POTrivialProof proof;
 	public boolean isCheckable;
 	public TCTypeList typeParams;
 	public POAnnotationList annotations;
@@ -58,7 +57,6 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.kind = kind;
 		this.name = ctxt.getName();
 		this.status = POStatus.UNPROVED;
-		this.proof = null;
 		this.number = 0;
 		this.isCheckable = ctxt.isCheckable();	// Set false for operation POs
 		this.typeParams = ctxt.getTypeParams();
@@ -126,22 +124,6 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	protected String getVar(String root)
 	{
 		return root + var++;
-	}
-
-	public void trivialCheck()
-	{
-		if (!Boolean.getBoolean("disable.trivial"))
-		{
-			for (POTrivialProof p: POTrivialProof.values())
-			{
-				if (p.proves(value))
-				{
-					status = POStatus.TRIVIAL;
-					proof = p;
-					break;
-				}
-			}
-		}
 	}
 
 	@Override

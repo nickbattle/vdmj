@@ -68,12 +68,6 @@ public class ProofObligationList extends Vector<ProofObligation>
 			sb.append(": (");
 			sb.append(po.status);
 
-			if (po.status == POStatus.TRIVIAL)
-			{
-				sb.append(" by ");
-				sb.append(po.proof);
-			}
-
 			if (po.counterexample != null && !po.counterexample.isEmpty())
 			{
 				sb.append(", Counterexample: ");
@@ -102,14 +96,6 @@ public class ProofObligationList extends Vector<ProofObligation>
 		}
 
 		return sb.toString();
-	}
-
-	public void trivialCheck()
-	{
-		for (ProofObligation po: this)
-		{
-			po.trivialCheck();
-		}
 	}
 
 	public void renumber()

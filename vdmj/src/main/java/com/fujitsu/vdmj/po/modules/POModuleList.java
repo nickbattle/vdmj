@@ -54,7 +54,6 @@ public class POModuleList extends POMappedList<TCModule, POModule>
 			obligations.addAll(m.getProofObligations(menv));
 		}
 
-		obligations.trivialCheck();
 		return obligations;
 	}
 }
