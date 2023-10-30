@@ -28,6 +28,8 @@ import java.util.Stack;
 
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
+import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCElseIfExpression;
 import com.fujitsu.vdmj.tc.expressions.TCEqualsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -36,6 +38,7 @@ import com.fujitsu.vdmj.tc.expressions.TCIfExpression;
 import com.fujitsu.vdmj.tc.expressions.TCImpliesExpression;
 import com.fujitsu.vdmj.tc.expressions.TCInSetExpression;
 import com.fujitsu.vdmj.tc.expressions.TCIntegerLiteralExpression;
+import com.fujitsu.vdmj.tc.expressions.TCLetDefExpression;
 import com.fujitsu.vdmj.tc.expressions.TCMapEnumExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotEqualExpression;
 import com.fujitsu.vdmj.tc.expressions.TCNotExpression;
@@ -62,6 +65,14 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 	{
 	}
 	
+	private void pops(Stack<TCExpression> truths, int pushes)
+	{
+		for (int i=0; i<pushes; i++)
+		{
+			truths.pop();
+		}
+	}
+
 	@Override
 	public Boolean caseForAllExpression(TCForAllExpression node, Stack<TCExpression> truths)
 	{
@@ -84,19 +95,44 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 							new LexKeywordToken(Token.INSET, sbind.location),
 							sbind.set));
 						
-						pushes++;	// eg. "x in set S" is always true here
+						pushes++;
 					}
 				}
 			}
 		}
 		
 		boolean result = node.predicate.apply(this, truths);
+		pops(truths, pushes);
+		return result;
+	}
+	
+	@Override
+	public Boolean caseLetDefExpression(TCLetDefExpression node, Stack<TCExpression> truths)
+	{
+		int pushes = 0;
 		
-		for (int i=0; i<pushes; i++)
+		for (TCDefinition def: node.localDefs)
 		{
-			truths.pop();
+			if (def instanceof TCValueDefinition)
+			{
+				TCValueDefinition vdef = (TCValueDefinition)def;
+				
+				if (vdef.pattern instanceof TCIdentifierPattern)
+				{
+					TCIdentifierPattern id = (TCIdentifierPattern)vdef.pattern;
+
+					truths.push(new TCEqualsExpression(
+							new TCVariableExpression(id.location, id.name, id.toString()),
+							new LexKeywordToken(Token.EQUALS, id.location),
+							vdef.exp));
+						
+					pushes++;
+				}
+			}
 		}
 		
+		boolean result = node.expression.apply(this, truths);
+		pops(truths, pushes);
 		return result;
 	}
 	
@@ -123,12 +159,7 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 		}
 
 		result = result && node.elseExp.apply(this, truths);
-		
-		for (int i=0; i<pushes; i++)
-		{
-			truths.pop();
-		}
-
+		pops(truths, pushes);
 		return result;		// All paths always true
 	}
 	
@@ -136,13 +167,13 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 	public Boolean caseImpliesExpression(TCImpliesExpression node, Stack<TCExpression> truths)
 	{
 		truths.push(node.left);
-		int pops = 1;
+		int pushes = 1;
 
 		if (node.left instanceof TCEqualsExpression)
 		{
 			TCEqualsExpression eq = (TCEqualsExpression)node.left;
 			truths.push(new TCNotEqualExpression(eq.left, new LexKeywordToken(Token.NE, eq.location), eq.right));
-			pops++;
+			pushes++;
 		}
 		else if (node.left instanceof TCNotExpression)
 		{
@@ -152,17 +183,12 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 			{
 				TCEqualsExpression eq = (TCEqualsExpression)nexp.exp;
 				truths.push(new TCNotEqualExpression(eq.left, new LexKeywordToken(Token.NE, eq.location), eq.right));
-				pops++;
+				pushes++;
 			}
 		}
 		
 		boolean result = node.right.apply(this, truths);
-		
-		for (int i=0; i<pops; i++)
-		{
-			truths.pop();
-		}
-		
+		pops(truths, pushes);
 		return result;
 	}
 	

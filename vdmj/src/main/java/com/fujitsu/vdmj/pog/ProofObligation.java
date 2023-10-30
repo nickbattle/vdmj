@@ -130,13 +130,16 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 
 	public void trivialCheck()
 	{
-		for (POTrivialProof p: POTrivialProof.values())
+		if (!Boolean.getBoolean("disable.trivial"))
 		{
-			if (p.proves(value))
+			for (POTrivialProof p: POTrivialProof.values())
 			{
-				status = POStatus.TRIVIAL;
-				proof = p;
-				break;
+				if (p.proves(value))
+				{
+					status = POStatus.TRIVIAL;
+					proof = p;
+					break;
+				}
 			}
 		}
 	}
