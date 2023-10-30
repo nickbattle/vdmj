@@ -25,10 +25,7 @@
 package workspace.plugins;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
@@ -41,7 +38,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
 import json.JSONObject;
-import lsp.LSPServer;
 import lsp.Utils;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
@@ -157,14 +153,13 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		return array;
 	}
 
-	public JSONArray getObligations(File file)
+	public RPCMessageList getJSONObligations(RPCRequest request, File file)
 	{
 		ProofObligationList poGeneratedList = getProofObligations();
-		JSONArray results = new JSONArray();
+		JSONArray poList = new JSONArray();
 		
 		messagehub.clearPluginMessages(this);
 		List<VDMMessage> messages = new Vector<VDMMessage>();
-		Set<File> errFiles = new HashSet<File>();
 		
 		for (ProofObligation po: poGeneratedList)
 		{
@@ -230,34 +225,21 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				}
 				
 				messages.add(new VDMWarning(9000, sb.toString(), po.location));
-				errFiles.add(po.location.file);
 			}
 			
 			if (po.countermessage != null)
 			{
 				json.put("message", "PO #" + po.number + ": " + po.countermessage);
 				messages.add(new VDMWarning(9001, po.countermessage, po.location));
-				errFiles.add(po.location.file);
 			}
 			
-			results.add(json);
+			poList.add(json);
 		}
 		
 		messagehub.addPluginMessages(this, messages);
-		RPCMessageList errs = messagehub.getDiagnosticResponses(errFiles);
+		RPCMessageList result = new RPCMessageList(request, poList);
+		result.addAll(messagehub.getDiagnosticResponses());
 		
-		for (JSONObject err: errs)
-		{
-			try
-			{
-				LSPServer.getInstance().writeMessage(err);
-			}
-			catch (IOException e)
-			{
-				Diag.error(e);
-			}
-		}
-		
-		return results;		// Just POG display results
+		return result;
 	}
 }
