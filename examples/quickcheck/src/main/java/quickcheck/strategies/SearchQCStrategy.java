@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ValueException;
-import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.values.NameValuePair;
 import com.fujitsu.vdmj.values.NameValuePairList;
 import com.fujitsu.vdmj.values.Value;
@@ -90,7 +89,7 @@ public class SearchQCStrategy extends QCStrategy
 
 		if (po.isCheckable && po.getCheckedExpression() != null)
 		{
-			boolean exists = po.getCheckedExpression() instanceof TCExistsExpression;
+			boolean exists = po.kind.isExistential();
 			NameValuePairList nvps = po.getCheckedExpression().apply(new SearchQCVisitor(exists), null);
 			
 			for (NameValuePair pair: nvps)
