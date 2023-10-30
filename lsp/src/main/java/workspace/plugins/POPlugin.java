@@ -25,9 +25,7 @@
 package workspace.plugins;
 
 import java.io.File;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
@@ -162,7 +160,6 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		
 		messagehub.clearPluginMessages(this);
 		List<VDMMessage> messages = new Vector<VDMMessage>();
-		Set<File> errFiles = new HashSet<File>();
 		
 		for (ProofObligation po: poGeneratedList)
 		{
@@ -228,14 +225,12 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				}
 				
 				messages.add(new VDMWarning(9000, sb.toString(), po.location));
-				errFiles.add(po.location.file);
 			}
 			
 			if (po.countermessage != null)
 			{
 				json.put("message", "PO #" + po.number + ": " + po.countermessage);
 				messages.add(new VDMWarning(9001, po.countermessage, po.location));
-				errFiles.add(po.location.file);
 			}
 			
 			poList.add(json);
@@ -243,7 +238,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		
 		messagehub.addPluginMessages(this, messages);
 		RPCMessageList result = new RPCMessageList(request, poList);
-		result.addAll(messagehub.getDiagnosticResponses(errFiles));
+		result.addAll(messagehub.getDiagnosticResponses());
 		
 		return result;
 	}
