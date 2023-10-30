@@ -55,7 +55,6 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ObjectContext;
-import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
@@ -513,7 +512,7 @@ public class QuickCheck
 						{
 							outcome = POStatus.TIMEOUT;
 						}
-						else if (po.getCheckedExpression() instanceof TCExistsExpression)
+						else if (po.kind.isExistential())
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
 						}
@@ -540,7 +539,7 @@ public class QuickCheck
 							po.setCounterexample(null);
 							po.setCounterMessage(null);
 						}
-						else if (po.getCheckedExpression() instanceof TCExistsExpression)
+						else if (po.kind.isExistential())	// Principal exp is "exists..."
 						{
 							printf("PO #%d, MAYBE %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.MAYBE);
