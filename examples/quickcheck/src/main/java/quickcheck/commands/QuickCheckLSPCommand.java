@@ -26,6 +26,7 @@ package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
@@ -37,8 +38,9 @@ import quickcheck.QuickCheck;
 import quickcheck.strategies.QCStrategy;
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.InitRunnable;
+import vdmj.commands.ScriptRunnable;
 
-public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnable
+public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnable, ScriptRunnable
 {
 	public final static String CMD = "quickcheck [-?|-help][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String USAGE = "Usage: " + CMD;
@@ -195,6 +197,12 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		}
 		
 		return "OK";
+	}
+
+	@Override
+	public String scriptRun(DAPRequest request) throws IOException
+	{
+		return initRun(request);
 	}
 
 	@Override
