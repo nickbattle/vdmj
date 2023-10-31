@@ -122,15 +122,25 @@ public class QuickCheckCommand extends AnalysisCommand
 						break;
 						
 					default:
+					{
+						String arg = arglist.get(i);
+						
 						try
 						{
-							poList.add(Integer.parseInt(arglist.get(i)));
+							poList.add(Integer.parseInt(arg));
 						}
 						catch (NumberFormatException e)
 						{
-							poNames.add(arglist.get(i));	// Name patterns
+							if (arg.startsWith("-"))
+							{
+								println("Unexpected argument: " + arg);
+								return USAGE;
+							}
+							
+							poNames.add(arg);	// Name patterns
 						}
 						break;
+					}
 				}
 			}
 			catch (IndexOutOfBoundsException e)

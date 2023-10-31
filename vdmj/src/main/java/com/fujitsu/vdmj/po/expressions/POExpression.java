@@ -145,7 +145,7 @@ public abstract class POExpression extends PONode implements Serializable
 	{
 		ProofObligationList obligations = new ProofObligationList();
 		
-		if (exp.getExptype().isUnion(location))
+		if (exp.getExptype() != null && exp.getExptype().isUnion(location))
 		{
 			TCUnionType ut = exp.getExptype().getUnion();
 			TCTypeSet sets = ut.getMatches(qualifier);

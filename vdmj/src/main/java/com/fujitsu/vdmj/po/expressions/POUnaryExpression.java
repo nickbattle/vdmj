@@ -51,7 +51,7 @@ abstract public class POUnaryExpression extends POExpression
 	{
 		ProofObligationList list = exp.getProofObligations(ctxt, env);
 		
-		if (exp.getExptype().isUnion(location))
+		if (exp.getExptype() != null && exp.getExptype().isUnion(location))
 		{
 			TCUnionType ut = exp.getExptype().getUnion();
 			TCTypeSet sets = ut.getMatches(getQualifier());
