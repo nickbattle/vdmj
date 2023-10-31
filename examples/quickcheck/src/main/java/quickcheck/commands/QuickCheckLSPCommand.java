@@ -36,11 +36,17 @@ import json.JSONObject;
 import quickcheck.QuickCheck;
 import quickcheck.strategies.QCStrategy;
 import vdmj.commands.AnalysisCommand;
+import vdmj.commands.InitRunnable;
 
-public class QuickCheckLSPCommand extends AnalysisCommand
+public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnable
 {
 	public final static String CMD = "quickcheck [-?|-help][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String USAGE = "Usage: " + CMD;
+	
+	private List<Integer> poList = new Vector<Integer>();
+	private List<String> poNames = new Vector<String>();
+	private long timeout = 0;
+	private QuickCheck qc = new QuickCheck();
 	
 	public QuickCheckLSPCommand(String line)
 	{
@@ -64,14 +70,8 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 		}
 	}
 
-	@Override
-	public DAPMessageList run(DAPRequest request)
+	private DAPMessageList setup(DAPRequest request)
 	{
-		List<Integer> poList = new Vector<Integer>();
-		List<String> poNames = new Vector<String>();
-		long timeout = 0;
-		QuickCheck qc = new QuickCheck();
-
 		List<String> arglist = new Vector<String>(Arrays.asList(argv));
 		arglist.remove(0);	// "qc"
 		qc.loadStrategies(arglist);
@@ -159,9 +159,42 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 			}
 		}
 		
-		QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames);
-		executor.start();
 		return null;
+	}
+
+	@Override
+	public DAPMessageList run(DAPRequest request)
+	{
+		DAPMessageList errs = setup(request);
+		
+		if (errs == null)
+		{
+			QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames);
+			executor.start();
+		}
+		
+		return errs;
+	}
+	
+	@Override
+	public String initRun(DAPRequest request)
+	{
+		DAPMessageList errs = setup(request);
+		
+		if (errs == null)
+		{
+			try
+			{
+				QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames);
+				executor.exec();	// Note, not start!
+			}
+			catch (Exception e)
+			{
+				return e.getMessage();
+			}
+		}
+		
+		return "OK";
 	}
 
 	@Override
@@ -174,5 +207,17 @@ public class QuickCheckLSPCommand extends AnalysisCommand
 	public boolean notWhenDirty()
 	{
 		return true;
+	}
+
+	@Override
+	public String getExpression()
+	{
+		return "quickcheck";
+	}
+
+	@Override
+	public String format(String result)
+	{
+		return result;
 	}
 }
