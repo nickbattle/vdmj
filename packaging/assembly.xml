@@ -20,17 +20,13 @@
 			<fileMode>0777</fileMode>
 		</file>
 		<file>
-			<source>src/main/scripts/vscode.sh</source>
-			<destName>vscode.sh</destName>
+			<source>src/main/scripts/vsix.sh</source>
+			<destName>vsix.sh</destName>
 			<fileMode>0777</fileMode>
 		</file>
 		<file>
 			<source>src/main/scripts/README_VDMJ</source>
 			<destName>README_VDMJ</destName>
-		</file>
-		<file>
-			<source>src/main/scripts/README_VSCODE</source>
-			<destName>README_VSCODE</destName>
 		</file>
 	</files>
 	
