@@ -190,6 +190,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 				QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames);
 				executor.exec();	// Note, not start!
 				executor.clean();	// Send POG updated notification
+				return executor.getAnswer();
 			}
 			catch (Exception e)
 			{
@@ -197,7 +198,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 			}
 		}
 		
-		return "OK";
+		return "Failed";
 	}
 
 	@Override

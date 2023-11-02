@@ -125,4 +125,9 @@ public class QuickCheckExecutor extends AsyncExecutor
 		
 		running = null;
 	}
+	
+	public String getAnswer()
+	{
+		return answer;
+	}
 }
