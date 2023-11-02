@@ -26,6 +26,9 @@ package lsp.workspace;
 
 import java.io.File;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Vector;
+
 import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPHandler;
@@ -64,6 +67,7 @@ public class DidChangeWSHandler extends LSPHandler
 			JSONObject params = request.get("params");
 			JSONArray changes = params.get("changes");
 			int actionCode = 0;
+			List<File> deleted = new Vector<File>();
 			
 			for (Object fileEvent: changes)
 			{
@@ -82,6 +86,11 @@ public class DidChangeWSHandler extends LSPHandler
 						{
 							actionCode = code;
 						}
+						
+						if (type == WatchKind.DELETE)
+						{
+							deleted.add(file);
+						}
 					}
 					else
 					{
@@ -93,7 +102,7 @@ public class DidChangeWSHandler extends LSPHandler
 			// Do rebuilding and type checking after ALL the changes are processed
 			// This can return null, since didChangeWatchedFiles is a notification.
 			
-			return LSPWorkspaceManager.getInstance().afterChangeWatchedFiles(request, actionCode);
+			return LSPWorkspaceManager.getInstance().afterChangeWatchedFiles(request, actionCode, deleted);
 		}
 		catch (URISyntaxException e)
 		{
