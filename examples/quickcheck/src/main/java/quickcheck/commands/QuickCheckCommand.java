@@ -75,7 +75,8 @@ public class QuickCheckCommand extends AnalysisCommand
 		
 		if (qc.hasErrors())
 		{
-			return "Failed to load QC strategies";
+			errorln("Failed to load QC strategies");
+			return null;
 		}
 		
 		QCConsole.setQuiet(false);
@@ -168,12 +169,14 @@ public class QuickCheckCommand extends AnalysisCommand
 		
 		if (qc.hasErrors())
 		{
-			return "Failed to find POs";
+			errorln("Failed to find POs");
+			return null;
 		}
 		
 		if (chosen.isEmpty())
 		{
-			return "No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class");
+			errorln("No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class"));
+			return null;
 		}
 		
 		if (qc.initStrategies(timeout))
