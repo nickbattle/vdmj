@@ -1105,16 +1105,18 @@ public class LSPWorkspaceManager
 		return actionCode;
 	}
 
-	public RPCMessageList afterChangeWatchedFiles(RPCRequest request, int actionCode) throws Exception
+	public RPCMessageList afterChangeWatchedFiles(RPCRequest request, int actionCode, List<File> deleted) throws Exception
 	{
 		if (actionCode == RELOAD_AND_CHECK)
 		{
 			loadAllProjectFiles();
 		}
 		
+		RPCMessageList results = null;
+		
 		if (actionCode == RELOAD_AND_CHECK || actionCode == RECHECK)
 		{
-			RPCMessageList results = checkLoadedFiles("after change watched");
+			results = checkLoadedFiles("after change watched");
 			
 			if (hasClientCapability("workspace.codeLens.refreshSupport") ||
 				hasClientCapability("experimental.codeLens.refreshSupport"))
@@ -1122,12 +1124,19 @@ public class LSPWorkspaceManager
 				results.add(RPCRequest.create("workspace/codeLens/refresh", null));
 			}
 			
-			return results;
+			// Send publishDiagnostics for any deleted files, to clear messages
+			
+			if (deleted != null)
+			{
+				for (File file: deleted)
+				{
+					JSONObject params = new JSONObject("uri", file.toURI().toString(), "diagnostics", new JSONArray());
+					results.add(RPCRequest.notification("textDocument/publishDiagnostics", params));
+				}
+			}
 		}
-		else
-		{
-			return null;	// The didChangeWatchedFiles is a notification, so no reply needed.
-		}
+		
+		return results;		// Can be null, if DO_NOTHING
 	}
 
 	public RPCMessageList lspDefinition(RPCRequest request, File file, long zline, long zcol)

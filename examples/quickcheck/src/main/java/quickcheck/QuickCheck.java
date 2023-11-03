@@ -24,10 +24,10 @@
 
 package quickcheck;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+import static quickcheck.commands.QCConsole.errorln;
+import static quickcheck.commands.QCConsole.infof;
+import static quickcheck.commands.QCConsole.infoln;
+import static quickcheck.commands.QCConsole.verbose;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -391,7 +391,7 @@ public class QuickCheck
 
 			if (!po.isCheckable)
 			{
-				printf("PO #%d, UNCHECKED\n", po.number);
+				infof("PO #%d, UNCHECKED\n", po.number);
 				return;
 			}
 			else if (results.provedBy != null)
@@ -400,7 +400,7 @@ public class QuickCheck
 				po.setProvedBy(results.provedBy);
 				po.setCounterexample(null);
 				po.setCounterMessage(null);
-				printf("PO #%d, PROVED by %s strategy %s\n", po.number, results.provedBy, duration(results.duration));
+				infof("PO #%d, PROVED by %s strategy %s\n", po.number, results.provedBy, duration(results.duration));
 				return;
 			}
 
@@ -481,10 +481,10 @@ public class QuickCheck
 				
 				if (execResult == null)		// cancelled
 				{
-					println("----");
+					infoln("----");
 					printBindings(bindings);
-					println("----");
-					println(po);
+					infoln("----");
+					infoln(po);
 				}
 				else if (execResult instanceof BooleanValue)
 				{
@@ -520,7 +520,7 @@ public class QuickCheck
 							outcome = POStatus.MAYBE;
 						}
 						
-						printf("PO #%d, %s %s\n", po.number, outcome.toString().toUpperCase(), duration(before, after));
+						infof("PO #%d, %s %s\n", po.number, outcome.toString().toUpperCase(), duration(before, after));
 						po.setStatus(outcome);
 						po.setCounterexample(null);
 						po.setCounterMessage(null);
@@ -529,28 +529,28 @@ public class QuickCheck
 					{
 						if (didTimeout)		// Result would have been true (above), but...
 						{
-							printf("PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
+							infof("PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.TIMEOUT);
 							po.setCounterexample(null);
 							po.setCounterMessage(null);
 						}
 						else if (po.kind.isExistential())	// Principal exp is "exists..."
 						{
-							printf("PO #%d, MAYBE %s\n", po.number, duration(before, after));
+							infof("PO #%d, MAYBE %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.MAYBE);
 							po.setCounterexample(null);
 							po.setCounterMessage(null);
 						}
 						else
 						{
-							printf("PO #%d, FAILED %s: ", po.number, duration(before, after));
+							infof("PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
 							po.setCounterexample(printFailPath(bindings));
 							
 							if (exception != null)
 							{
 								String msg = "Causes " + exception.getMessage(); 
-								println(msg);
+								infoln(msg);
 								po.setCounterMessage(msg);
 							}
 							else
@@ -558,35 +558,35 @@ public class QuickCheck
 								po.setCounterMessage(null);
 							}
 							
-							println("----");
-							println(po);
+							infoln("----");
+							infoln(po);
 						}
 					}
 				}
 				else
 				{
 					String msg = String.format("Error: PO evaluation returns %s?\n", execResult.kind());
-					printf("PO #%d, %s\n", po.number, msg);
+					infof("PO #%d, %s\n", po.number, msg);
 					po.setStatus(POStatus.FAILED);
 					po.setCounterexample(null);
 					po.setCounterMessage(msg);
-					println("----");
+					infoln("----");
 					printBindings(bindings);
-					println("----");
-					println(po);
+					infoln("----");
+					infoln(po);
 				}
 			}
 			catch (Exception e)
 			{
 				String msg = String.format("Exception: %s", e.getMessage());
-				printf("PO #%d, %s\n", po.number, msg);
+				infof("PO #%d, %s\n", po.number, msg);
 				po.setStatus(POStatus.FAILED);
 				po.setCounterexample(null);
 				po.setCounterMessage(msg);
-				println("----");
+				infoln("----");
 				printBindings(bindings);
-				println("----");
-				println(po);
+				infoln("----");
+				infoln(po);
 				errorCount++;
 			}
 			finally
@@ -601,7 +601,7 @@ public class QuickCheck
 		catch (Exception e)
 		{
 			errorCount++;
-			println(e);
+			errorln(e);
 		}
 	}
 
@@ -654,7 +654,7 @@ public class QuickCheck
 		
 		for (INBindingSetter bind: bindings)
 		{
-			printf("%s = [", bind);
+			infof("%s = [", bind);
 			
 			ValueList list = bind.getBindValues();
 			int max = (list.size() > MAXVALUES) ? MAXVALUES : list.size();
@@ -662,17 +662,17 @@ public class QuickCheck
 			
 			for (int i=0; i<max; i++)
 			{
-				printf("%s%s", sep, list.get(i).toShortString(20));
+				infof("%s%s", sep, list.get(i).toShortString(20));
 				sep = ", ";
 			}
 			
 			if (max < list.size())
 			{
-				printf("... (%d values)]\n", list.size());
+				infof("... (%d values)]\n", list.size());
 			}
 			else
 			{
-				printf("]\n");
+				infof("]\n");
 			}
 		}
 	}
@@ -693,12 +693,12 @@ public class QuickCheck
 		
 		if (path == null || path.isEmpty())
 		{
-			printf("No counterexample\n");
+			infof("No counterexample\n");
 			printBindings(bindings);
 			return null;
 		}
 		
-		printf("Counterexample: ");
+		infof("Counterexample: ");
 		String sep = "";
 		Context ctxt = path;
 		
@@ -706,14 +706,14 @@ public class QuickCheck
 		{
 			for (TCNameToken name: ctxt.keySet())
 			{
-				printf("%s%s = %s", sep, name, ctxt.get(name));
+				infof("%s%s = %s", sep, name, ctxt.get(name));
 				sep = ", ";
 			}
 			
 			ctxt = ctxt.outer;
 		}
 		
-		println("");
+		infoln("");
 		return path;
 	}
 

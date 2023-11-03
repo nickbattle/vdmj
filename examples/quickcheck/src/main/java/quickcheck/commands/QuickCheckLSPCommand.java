@@ -24,7 +24,8 @@
 
 package quickcheck.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static quickcheck.commands.QCConsole.errorln;
+import static quickcheck.commands.QCConsole.println;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -42,7 +43,7 @@ import vdmj.commands.ScriptRunnable;
 
 public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnable, ScriptRunnable
 {
-	public final static String CMD = "quickcheck [-?|-help][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	public final static String CMD = "quickcheck [-?|-help][-q][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String USAGE = "Usage: " + CMD;
 	
 	private List<Integer> poList = new Vector<Integer>();
@@ -82,6 +83,8 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		{
 			return result(request, "Failed to load QC strategies");
 		}
+		
+		QCConsole.setQuiet(false);
 
 		for (int i=0; i < arglist.size(); i++)	// Should just be POs, or -? -help
 		{
@@ -111,6 +114,10 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 						
 						return result(request, null);
 						
+					case "-q":
+						QCConsole.setQuiet(true);
+						break;
+						
 					case "-t":
 						i++;
 						timeout = Integer.parseInt(arglist.get(i));
@@ -139,7 +146,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 						{
 							if (arg.startsWith("-"))
 							{
-								println("Unexpected argument: " + arg);
+								errorln("Unexpected argument: " + arg);
 								return result(request, USAGE);
 							}
 							
@@ -151,12 +158,12 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 			}
 			catch (IndexOutOfBoundsException e)
 			{
-				println("Malformed arguments");
+				errorln("Malformed arguments");
 				return result(request, USAGE);
 			}
 			catch (NumberFormatException e)
 			{
-				println("Malformed argument: " + e.getMessage());
+				errorln("Malformed argument: " + e.getMessage());
 				return result(request, USAGE);
 			}
 		}
@@ -190,14 +197,16 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 				QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, timeout, poList, poNames);
 				executor.exec();	// Note, not start!
 				executor.clean();	// Send POG updated notification
+				return executor.getAnswer();
 			}
 			catch (Exception e)
 			{
-				return e.getMessage();
+				errorln(e.getMessage());
+				return "Failed";
 			}
 		}
 		
-		return "OK";
+		return "Failed";
 	}
 
 	@Override
