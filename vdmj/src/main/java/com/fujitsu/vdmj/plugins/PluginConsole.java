@@ -84,11 +84,11 @@ public class PluginConsole
 		}
 	}
 
-	public static void infoln(String m)
+	public static void infoln(Object m)
 	{
 		if (!quiet)
 		{
-			Console.out.println(m);
+			Console.out.println(m.toString());
 		}
 	}
 
