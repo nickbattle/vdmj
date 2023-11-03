@@ -24,7 +24,8 @@
 
 package quickcheck.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static quickcheck.commands.QCConsole.errorln;
+import static quickcheck.commands.QCConsole.println;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,7 +47,7 @@ import quickcheck.strategies.StrategyResults;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	private final static String CMD = "quickcheck [-?|-help][-q][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String USAGE = "Usage: " + CMD;
 			
 	public QuickCheckCommand(String line)
@@ -76,6 +77,8 @@ public class QuickCheckCommand extends AnalysisCommand
 		{
 			return "Failed to load QC strategies";
 		}
+		
+		QCConsole.setQuiet(false);
 
 		for (int i=0; i < arglist.size(); i++)	// Should just be POs, or -? -help
 		{
@@ -105,6 +108,10 @@ public class QuickCheckCommand extends AnalysisCommand
 						
 						return null;
 						
+					case "-q":
+						QCConsole.setQuiet(true);
+						break;
+						
 					case "-t":
 						i++;
 						timeout = Integer.parseInt(arglist.get(i));
@@ -133,7 +140,7 @@ public class QuickCheckCommand extends AnalysisCommand
 						{
 							if (arg.startsWith("-"))
 							{
-								println("Unexpected argument: " + arg);
+								errorln("Unexpected argument: " + arg);
 								return USAGE;
 							}
 							
@@ -145,12 +152,12 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 			catch (IndexOutOfBoundsException e)
 			{
-				println("Malformed arguments");
+				errorln("Malformed arguments");
 				return USAGE;
 			}
 			catch (NumberFormatException e)
 			{
-				println("Malformed argument: " + e.getMessage());
+				errorln("Malformed argument: " + e.getMessage());
 				return USAGE;
 			}
 		}
@@ -191,7 +198,7 @@ public class QuickCheckCommand extends AnalysisCommand
 					}
 					catch (Exception e)
 					{
-						println(e);
+						errorln(e);
 					}
 					finally
 					{

@@ -24,10 +24,10 @@
 
 package quickcheck;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infof;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+import static quickcheck.commands.QCConsole.errorln;
+import static quickcheck.commands.QCConsole.infof;
+import static quickcheck.commands.QCConsole.infoln;
+import static quickcheck.commands.QCConsole.verbose;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;

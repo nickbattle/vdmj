@@ -22,23 +22,24 @@
  *
  ******************************************************************************/
 
-package com.fujitsu.vdmj.plugins;
-
-import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.Map.Entry;
+package quickcheck.commands;
 
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.messages.Console;
 
-public class PluginConsole
+/**
+ * This copies the PluginConsole from VDMJ to allow us to have "global" quiet
+ * setting within the QC command environment, without affecting the outer
+ * environment.
+ */
+
+public class QCConsole
 {
 	private static boolean quiet = false;
 	
 	public static void setQuiet(boolean quiet)
 	{
-		PluginConsole.quiet = quiet;
+		QCConsole.quiet = quiet;
 	}
 	
 	public static boolean getQuiet()
@@ -46,12 +47,6 @@ public class PluginConsole
 		return quiet;
 	}
 	
-	public static void fail(String format, Object... args)
-	{
-		Console.out.printf(format + "\n", args);
-		System.exit(1);
-	}
-
 	public static void verbose(String format, Object... args)
 	{
 		if (Settings.verbose)
@@ -65,19 +60,6 @@ public class PluginConsole
 		if (Settings.verbose)
 		{
 			Console.out.println(m);
-		}
-	}
-
-	public static String plural(int n, String s, String pl)
-	{
-		return n + " " + (n != 1 ? s + pl : s);
-	}
-
-	public static void info(String m)
-	{
-		if (!quiet)
-		{
-			Console.out.print(m);
 		}
 	}
 
@@ -115,50 +97,5 @@ public class PluginConsole
 	public static void errorf(String format, Object... args)
 	{
 		Console.err.printf(format, args);
-	}
-
-	public static void println(Throwable throwable)
-	{
-		Console.out.println(String.format("EXCEPTION: %s %s",
-				throwable.getClass().getSimpleName(), throwable.getMessage()));
-		
-		StackTraceElement[] stack = throwable.getStackTrace();
-		int max = Properties.diag_max_stack;
-		int count = (max == 0 )? stack.length : (stack.length < max) ? stack.length : max;
-		
-		for (int i=0; i<count; i++)
-		{
-			StackTraceElement frame = stack[i];
-			Console.out.println(String.format("  %s %s at %s line %d",
-					frame.getClassName(), frame.getMethodName(), frame.getFileName(), frame.getLineNumber()));
-		}
-		
-		if (count < stack.length)
-		{
-			Console.out.println((stack.length - count) +
-				" more frames available (vdmj.diag.max_stack currently = " +
-				Properties.diag_max_stack +")");
-		}
-	}
-	
-	public static Charset validateCharset(String cs)
-	{
-		if (!Charset.isSupported(cs))
-		{
-			println("Charset " + cs + " is not supported\n");
-			println("Available charsets:");
-			println("Default = " + Charset.defaultCharset());
-			Map<String,Charset> available = Charset.availableCharsets();
-
-			for (Entry<String, Charset> entry: available.entrySet())
-			{
-				println(entry.getKey() + " " + available.get(entry.getKey()).aliases());
-			}
-
-			println("");
-			fail("Charset " + cs + " is not supported");
-		}
-
-		return Charset.forName(cs);
 	}
 }
