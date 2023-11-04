@@ -120,6 +120,18 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		
 		return sb.toString();
 	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if (other instanceof ProofObligation)
+		{
+			ProofObligation opo = (ProofObligation)other;
+			return kind == opo.kind && location == opo.location;
+		}
+		
+		return false; 
+	}
 
 	protected String getVar(String root)
 	{
