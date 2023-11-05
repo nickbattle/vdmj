@@ -380,12 +380,14 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		measureName = name.getMeasureName(measureExp.location);
 		checkMeasure(measureName, actual);
 		
+		// Note that the measure_f has the precondition of the function it measures.
+
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
-				typeParams, type.getMeasureType(false, actual), getParamPatternList(), measureExp, null, null, false, null);
+				typeParams, type.getMeasureType(false, actual), getParamPatternList(), measureExp, precondition, null, false, null);
 
 		def.classDefinition = classDefinition;
+		def.implicitDefinitions(base);
 		def.typeResolve(base);
-		
 		def.typeCheck(base, scope);
 		
 		measureDef = def;

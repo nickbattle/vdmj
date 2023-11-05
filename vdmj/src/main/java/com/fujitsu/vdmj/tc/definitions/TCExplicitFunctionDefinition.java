@@ -396,14 +396,17 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		TCPatternListList cpll = new TCPatternListList();
 		cpll.add(all);
 		
+		// Note that the measure_f has the precondition of the function it measures.
+		
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
-				typeParams, type.getMeasureType(isCurried, actual), cpll, measureExp, null, null, false, null);
+				typeParams, type.getMeasureType(isCurried, actual), cpll, measureExp, precondition, null, false, null);
 
 		def.classDefinition = classDefinition;
+		def.implicitDefinitions(base);
 		def.typeResolve(base);
+		def.typeCheck(base, scope);
+
 		measureDef = def;
-		
-		measureDef.typeCheck(base, scope);
 	}
 
 	/**
@@ -620,9 +623,9 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			return postdef;
 		}
 		
-		if (measureDef != null && measureDef.findName(sought, scope) != null)
+		if (measureDef != null)
 		{
-			return measureDef;
+			return measureDef.findName(sought, scope);	// eg. pre_measure_f
 		}
 
 		return null;
