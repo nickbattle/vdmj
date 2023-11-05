@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.pog;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -55,6 +56,30 @@ import com.fujitsu.vdmj.typechecker.TypeChecker;
 public class ProofObligationList extends Vector<ProofObligation>
 {
 	// Convenience class to hold lists of POs.
+	
+	@Override
+	public synchronized boolean add(ProofObligation e)
+	{
+		if (!this.contains(e))		// Eliminate duplicates
+		{
+			return super.add(e);
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public synchronized boolean addAll(Collection<? extends ProofObligation> poList)
+	{
+		boolean changed = false;
+		
+		for (ProofObligation po: poList)
+		{
+			changed = this.add(po) || changed;
+		}
+		
+		return changed;
+	}
 
 	@Override
 	public String toString()

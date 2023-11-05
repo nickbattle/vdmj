@@ -466,6 +466,10 @@ public class QuickCheck
 					{
 						execResult = null;
 					}
+					else if (e.number == 4024)	// 'not yet specified' expression reached
+					{
+						execResult = new BooleanValue(true);	// MAYBE, in effect
+					}
 					else
 					{
 						execResult = new BooleanValue(false);
