@@ -64,7 +64,7 @@ public enum POType
 	TOTAL_ORDER("total order"),
 	EQUIV_RELATION("equivalence relation"),
 	TOTAL("total function"),
-	INV_SATISFIABILITY("invariant satisfiability"),
+	INV_SATISFIABILITY("invariant satisfiability", true),
 	THEOREM("theorem"),
 	STATE_INIT("state init", true);
 

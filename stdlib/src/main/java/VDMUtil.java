@@ -68,7 +68,7 @@ public class VDMUtil
 	}
 
 	@VDMFunction
-	public static Value seq_of_char2val_(Value arg)
+	public static Value seq_of_char2val(Value arg)
 	{
 		ValueList result = new ValueList();
 
