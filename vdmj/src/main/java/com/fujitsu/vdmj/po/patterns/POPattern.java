@@ -162,6 +162,15 @@ public abstract class POPattern extends PONode implements Serializable
 	}
 
 	/**
+	 * Indicates that the pattern is associated with a maximal type, which may
+	 * affect the string representation - eg. mk_R!(...).
+	 */
+	public void setMaximal(boolean maximal)
+	{
+		return;		// Only used in PORecordPattern
+	}
+
+	/**
 	 * Implemented by all patterns to allow visitor processing.
 	 */
 	abstract public <R, S> R apply(POPatternVisitor<R, S> visitor, S arg);

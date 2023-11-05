@@ -75,11 +75,16 @@ public class TotalFunctionObligation extends ProofObligation
 			
     		for (POPatternList pl: def.paramPatternList)
     		{
+    			int param = 0;
+    			
     			for (POPattern p: pl)
     			{
     				fapply.append(sep);
-    				fapply.append(p.removeIgnorePatterns());
+    				POPattern p2 = p.removeIgnorePatterns();
+   					p2.setMaximal(ftype.parameters.get(param).isMaximal());
+    				fapply.append(p2);
 					sep = ", ";
+					param++;
     			}
 
     			if (ftype.result instanceof TCFunctionType)
