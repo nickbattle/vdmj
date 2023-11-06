@@ -49,7 +49,7 @@ public enum POType
 	SEQ_MODIFICATION("sequence modification"),
 	VALUE_BINDING("value binding", true),
 	SUB_TYPE("subtype"),
-	CASES_EXHAUSTIVE("cases exhaustive", true),
+	CASES_EXHAUSTIVE("cases exhaustive"),
 	INVARIANT("type invariant"),
 	RECURSIVE("recursive function"),
 	STATE_INVARIANT("state invariant"),

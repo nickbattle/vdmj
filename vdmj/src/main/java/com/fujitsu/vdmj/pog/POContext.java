@@ -50,6 +50,11 @@ abstract public class POContext
 	{
 		return null;
 	}
+	
+	public boolean isExistential()
+	{
+		return false;
+	}
 
 	public TCTypeList getTypeParams()
 	{

@@ -472,7 +472,7 @@ public class QuickCheck
 					else if (e.number == 4024)	// 'not yet specified' expression reached
 					{
 						// MAYBE, in effect - execCompleted will be false
-						execResult = new BooleanValue(!po.kind.isExistential());
+						execResult = new BooleanValue(!po.isExistential());
 					}
 					else
 					{
@@ -516,7 +516,7 @@ public class QuickCheck
 						{
 							outcome = POStatus.TIMEOUT;
 						}
-						else if (po.kind.isExistential())
+						else if (po.isExistential())
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
 							Context path = getWitness(bindings);
@@ -548,7 +548,7 @@ public class QuickCheck
 							po.setCounterexample(null);
 							po.setCounterMessage(null);
 						}
-						else if (po.kind.isExistential())	// Principal exp is "exists..."
+						else if (po.isExistential())	// Principal exp is "exists..."
 						{
 							infof("PO #%d, MAYBE %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.MAYBE);

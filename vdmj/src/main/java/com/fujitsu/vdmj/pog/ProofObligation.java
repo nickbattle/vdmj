@@ -51,6 +51,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 
 	private int var = 1;
 	private TCExpression checkedExpression = null;
+	private boolean existential = false;
 
 	public ProofObligation(LexLocation location, POType kind, POContextStack ctxt)
 	{
@@ -70,6 +71,8 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		{
 			this.status = POStatus.UNCHECKED;	// Implies unproved
 		}
+		
+		existential = ctxt.isExistential() || (ctxt.hasNone() && kind.isExistential());
 
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before PO creation
 	}
@@ -109,6 +112,11 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public void setWitness(String witness)
 	{
 		this.witness = witness;
+	}
+	
+	public boolean isExistential()
+	{
+		return existential;
 	}
 
 	@Override

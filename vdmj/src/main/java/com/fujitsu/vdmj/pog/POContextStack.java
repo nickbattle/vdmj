@@ -119,6 +119,32 @@ public class POContextStack extends Stack<POContext>
 		
 		return null;
 	}
+	
+	public boolean isExistential()
+	{
+		for (POContext ctxt: this)
+		{
+			if (!(ctxt instanceof PONameContext))
+			{
+				return ctxt.isExistential();
+			}
+		}
+		
+		return false;
+	}
+
+	public boolean hasNone()
+	{
+		for (POContext ctxt: this)
+		{
+			if (!(ctxt instanceof PONameContext))
+			{
+				return false;	// Has something significant
+			}
+		}
+		
+		return true;
+	}
 
 	public TCTypeList getTypeParams()
 	{
