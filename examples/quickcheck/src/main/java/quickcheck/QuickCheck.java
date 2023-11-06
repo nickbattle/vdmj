@@ -214,36 +214,6 @@ public class QuickCheck
 		return chosen;
 	}
 	
-	public List<String> strategyNames(List<String> arglist)
-	{
-		List<String> names = new Vector<String>();
-		Iterator<String> iter = arglist.iterator();
-		
-		while (iter.hasNext())
-		{
-			String arg = iter.next();
-			
-			if (arg.equals("-s"))
-			{
-				iter.remove();
-				
-				if (iter.hasNext())
-				{
-					arg = iter.next();
-					iter.remove();
-					names.add(arg);
-				}
-				else
-				{
-					errorln("-s must be followed by a strategy name");
-					names.add("unknown");
-				}
-			}
-		}
-		
-		return names;
-	}
-	
 	public ProofObligationList getPOs(ProofObligationList all, List<Integer> poList, List<String> poNames)
 	{
 		errorCount = 0;
@@ -333,9 +303,9 @@ public class QuickCheck
 		
 		INExpression exp = getINExpression(po);
 		List<INBindingSetter> binds = getINBindList(exp);
-		long before = System.currentTimeMillis();
 		IterableContext ictxt = addTypeParams(po, Interpreter.getInstance().getInitialContext());
 		boolean hasAllValues = false;
+		long before = System.currentTimeMillis();
 		
 		while (ictxt.hasNext())
 		{
@@ -399,7 +369,8 @@ public class QuickCheck
 				po.setStatus(POStatus.PROVED);
 				po.setProvedBy(results.provedBy);
 				po.setCounterexample(null);
-				po.setCounterMessage(null);
+				po.setMessage(null);
+				po.setWitness(null);
 				infof("PO #%d, PROVED by %s strategy %s\n", po.number, results.provedBy, duration(results.duration));
 				return;
 			}
@@ -419,7 +390,7 @@ public class QuickCheck
 					}
 					else
 					{
-						errorln("PO #" + po.number + ": No range defined for " + mbind);
+						errorln("PO #" + po.number + ": No bind values defined for " + mbind);
 						errorCount++;
 					}
 				}
@@ -441,7 +412,7 @@ public class QuickCheck
 				
 				IterableContext ictxt = addTypeParams(po, ctxt);
 				Value execResult = new BooleanValue(false);
-				ContextException exception = null;
+				ContextException execException = null;
 				boolean execCompleted = false;
 				long before = System.currentTimeMillis();
 
@@ -477,7 +448,7 @@ public class QuickCheck
 					else
 					{
 						execResult = new BooleanValue(false);
-						exception = e;
+						execException = e;
 					}
 				}
 				finally
@@ -511,6 +482,8 @@ public class QuickCheck
 					{
 						POStatus outcome = null;
 						String message = "";
+						po.setWitness(null);
+						po.setProvedBy(null);
 						
 						if (didTimeout)
 						{
@@ -519,10 +492,14 @@ public class QuickCheck
 						else if (po.isExistential())
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
-							Context path = getWitness(bindings);
-							String w = stringOfContext(path);
-							po.setWitness(w);
-							if (w != null) message = " witness " + w;
+							String witness = stringOfContext(findWitness(bindings));
+							po.setWitness(witness);
+							
+							if (witness != null)
+							{
+								message = " by witness " + witness;
+								po.setProvedBy("witness");
+							}
 						}
 						else if (results.hasAllValues && execCompleted)
 						{
@@ -538,7 +515,7 @@ public class QuickCheck
 						infof("PO #%d, %s%s %s\n", po.number, outcome.toString().toUpperCase(), message, duration(before, after));
 						po.setStatus(outcome);
 						po.setCounterexample(null);
-						po.setCounterMessage(null);
+						po.setMessage(null);
 					}
 					else
 					{
@@ -547,31 +524,34 @@ public class QuickCheck
 							infof("PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.TIMEOUT);
 							po.setCounterexample(null);
-							po.setCounterMessage(null);
+							po.setMessage(null);
+							po.setWitness(null);
 						}
 						else if (po.isExistential())	// Principal exp is "exists..."
 						{
 							infof("PO #%d, MAYBE %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.MAYBE);
 							po.setCounterexample(null);
-							po.setCounterMessage(null);
+							po.setMessage(null);
+							po.setWitness(null);
 						}
 						else
 						{
 							infof("PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
 							printCounterexample(bindings);
-							po.setCounterexample(getCounterexample(bindings));
+							po.setCounterexample(findCounterexample(bindings));
+							po.setWitness(null);
 							
-							if (exception != null)
+							if (execException != null)
 							{
-								String msg = "Causes " + exception.getMessage(); 
+								String msg = "Causes " + execException.getMessage(); 
 								infoln(msg);
-								po.setCounterMessage(msg);
+								po.setMessage(msg);
 							}
 							else
 							{
-								po.setCounterMessage(null);
+								po.setMessage(null);
 							}
 							
 							infoln("----");
@@ -585,7 +565,7 @@ public class QuickCheck
 					infoln(msg);
 					po.setStatus(POStatus.FAILED);
 					po.setCounterexample(null);
-					po.setCounterMessage(msg);
+					po.setMessage(msg);
 					infoln("----");
 					printBindings(bindings);
 					infoln("----");
@@ -599,7 +579,7 @@ public class QuickCheck
 				infoln(msg);
 				po.setStatus(POStatus.FAILED);
 				po.setCounterexample(null);
-				po.setCounterMessage(msg);
+				po.setMessage(msg);
 				infoln("----");
 				printBindings(bindings);
 				infoln("----");
@@ -610,8 +590,7 @@ public class QuickCheck
 			{
 				for (INBindingSetter mbind: bindings)
 				{
-					mbind.setBindValues(null, 0);
-					mbind.setCounterexample(null, false);
+					mbind.setBindValues(null, 0);	// Clears everything
 				}
 			}
 		}
@@ -620,6 +599,36 @@ public class QuickCheck
 			errorCount++;
 			errorln(e);
 		}
+	}
+
+	private List<String> strategyNames(List<String> arglist)
+	{
+		List<String> names = new Vector<String>();
+		Iterator<String> iter = arglist.iterator();
+		
+		while (iter.hasNext())
+		{
+			String arg = iter.next();
+			
+			if (arg.equals("-s"))
+			{
+				iter.remove();
+				
+				if (iter.hasNext())
+				{
+					arg = iter.next();
+					iter.remove();
+					names.add(arg);
+				}
+				else
+				{
+					errorln("-s must be followed by a strategy name");
+					names.add("unknown");
+				}
+			}
+		}
+		
+		return names;
 	}
 
 	private IterableContext addTypeParams(ProofObligation po, Context ctxt)
@@ -694,7 +703,7 @@ public class QuickCheck
 		}
 	}
 	
-	private Context getCounterexample(List<INBindingSetter> bindings)
+	private Context findCounterexample(List<INBindingSetter> bindings)
 	{
 		Context ctxt = null;
 		
@@ -711,7 +720,7 @@ public class QuickCheck
 		return ctxt;
 	}
 	
-	private Context getWitness(List<INBindingSetter> bindings)
+	private Context findWitness(List<INBindingSetter> bindings)
 	{
 		Context ctxt = null;
 		
@@ -730,7 +739,7 @@ public class QuickCheck
 
 	private void printCounterexample(List<INBindingSetter> bindings)
 	{
-		Context path = getCounterexample(bindings);
+		Context path = findCounterexample(bindings);
 		String cex = stringOfContext(path);
 		
 		if (cex == null)
