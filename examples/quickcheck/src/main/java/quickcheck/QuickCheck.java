@@ -521,6 +521,7 @@ public class QuickCheck
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
 							Context path = getWitness(bindings);
 							String w = stringOfContext(path);
+							po.setWitness(w);
 							if (w != null) message = " witness " + w;
 						}
 						else if (results.hasAllValues && execCompleted)
