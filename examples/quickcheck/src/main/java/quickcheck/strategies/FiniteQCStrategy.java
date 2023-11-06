@@ -163,7 +163,7 @@ public class FiniteQCStrategy extends QCStrategy
 		// The current bind may be finite, but others may not be.
 		boolean hasAll = (po.typeParams == null);
 		
-		return new StrategyResults(null, hasAll, result, System.currentTimeMillis() - before);
+		return new StrategyResults(result, hasAll, System.currentTimeMillis() - before);
 	}
 
 	@Override

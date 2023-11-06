@@ -318,7 +318,8 @@ public class QuickCheck
 				
 				if (sresults.provedBy != null)	// No need to go further
 				{
-					return new StrategyResults(sresults.provedBy, sresults.hasAllValues, cexamples, System.currentTimeMillis() - before);
+					sresults.setDuration(System.currentTimeMillis() - before);
+					return sresults;
 				}
 				
 				for (String bind: cexamples.keySet())
@@ -348,7 +349,7 @@ public class QuickCheck
 			}
 		}
 		
-		return new StrategyResults(null, hasAllValues, union, System.currentTimeMillis() - before);
+		return new StrategyResults(union, hasAllValues, System.currentTimeMillis() - before);
 	}
 	
 	public void checkObligation(ProofObligation po, StrategyResults results)
@@ -368,20 +369,18 @@ public class QuickCheck
 			{
 				po.setStatus(POStatus.PROVED);
 				po.setProvedBy(results.provedBy);
+				po.setMessage(results.message);
+				po.setWitness(results.witness);
 				po.setCounterexample(null);
-				po.setMessage(null);
-				po.setWitness(null);
 				infof("PO #%d, PROVED by %s strategy %s\n", po.number, results.provedBy, duration(results.duration));
 				return;
 			}
 
 			try
 			{
-				Map<String, ValueList> cexamples = results.counterexamples;
-				
 				for (INBindingSetter mbind: bindings)
 				{
-					ValueList values = cexamples.get(mbind.toString());
+					ValueList values = results.counterexamples.get(mbind.toString());
 					
 					if (values != null)
 					{

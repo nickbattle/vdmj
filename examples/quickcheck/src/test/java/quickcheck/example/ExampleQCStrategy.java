@@ -106,11 +106,11 @@ public class ExampleQCStrategy extends QCStrategy
 		
 		if (provedResult)
 		{
-			return new StrategyResults(getName(), false, values, System.currentTimeMillis() - before);
+			return new StrategyResults(getName(), "Just an example", "Witness here", System.currentTimeMillis() - before);
 		}
 		else
 		{
-			return new StrategyResults(null, false, values, System.currentTimeMillis() - before);
+			return new StrategyResults(values, false, System.currentTimeMillis() - before);
 		}
 	}
 
