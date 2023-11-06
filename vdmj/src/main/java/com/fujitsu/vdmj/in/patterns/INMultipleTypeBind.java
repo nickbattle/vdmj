@@ -44,6 +44,7 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	
 	private ValueList bindValues = null;
 	private Context bindCounterexample = null;
+	private Context bindWitness = null;
 	private boolean bindPermuted = false;
 	private boolean bindOverride = false;
 	private long bindTimeout = 0;
@@ -80,6 +81,8 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 		}
 
 		didTimeout = false;
+		bindCounterexample = null;
+		bindWitness = null;
 	}
 	
 	@Override
@@ -121,6 +124,25 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 		return bindCounterexample;
 	}
 	
+	@Override
+	public void setWitness(Context ctxt)
+	{
+		if (ctxt == null)
+		{
+			bindWitness = null;
+		}
+		else if (bindWitness == null)	// Catch first witness, don't overwrite
+		{
+			bindWitness = ctxt;
+		}
+	}
+
+	@Override
+	public Context getWitness()
+	{
+		return bindWitness;
+	}
+
 	@Override
 	public TCType getType()
 	{

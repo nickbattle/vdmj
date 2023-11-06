@@ -44,6 +44,7 @@ public class INTypeBind extends INBind implements INBindingSetter
 	
 	private ValueList bindValues = null;
 	private Context bindCounterexample = null;
+	private Context bindWitness = null;
 	private boolean bindPermuted = false;
 	private boolean bindOverride = false;
 	private long bindTimeout = 0;
@@ -74,6 +75,8 @@ public class INTypeBind extends INBind implements INBindingSetter
 		}
 
 		didTimeout = false;
+		bindCounterexample = null;
+		bindWitness = null;
 	}
 
 	@Override
@@ -119,6 +122,25 @@ public class INTypeBind extends INBind implements INBindingSetter
 	public Context getCounterexample()
 	{
 		return bindCounterexample;
+	}
+	
+	@Override
+	public void setWitness(Context ctxt)
+	{
+		if (ctxt == null)
+		{
+			bindWitness = null;
+		}
+		else if (bindWitness == null)	// Catch first witness, don't overwrite
+		{
+			bindWitness = ctxt;
+		}
+	}
+
+	@Override
+	public Context getWitness()
+	{
+		return bindWitness;
 	}
 
 	@Override

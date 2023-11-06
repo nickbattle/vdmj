@@ -41,6 +41,12 @@ public class POCaseContext extends POContext
 		this.type = type;
 		this.exp = exp;
 	}
+	
+	@Override
+	public boolean isExistential()
+	{
+		return !pattern.isSimple();
+	}
 
 	@Override
 	public String getContext()

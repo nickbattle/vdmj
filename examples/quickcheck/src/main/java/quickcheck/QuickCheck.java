@@ -442,6 +442,7 @@ public class QuickCheck
 				IterableContext ictxt = addTypeParams(po, ctxt);
 				Value execResult = new BooleanValue(false);
 				ContextException exception = null;
+				boolean execCompleted = false;
 				long before = System.currentTimeMillis();
 
 				try
@@ -459,6 +460,8 @@ public class QuickCheck
 						execResult = poexp.eval(ictxt);
 					}
 					while (ictxt.hasNext() && execResult.boolValue(ctxt));
+					
+					execCompleted = true;
 				}
 				catch (ContextException e)
 				{
@@ -468,7 +471,8 @@ public class QuickCheck
 					}
 					else if (e.number == 4024)	// 'not yet specified' expression reached
 					{
-						execResult = new BooleanValue(true);	// MAYBE, in effect
+						// MAYBE, in effect - execCompleted will be false
+						execResult = new BooleanValue(!po.isExistential());
 					}
 					else
 					{
@@ -506,25 +510,32 @@ public class QuickCheck
 					if (execResult.boolValue(ctxt))
 					{
 						POStatus outcome = null;
+						String message = "";
 						
 						if (didTimeout)
 						{
 							outcome = POStatus.TIMEOUT;
 						}
-						else if (po.kind.isExistential())
+						else if (po.isExistential())
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
+							Context path = getWitness(bindings);
+							String w = stringOfContext(path);
+							po.setWitness(w);
+							if (w != null) message = " witness " + w;
 						}
-						else if (results.hasAllValues)
+						else if (results.hasAllValues && execCompleted)
 						{
 							outcome = POStatus.PROVED;		// All values were tested and passed, so PROVED
+							message = " by finite types";
+							po.setProvedBy("finite");
 						}
 						else
 						{
 							outcome = POStatus.MAYBE;
 						}
 						
-						infof("PO #%d, %s %s\n", po.number, outcome.toString().toUpperCase(), duration(before, after));
+						infof("PO #%d, %s%s %s\n", po.number, outcome.toString().toUpperCase(), message, duration(before, after));
 						po.setStatus(outcome);
 						po.setCounterexample(null);
 						po.setCounterMessage(null);
@@ -538,7 +549,7 @@ public class QuickCheck
 							po.setCounterexample(null);
 							po.setCounterMessage(null);
 						}
-						else if (po.kind.isExistential())	// Principal exp is "exists..."
+						else if (po.isExistential())	// Principal exp is "exists..."
 						{
 							infof("PO #%d, MAYBE %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.MAYBE);
@@ -549,7 +560,8 @@ public class QuickCheck
 						{
 							infof("PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
-							po.setCounterexample(printFailPath(bindings));
+							printCounterexample(bindings);
+							po.setCounterexample(getCounterexample(bindings));
 							
 							if (exception != null)
 							{
@@ -569,8 +581,8 @@ public class QuickCheck
 				}
 				else
 				{
-					String msg = String.format("Error: PO evaluation returns %s?\n", execResult.kind());
-					infof("PO #%d, %s\n", po.number, msg);
+					String msg = String.format("Error: PO #%d evaluation returns %s?\n", po.number, execResult.kind());
+					infoln(msg);
 					po.setStatus(POStatus.FAILED);
 					po.setCounterexample(null);
 					po.setCounterMessage(msg);
@@ -578,12 +590,13 @@ public class QuickCheck
 					printBindings(bindings);
 					infoln("----");
 					infoln(po);
+					errorCount++;
 				}
 			}
 			catch (Exception e)
 			{
-				String msg = String.format("Exception: %s", e.getMessage());
-				infof("PO #%d, %s\n", po.number, msg);
+				String msg = String.format("Exception: PO #%d %s", po.number, e.getMessage());
+				infoln(msg);
 				po.setStatus(POStatus.FAILED);
 				po.setCounterexample(null);
 				po.setCounterMessage(msg);
@@ -681,28 +694,63 @@ public class QuickCheck
 		}
 	}
 	
-	private Context printFailPath(List<INBindingSetter> bindings)
+	private Context getCounterexample(List<INBindingSetter> bindings)
 	{
-		Context path = null;
+		Context ctxt = null;
 		
 		for (INBindingSetter setter: bindings)
 		{
-			path = setter.getCounterexample();
+			ctxt = setter.getCounterexample();
 			
-			if (path != null)
+			if (ctxt != null)
 			{
 				break;	// Any one will do - see INForAllExpression
 			}
 		}
+
+		return ctxt;
+	}
+	
+	private Context getWitness(List<INBindingSetter> bindings)
+	{
+		Context ctxt = null;
 		
+		for (INBindingSetter setter: bindings)
+		{
+			ctxt = setter.getWitness();
+			
+			if (ctxt != null)
+			{
+				break;	// Any one will do - see INExistsExpression
+			}
+		}
+
+		return ctxt;
+	}
+
+	private void printCounterexample(List<INBindingSetter> bindings)
+	{
+		Context path = getCounterexample(bindings);
+		String cex = stringOfContext(path);
+		
+		if (cex == null)
+		{
+			infoln("No counterexample");
+		}
+		else
+		{
+			infoln("Counterexample: " + cex);
+		}
+	}
+
+	private String stringOfContext(Context path)
+	{
 		if (path == null || path.isEmpty())
 		{
-			infof("No counterexample\n");
-			printBindings(bindings);
 			return null;
 		}
 		
-		infof("Counterexample: ");
+		StringBuilder result = new StringBuilder();
 		String sep = "";
 		Context ctxt = path;
 		
@@ -710,15 +758,17 @@ public class QuickCheck
 		{
 			for (TCNameToken name: ctxt.keySet())
 			{
-				infof("%s%s = %s", sep, name, ctxt.get(name));
+				result.append(sep);
+				result.append(name);
+				result.append(" = ");
+				result.append(ctxt.get(name));
 				sep = ", ";
 			}
 			
 			ctxt = ctxt.outer;
 		}
 		
-		infoln("");
-		return path;
+		return result.toString();
 	}
 
 	private String duration(long time)

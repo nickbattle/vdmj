@@ -109,6 +109,7 @@ public class INExistsExpression extends INExpression
 					{
 						if (!v.equals(nvp.value))
 						{
+							setWitness(evalContext);
 							matches = false;
 							break;	// This quantifier set does not match
 						}
@@ -119,6 +120,7 @@ public class INExistsExpression extends INExpression
 				{
 					if (matches && predicate.eval(evalContext).boolValue(ctxt))
 					{
+						setWitness(evalContext);
 						return new BooleanValue(true);
 					}
 				}
@@ -172,6 +174,26 @@ public class INExistsExpression extends INExpression
 				if (setter.getBindValues() != null)			// One we care about (set QC values for)
 				{
 					setter.setCounterexample(ctxt, didTimeout);
+					break;									// Just one will do - see QC printFailPath
+				}
+			}
+		}
+	}
+	
+	/**
+	 * This is used by the QuickCheck plugin to report which values succeeded.
+	 */
+	private void setWitness(Context ctxt)
+	{
+		for (INMultipleBind bind: bindList)
+		{
+			if (bind instanceof INBindingSetter)			// Type and multitype binds
+			{
+				INBindingSetter setter = (INBindingSetter)bind;
+				
+				if (setter.getBindValues() != null)			// One we care about (set QC values for)
+				{
+					setter.setWitness(ctxt);
 					break;									// Just one will do - see QC printFailPath
 				}
 			}

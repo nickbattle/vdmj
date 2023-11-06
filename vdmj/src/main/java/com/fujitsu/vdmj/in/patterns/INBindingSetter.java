@@ -37,4 +37,6 @@ public interface INBindingSetter
 	public TCType getType();
 	public void setCounterexample(Context ctxt, boolean didTimeout);
 	public Context getCounterexample();
+	public void setWitness(Context ctxt);
+	public Context getWitness();
 }
