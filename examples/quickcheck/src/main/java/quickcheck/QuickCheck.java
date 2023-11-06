@@ -442,6 +442,7 @@ public class QuickCheck
 				IterableContext ictxt = addTypeParams(po, ctxt);
 				Value execResult = new BooleanValue(false);
 				ContextException exception = null;
+				boolean execCompleted = false;
 				long before = System.currentTimeMillis();
 
 				try
@@ -459,6 +460,8 @@ public class QuickCheck
 						execResult = poexp.eval(ictxt);
 					}
 					while (ictxt.hasNext() && execResult.boolValue(ctxt));
+					
+					execCompleted = true;
 				}
 				catch (ContextException e)
 				{
@@ -468,7 +471,8 @@ public class QuickCheck
 					}
 					else if (e.number == 4024)	// 'not yet specified' expression reached
 					{
-						execResult = new BooleanValue(true);	// MAYBE, in effect
+						// MAYBE, in effect - execCompleted will be false
+						execResult = new BooleanValue(!po.kind.isExistential());
 					}
 					else
 					{
@@ -515,7 +519,7 @@ public class QuickCheck
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
 						}
-						else if (results.hasAllValues)
+						else if (results.hasAllValues && execCompleted)
 						{
 							outcome = POStatus.PROVED;		// All values were tested and passed, so PROVED
 						}
@@ -569,8 +573,8 @@ public class QuickCheck
 				}
 				else
 				{
-					String msg = String.format("Error: PO evaluation returns %s?\n", execResult.kind());
-					infof("PO #%d, %s\n", po.number, msg);
+					String msg = String.format("Error: PO #%d evaluation returns %s?\n", po.number, execResult.kind());
+					infoln(msg);
 					po.setStatus(POStatus.FAILED);
 					po.setCounterexample(null);
 					po.setCounterMessage(msg);
@@ -578,12 +582,13 @@ public class QuickCheck
 					printBindings(bindings);
 					infoln("----");
 					infoln(po);
+					errorCount++;
 				}
 			}
 			catch (Exception e)
 			{
-				String msg = String.format("Exception: %s", e.getMessage());
-				infof("PO #%d, %s\n", po.number, msg);
+				String msg = String.format("Exception: PO #%d %s", po.number, e.getMessage());
+				infoln(msg);
 				po.setStatus(POStatus.FAILED);
 				po.setCounterexample(null);
 				po.setCounterMessage(msg);
