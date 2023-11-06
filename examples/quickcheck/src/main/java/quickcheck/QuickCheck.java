@@ -519,6 +519,9 @@ public class QuickCheck
 						else if (po.kind.isExistential())
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
+							Context path = getWitness(bindings);
+							String w = stringOfContext(path);
+							if (w != null) message = " witness " + w;
 						}
 						else if (results.hasAllValues && execCompleted)
 						{
@@ -556,7 +559,8 @@ public class QuickCheck
 						{
 							infof("PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
-							po.setCounterexample(printFailPath(bindings));
+							printCounterexample(bindings);
+							po.setCounterexample(getCounterexample(bindings));
 							
 							if (exception != null)
 							{
@@ -689,28 +693,63 @@ public class QuickCheck
 		}
 	}
 	
-	private Context printFailPath(List<INBindingSetter> bindings)
+	private Context getCounterexample(List<INBindingSetter> bindings)
 	{
-		Context path = null;
+		Context ctxt = null;
 		
 		for (INBindingSetter setter: bindings)
 		{
-			path = setter.getCounterexample();
+			ctxt = setter.getCounterexample();
 			
-			if (path != null)
+			if (ctxt != null)
 			{
 				break;	// Any one will do - see INForAllExpression
 			}
 		}
+
+		return ctxt;
+	}
+	
+	private Context getWitness(List<INBindingSetter> bindings)
+	{
+		Context ctxt = null;
 		
+		for (INBindingSetter setter: bindings)
+		{
+			ctxt = setter.getWitness();
+			
+			if (ctxt != null)
+			{
+				break;	// Any one will do - see INExistsExpression
+			}
+		}
+
+		return ctxt;
+	}
+
+	private void printCounterexample(List<INBindingSetter> bindings)
+	{
+		Context path = getCounterexample(bindings);
+		String cex = stringOfContext(path);
+		
+		if (cex == null)
+		{
+			infoln("No counterexample");
+		}
+		else
+		{
+			infoln("Counterexample: " + cex);
+		}
+	}
+
+	private String stringOfContext(Context path)
+	{
 		if (path == null || path.isEmpty())
 		{
-			infof("No counterexample\n");
-			printBindings(bindings);
 			return null;
 		}
 		
-		infof("Counterexample: ");
+		StringBuilder result = new StringBuilder();
 		String sep = "";
 		Context ctxt = path;
 		
@@ -718,15 +757,17 @@ public class QuickCheck
 		{
 			for (TCNameToken name: ctxt.keySet())
 			{
-				infof("%s%s = %s", sep, name, ctxt.get(name));
+				result.append(sep);
+				result.append(name);
+				result.append(" = ");
+				result.append(ctxt.get(name));
 				sep = ", ";
 			}
 			
 			ctxt = ctxt.outer;
 		}
 		
-		infoln("");
-		return path;
+		return result.toString();
 	}
 
 	private String duration(long time)

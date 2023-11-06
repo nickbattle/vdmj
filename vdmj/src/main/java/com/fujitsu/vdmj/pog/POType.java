@@ -33,7 +33,7 @@ public enum POType
 	FUNC_SATISFIABILITY("function satisfiability", true),
 	FUNC_PATTERNS("function parameter patterns", true),
 	LET_BE_EXISTS("let be st existence", true),
-	UNIQUE_EXISTENCE("unique existence binding", true),
+	UNIQUE_EXISTENCE("unique existence binding"),	// Note: not existential!
 	FUNC_ITERATION("function iteration"),
 	MAP_ITERATION("map iteration"),
 	FUNC_COMPOSE("function compose"),

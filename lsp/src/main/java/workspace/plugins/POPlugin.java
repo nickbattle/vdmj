@@ -233,6 +233,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				messages.add(new VDMWarning(9001, po.countermessage, po.location));
 			}
 			
+			if (po.witness != null)
+			{
+				json.put("witness", "PO #" + po.number + ": " + po.witness);
+			}
+			
 			poList.add(json);
 		}
 		

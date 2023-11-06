@@ -47,6 +47,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public Context counterexample;
 	public String countermessage;
 	public String provedBy;
+	public String witness;
 
 	private int var = 1;
 	private TCExpression checkedExpression = null;
@@ -103,6 +104,11 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public void setCounterMessage(String message)
 	{
 		this.countermessage = message;
+	}
+	
+	public void setWitness(String witness)
+	{
+		this.witness = witness;
 	}
 
 	@Override
