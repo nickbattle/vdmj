@@ -137,7 +137,12 @@ public class POContextStack extends Stack<POContext>
 	{
 		for (POContext ctxt: this)
 		{
-			if (!(ctxt instanceof PONameContext))
+			if (ctxt instanceof PONameContext ||
+				ctxt instanceof PONoCheckContext)
+			{
+				continue;
+			}
+			else
 			{
 				return false;	// Has something significant
 			}

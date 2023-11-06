@@ -95,7 +95,7 @@ public class POStateDefinition extends PODefinition
 		ProofObligationList list =
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 
-		ctxt = new POContextStack();
+		ctxt.pop();		// Remove default name context
 		ctxt.push(new PONameContext(new TCNameList(this.name)));
 				
 		if (invExpression != null)
