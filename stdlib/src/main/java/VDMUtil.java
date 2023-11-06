@@ -68,7 +68,7 @@ public class VDMUtil
 	}
 
 	@VDMFunction
-	public static Value seq_of_char2val(Value arg)
+	public static Value seq_of_char2val_(Value arg)		// Note, with underscore - see VDM
 	{
 		ValueList result = new ValueList();
 
@@ -93,7 +93,7 @@ public class VDMUtil
 			INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
 
 			result.add(new BooleanValue(true));
-			Context ctxt = new Context(null, "seq_of_char2val", null);
+			Context ctxt = new Context(null, "seq_of_char2val_", null);
 			ctxt.setThreadState(null);
 			result.add(inexp.eval(ctxt));
 		}
@@ -123,7 +123,7 @@ public class VDMUtil
 		}
 	}
 
-	public Value get_file_pos(Context ctxt)
+	public static Value get_file_pos(Context ctxt)
 	{
 		try
 		{
