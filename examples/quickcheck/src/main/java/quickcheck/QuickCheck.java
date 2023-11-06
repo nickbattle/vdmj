@@ -510,6 +510,7 @@ public class QuickCheck
 					if (execResult.boolValue(ctxt))
 					{
 						POStatus outcome = null;
+						String message = "";
 						
 						if (didTimeout)
 						{
@@ -522,13 +523,15 @@ public class QuickCheck
 						else if (results.hasAllValues && execCompleted)
 						{
 							outcome = POStatus.PROVED;		// All values were tested and passed, so PROVED
+							message = " by finite types";
+							po.setProvedBy("finite");
 						}
 						else
 						{
 							outcome = POStatus.MAYBE;
 						}
 						
-						infof("PO #%d, %s %s\n", po.number, outcome.toString().toUpperCase(), duration(before, after));
+						infof("PO #%d, %s%s %s\n", po.number, outcome.toString().toUpperCase(), message, duration(before, after));
 						po.setStatus(outcome);
 						po.setCounterexample(null);
 						po.setCounterMessage(null);
