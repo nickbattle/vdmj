@@ -24,12 +24,15 @@
 
 package quickcheck.visitors;
 
+import java.util.List;
 import java.util.Stack;
+import java.util.Vector;
 
 import com.fujitsu.vdmj.ast.lex.LexKeywordToken;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCValueDefinition;
+import com.fujitsu.vdmj.tc.expressions.TCDefExpression;
 import com.fujitsu.vdmj.tc.expressions.TCElseIfExpression;
 import com.fujitsu.vdmj.tc.expressions.TCEqualsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -50,6 +53,7 @@ import com.fujitsu.vdmj.tc.patterns.TCIdentifierPattern;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleSetBind;
 import com.fujitsu.vdmj.tc.patterns.TCPattern;
+import com.fujitsu.vdmj.util.Utils;
 
 /**
  * Search for trivial truths in POs. Each method is passed a stack of expressions
@@ -61,8 +65,16 @@ import com.fujitsu.vdmj.tc.patterns.TCPattern;
  */
 public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpression>>
 {
+	private final List<String> evaluated;
+	
 	public TrivialQCVisitor()
 	{
+		evaluated = new Vector<String>();
+	}
+	
+	public String getMessage()
+	{
+		return Utils.listToString(evaluated);
 	}
 	
 	private void pops(Stack<TCExpression> truths, int pushes)
@@ -108,6 +120,36 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 	
 	@Override
 	public Boolean caseLetDefExpression(TCLetDefExpression node, Stack<TCExpression> truths)
+	{
+		int pushes = 0;
+		
+		for (TCDefinition def: node.localDefs)
+		{
+			if (def instanceof TCValueDefinition)
+			{
+				TCValueDefinition vdef = (TCValueDefinition)def;
+				
+				if (vdef.pattern instanceof TCIdentifierPattern)
+				{
+					TCIdentifierPattern id = (TCIdentifierPattern)vdef.pattern;
+
+					truths.push(new TCEqualsExpression(
+							new TCVariableExpression(id.location, id.name, id.toString()),
+							new LexKeywordToken(Token.EQUALS, id.location),
+							vdef.exp));
+						
+					pushes++;
+				}
+			}
+		}
+		
+		boolean result = node.expression.apply(this, truths);
+		pops(truths, pushes);
+		return result;
+	}
+	
+	@Override
+	public Boolean caseDefExpression(TCDefExpression node, Stack<TCExpression> truths)
 	{
 		int pushes = 0;
 		
@@ -234,6 +276,14 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 	@Override
 	public Boolean caseExpression(TCExpression node, Stack<TCExpression> truths)
 	{
-		return truths.contains(node);
+		if (truths.contains(node))
+		{
+			evaluated.add(node.toString());		// This truth was used
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 }

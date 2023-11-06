@@ -84,9 +84,10 @@ public class TrivialQCStrategy extends QCStrategy
 		if (po.isCheckable && po.getCheckedExpression() != null)
 		{
 			TrivialQCVisitor visitor = new TrivialQCVisitor();
+
 			if (po.getCheckedExpression().apply(visitor, new Stack<TCExpression>()))
 			{
-				return new StrategyResults(getName(), null, null, System.currentTimeMillis() - before);
+				return new StrategyResults(getName(), visitor.getMessage(), null, System.currentTimeMillis() - before);
 			}
 		}
 		

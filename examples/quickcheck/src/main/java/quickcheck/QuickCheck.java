@@ -372,7 +372,7 @@ public class QuickCheck
 				po.setMessage(results.message);
 				po.setWitness(results.witness);
 				po.setCounterexample(null);
-				infof("PO #%d, PROVED by %s strategy %s\n", po.number, results.provedBy, duration(results.duration));
+				infof("PO #%d, PROVED by %s %s %s\n", po.number, results.provedBy, results.message, duration(results.duration));
 				return;
 			}
 
