@@ -24,6 +24,7 @@
 
 package quickcheck.visitors;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Vector;
 
@@ -151,7 +152,7 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		}
 		else if (ptype.result instanceof TCNumericType)
 		{
-			body = new INIntegerLiteralExpression(new LexIntegerToken(1, node.location));
+			body = new INIntegerLiteralExpression(new LexIntegerToken(BigInteger.ONE, node.location));
 		}
 		else
 		{
