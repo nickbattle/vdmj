@@ -26,7 +26,6 @@ package quickcheck.strategies;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
 
@@ -35,7 +34,6 @@ import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
 import quickcheck.visitors.TrivialQCVisitor;
@@ -82,18 +80,18 @@ public class TrivialQCStrategy extends QCStrategy
 	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
 	{
 		long before = System.currentTimeMillis();
-		String provedBy = null;
 
 		if (po.isCheckable && po.getCheckedExpression() != null)
 		{
 			TrivialQCVisitor visitor = new TrivialQCVisitor();
+
 			if (po.getCheckedExpression().apply(visitor, new Stack<TCExpression>()))
 			{
-				provedBy = getName();
+				return new StrategyResults(getName(), visitor.getMessage(), null, System.currentTimeMillis() - before);
 			}
 		}
 		
-		return new StrategyResults(provedBy, false, new HashMap<String, ValueList>(), System.currentTimeMillis() - before);
+		return new StrategyResults();	// Got nothing!
 	}
 
 	@Override

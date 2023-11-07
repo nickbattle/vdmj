@@ -124,7 +124,13 @@ public class POContextStack extends Stack<POContext>
 	{
 		for (POContext ctxt: this)
 		{
-			if (!(ctxt instanceof PONameContext))
+			if (ctxt instanceof PONameContext ||
+				ctxt instanceof PONoCheckContext ||
+				ctxt instanceof POScopeContext)
+			{
+				continue;	// These aren't important
+			}
+			else
 			{
 				return ctxt.isExistential();
 			}
@@ -137,13 +143,19 @@ public class POContextStack extends Stack<POContext>
 	{
 		for (POContext ctxt: this)
 		{
-			if (!(ctxt instanceof PONameContext))
+			if (ctxt instanceof PONameContext ||
+				ctxt instanceof PONoCheckContext ||
+				ctxt instanceof POScopeContext)
+			{
+				continue;		// These aren't important
+			}
+			else
 			{
 				return false;	// Has something significant
 			}
 		}
 		
-		return true;
+		return true;	// Has nothing important
 	}
 
 	public TCTypeList getTypeParams()

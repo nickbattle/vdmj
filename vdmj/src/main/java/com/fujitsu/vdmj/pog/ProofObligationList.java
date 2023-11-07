@@ -110,9 +110,9 @@ public class ProofObligationList extends Vector<ProofObligation>
 			
 			sb.append(")\n");
 			
-			if (po.countermessage != null)
+			if (po.message != null)
 			{
-				sb.append(po.countermessage);
+				sb.append(po.message);
 				sb.append("\n");
 			}
 			
@@ -226,7 +226,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 						iter.remove();
 						obligation.status = POStatus.FAILED;
 						obligation.isCheckable = false;
-						obligation.countermessage = "PO #" + obligation.number + ": Missing measure function";
+						obligation.message = "PO #" + obligation.number + ": Missing measure function";
 					}
 					break;
 					

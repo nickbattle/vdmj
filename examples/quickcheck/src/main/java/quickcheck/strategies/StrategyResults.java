@@ -39,24 +39,50 @@ import com.fujitsu.vdmj.values.ValueList;
  */
 public class StrategyResults
 {
-	public final String provedBy;			// If set, proved already
-	public final boolean hasAllValues;		// Contains all possible values from all binds
+	public final String provedBy;			// If set, proved by the strategy
+	public final String message;			// Any message along with the result
+	public final String witness;			// Any witness found
+	
 	public final Map<String, ValueList> counterexamples;
-	public final long duration;				// time to generate counterexamples, in millisecs
+	public final boolean hasAllValues;		// Contains all possible values from all binds
+	
+	public long duration;					// time to generate counterexamples, in millisecs
 
 	public StrategyResults()
 	{
 		this.provedBy = null;
-		this.hasAllValues = false;
+		this.message = null;
+		this.witness = null;
+		
 		this.counterexamples = new HashMap<String, ValueList>();
+		this.hasAllValues = false;
 		this.duration = 0;
 	}
 
-	public StrategyResults(String proved, boolean hasAllValues, Map<String, ValueList> counterexamples, long duration)
+	public StrategyResults(Map<String, ValueList> counterexamples, boolean hasAllValues, long duration)
 	{
-		this.provedBy = proved;
-		this.hasAllValues = hasAllValues;
+		this.provedBy = null;
+		this.message = null;
+		this.witness = null;
+
 		this.counterexamples = counterexamples;
+		this.hasAllValues = hasAllValues;
+		this.duration = duration;
+	}
+
+	public StrategyResults(String provedBy, String message, String witness, long duration)
+	{
+		this.provedBy = provedBy;
+		this.message = message;
+		this.witness = witness;
+
+		this.counterexamples = new HashMap<String, ValueList>();
+		this.hasAllValues = false;
+		this.duration = duration;
+	}
+	
+	public void setDuration(Long duration)
+	{
 		this.duration = duration;
 	}
 }
