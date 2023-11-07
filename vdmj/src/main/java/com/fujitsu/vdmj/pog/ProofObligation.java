@@ -118,6 +118,17 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	{
 		return existential;
 	}
+	
+	/**
+	 * True if there are multiple binds in the obligation which represent "the same" values,
+	 * for example a forall x:nat... with an exists y:nat.. inside that is reasoning about
+	 * the same set of nats. In this case, the random strategy has to include fixed values
+	 * too. 
+	 */
+	public boolean hasCorrelatedBinds()
+	{
+		return false;
+	}
 
 	@Override
 	public String toString()
