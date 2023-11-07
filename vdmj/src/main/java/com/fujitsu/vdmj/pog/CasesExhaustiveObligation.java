@@ -30,11 +30,14 @@ import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 
 public class CasesExhaustiveObligation extends ProofObligation
 {
+	private final boolean hasCorrelatedBinds;
+	
 	public CasesExhaustiveObligation(POCasesExpression exp, POContextStack ctxt)
 	{
 		super(exp.location, POType.CASES_EXHAUSTIVE, ctxt);
 		StringBuilder sb = new StringBuilder();
 		String prefix = "";
+		boolean correlated = false;
 
 		for (POCaseAlternative alt: exp.cases)
 		{
@@ -59,11 +62,20 @@ public class CasesExhaustiveObligation extends ProofObligation
 	    		sb.append(" = ");
 	    		sb.append(alt.pattern.removeIgnorePatterns());
 	    		sb.append(")");
+	    		
+	    		correlated = true;
 			}
 
 			prefix = " or ";
 		}
 
+		hasCorrelatedBinds = correlated;
 		value = ctxt.getObligation(sb.toString());
+	}
+
+	@Override
+	public boolean hasCorrelatedBinds()
+	{
+		return hasCorrelatedBinds;
 	}
 }

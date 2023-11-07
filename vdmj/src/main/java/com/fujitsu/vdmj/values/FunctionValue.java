@@ -248,6 +248,15 @@ public class FunctionValue extends Value
 			}
 		}
 	}
+	
+	public void setMeasure(FunctionValue measure)
+	{
+		measure.measuringThreads = Collections.synchronizedSet(new HashSet<Long>());
+		measure.callingThreads = Collections.synchronizedSet(new HashSet<Long>());
+		measure.isMeasure = true;
+
+		this.measure = measure;
+	}
 
 	public Value eval(
 		LexLocation from, Value arg, Context ctxt) throws ValueException

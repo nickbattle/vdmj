@@ -177,6 +177,7 @@ public class INExplicitFunctionDefinition extends INDefinition
 		
 		FunctionValue prefv = null;
 		FunctionValue postfv = null;
+		FunctionValue measurefv = null;
 
 		if (predef != null)
 		{
@@ -188,9 +189,19 @@ public class INExplicitFunctionDefinition extends INDefinition
 			postfv = postdef.getPolymorphicValue(argTypes, params, ctxt);
 		}
 		
+		if (measureDef != null)
+		{
+			measurefv = measureDef.getPolymorphicValue(argTypes, params, ctxt);
+		}
+		
 		TCFunctionType ftype = (TCFunctionType)INInstantiate.instantiate(getType(), params, ctxt);
 		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, null);
 
+		if (measurefv != null)
+		{
+			rv.setMeasure(measurefv);
+		}
+		
 		polyfuncs.put(argTypes, rv);
 		return rv;
 	}

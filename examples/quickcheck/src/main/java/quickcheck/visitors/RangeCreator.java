@@ -27,10 +27,24 @@ package quickcheck.visitors;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.ast.lex.LexBooleanToken;
+import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
+import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
+import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INIntegerLiteralExpression;
+import com.fujitsu.vdmj.in.expressions.INUndefinedExpression;
+import com.fujitsu.vdmj.in.patterns.INIdentifierPattern;
+import com.fujitsu.vdmj.in.patterns.INPatternList;
+import com.fujitsu.vdmj.in.types.INInstantiate;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
+import com.fujitsu.vdmj.tc.types.TCBooleanType;
+import com.fujitsu.vdmj.tc.types.TCFunctionType;
+import com.fujitsu.vdmj.tc.types.TCNumericType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.visitors.TCTypeVisitor;
 import com.fujitsu.vdmj.util.KCombinator;
+import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.ValueSet;
 
 public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
@@ -113,5 +127,37 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 		}
 		
 		return power;
+	}
+	
+	/**
+	 * Attempt to produce a function that matches a (possibly polymorphic) TCFunctionType.
+	 */
+	protected FunctionValue instantiate(TCFunctionType node)
+	{
+		INPatternList params = new INPatternList();
+		INExpression body = null;
+		
+		// Resolve any @T types referred to in the type parameters
+		TCFunctionType ptype = (TCFunctionType) INInstantiate.instantiate(node, ctxt, ctxt);
+		
+		for (int i=1; i <= ptype.parameters.size(); i++)
+		{
+			params.add(new INIdentifierPattern(new TCNameToken(node.location, node.location.module, "p" + i)));
+		}
+		
+		if (ptype.result instanceof TCBooleanType)
+		{
+			body = new INBooleanLiteralExpression(new LexBooleanToken(true, node.location));
+		}
+		else if (ptype.result instanceof TCNumericType)
+		{
+			body = new INIntegerLiteralExpression(new LexIntegerToken(1, node.location));
+		}
+		else
+		{
+			body = new INUndefinedExpression(node.location);
+		}
+		
+		return new FunctionValue(node.location, "$qc_dummy", ptype, params, body, null);
 	}
 }
