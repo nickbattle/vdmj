@@ -395,6 +395,7 @@ public class QuickCheck
 				}
 				
 				Context ctxt = Interpreter.getInstance().getInitialContext();
+				Interpreter.getInstance().setDefaultName(po.location.module);
 				
 				if (Settings.dialect != Dialect.VDM_SL)
 				{
@@ -419,14 +420,13 @@ public class QuickCheck
 				{
 					verbose("PO #%d, starting...\n", po.number);
 					
+					// Suspend annotation execution by the interpreter, because the
+					// expressions and statements in the PO can invoke them.
+					INAnnotation.suspend(true);
+					
 					do
 					{
 						ictxt.next();
-						
-						// Suspend annotation execution by the interpreter, because the
-						// expressions and statements in the PO can invoke them.
-						INAnnotation.suspend(true);
-						
 						execResult = poexp.eval(ictxt);
 					}
 					while (ictxt.hasNext() && execResult.boolValue(ctxt));
