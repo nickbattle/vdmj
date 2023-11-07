@@ -1130,6 +1130,11 @@ public class LSPWorkspaceManager
 			{
 				for (File file: deleted)
 				{
+					if (isExternalFile(file))
+					{
+						file = getExtractedName(file);	// Messages reported against extract
+					}
+					
 					JSONObject params = new JSONObject("uri", file.toURI().toString(), "diagnostics", new JSONArray());
 					results.add(RPCRequest.notification("textDocument/publishDiagnostics", params));
 				}
