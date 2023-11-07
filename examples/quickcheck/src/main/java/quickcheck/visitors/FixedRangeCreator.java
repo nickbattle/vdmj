@@ -28,9 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
-import com.fujitsu.vdmj.ast.lex.LexIntegerToken;
-import com.fujitsu.vdmj.in.expressions.INIntegerLiteralExpression;
-import com.fujitsu.vdmj.in.patterns.INPatternList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -71,7 +68,6 @@ import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.CharacterValue;
 import com.fujitsu.vdmj.values.FieldMap;
 import com.fujitsu.vdmj.values.FieldValue;
-import com.fujitsu.vdmj.values.FunctionValue;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.InvariantValue;
 import com.fujitsu.vdmj.values.MapValue;
@@ -269,9 +265,8 @@ public class FixedRangeCreator extends RangeCreator
 	@Override
 	public ValueSet caseFunctionType(TCFunctionType node, Integer arg)
 	{
-		FunctionValue dummy = new FunctionValue(LexLocation.ANY, "dummy", node,
-				new INPatternList(), new INIntegerLiteralExpression(new LexIntegerToken(0, LexLocation.ANY)), null);
-		return new ValueSet(dummy);
+		// FunctionValue dummy = instantiate(node);
+		return new ValueSet();
 	}
 
 	@Override

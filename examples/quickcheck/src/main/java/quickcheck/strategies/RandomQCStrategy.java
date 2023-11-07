@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.values.ValueList;
 import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
+import quickcheck.visitors.FixedRangeCreator;
 import quickcheck.visitors.RandomRangeCreator;
 
 public class RandomQCStrategy extends QCStrategy
@@ -136,10 +137,21 @@ public class RandomQCStrategy extends QCStrategy
 		{
 			for (INBindingSetter bind: binds)
 			{
-				RandomRangeCreator visitor = new RandomRangeCreator(ctxt, seed++);
-				ValueSet values = bind.getType().apply(visitor, expansionLimit);
 				ValueList list = new ValueList();
-				list.addAll(values);
+				
+				if (po.hasCorrelatedBinds())	// Must used fixed values by type
+				{
+					FixedRangeCreator visitor = new FixedRangeCreator(ctxt);
+					ValueSet extras = bind.getType().apply(visitor, expansionLimit);
+					list.addAll(extras);
+				}
+				else
+				{
+					RandomRangeCreator visitor = new RandomRangeCreator(ctxt, seed++);
+					ValueSet values = bind.getType().apply(visitor, expansionLimit);
+					list.addAll(values);
+				}
+				
 				result.put(bind.toString(), list);
 			}
 		}

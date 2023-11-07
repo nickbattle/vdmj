@@ -293,7 +293,8 @@ public class RandomRangeCreator extends RangeCreator
 	@Override
 	public ValueSet caseFunctionType(TCFunctionType node, Integer limit)
 	{
-		return new ValueSet();	// Can't generate functions!
+		// FunctionValue dummy = instantiate(node);
+		return new ValueSet();
 	}
 
 	@Override
