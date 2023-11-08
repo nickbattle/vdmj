@@ -513,7 +513,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			defs.add(postdef);
 		}
 		
-		if (measureName != null && measureName.getName().startsWith("measure_"))
+		if (measureName != null && measureName.isMeasureName())
 		{
 			defs.add(measureDef);
 		}

@@ -157,7 +157,7 @@ public class INImplicitFunctionDefinition extends INDefinition
 			postfunc.uninstantiated = (typeParams != null);
 		}
 
-		if (measureDef != null && measureDef.name.getName().startsWith("measure_"))
+		if (measureDef != null && measureDef.name.isMeasureName())
 		{
 			// Add implicit measure_* functions and any pre_measure_*s too.
 			nvl.addAll(measureDef.getNamedValues(ctxt));
