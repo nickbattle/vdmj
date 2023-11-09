@@ -108,19 +108,15 @@ public class INExplicitOperationDefinition extends INDefinition
 			(postdef == null) ? null : new FunctionValue(postdef, null, null, null, null);
 
 		OperationValue op = new OperationValue(this, prefunc, postfunc, statedef);
-		op.isConstructor = isConstructor;
-		op.isStatic = accessSpecifier.isStatic;
 		nvl.add(new NameValuePair(name, op));
 
 		if (predef != null)
 		{
-			prefunc.isStatic = accessSpecifier.isStatic;
 			nvl.add(new NameValuePair(predef.name, prefunc));
 		}
 
 		if (postdef != null)
 		{
-			postfunc.isStatic = accessSpecifier.isStatic;
 			nvl.add(new NameValuePair(postdef.name, postfunc));
 		}
 

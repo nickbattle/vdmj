@@ -73,7 +73,7 @@ public class FunctionValue extends Value
 	public final INExpression body;
 	public final FunctionValue precondition;
 	public final FunctionValue postcondition;
-	private final FunctionValue measure;
+	public final FunctionValue measure;
 	public final INClassDefinition classdef;
 
 	public Context freeVariables;
@@ -83,9 +83,9 @@ public class FunctionValue extends Value
 	private Set<Long> callingThreads = null;
 	private boolean isMeasure = false;
 
-	public ObjectValue self = null;
-	public boolean isStatic = false;			// ?????
-	public boolean uninstantiated = false;		// ?????
+	private ObjectValue self = null;
+	private boolean isStatic = false;
+	public boolean uninstantiated = false;
 
 	/**
 	 * Private constructor used by clone and curry.
@@ -165,6 +165,8 @@ public class FunctionValue extends Value
 		this.measure = measure;
 		this.freeVariables = freeVariables;
 		this.classdef = def.classDefinition;
+		this.uninstantiated = (def.typeParams != null);
+		this.isStatic = def.accessSpecifier.isStatic;
 
 		if (Settings.measureChecks && measure != null)
 		{
@@ -208,6 +210,8 @@ public class FunctionValue extends Value
 		this.measure = measure;
 		this.freeVariables = freeVariables;
 		this.classdef = def.classDefinition;
+		this.uninstantiated = (def.typeParams != null);
+		this.isStatic = def.accessSpecifier.isStatic;
 
 		if (Settings.measureChecks && measure != null)
 		{
@@ -233,7 +237,7 @@ public class FunctionValue extends Value
 		this(fdef, precondition, postcondition, measure, freeVariables);
 		this.typeValues = argTypes;
 		this.type = ftype;
-		this.uninstantiated = true;
+		this.uninstantiated = false;
 	}
 
 	/**
@@ -246,7 +250,7 @@ public class FunctionValue extends Value
 		this(fdef, precondition, postcondition, measure, freeVariables);
 		this.typeValues = argTypes;
 		this.type = ftype;
-		this.uninstantiated = true;
+		this.uninstantiated = false;
 	}
 
 	/**
@@ -277,6 +281,11 @@ public class FunctionValue extends Value
 		return type.toString();
 	}
 
+	public void setSelf(FunctionValue from)
+	{
+		this.self = from.self;
+	}
+	
 	public void setSelf(ObjectValue self)
 	{
 		if (!isStatic)

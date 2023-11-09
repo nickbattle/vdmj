@@ -133,19 +133,15 @@ public class INImplicitOperationDefinition extends INDefinition
 		// the pre_() expression for implicit functions.
 
 		OperationValue op =	new OperationValue(this, prefunc, postfunc, statedef);
-		op.isConstructor = isConstructor;
-		op.isStatic = accessSpecifier.isStatic;
 		nvl.add(new NameValuePair(name, op));
 
 		if (predef != null)
 		{
-			prefunc.isStatic = accessSpecifier.isStatic;
 			nvl.add(new NameValuePair(predef.name, prefunc));
 		}
 
 		if (postdef != null)
 		{
-			postfunc.isStatic = accessSpecifier.isStatic;
 			nvl.add(new NameValuePair(postdef.name, postfunc));
 		}
 
