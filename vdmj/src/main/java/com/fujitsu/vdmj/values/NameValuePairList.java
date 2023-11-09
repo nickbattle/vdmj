@@ -52,6 +52,20 @@ public class NameValuePairList extends Vector<NameValuePair>
 		return super.add(nv);
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T> T getNamedValue(TCNameToken sought)
+	{
+		for (NameValuePair pair: this)
+		{
+			if (pair.name.equals(sought))
+			{
+				return (T) pair.value;
+			}
+		}
+		
+		return null;
+	}
+
 	public NameValuePairList getUpdatable(ValueListenerList listeners)
 	{
 		NameValuePairList nlist = new NameValuePairList();

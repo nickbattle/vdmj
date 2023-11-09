@@ -401,12 +401,12 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
 				typeParams, type.getMeasureType(isCurried, actual), cpll, measureExp, precondition, null, false, null);
 
+		measureDef = def;
+
 		def.classDefinition = classDefinition;
 		def.implicitDefinitions(base);
 		def.typeResolve(base);
 		def.typeCheck(base, scope);
-
-		measureDef = def;
 	}
 
 	/**
