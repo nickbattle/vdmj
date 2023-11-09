@@ -147,8 +147,8 @@ public class INExplicitFunctionDefinition extends INDefinition
 			nvl.addAll(names);
 		}
 
-		FunctionValue func = new FunctionValue(this, prefunc, postfunc, null);
-		func.isStatic = accessSpecifier.isStatic;;
+		FunctionValue func = new FunctionValue(this, prefunc, postfunc, measurefunc, null);
+		func.isStatic = accessSpecifier.isStatic;
 		func.uninstantiated = (typeParams != null);
 		nvl.add(new NameValuePair(name, func));
 
@@ -196,13 +196,8 @@ public class INExplicitFunctionDefinition extends INDefinition
 		}
 		
 		TCFunctionType ftype = (TCFunctionType)INInstantiate.instantiate(getType(), params, ctxt);
-		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, null);
+		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, measurefv, null);
 
-		if (measurefv != null)
-		{
-			rv.setMeasure(measurefv);
-		}
-		
 		polyfuncs.put(argTypes, rv);
 		return rv;
 	}

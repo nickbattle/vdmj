@@ -376,14 +376,14 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 	 */
 	private void setMeasureExp(Environment base, Environment local, NameScope scope)
 	{
-		TCType actual = measureExp.typeCheck(local, null, NameScope.NAMES, null);
+		TCType mexpType = measureExp.typeCheck(local, null, NameScope.NAMES, null);
 		measureName = name.getMeasureName(measureExp.location);
-		checkMeasure(measureName, actual);
+		checkMeasure(measureName, mexpType);
 		
 		// Note that the measure_f has the precondition of the function it measures.
 
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
-				typeParams, type.getMeasureType(false, actual), getParamPatternList(), measureExp, precondition, null, false, null);
+				typeParams, type.getMeasureType(mexpType), getParamPatternList(), measureExp, precondition, null, false, null);
 
 		def.classDefinition = classDefinition;
 		def.implicitDefinitions(base);
@@ -433,6 +433,14 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 				detail2(mname.getName(), mtype.parameters, mname.getName(), type.parameters);
 			}
 
+			TCType result = mtype.result;
+			
+			while (result instanceof TCFunctionType)
+			{
+				TCFunctionType fr = (TCFunctionType)result;
+				result = fr.result;
+			}
+			
 			checkMeasure(mname, mtype.result);
 		}
 	}
@@ -492,7 +500,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 		
 		if (measureDef != null && measureDef.findName(sought, scope) != null)
 		{
-			return measureDef;
+			return measureDef.findName(sought, scope);	// eg. pre_measure_f
 		}
 
 		return null;
@@ -513,7 +521,7 @@ public class TCImplicitFunctionDefinition extends TCDefinition
 			defs.add(postdef);
 		}
 		
-		if (measureName != null && measureName.isMeasureName())
+		if (measureDef != null && measureName.isMeasureName())
 		{
 			defs.add(measureDef);
 		}

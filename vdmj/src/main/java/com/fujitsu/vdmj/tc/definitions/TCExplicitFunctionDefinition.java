@@ -343,7 +343,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 		if (measureExp instanceof TCVariableExpression)
 		{
 			TCVariableExpression exp = (TCVariableExpression)measureExp;
-			if (base.isVDMPP()) exp.name.setTypeQualifier(getMeasureParams());
+			if (base.isVDMPP()) exp.name.setTypeQualifier(type.parameters);
 			TCDefinition def = base.findName(exp.name, scope);
 			
 			if (def instanceof TCExplicitFunctionDefinition)
@@ -381,25 +381,14 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	 */
 	private void setMeasureExp(Environment base, Environment local, NameScope scope)
 	{
-		TCType actual = measureExp.typeCheck(local, null, NameScope.NAMES, null);
+		TCType mexpType = measureExp.typeCheck(local, null, NameScope.NAMES, null);
 		measureName = name.getMeasureName(measureExp.location);
-		checkMeasure(measureName, actual);
-		
-		// Concatenate the parameter patterns into one list for curried measures
-		TCPatternList all = new TCPatternList();
-		
-		for (TCPatternList p: paramPatternList)
-		{
-			all.addAll(p);
-		}
-		
-		TCPatternListList cpll = new TCPatternListList();
-		cpll.add(all);
+		checkMeasure(measureName, mexpType);
 		
 		// Note that the measure_f has the precondition of the function it measures.
 		
 		TCExplicitFunctionDefinition def = new TCExplicitFunctionDefinition(null, accessSpecifier, measureName,
-				typeParams, type.getMeasureType(isCurried, actual), cpll, measureExp, precondition, null, false, null);
+				typeParams, type.getMeasureType(mexpType), paramPatternList, measureExp, precondition, null, false, null);
 
 		def.classDefinition = classDefinition;
 		def.implicitDefinitions(base);
@@ -414,7 +403,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	 */
 	private void setMeasureDef(TCNameToken mname, Environment base, NameScope scope)
 	{
-		if (base.isVDMPP()) mname.setTypeQualifier(getMeasureParams());
+		if (base.isVDMPP()) mname.setTypeQualifier(type.parameters);
 		measureDef = (TCExplicitFunctionDefinition) base.findName(mname, scope);
 
 		if (measureDef == this)
@@ -442,23 +431,30 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			}
 
 			TCFunctionType mtype = (TCFunctionType)measureDef.getType();
-			TCTypeList mparams = getMeasureParams();
 			
 			if (typeParams != null)		// Polymorphic, so compare "shape" of param signature
 			{
-				if (!mtype.parameters.toString().equals(mparams.toString()))
+				if (!mtype.parameters.toString().equals(type.parameters.toString()))
 				{
 					mname.report(3303, "Measure parameters different to function");
-					detail2(mname.getName(), mtype.parameters, "Expected", mparams);
+					detail2(mname.getName(), mtype.parameters, "Expected", type.parameters);
 				}
 			}
-			else if (!TypeComparator.compatible(mtype.parameters, mparams))
+			else if (!TypeComparator.compatible(mtype.parameters, type.parameters))
 			{
 				mname.report(3303, "Measure parameters different to function");
-				detail2(mname.getName(), mtype.parameters, "Expected", mparams);
+				detail2(mname.getName(), mtype.parameters, "Expected", type.parameters);
 			}
-
-			checkMeasure(mname, mtype.result);
+			
+			TCType result = mtype.result;
+			
+			while (result instanceof TCFunctionType)
+			{
+				TCFunctionType fr = (TCFunctionType)result;
+				result = fr.result;
+			}
+			
+			checkMeasure(mname, result);
 		}
 	}
 
@@ -495,26 +491,6 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 	public TCType getType()
 	{
 		return type;		// NB entire "->" type, not the result
-	}
-
-	private TCTypeList getMeasureParams()
-	{
-		TCTypeList params = new TCTypeList();
-		params.addAll(type.parameters);
-		
-		if (isCurried)
-		{
-			TCType rtype = type.result;
-
-			while (rtype instanceof TCFunctionType)
-			{
-				TCFunctionType ftype = (TCFunctionType)rtype;
-				params.addAll(ftype.parameters);
-				rtype = ftype.result;
-			}
-		}
-		
-		return params;
 	}
 
 	private TCType checkParams(ListIterator<TCPatternList> plists, TCFunctionType ftype)

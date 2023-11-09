@@ -76,50 +76,63 @@ public class FunctionValue extends Value
 	public Context freeVariables;
 	public final INClassDefinition classdef;
 
-	// Causes parameter assignments to check their invariants (if any).
-	// This is set to false for inv_() functions, which cannot check them.
-	private final boolean checkInvariants;
-
 	// Measure function value, if any
-	private TCNameToken measureName = null;
-	private FunctionValue measure = null;
+	private final TCNameToken measureName;
+	private final FunctionValue measure;
+	private final ValueList curriedArgs;
+
 	private Map<Long, Stack<Value>> measureValues = null;
 	private Set<Long> measuringThreads = null;
 	private Set<Long> callingThreads = null;
-	private ValueList curriedArgs = null;
 	private boolean isMeasure = false;
 
 	public ObjectValue self = null;
 	public boolean isStatic = false;
 	public boolean uninstantiated = false;
 
+	/**
+	 * Private constructor used by clone and curry.
+	 * @param typeValues 
+	 */
 	private FunctionValue(LexLocation location, String name, TCFunctionType type,
-		INPatternListList paramPatternList, INExpression body,
-		FunctionValue precondition, FunctionValue postcondition,
-		Context freeVariables, boolean checkInvariants, ValueList curriedArgs,
+		Context typeValues, INPatternListList paramPatternList, INExpression body,
+		FunctionValue precondition, FunctionValue postcondition, FunctionValue measure,
+		Context freeVariables, ValueList curriedArgs,
 		TCNameToken measureName, Map<Long, Stack<Value>> measureValues, INClassDefinition classdef)
 	{
 		this.location = location;
 		this.name = name;
 		this.typeValues = null;
 		this.type = type;
+		this.typeValues = typeValues;
 		this.paramPatternList = paramPatternList;
 		this.body = body;
 		this.precondition = precondition;
 		this.postcondition = postcondition;
+		this.measure = measure;
 		this.freeVariables = freeVariables;
-		this.checkInvariants = checkInvariants;
 		this.curriedArgs = curriedArgs;
 		this.classdef = classdef;
 		
-		if (Settings.measureChecks && measureName != null)
+		if (Settings.measureChecks && measure != null)
 		{
 			this.measureName = measureName;
 			this.measureValues = measureValues;	// NB. a copy of the base FunctionValue's
+			
+			measure.measuringThreads = Collections.synchronizedSet(new HashSet<Long>());
+			measure.callingThreads = Collections.synchronizedSet(new HashSet<Long>());
+			measure.isMeasure = true;
+		}
+		else
+		{
+			this.measureName = null;
+			this.measureValues = null;
 		}
 	}
 
-	// This is used by lambda expressions - so no classdef
+	/*
+	 * This is used by lambda expressions - so no classdef, pre/post/measure
+	 */
 	public FunctionValue(LexLocation location, String name, TCFunctionType type,
 		INPatternList paramPatterns, INExpression body, Context freeVariables)
 	{
@@ -132,14 +145,23 @@ public class FunctionValue extends Value
 		this.precondition = null;
 		this.postcondition = null;
 		this.freeVariables = freeVariables;
-		this.checkInvariants = true;
+		this.curriedArgs = null;
 		this.classdef = null;
 
 		paramPatternList.add(paramPatterns);
+
+		this.measure = null;
+		this.measureName = null;
+		this.measureValues = null;
+		this.measuringThreads = null;
+		this.callingThreads = null;
 	}
 
+	/**
+	 * Explicit functions.
+	 */
 	public FunctionValue(INExplicitFunctionDefinition def,
-		FunctionValue precondition, FunctionValue postcondition,
+		FunctionValue precondition, FunctionValue postcondition, FunctionValue measure,
 		Context freeVariables)
 	{
 		this.location = def.location;
@@ -150,19 +172,32 @@ public class FunctionValue extends Value
 		this.body = def.body;
 		this.precondition = precondition;
 		this.postcondition = postcondition;
+		this.measure = measure;
 		this.freeVariables = freeVariables;
-		this.checkInvariants = !def.isTypeInvariant;
+		this.curriedArgs = null;
 		this.classdef = def.classDefinition;
 
-		if (Settings.measureChecks && def.measureName != null)
+		if (Settings.measureChecks && measure != null)
 		{
-			measureName = def.measureName;
-			measureValues = Collections.synchronizedMap(new HashMap<Long, Stack<Value>>());
+			this.measureName = def.measureName;
+			this.measureValues = Collections.synchronizedMap(new HashMap<Long, Stack<Value>>());
+			
+			measure.measuringThreads = Collections.synchronizedSet(new HashSet<Long>());
+			measure.callingThreads = Collections.synchronizedSet(new HashSet<Long>());
+			measure.isMeasure = true;
+		}
+		else
+		{
+			this.measureName = null;
+			this.measureValues = null;
 		}
 	}
 
+	/**
+	 * Implicit functions.
+	 */
 	public FunctionValue(INImplicitFunctionDefinition def,
-		FunctionValue precondition, FunctionValue postcondition,
+		FunctionValue precondition, FunctionValue postcondition, FunctionValue measure,
 		Context freeVariables)
 	{
 		this.location = def.location;
@@ -183,38 +218,54 @@ public class FunctionValue extends Value
 		this.body = def.body;
 		this.precondition = precondition;
 		this.postcondition = postcondition;
+		this.measure = measure;
 		this.freeVariables = freeVariables;
-		this.checkInvariants = true;
+		this.curriedArgs = null;
 		this.classdef = def.classDefinition;
 
-		if (Settings.measureChecks && def.measureName != null)
+		if (Settings.measureChecks && measure != null)
 		{
-			measureName = def.measureName;
-			measureValues = Collections.synchronizedMap(new HashMap<Long, Stack<Value>>());
+			this.measureName = def.measureName;
+			this.measureValues = Collections.synchronizedMap(new HashMap<Long, Stack<Value>>());
+			this.measuringThreads = Collections.synchronizedSet(new HashSet<Long>());
+			this.callingThreads = Collections.synchronizedSet(new HashSet<Long>());
+			measure.isMeasure = true;
+		}
+		else
+		{
+			this.measureName = null;
+			this.measureValues = null;
 		}
 	}
 
-	public FunctionValue(INImplicitFunctionDefinition fdef,
-		TCFunctionType ftype, Context argTypes, FunctionValue precondition,
-		FunctionValue postcondition, Context freeVariables)
-	{
-		this(fdef, precondition, postcondition, freeVariables);
-		this.typeValues = argTypes;
-		this.type = ftype;
-	}
-
+	/**
+	 * Polymorphic explicit functions.
+	 */
 	public FunctionValue(INExplicitFunctionDefinition fdef,
 		TCFunctionType ftype, Context argTypes, FunctionValue precondition,
-		FunctionValue postcondition, Context freeVariables)
+		FunctionValue postcondition, FunctionValue measure, Context freeVariables)
 	{
-		this(fdef, precondition, postcondition, freeVariables);
+		this(fdef, precondition, postcondition, measure, freeVariables);
 		this.typeValues = argTypes;
 		this.type = ftype;
 	}
 
-	// This constructor is used by IterFunctionValue and CompFunctionValue
-	// The methods which matter are overridden in those classes.
+	/**
+	 * Polymorphic implicit functions.
+	 */
+	public FunctionValue(INImplicitFunctionDefinition fdef,
+		TCFunctionType ftype, Context argTypes, FunctionValue precondition,
+		FunctionValue postcondition, FunctionValue measure, Context freeVariables)
+	{
+		this(fdef, precondition, postcondition, measure, freeVariables);
+		this.typeValues = argTypes;
+		this.type = ftype;
+	}
 
+	/**
+	 * This constructor is used by IterFunctionValue and CompFunctionValue
+	 * The methods which matter are overridden in those classes.
+	 */
 	public FunctionValue(LexLocation location, TCFunctionType type, String name, INClassDefinition classdef)
 	{
 		this.location = location;
@@ -226,8 +277,13 @@ public class FunctionValue extends Value
 		this.precondition = null;
 		this.postcondition = null;
 		this.freeVariables = null;
-		this.checkInvariants = true;
+		this.curriedArgs = null;
 		this.classdef = classdef;
+		this.measure = null;
+		this.measureName = null;
+		this.measureValues = null;
+		this.measuringThreads = null;
+		this.callingThreads = null;
 	}
 
 	@Override
@@ -247,15 +303,6 @@ public class FunctionValue extends Value
 				measure.setSelf(self);
 			}
 		}
-	}
-	
-	public void setMeasure(FunctionValue measure)
-	{
-		measure.measuringThreads = Collections.synchronizedSet(new HashSet<Long>());
-		measure.callingThreads = Collections.synchronizedSet(new HashSet<Long>());
-		measure.isMeasure = true;
-
-		this.measure = measure;
 	}
 
 	public Value eval(
@@ -322,13 +369,10 @@ public class FunctionValue extends Value
 
 			// The "old" signature of type invariant functions was inv_T: T +> bool. That means that
 			// you are passing an object of type T to the invariant, rather than the RHS of the type.
-			// This was subsequently changed, so that the signature is inv_T: nat +> bool (for T=nat).
+			// This was subsequently changed, so that the signature is inv_T: T! +> bool (for T=nat).
 			// So we can always check the types of the arguments here...
-			//
-			// Was if (checkInvariants)	// Don't even convert invariant arg values
-			{
-				pv = pv.convertTo(typeIter.next(), ctxt);
-			}
+
+			pv = pv.convertTo(typeIter.next(), ctxt);
 
 			try
 			{
@@ -398,21 +442,21 @@ public class FunctionValue extends Value
 
 			if (measureName != null)
 			{
-				if (measure == null)
-				{
-					measure = evalContext.lookup(measureName).functionValue(ctxt);
-
-					if (typeValues != null)		// Function is polymorphic, so measure copies type args
-					{
-						measure = (FunctionValue)measure.clone();
-						measure.uninstantiated = false;
-						measure.typeValues = typeValues;
-					}
-
-					measure.measuringThreads = Collections.synchronizedSet(new HashSet<Long>());
-					measure.callingThreads = Collections.synchronizedSet(new HashSet<Long>());
-					measure.isMeasure = true;
-				}
+//				if (measure == null)
+//				{
+//					measure = evalContext.lookup(measureName).functionValue(ctxt);
+//
+//					if (typeValues != null)		// Function is polymorphic, so measure copies type args
+//					{
+//						measure = (FunctionValue)measure.clone();
+//						measure.uninstantiated = false;
+//						measure.typeValues = typeValues;
+//					}
+//
+//					measure.measuringThreads = Collections.synchronizedSet(new HashSet<Long>());
+//					measure.callingThreads = Collections.synchronizedSet(new HashSet<Long>());
+//					measure.isMeasure = true;
+//				}
 				
 				// If this is a curried function, then the measure is called with all of the
 				// previously applied argument values, in addition to the argValues.
@@ -420,16 +464,16 @@ public class FunctionValue extends Value
 				ValueList measureArgs = null;
 				
 				
-				if (curriedArgs == null)
+				//if (curriedArgs == null)
 				{
 					measureArgs = argValues;
 				}
-				else
-				{
-					measureArgs = new ValueList();
-					measureArgs.addAll(curriedArgs);	// Previous args
-					measureArgs.addAll(argValues);		// Final args
-				}
+//				else
+//				{
+//					measureArgs = new ValueList();
+//					measureArgs.addAll(curriedArgs);	// Previous args
+//					measureArgs.addAll(argValues);		// Final args
+//				}
 
 				// We disable the swapping and time (RT) as measure checks should be "free".
 				Value mv;
@@ -468,7 +512,10 @@ public class FunctionValue extends Value
     						name + Utils.listToString("(", argValues, ", ", ")") + ", measure " +
     						measure.name + ", current " + mv + ", previous " + old;
     					
-    					measure = null;	// Re-initialise counters
+    					// Re-initialise counters
+    					measureValues.clear();
+    					measure.measuringThreads.clear();
+    					
     					abort(4146, message, evalContext);
     				}
 				}
@@ -560,6 +607,13 @@ public class FunctionValue extends Value
 				{
 					newpost = postcondition.curry(evalContext);
 				}
+				
+				FunctionValue newmeasure = null;
+				
+				if (measure != null)
+				{
+					newmeasure = measure.curry(evalContext);
+				}
 
 				// Curried arguments are collected so that we can invoke any measure functions
 				// once we reach the final apply that does not return a function.
@@ -579,14 +633,12 @@ public class FunctionValue extends Value
 				}
 
     			FunctionValue rv = new FunctionValue(location, "curried",
-    				(TCFunctionType)type.result,
+    				(TCFunctionType)type.result, typeValues,
     				paramPatternList.subList(1, paramPatternList.size()),
-    				body, newpre, newpost, evalContext, false, argList,
+    				body, newpre, newpost, newmeasure, evalContext, argList,
     				measureName, measureValues, classdef);
 
     			rv.setSelf(self);
-    			rv.typeValues = typeValues;
-
         		return rv;
 			}
 
@@ -731,13 +783,10 @@ public class FunctionValue extends Value
 					TCFunctionType newType = new TCFunctionType(location, domain, true, range);
 
 					// Create a new function with restricted dom/rng
-					FunctionValue restricted = new FunctionValue(location, name, newType,
-							paramPatternList, body, precondition, postcondition,
-							freeVariables, checkInvariants, curriedArgs,
-							measureName, measureValues, classdef);
+					FunctionValue restricted = new FunctionValue(location, name, newType, typeValues,
+							paramPatternList, body, precondition, postcondition, measure,
+							freeVariables, curriedArgs, measureName, measureValues, classdef);
 
-					restricted.typeValues = typeValues;
-					
 					if (to instanceof TCNamedType)
 					{
 						return new InvariantValue((TCNamedType)to, restricted, ctxt);
@@ -760,21 +809,17 @@ public class FunctionValue extends Value
 		// Remove first set of parameters, and set the free variables instead.
 		// And adjust the return type to be the result type (a function).
 
-		return new FunctionValue(location, name, (TCFunctionType)type.result,
+		return new FunctionValue(location, name, (TCFunctionType)type.result, typeValues,
 			paramPatternList.subList(1, paramPatternList.size()),
-			body, precondition, postcondition, newFreeVariables, false, null, null, null, classdef);
+			body, precondition, postcondition, measure, newFreeVariables, null, null, null, classdef);
 	}
 
 	@Override
 	public Object clone()
 	{
-		FunctionValue copy = new FunctionValue(location, name, type,
-			paramPatternList, body, precondition, postcondition,
-			freeVariables, checkInvariants, curriedArgs,
-			measureName, measureValues, classdef);
-
-		copy.typeValues = typeValues;
-		return copy;
+		return new FunctionValue(location, name, type, typeValues,
+			paramPatternList, body, precondition, postcondition, measure,
+			freeVariables, curriedArgs, measureName, measureValues, classdef);
 	}
 	
 	/**
