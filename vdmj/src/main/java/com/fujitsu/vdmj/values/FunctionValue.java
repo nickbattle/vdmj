@@ -73,13 +73,10 @@ public class FunctionValue extends Value
 	public final INExpression body;
 	public final FunctionValue precondition;
 	public final FunctionValue postcondition;
-	public Context freeVariables;
+	private final FunctionValue measure;
 	public final INClassDefinition classdef;
 
-	// Measure function value, if any
-	private final TCNameToken measureName;
-	private final FunctionValue measure;
-	private final ValueList curriedArgs;
+	public Context freeVariables;
 
 	private Map<Long, Stack<Value>> measureValues = null;
 	private Set<Long> measuringThreads = null;
@@ -87,8 +84,8 @@ public class FunctionValue extends Value
 	private boolean isMeasure = false;
 
 	public ObjectValue self = null;
-	public boolean isStatic = false;
-	public boolean uninstantiated = false;
+	public boolean isStatic = false;			// ?????
+	public boolean uninstantiated = false;		// ?????
 
 	/**
 	 * Private constructor used by clone and curry.
@@ -97,12 +94,10 @@ public class FunctionValue extends Value
 	private FunctionValue(LexLocation location, String name, TCFunctionType type,
 		Context typeValues, INPatternListList paramPatternList, INExpression body,
 		FunctionValue precondition, FunctionValue postcondition, FunctionValue measure,
-		Context freeVariables, ValueList curriedArgs,
-		TCNameToken measureName, Map<Long, Stack<Value>> measureValues, INClassDefinition classdef)
+		Context freeVariables, Map<Long, Stack<Value>> measureValues, INClassDefinition classdef)
 	{
 		this.location = location;
 		this.name = name;
-		this.typeValues = null;
 		this.type = type;
 		this.typeValues = typeValues;
 		this.paramPatternList = paramPatternList;
@@ -111,12 +106,10 @@ public class FunctionValue extends Value
 		this.postcondition = postcondition;
 		this.measure = measure;
 		this.freeVariables = freeVariables;
-		this.curriedArgs = curriedArgs;
 		this.classdef = classdef;
 		
 		if (Settings.measureChecks && measure != null)
 		{
-			this.measureName = measureName;
 			this.measureValues = measureValues;	// NB. a copy of the base FunctionValue's
 			
 			measure.measuringThreads = Collections.synchronizedSet(new HashSet<Long>());
@@ -125,7 +118,6 @@ public class FunctionValue extends Value
 		}
 		else
 		{
-			this.measureName = null;
 			this.measureValues = null;
 		}
 	}
@@ -145,13 +137,11 @@ public class FunctionValue extends Value
 		this.precondition = null;
 		this.postcondition = null;
 		this.freeVariables = freeVariables;
-		this.curriedArgs = null;
 		this.classdef = null;
 
 		paramPatternList.add(paramPatterns);
 
 		this.measure = null;
-		this.measureName = null;
 		this.measureValues = null;
 		this.measuringThreads = null;
 		this.callingThreads = null;
@@ -174,12 +164,10 @@ public class FunctionValue extends Value
 		this.postcondition = postcondition;
 		this.measure = measure;
 		this.freeVariables = freeVariables;
-		this.curriedArgs = null;
 		this.classdef = def.classDefinition;
 
 		if (Settings.measureChecks && measure != null)
 		{
-			this.measureName = def.measureName;
 			this.measureValues = Collections.synchronizedMap(new HashMap<Long, Stack<Value>>());
 			
 			measure.measuringThreads = Collections.synchronizedSet(new HashSet<Long>());
@@ -188,7 +176,6 @@ public class FunctionValue extends Value
 		}
 		else
 		{
-			this.measureName = null;
 			this.measureValues = null;
 		}
 	}
@@ -220,20 +207,18 @@ public class FunctionValue extends Value
 		this.postcondition = postcondition;
 		this.measure = measure;
 		this.freeVariables = freeVariables;
-		this.curriedArgs = null;
 		this.classdef = def.classDefinition;
 
 		if (Settings.measureChecks && measure != null)
 		{
-			this.measureName = def.measureName;
 			this.measureValues = Collections.synchronizedMap(new HashMap<Long, Stack<Value>>());
-			this.measuringThreads = Collections.synchronizedSet(new HashSet<Long>());
-			this.callingThreads = Collections.synchronizedSet(new HashSet<Long>());
+			
+			measure.measuringThreads = Collections.synchronizedSet(new HashSet<Long>());
+			measure.callingThreads = Collections.synchronizedSet(new HashSet<Long>());
 			measure.isMeasure = true;
 		}
 		else
 		{
-			this.measureName = null;
 			this.measureValues = null;
 		}
 	}
@@ -248,6 +233,7 @@ public class FunctionValue extends Value
 		this(fdef, precondition, postcondition, measure, freeVariables);
 		this.typeValues = argTypes;
 		this.type = ftype;
+		this.uninstantiated = true;
 	}
 
 	/**
@@ -260,6 +246,7 @@ public class FunctionValue extends Value
 		this(fdef, precondition, postcondition, measure, freeVariables);
 		this.typeValues = argTypes;
 		this.type = ftype;
+		this.uninstantiated = true;
 	}
 
 	/**
@@ -277,10 +264,8 @@ public class FunctionValue extends Value
 		this.precondition = null;
 		this.postcondition = null;
 		this.freeVariables = null;
-		this.curriedArgs = null;
 		this.classdef = classdef;
 		this.measure = null;
-		this.measureName = null;
 		this.measureValues = null;
 		this.measuringThreads = null;
 		this.callingThreads = null;
@@ -297,6 +282,16 @@ public class FunctionValue extends Value
 		if (!isStatic)
 		{
 			this.self = self;
+			
+			if (precondition != null)
+			{
+				precondition.setSelf(self);
+			}
+	
+			if (postcondition != null)
+			{
+				postcondition.setSelf(self);
+			}
 	
 			if (measure != null)
 			{
@@ -440,49 +435,15 @@ public class FunctionValue extends Value
 				}
 			}
 
-			if (measureName != null)
+			if (measure != null)
 			{
-//				if (measure == null)
-//				{
-//					measure = evalContext.lookup(measureName).functionValue(ctxt);
-//
-//					if (typeValues != null)		// Function is polymorphic, so measure copies type args
-//					{
-//						measure = (FunctionValue)measure.clone();
-//						measure.uninstantiated = false;
-//						measure.typeValues = typeValues;
-//					}
-//
-//					measure.measuringThreads = Collections.synchronizedSet(new HashSet<Long>());
-//					measure.callingThreads = Collections.synchronizedSet(new HashSet<Long>());
-//					measure.isMeasure = true;
-//				}
-				
-				// If this is a curried function, then the measure is called with all of the
-				// previously applied argument values, in addition to the argValues.
-				
-				ValueList measureArgs = null;
-				
-				
-				//if (curriedArgs == null)
-				{
-					measureArgs = argValues;
-				}
-//				else
-//				{
-//					measureArgs = new ValueList();
-//					measureArgs.addAll(curriedArgs);	// Previous args
-//					measureArgs.addAll(argValues);		// Final args
-//				}
-
-				// We disable the swapping and time (RT) as measure checks should be "free".
-				Value mv;
+				Value currentMeasure;
 				
 				try
 				{
 					measure.measuringThreads.add(tid);
-					evalContext.threadState.setAtomic(true);
-					mv = measure.eval(measure.location, measureArgs, evalContext).deref();
+					evalContext.threadState.setAtomic(true);	// measure checks are "free".
+					currentMeasure = measure.eval(measure.location, argValues, evalContext).deref();
 				}
 				catch (ValueException e)
 				{
@@ -502,25 +463,26 @@ public class FunctionValue extends Value
 					measureValues.put(tid, stack);
 				}
 
-				if (!stack.isEmpty())
+				if (!stack.isEmpty())	// Not the first call
 				{
-					Value old = stack.peek();		// Previous value
+					Value lastMeasure = stack.peek();
 
-    				if (old != null && mv.compareTo(old) >= 0)		// Not decreasing order
+    				if (lastMeasure != null && currentMeasure.compareTo(lastMeasure) >= 0)
     				{
     					String message = "Measure failure: " +
     						name + Utils.listToString("(", argValues, ", ", ")") + ", measure " +
-    						measure.name + ", current " + mv + ", previous " + old;
+    						measure.name + ", current " + currentMeasure + ", previous " + lastMeasure;
     					
-    					// Re-initialise counters
+    					// Re-initialise measure counters etc.
     					measureValues.clear();
     					measure.measuringThreads.clear();
+    					measure.callingThreads.clear();
     					
     					abort(4146, message, evalContext);
     				}
 				}
 
-				stack.push(mv);
+				stack.push(currentMeasure);
 			}
 
 			Value rv = null;
@@ -615,18 +577,6 @@ public class FunctionValue extends Value
 					newmeasure = measure.curry(evalContext);
 				}
 
-				// Curried arguments are collected so that we can invoke any measure functions
-				// once we reach the final apply that does not return a function.
-				
-				ValueList argList = new ValueList();
-				
-				if (curriedArgs != null)
-				{
-					argList.addAll(curriedArgs);
-				}
-				
-				argList.addAll(argValues);
-				
 				if (freeVariables != null)
 				{
 					evalContext.putAll(freeVariables);	// Pass free vars along chain
@@ -635,8 +585,8 @@ public class FunctionValue extends Value
     			FunctionValue rv = new FunctionValue(location, "curried",
     				(TCFunctionType)type.result, typeValues,
     				paramPatternList.subList(1, paramPatternList.size()),
-    				body, newpre, newpost, newmeasure, evalContext, argList,
-    				measureName, measureValues, classdef);
+    				body, newpre, newpost, newmeasure, evalContext,
+    				measureValues, classdef);
 
     			rv.setSelf(self);
         		return rv;
@@ -785,7 +735,7 @@ public class FunctionValue extends Value
 					// Create a new function with restricted dom/rng
 					FunctionValue restricted = new FunctionValue(location, name, newType, typeValues,
 							paramPatternList, body, precondition, postcondition, measure,
-							freeVariables, curriedArgs, measureName, measureValues, classdef);
+							freeVariables, measureValues, classdef);
 
 					if (to instanceof TCNamedType)
 					{
@@ -811,7 +761,7 @@ public class FunctionValue extends Value
 
 		return new FunctionValue(location, name, (TCFunctionType)type.result, typeValues,
 			paramPatternList.subList(1, paramPatternList.size()),
-			body, precondition, postcondition, measure, newFreeVariables, null, null, null, classdef);
+			body, precondition, postcondition, measure, newFreeVariables, null, classdef);
 	}
 
 	@Override
@@ -819,7 +769,7 @@ public class FunctionValue extends Value
 	{
 		return new FunctionValue(location, name, type, typeValues,
 			paramPatternList, body, precondition, postcondition, measure,
-			freeVariables, curriedArgs, measureName, measureValues, classdef);
+			freeVariables, measureValues, classdef);
 	}
 	
 	/**

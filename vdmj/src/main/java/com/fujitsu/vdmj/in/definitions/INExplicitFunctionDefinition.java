@@ -149,7 +149,6 @@ public class INExplicitFunctionDefinition extends INDefinition
 
 		FunctionValue func = new FunctionValue(this, prefunc, postfunc, measurefunc, null);
 		func.isStatic = accessSpecifier.isStatic;
-		func.uninstantiated = (typeParams != null);
 		nvl.add(new NameValuePair(name, func));
 
 		return nvl;
