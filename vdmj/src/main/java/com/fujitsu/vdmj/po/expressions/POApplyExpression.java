@@ -211,7 +211,7 @@ public class POApplyExpression extends POExpression
 			start = root.toString();
 		}
 		
-		return start + Utils.listToString(args);
+		return start + Utils.listToString("(", args, ", ", ")");
 	}
 
 	@Override
