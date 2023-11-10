@@ -27,6 +27,7 @@ package quickcheck.plugin;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.util.Utils;
 
+import json.JSONObject;
 import quickcheck.commands.QuickCheckLSPCommand;
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.HelpList;
@@ -49,6 +50,17 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 	public void init()
 	{
 		// Get everything from PO?
+	}
+	
+	@Override
+	public void setServerCapabilities(JSONObject capabilities)
+	{
+		JSONObject experimental = capabilities.get("experimental");
+		
+		if (experimental != null)
+		{
+			experimental.put("quickCheckProvider", true);
+		}
 	}
 	
 	@Override

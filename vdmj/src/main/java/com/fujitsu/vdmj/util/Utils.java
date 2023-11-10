@@ -237,11 +237,18 @@ public class Utils
 		{
 			String path = VDMJ.class.getName().replaceAll("\\.", "/");
 			URL url = VDMJ.class.getResource("/" + path + ".class");
-			JarURLConnection conn = (JarURLConnection)url.openConnection();
-		    JarFile jar = conn.getJarFile();
-			Manifest mf = jar.getManifest();
-			String version = (String)mf.getMainAttributes().get(Attributes.Name.IMPLEMENTATION_VERSION);
-			return version;
+			
+			if (url.getProtocol().equals("jar"))
+			{
+				JarURLConnection conn = (JarURLConnection)url.openConnection();
+			    JarFile jar = conn.getJarFile();
+				Manifest mf = jar.getManifest();
+				return (String)mf.getMainAttributes().get(Attributes.Name.IMPLEMENTATION_VERSION);
+			}
+			else
+			{
+				return "(no version available in " + url.getProtocol() + ")";
+			}
 		}
 		catch (Exception e)
 		{

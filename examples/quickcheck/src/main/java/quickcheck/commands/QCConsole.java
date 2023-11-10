@@ -24,16 +24,17 @@
 
 package quickcheck.commands;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.plugins.PluginConsole;
 
 /**
- * This copies the PluginConsole from VDMJ to allow us to have "global" quiet
+ * This extends the PluginConsole from VDMJ to allow us to have "global" quiet
  * setting within the QC command environment, without affecting the outer
- * environment.
+ * environment. By extending PluginConsole, we get a "private" quiet flag
+ * that won't interfere with the global one, but we can still use the inherited
+ * methods as well.
  */
-
-public class QCConsole
+public class QCConsole extends PluginConsole
 {
 	private static boolean quiet = false;
 	
@@ -46,20 +47,12 @@ public class QCConsole
 	{
 		return quiet;
 	}
-	
-	public static void verbose(String format, Object... args)
-	{
-		if (Settings.verbose)
-		{
-			Console.out.printf(format, args);
-		}
-	}
 
-	public static void verboseln(String m)
+	public static void info(String m)
 	{
-		if (Settings.verbose)
+		if (!quiet)
 		{
-			Console.out.println(m);
+			Console.out.print(m);
 		}
 	}
 
@@ -77,25 +70,5 @@ public class QCConsole
 		{
 			Console.out.println(m.toString());
 		}
-	}
-
-	public static void println(Object m)
-	{
-		Console.out.println(m.toString());
-	}
-
-	public static void printf(String format, Object... args)
-	{
-		Console.out.printf(format, args);
-	}
-
-	public static void errorln(Object m)
-	{
-		Console.err.println(m.toString());
-	}
-
-	public static void errorf(String format, Object... args)
-	{
-		Console.err.printf(format, args);
 	}
 }

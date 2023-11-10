@@ -368,7 +368,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 
 		if (!(body instanceof TCNotYetSpecifiedExpression) &&
 			!(body instanceof TCSubclassResponsibilityExpression) &&
-			!(name.getName().startsWith("measure_")))
+			!(name.isMeasureName()))
 		{
 			checked.unusedCheck();	// Look underneath qualified definitions, if any
 		}
@@ -646,7 +646,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 			defs.add(postdef);
 		}
 		
-		if (measureName != null && measureName.getName().startsWith("measure_"))
+		if (measureName != null && measureName.isMeasureName())
 		{
 			defs.add(measureDef);
 		}

@@ -212,6 +212,11 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 		return new TCNameToken(l, getModule(), "measure_" + getName(), false, false);
 	}
 	
+	public boolean isMeasureName()
+	{
+		return lexname.name.startsWith("measure_");		// True, if a generated measure function
+	}
+	
 	public TCNameToken getResultName(LexLocation l)
 	{
 		return new TCNameToken(l, getModule(), "RESULT", false, false);

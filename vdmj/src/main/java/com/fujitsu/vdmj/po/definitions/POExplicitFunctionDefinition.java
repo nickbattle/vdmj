@@ -185,7 +185,7 @@ public class POExplicitFunctionDefinition extends PODefinition
 			}
 		}
 		
-		if (measureDef != null && measureName != null && measureName.getName().startsWith("measure_"))
+		if (measureDef != null && measureName != null && measureName.isMeasureName())
 		{
 			ctxt.push(new PONameContext(new TCNameList(measureName)));
 			obligations.addAll(measureDef.getProofObligations(ctxt, env));
