@@ -270,13 +270,19 @@ public class Breakpoint implements Serializable
 	{
 		Thread current = Thread.currentThread();
 
+		/**
+		 * We can only debug expression breakpoints that occur from within SchedulableThreads,
+		 * usually MainThread or InitThread etc. But it is possible to perform very high
+		 * performance evaluations without creating extra SchedulableThreads, though these
+		 * cannot be debugged and they are responsible for handling their own ContextExceptions
+		 * and so on...
+		 */
 		if (current instanceof SchedulableThread)
 		{
 			SchedulableThread th = (SchedulableThread)current;
 			th.suspendOthers();
+			DebugLink.getInstance().breakpoint(ctxt, this);
 		}
-
-		DebugLink.getInstance().breakpoint(ctxt, this);
 	}
 	
 	/**
