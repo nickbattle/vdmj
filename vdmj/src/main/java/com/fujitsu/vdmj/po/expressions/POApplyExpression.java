@@ -102,9 +102,7 @@ public class POApplyExpression extends POExpression
 			}
 		}
 		
-		boolean polymorphic = type.isFunction(location) && type.getFunction().instantiated != null;
-
-		if (!type.isUnknown(location) && !polymorphic &&
+		if (!type.isUnknown(location) &&
 			(type.isFunction(location) || type.isOperation(location)))
 		{
 			TCTypeList paramTypes = type.isFunction(location) ?
@@ -112,7 +110,7 @@ public class POApplyExpression extends POExpression
 			
 			String prename = root.getPreName();
 
-			if (type.isFunction(location) && (prename == null || !prename.equals("")))
+			if (type.isFunction(location) && prename != null && !prename.equals(""))
 			{
 				boolean needed = true;
 				
@@ -153,10 +151,14 @@ public class POApplyExpression extends POExpression
 			}
 		}
 
-		if (!type.isUnknown(location) && type.isFunction(location) && !polymorphic)
+		if (!type.isUnknown(location) && type.isFunction(location))
 		{
 			if (recursive != null)	// name is a function in a recursive loop
 			{
+				/**
+				 * All of the functions in the loop will generate similar obligations,
+				 * so the "add" method eliminates any duplicates.
+				 */
 				for (PODefinitionList loop: recursive)
 				{
 					obligations.add(new RecursiveObligation(loop, this, ctxt));
