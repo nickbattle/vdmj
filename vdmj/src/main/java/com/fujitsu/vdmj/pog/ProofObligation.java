@@ -45,9 +45,9 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public TCTypeList typeParams;
 	public POAnnotationList annotations;
 	public Context counterexample;
+	public Context witness;
 	public String message;
 	public String provedBy;
-	public String witness;
 
 	private int var = 1;
 	private TCExpression checkedExpression = null;
@@ -64,6 +64,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.typeParams = ctxt.getTypeParams();
 		this.annotations = ctxt.getAnnotations();
 		this.counterexample = new Context(location, "Counterexample", null);
+		this.witness = new Context(location, "Witness", null);
 		this.message = null;
 		this.provedBy = null;
 		
@@ -104,14 +105,21 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		}
 	}
 	
+	public void setWitness(Context path)
+	{
+		witness.clear();
+		Context ctxt = path;
+		
+		while (ctxt != null && ctxt.outer != null)
+		{
+			witness.putAll(ctxt);
+			ctxt = ctxt.outer;
+		}
+	}
+
 	public void setMessage(String message)
 	{
 		this.message = message;
-	}
-	
-	public void setWitness(String witness)
-	{
-		this.witness = witness;
 	}
 	
 	public boolean isExistential()

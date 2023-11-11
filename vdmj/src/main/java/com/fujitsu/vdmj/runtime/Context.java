@@ -329,6 +329,23 @@ public class Context extends HashMap<TCNameToken, Value>
 
 		return sb.toString();
 	}
+	
+	public String toStringLine()
+	{
+		StringBuilder sb = new StringBuilder();
+		String sep = "";
+		
+		for (TCNameToken vname: this.keySet())
+		{
+			sb.append(sep);
+			sb.append(vname.getName());
+			sb.append(" = ");
+			sb.append(this.get(vname));
+			sep = ", ";
+		}
+		
+		return sb.toString();
+	}
 
 	/**
 	 * This is used by the stack overflow processing via Function/OperationValue.
