@@ -212,8 +212,20 @@ public class POApplyExpression extends POExpression
 		{
 			start = root.toString();
 		}
+
+		StringBuilder sb = new StringBuilder(start);
+		sb.append("(");
+		String separator = "";
 		
-		return start + Utils.listToString("(", args, ", ", ")");
+		for (POExpression arg: args)
+		{
+			sb.append(separator);
+			sb.append(Utils.deBracketed(arg));
+			separator = ", ";
+		}
+
+		sb.append(")");
+		return sb.toString();
 	}
 
 	@Override
