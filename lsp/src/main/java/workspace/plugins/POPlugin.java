@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -200,42 +199,29 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			
 			if (!po.counterexample.isEmpty())
 			{
-				JSONObject values = new JSONObject();
-				
-				for (TCNameToken vname: po.counterexample.keySet())
-				{
-					values.put(vname.getName(), po.counterexample.get(vname).toString());
-				}
-				
-				json.put("counterexample", values);
+				json.put("counterexample", Utils.contextToJSON(po.counterexample));
 				
 				StringBuilder sb = new StringBuilder();
 				sb.append("PO #");
 				sb.append(po.number);
 				sb.append(" counterexample: ");
-				String sep = "";
-				
-				for (TCNameToken vname: po.counterexample.keySet())
-				{
-					sb.append(sep);
-					sb.append(vname.getName());
-					sb.append(" = ");
-					sb.append(po.counterexample.get(vname));
-					sep = ", ";
-				}
-				
+				sb.append(po.counterexample.toStringLine());
 				messages.add(new VDMWarning(9000, sb.toString(), po.location));
+			}
+			
+			if (!po.witness.isEmpty())
+			{
+				json.put("witness", Utils.contextToJSON(po.witness));
+			}
+			
+			if (po.provedBy != null)
+			{
+				json.put("provedBy", po.provedBy);
 			}
 			
 			if (po.message != null)
 			{
-				json.put("message", "PO #" + po.number + ": " + po.message);
-				messages.add(new VDMWarning(9001, po.message, po.location));
-			}
-			
-			if (po.witness != null)
-			{
-				json.put("witness", "PO #" + po.number + ": " + po.witness);
+				json.put("message", po.message);
 			}
 			
 			poList.add(json);
