@@ -155,6 +155,11 @@ public class RecursiveObligation extends ProofObligation
 		
 		TCFunctionType ftype = (TCFunctionType) mdef.getType();
 		
+		while (ftype.result instanceof TCFunctionType)	// Skip curries
+		{
+			ftype = (TCFunctionType)ftype.result;
+		}
+		
 		if (ftype.result instanceof TCProductType)
 		{
 			TCProductType type = (TCProductType)ftype.result;
