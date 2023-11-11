@@ -27,6 +27,7 @@ package quickcheck.strategies;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.values.ValueList;
 
 /**
@@ -41,7 +42,7 @@ public class StrategyResults
 {
 	public final String provedBy;			// If set, proved by the strategy
 	public final String message;			// Any message along with the result
-	public final String witness;			// Any witness found
+	public final Context witness;			// Any witness found
 	
 	public final Map<String, ValueList> counterexamples;
 	public final boolean hasAllValues;		// Contains all possible values from all binds
@@ -70,7 +71,7 @@ public class StrategyResults
 		this.duration = duration;
 	}
 
-	public StrategyResults(String provedBy, String message, String witness, long duration)
+	public StrategyResults(String provedBy, String message, Context witness, long duration)
 	{
 		this.provedBy = provedBy;
 		this.message = message;
