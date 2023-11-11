@@ -36,6 +36,7 @@ import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
+import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import json.JSONArray;
@@ -530,5 +531,17 @@ public class Utils
 					return true;
 			}
 		}
+	}
+	
+	public static JSONObject contextToJSON(Context ctxt)
+	{
+		JSONObject json = new JSONObject();
+		
+		for (TCNameToken vname: ctxt.keySet())
+		{
+			json.put(vname.getName(), ctxt.get(vname).toString());
+		}
+		
+		return json;
 	}
 }
