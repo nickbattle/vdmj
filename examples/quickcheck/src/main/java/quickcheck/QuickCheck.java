@@ -24,10 +24,10 @@
 
 package quickcheck;
 
-import static quickcheck.commands.QCConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 import static quickcheck.commands.QCConsole.infof;
 import static quickcheck.commands.QCConsole.infoln;
-import static quickcheck.commands.QCConsole.verbose;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -480,7 +480,7 @@ public class QuickCheck
 					if (execResult.boolValue(ctxt))
 					{
 						POStatus outcome = null;
-						String message = "";
+						String desc = "";
 						po.setWitness(null);
 						po.setProvedBy(null);
 						
@@ -491,19 +491,19 @@ public class QuickCheck
 						else if (po.isExistential())
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
-							String witness = stringOfContext(findWitness(bindings));
+							Context witness = findWitness(bindings);
 							po.setWitness(witness);
 							
 							if (witness != null)
 							{
-								message = " by witness " + witness;
+								desc = " by witness " + witness.toStringLine();
 								po.setProvedBy("witness");
 							}
 						}
 						else if (results.hasAllValues && execCompleted)
 						{
 							outcome = POStatus.PROVED;		// All values were tested and passed, so PROVED
-							message = " by finite types";
+							desc = " by finite types";
 							po.setProvedBy("finite");
 						}
 						else
@@ -511,7 +511,7 @@ public class QuickCheck
 							outcome = POStatus.MAYBE;
 						}
 						
-						infof("PO #%d, %s%s %s\n", po.number, outcome.toString().toUpperCase(), message, duration(before, after));
+						infof("PO #%d, %s%s %s\n", po.number, outcome.toString().toUpperCase(), desc, duration(before, after));
 						po.setStatus(outcome);
 						po.setCounterexample(null);
 						po.setMessage(null);

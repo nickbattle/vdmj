@@ -106,7 +106,8 @@ public class ExampleQCStrategy extends QCStrategy
 		
 		if (provedResult)
 		{
-			return new StrategyResults(getName(), "Just an example", "Witness here", System.currentTimeMillis() - before);
+			Context witness = null;		// Could have witness values set
+			return new StrategyResults(getName(), "Just an example", witness , System.currentTimeMillis() - before);
 		}
 		else
 		{
