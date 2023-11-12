@@ -32,9 +32,9 @@ import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.modules.POModuleList;
-import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingConstantVisitor;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -172,16 +172,8 @@ public class POPluginSL extends POPlugin
 
 	private String paramMatch(POPattern p, Context ctxt)
 	{
-		if (p instanceof POIdentifierPattern)
-		{
-			POIdentifierPattern id = (POIdentifierPattern)p;
-			
-			if (ctxt.containsKey(id.name))
-			{
-				return ctxt.get(id.name).toString();
-	     	}
-		}
-		
-		return null;
+		POGetMatchingConstantVisitor visitor = new POGetMatchingConstantVisitor();
+		String result = p.apply(visitor, ctxt);
+		return visitor.hasFailed() ? null : result;
 	}
 }
