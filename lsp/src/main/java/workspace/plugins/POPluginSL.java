@@ -28,9 +28,19 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.modules.POModuleList;
+import com.fujitsu.vdmj.po.patterns.POIdentifierPattern;
+import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.types.POPatternListTypePair;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.runtime.Context;
 
+import json.JSONObject;
 import workspace.events.CheckPrepareEvent;
 
 public class POPluginSL extends POPlugin
@@ -77,5 +87,101 @@ public class POPluginSL extends POPlugin
 		}
 		
 		return obligationList;
+	}
+
+	@Override
+	protected JSONObject getLaunch(ProofObligation po, Context ctxt)
+	{
+		PODefinition def = po.definition;
+		JSONObject result = null;
+		
+		if (def instanceof POExplicitFunctionDefinition)
+		{
+			POExplicitFunctionDefinition efd = (POExplicitFunctionDefinition)def;
+			StringBuilder callString = new StringBuilder();
+			
+			for (POPatternList pl: efd.paramPatternList)
+			{
+				callString.append("(");
+				String sep = "";
+				
+				for (POPattern p: pl)
+				{
+					String match = paramMatch(p, ctxt);
+					
+					if (match == null)
+					{
+						return null;	// Can't match some params
+					}
+
+					callString.append(sep);
+					callString.append(match);
+					sep = ", ";
+				}
+					
+				callString.append(")");
+			}
+			
+			result = new JSONObject(
+				"name",		"PO #" + po.number + " counterexample",
+				"type",		"vdm",
+				"request",	"launch",
+				"noDebug",	false,
+				"defaultName",	def.name.getModule(),
+				"command",	"print " + def.name.getName() + callString
+			);
+		}
+		else if (def instanceof POImplicitFunctionDefinition)
+		{
+			POImplicitFunctionDefinition efd = (POImplicitFunctionDefinition)def;
+			StringBuilder callString = new StringBuilder();
+			callString.append("(");
+			String sep = "";
+			
+			for (POPatternListTypePair pl: efd.parameterPatterns)
+			{
+				for (POPattern p: pl.patterns)
+				{
+					String match = paramMatch(p, ctxt);
+					
+					if (match == null)
+					{
+						return null;	// Can't match some params
+					}
+
+					callString.append(sep);
+					callString.append(match);
+					sep = ", ";
+				}
+			}
+			
+			callString.append(")");
+			
+			result = new JSONObject(
+				"name",		"PO #" + po.number + " counterexample",
+				"type",		"vdm",
+				"request",	"launch",
+				"noDebug",	false,
+				"defaultName",	def.name.getModule(),
+				"command",	"print " + def.name.getName() + callString
+			);
+		}
+
+		return result;
+	}
+
+	private String paramMatch(POPattern p, Context ctxt)
+	{
+		if (p instanceof POIdentifierPattern)
+		{
+			POIdentifierPattern id = (POIdentifierPattern)p;
+			
+			if (ctxt.containsKey(id.name))
+			{
+				return ctxt.get(id.name).toString();
+	     	}
+		}
+		
+		return null;
 	}
 }
