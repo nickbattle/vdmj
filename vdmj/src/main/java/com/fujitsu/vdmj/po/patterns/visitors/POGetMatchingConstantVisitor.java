@@ -114,7 +114,7 @@ public class POGetMatchingConstantVisitor extends POPatternVisitor<String, Conte
 	@Override
 	public String caseIgnorePattern(POIgnorePattern node, Context arg)
 	{
-		// Difficult - we have to discover the patterns type.
+		// Difficult - we have to discover the pattern's type.
 		failed = true;
 		return "?";
 	}
@@ -177,7 +177,9 @@ public class POGetMatchingConstantVisitor extends POPatternVisitor<String, Conte
 	@Override
 	public String caseRecordPattern(PORecordPattern node, Context arg)
 	{
-		StringBuilder sb = new StringBuilder("mk_R(");
+		StringBuilder sb = new StringBuilder("mk_");
+		sb.append(node.type.toExplicitString(node.location));
+		sb.append("(");
 		String sep = "";
 
 		for (POPattern p: node.plist)
