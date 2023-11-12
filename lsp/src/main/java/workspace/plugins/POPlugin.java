@@ -96,7 +96,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		
 		if (experimental != null)
 		{
-			experimental.put("proofObligationProvider", true);
+			experimental.put("proofObligationProvider", new JSONObject());
 		}
 	}
 
