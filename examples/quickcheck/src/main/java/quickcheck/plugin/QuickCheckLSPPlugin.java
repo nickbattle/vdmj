@@ -79,6 +79,6 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 	@Override
 	public HelpList getCommandHelp()
 	{
-		return new HelpList(QuickCheckLSPCommand.CMD + " - lightweight PO verification");
+		return new HelpList(QuickCheckLSPCommand.SHORT + " - lightweight PO verification");
 	}
 }
