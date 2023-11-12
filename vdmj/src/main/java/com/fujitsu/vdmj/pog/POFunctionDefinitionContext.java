@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
@@ -41,6 +42,7 @@ import com.fujitsu.vdmj.tc.types.TCTypeList;
 
 public class POFunctionDefinitionContext extends POContext
 {
+	public final PODefinition definition;
 	public final POAnnotationList annotations;
 	public final TCNameToken name;
 	public final TCFunctionType deftype;
@@ -52,6 +54,7 @@ public class POFunctionDefinitionContext extends POContext
 	public POFunctionDefinitionContext(
 		POExplicitFunctionDefinition definition, boolean precond)
 	{
+		this.definition = definition;
 		this.annotations = definition.annotations;
 		this.name = definition.name;
 		this.deftype = definition.type;
@@ -65,6 +68,7 @@ public class POFunctionDefinitionContext extends POContext
 	public POFunctionDefinitionContext(
 		POImplicitFunctionDefinition definition, boolean precond)
 	{
+		this.definition = definition;
 		this.annotations = definition.annotations;
 		this.name = definition.name;
 		this.deftype = definition.type;
@@ -136,5 +140,11 @@ public class POFunctionDefinitionContext extends POContext
 	public POAnnotationList getAnnotations()
 	{
 		return annotations;
+	}
+	
+	@Override
+	public PODefinition getDefinition()
+	{
+		return definition;
 	}
 }

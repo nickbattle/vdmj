@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -114,5 +115,10 @@ abstract public class POContext
 		}
 
 		return call.toString();
+	}
+
+	public PODefinition getDefinition()
+	{
+		return null;
 	}
 }

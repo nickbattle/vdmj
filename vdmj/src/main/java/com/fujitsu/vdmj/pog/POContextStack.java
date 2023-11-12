@@ -28,6 +28,7 @@ import java.util.ListIterator;
 import java.util.Stack;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -120,6 +121,21 @@ public class POContextStack extends Stack<POContext>
 		return null;
 	}
 	
+	public PODefinition getDefinition()
+	{
+		for (POContext ctxt: this)
+		{
+			PODefinition definition = ctxt.getDefinition();
+			
+			if (definition != null)
+			{
+				return definition;
+			}
+		}
+		
+		return null;
+	}
+
 	public boolean isExistential()
 	{
 		for (POContext ctxt: this)
