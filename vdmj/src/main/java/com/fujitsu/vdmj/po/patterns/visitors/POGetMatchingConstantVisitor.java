@@ -114,7 +114,6 @@ public class POGetMatchingConstantVisitor extends POPatternVisitor<String, Conte
 	@Override
 	public String caseIgnorePattern(POIgnorePattern node, Context arg)
 	{
-		// Difficult - we have to discover the pattern's type.
 		failed = true;
 		return "?";
 	}
