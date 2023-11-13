@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingConstantVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
@@ -99,6 +100,7 @@ public class POPluginSL extends POPlugin
 		{
 			POExplicitFunctionDefinition efd = (POExplicitFunctionDefinition)def;
 			StringBuilder callString = new StringBuilder();
+			PORemoveIgnoresVisitor.init();
 			
 			for (POPatternList pl: efd.paramPatternList)
 			{
@@ -107,7 +109,7 @@ public class POPluginSL extends POPlugin
 				
 				for (POPattern p: pl)
 				{
-					String match = paramMatch(p, ctxt);
+					String match = paramMatch(p.removeIgnorePatterns(), ctxt);
 					
 					if (match == null)
 					{
@@ -137,12 +139,13 @@ public class POPluginSL extends POPlugin
 			StringBuilder callString = new StringBuilder();
 			callString.append("(");
 			String sep = "";
+			PORemoveIgnoresVisitor.init();
 			
 			for (POPatternListTypePair pl: efd.parameterPatterns)
 			{
 				for (POPattern p: pl.patterns)
 				{
-					String match = paramMatch(p, ctxt);
+					String match = paramMatch(p.removeIgnorePatterns(), ctxt);
 					
 					if (match == null)
 					{
