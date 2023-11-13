@@ -160,7 +160,7 @@ public class POApplyExpression extends POExpression
 			{
 				for (PODefinitionList loop: recursive)
 				{
-					obligations.add(new RecursiveObligation(loop, this, ctxt));
+					obligations.add(new RecursiveObligation(location, loop, this, ctxt));
 				}
 			}
 		}

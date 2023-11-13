@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.pog;
 
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinitionList;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
@@ -62,9 +63,9 @@ public class RecursiveObligation extends ProofObligation
 		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
 	}
 	
-	public RecursiveObligation(PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
+	public RecursiveObligation(LexLocation location, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
 	{
-		super(defs.get(0).location, POType.RECURSIVE, ctxt);
+		super(location, POType.RECURSIVE, ctxt);
 		int measureLexical = getLex(getMeasureDef(defs.get(0)));
 		
 		String lhs = getLHS(defs.get(0));
