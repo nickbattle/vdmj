@@ -219,11 +219,25 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				sb.append(" counterexample: ");
 				sb.append(po.counterexample.toStringLine());
 				messages.add(new VDMWarning(9000, sb.toString(), po.location));
+				
+				if (po.message != null)		// Add any message as a warning too
+				{
+					messages.add(new VDMWarning(9000, po.message, po.location));
+				}
 			}
 			
 			if (!po.witness.isEmpty())
 			{
-				json.put("witness", Utils.contextToJSON(po.witness));
+				JSONObject witness = new JSONObject();
+				witness.put("variables", Utils.contextToJSON(po.witness));
+				JSONObject launch = getLaunch(po, po.witness);
+				
+				if (launch != null)
+				{
+					witness.put("launch", launch);
+				}
+				
+				json.put("witness", witness);
 			}
 			
 			if (po.provedBy != null)
