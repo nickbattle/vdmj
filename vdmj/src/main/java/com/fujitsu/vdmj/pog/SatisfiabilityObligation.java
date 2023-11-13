@@ -43,6 +43,7 @@ public class SatisfiabilityObligation extends ProofObligation
 	public SatisfiabilityObligation(POImplicitFunctionDefinition func, POContextStack ctxt)
 	{
 		super(func.location, POType.FUNC_SATISFIABILITY, ctxt);
+		this.definition = func;
 		StringBuilder sb = new StringBuilder();
 
 		if (func.predef != null)
@@ -137,6 +138,7 @@ public class SatisfiabilityObligation extends ProofObligation
 	public SatisfiabilityObligation(POStateDefinition statedef, POContextStack ctxt)
 	{
 		super(statedef.location, POType.INV_SATISFIABILITY, ctxt);
+		this.definition = statedef.invdef;
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("exists ");
