@@ -39,7 +39,7 @@ import com.fujitsu.vdmj.util.Utils;
 
 public class RecursiveObligation extends ProofObligation
 {
-	public RecursiveObligation(PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
+	public RecursiveObligation(LexLocation location, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
 	{
 		super(location, POType.RECURSIVE, ctxt);
 		int measureLexical = getLex(getMeasureDef(defs.get(0)));
