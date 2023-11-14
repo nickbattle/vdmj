@@ -29,8 +29,11 @@ import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.definitions.POClassList;
+import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.runtime.Context;
 
+import json.JSONObject;
 import workspace.events.CheckPrepareEvent;
 
 public class POPluginPR extends POPlugin
@@ -77,5 +80,12 @@ public class POPluginPR extends POPlugin
 		}
 
 		return obligationList;
+	}
+
+	@Override
+	protected JSONObject getLaunch(ProofObligation po, Context ctxt)
+	{
+		// TODO More complex than SL as we have to think about constructors...
+		return null;
 	}
 }

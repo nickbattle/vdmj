@@ -278,7 +278,7 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 	{
 		if (truths.contains(node))
 		{
-			evaluated.add(node.toString());		// This truth was used
+			evaluated.add(Utils.deBracketed(node));		// This truth was used
 			return true;
 		}
 		else
