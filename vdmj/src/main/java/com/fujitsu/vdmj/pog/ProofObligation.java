@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.pog;
 
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -41,6 +42,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public int number;
 	public String value;
 	public POStatus status;
+	public PODefinition definition;
 	public boolean isCheckable;
 	public TCTypeList typeParams;
 	public POAnnotationList annotations;
@@ -59,6 +61,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.kind = kind;
 		this.name = ctxt.getName();
 		this.status = POStatus.UNPROVED;
+		this.definition = ctxt.getDefinition();
 		this.number = 0;
 		this.isCheckable = ctxt.isCheckable();	// Set false for operation POs
 		this.typeParams = ctxt.getTypeParams();

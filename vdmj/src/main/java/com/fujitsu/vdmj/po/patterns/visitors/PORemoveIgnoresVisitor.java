@@ -103,7 +103,7 @@ public class PORemoveIgnoresVisitor extends POPatternVisitor<POPattern, Object>
 		// Generate a new "any" name for use during PO generation. The name
 		// must be unique for the pattern instance.
 		
-		TCNameToken anyName = new TCNameToken(node.location, "", "$any" + var++);
+		TCNameToken anyName = new TCNameToken(node.location, node.location.module, "$any" + var++);
 		return new POIdentifierPattern(anyName);
 	}
 	

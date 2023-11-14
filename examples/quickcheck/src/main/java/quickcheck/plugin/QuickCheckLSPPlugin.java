@@ -55,11 +55,11 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 	@Override
 	public void setServerCapabilities(JSONObject capabilities)
 	{
-		JSONObject experimental = capabilities.get("experimental");
+		JSONObject provider = capabilities.getPath("experimental.proofObligationProvider");
 		
-		if (experimental != null)
+		if (provider != null)
 		{
-			experimental.put("quickCheckProvider", true);
+			provider.put("quickCheckProvider", true);
 		}
 	}
 	
@@ -79,6 +79,6 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 	@Override
 	public HelpList getCommandHelp()
 	{
-		return new HelpList(QuickCheckLSPCommand.CMD + " - lightweight PO verification");
+		return new HelpList(QuickCheckLSPCommand.SHORT + " - lightweight PO verification");
 	}
 }

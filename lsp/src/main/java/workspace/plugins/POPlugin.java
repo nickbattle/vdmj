@@ -34,6 +34,7 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.runtime.Context;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -96,7 +97,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		
 		if (experimental != null)
 		{
-			experimental.put("proofObligationProvider", true);
+			experimental.put("proofObligationProvider", new JSONObject());
 		}
 	}
 
@@ -138,6 +139,8 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	abstract public <T extends Mappable> boolean checkLoadedFiles(T poList) throws Exception;
 	
 	abstract public ProofObligationList getProofObligations();
+	
+	abstract protected JSONObject getLaunch(ProofObligation po, Context ctxt);
 	
 	protected JSONArray splitPO(String value)
 	{
@@ -199,7 +202,16 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			
 			if (!po.counterexample.isEmpty())
 			{
-				json.put("counterexample", Utils.contextToJSON(po.counterexample));
+				JSONObject cexample = new JSONObject();
+				cexample.put("variables", Utils.contextToJSON(po.counterexample));
+				JSONObject launch = getLaunch(po, po.counterexample);
+				
+				if (launch != null)
+				{
+					cexample.put("launch", launch);
+				}
+				
+				json.put("counterexample", cexample);
 				
 				StringBuilder sb = new StringBuilder();
 				sb.append("PO #");
@@ -207,11 +219,25 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				sb.append(" counterexample: ");
 				sb.append(po.counterexample.toStringLine());
 				messages.add(new VDMWarning(9000, sb.toString(), po.location));
+				
+				if (po.message != null)		// Add any message as a warning too
+				{
+					messages.add(new VDMWarning(9000, po.message, po.location));
+				}
 			}
 			
 			if (!po.witness.isEmpty())
 			{
-				json.put("witness", Utils.contextToJSON(po.witness));
+				JSONObject witness = new JSONObject();
+				witness.put("variables", Utils.contextToJSON(po.witness));
+				JSONObject launch = getLaunch(po, po.witness);
+				
+				if (launch != null)
+				{
+					witness.put("launch", launch);
+				}
+				
+				json.put("witness", witness);
 			}
 			
 			if (po.provedBy != null)

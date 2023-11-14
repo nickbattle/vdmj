@@ -44,6 +44,7 @@ import vdmj.commands.ScriptRunnable;
 public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnable, ScriptRunnable
 {
 	public final static String CMD = "quickcheck [-?|-help][-q][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	public final static String SHORT = "quickcheck [-help][<options>][<POs>]";
 	private final static String USAGE = "Usage: " + CMD;
 	
 	private List<Integer> poList = new Vector<Integer>();
