@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.tc.types.visitors;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.tc.types.TCBasicType;
 import com.fujitsu.vdmj.tc.types.TCBooleanType;
 import com.fujitsu.vdmj.tc.types.TCBracketType;
@@ -161,7 +164,7 @@ public class TCAnyValueGenerator extends TCTypeVisitor<Value, Object>
 	{
 		try
 		{
-			return new NaturalOneValue(1);
+			return new NaturalOneValue(BigInteger.ONE);
 		}
 		catch (Exception e)
 		{
@@ -174,7 +177,7 @@ public class TCAnyValueGenerator extends TCTypeVisitor<Value, Object>
 	{
 		try
 		{
-			return new NaturalValue(1);
+			return new NaturalValue(BigInteger.ONE);
 		}
 		catch (Exception e)
 		{
@@ -224,7 +227,7 @@ public class TCAnyValueGenerator extends TCTypeVisitor<Value, Object>
 	{
 		try
 		{
-			return new RationalValue(0.0);
+			return new RationalValue(BigDecimal.ZERO);
 		}
 		catch (Exception e)
 		{
@@ -237,7 +240,7 @@ public class TCAnyValueGenerator extends TCTypeVisitor<Value, Object>
 	{
 		try
 		{
-			return new RealValue(0.0);
+			return new RealValue(BigDecimal.ZERO);
 		}
 		catch (Exception e)
 		{

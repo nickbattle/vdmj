@@ -48,6 +48,11 @@ public class RationalValue extends RealValue
 		super(value);
 	}
 
+	public RationalValue(double value)
+	{
+		super(new BigDecimal(value));
+	}
+
 	@Override
 	public String kind()
 	{

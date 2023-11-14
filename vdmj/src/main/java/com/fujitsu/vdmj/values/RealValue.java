@@ -40,18 +40,9 @@ public class RealValue extends NumericValue
 {
 	private static final long serialVersionUID = 1L;
 
-	public RealValue(BigDecimal value) throws Exception
+	public RealValue(BigDecimal value)
 	{
 		super(value);
-
-//		if (Double.isInfinite(value))
-//		{
-//			throw new Exception("Real is infinite");
-//		}
-//		else if (Double.isNaN(value))
-//		{
-//			throw new Exception("Real is NaN");
-//		}
 	}
 
 	public RealValue(BigInteger value)
