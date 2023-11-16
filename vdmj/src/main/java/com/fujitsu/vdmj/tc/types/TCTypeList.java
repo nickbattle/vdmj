@@ -60,6 +60,7 @@ public class TCTypeList extends TCMappedList<ASTType, TCType> implements Cloneab
 
 	public TCType getType(LexLocation location)
 	{
+		assert this.size() > 0 : "Getting type of empty TypeList";
 		TCType result = null;
 
 		if (this.size() == 1)
