@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
 import com.fujitsu.vdmj.po.modules.POModuleList;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
@@ -99,49 +100,17 @@ public class POPluginSL extends POPlugin
 		if (def instanceof POExplicitFunctionDefinition)
 		{
 			POExplicitFunctionDefinition efd = (POExplicitFunctionDefinition)def;
-			StringBuilder callString = new StringBuilder();
-			PORemoveIgnoresVisitor.init();
-			
-			for (POPatternList pl: efd.paramPatternList)
-			{
-				callString.append("(");
-				String sep = "";
-				
-				for (POPattern p: pl)
-				{
-					String match = paramMatch(p.removeIgnorePatterns(), ctxt);
-					
-					if (match == null)
-					{
-						return null;	// Can't match some params
-					}
-
-					callString.append(sep);
-					callString.append(match);
-					sep = ", ";
-				}
-					
-				callString.append(")");
-			}
-			
-			result = new JSONObject(
-				"name",		"PO #" + po.number + " counterexample",
-				"type",		"vdm",
-				"request",	"launch",
-				"noDebug",	false,
-				"defaultName",	def.name.getModule(),
-				"command",	"print " + def.name.getName() + callString
-			);
+			result = launchExplicitFunction(po, efd, ctxt);
 		}
 		else if (def instanceof POImplicitFunctionDefinition)
 		{
-			POImplicitFunctionDefinition efd = (POImplicitFunctionDefinition)def;
+			POImplicitFunctionDefinition ifd = (POImplicitFunctionDefinition)def;
 			StringBuilder callString = new StringBuilder();
 			callString.append("(");
 			String sep = "";
 			PORemoveIgnoresVisitor.init();
 			
-			for (POPatternListTypePair pl: efd.parameterPatterns)
+			for (POPatternListTypePair pl: ifd.parameterPatterns)
 			{
 				for (POPattern p: pl.patterns)
 				{
@@ -169,8 +138,54 @@ public class POPluginSL extends POPlugin
 				"command",	"print " + def.name.getName() + callString
 			);
 		}
+		else if (def instanceof POTypeDefinition)
+		{
+			POTypeDefinition td = (POTypeDefinition)def;
+			
+			if (td.invdef != null)
+			{
+				result = launchExplicitFunction(po, td.invdef, ctxt);
+			}
+		}
 
 		return result;
+	}
+	
+	private JSONObject launchExplicitFunction(ProofObligation po, POExplicitFunctionDefinition efd, Context ctxt)
+	{
+		StringBuilder callString = new StringBuilder();
+		PORemoveIgnoresVisitor.init();
+		
+		for (POPatternList pl: efd.paramPatternList)
+		{
+			callString.append("(");
+			String sep = "";
+			
+			for (POPattern p: pl)
+			{
+				String match = paramMatch(p.removeIgnorePatterns(), ctxt);
+				
+				if (match == null)
+				{
+					return null;	// Can't match some params
+				}
+
+				callString.append(sep);
+				callString.append(match);
+				sep = ", ";
+			}
+				
+			callString.append(")");
+		}
+		
+		return new JSONObject(
+			"name",		"PO #" + po.number + " counterexample",
+			"type",		"vdm",
+			"request",	"launch",
+			"noDebug",	false,
+			"defaultName",	efd.name.getModule(),
+			"command",	"print " + efd.name.getName() + callString
+		);
 	}
 
 	private String paramMatch(POPattern p, Context ctxt)
