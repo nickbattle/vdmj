@@ -27,9 +27,7 @@ package examples;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Vector;
 
-import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
@@ -98,9 +96,7 @@ public class ExamplePluginPR extends ExamplePlugin
 			if (def.name != null)
 			{
 				VDMWarning warning = new VDMWarning(9999, "Example warning from plugin", def.name.getLocation());
-				List<VDMMessage> list = new Vector<VDMMessage>();
-				list.add(warning);
-				MessageHub.getInstance().addPluginMessages(this, list);	// Add the warning to the hub
+				MessageHub.getInstance().addPluginMessage(this, warning);	// Add the warning to the hub
 				break;
 			}
 		}

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2022 Nick Battle.
+ *	Copyright (c) 2023 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,14 +22,42 @@
  *
  ******************************************************************************/
 
-package workspace.events;
+package workspace.plugins;
 
-import rpc.RPCRequest;
+import com.fujitsu.vdmj.lex.Dialect;
 
-abstract public class AbstractCheckFilesEvent extends LSPEvent
+import workspace.EventListener;
+
+/**
+ * The workspace plugin. This may grow in use, if it makes sense
+ * to move the workspace manager tasks here, driven by LSP events.
+ */
+public class WSPlugin extends AnalysisPlugin implements EventListener
 {
-	public AbstractCheckFilesEvent()
+	public static AnalysisPlugin factory(Dialect dialect)
 	{
-		super(RPCRequest.create("AbstractFileRequest", ""));
+		switch (dialect)
+		{
+			default:
+				return new WSPlugin();
+		}
+	}
+	
+	@Override
+	public int getPriority()
+	{
+		return EventListener.WS_PRIORITY;
+	}
+
+	@Override
+	public String getName()
+	{
+		return "WS";
+	}
+
+	@Override
+	public void init()
+	{
+		// No need to handle any events yet
 	}
 }
