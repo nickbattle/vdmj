@@ -103,9 +103,7 @@ public class ExamplePluginSL extends ExamplePlugin
 			if (def.name != null)
 			{
 				VDMWarning warning = new VDMWarning(9999, "Example warning from plugin", def.name.getLocation());
-				List<VDMMessage> list = new Vector<VDMMessage>();
-				list.add(warning);
-				MessageHub.getInstance().addPluginMessages(this, list);	// Add the warning to the hub
+				MessageHub.getInstance().addPluginMessage(this, warning);	// Add the warning to the hub
 				break;
 			}
 		}

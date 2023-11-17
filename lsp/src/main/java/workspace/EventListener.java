@@ -34,11 +34,12 @@ import workspace.events.LSPEvent;
  */
 public interface EventListener
 {
-	public final static int AST_PRIORITY = Integer.getInteger("lspx.plugins.priority.ast", 100);
-	public final static int TC_PRIORITY  = Integer.getInteger("lspx.plugins.priority.tc", 200);
-	public final static int IN_PRIORITY  = Integer.getInteger("lspx.plugins.priority.in", 300);
-	public final static int PO_PRIORITY  = Integer.getInteger("lspx.plugins.priority.po", 400);
-	public final static int CT_PRIORITY  = Integer.getInteger("lspx.plugins.priority.co", 500);
+	public final static int WS_PRIORITY  = Integer.getInteger("lspx.plugins.priority.ws", 100);
+	public final static int AST_PRIORITY = Integer.getInteger("lspx.plugins.priority.ast", 200);
+	public final static int TC_PRIORITY  = Integer.getInteger("lspx.plugins.priority.tc", 300);
+	public final static int IN_PRIORITY  = Integer.getInteger("lspx.plugins.priority.in", 400);
+	public final static int PO_PRIORITY  = Integer.getInteger("lspx.plugins.priority.po", 500);
+	public final static int CT_PRIORITY  = Integer.getInteger("lspx.plugins.priority.co", 600);
 
 	public final static int USER_PRIORITY = Integer.getInteger("lspx.plugins.priority.user", 1000);
 	

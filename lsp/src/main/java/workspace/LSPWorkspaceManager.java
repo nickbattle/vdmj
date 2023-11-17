@@ -53,6 +53,8 @@ import java.util.regex.PatternSyntaxException;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
+import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
@@ -95,6 +97,7 @@ import workspace.events.ShutdownEvent;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.INPlugin;
 import workspace.plugins.TCPlugin;
+import workspace.plugins.WSPlugin;
 
 public class LSPWorkspaceManager
 {
@@ -155,6 +158,7 @@ public class LSPWorkspaceManager
 			 * when the client capabilities have been received.
 			 */
 			PluginRegistry registry = PluginRegistry.getInstance();
+			registry.registerPlugin(WSPlugin.factory(Settings.dialect));
 			registry.registerPlugin(ASTPlugin.factory(Settings.dialect));
 			registry.registerPlugin(TCPlugin.factory(Settings.dialect));
 			registry.registerPlugin(INPlugin.factory(Settings.dialect));
@@ -524,6 +528,7 @@ public class LSPWorkspaceManager
 			Diag.info("Not overwriting existing extract file: %s", extract);
 			externalFiles.put(extract, FileTime.fromMillis(0));
 			loadFile(extract);
+			modifiedExtractWarning(extract);
 		}
 		else
 		{
@@ -547,6 +552,29 @@ public class LSPWorkspaceManager
 				Diag.info("External file contains no VDM source: %s", file);
 			}
 		}
+	}
+	
+	private void modifiedExtractWarning(File extract) throws IOException
+	{
+		SourceFile source = new SourceFile(extract);
+		String line1 = source.getLine(1);
+		String line2 = source.getLine(2);
+		LexLocation loc = null;
+		
+		// Look for standard extract header (see ExternalFileFormats), else
+		// highlight the first line.
+		
+		if (line2.startsWith("-- Document created from"))
+		{
+			loc = new LexLocation(extract, "", 2, 4, 2, line2.length() + 4);
+		}
+		else
+		{
+			loc = new LexLocation(extract, "", 1, 1, 1, line1.length());
+		}
+		
+		WSPlugin ws = registry.getPlugin("WS");
+		messagehub.addPluginMessage(ws, new VDMWarning(0, "This extracted file has been modified", loc));
 	}
 
 	private boolean onDotPath(File file)
@@ -850,6 +878,7 @@ public class LSPWorkspaceManager
 			{
 				sendMessage(WARNING_MSG, "WARNING: Changing extracted VDM source: " + file);
 				externalFilesWarned.add(file);
+				modifiedExtractWarning(file);
 			}
 			
 			StringBuilder buffer = projectFiles.get(file);
@@ -906,6 +935,8 @@ public class LSPWorkspaceManager
 			if (externalFiles.containsKey(file))
 			{
 				sendMessage(WARNING_MSG, "WARNING: Saving extracted VDM source: " + file);
+				modifiedExtractWarning(file);
+
 			}
 	
 			if (text != null)
