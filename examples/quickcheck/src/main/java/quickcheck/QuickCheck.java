@@ -528,8 +528,19 @@ public class QuickCheck
 						}
 						else if (po.isExistential())	// Principal exp is "exists..."
 						{
-							infof("PO #%d, MAYBE %s\n", po.number, duration(before, after));
-							po.setStatus(POStatus.MAYBE);
+							if (results.hasAllValues)
+							{
+								infof("PO #%d, FAILED (unsatisfiable) %s\n", po.number, duration(before, after));
+								po.setStatus(POStatus.FAILED);
+								infoln("----");
+								infoln(po);
+							}
+							else
+							{
+								infof("PO #%d, MAYBE %s\n", po.number, duration(before, after));
+								po.setStatus(POStatus.MAYBE);
+							}
+							
 							po.setCounterexample(null);
 							po.setMessage(null);
 							po.setWitness(null);
