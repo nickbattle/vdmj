@@ -532,6 +532,7 @@ public class QuickCheck
 							{
 								infof("PO #%d, FAILED (unsatisfiable) %s\n", po.number, duration(before, after));
 								po.setStatus(POStatus.FAILED);
+								po.setMessage("Unsatisfiable");
 								infoln("----");
 								infoln(po);
 							}
@@ -539,10 +540,10 @@ public class QuickCheck
 							{
 								infof("PO #%d, MAYBE %s\n", po.number, duration(before, after));
 								po.setStatus(POStatus.MAYBE);
+								po.setMessage(null);
 							}
 							
 							po.setCounterexample(null);
-							po.setMessage(null);
 							po.setWitness(null);
 						}
 						else

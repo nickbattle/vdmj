@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
+import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Context;
@@ -219,8 +220,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				sb.append(" counterexample: ");
 				sb.append(po.counterexample.toStringLine());
 				messages.add(new VDMWarning(9000, sb.toString(), po.location));
-				
-				if (po.message != null)		// Add any message as a warning too
+			}
+
+			if (po.status == POStatus.FAILED)
+			{
+				if (po.message != null)		// Add failed messages as a warning too
 				{
 					messages.add(new VDMWarning(9000, po.message, po.location));
 				}
