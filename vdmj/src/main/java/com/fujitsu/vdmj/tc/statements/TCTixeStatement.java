@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.statements.visitors.TCStatementVisitor;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
+import com.fujitsu.vdmj.tc.types.TCUnknownType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
@@ -56,14 +57,16 @@ public class TCTixeStatement extends TCStatement
 		TCType rt = body.typeCheck(env, scope, constraint, mandatory);
 		TCTypeSet extypes = body.exitCheck(env);
 
-		// if (!extypes.isEmpty())
+		if (extypes.isEmpty())
 		{
-			TCType union = extypes.getType(location);
+			extypes.add(new TCUnknownType(location));	// Force TC of alts anyway
+		}
 
-    		for (TCTixeStmtAlternative tsa: traps)
-    		{
-    			tsa.typeCheck(env, scope, union, constraint, mandatory);
-    		}
+		TCType union = extypes.getType(location);
+
+		for (TCTixeStmtAlternative tsa: traps)
+		{
+			tsa.typeCheck(env, scope, union, constraint, mandatory);
 		}
 
 		return setType(rt);

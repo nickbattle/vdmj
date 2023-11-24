@@ -107,30 +107,37 @@ public class MessageHub
 	 */
 	public synchronized void addPluginMessages(AnalysisPlugin plugin, List<? extends VDMMessage> messages)
 	{
-		String pname = plugin.getName();
-		
 		for (VDMMessage message: messages)
 		{
-			Map<String, Set<VDMMessage>> pmap = messageMap.get(message.location.file);
+			addPluginMessage(plugin, message);
+		}
+	}
+
+	/**
+	 * Add a single message for a plugin.
+	 */
+	public void addPluginMessage(AnalysisPlugin plugin, VDMMessage message)
+	{
+		String pname = plugin.getName();
+		Map<String, Set<VDMMessage>> pmap = messageMap.get(message.location.file);
+		
+		if (pmap != null)
+		{
+			Set<VDMMessage> pmessages = pmap.get(pname);
 			
-			if (pmap != null)
+			if (pmessages != null)
 			{
-				Set<VDMMessage> pmessages = pmap.get(pname);
-				
-				if (pmessages != null)
-				{
-					pmessages.add(message);
-					Diag.fine("Added %s MSG %s", pname, message);
-				}
-				else
-				{
-					Diag.error("Cannot add message for plugin %s", pname);
-				}
+				pmessages.add(message);
+				Diag.fine("Added %s MSG %s", pname, message);
 			}
 			else
 			{
-				Diag.error("File %s not in MessageHub", message.location.file);
+				Diag.error("Cannot add message for plugin %s", pname);
 			}
+		}
+		else
+		{
+			Diag.error("File %s not in MessageHub", message.location.file);
 		}
 	}
 	

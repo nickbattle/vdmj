@@ -31,7 +31,6 @@ import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.po.definitions.POClassList;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.runtime.Context;
 
 import json.JSONObject;
 import workspace.events.CheckPrepareEvent;
@@ -83,9 +82,14 @@ public class POPluginPR extends POPlugin
 	}
 
 	@Override
-	protected JSONObject getLaunch(ProofObligation po, Context ctxt)
+	protected JSONObject getCexLaunch(ProofObligation po)
 	{
-		// TODO More complex than SL as we have to think about constructors...
-		return null;
+		return null;	// Needs to create new object?
+	}
+
+	@Override
+	protected JSONObject getWitnessLaunch(ProofObligation po)
+	{
+		return null;	// Needs to create new object?
 	}
 }

@@ -95,10 +95,15 @@ public class QuickCheckExecutor extends AsyncExecutor
 				{
 					qc.checkObligation(po, results);
 				}
+				
+				if (cancelled)
+				{
+					break;
+				}
 			}
 		}
 		
-		answer = qc.hasErrors() ? "Failed" : "OK";
+		answer = qc.hasErrors() ? "Failed" : cancelled ? "Cancelled" : "OK";
 	}
 
 	@Override

@@ -28,6 +28,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.util.Utils;
 
 import json.JSONObject;
+import quickcheck.commands.QCRunLSPCommand;
 import quickcheck.commands.QuickCheckLSPCommand;
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.HelpList;
@@ -68,9 +69,14 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 	{
 		String[] argv = Utils.toArgv(line);
 		
-		if (argv[0].equals("quickcheck") || argv[0].equals("qc"))
+		switch (argv[0])
 		{
-			return new QuickCheckLSPCommand(line);
+			case "quickcheck":
+			case "qc":
+				return new QuickCheckLSPCommand(line);
+				
+			case "qcrun":
+				return new QCRunLSPCommand(line);
 		}
 		
 		return null;
@@ -79,6 +85,8 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 	@Override
 	public HelpList getCommandHelp()
 	{
-		return new HelpList(QuickCheckLSPCommand.SHORT + " - lightweight PO verification");
+		return new HelpList(
+			QuickCheckLSPCommand.SHORT + " - lightweight PO verification",
+			QCRunLSPCommand.HELP);
 	}
 }
