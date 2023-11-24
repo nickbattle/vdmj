@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.util.Utils;
 
+import quickcheck.commands.QCRunCommand;
 import quickcheck.commands.QuickCheckCommand;
 
 public class QuickCheckPlugin extends AnalysisPlugin
@@ -55,9 +56,14 @@ public class QuickCheckPlugin extends AnalysisPlugin
 	{
 		String[] argv = Utils.toArgv(line);
 		
-		if (argv[0].equals("quickcheck") || argv[0].equals("qc"))
+		switch (argv[0])
 		{
-			return new QuickCheckCommand(line);
+			case "quickcheck":
+			case "qc":
+				return new QuickCheckCommand(line);
+				
+			case "qcrun":
+				return new QCRunCommand(line);
 		}
 		
 		return null;
@@ -67,5 +73,6 @@ public class QuickCheckPlugin extends AnalysisPlugin
 	public void help()
 	{
 		QuickCheckCommand.help();
+		QCRunCommand.help();
 	}
 }

@@ -28,19 +28,9 @@ import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
-import com.fujitsu.vdmj.po.definitions.PODefinition;
-import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
-import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
-import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
 import com.fujitsu.vdmj.po.modules.POModuleList;
-import com.fujitsu.vdmj.po.patterns.POPattern;
-import com.fujitsu.vdmj.po.patterns.POPatternList;
-import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingConstantVisitor;
-import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
-import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.runtime.Context;
 
 import json.JSONObject;
 import workspace.events.CheckPrepareEvent;
@@ -92,106 +82,42 @@ public class POPluginSL extends POPlugin
 	}
 
 	@Override
-	protected JSONObject getLaunch(ProofObligation po, Context ctxt)
+	protected JSONObject getCexLaunch(ProofObligation po)
 	{
-		PODefinition def = po.definition;
-		JSONObject result = null;
+		String launch = po.getCexLaunch();
 		
-		if (def instanceof POExplicitFunctionDefinition)
+		if (launch == null)
 		{
-			POExplicitFunctionDefinition efd = (POExplicitFunctionDefinition)def;
-			result = launchExplicitFunction(po, efd, ctxt);
-		}
-		else if (def instanceof POImplicitFunctionDefinition)
-		{
-			POImplicitFunctionDefinition ifd = (POImplicitFunctionDefinition)def;
-			StringBuilder callString = new StringBuilder();
-			callString.append("(");
-			String sep = "";
-			PORemoveIgnoresVisitor.init();
-			
-			for (POPatternListTypePair pl: ifd.parameterPatterns)
-			{
-				for (POPattern p: pl.patterns)
-				{
-					String match = paramMatch(p.removeIgnorePatterns(), ctxt);
-					
-					if (match == null)
-					{
-						return null;	// Can't match some params
-					}
-
-					callString.append(sep);
-					callString.append(match);
-					sep = ", ";
-				}
-			}
-			
-			callString.append(")");
-			
-			result = new JSONObject(
-				"name",		"PO #" + po.number + " counterexample",
-				"type",		"vdm",
-				"request",	"launch",
-				"noDebug",	false,
-				"defaultName",	def.name.getModule(),
-				"command",	"print " + def.name.getName() + callString
-			);
-		}
-		else if (def instanceof POTypeDefinition)
-		{
-			POTypeDefinition td = (POTypeDefinition)def;
-			
-			if (td.invdef != null)
-			{
-				result = launchExplicitFunction(po, td.invdef, ctxt);
-			}
-		}
-
-		return result;
-	}
-	
-	private JSONObject launchExplicitFunction(ProofObligation po, POExplicitFunctionDefinition efd, Context ctxt)
-	{
-		StringBuilder callString = new StringBuilder();
-		PORemoveIgnoresVisitor.init();
-		
-		for (POPatternList pl: efd.paramPatternList)
-		{
-			callString.append("(");
-			String sep = "";
-			
-			for (POPattern p: pl)
-			{
-				String match = paramMatch(p.removeIgnorePatterns(), ctxt);
-				
-				if (match == null)
-				{
-					return null;	// Can't match some params
-				}
-
-				callString.append(sep);
-				callString.append(match);
-				sep = ", ";
-			}
-				
-			callString.append(")");
+			return null;	// No counterexample or definition or mismatched params
 		}
 		
 		return new JSONObject(
-			"name",		"PO #" + po.number + " counterexample",
-			"type",		"vdm",
-			"request",	"launch",
-			"noDebug",	false,
-			"defaultName",	efd.name.getModule(),
-			"command",	"print " + efd.name.getName() + callString
-		);
+				"name",			"PO #" + po.number + " counterexample",
+				"type",			"vdm",
+				"request",		"launch",
+				"noDebug",		false,
+				"defaultName",	po.definition.name.getModule(),
+				"command",		"print " + launch
+			);
 	}
 
-	private String paramMatch(POPattern p, Context ctxt)
+	@Override
+	protected JSONObject getWitnessLaunch(ProofObligation po)
 	{
-		POGetMatchingConstantVisitor visitor = new POGetMatchingConstantVisitor();
-		String result = p.apply(visitor, ctxt);
-		return visitor.hasFailed() ? null : result;
+		String launch = po.getWitnessLaunch();
+		
+		if (launch == null)
+		{
+			return null;	// No witness or definition or mismatched params
+		}
+		
+		return new JSONObject(
+				"name",			"PO #" + po.number + " witness",
+				"type",			"vdm",
+				"request",		"launch",
+				"noDebug",		false,
+				"defaultName",	po.definition.name.getModule(),
+				"command",		"print " + launch
+			);
 	}
 }
