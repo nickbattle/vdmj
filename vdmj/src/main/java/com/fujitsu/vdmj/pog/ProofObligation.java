@@ -27,7 +27,15 @@ package com.fujitsu.vdmj.pog;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
+import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.po.patterns.POPatternList;
+import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingConstantVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
+import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -197,4 +205,118 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	{
 		return type.toExplicitString(poLoc);
 	}
+	
+	/**
+	 * Generate a string invocation for the context passed.
+	 */
+	public String getCexLaunch()
+	{
+		if (counterexample.isEmpty())
+		{
+			return null;
+		}
+		
+		return getLaunch(counterexample);
+	}
+	
+	public String getWitnessLaunch()
+	{
+		if (witness.isEmpty())
+		{
+			return null;
+		}
+		
+		return getLaunch(witness);
+	}
+
+	private String getLaunch(Context ctxt)
+	{
+		if (definition instanceof POExplicitFunctionDefinition)
+		{
+			POExplicitFunctionDefinition efd = (POExplicitFunctionDefinition)definition;
+			return launchExplicitFunction(efd, ctxt);
+		}
+		else if (definition instanceof POImplicitFunctionDefinition)
+		{
+			POImplicitFunctionDefinition ifd = (POImplicitFunctionDefinition)definition;
+			return launchImplicitFunction(ifd, ctxt);
+		}
+		else if (definition instanceof POTypeDefinition)
+		{
+			POTypeDefinition td = (POTypeDefinition)definition;
+			
+			if (td.invdef != null)
+			{
+				return launchExplicitFunction(td.invdef, ctxt);
+			}
+		}
+
+		return null;	// Unexpected definition
+	}
+	
+	private String launchExplicitFunction(POExplicitFunctionDefinition efd, Context ctxt)
+	{
+		StringBuilder callString = new StringBuilder(efd.name.getName());
+		PORemoveIgnoresVisitor.init();
+		
+		for (POPatternList pl: efd.paramPatternList)
+		{
+			callString.append("(");
+			String sep = "";
+			
+			for (POPattern p: pl)
+			{
+				String match = paramMatch(p.removeIgnorePatterns(), ctxt);
+				
+				if (match == null)
+				{
+					return null;	// Can't match some params
+				}
+
+				callString.append(sep);
+				callString.append(match);
+				sep = ", ";
+			}
+				
+			callString.append(")");
+		}
+		
+		return  callString.toString();
+	}
+
+	private String launchImplicitFunction(POImplicitFunctionDefinition ifd, Context ctxt)
+	{
+		StringBuilder callString = new StringBuilder(ifd.name.getName());
+		callString.append("(");
+		String sep = "";
+		PORemoveIgnoresVisitor.init();
+		
+		for (POPatternListTypePair pl: ifd.parameterPatterns)
+		{
+			for (POPattern p: pl.patterns)
+			{
+				String match = paramMatch(p.removeIgnorePatterns(), ctxt);
+				
+				if (match == null)
+				{
+					return null;	// Can't match some params
+				}
+
+				callString.append(sep);
+				callString.append(match);
+				sep = ", ";
+			}
+		}
+		
+		callString.append(")");
+		
+		return callString.toString();
+	}
+	
+	private String paramMatch(POPattern p, Context ctxt)
+	{
+		POGetMatchingConstantVisitor visitor = new POGetMatchingConstantVisitor();
+		String result = p.apply(visitor, ctxt);
+		return visitor.hasFailed() ? null : result;
+	}	
 }

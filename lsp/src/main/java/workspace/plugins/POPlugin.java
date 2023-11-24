@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
-import com.fujitsu.vdmj.runtime.Context;
 
 import json.JSONArray;
 import json.JSONObject;
@@ -141,7 +140,9 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract public ProofObligationList getProofObligations();
 	
-	abstract protected JSONObject getLaunch(ProofObligation po, Context ctxt);
+	abstract protected JSONObject getCexLaunch(ProofObligation po);
+
+	abstract protected JSONObject getWitnessLaunch(ProofObligation po);
 	
 	protected JSONArray splitPO(String value)
 	{
@@ -205,7 +206,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			{
 				JSONObject cexample = new JSONObject();
 				cexample.put("variables", Utils.contextToJSON(po.counterexample));
-				JSONObject launch = getLaunch(po, po.counterexample);
+				JSONObject launch = getCexLaunch(po);
 				
 				if (launch != null)
 				{
@@ -234,7 +235,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			{
 				JSONObject witness = new JSONObject();
 				witness.put("variables", Utils.contextToJSON(po.witness));
-				JSONObject launch = getLaunch(po, po.witness);
+				JSONObject launch = getWitnessLaunch(po);
 				
 				if (launch != null)
 				{
