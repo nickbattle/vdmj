@@ -91,10 +91,18 @@ public class QCRunLSPCommand extends AnalysisCommand
 						"Obligation does not have a counterexample/witness. Run qc?", null);
 				}
 				
-				println("print " + launch);
-				ExpressionExecutor executor = new ExpressionExecutor("print", request, launch);
-				executor.start();
-				return null;
+				if (launch != null)
+				{
+					println("=> print " + launch);
+					ExpressionExecutor executor = new ExpressionExecutor("print", request, launch);
+					executor.start();
+					return null;
+				}
+				else
+				{
+					return new DAPMessageList(request, false,
+						"Context does not bind all " + obligation.definition.name + " parameters?", null);
+				}
 			}
 		}
 		
