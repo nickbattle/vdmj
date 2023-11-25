@@ -88,10 +88,17 @@ public class QCRunCommand extends AnalysisCommand
 						return "Obligation does not have a counterexample/witness. Run qc?";
 					}
 					
-					String pline = "print " + launch;
-					println("> " + pline);
-					PrintCommand cmd = new PrintCommand(pline);
-					return cmd.run(pline);
+					if (launch != null)
+					{
+						String pline = "print " + launch;
+						println("=> " + pline);
+						PrintCommand cmd = new PrintCommand(pline);
+						return cmd.run(pline);
+					}
+					else
+					{
+						return "Context does not bind all " + obligation.definition.name + " parameters?";
+					}
 				}
 			}
 			
