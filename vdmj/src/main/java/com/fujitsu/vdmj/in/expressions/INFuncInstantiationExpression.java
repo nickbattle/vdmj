@@ -121,7 +121,7 @@ public class INFuncInstantiationExpression extends INExpression
 				rv = impdef.getPolymorphicValue(argtypes, params, ctxt);
 			}
 
-    		rv.setSelf(fv.self);
+    		rv.setSelf(fv);
 			rv.uninstantiated = false;
 			return rv;
 		}

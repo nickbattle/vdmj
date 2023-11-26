@@ -39,37 +39,13 @@ import com.fujitsu.vdmj.util.Utils;
 
 public class RecursiveObligation extends ProofObligation
 {
-	public RecursiveObligation(
-		POExplicitFunctionDefinition def, POApplyExpression apply, POContextStack ctxt)
-	{
-		super(apply.location, POType.RECURSIVE, ctxt);
-		int measureLexical = getLex(def.measureDef);
-
-		String lhs = getLHS(def);
-		String rhs = apply.getMeasureApply(def.measureName);
-
-		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
-	}
-
-	public RecursiveObligation(
-		POImplicitFunctionDefinition def, POApplyExpression apply, POContextStack ctxt)
-	{
-		super(def.location, POType.RECURSIVE, ctxt);
-		int measureLexical = getLex(def.measureDef);
-		
-		String lhs = getLHS(def);
-		String rhs = def.measureName.getName() + "(" + apply.args + ")";
-
-		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
-	}
-	
 	public RecursiveObligation(LexLocation location, PODefinitionList defs, POApplyExpression apply, POContextStack ctxt)
 	{
 		super(location, POType.RECURSIVE, ctxt);
 		int measureLexical = getLex(getMeasureDef(defs.get(0)));
 		
 		String lhs = getLHS(defs.get(0));
-		String rhs = getMeasureName(defs.get(1)) + "(" + apply.args + ")";
+		String rhs = apply.getMeasureApply(getMeasureName(defs.get(1)));
 
 		value = ctxt.getObligation(greater(measureLexical, lhs, rhs));
 	}
@@ -95,17 +71,12 @@ public class RecursiveObligation extends ProofObligation
 				sb.append("]");
 			}
 			
-			String sep = "";
-			sb.append("(");
-			
 			for (POPatternList plist: edef.paramPatternList)
 			{
-				 sb.append(sep);
+				 sb.append("(");
 				 sb.append(Utils.listToString(plist));
-				 sep = ", ";
+				 sb.append(")");
 			}
-
-			sb.append(")");
 		}
 		else if (def instanceof POImplicitFunctionDefinition)
 		{
@@ -184,6 +155,11 @@ public class RecursiveObligation extends ProofObligation
 		}
 		
 		TCFunctionType ftype = (TCFunctionType) mdef.getType();
+		
+		while (ftype.result instanceof TCFunctionType)	// Skip curries
+		{
+			ftype = (TCFunctionType)ftype.result;
+		}
 		
 		if (ftype.result instanceof TCProductType)
 		{

@@ -122,34 +122,33 @@ public class INExplicitFunctionDefinition extends INDefinition
 	{
 		NameValuePairList nvl = new NameValuePairList();
 
-		FunctionValue prefunc =
-			(predef == null) ? null : new FunctionValue(predef, null, null, null);
-
-		FunctionValue postfunc =
-			(postdef == null) ? null : new FunctionValue(postdef, null, null, null);
-
-		FunctionValue func = new FunctionValue(this, prefunc, postfunc, null);
-		func.isStatic = accessSpecifier.isStatic;;
-		func.uninstantiated = (typeParams != null);
-		nvl.add(new NameValuePair(name, func));
+		FunctionValue prefunc = null;
+		FunctionValue postfunc = null;
+		FunctionValue measurefunc = null;
 
 		if (predef != null)
 		{
-			nvl.add(new NameValuePair(predef.name, prefunc));
-			prefunc.uninstantiated = (typeParams != null);
+			NameValuePairList names = predef.getNamedValues(ctxt);
+			prefunc = names.getNamedValue(predef.name);
+			nvl.addAll(names);
 		}
 
 		if (postdef != null)
 		{
-			nvl.add(new NameValuePair(postdef.name, postfunc));
-			postfunc.uninstantiated = (typeParams != null);
+			NameValuePairList names = postdef.getNamedValues(ctxt);
+			postfunc = names.getNamedValue(postdef.name);
+			nvl.addAll(names);
 		}
 		
 		if (measureDef != null && measureDef.name.isMeasureName())
 		{
-			// Add implicit measure_* functions and any pre_measure_*s too.
-			nvl.addAll(measureDef.getNamedValues(ctxt));
+			NameValuePairList names = measureDef.getNamedValues(ctxt);
+			measurefunc = names.getNamedValue(measureDef.name);
+			nvl.addAll(names);
 		}
+
+		FunctionValue func = new FunctionValue(this, prefunc, postfunc, measurefunc, null);
+		nvl.add(new NameValuePair(name, func));
 
 		return nvl;
 	}
@@ -195,13 +194,8 @@ public class INExplicitFunctionDefinition extends INDefinition
 		}
 		
 		TCFunctionType ftype = (TCFunctionType)INInstantiate.instantiate(getType(), params, ctxt);
-		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, null);
+		FunctionValue rv = new FunctionValue(this, ftype, params, prefv, postfv, measurefv, null);
 
-		if (measurefv != null)
-		{
-			rv.setMeasure(measurefv);
-		}
-		
 		polyfuncs.put(argTypes, rv);
 		return rv;
 	}

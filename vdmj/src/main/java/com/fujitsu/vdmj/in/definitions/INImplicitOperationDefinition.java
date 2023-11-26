@@ -123,29 +123,25 @@ public class INImplicitOperationDefinition extends INDefinition
 		NameValuePairList nvl = new NameValuePairList();
 
 		FunctionValue prefunc =
-			(predef == null) ? null : new FunctionValue(predef, null, null, null);
+			(predef == null) ? null : new FunctionValue(predef, null, null, null, null);
 
 		FunctionValue postfunc =
-			(postdef == null) ? null : new FunctionValue(postdef, null, null, null);
+			(postdef == null) ? null : new FunctionValue(postdef, null, null, null, null);
 
 		// Note, body may be null if it is really implicit. This is caught
 		// when the function is invoked. The value is needed to implement
 		// the pre_() expression for implicit functions.
 
 		OperationValue op =	new OperationValue(this, prefunc, postfunc, statedef);
-		op.isConstructor = isConstructor;
-		op.isStatic = accessSpecifier.isStatic;
 		nvl.add(new NameValuePair(name, op));
 
 		if (predef != null)
 		{
-			prefunc.isStatic = accessSpecifier.isStatic;
 			nvl.add(new NameValuePair(predef.name, prefunc));
 		}
 
 		if (postdef != null)
 		{
-			postfunc.isStatic = accessSpecifier.isStatic;
 			nvl.add(new NameValuePair(postdef.name, postfunc));
 		}
 

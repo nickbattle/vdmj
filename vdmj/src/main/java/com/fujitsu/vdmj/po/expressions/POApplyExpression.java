@@ -36,7 +36,6 @@ import com.fujitsu.vdmj.pog.SeqApplyObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -103,9 +102,7 @@ public class POApplyExpression extends POExpression
 			}
 		}
 		
-		boolean polymorphic = type.isFunction(location) && type.getFunction().instantiated != null;
-
-		if (!type.isUnknown(location) && !polymorphic &&
+		if (!type.isUnknown(location) &&
 			(type.isFunction(location) || type.isOperation(location)))
 		{
 			TCTypeList paramTypes = type.isFunction(location) ?
@@ -113,7 +110,7 @@ public class POApplyExpression extends POExpression
 			
 			String prename = root.getPreName();
 
-			if (type.isFunction(location) && (prename == null || !prename.equals("")))
+			if (type.isFunction(location) && prename != null && !prename.equals(""))
 			{
 				boolean needed = true;
 				
@@ -154,10 +151,14 @@ public class POApplyExpression extends POExpression
 			}
 		}
 
-		if (!type.isUnknown(location) && type.isFunction(location) && !polymorphic)
+		if (!type.isUnknown(location) && type.isFunction(location))
 		{
 			if (recursive != null)	// name is a function in a recursive loop
 			{
+				/**
+				 * All of the functions in the loop will generate similar obligations,
+				 * so the "add" method eliminates any duplicates.
+				 */
 				for (PODefinitionList loop: recursive)
 				{
 					obligations.add(new RecursiveObligation(location, loop, this, ctxt));
@@ -180,16 +181,16 @@ public class POApplyExpression extends POExpression
 		return obligations;
 	}
 	
-	public String getMeasureApply(TCNameToken measure)
+	public String getMeasureApply(String measure)
 	{
 		return getMeasureApply(measure, true);
 	}
 	
 	/**
 	 * Create a measure application string from this apply, turning the root function
-	 * name into the measure name passed, and collapsing curried argument sets into one. 
+	 * name into the measure name passed. 
 	 */
-	private String getMeasureApply(TCNameToken measure, boolean close)
+	private String getMeasureApply(String measure, boolean close)
 	{
 		String start = null;
 		
@@ -200,19 +201,31 @@ public class POApplyExpression extends POExpression
 		}
 		else if (root instanceof POVariableExpression)
 		{
-			start = measure.getName() + "(";
+			start = measure;
 		}
 		else if (root instanceof POFuncInstantiationExpression)
 		{
 			POFuncInstantiationExpression fie = (POFuncInstantiationExpression)root;
-			start = measure.getName() + "[" + Utils.listToString(fie.actualTypes) + "](";
+			start = measure + "[" + Utils.listToString(fie.actualTypes) + "]";
 		}
 		else
 		{
-			start = root.toString() + "(";
+			start = root.toString();
 		}
+
+		StringBuilder sb = new StringBuilder(start);
+		sb.append("(");
+		String separator = "";
 		
-		return start  + Utils.listToString(args) + (close ? ")" : ", ");
+		for (POExpression arg: args)
+		{
+			sb.append(separator);
+			sb.append(Utils.deBracketed(arg));
+			separator = ", ";
+		}
+
+		sb.append(")");
+		return sb.toString();
 	}
 
 	@Override
