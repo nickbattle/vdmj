@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeSet;
 import com.fujitsu.vdmj.tc.types.TCUnionType;
 import com.fujitsu.vdmj.tc.types.TCUnknownType;
+import com.fujitsu.vdmj.values.visitors.ExplicitValueVisitor;
 import com.fujitsu.vdmj.values.visitors.ValueVisitor;
 
 /**
@@ -131,6 +132,11 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 		}
 
 		return value;
+	}
+	
+	public String toExplicitString(LexLocation from)
+	{
+		return this.apply(new ExplicitValueVisitor(), from);
 	}
 
 	/**

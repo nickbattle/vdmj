@@ -107,7 +107,7 @@ public class POGetMatchingConstantVisitor extends POPatternVisitor<String, Conte
 		}
 		else
 		{
-			return v.toString();
+			return v.toExplicitString(node.location);
 		}
 	}
 	
