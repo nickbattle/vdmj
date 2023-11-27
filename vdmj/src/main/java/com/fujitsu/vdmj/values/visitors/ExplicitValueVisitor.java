@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.values.MapValue;
 import com.fujitsu.vdmj.values.RecordValue;
+import com.fujitsu.vdmj.values.ReferenceValue;
 import com.fujitsu.vdmj.values.SeqValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.TupleValue;
@@ -44,6 +45,12 @@ public class ExplicitValueVisitor extends ValueVisitor<String, LexLocation>
 	public String caseValue(Value node, LexLocation arg)
 	{
 		return node.toString();
+	}
+	
+	@Override
+	public String caseReferenceValue(ReferenceValue node, LexLocation from)
+	{
+		return node.getValue().apply(this, from);
 	}
 	
  	public String caseMapValue(MapValue node, LexLocation from)
