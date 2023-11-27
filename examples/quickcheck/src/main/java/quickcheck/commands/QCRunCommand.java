@@ -26,6 +26,7 @@ package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
@@ -102,8 +103,20 @@ public class QCRunCommand extends AnalysisCommand
 					{
 						String pline = "print " + launch;
 						println("=> " + pline);
-						PrintCommand cmd = new PrintCommand(pline);
-						return cmd.run(pline);
+						
+						// Temporarily allow maximal parsing, for invariant POs
+						boolean saved = Properties.parser_maximal_types;
+						
+						try
+						{
+							Properties.parser_maximal_types = true;
+							PrintCommand cmd = new PrintCommand(pline);
+							return cmd.run(pline);
+						}
+						finally
+						{
+							Properties.parser_maximal_types = saved;
+						}
 					}
 					else
 					{
