@@ -224,7 +224,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 					{
 						// Probably an implicit missing measure
 						iter.remove();
-						obligation.status = POStatus.FAILED;
+						obligation.status = POStatus.UNCHECKED;
 						obligation.isCheckable = false;
 						obligation.message = "PO #" + obligation.number + ": Missing measure function";
 					}
