@@ -64,18 +64,15 @@ import com.fujitsu.vdmj.util.KCombinator;
 import com.fujitsu.vdmj.util.KPermutor;
 import com.fujitsu.vdmj.util.Selector;
 import com.fujitsu.vdmj.values.BooleanValue;
-import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.CharacterValue;
 import com.fujitsu.vdmj.values.FieldMap;
 import com.fujitsu.vdmj.values.FieldValue;
 import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.InvariantValue;
 import com.fujitsu.vdmj.values.MapValue;
-import com.fujitsu.vdmj.values.NameValuePairMap;
 import com.fujitsu.vdmj.values.NaturalOneValue;
 import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.NilValue;
-import com.fujitsu.vdmj.values.ObjectValue;
 import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.QuoteValue;
 import com.fujitsu.vdmj.values.RealValue;
@@ -105,8 +102,8 @@ public class FixedRangeCreator extends RangeCreator
 	@Override
 	public ValueSet caseClassType(TCClassType node, Integer limit)
 	{
-		ObjectValue obj = new ObjectValue(node, new NameValuePairMap(), new Vector<ObjectValue>(), CPUValue.vCPU, null);
-		return new ValueSet(obj);
+		// ObjectValue obj = new ObjectValue(node, new NameValuePairMap(), new Vector<ObjectValue>(), CPUValue.vCPU, null);
+		return new ValueSet();
 	}
 
 	@Override

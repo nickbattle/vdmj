@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.runtime.Interpreter;
 
 /**
  * Launch a "print" command for a PO counterexample or witness.
@@ -73,6 +74,15 @@ public class QCRunCommand extends AnalysisCommand
 			{
 				if (obligation.number == number)
 				{
+					try
+					{
+						Interpreter.getInstance().setDefaultName(obligation.location.module);
+					}
+					catch (Exception e)
+					{
+						return "Exception: " + e.getMessage();		// Shouldn't happen
+					}
+					
 					String launch = null;
 					
 					if (!obligation.counterexample.isEmpty())
