@@ -27,6 +27,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.runtime.Interpreter;
 
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -75,6 +76,15 @@ public class QCRunLSPCommand extends AnalysisCommand
 		{
 			if (obligation.number == number)
 			{
+				try
+				{
+					Interpreter.getInstance().setDefaultName(obligation.location.module);
+				}
+				catch (Exception e)
+				{
+					return new DAPMessageList(request, e);		// Shouldn't happen
+				}
+				
 				String launch = null;
 				
 				if (!obligation.counterexample.isEmpty())

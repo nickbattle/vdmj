@@ -112,7 +112,7 @@ public class ExplicitValueVisitor extends ValueVisitor<String, LexLocation>
  	public String caseSetValue(SetValue node, LexLocation from)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("[");
+		sb.append("{");
 
 		if (!node.values.isEmpty())
 		{
@@ -125,7 +125,7 @@ public class ExplicitValueVisitor extends ValueVisitor<String, LexLocation>
 			}
 		}
 
-		sb.append("]");
+		sb.append("}");
 		return sb.toString();
 	}
 
