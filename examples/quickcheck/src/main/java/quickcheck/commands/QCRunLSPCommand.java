@@ -104,7 +104,8 @@ public class QCRunLSPCommand extends AnalysisCommand
 				if (launch != null)
 				{
 					println("=> print " + launch);
-					ExpressionExecutor executor = new ExpressionExecutor("print", request, launch);
+					// This allows maximal types to parse, for invariant POs
+					ExpressionExecutor executor = new ExpressionExecutor("print", request, launch, true);
 					executor.start();
 					return null;
 				}
