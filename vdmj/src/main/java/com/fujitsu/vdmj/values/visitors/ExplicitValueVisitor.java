@@ -35,8 +35,8 @@ import com.fujitsu.vdmj.values.TupleValue;
 import com.fujitsu.vdmj.values.Value;
 
 /**
- * This visitor produces a toString of a value, with any named types expanded
- * to be explicit if they are not within the current module.
+ * This visitor produces a toString of a value, with any record values expanded
+ * to be explicit (like mk_A`R) if they are not within the "from" module.
  */
 public class ExplicitValueVisitor extends ValueVisitor<String, LexLocation>
 {
@@ -48,6 +48,11 @@ public class ExplicitValueVisitor extends ValueVisitor<String, LexLocation>
 	
  	public String caseMapValue(MapValue node, LexLocation from)
 	{
+ 		if (node.values.isEmpty())
+ 		{
+ 			return "{|->}";
+ 		}
+ 		
 		StringBuilder sb = new StringBuilder();
 		sb.append("{");
 		String prefix = "";
