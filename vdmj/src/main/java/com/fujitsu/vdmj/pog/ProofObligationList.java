@@ -140,7 +140,6 @@ public class ProofObligationList extends Vector<ProofObligation>
 	
 	public void typeCheck(TCModule tcmodule, MultiModuleEnvironment menv)
 	{
-		renumber();
 		for (ProofObligation po: this)
 		{
 			try
