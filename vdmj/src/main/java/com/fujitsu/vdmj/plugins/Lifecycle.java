@@ -352,7 +352,10 @@ public class Lifecycle
 	
 			if (file.isDirectory())
 			{
-				for (File subfile: file.listFiles(Settings.dialect.getFilter()))
+				File[] list = file.listFiles(Settings.dialect.getFilter());
+				Arrays.sort(list);	// Predictable order
+				
+				for (File subfile: list)
 				{
 					if (subfile.isFile())
 					{
