@@ -437,7 +437,7 @@ public class TCExplicitFunctionDefinition extends TCDefinition
 				if (!mtype.parameters.toString().equals(type.parameters.toString()))
 				{
 					mname.report(3303, "Measure parameters different to function");
-					detail2(mname.getName(), mtype.parameters, "Expected", type.parameters);
+					detail2(mname.getName(), mtype, "Expected", type.getMeasureType(mtype.result));
 				}
 			}
 			else if (isCurried && !(mtype.result instanceof TCFunctionType))
