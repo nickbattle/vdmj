@@ -136,7 +136,7 @@ public class ParameterPatternObligation extends ProofObligation
 					foralls.append(fprefix);
 					foralls.append(aname);
 					foralls.append(":");
-					foralls.append(atype);
+					foralls.append(atype.toExplicitString(location));
 	
 					argnames.append(aprefix);
 					argnames.append(aname);
@@ -145,7 +145,7 @@ public class ParameterPatternObligation extends ProofObligation
 					aprefix = ", ";
 					ebindings.append(bname);
 					ebindings.append(":");
-					ebindings.append(atype);
+					ebindings.append(atype.toExplicitString(location));
 	
 					for (PODefinition def: dlist)
 					{
@@ -154,7 +154,7 @@ public class ParameterPatternObligation extends ProofObligation
 							ebindings.append(aprefix);
 							ebindings.append(def.name.getName());
 							ebindings.append(":");
-							ebindings.append(def.getType());
+							ebindings.append(def.getType().toExplicitString(location));
 							existingBindings.add(def.name.getName());
 						}
 					}

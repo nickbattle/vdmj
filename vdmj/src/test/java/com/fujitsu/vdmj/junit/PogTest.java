@@ -69,7 +69,7 @@ public class PogTest extends TestCase
 		/* 2 */ "exists a : seq of nat1 & (a <> [])\n",
 		/* 3 */ "forall m1, m2 in set {{1 |-> 2}, {2 |-> 3}} & forall d3 in set dom m1, d4 in set dom m2 & d3 = d4 => m1(d3) = m2(d4)\n",
 		/* 4 */ "After instance variable initializers (iv < 10)\n",
-		/* 5 */ "forall arg1:(int * int), arg2:seq of (int) & (exists bind1:(int * int), i:int, j:int & (arg1 = bind1) and (mk_(i, j) = bind1)) and (exists bind1:seq of (int), k:int & (arg2 = bind1) and ([k] = bind1))\n",
+		/* 5 */ "forall arg1:(int) * (int), arg2:seq of int & (exists bind1:(int) * (int), i:int, j:int & (arg1 = bind1) and (mk_(i, j) = bind1)) and (exists bind1:seq of int, k:int & (arg2 = bind1) and ([k] = bind1))\n",
 		/* 6 */ "(forall mk_(i, j):(int) * (int), [k]:seq of int &\n  i in set dom m)\n",
 		/* 7 */ "(forall mk_(i, j):(int) * (int) &\n  i in set dom m)\n",
 		/* 8 */ "(let x:nat1 = 123 in\n  -1 in set dom m)\n",
