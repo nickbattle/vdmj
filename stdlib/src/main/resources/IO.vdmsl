@@ -1,3 +1,4 @@
+-- @NoPOG - do not generate obligations for this module
 module IO
 exports all
 definitions

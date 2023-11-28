@@ -1,3 +1,4 @@
+-- @NoPOG - do not generate obligations for this class
 class MATH
 
 -- 	VDMTools STANDARD LIBRARY: MATH

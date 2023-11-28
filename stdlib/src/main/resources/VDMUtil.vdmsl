@@ -1,3 +1,4 @@
+-- @NoPOG - do not generate obligations for this module
 module VDMUtil
 
 -- 	VDMTools STANDARD LIBRARY: MiscUtils

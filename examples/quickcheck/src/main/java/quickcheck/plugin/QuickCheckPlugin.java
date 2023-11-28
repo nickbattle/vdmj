@@ -63,6 +63,7 @@ public class QuickCheckPlugin extends AnalysisPlugin
 				return new QuickCheckCommand(line);
 				
 			case "qcrun":
+			case "qr":
 				return new QCRunCommand(line);
 		}
 		

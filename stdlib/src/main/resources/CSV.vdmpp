@@ -1,3 +1,4 @@
+-- @NoPOG - do not generate obligations for this class
 class CSV
 
 --  Overture STANDARD LIBRARY: INPUT/OUTPUT
