@@ -76,6 +76,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 				return new QuickCheckLSPCommand(line);
 				
 			case "qcrun":
+			case "qr":
 				return new QCRunLSPCommand(line);
 		}
 		

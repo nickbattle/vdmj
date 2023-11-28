@@ -46,7 +46,7 @@ public class QCRunCommand extends AnalysisCommand
 	{
 		super(line);
 
-		if (!argv[0].equals("qcrun"))
+		if (!argv[0].equals("qcrun") && !argv[0].equals("qr"))
 		{
 			throw new IllegalArgumentException(USAGE);
 		}
