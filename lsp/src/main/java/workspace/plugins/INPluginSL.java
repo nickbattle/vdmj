@@ -31,13 +31,13 @@ import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
 import vdmj.commands.AnalysisCommand;
-import vdmj.commands.HelpList;
 import vdmj.commands.ModulesCommand;
 import workspace.events.CheckPrepareEvent;
 

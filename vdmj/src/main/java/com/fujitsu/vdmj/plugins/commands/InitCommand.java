@@ -97,8 +97,8 @@ public class InitCommand extends AnalysisCommand
 		return null;
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("init - re-initialize the specification");
+		return "init - re-initialize the specification";
 	}
 }

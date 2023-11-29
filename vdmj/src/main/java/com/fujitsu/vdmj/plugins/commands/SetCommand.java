@@ -129,8 +129,8 @@ public class SetCommand extends ControlAnalysisCommand
 		}
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("set [<pre|post|inv|dtc|measures|annotations> <on|off>] - set runtime checks");
+		return "set [<pre|post|inv|dtc|measures|annotations> <on|off>] - set runtime checks";
 	}
 }

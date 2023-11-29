@@ -223,8 +223,8 @@ public class QuickCheckCommand extends AnalysisCommand
 		return null;
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println(SHORT + " - lightweight PO verification");
+		return SHORT + " - lightweight PO verification";
 	}
 }

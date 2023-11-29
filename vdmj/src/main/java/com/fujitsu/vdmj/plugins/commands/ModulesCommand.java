@@ -75,8 +75,8 @@ public class ModulesCommand extends AnalysisCommand
 		}
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("modules - list the specification modules");
+		return "modules - list the specification modules";
 	}
 }

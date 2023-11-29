@@ -129,8 +129,8 @@ public class SaveCommand extends AnalysisCommand
 		}
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("save [<files>] - generate external source extract files");
+		return "save [<files>] - generate external source extract files";
 	}
 }

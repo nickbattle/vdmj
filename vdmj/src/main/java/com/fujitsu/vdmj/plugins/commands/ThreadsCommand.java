@@ -92,11 +92,8 @@ public class ThreadsCommand extends AnalysisCommand
 		return null;
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		if (Settings.dialect != Dialect.VDM_SL)
-		{
-			println("threads - list the running threads");
-		}
+		return "threads - list the running threads";
 	}
 }

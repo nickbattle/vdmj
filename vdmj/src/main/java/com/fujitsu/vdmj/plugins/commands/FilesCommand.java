@@ -63,8 +63,8 @@ public class FilesCommand extends AnalysisCommand
 		return null;
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("files - list the specification files");
+		return "files - list the specification files";
 	}
 }

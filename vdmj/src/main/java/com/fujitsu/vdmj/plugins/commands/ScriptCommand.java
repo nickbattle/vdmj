@@ -144,8 +144,8 @@ public class ScriptCommand extends AnalysisCommand
 		return line.toString();
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("script <file> - run commands from file");
+		return "script <file> - run commands from file";
 	}
 }

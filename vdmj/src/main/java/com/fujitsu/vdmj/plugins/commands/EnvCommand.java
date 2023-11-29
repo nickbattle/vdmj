@@ -55,8 +55,8 @@ public class EnvCommand extends AnalysisCommand
 		return null;
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("env - list the global symbols in the default environment");
+		return "env - list the global symbols in the default environment";
 	}
 }

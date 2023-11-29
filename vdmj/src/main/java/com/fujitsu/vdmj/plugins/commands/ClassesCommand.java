@@ -75,8 +75,8 @@ public class ClassesCommand extends AnalysisCommand
 		}
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("classes - list the specification classes");
+		return "classes - list the specification classes";
 	}
 }

@@ -133,8 +133,8 @@ public class QCRunCommand extends AnalysisCommand
 		}
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println(CMD + " - execute counterexample/witness");
+		return CMD + " - execute counterexample/witness";
 	}
 }

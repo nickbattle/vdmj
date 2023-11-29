@@ -119,8 +119,8 @@ public class WordCommand extends AnalysisCommand
 		}
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("word [<files>] - generate Word HTML line coverage files");
+		return "word [<files>] - generate Word HTML line coverage files";
 	}
 }

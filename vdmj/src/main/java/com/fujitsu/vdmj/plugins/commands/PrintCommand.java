@@ -125,8 +125,8 @@ public class PrintCommand extends AnalysisCommand
 		return null;
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("[p]rint <exp> - evaluate an expression");
+		return "print <exp> - evaluate an expression";
 	}
 }

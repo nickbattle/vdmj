@@ -103,8 +103,8 @@ public class TranslateCommand extends AnalysisCommand
 	 * "help" output in the command line. The format is the same as the other help lines, with
 	 * an indication of what arguments the command takes, and a one line description.
 	 */
-	public static void help()
+	public static String help()
 	{
-		System.out.println("translate - translate the VDM specification");
+		return "translate - translate the VDM specification";
 	}
 }

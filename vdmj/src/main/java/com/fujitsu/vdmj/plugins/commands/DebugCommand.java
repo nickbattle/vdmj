@@ -24,10 +24,9 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-
 import com.fujitsu.vdmj.debug.BreakpointReader;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
 public class DebugCommand extends AnalysisCommand
@@ -56,14 +55,16 @@ public class DebugCommand extends AnalysisCommand
 		return null;
 	}
 	
-	public static void help()
+	public static HelpList help()
 	{
-		println("break [<file>:]<line#> [<condition>] - create a breakpoint");
-		println("break <function/operation> [<condition>] - create a breakpoint");
-		println("trace [<file>:]<line#> [<exp>] - create a tracepoint");
-		println("trace <function/operation> [<exp>] - create a tracepoint");
-		println("catch [<exp list>] - create an exception catchpoint");
-		println("remove <breakpoint#> - remove a trace/breakpoint");
-		println("list - list breakpoints");
+		return new HelpList(
+			"break [<file>:]<line#> [<condition>] - create a breakpoint",
+			"break <function/operation> [<condition>] - create a breakpoint",
+			"trace [<file>:]<line#> [<exp>] - create a tracepoint",
+			"trace <function/operation> [<exp>] - create a tracepoint",
+			"catch [<exp list>] - create an exception catchpoint",
+			"remove <breakpoint#> - remove a trace/breakpoint",
+			"list - list breakpoints"
+		);
 	}
 }

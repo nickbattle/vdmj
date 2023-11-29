@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2022 Nick Battle.
+ *	Copyright (c) 2023 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,12 +22,14 @@
  *
  ******************************************************************************/
 
-package vdmj.commands;
+package com.fujitsu.vdmj.plugins;
 
 import java.util.TreeMap;
 
 /**
- * An ordered list of "command", "usage" help pairs.
+ * An ordered list of "command", "usage" help pairs. The map holding the pairs is
+ * ordered by the ordering of the "command" key, which is taken to be the first
+ * word on the help line(s) passed.
  */
 public class HelpList extends TreeMap<String, String>
 {
@@ -44,7 +46,7 @@ public class HelpList extends TreeMap<String, String>
 		add(lines);
 	}
 	
-	private void add(String... lines)
+	public void add(String... lines)
 	{
 		for (String line: lines)
 		{

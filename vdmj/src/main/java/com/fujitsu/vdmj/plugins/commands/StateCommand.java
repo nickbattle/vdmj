@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.plugins.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -66,11 +65,8 @@ public class StateCommand extends AnalysisCommand
 		return null;
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		if (Settings.dialect == Dialect.VDM_SL)
-		{
-			println("state - show the default module state");
-		}
+		return "state - show the default module state";
 	}
 }

@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.plugins.commands.AssertCommand;
 import com.fujitsu.vdmj.plugins.commands.ClassesCommand;
 import com.fujitsu.vdmj.plugins.commands.CoverageCommand;
@@ -445,28 +446,40 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	public void help()
+	public HelpList getCommandHelp()
 	{
-		InitCommand.help();
-		SetCommand.help();
-		DefaultCommand.help();
-		ModulesCommand.help();
-		ClassesCommand.help();
-		FilesCommand.help();
-		PluginsCommand.help();
-		EnvCommand.help();
-		StateCommand.help();
-		LogCommand.help();
-		PrintCommand.help();
-		ScriptCommand.help();
-		AssertCommand.help();
-		ThreadsCommand.help();
-		CreateCommand.help();
-		DebugCommand.help();
-		CoverageCommand.help();
-		LatexCommand.help();
-		WordCommand.help();
-		SaveCommand.help();
-		RuntraceCommand.help();
+		HelpList list = new HelpList(
+			InitCommand.help(),
+			SetCommand.help(),
+			DefaultCommand.help(),
+			FilesCommand.help(),
+			PluginsCommand.help(),
+			EnvCommand.help(),
+			PrintCommand.help(),
+			ScriptCommand.help(),
+			AssertCommand.help(),
+			CoverageCommand.help(),
+			LatexCommand.help(),
+			WordCommand.help(),
+			SaveCommand.help()
+		);
+		
+		list.add(DebugCommand.help());
+		list.add(RuntraceCommand.help());
+		
+		if (Settings.dialect == Dialect.VDM_SL)
+		{
+			list.add(ModulesCommand.help());
+			list.add(StateCommand.help());
+		}
+		else
+		{
+			list.add(ClassesCommand.help());
+			list.add(CreateCommand.help());
+			list.add(LogCommand.help());
+			list.add(ThreadsCommand.help());
+		}
+		
+		return list;
 	}
 }

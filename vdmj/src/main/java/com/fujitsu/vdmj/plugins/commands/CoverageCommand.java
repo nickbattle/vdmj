@@ -184,8 +184,8 @@ public class CoverageCommand extends AnalysisCommand
     	}
     }
 	
-	public static void help()
+	public static String help()
 	{
-		println("coverage clear|write <dir>|merge <dir>|<filenames> - handle line coverage");
+		return "coverage clear|write <dir>|merge <dir>|<filenames> - handle line coverage";
 	}
 }

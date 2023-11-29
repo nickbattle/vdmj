@@ -121,8 +121,8 @@ public class LatexCommand extends AnalysisCommand
 		}
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("latex|latexdoc [<files>] - generate LaTeX line coverage files");
+		return "latex latexdoc [<files>] - generate LaTeX line coverage files";
 	}
 }

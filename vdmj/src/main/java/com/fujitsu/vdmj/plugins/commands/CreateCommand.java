@@ -82,11 +82,8 @@ public class CreateCommand extends AnalysisCommand
 		return null;
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		if (Settings.dialect != Dialect.VDM_SL)
-		{
-			println("create <id> := <exp> - create a named variable");
-		}
+		return "create <id> := <exp> - create a named variable";
 	}
 }

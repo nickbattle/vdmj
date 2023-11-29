@@ -24,8 +24,6 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-
 import com.fujitsu.vdmj.ExitStatus;
 
 public class ReloadCommand extends ControlAnalysisCommand
@@ -57,8 +55,8 @@ public class ReloadCommand extends ControlAnalysisCommand
 		}
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("reload - reload specification files");
+		return "reload - reload specification files";
 	}
 }

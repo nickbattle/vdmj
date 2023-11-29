@@ -106,8 +106,8 @@ public class PogCommand extends AnalysisCommand
 		return null;
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("pog [<fn/op name> | <number> | <status>] - generate proof obligations");
+		return "pog [<fn/op name> | <number> | <status>] - generate proof obligations";
 	}
 }

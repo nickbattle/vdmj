@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.plugins.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
@@ -60,8 +59,8 @@ public class PluginsCommand extends AnalysisCommand
 		return null;
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		println("plugins - list the loaded plugins");
+		return "plugins - list the loaded plugins";
 	}
 }

@@ -67,8 +67,8 @@ public class DefaultCommand extends AnalysisCommand
 		return null;
 	}
 	
-	public static void help()
+	public static String help()
 	{
-		printf("default <%s> - set the default %s name\n", KIND, KIND);
+		return String.format("default <%s> - set the default %s name", KIND, KIND);
 	}
 }
