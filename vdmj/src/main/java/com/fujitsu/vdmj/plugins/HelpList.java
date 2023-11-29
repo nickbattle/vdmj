@@ -50,7 +50,7 @@ public class HelpList extends TreeMap<String, String>
 	{
 		for (String line: lines)
 		{
-			String[] parts = line.split("\\s+");
+			String[] parts = line.split("[^\\w]+");
 			put(parts[0], line);
 		}
 	}

@@ -123,6 +123,6 @@ public class LatexCommand extends AnalysisCommand
 	
 	public static String help()
 	{
-		return "latex latexdoc [<files>] - generate LaTeX line coverage files";
+		return "latex|latexdoc [<files>] - generate LaTeX line coverage files";
 	}
 }
