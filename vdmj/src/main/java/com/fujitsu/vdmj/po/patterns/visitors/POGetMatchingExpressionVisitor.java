@@ -202,7 +202,9 @@ public class POGetMatchingExpressionVisitor extends POPatternVisitor<POExpressio
 			list.add(p.apply(this, arg));
 		}
 
-		return new POMkTypeExpression(node.typename, list, null, null);
+		// If the type is not within the pattern's module, be explicit
+		boolean explicit = !node.location.module.equals(node.typename.getModule());
+		return new POMkTypeExpression(node.typename.getExplicit(explicit), list, null, null);
 	}
 	
 	@Override
