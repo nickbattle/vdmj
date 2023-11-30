@@ -97,6 +97,22 @@ public class PluginRegistry
 		return sorted;
 	}
 	
+	public void usage()
+	{
+		for (AnalysisPlugin plugin: getPlugins())
+		{
+			plugin.usage();
+		}
+	}
+	
+	public void processArgs(List<String> argv)
+	{
+		for (AnalysisPlugin plugin: getPlugins())
+		{
+			plugin.processArgs(argv);	// In priority order
+		}
+	}
+	
 	public AnalysisCommand getCommand(String line)
 	{
 		String[] argv = line.split("\\s+");

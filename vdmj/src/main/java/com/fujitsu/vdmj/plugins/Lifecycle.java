@@ -146,8 +146,6 @@ public class Lifecycle
 
 	private void usage()
 	{
-		List<AnalysisPlugin> plugins = PluginRegistry.getInstance().getPlugins();
-		
 		println("Usage: VDMJ [-vdmsl | -vdmpp | -vdmrt] [<options>] [<files or dirs>]");
 		println("-vdmsl: parse files as VDM-SL (default)");
 		println("-vdmpp: parse files as VDM++");
@@ -161,10 +159,7 @@ public class Lifecycle
 		println("-q: suppress information messages");
 		println("-verbose: display detailed startup information");
 		
-		for (AnalysisPlugin plugin: plugins)
-		{
-			plugin.usage();
-		}
+		PluginRegistry.getInstance().usage();
 		
 		System.exit(0);
 	}
@@ -268,10 +263,7 @@ public class Lifecycle
 			}
 		}
 		
-		for (AnalysisPlugin plugin: PluginRegistry.getInstance().getPlugins())
-		{
-			plugin.processArgs(argv);	// In priority order
-		}
+		PluginRegistry.getInstance().processArgs(argv);	// In priority order
 	}
 	
 	protected void loadPlugins()
