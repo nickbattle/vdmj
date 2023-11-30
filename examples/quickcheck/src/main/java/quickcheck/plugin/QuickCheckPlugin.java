@@ -27,6 +27,7 @@ package quickcheck.plugin;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.util.Utils;
 
 import quickcheck.commands.QCRunCommand;
@@ -71,9 +72,11 @@ public class QuickCheckPlugin extends AnalysisPlugin
 	}
 	
 	@Override
-	public void help()
+	public HelpList getCommandHelp()
 	{
-		QuickCheckCommand.help();
-		QCRunCommand.help();
+		return new HelpList(
+			QuickCheckCommand.HELP,
+			QCRunCommand.HELP
+		);
 	}
 }

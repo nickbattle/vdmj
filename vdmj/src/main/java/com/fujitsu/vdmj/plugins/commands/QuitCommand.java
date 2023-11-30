@@ -24,13 +24,13 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-
 import com.fujitsu.vdmj.ExitStatus;
 
 public class QuitCommand extends ControlAnalysisCommand
 {
-	private final static String USAGE = "Usage: [q]uit";
+	private final static String CMD = "quit";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - close the session";
 
 	public QuitCommand(String line)
 	{
@@ -55,10 +55,5 @@ public class QuitCommand extends ControlAnalysisCommand
 		{
 			return USAGE;
 		}
-	}
-	
-	public static void help()
-	{
-		println("[q]uit - close the session");
 	}
 }

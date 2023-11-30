@@ -24,13 +24,14 @@
 
 package workspace.plugins;
 
+import com.fujitsu.vdmj.plugins.HelpList;
+
 import dap.DAPMessageList;
 import json.JSONObject;
 import lsp.LSPMessageUtils;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import vdmj.commands.AnalysisCommand;
-import vdmj.commands.HelpList;
 import workspace.EventHub;
 import workspace.EventListener;
 import workspace.MessageHub;

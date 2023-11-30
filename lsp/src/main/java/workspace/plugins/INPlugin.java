@@ -30,6 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import com.fujitsu.vdmj.in.definitions.INDefinitionList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
@@ -38,7 +39,6 @@ import vdmj.commands.AnalysisCommand;
 import vdmj.commands.DefaultCommand;
 import vdmj.commands.ErrorCommand;
 import vdmj.commands.HelpCommand;
-import vdmj.commands.HelpList;
 import vdmj.commands.InitCommand;
 import vdmj.commands.PluginsCommand;
 import vdmj.commands.PrintCommand;

@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.DebuggerException;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -412,13 +413,15 @@ public class RuntraceCommand extends AnalysisCommand
 		println("Trace filter currently " + reduction*100 + "% " + reductionType + " (seed " + traceseed + ")");
 	}
 
-	public static void help()
+	public static HelpList help()
 	{
-		println("runtrace <name> [start test [end test]] - run CT trace");
-		println("debugtrace <name> [start test [end test]] - debug CT trace");
-		println("savetrace [<file> | off] - save CT trace output");
-		println("seedtrace <number> - seed CT trace random generator");
-		println("runalltraces [<name>] - run all CT traces in class/module name");
-		println("filter %age | <reduction type> - reduce CT trace(s)");
+		return new HelpList(
+			"runtrace <name> [start test [end test]] - run CT trace",
+			"debugtrace <name> [start test [end test]] - debug CT trace",
+			"savetrace [<file> | off] - save CT trace output",
+			"seedtrace <number> - seed CT trace random generator",
+			"runalltraces [<name>] - run all CT traces in class/module name",
+			"filter %age | <reduction type> - reduce CT trace(s)"
+		);
 	}
 }

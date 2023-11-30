@@ -24,6 +24,8 @@
 
 package vdmj.commands;
 
+import com.fujitsu.vdmj.plugins.HelpList;
+
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;

@@ -27,6 +27,7 @@ package plugins;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
+import com.fujitsu.vdmj.plugins.HelpList;
 
 import commands.TranslateCommand;
 
@@ -67,8 +68,8 @@ public class V2CPluginVDMJ extends AnalysisPlugin
 	}
 	
 	@Override
-	public void help()
+	public HelpList getCommandHelp()
 	{
-		TranslateCommand.help();
+		return new HelpList(TranslateCommand.HELP);
 	}
 }

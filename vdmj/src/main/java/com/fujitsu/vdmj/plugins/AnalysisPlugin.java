@@ -82,14 +82,22 @@ abstract public class AnalysisPlugin
 		return;			// List usage of any command line -options used
 	}
 	
+	/**
+	 * Plugins can return Commands to execute in the console. They are passed
+	 * the whole command line, so that they can process arguments.
+	 */
 	public AnalysisCommand getCommand(String line)
 	{
-		return null;	// Get an object to handle line, if supported
+		return null;
 	}
-	
-	public void help()
+
+	/**
+	 * Returns an array of String arrays for Command help. The first string is the
+	 * simple name of the command, the 2nd is the detail of the usage. 
+	 */
+	public HelpList getCommandHelp()
 	{
-		return;			// List usage of commands supported
+		return new HelpList();
 	}
 
 	protected List<VDMMessage> errsOf(Throwable e)

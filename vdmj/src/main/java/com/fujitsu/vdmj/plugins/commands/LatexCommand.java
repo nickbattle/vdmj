@@ -35,7 +35,10 @@ import com.fujitsu.vdmj.runtime.SourceFile;
 
 public class LatexCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: latex|latexdoc [<files>]";
+	private final static String CMD = "latex|latexdoc [<files>]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - generate LaTeX line coverage files";
+
 	private final Interpreter interpreter;
 
 	public LatexCommand(String line)
@@ -119,10 +122,5 @@ public class LatexCommand extends AnalysisCommand
 		{
 			println("latex: " + e.getMessage());
 		}
-	}
-	
-	public static void help()
-	{
-		println("latex|latexdoc [<files>] - generate LaTeX line coverage files");
 	}
 }

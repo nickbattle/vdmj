@@ -35,11 +35,13 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.messages.RTValidator;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
+import com.fujitsu.vdmj.plugins.HelpList;
 
 public class LogCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: log | validate";
-
+	private final static String CMD = "log | validate";
+	private final static String USAGE = "Usage: " + CMD;
+	
 	public LogCommand(String line)
 	{
 		super(line);
@@ -163,12 +165,11 @@ public class LogCommand extends AnalysisCommand
 		}
 	}
 	
-	public static void help()
+	public static HelpList help()
 	{
-		if (Settings.dialect == Dialect.VDM_RT)
-		{
-			println("log [<file> | off] - log RT events to file");
-			println("validate <file> - validate RT log events");
-		}
+		return new HelpList(
+			"log [<file> | off] - log RT events to file",
+			"validate <file> - validate RT log events"
+		);
 	}
 }

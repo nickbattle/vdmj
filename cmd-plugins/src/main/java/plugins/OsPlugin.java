@@ -32,8 +32,11 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
  */
 public class OsPlugin extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: os <command> [<arguments>]";
-
+	private final static String CMD = "os <command> [<arguments>]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - run an operating system command";
+	
+	
 	public OsPlugin(String line)
 	{
 		super(line);
@@ -49,8 +52,7 @@ public class OsPlugin extends AnalysisCommand
 	{
 		if (argv.length == 1)
 		{
-			Console.out.println(help());
-			return null;
+			return USAGE;
 		}
 		
 		String[] cmd = new String[argv.length - 1];
@@ -74,13 +76,5 @@ public class OsPlugin extends AnalysisCommand
 		}
 		
 		return null;	// Even if command failed
-	}
-
-	/**
-	 * This would be used if the OsCommand was also part of an AnalysisPlugin
-	 */
-	public static String help()
-	{
-		return "os <command> [<args>] - run an operating system command";
 	}
 }

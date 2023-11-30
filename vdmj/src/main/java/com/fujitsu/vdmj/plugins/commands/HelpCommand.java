@@ -24,13 +24,15 @@
 
 package com.fujitsu.vdmj.plugins.commands;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
+import com.fujitsu.vdmj.plugins.HelpList;
+import com.fujitsu.vdmj.plugins.PluginRegistry;
 
 public class HelpCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: help";
+	private final static String CMD = "help [<command>]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - list all commands available";
 
 	public HelpCommand(String line)
 	{
@@ -45,24 +47,44 @@ public class HelpCommand extends AnalysisCommand
 	@Override
 	public String run(String line)
 	{
+		StringBuilder sb = new StringBuilder();
+		HelpList help = PluginRegistry.getInstance().getCommandHelp();
+
+		help.add(ReloadCommand.HELP);	// These three don't come from any plugin.
+		help.add(HelpCommand.HELP);
+		help.add(QuitCommand.HELP);
+
+		String sought = null;
+		String sep = "";
+		
 		if (argv.length == 1)
 		{
-			registry.getHelp();
-			
-			// These three don't come from any plugin.
-			ReloadCommand.help();
-			HelpCommand.help();
-			QuitCommand.help();
-			return null;
+			sought = null;
+		}
+		else if (argv.length == 2)
+		{
+			sought = argv[1]; 
 		}
 		else
 		{
-			return "Usage: help";
+			return USAGE;
 		}
-	}
-	
-	public static void help()
-	{
-		println("help - list all commands available");
+		
+		for (String cmd: help.keySet())
+		{
+			if (sought == null || cmd.equals(sought))
+			{
+				sb.append(sep);
+				sb.append(help.get(cmd));
+				sep = "\n";
+			}
+		}
+
+		if (sb.length() == 0)
+		{
+			sb.append("Unknown command '" + sought + "'");
+		}
+		
+		return sb.toString();
 	}
 }

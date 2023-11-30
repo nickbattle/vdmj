@@ -41,6 +41,7 @@ public class QCRunCommand extends AnalysisCommand
 {
 	private final static String CMD = "qcrun <PO number>";
 	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - execute counterexample/witness";
 
 	public QCRunCommand(String line)
 	{
@@ -131,10 +132,5 @@ public class QCRunCommand extends AnalysisCommand
 		{
 			return USAGE;
 		}
-	}
-	
-	public static void help()
-	{
-		println(CMD + " - execute counterexample/witness");
 	}
 }

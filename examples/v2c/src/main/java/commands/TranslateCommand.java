@@ -43,6 +43,10 @@ import examples.v2c.tr.modules.TRModuleList;
  */
 public class TranslateCommand extends AnalysisCommand
 {
+	private final static String CMD = "translate";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - translate the VDM specification";
+
 	/**
 	 * The constructor is called from the command line interpreter when the user first types
 	 * "translate <args>". It is passed the whole line typed by the user, which is broken into
@@ -51,6 +55,11 @@ public class TranslateCommand extends AnalysisCommand
 	public TranslateCommand(String line)
 	{
 		super(line);
+		
+		if (!argv[0].equals("translate"))
+		{
+			throw new IllegalArgumentException(USAGE);
+		}
 	}
 	
 	/**
@@ -96,15 +105,5 @@ public class TranslateCommand extends AnalysisCommand
 			System.out.println(e.getMessage());
 			return null;
 		}
-	}
-
-	/**
-	 * Once this plugin is loaded  the following help line is added to the general
-	 * "help" output in the command line. The format is the same as the other help lines, with
-	 * an indication of what arguments the command takes, and a one line description.
-	 */
-	public static void help()
-	{
-		System.out.println("translate - translate the VDM specification");
 	}
 }

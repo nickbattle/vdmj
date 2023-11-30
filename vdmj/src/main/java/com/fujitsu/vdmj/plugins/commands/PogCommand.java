@@ -35,7 +35,9 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 
 public class PogCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: pog [<fn/op name> | <number> | <status>]";
+	private final static String CMD = "pog [<fn/op name> | <number> | <status>]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - generate proof obligations";
 
 	public PogCommand(String line)
 	{
@@ -104,10 +106,5 @@ public class PogCommand extends AnalysisCommand
 		}
 		
 		return null;
-	}
-	
-	public static void help()
-	{
-		println("pog [<fn/op name> | <number> | <status>] - generate proof obligations");
 	}
 }

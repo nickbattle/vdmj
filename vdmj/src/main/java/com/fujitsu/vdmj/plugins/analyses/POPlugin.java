@@ -39,6 +39,7 @@ import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.CommandList;
 import com.fujitsu.vdmj.plugins.EventListener;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.plugins.commands.PogCommand;
 import com.fujitsu.vdmj.plugins.events.AbstractCheckFilesEvent;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
@@ -178,8 +179,8 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	public void help()
+	public HelpList getCommandHelp()
 	{
-		PogCommand.help();
+		return new HelpList(PogCommand.HELP);
 	}
 }

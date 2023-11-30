@@ -31,10 +31,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.plugins.HelpList;
+
 import json.JSONObject;
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.ErrorCommand;
-import vdmj.commands.HelpList;
 import workspace.plugins.AnalysisPlugin;
 
 public class PluginRegistry

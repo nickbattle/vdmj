@@ -130,19 +130,24 @@ public class PluginRegistry
 		
 		return result;
 	}
-
-	public void getHelp()
+	
+	public HelpList getCommandHelp()
 	{
+		HelpList result = new HelpList();
+		
 		for (AnalysisPlugin plugin: plugins.values())
 		{
 			try
 			{
-				plugin.help();
+				HelpList messages = plugin.getCommandHelp();
+				result.add(messages);
 			}
 			catch (Throwable e)
 			{
-				// Ignore misbehaving plugins
+				result.add(String.format("Exception in %s getCommandHelp", plugin.getName()));
 			}
 		}
+		
+		return result;
 	}
 }

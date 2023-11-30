@@ -43,6 +43,7 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.EventListener;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.plugins.commands.AssertCommand;
 import com.fujitsu.vdmj.plugins.commands.ClassesCommand;
 import com.fujitsu.vdmj.plugins.commands.CoverageCommand;
@@ -457,8 +458,9 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			case "plugins":		return new PluginsCommand(line);
 			case "env":			return new EnvCommand(line);
 			case "state":		return new StateCommand(line);
-			case "log":			return new LogCommand(line);
 			case "precision":	return new PrecisionCommand(line);
+			case "log":
+			case "validate":	return new LogCommand(line);
 			case "print":
 			case "p":			return new PrintCommand(line);
 			case "script":		return new ScriptCommand(line);
@@ -483,29 +485,40 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	}
 	
 	@Override
-	public void help()
+	public HelpList getCommandHelp()
 	{
-		InitCommand.help();
-		SetCommand.help();
-		DefaultCommand.help();
-		ModulesCommand.help();
-		ClassesCommand.help();
-		FilesCommand.help();
-		PluginsCommand.help();
-		EnvCommand.help();
-		StateCommand.help();
-		LogCommand.help();
-		PrecisionCommand.help();
-		PrintCommand.help();
-		ScriptCommand.help();
-		AssertCommand.help();
-		ThreadsCommand.help();
-		CreateCommand.help();
-		DebugCommand.help();
-		CoverageCommand.help();
-		LatexCommand.help();
-		WordCommand.help();
-		SaveCommand.help();
-		RuntraceCommand.help();
+		HelpList list = new HelpList(
+			InitCommand.HELP,
+			SetCommand.HELP,
+			DefaultCommand.HELP,
+			FilesCommand.HELP,
+			PluginsCommand.HELP,
+			EnvCommand.HELP,
+			PrintCommand.HELP,
+			ScriptCommand.HELP,
+			AssertCommand.HELP,
+			CoverageCommand.HELP,
+			LatexCommand.HELP,
+			WordCommand.HELP,
+			SaveCommand.HELP
+		);
+		
+		list.add(DebugCommand.help());
+		list.add(RuntraceCommand.help());
+		
+		if (Settings.dialect == Dialect.VDM_SL)
+		{
+			list.add(ModulesCommand.HELP);
+			list.add(StateCommand.HELP);
+		}
+		else
+		{
+			list.add(ClassesCommand.HELP);
+			list.add(CreateCommand.HELP);
+			list.add(LogCommand.help());
+			list.add(ThreadsCommand.HELP);
+		}
+		
+		return list;
 	}
 }

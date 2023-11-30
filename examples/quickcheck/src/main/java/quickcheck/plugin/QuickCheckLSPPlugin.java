@@ -25,13 +25,13 @@
 package quickcheck.plugin;
 
 import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.util.Utils;
 
 import json.JSONObject;
 import quickcheck.commands.QCRunLSPCommand;
 import quickcheck.commands.QuickCheckLSPCommand;
 import vdmj.commands.AnalysisCommand;
-import vdmj.commands.HelpList;
 import workspace.plugins.AnalysisPlugin;
 
 public class QuickCheckLSPPlugin extends AnalysisPlugin

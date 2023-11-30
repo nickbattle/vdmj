@@ -35,7 +35,9 @@ import com.fujitsu.vdmj.tc.definitions.TCClassList;
 
 public class ClassesCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: classes";
+	private final static String CMD = "classes";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - list the specification classes";
 
 	public ClassesCommand(String line)
 	{
@@ -73,10 +75,5 @@ public class ClassesCommand extends AnalysisCommand
 			
 			return null;
 		}
-	}
-	
-	public static void help()
-	{
-		println("classes - list the specification classes");
 	}
 }

@@ -35,12 +35,12 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
+import com.fujitsu.vdmj.plugins.HelpList;
 
 import dap.DAPMessageList;
 import json.JSONObject;
 import rpc.RPCMessageList;
 import vdmj.commands.AnalysisCommand;
-import vdmj.commands.HelpList;
 import workspace.Diag;
 import workspace.EventHub;
 import workspace.EventListener;

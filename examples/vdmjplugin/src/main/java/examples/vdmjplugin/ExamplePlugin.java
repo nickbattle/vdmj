@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 import com.fujitsu.vdmj.plugins.AnalysisEvent;
 import com.fujitsu.vdmj.plugins.EventListener;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.plugins.commands.MessageCommand;
 import com.fujitsu.vdmj.plugins.events.CheckSyntaxEvent;
 
@@ -166,9 +167,9 @@ abstract public class ExamplePlugin extends AnalysisPlugin implements EventListe
 	}
 	
 	@Override
-	public void help()
+	public HelpList getCommandHelp()
 	{
-		println("maxlen <len>: repeat checks with new maxlen");
+		return new HelpList("maxlen <len>: repeat checks with new maxlen");
 	}
 	
 	@Override

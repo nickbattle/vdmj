@@ -32,7 +32,9 @@ import com.fujitsu.vdmj.Settings;
 
 public class SetCommand extends ControlAnalysisCommand
 {
-	private final static String USAGE = "Usage: set [<pre|post|inv|dtc|exceptions|measures|annotations> <on|off>]";
+	private final static String CMD = "set [<pre|post|inv|dtc|exceptions|measures|annotations> <on|off>]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - set runtime checks";
 
 	public SetCommand(String line)
 	{
@@ -127,10 +129,5 @@ public class SetCommand extends ControlAnalysisCommand
 				return USAGE;
 			}
 		}
-	}
-	
-	public static void help()
-	{
-		println("set [<pre|post|inv|dtc|measures|annotations> <on|off>] - set runtime checks");
 	}
 }

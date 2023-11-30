@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INDefinitionList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.mapper.Mappable;
+import com.fujitsu.vdmj.plugins.HelpList;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
@@ -38,7 +39,6 @@ import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
 import vdmj.commands.ClassesCommand;
 import vdmj.commands.AnalysisCommand;
-import vdmj.commands.HelpList;
 import vdmj.commands.LogCommand;
 import workspace.events.CheckPrepareEvent;
 

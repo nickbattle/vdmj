@@ -38,7 +38,9 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 
 public class ScriptCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: script <file>";
+	private final static String CMD = "script <file>";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - run commands from file";
 
 	public ScriptCommand(String line)
 	{
@@ -142,10 +144,5 @@ public class ScriptCommand extends AnalysisCommand
 		while (line.length() > 0 && line.charAt(line.length() - 1) == '\\');
 
 		return line.toString();
-	}
-	
-	public static void help()
-	{
-		println("script <file> - run commands from file");
 	}
 }
