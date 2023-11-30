@@ -40,7 +40,9 @@ import com.fujitsu.vdmj.values.Value;
 
 public class PrintCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: [p]rint <expression>";
+	private final static String CMD = "print <expression>";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - evaluate an expression";
 
 	public PrintCommand(String line)
 	{
@@ -123,10 +125,5 @@ public class PrintCommand extends AnalysisCommand
 		}
 		
 		return null;
-	}
-	
-	public static String help()
-	{
-		return "print <exp> - evaluate an expression";
 	}
 }

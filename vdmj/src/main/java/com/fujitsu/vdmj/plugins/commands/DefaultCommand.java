@@ -33,8 +33,10 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 
 public class DefaultCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: default <name>";
+	private final static String CMD = "default <name>";
+	private final static String USAGE = "Usage: " + CMD;
 	private final static String KIND = Settings.dialect == Dialect.VDM_SL ? "module" : "class";
+	public  final static String HELP = String.format("default <%s> - set the default %s name", KIND, KIND);
 	
 	public DefaultCommand(String line)
 	{
@@ -65,10 +67,5 @@ public class DefaultCommand extends AnalysisCommand
 		}
 		
 		return null;
-	}
-	
-	public static String help()
-	{
-		return String.format("default <%s> - set the default %s name", KIND, KIND);
 	}
 }

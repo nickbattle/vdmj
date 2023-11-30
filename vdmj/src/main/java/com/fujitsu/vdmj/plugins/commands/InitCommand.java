@@ -35,7 +35,9 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 
 public class InitCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: init";
+	private final static String CMD = "init";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - re-initialize the specification";
 
 	public InitCommand(String line)
 	{
@@ -95,10 +97,5 @@ public class InitCommand extends AnalysisCommand
 		}
 		
 		return null;
-	}
-	
-	public static String help()
-	{
-		return "init - re-initialize the specification";
 	}
 }

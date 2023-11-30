@@ -50,7 +50,9 @@ import com.fujitsu.vdmj.util.DependencyOrder;
  */
 public class OrderPlugin extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: order [filename]";
+	private final static String CMD = "order [filename]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - print/save optimal module/class order";
 
 	public OrderPlugin(String line)
 	{
@@ -73,8 +75,7 @@ public class OrderPlugin extends AnalysisCommand
 		}
 		else if (argv.length != 1)
 		{
-			help();
-			return null;
+			return USAGE;
 		}
 		
 		Order order = new Order(outputfile);
@@ -90,14 +91,6 @@ public class OrderPlugin extends AnalysisCommand
 		}
 
 		return null;
-	}
-
-	/**
-	 * This would be used if the OrderCommand was also part of an AnalysisPlugin
-	 */
-	public static String help()
-	{
-		return "order [filename] - print/save optimal module/class order";
 	}
 
 	/**

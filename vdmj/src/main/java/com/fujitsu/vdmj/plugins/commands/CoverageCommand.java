@@ -38,7 +38,10 @@ import com.fujitsu.vdmj.runtime.SourceFile;
 
 public class CoverageCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: coverage clear|write <dir>|merge <dir>|<filenames>";
+	private final static String CMD = "coverage clear|write <dir>|merge <dir>|<filenames>";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - handle line coverage";
+
 	private Interpreter interpreter = null;
 
 	public CoverageCommand(String line)
@@ -183,9 +186,4 @@ public class CoverageCommand extends AnalysisCommand
     		println("Merged coverage for " + f);
     	}
     }
-	
-	public static String help()
-	{
-		return "coverage clear|write <dir>|merge <dir>|<filenames> - handle line coverage";
-	}
 }

@@ -181,6 +181,6 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public HelpList getCommandHelp()
 	{
-		return new HelpList(PogCommand.help());
+		return new HelpList(PogCommand.HELP);
 	}
 }

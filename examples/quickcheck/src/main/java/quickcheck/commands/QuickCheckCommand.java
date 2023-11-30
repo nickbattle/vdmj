@@ -50,6 +50,7 @@ public class QuickCheckCommand extends AnalysisCommand
 	private final static String CMD = "quickcheck [-?|-help][-q][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String SHORT = "quickcheck [-help][<options>][<POs>]";
 	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = SHORT + " - lightweight PO verification";
 			
 	public QuickCheckCommand(String line)
 	{
@@ -221,10 +222,5 @@ public class QuickCheckCommand extends AnalysisCommand
 		}
 		
 		return null;
-	}
-	
-	public static String help()
-	{
-		return SHORT + " - lightweight PO verification";
 	}
 }

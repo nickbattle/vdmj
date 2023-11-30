@@ -35,8 +35,10 @@ import com.fujitsu.vdmj.scheduler.SchedulableThread;
 
 public class ThreadsCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: threads";
-
+	private final static String CMD = "threads";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - list the running threads";
+	
 	public ThreadsCommand(String line)
 	{
 		super(line);
@@ -90,10 +92,5 @@ public class ThreadsCommand extends AnalysisCommand
 		}
 		
 		return null;
-	}
-	
-	public static String help()
-	{
-		return "threads - list the running threads";
 	}
 }

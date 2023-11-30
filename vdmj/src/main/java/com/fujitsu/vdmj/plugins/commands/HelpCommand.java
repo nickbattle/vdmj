@@ -30,7 +30,9 @@ import com.fujitsu.vdmj.plugins.PluginRegistry;
 
 public class HelpCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: help";
+	private final static String CMD = "help [<command>]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - list all commands available";
 
 	public HelpCommand(String line)
 	{
@@ -48,12 +50,9 @@ public class HelpCommand extends AnalysisCommand
 		StringBuilder sb = new StringBuilder();
 		HelpList help = PluginRegistry.getInstance().getCommandHelp();
 
-		// These three don't come from any plugin.
-		help.add(
-			ReloadCommand.help(),
-			HelpCommand.help(),
-			QuitCommand.help()
-		);
+		help.add(ReloadCommand.HELP);	// These three don't come from any plugin.
+		help.add(HelpCommand.HELP);
+		help.add(QuitCommand.HELP);
 
 		String sought = null;
 		String sep = "";
@@ -68,7 +67,7 @@ public class HelpCommand extends AnalysisCommand
 		}
 		else
 		{
-			return "Usage: help [<command>]";
+			return USAGE;
 		}
 		
 		for (String cmd: help.keySet())
@@ -87,10 +86,5 @@ public class HelpCommand extends AnalysisCommand
 		}
 		
 		return sb.toString();
-	}
-	
-	public static String help()
-	{
-		return "help [command] - list all commands available";
 	}
 }

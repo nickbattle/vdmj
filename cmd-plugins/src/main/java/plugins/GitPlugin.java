@@ -30,8 +30,10 @@ import com.fujitsu.vdmj.plugins.AnalysisCommand;
 
 public class GitPlugin extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: git <command> [args]";
-	
+	private final static String CMD = "git <command> [args]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - run a git command";
+
 	public GitPlugin(String line)
 	{
 		super(line);
@@ -68,13 +70,5 @@ public class GitPlugin extends AnalysisCommand
 		}
 		
 		return null;
-	}
-
-	/**
-	 * This would be used if the GitCommand was also part of an AnalysisPlugin
-	 */
-	public static void help()
-	{
-		println("git <command> [<args>] - run a git command");
 	}
 }

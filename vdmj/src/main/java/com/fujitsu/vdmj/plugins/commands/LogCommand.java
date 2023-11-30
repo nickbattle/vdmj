@@ -39,8 +39,9 @@ import com.fujitsu.vdmj.plugins.HelpList;
 
 public class LogCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: log | validate";
-
+	private final static String CMD = "log | validate";
+	private final static String USAGE = "Usage: " + CMD;
+	
 	public LogCommand(String line)
 	{
 		super(line);

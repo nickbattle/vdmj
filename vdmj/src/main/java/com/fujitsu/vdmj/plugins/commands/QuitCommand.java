@@ -28,7 +28,9 @@ import com.fujitsu.vdmj.ExitStatus;
 
 public class QuitCommand extends ControlAnalysisCommand
 {
-	private final static String USAGE = "Usage: [q]uit";
+	private final static String CMD = "quit";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - close the session";
 
 	public QuitCommand(String line)
 	{
@@ -53,10 +55,5 @@ public class QuitCommand extends ControlAnalysisCommand
 		{
 			return USAGE;
 		}
-	}
-	
-	public static String help()
-	{
-		return "quit - close the session";
 	}
 }

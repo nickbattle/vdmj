@@ -35,7 +35,10 @@ import com.fujitsu.vdmj.runtime.SourceFile;
 
 public class WordCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: word [<files>]";
+	private final static String CMD = "word [<files>]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - generate Word HTML line coverage files";
+
 	private final Interpreter interpreter;
 
 	public WordCommand(String line)
@@ -117,10 +120,5 @@ public class WordCommand extends AnalysisCommand
 		{
 			println("word: " + e.getMessage());
 		}
-	}
-	
-	public static String help()
-	{
-		return "word [<files>] - generate Word HTML line coverage files";
 	}
 }

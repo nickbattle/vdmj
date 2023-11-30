@@ -33,7 +33,9 @@ import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
 
 public class FilesCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: files";
+	private final static String CMD = "files";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - list the specification files";
 
 	public FilesCommand(String line)
 	{
@@ -61,10 +63,5 @@ public class FilesCommand extends AnalysisCommand
 		}
 		
 		return null;
-	}
-	
-	public static String help()
-	{
-		return "files - list the specification files";
 	}
 }

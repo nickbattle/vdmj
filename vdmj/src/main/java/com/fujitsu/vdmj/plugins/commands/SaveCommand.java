@@ -37,7 +37,10 @@ import com.fujitsu.vdmj.runtime.SourceFile;
 
 public class SaveCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: save [<filenames>]";
+	private final static String CMD = "save [<filenames>]";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - generate external source extract files";
+	
 	private final Interpreter interpreter;
 
 	public SaveCommand(String line)
@@ -127,10 +130,5 @@ public class SaveCommand extends AnalysisCommand
 		{
 			println("save: " + e.getMessage());
 		}
-	}
-	
-	public static String help()
-	{
-		return "save [<files>] - generate external source extract files";
 	}
 }

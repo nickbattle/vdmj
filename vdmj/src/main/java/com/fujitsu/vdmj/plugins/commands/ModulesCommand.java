@@ -35,7 +35,9 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 
 public class ModulesCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: modules";
+	private final static String CMD = "modules";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - list the specification modules";
 
 	public ModulesCommand(String line)
 	{
@@ -73,10 +75,5 @@ public class ModulesCommand extends AnalysisCommand
 		{
 			return "Command is only available for VDM-SL";
 		}
-	}
-	
-	public static String help()
-	{
-		return "modules - list the specification modules";
 	}
 }

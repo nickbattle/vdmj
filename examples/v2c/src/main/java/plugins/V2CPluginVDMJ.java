@@ -70,6 +70,6 @@ public class V2CPluginVDMJ extends AnalysisPlugin
 	@Override
 	public HelpList getCommandHelp()
 	{
-		return new HelpList(TranslateCommand.help());
+		return new HelpList(TranslateCommand.HELP);
 	}
 }

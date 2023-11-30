@@ -34,7 +34,9 @@ import com.fujitsu.vdmj.runtime.ModuleInterpreter;
 
 public class StateCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: state";
+	private final static String CMD = "state";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - show the 'default' module state";
 
 	public StateCommand(String line)
 	{
@@ -63,10 +65,5 @@ public class StateCommand extends AnalysisCommand
 		printf("%s", c == null ? "(no state)\n" : c.toString());
 		
 		return null;
-	}
-	
-	public static String help()
-	{
-		return "state - show the default module state";
 	}
 }

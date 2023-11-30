@@ -31,7 +31,9 @@ import com.fujitsu.vdmj.plugins.AnalysisPlugin;
 
 public class PluginsCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: plugins";
+	private final static String CMD = "plugins";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - list the loaded plugins";
 
 	public PluginsCommand(String line)
 	{
@@ -57,10 +59,5 @@ public class PluginsCommand extends AnalysisCommand
 		}
 		
 		return null;
-	}
-	
-	public static String help()
-	{
-		return "plugins - list the loaded plugins";
 	}
 }

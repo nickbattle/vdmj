@@ -47,7 +47,10 @@ import com.fujitsu.vdmj.values.Value;
 
 public class AssertCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: assert <file>";
+	private final static String CMD = "assert <file>";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - check assertions from a file";
+
 	private boolean errors;
 
 	public AssertCommand(String line)
@@ -192,10 +195,5 @@ public class AssertCommand extends AnalysisCommand
 	public boolean errors()
 	{
 		return errors;
-	}
-	
-	public static String help()
-	{
-		return "assert <file> - check assertions from a file";
 	}
 }

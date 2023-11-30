@@ -75,8 +75,8 @@ public class QuickCheckPlugin extends AnalysisPlugin
 	public HelpList getCommandHelp()
 	{
 		return new HelpList(
-			QuickCheckCommand.help(),
-			QCRunCommand.help()
+			QuickCheckCommand.HELP,
+			QCRunCommand.HELP
 		);
 	}
 }

@@ -421,7 +421,8 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			case "plugins":		return new PluginsCommand(line);
 			case "env":			return new EnvCommand(line);
 			case "state":		return new StateCommand(line);
-			case "log":			return new LogCommand(line);
+			case "log":
+			case "validate":	return new LogCommand(line);
 			case "print":
 			case "p":			return new PrintCommand(line);
 			case "script":		return new ScriptCommand(line);
@@ -449,19 +450,19 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	public HelpList getCommandHelp()
 	{
 		HelpList list = new HelpList(
-			InitCommand.help(),
-			SetCommand.help(),
-			DefaultCommand.help(),
-			FilesCommand.help(),
-			PluginsCommand.help(),
-			EnvCommand.help(),
-			PrintCommand.help(),
-			ScriptCommand.help(),
-			AssertCommand.help(),
-			CoverageCommand.help(),
-			LatexCommand.help(),
-			WordCommand.help(),
-			SaveCommand.help()
+			InitCommand.HELP,
+			SetCommand.HELP,
+			DefaultCommand.HELP,
+			FilesCommand.HELP,
+			PluginsCommand.HELP,
+			EnvCommand.HELP,
+			PrintCommand.HELP,
+			ScriptCommand.HELP,
+			AssertCommand.HELP,
+			CoverageCommand.HELP,
+			LatexCommand.HELP,
+			WordCommand.HELP,
+			SaveCommand.HELP
 		);
 		
 		list.add(DebugCommand.help());
@@ -469,15 +470,15 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		
 		if (Settings.dialect == Dialect.VDM_SL)
 		{
-			list.add(ModulesCommand.help());
-			list.add(StateCommand.help());
+			list.add(ModulesCommand.HELP);
+			list.add(StateCommand.HELP);
 		}
 		else
 		{
-			list.add(ClassesCommand.help());
-			list.add(CreateCommand.help());
+			list.add(ClassesCommand.HELP);
+			list.add(CreateCommand.HELP);
 			list.add(LogCommand.help());
-			list.add(ThreadsCommand.help());
+			list.add(ThreadsCommand.HELP);
 		}
 		
 		return list;

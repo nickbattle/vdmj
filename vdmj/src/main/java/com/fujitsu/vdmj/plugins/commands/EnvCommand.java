@@ -31,7 +31,9 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 
 public class EnvCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: env";
+	private final static String CMD = "env";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - list the global symbols in the default environment";
 
 	public EnvCommand(String line)
 	{
@@ -53,10 +55,5 @@ public class EnvCommand extends AnalysisCommand
 		
 		printf("%s", Interpreter.getInstance().getInitialContext());
 		return null;
-	}
-	
-	public static String help()
-	{
-		return "env - list the global symbols in the default environment";
 	}
 }

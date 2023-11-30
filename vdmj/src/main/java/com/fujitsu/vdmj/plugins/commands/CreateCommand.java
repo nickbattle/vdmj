@@ -36,7 +36,9 @@ import com.fujitsu.vdmj.runtime.ClassInterpreter;
 
 public class CreateCommand extends AnalysisCommand
 {
-	private final static String USAGE = "Usage: create <name> := <expression>";
+	private final static String CMD = "create <name> := <expression>";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - create a named variable";
 
 	public CreateCommand(String line)
 	{
@@ -80,10 +82,5 @@ public class CreateCommand extends AnalysisCommand
 		}
 		
 		return null;
-	}
-	
-	public static String help()
-	{
-		return "create <id> := <exp> - create a named variable";
 	}
 }

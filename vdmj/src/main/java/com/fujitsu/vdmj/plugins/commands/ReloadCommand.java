@@ -28,7 +28,9 @@ import com.fujitsu.vdmj.ExitStatus;
 
 public class ReloadCommand extends ControlAnalysisCommand
 {
-	private final static String USAGE = "Usage: reload";
+	private final static String CMD = "reload";
+	private final static String USAGE = "Usage: " + CMD;
+	public  final static String HELP = CMD + " - reload specification files";
 
 	public ReloadCommand(String line)
 	{
@@ -53,10 +55,5 @@ public class ReloadCommand extends ControlAnalysisCommand
 		{
 			return USAGE;
 		}
-	}
-	
-	public static String help()
-	{
-		return "reload - reload specification files";
 	}
 }
