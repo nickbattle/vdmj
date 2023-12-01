@@ -56,7 +56,24 @@ public class TCRecordPattern extends TCPattern
 	@Override
 	public String toSource()
 	{
-		return "mk_" + typename + "(" + Utils.listToString(plist) + ")";
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append("mk_");
+		sb.append(typename);
+		sb.append("(");
+		
+		String sep = "";
+		
+		for (TCPattern p: plist)
+		{
+			sb.append(sep);
+			sb.append(p.toSource());
+			sep =", ";
+		}
+		
+		sb.append(")");
+		
+		return sb.toString();
 	}
 
 	@Override
