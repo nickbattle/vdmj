@@ -87,7 +87,26 @@ public class POFuncInstantiationExpression extends POExpression
 	@Override
 	public String getPreName()
 	{
-		return function.getPreName();
+		String prename = function.getPreName();
+		
+		if (prename == null || prename.isEmpty())
+		{
+			return prename;
+		}
+		
+		StringBuilder sb = new StringBuilder(prename);
+		sb.append("[");
+		String sep = "";
+		
+		for (TCType p: actualTypes)
+		{
+			sb.append(sep);
+			sb.append(p.toExplicitString(location));
+			sep = ", ";
+		}
+		
+		sb.append("]");
+		return sb.toString();
 	}
 
 	@Override

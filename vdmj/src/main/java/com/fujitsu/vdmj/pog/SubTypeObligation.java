@@ -446,10 +446,9 @@ public class SubTypeObligation extends ProofObligation
 					}
 				}
 			}
-			else
-			{
-				addIs(sb, exp, etype);
-			}
+
+			sb.append(prefix);
+			addIs(sb, exp, etype);	// eg. is injective as well as the above
 		}
 		else if (etype instanceof TCSetType)
 		{
