@@ -57,6 +57,7 @@ import com.fujitsu.vdmj.ast.modules.ASTModuleImports;
 import com.fujitsu.vdmj.ast.modules.ASTModuleList;
 import com.fujitsu.vdmj.ast.types.ASTType;
 import com.fujitsu.vdmj.ast.types.ASTTypeList;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.LexException;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -382,8 +383,20 @@ public class ModuleReader extends SyntaxReader
 		LexNameList nameList = readIdList(true);
 		ASTTypeList typeParams = ignoreTypeParams();
 		checkFor(Token.COLON, 2176, "Expecting ':' after export name");
-		ASTType type = getTypeReader().readType();
-		return new ASTExportedFunction(token.location, nameList, type, typeParams);
+		
+		// Allow maximal types for inv_T exports
+		boolean saved = Properties.parser_maximal_types;
+		
+		try
+		{
+			Properties.parser_maximal_types = true;
+			ASTType type = getTypeReader().readType();
+			return new ASTExportedFunction(token.location, nameList, type, typeParams);
+		}
+		finally
+		{
+			Properties.parser_maximal_types = saved;
+		}
 	}
 
 	private ASTExportList readExportedOperations()
