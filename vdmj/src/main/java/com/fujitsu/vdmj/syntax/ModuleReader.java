@@ -655,7 +655,19 @@ public class ModuleReader extends SyntaxReader
 		if (lastToken().is(Token.COLON))
 		{
 			nextToken();
-			type = getTypeReader().readType();
+			
+			// Allow maximal ! for inv_T functions
+			boolean saved = Properties.parser_maximal_types;
+			
+			try
+			{
+				Properties.parser_maximal_types = true;
+				type = getTypeReader().readType();
+			}
+			finally
+			{
+				Properties.parser_maximal_types = saved;
+			}
 		}
 
 		LexNameToken renamed = null;
