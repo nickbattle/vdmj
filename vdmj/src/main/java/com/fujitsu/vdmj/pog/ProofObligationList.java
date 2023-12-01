@@ -51,6 +51,7 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 @SuppressWarnings("serial")
 public class ProofObligationList extends Vector<ProofObligation>
@@ -183,7 +184,10 @@ public class ProofObligationList extends Vector<ProofObligation>
 		// Some POs from VDM++ specs can include "new" etc, so parse as the given dialect
 		LexTokenReader ltr = new LexTokenReader(obligation.getValue(), Settings.dialect);
 		ExpressionReader reader = new ExpressionReader(ltr);
+		
+		// Treat the PO as if it is an expression within the module that defines it.
 		reader.setCurrentModule(mname);
+		TypeComparator.setCurrentModule(mname);
 		
 		boolean oldmax = Properties.parser_maximal_types;
 		Properties.parser_maximal_types = true;		// For parse of PO on inv_T(T!)
