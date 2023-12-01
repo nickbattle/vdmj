@@ -61,11 +61,14 @@ public class RecursiveObligation extends ProofObligation
 			
 			if (edef.typeParams != null)
 			{
+				String sep = "";
 				sb.append("[");
 				
 				for (TCType type: edef.typeParams)
 				{
+					sb.append(sep);
 					sb.append(type);
+					sep = ", ";
 				}
 				
 				sb.append("]");
