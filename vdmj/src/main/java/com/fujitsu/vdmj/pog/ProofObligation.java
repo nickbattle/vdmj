@@ -38,8 +38,10 @@ import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.values.ParameterValue;
 
 abstract public class ProofObligation implements Comparable<ProofObligation>
 {
@@ -259,10 +261,15 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		StringBuilder callString = new StringBuilder(efd.name.getName());
 		PORemoveIgnoresVisitor.init();
 		
+		if (efd.typeParams != null)
+		{
+			callString.append(addTypeParams(efd.typeParams, ctxt));
+		}
+		
 		for (POPatternList pl: efd.paramPatternList)
 		{
-			callString.append("(");
 			String sep = "";
+			callString.append("(");
 			
 			for (POPattern p: pl)
 			{
@@ -283,13 +290,19 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		
 		return  callString.toString();
 	}
-
+	
 	private String launchImplicitFunction(POImplicitFunctionDefinition ifd, Context ctxt)
 	{
 		StringBuilder callString = new StringBuilder(ifd.name.getName());
-		callString.append("(");
-		String sep = "";
 		PORemoveIgnoresVisitor.init();
+		
+		if (ifd.typeParams != null)
+		{
+			callString.append(addTypeParams(ifd.typeParams, ctxt));
+		}
+
+		String sep = "";
+		callString.append("(");
 		
 		for (POPatternListTypePair pl: ifd.parameterPatterns)
 		{
@@ -313,6 +326,25 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		return callString.toString();
 	}
 	
+	private String addTypeParams(TCTypeList params, Context ctxt)
+	{
+		StringBuilder callString = new StringBuilder();
+		String sep = "";
+		callString.append("[");
+		
+		for (TCType p: params)
+		{
+			TCParameterType param = (TCParameterType)p;
+			ParameterValue inst = (ParameterValue) ctxt.get(param.name);
+			callString.append(sep);
+			callString.append(inst.type);
+			sep = ", ";
+		}
+		
+		callString.append("]");
+		return callString.toString();
+	}
+
 	private String paramMatch(POPattern p, Context ctxt)
 	{
 		POGetMatchingConstantVisitor visitor = new POGetMatchingConstantVisitor();
