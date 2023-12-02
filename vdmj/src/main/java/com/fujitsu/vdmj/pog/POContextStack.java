@@ -138,8 +138,10 @@ public class POContextStack extends Stack<POContext>
 
 	public boolean isExistential()
 	{
-		for (POContext ctxt: this)
+		for (int i = size() - 1; i >= 0; i--)	// NB. reverse order, for tail "exists"
 		{
+			POContext ctxt = get(i);
+			
 			if (ctxt instanceof PONameContext ||
 				ctxt instanceof PONoCheckContext ||
 				ctxt instanceof POScopeContext)
