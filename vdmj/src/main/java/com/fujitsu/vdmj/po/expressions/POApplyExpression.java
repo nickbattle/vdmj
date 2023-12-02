@@ -105,36 +105,16 @@ public class POApplyExpression extends POExpression
 		if (!type.isUnknown(location) &&
 			(type.isFunction(location) || type.isOperation(location)))
 		{
-			TCTypeList paramTypes = type.isFunction(location) ?
-				type.getFunction().parameters : type.getOperation().parameters;
-			
 			String prename = root.getPreName();
 
-			if (type.isFunction(location) && prename != null && !prename.equals(""))
+			if (type.isFunction(location) && prename != null && !prename.isEmpty())
 			{
-				boolean needed = true;
-				
-				if (type.definitions != null)
-				{
-					TCDefinition def = type.definitions.firstElement();
-					
-					// If the apply is of an explicit curried function, we don't want to
-					// generate a precondition obligation, because we haven't collected
-					// all the curried parameters yet.
-					
-					if (def instanceof TCExplicitFunctionDefinition)
-					{
-						TCExplicitFunctionDefinition edef = (TCExplicitFunctionDefinition)def;
-						needed =!edef.isCurried;
-					}
-				}
-				
-				if (needed)
-				{
-					obligations.add(new FunctionApplyObligation(root, args, prename, ctxt));
-				}
+				obligations.add(new FunctionApplyObligation(root, args, prename, ctxt));
 			}
 
+			TCTypeList paramTypes = type.isFunction(location) ?
+					type.getFunction().parameters : type.getOperation().parameters;
+				
 			int i=0;
 
 			for (TCType at: argtypes)
@@ -226,6 +206,45 @@ public class POApplyExpression extends POExpression
 
 		sb.append(")");
 		return sb.toString();
+	}
+	
+	/**
+	 * This is used in apply chains or curried calls, where the precondition is needed
+	 * at the end of the chain.
+	 */
+	@Override
+	public String getPreName()
+	{
+		if (root instanceof POFuncInstantiationExpression)
+		{
+			String pn = root.getPreName();
+			
+			if (pn != null && !pn.isEmpty())
+			{
+				return pn + "(" + Utils.listToString(args) + ")";
+			}
+		}
+		else if (type.definitions != null && !type.definitions.isEmpty())
+		{
+			TCDefinition def = type.definitions.firstElement();
+			
+			if (def instanceof TCExplicitFunctionDefinition)
+			{
+				TCExplicitFunctionDefinition exdef = (TCExplicitFunctionDefinition)def;
+				
+				if (exdef.isCurried)
+				{
+					String pn = root.getPreName();
+					
+					if (pn != null && !pn.isEmpty())
+					{
+						return pn + "(" + Utils.listToString(args) + ")";
+					}
+				}
+			}
+		}
+		
+		return null;	// Already generated elsewhere
 	}
 
 	@Override
