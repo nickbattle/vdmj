@@ -31,9 +31,9 @@
         <module>dbgpc</module>
         <module>cmd-plugins</module>
         <module>vdmjunit</module>
-        <module>examples</module>
-        <module>packaging</module>
         <module>quickcheck</module>
+        <module>packaging</module>
+        <module>examples</module>
     </modules>
 
 	<dependencyManagement>
