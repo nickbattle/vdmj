@@ -227,9 +227,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 					{
 						// Probably an implicit missing measure
 						iter.remove();
-						obligation.status = POStatus.UNCHECKED;
-						obligation.isCheckable = false;
-						obligation.message = "PO #" + obligation.number + ": Missing measure function";
+						obligation.markUnchecked("Obligation for missing measure function");
 					}
 					break;
 					
@@ -249,5 +247,16 @@ public class ProofObligationList extends Vector<ProofObligation>
 		}
 		
 		obligation.setCheckedExpression(tcexp);
+	}
+
+	/**
+	 * This is used by POG to mark obligations as unchecked, with a reason.
+	 */
+	public void markUnchecked(String message)
+	{
+		for (ProofObligation obligation: this)
+		{
+			obligation.markUnchecked(message);
+		}
 	}
 }

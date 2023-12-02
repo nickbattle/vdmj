@@ -115,6 +115,7 @@ abstract public class Environment
 					}
 
 					TypeChecker.warning(5008, message, n1.getLocation());
+					n1.setHides(def);
 				}
 			}
 		}
