@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.po.patterns.POIgnorePattern;
 import com.fujitsu.vdmj.pog.CasesExhaustiveObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.util.Utils;
@@ -67,6 +68,8 @@ public class POCasesExpression extends POExpression
 
 		int count = 0;
 		boolean hasIgnore = false;
+		TCNameList hidden = new TCNameList();
+		ProofObligationList _obligations = new ProofObligationList();
 
 		for (POCaseAlternative alt: cases)
 		{
@@ -74,15 +77,17 @@ public class POCasesExpression extends POExpression
 			{
 				hasIgnore = true;
 			}
-
+			
+			hidden.addAll(alt.pattern.getHiddenVariables());	// cumulative
+			
 			// PONotCaseContext pushed by the POCaseAlternative...
-			obligations.addAll(alt.getProofObligations(ctxt, expType, env));
+			_obligations.addAll(alt.getProofObligations(ctxt, expType, env));
 			count++;
 		}
-
+		
 		if (others != null)
 		{
-			obligations.addAll(others.getProofObligations(ctxt, env));
+			_obligations.addAll(others.getProofObligations(ctxt, env));
 		}
 
 		for (int i=0; i<count; i++)
@@ -92,9 +97,16 @@ public class POCasesExpression extends POExpression
 
 		if (others == null && !hasIgnore)
 		{
-			obligations.add(new CasesExhaustiveObligation(this, ctxt));
+			_obligations.add(new CasesExhaustiveObligation(this, ctxt));
 		}
 
+
+		if (!hidden.isEmpty())
+		{
+			_obligations.markUnchecked("Obligation patterns contain hidden variables: " + hidden);
+		}
+
+		obligations.addAll(_obligations);
 		return obligations;
 	}
 

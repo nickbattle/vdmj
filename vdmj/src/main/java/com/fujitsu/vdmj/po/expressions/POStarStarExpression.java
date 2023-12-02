@@ -55,8 +55,7 @@ public class POStarStarExpression extends POBinaryExpression
 
 			if (prename == null || !prename.equals(""))
 			{
-				obligations.add(
-					new FuncIterationObligation(this, prename, ctxt));
+				obligations.add(new FuncIterationObligation(this, prename, ctxt));
 			}
 		}
 

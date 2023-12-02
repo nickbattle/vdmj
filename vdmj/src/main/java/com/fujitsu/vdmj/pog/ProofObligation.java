@@ -135,6 +135,16 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.message = message;
 	}
 	
+	/**
+	 * This is used to mark obligations as unchecked, with a reason.
+	 */
+	public void markUnchecked(String message)
+	{
+		this.isCheckable = false;
+		this.setStatus(POStatus.UNCHECKED);
+		this.setMessage(message);
+	}
+
 	public boolean isExistential()
 	{
 		return existential;

@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.expressions;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
+import com.fujitsu.vdmj.pog.FunctionApplyObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.tc.types.TCFunctionType;
@@ -89,7 +90,7 @@ public class POFuncInstantiationExpression extends POExpression
 	{
 		String prename = function.getPreName();
 		
-		if (prename == null || prename.isEmpty())
+		if (prename == null || prename.isEmpty() || prename == FunctionApplyObligation.UNKNOWN)
 		{
 			return prename;
 		}

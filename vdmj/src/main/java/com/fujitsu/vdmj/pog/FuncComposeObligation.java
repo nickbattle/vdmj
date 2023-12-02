@@ -40,7 +40,7 @@ public class FuncComposeObligation extends ProofObligation
 
 		if (pref2 == null || !pref2.equals(""))
 		{
-    		if (pref2 != null)
+    		if (pref2 != null && pref2 != FunctionApplyObligation.UNKNOWN)
     		{
         		sb.append(pref2);
         		sb.append("(arg) => ");
@@ -53,7 +53,7 @@ public class FuncComposeObligation extends ProofObligation
     		}
 		}
 
-		if (pref1 != null)
+		if (pref1 != FunctionApplyObligation.UNKNOWN && pref1 != null)
 		{
     		sb.append(pref1);
     		sb.append("(");

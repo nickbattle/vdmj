@@ -55,8 +55,7 @@ public class POCompExpression extends POBinaryExpression
 
 			if (pref1 == null || !pref1.equals(""))
 			{
-				obligations.add(new FuncComposeObligation(
-					this, pref1, pref2, ctxt));
+				obligations.add(new FuncComposeObligation(this, pref1, pref2, ctxt));
 			}
 		}
 

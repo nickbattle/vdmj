@@ -35,6 +35,7 @@ import com.fujitsu.vdmj.po.patterns.visitors.POGetAllDefinitionsVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetAllVarNamesVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetPossibleTypeVisitor;
+import com.fujitsu.vdmj.po.patterns.visitors.POHiddenVariablesVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.POPatternVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.tc.lex.TCNameList;
@@ -168,6 +169,15 @@ public abstract class POPattern extends PONode implements Serializable
 	public void setMaximal(boolean maximal)
 	{
 		return;		// Only used in PORecordPattern
+	}
+	
+	/**
+	 * Search the pattern for identifiers that hide other definitions. This is
+	 * used during PO generation to avoid TC errors.
+	 */
+	public TCNameList getHiddenVariables()
+	{
+		return apply(new POHiddenVariablesVisitor(), null);
 	}
 
 	/**

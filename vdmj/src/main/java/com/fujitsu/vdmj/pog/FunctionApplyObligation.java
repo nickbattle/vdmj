@@ -30,12 +30,14 @@ import com.fujitsu.vdmj.util.Utils;
 
 public class FunctionApplyObligation extends ProofObligation
 {
+	public static final String UNKNOWN = "???";		// Use pre_(root, args) form
+
 	public FunctionApplyObligation(POExpression root, POExpressionList args, String prename, POContextStack ctxt)
 	{
 		super(root.location, POType.FUNC_APPLY, ctxt);
 		StringBuilder sb = new StringBuilder();
 
-		if (prename == null)
+		if (prename == UNKNOWN)
 		{
 			sb.append("pre_(");
 			sb.append(root);

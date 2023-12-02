@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.ast.lex.LexNameToken;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
@@ -43,6 +44,7 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 	private final LexNameToken lexname;
 
 	private TCTypeList parameters = null;
+	private TCDefinition hides = null;
 	
 	public TCNameToken(LexNameToken name)
 	{
@@ -72,6 +74,16 @@ public class TCNameToken extends TCToken implements Serializable, Comparable<TCN
 	public TCTypeList getTypeQualifier()
 	{
 		return parameters;
+	}
+	
+	public void setHides(TCDefinition def)
+	{
+		this.hides = def;
+	}
+	
+	public TCDefinition getHides()
+	{
+		return hides;
 	}
 
 	@Override
