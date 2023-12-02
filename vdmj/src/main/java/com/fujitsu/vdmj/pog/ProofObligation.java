@@ -263,7 +263,14 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		
 		if (efd.typeParams != null)
 		{
-			callString.append(addTypeParams(efd.typeParams, ctxt));
+			String inst = addTypeParams(efd.typeParams, ctxt);
+			
+			if (inst == null)
+			{
+				return null;
+			}
+			
+			callString.append(inst);
 		}
 		
 		for (POPatternList pl: efd.paramPatternList)
@@ -298,7 +305,14 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		
 		if (ifd.typeParams != null)
 		{
-			callString.append(addTypeParams(ifd.typeParams, ctxt));
+			String inst = addTypeParams(ifd.typeParams, ctxt);
+			
+			if (inst == null)
+			{
+				return null;
+			}
+			
+			callString.append(inst);
 		}
 
 		String sep = "";
@@ -336,6 +350,12 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		{
 			TCParameterType param = (TCParameterType)p;
 			ParameterValue inst = (ParameterValue) ctxt.get(param.name);
+			
+			if (inst == null)
+			{
+				return null;	// Missing type parameter?
+			}
+			
 			callString.append(sep);
 			callString.append(inst.type);
 			sep = ", ";
