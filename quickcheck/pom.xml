@@ -4,8 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>dk.au.ece.vdmj</groupId>
-		<artifactId>examples</artifactId>
+		<artifactId>vdmj-suite</artifactId>
 		<version>${revision}${sha1}${changelist}</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>quickcheck</artifactId>
