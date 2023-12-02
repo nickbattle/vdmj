@@ -38,7 +38,7 @@ public class FuncIterationObligation extends ProofObligation
 		sb.append(" > 1 => forall arg:");
 		sb.append(exp.rtype.getNumeric());
 
-		if (prename != null)
+		if (prename != FunctionApplyObligation.UNKNOWN && prename != null)
 		{
     		sb.append(" & ");
     		sb.append(prename);
