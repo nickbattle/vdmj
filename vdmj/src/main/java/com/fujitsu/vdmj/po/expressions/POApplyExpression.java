@@ -34,8 +34,6 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.pog.SeqApplyObligation;
 import com.fujitsu.vdmj.pog.SubTypeObligation;
-import com.fujitsu.vdmj.tc.definitions.TCDefinition;
-import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.types.TCMapType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
@@ -215,36 +213,12 @@ public class POApplyExpression extends POExpression
 	@Override
 	public String getPreName()
 	{
-		if (root instanceof POFuncInstantiationExpression)
+		if (root.getPreName() == null)
 		{
-			String pn = root.getPreName();
-			
-			if (pn != null && !pn.isEmpty())
-			{
-				return pn + "(" + Utils.listToString(args) + ")";
-			}
-		}
-		else if (type.definitions != null && !type.definitions.isEmpty())
-		{
-			TCDefinition def = type.definitions.firstElement();
-			
-			if (def instanceof TCExplicitFunctionDefinition)
-			{
-				TCExplicitFunctionDefinition exdef = (TCExplicitFunctionDefinition)def;
-				
-				if (exdef.isCurried)
-				{
-					String pn = root.getPreName();
-					
-					if (pn != null && !pn.isEmpty())
-					{
-						return pn + "(" + Utils.listToString(args) + ")";
-					}
-				}
-			}
+			return null;
 		}
 		
-		return null;	// Already generated elsewhere
+		return FunctionApplyObligation.UNKNOWN;		// Use pre_(root, args) form
 	}
 
 	@Override
