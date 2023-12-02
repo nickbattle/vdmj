@@ -10,8 +10,8 @@
 	</parent>
 
 	<artifactId>quickcheck</artifactId>
-	<name>Example QuickCheck plugin</name>
-	<description>Experimental brute force plugin for PO verification.</description>
+	<name>QuickCheck plugin</name>
+	<description>Direct execution plugin for PO verification.</description>
 
 	<dependencies>
 		<dependency>
