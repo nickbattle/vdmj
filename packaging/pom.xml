@@ -19,6 +19,14 @@
 		<packaging.skip.clean>true</packaging.skip.clean>
 	</properties>
 	
+	<dependencies>
+		<dependency>
+			<groupId>dk.au.ece.vdmj</groupId>
+			<artifactId>quickcheck</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+	
 	<build>
 		<plugins>
 			<plugin>
