@@ -82,6 +82,7 @@ public class QuickCheck
 	private List<QCStrategy> disabled = null;		// Known, but not to be used
 	private ProofObligationList chosen = null;
 	private long timeout = 0;
+	private List<POStatus> includes = new Vector<POStatus>();
 	
 	public QuickCheck()
 	{
@@ -362,7 +363,7 @@ public class QuickCheck
 
 			if (!po.isCheckable)
 			{
-				infof("PO #%d, UNCHECKED\n", po.number);
+				info(POStatus.UNCHECKED, "PO #%d, UNCHECKED\n", po.number);
 				return;
 			}
 			else if (results.provedBy != null)
@@ -372,7 +373,7 @@ public class QuickCheck
 				po.setMessage(results.message);
 				po.setWitness(results.witness);
 				po.setCounterexample(null);
-				infof("PO #%d, PROVED by %s %s %s\n", po.number, results.provedBy, results.message, duration(results.duration));
+				info(POStatus.PROVED, "PO #%d, PROVED by %s %s %s\n", po.number, results.provedBy, results.message, duration(results.duration));
 				return;
 			}
 
@@ -511,7 +512,7 @@ public class QuickCheck
 							outcome = POStatus.MAYBE;
 						}
 						
-						infof("PO #%d, %s%s %s\n", po.number, outcome.toString().toUpperCase(), desc, duration(before, after));
+						info(outcome, "PO #%d, %s%s %s\n", po.number, outcome.toString().toUpperCase(), desc, duration(before, after));
 						po.setStatus(outcome);
 						po.setCounterexample(null);
 						po.setMessage(null);
@@ -520,7 +521,7 @@ public class QuickCheck
 					{
 						if (didTimeout)		// Result would have been true (above), but...
 						{
-							infof("PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
+							info(POStatus.TIMEOUT, "PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.TIMEOUT);
 							po.setCounterexample(null);
 							po.setMessage(null);
@@ -530,15 +531,15 @@ public class QuickCheck
 						{
 							if (results.hasAllValues)
 							{
-								infof("PO #%d, FAILED (unsatisfiable) %s\n", po.number, duration(before, after));
+								info(POStatus.FAILED, "PO #%d, FAILED (unsatisfiable) %s\n", po.number, duration(before, after));
 								po.setStatus(POStatus.FAILED);
 								po.setMessage("Unsatisfiable");
-								infoln("----");
-								infoln(po);
+								infon(POStatus.FAILED, "----");
+								infon(POStatus.FAILED, po.toString());
 							}
 							else
 							{
-								infof("PO #%d, MAYBE %s\n", po.number, duration(before, after));
+								info(POStatus.MAYBE, "PO #%d, MAYBE %s\n", po.number, duration(before, after));
 								po.setStatus(POStatus.MAYBE);
 								po.setMessage(null);
 							}
@@ -548,7 +549,7 @@ public class QuickCheck
 						}
 						else
 						{
-							infof("PO #%d, FAILED %s: ", po.number, duration(before, after));
+							info(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
 							printCounterexample(bindings);
 							po.setCounterexample(findCounterexample(bindings));
@@ -557,7 +558,7 @@ public class QuickCheck
 							if (execException != null)
 							{
 								String msg = "Causes " + execException.getMessage(); 
-								infoln(msg);
+								infon(POStatus.FAILED, msg);
 								po.setMessage(msg);
 							}
 							else
@@ -565,8 +566,8 @@ public class QuickCheck
 								po.setMessage(null);
 							}
 							
-							infoln("----");
-							infoln(po);
+							infon(POStatus.FAILED, "----");
+							infon(POStatus.FAILED, po.toString());
 						}
 					}
 				}
@@ -609,6 +610,22 @@ public class QuickCheck
 		{
 			errorCount++;
 			errorln(e);
+		}
+	}
+
+	private void info(POStatus status, String format, Object... args)
+	{
+		if (includes.isEmpty() || includes.contains(status))
+		{
+			infof(format, args);
+		}
+	}
+
+	private void infon(POStatus status, String msg)
+	{
+		if (includes.isEmpty() || includes.contains(status))
+		{
+			infoln(msg);
 		}
 	}
 
@@ -755,11 +772,11 @@ public class QuickCheck
 		
 		if (cex == null)
 		{
-			infoln("No counterexample");
+			infon(POStatus.FAILED, "No counterexample");
 		}
 		else
 		{
-			infoln("Counterexample: " + cex);
+			infon(POStatus.FAILED, "Counterexample: " + cex);
 		}
 	}
 
@@ -801,5 +818,10 @@ public class QuickCheck
 	{
 		double duration = (double)(after - before)/1000;
 		return "in " + duration + "s";
+	}
+
+	public void setIncludes(List<POStatus> includes)
+	{
+		this.includes  = includes;
 	}
 }

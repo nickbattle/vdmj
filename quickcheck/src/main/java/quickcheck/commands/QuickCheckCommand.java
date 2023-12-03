@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
+import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -47,7 +48,7 @@ import quickcheck.strategies.StrategyResults;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-q][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	private final static String CMD = "quickcheck [-?|-help][-q][-t <secs>][-i <status>]*[-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String SHORT = "quickcheck [-help][<options>][<POs>]";
 	private final static String USAGE = "Usage: " + CMD;
 	public  final static String HELP = SHORT + " - lightweight PO verification";
@@ -67,6 +68,7 @@ public class QuickCheckCommand extends AnalysisCommand
 	{
 		List<Integer> poList = new Vector<Integer>();
 		List<String> poNames = new Vector<String>();
+		List<POStatus> includes = new Vector<POStatus>();
 		long timeout = 0;
 		
 		QuickCheck qc = new QuickCheck();
@@ -119,6 +121,20 @@ public class QuickCheckCommand extends AnalysisCommand
 						i++;
 						timeout = Integer.parseInt(arglist.get(i));
 						break;
+						
+					case "-i":
+						i++;
+						
+						try
+						{
+							includes.add(POStatus.valueOf(arglist.get(i).toUpperCase()));
+						}
+						catch (IllegalArgumentException e)
+						{
+							errorln("Not a valid PO status: " + arglist.get(i));
+							return USAGE;
+						}
+						break;
 
 					case "-":
 						i++;
@@ -164,7 +180,9 @@ public class QuickCheckCommand extends AnalysisCommand
 				return USAGE;
 			}
 		}
-		
+
+		qc.setIncludes(includes);
+
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
 		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
