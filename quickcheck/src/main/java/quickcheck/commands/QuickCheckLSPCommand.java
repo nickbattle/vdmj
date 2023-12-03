@@ -24,31 +24,32 @@
 
 package quickcheck.commands;
 
-import static quickcheck.commands.QCConsole.errorln;
-import static quickcheck.commands.QCConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.pog.POStatus;
+
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import quickcheck.QuickCheck;
-import quickcheck.strategies.QCStrategy;
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.InitRunnable;
 import vdmj.commands.ScriptRunnable;
 
 public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnable, ScriptRunnable
 {
-	public final static String CMD = "quickcheck [-?|-help][-q][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	public final static String CMD = "quickcheck [-?|-help][-q][-t <secs>][-i <status>]*[-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	public final static String SHORT = "quickcheck [-help][<options>][<POs>]";
 	private final static String USAGE = "Usage: " + CMD;
 	
 	private List<Integer> poList = new Vector<Integer>();
 	private List<String> poNames = new Vector<String>();
+	private List<POStatus> includes = new Vector<POStatus>();
 	private long timeout = 0;
 	private QuickCheck qc = new QuickCheck();
 	
@@ -95,24 +96,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 				{
 					case "-?":
 					case "-help":
-						println(USAGE);
-						println("Enabled strategies:");
-						
-						for (QCStrategy strategy: qc.getEnabledStrategies())
-						{
-							println("  " + strategy.help());
-						}
-						
-						if (!qc.getDisabledStrategies().isEmpty())
-						{
-							println("Disabled strategies (add with -s <name>):");
-							
-							for (QCStrategy strategy: qc.getDisabledStrategies())
-							{
-								println("  " + strategy.help());
-							}
-						}
-						
+						qc.printHelp(USAGE);
 						return result(request, null);
 						
 					case "-q":
@@ -122,6 +106,19 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 					case "-t":
 						i++;
 						timeout = Integer.parseInt(arglist.get(i));
+						break;
+
+					case "-i":
+						try
+						{
+							i++;
+							includes.add(POStatus.valueOf(arglist.get(i).toUpperCase()));
+						}
+						catch (IllegalArgumentException e)
+						{
+							errorln("Not a valid PO status: " + arglist.get(i));
+							return result(request, USAGE);
+						}
 						break;
 
 					case "-":
@@ -169,6 +166,8 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 			}
 		}
 		
+		QCConsole.setIncludes(includes);
+
 		return null;
 	}
 

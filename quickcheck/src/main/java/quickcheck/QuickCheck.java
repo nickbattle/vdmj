@@ -25,6 +25,9 @@
 package quickcheck;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.infof;
+import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 import static quickcheck.commands.QCConsole.infof;
 import static quickcheck.commands.QCConsole.infoln;
@@ -362,7 +365,7 @@ public class QuickCheck
 
 			if (!po.isCheckable)
 			{
-				infof("PO #%d, UNCHECKED\n", po.number);
+				infof(POStatus.UNCHECKED, "PO #%d, UNCHECKED\n", po.number);
 				return;
 			}
 			else if (results.provedBy != null)
@@ -372,7 +375,7 @@ public class QuickCheck
 				po.setMessage(results.message);
 				po.setWitness(results.witness);
 				po.setCounterexample(null);
-				infof("PO #%d, PROVED by %s %s %s\n", po.number, results.provedBy, results.message, duration(results.duration));
+				infof(POStatus.PROVED, "PO #%d, PROVED by %s %s %s\n", po.number, results.provedBy, results.message, duration(results.duration));
 				return;
 			}
 
@@ -511,7 +514,7 @@ public class QuickCheck
 							outcome = POStatus.MAYBE;
 						}
 						
-						infof("PO #%d, %s%s %s\n", po.number, outcome.toString().toUpperCase(), desc, duration(before, after));
+						infof(outcome, "PO #%d, %s%s %s\n", po.number, outcome.toString().toUpperCase(), desc, duration(before, after));
 						po.setStatus(outcome);
 						po.setCounterexample(null);
 						po.setMessage(null);
@@ -520,7 +523,7 @@ public class QuickCheck
 					{
 						if (didTimeout)		// Result would have been true (above), but...
 						{
-							infof("PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
+							infof(POStatus.TIMEOUT, "PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.TIMEOUT);
 							po.setCounterexample(null);
 							po.setMessage(null);
@@ -530,15 +533,15 @@ public class QuickCheck
 						{
 							if (results.hasAllValues)
 							{
-								infof("PO #%d, FAILED (unsatisfiable) %s\n", po.number, duration(before, after));
+								infof(POStatus.FAILED, "PO #%d, FAILED (unsatisfiable) %s\n", po.number, duration(before, after));
 								po.setStatus(POStatus.FAILED);
 								po.setMessage("Unsatisfiable");
-								infoln("----");
-								infoln(po);
+								infoln(POStatus.FAILED, "----");
+								infoln(POStatus.FAILED, po.toString());
 							}
 							else
 							{
-								infof("PO #%d, MAYBE %s\n", po.number, duration(before, after));
+								infof(POStatus.MAYBE, "PO #%d, MAYBE %s\n", po.number, duration(before, after));
 								po.setStatus(POStatus.MAYBE);
 								po.setMessage(null);
 							}
@@ -548,7 +551,7 @@ public class QuickCheck
 						}
 						else
 						{
-							infof("PO #%d, FAILED %s: ", po.number, duration(before, after));
+							infof(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
 							printCounterexample(bindings);
 							po.setCounterexample(findCounterexample(bindings));
@@ -557,7 +560,7 @@ public class QuickCheck
 							if (execException != null)
 							{
 								String msg = "Causes " + execException.getMessage(); 
-								infoln(msg);
+								infoln(POStatus.FAILED, msg);
 								po.setMessage(msg);
 							}
 							else
@@ -565,8 +568,8 @@ public class QuickCheck
 								po.setMessage(null);
 							}
 							
-							infoln("----");
-							infoln(po);
+							infoln(POStatus.FAILED, "----");
+							infoln(POStatus.FAILED, po.toString());
 						}
 					}
 				}
@@ -755,11 +758,11 @@ public class QuickCheck
 		
 		if (cex == null)
 		{
-			infoln("No counterexample");
+			infoln(POStatus.FAILED, "No counterexample");
 		}
 		else
 		{
-			infoln("Counterexample: " + cex);
+			infoln(POStatus.FAILED, "Counterexample: " + cex);
 		}
 	}
 
@@ -801,5 +804,38 @@ public class QuickCheck
 	{
 		double duration = (double)(after - before)/1000;
 		return "in " + duration + "s";
+	}
+
+	public void printHelp(String USAGE)
+	{
+		println(USAGE);
+		println("");
+		println("  -?|-help           - show command help");
+		println("  -q                 - run with minimal output (quiet)");
+		println("  -t <secs>          - timeout in secs");
+		println("  -i <status>        - only show this result status");
+		println("  -s <strategy>      - enable this strategy (below)");
+		println("  -<strategy:option> - pass option to strategy");
+		println("  PO# numbers        - only process these POs");
+		println("  PO# - PO#          - process a range of POs");
+		println("  <pattern>          - process PO names or modules matching");
+		println("");
+		println("Enabled strategies:");
+		
+		for (QCStrategy strategy: getEnabledStrategies())
+		{
+			println("  " + strategy.help());
+		}
+		
+		if (!getDisabledStrategies().isEmpty())
+		{
+			println("");
+			println("Disabled strategies (add with -s <name>):");
+			
+			for (QCStrategy strategy: getDisabledStrategies())
+			{
+				println("  " + strategy.help());
+			}
+		}
 	}
 }

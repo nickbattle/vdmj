@@ -24,8 +24,12 @@
 
 package quickcheck.commands;
 
+import java.util.List;
+import java.util.Vector;
+
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.plugins.PluginConsole;
+import com.fujitsu.vdmj.pog.POStatus;
 
 /**
  * This extends the PluginConsole from VDMJ to allow us to have "global" quiet
@@ -37,6 +41,7 @@ import com.fujitsu.vdmj.plugins.PluginConsole;
 public class QCConsole extends PluginConsole
 {
 	private static boolean quiet = false;
+	private static List<POStatus> includes = new Vector<POStatus>();
 	
 	public static void setQuiet(boolean quiet)
 	{
@@ -47,26 +52,31 @@ public class QCConsole extends PluginConsole
 	{
 		return quiet;
 	}
-
-	public static void info(String m)
+	
+	public static void setIncludes(List<POStatus> includes)
 	{
-		if (!quiet)
+		QCConsole.includes = includes;
+	}
+
+	public static void info(POStatus status, String m)
+	{
+		if (!quiet && (includes.isEmpty() || includes.contains(status)))
 		{
 			Console.out.print(m);
 		}
 	}
 
-	public static void infof(String format, Object... args)
+	public static void infof(POStatus status, String format, Object... args)
 	{
-		if (!quiet)
+		if (!quiet && (includes.isEmpty() || includes.contains(status)))
 		{
 			Console.out.printf(format, args);
 		}
 	}
 
-	public static void infoln(Object m)
+	public static void infoln(POStatus status, Object m)
 	{
-		if (!quiet)
+		if (!quiet && (includes.isEmpty() || includes.contains(status)))
 		{
 			Console.out.println(m.toString());
 		}

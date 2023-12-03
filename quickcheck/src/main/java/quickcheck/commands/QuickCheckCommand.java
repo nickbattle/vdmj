@@ -24,8 +24,8 @@
 
 package quickcheck.commands;
 
-import static quickcheck.commands.QCConsole.errorln;
-import static quickcheck.commands.QCConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,16 +38,16 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
+import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
 import quickcheck.QuickCheck;
-import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
 
 public class QuickCheckCommand extends AnalysisCommand
 {
-	private final static String CMD = "quickcheck [-?|-help][-q][-t <secs>][-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	private final static String CMD = "quickcheck [-?|-help][-q][-t <secs>][-i <status>]*[-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	private final static String SHORT = "quickcheck [-help][<options>][<POs>]";
 	private final static String USAGE = "Usage: " + CMD;
 	public  final static String HELP = SHORT + " - lightweight PO verification";
@@ -67,6 +67,7 @@ public class QuickCheckCommand extends AnalysisCommand
 	{
 		List<Integer> poList = new Vector<Integer>();
 		List<String> poNames = new Vector<String>();
+		List<POStatus> includes = new Vector<POStatus>();
 		long timeout = 0;
 		
 		QuickCheck qc = new QuickCheck();
@@ -91,24 +92,7 @@ public class QuickCheckCommand extends AnalysisCommand
 				{
 					case "-?":
 					case "-help":
-						println(USAGE);
-						println("Enabled strategies:");
-						
-						for (QCStrategy strategy: qc.getEnabledStrategies())
-						{
-							println("  " + strategy.help());
-						}
-						
-						if (!qc.getDisabledStrategies().isEmpty())
-						{
-							println("Disabled strategies (add with -s <name>):");
-							
-							for (QCStrategy strategy: qc.getDisabledStrategies())
-							{
-								println("  " + strategy.help());
-							}
-						}
-						
+						qc.printHelp(USAGE);
 						return null;
 						
 					case "-q":
@@ -118,6 +102,19 @@ public class QuickCheckCommand extends AnalysisCommand
 					case "-t":
 						i++;
 						timeout = Integer.parseInt(arglist.get(i));
+						break;
+						
+					case "-i":
+						try
+						{
+							i++;
+							includes.add(POStatus.valueOf(arglist.get(i).toUpperCase()));
+						}
+						catch (IllegalArgumentException e)
+						{
+							println("Not a valid PO status: " + arglist.get(i));
+							return USAGE;
+						}
 						break;
 
 					case "-":
@@ -143,7 +140,7 @@ public class QuickCheckCommand extends AnalysisCommand
 						{
 							if (arg.startsWith("-"))
 							{
-								errorln("Unexpected argument: " + arg);
+								println("Unexpected argument: " + arg);
 								return USAGE;
 							}
 							
@@ -155,29 +152,31 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 			catch (IndexOutOfBoundsException e)
 			{
-				errorln("Malformed arguments");
+				println("Malformed arguments");
 				return USAGE;
 			}
 			catch (NumberFormatException e)
 			{
-				errorln("Malformed argument: " + e.getMessage());
+				println("Malformed argument: " + e.getMessage());
 				return USAGE;
 			}
 		}
-		
+
+		QCConsole.setIncludes(includes);
+
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
 		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
 		
 		if (qc.hasErrors())
 		{
-			errorln("Failed to find POs");
+			println("Failed to find POs");
 			return null;
 		}
 		
 		if (chosen.isEmpty())
 		{
-			errorln("No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class"));
+			println("No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class"));
 			return null;
 		}
 		
