@@ -27,6 +27,7 @@ package quickcheck;
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.infof;
 import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 import static quickcheck.commands.QCConsole.infof;
 import static quickcheck.commands.QCConsole.infoln;
@@ -803,5 +804,38 @@ public class QuickCheck
 	{
 		double duration = (double)(after - before)/1000;
 		return "in " + duration + "s";
+	}
+
+	public void printHelp(String USAGE)
+	{
+		println(USAGE);
+		println("");
+		println("  -?|-help           - show command help");
+		println("  -q                 - run with minimal output (quiet)");
+		println("  -t <secs>          - timeout in secs");
+		println("  -i <status>        - only show this result status");
+		println("  -s <strategy>      - enable this strategy (below)");
+		println("  -<strategy:option> - pass option to strategy");
+		println("  PO# numbers        - only process these POs");
+		println("  PO# - PO#          - process a range of POs");
+		println("  <pattern>          - process PO names or modules matching");
+		println("");
+		println("Enabled strategies:");
+		
+		for (QCStrategy strategy: getEnabledStrategies())
+		{
+			println("  " + strategy.help());
+		}
+		
+		if (!getDisabledStrategies().isEmpty())
+		{
+			println("");
+			println("Disabled strategies (add with -s <name>):");
+			
+			for (QCStrategy strategy: getDisabledStrategies())
+			{
+				println("  " + strategy.help());
+			}
+		}
 	}
 }

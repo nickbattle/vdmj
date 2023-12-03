@@ -24,8 +24,8 @@
 
 package quickcheck.commands;
 
-import static quickcheck.commands.QCConsole.errorln;
-import static quickcheck.commands.QCConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +43,6 @@ import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
 import quickcheck.QuickCheck;
-import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
 
 public class QuickCheckCommand extends AnalysisCommand
@@ -93,24 +92,7 @@ public class QuickCheckCommand extends AnalysisCommand
 				{
 					case "-?":
 					case "-help":
-						println(USAGE);
-						println("Enabled strategies:");
-						
-						for (QCStrategy strategy: qc.getEnabledStrategies())
-						{
-							println("  " + strategy.help());
-						}
-						
-						if (!qc.getDisabledStrategies().isEmpty())
-						{
-							println("Disabled strategies (add with -s <name>):");
-							
-							for (QCStrategy strategy: qc.getDisabledStrategies())
-							{
-								println("  " + strategy.help());
-							}
-						}
-						
+						qc.printHelp(USAGE);
 						return null;
 						
 					case "-q":
@@ -123,10 +105,9 @@ public class QuickCheckCommand extends AnalysisCommand
 						break;
 						
 					case "-i":
-						i++;
-						
 						try
 						{
+							i++;
 							includes.add(POStatus.valueOf(arglist.get(i).toUpperCase()));
 						}
 						catch (IllegalArgumentException e)

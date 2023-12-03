@@ -25,7 +25,6 @@
 package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -38,7 +37,6 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import quickcheck.QuickCheck;
-import quickcheck.strategies.QCStrategy;
 import vdmj.commands.AnalysisCommand;
 import vdmj.commands.InitRunnable;
 import vdmj.commands.ScriptRunnable;
@@ -98,24 +96,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 				{
 					case "-?":
 					case "-help":
-						println(USAGE);
-						println("Enabled strategies:");
-						
-						for (QCStrategy strategy: qc.getEnabledStrategies())
-						{
-							println("  " + strategy.help());
-						}
-						
-						if (!qc.getDisabledStrategies().isEmpty())
-						{
-							println("Disabled strategies (add with -s <name>):");
-							
-							for (QCStrategy strategy: qc.getDisabledStrategies())
-							{
-								println("  " + strategy.help());
-							}
-						}
-						
+						qc.printHelp(USAGE);
 						return result(request, null);
 						
 					case "-q":
@@ -128,10 +109,9 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 						break;
 
 					case "-i":
-						i++;
-						
 						try
 						{
+							i++;
 							includes.add(POStatus.valueOf(arglist.get(i).toUpperCase()));
 						}
 						catch (IllegalArgumentException e)
