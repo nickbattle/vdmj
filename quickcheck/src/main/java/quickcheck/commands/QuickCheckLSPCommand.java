@@ -186,7 +186,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 			}
 		}
 		
-		qc.setIncludes(includes);
+		QCConsole.setIncludes(includes);
 
 		return null;
 	}

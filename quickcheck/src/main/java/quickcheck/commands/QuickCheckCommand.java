@@ -131,7 +131,7 @@ public class QuickCheckCommand extends AnalysisCommand
 						}
 						catch (IllegalArgumentException e)
 						{
-							errorln("Not a valid PO status: " + arglist.get(i));
+							println("Not a valid PO status: " + arglist.get(i));
 							return USAGE;
 						}
 						break;
@@ -159,7 +159,7 @@ public class QuickCheckCommand extends AnalysisCommand
 						{
 							if (arg.startsWith("-"))
 							{
-								errorln("Unexpected argument: " + arg);
+								println("Unexpected argument: " + arg);
 								return USAGE;
 							}
 							
@@ -171,17 +171,17 @@ public class QuickCheckCommand extends AnalysisCommand
 			}
 			catch (IndexOutOfBoundsException e)
 			{
-				errorln("Malformed arguments");
+				println("Malformed arguments");
 				return USAGE;
 			}
 			catch (NumberFormatException e)
 			{
-				errorln("Malformed argument: " + e.getMessage());
+				println("Malformed argument: " + e.getMessage());
 				return USAGE;
 			}
 		}
 
-		qc.setIncludes(includes);
+		QCConsole.setIncludes(includes);
 
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
@@ -189,13 +189,13 @@ public class QuickCheckCommand extends AnalysisCommand
 		
 		if (qc.hasErrors())
 		{
-			errorln("Failed to find POs");
+			println("Failed to find POs");
 			return null;
 		}
 		
 		if (chosen.isEmpty())
 		{
-			errorln("No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class"));
+			println("No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class"));
 			return null;
 		}
 		
