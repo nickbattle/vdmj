@@ -43,7 +43,7 @@ import vdmj.commands.ScriptRunnable;
 
 public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnable, ScriptRunnable
 {
-	public final static String CMD = "quickcheck [-?|-help][-q][-t <secs>][-i <status>]*[-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
+	public final static String CMD = "quickcheck [-?|-help][-q|-v][-t <secs>][-i <status>]*[-s <strategy>]* [-<strategy:option>]* [<PO numbers/ranges/patterns>]";
 	public final static String SHORT = "quickcheck [-help][<options>][<POs>]";
 	private final static String USAGE = "Usage: " + CMD;
 	
@@ -87,6 +87,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 		}
 		
 		QCConsole.setQuiet(false);
+		QCConsole.setVerbose(false);
 
 		for (int i=0; i < arglist.size(); i++)	// Should just be POs, or -? -help
 		{
@@ -101,6 +102,10 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 						
 					case "-q":
 						QCConsole.setQuiet(true);
+						break;
+						
+					case "-v":
+						QCConsole.setVerbose(true);
 						break;
 						
 					case "-t":

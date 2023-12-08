@@ -25,12 +25,10 @@
 package quickcheck;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infof;
-import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
 import static quickcheck.commands.QCConsole.infof;
 import static quickcheck.commands.QCConsole.infoln;
+import static quickcheck.commands.QCConsole.verbose;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -811,7 +809,7 @@ public class QuickCheck
 		println(USAGE);
 		println("");
 		println("  -?|-help           - show command help");
-		println("  -q                 - run with minimal output (quiet)");
+		println("  -q|-v              - run with minimal or verbose output");
 		println("  -t <secs>          - timeout in secs");
 		println("  -i <status>        - only show this result status");
 		println("  -s <strategy>      - enable this strategy (below)");
