@@ -41,6 +41,7 @@ import com.fujitsu.vdmj.pog.POStatus;
 public class QCConsole extends PluginConsole
 {
 	private static boolean quiet = false;
+	private static boolean verbose = false;
 	private static List<POStatus> includes = new Vector<POStatus>();
 	
 	public static void setQuiet(boolean quiet)
@@ -56,6 +57,11 @@ public class QCConsole extends PluginConsole
 	public static void setIncludes(List<POStatus> includes)
 	{
 		QCConsole.includes = includes;
+	}
+	
+	public static void setVerbose(boolean verbose)
+	{
+		QCConsole.verbose = verbose;
 	}
 
 	public static void info(POStatus status, String m)
@@ -79,6 +85,22 @@ public class QCConsole extends PluginConsole
 		if (!quiet && (includes.isEmpty() || includes.contains(status)))
 		{
 			Console.out.println(m.toString());
+		}
+	}
+
+	public static void verbose(String format, Object... args)
+	{
+		if (!quiet && verbose)
+		{
+			Console.out.printf(format, args);
+		}
+	}
+
+	public static void verboseln(String m)
+	{
+		if (!quiet && verbose)
+		{
+			Console.out.println(m);
 		}
 	}
 }
