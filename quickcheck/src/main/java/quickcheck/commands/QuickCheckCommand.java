@@ -26,6 +26,7 @@ package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
+import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.Arrays;
 import java.util.List;
@@ -189,6 +190,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		{
 			for (ProofObligation po: chosen)
 			{
+				verbose("Processing PO #%s\n", po.number);
 				StrategyResults results = qc.getValues(po);
 				
 				if (!qc.hasErrors())
