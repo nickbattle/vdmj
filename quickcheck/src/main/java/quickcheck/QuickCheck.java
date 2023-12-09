@@ -314,24 +314,36 @@ public class QuickCheck
 			
 			for (QCStrategy strategy: strategies)
 			{
+				verbose("Invoking %s strategy\n", strategy.getName());
 				StrategyResults sresults = strategy.getValues(po, exp, binds, ictxt);
 				Map<String, ValueList> cexamples = sresults.counterexamples;
 				
 				if (sresults.provedBy != null)	// No need to go further
 				{
+					verbose("Obligation proved by %s\n", strategy.getName());
 					sresults.setDuration(System.currentTimeMillis() - before);
 					return sresults;
 				}
 				
-				for (String bind: cexamples.keySet())
+				if (cexamples.isEmpty())
 				{
-					if (union.containsKey(bind))
+					verbose("No bindings returned by %s\n", strategy.getName());
+				}
+				else
+				{
+					for (String bind: cexamples.keySet())
 					{
-						union.get(bind).addAll(cexamples.get(bind));
-					}
-					else
-					{
-						union.put(bind, cexamples.get(bind));
+						ValueList values = cexamples.get(bind);
+						verbose("%s returned %d values for %s\n", strategy.getName(), values.size(), bind);
+						
+						if (union.containsKey(bind))
+						{
+							union.get(bind).addAll(values);
+						}
+						else
+						{
+							union.put(bind, values);
+						}
 					}
 				}
 				
@@ -419,7 +431,7 @@ public class QuickCheck
 
 				try
 				{
-					verbose("PO #%d, starting...\n", po.number);
+					verbose("PO #%d, starting evaluation...\n", po.number);
 					
 					// Suspend annotation execution by the interpreter, because the
 					// expressions and statements in the PO can invoke them.
