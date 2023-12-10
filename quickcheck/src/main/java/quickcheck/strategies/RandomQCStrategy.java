@@ -24,8 +24,8 @@
 
 package quickcheck.strategies;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+import static quickcheck.commands.QCConsole.println;
+import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -84,8 +84,8 @@ public class RandomQCStrategy extends QCStrategy
 					default:
 						if (arg.startsWith("-random:"))
 						{
-							errorln("Unknown random option: " + arg);
-							errorln(help());
+							println("Unknown random option: " + arg);
+							println(help());
 							errorCount++;
 							iter.remove();
 						}
@@ -93,20 +93,17 @@ public class RandomQCStrategy extends QCStrategy
 			}
 			catch (NumberFormatException e)
 			{
-				errorln("Argument must be numeric");
-				errorln(help());
+				println("Argument must be numeric");
+				println(help());
 				errorCount++;
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
-				errorln("Missing argument");
-				errorln(help());
+				println("Missing argument");
+				println(help());
 				errorCount++;
 			}
 		}
-		
-		verbose("random:size = %d\n", expansionLimit);
-		verbose("random:seed = %d\n", seed);
 	}
 	
 	@Override
@@ -124,6 +121,8 @@ public class RandomQCStrategy extends QCStrategy
 	@Override
 	public boolean init(QuickCheck qc)
 	{
+		verbose("random:size = %d\n", expansionLimit);
+		verbose("random:seed = %d\n", seed);
 		return true;
 	}
 

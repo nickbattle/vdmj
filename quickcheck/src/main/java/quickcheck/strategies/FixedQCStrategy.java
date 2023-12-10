@@ -24,10 +24,9 @@
 
 package quickcheck.strategies;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.printf;
-import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+import static quickcheck.commands.QCConsole.println;
+import static quickcheck.commands.QCConsole.errorln;
+import static quickcheck.commands.QCConsole.verbose;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -156,8 +155,8 @@ public class FixedQCStrategy extends QCStrategy
 					default:
 						if (arg.startsWith("-fixed:"))
 						{
-							errorln("Unknown fixed option: " + arg);
-							errorln(help());
+							println("Unknown fixed option: " + arg);
+							println(help());
 							errorCount++;
 							iter.remove();
 						}
@@ -165,20 +164,17 @@ public class FixedQCStrategy extends QCStrategy
 			}
 			catch (NumberFormatException e)
 			{
-				errorln("Argument must be numeric");
-				errorln(help());
+				println("Argument must be numeric");
+				println(help());
 				errorCount++;
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
-				errorln("Missing argument");
-				errorln(help());
+				println("Missing argument");
+				println(help());
 				errorCount++;
 			}
 		}
-		
-		verbose("fixed:size = %d\n", expansionLimit);
-		verbose("fixed:file = %s\n", rangesFile);
 	}
 	
 	@Override
@@ -276,7 +272,7 @@ public class FixedQCStrategy extends QCStrategy
 			RootContext ictxt = interpreter.getInitialContext();
 			Map<String, ValueList> ranges = new HashMap<String, ValueList>();
 			long before = System.currentTimeMillis();
-			printf("Expanding " + inbinds.size() + " ranges: ");
+			verbose("Expanding %d binds:\n", inbinds.size());
 			
 			for (int i=0; i<inbinds.size(); i++)
 			{
@@ -285,7 +281,7 @@ public class FixedQCStrategy extends QCStrategy
 
 				ctxt.threadState.init();
 				String key = keyFor(inbinds.get(i));
-				printf(".");
+				verbose("%s\n", key);
 				INExpression exp = inexps.get(i);
 				Value value = exp.eval(ctxt);
 				
@@ -318,7 +314,7 @@ public class FixedQCStrategy extends QCStrategy
 				}
 				else
 				{
-					println("\nRange does not evaluate to a set or integer " + exp.location);
+					println("Range does not evaluate to a set or integer " + exp.location);
 					errorCount++;
 				}
 			}
@@ -329,7 +325,7 @@ public class FixedQCStrategy extends QCStrategy
 			}
 			
 			long after = System.currentTimeMillis();
-			println("\nRanges expanded " + duration(before, after));
+			verbose("Ranges expanded %s\n", duration(before, after));
 
 			return ranges;
 		}
@@ -496,6 +492,9 @@ public class FixedQCStrategy extends QCStrategy
 	@Override
 	public boolean init(QuickCheck qc)
 	{
+		verbose("fixed:size = %d\n", expansionLimit);
+		verbose("fixed:file = %s\n", rangesFile);
+
 		if (createFile)
 		{
 			createRangeFile(qc, rangesFile);
@@ -505,7 +504,7 @@ public class FixedQCStrategy extends QCStrategy
 		{
 			if (new File(rangesFile).exists())
 			{
-				println("Using ranges file " + rangesFile);
+				verbose("Using ranges file %s\n", rangesFile);
 				allRanges = readRangeFile(qc, rangesFile);
 			}
 			else

@@ -24,8 +24,8 @@
 
 package quickcheck.strategies;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verbose;
+import static quickcheck.commands.QCConsole.println;
+import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -72,8 +72,8 @@ public class FiniteQCStrategy extends QCStrategy
 					default:
 						if (arg.startsWith("-finite:"))
 						{
-							errorln("Unknown finite option: " + arg);
-							errorln(help());
+							println("Unknown finite option: " + arg);
+							println(help());
 							errorCount++;
 							iter.remove();
 						}
@@ -81,19 +81,17 @@ public class FiniteQCStrategy extends QCStrategy
 			}
 			catch (NumberFormatException e)
 			{
-				errorln("Argument must be numeric");
-				errorln(help());
+				println("Argument must be numeric");
+				println(help());
 				errorCount++;
 			}
 			catch (ArrayIndexOutOfBoundsException e)
 			{
-				errorln("Missing argument");
-				errorln(help());
+				println("Missing argument");
+				println(help());
 				errorCount++;
 			}
 		}
-		
-		verbose("finite:size = %d\n", expansionLimit);
 	}
 
 	@Override
@@ -117,6 +115,7 @@ public class FiniteQCStrategy extends QCStrategy
 	@Override
 	public boolean init(QuickCheck qc)
 	{
+		verbose("finite:size = %d\n", expansionLimit);
 		return true;
 	}
 
@@ -136,18 +135,22 @@ public class FiniteQCStrategy extends QCStrategy
 				{
 					long size = bind.getType().apply(new INTypeSizeVisitor(), ctxt);
 					product = product * size;	// cumulative for each bind
+					verbose("Size of %s type is %s\n", bind, product);
 					
 			   		if (product > expansionLimit)
 					{
+			   			verbose("Size is greater than %d limit\n", expansionLimit);
 			   			return new StrategyResults();	// Too big
 					}
 				}
 				catch (InternalException e)		// Infinite
 				{
+		   			verbose("Size of bind %s is greater than %d limit\n", bind, expansionLimit);
 					return new StrategyResults();
 				}
 				catch (ArithmeticException e)	// Overflow probably
 				{
+		   			verbose("Size of bind %s is greater than %d limit\n", bind, expansionLimit);
 					return new StrategyResults();
 				}
 			}

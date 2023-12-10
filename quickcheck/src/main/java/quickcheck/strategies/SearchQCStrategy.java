@@ -24,7 +24,8 @@
 
 package quickcheck.strategies;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static quickcheck.commands.QCConsole.println;
+import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.HashMap;
 import java.util.List;
@@ -55,8 +56,8 @@ public class SearchQCStrategy extends QCStrategy
 
 			if (argv.get(i).startsWith("-search:"))
 			{
-				errorln("Unknown search option: " + argv.get(i));
-				errorln(help());
+				println("Unknown search option: " + argv.get(i));
+				println(help());
 				errorCount ++;
 				argv.remove(i);
 			}
@@ -130,6 +131,11 @@ public class SearchQCStrategy extends QCStrategy
 						break;
 					}
 				}
+			}
+			
+			if (nvps.isEmpty())
+			{
+				verbose("No search patterns found\n");
 			}
 		}
 		
