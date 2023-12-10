@@ -355,6 +355,7 @@ public class QuickCheck
 				if (!union.containsKey(bind.toString()))
 				{
 					// Generate some values for missing bindings, using the fixed method
+					verbose("Generating fixed values for %s\n", bind);
 					ValueList list = new ValueList();
 					list.addAll(bind.getType().apply(new FixedRangeCreator(ictxt), 10));
 					union.put(bind.toString(), list);

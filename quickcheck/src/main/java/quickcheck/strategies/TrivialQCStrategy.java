@@ -24,7 +24,8 @@
 
 package quickcheck.strategies;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static quickcheck.commands.QCConsole.println;
+import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.List;
 import java.util.Stack;
@@ -50,8 +51,8 @@ public class TrivialQCStrategy extends QCStrategy
 
 			if (argv.get(i).startsWith("-trivial:"))
 			{
-				errorln("Unknown trivial option: " + argv.get(i));
-				errorln(help());
+				println("Unknown trivial option: " + argv.get(i));
+				println(help());
 				errorCount ++;
 				argv.remove(i);
 			}
@@ -89,6 +90,8 @@ public class TrivialQCStrategy extends QCStrategy
 			{
 				return new StrategyResults(getName(), visitor.getMessage(), null, System.currentTimeMillis() - before);
 			}
+			
+			verbose("No trivial patterns found\n");
 		}
 		
 		return new StrategyResults();	// Got nothing!
