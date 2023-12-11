@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package annotations.ast;
+package quickcheck.annotations.ast;
 
 import com.fujitsu.vdmj.ast.annotations.ASTAnnotation;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;

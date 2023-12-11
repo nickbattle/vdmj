@@ -3,5 +3,5 @@
 ##########################################################################################
 
 # annotations
-package annotations.ast to annotations.tc;
+package quickcheck.annotations.ast to quickcheck.annotations.tc;
 map ASTQuickCheckAnnotation{name, qcParam, qcTypes} to TCQuickCheckAnnotation(name, qcParam, qcTypes);

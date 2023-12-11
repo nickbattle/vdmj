@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package annotations;
+package quickcheck.annotations;
 
 import java.util.HashMap;
 import java.util.List;

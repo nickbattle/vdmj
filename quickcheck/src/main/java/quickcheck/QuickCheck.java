@@ -68,8 +68,8 @@ import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
-import annotations.IterableContext;
-import annotations.po.POQuickCheckAnnotation;
+import quickcheck.annotations.po.POQuickCheckAnnotation;
+import quickcheck.annotations.IterableContext;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
 import quickcheck.visitors.FixedRangeCreator;
