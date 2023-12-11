@@ -408,13 +408,16 @@ public abstract class SyntaxReader
 
 	protected void trailingAnnotationCheck() throws LexException, ParserException
 	{
-		ASTAnnotationList trailing = readAnnotations(getComments());
-		
-		if (!trailing.isEmpty())
+		if (getErrorCount() == 0)	// Avoid confusing annotation warnings, if spec invalid
 		{
-			for (ASTAnnotation annotation: trailing)
+			ASTAnnotationList trailing = readAnnotations(getComments());
+			
+			if (!trailing.isEmpty())
 			{
-				warning(5038, "Trailing annotation ignored: " + annotation, annotation.name.location);
+				for (ASTAnnotation annotation: trailing)
+				{
+					warning(5038, "Trailing annotation ignored: " + annotation, annotation.name.location);
+				}
 			}
 		}
 	}
