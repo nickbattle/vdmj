@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package annotations.po;
+package quickcheck.annotations.po;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
