@@ -48,6 +48,7 @@ import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.messages.LocatedException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMWarning;
+import com.fujitsu.vdmj.util.GetResource;
 
 
 /**
@@ -87,10 +88,11 @@ public abstract class SyntaxReader
 	/** The maximum number of syntax errors allowed in one Reader. */
 	private static final int MAX = 100;
 
+	private static List<String> annotationClasses = null;
+
 	/**
 	 * Create a reader with the given lexical analyser and VDM++ flag.
 	 */
-
 	protected SyntaxReader(LexTokenReader reader)
 	{
 		this.reader = reader;
@@ -104,7 +106,6 @@ public abstract class SyntaxReader
 	 *
 	 * @return The next token.
 	 */
-
 	protected LexToken nextToken() throws LexException
 	{
 		return reader.nextToken();
@@ -117,7 +118,6 @@ public abstract class SyntaxReader
 	 *
 	 * @return The last token again.
 	 */
-
 	protected LexToken lastToken() throws LexException
 	{
 		return reader.getLast();
@@ -131,7 +131,6 @@ public abstract class SyntaxReader
 	 * @return The last token.
 	 * @throws LexException
 	 */
-
 	protected LexToken readToken() throws LexException
 	{
 		LexToken tok = reader.getLast();
@@ -145,7 +144,6 @@ public abstract class SyntaxReader
 	 *
 	 * @param module
 	 */
-
 	public void setCurrentModule(String module)
 	{
 		reader.currentModule = module;
@@ -154,7 +152,6 @@ public abstract class SyntaxReader
 	/**
 	 * @return The current module/class name.
 	 */
-
 	public String getCurrentModule()
 	{
 		return reader.currentModule;
@@ -168,7 +165,6 @@ public abstract class SyntaxReader
 	 * @param id The identifier to convert
 	 * @return The corresponding name.
 	 */
-
 	protected LexNameToken idToName(LexIdentifierToken id)
 	{
 		LexNameToken name = new LexNameToken(reader.currentModule, id);
@@ -183,7 +179,6 @@ public abstract class SyntaxReader
 	 * @return	The last token as a LexIdentifierToken.
 	 * @throws LexException
 	 */
-
 	protected LexIdentifierToken lastIdToken()
 		throws ParserException, LexException
 	{
@@ -215,7 +210,6 @@ public abstract class SyntaxReader
 	 * @throws LexException
 	 * @throws ParserException
 	 */
-
 	protected LexNameToken lastNameToken()
 		throws LexException, ParserException
 	{
@@ -258,7 +252,6 @@ public abstract class SyntaxReader
 	 * @throws LexException
 	 * @throws ParserException
 	 */
-
 	protected LexIdentifierToken readIdToken(String message)
 			throws LexException, ParserException
 	{
@@ -307,7 +300,6 @@ public abstract class SyntaxReader
 	 * @throws LexException
 	 * @throws ParserException
 	 */
-
 	protected LexNameToken readNameToken(String message)
 			throws LexException, ParserException
 	{
@@ -430,7 +422,6 @@ public abstract class SyntaxReader
 	/**
 	 * @return A new DefinitionReader.
 	 */
-
 	protected DefinitionReader getDefinitionReader()
 	{
 		if (definitionReader == null)
@@ -445,7 +436,6 @@ public abstract class SyntaxReader
 	/**
 	 * @return A new DefinitionReader.
 	 */
-
 	protected ExpressionReader getExpressionReader()
 	{
 		if (expressionReader == null)
@@ -460,7 +450,6 @@ public abstract class SyntaxReader
 	/**
 	 * @return A new PatternReader.
 	 */
-
 	protected PatternReader getPatternReader()
 	{
 		if (patternReader == null)
@@ -475,7 +464,6 @@ public abstract class SyntaxReader
 	/**
 	 * @return A new TypeReader.
 	 */
-
 	protected TypeReader getTypeReader()
 	{
 		if (typeReader == null)
@@ -490,7 +478,6 @@ public abstract class SyntaxReader
 	/**
 	 * @return A new BindReader.
 	 */
-
 	protected BindReader getBindReader()
 	{
 		if (bindReader == null)
@@ -505,7 +492,6 @@ public abstract class SyntaxReader
 	/**
 	 * @return A new StatementReader.
 	 */
-
 	protected StatementReader getStatementReader()
 	{
 		if (statementReader == null)
@@ -520,7 +506,6 @@ public abstract class SyntaxReader
 	/**
 	 * @return A new ClassReader.
 	 */
-
 	protected ClassReader getClassReader()
 	{
 		if (classReader == null)
@@ -545,7 +530,6 @@ public abstract class SyntaxReader
 	 * @throws LexException
 	 * @throws ParserException
 	 */
-
 	protected void checkFor(Token tok, int number, String message)
 		throws LexException, ParserException
 	{
@@ -566,7 +550,6 @@ public abstract class SyntaxReader
 	 * @return True if the token was skipped.
 	 * @throws LexException
 	 */
-
 	protected boolean ignore(Token tok) throws LexException
 	{
 		if (lastToken().is(tok))
@@ -588,7 +571,6 @@ public abstract class SyntaxReader
 	 * @throws ParserException
 	 * @throws LexException
 	 */
-
 	protected void throwMessage(int number, String message)
 		throws ParserException, LexException
 	{
@@ -604,7 +586,6 @@ public abstract class SyntaxReader
 	 *
 	 * @throws ParserException
 	 */
-
 	protected void throwMessage(int number, String message, LexToken token)
 		throws ParserException
 	{
@@ -621,7 +602,6 @@ public abstract class SyntaxReader
 	 *
 	 * @throws ParserException
 	 */ 
-
 	protected void throwMessage(int number, String message, int depth)
 			throws ParserException, LexException
 	{
@@ -642,7 +622,6 @@ public abstract class SyntaxReader
 	 * @param after A list of tokens to recover to, and step one beyond.
 	 * @param upto A list of tokens to recover to.
 	 */
-
 	protected void report(LocatedException error, Token[] after, Token[] upto)
 	{
 		if (errors.size() < MAX)
@@ -723,7 +702,6 @@ public abstract class SyntaxReader
 	/**
 	 * @return The error count from all readers that can raise errors.
 	 */
-
 	public int getErrorCount()
 	{
 		int size = 0;
@@ -739,7 +717,6 @@ public abstract class SyntaxReader
 	/**
 	 * @return The errors from all readers that can raise errors.
 	 */
-
 	public List<VDMError> getErrors()
 	{
 		List<VDMError> list = new Vector<VDMError>();
@@ -756,7 +733,6 @@ public abstract class SyntaxReader
 	/**
 	 * @return The warning count from all readers that can raise warnings.
 	 */
-
 	public int getWarningCount()
 	{
 		int size = 0;
@@ -772,7 +748,6 @@ public abstract class SyntaxReader
 	/**
 	 * @return The warnings from all readers that can raise warnings.
 	 */
-
 	public List<VDMWarning> getWarnings()
 	{
 		List<VDMWarning> list = new Vector<VDMWarning>();
@@ -789,7 +764,6 @@ public abstract class SyntaxReader
 	/**
 	 * Print errors and warnings to the PrintWriter passed.
 	 */
-
 	public void printErrors(ConsoleWriter out)
 	{
 		for (VDMError e: getErrors())
@@ -817,12 +791,29 @@ public abstract class SyntaxReader
 	{
 		String classpath = Properties.annotations_packages;
 		String[] packages = classpath.split(";|:");
+		String astName = "AST" + name + "Annotation";
+		
+		if (annotationClasses == null)
+		{
+			try
+			{
+				annotationClasses = GetResource.readResource("vdmj.annotations");
+			}
+			catch (Exception e)
+			{
+				// ignore
+			}
+		}
+		
+		/*
+		 * The original method to load annotations uses the annotation_packages property.
+		 */
 		
 		for (String pack: packages)
 		{
 			try
 			{
-				Class<?> clazz = Class.forName(pack + ".AST" + name + "Annotation");
+				Class<?> clazz = Class.forName(pack + "." + astName);
 				Constructor<?> ctor = clazz.getConstructor(LexIdentifierToken.class);
 				return (ASTAnnotation) ctor.newInstance(name);
 			}
@@ -832,11 +823,36 @@ public abstract class SyntaxReader
 			}
 			catch (Exception e)
 			{
-				throwMessage(2334, "Failed to instantiate AST" + name + "Annotation");
+				throwMessage(2334, "Failed to instantiate " + astName);
+			}
+		}
+		
+		/*
+		 * The preferred method of loading uses an "annotations" resource file, allowing
+		 * annotations to be in any package, though the AST<name>Annotation rule remains.
+		 */
+		
+		if (annotationClasses != null)
+		{
+			for (String annotationClass: annotationClasses)
+			{
+				try
+				{
+					if (annotationClass.endsWith("." + astName))
+					{
+						Class<?> clazz = Class.forName(annotationClass);
+						Constructor<?> ctor = clazz.getConstructor(LexIdentifierToken.class);
+						return (ASTAnnotation) ctor.newInstance(name);
+					}
+				}
+				catch (Exception e)
+				{
+					throwMessage(2334, "Failed to instantiate " + astName);
+				}
 			}
 		}
 
-		throwMessage(2334, "Cannot find AST" + name + "Annotation on " + classpath);
+		throwMessage(2334, "Cannot find " + astName + " on " + classpath);
 		return null;
 	}
 	
