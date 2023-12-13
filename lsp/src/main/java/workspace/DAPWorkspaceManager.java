@@ -107,9 +107,6 @@ public class DAPWorkspaceManager
 	 * These are the only property names that can sensibly set via the DAP launch.
 	 */
 	private static List<String> propertyNames = Arrays.asList(
-		"vdmj.annotations.packages",
-		"vdmj.annotations.debug",
-		"vdmj.mapping.search_path",
 		"vdmj.scheduler.fcfs_timeslice",
 		"vdmj.scheduler.virtual_timeslice",
 		"vdmj.scheduler.jitter",
@@ -284,7 +281,7 @@ public class DAPWorkspaceManager
 				}
 			}
 			
-			// System properties above override those from the properties file
+			// System properties above override those from any properties file
 			Diag.info("Reading properties from %s", LSPWorkspaceManager.PROPERTIES);
 			Properties.init(LSPWorkspaceManager.PROPERTIES);
 		}

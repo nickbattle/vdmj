@@ -88,6 +88,7 @@ public abstract class SyntaxReader
 	/** The maximum number of syntax errors allowed in one Reader. */
 	private static final int MAX = 100;
 
+	/** A list of class names from the vdmj.annotations resource file */
 	private static List<String> annotationClasses = null;
 
 	/**
@@ -408,13 +409,16 @@ public abstract class SyntaxReader
 
 	protected void trailingAnnotationCheck() throws LexException, ParserException
 	{
-		ASTAnnotationList trailing = readAnnotations(getComments());
-		
-		if (!trailing.isEmpty())
+		if (getErrorCount() == 0)	// Avoid confusing annotation warnings, if spec invalid
 		{
-			for (ASTAnnotation annotation: trailing)
+			ASTAnnotationList trailing = readAnnotations(getComments());
+			
+			if (!trailing.isEmpty())
 			{
-				warning(5038, "Trailing annotation ignored: " + annotation, annotation.name.location);
+				for (ASTAnnotation annotation: trailing)
+				{
+					warning(5038, "Trailing annotation ignored: " + annotation, annotation.name.location);
+				}
 			}
 		}
 	}
@@ -832,23 +836,20 @@ public abstract class SyntaxReader
 		 * annotations to be in any package, though the AST<name>Annotation rule remains.
 		 */
 		
-		if (annotationClasses != null)
+		for (String annotationClass: annotationClasses)
 		{
-			for (String annotationClass: annotationClasses)
+			try
 			{
-				try
+				if (annotationClass.endsWith("." + astName))
 				{
-					if (annotationClass.endsWith("." + astName))
-					{
-						Class<?> clazz = Class.forName(annotationClass);
-						Constructor<?> ctor = clazz.getConstructor(LexIdentifierToken.class);
-						return (ASTAnnotation) ctor.newInstance(name);
-					}
+					Class<?> clazz = Class.forName(annotationClass);
+					Constructor<?> ctor = clazz.getConstructor(LexIdentifierToken.class);
+					return (ASTAnnotation) ctor.newInstance(name);
 				}
-				catch (Exception e)
-				{
-					throwMessage(2334, "Failed to instantiate " + astName);
-				}
+			}
+			catch (Exception e)
+			{
+				throwMessage(2334, "Failed to instantiate " + astName);
 			}
 		}
 
@@ -858,7 +859,7 @@ public abstract class SyntaxReader
 	
 	protected LexCommentList getComments()
 	{
-		return reader.getComments();
+		return reader.getComments();	// Also clears comments
 	}
 	
 	protected boolean isReserved(String name)

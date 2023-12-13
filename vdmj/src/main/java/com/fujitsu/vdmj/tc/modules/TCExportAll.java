@@ -27,7 +27,6 @@ package com.fujitsu.vdmj.tc.modules;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinitionList;
-import com.fujitsu.vdmj.tc.definitions.TCStateDefinition;
 import com.fujitsu.vdmj.tc.modules.visitors.TCImportExportVisitor;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -47,7 +46,7 @@ public class TCExportAll extends TCExport
 		
 		for (TCDefinition d: actualDefs)
 		{
-			if (!(d instanceof TCStateDefinition))	// Everything except state defs
+			// if (!(d instanceof TCStateDefinition))	// Everything except state defs
 			{
 				list.add(d);
 			}
