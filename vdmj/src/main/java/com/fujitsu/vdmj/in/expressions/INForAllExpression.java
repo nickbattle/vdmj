@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.patterns.INPattern;
@@ -48,6 +47,9 @@ public class INForAllExpression extends INExpression
 	public final INMultipleBindList bindList;
 	public final INExpression predicate;
 	
+	/** True if the execution did not have all bind values on exit */
+	public boolean maybe = false;
+	
 	public INForAllExpression(LexLocation location,	INMultipleBindList bindList, INExpression predicate)
 	{
 		super(location);
@@ -66,7 +68,7 @@ public class INForAllExpression extends INExpression
 	{
 		breakpoint.check(location, ctxt);
 		long start = System.currentTimeMillis();
-		long timeout = getTimeout();
+		long timeout = bindList.getTimeout();
 
 		try
 		{
@@ -91,7 +93,8 @@ public class INForAllExpression extends INExpression
 				{
 					if (System.currentTimeMillis() - start > timeout)
 					{
-						setCounterexample(null, true);
+						bindList.setCounterexample(null, true);
+						maybe = !bindList.hasAllValues();
 						return new BooleanValue(true);
 					}
 				}
@@ -122,13 +125,15 @@ public class INForAllExpression extends INExpression
 				{
 					if (matches && !predicate.eval(evalContext).boolValue(ctxt))
 					{
-						setCounterexample(evalContext, false);
+						bindList.setCounterexample(evalContext, false);
+						maybe = !bindList.hasAllValues();
 						return new BooleanValue(false);
 					}
 				}
 				catch (ContextException e)
 				{
-					setCounterexample(evalContext, false);
+					bindList.setCounterexample(evalContext, false);
+					maybe = !bindList.hasAllValues();
 					throw e;
 				}
 				catch (ValueException e)
@@ -142,49 +147,8 @@ public class INForAllExpression extends INExpression
 	    	return abort(e);
 	    }
 
+		maybe = !bindList.hasAllValues();
 		return new BooleanValue(true);
-	}
-	
-	/**
-	 * This is used by the QuickCheck plugin to limit PO execution times.
-	 */
-	private long getTimeout()
-	{
-		for (INMultipleBind bind: bindList)
-		{
-			if (bind instanceof INBindingSetter)			// Type and multitype binds
-			{
-				INBindingSetter setter = (INBindingSetter)bind;
-				long timeout = setter.getTimeout();
-				
-				if (timeout > 0)
-				{
-					return timeout;
-				}
-			}
-		}
-		
-		return 0;
-	}
-	
-	/**
-	 * This is used by the QuickCheck plugin to report which values failed.
-	 */
-	private void setCounterexample(Context ctxt, boolean didTimeout)
-	{
-		for (INMultipleBind bind: bindList)
-		{
-			if (bind instanceof INBindingSetter)			// Type and multitype binds
-			{
-				INBindingSetter setter = (INBindingSetter)bind;
-				
-				if (setter.getBindValues() != null)			// One we care about (set QC values for)
-				{
-					setter.setCounterexample(ctxt, didTimeout);
-					break;									// Just one will do - see QC printFailPath
-				}
-			}
-		}
 	}
 
 	@Override

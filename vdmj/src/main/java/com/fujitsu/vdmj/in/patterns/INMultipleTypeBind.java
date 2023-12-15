@@ -47,6 +47,7 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	private Context bindWitness = null;
 	private boolean bindPermuted = false;
 	private boolean bindOverride = false;
+	private boolean bindAllValues = false;
 	private long bindTimeout = 0;
 	private boolean didTimeout = false;
 
@@ -64,13 +65,14 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	}
 	
 	@Override
-	public void setBindValues(ValueList values, long timeout)
+	public void setBindValues(ValueList values, long timeout, boolean hasAllValues)
 	{
 		if (values == null)
 		{
 			bindValues = null;
 			bindOverride = false;
 			bindTimeout = 0;
+			bindAllValues = true;	// NOTE: because execution usually does
 		}
 		else
 		{
@@ -78,6 +80,7 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 			bindValues.addAll(values);
 			bindOverride = true;
 			bindTimeout = timeout;
+			bindAllValues = hasAllValues;
 		}
 
 		didTimeout = false;
@@ -101,6 +104,12 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	public boolean didTimeout()
 	{
 		return didTimeout;
+	}
+	
+	@Override
+	public boolean hasAllValues()
+	{
+		return bindAllValues;
 	}
 
 	@Override
