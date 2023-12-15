@@ -399,7 +399,7 @@ public class QuickCheck
 					if (values != null)
 					{
 						verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
-						mbind.setBindValues(values, timeout);
+						mbind.setBindValues(values, timeout, results.hasAllValues);
 					}
 					else
 					{
@@ -615,7 +615,7 @@ public class QuickCheck
 			{
 				for (INBindingSetter mbind: bindings)
 				{
-					mbind.setBindValues(null, 0);	// Clears everything
+					mbind.setBindValues(null, 0, false);	// Clears everything
 				}
 			}
 		}

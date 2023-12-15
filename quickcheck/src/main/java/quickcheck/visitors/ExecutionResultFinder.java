@@ -26,7 +26,9 @@ package quickcheck.visitors;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.in.expressions.INExistsExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.expressions.visitors.INLeafExpressionVisitor;
 import com.fujitsu.vdmj.pog.POStatus;
 
@@ -47,10 +49,49 @@ public class ExecutionResultFinder extends INLeafExpressionVisitor<POStatus, Lis
 	{
 		return new Vector<POStatus>();
 	}
+	
+	private List<POStatus> result(POStatus status)
+	{
+		List<POStatus> one = newCollection();
+		one.add(status);
+		return one;
+	}
 
 	@Override
 	public List<POStatus> caseExpression(INExpression node, Object arg)
 	{
 		return newCollection();
+	}
+	
+	@Override
+	public List<POStatus> caseForAllExpression(INForAllExpression node, Object arg)
+	{
+		if (node.bindList.isInstrumented())
+		{
+			List<POStatus> inner = node.predicate.apply(this, arg);
+			POStatus subexp = !inner.isEmpty() ? inner.get(0) : POStatus.UNPROVED;
+			
+			// if (!node.maybe)	// forall had everything
+			{
+				return result(POStatus.MAYBE);
+			}
+		}
+		else
+		{
+			return super.caseForAllExpression(node, arg);
+		}
+	}
+	
+	@Override
+	public List<POStatus> caseExistsExpression(INExistsExpression node, Object arg)
+	{
+		if (node.bindList.isInstrumented())
+		{
+			return result(POStatus.MAYBE);
+		}
+		else
+		{
+			return super.caseExistsExpression(node, arg);
+		}
 	}
 }
