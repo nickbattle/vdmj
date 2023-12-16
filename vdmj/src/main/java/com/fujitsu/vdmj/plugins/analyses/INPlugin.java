@@ -439,7 +439,13 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 			case "word":		return new WordCommand(line);
 			case "save":		return new SaveCommand(line);
 			case "runtrace":
-			case "rt":			return new RuntraceCommand(line);
+			case "rt":
+			case "debugtrace":
+			case "dt":
+			case "runalltraces":
+			case "savetrace":
+			case "seedtrace":
+			case "filter":		return new RuntraceCommand(line);
 
 			default:
 				return null;
