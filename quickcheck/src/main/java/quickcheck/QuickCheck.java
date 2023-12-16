@@ -73,6 +73,7 @@ import quickcheck.annotations.IterableContext;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
 import quickcheck.visitors.FixedRangeCreator;
+import quickcheck.visitors.MaybeFinder;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
@@ -428,6 +429,7 @@ public class QuickCheck
 				Value execResult = new BooleanValue(false);
 				ContextException execException = null;
 				boolean execCompleted = false;
+				boolean hasMaybe = false;
 				long before = System.currentTimeMillis();
 
 				try
@@ -442,6 +444,10 @@ public class QuickCheck
 					{
 						ictxt.next();
 						execResult = poexp.eval(ictxt);
+						
+						MaybeFinder finder = new MaybeFinder();
+						poexp.apply(finder, null);
+						hasMaybe = finder.hasMaybe();
 					}
 					while (ictxt.hasNext() && execResult.boolValue(ctxt));
 					
@@ -502,6 +508,10 @@ public class QuickCheck
 						{
 							outcome = POStatus.TIMEOUT;
 						}
+						else if (hasMaybe)
+						{
+							outcome = POStatus.MAYBE;
+						}
 						else if (po.isExistential())
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
@@ -536,6 +546,14 @@ public class QuickCheck
 						{
 							infof(POStatus.TIMEOUT, "PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.TIMEOUT);
+							po.setCounterexample(null);
+							po.setMessage(null);
+							po.setWitness(null);
+						}
+						else if (hasMaybe)
+						{
+							infof(POStatus.MAYBE, "PO #%d, MAYBE %s\n", po.number, duration(before, after));
+							po.setStatus(POStatus.MAYBE);
 							po.setCounterexample(null);
 							po.setMessage(null);
 							po.setWitness(null);

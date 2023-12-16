@@ -30,68 +30,59 @@ import com.fujitsu.vdmj.in.expressions.INExistsExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.expressions.visitors.INLeafExpressionVisitor;
-import com.fujitsu.vdmj.pog.POStatus;
 
 /**
  * Search an expression tree after a QuickCheck execution to decide the outcome.
  * This is affected by the forall/exists subexpressions, whether they have
  * type bindings set and whether the binds have all type values. 
  */
-public class ExecutionResultFinder extends INLeafExpressionVisitor<POStatus, List<POStatus>, Object>
+public class MaybeFinder extends INLeafExpressionVisitor<Object, List<Object>, Object>
 {
-	public ExecutionResultFinder(boolean allNodes)
+	private int maybeCount = 0; 
+	
+	public MaybeFinder()
 	{
-		super(allNodes);
-	}
-
-	@Override
-	protected List<POStatus> newCollection()
-	{
-		return new Vector<POStatus>();
+		super(false);
 	}
 	
-	private List<POStatus> result(POStatus status)
+	public boolean hasMaybe()
 	{
-		List<POStatus> one = newCollection();
-		one.add(status);
-		return one;
+		return maybeCount > 0;
 	}
 
 	@Override
-	public List<POStatus> caseExpression(INExpression node, Object arg)
+	protected List<Object> newCollection()
+	{
+		return new Vector<Object>();
+	}
+	
+	@Override
+	public List<Object> caseExpression(INExpression node, Object arg)
 	{
 		return newCollection();
 	}
 	
 	@Override
-	public List<POStatus> caseForAllExpression(INForAllExpression node, Object arg)
+	public List<Object> caseForAllExpression(INForAllExpression node, Object arg)
 	{
-		if (node.bindList.isInstrumented())
+		if (node.maybe)
 		{
-			List<POStatus> inner = node.predicate.apply(this, arg);
-			POStatus subexp = !inner.isEmpty() ? inner.get(0) : POStatus.UNPROVED;
-			
-			// if (!node.maybe)	// forall had everything
-			{
-				return result(POStatus.MAYBE);
-			}
+			maybeCount++;
+			node.maybe = false;
 		}
-		else
-		{
-			return super.caseForAllExpression(node, arg);
-		}
+		
+		return super.caseForAllExpression(node, arg);
 	}
 	
 	@Override
-	public List<POStatus> caseExistsExpression(INExistsExpression node, Object arg)
+	public List<Object> caseExistsExpression(INExistsExpression node, Object arg)
 	{
-		if (node.bindList.isInstrumented())
+		if (node.maybe)
 		{
-			return result(POStatus.MAYBE);
+			maybeCount++;
+			node.maybe = false;
 		}
-		else
-		{
-			return super.caseExistsExpression(node, arg);
-		}
+		
+		return super.caseExistsExpression(node, arg);
 	}
 }
