@@ -123,7 +123,7 @@ public class INExistsExpression extends INExpression
 					if (matches && predicate.eval(evalContext).boolValue(ctxt))
 					{
 						bindList.setWitness(evalContext);
-						maybe = !bindList.hasAllValues();
+						maybe = false;
 						return new BooleanValue(true);
 					}
 				}

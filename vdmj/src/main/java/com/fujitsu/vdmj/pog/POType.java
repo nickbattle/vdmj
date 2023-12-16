@@ -30,9 +30,9 @@ public enum POType
 	FUNC_APPLY("function apply"),
 	SEQ_APPLY("sequence apply"),
 	FUNC_POST_CONDITION("post condition"),
-	FUNC_SATISFIABILITY("function satisfiability", true),
-	FUNC_PATTERNS("function parameter patterns", true),
-	LET_BE_EXISTS("let be st existence", true),
+	FUNC_SATISFIABILITY("function satisfiability"),
+	FUNC_PATTERNS("function parameter patterns"),
+	LET_BE_EXISTS("let be st existence"),
 	UNIQUE_EXISTENCE("unique existence binding"),	// Note: not existential!
 	FUNC_ITERATION("function iteration"),
 	MAP_ITERATION("map iteration"),
@@ -41,13 +41,13 @@ public enum POType
 	NON_EMPTY_SET("non-empty set"),
 	NON_EMPTY_SEQ("non-empty sequence"),
 	NON_ZERO("non-zero"),
-	FINITE_MAP("finite map", true),
-	FINITE_SET("finite set", true),
+	FINITE_MAP("finite map"),
+	FINITE_SET("finite set"),
 	MAP_COMPATIBLE("map compatible"),
 	MAP_SEQ_OF_COMPATIBLE("map sequence compatible"),
 	MAP_SET_OF_COMPATIBLE("map set compatible"),
 	SEQ_MODIFICATION("sequence modification"),
-	VALUE_BINDING("value binding", true),
+	VALUE_BINDING("value binding"),
 	SUB_TYPE("subtype"),
 	CASES_EXHAUSTIVE("cases exhaustive"),
 	INVARIANT("type invariant"),
@@ -55,7 +55,7 @@ public enum POType
 	STATE_INVARIANT("state invariant"),
 	WHILE_LOOP("while loop termination"),
 	OP_POST_CONDITION("operation post condition"),
-	OPERATION_PATTERNS("operation parameter patterns", true),
+	OPERATION_PATTERNS("operation parameter patterns"),
 	OP_SATISFIABILITY("operation satisfiability"),
 	SET_MEMBER("set membership"),
 	SEQ_MEMBER("sequence membership"),
@@ -64,30 +64,17 @@ public enum POType
 	TOTAL_ORDER("total order"),
 	EQUIV_RELATION("equivalence relation"),
 	TOTAL("total function"),
-	INV_SATISFIABILITY("invariant satisfiability", true),
+	INV_SATISFIABILITY("invariant satisfiability"),
 	THEOREM("theorem"),
-	STATE_INIT("state init", true);
+	STATE_INIT("state init");
 
 	private String kind;
-	private boolean existential;	// PO is of the form "exists ..." rather than "forall ..." etc.
 
 	POType(String kind)
 	{
 		this.kind = kind;
-		this.existential = false;
 	}
 
-	POType(String kind, boolean existential)
-	{
-		this.kind = kind;
-		this.existential = existential;
-	}
-
-	public boolean isExistential()
-	{
-		return existential;
-	}
-	
 	@Override
 	public String toString()
 	{

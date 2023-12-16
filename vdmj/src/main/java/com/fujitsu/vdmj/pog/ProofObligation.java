@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -86,7 +87,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 			this.status = POStatus.UNCHECKED;	// Implies unproved
 		}
 		
-		existential = ctxt.isExistential() || (ctxt.hasNone() && kind.isExistential());
+		//existential = ctxt.isExistential() || (ctxt.hasNone() && kind.isExistential());
 
 		POGetMatchingExpressionVisitor.init();	// Reset the "any" count, before PO creation
 	}
@@ -203,6 +204,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public void setCheckedExpression(TCExpression checkedExpression)
 	{
 		this.checkedExpression = checkedExpression;
+		this.existential = (checkedExpression instanceof TCExistsExpression);
 	}
 	
 	public TCExpression getCheckedExpression()

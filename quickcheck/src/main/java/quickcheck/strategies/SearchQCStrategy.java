@@ -90,7 +90,7 @@ public class SearchQCStrategy extends QCStrategy
 
 		if (po.isCheckable && po.getCheckedExpression() != null)
 		{
-			boolean exists = po.kind.isExistential();
+			boolean exists = po.isExistential();
 			NameValuePairList nvps = po.getCheckedExpression().apply(new SearchQCVisitor(exists), null);
 			
 			for (NameValuePair pair: nvps)

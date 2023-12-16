@@ -181,10 +181,9 @@ public class POImplicitOperationDefinition extends PODefinition
 			ctxt.pop();
 		}
 
-		ctxt.push(new PONoCheckContext());
-
 		if (body != null)
 		{
+			ctxt.push(new PONoCheckContext());
 			obligations.addAll(body.getProofObligations(ctxt, env));
 
 			if (isConstructor &&
@@ -199,6 +198,8 @@ public class POImplicitOperationDefinition extends PODefinition
 			{
 				obligations.add(new SubTypeObligation(this, actualResult, ctxt));
 			}
+			
+			ctxt.pop();
 		}
 		else
 		{
@@ -209,8 +210,6 @@ public class POImplicitOperationDefinition extends PODefinition
 				ctxt.pop();
 			}
 		}
-		
-		ctxt.pop();
 
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;
