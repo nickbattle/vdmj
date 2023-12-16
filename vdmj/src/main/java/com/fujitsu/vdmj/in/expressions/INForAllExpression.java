@@ -94,7 +94,7 @@ public class INForAllExpression extends INExpression
 					if (System.currentTimeMillis() - start > timeout)
 					{
 						bindList.setCounterexample(null, true);
-						maybe = !bindList.hasAllValues();
+						maybe = true;
 						return new BooleanValue(true);
 					}
 				}
