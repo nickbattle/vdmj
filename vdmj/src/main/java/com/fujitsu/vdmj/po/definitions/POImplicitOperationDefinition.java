@@ -137,8 +137,6 @@ public class POImplicitOperationDefinition extends PODefinition
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 		TCNameList pids = new TCNameList();
 		boolean matchNeeded = false;
-		
-		ctxt.push(new PONoCheckContext());
 
 		for (POPatternListTypePair pltp: parameterPatterns)
 		{
@@ -178,11 +176,14 @@ public class POImplicitOperationDefinition extends PODefinition
 				obligations.addAll(postdef.getProofObligations(ctxt, env));
 			}
 			
+			ctxt.push(new PONoCheckContext());
 			obligations.add(new OperationPostConditionObligation(this, ctxt));
+			ctxt.pop();
 		}
 
 		if (body != null)
 		{
+			ctxt.push(new PONoCheckContext());
 			obligations.addAll(body.getProofObligations(ctxt, env));
 
 			if (isConstructor &&
@@ -195,23 +196,21 @@ public class POImplicitOperationDefinition extends PODefinition
 			if (!isConstructor &&
 				!TypeComparator.isSubType(actualResult, type.result))
 			{
-				obligations.add(
-					new SubTypeObligation(this, actualResult, ctxt));
+				obligations.add(new SubTypeObligation(this, actualResult, ctxt));
 			}
+			
+			ctxt.pop();
 		}
 		else
 		{
 			if (postcondition != null)
 			{
 				ctxt.push(new POOperationDefinitionContext(this, false, state));
-				obligations.add(
-					new SatisfiabilityObligation(this, state, ctxt));
+				obligations.add(new SatisfiabilityObligation(this, state, ctxt));
 				ctxt.pop();
 			}
 		}
 
-		ctxt.pop();
-		
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;
 	}

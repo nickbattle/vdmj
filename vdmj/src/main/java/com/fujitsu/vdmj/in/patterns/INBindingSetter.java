@@ -30,8 +30,9 @@ import com.fujitsu.vdmj.values.ValueList;
 
 public interface INBindingSetter
 {
-	public void setBindValues(ValueList values, long timeout);
+	public void setBindValues(ValueList values, long timeout, boolean hasAllValues);
 	public ValueList getBindValues();
+	public boolean hasAllValues();
 	public long getTimeout();
 	public boolean didTimeout();
 	public TCType getType();

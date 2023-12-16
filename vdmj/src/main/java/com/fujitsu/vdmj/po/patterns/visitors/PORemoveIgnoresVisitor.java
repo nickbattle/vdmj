@@ -94,6 +94,15 @@ public class PORemoveIgnoresVisitor extends POPatternVisitor<POPattern, Object>
 	@Override
 	public POPattern caseIdentifierPattern(POIdentifierPattern node, Object arg)
 	{
+		// If we encounter any "old" state names, like "Sigma~", we rename to
+		// "oldSigma" to allow POs to work as simple expressions.
+		
+		if (node.name.isOld())
+		{
+			TCNameToken oldName = new TCNameToken(node.location, node.location.module, "old" + node.name.getName());
+			return new POIdentifierPattern(oldName);
+		}
+		
 		return node;
 	}
 	

@@ -136,44 +136,6 @@ public class POContextStack extends Stack<POContext>
 		return null;
 	}
 
-	public boolean isExistential()
-	{
-		for (POContext ctxt: this)
-		{
-			if (ctxt instanceof PONameContext ||
-				ctxt instanceof PONoCheckContext ||
-				ctxt instanceof POScopeContext)
-			{
-				continue;	// These aren't important
-			}
-			else
-			{
-				return ctxt.isExistential();
-			}
-		}
-		
-		return false;
-	}
-
-	public boolean hasNone()
-	{
-		for (POContext ctxt: this)
-		{
-			if (ctxt instanceof PONameContext ||
-				ctxt instanceof PONoCheckContext ||
-				ctxt instanceof POScopeContext)
-			{
-				continue;		// These aren't important
-			}
-			else
-			{
-				return false;	// Has something significant
-			}
-		}
-		
-		return true;	// Has nothing important
-	}
-
 	public TCTypeList getTypeParams()
 	{
 		for (POContext ctxt: this)

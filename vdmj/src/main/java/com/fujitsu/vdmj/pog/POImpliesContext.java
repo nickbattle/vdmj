@@ -39,12 +39,12 @@ public class POImpliesContext extends POContext
 
 	public POImpliesContext(POExplicitOperationDefinition def)
 	{
-		this.exp = preconditionCall(def.name, null, def.getParamPatternList(), def.precondition);
+		this.exp = preconditionCall(def.name, null, def.predef.getParamPatternList(), def.precondition);
 	}
 
 	public POImpliesContext(POImplicitOperationDefinition def)
 	{
-		this.exp = preconditionCall(def.name, null, def.getParamPatternList(), def.precondition);
+		this.exp = preconditionCall(def.name, null, def.predef.getParamPatternList(), def.precondition);
 	}
 
 	@Override

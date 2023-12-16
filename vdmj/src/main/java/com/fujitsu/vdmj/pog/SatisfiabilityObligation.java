@@ -93,6 +93,7 @@ public class SatisfiabilityObligation extends ProofObligation
 			separator = "";
 			appendResult(sb, op.result);
 			appendStatePatterns(sb, stateDefinition, false, true);
+			appendStatePatterns(sb, stateDefinition, true, true);
 			sb.append(" & ");
 		}
 
