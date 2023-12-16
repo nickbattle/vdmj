@@ -61,7 +61,7 @@ public class POOperationDefinitionContext extends POContext
 	{
 		StringBuilder sb = new StringBuilder();
 
-		if (!deftype.parameters.isEmpty())
+		if (!deftype.parameters.isEmpty() || stateDefinition != null)
 		{
     		sb.append("forall ");
     		String sep = "";
@@ -78,6 +78,7 @@ public class POOperationDefinitionContext extends POContext
 
 			if (stateDefinition != null)
 			{
+				sb.append(sep);
 				appendStatePatterns(sb);
 			}
 
@@ -103,13 +104,13 @@ public class POOperationDefinitionContext extends POContext
 		else if (stateDefinition instanceof POStateDefinition)
 		{
 			POStateDefinition def = (POStateDefinition)stateDefinition;
-			sb.append(", oldstate:");
+			sb.append("oldstate:");
 			sb.append(def.name.getName());
 		}
 		else
 		{
 			POClassDefinition def = (POClassDefinition)stateDefinition;
-			sb.append(", oldself:");
+			sb.append("oldself:");
 			sb.append(def.name.getName());
 		}
 	}
