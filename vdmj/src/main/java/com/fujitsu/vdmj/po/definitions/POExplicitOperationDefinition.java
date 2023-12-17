@@ -118,8 +118,6 @@ public class POExplicitOperationDefinition extends PODefinition
 				(annotations != null) ? annotations.poBefore(this, ctxt) : new ProofObligationList();
 		TCNameList pids = new TCNameList();
 
-		ctxt.push(new PONoCheckContext());		// Don't typecheck operation POs yet
-		
 		for (POPattern p: parameterPatterns)
 		{
 			pids.addAll(p.getVariableNames());
@@ -150,9 +148,12 @@ public class POExplicitOperationDefinition extends PODefinition
 				obligations.addAll(postdef.getProofObligations(ctxt, env));
 			}
 
+			ctxt.push(new PONoCheckContext());
 			obligations.add(new OperationPostConditionObligation(this, ctxt));
+			ctxt.pop();
 		}
 
+		ctxt.push(new PONoCheckContext());
 		obligations.addAll(body.getProofObligations(ctxt, env));
 
 		if (isConstructor &&
