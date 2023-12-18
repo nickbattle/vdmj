@@ -39,10 +39,12 @@ import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.values.ParameterValue;
+import com.fujitsu.vdmj.values.Value;
 
 abstract public class ProofObligation implements Comparable<ProofObligation>
 {
@@ -258,7 +260,31 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		{
 			POTypeDefinition td = (POTypeDefinition)definition;
 			
-			if (td.invdef != null)
+			if (kind == POType.TOTAL_ORDER && td.orddef != null)
+			{
+				// The PO defines params "x" < "y" but ord_T is "p1$" < "p2$".
+				// So we create a patched context...
+				Context patched = new Context(ctxt.location, ctxt.title, ctxt.outer);
+				
+				for (TCNameToken key: ctxt.keySet())
+				{
+					Value arg = ctxt.get(key);
+					
+					if (key.getName().equals("x"))
+					{
+						key = new TCNameToken(key.getLocation(), key.getModule(), "p1$");
+					}
+					else if (key.getName().equals("y"))
+					{
+						key = new TCNameToken(key.getLocation(), key.getModule(), "p2$");
+					}
+
+					patched.put(key, arg);
+				}
+				
+				return launchExplicitFunction(td.orddef, patched);
+			}
+			else if (td.invdef != null)
 			{
 				return launchExplicitFunction(td.invdef, ctxt);
 			}
