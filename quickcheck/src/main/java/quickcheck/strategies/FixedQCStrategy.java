@@ -553,6 +553,6 @@ public class FixedQCStrategy extends QCStrategy
 	@Override
 	public boolean useByDefault()
 	{
-		return false;	// Use if no -s given
+		return true;	// Use if no -s given
 	}
 }
