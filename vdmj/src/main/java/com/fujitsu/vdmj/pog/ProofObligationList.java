@@ -39,6 +39,8 @@ import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMError;
+import com.fujitsu.vdmj.po.PONode;
+import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.modules.MultiModuleEnvironment;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
@@ -245,8 +247,15 @@ public class ProofObligationList extends Vector<ProofObligation>
 		{
 			throw new ParserException(2330, "PO has type errors?", obligation.location, 0);
 		}
-		
+
 		obligation.setCheckedExpression(tcexp);
+
+		// Note whether the obligation expression itself has obligations. This is used
+		// in some proof strategies.
+		
+		POExpression poexp = ClassMapper.getInstance(PONode.MAPPINGS).convert(tcexp);
+		ProofObligationList popos = poexp.getProofObligations(new POContextStack(), env);
+		obligation.setHasObligations(!popos.isEmpty());
 	}
 
 	/**

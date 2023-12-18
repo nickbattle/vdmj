@@ -167,6 +167,6 @@ public class RandomQCStrategy extends QCStrategy
 	@Override
 	public boolean useByDefault()
 	{
-		return true;	// Don't use if no -s given
+		return false;	// Don't use if no -s given
 	}
 }

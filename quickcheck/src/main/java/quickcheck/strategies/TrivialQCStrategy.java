@@ -24,7 +24,7 @@
 
 package quickcheck.strategies;
 
-import static quickcheck.commands.QCConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.List;
@@ -82,7 +82,7 @@ public class TrivialQCStrategy extends QCStrategy
 	{
 		long before = System.currentTimeMillis();
 
-		if (po.isCheckable && po.getCheckedExpression() != null)
+		if (po.isCheckable && po.getCheckedExpression() != null && !po.hasObligations())
 		{
 			TrivialQCVisitor visitor = new TrivialQCVisitor();
 
