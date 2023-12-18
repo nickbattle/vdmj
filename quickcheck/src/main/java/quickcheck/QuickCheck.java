@@ -70,6 +70,7 @@ import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.annotations.po.POQuickCheckAnnotation;
 import quickcheck.annotations.IterableContext;
+import quickcheck.strategies.FixedQCStrategy;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
 import quickcheck.visitors.FixedRangeCreator;
@@ -353,12 +354,14 @@ public class QuickCheck
 		
 			for (INBindingSetter bind: binds)
 			{
-				if (!union.containsKey(bind.toString()))
+				ValueList values = union.get(bind.toString());
+				
+				if (values == null || values.size() < FixedQCStrategy.DEFAULT_LIMIT)
 				{
-					// Generate some values for missing bindings, using the fixed method
+					// Generate some (more) values for missing bindings, using the fixed method
 					verbose("Generating fixed values for %s\n", bind);
 					ValueList list = new ValueList();
-					list.addAll(bind.getType().apply(new FixedRangeCreator(ictxt), 10));
+					list.addAll(bind.getType().apply(new FixedRangeCreator(ictxt), FixedQCStrategy.DEFAULT_LIMIT));
 					union.put(bind.toString(), list);
 				}
 			}
@@ -550,14 +553,6 @@ public class QuickCheck
 							po.setMessage(null);
 							po.setWitness(null);
 						}
-						else if (hasMaybe)
-						{
-							infof(POStatus.MAYBE, "PO #%d, MAYBE %s\n", po.number, duration(before, after));
-							po.setStatus(POStatus.MAYBE);
-							po.setCounterexample(null);
-							po.setMessage(null);
-							po.setWitness(null);
-						}
 						else if (po.isExistential())	// Principal exp is "exists..."
 						{
 							if (results.hasAllValues)
@@ -580,25 +575,38 @@ public class QuickCheck
 						}
 						else
 						{
-							infof(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
-							po.setStatus(POStatus.FAILED);
-							printCounterexample(bindings);
-							po.setCounterexample(findCounterexample(bindings));
-							po.setWitness(null);
+							Context counterexample = findCounterexample(bindings);
 							
-							if (execException != null)
+							if (counterexample != null)
 							{
-								String msg = "Causes " + execException.getMessage(); 
-								infoln(POStatus.FAILED, msg);
-								po.setMessage(msg);
+								infof(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
+								po.setStatus(POStatus.FAILED);
+								printCounterexample(bindings);
+								po.setCounterexample(counterexample);
+								po.setWitness(null);
+								
+								if (execException != null)
+								{
+									String msg = "Causes " + execException.getMessage(); 
+									infoln(POStatus.FAILED, msg);
+									po.setMessage(msg);
+								}
+								else
+								{
+									po.setMessage(null);
+								}
+								
+								infoln(POStatus.FAILED, "----");
+								infoln(POStatus.FAILED, po.toString());
 							}
 							else
 							{
+								infof(POStatus.MAYBE, "PO #%d, MAYBE %s\n", po.number, duration(before, after));
+								po.setStatus(POStatus.MAYBE);
+								po.setCounterexample(null);
 								po.setMessage(null);
+								po.setWitness(null);
 							}
-							
-							infoln(POStatus.FAILED, "----");
-							infoln(POStatus.FAILED, po.toString());
 						}
 					}
 				}

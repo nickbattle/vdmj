@@ -98,7 +98,9 @@ import quickcheck.visitors.FixedRangeCreator;
 
 public class FixedQCStrategy extends QCStrategy
 {
-	private int expansionLimit = 20;		// Top level binding value expansion limit
+	public final static int DEFAULT_LIMIT = 20;
+	
+	private int expansionLimit = DEFAULT_LIMIT;		// Top level binding value expansion limit
 	
 	private int errorCount = 0;
 	private String rangesFile = "ranges.qc";
@@ -509,7 +511,7 @@ public class FixedQCStrategy extends QCStrategy
 			}
 			else
 			{
-				println("Did not find " + rangesFile + " (see -fixed:create option)");
+				verbose("Did not find " + rangesFile + " (try -fixed:create option)\n");
 				allRanges = new HashMap<String, ValueList>();
 			}
 			
