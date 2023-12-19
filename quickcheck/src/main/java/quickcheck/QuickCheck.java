@@ -356,13 +356,13 @@ public class QuickCheck
 			{
 				ValueList values = union.get(bind.toString());
 				
-				if (values == null || values.size() < FixedQCStrategy.DEFAULT_LIMIT)
+				if (values == null)
 				{
-					// Generate some (more) values for missing bindings, using the fixed method
+					// Generate some values for missing bindings, using the fixed method
 					verbose("Generating fixed values for %s\n", bind);
-					ValueList list = new ValueList();
-					list.addAll(bind.getType().apply(new FixedRangeCreator(ictxt), FixedQCStrategy.DEFAULT_LIMIT));
-					union.put(bind.toString(), list);
+					values = new ValueList();
+					values.addAll(bind.getType().apply(new FixedRangeCreator(ictxt), FixedQCStrategy.DEFAULT_LIMIT));
+					union.put(bind.toString(), values);
 				}
 			}
 		}
@@ -575,38 +575,25 @@ public class QuickCheck
 						}
 						else
 						{
-							Context counterexample = findCounterexample(bindings);
+							infof(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
+							po.setStatus(POStatus.FAILED);
+							printCounterexample(bindings);
+							po.setCounterexample(findCounterexample(bindings));
+							po.setWitness(null);
 							
-							if (counterexample != null)
+							if (execException != null)
 							{
-								infof(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
-								po.setStatus(POStatus.FAILED);
-								printCounterexample(bindings);
-								po.setCounterexample(counterexample);
-								po.setWitness(null);
-								
-								if (execException != null)
-								{
-									String msg = "Causes " + execException.getMessage(); 
-									infoln(POStatus.FAILED, msg);
-									po.setMessage(msg);
-								}
-								else
-								{
-									po.setMessage(null);
-								}
-								
-								infoln(POStatus.FAILED, "----");
-								infoln(POStatus.FAILED, po.toString());
+								String msg = "Causes " + execException.getMessage(); 
+								infoln(POStatus.FAILED, msg);
+								po.setMessage(msg);
 							}
 							else
 							{
-								infof(POStatus.MAYBE, "PO #%d, MAYBE %s\n", po.number, duration(before, after));
-								po.setStatus(POStatus.MAYBE);
-								po.setCounterexample(null);
 								po.setMessage(null);
-								po.setWitness(null);
 							}
+							
+							infoln(POStatus.FAILED, "----");
+							infoln(POStatus.FAILED, po.toString());
 						}
 					}
 				}
@@ -790,16 +777,23 @@ public class QuickCheck
 
 	private void printCounterexample(List<INBindingSetter> bindings)
 	{
-		Context path = findCounterexample(bindings);
-		String cex = stringOfContext(path);
-		
-		if (cex == null)
+		if (bindings.isEmpty())
 		{
-			infoln(POStatus.FAILED, "No counterexample");
+			infoln(POStatus.FAILED, "Obligation is always false");
 		}
 		else
 		{
-			infoln(POStatus.FAILED, "Counterexample: " + cex);
+			Context path = findCounterexample(bindings);
+			String cex = stringOfContext(path);
+			
+			if (cex == null)
+			{
+				infoln(POStatus.FAILED, "No counterexample");
+			}
+			else
+			{
+				infoln(POStatus.FAILED, "Counterexample: " + cex);
+			}
 		}
 	}
 

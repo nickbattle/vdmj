@@ -92,6 +92,7 @@ import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.SetValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
+import com.fujitsu.vdmj.values.ValueSet;
 
 import quickcheck.QuickCheck;
 import quickcheck.visitors.FixedRangeCreator;
@@ -531,9 +532,18 @@ public class FixedQCStrategy extends QCStrategy
 			{
 				String key = bind.toString();
 				
-				if (allRanges.containsKey(key))		// else a default created later
+				if (allRanges.containsKey(key))		// ranges.qc takes priority
 				{
+					verbose("Using values from ranges file for %s\n", bind);
 					values.put(key, allRanges.get(key));
+				}
+				else
+				{
+					verbose("Generating fixed values for %s\n", bind);
+					ValueSet set = bind.getType().apply(new FixedRangeCreator(ctxt), expansionLimit);
+					ValueList list = new ValueList();
+					list.addAll(set);
+					values.put(key, list);
 				}
 			}
 		}
