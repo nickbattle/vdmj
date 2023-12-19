@@ -202,7 +202,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 					"source",	splitPO(po.value),
 					"status",	po.status.toString());
 			
-			if (po.counterexample == null)
+			if (po.counterexample != null)
 			{
 				JSONObject cexample = new JSONObject();
 				cexample.put("variables", Utils.contextToJSON(po.counterexample));
