@@ -577,7 +577,7 @@ public class QuickCheck
 						{
 							infof(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
-							printCounterexample(bindings, poexp);
+							printCounterexample(bindings);
 							po.setCounterexample(findCounterexample(bindings));
 							po.setWitness(null);
 							
@@ -775,11 +775,11 @@ public class QuickCheck
 		return ctxt;
 	}
 
-	private void printCounterexample(List<INBindingSetter> bindings, INExpression poexp)
+	private void printCounterexample(List<INBindingSetter> bindings)
 	{
 		if (bindings.isEmpty())
 		{
-			infoln(POStatus.FAILED, "Counterexample: " + poexp);
+			infoln(POStatus.FAILED, "Obligation is always false");
 		}
 		else
 		{
