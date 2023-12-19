@@ -51,7 +51,7 @@ public class INMultipleTypeBind extends INMultipleBind
 		super(plist);
 		this.type = type;
 		this.hasTypeParams = !type.apply(new TCParameterCollector(), null).isEmpty();
-		this.setter = new INBindingOverride(type);
+		this.setter = new INBindingOverride(toString(), type);
 	}
 
 	@Override

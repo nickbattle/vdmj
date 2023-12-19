@@ -29,12 +29,19 @@ import com.fujitsu.vdmj.values.ValueList;
 
 public class INBindingOverride
 {
+	private final String key;
 	private final TCType type;
 	private ValueList bindValues = null;
 
-	public INBindingOverride(TCType type)
+	public INBindingOverride(String key, TCType type)
 	{
+		this.key = key;
 		this.type = type;
+	}
+	
+	public String toString()
+	{
+		return key;
 	}
 	
 	public boolean hasOverride()
