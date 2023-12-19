@@ -137,7 +137,7 @@ public class ClassMapper
 		if (errorCount > 0)
 		{
 			System.err.println("Aborting with " + errorCount + " errors");
-			System.exit(1);
+			throw new ClassMapperException(config);
 		}
 	}
 
@@ -367,9 +367,9 @@ public class ClassMapper
 			
 			if (mappings.containsKey(toIgnore))
 			{
-				error("Class is already mapped: " + toIgnore.getName());
+				System.err.println("Class is already mapped: " + toIgnore.getName());
 			}
-			else
+			// else
 			{
 				mappings.put(toIgnore, new MapParams(lineNo, toIgnore, toIgnore, null, null, true));
 			}
@@ -472,9 +472,9 @@ public class ClassMapper
 
 			if (mappings.containsKey(srcClass))
 			{
-				error("Class is already mapped: " + srcClass.getName());
+				System.err.println("Class is already mapped: " + srcClass.getName());
 			}
-			else
+			// else
 			{
 				mappings.put(srcClass, new MapParams(lineNo, srcClass, destClass, ctorFields, setterFields, false));
 			}
