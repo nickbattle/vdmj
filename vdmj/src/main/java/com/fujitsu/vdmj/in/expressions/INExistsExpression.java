@@ -45,9 +45,6 @@ public class INExistsExpression extends INExpression
 	public final INMultipleBindList bindList;
 	public final INExpression predicate;
 	
-	/** True if the execution did not have all bind values on exit */
-	public boolean maybe = false;
-	
 	/** Result information for QuickCheck */
 	private INBindingGlobals results = INBindingGlobals.getInstance();
 
@@ -94,8 +91,9 @@ public class INExistsExpression extends INExpression
 				{
 					if (System.currentTimeMillis() - start > timeout)
 					{
-						results.setCounterexample(null, true);
-						maybe = true;
+						results.setWitness(null);
+						results.setDidTimeout(true);
+						results.setMaybe(true);
 						return new BooleanValue(true);
 					}
 				}
@@ -127,7 +125,8 @@ public class INExistsExpression extends INExpression
 					if (matches && predicate.eval(evalContext).boolValue(ctxt))
 					{
 						results.setWitness(evalContext);
-						maybe = false;
+						results.setDidTimeout(false);
+						results.setMaybe(false);
 						return new BooleanValue(true);
 					}
 				}
@@ -142,7 +141,7 @@ public class INExistsExpression extends INExpression
 	    	abort(e);
 	    }
 
-		maybe = !results.hasAllValues();
+		results.setMaybe();
 		return new BooleanValue(false);
 	}
 

@@ -45,6 +45,7 @@ public class INBindingGlobals
 	private boolean bindAllValues = false;
 	private long bindTimeout = 0;
 	private boolean didTimeout = false;
+	private boolean maybe = false;
 
 	private INBindingGlobals()
 	{
@@ -58,6 +59,7 @@ public class INBindingGlobals
 		bindAllValues = false;
 		bindTimeout = 0;
 		didTimeout = false;
+		maybe = false;
 	}
 
 	public void setTimeout(long timeout)
@@ -80,15 +82,18 @@ public class INBindingGlobals
 		return this.bindAllValues;
 	}
 	
+	public void setDidTimeout(boolean did)
+	{
+		this.didTimeout = did;
+	}
+	
 	public boolean didTimeout()
 	{
 		return this.didTimeout;
 	}
 	
-	public void setCounterexample(Context ctxt, boolean didTimeout)
+	public void setCounterexample(Context ctxt)
 	{
-		this.didTimeout = didTimeout;
-		
 		if (ctxt == null)
 		{
 			bindCounterexample = null;
@@ -119,5 +124,20 @@ public class INBindingGlobals
 	public Context getWitness()
 	{
 		return bindWitness;
+	}
+	
+	public void setMaybe(boolean maybe)
+	{
+		this.maybe = maybe || this.maybe;	// Cumulative
+	}
+	
+	public void setMaybe()
+	{
+		this.maybe = (!bindAllValues) || this.maybe;	// Cumulative
+	}
+	
+	public boolean hasMaybe()
+	{
+		return maybe;
 	}
 }

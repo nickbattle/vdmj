@@ -75,7 +75,6 @@ import quickcheck.strategies.FixedQCStrategy;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
 import quickcheck.visitors.FixedRangeCreator;
-import quickcheck.visitors.MaybeFinder;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
@@ -375,7 +374,11 @@ public class QuickCheck
 	{
 		try
 		{
-			resetErrors();	// Only flag fatal errors
+			resetErrors();		// Only flag fatal errors
+			
+			INBindingGlobals globals = INBindingGlobals.getInstance();
+			globals.clear();	// Clear before each obligation run
+			
 			INExpression poexp = getINExpression(po);
 			List<INBindingOverride> bindings = getINBindList(poexp);;
 
@@ -413,7 +416,6 @@ public class QuickCheck
 					}
 				}
 				
-				INBindingGlobals globals = INBindingGlobals.getInstance();
 				globals.setTimeout(timeout);
 				globals.setAllValues(results.hasAllValues);
 				
@@ -437,7 +439,6 @@ public class QuickCheck
 				Value execResult = new BooleanValue(false);
 				ContextException execException = null;
 				boolean execCompleted = false;
-				boolean hasMaybe = false;
 				long before = System.currentTimeMillis();
 
 				try
@@ -452,10 +453,6 @@ public class QuickCheck
 					{
 						ictxt.next();
 						execResult = poexp.eval(ictxt);
-						
-						MaybeFinder finder = new MaybeFinder();
-						poexp.apply(finder, null);
-						hasMaybe = finder.hasMaybe();
 					}
 					while (ictxt.hasNext() && execResult.boolValue(ctxt));
 					
@@ -505,7 +502,7 @@ public class QuickCheck
 						{
 							outcome = POStatus.TIMEOUT;
 						}
-						else if (hasMaybe)
+						else if (globals.hasMaybe())
 						{
 							outcome = POStatus.MAYBE;
 						}
@@ -618,14 +615,14 @@ public class QuickCheck
 				infoln(po);
 				errorCount++;
 			}
-			finally		// Clear everything
+			finally		// Clear everything, to be safe
 			{
 				for (INBindingOverride mbind: bindings)
 				{
 					mbind.setBindValues(null);
 				}
 				
-				INBindingGlobals.getInstance().clear();
+				globals.clear();
 			}
 		}
 		catch (Exception e)
