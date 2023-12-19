@@ -356,13 +356,13 @@ public class QuickCheck
 			{
 				ValueList values = union.get(bind.toString());
 				
-				if (values == null || values.size() < FixedQCStrategy.DEFAULT_LIMIT)
+				if (values == null)
 				{
-					// Generate some (more) values for missing bindings, using the fixed method
+					// Generate some values for missing bindings, using the fixed method
 					verbose("Generating fixed values for %s\n", bind);
-					ValueList list = new ValueList();
-					list.addAll(bind.getType().apply(new FixedRangeCreator(ictxt), FixedQCStrategy.DEFAULT_LIMIT));
-					union.put(bind.toString(), list);
+					values = new ValueList();
+					values.addAll(bind.getType().apply(new FixedRangeCreator(ictxt), FixedQCStrategy.DEFAULT_LIMIT));
+					union.put(bind.toString(), values);
 				}
 			}
 		}
