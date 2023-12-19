@@ -124,9 +124,13 @@ public class INExistsExpression extends INExpression
 				{
 					if (matches && predicate.eval(evalContext).boolValue(ctxt))
 					{
-						results.setWitness(evalContext);
-						results.setDidTimeout(false);
-						results.setMaybe(false);
+						if (bindList.isInstrumented())
+						{
+							results.setWitness(evalContext);
+							results.setDidTimeout(false);
+							results.setMaybe(false);
+						}
+						
 						return new BooleanValue(true);
 					}
 				}
@@ -141,7 +145,11 @@ public class INExistsExpression extends INExpression
 	    	abort(e);
 	    }
 
-		results.setMaybe();
+		if (bindList.isInstrumented())
+		{
+			results.setMaybe();
+		}
+		
 		return new BooleanValue(false);
 	}
 

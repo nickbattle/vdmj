@@ -59,6 +59,12 @@ public class INMultipleTypeBind extends INMultipleBind
 	{
 		return plist + ":" + type.toExplicitString(location);
 	}
+	
+	@Override
+	public boolean isInstrumented()
+	{
+		return setter.hasOverride();
+	}
 
 	public TCType getType()
 	{

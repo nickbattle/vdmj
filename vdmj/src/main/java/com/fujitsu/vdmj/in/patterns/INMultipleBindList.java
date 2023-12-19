@@ -41,4 +41,17 @@ public class INMultipleBindList extends INMappedList<TCMultipleBind, INMultipleB
 	{
 		super(from);
 	}
+	
+	public boolean isInstrumented()
+	{
+		for (INMultipleBind bind: this)
+		{
+			if (bind.isInstrumented())
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
 }

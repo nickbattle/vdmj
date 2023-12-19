@@ -175,7 +175,7 @@ public class QuickCheck
 	
 	public boolean initStrategies(long timeoutSecs)
 	{
-		this.timeout = (timeoutSecs == 0) ? DEFAULT_TIMEOUT : timeoutSecs * 1000;
+		this.timeout = (timeoutSecs < 0) ? DEFAULT_TIMEOUT : timeoutSecs * 1000;
 		boolean doChecks = true;
 		
 		for (QCStrategy strategy: strategies)

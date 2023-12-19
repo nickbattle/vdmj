@@ -69,7 +69,7 @@ public class QuickCheckCommand extends AnalysisCommand
 		List<Integer> poList = new Vector<Integer>();
 		List<String> poNames = new Vector<String>();
 		List<POStatus> includes = new Vector<POStatus>();
-		long timeout = 0;
+		long timeout = -1;
 		
 		QuickCheck qc = new QuickCheck();
 

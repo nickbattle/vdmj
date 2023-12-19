@@ -65,6 +65,12 @@ public abstract class INMultipleBind extends INNode
 		list.add(this);
 		return list;
 	}
+	
+	/** True if the bind has INBindSetter values set */
+	public boolean isInstrumented()
+	{
+		return false;
+	}
 
 	/** Get a list of all the possible values to bind the variables to. */ 
 	abstract public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException;

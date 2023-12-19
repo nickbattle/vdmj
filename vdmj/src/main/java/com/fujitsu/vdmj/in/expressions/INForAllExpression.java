@@ -127,17 +127,25 @@ public class INForAllExpression extends INExpression
 				{
 					if (matches && !predicate.eval(evalContext).boolValue(ctxt))
 					{
-						results.setCounterexample(evalContext);
-						results.setDidTimeout(false);
-						results.setMaybe();
+						if (bindList.isInstrumented())
+						{
+							results.setCounterexample(evalContext);
+							results.setDidTimeout(false);
+							results.setMaybe();
+						}
+						
 						return new BooleanValue(false);
 					}
 				}
 				catch (ContextException e)
 				{
-					results.setCounterexample(evalContext);
-					results.setDidTimeout(false);
-					results.setMaybe();
+					if (bindList.isInstrumented())
+					{
+						results.setCounterexample(evalContext);
+						results.setDidTimeout(false);
+						results.setMaybe();
+					}
+					
 					throw e;
 				}
 				catch (ValueException e)
@@ -151,7 +159,11 @@ public class INForAllExpression extends INExpression
 	    	return abort(e);
 	    }
 
-		results.setMaybe();
+		if (bindList.isInstrumented())
+		{
+			results.setMaybe();
+		}
+		
 		return new BooleanValue(true);
 	}
 
