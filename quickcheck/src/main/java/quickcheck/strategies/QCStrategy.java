@@ -27,7 +27,7 @@ package quickcheck.strategies;
 import java.util.List;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
 
@@ -39,6 +39,6 @@ abstract public class QCStrategy
 	abstract public boolean hasErrors();
 	abstract public boolean useByDefault();
 	abstract public boolean init(QuickCheck qc);
-	abstract public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt);
+	abstract public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingOverride> binds, Context ctxt);
 	abstract public String help();
 }

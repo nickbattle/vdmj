@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.in.expressions;
 
 import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
+import com.fujitsu.vdmj.in.patterns.INBindingGlobals;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.patterns.INPattern;
@@ -50,6 +51,9 @@ public class INForAllExpression extends INExpression
 	/** True if the execution did not have all bind values on exit */
 	public boolean maybe = false;
 	
+	/** Result information for QuickCheck */
+	private INBindingGlobals results = INBindingGlobals.getInstance();
+
 	public INForAllExpression(LexLocation location,	INMultipleBindList bindList, INExpression predicate)
 	{
 		super(location);
@@ -68,7 +72,7 @@ public class INForAllExpression extends INExpression
 	{
 		breakpoint.check(location, ctxt);
 		long start = System.currentTimeMillis();
-		long timeout = bindList.getTimeout();
+		long timeout = results.getTimeout();
 
 		try
 		{
@@ -93,7 +97,7 @@ public class INForAllExpression extends INExpression
 				{
 					if (System.currentTimeMillis() - start > timeout)
 					{
-						bindList.setCounterexample(null, true);
+						results.setCounterexample(null, true);
 						maybe = true;
 						return new BooleanValue(true);
 					}
@@ -125,15 +129,15 @@ public class INForAllExpression extends INExpression
 				{
 					if (matches && !predicate.eval(evalContext).boolValue(ctxt))
 					{
-						bindList.setCounterexample(evalContext, false);
-						maybe = !bindList.hasAllValues();
+						results.setCounterexample(evalContext, false);
+						maybe = !results.hasAllValues();
 						return new BooleanValue(false);
 					}
 				}
 				catch (ContextException e)
 				{
-					bindList.setCounterexample(evalContext, false);
-					maybe = !bindList.hasAllValues();
+					results.setCounterexample(evalContext, false);
+					maybe = !results.hasAllValues();
 					throw e;
 				}
 				catch (ValueException e)
@@ -147,7 +151,7 @@ public class INForAllExpression extends INExpression
 	    	return abort(e);
 	    }
 
-		maybe = !bindList.hasAllValues();
+		maybe = !results.hasAllValues();
 		return new BooleanValue(true);
 	}
 

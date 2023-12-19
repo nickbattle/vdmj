@@ -44,7 +44,8 @@ import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INBindingOverride;
+import com.fujitsu.vdmj.in.patterns.INBindingGlobals;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
@@ -290,7 +291,7 @@ public class QuickCheck
 		}
 	}
 	
-	public List<INBindingSetter> getINBindList(INExpression inexp)
+	public List<INBindingOverride> getINBindList(INExpression inexp)
 	{
 		return inexp.apply(new TypeBindFinder(), null);
 	}
@@ -305,7 +306,7 @@ public class QuickCheck
 		}
 		
 		INExpression exp = getINExpression(po);
-		List<INBindingSetter> binds = getINBindList(exp);
+		List<INBindingOverride> binds = getINBindList(exp);
 		IterableContext ictxt = addTypeParams(po, Interpreter.getInstance().getInitialContext());
 		boolean hasAllValues = false;
 		long before = System.currentTimeMillis();
@@ -352,7 +353,7 @@ public class QuickCheck
 				hasAllValues = hasAllValues || sresults.hasAllValues;	// At least one has all values
 			}
 		
-			for (INBindingSetter bind: binds)
+			for (INBindingOverride bind: binds)
 			{
 				ValueList values = union.get(bind.toString());
 				
@@ -376,7 +377,7 @@ public class QuickCheck
 		{
 			resetErrors();	// Only flag fatal errors
 			INExpression poexp = getINExpression(po);
-			List<INBindingSetter> bindings = getINBindList(poexp);;
+			List<INBindingOverride> bindings = getINBindList(poexp);;
 
 			if (!po.isCheckable)
 			{
@@ -396,14 +397,14 @@ public class QuickCheck
 
 			try
 			{
-				for (INBindingSetter mbind: bindings)
+				for (INBindingOverride mbind: bindings)
 				{
 					ValueList values = results.counterexamples.get(mbind.toString());
 					
 					if (values != null)
 					{
 						verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
-						mbind.setBindValues(values, timeout, results.hasAllValues);
+						mbind.setBindValues(values);
 					}
 					else
 					{
@@ -411,6 +412,10 @@ public class QuickCheck
 						errorCount++;
 					}
 				}
+				
+				INBindingGlobals globals = INBindingGlobals.getInstance();
+				globals.setTimeout(timeout);
+				globals.setAllValues(results.hasAllValues);
 				
 				Context ctxt = Interpreter.getInstance().getInitialContext();
 				Interpreter.getInstance().setDefaultName(po.location.module);
@@ -489,17 +494,6 @@ public class QuickCheck
 				}
 				else if (execResult instanceof BooleanValue)
 				{
-					boolean didTimeout = false;
-					
-					for (INBindingSetter mbind: bindings)
-					{
-						if (mbind.didTimeout())
-						{
-							didTimeout = true;
-							break;
-						}
-					}
-
 					if (execResult.boolValue(ctxt))
 					{
 						POStatus outcome = null;
@@ -507,7 +501,7 @@ public class QuickCheck
 						po.setWitness(null);
 						po.setProvedBy(null);
 						
-						if (didTimeout)
+						if (globals.didTimeout())
 						{
 							outcome = POStatus.TIMEOUT;
 						}
@@ -518,7 +512,7 @@ public class QuickCheck
 						else if (po.isExistential())
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
-							Context witness = findWitness(bindings);
+							Context witness = globals.getWitness();
 							po.setWitness(witness);
 							
 							if (witness != null)
@@ -545,7 +539,7 @@ public class QuickCheck
 					}
 					else
 					{
-						if (didTimeout)		// Result would have been true (above), but...
+						if (globals.didTimeout())		// Result would have been true (above), but...
 						{
 							infof(POStatus.TIMEOUT, "PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.TIMEOUT);
@@ -578,7 +572,7 @@ public class QuickCheck
 							infof(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
 							printCounterexample(bindings);
-							po.setCounterexample(findCounterexample(bindings));
+							po.setCounterexample(globals.getCounterexample());
 							po.setWitness(null);
 							
 							if (execException != null)
@@ -624,12 +618,14 @@ public class QuickCheck
 				infoln(po);
 				errorCount++;
 			}
-			finally
+			finally		// Clear everything
 			{
-				for (INBindingSetter mbind: bindings)
+				for (INBindingOverride mbind: bindings)
 				{
-					mbind.setBindValues(null, 0, false);	// Clears everything
+					mbind.setBindValues(null);
 				}
+				
+				INBindingGlobals.getInstance().clear();
 			}
 		}
 		catch (Exception e)
@@ -712,11 +708,11 @@ public class QuickCheck
 		return ictxt;
 	}
 
-	private void printBindings(List<INBindingSetter> bindings)
+	private void printBindings(List<INBindingOverride> bindings)
 	{
 		int MAXVALUES = 10;
 		
-		for (INBindingSetter bind: bindings)
+		for (INBindingOverride bind: bindings)
 		{
 			infof("%s = [", bind);
 			
@@ -740,42 +736,8 @@ public class QuickCheck
 			}
 		}
 	}
-	
-	private Context findCounterexample(List<INBindingSetter> bindings)
-	{
-		Context ctxt = null;
-		
-		for (INBindingSetter setter: bindings)
-		{
-			ctxt = setter.getCounterexample();
-			
-			if (ctxt != null)
-			{
-				break;	// Any one will do - see INForAllExpression
-			}
-		}
 
-		return ctxt;
-	}
-	
-	private Context findWitness(List<INBindingSetter> bindings)
-	{
-		Context ctxt = null;
-		
-		for (INBindingSetter setter: bindings)
-		{
-			ctxt = setter.getWitness();
-			
-			if (ctxt != null)
-			{
-				break;	// Any one will do - see INExistsExpression
-			}
-		}
-
-		return ctxt;
-	}
-
-	private void printCounterexample(List<INBindingSetter> bindings)
+	private void printCounterexample(List<INBindingOverride> bindings)
 	{
 		if (bindings.isEmpty())
 		{
@@ -783,7 +745,7 @@ public class QuickCheck
 		}
 		else
 		{
-			Context path = findCounterexample(bindings);
+			Context path = INBindingGlobals.getInstance().getCounterexample();
 			String cex = stringOfContext(path);
 			
 			if (cex == null)

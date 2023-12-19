@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.values.ValueList;
@@ -94,12 +94,12 @@ public class ExampleQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingOverride> binds, Context ctxt)
 	{
 		Map<String, ValueList> values = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
 		
-		for (INBindingSetter bind: binds)
+		for (INBindingOverride bind: binds)
 		{
 			values.put(bind.toString(), new ValueList());	// ie. nothing, for every bind
 		}

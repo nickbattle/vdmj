@@ -30,23 +30,23 @@ import java.util.Vector;
 import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.visitors.INLeafDefinitionVisitor;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 
-public class DefinitionTypeBindFinder extends INLeafDefinitionVisitor<INBindingSetter, List<INBindingSetter>, Object>
+public class DefinitionTypeBindFinder extends INLeafDefinitionVisitor<INBindingOverride, List<INBindingOverride>, Object>
 {
-	public DefinitionTypeBindFinder(INVisitorSet<INBindingSetter, List<INBindingSetter>, Object> inVisitorSet)
+	public DefinitionTypeBindFinder(INVisitorSet<INBindingOverride, List<INBindingOverride>, Object> inVisitorSet)
 	{
 		this.visitorSet = inVisitorSet;
 	}
 
 	@Override
-	protected List<INBindingSetter> newCollection()
+	protected List<INBindingOverride> newCollection()
 	{
-		return new Vector<INBindingSetter>();
+		return new Vector<INBindingOverride>();
 	}
 
 	@Override
-	public List<INBindingSetter> caseDefinition(INDefinition node, Object arg)
+	public List<INBindingOverride> caseDefinition(INDefinition node, Object arg)
 	{
 		return newCollection();
 	}

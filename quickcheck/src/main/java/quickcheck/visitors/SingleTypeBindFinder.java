@@ -29,33 +29,33 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
 import com.fujitsu.vdmj.in.patterns.INBind;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.in.patterns.INTypeBind;
 import com.fujitsu.vdmj.in.patterns.visitors.INLeafBindVisitor;
 
-public class SingleTypeBindFinder extends INLeafBindVisitor<INBindingSetter, List<INBindingSetter>, Object>
+public class SingleTypeBindFinder extends INLeafBindVisitor<INBindingOverride, List<INBindingOverride>, Object>
 {
-	public SingleTypeBindFinder(INVisitorSet<INBindingSetter, List<INBindingSetter>, Object> inVisitorSet)
+	public SingleTypeBindFinder(INVisitorSet<INBindingOverride, List<INBindingOverride>, Object> inVisitorSet)
 	{
 		this.visitorSet = inVisitorSet;
 	}
 
 	@Override
-	protected List<INBindingSetter> newCollection()
+	protected List<INBindingOverride> newCollection()
 	{
-		return new Vector<INBindingSetter>();
+		return new Vector<INBindingOverride>();
 	}
 	
 	@Override
-	public List<INBindingSetter> caseTypeBind(INTypeBind node, Object arg)
+	public List<INBindingOverride> caseTypeBind(INTypeBind node, Object arg)
 	{
-		List<INBindingSetter> binds = newCollection();
-		binds.add(node);
+		List<INBindingOverride> binds = newCollection();
+		binds.add(node.setter);
 		return binds;
 	}
 
 	@Override
-	public List<INBindingSetter> caseBind(INBind node, Object arg)
+	public List<INBindingOverride> caseBind(INBind node, Object arg)
 	{
 		return newCollection();
 	}

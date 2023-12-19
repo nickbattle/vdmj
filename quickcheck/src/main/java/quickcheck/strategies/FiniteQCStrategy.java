@@ -32,7 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
 import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.messages.InternalException;
@@ -120,7 +120,7 @@ public class FiniteQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingOverride> binds, Context ctxt)
 	{
 		HashMap<String, ValueList> result = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
@@ -129,7 +129,7 @@ public class FiniteQCStrategy extends QCStrategy
 		{
 			long product = 1;
 			
-			for (INBindingSetter bind: binds)
+			for (INBindingOverride bind: binds)
 			{
 				try
 				{
@@ -156,7 +156,7 @@ public class FiniteQCStrategy extends QCStrategy
 			}
 			
 			// Game on... all binds can be expanded
-			for (INBindingSetter bind: binds)
+			for (INBindingOverride bind: binds)
 			{
 				result.put(bind.toString(), bind.getType().apply(new INGetAllValuesVisitor(), ctxt));
 			}

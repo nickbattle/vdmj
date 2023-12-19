@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Stack;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -78,7 +78,7 @@ public class TrivialQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingOverride> binds, Context ctxt)
 	{
 		long before = System.currentTimeMillis();
 
