@@ -318,15 +318,18 @@ public class QuickCheck
 			{
 				verbose("Invoking %s strategy\n", strategy.getName());
 				StrategyResults sresults = strategy.getValues(po, poexp, binds, ictxt);
-				Map<String, ValueList> cexamples = sresults.counterexamples;
 				
 				if (sresults.provedBy != null)	// No need to go further
 				{
 					verbose("Obligation proved by %s\n", strategy.getName());
 					sresults.setDuration(System.currentTimeMillis() - before);
+					sresults.setBinds(binds);
+					sresults.setInExpression(poexp);
 					return sresults;
 				}
-				
+
+				Map<String, ValueList> cexamples = sresults.counterexamples;
+
 				if (cexamples.isEmpty())
 				{
 					verbose("No bindings returned by %s\n", strategy.getName());
@@ -351,19 +354,19 @@ public class QuickCheck
 				
 				hasAllValues = hasAllValues || sresults.hasAllValues;	// At least one has all values
 			}
+		}
 		
-			for (INBindingOverride bind: binds)
+		for (INBindingOverride bind: binds)
+		{
+			ValueList values = union.get(bind.toString());
+			
+			if (values == null)
 			{
-				ValueList values = union.get(bind.toString());
-				
-				if (values == null)
-				{
-					// Generate some values for missing bindings, using the fixed method
-					verbose("Generating fixed values for %s\n", bind);
-					values = new ValueList();
-					values.addAll(bind.getType().apply(new FixedRangeCreator(ictxt), FixedQCStrategy.DEFAULT_LIMIT));
-					union.put(bind.toString(), values);
-				}
+				// Generate some values for missing bindings, using the fixed method
+				verbose("Generating fixed values for %s\n", bind);
+				values = new ValueList();
+				values.addAll(bind.getType().apply(new FixedRangeCreator(ictxt), FixedQCStrategy.DEFAULT_LIMIT));
+				union.put(bind.toString(), values);
 			}
 		}
 		
@@ -381,9 +384,6 @@ public class QuickCheck
 			
 			INBindingGlobals globals = INBindingGlobals.getInstance();
 			globals.clear();	// Clear before each obligation run
-			
-			INExpression poexp = results.inExpression;
-			List<INBindingOverride> bindings = results.binds;
 
 			if (!po.isCheckable)
 			{
@@ -400,6 +400,9 @@ public class QuickCheck
 				infof(POStatus.PROVED, "PO #%d, PROVED by %s %s %s\n", po.number, results.provedBy, results.message, duration(results.duration));
 				return;
 			}
+			
+			INExpression poexp = results.inExpression;
+			List<INBindingOverride> bindings = results.binds;
 
 			try
 			{
