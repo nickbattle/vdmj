@@ -36,20 +36,15 @@ import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.visitors.TCParameterCollector;
 import com.fujitsu.vdmj.values.ValueList;
 
-public class INMultipleTypeBind extends INMultipleBind implements INBindingSetter
+public class INMultipleTypeBind extends INMultipleBind
 {
 	private static final long serialVersionUID = 1L;
 	public final TCType type;
 	public final boolean hasTypeParams;
 	
+	public INBindingOverride setter = null;
 	private ValueList bindValues = null;
-	private Context bindCounterexample = null;
-	private Context bindWitness = null;
 	private boolean bindPermuted = false;
-	private boolean bindOverride = false;
-	private boolean bindAllValues = false;
-	private long bindTimeout = 0;
-	private boolean didTimeout = false;
 
 	public INMultipleTypeBind(INPatternList plist, TCType type)
 	{
@@ -64,95 +59,6 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 		return plist + ":" + type.toExplicitString(location);
 	}
 	
-	@Override
-	public void setBindValues(ValueList values, long timeout, boolean hasAllValues)
-	{
-		if (values == null)
-		{
-			bindValues = null;
-			bindOverride = false;
-			bindTimeout = 0;
-			bindAllValues = true;	// NOTE: because execution usually does
-		}
-		else
-		{
-			bindValues = new ValueList();
-			bindValues.addAll(values);
-			bindOverride = true;
-			bindTimeout = timeout;
-			bindAllValues = hasAllValues;
-		}
-
-		didTimeout = false;
-		bindCounterexample = null;
-		bindWitness = null;
-	}
-	
-	@Override
-	public ValueList getBindValues()
-	{
-		return bindValues;	// Without calculation!
-	}
-	
-	@Override
-	public long getTimeout()
-	{
-		return bindTimeout;
-	}
-	
-	@Override
-	public boolean didTimeout()
-	{
-		return didTimeout;
-	}
-	
-	@Override
-	public boolean hasAllValues()
-	{
-		return bindAllValues;
-	}
-
-	@Override
-	public void setCounterexample(Context ctxt, boolean didTimeout)
-	{
-		this.didTimeout = didTimeout;
-		
-		if (ctxt == null)
-		{
-			bindCounterexample = null;
-		}
-		else if (bindCounterexample == null)	// Catch first fail, don't overwrite
-		{
-			bindCounterexample = ctxt;
-		}
-	}
-	
-	@Override
-	public Context getCounterexample()
-	{
-		return bindCounterexample;
-	}
-	
-	@Override
-	public void setWitness(Context ctxt)
-	{
-		if (ctxt == null)
-		{
-			bindWitness = null;
-		}
-		else if (bindWitness == null)	// Catch first witness, don't overwrite
-		{
-			bindWitness = ctxt;
-		}
-	}
-
-	@Override
-	public Context getWitness()
-	{
-		return bindWitness;
-	}
-
-	@Override
 	public TCType getType()
 	{
 		return type;
@@ -161,7 +67,12 @@ public class INMultipleTypeBind extends INMultipleBind implements INBindingSette
 	@Override
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
-		if (bindOverride || (bindValues != null && bindPermuted == permuted && !hasTypeParams))
+		if (setter != null && setter.hasOverride())
+		{
+			return setter.getBindValues();
+		}
+		
+		if (bindValues != null && bindPermuted == permuted && !hasTypeParams)
 		{
 			return bindValues;		// Should be exactly the same
 		}

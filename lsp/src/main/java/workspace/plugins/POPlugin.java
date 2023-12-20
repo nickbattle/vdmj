@@ -202,7 +202,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 					"source",	splitPO(po.value),
 					"status",	po.status.toString());
 			
-			if (!po.counterexample.isEmpty())
+			if (po.counterexample != null)
 			{
 				JSONObject cexample = new JSONObject();
 				cexample.put("variables", Utils.contextToJSON(po.counterexample));
@@ -231,7 +231,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 				}
 			}
 			
-			if (!po.witness.isEmpty())
+			if (po.witness != null)
 			{
 				JSONObject witness = new JSONObject();
 				witness.put("variables", Utils.contextToJSON(po.witness));

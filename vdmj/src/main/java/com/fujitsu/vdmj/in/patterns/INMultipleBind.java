@@ -65,7 +65,7 @@ public abstract class INMultipleBind extends INNode
 		list.add(this);
 		return list;
 	}
-
+	
 	/** Get a list of all the possible values to bind the variables to. */ 
 	abstract public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException;
 

@@ -44,7 +44,7 @@ import com.fujitsu.vdmj.ast.patterns.ASTMultipleBindList;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.in.patterns.INMultipleBind;
 import com.fujitsu.vdmj.in.patterns.INMultipleBindList;
 import com.fujitsu.vdmj.in.patterns.INMultipleTypeBind;
@@ -391,7 +391,7 @@ public class FixedQCStrategy extends QCStrategy
 
 			for (ProofObligation po: qc.getChosen())
 			{
-				for (INBindingSetter mbind: qc.getINBindList(qc.getINExpression(po)))
+				for (INBindingOverride mbind: qc.getINBindList(qc.getINExpression(po)))
 				{
 					if (!done.contains(mbind.toString()))
 					{
@@ -521,14 +521,14 @@ public class FixedQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingSetter> binds, Context ctxt)
+	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingOverride> binds, Context ctxt)
 	{
 		Map<String, ValueList> values = new HashMap<String, ValueList>();
 		long before = System.currentTimeMillis();
 		
 		try
 		{
-			for (INBindingSetter bind: binds)
+			for (INBindingOverride bind: binds)
 			{
 				String key = bind.toString();
 				

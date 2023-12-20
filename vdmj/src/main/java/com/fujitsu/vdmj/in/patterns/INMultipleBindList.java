@@ -25,7 +25,6 @@
 package com.fujitsu.vdmj.in.patterns;
 
 import com.fujitsu.vdmj.in.INMappedList;
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBind;
 import com.fujitsu.vdmj.tc.patterns.TCMultipleBindList;
 
@@ -44,103 +43,27 @@ public class INMultipleBindList extends INMappedList<TCMultipleBind, INMultipleB
 	}
 
 	/**
-	 * QuickCheck has set some type binds?
+	 * Note this method takes account of non-type binds, which in their nature
+	 * have all values (explicitly). This is used in forall and exists expressions
+	 * to set the INBindingGlobals "maybe" flag. 
 	 */
-	public boolean isInstrumented()
-	{
-		for (INMultipleBind bind: this)
-		{
-			if (bind instanceof INBindingSetter)	// Type and multitype binds
-			{
-				INBindingSetter setter = (INBindingSetter)bind;
-				
-				if (setter.getBindValues() != null)
-				{
-					return true;
-				}
-			}
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * This is used by the QuickCheck plugin to limit PO execution times.
-	 */
-	public long getTimeout()
-	{
-		for (INMultipleBind bind: this)
-		{
-			if (bind instanceof INBindingSetter)	// Type and multitype binds
-			{
-				INBindingSetter setter = (INBindingSetter)bind;
-				long timeout = setter.getTimeout();
-				
-				if (timeout > 0)
-				{
-					return timeout;
-				}
-			}
-		}
-		
-		return 0;
-	}
-
-	/**
-	 * This is used by the QuickCheck plugin to report which values failed.
-	 */
-	public void setCounterexample(Context ctxt, boolean didTimeout)
-	{
-		for (INMultipleBind bind: this)
-		{
-			if (bind instanceof INBindingSetter)	// Type and multitype binds
-			{
-				INBindingSetter setter = (INBindingSetter)bind;
-				
-				if (setter.getBindValues() != null)	// One we care about (set QC values for)
-				{
-					setter.setCounterexample(ctxt, didTimeout);
-					break;							// Just one will do - see QC printFailPath
-				}
-			}
-		}
-	}
-
-	/**
-	 * This is used by the QuickCheck plugin to report which values succeeded.
-	 */
-	public void setWitness(Context ctxt)
-	{
-		for (INMultipleBind bind: this)
-		{
-			if (bind instanceof INBindingSetter)	// Type and multitype binds
-			{
-				INBindingSetter setter = (INBindingSetter)bind;
-				
-				if (setter.getBindValues() != null)	// One we care about (set QC values for)
-				{
-					setter.setWitness(ctxt);
-					break;							// Just one will do - see QC printFailPath
-				}
-			}
-		}
-	}
-
 	public boolean hasAllValues()
 	{
+		INBindingGlobals globals = INBindingGlobals.getInstance();
+		
+		if (globals.hasAllValues())
+		{
+			return true;
+		}
+		
 		for (INMultipleBind bind: this)
 		{
-			if (bind instanceof INBindingSetter)	// Type and multitype binds
+			if (bind instanceof INMultipleTypeBind)
 			{
-				INBindingSetter setter = (INBindingSetter)bind;
-
-				if (!setter.hasAllValues())
-				{
-					return false;	// One hasn't
-				}
+				return false;
 			}
 		}
 		
-		return true;	// All have
+		return true;	// Note, pure set binds have all values
 	}
 }

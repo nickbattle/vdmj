@@ -24,20 +24,52 @@
 
 package com.fujitsu.vdmj.in.patterns;
 
-import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.values.ValueList;
 
-public interface INBindingSetter
+public class INBindingOverride
 {
-	public void setBindValues(ValueList values, long timeout, boolean hasAllValues);
-	public ValueList getBindValues();
-	public boolean hasAllValues();
-	public long getTimeout();
-	public boolean didTimeout();
-	public TCType getType();
-	public void setCounterexample(Context ctxt, boolean didTimeout);
-	public Context getCounterexample();
-	public void setWitness(Context ctxt);
-	public Context getWitness();
+	private final String key;
+	private final TCType type;
+	private ValueList bindValues = null;
+
+	public INBindingOverride(String key, TCType type)
+	{
+		this.key = key;
+		this.type = type;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return key;
+	}
+	
+	public boolean hasOverride()
+	{
+		return (bindValues != null);
+	}
+	
+	public void setBindValues(ValueList values)
+	{
+		if (values == null)
+		{
+			bindValues = null;
+		}
+		else
+		{
+			bindValues = new ValueList();
+			bindValues.addAll(values);
+		}
+	}
+	
+	public ValueList getBindValues()
+	{
+		return this.bindValues;
+	}
+	
+	public TCType getType()
+	{
+		return type;
+	}
 }

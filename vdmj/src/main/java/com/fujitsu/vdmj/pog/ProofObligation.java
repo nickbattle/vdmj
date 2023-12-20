@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingExpressionVisitor;
 import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 import com.fujitsu.vdmj.po.types.POPatternListTypePair;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -59,6 +60,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	public boolean isCheckable;
 	public TCTypeList typeParams;
 	public POAnnotationList annotations;
+	
 	public Context counterexample;
 	public Context witness;
 	public String message;
@@ -80,8 +82,8 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		this.isCheckable = ctxt.isCheckable();	// Set false for operation POs
 		this.typeParams = ctxt.getTypeParams();
 		this.annotations = ctxt.getAnnotations();
-		this.counterexample = new Context(location, "Counterexample", null);
-		this.witness = new Context(location, "Witness", null);
+		this.counterexample = null;
+		this.witness = null;
 		this.message = null;
 		this.provedBy = null;
 		
@@ -110,7 +112,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 
 	public void setCounterexample(Context path)
 	{
-		counterexample.clear();
+		counterexample = new Context(location, "Counterexample", null);
 		Context ctxt = path;
 		
 		while (ctxt != null && ctxt.outer != null)
@@ -122,7 +124,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	
 	public void setWitness(Context path)
 	{
-		witness.clear();
+		witness = new Context(location, "Witness", null);
 		Context ctxt = path;
 		
 		while (ctxt != null && ctxt.outer != null)
@@ -226,9 +228,9 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	 */
 	public String getCexLaunch()
 	{
-		if (counterexample.isEmpty())
+		if (counterexample == null)
 		{
-			return null;
+			return getLaunch(Interpreter.getInstance().getInitialContext());
 		}
 		
 		return getLaunch(counterexample);
@@ -236,9 +238,9 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 	
 	public String getWitnessLaunch()
 	{
-		if (witness.isEmpty())
+		if (witness == null)
 		{
-			return null;
+			return getLaunch(Interpreter.getInstance().getInitialContext());
 		}
 		
 		return getLaunch(witness);

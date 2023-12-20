@@ -87,11 +87,11 @@ public class QCRunLSPCommand extends AnalysisCommand
 				
 				String launch = null;
 				
-				if (!obligation.counterexample.isEmpty())
+				if (obligation.counterexample != null)
 				{
 					launch = obligation.getCexLaunch();
 				}
-				else if (!obligation.witness.isEmpty())
+				else if (obligation.witness != null)
 				{
 					launch = obligation.getWitnessLaunch();
 				}

@@ -25,8 +25,11 @@
 package quickcheck.strategies;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.values.ValueList;
 
@@ -47,6 +50,8 @@ public class StrategyResults
 	public final Map<String, ValueList> counterexamples;
 	public final boolean hasAllValues;		// Contains all possible values from all binds
 	
+	public INExpression inExpression;		// The INExpression
+	public List<INBindingOverride> binds;	// The binds used	
 	public long duration;					// time to generate counterexamples, in millisecs
 
 	public StrategyResults()
@@ -85,5 +90,15 @@ public class StrategyResults
 	public void setDuration(Long duration)
 	{
 		this.duration = duration;
+	}
+
+	public void setInExpression(INExpression inExpression)
+	{
+		this.inExpression = inExpression;
+	}
+
+	public void setBinds(List<INBindingOverride> binds)
+	{
+		this.binds = binds;
 	}
 }

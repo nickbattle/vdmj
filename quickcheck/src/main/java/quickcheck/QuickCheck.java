@@ -44,7 +44,8 @@ import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.patterns.INBindingSetter;
+import com.fujitsu.vdmj.in.patterns.INBindingOverride;
+import com.fujitsu.vdmj.in.patterns.INBindingGlobals;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
@@ -74,7 +75,6 @@ import quickcheck.strategies.FixedQCStrategy;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
 import quickcheck.visitors.FixedRangeCreator;
-import quickcheck.visitors.MaybeFinder;
 import quickcheck.visitors.TypeBindFinder;
 
 public class QuickCheck
@@ -175,7 +175,7 @@ public class QuickCheck
 	
 	public boolean initStrategies(long timeoutSecs)
 	{
-		this.timeout = (timeoutSecs == 0) ? DEFAULT_TIMEOUT : timeoutSecs * 1000;
+		this.timeout = (timeoutSecs < 0) ? DEFAULT_TIMEOUT : timeoutSecs * 1000;
 		boolean doChecks = true;
 		
 		for (QCStrategy strategy: strategies)
@@ -290,7 +290,7 @@ public class QuickCheck
 		}
 	}
 	
-	public List<INBindingSetter> getINBindList(INExpression inexp)
+	public List<INBindingOverride> getINBindList(INExpression inexp)
 	{
 		return inexp.apply(new TypeBindFinder(), null);
 	}
@@ -304,8 +304,8 @@ public class QuickCheck
 			return new StrategyResults();
 		}
 		
-		INExpression exp = getINExpression(po);
-		List<INBindingSetter> binds = getINBindList(exp);
+		INExpression poexp = getINExpression(po);
+		List<INBindingOverride> binds = getINBindList(poexp);
 		IterableContext ictxt = addTypeParams(po, Interpreter.getInstance().getInitialContext());
 		boolean hasAllValues = false;
 		long before = System.currentTimeMillis();
@@ -317,7 +317,7 @@ public class QuickCheck
 			for (QCStrategy strategy: strategies)
 			{
 				verbose("Invoking %s strategy\n", strategy.getName());
-				StrategyResults sresults = strategy.getValues(po, exp, binds, ictxt);
+				StrategyResults sresults = strategy.getValues(po, poexp, binds, ictxt);
 				Map<String, ValueList> cexamples = sresults.counterexamples;
 				
 				if (sresults.provedBy != null)	// No need to go further
@@ -352,7 +352,7 @@ public class QuickCheck
 				hasAllValues = hasAllValues || sresults.hasAllValues;	// At least one has all values
 			}
 		
-			for (INBindingSetter bind: binds)
+			for (INBindingOverride bind: binds)
 			{
 				ValueList values = union.get(bind.toString());
 				
@@ -367,16 +367,23 @@ public class QuickCheck
 			}
 		}
 		
-		return new StrategyResults(union, hasAllValues, System.currentTimeMillis() - before);
+		StrategyResults results = new StrategyResults(union, hasAllValues, System.currentTimeMillis() - before);
+		results.setBinds(binds);
+		results.setInExpression(poexp);
+		return results;
 	}
 	
 	public void checkObligation(ProofObligation po, StrategyResults results)
 	{
 		try
 		{
-			resetErrors();	// Only flag fatal errors
-			INExpression poexp = getINExpression(po);
-			List<INBindingSetter> bindings = getINBindList(poexp);;
+			resetErrors();		// Only flag fatal errors
+			
+			INBindingGlobals globals = INBindingGlobals.getInstance();
+			globals.clear();	// Clear before each obligation run
+			
+			INExpression poexp = results.inExpression;
+			List<INBindingOverride> bindings = results.binds;
 
 			if (!po.isCheckable)
 			{
@@ -396,14 +403,14 @@ public class QuickCheck
 
 			try
 			{
-				for (INBindingSetter mbind: bindings)
+				for (INBindingOverride mbind: bindings)
 				{
 					ValueList values = results.counterexamples.get(mbind.toString());
 					
 					if (values != null)
 					{
 						verbose("PO #%d, setting %s, %d values\n", po.number, mbind.toString(), values.size());
-						mbind.setBindValues(values, timeout, results.hasAllValues);
+						mbind.setBindValues(values);
 					}
 					else
 					{
@@ -411,6 +418,9 @@ public class QuickCheck
 						errorCount++;
 					}
 				}
+				
+				globals.setTimeout(timeout);
+				globals.setAllValues(results.hasAllValues);
 				
 				Context ctxt = Interpreter.getInstance().getInitialContext();
 				Interpreter.getInstance().setDefaultName(po.location.module);
@@ -432,7 +442,6 @@ public class QuickCheck
 				Value execResult = new BooleanValue(false);
 				ContextException execException = null;
 				boolean execCompleted = false;
-				boolean hasMaybe = false;
 				long before = System.currentTimeMillis();
 
 				try
@@ -447,10 +456,6 @@ public class QuickCheck
 					{
 						ictxt.next();
 						execResult = poexp.eval(ictxt);
-						
-						MaybeFinder finder = new MaybeFinder();
-						poexp.apply(finder, null);
-						hasMaybe = finder.hasMaybe();
 					}
 					while (ictxt.hasNext() && execResult.boolValue(ctxt));
 					
@@ -489,17 +494,6 @@ public class QuickCheck
 				}
 				else if (execResult instanceof BooleanValue)
 				{
-					boolean didTimeout = false;
-					
-					for (INBindingSetter mbind: bindings)
-					{
-						if (mbind.didTimeout())
-						{
-							didTimeout = true;
-							break;
-						}
-					}
-
 					if (execResult.boolValue(ctxt))
 					{
 						POStatus outcome = null;
@@ -507,18 +501,18 @@ public class QuickCheck
 						po.setWitness(null);
 						po.setProvedBy(null);
 						
-						if (didTimeout)
+						if (globals.didTimeout())
 						{
 							outcome = POStatus.TIMEOUT;
 						}
-						else if (hasMaybe)
+						else if (globals.hasMaybe())
 						{
 							outcome = POStatus.MAYBE;
 						}
 						else if (po.isExistential())
 						{
 							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
-							Context witness = findWitness(bindings);
+							Context witness = globals.getWitness();
 							po.setWitness(witness);
 							
 							if (witness != null)
@@ -545,7 +539,7 @@ public class QuickCheck
 					}
 					else
 					{
-						if (didTimeout)		// Result would have been true (above), but...
+						if (globals.didTimeout())		// Result would have been true (above), but...
 						{
 							infof(POStatus.TIMEOUT, "PO #%d, TIMEOUT %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.TIMEOUT);
@@ -578,7 +572,7 @@ public class QuickCheck
 							infof(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
 							po.setStatus(POStatus.FAILED);
 							printCounterexample(bindings);
-							po.setCounterexample(findCounterexample(bindings));
+							po.setCounterexample(globals.getCounterexample());
 							po.setWitness(null);
 							
 							if (execException != null)
@@ -624,12 +618,14 @@ public class QuickCheck
 				infoln(po);
 				errorCount++;
 			}
-			finally
+			finally		// Clear everything, to be safe
 			{
-				for (INBindingSetter mbind: bindings)
+				for (INBindingOverride mbind: bindings)
 				{
-					mbind.setBindValues(null, 0, false);	// Clears everything
+					mbind.setBindValues(null);
 				}
+				
+				globals.clear();
 			}
 		}
 		catch (Exception e)
@@ -712,11 +708,11 @@ public class QuickCheck
 		return ictxt;
 	}
 
-	private void printBindings(List<INBindingSetter> bindings)
+	private void printBindings(List<INBindingOverride> bindings)
 	{
 		int MAXVALUES = 10;
 		
-		for (INBindingSetter bind: bindings)
+		for (INBindingOverride bind: bindings)
 		{
 			infof("%s = [", bind);
 			
@@ -740,42 +736,8 @@ public class QuickCheck
 			}
 		}
 	}
-	
-	private Context findCounterexample(List<INBindingSetter> bindings)
-	{
-		Context ctxt = null;
-		
-		for (INBindingSetter setter: bindings)
-		{
-			ctxt = setter.getCounterexample();
-			
-			if (ctxt != null)
-			{
-				break;	// Any one will do - see INForAllExpression
-			}
-		}
 
-		return ctxt;
-	}
-	
-	private Context findWitness(List<INBindingSetter> bindings)
-	{
-		Context ctxt = null;
-		
-		for (INBindingSetter setter: bindings)
-		{
-			ctxt = setter.getWitness();
-			
-			if (ctxt != null)
-			{
-				break;	// Any one will do - see INExistsExpression
-			}
-		}
-
-		return ctxt;
-	}
-
-	private void printCounterexample(List<INBindingSetter> bindings)
+	private void printCounterexample(List<INBindingOverride> bindings)
 	{
 		if (bindings.isEmpty())
 		{
@@ -783,7 +745,7 @@ public class QuickCheck
 		}
 		else
 		{
-			Context path = findCounterexample(bindings);
+			Context path = INBindingGlobals.getInstance().getCounterexample();
 			String cex = stringOfContext(path);
 			
 			if (cex == null)
