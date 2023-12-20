@@ -49,7 +49,7 @@ public class INForAllExpression extends INExpression
 	public final INExpression predicate;
 	
 	/** Result information for QuickCheck */
-	private INBindingGlobals results = INBindingGlobals.getInstance();
+	public INBindingGlobals globals = null;
 
 	public INForAllExpression(LexLocation location,	INMultipleBindList bindList, INExpression predicate)
 	{
@@ -69,7 +69,7 @@ public class INForAllExpression extends INExpression
 	{
 		breakpoint.check(location, ctxt);
 		long start = System.currentTimeMillis();
-		long timeout = results.getTimeout();
+		long timeout = globals == null ? 0 : globals.getTimeout();
 
 		try
 		{
@@ -94,9 +94,13 @@ public class INForAllExpression extends INExpression
 				{
 					if (System.currentTimeMillis() - start > timeout)
 					{
-						results.setCounterexample(null);
-						results.setDidTimeout(true);
-						results.setMaybe(true);
+						if (globals != null)
+						{
+							globals.setCounterexample(null);
+							globals.setDidTimeout(true);
+							globals.setMaybe(true);
+						}
+						
 						return new BooleanValue(true);
 					}
 				}
@@ -127,11 +131,11 @@ public class INForAllExpression extends INExpression
 				{
 					if (matches && !predicate.eval(evalContext).boolValue(ctxt))
 					{
-						if (bindList.isInstrumented())
+						if (globals != null)
 						{
-							results.setCounterexample(evalContext);
-							results.setDidTimeout(false);
-							results.setMaybe();
+							globals.setCounterexample(evalContext);
+							globals.setDidTimeout(false);
+							globals.setMaybe();
 						}
 						
 						return new BooleanValue(false);
@@ -139,11 +143,11 @@ public class INForAllExpression extends INExpression
 				}
 				catch (ContextException e)
 				{
-					if (bindList.isInstrumented())
+					if (globals != null)
 					{
-						results.setCounterexample(evalContext);
-						results.setDidTimeout(false);
-						results.setMaybe();
+						globals.setCounterexample(evalContext);
+						globals.setDidTimeout(false);
+						globals.setMaybe();
 					}
 					
 					throw e;
@@ -159,9 +163,9 @@ public class INForAllExpression extends INExpression
 	    	return abort(e);
 	    }
 
-		if (bindList.isInstrumented())
+		if (globals != null)
 		{
-			results.setMaybe();
+			globals.setMaybe();
 		}
 		
 		return new BooleanValue(true);

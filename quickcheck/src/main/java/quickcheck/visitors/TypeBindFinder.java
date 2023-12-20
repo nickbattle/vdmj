@@ -28,8 +28,11 @@ import java.util.List;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.in.INVisitorSet;
+import com.fujitsu.vdmj.in.expressions.INExistsExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INForAllExpression;
 import com.fujitsu.vdmj.in.expressions.visitors.INLeafExpressionVisitor;
+import com.fujitsu.vdmj.in.patterns.INBindingGlobals;
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 
 public class TypeBindFinder extends INLeafExpressionVisitor<INBindingOverride, List<INBindingOverride>, Object>
@@ -61,6 +64,20 @@ public class TypeBindFinder extends INLeafExpressionVisitor<INBindingOverride, L
 	protected List<INBindingOverride> newCollection()
 	{
 		return new Vector<INBindingOverride>();
+	}
+	
+	@Override
+	public List<INBindingOverride> caseForAllExpression(INForAllExpression node, Object arg)
+	{
+		node.globals = INBindingGlobals.getInstance();
+		return super.caseForAllExpression(node, arg);
+	}
+	
+	@Override
+	public List<INBindingOverride> caseExistsExpression(INExistsExpression node, Object arg)
+	{
+		node.globals = INBindingGlobals.getInstance();
+		return super.caseExistsExpression(node, arg);
 	}
 
 	@Override

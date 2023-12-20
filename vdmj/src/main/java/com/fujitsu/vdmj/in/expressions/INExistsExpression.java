@@ -46,7 +46,7 @@ public class INExistsExpression extends INExpression
 	public final INExpression predicate;
 	
 	/** Result information for QuickCheck */
-	private INBindingGlobals results = INBindingGlobals.getInstance();
+	public INBindingGlobals globals = null;
 
 	public INExistsExpression(LexLocation location, INMultipleBindList bindList, INExpression predicate)
 	{
@@ -66,7 +66,7 @@ public class INExistsExpression extends INExpression
 	{
 		breakpoint.check(location, ctxt);
 		long start = System.currentTimeMillis();
-		long timeout = results.getTimeout();
+		long timeout = globals == null ? 0 : globals.getTimeout();
 
 		try
 		{
@@ -91,9 +91,13 @@ public class INExistsExpression extends INExpression
 				{
 					if (System.currentTimeMillis() - start > timeout)
 					{
-						results.setWitness(null);
-						results.setDidTimeout(true);
-						results.setMaybe(true);
+						if (globals != null)
+						{
+							globals.setWitness(null);
+							globals.setDidTimeout(true);
+							globals.setMaybe(true);
+						}
+						
 						return new BooleanValue(true);
 					}
 				}
@@ -124,11 +128,11 @@ public class INExistsExpression extends INExpression
 				{
 					if (matches && predicate.eval(evalContext).boolValue(ctxt))
 					{
-						if (bindList.isInstrumented())
+						if (globals != null)
 						{
-							results.setWitness(evalContext);
-							results.setDidTimeout(false);
-							results.setMaybe(false);
+							globals.setWitness(evalContext);
+							globals.setDidTimeout(false);
+							globals.setMaybe(false);
 						}
 						
 						return new BooleanValue(true);
@@ -145,9 +149,9 @@ public class INExistsExpression extends INExpression
 	    	abort(e);
 	    }
 
-		if (bindList.isInstrumented())
+		if (globals != null)
 		{
-			results.setMaybe();
+			globals.setMaybe();
 		}
 		
 		return new BooleanValue(false);

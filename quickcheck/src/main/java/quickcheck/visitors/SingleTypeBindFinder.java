@@ -50,6 +50,7 @@ public class SingleTypeBindFinder extends INLeafBindVisitor<INBindingOverride, L
 	public List<INBindingOverride> caseTypeBind(INTypeBind node, Object arg)
 	{
 		List<INBindingOverride> binds = newCollection();
+		node.setter = new INBindingOverride(node.toString(), node.type);
 		binds.add(node.setter);
 		return binds;
 	}

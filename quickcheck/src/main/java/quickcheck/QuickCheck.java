@@ -304,8 +304,8 @@ public class QuickCheck
 			return new StrategyResults();
 		}
 		
-		INExpression exp = getINExpression(po);
-		List<INBindingOverride> binds = getINBindList(exp);
+		INExpression poexp = getINExpression(po);
+		List<INBindingOverride> binds = getINBindList(poexp);
 		IterableContext ictxt = addTypeParams(po, Interpreter.getInstance().getInitialContext());
 		boolean hasAllValues = false;
 		long before = System.currentTimeMillis();
@@ -317,7 +317,7 @@ public class QuickCheck
 			for (QCStrategy strategy: strategies)
 			{
 				verbose("Invoking %s strategy\n", strategy.getName());
-				StrategyResults sresults = strategy.getValues(po, exp, binds, ictxt);
+				StrategyResults sresults = strategy.getValues(po, poexp, binds, ictxt);
 				Map<String, ValueList> cexamples = sresults.counterexamples;
 				
 				if (sresults.provedBy != null)	// No need to go further
@@ -367,7 +367,10 @@ public class QuickCheck
 			}
 		}
 		
-		return new StrategyResults(union, hasAllValues, System.currentTimeMillis() - before);
+		StrategyResults results = new StrategyResults(union, hasAllValues, System.currentTimeMillis() - before);
+		results.setBinds(binds);
+		results.setInExpression(poexp);
+		return results;
 	}
 	
 	public void checkObligation(ProofObligation po, StrategyResults results)
@@ -379,8 +382,8 @@ public class QuickCheck
 			INBindingGlobals globals = INBindingGlobals.getInstance();
 			globals.clear();	// Clear before each obligation run
 			
-			INExpression poexp = getINExpression(po);
-			List<INBindingOverride> bindings = getINBindList(poexp);;
+			INExpression poexp = results.inExpression;
+			List<INBindingOverride> bindings = results.binds;
 
 			if (!po.isCheckable)
 			{

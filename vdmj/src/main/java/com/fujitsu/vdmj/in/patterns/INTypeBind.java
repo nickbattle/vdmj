@@ -41,8 +41,8 @@ public class INTypeBind extends INBind
 	private static final long serialVersionUID = 1L;
 	public final TCType type;
 	public final boolean hasTypeParams;
-	public final INBindingOverride setter;
 	
+	public INBindingOverride setter = null;
 	private ValueList bindValues = null;
 	private boolean bindPermuted = false;
 
@@ -51,7 +51,6 @@ public class INTypeBind extends INBind
 		super(pattern.location, pattern);
 		this.type = type;
 		this.hasTypeParams = !type.apply(new TCParameterCollector(), null).isEmpty();
-		this.setter = new INBindingOverride(toString(), type);
 	}
 	@Override
 	public INMultipleBindList getMultipleBindList()
@@ -72,7 +71,7 @@ public class INTypeBind extends INBind
 	@Override
 	public ValueList getBindValues(Context ctxt, boolean permuted) throws ValueException
 	{
-		if (setter.hasOverride())
+		if (setter != null && setter.hasOverride())
 		{
 			return setter.getBindValues();
 		}
