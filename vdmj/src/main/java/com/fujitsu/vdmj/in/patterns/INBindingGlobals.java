@@ -131,11 +131,6 @@ public class INBindingGlobals
 		this.maybe = this.maybe || maybe;	// Cumulative
 	}
 	
-	public void setMaybe()
-	{
-		this.maybe = this.maybe || (!bindAllValues);	// Cumulative
-	}
-	
 	public boolean hasMaybe()
 	{
 		return maybe;

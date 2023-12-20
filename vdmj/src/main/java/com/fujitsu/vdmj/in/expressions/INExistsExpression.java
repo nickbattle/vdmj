@@ -151,7 +151,7 @@ public class INExistsExpression extends INExpression
 
 		if (globals != null)
 		{
-			globals.setMaybe();
+			globals.setMaybe(!bindList.hasAllValues());
 		}
 		
 		return new BooleanValue(false);
