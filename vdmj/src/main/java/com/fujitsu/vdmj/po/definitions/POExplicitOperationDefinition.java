@@ -27,6 +27,8 @@ package com.fujitsu.vdmj.po.definitions;
 import java.util.List;
 import java.util.Vector;
 
+import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.visitors.PODefinitionVisitor;
 import com.fujitsu.vdmj.po.expressions.POExpression;
@@ -128,12 +130,17 @@ public class POExplicitOperationDefinition extends PODefinition
 			obligations.add(new ParameterPatternObligation(this, ctxt));
 		}
 
-		if (precondition != null)
+		/**
+		 * Pre- and postconditions for OO dialects are not clearly defined, and obligations
+		 * generated from them are generally not type-checkable. So we conditionally
+		 * exclude them, depending on the dialect.
+		 */
+		if (precondition != null && Settings.dialect == Dialect.VDM_SL)
 		{
 			obligations.addAll(predef.getProofObligations(ctxt, env));
 		}
 
-		if (postcondition != null)
+		if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
 		{
 			if (precondition != null)
 			{
@@ -152,7 +159,7 @@ public class POExplicitOperationDefinition extends PODefinition
 			obligations.add(new OperationPostConditionObligation(this, ctxt));
 			ctxt.pop();
 		}
-
+		
 		ctxt.push(new PONoCheckContext());
 		obligations.addAll(body.getProofObligations(ctxt, env));
 
