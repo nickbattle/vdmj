@@ -254,7 +254,9 @@ public class ProofObligationList extends Vector<ProofObligation>
 		// in some proof strategies.
 		
 		POExpression poexp = ClassMapper.getInstance(PONode.MAPPINGS).convert(tcexp);
-		ProofObligationList popos = poexp.getProofObligations(new POContextStack(), env);
+		POContextStack stack = new POContextStack();
+		stack.push(new PONameContext());	// Must have one context
+		ProofObligationList popos = poexp.getProofObligations(stack, env);
 		obligation.setHasObligations(!popos.isEmpty());
 	}
 
