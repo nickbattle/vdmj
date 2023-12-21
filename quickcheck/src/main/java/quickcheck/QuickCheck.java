@@ -376,7 +376,7 @@ public class QuickCheck
 		return results;
 	}
 	
-	public void checkObligation(ProofObligation po, StrategyResults results)
+	public void checkObligation(ProofObligation po, StrategyResults sresults)
 	{
 		try
 		{
@@ -390,25 +390,25 @@ public class QuickCheck
 				infof(POStatus.UNCHECKED, "PO #%d, UNCHECKED\n", po.number);
 				return;
 			}
-			else if (results.provedBy != null)
+			else if (sresults.provedBy != null)
 			{
 				po.setStatus(POStatus.PROVED);
-				po.setProvedBy(results.provedBy);
-				po.setMessage(results.message);
-				po.setWitness(results.witness);
+				po.setProvedBy(sresults.provedBy);
+				po.setMessage(sresults.message);
+				po.setWitness(sresults.witness);
 				po.setCounterexample(null);
-				infof(POStatus.PROVED, "PO #%d, PROVED by %s %s %s\n", po.number, results.provedBy, results.message, duration(results.duration));
+				infof(POStatus.PROVED, "PO #%d, PROVED by %s %s %s\n", po.number, sresults.provedBy, sresults.message, duration(sresults.duration));
 				return;
 			}
 			
-			INExpression poexp = results.inExpression;
-			List<INBindingOverride> bindings = results.binds;
+			INExpression poexp = sresults.inExpression;
+			List<INBindingOverride> bindings = sresults.binds;
 
 			try
 			{
 				for (INBindingOverride mbind: bindings)
 				{
-					ValueList values = results.counterexamples.get(mbind.toString());
+					ValueList values = sresults.counterexamples.get(mbind.toString());
 					
 					if (values != null)
 					{
@@ -423,7 +423,7 @@ public class QuickCheck
 				}
 				
 				globals.setTimeout(timeout);
-				globals.setAllValues(results.hasAllValues);
+				globals.setAllValues(sresults.hasAllValues);
 				
 				Context ctxt = Interpreter.getInstance().getInitialContext();
 				Interpreter.getInstance().setDefaultName(po.location.module);
@@ -486,7 +486,7 @@ public class QuickCheck
 					INAnnotation.suspend(false);
 				}
 				
-				long after = System.currentTimeMillis() + results.duration;
+				long after = System.currentTimeMillis() + sresults.duration;
 				
 				if (execResult == null)		// cancelled
 				{
@@ -524,7 +524,7 @@ public class QuickCheck
 								po.setProvedBy("witness");
 							}
 						}
-						else if (results.hasAllValues && execCompleted)
+						else if (sresults.hasAllValues && execCompleted)
 						{
 							outcome = POStatus.PROVED;		// All values were tested and passed, so PROVED
 							desc = " by finite types";
@@ -552,7 +552,7 @@ public class QuickCheck
 						}
 						else if (po.isExistential())	// Principal exp is "exists..."
 						{
-							if (results.hasAllValues)
+							if (sresults.hasAllValues)
 							{
 								infof(POStatus.FAILED, "PO #%d, FAILED (unsatisfiable) %s\n", po.number, duration(before, after));
 								po.setStatus(POStatus.FAILED);
