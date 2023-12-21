@@ -87,7 +87,11 @@ public class QCRunCommand extends AnalysisCommand
 					
 					String launch = null;
 					
-					if (obligation.counterexample != null)
+					if (obligation.definition == null || obligation.definition.name == null)
+					{
+						return "Obligation does not have a callable definition?"; 
+					}
+					else if (obligation.counterexample != null)
 					{
 						launch = obligation.getCexLaunch();
 					}

@@ -87,7 +87,12 @@ public class QCRunLSPCommand extends AnalysisCommand
 				
 				String launch = null;
 				
-				if (obligation.counterexample != null)
+				if (obligation.definition == null || obligation.definition.name == null)
+				{
+					return new DAPMessageList(request, false,
+							"Obligation does not have a callable definition?", null); 
+				}
+				else if (obligation.counterexample != null)
 				{
 					launch = obligation.getCexLaunch();
 				}

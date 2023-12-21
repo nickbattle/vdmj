@@ -262,28 +262,10 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		{
 			POTypeDefinition td = (POTypeDefinition)definition;
 			
-			if (kind == POType.TOTAL_ORDER && td.orddef != null)
+			if ((kind == POType.TOTAL_ORDER || kind == POType.STRICT_ORDER) && td.orddef != null)
 			{
-				// The PO defines params "x" < "y" but ord_T is "p1$" < "p2$".
-				// So we create a patched context...
-				Context patched = new Context(ctxt.location, ctxt.title, ctxt.outer);
-				
-				for (TCNameToken key: ctxt.keySet())
-				{
-					Value arg = ctxt.get(key);
-					
-					if (key.getName().equals("x"))
-					{
-						key = new TCNameToken(key.getLocation(), key.getModule(), "p1$");
-					}
-					else if (key.getName().equals("y"))
-					{
-						key = new TCNameToken(key.getLocation(), key.getModule(), "p2$");
-					}
-
-					patched.put(key, arg);
-				}
-				
+				// The PO defines params "x" < "y" etc, but ord_T is "p1$" < "p2$".
+				Context patched = patchContext(ctxt, "x", "p1$", "y", "p2$", "z", "p3$"); 
 				return launchExplicitFunction(td.orddef, patched);
 			}
 			else if (td.invdef != null)
@@ -409,6 +391,29 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		POGetMatchingConstantVisitor visitor = new POGetMatchingConstantVisitor();
 		String result = p.apply(visitor, ctxt);
 		return visitor.hasFailed() ? null : result;
+	}
+	
+	private Context patchContext(Context ctxt, String... args)
+	{
+		Context patched = new Context(ctxt.location, ctxt.title, ctxt.outer);
+		
+		for (TCNameToken key: ctxt.keySet())
+		{
+			Value value = ctxt.get(key);
+			
+			for (int a=0; a < args.length; a = a + 2)
+			{
+				if (key.getName().equals(args[a]))
+				{
+					key = new TCNameToken(key.getLocation(), key.getModule(), args[a+1]);
+					break;
+				}
+			}
+			
+			patched.put(key, value);
+		}
+	
+		return patched;
 	}
 
 	public boolean hasObligations()
