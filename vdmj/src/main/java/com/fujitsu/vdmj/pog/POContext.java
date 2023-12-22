@@ -119,6 +119,6 @@ abstract public class POContext
 
 	public PODefinition getDefinition()
 	{
-		return null;
+		return null;	// See fn/op contexts, also overridden by various POs
 	}
 }

@@ -27,57 +27,70 @@ package com.fujitsu.vdmj.pog;
 public enum POType
 {
 	MAP_APPLY("map apply"),
-	FUNC_APPLY("function apply"),
-	SEQ_APPLY("sequence apply"),
+	FUNC_APPLY("function apply", true),
+	SEQ_APPLY("sequence apply", true),
 	FUNC_POST_CONDITION("post condition"),
-	FUNC_SATISFIABILITY("function satisfiability"),
+	FUNC_SATISFIABILITY("function satisfiability", true),
 	FUNC_PATTERNS("function parameter patterns"),
 	LET_BE_EXISTS("let be st existence"),
-	UNIQUE_EXISTENCE("unique existence binding"),	// Note: not existential!
-	FUNC_ITERATION("function iteration"),
-	MAP_ITERATION("map iteration"),
-	FUNC_COMPOSE("function compose"),
-	MAP_COMPOSE("map compose"),
-	NON_EMPTY_SET("non-empty set"),
-	NON_EMPTY_SEQ("non-empty sequence"),
-	NON_ZERO("non-zero"),
-	FINITE_MAP("finite map"),
-	FINITE_SET("finite set"),
-	MAP_COMPATIBLE("map compatible"),
-	MAP_SEQ_OF_COMPATIBLE("map sequence compatible"),
-	MAP_SET_OF_COMPATIBLE("map set compatible"),
-	SEQ_MODIFICATION("sequence modification"),
-	VALUE_BINDING("value binding"),
-	SUB_TYPE("subtype"),
-	CASES_EXHAUSTIVE("cases exhaustive"),
-	INVARIANT("type invariant"),
+	UNIQUE_EXISTENCE("unique existence binding", true),
+	FUNC_ITERATION("function iteration", true),
+	MAP_ITERATION("map iteration", true),
+	FUNC_COMPOSE("function compose", true),
+	MAP_COMPOSE("map compose", true),
+	NON_EMPTY_SET("non-empty set", true),
+	NON_EMPTY_SEQ("non-empty sequence", true),
+	NON_ZERO("non-zero", true),
+	FINITE_MAP("finite map", true),
+	FINITE_SET("finite set", true),
+	MAP_COMPATIBLE("map compatible", true),
+	MAP_SEQ_OF_COMPATIBLE("map sequence compatible", true),
+	MAP_SET_OF_COMPATIBLE("map set compatible", true),
+	SEQ_MODIFICATION("sequence modification", true),
+	VALUE_BINDING("value binding", true),
+	SUB_TYPE("subtype", true),
+	CASES_EXHAUSTIVE("cases exhaustive", true),
+	INVARIANT("type invariant", true),
 	RECURSIVE("recursive function"),
 	STATE_INVARIANT("state invariant"),
 	WHILE_LOOP("while loop termination"),
 	OP_POST_CONDITION("operation post condition"),
 	OPERATION_PATTERNS("operation parameter patterns"),
-	OP_SATISFIABILITY("operation satisfiability"),
-	SET_MEMBER("set membership"),
-	SEQ_MEMBER("sequence membership"),
+	OP_SATISFIABILITY("operation satisfiability", true),
+	SET_MEMBER("set membership", true),
+	SEQ_MEMBER("sequence membership", true),
 	ORDERED("ordered"),
-	STRICT_ORDER("strict order"),
-	TOTAL_ORDER("total order"),
-	EQUIV_RELATION("equivalence relation"),
+	STRICT_ORDER("strict order", true),
+	TOTAL_ORDER("total order", true),
+	EQUIV_RELATION("equivalence relation", true),
 	TOTAL("total function"),
-	INV_SATISFIABILITY("invariant satisfiability"),
+	INV_SATISFIABILITY("invariant satisfiability", true),
 	THEOREM("theorem"),
-	STATE_INIT("state init");
+	STATE_INIT("state init", true);
 
 	private String kind;
+	private boolean standAlone;
 
 	POType(String kind)
 	{
 		this.kind = kind;
+		this.standAlone = false;
+	}
+
+	POType(String kind, boolean standAlone)
+	{
+		this.kind = kind;
+		this.standAlone = standAlone;
 	}
 
 	@Override
 	public String toString()
 	{
 		return kind;
+	}
+	
+	public boolean isStandAlone()
+	{
+		return standAlone;
 	}
 }

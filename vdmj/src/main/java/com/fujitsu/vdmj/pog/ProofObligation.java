@@ -29,7 +29,6 @@ import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.definitions.POImplicitFunctionDefinition;
-import com.fujitsu.vdmj.po.definitions.POTypeDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.po.patterns.visitors.POGetMatchingConstantVisitor;
@@ -40,12 +39,10 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.tc.expressions.TCExistsExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.values.ParameterValue;
-import com.fujitsu.vdmj.values.Value;
 
 abstract public class ProofObligation implements Comparable<ProofObligation>
 {
@@ -112,25 +109,39 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 
 	public void setCounterexample(Context path)
 	{
-		counterexample = new Context(location, "Counterexample", null);
-		Context ctxt = path;
-		
-		while (ctxt != null && ctxt.outer != null)
+		if (path == null)
 		{
-			counterexample.putAll(ctxt);
-			ctxt = ctxt.outer;
+			counterexample = null;
+		}
+		else
+		{
+			counterexample = new Context(location, "Counterexample", null);
+			Context ctxt = path;
+			
+			while (ctxt != null && ctxt.outer != null)
+			{
+				counterexample.putAll(ctxt);
+				ctxt = ctxt.outer;
+			}
 		}
 	}
 	
 	public void setWitness(Context path)
 	{
-		witness = new Context(location, "Witness", null);
-		Context ctxt = path;
-		
-		while (ctxt != null && ctxt.outer != null)
+		if (path == null)
 		{
-			witness.putAll(ctxt);
-			ctxt = ctxt.outer;
+			witness = null;
+		}
+		else
+		{
+			witness = new Context(location, "Witness", null);
+			Context ctxt = path;
+			
+			while (ctxt != null && ctxt.outer != null)
+			{
+				witness.putAll(ctxt);
+				ctxt = ctxt.outer;
+			}
 		}
 	}
 
@@ -246,7 +257,7 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		return getLaunch(witness);
 	}
 
-	private String getLaunch(Context ctxt)
+	public String getLaunch(Context ctxt)
 	{
 		if (definition instanceof POExplicitFunctionDefinition)
 		{
@@ -258,20 +269,10 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 			POImplicitFunctionDefinition ifd = (POImplicitFunctionDefinition)definition;
 			return launchImplicitFunction(ifd, ctxt);
 		}
-		else if (definition instanceof POTypeDefinition)
+		else if (kind.isStandAlone())
 		{
-			POTypeDefinition td = (POTypeDefinition)definition;
-			
-			if ((kind == POType.TOTAL_ORDER || kind == POType.STRICT_ORDER) && td.orddef != null)
-			{
-				// The PO defines params "x" < "y" etc, but ord_T is "p1$" < "p2$".
-				Context patched = patchContext(ctxt, "x", "p1$", "y", "p2$", "z", "p3$"); 
-				return launchExplicitFunction(td.orddef, patched);
-			}
-			else if (td.invdef != null)
-			{
-				return launchExplicitFunction(td.invdef, ctxt);
-			}
+			// PO is a stand alone expression, so just execute that
+			return value.trim();
 		}
 
 		return null;	// Unexpected definition
@@ -391,29 +392,6 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 		POGetMatchingConstantVisitor visitor = new POGetMatchingConstantVisitor();
 		String result = p.apply(visitor, ctxt);
 		return visitor.hasFailed() ? null : result;
-	}
-	
-	private Context patchContext(Context ctxt, String... args)
-	{
-		Context patched = new Context(ctxt.location, ctxt.title, ctxt.outer);
-		
-		for (TCNameToken key: ctxt.keySet())
-		{
-			Value value = ctxt.get(key);
-			
-			for (int a=0; a < args.length; a = a + 2)
-			{
-				if (key.getName().equals(args[a]))
-				{
-					key = new TCNameToken(key.getLocation(), key.getModule(), args[a+1]);
-					break;
-				}
-			}
-			
-			patched.put(key, value);
-		}
-	
-		return patched;
 	}
 
 	public boolean hasObligations()

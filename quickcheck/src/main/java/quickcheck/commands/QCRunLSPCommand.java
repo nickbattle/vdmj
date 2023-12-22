@@ -86,24 +86,31 @@ public class QCRunLSPCommand extends AnalysisCommand
 				}
 				
 				String launch = null;
-				
-				if (obligation.definition == null || obligation.definition.name == null)
+
+				if (obligation.definition != null)
 				{
-					return new DAPMessageList(request, false,
-							"Obligation does not have a callable definition?", null); 
+					if (obligation.counterexample != null)
+					{
+						launch = obligation.getCexLaunch();
+					}
+					else if (obligation.witness != null)
+					{
+						launch = obligation.getWitnessLaunch();
+					}
+					else
+					{
+						return new DAPMessageList(request, false,
+							"Obligation does not have a counterexample/witness. Run qc?", null);
+					}
 				}
-				else if (obligation.counterexample != null)
+				else if (obligation.kind.isStandAlone())
 				{
-					launch = obligation.getCexLaunch();
-				}
-				else if (obligation.witness != null)
-				{
-					launch = obligation.getWitnessLaunch();
+					launch = obligation.getLaunch(null);
 				}
 				else
 				{
 					return new DAPMessageList(request, false,
-						"Obligation does not have a counterexample/witness. Run qc?", null);
+							"Obligation does not have a callable definition?", null); 
 				}
 				
 				if (launch != null)
