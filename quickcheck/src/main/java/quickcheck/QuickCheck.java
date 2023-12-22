@@ -570,6 +570,14 @@ public class QuickCheck
 							po.setCounterexample(null);
 							po.setWitness(null);
 						}
+						if (globals.hasMaybe() && execCompleted)
+						{
+							infof(POStatus.MAYBE, "PO #%d, MAYBE %s\n", po.number, duration(before, after));
+							po.setStatus(POStatus.MAYBE);
+							po.setMessage(null);
+							po.setCounterexample(null);
+							po.setWitness(null);
+						}
 						else
 						{
 							infof(POStatus.FAILED, "PO #%d, FAILED %s: ", po.number, duration(before, after));
