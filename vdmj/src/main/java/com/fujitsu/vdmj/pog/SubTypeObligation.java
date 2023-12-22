@@ -175,7 +175,6 @@ public class SubTypeObligation extends ProofObligation
 			new TCNameToken(def.location, def.name.getModule(), "RESULT"), null);
 
 		value = ctxt.getObligation(oneType(false, result, def.type.result, actualResult));
-		definition = def;
 	}
 
 	public SubTypeObligation(
@@ -204,7 +203,6 @@ public class SubTypeObligation extends ProofObligation
 		}
 
 		value = ctxt.getObligation(oneType(false, result, def.type.result, actualResult));
-		definition = def;
 	}
 
 	private String oneType(boolean rec, POExpression exp, TCType etype, TCType atype)

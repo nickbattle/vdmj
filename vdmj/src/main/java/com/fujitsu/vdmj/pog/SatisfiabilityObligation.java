@@ -43,7 +43,6 @@ public class SatisfiabilityObligation extends ProofObligation
 	public SatisfiabilityObligation(POImplicitFunctionDefinition func, POContextStack ctxt)
 	{
 		super(func.location, POType.FUNC_SATISFIABILITY, ctxt);
-		this.definition = func;
 		StringBuilder sb = new StringBuilder();
 
 		if (func.predef != null)
@@ -107,13 +106,11 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(")");
 
 		value = ctxt.getObligation(sb.toString());
-		definition = op;
 	}
 
 	public SatisfiabilityObligation(POTypeDefinition typedef, POContextStack ctxt)
 	{
 		super(typedef.location, POType.INV_SATISFIABILITY, ctxt);
-		this.definition = typedef.invdef;
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("exists ");
@@ -135,7 +132,6 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(typedef.invExpression);
 		
 		value = ctxt.getObligation(sb.toString());
-		definition = typedef;
 	}
 
 	public SatisfiabilityObligation(POStateDefinition statedef, POContextStack ctxt)
@@ -153,7 +149,6 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(statedef.invExpression);
 		
 		value = ctxt.getObligation(sb.toString());
-		definition = statedef;
 	}
 
 	private void appendResult(StringBuilder sb, POPatternTypePair ptp)

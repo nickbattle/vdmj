@@ -38,6 +38,5 @@ public class StrictOrderObligation extends ProofObligation
 		po = po.replaceAll("%N", ordT.getName());
 		po = po.replaceAll("%T", def.name.getName());
 		value = ctxt.getObligation(po);
-		definition = def;
 	}
 }
