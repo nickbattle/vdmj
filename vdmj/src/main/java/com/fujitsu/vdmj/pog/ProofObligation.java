@@ -109,25 +109,39 @@ abstract public class ProofObligation implements Comparable<ProofObligation>
 
 	public void setCounterexample(Context path)
 	{
-		counterexample = new Context(location, "Counterexample", null);
-		Context ctxt = path;
-		
-		while (ctxt != null && ctxt.outer != null)
+		if (path == null)
 		{
-			counterexample.putAll(ctxt);
-			ctxt = ctxt.outer;
+			counterexample = null;
+		}
+		else
+		{
+			counterexample = new Context(location, "Counterexample", null);
+			Context ctxt = path;
+			
+			while (ctxt != null && ctxt.outer != null)
+			{
+				counterexample.putAll(ctxt);
+				ctxt = ctxt.outer;
+			}
 		}
 	}
 	
 	public void setWitness(Context path)
 	{
-		witness = new Context(location, "Witness", null);
-		Context ctxt = path;
-		
-		while (ctxt != null && ctxt.outer != null)
+		if (path == null)
 		{
-			witness.putAll(ctxt);
-			ctxt = ctxt.outer;
+			witness = null;
+		}
+		else
+		{
+			witness = new Context(location, "Witness", null);
+			Context ctxt = path;
+			
+			while (ctxt != null && ctxt.outer != null)
+			{
+				witness.putAll(ctxt);
+				ctxt = ctxt.outer;
+			}
 		}
 	}
 
