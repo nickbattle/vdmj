@@ -39,5 +39,6 @@ public class EquivRelationObligation extends ProofObligation
 		po = po.replaceAll("%N", eqT.getName());
 		po = po.replaceAll("%T", def.name.getName());
 		value = ctxt.getObligation(po);
+		definition = def;
 	}
 }

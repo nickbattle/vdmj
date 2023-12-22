@@ -34,6 +34,6 @@ public class TotalOrderObligation extends ProofObligation
 		String po = "(forall x:%T, y:%T & x <= y or y <= x)";
 		po = po.replaceAll("%T", def.name.getName());
 		value = ctxt.getObligation(po);
-		this.definition = def;
+		definition = def;
 	}
 }

@@ -56,6 +56,7 @@ public class ParameterPatternObligation extends ProofObligation
 		this.predef = def.predef;
 		value = ctxt.getObligation(
 			generate(def.paramPatternList, def.type.parameters, def.type.result));
+		definition = def;
 	}
 
 	public ParameterPatternObligation(
@@ -65,6 +66,7 @@ public class ParameterPatternObligation extends ProofObligation
 		this.predef = def.predef;
 		value = ctxt.getObligation(
 			generate(def.getParamPatternList(), def.type.parameters, def.type.result));
+		definition = def;
 	}
 
 	public ParameterPatternObligation(
@@ -74,6 +76,7 @@ public class ParameterPatternObligation extends ProofObligation
 		this.predef = def.predef;
 		value = ctxt.getObligation(
 			generate(def.getParamPatternList(), def.type.parameters, def.type.result));
+		definition = def;
 	}
 
 	public ParameterPatternObligation(
@@ -83,6 +86,7 @@ public class ParameterPatternObligation extends ProofObligation
 		this.predef = def.predef;
 		value = ctxt.getObligation(
 			generate(def.getListParamPatternList(), def.type.parameters, def.type.result));
+		definition = def;
 	}
 
 	private String generate(List<POPatternList> plist, TCTypeList params, TCType result)

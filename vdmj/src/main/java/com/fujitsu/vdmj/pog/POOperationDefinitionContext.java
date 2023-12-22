@@ -43,6 +43,7 @@ public class POOperationDefinitionContext extends POContext
 	public final POPatternList paramPatternList;
 	public final boolean addPrecond;
 	public final String precondition;
+	public final PODefinition definition;
 	public final PODefinition stateDefinition;
 
 	public POOperationDefinitionContext(POImplicitOperationDefinition definition,
@@ -54,6 +55,13 @@ public class POOperationDefinitionContext extends POContext
 		this.paramPatternList = definition.getParamPatternList();
 		this.precondition = preconditionCall(name, null, paramPatternList, definition.precondition);
 		this.stateDefinition = stateDefinition;
+		this.definition = definition;
+	}
+	
+	@Override
+	public PODefinition getDefinition()
+	{
+		return definition;
 	}
 
 	@Override

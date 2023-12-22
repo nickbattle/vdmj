@@ -38,6 +38,7 @@ public class OperationPostConditionObligation extends ProofObligation
 	{
 		super(op.location, POType.OP_POST_CONDITION, ctxt);
 		value = ctxt.getObligation(getExp(op.precondition, op.postcondition, null));
+		definition = op;
 	}
 
 	public OperationPostConditionObligation(
@@ -45,6 +46,7 @@ public class OperationPostConditionObligation extends ProofObligation
 	{
 		super(op.location, POType.OP_POST_CONDITION, ctxt);
 		value = ctxt.getObligation(getExp(op.precondition, op.postcondition, op.errors));
+		definition = op;
 	}
 
 	private String getExp(POExpression preexp, POExpression postexp, List<POErrorCase> errs)

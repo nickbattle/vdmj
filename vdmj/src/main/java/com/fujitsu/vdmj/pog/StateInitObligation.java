@@ -33,5 +33,6 @@ public class StateInitObligation extends ProofObligation
 		super(def.location, POType.STATE_INIT, ctxt);
 		this.definition = def.initdef;
 		value = ctxt.getObligation("exists " + def.initPattern + " : " + def.name + " & " + def.initExpression);
+		definition = def;
 	}
 }

@@ -107,6 +107,7 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(")");
 
 		value = ctxt.getObligation(sb.toString());
+		definition = op;
 	}
 
 	public SatisfiabilityObligation(POTypeDefinition typedef, POContextStack ctxt)
@@ -134,6 +135,7 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(typedef.invExpression);
 		
 		value = ctxt.getObligation(sb.toString());
+		definition = typedef;
 	}
 
 	public SatisfiabilityObligation(POStateDefinition statedef, POContextStack ctxt)
@@ -151,6 +153,7 @@ public class SatisfiabilityObligation extends ProofObligation
 		sb.append(statedef.invExpression);
 		
 		value = ctxt.getObligation(sb.toString());
+		definition = statedef;
 	}
 
 	private void appendResult(StringBuilder sb, POPatternTypePair ptp)
