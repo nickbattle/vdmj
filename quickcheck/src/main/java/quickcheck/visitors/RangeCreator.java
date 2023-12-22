@@ -81,7 +81,7 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 				count++;
 			}
 			
-			int persize = limit / 5;	// Try up to five sizes?
+			int persize = limit / 5 + 1;		// Try up to five sizes?
 			
 			for (int ss = 1; ss <= size; ss++)
 			{
