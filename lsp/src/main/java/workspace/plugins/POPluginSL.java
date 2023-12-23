@@ -96,7 +96,7 @@ public class POPluginSL extends POPlugin
 				"type",			"vdm",
 				"request",		"launch",
 				"noDebug",		false,
-				"defaultName",	po.definition.name.getModule(),
+				"defaultName",	po.location.module,
 				"command",		"print " + launch
 			);
 	}
@@ -116,7 +116,7 @@ public class POPluginSL extends POPlugin
 				"type",			"vdm",
 				"request",		"launch",
 				"noDebug",		false,
-				"defaultName",	po.definition.name.getModule(),
+				"defaultName",	po.location.module,
 				"command",		"print " + launch
 			);
 	}
