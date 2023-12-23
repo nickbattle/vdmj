@@ -82,9 +82,9 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 				count++;
 			}
 			
-			int from = (size > 3) ? 3 : size;	// Avoid very small sets?
+			int persize = limit / 5 + 1;		// Try up to five sizes?
 			
-			for (int ss = from; ss <= size; ss++)
+			for (int ss = 1; ss <= size; ss++)
 			{
 				for (int[] kc: new KCombinator(size, ss))
 				{
@@ -100,6 +100,11 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 					if (++count >= limit)
 					{
 						return results;
+					}
+					
+					if (count % persize == 0)
+					{
+						break;	// Try next ss
 					}
 				}
 			}
