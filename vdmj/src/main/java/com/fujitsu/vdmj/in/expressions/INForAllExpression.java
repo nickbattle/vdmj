@@ -135,7 +135,7 @@ public class INForAllExpression extends INExpression
 						{
 							globals.setCounterexample(evalContext);
 							globals.setDidTimeout(false);
-							globals.setMaybe(!bindList.hasAllValues());
+							globals.setMaybe(false);
 						}
 						
 						return new BooleanValue(false);
@@ -147,7 +147,7 @@ public class INForAllExpression extends INExpression
 					{
 						globals.setCounterexample(evalContext);
 						globals.setDidTimeout(false);
-						globals.setMaybe(!bindList.hasAllValues());
+						globals.setMaybe(false);
 					}
 					
 					throw e;

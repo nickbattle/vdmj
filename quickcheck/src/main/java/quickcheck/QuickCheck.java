@@ -570,7 +570,7 @@ public class QuickCheck
 							po.setCounterexample(null);
 							po.setWitness(null);
 						}
-						else if (globals.hasMaybe() && execCompleted && globals.getCounterexample() == null)
+						else if (globals.hasMaybe() && execCompleted)
 						{
 							infof(POStatus.MAYBE, "PO #%d, MAYBE %s\n", po.number, duration(before, after));
 							po.setStatus(POStatus.MAYBE);
