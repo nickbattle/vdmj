@@ -438,7 +438,7 @@ public class TCExplicitOperationDefinition extends TCDefinition
 
 		if (state != null)
 		{
-			plist.add(new TCIdentifierPattern(state.name));
+			plist.add(new TCIdentifierPattern(state.name.getOldName()));
 		}
 		else if (base.isVDMPP() && !accessSpecifier.isStatic)
 		{
