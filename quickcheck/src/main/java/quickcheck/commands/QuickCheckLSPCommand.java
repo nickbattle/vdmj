@@ -50,7 +50,7 @@ public class QuickCheckLSPCommand extends AnalysisCommand implements InitRunnabl
 	private List<Integer> poList = new Vector<Integer>();
 	private List<String> poNames = new Vector<String>();
 	private List<POStatus> includes = new Vector<POStatus>();
-	private long timeout = 0;
+	private long timeout = -1;
 	private QuickCheck qc = new QuickCheck();
 	
 	public QuickCheckLSPCommand(String line)

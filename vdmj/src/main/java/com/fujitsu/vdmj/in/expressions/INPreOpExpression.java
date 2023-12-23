@@ -72,7 +72,7 @@ public class INPreOpExpression extends INExpression
     		{
     			try
     			{
-    				RecordValue sigma = ctxt.lookup(state.name).recordValue(ctxt);
+    				RecordValue sigma = ctxt.lookup(state.name.getOldName()).recordValue(ctxt);
 
     				for (TCField field: state.fields)
     				{
