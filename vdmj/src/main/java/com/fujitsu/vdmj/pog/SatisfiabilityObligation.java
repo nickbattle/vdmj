@@ -110,7 +110,7 @@ public class SatisfiabilityObligation extends ProofObligation
 
 	public SatisfiabilityObligation(POTypeDefinition typedef, POContextStack ctxt)
 	{
-		super(typedef.location, POType.INV_SATISFIABILITY, ctxt);
+		super(typedef.invPattern.location, POType.INV_SATISFIABILITY, ctxt);
 		StringBuilder sb = new StringBuilder();
 
 		sb.append("exists ");
@@ -136,7 +136,7 @@ public class SatisfiabilityObligation extends ProofObligation
 
 	public SatisfiabilityObligation(POStateDefinition statedef, POContextStack ctxt)
 	{
-		super(statedef.location, POType.INV_SATISFIABILITY, ctxt);
+		super(statedef.invPattern.location, POType.INV_SATISFIABILITY, ctxt);
 		this.definition = statedef.invdef;
 		StringBuilder sb = new StringBuilder();
 

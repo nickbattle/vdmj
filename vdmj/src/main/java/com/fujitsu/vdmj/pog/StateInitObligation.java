@@ -30,7 +30,7 @@ public class StateInitObligation extends ProofObligation
 {
 	public StateInitObligation(POStateDefinition def, POContextStack ctxt)
 	{
-		super(def.location, POType.STATE_INIT, ctxt);
+		super(def.initdef.location, POType.STATE_INIT, ctxt);
 		definition = def.initdef;
 		value = ctxt.getObligation("exists " + def.initPattern + " : " + def.name + " & " + def.initExpression);
 	}
