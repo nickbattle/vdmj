@@ -35,9 +35,6 @@ import java.io.InputStream;
  */
 public class Properties
 {
-	/** The main VDMJ lifecycle class */
-	public static String lifecycle = null;
-	
 	/** The tab stop for source files. */
 	public static int parser_tabstop = 4;
 	
@@ -181,11 +178,8 @@ public class Properties
 
 	private static void setValues(java.util.Properties vdmj)
 	{
-		lifecycle = get(vdmj, "vdmj.lifecycle", null);
-		
 		parser_tabstop = get(vdmj, "vdmj.parser.tabstop", 4);
 		parser_comment_nesting = get(vdmj, "vdmj.parser.comment_nesting", 3);
-		parser_external_readers = get(vdmj, "vdmj.parser.external_readers", null);
 		parser_merge_comments = get(vdmj, "vdmj.parser.merge_comments", false);
 		parser_maximal_types = get(vdmj, "vdmj.parser.maximal_types", false);
 
