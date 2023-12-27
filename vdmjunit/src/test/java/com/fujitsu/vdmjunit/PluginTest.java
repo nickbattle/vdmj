@@ -39,7 +39,13 @@ public class PluginTest extends VDMJUnitTestSL
 	@BeforeClass
 	public static void start() throws Exception
 	{
-		System.setProperty("vdmj.plugins", "com.fujitsu.vdmjunit.TestPlugin");
+		System.setProperty("vdmj.plugins",
+				"com.fujitsu.vdmjunit.TestPlugin," +
+				"com.fujitsu.vdmj.plugins.analyses.ASTPlugin," + 
+				"com.fujitsu.vdmj.plugins.analyses.TCPlugin," + 
+				"com.fujitsu.vdmj.plugins.analyses.INPlugin," + 
+				"com.fujitsu.vdmj.plugins.analyses.POPlugin");
+
 		readSpecification("SL");	// Includes two files
 	}
 	

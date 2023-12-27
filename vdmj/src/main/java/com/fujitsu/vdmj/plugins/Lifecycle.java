@@ -52,9 +52,6 @@ import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.plugins.analyses.ASTPlugin;
-import com.fujitsu.vdmj.plugins.analyses.INPlugin;
-import com.fujitsu.vdmj.plugins.analyses.POPlugin;
-import com.fujitsu.vdmj.plugins.analyses.TCPlugin;
 import com.fujitsu.vdmj.plugins.events.AbstractCheckFilesEvent;
 import com.fujitsu.vdmj.plugins.events.CheckCompleteEvent;
 import com.fujitsu.vdmj.plugins.events.CheckFailedEvent;
@@ -271,24 +268,6 @@ public class Lifecycle
 		try
 		{
 			PluginRegistry registry = PluginRegistry.getInstance();
-			verboseln("Registering standard plugins");
-
-			ASTPlugin ast = ASTPlugin.factory(Settings.dialect);
-			registry.registerPlugin(ast);
-			verboseln("Registered AST plugin");
-
-			TCPlugin tc = TCPlugin.factory(Settings.dialect);
-			registry.registerPlugin(tc);
-			verboseln("Registered TC plugin");
-
-			INPlugin in = INPlugin.factory(Settings.dialect);
-			registry.registerPlugin(in);
-			verboseln("Registered IN plugin");
-			
-			POPlugin po = POPlugin.factory(Settings.dialect);
-			registry.registerPlugin(po);
-			verboseln("Registered PO plugin");
-			
 			List<String> userPlugins = GetResource.readResource("vdmj.plugins");
 			
 			if (!userPlugins.isEmpty())
