@@ -72,7 +72,7 @@ public class Lifecycle
 	protected List<String> argv = null;
 	protected List<File> paths = null;
 	protected List<File> files = null;
-	protected boolean warnings = true;
+	protected boolean warnings = true;	// Affects all plugins
 
 	public Lifecycle(String[] args)
 	{
@@ -147,14 +147,13 @@ public class Lifecycle
 		println("-vdmsl: parse files as VDM-SL (default)");
 		println("-vdmpp: parse files as VDM++");
 		println("-vdmrt: parse files as VDM-RT");
-		println("-w: suppress warning messages");
-		println("-v: show VDMJ jar version");
+		println("-verbose: display detailed startup information");
 		println("-path: search path for files");
-		println("-strict: use strict grammar rules");
+		println("-v: show VDMJ jar version");
 		println("-r <release>: VDM language release");
 		println("-t <charset>: select a console charset");
 		println("-q: suppress information messages");
-		println("-verbose: display detailed startup information");
+		println("-w: suppress warning messages");
 		
 		PluginRegistry.getInstance().usage();
 		
@@ -235,16 +234,6 @@ public class Lifecycle
 					{
 						fail("-path requires a directory");
 					}
-	    			break;
-
-				case "-annotations":
-					Settings.annotations = true;
-					iter.remove();
-	    			break;
-
-				case "-strict":
-					Settings.strict = true;
-					iter.remove();
 	    			break;
 
 				case "-q":
