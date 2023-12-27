@@ -161,7 +161,7 @@ public class BacktrackInputReader
 		externalReaders.put(".md", MarkdownStreamReader.class);
 		externalReaders.put(".markdown", MarkdownStreamReader.class);
 		
-		List<String> userExtReaders = GetResource.readResource("vdmj.parser.external_readers");
+		List<String> userExtReaders = GetResource.readResource("vdmj.readers", "vdmj.parser.external_readers");
 		
 		if (!userExtReaders.isEmpty())
 		{

@@ -84,7 +84,12 @@ public class GetResource
 	
 	public static List<String> readResource(String resourceName) throws Exception
 	{
-		String property = System.getProperty(resourceName);
+		return readResource(resourceName, resourceName);
+	}
+	
+	public static List<String> readResource(String resourceName, String propertyName) throws Exception
+	{
+		String property = System.getProperty(propertyName);
 		
 		if (property != null)	// Overrides the resources
 		{
