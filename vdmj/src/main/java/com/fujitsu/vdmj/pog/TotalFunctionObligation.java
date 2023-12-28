@@ -38,7 +38,7 @@ public class TotalFunctionObligation extends ProofObligation
 {
 	public TotalFunctionObligation(POExplicitFunctionDefinition def, POContextStack ctxt)
 	{
-		super(def.location, POType.TOTAL, ctxt);
+		super(def.location, POType.TOTAL_FUNCTION, ctxt);
 		value = ctxt.getObligation(getContext(def.name.getName(), def));
 		definition = def;
 	}
