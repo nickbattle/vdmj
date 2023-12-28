@@ -32,9 +32,12 @@ import java.util.List;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.pog.NonZeroObligation;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
+import com.fujitsu.vdmj.tc.types.TCNumericType;
 
 import quickcheck.QuickCheck;
 import quickcheck.visitors.TotalExpressionVisitor;
@@ -76,7 +79,7 @@ public class DirectQCStrategy extends QCStrategy
 	@Override
 	public boolean useByDefault()
 	{
-		return false;
+		return true;
 	}
 
 	@Override
@@ -88,16 +91,40 @@ public class DirectQCStrategy extends QCStrategy
 	@Override
 	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingOverride> binds, Context ctxt)
 	{
+		if (po.hasObligations())
+		{
+			verboseln("Obligation with POs cannot be proved directly");
+			return new StrategyResults();
+		}
+		
 		switch (po.kind)
 		{
 			case TOTAL_FUNCTION:
 				verboseln("Trying direct proof of total obligation");
 				return directTotalObligation((TotalFunctionObligation) po);
+			
+			case NON_ZERO:
+				verboseln("Trying direct proof of non-zero obligation");
+				return directNonZeroObligation((NonZeroObligation) po);
 				
 			default:
 				verboseln("Obligation cannot be proved directly");
 				return new StrategyResults();
 		}
+	}
+
+	private StrategyResults directNonZeroObligation(NonZeroObligation po)
+	{
+		long before = System.currentTimeMillis();
+		TCNumericType ntype = po.right.getExptype().getNumeric();
+		
+		if (ntype instanceof TCNaturalOneType)
+		{
+			return new StrategyResults(getName(), "(nat1 cannot be zero)",
+					null, System.currentTimeMillis() - before);
+		}
+		
+		return new StrategyResults();
 	}
 
 	private StrategyResults directTotalObligation(TotalFunctionObligation po)
