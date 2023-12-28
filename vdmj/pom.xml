@@ -94,10 +94,6 @@
 									<Class-Path>.</Class-Path>
 								</manifestEntries>
 							</archive>
-							<includes>
-								<include>**/*.class</include>
-								<include>*.mappings</include>
-							</includes>
 						</configuration>
 					</execution>
                     <execution>
