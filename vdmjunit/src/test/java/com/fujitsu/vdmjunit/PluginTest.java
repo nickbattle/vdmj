@@ -39,14 +39,14 @@ public class PluginTest extends VDMJUnitTestSL
 	@BeforeClass
 	public static void start() throws Exception
 	{
-		System.setProperty("vdmj.plugins", "com.fujitsu.vdmjunit.TestPlugin");
+		// Note: vdmj.plugins adds com.fujitsu.vdmjunit.TestPlugin
 		readSpecification("SL");	// Includes two files
 	}
 	
 	@AfterClass
 	public static void stop()
 	{
-		System.clearProperty("vdmj.plugins");
+		// Nothing
 	}
 	
 	@Before

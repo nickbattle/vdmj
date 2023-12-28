@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.VDMError;
 import com.fujitsu.vdmj.util.GetResource;
@@ -161,7 +160,7 @@ public class BacktrackInputReader
 		externalReaders.put(".md", MarkdownStreamReader.class);
 		externalReaders.put(".markdown", MarkdownStreamReader.class);
 		
-		List<String> userExtReaders = GetResource.readResource("vdmj.parser.external_readers");
+		List<String> userExtReaders = GetResource.readResource("vdmj.readers");
 		
 		if (!userExtReaders.isEmpty())
 		{
@@ -178,7 +177,7 @@ public class BacktrackInputReader
 					}
 					else
 					{
-						System.err.printf("Malformed external readers: %s\n", Properties.parser_external_readers);
+						System.err.printf("Malformed external readers resource?\n");
 					}
 				}
 				catch (Exception e)

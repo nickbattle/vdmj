@@ -105,6 +105,8 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	public void usage()
 	{
 		println("-c <charset>: select a file charset");
+		println("-strict: use strict grammar rules");
+		println("-annotations: enable annotation processing");
 	}
 
 	@Override
@@ -128,6 +130,16 @@ abstract public class ASTPlugin extends AnalysisPlugin implements EventListener
 	    			{
 	    				fail("-c option requires a charset name");
 	    			}
+	    			break;
+
+				case "-strict":
+					Settings.strict = true;
+					iter.remove();
+	    			break;
+	    			
+				case "-annotations":
+					Settings.annotations = true;
+					iter.remove();
 	    			break;
     		}
 		}

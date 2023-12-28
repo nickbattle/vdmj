@@ -1,0 +1,4 @@
+com.fujitsu.vdmj.plugins.analyses.ASTPlugin
+com.fujitsu.vdmj.plugins.analyses.TCPlugin
+com.fujitsu.vdmj.plugins.analyses.INPlugin
+com.fujitsu.vdmj.plugins.analyses.POPlugin

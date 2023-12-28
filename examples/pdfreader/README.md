@@ -13,6 +13,6 @@ usually means the method must "preread" the content into a local buffer, like a 
 which is then used to generate a String's toCharArray().
 
 To plug the new reader (or multiple readers) into VDMJ, the "vdmj.parser.external_readers" property
-or resource file must be set to a list of <suffix>=<class> pairs, like ".pdf = examples.parser.PDFStreamReader".
-This will attempt to use the example PDFStreamReader class for all files that end in ".pdf". Note
-that the suffix is not case sensitive.
+or "vdmj.readers" resource file must be set to a list of <suffix>=<class> pairs, like
+".pdf = examples.parser.PDFStreamReader". This will attempt to use the example PDFStreamReader class
+for all files that end in ".pdf". Note that the suffix is not case sensitive.

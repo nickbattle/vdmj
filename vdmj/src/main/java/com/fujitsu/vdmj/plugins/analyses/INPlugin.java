@@ -149,7 +149,6 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 		println("-dtc: disable all dynamic type checking");
 		println("-exceptions: raise pre/post/inv violations as <RuntimeError>");
 		println("-measures: disable recursive measure checking");
-		println("-annotations: enable annotation processing");
 		println("-log <filename>: enable real-time event logging");
 		println("-remote <class>: enable remote control");
 		println("-simulation <class>: enable simulation control");
