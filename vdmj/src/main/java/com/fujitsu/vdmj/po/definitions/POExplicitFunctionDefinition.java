@@ -76,6 +76,8 @@ public class POExplicitFunctionDefinition extends PODefinition
 	public final POExplicitFunctionDefinition measureDef;
 	public final TCNameToken measureName;
 
+	public int bodyObligationCount = 0;		// Set by getObligations
+
 	public POExplicitFunctionDefinition(POAnnotationList annotations, TCNameToken name,
 		TCTypeList typeParams, TCFunctionType type,
 		POPatternListList parameters,
@@ -193,7 +195,9 @@ public class POExplicitFunctionDefinition extends PODefinition
 		}
 
 		ctxt.push(new POFunctionDefinitionContext(this, true));
-		obligations.addAll(body.getProofObligations(ctxt, env));
+		ProofObligationList bodyObligations = body.getProofObligations(ctxt, env);
+		bodyObligationCount  = bodyObligations.size();
+		obligations.addAll(bodyObligations);
 
 		if (isUndefined ||
 			!TypeComparator.isSubType(actualResult, expectedResult))

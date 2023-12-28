@@ -63,7 +63,7 @@ public enum POType
 	STRICT_ORDER("strict order", true),
 	TOTAL_ORDER("total order", true),
 	EQUIV_RELATION("equivalence relation", true),
-	TOTAL("total function"),
+	TOTAL_FUNCTION("total function"),
 	INV_SATISFIABILITY("invariant satisfiability", true),
 	THEOREM("theorem"),
 	STATE_INIT("state init", true);

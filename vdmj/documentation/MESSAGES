@@ -776,6 +776,7 @@ as the expected and actual values.
 3364, "Recursive cycle measures return different types"
 3365, "Void operation cannot use 'return <exp>'"
 3366, "Cannot access state field '<name>' from this context"
+3367, "Cannot divide by zero literal"
 
 
 4000, "Cannot instantiate abstract class <class>"
