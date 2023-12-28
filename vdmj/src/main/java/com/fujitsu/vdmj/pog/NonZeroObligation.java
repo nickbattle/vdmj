@@ -29,9 +29,12 @@ import com.fujitsu.vdmj.po.expressions.POExpression;
 
 public class NonZeroObligation extends ProofObligation
 {
+	public final POExpression right;
+	
 	public NonZeroObligation(LexLocation location, POExpression right, POContextStack ctxt)
 	{
 		super(location, POType.NON_ZERO, ctxt);
+		this.right = right;
 		value = ctxt.getObligation(right + " <> 0");
 	}
 }

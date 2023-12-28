@@ -46,13 +46,7 @@ public class PODivideExpression extends PONumericBinaryExpression
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt, env);
-
-		if (!(right instanceof POIntegerLiteralExpression) &&
-			!(right instanceof PORealLiteralExpression))
-		{
-			obligations.add(new NonZeroObligation(location, right, ctxt));
-		}
-
+		obligations.add(new NonZeroObligation(location, right, ctxt));
 		return obligations;
 	}
 
