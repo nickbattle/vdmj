@@ -92,12 +92,6 @@ public class DirectQCStrategy extends QCStrategy
 	@Override
 	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingOverride> binds, Context ctxt)
 	{
-		if (po.hasObligations())
-		{
-			verboseln("Obligation with POs cannot be proved directly");
-			return new StrategyResults();
-		}
-		
 		switch (po.kind)
 		{
 			case TOTAL_FUNCTION:
@@ -132,11 +126,16 @@ public class DirectQCStrategy extends QCStrategy
 	{
 		TotalExpressionVisitor visitor = new TotalExpressionVisitor();
 		POExplicitFunctionDefinition exdef = (POExplicitFunctionDefinition) po.definition;
+		
+		if (exdef.bodyObligationCount > 0)
+		{
+			return new StrategyResults();	// Body can fail in principle, so not definitely total
+		}
 
 		if (exdef.isUndefined ||
 			!TypeComparator.isSubType(exdef.actualResult, exdef.expectedResult))
 		{
-			return new StrategyResults();	// Body may not always be the right type
+			return new StrategyResults();	// Body may not be the right type, so not definitely total
 		}
 
 		long before = System.currentTimeMillis();
