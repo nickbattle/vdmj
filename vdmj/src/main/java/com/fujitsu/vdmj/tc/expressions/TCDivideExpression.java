@@ -24,6 +24,9 @@
 
 package com.fujitsu.vdmj.tc.expressions;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.tc.expressions.visitors.TCExpressionVisitor;
 import com.fujitsu.vdmj.tc.types.TCRealType;
@@ -50,7 +53,7 @@ public class TCDivideExpression extends TCNumericBinaryExpression
 		{
 			TCIntegerLiteralExpression exp = (TCIntegerLiteralExpression)right;
 			
-			if (exp.value.value == 0)
+			if (exp.value.value.equals(BigInteger.ZERO))
 			{
 				right.report(3367, "Cannot divide by zero literal");
 			}
@@ -59,7 +62,7 @@ public class TCDivideExpression extends TCNumericBinaryExpression
 		{
 			TCRealLiteralExpression exp = (TCRealLiteralExpression)right;
 			
-			if (exp.value.value == 0)
+			if (exp.value.value.equals(BigDecimal.ZERO))
 			{
 				right.report(3367, "Cannot divide by zero literal");
 			}
