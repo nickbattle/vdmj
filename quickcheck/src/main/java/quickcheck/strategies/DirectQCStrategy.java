@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCNumericType;
+import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 import quickcheck.QuickCheck;
 import quickcheck.visitors.TotalExpressionVisitor;
@@ -131,7 +132,13 @@ public class DirectQCStrategy extends QCStrategy
 	{
 		TotalExpressionVisitor visitor = new TotalExpressionVisitor();
 		POExplicitFunctionDefinition exdef = (POExplicitFunctionDefinition) po.definition;
-		
+
+		if (exdef.isUndefined ||
+			!TypeComparator.isSubType(exdef.actualResult, exdef.expectedResult))
+		{
+			return new StrategyResults();	// Body may not always be the right type
+		}
+
 		long before = System.currentTimeMillis();
 		exdef.body.apply(visitor, null);
 		
