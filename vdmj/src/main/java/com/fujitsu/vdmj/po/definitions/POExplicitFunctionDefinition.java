@@ -76,6 +76,8 @@ public class POExplicitFunctionDefinition extends PODefinition
 	public final POExplicitFunctionDefinition measureDef;
 	public final TCNameToken measureName;
 
+	public int obligationCount = 0;		// Set by getObligations
+
 	public POExplicitFunctionDefinition(POAnnotationList annotations, TCNameToken name,
 		TCTypeList typeParams, TCFunctionType type,
 		POPatternListList parameters,
@@ -205,6 +207,8 @@ public class POExplicitFunctionDefinition extends PODefinition
 		ctxt.pop();
 
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
+		
+		obligationCount  = obligations.size();
 		return obligations;
 	}
 
