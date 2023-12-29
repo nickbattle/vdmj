@@ -40,7 +40,6 @@ import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.syntax.ClassReader;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.TCRecursiveLoops;
 import com.fujitsu.vdmj.tc.definitions.TCClassList;
 import com.fujitsu.vdmj.typechecker.ClassTypeChecker;
 import com.fujitsu.vdmj.typechecker.TypeChecker;
@@ -168,7 +167,6 @@ public class PogTest extends TestCase
 		assertEquals("Spec type check errors", 0, TypeChecker.getErrorCount());
 
 		POClassList poglist = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checked);
-		ClassMapper.getInstance(PONode.MAPPINGS).convert(TCRecursiveLoops.getInstance());
 		ProofObligationList polist = poglist.getProofObligations();
 
 		// Copy this output to re-generate the expected from the actuals...

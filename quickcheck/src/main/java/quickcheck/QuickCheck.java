@@ -275,7 +275,7 @@ public class QuickCheck
 			if (po.isCheckable && po.getCheckedExpression() != null)
 			{
 				TCExpression tcexp = po.getCheckedExpression();
-				return ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+				return ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tcexp);
 			}
 			else
 			{

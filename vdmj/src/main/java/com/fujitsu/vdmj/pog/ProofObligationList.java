@@ -203,7 +203,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 			throw new ParserException(2330, "Tokens found after expression at " + end, LexLocation.ANY, 0);
 		}
 		
-		TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+		TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
 		
 		TypeChecker.clearErrors();
 		TCType potype = tcexp.typeCheck(env, null, NameScope.NAMESANDANYSTATE, null);
@@ -253,7 +253,7 @@ public class ProofObligationList extends Vector<ProofObligation>
 		// Note whether the obligation expression itself has obligations. This is used
 		// in some proof strategies.
 		
-		POExpression poexp = ClassMapper.getInstance(PONode.MAPPINGS).convert(tcexp);
+		POExpression poexp = ClassMapper.getInstance(PONode.MAPPINGS).convertLocal(tcexp);
 		POContextStack stack = new POContextStack();
 		stack.push(new PONameContext());	// Must have one context
 		ProofObligationList popos = poexp.getProofObligations(stack, env);

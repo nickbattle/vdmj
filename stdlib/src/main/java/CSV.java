@@ -280,10 +280,10 @@ public class CSV implements Serializable
 		ExpressionReader reader = new ExpressionReader(ltr);
 		reader.setCurrentModule(module);
 		ASTExpression exp = reader.readExpression();
-		TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convert(exp);
+		TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(exp);
 		Interpreter ip = Interpreter.getInstance();
 		ip.typeCheck(tcexp);
-		INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+		INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tcexp);
 		Context ctxt = new Context(LexLocation.ANY, method, null);
 		ctxt.setThreadState(CPUValue.vCPU);
 		

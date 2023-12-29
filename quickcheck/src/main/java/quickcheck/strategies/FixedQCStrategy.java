@@ -226,8 +226,8 @@ public class FixedQCStrategy extends QCStrategy
 			}
 			
 			ltr.close();
-			TCMultipleBindList tcbinds = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astbinds);
-			TCExpressionList tcexps = ClassMapper.getInstance(TCNode.MAPPINGS).convert(astexps);
+			TCMultipleBindList tcbinds = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(astbinds);
+			TCExpressionList tcexps = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(astexps);
 			TCTypeList tctypes = new TCTypeList();
 			Environment env = interpreter.getGlobalEnvironment();
 			TypeChecker.clearErrors();
@@ -270,8 +270,8 @@ public class FixedQCStrategy extends QCStrategy
 				return null;
 			}
 			
-			INMultipleBindList inbinds = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcbinds);
-			INExpressionList inexps = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexps);
+			INMultipleBindList inbinds = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tcbinds);
+			INExpressionList inexps = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tcexps);
 			RootContext ictxt = interpreter.getInitialContext();
 			Map<String, ValueList> ranges = new HashMap<String, ValueList>();
 			long before = System.currentTimeMillis();

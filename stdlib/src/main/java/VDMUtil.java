@@ -87,10 +87,10 @@ public class VDMUtil
 			ExpressionReader reader = new ExpressionReader(ltr);
 			reader.setCurrentModule("VDMUtil");
 			ASTExpression exp = reader.readExpression();
-			TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convert(exp);
+			TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(exp);
 			Interpreter ip = Interpreter.getInstance();
 			ip.typeCheck(tcexp);
-			INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+			INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tcexp);
 
 			result.add(new BooleanValue(true));
 			Context ctxt = new Context(null, "seq_of_char2val_", null);
