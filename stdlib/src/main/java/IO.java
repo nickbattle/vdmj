@@ -115,10 +115,10 @@ public class IO implements Serializable
 			ExpressionReader reader = new ExpressionReader(ltr);
 			reader.setCurrentModule("IO");
 			ASTExpression exp = reader.readExpression();
-			TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convert(exp);
+			TCExpression tcexp = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(exp);
 			Interpreter ip = Interpreter.getInstance();
 			ip.typeCheck(tcexp);
-			INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(tcexp);
+			INExpression inexp = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tcexp);
 			
 			result.add(new BooleanValue(true));
 			result.add(inexp.eval(ctxt));

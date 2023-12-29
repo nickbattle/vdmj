@@ -578,7 +578,7 @@ public class TCTypeDefinition extends TCDefinition
 			ExpressionReader er = new ExpressionReader(ltr);
 			er.setCurrentModule(location.module);
 			ASTExpression ast = er.readExpression();
-			return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+			return ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
 		}
 		finally
 		{

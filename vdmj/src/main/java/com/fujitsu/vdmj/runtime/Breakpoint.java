@@ -136,10 +136,10 @@ public class Breakpoint implements Serializable
 					ExpressionReader reader = new ExpressionReader(ltr);
         			reader.setCurrentModule(location.module);
         			ASTExpression ast = reader.readExpression();
-        			TCExpression tc = ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+        			TCExpression tc = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
         			Environment env = Interpreter.getInstance().getGlobalEnvironment();
         			tc.typeCheck(env, null, NameScope.GLOBAL, null);
-        			condition = ClassMapper.getInstance(INNode.MAPPINGS).convert(tc);
+        			condition = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tc);
         			break;
 			}
 		}

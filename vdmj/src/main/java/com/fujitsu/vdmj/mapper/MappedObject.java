@@ -41,4 +41,9 @@ public abstract class MappedObject implements Serializable, Mappable
 	{
 		return myId;
 	}
+	
+	public static long getNextMappedId()
+	{
+		return nextUniqueId;
+	}
 }

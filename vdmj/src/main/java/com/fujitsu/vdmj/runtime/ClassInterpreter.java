@@ -269,7 +269,7 @@ public class ClassInterpreter extends Interpreter
 			throw new ParserException(2330, "Tokens found after expression at " + end, LexLocation.ANY, 0);
 		}
 
-		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+		return ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
 	}
 
 	private Value execute(INExpression inex) throws Exception
@@ -303,7 +303,7 @@ public class ClassInterpreter extends Interpreter
 	{
 		TCExpression expr = parseExpression(line, getDefaultName());
 		typeCheck(expr);
-		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convert(expr);
+		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(expr);
 		return execute(inex);
 	}
 
@@ -333,7 +333,7 @@ public class ClassInterpreter extends Interpreter
 		}
 
 		ctxt.threadState.init();
-		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convert(expr);
+		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(expr);
 		return inex.eval(ctxt);
 	}
 

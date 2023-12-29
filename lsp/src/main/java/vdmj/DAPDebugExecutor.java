@@ -667,7 +667,7 @@ public class DAPDebugExecutor implements DebugExecutor
 					try
 					{
 						TCPerSyncDefinition pdef = (TCPerSyncDefinition)d;
-						INExpression guard = ClassMapper.getInstance(INNode.MAPPINGS).convert(pdef.guard);
+						INExpression guard = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(pdef.guard);
 
 						if (pdef.opname.getName().equals(opname) ||
 							pdef.location.startLine == line ||

@@ -268,7 +268,7 @@ public class ModuleInterpreter extends Interpreter
 			throw new ParserException(2330, "Tokens found after expression at " + end, LexLocation.ANY, 0);
 		}
 		
-		return ClassMapper.getInstance(TCNode.MAPPINGS).convert(ast);
+		return ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(ast);
 	}
 
 	/**
@@ -293,7 +293,7 @@ public class ModuleInterpreter extends Interpreter
 		clearBreakpointHits();
 
 		// scheduler.reset();
-		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convert(expr);
+		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(expr);
 		MainThread main = new MainThread(inex, mainContext);
 		main.start();
 		scheduler.start(main);
@@ -326,7 +326,7 @@ public class ModuleInterpreter extends Interpreter
 		}
 
 		ctxt.threadState.init();
-		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convert(tc);
+		INExpression inex = ClassMapper.getInstance(INNode.MAPPINGS).convertLocal(tc);
 		return inex.eval(ctxt);
 	}
 
@@ -379,7 +379,7 @@ public class ModuleInterpreter extends Interpreter
 		{
 			long now = System.currentTimeMillis();
 			pogModules = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedModules);
-			ClassMapper.getInstance(PONode.MAPPINGS).convert(TCRecursiveLoops.getInstance());
+			ClassMapper.getInstance(PONode.MAPPINGS).convertLocal(TCRecursiveLoops.getInstance());
 			Utils.mapperStats(now, PONode.MAPPINGS);
 		}
 		

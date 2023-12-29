@@ -49,17 +49,17 @@ public class POApplyExpression extends POExpression
 	public final POExpressionList args;
 	public final TCType type;
 	public final TCTypeList argtypes;
-	public final PODefinitionListList recursive;
+	public final PODefinitionListList recursiveCycles;
 
 	public POApplyExpression(POExpression root, POExpressionList args,
-		TCType type, TCTypeList argtypes, PODefinitionListList recursive)
+		TCType type, TCTypeList argtypes, PODefinitionListList recursiveCycles)
 	{
 		super(root);
 		this.root = root;
 		this.args = args;
 		this.type = type;
 		this.argtypes = argtypes;
-		this.recursive = recursive;
+		this.recursiveCycles = recursiveCycles;
 	}
 
 	@Override
@@ -131,13 +131,13 @@ public class POApplyExpression extends POExpression
 
 		if (!type.isUnknown(location) && type.isFunction(location))
 		{
-			if (recursive != null)	// name is a function in a recursive loop
+			if (recursiveCycles != null)	// name is a function in a recursive loop
 			{
 				/**
 				 * All of the functions in the loop will generate similar obligations,
 				 * so the "add" method eliminates any duplicates.
 				 */
-				for (PODefinitionList loop: recursive)
+				for (PODefinitionList loop: recursiveCycles)
 				{
 					obligations.add(new RecursiveObligation(location, loop, this, ctxt));
 				}

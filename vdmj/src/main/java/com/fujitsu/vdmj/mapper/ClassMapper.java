@@ -147,6 +147,9 @@ public class ClassMapper
 	/** A list of methods to call in the init() processing */
 	private final List<Method> initializers = new Vector<Method>();
 
+	/** If the mark() method has been called, but not restore(), holds converted IDs */
+	private List<Long> marked = null;
+
 	/**
 	 * A class to define how to construct one destPackage class, passing srcPackage
 	 * object fields to the Constructor and setter methods.
@@ -748,6 +751,25 @@ public class ClassMapper
 		return convert(source, message);
 	}
 	
+	/**
+	 * Perform a recursive mapping, but clean up the converted objects. This is
+	 * so that callers can convert small AST trees for local purposes and then
+	 * remove them afterwards, without the accumulation of "old" entries in the
+	 * converted map that will never be needed.
+	 */
+	public <T> T convertLocal(Object source) throws Exception
+	{
+		try
+		{
+			mark();
+			return convert(source);
+		}
+		finally
+		{
+			restore();
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	private <T> T convert(Object source, String message) throws Exception
 	{
@@ -915,12 +937,46 @@ public class ClassMapper
 			{
 				MappedObject mo = (MappedObject)source;
 				converted.put(mo.getMappedId(), result);
+				
+				if (marked != null)
+				{
+					marked.add(mo.getMappedId());
+				}
 			}
 		}
 		
 		return result;
 	}
+	
+	
+	/**
+	 * Save the "converted" map, so that we can later remove conversions
+	 * using restore().
+	 */
+	private void mark()
+	{
+		marked = new Vector<Long>();
+	}
+	
+	private void restore()
+	{
+		// Remove "converted" mappings from the low tide set by mark() to the
+		// current level.
+		
+		if (marked != null)
+		{
+			for (Long id: marked)
+			{
+				converted.remove(id);
+			}
+		}
+		
+		marked = null;
+	}
 
+	/**
+	 * Dump the progress stack on an exception. Used in debugging.
+	 */
 	private void dumpProgress(Throwable throwable)
 	{
 		if (!dumpedProgress)
