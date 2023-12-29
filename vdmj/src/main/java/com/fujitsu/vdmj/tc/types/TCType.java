@@ -179,13 +179,25 @@ public abstract class TCType extends TCNode implements Comparable<TCType>, Seria
 	}
 
 	/**
-	 * Test whether this type is of the given type, accounting for optional types, named
+	 * Test whether this type is POSSIBLY of the given type, accounting for optional types, named
 	 * types, bracketed types and unions.
 	 * 
 	 * @param typeclass
 	 * @param from
 	 */
 	public boolean isType(Class<? extends TCType> typeclass, LexLocation from)
+	{
+		return typeclass.isInstance(this);
+	}
+
+	/**
+	 * Test whether this type is DEFINITELY of the given type, accounting for named
+	 * types, bracketed types and unions.
+	 * 
+	 * @param typeclass
+	 * @param from
+	 */
+	public boolean isAlways(Class<? extends TCType> typeclass, LexLocation from)
 	{
 		return typeclass.isInstance(this);
 	}

@@ -48,7 +48,7 @@ public class PODivideExpression extends PONumericBinaryExpression
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt, env);
 
-		if (!(right.getExptype() instanceof TCNaturalOneType))
+		if (!right.getExptype().isAlways(TCNaturalOneType.class, location))
 		{
 			obligations.add(new NonZeroObligation(location, right, ctxt));
 		}

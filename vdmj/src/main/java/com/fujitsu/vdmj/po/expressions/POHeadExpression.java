@@ -56,7 +56,7 @@ public class POHeadExpression extends POUnaryExpression
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt, env);
 		
-		if (!(etype instanceof TCSeq1Type))
+		if (!etype.isAlways(TCSeq1Type.class, location))
 		{
 			obligations.add(new NonEmptySeqObligation(exp, ctxt));
 		}

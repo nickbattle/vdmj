@@ -95,6 +95,17 @@ public class TCOptionalType extends TCType
 		
 		return type.isType(typeclass, location);
 	}
+	
+	@Override
+	public boolean isAlways(Class<? extends TCType> typeclass, LexLocation from)
+	{
+		if (typeclass.equals(TCVoidType.class))
+		{
+			return false;	// Optionals are never void
+		}
+		
+		return type.isAlways(typeclass, location);
+	}
 
 	@Override
 	public boolean isUnion(LexLocation from)

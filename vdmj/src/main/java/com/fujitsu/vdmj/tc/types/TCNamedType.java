@@ -65,6 +65,13 @@ public class TCNamedType extends TCInvariantType
 		if (opaque && !from.module.equals(location.module)) return false;
 		return type.isType(typeclass, location);
 	}
+	
+	@Override
+	public boolean isAlways(Class<? extends TCType> typeclass, LexLocation from)
+	{
+		if (opaque && !from.module.equals(location.module)) return false;
+		return type.isAlways(typeclass, location);
+	}
 
 	@Override
 	public boolean isUnion(LexLocation from)

@@ -114,6 +114,19 @@ public class TCUnionType extends TCType
 
 		return false;
 	}
+	
+	public boolean isAlways(Class<? extends TCType> typeclass, LexLocation from)
+	{
+		for (TCType t: types)
+		{
+			if (!t.isAlways(typeclass, location))
+			{
+				return false;
+			}
+		}
+
+		return true;	// All of them pass
+	}
 
 	@Override
 	public boolean isUnknown(LexLocation from)

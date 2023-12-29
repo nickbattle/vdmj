@@ -53,7 +53,7 @@ public class PODistIntersectExpression extends POUnaryExpression
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt, env);
 		
-		if (!(exp.getExptype() instanceof TCSet1Type))
+		if (!exp.getExptype().isAlways(TCSet1Type.class, location))
 		{
 			obligations.add(new NonEmptySetObligation(exp, ctxt));
 		}
