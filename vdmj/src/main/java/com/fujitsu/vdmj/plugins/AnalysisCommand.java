@@ -27,8 +27,8 @@ package com.fujitsu.vdmj.plugins;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 import com.fujitsu.vdmj.plugins.commands.ErrorCommand;
 import com.fujitsu.vdmj.util.GetResource;
@@ -109,9 +109,8 @@ abstract public class AnalysisCommand
 	private static AnalysisCommand loadDirectly(String line) throws Exception
 	{
 		String[] argv = line.split("\\s+");
-		List<String> pairs = GetResource.readResource("vdmj.commands");
 		
-		for (String pair: pairs)
+		for (String pair: GetResource.readResource("vdmj.commands"))
 		{
 			try
 			{
@@ -139,5 +138,58 @@ abstract public class AnalysisCommand
 		}
 
 		return null;
+	}
+	
+	/**
+	 * Get the HELP fields of the vdmj.commands classes. See HelpCommand.
+	 */
+	public static HelpList getCommandHelp()
+	{
+		HelpList results = new HelpList();
+		
+		try
+		{
+			for (String pair: GetResource.readResource("vdmj.commands"))
+			{
+				try
+				{
+					String[] parts = pair.split("\\s*=\\s*");
+					
+					if (parts.length == 2)
+					{
+						Class<?> clazz = Class.forName(parts[1]);
+						Field field = clazz.getField("HELP");
+						String help = (String) field.get(null);
+						results.add(help);
+					}
+				}
+				catch (ClassNotFoundException e)
+				{
+					// Try next package
+				}
+				catch (NoSuchFieldException e)
+				{
+					// Ignore
+				}
+				catch (SecurityException e)
+				{
+					// Ignore
+				}
+				catch (IllegalArgumentException e)
+				{
+					// Ignore
+				}
+				catch (IllegalAccessException e)
+				{
+					// Ignore
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			// No commands configured?
+		}
+		
+		return results;
 	}
 }
