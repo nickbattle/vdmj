@@ -24,19 +24,16 @@
 
 package com.fujitsu.vdmj.plugins;
 
-import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
-import com.fujitsu.vdmj.commands.CommandPlugin;
-import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.plugins.commands.ErrorCommand;
-import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.util.GetResource;
 import com.fujitsu.vdmj.util.Utils;
 
-@SuppressWarnings("deprecation")		// While we use CommandPlugin in loadDirectly
 abstract public class AnalysisCommand
 {
 	protected final PluginRegistry registry;
@@ -111,43 +108,17 @@ abstract public class AnalysisCommand
 	 */
 	private static AnalysisCommand loadDirectly(String line) throws Exception
 	{
-		String[] packages = Properties.cmd_plugin_packages.split(";|:");
+		String[] argv = line.split("\\s+");
 		
-		for (String pack: packages)
+		for (String pair: GetResource.readResource("vdmj.commands"))
 		{
 			try
 			{
-				// Remove this CommandPlugin test when we remove the @Deprecated classes.
-				String[] argv = line.split("\\s+");
-				String plugin = Character.toUpperCase(argv[0].charAt(0)) + argv[0].substring(1).toLowerCase();
-				Class<?> clazz = Class.forName(pack + "." + plugin + "Plugin");
-
-				if (CommandPlugin.class.isAssignableFrom(clazz))
+				String[] parts = pair.split("\\s*=\\s*");
+				
+				if (parts.length == 2 && parts[0].equals(argv[0]))
 				{
-					Constructor<?> ctor = clazz.getConstructor(Interpreter.class);
-					CommandPlugin cmd = (CommandPlugin)ctor.newInstance(Interpreter.getInstance());
-					
-					// Convert an old CommandPlugin to an AnalysisCommand
-					return new AnalysisCommand(line)
-					{
-						@Override
-						public String run(String line)
-						{
-							try
-							{
-								cmd.run(argv);
-							}
-							catch (Exception e)
-							{
-								errorln(e);
-							}
-
-							return null;
-						}
-					};
-				}
-				else if (AnalysisCommand.class.isAssignableFrom(clazz))
-				{
+					Class<?> clazz = Class.forName(parts[1]);
 					Constructor<?> ctor = clazz.getConstructor(String.class);
 					return (AnalysisCommand)ctor.newInstance(new Object[]{line});
 				}
@@ -167,5 +138,58 @@ abstract public class AnalysisCommand
 		}
 
 		return null;
+	}
+	
+	/**
+	 * Get the HELP fields of the vdmj.commands classes. See HelpCommand.
+	 */
+	public static HelpList getCommandHelp()
+	{
+		HelpList results = new HelpList();
+		
+		try
+		{
+			for (String pair: GetResource.readResource("vdmj.commands"))
+			{
+				try
+				{
+					String[] parts = pair.split("\\s*=\\s*");
+					
+					if (parts.length == 2)
+					{
+						Class<?> clazz = Class.forName(parts[1]);
+						Field field = clazz.getField("HELP");
+						String help = (String) field.get(null);
+						results.add(help);
+					}
+				}
+				catch (ClassNotFoundException e)
+				{
+					// Try next package
+				}
+				catch (NoSuchFieldException e)
+				{
+					// Ignore
+				}
+				catch (SecurityException e)
+				{
+					// Ignore
+				}
+				catch (IllegalArgumentException e)
+				{
+					// Ignore
+				}
+				catch (IllegalAccessException e)
+				{
+					// Ignore
+				}
+			}
+		}
+		catch (Exception e)
+		{
+			// No commands configured?
+		}
+		
+		return results;
 	}
 }

@@ -108,9 +108,6 @@ public class Properties
 	public static boolean rt_diags_timestep = false;
 
 	
-	/** The packages for command plugins to load from. */
-	public static String cmd_plugin_packages = "plugins";
-	
 	/** The class name for the DebugLink */
 	public static String debug_link_class = null;
 	
@@ -210,7 +207,6 @@ public class Properties
 		in_powerset_limit = get(vdmj, "vdmj.in.powerset_limit", 30);
 		in_typebind_limit = get(vdmj, "vdmj.in.typebind_limit", 100000);
 
-		cmd_plugin_packages = get(vdmj, "vdmj.cmd.plugin_packages", "plugins");
 		debug_link_class = get(vdmj, "vdmj.debug.link_class", null);		
 		diag_max_stack = get(vdmj, "vdmj.diag.max_stack", 1);
 	}

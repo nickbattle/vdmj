@@ -53,6 +53,8 @@ public class HelpCommand extends AnalysisCommand
 		help.add(ReloadCommand.HELP);	// These three don't come from any plugin.
 		help.add(HelpCommand.HELP);
 		help.add(QuitCommand.HELP);
+		
+		help.add(AnalysisCommand.getCommandHelp());		// Standalone commands
 
 		String sought = null;
 		String sep = "";

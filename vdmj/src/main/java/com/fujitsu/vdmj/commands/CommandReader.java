@@ -44,7 +44,6 @@ import java.util.regex.Pattern;
 
 import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.debug.BreakpointReader;
 import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
@@ -63,6 +62,7 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.SourceFile;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.traces.TraceReductionType;
+import com.fujitsu.vdmj.util.GetResource;
 import com.fujitsu.vdmj.values.BooleanValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -414,18 +414,18 @@ abstract public class CommandReader
 		{
 			return cmd.run(argv);
 		}
+
+		List<String> pairs = GetResource.readResource("vdmj.commands");
 		
-		String plugin = Character.toUpperCase(argv[0].charAt(0)) + argv[0].substring(1).toLowerCase() + "Plugin";
-		String[] packages = Properties.cmd_plugin_packages.split(";|:");
-		
-		for (String pack: packages)
+		for (String pair: pairs)
 		{
 			try
 			{
-				Class<?> clazz = Class.forName(pack + "." + plugin);
-
-				if (CommandPlugin.class.isAssignableFrom(clazz))
+				String[] parts = pair.split("\\s*=\\s*");
+				
+				if (parts.length == 2 && parts[0].equals(argv[0]))
 				{
+					Class<?> clazz = Class.forName(parts[1]);
 					Constructor<?> ctor = clazz.getConstructor(Interpreter.class);
 					cmd = (CommandPlugin)ctor.newInstance(interpreter);
 					plugins.put(argv[0], cmd);
