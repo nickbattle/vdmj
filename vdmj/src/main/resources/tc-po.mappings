@@ -348,11 +348,6 @@ unmapped com.fujitsu.vdmj.tc.types.TCUnresolvedType;
 unmapped com.fujitsu.vdmj.tc.types.TCVoidReturnType;
 unmapped com.fujitsu.vdmj.tc.types.TCVoidType;
 
-# POG
-package com.fujitsu.vdmj.tc to com.fujitsu.vdmj.po;
-map TCRecursiveMap{} to PORecursiveMap(this);
-map TCRecursiveLoops{recursiveLoops} to PORecursiveLoops(recursiveLoops);
-
 # Java - usually unmappeds
 unmapped java.lang.Boolean;
 unmapped java.lang.String;
