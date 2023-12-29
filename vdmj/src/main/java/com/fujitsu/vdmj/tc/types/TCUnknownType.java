@@ -50,6 +50,12 @@ public class TCUnknownType extends TCType
 	{
 		return true;
 	}
+	
+	@Override
+	public boolean isAlways(Class<? extends TCType> typeclass, LexLocation from)
+	{
+		return true;
+	}
 
 	@Override
 	public boolean isUnknown(LexLocation from)

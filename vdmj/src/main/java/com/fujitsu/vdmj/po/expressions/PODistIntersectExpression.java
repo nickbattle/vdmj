@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.NonEmptySetObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCSet1Type;
 import com.fujitsu.vdmj.tc.types.TCTypeQualifier;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -51,7 +52,12 @@ public class PODistIntersectExpression extends POUnaryExpression
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt, env);
-		obligations.add(new NonEmptySetObligation(exp, ctxt));
+		
+		if (!exp.getExptype().isAlways(TCSet1Type.class, location))
+		{
+			obligations.add(new NonEmptySetObligation(exp, ctxt));
+		}
+		
 		return obligations;
 	}
 

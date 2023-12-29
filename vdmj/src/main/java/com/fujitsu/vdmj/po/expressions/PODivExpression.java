@@ -29,6 +29,7 @@ import com.fujitsu.vdmj.po.expressions.visitors.POExpressionVisitor;
 import com.fujitsu.vdmj.pog.NonZeroObligation;
 import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.tc.types.TCNaturalOneType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -46,7 +47,12 @@ public class PODivExpression extends PONumericBinaryExpression
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = super.getProofObligations(ctxt, env);
-		obligations.add(new NonZeroObligation(location, right, ctxt));
+		
+		if (!right.getExptype().isAlways(TCNaturalOneType.class, location))
+		{
+			obligations.add(new NonZeroObligation(location, right, ctxt));
+		}
+		
 		return obligations;
 	}
 
