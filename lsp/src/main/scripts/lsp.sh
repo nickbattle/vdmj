@@ -17,6 +17,7 @@ VERSION=$MVERSION
 
 # The Maven repository directory containing jars
 MAVENREPO=~/.m2/repository/dk/au/ece/vdmj
+ISABELLEREPO=~/.m2/repository/vdmtoolkit
 
 JAVA64_VMOPTS="-Xmx3000m -Xss1m"
 #JAVA64_VMOPTS="-Xmx3000m -Xss1m -Djava.rmi.server.hostname=localhost -Dcom.sun.management.jmxremote"
@@ -55,8 +56,9 @@ ANNOTATIONS_JAR=$MAVENREPO/annotations/${VERSION}/annotations-${VERSION}.jar
 LSP_JAR=$MAVENREPO/lsp/${VERSION}/lsp-${VERSION}.jar
 STDLIB_JAR=$MAVENREPO/stdlib/${VERSION}/stdlib-${VERSION}.jar
 QUICKCHECK_JAR=$MAVENREPO/quickcheck/${VERSION}/quickcheck-${VERSION}.jar
+ISABELLE_JARS=$ISABELLEREPO/vdm2isa/1.2.0-SNAPSHOT/vdm2isa-1.2.0-SNAPSHOT.jar:$ISABELLEREPO/vdm2isa-lsp/1.2.0-SNAPSHOT/vdm2isa-lsp-1.2.0-SNAPSHOT.jar
 
 exec java ${JAVA64_VMOPTS} \
-    -cp $VDMJ_JAR:$ANNOTATIONS_JAR:$LSP_JAR:$STDLIB_JAR:$QUICKCHECK_JAR \
+    -cp $VDMJ_JAR:$ANNOTATIONS_JAR:$LSP_JAR:$STDLIB_JAR:$QUICKCHECK_JAR:$ISABELLE_JARS \
     lsp.LSPServerDebug $DIALECT -lsp 8000 -dap 8001
 
