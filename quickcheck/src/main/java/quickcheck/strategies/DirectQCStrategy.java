@@ -142,6 +142,10 @@ public class DirectQCStrategy extends QCStrategy
 				return new StrategyResults(getName(), "(patterns match type values)", null, System.currentTimeMillis() - before);
 			}
 		}
+		catch (ArithmeticException e)
+		{
+			// Infinite subtype encountered...
+		}
 		catch (InternalException e)
 		{
 			// Infinite subtype encountered...
