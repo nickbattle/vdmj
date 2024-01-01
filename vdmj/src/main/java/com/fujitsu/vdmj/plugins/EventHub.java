@@ -40,7 +40,7 @@ import com.fujitsu.vdmj.messages.VDMMessage;
 public class EventHub
 {
 	private static EventHub INSTANCE = null;
-	private long lastDuration = 0;
+	private long lastDuration = -1;
 	
 	private static class ListenerComparator implements Comparator<EventListener>
 	{
