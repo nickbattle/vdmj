@@ -27,14 +27,22 @@ package quickcheck.strategies;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
+import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
+import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
+import com.fujitsu.vdmj.po.expressions.POCaseAlternative;
+import com.fujitsu.vdmj.po.patterns.POPattern;
+import com.fujitsu.vdmj.pog.CasesExhaustiveObligation;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 
 import quickcheck.QuickCheck;
@@ -94,11 +102,51 @@ public class DirectQCStrategy extends QCStrategy
 			case TOTAL_FUNCTION:
 				verboseln("Trying direct proof of total obligation");
 				return directTotalObligation((TotalFunctionObligation) po);
+			
+			case CASES_EXHAUSTIVE:
+				verboseln("Trying direct proof of exhaustive cases obligation");
+				return directCasesObligation((CasesExhaustiveObligation) po);
 				
 			default:
 				verboseln("Obligation cannot be proved directly");
 				return new StrategyResults();
 		}
+	}
+
+	private StrategyResults directCasesObligation(CasesExhaustiveObligation po)
+	{
+		try
+		{
+			long before = System.currentTimeMillis();
+			Context ctxt = Interpreter.getInstance().getInitialContext();
+			long typeSize = po.exp.expType.apply(new INTypeSizeVisitor(), ctxt);
+			
+			if (typeSize > po.exp.cases.size())
+			{
+				return new StrategyResults();	// Impossible
+			}
+			
+			Set<POPattern> unique = new HashSet<POPattern>();
+			
+			for (POCaseAlternative p: po.exp.cases)
+			{
+				if (p.pattern.isSimple())
+				{
+					unique.add(p.pattern);
+				}
+			}
+			
+			if (unique.size() == typeSize)
+			{
+				return new StrategyResults(getName(), "(patterns match type values)", null, System.currentTimeMillis() - before);
+			}
+		}
+		catch (InternalException e)
+		{
+			// Infinite subtype encountered...
+		}
+		
+		return new StrategyResults();	// Complex patterns, so we're not sure
 	}
 
 	private StrategyResults directTotalObligation(TotalFunctionObligation po)
