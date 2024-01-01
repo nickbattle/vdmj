@@ -465,23 +465,27 @@ public class Lifecycle
 		int nwarns = display(messages, VDMWarning.class, warnings);
 		
 		ASTPlugin ast = PluginRegistry.getInstance().getPlugin("AST");
-		int count = ast.getCount();
+		int count = ast.getCount();		// Modules or classes
 
 		if (count > 0)	// Just using -i gives count = 0
 		{
-			String objects = Settings.dialect == Dialect.VDM_SL ?
-				plural(count, "module", "s") :
-				plural(count, "class", "es");
-				
 			double duration = (double)(EventHub.getInstance().getLastDuration())/1000;
-			String title = event.getProperty(AbstractCheckFilesEvent.TITLE);
-			String kind = event.getProperty(AbstractCheckFilesEvent.KIND);
 			
-			if (nerrs > 0 || nwarns > 0 || !title.equals("Prepared"))
+			if (duration >= 0)	// Someone handled an event
 			{
-		   		info(title + " " + objects + " in " + duration + " secs. ");
-		   		info(nerrs == 0 ? "No " + kind + " errors" : "Found " + plural(nerrs, kind + " error", "s"));
-		  		infoln(nwarns == 0 ? "" : " and " + (warnings ? "" : "suppressed ") + plural(nwarns, "warning", "s"));
+				String objects = Settings.dialect == Dialect.VDM_SL ?
+						plural(count, "module", "s") :
+						plural(count, "class", "es");
+						
+				String title = event.getProperty(AbstractCheckFilesEvent.TITLE);
+				String kind = event.getProperty(AbstractCheckFilesEvent.KIND);
+				
+				if (nerrs > 0 || nwarns > 0 || !title.equals("Prepared"))
+				{
+			   		info(title + " " + objects + " in " + duration + " secs. ");
+			   		info(nerrs == 0 ? "No " + kind + " errors" : "Found " + plural(nerrs, kind + " error", "s"));
+			  		infoln(nwarns == 0 ? "" : " and " + (warnings ? "" : "suppressed ") + plural(nwarns, "warning", "s"));
+				}
 			}
 		}
 		

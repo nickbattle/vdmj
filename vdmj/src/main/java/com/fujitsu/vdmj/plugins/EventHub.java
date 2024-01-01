@@ -116,7 +116,7 @@ public class EventHub
 			}
 		}
 		
-		lastDuration = System.currentTimeMillis() - before;
+		lastDuration = (list == null) ? -1 : System.currentTimeMillis() - before;
 		return responses;
 	}
 	
