@@ -27,6 +27,7 @@ package quickcheck.strategies;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
 
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -119,9 +120,9 @@ public class DirectQCStrategy extends QCStrategy
 		{
 			long before = System.currentTimeMillis();
 			Context ctxt = Interpreter.getInstance().getInitialContext();
-			long typeSize = po.exp.expType.apply(new INTypeSizeVisitor(), ctxt);
+			BigInteger typeSize = po.exp.expType.apply(new INTypeSizeVisitor(), ctxt);
 			
-			if (typeSize > po.exp.cases.size())
+			if (typeSize.longValue() > po.exp.cases.size())
 			{
 				return new StrategyResults();	// Impossible
 			}
@@ -136,7 +137,7 @@ public class DirectQCStrategy extends QCStrategy
 				}
 			}
 			
-			if (unique.size() == typeSize)
+			if (unique.size() == typeSize.longValue())
 			{
 				return new StrategyResults(getName(), "(patterns match type values)", null, System.currentTimeMillis() - before);
 			}
