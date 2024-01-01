@@ -257,11 +257,15 @@ public class Lifecycle
 		try
 		{
 			PluginRegistry registry = PluginRegistry.getInstance();
-			List<String> userPlugins = GetResource.readResource("vdmj.plugins");
+			List<String> vdmjPlugins = GetResource.readResource("vdmj.plugins");
 			
-			if (!userPlugins.isEmpty())
+			if (vdmjPlugins.isEmpty())
 			{
-				for (String plugin: userPlugins)
+				println("No vdmj.plugins defined. Set vdmj.plugins property or resource");
+			}
+			else
+			{
+				for (String plugin: vdmjPlugins)
 				{
 					try
 					{
@@ -284,6 +288,11 @@ public class Lifecycle
 						throw e;
 					}
 				}
+			}
+			
+			if (registry.getPlugin("AST") == null)
+			{
+				println("No AST plugin defined in vdmj.plugins?");
 			}
 		}
 		catch (Throwable e)
