@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCExplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCImplicitFunctionDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
+import com.fujitsu.vdmj.tc.expressions.TCNewExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
@@ -46,22 +47,49 @@ public class TCQuickCheckAnnotation extends TCAnnotation
 	
 	public final TCParameterType qcParam;
 	public final TCTypeList qcTypes;
+	public final TCNewExpression qcConstructor;
 
-	public TCQuickCheckAnnotation(TCIdentifierToken name, TCParameterType qcParam, TCTypeList qcTypes)
+	public TCQuickCheckAnnotation(TCIdentifierToken name,
+		TCParameterType qcParam, TCTypeList qcTypes, TCNewExpression qcConstructor)
 	{
 		super(name, null);
 		this.qcParam = qcParam;
 		this.qcTypes = qcTypes;
+		this.qcConstructor = qcConstructor;
 	}
 	
 	@Override
 	public String toString()
 	{
-		return "@" + name + " " + qcParam + " = " + Utils.listToString("", qcTypes, ", ", ";");
+		if (qcConstructor != null)
+		{
+			return "@" + name + " " + qcConstructor + ";";
+		}
+		else
+		{
+			return "@" + name + " " + qcParam + " = " + Utils.listToString("", qcTypes, ", ", ";");
+		}
 	}
 
 	@Override
 	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
+	{
+		if (qcConstructor == null)
+		{
+			checkTypeParams(def, env, scope);
+		}
+		else
+		{
+			checkConstructor(def, env, scope);
+		}
+	}
+	
+	private void checkConstructor(TCDefinition def, Environment env, NameScope scope)
+	{
+		// check?
+	}
+
+	private void checkTypeParams(TCDefinition def, Environment env, NameScope scope)
 	{
 		TCTypeList funcParams = null;
 		

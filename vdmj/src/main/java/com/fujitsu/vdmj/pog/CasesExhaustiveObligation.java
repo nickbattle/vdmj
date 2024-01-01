@@ -31,10 +31,13 @@ import com.fujitsu.vdmj.po.patterns.visitors.PORemoveIgnoresVisitor;
 public class CasesExhaustiveObligation extends ProofObligation
 {
 	private final boolean hasCorrelatedBinds;
+	public final POCasesExpression exp;
 	
 	public CasesExhaustiveObligation(POCasesExpression exp, POContextStack ctxt)
 	{
 		super(exp.location, POType.CASES_EXHAUSTIVE, ctxt);
+		this.exp = exp;
+		
 		StringBuilder sb = new StringBuilder();
 		String prefix = "";
 		boolean correlated = false;

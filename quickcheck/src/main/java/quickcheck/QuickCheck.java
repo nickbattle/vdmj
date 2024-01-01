@@ -57,6 +57,7 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.ObjectContext;
+import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
@@ -306,7 +307,9 @@ public class QuickCheck
 		
 		INExpression poexp = getINExpression(po);
 		List<INBindingOverride> binds = getINBindList(poexp);
-		IterableContext ictxt = addTypeParams(po, Interpreter.getInstance().getInitialContext());
+		Context ctxt = Interpreter.getInstance().getInitialContext();
+		ctxt = addSelf(po, ctxt);
+		IterableContext ictxt = addTypeParams(po, ctxt);
 		boolean hasAllValues = false;
 		long before = System.currentTimeMillis();
 		
@@ -428,19 +431,7 @@ public class QuickCheck
 				Context ctxt = Interpreter.getInstance().getInitialContext();
 				Interpreter.getInstance().setDefaultName(po.location.module);
 				
-				if (Settings.dialect != Dialect.VDM_SL)
-				{
-					ClassInterpreter in = ClassInterpreter.getInstance();
-					INClassDefinition classdef = in.getDefaultClass();
-					ObjectValue object = classdef.newInstance(null, null, ctxt);
-
-					ctxt = new ObjectContext(
-							classdef.name.getLocation(), classdef.name.getName() + "()",
-							ctxt, object);
-
-					ctxt.put(classdef.name.getSelfName(), object);
-				}
-				
+				ctxt = addSelf(po, ctxt);
 				IterableContext ictxt = addTypeParams(po, ctxt);
 				Value execResult = new BooleanValue(false);
 				ContextException execException = null;
@@ -689,12 +680,16 @@ public class QuickCheck
 					if (a instanceof POQuickCheckAnnotation)
 					{
 						POQuickCheckAnnotation qca = (POQuickCheckAnnotation)a;
-						int index = 0;
 						
-						for (TCType ptype: qca.qcTypes)
+						if (qca.qcTypes != null)	// ie. not new C(args)
 						{
-							Map<TCNameToken, Value> map = ictxt.newMap(index++);
-							map.put(qca.qcParam.name, new ParameterValue(ptype));
+							int index = 0;
+							
+							for (TCType ptype: qca.qcTypes)
+							{
+								Map<TCNameToken, Value> map = ictxt.newMap(index++);
+								map.put(qca.qcParam.name, new ParameterValue(ptype));
+							}
 						}
 					}
 				}
@@ -717,6 +712,48 @@ public class QuickCheck
 		}
 
 		return ictxt;
+	}
+	
+	private Context addSelf(ProofObligation po, Context ctxt)
+	{
+		if (Settings.dialect != Dialect.VDM_SL)
+		{
+			try
+			{
+				if (po.annotations != null)
+				{
+					for (POAnnotation a: po.annotations)
+					{
+						if (a instanceof POQuickCheckAnnotation)
+						{
+							POQuickCheckAnnotation qca = (POQuickCheckAnnotation)a;
+							
+							if (qca.qcConstructor != null)
+							{
+								// create object and return it... how?
+								break;
+							}
+						}
+					}
+				}
+
+				ClassInterpreter in = ClassInterpreter.getInstance();
+				INClassDefinition classdef = in.getDefaultClass();
+				ObjectValue object = classdef.newInstance(null, null, ctxt);
+
+				ctxt = new ObjectContext(
+						classdef.name.getLocation(), classdef.name.getName() + "()",
+						ctxt, object);
+
+				ctxt.put(classdef.name.getSelfName(), object);
+			}
+			catch (ValueException e)
+			{
+				// Use ctxt unchanged?
+			}
+		}
+		
+		return ctxt;
 	}
 
 	private void printBindings(List<INBindingOverride> bindings)

@@ -4,4 +4,4 @@
 
 # annotations
 package quickcheck.annotations.ast to quickcheck.annotations.tc;
-map ASTQuickCheckAnnotation{name, qcParam, qcTypes} to TCQuickCheckAnnotation(name, qcParam, qcTypes);
+map ASTQuickCheckAnnotation{name, qcParam, qcTypes, qcConstructor} to TCQuickCheckAnnotation(name, qcParam, qcTypes, qcConstructor);

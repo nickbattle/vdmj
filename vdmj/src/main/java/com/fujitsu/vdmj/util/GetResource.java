@@ -90,15 +90,20 @@ public class GetResource
 	public static List<String> readResource(String resourceName, String propertyName) throws Exception
 	{
 		String property = System.getProperty(propertyName);
+		List<String> results = new Vector<String>();
 		
 		if (property != null)	// Overrides the resources
 		{
-			String[] parts = property.split("\\s*[,;]\\s*");
-			return Arrays.asList(parts);
+			if (!property.isEmpty())
+			{
+				results.addAll(Arrays.asList(property.split("\\s*[,;]\\s*")));
+			}
+			
+			return results;
 		}
 		else
 		{
-			List<String> results = new Vector<String>();
+			
 			Enumeration<URL> urls = GetResource.class.getClassLoader().getResources(resourceName);
 	
 			while (urls.hasMoreElements())
