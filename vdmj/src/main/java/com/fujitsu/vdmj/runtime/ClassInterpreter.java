@@ -43,7 +43,9 @@ import com.fujitsu.vdmj.in.definitions.INClassList;
 import com.fujitsu.vdmj.in.definitions.INDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
@@ -420,13 +422,15 @@ public class ClassInterpreter extends Interpreter
 	@Override
 	public INStatement findStatement(File file, int lineno)
 	{
-		return executableClasses.findStatement(file, lineno);
+		INStatementList list = executableClasses.findStatements(file, lineno);
+		return (list == null || list.isEmpty()) ? null : list.firstElement();
 	}
 
 	@Override
 	public INExpression findExpression(File file, int lineno)
 	{
-		return executableClasses.findExpression(file, lineno);
+		INExpressionList list = executableClasses.findExpressions(file, lineno);
+		return (list == null || list.isEmpty()) ? null : list.firstElement();
 	}
 
 	public void create(String var, String exp) throws Exception

@@ -28,6 +28,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
 import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
@@ -39,6 +40,8 @@ import com.fujitsu.vdmj.debug.ConsoleDebugReader;
 import com.fujitsu.vdmj.debug.ConsoleKeyWatcher;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.definitions.INClassList;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.VDMMessage;
@@ -225,5 +228,17 @@ public class INPluginPP extends INPlugin
 		}
 		
 		return interpreter;
+	}
+
+	@Override
+	public INExpressionList findExpressions(File file, int lineno)
+	{
+		return inClassList.findExpressions(file, lineno);
+	}
+
+	@Override
+	public INStatementList findStatements(File file, int lineno)
+	{
+		return inClassList.findStatements(file, lineno);
 	}
 }

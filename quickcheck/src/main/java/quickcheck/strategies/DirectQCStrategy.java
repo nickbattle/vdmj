@@ -35,11 +35,14 @@ import java.util.Set;
 import com.fujitsu.vdmj.in.expressions.INCaseAlternative;
 import com.fujitsu.vdmj.in.expressions.INCasesExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.patterns.INBindingGlobals;
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
 import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.plugins.PluginRegistry;
+import com.fujitsu.vdmj.plugins.analyses.INPlugin;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POCaseAlternative;
 import com.fujitsu.vdmj.po.patterns.POPattern;
@@ -129,11 +132,24 @@ public class DirectQCStrategy extends QCStrategy
 			Context ctxt = Interpreter.getInstance().getInitialContext();
 			
 			LexLocation loc = po.exp.location;
-			INExpression found = Interpreter.getInstance().findExpression(loc.file, loc.startLine);
+			INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
+			INExpressionList list = in.findExpressions(loc.file, loc.startLine);
+			INCasesExpression cases = null;
 			
-			if (found instanceof INCasesExpression)		// Multiple expressions on line?
+			if (list != null)
 			{
-				INCasesExpression cases = (INCasesExpression)found;
+				for (INExpression exp: list)	// All on the same line
+				{
+					if (exp instanceof INCasesExpression && exp.location.equals(loc))
+					{
+						cases = (INCasesExpression) exp;
+						break;
+					}
+				}
+			}
+			
+			if (cases != null)		// Should always be found, but...
+			{
 				ValueList values = po.exp.expType.apply(new INGetAllValuesVisitor(), ctxt);
 				long timeout = INBindingGlobals.getInstance().getTimeout();
 				
@@ -153,16 +169,16 @@ public class DirectQCStrategy extends QCStrategy
 						{
 							// Did not match
 						}
-						
-						if (System.currentTimeMillis() - before > timeout)
-						{
-							return new StrategyResults();	// Maybe
-						}
 					}
 					
 					if (!matched)
 					{
 						return new StrategyResults(getName(), "(case " + value + " unmatched)", System.currentTimeMillis() - before);
+					}
+					
+					if (System.currentTimeMillis() - before > timeout)
+					{
+						return new StrategyResults();	// Maybe, for very large types
 					}
 				}
 
@@ -170,11 +186,16 @@ public class DirectQCStrategy extends QCStrategy
 			}
 			else
 			{
+				/**
+				 * Plan B. The cases expression has been type checked, so all of the patterns can
+				 * match the type. So we count whether there are the right number of simple patterns
+				 * to match the type size - a simple pattern can only match one value.
+				 */
 				BigInteger typeSize = po.exp.expType.apply(new INTypeSizeVisitor(), ctxt);
 				
 				if (typeSize.longValue() > po.exp.cases.size())
 				{
-					return new StrategyResults();	// Impossible
+					return new StrategyResults();	// Impossible with simple patterns
 				}
 				
 				Set<POPattern> unique = new HashSet<POPattern>();

@@ -29,8 +29,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.fujitsu.vdmj.in.INMappedList;
-import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.RootContext;
@@ -138,17 +138,17 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
 		}
 	}
 	
-	public INStatement findStatement(File file, int lineno)
+	public INStatementList findStatements(File file, int lineno)
 	{
 		for (INClassDefinition c: this)
 		{
 			if (c.name.getLocation().file.equals(file))
 			{
-    			INStatement stmt = c.findStatement(lineno);
+    			INStatementList stmts = c.findStatements(lineno);
 
-    			if (stmt != null)
+    			if (stmts != null && !stmts.isEmpty())
     			{
-    				return stmt;
+    				return stmts;
     			}
 			}
 		}
@@ -156,17 +156,17 @@ public class INClassList extends INMappedList<TCClassDefinition, INClassDefiniti
 		return null;
 	}
 
-	public INExpression findExpression(File file, int lineno)
+	public INExpressionList findExpressions(File file, int lineno)
 	{
 		for (INClassDefinition c: this)
 		{
 			if (c.name.getLocation().file.equals(file))
 			{
-    			INExpression exp = c.findExpression(lineno);
+    			INExpressionList exps = c.findExpressions(lineno);
 
-    			if (exp != null)
+    			if (exps != null && !exps.isEmpty())
     			{
-    				return exp;
+    				return exps;
     			}
 			}
 		}
