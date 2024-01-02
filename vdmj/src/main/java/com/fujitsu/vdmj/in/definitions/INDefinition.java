@@ -31,9 +31,7 @@ import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionExpressionFinder;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionStatementFinder;
 import com.fujitsu.vdmj.in.definitions.visitors.INDefinitionVisitor;
-import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
-import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.Token;
@@ -117,29 +115,27 @@ public abstract class INDefinition extends INNode implements Serializable, Compa
 	abstract public TCType getType();
 
 	/**
-	 * Locate a {@link TCStatement} that starts on the line number indicated.
+	 * Locate all {@link TCStatement} that starts on the line number indicated.
 	 * This is used by the debugger to set breakpoints.
 	 *
 	 * @param lineno The line number to look for.
-	 * @return A statement that starts on the line, or null if there is none.
+	 * @return A list of statements that start on the line, or null if there is none.
 	 */
-	public final INStatement findStatement(int lineno)
+	public final INStatementList findStatements(int lineno)
 	{
-		INStatementList all = this.apply(new INDefinitionStatementFinder(), lineno);
-		return all.isEmpty() ? null : all.get(0);
+		return this.apply(new INDefinitionStatementFinder(), lineno);
 	}
 
 	/**
-	 * Locate an {@link TCExpression} that starts on the line number indicated.
+	 * Locate all {@link TCExpression} that start on the line number indicated.
 	 * This is used by the debugger to set breakpoints.
 	 *
-	 * @param lineno The line number to look for.
+	 * @param linno The line number to look for.
 	 * @return An expression that starts on the line, or null if there is none.
 	 */
-	public final INExpression findExpression(int lineno)
+	public final INExpressionList findExpressions(int lineno)
 	{
-		INExpressionList all = this.apply(new INDefinitionExpressionFinder(), lineno);
-		return all.isEmpty() ? null : all.get(0);
+		return this.apply(new INDefinitionExpressionFinder(), lineno);
 	}
 
 	/**

@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.plugins.analyses;
 import static com.fujitsu.vdmj.plugins.PluginConsole.fail;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -35,6 +36,8 @@ import com.fujitsu.vdmj.ExitStatus;
 import com.fujitsu.vdmj.RemoteControl;
 import com.fujitsu.vdmj.RemoteSimulation;
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
@@ -379,6 +382,10 @@ abstract public class INPlugin extends AnalysisPlugin implements EventListener
 	abstract public Interpreter getInterpreter();
 
 	abstract public <T extends Collection<?>> T getIN();
+	
+	abstract public INExpressionList findExpressions(File file, int lineno);
+	
+	abstract public INStatementList findStatements(File file, int lineno);
 
 	@SuppressWarnings("unchecked")
 	private static <T> T getRemoteClass(String remoteName)

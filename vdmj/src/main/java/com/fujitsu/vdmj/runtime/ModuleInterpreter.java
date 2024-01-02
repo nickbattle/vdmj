@@ -41,9 +41,11 @@ import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.lex.LexTokenReader;
@@ -354,7 +356,8 @@ public class ModuleInterpreter extends Interpreter
 	@Override
 	public INStatement findStatement(File file, int lineno)
 	{
-		return executableModules.findStatement(file, lineno);
+		INStatementList list = executableModules.findStatements(file, lineno);
+		return (list == null || list.isEmpty()) ? null : list.firstElement();
 	}
 
 	/**
@@ -368,7 +371,8 @@ public class ModuleInterpreter extends Interpreter
 	@Override
 	public INExpression findExpression(File file, int lineno)
 	{
-		return executableModules.findExpression(file, lineno);
+		INExpressionList list = executableModules.findExpressions(file, lineno);
+		return (list == null || list.isEmpty()) ? null : list.firstElement();
 	}
 
 	@Override
