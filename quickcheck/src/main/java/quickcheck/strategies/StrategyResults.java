@@ -44,6 +44,7 @@ import com.fujitsu.vdmj.values.ValueList;
 public class StrategyResults
 {
 	public final String provedBy;			// If set, proved by the strategy
+	public final String disprovedBy;		// If set, disproved by the strategy
 	public final String message;			// Any message along with the result
 	public final Context witness;			// Any witness found
 	
@@ -57,6 +58,7 @@ public class StrategyResults
 	public StrategyResults()
 	{
 		this.provedBy = null;
+		this.disprovedBy = null;
 		this.message = null;
 		this.witness = null;
 		
@@ -65,9 +67,22 @@ public class StrategyResults
 		this.duration = 0;
 	}
 
+	public StrategyResults(String disprovedBy, String message, long duration)
+	{
+		this.provedBy = null;
+		this.disprovedBy = disprovedBy;
+		this.message = message;
+		this.witness = null;
+
+		this.counterexamples = new HashMap<String, ValueList>();;
+		this.hasAllValues = false;
+		this.duration = duration;
+	}
+
 	public StrategyResults(Map<String, ValueList> counterexamples, boolean hasAllValues, long duration)
 	{
 		this.provedBy = null;
+		this.disprovedBy = null;
 		this.message = null;
 		this.witness = null;
 
@@ -79,6 +94,7 @@ public class StrategyResults
 	public StrategyResults(String provedBy, String message, Context witness, long duration)
 	{
 		this.provedBy = provedBy;
+		this.disprovedBy = null;
 		this.message = message;
 		this.witness = witness;
 

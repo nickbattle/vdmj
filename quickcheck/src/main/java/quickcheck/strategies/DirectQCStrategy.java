@@ -32,10 +32,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fujitsu.vdmj.in.expressions.INCaseAlternative;
+import com.fujitsu.vdmj.in.expressions.INCasesExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.patterns.INBindingGlobals;
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
+import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
 import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
-import com.fujitsu.vdmj.messages.InternalException;
+import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POCaseAlternative;
 import com.fujitsu.vdmj.po.patterns.POPattern;
@@ -44,7 +48,10 @@ import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
+import com.fujitsu.vdmj.runtime.PatternMatchException;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
+import com.fujitsu.vdmj.values.Value;
+import com.fujitsu.vdmj.values.ValueList;
 
 import quickcheck.QuickCheck;
 import quickcheck.visitors.TotalExpressionVisitor;
@@ -120,35 +127,76 @@ public class DirectQCStrategy extends QCStrategy
 		{
 			long before = System.currentTimeMillis();
 			Context ctxt = Interpreter.getInstance().getInitialContext();
-			BigInteger typeSize = po.exp.expType.apply(new INTypeSizeVisitor(), ctxt);
 			
-			if (typeSize.longValue() > po.exp.cases.size())
+			LexLocation loc = po.exp.location;
+			INExpression found = Interpreter.getInstance().findExpression(loc.file, loc.startLine);
+			
+			if (found instanceof INCasesExpression)		// Multiple expressions on line?
 			{
-				return new StrategyResults();	// Impossible
-			}
-			
-			Set<POPattern> unique = new HashSet<POPattern>();
-			
-			for (POCaseAlternative p: po.exp.cases)
-			{
-				if (p.pattern.isSimple())
+				INCasesExpression cases = (INCasesExpression)found;
+				ValueList values = po.exp.expType.apply(new INGetAllValuesVisitor(), ctxt);
+				long timeout = INBindingGlobals.getInstance().getTimeout();
+				
+				for (Value value: values)
 				{
-					unique.add(p.pattern);
+					boolean matched = false;
+					
+					for (INCaseAlternative alt: cases.cases)
+					{
+						try
+						{
+							alt.pattern.getNamedValues(value, ctxt);
+							matched = true;
+							break;
+						}
+						catch (PatternMatchException e)
+						{
+							// Did not match
+						}
+						
+						if (System.currentTimeMillis() - before > timeout)
+						{
+							return new StrategyResults();	// Maybe
+						}
+					}
+					
+					if (!matched)
+					{
+						return new StrategyResults(getName(), "(case " + value + " unmatched)", System.currentTimeMillis() - before);
+					}
 				}
-			}
-			
-			if (unique.size() == typeSize.longValue())
-			{
+
 				return new StrategyResults(getName(), "(patterns match type values)", null, System.currentTimeMillis() - before);
 			}
+			else
+			{
+				BigInteger typeSize = po.exp.expType.apply(new INTypeSizeVisitor(), ctxt);
+				
+				if (typeSize.longValue() > po.exp.cases.size())
+				{
+					return new StrategyResults();	// Impossible
+				}
+				
+				Set<POPattern> unique = new HashSet<POPattern>();
+				
+				for (POCaseAlternative p: po.exp.cases)
+				{
+					if (p.pattern.isSimple())
+					{
+						unique.add(p.pattern);
+					}
+				}
+				
+				if (unique.size() == typeSize.longValue())
+				{
+					return new StrategyResults(getName(), "(patterns match type values)", null, System.currentTimeMillis() - before);
+				}
+			}
 		}
-		catch (ArithmeticException e)
+		catch (Throwable e)
 		{
-			// Infinite subtype encountered...
-		}
-		catch (InternalException e)
-		{
-			// Infinite subtype encountered...
+			// Probably infinite subtype encountered, or stack/arithmetic overflow
+			verboseln("Direct failed with " + e);
 		}
 		
 		return new StrategyResults();	// Complex patterns, so we're not sure

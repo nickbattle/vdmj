@@ -312,6 +312,8 @@ public class QuickCheck
 		IterableContext ictxt = addTypeParams(po, ctxt);
 		boolean hasAllValues = false;
 		long before = System.currentTimeMillis();
+		INBindingGlobals globals = INBindingGlobals.getInstance();
+		globals.setTimeout(timeout);	// Strategies can use this
 		
 		while (ictxt.hasNext())
 		{
@@ -322,9 +324,9 @@ public class QuickCheck
 				verbose("Invoking %s strategy\n", strategy.getName());
 				StrategyResults sresults = strategy.getValues(po, poexp, binds, ictxt);
 				
-				if (sresults.provedBy != null)	// No need to go further
+				if (sresults.provedBy != null || sresults.disprovedBy != null)	// No need to go further
 				{
-					verbose("Obligation proved by %s\n", strategy.getName());
+					verbose("Obligation (dis)proved by %s\n", strategy.getName());
 					sresults.setDuration(System.currentTimeMillis() - before);
 					sresults.setBinds(binds);
 					sresults.setInExpression(poexp);
@@ -401,6 +403,16 @@ public class QuickCheck
 				po.setWitness(sresults.witness);
 				po.setCounterexample(null);
 				infof(POStatus.PROVED, "PO #%d, PROVED by %s %s %s\n", po.number, sresults.provedBy, sresults.message, duration(sresults.duration));
+				return;
+			}
+			else if (sresults.disprovedBy != null)
+			{
+				po.setStatus(POStatus.FAILED);
+				po.setProvedBy(sresults.disprovedBy);
+				po.setMessage(sresults.message);
+				po.setWitness(null);
+				po.setCounterexample(null);
+				infof(POStatus.FAILED, "PO #%d, FAILED by %s %s %s\n", po.number, sresults.disprovedBy, sresults.message, duration(sresults.duration));
 				return;
 			}
 			
