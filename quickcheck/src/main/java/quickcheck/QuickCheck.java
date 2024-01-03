@@ -402,7 +402,8 @@ public class QuickCheck
 				po.setMessage(sresults.message);
 				po.setWitness(sresults.witness);
 				po.setCounterexample(null);
-				infof(POStatus.PROVED, "PO #%d, PROVED by %s %s %s\n", po.number, sresults.provedBy, sresults.message, duration(sresults.duration));
+				infof(POStatus.PROVED, "PO #%d, PROVED by %s %s %s\n",
+						po.number, sresults.provedBy, sresults.message, duration(sresults.duration));
 				return;
 			}
 			else if (sresults.disprovedBy != null)
@@ -411,8 +412,18 @@ public class QuickCheck
 				po.setProvedBy(sresults.disprovedBy);
 				po.setMessage(sresults.message);
 				po.setWitness(null);
-				po.setCounterexample(null);
-				infof(POStatus.FAILED, "PO #%d, FAILED by %s %s %s\n", po.number, sresults.disprovedBy, sresults.message, duration(sresults.duration));
+				po.setCounterexample(sresults.witness);		// Note: set in counterexample
+				
+				if (sresults.witness == null)
+				{
+					infof(POStatus.FAILED, "PO #%d, FAILED by %s %s %s\n",
+							po.number, sresults.disprovedBy, sresults.message, duration(sresults.duration));
+				}
+				else
+				{
+					infof(POStatus.FAILED, "PO #%d, FAILED by %s %s: Counterexample: %s\n",
+							po.number, sresults.disprovedBy, duration(sresults.duration), sresults.witness.toStringLine());
+				}
 				return;
 			}
 			

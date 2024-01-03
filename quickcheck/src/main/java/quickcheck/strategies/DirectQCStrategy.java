@@ -51,6 +51,7 @@ import com.fujitsu.vdmj.pog.TotalFunctionObligation;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.PatternMatchException;
+import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.typechecker.TypeComparator;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
@@ -171,7 +172,10 @@ public class DirectQCStrategy extends QCStrategy
 					
 					if (!matched)
 					{
-						return new StrategyResults(getName(), "(case " + value + " unmatched)", System.currentTimeMillis() - before);
+						TCNameToken name = new TCNameToken(po.location, po.location.module, po.exp.exp.toString());
+						Context cex = new Context(po.location, "Counterexample", null);
+						cex.put(name, value);
+						return new StrategyResults(getName(), cex, "(case unmatched)", System.currentTimeMillis() - before);
 					}
 					
 					if (System.currentTimeMillis() - before > timeout)
@@ -180,7 +184,7 @@ public class DirectQCStrategy extends QCStrategy
 					}
 				}
 				
-				return new StrategyResults(getName(), "(patterns match type values)", null, System.currentTimeMillis() - before);
+				return new StrategyResults(getName(), "(patterns match all type values)", null, System.currentTimeMillis() - before);
 			}
 			else
 			{
@@ -208,7 +212,7 @@ public class DirectQCStrategy extends QCStrategy
 				
 				if (unique.size() == typeSize)
 				{
-					return new StrategyResults(getName(), "(patterns match type values)", null, System.currentTimeMillis() - before);
+					return new StrategyResults(getName(), "(patterns match all type values)", null, System.currentTimeMillis() - before);
 				}
 			}
 		}
