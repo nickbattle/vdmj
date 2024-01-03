@@ -422,15 +422,27 @@ public class ClassInterpreter extends Interpreter
 	@Override
 	public INStatement findStatement(File file, int lineno)
 	{
-		INStatementList list = executableClasses.findStatements(file, lineno);
+		INStatementList list = findStatements(file, lineno);
 		return (list == null || list.isEmpty()) ? null : list.firstElement();
+	}
+
+	@Override
+	public INStatementList findStatements(File file, int lineno)
+	{
+		return executableClasses.findStatements(file, lineno);
 	}
 
 	@Override
 	public INExpression findExpression(File file, int lineno)
 	{
-		INExpressionList list = executableClasses.findExpressions(file, lineno);
+		INExpressionList list = findExpressions(file, lineno);
 		return (list == null || list.isEmpty()) ? null : list.firstElement();
+	}
+
+	@Override
+	public INExpressionList findExpressions(File file, int lineno)
+	{
+		return executableClasses.findExpressions(file, lineno);
 	}
 
 	public void create(String var, String exp) throws Exception

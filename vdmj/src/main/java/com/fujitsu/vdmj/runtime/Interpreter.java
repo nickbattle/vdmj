@@ -41,8 +41,10 @@ import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.in.statements.INStatement;
+import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.ast.expressions.ASTExpression;
 import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
@@ -331,6 +333,7 @@ abstract public class Interpreter
 	 * @return A INStatement object if found, else null.
 	 */
 	abstract public INStatement findStatement(File file, int lineno);
+	abstract public INStatementList findStatements(File file, int lineno);
 
 	/**
 	 * Find an expression by file name and line number.
@@ -340,6 +343,7 @@ abstract public class Interpreter
 	 * @return An INExpression object if found, else null.
 	 */
 	abstract public INExpression findExpression(File file, int lineno);
+	abstract public INExpressionList findExpressions(File file, int lineno);
 
 	/**
 	 * Find a global environment value by name.
