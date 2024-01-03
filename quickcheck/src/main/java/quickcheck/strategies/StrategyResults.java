@@ -46,7 +46,7 @@ public class StrategyResults
 	public final String provedBy;			// If set, proved by the strategy
 	public final String disprovedBy;		// If set, disproved by the strategy
 	public final String message;			// Any message along with the result
-	public final Context witness;			// Any witness found
+	public final Context witness;			// Any witness found (can be a disproof witness)
 	
 	public final Map<String, ValueList> counterexamples;
 	public final boolean hasAllValues;		// Contains all possible values from all binds
@@ -67,12 +67,12 @@ public class StrategyResults
 		this.duration = 0;
 	}
 
-	public StrategyResults(String disprovedBy, String message, long duration)
+	public StrategyResults(String disprovedBy, Context witness, String message, long duration)
 	{
 		this.provedBy = null;
 		this.disprovedBy = disprovedBy;
 		this.message = message;
-		this.witness = null;
+		this.witness = witness;
 
 		this.counterexamples = new HashMap<String, ValueList>();;
 		this.hasAllValues = false;
