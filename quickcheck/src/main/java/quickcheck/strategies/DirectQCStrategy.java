@@ -173,7 +173,7 @@ public class DirectQCStrategy extends QCStrategy
 					if (!matched)
 					{
 						TCNameToken name = new TCNameToken(po.location, po.location.module, po.exp.exp.toString());
-						Context cex = new Context(po.location, "Counterexample", null);
+						Context cex = new Context(po.location, "Counterexample", Interpreter.getInstance().getInitialContext());
 						cex.put(name, value);
 						return new StrategyResults(getName(), cex, "(case unmatched)", System.currentTimeMillis() - before);
 					}
