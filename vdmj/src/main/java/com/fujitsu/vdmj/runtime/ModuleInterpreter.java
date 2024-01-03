@@ -356,8 +356,14 @@ public class ModuleInterpreter extends Interpreter
 	@Override
 	public INStatement findStatement(File file, int lineno)
 	{
-		INStatementList list = executableModules.findStatements(file, lineno);
+		INStatementList list = findStatements(file, lineno);
 		return (list == null || list.isEmpty()) ? null : list.firstElement();
+	}
+
+	@Override
+	public INStatementList findStatements(File file, int lineno)
+	{
+		return executableModules.findStatements(file, lineno);
 	}
 
 	/**
@@ -371,8 +377,14 @@ public class ModuleInterpreter extends Interpreter
 	@Override
 	public INExpression findExpression(File file, int lineno)
 	{
-		INExpressionList list = executableModules.findExpressions(file, lineno);
+		INExpressionList list = findExpressions(file, lineno);
 		return (list == null || list.isEmpty()) ? null : list.firstElement();
+	}
+
+	@Override
+	public INExpressionList findExpressions(File file, int lineno)
+	{
+		return executableModules.findExpressions(file, lineno);
 	}
 
 	@Override
