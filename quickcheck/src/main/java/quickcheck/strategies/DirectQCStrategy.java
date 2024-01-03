@@ -40,8 +40,6 @@ import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
 import com.fujitsu.vdmj.in.types.visitors.INTypeSizeVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.plugins.PluginRegistry;
-import com.fujitsu.vdmj.plugins.analyses.INPlugin;
 import com.fujitsu.vdmj.po.definitions.POExplicitFunctionDefinition;
 import com.fujitsu.vdmj.po.expressions.POCaseAlternative;
 import com.fujitsu.vdmj.po.patterns.POPattern;
@@ -131,7 +129,7 @@ public class DirectQCStrategy extends QCStrategy
 			long before = System.currentTimeMillis();
 			Context ctxt = Interpreter.getInstance().getInitialContext();
 			LexLocation loc = po.exp.location;
-			INPlugin in = PluginRegistry.getInstance().getPlugin("IN");
+			Interpreter in = Interpreter.getInstance();
 			INExpressionList list = in.findExpressions(loc.file, loc.startLine);
 			INCasesExpression cases = null;
 			
