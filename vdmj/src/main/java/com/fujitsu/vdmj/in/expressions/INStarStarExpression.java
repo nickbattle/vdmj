@@ -29,8 +29,10 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.values.FunctionValue;
+import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.IterFunctionValue;
 import com.fujitsu.vdmj.values.MapValue;
+import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.NumericValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueMap;
@@ -92,10 +94,27 @@ public class INStarStarExpression extends INBinaryExpression
     		}
     		else if (lv instanceof NumericValue)
     		{
-    			double ld = lv.realValue(ctxt);
-    			double rd = rv.realValue(ctxt);
-
-    			return NumericValue.valueOf(Math.pow(ld, rd), ctxt);
+    			if (lv instanceof IntegerValue && rv instanceof NaturalValue)
+    			{
+    				long ll = lv.intValue(ctxt);
+    				long rl = rv.natValue(ctxt);
+    				
+    				try
+					{
+						return NumericValue.valueOf(power(ll, rl), ctxt);
+					}
+					catch (ArithmeticException e)
+					{
+						throw new ValueException(4169, "Arithmetic overflow", ctxt);
+					}
+    			}
+    			else
+    			{
+	    			double ld = lv.realValue(ctxt);
+	    			double rd = rv.realValue(ctxt);
+	
+	    			return NumericValue.valueOf(Math.pow(ld, rd), ctxt);
+    			}
     		}
 
     		return abort(4031,
@@ -105,6 +124,25 @@ public class INStarStarExpression extends INBinaryExpression
 		{
 			return abort(e);
 		}
+	}
+	
+	private long power(long x, long n) throws ArithmeticException
+	{
+	    long result = 1;
+	    long square = x;
+	    
+	    while (n > 0)
+	    {
+	        if (n % 2 == 1)
+	        {
+	            result = Math.multiplyExact(result, square);
+	        }
+	        
+	        square = square * square;	// Note: not exact as may be last loop
+	        n /= 2;
+	    }
+	    
+	    return result;
 	}
 
 	@Override
