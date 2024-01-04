@@ -105,7 +105,7 @@ public class DirectQCStrategy extends QCStrategy
 	}
 
 	@Override
-	public StrategyResults getValues(ProofObligation po, INExpression exp, List<INBindingOverride> binds, Context ctxt)
+	public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt)
 	{
 		switch (po.kind)
 		{

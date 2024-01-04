@@ -35,15 +35,15 @@ import com.fujitsu.vdmj.values.ValueList;
 
 /**
  * A class to hold the return values of a getValues() call on a QC plugin.
- * The provedBy field indicates that the PO has been proved to have no counterexamples.
+ * The (dis)provedBy fields indicate that the PO probably has no counterexamples.
  * Otherwise, counterexamples contains known or possible values to check. The
  * hasAllValues field indicates that all possible values of all bindings are included
  * (probably from the "finite" strategy) and hence if no counterexamples are found,
- * the PO is proved.
+ * the PO is provable.
  */
 public class StrategyResults
 {
-	public final String provedBy;			// If set, proved by the strategy
+	public final String provedBy;			// If set, provable by the strategy
 	public final String disprovedBy;		// If set, disproved by the strategy
 	public final String message;			// Any message along with the result
 	public final Context witness;			// Any witness found (can be a disproof witness)

@@ -322,7 +322,7 @@ public class QuickCheck
 			for (QCStrategy strategy: strategies)
 			{
 				verbose("Invoking %s strategy\n", strategy.getName());
-				StrategyResults sresults = strategy.getValues(po, poexp, binds, ictxt);
+				StrategyResults sresults = strategy.getValues(po, binds, ictxt);
 				
 				if (sresults.provedBy != null || sresults.disprovedBy != null)	// No need to go further
 				{
@@ -397,12 +397,12 @@ public class QuickCheck
 			}
 			else if (sresults.provedBy != null)
 			{
-				po.setStatus(POStatus.PROVED);
+				po.setStatus(POStatus.PROVABLE);
 				po.setProvedBy(sresults.provedBy);
 				po.setMessage(sresults.message);
 				po.setWitness(sresults.witness);
 				po.setCounterexample(null);
-				infof(POStatus.PROVED, "PO #%d, PROVED by %s %s %s\n",
+				infof(POStatus.PROVABLE, "PO #%d, PROVABLE by %s %s %s\n",
 						po.number, sresults.provedBy, sresults.message, duration(sresults.duration));
 				return;
 			}
@@ -528,7 +528,7 @@ public class QuickCheck
 						}
 						else if (po.isExistential())
 						{
-							outcome = POStatus.PROVED;		// An "exists" PO is PROVED, if true.
+							outcome = POStatus.PROVABLE;		// An "exists" PO is PROVABLE, if true.
 							Context witness = globals.getWitness();
 							po.setWitness(witness);
 							
@@ -540,7 +540,7 @@ public class QuickCheck
 						}
 						else if (sresults.hasAllValues && execCompleted)
 						{
-							outcome = POStatus.PROVED;		// All values were tested and passed, so PROVED
+							outcome = POStatus.PROVABLE;		// All values were tested and passed, so PROVABLE
 							desc = " by finite types";
 							po.setProvedBy("finite");
 						}
