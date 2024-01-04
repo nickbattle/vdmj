@@ -36,8 +36,10 @@ import com.fujitsu.vdmj.in.expressions.visitors.INExpressionVisitor;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.values.FunctionValue;
+import com.fujitsu.vdmj.values.IntegerValue;
 import com.fujitsu.vdmj.values.IterFunctionValue;
 import com.fujitsu.vdmj.values.MapValue;
+import com.fujitsu.vdmj.values.NaturalValue;
 import com.fujitsu.vdmj.values.NumericValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueMap;
@@ -45,8 +47,6 @@ import com.fujitsu.vdmj.values.ValueMap;
 public class INStarStarExpression extends INBinaryExpression
 {
 	private static final long serialVersionUID = 1L;
-
-	private static final BigInteger BIG_MAX_INT = new BigInteger(Integer.toString(Integer.MAX_VALUE));
 
 	public INStarStarExpression(INExpression left, LexToken op, INExpression right)
 	{
@@ -101,42 +101,42 @@ public class INStarStarExpression extends INBinaryExpression
     		}
     		else if (lv instanceof NumericValue)
     		{
-    			if (NumericValue.areIntegers(lv, rv))
-    			{
-    				if (rv.intValue(ctxt).compareTo(BIG_MAX_INT) < 0)
-    				{
-    					int exp = rv.intValue(ctxt).intValue();
-    					
-    					if (exp >= 0)
-    					{
-    						return NumericValue.valueOf(lv.intValue(ctxt).pow(exp), ctxt);
-    					}
-    					else
-    					{
-    						return NumericValue.valueOf(BigDecimal.ONE.divide(lv.realValue(ctxt).pow(-exp)), ctxt);
-    					}
-    				}
-    			}
-
-    			Apfloat ld = new Apfloat(lv.realValue(ctxt), Settings.precision.getPrecision());
-    			Apfloat rd = new Apfloat(rv.realValue(ctxt), Settings.precision.getPrecision());
-    			Apfloat result;
-    			
-    			if (ld.signum() < 0 && NumericValue.isInteger(rv))
+				if (lv instanceof IntegerValue && rv instanceof NaturalValue)
 				{
-					BigInteger exp = rv.intValue(ctxt);
-					result = ApfloatMath.pow(ld, exp.longValue());
+					BigInteger ll = lv.intValue(ctxt);
+					BigInteger rl = rv.natValue(ctxt);
+					
+					try
+					{
+						return NumericValue.valueOf(ll.pow(rl.intValueExact()), ctxt);
+					}
+					catch (ArithmeticException e)
+					{
+						throw new ValueException(4169, "Arithmetic overflow", ctxt);
+					}
 				}
-    			else if (rd.intValue() >= 0)
-    			{
-    				result = ApfloatMath.pow(ld, rd);
-    			}
-    			else
-    			{
-    				result = Apfloat.ONE.divide(ApfloatMath.pow(ld, rd.negate()));
-    			}
-
-    			return NumericValue.valueOf(new BigDecimal(result.toString(), Settings.precision), ctxt);
+				else
+				{
+	    			Apfloat ld = new Apfloat(lv.realValue(ctxt), Settings.precision.getPrecision());
+	    			Apfloat rd = new Apfloat(rv.realValue(ctxt), Settings.precision.getPrecision());
+	    			Apfloat result;
+	    			
+	    			if (ld.signum() < 0 && NumericValue.isInteger(rv))
+					{
+						BigInteger exp = rv.intValue(ctxt);
+						result = ApfloatMath.pow(ld, exp.longValue());
+					}
+	    			else if (rd.signum() >= 0)
+	    			{
+	    				result = ApfloatMath.pow(ld, rd);
+	    			}
+	    			else
+	    			{
+	    				result = Apfloat.ONE.divide(ApfloatMath.pow(ld, rd.negate()));
+	    			}
+	
+	    			return NumericValue.valueOf(new BigDecimal(result.toString(), Settings.precision), ctxt);
+				}
     		}
 
     		return abort(4031,
