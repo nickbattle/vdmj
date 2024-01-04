@@ -25,7 +25,8 @@
 package quickcheck.strategies;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
-import static com.fujitsu.vdmj.plugins.PluginConsole.verboseln;
+import static quickcheck.commands.QCConsole.verbose;
+import static quickcheck.commands.QCConsole.verboseln;
 
 import java.math.BigInteger;
 import java.util.HashSet;
@@ -128,10 +129,9 @@ public class DirectQCStrategy extends QCStrategy
 		try
 		{
 			long before = System.currentTimeMillis();
-			Context ctxt = Interpreter.getInstance().getInitialContext();
-			
-			LexLocation loc = po.exp.location;
 			Interpreter in = Interpreter.getInstance();
+			Context ctxt = in.getInitialContext();
+			LexLocation loc = po.exp.location;
 			INExpressionList list = in.findExpressions(loc.file, loc.startLine);
 			INCasesExpression cases = null;
 			
@@ -151,6 +151,8 @@ public class DirectQCStrategy extends QCStrategy
 			{
 				ValueList values = po.exp.expType.apply(new INGetAllValuesVisitor(), ctxt);
 				long timeout = INBindingGlobals.getInstance().getTimeout();
+				
+				verbose("Checking %d values of type %s\n", values.size(), po.exp.expType);
 				
 				for (Value value: values)
 				{
@@ -172,6 +174,8 @@ public class DirectQCStrategy extends QCStrategy
 					
 					if (!matched)
 					{
+						verbose("Value %s does not match any case patterns\n", value);
+						
 						TCNameToken name = new TCNameToken(po.location, po.location.module, po.exp.exp.toString());
 						Context cex = new Context(po.location, "Counterexample", Interpreter.getInstance().getInitialContext());
 						cex.put(name, value);
@@ -232,24 +236,32 @@ public class DirectQCStrategy extends QCStrategy
 		
 		if (exdef.bodyObligationCount > 0)
 		{
-			return new StrategyResults();	// Body can fail in principle, so not definitely total
+			verboseln("Function body raises some proof obligations, so not total");
+			return new StrategyResults();
 		}
+		
+		verboseln("Function body does not raise any obligations");
 
 		if (exdef.isUndefined ||
 			!TypeComparator.isSubType(exdef.actualResult, exdef.expectedResult))
 		{
-			return new StrategyResults();	// Body may not be the right type, so not definitely total
+			verboseln("But function body type is not a subtype of the return type, so not total");
+			return new StrategyResults();
 		}
+
+		verboseln("Function body type always matches the return type");
 
 		long before = System.currentTimeMillis();
 		exdef.body.apply(visitor, null);
 		
 		if (visitor.isTotal())
 		{
+			verboseln("Function body has no partial operators");
 			return new StrategyResults(getName(), "(body is total)", null, System.currentTimeMillis() - before);
 		}
 		else
 		{
+			verboseln("But function body contains some partial operators");
 			return new StrategyResults();
 		}
 	}

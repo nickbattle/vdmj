@@ -24,6 +24,8 @@
 
 package quickcheck.visitors;
 
+import static quickcheck.commands.QCConsole.verbose;
+
 import java.util.List;
 import java.util.Stack;
 import java.util.Vector;
@@ -276,8 +278,14 @@ public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpre
 	@Override
 	public Boolean caseExpression(TCExpression node, Stack<TCExpression> truths)
 	{
-		if (truths.contains(node))
+		int idx = truths.indexOf(node);
+		
+		if (idx >= 0)
 		{
+			TCExpression original = truths.get(idx);
+			verbose("Expression %s defined at line %d\n", original, original.location.startLine);
+			verbose("Expression %s true at line %d\n", node, node.location.startLine);
+			
 			evaluated.add(Utils.deBracketed(node));		// This truth was used
 			return true;
 		}

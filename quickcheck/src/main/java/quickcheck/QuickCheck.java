@@ -29,6 +29,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static quickcheck.commands.QCConsole.infof;
 import static quickcheck.commands.QCConsole.infoln;
 import static quickcheck.commands.QCConsole.verbose;
+import static quickcheck.commands.QCConsole.verboseln;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
@@ -181,6 +182,8 @@ public class QuickCheck
 		
 		for (QCStrategy strategy: strategies)
 		{
+			verbose("------------------------ Initializing %s strategy\n", strategy.getName());
+
 			doChecks = doChecks && strategy.init(this);
 			
 			if (strategy.hasErrors())
@@ -193,6 +196,7 @@ public class QuickCheck
 			}
 		}
 
+		verbose("------------------------ Initialized\n");
 		return doChecks;
 	}
 	
@@ -321,12 +325,12 @@ public class QuickCheck
 			
 			for (QCStrategy strategy: strategies)
 			{
-				verbose("Invoking %s strategy\n", strategy.getName());
+				verbose("------------------------ Invoking %s strategy on PO #%d\n", strategy.getName(), po.number);
 				StrategyResults sresults = strategy.getValues(po, binds, ictxt);
 				
 				if (sresults.provedBy != null || sresults.disprovedBy != null)	// No need to go further
 				{
-					verbose("Obligation (dis)proved by %s\n", strategy.getName());
+					verbose("Obligation resolved by %s\n", strategy.getName());
 					sresults.setDuration(System.currentTimeMillis() - before);
 					sresults.setBinds(binds);
 					sresults.setInExpression(poexp);
@@ -359,6 +363,8 @@ public class QuickCheck
 				
 				hasAllValues = hasAllValues || sresults.hasAllValues;	// At least one has all values
 			}
+			
+			verboseln("-------------------------");
 		}
 		
 		for (INBindingOverride bind: binds)
@@ -383,6 +389,8 @@ public class QuickCheck
 	
 	public void checkObligation(ProofObligation po, StrategyResults sresults)
 	{
+		verbose("------------------------ Checking PO #%d\n", po.number);
+
 		try
 		{
 			resetErrors();		// Only flag fatal errors
