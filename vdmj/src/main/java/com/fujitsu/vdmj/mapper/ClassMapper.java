@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.mapper;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -65,18 +66,25 @@ public class ClassMapper
 
 	/**
 	 * Get an instance of a mapper, defined by the mapspec file name (resource).
+	 * The error stream can be passed too, with a default getInstance that
+	 * uses System.err.
 	 */
-	public static ClassMapper getInstance(String config)
+	public static ClassMapper getInstance(String config, PrintStream err)
 	{
 		ClassMapper mapper = mappers.get(config);
 		
 		if (mapper == null)
 		{
-			mapper = new ClassMapper(config);
+			mapper = new ClassMapper(config, err);
 			mappers.put(config, mapper);
 		}
 
 		return mapper;
+	}
+
+	public static ClassMapper getInstance(String config)
+	{
+		return getInstance(config, System.err);
 	}
 	
 	/**
@@ -106,6 +114,7 @@ public class ClassMapper
 	/**
 	 * Fields used during the processing of the configuration file
 	 */
+	private final PrintStream errorStream;
 	private final String configFile;
 	private Field SELF;
 	private String srcPackage = "";
@@ -116,8 +125,9 @@ public class ClassMapper
 	/**
 	 * The private constructor, passed the resource name of the mapping file.
 	 */
-	private ClassMapper(String config)
+	private ClassMapper(String config, PrintStream err)
 	{
+		errorStream = err;
 		configFile = config;
 		long before = System.currentTimeMillis();
 
@@ -136,7 +146,7 @@ public class ClassMapper
 		
 		if (errorCount > 0)
 		{
-			System.err.println("Aborting with " + errorCount + " errors");
+			errorStream.println("Aborting with " + errorCount + " errors");
 			throw new ClassMapperException(config);
 		}
 	}
@@ -235,7 +245,7 @@ public class ClassMapper
 	
 	private void error(String message)
 	{
-		System.err.println(configFile + " line " + lineNo + ": " + message);
+		errorStream.println(configFile + " line " + lineNo + ": " + message);
 		errorCount++;
 	}
 
@@ -370,7 +380,7 @@ public class ClassMapper
 			
 			if (mappings.containsKey(toIgnore))
 			{
-				System.err.println("Class is already mapped: " + toIgnore.getName());
+				errorStream.println("Class is already mapped: " + toIgnore.getName());
 			}
 			// else
 			{
@@ -475,7 +485,7 @@ public class ClassMapper
 
 			if (mappings.containsKey(srcClass))
 			{
-				System.err.println("Class is already mapped: " + srcClass.getName());
+				errorStream.println("Class is already mapped: " + srcClass.getName());
 			}
 			// else
 			{
@@ -580,21 +590,21 @@ public class ClassMapper
 				{
 					error("No such constructor: " + mp.destClass.getSimpleName() + "(" + typeString(paramTypes) + ")");
 					
-					System.err.println("Fields available from " + entry.getSimpleName() + ":");
+					errorStream.println("Fields available from " + entry.getSimpleName() + ":");
 					
 					for (Field f: getAllFields(entry))
 					{
-						System.err.println("    " + f.getType().getSimpleName() + " " + f.getName());
+						errorStream.println("    " + f.getType().getSimpleName() + " " + f.getName());
 					}
 					
-					System.err.println("Constructors available for " + mp.destClass.getSimpleName() + ":");
+					errorStream.println("Constructors available for " + mp.destClass.getSimpleName() + ":");
 					
 					for (Constructor<?> ctor: mp.destClass.getConstructors())
 					{
-						System.err.println("    " + mp.destClass.getSimpleName() + "(" + typeString(ctor.getParameterTypes()) + ")");
+						errorStream.println("    " + mp.destClass.getSimpleName() + "(" + typeString(ctor.getParameterTypes()) + ")");
 					}
 					
-					System.err.println();
+					errorStream.println();
 				}
 				
 				mp.setters = new Method[mp.setterFields.size()];
@@ -983,22 +993,22 @@ public class ClassMapper
 		{
 			if (!inProgress.isEmpty())
 			{
-				System.err.println("ClassMapper conversion stack...");
+				errorStream.println("ClassMapper conversion stack...");
 				Progress top = inProgress.peek();
 				MapParams target = mappings.get(top.source.getClass());
 				
 				for (Progress item: inProgress)
 				{
-					System.err.println(item.toString());
+					errorStream.println(item.toString());
 				}
 				
 				if (target != null)
 				{
-					System.err.println(target.toString());
+					errorStream.println(target.toString());
 				}
 			}
 			
-			System.err.println("FAILED: " + throwable.toString());
+			errorStream.println("FAILED: " + throwable.toString());
 			dumpedProgress = true;
 		}
 	}

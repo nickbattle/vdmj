@@ -86,7 +86,7 @@ public class TCQuickCheckAnnotation extends TCAnnotation
 	
 	private void checkConstructor(TCDefinition def, Environment env, NameScope scope)
 	{
-		// check?
+		qcConstructor.typeCheck(env, null, scope, null);
 	}
 
 	private void checkTypeParams(TCDefinition def, Environment env, NameScope scope)

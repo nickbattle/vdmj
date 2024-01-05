@@ -25,6 +25,8 @@
 package quickcheck;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.errorln;
+import static com.fujitsu.vdmj.plugins.PluginConsole.infof;
+import static com.fujitsu.vdmj.plugins.PluginConsole.infoln;
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static quickcheck.commands.QCConsole.infof;
 import static quickcheck.commands.QCConsole.infoln;
@@ -45,8 +47,8 @@ import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.expressions.INBooleanLiteralExpression;
 import com.fujitsu.vdmj.in.expressions.INExpression;
-import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.in.patterns.INBindingGlobals;
+import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
@@ -71,8 +73,8 @@ import com.fujitsu.vdmj.values.ParameterValue;
 import com.fujitsu.vdmj.values.Value;
 import com.fujitsu.vdmj.values.ValueList;
 
-import quickcheck.annotations.po.POQuickCheckAnnotation;
 import quickcheck.annotations.IterableContext;
+import quickcheck.annotations.po.POQuickCheckAnnotation;
 import quickcheck.strategies.FixedQCStrategy;
 import quickcheck.strategies.QCStrategy;
 import quickcheck.strategies.StrategyResults;
@@ -751,6 +753,10 @@ public class QuickCheck
 		{
 			try
 			{
+				ClassInterpreter in = ClassInterpreter.getInstance();
+				INClassDefinition classdef = in.getDefaultClass();
+				ObjectValue object = null;
+
 				if (po.annotations != null)
 				{
 					for (POAnnotation a: po.annotations)
@@ -759,28 +765,38 @@ public class QuickCheck
 						{
 							POQuickCheckAnnotation qca = (POQuickCheckAnnotation)a;
 							
-							if (qca.qcConstructor != null)
+							if (qca.tc != null)
 							{
-								// create object and return it... how?
+								if (qca.newexp == null)		// cached
+								{
+									qca.newexp = ClassMapper.getInstance(INNode.MAPPINGS).convert(qca.tc.qcConstructor);
+								}
+								
+								object = (ObjectValue) qca.newexp.eval(in.getInitialContext());
 								break;
 							}
 						}
 					}
 				}
 
-				ClassInterpreter in = ClassInterpreter.getInstance();
-				INClassDefinition classdef = in.getDefaultClass();
-				ObjectValue object = classdef.newInstance(null, null, ctxt);
-
-				ctxt = new ObjectContext(
-						classdef.name.getLocation(), classdef.name.getName() + "()",
-						ctxt, object);
-
+				if (object == null)
+				{
+					object = classdef.newInstance(null, null, ctxt);
+	
+					ctxt = new ObjectContext(
+							classdef.name.getLocation(), classdef.name.getName() + "()",
+							ctxt, object);
+				}
+	
 				ctxt.put(classdef.name.getSelfName(), object);
 			}
 			catch (ValueException e)
 			{
 				// Use ctxt unchanged?
+			}
+			catch (Exception e)
+			{
+				// Problem with "new"?
 			}
 		}
 		
