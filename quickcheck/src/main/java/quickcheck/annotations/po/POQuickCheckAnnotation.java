@@ -24,12 +24,14 @@
 
 package quickcheck.annotations.po;
 
+import com.fujitsu.vdmj.in.expressions.INNewExpression;
 import com.fujitsu.vdmj.po.annotations.POAnnotation;
-import com.fujitsu.vdmj.po.expressions.PONewExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.types.TCParameterType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
 import com.fujitsu.vdmj.util.Utils;
+
+import quickcheck.annotations.tc.TCQuickCheckAnnotation;
 
 public class POQuickCheckAnnotation extends POAnnotation
 {
@@ -37,23 +39,24 @@ public class POQuickCheckAnnotation extends POAnnotation
 	
 	public final TCParameterType qcParam;
 	public final TCTypeList qcTypes;
-	public final PONewExpression qcConstructor;
+	public final TCQuickCheckAnnotation tc;
+	public INNewExpression newexp;
 
 	public POQuickCheckAnnotation(TCIdentifierToken name,
-		TCParameterType qcParam, TCTypeList qcTypes, PONewExpression qcConstructor)
+		TCParameterType qcParam, TCTypeList qcTypes, TCQuickCheckAnnotation tc)
 	{
 		super(name, null);
 		this.qcParam = qcParam;
 		this.qcTypes = qcTypes;
-		this.qcConstructor = qcConstructor;
+		this.tc = tc;
 	}
 	
 	@Override
 	public String toString()
 	{
-		if (qcConstructor != null)
+		if (tc != null)
 		{
-			return "@" + name + " " + qcConstructor + ";";
+			return "@" + name + " " + tc.qcConstructor + ";";
 		}
 		else
 		{
