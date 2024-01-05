@@ -66,27 +66,25 @@ public class ClassMapper
 
 	/**
 	 * Get an instance of a mapper, defined by the mapspec file name (resource).
+	 * The error stream can be passed too, with a default getInstance that
+	 * uses System.err.
 	 */
-	public static ClassMapper getInstance(String config)
+	public static ClassMapper getInstance(String config, PrintStream err)
 	{
 		ClassMapper mapper = mappers.get(config);
 		
 		if (mapper == null)
 		{
-			mapper = new ClassMapper(config);
+			mapper = new ClassMapper(config, err);
 			mappers.put(config, mapper);
 		}
 
 		return mapper;
 	}
-	
-	/**
-	 * Set the instance error stream to be something other than System.err.
-	 */
-	public ClassMapper setErrStream(PrintStream err)
+
+	public static ClassMapper getInstance(String config)
 	{
-		errorStream = err;
-		return this;	// Convenient for getInstance().setErrStream(...).convert(obj)
+		return getInstance(config, System.err);
 	}
 	
 	/**
@@ -116,19 +114,20 @@ public class ClassMapper
 	/**
 	 * Fields used during the processing of the configuration file
 	 */
+	private final PrintStream errorStream;
 	private final String configFile;
 	private Field SELF;
 	private String srcPackage = "";
 	private String destPackage = "";
 	private int lineNo = 0;
 	private int errorCount = 0;
-	private PrintStream errorStream = System.err;
 	
 	/**
 	 * The private constructor, passed the resource name of the mapping file.
 	 */
-	private ClassMapper(String config)
+	private ClassMapper(String config, PrintStream err)
 	{
+		errorStream = err;
 		configFile = config;
 		long before = System.currentTimeMillis();
 
