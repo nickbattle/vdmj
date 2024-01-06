@@ -965,6 +965,11 @@ public class ClassMapper
 	 */
 	private void mark()
 	{
+		if (marked != null)
+		{
+			errorStream.println("WARNING: Nested call to convertLocal?");
+		}
+		
 		marked = new Vector<Long>();
 	}
 	
