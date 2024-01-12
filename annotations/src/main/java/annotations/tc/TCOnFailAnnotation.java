@@ -46,6 +46,8 @@ public class TCOnFailAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
 	private String format = null;
+	@SuppressWarnings("unused")
+	private TCDocLinkAnnotation doclink = null;
 
 	public TCOnFailAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -129,6 +131,8 @@ public class TCOnFailAnnotation extends TCAnnotation
 				{
 					name.report(6008, "@OnFail must only use %[arg$][#][width]s conversions");
 				}
+				
+				doclink = TCDocLinkAnnotation.enclosing(env);
 			}
 			else
 			{

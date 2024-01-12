@@ -38,11 +38,13 @@ public class INOnFailAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
 	private final String format;
+	private final INDocLinkAnnotation doclink;
 
-	public INOnFailAnnotation(TCIdentifierToken name, INExpressionList args, String format)
+	public INOnFailAnnotation(TCIdentifierToken name, INExpressionList args, String format, INDocLinkAnnotation doclink)
 	{
 		super(name, args);
 		this.format = format;
+		this.doclink = doclink;
 	}
 	
 	@Override
@@ -79,6 +81,11 @@ public class INOnFailAnnotation extends INAnnotation
 				}
 							
 				Console.out.printf(errno + useformat + location + "\n", values);
+				
+				if (doclink != null)
+				{
+					Console.out.printf(doclink.toString());
+				}
 			}
 		}
 		catch (ValueException e)
