@@ -124,7 +124,7 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 	{
 		for (TCAnnotation annotation: this)
 		{
-			annotation.tcAfter(m);
+			annotation.tcAfter(m, e);
 		}
 	}
 
