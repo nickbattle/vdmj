@@ -210,7 +210,15 @@ abstract public class Environment
 		{
 			if (possible.isFunctionOrOperation())
 			{
-				TypeChecker.detail("Possible", possible.name);
+				boolean accessible = TCClassDefinition.isAccessible(this, possible, false);
+				String tag = "Possible";
+				
+				if (!accessible)
+				{
+					tag = tag + " (but " + possible.accessSpecifier + ")";
+				}
+				
+				TypeChecker.detail(tag, possible.name);
 			}
 		}
 	}

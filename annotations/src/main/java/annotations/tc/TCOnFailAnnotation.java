@@ -48,7 +48,6 @@ public class TCOnFailAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
 	private String format = null;
-	@SuppressWarnings("unused")
 	private TCAnnotationList doclinks = null;
 
 	public TCOnFailAnnotation(TCIdentifierToken name, TCExpressionList args)
