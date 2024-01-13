@@ -42,7 +42,9 @@ import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
 
 public abstract class TCAnnotation extends TCNode implements MappingOptional
 {
@@ -145,7 +147,17 @@ public abstract class TCAnnotation extends TCNode implements MappingOptional
 		// Do nothing
 	}
 
+	public void tcBefore(TCModule m, ModuleEnvironment e)
+	{
+		// Do nothing
+	}
+
 	public void tcBefore(TCClassDefinition clazz)
+	{
+		// Do nothing
+	}
+
+	public void tcBefore(TCClassDefinition clazz, PrivateClassEnvironment self)
 	{
 		// Do nothing
 	}
@@ -170,11 +182,21 @@ public abstract class TCAnnotation extends TCNode implements MappingOptional
 		// Do nothing
 	}
 
+	public void tcAfter(TCModule m, ModuleEnvironment env)
+	{
+		// Do nothing
+	}
+
 	public void tcAfter(TCClassDefinition m)
 	{
 		// Do nothing
 	}
 	
+	public void tcAfter(TCClassDefinition clazz, PrivateClassEnvironment self)
+	{
+		// Do nothing
+	}
+
 	public static void close()
 	{
 		for (TCAnnotation annotation: instances)

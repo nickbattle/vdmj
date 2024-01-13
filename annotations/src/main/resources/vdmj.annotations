@@ -8,3 +8,4 @@ annotations.ast.ASTSeparateAnnotation
 annotations.ast.ASTSepRequireAnnotation
 annotations.ast.ASTTraceAnnotation
 annotations.ast.ASTWarningAnnotation
+annotations.ast.ASTDocLinkAnnotation

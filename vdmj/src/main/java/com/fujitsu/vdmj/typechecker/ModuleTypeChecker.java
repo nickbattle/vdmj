@@ -198,8 +198,12 @@ public class ModuleTypeChecker extends TypeChecker
 			for (TCModule m: modules)
 			{
 				TypeComparator.setCurrentModule(m.name.getName());
-				
-				Environment e = new ModuleEnvironment(m);
+				ModuleEnvironment e = new ModuleEnvironment(m);
+
+				if (pass == Pass.DEFS && m.annotations != null)
+				{
+					m.annotations.tcBefore(m, e);
+				}
 
 				for (TCDefinition d: m.defs)
 				{
@@ -222,6 +226,11 @@ public class ModuleTypeChecker extends TypeChecker
 		    				}
 						}
 					}
+				}
+				
+				if (pass == Pass.DEFS && m.annotations != null)
+				{
+					m.annotations.tcAfter(m, e);
 				}
 			}
 		}
