@@ -24,6 +24,7 @@
 
 package annotations.tc;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -173,6 +174,37 @@ public class TCWarningAnnotation extends TCAnnotation
 			
 			if (suppressed.contains((long)w.number))
 			{
+				witer.remove();
+			}
+		}
+	}
+	
+	/**
+	 * We have to use a doClose because the final stage of unusedChecks in the
+	 * module typechecker are called after all the modules have been processed,
+	 * so warnings may be raised after all of the tcAfter cases above.
+	 */
+	@Override
+	public void doClose()
+	{
+		Iterator<VDMWarning> witer = TypeChecker.getWarnings().iterator();
+		int myLine  = name.getLocation().startLine;
+		File myFile = name.getLocation().file;
+		
+		while (witer.hasNext())
+		{
+			VDMWarning w = witer.next();
+			
+			if (moduleName != null && !w.location.module.equals(moduleName))
+			{
+				continue;
+			}
+			
+			if (w.location.startLine == myLine + 1 &&
+				w.location.file.equals(myFile) &&
+				suppressed.contains((long)w.number))
+			{
+				// Warning is on the line after the one we annotated, so remove it
 				witer.remove();
 			}
 		}
