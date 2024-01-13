@@ -25,8 +25,10 @@
 package annotations.tc;
 
 import java.util.Arrays;
+import java.util.Stack;
 
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
+import com.fujitsu.vdmj.tc.annotations.TCAnnotationList;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
@@ -47,7 +49,7 @@ public class TCOnFailAnnotation extends TCAnnotation
 	private static final long serialVersionUID = 1L;
 	private String format = null;
 	@SuppressWarnings("unused")
-	private TCDocLinkAnnotation doclink = null;
+	private TCAnnotationList doclinks = null;
 
 	public TCOnFailAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -132,7 +134,13 @@ public class TCOnFailAnnotation extends TCAnnotation
 					name.report(6008, "@OnFail must only use %[arg$][#][width]s conversions");
 				}
 				
-				doclink = TCDocLinkAnnotation.enclosing(env);
+				Stack<TCDocLinkAnnotation> enclosing = TCDocLinkAnnotation.enclosing();
+				
+				if (!enclosing.isEmpty())
+				{
+					doclinks = new TCAnnotationList();
+					doclinks.addAll(enclosing);
+				}
 			}
 			else
 			{

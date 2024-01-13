@@ -24,6 +24,8 @@
 
 package annotations.tc;
 
+import java.util.Stack;
+
 import com.fujitsu.vdmj.tc.annotations.TCAnnotation;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
@@ -32,12 +34,15 @@ import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
+import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 
 public class TCDocLinkAnnotation extends TCAnnotation
 {
 	private static final long serialVersionUID = 1L;
+	
+	private static Stack<TCDocLinkAnnotation> stack = new Stack<TCDocLinkAnnotation>();
 
 	public TCDocLinkAnnotation(TCIdentifierToken name, TCExpressionList args)
 	{
@@ -45,33 +50,70 @@ public class TCDocLinkAnnotation extends TCAnnotation
 	}
 
 	@Override
-	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
-	{
-		check();
-	}
-
-	@Override
 	public void tcBefore(TCModule module)
 	{
+		stack.clear();
+		stack.push(this);
 		check();
 	}
 
 	@Override
 	public void tcBefore(TCClassDefinition clazz)
 	{
+		stack.clear();
+		stack.push(this);
+		check();
+	}
+
+	@Override
+	public void tcBefore(TCDefinition def, Environment env, NameScope scope)
+	{
+		stack.push(this);
 		check();
 	}
 
 	@Override
 	public void tcBefore(TCStatement stmt, Environment env, NameScope scope)
 	{
+		stack.push(this);
 		check();
 	}
 	
 	@Override
 	public void tcBefore(TCExpression exp, Environment env, NameScope scope)
 	{
+		stack.push(this);
 		check();
+	}
+	
+	@Override
+	public void tcAfter(TCClassDefinition m)
+	{
+		stack.pop();
+	}
+
+	@Override
+	public void tcAfter(TCModule m)
+	{
+		stack.pop();
+	}
+
+	@Override
+	public void tcAfter(TCDefinition def, TCType type, Environment env, NameScope scope)
+	{
+		stack.pop();
+	}
+	
+	@Override
+	public void tcAfter(TCExpression exp, TCType type, Environment env, NameScope scope)
+	{
+		stack.pop();
+	}
+
+	@Override
+	public void tcAfter(TCStatement stmt, TCType type, Environment env, NameScope scope)
+	{
+		stack.pop();
 	}
 
 	public void check()
@@ -82,21 +124,8 @@ public class TCDocLinkAnnotation extends TCAnnotation
 		}
 	}
 	
-	public static TCDocLinkAnnotation enclosing(Environment env)
+	public static Stack<TCDocLinkAnnotation> enclosing()
 	{
-		TCDefinition encl = env.getEnclosingDefinition();
-		
-		if (encl != null && !encl.annotations.isEmpty())
-		{
-			for (TCAnnotation ann: encl.annotations)
-			{
-				if (ann instanceof TCDocLinkAnnotation)
-				{
-					return (TCDocLinkAnnotation) ann;
-				}
-			}
-		}
-		
-		return null;
+		return stack;
 	}
 }

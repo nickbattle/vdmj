@@ -25,6 +25,7 @@
 package annotations.in;
 
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
+import com.fujitsu.vdmj.in.annotations.INAnnotationList;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
 import com.fujitsu.vdmj.in.expressions.INIntegerLiteralExpression;
@@ -38,13 +39,13 @@ public class INOnFailAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
 	private final String format;
-	private final INDocLinkAnnotation doclink;
+	private final INAnnotationList doclinks;	// INDocLinkAnnotations
 
-	public INOnFailAnnotation(TCIdentifierToken name, INExpressionList args, String format, INDocLinkAnnotation doclink)
+	public INOnFailAnnotation(TCIdentifierToken name, INExpressionList args, String format, INAnnotationList doclinks)
 	{
 		super(name, args);
 		this.format = format;
-		this.doclink = doclink;
+		this.doclinks = doclinks;
 	}
 	
 	@Override
@@ -82,9 +83,12 @@ public class INOnFailAnnotation extends INAnnotation
 							
 				Console.out.printf(errno + useformat + location + "\n", values);
 				
-				if (doclink != null)
+				if (doclinks != null)
 				{
-					Console.out.printf(doclink.toString());
+					for (INAnnotation link: doclinks)
+					{
+						Console.out.printf(link.toString());
+					}
 				}
 			}
 		}
