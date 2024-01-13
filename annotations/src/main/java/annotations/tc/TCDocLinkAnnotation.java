@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
 import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.expressions.TCExpressionList;
+import com.fujitsu.vdmj.tc.expressions.TCStringLiteralExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
@@ -122,7 +123,17 @@ public class TCDocLinkAnnotation extends TCAnnotation
 	{
 		if (args.isEmpty())
 		{
-			name.report(6008, "@DocLink(Expression...)");
+			name.report(6008, "@DocLink(\"arg\"...)");
+		}
+		else
+		{
+			for (TCExpression arg: args)
+			{
+				if (!(arg instanceof TCStringLiteralExpression))
+				{
+					arg.report(6008, "@DocLink args must be string literals");
+				}
+			}
 		}
 	}
 	

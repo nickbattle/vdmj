@@ -27,17 +27,18 @@ package annotations.in;
 import com.fujitsu.vdmj.in.annotations.INAnnotation;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
+import com.fujitsu.vdmj.in.expressions.INStringLiteralExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 
 public class INDocLinkAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
-
+	
 	public INDocLinkAnnotation(TCIdentifierToken name, INExpressionList args)
 	{
 		super(name, args);
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -45,7 +46,8 @@ public class INDocLinkAnnotation extends INAnnotation
 		
 		for (INExpression arg: args)
 		{
-			sb.append(arg.toString());
+			INStringLiteralExpression s = (INStringLiteralExpression) arg;
+			sb.append(s.value.value);
 			sb.append("\n");
 		}
 		
