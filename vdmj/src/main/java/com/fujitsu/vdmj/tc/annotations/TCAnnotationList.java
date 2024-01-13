@@ -34,7 +34,9 @@ import com.fujitsu.vdmj.tc.definitions.TCDefinition;
 import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
 
 public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 {
@@ -78,11 +80,27 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 		}
 	}
 
+	public void tcBefore(TCModule m, ModuleEnvironment e)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.tcBefore(m, e);
+		}
+	}
+
 	public void tcBefore(TCClassDefinition clazz)
 	{
 		for (TCAnnotation annotation: this)
 		{
 			annotation.tcBefore(clazz);
+		}
+	}
+
+	public void tcBefore(TCClassDefinition clazz, PrivateClassEnvironment self)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.tcBefore(clazz, self);
 		}
 	}
 
@@ -102,11 +120,27 @@ public class TCAnnotationList extends TCMappedList<ASTAnnotation, TCAnnotation>
 		}
 	}
 
+	public void tcAfter(TCModule m, ModuleEnvironment e)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.tcAfter(m);
+		}
+	}
+
 	public void tcAfter(TCClassDefinition clazz)
 	{
 		for (TCAnnotation annotation: this)
 		{
 			annotation.tcAfter(clazz);
+		}
+	}
+
+	public void tcAfter(TCClassDefinition clazz, PrivateClassEnvironment self)
+	{
+		for (TCAnnotation annotation: this)
+		{
+			annotation.tcAfter(clazz, self);
 		}
 	}
 }
