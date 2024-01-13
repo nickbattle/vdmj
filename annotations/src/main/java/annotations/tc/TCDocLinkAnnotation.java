@@ -36,7 +36,9 @@ import com.fujitsu.vdmj.tc.modules.TCModule;
 import com.fujitsu.vdmj.tc.statements.TCStatement;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
+import com.fujitsu.vdmj.typechecker.PrivateClassEnvironment;
 
 public class TCDocLinkAnnotation extends TCAnnotation
 {
@@ -50,7 +52,7 @@ public class TCDocLinkAnnotation extends TCAnnotation
 	}
 
 	@Override
-	public void tcBefore(TCModule module)
+	public void tcBefore(TCModule module, ModuleEnvironment env)
 	{
 		stack.clear();
 		stack.push(this);
@@ -58,7 +60,7 @@ public class TCDocLinkAnnotation extends TCAnnotation
 	}
 
 	@Override
-	public void tcBefore(TCClassDefinition clazz)
+	public void tcBefore(TCClassDefinition clazz, PrivateClassEnvironment env)
 	{
 		stack.clear();
 		stack.push(this);
@@ -87,13 +89,13 @@ public class TCDocLinkAnnotation extends TCAnnotation
 	}
 	
 	@Override
-	public void tcAfter(TCClassDefinition m)
+	public void tcAfter(TCClassDefinition m, PrivateClassEnvironment env)
 	{
 		stack.pop();
 	}
 
 	@Override
-	public void tcAfter(TCModule m)
+	public void tcAfter(TCModule m, ModuleEnvironment e)
 	{
 		stack.pop();
 	}
