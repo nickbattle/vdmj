@@ -210,10 +210,10 @@ abstract public class Environment
 		{
 			if (possible.isFunctionOrOperation())
 			{
-				boolean accessible = TCClassDefinition.isAccessible(this, possible, false);
 				String tag = "Possible";
 				
-				if (!accessible)
+				if (Settings.dialect != Dialect.VDM_SL &&
+					!TCClassDefinition.isAccessible(this, possible, false))
 				{
 					tag = tag + " (but " + possible.accessSpecifier + ")";
 				}

@@ -170,6 +170,7 @@ public class TCCallObjectStatement extends TCStatement
 		{
 			// Use raw method, so we can use field's location
 			TypeChecker.report(3209, "Member " + field + " is not in scope", field.getLocation());
+			env.listAlternatives(field);
 			return setType(new TCUnknownType(location));
 		}
 		else if (fdef.isStatic() && !env.isStatic())
