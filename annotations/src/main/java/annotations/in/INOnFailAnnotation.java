@@ -38,8 +38,8 @@ import com.fujitsu.vdmj.values.Value;
 public class INOnFailAnnotation extends INAnnotation
 {
 	private static final long serialVersionUID = 1L;
-	private final String format;
-	private final INAnnotationList doclinks;	// INDocLinkAnnotations
+	protected final String format;
+	protected final INAnnotationList doclinks;	// INDocLinkAnnotations
 
 	public INOnFailAnnotation(TCIdentifierToken name, INExpressionList args, String format, INAnnotationList doclinks)
 	{
