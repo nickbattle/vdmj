@@ -1,0 +1,8 @@
+#
+# Test mappings for ClassMapperTest
+#
+
+package com.fujitsu.vdmj.mapper to com.fujitsu.vdmj.mapper;
+map TestSource{name, left, right} to TestDestination(name, left, right);
+
+unmapped java.lang.String;

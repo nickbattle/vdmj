@@ -43,6 +43,7 @@ import java.util.Stack;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.config.Properties;
+import com.fujitsu.vdmj.util.GetResource;
 
 /**
  * A class to map classes and extend trees of objects. 
@@ -51,6 +52,9 @@ public class ClassMapper
 {
 	/** The mappers that have already been loaded, indexed by resource name */
 	private final static Map<String, ClassMapper> mappers = new HashMap<String, ClassMapper>();
+
+	/** Resource name for mapping search extensions */
+	private static final String MAPPINGS = "vdmj.mappings";
 	
 	/**
 	 * These caches hold the object references converted so far, and keep a stack of
@@ -263,23 +267,36 @@ public class ClassMapper
 		}
 		
 		/**
-		 * You can add extra file locations by setting the vdmj.mappingpath property.
-		 * This allows more than one mapping file of the same name to be included within
-		 * one jar file.
+		 * You can add extra file locations by setting the vdmj.mapping.search_path property,
+		 * or by putting resource folders in "vdmj.mappings". This allows more than one mapping
+		 * file of the same name to be included within one jar file.
 		 */
+		List <String> alternativePaths = new Vector<String>();
+		
 		String mappingPath = Properties.mapping_search_path;
 		
 		if (mappingPath != null)
 		{
 			for (String classpath: mappingPath.split(File.pathSeparator))
 			{
-				String filename = classpath + "/" + configFile;		// NB. Use slash here!
-				InputStream is = getClass().getResourceAsStream(filename);
-				
-				if (is != null)
-				{
-					readMapping(filename, is);
-				}
+				alternativePaths.add(classpath + "/" + configFile);	// NB. Use slash here!
+			}
+		}
+		else
+		{
+			for (String classpath: GetResource.readResource(MAPPINGS))
+			{
+				alternativePaths.add(classpath + "/" + configFile);	// NB. Use slash here!
+			}
+		}
+		
+		for (String resourceName: alternativePaths)
+		{
+			InputStream is = getClass().getResourceAsStream(resourceName);
+			
+			if (is != null)
+			{
+				readMapping(resourceName, is);
 			}
 		}
 	}
