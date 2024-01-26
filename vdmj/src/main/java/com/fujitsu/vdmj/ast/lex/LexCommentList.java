@@ -51,7 +51,15 @@ public class LexCommentList extends Vector<LexComment>
 		{
 			LexComment previous = this.lastElement();
 			
-			if (!previous.block && previous.endloc.startLine == location.startLine - 1)
+			/**
+			 * We merge this comment into the previous one if neither is a block comment,
+			 * if the previous one is on the line above, and if the current comment does not
+			 * contain what looks like the start of an annotation. 
+			 */
+			
+			if (!previous.block && !block &&
+				 previous.endloc.startLine == location.startLine - 1 &&
+				!comment.trim().startsWith("@"))
 			{
 				this.remove(size() - 1);
 				
