@@ -543,6 +543,7 @@ public class LSPWorkspaceManager
 				source.printSource(spw);
 				spw.close();
 				Diag.info("Extracted source written to " + extract);
+				extract.setReadOnly();	// Works with files.readonlyFromPermissions in VSCode
 				
 				loadFile(extract);
 	
