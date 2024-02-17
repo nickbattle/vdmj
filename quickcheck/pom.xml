@@ -9,6 +9,17 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
+	<developers>
+		<developer>
+			<id>NickBattle</id>
+			<name>Nick Battle</name>
+			<email>nick.battle@gmail.com</email>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
 	<artifactId>quickcheck</artifactId>
 	<name>QuickCheck plugin</name>
 	<description>Direct execution plugin for PO verification.</description>

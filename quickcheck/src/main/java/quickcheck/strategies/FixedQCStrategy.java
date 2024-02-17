@@ -41,6 +41,7 @@ import java.util.Set;
 import com.fujitsu.vdmj.ast.expressions.ASTExpressionList;
 import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.ast.patterns.ASTMultipleBindList;
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.expressions.INExpression;
 import com.fujitsu.vdmj.in.expressions.INExpressionList;
@@ -211,6 +212,8 @@ public class FixedQCStrategy extends QCStrategy
 			
 			ASTMultipleBindList astbinds = new ASTMultipleBindList();
 			ASTExpressionList astexps = new ASTExpressionList();
+			boolean saved = Properties.parser_maximal_types;
+			Properties.parser_maximal_types = true;
 			
 			while (ltr.getLast().isNot(Token.EOF))
 			{
@@ -225,6 +228,7 @@ public class FixedQCStrategy extends QCStrategy
 				checkFor(ltr, Token.SEMICOLON, "Expecting semi-colon after previous <set expression>");
 			}
 			
+			Properties.parser_maximal_types = saved;
 			ltr.close();
 			TCMultipleBindList tcbinds = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(astbinds);
 			TCExpressionList tcexps = ClassMapper.getInstance(TCNode.MAPPINGS).convertLocal(astexps);
