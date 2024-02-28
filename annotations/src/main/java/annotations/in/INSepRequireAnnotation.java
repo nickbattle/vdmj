@@ -46,14 +46,14 @@ import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
  * requires that the e2 event does occur. A conjecture SepRequire(e1, c, e2, d, m) evaluates
  * to true over an execution trace if and only if:
  * 
- * forall i1, t1 & O(e1, i1, t1) and E(c, t1) =>
- *     not exists i2, t2 & O(e2, i2, t2)
- *         and t1 <= t2 and t2 < t1 + d
- *         and (m => i1 = i2)
- *         and (e1 = e2 => i2 = i1 + 1)
- *     and exists i3, t3 & O(e2 , i3 , t3)
- *         and (m => i1 = i3 )
- *         and (e1 = e2 => i3 = i1 + 1)
+ * forall i1, t1 &amp; O(e1, i1, t1) and E(c, t1) =&gt;
+ *     not exists i2, t2 &amp; O(e2, i2, t2)
+ *         and t1 &lt;= t2 and t2 &lt; t1 + d
+ *         and (m =&gt; i1 = i2)
+ *         and (e1 = e2 =&gt; i2 = i1 + 1)
+ *     and exists i3, t3 &amp; O(e2 , i3 , t3)
+ *         and (m =&gt; i1 = i3 )
+ *         and (e1 = e2 =&gt; i3 = i1 + 1)
  * 
  * See http://dx.doi.org/10.1109/HASE.2007.26.
  */

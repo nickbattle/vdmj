@@ -62,7 +62,7 @@ import com.fujitsu.vdmj.util.Utils;
  * which are known to be true in the current context and they return true if they
  * are always true, given this stack.
  * 
- * eg. X => Y will pass "X" as a truth when evaluating Y. If Y is just X, then
+ * eg. X =&gt; Y will pass "X" as a truth when evaluating Y. If Y is just X, then
  * that will always be true and so the whole implication is always true, etc.
  */
 public class TrivialQCVisitor extends TCExpressionVisitor<Boolean, Stack<TCExpression>>
