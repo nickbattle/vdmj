@@ -4,8 +4,8 @@
 #####################################################################################
 
 # Change these to flip version
-MVERSION="4.5.0"
-PVERSION="4.5.0-P"
+MVERSION="4.6.0-SNAPSHOT"
+PVERSION="4.6.0-P-SNAPSHOT"
 
 # The Maven repository directory containing jars
 MAVENREPO=~/.m2/repository/dk/au/ece/vdmj
