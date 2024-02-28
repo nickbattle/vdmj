@@ -104,6 +104,7 @@
                     </executions>
                     <configuration>
                         <failOnError>false</failOnError>
+                        <detectOfflineLinks>false</detectOfflineLinks>
                         <quiet>true</quiet>
                         <source>8</source>
                     </configuration>

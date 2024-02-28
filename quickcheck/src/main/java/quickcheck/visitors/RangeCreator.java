@@ -113,7 +113,7 @@ public abstract class RangeCreator extends TCTypeVisitor<ValueSet, Integer>
 	}
 	
 	/**
-	 * Return the lowest integer power of n that is <= limit. If n < 2,
+	 * Return the lowest integer power of n that is &lt;= limit. If n &lt; 2,
 	 * just return 1.
 	 */
 	protected int leastPower(int n, int limit)

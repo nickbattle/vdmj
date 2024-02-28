@@ -39,7 +39,7 @@ import com.fujitsu.vdmj.runtime.ValueException;
  * 
  * Then execute new Test().test() as usual. The output should be like:
  * 
- * > p new Test().test()
+ * &gt; p new Test().test()
  * Last = 0
  * Updated = 1
  * Last = 1
