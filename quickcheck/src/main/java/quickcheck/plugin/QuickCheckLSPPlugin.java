@@ -38,6 +38,10 @@ import quickcheck.commands.QCConsole;
 import quickcheck.commands.QCRunLSPCommand;
 import quickcheck.commands.QuickCheckExecutor;
 import quickcheck.commands.QuickCheckLSPCommand;
+import rpc.RPCDispatcher;
+import rpc.RPCErrors;
+import rpc.RPCMessageList;
+import rpc.RPCRequest;
 import vdmj.commands.AnalysisCommand;
 import workspace.events.DAPEvent;
 import workspace.events.UnknownCommandEvent;
@@ -59,12 +63,15 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
-		// Get everything from PO?
+		// Register QC handler with DAPDispatcher
+		RPCDispatcher dispatcher = RPCDispatcher.getInstance();
+		dispatcher.register(new QuickCheckHandler(), "slsp/POG/quickcheck");
 	}
 	
 	@Override
 	public DAPMessageList handleEvent(DAPEvent event) throws Exception
 	{
+		// Better to use the handler registration above, but just in case
 		if (event instanceof UnknownCommandEvent)
 		{
 			UnknownCommandEvent ume = (UnknownCommandEvent)event;
@@ -79,7 +86,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		return null;
 	}
 	
-	private DAPMessageList quickCheck(DAPRequest request)
+	public DAPMessageList quickCheck(DAPRequest request)
 	{
 		QuickCheck qc = new QuickCheck();
 
@@ -98,6 +105,30 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		poNames.add(".*");	// Include everything
 		
 		QuickCheckExecutor executor = new QuickCheckExecutor(request, qc, 1L, poList, poNames);
+		executor.start();
+		
+		return null;
+	}
+	
+	public RPCMessageList quickCheck(RPCRequest request)
+	{
+		QuickCheck qc = new QuickCheck();
+
+		qc.loadStrategies(new Vector<String>());	// Use defaults
+		
+		if (qc.hasErrors())
+		{
+			return new RPCMessageList(request, RPCErrors.InternalError, "Failed to load QC strategies");
+		}
+		
+		QCConsole.setQuiet(true);
+		QCConsole.setVerbose(false);
+
+		Vector<Integer> poList = new Vector<Integer>();
+		Vector<String> poNames = new Vector<String>();
+		poNames.add(".*");	// Include everything
+		
+		QuickCheckThread executor = new QuickCheckThread(request, qc, 1L, poList, poNames);
 		executor.start();
 		
 		return null;
