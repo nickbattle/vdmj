@@ -71,7 +71,7 @@ public class DAPServer extends JSONServer
 	
 	private DAPDispatcher getDispatcher() throws IOException
 	{
-		DAPDispatcher dispatcher = new DAPDispatcher();
+		DAPDispatcher dispatcher = DAPDispatcher.getInstance();
 		
 		dispatcher.register(new InitializeHandler(), "initialize");
 		dispatcher.register(new LaunchHandler(), "launch");
