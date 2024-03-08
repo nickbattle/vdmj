@@ -26,11 +26,11 @@ package dap.handlers;
 
 import java.io.IOException;
 
-import dap.AsyncExecutor;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
+import lsp.CancellableThread;
 
 public class SourceHandler extends DAPHandler
 {
@@ -50,7 +50,7 @@ public class SourceHandler extends DAPHandler
 		switch (reference.intValue())
 		{
 			case 0:		// Executing command
-				result = AsyncExecutor.currentlyRunning();
+				result = CancellableThread.currentlyRunning();
 				break;
 				
 			default:

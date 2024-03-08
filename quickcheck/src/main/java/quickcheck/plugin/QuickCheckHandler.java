@@ -23,16 +23,9 @@
  ******************************************************************************/
 package quickcheck.plugin;
 
-import java.io.IOException;
-
-import dap.DAPHandler;
-import dap.DAPMessageList;
-import dap.DAPRequest;
 import lsp.LSPHandler;
-import rpc.RPCHandler;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import rpc.RPCResponse;
 import workspace.PluginRegistry;
 
 /**

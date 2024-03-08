@@ -34,7 +34,8 @@ abstract public class CancellableThread extends Thread
 	private static final Map<Object, CancellableThread> active = new HashMap<Object, CancellableThread>();
 	protected final Object myId;
 	protected boolean cancelled = false;
-	
+	protected static String running = null;
+
 	public CancellableThread(Object myId)
 	{
 		this.myId = myId;
@@ -99,4 +100,9 @@ abstract public class CancellableThread extends Thread
 	}
 
 	abstract protected void body();
+	
+	public static String currentlyRunning()
+	{
+		return running;
+	}
 }

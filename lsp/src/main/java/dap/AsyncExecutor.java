@@ -39,8 +39,6 @@ public abstract class AsyncExecutor extends CancellableThread
 	protected final DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
 	protected final DAPRequest request;
 
-	protected static String running = null;
-
 	public AsyncExecutor(String id, DAPRequest request)
 	{
 		super(id);
@@ -114,10 +112,5 @@ public abstract class AsyncExecutor extends CancellableThread
 		super.setCancelled();
 		Breakpoint.setExecInterrupt(Breakpoint.TERMINATE);
 		Diag.info("Set the exec interrupt value to TERMINATE");
-	}
-	
-	public static String currentlyRunning()
-	{
-		return running;
 	}
 }

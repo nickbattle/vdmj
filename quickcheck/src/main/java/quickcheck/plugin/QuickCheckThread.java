@@ -24,6 +24,7 @@
 
 package quickcheck.plugin;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.fujitsu.vdmj.Settings;
@@ -31,7 +32,9 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
+import json.JSONObject;
 import lsp.CancellableThread;
+import lsp.LSPServer;
 import quickcheck.QuickCheck;
 import quickcheck.strategies.StrategyResults;
 import rpc.RPCRequest;
@@ -58,38 +61,61 @@ public class QuickCheckThread extends CancellableThread
 	@Override
 	protected void body()
 	{
-		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
-		ProofObligationList all = pog.getProofObligations();
-		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
-		
-		if (qc.hasErrors())
+		try
 		{
-			Diag.error("Failed to find POs");
-			return;
-		}
-		
-		if (chosen.isEmpty())
-		{
-			Diag.error("No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class"));
-			return;
-		}
-		
-		if (qc.initStrategies(timeout))
-		{
-			for (ProofObligation po: chosen)
+			running = "quickcheck";
+			
+			POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
+			ProofObligationList all = pog.getProofObligations();
+			ProofObligationList chosen = qc.getPOs(all, poList, poNames);
+			
+			if (qc.hasErrors())
 			{
-				StrategyResults results = qc.getValues(po);
-				
-				if (!qc.hasErrors())
+				Diag.error("Failed to find POs");
+				LSPServer.getInstance().writeMessage(
+						RPCRequest.notification("slsp/POG/updated",
+							new JSONObject("quickcheck", false)));
+				return;
+			}
+			
+			if (chosen.isEmpty())
+			{
+				Diag.error("No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class"));
+				LSPServer.getInstance().writeMessage(
+						RPCRequest.notification("slsp/POG/updated",
+							new JSONObject("quickcheck", false)));
+				return;
+			}
+			
+			if (qc.initStrategies(timeout))
+			{
+				for (ProofObligation po: chosen)
 				{
-					qc.checkObligation(po, results);
-				}
-				
-				if (cancelled)
-				{
-					break;
+					StrategyResults results = qc.getValues(po);
+					
+					if (!qc.hasErrors())
+					{
+						qc.checkObligation(po, results);
+					}
+					
+					if (cancelled)
+					{
+						break;
+					}
 				}
 			}
+		
+			LSPServer.getInstance().writeMessage(
+				RPCRequest.notification("slsp/POG/updated",
+					new JSONObject("quickcheck", !qc.hasErrors())));
+		}
+		catch (IOException e)
+		{
+			Diag.error(e);
+		}
+		finally
+		{
+			running = null;
 		}
 	}
 }

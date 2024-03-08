@@ -1,0 +1,6 @@
+functions
+	f: real -> nat
+	f(a) == a
+	pre a > 0;
+
+ 

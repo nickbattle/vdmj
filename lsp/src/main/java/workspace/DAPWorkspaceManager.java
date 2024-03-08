@@ -62,7 +62,6 @@ import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 
-import dap.AsyncExecutor;
 import dap.DAPInitializeResponse;
 import dap.DAPMessageList;
 import dap.DAPRequest;
@@ -72,6 +71,7 @@ import dap.InitExecutor;
 import dap.RemoteControlExecutor;
 import json.JSONArray;
 import json.JSONObject;
+import lsp.CancellableThread;
 import lsp.Utils;
 import vdmj.DAPDebugReader;
 import vdmj.commands.AnalysisCommand;
@@ -745,9 +745,9 @@ public class DAPWorkspaceManager
 		
 		AnalysisCommand command = AnalysisCommand.parse(expression);
 	
-		if (command.notWhenRunning() && AsyncExecutor.currentlyRunning() != null)
+		if (command.notWhenRunning() && CancellableThread.currentlyRunning() != null)
 		{
-			return new DAPMessageList(request, false, "Still running " + AsyncExecutor.currentlyRunning(), null);
+			return new DAPMessageList(request, false, "Still running " + CancellableThread.currentlyRunning(), null);
 		}
 
 		// If we are about to evaluate something, check that we can execute.
