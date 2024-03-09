@@ -26,36 +26,43 @@ package quickcheck.plugin;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Vector;
 
-import com.fujitsu.vdmj.Settings;
-import com.fujitsu.vdmj.lex.Dialect;
+import com.fujitsu.vdmj.messages.VDMMessage;
+import com.fujitsu.vdmj.messages.VDMWarning;
+import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
+import json.JSONArray;
 import json.JSONObject;
 import lsp.CancellableThread;
 import lsp.LSPServer;
+import lsp.Utils;
 import quickcheck.QuickCheck;
 import quickcheck.strategies.StrategyResults;
+import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import rpc.RPCResponse;
 import workspace.Diag;
+import workspace.MessageHub;
 import workspace.PluginRegistry;
 import workspace.plugins.POPlugin;
 
 public class QuickCheckThread extends CancellableThread
 {
+	private final RPCRequest request;
 	private final QuickCheck qc;
-	private final long timeout;
-	private final List<Integer> poList;
-	private final List<String> poNames;
+	private final ProofObligationList chosen;
+	private final POPlugin pog;
 
-	public QuickCheckThread(RPCRequest request, QuickCheck qc, long timeout, List<Integer> poList, List<String> poNames)
+	public QuickCheckThread(RPCRequest request, QuickCheck qc, ProofObligationList chosen)
 	{
 		super(request.get("id"));
+		this.request = request;
 		this.qc = qc;
-		this.timeout = timeout;
-		this.poList = poList;
-		this.poNames = poNames;
+		this.chosen = chosen;
+		this.pog = PluginRegistry.getInstance().getPlugin("PO");
 	}
 
 	@Override
@@ -64,50 +71,38 @@ public class QuickCheckThread extends CancellableThread
 		try
 		{
 			running = "quickcheck";
+			RPCMessageList responses = new RPCMessageList();
 			
-			POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
-			ProofObligationList all = pog.getProofObligations();
-			ProofObligationList chosen = qc.getPOs(all, poList, poNames);
+			MessageHub.getInstance().clearPluginMessages(pog);
+			List<VDMMessage> messages = new Vector<VDMMessage>();
+			JSONArray list = new JSONArray();
 			
-			if (qc.hasErrors())
+			for (ProofObligation po: chosen)
 			{
-				Diag.error("Failed to find POs");
-				LSPServer.getInstance().writeMessage(
-						RPCRequest.notification("slsp/POG/updated",
-							new JSONObject("quickcheck", false)));
-				return;
-			}
-			
-			if (chosen.isEmpty())
-			{
-				Diag.error("No POs in current " + (Settings.dialect == Dialect.VDM_SL ? "module" : "class"));
-				LSPServer.getInstance().writeMessage(
-						RPCRequest.notification("slsp/POG/updated",
-							new JSONObject("quickcheck", false)));
-				return;
-			}
-			
-			if (qc.initStrategies(timeout))
-			{
-				for (ProofObligation po: chosen)
+				StrategyResults results = qc.getValues(po);
+				
+				if (!qc.hasErrors())
 				{
-					StrategyResults results = qc.getValues(po);
-					
-					if (!qc.hasErrors())
-					{
-						qc.checkObligation(po, results);
-					}
-					
-					if (cancelled)
-					{
-						break;
-					}
+					qc.checkObligation(po, results);
+				}
+				
+				list.add(getQCResponse(po, messages));
+				
+				if (cancelled)
+				{
+					break;
 				}
 			}
-		
-			LSPServer.getInstance().writeMessage(
-				RPCRequest.notification("slsp/POG/updated",
-					new JSONObject("quickcheck", !qc.hasErrors())));
+			
+			responses.add(RPCResponse.result(request, list));
+			MessageHub.getInstance().addPluginMessages(pog, messages);
+			responses.addAll(MessageHub.getInstance().getDiagnosticResponses());
+			LSPServer server = LSPServer.getInstance();
+			
+			for (JSONObject message: responses)
+			{
+				server.writeMessage(message);
+			}
 		}
 		catch (IOException e)
 		{
@@ -117,5 +112,67 @@ public class QuickCheckThread extends CancellableThread
 		{
 			running = null;
 		}
+	}
+
+	private JSONObject getQCResponse(ProofObligation po, List<VDMMessage> messages)
+	{
+		JSONObject json = new JSONObject(
+				"id",		Long.valueOf(po.number),
+				"status",	po.status.toString());
+		
+		if (po.counterexample != null)
+		{
+			JSONObject cexample = new JSONObject();
+			cexample.put("variables", Utils.contextToJSON(po.counterexample));
+			JSONObject launch = pog.getCexLaunch(po);
+			
+			if (launch != null)
+			{
+				cexample.put("launch", launch);
+			}
+			
+			json.put("counterexample", cexample);
+			
+			StringBuilder sb = new StringBuilder();
+			sb.append("PO #");
+			sb.append(po.number);
+			sb.append(" counterexample: ");
+			sb.append(po.counterexample.toStringLine());
+			messages.add(new VDMWarning(9000, sb.toString(), po.location));
+		}
+
+		if (po.status == POStatus.FAILED)
+		{
+			if (po.message != null)		// Add failed messages as a warning too
+			{
+				messages.add(new VDMWarning(9000, po.message, po.location));
+			}
+		}
+		
+		if (po.witness != null)
+		{
+			JSONObject witness = new JSONObject();
+			witness.put("variables", Utils.contextToJSON(po.witness));
+			JSONObject launch = pog.getWitnessLaunch(po);
+			
+			if (launch != null)
+			{
+				witness.put("launch", launch);
+			}
+			
+			json.put("witness", witness);
+		}
+		
+		if (po.provedBy != null)
+		{
+			json.put("provedBy", po.provedBy);
+		}
+		
+		if (po.message != null)
+		{
+			json.put("message", po.message);
+		}
+
+		return json;
 	}
 }

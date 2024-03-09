@@ -82,13 +82,13 @@ public class POPluginPR extends POPlugin
 	}
 
 	@Override
-	protected JSONObject getCexLaunch(ProofObligation po)
+	public JSONObject getCexLaunch(ProofObligation po)
 	{
 		return null;	// Needs to create new object?
 	}
 
 	@Override
-	protected JSONObject getWitnessLaunch(ProofObligation po)
+	public JSONObject getWitnessLaunch(ProofObligation po)
 	{
 		return null;	// Needs to create new object?
 	}

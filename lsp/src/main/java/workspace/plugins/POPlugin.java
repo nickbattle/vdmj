@@ -25,14 +25,9 @@
 package workspace.plugins;
 
 import java.io.File;
-import java.util.List;
-import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.mapper.Mappable;
-import com.fujitsu.vdmj.messages.VDMMessage;
-import com.fujitsu.vdmj.messages.VDMWarning;
-import com.fujitsu.vdmj.pog.POStatus;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -140,9 +135,9 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	
 	abstract public ProofObligationList getProofObligations();
 	
-	abstract protected JSONObject getCexLaunch(ProofObligation po);
+	abstract public JSONObject getCexLaunch(ProofObligation po);
 
-	abstract protected JSONObject getWitnessLaunch(ProofObligation po);
+	abstract public JSONObject getWitnessLaunch(ProofObligation po);
 	
 	protected JSONArray splitPO(String value)
 	{
@@ -159,13 +154,9 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 
 	public RPCMessageList getJSONObligations(RPCRequest request, File file)
 	{
-		ProofObligationList poGeneratedList = getProofObligations();
 		JSONArray poList = new JSONArray();
 		
-		messagehub.clearPluginMessages(this);
-		List<VDMMessage> messages = new Vector<VDMMessage>();
-		
-		for (ProofObligation po: poGeneratedList)
+		for (ProofObligation po: getProofObligations())
 		{
 			if (file != null)
 			{
@@ -202,66 +193,9 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 					"source",	splitPO(po.value),
 					"status",	po.status.toString());
 			
-			if (po.counterexample != null)
-			{
-				JSONObject cexample = new JSONObject();
-				cexample.put("variables", Utils.contextToJSON(po.counterexample));
-				JSONObject launch = getCexLaunch(po);
-				
-				if (launch != null)
-				{
-					cexample.put("launch", launch);
-				}
-				
-				json.put("counterexample", cexample);
-				
-				StringBuilder sb = new StringBuilder();
-				sb.append("PO #");
-				sb.append(po.number);
-				sb.append(" counterexample: ");
-				sb.append(po.counterexample.toStringLine());
-				messages.add(new VDMWarning(9000, sb.toString(), po.location));
-			}
-
-			if (po.status == POStatus.FAILED)
-			{
-				if (po.message != null)		// Add failed messages as a warning too
-				{
-					messages.add(new VDMWarning(9000, po.message, po.location));
-				}
-			}
-			
-			if (po.witness != null)
-			{
-				JSONObject witness = new JSONObject();
-				witness.put("variables", Utils.contextToJSON(po.witness));
-				JSONObject launch = getWitnessLaunch(po);
-				
-				if (launch != null)
-				{
-					witness.put("launch", launch);
-				}
-				
-				json.put("witness", witness);
-			}
-			
-			if (po.provedBy != null)
-			{
-				json.put("provedBy", po.provedBy);
-			}
-			
-			if (po.message != null)
-			{
-				json.put("message", po.message);
-			}
-			
 			poList.add(json);
 		}
 		
-		messagehub.addPluginMessages(this, messages);
-		RPCMessageList result = new RPCMessageList(request, poList);
-		result.addAll(messagehub.getDiagnosticResponses());
-		
-		return result;
+		return new RPCMessageList(request, poList);
 	}
 }

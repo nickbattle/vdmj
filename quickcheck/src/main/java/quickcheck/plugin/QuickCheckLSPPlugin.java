@@ -28,6 +28,7 @@ import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.plugins.HelpList;
+import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.util.Utils;
 
@@ -43,7 +44,10 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.commands.AnalysisCommand;
 import workspace.DAPWorkspaceManager;
+import workspace.Diag;
+import workspace.PluginRegistry;
 import workspace.plugins.AnalysisPlugin;
+import workspace.plugins.POPlugin;
 
 public class QuickCheckLSPPlugin extends AnalysisPlugin
 {
@@ -70,11 +74,12 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 	{
 		if (messagehub.hasErrors())
 		{
+			Diag.error("Spec has errors");
 			return new RPCMessageList(request, RPCErrors.InternalError, "Spec has errors");
 		}
-		
-		if (CancellableThread.currentlyRunning() != null)
+		else if (CancellableThread.currentlyRunning() != null)
 		{
+			Diag.error("Running " + CancellableThread.currentlyRunning());
 			return new RPCMessageList(request, RPCErrors.InternalError, "Running " + CancellableThread.currentlyRunning());
 		}
 		
@@ -86,23 +91,46 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		}
 		
 		QuickCheck qc = new QuickCheck();
-
-		qc.loadStrategies(new Vector<String>());	// Use defaults
-		
-		if (qc.hasErrors())
-		{
-			return new RPCMessageList(request, RPCErrors.InternalError, "Failed to load QC strategies");
-		}
 		
 		QCConsole.setQuiet(true);
 		QCConsole.setVerbose(false);
 
+		qc.loadStrategies(new Vector<String>());	// Use default strategies for now
+		
+		if (qc.hasErrors())
+		{
+			Diag.error("Failed to load QC strategies");
+			return new RPCMessageList(request, RPCErrors.InternalError, "Failed to load QC strategies");
+		}
+
 		Vector<Integer> poList = new Vector<Integer>();
 		Vector<String> poNames = new Vector<String>();
-		poNames.add(".*");	// Include everything
+		poNames.add(".*");	// Include everything for now
+
+		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
+		ProofObligationList all = pog.getProofObligations();
+		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
 		
-		QuickCheckThread executor = new QuickCheckThread(request, qc, 1L, poList, poNames);
-		executor.start();
+		if (qc.hasErrors())
+		{
+			Diag.error("Failed to find POs");
+			return new RPCMessageList(request, RPCErrors.InternalError, "Failed to find POs");
+		}
+		else if (chosen.isEmpty())
+		{
+			Diag.error("No POs in scope");
+			return new RPCMessageList(request, RPCErrors.InternalError, "No POs in scope");
+		}
+		else if (qc.initStrategies(1L))
+		{
+			QuickCheckThread executor = new QuickCheckThread(request, qc, chosen);
+			executor.start();
+		}
+		else
+		{
+			Diag.error("No strategy to run");
+			return new RPCMessageList(request, RPCErrors.InternalError, "No strategy to run");
+		}
 		
 		return null;
 	}
