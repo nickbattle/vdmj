@@ -34,6 +34,7 @@ import static quickcheck.commands.QCConsole.verbose;
 import static quickcheck.commands.QCConsole.verboseln;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -124,7 +125,7 @@ public class QuickCheck
 					Class<?> clazz = Class.forName(classname);
 					Constructor<?> ctor = clazz.getDeclaredConstructor(List.class);
 					int argvSize = argv.size();
-					QCStrategy instance = (QCStrategy) ctor.newInstance((Object)argv);
+					QCStrategy instance = (QCStrategy) ctor.newInstance(argv);
 					
 					if (instance.hasErrors())
 					{
@@ -155,6 +156,11 @@ public class QuickCheck
 				catch (NoSuchMethodException e)
 				{
 					errorln("Strategy " + classname + " must implement ctor(List<String> argv)");
+					errorCount++;
+				}
+				catch (InvocationTargetException e)
+				{
+					errorln("Strategy " + classname + ": " + e.getTargetException());
 					errorCount++;
 				}
 				catch (Throwable th)
