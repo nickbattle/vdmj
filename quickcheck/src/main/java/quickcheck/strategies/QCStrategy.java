@@ -45,11 +45,14 @@ abstract public class QCStrategy
 	
 	protected Map<String, Object> getParams(List<Map<String, Object>> list, String name)
 	{
-		for (Map<String, Object> entry: list)
+		if (list != null)
 		{
-			if (name.equals(entry.get("name")))
+			for (Map<String, Object> entry: list)
 			{
-				return entry;
+				if (name.equals(entry.get("name")))
+				{
+					return entry;
+				}
 			}
 		}
 		
