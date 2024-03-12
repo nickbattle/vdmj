@@ -106,7 +106,7 @@ public class QuickCheck
 		errorCount = 0;
 	}
 	
-	public void loadStrategies(List<String> argv)
+	public void loadStrategies(List<?> argv)
 	{
 		strategies = new Vector<QCStrategy>();
 		disabled = new Vector<QCStrategy>();
@@ -140,7 +140,7 @@ public class QuickCheck
 					{
 						disabled.add(instance);
 						
-						if (argvSize != argv.size())
+						if (argv != null && argvSize != argv.size())
 						{
 							// Constructor took some arguments
 							errorln("The " + instance.getName() + " strategy is not enabled. Add -s " + instance.getName());
@@ -676,29 +676,46 @@ public class QuickCheck
 		}
 	}
 
-	private List<String> strategyNames(List<String> arglist)
+	private List<String> strategyNames(List<?> arglist)
 	{
 		List<String> names = new Vector<String>();
-		Iterator<String> iter = arglist.iterator();
 		
-		while (iter.hasNext())
+		if (arglist != null && !arglist.isEmpty())
 		{
-			String arg = iter.next();
-			
-			if (arg.equals("-s"))
+			if (arglist.get(0) instanceof String)
 			{
-				iter.remove();
+				@SuppressWarnings("unchecked")
+				Iterator<String> iter = (Iterator<String>) arglist.iterator();
 				
-				if (iter.hasNext())
+				while (iter.hasNext())
 				{
-					arg = iter.next();
-					iter.remove();
-					names.add(arg);
+					String arg = iter.next();
+					
+					if (arg.equals("-s"))
+					{
+						iter.remove();
+						
+						if (iter.hasNext())
+						{
+							arg = iter.next();
+							iter.remove();
+							names.add(arg);
+						}
+						else
+						{
+							errorln("-s must be followed by a strategy name");
+							names.add("unknown");
+						}
+					}
 				}
-				else
+			}
+			else
+			{
+				for (int i=0; i<arglist.size(); i++)
 				{
-					errorln("-s must be followed by a strategy name");
-					names.add("unknown");
+					@SuppressWarnings("unchecked")
+					Map<String, Object> map = (Map<String, Object>) arglist.get(i);
+					names.add((String) map.get("name"));
 				}
 			}
 		}

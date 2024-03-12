@@ -28,6 +28,7 @@ import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
@@ -42,19 +43,27 @@ public class TrivialQCStrategy extends QCStrategy
 {
 	private int errorCount = 0;
 
-	public TrivialQCStrategy(List<String> argv)
+	public TrivialQCStrategy(List<?> argv)
 	{
-		for (int i=0; i < argv.size(); i++)
+		if (!argv.isEmpty() && argv.get(0) instanceof String)
 		{
-			// No plugin arguments yet?
-
-			if (argv.get(i).startsWith("-trivial:"))
+			for (int i=0; i < argv.size(); i++)
 			{
-				println("Unknown trivial option: " + argv.get(i));
-				println(help());
-				errorCount ++;
-				argv.remove(i);
+				String arg = (String)argv.get(i);
+	
+				if (arg.startsWith("-trivial:"))
+				{
+					println("Unknown trivial option: " + arg);
+					println(help());
+					errorCount ++;
+					argv.remove(i);
+				}
 			}
+		}
+		else
+		{
+			@SuppressWarnings({ "unchecked", "unused" })
+			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "trivial");
 		}
 	}
 	

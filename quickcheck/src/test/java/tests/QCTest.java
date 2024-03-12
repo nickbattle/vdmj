@@ -60,7 +60,13 @@ public class QCTest extends LSPTest
 		assertTrue(notify.get(1).getPath("params.diagnostics") instanceof JSONArray);
 
 		QuickCheckHandler handler = new QuickCheckHandler();
-		RPCRequest request = RPCRequest.create(123L, "slsp/POG/quickcheck", null);
+
+		JSONArray params = new JSONArray
+		(
+			new JSONObject("name", "fixed", "size", 1000)
+		);
+		
+		RPCRequest request = RPCRequest.create(123L, "slsp/POG/quickcheck", params);
 		
 		RPCMessageList response = handler.request(request);
 		assertEquals(null, response);

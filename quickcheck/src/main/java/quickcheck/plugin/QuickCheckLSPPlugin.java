@@ -24,6 +24,9 @@
 
 package quickcheck.plugin;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.lex.Dialect;
@@ -32,6 +35,7 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.util.Utils;
 
+import json.JSONArray;
 import json.JSONObject;
 import lsp.CancellableThread;
 import quickcheck.QuickCheck;
@@ -95,7 +99,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		QCConsole.setQuiet(true);
 		QCConsole.setVerbose(false);
 
-		qc.loadStrategies(new Vector<String>());	// Use default strategies for now
+		qc.loadStrategies(getParams(request));
 		
 		if (qc.hasErrors())
 		{
@@ -133,6 +137,31 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		}
 		
 		return null;
+	}
+
+	private List<Map<String, Object>> getParams(RPCRequest request)
+	{
+		List<Map<String, Object>> list = new Vector<Map<String, Object>>();
+		JSONArray params = request.get("params");
+		
+		if (params != null)
+		{
+			for (int i=0; i<params.size(); i++)
+			{
+				Map<String, Object> map = new HashMap<String, Object>();
+				JSONObject entry = (JSONObject) params.get(i);
+				
+				for (String key: entry.keySet())
+				{
+					Object value = entry.get(key);
+					map.put(key, value);
+				}
+				
+				list.add(map);
+			}
+		}
+		
+		return list;
 	}
 
 	@Override

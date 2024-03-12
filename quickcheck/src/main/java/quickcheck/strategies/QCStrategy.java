@@ -24,7 +24,9 @@
 
 package quickcheck.strategies;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -40,4 +42,17 @@ abstract public class QCStrategy
 	abstract public boolean init(QuickCheck qc);
 	abstract public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt);
 	abstract public String help();
+	
+	protected Map<String, Object> getParams(List<Map<String, Object>> list, String name)
+	{
+		for (Map<String, Object> entry: list)
+		{
+			if (name.equals(entry.get("name")))
+			{
+				return entry;
+			}
+		}
+		
+		return new HashMap<String, Object>();
+	}
 }
