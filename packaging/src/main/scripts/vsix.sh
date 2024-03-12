@@ -17,7 +17,7 @@ then
 fi
 
 VERSION="4.6.0-P-SNAPSHOT"
-VDMJ="vdmj"
+VDMJ="vdmj_hp"
 
 SELF=$(which "$0")
 DISTRIBUTION=$(dirname "$SELF")
