@@ -29,7 +29,6 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
-import dap.DAPServer;
 import json.JSONObject;
 import lsp.CancellableThread;
 import vdmj.DAPDebugReader;
@@ -67,7 +66,6 @@ public class TerminateHandler extends DAPHandler
 			JSONObject arguments = request.get("arguments");
 			Boolean restart = arguments.get("restart");
 			DAPMessageList result = manager.dapTerminate(request, restart);
-			DAPServer.getInstance().setRunning(false);
 			return result;
 		}
 	}

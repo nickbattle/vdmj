@@ -29,6 +29,7 @@ import java.io.IOException;
 import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
+import dap.DAPServer;
 import json.JSONObject;
 import lsp.CancellableThread;
 import lsp.Utils;
@@ -65,7 +66,9 @@ public class DisconnectHandler extends DAPHandler
 		{
 			JSONObject arguments = request.get("arguments");
 			Boolean terminateDebuggee = Utils.getBoolean(arguments, "terminateDebuggee");
-			return manager.dapDisconnect(request, terminateDebuggee);
+			DAPMessageList result = manager.dapDisconnect(request, terminateDebuggee);
+			DAPServer.getInstance().setRunning(false);
+			return result;
 		}
 	}
 }
