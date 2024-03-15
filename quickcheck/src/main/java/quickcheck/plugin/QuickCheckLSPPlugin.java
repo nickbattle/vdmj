@@ -87,11 +87,20 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 			return new RPCMessageList(request, RPCErrors.InternalError, "Running " + CancellableThread.currentlyRunning());
 		}
 		
-		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		Interpreter interpreter = manager.getInterpreter();
 		
 		if (interpreter.getInitialContext() == null)	// eg. from unit tests
 		{
-			interpreter.init();
+			try
+			{
+				interpreter.init();
+			}
+			catch (Exception e)
+			{
+				Diag.error(e);
+				return new RPCMessageList(request, RPCErrors.InternalError, "Init has errors");
+			}
 		}
 		
 		QuickCheck qc = new QuickCheck();
