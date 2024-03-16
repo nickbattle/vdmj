@@ -61,9 +61,12 @@ public class QCTest extends LSPTest
 
 		QuickCheckHandler handler = new QuickCheckHandler();
 
-		JSONArray params = new JSONArray
-		(
-			new JSONObject("name", "fixed", "size", 1000)
+		JSONObject params = new JSONObject("timeout", 2L, "pattern", ".*",
+			"strategies",
+			new JSONArray
+			(
+				new JSONObject("name", "fixed", "size", 1000)
+			)
 		);
 		
 		RPCRequest request = RPCRequest.create(123L, "slsp/POG/quickcheck", params);

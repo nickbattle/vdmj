@@ -118,11 +118,27 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 
 		Vector<Integer> poList = new Vector<Integer>();
 		Vector<String> poNames = new Vector<String>();
-		poNames.add(".*");	// Include everything for now
+		String pattern = ".*";
+		
+		if (request.get("params") != null)
+		{
+			JSONObject params = request.get("params");
+			pattern = params.get("pattern", ".*");
+		}
+		
+		poNames.add(pattern);
 
 		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
 		ProofObligationList all = pog.getProofObligations();
 		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
+		
+		long timeout = 1L;
+		
+		if (request.get("params") != null)
+		{
+			JSONObject params = request.get("params");
+			timeout = params.get("timeout", 1L);
+		}
 		
 		if (qc.hasErrors())
 		{
@@ -134,7 +150,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 			Diag.error("No POs in scope");
 			return new RPCMessageList(request, RPCErrors.InternalError, "No POs in scope");
 		}
-		else if (qc.initStrategies(1L))
+		else if (qc.initStrategies(timeout))
 		{
 			QuickCheckThread executor = new QuickCheckThread(request, qc, chosen);
 			executor.start();
@@ -151,14 +167,16 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 	private List<Map<String, Object>> getParams(RPCRequest request)
 	{
 		List<Map<String, Object>> list = new Vector<Map<String, Object>>();
-		JSONArray params = request.get("params");
+		JSONObject params = request.get("params");
 		
-		if (params != null)
+		if (params != null && params.get("strategies") != null)
 		{
-			for (int i=0; i<params.size(); i++)
+			JSONArray strategies = params.get("strategies");
+			
+			for (int i=0; i<strategies.size(); i++)
 			{
 				Map<String, Object> map = new HashMap<String, Object>();
-				JSONObject entry = (JSONObject) params.get(i);
+				JSONObject entry = (JSONObject) strategies.get(i);
 				
 				for (String key: entry.keySet())
 				{
