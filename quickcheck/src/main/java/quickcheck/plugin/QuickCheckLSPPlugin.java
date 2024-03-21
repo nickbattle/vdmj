@@ -118,27 +118,36 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 
 		Vector<Integer> poList = new Vector<Integer>();
 		Vector<String> poNames = new Vector<String>();
-		String pattern = ".*";
-		
-		if (request.get("params") != null)
-		{
-			JSONObject params = request.get("params");
-			pattern = params.get("pattern", ".*");
-		}
-		
-		poNames.add(pattern);
-
-		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
-		ProofObligationList all = pog.getProofObligations();
-		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
-		
 		long timeout = 1L;
 		
 		if (request.get("params") != null)
 		{
 			JSONObject params = request.get("params");
-			timeout = params.get("timeout", 1L);
+			
+			if (params.get("config") != null)
+			{
+				JSONObject config = params.get("config");
+				JSONArray obligations = config.get("obligations");
+				timeout = config.get("timeout", 1L);
+				
+				if (obligations != null && !obligations.isEmpty())
+				{
+					for (int i=0; i < obligations.size(); i++)
+					{
+						long po = obligations.index(i);
+						poList.add((int) po);
+					}
+				}
+				else
+				{
+					poNames.add(".*");
+				}
+			}
 		}
+
+		POPlugin pog = PluginRegistry.getInstance().getPlugin("PO");
+		ProofObligationList all = pog.getProofObligations();
+		ProofObligationList chosen = qc.getPOs(all, poList, poNames);
 		
 		if (qc.hasErrors())
 		{
