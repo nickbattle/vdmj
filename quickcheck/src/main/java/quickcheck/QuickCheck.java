@@ -715,7 +715,13 @@ public class QuickCheck
 				{
 					@SuppressWarnings("unchecked")
 					Map<String, Object> map = (Map<String, Object>) arglist.get(i);
-					names.add((String) map.get("name"));
+					
+					Boolean enabled = (Boolean) map.getOrDefault("enabled", true);
+					
+					if (enabled)
+					{
+						names.add((String) map.get("name"));
+					}
 				}
 			}
 		}
