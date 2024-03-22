@@ -72,6 +72,7 @@ public class POPluginSL extends POPlugin
 	{
 		if (obligationList == null)
 		{
+			messagehub.clearPluginMessages(this);
 			POAnnotation.init();
 			obligationList = poModuleList.getProofObligations();
 			POAnnotation.close();

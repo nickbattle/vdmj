@@ -38,6 +38,7 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.EventListener;
+import workspace.MessageHub;
 import workspace.events.CheckCompleteEvent;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.LSPEvent;
@@ -195,7 +196,11 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			
 			poList.add(json);
 		}
+
+
+		RPCMessageList response = new RPCMessageList(request, poList);
+		response.addAll(MessageHub.getInstance().getDiagnosticResponses());
 		
-		return new RPCMessageList(request, poList);
+		return response;
 	}
 }
