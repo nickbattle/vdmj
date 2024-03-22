@@ -111,8 +111,8 @@ public class RandomQCStrategy extends QCStrategy
 		{
 			@SuppressWarnings("unchecked")
 			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "random");
-			expansionLimit = map.containsKey("size") ? (int) map.get("size") : expansionLimit;
-			seed = map.containsKey("seed") ? (long) map.get("seed") : seed;
+			expansionLimit = get(map, "size", expansionLimit);
+			seed = get(map, "seed", seed);
 		}
 	}
 	

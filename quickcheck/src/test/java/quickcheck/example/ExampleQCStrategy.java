@@ -81,7 +81,7 @@ public class ExampleQCStrategy extends QCStrategy
 		else
 		{
 			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "example");
-			provedResult = map.containsKey("proved") ? (boolean) map.get("proved") : false;
+			provedResult = get(map, "proved", false);
 		}
 	}
 	

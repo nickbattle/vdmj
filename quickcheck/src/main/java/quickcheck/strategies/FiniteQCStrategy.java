@@ -100,7 +100,7 @@ public class FiniteQCStrategy extends QCStrategy
 		{
 			@SuppressWarnings("unchecked")
 			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "finite");
-			expansionLimit = map.containsKey("size") ? (int) map.get("size") : expansionLimit;
+			expansionLimit = get(map, "size", expansionLimit);
 		}
 	}
 

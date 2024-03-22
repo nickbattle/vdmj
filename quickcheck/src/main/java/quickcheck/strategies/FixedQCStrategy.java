@@ -187,7 +187,7 @@ public class FixedQCStrategy extends QCStrategy
 		{
 			@SuppressWarnings("unchecked")
 			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "fixed");
-			expansionLimit = map.containsKey("size") ? ((Long)map.get("size")).intValue() : expansionLimit;
+			expansionLimit = get(map, "size", expansionLimit);
 		}
 	}
 	
