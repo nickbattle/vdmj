@@ -55,6 +55,7 @@ public class QuickCheckThread extends CancellableThread
 	private final QuickCheck qc;
 	private final ProofObligationList chosen;
 	private final POPlugin pog;
+	private final Object workDoneToken;
 
 	public QuickCheckThread(RPCRequest request, QuickCheck qc, ProofObligationList chosen)
 	{
@@ -63,6 +64,9 @@ public class QuickCheckThread extends CancellableThread
 		this.qc = qc;
 		this.chosen = chosen;
 		this.pog = PluginRegistry.getInstance().getPlugin("PO");
+		
+		JSONObject params = request.get("params");
+		this.workDoneToken = params.get("workDoneToken");
 	}
 
 	@Override
@@ -73,9 +77,12 @@ public class QuickCheckThread extends CancellableThread
 			running = "quickcheck";
 			RPCMessageList responses = new RPCMessageList();
 			
+			LSPServer server = LSPServer.getInstance();
 			MessageHub.getInstance().clearPluginMessages(pog);
 			List<VDMMessage> messages = new Vector<VDMMessage>();
 			JSONArray list = new JSONArray();
+			long percentDone = -1;
+			int count = 0;
 			
 			for (ProofObligation po: chosen)
 			{
@@ -87,17 +94,53 @@ public class QuickCheckThread extends CancellableThread
 				}
 				
 				list.add(getQCResponse(po, messages));
+				count++;
+				
+				if (workDoneToken != null)
+				{
+					long done = (100 * count)/chosen.size();
+					
+					if (done != percentDone)	// Only if changed %age
+					{
+						JSONObject value = null;
+						
+						if (percentDone < 0)
+						{
+							value = new JSONObject(
+								"kind",			"begin",
+								"title",		"Executing QuickCheck",
+								"message",		"Processing QuickCheck",
+								"percentage",	done);
+						}
+						else
+						{
+							value = new JSONObject(
+								"kind",			"report",
+								"message",		"Processing QuickCheck",
+								"percentage",	done);
+						}
+						
+						JSONObject params = new JSONObject("token", workDoneToken, "value", value);
+						Diag.fine("Sending QC work done = %d%%", done);
+						server.writeMessage(RPCRequest.notification("$/progress", params));
+						percentDone = done;
+					}
+				}
 				
 				if (cancelled)
 				{
+					list.clear();
 					break;
 				}
 			}
-			
+
 			responses.add(RPCResponse.result(request, list));
-			MessageHub.getInstance().addPluginMessages(pog, messages);
-			responses.addAll(MessageHub.getInstance().getDiagnosticResponses());
-			LSPServer server = LSPServer.getInstance();
+
+			if (!cancelled)
+			{
+				MessageHub.getInstance().addPluginMessages(pog, messages);
+				responses.addAll(MessageHub.getInstance().getDiagnosticResponses());
+			}
 			
 			for (JSONObject message: responses)
 			{

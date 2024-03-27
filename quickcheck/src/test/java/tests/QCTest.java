@@ -63,11 +63,13 @@ public class QCTest extends LSPTest
 
 		JSONObject params = new JSONObject
 		(
+			"workDoneToken", "12345678",	// random
+			
 			"config",
 				new JSONObject
 				(
 					"timeout",		2L,
-					"obligations",	new JSONArray(1)
+					"obligations",	new JSONArray(1, 2)
 				)
 		);
 		
