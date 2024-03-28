@@ -88,6 +88,27 @@ abstract public class CancellableThread extends Thread
 		}
 	}
 	
+	public static void joinId(Object id)
+	{
+		CancellableThread thread = active.get(id);
+		
+		if (thread == null)
+		{
+			Diag.error("Cannot join thread id %s", id.toString());
+		}
+		else
+		{
+			try
+			{
+				thread.join();
+			}
+			catch (InterruptedException e)
+			{
+				// ignore
+			}
+		}
+	}
+	
 	public void setCancelled()
 	{
 		cancelled = true;
