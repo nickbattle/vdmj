@@ -259,7 +259,6 @@ public class Properties
 		return value;
 	}
 	
-	@SuppressWarnings("unused")
 	private static String get(java.util.Properties local, String key, String def)
 	{
 		String value = System.getProperty(key);

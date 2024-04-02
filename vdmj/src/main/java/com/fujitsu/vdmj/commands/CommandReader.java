@@ -770,7 +770,7 @@ abstract public class CommandReader
 		return notAvailable(line);
 	}
 
-	protected boolean doQuit(@SuppressWarnings("unused") String line)
+	protected boolean doQuit(String line)
 	{
 		if (RTLogger.getLogSize() > 0)
 		{
@@ -958,7 +958,7 @@ abstract public class CommandReader
 		return notAvailable(line);
 	}
 
-	protected boolean doInit(@SuppressWarnings("unused") String line)
+	protected boolean doInit(String line)
 	{
 		LexLocation.clearLocations();
 		println("Cleared all coverage information");
@@ -995,7 +995,7 @@ abstract public class CommandReader
 		return true;
 	}
 
-	protected boolean doEnv(@SuppressWarnings("unused") String line)
+	protected boolean doEnv(String line)
 	{
 		print(interpreter.getInitialContext().toString());
 		return true;
@@ -1552,7 +1552,7 @@ abstract public class CommandReader
 		return assertErrors == 0;
 	}
 
-	protected void doHelp(@SuppressWarnings("unused") String line)
+	protected void doHelp(String line)
 	{
 		println("print <expression> - evaluate expression");
 		println("runtrace <name> [start test [end test]] - run CT trace");
@@ -1596,7 +1596,7 @@ abstract public class CommandReader
 	 * The method just prints "Command not available in this context" and
 	 * returns true.
 	 */
-	protected boolean notAvailable(@SuppressWarnings("unused") String line)
+	protected boolean notAvailable(String line)
 	{
 		println("Command not available in this context");
 		return true;
