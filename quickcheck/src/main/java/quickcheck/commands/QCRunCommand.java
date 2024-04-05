@@ -30,6 +30,7 @@ import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.plugins.AnalysisCommand;
 import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
+import com.fujitsu.vdmj.pog.POType;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Interpreter;
@@ -91,6 +92,12 @@ public class QCRunCommand extends AnalysisCommand
 					{
 						if (obligation.counterexample != null)
 						{
+							if (obligation.kind == POType.RECURSIVE)
+							{
+								return "Recursive measure fails for these bindings: " +
+										obligation.counterexample.toStringLine();
+							}
+							
 							launch = obligation.getCexLaunch();
 						}
 						else if (obligation.witness != null)

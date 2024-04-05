@@ -31,6 +31,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.messages.VDMMessage;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.pog.POStatus;
+import com.fujitsu.vdmj.pog.POType;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 
@@ -167,7 +168,21 @@ public class QuickCheckThread extends CancellableThread
 		{
 			JSONObject cexample = new JSONObject();
 			cexample.put("variables", Utils.contextToJSON(po.counterexample));
-			JSONObject launch = pog.getCexLaunch(po);
+			JSONObject launch = null;
+			
+			if (po.kind == POType.RECURSIVE)
+			{
+				// Recursive function obligations check the measure_f value for each
+				// (mutually) recursive call. So a launch would have to make two comparisons
+				// of measure values. Until we can figure out how to do this, we don't
+				// send a launch string, but set a message instead.
+				
+				json.put("message", "Recursive measure fails for these bindings");
+			}
+			else
+			{
+				launch = pog.getCexLaunch(po);
+			}
 			
 			if (launch != null)
 			{
