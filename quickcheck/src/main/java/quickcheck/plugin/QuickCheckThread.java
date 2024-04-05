@@ -175,7 +175,7 @@ public class QuickCheckThread extends CancellableThread
 				// Recursive function obligations check the measure_f value for each
 				// (mutually) recursive call. So a launch would have to make two comparisons
 				// of measure values. Until we can figure out how to do this, we don't
-				// send a launch string, but set a message instead.
+				// send a launch string, but set a message to display instead.
 				
 				json.put("message", "Recursive measure fails for these bindings");
 			}
