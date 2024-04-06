@@ -30,6 +30,7 @@ import static quickcheck.commands.QCConsole.verbose;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.in.types.visitors.INGetAllValuesVisitor;
@@ -46,50 +47,60 @@ public class FiniteQCStrategy extends QCStrategy
 	private int expansionLimit = 1024;	// Small and fast?
 	private int errorCount = 0;
 
-	public FiniteQCStrategy(List<String> argv)
+	public FiniteQCStrategy(List<?> argv)
 	{
-		Iterator<String> iter = argv.iterator();
-		
-		while (iter.hasNext())
+		if (!argv.isEmpty() && argv.get(0) instanceof String)
 		{
-			try
+			@SuppressWarnings("unchecked")
+			Iterator<String> iter = (Iterator<String>) argv.iterator();
+			
+			while (iter.hasNext())
 			{
-				String arg = iter.next();
-				
-				switch (arg)
+				try
 				{
-					case "-finite:size":		// Total top level size = type size
-						iter.remove();
-
-						if (iter.hasNext())
-						{
-							expansionLimit = Integer.parseInt(iter.next());
+					String arg = iter.next();
+					
+					switch (arg)
+					{
+						case "-finite:size":		// Total top level size = type size
 							iter.remove();
-						}
-						break;
-
-					default:
-						if (arg.startsWith("-finite:"))
-						{
-							println("Unknown finite option: " + arg);
-							println(help());
-							errorCount++;
-							iter.remove();
-						}
+	
+							if (iter.hasNext())
+							{
+								expansionLimit = Integer.parseInt(iter.next());
+								iter.remove();
+							}
+							break;
+	
+						default:
+							if (arg.startsWith("-finite:"))
+							{
+								println("Unknown finite option: " + arg);
+								println(help());
+								errorCount++;
+								iter.remove();
+							}
+					}
+				}
+				catch (NumberFormatException e)
+				{
+					println("Argument must be numeric");
+					println(help());
+					errorCount++;
+				}
+				catch (ArrayIndexOutOfBoundsException e)
+				{
+					println("Missing argument");
+					println(help());
+					errorCount++;
 				}
 			}
-			catch (NumberFormatException e)
-			{
-				println("Argument must be numeric");
-				println(help());
-				errorCount++;
-			}
-			catch (ArrayIndexOutOfBoundsException e)
-			{
-				println("Missing argument");
-				println(help());
-				errorCount++;
-			}
+		}
+		else
+		{
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "finite");
+			expansionLimit = get(map, "size", expansionLimit);
 		}
 	}
 

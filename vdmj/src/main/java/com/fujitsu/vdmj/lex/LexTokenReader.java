@@ -97,8 +97,7 @@ public class LexTokenReader extends BacktrackInputReader
     	/**
     	 * Create a Position from the outer class' current position details.
     	 */
-    	@SuppressWarnings("synthetic-access")
-		public Position()
+    	public Position()
 		{
 			lc = linecount;
 			cc = charpos;
@@ -114,7 +113,6 @@ public class LexTokenReader extends BacktrackInputReader
 		/**
 		 * Set the outer class position details to those contained in this.
 		 */
-		@SuppressWarnings("synthetic-access")
 		public void set()
 		{
 			linecount = lc;

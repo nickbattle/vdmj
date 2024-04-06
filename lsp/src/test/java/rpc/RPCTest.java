@@ -47,7 +47,7 @@ public class RPCTest extends TestCase
 		StringReader ireader = new StringReader(json);
 		JSONReader reader = new JSONReader(ireader);
 		JSONObject map = reader.readObject();
-		RPCDispatcher d = new RPCDispatcher();
+		RPCDispatcher d = RPCDispatcher.getInstance();
 
 		d.register(new RPCHandler()
 		{
@@ -84,7 +84,7 @@ public class RPCTest extends TestCase
 		StringReader ireader = new StringReader(json);
 		JSONReader reader = new JSONReader(ireader);
 		JSONObject map = reader.readObject();
-		RPCDispatcher d = new RPCDispatcher();
+		RPCDispatcher d = RPCDispatcher.getInstance();
 
 		d.register(new RPCHandler()
 		{
@@ -121,7 +121,7 @@ public class RPCTest extends TestCase
 		StringReader ireader = new StringReader(json);
 		JSONReader reader = new JSONReader(ireader);
 		JSONObject map = reader.readObject();
-		RPCDispatcher d = new RPCDispatcher();
+		RPCDispatcher d = RPCDispatcher.getInstance();
 		RPCMessageList responses = d.dispatch(RPCRequest.create(map));
 		StringWriter out = new StringWriter();
 		JSONWriter writer = new JSONWriter(new PrintWriter(out));

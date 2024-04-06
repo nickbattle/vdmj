@@ -30,8 +30,25 @@ import java.util.Map;
 
 public class DAPDispatcher
 {
+	private static DAPDispatcher INSTANCE = null;
+	
 	private Map<String, DAPHandler> handlers = new HashMap<String, DAPHandler>();
 	private DAPHandler unknownHandler = null;
+	
+	private DAPDispatcher()
+	{
+		// Nothing to do
+	}
+	
+	public static DAPDispatcher getInstance()
+	{
+		if (INSTANCE == null)
+		{
+			INSTANCE = new DAPDispatcher();
+		}
+		
+		return INSTANCE;
+	}
 	
 	public void register(DAPHandler handler, String... methods)
 	{

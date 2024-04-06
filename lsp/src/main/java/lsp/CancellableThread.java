@@ -34,7 +34,8 @@ abstract public class CancellableThread extends Thread
 	private static final Map<Object, CancellableThread> active = new HashMap<Object, CancellableThread>();
 	protected final Object myId;
 	protected boolean cancelled = false;
-	
+	protected static String running = null;
+
 	public CancellableThread(Object myId)
 	{
 		this.myId = myId;
@@ -87,6 +88,27 @@ abstract public class CancellableThread extends Thread
 		}
 	}
 	
+	public static void joinId(Object id)
+	{
+		CancellableThread thread = active.get(id);
+		
+		if (thread == null)
+		{
+			Diag.error("Cannot join thread id %s", id.toString());
+		}
+		else
+		{
+			try
+			{
+				thread.join();
+			}
+			catch (InterruptedException e)
+			{
+				// ignore
+			}
+		}
+	}
+	
 	public void setCancelled()
 	{
 		cancelled = true;
@@ -99,4 +121,9 @@ abstract public class CancellableThread extends Thread
 	}
 
 	abstract protected void body();
+	
+	public static String currentlyRunning()
+	{
+		return running;
+	}
 }

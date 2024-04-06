@@ -48,8 +48,7 @@ public abstract class INStateDesignator extends INNode
 	@Override
 	abstract public String toString();
 
-	public INDefinition targetDefinition(
-		@SuppressWarnings("unused") Environment env)
+	public INDefinition targetDefinition(Environment env)
 	{
 		return null;
 	}

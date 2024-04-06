@@ -110,74 +110,84 @@ public class FixedQCStrategy extends QCStrategy
 
 	private Map<String, ValueList> allRanges = null;
 	
-	public FixedQCStrategy(List<String> argv)
+	public FixedQCStrategy(List<?> argv)
 	{
-		Iterator<String> iter = argv.iterator();
-		
-		while (iter.hasNext())
+		if (!argv.isEmpty() && argv.get(0) instanceof String)
 		{
-			try
+			@SuppressWarnings("unchecked")
+			Iterator<String> iter = (Iterator<String>) argv.iterator();
+			
+			while (iter.hasNext())
 			{
-				String arg = iter.next();
-				
-				switch (arg)
+				try
 				{
-					case "-fixed:file":			// Use this as ranges.qc
-						iter.remove();
-
-						if (iter.hasNext())
-						{
-							rangesFile = iter.next();
+					String arg = iter.next();
+					
+					switch (arg)
+					{
+						case "-fixed:file":			// Use this as ranges.qc
 							iter.remove();
-						}
-						
-						createFile = false;
-						break;
-						
-					case "-fixed:create":		// Create ranges.qc
-						iter.remove();
-						
-						if (iter.hasNext())
-						{
-							rangesFile = iter.next();
+	
+							if (iter.hasNext())
+							{
+								rangesFile = iter.next();
+								iter.remove();
+							}
+							
+							createFile = false;
+							break;
+							
+						case "-fixed:create":		// Create ranges.qc
 							iter.remove();
-						}
-
-						createFile = true;
-						break;
-						
-					case "-fixed:size":		// Total top level size
-						iter.remove();
-
-						if (iter.hasNext())
-						{
-							expansionLimit = Integer.parseInt(iter.next());
+							
+							if (iter.hasNext())
+							{
+								rangesFile = iter.next();
+								iter.remove();
+							}
+	
+							createFile = true;
+							break;
+							
+						case "-fixed:size":		// Total top level size
 							iter.remove();
-						}
-						break;
-						
-					default:
-						if (arg.startsWith("-fixed:"))
-						{
-							println("Unknown fixed option: " + arg);
-							println(help());
-							errorCount++;
-							iter.remove();
-						}
+	
+							if (iter.hasNext())
+							{
+								expansionLimit = Integer.parseInt(iter.next());
+								iter.remove();
+							}
+							break;
+							
+						default:
+							if (arg.startsWith("-fixed:"))
+							{
+								println("Unknown fixed option: " + arg);
+								println(help());
+								errorCount++;
+								iter.remove();
+							}
+					}
+				}
+				catch (NumberFormatException e)
+				{
+					println("Argument must be numeric");
+					println(help());
+					errorCount++;
+				}
+				catch (ArrayIndexOutOfBoundsException e)
+				{
+					println("Missing argument");
+					println(help());
+					errorCount++;
 				}
 			}
-			catch (NumberFormatException e)
-			{
-				println("Argument must be numeric");
-				println(help());
-				errorCount++;
-			}
-			catch (ArrayIndexOutOfBoundsException e)
-			{
-				println("Missing argument");
-				println(help());
-				errorCount++;
-			}
+		}
+		else
+		{
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "fixed");
+			expansionLimit = get(map, "size", expansionLimit);
 		}
 	}
 	

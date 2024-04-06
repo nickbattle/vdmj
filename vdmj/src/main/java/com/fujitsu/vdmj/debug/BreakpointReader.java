@@ -109,7 +109,7 @@ public class BreakpointReader
 		return true;
 	}
 
-	public boolean doList(@SuppressWarnings("unused") String line)
+	public boolean doList(String line)
 	{
 		Map<Integer, Breakpoint> map = interpreter.getBreakpoints();
 

@@ -32,6 +32,7 @@ import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.plugins.commands.PrintCommand;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
 /**
@@ -91,6 +92,17 @@ public class QCRunCommand extends AnalysisCommand
 					{
 						if (obligation.counterexample != null)
 						{
+							if (obligation instanceof RecursiveObligation)
+							{
+								RecursiveObligation rec = (RecursiveObligation)obligation;
+								
+								if (rec.mutuallyRecursive)
+								{
+									return "Mutually recursive measures fail for these bindings: " +
+											obligation.counterexample.toStringLine();
+								}
+							}
+							
 							launch = obligation.getCexLaunch();
 						}
 						else if (obligation.witness != null)

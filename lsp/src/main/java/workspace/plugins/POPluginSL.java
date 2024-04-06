@@ -72,6 +72,7 @@ public class POPluginSL extends POPlugin
 	{
 		if (obligationList == null)
 		{
+			messagehub.clearPluginMessages(this);
 			POAnnotation.init();
 			obligationList = poModuleList.getProofObligations();
 			POAnnotation.close();
@@ -82,7 +83,7 @@ public class POPluginSL extends POPlugin
 	}
 
 	@Override
-	protected JSONObject getCexLaunch(ProofObligation po)
+	public JSONObject getCexLaunch(ProofObligation po)
 	{
 		String launch = po.getCexLaunch();
 		
@@ -102,7 +103,7 @@ public class POPluginSL extends POPlugin
 	}
 
 	@Override
-	protected JSONObject getWitnessLaunch(ProofObligation po)
+	public JSONObject getWitnessLaunch(ProofObligation po)
 	{
 		String launch = po.getWitnessLaunch();
 		

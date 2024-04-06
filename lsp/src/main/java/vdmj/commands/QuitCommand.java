@@ -24,7 +24,6 @@
 
 package vdmj.commands;
 
-import dap.AsyncExecutor;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServer;
@@ -51,7 +50,7 @@ public class QuitCommand extends AnalysisCommand
 	{
 		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
 
-		if (AsyncExecutor.currentlyRunning() != null)
+		if (CancellableThread.currentlyRunning() != null)
 		{
 			CancellableThread.cancelAll();
 			manager.stopDebugReader();

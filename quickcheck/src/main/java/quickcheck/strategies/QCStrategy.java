@@ -24,7 +24,9 @@
 
 package quickcheck.strategies;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -40,4 +42,42 @@ abstract public class QCStrategy
 	abstract public boolean init(QuickCheck qc);
 	abstract public StrategyResults getValues(ProofObligation po, List<INBindingOverride> binds, Context ctxt);
 	abstract public String help();
+	
+	/**
+	 * These methods help with access to the JSON parameters passed from VSCode.
+	 */
+	
+	protected Map<String, Object> getParams(List<Map<String, Object>> list, String name)
+	{
+		if (list != null)
+		{
+			for (Map<String, Object> entry: list)
+			{
+				if (name.equals(entry.get("name")))
+				{
+					return entry;
+				}
+			}
+		}
+		
+		return new HashMap<String, Object>();
+	}
+	
+	protected int get(Map<String, Object> map, String key, int def)
+	{
+		Long value = (Long) map.get(key);
+		return (value != null) ? value.intValue() : def;
+	}
+	
+	protected long get(Map<String, Object> map, String key, long def)
+	{
+		Long value = (Long) map.get(key);
+		return (value != null) ? value.longValue() : def;
+	}
+	
+	protected boolean get(Map<String, Object> map, String key, boolean def)
+	{
+		Boolean value = (Boolean) map.get(key);
+		return (value != null) ? value.booleanValue() : def;
+	}
 }

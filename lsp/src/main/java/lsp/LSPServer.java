@@ -96,7 +96,7 @@ public class LSPServer extends JSONServer implements VDMJMain
 	
 	private RPCDispatcher getDispatcher() throws IOException
 	{
-		RPCDispatcher dispatcher = new RPCDispatcher();
+		RPCDispatcher dispatcher = RPCDispatcher.getInstance();
 		
 		dispatcher.register(new InitializeHandler(), "initialize", "initialized", "client/registerCapability");
 		dispatcher.register(new ShutdownHandler(), "shutdown");

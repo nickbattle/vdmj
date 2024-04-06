@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2021 Nick Battle.
+ *	Copyright (c) 2023 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -21,42 +21,29 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
+package quickcheck.plugin;
 
-package dap.handlers;
+import lsp.LSPHandler;
+import rpc.RPCMessageList;
+import rpc.RPCRequest;
+import workspace.PluginRegistry;
 
-import java.io.IOException;
-
-import dap.DAPHandler;
-import dap.DAPMessageList;
-import dap.DAPRequest;
-import json.JSONObject;
-import lsp.CancellableThread;
-
-public class SourceHandler extends DAPHandler
+/**
+ * LSP Handler for QC DAP commands
+ */
+public class QuickCheckHandler extends LSPHandler
 {
-	public SourceHandler()
-	{
-		super();
-	}
-	
 	@Override
-	public DAPMessageList run(DAPRequest request) throws IOException
+	public RPCMessageList request(RPCRequest request)
 	{
-		JSONObject arguments = request.get("arguments");
-		JSONObject source = arguments.get("source");
-		Long reference = source.get("sourceReference");
-		String result = null;
-		
-		switch (reference.intValue())
+		try
 		{
-			case 0:		// Executing command
-				result = CancellableThread.currentlyRunning();
-				break;
-				
-			default:
-				result = "Unknown source reference " + reference;
+			QuickCheckLSPPlugin qc = PluginRegistry.getInstance().getPlugin("QC");
+			return qc.quickCheck(request);
 		}
-		
-		return new DAPMessageList(request, new JSONObject("content", result));
+		catch (Exception e)
+		{
+			return new RPCMessageList(request, e);
+		}
 	}
 }

@@ -30,8 +30,25 @@ import java.util.Map;
 
 public class RPCDispatcher
 {
+	private static RPCDispatcher INSTANCE = null;
+	
 	private Map<String, RPCHandler> handlers = new HashMap<String, RPCHandler>();
 	private RPCHandler unknownHandler = null;
+	
+	private RPCDispatcher()
+	{
+		// Nothing to do
+	}
+	
+	public static RPCDispatcher getInstance()
+	{
+		if (INSTANCE == null)
+		{
+			INSTANCE = new RPCDispatcher();
+		}
+		
+		return INSTANCE;
+	}
 	
 	public void register(RPCHandler handler, String... methods)
 	{

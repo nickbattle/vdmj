@@ -24,11 +24,12 @@
 
 package quickcheck.strategies;
 
-import static quickcheck.commands.QCConsole.println;
+import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 import static quickcheck.commands.QCConsole.verbose;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fujitsu.vdmj.in.patterns.INBindingOverride;
 import com.fujitsu.vdmj.pog.ProofObligation;
@@ -47,19 +48,27 @@ public class SearchQCStrategy extends QCStrategy
 {
 	private int errorCount = 0;
 
-	public SearchQCStrategy(List<String> argv)
+	public SearchQCStrategy(List<?> argv)
 	{
-		for (int i=0; i < argv.size(); i++)
+		if (!argv.isEmpty() && argv.get(0) instanceof String)
 		{
-			// No plugin arguments yet?
-
-			if (argv.get(i).startsWith("-search:"))
+			for (int i=0; i < argv.size(); i++)
 			{
-				println("Unknown search option: " + argv.get(i));
-				println(help());
-				errorCount ++;
-				argv.remove(i);
+				String arg = (String)argv.get(i);
+			
+				if (arg.startsWith("-search:"))
+				{
+					println("Unknown search option: " + arg);
+					println(help());
+					errorCount ++;
+					argv.remove(i);
+				}
 			}
+		}
+		else
+		{
+			@SuppressWarnings({ "unchecked", "unused" })
+			Map<String, Object> map = getParams((List<Map<String, Object>>) argv, "search");
 		}
 	}
 	

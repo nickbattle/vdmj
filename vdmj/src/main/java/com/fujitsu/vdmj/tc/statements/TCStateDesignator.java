@@ -50,7 +50,7 @@ public abstract class TCStateDesignator extends TCNode
 
 	abstract public TCType typeCheck(Environment env);
 
-	public TCDefinition targetDefinition(@SuppressWarnings("unused") Environment env)
+	public TCDefinition targetDefinition(Environment env)
 	{
 		return null;
 	}

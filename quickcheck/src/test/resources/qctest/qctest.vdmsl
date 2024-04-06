@@ -1,0 +1,4 @@
+functions
+	f: real -> nat
+	f(a) == 1/a
+	pre a > 0;
