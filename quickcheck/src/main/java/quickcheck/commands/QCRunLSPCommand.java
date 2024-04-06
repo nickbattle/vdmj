@@ -25,9 +25,9 @@ package quickcheck.commands;
 
 import static com.fujitsu.vdmj.plugins.PluginConsole.println;
 
-import com.fujitsu.vdmj.pog.POType;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
+import com.fujitsu.vdmj.pog.RecursiveObligation;
 import com.fujitsu.vdmj.runtime.Interpreter;
 
 import dap.DAPMessageList;
@@ -93,11 +93,16 @@ public class QCRunLSPCommand extends AnalysisCommand
 				{
 					if (obligation.counterexample != null)
 					{
-						if (obligation.kind == POType.RECURSIVE)
+						if (obligation instanceof RecursiveObligation)
 						{
-							return new DAPMessageList(request, new JSONObject("result",
-								"Recursive measure fails for these bindings: " +
-								obligation.counterexample.toStringLine()));
+							RecursiveObligation rec = (RecursiveObligation)obligation;
+							
+							if (rec.mutuallyRecursive)
+							{
+								return new DAPMessageList(request, new JSONObject("result",
+									"Mutually recursive measures fail for these bindings: " +
+									obligation.counterexample.toStringLine()));
+							}
 						}
 						
 						launch = obligation.getCexLaunch();
