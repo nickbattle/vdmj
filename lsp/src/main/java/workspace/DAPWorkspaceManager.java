@@ -164,7 +164,7 @@ public class DAPWorkspaceManager
 	public DAPMessageList dapLaunch(DAPRequest request,
 			boolean noDebug, String defaultName, String command, String remoteControl, String logging) throws Exception
 	{
-		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+		LSPPlugin manager = LSPPlugin.getInstance();
 
 		if (manager.checkInProgress())
 		{
@@ -275,8 +275,8 @@ public class DAPWorkspaceManager
 			}
 			
 			// System properties above override those from any properties file
-			Diag.info("Reading properties from %s", LSPWorkspaceManager.PROPERTIES);
-			Properties.init(LSPWorkspaceManager.PROPERTIES);
+			Diag.info("Reading properties from %s", LSPPlugin.PROPERTIES);
+			Properties.init(LSPPlugin.PROPERTIES);
 		}
 	}
 	
@@ -301,8 +301,8 @@ public class DAPWorkspaceManager
 		}
 		
 		// Reset properties from the file
-		Diag.info("Resetting properties from %s", LSPWorkspaceManager.PROPERTIES);
-		Properties.init(LSPWorkspaceManager.PROPERTIES);
+		Diag.info("Resetting properties from %s", LSPPlugin.PROPERTIES);
+		Properties.init(LSPPlugin.PROPERTIES);
 	}
 
 	public DAPMessageList dapConfigurationDone(DAPRequest request)
@@ -844,7 +844,7 @@ public class DAPWorkspaceManager
 		if (restart && !specHasErrors())
 		{
 			stdout("\nSession restarting...\n");
-			LSPWorkspaceManager lsp = LSPWorkspaceManager.getInstance();
+			LSPPlugin lsp = LSPPlugin.getInstance();
 			lsp.restart();
 		}
 		else

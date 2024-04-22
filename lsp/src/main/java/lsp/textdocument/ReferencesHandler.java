@@ -33,7 +33,7 @@ import lsp.Utils;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.LSPPlugin;
 
 public class ReferencesHandler extends LSPHandler
 {
@@ -58,7 +58,7 @@ public class ReferencesHandler extends LSPHandler
 			JSONObject context = params.get("context");
 			Boolean incdec = context.get("includeDeclaration");
 			
-			return LSPWorkspaceManager.getInstance().lspReferences(request,
+			return LSPPlugin.getInstance().lspReferences(request,
 					file, line.intValue(), col.intValue(), incdec);
 		}
 		catch (URISyntaxException e)

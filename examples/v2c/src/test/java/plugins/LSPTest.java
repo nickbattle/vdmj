@@ -38,13 +38,11 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.DAPWorkspaceManager;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
-import workspace.LSPXWorkspaceManager;
+import workspace.LSPPlugin;
 
 abstract public class LSPTest
 {
-	protected LSPWorkspaceManager lspManager = null;
-	protected LSPXWorkspaceManager lspxManager = null;
+	protected LSPPlugin lspManager = null;
 	protected DAPWorkspaceManager dapManager = null;
 	
 	static
@@ -55,11 +53,9 @@ abstract public class LSPTest
 	protected void setupWorkspace(Dialect dialect) throws IOException
 	{
 		Settings.dialect = dialect;
-		LSPWorkspaceManager.reset();
-		LSPXWorkspaceManager.reset();
+		LSPPlugin.reset();
 		DAPWorkspaceManager.reset();
-		lspManager = LSPWorkspaceManager.getInstance();
-		lspxManager = LSPXWorkspaceManager.getInstance();
+		lspManager = LSPPlugin.getInstance();
 		dapManager = DAPWorkspaceManager.getInstance();
 	}
 	

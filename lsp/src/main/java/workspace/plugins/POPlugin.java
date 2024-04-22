@@ -34,6 +34,8 @@ import com.fujitsu.vdmj.pog.ProofObligationList;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
+import lsp.lspx.POGHandler;
+import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
@@ -82,6 +84,8 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
+		dispatcher.register(new POGHandler(), "slsp/POG/generate");
+
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
 	}
@@ -151,6 +155,24 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 		}
 		
 		return array;
+	}
+
+	public RPCMessageList pogGenerate(RPCRequest request, File file)
+	{
+		try
+		{
+			if (messagehub.hasErrors())	// No clean tree
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
+			}
+			
+			return getJSONObligations(request, file);
+		}
+		catch (Exception e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
 	}
 
 	public RPCMessageList getJSONObligations(RPCRequest request, File file)

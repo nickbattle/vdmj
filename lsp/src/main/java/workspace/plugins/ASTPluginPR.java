@@ -46,7 +46,7 @@ import com.fujitsu.vdmj.syntax.ClassReader;
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.LSPPlugin;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
 import workspace.lenses.ASTCodeLens;
@@ -74,7 +74,7 @@ public class ASTPluginPR extends ASTPlugin
 		dirty = false;
 		dirtyClassList = null;
 		
-		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
+		Map<File, StringBuilder> projectFiles = LSPPlugin.getInstance().getProjectFiles();
 		LexLocation.resetLocations();
 		
 		if (Settings.dialect == Dialect.VDM_RT)
@@ -147,7 +147,7 @@ public class ASTPluginPR extends ASTPlugin
 	{
 		dirty = true;	// Until saved.
 
-		Map<File, StringBuilder> projectFiles = LSPWorkspaceManager.getInstance().getProjectFiles();
+		Map<File, StringBuilder> projectFiles = LSPPlugin.getInstance().getProjectFiles();
 		StringBuilder buffer = projectFiles.get(file);
 		
 		LexTokenReader ltr = new LexTokenReader(buffer.toString(), Settings.dialect, file);

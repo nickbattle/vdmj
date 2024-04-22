@@ -32,6 +32,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -54,6 +57,7 @@ import java.util.regex.PatternSyntaxException;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.lex.BacktrackInputReader;
+import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.VDMWarning;
 import com.fujitsu.vdmj.runtime.SourceFile;
@@ -68,16 +72,35 @@ import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCRecordType;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.tc.types.TCTypeList;
+import com.fujitsu.vdmj.util.GetResource;
 
 import json.JSONArray;
 import json.JSONObject;
+import lsp.CancelHandler;
+import lsp.ExitHandler;
+import lsp.InitializeHandler;
 import lsp.LSPInitializeResponse;
 import lsp.LSPMessageUtils;
 import lsp.LSPServer;
+import lsp.SetTraceNotificationHandler;
+import lsp.ShutdownHandler;
+import lsp.UnknownHandler;
 import lsp.Utils;
+import lsp.textdocument.CodeLensHandler;
+import lsp.textdocument.CompletionHandler;
 import lsp.textdocument.CompletionItemKind;
 import lsp.textdocument.CompletionTriggerKind;
+import lsp.textdocument.DefinitionHandler;
+import lsp.textdocument.DidChangeHandler;
+import lsp.textdocument.DidCloseHandler;
+import lsp.textdocument.DidOpenHandler;
+import lsp.textdocument.DidSaveHandler;
+import lsp.textdocument.DocumentSymbolHandler;
+import lsp.textdocument.ReferencesHandler;
+import lsp.textdocument.TypeHierarchyHandler;
 import lsp.textdocument.WatchKind;
+import lsp.workspace.DidChangeWSHandler;
+import rpc.RPCDispatcher;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
@@ -95,14 +118,23 @@ import workspace.events.LSPEvent;
 import workspace.events.OpenFileEvent;
 import workspace.events.SaveFileEvent;
 import workspace.events.ShutdownEvent;
+import workspace.events.UnknownMethodEvent;
 import workspace.plugins.ASTPlugin;
+import workspace.plugins.AnalysisPlugin;
+import workspace.plugins.CTPlugin;
 import workspace.plugins.INPlugin;
+import workspace.plugins.POPlugin;
 import workspace.plugins.TCPlugin;
+import workspace.plugins.TRPlugin;
 import workspace.plugins.WSPlugin;
 
-public class LSPWorkspaceManager
+/**
+ * The main AnalysisPlugin that deals with LSP protocol messages. This is
+ * created at startup by the LSP listener.
+ */
+public class LSPPlugin extends AnalysisPlugin
 {
-	private static LSPWorkspaceManager INSTANCE = null;
+	private static LSPPlugin INSTANCE = null;
 	private PluginRegistry registry;
 	private EventHub eventhub;
 	private MessageHub messagehub;
@@ -129,7 +161,7 @@ public class LSPWorkspaceManager
 	private static final String EXTERNALS = ".vscode/externals";
 	public static final String PROPERTIES = ".vscode/vdmj.properties";
 
-	private LSPWorkspaceManager()
+	private LSPPlugin()
 	{
 		registry = PluginRegistry.getInstance();
 		eventhub = EventHub.getInstance();
@@ -147,34 +179,75 @@ public class LSPWorkspaceManager
 			Diag.info("Workspace created, encoding set to %s", encoding.displayName());
 		}
 	}
+	
+	@Override
+	public int getPriority()
+	{
+		return EventListener.LSP_PRIORITY;
+	}
 
-	public static synchronized LSPWorkspaceManager getInstance()
+	@Override
+	public String getName()
+	{
+		return "LSP";
+	}
+
+	public static synchronized LSPPlugin getInstance()
 	{
 		if (INSTANCE == null)
 		{
-			INSTANCE = new LSPWorkspaceManager();
+			INSTANCE = new LSPPlugin();
 			
 			/**
 			 * Register the built-in plugins. Others are registered in LSPXWorkspaceManager,
 			 * when the client capabilities have been received.
 			 */
 			PluginRegistry registry = PluginRegistry.getInstance();
+			
+			registry.registerPlugin(INSTANCE);
 			registry.registerPlugin(WSPlugin.factory(Settings.dialect));
 			registry.registerPlugin(ASTPlugin.factory(Settings.dialect));
 			registry.registerPlugin(TCPlugin.factory(Settings.dialect));
 			registry.registerPlugin(INPlugin.factory(Settings.dialect));
+			registry.registerPlugin(TRPlugin.factory(Settings.dialect));
 			
-			Diag.info("Created LSPWorkspaceManager");
+			Diag.info("Created LSPPlugin");
 		}
 
 		return INSTANCE;
 	}
-	
+
+	@Override
+	public void init()
+	{
+		RPCDispatcher dispatcher = RPCDispatcher.getInstance();
+		
+		dispatcher.register(new InitializeHandler(), "initialize", "initialized", "client/registerCapability");
+		dispatcher.register(new ShutdownHandler(), "shutdown");
+		dispatcher.register(new ExitHandler(), "exit");
+		dispatcher.register(new CancelHandler(), "$/cancelRequest");
+		dispatcher.register(new SetTraceNotificationHandler(), "$/setTraceNotification", "$/setTrace");
+
+		dispatcher.register(new DidOpenHandler(), "textDocument/didOpen");
+		dispatcher.register(new DidCloseHandler(), "textDocument/didClose");
+		dispatcher.register(new DidChangeHandler(), "textDocument/didChange");
+		dispatcher.register(new DidSaveHandler(), "textDocument/didSave");
+		dispatcher.register(new DefinitionHandler(), "textDocument/definition");
+		dispatcher.register(new DocumentSymbolHandler(), "textDocument/documentSymbol");
+		dispatcher.register(new CompletionHandler(), "textDocument/completion");
+		dispatcher.register(new CodeLensHandler(), "textDocument/codeLens", "codeLens/resolve");
+		dispatcher.register(new ReferencesHandler(), "textDocument/references");
+		dispatcher.register(new TypeHierarchyHandler(), "textDocument/prepareTypeHierarchy", "typeHierarchy/supertypes", "typeHierarchy/subtypes");
+
+		dispatcher.register(new DidChangeWSHandler(), "workspace/didChangeWatchedFiles");
+
+		dispatcher.register(new UnknownHandler());	// Called for unknown methods
+	}
+
 	public static void reset()
 	{
 		Diag.config("Resetting WorkspaceManagers, PluginRegistry, EventHub and MessageHub");
 		
-		LSPXWorkspaceManager.reset();
 		DAPWorkspaceManager.reset();
 		DAPXWorkspaceManager.reset();
 		PluginRegistry.reset();
@@ -206,7 +279,7 @@ public class LSPWorkspaceManager
 		this.clientCapabilities = clientCapabilities;
 		this.openFiles.clear();
 		
-		LSPXWorkspaceManager.getInstance().enablePlugins();
+		enablePlugins();
 		
 		System.setProperty("vdmj.parser.tabstop", "1");	// Forced, for LSP location offsets
 		Diag.info("Reading properties from %s", PROPERTIES);
@@ -232,6 +305,98 @@ public class LSPWorkspaceManager
 		{
 			Diag.error(e);
 			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	/**
+	 * This is called after the client capabilities have been received. If the option
+	 * is enabled in the capabilities, the relevant plugin is registered.
+	 * 
+	 * PO and CT are built-in, but still enabled by the capabilities.
+	 * 
+	 * Further plugins may be loaded via the property "lspx.plugins".
+	 * @throws Exception 
+	 */
+	private void enablePlugins() throws Exception
+	{
+		if (hasClientCapability("experimental.proofObligationGeneration"))
+		{
+			registry.registerPlugin(POPlugin.factory(Settings.dialect));
+		}
+		
+		if (hasClientCapability("experimental.combinatorialTesting"))
+		{
+			registry.registerPlugin(CTPlugin.factory(Settings.dialect));
+		}
+		
+		List<String> plugins = GetResource.readResource("lspx.plugins");
+		
+		if (!plugins.isEmpty())
+		{
+			for (String plugin: plugins)
+			{
+				try
+				{
+					Class<?> clazz = Class.forName(plugin);
+					
+					try
+					{
+						Method factory = clazz.getMethod("factory", Dialect.class);
+						AnalysisPlugin instance = (AnalysisPlugin)factory.invoke(null, Settings.dialect);
+						registry.registerPlugin(instance);
+						Diag.info("Registered LSPX plugin %s", plugin);
+					}
+					catch (NoSuchMethodException e)		// Try default constructor
+					{
+						try
+						{
+							if (Modifier.isAbstract(clazz.getModifiers()))
+							{
+								Diag.severe("Plugin class is abstract: %s", clazz.getName());
+								continue;
+							}
+	
+							Constructor<?> ctor = clazz.getConstructor();
+							AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
+							registry.registerPlugin(instance);
+							Diag.info("Registered LSPX plugin %s", plugin);
+						}
+						catch (Throwable th)
+						{
+							Diag.error(th);
+							Diag.error("Cannot register LSPX plugin %s", plugin);
+						}
+					}
+					catch (Exception e)
+					{
+						Diag.error(e);
+						Diag.error("Plugin %s factory method failed", plugin);
+					}
+				}
+				catch (ClassNotFoundException e)
+				{
+					Diag.error("Plugin class %s not found", plugin);
+				}
+			}
+		}
+		else
+		{
+			Diag.info("No external plugins configured in lspx.plugins");
+		}
+	}
+	
+	public RPCMessageList unhandledMethod(RPCRequest request)
+	{
+		RPCMessageList results = eventhub.publish(new UnknownMethodEvent(request));
+		
+		if (results.isEmpty())
+		{
+			Diag.error("No external plugin registered for " + request.getMethod());
+			return new RPCMessageList(request, RPCErrors.MethodNotFound, request.getMethod());
+		}
+		else
+		{
+			return results;
 		}
 	}
 

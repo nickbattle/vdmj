@@ -37,7 +37,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.LSPPlugin;
 
 public class TypeHierarchyHandler extends LSPHandler
 {
@@ -82,7 +82,7 @@ public class TypeHierarchyHandler extends LSPHandler
 			Long line = position.get("line");
 			Long col = position.get("character");
 			
-			return LSPWorkspaceManager.getInstance().lspPrepareTypeHierarchy(request, file, line, col);
+			return LSPPlugin.getInstance().lspPrepareTypeHierarchy(request, file, line, col);
 		}
 		catch (URISyntaxException e)
 		{
@@ -104,7 +104,7 @@ public class TypeHierarchyHandler extends LSPHandler
 			JSONObject item = params.get("item");
 			String classname = item.get("name");
 			
-			return LSPWorkspaceManager.getInstance().lspSupertypes(request, classname);
+			return LSPPlugin.getInstance().lspSupertypes(request, classname);
 		}
 		catch (Exception e)
 		{
@@ -122,7 +122,7 @@ public class TypeHierarchyHandler extends LSPHandler
 			JSONObject item = params.get("item");
 			String classname = item.get("name");
 			
-			return LSPWorkspaceManager.getInstance().lspSubtypes(request, classname);
+			return LSPPlugin.getInstance().lspSubtypes(request, classname);
 		}
 		catch (Exception e)
 		{

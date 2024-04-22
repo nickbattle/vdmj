@@ -226,7 +226,7 @@ public class MessageHub
 	 */
 	public RPCMessageList getDiagnosticResponses()
 	{
-		Set<File> files = LSPWorkspaceManager.getInstance().getProjectFiles().keySet();
+		Set<File> files = LSPPlugin.getInstance().getProjectFiles().keySet();
 		return getDiagnosticResponses(files);
 	}
 	

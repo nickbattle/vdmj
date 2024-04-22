@@ -38,7 +38,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.LSPPlugin;
 
 public class DidChangeWSHandler extends LSPHandler
 {
@@ -80,7 +80,7 @@ public class DidChangeWSHandler extends LSPHandler
 					{
 						WatchKind type = WatchKind.kindOf(change.get("type"));
 						File file = Utils.uriToFile(uri);
-						int code = LSPWorkspaceManager.getInstance().lspDidChangeWatchedFile(request, file, type);
+						int code = LSPPlugin.getInstance().lspDidChangeWatchedFile(request, file, type);
 						
 						if (code > actionCode)	// Note: ordered severity
 						{
@@ -102,7 +102,7 @@ public class DidChangeWSHandler extends LSPHandler
 			// Do rebuilding and type checking after ALL the changes are processed
 			// This can return null, since didChangeWatchedFiles is a notification.
 			
-			return LSPWorkspaceManager.getInstance().afterChangeWatchedFiles(request, actionCode, deleted);
+			return LSPPlugin.getInstance().afterChangeWatchedFiles(request, actionCode, deleted);
 		}
 		catch (URISyntaxException e)
 		{

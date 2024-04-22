@@ -35,7 +35,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.LSPPlugin;
 
 public class DidChangeHandler extends LSPHandler
 {
@@ -63,7 +63,7 @@ public class DidChangeHandler extends LSPHandler
 					JSONObject change = (JSONObject)contentChange;
 					JSONObject range = change.get("range");
 					String text = change.get("text");
-					RPCMessageList r = LSPWorkspaceManager.getInstance().lspDidChange(request, file, range, text);
+					RPCMessageList r = LSPPlugin.getInstance().lspDidChange(request, file, range, text);
 					if (r != null) result.addAll(r);
 				}
 			}

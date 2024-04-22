@@ -37,8 +37,8 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
-import workspace.LSPXWorkspaceManager;
+import workspace.LSPPlugin;
+import workspace.plugins.CTPlugin;
 
 public class CTHandler extends LSPHandler
 {
@@ -50,7 +50,7 @@ public class CTHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		if (!LSPWorkspaceManager.getInstance().hasClientCapability("experimental.combinatorialTesting"))
+		if (!LSPPlugin.getInstance().hasClientCapability("experimental.combinatorialTesting"))
 		{
 			return new RPCMessageList(request, RPCErrors.MethodNotFound, "CT plugin is not enabled by client");
 		}
@@ -77,7 +77,8 @@ public class CTHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			File project = params == null ? null : Utils.uriToFile(params.get("uri"));
-			return LSPXWorkspaceManager.getInstance().ctTraces(request, project);
+			CTPlugin ct = registry.getPlugin("CT");
+			return ct.ctTraces(request, project);
 		}
 		catch (URISyntaxException e)
 		{
@@ -97,7 +98,8 @@ public class CTHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			String name = params.get("name");
-			return LSPXWorkspaceManager.getInstance().ctGenerate(request, name);
+			CTPlugin ct = registry.getPlugin("CT");
+			return ct.ctGenerate(request, name);
 		}
 		catch (Exception e)
 		{
@@ -158,7 +160,8 @@ public class CTHandler extends LSPHandler
 				end = range.get("end");
 			}
 			
-			return LSPXWorkspaceManager.getInstance().ctExecute(request, tracename,
+			CTPlugin ct = registry.getPlugin("CT");
+			return ct.ctExecute(request, tracename,
 					partialResultToken, workDoneToken, rType, subset, seed, start, end);
 		}
 		catch (Exception e)

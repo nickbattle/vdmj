@@ -29,11 +29,15 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import workspace.Diag;
+import workspace.PluginRegistry;
 
 abstract public class LSPHandler implements RPCHandler
 {
+	protected final PluginRegistry registry;
+	
 	public LSPHandler()
 	{
+		registry = PluginRegistry.getInstance();
 	}
 
 	@Override

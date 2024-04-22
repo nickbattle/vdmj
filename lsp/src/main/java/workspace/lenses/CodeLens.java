@@ -29,7 +29,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.LSPPlugin;
 
 /**
  * The base class for all code lenses.
@@ -43,7 +43,7 @@ abstract public class CodeLens
 	 */
 	protected String getClientName()
 	{
-		return LSPWorkspaceManager.getInstance().getClientInfo("name");
+		return LSPPlugin.getInstance().getClientInfo("name");
 	}
 	
 	/**

@@ -27,7 +27,7 @@ package lsp;
 import dap.DAPServerSocket;
 import json.JSONArray;
 import json.JSONObject;
-import workspace.LSPWorkspaceManager;
+import workspace.LSPPlugin;
 import workspace.PluginRegistry;
 
 public class LSPInitializeResponse extends JSONObject
@@ -45,7 +45,7 @@ public class LSPInitializeResponse extends JSONObject
 	private JSONObject getServerCapabilities()
 	{
 		JSONObject cap = new JSONObject();
-		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+		LSPPlugin manager = LSPPlugin.getInstance();
 		
 		
 		cap.put("definitionProvider", true);			// Go to definition for F12
