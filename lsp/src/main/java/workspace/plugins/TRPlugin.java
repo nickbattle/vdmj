@@ -42,7 +42,6 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.EventListener;
-import workspace.LSPPlugin;
 
 /**
  * The translate plugin.

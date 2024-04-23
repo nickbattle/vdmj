@@ -40,6 +40,7 @@ import lsp.Utils;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.plugins.AnalysisPlugin;
+import workspace.plugins.LSPPlugin;
 
 /**
  * A singleton object to manage the current set of error and warning messages for all

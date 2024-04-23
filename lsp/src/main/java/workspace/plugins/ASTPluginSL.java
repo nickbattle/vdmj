@@ -42,7 +42,6 @@ import com.fujitsu.vdmj.syntax.ModuleReader;
 
 import json.JSONArray;
 import lsp.textdocument.SymbolKind;
-import workspace.LSPPlugin;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
 import workspace.lenses.ASTCodeLens;

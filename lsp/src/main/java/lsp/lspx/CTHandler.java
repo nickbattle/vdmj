@@ -37,8 +37,8 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPPlugin;
 import workspace.plugins.CTPlugin;
+import workspace.plugins.LSPPlugin;
 
 public class CTHandler extends LSPHandler
 {

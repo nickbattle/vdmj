@@ -27,7 +27,8 @@ package lsp;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import workspace.Diag;
-import workspace.LSPPlugin;
+import workspace.plugins.LSPPlugin;
+
 import java.io.File;
 import java.net.URISyntaxException;
 

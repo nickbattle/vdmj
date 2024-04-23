@@ -36,9 +36,9 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.EventHub;
-import workspace.LSPPlugin;
 import workspace.MessageHub;
 import workspace.events.UnknownTranslationEvent;
+import workspace.plugins.LSPPlugin;
 import workspace.plugins.TRPlugin;
 
 public class TranslateHandler extends LSPHandler

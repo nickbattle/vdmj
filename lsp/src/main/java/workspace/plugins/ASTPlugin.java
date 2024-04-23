@@ -53,7 +53,6 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.EventListener;
-import workspace.LSPPlugin;
 import workspace.events.ChangeFileEvent;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;

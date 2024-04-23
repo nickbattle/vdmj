@@ -43,7 +43,7 @@ import rpc.RPCRequest;
 import rpc.RPCResponse;
 import vdmj.DAPDebugLink;
 import workspace.Diag;
-import workspace.LSPPlugin;
+import workspace.plugins.LSPPlugin;
 
 public class LSPServer extends JSONServer implements VDMJMain
 {

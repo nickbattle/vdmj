@@ -84,6 +84,7 @@ import workspace.events.DAPLaunchEvent;
 import workspace.events.DAPTerminateEvent;
 import workspace.plugins.ASTPlugin;
 import workspace.plugins.INPlugin;
+import workspace.plugins.LSPPlugin;
 
 public class DAPWorkspaceManager
 {

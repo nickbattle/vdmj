@@ -27,8 +27,8 @@ package lsp;
 import dap.DAPServerSocket;
 import json.JSONArray;
 import json.JSONObject;
-import workspace.LSPPlugin;
 import workspace.PluginRegistry;
+import workspace.plugins.LSPPlugin;
 
 public class LSPInitializeResponse extends JSONObject
 {

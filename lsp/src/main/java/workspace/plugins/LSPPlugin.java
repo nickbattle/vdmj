@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package workspace;
+package workspace.plugins;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -104,6 +104,15 @@ import rpc.RPCDispatcher;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
+import workspace.DAPWorkspaceManager;
+import workspace.DAPXWorkspaceManager;
+import workspace.Diag;
+import workspace.DiagUtils;
+import workspace.EventHub;
+import workspace.EventListener;
+import workspace.GlobFinder;
+import workspace.MessageHub;
+import workspace.PluginRegistry;
 import workspace.events.ChangeFileEvent;
 import workspace.events.CheckCompleteEvent;
 import workspace.events.CheckFailedEvent;
@@ -119,14 +128,6 @@ import workspace.events.OpenFileEvent;
 import workspace.events.SaveFileEvent;
 import workspace.events.ShutdownEvent;
 import workspace.events.UnknownMethodEvent;
-import workspace.plugins.ASTPlugin;
-import workspace.plugins.AnalysisPlugin;
-import workspace.plugins.CTPlugin;
-import workspace.plugins.INPlugin;
-import workspace.plugins.POPlugin;
-import workspace.plugins.TCPlugin;
-import workspace.plugins.TRPlugin;
-import workspace.plugins.WSPlugin;
 
 /**
  * The main AnalysisPlugin that deals with LSP protocol messages. This is
@@ -171,12 +172,12 @@ public class LSPPlugin extends AnalysisPlugin
 		if (System.getProperty("lsp.encoding") == null)
 		{
 			encoding = Charset.defaultCharset();
-			Diag.info("Workspace created, using default encoding: %s", encoding.name());
+			Diag.info("LSPPlugin created, using default encoding: %s", encoding.name());
 		}
 		else
 		{
 			encoding = Charset.forName(System.getProperty("lsp.encoding"));
-			Diag.info("Workspace created, encoding set to %s", encoding.displayName());
+			Diag.info("LSPPlugin created, encoding set to %s", encoding.displayName());
 		}
 	}
 	

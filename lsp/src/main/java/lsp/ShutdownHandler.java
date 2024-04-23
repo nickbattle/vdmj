@@ -25,7 +25,7 @@
 package lsp;
 
 import rpc.RPCRequest;
-import workspace.LSPPlugin;
+import workspace.plugins.LSPPlugin;
 import rpc.RPCMessageList;
 
 public class ShutdownHandler extends LSPHandler

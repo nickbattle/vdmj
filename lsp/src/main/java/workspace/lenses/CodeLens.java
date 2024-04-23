@@ -29,7 +29,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
 import workspace.Diag;
-import workspace.LSPPlugin;
+import workspace.plugins.LSPPlugin;
 
 /**
  * The base class for all code lenses.

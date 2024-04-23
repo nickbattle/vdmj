@@ -40,7 +40,7 @@ import rpc.RPCRequest;
 import workspace.DAPWorkspaceManager;
 import workspace.DAPXWorkspaceManager;
 import workspace.Diag;
-import workspace.LSPPlugin;
+import workspace.plugins.LSPPlugin;
 
 abstract public class LSPTest
 {

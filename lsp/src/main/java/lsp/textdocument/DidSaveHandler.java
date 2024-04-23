@@ -33,7 +33,7 @@ import lsp.Utils;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPPlugin;
+import workspace.plugins.LSPPlugin;
 
 public class DidSaveHandler extends LSPHandler
 {
