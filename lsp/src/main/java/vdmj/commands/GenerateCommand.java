@@ -33,9 +33,9 @@ import dap.DAPRequest;
 import dap.GenerateExecutor;
 import lsp.LSPException;
 import lsp.Utils;
-import workspace.DAPWorkspaceManager;
 import workspace.Diag;
 import workspace.PluginRegistry;
+import workspace.plugins.DAPPlugin;
 import workspace.plugins.INPlugin;
 
 public class GenerateCommand extends AnalysisCommand
@@ -69,7 +69,7 @@ public class GenerateCommand extends AnalysisCommand
 				return new DAPMessageList(request, false, "Specification has changed: try restart", null);
 			}
 
-			Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+			Interpreter interpreter = DAPPlugin.getInstance().getInterpreter();
 			interpreter.init();
 			TCNameToken qname = null;
 			

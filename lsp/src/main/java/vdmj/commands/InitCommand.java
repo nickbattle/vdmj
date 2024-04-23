@@ -33,7 +33,7 @@ import dap.DAPRequest;
 import dap.DAPResponse;
 import dap.InitExecutor;
 import json.JSONObject;
-import workspace.DAPWorkspaceManager;
+import workspace.plugins.DAPPlugin;
 
 public class InitCommand extends AnalysisCommand implements ScriptRunnable
 {
@@ -92,7 +92,7 @@ public class InitCommand extends AnalysisCommand implements ScriptRunnable
 	public String scriptRun(DAPRequest request) throws IOException
 	{
 		LexLocation.clearLocations();
-		DAPWorkspaceManager.getInstance().getInterpreter().init();
+		DAPPlugin.getInstance().getInterpreter().init();
 		return "()\nGlobal context initialized\nCleared all coverage information";
 	}
 }

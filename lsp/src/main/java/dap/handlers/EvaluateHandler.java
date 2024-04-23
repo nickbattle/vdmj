@@ -31,7 +31,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
 import vdmj.DAPDebugReader;
-import workspace.DAPWorkspaceManager;
+import workspace.plugins.DAPPlugin;
 
 public class EvaluateHandler extends DAPHandler
 {
@@ -43,7 +43,7 @@ public class EvaluateHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPPlugin manager = DAPPlugin.getInstance();
 		DAPDebugReader debugReader = manager.getDebugReader();
 		
 		if (debugReader != null && debugReader.isListening())

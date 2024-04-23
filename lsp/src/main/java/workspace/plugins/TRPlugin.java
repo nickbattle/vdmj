@@ -61,7 +61,7 @@ public class TRPlugin extends AnalysisPlugin implements EventListener
 	
 	private TRPlugin()
 	{
-		lspPlugin = registry.getPlugin("LSP");
+		lspPlugin = LSPPlugin.getInstance();
 	}
 	
 	@Override
@@ -79,7 +79,7 @@ public class TRPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		dispatcher.register(new TranslateHandler(), "slsp/TR/translate");
+		lspDispatcher.register(new TranslateHandler(), "slsp/TR/translate");
 	}
 
 	/**

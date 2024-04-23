@@ -58,7 +58,6 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import vdmj.commands.GenerateCommand;
-import workspace.DAPWorkspaceManager;
 import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.CheckCompleteEvent;
@@ -119,7 +118,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		dispatcher.register(new CTHandler(), "slsp/CT/traces", "slsp/CT/generate", "slsp/CT/execute");
+		lspDispatcher.register(new CTHandler(), "slsp/CT/traces", "slsp/CT/generate", "slsp/CT/execute");
 
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
@@ -216,7 +215,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
 			}
 			
-			DAPWorkspaceManager.getInstance().refreshInterpreter();
+			DAPPlugin.getInstance().refreshInterpreter();
 			CTPlugin ct = registry.getPlugin("CT");
 			Map<String, TCNameList> nameMap = ct.getTraceNames();
 			JSONArray results = new JSONArray();
@@ -260,7 +259,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
 			}
 	
-			DAPWorkspaceManager.getInstance().refreshInterpreter();
+			DAPPlugin.getInstance().refreshInterpreter();
 			TCNameToken tracename = Utils.stringToName(name);
 			int count = ct.generate(tracename);
 			return new RPCMessageList(request, new JSONObject("numberOfTests", count));
@@ -296,7 +295,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
 			}
 
-			if (DAPWorkspaceManager.getInstance().refreshInterpreter())
+			if (DAPPlugin.getInstance().refreshInterpreter())
 			{
 				Diag.error("The spec has changed since generate, so re-generating");
 				ct.generate(tracename);
@@ -328,7 +327,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 	
 	public int generate(TCNameToken tracename) throws LSPException
 	{
-		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+		Interpreter interpreter = DAPPlugin.getInstance().getInterpreter();
 		interpreter.init();
 		INNamedTraceDefinition tracedef = interpreter.findTraceDefinition(tracename);
 
@@ -438,7 +437,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 
 		CallSequence test = traceIterator.getNextTest();
 		String callString = test.getCallString(traceContext);
-		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+		Interpreter interpreter = DAPPlugin.getInstance().getInterpreter();
 
 		// interpreter.init();  Not needed as we run from InitExecutor only
 		List<Object> result = interpreter.runOneTrace(traceClassDef, test, true);
@@ -590,7 +589,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 
 		private JSONArray runBatch(int batchSize, long endTest) throws Exception
 		{
-			Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+			Interpreter interpreter = DAPPlugin.getInstance().getInterpreter();
 			JSONArray array = new JSONArray();
 			
 			Diag.fine("Starting batch at test number %d...", testNumber);

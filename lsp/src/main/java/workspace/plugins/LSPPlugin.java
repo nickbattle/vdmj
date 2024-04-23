@@ -80,7 +80,6 @@ import lsp.CancelHandler;
 import lsp.ExitHandler;
 import lsp.InitializeHandler;
 import lsp.LSPInitializeResponse;
-import lsp.LSPMessageUtils;
 import lsp.LSPServer;
 import lsp.SetTraceNotificationHandler;
 import lsp.ShutdownHandler;
@@ -100,12 +99,9 @@ import lsp.textdocument.ReferencesHandler;
 import lsp.textdocument.TypeHierarchyHandler;
 import lsp.textdocument.WatchKind;
 import lsp.workspace.DidChangeWSHandler;
-import rpc.RPCDispatcher;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import workspace.DAPWorkspaceManager;
-import workspace.DAPXWorkspaceManager;
 import workspace.Diag;
 import workspace.DiagUtils;
 import workspace.EventHub;
@@ -136,10 +132,6 @@ import workspace.events.UnknownMethodEvent;
 public class LSPPlugin extends AnalysisPlugin
 {
 	private static LSPPlugin INSTANCE = null;
-	private PluginRegistry registry;
-	private EventHub eventhub;
-	private MessageHub messagehub;
-	private final LSPMessageUtils msgutils;
 	private final Charset encoding;
 
 	private JSONObject clientInfo;
@@ -164,11 +156,6 @@ public class LSPPlugin extends AnalysisPlugin
 
 	private LSPPlugin()
 	{
-		registry = PluginRegistry.getInstance();
-		eventhub = EventHub.getInstance();
-		messagehub = MessageHub.getInstance();
-		msgutils = new LSPMessageUtils();
-		
 		if (System.getProperty("lsp.encoding") == null)
 		{
 			encoding = Charset.defaultCharset();
@@ -200,8 +187,8 @@ public class LSPPlugin extends AnalysisPlugin
 			INSTANCE = new LSPPlugin();
 			
 			/**
-			 * Register the built-in plugins. Others are registered in LSPXWorkspaceManager,
-			 * when the client capabilities have been received.
+			 * Register the built-in plugins. Others are registered when the client capabilities
+			 * have been received.
 			 */
 			PluginRegistry registry = PluginRegistry.getInstance();
 			
@@ -221,36 +208,33 @@ public class LSPPlugin extends AnalysisPlugin
 	@Override
 	public void init()
 	{
-		RPCDispatcher dispatcher = RPCDispatcher.getInstance();
-		
-		dispatcher.register(new InitializeHandler(), "initialize", "initialized", "client/registerCapability");
-		dispatcher.register(new ShutdownHandler(), "shutdown");
-		dispatcher.register(new ExitHandler(), "exit");
-		dispatcher.register(new CancelHandler(), "$/cancelRequest");
-		dispatcher.register(new SetTraceNotificationHandler(), "$/setTraceNotification", "$/setTrace");
+		lspDispatcher.register(new InitializeHandler(), "initialize", "initialized", "client/registerCapability");
+		lspDispatcher.register(new ShutdownHandler(), "shutdown");
+		lspDispatcher.register(new ExitHandler(), "exit");
+		lspDispatcher.register(new CancelHandler(), "$/cancelRequest");
+		lspDispatcher.register(new SetTraceNotificationHandler(), "$/setTraceNotification", "$/setTrace");
 
-		dispatcher.register(new DidOpenHandler(), "textDocument/didOpen");
-		dispatcher.register(new DidCloseHandler(), "textDocument/didClose");
-		dispatcher.register(new DidChangeHandler(), "textDocument/didChange");
-		dispatcher.register(new DidSaveHandler(), "textDocument/didSave");
-		dispatcher.register(new DefinitionHandler(), "textDocument/definition");
-		dispatcher.register(new DocumentSymbolHandler(), "textDocument/documentSymbol");
-		dispatcher.register(new CompletionHandler(), "textDocument/completion");
-		dispatcher.register(new CodeLensHandler(), "textDocument/codeLens", "codeLens/resolve");
-		dispatcher.register(new ReferencesHandler(), "textDocument/references");
-		dispatcher.register(new TypeHierarchyHandler(), "textDocument/prepareTypeHierarchy", "typeHierarchy/supertypes", "typeHierarchy/subtypes");
+		lspDispatcher.register(new DidOpenHandler(), "textDocument/didOpen");
+		lspDispatcher.register(new DidCloseHandler(), "textDocument/didClose");
+		lspDispatcher.register(new DidChangeHandler(), "textDocument/didChange");
+		lspDispatcher.register(new DidSaveHandler(), "textDocument/didSave");
+		lspDispatcher.register(new DefinitionHandler(), "textDocument/definition");
+		lspDispatcher.register(new DocumentSymbolHandler(), "textDocument/documentSymbol");
+		lspDispatcher.register(new CompletionHandler(), "textDocument/completion");
+		lspDispatcher.register(new CodeLensHandler(), "textDocument/codeLens", "codeLens/resolve");
+		lspDispatcher.register(new ReferencesHandler(), "textDocument/references");
+		lspDispatcher.register(new TypeHierarchyHandler(), "textDocument/prepareTypeHierarchy", "typeHierarchy/supertypes", "typeHierarchy/subtypes");
 
-		dispatcher.register(new DidChangeWSHandler(), "workspace/didChangeWatchedFiles");
+		lspDispatcher.register(new DidChangeWSHandler(), "workspace/didChangeWatchedFiles");
 
-		dispatcher.register(new UnknownHandler());	// Called for unknown methods
+		lspDispatcher.register(new UnknownHandler());	// Called for unknown methods
 	}
 
 	public static void reset()
 	{
 		Diag.config("Resetting WorkspaceManagers, PluginRegistry, EventHub and MessageHub");
 		
-		DAPWorkspaceManager.reset();
-		DAPXWorkspaceManager.reset();
+		DAPPlugin.reset();
 		PluginRegistry.reset();
 		EventHub.reset();
 		MessageHub.reset();
@@ -315,8 +299,7 @@ public class LSPPlugin extends AnalysisPlugin
 	 * 
 	 * PO and CT are built-in, but still enabled by the capabilities.
 	 * 
-	 * Further plugins may be loaded via the property "lspx.plugins".
-	 * @throws Exception 
+	 * Further plugins may be loaded via the property/resource "lspx.plugins".
 	 */
 	private void enablePlugins() throws Exception
 	{
@@ -1472,7 +1455,7 @@ public class LSPPlugin extends AnalysisPlugin
 		else if (def instanceof TCClassDefinition)
 		{
 			TCClassDefinition cdef = (TCClassDefinition)def;
-			return new RPCMessageList(request, msgutils.typeHierarchyItem(cdef));
+			return new RPCMessageList(request, messages.typeHierarchyItem(cdef));
 		}
 		else
 		{
@@ -1485,14 +1468,14 @@ public class LSPPlugin extends AnalysisPlugin
 	{
 		TCPlugin tc = registry.getPlugin("TC");
 		TCClassList results = tc.getTypeHierarchy(classname, false);
-		return new RPCMessageList(request, msgutils.typeHierarchyItems(results));
+		return new RPCMessageList(request, messages.typeHierarchyItems(results));
 	}
 
 	public RPCMessageList lspSubtypes(RPCRequest request, String classname)
 	{
 		TCPlugin tc = registry.getPlugin("TC");
 		TCClassList results = tc.getTypeHierarchy(classname, true);
-		return new RPCMessageList(request, msgutils.typeHierarchyItems(results));
+		return new RPCMessageList(request, messages.typeHierarchyItems(results));
 	}
 
 	public RPCMessageList lspCompletion(RPCRequest request,

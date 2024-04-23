@@ -34,7 +34,9 @@ import workspace.events.LSPEvent;
  */
 public interface EventListener
 {
-	public final static int LSP_PRIORITY  = Integer.getInteger("lspx.plugins.priority.lsp", 0);
+	public final static int LSP_PRIORITY = Integer.getInteger("lspx.plugins.priority.lsp", 0);
+	public final static int DAP_PRIORITY = Integer.getInteger("lspx.plugins.priority.dap", 0);
+
 	public final static int WS_PRIORITY  = Integer.getInteger("lspx.plugins.priority.ws", 100);
 	public final static int AST_PRIORITY = Integer.getInteger("lspx.plugins.priority.ast", 200);
 	public final static int TC_PRIORITY  = Integer.getInteger("lspx.plugins.priority.tc", 300);

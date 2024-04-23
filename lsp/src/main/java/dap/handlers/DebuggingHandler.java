@@ -30,8 +30,8 @@ import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import vdmj.DAPDebugReader;
-import workspace.DAPWorkspaceManager;
 import workspace.Diag;
+import workspace.plugins.DAPPlugin;
 
 public class DebuggingHandler extends DAPHandler
 {
@@ -43,7 +43,7 @@ public class DebuggingHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPPlugin manager = DAPPlugin.getInstance();
 		DAPDebugReader debugReader = manager.getDebugReader();
 		
 		if (debugReader != null && debugReader.isListening())

@@ -27,7 +27,7 @@ package dap;
 
 import java.io.IOException;
 
-import workspace.DAPXWorkspaceManager;
+import workspace.plugins.DAPPlugin;
 
 public class UnknownHandler extends DAPHandler
 {
@@ -39,7 +39,7 @@ public class UnknownHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		DAPXWorkspaceManager manager = DAPXWorkspaceManager.getInstance();
+		DAPPlugin manager = DAPPlugin.getInstance();
 		return manager.unhandledCommand(request);
 	}
 }

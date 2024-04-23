@@ -22,7 +22,7 @@
  *
  ******************************************************************************/
 
-package workspace;
+package workspace.plugins;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,12 +69,27 @@ import dap.DAPResponse;
 import dap.DAPServer;
 import dap.InitExecutor;
 import dap.RemoteControlExecutor;
+import dap.UnknownHandler;
+import dap.handlers.DebuggingHandler;
+import dap.handlers.DisconnectHandler;
+import dap.handlers.EvaluateHandler;
+import dap.handlers.InitializeHandler;
+import dap.handlers.LaunchHandler;
+import dap.handlers.PauseHandler;
+import dap.handlers.SetBreakpointsHandler;
+import dap.handlers.SourceHandler;
+import dap.handlers.StackTraceHandler;
+import dap.handlers.TerminateHandler;
+import dap.handlers.ThreadsHandler;
 import json.JSONArray;
 import json.JSONObject;
 import lsp.CancellableThread;
 import lsp.Utils;
 import vdmj.DAPDebugReader;
 import vdmj.commands.AnalysisCommand;
+import workspace.Diag;
+import workspace.EventListener;
+import workspace.PluginRegistry;
 import workspace.events.DAPBeforeEvaluateEvent;
 import workspace.events.DAPConfigDoneEvent;
 import workspace.events.DAPDisconnectEvent;
@@ -82,16 +97,11 @@ import workspace.events.DAPEvaluateEvent;
 import workspace.events.DAPInitializeEvent;
 import workspace.events.DAPLaunchEvent;
 import workspace.events.DAPTerminateEvent;
-import workspace.plugins.ASTPlugin;
-import workspace.plugins.INPlugin;
-import workspace.plugins.LSPPlugin;
+import workspace.events.UnknownCommandEvent;
 
-public class DAPWorkspaceManager
+public class DAPPlugin extends AnalysisPlugin
 {
-	private static DAPWorkspaceManager INSTANCE = null;
-	private final PluginRegistry registry;
-	private final EventHub eventhub;
-	private final MessageHub messagehub;
+	private static DAPPlugin INSTANCE = null;
 	
 	private JSONObject clientCapabilities;
 	private Boolean noDebug;
@@ -119,24 +129,57 @@ public class DAPWorkspaceManager
 		"vdmj.in.typebind_limit"
 	);
 	
-	protected DAPWorkspaceManager()
+	protected DAPPlugin()
 	{
-		this.registry = PluginRegistry.getInstance();
-		this.eventhub = EventHub.getInstance();
-		this.messagehub = MessageHub.getInstance();
-		Diag.info("Created DAPWorkspaceManager");
+		Diag.info("DAPPlugin created");
+	}
+	
+	@Override
+	public int getPriority()
+	{
+		return EventListener.DAP_PRIORITY;
 	}
 
-	public static synchronized DAPWorkspaceManager getInstance()
+	@Override
+	public String getName()
+	{
+		return "DAP";
+	}
+
+	public static synchronized DAPPlugin getInstance()
 	{
 		if (INSTANCE == null)
 		{
-			INSTANCE = new DAPWorkspaceManager();
+			INSTANCE = new DAPPlugin();
+			
+			PluginRegistry registry = PluginRegistry.getInstance();
+			registry.registerPlugin(INSTANCE);
 		}
 		
 		return INSTANCE;
 	}
 	
+	@Override
+	public void init()
+	{
+		dapDispatcher.register(new InitializeHandler(), "initialize");
+		dapDispatcher.register(new LaunchHandler(), "launch");
+		dapDispatcher.register(new InitializeHandler(), "configurationDone");
+		dapDispatcher.register(new ThreadsHandler(), "threads");
+		dapDispatcher.register(new SetBreakpointsHandler(), "setBreakpoints", "setExceptionBreakpoints", "setFunctionBreakpoints");
+		dapDispatcher.register(new EvaluateHandler(), "evaluate");
+		dapDispatcher.register(new StackTraceHandler(), "stackTrace");
+		dapDispatcher.register(new DisconnectHandler(), "disconnect");
+		dapDispatcher.register(new TerminateHandler(), "terminate");
+		dapDispatcher.register(new PauseHandler(), "pause");
+		dapDispatcher.register(new SourceHandler(), "source");
+		
+		dapDispatcher.register(new DebuggingHandler(),
+			"continue", "stepIn", "stepOut", "next", "scopes", "variables");
+
+		dapDispatcher.register(new UnknownHandler());
+	}
+
 	/**
 	 * This is only used by unit testing.
 	 */
@@ -365,6 +408,21 @@ public class DAPWorkspaceManager
 		{
 			Diag.info("Missing client capability: %s", dotName);
 			return null;
+		}
+	}
+
+	public DAPMessageList unhandledCommand(DAPRequest request)
+	{
+		DAPMessageList responses = eventhub.publish(new UnknownCommandEvent(request));
+		
+		if (responses.isEmpty())
+		{
+			Diag.error("No external plugin registered for unknownMethodEvent (%s)", request.getCommand());
+			return new DAPMessageList(request, false, "Unknown DAP command: " + request.getCommand(), null);
+		}
+		else
+		{
+			return responses;
 		}
 	}
 

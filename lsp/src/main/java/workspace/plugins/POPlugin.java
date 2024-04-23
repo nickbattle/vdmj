@@ -84,7 +84,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
-		dispatcher.register(new POGHandler(), "slsp/POG/generate");
+		lspDispatcher.register(new POGHandler(), "slsp/POG/generate");
 
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);

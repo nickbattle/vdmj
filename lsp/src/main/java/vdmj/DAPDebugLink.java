@@ -44,8 +44,8 @@ import com.fujitsu.vdmj.values.CPUValue;
 import dap.DAPResponse;
 import dap.DAPServer;
 import json.JSONObject;
-import workspace.DAPWorkspaceManager;
 import workspace.Diag;
+import workspace.plugins.DAPPlugin;
 
 public class DAPDebugLink extends ConsoleDebugLink
 {
@@ -103,7 +103,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 			return;		// Too late!
 		}
 
-		if (DAPWorkspaceManager.getInstance().getNoDebug())
+		if (DAPPlugin.getInstance().getNoDebug())
 		{
 			return;		// No one cares
 		}
@@ -238,7 +238,7 @@ public class DAPDebugLink extends ConsoleDebugLink
 			return;		// Too late!
 		}
 		
-		if (DAPWorkspaceManager.getInstance().getNoDebug())
+		if (DAPPlugin.getInstance().getNoDebug())
 		{
 			return;		// No one cares
 		}

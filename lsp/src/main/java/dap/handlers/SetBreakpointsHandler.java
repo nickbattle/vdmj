@@ -34,7 +34,7 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.Utils;
 import vdmj.DAPDebugReader;
-import workspace.DAPWorkspaceManager;
+import workspace.plugins.DAPPlugin;
 
 public class SetBreakpointsHandler extends DAPHandler
 {
@@ -67,7 +67,7 @@ public class SetBreakpointsHandler extends DAPHandler
 	{
 		try
 		{
-			DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+			DAPPlugin manager = DAPPlugin.getInstance();
 			DAPDebugReader debugReader = manager.getDebugReader();
 			
 			if (debugReader != null && debugReader.isListening())
@@ -82,7 +82,7 @@ public class SetBreakpointsHandler extends DAPHandler
 				File file = Utils.pathToFile(source.get("path"));
 				JSONArray breakpoints = arguments.get("breakpoints");
 				
-				return DAPWorkspaceManager.getInstance().dapSetBreakpoints(request, file, breakpoints);
+				return DAPPlugin.getInstance().dapSetBreakpoints(request, file, breakpoints);
 			}
 		}
 		catch (Exception e)
@@ -95,7 +95,7 @@ public class SetBreakpointsHandler extends DAPHandler
 	{
 		try
 		{
-			DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+			DAPPlugin manager = DAPPlugin.getInstance();
 			DAPDebugReader debugReader = manager.getDebugReader();
 			
 			if (debugReader != null && debugReader.isListening())
@@ -108,7 +108,7 @@ public class SetBreakpointsHandler extends DAPHandler
 				JSONObject arguments = request.get("arguments");
 				JSONArray breakpoints = arguments.get("breakpoints");
 				
-				return DAPWorkspaceManager.getInstance().dapSetFunctionBreakpoints(request, breakpoints);
+				return DAPPlugin.getInstance().dapSetFunctionBreakpoints(request, breakpoints);
 			}
 		}
 		catch (Exception e)
@@ -121,7 +121,7 @@ public class SetBreakpointsHandler extends DAPHandler
 	{
 		try
 		{
-			DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+			DAPPlugin manager = DAPPlugin.getInstance();
 			DAPDebugReader debugReader = manager.getDebugReader();
 			
 			if (debugReader != null && debugReader.isListening())

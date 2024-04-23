@@ -38,7 +38,7 @@ public class UnknownHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		LSPPlugin manager = registry.getPlugin("LSP");
+		LSPPlugin manager = LSPPlugin.getInstance();
 		return manager.unhandledMethod(request);
 	}
 }

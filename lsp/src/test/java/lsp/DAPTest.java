@@ -37,16 +37,14 @@ import json.JSONObject;
 import json.JSONWriter;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import workspace.DAPWorkspaceManager;
-import workspace.DAPXWorkspaceManager;
 import workspace.Diag;
+import workspace.plugins.DAPPlugin;
 import workspace.plugins.LSPPlugin;
 
 abstract public class DAPTest
 {
 	protected LSPPlugin lspManager = null;
-	protected DAPWorkspaceManager dapManager = null;
-	protected DAPXWorkspaceManager dapxManager = null;
+	protected DAPPlugin dapManager = null;
 	
 	static
 	{
@@ -58,8 +56,7 @@ abstract public class DAPTest
 		Settings.dialect = dialect;
 		LSPPlugin.reset();	// Clears other managers, registry and hubs too
 		lspManager = LSPPlugin.getInstance();
-		dapManager = DAPWorkspaceManager.getInstance();
-		dapxManager = DAPXWorkspaceManager.getInstance();
+		dapManager = DAPPlugin.getInstance();
 	}
 	
 	protected RPCMessageList initialize(File root, JSONObject capabilities) throws Exception

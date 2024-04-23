@@ -26,6 +26,7 @@ package workspace.plugins;
 
 import com.fujitsu.vdmj.plugins.HelpList;
 
+import dap.DAPDispatcher;
 import dap.DAPMessageList;
 import json.JSONObject;
 import lsp.LSPMessageUtils;
@@ -42,7 +43,8 @@ import workspace.events.LSPEvent;
 
 abstract public class AnalysisPlugin
 {
-	protected final RPCDispatcher dispatcher;
+	protected final RPCDispatcher lspDispatcher;
+	protected final DAPDispatcher dapDispatcher;
 	protected final LSPMessageUtils messages;
 	protected final PluginRegistry registry;
 	protected final EventHub eventhub;
@@ -50,7 +52,8 @@ abstract public class AnalysisPlugin
 	
 	public AnalysisPlugin()
 	{
-		dispatcher = RPCDispatcher.getInstance();
+		lspDispatcher = RPCDispatcher.getInstance();
+		dapDispatcher = DAPDispatcher.getInstance();
 		messages = new LSPMessageUtils();
 		registry = PluginRegistry.getInstance();
 		eventhub = EventHub.getInstance();

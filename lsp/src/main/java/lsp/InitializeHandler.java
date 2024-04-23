@@ -74,7 +74,7 @@ public class InitializeHandler extends LSPHandler
 				Diag.config("Assuming rootUri = %s", rootUri);
 			}
 			
-			LSPPlugin lsp = registry.getPlugin("LSP");
+			LSPPlugin lsp = LSPPlugin.getInstance();
 			return lsp.lspInitialize(request, clientInfo, rootUri, clientCapabilities);
 		}
 		catch (URISyntaxException e)
@@ -92,7 +92,7 @@ public class InitializeHandler extends LSPHandler
 	private RPCMessageList initialized(RPCRequest request)
 	{
 		LSPServer.getInstance().setInitialized(true);
-		LSPPlugin lsp = registry.getPlugin("LSP");
+		LSPPlugin lsp = LSPPlugin.getInstance();
 		return lsp.lspInitialized(request);
 	}
 
