@@ -38,6 +38,7 @@ import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.RTLogger;
+import com.fujitsu.vdmj.messages.VDMThreadDeath;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.ExceptionHandler;
@@ -152,6 +153,10 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 		{
 			reschedule(null, null);
 			body();
+		}
+		catch (VDMThreadDeath e)
+		{
+			// Exit cleanly
 		}
 		finally
 		{
@@ -308,7 +313,7 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
     				if (stopCalled && state == RunState.RUNNING)
     				{
     					// stopThread made us RUNNABLE, now we're running, so die
-    					throw new ThreadDeath();
+    					throw new VDMThreadDeath();
     				}
 
     				return;
@@ -331,7 +336,7 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 		switch (sig)
 		{
 			case TERMINATE:
-				throw new ThreadDeath();
+				throw new VDMThreadDeath();
 
 			case SUSPEND:
 				DebugLink.getInstance().stopped(ctxt, location, null);
@@ -339,7 +344,7 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 				
 			case DEADLOCKED:
 				DebugLink.getInstance().stopped(ctxt, location, new Exception("DEADLOCK detected"));
-				throw new ThreadDeath();
+				throw new VDMThreadDeath();
 		}
 	}
 

@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugReason;
 import com.fujitsu.vdmj.in.expressions.INExpression;
+import com.fujitsu.vdmj.messages.VDMThreadDeath;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -94,10 +95,9 @@ public class MainThread extends SchedulableThread
 			setException(e);
 			suspendOthers();
 		}
-		catch (ThreadDeath e)
+		catch (VDMThreadDeath e)
 		{
 			completeReason = DebugReason.ABORTED;
-			throw e;
 		}
 		catch (Throwable th)	// Java errors not caught above
 		{
