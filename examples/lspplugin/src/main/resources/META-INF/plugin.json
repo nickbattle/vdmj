@@ -2,5 +2,5 @@
     "name": "ExamplePlugin",
     "description": "Example LSP plugin",
     "dialects": [ "vdmsl", "vdmpp", "vdmrt" ],
-    "precision": "standard"
+    "precision": "high"
 }

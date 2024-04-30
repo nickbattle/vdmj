@@ -2,5 +2,5 @@
     "name": "quickcheck",
     "description": "QuickCheck lightweight verification plugin",
     "dialects": [ "vdmsl", "vdmpp", "vdmrt" ],
-    "precision": "standard"
+    "precision": "high"
 }
