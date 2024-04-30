@@ -29,7 +29,7 @@ import java.io.IOException;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.ExpressionExecutor;
-import workspace.DAPWorkspaceManager;
+import workspace.plugins.DAPPlugin;
 
 public class PrintCommand extends AnalysisCommand implements InitRunnable, ScriptRunnable
 {
@@ -66,7 +66,7 @@ public class PrintCommand extends AnalysisCommand implements InitRunnable, Scrip
 	{
 		try
 		{
-			DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+			DAPPlugin manager = DAPPlugin.getInstance();
 			return manager.getInterpreter().execute(expression).toString();
 		}
 		catch (Exception e)

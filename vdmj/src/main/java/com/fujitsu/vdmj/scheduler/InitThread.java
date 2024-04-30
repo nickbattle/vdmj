@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.in.modules.INModuleList;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.messages.Console;
+import com.fujitsu.vdmj.messages.VDMThreadDeath;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -128,7 +129,7 @@ public class InitThread extends SchedulableThread
 			setException(e);
 			suspendOthers();
 		}
-		catch (ThreadDeath th)
+		catch (VDMThreadDeath th)
 		{
 			// Fine
 		}

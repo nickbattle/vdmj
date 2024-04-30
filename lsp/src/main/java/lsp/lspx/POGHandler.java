@@ -35,8 +35,8 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
-import workspace.LSPXWorkspaceManager;
+import workspace.plugins.LSPPlugin;
+import workspace.plugins.POPlugin;
 
 public class POGHandler extends LSPHandler
 {
@@ -48,7 +48,7 @@ public class POGHandler extends LSPHandler
 	@Override
 	public RPCMessageList request(RPCRequest request)
 	{
-		if (!LSPWorkspaceManager.getInstance().hasClientCapability("experimental.proofObligationGeneration"))
+		if (!LSPPlugin.getInstance().hasClientCapability("experimental.proofObligationGeneration"))
 		{
 			return new RPCMessageList(request, RPCErrors.MethodNotFound, "PO plugin is not enabled by client");
 		}
@@ -69,7 +69,8 @@ public class POGHandler extends LSPHandler
 		{
 			JSONObject params = request.get("params");
 			File file = Utils.uriToFile(params.get("uri"));
-			return LSPXWorkspaceManager.getInstance().pogGenerate(request, file);
+			POPlugin po = registry.getPlugin("PO");
+			return po.pogGenerate(request, file);
 		}
 		catch (URISyntaxException e)
 		{

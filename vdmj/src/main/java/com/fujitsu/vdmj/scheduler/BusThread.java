@@ -25,6 +25,7 @@
 package com.fujitsu.vdmj.scheduler;
 
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.VDMThreadDeath;
 import com.fujitsu.vdmj.runtime.Context;
 
 public class BusThread extends SchedulableThread
@@ -52,7 +53,7 @@ public class BusThread extends SchedulableThread
 		switch (sig)
 		{
 			case TERMINATE:
-				throw new ThreadDeath();
+				throw new VDMThreadDeath();
 
 			case SUSPEND:	// Ignore
 				break;

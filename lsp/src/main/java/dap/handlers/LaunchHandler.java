@@ -29,7 +29,7 @@ import dap.DAPHandler;
 import dap.DAPMessageList;
 import dap.DAPRequest;
 import json.JSONObject;
-import workspace.DAPWorkspaceManager;
+import workspace.plugins.DAPPlugin;
 
 public class LaunchHandler extends DAPHandler
 {
@@ -50,7 +50,7 @@ public class LaunchHandler extends DAPHandler
 			String remoteControl = arguments.get("remoteControl");
 			String logging = arguments.get("logging");
 			
-			return DAPWorkspaceManager.getInstance().dapLaunch(
+			return DAPPlugin.getInstance().dapLaunch(
 					request, noDebug, defaultName, command, remoteControl, logging);
 		}
 		catch (Exception e)

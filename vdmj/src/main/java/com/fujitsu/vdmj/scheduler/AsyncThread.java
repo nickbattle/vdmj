@@ -29,6 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 import com.fujitsu.vdmj.debug.DebugLink;
 import com.fujitsu.vdmj.debug.DebugReason;
 import com.fujitsu.vdmj.lex.LexLocation;
+import com.fujitsu.vdmj.messages.VDMThreadDeath;
 import com.fujitsu.vdmj.runtime.ClassInterpreter;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
@@ -121,10 +122,9 @@ public class AsyncThread extends SchedulableThread
 			ResourceScheduler.setException(e);
 			SchedulableThread.signalAll(Signal.SUSPEND);
 		}
-		catch (ThreadDeath e)
+		catch (VDMThreadDeath e)
 		{
 			completeReason = DebugReason.ABORTED;
-			throw e;
 		}
 		catch (Throwable th)	// Java errors not caught above
 		{

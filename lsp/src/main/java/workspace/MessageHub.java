@@ -40,6 +40,7 @@ import lsp.Utils;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.plugins.AnalysisPlugin;
+import workspace.plugins.LSPPlugin;
 
 /**
  * A singleton object to manage the current set of error and warning messages for all
@@ -226,7 +227,7 @@ public class MessageHub
 	 */
 	public RPCMessageList getDiagnosticResponses()
 	{
-		Set<File> files = LSPWorkspaceManager.getInstance().getProjectFiles().keySet();
+		Set<File> files = LSPPlugin.getInstance().getProjectFiles().keySet();
 		return getDiagnosticResponses(files);
 	}
 	

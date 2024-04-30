@@ -27,7 +27,8 @@ package lsp;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.plugins.LSPPlugin;
+
 import java.io.File;
 import java.net.URISyntaxException;
 
@@ -72,8 +73,9 @@ public class InitializeHandler extends LSPHandler
 				rootUri = new File(".").getCanonicalFile();	// Some editors don't set the root?
 				Diag.config("Assuming rootUri = %s", rootUri);
 			}
-	
-			return LSPWorkspaceManager.getInstance().lspInitialize(request, clientInfo, rootUri, clientCapabilities);
+			
+			LSPPlugin lsp = LSPPlugin.getInstance();
+			return lsp.lspInitialize(request, clientInfo, rootUri, clientCapabilities);
 		}
 		catch (URISyntaxException e)
 		{
@@ -90,7 +92,8 @@ public class InitializeHandler extends LSPHandler
 	private RPCMessageList initialized(RPCRequest request)
 	{
 		LSPServer.getInstance().setInitialized(true);
-		return LSPWorkspaceManager.getInstance().lspInitialized(request);
+		LSPPlugin lsp = LSPPlugin.getInstance();
+		return lsp.lspInitialized(request);
 	}
 
 	@Override

@@ -34,7 +34,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.plugins.LSPPlugin;
 
 public class CodeLensHandler extends LSPHandler
 {
@@ -67,7 +67,7 @@ public class CodeLensHandler extends LSPHandler
 			JSONObject textDocument = params.get("textDocument");
 			File file = Utils.uriToFile(textDocument.get("uri"));
 			
-			return LSPWorkspaceManager.getInstance().lspCodeLens(request, file);
+			return LSPPlugin.getInstance().lspCodeLens(request, file);
 		}
 		catch (URISyntaxException e)
 		{
@@ -88,7 +88,7 @@ public class CodeLensHandler extends LSPHandler
 			JSONObject params = request.get("params");
 			JSONObject data = params.get("data");
 			
-			return LSPWorkspaceManager.getInstance().lspCodeLensResolve(request, data);
+			return LSPPlugin.getInstance().lspCodeLensResolve(request, data);
 		}
 		catch (Exception e)
 		{

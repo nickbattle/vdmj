@@ -34,7 +34,7 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
-import workspace.LSPWorkspaceManager;
+import workspace.plugins.LSPPlugin;
 
 public class DidCloseHandler extends LSPHandler
 {
@@ -52,7 +52,7 @@ public class DidCloseHandler extends LSPHandler
 			JSONObject text = params.get("textDocument");
 			File file = Utils.uriToFile(text.get("uri"));
 			
-			return LSPWorkspaceManager.getInstance().lspDidClose(request, file);
+			return LSPPlugin.getInstance().lspDidClose(request, file);
 		}
 		catch (URISyntaxException e)
 		{

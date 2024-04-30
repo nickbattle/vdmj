@@ -24,6 +24,7 @@
 
 package workspace.plugins;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -50,12 +51,13 @@ import json.JSONObject;
 import lsp.CancellableThread;
 import lsp.LSPException;
 import lsp.LSPServer;
+import lsp.Utils;
+import lsp.lspx.CTHandler;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import rpc.RPCResponse;
 import vdmj.commands.GenerateCommand;
-import workspace.DAPWorkspaceManager;
 import workspace.Diag;
 import workspace.EventListener;
 import workspace.events.CheckCompleteEvent;
@@ -116,6 +118,8 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 	@Override
 	public void init()
 	{
+		lspDispatcher.register(new CTHandler(), "slsp/CT/traces", "slsp/CT/generate", "slsp/CT/execute");
+
 		eventhub.register(CheckPrepareEvent.class, this);
 		eventhub.register(CheckCompleteEvent.class, this);
 		eventhub.register(DAPBeforeEvaluateEvent.class, this);
@@ -201,9 +205,129 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 
 	abstract public <T extends Mappable> T getCT();
 	
+
+	public RPCMessageList ctTraces(RPCRequest request, File project)
+	{
+		try
+		{
+			if (messagehub.hasErrors())
+			{
+				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
+			}
+			
+			DAPPlugin.getInstance().refreshInterpreter();
+			CTPlugin ct = registry.getPlugin("CT");
+			Map<String, TCNameList> nameMap = ct.getTraceNames();
+			JSONArray results = new JSONArray();
+			
+			for (String module: nameMap.keySet())
+			{
+				JSONArray array = new JSONArray();
+				
+				for (TCNameToken name: nameMap.get(module))
+				{
+					array.add(new JSONObject(
+						"name",		name.getExplicit(true).toString(),
+						"location",	Utils.lexLocationToLocation(name.getLocation())));
+				}
+				
+				results.add(new JSONObject("name", module, "traces", array));
+			}
+			
+			return new RPCMessageList(request, results);
+		}
+		catch (Exception e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	public RPCMessageList ctGenerate(RPCRequest request, String name)
+	{
+		try
+		{
+			if (messagehub.hasErrors())
+			{
+				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
+			}
+			
+			CTPlugin ct = registry.getPlugin("CT");
+			
+			if (ct.isRunning())
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
+			}
+	
+			DAPPlugin.getInstance().refreshInterpreter();
+			TCNameToken tracename = Utils.stringToName(name);
+			int count = ct.generate(tracename);
+			return new RPCMessageList(request, new JSONObject("numberOfTests", count));
+		}
+		catch (LSPException e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, e.getError(), e.getMessage());
+		}
+		catch (Exception e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+
+	public RPCMessageList ctExecute(RPCRequest request, String name,
+			Object progressToken, Object workDoneToken,
+			TraceReductionType rType, float subset, long seed, Long start, Long end)
+	{
+		try
+		{
+			if (messagehub.hasErrors())
+			{
+				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
+			}
+
+			TCNameToken tracename = Utils.stringToName(name);
+			CTPlugin ct = registry.getPlugin("CT");
+
+			if (ct.isRunning())
+			{
+				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
+			}
+
+			if (DAPPlugin.getInstance().refreshInterpreter())
+			{
+				Diag.error("The spec has changed since generate, so re-generating");
+				ct.generate(tracename);
+			}
+			
+			JSONArray batch = ct.runTraceRange(request, tracename, progressToken, workDoneToken,
+					rType, subset, seed, start, end);
+			
+			if (batch == null)	// Running in background
+			{
+				return null;
+			}
+			else
+			{
+				return new RPCMessageList(request, batch);
+			}
+		}
+		catch (LSPException e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, e.getError(), e.getMessage());
+		}
+		catch (Exception e)
+		{
+			Diag.error(e);
+			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
+		}
+	}
+	
 	public int generate(TCNameToken tracename) throws LSPException
 	{
-		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+		Interpreter interpreter = DAPPlugin.getInstance().getInterpreter();
 		interpreter.init();
 		INNamedTraceDefinition tracedef = interpreter.findTraceDefinition(tracename);
 
@@ -313,7 +437,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 
 		CallSequence test = traceIterator.getNextTest();
 		String callString = test.getCallString(traceContext);
-		Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+		Interpreter interpreter = DAPPlugin.getInstance().getInterpreter();
 
 		// interpreter.init();  Not needed as we run from InitExecutor only
 		List<Object> result = interpreter.runOneTrace(traceClassDef, test, true);
@@ -465,7 +589,7 @@ abstract public class CTPlugin extends AnalysisPlugin implements EventListener
 
 		private JSONArray runBatch(int batchSize, long endTest) throws Exception
 		{
-			Interpreter interpreter = DAPWorkspaceManager.getInstance().getInterpreter();
+			Interpreter interpreter = DAPPlugin.getInstance().getInterpreter();
 			JSONArray array = new JSONArray();
 			
 			Diag.fine("Starting batch at test number %d...", testNumber);

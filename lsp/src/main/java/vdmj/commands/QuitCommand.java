@@ -28,7 +28,7 @@ import dap.DAPMessageList;
 import dap.DAPRequest;
 import dap.DAPServer;
 import lsp.CancellableThread;
-import workspace.DAPWorkspaceManager;
+import workspace.plugins.DAPPlugin;
 
 public class QuitCommand extends AnalysisCommand
 {
@@ -48,7 +48,7 @@ public class QuitCommand extends AnalysisCommand
 	@Override
 	public DAPMessageList run(DAPRequest request)
 	{
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPPlugin manager = DAPPlugin.getInstance();
 
 		if (CancellableThread.currentlyRunning() != null)
 		{

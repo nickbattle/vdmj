@@ -47,10 +47,10 @@ import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import vdmj.commands.AnalysisCommand;
-import workspace.DAPWorkspaceManager;
 import workspace.Diag;
 import workspace.PluginRegistry;
 import workspace.plugins.AnalysisPlugin;
+import workspace.plugins.DAPPlugin;
 import workspace.plugins.POPlugin;
 
 public class QuickCheckLSPPlugin extends AnalysisPlugin
@@ -87,7 +87,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 			return new RPCMessageList(request, RPCErrors.InternalError, "Running " + CancellableThread.currentlyRunning());
 		}
 		
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPPlugin manager = DAPPlugin.getInstance();
 		Interpreter interpreter = manager.getInterpreter();
 		
 		if (interpreter.getInitialContext() == null)	// eg. from unit tests

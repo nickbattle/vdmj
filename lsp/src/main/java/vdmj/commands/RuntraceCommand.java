@@ -30,10 +30,10 @@ import json.JSONArray;
 import json.JSONObject;
 import lsp.LSPException;
 import lsp.Utils;
-import workspace.DAPWorkspaceManager;
 import workspace.Diag;
 import workspace.PluginRegistry;
 import workspace.plugins.CTPlugin;
+import workspace.plugins.DAPPlugin;
 
 public class RuntraceCommand extends AnalysisCommand implements InitRunnable
 {
@@ -69,7 +69,7 @@ public class RuntraceCommand extends AnalysisCommand implements InitRunnable
 	{
 		try
 		{
-			DAPWorkspaceManager dapManager = DAPWorkspaceManager.getInstance();
+			DAPPlugin dapManager = DAPPlugin.getInstance();
 			CTPlugin ct = PluginRegistry.getInstance().getPlugin("CT");
 			
 			if (ct.isRunning())

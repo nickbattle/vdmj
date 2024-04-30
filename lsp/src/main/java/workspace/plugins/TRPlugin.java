@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2023 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -22,317 +22,64 @@
  *
  ******************************************************************************/
 
-package workspace;
+package workspace.plugins;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.lex.Dialect;
 import com.fujitsu.vdmj.runtime.SourceFile;
-import com.fujitsu.vdmj.tc.lex.TCNameList;
-import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.traces.TraceReductionType;
-import com.fujitsu.vdmj.util.GetResource;
 
-import json.JSONArray;
 import json.JSONObject;
-import lsp.LSPException;
-import lsp.Utils;
+import lsp.lspx.TranslateHandler;
 import rpc.RPCErrors;
 import rpc.RPCMessageList;
 import rpc.RPCRequest;
-import workspace.events.UnknownMethodEvent;
-import workspace.plugins.AnalysisPlugin;
-import workspace.plugins.CTPlugin;
-import workspace.plugins.POPlugin;
-import workspace.plugins.TCPlugin;
+import workspace.EventListener;
 
-public class LSPXWorkspaceManager
+/**
+ * The translate plugin.
+ */
+public class TRPlugin extends AnalysisPlugin implements EventListener
 {
-	private static LSPXWorkspaceManager INSTANCE = null;
-	private final PluginRegistry registry;
-	private final EventHub eventhub;
-	private final MessageHub messagehub;
-	private final LSPWorkspaceManager wsManager;
+	private final LSPPlugin lspPlugin;
 	
-	protected LSPXWorkspaceManager()
+	public static AnalysisPlugin factory(Dialect dialect)
 	{
-		this.registry = PluginRegistry.getInstance();
-		this.eventhub = EventHub.getInstance();
-		this.messagehub = MessageHub.getInstance();
-		this.wsManager = LSPWorkspaceManager.getInstance();
-	}
-
-	public static synchronized LSPXWorkspaceManager getInstance()
-	{
-		if (INSTANCE == null)
+		switch (dialect)
 		{
-			INSTANCE = new LSPXWorkspaceManager();		
-			Diag.info("Created LSPXWorkspaceManager");
-		}
-
-		return INSTANCE;
-	}
-
-	/**
-	 * This is called after the client capabilities have been received. If the option
-	 * is enabled in the capabilities, the relevant plugin is registered.
-	 * 
-	 * PO and CT are built-in, but still enabled by the capabilities.
-	 * 
-	 * Further plugins may be loaded via the property "lspx.plugins".
-	 * @throws Exception 
-	 */
-	public void enablePlugins() throws Exception
-	{
-		if (wsManager.hasClientCapability("experimental.proofObligationGeneration"))
-		{
-			registry.registerPlugin(POPlugin.factory(Settings.dialect));
-		}
-		
-		if (wsManager.hasClientCapability("experimental.combinatorialTesting"))
-		{
-			registry.registerPlugin(CTPlugin.factory(Settings.dialect));
-		}
-		
-		List<String> plugins = GetResource.readResource("lspx.plugins");
-		
-		if (!plugins.isEmpty())
-		{
-			for (String plugin: plugins)
-			{
-				try
-				{
-					Class<?> clazz = Class.forName(plugin);
-					
-					try
-					{
-						Method factory = clazz.getMethod("factory", Dialect.class);
-						AnalysisPlugin instance = (AnalysisPlugin)factory.invoke(null, Settings.dialect);
-						registry.registerPlugin(instance);
-						Diag.info("Registered LSPX plugin %s", plugin);
-					}
-					catch (NoSuchMethodException e)		// Try default constructor
-					{
-						try
-						{
-							if (Modifier.isAbstract(clazz.getModifiers()))
-							{
-								Diag.severe("Plugin class is abstract: %s", clazz.getName());
-								continue;
-							}
-
-							Constructor<?> ctor = clazz.getConstructor();
-							AnalysisPlugin instance = (AnalysisPlugin) ctor.newInstance();
-							registry.registerPlugin(instance);
-							Diag.info("Registered LSPX plugin %s", plugin);
-						}
-						catch (Throwable th)
-						{
-							Diag.error(th);
-							Diag.error("Cannot register LSPX plugin %s", plugin);
-						}
-					}
-					catch (Exception e)
-					{
-						Diag.error(e);
-						Diag.error("Plugin %s factory method failed", plugin);
-					}
-				}
-				catch (ClassNotFoundException e)
-				{
-					Diag.error("Plugin class %s not found", plugin);
-				}
-			}
-		}
-		else
-		{
-			Diag.info("No external plugins configured in lspx.plugins");
-		}
-	}
-
-	public RPCMessageList unhandledMethod(RPCRequest request)
-	{
-		RPCMessageList results = eventhub.publish(new UnknownMethodEvent(request));
-		
-		if (results.isEmpty())
-		{
-			Diag.error("No external plugin registered for " + request.getMethod());
-			return new RPCMessageList(request, RPCErrors.MethodNotFound, request.getMethod());
-		}
-		else
-		{
-			return results;
-		}
-	}
-
-	/**
-	 * Reset the singleton.
-	 */
-	public static void reset()
-	{
-		if (INSTANCE != null)
-		{
-			INSTANCE = null;
+			default:
+				return new TRPlugin();
 		}
 	}
 	
-	/**
-	 * LSPX extensions...
-	 */
-
-	public RPCMessageList pogGenerate(RPCRequest request, File file)
+	private TRPlugin()
 	{
-		try
-		{
-			if (messagehub.hasErrors())	// No clean tree
-			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Specification errors found");
-			}
-			
-			POPlugin po = registry.getPlugin("PO");
-			return po.getJSONObligations(request, file);
-		}
-		catch (Exception e)
-		{
-			Diag.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
-	}
-
-	public RPCMessageList ctTraces(RPCRequest request, File project)
-	{
-		try
-		{
-			if (specHasErrors())
-			{
-				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
-			}
-			
-			DAPWorkspaceManager.getInstance().refreshInterpreter();
-			CTPlugin ct = registry.getPlugin("CT");
-			Map<String, TCNameList> nameMap = ct.getTraceNames();
-			JSONArray results = new JSONArray();
-			
-			for (String module: nameMap.keySet())
-			{
-				JSONArray array = new JSONArray();
-				
-				for (TCNameToken name: nameMap.get(module))
-				{
-					array.add(new JSONObject(
-						"name",		name.getExplicit(true).toString(),
-						"location",	Utils.lexLocationToLocation(name.getLocation())));
-				}
-				
-				results.add(new JSONObject("name", module, "traces", array));
-			}
-			
-			return new RPCMessageList(request, results);
-		}
-		catch (Exception e)
-		{
-			Diag.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
-	}
-
-	public RPCMessageList ctGenerate(RPCRequest request, String name)
-	{
-		try
-		{
-			if (specHasErrors())
-			{
-				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
-			}
-			
-			CTPlugin ct = registry.getPlugin("CT");
-			
-			if (ct.isRunning())
-			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
-			}
-	
-			DAPWorkspaceManager.getInstance().refreshInterpreter();
-			TCNameToken tracename = Utils.stringToName(name);
-			int count = ct.generate(tracename);
-			return new RPCMessageList(request, new JSONObject("numberOfTests", count));
-		}
-		catch (LSPException e)
-		{
-			Diag.error(e);
-			return new RPCMessageList(request, e.getError(), e.getMessage());
-		}
-		catch (Exception e)
-		{
-			Diag.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
-	}
-
-	public RPCMessageList ctExecute(RPCRequest request, String name,
-			Object progressToken, Object workDoneToken,
-			TraceReductionType rType, float subset, long seed, Long start, Long end)
-	{
-		try
-		{
-			if (specHasErrors())
-			{
-				return new RPCMessageList(request, RPCErrors.ParseError, "Specification has errors");
-			}
-
-			TCNameToken tracename = Utils.stringToName(name);
-			CTPlugin ct = registry.getPlugin("CT");
-
-			if (ct.isRunning())
-			{
-				return new RPCMessageList(request, RPCErrors.InvalidRequest, "Trace still running");
-			}
-
-			if (DAPWorkspaceManager.getInstance().refreshInterpreter())
-			{
-				Diag.error("The spec has changed since generate, so re-generating");
-				ct.generate(tracename);
-			}
-			
-			JSONArray batch = ct.runTraceRange(request, tracename, progressToken, workDoneToken,
-					rType, subset, seed, start, end);
-			
-			if (batch == null)	// Running in background
-			{
-				return null;
-			}
-			else
-			{
-				return new RPCMessageList(request, batch);
-			}
-		}
-		catch (LSPException e)
-		{
-			Diag.error(e);
-			return new RPCMessageList(request, e.getError(), e.getMessage());
-		}
-		catch (Exception e)
-		{
-			Diag.error(e);
-			return new RPCMessageList(request, RPCErrors.InternalError, e.getMessage());
-		}
+		lspPlugin = LSPPlugin.getInstance();
 	}
 	
-	private boolean specHasErrors()
+	@Override
+	public int getPriority()
 	{
-		return messagehub.hasErrors();
+		return EventListener.TR_PRIORITY;
+	}
+
+	@Override
+	public String getName()
+	{
+		return "TR";
+	}
+
+	@Override
+	public void init()
+	{
+		lspDispatcher.register(new TranslateHandler(), "slsp/TR/translate");
 	}
 
 	/**
@@ -340,7 +87,7 @@ public class LSPXWorkspaceManager
 	 */
 	private File getSubFolder(File saveUri, File file)
 	{
-		File root = wsManager.getRoot();
+		File root = lspPlugin.getRoot();
 		
 		if (file.getParent().startsWith(root.getPath()))
 		{
@@ -356,7 +103,7 @@ public class LSPXWorkspaceManager
 	public RPCMessageList translateLaTeX(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		File responseFile = null;
-		Map<File, StringBuilder> filemap = wsManager.getProjectFiles();
+		Map<File, StringBuilder> filemap = lspPlugin.getProjectFiles();
 
 		try
 		{
@@ -383,7 +130,7 @@ public class LSPXWorkspaceManager
 					}
 				}
 				
-				if (file.equals(wsManager.getRoot()))
+				if (file.equals(lspPlugin.getRoot()))
 				{
 					createLaTeXDocument(saveUri, filemap.keySet());
 				}
@@ -409,7 +156,7 @@ public class LSPXWorkspaceManager
 	
 	private void createLaTeXDocument(File saveUri, Set<File> sources) throws IOException
 	{
-		String project = wsManager.getRoot().getName();
+		String project = lspPlugin.getRoot().getName();
 		File document = new File(saveUri, project + ".tex");
 		PrintWriter out = new PrintWriter(new FileOutputStream(document));
 		
@@ -425,7 +172,7 @@ public class LSPXWorkspaceManager
 		out.println("\\tableofcontents");
 		out.println();
 		
-        Path sourceBase = Paths.get(wsManager.getRoot().getAbsolutePath());
+        Path sourceBase = Paths.get(lspPlugin.getRoot().getAbsolutePath());
 		
 		for (File pfile: sources)
 		{
@@ -485,7 +232,7 @@ public class LSPXWorkspaceManager
 	public RPCMessageList translateWord(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		File responseFile = null;
-		Map<File, StringBuilder> filemap = wsManager.getProjectFiles();
+		Map<File, StringBuilder> filemap = lspPlugin.getProjectFiles();
 
 		try
 		{
@@ -547,7 +294,7 @@ public class LSPXWorkspaceManager
 	public RPCMessageList translateCoverage(RPCRequest request, File file, File saveUri, JSONObject options)
 	{
 		File responseFile = null;
-		Map<File, StringBuilder> filemap = wsManager.getProjectFiles();
+		Map<File, StringBuilder> filemap = lspPlugin.getProjectFiles();
 
 		try
 		{

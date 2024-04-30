@@ -34,7 +34,7 @@ import json.JSONObject;
 import lsp.CancellableThread;
 import lsp.Utils;
 import vdmj.DAPDebugReader;
-import workspace.DAPWorkspaceManager;
+import workspace.plugins.DAPPlugin;
 
 public class DisconnectHandler extends DAPHandler
 {
@@ -46,7 +46,7 @@ public class DisconnectHandler extends DAPHandler
 	@Override
 	public DAPMessageList run(DAPRequest request) throws IOException
 	{
-		DAPWorkspaceManager manager = DAPWorkspaceManager.getInstance();
+		DAPPlugin manager = DAPPlugin.getInstance();
 		DAPDebugReader debugReader = manager.getDebugReader();
 		
 		if (debugReader != null)

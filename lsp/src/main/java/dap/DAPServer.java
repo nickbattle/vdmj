@@ -45,8 +45,8 @@ import dap.handlers.TerminateHandler;
 import dap.handlers.ThreadsHandler;
 import json.JSONObject;
 import json.JSONServer;
-import workspace.DAPWorkspaceManager;
 import workspace.Diag;
+import workspace.plugins.DAPPlugin;
 
 public class DAPServer extends JSONServer
 {
@@ -61,7 +61,7 @@ public class DAPServer extends JSONServer
 		INSTANCE = this;
 		this.dispatcher = getDispatcher();
 		
-		DAPWorkspaceManager.getInstance();		// Just set up
+		DAPPlugin.getInstance();		// Just set up
 	}
 	
 	public static DAPServer getInstance()

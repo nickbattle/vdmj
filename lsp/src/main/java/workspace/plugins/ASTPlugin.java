@@ -53,7 +53,6 @@ import rpc.RPCMessageList;
 import rpc.RPCRequest;
 import workspace.Diag;
 import workspace.EventListener;
-import workspace.LSPWorkspaceManager;
 import workspace.events.ChangeFileEvent;
 import workspace.events.CheckPrepareEvent;
 import workspace.events.CheckSyntaxEvent;
@@ -149,7 +148,7 @@ public abstract class ASTPlugin extends AnalysisPlugin implements EventListener
 	private RPCMessageList lspDynamicRegistrations()
 	{
 		RPCMessageList registrations = new RPCMessageList();
-		LSPWorkspaceManager manager = LSPWorkspaceManager.getInstance();
+		LSPPlugin manager = LSPPlugin.getInstance();
 		
 		if (manager.hasClientCapability("workspace.didChangeWatchedFiles.dynamicRegistration"))
 		{

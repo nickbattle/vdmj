@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- *	Copyright (c) 2020 Nick Battle.
+ *	Copyright (c) 2023 Nick Battle.
  *
  *	Author: Nick Battle
  *
@@ -21,24 +21,12 @@
  *	SPDX-License-Identifier: GPL-3.0-or-later
  *
  ******************************************************************************/
+package com.fujitsu.vdmj.messages;
 
-package lsp;
-
-import rpc.RPCRequest;
-import workspace.plugins.LSPPlugin;
-import rpc.RPCMessageList;
-
-public class UnknownHandler extends LSPHandler
+/**
+ * A replacement for the deprecated java.lang.ThreadDeath.
+ */
+public class VDMThreadDeath extends Error
 {
-	public UnknownHandler()
-	{
-		super();
-	}
-
-	@Override
-	public RPCMessageList request(RPCRequest request)
-	{
-		LSPPlugin manager = LSPPlugin.getInstance();
-		return manager.unhandledMethod(request);
-	}
+	private static final long serialVersionUID = 1L;
 }
