@@ -31,6 +31,8 @@ import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.runtime.Breakpoint;
 import com.fujitsu.vdmj.runtime.Context;
+import com.fujitsu.vdmj.runtime.ContextException;
+import com.fujitsu.vdmj.scheduler.InitThread;
 import com.fujitsu.vdmj.values.Value;
 
 /**
@@ -60,6 +62,18 @@ public abstract class INStatement extends INNode implements Serializable
 
 	/** Evaluate the statement in the context given. */
 	abstract public Value eval(Context ctxt);
+
+	/**
+	 * Check whether we are running during initialzation and fail. This is used by
+	 * some expressions and statements that are not permitted (like "duration" in RT).
+	 */
+	protected void assertNotInit(Context ctxt)
+	{
+		if (Thread.currentThread() instanceof InitThread)
+		{
+			throw new ContextException(4177, "Not permitted during initialization", location, ctxt);
+		}
+	}
 
 	/**
 	 * Implemented by all statements to allow visitor processing.
