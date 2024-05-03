@@ -64,7 +64,7 @@ public abstract class INStatement extends INNode implements Serializable
 	abstract public Value eval(Context ctxt);
 
 	/**
-	 * Check whether we are running during initialzation and fail. This is used by
+	 * Check whether we are running during initialzation and fail if we are. This is used by
 	 * some expressions and statements that are not permitted (like "duration" in RT).
 	 */
 	protected void assertNotInit(Context ctxt)

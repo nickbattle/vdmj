@@ -35,7 +35,6 @@ import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.ContextException;
 import com.fujitsu.vdmj.runtime.Interpreter;
 import com.fujitsu.vdmj.runtime.Tracepoint;
-import com.fujitsu.vdmj.scheduler.MainThread;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.values.OperationValue;
 
@@ -92,7 +91,7 @@ public class ConsoleDebugReader extends Thread implements TraceCallback
 			Breakpoint bp = link.getBreakpoint(debuggedThread);
 			LexLocation loc = link.getLocation(debuggedThread);
 			
-			MainThread mainThread = SchedulableThread.getMainThread();
+			SchedulableThread mainThread = SchedulableThread.getMainThread();
 			Exception mainEx = mainThread != null ? mainThread.getException() : null;
 			
 			if (mainEx instanceof ContextException)
