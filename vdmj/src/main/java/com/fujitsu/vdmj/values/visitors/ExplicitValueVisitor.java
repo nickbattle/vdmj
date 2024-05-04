@@ -53,7 +53,8 @@ public class ExplicitValueVisitor extends ValueVisitor<String, LexLocation>
 		return node.getValue().apply(this, from);
 	}
 	
- 	public String caseMapValue(MapValue node, LexLocation from)
+ 	@Override
+	public String caseMapValue(MapValue node, LexLocation from)
 	{
  		if (node.values.isEmpty())
  		{
@@ -101,7 +102,8 @@ public class ExplicitValueVisitor extends ValueVisitor<String, LexLocation>
 		return sb.toString();
  	}
 
- 	public String caseSeqValue(SeqValue node, LexLocation from)
+ 	@Override
+	public String caseSeqValue(SeqValue node, LexLocation from)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("[");
@@ -121,7 +123,8 @@ public class ExplicitValueVisitor extends ValueVisitor<String, LexLocation>
 		return sb.toString();
 	}
 
- 	public String caseSetValue(SetValue node, LexLocation from)
+ 	@Override
+	public String caseSetValue(SetValue node, LexLocation from)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("{");
@@ -141,7 +144,8 @@ public class ExplicitValueVisitor extends ValueVisitor<String, LexLocation>
 		return sb.toString();
 	}
 
- 	public String caseTupleValue(TupleValue node, LexLocation from)
+ 	@Override
+	public String caseTupleValue(TupleValue node, LexLocation from)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("mk_(");

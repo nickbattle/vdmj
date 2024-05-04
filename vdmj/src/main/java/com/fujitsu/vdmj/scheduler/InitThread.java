@@ -357,6 +357,7 @@ public class InitThread extends SchedulableThread
 		exception = e;
 	}
 	
+	@Override
 	public Exception getException()
 	{
 		return exception;

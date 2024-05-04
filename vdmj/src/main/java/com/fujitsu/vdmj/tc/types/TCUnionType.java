@@ -115,6 +115,7 @@ public class TCUnionType extends TCType
 		return false;
 	}
 	
+	@Override
 	public boolean isAlways(Class<? extends TCType> typeclass, LexLocation from)
 	{
 		for (TCType t: types)
