@@ -640,17 +640,20 @@ public class DAPDebugExecutor implements DebugExecutor
 			buildGuards(c, frame);
 		}
 		
-		Context arguments = buildLocals(c, frame);
+		RootContext arguments = buildLocals(c, frame);
 		
 		if (arguments != null)
 		{
 			nextLoc[0] = arguments.location;
-			arguments = buildArguments((RootContext)arguments, frame);
+			return buildArguments(arguments, frame);
 		}
 		
-		return arguments;
+		return null;	// No further frames
 	}
 	
+	/**
+	 * Add any guards to the frame in a named scope
+	 */
 	private void buildGuards(Context c, Frame frame)
 	{
 		if (c instanceof ObjectContext)
@@ -723,6 +726,10 @@ public class DAPDebugExecutor implements DebugExecutor
 		}
 	}
 
+	/**
+	 * Add a "Locals" scope for "let" contexts that are not arguments in a RootContext.
+	 * Return the RootContext for (any) argument processing, or null at the outer level.
+	 */
 	private RootContext buildLocals(Context c, Frame frame)
 	{
 		Context locals = new Context(frame.location, "Locals", null);
@@ -743,16 +750,20 @@ public class DAPDebugExecutor implements DebugExecutor
 		return (RootContext) c;
 	}
 	
+	/**
+	 * Add a scope for any RootContext variables (arguments or globals).
+	 * Return the next Context or null at the outer level.
+	 */
 	private Context buildArguments(RootContext c, Frame frame)
 	{
-		String title = (c.outer == null ? "Globals" : "Arguments");
-		LexLocation loc = frame.location;	// (c.outer == null ? c.location : frame.location);
+		String scope = (c.outer == null ? "Globals" : "Arguments");
+		LexLocation loc = c.location;
 		
-		if (c == ctxt)	// Stopped in base context (init)
+		if (frame.frameId == topFrameId)	// in base context
 		{
 			loc = breakloc;
 		}
-		else if (loc.file.getName().equals("?"))
+		else if (loc == LexLocation.ANY)
 		{
 			// Flat SL specs have a default location of "?" for the outer context.
 			// That causes problems in the client, so we try to replace it with
@@ -768,7 +779,7 @@ public class DAPDebugExecutor implements DebugExecutor
 			}
 		}
 		
-		Context arguments = new Context(loc, title, null);
+		Context arguments = new Context(loc, scope, null);
 		
 		for (Entry<TCNameToken, Value> nvp: c.entrySet())
 		{
@@ -835,10 +846,10 @@ public class DAPDebugExecutor implements DebugExecutor
 		{
 			int vref = nextVariablesReference.incrementAndGet();
 			variablesReferences.put(vref, arguments);
-			frame.scopes.add(new Scope(title, vref));
+			frame.scopes.add(new Scope(scope, vref));
 		}
 
-		frame.title = c.title;
+		frame.title = c.title;	// Title comes from RootContext
 		frame.location = loc;
 		return c.outer;
 	}
