@@ -42,6 +42,7 @@ import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.runtime.Context;
 import com.fujitsu.vdmj.runtime.Delegate;
 import com.fujitsu.vdmj.runtime.ObjectContext;
+import com.fujitsu.vdmj.runtime.StateContext;
 import com.fujitsu.vdmj.runtime.ValueException;
 import com.fujitsu.vdmj.scheduler.Lock;
 import com.fujitsu.vdmj.tc.definitions.TCClassDefinition;
@@ -331,8 +332,8 @@ public class INClassDefinition extends INDefinition
 			}
 			else
 			{
-				// Create a local context to identify the init location for this defn.
-				Context ctxt = new Context(d.location, "<init> " + d, initCtxt); 
+				// Create a root context to identify the init location for this defn.
+				Context ctxt = new StateContext(d.location, "<init> " + d, initCtxt, null); 
 				
 				if (d.isValueDefinition())
 				{

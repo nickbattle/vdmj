@@ -179,8 +179,8 @@ public class INModule extends INNode implements Serializable
 		{
 			try
 			{
-				// Create a local context to identify the init location for this defn.
-				Context ctxt = new Context(d.location, "<init> " + d, initialContext); 
+				// Create a root context to identify the init location for this defn.
+				Context ctxt = new StateContext(d.location, "<init> " + d, initialContext, null); 
 				
 				initialContext.putList(d.getNamedValues(ctxt));
 			}
