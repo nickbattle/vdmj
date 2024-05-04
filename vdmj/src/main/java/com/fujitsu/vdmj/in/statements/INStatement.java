@@ -26,6 +26,7 @@ package com.fujitsu.vdmj.in.statements;
 
 import java.io.Serializable;
 
+import com.fujitsu.vdmj.config.Properties;
 import com.fujitsu.vdmj.in.INNode;
 import com.fujitsu.vdmj.in.statements.visitors.INStatementVisitor;
 import com.fujitsu.vdmj.lex.LexLocation;
@@ -69,7 +70,7 @@ public abstract class INStatement extends INNode implements Serializable
 	 */
 	protected void assertNotInit(Context ctxt)
 	{
-		if (Thread.currentThread() instanceof InitThread)
+		if (Properties.in_init_checks && Thread.currentThread() instanceof InitThread)
 		{
 			throw new ContextException(4177, "Not permitted during initialization", location, ctxt);
 		}

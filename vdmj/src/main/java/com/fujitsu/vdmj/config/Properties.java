@@ -119,7 +119,10 @@ public class Properties
 	
 	/** The maximum stack to dump via println(Throwable) */
 	public static int diag_max_stack = 1;
-	
+
+	/** Whether to do checks during initialization */
+	public static boolean in_init_checks = true;
+
 	/**
 	 * When the class is initialized, which uses the vdmj.properties file, and any System
 	 * properties, to set the static fields above.
@@ -206,6 +209,7 @@ public class Properties
 		
 		in_powerset_limit = get(vdmj, "vdmj.in.powerset_limit", 30);
 		in_typebind_limit = get(vdmj, "vdmj.in.typebind_limit", 100000);
+		in_init_checks = get (vdmj, "vdmj.in.init_checks", true);
 
 		debug_link_class = get(vdmj, "vdmj.debug.link_class", null);		
 		diag_max_stack = get(vdmj, "vdmj.diag.max_stack", 1);

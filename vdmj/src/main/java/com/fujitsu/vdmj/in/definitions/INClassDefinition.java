@@ -331,13 +331,16 @@ public class INClassDefinition extends INDefinition
 			}
 			else
 			{
+				// Create a local context to identify the init location for this defn.
+				Context ctxt = new Context(d.location, "<init> " + d, initCtxt); 
+				
 				if (d.isValueDefinition())
 				{
-					nvl = d.getNamedValues(initCtxt);
+					nvl = d.getNamedValues(ctxt);
 				}
 				else if (d.isStatic() && d.isInstanceVariable())
 				{
-					nvl = d.getNamedValues(initCtxt);
+					nvl = d.getNamedValues(ctxt);
 				}
 			}
 			
