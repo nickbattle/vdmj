@@ -90,7 +90,14 @@ abstract public class Value implements Comparable<Value>, Serializable, Formatta
 			sb.append(precision);
 		}
 
-		sb.append('s');
+		if ((flags & FormattableFlags.UPPERCASE) > 0)
+		{
+			sb.append('S');
+		}
+		else
+		{
+			sb.append('s');
+		}
 
 		formatter.format(sb.toString(), value);
 	}

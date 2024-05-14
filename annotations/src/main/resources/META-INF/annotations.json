@@ -1,0 +1,6 @@
+{
+    "name": "annotations",
+    "description": "Standard VDMJ Annotations",
+    "dialects": [ "vdmsl", "vdmpp", "vdmrt" ],
+    "precision": "standard"
+}

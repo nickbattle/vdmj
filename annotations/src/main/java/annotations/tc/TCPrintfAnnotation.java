@@ -105,7 +105,7 @@ public class TCPrintfAnnotation extends TCAnnotation
 				}
 				catch (IllegalArgumentException e)
 				{
-					name.report(6008, "@Printf must use %[arg$][#][width]s conversions");
+					name.report(6008, "@Printf must use %[arg$][#][width](s|S) conversions");
 				}
 			}
 			else

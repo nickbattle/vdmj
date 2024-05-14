@@ -126,6 +126,7 @@ public class MainThread extends SchedulableThread
 		exception = e;
 	}
 	
+	@Override
 	public Exception getException()
 	{
 		return exception;

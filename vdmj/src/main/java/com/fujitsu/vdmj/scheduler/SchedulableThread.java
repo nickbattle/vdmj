@@ -422,15 +422,15 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 		}
 	}
 	
-	public static MainThread getMainThread()
+	public static SchedulableThread getMainThread()
 	{
 		synchronized (allThreads)
 		{
     		for (SchedulableThread th: allThreads)
     		{
-   				if (th instanceof MainThread)
+   				if (th instanceof MainThread || th instanceof InitThread)
    				{
-   					return (MainThread)th;
+   					return th;
    				}
     		}
     		
@@ -446,6 +446,11 @@ public abstract class SchedulableThread extends Thread implements Serializable, 
 	public static int getThreadCount()
 	{
 		return threadCount;		// Number of non-bus threads
+	}
+	
+	public Exception getException()
+	{
+		return null;
 	}
 
 	public synchronized void setSignal(Signal sig)

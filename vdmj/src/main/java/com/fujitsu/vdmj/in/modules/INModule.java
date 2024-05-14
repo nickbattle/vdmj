@@ -179,7 +179,10 @@ public class INModule extends INNode implements Serializable
 		{
 			try
 			{
-				initialContext.putList(d.getNamedValues(initialContext));
+				// Create a root context to identify the init location for this defn.
+				Context ctxt = new StateContext(d.location, "<init> " + d, initialContext, null); 
+				
+				initialContext.putList(d.getNamedValues(ctxt));
 			}
 			catch (ContextException e)
 			{

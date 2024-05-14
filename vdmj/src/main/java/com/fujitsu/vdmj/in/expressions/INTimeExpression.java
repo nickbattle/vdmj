@@ -44,6 +44,8 @@ public class INTimeExpression extends INExpression
 	public Value eval(Context ctxt)
 	{
 		location.hit();
+		
+		assertNotInit(ctxt);
 
 		try
         {
