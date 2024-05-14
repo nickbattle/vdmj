@@ -2,5 +2,5 @@
     "name": "annotations2",
     "description": "Experimental VDMJ Annotations",
     "dialects": [ "vdmsl", "vdmpp", "vdmrt" ],
-    "precision": "standard"
+    "precision": "high"
 }
