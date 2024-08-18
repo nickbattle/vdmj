@@ -40,7 +40,7 @@ echo "**************************** Updating VSIX! ****************************"
     cd "$DISTRIBUTION"
     rm -rf extension
     EXTRACT="extension/resources/jars"
-    unzip -q "$VSIX" "$EXTRACT/$VDMJ/*" "$EXTRACT/plugins/*"
+    unzip -q "$VSIX" "$EXTRACT/$VDMJ/*"
 
     rm -vf $EXTRACT/$VDMJ/vdmj-*.jar
     rm -vf $EXTRACT/$VDMJ/lsp-*.jar
