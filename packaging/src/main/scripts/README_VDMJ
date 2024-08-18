@@ -5,7 +5,7 @@ The VDMJ distribution contains a bash shell script, "vdmj.sh", to help you to st
 including all of the relevant jar files in the distribution ZIP. To run the script, unzip the distribution
 and add the extract folder to your $PATH.
 
-PATH=$PATH:~/vdmj-suite-4.5.0-SNAPSHOT/
+PATH=$PATH:~/vdmj-suite-4.6.0-SNAPSHOT/
 
 nick@cube:~> vdmj.sh 
 Usage: vdmj.sh [-help] <VM and VDMJ options>
@@ -36,10 +36,10 @@ be sensible to add this to some sort of script in your environment. For simple i
 use "-jar", which uses the MainClass defined in its manifest; for more complex invocations, that include
 the other jars, you have to specify the "-cp" classpath and the main class "VDMJ":
 
-nick@cube> java -jar vdmj-4.5.0-SNAPSHOT.jar 
+nick@cube> java -jar vdmj-4.6.0-SNAPSHOT.jar 
 You did not identify any source files
 
-nick@cube> java -jar vdmj-4.5.0-SNAPSHOT.jar -vdmsl -i
+nick@cube> java -jar vdmj-4.6.0-SNAPSHOT.jar -vdmsl -i
 Interpreter started
 > p 1+1
 = 2
@@ -48,11 +48,11 @@ Executed in 0.009 secs.
 Bye
 
 nick@cube> java -Xmx2g -cp \
-	vdmj-4.5.0-SNAPSHOT.jar:\
-	annotations-4.5.0-SNAPSHOT.jar:\
-	annotations2-4.5.0-SNAPSHOT.jar:\
-	cmd-plugins-4.5.0-SNAPSHOT.jar:\
-	stdlib-4.5.0-SNAPSHOT.jar VDMJ -annotations -i test.vdm
+	vdmj-4.6.0-SNAPSHOT.jar:\
+	annotations-4.6.0-SNAPSHOT.jar:\
+	annotations2-4.6.0-SNAPSHOT.jar:\
+	cmd-plugins-4.6.0-SNAPSHOT.jar:\
+	stdlib-4.6.0-SNAPSHOT.jar VDMJ -annotations -i test.vdm
 Parsed 1 module in 0.103 secs. No syntax errors
 Type checked 1 module in 0.313 secs. No type errors
 Initialized 1 module in 0.292 secs. No init errors
