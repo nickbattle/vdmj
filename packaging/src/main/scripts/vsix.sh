@@ -44,15 +44,15 @@ echo "**************************** Updating VSIX! ****************************"
 
     rm -vf $EXTRACT/$VDMJ/vdmj-*.jar
     rm -vf $EXTRACT/$VDMJ/lsp-*.jar
-    rm -vf $EXTRACT/$VDMJ/annotations-*.jar
+    rm -vf $EXTRACT/$VDMJ/annotations/annotations-*.jar
     rm -vf $EXTRACT/$VDMJ/libs/stdlib-*.jar
-    rm -vf $EXTRACT/plugins/quickcheck-*.jar
+    rm -vf $EXTRACT/$VDMJ/plugins/quickcheck-*.jar
 
     cp -vf vdmj-$VERSION.jar $EXTRACT/$VDMJ
     cp -vf lsp-$VERSION.jar $EXTRACT/$VDMJ
-    cp -vf annotations-$VERSION.jar $EXTRACT/$VDMJ
+    cp -vf annotations-$VERSION.jar $EXTRACT/$VDMJ/annotations
     cp -vf stdlib-$VERSION.jar $EXTRACT/$VDMJ/libs
-    cp -vf quickcheck-$VERSION.jar $EXTRACT/plugins
+    cp -vf quickcheck-$VERSION.jar $EXTRACT/$VDMJ/plugins
 
     zip -q "$VSIX" $(find $EXTRACT -type f)
     rm -rf extension
