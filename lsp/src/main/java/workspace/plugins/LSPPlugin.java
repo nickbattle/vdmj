@@ -1292,7 +1292,19 @@ public class LSPPlugin extends AnalysisPlugin
 	{
 		if (actionCode == RELOAD_AND_CHECK)
 		{
-			loadAllProjectFiles();
+			// We may have effectively deleted files by editing VDMIGNORE
+			List<File> oldIgnores = vdmignore;
+			
+			loadAllProjectFiles();		// Re-reads ignore file
+			
+			// Check for newly ignored files and add as deletions (processed below)
+			for (File file: vdmignore)
+			{
+				if (!oldIgnores.contains(file))
+				{
+					deleted.add(file);
+				}
+			}
 		}
 		
 		RPCMessageList results = null;
