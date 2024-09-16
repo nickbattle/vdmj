@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fujitsu.vdmj.Release;
 import com.fujitsu.vdmj.Settings;
 import com.fujitsu.vdmj.VDMJMain;
 import com.fujitsu.vdmj.lex.Dialect;
@@ -74,6 +75,7 @@ public class LSPServer extends JSONServer implements VDMJMain
 		Settings.dialect = dialect;
 		Settings.strict = Boolean.getBoolean("vdmj.strict");
 		Settings.verbose = Boolean.getBoolean("vdmj.verbose");
+		Settings.release = Release.lookup(System.getProperty("vdmj.release", "vdm10"));
 		
 		LSPPlugin.getInstance();	// Creates all plugins
 	}
