@@ -196,7 +196,7 @@ public class QuickCheckThread extends CancellableThread
 			StringBuilder sb = new StringBuilder();
 			sb.append("PO #");
 			sb.append(po.number);
-			sb.append(" counterexample: ");
+			sb.append(" Counterexample: ");
 			sb.append(po.counterexample.toStringLine());
 			messages.add(new VDMWarning(9000, sb.toString(), po.location));
 		}
