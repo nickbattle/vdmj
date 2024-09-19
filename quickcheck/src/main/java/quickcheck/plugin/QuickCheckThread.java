@@ -205,7 +205,12 @@ public class QuickCheckThread extends CancellableThread
 		{
 			if (po.message != null)		// Add failed messages as a warning too
 			{
-				messages.add(new VDMWarning(9000, po.message, po.location));
+				StringBuilder sb = new StringBuilder();
+				sb.append("PO #");
+				sb.append(po.number);
+				sb.append(" ");
+				sb.append(po.message);
+				messages.add(new VDMWarning(9000, sb.toString(), po.location));
 			}
 		}
 		
