@@ -162,7 +162,7 @@ public class ClassMapper
 	private final List<Method> initializers = new Vector<Method>();
 
 	/** If the mark() method has been called, but not restore(), holds converted IDs */
-	private List<Long> marked = null;
+	private Map<Long, List<Long>> marked = new HashMap<Long, List<Long>>();
 
 	/**
 	 * A class to define how to construct one destPackage class, passing srcPackage
@@ -965,9 +965,11 @@ public class ClassMapper
 				MappedObject mo = (MappedObject)source;
 				converted.put(mo.getMappedId(), result);
 				
-				if (marked != null)
+				List<Long> list = marked.get(Thread.currentThread().getId());
+				
+				if (list != null)
 				{
-					marked.add(mo.getMappedId());
+					list.add(mo.getMappedId());
 				}
 			}
 		}
@@ -982,28 +984,32 @@ public class ClassMapper
 	 */
 	private void mark()
 	{
-		if (marked != null)
+		List<Long> list = marked.get(Thread.currentThread().getId());
+		
+		if (list != null)
 		{
 			errorStream.println("WARNING: Nested call to convertLocal?");
 		}
 		
-		marked = new Vector<Long>();
+		marked.put(Thread.currentThread().getId(), new Vector<Long>());
 	}
 	
 	private void restore()
 	{
 		// Remove "converted" mappings from the low tide set by mark() to the
 		// current level.
-		
-		if (marked != null)
+
+		List<Long> list = marked.get(Thread.currentThread().getId());
+
+		if (list != null)
 		{
-			for (Long id: marked)
+			for (Long id: list)
 			{
 				converted.remove(id);
 			}
 		}
 		
-		marked = null;
+		marked.remove(Thread.currentThread().getId());
 	}
 
 	/**
