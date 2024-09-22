@@ -65,6 +65,7 @@ public class INPrintfAnnotation extends INAnnotation
 		}
 		
 		INStringLiteralExpression fmt = (INStringLiteralExpression)args.get(0);
+		fmt.location.hits++;
 		Console.out.printf(fmt.value.value, values);
 	}
 }
