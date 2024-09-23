@@ -4,7 +4,7 @@
 #####################################################################################
 
 # Change this to flip VDMJ version
-VERSION=${VDMJ_VERSION:-4.6.0-SNAPSHOT}
+VERSION=${VDMJ_VERSION:-4.6.0}
 
 function help()
 {

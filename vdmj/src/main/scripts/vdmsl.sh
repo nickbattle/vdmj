@@ -4,8 +4,8 @@
 #####################################################################################
 
 # Change these to flip VDMJ version
-MVERSION=${VDMJ_VERSION:-4.6.0-SNAPSHOT}
-PVERSION=${VDMJ_PVERSION:-4.6.0-P-SNAPSHOT}
+MVERSION=${VDMJ_VERSION:-4.6.0}
+PVERSION=${VDMJ_PVERSION:-4.6.0-P}
 
 # The Maven repository directory containing VDMJ versions
 MAVENREPO=~/.m2/repository/dk/au/ece/vdmj
