@@ -24,12 +24,13 @@
 
 package workspace.events;
 
+import json.JSONObject;
 import rpc.RPCRequest;
 
 abstract public class AbstractCheckFilesEvent extends LSPEvent
 {
 	public AbstractCheckFilesEvent()
 	{
-		super(RPCRequest.create("AbstractFileRequest", ""));
+		super(RPCRequest.create("AbstractFileRequest", new JSONObject()));	// No params
 	}
 }
