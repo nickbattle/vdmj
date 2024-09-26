@@ -430,7 +430,6 @@ public class DAPPlugin extends AnalysisPlugin
 	 * The interpreter has changed if there is an interpreter, and the IN tree
 	 * within that interpreter is not the same as the IN plugin's tree.
 	 */
-	@SuppressWarnings("deprecation")
 	private boolean hasChanged()
 	{
 		INPlugin in = registry.getPlugin("IN");

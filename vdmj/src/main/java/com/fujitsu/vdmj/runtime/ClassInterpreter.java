@@ -52,10 +52,6 @@ import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
-import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.annotations.POAnnotation;
-import com.fujitsu.vdmj.po.definitions.POClassList;
-import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.scheduler.CTMainThread;
 import com.fujitsu.vdmj.scheduler.MainThread;
 import com.fujitsu.vdmj.scheduler.RunState;
@@ -75,7 +71,6 @@ import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.FlatCheckedEnvironment;
 import com.fujitsu.vdmj.typechecker.NameScope;
 import com.fujitsu.vdmj.typechecker.PublicClassEnvironment;
-import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.BUSValue;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.NameValuePair;
@@ -95,7 +90,6 @@ public class ClassInterpreter extends Interpreter
 	private INClassDefinition defaultClass;
 	private NameValuePairMap createdValues;
 	private TCDefinitionSet createdDefinitions;
-	private POClassList pogClasses;
 
 	public ClassInterpreter(INClassList executableClasses, TCClassList checkedClasses) throws Exception
 	{
@@ -458,23 +452,6 @@ public class ClassInterpreter extends Interpreter
 		createdDefinitions.add(new TCLocalDefinition(location, name, type));
 	}
 
-	@Override
-	@Deprecated
-	public ProofObligationList getProofObligations() throws Exception
-	{
-		if (pogClasses == null)
-		{
-			long now = System.currentTimeMillis();
-			pogClasses = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedClasses);
-			Utils.mapperStats(now, PONode.MAPPINGS);
-		}
-		
-		POAnnotation.init();
-		ProofObligationList list = pogClasses.getProofObligations();
-		POAnnotation.close();
-		return list;
-	}
-
 	private void logSwapIn()
 	{
 		// Show the "system constructor" thread creation
@@ -562,26 +539,9 @@ public class ClassInterpreter extends Interpreter
 	}
 
 	@SuppressWarnings("unchecked")
-	@Deprecated
 	@Override
-	public <T extends List<?>> T getTC()
-	{
-		return (T)checkedClasses;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Deprecated
-	@Override
-	public <T extends List<?>> T getIN()
+	public <T> T getIN()
 	{
 		return (T)executableClasses;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Deprecated
-	@Override
-	public <T extends List<?>> T getPO()
-	{
-		return (T)pogClasses;
 	}
 }

@@ -79,6 +79,7 @@ import com.fujitsu.vdmj.messages.InternalException;
 import com.fujitsu.vdmj.messages.RTLogger;
 import com.fujitsu.vdmj.plugins.PluginRegistry;
 import com.fujitsu.vdmj.plugins.analyses.INPlugin;
+import com.fujitsu.vdmj.plugins.analyses.POPlugin;
 import com.fujitsu.vdmj.pog.ProofObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.runtime.Breakpoint;
@@ -2989,10 +2990,10 @@ public class DBGPReader extends DebugLink implements VDMJMain
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	private void processPOG(DBGPCommand c) throws Exception
 	{
-		ProofObligationList all = interpreter.getProofObligations();
+		POPlugin plugin = PluginRegistry.getInstance().getPlugin("PO");
+		ProofObligationList all = plugin.getProofObligations();
 		ProofObligationList list = null;
 
 		if (c.data.equals("*"))

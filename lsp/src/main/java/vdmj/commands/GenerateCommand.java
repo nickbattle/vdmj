@@ -106,7 +106,6 @@ public class GenerateCommand extends AnalysisCommand
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
 	private boolean hasChanged()
 	{
 		INPlugin in = PluginRegistry.getInstance().getPlugin("IN");

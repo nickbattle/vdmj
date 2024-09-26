@@ -52,16 +52,11 @@ import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.mapper.ClassMapper;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
-import com.fujitsu.vdmj.po.PONode;
-import com.fujitsu.vdmj.po.annotations.POAnnotation;
-import com.fujitsu.vdmj.po.modules.POModuleList;
-import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.scheduler.CTMainThread;
 import com.fujitsu.vdmj.scheduler.MainThread;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
 import com.fujitsu.vdmj.syntax.ParserException;
 import com.fujitsu.vdmj.tc.TCNode;
-import com.fujitsu.vdmj.tc.TCRecursiveLoops;
 import com.fujitsu.vdmj.tc.expressions.TCExpression;
 import com.fujitsu.vdmj.tc.lex.TCIdentifierToken;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
@@ -70,7 +65,6 @@ import com.fujitsu.vdmj.tc.modules.TCModuleList;
 import com.fujitsu.vdmj.traces.CallSequence;
 import com.fujitsu.vdmj.typechecker.Environment;
 import com.fujitsu.vdmj.typechecker.ModuleEnvironment;
-import com.fujitsu.vdmj.util.Utils;
 import com.fujitsu.vdmj.values.CPUValue;
 import com.fujitsu.vdmj.values.Value;
 
@@ -88,8 +82,6 @@ public class ModuleInterpreter extends Interpreter
 	public INModule defaultModule;
 	/** The default module's environment */
 	private Environment defaultEnvironment;
-	/** The PO analysis tree */
-	private POModuleList pogModules;
 
 	/**
 	 * Create an Interpreter from the list of executableModules passed.
@@ -388,24 +380,6 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@Override
-	@Deprecated
-	public ProofObligationList getProofObligations() throws Exception
-	{
-		if (pogModules == null)
-		{
-			long now = System.currentTimeMillis();
-			pogModules = ClassMapper.getInstance(PONode.MAPPINGS).init().convert(checkedModules);
-			ClassMapper.getInstance(PONode.MAPPINGS).convertLocal(TCRecursiveLoops.getInstance());
-			Utils.mapperStats(now, PONode.MAPPINGS);
-		}
-		
-		POAnnotation.init();
-		ProofObligationList list = pogModules.getProofObligations();
-		POAnnotation.close();
-		return list;
-	}
-
-	@Override
 	public Context getTraceContext(INClassDefinition classdef) throws ValueException
 	{
 		Context mainContext = new StateContext(defaultModule.name.getLocation(),
@@ -445,26 +419,9 @@ public class ModuleInterpreter extends Interpreter
 	}
 
 	@SuppressWarnings("unchecked")
-	@Deprecated
 	@Override
-	public <T extends List<?>> T getTC()
-	{
-		return (T)checkedModules;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Deprecated
-	@Override
-	public <T extends List<?>> T getIN()
+	public <T> T getIN()
 	{
 		return (T)executableModules;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Deprecated
-	@Override
-	public <T extends List<?>> T getPO()
-	{
-		return (T)pogModules;
 	}
 }
