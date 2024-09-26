@@ -103,8 +103,6 @@ abstract public class AnalysisCommand
 	 * it might be useful to offer "global" commands as an extension that are not linked to
 	 * a particular plugin. The cmd-plugins jar includes a GitPlugin example that can be loaded
 	 * this way.
-	 * 
-	 * Note that for this to work, the name of the command (as in the past) must be <Cmd>Plugin.
 	 */
 	private static AnalysisCommand loadDirectly(String line) throws Exception
 	{

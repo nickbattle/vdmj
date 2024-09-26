@@ -52,7 +52,16 @@ abstract public class AnalysisPlugin
 		registry = PluginRegistry.getInstance();
 	}
 	
+	/**
+	 * Define the name of the plugin. This must be unique, unless you intend to
+	 * replace another plugin of the same name.
+	 */
 	public abstract String getName();
+	
+	/**
+	 * Initialize the plugin, called once during registration. Typically this will
+	 * register with the EventHub for any events that the plugin wants to handle.
+	 */
 	public abstract void init();
 	
 	/**
@@ -67,19 +76,30 @@ abstract public class AnalysisPlugin
 		return EventListener.USER_PRIORITY;
 	}
 	
+	/**
+	 * A text description of the plugin, as used by the "plugins" console command.
+	 * This can be overridden.
+	 */
 	public String getDescription()
 	{
 		return getClass().getName() + ", priority " + getPriority();
 	}
 	
+	/**
+	 * Process and remove any argv options that are handled by this plugin.
+	 */
 	public void processArgs(List<String> argv)
 	{
-		return;			// Process any command line -options used
+		return;
 	}
 	
+	/**
+	 * Print any command line -options and their usage. This is used by the
+	 * -? or -help options to list what is available. This typically uses println.
+	 */
 	public void usage()
 	{
-		return;			// List usage of any command line -options used
+		return;
 	}
 	
 	/**
@@ -100,6 +120,10 @@ abstract public class AnalysisPlugin
 		return new HelpList();
 	}
 
+	/**
+	 * A convenience method for turning exceptions into a List<VDMMessage>, returned
+	 * by handleEvent methods (see EventListener interface).
+	 */
 	protected List<VDMMessage> errsOf(Throwable e)
 	{
 		List<VDMMessage> errs = new Vector<VDMMessage>();
