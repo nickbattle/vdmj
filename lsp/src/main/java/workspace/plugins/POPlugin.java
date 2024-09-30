@@ -109,7 +109,7 @@ abstract public class POPlugin extends AnalysisPlugin implements EventListener
 			preCheck((CheckPrepareEvent)event);
 			return new RPCMessageList();
 		}
-		if (event instanceof CheckCompleteEvent)
+		else if (event instanceof CheckCompleteEvent)
 		{
 			TCPlugin tc = registry.getPlugin("TC");
 			checkLoadedFiles(tc.getTC());

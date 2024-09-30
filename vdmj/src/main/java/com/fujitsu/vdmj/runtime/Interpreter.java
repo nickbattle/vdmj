@@ -32,12 +32,16 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import com.fujitsu.vdmj.Settings;
+import com.fujitsu.vdmj.ast.expressions.ASTExpression;
+import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
+import com.fujitsu.vdmj.ast.lex.LexNameToken;
+import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.in.definitions.INClassDefinition;
 import com.fujitsu.vdmj.in.definitions.INNamedTraceDefinition;
 import com.fujitsu.vdmj.in.expressions.INExpression;
@@ -46,17 +50,12 @@ import com.fujitsu.vdmj.in.modules.INModule;
 import com.fujitsu.vdmj.in.statements.INStatement;
 import com.fujitsu.vdmj.in.statements.INStatementList;
 import com.fujitsu.vdmj.lex.Dialect;
-import com.fujitsu.vdmj.ast.expressions.ASTExpression;
-import com.fujitsu.vdmj.ast.lex.LexIdentifierToken;
 import com.fujitsu.vdmj.lex.LexLocation;
-import com.fujitsu.vdmj.ast.lex.LexNameToken;
-import com.fujitsu.vdmj.ast.lex.LexToken;
 import com.fujitsu.vdmj.lex.LexTokenReader;
 import com.fujitsu.vdmj.lex.Token;
 import com.fujitsu.vdmj.messages.Console;
 import com.fujitsu.vdmj.messages.ConsoleWriter;
 import com.fujitsu.vdmj.messages.VDMErrorsException;
-import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.scheduler.ResourceScheduler;
 import com.fujitsu.vdmj.scheduler.SchedulableThread;
 import com.fujitsu.vdmj.syntax.ExpressionReader;
@@ -313,17 +312,6 @@ abstract public class Interpreter
 	 * Get a list of all source files.
 	 */
 	abstract public Set<File> getSourceFiles();
-
-	/**
-	 * Get a list of proof obligations for the loaded specification.
-	 * 
-	 * This is @deprecated in favour of the POPlugin getProofObligations() method.
-	 *
-	 * @return A list of POs.
-	 * @throws Exception 
-	 */
-	@Deprecated
-	abstract public ProofObligationList getProofObligations() throws Exception;
 
 	/**
 	 * Find a statement by file name and line number.
@@ -717,15 +705,9 @@ abstract public class Interpreter
 
 	public abstract List<Object> runOneTrace(INClassDefinition classDefinition, CallSequence test, boolean debug);
 	
-	/** @deprecated in favour of TCPlugin.getTC() */
-	@Deprecated
-	abstract public <T extends List<?>> T getTC();
-	
-	/** @deprecated in favour of INPlugin.getIN() */
-	@Deprecated
-	abstract public <T extends List<?>> T getIN();
-	
-	/** @deprecated in favour of POPlugin.getPO() */
-	@Deprecated
-	abstract public <T extends List<?>> T getPO();
+	/**
+	 * Return the executable AST that is loaded in the interpreter, rather than the
+	 * one that is loaded in the INPlugin (ie. differences mean that the spec has changed).
+	 */
+	public abstract <T> T getIN();
 }

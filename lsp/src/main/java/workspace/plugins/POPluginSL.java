@@ -51,6 +51,7 @@ public class POPluginSL extends POPlugin
 		super.preCheck(ev);
 		poModuleList = null;
 		obligationList = null;
+		messagehub.clearPluginMessages(this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -72,7 +73,6 @@ public class POPluginSL extends POPlugin
 	{
 		if (obligationList == null)
 		{
-			messagehub.clearPluginMessages(this);
 			POAnnotation.init();
 			obligationList = poModuleList.getProofObligations();
 			POAnnotation.close();

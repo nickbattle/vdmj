@@ -11,8 +11,8 @@ function usage()
     exit 1
 }
 
-MVERSION="4.6.0"
-PVERSION="4.6.0-P"
+MVERSION="4.7.0-SNAPSHOT"
+PVERSION="4.7.0-P-SNAPSHOT"
 VERSION=$MVERSION
 
 # The Maven repository directory containing jars
