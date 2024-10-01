@@ -88,6 +88,7 @@ public class QuickCheckLSPPlugin extends AnalysisPlugin
 		}
 		
 		DAPPlugin manager = DAPPlugin.getInstance();
+		manager.refreshInterpreter();
 		Interpreter interpreter = manager.getInterpreter();
 		
 		if (interpreter.getInitialContext() == null)	// eg. from unit tests
