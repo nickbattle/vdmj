@@ -49,6 +49,8 @@ echo "**************************** Updating VSIX! ****************************"
     	$EXTRACT/$VDMJ/plugins/quickcheck-\*.jar
     
     unzip -q "$VSIX" "$EXTRACT/$VDMJ/*"
+    
+    mkdir $EXTRACT/$VDMJ $EXTRACT/$VDMJ/annotations $EXTRACT/$VDMJ/libs $EXTRACT/$VDMJ/plugins
 
     cp -vf vdmj-$VERSION.jar $EXTRACT/$VDMJ
     cp -vf lsp-$VERSION.jar $EXTRACT/$VDMJ
