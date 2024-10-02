@@ -50,7 +50,7 @@ echo "**************************** Updating VSIX! ****************************"
     
     unzip -q "$VSIX" "$EXTRACT/$VDMJ/*"
     
-    mkdir $EXTRACT/$VDMJ $EXTRACT/$VDMJ/annotations $EXTRACT/$VDMJ/libs $EXTRACT/$VDMJ/plugins
+    mkdir -p $EXTRACT/$VDMJ/annotations $EXTRACT/$VDMJ/libs $EXTRACT/$VDMJ/plugins
 
     cp -vf vdmj-$VERSION.jar $EXTRACT/$VDMJ
     cp -vf lsp-$VERSION.jar $EXTRACT/$VDMJ
