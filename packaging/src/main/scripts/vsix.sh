@@ -40,13 +40,15 @@ echo "**************************** Updating VSIX! ****************************"
     cd "$DISTRIBUTION"
     rm -rf extension
     EXTRACT="extension/resources/jars"
+    
+    zip -d "$VSIX" \
+        $EXTRACT/$VDMJ/vdmj-\*.jar \
+    	$EXTRACT/$VDMJ/lsp-\*.jar \
+    	$EXTRACT/$VDMJ/annotations/annotations-\*.jar \
+    	$EXTRACT/$VDMJ/libs/stdlib-\*.jar \
+    	$EXTRACT/$VDMJ/plugins/quickcheck-\*.jar
+    
     unzip -q "$VSIX" "$EXTRACT/$VDMJ/*"
-
-    rm -vf $EXTRACT/$VDMJ/vdmj-*.jar
-    rm -vf $EXTRACT/$VDMJ/lsp-*.jar
-    rm -vf $EXTRACT/$VDMJ/annotations/annotations-*.jar
-    rm -vf $EXTRACT/$VDMJ/libs/stdlib-*.jar
-    rm -vf $EXTRACT/$VDMJ/plugins/quickcheck-*.jar
 
     cp -vf vdmj-$VERSION.jar $EXTRACT/$VDMJ
     cp -vf lsp-$VERSION.jar $EXTRACT/$VDMJ
