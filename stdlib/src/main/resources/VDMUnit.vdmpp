@@ -64,11 +64,13 @@
 
 -- forward definition of java.lang.Throwable
 -- do not code generate (but import from Java library)
+-- @NoPOG - do not generate obligations for this class
 class Throwable
 end Throwable
 
 -- forward definition of java.lang.Error
 -- do not code generate (but import from Java library)
+-- @NoPOG - do not generate obligations for this class
 class Error is subclass of Throwable
 
 instance variables
@@ -97,6 +99,7 @@ end Error
 -- forward definition of junit.framework.AssertionFailedError
 --
 
+-- @NoPOG - do not generate obligations for this class
 class AssertionFailedError is subclass of Error
 
 operations
@@ -112,6 +115,7 @@ end AssertionFailedError
 -- forward definition of junit.framework.Assert
 --
 
+-- @NoPOG - do not generate obligations for this class
 class Assert
 
 operations
@@ -143,6 +147,7 @@ end Assert
 -- forward definition of junit.framework.Test
 --
 
+-- @NoPOG - do not generate obligations for this class
 class Test is subclass of Assert
 
 instance variables
@@ -168,6 +173,7 @@ end Test
 -- forward definition of junit.framework.TestCase
 --
 
+-- @NoPOG - do not generate obligations for this class
 class TestCase is subclass of Test
 
 operations
@@ -263,6 +269,7 @@ end TestCase
 -- forward definition of junit.framework.TestSuite
 --
 
+-- @NoPOG - do not generate obligations for this class
 class TestSuite is subclass of Test
 
 instance variables
@@ -363,6 +370,7 @@ end TestSuite
 -- forward definition of junit.framework.TestListener
 --
 
+-- @NoPOG - do not generate obligations for this class
 class TestListener
 
 operations
@@ -390,6 +398,7 @@ end TestListener
 -- forward definition of junit.framework.TestResult
 --
 
+-- @NoPOG - do not generate obligations for this class
 class TestResult
 
 types
@@ -555,6 +564,7 @@ end TestResult
 
 
 
+-- @NoPOG - do not generate obligations for this class
 class TestRunner
 
 operations
