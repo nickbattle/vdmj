@@ -68,7 +68,7 @@ public class POExplicitOperationDefinition extends PODefinition
 	public final POExplicitFunctionDefinition predef;
 	public final POExplicitFunctionDefinition postdef;
 	public final PODefinitionList paramDefinitions;
-	public final POStateDefinition state;
+	public final POStateDefinition stateDefinition;
 	public final TCType actualResult;
 	public final boolean isConstructor;
 
@@ -80,6 +80,7 @@ public class POExplicitOperationDefinition extends PODefinition
 		POExplicitFunctionDefinition postdef,
 		PODefinitionList paramDefinitions,
 		POStateDefinition state,
+		POClassDefinition classDefinition,
 		TCType actualResult, boolean isConstructor)
 	{
 		super(name.getLocation(), name);
@@ -93,7 +94,8 @@ public class POExplicitOperationDefinition extends PODefinition
 		this.predef = predef;
 		this.postdef = postdef;
 		this.paramDefinitions = paramDefinitions;
-		this.state = state;
+		this.stateDefinition = state;
+		this.classDefinition = classDefinition;
 		this.actualResult = actualResult;
 		this.isConstructor = isConstructor;
 	}
@@ -161,9 +163,26 @@ public class POExplicitOperationDefinition extends PODefinition
 			ctxt.pop();
 		}
 		
-		ctxt.push(new POOperationDefinitionContext(this, (precondition != null), state, true));
-		obligations.addAll(body.getProofObligations(ctxt, env));
-		ctxt.pop();
+		if (stateDefinition != null)
+		{
+			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), stateDefinition, true));
+			obligations.addAll(body.getProofObligations(ctxt, env));
+			ctxt.pop();
+		}
+		else if (classDefinition != null)
+		{
+			ctxt.push(new PONoCheckContext());
+			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), classDefinition, true));
+			obligations.addAll(body.getProofObligations(ctxt, env));
+			ctxt.pop();
+			ctxt.pop();
+		}
+		else
+		{
+			ctxt.push(new POOperationDefinitionContext(this, (precondition != null), null, true));
+			obligations.addAll(body.getProofObligations(ctxt, env));
+			ctxt.pop();
+		}
 
 		if (isConstructor &&
 			classDefinition != null &&

@@ -30,7 +30,9 @@ import java.util.Map;
 import java.util.Vector;
 
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
+import com.fujitsu.vdmj.po.definitions.POClassDefinition;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
+import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
@@ -132,10 +134,16 @@ abstract public class POContext
 			sep = ", ";
 		}
 
-		if (state != null)
+		if (state instanceof POStateDefinition)
 		{
 			call.append(sep);
 			call.append(state.toPattern());
+		}
+		else if (state instanceof POClassDefinition)
+		{
+			POClassDefinition cdef = (POClassDefinition)state;
+			call.append(sep);
+			call.append(cdef.toNew());
 		}
 		
 		call.append(")");

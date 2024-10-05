@@ -98,9 +98,36 @@ public class POClassDefinition extends PODefinition
 
 		for (PODefinition field: definitions)
 		{
-			sb.append(sep);
-			sb.append(field.name.getName());
-			sep = ", ";
+			if (field instanceof POInstanceVariableDefinition)
+			{
+				sb.append(sep);
+				sb.append(field.name.getName());
+				sb.append(" |-> ");
+				sb.append(field.name.getName());
+				sep = ", ";
+			}
+		}
+		
+		sb.append(")");
+		return sb.toString();
+	}
+	
+	public String toNew()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("new ");
+		sb.append(name);
+		sb.append("(");
+		String sep = "";
+
+		for (PODefinition field: definitions)
+		{
+			if (field instanceof POInstanceVariableDefinition)
+			{
+				sb.append(sep);
+				sb.append(field.name.getName());
+				sep = ", ";
+			}
 		}
 		
 		sb.append(")");

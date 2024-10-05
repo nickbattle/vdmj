@@ -71,7 +71,7 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	
 	/**
 	 * For a state definition S, return a pattern like mk_S(a, b, ...) where the field patterns
-	 * are the names of the state fields. Similarly with objects, using "obj_" patterns.
+	 * are the names of the state fields. Similarly with objects, using "obj_C" patterns.
 	 */
 	public String toPattern()
 	{
