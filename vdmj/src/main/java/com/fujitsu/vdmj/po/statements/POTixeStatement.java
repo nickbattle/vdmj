@@ -64,6 +64,12 @@ public class POTixeStatement extends POStatement
 	}
 
 	@Override
+	public boolean stopsPOG()
+	{
+		return true;
+	}
+
+	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseTixeStatement(this, arg);

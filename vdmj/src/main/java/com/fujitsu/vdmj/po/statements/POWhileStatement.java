@@ -62,6 +62,12 @@ public class POWhileStatement extends POStatement
 	}
 
 	@Override
+	public boolean stopsPOG()
+	{
+		return true;
+	}
+
+	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseWhileStatement(this, arg);

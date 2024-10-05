@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -53,9 +54,18 @@ public class POAlwaysStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
+		ctxt.push(new PONoCheckContext());
 		ProofObligationList obligations = always.getProofObligations(ctxt, env);
+		ctxt.pop();
+		
 		obligations.addAll(body.getProofObligations(ctxt, env));
 		return obligations;
+	}
+	
+	@Override
+	public boolean stopsPOG()
+	{
+		return true;
 	}
 
 	@Override

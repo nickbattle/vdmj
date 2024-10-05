@@ -31,6 +31,7 @@ import com.fujitsu.vdmj.po.patterns.POSetBind;
 import com.fujitsu.vdmj.po.patterns.POTypeBind;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.SeqMemberObligation;
 import com.fujitsu.vdmj.pog.SetMemberObligation;
@@ -86,7 +87,10 @@ public class POTrapStatement extends POStatement
 			list.add(new SeqMemberObligation(bind.pattern.getMatchingExpression(), bind.sequence, ctxt));
 		}
 
+		ctxt.push(new PONoCheckContext());
 		list.addAll(with.getProofObligations(ctxt, env));
+		ctxt.pop();
+		
 		list.addAll(body.getProofObligations(ctxt, env));
 		return list;
 	}

@@ -27,6 +27,7 @@ package com.fujitsu.vdmj.po.statements;
 import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.PONoCheckContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -35,6 +36,7 @@ abstract public class POSimpleBlockStatement extends POStatement
 {
 	private static final long serialVersionUID = 1L;
 	public final POStatementList statements;
+	private boolean stoppedPOG;
 
 	public POSimpleBlockStatement(LexLocation location, POStatementList statements)
 	{
@@ -68,13 +70,28 @@ abstract public class POSimpleBlockStatement extends POStatement
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
 		ProofObligationList obligations = new ProofObligationList();
+		stoppedPOG = false;
 
 		for (POStatement stmt: statements)
 		{
 			obligations.addAll(stmt.getProofObligations(ctxt, env));
+			
+			if (!stoppedPOG && stmt.stopsPOG())
+			{
+				ctxt.push(new PONoCheckContext());
+				stoppedPOG = true;
+			}
 		}
+		
+		if (stoppedPOG) ctxt.pop();
 
 		return obligations;
+	}
+
+	@Override
+	public boolean stopsPOG()
+	{
+		return stoppedPOG;	// Something in this block is dodgy
 	}
 
 	@Override

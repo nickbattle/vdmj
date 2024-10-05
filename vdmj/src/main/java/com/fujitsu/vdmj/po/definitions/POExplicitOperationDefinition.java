@@ -40,6 +40,7 @@ import com.fujitsu.vdmj.pog.POContextStack;
 import com.fujitsu.vdmj.pog.POFunctionDefinitionContext;
 import com.fujitsu.vdmj.pog.POImpliesContext;
 import com.fujitsu.vdmj.pog.PONoCheckContext;
+import com.fujitsu.vdmj.pog.POOperationDefinitionContext;
 import com.fujitsu.vdmj.pog.ParameterPatternObligation;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.pog.StateInvariantObligation;
@@ -160,8 +161,9 @@ public class POExplicitOperationDefinition extends PODefinition
 			ctxt.pop();
 		}
 		
-		ctxt.push(new PONoCheckContext());
+		ctxt.push(new POOperationDefinitionContext(this, false, state, true));
 		obligations.addAll(body.getProofObligations(ctxt, env));
+		ctxt.pop();
 
 		if (isConstructor &&
 			classDefinition != null &&
@@ -176,8 +178,6 @@ public class POExplicitOperationDefinition extends PODefinition
 			obligations.add(new SubTypeObligation(this, actualResult, ctxt));
 		}
 		
-		ctxt.pop();
-
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);
 		return obligations;
 	}

@@ -100,6 +100,12 @@ public class POForPatternBindStatement extends POStatement
 	}
 
 	@Override
+	public boolean stopsPOG()
+	{
+		return true;
+	}
+
+	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
 	{
 		return visitor.caseForPatternBindStatement(this, arg);

@@ -190,7 +190,6 @@ public class POImplicitOperationDefinition extends PODefinition
 		
 		if (body != null)
 		{
-			ctxt.push(new PONoCheckContext());
 			obligations.addAll(body.getProofObligations(ctxt, env));
 
 			if (isConstructor &&
@@ -205,14 +204,12 @@ public class POImplicitOperationDefinition extends PODefinition
 			{
 				obligations.add(new SubTypeObligation(this, actualResult, ctxt));
 			}
-			
-			ctxt.pop();
 		}
 		else
 		{
 			if (postcondition != null && Settings.dialect == Dialect.VDM_SL)
 			{
-				ctxt.push(new POOperationDefinitionContext(this, false, state));
+				ctxt.push(new POOperationDefinitionContext(this, false, state, false));
 				obligations.add(new SatisfiabilityObligation(this, state, ctxt));
 				ctxt.pop();
 			}

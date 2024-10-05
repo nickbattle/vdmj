@@ -83,6 +83,15 @@ public abstract class POStatement extends PONode implements Serializable
 	}
 
 	/**
+	 * If true, this statement prevents the POG from generating checkable obligations
+	 * beyond this point in the block - for example, assignments and loops.
+	 */
+	public boolean stopsPOG()
+	{
+		return false;
+	}
+
+	/**
 	 * Implemented by all definitions to allow visitor processing.
 	 */
 	abstract public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg);
