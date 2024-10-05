@@ -40,9 +40,8 @@ public class StateInvariantObligation extends ProofObligation
 		super(ass.location, POType.STATE_INVARIANT, ctxt);
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append("After ");
-		sb.append(ass);
-		sb.append("\n");
+		// Note a StateDesignator is not a pattern, so this may not work!
+		sb.append("let " + ass.target + " = " + ass.exp + " in\n");
 
 		if (ass.classDefinition != null)
 		{
