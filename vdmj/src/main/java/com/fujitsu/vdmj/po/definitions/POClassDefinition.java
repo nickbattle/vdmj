@@ -88,6 +88,26 @@ public class POClassDefinition extends PODefinition
 	}
 
 	@Override
+	public String toPattern()
+	{
+		StringBuilder sb = new StringBuilder();
+		sb.append("obj_");
+		sb.append(name);
+		sb.append("(");
+		String sep = "";
+
+		for (PODefinition field: definitions)
+		{
+			sb.append(sep);
+			sb.append(field.name.getName());
+			sep = ", ";
+		}
+		
+		sb.append(")");
+		return sb.toString();
+	}
+
+	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment publicEnv)
 	{
 		ProofObligationList list =

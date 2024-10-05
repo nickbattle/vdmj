@@ -32,6 +32,7 @@ import java.util.Vector;
 import com.fujitsu.vdmj.po.annotations.POAnnotationList;
 import com.fujitsu.vdmj.po.definitions.PODefinition;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
@@ -114,6 +115,30 @@ abstract public class POContext
 			call.append("(" + plist.removeIgnorePatterns() + ")");
 		}
 
+		return call.toString();
+	}
+	
+	protected String preconditionCall(TCNameToken name, POPatternList paramPatternList, PODefinition state)
+	{
+		StringBuilder call = new StringBuilder();
+		call.append(name.getPreName(name.getLocation()));
+		call.append("(");
+		String sep = "";
+		
+		for (POPattern param: paramPatternList)
+		{
+			call.append(sep);
+			call.append(param.removeIgnorePatterns());
+			sep = ", ";
+		}
+
+		if (state != null)
+		{
+			call.append(sep);
+			call.append(state.toPattern());
+		}
+		
+		call.append(")");
 		return call.toString();
 	}
 

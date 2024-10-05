@@ -161,7 +161,7 @@ public class POExplicitOperationDefinition extends PODefinition
 			ctxt.pop();
 		}
 		
-		ctxt.push(new POOperationDefinitionContext(this, false, state, true));
+		ctxt.push(new POOperationDefinitionContext(this, (precondition != null), state, true));
 		obligations.addAll(body.getProofObligations(ctxt, env));
 		ctxt.pop();
 

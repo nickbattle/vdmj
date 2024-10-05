@@ -34,7 +34,6 @@ import com.fujitsu.vdmj.po.definitions.POStateDefinition;
 import com.fujitsu.vdmj.po.patterns.POPattern;
 import com.fujitsu.vdmj.po.patterns.POPatternList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
-import com.fujitsu.vdmj.tc.types.TCField;
 import com.fujitsu.vdmj.tc.types.TCOperationType;
 import com.fujitsu.vdmj.tc.types.TCType;
 
@@ -56,7 +55,7 @@ public class POOperationDefinitionContext extends POContext
 		this.deftype = definition.type;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.parameterPatterns;
-		this.precondition = preconditionCall(name, null, paramPatternList, definition.precondition);
+		this.precondition = preconditionCall(name, paramPatternList, stateDefinition);
 		this.stateDefinition = stateDefinition;
 		this.definition = definition;
 		this.expandState = expandState;
@@ -69,7 +68,7 @@ public class POOperationDefinitionContext extends POContext
 		this.deftype = definition.type;
 		this.addPrecond = precond;
 		this.paramPatternList = definition.getParamPatternList();
-		this.precondition = preconditionCall(name, null, paramPatternList, definition.precondition);
+		this.precondition = preconditionCall(name, paramPatternList, stateDefinition);
 		this.stateDefinition = stateDefinition;
 		this.definition = definition;
 		this.expandState = expandState;
@@ -132,19 +131,8 @@ public class POOperationDefinitionContext extends POContext
 			
 			if (expandState)
 			{
-				sb.append("mk_");
-				sb.append(def.name.getName());
-				sb.append("(");
-				String sep = "";
-				
-				for (TCField field: def.fields)
-				{
-					sb.append(sep);
-					sb.append(field.tag);
-					sep = ", ";
-				}
-				
-				sb.append("):");
+				sb.append(def.toPattern());
+				sb.append(":");
 				sb.append(def.name.getName());
 			}
 			else
@@ -159,19 +147,8 @@ public class POOperationDefinitionContext extends POContext
 
 			if (expandState)
 			{
-				sb.append("obj_");
-				sb.append(def.name.getName());
-				sb.append("(");
-				String sep = "";
-				
-				for (PODefinition field: def.definitions)
-				{
-					sb.append(sep);
-					sb.append(field.name.getName());
-					sep = ", ";
-				}
-				
-				sb.append("):");
+				sb.append(def.toPattern());
+				sb.append(":");
 				sb.append(def.name.getName());
 			}
 			else
