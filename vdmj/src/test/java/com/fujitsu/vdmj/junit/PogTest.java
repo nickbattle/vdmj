@@ -144,8 +144,8 @@ public class PogTest extends TestCase
 		/* 78 */ "(forall mk_(n, x):(nat1) * (nat1) &\n  (not (n < 2) =>\n    ((n - 1) > 0) and ((x - 1) > 0)))\n",
 		/* 79 */ "(forall mk_(n, x):(nat1) * (nat1) &\n  (not (n < 2) =>\n    (let lhs = id3(mk_(n, x)), rhs = id3(mk_((n - 1), (x - 1))) in if lhs.#1 <> rhs.#1 then lhs.#1 > rhs.#1 else lhs.#2 > rhs.#2)))\n",
 		/* 80 */ "(forall i:int, obj_A(iv |-> iv):A &\n  1 in set dom m)\n",
-		/* 81 */ "(forall i:int, obj_A(iv |-> iv):A &\n  1 in set dom m)\n",
-		/* 82 */ "(forall i:int, obj_A(iv |-> iv):A &\n  2 in set dom m)\n",
+		/* 81 */ "(forall i:int, obj_A(iv |-> iv):A &\n  ((m(1) < 10) =>\n    1 in set dom m))\n",
+		/* 82 */ "(forall i:int, obj_A(iv |-> iv):A &\n  (not (m(1) < 10) =>\n    2 in set dom m))\n",
 		/* 83 */ "(forall i:int, obj_A(iv |-> iv):A &\n  3 in set dom m)\n",
 		/* 84 */ "(forall obj_A(iv |-> iv):A &\n  while (x > 0) do ...)\n",
 		/* 85 */ "(forall obj_A(iv |-> iv):A &\n  let iv = (iv + 1) in (iv < 10))\n"

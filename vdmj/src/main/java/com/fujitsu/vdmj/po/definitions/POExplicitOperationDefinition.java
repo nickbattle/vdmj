@@ -194,7 +194,9 @@ public class POExplicitOperationDefinition extends PODefinition
 		if (!isConstructor &&
 			!TypeComparator.isSubType(actualResult, type.result))
 		{
+			ctxt.push(new PONoCheckContext());
 			obligations.add(new SubTypeObligation(this, actualResult, ctxt));
+			ctxt.pop();
 		}
 		
 		if (annotations != null) annotations.poAfter(this, obligations, ctxt);

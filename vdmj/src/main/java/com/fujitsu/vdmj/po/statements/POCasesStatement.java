@@ -93,6 +93,24 @@ public class POCasesStatement extends POStatement
 
 		return obligations;
 	}
+	
+	@Override
+	public boolean stopsPOG()
+	{
+		boolean result = false;
+		
+		for (POCaseStmtAlternative alt: cases)
+		{
+			result = result || alt.statement.stopsPOG();
+		}
+
+		if (others != null)
+		{
+			result = result || others.stopsPOG();
+		}
+		
+		return result;
+	}
 
 	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)

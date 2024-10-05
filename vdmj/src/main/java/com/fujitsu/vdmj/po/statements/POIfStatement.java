@@ -28,6 +28,9 @@ import com.fujitsu.vdmj.lex.LexLocation;
 import com.fujitsu.vdmj.po.expressions.POExpression;
 import com.fujitsu.vdmj.po.statements.visitors.POStatementVisitor;
 import com.fujitsu.vdmj.pog.POContextStack;
+import com.fujitsu.vdmj.pog.POImpliesContext;
+import com.fujitsu.vdmj.pog.PONoCheckContext;
+import com.fujitsu.vdmj.pog.PONotImpliesContext;
 import com.fujitsu.vdmj.pog.ProofObligationList;
 import com.fujitsu.vdmj.typechecker.Environment;
 
@@ -38,6 +41,8 @@ public class POIfStatement extends POStatement
 	public final POStatement thenStmt;
 	public final POElseIfStatementList elseList;
 	public final POStatement elseStmt;
+	
+	private boolean stopsPOG = false;
 
 	public POIfStatement(LexLocation location, POExpression ifExp, POStatement thenStmt,
 		POElseIfStatementList elseList, POStatement elseStmt)
@@ -72,12 +77,26 @@ public class POIfStatement extends POStatement
 	@Override
 	public ProofObligationList getProofObligations(POContextStack ctxt, Environment env)
 	{
+		stopsPOG = ifExp.stopsPOG();
+		
+		if (stopsPOG) ctxt.push(new PONoCheckContext());
 		ProofObligationList obligations = ifExp.getProofObligations(ctxt, env);
+		ctxt.push(new POImpliesContext(ifExp));
 		obligations.addAll(thenStmt.getProofObligations(ctxt, env));
+		ctxt.pop();
+		if (stopsPOG) ctxt.pop();
+
+		ctxt.push(new PONotImpliesContext(ifExp));	// not (ifExp) =>
 
 		for (POElseIfStatement stmt: elseList)
 		{
+			stopsPOG = stopsPOG || stmt.elseIfExp.stopsPOG();
+			
+			if (stopsPOG) ctxt.push(new PONoCheckContext());
 			obligations.addAll(stmt.getProofObligations(ctxt, env));
+			if (stopsPOG) ctxt.pop();
+
+			ctxt.push(new PONotImpliesContext(stmt.elseIfExp));
 		}
 
 		if (elseStmt != null)
@@ -85,7 +104,19 @@ public class POIfStatement extends POStatement
 			obligations.addAll(elseStmt.getProofObligations(ctxt, env));
 		}
 
+		for (int i=0; i<elseList.size(); i++)
+		{
+			ctxt.pop();
+		}
+
+		ctxt.pop();
 		return obligations;
+	}
+	
+	@Override
+	public boolean stopsPOG()
+	{
+		return stopsPOG;
 	}
 
 	@Override

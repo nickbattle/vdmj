@@ -46,6 +46,12 @@ public class PODurationStatement extends POStatement
 	{
 		return "duration (" + duration + ") " + statement;
 	}
+	
+	@Override
+	public boolean stopsPOG()
+	{
+		return duration.stopsPOG();
+	}
 
 	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)

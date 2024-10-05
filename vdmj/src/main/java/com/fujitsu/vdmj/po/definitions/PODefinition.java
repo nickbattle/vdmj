@@ -37,6 +37,7 @@ import com.fujitsu.vdmj.tc.lex.TCNameList;
 import com.fujitsu.vdmj.tc.lex.TCNameToken;
 import com.fujitsu.vdmj.tc.types.TCType;
 import com.fujitsu.vdmj.typechecker.Environment;
+import com.fujitsu.vdmj.typechecker.NameScope;
 
 /**
  * The abstract parent of all definitions. A definition can represent a data
@@ -51,6 +52,9 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	/** The name of the object being defined. */
 	public final TCNameToken name;
 	
+	/** The scope of the name */
+	public NameScope nameScope = null;
+	
 	/** A pointer to the enclosing class definition, if any. */
 	public POClassDefinition classDefinition = null;	// Set in subclass constructors.
 	
@@ -64,6 +68,11 @@ public abstract class PODefinition extends PONode implements Serializable, Compa
 	{
 		super(location);
 		this.name = tcNameToken;
+	}
+	
+	public void setNameScope(NameScope scope)
+	{
+		this.nameScope = scope;
 	}
 
 	@Override

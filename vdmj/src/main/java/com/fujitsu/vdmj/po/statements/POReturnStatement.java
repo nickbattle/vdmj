@@ -60,6 +60,17 @@ public class POReturnStatement extends POStatement
 
 		return obligations;
 	}
+	
+	@Override
+	public boolean stopsPOG()
+	{
+		if (expression != null)
+		{
+			return expression.stopsPOG();
+		}
+		
+		return super.stopsPOG();
+	}
 
 	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)

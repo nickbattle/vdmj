@@ -46,6 +46,12 @@ public class POCyclesStatement extends POStatement
 	{
 		return "cycles (" + cycles + ") " + statement;
 	}
+	
+	@Override
+	public boolean stopsPOG()
+	{
+		return cycles.stopsPOG();
+	}
 
 	@Override
 	public <R, S> R apply(POStatementVisitor<R, S> visitor, S arg)
