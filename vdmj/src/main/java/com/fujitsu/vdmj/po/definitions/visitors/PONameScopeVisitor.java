@@ -24,6 +24,7 @@
 
 package com.fujitsu.vdmj.po.definitions.visitors;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import com.fujitsu.vdmj.po.PONode;
@@ -63,12 +64,12 @@ public class PONameScopeVisitor extends POLeafDefinitionVisitor<PONode, Set<PONo
 	@Override
 	protected Set<PONode> newCollection()
 	{
-		return null;
+		return new HashSet<PONode>();
 	}
 
 	@Override
 	public Set<PONode> caseDefinition(PODefinition node, Object arg)
 	{
-		return null;
+		return newCollection();
 	}
 }

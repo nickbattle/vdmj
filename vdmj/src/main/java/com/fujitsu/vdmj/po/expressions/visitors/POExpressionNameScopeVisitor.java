@@ -30,6 +30,7 @@ import java.util.Set;
 import com.fujitsu.vdmj.po.PONode;
 import com.fujitsu.vdmj.po.POVisitorSet;
 import com.fujitsu.vdmj.po.expressions.POExpression;
+import com.fujitsu.vdmj.po.expressions.POVariableExpression;
 
 /**
  * A visitor set to explore the PO tree and update the NameScopes accessed.
@@ -39,6 +40,12 @@ public class POExpressionNameScopeVisitor extends POLeafExpressionVisitor<PONode
 	public POExpressionNameScopeVisitor(POVisitorSet<PONode, Set<PONode>, Object> visitors)
 	{
 		this.visitorSet = visitors;
+	}
+	
+	@Override
+	public Set<PONode> caseVariableExpression(POVariableExpression node, Object arg)
+	{
+		return super.caseVariableExpression(node, arg);
 	}
 	
 	@Override
